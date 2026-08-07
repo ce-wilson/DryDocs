@@ -22,11 +22,14 @@ Refusals (each is a contract, not a warning):
   (``folder/job_name``) is refused — canonical keys, not invented ids.
 - **Trust boundary** (D2): the client must be bound to ``drydocs`` —
   :class:`TrustBoundaryError` otherwise. Never ``ddcontext``.
-- **Gate-bound vocabulary**: the four rel labels are registered ``status:
-  planned`` (``model.VOCAB_IDS``); a live load raises
-  :class:`GateBoundVocabularyError` until the HITL gate flips them ``active``
+- **Gate-bound vocabulary**: every rel label a load writes is checked against
+  its registered status (``model.VOCAB_IDS`` / ``RUA_VOCAB_IDS``); a live
+  load raises :class:`GateBoundVocabularyError` for any label not ``active``
   in ``relationship_vocabulary.yaml``. The gate cannot be reasoned around in
-  code — it is a registry read.
+  code — it is a registry read, PER LABEL: gate rua-load-shapes (SIGNED OFF
+  2026-08-07, applied at G55) activated m3_invokes / m7_uses_artifact /
+  m3_reads_from / m3_writes_to, while m3_triggers stays planned and still
+  refuses.
 
 Node mechanics: ControlMJob endpoints are **MATCHed, never MERGEd** — the M3
 load owns those nodes (a lineage-created job stub would violate the m3-verify
@@ -66,6 +69,7 @@ from typing import Any
 
 import drydocs_core.ontology as _core_ontology
 from drydocs_core import yaml_fragments
+from drydocs_core.ontology.swo_adapter import EXTENSION_LANGUAGE_IRI
 
 from .model import VOCAB_IDS, LineageGraph
 
@@ -517,3 +521,457 @@ def write_curated(
         if rows and "written" in rows[0]:
             written += rows[0]["written"]
     return written
+
+
+# --- the rua curated load (G23; gate rua-load-shapes, SIGNED OFF 2026-08-07) ------
+#
+# Loads what the rua chain staged (G20 inventory + G24 repo seam), EXACTLY per
+# the signed rulings and nothing beyond them:
+#
+# - :Script MERGEd on the §D1 key — the NORMALIZED ABSOLUTE PATH (mechanical
+#   only: duplicate slashes collapsed, trailing slash stripped, relative or
+#   ..-bearing paths counted malformed and never loaded; NO symlink
+#   resolution, NO case folding). The URN urn:drydocs:script:{path} is a
+#   RENDER stamped as a property, never the key (§G1: identity is a business
+#   key). A profile IS a :Script with script_role='profile' (§C2(i)).
+# - :DataAsset for the directory records (rua_path), MERGEd on the D1 proxy
+#   URN. Directory `owner` stays a PLAIN PROPERTY: §C1's attribution edge is
+#   planned and BUILD-BLOCKED on K17 — no :AppUser is minted or matched here.
+# - :SourceOccurrence per staged observation (§D2's reified grain), MERGEd on
+#   a deterministic occurrenceId (urn + origin + locator), each anchored
+#   (:SourceOccurrence)-[:OCCURRENCE_OF]->(:Script) — g22_occurrence_of, the
+#   transcribed §D2 prov:specializationOf binding. Server locator = host+path
+#   (host = the §D3-ruled rua_fqdn spelling, falling back to hostname/bundle
+#   for the ID only — resolution never uses the fallback); repo locator =
+#   repo+ref+commit+path, joined to the server side on CONTENT HASH (the G24
+#   git blob sha1), never by path. sha256 absence is a real, counted state
+#   (§G2). storage_scope stamps 'unknown' until G56 captures the mount table;
+#   a script whose server occurrences span >1 host under unknown scope is
+#   flagged identity_unconfirmed_across_hosts, never silently merged-as-
+#   confirmed (§D1 + the D-amendment: the honesty lives in the claim layer).
+# - (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path extension
+#   (§C3 — the shared core adapter; the term is OPTIONAL-MATCHed, never
+#   minted: a mapped term missing from the graph means bootstrap has not run).
+#
+# What does NOT load, because the gate held or declined it: NO :AppUser and no
+# m3_delegates_to (§A1 HELD behind K17); no arch_owns_directory edges (§C1
+# planned, K17-blocked); no SOURCES edges (§C2 planned); no ExecutionHost is
+# minted (§D3 — rua mints no second host identity; the loader only RESOLVES
+# rua_fqdn against the deployed executionhost_nodeid key and counts the
+# misses). The meta.txt envelope lands as the plain rua_* capture properties
+# (§D4: the source is a STUB — no audit-envelope fields are written).
+
+_SERVER_ORIGIN = "server-extract"
+_REPO_ORIGIN = "code-repo"
+
+_DUP_SLASH_RE = re.compile(r"/{2,}")
+
+_OCCURRENCE_CONSTRAINT = (
+    "CREATE CONSTRAINT sourceoccurrence_id IF NOT EXISTS "
+    "FOR (o:SourceOccurrence) REQUIRE o.occurrenceId IS UNIQUE"
+)
+
+_RUA_SCRIPT_MERGE = """\
+UNWIND $rows AS row
+MERGE (s:Script {path: row.path})
+  ON CREATE SET s.created_at = datetime($written_at),
+                s.source     = 'drydocs-lineage',
+                s.kind       = row.kind
+SET s.name         = row.name,
+    s.urn          = row.urn,
+    s.script_role  = coalesce(row.script_role, s.script_role),
+    s.identity_unconfirmed_across_hosts = row.identity_unconfirmed,
+    s.last_seen_at = datetime($written_at)"""
+
+_RUA_ASSET_MERGE = """\
+UNWIND $rows AS row
+MERGE (a:DataAsset {assetId: row.asset_id})
+  ON CREATE SET a.created_at = datetime($written_at),
+                a.source     = 'drydocs-lineage'
+SET a.kind         = row.kind,
+    a.location     = row.location,
+    a += row.props,
+    a.last_seen_at = datetime($written_at)"""
+
+_OCCURRENCE_MERGE = """\
+UNWIND $rows AS row
+MATCH (s:Script {path: row.script_path})
+MERGE (o:SourceOccurrence {occurrenceId: row.occurrence_id})
+  ON CREATE SET o.created_at = datetime($written_at),
+                o.source     = 'drydocs-lineage'
+SET o += row.props,
+    o.last_seen_at = datetime($written_at)
+MERGE (o)-[r:OCCURRENCE_OF]->(s)
+  ON CREATE SET r.first_seen_at = datetime($written_at),
+                r.source        = 'drydocs-lineage',
+                r.vocab_id      = 'g22_occurrence_of'
+SET r.last_seen_at = datetime($written_at)
+RETURN count(r) AS written"""
+
+_ENCODED_IN_MERGE = """\
+UNWIND $rows AS row
+MATCH (s:Script {path: row.script_path})
+OPTIONAL MATCH (lang:OntologyTerm:SwoClass {iri: row.language_iri})
+FOREACH (l IN CASE WHEN lang IS NULL THEN [] ELSE [lang] END |
+  MERGE (s)-[enc:IS_ENCODED_IN]->(l)
+    ON CREATE SET enc.first_seen_at = datetime($written_at),
+                  enc.source        = 'drydocs-lineage',
+                  enc.vocab_id      = 'u1_is_encoded_in'
+  SET enc.last_seen_at = datetime($written_at)
+)
+RETURN sum(CASE WHEN lang IS NULL THEN 0 ELSE 1 END) AS written"""
+
+#: §D3(i): the envelope's captured host meets :ExecutionHost on `nodeid`
+#: DIRECTLY (the deployed P3 UNIQUE key holds FQDNs); a bare hostname is
+#: NEVER matched — binding a script to the wrong server is worse than not
+#: binding it. Read-only: rua mints no second host identity.
+_HOST_RESOLVE = """\
+UNWIND $fqdns AS fqdn
+OPTIONAL MATCH (h:ExecutionHost {nodeid: fqdn})
+RETURN fqdn, h IS NOT NULL AS resolved"""
+
+
+def normalize_script_path(path: str) -> str | None:
+    """§D1 normalization — MECHANICAL ONLY: collapse duplicate slashes, strip
+    the trailing slash; a relative or ``..``-bearing path is malformed
+    (``None`` — the caller counts it). NO symlink resolution and NO case
+    folding: POSIX paths are case-sensitive and nothing on the capture side
+    ever resolved a link, so both would be guesses dressed up as
+    normalization."""
+    p = _DUP_SLASH_RE.sub("/", (path or "").strip())
+    if len(p) > 1:
+        p = p.rstrip("/")
+    if not p.startswith("/") or any(seg == ".." for seg in p.split("/")):
+        return None
+    return p
+
+
+def script_urn(normalized_path: str) -> str:
+    """§D1/§G1: ``urn:drydocs:script:{normalized-abs-path}`` — a deterministic
+    RENDER of the path key, one grammar with the unmanaged-asset URN."""
+    return f"urn:drydocs:script:{normalized_path}"
+
+
+def _occurrence_host(occ: dict) -> tuple[str, str]:
+    """(id_host, resolvable_fqdn) for a server occurrence record.
+
+    ``id_host`` (fqdn → hostname → bundle) only disambiguates the
+    occurrenceId; ``resolvable_fqdn`` is non-empty ONLY for a qualified
+    rua_fqdn — the §D3 rule that a bare hostname is never matched."""
+    fqdn = occ.get("rua_fqdn", "")
+    id_host = fqdn or occ.get("rua_host") or occ.get("rua_bundle", "")
+    return id_host, (fqdn if "." in fqdn else "")
+
+
+@dataclass(frozen=True)
+class RuaWritePlan:
+    """The exact statements the rua load runs — gate/review material (PURE)."""
+
+    statements: tuple[tuple[str, dict[str, Any]], ...]
+    rel_types: tuple[str, ...]  # edge labels planned (subset of OCCURRENCE_OF, IS_ENCODED_IN)
+    scripts: int  # :Script nodes MERGEd (profiles included)
+    profiles: int  # ...of which carry script_role='profile' (§C2)
+    assets: int  # directory :DataAsset nodes MERGEd
+    server_occurrences: int  # §D2 records from the server extract
+    repo_occurrences: int  # §D2 records joined from the repo manifest (hash join)
+    encoded_in: int  # scripts with a seeded language term (§C3)
+    unbound_extensions: int  # scripts with no seeded term — reported, never guessed
+    malformed_paths: int  # §D1 rejections — counted, never loaded
+    hash_missing: int  # server occurrences staged hash-absent (§G2 — a real state)
+    repo_join_uncomputable: int  # repo rows staged but no server copy to hash (G24)
+    multi_host_unconfirmed: int  # scripts flagged identity_unconfirmed_across_hosts
+    hosts: tuple[str, ...]  # distinct qualified fqdns for §D3 write-time resolution
+    hosts_unqualified: int  # server occurrences with no qualified fqdn — unresolvable by rule
+
+
+@dataclass(frozen=True)
+class RuaLoadReport:
+    """What a live rua load did — the counters the acceptance requires read
+    together: the plan's coverage of the staging, the write results, the §D3
+    host resolution, and the G20/G21/G24 extractor counters passed through."""
+
+    plan: RuaWritePlan
+    occurrence_edges_written: int
+    encoded_in_written: int
+    hosts_resolved: int
+    hosts_unresolved: tuple[str, ...]
+    coverage: dict[str, Any]  # G20/G21/G24 counters, passed through verbatim
+
+    def summary(self) -> str:
+        p = self.plan
+        return (
+            f"scripts={p.scripts} (profiles={p.profiles}) assets={p.assets} "
+            f"occurrences={p.server_occurrences}+{p.repo_occurrences} "
+            f"edges={self.occurrence_edges_written} "
+            f"encoded_in={self.encoded_in_written} | "
+            f"hosts: resolved={self.hosts_resolved} "
+            f"unresolved={len(self.hosts_unresolved)} "
+            f"unqualified={p.hosts_unqualified} | "
+            f"counted: malformed_paths={p.malformed_paths} "
+            f"hash_missing={p.hash_missing} "
+            f"unbound_ext={p.unbound_extensions} "
+            f"multi_host_unconfirmed={p.multi_host_unconfirmed} "
+            f"repo_unjoinable={p.repo_join_uncomputable}"
+        )
+
+
+def _repo_occurrence_index(graph: LineageGraph) -> dict[str, list[tuple[Any, tuple]]]:
+    """blob_sha → [(repo node, parsed occurrence)] — the load reads the PARSED
+    records, never the packed staging string (§D2 / ADR 0001)."""
+    from .extractors.code_repo import REPO_SCRIPT_KIND, _occurrences
+
+    index: dict[str, list[tuple[Any, tuple]]] = {}
+    for node in graph.processes.values():
+        if node.kind != REPO_SCRIPT_KIND:
+            continue
+        for occ in _occurrences(node):
+            index.setdefault(occ[3], []).append((node, occ))
+    return index
+
+
+def plan_rua(
+    graph: LineageGraph,
+    *,
+    bundle_dir: str | Path | None = None,
+) -> RuaWritePlan:
+    """Validate the staged rua candidates and return the exact write batches
+    (PURE — the review surface; :func:`write_rua` is the live load).
+
+    ``bundle_dir`` locates the carried-back server copies for the G24 content-
+    hash join of repo occurrences; without it (or without copies) repo rows
+    stay unjoined and are COUNTED, never guessed onto a path."""
+    from .extractors.code_repo import git_blob_sha1
+    from .extractors.rua_inventory import RUA_PATH_KIND, RUA_PROFILE_KIND, RUA_SCRIPT_KIND
+
+    repo_index = _repo_occurrence_index(graph)
+    bundle = Path(bundle_dir) if bundle_dir is not None else None
+
+    script_rows: list[dict[str, Any]] = []
+    occurrence_rows: list[dict[str, Any]] = []
+    encoded_rows: list[dict[str, Any]] = []
+    profiles = 0
+    server_occurrences = 0
+    repo_occurrences = 0
+    unbound_extensions = 0
+    malformed_paths = 0
+    hash_missing = 0
+    repo_join_uncomputable = 0
+    multi_host_unconfirmed = 0
+    hosts: set[str] = set()
+    hosts_unqualified = 0
+
+    for nid in sorted(graph.processes):
+        node = graph.processes[nid]
+        if node.kind not in (RUA_SCRIPT_KIND, RUA_PROFILE_KIND):
+            continue
+        norm = normalize_script_path(node.path)
+        if norm is None:
+            malformed_paths += 1
+            continue
+        urn = script_urn(norm)
+        is_profile = node.kind == RUA_PROFILE_KIND
+
+        node_hosts: set[str] = set()
+        records = node.occurrences or [dict(node.properties, path=node.path)]
+        for occ in records:
+            id_host, fqdn = _occurrence_host(occ)
+            node_hosts.add(id_host)
+            if fqdn:
+                hosts.add(fqdn)
+            else:
+                hosts_unqualified += 1
+            if not occ.get("sha256"):
+                hash_missing += 1
+            props = {k: v for k, v in occ.items() if isinstance(v, str) and v}
+            props["origin"] = _SERVER_ORIGIN
+            props["host"] = id_host
+            props.setdefault("storage_scope", "unknown")  # until G56 lands
+            occurrence_rows.append(
+                {
+                    "script_path": norm,
+                    "occurrence_id": f"{urn}#{_SERVER_ORIGIN}#{id_host}#{norm}",
+                    "props": props,
+                }
+            )
+            server_occurrences += 1
+
+        # G24 hash join: repo occurrences attach on CONTENT HASH, never path
+        if repo_index:
+            copy_rel = node.properties.get("rua_copy", "")
+            content: bytes | None = None
+            if bundle is not None and copy_rel:
+                try:
+                    content = (bundle / copy_rel.lstrip("/")).read_bytes()
+                except OSError:
+                    content = None
+            if content is None:
+                repo_join_uncomputable += 1
+            else:
+                for repo_node, occ in repo_index.get(git_blob_sha1(content), []):
+                    ref, commit, commit_date, blob_sha = occ
+                    occurrence_rows.append(
+                        {
+                            "script_path": norm,
+                            "occurrence_id": (
+                                f"{urn}#{_REPO_ORIGIN}#"
+                                f"{repo_node.properties.get('repo', '')}#"
+                                f"{ref}@{commit}#{repo_node.path}"
+                            ),
+                            "props": {
+                                "origin": _REPO_ORIGIN,
+                                "repo": repo_node.properties.get("repo", ""),
+                                "ref": ref,
+                                "commit": commit,
+                                "commit_date": commit_date,
+                                "path": repo_node.path,
+                                "blob_sha": blob_sha,
+                            },
+                        }
+                    )
+                    repo_occurrences += 1
+
+        unconfirmed = len(node_hosts) > 1  # scope is 'unknown' until G56
+        if unconfirmed:
+            multi_host_unconfirmed += 1
+        if is_profile:
+            profiles += 1
+        script_rows.append(
+            {
+                "path": norm,
+                "urn": urn,
+                "name": node.name,
+                "kind": node.kind,
+                "script_role": "profile" if is_profile else None,
+                "identity_unconfirmed": unconfirmed,
+            }
+        )
+
+        extension = norm[norm.rfind(".") :] if "." in norm.rsplit("/", 1)[-1] else ""
+        iri = EXTENSION_LANGUAGE_IRI.get(extension)
+        if iri:
+            encoded_rows.append({"script_path": norm, "language_iri": iri})
+        else:
+            unbound_extensions += 1
+
+    asset_rows: list[dict[str, Any]] = []
+    for aid in sorted(graph.data_assets):
+        asset = graph.data_assets[aid]
+        if asset.kind != RUA_PATH_KIND:
+            continue
+        asset_rows.append(
+            {
+                "asset_id": asset_urn(asset.kind, asset.location),
+                "kind": asset.kind,
+                "location": asset.location,
+                "props": {k: v for k, v in asset.properties.items() if isinstance(v, str) and v},
+            }
+        )
+
+    statements: list[tuple[str, dict[str, Any]]] = []
+    rel_types: list[str] = []
+    if script_rows:
+        statements.append((_SCRIPT_CONSTRAINT, {}))
+        statements.append((_RUA_SCRIPT_MERGE, {"rows": script_rows}))
+    if asset_rows:
+        statements.append((_ASSET_CONSTRAINT, {}))
+        statements.append((_RUA_ASSET_MERGE, {"rows": asset_rows}))
+    if occurrence_rows:
+        statements.append((_OCCURRENCE_CONSTRAINT, {}))
+        statements.append((_OCCURRENCE_MERGE, {"rows": occurrence_rows}))
+        rel_types.append("OCCURRENCE_OF")
+    if encoded_rows:
+        statements.append((_ENCODED_IN_MERGE, {"rows": encoded_rows}))
+        rel_types.append("IS_ENCODED_IN")
+
+    return RuaWritePlan(
+        statements=tuple(statements),
+        rel_types=tuple(sorted(rel_types)),
+        scripts=len(script_rows),
+        profiles=profiles,
+        assets=len(asset_rows),
+        server_occurrences=server_occurrences,
+        repo_occurrences=repo_occurrences,
+        encoded_in=len(encoded_rows),
+        unbound_extensions=unbound_extensions,
+        malformed_paths=malformed_paths,
+        hash_missing=hash_missing,
+        repo_join_uncomputable=repo_join_uncomputable,
+        multi_host_unconfirmed=multi_host_unconfirmed,
+        hosts=tuple(sorted(hosts)),
+        hosts_unqualified=hosts_unqualified,
+    )
+
+
+#: rel label → vocabulary id for the rua load's own gate check (the curated
+#: CMD_LINE labels have theirs in model.VOCAB_IDS)
+RUA_VOCAB_IDS = {"OCCURRENCE_OF": "g22_occurrence_of", "IS_ENCODED_IN": "u1_is_encoded_in"}
+
+
+def write_rua(
+    graph: LineageGraph,
+    client: Any = None,
+    *,
+    bundle_dir: str | Path | None = None,
+    registry: Path | None = None,
+    coverage: dict[str, Any] | None = None,
+) -> RuaLoadReport:
+    """The live rua load — same refusals as :func:`write_curated` (trust
+    boundary, gate-bound vocabulary), then the §D3 host-resolution read.
+
+    ``coverage`` is passed through verbatim onto the report (the G20/G21/G24
+    extractor counters the acceptance requires beside the load numbers)."""
+    plan = plan_rua(graph, bundle_dir=bundle_dir)
+
+    if client is None:
+        raise ValueError(
+            "a Neo4jClient bound to the 'drydocs' database is required for a "
+            "live load; use plan_rua() for review/dry-run"
+        )
+    database = client.connection_info().get("database")
+    if database != DATABASE:
+        raise TrustBoundaryError(
+            f"drydocs-lineage writes ground truth ONLY to {DATABASE!r} (ADR 0002 "
+            f"D2); refusing client bound to {database!r}"
+        )
+
+    needed = {RUA_VOCAB_IDS[t] for t in plan.rel_types}
+    statuses = vocabulary_status(needed, registry)
+    blocked = sorted(
+        f"{vid}={statuses.get(vid, 'UNREGISTERED')}"
+        for vid in needed
+        if statuses.get(vid) != "active"
+    )
+    if blocked:
+        raise GateBoundVocabularyError(
+            "rel vocabulary is gate-bound — no live load before the HITL gate "
+            f"flips these active in relationship_vocabulary.yaml: {blocked}"
+        )
+
+    written_at = datetime.now(UTC).isoformat()
+    occurrence_edges = 0
+    encoded_in = 0
+    for cypher, params in plan.statements:
+        rows = client.run(cypher, {**params, "written_at": written_at})
+        if rows and "written" in rows[0]:
+            if cypher is _OCCURRENCE_MERGE:
+                occurrence_edges += rows[0]["written"]
+            elif cypher is _ENCODED_IN_MERGE:
+                encoded_in += rows[0]["written"] or 0
+
+    hosts_resolved = 0
+    hosts_unresolved: list[str] = []
+    if plan.hosts:
+        for row in client.run(_HOST_RESOLVE, {"fqdns": list(plan.hosts)}):
+            if row.get("resolved"):
+                hosts_resolved += 1
+            else:
+                hosts_unresolved.append(row.get("fqdn", ""))
+
+    return RuaLoadReport(
+        plan=plan,
+        occurrence_edges_written=occurrence_edges,
+        encoded_in_written=encoded_in,
+        hosts_resolved=hosts_resolved,
+        hosts_unresolved=tuple(sorted(hosts_unresolved)),
+        coverage=dict(coverage or {}),
+    )

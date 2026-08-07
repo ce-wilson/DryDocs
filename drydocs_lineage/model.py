@@ -78,6 +78,13 @@ class ProcessNode:
     # remaining definition-level launcher params (G15: the DPL
     # argument contract — env/app_name/alias/seal/fid/image/
     # compute/launch_mode/…). PROPERTIES, never identity.
+    occurrences: list[dict] = field(default_factory=list)
+    # reified per-source observation records (gate rua-load-shapes
+    # §D2, SIGNED OFF 2026-08-07): origin + full locator + sha256
+    # where present + the capture envelope. ACCUMULATE — a second
+    # arrival of the same staged id appends, never overwrites and
+    # never drops (the as-built defect §D2 exposed). Staging shape;
+    # the G23 load turns each record into a :SourceOccurrence node.
 
 
 @dataclass

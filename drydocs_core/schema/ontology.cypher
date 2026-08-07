@@ -79,6 +79,9 @@ MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#qualifiedAttr
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#agent"})              SET n.label = "agent";
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#hadRole"})            SET n.label = "had role";
 MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#hadPrimarySource"})   SET n.label = "had primary source";
+// Occurrence-of-a-logical-entity (gate rua-load-shapes §D2, SIGNED OFF 2026-08-07;
+// the term ADR 0001 already cites): a SourceOccurrence specializes its Script.
+MERGE (n:OntologyTerm:ProvProperty {iri:"http://www.w3.org/ns/prov#specializationOf"})   SET n.label = "specialization of";
 
 
 // ----- DQV (data quality vocabulary) -----------------------------------------

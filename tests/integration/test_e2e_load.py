@@ -181,6 +181,113 @@ def test_m3_core_invariants(loaded_graph) -> None:
         assert r["missing_condition"] == 0
 
 
+def test_rua_bundle_round_trips_collector_shape_to_readback(neo4j_env, tmp_path) -> None:
+    """G23 acceptance: a synthetic v2 bundle round-trips collector-shape →
+    extractor → write_rua → cypher readback, against a REAL Neo4j.
+
+    The write must land in a database literally named ``drydocs`` (the trust
+    boundary refuses anything else), so this test provisions one in the same
+    EE container and bootstraps it (constraints + ontology — the seeded
+    SwoClass terms §C3's IS_ENCODED_IN targets). Asserts the §D2 grain: ONE
+    :Script for the two-source fixture with BOTH occurrence records anchored
+    OCCURRENCE_OF, idempotent on re-load."""
+    from drydocs_core.neo4j_client import Neo4jClient
+    from drydocs_lineage.extractors import CodeRepoExtractor, RuaInventoryExtractor
+    from drydocs_lineage.extractors.code_repo import git_blob_sha1
+    from drydocs_lineage.model import LineageGraph
+    from drydocs_lineage.writer import write_rua
+
+    with Neo4jClient(
+        neo4j_env["NEO4J_URI"], neo4j_env["NEO4J_USER"], neo4j_env["NEO4J_PASSWORD"], "system"
+    ) as sys_cli:
+        sys_cli.run_script("CREATE DATABASE drydocs IF NOT EXISTS WAIT")
+    _invoke({**neo4j_env, "NEO4J_DATABASE": "drydocs"}, "bootstrap")
+
+    # -- collector shape: a minimal v2 bundle + a repo manifest ------------------
+    body = b'echo "conform"\n'
+    bundle = tmp_path / "rua_e2e-host-01_svc.e2e_20260807T000000Z"
+    bundle.mkdir()
+    (bundle / "meta.txt").write_text(
+        "schema=rua-inventory/v2\ncollected_at=2026-08-07T00:00:00Z\n"
+        "user=svc.e2e\nuid=4242\nhostname=e2e-host-01\n"
+        "fqdn=e2e-host-01.example.internal\nscan_roots=/opt/app\n",
+        encoding="utf-8",
+    )
+    (bundle / "directories.tsv").write_text(
+        "path\ttype\towner\tgroup\tperms\tsize\tmtime\n"
+        "/opt/app\td\tsvc.e2e\tgrp\t750\t4096\t2026-08-01 09:00\n",
+        encoding="utf-8",
+    )
+    (bundle / "profiles.tsv").write_text(
+        "name\tpath\texists\tsize\tmtime\tperms\towner\tsha256\n"
+        f".profile\t/home/svc.e2e/.profile\tyes\t42\t2026-08-01 09:00\t644\tsvc.e2e\t{'aa' * 32}\n",
+        encoding="utf-8",
+    )
+    (bundle / "profiles").mkdir()
+    (bundle / "profiles" / ".profile").write_text("export E2E=1\n", encoding="utf-8")
+    (bundle / "scripts.tsv").write_text(
+        "path\towner\tgroup\tperms\tsize\tmtime\tsha256\n"
+        f"/opt/app/conform.ksh\tsvc.e2e\tgrp\t644\t15\t2026-08-01 09:00\t{'bb' * 32}\n",
+        encoding="utf-8",
+    )
+    (bundle / "scripts" / "opt" / "app").mkdir(parents=True)
+    (bundle / "scripts" / "opt" / "app" / "conform.ksh").write_bytes(body)
+    manifest = tmp_path / "repo_objects.tsv"
+    manifest.write_text(
+        "repo\tref\tcommit\tcommit_date\tpath\tblob_sha\n"
+        f"e2e-repo\trefs/heads/main\tfeed123\t2026-08-01T00:00:00Z\tapp/conform.ksh\t{git_blob_sha1(body)}\n",
+        encoding="utf-8",
+    )
+
+    g = LineageGraph()
+    cov = RuaInventoryExtractor().extract(bundle, g)
+    CodeRepoExtractor().extract(manifest, g)
+
+    with Neo4jClient(
+        neo4j_env["NEO4J_URI"], neo4j_env["NEO4J_USER"], neo4j_env["NEO4J_PASSWORD"], "drydocs"
+    ) as cli:
+        report = write_rua(g, cli, bundle_dir=bundle, coverage={"rua_inventory": cov.as_dict()})
+        assert report.plan.scripts == 2 and report.plan.profiles == 1
+        assert report.plan.repo_occurrences == 1
+        assert report.occurrence_edges_written == 3  # 2 server + 1 repo record
+        assert report.coverage["rua_inventory"]["scripts_staged"] == 1
+
+        # idempotent re-load: same bundle, no growth
+        write_rua(g, cli, bundle_dir=bundle)
+        counts = cli.run(
+            "MATCH (s:Script) WITH count(s) AS scripts "
+            "MATCH (o:SourceOccurrence) RETURN scripts, count(o) AS occurrences"
+        )[0]
+        assert counts["scripts"] == 2 and counts["occurrences"] == 3
+
+        # the §D2 grain read back: ONE script, BOTH origins, full locators
+        rows = cli.run(
+            "MATCH (o:SourceOccurrence)-[:OCCURRENCE_OF]->"
+            "(s:Script {path: '/opt/app/conform.ksh'}) "
+            "RETURN o.origin AS origin, o.path AS path ORDER BY origin"
+        )
+        assert [(r["origin"], r["path"]) for r in rows] == [
+            ("code-repo", "app/conform.ksh"),
+            ("server-extract", "/opt/app/conform.ksh"),
+        ]
+
+        # §C3: the .ksh script bound to the seeded Shell term
+        enc = cli.run(
+            "MATCH (s:Script {path: '/opt/app/conform.ksh'})-[:IS_ENCODED_IN]->(t) "
+            "RETURN t.iri AS iri"
+        )
+        assert enc and enc[0]["iri"] == "http://www.ebi.ac.uk/swo/SWO_0000124"
+
+        # the URN is a render beside the key, and the profile kept its role
+        urns = cli.run(
+            "MATCH (s:Script) RETURN s.path AS path, s.urn AS urn, "
+            "s.script_role AS role ORDER BY path"
+        )
+        by_path = {r["path"]: r for r in urns}
+        assert by_path["/opt/app/conform.ksh"]["urn"] == "urn:drydocs:script:/opt/app/conform.ksh"
+        assert by_path["/home/svc.e2e/.profile"]["role"] == "profile"
+
+
 def test_m3_verify_smoke(loaded_graph) -> None:
     """m3-verify runs against the loaded graph and renders its invariant table.
 

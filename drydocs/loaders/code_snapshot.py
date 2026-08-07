@@ -42,6 +42,12 @@ from typing import TYPE_CHECKING, ClassVar
 
 from drydocs_core.models.code_snapshot import CodeDirectoryRow, CodeModuleRow
 
+# §E1(b)/§E2 language adapter — MOVED to drydocs_core at G23 (re-exported here
+# unchanged): gate rua-load-shapes §C3 pointed the same adapter at :Script,
+# whose loader lives across the drydocs_lineage import boundary — shared
+# mappings are core's.
+from drydocs_core.ontology.swo_adapter import EXTENSION_LANGUAGE_IRI
+
 from .base import BaseLoader
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -61,23 +67,6 @@ SNAPSHOT_SCHEMAS = ("depgraph-machine-first/v1", "depgraph-machine-first/v2")
 SNAPSHOT_SCHEMA = SNAPSHOT_SCHEMAS[0]  # back-compat name (fixtures/tests)
 _V2_UNLOADED_SECTIONS = ("processes", "data_assets", "hosts")
 SNAPSHOT_GLOB = "drydocs-*.json"  # dated dependency snapshots ONLY — never tree-*.json
-
-# §E1(b)/§E2: extension -> the ALREADY-SEEDED SwoClass term (ontology.cypher).
-# Dependency mode only ever emits .py today; Shell/Java/SQL stay seeded-but-
-# unbound until a scan emits them (§E2 — partial use accepted at the gate).
-EXTENSION_LANGUAGE_IRI: dict[str, str] = {
-    ".py": "http://www.ebi.ac.uk/swo/SWO_0000118",  # Python
-    ".sh": "http://www.ebi.ac.uk/swo/SWO_0000124",  # Shell
-    # .ksh binds to the SAME Shell term as .sh — SME ruling 2026-08-06 (gate
-    # rua-load-shapes §C3). ksh IS a shell, so this binds a seeded term rather
-    # than inventing one, and it is not a cosmetic addition: the signed
-    # m3_triggers note names the .ksh wrapper as the COMMON case in this estate
-    # ("one .ksh wrapper script that launches the Informatica / Ab Initio / DPL
-    # workload"), so leaving it out left the most frequent extension unbound and
-    # merely CLI-reported.
-    ".ksh": "http://www.ebi.ac.uk/swo/SWO_0000124",  # Shell (ksh)
-    ".sql": "http://www.ebi.ac.uk/swo/SWO_0000126",  # SQL
-}
 
 # Extension -> the ALREADY-SEEDED :MediaType format term (ontology.cypher;
 # SME ruling 2026-08-05 — the non-.py majority of the tree gets typed the way
@@ -128,9 +117,18 @@ EXTENSION_MEDIA_TYPE_IRI: dict[str, str] = {
 ASSET_EXTENSIONS_SKIPPED: frozenset[str] = frozenset(
     {
         # images
-        ".png", ".svg", ".webp", ".gif", ".jpg", ".jpeg", ".ico",
+        ".png",
+        ".svg",
+        ".webp",
+        ".gif",
+        ".jpg",
+        ".jpeg",
+        ".ico",
         # fonts
-        ".ttf", ".otf", ".woff", ".woff2",
+        ".ttf",
+        ".otf",
+        ".woff",
+        ".woff2",
     }
 )
 

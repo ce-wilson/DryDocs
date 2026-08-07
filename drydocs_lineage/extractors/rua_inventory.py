@@ -477,24 +477,48 @@ class RuaInventoryExtractor:
                 coverage.profile_copies_missing += 1
             else:
                 coverage.script_copies_missing += 1
+        # the reified occurrence record (gate rua-load-shapes §D2): the SAME
+        # facts as the node props, kept PER ARRIVAL. Before the fix, a second
+        # arrival of a staged id was counted and DISCARDED (first-write-wins),
+        # so the second host's origin/sha256/owner/perms/mtime and envelope
+        # never landed — occurrences now ACCUMULATE, and the G23 load reads
+        # them (one :SourceOccurrence per record), never the node props.
+        occurrence = dict(props)
+        occurrence["path"] = path
         pid = process_id(kind, path)
         existing = graph.processes.get(pid)
         if existing is None:
-            graph.add_process(
-                ProcessNode(
-                    node_id=pid,
-                    kind=kind,
-                    name=name,
-                    path=path,
-                    properties=props,
-                )
+            node = ProcessNode(
+                node_id=pid,
+                kind=kind,
+                name=name,
+                path=path,
+                properties=props,
             )
+            node.occurrences.append(occurrence)
+            graph.add_process(node)
             if is_profile:
                 coverage.profiles_staged += 1
             else:
                 coverage.scripts_staged += 1
         else:
+            # counted AND kept: cross_host_collisions stays the ambiguity
+            # signal (§D3 — one file under shared storage vs N files under
+            # local, undecidable without fstype or a hash), while the record
+            # itself now accumulates instead of being dropped. Identical
+            # re-arrivals (same origin/host/path) dedup for idempotent staging.
             self._check_cross_host(existing.properties, env_props, coverage)
+            key = self._occurrence_key(occurrence)
+            if all(self._occurrence_key(o) != key for o in existing.occurrences):
+                existing.occurrences.append(occurrence)
+
+    @staticmethod
+    def _occurrence_key(occ: dict) -> tuple[str, str, str]:
+        """One observation = (origin, capture host, path). The fqdn is the
+        §D3-ruled host spelling; bare hostname, then bundle name, are the
+        honest fallbacks when the envelope lacks it."""
+        host = occ.get("rua_fqdn") or occ.get("rua_host") or occ.get("rua_bundle", "")
+        return (occ.get("origin", ""), host, occ.get("path", ""))
 
     @staticmethod
     def _count_malformed(section: str, coverage: RuaCoverage) -> None:

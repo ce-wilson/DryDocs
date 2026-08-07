@@ -323,6 +323,22 @@ MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Entity"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 
+// OCCURRENCE_OF  —  SourceOccurrence → Script  (prov:specializationOf; g22_occurrence_of)
+// The §D2 anchor edge: an occurrence specializes the one path-keyed Script it
+// observes (the binding the SourceOccurrence class block above declares).
+// Registered at G23 (the loader build) — transcription of the signed ruling.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#occurrenceOf"})
+  SET n.label  = "OCCURRENCE_OF",
+      n.domain = "SourceOccurrence",
+      n.range  = "Script",
+      n.notes  = "One source observation of a logical script, attached to the §D1 "
+               + "path-keyed Script node it specializes. Deterministic occurrenceId "
+               + "(urn + origin + locator) makes re-loads idempotent; locators: "
+               + "host+path (server-extract), repo+ref+commit+path (code-repo).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#occurrenceOf"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#specializationOf"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
 // BELONGS_TO_APPLICATION {role: seal_app_ref}  —  ControlMFolder → Port  (LOCAL, no PROV verb)
 // K8 activation (gate seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) —
 // supersedes the job-grain WAS_ASSOCIATED_WITH {role: seal_app_ref} term

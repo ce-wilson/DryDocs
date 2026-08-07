@@ -75,6 +75,8 @@ MERGE (n:SchemaMeta:AppUser {name: 'AppUser'})
   SET n.class = 'prov:SoftwareAgent', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:Script {name: 'Script'})
   SET n.class = 'dd:Script', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:SourceOccurrence {name: 'SourceOccurrence'})
+  SET n.class = 'dd:SourceOccurrence', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:ETLProcess {name: 'ETLProcess'})
   SET n.class = 'dd:ETLProcess', n.prov_type = 'Activity';
 MERGE (n:SchemaMeta:ExecutionHost {name: 'ExecutionHost'})
@@ -423,6 +425,10 @@ MERGE (a)-[r:IS_ENCODED_IN]->(b)
 MATCH (a:SchemaMeta {name: 'Script'}), (b:SchemaMeta {name: 'SwoClass'})
 MERGE (a)-[r:IS_ENCODED_IN]->(b)
   SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'SourceOccurrence'}), (b:SchemaMeta {name: 'Script'})
+MERGE (a)-[r:OCCURRENCE_OF]->(b)
+  SET r.vocab_id = 'g22_occurrence_of', r.prov_maps_to = 'prov:specializationOf', r.domain = 'architecture', r.status = 'active';
 
 // ── domain: registry ────────────────────────────────────────────────────────
 

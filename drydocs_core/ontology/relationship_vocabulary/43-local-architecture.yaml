@@ -307,3 +307,35 @@
     loader:       code_snapshot.v1
     domain:       architecture
     status:       active
+
+  - id:           g22_occurrence_of
+    neo4j_label:  OCCURRENCE_OF
+    inverse_label: "has occurrence"
+    role:         ~
+    from_node:    SourceOccurrence
+    to_node:      Script
+    prov_maps_to: "prov:specializationOf"
+    note: >
+      The anchor edge of the §D2 reified occurrence grain (gate
+      rua-load-shapes, SIGNED OFF 2026-08-07, 28/28): one observation of a
+      logical script IN one source, attached to the ONE path-keyed :Script
+      node (§D1) it specializes. REGISTERED AT G23, the loader build,
+      rather than G55: the MEANING was ruled and signed at §D2 — the
+      SourceOccurrence class note and its supplement block both declare
+      "the occurrence specializes the one logical Script node
+      (prov:specializationOf)", and §I1's fix-2 reads D2 as adding the
+      class AND its edge — but G55 applied only the entries the gate named
+      textually, so this entry transcribes the already-signed binding at
+      the moment the loader needs it. NOT a new meaning decided outside a
+      gate: the semantics, both endpoint classes, and the PROV term are
+      verbatim from the signed record; declining it would strand every
+      occurrence node the ruled grain requires. Occurrence identity =
+      deterministic occurrenceId (urn + origin + locator), so re-loads
+      MERGE idempotently; locator shapes per origin: host+path
+      (server-extract), repo+ref+commit+path (code-repo). Loaded ONLY by
+      the G23 rua load (writer.plan_rua/write_rua), gate-checked like
+      every other label it writes.
+    supplement:   ontology_supplement.cypher
+    loader:       writer.write_rua
+    domain:       architecture
+    status:       active

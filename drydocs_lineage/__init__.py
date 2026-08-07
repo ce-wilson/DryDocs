@@ -26,8 +26,12 @@ m3_writes_to), ``extractors.controlm_inventory`` (CSV projection → ProcessNode
 INVOKES candidates, parsing via the SHARED core parser — the depgraph fork is
 retired), ``review`` (the self-contained SME review page), ``collect/`` (the RHEL
 run-as-user collector, shell assets), and ``writer`` (Fork-3 curated-write mechanics —
-GATE-BOUND: the vocabulary is ``status: planned``, so ``write_curated`` refuses a live
-load until the HITL gate flips it active; ``plan_curated`` is the review surface).
+GATE-BOUND per label: gate rua-load-shapes SIGNED OFF 2026-08-07 activated
+m3_invokes / m7_uses_artifact / m3_reads_from / m3_writes_to (applied at G55), so
+``write_curated`` executes for those and still refuses planned labels (m3_triggers);
+``plan_curated`` is the review surface. G23 (2026-08-07) added the rua curated load
+— ``plan_rua`` / ``write_rua``: :Script on the §D1 path key, :SourceOccurrence
+records anchored OCCURRENCE_OF, directory DataAssets, §C3 IS_ENCODED_IN).
 STILL A STUB: ``curation.curate`` (phased cadence — trigger wiring is later work).
 """
 
