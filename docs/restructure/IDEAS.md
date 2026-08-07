@@ -62,6 +62,70 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-89`** · 2026-08-07 · `[bug]` · **open** · prio? **Med** —
+  **`OverviewRoute` renders ALL modules unfiltered — the Overview pick-list offers
+  routes the persona will bounce off.** `OverviewRoute.tsx:94` maps `MODULES` with no
+  `canAccessModule` filter, while `Aside.tsx:50` does filter
+  (`MODULES.filter((m) => canAccessModule(m.access, persona.role))`). So for the `user`
+  persona the Overview "What do you want to look at?" list shows `gates`,
+  `underhood` and now `software` — all `access: 'sme'` — and clicking any of them
+  hits the App.tsx role guard and redirects to `/`. The fix is one `.filter(...)`,
+  but it CHANGES BEHAVIOUR for modules that predate `/software`, so it wants its own
+  item with a test rather than a drive-by edit inside another item's commit. Worth
+  deciding at the same time: whether an inaccessible module should vanish or render
+  disabled-with-a-reason (vanishing is what the aside already does, so consistency
+  argues for the filter). (Found at the /software build, 2026-08-07, laptop —
+  `/software` inherited the defect rather than causing it.)
+  **A groom read this as promotable and was told to inbox it — worth a ruling next
+  groom.**
+
+- **`Idea-88`** · 2026-08-07 · `[idea]` · **parked → the G32 residency ruling, then Q14's term gate** · prio? **Med** —
+  **The only loaded software↔docs edge has NO registry declaration behind it — close
+  the gap with a `describes_product:` field.** The 27 live
+  `(:Document)-[:DESCRIBES]->(:SoftwareProduct)` edges for `controlm` are asserted by a
+  hardcoded Python constant — `drydocs/loaders/bmc_docs.py`
+  `SUBJECT_PRODUCT_ID = "controlm"` — and the corpus's `doc-source-registry.yaml` entry
+  carries only `taxonomy_path`, which NO file maps to a product id. So the one working
+  traversal in the estate is unreproducible from the ledger, and a report cannot
+  honestly infer the declaration (the /software page refuses to, deliberately — O56
+  honesty rule 4). Fix direction: a `describes_product:` field on doc-source-registry
+  entries, with the loader READING the registry instead of carrying the constant, plus
+  a guard that the id resolves to a real software-registry product. Parked rather than
+  groomed because it touches a loader AND a gated corpus behind two open rulings — G32
+  (which database corpora live in) and Q14 (which term carries the edge) — and this is
+  also where Q16's unshipped clause (b) will land. (Found at the Q16 close, 2026-08-07.)
+
+- **`Idea-87`** · 2026-08-07 · `[chore]` · **open** · prio? **High** —
+  **Company docmeta has diverged and is AHEAD — exactly the class a port silently
+  clobbers.** Port A landed on the company side and then moved: their ADR is
+  `0005-docmeta-document-ingestion.md` where the producer has docmeta at **ADR 0006**
+  (`0006-docmeta-component-and-doc-graph.md`, and producer 0005 is the browser↔Neo4j
+  access path — so the numbers COLLIDE with different subjects); their package is
+  `drydocs.docmeta` (`drydocs/docmeta/`) where the producer has top-level
+  `drydocs_docmeta/`; and they carry `prompts.py` and `pipeline.py`, which the producer
+  does not have at all. A straight producer→company port take would overwrite the
+  package path, renumber-or-duplicate the ADR, and drop two files that only exist over
+  there. Needs a deliberate reconcile decision before the next docmeta port — at
+  minimum: which ADR number is canonical on each side, whether the package paths
+  converge or stay deliberately divergent with a recorded reason, and whether
+  `prompts.py`/`pipeline.py` back-flow to the producer. Relates to `Idea-79`/J34
+  (the PORT-MANIFEST company-overlay seam) — same failure mode, different artifact.
+
+- **`Idea-86`** · 2026-08-07 · `[source]` · **parked → G32 rules `target_db`** · prio? **Med** —
+  **Register the internal MWAA documentation as a doc corpus — blocked on `target_db`,
+  which G32 owns.** The internal MWAA implementation-docs locator saved this session
+  (`internal/airflow-reference/mwaa-internal-docs.md`, hung off the `airflow` system
+  row's `locator.internal_docs` in `config/source-registry.yaml`, id
+  `airflow:internal-implementation-docs`) has NO entry in
+  `config/doc-source-registry.yaml`, so `drydocs docs-coverage` reports Airflow as
+  `no-corpus` — a true statement, and the exact row the Q16 report exists to print.
+  Registering one requires `target_db`, and `tests/unit/test_doc_registry.py` admits
+  only `{dddocs, ddcontext}` with no "pending" value — a field G32 is actively
+  deciding. **User ruling 2026-08-07: WAIT for G32** rather than declare a value that
+  the ruling may reverse. When it unparks, the entry is tier **T2** (internal
+  platform), connector **web**, curation **sme-confirm** (fixed per tier), and
+  classification **Internal**.
+
 - **`Idea-85`** · 2026-08-07 · `[chore]` · **open** · prio? **Med** —
   **Backlog ids + scheduling for the four post-G22 data-profile gate prompts**
   (drafted 2026-08-07, unsigned): `rua-bundle-data-profile`,
@@ -1189,6 +1253,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
   (silent null = provenance undercount).
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-07 (laptop, Q16-session gaps)** — source was the session, not this file, so no inbox line moved; recorded here because the ids are new. **Closed:** `Q16` → `done` as an explicit PARTIAL close (clause (a) shipped at b297268 / 9b4cf59 / 0ddf880; clause (b), the pointer reaching the graph, is NOT done and stays blocked behind Q14, which is behind G32 — said in the close note rather than implied by the status). **Promoted 3, all epic web-console:** `O56` (the `/software` page, groomed `done` — it was BUILT at 9b4cf59 before any item claimed it, so the ledger was carrying an invisible surface), `O57` (a console page for the load-map content no web/ code reads — 28 pipeline sources, 15 systems, 17 retired ids, 17 sequence steps; N5 chose the print surface, so the JSON's console consumer was never scoped), `O58` (a docs-verify surface, `fable` because its transport choice can change the drydocs_api read-path boundary — the sweep is multi-database and a QuerySpec carries exactly one `database:`). **Inboxed 4, none promoted:** `Idea-86` (MWAA corpus, parked on G32 per the user's ruling), `Idea-87` (company docmeta divergence — ADR number AND package path, port-clobber class), `Idea-88` (the undeclared bmc-docs→controlm link; also where Q16's clause (b) lands), `Idea-89` (OverviewRoute renders all modules unfiltered). **Merged 0.**
 
 - **GROOMED TOGETHER 2026-08-07 (pm)** — the OLD OPEN TAIL. The morning groom cleared the fresh Idea-56..84 cohort; this run worked the entries that had been sitting `open` since 2026-07-03 through 2026-08-04, and promoted 15 of them: `Idea-84`→J36, `Idea-54`→J37, `Idea-18`+`Idea-24`+`Idea-26`→**J38** (one item, because the three share a defect rather than content — the inbox is not a channel the other repo reads), `Idea-19`→J39, `Idea-52`→G59, `Idea-20`(c)→G60, `Idea-21`→G61, `Idea-51`→N11, `Idea-43`→D10, `Idea-42`→U16, `Idea-48`→U17, `Idea-55`→O54, `Idea-40`→O55, `Idea-8`→L26, `Idea-1`→R14. Two HITL-safe drafts, not decisions: D10 (the XML-vs-replica precedence prompt) and G61 (the two provenance gap classes) both DRAFT and rule nothing, per the standing G27/W1/N10 precedent. `Idea-41` merged into J34 and `Idea-20` marked partial — both stay in the inbox. Left open on purpose, and named in the groom report: `Idea-73`/`Idea-74` (user decisions blocking O44), `Idea-32` (SME scope call), `Idea-34`/`Idea-33`/`Idea-28`/`Idea-16`/`Idea-17` (SME rulings, user manual steps, destructive ref deletion — none of them a groom's to make).
 
