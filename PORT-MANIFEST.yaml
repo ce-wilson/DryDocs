@@ -402,6 +402,22 @@ rows:
   - path: "internal-local/**"
     disposition: never-port
     note: "gitignored; travels by hand only, never by git"
+  # ---- staged for the NEXT port (remove these five rows after it merges) ----
+  - path: "docs/gate-autosys-crosswalk-company-prompt.md"
+    disposition: clean-add
+    note: "delivery pack drafted 2026-08-07 (F1 status/profile/ratification) — crosses once, then retires per the never-port row below"
+  - path: "docs/gate-airflow-crosswalk-company-prompt.md"
+    disposition: clean-add
+    note: "delivery pack drafted 2026-08-07 (F2) — same lifecycle"
+  - path: "docs/gate-audit-envelope-phase4-company-prompt.md"
+    disposition: clean-add
+    note: "delivery pack drafted 2026-08-07 (M3) — same lifecycle"
+  - path: "docs/gate-envelope-property-terms-company-prompt.md"
+    disposition: clean-add
+    note: "delivery pack drafted 2026-08-07 (M4; run after the M3 pack) — same lifecycle"
+  - path: "docs/gate-ui-write-surface-company-prompt.md"
+    disposition: clean-add
+    note: "delivery pack drafted 2026-08-07 (O20) — same lifecycle"
   - path: "docs/gate-*-company-prompt.md"
     disposition: never-port
     note: "COMPANY-SESSION DELIVERY PACKS, one-way and ONE-TIME: drafted producer-side,

@@ -84,6 +84,14 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   (gate-prompt draft; schema change waits on the gate). Seal-samples §A3 fixture
   divergence (`Cloud Enablement Lead` synthetic role) is SANCTIONED — the producer
   pin's own comment names it as the set that must change; no producer edit.
+  **STAGED FOR THE NEXT PORT (2026-08-07 pm):** five NEW company packs for the
+  producer-signed gates with unknown company status — autosys-crosswalk (F1),
+  airflow-crosswalk (F2), audit-envelope-phase4 (M3), envelope-property-terms (M4,
+  run after M3), ui-write-surface (O20) — each opens with a STATUS question (an
+  already-ratified answer stops the session), then an internal-dataset profile, then
+  the producer rulings to finish per-item. Explicit clean-add manifest rows ride
+  above the `docs/gate-*-company-prompt.md` never-port glob; REMOVE those five rows
+  after the delivering port merges.
 - **Producer head `a14a8028`** (2026-08-06), applied company-side as
   **PORT-REPORT-a14a8028** — range `5f79d145..a14a8028` = **107 commits, PRODUCER-VERIFIED
   2026-08-06** (range enumerated against producer git; both cited never-port docs exist;
