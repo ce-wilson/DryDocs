@@ -62,17 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-84`** · 2026-08-07 · `[bug]` · **open** · prio? **Low** —
-  **Testcontainers integration tests on this desktop need
-  `TESTCONTAINERS_RYUK_DISABLED=true`.** At the G23 e2e build, container startup
-  failed with "Port mapping ... port 8080 is not available" for the ryuk reaper —
-  reproduced identically on an existing J9 test, so pre-existing environment
-  trouble, not the new test. Workaround (remove stale ryuk containers, then set
-  the env var) ran the new e2e green in 22s. Decide: pin the env var for this
-  machine class (integration-test docs or conftest), or fix the underlying port
-  conflict. (Found at the G23 close, desktop, 2026-08-07.)
-
-
 - **`Idea-83`** · 2026-08-07 · `[bug]` · **groomed → J33 (2026-08-07)** · prio? **Low** —
   **Three standing rich-ANSI test failures on this desktop, pre-existing (not
   G55).** `test_supplements.py::test_chain_applies_in_registry_order` +
@@ -100,7 +89,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Registry schema change → gate territory; groom toward the config layer.
   (Source: company `gate-log.md` standing-divergence entry + PORT-REPORT-a14a8028
   fix close-out, ledgered in docs/port-prompt.md.)
-
 
 
 - **`Idea-79`** · 2026-08-06 · `[idea]` · **groomed → J34 (2026-08-07)** · prio? **Med** —
@@ -498,27 +486,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   lands in the producer repo as an artifact, or the roll becomes a step in the port prompt's
   own closing sequence.
 
-- **`Idea-55`** · 2026-08-04 · `[idea]` · **open** · prio? **Low** —
-  **The load sequence is config-living-in-code and now guarded — it may
-  deserve an enforcement-matrix row.** `render_enforcement_matrix.py`'s own docstring calls
-  `code_resident` "config living in code, the page's KPI example", and `cli.CANONICAL_LOAD_SEQUENCE`
-  (with `LOAD_PROFILES` / `SCHEDULED_INGEST_EXCLUSIONS`) is exactly that — except it now has
-  guards, so it would land `enforced` rather than `unguarded`. Blocked on a small design
-  question rather than effort: every SURFACES row today has a `file:` under `config/`, so a
-  code-resident row needs the registry to accept a module path. (Noticed at N6; deliberately
-  NOT done there — the matrix is an O12/admin surface, not N6's scope.)
-
-- **`Idea-54`** · 2026-08-04 · `[bug]` · **open** · prio? **Med** —
-  **A guard written on one machine had never actually executed on the
-  other, and passed by accident when it did.** `test_runbook_currency.py::_cli_verbs` shelled
-  out to `drydocs --help` and parsed it. On the laptop that failed twice at once: `text=True`
-  decodes with cp1252, which cannot decode the `┐` in Typer's rich box (`0x90`), so `stdout`
-  came back `None`; and the rows start with `│`, not `|`, so the pattern would have matched
-  nothing anyway — which makes EVERY documented verb look unregistered. Fixed at N6 by
-  reading `app.registered_commands` instead of parsing a rendered table. The general question
-  worth grooming: how many other guards shell out and parse human-facing output, and is
-  "never parse a render when the object is importable" worth writing down as a standard?
-
 - **`Idea-53`** · 2026-08-04 · `[bug]` · **groomed → S10 (BUILT 2026-08-05)** · prio? **High** —
   *(the missing loader guard is now an item and was BUILT the same
   day; the tracker-row half was not groomed — it was DONE in the same commit, T23's row now carries
@@ -540,40 +507,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   at the next port roll, and consider whether the loader should FAIL LOUDLY on a
   `:BusinessApplication` with a null app_id rather than silently creating its twin, which is
   the guard the null-tolerance argument implies but nothing implements.
-
-- **`Idea-52`** · 2026-08-04 · `[question]` · **open** · prio? **Med** —
-  **`apply-supplements` would silently skip the company's two local
-  supplements — the exact defect G29 was built to remove.** Producer's chain is the ONE ordered
-  list `base -> seal -> catalog -> registry` (+ opt-in sosa) in
-  `drydocs_core/schema/supplements.py`. The company additionally runs
-  `apply-resource-pools-supplement` (Control-M QUANTITATIVE resource pools, feeds
-  `controlm_quantitatives.py`) and `apply-platforms-supplement` (now a documented SUPERSEDED
-  no-op, T12) — verified 2026-08-04 that NEITHER verb nor supplement file exists producer-side,
-  so they are genuinely company-local, not producer staleness. Consequence: if the company
-  adopts `apply-supplements` as its one chain, resource-pools is omitted and whatever MATCHes
-  its terms goes quiet — which is precisely how the pre-G29 three-verb block omitted `registry`
-  and left `load-software-registry` MATCHing terms nothing had seeded. Relayed as "add your two
-  to your own SUPPLEMENTS list before switching". Open producer-side question: should
-  `apply-supplements` VERIFY that every supplement file present on disk is in the chain, so a
-  local addition cannot be silently skipped? That guard would be portable and would have caught
-  this class on either side.
-
-- **`Idea-51`** · 2026-08-04 · `[bug]` · **open** · prio? **Med** —
-  **N6 is now the only thing keeping three load sequences honest, and it is
-  ready.** Asked to confirm the load sequence, a check of all three surfaces found them agreeing
-  on the shape and disagreeing on membership. `bootstrap-schema-graph` was in BOTH operator
-  surfaces (`scripts/ingest.sh` step 3/6, the startup runbook's Appendix B) and missing ONLY from
-  `cli.CANONICAL_LOAD_SEQUENCE`, so the generated load-map published 15 steps while both real
-  paths ran 16 — FIXED same session (declaration corrected, load-map regenerated at 17). What is
-  NOT fixed is why nothing caught it: `test_load_map_declarations.py` checks that every declared
-  step is a real command and that every LOADER-backed command is sequenced, but
-  `bootstrap-schema-graph` is a schema command, so the completeness check never reaches it — the
-  guard is one-directional for non-loader verbs. ingest.sh's own comment already says this block
-  and Appendix B "are meant to be the same sequence, not two sequences that drift", which is
-  exactly N6's acceptance ("a guard proves they agree"). Remaining divergence for N6 to absorb:
-  ingest.sh omits refresh-reference, load-software-registry, load-bmc-docs, load-doc-traceability
-  and docs-verify that the runbook and the declaration carry — deliberate for a scheduled
-  Control-M ingest, but nothing records that it is deliberate, so it reads identically to drift.
 
 - **`Idea-50`** · 2026-08-04 · `[source]` · **parked → the internal DPL build starts landing** · prio? **Med** —
   **`controlm-pipeline-stub` captured + integration plan written (internal).**
@@ -619,13 +552,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   no check compares a RUNNING server's reported version against the pinned one, which is why
   the desktop drifted silently. If the ruling is "re-point with a venue note", that gap is
   the thing worth an item.
-
-- **`Idea-48`** · 2026-08-02 · `[question]` · **open** · prio? **Low** —
-  **`DesignDoc.commit` is an author's claim, not a git fact — decide
-  whether the writer persona's staleness ranking should use it.** `drydocs-startup-refresh-runbook`
-  carries `a135a6d` (2026-07-20, from the doc's own "reflected commit" prose) while the file's
-  last touch is `554a4e8` (2026-07-31, Rev 5). Both readings are defensible — "what the author says
-  it reflects" vs "when it was edited" — but the plan doesn't say which, so the ranking is undefined.
 
 - **`Idea-47`** · 2026-08-02 · `[idea]` · **parked → gate §H5 (loader→cypher edge is a new edge type)** · prio? **Low** —
   **The 45 `.cypher` files are now nodes with zero edges — nothing joins a
@@ -698,43 +624,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Framework property tables — the capture holes that block crosswalk sign-off. Needs the
   docmeta confluence connector (or an interim company-side capture) — company network only.
 
-- **`Idea-43`** · 2026-07-29 · `[question]` · **open — HITL, user/SME rules** · prio? **High** —
-  **psgmgr replica vs Control-M XML export: which source wins per
-  object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
-  G47/G48; the build fills a nullable derived column and decides NO source-of-truth
-  question.) Needs a config/precedence.yaml ruling + a named owner-and-sunset for the dual
-  definition path (the context-graph dual-ingestion tale's rule of thumb) — e.g. "XML
-  export is the definition SoR; the Oracle replica remains the runtime/stats feed", or
-  whatever is actually intended. Also touches T16: if XML becomes the standing feed, the
-  CM_DEF_VJOB_DETAIL retirement note gains a second path. HITL — user/SME rules this,
-  never a groom.
-
-- **`Idea-42`** · 2026-07-28 · `[question]` · **open — user call** · prio? **Med** —
-  **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
-  in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
-  after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
-  0002-C absorbed depgraph's **lineage** assets into drydocs-core, but the **scanner** never
-  moved: `snapshot.ps1` shells out to `../depgraph` every session, which is precisely why a
-  months-old sibling checkout could write a 105-edge undercount (→ U7). The whole *class* of
-  defect — instrument revision decided by a checkout nobody looks at, capability split across
-  branches, `dirty:true` in every meta block — exists only because the tool lives outside this
-  repo's history. In-housing it (`drydocs_core/codegraph/`, or a thin vendored package) would
-  delete that class outright: one `poetry run` invocation, pinned by `poetry.lock`, versioned
-  with the code it measures, no probe needed because the tool and the caller ship together.
-  Against: depgraph is deliberately stdlib-only and general-purpose (it scans any project, not
-  just this one), it has its own Control-M/RUA/html-review surfaces DryDocs does not use, and
-  0002-C consciously chose absorb-the-assets-not-the-tool. So this is a real trade, not a
-  cleanup — size it before committing. Precondition now satisfied either way: the fork is
-  consolidated (depgraph `5006567`, one branch), so there is a single revision to vendor from.
-  KEPT-UPDATED 2026-08-02 (weekly groom) — still the user's call, but the argument moved: **U9
-  added a THIRD producer-side post-processing step wrapped around the sibling tool** (git-ignore
-  filtering, after U7's capability probe and U8's abs_path strip). None of the three could live
-  in depgraph, because each encodes something about THIS repo rather than about scanning — which
-  is a point for the fork ("the general instrument stays general") and against it at the same
-  time ("the wrapper is now bigger than the seam it wraps"). Worth deciding before a fourth step
-  appears. What has NOT changed: no scan capability was missing this time — `main` already
-  reported `tree: true`, so the sibling checkout was not the constraint.
-- **`Idea-41`** · 2026-07-28 · `[question]` · **open — user call** · prio? **Med** —
+- **`Idea-41`** · 2026-07-28 · `[question]` · **merged → J34 (2026-08-07 pm — the overlay grammar must be able to express a producer-LOCAL file); the disposition ruling itself stays the user's** · prio? **Med** —
   **`config/dev-environment.yaml` under a `canonical-producer` row —
   decide the disposition producer-side too, not just company-side.** Step 48 raises this for the
   consumer, but the asymmetry is ours: `config/**` is `canonical-producer`, and U7 has just made
@@ -752,15 +642,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the first time, `-Tree` works). Semantic merge details in DryDocs `8a82e3b` and the depgraph
   merge commit; the `add_rel` signature/shape collision and three regions git auto-merged that
   should have conflicted are the parts worth re-reading if that code is touched again.
-- **`Idea-40`** · 2026-07-28 · `[chore]` · **open** · prio? **Med** —
-  **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
-  clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
-  still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
-  the fix means rewriting the router imports against `react-router@8.3.0`. Escalated from O34
-  per its stop clause (postcss/nanoid patches applied there); a UI-workstream decision, and
-  likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
-  red until ruled. Pairs with the code-splitting design call O34 also parked.
-
 - **`Idea-39`** · 2026-07-27 · `[idea]` · **groomed → C26, C27** · prio? **Med** —
   *(the whole entry is now covered: C26 writes the divergence
   down and reserves the four shapes as `planned` — actionable NOW, no trigger; C27 is the
@@ -940,7 +821,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   call and the order is enforced in code. Offered as the likely origin, NOT declared closed:
   if the user meant somewhere else, the report is still open. The runbook itself stays
   untouched and its three owed edits are the separate 2026-07-26 [doc] entry above.
-- **`Idea-32`** · 2026-07-23 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-32`** · 2026-07-23 · `[idea]` · **open — user/SME ruling: which scope (the controlm_jobs.sql direct pull vs the remediation staging reads); re-checked at the 2026-08-07 pm groom** · prio? **Med** —
   **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
   the Oracle connection is planned — and the user's note ties it to the REMEDIATION
@@ -1045,19 +926,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   anti-pattern). (Backstage assessment T8, UI-WIP/backstage-catalog-assessment.md §3;
   design constraint for the shell — attach to the env-toggle item when one exists.)
 
-- **`Idea-26`** · 2026-07-22 · `[chore]` · **open — next port** · prio? **Low** —
-  **Company adoption: route the XML run's WARN flood through the new
-  loader run logs (next port).** Producer BUILT the generalized run-log family same day
-  (user directive after the first company XML run flooded the console with per-row
-  `description_tokens` WARNINGs): `drydocs_core/run_log.py` + `BaseLoader` wiring —
-  configurable path (`DRYDOCS_LOGDIR` → `SPIDERP_LOGDIR` fallback → `~/logs/DryDocs`),
-  shared naming (`load.<loader>.<stamp>.log`), header/meta from the process, WARN-stream
-  tee + uncapped reject detail, summary footer, best-effort contract. When ported,
-  company-side should ALSO (a) attach the tee in the XML *extractor* stage (the
-  description_tokens flood happens pre-loader, in the adapter), and (b) consider raising
-  the console handler to WARNING-summary-only once the stream lands in the file — the
-  file is the review surface, the console shows counts.
-
 - **`Idea-25`** · 2026-07-22 · `[idea]` · **parked → a producer extractor starts consuming a temporal field** · prio? **Low** —
   **Control-M compact-timestamp normalization (mechanism, from the
   company XML-loader's second timestamp bug).** Control-M XML exports carry compact
@@ -1096,14 +964,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Trigger re-checked 2026-08-04 (Control-M inbox groom): `controlm_xml.py` still consumes
   no temporal fields — stays parked.
 
-- **`Idea-24`** · 2026-07-21 · `[chore]` · **open — next port** · prio? **Low** —
-  **Next cross-repo port: carry the AIS acronym expansion across
-  files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
-  PROVISIONAL gloss sits on their `source-registry.yaml` docs-source entry with a
-  PORT-MANIFEST canonical-producer row expecting the producer expansion at next cherrypick —
-  different files, so the port must transplant the value, not same-file overwrite. Also
-  still open company-side: no 06-29 gate-log entry (their audit gap; backfill offered).
-
 - **`Idea-23`** · 2026-07-21 · `[idea]` · **parked → the writer ETLProcess endpoint work makes the edge landable** · prio? **Med** —
   **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
   payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
@@ -1121,19 +981,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Epic O extension groom. Groom when the public site starts; the icon/logo direction
   should stay consistent with the O22 console glyph set.
 
-- **`Idea-21`** · 2026-07-21 · `[idea]` · **open** · prio? **Med** —
-  **FW-really-API confirmed live** — the greenfield-provenance use case
-  for the fix module: a file-watcher-shaped job's `.tok` is produced by an UPSTREAM API-call
-  job writing the file locally, no external push exists — the name/type lies. Already
-  codified as the `_FW`-really-API anti-pattern + design principle 8 (intent from resolved
-  flow, flag name-token disagreement) in
-  `internal/remediation/governance/nfr-consistency-and-greenfield.md`; the description-field
-  metadata plan is the declared-provenance carrier. Two NEW provenance gap classes from the
-  live case: (a) payload script deployed on the exec host but ABSENT from SCM (code search
-  finds only the XML variable reference) → *artifact-not-in-SCM* flag on :Script; (b)
-  pipeline-id-keyed code discovery has NO key for non-DPL python jobs → PATH-keyed Script
-  identity is the fallback, and the GUID-vs-path boundary is the kind discriminator.
-- **`Idea-20`** · 2026-07-21 · `[source]` · **open** · prio? **Med** —
+- **`Idea-20`** · 2026-07-21 · `[source]` · **groomed → G60 (2026-08-07 pm) — clause (c) ONLY; clauses (a) the ingestion-launcher classifier sample and (d) cross-job runtime threading stay OPEN** · prio? **Med** —
   **DPL ingestion leg + AWS zone model traced** (company ingestion
   template; mechanism-only — values stay company-side). Upstream of the launcher spine:
   FM drop of a `.dat` + `.tok` landing pair → Control-M file-watcher condition grammar
@@ -1155,39 +1003,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (parquet + .tok → backup) — a G14-shaped surface G14 doesn't read (it parses
   CMD_LINE only); (d) cross-job `%%\\JOB\VAR` runtime threading (run GUIDs, record
   counts passed between jobs) — context-graph flavored, definition-level no-op.
-
-- **`Idea-19`** · 2026-07-21 · `[idea]` · **open** · prio? **Med** —
-  **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
-  The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely
-  because these never came back; reproduce mechanism-only via the screenshot/describe
-  channel: snow-support schema supplements (`hpsm_queue_key`/`sn_group_name` constraint
-  pair + a `snow-snowflake-itsm` source stub), the `drydocs_remediation` DPL-watch-drift
-  rule + tests (pairs with the DPL runtime-trace inbox entry below), the `graph_verify`
-  Assertion refactor, the docgen deviations vs the finalized company TDD, the
-  `CONFLUENCE_BASE_URL` config seam (mechanism: base-URL as config; the value stays
-  company-side), and the `controlm_folders.sql` `J` table alias. Ties into the
-  drydocs-review back-flow epic. Until these land, every future port repeats the
-  squash-reconcile instead of a clean linear apply.
-
-- **`Idea-18`** · 2026-07-21 · `[chore]` · **open — relay next company session** · prio? **Low** —
-  **Company-side heads-ups from the port-report gap review** (their
-  tracker — recorded here so they aren't lost; relay next company session): (a) the
-  `test_schema_graph.py` drift-guard sequencing conflict — see the new reconcile-port
-  skill ledger note (re-add only after their doc-vocab gate); (b) confirm
-  `docs/restructure/internal-backlog.yaml` was deleted after the DD-series merge
-  (bd7952f follow-up 2 — 388a30d shows the merge happened, not the deletion); (c) the
-  company is producer commits behind past `7e8df54` (L7 gate sign-off + live loader,
-  G14 lineage file-ops pass, the hermetic oracle-kerberos test fix that retires the
-  standing known-failure note, DPL inbox, port-gap fixes) — **and their tooling can't
-  see it**: the 07-21 company-side "identify unported commits" search concluded "fully
-  ported, nothing outstanding" from a FROZEN `cewilson/main` ref (`git fetch cewilson`
-  404s company-side; likely the stale pre-rename remote URL — the live repo is
-  `https://github.com/ce-wilson/DryDocs.git`, pushed 07-21). First company action:
-  `git remote set-url` + re-auth, re-fetch, then re-run their own re-verify
-  (`git log <last-ported>..cewilson/main`). Silver lining from that search: the L7
-  port branch IS merged to company main (`373e993`→`c8cf9f0`), closing the
-  "NOT merged" state in 5eba0c3, and the historical port reports (0eb1a8d, aa049d3,
-  e6f8cca, e418258, eeaffa2, f7970e5) all exist as files company-side.
 
 - **`Idea-17`** · 2026-07-20 · `[chore]` · **open — user decision, destructive** · prio? **Low** —
   **Post-squash ref cleanup (user decision, destructive)**: origin still
@@ -1287,13 +1102,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   not started and the domain's availability is unresolved. (Re-inboxed slim at the
   2026-07-13 groom from the artifact-design-review line, sub-item 3.)
 
-- **`Idea-8`** · 2026-07-12 · `[doc]` · **open** · prio? **Low** —
-  **/documentation skill has NO white-paper guideline** (types: README, API,
-  runbook, architecture, onboarding). Wrote docs/whitepaper/drydocs-whitepaper.md deriving
-  structure from the architecture-doc type + white-paper conventions; if white papers recur,
-  add a "White paper" type to the skill (exec summary → problem → approach → architecture →
-  governance → roadmap) and consider an Epic L outline for it (whitepaper.outline.yaml).
-
 - **`Idea-7`** · 2026-07-11 · `[idea]` · **parked → the SME schedules the lineage gate** · prio? **Med** —
   **Lineage live-load gate session** (captured at the G9 close). The Fork-3
   writer is built and REFUSES by design: the four vocabulary entries (m3_invokes / m3_triggers /
@@ -1369,11 +1177,204 @@ question a 1,000-line file with the trail at the bottom could not answer.
   plan-tracked until Q4–Q6 land. NEW RIDER (GraphAcademy advisor, 2026-07-17): when the docmeta
   loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
   (silent null = provenance undercount).
-- **`Idea-1`** · 2026-07-03 · `[chore]` · **open** · prio? **Low** —
+## Recently groomed (audit trail)
+
+- **GROOMED TOGETHER 2026-08-07 (pm)** — the OLD OPEN TAIL. The morning groom cleared the fresh Idea-56..84 cohort; this run worked the entries that had been sitting `open` since 2026-07-03 through 2026-08-04, and promoted 15 of them: `Idea-84`→J36, `Idea-54`→J37, `Idea-18`+`Idea-24`+`Idea-26`→**J38** (one item, because the three share a defect rather than content — the inbox is not a channel the other repo reads), `Idea-19`→J39, `Idea-52`→G59, `Idea-20`(c)→G60, `Idea-21`→G61, `Idea-51`→N11, `Idea-43`→D10, `Idea-42`→U16, `Idea-48`→U17, `Idea-55`→O54, `Idea-40`→O55, `Idea-8`→L26, `Idea-1`→R14. Two HITL-safe drafts, not decisions: D10 (the XML-vs-replica precedence prompt) and G61 (the two provenance gap classes) both DRAFT and rule nothing, per the standing G27/W1/N10 precedent. `Idea-41` merged into J34 and `Idea-20` marked partial — both stay in the inbox. Left open on purpose, and named in the groom report: `Idea-73`/`Idea-74` (user decisions blocking O44), `Idea-32` (SME scope call), `Idea-34`/`Idea-33`/`Idea-28`/`Idea-16`/`Idea-17` (SME rulings, user manual steps, destructive ref deletion — none of them a groom's to make).
+
+- **`Idea-84`** · 2026-08-07 · `[bug]` · **groomed → J36 (2026-08-07 pm)** · prio? **Low** —
+  **Testcontainers integration tests on this desktop need
+  `TESTCONTAINERS_RYUK_DISABLED=true`.** At the G23 e2e build, container startup
+  failed with "Port mapping ... port 8080 is not available" for the ryuk reaper —
+  reproduced identically on an existing J9 test, so pre-existing environment
+  trouble, not the new test. Workaround (remove stale ryuk containers, then set
+  the env var) ran the new e2e green in 22s. Decide: pin the env var for this
+  machine class (integration-test docs or conftest), or fix the underlying port
+  conflict. (Found at the G23 close, desktop, 2026-08-07.)
+
+
+- **`Idea-55`** · 2026-08-04 · `[idea]` · **groomed → O54 (2026-08-07 pm; the "registry must accept a module path" blocker was checked at the groom and is NOT the blocker)** · prio? **Low** —
+  **The load sequence is config-living-in-code and now guarded — it may
+  deserve an enforcement-matrix row.** `render_enforcement_matrix.py`'s own docstring calls
+  `code_resident` "config living in code, the page's KPI example", and `cli.CANONICAL_LOAD_SEQUENCE`
+  (with `LOAD_PROFILES` / `SCHEDULED_INGEST_EXCLUSIONS`) is exactly that — except it now has
+  guards, so it would land `enforced` rather than `unguarded`. Blocked on a small design
+  question rather than effort: every SURFACES row today has a `file:` under `config/`, so a
+  code-resident row needs the registry to accept a module path. (Noticed at N6; deliberately
+  NOT done there — the matrix is an O12/admin surface, not N6's scope.)
+
+- **`Idea-54`** · 2026-08-04 · `[bug]` · **groomed → J37 (2026-08-07 pm)** · prio? **Med** —
+  **A guard written on one machine had never actually executed on the
+  other, and passed by accident when it did.** `test_runbook_currency.py::_cli_verbs` shelled
+  out to `drydocs --help` and parsed it. On the laptop that failed twice at once: `text=True`
+  decodes with cp1252, which cannot decode the `┐` in Typer's rich box (`0x90`), so `stdout`
+  came back `None`; and the rows start with `│`, not `|`, so the pattern would have matched
+  nothing anyway — which makes EVERY documented verb look unregistered. Fixed at N6 by
+  reading `app.registered_commands` instead of parsing a rendered table. The general question
+  worth grooming: how many other guards shell out and parse human-facing output, and is
+  "never parse a render when the object is importable" worth writing down as a standard?
+
+- **`Idea-52`** · 2026-08-04 · `[question]` · **groomed → G59 (2026-08-07 pm; the company-side relay was already made)** · prio? **Med** —
+  **`apply-supplements` would silently skip the company's two local
+  supplements — the exact defect G29 was built to remove.** Producer's chain is the ONE ordered
+  list `base -> seal -> catalog -> registry` (+ opt-in sosa) in
+  `drydocs_core/schema/supplements.py`. The company additionally runs
+  `apply-resource-pools-supplement` (Control-M QUANTITATIVE resource pools, feeds
+  `controlm_quantitatives.py`) and `apply-platforms-supplement` (now a documented SUPERSEDED
+  no-op, T12) — verified 2026-08-04 that NEITHER verb nor supplement file exists producer-side,
+  so they are genuinely company-local, not producer staleness. Consequence: if the company
+  adopts `apply-supplements` as its one chain, resource-pools is omitted and whatever MATCHes
+  its terms goes quiet — which is precisely how the pre-G29 three-verb block omitted `registry`
+  and left `load-software-registry` MATCHing terms nothing had seeded. Relayed as "add your two
+  to your own SUPPLEMENTS list before switching". Open producer-side question: should
+  `apply-supplements` VERIFY that every supplement file present on disk is in the chain, so a
+  local addition cannot be silently skipped? That guard would be portable and would have caught
+  this class on either side.
+
+- **`Idea-51`** · 2026-08-04 · `[bug]` · **groomed → N11 (2026-08-07 pm; the divergence half closed with N6 on 2026-08-04)** · prio? **Med** —
+  **N6 is now the only thing keeping three load sequences honest, and it is
+  ready.** Asked to confirm the load sequence, a check of all three surfaces found them agreeing
+  on the shape and disagreeing on membership. `bootstrap-schema-graph` was in BOTH operator
+  surfaces (`scripts/ingest.sh` step 3/6, the startup runbook's Appendix B) and missing ONLY from
+  `cli.CANONICAL_LOAD_SEQUENCE`, so the generated load-map published 15 steps while both real
+  paths ran 16 — FIXED same session (declaration corrected, load-map regenerated at 17). What is
+  NOT fixed is why nothing caught it: `test_load_map_declarations.py` checks that every declared
+  step is a real command and that every LOADER-backed command is sequenced, but
+  `bootstrap-schema-graph` is a schema command, so the completeness check never reaches it — the
+  guard is one-directional for non-loader verbs. ingest.sh's own comment already says this block
+  and Appendix B "are meant to be the same sequence, not two sequences that drift", which is
+  exactly N6's acceptance ("a guard proves they agree"). Remaining divergence for N6 to absorb:
+  ingest.sh omits refresh-reference, load-software-registry, load-bmc-docs, load-doc-traceability
+  and docs-verify that the runbook and the declaration carry — deliberate for a scheduled
+  Control-M ingest, but nothing records that it is deliberate, so it reads identically to drift.
+
+- **`Idea-48`** · 2026-08-02 · `[question]` · **groomed → U17 (2026-08-07 pm)** · prio? **Low** —
+  **`DesignDoc.commit` is an author's claim, not a git fact — decide
+  whether the writer persona's staleness ranking should use it.** `drydocs-startup-refresh-runbook`
+  carries `a135a6d` (2026-07-20, from the doc's own "reflected commit" prose) while the file's
+  last touch is `554a4e8` (2026-07-31, Rev 5). Both readings are defensible — "what the author says
+  it reflects" vs "when it was edited" — but the plan doesn't say which, so the ranking is undefined.
+
+- **`Idea-43`** · 2026-07-29 · `[question]` · **groomed → D10 (2026-08-07 pm, the gate-prompt DRAFT — the ruling stays the SME's)** · prio? **High** —
+  **psgmgr replica vs Control-M XML export: which source wins per
+  object when they disagree?** (Guardrail 3 of the XML-fed cmd-line resolution idea → G46/
+  G47/G48; the build fills a nullable derived column and decides NO source-of-truth
+  question.) Needs a config/precedence.yaml ruling + a named owner-and-sunset for the dual
+  definition path (the context-graph dual-ingestion tale's rule of thumb) — e.g. "XML
+  export is the definition SoR; the Oracle replica remains the runtime/stats feed", or
+  whatever is actually intended. Also touches T16: if XML becomes the standing feed, the
+  CM_DEF_VJOB_DETAIL retirement note gains a second path. HITL — user/SME rules this,
+  never a groom.
+
+- **`Idea-42`** · 2026-07-28 · `[question]` · **groomed → U16 (2026-08-07 pm, the sizing record — the call stays the user's)** · prio? **Med** —
+  **Retire the `depgraph` sibling repo entirely by bringing the SCANNER
+  in-house?** The user's reaction to the fork merge was *"I didn't realize it was still used
+  after we made it a module"* — and that instinct was half right in a way worth acting on. ADR
+  0002-C absorbed depgraph's **lineage** assets into drydocs-core, but the **scanner** never
+  moved: `snapshot.ps1` shells out to `../depgraph` every session, which is precisely why a
+  months-old sibling checkout could write a 105-edge undercount (→ U7). The whole *class* of
+  defect — instrument revision decided by a checkout nobody looks at, capability split across
+  branches, `dirty:true` in every meta block — exists only because the tool lives outside this
+  repo's history. In-housing it (`drydocs_core/codegraph/`, or a thin vendored package) would
+  delete that class outright: one `poetry run` invocation, pinned by `poetry.lock`, versioned
+  with the code it measures, no probe needed because the tool and the caller ship together.
+  Against: depgraph is deliberately stdlib-only and general-purpose (it scans any project, not
+  just this one), it has its own Control-M/RUA/html-review surfaces DryDocs does not use, and
+  0002-C consciously chose absorb-the-assets-not-the-tool. So this is a real trade, not a
+  cleanup — size it before committing. Precondition now satisfied either way: the fork is
+  consolidated (depgraph `5006567`, one branch), so there is a single revision to vendor from.
+  KEPT-UPDATED 2026-08-02 (weekly groom) — still the user's call, but the argument moved: **U9
+  added a THIRD producer-side post-processing step wrapped around the sibling tool** (git-ignore
+  filtering, after U7's capability probe and U8's abs_path strip). None of the three could live
+  in depgraph, because each encodes something about THIS repo rather than about scanning — which
+  is a point for the fork ("the general instrument stays general") and against it at the same
+  time ("the wrapper is now bigger than the seam it wraps"). Worth deciding before a fourth step
+  appears. What has NOT changed: no scan capability was missing this time — `main` already
+  reported `tree: true`, so the sibling checkout was not the constraint.
+- **`Idea-40`** · 2026-07-28 · `[chore]` · **groomed → O55 (2026-08-07 pm; migrate OR record a waiver, both allowed)** · prio? **Med** —
+  **react-router high advisory (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) cannot
+  clear without the v7→v8 major migration** — v8 absorbs `react-router-dom` (its latest is
+  still 7.18.1, inside the vulnerable 7.12.0–8.2.0 range), so `npm audit fix` is a no-op and
+  the fix means rewriting the router imports against `react-router@8.3.0`. Escalated from O34
+  per its stop clause (postcss/nanoid patches applied there); a UI-workstream decision, and
+  likely moot in practice — the console is a Vite SPA, no RSC actions — but the audit stays
+  red until ruled. Pairs with the code-splitting design call O34 also parked.
+
+- **`Idea-26`** · 2026-07-22 · `[chore]` · **groomed → J38 (2026-08-07 pm, with Idea-18 and Idea-24)** · prio? **Low** —
+  **Company adoption: route the XML run's WARN flood through the new
+  loader run logs (next port).** Producer BUILT the generalized run-log family same day
+  (user directive after the first company XML run flooded the console with per-row
+  `description_tokens` WARNINGs): `drydocs_core/run_log.py` + `BaseLoader` wiring —
+  configurable path (`DRYDOCS_LOGDIR` → `SPIDERP_LOGDIR` fallback → `~/logs/DryDocs`),
+  shared naming (`load.<loader>.<stamp>.log`), header/meta from the process, WARN-stream
+  tee + uncapped reject detail, summary footer, best-effort contract. When ported,
+  company-side should ALSO (a) attach the tee in the XML *extractor* stage (the
+  description_tokens flood happens pre-loader, in the adapter), and (b) consider raising
+  the console handler to WARNING-summary-only once the stream lands in the file — the
+  file is the review surface, the console shows counts.
+
+- **`Idea-24`** · 2026-07-21 · `[chore]` · **groomed → J38 (2026-08-07 pm, with Idea-18 and Idea-26)** · prio? **Low** —
+  **Next cross-repo port: carry the AIS acronym expansion across
+  files.** Producer's authoritative home is `software-registry.yaml#acronyms`; the company's
+  PROVISIONAL gloss sits on their `source-registry.yaml` docs-source entry with a
+  PORT-MANIFEST canonical-producer row expecting the producer expansion at next cherrypick —
+  different files, so the port must transplant the value, not same-file overwrite. Also
+  still open company-side: no 06-29 gate-log entry (their audit gap; backfill offered).
+
+- **`Idea-21`** · 2026-07-21 · `[idea]` · **groomed → G61 (2026-08-07 pm, the provenance gate DRAFT)** · prio? **Med** —
+  **FW-really-API confirmed live** — the greenfield-provenance use case
+  for the fix module: a file-watcher-shaped job's `.tok` is produced by an UPSTREAM API-call
+  job writing the file locally, no external push exists — the name/type lies. Already
+  codified as the `_FW`-really-API anti-pattern + design principle 8 (intent from resolved
+  flow, flag name-token disagreement) in
+  `internal/remediation/governance/nfr-consistency-and-greenfield.md`; the description-field
+  metadata plan is the declared-provenance carrier. Two NEW provenance gap classes from the
+  live case: (a) payload script deployed on the exec host but ABSENT from SCM (code search
+  finds only the XML variable reference) → *artifact-not-in-SCM* flag on :Script; (b)
+  pipeline-id-keyed code discovery has NO key for non-DPL python jobs → PATH-keyed Script
+  identity is the fallback, and the GUID-vs-path boundary is the kind discriminator.
+- **`Idea-19`** · 2026-07-21 · `[idea]` · **groomed → J39 (2026-08-07 pm)** · prio? **Med** —
+  **Back-flow the company's un-back-flowed advances (bd7952f follow-up 3).**
+  The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely
+  because these never came back; reproduce mechanism-only via the screenshot/describe
+  channel: snow-support schema supplements (`hpsm_queue_key`/`sn_group_name` constraint
+  pair + a `snow-snowflake-itsm` source stub), the `drydocs_remediation` DPL-watch-drift
+  rule + tests (pairs with the DPL runtime-trace inbox entry below), the `graph_verify`
+  Assertion refactor, the docgen deviations vs the finalized company TDD, the
+  `CONFLUENCE_BASE_URL` config seam (mechanism: base-URL as config; the value stays
+  company-side), and the `controlm_folders.sql` `J` table alias. Ties into the
+  drydocs-review back-flow epic. Until these land, every future port repeats the
+  squash-reconcile instead of a clean linear apply.
+
+- **`Idea-18`** · 2026-07-21 · `[chore]` · **groomed → J38 (2026-08-07 pm, with Idea-24 and Idea-26; every relay is RE-VERIFIED before it is written down)** · prio? **Low** —
+  **Company-side heads-ups from the port-report gap review** (their
+  tracker — recorded here so they aren't lost; relay next company session): (a) the
+  `test_schema_graph.py` drift-guard sequencing conflict — see the new reconcile-port
+  skill ledger note (re-add only after their doc-vocab gate); (b) confirm
+  `docs/restructure/internal-backlog.yaml` was deleted after the DD-series merge
+  (bd7952f follow-up 2 — 388a30d shows the merge happened, not the deletion); (c) the
+  company is producer commits behind past `7e8df54` (L7 gate sign-off + live loader,
+  G14 lineage file-ops pass, the hermetic oracle-kerberos test fix that retires the
+  standing known-failure note, DPL inbox, port-gap fixes) — **and their tooling can't
+  see it**: the 07-21 company-side "identify unported commits" search concluded "fully
+  ported, nothing outstanding" from a FROZEN `cewilson/main` ref (`git fetch cewilson`
+  404s company-side; likely the stale pre-rename remote URL — the live repo is
+  `https://github.com/ce-wilson/DryDocs.git`, pushed 07-21). First company action:
+  `git remote set-url` + re-auth, re-fetch, then re-run their own re-verify
+  (`git log <last-ported>..cewilson/main`). Silver lining from that search: the L7
+  port branch IS merged to company main (`373e993`→`c8cf9f0`), closing the
+  "NOT merged" state in 5eba0c3, and the historical port reports (0eb1a8d, aa049d3,
+  e6f8cca, e418258, eeaffa2, f7970e5) all exist as files company-side.
+
+- **`Idea-8`** · 2026-07-12 · `[doc]` · **groomed → L26 (2026-08-07 pm; the Epic L outline half deliberately excluded)** · prio? **Low** —
+  **/documentation skill has NO white-paper guideline** (types: README, API,
+  runbook, architecture, onboarding). Wrote docs/whitepaper/drydocs-whitepaper.md deriving
+  structure from the architecture-doc type + white-paper conventions; if white papers recur,
+  add a "White paper" type to the skill (exec summary → problem → approach → architecture →
+  governance → roadmap) and consider an Epic L outline for it (whitepaper.outline.yaml).
+
+- **`Idea-1`** · 2026-07-03 · `[chore]` · **groomed → R14 (2026-08-07 pm)** · prio? **Low** —
   `common/` shows up in ADK `/list-apps` (it's a shared-tools package, not
   an app). Cosmetic; hide or restructure later.
-
-## Recently groomed (audit trail)
 
 - **GROOMED TOGETHER 2026-08-07** (user instruction): `Idea-80` + `Idea-82` produced **G58** (the dead-script archival report — three dispositions, a stated coverage precondition, the already-archived count) and **L24** (state the target state as a goal in the executive overview). One report item rather than two because both entries turn on the SAME argument: an absence observed by one feed is not an absence in the world. The one fragment NOT made an item — what to CALL the estate-level end state — rides G58's notes as a question the build surfaces, because nothing needs a formal term yet.
 
