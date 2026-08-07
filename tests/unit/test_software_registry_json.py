@@ -110,3 +110,32 @@ def test_every_product_vendor_exists():
         assert (
             p["vendor"] in vendor_ids
         ), f"product {p['id']}: vendor {p['vendor']} not in the rendered view"
+
+
+def test_documentation_corpus_resolves_to_a_registered_corpus():
+    """Q16: the product->corpus pointer is the headline row of the /software
+    coverage view. A typo there renders that row as an orphan, and nothing
+    caught it before — `documentation` was YAML-only until this field shipped.
+    """
+    import yaml
+
+    doc_registry = REPO / "config" / "doc-source-registry.yaml"
+    known = {s["id"] for s in yaml.safe_load(doc_registry.read_text(encoding="utf-8"))["sources"]}
+    committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
+    for p in committed["products"]:
+        block = p.get("documentation")
+        if not block:
+            continue
+        assert block["corpus"] in known, (
+            f"product {p['id']}: documentation.corpus {block['corpus']!r} is not a "
+            f"doc-source-registry id"
+        )
+
+
+def test_stack_is_a_list_so_built_on_and_ingested_from_stay_distinct():
+    """`used_by_drydocs` is true for both neo4j (built on) and controlm
+    (stack: [source] — ingested FROM). A surface rendering only that boolean
+    conflates them, which is why `stack` is emitted."""
+    committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
+    for p in committed["products"]:
+        assert isinstance(p["stack"], list), f"product {p['id']}: stack must be a list"

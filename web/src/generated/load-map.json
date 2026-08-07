@@ -1271,6 +1271,16 @@
         "state": "pending",
         "path": null
       },
+      "tier": "T1",
+      "curation": "none",
+      "connector": "web",
+      "target_db": "dddocs",
+      "trust_default": "GROUNDED",
+      "graph_locator": {
+        "match": "path_prefix",
+        "value": "external/orchestration/bmc-controlm/"
+      },
+      "taxonomy_path": "technology/orchestration/control-m",
       "taxonomy_captures": [],
       "ontology_mappings": [
         {
@@ -1322,6 +1332,16 @@
         "state": "placeholder",
         "path": null
       },
+      "tier": "T1",
+      "curation": "none",
+      "connector": "web",
+      "target_db": "dddocs",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "corpus_id",
+        "value": "bmc-controlm-utilities"
+      },
+      "taxonomy_path": "technology/orchestration/control-m",
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": [
@@ -1352,6 +1372,16 @@
         "state": "pending",
         "path": null
       },
+      "tier": "T1",
+      "curation": "none",
+      "connector": "filedrop",
+      "target_db": "ddcontext",
+      "trust_default": "GROUNDED",
+      "graph_locator": {
+        "match": "doc_id",
+        "value": "essential-graphrag"
+      },
+      "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": [
@@ -1382,6 +1412,16 @@
         "state": "pending",
         "path": null
       },
+      "tier": "T4",
+      "curation": "sme-confirm",
+      "connector": "confluence",
+      "target_db": "ddcontext",
+      "trust_default": "GROUNDED",
+      "graph_locator": {
+        "match": "none",
+        "value": null
+      },
+      "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": []
@@ -1402,6 +1442,16 @@
         "state": "placeholder",
         "path": null
       },
+      "tier": "T2",
+      "curation": "sme-confirm",
+      "connector": "web",
+      "target_db": "dddocs",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "none",
+        "value": null
+      },
+      "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [
         {
@@ -1428,6 +1478,16 @@
         "state": "placeholder",
         "path": null
       },
+      "tier": "T4",
+      "curation": "sme-confirm",
+      "connector": "email",
+      "target_db": "ddcontext",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "none",
+        "value": null
+      },
+      "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": []
@@ -1448,6 +1508,16 @@
         "state": "placeholder",
         "path": null
       },
+      "tier": "T1",
+      "curation": "none",
+      "connector": "filedrop",
+      "target_db": "ddcontext",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "none",
+        "value": null
+      },
+      "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": []

@@ -109,3 +109,34 @@ def test_sequence_mirrors_the_declaration():
     ]
     declared = [(s.command, s.mode, s.profiles, s.note) for s in cli.CANONICAL_LOAD_SEQUENCE]
     assert rendered == declared, "load-map.json sequence drifted from cli.CANONICAL_LOAD_SEQUENCE"
+
+
+def test_doc_corpus_rows_carry_the_doc_governance_fields():
+    """Q16 / the /software surface. `target_db` is the load-bearing one: without
+    it a consumer cannot know when it is ENTITLED to report a document count, and
+    a corpus targeting a database the reader cannot query must render "not
+    queried" rather than 0 — a 0 there is a false claim of absence.
+    """
+    committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
+    doc_rows = [s for s in committed["sources"] if s.get("home") == "doc-registry"]
+    assert doc_rows, "no doc-corpus rows in the load map"
+    for row in doc_rows:
+        for key in ("tier", "curation", "connector", "target_db", "trust_default"):
+            assert key in row, f"doc corpus {row['id']}: projection dropped {key}"
+        assert row["target_db"], f"doc corpus {row['id']}: target_db must not be empty"
+
+
+def test_the_not_queryable_target_db_set_is_pinned():
+    """When G32 rules and dddocs is provisioned (or the corpora re-target), this
+    fails — which forces the "not provisioned (G32)" labels on any surface to be
+    revisited instead of quietly going stale."""
+    from drydocs_api.query_specs import SPEC_DATABASES
+
+    committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
+    declared = {
+        s["target_db"] for s in committed["sources"] if s.get("home") == "doc-registry"
+    }
+    assert declared - set(SPEC_DATABASES) == {"dddocs"}, (
+        "the set of doc-corpus target databases a QuerySpec cannot read has changed; "
+        "revisit every surface that renders a 'not queried' label"
+    )

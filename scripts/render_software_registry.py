@@ -83,6 +83,14 @@ def build_software_registry_view() -> dict:
             "type": p.get("type"),
             "versions": p.get("versions", []),
             "used_by_drydocs": p.get("used_by_drydocs", False),
+            # `documentation` is the declared product->corpus link (Q16). Present
+            # on exactly one product today; emitted so a surface can render
+            # declared-vs-loaded without re-reading the YAML.
+            "documentation": p.get("documentation"),
+            # `stack` separates BUILT ON from INGESTED FROM — `used_by_drydocs`
+            # is true for both neo4j (backend) and controlm (stack: [source]),
+            # so a surface rendering that one boolean conflates them.
+            "stack": p.get("stack", []),
         }
         for p in registry["products"]
     ]

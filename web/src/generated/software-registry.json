@@ -153,7 +153,12 @@
       "versions": [
         "5.x"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "backend",
+        "web-console"
+      ]
     },
     {
       "id": "neo4j-bloom",
@@ -165,7 +170,9 @@
       "versions": [
         "2.x"
       ],
-      "used_by_drydocs": false
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
     },
     {
       "id": "controlm",
@@ -177,7 +184,65 @@
       "versions": [
         "9.0.21.300"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": {
+        "corpus": "bmc-controlm-utilities",
+        "docs_version": "9.0.20",
+        "current_for": [],
+        "available_versions": [
+          {
+            "version": "SaaS",
+            "path": "controlm-saas",
+            "access": "open",
+            "enumerable": false
+          },
+          {
+            "version": "9.0.22",
+            "path": "9.0.22",
+            "access": "forbidden",
+            "enumerable": "unknown"
+          },
+          {
+            "version": "9.0.21.300",
+            "path": "9.0.21.300",
+            "access": "forbidden",
+            "enumerable": "unknown"
+          },
+          {
+            "version": "9.0.21.200",
+            "path": "9.0.21.200",
+            "access": "forbidden",
+            "enumerable": "unknown"
+          },
+          {
+            "version": "9.0.21.100",
+            "path": "9.0.21.100",
+            "access": "forbidden",
+            "enumerable": "unknown"
+          },
+          {
+            "version": "9.0.21",
+            "path": "9.0.21",
+            "access": "open",
+            "enumerable": true
+          },
+          {
+            "version": "9.0.20",
+            "path": "9.0.20",
+            "access": "open",
+            "enumerable": true
+          },
+          {
+            "version": "9.0.19",
+            "path": "9.0.19",
+            "access": "open",
+            "enumerable": true
+          }
+        ]
+      },
+      "stack": [
+        "source"
+      ]
     },
     {
       "id": "oracle-db",
@@ -189,7 +254,11 @@
       "versions": [
         "19c"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "backend"
+      ]
     },
     {
       "id": "react",
@@ -201,7 +270,11 @@
       "versions": [
         "19.2.7"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "web-console"
+      ]
     },
     {
       "id": "reui",
@@ -213,7 +286,11 @@
       "versions": [
         "free tier"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "web-console"
+      ]
     },
     {
       "id": "react-flow",
@@ -225,7 +302,11 @@
       "versions": [
         "12.11.2"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "web-console"
+      ]
     },
     {
       "id": "tailwindcss",
@@ -237,7 +318,11 @@
       "versions": [
         "4.1.16"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "web-console"
+      ]
     },
     {
       "id": "python",
@@ -249,7 +334,11 @@
       "versions": [
         "3.11+"
       ],
-      "used_by_drydocs": true
+      "used_by_drydocs": true,
+      "documentation": null,
+      "stack": [
+        "backend"
+      ]
     },
     {
       "id": "abinitio",
@@ -259,7 +348,9 @@
       "role": "tool",
       "type": "commercial",
       "versions": [],
-      "used_by_drydocs": false
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
     },
     {
       "id": "informatica-powercenter",
@@ -269,7 +360,9 @@
       "role": "tool",
       "type": "commercial",
       "versions": [],
-      "used_by_drydocs": false
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
     },
     {
       "id": "airflow",
@@ -281,7 +374,9 @@
       "versions": [
         "3.x"
       ],
-      "used_by_drydocs": false
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
     },
     {
       "id": "autosys",
@@ -291,7 +386,9 @@
       "role": "orchestrator",
       "type": "commercial",
       "versions": [],
-      "used_by_drydocs": false
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
     }
   ]
 }

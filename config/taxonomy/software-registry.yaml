@@ -99,7 +99,10 @@ products:
     type: commercial              # EE via local Docker; community edition open-source
     versions: ["5.x"]             # catalog window 5.19-5.26; pin when container verifiable
     used_by_drydocs: true
-    stack: [web-console]
+    # DUPLICATE KEY REMOVED 2026-08-07: a dead `stack: [web-console]` sat above
+    # this line. yaml.safe_load silently keeps the LAST of a duplicated key, so
+    # the value was never wrong — it was simply unreadable, and invisible because
+    # nothing consumed `stack` from the generated JSON until Q16.
     stack: [backend, web-console]  # the DATABASE is backend; the JS driver
                                    # (neo4j-driver, web/package.json) also ships in
                                    # the console for the ADR 0005 dev-mode bolt

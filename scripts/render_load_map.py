@@ -195,6 +195,18 @@ def build_load_map() -> dict:
                 "classification": entry.get("classification"),
                 "confirmed": bool(entry.get("confirmed")),
                 "ledger": _ledger_state(entry),
+                # Doc-governance fields (Q16 / the /software surface). `target_db`
+                # is the load-bearing one: without it a consumer cannot know when
+                # it is ENTITLED to report a document count. A corpus targeting a
+                # database the reader cannot query must render "not queried",
+                # never 0 — a 0 there is a false claim of absence.
+                "tier": entry.get("tier"),
+                "curation": entry.get("curation"),
+                "connector": entry.get("connector"),
+                "target_db": entry.get("target_db"),
+                "trust_default": entry.get("trust_default"),
+                "graph_locator": entry.get("graph_locator"),
+                "taxonomy_path": entry.get("taxonomy_path"),
                 "taxonomy_captures": captures_by_source.get(sid, []),
                 "ontology_mappings": mappings_by_source.get(sid, []),
                 "loaders": loaders_by_source.get(sid, []),
