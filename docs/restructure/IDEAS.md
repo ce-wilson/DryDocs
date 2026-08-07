@@ -62,51 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-82`** · 2026-08-07 · `[idea]` · **open** · prio? **Med** —
-  **Name the estate-level TARGET STATE: "the production server holds only actively
-  used code" — and carry it into the executive overview as a stated goal.** User
-  direction, 2026-08-07, in the question that closed the G22 sign-off session.
-  **THE GAP:** DryDocs can already name every ARTIFACT-level state involved, but has
-  no name for the ESTATE-level condition they add up to. Artifact side is covered:
-  a tombstone (`removed_from_source_at`, the D7 sweep ruled at U13) is the existing
-  word for *was here, isn't now, history kept*, and after G22 §D2 the `:Script` case
-  needs no new flag at all — it falls out of the occurrence shape (code-repo
-  occurrence + no current server-extract occurrence = archived; server occurrence +
-  no repo occurrence = G24's existing `never_committed` bucket). That keeps
-  "archived" DERIVED FROM EVIDENCE rather than declared, the same move §G1 made when
-  it put identity in the business key and made the URN a render. What has no name is
-  the goal: an estate where the two sets have converged.
-  **WHY IT IS NOT A LABEL CHOICE:** the state is a property of the ESTATE, not of any
-  node, so it is a real vocabulary decision and rides the HITL gate rather than being
-  picked at a groom. Do NOT reach for the `00-header.yaml` lifecycle
-  (`planned|active|deprecated|removed`) — that enum governs relationship-vocabulary
-  ENTRIES (edge meanings, i.e. schema), and a script on a server is an INSTANCE.
-  Reusing the four words for both would put `removed` = "we deleted an edge
-  definition" and `removed` = "we deleted a file off a server" in one repo: the exact
-  two-things-one-spelling collision §A2 caught on `group` and J32 made a standing rule.
-  **THE PRECONDITION THAT MUST RIDE ANY WORK HERE (§H1):** absence of a server
-  occurrence is NOT proof of removal. All three usage axes are positive-only, and
-  present-on-server is bounded by `scan_roots`, so "not in the bundle" only ever means
-  "not observed by that feed". A tombstone must therefore be set from a SWEEP-SCOPED
-  absence — within roots actually scanned, on a bundle that actually parsed — or a
-  collector that skipped a mount tombstones live code. Since §E3's use case is
-  DELETION, that false positive deletes something running. §E3's three dispositions
-  stay distinct for the same reason: genuinely dead (archive and remove), misdeployed
-  (relocate, never delete), unreferenced-but-dynamically-called (keep).
-  **THE SECOND HALF OF THE ASK — the executive overview.** The user asked for this to
-  appear in `docs/overview/drydocs-executive-overview.html` as a stated **target-state
-  goal**, not only as a backlog item. Two things a groomer needs to know before
-  touching it: (1) that file is **hand-authored HTML and its own SINGLE SOURCE** —
-  there is NO `.md` twin (unlike `docs/whitepaper/`), it is not renderer output, and
-  `render_design_doc.py` does not cover `docs/overview/`, so it is edited directly;
-  (2) it is a **non-governed outward-facing doc** (CLAUDE.md §6), so editorial and
-  design treatment DO apply there — the publish-VERBATIM rule binds the design
-  renders, gate pages and the board, not this file. Nearest existing homes are "The
-  loop that makes it a system, not an inventory" (the operational-outcome section) and
-  "Honest about the gaps"; there is no target-state section today.
-  **RELATED:** §E3 (the archival/removal use case and its three dispositions), G23
-  (curated rua load), Idea-80 (dead-script report coverage precondition — same
-  coverage argument, and these two should probably groom together).
 
 - **`Idea-81`** · 2026-08-07 · `[idea]` · **open** · prio? **Med** —
   **Split wiring readiness out of the registry `confirmed` flag.** The a14a8028
@@ -122,20 +77,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (Source: company `gate-log.md` standing-divergence entry + PORT-REPORT-a14a8028
   fix close-out, ledgered in docs/port-prompt.md.)
 
-- **`Idea-80`** · 2026-08-06 · `[idea]` · **open — needs grooming once G22 signs** · prio? **High** —
-  **The dead-script report drives DELETION, so it needs a coverage precondition and
-  three dispositions, not two.** G22 §E3 named the use case: identifying unused,
-  deprecated code for archival and removal. That raises the bar on the report the
-  usage axis feeds. (a) **Body-copy coverage is a precondition, not a footnote** —
-  script-to-script invocation is visible only where the bundle carried the script
-  BODY, and the metadata-only listings ship none, so on those bundles
-  "unreferenced" means "no CMD_LINE reference", never "nothing calls it"; a report
-  that omits its coverage will propose deleting leaf scripts it was structurally
-  unable to see callers for. (b) **Three dispositions** — genuinely dead (remove),
-  MISDEPLOYED (relocate; §E1's caveat that a script may have been deployed to the
-  wrong server), and unreferenced-but-dynamically-called (keep). (c) The
-  misdeployment case is only valid where `storage_scope` is local — under shared
-  storage every host sees one file. *(From the G22 §E session, laptop.)*
 
 
 - **`Idea-79`** · 2026-08-06 · `[idea]` · **open** · prio? **Med** —
@@ -1409,6 +1350,69 @@ question a 1,000-line file with the trail at the bottom could not answer.
   an app). Cosmetic; hide or restructure later.
 
 ## Recently groomed (audit trail)
+
+- **GROOMED TOGETHER 2026-08-07** (user instruction): `Idea-80` + `Idea-82` produced **G58** (the dead-script archival report — three dispositions, a stated coverage precondition, the already-archived count) and **L24** (state the target state as a goal in the executive overview). One report item rather than two because both entries turn on the SAME argument: an absence observed by one feed is not an absence in the world. The one fragment NOT made an item — what to CALL the estate-level end state — rides G58's notes as a question the build surfaces, because nothing needs a formal term yet.
+
+- **`Idea-82`** · 2026-08-07 · `[idea]` · **groomed → G58 + L24 (2026-08-07, same day as capture)** · prio? **Med** —
+  **Name the estate-level TARGET STATE: "the production server holds only actively
+  used code" — and carry it into the executive overview as a stated goal.** User
+  direction, 2026-08-07, in the question that closed the G22 sign-off session.
+  **THE GAP:** DryDocs can already name every ARTIFACT-level state involved, but has
+  no name for the ESTATE-level condition they add up to. Artifact side is covered:
+  a tombstone (`removed_from_source_at`, the D7 sweep ruled at U13) is the existing
+  word for *was here, isn't now, history kept*, and after G22 §D2 the `:Script` case
+  needs no new flag at all — it falls out of the occurrence shape (code-repo
+  occurrence + no current server-extract occurrence = archived; server occurrence +
+  no repo occurrence = G24's existing `never_committed` bucket). That keeps
+  "archived" DERIVED FROM EVIDENCE rather than declared, the same move §G1 made when
+  it put identity in the business key and made the URN a render. What has no name is
+  the goal: an estate where the two sets have converged.
+  **WHY IT IS NOT A LABEL CHOICE:** the state is a property of the ESTATE, not of any
+  node, so it is a real vocabulary decision and rides the HITL gate rather than being
+  picked at a groom. Do NOT reach for the `00-header.yaml` lifecycle
+  (`planned|active|deprecated|removed`) — that enum governs relationship-vocabulary
+  ENTRIES (edge meanings, i.e. schema), and a script on a server is an INSTANCE.
+  Reusing the four words for both would put `removed` = "we deleted an edge
+  definition" and `removed` = "we deleted a file off a server" in one repo: the exact
+  two-things-one-spelling collision §A2 caught on `group` and J32 made a standing rule.
+  **THE PRECONDITION THAT MUST RIDE ANY WORK HERE (§H1):** absence of a server
+  occurrence is NOT proof of removal. All three usage axes are positive-only, and
+  present-on-server is bounded by `scan_roots`, so "not in the bundle" only ever means
+  "not observed by that feed". A tombstone must therefore be set from a SWEEP-SCOPED
+  absence — within roots actually scanned, on a bundle that actually parsed — or a
+  collector that skipped a mount tombstones live code. Since §E3's use case is
+  DELETION, that false positive deletes something running. §E3's three dispositions
+  stay distinct for the same reason: genuinely dead (archive and remove), misdeployed
+  (relocate, never delete), unreferenced-but-dynamically-called (keep).
+  **THE SECOND HALF OF THE ASK — the executive overview.** The user asked for this to
+  appear in `docs/overview/drydocs-executive-overview.html` as a stated **target-state
+  goal**, not only as a backlog item. Two things a groomer needs to know before
+  touching it: (1) that file is **hand-authored HTML and its own SINGLE SOURCE** —
+  there is NO `.md` twin (unlike `docs/whitepaper/`), it is not renderer output, and
+  `render_design_doc.py` does not cover `docs/overview/`, so it is edited directly;
+  (2) it is a **non-governed outward-facing doc** (CLAUDE.md §6), so editorial and
+  design treatment DO apply there — the publish-VERBATIM rule binds the design
+  renders, gate pages and the board, not this file. Nearest existing homes are "The
+  loop that makes it a system, not an inventory" (the operational-outcome section) and
+  "Honest about the gaps"; there is no target-state section today.
+  **RELATED:** §E3 (the archival/removal use case and its three dispositions), G23
+  (curated rua load), Idea-80 (dead-script report coverage precondition — same
+  coverage argument, and these two should probably groom together).
+
+- **`Idea-80`** · 2026-08-06 · `[idea]` · **groomed → G58 (2026-08-07, once G22 signed as its own status line required)** · prio? **High** —
+  **The dead-script report drives DELETION, so it needs a coverage precondition and
+  three dispositions, not two.** G22 §E3 named the use case: identifying unused,
+  deprecated code for archival and removal. That raises the bar on the report the
+  usage axis feeds. (a) **Body-copy coverage is a precondition, not a footnote** —
+  script-to-script invocation is visible only where the bundle carried the script
+  BODY, and the metadata-only listings ship none, so on those bundles
+  "unreferenced" means "no CMD_LINE reference", never "nothing calls it"; a report
+  that omits its coverage will propose deleting leaf scripts it was structurally
+  unable to see callers for. (b) **Three dispositions** — genuinely dead (remove),
+  MISDEPLOYED (relocate; §E1's caveat that a script may have been deployed to the
+  wrong server), and unreferenced-but-dynamically-called (keep). (c) The
+  misdeployment case is only valid where `storage_scope` is local — under shared
+  storage every host sees one file. *(From the G22 §E session, laptop.)*
 
 - **`Idea-78`** · 2026-08-06 · `[feature]` · **groomed → O45–O51 (2026-08-06, same day as capture)** · prio? **High** —
   **SME Context-Intake page: the front door for the unstructured email corpus
