@@ -11,6 +11,7 @@ import {
   MarkerType,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import TrustLegend from './TrustLegend'
 
 // The shared mini-DAG graph pane (extracted at O17 — the 4th copy of this
 // React Flow boilerplate was the signal): theme-token node colors, labeled
@@ -77,6 +78,7 @@ export default function MiniDag({
   title,
   selectedId,
   onSelect,
+  legend = false,
 }: {
   nodes: readonly DagNodeDef[]
   edges: readonly DagEdgeDef[]
@@ -84,6 +86,8 @@ export default function MiniDag({
   title: string
   selectedId: string | null
   onSelect: (id: string | null) => void
+  /** O29: opt-in trust-tier/provenance legend (the /docs corpus canvas wants it; other consumers opt in as their content mixes trust) */
+  legend?: boolean
 }) {
   const rfNodes: MiniDagRFNode[] = useMemo(
     () =>
@@ -136,6 +140,7 @@ export default function MiniDag({
         >
           <Background color="var(--edge)" gap={22} />
           <Controls showInteractive={false} />
+          {legend && <TrustLegend />}
         </ReactFlow>
       </div>
     </div>

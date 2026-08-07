@@ -11,6 +11,7 @@ import {
   MarkerType,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import TrustLegend from '../components/TrustLegend'
 import {
   LINEAGE_EDGES,
   LINEAGE_KIND_TOKEN,
@@ -119,6 +120,7 @@ export default function LineageGraphPane({
         >
           <Background color="var(--edge)" gap={22} />
           <Controls showInteractive={false} />
+          <TrustLegend />
         </ReactFlow>
       </div>
     </div>

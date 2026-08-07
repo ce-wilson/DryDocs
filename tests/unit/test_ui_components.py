@@ -194,6 +194,9 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     64 -> 65 at K11: AppCodeCascadePane rides UNBOUND like its parent
     MappingsRoute — 'mappings' is not a registry module, so a binding would
     invent one (the same reason the route itself carries no module).
+    65 -> 66 at O29: TrustLegend is deliberately UNBOUND — the trust-tier
+    legend renders on the lineage AND docs canvases (and any pane that opts
+    in), so binding it to either module would misstate it.
     Assigning the rest properly means reading imports, which is O42's TS
     resolver, not a naming heuristic.
     """
@@ -201,5 +204,5 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         27,
-        65,
+        66,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

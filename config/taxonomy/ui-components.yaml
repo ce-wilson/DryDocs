@@ -45,7 +45,7 @@
 
 schema: drydocs.ui-component-registry.v1
 classification: Internal-Public
-updated: 2026-07-31
+updated: 2026-08-07
 
 # --- join keys back to the third-party registry ------------------------------
 framework: react              # -> software-registry.yaml products[].id
@@ -131,6 +131,7 @@ components:
   - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }
   - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
   - { id: TowerIcon,               area: component,    path: components/TowerIcon.tsx }
+  - { id: TrustLegend,             area: component,    path: components/TrustLegend.tsx }
 
   # --- icon (1) ---
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }

@@ -44,6 +44,7 @@ export default function DocsRoute({ persona }: { persona: Persona }) {
           badge="EXAMPLE SHAPE · ILLUSTRATIVE — frames below are LIVE when the corpus is loaded"
           selectedId={selectedId}
           onSelect={setSelectedId}
+          legend
         />
       }
       tabContent={{
