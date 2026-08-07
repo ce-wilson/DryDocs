@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-07T00:45:33",
+    "captured_at": "2026-08-07T02:01:24",
     "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "3648cfc",
-      "full": "3648cfcd7c2c8e6d15f3edc459eea8d6cfa1f03b",
+      "commit": "6a65d4f",
+      "full": "6a65d4fb1001df7497ac9bc1c0cba6b31b0a4442",
       "branch": "main",
-      "describe": "3648cfc",
-      "subject": "feat(gates): G22 SIGNED OFF 28/28 - the rua load-shapes terminus closes, and three guards move deliberately",
+      "describe": "6a65d4f",
+      "subject": "fix(backlog): G23 depends_on G55 - a real ordering constraint, verified in code",
       "dirty": false,
       "pr": null
     },
@@ -7890,6 +7890,51 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/gate-cmdline-nfr-vetting-company-prompt.md",
+      "name": "gate-cmdline-nfr-vetting-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-cmdline-nfr-vetting-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-fcdo-crosswalk-company-prompt.md",
+      "name": "gate-fcdo-crosswalk-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-fcdo-crosswalk-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-rua-load-shapes-company-prompt.md",
+      "name": "gate-rua-load-shapes-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-rua-load-shapes-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-seal-app-ref-edge-reshape-company-prompt.md",
+      "name": "gate-seal-app-ref-edge-reshape-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-seal-app-ref-edge-reshape-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/gate-source-registry-v2-company-prompt.md",
+      "name": "gate-source-registry-v2-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/gate-source-registry-v2-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md",
       "name": "generic-snowflake-data-catalog-ingestion-plan.md",
       "extension": ".md",
@@ -12903,10 +12948,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
-      "name": "drydocs-20260806.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "name": "drydocs-20260807.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22720,6 +22765,31 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/gate-cmdline-nfr-vetting-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-fcdo-crosswalk-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-rua-load-shapes-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-seal-app-ref-edge-reshape-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/gate-source-registry-v2-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md"
     ],
     [
@@ -25795,7 +25865,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27627,13 +27697,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1550,
+    "files": 1555,
     "edges": 562,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1809,
+    "rels": 1814,
     "directories": 260
   }
 }
