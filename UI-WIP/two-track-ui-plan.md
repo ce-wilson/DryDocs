@@ -23,9 +23,9 @@ Work that needs no company data, no company credentials, and lands as ordinary c
 | T1-2 | Theme pass: landing hero (gradient core + petals + glowing network), glass header, card hover-lift, dark-mode graph glow, SkeletonModuleRoute cleanup | branch `feat/ui-underhood-theme` |
 | T1-3 | **Under the Hood** route `/under-the-hood`: 3-strategy benchmark showcase — 12-question scoreboard, token-memory tracker, hallucination spotlight (OS1), naive-vs-informed Cypher, 27.4× story; fixture from the committed P0 verdict | branch `feat/ui-underhood-theme` |
 | T1-4 | Adopted context-graph patterns, generic form: `StatTiles` At-a-Glance row; empty-state honesty ("which enrichment fills this") — already partially DryDocs idiom | with T1-3 |
-| T1-5 | Edge-provenance legend surfaced live in-UI (trust tiers on lineage/docs canvases, not only export manifests) — adopt of context-graph's declared/observed legend | NEXT (small) |
-| T1-6 | Light-mode design pass (site-plan open follow-up; dark stays canonical) | later |
-| T1-7 | Retire `App.css` legacy-mockup classes into the token idiom (SignIn/MyApps/GraphExplorer/TowerDrill/CypherConsole) | later |
+| T1-5 | Edge-provenance legend surfaced live in-UI (trust tiers on lineage/docs canvases, not only export manifests) — adopt of context-graph's declared/observed legend | DONE 2026-08-07 (O29) |
+| T1-6 | Light-mode design pass (site-plan open follow-up; dark stays canonical) | DONE 2026-08-07 (O32) |
+| T1-7 | Retire `App.css` legacy-mockup classes into the token idiom (SignIn/MyApps/GraphExplorer/TowerDrill/CypherConsole) | DONE 2026-08-07 (O30) |
 | T1-8 | Eval-harness fixture refresh path: when docmeta's automated benchmark harness lands, regenerate `web/src/underhood/benchmarkData.ts` from its output instead of the hand-carried record | later, ties to docmeta M-eval |
 
 Rationale: all of this is mechanism/fixture-grade, publishable (except T1-1, internal/), and

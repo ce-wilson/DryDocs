@@ -13,7 +13,18 @@
    see index.html + src/lib/theme.ts) overrides with the dark set. Every
    consumer — plain CSS, Tailwind utilities via the @theme mapping below, and
    React Flow node/edge styles (CSS vars work inside SVG) — reads these
-   variables; nothing downstream hardcodes a hex value. */
+   variables; nothing downstream hardcodes a hex value.
+
+   O32 (2026-08-07): the light sheet got its design pass. The DL-7 bridge
+   values were already in place from the 2026-07-28 quick-wins (--bg #f4f6f9 ~
+   the runtime monitor's #F4F6FA, --panel2 = its #EEF2F7 header tint; DL-2
+   status semantics above), so the pass was a surface-by-surface light smoke —
+   hub, shell, module template, lineage/docs canvases, /under-the-hood — whose
+   one real find was a cascade bug, not a token: un-layered element defaults in
+   index.css were eating authored utility colors (fixed there, @layer base).
+   Light is no longer "derived, not designed" — it is reviewed against the
+   DL-7 targets; the tower-drill mockup pages alone keep their dark hardcodes
+   (they are the mockup's language, recorded in App.css's retirement stub). */
 
 :root {
   --bg: #f4f6f9;

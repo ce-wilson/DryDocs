@@ -25,25 +25,33 @@
 
 body { min-height: 100svh; }
 
-a { color: var(--blue-br); }
+/* O32 (same root cause class as O36 above): these element defaults used to sit
+   UN-LAYERED, which out-cascades every layered Tailwind utility — `text-white`
+   on a Link, an authored text color on an anchor, all silently eaten (the
+   Overview CTA rendered navy-on-blue in light mode because of it). In
+   @layer base they stay the default for unstyled elements and lose, correctly,
+   to any utility class an author writes. */
+@layer base {
+  a { color: var(--blue-br); }
 
-code { font-family: var(--mono); }
+  code { font-family: var(--mono); }
 
-/* DL-1 (internal/datalens-reference/continuity.md): digit columns align in every
-   table regardless of typeface — Plex Mono is fixed-width anyway; this covers the
-   Plex Sans cells (counts, timestamps) so numeric columns never wobble. Spot
-   applications on non-table numerics use Tailwind's `tabular-nums` utility. */
-table { font-variant-numeric: tabular-nums; }
+  /* DL-1 (internal/datalens-reference/continuity.md): digit columns align in every
+     table regardless of typeface — Plex Mono is fixed-width anyway; this covers the
+     Plex Sans cells (counts, timestamps) so numeric columns never wobble. Spot
+     applications on non-table numerics use Tailwind's `tabular-nums` utility. */
+  table { font-variant-numeric: tabular-nums; }
 
-button { font: inherit; color: inherit; cursor: pointer; }
+  button { font: inherit; color: inherit; cursor: pointer; }
 
-input, select, textarea {
-  font: inherit;
-  color: inherit;
-  background: var(--bg2);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius-sm); /* O37: inputs/small controls stay sm */
-  padding: 0.35rem 0.5rem;
+  input, select, textarea {
+    font: inherit;
+    color: inherit;
+    background: var(--bg2);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-sm); /* O37: inputs/small controls stay sm */
+    padding: 0.35rem 0.5rem;
+  }
 }
 
 :focus-visible { outline: 2px solid var(--blue-br); outline-offset: 2px; }
