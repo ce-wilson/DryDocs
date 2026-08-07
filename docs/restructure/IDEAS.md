@@ -62,8 +62,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-84`** · 2026-08-07 · `[bug]` · **open** · prio? **Low** —
+  **Testcontainers integration tests on this desktop need
+  `TESTCONTAINERS_RYUK_DISABLED=true`.** At the G23 e2e build, container startup
+  failed with "Port mapping ... port 8080 is not available" for the ryuk reaper —
+  reproduced identically on an existing J9 test, so pre-existing environment
+  trouble, not the new test. Workaround (remove stale ryuk containers, then set
+  the env var) ran the new e2e green in 22s. Decide: pin the env var for this
+  machine class (integration-test docs or conftest), or fix the underlying port
+  conflict. (Found at the G23 close, desktop, 2026-08-07.)
 
-- **`Idea-83`** · 2026-08-07 · `[bug]` · **open** · prio? **Low** —
+
+- **`Idea-83`** · 2026-08-07 · `[bug]` · **groomed → J33 (2026-08-07)** · prio? **Low** —
   **Three standing rich-ANSI test failures on this desktop, pre-existing (not
   G55).** `test_supplements.py::test_chain_applies_in_registry_order` +
   `::test_unknown_only_name_exits_2_without_touching_the_graph` and
@@ -77,7 +87,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `Console(force_terminal=False)` under pytest — do NOT loosen the messages.
   (Found during the G55 close, 2026-08-07.)
 
-- **`Idea-81`** · 2026-08-07 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-81`** · 2026-08-07 · `[idea]` · **groomed → N10 (2026-08-07, the gate-prompt draft; schema change waits on the gate)** · prio? **Med** —
   **Split wiring readiness out of the registry `confirmed` flag.** The a14a8028
   fix session (company, 2026-08-06) surfaced a semantics drift: producer uses
   `confirmed` for SEMANTIC confirmation (gate-signed; the class that transfers per
@@ -93,7 +103,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 
 
-- **`Idea-79`** · 2026-08-06 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-79`** · 2026-08-06 · `[idea]` · **groomed → J34 (2026-08-07)** · prio? **Med** —
   **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering
   company-only tracked-path rows.** PORT-REPORT-a14a8028's clobber audit found the take
   dropped the company's `default_ok` section — quantified at the 2026-08-06 root-cause
@@ -106,7 +116,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   and a port can no longer delete them. Needs a small grammar decision (include file vs.
   marked section), then a manifest + guard change on both sides.
 
-- **`Idea-77`** · 2026-08-06 · `[chore]` · **open** · prio? **Low** —
+- **`Idea-77`** · 2026-08-06 · `[chore]` · **groomed → O53 (2026-08-07, default remove)** · prio? **Low** —
   **`web/src/components/HeroArt.tsx` is an orphan — the code graph's first
   front-end finding.** The O42 TS import edges went live (226 edges, depgraph
   `a56d2fc`) and the very first orphan query returned exactly one component:
@@ -120,7 +130,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (m)-[:IMPORTS]-() ...` — vite.config.ts is the other hit and is legitimately
   edge-less.)*
 
-- **`Idea-76`** · 2026-08-06 · `[chore]` · **open** · prio? **Med** —
+- **`Idea-76`** · 2026-08-06 · `[chore]` · **merged → J35 (2026-08-07, with Idea-56)** · prio? **Med** —
   **The port ledger stops at step 101 / `a14a802`, and ten commits have landed
   since — including the whole G22 gate session.** The internal port that started
   2026-08-06 classified the range ending at `a14a802`, so everything after it is
@@ -131,7 +141,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   ledger before the next port so the company side is classifying a range that ends
   somewhere deliberate. *(Noticed at the G22 session close, laptop.)*
 
-- **`Idea-75`** · 2026-08-06 · `[bug]` · **open — needs a K5 amendment gate, not an edit** · prio? **High** —
+- **`Idea-75`** · 2026-08-06 · `[bug]` · **groomed → K20 (2026-08-07, the amendment-gate DRAFT — K5 stays signed until sign-off)** · prio? **High** —
   **`tech_partner` is scoped to a node class that has no rows and no loader, and
   the SME says it belongs one level up.** SME, in-chat 2026-08-06: *"in the catalog
   there is a role hierarchy ProductCatalog-Product with role 'Tech Partner'"* — i.e.
@@ -203,7 +213,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   defer to something that does not exist, and a deferral pointing at nothing is an
   omission with better wording.
 
-- **`Idea-72`** · 2026-08-05 · `[doc]` · **open** · prio? **Low** —
+- **`Idea-72`** · 2026-08-05 · `[doc]` · **groomed → L25 (2026-08-07, rider default per the step-83 precedent)** · prio? **Low** —
   **A SIGNED gate page cites line numbers that have since moved.** The
   business-application-identity gate's §D2 (signed 2026-07-27) names its four
   `attribution_id` sites as `seal_applications.cypher:124,147,170` and
@@ -218,7 +228,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   precedent) rather than an edit? Cheap either way; the RULE is the valuable part,
   because L19's doc-drift sweep will hit the same question at scale.
 
-- **`Idea-71`** · 2026-08-05 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-71`** · 2026-08-05 · `[bug]` · **groomed → O52 (2026-08-07; the J26-class question rides the item's notes)** · prio? **Med** —
   **`ownership.attributions.v1` returns a column that is always null.** The
   QuerySpec ends `... e.sid AS holder_sid` (`drydocs_api/query_specs.py:451`),
   but `:Employee` is keyed and written as `employee_id` at every site
@@ -355,7 +365,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   products first. *[Corrected 2026-08-05 (user): AWS Snowflake is a TARGET DB platform (S3/Glue/
   Iceberg family), not an ETL product — the second row registers `snowflake` the data platform, not
   a "Snowflake ETL" tool. Recorded in C25's notes and both folder-naming twins.]*
-- **`Idea-64`** · 2026-08-05 · `[chore]` · **open** · prio? **High** —
+- **`Idea-64`** · 2026-08-05 · `[chore]` · **groomed → D9 (2026-08-07; the ordering decision routes through the gate)** · prio? **High** —
   **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
   `config/precedence.yaml` cannot express two internal tiers.** SME framing: Vendor → Company/Platform
   team → Lower support group. Concretely: BMC baseline ← DAT SRE standard (platform team,
@@ -397,7 +407,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   appearing in a field is not an attribution claim unless that field's job is to attribute** —
   ownership, routing, and attribution are three different facts that all serialize as a SEAL id, and
   the graph has exactly one place (the confirmed app-code mapping) where the third is authored.
-- **`Idea-61`** · 2026-08-05 · `[source]` · **open** · prio? **Med** —
+- **`Idea-61`** · 2026-08-05 · `[source]` · **parked → AutoSys ingestion work resumes (row 12 is a crosswalk amendment gate; checked at the 2026-08-07 groom — no active AutoSys stream to hang it on)** · prio? **Med** —
   **AutoSys attributes at a NAME-PREFIX grain, not a folder grain — crosswalk
   row 12, needs a gate amendment.** Placeholder captured in
   [`external/orchestration/autosys/README.md`](../../external/orchestration/autosys/README.md); the
@@ -452,7 +462,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Six open questions need the directory owner — name reuse after retirement is the one that decides
   whether every historical join by name is ambiguous.
 
-- **`Idea-58`** · 2026-08-05 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-58`** · 2026-08-05 · `[bug]` · **groomed → U15 (2026-08-07; the whole-meta-header pass stays a candidate in its notes)** · prio? **Med** —
   **`meta.depgraph.dirty` conflates "untracked files present" with "the
   instrument differs from its pin".** The 20260805 snapshot records `depgraph.commit:
   773fb1e, dirty: true` — but the sibling is at EXACTLY the pin, and the dirt is three
@@ -464,7 +474,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (see the two inboxed 2026-08-04), which is starting to argue for one grooming pass over
   the whole `meta` header rather than another point fix.
 
-- **`Idea-57`** · 2026-08-05 · `[bug]` · **open** · prio? **High** —
+- **`Idea-57`** · 2026-08-05 · `[bug]` · **merged → J35 (2026-08-07, the SHA-citation half); the company-side credential fix stays open, company's hand** · prio? **High** —
   **The company side cannot fetch the producer, and has been answering
   from a cached ref without knowing it was one.** A company session reported "producer repo
   not reachable — private or removed" and fell back to `cewilson/main @ 5f79d145`. The repo
@@ -478,7 +488,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   reader of the answer — should the port prompt require every producer-tree citation to
   quote the SHA it was read at, so a stale read announces itself?
 
-- **`Idea-56`** · 2026-08-05 · `[chore]` · **open** · prio? **High** —
+- **`Idea-56`** · 2026-08-05 · `[chore]` · **merged → J35 (2026-08-07, with Idea-76)** · prio? **High** —
   **The port ledger is being reconstructed after the fact, not rolled
   at the port.** Rolling it today found TWO unrecorded ports (`6713c142`, `5f79d145`) while
   the section still named `40c35724`; the `40c35724` entry itself admits the same thing
