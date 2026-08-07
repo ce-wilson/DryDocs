@@ -70,6 +70,12 @@ HISTORICAL_PATHS: dict[str, str] = {
         "front-matter history — the demo runbook records where it was RELOCATED FROM "
         "at the L14 refit. A former path is a fact about the past, not a claim that it exists"
     ),
+    "docs/port-fix-a14a8028-company-prompt.md": (
+        "the port-prompt ledger cites the fix pack the a14a8028 fix session RAN "
+        "(2026-08-06/07, session complete). The pack retired to internal-local/archive/"
+        "company-prompts/ at the 2026-08-07 prompt retirement — the citation is a fact "
+        "about a completed session, and the full text is one `git show ced0088` away"
+    ),
 }
 
 #: Paths in ANOTHER repo. Kept separate from HISTORICAL_PATHS on purpose: "this
