@@ -1926,3 +1926,56 @@ or added.
   deleting leaf scripts it was structurally unable to see callers for.
 - **Still open:** D1/D2/D4, F1–F2, G1–G2, H1–H2, I1–I3, §J sign-off. Sections A,
   B, C, E and H3 are done.
+
+## 2026-08-06 — RECORD: rua load shapes, F1 — a filesystem path is not confidential, and the URN survives (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **F1 RULED — the confidential set is HOSTNAMES and RUN-AS ACCOUNTS. A
+  filesystem path is NOT confidential (SME).** The standing rules agree:
+  CLAUDE.md's publish-boundary list names SIDs, credentials, server addresses,
+  GHE org names and production data values — paths appear in none of them.
+- **THE COLLISION THIS RESOLVES, and it was live.** D1's URN is **path-derived**.
+  Had paths been confidential, `urn:drydocs:script:/opt/app/foo.ksh` would have
+  been confidential too, and there would have been **no publishable layer for
+  scripts at all** — F1's own claim that "the URN and structural facts are the
+  publishable layer" would have been false. With this ruling that claim holds and
+  **D1's grammar survives unchanged.**
+- **The premise was broken twice, not once.** Beyond J23's tier collapse (which
+  the page flags), the classification vocabulary has **no per-property grain at
+  all** — `QuerySpec.classification` (O11, done) is one string for a whole spec.
+  A per-property split was never expressible, in either the old four-level
+  vocabulary or the new three-level one.
+- **Output shape, and the mechanism already exists and is in use:** (a) a
+  confidential-handling **note on the source-registry entry** — exactly what the
+  `exec-hosts`, `bitbucket` and `dpl` system rows already carry post-J23; (b) an
+  **export rule**, enforceable as a test over the QuerySpec registry — no spec
+  classified publishable may return a column in the confidential set. Every spec
+  is `internal` today, so the rule is vacuous now and guards forward.
+- **CORRECTION TO §E2's RECORD, made after the fact.** The session recommended
+  the repo-trust flag's home as the source-registry dataset row *as though it
+  needed creating*. **It already exists** — `trusted_ref`, built at G24, on
+  `bitbucket:repo-objects-manifest`, commented *"HUMAN-BLESSED intent line: the
+  one ref this repo's team keeps clean. null = server-extract-only truth (the
+  stale-main case). The corroboration sweep NAMES a candidate ref mechanically;
+  only a human sets this field."* Its semantics already match the SME refinement
+  exactly, so **the tri-state proposed at the session is not needed**: the field
+  is two-state with the safe default, and null already means "untrusted or
+  unknown, treat the same." The home reasoning stands and is why the existing
+  placement is right.
+- **A CONSEQUENCE OF §E1 APPLIED TO PROSE.** The `bitbucket` system note ended
+  *"production servers always run the latest RUNNING code"* — the exact overclaim
+  E1 retired. Corrected to "hold the latest **DEPLOYED** code", with the reason
+  recorded on the entry: deployed is not running, because a script may have been
+  deployed to the wrong server and is then present, called by nothing, and dead
+  in place.
+- **Related drift fixed the same day** (`3fb491d`): `docs/design/drydocs-project-tdd.md`
+  still said `config/classification.yaml` defines **four** tiers and listed
+  Internal-Confidential as live. Three since J23. A governed design doc carrying
+  a superseded tier count is the same stale-premise problem F1 flags in its own
+  text.
+- **F2 NOT YET TICKED.** When it is, two restatements are needed: classification
+  lives on the **SYSTEM** row, not the dataset row (v2's D1 split), and the page's
+  ids `rua-server-extract` / `code-repo` are **retired** — the replacements are
+  `exec-hosts:rua-bundle` and `bitbucket:repo-objects-manifest`, inheriting
+  `Internal` from their systems. `confirmed: false` with this gate as the
+  activation condition is already in place.
+- **Still open:** D1/D2/D4, F2, G1–G2, H1–H2, I1–I3, §J sign-off.

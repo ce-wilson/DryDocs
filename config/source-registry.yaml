@@ -220,8 +220,13 @@ systems:
     sdlc: ~
     notes: >
       A repo is a valid truth source ONLY where a team keeps a clean branch
-      (trusted_ref on the dataset row); production servers always run the
-      latest RUNNING code (G24).
+      (trusted_ref on the dataset row); production servers hold the latest
+      DEPLOYED code (G24).
+      WORDING CORRECTED 2026-08-06 (gate rua-load-shapes §E1, SME): this note
+      used to say servers "always run the latest RUNNING code". Deployed is NOT
+      running — a script may have been deployed to the WRONG SERVER, in which
+      case it is present, called by nothing on that host, and dead in place.
+      The server extract is truth for what is deployed and WHERE, nothing more.
 
   - id: oracle
     name: "Oracle DB schemas (data platform, placeholder)"
