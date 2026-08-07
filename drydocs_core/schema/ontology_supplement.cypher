@@ -118,20 +118,24 @@ MATCH (pc:OntologyTerm:ProvClass   {iri: "http://www.w3.org/ns/prov#SoftwareAgen
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 
-// RUNS_ON  —  ControlMJob | ETLProcess → ControlMHostGroup | ExecutionHost
+// RUNS_ON  —  ControlMJob → ControlMHostGroup | ExecutionHost
 // Infrastructure placement; no PROV-O equivalent (SCHEDULED_ON precedent).
 // One label, role-disambiguated: host_group (2-hop, NODE_ID names a group —
 // group match WINS, mirroring Control-M's own resolution), agent_host (1-hop
-// hard-coded member host), etl_host (planned). Written by the derived
-// resolution pass (runs_on_resolution.cypher) — UNMATCHED reported as
-// coverage, never guessed.
+// hard-coded member host). etl_host retired at gate rua-load-shapes §A2
+// (2026-08-07, applied at G55): ETL placement is the same fact as job
+// placement — m3_runs_on_etl_host deprecated, never loaded. Written by the
+// derived resolution pass (runs_on_resolution.cypher) — UNMATCHED reported
+// as coverage, never guessed.
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#runsOn"})
   SET n.label  = "RUNS_ON",
-      n.domain = "ControlMJob | ETLProcess",
+      n.domain = "ControlMJob",
       n.range  = "ControlMHostGroup | ExecutionHost",
       n.notes  = "Definition-time execution placement, role-disambiguated "
-               + "(host_group | agent_host | etl_host). Derived from CM_DEF_VJOB.NODE_ID "
+               + "(host_group | agent_host). Derived from CM_DEF_VJOB.NODE_ID "
                + "x CM_HOSTS; group match wins (gate controlm-hosts-topology §B). "
+               + "etl_host role retired at gate rua-load-shapes §A2 (redundant with "
+               + "job placement). "
                + "Rerun host affinity is runtime state — phase-2, never this edge.";
 
 // CONTAINS_HOST  —  ControlMHostGroup → ExecutionHost  (prov:hadMember)
@@ -236,6 +240,88 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wa
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#wasInformedBy"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasInformedBy"})
 MERGE (local)-[:MAPS_TO]->(prov);
+
+// --- CMD_LINE lineage verbs (gate rua-load-shapes §A3–§A5, SIGNED OFF 2026-08-07;
+//     blocks written at G55 — the flip; the curated load is G23) -------------------
+
+// INVOKES  —  ControlMJob → Script | ETLProcess  (prov:used; m3_invokes)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#invokes"})
+  SET n.label  = "INVOKES",
+      n.domain = "ControlMJob",
+      n.range  = "Script | ETLProcess",
+      n.notes  = "Job command line invokes a launcher script/JAR — or, per the §B2 "
+               + "widening, lands directly on an :ETLProcess where the evidence names "
+               + "one (the G12 abioncloud wrapper-payload expansion). One edge meaning, "
+               + "two endpoint classes, the ENDPOINT RECORDED PER EDGE; the raw evidence "
+               + "string is kept verbatim (§B3) so the endpoint choice stays "
+               + "re-checkable. Cardinality 1..n per job (compound command lines); "
+               + "Script identity PATH-keyed, duplicates surface for SME merge, never "
+               + "auto-merged (gate cmdline-lineage-review 2026-07-16).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#invokes"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// USES_ARTIFACT  —  ControlMJob → Script  (prov:used; m7_uses_artifact)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#usesArtifact"})
+  SET n.label  = "USES_ARTIFACT",
+      n.domain = "ControlMJob",
+      n.range  = "Script",
+      n.notes  = "Job uses a PAYLOAD artifact (jar/wheel/pset/container-image ref) — the "
+               + "Script the launcher dispatches, discriminated from the launcher itself "
+               + "(the m3_invokes target). Distinct label per the documented "
+               + "RUNS_ON-overload risk (gate cmdline-nfr-vetting SME-2). Activated in "
+               + "the same breath as INVOKES (rua-load-shapes §A4) so the "
+               + "launcher/payload split is right from first load. Feed: FACT_REGISTRY "
+               + "ETL_ARTIFACT_URI/KIND/SHA under aliases-suggest-values-decide.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#usesArtifact"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// READS_FROM  —  ETLProcess | ControlMJob → DataAsset  (prov:used; m3_reads_from)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#readsFrom"})
+  SET n.label  = "READS_FROM",
+      n.domain = "ETLProcess | ControlMJob",
+      n.range  = "DataAsset",
+      n.notes  = "Process reads a source dataset. Activated (rua-load-shapes §A5) for "
+               + "STRUCTURED, LAUNCHER- OR REGISTRY-GROUNDED evidence — dataset_flow AND "
+               + "parsed CMD_LINE file-ops — never script-body content grep. File-ops "
+               + "case: the type-correct Activity is the ControlMJob resolved via its "
+               + "INVOKES edge (Script is prov:Entity and cannot carry prov:used). "
+               + "To-node unified on DataAsset (D1 proxy URN); edge direction encodes "
+               + "source-vs-target.";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#readsFrom"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// WRITES_TO  —  ETLProcess | ControlMJob → DataAsset  (prov:generated; m3_writes_to)
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#writesTo"})
+  SET n.label  = "WRITES_TO",
+      n.domain = "ETLProcess | ControlMJob",
+      n.range  = "DataAsset",
+      n.notes  = "Process writes a target dataset. Same §A5 activation restriction as "
+               + "READS_FROM: structured, launcher- or registry-grounded evidence only. "
+               + "File-ops case resolves the owning ControlMJob via INVOKES; to-node "
+               + "unified on DataAsset (D1 proxy URN).";
+MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#writesTo"})
+MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#generated"})
+MERGE (local)-[:MAPS_TO]->(prov);
+
+// SourceOccurrence — reified occurrence record (gate rua-load-shapes §D2; planned,
+// loads at G23). One observation of a logical Script in one source; the only shape
+// holding all origins uniformly (server: host+path; repo: repo+ref+commit).
+// Standards binding: prov:specializationOf — the occurrence specializes the one
+// path-keyed Script node (§D1).
+MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#SourceOccurrence"})
+  SET n.label = "Source Occurrence",
+      n.notes = "Reified occurrence record (rua-load-shapes §D2): origin (server-extract "
+              + "| code-repo | reference-fact) + full locator + sha256 where present "
+              + "(§G2 — version discriminator; hash absence is a real, counted state); "
+              + "mount_root/fstype/storage_scope arrive with G56. prov:Entity; "
+              + "specializes the logical Script (prov:specializationOf).";
+MATCH (lc:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#SourceOccurrence"})
+MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Entity"})
+MERGE (lc)-[r:SUBCLASS_OF]->(pc)
+  ON CREATE SET r.source = "drydocs.ontology_supplement";
 
 // BELONGS_TO_APPLICATION {role: seal_app_ref}  —  ControlMFolder → Port  (LOCAL, no PROV verb)
 // K8 activation (gate seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) —

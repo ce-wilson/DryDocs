@@ -46,6 +46,62 @@
     domain:       architecture
     status:       planned
 
+  - id:           arch_owns_directory
+    neo4j_label:  WAS_ATTRIBUTED_TO
+    inverse_label: "owns"
+    role:         directory_owner
+    from_node:    DataAsset
+    to_node:      AppUser
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      Gate rua-load-shapes §C1 RULED 2026-08-06 (SIGNED OFF 2026-08-07,
+      28/28; registered at G55): run-as user owns home/directory
+      DataAssets. Entity → Agent matrix row; role-discrimination on this
+      shared label is the house pattern (arch_develops, arch_owns_code,
+      the catalog/docs/seal instances). PRECEDENT CORRECTION on the
+      record: arch_owns_code is itself planned with loader ~ and has never
+      loaded — the load-bearing precedent is the role-discriminated label,
+      not that entry. BLOCKED AT BUILD, NOT AT RULING: the to_node is the
+      :AppUser whose key §A1 held on K17 (fid-identity-and-scope,
+      unsigned) — this entry CANNOT be built before K17 signs; recorded so
+      G55 and G23 do not walk into it. Identity sub-ruling: directories.tsv
+      owner is a bare unix account name (service account OR person) — a
+      directory owner resolves to :AppUser ONLY on a known functional-id
+      match; everything else stages UNRESOLVED AND COUNTED, never guessed
+      onto an Agent.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_sources
+    neo4j_label:  SOURCES
+    inverse_label: "sourced by"
+    role:         ~
+    from_node:    Script
+    to_node:      Script
+    prov_maps_to: ~
+    note: >
+      Gate rua-load-shapes §C2 RULED 2026-08-06 (SIGNED OFF 2026-08-07,
+      28/28; registered at G55): shell dot-sourcing — a profile includes
+      another script's environment. TWO PARTS as ruled: (i) a profile is a
+      :Script carrying script_role: profile (third value of the A4
+      discriminator launcher | payload | profile) — a profile IS a shell
+      script file, no new node class, inherits §C3's SWO typing for free;
+      (ii) dot-sourcing gets its own LOCAL type with prov_maps_to ~,
+      because the Entity → Entity matrix row is prov:wasDerivedFrom
+      ("transformed or computed from") and sourcing is NOT derivation —
+      mapping it there would assert something false (the m3_scheduled_on
+      no-PROV-row precedent, active). m3_invokes is reused ONLY for actual
+      execution from a profile, never for inclusion. Feed staged by G21:
+      rua_code_ops.py separates _SOURCE_VERBS {'.', 'source'} ("shell
+      inclusion verbs, never an invocation") with needs_vocabulary: True
+      and writes no relationships — the meaning lands here.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
   - id:           arch_stored_in
     neo4j_label:  STORED_IN
     inverse_label: "stores"
@@ -223,7 +279,7 @@
     neo4j_label:  IS_ENCODED_IN
     inverse_label: "encodes"
     role:         ~
-    from_node:    CodeModule
+    from_node:    "CodeModule | Script"
     to_node:      SwoClass
     prov_maps_to: ~
     sosa_maps_to: ~
@@ -237,6 +293,16 @@
       carries (node.extension), and invent nothing. Broader function-level binding
       ("implements", "uses platform") was REJECTED — a dependency snapshot does not
       know what a module implements. Value is .py-only today (§E2).
+      WIDENED 2026-08-07 (gate rua-load-shapes §C3, SIGNED OFF 28/28;
+      applied at G55): from_node = CodeModule | Script — the E1(b) adapter
+      pointed at the second software-artifact class. The .ksh ADDITION
+      rode the ruling: .ksh binds to the SAME Shell term as .sh
+      (SWO_0000124; SME — .ksh is a peer of .sh, not a separate language;
+      the signed m3_triggers note names the .ksh wrapper as the common
+      case in this estate), applied in code_snapshot.py at the session
+      with a same-iri test. The :Script edge loads at G23; the CodeModule
+      loader is unchanged. Boundary re-confirmed: run_as / J.OWNER is
+      Agent territory (PROV/ORG), never an SWO binding.
     supplement:   ontology_supplement.cypher
     loader:       code_snapshot.v1
     domain:       architecture

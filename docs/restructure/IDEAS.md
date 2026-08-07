@@ -63,6 +63,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 <!-- add new ideas at the top -->
 
 
+- **`Idea-83`** · 2026-08-07 · `[bug]` · **open** · prio? **Low** —
+  **Three standing rich-ANSI test failures on this desktop, pre-existing (not
+  G55).** `test_supplements.py::test_chain_applies_in_registry_order` +
+  `::test_unknown_only_name_exits_2_without_touching_the_graph` and
+  `test_bootstrap_guard.py::test_bootstrap_reports_the_declared_count_on_success`
+  all assert plain substrings against CLI output that arrives with ANSI color
+  codes interleaved on this machine (`\x1b[1;31m` inside the matched phrase) —
+  fails under both `python -m pytest` and `poetry run pytest`, fails identically
+  on a stashed clean tree, `NO_COLOR=1` does not help (rich force-colors the
+  captured stream). Likely a rich/typer version or console-detection difference
+  on this desktop. Fix direction: strip ANSI in the assertions or force
+  `Console(force_terminal=False)` under pytest — do NOT loosen the messages.
+  (Found during the G55 close, 2026-08-07.)
+
 - **`Idea-81`** · 2026-08-07 · `[idea]` · **open** · prio? **Med** —
   **Split wiring readiness out of the registry `confirmed` flag.** The a14a8028
   fix session (company, 2026-08-06) surfaced a semantics drift: producer uses

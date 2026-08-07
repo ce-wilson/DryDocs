@@ -92,6 +92,28 @@ node_classifications:
       prov:Plan in the wasAssociatedWith(hadPlan) pattern. Finer software
       typing available via swo: if ever required.
 
+  - label:      SourceOccurrence
+    class:      "dd:SourceOccurrence"
+    prov_type:  Entity
+    note: >
+      Gate rua-load-shapes §D2 RULED 2026-08-06 (SIGNED OFF 2026-08-07,
+      28/28; registered at G55): a REIFIED occurrence record — one
+      observation of a logical Script in one source. PLANNED-FIRST; loads
+      at G23, never before. The only shape that holds all origins
+      UNIFORMLY: the server occurrence's locator is host+path, the repo
+      occurrence's is repo+ref+commit — an edge-property shape hung off
+      :ExecutionHost cannot carry the repo half, and the gate's premise is
+      one file arriving from three sources. Ruled out as graph shape: the
+      packed-string staging accumulation (ADR 0001's own words — "a string
+      is not queryable"). Properties at minimum: origin (server-extract |
+      code-repo | reference-fact), the full locator, sha256 where present
+      (§G2 — the version discriminator; hash ABSENCE is a real, counted
+      state; scripts get NO version nodes), and mount_root + fstype +
+      storage_scope once G56 lands. Standards binding:
+      prov:specializationOf — the occurrence specializes the one logical
+      Script node (§D1 normalized-absolute-path key).
+      ontology_supplement.cypher.
+
   - label:      ETLProcess
     class:      "dd:ETLProcess"
     prov_type:  Activity

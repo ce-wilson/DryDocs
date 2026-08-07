@@ -99,6 +99,55 @@ def test_ontology_map_directory_parses_with_unique_ids() -> None:
     assert set(doc["summary"]) <= {"proposed", "confirmed", "applied", "rejected"}
 
 
+# ---- the vocabulary lifecycle invariants (G55 acceptance) ---------------------
+
+
+def _vocab_entries() -> list[dict]:
+    doc = load_yaml_source(VOCAB_DIR, unique={"local_relationships": "id"})
+    return doc["local_relationships"]
+
+
+# Semantics seeded by the CORE schema (ontology.cypher), not a supplement:
+# prov_was_generated_by realises a pure PROV property whose ProvProperty term
+# is a core seed; c23_in_dimension is written at bootstrap by ontology.cypher
+# itself (loader: ontology.cypher — registered retroactively at C23, before
+# the vocabulary discipline existed). Nothing enters this set without the
+# same core-seeded justification in its entry note.
+CORE_SEEDED = {"prov_was_generated_by", "c23_in_dimension"}
+
+
+def test_no_entry_is_active_without_a_supplement() -> None:
+    """00-header.yaml's lifecycle: active means the supplement block EXISTS —
+    an active entry with `supplement: ~` would claim graph semantics nobody
+    seeded (the G55 acceptance's first invariant). Core-seeded entries are the
+    documented exception: their terms live in ontology.cypher itself."""
+    offenders = [
+        e["id"]
+        for e in _vocab_entries()
+        if e.get("status") == "active"
+        and not e.get("supplement")
+        and e["id"] not in CORE_SEEDED
+    ]
+    assert not offenders, f"active without a supplement: {offenders}"
+
+
+def test_g22_dispositions_are_terminal() -> None:
+    """Gate rua-load-shapes (SIGNED OFF 2026-08-07, 28/28), applied at G55:
+    activated entries are active, the declined entry is deprecated (a declined
+    entry left `planned` would silently read as still-a-candidate — the state
+    the G55 acceptance names), and the held entry stays planned until K17."""
+    status = {e["id"]: e.get("status") for e in _vocab_entries()}
+    assert status["m3_invokes"] == "active"  # §A3
+    assert status["m7_uses_artifact"] == "active"  # §A4
+    assert status["m3_reads_from"] == "active"  # §A5
+    assert status["m3_writes_to"] == "active"  # §A5
+    assert status["m3_runs_on_etl_host"] == "deprecated"  # §A2 declined
+    assert status["m3_delegates_to"] == "planned"  # §A1 held behind K17
+    assert status["arch_owns_directory"] == "planned"  # §C1 — build blocked on K17
+    assert status["arch_sources"] == "planned"  # §C2
+    assert status["m3_triggers"] == "planned"  # not a G22 candidate — unchanged
+
+
 def test_fragment_files_each_end_with_a_newline() -> None:
     """Concatenation must never glue one fragment's last line to the next
     fragment's first — a missing trailing newline corrupts the merged text."""

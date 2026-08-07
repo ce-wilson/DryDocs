@@ -340,7 +340,7 @@ local_relationships:
     inverse_label: "invoked by"
     role:         ~
     from_node:    ControlMJob
-    to_node:      Script
+    to_node:      "Script | ETLProcess"
     prov_maps_to: "prov:used"
     note: >
       Gate CONFIRMED 2026-07-15 (config/gate-log.md); planned = the flip +
@@ -360,10 +360,24 @@ local_relationships:
       invocations MIGRATE to the distinct m7_uses_artifact label at its
       build — until then this entry keeps the 1..n fold; :Script gains
       script_role {launcher, payload} at the same build (SME-3).
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A3, SIGNED OFF 28/28;
+      applied at G55): activates for reference facts — feeds verified
+      present at the ruling (controlm_inventory G14, the G39/G40 staging
+      seam, G16 SCRIPT_PATH facts). to_node widened to Script | ETLProcess
+      per §B2 (one edge meaning, two endpoint classes, the ENDPOINT
+      RECORDED PER EDGE — the m3_reads_from union-endpoint precedent; G12
+      already lands INVOKES on :ETLProcess for the abioncloud
+      wrapper-payload expansion). §B3 rides with it: the raw evidence
+      string (command line / variable form) is kept VERBATIM on the edge
+      or occurrence record — under B2 that string is how the
+      endpoint-class choice stays re-checkable. m7_uses_artifact activated
+      in the same breath (§A4) so the launcher/payload split is right from
+      first load. Supplement block written at the flip; NO LOADER here —
+      the curated load is G23.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_triggers
     neo4j_label:  TRIGGERS
@@ -434,10 +448,21 @@ local_relationships:
       artifact variables (FACT_REGISTRY migration — backlog G16) with the
       aliases-suggest-values-decide contract; never the variable NAME alone
       (2,384-var gap analysis: names lie).
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A4, SIGNED OFF 28/28;
+      applied at G55) — DELIBERATELY in the same breath as m3_invokes §A3:
+      activating A3 alone would land payloads in the INVOKES 1..n fold
+      first, forcing an in-graph migration; together, the launcher/payload
+      split is right from first load. Feed verified specific at the
+      ruling: FACT_REGISTRY ETL_ARTIFACT_URI / ETL_ARTIFACT_KIND /
+      ETL_ARTIFACT_SHA + ETL_PLATFORM / ETL_PLATFORM_FLAGS with alias
+      rollups under aliases-suggest-values-decide. Noted for §G2:
+      ETL_ARTIFACT_SHA is a CONTENT HASH on the variable, so a DPL-managed
+      artifact can be hash-BEARING even where the rua listing is
+      hash-absent. Supplement block written at the flip; loader is G23.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_runs_on_agent_host
     neo4j_label:  RUNS_ON
@@ -469,13 +494,26 @@ local_relationships:
     to_node:      ExecutionHost
     prov_maps_to: ~
     note: >
-      ETL workload runs on an engine/cluster entry point (Connector ·
-      Region / Bucket Name). Infrastructure placement; no PROV mapping.
-      Feed: CMDB / ETL engine config.
-    supplement:   ontology_supplement.cypher
+      DEPRECATED at gate rua-load-shapes §A2 (RULED 2026-08-06, SIGNED OFF
+      2026-08-07 28/28; applied at G55): DECLINED as redundant — ETL
+      placement is THE SAME FACT as job placement, so this entry would be
+      a synonym splitting "where does this run" across two labels. Never
+      gated for load, never loaded (loader ~). Replaced by
+      m3_runs_on_agent_host / m3_runs_on_host_group, both ACTIVE since P3
+      (2026-07-27): CM_DEF_VJOB.NODE_ID x CM_HOSTS.GRPNAME → role
+      host_group (2-hop, load-balanced), else NODE_ID x NODEID → role
+      agent_host (1-hop hard-coded). Column correction recorded at the
+      session: the join is NODE_ID, NEVER GROUP_NAME —
+      CM_DEF_VJOB.GROUP_NAME is the vendor APPLGROUP (application group),
+      the exact collision the ControlMHostGroup name exists to avoid.
+      ontology_supplement.cypher's documented role enum trimmed to
+      (host_group | agent_host) at the same build. Original meaning kept
+      for the record: ETL workload runs on an engine/cluster entry point;
+      infrastructure placement; no PROV mapping.
+    supplement:   ~
     loader:       ~
     domain:       controlm
-    status:       planned
+    status:       deprecated
 
   # ── M3: host topology (CM_HOSTS — GATE-BOUND, controlm-hosts-topology) ────
   # Registered 2026-07-09 from the psgmgr CM_HOSTS review (internal profile:
@@ -575,10 +613,22 @@ local_relationships:
       provisioning/02_proxy_constraints.cypher) — the edge direction
       already encodes source-vs-target, so the DataSource label is retired
       (see node_classifications). Matrix row: Activity → Entity = USED.
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A5, SIGNED OFF 28/28;
+      applied at G55) WITH THE RESTRICTION RESTATED — the SME changed the
+      page's own words: activates for STRUCTURED, LAUNCHER- OR
+      REGISTRY-GROUNDED evidence — dataset_flow AND parsed CMD_LINE
+      file-ops — but NOT script-body content grep. Both feeds verified at
+      the ruling: dpl_mac maps dataset_flow.json inputDatasets/
+      outputDatasets to candidates (GUID + version + zone);
+      controlm_inventory (G14) parses CMD_LINE MOVE/COPY/COMPRESS into the
+      same candidates with counters. Consequence accepted with the
+      activation: local_file DataAssets will be numerous and transient —
+      one per MOVE operand (§D1/§G1 answer the node-class question).
+      Supplement block written at the flip; loader is G23.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_writes_to
     neo4j_label:  WRITES_TO
@@ -602,10 +652,15 @@ local_relationships:
       already encodes source-vs-target, so the DataTarget label is retired
       (see node_classifications). Matrix row: Activity → Entity =
       GENERATED.
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A5, SIGNED OFF 28/28;
+      applied at G55) WITH THE RESTRICTION RESTATED — same ruling as
+      m3_reads_from: STRUCTURED, LAUNCHER- OR REGISTRY-GROUNDED evidence
+      (dataset_flow AND parsed CMD_LINE file-ops), NOT script-body content
+      grep. Supplement block written at the flip; loader is G23.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm
-    status:       planned
+    status:       active
 
   - id:           m3_delegates_to
     neo4j_label:  DELEGATES_TO
@@ -620,6 +675,15 @@ local_relationships:
       requires Agent → Agent — this is why ExecutionHost is classified
       prov:SoftwareAgent in node_classifications. Edge carries environment.
       Feed: CMDB / IAM.
+      HELD 2026-08-07 (gate rua-load-shapes §A1, SIGNED OFF 28/28): may
+      NOT activate while its SUBJECT HAS NO AGREED KEY —
+      fid-identity-and-scope (K17, drafted, UNSIGNED) rules :AppUser keyed
+      on fid with fid_name a property and name→fid resolution an explicit
+      crosswalk step. ControlMJob.run_as carries the tenant NAME, not the
+      directory key; activating now would key :AppUser on the name by
+      default — the silent split fid §A1 exists to prevent. The rua
+      envelope corroborates PRESENCE; it authors no identity. Stays
+      planned; re-tick after K17 signs.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       controlm

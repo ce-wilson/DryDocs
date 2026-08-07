@@ -10,10 +10,12 @@ Pins, in order of importance:
    ``drydocs_context`` until 2026-07-26, i.e. the guard had been scanning for a
    database name that no longer exists and would not have caught a constant
    naming the real one. Same class of bug as the one it guards against.
-2. **Gate-bound vocabulary:** the four rel labels are ``status: planned`` in
-   relationship_vocabulary.yaml — a live load against the REAL registry raises
-   GateBoundVocabularyError today, by design. Execution mechanics are testable
-   only against a synthetic registry flipped to ``active``.
+2. **Gate-bound vocabulary:** GATE STATE CHANGED AT G55 (rua-load-shapes §J,
+   SIGNED OFF 2026-08-07, 28/28): m3_invokes / m3_reads_from / m3_writes_to
+   are ``status: active`` in the real registry, so a live load of those labels
+   proceeds; m3_triggers stays ``planned`` and still raises
+   GateBoundVocabularyError — the gate check is per-label, and the terminus
+   retires per-label as gates activate, never wholesale.
 3. **Curated-only + identity:** confirmed rels must exist in the graph;
    ControlMJob endpoints must carry the NODE-KEY composite.
 4. **Mechanics:** constraint-on-key MERGE, UNWIND batches, MATCH (never MERGE)
@@ -137,12 +139,40 @@ def test_trust_boundary_refuses_other_databases() -> None:
 # --- 2. the vocabulary gate ---------------------------------------------------------
 
 
-def test_live_load_is_gate_bound_against_the_real_registry() -> None:
-    """THE gate: all four labels are status: planned today — a live load must
-    refuse. When the HITL gate flips them active, this test flips to the
-    execution contract (and gets updated deliberately, not silently)."""
+def test_live_load_executes_for_the_gate_activated_labels() -> None:
+    """THE gate, INVERTED DELIBERATELY at G55 (gate rua-load-shapes §J, SIGNED
+    OFF 2026-08-07, 28/28): m3_invokes / m3_reads_from / m3_writes_to went
+    planned → active, so the raises-check this test carried since the
+    vocabulary was declared flips to the execution contract — updated
+    deliberately, not silently, exactly as its old docstring promised. The
+    terminus survives per-label on what stayed planned (the companion test
+    below)."""
     g = _fixture_graph()
-    with pytest.raises(GateBoundVocabularyError, match="m3_invokes"):
+    client = _FakeClient()
+    assert write_curated(g, set(g.rels), client=client) == 4
+
+
+def test_live_load_still_gate_bound_on_the_planned_label() -> None:
+    """m3_triggers was NOT among the six G22 activation candidates and stays
+    status: planned — a plan carrying TRIGGERS still refuses against the real
+    registry. The raises-check terminus retires per-label as gates activate,
+    never wholesale."""
+    g = LineageGraph()
+    sid = process_id("shell_script", "/opt/scripts/wrap.ksh")
+    did = process_id("dpl", "b6b6c1b2-guid")
+    g.add_process(
+        ProcessNode(node_id=sid, kind="shell_script", name="wrap.ksh", path="/opt/scripts/wrap.ksh")
+    )
+    g.add_process(
+        ProcessNode(
+            node_id=did,
+            kind="dpl",
+            name="dt-pipelines-launcher.jar",
+            path="/apps/tenants/dpl_utils/dt-accelerators/dt-pipelines-launcher.jar",
+        )
+    )
+    g.add_rel(sid, "TRIGGERS", did)
+    with pytest.raises(GateBoundVocabularyError, match="m3_triggers"):
         write_curated(g, set(g.rels), client=_FakeClient())
 
 

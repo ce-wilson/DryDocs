@@ -232,7 +232,11 @@ MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:INVOKES]->(b)
-  SET r.vocab_id = 'm3_invokes', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_invokes', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ETLProcess'})
+MERGE (a)-[r:INVOKES]->(b)
+  SET r.vocab_id = 'm3_invokes', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Script'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:TRIGGERS]->(b)
@@ -240,15 +244,11 @@ MERGE (a)-[r:TRIGGERS]->(b)
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:USES_ARTIFACT]->(b)
-  SET r.vocab_id = 'm7_uses_artifact', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm7_uses_artifact', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:RUNS_ON]->(b)
   SET r.vocab_id = 'm3_runs_on_agent_host', r.role = 'agent_host', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'active';
-
-MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'ExecutionHost'})
-MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'm3_runs_on_etl_host', r.role = 'etl_host', r.prov_maps_to = null, r.domain = 'controlm', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ControlMHostGroup'})
 MERGE (a)-[r:RUNS_ON]->(b)
@@ -264,19 +264,19 @@ MERGE (a)-[r:DEFINED_ON]->(b)
 
 MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:READS_FROM]->(b)
-  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:READS_FROM]->(b)
-  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:WRITES_TO]->(b)
-  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:WRITES_TO]->(b)
-  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'controlm', r.status = 'planned';
+  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'controlm', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:DELEGATES_TO]->(b)
@@ -384,6 +384,14 @@ MATCH (a:SchemaMeta {name: 'Code'}), (b:SchemaMeta {name: 'DevTeam'})
 MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
   SET r.vocab_id = 'arch_owns_code', r.role = 'owner', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'architecture', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'DataAsset'}), (b:SchemaMeta {name: 'AppUser'})
+MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
+  SET r.vocab_id = 'arch_owns_directory', r.role = 'directory_owner', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'architecture', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Script'})
+MERGE (a)-[r:SOURCES]->(a)
+  SET r.vocab_id = 'arch_sources', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
+
 MATCH (a:SchemaMeta {name: 'Code'}), (b:SchemaMeta {name: 'Bitbucket'})
 MERGE (a)-[r:STORED_IN]->(b)
   SET r.vocab_id = 'arch_stored_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
@@ -409,6 +417,10 @@ MERGE (a)-[r:HAS_MEDIA_TYPE]->(b)
   SET r.vocab_id = 'u2_has_media_type', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'SwoClass'})
+MERGE (a)-[r:IS_ENCODED_IN]->(b)
+  SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'Script'}), (b:SchemaMeta {name: 'SwoClass'})
 MERGE (a)-[r:IS_ENCODED_IN]->(b)
   SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
