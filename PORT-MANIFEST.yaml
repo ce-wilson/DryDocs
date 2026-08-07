@@ -402,6 +402,18 @@ rows:
   - path: "internal-local/**"
     disposition: never-port
     note: "gitignored; travels by hand only, never by git"
+  - path: "docs/gate-*-company-prompt.md"
+    disposition: never-port
+    note: "COMPANY-SESSION DELIVERY PACKS, one-way and ONE-TIME: drafted producer-side,
+      they cross ONCE as explicit clean-adds (the five 2026-08-07 packs crossed with
+      PORT-REPORT-5417ef10, merged same day). After the delivering port merges, the
+      COMPANY copy is the live one — their pending sessions (rua-load-shapes
+      ratification, source-registry-v2 review, fcdo-crosswalk, cmdline-nfr-vetting)
+      read it, and they retire it at their own close-out. Producer originals retire to
+      internal-local/archive/ once delivery is confirmed; this row exists so the
+      producer-side retirement DELETIONS never delete the company's live copy. A FUTURE
+      prompt crosses by adding its specific file as a clean-add row ABOVE this one for
+      the delivering port, then removing that row after the merge."
   - path: "docs/port-*.md"
     disposition: never-port
     note: "PRODUCER-SIDE PORT CONTROL DOCS — the rolling port prompt, its step archive,

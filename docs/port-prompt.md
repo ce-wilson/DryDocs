@@ -62,9 +62,12 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   **PORT-REPORT-5417ef10** — range `a14a8028..5417ef10` = **50 commits / 63 changed
   paths, PRODUCER-VERIFIED 2026-08-07** (rev-list and diff counts match; G22 sign-off
   `3648cfcd` in range; the gate-log heading the report quotes matches verbatim).
-  Branch `drydocs-port-20260807`, backup tag `pre-cewilson-port-20260807` @ `cb5b83d8`,
-  **NOT merged, NOT pushed — the `--no-ff` merge + G22 ratification session are the
-  SME's calls.** Suite **1925 / 1 / 27** (single fail = WP1.4 infra-blocked carryover);
+  Branch `drydocs-port-20260807` (2 port commits, HEAD `6ec69db2`), backup tag
+  `pre-cewilson-port-20260807` @ `cb5b83d8`; **`--no-ff` MERGED onto company `main`
+  2026-08-07 (SME).** The G22 ratification session runs against the merged tree —
+  verify the 28/28 gate-log line first, per the staged prompt (the company's merged
+  copy of that prompt is the live one; the producer original is archived, see the
+  prompt-retirement note in this entry's commit). Suite **1925 / 1 / 27** (single fail = WP1.4 infra-blocked carryover);
   Track-1 123/3; reconcile guards 25 passed; zero graph writes; G23 load deferred in
   words. **Initiation note:** the port was run company-side from the staged G22 prompt's
   blocked precondition — the session correctly STOPPED, offered hold/port/verify, and
