@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-07T03:08:25",
+    "captured_at": "2026-08-07T04:15:01",
     "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "461ea8e",
-      "full": "461ea8e7a2cb3e2eb0bb35174febe0ec7b26faf3",
+      "commit": "9f1bb62",
+      "full": "9f1bb624508561d0231efdefe4c7de42ece0dcaf",
       "branch": "main",
-      "describe": "461ea8e",
-      "subject": "feat(lineage): G58 — dead-script archival report with the gate's safety bar",
+      "describe": "9f1bb62",
+      "subject": "docs(reference): A4 — write the dcat per-standard README the registry row already cited",
       "dirty": false,
       "pr": null
     },
@@ -7008,6 +7008,69 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/schemas",
+      "name": "schemas",
+      "extension": "",
+      "rel_path": "config/schemas",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/config/schemas/classification.schema.json",
+      "name": "classification.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/classification.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/precedence.schema.json",
+      "name": "precedence.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/precedence.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/relationship-vocabulary.schema.json",
+      "name": "relationship-vocabulary.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/relationship-vocabulary.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/source-mapping.schema.json",
+      "name": "source-mapping.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/source-mapping.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/source-registry.schema.json",
+      "name": "source-registry.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/source-registry.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/taxonomy-ontology-map.schema.json",
+      "name": "taxonomy-ontology-map.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/taxonomy-ontology-map.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/source-mappings",
       "name": "source-mappings",
       "extension": "",
@@ -13002,10 +13065,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0255.json",
-      "name": "drydocs-20260807-0255.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "name": "drydocs-20260807.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807-0255.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13537,6 +13600,24 @@
       "name": "README.md",
       "extension": ".md",
       "rel_path": "reference/standards/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/reference/standards/dcat",
+      "name": "dcat",
+      "extension": "",
+      "rel_path": "reference/standards/dcat",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/reference/standards/dcat/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "reference/standards/dcat/README.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14095,6 +14176,15 @@
       "name": "test_command_parser.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_command_parser.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_config_schemas.py",
+      "name": "test_config_schemas.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_config_schemas.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15490,6 +15580,15 @@
       "name": "TowerIcon.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/TowerIcon.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/TrustLegend.tsx",
+      "name": "TrustLegend.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/TrustLegend.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18879,6 +18978,10 @@
     ],
     [
       "drydocs/web/src/components/GraphExplorer.tsx",
+      "drydocs/web/src/components/GraphSvg.tsx"
+    ],
+    [
+      "drydocs/web/src/components/GraphExplorer.tsx",
       "drydocs/web/src/lib/forceLayout.ts"
     ],
     [
@@ -18888,6 +18991,10 @@
     [
       "drydocs/web/src/components/GraphSvg.tsx",
       "drydocs/web/src/data/towers.ts"
+    ],
+    [
+      "drydocs/web/src/components/MiniDag.tsx",
+      "drydocs/web/src/components/TrustLegend.tsx"
     ],
     [
       "drydocs/web/src/components/ModuleIcon.tsx",
@@ -19096,6 +19203,10 @@
     [
       "drydocs/web/src/lib/views.ts",
       "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/lineage/LineageGraphPane.tsx",
+      "drydocs/web/src/components/TrustLegend.tsx"
     ],
     [
       "drydocs/web/src/lineage/LineageGraphPane.tsx",
@@ -23462,6 +23573,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/schemas"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/source-mappings"
     ],
     [
@@ -23673,6 +23789,36 @@
       "drydocs/config/overrides",
       "CONTAINS",
       "drydocs/config/overrides/seal-contact-overrides.csv"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/classification.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/precedence.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/relationship-vocabulary.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/source-mapping.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/source-registry.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/taxonomy-ontology-map.schema.json"
     ],
     [
       "drydocs/config/source-mappings",
@@ -26947,7 +27093,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0255.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27192,6 +27338,11 @@
     [
       "drydocs/reference/standards",
       "CONTAINS",
+      "drydocs/reference/standards/dcat"
+    ],
+    [
+      "drydocs/reference/standards",
+      "CONTAINS",
       "drydocs/reference/standards/dcmi-terms"
     ],
     [
@@ -27213,6 +27364,11 @@
       "drydocs/reference/standards",
       "CONTAINS",
       "drydocs/reference/standards/w3c-org"
+    ],
+    [
+      "drydocs/reference/standards/dcat",
+      "CONTAINS",
+      "drydocs/reference/standards/dcat/README.md"
     ],
     [
       "drydocs/reference/standards/dcmi-terms",
@@ -27488,6 +27644,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_command_parser.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_config_schemas.py"
     ],
     [
       "drydocs/tests/unit",
@@ -28367,6 +28528,11 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/TrustLegend.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/icons"
     ],
     [
@@ -28789,13 +28955,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1559,
-    "edges": 807,
+    "files": 1568,
+    "edges": 810,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1822,
-    "directories": 264
+    "rels": 1833,
+    "directories": 266
   }
 }
