@@ -72,8 +72,10 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   OWED company-side, none a silent loss. **ROOT-CAUSE COLLAPSE (company run, 2026-08-06;
   corrects this entry's first draft, which mis-blamed S4):** the 16 collapse to ~4 causes.
   A ×4 = company data (BOM CSV, 30-snapshot prune ×2 to newest-only, snapshot
-  unmapped-extensions cleanliness — "clean" means `adapter.unmapped_extensions == {}`,
-  extend the extension map or prune the files). **B1 ×6 = the K8 folder-grain edge
+  unmapped-extensions contract — CORRECTED 2026-08-06: the §E2 restatement (`e3f65af`,
+  in range) demands NON-empty `unmapped_extensions` on an all-files snapshot + all
+  seeded extensions bound; the "clean == {}" first-draft relay was stale, caught by
+  the company session's static inspection). **B1 ×6 = the K8 folder-grain edge
   reshape was not applied to the company's EXTENDED `manual_mappings` writer** (a
   clobber-audit re-merge file) — their writer still speaks job-grain
   `{ControlMJob, WAS_ASSOCIATED_WITH}`, producer fixtures use

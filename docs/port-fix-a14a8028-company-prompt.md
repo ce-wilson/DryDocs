@@ -41,10 +41,14 @@ port had over-adopted the web half of held K18 work). **Suite: 14 failed.**
    em-dashes/arrows in `internal-local/.../run-kerberos-debug.ps1` and
    `backlogscan.ps1`.
 4. `test_committed_newest_snapshot_is_accepted_and_clean` — after the prune,
-   regenerate the snapshot; "clean" means `adapter.unmapped_extensions == {}`
-   (pinned by producer `test_code_snapshot_loader.py`). If extensions remain
-   unmapped, either extend the extension map in `drydocs/loaders/code_snapshot.py`
-   (adapter fix) or rule the offending files out of scope — record which, and why.
+   regenerate the snapshot. **CORRECTED 2026-08-06 (first draft said "clean means
+   `unmapped_extensions == {}`" — stale; the §E2 restatement at `e3f65af` is IN your
+   range):** the current contract is the inverse — every SEEDED extension must bind,
+   `unmapped_extensions` must be NON-EMPTY (an all-files snapshot records its skips;
+   empty means the skip went unrecorded, which §E2 forbids), and media-type rows
+   out-bind language rows. Follow the test's own comment block, not this prompt's
+   first draft. (Heads-up: the NEXT port carries 2026-08-06 SME rulings making
+   images/fonts a skipped asset class — this test's residue shrinks again then.)
 
 Acceptance: those 4 green; suite 14 → 10.
 
