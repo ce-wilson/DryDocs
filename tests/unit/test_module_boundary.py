@@ -70,6 +70,14 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.cmdline_staging",
         "drydocs.docs_verify",
         "drydocs.seal_samples",
+        # drydocs.docs_coverage = the Q16 software->documentation coverage report.
+        # Same bucket as docs_verify for the same recorded reason, and it IMPORTS
+        # docs_verify (count_query/locator_of) so the two verbs can never disagree
+        # about whether a corpus is loaded — an import that is free inside one group
+        # and would need a DECLARED_COMPONENT_IMPORTS exception anywhere else.
+        # Carries docs_verify's RE-HOME caveat: move both to docmeta if that
+        # component ever takes over corpus state.
+        "drydocs.docs_coverage",
     ),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here

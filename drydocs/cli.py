@@ -96,6 +96,8 @@ from drydocs_core.source_registry import (
     UnknownSourceError,
 )
 
+from .docs_coverage import REGISTRY_DB as COVERAGE_REGISTRY_DB
+from .docs_coverage import coverage as build_docs_coverage
 from .docs_verify import Summary as DocsVerifySummary
 from .docs_verify import exit_code as docs_verify_exit_code
 from .docs_verify import verify as verify_corpora
@@ -2054,6 +2056,134 @@ def _docs_verify_run(sources: list[dict]) -> None:
         console.print(
             "[red]wrong-db rows present — a corpus is not in the database it declared.[/]"
         )
+        raise typer.Exit(code)
+
+
+SOFTWARE_REGISTRY_PATH = (
+    Path(__file__).resolve().parents[1] / "config" / "taxonomy" / "software-registry.yaml"
+)
+PLATFORMS_PATH = Path(__file__).resolve().parents[1] / "config" / "taxonomy" / "platforms.yaml"
+SOURCE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "source-registry.yaml"
+
+
+@app.command(name="docs-coverage")
+def docs_coverage(
+    no_graph: bool = typer.Option(
+        False, "--no-graph", help="Declaration layer only — never contacts Neo4j."
+    ),
+    product: str = typer.Option("", "--product", help="Filter to one product id."),
+    section: str = typer.Option(
+        "all", "--section", help="products | corpora | systems | all"
+    ),
+) -> None:
+    """What documentation do we hold per software product, and what is blocking it.
+
+    Q16 (a). One row per product — INCLUDING the twelve of thirteen that carry no
+    documentation pointer at all, which are the rows the report exists to print.
+    Plus the corpora no product declares, and the source-registry systems with no
+    product row (where Snowflake appears, being absent from the registry entirely).
+
+    Runs fine with the database down: the cross-DB determination is arithmetic on
+    two YAML fields, so `--no-graph` still answers "is a DESCRIBES edge even
+    POSSIBLE". Graph-derived columns then read `-` (not probed), never 0.
+
+    Exits non-zero on a broken corpus pointer and on version drift — NOT on
+    no-corpus or cross-db-blocked, which are true statements about the world that
+    G32 owns.
+    """
+    import yaml
+
+    software = yaml.safe_load(SOFTWARE_REGISTRY_PATH.read_text(encoding="utf-8"))
+    docs = yaml.safe_load(DOC_REGISTRY_PATH.read_text(encoding="utf-8"))
+    sources = yaml.safe_load(SOURCE_REGISTRY_PATH.read_text(encoding="utf-8"))
+    platforms = yaml.safe_load(PLATFORMS_PATH.read_text(encoding="utf-8"))
+
+    run = None
+    if not no_graph:
+        try:
+            with _client(COVERAGE_REGISTRY_DB) as probe:
+                probe.run("RETURN 1 AS ok")
+
+            def run(database: str, cypher: str, params: dict) -> list[dict]:  # noqa: F811
+                with _client(database) as cli:
+                    return cli.run(cypher, params)
+
+        except Exception as exc:  # pragma: no cover - environment dependent
+            console.print(f"[yellow]graph not probed ({type(exc).__name__}); declaration layer only[/]")
+
+    report = build_docs_coverage(
+        software.get("products", []),
+        docs.get("sources", []),
+        systems=sources.get("systems", []),
+        platforms=platforms.get("platforms", []),
+        run=run,
+    )
+
+    rows = report.products
+    if product:
+        rows = [r for r in rows if r.product_id == product]
+
+    if section in ("all", "products"):
+        # ASCII arrow: the Windows console encodes cp1252 and dies on U+2192.
+        table = Table(title="software -> documentation coverage")
+        for col in ("product", "vendor", "corpus", "coverage", "blockers", "currency", "edges"):
+            table.add_column(col)
+        for r in rows:
+            colour = {
+                "traversable": "green",
+                "unregistered-corpus": "red",
+                "cross-db-blocked": "cyan",
+            }.get(r.coverage, "yellow" if r.coverage != "no-corpus" else "dim")
+            table.add_row(
+                r.product_id,
+                r.vendor_id,
+                r.corpus_id or "-",
+                f"[{colour}]{r.coverage}[/]",
+                ", ".join(r.blockers) or "-",
+                r.currency,
+                "-" if r.describes_edges is None else str(r.describes_edges),
+            )
+        console.print(table)
+        for r in rows:
+            if r.unregistered_doc_locators:
+                console.print(
+                    f"  [cyan]{r.product_id}[/]: documentation locator(s) with no corpus "
+                    f"registered - {', '.join(r.unregistered_doc_locators)}"
+                )
+            if r.divergence:
+                console.print(f"  [magenta]{r.product_id}[/]: {', '.join(r.divergence)} - {r.detail}")
+
+    if section in ("all", "corpora") and report.corpora:
+        table = Table(title="corpora no product declares")
+        for col in ("corpus", "tier", "target_db", "confirmed", "attribution"):
+            table.add_column(col)
+        for c in report.corpora:
+            table.add_row(
+                c.corpus_id,
+                str(c.tier or "-"),
+                str(c.target_db or "-"),
+                str(c.confirmed),
+                c.attribution,
+            )
+        console.print(table)
+
+    if section in ("all", "systems") and report.systems:
+        table = Table(title="registered systems with no software-registry product")
+        for col in ("system", "layer", "doc locators"):
+            table.add_column(col)
+        for s in report.systems:
+            table.add_row(s.system_id, str(s.layer or "-"), ", ".join(s.doc_locator_keys) or "-")
+        console.print(table)
+        console.print("[dim]  candidates for a human ruling - no claim that any SHOULD be a product[/]")
+
+    console.print(f"coverage: {report.summary()}")
+    if not report.reconciles():
+        console.print("[red]summary does not reconcile - an input assumption is wrong.[/]")
+
+    code = report.exit_code()
+    if code:
+        names = ", ".join(r.product_id for r in report.failing())
+        console.print(f"[red]drift or a broken corpus pointer: {names}[/]")
         raise typer.Exit(code)
 
 
