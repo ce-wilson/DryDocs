@@ -58,6 +58,29 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
+- **Producer head `5417ef10`** (2026-08-07), applied company-side as
+  **PORT-REPORT-5417ef10** — range `a14a8028..5417ef10` = **50 commits / 63 changed
+  paths, PRODUCER-VERIFIED 2026-08-07** (rev-list and diff counts match; G22 sign-off
+  `3648cfcd` in range; the gate-log heading the report quotes matches verbatim).
+  Branch `drydocs-port-20260807`, backup tag `pre-cewilson-port-20260807` @ `cb5b83d8`,
+  **NOT merged, NOT pushed — the `--no-ff` merge + G22 ratification session are the
+  SME's calls.** Suite **1925 / 1 / 27** (single fail = WP1.4 infra-blocked carryover);
+  Track-1 123/3; reconcile guards 25 passed; zero graph writes; G23 load deferred in
+  words. **Initiation note:** the port was run company-side from the staged G22 prompt's
+  blocked precondition — the session correctly STOPPED, offered hold/port/verify, and
+  the SME chose "land the port first"; the rolling guardrails held without a hand-given
+  prompt. **CAUTION for the merge review:** the range head `5417ef10` is itself the
+  "claim G55 in_progress" commit — the ported backlog shows G55 claimed with the work
+  NOT in range; G55 apply (`2435a7d`), the G23 curated-load build (`ba7fbaf`) and G58
+  (`461ea8e`) are among the **25 producer commits pending** for the next port
+  (base `5417ef10`). **Guardrail-3 miss:** the report quotes no
+  `rev-list --count <tag>..HEAD` — quote it at merge time. **Relays actioned
+  producer-side (2026-08-07):** #2 audit-fields.yaml + test_module_boundary.py
+  per-entry/union rows APPLIED to `PORT-MANIFEST.yaml` (this commit); the
+  `confirmed`-flag drift relay was already Idea-81 and same-day groomed → **N10**
+  (gate-prompt draft; schema change waits on the gate). Seal-samples §A3 fixture
+  divergence (`Cloud Enablement Lead` synthetic role) is SANCTIONED — the producer
+  pin's own comment names it as the set that must change; no producer edit.
 - **Producer head `a14a8028`** (2026-08-06), applied company-side as
   **PORT-REPORT-a14a8028** — range `5f79d145..a14a8028` = **107 commits, PRODUCER-VERIFIED
   2026-08-06** (range enumerated against producer git; both cited never-port docs exist;

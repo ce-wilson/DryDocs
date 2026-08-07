@@ -137,6 +137,19 @@ rows:
       under internal/) — consumer entries NEVER come from, or are removed by, a
       port. Policy/README/template text is producer-canonical (step 31).
     note: "tier-5 manual-CSV mechanism (gate seal-attribution-match-policy, 2026-07-14)"
+  - path: "config/audit-fields.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Keyed by source id. UNION: producer additions + company-only
+      confirmed-source entries (9 of them at PORT-REPORT-5417ef10) — company
+      entries never come from, or are removed by, a port. Mechanism/policy
+      prose is producer-canonical.
+    note: >
+      Relay #2 of PORT-REPORT-5417ef10 (2026-08-07): sat under the blanket
+      `config/**` = canonical-producer by omission — third instance of the
+      "company is ahead in a config file the manifest treats as
+      producer-owned" pattern (backlog.yaml at J16, dev-environment.yaml at
+      the 2026-07-28 port).
 
   # ---- append-only audit files ----------------------------------------------
   - path: "config/gate-log.md"
@@ -291,8 +304,13 @@ rows:
     disposition: canonical-producer
     note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"
   - path: "tests/unit/test_module_boundary.py"
-    disposition: canonical-producer
-    note: "carries ENTRYPOINT_MODULES exemption + default-deny — the settled boundary resolution"
+    disposition: per-entry
+    entry_rule: >
+      Module-group entries UNION: the boundary mechanism (ENTRYPOINT_MODULES
+      exemption + default-deny) is producer-canonical; company-only groups
+      (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — at
+      PORT-REPORT-5417ef10) are never dropped by a port.
+    note: "was canonical-producer until Relay #2 of PORT-REPORT-5417ef10 — taking it wholesale failed the company guard on their extended groups"
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"
