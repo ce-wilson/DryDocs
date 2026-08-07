@@ -63,6 +63,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
 <!-- add new ideas at the top -->
 
 
+- **`Idea-79`** · 2026-08-06 · `[idea]` · **open** · prio? **Med** —
+  **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering
+  company-only tracked-path rows.** PORT-REPORT-a14a8028's clobber audit found the take
+  dropped ~24 company-origin manifest lines (canonical-producer disposition means the
+  producer file wins verbatim), so company-only tracked paths fell through their own J16
+  guard (`test_port_reconcile_guards::test_no_tracked_path_falls_through`, failure #14 —
+  the one conscious deferral in that report). The company session re-adds the rows by
+  hand this time; the structural fix is a D2-registry-style overlay: producer manifest
+  stays canonical, company rows live in a separate company-side include the guard unions,
+  and a port can no longer delete them. Needs a small grammar decision (include file vs.
+  marked section), then a manifest + guard change on both sides.
+
 - **`Idea-77`** · 2026-08-06 · `[chore]` · **open** · prio? **Low** —
   **`web/src/components/HeroArt.tsx` is an orphan — the code graph's first
   front-end finding.** The O42 TS import edges went live (226 edges, depgraph
