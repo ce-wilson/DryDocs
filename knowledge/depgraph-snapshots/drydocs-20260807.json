@@ -1,29 +1,29 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-06T19:33:27",
-    "date": "20260806",
+    "captured_at": "2026-08-07T00:45:33",
+    "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f59119b",
-      "full": "f59119bf340baafd146f521408ed365961e6cb8b",
+      "commit": "3648cfc",
+      "full": "3648cfcd7c2c8e6d15f3edc459eea8d6cfa1f03b",
       "branch": "main",
-      "describe": "f59119b",
-      "subject": "docs(ui): thread-reuse delta rule + IntakeStepper decision merged into the intake plan and O46/O47",
+      "describe": "3648cfc",
+      "subject": "feat(gates): G22 SIGNED OFF 28/28 - the rua load-shapes terminus closes, and three guards move deliberately",
       "dirty": false,
       "pr": null
     },
     "depgraph": {
-      "commit": "a56d2fc",
-      "full": "a56d2fc4c0e873758c230721f25ed16c59d0dc9e",
+      "commit": "773fb1e",
+      "full": "773fb1ea11e8db41bc6200e19f701866e2cef3eb",
       "branch": "main",
-      "dirty": false,
+      "dirty": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
         "tree": true,
-        "ts_imports": true
+        "ts_imports": false
       }
     }
   },
@@ -7161,6 +7161,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/taxonomy/context-types.yaml",
+      "name": "context-types.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy/context-types.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/taxonomy/controlm.yaml",
       "name": "controlm.yaml",
       "extension": ".yaml",
@@ -8155,6 +8164,15 @@
       "name": "port-ais-supplement-company-prompt.md",
       "extension": ".md",
       "rel_path": "docs/port-ais-supplement-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/port-fix-a14a8028-company-prompt.md",
+      "name": "port-fix-a14a8028-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/port-fix-a14a8028-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9330,15 +9348,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -9355,15 +9364,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10293,24 +10293,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/plan_board.py",
       "name": "plan_board.py",
       "extension": ".py",
@@ -10531,6 +10513,15 @@
       "name": "handlers.py",
       "extension": ".py",
       "rel_path": "drydocs_api/handlers.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_api/intake.py",
+      "name": "intake.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/intake.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12912,10 +12903,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1804.json",
-      "name": "drydocs-20260806-1804.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json",
+      "name": "drydocs-20260806.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806-1804.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260806.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13641,6 +13632,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/render_context_types.py",
+      "name": "render_context_types.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_context_types.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/render_design_doc.py",
       "name": "render_design_doc.py",
       "extension": ".py",
@@ -14001,6 +14001,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_context_types.py",
+      "name": "test_context_types.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_context_types.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_controlm_cypher.py",
       "name": "test_controlm_cypher.py",
       "extension": ".py",
@@ -14275,6 +14284,15 @@
       "name": "test_incremental_delete.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_incremental_delete.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_intake_api.py",
+      "name": "test_intake_api.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_intake_api.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15576,6 +15594,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/web/src/generated/context-types.json",
+      "name": "context-types.json",
+      "extension": ".json",
+      "rel_path": "web/src/generated/context-types.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/generated/enforcement-matrix.json",
       "name": "enforcement-matrix.json",
       "extension": ".json",
@@ -16875,6 +16902,10 @@
     ],
     [
       "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_api/intake.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/mappings.py"
     ],
     [
@@ -16956,6 +16987,18 @@
     [
       "drydocs/drydocs_api/handlers.py",
       "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/drydocs_api/intake.py",
+      "drydocs/drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs/drydocs_api/intake.py",
+      "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/drydocs_api/intake.py",
+      "drydocs/drydocs_core/data_root.py"
     ],
     [
       "drydocs/drydocs_api/mappings.py",
@@ -17846,6 +17889,22 @@
       "drydocs/drydocs/loaders/base.py"
     ],
     [
+      "drydocs/tests/unit/test_intake_api.py",
+      "drydocs/drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs/tests/unit/test_intake_api.py",
+      "drydocs/drydocs_api/intake.py"
+    ],
+    [
+      "drydocs/tests/unit/test_intake_api.py",
+      "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_intake_api.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
       "drydocs/tests/unit/test_launcher_registry.py",
       "drydocs/drydocs_core/orchestration/__init__.py"
     ],
@@ -18512,910 +18571,6 @@
     [
       "drydocs/tests/unit/test_yaml_fragments.py",
       "drydocs/drydocs_core/yaml_fragments.py"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/components/SignIn.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/layout/Shell.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/AdminConfigRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/AskRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/AssetPathRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/ConsoleRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/DocsRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/GatesRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/LineageRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/LoadsRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/MappingsRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/OverviewRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/OwnershipRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/RemediationRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/RunbooksRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/explorer/ExplorerLiveRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/App.tsx",
-      "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx"
-    ],
-    [
-      "drydocs/web/src/ask/TaskGraphPane.tsx",
-      "drydocs/web/src/ask/askApi.ts"
-    ],
-    [
-      "drydocs/web/src/ask/TaskGraphPane.tsx",
-      "drydocs/web/src/lib/forceLayout.ts"
-    ],
-    [
-      "drydocs/web/src/ask/askApi.ts",
-      "drydocs/web/src/lib/adk.ts"
-    ],
-    [
-      "drydocs/web/src/components/BrandMark.tsx",
-      "drydocs/web/src/components/icons/HubGlyphs.tsx"
-    ],
-    [
-      "drydocs/web/src/components/CypherConsole.tsx",
-      "drydocs/web/src/lib/adk.ts"
-    ],
-    [
-      "drydocs/web/src/components/CypherConsole.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/components/CypherConsole.tsx",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/components/CypherConsole.tsx",
-      "drydocs/web/src/lib/neo4j.ts"
-    ],
-    [
-      "drydocs/web/src/components/GraphExplorer.tsx",
-      "drydocs/web/src/lib/forceLayout.ts"
-    ],
-    [
-      "drydocs/web/src/components/GraphExplorer.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/components/GraphSvg.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/components/ModuleIcon.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/components/MyApps.tsx",
-      "drydocs/web/src/components/GraphSvg.tsx"
-    ],
-    [
-      "drydocs/web/src/components/MyApps.tsx",
-      "drydocs/web/src/data/myApps.ts"
-    ],
-    [
-      "drydocs/web/src/components/MyApps.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/components/MyApps.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/components/SignIn.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/components/ThemeToggle.tsx",
-      "drydocs/web/src/lib/theme.ts"
-    ],
-    [
-      "drydocs/web/src/components/TowerDrill.tsx",
-      "drydocs/web/src/components/GraphSvg.tsx"
-    ],
-    [
-      "drydocs/web/src/components/TowerDrill.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/components/TowerIcon.tsx",
-      "drydocs/web/src/components/icons/HubGlyphs.tsx"
-    ],
-    [
-      "drydocs/web/src/components/TowerIcon.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/components/ui/IdChip.tsx",
-      "drydocs/web/src/lib/runtimeView.ts"
-    ],
-    [
-      "drydocs/web/src/components/ui/StatusItems.tsx",
-      "drydocs/web/src/lib/status.ts"
-    ],
-    [
-      "drydocs/web/src/docsmod/demoDocs.ts",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/explorer/DataFrame.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/explorer/DataFrame.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/DataFrame.tsx",
-      "drydocs/web/src/explorer/demoGraph.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/ExplorerGraphPane.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/ExplorerGraphPane.tsx",
-      "drydocs/web/src/explorer/demoGraph.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/ExplorerGraphPane.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/ExplorerGraphPane.tsx",
-      "drydocs/web/src/lib/views.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/components/ui/IdChip.tsx"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/components/ui/StatusItems.tsx"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/explorer/demoGraph.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/explorer/demoStatus.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/NodeInspector.tsx",
-      "drydocs/web/src/lib/views.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/SpecGrid.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/explorer/SpecGrid.tsx",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/demoGraph.ts",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/demoStatus.ts",
-      "drydocs/web/src/explorer/demoGraph.ts"
-    ],
-    [
-      "drydocs/web/src/explorer/demoStatus.ts",
-      "drydocs/web/src/lib/status.ts"
-    ],
-    [
-      "drydocs/web/src/layout/Aside.tsx",
-      "drydocs/web/src/components/ModuleIcon.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Aside.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/layout/Aside.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/layout/Header.tsx",
-      "drydocs/web/src/components/BrandMark.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Header.tsx",
-      "drydocs/web/src/components/ThemeToggle.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Header.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/layout/RightSidebarSlot.tsx",
-      "drydocs/web/src/layout/rightSidebarContext.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/layout/Aside.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/layout/Header.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/layout/RightSidebarSlot.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/layout/rightSidebarContext.tsx"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/layout/shellConfig.ts"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/layout/useRouteA11y.ts"
-    ],
-    [
-      "drydocs/web/src/layout/Shell.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/lib/graph.ts",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/lib/graphApi.ts",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/lib/mappingsApi.ts",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/lib/neo4j.ts",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/lib/views.ts",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/lineage/LineageGraphPane.tsx",
-      "drydocs/web/src/lineage/demoLineage.ts"
-    ],
-    [
-      "drydocs/web/src/loads/LoadsTimeline.tsx",
-      "drydocs/web/src/components/ui/IdChip.tsx"
-    ],
-    [
-      "drydocs/web/src/loads/LoadsTimeline.tsx",
-      "drydocs/web/src/components/ui/Meter.tsx"
-    ],
-    [
-      "drydocs/web/src/loads/LoadsTimeline.tsx",
-      "drydocs/web/src/components/ui/StatusChip.tsx"
-    ],
-    [
-      "drydocs/web/src/loads/LoadsTimeline.tsx",
-      "drydocs/web/src/loads/demoLoads.ts"
-    ],
-    [
-      "drydocs/web/src/main.tsx",
-      "drydocs/web/src/App.tsx"
-    ],
-    [
-      "drydocs/web/src/ownership/AssetSearchPanel.tsx",
-      "drydocs/web/src/ownership/assetSearch.ts"
-    ],
-    [
-      "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
-      "drydocs/web/src/components/MyApps.tsx"
-    ],
-    [
-      "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
-      "drydocs/web/src/ownership/demoOwnership.ts"
-    ],
-    [
-      "drydocs/web/src/remediation/demoRemediation.ts",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AdminConfigRoute.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AdminConfigRoute.tsx",
-      "drydocs/web/src/layout/rightSidebarContext.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AdminConfigRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AdminConfigRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/data/mappingsDemo.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/lib/mappingsApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/ask/TaskGraphPane.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/ask/askApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AssetPathRoute.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AssetPathRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/AssetPathRoute.tsx",
-      "drydocs/web/src/ownership/assetSearch.ts"
-    ],
-    [
-      "drydocs/web/src/routes/ConsoleRoute.tsx",
-      "drydocs/web/src/components/CypherConsole.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ConsoleRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ConsoleRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/components/LinkedDemoFrame.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/docsmod/demoDocs.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/GatesRoute.tsx",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/GatesRoute.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/GatesRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/GatesRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/lineage/LineageGraphPane.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/lineage/demoLineage.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/components/StatTiles.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/loads/LoadsTimeline.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/loads/demoLoads.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/data/mappingsDemo.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/lib/mappingsApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ModuleTemplate.tsx",
-      "drydocs/web/src/components/ui/EmptyState.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ModuleTemplate.tsx",
-      "drydocs/web/src/components/ui/ResizableSplit.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ModuleTemplate.tsx",
-      "drydocs/web/src/components/ui/Tabs.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ModuleTemplate.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/ModuleTemplate.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/components/BrandMark.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/components/ModuleIcon.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/components/ui/StatusItems.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/lib/status.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/lib/views.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/ownership/AssetSearchPanel.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/ownership/OwnershipGraphPane.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/ownership/demoOwnership.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RemediationRoute.tsx",
-      "drydocs/web/src/components/LinkedDemoFrame.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RemediationRoute.tsx",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RemediationRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RemediationRoute.tsx",
-      "drydocs/web/src/remediation/demoRemediation.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RemediationRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/components/LinkedDemoFrame.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/runbooks/demoRunbooks.ts"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/components/StatTiles.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/HallucinationSpotlight.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/QuestionDetail.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/Scoreboard.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/StrategyCards.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/ThinkingLogicPanel.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/TokenMemoryChart.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/UnderTheHoodRoute.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerLiveRoute.tsx",
-      "drydocs/web/src/components/GraphExplorer.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerLiveRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/explorer/DataFrame.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/explorer/ExplorerGraphPane.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/explorer/NodeInspector.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/explorer/demoGraph.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/layout/rightSidebarContext.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/modules/registry.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/routes/ModuleTemplate.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx",
-      "drydocs/web/src/components/TowerDrill.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx",
-      "drydocs/web/src/layout/ModuleToolbar.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx",
-      "drydocs/web/src/lib/views.ts"
-    ],
-    [
-      "drydocs/web/src/runbooks/demoRunbooks.ts",
-      "drydocs/web/src/components/MiniDag.tsx"
-    ],
-    [
-      "drydocs/web/src/underhood/HallucinationSpotlight.tsx",
-      "drydocs/web/src/underhood/ResultChip.tsx"
-    ],
-    [
-      "drydocs/web/src/underhood/HallucinationSpotlight.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
-    ],
-    [
-      "drydocs/web/src/underhood/QuestionDetail.tsx",
-      "drydocs/web/src/underhood/ResultChip.tsx"
-    ],
-    [
-      "drydocs/web/src/underhood/QuestionDetail.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
-    ],
-    [
-      "drydocs/web/src/underhood/ResultChip.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
-    ],
-    [
-      "drydocs/web/src/underhood/Scoreboard.tsx",
-      "drydocs/web/src/components/ui/StatusChip.tsx"
-    ],
-    [
-      "drydocs/web/src/underhood/Scoreboard.tsx",
-      "drydocs/web/src/underhood/ResultChip.tsx"
-    ],
-    [
-      "drydocs/web/src/underhood/Scoreboard.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
-    ],
-    [
-      "drydocs/web/src/underhood/StrategyCards.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
-    ],
-    [
-      "drydocs/web/src/underhood/TokenMemoryChart.tsx",
-      "drydocs/web/src/underhood/benchmarkData.ts"
     ]
   ],
   "processes": [],
@@ -23455,6 +22610,11 @@
     [
       "drydocs/config/taxonomy",
       "CONTAINS",
+      "drydocs/config/taxonomy/context-types.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy",
+      "CONTAINS",
       "drydocs/config/taxonomy/controlm.yaml"
     ],
     [
@@ -23601,6 +22761,11 @@
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/port-ais-supplement-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/port-fix-a14a8028-company-prompt.md"
     ],
     [
       "drydocs/docs",
@@ -24290,22 +23455,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -24356,16 +23511,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -25341,6 +24486,11 @@
       "drydocs/drydocs_api",
       "CONTAINS",
       "drydocs/drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
+      "drydocs/drydocs_api/intake.py"
     ],
     [
       "drydocs/drydocs_api",
@@ -26645,7 +25795,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806-1804.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260806.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -26990,6 +26140,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/render_context_types.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/render_design_doc.py"
     ],
     [
@@ -27185,6 +26340,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_context_types.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_controlm_cypher.py"
     ],
     [
@@ -27336,6 +26496,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_incremental_delete.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_intake_api.py"
     ],
     [
       "drydocs/tests/unit",
@@ -28140,6 +27305,11 @@
     [
       "drydocs/web/src/generated",
       "CONTAINS",
+      "drydocs/web/src/generated/context-types.json"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
       "drydocs/web/src/generated/enforcement-matrix.json"
     ],
     [
@@ -28457,13 +27627,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1543,
-    "edges": 780,
+    "files": 1550,
+    "edges": 562,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1806,
-    "directories": 264
+    "rels": 1809,
+    "directories": 260
   }
 }
