@@ -341,6 +341,14 @@ the m3-verify core invariants; deselected from all default runs):
 poetry run pytest tests/integration -m integration -q
 ```
 
+No manual environment prep: `tests/integration/conftest.py` defaults
+`TESTCONTAINERS_RYUK_DISABLED=true` (J36) because the ryuk reaper's port
+mapping intermittently fails on the producer Windows desktops ("port 8080 is
+not available" — shifting WinNAT excluded-port ranges, or a reaper left by a
+crashed run). The conftest docstring carries the full why, the override
+(`TESTCONTAINERS_RYUK_DISABLED=false`), and the stale-container cleanup
+one-liners for a hard-killed run.
+
 ## Further reading
 
 - [`knowledge/ARCHITECTURE.md`](knowledge/ARCHITECTURE.md) — the original repo-organization rationale (historical; the current boundary is [`MODULE_MAP.md`](MODULE_MAP.md) + `CLAUDE.md`).
