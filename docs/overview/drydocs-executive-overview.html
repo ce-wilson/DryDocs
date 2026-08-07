@@ -47,6 +47,25 @@
                           history. Content claims NOT refreshed (ADR statuses and the
                           crosswalk-consumer line are as of rev 6; S1/S2 have since
                           landed — a content refresh is a separate revision).
+       rev 8  2026-08-07  §06 gains a stated TARGET STATE (backlog L24, user direction):
+                          a production estate holding only actively used code, with
+                          replaced code archived to version control and storage. Written
+                          as a GOAL, not a current state — the dashed-border convention
+                          below has no prose equivalent, so the forward-looking framing
+                          is carried in the text itself ("a target the loops above move
+                          toward, not a description of today").
+                          The limit rides WITH the goal rather than sitting in §03's
+                          "Honest about the gaps": the three usage signals are
+                          positive-only and each is bounded by what its feed scanned, so
+                          an absence recorded by one feed is not an absence in the estate.
+                          The three review outcomes (dead / misdeployed / dynamically
+                          called) stay separate for the same reason.
+                          NO COINED TERM: naming the estate-level state formally would be
+                          a vocabulary decision routed through the SME gate, and nothing
+                          needs one — the goal is stated in plain English.
+                          Grounded in gate rua-load-shapes (SIGNED OFF 2026-08-07) and
+                          the archival report built at G58 (drydocs_lineage/archival.py).
+                          No other content claims refreshed; rev 7's note still applies.
 
      CONVENTION: dashed borders = proposed or planned. As each dotted line
      closes, flip it to solid, add a revision line above, and republish the
@@ -299,8 +318,8 @@
     <p class="log">
       <span><b>Audience:</b> Leadership · Production Support · Engineering · SME</span>
       <span><b>Classification</b> Internal-Public</span>
-      <span><b>Date</b> 2026-08-03</span>
-      <span><b>Revision</b> 7</span>
+      <span><b>Date</b> 2026-08-07</span>
+      <span><b>Revision</b> 8</span>
     </p>
   </header>
 
@@ -1021,6 +1040,39 @@ flowchart TB
         <strong>capture is a byproduct of what ran, not a documentation chore.</strong> Every loop
         re-grounds on the next ingest, so the graph corrects itself rather than drifting.
       </p>
+
+      <h3>Target state: only actively used code on the production server</h3>
+      <p>
+        <strong>The goal is a production estate that holds only code that is actually used.</strong>
+        When a script has been fully replaced, it belongs in version control and archive storage —
+        not left on the server, where the next person on call has to work out whether it still
+        matters. This is a target the loops above move toward, not a description of today.
+      </p>
+      <p>
+        The graph makes it measurable because it keeps three signals apart instead of collapsing
+        them into a single &ldquo;used&rdquo; flag: what is <em>deployed</em> on a server, what is
+        <em>called</em> by a job, and what a pipeline registry still lists as <em>active</em>. A
+        script that is present and called by nothing is a candidate for review. Archived code is
+        the same question answered from the other side — still in the repository, no longer on the
+        server — so progress toward the target is a number the system can report, not an
+        impression.
+      </p>
+      <p>
+        <strong>The limit is coverage, and the report states it rather than leaving it to the
+        reader.</strong> Each of the three signals can only show presence, and each is bounded by
+        what its feed actually scanned. Calls from one script to another are visible only where the
+        collector carried the script body, so on a listing-only capture
+        &ldquo;unreferenced&rdquo; means <em>no command-line reference was observed</em> — never
+        <em>nothing calls it</em>. An absence recorded by one feed is not an absence in the estate.
+      </p>
+      <p>
+        That is why the system proposes and a person decides. The report separates three outcomes
+        rather than two: code that is genuinely dead and can be archived and removed, code that was
+        <strong>deployed to the wrong server</strong> and should be relocated instead of deleted,
+        and code no command line names but a captured script body does call. Merging those three
+        would turn a cleanup into an outage, which is the same reason nothing here deletes on its
+        own judgement.
+      </p>
     </div>
   </section>
 
@@ -1065,6 +1117,7 @@ flowchart TB
   <footer>
     <div class="revs">
       <span><b>Revisions</b></span>
+      <span>rev 8 · 2026-08-07 — §06 gains a stated <b>target state</b>: a production estate holding only actively used code, with replaced code archived to version control and storage (backlog L24, user direction). Written as a goal, not a current state. Carries its own limit: the three usage signals show presence only, each bounded by what its feed scanned, so an absence recorded by one feed is not an absence in the estate — and the three review outcomes (dead / misdeployed / dynamically called) stay separate for the same reason. Grounded in the <code>rua-load-shapes</code> gate (signed 2026-08-07) and the archival report built at G58; no other content claims refreshed</span>
       <span>rev 7 · 2026-08-03 — U.S. business-English style pass per <code>docs/style/us-business-english.md</code> (L22): spine→backbone, planes→layers, decays/rots→goes stale/becomes outdated, gate-confirmed→validated through the SME gate, UK spellings Americanized; HTML stays the single hand-authored source (no .md established); content claims unchanged from rev 6</span>
       <span>rev 6 · 2026-07-25 — production-support framing sharpened: names the actual decay, from overview + business context + process flow down to an Excel sheet of folder and job details</span>
       <span>rev 5 · 2026-07-25 — three trust-tier graphs named explicitly (<code>drydocs</code> / <code>ddcontext</code> / <code>dddocs</code>, federated by <code>ddall</code>); §06 states that the original proposal survives as active vocabulary; stale database names corrected to the gated <code>dd*</code> convention</span>
