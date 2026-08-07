@@ -18,6 +18,29 @@
   import the graph-write or run-cadence layer.
 - **Components import only core, never each other.**
 
+## Naming: folder name vs module name (S7, raised at ADR 0008)
+
+A **module name** (`drydocs-<x>`, the backlog's `modules:` registry) names a *component* —
+a boundary the guard enforces and the backlog files work against. A **directory** names a
+*code root*. They are the same thing only where the guard needs them to be:
+
+- **First-party Python packages MUST match their module name** (underscore for hyphen:
+  `drydocs_lineage/` ↔ `drydocs-lineage`). `test_module_boundary.py` classifies modules by
+  package root, so a Python component whose directory diverged from its module name would
+  make the guard's classification ambiguous — that is the one condition under which a
+  rename is required, not stylistic.
+- **Non-Python surfaces keep their ecosystem-conventional names.** `web/` is the module
+  `drydocs-web` and `agents/` is `drydocs-agents` because a Vite app named `web/` and an
+  ADK service named `agents/` are what their own toolchains expect, and no import-boundary
+  guard keys on those directory names — the module identity lives only in the ledgers
+  (this file, the backlog registry, `config/taxonomy/ui-components.yaml`). Renaming them to
+  match would buy nothing and break ecosystem defaults.
+- The recurring confusion this rule answers: `web/` is the **real console**
+  (`drydocs-web`); `UI-WIP/` is a *docs workspace* (mockups, plans — module `docs`), not
+  code. S9 owns re-homing it under `docs/design/`.
+
+The backlog `modules:` comments cite this section rather than re-explaining it.
+
 ## Core — `drydocs-core` (shared; stable surface)
 
 | Module (physical) | Role |
