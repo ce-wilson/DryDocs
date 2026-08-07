@@ -69,12 +69,25 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   TREE-RECONCILE, 129 changed paths, 0 J16 fall-through. Company acceptance:
   **1856 / 16 / 31** (from 69 failed at reconcile start); `EXPECTED_CONSTRAINTS`
   55→**56** company-based (`codedirectory_file_id`). The 16 remaining failures are ALL
-  OWED company-side, none a silent loss: Group A ×4 pre-existing company data-strictness
-  (BOM in an untracked internal CSV, 30 snapshots vs newest-only retention ×2, committed
-  snapshot currency); Group B ×12 behavioral divergence to investigate not test-edit
-  (mapping store/api ×6 = S4 console-substrate shape, doc-traceability ×2 stray feedback
-  files, query-specs namespace table, source-registry gate state, port-reconcile J16
-  reverse-flow coverage, ui-components ledger). Decisions applied: Epic X `ddlineage`
+  OWED company-side, none a silent loss. **ROOT-CAUSE COLLAPSE (company run, 2026-08-06;
+  corrects this entry's first draft, which mis-blamed S4):** the 16 collapse to ~4 causes.
+  A ×4 = company data (BOM CSV, 30-snapshot prune ×2 to newest-only, snapshot
+  unmapped-extensions cleanliness — "clean" means `adapter.unmapped_extensions == {}`,
+  extend the extension map or prune the files). **B1 ×6 = the K8 folder-grain edge
+  reshape was not applied to the company's EXTENDED `manual_mappings` writer** (a
+  clobber-audit re-merge file) — their writer still speaks job-grain
+  `{ControlMJob, WAS_ASSOCIATED_WITH}`, producer fixtures use
+  `ControlMFolder -[BELONGS_TO_APPLICATION {role: seal_app_ref}]->` (producer
+  `drydocs_core/manual_mappings.py`); this is ledger step 63's GRAIN-BREAKING caution
+  firing, and the fix couples with the held folder-attribution stream AND K18
+  tier→row_kind (step 96, also in this range) — one T23-family migration, do them
+  together. B2 ×5 = per-item config/data divergence: `cm_hosts` not confirmed
+  company-side (producer is `confirmed: true`, gate controlm-hosts-topology 2026-07-09,
+  registry note says the confirmation TRANSFERS per Q6 — company may flip citing it, or
+  ratify under the two-tier doctrine); namespace table 5 rows vs ≥6; a `;`-split
+  citation parse; `control-m.md` stray feedback file; `AppCodeCascadePane` route
+  clean-added but its ledger row missed — producer row exists verbatim at
+  `config/taxonomy/ui-components.yaml:91`. B3 ×1 = the manifest clobber (below). Decisions applied: Epic X `ddlineage`
   retirement adopted at CONFIG level (live DB drop owed, `SHOW DATABASES` first);
   **company Catalog gate 2026-06-25 REVERSED** → full producer catalog model adopted
   (`code` reinstated, TC-CAT-003 retired, logged in company `config/gate-log.md`);
@@ -84,8 +97,10 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   SEAL-role "admits+flags" claim record-corrected (company refuses unknown roles, same
   as producer; divergence gate-bound to G35 §A3). Clobber audit re-merged 8
   company-extended canonical-producer files; **known conscious deferral: the take
-  clobbered ~24 company-origin rows in `PORT-MANIFEST.yaml`** (canonical-producer wins)
-  — company re-adds via `git diff pre-cewilson-port-20260806..HEAD -- PORT-MANIFEST.yaml`.
+  clobbered the company's `default_ok` section in `PORT-MANIFEST.yaml`** (canonical-producer
+  wins) — quantified at the root-cause run as **89 company-only paths** falling through
+  `default:` (PORT-REPORT-*.md, docs/build_*, docs/site/*, docs/prompts/*, settings.json, …);
+  company re-adds via `git diff pre-cewilson-port-20260806..HEAD -- PORT-MANIFEST.yaml`.
   Next-port base = `a14a8028`; 28 producer commits (G22 rulings, N8, O42, O45/O46
   intake slices) were already pending at review time.
 - **Producer head `5f79d145`** (2026-08-04), applied company-side as

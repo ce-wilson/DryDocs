@@ -66,10 +66,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-79`** · 2026-08-06 · `[idea]` · **open** · prio? **Med** —
   **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering
   company-only tracked-path rows.** PORT-REPORT-a14a8028's clobber audit found the take
-  dropped ~24 company-origin manifest lines (canonical-producer disposition means the
-  producer file wins verbatim), so company-only tracked paths fell through their own J16
-  guard (`test_port_reconcile_guards::test_no_tracked_path_falls_through`, failure #14 —
-  the one conscious deferral in that report). The company session re-adds the rows by
+  dropped the company's `default_ok` section — quantified at the 2026-08-06 root-cause
+  run as **89 company-only paths** falling through `default:` (canonical-producer
+  disposition means the producer file wins verbatim), so company-only tracked paths fell
+  through their own J16 guard (`test_no_tracked_path_falls_through_silently`, the one
+  conscious deferral in that report). The company session re-adds the rows by
   hand this time; the structural fix is a D2-registry-style overlay: producer manifest
   stays canonical, company rows live in a separate company-side include the guard unions,
   and a port can no longer delete them. Needs a small grammar decision (include file vs.
