@@ -1979,3 +1979,72 @@ or added.
   `Internal` from their systems. `confirmed: false` with this gate as the
   activation condition is already in place.
 - **Still open:** D1/D2/D4, F2, G1–G2, H1–H2, I1–I3, §J sign-off.
+
+## 2026-08-06 — RECORD: rua load shapes, F2 + section G — identity is a business key, the URN is a render (G22; gate `rua-load-shapes`, still UNSIGNED)
+
+- **F2 CONFIRMED, with two restatements** the page needs because it predates
+  source-registry v2. (1) **Classification lives on the SYSTEM row**, not the
+  dataset row — v2's D1 split put connection/locator/classification/SDLC on
+  systems and gate/crosswalk/authority/confirmed on datasets. (2) **The ids this
+  clause names are RETIRED** — `rua-server-extract` and `code-repo` were replaced
+  under the v2 born-here grammar by `exec-hosts:rua-bundle` and
+  `bitbucket:repo-objects-manifest`, and the D4 refusal list refuses the old
+  strings outright. **Verified in place at the ruling**, so the clause confirms
+  state rather than requesting it: `exec-hosts`, `bitbucket` and `dpl` all carry
+  `classification: Internal` with a confidential-handling note on the entry — the
+  F1 output shape exactly — and the bitbucket dataset row carries
+  `confirmed: false` naming this gate as the activation condition.
+- **G1 RULED — BOTH, not either.** The drafted "URN segment vs keyed property" is
+  a **false dichotomy** and is retired. The registry GUID sits as a **keyed
+  property** — it IS the business key (ADR 0001: *"node identity is always a
+  business key, never a URL"*, and that ADR seeds ontology terms carrying the IRI
+  as a **property**) — and the URN is a **deterministic render** that includes it.
+  Identity does not live in the URN: source-registry v2 §D3 already ruled the URN
+  *"derived deterministically, a render, never a hand-maintained field."*
+- **G1's split is MANAGED-vs-UNMANAGED**, not pipelines-vs-anything. Managed
+  (registry-known) assets key on the **GUID alone**, with `version` and `zone` as
+  properties, and render a GUID-bearing URN. Unmanaged assets fall back to the
+  grammar-built URN from path/name — `urn:drydocs:script:{normalized-abs-path}`
+  (publishable per F1) and `urn:drydocs:dataasset:{platform}:{namespace}:{name}`.
+- **This was already the code's own assumption**, waiting on exactly this clause
+  — `dpl_mac.py`: *"identity = dataset GUID alone (version/zone are properties),
+  pending the G22 clause-f GUID-vs-URN."*
+- **The `name#GUID` composite is NEVER stored as a unit, anywhere** (answering the
+  SME's question at the session). It is a promotion-clone **folder-naming
+  convention on disk** that `parse_clone_folder` **decomposes** into name + guid
+  + kind, keeping the parts and discarding the whole; the folder **casing** is
+  the kind discriminator (lowercase pipeline, UPPERCASE dataset, mixed ambiguous
+  — counted, never guessed). The direction also runs opposite to "folder naming
+  follows the URN": the folder name is one **source** of the GUID, and the URN is
+  rendered **from** the GUID afterwards.
+- **THREE different `#`-bearing strings, recorded because conflating them is the
+  live risk:** `<name>#<guid>` is a folder locator on disk (not identity);
+  `proc#dpl:{GUID}` is the **lineage staging** node id (staging only, never the
+  graph key); `urn:drydocs:…` is the rendered graph-side name.
+- **G2 CONFIRMED, and the no-version-nodes clause is SCOPED TO SCRIPTS.** As
+  drafted for scripts: content hash rides on occurrence records as the version
+  discriminator; same URN + different hashes = drift, queryable; **hash absence
+  is a real state** — metadata-only occurrences stage hash-absent with the
+  absence counted, drift compares only among hash-bearing occurrences, and a URN
+  whose occurrences are all hash-absent is uncorroborable-yet, a coverage fact
+  rather than an error. Scripts get **no version nodes**.
+- **Why the scoping was necessary: left blanket, the clause would have SILENTLY
+  OVERRIDDEN a codified ADR.** ADR 0001's second LPG rule: *"Versioned external
+  objects are distinct nodes keyed by (object, versionId), linked
+  WAS_DERIVED_FROM to the predecessor (prov:specializationOf). Never smuggle a
+  version into a URL string — a string is not queryable."* **The distinction that
+  resolves it: a content hash is a FINGERPRINT, not a source-assigned version.**
+  Nobody issues a versionId for a script. DPL-managed pipelines and datasets DO
+  carry an explicit `version` from the registry (G25 stages `pipelineId` +
+  `version` + `active`), so they are versioned external objects in the ADR's
+  sense and continue to follow rule 2 — untouched by this clause.
+- **Two amendments G2 was drafted without.** (1) **`ETL_ARTIFACT_SHA` is a hash
+  arriving on the VARIABLE** (A4, same day), so a DPL-managed artifact can be
+  hash-bearing even where the rua listing is hash-absent — a second corroboration
+  route for exactly the metadata-only bundles premise 2 describes. (2) **Drift
+  comparison must check `storage_scope` FIRST** (the D-amendment): N views of one
+  shared file always agree, so comparing them reports corroboration that was
+  never observed. The scope check is a **precondition** of drift detection, not a
+  footnote to it.
+- **Still open:** D1/D2/D4, H1–H2, I1–I3, §J sign-off. Sections A, B, C, E, F, G
+  and H3 are done.

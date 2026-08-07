@@ -711,6 +711,25 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-06",
+      "title": "RECORD: rua load shapes, F2 + section G — identity is a business key, the URN is a render (G22; gate `rua-load-shapes`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml"
+      ],
+      "log_ref": "config/gate-log.md:1983",
+      "unblocks": [
+        "K7",
+        "G22",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
