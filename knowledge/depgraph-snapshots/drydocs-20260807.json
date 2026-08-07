@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-07T04:15:01",
+    "captured_at": "2026-08-07T12:30:19",
     "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "9f1bb62",
-      "full": "9f1bb624508561d0231efdefe4c7de42ece0dcaf",
+      "commit": "cbb8b3d",
+      "full": "cbb8b3d70a75cb863b1458f817b9d7412019d516",
       "branch": "main",
-      "describe": "9f1bb62",
-      "subject": "docs(reference): A4 — write the dcat per-standard README the registry row already cited",
+      "describe": "cbb8b3d",
+      "subject": "test(runbook-currency): exempt the retired fix-pack citation as historical",
       "dirty": false,
       "pr": null
     },
@@ -58,6 +58,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/agents/backlog-groomer.md",
+      "name": "backlog-groomer.md",
+      "extension": ".md",
+      "rel_path": ".claude/agents/backlog-groomer.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/.claude/agents/ontology-mapper.md",
@@ -6738,6 +6747,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/dpl-dataset-registry-contract.yaml",
+      "name": "dpl-dataset-registry-contract.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/dpl-dataset-registry-contract.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/dpl-pipeline-registry-contract.yaml",
+      "name": "dpl-pipeline-registry-contract.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/dpl-pipeline-registry-contract.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/email-dl-contact-point.yaml",
       "name": "email-dl-contact-point.yaml",
       "extension": ".yaml",
@@ -6796,6 +6823,24 @@
       "name": "product-cabinet-attribution.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/product-cabinet-attribution.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/repo-manifest-data-profile.yaml",
+      "name": "repo-manifest-data-profile.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/repo-manifest-data-profile.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/rua-bundle-data-profile.yaml",
+      "name": "rua-bundle-data-profile.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/rua-bundle-data-profile.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -7953,51 +7998,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/gate-cmdline-nfr-vetting-company-prompt.md",
-      "name": "gate-cmdline-nfr-vetting-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-cmdline-nfr-vetting-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/gate-fcdo-crosswalk-company-prompt.md",
-      "name": "gate-fcdo-crosswalk-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-fcdo-crosswalk-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/gate-rua-load-shapes-company-prompt.md",
-      "name": "gate-rua-load-shapes-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-rua-load-shapes-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/gate-seal-app-ref-edge-reshape-company-prompt.md",
-      "name": "gate-seal-app-ref-edge-reshape-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-seal-app-ref-edge-reshape-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/gate-source-registry-v2-company-prompt.md",
-      "name": "gate-source-registry-v2-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-source-registry-v2-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md",
       "name": "generic-snowflake-data-catalog-ingestion-plan.md",
       "extension": ".md",
@@ -8272,15 +8272,6 @@
       "name": "port-ais-supplement-company-prompt.md",
       "extension": ".md",
       "rel_path": "docs/port-ais-supplement-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/port-fix-a14a8028-company-prompt.md",
-      "name": "port-fix-a14a8028-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/port-fix-a14a8028-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13065,10 +13056,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
-      "name": "drydocs-20260807.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0414.json",
+      "name": "drydocs-20260807-0414.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807-0414.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20008,6 +19999,11 @@
     [
       "drydocs/.claude/agents",
       "CONTAINS",
+      "drydocs/.claude/agents/backlog-groomer.md"
+    ],
+    [
+      "drydocs/.claude/agents",
+      "CONTAINS",
       "drydocs/.claude/agents/ontology-mapper.md"
     ],
     [
@@ -23673,6 +23669,16 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/dpl-dataset-registry-contract.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/dpl-pipeline-registry-contract.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/email-dl-contact-point.yaml"
     ],
     [
@@ -23704,6 +23710,16 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/product-cabinet-attribution.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/repo-manifest-data-profile.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/rua-bundle-data-profile.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -23963,31 +23979,6 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/gate-cmdline-nfr-vetting-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-fcdo-crosswalk-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-rua-load-shapes-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-seal-app-ref-edge-reshape-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-source-registry-v2-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
       "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md"
     ],
     [
@@ -24029,11 +24020,6 @@
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/port-ais-supplement-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/port-fix-a14a8028-company-prompt.md"
     ],
     [
       "drydocs/docs",
@@ -27093,7 +27079,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0414.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -28955,13 +28941,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1568,
+    "files": 1567,
     "edges": 810,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1833,
+    "rels": 1832,
     "directories": 266
   }
 }
