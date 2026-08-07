@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-07T02:55:52",
+    "captured_at": "2026-08-07T03:08:25",
     "date": "20260807",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "ba7fbaf",
-      "full": "ba7fbafd2f23ffb157c87883caf36f8c0f634239",
+      "commit": "461ea8e",
+      "full": "461ea8e7a2cb3e2eb0bb35174febe0ec7b26faf3",
       "branch": "main",
-      "describe": "ba7fbaf",
-      "subject": "feat(lineage): G23 — the rua curated load, per the signed rua-load-shapes rulings",
+      "describe": "461ea8e",
+      "subject": "feat(lineage): G58 — dead-script archival report with the gate's safety bar",
       "dirty": false,
       "pr": null
     },
@@ -11571,6 +11571,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_lineage/archival.py",
+      "name": "archival.py",
+      "extension": ".py",
+      "rel_path": "drydocs_lineage/archival.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_lineage/collect",
       "name": "collect",
       "extension": "",
@@ -12993,10 +13002,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
-      "name": "drydocs-20260807.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0255.json",
+      "name": "drydocs-20260807-0255.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807-0255.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14392,6 +14401,15 @@
       "name": "test_launcher_registry.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_launcher_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_lineage_archival.py",
+      "name": "test_lineage_archival.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_archival.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17348,6 +17366,18 @@
       "drydocs/drydocs_docmeta/connectors/base.py"
     ],
     [
+      "drydocs/drydocs_lineage/archival.py",
+      "drydocs/drydocs_lineage/extractors/rua_inventory.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/archival.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/archival.py",
+      "drydocs/drydocs_lineage/writer.py"
+    ],
+    [
       "drydocs/drydocs_lineage/extractors/__init__.py",
       "drydocs/drydocs_lineage/extractors/code_repo.py"
     ],
@@ -18042,6 +18072,22 @@
     [
       "drydocs/tests/unit/test_launcher_registry.py",
       "drydocs/drydocs_core/orchestration/shell.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_archival.py",
+      "drydocs/drydocs_lineage/archival.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_archival.py",
+      "drydocs/drydocs_lineage/extractors/code_repo.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_archival.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_archival.py",
+      "drydocs/drydocs_lineage/review.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_code_repo.py",
@@ -26106,6 +26152,11 @@
     [
       "drydocs/drydocs_lineage",
       "CONTAINS",
+      "drydocs/drydocs_lineage/archival.py"
+    ],
+    [
+      "drydocs/drydocs_lineage",
+      "CONTAINS",
       "drydocs/drydocs_lineage/collect"
     ],
     [
@@ -26896,7 +26947,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807-0255.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27607,6 +27658,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_launcher_registry.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_lineage_archival.py"
     ],
     [
       "drydocs/tests/unit",
@@ -28733,13 +28789,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1557,
-    "edges": 800,
+    "files": 1559,
+    "edges": 807,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1820,
+    "rels": 1822,
     "directories": 264
   }
 }
