@@ -1,7 +1,9 @@
 ---
 name: groom-backlog
 description: Groom raw notes into the DryDocs backlog. Use when the user pastes rough to-dos or a photo of paper notes, says "groom my notes" / "groom the backlog" / "add this to the backlog", or when IDEAS.md inbox lines need promoting into backlog.yaml v2 items (title/type/module/phase). Also the weekly grooming ritual.
-model: opus
+context: fork
+agent: backlog-groomer
+background: false
 ---
 
 # groom-backlog — raw notes → the backlog database
@@ -12,13 +14,23 @@ is the zero-schema INBOX; `docs/plan/board.html` is a deterministic RENDER of th
 Grooming is the transcription step in between — the user brain-dumps, this skill does the rest.
 The user should never have to hand-edit YAML.
 
+## How this skill executes (fork)
+
+This skill runs as a dispatched **`backlog-groomer`** agent (`context: fork`, model pinned to
+opus in `.claude/agents/backlog-groomer.md`). The fork does NOT see the chat transcript or any
+pasted image — the notes to groom must arrive **inside the skill invocation** (`$ARGUMENTS`)
+or **already be in the repo** (`IDEAS.md`). Main session, before dispatching: a photo of paper
+notes → transcribe it faithfully in-chat, show the user the transcription, and pass the
+transcription text as the arguments; pasted/spoken notes → pass them through verbatim.
+
 ## Inputs this skill accepts
 
-1. **Pasted rough text** — bullet lists, sentence fragments, shorthand.
-2. **A photo of paper notes** — transcribe it faithfully first, show the transcription,
-   then groom the transcription.
-3. **The IDEAS.md inbox** — the standing weekly ritual: groom every line in `## Inbox`.
-4. **A single thought in chat** ("add X to the backlog").
+1. **Pasted rough text** — bullet lists, sentence fragments, shorthand (passed as arguments).
+2. **A photo of paper notes** — main session transcribes first (see above); the fork grooms
+   the transcription.
+3. **The IDEAS.md inbox** — the standing weekly ritual: groom every line in `## Inbox`
+   (no arguments needed; the fork reads the repo).
+4. **A single thought in chat** ("add X to the backlog" — passed as arguments).
 
 ## Per-note decision procedure
 
@@ -47,9 +59,11 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 
 ### The two hard rules
 
-- **Ask the user ONLY when `module` or `phase` is genuinely ambiguous** — two+ plausible
-  assignments with different consequences. Everything else: pick sensibly and record the
-  choice in `notes:`. (Grooming that asks about everything is worse than paper notes.)
+- **Park (never guess) ONLY when `module` or `phase` is genuinely ambiguous** — two+ plausible
+  assignments with different consequences. The fork cannot ask the user mid-run: leave the note
+  in the `IDEAS.md` inbox as `- [question] …` and flag it in the final report for the user to
+  rule on. Everything else: pick sensibly and record the choice in `notes:`. (Grooming that
+  parks everything is worse than paper notes.)
 - **Never groom an ontology/relationship-semantics decision into a done deal.** Anything
   touching edge meaning routes through the HITL gate (`docs/restructure/03-hitl-sme-flow.md`)
   — the item's acceptance must say "via the gate", and the mapping stays `planned` until confirmed.
@@ -65,14 +79,15 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
    `## Recently groomed (audit trail)` with the date and resulting id(s), e.g.
    `- 2026-07-01 — [chore] fragment cleanup → J1.`
 4. **Validate** — the acceptance gate for this skill:
-   ```powershell
+   ```bash
    poetry run pytest tests/unit/test_backlog.py -q
    # poetry/pytest absent (some authoring envs)? Standalone equivalent (same checks):
    python .claude/skills/groom-backlog/validate.py
    ```
 5. **Regenerate the board** so the committed render matches the database:
-   ```powershell
-   $env:PYTHONPATH = "."; python scripts/render_board.py
+   ```bash
+   PYTHONPATH=. python scripts/render_board.py
+   # PowerShell equivalent: $env:PYTHONPATH = "."; python scripts/render_board.py
    ```
 6. **Commit**: `chore(backlog): groom — <n> promoted, <n> inboxed, <n> merged`, listing new ids
    in the body. Push per the session ritual.
@@ -104,9 +119,11 @@ either way.
 
 ## Model guidance
 
-This skill was authored on opus (I3). **Routine grooming runs on sonnet** — the schema,
-registries, and validator carry the judgment. Escalate to opus only when a groom implies a
-plan change (new phase, new epic with cross-cutting scope, priority conflicts).
+This skill was authored on opus (I3). Since 2026-08-07 every groom runs on **opus** via the
+`backlog-groomer` fork — the model is pinned in `.claude/agents/backlog-groomer.md`, not here
+(a skill-level `model:` field governs the main turn, not the fork). A groom that implies a
+plan change (new phase, new epic with cross-cutting scope, priority conflicts) is still a
+user decision: propose it in the final report, never enact it silently.
 
 ## Gotchas
 
