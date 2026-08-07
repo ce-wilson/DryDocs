@@ -1,6 +1,7 @@
 ---
 name: groom-backlog
 description: Groom raw notes into the DryDocs backlog. Use when the user pastes rough to-dos or a photo of paper notes, says "groom my notes" / "groom the backlog" / "add this to the backlog", or when IDEAS.md inbox lines need promoting into backlog.yaml v2 items (title/type/module/phase). Also the weekly grooming ritual.
+model: opus
 ---
 
 # groom-backlog — raw notes → the backlog database
