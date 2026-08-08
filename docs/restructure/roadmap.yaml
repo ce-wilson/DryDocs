@@ -107,12 +107,13 @@ modules:
     built: >
       Collector script and conf, the backup-bundle (rua_*) extractors and staged
       kinds, coverage reporting, and the signed G22 load shapes with the G23
-      curated-load build landed. The module is one rename (G57) away from its
-      settled vocabulary.
+      curated-load build landed. The rua_* naming stands: G57 (the family rename)
+      was withdrawn 2026-08-08 — the SME's file rename was a comparison maneuver,
+      not a rename directive.
     remaining: >
-      Four open items: G43 data-catalog cross-check reports, G56 mount-table
-      capture so shared-vs-local storage is derived, G57 the rua-to-bkup rename
-      (port-sequenced, solo), and G60 PRECMD/POSTCMD shell-text file-ops.
+      Three open items: G43 data-catalog cross-check reports, G56 mount-table
+      capture so shared-vs-local storage is derived, and G60 PRECMD/POSTCMD
+      shell-text file-ops.
     ideas:
       - id: Idea-7
         estimate: M
