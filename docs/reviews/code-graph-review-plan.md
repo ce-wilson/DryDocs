@@ -115,6 +115,10 @@ every mismatch; NO direct backlog edits (groom owns those).
 
 **Mandate.** Status of the current documents, joined to the code they claim
 to describe. Precondition: `load-doc-traceability` (subgraph empty today).
+All prose this persona writes — and any staleness verdict on existing prose —
+follows [`docs/style/us-business-english.md`](../style/us-business-english.md)
+(U.S. business-technical English, never UK/EU idiom; mechanism names are never
+renamed by a style judgment — that scope fence is in the guide).
 
 Units:
 1. **Component↔module join.** `:Component.ref` values (traceability matrix
