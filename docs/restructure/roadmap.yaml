@@ -25,7 +25,7 @@
 # classification: Internal (idea summaries ride along; same boundary as the inbox).
 
 schema: drydocs.roadmap.v1
-updated: "2026-08-07"
+updated: "2026-08-08"
 
 modules:
   - module: drydocs-core
@@ -47,9 +47,11 @@ modules:
       loaders with the canonical load sequence, the K2 match policy, docs-verify and
       docs-coverage reporting, and the 27-command CLI composition root.
     remaining: >
-      Two open items, both structural hygiene: S8 splits the 1,519-line cli.py into
-      per-domain command modules (the one file every port hand-merges), and J33
-      fixes three guard tests that break on ANSI-colored output.
+      S8 splits the 1,519-line cli.py into per-domain command modules (the one
+      file every port hand-merges), J33 fixes three guard tests that break on
+      ANSI-colored output, and Z3 (Epic Z, gated behind Z1/Z2) loads the
+      infrastructure server inventory and joins server names to Control-M job
+      hosts.
     ideas:
       - id: Idea-25
         estimate: S
@@ -111,9 +113,10 @@ modules:
       was withdrawn 2026-08-08 — the SME's file rename was a comparison maneuver,
       not a rename directive.
     remaining: >
-      Three open items: G43 data-catalog cross-check reports, G56 mount-table
-      capture so shared-vs-local storage is derived, and G60 PRECMD/POSTCMD
-      shell-text file-ops.
+      G43 data-catalog cross-check reports, G56 mount-table capture so
+      shared-vs-local storage is derived, G60 PRECMD/POSTCMD shell-text
+      file-ops, and Z4 (Epic Z, gated) the load-balancer nslookup resolver that
+      attributes jobs to the physical locations they run in.
     ideas:
       - id: Idea-7
         estimate: M
@@ -177,8 +180,10 @@ modules:
       The widest open front (13 items): the intake wave (O47 shell, O50 admin
       review queue, O51 reviewer-quality signals), the O26 app-to-app runbook
       view, the O44 ownership alluvial (blocked on the two source rulings below),
-      O43 test-suite seeding, O57/O58 load-map and docs-verify consoles, and
-      hygiene items O31/O53/O54/O55.
+      O43 test-suite seeding, O57/O58 load-map and docs-verify consoles,
+      hygiene items O31/O53/O54/O55, and Epic Z's two map surfaces (Z5 the
+      reusable world/country location-map module, Z6 the global time-zone
+      runtime map rendering in the viewer's local time zone).
     ideas:
       - id: Idea-73
         estimate: M
@@ -274,7 +279,9 @@ modules:
       HITL gates, not code — E1 SOSA and G35 TOM roles in progress; K17 FID
       identity, C25 software-version context, U10 package-layer, G44 data-catalog,
       and Y3 backlog-vocabulary gates queued; plus the gate-prompt drafting items
-      (K20, Q14, U11, G61). Throughput here is gate sessions, not build sessions.
+      (K20, Q14, U11, G61) and Z2, the server/location ontology gate (Epic Z:
+      Server and DataCenter shapes, geography grain, the Control-M node join
+      rule). Throughput here is gate sessions, not build sessions.
     ideas:
       - id: Idea-47
         estimate: M
@@ -318,10 +325,12 @@ modules:
       config families (S6), and the gate-prompts tree the enforcement surfaces
       render from.
     remaining: >
-      Six open items: K16 FID directory census (blocked on scope), N10 the
+      Seven open items: K16 FID directory census (blocked on scope), N10 the
       wired/ready registry split prompt, D9/D10 expressing and gating the internal
-      precedence chain, Q9 re-filing the GraphRAG corpus as vendor docs, and J13
-      the publish-ceiling drift sweep.
+      precedence chain, Q9 re-filing the GraphRAG corpus as vendor docs, J13 the
+      publish-ceiling drift sweep, and Z1 registering the infrastructure server
+      export (Epic Z: per-application download, prod + DR, geography fields —
+      whose data-center field is NOT the Control-M field of that name).
     ideas:
       - id: Idea-88
         estimate: M
