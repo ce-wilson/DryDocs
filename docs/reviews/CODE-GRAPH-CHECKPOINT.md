@@ -5,14 +5,30 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
 
 ## State
 
-- phase: ALL THREE COMPLETE (run 1); scanner fix LANDED (U6, same day)
-- next_action: U4 (tech-debt query pack) is unblocked — the graph is now
-  truthful (205 modules, 370 IMPORTS incl. cross-root + function-level;
-  drydocs_api scanned). Run 2 of the personas is worth a session whenever
-  drift is suspected: A1/A4/A5/A6 are answerable from the graph for the
-  first time.
+- phase: RUN 2 IN PROGRESS (2026-08-08, scheduled 2am session) — U-arch
+  complete; next unit U-pm (project manager), then U-tw (tech writer).
+- next_action: U-pm — done-claims / next_ready audit against the current
+  backlog.yaml.
 
 ## Run log
+
+- 2026-08-08 — **Run 2, U-arch complete.**
+  Preconditions: snapshot `drydocs-20260808.json` (commit `f156cc7`) →
+  `load-code-snapshot` (whole-tree per U9: 391 live `.py` / 830 IMPORTS;
+  273 `.py` at U14 package scope; the prompt's 205/370 baseline is pre-U9
+  scope — deviation explained, not drift) → `load-doc-traceability`
+  (DocSection 188, DesignDoc 16, Requirement 51, Component 55; the
+  doc_feedback pass REFUSED again on the L17 :Employee guard — same
+  expected firing as Run 1, not a blocker).
+  - U-arch → `persona-python-architect-2026-08.md`. A1 clean AND finally
+    falsifiable; A2 0/0 agree; A3 base.py 29→31, lineage/model.py 24
+    (confirmed #2, G22-reshape budget flag); A4 package-scope 0 holds;
+    A5 29→27. Two instrument findings: `drydocs_docmeta` (born 08-04,
+    10 modules) missing from the U14 $packages allow-list (score 30);
+    residual scanner blind spot — imports rooted off the repo root
+    (`scripts/` bare siblings, `agents/` common./graph_qa.) record zero
+    in-region edges, so the 23-item A4b queue is mostly false orphans
+    (score 20). Tombstones: 7, all non-.py — D7 healthy.
 
 - 2026-07-28 — **Run 1 complete, single session (U1+U2+U3).**
   Preconditions: snapshot `drydocs-20260728-0754.json` (commit `36866f9`)
