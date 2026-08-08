@@ -99,7 +99,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.fid_census",
     ),
     # drydocs-plan — backlog.yaml -> HTML project board renderer (Epic I).
-    "plan": ("drydocs.plan_board",),
+    # plan_roadmap belongs HERE (unlike plan_ideas, below): it renders no
+    # markdown — it consumes plan_board's published backlog shape, and a
+    # within-group import is exactly what this classification permits.
+    "plan": ("drydocs.plan_board", "drydocs.plan_roadmap"),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.
     #

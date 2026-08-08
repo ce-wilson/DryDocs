@@ -58,6 +58,7 @@ def main() -> None:
         import render_gates
         import render_ideas
         import render_load_map
+        import render_roadmap
         import render_software_registry
 
         render_gates.main()
@@ -70,6 +71,11 @@ def main() -> None:
         # re-rendering would leave a committed page describing a stale inbox —
         # exactly the J20 drift the one-command rule exists to prevent.
         render_ideas.main()
+        # The roadmap render (2026-08-07) rides for the same reason again: its
+        # counts and open-item titles come live from backlog.yaml, so any groom
+        # that skips the re-render leaves the roadmap page describing yesterday's
+        # backlog.
+        render_roadmap.main()
 
 
 if __name__ == "__main__":

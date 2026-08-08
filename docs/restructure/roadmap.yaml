@@ -1,0 +1,399 @@
+# drydocs.roadmap.v1 — the per-module build-out assessment behind docs/plan/roadmap.html.
+#
+# WHAT THIS FILE IS: the AUTHORED judgment layer of the roadmap page — per module, how far
+# the functionality is built out (stage + prose) and a size estimate for each open/parked
+# inbox idea that would land in that module. It deliberately does NOT carry counts: item
+# counts, statuses, and open-item titles are read live from backlog.yaml at render time so
+# they can never rot here.
+#
+# WHAT IT IS NOT: a plan with dates. Stages and estimates are relative-size judgments,
+# not commitments (user direction 2026-08-07: "a roadmap without target dates").
+#
+# MAINTENANCE RULES:
+#   - Every module in backlog.yaml `modules:` has exactly one entry here — the guard
+#     (tests/unit/test_plan_roadmap.py) fails on a missing or unknown module, so
+#     registering a module forces a roadmap judgment for it.
+#   - `ideas:` cites Idea-N ids from docs/restructure/IDEAS.md. When an idea is groomed,
+#     merged, or closed, REMOVE its row here (the backlog item then speaks for itself).
+#   - `stage` enum: mature | active | early | steady | parked.
+#   - `estimate` enum (relative size, no dates):
+#       S  = one focused session
+#       M  = a few sessions, one backlog item
+#       L  = an epic slice — multiple sessions, usually a HITL gate
+#       XL = a multi-epic program
+#
+# classification: Internal (idea summaries ride along; same boundary as the inbox).
+
+schema: drydocs.roadmap.v1
+updated: "2026-08-07"
+
+modules:
+  - module: drydocs-core
+    stage: mature
+    built: >
+      The shared foundation is complete and quiet: graph schema and constraints,
+      database provisioning, the ontology-supplement chain as data (G29) with the
+      chain-exclusions guard (G59), the per-domain relationship-vocabulary registry
+      (S5), and the shared models and Cypher tooling every loader builds on.
+    remaining: >
+      No open items. Changes arrive through gates — vocabulary and supplement edits
+      ride ontology items, never direct edits here.
+    ideas: []
+
+  - module: drydocs-load
+    stage: mature
+    built: >
+      The heaviest-built module: Control-M XML and staging extractors, curated
+      loaders with the canonical load sequence, the K2 match policy, docs-verify and
+      docs-coverage reporting, and the 27-command CLI composition root.
+    remaining: >
+      Two open items, both structural hygiene: S8 splits the 1,519-line cli.py into
+      per-domain command modules (the one file every port hand-merges), and J33
+      fixes three guard tests that break on ANSI-colored output.
+    ideas:
+      - id: Idea-25
+        estimate: S
+        note: Control-M compact-timestamp normalization (mechanism from the company
+          XML-loader's second timestamp bug); lands when an extractor consumes a
+          temporal field.
+      - id: Idea-23
+        estimate: M
+        note: m7_uses_artifact build follow-up — registered planned at the
+          cmdline-nfr-vetting gate; builds when the writer-endpoint work makes the
+          edge computable.
+
+  - module: drydocs-review
+    stage: steady
+    built: >
+      The producer-side HITL machinery works end to end: gate pages, the gate log,
+      review labels, SME notes, publishing, and the K16 FID-census measurement
+      tooling. Every signed gate this quarter ran through it.
+    remaining: >
+      No open items in-module. The substantive next step is the company
+      drydocs-review back-flow (their generic graph_review/graph_verify toolkit),
+      dispositioned under J39 in docs.
+    ideas: []
+
+  - module: drydocs-plan
+    stage: active
+    built: >
+      The three rendered planning surfaces over backlog.yaml and IDEAS.md — the
+      project board, the idea-inbox read view, and this roadmap page — all
+      deterministic, committed, and guarded against stale renders.
+    remaining: >
+      Epic Y sharding is the direction: Y2 splits the backlog one-item-per-file with
+      derived roll-ups (structure-breaking, port-sequenced), Y4 turns next_ready
+      into a query surface.
+    ideas: []
+
+  - module: drydocs-docgen
+    stage: mature
+    built: >
+      Canonical outline validation, the deterministic markdown-to-HTML design-doc
+      render (Epic L — one HTML per doc, screen plus print), PDF export, and the
+      markdown engine the ideas and roadmap pages reuse.
+    remaining: >
+      No open items in-module; the doc-TYPE gaps (white-paper type L26, BRD shape)
+      are tracked under docs because they are outline/content decisions, not
+      renderer work.
+    ideas:
+      - id: Idea-3
+        estimate: L
+        note: BRD outline (Epic L, deferred) — parked until the BRD shape settles
+          upstream.
+
+  - module: drydocs-lineage
+    stage: active
+    built: >
+      Collector script and conf, the backup-bundle (rua_*) extractors and staged
+      kinds, coverage reporting, and the signed G22 load shapes with the G23
+      curated-load build landed. The module is one rename (G57) away from its
+      settled vocabulary.
+    remaining: >
+      Four open items: G43 data-catalog cross-check reports, G56 mount-table
+      capture so shared-vs-local storage is derived, G57 the rua-to-bkup rename
+      (port-sequenced, solo), and G60 PRECMD/POSTCMD shell-text file-ops.
+    ideas:
+      - id: Idea-7
+        estimate: M
+        note: Lineage live-load gate session — parked until the SME schedules it.
+      - id: Idea-32
+        estimate: M
+        note: Oracle connection for the lineage/remediation path — scope ruling
+          pending (which dataset drives it).
+      - id: Idea-50
+        estimate: M
+        note: controlm-pipeline-stub integration — parked until the internal DPL
+          build starts landing.
+
+  - module: drydocs-deepdoc
+    stage: parked
+    built: >
+      Package scaffold only — three modules in the code graph and a charter
+      (reactive on-failure deep dive into ddcontext, ADR 0002 D2 C3), with the
+      component-boundary guard already enforcing its separation from lineage.
+    remaining: >
+      Zero backlog items have ever targeted this module. First real work waits on
+      the G32 residency ruling (which database ddcontext content lives in) and a
+      charter restatement — both explicitly named inside G32.
+    ideas: []
+
+  - module: drydocs-remediation
+    stage: parked
+    built: >
+      The proof of concept is complete and closed (G3): M0 PoC, R1 detector, Tier-1
+      transform engine, Jira handoff, and corroboration, under ADR 0002-B. It
+      writes no graph; Jira is the system of record.
+    remaining: >
+      No open items — deliberately parked. Next slices are tracked in the TDD
+      (sections 6/7) and resume when the remediation gates open; the sanitized
+      re-review (G10) and runbook pipeline are the named successors.
+    ideas:
+      - id: Idea-4
+        estimate: M
+        note: Control-M Workbench as the greenfield test bed — parked on BMC EPD
+          entitlement or the company-side OQ-1 close.
+      - id: Idea-5
+        estimate: M
+        note: Phase C packaging — deferred by ADR 0002-A-1 at the G2 relocate.
+      - id: Idea-6
+        estimate: L
+        note: Remediation next slices — the TDD is the tracking surface; resumes
+          when the remediation gates open.
+      - id: Idea-31
+        estimate: M
+        note: Model the company-side greenfield remediation standards
+          producer-side — parked until the M2 generalization opens.
+
+  - module: drydocs-web
+    stage: active
+    built: >
+      The console has its shell and eight-plus working surfaces: persona sign-in
+      with the module access model, gates page, enforcement matrix, load map,
+      software-registry page, ownership graph, mappings, and the under-the-hood
+      benchmark showcase. The laptop lane is actively extending it.
+    remaining: >
+      The widest open front (13 items): the intake wave (O47 shell, O50 admin
+      review queue, O51 reviewer-quality signals), the O26 app-to-app runbook
+      view, the O44 ownership alluvial (blocked on the two source rulings below),
+      O43 test-suite seeding, O57/O58 load-map and docs-verify consoles, and
+      hygiene items O31/O53/O54/O55.
+    ideas:
+      - id: Idea-73
+        estimate: M
+        note: Where the employee hierarchy comes from, and whether it lives
+          producer-side at all — user decision, blocks O44 column 1. High
+          priority in the inbox.
+      - id: Idea-74
+        estimate: M
+        note: ServiceNow queue/assignment-group export ingestion, producer-side or
+          company-side — user decision, blocks O44 column 3.
+
+  - module: drydocs-api
+    stage: active
+    built: >
+      The read-only QuerySpec API with the O33 guard, mappings and intake
+      endpoints, and the ownership/attribution query family — the contract both
+      the console and the agent tier consume.
+    remaining: >
+      Six open items: Q15 doc-spine navigation QuerySpecs, G38 federated-read
+      proof (ddall), O48 review-for-ontology extraction, O49 related-nodes panel,
+      O52 the always-null holder_sid fix, and R9 the agent query command.
+    ideas: []
+
+  - module: drydocs-agents
+    stage: early
+    built: >
+      The ADK Q&A spoke exists and runs: tiered read-only apps, the R5 stub-ADK
+      harness, the agents venv, and console wiring. What it has not had yet is a
+      live LLM-in-the-loop pass.
+    remaining: >
+      Five open items, all maturation: R8 answer evaluation and cap tuning, R11
+      the live two-question smoke, R12 promoting the stub harness to a committed
+      fixture, R13 ADK session growth, R14 agents/common app-list hygiene.
+    ideas: []
+
+  - module: drydocs-docmeta
+    stage: early
+    built: >
+      Document-corpus ingestion core (ADR 0006) with the doc spine and
+      traceability loads. The company side is AHEAD of the producer here — their
+      package layout diverged and they carry prompts.py and pipeline.py, which do
+      not exist in this tree.
+    remaining: >
+      Two open items (Q10 email/activity corpus with an SME surface, R7
+      stale-source detection and rescrape queue) — but the near-term big rock is
+      the Idea-87 reconcile, which must be ruled before the next docmeta port.
+    ideas:
+      - id: Idea-87
+        estimate: M
+        note: Company docmeta diverged and is ahead (ADR numbers collide, package
+          paths differ, two company-only files) — needs a deliberate reconcile
+          ruling before the next docmeta port. High priority in the inbox.
+      - id: Idea-44
+        estimate: S
+        note: fcdo-frameworks live Confluence scrape — company-side, parked on
+          company network access.
+
+  - module: reference
+    stage: steady
+    built: >
+      REGISTRY.yaml plus the platform, standards, and research trees; the Neo4j
+      plugin trim is documented and verified; the dcat per-standard README (A4)
+      closed the last registry row that cited a missing file.
+    remaining: >
+      No open items. This module grows additively as new sources register — it is
+      infrastructure that is done until a new platform or standard arrives.
+    ideas: []
+
+  - module: taxonomy
+    stage: steady
+    built: >
+      Importers for the captured hierarchies — applications, LOB-Product-Team,
+      Oracle schemas, scripts, Control-M variables — as pure classification, with
+      the taxonomy-first discipline holding (no meaning edges at import).
+    remaining: >
+      One open item: B5 captures the medallion stage vocabulary (RAW, TRUSTED,
+      REFINED, SNOWFLAKE) as taxonomy.
+    ideas:
+      - id: Idea-61
+        estimate: S
+        note: AutoSys attributes at a name-prefix grain, not folder grain —
+          crosswalk row 12 gate amendment when AutoSys ingestion resumes.
+
+  - module: ontology
+    stage: active
+    built: >
+      The meaning layer is the project's center of gravity: 33 closed items
+      spanning the supplement files, the relationship-vocabulary registry, and
+      this quarter's signed gates (match policy, SEAL edge reshape, audit
+      envelope, envelope terms, registry redesign, FCDO crosswalk).
+    remaining: >
+      Sixteen open items, and the bottleneck is deliberate: most are SME-bound
+      HITL gates, not code — E1 SOSA and G35 TOM roles in progress; K17 FID
+      identity, C25 software-version context, U10 package-layer, G44 data-catalog,
+      and Y3 backlog-vocabulary gates queued; plus the gate-prompt drafting items
+      (K20, Q14, U11, G61). Throughput here is gate sessions, not build sessions.
+    ideas:
+      - id: Idea-47
+        estimate: M
+        note: Join loaders to the Cypher they execute — a new edge type, parked on
+          the code-graph gate's H5 clause.
+      - id: Idea-37
+        estimate: M
+        note: Supplement shape C, the registration-vs-instance-seed re-slice —
+          parked until the SME convenes the supplement-shape gate.
+      - id: Idea-29
+        estimate: M
+        note: Email-DL contact-point modeling — parked until that gate signs.
+      - id: Idea-27
+        estimate: S
+        note: Env toggle equals one canonical node identity, never per-env nodes —
+          attaches to an env-toggle item when one exists.
+      - id: Idea-15
+        estimate: L
+        note: Replace SEAL/PAT naming with industry-standard, SaaS-configurable
+          terminology — two user decisions pending; feeds the standalone-template
+          goal.
+      - id: Idea-13
+        estimate: L
+        note: ETL-tooling inventory as a DryDocs domain — parked until a catalog
+          or domain owner asks for it.
+      - id: Idea-30a
+        estimate: L
+        note: PDN trigger design at milestone/SLA grain with graph-computed slack —
+          parked on cm_avg_run plus the calendar projection landing.
+      - id: Idea-30b
+        estimate: M
+        note: Deadline-calibration audit — the same slack computation, run as an
+          audit; parked with Idea-30a.
+
+  - module: config
+    stage: mature
+    built: >
+      The configuration backbone shipped this quarter: source-registry v2 (15
+      systems, 28 datasets, derived URNs), classification and the publish
+      boundary, precedence, orchestrator crosswalks, JSON Schemas for the six
+      config families (S6), and the gate-prompts tree the enforcement surfaces
+      render from.
+    remaining: >
+      Six open items: K16 FID directory census (blocked on scope), N10 the
+      wired/ready registry split prompt, D9/D10 expressing and gating the internal
+      precedence chain, Q9 re-filing the GraphRAG corpus as vendor docs, and J13
+      the publish-ceiling drift sweep.
+    ideas:
+      - id: Idea-88
+        estimate: M
+        note: describes_product field on doc-source-registry entries so the one
+          loaded software-docs edge is reproducible from the ledger — parked on
+          G32, then Q14.
+      - id: Idea-86
+        estimate: S
+        note: Register the internal MWAA docs as a corpus — parked on G32 ruling
+          target_db.
+      - id: Idea-28
+        estimate: S
+        note: Tier-1/tier-2 app-code rows — SME data entry, not a backlog item.
+
+  - module: graph-infra
+    stage: active
+    built: >
+      The runtime estate works: the EE container with multi-database
+      provisioning, the depgraph snapshot ritual plus viewer, code-graph and
+      doc-traceability loads, CI with testcontainers e2e (Ryuk default settled at
+      J36), and the MCP server wiring.
+    remaining: >
+      G32 (in progress) is the keystone — the document/content database residency
+      ruling that several parked corpus registrations wait on. Behind it: G49 MCP
+      post-APOC verify, G50 rollback-container deletion, G53 the single-database
+      contingency plan, U15 the dirty-flag split.
+    ideas:
+      - id: Idea-49
+        estimate: S
+        note: Recreate the desktop container or re-point — confirmed desktop-only;
+          user ruling.
+      - id: Idea-17
+        estimate: S
+        note: Post-squash ref cleanup — destructive, user-run.
+      - id: Idea-16
+        estimate: S
+        note: Add the SNYK_TOKEN repo secret — user manual step.
+      - id: Idea-14
+        estimate: M
+        note: depgraph metric extensions (codeflow takeaways) — parked until
+          depgraph work resumes.
+
+  - module: docs
+    stage: active
+    built: >
+      The largest module by volume (52 closed): the governed design-doc renders
+      and runbooks, the port machinery (manifest, prompt, reports, ledger), the
+      style guide, the whitepaper Rev 1, and this quarter's gate-prompt packs and
+      SME runbook starts.
+    remaining: >
+      Twenty-one open items in three waves: the V4-V10 SME-runbook sweep (one per
+      module), the J-series port-machinery upgrades (J31, J34, J35, J37, J38, J39
+      — the seam, ledger roll, relay list, and back-flow dispositions), and doc
+      infrastructure (L19 drift sweep, L23 run-book skill, L25 gate riders, L26
+      white-paper type, U16/U17 self-doc rulings, S9 repo-root hygiene, N11 guard
+      direction, Y1 sharding design in progress).
+    ideas:
+      - id: Idea-85
+        estimate: S
+        note: Backlog ids and scheduling for the four post-G22 data-profile gate
+          prompts — next groom.
+      - id: Idea-34
+        estimate: S
+        note: Q6 reopened — is the AIS acronym entry worth keeping; SME ruling.
+      - id: Idea-33
+        estimate: S
+        note: Unlocated user-reported typo (apply-catalog / apply-ontology) —
+          needs the user to point at the spot.
+      - id: Idea-9
+        estimate: M
+        note: dry-docs.com site visual language — the public site has no module
+          yet; filed here with the whitepaper until site work starts.
+      - id: Idea-22
+        estimate: L
+        note: Public marketing-site brand kit — same homeless-until-site-starts
+          status as Idea-9.

@@ -516,6 +516,11 @@ document.addEventListener("DOMContentLoaded", () => {
         "<script>document.getElementById('board-url').textContent=window.location.href;"
         "document.getElementById('board-url-copy').onclick=function(){"
         "navigator.clipboard.writeText(window.location.href);};</script>\n"
+        # The third planning surface (2026-08-07): per-module build-out vs. the
+        # backlog, with size estimates for open ideas — board / inbox / roadmap.
+        '<p class="subtitle"><a class="capture-link" href="roadmap.html">'
+        "Module roadmap &rarr;</a> "
+        '<a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>\n'
         f'<div class="roadmap">\n{roadmap}\n</div>\n'
         '<div class="filters">\n'
         '  <label>Module<select id="f-module"><option value="">All</option>\n'
