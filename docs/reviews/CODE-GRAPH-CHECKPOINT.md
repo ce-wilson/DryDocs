@@ -6,9 +6,9 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
 ## State
 
 - phase: RUN 2 IN PROGRESS (2026-08-08, scheduled 2am session) — U-arch
-  complete; next unit U-pm (project manager), then U-tw (tech writer).
-- next_action: U-pm — done-claims / next_ready audit against the current
-  backlog.yaml.
+  and U-pm complete; next unit U-tw (tech writer).
+- next_action: U-tw — doc-status board + re-check of Run 1 staleness
+  findings (pre-squash cites, sdlc §DEP paths).
 
 ## Run log
 
@@ -29,6 +29,15 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
     (`scripts/` bare siblings, `agents/` common./graph_qa.) record zero
     in-region edges, so the 23-item A4b queue is mostly false orphans
     (score 20). Tombstones: 7, all non-.py — D7 healthy.
+  - U-pm → `persona-project-manager-2026-08.md`. Done ledger TRUE again
+    (271 claims, 37 flags all dispositioned — incl. the first tombstone
+    disposition class, the S5 yaml→fragment-directory splits). Census gap
+    class CLOSED (docmeta visible). The finding moved to grooming: 9 of
+    62 next_ready items carry stale inputs — 5-item cluster from S5's
+    08-06 re-home, 3× `web/src/routes/ask/`, a retention-deleted dated
+    snapshot cite (structural: cite the dir, not a dated file), R9
+    filename typo, V4 `drydocs/review/`. E1 wears in_progress while
+    actually waiting on gate scheduling. One IDEAS line covers all.
 
 - 2026-07-28 — **Run 1 complete, single session (U1+U2+U3).**
   Preconditions: snapshot `drydocs-20260728-0754.json` (commit `36866f9`)
