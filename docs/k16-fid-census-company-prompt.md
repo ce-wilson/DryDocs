@@ -12,11 +12,45 @@
 
 Venue: company `<org>/DryDocs`, current `main`. Name the venue in every claim (J18).
 
-## Step 0 — the tool, and what it refuses to do
+## Step 0 — the command
+
+```
+drydocs fid-census \
+  --application <APP> \
+  --directory <idowner-export.csv> \
+  --map "account=<HEADER>,application=<HEADER>,type=<HEADER>,status=<HEADER>,owner=<HEADER>" \
+  --run-as <controlm-jobs.csv> \
+  --attribution <account-to-app.csv>
+```
+
+Optional: `--fid-facts <csv>` (demand set ii) and `--adhoc <csv>` (demand set iii),
+each with a `--*-column` override. `--delimiter '|'` for raw SQL Developer exports.
+
+**`--map` has NO DEFAULTS, deliberately.** The producer has never seen a
+functional-id directory export, and `config/source-mappings/seal-extract.yaml`
+records what happens when a loader's field names get mistaken for verified source
+vocabulary — `SEALID` lived in the repo for months as a column name that appears
+in no source. Name the real headers or the command refuses.
+
+`--run-as` reads the Control-M extract's `owner` column by default
+(`CM_DEF_VJOB.OWNER`, aliased `owner` in `controlm_jobs.sql`, which the psgmgr
+ledger records as *"run-as tenant Functional ID (service identity, not a person);
+also the `:run_as` scope-bind (exact match)"*). Override with `--run-as-column`.
+
+## Step 0b — the tool, and what it refuses to do
 
 `drydocs/fid_census.py` — pure. It opens no file, contacts no database, and writes
-nothing; you inject every input. `tests/unit/test_fid_census.py` guards it (14 tests,
-all synthetic).
+nothing; the CLI above is a thin adapter that injects every input.
+`tests/unit/test_fid_census.py` guards it (17 tests, all synthetic).
+
+**THE EXPORT'S GRAIN IS HANDLED EITHER WAY, and you do not need to determine it
+first.** An "idowner search" may return one row per ACCOUNT (filtered by owner) or
+one row per (ACCOUNT, OWNER) pair — and under the SME rule that every FID carries
+**at least two human owners**, the second shape means a two-owner account
+legitimately contributes two rows. So the census reports `directory_rows_total`
+and `directory_accounts_total` SEPARATELY, counts a differing-owner repeat as
+`multi_owner_rows` rather than a duplicate, and reserves `duplicate_directory_rows`
+for a true repeat of the same (account, owner). Report both numbers.
 
 Two refusals are deliberate, and you will hit both:
 
@@ -85,13 +119,16 @@ nothing.
 
 Send back `census.as_dict()` — counts only. Specifically:
 
-- (a) `directory_rows_total`, (b) `demand_in_application`, `demand_by_source`,
-  `demand_not_in_directory`
+- (a) `directory_rows_total` **and** `directory_accounts_total` — both, since the
+  grain determines which one "total directory rows" means
+- (b) `demand_in_application`, `demand_by_source`, `demand_not_in_directory`
 - (c) `remainder_by_type`, `remainder_by_status`
 - **Q0**: `comparable`, `agreements`, `disagreements`, `undecidable`,
   `disagreements_by_reading`
-- `run_as_owner_types` (gate §Q5), `case_only_mismatches`,
-  `duplicate_directory_accounts`, `reconciles`
+- **The two-owners rule**: `accounts_below_owner_minimum`,
+  `accounts_with_no_owner_recorded`, `owner_rule_measurable`
+- `run_as_owner_types` (gate §Q5), `case_only_mismatches`, `multi_owner_rows`,
+  `duplicate_directory_rows`, `reconciles`
 
 Plus three sentences of prose the numbers cannot carry: the application **kind** from
 step 1, whether the extract was a targeted query or a full extract filtered on your side
@@ -110,10 +147,17 @@ every cell marked _pending_.
 2. **A non-application `account_type` in `run_as_owner_types`.** That answers gate §Q5 in
    the negative: if non-application types really do appear as run-as owners, type cannot
    be used even as an explanatory filter.
-3. **`reconciles == False`.** The invariant is that every directory row lands in exactly
-   one of (b) or the remainder, and that the disagreement split is complete. A false here
-   means an input assumption is wrong — report it as a finding rather than adjusting the
-   inputs until it balances.
+3. **`reconciles == False`.** The invariant is that every distinct ACCOUNT lands in
+   exactly one of (b) or the remainder, and that the disagreement split is complete. A
+   false here means an input assumption is wrong — report it as a finding rather than
+   adjusting the inputs until it balances.
+4. **`owner_rule_measurable == False`.** The export carried no owner column, so
+   `accounts_below_owner_minimum: 0` means **unmeasured, not compliant**. Say which it
+   was; the two are different answers and the census refuses to conflate them.
+5. **`accounts_below_owner_minimum` > 0.** Accounts carrying fewer than two human
+   owners violate the SME rule stated 2026-08-07. Report the count — the RULE itself
+   becomes a graph test once an account→owner edge exists, which doc 09's phase list
+   does not yet model (it goes account→APPLICATION and never account→PERSON).
 
 ## Step 6 — what this does NOT authorize
 

@@ -2510,6 +2510,39 @@ items:
       tier as originally specified would resolve a job to the account's owning
       application and CONTRADICT a confirmed app-code mapping. The tier is harmless today
       only because the table is empty.
+      TWO SME INPUTS RECORDED 2026-08-07 (laptop) — DIRECTION, NOT RULINGS. Neither
+      ticks a clause; both constrain what the session may say, in the D3-SME-INPUT
+      idiom G22 used.
+      (1) EVERY FID CARRIES AT LEAST TWO HUMAN OWNERS. Three consequences. (a) The
+      rule is a GRAPH TEST, never a constraint — minimum cardinality is not
+      expressible in Neo4j, and the gate log already settled this twice ("NEVER a
+      uniqueness constraint - graph-TEST instead (the TOM-roles lesson)"; "Neo4j
+      cannot declare relationship cardinality any more than it could declare the
+      TOM-roles singleton"). (b) IT HAS NOTHING TO ATTACH TO YET: doc 09's phase list
+      models account -> APPLICATION (phase 4, BELONGS_TO_APPLICATION
+      {role: service_account}) and NEVER account -> PERSON, so a rule about human
+      owners has no edge. That gap is this gate's to rule, and it must not be swept
+      into doc 09's standing deferral of CONTACT columns (support owners, teams,
+      mailboxes -> email-dl-contact-point): owner-of-record is the accountability
+      fact the directory exists to assert, not a contact point. (c) The census
+      already MEASURES compliance — accounts_below_owner_minimum, kept separate from
+      accounts_with_no_owner_recorded so an unmeasurable estate is never reported as
+      a compliant one.
+      (2) THE ORACLE TABLE IS AN ALTERNATIVE SOURCE FOR THE FID — and this is a THIRD
+      answer to §Q3, which asks only "is the export the only pull mechanism, or is
+      there an API?". Not an export, not an API: a replica already in scope whose
+      confidential surface is already assessed. The distinction the session must hold:
+      Oracle supplies the FID VALUE (CM_DEF_VJOB.OWNER, which the psgmgr ledger
+      records as "run-as tenant Functional ID (service identity, not a person); also
+      the :run_as scope-bind (exact match)"), but NOT the FID RECORD — it carries no
+      type, no status and no application assignment, which are exactly the columns
+      §D2's clause (c) breaks down by and Q0 compares against. So Oracle can source
+      demand set (i); it CANNOT substitute for the directory extract, and if it did
+      the census would report 100% coverage while measuring nothing. The upside worth
+      recording: sourcing (i) from Oracle means the only thing crossing the boundary
+      is the directory extract filtered to accounts already named, which is the
+      smallest confidential surface available and is the argument doc 09 makes for
+      demand-driven scope in the first place.
 
   - id: K18
     epic: seal-attribution

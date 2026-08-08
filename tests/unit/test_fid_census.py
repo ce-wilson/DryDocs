@@ -92,14 +92,57 @@ def test_demanded_but_absent_from_the_directory_is_counted() -> None:
     assert census.demand_in_application == 0
 
 
-def test_duplicate_directory_accounts_are_counted_not_merged() -> None:
-    rows = _rows(
-        ("svc.a", APP, "application", "active"),
-        ("svc.a", APP, "platform", "retired"),
-    )
+def test_a_true_duplicate_row_is_counted_not_merged() -> None:
+    """Same account AND same owner twice — a real duplicate, distinct from the
+    multi-owner repeat below."""
+    rows = [
+        DirectoryRow("svc.a", APP, "application", "active", owner="ada"),
+        DirectoryRow("svc.a", APP, "platform", "retired", owner="ada"),
+    ]
     census = fid_census(APP, rows)
     assert census.directory_rows_total == 2
-    assert census.duplicate_directory_accounts == 1
+    assert census.directory_accounts_total == 1
+    assert census.duplicate_directory_rows == 1
+    assert census.multi_owner_rows == 0
+
+
+# --- the two-human-owners rule (SME 2026-08-07) --------------------------------
+
+
+def test_owner_grain_rows_are_not_duplicates_and_do_not_break_the_invariant() -> None:
+    """THE grain fix. The export may be one row per (account, owner), and the SME
+    rule is that every FID carries at least two human owners — so a two-owner
+    account legitimately contributes TWO rows. Counting those as duplicates would
+    turn ~200 accounts into ~200 phantom defects, and balancing the invariant on
+    ROWS instead of ACCOUNTS would report a correct census as broken."""
+    rows = [
+        DirectoryRow("svc.a", APP, "application", "active", owner="ada"),
+        DirectoryRow("svc.a", APP, "application", "active", owner="grace"),
+    ]
+    census = fid_census(APP, rows, run_as_owners=["svc.a"])
+    assert census.directory_rows_total == 2
+    assert census.directory_accounts_total == 1
+    assert census.multi_owner_rows == 1
+    assert census.duplicate_directory_rows == 0
+    assert census.accounts_below_owner_minimum == 0
+    assert census.reconciles(), "the invariant must balance on ACCOUNTS, not rows"
+
+
+def test_an_account_with_one_owner_violates_the_rule_and_is_counted() -> None:
+    census = fid_census(APP, [DirectoryRow("svc.a", APP, owner="ada")])
+    assert census.owner_rule_measurable
+    assert census.accounts_below_owner_minimum == 1
+    assert census.accounts_with_no_owner_recorded == 0
+
+
+def test_no_owner_column_is_unmeasurable_never_reported_as_compliant() -> None:
+    """"fewer than two owners" and "the export carried no owner column" are
+    different facts. Folding them would report an UNMEASURED estate as a
+    compliant one — the never-silent rule applied to a rule check."""
+    census = fid_census(APP, _rows(("svc.a", APP, "application", "active")))
+    assert census.owner_rule_measurable is False
+    assert census.accounts_below_owner_minimum == 0
+    assert census.accounts_with_no_owner_recorded == 1
 
 
 # --- 3. case: reported, never folded -------------------------------------------

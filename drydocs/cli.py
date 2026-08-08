@@ -2187,6 +2187,169 @@ def docs_coverage(
         raise typer.Exit(code)
 
 
+def _column_map(spec: str, *, required: tuple[str, ...], what: str) -> dict[str, str]:
+    """Parse `role=HEADER,role=HEADER` into {role: header}.
+
+    NO DEFAULT HEADERS, deliberately. The producer repo has never seen a
+    functional-id directory export, and `config/source-mappings/seal-extract.yaml`
+    records what happens when a loader's field names get mistaken for verified
+    source vocabulary: `SEALID` lived in this repo for months as a column name
+    that appears in no source. The caller names the real headers or the command
+    refuses.
+    """
+    mapping: dict[str, str] = {}
+    for pair in spec.split(","):
+        pair = pair.strip()
+        if not pair:
+            continue
+        if "=" not in pair:
+            raise typer.BadParameter(f"{what}: '{pair}' is not role=HEADER")
+        role, header = pair.split("=", 1)
+        mapping[role.strip()] = header.strip()
+    missing = [r for r in required if not mapping.get(r)]
+    if missing:
+        raise typer.BadParameter(f"{what}: missing role(s) {missing}; got {sorted(mapping)}")
+    return mapping
+
+
+def _read_column(path: Path, column: str, delimiter: str) -> list[str]:
+    import csv as _csv
+
+    with path.open(encoding="utf-8-sig", newline="") as fh:
+        reader = _csv.DictReader(fh, delimiter=delimiter)
+        if reader.fieldnames is None or column not in reader.fieldnames:
+            raise typer.BadParameter(
+                f"{path.name}: no column '{column}' (headers: {reader.fieldnames})"
+            )
+        return [row[column] for row in reader if (row.get(column) or "").strip()]
+
+
+@app.command(name="fid-census")
+def fid_census_cmd(
+    application: str = typer.Option(..., "--application", help="The ONE application to census."),
+    directory: Path = typer.Option(..., "--directory", help="Functional-id directory export (CSV)."),
+    map_spec: str = typer.Option(
+        ...,
+        "--map",
+        help=(
+            "Directory column roles -> real headers, e.g. "
+            "account=ID,application=APP,type=TYPE,status=STATUS,owner=OWNER. "
+            "account and application are required; type/status/owner optional."
+        ),
+    ),
+    delimiter: str = typer.Option(",", "--delimiter", help="Field delimiter; use '|' for raw exports."),
+    run_as: Path = typer.Option(None, "--run-as", help="Control-M job extract (demand set i)."),
+    run_as_column: str = typer.Option("owner", "--run-as-column", help="CM_DEF_VJOB.OWNER alias."),
+    fid_facts: Path = typer.Option(None, "--fid-facts", help="Unresolved FID facts (demand set ii)."),
+    fid_facts_column: str = typer.Option("fact_value", "--fid-facts-column"),
+    adhoc: Path = typer.Option(None, "--adhoc", help="Registered adhoc evidence (demand set iii)."),
+    adhoc_column: str = typer.Option("account", "--adhoc-column"),
+    attribution: Path = typer.Option(
+        None, "--attribution", help="account -> Control-M-derived folder attribution (for Q0)."
+    ),
+    attribution_map: str = typer.Option(
+        "account=account,application=application", "--attribution-map"
+    ),
+) -> None:
+    """Doc 09 phase 0 — the FID directory census, on ONE application.
+
+    COUNTS ONLY. `FidCensus` holds ints and dicts of ints, so a row dump is not
+    expressible in the return type — which is what lets the result travel back to
+    the producer repo while the measured values stay Internal.
+
+    Column headers are NEVER guessed: `--map` names the real ones. The directory
+    export's GRAIN is handled either way — one row per account, or one row per
+    (account, owner) under the two-human-owners rule — so rows and distinct
+    accounts are reported separately and a multi-owner repeat is not a duplicate.
+
+    Every disagreement between the directory's application assignment and the
+    Control-M-derived attribution lands in `unruled` and STAYS there: §G5 says the
+    three readings are distinguished per case by a human, never globally.
+    """
+    import csv as _csv
+
+    from .fid_census import DirectoryRow, fid_census
+
+    cols = _column_map(map_spec, required=("account", "application"), what="--map")
+    with directory.open(encoding="utf-8-sig", newline="") as fh:
+        reader = _csv.DictReader(fh, delimiter=delimiter)
+        headers = reader.fieldnames or []
+        unknown = [h for r, h in cols.items() if h not in headers]
+        if unknown:
+            raise typer.BadParameter(f"--map names header(s) absent from {directory.name}: {unknown}")
+        rows = [
+            DirectoryRow(
+                account=r.get(cols["account"], ""),
+                application=r.get(cols["application"], ""),
+                account_type=r.get(cols.get("type", ""), "") or "",
+                status=r.get(cols.get("status", ""), "") or "",
+                owner=r.get(cols.get("owner", ""), "") or "",
+            )
+            for r in reader
+        ]
+
+    attribution_by_account: dict[str, str] = {}
+    if attribution:
+        amap = _column_map(
+            attribution_map, required=("account", "application"), what="--attribution-map"
+        )
+        with attribution.open(encoding="utf-8-sig", newline="") as fh:
+            for r in _csv.DictReader(fh, delimiter=delimiter):
+                acct = (r.get(amap["account"]) or "").strip()
+                if acct:
+                    attribution_by_account[acct] = (r.get(amap["application"]) or "").strip()
+
+    census = fid_census(
+        application,
+        rows,
+        run_as_owners=_read_column(run_as, run_as_column, delimiter) if run_as else (),
+        unresolved_fid_facts=(
+            _read_column(fid_facts, fid_facts_column, delimiter) if fid_facts else ()
+        ),
+        adhoc_accounts=_read_column(adhoc, adhoc_column, delimiter) if adhoc else (),
+        attribution_by_account=attribution_by_account,
+    )
+
+    table = Table(title=f"FID directory census - {census.application}")
+    table.add_column("measure")
+    table.add_column("count", justify="right")
+    d = census.as_dict()
+    for key in (
+        "directory_rows_total",
+        "directory_accounts_total",
+        "demand_total",
+        "demand_in_application",
+        "demand_not_in_directory",
+        "remainder_total",
+        "comparable",
+        "agreements",
+        "disagreements",
+        "undecidable",
+        "accounts_below_owner_minimum",
+        "accounts_with_no_owner_recorded",
+        "multi_owner_rows",
+        "duplicate_directory_rows",
+        "case_only_mismatches",
+    ):
+        table.add_row(key, str(d[key]))
+    console.print(table)
+    console.print(f"demand by source: {d['demand_by_source']}")
+    console.print(f"remainder by type: {d['remainder_by_type']}")
+    console.print(f"remainder by status: {d['remainder_by_status']}")
+    console.print(f"run-as owner types (gate Q5): {d['run_as_owner_types']}")
+    console.print(f"§G5 breakdown: {d['disagreements_by_reading']}")
+
+    if not census.owner_rule_measurable:
+        console.print(
+            "[yellow]owner rule NOT MEASURED — the export carried no owner column, so "
+            "'0 below minimum' means unmeasured, not compliant.[/]"
+        )
+    if not census.reconciles():
+        console.print("[red]census does not reconcile - an input assumption is wrong.[/]")
+        raise typer.Exit(1)
+    console.print("[dim]counts only - no row left this command. Send as_dict() back to the producer.[/]")
+
+
 @app.command(name="m3-verify")
 def m3_verify() -> None:
     """Assert M3 (part 1) invariants on the populated graph."""

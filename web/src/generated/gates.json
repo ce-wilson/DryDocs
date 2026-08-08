@@ -927,6 +927,7 @@
       ],
       "log_ref": null,
       "unblocks": [
+        "K17",
         "G44",
         "J24"
       ]

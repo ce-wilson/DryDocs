@@ -75,6 +75,16 @@ G5_READINGS: tuple[str, ...] = (
 #: Where every disagreement starts and stays until an SME rules it (§G5).
 UNRULED = "unruled"
 
+#: SME, 2026-08-07: EVERY functional id must carry at least two human owners.
+#: Recorded here as a measurement threshold only — the RULE itself is a
+#: graph-test, never a Neo4j constraint. Twice-established precedent: minimum
+#: cardinality is not expressible in Neo4j ("NEVER a uniqueness constraint —
+#: graph-TEST instead, the TOM-roles lesson"), so the census counts violations
+#: and the enforcement lives in graph-tests/ once the account->owner edge exists.
+#: It does not exist yet: doc 09's phase list models account->APPLICATION and
+#: never account->PERSON, which is the gap this rule exposes.
+OWNER_MINIMUM = 2
+
 #: doc 09's three demand sets, in the doc's own order.
 DEMAND_SOURCES: tuple[str, ...] = ("run_as_owners", "unresolved_fid_facts", "adhoc_evidence")
 
@@ -96,6 +106,11 @@ class DirectoryRow:
     application: str
     account_type: str = ""
     status: str = ""
+    #: The HUMAN owner of record, when the export carries one. Optional because
+    #: the export's GRAIN is not known producer-side: an "idowner search" may
+    #: return one row per account (filtered by owner) or one row per
+    #: (account, owner) pair. Both are handled — see :data:`OWNER_MINIMUM`.
+    owner: str = ""
 
 
 @dataclass
@@ -109,7 +124,15 @@ class FidCensus:
     application: str = ""
 
     # (a) / (b) / (c)
+    #: RAW ROWS read for this application. Distinct from `directory_accounts_total`
+    #: because the export's grain is unknown: under (account, owner) grain a
+    #: two-owner account contributes TWO rows, so reporting only one of these
+    #: numbers as "(a) total directory rows" would be ambiguous by a factor of
+    #: however many owners each account has.
     directory_rows_total: int = 0
+    #: DISTINCT accounts — the grain (b) and (c) are actually computed at, and
+    #: the one the reconciliation invariant balances against.
+    directory_accounts_total: int = 0
     demand_total: int = 0  # |union of the three demand sets|
     demand_in_application: int = 0
     demand_by_source: dict[str, int] = field(default_factory=dict)
@@ -128,13 +151,39 @@ class FidCensus:
     undecidable: int = 0  # in the demand set + directory, but no attribution to compare
     disagreements_by_reading: dict[str, int] = field(default_factory=dict)
 
+    # --- the two-human-owners rule (SME, 2026-08-07) --------------------------
+    #: Accounts carrying fewer than OWNER_MINIMUM distinct human owners. A rule
+    #: that CAN be violated, so the census measures compliance for free.
+    accounts_below_owner_minimum: int = 0
+    #: Accounts for which no owner was recorded at all. Kept SEPARATE from the
+    #: line above: "fewer than two owners" and "the export carried no owner
+    #: column" are different facts, and folding them would report an unmeasurable
+    #: estate as a non-compliant one.
+    accounts_with_no_owner_recorded: int = 0
+    #: True only when at least one account carried owner data. Guards the reader
+    #: against reading `accounts_below_owner_minimum: 0` as "compliant" when the
+    #: real answer is "never measured".
+    owner_rule_measurable: bool = False
+
     # never-silent counters
     case_only_mismatches: int = 0  # would match if case were folded — reported, never folded
-    duplicate_directory_accounts: int = 0
+    #: Rows beyond the first for an account that carry a DIFFERENT owner —
+    #: EXPECTED under (account, owner) grain, not a defect.
+    multi_owner_rows: int = 0
+    #: Rows beyond the first with the SAME (account, owner) — a true duplicate.
+    duplicate_directory_rows: int = 0
 
     def reconciles(self) -> bool:
-        """(b) + remainder == (a), and the disagreement split is complete."""
-        rows_balance = self.demand_in_application + self.remainder_total == self.directory_rows_total
+        """(b) + remainder == distinct ACCOUNTS, and the disagreement split is complete.
+
+        Balanced against `directory_accounts_total`, NOT `directory_rows_total`:
+        (b) and (c) are computed per account, so under (account, owner) grain a
+        row-based invariant would fail on every multi-owner account and report a
+        correct census as broken.
+        """
+        rows_balance = (
+            self.demand_in_application + self.remainder_total == self.directory_accounts_total
+        )
         split_balance = sum(self.disagreements_by_reading.values()) == self.disagreements
         compare_balance = self.agreements + self.disagreements == self.comparable
         return rows_balance and split_balance and compare_balance
@@ -188,6 +237,7 @@ def fid_census(
 
     # ---- the directory side, scoped to this application ---------------------
     by_account: dict[str, DirectoryRow] = {}
+    owners_by_account: dict[str, set[str]] = {}
     for row in directory_rows:
         account = _normalize(row.account)
         if not account:
@@ -195,10 +245,32 @@ def fid_census(
         if _normalize(row.application) != census.application:
             continue  # another application's row — out of scope by construction
         census.directory_rows_total += 1
+        owner = _normalize(row.owner)
+        seen_owners = owners_by_account.setdefault(account, set())
         if account in by_account:
-            census.duplicate_directory_accounts += 1
-            continue
-        by_account[account] = row
+            # A repeat is EXPECTED under (account, owner) grain and is not a
+            # defect: the SME rule is that every FID carries at least two human
+            # owners, so a two-owner account legitimately contributes two rows.
+            # Only a repeat of the SAME (account, owner) is a true duplicate.
+            if owner and owner not in seen_owners:
+                census.multi_owner_rows += 1
+            else:
+                census.duplicate_directory_rows += 1
+        else:
+            by_account[account] = row
+        if owner:
+            seen_owners.add(owner)
+    census.directory_accounts_total = len(by_account)
+
+    # ---- the two-human-owners rule (SME 2026-08-07), measured not assumed ----
+    census.owner_rule_measurable = any(owners for owners in owners_by_account.values())
+    for account in by_account:
+        owners = owners_by_account.get(account, set())
+        if not owners:
+            # "no owner column in the export" is NOT "fewer than two owners".
+            census.accounts_with_no_owner_recorded += 1
+        elif len(owners) < OWNER_MINIMUM:
+            census.accounts_below_owner_minimum += 1
 
     # ---- the demand set (doc 09's three sets; the union is the pull list) ----
     per_source = {
