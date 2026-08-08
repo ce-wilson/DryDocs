@@ -62,6 +62,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-90`** · 2026-08-08 · `[idea]` · **open** · prio? **Med** —
+  **Business-layer location experiment ran (annual report + ORG/location ontology) —
+  three decisions queued.** Full write-up:
+  `internal/context-graph-analysis/business-layer-location-experiment.md`. The GraphRAG
+  search verdict: the `jpmc-reports` corpus is registered (External, `target_db:
+  ddcontext`, `:DataAsset`-slice shape, `confirmed: false`) but `ddcontext` is EMPTY on
+  the desktop (`neo4jtest`, probed 2026-08-08) and the registered shape is not the
+  lexical spine, so no vector retrieval is possible either way. The hand-applied ORG +
+  location pass over the public sources produced a coherent business layer regardless:
+  org units = the LOB layer verbatim ("managed on an LOB basis"), an effective-dated
+  `org:ChangeEvent` (the 2Q2024 segment merge), sites at MIXED grain (street → city →
+  country), and a hard epistemic line between an enumerable `org:Site` and an aggregate
+  presence claim ("177 locations") that must never be exploded into fake site nodes.
+  Queued: (1) the corpus's named P4+ reshape decision now has a real consumer — lexical
+  spine vs slice shape, and the newer 2025/2026 editions at the repo root should ride the
+  re-ingest; (2) the §3 ORG mappings are gate material (`status: planned` proposals) —
+  grain + claim-vs-site findings feed Z2, the org-structure shapes want a business-layer
+  gate or E-epic item; (3) any re-ingest gates on the desktop ddcontext provisioning
+  check (`Idea-49`). Also proves the Z5 map contract is satisfiable from the business
+  layer alone — a located-nodes world map needs no technical layer.
+
 - **`Idea-89`** · 2026-08-07 · `[bug]` · **closed → fixed in place 2026-08-07 (SME ruling); no item minted** · prio **Med** —
   **`OverviewRoute` renders ALL modules unfiltered — the Overview pick-list offers
   routes the persona will bounce off.** `OverviewRoute.tsx:94` maps `MODULES` with no
