@@ -5,10 +5,13 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
 
 ## State
 
-- phase: RUN 2 IN PROGRESS (2026-08-08, scheduled 2am session) — U-arch
-  and U-pm complete; next unit U-tw (tech writer).
-- next_action: U-tw — doc-status board + re-check of Run 1 staleness
-  findings (pre-squash cites, sdlc §DEP paths).
+- phase: RUN 2 COMPLETE (2026-08-08, scheduled 2am session) — U-arch,
+  U-pm, U-tw all done; IDEAS lines filed.
+- next_action: none scheduled. Run 3 is worth a session after (a) the
+  re-cite sweep + S5 re-groom land, or (b) the depgraph extractor learns
+  per-directory sys.path roots — re-check both then. The recurring theme
+  to watch: rev bumps without citation refreshes; consider a renderer or
+  test enforcing commit-reachability on design-doc front matter.
 
 ## Run log
 
@@ -38,6 +41,17 @@ Plan: [`code-graph-review-plan.md`](code-graph-review-plan.md).
     snapshot cite (structural: cite the dir, not a dated file), R9
     filename typo, V4 `drydocs/review/`. E1 wears in_progress while
     actually waiting on gate scheduling. One IDEAS line covers all.
+  - U-tw → `persona-tech-writer-2026-08.md`. Run-1 re-check: re-cite
+    sweep NOT done (all 5 pre-squash cites unchanged; startup-refresh
+    now Rev 10 still on `a135a6d`; mapping-demo still uncited); comma
+    shear open; sdlc §DEP all 3 rows open (vocabulary row now TWO moves
+    behind after S5); base.py citation FIXED, model.py still uncited;
+    drydocs_core doc gap FIXED (core-runbook + 3 more new runbooks).
+    First DEAD component ref: `config/taxonomy-ontology-map.yaml`
+    (S5 tombstone). New thinnest root: drydocs_docmeta (10 modules, no
+    design doc). Theme named: rev bumps happen, cite refreshes don't —
+    mechanism suggestion filed (commit-reachability check in renderer
+    or test). 5 IDEAS lines.
 
 - 2026-07-28 — **Run 1 complete, single session (U1+U2+U3).**
   Preconditions: snapshot `drydocs-20260728-0754.json` (commit `36866f9`)
