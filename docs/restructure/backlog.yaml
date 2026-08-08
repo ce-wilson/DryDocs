@@ -6574,6 +6574,12 @@ items:
       SUBJECT_PRODUCT_ID with a `describes_product:` registry field — is parked
       in the IDEAS.md inbox as Idea-88 rather than groomed, because it touches a
       loader and a gated corpus behind those same two rulings.
+      WHERE (b) IS NOW TRACKED, added 2026-08-07 on the user's ruling so it is not
+      traceable only by this prose: G32's notes carry a CLOSE CHECKLIST whose
+      first entry is exactly this clause — when that ruling signs, it must either
+      mint (b)'s successor item or record (b) as declined. That puts the pickup on
+      the item that unblocks it rather than on a reader happening to re-open this
+      close note.
       VENUE (J18): the report is sample-reproducible — `drydocs docs-coverage`
       runs against the committed YAML with the database OFF and reproduces every
       declaration-layer row; the graph-probed columns in this session's run were
@@ -9208,6 +9214,38 @@ items:
       name it as a reusable pattern in the ruling instead of re-deriving it.
       Until (e) is ruled, do not build the deepdoc scaffold against either
       stale charter.
+      CLOSE CHECKLIST — WORK THESE BEFORE FLIPPING THIS ITEM done. Added
+      2026-08-07 (laptop) on the user's ruling, because each one is a real
+      consequence of this ruling that has NO item of its own and would otherwise
+      be found only by re-reading prose.
+      (1) Q16 CLAUSE (b) HAS NO SUCCESSOR ITEM. Q16 closed `done` on 2026-08-07
+      as an explicit PARTIAL: its clause (a) shipped (drydocs docs-coverage), but
+      clause (b) — the product->documentation pointer reaching the GRAPH so an
+      agent can traverse from a product to the docs describing it — did NOT, and
+      is blocked behind Q14 (the term) which is blocked behind THIS item. Its
+      only forward trace today is prose in Q16's close note pointing at Idea-88.
+      So: when this signs, either mint the successor item or record in the
+      sign-off that (b) is declined — do not leave it traceable only by prose.
+      The ruling decides which: if doc corpora land in the registry's database,
+      (b) becomes buildable and DESCRIBES may need nothing new (Q16's own
+      "cheapest possible answer, check FIRST"); if the boundary hardens, (b) is
+      re-scoped as a business-key join and its acceptance changes shape.
+      (2) THE `not queried` LABELS GO STALE THE DAY THIS SIGNS. Two surfaces
+      render "dddocs is not provisioned (G32)" from the declaration —
+      web/src/software/softwareModel.ts (inGraphLabel) and the docs-coverage
+      detail lines. tests/unit/test_load_map_json.py::
+      test_the_not_queryable_target_db_set_is_pinned pins that set to exactly
+      {dddocs} and WILL FAIL when this ruling lands, which is deliberate: it is
+      the alarm that forces both surfaces to be revisited rather than quietly
+      lying. Treat that failure as a task, not a break.
+      (3) THE ONE WORKING TRAVERSAL DIES OR SURVIVES BY THIS RULING. The 27 live
+      (:Document)-[:DESCRIBES]->(:SoftwareProduct) edges exist ONLY because
+      bmc-docs is loaded in `drydocs` while declaring target_db: dddocs — the
+      residency accident this item exists to end. vendor_docs.cypher already
+      refuses to write that edge for exactly this reason. Say explicitly in the
+      ruling what happens to those 27 edges at the move; docs-coverage reports
+      the state as `traversable-until-move` precisely so it is not mistaken for
+      a durable capability.
 
   - id: G33
     epic: self-documentation
