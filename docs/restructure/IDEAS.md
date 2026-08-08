@@ -62,6 +62,65 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-91`** · 2026-08-08 · `[bug]` · **open** · prio? **Med** —
+  **U14 `$packages` allow-list is missing `drydocs_docmeta`** (persona Run 2, U-arch F4:
+  `docs/reviews/persona-python-architect-2026-08.md`). The package was born 2026-08-04
+  (`d647171`) — the same day the U14 baselines were measured — and has a MODULE_MAP row
+  and a `test_module_boundary.py` entry, but the tech-debt skill's A1–A6 pack and the
+  review plan still scope metrics to seven roots, so all 10 docmeta modules are invisible
+  to A3/A4/A5. Fix: add the eighth root in both places, re-baseline A3/A5, and note the
+  two untested connectors (`connectors/filedrop.py`, `connectors/web.py`) while there.
+  Same failure shape as Run 1's `drydocs_api` census miss, one package generation later.
+
+- **`Idea-92`** · 2026-08-08 · `[bug]` · **open** · prio? **Med** —
+  **Depgraph scanner blind spot: imports rooted off the repo root never resolve**
+  (persona Run 2, U-arch F1). `scripts/render_board.py:56-62` imports seven sibling
+  scripts by bare name — zero `scripts→scripts` edges in the graph; `agents/` modules
+  import `common.*`/`graph_qa.*` against the `agents/` sys.path root — zero
+  `agents→agents` edges. Absolute imports from the same files DO resolve, so the U6 fix
+  is fine; what is missing is per-directory sys.path roots (or an alias map) in the
+  extractor. Until fixed, the 23-item first-party orphan queue is mostly false positives
+  and only the package-scope metrics are trustworthy.
+
+- **`Idea-93`** · 2026-08-08 · `[chore]` · **open** · prio? **High** —
+  **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,
+  U-pm: `docs/reviews/persona-project-manager-2026-08.md`). Six causes: (1) the S5
+  2026-08-06 split of `config/taxonomy-ontology-map.yaml` and
+  `drydocs_core/ontology/relationship_vocabulary.yaml` into fragment DIRECTORIES —
+  stales Q14, G34, U10, U11 (and one traceability-matrix Component ref, per U-tw —
+  re-point it in the same pass); (2) `web/src/routes/ask/` never existed — the ask
+  module is `web/src/ask/` + `routes/AskRoute.tsx` (Q15, R11, R12); (3) U10 cites the
+  retention-deleted `drydocs-20260802.json` — rule of thumb: cite the snapshot
+  DIRECTORY, never a dated file, retention makes dated cites self-staling; (4) R9 has a
+  filename typo (`persona-architect-…` → `persona-python-architect-…`); (5) V4 cites
+  `drydocs/review/`, which is flat files not a directory; (6) status hygiene — E1 has
+  worn `in_progress` since 2026-06-22 while actually waiting on gate scheduling;
+  consider `blocked`. Done-claims audit itself: 271 claims, ZERO false — the ledger
+  holds.
+
+- **`Idea-94`** · 2026-08-08 · `[doc]` · **open** · prio? **High** —
+  **Design-doc re-cite sweep, SECOND filing — now with a mechanism ask** (persona Run 2,
+  U-tw: `docs/reviews/persona-tech-writer-2026-08.md`). The Run-1 sweep never ran: all
+  five pre-squash cites unchanged (`807e050`, `ac2ea2e`, `97ee81c`, `24d6a4b`,
+  `0e036ff`); `drydocs-startup-refresh-runbook` reached Rev 10 (seven bumps since
+  Run 1) still citing squash-day `a135a6d`; `drydocs-mapping-store-runbook` took two
+  bumps on `22d1a39`; `drydocs-mapping-demo-runbook` still has no `commit:` at all;
+  `drydocs-project-tdd` was edited 08-06 on a dangling cite. The pattern is behavioral —
+  rev bumps happen, cite refreshes don't — so beyond the one-time sweep, add
+  enforcement: the design-doc renderer or a unit test should fail on a `commit:` that
+  is unreachable from HEAD.
+
+- **`Idea-95`** · 2026-08-08 · `[doc]` · **open** · prio? **Med** —
+  **Doc-drift second filings + one new gap** (persona Run 2, U-tw). (a)
+  `drydocs_lineage/model.py` still cited by no traceability component — fan-in has
+  grown 9 → 24 and it is the G22-reshape fan-out surface (`base.py` DID get its cite,
+  so the Run-1 line half-landed). (b) `sdlc-neo4j-schema.md` §DEP: all three Run-1 rows
+  still stale, and the vocabulary row is now TWO moves behind (G2 re-home, then the S5
+  fragment split); the file gets additive edits (a C23 note landed 08-03) but no
+  verification sweeps — regenerate §DEP from the tree. (c) NEW: `drydocs_docmeta`
+  (10 modules) has no design doc or runbook — the same growth stage that produced the
+  core-runbook after Run 1 flagged drydocs_core.
+
 - **`Idea-90`** · 2026-08-08 · `[idea]` · **open** · prio? **Med** —
   **Business-layer location experiment ran (annual report + ORG/location ontology) —
   three decisions queued.** Full write-up:
