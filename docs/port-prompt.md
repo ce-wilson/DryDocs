@@ -777,13 +777,34 @@ OWED COMPANY-SIDE:
 > entry that rules company-only rows (e.g. the nine company-only source entries
 > in `audit-fields.yaml`) cannot be a ported producer artifact.
 
-- **`airflow-crosswalk`: NOT RATIFIED** (checked 2026-08-09, company `main` @
-  `a4c4ce37`). Step 1 initially read RATIFIED; the provenance check above
-  overturned it. The producer's F2 sign-off (2026-07-14, 17 confirmations,
-  ACCEPTED IN FULL) ported across and was read back as company confirmation.
-  The session correctly stopped before steps 2–3, so no work was wasted — but
-  the ratification is still owed, and the same check is owed on the other four
-  staged prompts before any of them is marked ratified.
+- **BOTH crosswalk gates: NOT RATIFIED** (checked 2026-08-09, company `main` @
+  `a4c4ce37`). Each read RATIFIED at Step 1 on three portable signals; the
+  provenance check overturned both. The producer's own sign-offs ported across
+  and were read back as company confirmation.
+  - `airflow-crosswalk` (producer F2, 2026-07-14, 17 confirmations, ACCEPTED IN
+    FULL) — `-S "Airflow/MWAA"` returns ONE commit, `80d0fc0e`, a port.
+  - `autosys-crosswalk` (producer F1, 2026-07-14, 13 confirmations, ACCEPTED IN
+    FULL) — `-S "autosys-crosswalk"` returns TWO, `e2cf3485`
+    (PORT-REPORT-57914bf4) and `80d0fc0e`. Both ports; no `gate(ratify):`
+    commit exists for it.
+  So the report line "both crosswalk gates are signed off company-side,
+  matching the producer" is exactly inverted — they are the producer's,
+  matching itself. Both ratifications are owed. Neither session wasted work:
+  each correctly stopped before steps 2–3.
+  The same check is owed on the remaining three staged prompts before any is
+  marked ratified.
+- **CONFIRMED GENUINE, from the same session — the row-6 / `cm_hosts` answer.**
+  Unlike the ratification claim this CANNOT be a ported artifact, because it
+  describes company loader-tier state the producer cannot see: their CM_HOSTS
+  extract is staging-only (supplement/loader not built), so `cm_hosts` stays
+  `confirmed: false` while its P3 host stage is unwired. Producer-side the same
+  row is `confirmed: true` (hosts loader + RUNS_ON shipped at P3, 2026-07-27).
+  That is the **Q1-B standing divergence**, now confirmed from the company side
+  for the first time rather than assumed. Their reading is correct and worth
+  keeping: a crosswalk maps CONCEPTS, not loads, so a loader-tier hold does not
+  touch the crosswalk ratification — row 6 lands with no pattern or ontology
+  divergence, and the host-topology resolution a future AutoSys loader would
+  face is a loader-gate matter.
 - L7 ratification: **DISCHARGED** (company gate-log 2026-07-27; T11). §6a below stays
   as the STANDING Tier-A template — `source-registry-v2` and `J23` both used its shape
   at PORT-REPORT-57914bf4, and every future Tier-A adoption needs one.
