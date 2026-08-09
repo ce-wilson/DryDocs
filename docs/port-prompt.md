@@ -568,6 +568,49 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   the requires-scheduler map open questions: names have diverged across repos; entries
   stay planned/proposed (inert). Resolve at the company platforms gate, not by editing.
 
+STANDING RELAYS (J38 — read this section at EVERY port; it is the channel the
+producer's "tell the next company session" notes travel by, replacing the idea
+inbox, which your repo never reads. Rules: every relay is RE-VERIFIED at the
+roll that carries it — nothing is relayed from memory, a stale relay is worse
+than none; a discharged relay is STRUCK with a dated reason, never silently
+deleted; action a relay in the port that carries it or record why not in the
+PORT-REPORT):
+
+- **R1 — AIS acronym expansion: transplant the VALUE across files** (standing
+  since 2026-07-21; re-verified at the 2026-08-09 roll). Producer's
+  authoritative home is `config/taxonomy/software-registry.yaml#acronyms`
+  (`AIS: "Application Integration Streaming"`); YOUR provisional gloss sits in
+  a different file (your source-registry entry for the internal AIS docs
+  portal), with your own manifest row expecting the producer expansion. Carry
+  the VALUE into your file — never a same-file overwrite, the files do not
+  correspond. Rider from the same note: your 06-29 gate (the Ais* class
+  removal) has no company gate-log entry — an audit gap on your side; the
+  producer offered a backfill.
+- **R2 — run-log adoption asks** (standing since 2026-07-22; re-verified — the
+  run-log family in `drydocs_core/run_log.py` + BaseLoader wiring is long
+  ported). Two asks remain YOURS because they sit in your adapter code: (a)
+  attach the WARN-stream tee in the XML EXTRACTOR stage — the
+  `description_tokens` WARN flood happens PRE-loader, in the adapter, so the
+  loader-stage tee never catches it; (b) once the stream lands in a file,
+  consider raising the console handler to WARNING-summary-only — the file is
+  the review surface, the console shows counts.
+- **R3 — 2026-07-21 port-report heads-ups, re-verified 2026-08-09:**
+  (a) `test_schema_graph.py` drift-guard sequencing — re-add that test ONLY
+  after your own doc-vocab gate; the trap is written in the reconcile-port
+  skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
+  confirm or strike in your next PORT-REPORT.
+  (b) confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
+  it should not exist anywhere anymore) was DELETED after the DD-series merge —
+  `388a30d` proved the merge happened, nothing yet proves the deletion. Still
+  unconfirmed as of this roll.
+  (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
+  404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
+  works; the fetch note at the top of this file carries the standing lesson).
+- **R4 — the J34 overlay migration (one-time, at the port carrying this
+  section):** move your 89 company-only `default_ok` paths into
+  `PORT-MANIFEST.company.yaml` per the standing-divergence bullet. Strike this
+  relay in the roll after your PORT-REPORT records it done.
+
 OWED COMPANY-SIDE:
 - L7 ratification: **DISCHARGED** (company gate-log 2026-07-27; T11). §6a below stays
   as the STANDING Tier-A template — `source-registry-v2` and `J23` both used its shape
