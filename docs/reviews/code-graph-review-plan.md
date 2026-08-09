@@ -124,9 +124,54 @@ Units:
 1. **Component↔module join.** `:Component.ref` values (traceability matrix
    citations) vs `:CodeModule.file_id` — matrix rows citing files that moved
    or died; modules with heavy fan-in (A3 list) that NO doc component cites.
-2. **Staleness ranking.** `DesignDoc.commit` vs `Project.git_commit`
-   (`4417d02` today): how many commits behind is each doc's last touch, and
-   does its cited component list still exist? Rank the re-verify queue.
+2. **Staleness ranking.** Three measures, reported together; **the ranking key
+   is the CLAIM** (ruled U17, 2026-08-09 — before that the unit said
+   `DesignDoc.commit` and then described it as "each doc's last touch", which
+   are not the same thing, so the ranking was undefined).
+
+   | Name | What it is | Source |
+   |---|---|---|
+   | `claim_lag` | commits from the doc's cited commit to `HEAD` | `DesignDoc.commit` — an author's assertion, transcribed from front-matter prose |
+   | `touch_lag` | commits from the file's last-touching commit to `HEAD` | git: `git log -1 --format=%H -- <path>` |
+   | `citation_lag` | commits between the cited commit and the last-touching commit | the two above |
+
+   **Rank the re-verify queue on `claim_lag`.** The mandate is the status of
+   documents "joined to the code they *claim* to describe" — a reader trusts the
+   citation, so the queue is the list of docs the code has outrun. Ranking on
+   `touch_lag` would answer a different question (editorial activity) and would
+   actively hide this persona's own subject: a doc edited ten times without ever
+   being re-checked against the code ranks as *fresh* under `touch_lag`, which is
+   precisely the failure the unit exists to find. `touch_lag` is still reported —
+   it is what separates "abandoned" from "edited but never re-verified".
+
+   **Worked example** (measured on this desktop at `4ecfca0`; the divergence Idea-48
+   was raised for, one month wider). `docs/design/drydocs-startup-refresh-runbook.md`
+   cites `a135a6d` (2026-07-20, squash day) and was last touched by `180f4ae`
+   (2026-08-06). `claim_lag` **792**, `touch_lag` **122**, `citation_lag` **670**.
+   The two readings do not merely differ in degree — they put the same document at
+   opposite ends of the queue. That is the whole argument for naming the key.
+
+   **`citation_lag` is its own verdict class**, not a rounding error: large
+   `citation_lag` with small `touch_lag` is "stale cite, fresh content" — the doc
+   is being maintained and its self-description is not. Rev bumps happen; citation
+   refreshes do not (Run 2 found this on two docs and had to invent the label
+   in-flight; this is that label, ratified).
+
+   **Three degenerate cases, each ruled rather than left to the query author:**
+   - *No citation* (`DesignDoc.commit` null) — the doc makes no claim. Rank
+     **unknown**, never fresh, and never silently substitute `touch_lag`; a
+     missing claim is a finding about the doc, not a gap to paper over.
+   - *Citation unreachable from `HEAD`* — rank **maximum**. A claim that cannot
+     be checked is worse than one measured as far behind.
+   - *Citation resolves but is not an ancestor* — the trap, and it is
+     **machine-dependent**, so test with `git merge-base --is-ancestor <cite>
+     HEAD`, never `git cat-file -t`. The five pre-squash citations Run 2 listed
+     (`807e050`, `ac2ea2e`, `97ee81c`, `24d6a4b`, `0e036ff`) all resolve as
+     objects on this desktop — the local `archive/old-history-2026-07-20` tag
+     keeps them alive — and none is an ancestor of `HEAD`. `cat-file` therefore
+     passes them here and fails them on a fresh clone, and `rev-list --count`
+     returns a number that means nothing across the disjoint pre-squash history.
+     Verify the venue per J18 before trusting any citation check.
 3. **Coverage gaps by subsystem.** Six scan roots × DesignDoc coverage —
    which root has the thinnest doc coverage relative to its module count
    (baseline: tests 85, drydocs 41, drydocs_core 35, lineage 12,
