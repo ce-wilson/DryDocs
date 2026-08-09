@@ -45,6 +45,14 @@ adr: docs/decisions/0004-software-registry-vendor-terminology.md
 # overwritten (inboxed in IDEAS.md).
 acronyms:
   AIS: "Application Integration Streaming"
+  # ADDED 2026-08-09 (C25 prerequisite, SME-supplied from the internal DPL
+  # documentation site). Recorded HERE for the same reason AIS is: this file is
+  # the durable home for "what did that name mean". The internal application
+  # registration exists and is deliberately NOT transcribed — a registration id
+  # is Internal (PUBLISH-BOUNDARY.md), and the drydocs_application_id field
+  # below already establishes the pattern of a producer-side placeholder that
+  # the company copy reconciles at port time.
+  DPL: "Data Pipeline Library"
 
 # Reserved Application id for DryDocs itself (no SEAL id producer-side; the
 # company copy reconciles this to the real SEAL id at port time).
@@ -89,6 +97,21 @@ vendors:
   - id: tailwind-labs
     name: Tailwind Labs
     publisher_url: https://tailwindcss.com/
+  # --- C25 prerequisite vendors (2026-08-09) --------------------------------
+  - id: snowflake
+    name: Snowflake
+    publisher_url: https://www.snowflake.com/
+  - id: in-house
+    name: In-house
+    # NO publisher_url, deliberately. This file's header frames it as a
+    # THIRD-PARTY registry and every vendor until now had a public publisher
+    # page; an internally-built framework has none, and pointing the field at a
+    # company URL would put an internal host in an Internal-Public file. The
+    # alternative considered and rejected was a placeholder URL: it satisfies a
+    # guard while putting a value in the ledger that resolves to nothing, and a
+    # later reader cannot tell a placeholder from a link that went stale.
+    # tests/unit/test_software_registry.py now requires publisher_url of
+    # third-party vendors only, with that reason recorded in the test.
 
 products:
   - id: neo4j
@@ -289,6 +312,59 @@ products:
     type: open-source
     versions: ["3.x"]              # 3.3.0 current 2026-07; MWAA lags (3.0 / 2.4.3+)
     used_by_drydocs: false          # crosswalk placeholder (airflow-mwaa source unconfirmed); flips if the source activates
+
+  # --- C25 prerequisite rows (2026-08-09) -----------------------------------
+  # Both registered as TAXONOMY CAPTURE: a product row says the product exists,
+  # never that any application uses it or at what version, so neither row
+  # pre-empts a §C ruling in gate software-version-context.
+  - id: snowflake
+    vendor: snowflake
+    name: Snowflake
+    category: DBMS - Cloud Data Platform
+    role: data-platform
+    type: commercial
+    versions: []                  # continuously released; no estate pin known
+    used_by_drydocs: false
+    # SME correction 2026-08-05, recorded because the wrong reading was the
+    # obvious one: Snowflake is a TARGET DB PLATFORM, the same family as S3,
+    # Glue tables and Iceberg tables — NOT an ETL product. The "Snowflake ETL"
+    # label on the internal SRE table names the loads-into-Snowflake JOB
+    # FAMILY, so any app->platform edge derived from that code reads "loads
+    # into Snowflake", never "runs a Snowflake ETL framework". The same
+    # mistake, one level up, is what B5 was re-referenced to fix: Snowflake is
+    # a consumption TARGET of the PROVISION stage, not the terminal stage.
+
+  - id: dpl
+    vendor: in-house
+    name: Data Pipeline Library (DPL)
+    category: Data Integration (ETL)
+    role: tool
+    type: internal
+    versions: []
+    # versions is EMPTY ON PURPOSE and the reason matters, because the obvious
+    # value is wrong: the container base image is datapipeline-apache-spark-
+    # 3.5.1 tagged with the DPL image version, so 3.5.1 is the EMBEDDED SPARK
+    # release and DPL's own version is the tag. Writing 3.5.1 here would record
+    # a dependency's version as the product's.
+    used_by_drydocs: false
+    # WHY THIS ROW EXISTS AT ALL — it is not new modeling, it is a missing
+    # pointer. DPL is already in the graph model as an ETLProcess `engine`
+    # value (abinitio|dpl, gate etlprocess-kind-enum) with its own
+    # invocation_type and identity = the pipeline GUID. Ab Initio carries BOTH
+    # a products: row and an engine value; DPL carried only the engine value,
+    # and that asymmetry has already cost something concrete: the 2026-07-27
+    # G26 guard catch removed the `abinitio-dtlaunch-wrapper` pattern row
+    # because dt-launcher.sh/dtlaunch.sh is the DPL spine, and the
+    # coverage_policy forbids a pattern row without a real product id. This row
+    # is what lets a correct DPL pattern row exist.
+    # MECHANISM (internal documentation, SME-supplied 2026-08-09; the site and
+    # every identifier on it stay company-side): modular pipelines for data
+    # movement, transformation and provisioning — prepare, ingest, transform,
+    # provision and reverse-provision types; transformations run on the Zilo
+    # library (Spark-based), which refines rather than contradicts the
+    # 2026-07-16 SME note "java zilo framework originally, -py routes to
+    # spark/pyspark" in relationship_vocabulary/40-local-controlm.yaml.
+    # Runtimes: EKS or GKP, with Hortonworks in heritage scenarios.
 
   - id: autosys
     vendor: broadcom

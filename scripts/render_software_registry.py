@@ -50,7 +50,11 @@ def build_software_registry_view() -> dict:
         row = {
             "id": v["id"],
             "name": v["name"],
-            "publisher_url": v["publisher_url"],
+            # Optional since 2026-08-09 (C25): an IN-HOUSE vendor has no public
+            # publisher page, and a company URL would cross the publish
+            # boundary. Empty string rather than null keeps the JSON shape
+            # stable for the console, which renders the name unlinked.
+            "publisher_url": v.get("publisher_url", ""),
             "icon": None,
         }
         if icon is None:

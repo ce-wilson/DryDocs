@@ -59,11 +59,45 @@ def test_product_required_fields_and_enums() -> None:
         assert isinstance(product.get("versions", []), list)
 
 
-def test_vendors_carry_publisher_url() -> None:
+# Vendors with no public publisher page. An internally-built product has no
+# vendor site, and pointing the field at a company URL would put an internal
+# host into an Internal-Public file — so the field is omitted rather than
+# filled with a placeholder that a later reader cannot tell from a stale link
+# (C25, 2026-08-09). Kept as an explicit allow-list so a THIRD-PARTY vendor
+# can never lose its URL by accident: adding an id here is a deliberate act.
+VENDORS_WITHOUT_PUBLISHER = {"in-house"}
+
+
+def test_third_party_vendors_carry_publisher_url() -> None:
     for vendor in _doc()["vendors"]:
+        if vendor["id"] in VENDORS_WITHOUT_PUBLISHER:
+            assert "publisher_url" not in vendor, (
+                f"vendor '{vendor['id']}' is listed as having no publisher page but carries "
+                f"a publisher_url — remove one or the other; a URL on an in-house vendor is "
+                f"either a placeholder or an internal host, and neither belongs here"
+            )
+            continue
         assert str(vendor.get("publisher_url", "")).startswith(
             "http"
         ), f"vendor '{vendor['id']}' missing publisher_url"
+
+
+def test_products_of_url_less_vendors_are_internal() -> None:
+    """The allow-list is not a general escape hatch.
+
+    A vendor may skip the publisher URL only because it ships nothing publicly,
+    which is the same fact as its products being `type: internal`. If a
+    commercial product ever pointed at an in-house vendor, the exemption would
+    be laundering a missing URL rather than recording an absent one.
+    """
+    doc = _doc()
+    for product in doc["products"]:
+        if product["vendor"] in VENDORS_WITHOUT_PUBLISHER:
+            assert product["type"] == "internal", (
+                f"product '{product['id']}' claims vendor '{product['vendor']}', which is "
+                f"exempt from publisher_url because it publishes nothing — but the product "
+                f"is type '{product['type']}', not 'internal'"
+            )
 
 
 def test_adapter_flattens_and_rows_validate() -> None:

@@ -6,7 +6,8 @@
   ],
   "note": "Soft link by id (vendor.icon override, else vendor.id). Vendors without a manifest icon are listed in vendors_without_icons — reported, never silent, never an error.",
   "acronyms": {
-    "AIS": "Application Integration Streaming"
+    "AIS": "Application Integration Streaming",
+    "DPL": "Data Pipeline Library"
   },
   "drydocs_application_id": "DRYDOCS-SELF",
   "vendors": [
@@ -131,6 +132,28 @@
       "name": "Tailwind Labs",
       "publisher_url": "https://tailwindcss.com/",
       "icon": null
+    },
+    {
+      "id": "snowflake",
+      "name": "Snowflake",
+      "publisher_url": "https://www.snowflake.com/",
+      "icon": {
+        "id": "snowflake",
+        "label": "Snowflake",
+        "kind": "software",
+        "vendor": null,
+        "category": "platform",
+        "hex": "#29B5E8",
+        "verified": true,
+        "asset": "vendor-icons/snowflake.svg",
+        "source": "vendors/packaged/snowflake.svg"
+      }
+    },
+    {
+      "id": "in-house",
+      "name": "In-house",
+      "publisher_url": "",
+      "icon": null
     }
   ],
   "vendors_without_icons": [
@@ -140,7 +163,8 @@
     "meta",
     "reui",
     "xyflow",
-    "tailwind-labs"
+    "tailwind-labs",
+    "in-house"
   ],
   "products": [
     {
@@ -374,6 +398,30 @@
       "versions": [
         "3.x"
       ],
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
+    },
+    {
+      "id": "snowflake",
+      "vendor": "snowflake",
+      "name": "Snowflake",
+      "category": "DBMS - Cloud Data Platform",
+      "role": "data-platform",
+      "type": "commercial",
+      "versions": [],
+      "used_by_drydocs": false,
+      "documentation": null,
+      "stack": []
+    },
+    {
+      "id": "dpl",
+      "vendor": "in-house",
+      "name": "Data Pipeline Library (DPL)",
+      "category": "Data Integration (ETL)",
+      "role": "tool",
+      "type": "internal",
+      "versions": [],
       "used_by_drydocs": false,
       "documentation": null,
       "stack": []
