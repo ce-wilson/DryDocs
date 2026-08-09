@@ -531,3 +531,83 @@ def test_cli_load_blocks_retired_binding(tmp_path: Path, monkeypatch) -> None:
     result = runner.invoke(cli.app, args)
     assert result.exit_code == 2
     assert "RETIRED" in result.stdout
+
+
+# --- SNOW vs Snowflake: two systems one string apart (SME flag 2026-08-09) ---
+
+# `snow` is ServiceNow. `snowflake` is the data platform. They are distinct
+# systems that already share a prefix, and the overlap is REAL rather than
+# cosmetic: Snowflake can hold ServiceNow data, at which point both names
+# describe the same rows. The grammar settles it — origin is the system of
+# record, Snowflake is then the CARRIER — but the settlement lives in prose,
+# and prose that nothing checks is how the flat dataset id `snowflake` came to
+# collide with the SYSTEM id `snowflake` and had to be retired at v2.
+CONFUSABLE = {
+    "snow": ("ServiceNow", "snowflake"),
+    "snowflake": ("Snowflake", "snow"),
+}
+
+
+def test_snow_and_snowflake_are_declared_distinct_and_say_so() -> None:
+    """Each must name itself unambiguously AND point at the other.
+
+    A reader who lands on one of these entries has to be able to tell, without
+    leaving the line, that the other exists and is a different thing.
+    """
+    doc = yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    systems = {s["id"]: s for s in doc["systems"]}
+
+    # The replica pattern is the reason the distinction survives contact with
+    # reality: ServiceNow is read from a Snowflake replica exactly as Control-M
+    # is read from the Oracle psgmgr replica, so "Snowflake" appears all over
+    # ServiceNow work while never being its origin.
+    psgmgr_precedent = [s for s in systems if s == "psgmgr"]
+    assert psgmgr_precedent, (
+        "the psgmgr system is gone — it is the precedent the snow/snowflake "
+        "origin-vs-carrier rule is explained by"
+    )
+
+    for sid, (must_name, counterpart) in CONFUSABLE.items():
+        assert sid in systems, f"system '{sid}' is gone — check nothing was merged away"
+        entry = systems[sid]
+        assert must_name.lower() in entry["name"].lower(), (
+            f"system '{sid}' no longer names {must_name} in its `name` — the id alone "
+            f"does not disambiguate it from '{counterpart}'"
+        )
+        note = str(entry.get("disambiguation", ""))
+        assert note, (
+            f"system '{sid}' has no `disambiguation:` — it is one string away from "
+            f"'{counterpart}' and means something entirely different"
+        )
+        assert counterpart in note, (
+            f"system '{sid}' disambiguation does not mention '{counterpart}'; the whole "
+            f"point is that a reader on this line learns the other one exists"
+        )
+
+
+def test_no_source_claims_snowflake_as_an_origin_without_being_born_there() -> None:
+    """Snowflake HOLDING data does not make it the origin.
+
+    The rule is already in the retired-id ledger verbatim — "replica grammar:
+    origin catalog, carrier snowflake" — so a `snowflake:`-origin dataset is
+    only correct for something Snowflake-native. This pins the one such row so
+    a ServiceNow-in-Snowflake dataset cannot quietly acquire the wrong origin.
+    """
+    doc = yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    # The rows live under `datasets:`. A first draft read `sources:`, which does
+    # not exist, so the guard scanned an empty list and passed against a
+    # deliberately misfiled row — the same failure shape it was written to
+    # catch. Assert the key is populated so it can never silently scan nothing.
+    datasets = doc["datasets"]
+    assert datasets, "no datasets found — this guard would pass vacuously"
+    born_here = {"snowflake:schema-inventory"}
+    offenders = [
+        s["id"]
+        for s in datasets
+        if str(s.get("id", "")).startswith("snowflake") and s["id"] not in born_here
+    ]
+    assert not offenders, (
+        f"source(s) claim snowflake as ORIGIN: {offenders}. Origin is the system of "
+        f"record; Snowflake merely holding the rows makes it the CARRIER. If one of "
+        f"these really is Snowflake-native, add it to `born_here` with a reason."
+    )

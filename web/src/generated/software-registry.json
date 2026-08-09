@@ -7,7 +7,8 @@
   "note": "Soft link by id (vendor.icon override, else vendor.id). Vendors without a manifest icon are listed in vendors_without_icons — reported, never silent, never an error.",
   "acronyms": {
     "AIS": "Application Integration Streaming",
-    "DPL": "Data Pipeline Library"
+    "DPL": "Data Pipeline Library",
+    "SNOW": "ServiceNow — the ITSM/CMDB platform. NOT Snowflake."
   },
   "drydocs_application_id": "DRYDOCS-SELF",
   "vendors": [

@@ -53,6 +53,16 @@ acronyms:
   # below already establishes the pattern of a producer-side placeholder that
   # the company copy reconciles at port time.
   DPL: "Data Pipeline Library"
+  # ADDED 2026-08-09 (SME flag, marked IMPORTANT). Recorded here because this
+  # file is the durable home for "what did that name mean", and because the two
+  # names below are one string apart while meaning entirely different things.
+  # THE CONFUSION IS CONCRETE, not theoretical: Snowflake can hold ServiceNow
+  # data, at which point both names describe the same rows. The v2 grammar
+  # already settles it — `origin` is the SYSTEM OF RECORD and Snowflake is then
+  # the CARRIER (config/source-registry.yaml, and the retired-id ledger's
+  # "origin catalog, carrier snowflake"). The `snowflake` PRODUCT row below
+  # carries the same caveat.
+  SNOW: "ServiceNow — the ITSM/CMDB platform. NOT Snowflake."
 
 # Reserved Application id for DryDocs itself (no SEAL id producer-side; the
 # company copy reconciles this to the real SEAL id at port time).
@@ -352,6 +362,15 @@ products:
     # into Snowflake", never "runs a Snowflake ETL framework". The same
     # mistake, one level up, is what B5 was re-referenced to fix: Snowflake is
     # a consumption TARGET of the PROVISION stage, not the terminal stage.
+    # NAME COLLISION, flagged IMPORTANT by the SME 2026-08-09 — SNOWFLAKE IS
+    # NOT `snow`. `snow` is the source-registry system id for SERVICENOW
+    # (ITSM/CMDB); this product is the data platform. The two are one string
+    # apart and the overlap is real, because Snowflake can HOLD ServiceNow
+    # data. When it does, the source-registry `origin` stays `snow` (the system
+    # of record) and Snowflake is the CARRIER — the grammar already ruled this
+    # at N9 and the retired-id ledger states it verbatim: "replica grammar:
+    # origin catalog, carrier snowflake". The flat dataset id `snowflake` was
+    # retired at v2 for colliding with the SYSTEM id, so this has bitten once.
 
   - id: dpl
     vendor: in-house
