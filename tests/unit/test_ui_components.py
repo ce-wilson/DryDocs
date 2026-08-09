@@ -133,6 +133,64 @@ def test_the_pointer_is_reciprocal() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# section headers — the comment blocks are a claim, so check them (2026-08-09)
+# --------------------------------------------------------------------------- #
+import re as _re  # noqa: E402
+
+_HEADER = _re.compile(r"# --- ([a-z-]+) \((\d+)\) ---")
+_ROW = _re.compile(r"id: (\w+),\s+area: ([a-z-]+)")
+
+
+def test_section_headers_agree_with_the_rows_beneath_them() -> None:
+    """`# --- route (19) ---` is an assertion about the file, so it gets checked.
+
+    Reported by the company at PORT-REPORT-0d3761a9 as a cosmetic nit; it is the
+    same class as U18's hand-typed package list — a count maintained by memory
+    drifts the moment someone adds a row, and a stale count is worse than none
+    because it reads as verified. Three had already drifted (`route` 19 vs 20,
+    `component` 14 vs 15) and `software` had no block at all, so VendorIcon sat
+    under `loads`.
+    """
+    text = UI_LEDGER.read_text(encoding="utf-8")
+    doc = _ui()
+
+    actual: dict[str, int] = {}
+    for comp in doc["components"]:
+        actual[comp["area"]] = actual.get(comp["area"], 0) + 1
+    declared = {m.group(1): int(m.group(2)) for m in _HEADER.finditer(text)}
+
+    wrong = {a: (declared.get(a), actual.get(a, 0)) for a in set(declared) | set(actual)
+             if declared.get(a) != actual.get(a, 0)}
+    assert not wrong, (
+        "section header counts disagree with the rows — {area: (header says, actual)}: "
+        f"{wrong}. A missing key means an area has no `# --- <area> (N) ---` block at all, "
+        f"so its rows are filed under whatever header precedes them."
+    )
+
+
+def test_every_row_sits_under_its_own_area_header() -> None:
+    """A correct count does not prove correct filing.
+
+    Both defects the company found were invisible to a count check alone: the
+    `explorer` header sat directly above the `ask` header with no rows between
+    them, so four explorer rows landed under `ask` while both totals still
+    looked plausible.
+    """
+    current: str | None = None
+    misfiled: list[str] = []
+    for lineno, line in enumerate(UI_LEDGER.read_text(encoding="utf-8").splitlines(), 1):
+        header = _HEADER.search(line)
+        if header:
+            current = header.group(1)
+            continue
+        row = _ROW.search(line)
+        if row and current and row.group(2) != current:
+            misfiled.append(f"{UI_LEDGER.name}:{lineno} {row.group(1)} is area={row.group(2)} "
+                            f"under the '{current}' block")
+    assert not misfiled, "rows filed under the wrong area header:\n  " + "\n  ".join(misfiled)
+
+
+# --------------------------------------------------------------------------- #
 # module binding — the one idea borrowed from the Miller process model:
 # the join UP from a UI element to the feature it serves
 # --------------------------------------------------------------------------- #

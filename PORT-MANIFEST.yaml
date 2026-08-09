@@ -293,9 +293,18 @@ rows:
       default board render): counts and open-item links are read live from the
       consumer's OWN backlog at render time, and the authored judgments come
       from docs/restructure/roadmap.yaml (its own row below). Same rule as
-      board.html: regenerate from the reconciled tree, never take the producer
-      render. (Row added 2026-08-09 — the J16 guard caught the pair one session
-      after the page shipped.)
+      board.html: REGENERATE from the reconciled tree (guardrail 5), never take
+      the producer render — the regenerate step is mandatory, not a suggestion,
+      because keeping a stale consumer render is as wrong as taking the
+      producer's. (Row added 2026-08-09 — the J16 guard caught the pair one
+      session after the page shipped.)
+      NAMING QUESTION, raised by the company's send-back and deliberately NOT
+      decided here: `canonical-company` is a poor fit for a DERIVED render,
+      which has no authored consumer content to be canonical about — it is
+      regenerated, not kept. board.html and the design-doc renders carry the
+      same label for the same reason, so splitting this one row would create an
+      inconsistency worse than the imprecision. Whether the vocabulary needs a
+      `derived` disposition is inboxed rather than settled unilaterally.
   - path: "docs/plan/board.html"
     disposition: canonical-company
     note: >
@@ -420,16 +429,29 @@ rows:
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"
   - path: "docs/restructure/roadmap.yaml"
-    disposition: evaluate
+    disposition: per-entry
+    entry_rule: >
+      module-keyed (modules[].id). Take the producer's STRUCTURE and any modules
+      you lack; keep YOUR stage / built / remaining / estimate judgments on
+      collision — they describe your tree, not the producer's. Idea citations
+      are pruned to YOUR live inbox, because a citation of an idea that exists
+      only in the other side's inbox is a dangling reference by construction.
+      The coverage guard (test_plan_roadmap.py) reads YOUR module registry, so a
+      module-set difference surfaces as a test failure, which is the guard
+      working.
     note: >
-      AUTHORED JUDGMENTS, module-keyed (stage / built / remaining / idea
-      estimates, guarded by test_plan_roadmap.py against the module registry
-      and the IDEAS inbox). Each side's build-out judgments describe its OWN
-      tree and plan — take the producer's structure and any modules you lack,
-      keep YOUR stage/remaining/estimate judgments on collision. The coverage
-      guard reads YOUR module registry, so a module-set difference surfaces as
-      a test failure, which is the guard working. (Row added 2026-08-09 with
-      the roadmap.html row above.)
+      AUTHORED JUDGMENTS. DISPOSITION CORRECTED 2026-08-09 from `evaluate` to
+      `per-entry`, on the company's send-back from PORT-REPORT-0d3761a9. The row
+      was mislabeled rather than under-specified: `evaluate` means "stop and
+      hand-decide on collision", while this note has always prescribed a
+      DETERMINISTIC rule (structure from the producer, judgments per side). The
+      company executed it correctly, but only by reading the note past a label
+      that told them to do something else — and a disposition that disagrees
+      with its own note is the failure mode the manifest exists to prevent.
+      Proven in the same port: the roadmap mechanism landed while content stayed
+      per-side, and 30 dangling `Idea-3..74` citations were pruned to the
+      company-live inbox. (Row added 2026-08-09 with the roadmap.html row
+      above.)
   - path: "docs/design/**"
     disposition: evaluate
     note: >

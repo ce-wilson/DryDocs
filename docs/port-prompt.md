@@ -35,9 +35,55 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state (2026-08-09, the J35 roll).** The ledger is rolled through the NAMED
-deliberate end **`5417ef10`** — the last producer-verified, company-merged port head
-(PORT-REPORT-5417ef10). Steps **55–105 are COLLAPSED** (one-liners in **Last completed
+**Roll state (2026-08-09 pm, the post-`0d3761a9` roll).** The ledger is now rolled
+through the NAMED deliberate end **`0d3761a9`**. Steps **106–115 are APPLIED** and
+collapse into **Last completed port** below; the live ledger restarts at **116+**,
+delta since `0d3761a9`.
+
+> **`0d3761a9` IS BUILT, NOT YET MERGED.** The port commit sits on the company branch
+> `drydocs-port-20260809` and is **not pushed** — the P8 merge is SME-gated. Treat the
+> range as ported for LEDGER purposes (it is built, tested and reported) but NOT as
+> landed for anything that depends on the merge: specifically, the **five staged
+> `docs/gate-*-company-prompt.md` clean-add rows stay staged** until the branch merges
+> (step 108). Do not remove them on the strength of this report.
+
+**Last completed port — the four required fields (J35).**
+- **Range:** `5417ef10..0d3761a9` — 68 commits, ledger steps 106–115.
+- **Port commit:** `b077f746` (branch `drydocs-port-20260809`, 97 files); the
+  PORT-REPORT + ledger roll landed separately as `1c102fc`.
+- **Backup tag:** `pre-cewilson-port-20260809` @ `60de653d`.
+- **Acceptance:** `tests/unit/` **1989 passed / 32 skipped / 1 failed** — the single
+  failure is PRE-EXISTING (`test_code_snapshot_loader::test_committed_newest_snapshot_is_accepted_and_clean`,
+  the T19/WP1.4 committed-snapshot infra-block; it fails on company HEAD's own adapter
+  too, so it is not port-introduced). Track-1 contract **123 passed / 3 skipped**.
+  J7/J34 reconcile guards **21 passed** with `RECONCILE_BEFORE_DIR` set — no status
+  downgrade, no dropped entry, gate-log append-only, and the J34 overlay covering the
+  9 company-only paths.
+
+**What the range carried, in one line each.** J34 manifest-overlay migration landed
+ATOMICALLY (producer `PORT-MANIFEST.yaml` + the overlay guards taken together, and
+`PORT-MANIFEST.company.yaml` created with the 9 company-only `default_ok` rows) — a
+verbatim manifest take can never again drop a company-only disposition, which is the
+structural fix for the 2026-08-06 clobber. Backlog union **317 → 374**: 34 in-range plus
+the **23-item pre-base gap-heal**, extracted from the exact SHA `0d3761a9` rather than
+producer HEAD, with X3/X4/J30 venue-noted and the summary recomputed. One structural
+collision, `C24`, resolved evidence-backed rather than by a silent pick: the company's
+C24 was a duplicate of the already-`done` N8, so the producer's canonical C24 stood.
+
+**THE CRITICAL CORRECTION, and it is a rule this file now carries.** The company's
+initial vocabulary reconcile WRONGLY ACTIVATED the G55 `rua-load-shapes` lineage flips.
+K8 (`seal-app-ref-edge-reshape`) is signed company-side; `rua-load-shapes` is a
+DIFFERENT gate and is still UNSIGNED there. All three vocab fragments were reverted to
+company HEAD so those entries stay `planned`, and the G23/rua code ported INERT because
+it is gate-bound and refuses the planned labels.
+**RULE: gate-bound files are never wholesale-take candidates.** "Identical to base" and
+"per-entry equivalent" are BOTH insufficient tests for them — a producer vocabulary or
+test file can be byte-identical to the base and still assume an active gate the consumer
+has not signed. Status/id-set parity is not field-and-gate parity. Check the GATE, not
+just the diff.
+
+Prior roll state, retained for context: the ledger was previously rolled through
+**`5417ef10`** (PORT-REPORT-5417ef10). Steps **55–105 are COLLAPSED** (one-liners in **Last completed
 port** below): steps 84–105 were applied at the two producer-VERIFIED ports
 (PORT-REPORT-a14a8028, PORT-REPORT-5417ef10); steps 55–83 were applied by the two
 reported-only mid-range ports (PORT-REPORT-6713c142, PORT-REPORT-5f79d145) and carried
@@ -606,10 +652,49 @@ PORT-REPORT):
   (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
   404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
   works; the fetch note at the top of this file carries the standing lesson).
-- **R4 — the J34 overlay migration (one-time, at the port carrying this
-  section):** move your 89 company-only `default_ok` paths into
-  `PORT-MANIFEST.company.yaml` per the standing-divergence bullet. Strike this
-  relay in the roll after your PORT-REPORT records it done.
+- ~~**R4 — the J34 overlay migration (one-time):** move your company-only
+  `default_ok` paths into `PORT-MANIFEST.company.yaml`.~~ — **STRUCK 2026-08-09:
+  DISCHARGED at PORT-REPORT-0d3761a9.** Done atomically, which is what made it
+  work: the producer manifest and the overlay guards were taken in the SAME
+  commit as the new `PORT-MANIFEST.company.yaml`, so the reader and the file it
+  reads landed together. 9 company-only rows lifted (`.vscode/**`,
+  `docs/build_*.py`, `docs/drydocs-design-document.*`, `docs/prompts/**`,
+  `docs/site/**`, and four report/log artifacts). The 21 reconcile guards pass
+  with the overlay covering them. A verbatim manifest take can no longer drop a
+  company-only disposition — the 2026-08-06 clobber (Idea-79) is structurally
+  fixed, not procedurally avoided.
+- **R5 — DPL + Snowflake registry entries: the producer is canonical, and you
+  were mid-flight on the same change** (new 2026-08-09, gate
+  `software-version-context` / C25). The SME began this expansion COMPANY-SIDE
+  on 2026-08-07 and stopped deliberately so the two copies would match, so this
+  is a producer-first divergence with a waiting consumer rather than a
+  collision. Producer now carries, in `config/taxonomy/software-registry.yaml`:
+  the `dpl` product row (`vendor: in-house`, `type: internal`, `role: tool`),
+  the `snowflake` product row (`role: data-platform` — a TARGET DB platform,
+  never an ETL product), the new `in-house` vendor with **no** `publisher_url`,
+  and `DPL: "Data Pipeline Library"` in `acronyms:`.
+  THREE RIDERS, each of which has already cost something if skipped:
+  (a) Take the VALUE across files if your copy diverges, exactly as R1 requires
+  — that lesson was learned on an acronym that lives in a different file on
+  each side, and this change touches the same `acronyms:` block.
+  (b) `versions: []` on `dpl` is DELIBERATE. The container base image is
+  `datapipeline-apache-spark-3.5.1` tagged with the DPL image version, so
+  3.5.1 is the EMBEDDED SPARK release and DPL's own version is the tag —
+  writing 3.5.1 there records a dependency's version as the product's.
+  (c) The `in-house` vendor has no publisher URL by design; an internal
+  framework has no vendor page and a company URL would put an internal host
+  into an Internal-Public file. `tests/unit/test_software_registry.py` was
+  narrowed to require `publisher_url` of THIRD-PARTY vendors only, via an
+  explicit allow-list, plus a second guard that a product of an exempt vendor
+  must be `type: internal`. Take both guards with the rows — the allow-list
+  without them re-opens the hole it closes.
+  WHY THE ROW EXISTS AT ALL, so it is not read as cosmetic: DPL was already an
+  ETLProcess `engine` value while Ab Initio carried BOTH an engine value and a
+  `products:` row, and that asymmetry is what the 2026-07-27 G26 guard catch
+  cited when it removed the `abinitio-dtlaunch-wrapper` pattern row —
+  `dtlaunch.sh` is the DPL spine and `coverage_policy` forbids a pattern row
+  without a real product id. This row is what lets a correct DPL pattern row
+  exist.
 
 OWED COMPANY-SIDE:
 - L7 ratification: **DISCHARGED** (company gate-log 2026-07-27; T11). §6a below stays

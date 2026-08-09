@@ -62,6 +62,41 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-100`** · 2026-08-09 · `[bug]` · **open** · prio? **High** —
+  **The manifest has no way to say "gate-bound" — and that gap nearly shipped an unsigned
+  gate's ontology.** The best finding in PORT-REPORT-0d3761a9, caught company-side by their
+  own re-check rather than by any guard: their initial vocabulary reconcile ACTIVATED the
+  G55 `rua-load-shapes` lineage flips, because K8 (`seal-app-ref-edge-reshape`) *is* signed
+  company-side and the files looked takeable. `rua-load-shapes` is a DIFFERENT gate and is
+  still unsigned there. They reverted all three vocab fragments; the G23/rua code ported
+  inert because it is gate-bound and refuses `planned` labels — so the code's own guard
+  caught what the manifest did not. **The rule they wrote down is the one this repo should
+  encode: "identical to base" and "per-entry equivalent" are BOTH insufficient tests for a
+  gate-bound file.** A producer vocabulary or test file can be byte-identical to the port
+  base and still assume an active gate the consumer has not signed — status/id-set parity is
+  not field-and-gate parity. Today `PORT-MANIFEST.yaml` expresses disposition (who wins) but
+  nothing about PRECONDITION (what must be signed first), so
+  `drydocs_core/ontology/relationship_vocabulary/**` carries a disposition that is right
+  whenever the gates agree and dangerous exactly when they do not. Shape of the fix: a
+  `gate_bound:` key on those rows naming the gate id, and a reconcile-time check that
+  refuses to activate an entry whose gate is unsigned on the RECEIVING side. Note the near
+  miss honestly — this was caught by a human re-reading their own work, which is not a
+  control.
+
+- **`Idea-101`** · 2026-08-09 · `[question]` · **open** · prio? **Low** —
+  **Does the manifest vocabulary need a `derived` disposition?** Raised by the company's
+  send-back on the two roadmap rows and deliberately not settled unilaterally. Derived
+  renders — `docs/plan/board.html`, `docs/plan/roadmap.html`, the design-doc `.html` — all
+  carry `disposition: canonical-company`, which is a poor fit: there is no authored consumer
+  content to be canonical about, and the actual instruction in every one of their notes is
+  REGENERATE from the reconciled tree. `canonical-company` and "regenerate" differ in a way
+  that matters — the first says *keep what you have*, and keeping a stale render is as wrong
+  as taking the producer's. The `roadmap.yaml` row had the same class of defect and was a
+  clear enough case to fix outright (`evaluate` → `per-entry`, since its note already
+  prescribed a deterministic rule); this one is not, because splitting a single row away
+  from the board.html precedent would create a worse inconsistency than the imprecision.
+  Decide it across all the derived rows at once, or leave it and say why in the manifest.
+
 - **`Idea-98`** · 2026-08-09 · `[chore]` · **open** · prio? **Med** —
   **The adhoc Ab Initio version loader — the build C25 authorized and deliberately did not do.**
   Gate `software-version-context` signed the shape and nothing else:

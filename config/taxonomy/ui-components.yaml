@@ -87,7 +87,7 @@ components:
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
 
-  # --- route (19) ---
+  # --- route (20) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
@@ -118,7 +118,7 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (14) ---
+  # --- component (15) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
@@ -138,13 +138,13 @@ components:
   # --- icon (1) ---
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- explorer (4) ---
   # --- ask (1) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
   - { id: TaskGraphPane,           area: ask,          path: ask/TaskGraphPane.tsx,                       module: ask,        module_evidence: directory }
 
+  # --- explorer (4) ---
   - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }
   - { id: ExplorerGraphPane,       area: explorer,     path: explorer/ExplorerGraphPane.tsx,              module: explorer,   module_evidence: directory }
   - { id: NodeInspector,           area: explorer,     path: explorer/NodeInspector.tsx,                  module: explorer,   module_evidence: directory }
@@ -155,6 +155,8 @@ components:
 
   # --- loads (1) ---
   - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx,                     module: loads,      module_evidence: directory }
+
+  # --- software (1) ---
   - { id: VendorIcon,              area: software,     path: software/VendorIcon.tsx,                     module: software,   module_evidence: directory }
 
   # --- ownership (2) ---
