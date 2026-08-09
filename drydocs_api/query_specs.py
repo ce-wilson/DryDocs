@@ -448,7 +448,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "OPTIONAL MATCH (m)-[:HAS_AGENT]->(e) "
                 "RETURN a.app_id AS app_id, m.attribution_id AS attribution_id, "
                 "m.role_source_name AS source_role, tr.id AS tom_role, m.level AS level, "
-                "m.unmapped_role AS unmapped_role, e.sid AS holder_sid "
+                "m.unmapped_role AS unmapped_role, e.employee_id AS holder_sid "
                 "ORDER BY m.unmapped_role DESC, app_id LIMIT $limit"
             ),
             columns=(

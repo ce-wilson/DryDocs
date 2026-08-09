@@ -169,6 +169,42 @@ def test_app_codes_spec_classifies_both_mapping_patterns():
     assert "mapping_pattern" in [c.name for c in spec.columns]
 
 
+def test_holder_sid_reads_the_property_the_loader_actually_writes():
+    """O52. `ownership.attributions.v1` returned `e.sid AS holder_sid` — a
+    property NO loader writes, so the K4 attribution review surface's Holder
+    SID column was silently always null on a loaded graph. `seal_contacts.cypher`
+    keys the Employee node `employee_id` (from the source column `employee_sid`,
+    which is where the typo came from), and that is the only spelling in the
+    tree.
+
+    The guard is PAIRWISE on purpose: the two specs that surface a holder SID
+    must agree on the expression, so a future edit to one announces itself
+    instead of drifting. A spec naming a property no loader writes stays green
+    in every other unit test — the J26 promise-vs-assertion family — which is
+    why this needs its own assertion rather than a schema check.
+    """
+    attributions = QUERY_SPECS["ownership.attributions.v1"]
+    contact_roles = QUERY_SPECS["mappings.seal-contact-roles.v1"]
+
+    expression = "e.employee_id AS holder_sid"
+    for spec in (attributions, contact_roles):
+        assert expression in spec.cypher, f"{spec.id}: holder_sid must read {expression}"
+        assert "e.sid" not in spec.cypher, f"{spec.id}: e.sid is written by no loader"
+        assert "holder_sid" in [c.name for c in spec.columns]
+
+
+def test_no_spec_reads_an_employee_sid_property():
+    """The rule behind O52, asserted across the whole registry so the next
+    spec cannot reintroduce it: `sid` is a SOURCE-COLUMN name (`employee_sid`
+    in the SEAL extract), never a graph property. The loader maps it onto
+    `employee_id` at MERGE time."""
+    for spec in QUERY_SPECS.values():
+        assert not re.search(r"\b[a-z]+\.sid\b", spec.cypher), (
+            f"spec '{spec.id}' reads a `.sid` property; the graph keys employees "
+            "`employee_id` (seal_contacts.cypher) — `sid` is the source column name"
+        )
+
+
 # ── O27 authoring conventions (drydocs_api/AUTHORING.md) ────────────────────
 
 _REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
