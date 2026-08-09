@@ -796,6 +796,19 @@ OWED COMPANY-SIDE:
 > The strongest positive evidence is content the producer has never seen: an
 > entry that rules company-only rows (e.g. the nine company-only source entries
 > in `audit-fields.yaml`) cannot be a ported producer artifact.
+> **STRONGER STILL — an entry class that is self-proving BY CONSTRUCTION (new
+> 2026-08-09).** A Tier-A `RATIFICATION (... adopted-via-port)` entry can NEVER be
+> a ported artifact, because the producer never writes one: it is the CONSUMER's
+> record of RECEIVING a port, and the producer has nothing to adopt. Verified
+> producer-side rather than assumed — grepping `adopted-via-port` and
+> `RATIFICATION (Tier A` across producer `config/gate-log.md` returns NOTHING; the
+> §6a template lives in this file, and every instance of the shape lives in YOUR
+> gate-log. For that class the pickaxe is therefore not the proof — it is only how
+> the commit id gets named for the ledger.
+> **But read the SUBJECT field, not the heading.** §6a fixes Subject as "the exact
+> statuses flipped", so such an entry discharges the gates its SUBJECT flips; a
+> gate named only in the heading is a citation, not a ratification (the J28
+> heading-vs-body distinction, in its ratification costume).
 
 - **BOTH crosswalk gates: NOT RATIFIED** (checked 2026-08-09, company `main` @
   `a4c4ce37`). Each read RATIFIED at Step 1 on three portable signals; the
@@ -839,11 +852,19 @@ OWED COMPANY-SIDE:
   divergence, every ruling landing `status: stub` so no loader writes envelope
   properties. The audit-download trigger stands DORMANT (not reachable from
   that venue; ingesting it is an SME decision).
-  **NOTE FOR `envelope-property-terms`:** the Tier-A entry above names **M3 +
-  M4**, and M4 IS `envelope-property-terms` (producer gate-log:1392, 10/10,
-  2026-08-04). So that prompt is very likely discharged by the same entry —
-  run its Step 1 against `gate-log.md:1645` specifically rather than assuming
-  either way.
+  **`envelope-property-terms`: DISCHARGED ON STRUCTURAL GROUNDS, 2026-08-09 —
+  and settled from the PRODUCER side, which is unusual enough to say why.** The
+  Tier-A entry above (`gate-log.md:1645`) names **M3 + M4**, and M4 IS
+  `envelope-property-terms` (producer gate-log:1392, 10/10, 2026-08-04). It is a
+  Tier-A adopted-via-port entry, and by the rule above that class cannot be a
+  ported artifact — so no company-side pickaxe is needed to establish that it is
+  genuine. This is the one pack of the five that did NOT need a company session
+  to resolve.
+  TWO SMALL THINGS ARE STILL OWED: (1) quote the introducing commit id, so this
+  ledgers like the other true positive rather than as a producer inference; and
+  (2) confirm the entry's SUBJECT field flips M4's statuses rather than merely
+  naming M4 in the heading — if the Subject turns out to cover M3 only, the pack
+  is LIVE and its Step 1 runs as written against `gate-log.md:1645`.
   **NAMING, worth recording:** the nine use the producer's registry-v2 grammar
   (`origin:artifact` / `origin@db.schema.table`) — `controlm:app-codes`,
   `snow@[db].[schema].itsm`, `hr:emp-hierarchy`, and one deliberate re-home,
