@@ -356,9 +356,37 @@ def _compiled(entries: Iterable[Mapping[str, Any]]) -> list[tuple[str, re.Patter
     return [(e["path"], glob_to_regex(e["path"])) for e in entries]
 
 
+def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
+    """The J34 overlay seam: union each declared, EXISTING side-local overlay
+    into the manifest view the guards run against.
+
+    Overlay rows append AFTER the manifest's rows (first match wins, so the
+    producer manifest's dispositions keep precedence — an overlay adds
+    coverage, never overrides authority) and default_ok entries union. The
+    returned dict is a new view; the input is not mutated. Because an overlay
+    lives OUTSIDE PORT-MANIFEST.yaml, a producer-manifest-verbatim apply
+    structurally cannot drop its rows — the property the seam exists for
+    (PORT-REPORT-a14a8028: 89 company-only default_ok paths dropped by a
+    wholesale take).
+    """
+    view = {
+        **manifest,
+        "rows": list(manifest.get("rows", [])),
+        "default_ok": list(manifest.get("default_ok", [])),
+    }
+    for declared in (manifest.get("overlay") or {}).get("files", []):
+        overlay_file = repo / declared["path"]
+        if not overlay_file.exists():
+            continue  # the other side's slot — absent here by design
+        overlay = yaml.safe_load(overlay_file.read_text(encoding="utf-8")) or {}
+        view["rows"].extend(overlay.get("rows", []))
+        view["default_ok"].extend(overlay.get("default_ok", []))
+    return view
+
+
 @pytest.fixture(scope="module")
 def manifest() -> dict:
-    return yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8"))
+    return union_overlays(yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8")))
 
 
 def _git_files(*extra_args: str) -> list[str]:
@@ -485,3 +513,107 @@ def test_no_tracked_path_falls_through_silently(manifest: dict) -> None:
         "or, for an [untracked] path that is local-only by intent, .gitignore it.\n  "
         + "\n  ".join(f"{p} [untracked]" if p in untracked else p for p in sorted(orphans)[:40])
     )
+
+
+# --- J34: the overlay seam — side-local rows a verbatim apply cannot drop ---------
+#
+# PORT-REPORT-a14a8028 (2026-08-06): a producer-manifest-verbatim take dropped the
+# company's default_ok block — 89 company-only paths fell through their own J16
+# guard. The fix is structural, not procedural: side-local rows live in an overlay
+# FILE the guards union in (union_overlays above), so replacing PORT-MANIFEST.yaml
+# wholesale cannot touch them. These tests prove the mechanism with fixtures; the
+# company's real overlay is company-tracked and absent producer-side by design.
+
+_PRODUCER_MANIFEST_V1 = {
+    "overlay": {"files": [{"path": "PORT-MANIFEST.company.yaml", "side": "company"}]},
+    "rows": [{"path": "drydocs/loaders/**", "disposition": "canonical-producer"}],
+    "default_ok": [{"path": "README.md", "reason": "each repo's own front door"}],
+}
+
+# a later producer edition — different rows, same overlay declaration; what a
+# verbatim apply installs over the consumer's copy
+_PRODUCER_MANIFEST_V2 = {
+    "overlay": {"files": [{"path": "PORT-MANIFEST.company.yaml", "side": "company"}]},
+    "rows": [
+        {"path": "drydocs/loaders/**", "disposition": "canonical-producer"},
+        {"path": "docs/style/**", "disposition": "canonical-producer"},
+    ],
+    "default_ok": [{"path": "README.md", "reason": "each repo's own front door"}],
+}
+
+_COMPANY_OVERLAY = (
+    "rows:\n"
+    "  - path: \"docs/site/**\"\n"
+    "    disposition: canonical-company\n"
+    "    note: \"company-only docs site\"\n"
+    "default_ok:\n"
+    "  - path: \"PORT-REPORT-*.md\"\n"
+    "    reason: \"company port artifacts — theirs by construction\"\n"
+)
+
+
+def test_overlay_rows_survive_producer_manifest_verbatim_apply(tmp_path: Path) -> None:
+    """THE ACCEPTANCE PROOF: replacing the producer manifest wholesale (v1 -> v2,
+    the verbatim apply) cannot drop a company overlay row, because the row was
+    never in the file that was replaced."""
+    (tmp_path / "PORT-MANIFEST.company.yaml").write_text(_COMPANY_OVERLAY, encoding="utf-8")
+
+    for edition in (_PRODUCER_MANIFEST_V1, _PRODUCER_MANIFEST_V2):
+        view = union_overlays(edition, repo=tmp_path)
+        rows = _compiled(view["rows"])
+        allowed = _compiled(view["default_ok"])
+        # the company-only row resolves in BOTH editions — before and after the apply
+        assert resolve_path("docs/site/index.html", rows) == "docs/site/**"
+        assert resolve_path("PORT-REPORT-20260806.md", allowed) == "PORT-REPORT-*.md"
+
+    # and the union is a view: the producer manifest dict itself is untouched
+    assert len(_PRODUCER_MANIFEST_V2["rows"]) == 2
+
+
+def test_overlay_precedence_producer_rows_win(tmp_path: Path) -> None:
+    """Overlay rows append AFTER the manifest's rows: first match wins, so an
+    overlay can add coverage but never override a producer disposition."""
+    (tmp_path / "PORT-MANIFEST.company.yaml").write_text(
+        "rows:\n"
+        "  - path: \"drydocs/loaders/**\"\n"
+        "    disposition: canonical-company\n"
+        "    note: \"an overlay may not seize this — the producer row must win\"\n",
+        encoding="utf-8",
+    )
+    view = union_overlays(_PRODUCER_MANIFEST_V1, repo=tmp_path)
+    rows = _compiled(view["rows"])
+    winner = next(
+        r for r in view["rows"] if r["path"] == resolve_path("drydocs/loaders/base.py", rows)
+    )
+    assert winner["disposition"] == "canonical-producer"
+
+
+def test_missing_overlay_is_a_clean_noop() -> None:
+    """The other side's slot is absent by design — the union must not invent
+    rows, fail, or mutate anything (producer-side runs hit this path always)."""
+    view = union_overlays(_PRODUCER_MANIFEST_V1, repo=Path("does/not/exist"))
+    assert view["rows"] == _PRODUCER_MANIFEST_V1["rows"]
+    assert view["default_ok"] == _PRODUCER_MANIFEST_V1["default_ok"]
+
+
+def test_live_overlay_declaration_is_well_formed(manifest: dict) -> None:
+    """The real manifest declares BOTH side slots (Idea-41: the grammar must be
+    able to express a producer-local file), each overlay path is itself covered
+    by a never-port row, and no live overlay row duplicates a manifest row
+    (a duplicate silently loses to first-match-wins — a guard error, not a
+    quiet loser)."""
+    raw = yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8"))
+    declared = (raw.get("overlay") or {}).get("files", [])
+    assert {d["side"] for d in declared} == {"company", "producer"}
+
+    rows = _compiled(raw["rows"])
+    for d in declared:
+        assert resolve_path(d["path"], rows) == "PORT-MANIFEST.*.yaml", (
+            f"{d['path']}: every overlay file must resolve to the never-port row — "
+            "side-local files never cross the boundary"
+        )
+
+    # duplicate-path check across the union (the manifest fixture IS the union)
+    paths = [r["path"] for r in manifest["rows"]]
+    dupes = sorted({p for p in paths if paths.count(p) > 1})
+    assert not dupes, f"overlay row(s) duplicate a manifest row — first-match-wins hides them: {dupes}"

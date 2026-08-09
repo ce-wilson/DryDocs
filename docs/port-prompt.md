@@ -445,9 +445,16 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   exist producer-side at all; `tests/unit/test_employee_roster.py` and a `test_snow_supp*`
   are likewise absent. (`drydocs/publishing/validator.py` exists both sides and diverges
   in content — sanctioned, `drydocs/**` is evaluate-on-collision.) See T21.
-- **`PORT-MANIFEST.yaml` = canonical-producer + a company-only `default_ok:`
-  appendix** (PORT-REPORT-*.md, .vscode/**, …). Take producer wholesale, then
-  re-append the company block — dropping it reds their J16 coverage guard.
+- **`PORT-MANIFEST.yaml` = canonical-producer, and the company-only rows now have
+  a home a verbatim take cannot touch (J34, 2026-08-09).** The manifest declares an
+  `overlay:` seam: side-local rows live in `PORT-MANIFEST.company.yaml` (company-tracked,
+  never-port), and the J16 guard UNIONS overlay rows/default_ok with the manifest —
+  overlay rows append AFTER producer rows, so producer dispositions keep precedence.
+  ONE-TIME MIGRATION at the port that delivers J34: move your 89 company-only
+  `default_ok` paths (PORT-REPORT-*.md, docs/build_*, docs/site/*, docs/prompts/*,
+  settings.json, …) out of your manifest copy into `PORT-MANIFEST.company.yaml`.
+  After that, take the producer manifest wholesale — the re-append-after-every-port
+  ritual (and its failure mode, the PORT-REPORT-a14a8028 89-path drop) retires.
 - **Enforcement-matrix SURFACES: `config/crosswalks/` lives under the COMPANY row id
   `crosswalks`** — producer's `orchestrator-crosswalks` was folded into it at
   PORT-REPORT-40c35724 (runtime consumer + drift test carried). Resolve future
