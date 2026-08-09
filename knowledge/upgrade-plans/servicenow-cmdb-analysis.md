@@ -6,6 +6,13 @@ SYNTHESIZED DryDocs dispositions; the vendor material itself stays local — see
 **Analyzed:** 2026-07-20. **Feeds:** `generic-terminology-research.md` (the SaaS-naming
 idea) and the gate-bound candidate list at the bottom.
 
+**This file is the BASELINE half of a pair (K21, 2026-08-09).** It reads the vendor doc set —
+the canonical CMDB/CSDM model. [`servicenow-replica-evidence.md`](servicenow-replica-evidence.md)
+reads our **replica** — the instance — and names where the two differ (company `u_` columns, a
+company `x_<scope>_` scoped app with no vendor baseline at all, and data-lake carrier columns that
+exist in ServiceNow nowhere). Read them together; neither is sufficient alone. Note candidate #1
+below is **re-opened** by that evidence.
+
 Disposition vocabulary: **INCORPORATE** (act on it — target named), **PARK** (real but
 no current use case), **REJECT** (out of scope for DryDocs). Nothing here changes the
 graph or vocabulary — meaning-bearing candidates route through the HITL gate.
@@ -146,6 +153,12 @@ Content Service (shared normalization); SaaS publisher packs + Okta usage.
 1. **Deployed-application-instance concept** (CSDM Application Service/Service Instance)
    — node-meaning decision → its own gate, only when an environment-level use case
    lands (dev/test/prod estates). Adopt the concept; pick our own stable label.
+   **RE-OPENED 2026-08-09 (K21): the trigger condition is met.** The replica carries
+   `u_seal_deployment_id` beside `u_seal_application_id`, and both sit on the Application
+   Service row (`cmdb_ci_service_discovered`) rather than on `cmdb_ci_business_app` — so the
+   source distinguishes application from deployment and keys each, while DryDocs has one
+   concept for both. See `servicenow-replica-evidence.md` §1.3(c) and §4. Still gate-bound;
+   this records that the deferral's own condition has arrived, nothing more.
 2. **Attestation practice** — a recurring SME re-confirmation pass over gate-accepted,
    non-discoverable facts (the Data Manager attestation model; extends D7's family).
    Process-level; groom when a cadence owner exists.

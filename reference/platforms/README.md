@@ -4,7 +4,8 @@
 |----------|------|-------------------|
 | **Neo4j** | graph database (the KG itself lives here) | `neo4j-skills:*` plugin + [`neo4j/`](neo4j/README.md) |
 | **Oracle** | source system (Control-M `psgmgr` views) + `DRYDOCS_STG` staging | Oracle `db:` skill |
-| **Snowflake** | future data platform (placeholder) | `neo4j-skills:neo4j-snowflake-graph-analytics-skill` |
+| **ServiceNow** | source system (CMDB/CSDM + the company TOM model), read through a Snowflake replica | public CMDB docs — see `REGISTRY.yaml#servicenow`; instance evidence in `knowledge/upgrade-plans/servicenow-replica-evidence.md` |
+| **Snowflake** | placeholder for DryDocs' own use — but ALREADY LIVE as the **carrier** of the ServiceNow replica | `neo4j-skills:neo4j-snowflake-graph-analytics-skill` |
 | **git** | code/authorship provenance + mirrored modeling-reference repos | `gh` CLI |
 
 ## How agents should use these

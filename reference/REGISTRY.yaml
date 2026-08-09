@@ -11,7 +11,7 @@
 # =============================================================================
 
 schema: drydocs.reference-registry.v1
-updated: 2026-06-20
+updated: 2026-08-09           # K21: ServiceNow registered as a source-platform; the snowflake entry gains the live-carrier fact
 classification: External       # ALL reference material is External (public) — see config/classification.yaml
 verified: 2026-06-21           # A1: local mirrors (../llm-graph-builder, ../sdw-sosa-ssn) + all platform/standard docs resolve; no stale entries
 
@@ -39,12 +39,36 @@ platforms:
     skills_prefix: "db:"
     docs: reference/platforms/README.md
 
+  - id: servicenow
+    role: source-platform          # SaaS ITSM / CMDB — we ingest FROM it, never build ON it
+    summary: >
+      The CMDB/CSDM system of record for configuration items, CI relationships and the
+      company TOM (Technical Operating Model) accountability model. Reached through a
+      Snowflake replica, never queried directly — same shape as Control-M through psgmgr.
+      PUBLIC DOCS ARE THE BASELINE for stock tables (cmdb_ci, cmdb_rel_ci, cmdb_rel_type,
+      cmdb_ci_service_discovered = CSDM "Application Service", cmdb_ci_business_app):
+      the vendor documents the canonical schema, so a replica column that is NOT in the
+      vendor doc is a company extension (`u_` columns, `x_<scope>_` scoped apps) or a
+      carrier artifact (data-lake `dwintel_dl_*`, `delete_flag`) — and naming which is
+      the point. NOT covered by the vendor doc at all: the `x_<scope>_cmdb_tom_*` tables,
+      which are a company scoped application with no vendor baseline.
+    source_url: https://www.servicenow.com/docs/r/servicenow-platform/configuration-management-database-cmdb/
+    docs: knowledge/upgrade-plans/servicenow-replica-evidence.md   # instance evidence (K21)
+    also: knowledge/upgrade-plans/servicenow-cmdb-analysis.md      # vendor doc-set analysis (C10)
+    manifest: external/ServiceNow/README.md                        # the downloaded Now Create asset set
+    verified: 2026-08-09           # K21 — cmdb_rel_ci/cmdb_rel_type field docs re-read from the public docs
+
   - id: snowflake
     role: data-platform-source
-    status: placeholder            # expansion target
+    status: placeholder            # expansion target — DryDocs INGESTS nothing from it yet
     summary: >
-      Future data platform. Neo4j graph-analytics-on-Snowflake reference available via
-      neo4j-skills:neo4j-snowflake-graph-analytics-skill when activated.
+      Future data platform for DryDocs' own use. Neo4j graph-analytics-on-Snowflake reference
+      available via neo4j-skills:neo4j-snowflake-graph-analytics-skill when activated.
+      NON-OBVIOUS FACT, recorded so it is not re-derived (SME 2026-08-09): Snowflake is ALREADY
+      LIVE in the estate as the CARRIER of the ServiceNow replica DryDocs will read. It holds
+      the origin/carrier slot that Oracle `psgmgr` holds for Control-M, so a snow dataset is
+      `snow@[db].[schema].<servicenow_table>` — origin `snow`, carrier snowflake. And note the
+      trap that bit once already: system id `snow` is SERVICENOW, not Snowflake.
     docs: reference/platforms/README.md
 
   - id: git
