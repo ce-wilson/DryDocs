@@ -849,6 +849,36 @@ OWED COMPANY-SIDE:
   `snow@[db].[schema].itsm`, `hr:emp-hierarchy`, and one deliberate re-home,
   `repo:org-location` → `hr:emp-location`. The v2 grammar is holding on
   sources the producer never authored, which is the strongest test it has had.
+- **`ui-write-surface`: SIGN-OFF GIVEN 2026-08-09, ENTRY NOT YET WRITTEN — do not
+  read this as ratified.** Recorded in this state deliberately, because the
+  distinction is the one that produced two false positives today: the SME has
+  authorised the ratification, and the company session has the census, but no
+  gate-log entry exists yet and nothing is committed company-side. Status stays
+  NEVER RUN until a commit exists and passes the provenance check.
+  Step 1 was provenance-verified as NEVER RUN before the work began — the check
+  returned two PORT commits (`afa2deeb` on branch `drydocs-port-20260721`, and
+  `12fa680e`), so the producer's O20 sign-off had ported across exactly as it
+  did for the two crosswalks. **This is the first time the rule PREVENTED a
+  false positive rather than catching one afterwards**, one day after it was
+  written.
+  The Step-2 census is genuine company-only content and is what will make the
+  entry self-proving: a full write-path route census with tiers, `/raw-cypher`
+  as the only graph-touching surface and read-pinned behind two layers
+  (`ensure_read_only` + `RoutingControl.READ`), **no M3-shaped path found**, and
+  a repo-wide grep confirming NO executable code assumes either precedence
+  direction. Dispositions map 1:1 onto the producer's O20 (`config/gate-log.md`
+  §701, Confirmed 4 · Edited 0 · Rejected 0), with no divergence.
+  WORTH CARRYING BACK, because it is the company AHEAD of the ruling rather
+  than conforming to it: the producer ruled M2 requires an always-visible origin
+  flag; the company implemented it so the flag CANNOT be absent — `app_code_mapping`
+  rejects an unflagged insert at the DB constraint (`origin TEXT NOT NULL CHECK`),
+  and `seal_contact_override` makes it structurally impossible by computing origin
+  source-first in the grid view and emitting every row as a literal `'source'` or
+  `'override'` via UNION ALL, never merged.
+  Two things stay open on their side, correctly: PRECEDENCE (override-vs-graph
+  remains a future gate on both sides) and the admin/SUPER-USER page, which O20
+  §SME-1 records as EXPECTED but which has no route built — company-side scoping,
+  not producer work.
 - **CONFIRMED GENUINE, from the same session — the row-6 / `cm_hosts` answer.**
   Unlike the ratification claim this CANNOT be a ported artifact, because it
   describes company loader-tier state the producer cannot see: their CM_HOSTS
