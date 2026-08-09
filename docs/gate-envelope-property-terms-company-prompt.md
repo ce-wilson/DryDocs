@@ -15,6 +15,34 @@ What is this gate's status on YOUR side? Search your `config/gate-log.md` for an
 - **RATIFIED** — quote the entry heading + date, report back, STOP.
 - **NEVER RUN** — continue to step 2.
 
+**BEFORE you may report RATIFIED, run the PROVENANCE CHECK. An entry existing is
+NOT evidence that you ratified anything.** `config/gate-log.md` is `union-append`
+in the port manifest, so producer entries land on your side BY DESIGN — and the
+crosswalk yamls and `source-registry.yaml` `confirmed:` flags port too. All three
+"corroborating signals" therefore corroborate each other and nothing else.
+
+    git log --oneline -S "envelope-property-terms" -- config/gate-log.md
+
+- The introducing commit is a **PORT commit** (subject starts `port(...)`, or it
+  sits on a port branch) -> the entry ARRIVED FROM THE PRODUCER. Report **NEVER
+  RUN**, not RATIFIED, and continue to step 2.
+- The introducing commit is **company-authored and unrelated to any port** ->
+  genuinely RATIFIED. Quote that commit id; it is what gets ledgered.
+
+Quote the command's OUTPUT, not your reading of it.
+
+THIS IS NOT HYPOTHETICAL. On 2026-08-09 the `airflow-crosswalk` check reported
+RATIFIED on exactly these three signals; the provenance command returned one
+commit, `80d0fc0e`, subject `port(cewilson): apply eeaffa2..f7970e5 (step 31 —
+web console O2 + 2026-07-14 gate session) onto branch`. The producer's own F2
+sign-off had ported across and was being read back as company confirmation. Note
+the tells that were visible without the command: the heading cites a PRODUCER
+backlog id (F1/F2/M3/M4/O20), the signer and date match the producer's exactly,
+and the producer's `confirmed:` comment string is byte-identical to yours.
+
+The strongest POSITIVE evidence is content the producer has never seen: an entry
+that rules company-only rows cannot be a ported artifact.
+
 ## Step 2 — profile the internal datasets used (agent; read-only, zero graph writes)
 
 The bindings live in the vocabulary registry and are enforced by drift guards, so the
