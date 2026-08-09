@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-09T14:33:02",
+    "captured_at": "2026-08-09T14:39:03",
     "date": "20260809",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "3bec2b3",
-      "full": "3bec2b357ebcb5da89651abec90d7e35a501de04",
+      "commit": "9270002",
+      "full": "92700026aa219089d4ad1baec5a1d3d1feef97c3",
       "branch": "main",
-      "describe": "3bec2b3",
-      "subject": "chore(depgraph): U19 — bump the instrument pin to 6ee0af6",
-      "dirty": true,
-      "untracked_present": true,
+      "describe": "9270002",
+      "subject": "fix(depgraph): U19 — the orphan queue was 82% scanner artifact",
+      "dirty": false,
+      "untracked_present": false,
       "pr": null
     },
     "depgraph": {
@@ -13211,10 +13211,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260809-1423.json",
-      "name": "drydocs-20260809-1423.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260809.json",
+      "name": "drydocs-20260809.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260809-1423.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260809.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27681,7 +27681,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260809-1423.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260809.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
