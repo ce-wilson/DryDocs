@@ -62,27 +62,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-91`** · 2026-08-08 · `[bug]` · **open** · prio? **Med** —
-  **U14 `$packages` allow-list is missing `drydocs_docmeta`** (persona Run 2, U-arch F4:
-  `docs/reviews/persona-python-architect-2026-08.md`). The package was born 2026-08-04
-  (`d647171`) — the same day the U14 baselines were measured — and has a MODULE_MAP row
-  and a `test_module_boundary.py` entry, but the tech-debt skill's A1–A6 pack and the
-  review plan still scope metrics to seven roots, so all 10 docmeta modules are invisible
-  to A3/A4/A5. Fix: add the eighth root in both places, re-baseline A3/A5, and note the
-  two untested connectors (`connectors/filedrop.py`, `connectors/web.py`) while there.
-  Same failure shape as Run 1's `drydocs_api` census miss, one package generation later.
-
-- **`Idea-92`** · 2026-08-08 · `[bug]` · **open** · prio? **Med** —
-  **Depgraph scanner blind spot: imports rooted off the repo root never resolve**
-  (persona Run 2, U-arch F1). `scripts/render_board.py:56-62` imports seven sibling
-  scripts by bare name — zero `scripts→scripts` edges in the graph; `agents/` modules
-  import `common.*`/`graph_qa.*` against the `agents/` sys.path root — zero
-  `agents→agents` edges. Absolute imports from the same files DO resolve, so the U6 fix
-  is fine; what is missing is per-directory sys.path roots (or an alias map) in the
-  extractor. Until fixed, the 23-item first-party orphan queue is mostly false positives
-  and only the package-scope metrics are trustworthy.
-
-- **`Idea-93`** · 2026-08-08 · `[chore]` · **open** · prio? **High** —
+- **`Idea-93`** · 2026-08-08 · `[chore]` · **groomed → executed IN PLACE at the 2026-08-09 groom (14 stale `inputs:` fixed in backlog.yaml) + merged → L19 (the design-doc half); the E1 status question STAYS OPEN — user call** · prio? **High** —
   **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,
   U-pm: `docs/reviews/persona-project-manager-2026-08.md`). Six causes: (1) the S5
   2026-08-06 split of `config/taxonomy-ontology-map.yaml` and
@@ -97,50 +77,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
   worn `in_progress` since 2026-06-22 while actually waiting on gate scheduling;
   consider `blocked`. Done-claims audit itself: 271 claims, ZERO false — the ledger
   holds.
-
-- **`Idea-94`** · 2026-08-08 · `[doc]` · **open** · prio? **High** —
-  **Design-doc re-cite sweep, SECOND filing — now with a mechanism ask** (persona Run 2,
-  U-tw: `docs/reviews/persona-tech-writer-2026-08.md`). The Run-1 sweep never ran: all
-  five pre-squash cites unchanged (`807e050`, `ac2ea2e`, `97ee81c`, `24d6a4b`,
-  `0e036ff`); `drydocs-startup-refresh-runbook` reached Rev 10 (seven bumps since
-  Run 1) still citing squash-day `a135a6d`; `drydocs-mapping-store-runbook` took two
-  bumps on `22d1a39`; `drydocs-mapping-demo-runbook` still has no `commit:` at all;
-  `drydocs-project-tdd` was edited 08-06 on a dangling cite. The pattern is behavioral —
-  rev bumps happen, cite refreshes don't — so beyond the one-time sweep, add
-  enforcement: the design-doc renderer or a unit test should fail on a `commit:` that
-  is unreachable from HEAD.
-
-- **`Idea-95`** · 2026-08-08 · `[doc]` · **open** · prio? **Med** —
-  **Doc-drift second filings + one new gap** (persona Run 2, U-tw). (a)
-  `drydocs_lineage/model.py` still cited by no traceability component — fan-in has
-  grown 9 → 24 and it is the G22-reshape fan-out surface (`base.py` DID get its cite,
-  so the Run-1 line half-landed). (b) `sdlc-neo4j-schema.md` §DEP: all three Run-1 rows
-  still stale, and the vocabulary row is now TWO moves behind (G2 re-home, then the S5
-  fragment split); the file gets additive edits (a C23 note landed 08-03) but no
-  verification sweeps — regenerate §DEP from the tree. (c) NEW: `drydocs_docmeta`
-  (10 modules) has no design doc or runbook — the same growth stage that produced the
-  core-runbook after Run 1 flagged drydocs_core.
-
-- **`Idea-90`** · 2026-08-08 · `[idea]` · **open** · prio? **Med** —
-  **Business-layer location experiment ran (annual report + ORG/location ontology) —
-  three decisions queued.** Full write-up:
-  `internal/context-graph-analysis/business-layer-location-experiment.md`. The GraphRAG
-  search verdict: the `jpmc-reports` corpus is registered (External, `target_db:
-  ddcontext`, `:DataAsset`-slice shape, `confirmed: false`) but `ddcontext` is EMPTY on
-  the desktop (`neo4jtest`, probed 2026-08-08) and the registered shape is not the
-  lexical spine, so no vector retrieval is possible either way. The hand-applied ORG +
-  location pass over the public sources produced a coherent business layer regardless:
-  org units = the LOB layer verbatim ("managed on an LOB basis"), an effective-dated
-  `org:ChangeEvent` (the 2Q2024 segment merge), sites at MIXED grain (street → city →
-  country), and a hard epistemic line between an enumerable `org:Site` and an aggregate
-  presence claim ("177 locations") that must never be exploded into fake site nodes.
-  Queued: (1) the corpus's named P4+ reshape decision now has a real consumer — lexical
-  spine vs slice shape, and the newer 2025/2026 editions at the repo root should ride the
-  re-ingest; (2) the §3 ORG mappings are gate material (`status: planned` proposals) —
-  grain + claim-vs-site findings feed Z2, the org-structure shapes want a business-layer
-  gate or E-epic item; (3) any re-ingest gates on the desktop ddcontext provisioning
-  check (`Idea-49`). Also proves the Z5 map contract is satisfiable from the business
-  layer alone — a located-nodes world map needs no technical layer.
+  **GROOM 2026-08-09 — what was executed, and what is left.** Fourteen (not nine)
+  non-`done` items carried a stale `inputs:` path, and all fourteen were corrected in
+  `backlog.yaml` at this groom rather than promoted, because `backlog.yaml` is the file a
+  groom owns: `E1`, `Q10`, `Q11`, `Q14`, `G34`, `G44`, `U10`, `U11` re-pointed at the S5
+  fragment DIRECTORIES (`drydocs_core/ontology/relationship_vocabulary/`,
+  `config/taxonomy-ontology-map/`); `E2` likewise; `Q15`, `R11`, `R12` re-pointed at
+  `web/src/ask/` + `web/src/routes/AskRoute.tsx`; `U10` also dropped the retention-deleted
+  dated snapshot for the snapshot DIRECTORY (the rule of thumb this entry proposed, now
+  applied); `R9` fixed to `persona-python-architect-2026-07.md`; `V4` re-pointed at the five
+  flat drydocs-review files plus `drydocs/publishing/`. `done` items were deliberately NOT
+  touched — their `inputs:` were true when the work ran, and rewriting them edits the record
+  rather than the work queue. STILL OPEN, and the reason this entry stays in the inbox: the
+  **E1 status question** (in_progress since 2026-06-22, actually waiting on gate scheduling —
+  `blocked` may be the honest value). A groom does not move an item's status: status is the
+  claim channel between the two machines, so that one is the user's call. The design-doc and
+  traceability-matrix half of this entry rides L19 clause (f).
 
 - **`Idea-89`** · 2026-08-07 · `[bug]` · **closed → fixed in place 2026-08-07 (SME ruling); no item minted** · prio **Med** —
   **`OverviewRoute` renders ALL modules unfiltered — the Overview pick-list offers
@@ -183,22 +135,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (which database corpora live in) and Q14 (which term carries the edge) — and this is
   also where Q16's unshipped clause (b) will land. (Found at the Q16 close, 2026-08-07.)
 
-- **`Idea-87`** · 2026-08-07 · `[chore]` · **open** · prio? **High** —
-  **Company docmeta has diverged and is AHEAD — exactly the class a port silently
-  clobbers.** Port A landed on the company side and then moved: their ADR is
-  `0005-docmeta-document-ingestion.md` where the producer has docmeta at **ADR 0006**
-  (`0006-docmeta-component-and-doc-graph.md`, and producer 0005 is the browser↔Neo4j
-  access path — so the numbers COLLIDE with different subjects); their package is
-  `drydocs.docmeta` (`drydocs/docmeta/`) where the producer has top-level
-  `drydocs_docmeta/`; and they carry `prompts.py` and `pipeline.py`, which the producer
-  does not have at all. A straight producer→company port take would overwrite the
-  package path, renumber-or-duplicate the ADR, and drop two files that only exist over
-  there. Needs a deliberate reconcile decision before the next docmeta port — at
-  minimum: which ADR number is canonical on each side, whether the package paths
-  converge or stay deliberately divergent with a recorded reason, and whether
-  `prompts.py`/`pipeline.py` back-flow to the producer. Relates to `Idea-79`/J34
-  (the PORT-MANIFEST company-overlay seam) — same failure mode, different artifact.
-
 - **`Idea-86`** · 2026-08-07 · `[source]` · **parked → G32 rules `target_db`** · prio? **Med** —
   **Register the internal MWAA documentation as a doc corpus — blocked on `target_db`,
   which G32 owns.** The internal MWAA implementation-docs locator saved this session
@@ -213,17 +149,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the ruling may reverse. When it unparks, the entry is tier **T2** (internal
   platform), connector **web**, curation **sme-confirm** (fixed per tier), and
   classification **Internal**.
-
-- **`Idea-85`** · 2026-08-07 · `[chore]` · **open** · prio? **Med** —
-  **Backlog ids + scheduling for the four post-G22 data-profile gate prompts**
-  (drafted 2026-08-07, unsigned): `rua-bundle-data-profile`,
-  `repo-manifest-data-profile`, `dpl-pipeline-registry-contract`,
-  `dpl-dataset-registry-contract` in `config/gate-prompts/`. Each has the same
-  two-step shape per SME direction: §A HITL identify-the-source-data (Internal)
-  → §B agent profiles the existing data → §C rulings. The dpl pair discharges
-  T13; repo-manifest is the trusted_ref blessing venue; rua-bundle gates any
-  load population beyond the G22-walked bundles. Promote with ids + agent/model
-  at next groom; sessions are company-side (real data lives there).
 
 - **`Idea-83`** · 2026-08-07 · `[bug]` · **groomed → J33 (2026-08-07)** · prio? **Low** —
   **Three standing rich-ANSI test failures on this desktop, pre-existing (not
@@ -1341,6 +1266,100 @@ question a 1,000-line file with the trail at the bottom could not answer.
   loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
   (silent null = provenance undercount).
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-09 (desktop, weekly)** — worked the six 2026-08-08 persona Run-2 captures plus the two `open` chores the 2026-08-07 pm groom left standing. **Promoted 11:** `Idea-91`→U18, `Idea-92`→U19, `Idea-94`(mechanism half)→L27, `Idea-95`(c)→V11, `Idea-85`→**G62/G63/G64/G65** (one item per gate session — the four post-G22 data-profile prompts were drafted 2026-08-07 and had no id, so the pull loop could not see them), `Idea-87`→J40, `Idea-90`→C28 + Q17. **Merged 3:** `Idea-94` and `Idea-95`(a,b) into **L19** (second filing — the sweep never ran and the drift got worse, so L19 was raised p3→p2 and re-stated with Run-2 numbers, and clause (f) now covers the S5 fragment-split re-cites); `Idea-90`’s location findings into **Z2** (mixed grain + the enumerable-site-vs-aggregate-claim line, as required confirmations). **Executed in place 1:** `Idea-93` — fourteen stale `inputs:` corrected directly in `backlog.yaml`; its E1 status question stays open and the entry stays in the inbox, marked. **Parked as a question: 0.** Two HITL-safe drafts, deciding nothing: C28 (business-layer ORG prompt, `status: planned` terms only, sign-off a separate session) and Q17 (a PROPOSED decision record the user rules) — the G27/W1/U16 precedent.
+
+- **`Idea-95`** · 2026-08-08 · `[doc]` · **merged → L19 (clauses a+b, the second filing) + groomed → V11 (clause c, 2026-08-09)** · prio? **Med** —
+  **Doc-drift second filings + one new gap** (persona Run 2, U-tw). (a)
+  `drydocs_lineage/model.py` still cited by no traceability component — fan-in has
+  grown 9 → 24 and it is the G22-reshape fan-out surface (`base.py` DID get its cite,
+  so the Run-1 line half-landed). (b) `sdlc-neo4j-schema.md` §DEP: all three Run-1 rows
+  still stale, and the vocabulary row is now TWO moves behind (G2 re-home, then the S5
+  fragment split); the file gets additive edits (a C23 note landed 08-03) but no
+  verification sweeps — regenerate §DEP from the tree. (c) NEW: `drydocs_docmeta`
+  (10 modules) has no design doc or runbook — the same growth stage that produced the
+  core-runbook after Run 1 flagged drydocs_core.
+
+- **`Idea-94`** · 2026-08-08 · `[doc]` · **merged → L19 (the sweep) + groomed → L27 (the enforcement mechanism, 2026-08-09)** · prio? **High** —
+  **Design-doc re-cite sweep, SECOND filing — now with a mechanism ask** (persona Run 2,
+  U-tw: `docs/reviews/persona-tech-writer-2026-08.md`). The Run-1 sweep never ran: all
+  five pre-squash cites unchanged (`807e050`, `ac2ea2e`, `97ee81c`, `24d6a4b`,
+  `0e036ff`); `drydocs-startup-refresh-runbook` reached Rev 10 (seven bumps since
+  Run 1) still citing squash-day `a135a6d`; `drydocs-mapping-store-runbook` took two
+  bumps on `22d1a39`; `drydocs-mapping-demo-runbook` still has no `commit:` at all;
+  `drydocs-project-tdd` was edited 08-06 on a dangling cite. The pattern is behavioral —
+  rev bumps happen, cite refreshes don't — so beyond the one-time sweep, add
+  enforcement: the design-doc renderer or a unit test should fail on a `commit:` that
+  is unreachable from HEAD.
+
+- **`Idea-92`** · 2026-08-08 · `[bug]` · **groomed → U19 (2026-08-09)** · prio? **Med** —
+  **Depgraph scanner blind spot: imports rooted off the repo root never resolve**
+  (persona Run 2, U-arch F1). `scripts/render_board.py:56-62` imports seven sibling
+  scripts by bare name — zero `scripts→scripts` edges in the graph; `agents/` modules
+  import `common.*`/`graph_qa.*` against the `agents/` sys.path root — zero
+  `agents→agents` edges. Absolute imports from the same files DO resolve, so the U6 fix
+  is fine; what is missing is per-directory sys.path roots (or an alias map) in the
+  extractor. Until fixed, the 23-item first-party orphan queue is mostly false positives
+  and only the package-scope metrics are trustworthy.
+
+- **`Idea-91`** · 2026-08-08 · `[bug]` · **groomed → U18 (2026-08-09)** · prio? **Med** —
+  **U14 `$packages` allow-list is missing `drydocs_docmeta`** (persona Run 2, U-arch F4:
+  `docs/reviews/persona-python-architect-2026-08.md`). The package was born 2026-08-04
+  (`d647171`) — the same day the U14 baselines were measured — and has a MODULE_MAP row
+  and a `test_module_boundary.py` entry, but the tech-debt skill's A1–A6 pack and the
+  review plan still scope metrics to seven roots, so all 10 docmeta modules are invisible
+  to A3/A4/A5. Fix: add the eighth root in both places, re-baseline A3/A5, and note the
+  two untested connectors (`connectors/filedrop.py`, `connectors/web.py`) while there.
+  Same failure shape as Run 1's `drydocs_api` census miss, one package generation later.
+
+- **`Idea-90`** · 2026-08-08 · `[idea]` · **groomed → Q17 (corpus reshape) + C28 (org-structure gate DRAFT); merged → Z2 (the location grain + claim-vs-site findings) — 2026-08-09** · prio? **Med** —
+  **Business-layer location experiment ran (annual report + ORG/location ontology) —
+  three decisions queued.** Full write-up:
+  `internal/context-graph-analysis/business-layer-location-experiment.md`. The GraphRAG
+  search verdict: the `jpmc-reports` corpus is registered (External, `target_db:
+  ddcontext`, `:DataAsset`-slice shape, `confirmed: false`) but `ddcontext` is EMPTY on
+  the desktop (`neo4jtest`, probed 2026-08-08) and the registered shape is not the
+  lexical spine, so no vector retrieval is possible either way. The hand-applied ORG +
+  location pass over the public sources produced a coherent business layer regardless:
+  org units = the LOB layer verbatim ("managed on an LOB basis"), an effective-dated
+  `org:ChangeEvent` (the 2Q2024 segment merge), sites at MIXED grain (street → city →
+  country), and a hard epistemic line between an enumerable `org:Site` and an aggregate
+  presence claim ("177 locations") that must never be exploded into fake site nodes.
+  Queued: (1) the corpus's named P4+ reshape decision now has a real consumer — lexical
+  spine vs slice shape, and the newer 2025/2026 editions at the repo root should ride the
+  re-ingest; (2) the §3 ORG mappings are gate material (`status: planned` proposals) —
+  grain + claim-vs-site findings feed Z2, the org-structure shapes want a business-layer
+  gate or E-epic item; (3) any re-ingest gates on the desktop ddcontext provisioning
+  check (`Idea-49`). Also proves the Z5 map contract is satisfiable from the business
+  layer alone — a located-nodes world map needs no technical layer.
+
+- **`Idea-87`** · 2026-08-07 · `[chore]` · **groomed → J40 (2026-08-09)** · prio? **High** —
+  **Company docmeta has diverged and is AHEAD — exactly the class a port silently
+  clobbers.** Port A landed on the company side and then moved: their ADR is
+  `0005-docmeta-document-ingestion.md` where the producer has docmeta at **ADR 0006**
+  (`0006-docmeta-component-and-doc-graph.md`, and producer 0005 is the browser↔Neo4j
+  access path — so the numbers COLLIDE with different subjects); their package is
+  `drydocs.docmeta` (`drydocs/docmeta/`) where the producer has top-level
+  `drydocs_docmeta/`; and they carry `prompts.py` and `pipeline.py`, which the producer
+  does not have at all. A straight producer→company port take would overwrite the
+  package path, renumber-or-duplicate the ADR, and drop two files that only exist over
+  there. Needs a deliberate reconcile decision before the next docmeta port — at
+  minimum: which ADR number is canonical on each side, whether the package paths
+  converge or stay deliberately divergent with a recorded reason, and whether
+  `prompts.py`/`pipeline.py` back-flow to the producer. Relates to `Idea-79`/J34
+  (the PORT-MANIFEST company-overlay seam) — same failure mode, different artifact.
+
+- **`Idea-85`** · 2026-08-07 · `[chore]` · **groomed → G62, G63, G64, G65 (2026-08-09 — one item per gate session, as the entry asked)** · prio? **Med** —
+  **Backlog ids + scheduling for the four post-G22 data-profile gate prompts**
+  (drafted 2026-08-07, unsigned): `rua-bundle-data-profile`,
+  `repo-manifest-data-profile`, `dpl-pipeline-registry-contract`,
+  `dpl-dataset-registry-contract` in `config/gate-prompts/`. Each has the same
+  two-step shape per SME direction: §A HITL identify-the-source-data (Internal)
+  → §B agent profiles the existing data → §C rulings. The dpl pair discharges
+  T13; repo-manifest is the trusted_ref blessing venue; rua-bundle gates any
+  load population beyond the G22-walked bundles. Promote with ids + agent/model
+  at next groom; sessions are company-side (real data lives there).
+
 
 - **GROOM 2026-08-07 (laptop, Q16-session gaps)** — source was the session, not this file, so no inbox line moved; recorded here because the ids are new. **Closed:** `Q16` → `done` as an explicit PARTIAL close (clause (a) shipped at b297268 / 9b4cf59 / 0ddf880; clause (b), the pointer reaching the graph, is NOT done and stays blocked behind Q14, which is behind G32 — said in the close note rather than implied by the status). **Promoted 3, all epic web-console:** `O56` (the `/software` page, groomed `done` — it was BUILT at 9b4cf59 before any item claimed it, so the ledger was carrying an invisible surface), `O57` (a console page for the load-map content no web/ code reads — 28 pipeline sources, 15 systems, 17 retired ids, 17 sequence steps; N5 chose the print surface, so the JSON's console consumer was never scoped), `O58` (a docs-verify surface, `fable` because its transport choice can change the drydocs_api read-path boundary — the sweep is multi-database and a QuerySpec carries exactly one `database:`). **Inboxed 4, none promoted:** `Idea-86` (MWAA corpus, parked on G32 per the user's ruling), `Idea-87` (company docmeta divergence — ADR number AND package path, port-clobber class), `Idea-88` (the undeclared bmc-docs→controlm link; also where Q16's clause (b) lands), `Idea-89` (OverviewRoute renders all modules unfiltered). **Merged 0.**
 

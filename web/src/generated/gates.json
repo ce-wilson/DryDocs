@@ -518,7 +518,8 @@
       ],
       "log_ref": "config/gate-log.md:1355",
       "unblocks": [
-        "M3"
+        "M3",
+        "G64"
       ]
     },
     {
@@ -533,7 +534,8 @@
       "log_ref": "config/gate-log.md:1392",
       "unblocks": [
         "M3",
-        "M4"
+        "M4",
+        "G64"
       ]
     },
     {
@@ -776,7 +778,8 @@
         "G56",
         "G57",
         "G58",
-        "J32"
+        "J32",
+        "G64"
       ]
     },
     {
@@ -904,7 +907,9 @@
         "config/gate-prompts/dpl-dataset-registry-contract.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G65"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -915,7 +920,9 @@
         "config/gate-prompts/dpl-pipeline-registry-contract.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G64"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -971,7 +978,9 @@
         "config/gate-prompts/repo-manifest-data-profile.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G63"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -982,7 +991,9 @@
         "config/gate-prompts/rua-bundle-data-profile.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G62"
+      ]
     },
     {
       "kind": "prompt-only",

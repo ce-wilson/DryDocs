@@ -227,15 +227,12 @@ modules:
       package layout diverged and they carry prompts.py and pipeline.py, which do
       not exist in this tree.
     remaining: >
-      Two open items (Q10 email/activity corpus with an SME surface, R7
-      stale-source detection and rescrape queue) — but the near-term big rock is
-      the Idea-87 reconcile, which must be ruled before the next docmeta port.
+      Four open items (Q10 email/activity corpus with an SME surface, R7
+      stale-source detection and rescrape queue, Q17 the jpmc-reports corpus
+      shape decision, V11 the missing SME runbook) — but the near-term big rock
+      is J40, the company-divergence reconcile, which must be ruled before the
+      next docmeta port.
     ideas:
-      - id: Idea-87
-        estimate: M
-        note: Company docmeta diverged and is ahead (ADR numbers collide, package
-          paths differ, two company-only files) — needs a deliberate reconcile
-          ruling before the next docmeta port. High priority in the inbox.
       - id: Idea-44
         estimate: S
         note: fcdo-frameworks live Confluence scrape — company-side, parked on
@@ -381,17 +378,15 @@ modules:
       style guide, the whitepaper Rev 1, and this quarter's gate-prompt packs and
       SME runbook starts.
     remaining: >
-      Twenty-one open items in three waves: the V4-V10 SME-runbook sweep (one per
-      module), the J-series port-machinery upgrades (J31, J34, J35, J37, J38, J39
-      — the seam, ledger roll, relay list, and back-flow dispositions), and doc
-      infrastructure (L19 drift sweep, L23 run-book skill, L25 gate riders, L26
-      white-paper type, U16/U17 self-doc rulings, S9 repo-root hygiene, N11 guard
+      Open items in three waves: the V4-V11 SME-runbook sweep (one per module,
+      V11 for docmeta added 2026-08-09), the J-series port-machinery upgrades
+      (J31, J37, J39 remaining after the J34/J35/J38 trio landed, plus J40, the
+      company docmeta reconcile), and doc infrastructure (L19 drift sweep — now
+      p2 on its second filing, L23 run-book skill, L25 gate riders, L26
+      white-paper type, L27 the dangling-commit-citation guard, U16/U17/U18/U19
+      self-doc rulings and instrument fixes, S9 repo-root hygiene, N11 guard
       direction, Y1 sharding design in progress).
     ideas:
-      - id: Idea-85
-        estimate: S
-        note: Backlog ids and scheduling for the four post-G22 data-profile gate
-          prompts — next groom.
       - id: Idea-34
         estimate: S
         note: Q6 reopened — is the AIS acronym entry worth keeping; SME ruling.
