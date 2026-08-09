@@ -55,28 +55,38 @@ Four standing rules for every query and every conclusion:
   slot below its live replacement. (A freshly re-provisioned graph carries
   zero tombstones — the 2026-08-03 wipe did — but they re-accumulate with
   every load after a move or delete, so the filter is not optional.)
-- **Scope metrics to the package allow-list** (U14): architecture metrics
-  (orphans, untested, fan-in baselines) bind
-  `m.project IN $packages` with `$packages = ['drydocs','drydocs_core',
+- **Scope metrics to the package allow-list** (U14; **eight roots since U18,
+  2026-08-09**): architecture metrics (orphans, untested, fan-in baselines)
+  bind `m.project IN $packages` with `$packages = ['drydocs','drydocs_core',
   'drydocs_api','drydocs_remediation','drydocs_lineage','drydocs_deepdoc',
-  'tests']` — the seven roots every pre-U9 baseline was measured on. This is
-  an allow-list IN THE QUERIES, never an exclude in the scanner: 54 of 77
-  raw orphan hits were Anthropic-vendored `.claude/skills` scripts, which
-  pollutes the metric but belongs in the tree. First-party Python OUTSIDE
-  the packages (`agents/`, `scripts/`, `knowledge/`) is a separate,
-  labeled queue — report it beside the baseline number, never folded in
-  (it was never in the pre-U9 baselines, so folding it breaks
-  comparability in the other direction).
+  'drydocs_docmeta','tests']`. This is an allow-list IN THE QUERIES, never an
+  exclude in the scanner: 54 of 77 raw orphan hits were Anthropic-vendored
+  `.claude/skills` scripts, which pollutes the metric but belongs in the tree.
+  First-party Python OUTSIDE the packages (`agents/`, `scripts/`,
+  `knowledge/`) is a separate, labeled queue — report it beside the baseline
+  number, never folded in (it was never in the pre-U9 baselines, so folding it
+  breaks comparability in the other direction).
+
+  **The list is hand-typed, so check it against `pyproject.toml` before
+  trusting any number.** `$packages` is the seven distributable packages in
+  `[tool.poetry] packages` plus `tests`, which is a scan root and not a
+  package. `drydocs_docmeta` was born 2026-08-04 in `d647171` — the same
+  commit added it to `pyproject.toml` and the same day U14 typed seven roots
+  here, so the allow-list was wrong from the hour it was written and ten
+  modules were invisible to A3/A4/A5 for five days. This is the second
+  instance (`drydocs_api` was the first, found at the U2 census), which is why
+  `tests/unit/test_code_graph_review_plan.py` now fails when the typed list
+  and `pyproject.toml` disagree.
 - **IMPORTS ≠ breaks-if-removed** (gate D2 caveat): an edge records that an
   import statement resolves, not that the dependency is load-bearing.
 
 | # | Query (run against database `drydocs`) | Debt category it measures |
 |---|---|---|
-| A1 | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t:CodeModule) WHERE NOT m:SchemaMeta AND NOT t:SchemaMeta AND m.removed_from_source_at IS NULL AND t.removed_from_source_at IS NULL AND t.project IN ['drydocs','drydocs_api','drydocs_deepdoc','drydocs_remediation','drydocs_lineage'] RETURN m.file_id, t.file_id` | **Architecture debt** — layering violations: the core layer importing upward. Baseline 0; any row is a finding. Cross-check `tests/unit/test_module_boundary.py`. |
+| A1 | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t:CodeModule) WHERE NOT m:SchemaMeta AND NOT t:SchemaMeta AND m.removed_from_source_at IS NULL AND t.removed_from_source_at IS NULL AND t.project IN ['drydocs','drydocs_api','drydocs_deepdoc','drydocs_remediation','drydocs_lineage','drydocs_docmeta'] RETURN m.file_id, t.file_id` | **Architecture debt** — layering violations: the core layer importing upward. Baseline 0; any row is a finding. Cross-check `tests/unit/test_module_boundary.py`. NOTE: this query carries its OWN hardcoded upward list, so it needed the U18 eighth root too — a core module importing `drydocs_docmeta` was unaskable before 2026-08-09. Re-probed at the widening: still **0**. |
 | A2 | `MATCH (m:CodeModule {circular:true}) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL RETURN m.file_id` plus live cross-check `MATCH (a:CodeModule)-[:IMPORTS*2..8]->(a) WHERE NOT a:SchemaMeta AND a.removed_from_source_at IS NULL RETURN count(DISTINCT a)` | **Code debt** — circular imports. Baseline 0 by both probes; scanner-vs-graph disagreement is itself a finding. |
-| A3 | `MATCH (m:CodeModule)<-[:IMPORTS]-(x:CodeModule) WHERE NOT m:SchemaMeta AND NOT x:SchemaMeta AND m.removed_from_source_at IS NULL AND x.removed_from_source_at IS NULL AND m.project IN $packages RETURN m.file_id, count(x) AS fan_in ORDER BY fan_in DESC LIMIT 15` | **Code debt** — change-risk hotspots: high fan-in means a small edit ripples wide. Read the top entries' diff history first in any review. `x` is deliberately unscoped: an importer in `agents/` is real fan-in. Baseline (package scope, 2026-08-04): `loaders/base.py` = 29. |
-| A4 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND NOT ()-[:IMPORTS]->(m) AND NOT (m)-[:IMPORTS]->() AND m.project <> 'tests' AND NOT m.file_id CONTAINS '__init__' RETURN m.file_id` | **Code debt** — dead-code candidates (no imports either direction). Package scope, 2026-08-04: **0** against the old 24 baseline. The separate first-party queue (swap the scope to `['agents','scripts','knowledge']`): 22 candidates — report it beside the baseline, never folded in. Every hit still needs a human disposition: entry point (CLI, script, pytest) vs genuinely dead. |
-| A5 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND m.project <> 'tests' AND NOT EXISTS { MATCH (t:CodeModule {project:'tests'})-[:IMPORTS]->(m) WHERE NOT t:SchemaMeta } RETURN m.file_id` | **Test debt** — modules no test imports (direct-import proxy only; fixtures and subprocess-level coverage won't show). Package scope, 2026-08-04: **29** (raw whole-repo `.py` reads 129 — vendored pollution, not test debt). |
+| A3 | `MATCH (m:CodeModule)<-[:IMPORTS]-(x:CodeModule) WHERE NOT m:SchemaMeta AND NOT x:SchemaMeta AND m.removed_from_source_at IS NULL AND x.removed_from_source_at IS NULL AND m.project IN $packages RETURN m.file_id, count(x) AS fan_in ORDER BY fan_in DESC LIMIT 15` | **Code debt** — change-risk hotspots: high fan-in means a small edit ripples wide. Read the top entries' diff history first in any review. `x` is deliberately unscoped: an importer in `agents/` is real fan-in. Baselines, old beside new so runs compare like with like: `loaders/base.py` = 29 (seven roots, 2026-08-04) → **31** (eight roots, 2026-08-09 at `2d104ef`). **All of that movement is tree drift, none of it the eighth root** — measured both ways on the same graph and the top-15 is byte-identical, because `drydocs_docmeta`'s highest fan-in is `connectors/base.py` at 7, well under the list's 13 cutoff. |
+| A4 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND NOT ()-[:IMPORTS]->(m) AND NOT (m)-[:IMPORTS]->() AND m.project <> 'tests' AND NOT m.file_id CONTAINS '__init__' RETURN m.file_id` | **Code debt** — dead-code candidates (no imports either direction). Package scope: **0** at seven roots (2026-08-04) and **0** at eight (2026-08-09, `2d104ef`) — every `drydocs_docmeta` module has at least one importer, so the eighth root adds nothing here. Against the old 24 baseline. The separate first-party queue (swap the scope to `['agents','scripts','knowledge']`): 22 candidates — report it beside the baseline, never folded in, and see U19 before working from it. Every hit still needs a human disposition: entry point (CLI, script, pytest) vs genuinely dead. |
+| A5 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND m.project <> 'tests' AND NOT EXISTS { MATCH (t:CodeModule {project:'tests'})-[:IMPORTS]->(m) WHERE NOT t:SchemaMeta } RETURN m.file_id` | **Test debt** — modules no test imports (direct-import proxy only; fixtures and subprocess-level coverage won't show). Baselines: **29** (seven roots, 2026-08-04) → **27** (seven roots, 2026-08-09 at `2d104ef`) → **29** (eight roots, same graph). **Read those three numbers, not the first and last** — the eight-root figure lands back on 29 by coincidence: the tree lost two untested modules while the eighth root contributed exactly two, so quoting 29 → 29 would report "no change" across two real movements in opposite directions. The eighth root's two are `drydocs_docmeta/connectors/filedrop.py` and `drydocs_docmeta/connectors/web.py`, and they belong in the untested list rather than being absent from it. Raw whole-repo `.py` reads 129 — vendored pollution, not test debt. |
 | A6 | `MATCH (a:CodeModule)-[:IMPORTS]->(b:CodeModule) WHERE NOT a:SchemaMeta AND NOT b:SchemaMeta AND a.removed_from_source_at IS NULL AND b.removed_from_source_at IS NULL AND a.project <> b.project RETURN a.project, b.project, count(*) ORDER BY count(*) DESC` | **Architecture debt** — cross-root coupling map; compare against MODULE_MAP.md's declared component boundaries. Unscoped on purpose: `IMPORTS` edges only exist between Python files, and post-U9 rows involving `agents/` or `scripts/` are first-party coupling worth seeing. |
 
 How to run: no CLI query command exists yet — use a short scratchpad script

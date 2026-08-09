@@ -85,6 +85,69 @@ def test_each_degenerate_case_is_ruled() -> None:
     )
 
 
+# --- U18: the $packages allow-list is typed by hand, so pin it to a fact -----
+
+SKILL = REPO / ".claude" / "skills" / "tech-debt" / "SKILL.md"
+PYPROJECT = REPO / "pyproject.toml"
+
+# `tests` is a scan root and not a distributable package, so it is the one
+# entry that legitimately has no counterpart in pyproject.
+NON_PACKAGE_ROOTS = {"tests"}
+
+
+def _declared_packages() -> set[str]:
+    """The authoritative list: what the project actually ships."""
+    import tomllib
+
+    data = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    return {entry["include"] for entry in data["tool"]["poetry"]["packages"]}
+
+
+def _typed_allow_list(text: str, anchor: str) -> set[str]:
+    start = text.index(anchor)
+    return set(re.findall(r"'([A-Za-z_][A-Za-z0-9_]*)'", text[start : text.index("]", start)]))
+
+
+def test_the_typed_package_scope_matches_what_the_project_ships() -> None:
+    """The failure this exists for, twice over.
+
+    `drydocs_api` was invisible to every metric until the U2 census; then
+    `drydocs_docmeta` was born on 2026-08-04 in d647171 — the commit that added
+    it to pyproject.toml — on the same day U14 typed seven roots into the pack,
+    so ten modules were outside A3/A4/A5 from the hour the list was written.
+    Both times the authoritative answer was already sitting in pyproject.toml.
+    A hand-maintained list makes a third instance a matter of time, so the list
+    is now checked against the fact rather than trusted.
+    """
+    expected = _declared_packages() | NON_PACKAGE_ROOTS
+    for path, anchor in ((SKILL, "$packages = ["), (PLAN, "`m.project IN [")):
+        typed = _typed_allow_list(path.read_text(encoding="utf-8"), anchor)
+        missing = expected - typed
+        extra = typed - expected
+        assert not missing and not extra, (
+            f"{path.relative_to(REPO).as_posix()}: the metric scope disagrees with "
+            f"pyproject.toml [tool.poetry] packages + {sorted(NON_PACKAGE_ROOTS)}.\n"
+            f"  missing (modules invisible to every A3/A4/A5 number): {sorted(missing)}\n"
+            f"  unexpected: {sorted(extra)}"
+        )
+
+
+def test_the_layering_query_carries_its_own_widened_list() -> None:
+    """A1 does not use `$packages` — it hardcodes the upward targets, so it
+    needed the U18 widening on its own. Before that, "does core import
+    drydocs_docmeta?" was a question the pack could not ask, and a clean result
+    would have meant nothing."""
+    skill = SKILL.read_text(encoding="utf-8")
+    a1 = skill[skill.index("| A1 |") : skill.index("| A2 |")]
+    upward = set(re.findall(r"'([A-Za-z_][A-Za-z0-9_]*)'", a1))
+    missing = (_declared_packages() - {"drydocs_core"}) - upward
+    assert not missing, (
+        "the A1 layering query's hardcoded upward-target list is missing "
+        f"{sorted(missing)} — a core module importing those is undetectable, and A1's "
+        "baseline of 0 would be silence rather than evidence"
+    )
+
+
 def test_the_reachability_check_is_ancestry_not_object_existence() -> None:
     """Machine-dependent, and verified as such: the five pre-squash citations
     resolve as objects on the desktop (the local archive tag keeps them alive)

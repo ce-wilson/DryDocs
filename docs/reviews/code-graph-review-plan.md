@@ -61,23 +61,29 @@ skill's A1–A6 pack — this table is the question-and-baseline view:
   Proof case: post-S2, the unfiltered A3 ranked the dead
   `drydocs_core/controlm/__init__.py` at #6, one slot below its live
   replacement.
-- **Metrics scoped to `$packages`** (U14): the U9 whole-tree snapshot is
-  the ruled artifact, but the METRIC queries bind
+- **Metrics scoped to `$packages`** (U14; **eight roots since U18,
+  2026-08-09**): the U9 whole-tree snapshot is the ruled artifact, but the
+  METRIC queries bind
   `m.project IN ['drydocs','drydocs_core','drydocs_api',
-  'drydocs_remediation','drydocs_lineage','drydocs_deepdoc','tests']` — the
-  seven roots the pre-U9 baselines were measured on. Vendored
-  `.claude/skills` scripts stay in the tree and out of the metrics (they
-  were 54 of 77 raw orphan hits). First-party Python outside the packages
-  (`agents/`, `scripts/`, `knowledge/`) is a separate labeled queue,
-  reported beside the baseline, never folded in.
+  'drydocs_remediation','drydocs_lineage','drydocs_deepdoc',
+  'drydocs_docmeta','tests']`. Vendored `.claude/skills` scripts stay in the
+  tree and out of the metrics (they were 54 of 77 raw orphan hits).
+  First-party Python outside the packages (`agents/`, `scripts/`,
+  `knowledge/`) is a separate labeled queue, reported beside the baseline,
+  never folded in. The list is the seven `[tool.poetry] packages` in
+  `pyproject.toml` plus `tests` (a scan root, not a package) — it is typed by
+  hand, so `tests/unit/test_code_graph_review_plan.py` fails when the two
+  disagree. `drydocs_docmeta` went missing for five days because it was born
+  the same day U14 typed the list, which is the second time a new package has
+  been invisible to every metric (`drydocs_api` was the first).
 
 | # | Question | Query sketch | Baseline (scope written next to each number) |
 |---|---|---|---|
-| A1 | Layering: does `drydocs_core` import any app layer? | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t) WHERE t.project IN ['drydocs','drydocs_deepdoc','drydocs_remediation','drydocs_lineage'] ...` + both tombstone filters | **0 — clean** (2026-07-27 six-root scan; scope inherent in the projects named) |
+| A1 | Layering: does `drydocs_core` import any app layer? | `MATCH (m:CodeModule {project:'drydocs_core'})-[:IMPORTS]->(t) WHERE t.project IN ['drydocs','drydocs_api','drydocs_deepdoc','drydocs_remediation','drydocs_lineage','drydocs_docmeta'] ...` + both tombstone filters | **0 — clean** (2026-07-27 six-root scan) → **0** re-probed with `drydocs_docmeta` in the upward list (2026-08-09, `2d104ef`). This query keeps its OWN hardcoded list rather than using `$packages`, so it needed the U18 widening separately — until then "does core import docmeta?" was a question the pack could not ask |
 | A2 | Circular imports | `MATCH (m:CodeModule {circular:true}) ...` + tombstone filter; cross-check with a live cycle query (`(m)-[:IMPORTS*2..6]->(m)`) — a disagreement between scanner verdict and graph is itself a finding (§C3) | scanner says 0 (2026-07-27, six-root; unchanged 2026-08-04 all-files) |
-| A3 | Fan-in hotspots (change-risk ranking) | `MATCH (m)<-[:IMPORTS]-(x) WHERE ... m.project IN $packages RETURN m.file_id, count(x) ORDER BY count(x) DESC` — `x` unscoped (an `agents/` importer is real fan-in), both ends tombstone-filtered | `loaders/base.py` = 18 (2026-07-27, six-root) → **29** (2026-08-04, all-files scan, package scope) — read ITS diff history first in any review |
-| A4 | Orphan candidates | no in- or out-IMPORTS, `extension = '.py'`, `project IN $packages`, project <> 'tests', name <> '__init__.py', tombstone-filtered | 24 candidates (2026-07-27, six-root) → **0 in-package** (2026-08-04, package scope; raw whole-repo `.py` reads 77, of which 54 vendored). The first-party non-package queue (`agents/` 15, `scripts/` 4, `knowledge/` 3) = **22 candidates** — separate queue, never in the 24 baseline |
-| A5 | Test coverage shape | which non-test modules have NO tests-project importer — `MATCH (m) WHERE ... m.extension='.py' AND m.project IN $packages AND m.project<>'tests' AND NOT EXISTS {MATCH (t {project:'tests'})-[:IMPORTS]->(m)} RETURN m` + tombstone filter | **29** (2026-08-04, package scope; raw whole-repo `.py` reads 129 — vendored pollution, not test debt) |
+| A3 | Fan-in hotspots (change-risk ranking) | `MATCH (m)<-[:IMPORTS]-(x) WHERE ... m.project IN $packages RETURN m.file_id, count(x) ORDER BY count(x) DESC` — `x` unscoped (an `agents/` importer is real fan-in), both ends tombstone-filtered | `loaders/base.py` = 18 (2026-07-27, six-root) → **29** (2026-08-04, seven roots) → **31** (2026-08-09, eight roots, `2d104ef`) — all of the last move is tree drift, none of it the eighth root: measured both ways on the same graph, the top-15 is identical, because `drydocs_docmeta`'s highest fan-in is `connectors/base.py` at 7 against a 13 cutoff. Read base.py's diff history first in any review |
+| A4 | Orphan candidates | no in- or out-IMPORTS, `extension = '.py'`, `project IN $packages`, project <> 'tests', name <> '__init__.py', tombstone-filtered | 24 candidates (2026-07-27, six-root) → **0 in-package** at seven roots (2026-08-04) → **0** at eight (2026-08-09, `2d104ef`); every `drydocs_docmeta` module has at least one importer, so the eighth root adds nothing here. Raw whole-repo `.py` reads 77, of which 54 vendored. The first-party non-package queue (`agents/` 15, `scripts/` 4, `knowledge/` 3) = **22 candidates** — separate queue, never in the 24 baseline, and see U19 before working from it |
+| A5 | Test coverage shape | which non-test modules have NO tests-project importer — `MATCH (m) WHERE ... m.extension='.py' AND m.project IN $packages AND m.project<>'tests' AND NOT EXISTS {MATCH (t {project:'tests'})-[:IMPORTS]->(m)} RETURN m` + tombstone filter | **29** (2026-08-04, seven roots) → **27** (2026-08-09, seven roots, `2d104ef`) → **29** (same graph, eight roots). Quote all three, never just the ends: the eight-root figure returns to 29 by coincidence — the tree lost two untested modules while the eighth root added exactly two, so "29 → 29" would report no change across two real movements in opposite directions. The two added are `drydocs_docmeta/connectors/filedrop.py` and `connectors/web.py`. Raw whole-repo `.py` reads 129 — vendored pollution, not test debt |
 | A6 | Cross-root coupling map | `MATCH (a)-[:IMPORTS]->(b) WHERE a.project<>b.project RETURN a.project,b.project,count(*)` + both tombstone filters — compare against MODULE_MAP's declared component boundaries | unprobed. Unscoped on purpose: `IMPORTS` edges only join Python files, and post-U9 rows involving `agents/`/`scripts/` are first-party coupling worth seeing |
 
 Deliverable: findings ranked by the tech-debt skill's (Impact+Risk)×(6−Effort)
