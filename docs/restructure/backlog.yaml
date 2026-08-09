@@ -11461,7 +11461,7 @@ items:
       before the ruling, which is when it is most useful.
   - id: B5
     epic: taxonomy-capture
-    title: "Capture the medallion stage vocabulary (RAW → TRUSTED → REFINED → SNOWFLAKE) as pure classification in config/taxonomy/ — the estate's canonical stage set, SME-confirmed via the gate"
+    title: "Capture the medallion stage vocabulary (RAW → TRUSTED → REFINED → PROVISIONED) as pure classification in config/taxonomy/ — the estate's canonical stage set, SME-confirmed via the gate"
     type: requirement
     module: taxonomy
     phase: 1
@@ -11483,6 +11483,7 @@ items:
       tools (DataLens pipeline cards, DSI stage KPI row) expose the same
       stage vocabulary; likely intersects the Snowflake data-catalog seam
       (G42-G44) and the DPL S3 zone prefixes. UI half is O38.
+      RE-REFERENCED 2026-08-09 (desktop, SME direction with vendor-doc evidence in hand): the terminal stage is PROVISIONED, not SNOWFLAKE — title corrected, and the same correction applied to docs/restructure/roadmap.yaml, which carried the old set. THE ERROR CLASS IS ONE THE SME ALREADY CALLED ONCE, one level down: at C25 the ruling was that Snowflake is a TARGET DB PLATFORM and the 'Snowflake ETL' label names the loads-into-Snowflake JOB FAMILY, not a software product. Same mistake here — a consumption TARGET was promoted into a STAGE slot, so the vocabulary asserted that every dataset's final stage is one particular warehouse. PROVISIONED is the stage; Snowflake is one of several platforms a Provision pipeline can write to (the internal DPL documentation's consumption zone lists relational and MPP targets alongside it). THE REPO ALREADY KNEW, which is why this is a correction rather than a discovery: the 2026-07 DPL ingestion-leg trace in IDEAS.md states 'PROVISIONING DB-load lands the consumption target (Provisioned ≠ an S3 prefix)' — B5's title simply never caught up, and roadmap.yaml inherited the stale set. That is also the substantive point for the capture: RAW/TRUSTED/REFINED are S3 zone PREFIXES while PROVISIONED is not a prefix at all, so the four names are not four of a kind and a flat enum would misrepresent the last one. NEW FINDING the capture must settle, from the same evidence: there appear to be TWO zone vocabularies, not one — an on-prem set (conformed / semantic / analytic) and an off-prem S3 set (trusted / refined), converging on a shared provision stage. So 'the estate's canonical stage set' may not be a single list, and the gate should rule whether they are one vocabulary with platform-scoped names or two that map onto each other. SOURCE BOUNDARY: the evidence is company-internal documentation; only the stage/zone MECHANISM is recorded here — the site, its URLs, and every identifier on it stay company-side (PUBLISH-BOUNDARY.md).
   - id: R9
     epic: agentic-qa
     title: "Read-only agent query command over the O33-guarded QuerySpecs: one deterministic, testable graph-navigation surface for agents (MCP recorded as the later option)"

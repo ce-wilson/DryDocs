@@ -257,7 +257,10 @@ modules:
       the taxonomy-first discipline holding (no meaning edges at import).
     remaining: >
       One open item: B5 captures the medallion stage vocabulary (RAW, TRUSTED,
-      REFINED, SNOWFLAKE) as taxonomy.
+      REFINED, PROVISIONED) as taxonomy. Corrected 2026-08-09: the terminal
+      stage is PROVISIONED. Snowflake is a consumption TARGET a Provision
+      pipeline writes to, not a stage — the same target-promoted-to-a-category
+      error the SME already ruled on at C25.
     ideas:
       - id: Idea-61
         estimate: S
