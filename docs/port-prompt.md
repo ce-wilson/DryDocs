@@ -793,6 +793,42 @@ OWED COMPANY-SIDE:
   each correctly stopped before steps 2–3.
   The same check is owed on the remaining three staged prompts before any is
   marked ratified.
+- **`audit-envelope-phase4`: GENUINELY RATIFIED — the first TRUE positive, and
+  the one that shows what real evidence looks like** (checked 2026-08-09,
+  company `main` @ `a4c4ce37`). Three heading-named entries, and the session
+  correctly separated them rather than counting them as three signals:
+  - `gate-log.md:1590` — the PRODUCER gate (M3, 13/13, 2026-08-04). Identified
+    unprompted as arriving via the a14a8028 / 5417ef10 ports. This one is the
+    ported artifact, and on its own it would have been another false positive.
+  - `gate-log.md:1645` — `## 2026-08-04 — RATIFICATION (Tier A,
+    adopted-via-port): doc-06 audit envelope — M3 + M4`. An explicit Tier-A
+    adoption entry, the §6a/L7 template shape.
+  - `gate-log.md:2624` — `## 2026-08-07 — GATE: audit-envelope-phase4 (company
+    extension — the nine company-only N9 sources) — SIGNED OFF, 9/9 +
+    audit-download trigger`, signed chad.wilson.
+  **THE THIRD ENTRY IS PROOF, not inference.** It rules nine sources the
+  producer has never seen, and the producer VERIFIED it carries none of them —
+  no `hr:` sources and no `repo:org-location` exist in
+  `config/source-registry.yaml` at all. Content the producer does not have
+  cannot have arrived from the producer. That is the positive evidence the
+  pickaxe cannot supply, and it is why this check is trustworthy where the two
+  crosswalk checks were not.
+  The producer's concern on the staged prompt — "your audit-fields.yaml carries
+  NINE company-only confirmed-source entries the producer cannot see" — is
+  DISCHARGED: all nine were ruled 2026-08-07 by the producer's own method, no
+  divergence, every ruling landing `status: stub` so no loader writes envelope
+  properties. The audit-download trigger stands DORMANT (not reachable from
+  that venue; ingesting it is an SME decision).
+  **NOTE FOR `envelope-property-terms`:** the Tier-A entry above names **M3 +
+  M4**, and M4 IS `envelope-property-terms` (producer gate-log:1392, 10/10,
+  2026-08-04). So that prompt is very likely discharged by the same entry —
+  run its Step 1 against `gate-log.md:1645` specifically rather than assuming
+  either way.
+  **NAMING, worth recording:** the nine use the producer's registry-v2 grammar
+  (`origin:artifact` / `origin@db.schema.table`) — `controlm:app-codes`,
+  `snow@[db].[schema].itsm`, `hr:emp-hierarchy`, and one deliberate re-home,
+  `repo:org-location` → `hr:emp-location`. The v2 grammar is holding on
+  sources the producer never authored, which is the strongest test it has had.
 - **CONFIRMED GENUINE, from the same session — the row-6 / `cm_hosts` answer.**
   Unlike the ratification claim this CANNOT be a ported artifact, because it
   describes company loader-tier state the producer cannot see: their CM_HOSTS
