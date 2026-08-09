@@ -666,16 +666,24 @@ PORT-REPORT):
   `388a30d` had proved the DD-series merge happened; this is the deletion half,
   open since 2026-07-21 and carried at three rolls. Producer-side the file is
   likewise absent.
+  EVIDENCE, quoted rather than summarised — `git ls-files "docs/restructure/*backlog.yaml*"`
+  company-side returns exactly one line:
+
+      docs/restructure/backlog.yaml
+
+  A glob is what makes that conclusive: it surfaces whatever IS there, so an
+  absent file is distinguishable from a mistyped one. The corrected exact-path
+  lookup returned empty on both branches as well; the two agree.
   THE AUDIT TRAIL IS KEPT DELIBERATELY, because the correction is the useful
   part: this was struck, UN-struck, and struck again within one day. The first
   strike rested on a run whose path was misspelled (`intenral-backlog.yaml`,
   r/n transposed), which returns empty whether or not the file exists — so it
-  was withdrawn. The SME then re-ran it with the spelling corrected, on both
-  branches, and it returned empty again. Standing lesson for any relay answered
-  with an exact-path lookup: `git ls-files` on a wrong path is
-  indistinguishable from success. Prefer a glob that surfaces the real name —
-  `git ls-files "docs/restructure/*backlog*"` — and quote the output rather
-  than the verdict.
+  was withdrawn. STANDING LESSON, and it generalises past this relay: an
+  exact-path `git ls-files` fails silently, because a wrong path and an absent
+  file produce the identical empty result. Answer any presence/absence relay
+  with a GLOB and quote the OUTPUT, never the verdict. The same defect class in
+  a different costume produced the `airflow-crosswalk` false ratification on the
+  same day — a check whose failure mode looks exactly like success.
   (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
   404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
   works; the fetch note at the top of this file carries the standing lesson).
