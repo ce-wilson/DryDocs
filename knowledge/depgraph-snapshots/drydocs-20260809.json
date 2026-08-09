@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-08T02:03:36",
-    "date": "20260808",
+    "captured_at": "2026-08-09T12:44:08",
+    "date": "20260809",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f156cc7",
-      "full": "f156cc7287dfe1a1465488d9b67ad31b9530cfe6",
+      "commit": "562eab1",
+      "full": "562eab1ccee947a5e2b8963b5fba51d357c6c6ef",
       "branch": "main",
-      "describe": "f156cc7",
-      "subject": "docs(internal): business-layer location experiment — GraphRAG verdict + ORG/location ontology over the annual report (Idea-90 inboxed)",
+      "describe": "562eab1",
+      "subject": "chore(backlog): J34+J35+J38 done — port-machinery trio closed (bundle merged 09c1be1)",
       "dirty": false,
       "pr": null
     },
@@ -8628,10 +8628,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/persona-project-manager-2026-08.md",
+      "name": "persona-project-manager-2026-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/persona-project-manager-2026-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/persona-python-architect-2026-07.md",
       "name": "persona-python-architect-2026-07.md",
       "extension": ".md",
       "rel_path": "docs/reviews/persona-python-architect-2026-07.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/persona-python-architect-2026-08.md",
+      "name": "persona-python-architect-2026-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/persona-python-architect-2026-08.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8659,6 +8677,15 @@
       "name": "persona-tech-writer-2026-07.md",
       "extension": ".md",
       "rel_path": "docs/reviews/persona-tech-writer-2026-07.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/persona-tech-writer-2026-08.md",
+      "name": "persona-tech-writer-2026-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/persona-tech-writer-2026-08.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13182,10 +13209,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json",
-      "name": "drydocs-20260807.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260808.json",
+      "name": "drydocs-20260808.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260807.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260808.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24956,7 +24983,17 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/persona-project-manager-2026-08.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/persona-python-architect-2026-07.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/persona-python-architect-2026-08.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -24972,6 +25009,11 @@
       "drydocs/docs/reviews",
       "CONTAINS",
       "drydocs/docs/reviews/persona-tech-writer-2026-07.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/persona-tech-writer-2026-08.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -27436,7 +27478,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260807.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260808.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -29343,13 +29385,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1588,
+    "files": 1591,
     "edges": 830,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1855,
+    "rels": 1858,
     "directories": 268
   }
 }
