@@ -656,10 +656,16 @@ PORT-REPORT):
   after your own doc-vocab gate; the trap is written in the reconcile-port
   skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
   confirm or strike in your next PORT-REPORT.
-  (b) confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
-  it should not exist anywhere anymore) was DELETED after the DD-series merge —
-  `388a30d` proved the merge happened, nothing yet proves the deletion. Still
-  unconfirmed as of this roll.
+  (b) ~~confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
+  it should not exist anywhere anymore) was DELETED after the DD-series merge~~
+  — **STRUCK 2026-08-09: DISCHARGED.** Venue named per J18: run COMPANY-SIDE by
+  the SME, `git ls-files docs/restructure/internal-backlog.yaml` returning empty
+  on BOTH `main` and the port branch `drydocs-port-20260809`. Checking both is
+  stronger than the relay asked for — it proves the deletion held AND that the
+  `5417ef10..0d3761a9` port did not reintroduce the file. `388a30d` had proved
+  the DD-series merge happened; this is the deletion half, unproven since
+  2026-07-21 and asked at three rolls. Producer-side the file is likewise absent
+  (untracked, no such path).
   (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
   404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
   works; the fetch note at the top of this file carries the standing lesson).
