@@ -560,6 +560,26 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   settings.json, …) out of your manifest copy into `PORT-MANIFEST.company.yaml`.
   After that, take the producer manifest wholesale — the re-append-after-every-port
   ritual (and its failure mode, the PORT-REPORT-a14a8028 89-path drop) retires.
+- **THE HELD K7–K15 FOLDER-ATTRIBUTION UI IS A NAMED EXCEPTION TO `web/**` AND
+  `config/**` BEING CANONICAL-PRODUCER — a wholesale directory take re-lands it EVERY
+  port** (registered 2026-08-09, after the second catch). Company-side
+  `web/src/routes/AppCodeCascadePane.tsx` is DELETED and `MappingsRoute.tsx` is held at
+  its pre-K11 revision — the Tier-B `seal-app-ref-edge-reshape` hold, where
+  `m3_belongs_to_application` stays `planned` and the folder-attribution loader is not
+  built company-side. Both files are canonical-producer by manifest row, so
+  `git checkout cewilson/main -- web/src` silently re-adopts held work: caught at
+  PORT-REPORT-a14a8028 (quick-wins rider) and again at the port in flight 2026-08-09.
+  The hold ends by GATE, never by port (guardrail 6 Tier B). Resolve as: drop
+  `routes/AppCodeCascadePane.tsx`; keep the company `MappingsRoute.tsx`; take the
+  `config/taxonomy/ui-components.yaml` rows EXCEPT `AppCodeCascadePane` (their
+  `test_no_ledger_entry_points_at_a_missing_file` reds on it); company
+  `test_ui_components.py` asserts producer's total MINUS ONE with bound UNCHANGED —
+  the component is UNBOUND, so only the total moves (producer `(29, 68)` at this
+  roll → company `(29, 67)`). Two facts checked here so they need not be re-derived:
+  no port range has touched either file since a14a8028 (`git log <base>..HEAD --` on
+  both is empty at `5417ef10`), and the pre-K11 `MappingsRoute` is already pure
+  Tailwind token classes — O30's App.css cull does NOT strip the held version's
+  styling. When the company gate rules, strike this bullet with its date.
 - **Enforcement-matrix SURFACES: `config/crosswalks/` lives under the COMPANY row id
   `crosswalks`** — producer's `orchestrator-crosswalks` was folded into it at
   PORT-REPORT-40c35724 (runtime consumer + drift test carried). Resolve future
