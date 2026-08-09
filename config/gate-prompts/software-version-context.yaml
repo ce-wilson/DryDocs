@@ -206,8 +206,36 @@ risks:
   - "Evidence laundering: loading the derived facts while the email itself lives only in someone's mailbox means the graph asserts something no one can check. §D1/§D5 are the countermeasure."
   - "Version-string ambiguity: `V4-3-2` and `V4-3-2-0` compare unequal as strings and may or may not be the same install. §C3 makes the choice explicit rather than emergent from a parser."
 
-decision: ~          # transcribed to config/gate-log.md on sign-off
-status: awaiting-sme
+decision: >
+  SIGNED OFF 2026-08-09 (desktop, SME in session; C25) — sections A-E and G.
+  Full transcription in config/gate-log.md under
+  "2026-08-09 - GATE: software-version-context (C25)".
+  A2 ruled USAGE by the compiler of the table, so USES_SOFTWARE is the right
+  verb and A3 did NOT fire. Recorded because this page recommended the other
+  answer: it said a readiness review usually inventories availability, and the
+  SME overrode that - which is exactly why A2 is asked of the compiler rather
+  than reasoned from the document type.
+  A1, B1-B4, C1, C2, C4, D1, D3-D5 and E1-E4 confirmed AS DRAFTED. Three
+  rulings differed from or extended the draft: C3 never pads a missing
+  component (absent is not zero); C5 adds an `evidence:` pointer block to the
+  abinitio product row so an empty `versions:` list stops reading identically
+  to "nothing is known"; D2 takes option (a), the `evidence_doc_id` property
+  pointer, with reification named as the upgrade path rather than the opening
+  shape.
+  Q2 answered REAL parallel installs, which makes the B2 multi-edge model
+  permanent and correct rather than a gap needing a `current` discriminator
+  the evidence cannot supply.
+  Q3 DEFERRED with its consequence stated: if a symlinked estate is later
+  confirmed, install_path is a poor MERGE key and identity moves to
+  (fid, version) - a re-key, so the answer is worth having before the loader
+  is built.
+  F NOT SIGNED - still blocked on gate fid-identity-and-scope (K17); the
+  application-level rollup is not written at all, not provisionally and not
+  behind a flag.
+  Nothing was written to the graph and no loader was built. The one vocabulary
+  entry, reg_appuser_uses_software, landed status: planned.
+status: signed-off
 drafted: 2026-08-04
+signed_off: 2026-08-09
 depends_on:
   - fid-identity-and-scope   # §F only; §A-§E can sign independently

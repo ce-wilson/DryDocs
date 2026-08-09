@@ -62,6 +62,37 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-98`** · 2026-08-09 · `[chore]` · **open** · prio? **Med** —
+  **The adhoc Ab Initio version loader — the build C25 authorized and deliberately did not do.**
+  Gate `software-version-context` signed the shape and nothing else:
+  `reg_appuser_uses_software` is registered `status: planned`, no loader exists, and the
+  `adhoc-sme-email` corpus stays `confirmed: false` for that reason alone. The build is:
+  the loader itself (MERGE key `{source, install_path}`, edge properties per §B3, `as_of`
+  from the email's sent date), the `:Document` minted from a hand-recorded citation, the
+  `evidence:` block's `as_of` filled in on the `abinitio` product row, registration in
+  `config/manual-loads/manifest.yaml` per §E4, and the §C1 install-path pattern rows in the
+  `invocation_patterns` shape. **Settle §Q3 before writing the MERGE key, not after** —
+  the gate deferred it with the consequence stated: if the estate re-points installs by
+  symlink, `install_path` is a poor key and identity moves to `(fid, version)`, which is a
+  re-key rather than an edit. Two things this build must NOT do: write the §F
+  application-level rollup (blocked on K17, and not behind a flag), and auto-append observed
+  versions to the curated `versions:` list (§C2).
+
+- **`Idea-99`** · 2026-08-09 · `[chore]` · **open** · prio? **Med** —
+  **Port relay owed: the producer is now canonical for the DPL and Snowflake registry
+  entries.** C25 registered the `dpl` and `snowflake` product rows, the `in-house` vendor
+  (no `publisher_url`, guard narrowed to third-party vendors), and the acronym
+  `DPL: "Data Pipeline Library"`. The SME began the same expansion company-side on
+  2026-08-07 and **stopped so the two copies would match** — so this is a deliberate
+  producer-first divergence with a waiting consumer, exactly the shape of the standing AIS
+  acronym relay (R1), whose lesson applies here too: that expansion had to be carried
+  ACROSS FILES rather than same-file overwritten, and this one may as well. Deliberately
+  NOT written into `docs/port-prompt.md` at the time it arose, because a port was in flight
+  against a fetched head and that file is a hand-merge surface — a relay added mid-port
+  lands in someone's conflict resolution instead of their checklist. **Add it once that
+  port merges**, together with the other post-port items (the staged clean-add rows, the
+  ledger roll, striking R4).
+
 - **`Idea-96`** · 2026-08-09 · `[chore]` · **open** · prio? **High** —
   **The backlog union rule has no guard: nothing asserts that after a port the consumer's
   item-id set is a superset of the producer's at the port base.** `PORT-MANIFEST.yaml`

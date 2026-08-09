@@ -47,3 +47,58 @@
     loader:       software_registry.py + batch_port_orchestrator.py + folder_attribution.cypher/manual_seal_attribution.cypher   # source: 'registry' stack rows / 'batch-port' declared (C14) / 'app-code-mapping' confirmed (G1, K11)
     domain:       registry
     status:       active
+
+  - id:           reg_appuser_uses_software
+    neo4j_label:  USES_SOFTWARE
+    inverse_label: "used by"
+    role:         ~
+    from_node:    AppUser
+    to_node:      SoftwareProduct
+    prov_maps_to: ~
+    note: >
+      Functional id (Agent) → SoftwareProduct (Entity). SAME LABEL, DIFFERENT
+      from_node than reg_uses_software — a separate entry rather than a widened
+      range, the C8-clean precedent that gave docs_chunk_part_of and
+      doc_section_part_of their own entries on PART_OF. LOCAL: PROV has no
+      Agent → Entity usage row, the identical reasoning already recorded above.
+      RULED at gate software-version-context (SIGNED OFF 2026-08-09,
+      config/gate-log.md), §B1.
+      WHY THE FID GRAIN AND NOT THE APPLICATION (§A1, the defect the gate
+      exists to prevent): the evidence rows are (functional-id name, install
+      path) pairs. The application is not measured — it is reached by joining
+      the fid to its owning application, and that join is a mutable,
+      point-in-time thing. Authoring the application-level edge directly would
+      bake a derivation into a fact and discard the only grain at which it can
+      be re-derived when a fid transfers. The application-level rollup is
+      §F and stays BLOCKED on gate fid-identity-and-scope — not written
+      provisionally, not behind a flag.
+      §A2 SEMANTICS, ruled by the SME who compiled the table: the rows assert
+      USAGE (the fid runs workload on that install), not entitlement or mere
+      presence — so USES_SOFTWARE is the correct verb and no second
+      availability entry is needed.
+      MERGE KEY is {source, install_path}, NOT {source} and NOT
+      {source, version} (§B2). install_path is the row's identity; version is
+      derived FROM it, so keying on the derived value would let a parser change
+      silently re-key existing edges. Two installs that parse to the same
+      version stay two edges. §Q2 ruled parallel installs REAL, so multi-edge
+      per (fid, product) is permanent and correct, not a gap — G3's 1:N ruling
+      holds and no uniqueness constraint may be added.
+      Edge properties: version · version_raw · install_path · source · origin ·
+      status · as_of · evidence_doc_id. The four audit-envelope properties are
+      NOT written — an email has an author and a sent date, which is the
+      DOCUMENT's provenance and not the row's (§B3, the audit-envelope-phase4
+      stub precedent). `as_of` carries the email's SENT date, never the load
+      date; first_seen_at/last_seen_at/last_run_id keep their standing
+      when-WE-saw-it meaning (§B4).
+      `evidence_doc_id` is the §D2 ruling: evidence attaches by PROPERTY
+      POINTER (option a), not by a node-grain edge and not by a reified
+      assertion. Option (b) was rejected as answering the wrong question — it
+      asserts the fid was sourced from that email, not that THIS VERSION claim
+      was; option (c) is the upgrade path if a recurring version feed ever
+      arrives, and this pointer is what makes that migration mechanical
+      (doc_feedback_authored_by set the precedent that reification waits for a
+      payload the collapsed form cannot carry).
+    supplement:   registry_ontology_supplement.cypher
+    loader:       ~                       # not built — the gate authorized the SHAPE only; the adhoc loader is a groomed follow-up
+    domain:       registry
+    status:       planned

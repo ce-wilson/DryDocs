@@ -204,13 +204,26 @@ sources:
     graph_locator:                        # nothing has loaded — no connector exists; locator lands with the first citation write
       match: none
       value: ~
-    confirmed: false                      # gate software-version-context §D is AWAITING SME — no loader may write from this entry
+    confirmed: false                      # SHAPE signed 2026-08-09; stays false because no loader exists — see the reason note below
     notes: >
       THE LANDING ZONE for one-time evidence that arrives as email: a fact
       an SME compiled by hand, for a review, with no system of record behind
       it and no pipeline planned. Registering one corpus (rather than one per
       email) keeps the ledger a ledger instead of an inbox.
-      SHAPE (gate software-version-context §D4, awaiting SME): CITATION-ONLY —
+      GATE SIGNED 2026-08-09 (software-version-context §D1–§D5; C25,
+      config/gate-log.md). Everything §D proposed was confirmed as drafted, so
+      the shape below is now RULED rather than proposed. `confirmed:` stays
+      false for a DIFFERENT reason than before: it no longer means "awaiting
+      the SME", it means no loader exists — the gate authorized the shape and
+      explicitly built nothing. The flip belongs to the adhoc loader's own
+      build, not to this gate.
+      §D2 RULED (a): evidence attaches to each version edge by PROPERTY
+      POINTER, `evidence_doc_id`. Not a node-grain HAD_PRIMARY_SOURCE edge —
+      that would assert the fid was sourced from the email, not that a
+      particular VERSION claim was. Reification (:SoftwareUsage) is the named
+      upgrade path if a recurring version feed ever arrives; the pointer is
+      what makes that migration mechanical.
+      SHAPE (gate software-version-context §D4, RULED): CITATION-ONLY —
       one :Document carrying doc_id / subject / sent_at / custodian /
       source_digest / corpus_id, with NO body text and NO :Chunk chain. The
       body carries named individuals and internal addresses, and there is no

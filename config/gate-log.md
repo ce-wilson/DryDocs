@@ -2401,3 +2401,144 @@ Recorded so it is not read as a clean release: **A1 stays held behind K17**, and
   it is fixed).
 - **G56** (collector mount capture, schema v3 — the D-amendment's workaround) and **G57** (the
   `rua_*` → `bkup_*` rename).
+
+## 2026-08-09 — GATE: software-version-context (C25) — SIGNED OFF, §A–§E + §G; §F BLOCKED
+
+**Prompt:** `config/gate-prompts/software-version-context.yaml` (drafted 2026-08-04).
+**Backlog:** C25. **Venue:** desktop, SME in session.
+**Scope signed:** §A grain · §B edge shape and version cardinality · §C derivation ·
+§D the evidence document · §E adhoc boundary · §G confirmations.
+**Not signed, deliberately:** §F, the application-level rollup — it depends on gate
+`fid-identity-and-scope` (K17) and is not written provisionally, not behind a flag.
+
+### §A — GRAIN. The verb was the blocking question, and it held.
+
+**A2 first, by the person who compiled the table: USAGE.** The rows assert that the functional
+id RUNS workload on that install — not entitlement, not mere presence on a host. `USES_SOFTWARE`
+is therefore the correct label, **§A3 did not fire**, and no second availability entry is needed.
+Recorded because the recommendation guessed the other way: the gate's own advice said *"a
+readiness review usually inventories availability"*, and the OWNER-NOT-USER distinction had
+already cost a modeling round at K7. The SME's answer overrode the recommendation, which is
+exactly why §A2 is asked of the compiler rather than reasoned from the document type.
+
+**A1 CONFIRMED as drafted.** Load grain is the functional id: `(:AppUser)-[:USES_SOFTWARE]->
+(:SoftwareProduct)`, one edge per (fid, install path). The application-level edge is DERIVED
+(§F), never authored from this evidence — writing it directly would bake a mutable ownership
+join into a fact and discard the only grain at which it can be re-derived when a fid transfers.
+
+### §B — EDGE SHAPE and VERSION CARDINALITY. All four confirmed as drafted.
+
+- **B1** — vocabulary entry `reg_appuser_uses_software` registered `status: planned`
+  (`drydocs_core/ontology/relationship_vocabulary/44-local-registry.yaml`): AppUser →
+  SoftwareProduct, label `USES_SOFTWARE`, `prov_maps_to: ~` (LOCAL — PROV has no Agent → Entity
+  usage row). A separate entry sharing the label, not a widened range: the C8-clean precedent
+  from `docs_chunk_part_of` / `doc_section_part_of`.
+- **B2** — MERGE key is `{source, install_path}`. Not `{source}` (correct only while one source
+  asserts one fact per pair, and wrong here), and not `{source, version}` — version is DERIVED
+  from install_path, so keying on it would let a parser change silently re-key existing edges.
+  Two installs that parse to the same version stay two edges, which is the truthful answer.
+- **B3** — edge properties as drafted; the four audit-envelope properties are NOT written. An
+  email has an author and a sent date, which is the DOCUMENT's provenance and not the row's. The
+  `config/audit-fields.yaml` disposition stays `stub` (audit-envelope-phase4 precedent).
+- **B4** — `as_of` is the email's SENT date, never the load date. `first_seen_at` /
+  `last_seen_at` / `last_run_id` keep their standing when-WE-saw-it meaning and are not
+  overloaded.
+
+**§Q2 answered, and it makes B2 permanent rather than provisional: parallel installs are REAL.**
+Migrations run old and new side by side, so several live edges per (fid, product) is the truth
+and not an artifact of accumulated history. G3's 1:N ruling holds, no uniqueness constraint may
+be added, and — the part worth recording — **no `current` discriminator is needed**. Had the
+answer been "uncleaned installs", the graph would have required a discriminator this evidence
+cannot supply, and the load would have shipped with a named gap.
+
+### §C — DERIVATION. C1–C4 as drafted; C3 and C5 ruled.
+
+- **C1** — the path → product match is a PATTERN TABLE row in the
+  `software-registry.yaml#invocation_patterns` shape, not loader-embedded regex, so the two
+  software-detection surfaces share one reviewable table. Ruled as SHAPE; authoring the rows is
+  a build follow-up, not this item.
+- **C2** — observed versions do NOT auto-append to the product's curated `versions:` list.
+  What the product IS stays human-curated; what the estate is RUNNING lives on edges.
+- **C3 RULED — never pad. Absent is not zero.** `V4-3-2-2` → `4.3.2.2`; `V4-3-2` → `4.3.2`,
+  three components, as found. Both forms are stored: `version_raw` verbatim from the path,
+  `version` normalized. Padding would assert a fourth component no source declared, and
+  `4.3.2` / `4.3.2.0` may be genuinely different installs. The cost is accepted openly:
+  comparison queries must handle ragged component counts.
+- **C4** — a path matching no pattern row is reported unresolved and loads nothing. No
+  nearest-match product assignment, ever.
+- **C5 RULED — add the `evidence:` block** to the `abinitio` product row (corpus + as_of + a
+  note that the rows are fid-grain and hand-compiled). §C2 correctly forbids observed versions
+  from editing the ledger, but that left a real asymmetry: a row empty because nothing is known
+  read identically to one empty because evidence exists and has not been reviewed. A pointer is
+  not a version, so the ledger stays curated while the silence becomes visible. Same shape as
+  the `documentation:` block on the `controlm` row.
+
+### §D — THE EVIDENCE DOCUMENT. All five confirmed; D2 chose option (a).
+
+- **D1** — ONE corpus `adhoc-sme-email`, already registered in `config/doc-source-registry.yaml`
+  (connector `email`, tier T4, curation `sme-confirm`, target_db `ddcontext`, trust_default
+  VERBATIM, refresh manual). Individual emails are `:Document` rows inside it; one corpus per
+  email would turn the ledger into an inbox. **`confirmed:` stays `false`, for a NEW reason** —
+  it no longer means "awaiting the SME", it means no loader exists. The flip belongs to the
+  adhoc loader's own build.
+- **D2 RULED (a) — PROPERTY POINTER `evidence_doc_id` on each edge.** Option (b), a node-grain
+  `HAD_PRIMARY_SOURCE` edge, was rejected as answering the wrong question: it asserts the fid
+  was sourced from that email, not that THIS VERSION claim was. Option (c), a reified
+  `:SoftwareUsage` assertion, is correct and precise but heavier than one shared batch document
+  justifies — `doc_feedback_authored_by` set the precedent that reification waits for a
+  disambiguating payload the collapsed form cannot carry. (a) and (c) are not exclusive over
+  time: (c) is the named upgrade path if a recurring version feed arrives, and the pointer is
+  what makes that migration mechanical.
+- **D3** — trust is SPLIT and the split is the point: the DOCUMENT is VERBATIM (the SME's own
+  words, stored as sent); FACTS DERIVED FROM IT are GROUNDED at best, because the attachment is
+  hand-compiled with a known-mislabeled identifier column (gate `fid-identity-and-scope` §A).
+  The defect is recorded ON the corpus entry so no later reader treats the attachment as clean.
+- **D4** — CITATION-ONLY: one `:Document` carrying doc_id / subject / sent_at / custodian /
+  source_digest / corpus_id, with NO body text and NO `:Chunk` chain. The body carries named
+  individuals and internal addresses, and no connector exists to refetch it reproducibly.
+- **D5** — the raw email and attachment stay company-side under `internal/`, with the stored
+  path on the registry entry. Never committed to this repo.
+
+### §E — ADHOC BOUNDARY. All four as drafted.
+
+`source` is `adhoc-abinitio-version-<yyyymmdd>` — dated, so the batch is one MATCH away from
+being found, re-run or swept, and a second readiness review cannot collide with the first (E1).
+`origin` is `declared` — human-asserted, superseded rather than swept when a derived edge for
+the same pair arrives (E2). The NAMED REPLACEMENT is plan-07 Phase 3 CMD_LINE detection (gate
+`software-usage-patterns`), with version detection from resolved paths as the extension this
+evidence justifies asking for (E3) — recording the replacement is what keeps the adhoc row from
+becoming permanent by default. The load registers in `config/manual-loads/manifest.yaml` even
+though its payload is not the tier-5 CSV shape, so one queue holds every human-authored fact
+(E4).
+
+### §F — NOT SIGNED. Blocked on `fid-identity-and-scope` (K17).
+
+The rollup is the fact a support user actually wants ("which versions is my application on?")
+and it is one join away — but that join is the whole subject of K17. Until it signs, the
+application-level edge is not written **at all**: not provisionally, not behind a flag.
+
+### §G — CONFIRMATIONS
+
+Signed for §A–§E. Nothing was written to the graph, no loader was built, and the one vocabulary
+entry landed `planned`. The two prerequisite product rows (`snowflake`, `dpl`) were registered
+before the gate ran, as taxonomy capture only — a product row says the product exists, never
+that any application uses it or at what version.
+
+### Follow-ups carried out of the gate
+
+- **The adhoc loader** — build `reg_appuser_uses_software`'s loader, flip the entry to `active`,
+  register the load in `config/manual-loads/manifest.yaml`, and mint the `:Document` from a
+  hand-recorded citation. Groomed as a follow-up; nothing was built here.
+- **The §C1 pattern rows** for the install-path → product match, in the `invocation_patterns`
+  shape. Now unblocked for DPL specifically: the missing `dpl` product row was what the
+  2026-07-27 G26 guard catch cited when it removed `abinitio-dtlaunch-wrapper`.
+- **§F stays open** and is the item to re-run once K17 signs.
+- **Q3 DEFERRED with its consequence stated** (not asked, not guessed): is `install_path` stable,
+  or do symlinks re-point the same logical install? If a symlinked estate is later confirmed,
+  path is a poor MERGE key and identity would move to (fid, version) — a re-key, so the answer
+  is worth having before the loader is built rather than after.
+- **PORT RELAY** — the producer is now canonical for the `dpl` and `snowflake` product rows, the
+  `in-house` vendor, and the `DPL` acronym expansion. The SME began the same expansion
+  company-side on 2026-08-07 and stopped so the two would match; this entry is the producer-side
+  half. The relay is NOT written into `docs/port-prompt.md` yet because a port is in flight
+  against a fetched head and that file is a hand-merge surface — add it once that port merges.

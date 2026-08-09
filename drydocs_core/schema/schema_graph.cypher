@@ -440,6 +440,10 @@ MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Softwa
 MERGE (a)-[r:USES_SOFTWARE]->(b)
   SET r.vocab_id = 'reg_uses_software', r.prov_maps_to = null, r.domain = 'registry', r.status = 'active';
 
+MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'SoftwareProduct'})
+MERGE (a)-[r:USES_SOFTWARE]->(b)
+  SET r.vocab_id = 'reg_appuser_uses_software', r.prov_maps_to = null, r.domain = 'registry', r.status = 'planned';
+
 // ── domain: docs ────────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'SoftwareProduct'})

@@ -622,6 +622,7 @@
         "G56",
         "G57",
         "G58",
+        "C25",
         "J32"
       ]
     },
@@ -778,6 +779,7 @@
         "G56",
         "G57",
         "G58",
+        "C25",
         "J32",
         "G64"
       ]
@@ -855,8 +857,32 @@
         "G56",
         "G57",
         "G58",
+        "C25",
         "J28",
         "J32"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-09",
+      "title": "GATE: software-version-context (C25) — SIGNED OFF, §A–§E + §G; §F BLOCKED",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/audit-envelope-phase4.yaml",
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/software-usage-patterns.yaml",
+        "config/gate-prompts/software-version-context.yaml"
+      ],
+      "log_ref": "config/gate-log.md:2405",
+      "unblocks": [
+        "K16",
+        "K17",
+        "K19",
+        "M3",
+        "C25",
+        "J32",
+        "Z2",
+        "G64"
       ]
     },
     {
@@ -966,6 +992,7 @@
         "K16",
         "K17",
         "K19",
+        "C25",
         "J32"
       ]
     },
@@ -1019,20 +1046,6 @@
       ],
       "log_ref": null,
       "unblocks": []
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "software-version-context (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/software-version-context.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "C25",
-        "Z2"
-      ]
     },
     {
       "kind": "prompt-only",

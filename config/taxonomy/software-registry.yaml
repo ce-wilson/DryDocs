@@ -290,6 +290,25 @@ products:
     type: commercial
     versions: []                  # unknown — plan-07 Phase 3 CMD_LINE detection target
     used_by_drydocs: false        # application-side product; row pre-created for Phase 3
+    # RULED at gate software-version-context §C5 (SIGNED OFF 2026-08-09).
+    # `versions:` stays EMPTY and stays human-curated: §C2 forbids observed
+    # versions from auto-appending here, so a hand-compiled spreadsheet can
+    # never rewrite the curated ledger. But that left a real asymmetry the
+    # gate named — a row empty because nothing is known reads identically to
+    # one empty because evidence exists and has not been reviewed. This block
+    # is the pointer that makes the silence visible. A pointer is not a
+    # version. Same shape as the `documentation:` block on the controlm row.
+    evidence:
+      corpus: adhoc-sme-email     # config/doc-source-registry.yaml
+      as_of: ~                    # the email's sent date — lands with the first citation write
+      note: >
+        Version evidence EXISTS for this product and lives on edges, never
+        here: (:AppUser)-[:USES_SOFTWARE {version, install_path, ...}]->
+        (:SoftwareProduct), one edge per (functional id, install path).
+        The rows are fid-grain and hand-compiled for a readiness review, with
+        a known-mislabeled identifier column (gate fid-identity-and-scope §A)
+        — GROUNDED at best, which is why they inform this row without
+        entering it.
 
   - id: informatica-powercenter
     vendor: informatica
