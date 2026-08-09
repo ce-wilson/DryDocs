@@ -69,15 +69,29 @@ VENDORS_WITHOUT_PUBLISHER = {"in-house"}
 
 
 def test_third_party_vendors_carry_publisher_url() -> None:
+    """publisher_url is REQUIRED of third-party vendors and OPTIONAL of the rest.
+
+    The exemption means "not required", NOT "forbidden" — and the difference is
+    load-bearing across the port. The producer's `in-house` row omits the field
+    because a company URL in an Internal-Public file would cross the publish
+    boundary; the CONSUMER has no such constraint and can legitimately carry the
+    real internal URL in its own tree. A first draft of this guard asserted the
+    field was absent, which would have failed the consumer's suite for doing the
+    correct thing — the Idea-100 class exactly: a producer-only precondition
+    written as a universal invariant.
+    """
     for vendor in _doc()["vendors"]:
+        url = vendor.get("publisher_url")
         if vendor["id"] in VENDORS_WITHOUT_PUBLISHER:
-            assert "publisher_url" not in vendor, (
-                f"vendor '{vendor['id']}' is listed as having no publisher page but carries "
-                f"a publisher_url — remove one or the other; a URL on an in-house vendor is "
-                f"either a placeholder or an internal host, and neither belongs here"
+            # May be absent. If present it must still be a real URL, so the
+            # exemption cannot be used to smuggle in a placeholder.
+            assert url is None or str(url).startswith("http"), (
+                f"vendor '{vendor['id']}' is exempt from REQUIRING a publisher_url, but the "
+                f"value it carries is not a URL: {url!r}. Omit the field or give it a real "
+                f"address — the exemption is not a licence for a placeholder."
             )
             continue
-        assert str(vendor.get("publisher_url", "")).startswith(
+        assert str(url or "").startswith(
             "http"
         ), f"vendor '{vendor['id']}' missing publisher_url"
 

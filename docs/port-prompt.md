@@ -698,13 +698,31 @@ PORT-REPORT):
   `datapipeline-apache-spark-3.5.1` tagged with the DPL image version, so
   3.5.1 is the EMBEDDED SPARK release and DPL's own version is the tag —
   writing 3.5.1 there records a dependency's version as the product's.
-  (c) The `in-house` vendor has no publisher URL by design; an internal
-  framework has no vendor page and a company URL would put an internal host
-  into an Internal-Public file. `tests/unit/test_software_registry.py` was
-  narrowed to require `publisher_url` of THIRD-PARTY vendors only, via an
-  explicit allow-list, plus a second guard that a product of an exempt vendor
-  must be `type: internal`. Take both guards with the rows — the allow-list
-  without them re-opens the hole it closes.
+  (c) **THIS IS A RECONCILE, NOT A CLEAN ADD — corrected 2026-08-09 pm on the
+  SME's FYI.** You already pushed a software-registry change with the INTERNAL
+  URL on 2026-08-07, then stopped so the two sides would match. So company state
+  exists and must not be overwritten: **reconcile ids and keep YOUR internal
+  URL.** The two sides are correctly asymmetric here, and neither is wrong —
+  the producer's `in-house` vendor OMITS `publisher_url` because a company URL
+  in an Internal-Public file would cross the publish boundary; your tree is not
+  published, so the real internal URL belongs in yours.
+  `tests/unit/test_software_registry.py` was narrowed to require
+  `publisher_url` of THIRD-PARTY vendors only, via an explicit allow-list, plus
+  a second guard that a product of an exempt vendor must be `type: internal`.
+  Take both guards with the rows — the allow-list without them re-opens the
+  hole it closes.
+  **A DEFECT IN THAT GUARD WAS FOUND AND FIXED BEFORE IT REACHED YOU, and it is
+  worth knowing because it is the Idea-100 class:** the first draft asserted the
+  exempt vendor had NO `publisher_url` at all, which would have failed YOUR
+  suite for doing the correct thing. The exemption now means "not required",
+  never "forbidden" — a real URL is accepted, a non-URL placeholder is still
+  rejected. A producer-only precondition written as a universal invariant is
+  exactly what breaks a consumer, and only the SME's mention of the internal
+  URL caught it.
+  Also reconcile the IDS rather than assuming them: the producer uses vendor
+  `in-house` and products `dpl` / `snowflake`. If your 08-07 push chose
+  different ids, one side renames — say which in your PORT-REPORT so the
+  registry does not fork on identity.
   WHY THE ROW EXISTS AT ALL, so it is not read as cosmetic: DPL was already an
   ETLProcess `engine` value while Ab Initio carried BOTH an engine value and a
   `products:` row, and that asymmetry is what the 2026-07-27 G26 guard catch
