@@ -70,6 +70,7 @@
       "log_ref": "config/gate-log.md:93",
       "unblocks": [
         "K3",
+        "K21",
         "G35"
       ]
     },
@@ -115,6 +116,7 @@
         "K2",
         "K3",
         "K17",
+        "K21",
         "S3",
         "G35"
       ]
@@ -518,6 +520,7 @@
       ],
       "log_ref": "config/gate-log.md:1355",
       "unblocks": [
+        "K21",
         "M3",
         "G64"
       ]
@@ -533,6 +536,7 @@
       ],
       "log_ref": "config/gate-log.md:1392",
       "unblocks": [
+        "K21",
         "M3",
         "M4",
         "G64"
@@ -583,6 +587,7 @@
       ],
       "log_ref": "config/gate-log.md:1476",
       "unblocks": [
+        "K21",
         "O44"
       ]
     },
@@ -769,6 +774,7 @@
         "K16",
         "K17",
         "K19",
+        "K21",
         "M3",
         "N1",
         "G22",
@@ -878,6 +884,7 @@
         "K16",
         "K17",
         "K19",
+        "K21",
         "M3",
         "C25",
         "J32",
@@ -1033,6 +1040,7 @@
       "log_ref": null,
       "unblocks": [
         "K3",
+        "K21",
         "G35"
       ]
     },
@@ -1057,6 +1065,7 @@
       ],
       "log_ref": null,
       "unblocks": [
+        "K21",
         "O44"
       ]
     }
