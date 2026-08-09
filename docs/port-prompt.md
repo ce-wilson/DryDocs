@@ -656,16 +656,23 @@ PORT-REPORT):
   after your own doc-vocab gate; the trap is written in the reconcile-port
   skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
   confirm or strike in your next PORT-REPORT.
-  (b) ~~confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
-  it should not exist anywhere anymore) was DELETED after the DD-series merge~~
-  — **STRUCK 2026-08-09: DISCHARGED.** Venue named per J18: run COMPANY-SIDE by
-  the SME, `git ls-files docs/restructure/internal-backlog.yaml` returning empty
-  on BOTH `main` and the port branch `drydocs-port-20260809`. Checking both is
-  stronger than the relay asked for — it proves the deletion held AND that the
-  `5417ef10..0d3761a9` port did not reintroduce the file. `388a30d` had proved
-  the DD-series merge happened; this is the deletion half, unproven since
-  2026-07-21 and asked at three rolls. Producer-side the file is likewise absent
-  (untracked, no such path).
+  (b) confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
+  it should not exist anywhere anymore) was DELETED after the DD-series merge —
+  `388a30d` proved the merge happened, nothing yet proves the deletion. STILL
+  UNCONFIRMED.
+  **STRUCK 2026-08-09 pm and UN-STRUCK the same day — read this before answering
+  it again.** The discharge was recorded on a `git ls-files` run that returned
+  empty, then withdrawn when the terminal transcript showed the path had been
+  MISSPELLED (`intenral-backlog.yaml`, transposed r/n) in both runs. A
+  misspelled path returns empty whether or not the file exists, so the command
+  proved nothing. The relay is open again.
+  ANSWER IT WITH A COMMAND THAT CANNOT FAIL SILENTLY — `git ls-files` on a
+  wrong path is indistinguishable from success, which is exactly how this got
+  through. Prefer a glob, which surfaces the real name if it is there:
+  `git ls-files "docs/restructure/*backlog*"` — expect the ledger and shard
+  files only. Paste the OUTPUT, not the verdict.
+  The producer's own strike was withdrawn in the same spirit: a discharge is
+  only as good as the command behind it, and the command was not checked.
   (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
   404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
   works; the fetch note at the top of this file carries the standing lesson).
@@ -732,6 +739,40 @@ PORT-REPORT):
   exist.
 
 OWED COMPANY-SIDE:
+
+> **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
+> already produced one false positive).** A company-side gate-log entry is NOT
+> evidence of company ratification, because `config/gate-log.md` is
+> `union-append` — producer entries land there BY DESIGN. The same is true of
+> the crosswalk yamls and `source-registry.yaml` confirmed flags: all three
+> port. So "the entry is present company-side" is consistent with a genuine
+> ratification AND with the producer's own record having arrived by port, and
+> nothing in the artifact distinguishes them.
+> **PROVED, not theorised:** the `airflow-crosswalk` Step-1 check reported
+> RATIFIED on three corroborating signals, all three of which port. The
+> discriminating command —
+> `git log --oneline -S "Airflow/MWAA" -- config/gate-log.md` — returned exactly
+> one commit, `80d0fc0e`, whose subject is
+> `port(cewilson): apply eeaffa2..f7970e5 (step 31 — web console O2 + 2026-07-14
+> gate session) onto branch`. A PORT commit. The entry arrived from the producer;
+> the ratification was never performed, and the producer's byte-identical
+> `confirmed:` comment string confirms the copy.
+> **RULE: before reporting any gate RATIFIED, run the provenance check** —
+> `git log --oneline -S "<a distinctive phrase from the entry>" -- config/gate-log.md`
+> — and quote the introducing commit. A port commit means NOT ratified. A
+> company-authored commit unrelated to any port means ratified, and that commit
+> id is what gets ledgered.
+> The strongest positive evidence is content the producer has never seen: an
+> entry that rules company-only rows (e.g. the nine company-only source entries
+> in `audit-fields.yaml`) cannot be a ported producer artifact.
+
+- **`airflow-crosswalk`: NOT RATIFIED** (checked 2026-08-09, company `main` @
+  `a4c4ce37`). Step 1 initially read RATIFIED; the provenance check above
+  overturned it. The producer's F2 sign-off (2026-07-14, 17 confirmations,
+  ACCEPTED IN FULL) ported across and was read back as company confirmation.
+  The session correctly stopped before steps 2–3, so no work was wasted — but
+  the ratification is still owed, and the same check is owed on the other four
+  staged prompts before any of them is marked ratified.
 - L7 ratification: **DISCHARGED** (company gate-log 2026-07-27; T11). §6a below stays
   as the STANDING Tier-A template — `source-registry-v2` and `J23` both used its shape
   at PORT-REPORT-57914bf4, and every future Tier-A adoption needs one.
