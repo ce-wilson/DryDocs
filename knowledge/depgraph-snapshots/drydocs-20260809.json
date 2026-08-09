@@ -1,24 +1,26 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-09T12:44:08",
+    "captured_at": "2026-08-09T14:33:02",
     "date": "20260809",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "562eab1",
-      "full": "562eab1ccee947a5e2b8963b5fba51d357c6c6ef",
+      "commit": "3bec2b3",
+      "full": "3bec2b357ebcb5da89651abec90d7e35a501de04",
       "branch": "main",
-      "describe": "562eab1",
-      "subject": "chore(backlog): J34+J35+J38 done — port-machinery trio closed (bundle merged 09c1be1)",
-      "dirty": false,
+      "describe": "3bec2b3",
+      "subject": "chore(depgraph): U19 — bump the instrument pin to 6ee0af6",
+      "dirty": true,
+      "untracked_present": true,
       "pr": null
     },
     "depgraph": {
-      "commit": "a56d2fc",
-      "full": "a56d2fc4c0e873758c230721f25ed16c59d0dc9e",
+      "commit": "6ee0af6",
+      "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
+      "untracked_present": false,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -13209,10 +13211,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260808.json",
-      "name": "drydocs-20260808.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260809-1423.json",
+      "name": "drydocs-20260809-1423.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260808.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260809-1423.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14320,6 +14322,15 @@
       "name": "test_cmdline_staging.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_cmdline_staging.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_code_graph_review_plan.py",
+      "name": "test_code_graph_review_plan.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_code_graph_review_plan.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16766,6 +16777,98 @@
   ],
   "edges": [
     [
+      "drydocs/.claude/skills/docx/scripts/office/pack.py",
+      "drydocs/.claude/skills/docx/scripts/office/validators/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/docx/scripts/office/unpack.py",
+      "drydocs/.claude/skills/docx/scripts/office/helpers/merge_runs.py"
+    ],
+    [
+      "drydocs/.claude/skills/docx/scripts/office/unpack.py",
+      "drydocs/.claude/skills/docx/scripts/office/helpers/simplify_redlines.py"
+    ],
+    [
+      "drydocs/.claude/skills/docx/scripts/office/validate.py",
+      "drydocs/.claude/skills/docx/scripts/office/validators/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/pdf/scripts/fill_fillable_fields.py",
+      "drydocs/.claude/skills/pdf/scripts/extract_form_field_info.py"
+    ],
+    [
+      "drydocs/.claude/skills/pptx/scripts/office/pack.py",
+      "drydocs/.claude/skills/pptx/scripts/office/validators/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/pptx/scripts/office/unpack.py",
+      "drydocs/.claude/skills/pptx/scripts/office/helpers/merge_runs.py"
+    ],
+    [
+      "drydocs/.claude/skills/pptx/scripts/office/unpack.py",
+      "drydocs/.claude/skills/pptx/scripts/office/helpers/simplify_redlines.py"
+    ],
+    [
+      "drydocs/.claude/skills/pptx/scripts/office/validate.py",
+      "drydocs/.claude/skills/pptx/scripts/office/validators/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/improve_description.py",
+      "drydocs/.claude/skills/skill-creator/scripts/utils.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/package_skill.py",
+      "drydocs/.claude/skills/skill-creator/scripts/quick_validate.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/run_eval.py",
+      "drydocs/.claude/skills/skill-creator/scripts/utils.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/run_loop.py",
+      "drydocs/.claude/skills/skill-creator/scripts/generate_report.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/run_loop.py",
+      "drydocs/.claude/skills/skill-creator/scripts/improve_description.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/run_loop.py",
+      "drydocs/.claude/skills/skill-creator/scripts/run_eval.py"
+    ],
+    [
+      "drydocs/.claude/skills/skill-creator/scripts/run_loop.py",
+      "drydocs/.claude/skills/skill-creator/scripts/utils.py"
+    ],
+    [
+      "drydocs/.claude/skills/xlsx/scripts/office/pack.py",
+      "drydocs/.claude/skills/xlsx/scripts/office/validators/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/xlsx/scripts/office/unpack.py",
+      "drydocs/.claude/skills/xlsx/scripts/office/helpers/merge_runs.py"
+    ],
+    [
+      "drydocs/.claude/skills/xlsx/scripts/office/unpack.py",
+      "drydocs/.claude/skills/xlsx/scripts/office/helpers/simplify_redlines.py"
+    ],
+    [
+      "drydocs/.claude/skills/xlsx/scripts/office/validate.py",
+      "drydocs/.claude/skills/xlsx/scripts/office/validators/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/xlsx/scripts/recalc.py",
+      "drydocs/.claude/skills/xlsx/scripts/office/soffice.py"
+    ],
+    [
+      "drydocs/agents/common/agent_run_writer.py",
+      "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
+      "drydocs/agents/common/graph_read.py",
+      "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
       "drydocs/agents/common/llm_ledger.py",
       "drydocs/drydocs_core/run_log.py"
     ],
@@ -16776,6 +16879,78 @@
     [
       "drydocs/agents/common/specs_catalog.py",
       "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/agents/controlm_fix/agent.py",
+      "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
+      "drydocs/agents/core_ingest/agent.py",
+      "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/common/agent_run_writer.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/common/ephemeral_client.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/common/graph_read.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/common/llm_ledger.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/graph_qa/control.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/graph_qa/envelope.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/graph_qa/pipeline.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/graph_qa/providers.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/common/__init__.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/common/specs_catalog.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/graph_qa/envelope.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/graph_qa/schema_context.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/graph_qa/tier2.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/tier2.py",
+      "drydocs/agents/graph_qa/task_graph.py"
+    ],
+    [
+      "drydocs/agents/graph_query/agent.py",
+      "drydocs/agents/common/neo4j_tool.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -17916,6 +18091,34 @@
     [
       "drydocs/scripts/render_board.py",
       "drydocs/drydocs/plan_board.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_context_types.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_enforcement_matrix.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_gates.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_ideas.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_load_map.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_roadmap.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_software_registry.py"
     ],
     [
       "drydocs/scripts/render_design_doc.py",
@@ -27478,7 +27681,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260808.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260809-1423.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -28029,6 +28232,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_cmdline_staging.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_code_graph_review_plan.py"
     ],
     [
       "drydocs/tests/unit",
@@ -29385,13 +29593,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1591,
-    "edges": 830,
+    "files": 1592,
+    "edges": 878,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1858,
+    "rels": 1859,
     "directories": 268
   }
 }

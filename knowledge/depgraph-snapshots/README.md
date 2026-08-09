@@ -160,6 +160,21 @@ Each snapshot's summary line reports `files`, `edges`, `circular_files`. To see 
 > lesson as every marker above — read `meta.depgraph` before concluding anything
 > from a cross-boundary diff.
 
+> **⚠ Instrument change — `scripts/` and `agents/` gain internal import edges after
+> 2026-08-09 (U19, depgraph `6ee0af6`).** The extractor now resolves bare-name imports
+> against the **file's own sys.path root** — the directory Python itself would put on
+> the path (walk up while `__init__.py` is present; the first ancestor that is not a
+> package is the root). Before it, `scripts/render_board.py`'s `import render_gates` and
+> `agents/graph_qa/*`'s `from common import …` resolved to nothing, so both regions
+> recorded **zero** internal edges. Measured on this desktop across the bump: **830 → 878**
+> edges, of which `scripts→scripts` **0 → 7** and `agents→agents` **0 → 20**. The
+> package-scope metrics are unmoved (A3 top-15 identical, A4 0, A5 29) because packages
+> already resolved through the repo root — this boundary is visible only outside them.
+> What it *does* move is the first-party orphan queue: **22 → 4**, with `agents/` going
+> 15 → 0, so roughly four in five of that queue was a scanner artifact rather than dead
+> code. The change is additive by construction (the extra root is appended after the
+> project roots, pinned by a test), so no edge that already resolved was moved.
+
 - or diff the two `.json` files (`git diff` / any JSON diff tool), or watch the summary counts.
 
 ### Seeded comparison — the v1 rewrite (original vs this version)

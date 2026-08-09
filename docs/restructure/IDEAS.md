@@ -62,6 +62,41 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-96`** · 2026-08-09 · `[chore]` · **open** · prio? **High** —
+  **The backlog union rule has no guard: nothing asserts that after a port the consumer's
+  item-id set is a superset of the producer's at the port base.** `PORT-MANIFEST.yaml`
+  states the rule unconditionally for `docs/restructure/backlog.yaml` — *"Union the items;
+  NEVER regress a status … or drop an entry"* — and `tests/unit/test_backlog.py` enforces
+  plenty about the file (schema, roll-up arithmetic, `next_ready`, unknown `depends_on`),
+  but every one of those checks looks at ONE copy in isolation. The union is a claim about
+  TWO copies, and no check ever compares them, so a port that quietly under-delivers items
+  leaves both sides internally consistent and passing. Textbook J26: a rule written in
+  prose and enforced by nobody, which is exactly the shape that survives unnoticed —
+  surfaced during a reconcile, where items present in the producer at the port base turned
+  out to be absent downstream and neither side's suite had anything to say about it. Note
+  the near-miss that makes this worse than it sounds: the dependency guard would have
+  caught it *if* any surviving item had depended on a missing one, so whether the gap is
+  visible at all is luck, not design. Shape of the fix: a port-time check (not a unit test
+  — the producer tree cannot see the consumer's) that diffs the two id sets at the recorded
+  port base and fails the port report on a non-empty producer-minus-consumer difference,
+  with a named allow-list for ids deliberately not carried. Cheap, and it converts the
+  union rule from a promise into an assertion. Mechanism only — the numbers and ids from
+  the occurrence stay in the port report, not here.
+
+- **`Idea-97`** · 2026-08-09 · `[bug]` · **open** · prio? **Low** —
+  **The review plan's doc-coverage baseline is two package generations stale — same disease
+  U18 just fixed one table over.** `docs/reviews/code-graph-review-plan.md` Phase 3 unit 3
+  still reads *"Six scan roots × DesignDoc coverage"* with per-root counts (`tests` 85,
+  `drydocs` 41, `drydocs_core` 35, `lineage` 12, `remediation` 7, `deepdoc` 3) that predate
+  BOTH `drydocs_api` and `drydocs_docmeta`. U18 widened the A1–A6 metric scope to eight
+  package roots and guarded the typed list against `pyproject.toml`, but that guard is
+  anchored on the `$packages` literal and this unit hard-codes its own root list in prose,
+  so it was out of the guard's reach and out of U18's stated surface. Left deliberately
+  rather than swept in. Fix is small: restate the unit on eight roots, re-measure the
+  per-root doc coverage, and decide whether the count belongs in prose at all or should be
+  derived like the metric scope now is — the third hand-typed root list in the same
+  document is the argument for deriving.
+
 - **`Idea-93`** · 2026-08-08 · `[chore]` · **groomed → executed IN PLACE at the 2026-08-09 groom (14 stale `inputs:` fixed in backlog.yaml) + merged → L19 (the design-doc half); the E1 status question STAYS OPEN — user call** · prio? **High** —
   **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,
   U-pm: `docs/reviews/persona-project-manager-2026-08.md`). Six causes: (1) the S5
