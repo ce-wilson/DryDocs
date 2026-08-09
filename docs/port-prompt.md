@@ -656,23 +656,26 @@ PORT-REPORT):
   after your own doc-vocab gate; the trap is written in the reconcile-port
   skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
   confirm or strike in your next PORT-REPORT.
-  (b) confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
-  it should not exist anywhere anymore) was DELETED after the DD-series merge —
-  `388a30d` proved the merge happened, nothing yet proves the deletion. STILL
-  UNCONFIRMED.
-  **STRUCK 2026-08-09 pm and UN-STRUCK the same day — read this before answering
-  it again.** The discharge was recorded on a `git ls-files` run that returned
-  empty, then withdrawn when the terminal transcript showed the path had been
-  MISSPELLED (`intenral-backlog.yaml`, transposed r/n) in both runs. A
-  misspelled path returns empty whether or not the file exists, so the command
-  proved nothing. The relay is open again.
-  ANSWER IT WITH A COMMAND THAT CANNOT FAIL SILENTLY — `git ls-files` on a
-  wrong path is indistinguishable from success, which is exactly how this got
-  through. Prefer a glob, which surfaces the real name if it is there:
-  `git ls-files "docs/restructure/*backlog*"` — expect the ledger and shard
-  files only. Paste the OUTPUT, not the verdict.
-  The producer's own strike was withdrawn in the same spirit: a discharge is
-  only as good as the command behind it, and the command was not checked.
+  (b) ~~confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
+  it should not exist anywhere anymore) was DELETED after the DD-series merge~~
+  — **STRUCK 2026-08-09: DISCHARGED.** Venue per J18: company-side, run by the
+  SME on BOTH `main` and the port branch `drydocs-port-20260809`;
+  `git ls-files docs/restructure/internal-backlog.yaml` returns empty on each.
+  Checking both is stronger than the relay asked — it proves the deletion held
+  AND that the `5417ef10..0d3761a9` port did not reintroduce the file.
+  `388a30d` had proved the DD-series merge happened; this is the deletion half,
+  open since 2026-07-21 and carried at three rolls. Producer-side the file is
+  likewise absent.
+  THE AUDIT TRAIL IS KEPT DELIBERATELY, because the correction is the useful
+  part: this was struck, UN-struck, and struck again within one day. The first
+  strike rested on a run whose path was misspelled (`intenral-backlog.yaml`,
+  r/n transposed), which returns empty whether or not the file exists — so it
+  was withdrawn. The SME then re-ran it with the spelling corrected, on both
+  branches, and it returned empty again. Standing lesson for any relay answered
+  with an exact-path lookup: `git ls-files` on a wrong path is
+  indistinguishable from success. Prefer a glob that surfaces the real name —
+  `git ls-files "docs/restructure/*backlog*"` — and quote the output rather
+  than the verdict.
   (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
   404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
   works; the fetch note at the top of this file carries the standing lesson).
