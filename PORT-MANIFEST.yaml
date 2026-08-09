@@ -40,7 +40,28 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-08-03   # 2026-08-03 (L22): +docs/style/** canonical-producer — the J16
+updated: 2026-08-09   # 2026-08-09 (J34): the OVERLAY SEAM — side-local rows live in a
+                      # separate include file the J16 guard UNIONS with this manifest
+                      # (`overlay:` block below). GRAMMAR DECISION, recorded here per the
+                      # item's acceptance: include FILE over marked section — the include
+                      # is the D2 loader-source-overlay precedent (the mechanism ports,
+                      # the contents never do), and a marked section dies by construction
+                      # the moment a verbatim take replaces this file, which is exactly
+                      # the failure being closed (PORT-REPORT-a14a8028: the take dropped
+                      # the company default_ok block — 89 company-only paths fell through
+                      # their own guard). UNION SEMANTICS: overlay rows append AFTER this
+                      # file's rows (first match wins, so this file's dispositions keep
+                      # precedence — an overlay adds coverage, never overrides authority;
+                      # a duplicate path is a guard error, not a silent loser); overlay
+                      # default_ok entries union, reasons mandatory. The grammar also
+                      # expresses a PRODUCER-LOCAL overlay (Idea-41): both sides get one
+                      # slot each, so producer-local rows (the dev-environment.yaml
+                      # class) have a home that never crosses. What this seam does NOT
+                      # do: choose config/dev-environment.yaml's disposition — per-entry
+                      # vs contract-plus-local-overlay is the user's J16 decision, not a
+                      # grammar default. Guard: test_port_reconcile_guards.py (overlay
+                      # union + verbatim-apply survival proof).
+                      # 2026-08-03 (L22): +docs/style/** canonical-producer — the J16
                       # guard caught both new style files the session they shipped,
                       # exactly as designed (the guide was committed one session earlier
                       # without a full-suite run; the guard flagged it here).
@@ -81,6 +102,24 @@ updated: 2026-08-03   # 2026-08-03 (L22): +docs/style/** canonical-producer — 
                       # print.html} canonical-company — consumer's TDD is finalized/ahead.
 direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
 default: "clean-add when absent on consumer; evaluate when both sides created the path"
+
+# ---- the overlay seam (J34, 2026-08-09) -------------------------------------
+# Each side may keep ONE side-local overlay file. The J16 fall-through guard
+# unions an overlay's rows (appended AFTER this file's rows) and default_ok
+# entries (reasons mandatory) with this manifest — so a producer-manifest-
+# verbatim apply structurally CANNOT drop a company-only row: the row is not in
+# the file being replaced. An overlay path duplicating a row here is a guard
+# error. The files are never-port (row below): side-local by definition.
+# Company session: move your 89 company-only default_ok paths (PORT-REPORT-*.md,
+# docs/build_*, docs/site/*, docs/prompts/*, settings.json, …) into
+# PORT-MANIFEST.company.yaml ONCE — after that, taking this file wholesale is
+# safe and the re-append-after-every-port ritual retires.
+overlay:
+  files:
+    - path: "PORT-MANIFEST.company.yaml"
+      side: company     # company-tracked; absent producer-side by design
+    - path: "PORT-MANIFEST.producer.yaml"
+      side: producer    # reserved producer slot (Idea-41); absent until needed
 
 rows:
   # ---- per-entry files (checkout of the whole file is FORBIDDEN) ------------
@@ -247,6 +286,16 @@ rows:
       consumer's reviewers as if it were theirs. Regenerate from the reconciled
       tree. (Row added 2026-08-05 with the page; the J16 coverage guard caught
       the new file in the same run that created it, which is the guard working.)
+  - path: "docs/plan/roadmap.html"
+    disposition: canonical-company
+    note: >
+      DERIVED — the module-roadmap page (scripts/render_roadmap.py, rides the
+      default board render): counts and open-item links are read live from the
+      consumer's OWN backlog at render time, and the authored judgments come
+      from docs/restructure/roadmap.yaml (its own row below). Same rule as
+      board.html: regenerate from the reconciled tree, never take the producer
+      render. (Row added 2026-08-09 — the J16 guard caught the pair one session
+      after the page shipped.)
   - path: "docs/plan/board.html"
     disposition: canonical-company
     note: >
@@ -318,7 +367,10 @@ rows:
     disposition: canonical-producer
   - path: "PORT-MANIFEST.yaml"
     disposition: canonical-producer
-    note: "this file — the producer maintains the dispositions; consumer proposes changes via back-flow notes"
+    note: "this file — the producer maintains the dispositions; consumer proposes changes via back-flow notes. Safe to take wholesale since J34: side-local rows live in the overlay files, outside this file"
+  - path: "PORT-MANIFEST.*.yaml"
+    disposition: never-port
+    note: "the J34 side-local overlays (company / producer) — side-local by definition; each side owns exactly its own and a port must never carry one across"
   - path: "MODULE_MAP.md"
     disposition: canonical-producer
   - path: "CLAUDE.md"
@@ -367,6 +419,17 @@ rows:
   - path: "tests/unit/test_controlm_cypher.py"
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"
+  - path: "docs/restructure/roadmap.yaml"
+    disposition: evaluate
+    note: >
+      AUTHORED JUDGMENTS, module-keyed (stage / built / remaining / idea
+      estimates, guarded by test_plan_roadmap.py against the module registry
+      and the IDEAS inbox). Each side's build-out judgments describe its OWN
+      tree and plan — take the producer's structure and any modules you lack,
+      keep YOUR stage/remaining/estimate judgments on collision. The coverage
+      guard reads YOUR module registry, so a module-set difference surfaces as
+      a test failure, which is the guard working. (Row added 2026-08-09 with
+      the roadmap.html row above.)
   - path: "docs/design/**"
     disposition: evaluate
     note: >

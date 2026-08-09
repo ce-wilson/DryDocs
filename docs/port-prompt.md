@@ -3,10 +3,27 @@
 **Format (v3 rolling, 2026-07-31).** This prompt carries ONLY (1) the durable
 guardrails and (2) the step ledger since the last completed port. Steps 1–42 are frozen
 in `port-prompt-archive-steps-1-42.md` (guardrail 1 has the path); numbering continues
-here at 43. On completion company-side: update **Last completed port**, fold new standing
-divergences into the ledger, and collapse the applied steps to ONE LINE each. The archive
-is FROZEN — applied steps ≥43 are never appended there; their full text lives in git
-history and the company PORT-REPORT.
+here at 43. The archive is FROZEN — applied steps ≥43 are never appended there; their
+full text lives in git history and the company PORT-REPORT.
+
+**CLOSING SEQUENCE (J35, 2026-08-09 — MANDATORY, structural, in this order).** A port
+is not closed until every step below is done; skipping any of them is how three
+consecutive rolls discovered unrecorded ports after the fact (PORT-REPORT-f71967db,
+PORT-REPORT-6713c142, PORT-REPORT-5f79d145 — the last two left NO producer-verifiable
+range, port commit, backup tag or acceptance numbers, an absence no later roll can
+repair). Company-side at completion:
+1. Write the PORT-REPORT (guardrail 8) with every producer-tree citation SHA-stamped.
+2. Update **Last completed port** here with the FOUR REQUIRED FIELDS — none may be
+   omitted or deferred: (a) the applied RANGE (`<base>..<head>`, with `rev-list
+   --count`); (b) the PORT COMMIT(s) on the port branch; (c) the BACKUP TAG and the
+   `rev-list --count <tag>..HEAD` proof; (d) the ACCEPTANCE NUMBERS (full suite,
+   Track-1, reconcile guards). A close missing any field is an unrecorded port by
+   definition — the motivating class above.
+3. Collapse the applied steps to ONE LINE each; fold new standing divergences into
+   the ledger.
+Producer-side at the next session: verify the roll against `git log
+<last-ported-head>..HEAD` COMMIT-BY-COMMIT (the roll-procedure rule below), never by
+eyeballing back from the newest entry.
 
 **LENGTH DISCIPLINE (v3 rule, and the reason for it).** This file regrew to 567 lines by
 step 51 because each roll added prose that the next roll never removed. A prompt nobody
@@ -18,30 +35,27 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state (2026-08-06).** Steps 52–54 COLLAPSED at the 2026-08-03 roll (applied in
-PORT-REPORT-f71967db and PORT-REPORT-40c35724). The live ledger runs **55–101**
-below, delta since `40c35724`. Two company ports (PORT-REPORT-6713c142,
-PORT-REPORT-5f79d145) landed MID-RANGE with no producer-verifiable range or
-acceptance numbers, so NO step is collapsed yet — collapse waits for a
-PORT-REPORT the producer can review against git (guardrail 8), not a report
-name cited second-hand. The
-verification tags introduced at step 49 (`[SME-SIGNED]`, `[LIVE-VERIFIED]`,
-`[TEST-PINNED]`, `[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]`) carry
-forward; anything untagged is NOT confirmed — treat contracts as ASSUMED until
-your side validates them (the T10/T13 discipline).
-**ROLL-PROCEDURE RULE (added after two ledger gaps in one cycle):** currency is
-verified by diffing the ledger's claimed coverage against
-`git log <last-ported-head>..HEAD` COMMIT-BY-COMMIT — never by eyeballing back
-from the newest entry. Both gaps (the f71967db port unrecorded here;
-O27/O28/C17/Q7/R6/S1 never ledgered) were caught by the company session's own
-range enumeration — the guardrail-2 safety net working, not a reason to keep
-the habit.
-**THIS ROLL (2026-08-06) IS THE FIRST ONE RUN THAT WAY, and it was run BEFORE the port
-rather than reconstructed after it** — breaking the three-roll streak the note above
-describes. 25 commits had landed since the step-96 roll (`0bad42a`) with no ledger
-entry; walking `0bad42a..HEAD` commit-by-commit produced steps **97–101** and confirmed
-the rest are ritual (7 snapshots/renders) or producer-only backlog state (claims, the
-O44 groom, Idea-75). Unported range as of this roll: **`5f79d145..HEAD` = 106 commits.**
+**Roll state (2026-08-09, the J35 roll).** The ledger is rolled through the NAMED
+deliberate end **`5417ef10`** — the last producer-verified, company-merged port head
+(PORT-REPORT-5417ef10). Steps **55–105 are COLLAPSED** (one-liners in **Last completed
+port** below): steps 84–105 were applied at the two producer-VERIFIED ports
+(PORT-REPORT-a14a8028, PORT-REPORT-5417ef10); steps 55–83 were applied by the two
+reported-only mid-range ports (PORT-REPORT-6713c142, PORT-REPORT-5f79d145) and carried
+through the verified ports' green acceptance — their own range/backup/acceptance
+fields remain unrecoverable, and this roll RECORDS that gap rather than inventing
+values (the closing-sequence rule above exists so the class cannot recur). Steps
+**102–105** ledger the `a14a8028..5417ef10` range that previously sat past step 101
+unledgered (the cc3e98e inbox line, now closed). The live ledger runs **106+** below,
+delta since `5417ef10`, rolled BEFORE the port that will carry it — the second roll
+run that way. Verification tags (`[SME-SIGNED]`, `[LIVE-VERIFIED]`, `[TEST-PINNED]`,
+`[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]`) carry forward; anything untagged
+is NOT confirmed — treat contracts as ASSUMED until your side validates them (the
+T10/T13 discipline).
+**ROLL-PROCEDURE RULE:** currency is verified by diffing the ledger's claimed coverage
+against `git log <last-ported-head>..HEAD` COMMIT-BY-COMMIT — never by eyeballing back
+from the newest entry. Both historic gaps (the f71967db port unrecorded here;
+O27/O28/C17/Q7/R6/S1 never ledgered) were caught by the company session's own range
+enumeration — the guardrail-2 safety net working, not a reason to keep the habit.
 
 Authorities are unchanged: [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml) is the WHAT
 (per-path disposition, first-matching-glob-row wins); [`git-readme.md`](../git-readme.md)
@@ -206,6 +220,42 @@ is the WHY + the acceptance oracle; this prompt is sequencing + delta context on
   2026-08-03** (reported, not producer-verifiable). Company acceptance: full
   `1652 / 28 / 0` (+84), Track-1 `123 / 3 / 0`, J7 guards 17 passed,
   `EXPECTED_CONSTRAINTS` 54→**55** company-based.
+- **Applied in full, collapsed at the 2026-08-09 J35 roll — steps 55–105** (55–83 via
+  the two reported-only ports, carried through verified acceptance; 84–105 at the
+  verified PORT-REPORT-a14a8028 / PORT-REPORT-5417ef10; full text in this file's git
+  history):
+  55 backlog duplicate-key guard. 56 G51 `ddschema` DDL + database-name guard.
+  57 L22 U.S. business-English guide (docs/style/** row). 58 C23 DQV seed DEFER.
+  59 G51 tail — bidirectional topology guard. 60 K7 seal-app-ref-edge-reshape gate
+  SIGNED 24/24. 61 K9 defined-mapping store. 62 composite-key standard (`:` join,
+  ctlm_id dot form). 63 K8 folder-grain loader [GRAIN-BREAKING; T23 family].
+  64 K12+K14 app-code taxonomy + strays. 65 K10 port activation cutover (`active`
+  boolean gone). 66 K11 steward cascade + §G1 orchestrator edges. 67 K13
+  catalog_has_application semantics. 68 U12 snapshot retention. 69 U13+U14 query-pack
+  filters. 70 C22 catalog-loader orphan sweep. 71 J18/J26/J27/J28 batch. 72 M3+M4
+  envelope gates. 73 Q13 vendor-docs pipeline. 74 J29 UTF-8 no-BOM. 75 Q6+Q12 docmeta
+  component. 76 SDLC app-runbook outline. 77 Excel runbook skill. 78 controlm-pipeline
+  stub capture (internal/). 79 G36 index drops. 80 L20 feedback stray-file guard.
+  81 S5 registry fragment split [STRUCTURE-BREAKING]. 82 U9 rel-filter leak fix.
+  83 ddlineage retired (topology 5→4) [LIVE-DB MIGRATION yours]. 84 depgraph pin bump.
+  85 S4 console draft substrate (mapping-store v2). 86 J30 branch disposal. 87 G54
+  exec-aware provision.ps1. 88 V-series module runbooks + coverage test. 89 runbook
+  currency guard. 90 N6 one load sequence, two profiles. 91 K15 job-grain pane
+  retired. 92 three gate prompts drafted [UNRULED]. 93 S10 pre-cutover refusal guard.
+  94 C24 sparse-refresh blanking fix. 95 W1–W3 + fcdo-crosswalk gate SIGNED 13/13.
+  96 K18 `tier`→`row_kind` [FORMAT-BREAKING; T23 family]. 97 K19 mapping-age suspects.
+  98 J32 field-meaning rule. 99 code-graph containment tree + media types
+  (EXPECTED_CONSTRAINTS 52→53). 100 SFS = target DB platform [RECORD-CORRECTION].
+  101 G35 TOM-roles: four clauses ruled, gate UNSIGNED, Operate-Manager data-loss fix.
+  **102–105, the `a14a8028..5417ef10` range (previously unledgered past step 101):**
+  102 G22 rua-load-shapes gate session, opened→SIGNED OFF 28/28 (`47325f1`→`3648cfc`),
+  including section C's .ksh SWO binding (`a4328dd` — the estate's unbound majority
+  typed). 103 SEAL sample GENERATOR replaces committed samples (`180f4ae`).
+  104 code-graph ASSET rulings — images (`5359b00`) then fonts (`6a11064`) skipped as
+  ASSET_EXTENSIONS_SKIPPED, SME 2026-08-06. 105 the range remainder: O42 web import
+  edges (`326e4c2`), N8 map-source rulings (`c2a6f58`), the SME context-intake plan +
+  O45/O46 slices (`a4108fc`, `fd29f3a`), four staged company gate prompts (`4dd5720`,
+  `edf2705`), port housekeeping/ledgering.
 - **Applied in full, collapsed:** 52 — J10 stages + CI determinism (applied at
   PORT-REPORT-f71967db, 2026-08-01; that port went unrecorded here until this
   roll). 53 — S3 identity cutover (constraints DROP+create applied; graph
@@ -382,6 +432,15 @@ GUARDRAILS (durable — apply to every port):
    clean-applies, collisions + resolutions, company-side adaptations, deliberately
    deferred, acceptance numbers, manifest adherence, state/reversibility, NEW
    divergences observed). The producer reviews it against producer git.
+   SHA-STAMPED CITATIONS (J35): every producer-tree citation in the report — a file
+   read, a tracker row, a config value, a step's claim — QUOTES THE SHA it was read
+   at (`read at cewilson/main @ <sha>`). A citation with no SHA is unreviewable; a
+   citation at a stale SHA announces itself as one instead of reading like a current
+   answer — the cached-`5f79d145` failure mode (see the fetch note at the top of
+   this file) is the motivating incident. Then close per the MANDATORY CLOSING
+   SEQUENCE in the header: the four required fields (range, port commit, backup
+   tag, acceptance numbers) land in **Last completed port** before the port is
+   considered closed.
 
 9. RUFF / FORMAT CONVERGENCE (J10 — each side formats its OWN tree). Authority:
    `git show cewilson/main:docs/ruff-format-convergence.md`. Find the boundary BY
@@ -445,9 +504,16 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   exist producer-side at all; `tests/unit/test_employee_roster.py` and a `test_snow_supp*`
   are likewise absent. (`drydocs/publishing/validator.py` exists both sides and diverges
   in content — sanctioned, `drydocs/**` is evaluate-on-collision.) See T21.
-- **`PORT-MANIFEST.yaml` = canonical-producer + a company-only `default_ok:`
-  appendix** (PORT-REPORT-*.md, .vscode/**, …). Take producer wholesale, then
-  re-append the company block — dropping it reds their J16 coverage guard.
+- **`PORT-MANIFEST.yaml` = canonical-producer, and the company-only rows now have
+  a home a verbatim take cannot touch (J34, 2026-08-09).** The manifest declares an
+  `overlay:` seam: side-local rows live in `PORT-MANIFEST.company.yaml` (company-tracked,
+  never-port), and the J16 guard UNIONS overlay rows/default_ok with the manifest —
+  overlay rows append AFTER producer rows, so producer dispositions keep precedence.
+  ONE-TIME MIGRATION at the port that delivers J34: move your 89 company-only
+  `default_ok` paths (PORT-REPORT-*.md, docs/build_*, docs/site/*, docs/prompts/*,
+  settings.json, …) out of your manifest copy into `PORT-MANIFEST.company.yaml`.
+  After that, take the producer manifest wholesale — the re-append-after-every-port
+  ritual (and its failure mode, the PORT-REPORT-a14a8028 89-path drop) retires.
 - **Enforcement-matrix SURFACES: `config/crosswalks/` lives under the COMPANY row id
   `crosswalks`** — producer's `orchestrator-crosswalks` was folded into it at
   PORT-REPORT-40c35724 (runtime consumer + drift test carried). Resolve future
@@ -502,6 +568,49 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   the requires-scheduler map open questions: names have diverged across repos; entries
   stay planned/proposed (inert). Resolve at the company platforms gate, not by editing.
 
+STANDING RELAYS (J38 — read this section at EVERY port; it is the channel the
+producer's "tell the next company session" notes travel by, replacing the idea
+inbox, which your repo never reads. Rules: every relay is RE-VERIFIED at the
+roll that carries it — nothing is relayed from memory, a stale relay is worse
+than none; a discharged relay is STRUCK with a dated reason, never silently
+deleted; action a relay in the port that carries it or record why not in the
+PORT-REPORT):
+
+- **R1 — AIS acronym expansion: transplant the VALUE across files** (standing
+  since 2026-07-21; re-verified at the 2026-08-09 roll). Producer's
+  authoritative home is `config/taxonomy/software-registry.yaml#acronyms`
+  (`AIS: "Application Integration Streaming"`); YOUR provisional gloss sits in
+  a different file (your source-registry entry for the internal AIS docs
+  portal), with your own manifest row expecting the producer expansion. Carry
+  the VALUE into your file — never a same-file overwrite, the files do not
+  correspond. Rider from the same note: your 06-29 gate (the Ais* class
+  removal) has no company gate-log entry — an audit gap on your side; the
+  producer offered a backfill.
+- **R2 — run-log adoption asks** (standing since 2026-07-22; re-verified — the
+  run-log family in `drydocs_core/run_log.py` + BaseLoader wiring is long
+  ported). Two asks remain YOURS because they sit in your adapter code: (a)
+  attach the WARN-stream tee in the XML EXTRACTOR stage — the
+  `description_tokens` WARN flood happens PRE-loader, in the adapter, so the
+  loader-stage tee never catches it; (b) once the stream lands in a file,
+  consider raising the console handler to WARNING-summary-only — the file is
+  the review surface, the console shows counts.
+- **R3 — 2026-07-21 port-report heads-ups, re-verified 2026-08-09:**
+  (a) `test_schema_graph.py` drift-guard sequencing — re-add that test ONLY
+  after your own doc-vocab gate; the trap is written in the reconcile-port
+  skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
+  confirm or strike in your next PORT-REPORT.
+  (b) confirm docs/restructure/internal-backlog.yaml (plain text on purpose —
+  it should not exist anywhere anymore) was DELETED after the DD-series merge —
+  `388a30d` proved the merge happened, nothing yet proves the deletion. Still
+  unconfirmed as of this roll.
+  (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
+  404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
+  works; the fetch note at the top of this file carries the standing lesson).
+- **R4 — the J34 overlay migration (one-time, at the port carrying this
+  section):** move your 89 company-only `default_ok` paths into
+  `PORT-MANIFEST.company.yaml` per the standing-divergence bullet. Strike this
+  relay in the roll after your PORT-REPORT records it done.
+
 OWED COMPANY-SIDE:
 - L7 ratification: **DISCHARGED** (company gate-log 2026-07-27; T11). §6a below stays
   as the STANDING Tier-A template — `source-registry-v2` and `J23` both used its shape
@@ -545,903 +654,92 @@ OWED COMPANY-SIDE:
   your graph. T10/T13: until a real export parses with zero mismatches, treat the
   field names as ASSUMED.
 
-STEP LEDGER — delta since `40c35724` (steps 43–54 collapsed above, applied
-through PORT-REPORT-40c35724). Each sub-stream carries its producer-side
-verification status in [BRACKETS]; spend review on [UNRULED].
+STEP LEDGER — delta since `5417ef10` (steps 43–105 collapsed above). Each
+sub-stream carries its producer-side verification status in [BRACKETS]; spend
+review on [UNRULED]. Grooms, claims, board/design renders and depgraph
+snapshots in the range are ritual — per-entry backlog union, derived
+regeneration, never-port outputs — and get no step.
 
-55. BACKLOG DUPLICATE-KEY GUARD [TEST-PINNED] (`c5b689e`). Direct answer to the
-    defect YOUR DD6 session found: PyYAML is last-key-wins, so the duplicate
-    `summary:` your port merge shipped passed every backlog guard. New
-    `test_no_duplicate_mapping_keys` parses via a SafeLoader subclass that
-    reports every duplicate key at every depth with both line numbers. Ports
-    normally (no company adaptation known for this file). Run it against YOUR
-    rebuilt backlog — it must pass; your pre-rebuild `1a3aff20` state is the
-    proof-case it exists to catch. Phase 1 of the backlog-at-scale epic
-    (IDEAS 2026-08-03); phases 2–3 (per-item sharding, graph query surface)
-    are NOT in this range — they gate first.
+106. G22 AFTERMATH TRIO — G55 vocabulary consequences + G23 curated load + G58
+    archival report [TEST-PINNED] (`2435a7d`, `ba7fbaf`, `461ea8e`). G55 applies
+    the signed gate's flips (guardrail 7: GATE-AUTHORIZED — do not run the
+    no-downgrade guards across it); G23 is the rua curated load per the signed
+    shapes (loads are always yours — T9); G58 the dead-script archival report
+    with the gate's safety bar. G23 depends on G55 — the ordering constraint is
+    recorded in the backlog (`6a65d4f`), verified in code, not prose.
 
-56. G51 — `ddschema` PROVISIONED + DATABASE-NAME GUARD WIDENED [TEST-PINNED]
-    (`21c46b8`, claim `f0ca0cc`). `01_databases.cypher` now creates `ddschema`
-    (NOT aliased into `ddall` — deliberate, the comment says why);
-    `test_database_names.py` matches any `*DATABASE*` constant (proof order:
-    the widened guard failed on exactly `SCHEMA_GRAPH_DATABASE`/`ddschema`,
-    then the DDL turned it green); topology anchor 4→5 names; ADR 0002
-    amended; gate-log RECORD entry (a record, not a gate — nothing to ratify);
-    runbook Rev 6 + rev pin 5→6 TOGETHER (the L21-noted mixed-pin file — take
-    both or neither); run-drydocs skill chain updated.
-    ***THIS DISCHARGES THE `ddschema`-DDL CLAUSE OF YOUR DD6*** — after
-    applying, DD6 narrows to `_client(database)` + wiring the two deferred
-    verbs (T22). `EXPECTED_CONSTRAINTS` does not move. The topology-anchor
-    test asserts the producer's five-name SET — verify it against YOUR
-    `01_databases.cypher` on apply rather than assuming the sets match.
+107. OLDEST-NON-HITL SWEEP — six small items [like-for-like] (O29 `afd6594`
+    trust-tier legend; O30 `74b0f1a` App.css retired; O32 `604c0b6` light-mode
+    cascade fix; S7 `31bd162` folder-vs-module naming rule in MODULE_MAP.md;
+    S6 `94924a5` JSON Schemas for the six config families; A4 `9f1bb62` dcat
+    per-standard README). web/** and MODULE_MAP.md are canonical-producer. S6's
+    schemas validate YOUR config copies at editor time — a squiggle on your
+    adapted values is the schema working; widen a schema only where your grammar
+    legitimately differs, and note it in the PORT-REPORT.
 
-57. L22 — U.S. BUSINESS-ENGLISH STYLE GUIDE + ADOPTION [SME-SIGNED]
-    (guide `6aeaadd`, adoption `e4d05dd`; grooms/claims `480fa04`/`bf2e4bd`).
-    NEW `docs/style/` (guide + idiom inventory) with a NEW PORT-MANIFEST row:
-    `docs/style/**` = canonical-producer (the J16 guard forced the row, as
-    designed). CLAUDE.md §6 gained the prose-style working agreement; the
-    documentation skill opens with it; exec overview → rev 7 (21 idioms
-    rewritten; HTML stays its single source — decision in the rev line);
-    whitepaper: 2 edits applied identically to `.md` + both renders. FENCE:
-    mechanism names are never renamed by a style pass, and "crosswalk(s)" is
-    an SME-approved exception (company-internal vocabulary) — the guide
-    records both. Company adaptation: none expected; your prose sessions
-    inherit the guide via CLAUDE.md.
+108. PORT MACHINERY HOUSEKEEPING at the 5417ef10 review (`7934c41`): Relay #2
+    applied (config/audit-fields.yaml + test_module_boundary.py per-entry/union
+    rows). FIVE company packs staged (`2f3c385`, clean-add rows above the
+    never-port glob — REMOVE those five rows after this port merges) + FOUR
+    post-G22 data-profile gate prompts drafted (`b001eb8`) [UNRULED]. Six
+    DELIVERED company prompts retired to local archive (`6b3a957`) — the
+    deletions are covered by the `docs/gate-*-company-prompt.md` never-port row,
+    so your live copies are untouched by design; verify they survived the apply.
 
-58. C23 — DQV SEED RULED **DEFER** [SME-SIGNED] (`11f9ab9`, claim `9c8e3d9`;
-    gate-log `dqv-seed-disposition`). The bootstrap :Metric/:Dimension catalog
-    STAYS; revival trigger (first measurement feed = temporal-runtime
-    freshness observations) recorded in `ontology.cypher` above the seed.
-    Vocabulary +4 `c23_*` entries (per-entry union: `c23_in_dimension` ACTIVE
-    — registered retroactively for a bootstrap-written edge — the other three
-    PLANNED; new `quality` domain). `schema_graph.cypher` + `gates.json`
-    regenerated (both drift guards fired first). GUARDRAIL 6: this is a
-    producer gate ruling — union-append the gate-log entry and take the vocab
-    entries, but your OWN measurement-feed timeline decides when planned
-    flips; nothing here writes your graph. `EXPECTED_CONSTRAINTS` unchanged.
+109. K16 PRODUCER HALF — the FID census METHOD (`232e88f`) + `drydocs
+    fid-census` (`20f6431`) [TEST-PINNED]. Counts-only by return type; the
+    COUNTS are Internal and cannot be produced producer-side — the item sits
+    `blocked` on your directory extract, and the census prompt is
+    `docs/k16-fid-census-company-prompt.md` (in-tree, not a gate pack).
+    cli.py is evaluate: add the verb, keep yours.
 
-59. G51 TAIL — THE TOPOLOGY GUARD THAT LET FOUR DATABASES STAND [TEST-PINNED]
-    (`aa0a0eb`). Step 56 added `ddschema` to the DDL, not to the surfaces that
-    ENUMERATE the topology. `test_databases_match_provisioning_script` was a
-    subset check whose own docstring promised equality; it is now bidirectional
-    and FAILED on `['ddschema']` before the config was touched. Same commit:
-    runbook Rev 7 WITH the `test_doc_traceability_loader` rev pin 6→7 (the L21
-    mixed-pin file — take both or neither), `ingest.sh` 5→6 steps, provisioning
-    README/`provision.ps1`, repo-README, the run-drydocs skill's wrong
-    `NEO4J_PLUGINS` advice, `enforcement-matrix.json` regenerated.
-    ***CAUTION — THIS GUARD WILL RED YOUR TREE, CORRECTLY.***
-    `config/dev-environment.yaml` is canonical-company and you took
-    `01_databases.cypher` with `ddschema` at step 56, so the widened guard fails
-    until YOUR file gains `schema_meta: ddschema` under `neo4j.databases`
-    (structure to adapt by hand, value yours — the standing divergence).
-    `EXPECTED_CONSTRAINTS` does not move.
+110. Q16(a) — `drydocs docs-coverage` + THE /software LEDGER PAGE (`b297268`,
+    `0ddf880`, `9b4cf59`, `71276d5`). Software→documentation coverage report;
+    the vendor→product→corpus→graph declared-vs-loaded console surface;
+    generated software-registry.json gains the doc-governance fields. The page
+    reads YOUR registry and corpora at render — regenerate under guardrail 5,
+    never take producer generated JSON. Overview pick-list persona-filter fix
+    rides along.
 
-60. K7 — APPLICATION↔CONTROL-M ATTRIBUTION CLOSE-OUT GATE **SIGNED OFF**
-    [SME-SIGNED] (gate-log `seal-app-ref-edge-reshape`, 24/24; §G6-RIDER was
-    already ruled at C17 2026-08-01 and is NOT re-opened). Grain moves job →
-    FOLDER; the edge is `BELONGS_TO_APPLICATION` (LOCAL, `prov_maps_to: ~`)
-    onto the app's Batch `:Port` — NOT `:BusinessApplication`, which is
-    supernode avoidance, not taste. K2 matching DEMOTES to a fallback that is
-    always DISCLOSED via the origin flag. `:Batch` bridge RETIRED
-    (`arch_contains_batch`/`arch_contains_folder` planned→deprecated) — do NOT
-    confuse these with `m3_contains_folder`, which stays ACTIVE and is the
-    load-bearing fan-out path. Build items K8–K13 opened BY the gate.
-    GUARDRAIL 6: union-append the gate-log entry, take the vocab entries
-    (`m3_belongs_to_application` is PLANNED — no loader) and the map flip;
-    every graph write stays yours.
-    GUARDRAIL 7: this is a GATE commit — do NOT run the no-downgrade guards
-    across it. The arch_* deprecation is an AUTHORIZED downgrade and the
-    gate-log entry is its authority.
-    ***YOUR T1 PREMISE CHANGED.*** T1 is the K2 JOB-grain live load; that grain
-    is now superseded. Re-scope T1 to the folder grain rather than running it as
-    written. Second live-behaviour note: your TWO app-code loaders (Control-M +
-    the AutoSys twin) write `Port.active` by derivation — K10 replaces that
-    boolean with per-port `active_state`, and your already-active ports
-    grandfather as `confirmed` with the Control-M link as provenance (§G4-RIDER).
-    `EXPECTED_CONSTRAINTS` does not move.
+111. SMALL GUARDS [TEST-PINNED, like-for-like] — G59 apply-supplements
+    completeness (`1490d02`: a supplement on disk can no longer be silently
+    skipped; the applied set is derived from the directory); J36 ryuk workaround
+    automatic (`9bf7ebb` — integration suite needs no manual prep); skip-guard
+    prose fix (`2c26e2f`); runbook-currency historical exemption (`cbb8b3d`).
 
-61. K9 — THE K7 DEFINED-MAPPING STORE [TEST-PINNED] (`17d9e08`; claim
-    `a1b9388`, after the dead remote claim was released at `1807df0`). NEW
-    `config/overrides/app-code-mappings.csv` → `app_code_mapping` table +
-    `v_app_code_grid`/`v_dual_coded_migrations` in `var/mapping.db` → the
-    `app-code-mapping` /mappings domain with an O24-verbatim draft endpoint;
-    ONE shared validator (`validate_app_code_row`) serves ingestion AND
-    drafting, so an artifact can never be refused at materialization. §E2
-    asymmetries are built in: rows ARE the source of record, overrides may be
-    PERMANENT (no status column; rationale required on override/manual-pin),
-    and `matched-fallback` is REFUSED at authoring (derived at load, §B3).
-    `K2_SHAPE` → `ControlMFolder -[BELONGS_TO_APPLICATION {seal_app_ref}]->
-    Port`; `draft_changeset` rekeyed (app_code keys, `app_id=` target grammar
-    — post-S3, and no committed manual CSV exists producer-side to protect);
-    TEMPLATE rekeyed the same way. The manual-loads PARSER deliberately still
-    enforces the job-grain shape until K8 — test-pinned with the rationale —
-    so YOUR real tier-5 CSVs (T4) keep parsing unchanged; the new grammar
-    arrives only in NEW artifacts, which queue fail-closed until your K8.
-    Console note: the job-grain drafting tray now fails closed SERVER-SIDE
-    (§A1, ruling cited in the error) until K11's steward screen lands.
-    `EXPECTED_CONSTRAINTS` does not move; nothing writes the graph;
-    `m3_belongs_to_application` stays planned.
+112. ROADMAP — THE THIRD PLANNING SURFACE (`3c60e2e`). drydocs/plan_roadmap.py
+    + scripts/render_roadmap.py join the default board render; authored
+    judgments live in docs/restructure/roadmap.yaml (module-coverage +
+    idea-citation guards in test_plan_roadmap.py). Manifest rows landed with
+    J34: the .html is a DERIVED canonical-company render; the .yaml is evaluate
+    — YOUR stage/remaining judgments describe YOUR tree, take structure only.
+    board.html links to the new page.
 
-62. COMPOSITE-KEY SERIALIZATION STANDARD [SME-RULED, TEST-PINNED]. Two
-    in-chat SME rulings, same session as K9: (1) the `ctlm_id` DOT composite
-    (`folder_id.job_id`, the psgmgr-derived convention, P2 §B precedent) is
-    THE serialized form of the job node key; (2) key-cell `field=value`
-    pairs join with **`:` not `;`** — the semicolon is the SQL statement
-    terminator. NEW standard doc
-    `knowledge/standards/technology/composite-key-serialization.md` (+ the
-    standards README index row); `_parse_key` in
-    `drydocs_core/manual_mappings.py` flipped `;`→`:`, fixtures updated.
-    TIMING IS THE POINT: the flip landed while ZERO manual CSVs are
-    committed producer-side (`manifest files: []`), so nothing migrated.
-    ***YOUR SIDE IS DIFFERENT (T4):*** if you hold REAL registered tier-5
-    CSVs under `internal/`, their key cells still say `;` — convert them in
-    the same commit that takes this parser change, or hold the whole step
-    back until you can; a half-applied step strands your committed rows at
-    parse time. K14 (value-form conformance sweep) is groomed producer-side
-    and ports as backlog only.
+113. BACKLOG RE-SHAPES [per-entry union as usual] — Epic Z groomed (`d95a64a`:
+    six server-location/geography items; the Z2 gate carries the standing
+    caution that the infrastructure data-center field is NOT the Control-M
+    same-named field) and G57 WITHDRAWN-CLOSED (`913861a`, user ruling): the
+    rua_*→bkup_* family rename is OFF THE BOOKS — the G22-session file rename
+    was a comparison maneuver, not a directive, and the rua_* names STAND. If
+    your rua-load-shapes ratification session queued a rename expectation,
+    strike it.
 
-63. K8 — FOLDER-GRAIN ATTRIBUTION LOADER; THE K2 JOB-GRAIN WRITER RETIRES
-    [TEST-PINNED, GRAIN-BREAKING] (`4df4df2`; claim `72777d8`). NEW
-    `drydocs/loaders/folder_attribution.py` + `folder_attribution.cypher`
-    write the ruled `(:ControlMFolder)-[:BELONGS_TO_APPLICATION
-    {seal_app_ref}]->(:Port BatchProcessing)` edge — authored K9 rows fan
-    out per app code, K2 DEMOTES to the per-folder unanimity fallback with
-    `origin=matched-fallback` (§B3); ties/undeclared-platform folders are
-    steward CONFLICTS, never auto-picks (1:1 OWNER-NOT-USER).
-    DELETED: `seal_attribution.cypher` + the `SealAttributionLoader` class
-    (the module keeps only the match-policy resolver); CLI
-    `load-seal-attribution` → `load-folder-attribution` in
-    `CANONICAL_LOAD_SEQUENCE`; graph-tests suite RENAMED
-    seal-attribution-coverage → folder-attribution-coverage (8 TCs; TC-08
-    asserts NO job-grain edges remain). Vocab: `m3_seal_app_ref`
-    active→deprecated (AUTHORIZED by the K7 sign-off's "stays active until
-    the K7 build migrates it" clause — guardrail-7 the J7 no-downgrade
-    guards across this step), `m3_belongs_to_application` planned→active;
-    supplement block swapped; `schema_graph.cypher` regenerated. Manual
-    tier-5 chain rekeyed end to end: `SUPPORTED_SHAPE`, `_parse_key`
-    requirements (app_code + app_id), the store's `manual_mapping` table
-    columns (`app_code, folder_id NULL-able, app_id`), and the manual
-    cypher now FANS OUT per code.
-    ***YOUR SIDE — THREE CAUTIONS:***
-    (a) T4/T23 SEQUENCING: your real tier-5 CSVs are JOB-grain; this step
-    makes them UNPARSEABLE (parser now requires `app_code`/`app_id`). Take
-    step 62's `;`→`:` conversion AND re-author those CSVs at the app-code
-    grain in the same change that takes this step, or hold both steps
-    together. (b) Your LIVE job edges + `active=true` ports are the real
-    migration (K7 §F1/G4-RIDER) — T23 territory, wipe-and-rebuild does not
-    exist for you; write your own migration before running the new loader.
-    (c) Your `controlm_app_codes.cypher`/AutoSys twin still write the
-    boolean flip — reconcile them with the new edge before both run, or a
-    folder can carry contradictory attribution surfaces.
-    `EXPECTED_CONSTRAINTS` does not move. Producer suite 1384→1399 (+15).
-    BONUS in the same commit: the publish-boundary bare-id guard caught a
-    REAL psgmgr folder id in step 62's standard doc examples — now
-    synthetic. Verify your copy took the fixed examples, not the originals.
+114. REVIEWS + PROSE [default_ok / internal] — persona review Run 2 (three
+    `docs/reviews/persona-*-2026-08.md` files + checkpoint + Idea-91..95; the
+    tech-writer mandate now cites the US-English guide, `afc79c4`);
+    business-layer location experiment (`f156cc7`,
+    internal/context-graph-analysis/**); L24 exec overview rev 8 (`b2287fa`);
+    MWAA implementation-docs locator (`9674403` — value in internal/, pointers
+    everywhere else); G32 close checklist (`250e355`). docs/reviews/** is
+    default_ok — point-in-time records of the side that ran them.
 
-64. K12 + K14 + STATUS-DOC REFRESH [SMALL, LIKE-FOR-LIKE] (`5978d78`; claim
-    `30ab908`, batch with the step-63 ledgering). K12: `controlm.yaml` gains
-    the `applications:` app-code section (pure classification; jobless
-    folders name-DERIVED and flagged) and the map entry's capture WAIVER is
-    replaced with the real path — your side takes both wholesale
-    (canonical-producer), but note the SECTION CONTENT reflects the
-    producer's reduced sample; re-derive yours from your real extract if you
-    maintain a parallel capture. K14: two ctlm_id strays converted to the
-    dot form (MappingsRoute.tsx React key; mapping_demo.html slash join) —
-    clean adds. Also the K2 rows in `docs/controlm-staging-ingestion-flow.md`
-    and `docs/controlm-c3-normalization-status.md` now state the K8
-    folder-grain shape; if your copies carry company edits, merge the row,
-    do not overwrite the file. Suite stays 1399.
-
-65. K10 — PORT ACTIVATION CUTOVER [TEST-PINNED, TOUCHES YOUR LIVE WRITERS].
-    `seal_applications.cypher` seeds `active_state='declared'` +
-    `declared_by/declared_at` ON CREATE only and NEVER writes 'confirmed';
-    both attribution edge writers stamp the port
-    `confirmed`/`confirmed_by`/`confirmed_at`/`confirmed_run_id` when the
-    BELONGS_TO_APPLICATION edge lands (§G5 — derived, no separate trigger;
-    coalesce-stable first-confirmation stamps). The `active` boolean is
-    GONE; suite TC-09 fails any port still carrying it.
-    ***YOUR SIDE:*** (a) §G4-RIDER is YOUR migration — grandfather your
-    already-`active=true` ports as `confirmed` with the Control-M app-code
-    link as provenance BEFORE taking TC-09, then drop the boolean; (b) your
-    `controlm_app_codes.cypher` + AutoSys twin still write the boolean —
-    re-point them (or retire them into the folder-attribution path, step
-    63(c)) in the same change; (c) TC-10's two-way confirmation<->edge
-    agreement will red any port confirmed by grandfathering whose folder
-    edges have not yet been migrated — sequence the §F1/T23 edge migration
-    FIRST, or hold this step with step 63. `EXPECTED_CONSTRAINTS` does not
-    move. Producer suite 1399→1403.
-
-66. K11 — STEWARD MAPPING CASCADE + THE §G1 ORCHESTRATOR-EDGE AUTHORING
-    [TOUCHES YOUR TWO app_codes WRITERS AGAIN]. The K7 gate's §G act built
-    end to end. Web: `AppCodeCascadePane.tsx` (new, clean add) on `/mappings`
-    domain `app-code-mapping` — orchestrator-first cascade, unmapped-only
-    folder queue, run_as_user sort, mandatory rationale, lifecycle chips as
-    confirmation provenance (§G7); `MappingsRoute.tsx` wires the branch;
-    `mappingsApi.ts` gains `draftAppCode` → `POST /mappings/app-code/draft`
-    — a route K9's handler NEVER HAD (`app.py`; route-presence test added).
-    LOADER SIDE IS THE PART THAT TOUCHES YOU: both attribution writers
-    (`folder_attribution.cypher`, `manual_seal_attribution.cypher`) now
-    AUTHOR `(:BusinessApplication)-[:USES_SOFTWARE {source:
-    'app-code-mapping', origin: 'confirmed'}]->(:SoftwareProduct)` when a
-    folder edge lands (§G1 — one mechanism with the K10 port confirmation;
-    FOREACH-guarded on registry presence, shortfall stamped as
-    `JobRun.orchestrator_edges` + warned). The orchestrator ref comes from
-    `platforms.yaml` (`controlm`) via a NEW `BaseLoader.extra_cypher_params`
-    hook — if you subclass BaseLoader with a custom `_flush`, merge the
-    hook. `batch_port_orchestrator.cypher` stamps `origin =
-    coalesce(u.origin, 'declared')` (§G2). Four new QuerySpecs
-    (`mappings.catalog-cascade/orchestrators/app-orchestrators/
-    unmapped-folders.v1`); suite TC-12 (confirmed-edge two-way agreement).
-    ***YOUR SIDE:*** (a) your `controlm_app_codes.cypher` + AutoSys twin are
-    now superseded TWICE over (boolean flip at step 65, orchestrator
-    authoring here) — retiring them into the folder-attribution path is the
-    clean end state; (b) TC-12 reds a confirmed app with an
-    'app-code-mapping' edge but no confirmed Batch port — sequence with the
-    steps 63/65 migrations; (c) `mappings.catalog-cascade.v1` binds
-    HAS_APPLICATION, which is ACTIVE on your side (G6 ruled the COMPANY
-    reading) — your cascade picker goes live immediately, no K13 wait; (d)
-    the AutoSys twin domain slots in per §G by adding its own platforms.yaml
-    ref + attribution loaders — the pane's orchestrator picker already
-    renders it. `EXPECTED_CONSTRAINTS` does not move. Producer suite
-    1403→1410 (+7); web build + oxlint clean. The legacy finding this step
-    noted (`mappings.attribution-coverage.v1` reading the RETIRED job-grain
-    edge) closed producer-side at step 91 (K15).
-
-67. K13 — catalog_has_application SEMANTICS RECONCILED TO §G6 (docs/config
-    only, no code behavior change). This is the producer ADOPTING YOUR
-    reading — the gate ruled the company's structural-SUPPORT semantics
-    (a Product supported by 2+ applications, front-end/back-end; 1:many BY
-    DESIGN) over the producer's old "Product owns SEAL applications".
-    Touched: `relationship_vocabulary.yaml` note (support reading leads;
-    the old WAS_ATTRIBUTED_TO matrix hint recorded as FALLEN — both ends
-    Entities post-K4, no PROV row; C9 history + `planned` status kept),
-    `taxonomy-ontology-map.yaml` gains its FIRST entry for this edge
-    (`product-has-application`, confirmed chad.wilson 2026-08-03 = the K7
-    sign-off, capture waived on the C9 reason; map summary confirmed 24),
-    `catalog_ontology_supplement.cypher` OntologyTerm notes (also removes a
-    claim false since C9: "Written by pat_product_mapping loader"),
-    data-context-extractor skill wording, and the step-66 surfaces' "K13
-    back-flow" pointers re-aimed at the C9 extract condition.
-    ***YOUR SIDE:*** (a) if your map already carries an entry for this edge,
-    RECONCILE ids with `product-has-application` (union-append doctrine) —
-    do not end up with two entries for one edge; (b) your vocabulary entry
-    is presumably `active` with a loader — take the NOTE wording
-    like-for-like but keep YOUR status/loader fields (the producer's stays
-    `planned`, loader `~`); (c) the supplement's SET is idempotent MERGE —
-    rerun refreshes the OntologyTerm notes; `EXPECTED_CONSTRAINTS` does not
-    move, suite count does not move (1410/5, no test delta).
-
-68. U12 — SNAPSHOT RETENTION ENFORCED IN snapshot.ps1 (+3 guard tests). The
-    ruled newest-only retention (SME 2026-08-02) moved from prose+human into
-    the script: after a successful write+filter, every other
-    `<project>-<date>[-HHmm].json` is deleted (pattern-anchored — `-code-*`
-    comparison files and `drydocs1-*` history names exempt; deliberately
-    AFTER the write so a failed run cannot delete the only good snapshot;
-    source order pinned by test). Proven live: the first enforcement run
-    removed FIVE stale snapshots. README trued to the all-files instrument
-    (whole-repo default + -CodeOnly, ruled retention replaces "keep ~10",
-    fourth instrument-change marker: 238 -> 1457 nodes on unchanged code at
-    the 2026-08-02 all-files boundary — instrument, not growth; absent-file
-    citations restated as git history). NEW tests/unit/
-    test_depgraph_snapshots.py: exactly-one committed all-files snapshot,
-    script enforcement present and after-the-write, README currency.
-    ***YOUR SIDE:*** the snapshot RITUAL is producer-machine-only, but the
-    directory + tests PORT: (a) the exactly-one test reds a tree carrying a
-    snapshot series — apply the same retention (keep newest, delete the
-    rest) in the port commit; (b) if your ritual wrapper diverged from
-    snapshot.ps1, take the retention block like-for-like. Suite 1410→1413.
-
-69. U13+U14 — THE CODE-GRAPH QUERY PACK GETS TWO STANDING FILTERS (docs +
-    skills only, no code change, no test delta — 1413/5). U13: every seed
-    query (tech-debt A1–A6, the review plan's table, groom-backlog's two
-    graph cross-checks) filters `removed_from_source_at IS NULL` or says in
-    one line why tombstones belong (the plan's Phase 2 units 1–2 are the
-    deliberate exceptions). U14: architecture metrics bind
-    `m.project IN $packages` = the SEVEN package roots — an allow-list in
-    the QUERIES, never a scanner exclude (U9's whole-tree artifact is the
-    ruled shape). First-party Python outside the packages (agents/,
-    scripts/, knowledge/) is a separate labeled orphan queue (22 today),
-    reported beside the baseline, never folded in. Baselines restated with
-    scope+date next to every number (fan-in 18→29, orphans 24→0 in-package,
-    untested 29 scoped / 129 raw).
-    ***YOUR SIDE:*** like-for-like docs/skills adoption; your graph carries
-    its own numbers, so re-probe YOUR baselines rather than adopting the
-    producer's (the producer's 2026-08-03 wipe left zero tombstones — a
-    fresh-provisioned graph reads the same, an aged one will not).
-
-70. C22 — THE CATALOG LOADER SWEEP (`+7` tests, 1413→1420/5). The silent
-    parent joins C17 fixed in products.cypher only are now the ONE shape in
-    all three hierarchy loaders: OPTIONAL MATCH, `orphan` written EVERY
-    run, unresolved id kept (`pl.orphan_parent_lob_id`,
-    `ap.orphan_parent_product_id`). All three name SETs coalesce, and the
-    row models moved with it — ProductLineRow/ProductRow/AreaProductRow
-    `name` is optional with ''→None normalization (a required name makes a
-    sparse refresh reject wholesale, worse than the blanking it replaces);
-    ids stay required. The C17-deferred question RULED EMIT:
-    `drydocs.loader/unresolved-parent` (warning) rides the O28 envelope —
-    BaseLoader gains `orphan_label` + a run-scoped count at close;
-    per-node flag stays the durable record; envelope standard doc updated.
-    ***YOUR SIDE:*** like-for-like — but if your tree carries loaded
-    :Product/:ProductLine/:AreaProduct data, RE-RUN the catalog loaders
-    after the port so the every-run orphan flags exist (nodes loaded under
-    the old cypher have no flag until touched); and if you extended
-    status-item type handling anywhere, note the new fifth type. The
-    dev_teams/catalog_lobs same-shape gap closed at step 94 (C24) — it IS
-    in this range after all.
-
-71. J18+J26+J27+J28 — THE J-SERIES CLOSE-OUT (one batch, 1420→1427/5).
-    J18: live-verification claims name their venue (backlog pull-rule step 5
-    + CLAUDE.md §6; P3/G33 close notes retro-tagged). J26: text-guard sweep —
-    negative assertions over committed Cypher/SQL now read COMMENT-STRIPPED
-    text (strip_comments / a `--` line filter); the family inventory +
-    self-description regression proofs live in
-    tests/unit/test_text_guard_conventions.py. J27: the two .gitignore
-    comments that named the org/domain are reworded to describe the corpus;
-    J15's guard gained scan D (no domain-shaped token in .gitignore, empty
-    allowlist). J28: render_gates.py classifies by SLUGIFIED-HEADING identity
-    — a body citation or PARTIAL ruling never closes a gate; prompts may
-    self-declare via a `# SIGNED OFF`/`# DEFERRED` marker line (F1/F2
-    crosswalk prompts got theirs); gates.json 41→43 rows, 8→10 open.
-    ***YOUR SIDE:*** all four are like-for-like, with two cautions. (a) J28
-    re-renders gates.json from YOUR gate-log — expect YOUR open list to grow
-    if your log carries citation-only or partial-ruling prompts; that is the
-    fix working, not drift. If any of your signed gates use prose headings
-    without the slug, add the `# SIGNED OFF` marker line to the prompt file
-    (the F1/F2 pattern) rather than editing log headings. (b) J27's scan D
-    reds a .gitignore that names any domain — reword or allowlist WITH a
-    reason in the same commit that takes the guard. J13 (the publish-ceiling
-    term sweep) remains OPEN and user-gated — not in this range.
-
-72. M3+M4 — THE DOC-06 ENVELOPE GATES (two gates, one session, 1427→1430/5).
-    M3 (gate `audit-envelope-phase4`, 13/13): the four remaining non-Control-M
-    audit-envelope stubs are RULED, none confirmed — the SME evidence reversed
-    the drafted recommendation: the SEAL registry's date fields are
-    onboarding-LIFECYCLE milestones with two-era capture (legacy applications
-    lack them), so creation_date is not record authorship; certification
-    columns excluded as attestation; the PAT report extracts project zero
-    audit columns (stub-until-projected); software-registry = permanent stub
-    (git history is the envelope). Revisit trigger recorded: the registry UI
-    exposes a per-application audit download. No loader change; audit-fields
-    notes + loader README envelope section + doc 06 phase marks. M4 (gate
-    `envelope-property-terms`, 10/10): the envelope properties bound
-    dct:creator/created/contributor/modified in a NEW `property_terms`
-    section (0b) of relationship_vocabulary.yaml; `dct:` registered in
-    namespaces.py (+ ontology.cypher header sync, documentation-grade — no
-    dct: OntologyTerm nodes seeded); reference/standards/dcmi-terms/ stub +
-    REGISTRY row; +3 drift guards in test_audit_fields.py.
-    ***YOUR SIDE:*** gate ADOPTION per the two-tier doctrine — the gate-log
-    entries union-append and YOUR tree runs its own ratification if it wants
-    the rulings load-bearing; the config/vocabulary/reference files are
-    canonical-producer. Two cautions: (a) if your tree ever mapped SEAL or
-    PAT envelope columns locally, the M3 rulings SUPERSEDE that — remove the
-    mapping or record your own gate divergence; (b) the new test
-    `test_every_envelope_property_carries_a_term_binding` reds a tree whose
-    vocabulary file predates section 0b — take the vocabulary file in the
-    same commit as the test.
-
-73. Q13 — VENDOR-DOCS PIPELINE VERIFIED (laptop `6cbe44b`, 1430→1449/5;
-    ledgered desktop-side — the close commit did not touch this file). The
-    2026-07-31 pipeline was closed with three silent-reporting fixes, all the
-    "succeeds loudly, does nothing" class: vendor_docs.cypher gained the
-    delta-only WAS_GENERATED_BY tail (rows_changed was structurally 0 —
-    placed ABOVE the SUBSECTION_OF empty-list UNWIND that drops TOC-depth<=1
-    rows, ordering test-pinned); rows now carry BOTH the registry corpus_id
-    and the capture id (docs-verify would have reported a loaded corpus as
-    MISSING); bare-stem doc_id resolution. ***YOUR SIDE:*** like-for-like;
-    if your tree loads vendor-docs corpora, RE-RUN the loader post-port so
-    the change-reporting is honest, and expect docs-verify to reconcile
-    where it previously read MISSING.
-
-74. J29 — UTF-8 NO-BOM STANDARD for loader-read formats (1449→1450/5). SME
-    ruling: every .cypher/.sql/.csv is UTF-8 WITHOUT BOM (UTF-8 itself was
-    the deliberate readability choice; the BOM is a writer artifact —
-    PowerShell Out-File/'>', Excel CSV export). Guard =
-    tests/unit/test_file_encoding.py (J22 tracked+untracked walk), proven on
-    a probe; three producer sample CSVs stripped; vendor .xsd captures
-    exempt (XML self-declares encoding; VERBATIM trust). Diagnosis note: the
-    M3-reload cypher-shell BOM rejection was a PS 5.1 PIPE injection, not
-    repo files. ***YOUR SIDE:*** the guard WILL red any BOM'd .cypher/.sql/
-    .csv in YOUR tree — likely candidates are Excel-exported tier-5 manual
-    CSVs. Strip them in the same commit that takes the test (a BOM'd CSV
-    read with plain utf-8 breaks header matching silently, so this is a fix,
-    not churn). cypher-shell scripts: copy the file and use `-f`; never pipe
-    content through PowerShell 5.1.
-
-75. Q6+Q12 — THE DOCMETA COMPONENT (laptop `d647171`; T21 discharged in the
-    same commit, which was the only ledger touch — this step closes that
-    gap). `drydocs_docmeta/` lands: connectors (`base.py` protocol +
-    `RawPage` + `SourceUnavailableError`; `web.py` stdlib urllib, injectable
-    transport, SSRF scheme allow-list, and the Q12 page-count refusal;
-    `filedrop.py`), pipeline + capture policy in one home; module-boundary
-    rows added. Producer-AUTHORED against the T21 description, never a copy
-    of your tree — your `connectors/` stays canonical-company.
-
-76. SDLC APPLICATION RUN BOOK — FOURTH DOC TYPE (`995eb9a`)
-    [LIKE-FOR-LIKE]. `docs/design/templates/sdlc-app-runbook.outline.yaml`
-    (22 sections captured verbatim from a real 56-page Informatica-ETL run
-    book) + synthesized `sdlc-app-runbook.example.md` (OrderHub, synthetic
-    SEAL block). Deliberately in `templates/` — OUTSIDE the
-    `docs/design/*-runbook.md` governed-sweep glob, so no rev machinery
-    attaches. +2 outline pins in `test_doc_outline.py`.
-
-77. EXCEL MINIMUM-VIABLE RUNBOOK SKILL (`69e1dbe`)
-    `.claude/skills/controlm-runbook-automation-excel/`: template-spec.yaml
-    (2 tabs: 48 Technical_Details rows + 35 job columns, per-field
-    `source: graph|graph-partial|manual`) -> `generate_template.py`
-    (openpyxl, new dev dep) -> committed xlsx. 31/35 job columns
-    graph-derivable. Synthetic values only (SEAL 70004 — the J15 guard
-    caught the original 90123 on first tracked run; reswept, not
-    allowlisted). FILLED workbooks are Internal — never in the skill dir.
-
-78. CONTROLM-PIPELINE-STUB CAPTURE + OPUS WORK ORDER (`0c77426`)
-    [INTERNAL PATHS]. `internal/controlm-config/reference/
-    controlm-pipeline-stub-capture.md` (verbatim: builder catalog, folder/
-    job-name grammars, Folder.xsd contract, DoMail defaults, inheritance
-    table) + `controlm-pipeline-stub-integration-plan.md` (items X1-X3/
-    W1-W4/V1-V2/E1-E4/F1 for YOUR internal Opus agent; deploy/ = SoD,
-    out of scope). Producer-twin groom trigger inboxed; DD-ids are yours.
-
-79. G36 — :BusinessApplication INDEX DROPS (`ea66764`) [LIVE-VERIFIED
-    desktop `neo4jtest`/`drydocs`]. `businessapplication_status/risk/name`
-    removed AND explicitly `DROP INDEX IF EXISTS`'d (the port_unique
-    belt-and-braces — removing the CREATE alone leaves live DBs carrying
-    the stale claim). Recorded rulings: NO index for `manually_created` or
-    `batch_orchestrator_last_run_id` (offline reporting at registry
-    cardinality). `EXPECTED_CONSTRAINTS` does NOT move — these were
-    indexes, not constraints. Re-run bootstrap after taking this.
-
-80. L20 — FEEDBACK STRAY-FILE GUARD (`c075ee2`, +4 tests -> 1505/5).
-    `DesignDocFeedbackAdapter.stray_files()`: top-level files in
-    `docs/design/feedback/` that are neither `<doc>-rev<N>.yaml` nor
-    README.md become findings; `DocFeedbackLoader` WARNs the list after
-    load (duck-typed — fake adapters unaffected). A standing test asserts
-    the committed feedback tree is stray-free — if YOUR feedback dir holds
-    loose files, it reds correctly; rename or move them, don't exempt.
-
-81. S5 — THE REGISTRY SPLIT [STRUCTURE-BREAKING for tooling; PORT-MANIFEST
-    updated] (`d84d86b`, +10 tests -> 1515/5). BOTH central registries are
-    now fragment DIRECTORIES (`config/taxonomy-ontology-map/`,
-    `drydocs_core/ontology/relationship_vocabulary/`) read by ONE loader
-    (`drydocs_core/yaml_fragments.py`: sorted-filename concatenation, loud
-    on duplicate keys/ids, single files still first-class). Split-time
-    proof: 83+38 entries deep-equal; ONLY entry order changed
-    (domain-grouped) — `schema_graph.cypher` regenerated in the commit.
-    ***YOUR SIDE:*** apply the SPLIT SHAPE, not a conflict resolution — the
-    manifest rows now glob the directories and say exactly that. Any of
-    your own scripts reading the two old file paths must repoint (grep for
-    both names); the reconcile-port snapshot step now writes the MERGED
-    documents (skill + guard docstring updated). Per-entry rules unchanged.
-
-    (Chores in the same range, no separate steps: `5d2d5bc` groom promoted
-    K15 — union by id as usual; claim/close/board/snapshot commits carry
-    only backlog.yaml + renders, all per-entry/derived.)
-
-82. U9 FILTER OFF-BY-ONE — GIT-IGNORED NAMES LEAKED THROUGH RELS
-    [TEST-PINNED by the J15 value guard, which caught it]. A depgraph rel is
-    `[src, TYPE, dst]`; `filter_ignored.py` checked endpoints at [0]/[1] —
-    [1] is the TYPE string — so every CONTAINS rel to a dropped node
-    SURVIVED, carrying git-ignored FILENAMES into the committed snapshot
-    (here: real workbook screenshot names in the repo root). Fix checks
-    [0]/[2] AND requires both endpoints to exist as kept nodes (dangling
-    rels can never leak again). ***YOUR SIDE:*** you run the same script
-    (step 68 retention); take the fix and REGENERATE your newest snapshot —
-    your current one likely carries ignored names in rels the same way.
-
-83. DDLINEAGE RETIRED — TOPOLOGY 5 -> 4 (X1 ADR amendment `bb934d0` + X2
-    sweep `b97636c`) [LIVE-DB MIGRATION on your side]. Nothing ever wrote or read
-    `ddlineage` (writer pinned to `drydocs` w/ TrustBoundaryError; your
-    G30-equivalent spec repoint came in an earlier range) — ADR 0002 now
-    carries a dated amendment retiring it; the deployed set is
-    drydocs/ddcontext/ddall/ddschema (re-derive #4 — that list is a copy,
-    and the LIVE `SHOW DATABASES` is what a drop must be judged against).
-    Sweep: provisioning DDL + ddall
-    alias dropped, provision.ps1 runs 02 twice not three times, smoke
-    reads two constituents, cli.py DOC_SWEEP_DATABASES, dev-environment
-    databases map (+ its key-set speed bump), startup-refresh runbook
-    Rev 9, `ddlineage` JOINED test_database_names' SUPERSEDED_NAMES (the
-    escape regex gained "retire" — a package source may name it only
-    while admitting it is old). ***YOUR SIDE:*** the DDL diff ports
-    like-for-like, but `CREATE ... IF NOT EXISTS` never DROPS: your live
-    `ddlineage` survives a green provision.ps1 run and its removal is a
-    MANUAL migration by your hand — alias out of `ddall` FIRST, then a
-    zero-node emptiness probe, then `DROP DATABASE ddlineage`; a
-    NON-EMPTY probe means something on your side writes a database the
-    producer never did — STOP and treat that as a defect report, not a
-    cleanup (the producer's per-machine drops are backlog X3/X4, same
-    protocol). SUPERSEDED_NAMES will red any company-local module that
-    names `ddlineage` without a retire/supersede admission — that is the
-    sweep finding your stragglers, not a port failure.
-
-    ***RIDER (2026-08-05) — BOTH PRODUCER DROPS ARE NOW DONE, and they
-    taught two things worth having BEFORE you run yours.*** X3 closed on
-    the desktop container and X4 on the laptop (`e495e88`, `e164e7f`);
-    both probed zero nodes AND zero relationships first, so neither was
-    a defect report. (1) **ALIAS-FIRST IS PLATFORM-ENFORCED, not just
-    good manners** — `DROP DATABASE ddlineage` attempted ahead of the
-    alias was REFUSED outright with `42N82, cannot drop database with
-    aliases`, changing nothing. If you get 42N82 you have the order
-    wrong, not a broken database. (2) **The clause order is
-    `DROP ALIAS <name> IF EXISTS FOR DATABASE`** — NOT
-    `DROP ALIAS <name> FOR DATABASE IF EXISTS`, which parses as a
-    different statement and fails. (The alias name is back-quoted in
-    Cypher because it contains a dot: `ddall.ddlineage`.) Also measured: `db.labels()` on the emptied
-    database still returns `[DataAsset, ControlMJob]`; that is the label
-    TOKEN store the 02_proxy_constraints pass registered, not data. A
-    token is not a node — probe with node/relationship COUNTS, or you
-    will talk yourself out of a legitimate drop. On the laptop the drop
-    statements had to be run by the operator by hand (the agent's
-    permission layer refused them on every route), so budget for a
-    human step rather than an unattended one.
-
-84. DEPGRAPH INSTRUMENT — PIN BUMP + A CURRENCY CHECK ON THE RITUAL
-    (`299af39`, `a782860`). The depgraph sibling consolidated onto its
-    own main at `773fb1e`; the pin in `config/dev-environment.yaml`
-    moved `5006567 -> 773fb1e` and the sibling checkout was pulled to
-    match. `snapshot.ps1` now compares the checkout it is about to run
-    against that pin and classifies ahead / behind / diverged / unknown.
-    It **WARNS, never refuses** — a snapshot taken on a drifted
-    instrument is still a snapshot, and a ritual that blocks gets
-    skipped. ***YOUR SIDE:*** `knowledge/depgraph-snapshots/**` is
-    canonical-producer (tooling ports) while `*.json` is never-port
-    (outputs never cross) — that row pair is unchanged and still
-    correct. The `depgraph:` block in `config/dev-environment.yaml` is
-    canonical-company: your fork lives at a GHE remote and your pin is
-    your own, so **take the script, keep your block**. One defect worth
-    knowing because it was caught only by a test matrix and not by
-    running it: the first classifier compared a freshly-read `HEAD`
-    instead of the resolved pin commit, and cheerfully reported
-    "behind" as "ahead".
-
-85. S4 — THE CONSOLE DRAFT SUBSTRATE (`0f87fb2`, + mapping-store runbook
-    Rev 2 `f7c0502`). `var/mapping.db` gains a `draft` table and a
-    `v_open_drafts` view; `SCHEMA_VERSION` -> `drydocs.mapping-store.v2`;
-    `build()` now CARRIES drafts across a rebuild instead of losing
-    them. `drydocs_api` gains draft writes (`/mappings/drafts`,
-    `/mappings/drafts/{id}/promote`) that return a receipt and emit an
-    ADDITIVE unified diff rather than editing config in place — ADR 0009
-    rule 5, propose in the DB and land in git. ***YOUR SIDE:*** this is
-    the first thing that ever WRITES to the mapping store, so the
-    runbook line "nothing here can lose data because it is all derived"
-    stopped being true the day S4 landed; Rev 2 says so. `drydocs_api/**`
-    and `drydocs_core/**` are evaluate-on-collision — your QuerySpecs
-    legitimately differ, so hand-merge rather than adopt.
-
-86. J30 — `wip/k9-laptop` DISPOSED (`5467476`). A long-lived producer
-    branch was audited against `main` and deleted; the one thing it held
-    that `main` lacked — `app_code_migrations()` and
-    `app_code_migration_report()` — was lifted into `drydocs_api`. Pure
-    producer housekeeping; carried here only so the API surface delta is
-    attributable rather than appearing from nowhere in a diff.
-
-87. G54 — `provision.ps1` IS EXEC-AWARE: A DOCKER-ONLY HOST PROVISIONS
-    WITH NO FLAGS (`13e1de6`, `f03a810`, `b1501ea`). `cypher-shell` ships
-    INSIDE the Neo4j image (`/var/lib/neo4j/bin/cypher-shell`), so a
-    machine whose only Neo4j is the container has none on PATH — the
-    documented invocation could not complete there, and the header used
-    to claim the image satisfied a requirement that is true of the IMAGE
-    and not of the PATH. The script now detects that and falls back to
-    `docker cp` + `docker exec … -f`, reading the container name from
-    `config/dev-environment.yaml` (`neo4j.container`), overridable with
-    `-Container`, forceable with `-ForceDockerExec`; it announces which
-    transport it took, and pins the IN-container address to
-    `bolt://localhost:7687` because the host port mapping is a host fact.
-    ***YOUR SIDE:*** the SCRIPT is portable and needs no edit — it reads
-    whatever container name your own `config/dev-environment.yaml`
-    declares (canonical-company, so keep yours). What is not portable is
-    the header's `docker run` block: container, ports, image tag and
-    source, credential handling are yours to re-author.
-    **A CORRECTION THAT MATTERS TO YOU SPECIFICALLY:** J29 (step 74)
-    left a note here saying PS 5.1 pipes inject a BOM. That was stated
-    too broadly, and a company screenshot disproved it — the pipe works
-    on a default ANSI-codepage console and fails only where the console
-    output encoding carries a preamble (`chcp 65001`, where
-    `[Console]::OutputEncoding.GetPreamble().Length` is 3). The note is
-    corrected in `drydocs_core/schema/provisioning/README.md`. `docker cp`
-    + `-f` sidesteps
-    console encoding entirely and is what the script does, so the
-    RECOMMENDATION is unchanged; only the reason was wrong. A rule
-    stated too broadly gets ignored the first time someone watches it
-    not apply.
-
-88. V-SERIES — MODULE RUNBOOKS, AND COVERAGE BECAME A TEST
-    (`d11f6c0` V1, `b8eed6d` V8, `523b929` V2, `23889eb` V3, `0b67b66`).
-    Three new module runbooks — `drydocs-api`, `drydocs-core`,
-    `drydocs-load` — each carrying a `- **Module:** <name>` front-matter
-    line, plus `tests/unit/test_runbook_coverage.py`, which asserts every
-    module in `MODULE_MAP` either HAS a runbook or sits in a named
-    exemption with a written reason. `RUNBOOK_PENDING` is shrink-only
-    (the N2 `LEDGER_PENDING` idiom): six modules remain on it. ***YOUR
-    SIDE:*** `docs/design/**` is `evaluate`, deliberately not
-    canonical-producer — the controlm-ingestion-tdd rows are the
-    precedent for a doc you finalize becoming your own canonical-company
-    row. The coverage guard reads YOUR `MODULE_MAP`, so if your module
-    set differs the guard will name the difference; that is the guard
-    working. Worth one warning from the producer's own week: the
-    `drydocs-core` runbook copied the topology database list inline and
-    was stale within HOURS, because X1 retired `ddlineage` the same day.
-    It now READS the list instead. Copy nothing into a runbook that a
-    one-liner can re-derive.
-
-89. RUNBOOK CURRENCY — THE SECOND GUARD, BECAUSE COVERAGE IS NOT TRUTH
-    (`fa6e6e0`). V1 proves a runbook EXISTS. It says nothing about
-    whether the runbook is still TRUE, and on one day that gap cost
-    three separate catches, every one of them found by a person noticing
-    rather than by a test. `tests/unit/test_runbook_currency.py` checks
-    that the things a runbook NAMES still exist: repo-relative paths in
-    backticks, and `drydocs` CLI verbs. It found four stale paths on its
-    first run — two from the S5 monolith->directory split, one package
-    relocate, one file that never existed — the class of change that
-    updates every importer automatically and every DOCUMENT not at all.
-    It also caught its own author, in the very rev note describing the
-    error it was written for: **backticks are an existence claim**, so a
-    note explaining that an earlier revision cited a dead path must
-    quote that path as plain text. ***YOUR SIDE:*** it cannot prove a
-    SENTENCE is still true — "nothing here can lose data" is not
-    detectable by grep — so it narrows the gap rather than closing it.
-    `HISTORICAL_PATHS` is the exemption dict, shrink-only, reason
-    required.
-
-90. N6 — ONE LOAD SEQUENCE, TWO PROFILES, AND THE RULING RECORDED
-    (`7884b23`, with `7a60e99` as its precursor). Two files told an
-    operator what to run — `scripts/ingest.sh` and the startup runbook's
-    Appendix B — each carrying its own ordered list. They disagreed by
-    five steps and NOTHING recorded whether that gap was a decision.
-    **That ambiguity was the defect, not the step counts:** a deliberate
-    subset and a forgotten step look identical from outside. The ruling:
-    the scheduled list is deliberately shorter (a Control-M ingest is
-    not a full refresh), and each standing step it skips now carries a
-    reason in `cli.SCHEDULED_INGEST_EXCLUSIONS` — `refresh-reference` is
-    a weekly chain on another cadence; `load-software-registry` and
-    `load-bmc-docs` are repo-triggered corpora; `docs-verify` would FAIL
-    that path by design, and under `set -e` would abort an ingest over a
-    reconciliation never meant to hold there. Appendix B's omission was
-    NOT deliberate and it gains `docs-verify` (runbook **Rev 10**).
-    Mechanically: sequence steps widen from 3-tuples to a named
-    `LoadStep` carrying `profiles`; `LOAD_PROFILES` +
-    `load_profile(name)`; `ingest.sh` READS its profile at run time and
-    has no list left to drift; `tests/unit/test_load_sequence_surfaces.py`
-    holds Appendix B to the same declaration. The precursor `7a60e99` is
-    the exhibit: `bootstrap-schema-graph` ran in BOTH operator surfaces
-    while missing from the declaration, so the published load map
-    counted 15 steps where both real paths ran 16 — the old completeness
-    check walks `COMMAND_LOADERS` and therefore only ever reaches
-    loader-backed verbs. The new guard starts at the SURFACES and works
-    inward, which is the direction that catches a non-loader verb.
-    ***YOUR SIDE — READ THIS AS NEW STRUCTURE, NOT A DIFF.*** Run
-    re-derive #3 first: an ImportError is the honest answer that your tree
-    has no declaration yet, and after adoption it is how you check the
-    step-vs-profile table above against what you actually shipped. Company
-    `cli.py` still has no `COMMAND_LOADERS` and no
-    `CANONICAL_LOAD_SEQUENCE` at all; that is the open **T19** row, and
-    N6 is the last of the N3–N6 slice it narrowed to. `drydocs/cli.py`
-    is `evaluate` (keep consumer verbs, add producer verbs), so the
-    declaration lands as an addition. If you adopt it, your profile
-    membership is YOUR ruling to make — the reasons above are the
-    producer's cadence, and your Control-M schedule may justify a
-    different subset. What should NOT differ is that the subset is
-    written down: an unexplained omission is indistinguishable from an
-    oversight, which is the whole point.
-    One incidental fix rides along, and it is a warning about guards in
-    general: `test_runbook_currency.py::_cli_verbs` shelled out to
-    `drydocs --help` and PARSED it. On a cp1252 console that decode
-    fails on the box character `┐` (`0x90`) so `stdout` came back
-    `None`, and the rows begin with `│` rather than `|` so the pattern
-    would have matched nothing anyway — which makes EVERY documented
-    verb look unregistered. A tightened regex was measured and did agree
-    exactly (37/37), and was still the wrong fix. It now reads
-    `app.registered_commands`: **never parse a render when the object is
-    importable.**
-
-91. K15 — THE JOB-GRAIN /mappings PANE RETIRED, NOT RE-BOUND (`192c510`)
-    [SME-RULED direction; web/API only]. Closes the step-66 legacy finding:
-    post-K8 the pane read the retired job-grain edge, reported every row
-    "unresolved", and drafted changesets the server refuses. The SME fact
-    that settled RETIRE over re-bind: a folder and its jobs carry the SAME
-    app code, so a job-grain grid is N× rows of one folder-level fact.
-    QuerySpec `mappings.attribution-coverage.v1` DELETED; the API domain row
-    stays `available: false` so a bookmarked tab renders visibly retired
-    rather than vanishing; MappingsRoute drops ~495 lines and defaults to
-    app-code-mapping. Your console carries the same dead pane after steps
-    63/66 — take this with them.
-
-92. GATE PROMPTS DRAFTED, NOTHING RULED [UNRULED] (`6244347`, `8d45832`).
-    Three new prompts await SME: software-version-context (loads at the
-    AppUser grain — the version rows are (fid-name, install-path) facts, and
-    the application is reached only through a MUTABLE ownership join, which
-    is why it is TWO gates not one), fid-identity-scope, and G32
-    content-topology. `6244347` also carries the naming-standard corrections
-    the version evidence forced — those port like-for-like. The prompt FILES
-    port; no config flips until signed. Your gates.json open list grows by
-    three on re-render — J28 working, not drift.
-
-93. S10 — REFUSE A PRE-CUTOVER GRAPH INSTEAD OF MINTING THE TWIN
-    (`04b267a`) [TEST-PINNED; born from YOUR 2026-08-04 incident — see the
-    T23 row]. `drydocs/loaders/app_identity.py` adds
-    `PreCutoverApplicationGuard`, mixed in on all four loaders that MERGE
-    the canonical `:BusinessApplication`; the check runs BEFORE preflight
-    and before `_open_run`, so a refused load writes NOTHING — not even the
-    :JobRun — and the refusal message carries the remedy (backfill or
-    rebuild, count duplicates first), not just the symptom. The coverage
-    test derives the MERGE-site list from the .cypher files, so a fifth
-    site added without the guard reds. Fixed in passing:
-    `batch_port_orchestrator`'s endpoint probe leaned on the deprecated
-    seal_id alias. ***YOUR SIDE:*** the guard PREVENTS the crash you
-    already hit; it does not repair live state — the S3 re-key/backfill
-    stays T23, exactly as that row says. Suite 1575/5 at this commit.
-
-94. C24 — catalog_lobs + dev_teams STOP BLANKING ON A SPARSE REFRESH
-    (`6a45a02`) [TEST-PINNED]. The two loaders step 70 inboxed, closed:
-    `catalog_lobs.cypher` coalesces BOTH `code` and `name` (code was losing
-    data on every id-only refresh — the more visible loss); `DevTeamRow.name`
-    goes optional with ''→None (a required name rejects a sparse row
-    wholesale, `last_seen_at` never advances, and an unrefreshed team reads
-    as retired); `team_id` stays required — optionality never leaks into
-    keying. The C22 parametrized coalesce pin now covers FIVE loaders, so a
-    sixth gets caught by the same test. ***YOUR SIDE:*** like-for-like;
-    same re-run note as step 70.
-
-95. W1–W3 + THE fcdo-crosswalk GATE — FCDO ALIGNMENT BUILT, SIGNED, AND THE
-    CORPUS ACTIVATED [SME-SIGNED] (`eaa4469` W1, `46a2b8c` W2, `2e4e726` W3;
-    gate `44a91ab` 13/13; activation `f53885d`). NEW
-    `config/crosswalks/fcdo-vocabulary.yaml` — 8 rows binding DryDocs terms
-    to standard CURIEs (PROV-O/DCAT/SKOS/ADMS/RDFS/OpenLineage),
-    mechanism-only (a test forbids firm-namespace strings). Its schema is a
-    SIBLING (`drydocs.vocab-crosswalk.v1`): `crosswalk.py` gains
-    `SIBLING_SCHEMA_IDS` so the orchestrator-crosswalk loader SKIPS it in
-    the directory scan while unknown schemas still fail loudly — take the
-    loader change, the config and `tests/unit/test_fcdo_crosswalk.py`
-    TOGETHER or the scan refuses the new file. Gate outcome: all rows
-    confirmed EXCEPT row 5 (loader envelope ↔ Descriptive Metadata),
-    blocked-on-recapture; the test pins the signed statuses. W2 registered
-    the property/enum alignments PLANNED on three landing spots
-    (ControlMJobRun Run semantics, SKOS-required attrs as the enum-gate
-    idiom, ColumnShape names); W3 documented the builder skill. The
-    `fcdo-frameworks` doc corpus flipped `confirmed: true` by user ruling
-    (gate-log RECORD; plus an audit-fields stub entry — `test_audit_fields`
-    requires one for every confirmed source, take them together).
-    ***YOUR SIDE:*** (a) gate ADOPTION is two-tier as always; the file
-    lands under the COMPANY enforcement-matrix row id `crosswalks`
-    (standing divergence above); (b) the row-5 recapture is YOURS — the
-    ruling waits on the company-side Confluence scrape, so that residue
-    closes on your side first.
-
-96. K18 — PLATFORM APP CODES CAN NO LONGER MASQUERADE AS TIER-1; `tier` →
-    `row_kind` ON EVERY SURFACE [TEST-PINNED; FORMAT-BREAKING company-side —
-    joins the T23 migration family] (`1386faf`; claim + the disagreement
-    rule on the item `1755f9b`). THE RENAME, precisely — five surfaces move
-    together, and taking a subset strands the others:
-    (1) `config/overrides/app-code-mappings.csv` header column `tier` →
-    `row_kind`; (2) the mapping-store column + views, `SCHEMA_VERSION` →
-    `drydocs.mapping-store.v3` (derived — rebuilds; S4 drafts carry);
-    (3) the wire (`AppCodeEntry.row_kind` in `mappingsApi.ts` /
-    `drydocs_api`); (4) the row model (`FolderAttributionRow.row_kind`);
-    (5) the EDGE PROPERTY — `folder_attribution.cypher` writes
-    `r.row_kind`, not `r.tier`, on BELONGS_TO_APPLICATION folder edges.
-    The K2 match-precedence tiers deliberately KEEP the word "tier" — no
-    property of theirs surfaces, and the value spaces never collided.
-    BEHAVIOR: the loader derives a row kind from PRAOCG name positions 3–5
-    against a CLOSED six-code platform list read from
-    `internal/standards/technology/platform-codes.yaml` (internal/ =
-    never-port; a missing file leaves the guard INERT, so a tree without a
-    twin behaves pre-K18). A platform-prefixed code never fans out even
-    when authored seal-born; a code-level platform DECLARATION now
-    REQUIRES `app_id` — the platform's OWN SEAL — plus rationale
-    (declare-by-absence retired; the legacy empty-app_id shape still reads
-    as a declaration, defensively). THE DISAGREEMENT RULE (SME, recorded
-    on the item): two row-kind signals never resolve silently — derivation
-    wins for BLOCKING fan-out, and every disagreement queues for a human
-    (`RowKindDisagreement` in coverage + a JobRun count); the inverse
-    direction (row says platform, name says application) queues without
-    blocking anything.
-    ***YOUR SIDE — FORMAT-BREAKING, sequence with steps 62/63:*** (a) your
-    tier-authored CSV rows re-author under the new header AND the
-    app_id-required rule in the same change that takes the store/loader;
-    (b) live `r.tier` edges migrate with the K8/T23 reload — one more
-    reason that migration is a single event, not a series; (c) the steward
-    pane gains a fourth authoring mode, "platform DECLARATION", where the
-    application you pick is the platform's own; (d) author YOUR OWN
-    platform-codes twin from your frameworks — the producer's six values
-    are its capture, not a contract. Suite 1597/5 at head (chain figure
-    below). K19 (the follow-on) is producer-backlog, not in this range.
-
-97. K19 — A MAPPING IS AN AS-OF ASSERTION; REUSED CODES QUEUE FOR REVIEW
-    (`2ef0050`; claim `e4b09c9`) [TEST-PINNED]. The K18 follow-on, and NOT a
-    format break. The 3-char app-code namespace is scarce, so codes get
-    retired and REISSUED with a new meaning (DDC is the documented case);
-    nothing stopped a reused code from silently inheriting its predecessor's
-    mapping. `detect_mapping_age_suspects()` (pure, `folder_attribution.py`)
-    flags any authored row whose `authored_on` strictly predates the
-    first-seen date of a folder it applies to — one suspect per authored ROW,
-    since each row is its own as-of assertion. Same-day is not postdating; no
-    date on either side is no age claim. REVIEW-ONLY and deliberately OUTSIDE
-    the coverage invariant: suspect folders stay attributed, because a
-    reissued code and a growing application are indistinguishable without a
-    human. Surfaced where the steward already looks (coverage `as_dict`,
-    `run.mapping_age_suspects`, a loader warning, the CLI review-queue print).
-    CHOICE recorded: detection only, NO `valid_from`/`valid_to` — effective
-    dating IS preserved mapping history, which routes to a gate, and it would
-    be a second CSV format break (v4) immediately behind K18's v3.
-    ***YOUR SIDE:*** needs `ControlMFolder.first_seen_at` populated or every
-    row reads "no age claim" and the queue is inertly empty — which looks
-    identical to clean.
-
-98. J32 — THE FIELD-MEANING RULE GETS A HOME (`cfccf6a`; claim `10ac1ee`)
-    [prose only — no vocabulary entry, no map entry, no loader change].
-    Ownership, routing and attribution are three different facts that all
-    serialize as a SEAL id, and the graph has exactly ONE place where the
-    third is authored — the confirmed app-code mapping. Everything else
-    carrying a SEAL loads as what it IS (a registration, a routing
-    instruction, a corroborating signal), never collapsed into
-    BELONGS_TO_APPLICATION. New standing section in
-    `docs/RELATIONSHIP_GUIDE.md` carrying the rule, the test for any new
-    source (ask what the field's JOB is, not what it contains), and three
-    observed instances as evidence. Rider: the AutoSys README now points at
-    the guide as the canonical home.
-    ***YOUR SIDE:*** take it before your next SEAL-bearing source, not after.
-
-99. CODE-GRAPH — CONTAINMENT TREE + MEDIA-TYPE LAYER (`d7ae7af`, merged
-    `78a2d92` `--no-ff`) [SME-RULED in-session 2026-08-05; LIVE-VERIFIED
-    desktop / `neo4jtest` / `drydocs` DB]. Admits the two decisions G33
-    deferred: directories enter the graph, and the non-`.py` majority gets
-    typed. `:CodeDirectory` (prov:Collection, keyed `file_id`) +
-    `CONTAINS_ENTRY` (prov:hadMember), ONE label for the whole tree so
-    traversal is a single `-[:CONTAINS_ENTRY*]->`; the repo-root dir maps
-    onto the existing `:Project`. New `code_tree.v1` loader running after
-    `code_snapshot.v1` in `load-code-snapshot`. `HAS_MEDIA_TYPE`
-    (dcat:mediaType) with 22 seeded `:MediaType` terms — 18 IANA-registered
-    (iri = the registration page) + 4 conventional under
-    `drydocs.local/format#` with `registered:false`; extensions with neither
-    binding stay UNBOUND and CLI-reported, never guessed.
-    **CONSTRAINT COUNT 52 → 53** (`codedirectory_file_id`) — your
-    `EXPECTED_CONSTRAINTS` moves a SECOND time (it went 54→55 at the step-82
-    port). ***THE CAUTION:*** `CodeTreeAdapter` keys its maps on RAW snapshot
-    ids — after prefix stripping the repo root and the `drydocs/` package dir
-    COLLIDE. Live: 1537 module + 264 dir rows, 0 rejected.
-
-100. SFS TYPING CORRECTION — SNOWFLAKE IS A TARGET DB PLATFORM, NOT ETL
-    (`ceff696`) [SME-RULED in-session 2026-08-05] [RECORD-CORRECTION].
-    "Snowflake ETL" in the captured DAT SRE table names the
-    loads-into-Snowflake JOB FAMILY the SFS code marks — not a software
-    product. Consequence for the C25 prerequisite: the second missing
-    software-registry row is `snowflake` the DATA PLATFORM (DBMS family,
-    sibling of `oracle-db`), never a Snowflake ETL tool row, and an
-    SFS-derived edge reads loads-into-Snowflake, not
-    runs-a-Snowflake-ETL-framework. Recorded in both folder-naming twins and
-    the platform-codes values twin (comment only — the K18 guard reads the
-    CODE, all six still parse); the captured DAT table stays verbatim.
-    ***YOUR SIDE:*** if you already authored a Snowflake registry row, check
-    which family it landed in before C25.
-
-101. G35 — THE SEAL TOM ROLE VOCABULARY: gate drafted, four clauses ruled,
-    and ONE CODE FIX APPLIED AHEAD OF SIGN-OFF [SME-RULED; the fix
-    TEST-PINNED; **the gate itself UNSIGNED**] (`867eadb`, `b79f691`,
-    `3df06de`, `80fd9a1`, `80180c1`, `e5c5adc`, `50337ad`, `67daf0a`;
-    O44 groom `ba712af`+`4188f81`; Idea-75 `d0123d5`).
-    **THE ONLY PART THAT CHANGES BEHAVIOR is `50337ad`**, and it is a data-loss
-    fix: `drydocs_core/models/seal.py` gains `SealRole.OPERATE_MANAGER` and
-    re-points `_ROLE_CANONICAL["operate manager"]` from `"L2 Operate Manager"`
-    to `"Operate Manager"`. Before it, a bare Operate Manager row was
-    rewritten to L2 and MERGEd onto that person's genuine L2
-    `attribution_id` — three source holdings became two, silently, survivor
-    decided by batch order. NEW `tests/unit/test_seal_roles.py` (the module
-    had NO tests) pins the invariant, not the instance: no alias may resolve
-    to a canonical name asserting a level the alias does not itself name.
-    RULED BUT NOT APPLIED — nothing ontological moved, the scheme still seeds
-    7 concepts and `seal_contacts.cypher` still has its 4-branch crosswalk:
-    L1/L2/bare Operate Manager are three classes; the `tech partner`→`CTO`
-    alias STAYS (verified NOT a K5 breach — `HAD_ROLE` is minted only on a
-    crosswalk hit and `cto` is not a branch); CBT is an optional class
-    deliberately left unmapped so it loads flagged. Four clauses reached
-    `config/gate-log.md` as two RECORD entries — the convention for a
-    confirmed clause inside an unsigned gate.
-    ***YOUR SIDE — CHECK BEFORE YOU RELOAD:*** if your real contact extract
-    carries a bare "Operate Manager" alongside an L2 for the same person on
-    the same app, those two have been ONE node. Taking `50337ad` makes them
-    two, so it is a re-key, not a no-op. Producer has no bundled SEAL sample
-    to reproduce with (both `seal_*__sample.csv` were deleted at `9d59f53`
-    for carrying real seal_ids and never replaced), so this was measured on
-    the synthetic taxonomy capture: 13 rows → 9 validating → 8 attributions
-    before, 9 after.
+115. THE PORT-MACHINERY TRIO — J34 + J35 + J38, one branch, three commits
+    [STRUCTURE for your manifest copy]. J34: the overlay seam — your ONE-TIME
+    migration of the 89 company-only default_ok paths into
+    PORT-MANIFEST.company.yaml happens at THIS port (standing-divergence bullet
+    has the procedure). J35: this roll, the mandatory closing sequence (header)
+    and SHA-stamped citations (guardrail 8). J38: the RELAY section above the
+    tracker — read it at every port from now on.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
