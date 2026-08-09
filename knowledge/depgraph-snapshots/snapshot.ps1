@@ -20,6 +20,11 @@
   The header is prepended to depgraph's JSON (formatting preserved, no BOM) so the
   viewer (viewer.html) shows the version and JSON diffs stay clean.
 
+  U15 — `dirty` on both sides of the header means TRACKED changes only, and
+        `untracked_present` is recorded beside it. One boolean over both used to
+        say "dirty" when the only dirt was a scratch file, which reads as "the
+        commit named here does not describe what was scanned" and is false.
+
   Post-processing steps keep the series trustworthy rather than merely present:
     U7 — record the INSTRUMENT (depgraph commit/branch/capabilities) in the header,
          and refuse to scan when the sibling checkout cannot do what the run needs.
@@ -45,6 +50,39 @@ $Tree = -not $CodeOnly
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 $repo = (Resolve-Path "$here\..\..").Path
+
+# --- worktree state: TRACKED changes and UNTRACKED presence, kept apart (U15) -
+# `git status --porcelain` with no flags lists untracked files too, so a single
+# boolean read `dirty` whenever any stray scratch file sat in the tree. The
+# 20260805 snapshot recorded dirty=true at exactly the pinned commit, the "dirt"
+# being three untracked paths -- which tells a reader the opposite of the truth:
+# that the committed code differs from what was scanned. The two facts answer
+# different questions, so they are now two fields:
+#
+#   dirty             do TRACKED files differ from HEAD? This is the provenance
+#                     question -- does the commit in this header actually
+#                     describe the code that was measured?
+#   untracked_present are there untracked paths in the worktree? Housekeeping
+#                     for the repo side; for the INSTRUMENT side it is closer to
+#                     provenance, because depgraph is run out of its checkout
+#                     and an untracked .py there is code that could take part in
+#                     the scan without appearing in any commit.
+#
+# `dirty` KEEPS ITS NAME rather than becoming dirty_tracked: it is loaded onto
+# :Project as git_dirty (drydocs/loaders/cypher/code_snapshot.cypher) and every
+# committed snapshot in the series carries it. What changes is that it now means
+# what its readers already assumed it meant.
+function Get-WorktreeState {
+  param([string]$Path)
+  # Two commands rather than one parse of --porcelain: each states its own
+  # question, and neither depends on the caller's location.
+  $tracked   = @(git -C "$Path" status --porcelain --untracked-files=no)
+  $untracked = @(git -C "$Path" ls-files --others --exclude-standard)
+  return [ordered]@{
+    dirty             = ($tracked.Count   -gt 0)
+    untracked_present = ($untracked.Count -gt 0)
+  }
+}
 
 # --- refresh the project board (best-effort; part of the session-end ritual) --
 # backlog.yaml -> docs/plan/board.html. Deterministic render: a resulting git
@@ -108,7 +146,15 @@ Push-Location $dep
 $depCommit = (git rev-parse --short HEAD).Trim()
 $depFull   = (git rev-parse HEAD).Trim()
 $depBranch = (git rev-parse --abbrev-ref HEAD).Trim()
-$depDirty  = ((git status --porcelain | Measure-Object).Count -gt 0)
+$depState      = Get-WorktreeState $dep
+$depDirty      = $depState.dirty
+$depUntracked  = $depState.untracked_present
+# Rendered once, used in both the refusal and the drift warning below. Untracked
+# paths are reported for the INSTRUMENT because depgraph runs out of this
+# checkout, so an untracked module there can join the scan while belonging to no
+# commit -- which is exactly the kind of thing the instrument header exists to
+# make visible.
+$depStateTxt = "$(if ($depDirty) { ' (tracked changes)' })$(if ($depUntracked) { ' (untracked present)' })"
 $env:PYTHONPATH = "."
 $capsJson  = (& python (Join-Path $here "probe_instrument.py")) -join ""
 Pop-Location
@@ -130,7 +176,7 @@ if ($absent.Count -gt 0) {
 Refusing to scan — the checked-out depgraph cannot do what this run needs.
 
   instrument : $dep
-               $depBranch @ $depCommit$(if ($depDirty) { ' (dirty)' })
+               $depBranch @ $depCommit$depStateTxt
   missing    :
 $($lines -join "`n")
 
@@ -198,7 +244,7 @@ intended revision.
   Write-Warning @"
 instrument DRIFT — the depgraph checkout is not the revision config/dev-environment.yaml pins.
 
-  checked out : $depBranch @ $depCommit$(if ($depDirty) { ' (dirty)' })
+  checked out : $depBranch @ $depCommit$depStateTxt
   pinned      : $pinDesc
   relation    : $rel
 
@@ -218,7 +264,9 @@ $branch   = (git rev-parse --abbrev-ref HEAD).Trim()
 $subject  = (git log -1 --format=%s).Trim()
 try { $describe = (git describe --tags --always 2>$null).Trim() } catch { $describe = $commit }
 if (-not $describe) { $describe = $commit }
-$dirty    = ((git status --porcelain | Measure-Object).Count -gt 0)
+$state     = Get-WorktreeState $repo
+$dirty     = $state.dirty
+$untracked = $state.untracked_present
 $pr = $null
 $m = [regex]::Match(((git log -20 --format="%s %b") -join "`n"), '(?:pull request |PR ?#|\(#)(\d+)')
 if ($m.Success) { $pr = [int]$m.Groups[1].Value }
@@ -255,10 +303,10 @@ $meta = [ordered]@{
   date        = $date
   scan        = ($targets | ForEach-Object { Split-Path $_ -Leaf })
   tree        = [bool]$Tree
-  git         = [ordered]@{ commit=$commit; full=$full; branch=$branch; describe=$describe; subject=$subject; dirty=$dirty; pr=$pr }
+  git         = [ordered]@{ commit=$commit; full=$full; branch=$branch; describe=$describe; subject=$subject; dirty=$dirty; untracked_present=$untracked; pr=$pr }
   # WHICH INSTRUMENT PRODUCED THIS (U7). Without it a scanner regression is
   # invisible in the artifact and shows up only as numbers nobody questions.
-  depgraph    = [ordered]@{ commit=$depCommit; full=$depFull; branch=$depBranch; dirty=$depDirty; version=$caps.version; capabilities=[ordered]@{ multi_root=[bool]$caps.multi_root; tree=[bool]$caps.tree; ts_imports=[bool]$caps.ts_imports } }
+  depgraph    = [ordered]@{ commit=$depCommit; full=$depFull; branch=$depBranch; dirty=$depDirty; untracked_present=$depUntracked; version=$caps.version; capabilities=[ordered]@{ multi_root=[bool]$caps.multi_root; tree=[bool]$caps.tree; ts_imports=[bool]$caps.ts_imports } }
 }
 $metaJson = ($meta | ConvertTo-Json -Depth 6 -Compress)
 $raw = Get-Content $tmp -Raw

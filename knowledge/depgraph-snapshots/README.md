@@ -22,12 +22,27 @@ header** so each snapshot is self-identifying:
   "project": "drydocs", "captured_at": "...", "date": "YYYYMMDD",
   "scan": ["DryDocs"], "tree": true,        // default: one root = the repo; -CodeOnly lists the 7 package roots, tree: false
   "git": { "commit": "<short>", "full": "...", "branch": "main",
-           "describe": "...", "subject": "...", "dirty": false, "pr": <num|null> },
+           "describe": "...", "subject": "...",
+           "dirty": false, "untracked_present": false, "pr": <num|null> },
   "depgraph": { "commit": "<short>", "full": "...", "branch": "main",
-                "dirty": false, "version": "0.1.0",
+                "dirty": false, "untracked_present": false, "version": "0.1.0",
                 "capabilities": { "multi_root": true, "tree": true } }
 }
 ```
+
+**`dirty` counts TRACKED changes only; untracked paths are reported separately** (U15).
+The two answer different questions. `dirty` is the provenance one — do tracked files differ
+from `HEAD`, i.e. does the commit named in this header actually describe the code that was
+measured? `untracked_present` is housekeeping. Until 2026-08-09 a single `git status
+--porcelain` covered both, so the 20260805 snapshot recorded `dirty: true` at exactly the
+pinned commit with three untracked scratch paths as the entire "dirt" — which states the
+opposite of the truth to anyone reading the header. `dirty` keeps its name rather than
+becoming `dirty_tracked`: it is loaded onto `:Project` as `git_dirty` and the whole committed
+series carries it; what changed is that it now means what its readers already assumed.
+On the **instrument** side `untracked_present` is closer to provenance than housekeeping —
+`depgraph` runs out of that checkout, so an untracked module there is code that can join the
+scan while belonging to no commit. Both the capability refusal and the drift warning print
+the two states separately for that reason.
 
 **`git` is what was measured; `depgraph` is what measured it** (U7). Both matter, because the
 scan runs in a *sibling repo* whose checked-out revision decides what the snapshot can see —

@@ -144,6 +144,76 @@ def test_capability_refusal_quotes_the_pin_rather_than_a_frozen_sha() -> None:
     ), "the refusal hardcodes a commit SHA again; it goes stale at the next pin bump"
 
 
+# --- worktree state: tracked vs untracked (U15, 2026-08-09) ------------------
+
+
+def test_dirty_counts_tracked_changes_only() -> None:
+    """`dirty` is a provenance claim, so untracked files must not set it.
+
+    A bare `git status --porcelain` lists untracked paths, so one boolean over
+    both said "dirty" when the only dirt was a scratch file. The 20260805
+    snapshot recorded dirty=true at exactly the pinned commit with three
+    untracked paths as the whole story -- a header that states the opposite of
+    the truth, since a reader takes dirty=true to mean the named commit does not
+    describe the scanned code.
+    """
+    script = _script()
+    assert "--untracked-files=no" in script, (
+        "the worktree-state helper no longer excludes untracked files from `dirty` -- "
+        "a stray scratch file marks the snapshot as not matching its own commit (U15)"
+    )
+    # The defect shape itself, in either spelling. `git status --porcelain` with
+    # no untracked flag is the exact call that conflated the two facts.
+    offenders = [
+        line.strip()
+        for line in script.splitlines()
+        if not line.strip().startswith("#")
+        and re.search(r"git (?:-C \S+ )?status --porcelain(?!\s*--untracked-files)", line)
+    ]
+    assert not offenders, (
+        "a bare `git status --porcelain` is back; it counts untracked paths as dirt:\n"
+        + "\n".join(offenders)
+    )
+
+
+def test_untracked_presence_is_recorded_rather_than_discarded() -> None:
+    """Narrowing `dirty` must not throw the other fact away.
+
+    Both header blocks carry it. On the INSTRUMENT side it is close to
+    provenance rather than housekeeping: depgraph runs out of that checkout, so
+    an untracked module there can take part in the scan while belonging to no
+    commit.
+    """
+    script = _script()
+    assert "ls-files --others --exclude-standard" in script, (
+        "nothing detects untracked paths any more -- the U15 split dropped the fact "
+        "instead of separating it"
+    )
+    meta_start = script.index("$meta = [ordered]@{")
+    meta_end = script.index("$metaJson =", meta_start)
+    meta = script[meta_start:meta_end]
+    for block in ("git", "depgraph"):
+        line = next(ln for ln in meta.splitlines() if ln.strip().startswith(f"{block} "))
+        assert "untracked_present=" in line, (
+            f"meta.{block} records `dirty` but not `untracked_present`; the reader can no "
+            f"longer tell a scratch file from a real divergence"
+        )
+
+
+def test_readme_documents_the_tracked_untracked_split() -> None:
+    """The README is the contract for the header shape -- consumers read it
+    rather than the PowerShell. U12 already pins its currency; this pins the
+    field the U15 change added."""
+    readme = (SNAP_DIR / "README.md").read_text(encoding="utf-8")
+    assert readme.count('"untracked_present"') >= 2, (
+        "the documented meta shape still shows only `dirty` on one or both blocks"
+    )
+    assert "TRACKED changes only" in readme, (
+        "the README does not say what `dirty` now means, so a reader will keep the old "
+        "reading of a field whose meaning changed"
+    )
+
+
 def test_powershell_keeps_non_ascii_out_of_quoted_strings() -> None:
     """PS 5.1 decodes a BOM-less .ps1 as the ANSI codepage.
 
