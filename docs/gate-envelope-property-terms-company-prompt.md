@@ -40,6 +40,18 @@ the tells that were visible without the command: the heading cites a PRODUCER
 backlog id (F1/F2/M3/M4/O20), the signer and date match the producer's exactly,
 and the producer's `confirmed:` comment string is byte-identical to yours.
 
+**READ THE COMMIT SUBJECT — your two kinds of gate-log commit are visibly
+different, and that is the fastest discriminator.** Evidenced from your own
+history:
+
+    port(cewilson): apply eeaffa2..f7970e5 ...        <- PORTED. not your ratification.
+    gate(ratify): seal-app-ref-edge-reshape company ratification ...   <- YOURS.
+    platforms: SME gate CONFIRMED (Wilson, ...) ...                    <- YOURS.
+
+Use a GATE ID as the search string, never a prose word. `-S "AutoSys"` returned
+six commits because the word appears throughout the log; `-S "autosys-crosswalk"`
+matches the entry that names the gate file and nothing else.
+
 The strongest POSITIVE evidence is content the producer has never seen: an entry
 that rules company-only rows cannot be a ported artifact.
 
