@@ -614,6 +614,17 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   the requires-scheduler map open questions: names have diverged across repos; entries
   stay planned/proposed (inert). Resolve at the company platforms gate, not by editing.
 
+> **IDS RENAMED 2026-08-09 — `R<n>` → `RELAY-<n>`, and the reason is a real
+> misfire, not tidiness.** Relay ids collided head-on with Epic R backlog ids:
+> `R1`–`R5` exist in BOTH namespaces and are meaningful in both. Asked to
+> confirm relay R3(b), the company session searched for the literal string
+> "R3(b)" — which does not appear, because the sub-clauses are `(a)`/`(b)`/`(c)`
+> bullets under the relay heading — then anchored on backlog `R3` (the
+> `:AgentRun` telemetry item) and answered a question nobody asked. The same
+> collision bit twice in one investigation: it also read relay `R1` as the
+> ADR 0007 R1-gate. Old ids are kept in the headings so a reader who remembers
+> `R3` still lands on `RELAY-3`. Cite sub-clauses as `RELAY-3(b)`.
+
 STANDING RELAYS (J38 — read this section at EVERY port; it is the channel the
 producer's "tell the next company session" notes travel by, replacing the idea
 inbox, which your repo never reads. Rules: every relay is RE-VERIFIED at the
@@ -622,7 +633,7 @@ than none; a discharged relay is STRUCK with a dated reason, never silently
 deleted; action a relay in the port that carries it or record why not in the
 PORT-REPORT):
 
-- **R1 — AIS acronym expansion: transplant the VALUE across files** (standing
+- **RELAY-1 (was R1) — AIS acronym expansion: transplant the VALUE across files** (standing
   since 2026-07-21; re-verified at the 2026-08-09 roll). Producer's
   authoritative home is `config/taxonomy/software-registry.yaml#acronyms`
   (`AIS: "Application Integration Streaming"`); YOUR provisional gloss sits in
@@ -632,7 +643,7 @@ PORT-REPORT):
   correspond. Rider from the same note: your 06-29 gate (the Ais* class
   removal) has no company gate-log entry — an audit gap on your side; the
   producer offered a backfill.
-- **R2 — run-log adoption asks** (standing since 2026-07-22; re-verified — the
+- **RELAY-2 (was R2) — run-log adoption asks** (standing since 2026-07-22; re-verified — the
   run-log family in `drydocs_core/run_log.py` + BaseLoader wiring is long
   ported). Two asks remain YOURS because they sit in your adapter code: (a)
   attach the WARN-stream tee in the XML EXTRACTOR stage — the
@@ -640,7 +651,7 @@ PORT-REPORT):
   loader-stage tee never catches it; (b) once the stream lands in a file,
   consider raising the console handler to WARNING-summary-only — the file is
   the review surface, the console shows counts.
-- **R3 — 2026-07-21 port-report heads-ups, re-verified 2026-08-09:**
+- **RELAY-3 (was R3) — 2026-07-21 port-report heads-ups, re-verified 2026-08-09:**
   (a) `test_schema_graph.py` drift-guard sequencing — re-add that test ONLY
   after your own doc-vocab gate; the trap is written in the reconcile-port
   skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
@@ -652,7 +663,7 @@ PORT-REPORT):
   (c) ~~remote-URL/fetch defect (stale pre-rename `cewilson` remote; fetch
   404s)~~ — **STRUCK 2026-08-09: resolved 2026-08-06** (SME confirmed fetch
   works; the fetch note at the top of this file carries the standing lesson).
-- ~~**R4 — the J34 overlay migration (one-time):** move your company-only
+- ~~**RELAY-4 (was R4) — the J34 overlay migration (one-time):** move your company-only
   `default_ok` paths into `PORT-MANIFEST.company.yaml`.~~ — **STRUCK 2026-08-09:
   DISCHARGED at PORT-REPORT-0d3761a9.** Done atomically, which is what made it
   work: the producer manifest and the overlay guards were taken in the SAME
@@ -663,7 +674,7 @@ PORT-REPORT):
   with the overlay covering them. A verbatim manifest take can no longer drop a
   company-only disposition — the 2026-08-06 clobber (Idea-79) is structurally
   fixed, not procedurally avoided.
-- **R5 — DPL + Snowflake registry entries: the producer is canonical, and you
+- **RELAY-5 (was R5) — DPL + Snowflake registry entries: the producer is canonical, and you
   were mid-flight on the same change** (new 2026-08-09, gate
   `software-version-context` / C25). The SME began this expansion COMPANY-SIDE
   on 2026-08-07 and stopped deliberately so the two copies would match, so this
@@ -674,7 +685,7 @@ PORT-REPORT):
   never an ETL product), the new `in-house` vendor with **no** `publisher_url`,
   and `DPL: "Data Pipeline Library"` in `acronyms:`.
   THREE RIDERS, each of which has already cost something if skipped:
-  (a) Take the VALUE across files if your copy diverges, exactly as R1 requires
+  (a) Take the VALUE across files if your copy diverges, exactly as RELAY-1 requires
   — that lesson was learned on an acronym that lives in a different file on
   each side, and this change touches the same `acronyms:` block.
   (b) `versions: []` on `dpl` is DELIBERATE. The container base image is
