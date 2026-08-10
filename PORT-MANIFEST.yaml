@@ -487,36 +487,34 @@ rows:
   - path: "internal-local/**"
     disposition: never-port
     note: "gitignored; travels by hand only, never by git"
-  # ---- staged packs: REMOVE AT THE PUSH, AND ONLY THREE OF THE FIVE ----
-  # The delivering port merged company-side 2026-08-09 but sat UNPUSHED. An
-  # unpushed merge is local state on one machine: remove these rows against it
-  # and a branch reset strands the files. Remove at the PUSH, not the merge.
-  # Then only the three DISCHARGED packs go (audit-envelope-phase4,
-  # envelope-property-terms, ui-write-surface). The two CROSSWALK rows STAY:
-  # those prompts are live-but-deferred and carry edits made AFTER delivery
-  # (91f4845: the SME deferral, the DEFERRED branch, the J28 fix). Drop their
-  # rows and the never-port glob below reasserts, so the deferral a future
-  # company session most needs to read never reaches it.
+  # ---- staged packs: THREE RETIRED 2026-08-09, TWO DELIBERATELY RETAINED ----
+  # The delivering port merged AND PUSHED company-side 2026-08-09, which is the
+  # trigger step 108 names. The three DISCHARGED packs are retired: their rows are
+  # gone from here and the producer originals moved to internal-local/archive/,
+  # so the never-port glob below now covers them (audit-envelope-phase4 RATIFIED
+  # @ company 838857e7; envelope-property-terms discharged on structure;
+  # ui-write-surface RATIFIED @ company 48252f72).
+  # THE TWO CROSSWALK ROWS BELOW STAY, and this is not an oversight. Those prompts
+  # are live-but-DEFERRED and carry edits made AFTER their first delivery
+  # (91f4845: the SME deferral with its ingestion precondition, a new DEFERRED
+  # branch in step 1, and a J28 fix -- autosys had said "heading-named or cited",
+  # admitting the exact body citation the rule exists to exclude). Drop these two
+  # rows and the never-port glob reasserts, so the deferral a future company
+  # session most needs to read never reaches it. They come out when the crosswalk
+  # ratifications are actually run, not before.
   - path: "docs/gate-autosys-crosswalk-company-prompt.md"
     disposition: clean-add
     note: "delivery pack drafted 2026-08-07 (F1 status/profile/ratification) — crosses once, then retires per the never-port row below"
   - path: "docs/gate-airflow-crosswalk-company-prompt.md"
     disposition: clean-add
     note: "delivery pack drafted 2026-08-07 (F2) — same lifecycle"
-  - path: "docs/gate-audit-envelope-phase4-company-prompt.md"
-    disposition: clean-add
-    note: "delivery pack drafted 2026-08-07 (M3) — same lifecycle"
-  - path: "docs/gate-envelope-property-terms-company-prompt.md"
-    disposition: clean-add
-    note: "delivery pack drafted 2026-08-07 (M4; run after the M3 pack) — same lifecycle"
-  - path: "docs/gate-ui-write-surface-company-prompt.md"
-    disposition: clean-add
-    note: "delivery pack drafted 2026-08-07 (O20) — same lifecycle"
   - path: "docs/gate-*-company-prompt.md"
     disposition: never-port
     note: "COMPANY-SESSION DELIVERY PACKS, one-way and ONE-TIME: drafted producer-side,
       they cross ONCE as explicit clean-adds (the five 2026-08-07 packs crossed with
-      PORT-REPORT-5417ef10, merged same day). After the delivering port merges, the
+      PORT-REPORT-5417ef10; merged and pushed company-side 2026-08-09, at which point
+      THREE were retired and TWO deliberately retained above -- see that block). After
+      the delivering port merges, the
       COMPANY copy is the live one — their pending sessions (rua-load-shapes
       ratification, source-registry-v2 review, fcdo-crosswalk, cmdline-nfr-vetting)
       read it, and they retire it at their own close-out. Producer originals retire to
