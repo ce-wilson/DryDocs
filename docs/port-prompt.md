@@ -1115,6 +1115,79 @@ regeneration, never-port outputs — and get no step.
     and SHA-stamped citations (guardrail 8). J38: the RELAY section above the
     tracker — read it at every port from now on.
 
+116. O52 — THE ALWAYS-NULL `holder_sid` COLUMN [TEST-PINNED] (`4ecfca0`).
+    `ownership.attributions.v1` read `e.sid`, a property NO loader writes, so the
+    K4 attribution review surface's Holder SID was silently null on a loaded
+    graph: `seal_contacts.cypher` MERGEs `(:Employee {employee_id: ...})` and the
+    spec carried the SOURCE spelling (`employee_sid`) across the MERGE. The
+    one-word fix is not the payload — two guards are: PAIRWISE (both
+    holder_sid-bearing specs must carry the identical expression, so editing one
+    announces itself) and REGISTRY-WIDE (no spec may read a `<alias>.sid` property
+    at all — the rule, not today's instance). Both were proven to FAIL on the
+    reintroduced defect before being trusted (J26). If your QuerySpec registry has
+    diverged, take the GUARDS regardless of the expression.
+
+117. EPIC U — THE INSTRUMENT SERIES [TEST-PINNED] (`06c9f63` U15, `2d104ef` U17,
+    `f8d9dd7` U18, `3bec2b3` + `9270002` U19). U15: snapshot `dirty` counts
+    TRACKED changes only, with `untracked_present` reported separately on BOTH
+    `meta.git` and `meta.depgraph`. U17: the staleness ranking ranks on
+    `claim_lag` and says so, with the `git merge-base --is-ancestor` rule (never
+    `cat-file -t`). U18: the metrics scope is EIGHT package roots, guarded against
+    what pyproject actually ships. U19 is the one that touches you — the orphan
+    queue was **82% scanner artifact**, fixed in the depgraph SIBLING repo
+    (`6ee0af6`) and pinned in `config/dev-environment.yaml`.
+    **T18 INTERACTION:** your depgraph fork still lacks the U6 multi-root
+    resolver, so `capability_assert: false` stays. This pin does not change that
+    — it raises what catching up means.
+
+118. C25 — `software-version-context` SIGNED OFF [SME-SIGNED] (`37a9abb`;
+    prerequisites `aef10c5`, `1e0b6e7`; `0019368` B5). §A–§E and §G ruled, §F
+    blocked. Registers the `snowflake` and `dpl` product rows and the `in-house`
+    vendor — **this is RELAY-5, and it is a RECONCILE, NOT a clean add**: you
+    pushed your own software-registry change carrying the internal URL on 08-07.
+    `33224d5` narrowed the `publisher_url` guard to third-party vendors only,
+    after the first draft would have FAILED your suite for doing the correct
+    thing. B5's terminal medallion stage is PROVISIONED, not SNOWFLAKE.
+
+119. SNOW IS SERVICENOW, NOT SNOWFLAKE (`ed32efb`) + K21 (`8011a04`, `3fcb4b3`,
+    `ebd0174`) [SME-DIRECTED]. Both the `snow` and `snowflake` systems in
+    `source-registry.yaml` now carry a `disambiguation:` key naming the other,
+    guarded so neither can be edited to drop the cross-reference. THE PATTERN IS
+    THE psgmgr ONE, EXACTLY:
+        Control-M   -> Oracle psgmgr replica -> controlm@[db].psgmgr.<table>
+        ServiceNow  -> Snowflake replica     -> snow@[db].[schema].<table>
+    Origin is the SYSTEM OF RECORD; carrier is the STORAGE LOCATION. K21 mined
+    the replica evidence into the TOM mapping
+    (`knowledge/upgrade-plans/servicenow-replica-evidence.md` — Internal-Public,
+    mechanism-only: `[db]` / `[schema]` / `x_<scope>_` placeholders throughout,
+    source screenshots gitignored). NOTHING IS ADOPTED — no source activated, no
+    loader built, no gate signed; it feeds G35 and the TOM reshape.
+
+120. THE RATIFICATION-PROVENANCE RULE, AND ALL FIVE STAGED PACKS RESOLVED
+    [SME-SIGNED / RECORD-CORRECTION]. The largest thing in this range; read it
+    before the rest, and read OWED COMPANY-SIDE for the per-gate detail. A
+    company-side gate-log entry is NOT evidence of company ratification, because
+    `config/gate-log.md` is `union-append` and producer entries land there BY
+    DESIGN (`7c73258`, `63aa76e` — search a GATE ID, never a prose word).
+    Outcomes: `airflow-crosswalk` and `autosys-crosswalk` were reported RATIFIED
+    and are NOT (`c349d9a`, `3d5282f`) — now DEFERRED behind an ingestion
+    precondition (`d587b92`; prompts fixed `91f4845`). `audit-envelope-phase4`
+    IS ratified, company commit `838857e7` (`7d47ff7`).
+    `envelope-property-terms` discharged on structure (`0d38e33`).
+    `ui-write-surface` RATIFIED, company commit `48252f72` (`d8ee8cb`).
+    And the rule's OWN correction (`a78ac14`): a `port(...)` subject proves
+    nothing about authorship, because the RECONCILE step is exactly where you
+    write your own adoption record. Content, not subject, is the discriminator.
+
+121. PORT-MACHINERY HOUSEKEEPING — changes what this file tells you to check, not
+    your tree (`c69923e` the `0d3761a9` roll + send-backs; `9bede36` relay ids
+    renamed `R<n>` -> `RELAY-<n>`, which collided with Epic R;
+    `766f2c8` / `c349d9a` / `9468b54` / `872d15f` the RELAY-3(b)
+    strike-unstrike-restrike and its standing lesson — answer any
+    presence/absence relay with a GLOB and quote the OUTPUT; `d530cd1` the held
+    K7–K15 UI promoted to a STANDING DIVERGENCE after a wholesale `web/**` take
+    re-landed it twice; `dab5c90` the ui-write-surface hold, since discharged).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
