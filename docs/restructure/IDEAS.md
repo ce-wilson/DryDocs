@@ -62,6 +62,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-103`** · 2026-08-10 · `[bug]` · **open** · prio? **Low** —
+  **Five more unclosed markdown fences live outside the `docs/**` guard, in files this
+  repo did not author.** The J41 sweep that found the `port-prompt.md` defect
+  (`84ed7e3`, live five days and four ports) scanned all 507 tracked `.md` files and
+  found six. One was ours and is fixed (`docs/decisions/0002` carried an orphan trailing
+  fence). `tests/unit/test_markdown_fences.py` now guards `docs/**`. The rest were left
+  DELIBERATELY, and the reason is the interesting part: `internal/fcdo-reference/`
+  CONFLUENCE-TRANSCRIPT.md (opens 5140 of 5355) and TRANSCRIPT-1-ONTOLOGY.md (419 of
+  568) are CAPTURED transcripts, and `.claude/skills/data-context-extractor/references/`
+  is vendored skill material — editing either to satisfy a guard means editing somebody
+  else's capture, which is a provenance decision rather than a formatting one.
+  `SDLC-Docs/extracted/issue-driven-capture-loop.md` (181 of 181) is a trailing orphan
+  and probably safe. DECIDE: widen the guard with an explicit capture carve-out, or
+  leave captures unguarded and say so where the boundary lives.
+
 - **`Idea-102`** · 2026-08-09 · `[question]` · **open** · prio? **High** —
   **The deployment grain has an SME-confirmed cardinality and no home — DryDocs has one
   concept where the source has two.** K21 found `u_seal_deployment_id` sitting beside

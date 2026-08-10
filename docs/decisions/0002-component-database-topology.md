@@ -294,4 +294,3 @@ something wrote a database nothing should write.
    Enterprise edition committed (D1 firm, Community fallback stays a rejected alternative only).
    Gate run logged in `config/gate-log.md`. The extraction (0002-A) and rebase (0002-B) plans are
    now ungated; follow-ups 1–6 are ready to groom into `backlog.yaml`.
-```

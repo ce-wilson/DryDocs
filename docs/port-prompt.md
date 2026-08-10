@@ -322,7 +322,7 @@ after the apply — which is the OPENING SEQUENCE's whole reason for existing.
   50–51 in PORT-REPORT-57914bf4 (N9 full-adopt; T19 narrowed to N3–N6),
   52 in PORT-REPORT-f71967db.
 
-```text
+````text
 You are porting the DryDocs PRODUCER repo (ce-wilson/DryDocs, github.com) onto the
 company <company-org>/DryDocs base (GitHub Enterprise). ONE-WAY producer→consumer
 apply. Work in a clean checkout of company `main`.
@@ -1254,4 +1254,4 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - J7 reconcile guards with RECONCILE_BEFORE_DIR set: all pass (producer-side at the
   back-flow enactment: 12 passed / 4 skipped; the J16 manifest-coverage /
   default_ok / backlog-no-regression checks run unconditionally, no env var needed).
-```
+````
