@@ -55,10 +55,24 @@ OWED COMPANY-SIDE:
         "chore(backlog): groom — 11 promoted, 3 merged",
         "chore(backlog): claim J41 in_progress (pushed before work)",
         "chore(depgraph): snapshot drydocs-20260809 @ 9270002",
+        # Without these two the check cannot terminate — see below.
+        "chore(port): roll the ledger through 0d3761a9",
+        "chore(port): ledger step 122 — J41",
     ],
 )
 def test_ritual_subjects_need_no_ledger_step(subject: str) -> None:
     assert is_ritual(subject)
+
+
+def test_the_ledger_roll_commit_is_ritual_or_the_check_cannot_terminate() -> None:
+    """Found by running this module against its own repository.
+
+    The commit that WRITES the citations can never be among them, so if a roll
+    were substantive every roll would mint a fresh uncited commit and the next
+    roll would too — an infinite regress that reads as a real coverage gap.
+    """
+    roll = Commit("cdc7a85", "chore(port): ledger step 122 — J41")
+    assert uncited_commits([roll], LEDGER) == []
 
 
 @pytest.mark.parametrize(
@@ -71,6 +85,10 @@ def test_ritual_subjects_need_no_ledger_step(subject: str) -> None:
         "chore(backlog): rewrite the pull rule",
         "chore(depgraph): bump the instrument pin to 6ee0af6",
         "chore(manifest): retire the three discharged packs",
+        # The roll exemption is narrow ON PURPOSE: retiring manifest rows is also
+        # a chore(port) and IS substantive work a consumer must be told about.
+        "chore(port): retire the three discharged packs",
+        "chore(port): stage five company packs above the never-port glob",
     ],
 )
 def test_substantive_subjects_are_never_ritual(subject: str) -> None:

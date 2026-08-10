@@ -37,6 +37,14 @@ RITUAL_SUBJECT_PATTERNS: tuple[re.Pattern[str], ...] = (
     re.compile(r"^chore\(depgraph\):\s*snapshot\b", re.I),
     re.compile(r"^chore\(render\):", re.I),
     re.compile(r"^chore\(board\):", re.I),
+    # The ledger roll itself, and it is not a convenience exemption — without it
+    # the check cannot terminate. The commit that WRITES the citations can never
+    # be among them, so every roll would mint a fresh uncited commit and the next
+    # roll would too. Found by running this module against its own repository.
+    # Deliberately NARROW: only a roll or a step write, never `chore(port):` at
+    # large, because retiring manifest rows is also a chore(port) and is
+    # substantive work a consumer must be told about.
+    re.compile(r"^chore\(port\):\s*(roll\b|ledger\b)", re.I),
 )
 
 #: Every LIVE relay must declare where its claim comes from. Only the last of
