@@ -11,6 +11,7 @@ database as the set of constraint names it holds.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -20,6 +21,22 @@ from drydocs import cli as cli_mod
 from drydocs_core.schema.constraints import declared_constraint_names
 
 runner = CliRunner()
+
+# Strip ANSI before matching, and it is load-bearing rather than cosmetic. rich
+# honours FORCE_COLOR from the ambient environment even under NO_COLOR, so on any
+# machine that exports it (this desktop does, FORCE_COLOR=3) the CLI writes escape
+# sequences INTO result.output and every plain-substring assertion below fails —
+# while the CLI itself behaves correctly. That reads as a real failure, and the
+# port's acceptance gate is a ZERO-FAIL contract, so a consumer would reasonably
+# have reported it as port-introduced. Normalising here beats trusting the
+# environment, and beats CliRunner(color=False) — this click no longer takes it.
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+
+
+def plain(result) -> str:
+    """``result.output`` with any ANSI colour sequences removed."""
+    return _ANSI_RE.sub("", result.output)
+
 
 CONSTRAINTS_FILE = (
     Path(__file__).resolve().parents[2] / "drydocs_core" / "schema" / "constraints.cypher"
@@ -115,7 +132,7 @@ def test_bootstrap_reports_the_declared_count_on_success(fake_client) -> None:
     result = runner.invoke(cli_mod.app, ["bootstrap", "--skip-ontology"])
     assert result.exit_code == 0, result.output
     n = len(declared_constraint_names(CONSTRAINTS_FILE))
-    assert f"Constraints applied ({n}/{n} declared present)." in result.output
+    assert f"Constraints applied ({n}/{n} declared present)." in plain(result)
 
 
 def test_bootstrap_refuses_when_the_apply_lands_nothing(fake_client) -> None:
@@ -123,8 +140,8 @@ def test_bootstrap_refuses_when_the_apply_lands_nothing(fake_client) -> None:
     fake_client(_FakeClient(apply_lands=False))
     result = runner.invoke(cli_mod.app, ["bootstrap", "--skip-ontology"])
     assert result.exit_code == 2, result.output
-    assert "absent after apply" in result.output
-    assert "Constraints applied" not in result.output
+    assert "absent after apply" in plain(result)
+    assert "Constraints applied" not in plain(result)
 
 
 def test_bootstrap_refuses_a_partial_landing_and_names_the_missing(fake_client) -> None:
@@ -133,7 +150,7 @@ def test_bootstrap_refuses_a_partial_landing_and_names_the_missing(fake_client) 
     fake_client(_FakeClient(apply_lands=False, preexisting=all_but_last))
     result = runner.invoke(cli_mod.app, ["bootstrap", "--skip-ontology"])
     assert result.exit_code == 2, result.output
-    assert declared[-1] in result.output
+    assert declared[-1] in plain(result)
 
 
 def test_bootstrap_guard_tolerates_extra_undeclared_constraints(fake_client) -> None:
