@@ -890,12 +890,40 @@ OWED COMPANY-SIDE:
   `snow@[db].[schema].itsm`, `hr:emp-hierarchy`, and one deliberate re-home,
   `repo:org-location` → `hr:emp-location`. The v2 grammar is holding on
   sources the producer never authored, which is the strongest test it has had.
-- **`ui-write-surface`: SIGN-OFF GIVEN 2026-08-09, ENTRY NOT YET WRITTEN — do not
-  read this as ratified.** Recorded in this state deliberately, because the
-  distinction is the one that produced two false positives today: the SME has
-  authorised the ratification, and the company session has the census, but no
-  gate-log entry exists yet and nothing is committed company-side. Status stays
-  NEVER RUN until a commit exists and passes the provenance check.
+- **`ui-write-surface`: RATIFIED 2026-08-09 — company commit `48252f72`,
+  entry at company `gate-log.md:2711`.** Subject:
+  `gate(ratify): ui-write-surface company ratification - NEVER RUN -> SIGNED OFF
+  (write-path census of deployed drydocs-api console)`. THAT SUBJECT IS THE
+  DISPOSITIVE EVIDENCE — a `gate(ratify):` commit, not a `port(cewilson):` one,
+  which is exactly what the rule above names as proof. Committed on company
+  `main`, unpushed at the time of report.
+  This row was deliberately held at "SIGN-OFF GIVEN, ENTRY NOT YET WRITTEN"
+  until the commit existed, rather than flipped on the SME's authorisation —
+  the whole point being that an intention and a ratification are different
+  artifacts. Both riders were met in the committed entry: the `gate(ratify):`
+  subject convention (the `ecdf0af` shape from seal-app-ref-edge-reshape), and
+  the census placed IN the entry rather than pointed at.
+  **BUT THE SELF-PROVING ARGUMENT IS OVERSTATED, AND THIS IS THE THIRD
+  INSTANCE OF TODAY'S DEFECT CLASS — VERIFIED PRODUCER-SIDE, NOT SUSPECTED.**
+  The report offers four bullets as content "the producer cannot have". TWO OF
+  THE FOUR ARE PRODUCER ARTIFACTS THAT PORTED:
+  the computed source-first `v_seal_contact_grid` view is producer code at
+  `drydocs_core/mapping_store.py:216-231` — the same UNION ALL emitting literal
+  `'source'` / `'override'`, source-first, never merged; and the
+  `app_code_mapping.origin NOT NULL CHECK` is producer code at the same file,
+  lines 258-259, introduced by producer commit `17d9e08` (K9, 2026-08-03).
+  Both are O24/M2 producer work. A provenance check resting on those two would
+  have failed the same way the crosswalk checks did.
+  What IS genuinely company-only, and what the row therefore rests on: the
+  census of the DEPLOYED console's routes with tiers, the "no M3-shaped path
+  found" verdict against their tree, and the precedence-grep negative with its
+  company-tree line references. Those the producer cannot have. The ratification
+  stands; two of its four stated proofs do not.
+  METHOD NOTE, because it bit the producer too: a first grep for
+  `origin TEXT NOT NULL` returned EMPTY and nearly confirmed the company's
+  reading — the column is whitespace-padded (`origin             TEXT NOT NULL`),
+  so the pattern missed. An empty grep is not evidence of absence; that is the
+  RELAY-3(b) lesson arriving in a third costume, on the same day.
   Step 1 was provenance-verified as NEVER RUN before the work began — the check
   returned two PORT commits (`afa2deeb` on branch `drydocs-port-20260721`, and
   `12fa680e`), so the producer's O20 sign-off had ported across exactly as it
