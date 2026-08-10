@@ -826,6 +826,26 @@ OWED COMPANY-SIDE:
   each correctly stopped before steps 2–3.
   The same check is owed on the remaining three staged prompts before any is
   marked ratified.
+  **DEFERRED 2026-08-09 (SME) — owed, but not scheduled, and the trigger is a
+  PRECONDITION rather than a date.** Neither orchestrator is ingested on either
+  side; `external/orchestration/{autosys,airflow}/` hold a README each and no
+  source is registered. A company session spent here today buys nothing
+  operationally, and company sessions are the scarce resource — P8, the
+  `ui-write-surface` entry, T22/DD6 and the T23 graph legs all have live
+  consumers. **TRIGGER: ratify BEFORE the first AutoSys or Airflow source is
+  registered for ingestion — not after, and not at the ingestion review.**
+  WHY THE TRIGGER HAS TO BE A PRECONDITION, and this is the part that makes
+  deferral safe rather than merely cheap: `drydocs_core/orchestration/crosswalk.py`
+  gates `resolve()` on `require_confirmed=True`, and BOTH crosswalk yamls carry
+  `status: confirmed` — which PORTED. So the only runtime gate protecting these
+  mappings is already satisfied company-side by an artifact the company never
+  ratified. Nothing calls `resolve()` today (verified producer-side: no caller
+  outside the module and its own tests), so the gate is open onto an empty room.
+  But the first ingestion wires a caller, and at that moment `resolve()` succeeds
+  SILENTLY — there is no second checkpoint where the missing ratification would
+  surface. That is this session's recurring defect class in its purest form: a
+  check that reads like a gate and passes for the wrong reason. Deferring is
+  correct; forgetting would not be.
 - **`audit-envelope-phase4`: GENUINELY RATIFIED — the first TRUE positive, and
   the one that shows what real evidence looks like** (checked 2026-08-09,
   company `main` @ `a4c4ce37`). Three heading-named entries, and the session
