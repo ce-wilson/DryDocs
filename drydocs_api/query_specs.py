@@ -275,6 +275,44 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         # prefilled from the declared edge, §G2) -> unmapped-folder filter
         # (§G7). The screen drafts store rows only; the K8 loader writes. ──
         QuerySpec(
+            # The backlog acceptance spells this intake.area_tree.v1; the registry id
+            # convention is kebab-case (enforced at import) and wins — recorded at the
+            # O47 close rather than silently diverged.
+            id="intake.area-tree.v1",
+            database="drydocs",
+            description=(
+                "The intake page's area cascade (O47): ProductLine -> HAS_PRODUCT "
+                "-> Product -> HAS_AREA_PRODUCT -> AreaProduct, one call, flat "
+                "rows the picker groups client-side (cacheable — the tree changes "
+                "only at catalog loads). WRITTEN FOR THE DAY THE EDGE LANDS: "
+                "catalog_has_area_product is status planned with no extract, and "
+                "the AreaProduct nodes that exist today are pat_product_mapping "
+                "fallback anchors with no parent edge and no name — so "
+                "area_product is null until the area_products extract arrives, "
+                "the pane says so, and 'Unknown' stays the honest answer at that "
+                "level (the plan's own rule)."
+            ),
+            cypher=(
+                "MATCH (pl:ProductLine) WHERE NOT pl:SchemaMeta "
+                "OPTIONAL MATCH (pl)-[:HAS_PRODUCT]->(p:Product) "
+                "OPTIONAL MATCH (p)-[:HAS_AREA_PRODUCT]->(ap:AreaProduct) "
+                "RETURN pl.product_line_id AS product_line_id, pl.name AS product_line, "
+                "p.product_id AS product_id, p.name AS product, "
+                "ap.area_product_id AS area_product_id, ap.name AS area_product "
+                "ORDER BY product_line, product, area_product LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("product_line_id", "string", "Product line ID"),
+                ColumnDef("product_line", "string", "Product line"),
+                ColumnDef("product_id", "string", "Product ID"),
+                ColumnDef("product", "string", "Product"),
+                ColumnDef("area_product_id", "string", "Area product ID"),
+                ColumnDef("area_product", "string", "Area product"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="mappings.catalog-cascade.v1",
             database="drydocs",
             description=(
