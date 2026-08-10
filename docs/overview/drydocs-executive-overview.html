@@ -66,6 +66,27 @@
                           Grounded in gate rua-load-shapes (SIGNED OFF 2026-08-07) and
                           the archival report built at G58 (drydocs_lineage/archival.py).
                           No other content claims refreshed; rev 7's note still applies.
+       rev 9  2026-08-10  REFERENCES section added to the footer (backlog L28), covering
+                          every external work this document draws on: the two agent
+                          reference architectures (KGoT, llm-graph-builder), the
+                          Databricks catalog precedent, the three Neo4j articles behind
+                          the layer model, and the seven ontology standards in the §03
+                          table. Inline <sup> markers anchor the four places the prose
+                          leans on outside work, and TWO PREVIOUSLY UNCITED CLAIMS are
+                          now attributed — the Unity Catalog comparison in §01 and the
+                          quoted Databricks sentence in §03.
+                          WHY: spcl/knowledge-graph-of-thoughts was already load-bearing
+                          and cited nowhere — ADR 0007 analyzes it by name, and four
+                          agents/ modules carry its design (task_graph, llm_ledger) or
+                          name its traps (providers, schema_context). It is now
+                          registered at reference/research/knowledge-graph-of-thoughts.md
+                          (paper, arXiv id, BSD 3-Clause / ETH Zurich, adopted-vs-rejected)
+                          and indexed in reference/REGISTRY.yaml, whose research: block
+                          was a stub with no entries before this.
+                          NO NEW CSS: the footer's .revs pattern and the existing `a`
+                          rule carry the block; <sup> uses browser defaults, so both
+                          themes are unaffected. Content claims NOT refreshed — rev 7's
+                          note still applies, and the ADR statuses are as of rev 6.
 
      CONVENTION: dashed borders = proposed or planned. As each dotted line
      closes, flip it to solid, add a revision line above, and republish the
@@ -318,8 +339,8 @@
     <p class="log">
       <span><b>Audience:</b> Leadership · Production Support · Engineering · SME</span>
       <span><b>Classification</b> Internal-Public</span>
-      <span><b>Date</b> 2026-08-07</span>
-      <span><b>Revision</b> 8</span>
+      <span><b>Date</b> 2026-08-10</span>
+      <span><b>Revision</b> 9</span>
     </p>
   </header>
 
@@ -464,7 +485,7 @@
         <strong>people</strong> because applications carry attributed roles; <strong>documents</strong> because
         facts cite the page they came from.</p>
       <p>
-        This is the conclusion Databricks Unity Catalog reached independently, for the same reason:
+        This is the conclusion Databricks Unity Catalog reached independently<sup><a href="#refs">[3]</a></sup>, for the same reason:
         lineage derived from what ran stays accurate; lineage declared by a human becomes outdated. DryDocs derives
         from Control-M definitions what Unity Catalog derives from Spark execution plans.
       </p>
@@ -578,14 +599,14 @@ flowchart TB
 
     <div class="prose">
       <p>
-        A <strong>taxonomy</strong> tells you what category something is. An <strong>ontology</strong> tells you
+        A <strong>taxonomy</strong> tells you what category something is<sup><a href="#refs">[5&ndash;7]</a></sup>. An <strong>ontology</strong> tells you
         what a connection <em>means</em>. Five layers only compose into one graph if the edges between
         them are drawn from a shared, defined vocabulary — otherwise each source arrives with its
         own private notion of &ldquo;owns&rdquo;, &ldquo;uses&rdquo;, and &ldquo;depends on&rdquo;, and the graph becomes a picture
         rather than something you can reason over.
       </p>
       <p>
-        DryDocs does not invent that vocabulary. It maps to W3C and community standards, records
+        DryDocs does not invent that vocabulary. It maps to W3C and community standards<sup><a href="#refs">[8&ndash;14]</a></sup>, records
         every mapping in a controlled registry, and puts the ones that are not yet company-approved
         behind a fence.
       </p>
@@ -713,7 +734,7 @@ flowchart LR
       <p>
         This is the same conclusion Databricks reached out loud: <em>&ldquo;agents are only as good as the
         context they have — without a shared definition of what the business actually means, even a
-        capable agent will guess.&rdquo;</em> Defining the ontology properly across the taxonomies is not
+        capable agent will guess.&rdquo;</em><sup><a href="#refs">[4]</a></sup> Defining the ontology properly across the taxonomies is not
         modeling hygiene. It is the difference between an agent that can cite a path and one that
         produces a confident sentence nobody can verify.
       </p>
@@ -849,7 +870,7 @@ flowchart LR
           <tr><td>drydocs-docmeta</td><td>Scraped registry and product pages as a document graph</td><td><code>dddocs</code></td><td><span class="chip plan">planned</span></td></tr>
           <tr><td>drydocs-api</td><td>Read-only projection; server-side credentials, per-view DB routing</td><td>—</td><td><span class="chip live">live</span></td></tr>
           <tr><td>web console</td><td>Explorer, mappings, gates, lineage, runbooks</td><td>drafts only</td><td><span class="chip build">in build</span></td></tr>
-          <tr><td>agents</td><td>Tiered read-only Q&amp;A: QuerySpec router → schema-grounded text2cypher</td><td>—</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>agents</td><td>Tiered read-only Q&amp;A: QuerySpec router → schema-grounded text2cypher<sup><a href="#refs">[1,&thinsp;2]</a></sup></td><td>—</td><td><span class="chip live">live</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1117,6 +1138,7 @@ flowchart TB
   <footer>
     <div class="revs">
       <span><b>Revisions</b></span>
+      <span>rev 9 · 2026-08-10 — a <b>References</b> section added to this footer, covering every external work the document draws on (backlog L28): the two agent reference architectures, the Databricks catalog precedent, the three articles behind the layer model, and the seven ontology standards in §03. Two claims that were uncited until now are attributed — the Unity Catalog comparison in §01 and the quoted Databricks sentence in §03 — and inline markers anchor the four places the document leans on outside work. The reason it was raised: <code>spcl/knowledge-graph-of-thoughts</code> was already load-bearing (ADR 0007 analyzes it; four <code>agents/</code> modules carry its design or name its traps) and cited nowhere, so it is now registered at <code>reference/research/knowledge-graph-of-thoughts.md</code> with its paper, BSD 3-Clause license, and what we adopted versus rejected. No content claims refreshed; rev 7&rsquo;s note still applies</span>
       <span>rev 8 · 2026-08-07 — §06 gains a stated <b>target state</b>: a production estate holding only actively used code, with replaced code archived to version control and storage (backlog L24, user direction). Written as a goal, not a current state. Carries its own limit: the three usage signals show presence only, each bounded by what its feed scanned, so an absence recorded by one feed is not an absence in the estate — and the three review outcomes (dead / misdeployed / dynamically called) stay separate for the same reason. Grounded in the <code>rua-load-shapes</code> gate (signed 2026-08-07) and the archival report built at G58; no other content claims refreshed</span>
       <span>rev 7 · 2026-08-03 — U.S. business-English style pass per <code>docs/style/us-business-english.md</code> (L22): spine→backbone, planes→layers, decays/rots→goes stale/becomes outdated, gate-confirmed→validated through the SME gate, UK spellings Americanized; HTML stays the single hand-authored source (no .md established); content claims unchanged from rev 6</span>
       <span>rev 6 · 2026-07-25 — production-support framing sharpened: names the actual decay, from overview + business context + process flow down to an Excel sheet of folder and job details</span>
@@ -1126,6 +1148,28 @@ flowchart TB
       <span>rev 2 · 2026-07-25 — SME pass: origin restored, production-support framing rewritten, ontology-standards section added, people and escalation sources added to the module map</span>
       <span>rev 1 · 2026-07-25 — initial: five planes, modules, configuration, the loop</span>
     </div>
+    <div class="revs" id="refs">
+      <span><b>References</b> &mdash; external work this document draws on. Full write-ups, licenses and verification dates live in <code>reference/</code>, indexed by <code>reference/REGISTRY.yaml</code>. Links verified 2026-08-10.</span>
+      <span><b>Agent architecture</b> &mdash; the two reference architectures behind the <code>agents</code> module; neither adopted wholesale (<code>docs/decisions/0007-agentic-qa-architecture.md</code>)</span>
+      <span>[1] &nbsp;Besta, M. <em>et al.</em>, &ldquo;Affordable AI Assistants with Knowledge Graph of Thoughts&rdquo;, 2025 &mdash; <a href="https://arxiv.org/abs/2504.02670">arXiv:2504.02670</a>; implementation <a href="https://github.com/spcl/knowledge-graph-of-thoughts">spcl/knowledge-graph-of-thoughts</a>, SPCL / ETH Zurich, BSD 3-Clause. Source of the task-scoped working memory and the per-call cost ledger; its write branch and whole-graph prompting were rejected &mdash; <code>reference/research/knowledge-graph-of-thoughts.md</code></span>
+      <span>[2] &nbsp;<a href="https://github.com/neo4j-labs/llm-graph-builder">neo4j-labs/llm-graph-builder</a>, Neo4j Labs. Source of the per-answer information envelope, the document status lifecycle, and the token-usage extractor</span>
+      <span><b>Catalog and lineage precedent</b> &mdash; the derived-not-declared argument in section 01, and the quoted line in section 03</span>
+      <span>[3] &nbsp;<a href="https://docs.databricks.com/aws/en/data-governance/unity-catalog/">Databricks Unity Catalog</a> &mdash; governance and lineage documentation; lineage derived from Spark execution plans. Full notes: <code>reference/research/databricks-unity-catalog.md</code></span>
+      <span>[4] &nbsp;Databricks, <a href="https://www.databricks.com/blog/whats-new-unity-catalog-data-ai-summit-2026">&ldquo;What&rsquo;s new in Unity Catalog&rdquo;</a>, Data + AI Summit 2026 &mdash; the source of the quoted sentence on agents and shared definitions</span>
+      <span><b>The layer model</b> &mdash; taxonomy, ontology, knowledge graph, context graph (<code>docs/restructure/00-conceptual-model.md</code>)</span>
+      <span>[5] &nbsp;Neo4j, <a href="https://neo4j.com/blog/knowledge-graph/taxonomy-vs-ontology-vs-knowledge-graph/">&ldquo;Taxonomy vs Ontology vs Knowledge Graph&rdquo;</a></span>
+      <span>[6] &nbsp;Neo4j, <a href="https://neo4j.com/blog/graph-database/2-of-3-why-graphs-knowledge-graphs-and-context-graphs-matter-to-customers/">&ldquo;Why graphs, knowledge graphs and context graphs matter&rdquo;</a> &mdash; the definition of the context layer</span>
+      <span>[7] &nbsp;Neo4j, <a href="https://neo4j.com/blog/graph-database/3-of-3-the-graph-ecosystem-bringing-connected-context-to-enterprise-ai/">&ldquo;The graph ecosystem: connected context for enterprise AI&rdquo;</a></span>
+      <span><b>Ontology standards</b> &mdash; the vocabulary the section-03 table maps to; DryDocs defines none of these</span>
+      <span>[8] &nbsp;W3C, <a href="https://www.w3.org/TR/prov-o/">PROV-O: The Provenance Ontology</a> &mdash; <code>http://www.w3.org/ns/prov#</code></span>
+      <span>[9] &nbsp;W3C, <a href="https://www.w3.org/TR/vocab-org/">The Organization Ontology</a> &mdash; <code>http://www.w3.org/ns/org#</code></span>
+      <span>[10] EKGF, <a href="https://ekgf.github.io/dprod/">DPROD &mdash; the Data Product ontology</a></span>
+      <span>[11] W3C, <a href="https://www.w3.org/TR/vocab-dcat-3/">Data Catalog Vocabulary (DCAT) version 3</a> &mdash; <code>http://www.w3.org/ns/dcat#</code></span>
+      <span>[12] W3C, <a href="https://www.w3.org/TR/skos-reference/">SKOS Simple Knowledge Organization System</a> &mdash; <code>http://www.w3.org/2004/02/skos/core#</code></span>
+      <span>[13] W3C, <a href="https://www.w3.org/TR/vocab-dqv/">Data Quality Vocabulary (DQV)</a> &mdash; <code>http://www.w3.org/ns/dqv#</code></span>
+      <span>[14] W3C, <a href="https://www.w3.org/TR/vocab-ssn/">Semantic Sensor Network Ontology (SOSA / SSN)</a> &mdash; <code>http://www.w3.org/ns/sosa/</code>. Marked experimental above: a W3C standard, not yet a declared company standard</span>
+    </div>
+
     <div class="revs">
       <span><b>Tracking</b></span>
       <span>Structure shown reflects the current repository plus ADR 0008 (orchestration boundary), ADR 0009 (configuration substrate), and ADR 0010 (source-term abstraction). Dashed borders mark what is proposed, planned, or gate-pending; as each closes, it flips to solid and a revision line is added above.</span>

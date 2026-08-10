@@ -18,8 +18,11 @@ matters"; do not paste copyrighted full texts.
 | Semantic layer from a warehouse | [Neo4j: Build a Semantic Layer from GCP with NeoCarta](https://neo4j.com/blog/genai/build-a-semantic-layer-from-gcp-with-neocarta/) | Neo4j Labs build of exactly our data-catalog layer — crosswalk below |
 | GraphRAG (book) | [Essential GraphRAG — Knowledge Graph-Enhanced RAG](https://www.manning.com/books/essential-graphrag) (Bratanič & Hane, Manning 2025; Neo4j-sponsored ebook — local PDF gitignored at repo root, cite don't commit; link verified 2026-07-16) | worked lexical-graph + graph-retrieval patterns; input to the docmeta P0 benchmark verdict and the agent-traversal experiment (backlog Q1/Q2) |
 | Catalog + glossary as one governed object model | [Databricks Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog/) — full notes: [`databricks-unity-catalog.md`](databricks-unity-catalog.md) (links verified 2026-07-25) | vendor build of the layer in `docs/patterns/data-catalog/`; its Domains / Glossary / governed tags / classification land on our `CatalogDataDomain` / `CatalogBusinessTerm` / `CatalogTag` / `classification.yaml` — plus lineage derived from execution plans, never declared |
+| Task-scoped graphs as agent working memory | [Besta et al., *Affordable AI Assistants with Knowledge Graph of Thoughts*](https://arxiv.org/abs/2504.02670) (arXiv:2504.02670) + [spcl/knowledge-graph-of-thoughts](https://github.com/spcl/knowledge-graph-of-thoughts) (BSD 3-Clause, ETH Zurich) — full notes: [`knowledge-graph-of-thoughts.md`](knowledge-graph-of-thoughts.md) (verified 2026-08-10) | the reference architecture behind ADR 0007's agent tier: its task graph is our layer-4 first occupant (`agents/graph_qa/task_graph.py`), its `collect_stats` ledger is `agents/common/llm_ledger.py` — and the two mechanisms we **rejected** (free graph writes vs O20, whole-graph prompts) are named in our source so they are not re-imported |
 
-Verified 2026-06-21 (A3). Add new rows as research is consulted; cite them in ADRs under `docs/`.
+Verified 2026-06-21 (A3); KGoT row added 2026-08-10 (L28). Add new rows as research is consulted;
+cite them in ADRs under `docs/` — and register the work here when an ADR cites it, so the citation
+resolves to a license and a paper rather than a bare repo name.
 
 ## NeoCarta — context for the data-catalog layer
 
@@ -58,3 +61,11 @@ public build of this layer. NeoCarta is the closer *architectural* parallel (a g
 from a warehouse); Unity Catalog is the closer *governance* parallel (glossary, domains, and
 policy-enforced tags in one object model, with lineage derived from execution plans). Same
 verdict on both: tool pattern to borrow, not a standard to seed.
+
+## Full write-ups in this directory
+
+| Note | Subject | Verdict |
+|---|---|---|
+| [`databricks-unity-catalog.md`](databricks-unity-catalog.md) | Databricks Unity Catalog — catalog/glossary governance | pattern to borrow, not a standard to seed |
+| [`knowledge-graph-of-thoughts.md`](knowledge-graph-of-thoughts.md) | KGoT (SPCL / ETH Zurich) — the agent tier's reference architecture | adopted in part (task graph, cost ledger, bounded loop); INSERT branch and whole-graph prompts rejected |
+| [`essential-graphrag-notes.md`](essential-graphrag-notes.md) | *Essential GraphRAG* (Bratanič & Hane) — retrieval patterns | input to the docmeta benchmark verdict |

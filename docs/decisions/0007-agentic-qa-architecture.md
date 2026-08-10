@@ -36,7 +36,7 @@ artifact¹):
   mode returns `cypher_query` to the UI. Strong: the per-answer info envelope
   (tokens, response time, mode, node details), the Document status lifecycle
   with explicit reprocess conditions, Neo4j-backed chat memory.
-- **spcl/knowledge-graph-of-thoughts (KGoT)** — an iterative controller that
+- **spcl/knowledge-graph-of-thoughts (KGoT)²** — an iterative controller that
   builds a *task-scoped* KG per question: majority-vote INSERT (tools + LLM
   Cypher writes) vs RETRIEVE (query + parse), fix-Cypher repair loops on every
   failure, forced-solve fallbacks, and a per-LLM-call JSONL cost ledger
@@ -267,3 +267,16 @@ would re-open the boundary ADR 0005 closed.
 surveys → synthesis). Rendered dossier with both workflow diagrams:
 https://claude.ai/code/artifact/47aac12b-5800-433c-8400-c883e4f7111c
 (access-gated; the substance is restated above — the ADR stands alone).
+
+² KGoT citation (registered 2026-08-10, backlog L28): Besta, M. *et al.*,
+**"Affordable AI Assistants with Knowledge Graph of Thoughts"**, 2025 —
+arXiv:2504.02670, doi:10.48550/arXiv.2504.02670. Implementation:
+https://github.com/spcl/knowledge-graph-of-thoughts (SPCL, ETH Zurich;
+**BSD 3-Clause, © 2025 ETH Zurich**). No KGoT code is vendored into DryDocs —
+what crossed over is design, restated in our own modules. What this ADR adopted
+from it, what it rejected, and the two traps named in our source:
+[`reference/research/knowledge-graph-of-thoughts.md`](../../reference/research/knowledge-graph-of-thoughts.md),
+indexed at `reference/REGISTRY.yaml` (`research.entries[kgot]`). The sibling
+architecture compared against it is
+[neo4j-labs/llm-graph-builder](https://github.com/neo4j-labs/llm-graph-builder),
+registered under `platforms[neo4j].repos`.

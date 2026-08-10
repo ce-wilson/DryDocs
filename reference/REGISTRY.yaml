@@ -11,7 +11,7 @@
 # =============================================================================
 
 schema: drydocs.reference-registry.v1
-updated: 2026-08-09           # K21: ServiceNow registered as a source-platform; the snowflake entry gains the live-carrier fact
+updated: 2026-08-10           # L28: the research: stub becomes a real entry list — KGoT registered (paper + repo + BSD-3-Clause + what cites it), Unity Catalog and Essential GraphRAG backfilled
 classification: External       # ALL reference material is External (public) — see config/classification.yaml
 verified: 2026-06-21           # A1: local mirrors (../llm-graph-builder, ../sdw-sosa-ssn) + all platform/standard docs resolve; no stale entries
 
@@ -123,4 +123,63 @@ standards:
 
 research:
   docs: reference/research/README.md
-  note: "Academic papers backing modeling decisions; cite in ADRs under docs/."
+  note: >
+    Academic papers and public implementations backing modeling decisions; cite in ADRs
+    under docs/. RULE (L28): when an ADR cites an external work, that work gets an entry
+    HERE — so the citation resolves to a paper, a license and a verified link rather than
+    a bare repo name. `entries` carries the works with a full write-up in
+    reference/research/; the README table is the wider reading list.
+  entries:
+    - id: kgot
+      role: agent-architecture-reference
+      title: "Affordable AI Assistants with Knowledge Graph of Thoughts"
+      authors: "Besta, M.; Paleari, L.; Jiang, J.H.A.; Gerstenberger, R.; Wu, Y.; Hannesson, J.G.; Iff, P.; Kubicek, A.; Nyczyk, P.; Khimey, D.; Blach, N.; Zhang, H.; Zhang, T.; Ma, P.; Kwaśniewski, G.; Copik, M.; Niewiadomski, H.; Hoefler, T."
+      year: 2025
+      paper: https://arxiv.org/abs/2504.02670
+      doi: 10.48550/arXiv.2504.02670
+      source_url: https://github.com/spcl/knowledge-graph-of-thoughts
+      publisher: "SPCL (Scalable Parallel Computing Lab), ETH Zurich"
+      license: "BSD-3-Clause, (c) 2025 ETH Zurich"   # no KGoT code is vendored here — design only
+      cited_by:
+        - docs/decisions/0007-agentic-qa-architecture.md   # analyzed by name as one of two reference architectures
+        - agents/graph_qa/task_graph.py                    # ADOPTED — task-scoped working memory, NetworkX shape
+        - agents/common/llm_ledger.py                      # ADOPTED — the collect_stats per-call cost ledger
+        - agents/graph_qa/providers.py                     # REJECTED — their hardcoded-tool-model trap
+        - agents/graph_qa/schema_context.py                # REJECTED — their whole-graph-state injection
+      why: >
+        The reference architecture behind ADR 0007's agent tier, and the reason layer 4
+        got ruled rather than improvised: KGoT's task graph IS the context graph
+        CLAUDE.md defers, so its residency went to the R1 gate (in-process only,
+        2026-07-23). Adopted in part — task graph, cost ledger, bounded escalation,
+        fix-Cypher loop, majority vote, forced-solve. Rejected in part — the INSERT
+        branch collides with the O20 zero-write ruling and whole-graph prompting cannot
+        survive a persistent KG.
+      docs: reference/research/knowledge-graph-of-thoughts.md
+      verified: 2026-08-10           # L28 — citation, arXiv id and license read from the repo
+
+    - id: databricks-unity-catalog
+      role: data-catalog-governance-reference
+      title: "Databricks Unity Catalog — governance and semantic layer"
+      source_url: https://docs.databricks.com/aws/en/data-governance/unity-catalog/
+      publisher: Databricks
+      license: "public vendor documentation (cite, do not paste)"
+      why: >
+        The only public build putting glossary, domain grouping, controlled tags and
+        enforcement in ONE governed object model — the shape docs/patterns/data-catalog/
+        already describes. Tool pattern to borrow, not a standard to seed.
+      docs: reference/research/databricks-unity-catalog.md
+      verified: 2026-07-25
+
+    - id: essential-graphrag
+      role: retrieval-patterns-reference
+      title: "Essential GraphRAG — Knowledge Graph-Enhanced RAG"
+      authors: "Bratanič, T.; Hane, O."
+      year: 2025
+      publisher: Manning
+      source_url: https://www.manning.com/books/essential-graphrag
+      license: "commercial book — cite, never commit the PDF (gitignored at repo root)"
+      why: >
+        Worked lexical-graph and graph-retrieval patterns; input to the docmeta P0
+        benchmark verdict and the agent-traversal experiment (backlog Q1/Q2).
+      docs: reference/research/essential-graphrag-notes.md
+      verified: 2026-07-16
