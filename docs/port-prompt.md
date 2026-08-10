@@ -67,50 +67,50 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state (2026-08-09 pm, the post-`6f03264` roll).** The ledger is now rolled
-through the NAMED deliberate end **`6f03264`**. Steps **116-121 are APPLIED** and
-collapse into **Last completed port** below; the live ledger restarts at **122+**,
-delta since `6f03264`.
+**Roll state (2026-08-10, the post-`ae21ee4` roll).** The ledger is rolled through
+the certified tag **`port-base-20260810b` (`ae21ee4`)** — the FIRST TAG-BASED PORT,
+and the opening sequence worked end-to-end: range verified at fetch time against
+the certified 9/15, zero J16 fall-through, the +39 suite delta = exactly the two
+new guard files. Steps **122-123 are APPLIED** (verified commit-by-commit: 9
+commits, 4 cited in steps 122/123, 5 ritual). Live ledger restarts at **124+**,
+delta since `ae21ee4`.
 
-> **`6f03264` IS BUILT, NOT YET MERGED.** The port commit sits on the company branch
-> `drydocs-port-20260809b` and is not merged or pushed — the `--no-ff` is the SME's
-> call. Treat the range as ported for LEDGER purposes (built, tested, reported) but NOT
-> as landed for anything that depends on the merge.
-> **The previous port DID complete: merged AND pushed 2026-08-09**, which fired the
-> trigger for the producer's staged-row removal (`f6954ac`) — three discharged packs
-> retired, the two crosswalk rows deliberately retained. That retention was load-bearing
-> and is now proven: the crosswalk prompts were ABSENT in company HEAD (retired last
-> port) and came back as clean-adds, so the `91f4845` deferral content reached the
-> company. A blanket "remove all five" would have silently lost it.
+> **`ae21ee4` IS BUILT, NOT YET MERGED.** Port commit `12420373` (+ report commit
+> `297d25bc`) on company branch `drydocs-port-20260810`, applied onto `main @
+> 308dda92` — the `--no-ff` merge is the SME's call. `6f03264`'s port (`feeb0706`)
+> DID land: merged as `308dda92` and pushed BEFORE this port began, so Phase 0 was
+> satisfied on arrival.
+> **J41 landed `done` company-side** — deliberate call, correctly distinguished from
+> the U18/U19 `todo` shape: a script that exists-but-is-not-invoked is not an
+> unadopted enabling pin. Their `test_module_boundary.py` now carries BOTH component
+> groups (producer `port` + company-only `docmeta-acquire`) — the rework trap
+> handled as step 122 warned.
+> **Company fence pre-check: clean (11/11).** Their never-port `port-prompt.md` does
+> NOT carry the producer-lineage fence defect — independently maintained, verified
+> before their full suite ran.
 
 **Last completed port — the four required fields (J35).**
-- **Range:** `0d3761a9..6f03264` — **45 commits / 45 changed paths**, ledger steps
-  116-121 (`rev-list --count` and `diff --name-only | measure` both quoted).
-- **Port commit:** `feeb0706` (branch `drydocs-port-20260809b`).
-- **Backup tag:** `pre-cewilson-port-20260809b` @ `48252f72`;
-  `rev-list --count pre-cewilson-port-20260809b..HEAD` = **1** (guardrail 3).
-- **Acceptance:** `tests/unit/` **2006 passed / 32 skipped / 1 failed** — the single
-  failure is PRE-EXISTING (`test_code_snapshot_loader::test_committed_newest_snapshot_is_accepted_and_clean`,
-  the T19/WP1.4 infra-block; not in the range's changed paths, fails on company HEAD's
-  own adapter). **+17 over `0d3761a9`'s 1989 = exactly the new guards**, same one
-  failure, same 32 skips. Track-1 **123 / 3**. J7/J34 reconcile guards **21 passed**
-  with `RECONCILE_BEFORE_DIR` set. **0 J16 fall-through** across all 45 paths.
+- **Range:** `6f03264..ae21ee4` (= tag `port-base-20260810b`) — **9 commits / 15
+  changed paths**, ledger steps 122-123; range verified AT FETCH TIME against the
+  certified expectation, not only at report time.
+- **Port commit:** `12420373` (branch `drydocs-port-20260810`); report as `297d25bc`.
+- **Backup tag:** `pre-cewilson-port-20260810` @ `308dda92`;
+  `rev-list --count <tag>..HEAD` = 2 (payload + report — the report body's "1" was
+  written pre-report-commit, the send-back's "2" is final).
+- **Acceptance:** full suite **2045 passed / 32 skipped / 1 failed** — the single
+  failure is the pre-existing WP1.4/T19 infra-block, proven not-port-introduced by
+  the strongest argument yet: byte-identical inputs at pre-port HEAD fail identically.
+  **2006 + 39 = 2045, and the two new guard files ARE 39 tests** (28 port_preflight
+  + 11 markdown_fences; producer-verified). Track-1 **123/3/0**; J7 guards **21**;
+  CI guards green; 0 J16 fall-through.
 
-**Steps 116-121, one line each.** 116 O52 always-null `holder_sid` (the two QuerySpec
-guards are the payload). 117 Epic U instrument series — U18/U19 landed **`todo`, not
-`done`** company-side, correctly: the enabling U19 depgraph pin is not adopted (T18),
-`reconcile_note` attached on the U9/C21 precedent. 118 C25 `software-version-context`
-SIGNED OFF — see the RELAY-5 correction below, the reconcile half was wrong. 119 SNOW is
-ServiceNow on the psgmgr replica pattern + K21. 120 the ratification-provenance rule and
-all five staged packs resolved. 121 port-machinery housekeeping.
+**Steps 122-123, one line each.** 122 J41 opening-sequence machinery (module +
+guards + `port` group + SKILL.md certified-tag check; company runs nothing). 123 the
+markdown-fence fix + portable guard (company ran it against their own docs: clean).
 
-**Two findings the run confirmed, both of which J41 now prevents.** Quoted from the
-report rather than paraphrased: *"Had the range head been `ed07931` (pre-fix) the
-zero-fail contract would have shown a spurious failure"* (`FORCE_COLOR`), and *"the
-duplicate was present at `ed079311`; porting there would have failed
-`test_idea_ids_are_unique`. Confirms holding for the re-fetch was correct over 'port
-now'"* (Idea-101). Both existed in the offered range and neither was visible until
-after the apply — which is the OPENING SEQUENCE's whole reason for existing.
+(Steps 116-121 collapsed at the prior roll — one-liners in PORT-REPORT-6f03264 and
+this file's git history. The FORCE_COLOR / Idea-101 findings that motivated J41 are
+recorded there too.)
 
 ## Last completed port
 

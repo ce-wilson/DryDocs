@@ -53,6 +53,16 @@ the accumulated lessons from prior ports. Read both.
 4. **Validate Track-1** (the contract — needs no data file).
 5. **Don't push.** Write a port report (template below) and stop.
 
+## Encoding trap (company send-back, PORT-REPORT-ae21ee4, 2026-08-10)
+
+PowerShell 5.1 mojibakes em-dashes in `git show` output (the console codepage, not
+git), which makes block-extraction from producer files UNSAFE there — a copied block
+silently differs from the source. For any per-entry/union work on files containing
+em-dashes (`backlog.yaml`, `IDEAS.md`, this repo's prose generally), do the
+extraction and insert in PYTHON reading the file as UTF-8, never by pasting from
+PowerShell output. The ae21ee4 port hit this live and routed around it; this note is
+the producer-side half of that lesson.
+
 ## Collision ledger (resolve these by keeping the noted side)
 
 | Path | Resolution |
