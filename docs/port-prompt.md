@@ -1184,6 +1184,9 @@ port** above. The live ledger restarts at 122, delta since `6f03264`.)
     THE ONE CAUTION THAT WOULD COST YOU A REWORK: `tests/unit/test_module_boundary.py`
     gains a new `port` component group. If your copy has diverged, take the GROUP with
     the module or the classification guard fails on an unclassified `drydocs.port_preflight`.
+    Follow-up `c89cf9f`: the ledger-ROLL commit is ritual, found by running the check
+    against its own repo — the commit that writes the citations can never be among
+    them, so without the exemption the check never terminates.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
