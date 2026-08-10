@@ -374,6 +374,31 @@ is to ask for the column, not to start string-splitting.
 `end_point` (boolean) has **no public vendor definition** that this analysis could find. It is left
 unassigned rather than guessed.
 
+**The vocabulary is small and bounded — SME count, 2026-08-10: 48 standard/global + 6 custom = 54.**
+Two consequences, one good and one to check.
+
+*The good one:* this makes the ring-1 crosswalk a **54-row mapping job**, not an open-ended modelling
+problem. `cmdb_rel_type` → `relationship_vocabulary` is finite, enumerable and reviewable in one
+sitting, which is a materially better position than the CI class hierarchy (§3.6) where the class
+count is large and the useful subset unknown. And the *used* subset is smaller still: every sampled
+`cmdb_rel_ci` row carried the same single `type` value, so §3.2's rule applies here too — a
+`COUNT(*) … GROUP BY type` says which of the 54 are live, and only those need a DryDocs decision.
+
+*The mechanism worth knowing:* the standard-vs-custom split **is a column**. `sys_scope` is present
+on this view, and it is what separates global (stock) rows from scoped (company) ones. So §3.1's
+vendor-baseline-versus-company-extension boundary — which for `u_` columns and the TOM tables takes
+judgment — is **machine-readable on this table**. A crosswalk can label every row's provenance
+without anyone deciding case by case.
+
+*The thing to check:* the SME reports 54 is **fewer than an older extract** held from the same
+estate. No public source states an out-of-box baseline count, so the number cannot be validated
+externally, and three readings survive: **(a)** types were genuinely retired or consolidated over
+time; **(b)** the replica view is FILTERED or STALE and does not carry every row — a carrier-fidelity
+problem, and the same class of finding as §3.1's "the replica is not a pure mirror"; **(c)** the old
+extract came from a different instance or scope, or counted rows this view excludes (deleted,
+inactive). See §6 Q9 for the test that separates them, because (b) is much more serious than the
+other two: it would mean row counts on the replica are not source truth anywhere, not just here.
+
 ### 3.4 Soft deletes are an ingestion contract question
 
 If rows persist in the replica after deletion in ServiceNow, then any pull ignoring `delete_flag`
@@ -549,7 +574,28 @@ source's grain with the operating model's, and one `GROUP BY sys_class_name` set
    Both can be true — the source may record finer than the operating model uses it — but which is
    which decides what a loader reads. **One query settles it:** count TOM rows grouped by
    `cmdb_ci.sys_class_name`.
-9. **Are the KB articles linked to the Deployment Module worth pulling?** The SME flagged them as
+9. **Is the replica a COMPLETE copy, or a filtered/stale projection?** *(NEW — raised by the
+   `cmdb_rel_type` count coming in below an older extract, §3.3, and it outranks everything else
+   here.)* Every finding in this document assumes the views carry all the rows. If they do not, the
+   assumption is wrong everywhere at once, and no amount of care about column meanings compensates.
+   **The decisive test is cheap and needs no comparison to the old extract** — look for edges whose
+   type does not resolve:
+
+   ```sql
+   -- any row > 0 means the type view is missing rows that LIVE EDGES depend on
+   SELECT COUNT(*) FROM v_cmdb_rel_ci r
+     LEFT JOIN v_cmdb_rel_type t ON r.type = t.sys_id
+    WHERE t.sys_id IS NULL;
+   ```
+
+   A dangling foreign key inside the replica proves incompleteness from the inside, with no external
+   baseline needed. If it returns zero, the type view is self-consistent with the edge view and
+   reading (a) or (c) is the likely explanation. Two cheap follow-ups either way: group
+   `v_cmdb_rel_type` by `delete_flag` (does the view carry soft-deleted rows, or hide them — §3.4),
+   and check the maximum `sys_created_on` / `dwintel_dl_ld_ts` to distinguish *filtered* from
+   *stale*. **This should be settled before any pull scope is ruled**, since it decides whether the
+   replica can be a source of record at all or only a convenience copy.
+10. **Are the KB articles linked to the Deployment Module worth pulling?** The SME flagged them as
    "more meaningful," and for a production-support knowledge graph that is squarely on-mission — a
    documented fix attached to the deployment that has the incident is exactly what DryDocs exists to
    answer. It would promote the `kb_*` family from ring 3 to a real candidate. **What to check
