@@ -9840,6 +9840,35 @@ items:
       across three accountable roles collides if the role segment is dropped, and
       four people in one role class collide if the sid is dropped. Whatever this
       gate rules about role classes must keep that key shape valid.
+      DRAFTING HALF DELIVERED 2026-08-10 (LAPTOP). STATUS STAYS in_progress ON PURPOSE — under the
+      awaiting-HITL convention it was released from, because the acceptance says the spec is
+      "authored AND WALKED with the SME" and only the authoring is done. Nothing is signed, nothing
+      loads, and business-application.yaml's roles: list is deliberately NOT reconciled, since §H4
+      reconciles it to whatever §A rules and §A is still open. WHAT THE PASS DID: brought the K21
+      ServiceNow evidence onto the page, which is the reason this item was routed to the laptop.
+      Clauses (d) and (e) were the two the release note named, and both were written from
+      DESCRIPTION rather than evidence — (e) turned out to be wrong. §E4 reasoned the inherited-from
+      parent is estate data DryDocs does not have and treated the modelled-node option as blocked on
+      acquiring it; the parent is the AREA PRODUCT and :AreaProduct is a K6-signed node class we
+      already hold, so the option was never blocked. The false premise is kept above its correction
+      per the §A4 precedent, and §E5b states the K6 boundary explicitly so an inheritance edge to
+      :AreaProduct is not later misread as merging the two role families K6 declared independent.
+      Also landed: §D5/§D5b (the ServiceNow side specified end to end — and the two rosters differ in
+      KIND of holder, not only in count), §B6b/§B6c (the TOM row names a GROUP, so §B6's
+      always-a-person invariant needs its scope ruled before a loader relies on it; the PROV shape
+      survives either way since prov:agent admits an Organization), §G0d-§G0f (G13/G14/G15 gain a
+      named subject — the Deployment Module — which §G15 explicitly asked for, plus what that does
+      NOT authorize and a correction to a reading that would have ruled §G15 by dissolving its
+      subject), §F6/§F6b (the vocabulary-as-data target already running on the ServiceNow side,
+      carrying a role RETIREMENT flag DryDocs has no equivalent for, which bears on §A2/§G5/§G12),
+      §E1c (the TOM tables are a company scoped app with NO vendor baseline, so every TOM fact is an
+      SME or instance fact), mapping rows 5-6, one new open question and one new risk. THE NEW OPEN
+      QUESTION SHOULD BE SETTLED BEFORE THE WALK, not during it: is the TOM row's subject a Business
+      Application CI or a Deployment Module CI? One GROUP BY cmdb_ci.sys_class_name answers it, and
+      §G0e's fork turns on it. THE NEW RISK is filed rather than hidden: all of this evidence comes
+      through a replica whose completeness is unconfirmed (K21 open question 9). Every ruling here is
+      about SHAPE, which survives a partial copy; counts do not — including §C4's completeness
+      report, which is a count by construction. Suite green at 1811 passed.
 
   # ── appended at the 2026-07-27 groom run (weekly inbox groom) ──────────────
   # Sources: the two 2026-07-27 publish-boundary inbox entries (→ J14/J15), the

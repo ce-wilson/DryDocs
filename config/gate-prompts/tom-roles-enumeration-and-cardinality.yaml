@@ -1,5 +1,25 @@
 # SME gate-prompt spec — the TOM role enumeration + cardinality (backlog G35).
-# DRAFTED 2026-08-05, awaiting SME.
+# DRAFTED 2026-08-05, awaiting SME. REVISED 2026-08-10 with the K21 evidence.
+#
+# WHAT CHANGED ON 2026-08-10, stated up front because two sections were written
+# against premises that are now known to be wrong. K21 mined the ServiceNow
+# replica the SME queries (knowledge/upgrade-plans/servicenow-replica-evidence.md)
+# and the SME answered four questions on it directly. The page previously described
+# the ServiceNow side FROM DESCRIPTION; it now describes it from evidence:
+#   * §E4 was WRONG. It reasoned that the inherited-from parent is estate data
+#     DryDocs does not have, and treated the modelled-node option as blocked on
+#     that. The parent is the AREA PRODUCT, and :AreaProduct is an existing
+#     DryDocs node class signed at K6. The option is not blocked. See §E5.
+#   * §G15 asked the gate to confirm Application Module Owner's SUBJECT before
+#     ruling required-ness. The subject now has a name, a key and a place in a CI
+#     hierarchy — the Deployment Module — and G13/G14/G15 plausibly share it. §G0d.
+#   * §D's ServiceNow side is now specified end to end rather than named, so §D3's
+#     discriminator can be ruled against a real shape. See §D5.
+#   * §B6's "always names a person" invariant has a counter-example to answer
+#     before it is relied on: the ServiceNow TOM row names a GROUP. See §B6b.
+# One caveat rides on all of it and is NOT resolved: whether the replica is a
+# complete copy (K21 open question 9). If it is a filtered projection, evidence
+# drawn from it is evidence about the copy. Flagged in risks, not hidden here.
 #
 # This gate RE-OPENS §B of a SIGNED ruling (seal-tom-attribution-reshape,
 # 2026-07-10, applied at K4 on 2026-07-15). That is deliberate and is the whole
@@ -83,6 +103,7 @@ meta:
   Ontology map: "config/taxonomy-ontology-map/20-mappings-seal.yaml #seal-tom-attribution — status: applied (confirmed 2026-07-10, applied 2026-07-15 at K4). Its role_vocabulary field states the fixed 7 and is one of the surfaces any ruling here must update"
   Precedence: "The signed 2026-07-10 §B ruling is the standing rule this AMENDS. The identity gate's §A1 fence (2026-07-27) and the K5 Product Cabinet ruling (2026-07-20) are NOT reopened — see the scope fence in this file's header"
   Source of record: "config/gate-log.md 2026-07-10 (the signed §B two-family revision) · docs/restructure/backlog.yaml G35 · drydocs_core/schema/seal_ontology_supplement.cypher:176-198 (the scheme as seeded)"
+  ServiceNow evidence: "knowledge/upgrade-plans/servicenow-replica-evidence.md (K21, 2026-08-09/10) — the INSTANCE half: the TOM join spine, the CI relationship chain, the inheritance values, the deployment-module subject, and the open questions this page inherits. Its companion knowledge/upgrade-plans/servicenow-cmdb-analysis.md (C10) is the VENDOR-DOC half. Read together: the vendor documents the stock CMDB, and documents NOTHING about the x_<scope>_cmdb_tom_* tables, which are a company scoped app — see §E1c"
 
 # ---------------------------------------------------------------------------
 # SME direction received 2026-08-05, IN-CHAT, before the walk. Recorded verbatim
@@ -290,6 +311,54 @@ sme_direction:
         gate. Neither route is possible today: see §A8 — the vocabulary is not
         configurable at all, and the one role list that lives in YAML is read by
         no code.
+    - id: deployment-grain-and-the-ci-chain
+      received: "2026-08-09, extended 2026-08-10"
+      said: >
+        One application, multiple deployments is correct — the identifier reads as
+        app_id(seal_id):deployment_id. Everything that we map is off the APPLICATION.
+        Modules are referenced by default for changes but in practice are not used as
+        intended — in ServiceNow the CI must default to a deployment module for
+        Changes, Incidents and KB, and people generally accept the default. The CI
+        relationships run: Business Application [Instantiates] Deployment Module,
+        upstream [Instance of] application [Contained by] area product; each
+        Deployment Module carries its own unique CI id. On the TOM row, `inheritance`
+        is either Inherited — in which case the CI comes from the AREA PRODUCT — or
+        Overridden, meaning changed by hand. There are KB articles linked to the
+        deployment module.
+      changes: >
+        FOUR things, touching four different sections. (1) §E stops being guesswork:
+        both `inheritance` values are named and the parent is identified, which is
+        what §E1 asserted from description and §E3 asks the SME to rule. (2) §E4's
+        premise is FALSE — see §E5. (3) §G13/§G14/§G15 gain a named subject, the
+        Deployment Module, which §G15 explicitly asked for before required-ness could
+        be ruled; §G0d proposes they share it. (4) The mapping grain is CONFIRMED as
+        the APPLICATION, so this gate's attribution subject does not move and the
+        identity gate's 4-part key survives untouched — the one outcome that would
+        have re-keyed every Attribution is ruled out.
+      reading_confirmed: >
+        The module remark was first read as "the module grain carries no reliable
+        meaning, so no grain is needed." The SME corrected that on 2026-08-10 and the
+        correction is the operative version: the DEPLOYMENT MODULE CI IS REAL — own
+        unique CI id, a place in the relationship chain, KB articles attached. What
+        is defaulted is the module reference on TRANSACTIONAL records (Changes,
+        Incidents, KB). So the grain is sound and only the counting of transactions
+        per module is not. Recorded because the first reading would have discarded a
+        real CI class on the strength of a defaulted foreign key — and §G15 would
+        have been ruled on it.
+      still_needed: >
+        Whether the TOM row's subject is a Business Application CI or a Deployment
+        Module CI. `tom_main.parent_id` resolves to `cmdb_ci` and the sample query
+        joins BOTH class tables on that sys_id defensively, so the evidence does not
+        say which one hit — yet the SEAL ids come off `cmdb_ci_service_discovered`.
+        Both can be true, since the source may record finer than the operating model
+        uses it, and one GROUP BY cmdb_ci.sys_class_name settles it. Carried as open
+        question tom-subject-class.
+      scope: >
+        NO ONTOLOGY CHANGE and K6 is NOT reopened. What inherits is the ASSIGNMENT'S
+        CI, not the role vocabulary: K6 ruled the Product Cabinet and TOM role
+        families INDEPENDENT ("do not conflate"), and nothing here shares a concept
+        between them. §E5 states this on its own line so the finding cannot be read
+        as merging the two schemes.
 
 mapping:
   - n: 1
@@ -312,10 +381,25 @@ mapping:
     element: "Which roster surface an attribution came from — CURRENT: not recorded. Attribution.source is the literal 'SEAL' at both loader sites regardless of which view produced the row"
     target: "a surface/view discriminator on the Attribution, so a count difference between SEAL Application Contacts and the ServiceNow TOM Accountable view is a readable fact rather than an unexplained mismatch"
     edge: "property on :Attribution  [PROPOSED — new, §D]"
+    evidence_2026_08_10: >
+      The ServiceNow side is now SPECIFIED rather than named (K21 §1.1). Its row is
+      anchored on x_<scope>_cmdb_tom_main, resolves its role through a tom_roles
+      lookup carrying an `active` flag, names a sys_user_group as holder, points at
+      its subject via parent_id -> cmdb_ci, and carries its own record number. So the
+      discriminator has two concrete values to distinguish, not two labels — and §D3
+      can be ruled on shape rather than on description.
   - n: 6
     element: "Inheritance — CURRENT: not modelled. Every attribution is a flat direct assertion; there is no way to say an assignment was inherited from a parent CI rather than set on this application"
-    target: "either explicitly OUT OF SCOPE (recorded as a known non-capability), or an assertion_mode property plus an inherited-from pointer"
-    edge: "property on :Attribution (+ a possible parent edge)  [PROPOSED — new, §E]"
+    target: "either explicitly OUT OF SCOPE (recorded as a known non-capability), or an assertion_mode property plus an inherited-from pointer — and after 2026-08-10 the pointer may be a MODELLED EDGE, because the parent is a node DryDocs already holds"
+    edge: "property on :Attribution (+ a parent edge to :AreaProduct, now available)  [PROPOSED — new, §E]"
+    evidence_2026_08_10: >
+      SME: `inheritance` takes exactly two values — Inherited, in which case the CI
+      comes from the AREA PRODUCT, or Overridden, meaning set by hand. The page's
+      third value, "(empty)", is not corroborated by the evidence and should be
+      confirmed or dropped at the walk (§E1b). Neither value appears in the public
+      ServiceNow documentation, which is consistent with the TOM tables being a
+      company scoped app with no vendor baseline at all (K21 §3.1) — so every fact
+      about them is an SME fact or an instance fact, never a vendor one.
   - n: 7
     element: "Employee hierarchy placement — CURRENT: nothing. :Employee is a node class (prov:Agent) with NO Employee-to-Employee edge anywhere in the relationship vocabulary; there is no REPORTS_TO, no manager edge, and no producer-side backlog item that would create one"
     target: "OUT OF SCOPE for the contact load by SME direction 2026-08-05 — the attribution links the person, a LATER PASS places that person in the hierarchy. Recorded here because the hand-off target does not yet exist"
@@ -374,6 +458,8 @@ sections:
       - "B4 THE VALUES: after B1, the SME supplies exactly ONE fact per role class — REQUIRED or OPTIONAL. §G puts each class on its own line for that ruling. Nothing else is per-class: no minimum beyond the presence rule, no maximum, no observed-count reconciliation. The four holders of Backup Information Owner and the 1-3 Operate Managers of the signed prose stop being numbers to model and become simply what the data says."
       - "B5 A MISSING REQUIRED CONTACT IS A FINDING, NOT A FAILURE — SME DIRECTION: 'the load should FLAG if one is missing or not readable, but should LOAD THE REST'. Today the code does the inverse on both counts: an unreadable role name raises ValidationError and kills THAT ROW (§A3), while a missing required contact is invisible because nothing checks per-application completeness at all. Confirm the target behaviour — the load NEVER fails a row for an unrecognised role, and EVERY application missing a required contact appears on a report. The two halves are one rule: whatever cannot be read must still be visible."
       - "B6 A ROLE HOLDING ALWAYS NAMES A PERSON — SME DIRECTION 2026-08-05: \"the only known is that they will map to someone.\" Every attribution that exists resolves to an Employee; there is no unassigned-but-present holding. Confirm this as an INVARIANT the load may rely on, which makes an Attribution with no HAS_AGENT a defect rather than a legitimate state — and note the loader cannot currently produce one (employee_sid is a required field on the row model), so the invariant is already true and this records WHY rather than changing anything."
+      - "B6b A COUNTER-EXAMPLE ARRIVED BEFORE THE INVARIANT WAS RELIED ON (K21, 2026-08-09), and it is better met now than after a loader depends on it. §B6 records the SME direction that every holding resolves to a PERSON, and reasons the invariant is already true because employee_sid is a required field. That is true OF THE SEAL SURFACE. On the SERVICENOW surface, as sampled, the TOM row names a GROUP — `tom_main.group` resolves to `sys_user_group`, and no person table is joined anywhere in the SME's query. STATED AS A LIMIT, NOT A REFUTATION: one report proves what that report selected, not what the table can hold, and whether `tom_main` also carries a user column is carried as an open question. Confirm the scope of the invariant: is 'always names a person' a rule about the SEAL extract (in which case it holds and §D3's discriminator is what keeps it honest once a second surface loads), or a rule about TOM accountability generally (in which case the ServiceNow surface contradicts it and one of the two has to give)?"
+      - "B6c IF THE GROUP READING SURVIVES, THE PROV SHAPE STILL DOES — worth saying so the question is not heard as an objection to the model. prov:agent admits an ORGANIZATION as readily as a PERSON, so (:Attribution)-[:HAS_AGENT]->(...) type-checks either way; what would widen is the TARGET NODE CLASS, from :Employee alone to :Employee or a group/team class. The knock-on is §B6's other clause: 'an Attribution with no HAS_AGENT is a defect' stays true, but 'every Attribution reaches an :Employee' would not. Confirm which of the two statements is the invariant the verify layer should test."
       - "B7 HIERARCHY PLACEMENT IS A LATER PASS — SME DIRECTION: \"if a person is in the role, create the relationship to the employee hierarchy in a later pass.\" This gate's load links the ATTRIBUTION to the PERSON and stops there; placing that person in the reporting structure is separate work on a separate cadence. Confirm the boundary — and confirm it knowing the hand-off target DOES NOT EXIST producer-side: :Employee is a node class with NO Employee-to-Employee edge anywhere in the relationship vocabulary, no REPORTS_TO, and no backlog item that would create one. The direction is right, and it currently defers to nothing, so the deferral needs an owner or it is just an omission with better wording."
   - title: "C. Presence is a graph-test, never a database constraint"
     confirmations:
@@ -391,12 +477,19 @@ sections:
       - "D2b THE CONSUMER NOW EXISTS ON PAPER: backlog O44 (groomed 2026-08-05 from SME direction in the same session) is a four-column reconciliation ALLUVIAL diagram — employee hierarchy | SEAL/TOM contacts | ServiceNow queues and technicians | PAT structure — carrying a ribbon between a person's appearance in each column, and TERMINATING that ribbon where the counterpart is absent. That pane is where a roster disagreement becomes VISIBLE rather than inferred, and it is the thing §D3's discriminator is FOR. Confirm the discriminator is specified with that consumer in mind: a value an operator can read as \"SEAL says X, ServiceNow says Y\", not an internal provenance stamp. In an alluvial diagram a disagreement renders as a ribbon that STOPS, so the discriminator has to distinguish \"this surface did not assert it\" from \"this surface was never read\" — a diagram cannot draw the difference the data does not carry. Note O44 depends_on this gate, and that neither of the two surfaces §D1 compares is ingested today — the SEAL side loads, the ServiceNow side does not (inboxed 2026-08-05)."
       - "D3 THE PROPOSAL: a surface discriminator on the Attribution (mapping row 5) naming which view produced it, so disagreement becomes a readable fact. Confirm, or rule that one surface is authoritative and the other is not ingested at all — which is a cleaner answer if it is true, and the SME is the only one who can say whether it is."
       - "D4 PRECEDENCE, IF BOTH ARE INGESTED: config/precedence.yaml must gain the SEAL-view-vs-ServiceNow-view order, or the resolver has no rule when they disagree about the same (app, role, person). Confirm whether that ordering is decided here or deferred — deferring is acceptable, silently having no rule is not."
+      - "D5 THE SERVICENOW SIDE IS NOW SPECIFIED, NOT JUST NAMED (K21, 2026-08-09). When this section was drafted, 'the ServiceNow TOM Accountable view' was a description; the shape is now evidence. The row is anchored on the TOM assignment itself and carries its own record number; the role resolves through a `tom_roles` LOOKUP TABLE carrying an `active` flag; the holder resolves to a `sys_user_group`; the subject is reached by `parent_id` -> `cmdb_ci`; and the assignment mode and its parent pointer ride on the same row (§E). §D3 can therefore be ruled against a real shape. Confirm the discriminator is specified knowing this — the two surfaces do not merely differ in COUNT, they differ in SHAPE, and a discriminator that only records 'which view' loses that."
+      - "D5b THE DIFFERENCE IS BIGGER THAN A COUNT, and it is the reason D3 matters more than the page first implied: the SEAL side attributes to a PERSON (employee_sid is a required field on the row model) while the ServiceNow side, as sampled, attributes to a GROUP. So a disagreement between them may not be two rosters listing different people — it may be two rosters describing different KINDS of holder. §B6b carries the open question; §D3's discriminator is what would let an operator see which case they are looking at. Confirm the two sections are ruled with that coupling in view."
   - title: "E. Inheritance — modelled, or explicitly not"
     confirmations:
       - "E1 THE FINDING: the ServiceNow view carries an assignment mode — Inherited / Overridden / (empty) — plus an 'Inherited from CI' parent pointer. DryDocs models attribution as a FLAT ASSERTION with no way to distinguish an assignment set on this application from one inherited from a parent configuration item."
+      - "E1b CONFIRMED AS DATA, AND THE VALUES ARE NAMED — SME 2026-08-10, via the K21 replica evidence. `inheritance` and `inherited_from_ci` are COLUMNS ON EVERY TOM ROW, not a UI affordance, so the distinction is carried in the data the loader already reads and then discards. The mode takes two values: INHERITED, in which case the CI comes from the AREA PRODUCT, and OVERRIDDEN, meaning it was changed by hand. ONE CORRECTION TO THIS PAGE RIDES HERE: §E1 above lists a THIRD value, '(empty)', which the evidence does not corroborate — confirm at the walk whether an empty mode is a real state (an assignment that is neither inherited nor overridden) or an artefact of how the view was read, because §E3's ruling has to cover every value that exists and no more."
+      - "E1c WHY THE VALUES ARE NOT LOOKUP-ABLE, and it matters for every fact on this page: NEITHER value appears in the public ServiceNow documentation, because the TOM tables are not stock ServiceNow. They are a COMPANY SCOPED APPLICATION (`x_<scope>_cmdb_tom_main` / `_tom_roles`) with no vendor baseline at all (K21 §3.1). The rest of the CMDB — cmdb_ci, cmdb_rel_ci, cmdb_rel_type — is stock and publicly documented, so the usual 'check the vendor doc' move works there and CANNOT work here. Every TOM fact is an SME fact or an instance measurement. Confirm that is understood, because it changes what evidence this gate is entitled to rely on."
       - "E2 WHY IT INTERACTS WITH §B AND §C: an inherited holder and a directly-asserted holder in the same role class may be the reason a class looks multi-holder when the operating model says singleton. If inheritance is not modelled, §C4's graph-test will report violations that are not violations, and the first response to a noisy check is to weaken it."
       - "E3 THE RULING: either (i) model it — an assertion_mode property plus an inherited-from pointer (mapping row 6), which makes the override relationship legible and lets the cardinality check count direct assertions only; or (ii) declare it OUT OF SCOPE and record that DryDocs deliberately flattens inheritance, so the next reviewer meets a decision rather than an omission. Both are acceptable answers; leaving it unstated is not, because the data already carries the distinction and the loaders already discard it."
-      - "E4 IF (i): the inherited-from parent is a CI in another system's hierarchy, not a BusinessApplication DryDocs holds. Confirm whether the pointer is a foreign reference recorded as a property, or a modelled node — the former is available now, the latter is a dependency on estate data DryDocs does not have."
+      - "E4 [AS DRAFTED — THE PREMISE IS FALSE, see E5; kept because it is in the committed history and a later reader will meet it] IF (i): the inherited-from parent is a CI in another system's hierarchy, not a BusinessApplication DryDocs holds. Confirm whether the pointer is a foreign reference recorded as a property, or a modelled node — the former is available now, the latter is a dependency on estate data DryDocs does not have."
+      - "E5 THE PARENT IS THE AREA PRODUCT, AND DRYDOCS ALREADY MODELS IT — SME 2026-08-10. This is the sharpest correction the K21 evidence makes to this page. §E4 was drafted on the assumption that the inherited-from parent is estate data we do not hold, and it treated the modelled-node option as blocked on acquiring that data. It is not blocked. When `inheritance` = Inherited the CI comes from the AREA PRODUCT, and `:AreaProduct` is an EXISTING DryDocs node class — gated and signed at K6 (product-cabinet-attribution, 2026-07-20), already carrying area_product_owner and tech_partner. So E3's option (i) can be a REAL EDGE to a node that already exists, not a foreign key stored as a string. Confirm the corrected premise before ruling E3, because the two options are no longer 'cheap property versus expensive dependency' — they are now closer in cost, which makes the choice a modelling judgement rather than a resourcing one."
+      - "E5b THE BOUNDARY THAT MUST RIDE WITH E5, stated so the ruling cannot be misread later: what inherits is the ASSIGNMENT'S CI, NOT the role vocabulary. K6 ruled the Product Cabinet family (product_roles, scoped to :Product / :AreaProduct) and the TOM family (tom_roles, on :BusinessApplication) INDEPENDENT, with 'do not conflate' explicit in the node classification and no shared concepts. Nothing in E5 merges them, and nothing here reopens K5 or K6. The claim is narrow: a TOM assignment recorded on an application may have been SET AT the area product and flowed down, which is a provenance fact about that assignment. Confirm the boundary explicitly — an inheritance edge pointing at :AreaProduct is exactly the shape a future reader would mistake for a shared role hierarchy."
+      - "E5c AND IT GIVES §D SOMETHING §D CANNOT GET ON ITS OWN: an inherited assignment and a directly-asserted one are different KINDS of fact, and §D2 warns that a count difference today is unattributable. If assertion_mode is modelled, part of a roster disagreement becomes explainable without any surface discriminator at all — 'SEAL shows three, ServiceNow shows five, two of the five are inherited' is a complete answer. Confirm whether §E and §D are ruled together for that reason; they were drafted as independent sections and the evidence has coupled them."
   - title: "F. Declaration timing — up front, or during the load"
     confirmations:
       - "F1 THE DIRECTION: roles may be DECLARED UP FRONT (a config-declared vocabulary) or DURING THE LOAD (a name the source presents that DryDocs admits and records). Both routes end at the same place — the role class exists, carrying its `required` flag and its cardinality — and differ only in when and by whom it was named. Confirm both routes are wanted; up-front-only is simpler and would be a reasonable narrowing if the SME prefers it."
@@ -404,11 +497,16 @@ sections:
       - "F3 WHERE THE DECLARED VOCABULARY LIVES: a config file under config/taxonomy/ is the natural home, and the honest note is that config/taxonomy/business-application.yaml ALREADY has a `roles:` list which NOTHING READS (§A8). Confirm whether the declared vocabulary extends that list into the real source — which retires an orphaned file and its drift in one move — or takes a new file, leaving the old list to be deleted rather than reinterpreted. Leaving both is the one outcome to refuse."
       - "F4 THE ADMISSION GATE MOVES: SealRole (a Python enum) stops being the admission list, because an enum cannot admit a name declared at load. Confirm the enum is retired as the gate and either deleted or demoted to a convenience alias set — and note that _ROLE_CANONICAL survives EITHER WAY, since alias tolerance ('l2 ops manager', 'bio') is a separate concern from vocabulary membership, and it is where the §A4 and §A6 defects actually live."
       - "F5 THE SCHEME DIVERGENCE IS DELIBERATE (see §A7): tom_roles becomes OPEN, product_roles stays FIXED. Confirm, and confirm it is recorded as a skos:changeNote or equivalent on the scheme itself rather than only in the gate log — the two schemes sit side by side in the same supplement file, and a reader comparing them needs the reason in the same place as the difference."
+      - "F6 THE TARGET ALREADY EXISTS ON THE OTHER SIDE OF THE FENCE — a worked example rather than an argument (K21, 2026-08-09). §A8's finding is that DryDocs' role vocabulary is hardcoded across four surfaces in three languages, and §F1's direction is that it should become DATA. ServiceNow's TOM app already does exactly that: `x_<scope>_cmdb_tom_roles` is a TABLE, one row per role class, keyed by sys_id, joined from the assignment row by reference. Adding a role there is an INSERT. That is the shape §F1 is asking for, running in the system this data comes from, which makes the target concrete rather than aspirational. Confirm the direction with the example in view."
+      - "F6b AND IT CARRIES A COLUMN THIS PAGE HAS NOT CONSIDERED: `tom_roles` has an `active` FLAG, and the SME's own query filters on it (`resp.active = TRUE`). So role classes are not merely ADDED over time — they are RETIRED, and the source distinguishes a live class from a withdrawn one. DryDocs has no equivalent: a TOMRole concept, once seeded, has no lifecycle at all. This bears directly on §A2 and §G5 (technology_risk_controls, a seeded concept nothing can write) and on §G12 (Risk Manager, dropped from the capture) — both are questions about RETIREMENT that the page currently has to answer by deleting from a signed scheme, which §G5 rightly calls a ruling in itself. Confirm whether the declared vocabulary gains an active/retired flag alongside `required`, so retirement becomes a state rather than a deletion."
   - title: "G. The role register — every class ruled on its own line"
     confirmations:
       - "G0 HOW TO USE THIS SECTION — SME DIRECTION 2026-08-05: each role is listed INDEPENDENTLY, one tick per class, rather than ruled in blocks. Each line asks ONE thing after §B1: is this class REQUIRED (the application must carry at least one holder) or OPTIONAL (it may carry none)? Cardinality is not asked — §B1 already ruled it one-or-more for every class. A class left unticked is a class NOT ruled — the register is deliberately unable to express a silent default."
       - "G0b THE REGISTER GREW ON 2026-08-06 when the SME supplied the thirteen-class list (§A1c). Numbering is NOT reflowed — ids are referenced from open_questions and from the risks, and renumbering a register mid-walk is how a ruling ends up attached to the wrong class. So: G1-G9 are the nine accountable classes as the page originally reconstructed them; G10-G12 are the three extract names with no concept; G13-G16 are the four classes the SME's list ADDS, which exist in no scheme, no enum, no crosswalk and no prior capture. Three lines are now in tension with the list and say so on their own line — G5 (technology_risk_controls, absent from it), G10 (Chief Business Technologist, absent) and G12 (Risk Manager, absent). Sixteen ids, and the SME's list has thirteen members: the gap is exactly those three, and closing it is §A2 and §A5b's work, not arithmetic."
       - "G0c THE ONE PARTIAL ANSWER ALREADY GIVEN, recorded where it landed rather than generalised: the SME's list carries the note \"these are optional\" positioned immediately after Deployment Owner, Deployment Information Owner and Application Module Owner. Read positionally that marks G13, G14 and G15 OPTIONAL. Confirm the reading — a note attached by position is exactly the kind of thing that should be said out loud once rather than assumed forever — and note it says nothing about the other ten, which still need their own line."
+      - "G0d THE THREE DEPLOYMENT/MODULE LINES MAY SHARE ONE SUBJECT, AND IT NOW HAS A NAME (K21, SME 2026-08-10). G13, G14 and G15 were added by the SME's thirteen-class list, exist in no scheme or crosswalk, and G15 in particular asks the gate to CONFIRM THE SUBJECT before required-ness can be ruled — because a module owner plausibly owns a PART of an application and DryDocs has no module grain. The subject is identifiable: the ServiceNow CI class is the DEPLOYMENT MODULE. It is named `app_id:deployment_id`, carries its OWN unique CI id, and sits one level below the application in the CI chain — `Business Application [Instantiates] Deployment Module`, inverse `[Instance of]`, with `[Contained by] area product` above. 'Deployment' and 'module' are ONE THING in this estate, which is why G13/G14/G15 plausibly resolve TOGETHER against one grain rather than one line at a time. OFFERED AS THE READING TO CONFIRM, NOT AS A FACT: the SME named the CI class, not the three roles' subjects, and G14's own line already asks whether it belongs to the Information Owner family or is independent."
+      - "G0e WHAT G0d DOES NOT AUTHORIZE, because the temptation is obvious: it does NOT create a deployment grain in DryDocs. The SME also ruled that EVERYTHING MAPPED IS OFF THE APPLICATION (2026-08-09), so this gate's attribution subject does not move and the identity gate's 4-part key is untouched. If G13-G15 are ruled REQUIRED or OPTIONAL as application-level roles, that is coherent — the role NAMES a deployment concern while the accountability still attaches to the application. If instead the SME rules that these three genuinely attribute to a DEPLOYMENT, that is a new node class, a new key and a re-keying question, and it belongs to its own gate rather than to a register line here. Confirm which, because the register cannot express the second."
+      - "G0f AND ONE CORRECTION TO A READING THAT NEARLY LANDED HERE: the SME's remark that modules 'aren't used as intended' was first taken to mean the module grain carries no reliable meaning, which would have ruled G15 by declaring its subject unreal. The 2026-08-10 clarification reverses that. The Deployment Module CI is real — own id, own place in the chain, KB articles attached to it. What is defaulted is the module reference on TRANSACTIONAL records: a Change, an Incident and a KB article must each name a deployment module, ServiceNow defaults it, and people generally accept the default. So the GRAIN is sound and only the COUNTING OF TRANSACTIONS per module is not. G15 must be ruled on the grain, never on the transaction data."
       - "G1 APPLICATION OWNER (`application_owner`) — written today by seal_applications.cypher from the DECO row's app_owner_sid, as a literal concept id. REQUIRED or OPTIONAL?"
       - "G2 PRIMARY INFORMATION OWNER (`primary_information_owner`) — written today by seal_applications.cypher from the DECO row's info_owner_sid, as a literal. The signed §B recorded it as replacing the old flat `data_owner`. REQUIRED or OPTIONAL?"
       - "G3 BACKUP INFORMATION OWNER (`backup_information_owner`) — written today via the contact-extract crosswalk. The class with four observed holders on one application; after §B1 that is simply what the data says, not an anomaly. REQUIRED or OPTIONAL?"
@@ -422,14 +520,16 @@ sections:
       - "G10 CHIEF BUSINESS TECHNOLOGIST (CBT) — DISPOSED AND RULED 2026-08-06. SME: \"add optional role: Chief Business Technologist (CBT) but do not create a cypher relationship mapping for it, in case it appears.\" So it is a ROLE CLASS IN ITS OWN RIGHT — not an alias of Chief Technology Officer (G4) — and it is OPTIONAL. This is the first line of the register answered outright, and it answers the disposition and the required-ness together. IT REQUIRED NO CODE CHANGE, which is the interesting part: CBT is already admissible (SealRole, plus the `cbt` alias) and no Cypher branch exists for it, so a CBT row already loads and arrives flagged unmapped_role=true. The ruling turns an accident into an intention — the K4 policy used ON PURPOSE, recording a name the source may emit without minting a concept for it. The taxonomy capture was updated to carry CBT and Chief Technology Officer on the SAME application, held by different people, so the sample states they are two classes rather than leaving it to be inferred."
       - "G11 BACKUP APPLICATION OWNER — in the extract and the enum, no concept, flagged unmapped. Recorded in drydocs_core/models/seal.py as effective 2026-05-18, so it POSTDATES the ruling that fixed the scheme at seven — the first worked example of what a FIXED scheme costs, and the reason §F rules the vocabulary open. DISPOSITION FIRST, then required or optional."
       - "G12 RISK MANAGER — in the extract and the enum, no concept, flagged unmapped, and as of 2026-08-06 NO LONGER IN THE TAXONOMY CAPTURE either: it is absent from the SME's thirteen-class list and the rebuilt capture dropped it. §A2 asks whether it IS `technology_risk_controls` (G5) under the source's own name. The absence makes that pairing MORE urgent rather than moot, because if the two are one class then the list is missing risk accountability entirely, and if they are not then both a concept and a source name are now unaccounted for. Resolve the pairing, then rule once — and rule the absence explicitly, since dropping a class from a capture is not the same act as retiring it from the vocabulary."
-      - "G13 DEPLOYMENT OWNER — NEW on 2026-08-06 (§A1c). Exists in no scheme, no enum, no crosswalk and no prior capture, so it has no concept id, no crosswalk branch and no alias: today the row is REJECTED at validation, not flagged (§A1d measured it). Marked OPTIONAL by the positional note at G0c — confirm. A definition is also needed, on the same grounds as §A5c."
-      - "G14 DEPLOYMENT INFORMATION OWNER — NEW on 2026-08-06, same standing as G13 and rejected today for the same reason. The name pairs with Primary/Backup Information Owner (G2/G3) but scopes to deployment rather than to the application, so confirm whether it belongs to the Information Owner family or is independent — it changes whether an operator looking for \"who owns the information\" should find one answer or two."
-      - "G15 APPLICATION MODULE OWNER — NEW on 2026-08-06, rejected today. This is the first role in the set whose subject may not be the APPLICATION: a module owner plausibly owns a PART of an application, and DryDocs has no module grain to attribute to. Confirm the subject before required-ness — if it is genuinely per-module, a per-application required flag cannot express it and the class needs a home this gate does not have."
+      - "G13 DEPLOYMENT OWNER — NEW on 2026-08-06 (§A1c). Exists in no scheme, no enum, no crosswalk and no prior capture, so it has no concept id, no crosswalk branch and no alias: today the row is REJECTED at validation, not flagged (§A1d measured it). Marked OPTIONAL by the positional note at G0c — confirm. A definition is also needed, on the same grounds as §A5c. SUBJECT CANDIDATE (2026-08-10): the Deployment Module CI — see §G0d/§G0e, and note the SME confirmed one application carries MANY deployments, so a per-application flag on this class is a statement about the application, not about any one deployment."
+      - "G14 DEPLOYMENT INFORMATION OWNER — NEW on 2026-08-06, same standing as G13 and rejected today for the same reason. The name pairs with Primary/Backup Information Owner (G2/G3) but scopes to deployment rather than to the application, so confirm whether it belongs to the Information Owner family or is independent — it changes whether an operator looking for \"who owns the information\" should find one answer or two. THE SCOPE IT NAMES IS REAL (2026-08-10): the Deployment Module is a genuine CI class, so \"scopes to deployment\" is no longer a hypothesis about the name — it is the subject candidate at G0d. That SHARPENS the family question rather than settling it: if this class attributes to the application like G2/G3, the three form one family at one grain; if it attributes to a deployment, it is a different grain wearing a similar name, and G0e says that is its own gate."
+      - "G15 APPLICATION MODULE OWNER — NEW on 2026-08-06, rejected today. This is the first role in the set whose subject may not be the APPLICATION: a module owner plausibly owns a PART of an application, and DryDocs has no module grain to attribute to. Confirm the subject before required-ness — if it is genuinely per-module, a per-application required flag cannot express it and the class needs a home this gate does not have. THE SUBJECT IS NOW IDENTIFIABLE (2026-08-10): the module is the DEPLOYMENT MODULE CI, named `app_id:deployment_id` with its own CI id, `[Instance of]` the application — see §G0d, and §G0e for what that does and does not authorize. Rule the subject on this line first, then required-ness."
       - "G16 SITE RELIABILITY ENGINEER (SRE) — NEW on 2026-08-06, rejected today. It sits with the Operate Manager family in the SME's ordering, which suggests an operational rather than accountable role, and that distinction matters: §B's required/optional split is about ACCOUNTABILITY for an application, and a staffing role that happens to be recorded on the same extract is a different kind of fact. Confirm which it is, then rule."
   - title: "H. Sign-off"
     confirmations:
       - "H1 Sections A-H are reviewed and the direction is correct, OR amended by explicit SME edits recorded in config/gate-log.md. NOTE §A5 was CONFIRMED IN ADVANCE OF THE WALK (2026-08-05, the Operate Manager split) and its consequence APPLIED on 2026-08-06 — both now carry a standalone RECORD entry in config/gate-log.md dated 2026-08-06, so the sign-off entry states what was decided AT the walk rather than re-claiming what was already decided before it."
       - "H1b THE CLAUSE ALMOST WENT UNRECORDED, and the mechanism is worth fixing rather than just noting. §A5 was confirmed on 2026-08-05 and lived ONLY in this file — committed, dated and attributable in git, and absent from config/gate-log.md, which is the durable source of record. It surfaced a day later because the SME asked whether it had been confirmed, not because anything reported it. The general defect: a CONFIRMED CLAUSE inside an UNSIGNED gate has no home in a log organised by sign-off, so any gate walked across more than one sitting can leave rulings stranded in a draft. Confirm the interim convention used here — a RECORD entry per confirmed-and-applied clause, on the existing G51/X1 idiom — and whether that becomes the standing rule for multi-sitting gates."
+      - "H1c THE PAGE WAS REVISED ON 2026-08-10 AND THE WALK SHOULD KNOW WHICH CLAUSES ARE NEW, because reviewing a revised page as if it were the original is how a correction gets ticked without being read. NEW OR CHANGED, all from the K21 ServiceNow evidence and the SME statements on it: §E1b and §E1c (the inheritance values are named; the TOM tables have no vendor baseline), §E5/§E5b/§E5c (the parent is the AREA PRODUCT, a node DryDocs already holds — §E4's premise was FALSE and is kept struck for the record; plus the K6 boundary and the §D coupling), §D5/§D5b (the ServiceNow side is specified, and the two surfaces differ in KIND of holder rather than only in count), §B6b/§B6c (the group-versus-person counter-example, and why the PROV shape survives it either way), §G0d/§G0e/§G0f (the Deployment Module subject for G13-G15, what it does NOT authorize, and the correction to a reading that nearly ruled §G15 on transaction data), §G13/§G14/§G15 line updates, §F6/§F6b (the vocabulary-as-data target already running on the ServiceNow side, including a retirement flag DryDocs has no equivalent for), mapping rows 5 and 6, one new open question (tom-subject-class) and one new risk (the replica caveat). Confirm the revision is understood as EVIDENCE ARRIVING, not as scope creep: no new ruling is requested that was not already requested on 2026-08-05."
+      - "H1d TWO CORRECTIONS ARE ON THE RECORD RATHER THAN QUIETLY FIXED, on the §A4 precedent that a gate log needs the defect and not just its repair. (1) §E4 reasoned from a premise that is false, and the false version is retained above its correction. (2) The SME's remark that modules 'aren't used as intended' was first read as meaning the module grain is unreal, which would have ruled §G15 by dissolving its subject; the 2026-08-10 clarification reverses it — the Deployment Module CI is real and only the TRANSACTIONAL reference to it is defaulted. Confirm both readings as corrected, because both wrong versions are in the committed history."
       - "H2 NOTHING IS APPLIED BY TICKING BOXES HERE and no graph write is authorized. The tom_roles scheme keeps its 7 concepts, seal_contacts.cypher keeps its 4-branch crosswalk, and #seal-tom-attribution stays status: applied describing the fixed 7. Every correction is a SEPARATE, logged follow-up after this entry is transcribed. ONE EXCEPTION, taken on explicit SME instruction and logged as its own RECORD on 2026-08-06: drydocs_core/models/seal.py now carries an eleventh enum member (OPERATE_MANAGER) and its bare-Operate-Manager alias points at it instead of L2 (§A4). That was a data-loss fix, not a vocabulary ruling — the enum is the SOURCE-NAME admission list, no concept was created, and the affected rows now arrive flagged unmapped rather than merged. The OTHER contested alias, Tech Partner -> CTO (§A6), is UNCHANGED and still live."
       - "H3 THE FOLLOW-UP SET IS AGREED AS ONE UNIT (they cannot land piecemeal without leaving the surfaces mutually inconsistent). EXISTING surfaces to amend: the supplement's scheme seed; both loader crosswalks; the SealRole enum and _ROLE_CANONICAL aliases; the map entry's role_vocabulary text in config/taxonomy-ontology-map/20-mappings-seal.yaml; the vocabulary fragment 41-local-seal.yaml; NODE_QUICK_REFERENCE.md; config/taxonomy/business-application.yaml's `roles:` list (which G35's acceptance names explicitly); and the seal-extract field ledger's \"kept verbatim\" claim (§A4b). NEW surfaces the SME direction creates: the declared role vocabulary and its reader (§F3); the `required` + cardinality attributes on the concept (§B3); the per-application REQUIRED-CONTACT COMPLETENESS REPORT (§B5), which has no counterpart today; and the cardinality graph-test (§C4)."
       - "H4 THE TAXONOMY CAPTURE IS RECONCILED to whatever §A rules — config/taxonomy/business-application.yaml lists 13 role names (6, then 8, then 13 across 2026-08-06; §A1b) agreeing with neither the scheme nor the loader, and it is the file a future importer would treat as the source shape. Two things ride with the reconciliation. Its `roles:` list is DERIVED — the union of the names in `memberships` — so reconciling the list without reconciling the membership blocks that produce it would not survive the next regeneration. And the reconciliation should decide whether this file keeps a role list AT ALL: §F3 asks whether the declared vocabulary extends it or takes a new file, and if a new file wins, the honest outcome here is deletion rather than a fourth divergent list kept in step by hand."
@@ -437,6 +537,24 @@ sections:
       - "H6 Safe to transcribe this decision into config/gate-log.md as an AMENDMENT to the 2026-07-10 entry (not a replacement — the original ruling stays readable, the amendment states what changed and why), and only once transcribed, to begin the follow-up work."
 
 open_questions:
+  - id: tom-subject-class
+    status: "RAISED 2026-08-10 by the K21 evidence. Settled by one query, not by a ruling — but §B, §D and §G all read differently depending on the answer, so it should be run BEFORE the walk rather than during it."
+    note: >
+      IS THE TOM ROW'S SUBJECT A BUSINESS APPLICATION CI OR A DEPLOYMENT MODULE CI?
+      `tom_main.parent_id` resolves to `cmdb_ci`, the base class table, and the SME's
+      query joins BOTH `cmdb_ci_business_app` AND `cmdb_ci_service_discovered` on that
+      same sys_id — defensively, so only the CI's actual class returns non-null. The
+      sample therefore does not reveal which one hit. It matters because the two
+      readings point opposite ways: the SEAL identifiers come off
+      `cmdb_ci_service_discovered`, which would put the assignment at DEPLOYMENT grain
+      in the SOURCE, while the SME has ruled that everything mapped is off the
+      APPLICATION. Both can be true at once — a source may record finer than the
+      operating model uses it — and that is the likeliest answer, but it should be
+      established rather than assumed, because §G0e's fork (are G13-G15
+      application-level roles that NAME a deployment concern, or genuine
+      deployment-level attributions?) turns on it.
+      THE QUERY: count TOM rows grouped by `cmdb_ci.sys_class_name`. One row of output
+      per class present, and the answer is whichever classes actually appear.
   - id: which-roles-are-required
     status: "MECHANISM BUILT 2026-08-05 (§G, the role register); 3 of 16 lines answered 2026-08-06 by the positional 'these are optional' note (G13-G15, §G0c); the other thirteen still outstanding."
     note: >
@@ -536,6 +654,34 @@ open_questions:
       acceptable; the page asks only that the deferral be explicit.
 
 risks:
+  - id: the-servicenow-evidence-is-second-hand-through-a-replica
+    status: "OPEN — raised 2026-08-10 with the evidence it qualifies. Not a reason to discount §D, §E or §G0d; a reason to know what they rest on."
+    note: >
+      EVERY SERVICENOW FACT ON THIS PAGE COMES FROM A REPLICA, NOT FROM SERVICENOW.
+      The estate reads ServiceNow through a Snowflake copy — the same shape as
+      Control-M through the Oracle psgmgr replica, and the same shape this repo
+      already trusts elsewhere — so the pattern is familiar and accepted. Two
+      qualifications ride with it anyway, because they were measured rather than
+      assumed (K21 §3.1, §3.3).
+      FIRST, THE COPY IS NOT A PURE MIRROR. The views carry columns ServiceNow never
+      had — a data-lake snapshot family and a `delete_flag` — so a column's presence
+      does not make it vendor schema, and a soft-deleted row may or may not be
+      visible depending on how the view was built. None of the §E or §G0d findings
+      depend on those columns, but a LOADER built from this page would.
+      SECOND, AND UNRESOLVED: the SME counted the relationship-type vocabulary at 54
+      and reports that is FEWER than an older extract from the same estate. Three
+      readings survive — genuine retirement, a different source for the old extract,
+      or A FILTERED OR STALE VIEW. The third would mean row counts on the replica are
+      not source truth anywhere, which does not change any RULING on this page (they
+      are all about shape, not counts) but would undermine anything later built on
+      counts — including §C4's completeness report, which is a count by construction.
+      K21 open question 9 carries the test that settles it from inside the replica: a
+      LEFT JOIN from the edge view to the type view, counting rows whose type does
+      not resolve. Non-zero proves incompleteness with no external baseline needed.
+      WHY IT IS FILED AS A RISK RATHER THAN A BLOCKER: every §D/§E/§G0d finding is
+      about SHAPE — which columns exist, what their values mean, how the CI chain is
+      wired — and shape survives a partial copy. Counts do not. Rule shape here;
+      treat any count drawn from the replica as provisional until the test runs.
   - id: coercion-is-losing-data-now
     status: >
       CLOSED 2026-08-06 — fixed on SME instruction ahead of sign-off, exactly as this
