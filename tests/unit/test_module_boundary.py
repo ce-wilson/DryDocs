@@ -103,6 +103,13 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # markdown — it consumes plan_board's published backlog shape, and a
     # within-group import is exactly what this classification permits.
     "plan": ("drydocs.plan_board", "drydocs.plan_roadmap"),
+    # drydocs-port — J41 port machinery. Its own group rather than a lodger in
+    # "plan", and the reason is the same one that moved plan_ideas to docgen:
+    # classify by WHAT IT DOES, not by which documents it happens to read. It
+    # renders nothing, publishes no surface, and reads port-prompt.md only as
+    # text. Import profile is stdlib + subprocess and nothing else — no component,
+    # not even config — which is what lets its guards run without a repository.
+    "port": ("drydocs.port_preflight",),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.
     #

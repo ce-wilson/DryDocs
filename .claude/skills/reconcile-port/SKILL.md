@@ -20,7 +20,18 @@ the accumulated lessons from prior ports. Read both.
 1. **Preflight.** Clean tree, on `main`. Set a backup tag:
    `git tag -f pre-cewilson-port`. Add/refresh the remote and fetch:
    `git remote add cewilson https://github.com/ce-wilson/DryDocs.git` (ignore if
-   it exists), then `git fetch cewilson main`.
+   it exists), then `git fetch cewilson main --tags`.
+   **THEN CHECK THE BASE IS CERTIFIED (J41).** Port
+   `<last-ported>..port-base-YYYYMMDD`, never `..HEAD`. **If the producer offers a
+   bare SHA or "HEAD", STOP and ask for the tag** — same shape as the
+   fetch-failure rule, and for the same reason: producer `HEAD` moves while you
+   read it (on 2026-08-09 a base moved 42 → 45 commits mid-session), and an
+   untagged commit is one nobody ran the opening sequence against. Two real
+   failures shipped in one such range — a `FORCE_COLOR` colour-vs-behaviour test
+   failure and a duplicate `Idea-101` — either of which would have broken the
+   zero-fail acceptance contract and read as port-introduced.
+   If producer HEAD has moved past the tag, that is NORMAL: those commits ride the
+   next port, not this one.
 2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
    the machine-readable disposition per path (first match wins; `**` spans
    separators, `*`/`?` do not; per-entry rows FORBID whole-file checkout).

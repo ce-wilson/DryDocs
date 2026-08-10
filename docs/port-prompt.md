@@ -25,6 +25,38 @@ Producer-side at the next session: verify the roll against `git log
 <last-ported-head>..HEAD` COMMIT-BY-COMMIT (the roll-procedure rule below), never by
 eyeballing back from the newest entry.
 
+**OPENING SEQUENCE (J41, 2026-08-09 — MANDATORY, producer-side, before any company
+session starts).** J35 above is the CLOSING half. For nine months there was no opening
+half, so every port began on a base nobody had certified. That cost a full cycle on
+2026-08-09: a company session was handed a thorough 8-phase plan and could not run it
+solo, and two real failures rode in the offered range invisibly (a `FORCE_COLOR`
+colour-vs-behaviour test failure, and a duplicate `Idea-101` from a two-session id
+collision that would have failed `test_idea_ids_are_unique` on apply). Run
+`poetry run python scripts/port_preflight.py --base <last-ported-head> --tag`; it
+performs all six and refuses to certify on any failure:
+1. **Suite green** on the exact commit offered, **venue-stamped (J18)**.
+2. **Ledger rolled** through that commit, coverage verified COMMIT-BY-COMMIT.
+3. **Every producer action triggered by company state is landed** — anything the
+   company would otherwise have to do to a `canonical-producer` file. This is the one
+   that failed: the plan asked the company to edit `PORT-MANIFEST.yaml`, which its own
+   apply phase takes wholesale, so the edit would have been reverted in the same session.
+4. **Renders current** (re-render, then `git diff --quiet`).
+5. **Relay basis tags** present on every live relay (see the RELAY section).
+6. **Base tagged `port-base-YYYYMMDD` and pushed.**
+
+**THE BASE IS A TAG, NOT `HEAD` (J41).** The company still fetches fresh — never a
+cached ref, the 2026-08-05 lesson stands — but ports `<last-ported>..port-base-YYYYMMDD`,
+not `..HEAD`. Producer `HEAD` moves while a session reads it: on 2026-08-09 the base
+moved 42 → 45 commits mid-hold and every prompt had to carry an awkward "verify, the
+producer is still committing". A tag is immutable and certified; if HEAD has moved past
+it, those commits ride the NEXT port, which is normal rather than a discrepancy.
+
+**ONE OWNER PER PHASE (J41).** A port plan names exactly ONE owner per phase and NEVER
+crosses the repo boundary. If a phase's owner differs from the phase before it, the plan
+ENDS there and a new plan begins after the handoff. A plan that cannot name one owner per
+phase has a hidden handoff in it — and no amount of instruction detail rescues a phase
+its assignee cannot durably perform.
+
 **LENGTH DISCIPLINE (v3 rule, and the reason for it).** This file regrew to 567 lines by
 step 51 because each roll added prose that the next roll never removed. A prompt nobody
 finishes reading is not a control document. So:
@@ -35,88 +67,50 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state (2026-08-09 pm, the post-`0d3761a9` roll).** The ledger is now rolled
-through the NAMED deliberate end **`0d3761a9`**. Steps **106–115 are APPLIED** and
-collapse into **Last completed port** below; the live ledger restarts at **116+**,
-delta since `0d3761a9`.
+**Roll state (2026-08-09 pm, the post-`6f03264` roll).** The ledger is now rolled
+through the NAMED deliberate end **`6f03264`**. Steps **116-121 are APPLIED** and
+collapse into **Last completed port** below; the live ledger restarts at **122+**,
+delta since `6f03264`.
 
-> **`0d3761a9` IS MERGED, NOT YET PUSHED (state as of 2026-08-09 pm).** P8 happened:
-> the company `git status` shows `main` clean and **ahead of `origin/main` by 4
-> commits** — `a4c4ce37` + `1c102f5c` + `b077f746` (the merged port) plus `48252f72`
-> (the `ui-write-surface` ratification). So the blocker moved from the MERGE to the
-> PUSH.
-> **The five staged `docs/gate-*-company-prompt.md` clean-add rows STAY for now,
-> and the reason is not inertia.** Step 108 says remove them once the delivering
-> port merges, and it has — but an unpushed merge is still local state on one
-> machine, and removing producer rows against it would strand the files if that
-> branch were ever reset. Remove at the PUSH, not at the merge.
-> **AND THEN ONLY THREE OF THE FIVE.** The rows for the discharged packs
-> (`audit-envelope-phase4`, `envelope-property-terms`, `ui-write-surface`) go; the
-> two CROSSWALK rows must STAY, because those prompts are live-but-deferred and
-> carry edits made after delivery (`91f4845`: the deferral, the DEFERRED branch,
-> the J28 fix). Drop their rows and the never-port glob reasserts, and the deferral
-> a future company session most needs to read never reaches it. A blanket reading
-> of step 108 would have done exactly that.
+> **`6f03264` IS BUILT, NOT YET MERGED.** The port commit sits on the company branch
+> `drydocs-port-20260809b` and is not merged or pushed — the `--no-ff` is the SME's
+> call. Treat the range as ported for LEDGER purposes (built, tested, reported) but NOT
+> as landed for anything that depends on the merge.
+> **The previous port DID complete: merged AND pushed 2026-08-09**, which fired the
+> trigger for the producer's staged-row removal (`f6954ac`) — three discharged packs
+> retired, the two crosswalk rows deliberately retained. That retention was load-bearing
+> and is now proven: the crosswalk prompts were ABSENT in company HEAD (retired last
+> port) and came back as clean-adds, so the `91f4845` deferral content reached the
+> company. A blanket "remove all five" would have silently lost it.
 
 **Last completed port — the four required fields (J35).**
-- **Range:** `5417ef10..0d3761a9` — 68 commits, ledger steps 106–115.
-- **Port commit:** `b077f746` (branch `drydocs-port-20260809`, 97 files); the
-  PORT-REPORT + ledger roll landed separately as `1c102fc`.
-- **Backup tag:** `pre-cewilson-port-20260809` @ `60de653d`.
-- **Acceptance:** `tests/unit/` **1989 passed / 32 skipped / 1 failed** — the single
+- **Range:** `0d3761a9..6f03264` — **45 commits / 45 changed paths**, ledger steps
+  116-121 (`rev-list --count` and `diff --name-only | measure` both quoted).
+- **Port commit:** `feeb0706` (branch `drydocs-port-20260809b`).
+- **Backup tag:** `pre-cewilson-port-20260809b` @ `48252f72`;
+  `rev-list --count pre-cewilson-port-20260809b..HEAD` = **1** (guardrail 3).
+- **Acceptance:** `tests/unit/` **2006 passed / 32 skipped / 1 failed** — the single
   failure is PRE-EXISTING (`test_code_snapshot_loader::test_committed_newest_snapshot_is_accepted_and_clean`,
-  the T19/WP1.4 committed-snapshot infra-block; it fails on company HEAD's own adapter
-  too, so it is not port-introduced). Track-1 contract **123 passed / 3 skipped**.
-  J7/J34 reconcile guards **21 passed** with `RECONCILE_BEFORE_DIR` set — no status
-  downgrade, no dropped entry, gate-log append-only, and the J34 overlay covering the
-  9 company-only paths.
+  the T19/WP1.4 infra-block; not in the range's changed paths, fails on company HEAD's
+  own adapter). **+17 over `0d3761a9`'s 1989 = exactly the new guards**, same one
+  failure, same 32 skips. Track-1 **123 / 3**. J7/J34 reconcile guards **21 passed**
+  with `RECONCILE_BEFORE_DIR` set. **0 J16 fall-through** across all 45 paths.
 
-**What the range carried, in one line each.** J34 manifest-overlay migration landed
-ATOMICALLY (producer `PORT-MANIFEST.yaml` + the overlay guards taken together, and
-`PORT-MANIFEST.company.yaml` created with the 9 company-only `default_ok` rows) — a
-verbatim manifest take can never again drop a company-only disposition, which is the
-structural fix for the 2026-08-06 clobber. Backlog union **317 → 374**: 34 in-range plus
-the **23-item pre-base gap-heal**, extracted from the exact SHA `0d3761a9` rather than
-producer HEAD, with X3/X4/J30 venue-noted and the summary recomputed. One structural
-collision, `C24`, resolved evidence-backed rather than by a silent pick: the company's
-C24 was a duplicate of the already-`done` N8, so the producer's canonical C24 stood.
+**Steps 116-121, one line each.** 116 O52 always-null `holder_sid` (the two QuerySpec
+guards are the payload). 117 Epic U instrument series — U18/U19 landed **`todo`, not
+`done`** company-side, correctly: the enabling U19 depgraph pin is not adopted (T18),
+`reconcile_note` attached on the U9/C21 precedent. 118 C25 `software-version-context`
+SIGNED OFF — see the RELAY-5 correction below, the reconcile half was wrong. 119 SNOW is
+ServiceNow on the psgmgr replica pattern + K21. 120 the ratification-provenance rule and
+all five staged packs resolved. 121 port-machinery housekeeping.
 
-**THE CRITICAL CORRECTION, and it is a rule this file now carries.** The company's
-initial vocabulary reconcile WRONGLY ACTIVATED the G55 `rua-load-shapes` lineage flips.
-K8 (`seal-app-ref-edge-reshape`) is signed company-side; `rua-load-shapes` is a
-DIFFERENT gate and is still UNSIGNED there. All three vocab fragments were reverted to
-company HEAD so those entries stay `planned`, and the G23/rua code ported INERT because
-it is gate-bound and refuses the planned labels.
-**RULE: gate-bound files are never wholesale-take candidates.** "Identical to base" and
-"per-entry equivalent" are BOTH insufficient tests for them — a producer vocabulary or
-test file can be byte-identical to the base and still assume an active gate the consumer
-has not signed. Status/id-set parity is not field-and-gate parity. Check the GATE, not
-just the diff.
-
-Prior roll state, retained for context: the ledger was previously rolled through
-**`5417ef10`** (PORT-REPORT-5417ef10). Steps **55–105 are COLLAPSED** (one-liners in **Last completed
-port** below): steps 84–105 were applied at the two producer-VERIFIED ports
-(PORT-REPORT-a14a8028, PORT-REPORT-5417ef10); steps 55–83 were applied by the two
-reported-only mid-range ports (PORT-REPORT-6713c142, PORT-REPORT-5f79d145) and carried
-through the verified ports' green acceptance — their own range/backup/acceptance
-fields remain unrecoverable, and this roll RECORDS that gap rather than inventing
-values (the closing-sequence rule above exists so the class cannot recur). Steps
-**102–105** ledger the `a14a8028..5417ef10` range that previously sat past step 101
-unledgered (the cc3e98e inbox line, now closed). The live ledger runs **106+** below,
-delta since `5417ef10`, rolled BEFORE the port that will carry it — the second roll
-run that way. Verification tags (`[SME-SIGNED]`, `[LIVE-VERIFIED]`, `[TEST-PINNED]`,
-`[STAGING-ONLY]`, `[RECORD-CORRECTION]`, `[UNRULED]`) carry forward; anything untagged
-is NOT confirmed — treat contracts as ASSUMED until your side validates them (the
-T10/T13 discipline).
-**ROLL-PROCEDURE RULE:** currency is verified by diffing the ledger's claimed coverage
-against `git log <last-ported-head>..HEAD` COMMIT-BY-COMMIT — never by eyeballing back
-from the newest entry. Both historic gaps (the f71967db port unrecorded here;
-O27/O28/C17/Q7/R6/S1 never ledgered) were caught by the company session's own range
-enumeration — the guardrail-2 safety net working, not a reason to keep the habit.
-
-Authorities are unchanged: [`PORT-MANIFEST.yaml`](../PORT-MANIFEST.yaml) is the WHAT
-(per-path disposition, first-matching-glob-row wins); [`git-readme.md`](../git-readme.md)
-is the WHY + the acceptance oracle; this prompt is sequencing + delta context only.
+**Two findings the run confirmed, both of which J41 now prevents.** Quoted from the
+report rather than paraphrased: *"Had the range head been `ed07931` (pre-fix) the
+zero-fail contract would have shown a spurious failure"* (`FORCE_COLOR`), and *"the
+duplicate was present at `ed079311`; porting there would have failed
+`test_idea_ids_are_unique`. Confirms holding for the re-fetch was correct over 'port
+now'"* (Idea-101). Both existed in the offered range and neither was visible until
+after the apply — which is the OPENING SEQUENCE's whole reason for existing.
 
 ## Last completed port
 
@@ -664,7 +658,21 @@ than none; a discharged relay is STRUCK with a dated reason, never silently
 deleted; action a relay in the port that carries it or record why not in the
 PORT-REPORT):
 
-- **RELAY-1 (was R1) — AIS acronym expansion: transplant the VALUE across files** (standing
+**EVERY LIVE RELAY DECLARES ITS BASIS (J41, 2026-08-09). Unlabelled means
+unverified.** The tracker below has carried this caveat since T11 — "STATUS IS A
+PRODUCER BELIEF, NOT COMPANY STATE ... every `pending` means *not known to be done*"
+— and the RELAY section, added later as J38, never inherited it. RELAY-5 is what that
+cost: it told the company "you already pushed a software-registry change with the
+internal URL", and their `git log --all -S "in-house"` showed it was never there.
+- `[VERIFIED-PRODUCER]` — a fact about the PRODUCER tree, checkable from here.
+- `[SME-REPORTED]` — told to the producer by the SME; **unverifiable company-side**.
+  Say what to do if it is NOT found; never phrase it as established company state.
+- `[COMPANY-CONFIRMED]` — came back in a PORT-REPORT. The ONLY tag that may assert
+  company state.
+`scripts/port_preflight.py` fails the port if any live relay lacks one.
+
+- **RELAY-1 (was R1) — AIS acronym expansion: transplant the VALUE across files**
+  `[VERIFIED-PRODUCER]` (standing
   since 2026-07-21; re-verified at the 2026-08-09 roll). Producer's
   authoritative home is `config/taxonomy/software-registry.yaml#acronyms`
   (`AIS: "Application Integration Streaming"`); YOUR provisional gloss sits in
@@ -674,7 +682,8 @@ PORT-REPORT):
   correspond. Rider from the same note: your 06-29 gate (the Ais* class
   removal) has no company gate-log entry — an audit gap on your side; the
   producer offered a backfill.
-- **RELAY-2 (was R2) — run-log adoption asks** (standing since 2026-07-22; re-verified — the
+- **RELAY-2 (was R2) — run-log adoption asks** `[VERIFIED-PRODUCER]`
+  (standing since 2026-07-22; re-verified — the
   run-log family in `drydocs_core/run_log.py` + BaseLoader wiring is long
   ported). Two asks remain YOURS because they sit in your adapter code: (a)
   attach the WARN-stream tee in the XML EXTRACTOR stage — the
@@ -682,7 +691,8 @@ PORT-REPORT):
   loader-stage tee never catches it; (b) once the stream lands in a file,
   consider raising the console handler to WARNING-summary-only — the file is
   the review surface, the console shows counts.
-- **RELAY-3 (was R3) — 2026-07-21 port-report heads-ups, re-verified 2026-08-09:**
+- **RELAY-3 (was R3) — 2026-07-21 port-report heads-ups** `[COMPANY-CONFIRMED]`
+  **(re-verified 2026-08-09; (b) and (c) discharged on company-run evidence):**
   (a) `test_schema_graph.py` drift-guard sequencing — re-add that test ONLY
   after your own doc-vocab gate; the trap is written in the reconcile-port
   skill's ledger (SKILL.md, "Sequencing trap"). Status unknown company-side —
@@ -729,8 +739,22 @@ PORT-REPORT):
   with the overlay covering them. A verbatim manifest take can no longer drop a
   company-only disposition — the 2026-08-06 clobber (Idea-79) is structurally
   fixed, not procedurally avoided.
-- **RELAY-5 (was R5) — DPL + Snowflake registry entries: the producer is canonical, and you
-  were mid-flight on the same change** (new 2026-08-09, gate
+- **RELAY-5 (was R5) — DPL + Snowflake registry entries** `[SME-REPORTED]`
+  **— AND THE "you were mid-flight on the same change" HALF WAS WRONG. CORRECTED
+  2026-08-09 pm at PORT-REPORT-6f03264, by the company, on evidence.** This relay
+  told you the reconcile half as established fact. It is not: `git log --all -S
+  "in-house" -- config/taxonomy/software-registry.yaml` company-side returns ONLY the
+  producer commit `aef10c54`, and `git grep in-house` in `config/` is empty. The SME
+  did do that work internally on 2026-08-07, but it never reached a pushed company
+  branch — so the producer asserted the state of a tree it cannot see. The company
+  handled it exactly right: treated it as a stale producer belief, took the producer
+  `software-registry.yaml` verbatim, and did NOT fabricate an internal URL. **So this
+  is a CLEAN ADD unless and until a company internal-URL edit surfaces on an unmerged
+  machine; reconcile it when that lands.** This correction is why the basis-tag rule
+  above exists — the producer half of the relay below remains sound, the company half
+  never had a basis.
+
+  The PRODUCER-SIDE facts, which ARE checkable from here (new 2026-08-09, gate
   `software-version-context` / C25). The SME began this expansion COMPANY-SIDE
   on 2026-08-07 and stopped deliberately so the two copies would match, so this
   is a producer-first divergence with a waiting consumer rather than a
@@ -747,11 +771,8 @@ PORT-REPORT):
   `datapipeline-apache-spark-3.5.1` tagged with the DPL image version, so
   3.5.1 is the EMBEDDED SPARK release and DPL's own version is the tag —
   writing 3.5.1 there records a dependency's version as the product's.
-  (c) **THIS IS A RECONCILE, NOT A CLEAN ADD — corrected 2026-08-09 pm on the
-  SME's FYI.** You already pushed a software-registry change with the INTERNAL
-  URL on 2026-08-07, then stopped so the two sides would match. So company state
-  exists and must not be overwritten: **reconcile ids and keep YOUR internal
-  URL.** The two sides are correctly asymmetric here, and neither is wrong —
+  (c) **THE PUBLISH-BOUNDARY ASYMMETRY, which stands regardless of the correction
+  above.** If a company internal-URL edit does surface, keep it —
   the producer's `in-house` vendor OMITS `publisher_url` because a company URL
   in an Internal-Public file would cross the publish boundary; your tree is not
   published, so the real internal URL belongs in yours.
@@ -1148,78 +1169,10 @@ regeneration, never-port outputs — and get no step.
     and SHA-stamped citations (guardrail 8). J38: the RELAY section above the
     tracker — read it at every port from now on.
 
-116. O52 — THE ALWAYS-NULL `holder_sid` COLUMN [TEST-PINNED] (`4ecfca0`).
-    `ownership.attributions.v1` read `e.sid`, a property NO loader writes, so the
-    K4 attribution review surface's Holder SID was silently null on a loaded
-    graph: `seal_contacts.cypher` MERGEs `(:Employee {employee_id: ...})` and the
-    spec carried the SOURCE spelling (`employee_sid`) across the MERGE. The
-    one-word fix is not the payload — two guards are: PAIRWISE (both
-    holder_sid-bearing specs must carry the identical expression, so editing one
-    announces itself) and REGISTRY-WIDE (no spec may read a `<alias>.sid` property
-    at all — the rule, not today's instance). Both were proven to FAIL on the
-    reintroduced defect before being trusted (J26). If your QuerySpec registry has
-    diverged, take the GUARDS regardless of the expression.
-
-117. EPIC U — THE INSTRUMENT SERIES [TEST-PINNED] (`06c9f63` U15, `2d104ef` U17,
-    `f8d9dd7` U18, `3bec2b3` + `9270002` U19). U15: snapshot `dirty` counts
-    TRACKED changes only, with `untracked_present` reported separately on BOTH
-    `meta.git` and `meta.depgraph`. U17: the staleness ranking ranks on
-    `claim_lag` and says so, with the `git merge-base --is-ancestor` rule (never
-    `cat-file -t`). U18: the metrics scope is EIGHT package roots, guarded against
-    what pyproject actually ships. U19 is the one that touches you — the orphan
-    queue was **82% scanner artifact**, fixed in the depgraph SIBLING repo
-    (`6ee0af6`) and pinned in `config/dev-environment.yaml`.
-    **T18 INTERACTION:** your depgraph fork still lacks the U6 multi-root
-    resolver, so `capability_assert: false` stays. This pin does not change that
-    — it raises what catching up means.
-
-118. C25 — `software-version-context` SIGNED OFF [SME-SIGNED] (`37a9abb`;
-    prerequisites `aef10c5`, `1e0b6e7`; `0019368` B5). §A–§E and §G ruled, §F
-    blocked. Registers the `snowflake` and `dpl` product rows and the `in-house`
-    vendor — **this is RELAY-5, and it is a RECONCILE, NOT a clean add**: you
-    pushed your own software-registry change carrying the internal URL on 08-07.
-    `33224d5` narrowed the `publisher_url` guard to third-party vendors only,
-    after the first draft would have FAILED your suite for doing the correct
-    thing. B5's terminal medallion stage is PROVISIONED, not SNOWFLAKE.
-
-119. SNOW IS SERVICENOW, NOT SNOWFLAKE (`ed32efb`) + K21 (`8011a04`, `3fcb4b3`,
-    `ebd0174`) [SME-DIRECTED]. Both the `snow` and `snowflake` systems in
-    `source-registry.yaml` now carry a `disambiguation:` key naming the other,
-    guarded so neither can be edited to drop the cross-reference. THE PATTERN IS
-    THE psgmgr ONE, EXACTLY:
-        Control-M   -> Oracle psgmgr replica -> controlm@[db].psgmgr.<table>
-        ServiceNow  -> Snowflake replica     -> snow@[db].[schema].<table>
-    Origin is the SYSTEM OF RECORD; carrier is the STORAGE LOCATION. K21 mined
-    the replica evidence into the TOM mapping
-    (`knowledge/upgrade-plans/servicenow-replica-evidence.md` — Internal-Public,
-    mechanism-only: `[db]` / `[schema]` / `x_<scope>_` placeholders throughout,
-    source screenshots gitignored). NOTHING IS ADOPTED — no source activated, no
-    loader built, no gate signed; it feeds G35 and the TOM reshape.
-
-120. THE RATIFICATION-PROVENANCE RULE, AND ALL FIVE STAGED PACKS RESOLVED
-    [SME-SIGNED / RECORD-CORRECTION]. The largest thing in this range; read it
-    before the rest, and read OWED COMPANY-SIDE for the per-gate detail. A
-    company-side gate-log entry is NOT evidence of company ratification, because
-    `config/gate-log.md` is `union-append` and producer entries land there BY
-    DESIGN (`7c73258`, `63aa76e` — search a GATE ID, never a prose word).
-    Outcomes: `airflow-crosswalk` and `autosys-crosswalk` were reported RATIFIED
-    and are NOT (`c349d9a`, `3d5282f`) — now DEFERRED behind an ingestion
-    precondition (`d587b92`; prompts fixed `91f4845`). `audit-envelope-phase4`
-    IS ratified, company commit `838857e7` (`7d47ff7`).
-    `envelope-property-terms` discharged on structure (`0d38e33`).
-    `ui-write-surface` RATIFIED, company commit `48252f72` (`d8ee8cb`).
-    And the rule's OWN correction (`a78ac14`): a `port(...)` subject proves
-    nothing about authorship, because the RECONCILE step is exactly where you
-    write your own adoption record. Content, not subject, is the discriminator.
-
-121. PORT-MACHINERY HOUSEKEEPING — changes what this file tells you to check, not
-    your tree (`c69923e` the `0d3761a9` roll + send-backs; `9bede36` relay ids
-    renamed `R<n>` -> `RELAY-<n>`, which collided with Epic R;
-    `766f2c8` / `c349d9a` / `9468b54` / `872d15f` the RELAY-3(b)
-    strike-unstrike-restrike and its standing lesson — answer any
-    presence/absence relay with a GLOB and quote the OUTPUT; `d530cd1` the held
-    K7–K15 UI promoted to a STANDING DIVERGENCE after a wholesale `web/**` take
-    re-landed it twice; `dab5c90` the ui-write-surface hold, since discharged).
+(Steps 116-121 are APPLIED at PORT-REPORT-6f03264 and collapse into **Last completed
+port** above. The live ledger restarts at 122 with the next delta since `6f03264`;
+nothing is listed here yet, and `scripts/port_preflight.py` will name any commit that
+should be.)
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):

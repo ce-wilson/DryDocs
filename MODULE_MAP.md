@@ -86,6 +86,7 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 | `drydocs/plan_board.py` | `drydocs-plan` — backlog.yaml → HTML project board renderer (Epic I) | `docs/plan/board.html` |
 | `drydocs/plan_ideas.py` | `drydocs-plan` — IDEAS.md → HTML idea-inbox read view; reuses `design_doc.render_body` rather than adding a second markdown renderer | `docs/plan/ideas.html` |
 | `drydocs/plan_roadmap.py` | `drydocs-plan` — roadmap.yaml (authored stage/estimates) + backlog.yaml (live counts) → per-module build-out roadmap; the third planning surface | `docs/plan/roadmap.html` |
+| `drydocs/port_preflight.py` | `drydocs-port` — J41 the port OPENING sequence: certifies a producer base before a company session starts (tree/renders/suite/ledger-coverage/relay-basis/tag). Pure functions take TEXT and COMMIT LISTS, never a repo, so the guards run without one; only `run_checks` shells out | `port-base-<date>` tag + a pass/fail report |
 | `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
 | `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML renderer, one surface: screen + @media print (Epic L; L13) | `docs/design/*.html` |
 | `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium html→PDF via the @media print sheet (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
