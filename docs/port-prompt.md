@@ -1188,6 +1188,21 @@ port** above. The live ledger restarts at 122, delta since `6f03264`.)
     against its own repo — the commit that writes the citations can never be among
     them, so without the exemption the check never terminates.
 
+123. MARKDOWN FENCES — `docs/port-prompt.md` meant something other than what it said,
+    for five days [TEST-PINNED] (`40302a2`). The pasteable prompt is wrapped in a
+    ```` ```text ```` fence with a ```` ```powershell ```` example nested inside it,
+    BOTH three backticks — so the inner block's closer closed the OUTER one and 872
+    lines of guardrails, relays, tracker and ledger leaked out of the payload. Live
+    since `84ed7e3` (2026-08-05), through four ports. Nothing errored.
+    **The rule, and it is the whole fix: an outer fence must be LONGER than anything
+    nested inside it.** `tests/unit/test_markdown_fences.py` guards `docs/**` and is
+    the portable part — take it, then run it against YOUR docs tree, because the same
+    defect class is not producer-specific. A sweep of all 507 tracked `.md` files found
+    six; one more was ours (`docs/decisions/0002`, orphan trailing fence, fixed here).
+    The rest sit in captured transcripts and vendored skill packs and were inboxed
+    (Idea-103) rather than edited — fixing somebody else's capture to satisfy a guard
+    is a provenance call, not a formatting one. Same question applies on your side.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
