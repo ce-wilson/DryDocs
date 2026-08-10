@@ -6,18 +6,45 @@
 > status. This session establishes it, profiles what only your estate can show, and
 > finishes the ratification the two-tier doctrine says is yours.
 
+> **DEFERRED 2026-08-09 (SME) — DO NOT RUN THIS SESSION ON SIGHT.** Neither
+> orchestrator is ingested on either side, so ratifying today buys nothing
+> operationally and spends a company session that P8, T22/DD6 and the T23 graph
+> legs have better claim to. **Run this when, and only when, the first AutoSys
+> source is about to be registered for ingestion — BEFORE the registration, not
+> at the ingestion review.**
+> WHY THE ORDER MATTERS, and it is the whole reason this is a hold rather than a
+> shrug: `drydocs_core/orchestration/crosswalk.py` gates `resolve()` on
+> `require_confirmed=True`, and `config/crosswalks/autosys-to-bmc.yaml` carries
+> `status: confirmed` — which PORTED to you. So the only runtime gate protecting
+> these mappings is ALREADY SATISFIED on your side by an artifact you never
+> ratified. Nothing calls `resolve()` today (verified producer-side: no caller
+> outside the module and its own tests), so the open gate leads nowhere. The
+> first ingestion wires a caller and `resolve()` succeeds SILENTLY — there is no
+> second checkpoint where the missing ratification would surface.
+> **AND DO NOT ANSWER `NOT APPLICABLE`.** That branch below is for an
+> orchestrator you will never ingest. These crosswalks are a deliberate
+> forward-looking placeholder (`external/orchestration/autosys/README.md` says
+> exactly that), so NOT APPLICABLE would foreclose it as a decision when the truth
+> is a hold. If you must record something today, record **DEFERRED** with this
+> trigger — see the added branch in step 1.
+
 Venue: company `<org>/DryDocs`, current `main`. Name the venue in every claim (J18).
 
 ## Step 1 — STATUS FIRST (answer before touching anything else)
 
 What is this gate's status on YOUR side? Search your `config/gate-log.md` for any
-`autosys-crosswalk` entry (heading-named or cited), check your
+`autosys-crosswalk` entry — **heading-named only; a body citation does not
+count (J28)** — check your
 `config/crosswalks/autosys-to-bmc.yaml` row statuses, and your source-registry
 `autosys-export` row. Report ONE of:
 - **RATIFIED** — an entry exists: quote its heading + date, report back, and STOP.
 - **DIVERGED** — your crosswalk/registry rows differ from producer: name the rows, stop
   at a divergence report.
 - **NEVER RUN** — no entry: continue to step 2.
+- **DEFERRED** — the SME hold above is still in force and no AutoSys source is
+  being registered: report DEFERRED, quote the trigger, and STOP. This is NOT
+  the same answer as NOT APPLICABLE, and the difference is load-bearing —
+  DEFERRED keeps the ratification owed, NOT APPLICABLE retires it.
 - **NOT APPLICABLE** — no AutoSys estate exists or is planned on your side: record that
   in your gate-log as a dated disposition (the Q1-B pinned-divergence idiom), report
   back, and STOP. A crosswalk for an orchestrator you will never ingest needs a
