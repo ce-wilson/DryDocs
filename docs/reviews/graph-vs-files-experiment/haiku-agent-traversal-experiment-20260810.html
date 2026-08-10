@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haiku agent-traversal experiment — 2026-08-10</title>
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f7f8fa; --panel-2: #eef1f5; --edge: #d7dce4;
+    --text: #16191d; --muted: #5b6472; --faint: #8b93a1;
+    --green: #1f8b4c; --teal: #0e7490; --yellow: #a16207; --fail: #b4453a; --blue: #2563eb;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1116; --panel: #151a21; --panel-2: #1b222b; --edge: #2a323d;
+      --text: #e6e9ee; --muted: #9aa4b2; --faint: #6b7686;
+      --green: #4ade80; --teal: #2dd4bf; --yellow: #fbbf24; --fail: #f0857d; --blue: #60a5fa;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1116; --panel: #151a21; --panel-2: #1b222b; --edge: #2a323d;
+    --text: #e6e9ee; --muted: #9aa4b2; --faint: #6b7686;
+    --green: #4ade80; --teal: #2dd4bf; --yellow: #fbbf24; --fail: #f0857d; --blue: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  header { border-bottom: 1px solid var(--edge); padding-bottom: 1.25rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.6rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+  .sub { color: var(--muted); font-size: .93rem; }
+  .tags { margin-top: .75rem; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .tag {
+    font: 500 .72rem/1 var(--mono); padding: .32rem .55rem; border-radius: 999px;
+    border: 1px solid var(--edge); color: var(--muted); background: var(--panel);
+  }
+  h2 { font-size: 1.08rem; margin: 2.4rem 0 .8rem; padding-bottom: .35rem; border-bottom: 1px solid var(--edge); }
+  h3 { font-size: .95rem; margin: 1.5rem 0 .5rem; color: var(--muted); }
+  p { margin: .6rem 0; }
+  code, .mono { font-family: var(--mono); font-size: .86em; }
+  code { background: var(--panel-2); padding: .1rem .3rem; border-radius: 3px; }
+  .scroll { overflow-x: auto; margin: .9rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; min-width: 560px; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  tbody tr:hover { background: var(--panel); }
+  .num { font-family: var(--mono); white-space: nowrap; }
+  .win { color: var(--green); font-weight: 600; }
+  .lose { color: var(--fail); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .card { border: 1px solid var(--edge); border-radius: 8px; padding: 1rem; background: var(--panel); }
+  .card h4 { margin: 0 0 .5rem; font-size: .9rem; }
+  .card .big { font: 700 1.9rem/1 var(--mono); }
+  .card .cap { color: var(--muted); font-size: .8rem; margin-top: .3rem; }
+  .callout {
+    border-left: 3px solid var(--teal); background: var(--panel);
+    padding: .8rem 1rem; margin: 1.1rem 0; border-radius: 0 6px 6px 0;
+  }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.bad { border-left-color: var(--fail); }
+  .callout h4 { margin: 0 0 .4rem; font-size: .88rem; }
+  ul { margin: .5rem 0; padding-left: 1.2rem; }
+  li { margin: .3rem 0; }
+  .flow { display: flex; flex-wrap: wrap; gap: .5rem; align-items: stretch; margin: 1rem 0; }
+  .step { flex: 1 1 160px; border: 1px solid var(--edge); border-radius: 6px; padding: .6rem .7rem; background: var(--panel); }
+  .step .t { font: 600 .72rem/1 var(--mono); color: var(--teal); }
+  .step .n { font-size: .84rem; margin-top: .25rem; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--edge); color: var(--faint); font-size: .82rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Haiku agent-traversal experiment</h1>
+  <div class="sub">Does navigating code context through the loaded Neo4j code graph beat reading files? &nbsp;·&nbsp; 2026-08-10, 03:05–03:35 local, desktop</div>
+  <div class="tags">
+    <span class="tag">2×2 design</span>
+    <span class="tag">model pinned: haiku</span>
+    <span class="tag">reviewer: fable (blind → unblinded)</span>
+    <span class="tag">30 min wall-clock</span>
+    <span class="tag">6 agent runs</span>
+  </div>
+</header>
+
+<h2>The design</h2>
+<p>
+  Two tasks × two tracks. The <strong>model is pinned</strong> (haiku everywhere) so the only variable
+  inside each pair is the context-navigation method. Agent <em>type</em> varies by task — never by track.
+</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Task</th><th>Track A — FILES (ALPHA)</th><th>Track B — GRAPH (BETA)</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Planning</strong><br><span class="sub">groom-plan, Ideas 96–103</span></td>
+      <td><code>backlog-groomer</code>, haiku<br>Glob / Grep / Read only</td>
+      <td><code>backlog-groomer</code>, haiku<br>Cypher over the code graph + targeted Reads</td>
+    </tr>
+    <tr>
+      <td><strong>Coding</strong><br><span class="sub">O53 — the HeroArt orphan</span></td>
+      <td><code>general-purpose</code>, haiku, worktree</td>
+      <td><code>general-purpose</code>, haiku, worktree</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p class="sub">
+  Graph venue: database <code>drydocs</code>, container <code>neo4jtest</code>, snapshot @ <code>bd051ab</code>
+  — 1,447 <code>:CodeModule</code> (1,434 live), 880 <code>IMPORTS</code>, 267 <code>:CodeDirectory</code>.
+  O53 was chosen because it <em>originated</em> from the code graph (the Idea-77 orphan finding),
+  so each track re-verifies the same claim by its own method.
+</p>
+
+<div class="flow">
+  <div class="step"><div class="t">03:05</div><div class="n">Planning A + B dispatched in parallel</div></div>
+  <div class="step"><div class="t">03:11</div><div class="n">Fable review 1 — <strong>blind</strong> (ALPHA/BETA unlabelled)</div></div>
+  <div class="step"><div class="t">03:17</div><div class="n">Coding A + B in isolated worktrees</div></div>
+  <div class="step"><div class="t">03:30</div><div class="n">Fable review 2 — unblinded, final grades</div></div>
+</div>
+
+<h2>Scores</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Run</th><th>Accuracy</th><th>Completeness</th><th>Sizing</th><th>Convention</th><th>Compliance</th></tr></thead>
+  <tbody>
+    <tr><td>planning-ALPHA <span class="sub">files</span></td><td class="num lose">3</td><td class="num">7</td><td class="num">6</td><td class="num lose">3</td><td>VALID</td></tr>
+    <tr><td>planning-BETA <span class="sub">graph</span></td><td class="num win">6</td><td class="num">7</td><td class="num">7</td><td class="num win">8</td><td>VALID</td></tr>
+    <tr><td>o53-ALPHA <span class="sub">files</span></td><td class="num win">6</td><td colspan="3" class="sub">clause-by-clause against the O53 acceptance</td><td>VALID</td></tr>
+    <tr><td>o53-BETA <span class="sub">graph</span></td><td class="num lose">4 <span class="sub">(capped)</span></td><td colspan="3" class="sub">cap: no archived pre-delete verification</td><td>VALID <span class="sub">· 2 flagged calls</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h4>Planning — graph won</h4>
+    <div class="big win">6 v 3</div>
+    <div class="cap">1 drafted-id collision vs <strong>5 of 6</strong>. ALPHA's "next free id" table was fabricated; two of three epic names don't exist.</div>
+  </div>
+  <div class="card">
+    <h4>Coding — files won</h4>
+    <div class="big win">6 v 4</div>
+    <div class="cap">Same diff, different discipline: ALPHA verified before deleting, on record. BETA left no evidence it ran the query its track exists to demonstrate.</div>
+  </div>
+</div>
+
+<h2>Performance</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Run</th><th>Duration</th><th>Tool uses<br><span class="sub">observed</span></th><th>Tool uses<br><span class="sub">self-reported</span></th><th>Tokens</th></tr></thead>
+  <tbody>
+    <tr><td>planning-ALPHA</td><td class="num">306.1s</td><td class="num">41</td><td class="num lose">27</td><td class="num">72,605</td></tr>
+    <tr><td>planning-BETA</td><td class="num win">258.5s</td><td class="num win">26</td><td class="num lose">10</td><td class="num">81,671</td></tr>
+    <tr><td>o53-ALPHA</td><td class="num">408.7s</td><td class="num">47</td><td class="num lose">28</td><td class="num">77,594</td></tr>
+    <tr><td>o53-BETA</td><td class="num win">265.5s</td><td class="num win">31</td><td class="num lose">11 <span class="sub">(lists 19)</span></td><td class="num">77,451</td></tr>
+  </tbody>
+</table>
+</div>
+<p>
+  Graph was faster on both tasks — <strong>−15.6%</strong> planning, <strong>−35.0%</strong> coding — with
+  fewer tool uses (26 v 41; 31 v 47), at +12.5% tokens on planning and token parity on coding.
+</p>
+
+<div class="callout bad">
+  <h4>All four workers under-reported their own tool use by 34–65%</h4>
+  <p>
+    27 v 41 · 10 v 26 · 28 v 47 · 11 v 31. Systematic across both tracks and both task types — haiku counts
+    "logical steps" and drops retries, failures and report writes. Two self-reports are internally
+    inconsistent on their face (o53-BETA claims 11 while enumerating 19). <strong>Both planning runs
+    fabricated their timestamps</strong> — one claims a 90-minute span for a 306-second run, neither is
+    near the 03:05 dispatch window.
+  </p>
+  <p><strong>Consequence for any re-run:</strong> self-reported metrics are unusable for cross-track
+  comparison. Only orchestrator-observed numbers count, and the run log must capture them.</p>
+</div>
+
+<h2>What neither track got right</h2>
+<div class="callout warn">
+  <h4>Both coding runs missed the coverage-pin clause — so neither diff was adoptable</h4>
+  <p>
+    The acceptance's "coverage pin moved with the history-line convention" is the tuple
+    <code>(29, 68)</code> in <code>test_ui_components.py</code>, whose docstring is the convention.
+    Neither run touched it, so <strong>both worktrees leave the Python guard suite red</strong> — while
+    both correctly report npm build and lint green. The web build cannot see this; only the repo's own
+    drift guard can, and neither run ran it.
+  </p>
+  <p>
+    BETA additionally missed the <code>(15)</code> → <code>(14)</code> section header, breaking a second
+    guard. Fable also found the coding prompt's pointer to "neighbouring retired rows" was itself a red
+    herring — that yaml has no retired rows — and scored it evenly as a shared handicap.
+  </p>
+</div>
+
+<h2>Verdict</h2>
+<p>
+  <strong>Planning: the graph helped, on the dimension that matters.</strong> It surfaced the existing
+  <code>port_preflight.py</code> machinery that re-homes Idea-96 — the single most consequential correct
+  fact in either plan — which ALPHA's eleven Globs never found. Unblinding made ALPHA's failure
+  <em>worse</em>: it had unrestricted Grep over <code>backlog.yaml</code>, and one
+  <code>grep "- id: J18"</code> would have caught the collisions. That was diligence, not tooling.
+</p>
+<p>
+  <strong>Coding: a wash on the diff, a hurt on the discipline.</strong> Both tracks converged on the same
+  three files. BETA's 35% speed edge is worth nothing on a deletion task where the verification
+  <em>is</em> the deliverable.
+</p>
+<div class="callout">
+  <h4>Fable's one improvement before a re-run is worth it</h4>
+  <p>
+    Extend the graph to the <strong>acceptance-bearing non-code surfaces</strong> — taxonomy ledger rows
+    and guard-test pins as nodes joined to the code modules they inventory. Every BETA miss
+    (PowerShell-locating <code>ui-components.yaml</code>, the unnoticed header count, the unnoticed pin)
+    happened precisely where the graph goes blind, and O53-shaped chores live mostly in that blind zone.
+    As fable put it: <em>the worker didn't break the rules so much as walk off the edge of the map the
+    rules assumed was complete.</em>
+  </p>
+</div>
+
+<h2>Outcome</h2>
+<ul>
+  <li><strong>ALPHA (files) code set adopted</strong> by SME ruling — on discipline, not diff quality.</li>
+  <li>Applied on the post-O47 tree as a <em>re-application, not a merge</em>: the diffs were cut before
+      O47 moved the same surfaces, so the yaml hunk re-applied against <code>(16)</code> and the pin moved
+      <strong>70 → 69</strong> — the clause both runs missed, <strong>fixed at adoption</strong>.</li>
+  <li>Orphan re-verified by grep before and after the delete. Build green, lint at the three pre-existing
+      warnings, full suite <span class="num">1836 passed / 5 skipped</span>.</li>
+  <li>O53 closed as <code>c9ea9fc</code>; the full experiment record committed as <code>c353956</code>.</li>
+</ul>
+<p class="sub">
+  That adoption step is the standing lesson: <strong>an experiment diff is a candidate, not a merge.</strong>
+  Both candidates were red on the repo's own guards; the review caught what the runs did not.
+</p>
+
+<footer>
+  Authority: <code>docs/reviews/graph-vs-files-experiment/</code> — PROTOCOL.md, GRADES.md (authoritative),
+  fable-review-1.md, RUN-LOG.md, both plans, both diffs. Venue: desktop, <code>neo4jtest</code>,
+  database <code>drydocs</code> (J18). This page is a hand-authored view, not a generated render.
+</footer>
+
+</div>
+</body>
+</html>
