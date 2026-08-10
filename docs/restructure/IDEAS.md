@@ -96,17 +96,32 @@ question a 1,000-line file with the trail at the bottom could not answer.
   shape this looked like for about an hour. **What is left.** (1) **The key, and it still
   blocks.** If the deployment id is scoped under the application id, a bare `deployment_id` is
   NOT a business key and a loader keying on it alone MERGEs distinct deployments together — the
-  identity-gate §D2 / §C3 failure on a new axis. One count of distinct ids against one count of
-  distinct pairs settles it. (2) **The label**, if we capture it: C10's standing advice holds —
+  identity-gate §D2 / §C3 failure on a new axis. **UPDATED 2026-08-10 — the SME supplied the CI
+  topology and it answers the key question and renames the thing.** The CI class is the
+  **Deployment Module**: `Business Application [Instantiates] Deployment Module`, inverse
+  `[Instance of]`, and above it `[Contained by] area product`. Each Deployment Module carries its
+  OWN unique CI id, so the CI id is the key and `app_id:deployment_id` is the human-readable name
+  — which is itself the proof the deployment id is scoped, since a globally unique id would not
+  need the application in its name. **"Deployment" and "module" are ONE thing**, which means G35's
+  G13 (Deployment Owner), G14 (Deployment Information Owner) and G15 (Application Module Owner)
+  plausibly share ONE subject and could resolve together rather than one register line at a time.
+  **A CORRECTION THIS ENTRY MUST CARRY, because its first version had it backwards:** the module
+  reference being a form default applies to TRANSACTIONAL records — a Change, an Incident or a KB
+  article must name a deployment module, ServiceNow defaults it, and people accept the default. The
+  Deployment Module CI ITSELF is real, with its own id, its own place in the chain, and KB articles
+  attached. So the grain is sound and only the *counting of transactions per module* is not; the
+  earlier conclusion that §G15 needed no grain would have discarded a real CI class on the strength
+  of a defaulted foreign key. (2) **The label**, if we capture it: C10's standing advice holds —
   adopt the CONCEPT, pick our own stable name, since the vendor's own label moved (Application
-  Service → Service Instance at Yokohama). (3) **A rider on an existing gate now, not its own
-  gate** — nothing changes an attribution subject any more. **AND A SECOND, INDEPENDENT FINDING
-  FOR G35 §G15:** that clause asks whether Application Module Owner's subject is a module DryDocs
-  has no grain for. Practice answers it — the module reference is a FORM DEFAULT on change
-  records, populated and not meaningful. Building a module grain to hold it would model the
-  default rather than the operating model, so §G15 can be ruled without inventing one. Note the
-  general trap it demonstrates: a populated column can be emptier than a null one.
-  Evidence, and open question 7: `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
+  Service → Service Instance at Yokohama), and this instance's own inverse label (`Instance of`)
+  already differs from the one public material uses (`Instantiated by`). (3) **A rider on an
+  existing gate, not its own gate** — nothing changes an attribution subject. **AND A SEPARATE
+  THREAD WORTH ITS OWN ITEM:** KB articles link at Deployment Module grain and the SME called them
+  "more meaningful." A documented fix attached to the deployment that has the incident is squarely
+  what a production-support knowledge graph is for; it would promote the `kb_*` family from ring 3
+  to a real candidate. Check first whether the KB→module link is asserted or defaulted, since the
+  defect above would hit it identically. Evidence, and open questions 8 + 9:
+  `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
 
 - **`Idea-100`** · 2026-08-09 · `[bug]` · **open** · prio? **High** —
   **The manifest has no way to say "gate-bound" — and that gap nearly shipped an unsigned

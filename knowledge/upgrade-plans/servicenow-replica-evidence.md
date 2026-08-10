@@ -135,15 +135,25 @@ the use case has now landed.
 > not about re-homing attribution. Those are very different pieces of work, and the second one is
 > the expensive one we are now not doing.
 >
-> **The module half is a second finding, not an aside.** ServiceNow's Application Module is
-> referenced by default on change records, so the field is *populated* and *not meaningful* — the
-> reference exists because the form defaults it, not because someone asserted it. This is §3.2's
-> lesson arriving on a field that would be far more tempting to trust than a null `u_hash`: a
-> populated column can be emptier than an empty one. It bears directly on G35 §G15, which asks
-> whether Application Module Owner's subject is a module DryDocs has no grain for — the honest
-> answer from practice is that the module grain exists in the source and does not carry reliable
-> meaning, so building a module grain to hold it would model the form default rather than the
-> operating model.
+> **The module half is a second finding — and the first reading of it here was too strong.**
+> Corrected by the SME on 2026-08-10, because the distinction decides real work:
+>
+> - **The Deployment Module CI is real.** It has its own unique CI id, a defined place in the
+>   relationship chain (§1.4), and KB articles attached to it. It is a genuine grain, not an artifact.
+> - **What is unreliable is the module reference on TRANSACTIONAL records.** In ServiceNow a Change,
+>   an Incident and a KB article must each name a deployment module, the form defaults it, and people
+>   generally accept the default. So the *link from a change to a module* is noisy; the *module* is
+>   not.
+>
+> This document originally collapsed the two and concluded that a DryDocs module grain "would model
+> the form default rather than the operating model," and that G35 §G15 could be ruled without
+> inventing a grain. **That was wrong in the direction that matters** — it would have discarded a
+> real CI class on the strength of a defaulted foreign key. The correct statement: the grain is
+> sound, and any *counting* of changes or incidents per module is not.
+>
+> §3.2's lesson still applies, just to the right column: a populated field can be emptier than a null
+> one, and here it is the transactional reference — the field most likely to be trusted, because it
+> is never empty.
 >
 > **What is still open** (§6 Q7): whether `u_seal_deployment_id` is globally unique or unique only
 > within its application. Still worth settling even though the deployment is not the attribution
@@ -160,7 +170,76 @@ raised because G35 §B6 records the SME direction that "a role holding always na
 `inherited_from_ci` (the parent pointer) are columns on the anchor table, and the query resolves the
 pointer back through `cmdb_ci` to a name. G35 §E1 asserted this from description; it is now evidence.
 
-### 1.4 Three reasons this is a report, not an ingestion contract
+> **SME, 2026-08-10 — what the two columns actually mean.** `inheritance` takes one of two values:
+> **`Inherited`**, in which case the CI comes **from the area product**; or **`Overridden`**, meaning
+> it was changed by hand. Not a vendor concept — neither value appears in the public ServiceNow
+> documentation, which is consistent with §3.1: the TOM tables are a company scoped app with no
+> vendor baseline.
+>
+> **This is the strongest correction in the document, because DryDocs already models the parent.**
+> G35 §E4 reasons that "the inherited-from parent is a CI in another system's hierarchy, not a
+> BusinessApplication DryDocs holds," and treats the modelled-node option as blocked on estate data
+> we do not have. The parent is the **area product** — and `:AreaProduct` is an existing DryDocs node
+> class, gated and signed at K6 (`product-cabinet-attribution`, 2026-07-20), carrying
+> `area_product_owner` and `tech_partner`. So E4's blocked option is not blocked: the pointer can be
+> a modelled edge to a node that already exists, not a foreign reference stored as a property.
+>
+> **One boundary, stated so this is not misread as reopening K6.** What inherits is the
+> **assignment's CI**, not the role vocabulary. K6 ruled the two role families INDEPENDENT — Product
+> Cabinet roles (`product_roles`, scoped to `:Product` / `:AreaProduct`) share no concepts with TOM
+> roles (`tom_roles`, on `:BusinessApplication`), and "do not conflate" is explicit in the node
+> classification. Nothing here merges them. It says only that a TOM assignment on an application may
+> have been *set at* the area product and flowed down, which is a provenance fact about the
+> assignment, not a shared concept scheme.
+
+### 1.4 The CI relationship chain — the actual CMDB shape
+
+**SME, 2026-08-10.** The CI relationship panes (the formatter's Downstream / Upstream split) give the
+topology the TOM rows hang off:
+
+```
+  AREA PRODUCT
+      |  [Contains]  /  [Contained by]
+  BUSINESS APPLICATION            <-- everything DryDocs maps is off THIS node
+      |  [Instantiates]  /  [Instance of]
+  DEPLOYMENT MODULE               <-- named app_id:deployment_id; own unique CI id (e.g. CI123456789)
+      |
+      +-- KB articles link HERE
+```
+
+Four things this settles or sharpens:
+
+**(i) "Deployment" and "module" are the same thing.** The CI class is the **Deployment Module**. The
+document previously treated `u_seal_deployment_id` and ServiceNow's Application Module as two
+separate findings; they are one. That matters for G35, where **G13 Deployment Owner, G14 Deployment
+Information Owner and G15 Application Module Owner all plausibly share a single subject** — this CI
+class. §G15 asks the gate to "confirm the subject before required-ness," and the candidate subject
+now has a name, a key and a place in a hierarchy. Offered as the reading to confirm, not as a fact:
+the SME named the CI class, not the three roles' subjects.
+
+**(ii) The label pairs are the `cmdb_rel_type` inverse-pair mechanism, working.** `Instantiates` /
+`Instance of` and `Contains` / `Contained by` are exactly the `parent_descriptor` /
+`child_descriptor` shape of §3.3, which is the strongest argument yet that ring 1's `cmdb_rel_type`
+pull maps mechanically onto `neo4j_label` + `inverse_label`.
+
+**And a trap inside the confirmation:** the public material that mentions this family at all writes
+the pair as **`Instantiates::Instantiated by`**, while this instance uses **`Instance of`** as the
+inverse. Different label, same relation. That is the concrete reason §3.3 says to *read* the
+descriptor columns rather than assume a vocabulary — a crosswalk built from the vendor's label set
+would miss this instance's actual value.
+
+**(iii) The deployment key question (§6 Q7) is answered.** Each Deployment Module carries **its own
+unique CI id**. So the CI `sys_id` is the technical key, and `app_id:deployment_id` is the
+human-readable **name** — which incidentally confirms the deployment id is scoped under the
+application, since a globally unique id would not need the application in its name. Any capture keys
+on the CI id and treats the composite as a name, never the reverse.
+
+**(iv) The Business Application really is the mapping node.** The chain shows the layer above (area
+product) and the layer below (deployment module), with DryDocs' `:BusinessApplication` in the middle
+— matching the 2026-08-09 direction that everything mapped is off the application. DryDocs already
+holds both neighbours in some form: `:AreaProduct` exists (K6); the deployment module does not.
+
+### 1.5 Three reasons this is a report, not an ingestion contract
 
 The item raised the precision question in the abstract. The sample answers it concretely — it
 carries defects that are harmless in a report and would be bugs in a contract.
@@ -355,7 +434,10 @@ Findings only. Every row is for the gate to rule.
 | **G35 §B6** — "a role holding always names a person… an Attribution with no HAS_AGENT is a defect" | As sampled, `tom_main.group` names a **group**; no person join appears | **TENSION** — see §6 Q1 before this becomes an invariant. If the ServiceNow surface attributes to groups, an invariant asserted from the SEAL surface does not hold across both |
 | **`seal-tom-attribution-reshape` mapping #3** — `(:Attribution)-[:HAS_AGENT]->(:Employee)` | Same finding | **SCOPE** — `prov:agent` admits an Organization as readily as a Person, so the PROV shape survives; the *target node class* is what would need to widen |
 | **C10 gate-bound candidate #1** — the deployed-instance concept, deferred "until an environment-level use case lands" | `u_seal_deployment_id` sits beside `u_seal_application_id` on the Application Service row; SME **confirmed 1:N** 2026-08-09, identifier reading as `app_id(seal_id):deployment_id` — **but also that everything mapped is off the APPLICATION** | **NARROWED, NOT RE-HOMED** — the candidate is now about capturing an identifier we discard, not about moving the attribution subject. Attributing to `:BusinessApplication` is confirmed correct. Q7 (key scope) still gates any capture |
-| **G35 §G15** — Application Module Owner: "a module owner plausibly owns a PART of an application, and DryDocs has no module grain to attribute to. Confirm the subject before required-ness" | SME 2026-08-09: modules are **referenced by default on changes and in practice not used as intended** | **ANSWERS THE SUBJECT QUESTION FROM PRACTICE** — the module grain exists in the source and does not carry reliable meaning. A DryDocs module grain built to hold this would model a form default. §G15 can be ruled without inventing one |
+| **G35 §G15** — Application Module Owner: "a module owner plausibly owns a PART of an application, and DryDocs has no module grain to attribute to. Confirm the subject before required-ness" | SME 2026-08-10: the subject is the **Deployment Module** CI — own unique id, named `app_id:deployment_id`, `[Instance of]` the application. What is defaulted is the module reference on Changes/Incidents/KB, not the CI | **NAMES THE SUBJECT** — §G15's missing grain exists and is identified. Supersedes this document's first reading, which wrongly concluded no grain was needed |
+| **G35 §G13/§G14/§G15** — three role classes the SME's list added, with no concept, no crosswalk and no prior capture | All three plausibly share ONE subject: the Deployment Module | **CANDIDATE UNIFICATION** — offered for the gate to confirm. If it holds, three unruled register lines resolve together against one grain rather than one at a time |
+| **G35 §E4** — "the inherited-from parent is a CI in another system's hierarchy… the modelled-node option is a dependency on estate data DryDocs does not have" | SME 2026-08-10: `Inherited` means the CI came **from the area product**; `Overridden` means set by hand. `:AreaProduct` is an existing, K6-signed DryDocs node class | **THE BLOCKED OPTION IS NOT BLOCKED** — the parent is already modelled here, so E4 can choose a real edge rather than a property. Supersedes the weaker "available in the replica" reading above |
+| **K6 `product-cabinet-attribution`** — the two role families are INDEPENDENT, "do not conflate" | Inheritance moves the assignment's CI, not the role vocabulary | **UNTOUCHED** — recorded explicitly so the E4 finding is not misread as reopening K6 |
 
 **The last row is the finding to carry forward.** DryDocs models `:BusinessApplication` and attributes
 TOM roles to it. The evidence shows the company's own operating model attributing accountability at
@@ -424,7 +506,10 @@ which adapter reads Snowflake) that no one has made.
 
 ## 6. What this evidence cannot settle
 
-Ordered by how much they block. Q1–Q3 are SME questions; Q4–Q6 need one more look at the replica.
+Ordered by how much they block. **Q3 and Q7 were answered by the SME on 2026-08-09/10 and are kept
+struck through rather than deleted** — the alternatives were live and a later reader should see they
+were ruled out rather than never considered. Q8 is the sharpest of the remainder: it reconciles the
+source's grain with the operating model's, and one `GROUP BY sys_class_name` settles it.
 
 1. **Does `tom_main` carry a user/person column as well as `group`?** The sample joins only
    `sys_user_group`. This decides whether G35 §B6's "always names a person" is an invariant or a
@@ -439,21 +524,38 @@ Ordered by how much they block. Q1–Q3 are SME questions; Q4–Q6 need one more
    attribution subject does not move, and the C10 candidate narrows from "re-home attribution" to
    "capture an identifier we discard." Kept struck-through rather than deleted because the question
    was the reason for the finding, and a later reader meeting only the answer would not know the
-   alternative was considered and ruled out. **Residual:** what
-   `tom_main.inheritance` / `inherited_from_ci` encode is still unexplained — if mapping is
-   application-level, the inheritance those columns carry is inheritance *between CIs*, which is a
-   different mechanism than role inheritance between application and deployment. §1.3(e) stands.
+   alternative was considered and ruled out. **Residual CLOSED 2026-08-10:** the inheritance columns
+   are explained — `Inherited` means the CI came from the area product, `Overridden` means set by
+   hand. It is inheritance down the CI chain (area product → application), not between application
+   and deployment. See §1.3(e).
 4. **Does the replica's `cmdb_rel_type` view carry `parent_descriptor`?** Not visible; decides §3.3.
 5. **What does `delete_flag` mean operationally** — values, retention, interaction with
    `dwintel_dl_snapshot_trim`? Decides §3.4.
 6. **What is `end_point` on `cmdb_rel_type`?** No public definition found. Instance or SME only.
-7. **Is `u_seal_deployment_id` globally unique, or unique only within its application?** Raised by
-   the 2026-08-09 confirmation that the identifier reads as `app_id(seal_id):deployment_id`. This is
-   the one question that turns the SME's read into a business key: if it is scoped, any deployment
-   node must be keyed on the **pair**, and a loader keying on `deployment_id` alone will MERGE
-   distinct deployments from different applications into one node. Cheap to settle — a count of
-   distinct `u_seal_deployment_id` against a count of distinct pairs answers it. **Blocks any
-   deployment-grain modelling**, not just the gate.
+7. ~~**Is `u_seal_deployment_id` globally unique, or unique only within its application?**~~
+   **ANSWERED 2026-08-10:** each Deployment Module carries **its own unique CI id**, so the CI
+   `sys_id` is the key and `app_id:deployment_id` is the human-readable name. The composite name is
+   itself the evidence that the deployment id is scoped under the application — a globally unique id
+   would not need the application in its name. **Capture rule:** key on the CI id, treat the
+   composite as a name, never the reverse.
+
+8. **Is the TOM row's subject a Business Application CI or a Deployment Module CI?** *(NEW, and it is
+   the one that reconciles the two SME statements.)* `tom_main.parent_id` resolves to `cmdb_ci`, and
+   the query joins **both** `cmdb_ci_business_app` and `cmdb_ci_service_discovered` on that same
+   `sys_id` — defensively, so only the CI's actual class returns non-null. The sample does not show
+   which one hit, because `sys_class_name` was selected but its values are not in evidence.
+   This matters: the SEAL ids come off `cmdb_ci_service_discovered` (§1.3(c)), which would put the
+   TOM assignment at deployment grain in the **source**, while practice maps off the **application**.
+   Both can be true — the source may record finer than the operating model uses it — but which is
+   which decides what a loader reads. **One query settles it:** count TOM rows grouped by
+   `cmdb_ci.sys_class_name`.
+9. **Are the KB articles linked to the Deployment Module worth pulling?** The SME flagged them as
+   "more meaningful," and for a production-support knowledge graph that is squarely on-mission — a
+   documented fix attached to the deployment that has the incident is exactly what DryDocs exists to
+   answer. It would promote the `kb_*` family from ring 3 to a real candidate. **What to check
+   first:** whether the KB→module link is a genuine assertion or another defaulted reference (§1.3's
+   correction) — the same defect that makes change counts per module untrustworthy would make KB
+   attachment untrustworthy in exactly the same way.
 
 Two smaller ones, recorded so they are not rediscovered: whether any table appears in more than one
 `DW_*_DATA_VIEW` schema and which would be authoritative (§2.2), and whether `connection_strength` /
