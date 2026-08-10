@@ -40,12 +40,23 @@ through the NAMED deliberate end **`0d3761a9`**. Steps **106–115 are APPLIED**
 collapse into **Last completed port** below; the live ledger restarts at **116+**,
 delta since `0d3761a9`.
 
-> **`0d3761a9` IS BUILT, NOT YET MERGED.** The port commit sits on the company branch
-> `drydocs-port-20260809` and is **not pushed** — the P8 merge is SME-gated. Treat the
-> range as ported for LEDGER purposes (it is built, tested and reported) but NOT as
-> landed for anything that depends on the merge: specifically, the **five staged
-> `docs/gate-*-company-prompt.md` clean-add rows stay staged** until the branch merges
-> (step 108). Do not remove them on the strength of this report.
+> **`0d3761a9` IS MERGED, NOT YET PUSHED (state as of 2026-08-09 pm).** P8 happened:
+> the company `git status` shows `main` clean and **ahead of `origin/main` by 4
+> commits** — `a4c4ce37` + `1c102f5c` + `b077f746` (the merged port) plus `48252f72`
+> (the `ui-write-surface` ratification). So the blocker moved from the MERGE to the
+> PUSH.
+> **The five staged `docs/gate-*-company-prompt.md` clean-add rows STAY for now,
+> and the reason is not inertia.** Step 108 says remove them once the delivering
+> port merges, and it has — but an unpushed merge is still local state on one
+> machine, and removing producer rows against it would strand the files if that
+> branch were ever reset. Remove at the PUSH, not at the merge.
+> **AND THEN ONLY THREE OF THE FIVE.** The rows for the discharged packs
+> (`audit-envelope-phase4`, `envelope-property-terms`, `ui-write-surface`) go; the
+> two CROSSWALK rows must STAY, because those prompts are live-but-deferred and
+> carry edits made after delivery (`91f4845`: the deferral, the DEFERRED branch,
+> the J28 fix). Drop their rows and the never-port glob reasserts, and the deferral
+> a future company session most needs to read never reaches it. A blanket reading
+> of step 108 would have done exactly that.
 
 **Last completed port — the four required fields (J35).**
 - **Range:** `5417ef10..0d3761a9` — 68 commits, ledger steps 106–115.
@@ -809,20 +820,37 @@ OWED COMPANY-SIDE:
 > subject does NOT prove an entry arrived from the producer.** The rule above was
 > first written implying the pickaxe would return a company-authored, non-port
 > commit for a Tier-A entry. It does not. The company's audit-envelope-phase4
-> re-check returned `b75871b8` for the Tier-A adoption at their `gate-log.md:1645`,
-> subject `port(20260807): reconcile producer a14a8028..5417ef10 — land the G22
-> rua-load...`. A PORT commit — because the RECONCILE step is exactly where the
-> consumer writes its own adoption record, and that work is committed under the
-> port's subject. So the subject test is sound in ONE direction only:
+> re-check returned a PORT commit for the Tier-A adoption at their
+> `gate-log.md:1645` — because the RECONCILE step is exactly where the consumer
+> writes its own adoption record, and that work commits under the port's subject.
+> **THE EXAMPLE IS SHARPER THAN FIRST RECORDED (attribution corrected 2026-08-09
+> pm, by the company session, against the producer's own miscite of `b75871b8`).**
+> `12fa680e` — `port(cewilson): apply 6713c142..5f79d145 (steps 59-81) onto company
+> main`, 2026-08-04 — carries BOTH entries at once:
+>   L1590, the producer's own `audit-envelope-phase4` sign-off (13/13). PORTED.
+>   L1645, the company's Tier-A adoption of it. COMPANY-AUTHORED, written during
+>   that same reconcile.
+> One commit, one subject, two authorships. That is the whole argument in a single
+> object, and no subject-based test can separate them. So the subject test is sound
+> in ONE direction only:
 >   `gate(...)` / company-authored, unrelated to a port -> RATIFIED. Dispositive.
 >   `port(...)` -> NOT dispositive either way. It means the commit applied a port;
 >   it does not tell you who authored the lines inside it.
 > **The reliable discriminator is CONTENT, not subject: does the producer's tree
 > contain this entry?** For the Tier-A class the answer is structurally no, which
 > is why that class still resolves — the reasoning holds, the mechanism named for
-> it was wrong. Read the company session's own gloss with the same care: it
+> it was wrong. Read the company session's own gloss with the same care: it first
 > labelled L1645 a "ported artifact, as expected", and it is not one — the
-> producer has no entry of that shape to port.
+> producer has no entry of that shape to port. **Challenged, that session
+> re-verified and corrected itself the same day**, and its doctrine note is the
+> cleanest statement either side has produced, so it is adopted here verbatim in
+> substance: *when a heading's shape is company-only — a Tier-A adoption, or a
+> ruling over company-only rows — the entry is company-authored EVEN WHEN CARRIED
+> BY A `port(...)` COMMIT; do not let the commit subject alone demote it.*
+> Net effect on that gate: two of its three heading-named entries are company
+> ratification content, which makes RATIFIED **stronger** than first stated, not
+> weaker. Both sides reached the same rule independently, from opposite errors —
+> the producer over-trusting the subject, the company over-trusting the entry.
 > **But read the SUBJECT field, not the heading.** §6a fixes Subject as "the exact
 > statuses flipped", so such an entry discharges the gates its SUBJECT flips; a
 > gate named only in the heading is a citation, not a ratification (the J28
@@ -871,10 +899,15 @@ OWED COMPANY-SIDE:
   sources + sp...` — a `gate(...)` subject, company-authored, unrelated to any
   port. THAT is the ledgerable id, and it was missing from the first pass: the
   original finding was right but rested on three entries rather than a named
-  commit. The re-check also cleanly separated the two ported entries,
-  `12fa680e` (the producer four-source sign-off, L1590) and `b75871b8` (the
-  Tier-A adoption, L1645 — see the correction above; that one is company-
-  AUTHORED despite its port subject). Three heading-named entries, and the session
+  commit. THE THREE-WAY READ, corrected 2026-08-09 pm and worth keeping intact
+  because it is the reference example for the whole provenance rule:
+    L1590 — the PRODUCER's own sign-off (13/13). Ported. Portable.
+    L1645 — the COMPANY's Tier-A adoption. Company-authored, and it rode inside
+            the SAME port commit `12fa680e` as L1590.
+    L2624 — the COMPANY's nine-source extension, via `gate(...)` commit
+            `838857e7`. Company-authored, unambiguous by subject too.
+  Two of the three are company ratification content. The producer's earlier
+  attribution of L1645 to `b75871b8` was wrong and is corrected here. Three heading-named entries, and the session
   correctly separated them rather than counting them as three signals:
   - `gate-log.md:1590` — the PRODUCER gate (M3, 13/13, 2026-08-04). Identified
     unprompted as arriving via the a14a8028 / 5417ef10 ports. This one is the
