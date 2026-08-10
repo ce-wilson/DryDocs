@@ -805,6 +805,24 @@ OWED COMPANY-SIDE:
 > §6a template lives in this file, and every instance of the shape lives in YOUR
 > gate-log. For that class the pickaxe is therefore not the proof — it is only how
 > the commit id gets named for the ledger.
+> **CORRECTION, SAME DAY, AND IT IS THE PRODUCER'S OWN ERROR — a `port(...)`
+> subject does NOT prove an entry arrived from the producer.** The rule above was
+> first written implying the pickaxe would return a company-authored, non-port
+> commit for a Tier-A entry. It does not. The company's audit-envelope-phase4
+> re-check returned `b75871b8` for the Tier-A adoption at their `gate-log.md:1645`,
+> subject `port(20260807): reconcile producer a14a8028..5417ef10 — land the G22
+> rua-load...`. A PORT commit — because the RECONCILE step is exactly where the
+> consumer writes its own adoption record, and that work is committed under the
+> port's subject. So the subject test is sound in ONE direction only:
+>   `gate(...)` / company-authored, unrelated to a port -> RATIFIED. Dispositive.
+>   `port(...)` -> NOT dispositive either way. It means the commit applied a port;
+>   it does not tell you who authored the lines inside it.
+> **The reliable discriminator is CONTENT, not subject: does the producer's tree
+> contain this entry?** For the Tier-A class the answer is structurally no, which
+> is why that class still resolves — the reasoning holds, the mechanism named for
+> it was wrong. Read the company session's own gloss with the same care: it
+> labelled L1645 a "ported artifact, as expected", and it is not one — the
+> producer has no entry of that shape to port.
 > **But read the SUBJECT field, not the heading.** §6a fixes Subject as "the exact
 > statuses flipped", so such an entry discharges the gates its SUBJECT flips; a
 > gate named only in the heading is a citation, not a ratification (the J28
@@ -846,9 +864,17 @@ OWED COMPANY-SIDE:
   surface. That is this session's recurring defect class in its purest form: a
   check that reads like a gate and passes for the wrong reason. Deferring is
   correct; forgetting would not be.
-- **`audit-envelope-phase4`: GENUINELY RATIFIED — the first TRUE positive, and
-  the one that shows what real evidence looks like** (checked 2026-08-09,
-  company `main` @ `a4c4ce37`). Three heading-named entries, and the session
+- **`audit-envelope-phase4`: GENUINELY RATIFIED — company commit `838857e7`,
+  entry at company `gate-log.md:2624`** (re-checked under the stricter rule
+  2026-08-09, company `main` @ `48252f72`; first checked @ `a4c4ce37`).
+  Subject `gate(audit-envelope-phase4): company extension - rule 9 company
+  sources + sp...` — a `gate(...)` subject, company-authored, unrelated to any
+  port. THAT is the ledgerable id, and it was missing from the first pass: the
+  original finding was right but rested on three entries rather than a named
+  commit. The re-check also cleanly separated the two ported entries,
+  `12fa680e` (the producer four-source sign-off, L1590) and `b75871b8` (the
+  Tier-A adoption, L1645 — see the correction above; that one is company-
+  AUTHORED despite its port subject). Three heading-named entries, and the session
   correctly separated them rather than counting them as three signals:
   - `gate-log.md:1590` — the PRODUCER gate (M3, 13/13, 2026-08-04). Identified
     unprompted as arriving via the a14a8028 / 5417ef10 ports. This one is the
