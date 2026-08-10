@@ -62,6 +62,37 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-101`** · 2026-08-09 · `[question]` · **open** · prio? **High** —
+  **The deployment grain has an SME-confirmed cardinality and no home — DryDocs has one
+  concept where the source has two.** K21 found `u_seal_deployment_id` sitting beside
+  `u_seal_application_id` on the CSDM Application Service row (`cmdb_ci_service_discovered`),
+  never on `cmdb_ci_business_app`. The SME then confirmed it directly: **one application,
+  multiple deployments is correct**, with the identifier reading as
+  `app_id(seal_id):deployment_id`. That closes the condition C10's gate-bound candidate #1 was
+  deferred on ("only when an environment-level use case lands"). **THE SAME SESSION ALSO SUPPLIED
+  THE CAVEAT THAT SHRINKS IT, and the caveat is the more valuable half:** *everything we map is
+  off the **application**; modules are referenced by default for changes but in practice are not
+  used as intended.* So the grain is ruled — attribution stays on the application,
+  `seal-tom-attribution-reshape`'s subject does NOT move, and `:BusinessApplication` is correct
+  as-is. What survives is much smaller than it first looked: **capture an identifier the source
+  carries and we discard**, not re-home attribution. Worth writing down precisely because the
+  expensive reading was the plausible one — this repo's grain corrections (K1/K2, and the
+  2026-07-22 move of SEAL attribution from job level to the folder→batch `:Port`) are exactly the
+  shape this looked like for about an hour. **What is left.** (1) **The key, and it still
+  blocks.** If the deployment id is scoped under the application id, a bare `deployment_id` is
+  NOT a business key and a loader keying on it alone MERGEs distinct deployments together — the
+  identity-gate §D2 / §C3 failure on a new axis. One count of distinct ids against one count of
+  distinct pairs settles it. (2) **The label**, if we capture it: C10's standing advice holds —
+  adopt the CONCEPT, pick our own stable name, since the vendor's own label moved (Application
+  Service → Service Instance at Yokohama). (3) **A rider on an existing gate now, not its own
+  gate** — nothing changes an attribution subject any more. **AND A SECOND, INDEPENDENT FINDING
+  FOR G35 §G15:** that clause asks whether Application Module Owner's subject is a module DryDocs
+  has no grain for. Practice answers it — the module reference is a FORM DEFAULT on change
+  records, populated and not meaningful. Building a module grain to hold it would model the
+  default rather than the operating model, so §G15 can be ruled without inventing one. Note the
+  general trap it demonstrates: a populated column can be emptier than a null one.
+  Evidence, and open question 7: `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
+
 - **`Idea-100`** · 2026-08-09 · `[bug]` · **open** · prio? **High** —
   **The manifest has no way to say "gate-bound" — and that gap nearly shipped an unsigned
   gate's ontology.** The best finding in PORT-REPORT-0d3761a9, caught company-side by their

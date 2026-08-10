@@ -153,12 +153,17 @@ Content Service (shared normalization); SaaS publisher packs + Okta usage.
 1. **Deployed-application-instance concept** (CSDM Application Service/Service Instance)
    — node-meaning decision → its own gate, only when an environment-level use case
    lands (dev/test/prod estates). Adopt the concept; pick our own stable label.
-   **RE-OPENED 2026-08-09 (K21): the trigger condition is met.** The replica carries
-   `u_seal_deployment_id` beside `u_seal_application_id`, and both sit on the Application
-   Service row (`cmdb_ci_service_discovered`) rather than on `cmdb_ci_business_app` — so the
-   source distinguishes application from deployment and keys each, while DryDocs has one
-   concept for both. See `servicenow-replica-evidence.md` §1.3(c) and §4. Still gate-bound;
-   this records that the deferral's own condition has arrived, nothing more.
+   **RE-OPENED 2026-08-09 (K21): the trigger condition is met, and the SME has confirmed the
+   cardinality.** The replica carries `u_seal_deployment_id` beside `u_seal_application_id`, and
+   both sit on the Application Service row (`cmdb_ci_service_discovered`) rather than on
+   `cmdb_ci_business_app` — so the source distinguishes application from deployment and keys
+   each, while DryDocs has one concept for both. **SME 2026-08-09: one application, multiple
+   deployments is correct**, with the identifier reading as `app_id(seal_id):deployment_id` —
+   so the relation is 1:N and the deployment key is plausibly composite. See
+   `servicenow-replica-evidence.md` §1.3(c), §4 and open questions 3 and 7. Still gate-bound:
+   this records that the deferral's own condition has arrived and that the cardinality is no
+   longer an inference. The grain question — is a TOM role held against the application or the
+   deployment — is what the gate must still rule.
 2. **Attestation practice** — a recurring SME re-confirmation pass over gate-accepted,
    non-discoverable facts (the Data Manager attestation model; extends D7's family).
    Process-level; groom when a cadence owner exists.

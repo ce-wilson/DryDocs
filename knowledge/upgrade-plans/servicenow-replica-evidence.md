@@ -107,6 +107,48 @@ service is a logical representation of a deployed application stack and is **not
 and parked it as gate-bound candidate #1, "only when an environment-level use case lands." §4 argues
 the use case has now landed.
 
+> **SME CONFIRMATION, 2026-08-09** (given on this finding, recorded verbatim in substance):
+> **one application, multiple deployments is correct**, and the identifier shape reads as
+> **`app_id(seal_id):deployment_id`**.
+>
+> Two things follow, and they are different in kind. **The cardinality is now a stated fact**, not
+> an inference from column names: the application→deployment relation is 1:N, which is what gate-bound
+> candidate #1 was waiting on. **The key shape is the SME's read of the data** ("looks like"), and it
+> carries a consequence worth pinning before anyone builds on it: if the deployment identifier is
+> *scoped under* the application id, then **a bare `deployment_id` is not a business key** — the key
+> is the pair. Keying a future deployment node on `deployment_id` alone would collide across
+> applications wherever the source restarts its numbering.
+>
+> This repo has been here before, which is why it is worth stating rather than assuming: identity
+> gate §D2 pinned the 4-part `attribution_id` for exactly this reason, and §C3 refused the tempting
+> narrower key because MERGE would have collapsed distinct rows. Same shape, new axis.
+>
+> **THE CAVEAT, same session — and it is the part that decides what to build.** SME: *everything
+> we map is off the **application**. Modules are referenced by default for changes, but in practice
+> are not used as intended.*
+>
+> So the grain question (§6 Q3) is answered for **practice**: mapping and accountability are done
+> at the **application** level. The deployment id is real and the 1:N is real, but the deployment is
+> **not** the attribution subject, and DryDocs attributing to `:BusinessApplication` is therefore
+> *correct as-is* rather than one layer too high. That materially narrows what the re-opened C10
+> candidate #1 is for: it is about **capturing an identifier the source carries and we discard**,
+> not about re-homing attribution. Those are very different pieces of work, and the second one is
+> the expensive one we are now not doing.
+>
+> **The module half is a second finding, not an aside.** ServiceNow's Application Module is
+> referenced by default on change records, so the field is *populated* and *not meaningful* — the
+> reference exists because the form defaults it, not because someone asserted it. This is §3.2's
+> lesson arriving on a field that would be far more tempting to trust than a null `u_hash`: a
+> populated column can be emptier than an empty one. It bears directly on G35 §G15, which asks
+> whether Application Module Owner's subject is a module DryDocs has no grain for — the honest
+> answer from practice is that the module grain exists in the source and does not carry reliable
+> meaning, so building a module grain to hold it would model the form default rather than the
+> operating model.
+>
+> **What is still open** (§6 Q7): whether `u_seal_deployment_id` is globally unique or unique only
+> within its application. Still worth settling even though the deployment is not the attribution
+> subject — the moment the id is captured at all, it needs to be captured under the right key.
+
 **(d) As sampled, the TOM assignment names a GROUP, not a person.** `tom_main.group` resolves to
 `sys_user_group`. There is no `sys_user` join anywhere in the query, and no person column is
 selected. **Stated as a limit, not a conclusion:** this proves the SME's report attributes to a
@@ -312,7 +354,8 @@ Findings only. Every row is for the gate to rule.
 | **G35 §A8/§F1/§F3** — "the role vocabulary becomes DATA, config-declared or admitted at load" | ServiceNow's side **already is** data: `tom_roles` is a table with `sys_id`, `name`, `active` | **CONFIRMS THE TARGET** — and supplies a worked example. `active` also means role classes *retire*, which no DryDocs surface can currently express |
 | **G35 §B6** — "a role holding always names a person… an Attribution with no HAS_AGENT is a defect" | As sampled, `tom_main.group` names a **group**; no person join appears | **TENSION** — see §6 Q1 before this becomes an invariant. If the ServiceNow surface attributes to groups, an invariant asserted from the SEAL surface does not hold across both |
 | **`seal-tom-attribution-reshape` mapping #3** — `(:Attribution)-[:HAS_AGENT]->(:Employee)` | Same finding | **SCOPE** — `prov:agent` admits an Organization as readily as a Person, so the PROV shape survives; the *target node class* is what would need to widen |
-| **C10 gate-bound candidate #1** — the deployed-instance concept, deferred "until an environment-level use case lands" | `u_seal_deployment_id` sits beside `u_seal_application_id` on the Application Service row | **THE USE CASE HAS LANDED** — the source distinguishes application from deployment and carries an id for each. DryDocs has one concept where the source has two |
+| **C10 gate-bound candidate #1** — the deployed-instance concept, deferred "until an environment-level use case lands" | `u_seal_deployment_id` sits beside `u_seal_application_id` on the Application Service row; SME **confirmed 1:N** 2026-08-09, identifier reading as `app_id(seal_id):deployment_id` — **but also that everything mapped is off the APPLICATION** | **NARROWED, NOT RE-HOMED** — the candidate is now about capturing an identifier we discard, not about moving the attribution subject. Attributing to `:BusinessApplication` is confirmed correct. Q7 (key scope) still gates any capture |
+| **G35 §G15** — Application Module Owner: "a module owner plausibly owns a PART of an application, and DryDocs has no module grain to attribute to. Confirm the subject before required-ness" | SME 2026-08-09: modules are **referenced by default on changes and in practice not used as intended** | **ANSWERS THE SUBJECT QUESTION FROM PRACTICE** — the module grain exists in the source and does not carry reliable meaning. A DryDocs module grain built to hold this would model a form default. §G15 can be ruled without inventing one |
 
 **The last row is the finding to carry forward.** DryDocs models `:BusinessApplication` and attributes
 TOM roles to it. The evidence shows the company's own operating model attributing accountability at
@@ -389,13 +432,28 @@ Ordered by how much they block. Q1–Q3 are SME questions; Q4–Q6 need one more
 2. **Is the TOM scoped app the same surface as SEAL's Application Contacts, or the second surface?**
    G35 §D1 compares two rosters that disagree. If the TOM scoped app *is* the ServiceNow side of that
    comparison, §D3's discriminator has its two values. **Blocks §D3.**
-3. **What is the accountability grain — Application Service, or Business Application?** §1.3(c) shows
-   the SEAL ids on the Application Service. Confirm whether that is where accountability genuinely
-   sits, or an artifact of how this one report was built. **Blocks the C10 candidate #1 re-open.**
+3. ~~**What is the accountability grain — Application Service, or Business Application?**~~
+   **ANSWERED 2026-08-09 by the SME: the APPLICATION.** Everything mapped is off the application;
+   deployments and modules exist in the source but are not the mapping subject. So DryDocs
+   attributing to `:BusinessApplication` is correct as-is, `seal-tom-attribution-reshape`'s
+   attribution subject does not move, and the C10 candidate narrows from "re-home attribution" to
+   "capture an identifier we discard." Kept struck-through rather than deleted because the question
+   was the reason for the finding, and a later reader meeting only the answer would not know the
+   alternative was considered and ruled out. **Residual:** what
+   `tom_main.inheritance` / `inherited_from_ci` encode is still unexplained — if mapping is
+   application-level, the inheritance those columns carry is inheritance *between CIs*, which is a
+   different mechanism than role inheritance between application and deployment. §1.3(e) stands.
 4. **Does the replica's `cmdb_rel_type` view carry `parent_descriptor`?** Not visible; decides §3.3.
 5. **What does `delete_flag` mean operationally** — values, retention, interaction with
    `dwintel_dl_snapshot_trim`? Decides §3.4.
 6. **What is `end_point` on `cmdb_rel_type`?** No public definition found. Instance or SME only.
+7. **Is `u_seal_deployment_id` globally unique, or unique only within its application?** Raised by
+   the 2026-08-09 confirmation that the identifier reads as `app_id(seal_id):deployment_id`. This is
+   the one question that turns the SME's read into a business key: if it is scoped, any deployment
+   node must be keyed on the **pair**, and a loader keying on `deployment_id` alone will MERGE
+   distinct deployments from different applications into one node. Cheap to settle — a count of
+   distinct `u_seal_deployment_id` against a count of distinct pairs answers it. **Blocks any
+   deployment-grain modelling**, not just the gate.
 
 Two smaller ones, recorded so they are not rediscovered: whether any table appears in more than one
 `DW_*_DATA_VIEW` schema and which would be authoritative (§2.2), and whether `connection_strength` /
