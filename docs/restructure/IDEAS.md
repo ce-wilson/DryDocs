@@ -62,7 +62,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-101`** · 2026-08-09 · `[question]` · **open** · prio? **High** —
+- **`Idea-102`** · 2026-08-09 · `[question]` · **open** · prio? **High** —
   **The deployment grain has an SME-confirmed cardinality and no home — DryDocs has one
   concept where the source has two.** K21 found `u_seal_deployment_id` sitting beside
   `u_seal_application_id` on the CSDM Application Service row (`cmdb_ci_service_discovered`),
