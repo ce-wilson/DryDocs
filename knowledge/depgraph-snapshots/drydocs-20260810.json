@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-09T14:39:03",
-    "date": "20260809",
+    "captured_at": "2026-08-10T00:36:42",
+    "date": "20260810",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "9270002",
-      "full": "92700026aa219089d4ad1baec5a1d3d1feef97c3",
+      "commit": "bd051ab",
+      "full": "bd051abbd2876b245a0f2806b6054ac1819dbcd2",
       "branch": "main",
-      "describe": "9270002",
-      "subject": "fix(depgraph): U19 — the orphan queue was 82% scanner artifact",
+      "describe": "port-base-20260810",
+      "subject": "chore(port): ledger step 122 — record the terminate fix",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -8009,37 +8009,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/gate-audit-envelope-phase4-company-prompt.md",
-      "name": "gate-audit-envelope-phase4-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-audit-envelope-phase4-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/gate-autosys-crosswalk-company-prompt.md",
       "name": "gate-autosys-crosswalk-company-prompt.md",
       "extension": ".md",
       "rel_path": "docs/gate-autosys-crosswalk-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/gate-envelope-property-terms-company-prompt.md",
-      "name": "gate-envelope-property-terms-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-envelope-property-terms-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/gate-ui-write-surface-company-prompt.md",
-      "name": "gate-ui-write-surface-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-ui-write-surface-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10569,6 +10542,15 @@
       "name": "plan_roadmap.py",
       "extension": ".py",
       "rel_path": "drydocs/plan_roadmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port_preflight.py",
+      "name": "port_preflight.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port_preflight.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13211,10 +13193,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260809.json",
-      "name": "drydocs-20260809.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260809-1439.json",
+      "name": "drydocs-20260809-1439.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260809.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260809-1439.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13539,6 +13521,15 @@
       "name": "servicenow-cmdb-analysis.md",
       "extension": ".md",
       "rel_path": "knowledge/upgrade-plans/servicenow-cmdb-analysis.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/upgrade-plans/servicenow-replica-evidence.md",
+      "name": "servicenow-replica-evidence.md",
+      "extension": ".md",
+      "rel_path": "knowledge/upgrade-plans/servicenow-replica-evidence.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13944,6 +13935,15 @@
       "name": "mapping_analytics.py",
       "extension": ".py",
       "rel_path": "scripts/mapping_analytics.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/port_preflight.py",
+      "name": "port_preflight.py",
+      "extension": ".py",
+      "rel_path": "scripts/port_preflight.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14984,6 +14984,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_port_preflight.py",
+      "name": "test_port_preflight.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_preflight.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_port_reconcile_guards.py",
       "name": "test_port_reconcile_guards.py",
       "extension": ".py",
@@ -15555,6 +15564,15 @@
       "name": "oracle.svg",
       "extension": ".svg",
       "rel_path": "web/public/vendor-icons/oracle.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/public/vendor-icons/snowflake.svg",
+      "name": "snowflake.svg",
+      "extension": ".svg",
+      "rel_path": "web/public/vendor-icons/snowflake.svg",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18089,6 +18107,10 @@
       "drydocs/drydocs_core/mapping_store.py"
     ],
     [
+      "drydocs/scripts/port_preflight.py",
+      "drydocs/drydocs/port_preflight.py"
+    ],
+    [
       "drydocs/scripts/render_board.py",
       "drydocs/drydocs/plan_board.py"
     ],
@@ -18967,6 +18989,10 @@
     [
       "drydocs/tests/unit/test_plan_roadmap.py",
       "drydocs/drydocs/plan_roadmap.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_preflight.py",
+      "drydocs/drydocs/port_preflight.py"
     ],
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
@@ -24501,22 +24527,7 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/gate-audit-envelope-phase4-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
       "drydocs/docs/gate-autosys-crosswalk-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-envelope-property-terms-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-ui-write-surface-company-prompt.md"
     ],
     [
       "drydocs/docs",
@@ -25382,6 +25393,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/plan_roadmap.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/port_preflight.py"
     ],
     [
       "drydocs/drydocs",
@@ -27681,7 +27697,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260809.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260809-1439.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -27822,6 +27838,11 @@
       "drydocs/knowledge/upgrade-plans",
       "CONTAINS",
       "drydocs/knowledge/upgrade-plans/servicenow-cmdb-analysis.md"
+    ],
+    [
+      "drydocs/knowledge/upgrade-plans",
+      "CONTAINS",
+      "drydocs/knowledge/upgrade-plans/servicenow-replica-evidence.md"
     ],
     [
       "drydocs/knowledge/upgrade-plans",
@@ -28027,6 +28048,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/mapping_analytics.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/port_preflight.py"
     ],
     [
       "drydocs/scripts",
@@ -28601,6 +28627,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_port_preflight.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_port_reconcile_guards.py"
     ],
     [
@@ -28937,6 +28968,11 @@
       "drydocs/web/public/vendor-icons",
       "CONTAINS",
       "drydocs/web/public/vendor-icons/oracle.svg"
+    ],
+    [
+      "drydocs/web/public/vendor-icons",
+      "CONTAINS",
+      "drydocs/web/public/vendor-icons/snowflake.svg"
     ],
     [
       "drydocs/web/src",
@@ -29593,13 +29629,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1592,
-    "edges": 878,
+    "files": 1594,
+    "edges": 880,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1859,
+    "rels": 1861,
     "directories": 268
   }
 }
