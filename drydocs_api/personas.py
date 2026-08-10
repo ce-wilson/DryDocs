@@ -26,6 +26,11 @@ PERSONAS: dict[str, Persona] = {
     # steward = the O13 power-user tier (user < steward < admin): sees
     # /mappings, not /admin/config and not raw Cypher.
     "kchen2190": Persona(id="kchen2190", role="steward"),
+    # O47: the intake persona. Role 'user' on purpose — SME is a persona, not
+    # a fourth role tier; the /intake page gate is client-side (auth.ts
+    # canAccessIntake) and the intake API's own transition map is role-based,
+    # so an SME holds exactly the user-tier server rights.
+    "sme": Persona(id="sme", role="user"),
 }
 
 

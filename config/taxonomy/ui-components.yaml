@@ -87,7 +87,7 @@ components:
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
 
-  # --- route (20) ---
+  # --- route (21) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
@@ -96,6 +96,7 @@ components:
   - { id: DocsRoute,               area: route,        path: routes/DocsRoute.tsx,                        module: docs,       module_evidence: route-name }
   - { id: SoftwareRoute,           area: route,        path: routes/SoftwareRoute.tsx,                    module: software,   module_evidence: route-name }
   - { id: GatesRoute,              area: route,        path: routes/GatesRoute.tsx,                       module: gates,      module_evidence: route-name }
+  - { id: IntakeRoute,             area: route,        path: routes/IntakeRoute.tsx }
   - { id: LineageRoute,            area: route,        path: routes/LineageRoute.tsx,                     module: lineage,    module_evidence: route-name }
   - { id: LoadsRoute,              area: route,        path: routes/LoadsRoute.tsx,                       module: loads,      module_evidence: route-name }
   - { id: MappingsRoute,           area: route,        path: routes/MappingsRoute.tsx }
@@ -118,12 +119,13 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (15) ---
+  # --- component (16) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
   - { id: GraphSvg,                area: component,    path: components/GraphSvg.tsx }
   - { id: HeroArt,                 area: component,    path: components/HeroArt.tsx }
+  - { id: IntakeStepper,           area: component,    path: components/IntakeStepper.tsx }
   - { id: LinkedDemoFrame,         area: component,    path: components/LinkedDemoFrame.tsx }
   - { id: MiniDag,                 area: component,    path: components/MiniDag.tsx }
   - { id: ModuleIcon,              area: component,    path: components/ModuleIcon.tsx }

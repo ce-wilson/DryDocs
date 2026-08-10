@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { currentSession, personaFor, PERSONAS, signIn, signOut, type Session } from './lib/auth'
+import { canAccessIntake, currentSession, personaFor, PERSONAS, signIn, signOut, type Session } from './lib/auth'
 import SignIn from './components/SignIn'
 import Shell, { type EnvName } from './layout/Shell'
 import OverviewRoute from './routes/OverviewRoute'
@@ -10,6 +10,7 @@ import ExplorerTowerRoute from './routes/explorer/ExplorerTowerRoute'
 import AskRoute from './routes/AskRoute'
 import OwnershipRoute from './routes/OwnershipRoute'
 import AssetPathRoute from './routes/AssetPathRoute'
+import IntakeRoute from './routes/IntakeRoute'
 import ConsoleRoute from './routes/ConsoleRoute'
 import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
@@ -97,6 +98,14 @@ export default function App() {
         <Route
           path="under-the-hood"
           element={persona.role === 'steward' || persona.role === 'admin' ? <UnderTheHoodRoute /> : <Navigate to="/" replace />}
+        />
+
+        {/* O47: the sme persona (?as=sme) plus steward/admin — the intake
+            page's gate lives in auth.ts (canAccessIntake), because "SME" is a
+            persona, not a fourth role tier. */}
+        <Route
+          path="intake"
+          element={canAccessIntake(persona) ? <IntakeRoute persona={persona} /> : <Navigate to="/" replace />}
         />
 
         {/* O13: steward + admin only — the server enforces the same boundary

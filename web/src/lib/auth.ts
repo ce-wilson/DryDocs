@@ -36,7 +36,28 @@ export const PERSONAS: readonly Persona[] = [
     role: 'steward',
     chip: 'mapping steward · manual tiers (O13)',
   },
+  // O47: the intake persona. Deliberately role 'user' — SME is WHO they are,
+  // not a fourth role tier (adding one would ripple through canAccessModule
+  // for a single page). /intake gates on `id === SME_PERSONA_ID || role !==
+  // 'user'`, and towerKey scopes the area cascade's default exactly as it
+  // scopes jdoe4821's tower drill. NOTE: the plan says "towerId"; the roster
+  // field has been towerKey since O-series auth landed — field name wins.
+  {
+    id: 'sme',
+    displayName: 'S. Merchant',
+    role: 'user',
+    chip: 'app-support SME · context intake',
+    towerKey: 'home',
+  },
 ]
+
+/** The persona whose ?as= id opens /intake without steward/admin role (O47). */
+export const SME_PERSONA_ID = 'sme'
+
+/** May this persona open the intake page? SME persona, steward, or admin. */
+export function canAccessIntake(persona: Persona): boolean {
+  return persona.id === SME_PERSONA_ID || persona.role !== 'user'
+}
 
 export interface Session {
   personaId: string

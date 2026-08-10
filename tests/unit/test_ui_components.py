@@ -260,10 +260,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     66 -> 68 at Q16: SoftwareRoute (route-name) and VendorIcon (directory) both
     bind to the new `software` module, so BOTH counts move by two — the
     /software page is a fully-bound addition, not a partial one.
+    68 -> 70 at O47: IntakeRoute and IntakeStepper ride UNBOUND like
+    MappingsRoute/AppCodeCascadePane — 'intake' is not a registry module (the
+    page is reached by ?as=sme / deep link, no Aside entry), so a binding
+    would invent one.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         29,
-        68,
+        70,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
