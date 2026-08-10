@@ -264,10 +264,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     MappingsRoute/AppCodeCascadePane — 'intake' is not a registry module (the
     page is reached by ?as=sme / deep link, no Aside entry), so a binding
     would invent one.
+    70 -> 69 at O53: HeroArt deleted (the code graph's first front-end orphan,
+    Idea-77 -> graph-vs-files experiment ALPHA code set, SME-adopted). THIS pin
+    move is the clause BOTH experiment runs missed — fixed at adoption, which
+    is why adoption is a review step and not a merge.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         29,
-        70,
+        69,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

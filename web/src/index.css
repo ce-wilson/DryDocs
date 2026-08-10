@@ -86,11 +86,10 @@ body { min-height: 100svh; }
 .hover-lift { transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
 .hover-lift:hover { transform: translateY(-3px); border-color: var(--faint); box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4); }
 
-/* Overview hero background network (components/HeroArt.tsx): a slow opacity
-   pulse, dark mode only — purely decorative, neutralized for everyone by the
-   prefers-reduced-motion rule below. */
-@keyframes hero-net-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
-.dark .hero-net { animation: hero-net-pulse 6s ease-in-out infinite; }
+/* DELETED O53: .hero-net pulsing animation — was the Overview hero background
+   network (components/HeroArt.tsx), a slow opacity pulse, dark mode only.
+   HeroArt.tsx orphan removed 2026-08-10 (no importer; verified by grep before
+   the delete — graph-vs-files experiment, ALPHA code set adopted). */
 
 /* React Flow / MiniDag custom node glow (site-plan §2 "graph canvases theme
    too"): every custom node wrapper carries `.rf-node` plus a `--rf-glow`

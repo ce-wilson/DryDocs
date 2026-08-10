@@ -119,12 +119,11 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (16) ---
+  # --- component (15) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
   - { id: GraphSvg,                area: component,    path: components/GraphSvg.tsx }
-  - { id: HeroArt,                 area: component,    path: components/HeroArt.tsx }
   - { id: IntakeStepper,           area: component,    path: components/IntakeStepper.tsx }
   - { id: LinkedDemoFrame,         area: component,    path: components/LinkedDemoFrame.tsx }
   - { id: MiniDag,                 area: component,    path: components/MiniDag.tsx }
