@@ -75,9 +75,10 @@ new guard files. Steps **122-123 are APPLIED** (verified commit-by-commit: 9
 commits, 4 cited in steps 122/123, 5 ritual). Live ledger restarts at **124+**,
 delta since `ae21ee4`.
 
-> **`ae21ee4` IS BUILT, NOT YET MERGED.** Port commit `12420373` (+ report commit
-> `297d25bc`) on company branch `drydocs-port-20260810`, applied onto `main @
-> 308dda92` — the `--no-ff` merge is the SME's call. `6f03264`'s port (`feeb0706`)
+> **`ae21ee4` IS MERGED (SME, 2026-08-10) — the port branch is REMOVED.** Port commit
+> `12420373` (+ report `297d25bc`) applied onto `main @ 308dda92`, `--no-ff` merged onto
+> company `main`, branch `drydocs-port-20260810` deleted at close-out. The port loop is
+> FULLY CAUGHT UP on both sides. `6f03264`'s port (`feeb0706`)
 > DID land: merged as `308dda92` and pushed BEFORE this port began, so Phase 0 was
 > satisfied on arrival.
 > **J41 landed `done` company-side** — deliberate call, correctly distinguished from
