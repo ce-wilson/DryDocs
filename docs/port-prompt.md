@@ -1170,9 +1170,20 @@ regeneration, never-port outputs — and get no step.
     tracker — read it at every port from now on.
 
 (Steps 116-121 are APPLIED at PORT-REPORT-6f03264 and collapse into **Last completed
-port** above. The live ledger restarts at 122 with the next delta since `6f03264`;
-nothing is listed here yet, and `scripts/port_preflight.py` will name any commit that
-should be.)
+port** above. The live ledger restarts at 122, delta since `6f03264`.)
+
+122. J41 — THE OPENING SEQUENCE [TEST-PINNED] (`f32aadc` mechanism, `9a71479` docs).
+    The producer half J35 never had, and the three rules at the top of this file are
+    the payload: run the six checks before offering a base, port a `port-base-*` TAG
+    rather than `HEAD`, and name ONE OWNER PER PHASE. `drydocs.port_preflight` +
+    `scripts/port_preflight.py --base <last-ported> --tag` enforce it; the
+    ledger-coverage check mechanises the ROLL-PROCEDURE RULE.
+    **Nothing here is yours to run** — this is producer machinery, and the only part
+    that reaches you is the reconcile-port SKILL.md change: if the producer offers a
+    bare SHA or "HEAD" instead of a `port-base-*` tag, STOP and ask for the tag.
+    THE ONE CAUTION THAT WOULD COST YOU A REWORK: `tests/unit/test_module_boundary.py`
+    gains a new `port` component group. If your copy has diverged, take the GROUP with
+    the module or the classification guard fails on an unclassified `drydocs.port_preflight`.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
