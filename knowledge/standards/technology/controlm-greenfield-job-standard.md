@@ -339,12 +339,17 @@ block is deleted, and the destination reference goes with it. R40 is widened acc
 Two things make this cheaper than it looks, and both are worth recording because they are the
 argument, not the decision:
 
-**The destination has more than one spelling, and none of them is declared.** The generator emits
-`%%NOTIFY`; a deployed on-prem load job carries an On-Do action reading *"When Job ended Not OK —
-Send mail notification to `%%EMAIL_GRP`"*; the live TRUST folder declares neither. So the mechanism
-is **already silently unbound wherever it is used** — each of those jobs resolves its destination to
-`CTMERR` and mails nothing. Deletion switches off nothing that was working; it removes a block whose
-only current effect is to generate R30 findings.
+**The destination has more than one spelling.** The generator emits `%%NOTIFY`; a deployed on-prem
+load job carries an On-Do action reading *"When Job ended Not OK — Send mail notification to
+`%%EMAIL_GRP`"*; a hand-built Ab Initio folder declares a third, `%%EMAIL_GRP_S`.
+
+**CORRECTED 2026-08-11 (C32).** This section first argued that none of them is declared, so the
+block already resolves to `CTMERR`, mails nothing, and deletion costs nothing. That is true of the
+DPL-**generated** folders and **false** of the hand-built ones, which declare all three to a real L2
+support address — there the block sends. The ruling stands; the argument does not, and the honest
+version is: on generated folders this is cleanup, on hand-built ones it is a deliberate removal of
+a working mail path, made because the ServiceNow incident is the call to action. Carrying the easier
+argument would tell a reader who meets a hand-built folder that the rule does not apply to them.
 
 **A second spelling is itself the R33 argument in miniature.** Two names for one concept, neither
 declared, is exactly the drift the one-name-per-concept rule exists to stop. Repairing the block

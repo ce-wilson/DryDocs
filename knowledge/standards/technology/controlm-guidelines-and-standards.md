@@ -300,9 +300,15 @@ wins**:
 ### 5.4 Job naming and numbering
 
 ```
-{APP[:4]}{FREQ}{JOB_NUM}_{SOR}_{DATASET}_{PAYLOAD}_{CHANNEL}_{TYPE}
-                                          DAT|TOK   AWS|ONPM
+{APP[:4]}{FREQ}{JOB_NUM}_{SOR}_{DATASET}_[PAYLOAD]_[PLATFORM]_{CHANNEL}_{TYPE}
+                                          DAT|TOK   SNF|EXA|TD  AWS|ONPM
 ```
+
+**`PLATFORM` and `CHANNEL` are two axes, and a job can carry both.** Platform is *where the data
+lands* (Snowflake, Oracle Exadata, Teradata); channel is *where the job runs* (AWS, on-prem). A
+deployed Snowflake views load carries `_SNF_AWS_` — Snowflake target, AWS execution — so a single
+slot cannot describe it. `PAYLOAD` and `PLATFORM` are optional: watchers have a payload and no
+platform, loads have a platform and no payload.
 
 **MUST** (**R29**): `JOB_NUM` is fixed-width zero-padded, so alphanumeric sort equals numeric sort —
 `_FW_0010` beside `_FW_0002`, never `_FW_10` beside `_FW_2`.
@@ -393,6 +399,130 @@ boundary restricts artifact sources to approved repositories, and a bare name na
 
 Under the ladder, Placement and Trust declare **nothing of their own**.
 
+### 6.3 The downstream fan-out — refine, then split
+
+Ingestion ends where the data lands. What happens next is a different shape, and it is where most
+of the estate's jobs actually live: **one refined dataset fans out to several targets, on more than
+one lifecycle.**
+
+```mermaid
+flowchart LR
+  subgraph ING["Ingestion — §6.1 / §6.2"]
+    direction TB
+    TR["0050 · TRUST<br/>data lands"]
+    CP["0060 · CPY<br/>control copy"]
+    TR --> CP
+  end
+
+  RF["0070 · RFND<br/>refine / CDC<br/><i>one dataset</i>"]
+  CP --> RF
+
+  subgraph STRAT["Strategic target"]
+    SNF["0070 · SNF_AWS_RFND<br/>Snowflake views load"]
+  end
+
+  subgraph DECOM["Legacy targets — decommissioning"]
+    direction TB
+    ORA["0080 · ONPM_EXALD<br/>Oracle load-ready file"]
+    TDL["0080 · ONPM_TDLOAD<br/>Teradata load"]
+    VAL["0080 · ONPM_TDLOAD<br/>work-layer validation"]
+    TDL --> VAL
+  end
+
+  RF --> SNF
+  RF --> ORA
+  RF --> TDL
+
+  CLOSE["9999 · DUMMY / 0099 · HK<br/>close the day"]
+  SNF --> CLOSE
+  ORA --> CLOSE
+  VAL --> CLOSE
+
+  classDef strat stroke-width:2px
+  class SNF strat
+```
+
+**The `{TYPE}` vocabulary is larger than the ingestion set.** A standard that enumerates four job
+types cannot validate a real folder. Deployed values:
+
+| `TYPE` | Role | Stage |
+|---|---|---|
+| `FW` | file watcher | ingestion |
+| `PLCT` | placement | ingestion |
+| `TRUST` | trust-zone ingestion | ingestion |
+| `CPY` | control-file copy | ingestion |
+| `RFND` | refine / change data capture | **fan-out point** |
+| `EXALD` · `TDLOAD` | platform load (Oracle Exadata, Teradata) | target |
+| `HK` | housekeeping / close | close |
+| `DUMMY` | join point, runs nothing | close |
+
+**MUST**: the suffix names the job's **role**, not its script. Two jobs running the same wrapper
+with different psets are different roles, and the name is where a reader sees that without opening
+the command line.
+
+**Three rules govern the split.**
+
+**MUST**: the refine stage produces **one** dataset, and every target reads *that*. A target that
+re-derives the dataset for itself is a second version of the same fact — the §1 principle, applied
+one stage later. In practice this shows up as one `%%ENTITY_NM` shared by every job in the fan-out.
+
+**MUST**: each target job names its **platform** (§5.4) and takes its target schema from a variable
+(`SCHEMA_ORA`, `SCHEMA_TD`, …) declared at the widest scope that holds it — which is the target's
+own folder, not the job.
+
+**SHOULD**: a fan-out closes on a single join point (a dummy or a housekeeping job), so "the day is
+finished" is one condition rather than a count of legs a monitor has to know.
+
+#### 6.3.1 Lifecycle is a fact, and nothing currently carries it
+
+The strategic path and the decommissioning paths run **side by side, in the same estate, under the
+same naming convention.** A Teradata load being retired next quarter looks exactly like a Snowflake
+load being invested in. Nothing in a job definition distinguishes them.
+
+That is the single most valuable fact a support decision needs — *is this load on its way out?* —
+and today it exists only in the SME's head. Two carriers already in the estate get close without
+being it:
+
+- **`LEGACY_NAME`** in the description (§7.4) says *this job replaced an older one*. It marks the
+  destination of a migration, not the source.
+- **Quantitative resource pools** name the target platform independently of the job name (§6.3.2),
+  so "everything holding the Teradata pool" is a decommissioning inventory today.
+
+Neither states intent. Registering a lifecycle token is the obvious answer and it is an **open
+item** (§12), not a rule — the vocabulary is a governance decision, not a naming one.
+
+#### 6.3.2 Resource pools are a second, independent platform signal
+
+A load holds a quantitative resource pool named for its target — an Oracle pool on the Oracle load,
+a Teradata pool on the Teradata one. That is the platform stated **without parsing a job name**.
+
+**SHOULD**: keep the two signals in agreement. Where the job name says one platform and the resource
+pool says another, one of them is a typo — and because they are derived independently, the
+disagreement is machine-detectable rather than a judgement call.
+
+#### 6.3.3 Environment selection by datacenter prefix
+
+A supported pattern, written down because it looks like a defect and is not:
+
+```
+CURRENVIRON = %%SUBSTR %%DATACENTER 1 1     → "P"
+FID         = %%FID_%%CURRENVIRON            → %%FID_P
+ENV         = %%ENV_%%CURRENVIRON            → %%ENV_P
+```
+
+The **name** of the variable being resolved is composed from another variable's value. One folder
+definition promotes across dev, test and production with no edit — genuinely good practice, and it
+is why the datacenter name's first character is load-bearing rather than decorative.
+
+**MUST** state the cost rather than let a reader find it: **a static resolver cannot resolve
+`%%FID`.** It has to evaluate `%%SUBSTR` first and re-resolve. Any lineage pass that treats `%%FID`
+as an ordinary reference gets a miss or a literal `CTMERR` — and the FID is a join key, so the
+failure is silent and it is upstream of everything.
+
+This is the one sanctioned exception to §5's one-name-per-concept reading: `FID_D` / `FID_Q` /
+`FID_P` are three names for what looks like one concept, and they are legitimate, because the
+concept is *"the FID for environment X"* and X is genuinely a dimension.
+
 ---
 
 ## 7. The description field
@@ -469,6 +599,29 @@ for runbook documentation. They are deliberately not wired to anything.
 **MUST NOT** collapse them. And **MUST NOT** put a ServiceNow queue in a Control-M variable at all:
 technician routing lives in the escalation database, joined on the job name.
 
+### 7.4 `LEGACY_NAME` — the decommissioning crosswalk
+
+**MUST**, on any job that replaced one on a platform being retired:
+
+```
+LEGACY_NAME: LEGACY006_SAMPLE_PARTY_CONTACT_CD
+```
+
+**Why this is a token and not a note.** The estate already writes it — as prose, in brackets, at
+the end of the description (`CDC Job [ Legacy Name : … ]`). It is the **only** record that this job
+and that retired job are the same work, and it is the join that answers "what used to do this" for
+a decommissioning inventory, an audit, or an incident on a job nobody recognizes. A fact that
+important should not depend on a bracket convention surviving the next edit.
+
+**MUST** be the legacy job's name exactly, one value, no commentary inside the token. Where a job
+replaced more than one, the token is multi-valued on the documented separator — the same shape
+`REC_ID` uses.
+
+**MUST NOT** be inferred from a name prefix. Two jobs sharing a legacy prefix are evidence, not a
+crosswalk, and a graph that treats a guess as an edge is worse than one with a gap.
+
+The remaining prose in those descriptions is the job's role in words — `JOB_ROLE` (§7.2), unstructured.
+
 ---
 
 ## 8. Notifications
@@ -483,12 +636,24 @@ signal nobody is required to act on is noise.
 `DOMAIL` block is deleted, not re-pointed.
 
 **MUST NOT** repair the destination. Delete the block and its destination reference goes with it,
-whatever that job spells it — the estate currently carries at least `%%NOTIFY` (what every generated
-job emits) and `%%EMAIL_GRP` (an On-Do action on a deployed load job). **Neither is declared
-anywhere.** That is the second argument for deletion rather than repair: the mechanism is already
-silently unbound wherever it is used, so nothing is being switched off that was working. Where such
-a reference is found it is reported as an ordinary unresolvable reference (**R30**) — evidence the
-block should not be there, never a missing variable to supply.
+whatever that job spells it — the estate carries at least `%%NOTIFY` and `%%EMAIL_GRP`, and one
+hand-built folder declares a third, `%%EMAIL_GRP_S`, all three pointing at one support address.
+
+**Two kinds of folder, and the difference matters when you make the change:**
+
+| | Destination | Effect of deleting the block |
+|---|---|---|
+| **Generated** (DPL) | referenced, **declared nowhere** | none — it already resolves to `CTMERR` and mails nothing |
+| **Hand-built** (Ab Initio) | declared, real address | **a working mail path stops** |
+
+So on generated folders this is cleanup, and on hand-built ones it is a **deliberate removal of
+something that currently sends** — which is the ruling, made with that cost in view, because the
+ServiceNow incident is the call to action and a second channel nobody is required to act on is
+noise. Say the cost out loud rather than carry the easier argument: a reader who meets a hand-built
+folder and was told "this deletes nothing" will reasonably conclude the rule does not apply here.
+
+Where an *undeclared* destination is found it is additionally an ordinary unresolvable reference
+(**R30**) — evidence the block should not be there, never a missing variable to supply.
 
 Contacts survive this, at folder scope and as documentation only — see §7.3.
 
@@ -643,6 +808,9 @@ Before submitting a folder:
 - [ ] No forbidden character in any variable name; none ≤ 38 chars exceeded (**R38**)
 - [ ] TOK/CTL watcher cats its watch path; **DAT watcher does not cat** (**R39a/b**)
 - [ ] Zero `<SHOUT>` / `<DOSHOUT>` / `<DOMAIL>` (**R40**)
+- [ ] A load names its **platform** and its **channel** in separate slots (§5.4)
+- [ ] The job name and the quantitative resource pool agree on the target platform (§6.3.2)
+- [ ] `LEGACY_NAME` is present on any job that replaced a retired one (§7.4)
 - [ ] No variable value is bare punctuation (**R1**)
 - [ ] Job numbers zero-padded, gapped, and ordered like the dependency graph (**R29**)
 
@@ -650,11 +818,16 @@ Before submitting a folder:
 
 ## 12. Open items
 
-1. **`SOURCE_CONTACT`** — must it be a DL rather than a named individual? (§7.1)
-2. **The dot convention** — `..` before the extension, or the dot stored inside `FILE_EXTENSION`?
+1. **A lifecycle token** — what carries *"this load is being decommissioned"*? Nothing does today,
+   and it is the fact a support decision needs most. The vocabulary is a governance decision, not a
+   naming one. (§6.3.1)
+2. **`SOURCE_CONTACT`** — must it be a DL rather than a named individual? (§7.1)
+3. **The dot convention** — `..` before the extension, or the dot stored inside `FILE_EXTENSION`?
    Both are legal; the estate must pick one. (§3.2)
-3. **Site Standards licensing** (§9)
-4. **Job-number bands** — reconcile the generator's numbering with the functional bands. (§5.4)
+4. **Site Standards licensing** (§9)
+5. **Job-number bands** — reconcile the generator's numbering with the functional bands. (§5.4)
+6. **Job numbers repeat across a fan-out** — two targets both at `0080` in one folder. Is the number
+   the *stage* (so repetition is correct) or the *job* (so it is a collision)? (§5.4, §6.3)
 
 *Closed:* `<DOMAIL>` — **removed alongside the shouts** (SME, 2026-08-11; §8).
 
