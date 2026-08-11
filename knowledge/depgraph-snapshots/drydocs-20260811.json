@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T09:48:06",
+    "captured_at": "2026-08-11T10:28:41",
     "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5405ab6",
-      "full": "5405ab6d8fcb774b2e9ee65af472ea98b9c97be9",
+      "commit": "95738a8",
+      "full": "95738a83c25c4da2e8b55adee7b593aafeb72f66",
       "branch": "main",
-      "describe": "port-base-20260810b-40-g5405ab6",
-      "subject": "docs(controlm): SME ruling — DOMAIL is removed alongside the shouts",
+      "describe": "port-base-20260810b-42-g95738a8",
+      "subject": "backlog(remediation): G68 + O59 — the folder-set profile and the SME intake surface",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -13652,10 +13652,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
-      "name": "drydocs-20260811.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-0947.json",
+      "name": "drydocs-20260811-0947.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-0947.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28568,7 +28568,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-0947.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
