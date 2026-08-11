@@ -81,6 +81,11 @@ AND (post_execution_command IS NULL
   (`controlm-runbook-automation` skill): each violating FileWatcher generates a proposed
   change (add the post-exec `cat`) through the review gate → the Jira fix package.
 
+> 📄 **Folded into [Control-M Guidelines & Standards](controlm-guidelines-and-standards.md) §6.1
+> (C31)**, which states both clauses of this rule normatively alongside every other rule a job
+> author needs. This page remains the rule's *rationale* — why the cat exists at all, and what the
+> two-point reconciliation buys.
+
 ## Amendment 2026-08-11 (C30) — the check is now an equality, and it has a detector
 
 Two changes, both from the [greenfield job standard](controlm-greenfield-job-standard.md):

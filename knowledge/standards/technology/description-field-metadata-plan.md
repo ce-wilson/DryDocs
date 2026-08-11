@@ -37,6 +37,12 @@ trust_tier: internal / SME-asserted / planned
 > and the live token is `REC_ID`, a source-system reference); and the FW description's `ENV` becomes
 > `FTS_ID`, because `ENV` already means the deployment environment on the command jobs. §2b stays as
 > the transcription of what the corpus says; the greenfield standard is what to build.
+>
+> **To author a job, read [Control-M Guidelines & Standards](controlm-guidelines-and-standards.md)
+> instead** — one normative page (C31) that replaces this document's §2b/§2c along with four other
+> partial standards. This file remains the *history*: the 2026-06-11 field observation, the
+> 2026-08-11 transcription, and the key-prefix governance. It is no longer where the target state
+> lives.
 
 > ⚠️ **Trust tier:** internal / planned / SME-asserted. The "modern" examples below are the *target pattern* observed in early adopters — not yet validated estate-wide.
 

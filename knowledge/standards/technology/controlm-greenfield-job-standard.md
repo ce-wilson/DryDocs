@@ -23,6 +23,13 @@ holds the real folder, accounts and ids.
 > service accounts, SEALs, FIDs, GUIDs, DL addresses and author ids live ONLY in the values twin.
 > Examples below use the synthetic SEAL block **70001–70099** and `example.invalid` addresses.
 
+> 📄 **This is the RATIONALE half.** The normative page a job author follows is
+> [**Control-M Guidelines & Standards**](controlm-guidelines-and-standards.md) (C31) — the same
+> decisions in MUST/SHOULD voice, with the scope diagram and a worked resolution trace, and no
+> argument. Three documents, three jobs: **normative there, rationale here, enforcement in the
+> rules registry.** Keep it that way; two pages arguing the same point is how a standards corpus
+> becomes five contradictory ones.
+
 **Machine-checked.** Every rule here has a detector:
 `drydocs_remediation.detect.detect_conformance` (rules R2, R30–R40, registered in the internal
 rules registry). The test suite pins the pair that matters — a flow built to violate the standard
