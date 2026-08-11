@@ -2542,3 +2542,73 @@ that any application uses it or at what version.
   company-side on 2026-08-07 and stopped so the two would match; this entry is the producer-side
   half. The relay is NOT written into `docs/port-prompt.md` yet because a port is in flight
   against a fetched head and that file is a hand-merge surface — add it once that port merges.
+
+## 2026-08-11 — RECORD: TOM roles (G35), walk round 1 — six rulings, one of which changes the port
+
+**Gate:** `tom-roles-enumeration-and-cardinality` (backlog G35) · **still UNSIGNED** — a RECORD
+entry, not a sign-off. Six clauses confirmed at a live SME walk; §H2 still governs and no graph
+write is authorized. Recorded now rather than at sign-off because §H1b's finding is this repo's
+own: a confirmed clause inside an unsigned gate has no home in a log organised by sign-off, and one
+was stranded that way on 2026-08-05.
+
+Evidence behind all six: `knowledge/upgrade-plans/servicenow-replica-evidence.md` (K21, §§7–8) —
+the SQL probe run of 2026-08-11 and the ServiceNow API evidence of the same day.
+
+- **§A RULED — BOTH REGISTERS, WITH A SURFACE DISCRIMINATOR.** The ServiceNow TOM catalog holds
+  **100+ role types** carrying `Scope` (Individual/Group) and `Type` (Accountable/Operational/
+  Approval/Assignment); the SEAL contact extract surfaces 13. The long-running 7-vs-9-vs-13 dispute
+  was therefore never about the register — it was about what one feed surfaces. Both are modelled,
+  and every attribution records which surface asserted it. **Two consequences promoted from optional
+  to required by this ruling:** §D4 precedence is now mandatory (two ingested surfaces that disagree
+  with no rule is the one outcome §D4 refuses), and §G's register must state which register each
+  line belongs to, because the ServiceNow side brings Scope/Type and the SEAL 13 do not.
+- **§E RULED — AUTHORED ROWS ONLY; INHERITANCE IS COMPUTED.** Of the three `Inheritance` states,
+  only **Direct** (blank) and **Overridden** are authored; **Inherited** rows are derived copies
+  carrying two lineage pointers (`inherited_from_ci`, `inherited_from`). The load stores the
+  authored rows and derives the rest, rather than materialising a derived fact as though asserted.
+  **This crosses a scope boundary deliberately:** reconstructing an inherited holder requires
+  ancestor CIs, which sit ABOVE the ~200 applications DryDocs supports — including CIs owned by
+  teams it does not. The pull widens to take ancestor CIs **for their TOM rows only**, and K21 §7.4
+  is amended to say so rather than stretched in silence.
+- **GROUP-SCOPED ROLES RULED — VOCABULARY YES, GRAPH SHAPE DEFERRED.** The group-scoped family
+  (service ownership, change ownership, several change-approval teams, an eCAB team, five
+  incident-resolver tiers, four problem-owner variants) enters the register with `Scope: Group` so
+  the vocabulary is complete. **G35 mints NO group→application graph shape.** That shape is owned by
+  the company-signed gate `snow-hpsm-queue-to-group` (2026-07-15), which already builds
+  `(:BusinessApplication)-[:HAS_SUPPORT_QUEUE]->(:HpsmQueue)-[:RESOLVED_BY]->(:ServiceNowGroup)`.
+  Minting a second shape for the same fact would collide at the next port.
+- **§D3 RULED — A THREE-VALUED SURFACE DISCRIMINATOR, REUSING EXISTING VERIFICATION FIELDS.** The
+  surfaces are **hand-verified crosswalk**, **SEAL contact extract**, and **ServiceNow TOM** — three,
+  not the two §D1 described. Trust level rides on the crosswalk's existing `verified` /
+  `cert_status` / `cert_next_date` vocabulary rather than a newly minted one, on the same discipline
+  that reads `cmdb_rel_type`'s descriptor columns instead of splitting `name`.
+- **§D4 RULED — HAND-VERIFIED > SERVICENOW TOM > SEAL EXTRACT.** Human verification outranks both
+  automated surfaces; the operating-model source outranks the contact extract. This is the order
+  `config/precedence.yaml` gains, and it is the reason the crosswalk was built by hand in the first
+  place.
+- **THE PORT GAP RULED — STANDING RELAY PLUS AN EVIDENCE-DOC RECORD.** See the finding below; no
+  code moves.
+
+**THE FINDING THAT PROMPTED THE LAST RULING, recorded because the doctrine has no slot for it.**
+`snow_support_crosswalk.py`, `snow_support_crosswalk.cypher`, the `load-snow-support-crosswalk` CLI,
+the `:ServiceNowGroup` and `:HpsmQueue` node classes, and the signed gate `snow-hpsm-queue-to-group`
+(2026-07-15) exist **company-side only**. Verified this session: they appear nowhere in the producer
+working tree and nowhere in producer git history. So G35 was being drafted over a company-signed
+modelling position that the producer repo cannot see.
+
+Guardrail 6 covers the company adopting a PRODUCER-signed gate (Tier A / Tier B). It has no
+provision for the reverse — a company-signed gate with a built ontology that the producer lacks.
+"Company-only" elsewhere in the port-prompt means paths and config rows, which are inert; a
+modelling position is not inert, because the producer can independently invent a competing one. That
+is exactly what this walk nearly did.
+
+**Also worth recording: the two models are the same fact from different sources.** The company
+crosswalk is hand-verified YAML, per-machine and gitignored; the TOM tables carry the same
+app→group→technician mapping from the source, and the crosswalk's `l2`/`l3` tiers correspond to
+TOM's incident-resolver tiers. That is §D1's roster-disagreement problem again, for groups rather
+than people — and a real upgrade path for the crosswalk, owned by `snow-hpsm-queue-to-group` rather
+than by this gate.
+
+**Nothing is applied.** The `tom_roles` scheme keeps its 7 concepts, both loader crosswalks are
+unchanged, `config/precedence.yaml` gains nothing yet, and no node class is created. Each follow-up
+lands as its own logged change after this gate is signed.

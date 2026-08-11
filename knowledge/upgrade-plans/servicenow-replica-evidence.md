@@ -990,3 +990,79 @@ asked the walk to "confirm or drop it."
 origin state that every inherited copy ultimately points back to. §E1 was right as drafted and §E1b
 was wrong to question it. The gate prompt has been corrected so the walk is not asked to consider
 dropping a legitimate state.
+
+---
+
+## 9. The company-side ServiceNow model the producer cannot see
+
+**Recorded 2026-08-11 at the G35 walk, because this document is where a producer-side gate looks for
+what ServiceNow means — and it was missing the fact that half the question is already answered.**
+
+The company has **built and signed** a ServiceNow support model. Gate `snow-hpsm-queue-to-group`,
+signed 2026-07-15:
+
+| Layer | Artifact |
+|---|---|
+| Source data | a hand-verified Internal YAML crosswalk, keyed on SEAL id — gitignored, per-machine |
+| Adapter | `snow_support_crosswalk.py` — flattens to one row per (app, tier, platform) |
+| Graph write | `snow_support_crosswalk.cypher` — MERGEs `:ServiceNowGroup` / `:HpsmQueue`, links to `:BusinessApplication` |
+| CLI | `load-snow-support-crosswalk` |
+
+The shape it writes, with `:BusinessApplication.seal_id` as the pivot:
+
+```
+(:BusinessApplication {seal_id})-[:HAS_SUPPORT_QUEUE]->(:HpsmQueue)-[:RESOLVED_BY]->(:ServiceNowGroup)
+```
+
+`:ServiceNowGroup` carries the technician list, the group id, the tier and a certification status.
+The crosswalk joins three things per application: the PAT side (product, tech partner and product
+owner SIDs), the SEAL id as join key, and the ServiceNow side (group plus L2/L3 technicians), with
+an HPSM queue as the routing anchor.
+
+**None of this exists producer-side, and none of it ever has** — verified against the working tree
+and against `git log --all` on every path. It is company-originated work, not a producer artifact
+awaiting a port.
+
+### 9.1 Why it is recorded here
+
+Because a producer-side gate was about to invent a competing model. G35's walk on 2026-08-11 reached
+the question "should the group-scoped TOM roles enter the model?" with no way to know that
+`(:BusinessApplication)-[:HAS_SUPPORT_QUEUE]->(:HpsmQueue)-[:RESOLVED_BY]->(:ServiceNowGroup)`
+already exists and is signed. It was stopped by the SME producing the screenshots, not by anything
+in this repo.
+
+**The port doctrine has no slot for this.** Guardrail 6 rules the company adopting a *producer*-signed
+gate — Tier A when the company holds no position, Tier B when it does. There is no provision for the
+reverse. And "company-only" elsewhere in the port-prompt means paths and config rows, which are
+inert; a **modelling position is not inert**, because the producer can independently invent a
+competing one against the same source. Filed as `RELAY-6` so every future port re-states it.
+
+### 9.2 The two models are the same fact from different sources
+
+This is the part with consequences beyond bookkeeping.
+
+| | Company crosswalk | ServiceNow TOM (§8) |
+|---|---|---|
+| Origin | hand-verified YAML, per-machine, gitignored | the source system, via replica or API |
+| Keyed on | SEAL id | CI, resolved to SEAL via `u_seal_application_id` |
+| Groups | `snow_group` + technicians CSV, per tier | `sys_user_group`, per group-scoped role type |
+| Tiers | explicit `l2` / `l3` | the incident-resolver role tiers |
+| Trust | `verified`, `cert_status`, `cert_next_date` | none — it is whatever the source says |
+
+The `l2`/`l3` tiers and TOM's incident-resolver tiers are **the same fact recorded twice**. That is
+§D1's roster-disagreement problem again — for groups rather than people — and it is why G35's §D4
+ruling had to place them in an order: **hand-verified > ServiceNow TOM > SEAL extract.**
+
+**The upgrade path is real and is not this gate's to take.** A hand-verified, per-machine, gitignored
+YAML is exactly the kind of artifact a sourced feed should eventually replace. But `verified` and
+`cert_status` exist for a reason — somebody checked — and replacing human verification with a raw
+source feed trades accuracy for currency. That decision belongs to `snow-hpsm-queue-to-group`, and
+the producer should not pre-empt it. §D4's order deliberately lets both coexist so that the choice
+stays open.
+
+### 9.3 What G35 does about it
+
+**Nothing structural, and that is the ruling.** G35 admits the group-scoped role *types* into the
+vocabulary with `Scope: Group`, so the register is complete and honest, and **mints no
+group→application graph shape**. The shape stays owned by the signed gate. A second shape for the
+same fact would collide at the next port, and the collision would be the producer's fault.

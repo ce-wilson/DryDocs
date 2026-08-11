@@ -893,6 +893,20 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-11",
+      "title": "RECORD: TOM roles (G35), walk round 1 — six rulings, one of which changes the port",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
+      ],
+      "log_ref": "config/gate-log.md:2546",
+      "unblocks": [
+        "K21",
+        "O44"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

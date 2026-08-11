@@ -802,6 +802,40 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   without a real product id. This row is what lets a correct DPL pattern row
   exist.
 
+- **RELAY-6 — THE COMPANY HOLDS A SIGNED SERVICENOW MODEL THE PRODUCER CANNOT SEE,
+  AND GUARDRAIL 6 HAS NO SLOT FOR THAT DIRECTION** `[SME-REPORTED]` (new 2026-08-11,
+  from screenshots of a company session; the producer-side half IS verified — see
+  below). The company has built and SIGNED `snow-hpsm-queue-to-group` (2026-07-15):
+  `snow_support_crosswalk.py` + `.cypher`, a `load-snow-support-crosswalk` CLI, the
+  node classes `:ServiceNowGroup` and `:HpsmQueue`, and the shape
+  `(:BusinessApplication {seal_id})-[:HAS_SUPPORT_QUEUE]->(:HpsmQueue)-[:RESOLVED_BY]->(:ServiceNowGroup)`,
+  fed from a hand-verified Internal YAML crosswalk keyed on SEAL.
+  **`[VERIFIED-PRODUCER]`: none of it exists producer-side and none of it ever has** —
+  absent from the working tree and from `git log --all` on every one of those paths.
+  So this is company-ORIGINATED work, not a producer artifact awaiting a port.
+  **WHY IT IS A RELAY RATHER THAN A CURIOSITY:** guardrail 6 rules the company
+  adopting a PRODUCER-signed gate (Tier A / Tier B) and says nothing about the
+  reverse. Everything else the port calls "company-only" is a path or a config row,
+  which is inert — a MODELLING POSITION is not, because the producer can
+  independently invent a competing one against the same source. It nearly did:
+  G35's walk on 2026-08-11 was about to admit ServiceNow group-scoped roles and
+  would have minted a second group→application shape. It was stopped by the SME
+  showing the screenshots, not by anything in this repo.
+  **RULED AT THAT WALK (gate-log 2026-08-11 RECORD):** G35 admits the group-scoped
+  role TYPES into the vocabulary and mints NO graph shape — the shape stays owned by
+  `snow-hpsm-queue-to-group`. **What the company session should do with this relay:**
+  confirm the gate and loader still exist and are signed, and say whether the
+  producer should hold a READ-ONLY record of the model (names, node classes, edge
+  shape — no code) so producer-side gates stop drafting blind. Recorded producer-side
+  in `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
+  **A rider worth ruling while you are there:** the crosswalk is hand-verified YAML,
+  per-machine and gitignored, while the ServiceNow TOM tables carry the same
+  app→group→technician mapping FROM THE SOURCE, with the crosswalk's `l2`/`l3` tiers
+  corresponding to TOM's incident-resolver tiers. That is a real upgrade path for the
+  crosswalk and it belongs to YOUR gate, not to G35 — but G35's §D4 ruling
+  (hand-verified > ServiceNow TOM > SEAL extract) already assumes both can coexist,
+  so a decision to retire either one needs to reach the producer.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
