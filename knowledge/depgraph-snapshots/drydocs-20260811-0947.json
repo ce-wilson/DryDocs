@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T08:59:33",
+    "captured_at": "2026-08-11T09:48:06",
     "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "8471e40",
-      "full": "8471e405b4c28b8ec5adbfe63f967abd0224fafb",
+      "commit": "5405ab6",
+      "full": "5405ab6d8fcb774b2e9ee65af472ea98b9c97be9",
       "branch": "main",
-      "describe": "port-base-20260810b-38-g8471e40",
-      "subject": "docs(controlm): C31 — one guidelines and standards page replacing five partial ones",
+      "describe": "port-base-20260810b-40-g5405ab6",
+      "subject": "docs(controlm): SME ruling — DOMAIL is removed alongside the shouts",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -13652,10 +13652,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-0322.json",
-      "name": "drydocs-20260811-0322.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "name": "drydocs-20260811.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-0322.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28568,7 +28568,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-0322.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
