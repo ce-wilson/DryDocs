@@ -659,12 +659,64 @@ Contacts survive this, at folder scope and as documentation only — see §7.3.
 
 ---
 
-## 9. Use the tool's own guardrails
+## 9. The vendor's own fields — one is closed, one is free
 
-**SHOULD**: enable **Enforce Validations** and attach a **Site Standard** to the folder. A Site
-Standard enforces the required declaration set **at author time, in Control-M**, instead of a
-downstream check discovering the gap after deployment. Confirm what the environment licenses before
-committing to it.
+### 9.1 Enforce Validations and Site Standard — RULED OUT (2026-08-11)
+
+An earlier revision of this page recommended enabling **Enforce Validations** and attaching a
+**Site Standard**, so the required declaration set would be enforced *at author time* rather than
+by a downstream check after deployment. It asked the reader to confirm what the environment
+licenses.
+
+**The answer is that neither is available, and it is not a licensing question.** Both fields are
+unused and cannot be edited — a platform decision. The recommendation is withdrawn rather than left
+standing, so no future reader spends time re-litigating it.
+
+**The consequence matters more than the withdrawal: there is no author-time enforcement, at all.**
+Nothing prevents a malformed folder or job at the moment someone writes it. Every check in this
+standard is therefore *after the fact* — the conformance detectors and the description parse are
+not a safety net behind a vendor guardrail, they are the only guardrail. Two things follow:
+
+- A rule this page states is only as real as the detector that finds violations of it. A **SHOULD**
+  with no check is advice, and should be read that way.
+- Because bad input cannot be prevented, the design goal shifts to never *reading* bad input. That
+  is the argument for a self-identifying marker on anything this standard parses — see §7.
+
+### 9.2 Documentation Reference URL — free, and it survives regeneration
+
+The **Documentation Reference URL** is a defined vendor field, single-valued, and **no known
+process uses it**. That makes it the cheapest carrier available: nothing to collide with, no
+semantics to overload, no existing workflow to break.
+
+Two facts settle how to use it, both confirmed 2026-08-11:
+
+- **The DPL builder does NOT stamp it.** This is the important one. `get_description()` is
+  generator-owned, so a hand-authored description on a generated job is overwritten at the next
+  regeneration — but the Documentation Reference URL is not touched. On an estate that is mostly
+  generated objects, **this is the only vendor field that both accepts authored content and
+  survives regeneration.**
+- **The deployed DPL metadata is reachable by application id and carries no code-repository
+  pointer.** So a repository link cannot be derived from it.
+
+**Rules:**
+
+- **MUST** be used at **folder scope only.** A per-job link is a per-job maintenance obligation
+  that rots per-job, with nobody owning the re-check. One value per logical process, held by the
+  team that owns the documentation.
+- **MUST** point at the page **for this folder** — not the team's space root or a repository's
+  browse root. A link to a root answers *which wiki* or *which repo*, never *which runbook*, and it
+  passes review precisely because the field is populated and the link resolves.
+- **MUST NOT** carry a code-repository link. Since the repository is not derivable from DPL
+  metadata, the folder's documentation page links it, and a reader gets there in one hop — a link a
+  human maintains where humans already maintain links, rather than a copy in a field nobody reads.
+- **SHOULD** be treated as a coverage measure, not a quality one: *folders with a documentation URL
+  ÷ folders*. Since we are the only consumer, nothing else will ever report a rotted link, so this
+  number is the only feedback loop there is.
+
+> **Note the asymmetry this creates.** For a *generated job*, the description is unsafe (the builder
+> owns it) and the Documentation Reference URL is folder-scope by the rule above — so a generated
+> job has **no** safe carrier for authored metadata. That is not an oversight; it is why this
+> standard puts authored metadata at folder scope, where the generator does not reach.
 
 ---
 

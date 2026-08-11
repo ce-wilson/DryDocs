@@ -97,6 +97,12 @@ FOREIGN_PATHS: dict[str, str] = {
         "COMPANY-side test named in the same per-file-ignores inventory as absent "
         "producer-side, alongside a `test_snow_supp*` this pattern does not match"
     ),
+    "drydocs_core/orchestration/controlm/resource_pool_company.py": (
+        "COMPANY-side module created AT the caa0406 port (G76 mechanism/vocabulary "
+        "split). port-prompt names it in the standing-divergence ledger to say the "
+        "estate vocabulary lives THERE and never flows back — naming where a thing "
+        "went is the whole point of the entry"
+    ),
     "drydocs_core/adapters/controlm_xml_adapter.py": (
         "COMPANY-side module (G75/G76, 2026-08-11). port-prompt names it to say it is "
         "company-canonical and NOT a producer back-flow target — it encodes the "

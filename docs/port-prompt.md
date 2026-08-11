@@ -635,6 +635,46 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   a mapping keyed by category is a defect, not a refactor. `CATEGORY_LABEL` is the
   PROPOSED label vocabulary and is not ratified producer-side: nothing there writes a
   graph, and minting those labels is HITL-gate territory.
+  **APPLIED AND CONFIRMED at PORT-REPORT-caa0406** — the company took the mechanism
+  wholesale with `DEFAULT_RULES` empty and moved its estate vocabulary to a new
+  `drydocs_core/orchestration/controlm/resource_pool_company.py` (caller-supplied
+  ordered rules + app-code regex), re-pointing the adapter and its classifier test.
+  Regexes were NOT re-inlined and ordering was preserved. That company module is
+  **canonical-company and never flows back**; the producer file stays mechanism-only.
+- **`description_tokens.py` IS UNION-MERGED, NOT WHOLESALE** (new 2026-08-11 at
+  PORT-REPORT-caa0406). The two sides hold DIFFERENT MODELS in one module with **zero
+  name overlap**, verified producer-side rather than asserted: producer exports
+  `parse_description` / `required_tokens` / `validate` (the C30 conformance model,
+  consumed only by its own test), while the company-canonical adapter imports
+  `parse_tokens` / `classify_job_role` (the C30-retired live-load model). Neither name
+  set touches the other, so both survive in one file and the manifest's
+  `orchestration/**` canonical-producer row yields to the held adapter's dependency.
+  Resolve future collisions the same way — union, never wholesale — until the
+  back-flow below lands. **Producer back-flow candidate, and it is the real fix:**
+  split the conformance model and the live-load parser into separate modules
+  producer-side, which removes the union entirely. Recorded because a union that
+  depends on two name sets never colliding is one careless rename from breaking.
+- **`drydocs_remediation/detect.py` IS UNION, and the `Finding` shape is SHARED**
+  (new 2026-08-11, same report). Producer contributes R30–R40 plus `xml_bridge`; the
+  company contributes `detect_dpl_findings` (with `DPL-*` rule ids) and `dpl_review`.
+  Both are kept. The shared `Finding` dataclass is what makes the union cheap and is
+  the thing to protect: `tests/unit/test_no_shadow_definitions.py` forbids a second
+  Finding class producer-side, and the same discipline is what keeps these two rule
+  families reportable in one list. A company `DPL-*` id must never collide with a
+  producer `R<n>` id — the two namespaces are deliberately disjoint.
+- **`tests/unit/test_runbook_currency.py` IS DEFERRED COMPANY-SIDE, and the producer
+  disagrees mildly** (2026-08-11). The company removed rather than adopted it, because
+  all three of its failures are T19/T22 company deferrals — producer surfaces
+  (`docs/plan/load-map.html`, `web/src/generated/load-map.json`) and CLI verbs
+  (`sweep-removed`, `load-essential-graphrag`) absent company-side by design. The
+  reasoning is sound and the call is the company's. **But the guard has the escape
+  hatches for exactly this case** — `FOREIGN_PATHS` (a path in another repo) and
+  `HISTORICAL_PATHS` (a statement about the past), both of which take a written
+  reason — so adopting it with three exemption entries preserves the protection
+  instead of dropping it. Worth doing because the guard is not theoretical: it caught
+  a real producer defect inside this very range, when the step-134 ledger roll
+  backticked three module paths in an abbreviated form that did not exist. Backticks
+  are an existence claim on both sides.
 - README.md: company one-line footer stays (producer's lives at internal/repo-README.md).
 - .github/**: adapt-rather-than-adopt — company CI/workflow config wins.
 - config/dev-environment.yaml: canonical-company on BOTH manifests since
@@ -870,6 +910,27 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   crosswalk and it belongs to YOUR gate, not to G35 — but G35's §D4 ruling
   (hand-verified > ServiceNow TOM > SEAL extract) already assumes both can coexist,
   so a decision to retire either one needs to reach the producer.
+
+- **RELAY-7 — YOUR `email-dl-contact-point` GATE PROMPT NOW ASKS A QUESTION THAT HAS
+  BEEN ANSWERED** `[VERIFIED-PRODUCER]` (raised 2026-08-11 at the producer review of
+  PORT-REPORT-caa0406). The port correctly dropped producer edits to
+  `config/gate-prompts/email-dl-contact-point.yaml` — the file is canonical-company and
+  the disposition is right. But the dropped content was not a producer preference, it
+  was an **SME ruling**: producer commit `5405ab6` re-posed §G4 because `<DOMAIL>` is
+  removed alongside the shouts, so the option that clause used to weigh no longer
+  exists. Checkable from here: `git show 5405ab6 --stat` lists that yaml.
+  **What this means for you:** your copy still frames §G4 as though generated mail
+  survives. Running the gate on it will produce a ruling on a dead option. Re-pose §G4
+  your side — the new question is what corroborates §B2 now that the wired feed is
+  gone (psets, intended-only, or the ServiceNow incident record). Do NOT resolve this
+  by changing the file's disposition; canonical-company is correct and a future port
+  should drop producer edits to it again.
+  **A rider that arrived in the same range and belongs to the same gate:** §G6 carries
+  the Idea-105 rider — two claimants on the 4000-char `DESCRIPTION` on generated
+  objects. A fourth exit now exists that the rider does not list: a versioned sentinel
+  prefix (`DD1|`) partitions the field, so the generator's literal stays untagged and
+  E1's exact match is unaffected, with zero migration on any deployed object. Producer
+  is writing that up; take it as an input to your gate rather than re-deriving it.
 
 OWED COMPANY-SIDE:
 
