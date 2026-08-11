@@ -24,6 +24,16 @@ a known reference gap):
   verbatim, never resolved here — ``NODEID``, ``APPLICATION``, ``RUN_AS``),
   at folder level or nested inside ``SUB_FOLDER`` elements
   (``SUB_FOLDER_NAME`` / ``FOLDER_NAME`` / ``JOBNAME`` naming synonyms).
+- ``DESCRIPTION`` (synonym ``DESC``) on folders AND jobs, staged VERBATIM
+  (G66). The vendor field is 1 to 4000 chars of free text and is NOT runtime-
+  accessible as a ``%%`` variable, so it can never drive behavior — but the
+  company description-metadata standard repurposes it as a pipe-delimited
+  ``key: value`` carrier for metadata that exists nowhere else (delivery
+  mechanism, MFT route ids, support DLs, source contact, downstream
+  notification). Staging it verbatim is the whole point: parsing is
+  :mod:`drydocs_core.orchestration.controlm.description_tokens`, never this
+  seam, for the same reason ``CMDLINE`` is staged unresolved — one parser,
+  never a second engine in an adapter.
 - Variables as ``VARIABLE`` elements (``NAME`` verbatim with its ``%%``
   prefix, ``VALUE``) at folder, sub-folder, and job scope. DOCUMENT ORDER IS
   THE CONTRACT: the resolver's sequential-assignment semantics depend on
@@ -54,6 +64,7 @@ _SUBFOLDER_TAGS = {"SUB_FOLDER", "SUBFOLDER"}
 #: attribute synonyms, first hit wins
 _FOLDER_NAME_ATTRS = ("FOLDER_NAME", "TABLE_NAME")
 _SUBFOLDER_NAME_ATTRS = ("SUB_FOLDER_NAME", "FOLDER_NAME", "JOBNAME")
+_DESCRIPTION_ATTRS = ("DESCRIPTION", "DESC")
 
 
 def _attr(elem: ET.Element, *names: str) -> str:
@@ -72,6 +83,8 @@ class XmlFolderRecord:
     folder_name: str
     kind: str  # "folder" | "smart_folder"
     source_file: str = ""
+    #: DESCRIPTION verbatim — the description-metadata carrier, parsed elsewhere
+    description: str = ""
 
 
 @dataclass(frozen=True)
@@ -89,6 +102,8 @@ class XmlJobRecord:
     application: str = ""
     run_as: str = ""
     source_file: str = ""
+    #: DESCRIPTION verbatim — the description-metadata carrier, parsed elsewhere
+    description: str = ""
 
 
 @dataclass(frozen=True)
@@ -121,6 +136,11 @@ class XmlDefsCoverage:
     variables_no_name: int = 0  # VARIABLE without NAME — skipped
     duplicate_jobs: int = 0  # same (dc, folder, subfolder, name) — first wins
     elements_ignored: int = 0  # tags this seam does not consume — tolerated
+    # NOT a skip reason — an ADOPTION signal (G66). Folders + jobs carrying no
+    # DESCRIPTION are staged normally; the count says how much of the export
+    # predates the description-metadata standard, which is the number anyone
+    # asking "can we key on this yet?" actually needs.
+    descriptions_absent: int = 0
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -130,6 +150,7 @@ class XmlDefsCoverage:
             f"files={self.files_read} folders={self.folders} jobs={self.jobs} "
             f"variables={self.variables} | counted: "
             f"no_cmd_line={self.jobs_no_cmd_line} "
+            f"no_description={self.descriptions_absent} "
             f"dupes={self.duplicate_jobs} ignored={self.elements_ignored} | "
             f"skipped: invalid_files={self.files_invalid} "
             f"folders_no_name={self.folders_no_name} "
@@ -235,12 +256,16 @@ class ControlMXmlDefsExtractor:
             coverage.folders_no_name += 1
             return
         data_center = _attr(elem, "DATACENTER")
+        description = _attr(elem, *_DESCRIPTION_ATTRS)
+        if not description:
+            coverage.descriptions_absent += 1
         result.folders.append(
             XmlFolderRecord(
                 data_center=data_center,
                 folder_name=folder_name,
                 kind="smart_folder" if tag in _SMART_TAGS else "folder",
                 source_file=path.as_posix(),
+                description=description,
             )
         )
         coverage.folders += 1
@@ -345,6 +370,9 @@ class ControlMXmlDefsExtractor:
         cmd_line = _attr(elem, "CMDLINE")
         if not cmd_line:
             coverage.jobs_no_cmd_line += 1
+        description = _attr(elem, *_DESCRIPTION_ATTRS)
+        if not description:
+            coverage.descriptions_absent += 1
         result.jobs.append(
             XmlJobRecord(
                 data_center=data_center,
@@ -357,6 +385,7 @@ class ControlMXmlDefsExtractor:
                 application=_attr(elem, "APPLICATION"),
                 run_as=_attr(elem, "RUN_AS"),
                 source_file=path.as_posix(),
+                description=description,
             )
         )
         coverage.jobs += 1

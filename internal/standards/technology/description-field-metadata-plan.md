@@ -38,6 +38,27 @@ Real metadata key values observed: `USER: ftsi37291` (MFT service account),
 `ROUTE_ID: 372399`, `SourceContact: DATA_ECO_SQLSRV_L2_SUPPORT@restricted.chase.com`,
 `SourceSnowQueue: CCB_HLT_ASUP_SQLSRV`, `datasetSeriesName: MLCM CRM`.
 
+### Standards-page values (C29, 2026-08-11) — and where they disagree with production
+
+The four company standards pages captured at
+[`../../controlm-config/reference/controlm-job-metadata-standards-capture.md`](../../controlm-config/reference/controlm-job-metadata-standards-capture.md)
+carry their own worked values. They are transcribed in full there; only the
+**disagreements with the production observation above** are worth repeating here,
+because each one is a question for whoever ratifies the template:
+
+| Key | Production (2026-06-11, observed) | Standards page (2026-08-11, documented) | The question |
+|---|---|---|---|
+| route id | `ROUTE_ID: 372399` — **numeric**, one value | `INBOUND_ROUTE: MFTS_RT_IN_CRM_001` / `OUTBOUND_ROUTE: MFTS_RT_OUT_APP_001` — **string, and split in two** | Is the numeric id the real MFTS route key and the string a documentation placeholder, or has the route-id format changed? A directional pair also cannot be stored in the single-valued observed key |
+| transfer account | `USER: ftsi37291` | `USER: ftsi37291` | **Agrees** — the same real MFT service account appears in both, which is good corroboration that the standards page was written from this estate |
+| environment | *(not observed on this job)* | `ENV: FTS2` | New |
+| source contact | `SourceContact: DATA_ECO_SQLSRV_L2_SUPPORT@restricted.chase.com` — single address, CamelCase key | `SOURCE_CONTACT: <two addresses, semicolon-separated>` — SCREAMING_SNAKE key | Key renamed and the value became multi-valued |
+| ServiceNow queue | `SourceSnowQueue: CCB_HLT_ASUP_SQLSRV` — the **source system's** queue, populated | `PDN_SNOW_QUEUE: NULL` — the **downstream consumer's** queue, unassigned | **Different subjects, not a rename.** A mapping that merges them is wrong |
+| support DLs | folder variables `EMAIL_DL_L3` / `EMAIL_DL_L2` | job description tokens `EMAIL_DL_L3` / `EMAIL_DL_L2` **and** folder variables `L3_EMAIL_DL_NM` / `L2_EMAIL_DL_NM` | Two carriers and two spellings; unsettled (gate rider §G2) |
+
+The standards pages also introduce values with no production counterpart yet: the
+`JOB_ROLE: PUBLISHER` discriminator, the `PDN_DL` downstream consumer list, and the
+`DevX-project` folder variable.
+
 ## SEAL identities (REAL)
 
 - Folder variable **`SEAL=111027` = Home Lending Advice and Reporting**

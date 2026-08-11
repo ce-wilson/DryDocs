@@ -62,6 +62,44 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-105`** · 2026-08-11 · `[question]` · **open** · prio? **High** —
+  **Two things claim the same 4000-char Control-M `DESCRIPTION` field on generated
+  objects, and they cannot both hold.** The DPL generator stamps two literal strings
+  (`Generated Control-M Folder`, `Generated job to trigger DPL …`), and
+  `internal/controlm-config/controlm-pipeline-stub-integration-plan.md` item **E1** keys
+  machine-generated provenance on an EXACT match of those literals. The company
+  description-metadata standard captured at C29
+  (`internal/controlm-config/reference/controlm-job-metadata-standards-capture.md`)
+  fills the same field with pipe-delimited `key: value` tokens. Add a token block and
+  E1's literal match breaks; require the literal and the token block has nowhere to go.
+  Neither document mentions the other. Three exits: (a) exempt generated objects from
+  the token standard — cheapest, but generated objects are the majority of the estate
+  and the metadata is most valuable exactly where nobody hand-authored anything;
+  (b) fold the literal in as one token (`GENERATED_BY: <generator>`) — keeps both, but
+  changes E1 from a string compare to a parse and invalidates the discriminator on every
+  object already generated; (c) move the discriminator off `DESCRIPTION` to something
+  else the generator also stamps. DECIDE with whichever item lands E1; raised as gate
+  rider `email-dl-contact-point` §G6 so a section-C ruling cannot presume an exit
+  silently. Sibling finding: REQ-3 in the same capture reintroduces the dot-smuggling
+  pattern (`…%%$NEXT..tok`) that the description-metadata plan §3 lists as hazard #1 —
+  so the practice is not extinct in the *standards*, not just in the legacy estate.
+
+- **`Idea-104`** · 2026-08-11 · `[question]` · **open** · prio? **Med** —
+  **The MFT route id changed shape between the field observation and the standard, and
+  nobody has said which is real.** The 2026-06-11 production capture
+  (`internal/standards/technology/description-field-metadata-plan.md`) records one
+  numeric key, `ROUTE_ID: 372399`. The 2026-08-11 standards capture records a
+  *directional pair* of *string* ids, `INBOUND_ROUTE: MFTS_RT_IN_…` /
+  `OUTBOUND_ROUTE: MFTS_RT_OUT_…`, each modeled as a `dprod:DataProductPort`. Three
+  readings and they lead different places: the strings are documentation placeholders
+  and the real ids are numeric; the route-id format genuinely changed; or the numeric id
+  was only ever one leg of a pair nobody had split yet. It matters because C16's prefix
+  governance assigns a SINGLE target (`mfts.routeId`) that a directional pair does not
+  fit, and because a `dprod` port needs a stable key. Same capture, same class of
+  problem, worth ruling together: `SourceSnowQueue` (the *source system's* queue,
+  populated in production) and `PDN_SNOW_QUEUE` (the *downstream consumer's* queue,
+  `NULL` in the standard) are DIFFERENT SUBJECTS that a naive key mapping would merge.
+
 - **`Idea-103`** · 2026-08-10 · `[bug]` · **open** · prio? **Low** —
   **Five more unclosed markdown fences live outside the `docs/**` guard, in files this
   repo did not author.** The J41 sweep that found the `port-prompt.md` defect

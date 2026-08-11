@@ -16,6 +16,17 @@ trust_tier: internal / SME-asserted / planned
 **Status:** 🔵 **PLANNED / DRAFT-IN-PROGRESS** — captured 2026-06-11 from SME (chat + production screenshots). **The modern guidelines are not documented or communicated anywhere else yet — this document is the emerging draft, being created as-we-go.** Treat it as the working source for the standard until formally ratified.
 **Role:** Roadmap note. Defines (a) the planned repurposing of the Control-M **Description** field as a structured metadata carrier for graph relationships, and (b) the phased **variable modernization** effort with the production support team + agents.
 
+> 📄 **Amended 2026-08-11 (C29).** Four company standards pages and a four-item requirements
+> page were captured, verbatim and Internal, at
+> `internal/controlm-config/reference/controlm-job-metadata-standards-capture.md`. They are the
+> first written form of the "modern guidelines" this document says are undocumented — so §2's
+> observed-key table is no longer the only inventory. The consolidated, sanitized register is
+> **§2b** (tokens and variables by job type) and **§2c** (the file-name component standard).
+> Read §2 as the 2026-06-11 field observation and §2b/§2c as the 2026-08-11 documented standard;
+> where they use different spellings for the same concept, §2b.7 carries the mapping. Still
+> `status: planned` — the capture is a company draft (its own breadcrumb reads `WIP-DRAFT`),
+> nothing in it is ratified here, and no vocabulary entry or loader exists for any proposed term.
+
 > ⚠️ **Trust tier:** internal / planned / SME-asserted. The "modern" examples below are the *target pattern* observed in early adopters — not yet validated estate-wide.
 
 > 🔒 **Split twin (J14, 2026-07-27):** this file is the publishable MECHANISM half.
@@ -103,6 +114,214 @@ The `SEAL` folder variable is the highest-value addition — a *declared* key fo
 - **Pre-population strategy:** `Application → SealID` can be pre-populated **when known**; otherwise `Application → Platform` (platform-coded estates have **no direct SEAL**; application-coded ones do). **Which of the two applies cannot be determined from the Control-M data alone.** A later phase links to SEAL with what we know and **derives** the rest — derivations are "not always intuitive" (expect manual/SME adjudication for a tail). Registry: [folder-naming-convention](folder-naming-convention.md#application-code-registry-shape--sanitized-rows-real-registry-in-the-values-twin).
 
 **Parsing format (as observed):** `key: value` pairs delimited by `|` (pipe). Spacing is inconsistent in the wild (`|SeriesSLA`, `| USER`) — parser must be whitespace-tolerant. No escaping convention defined yet for values containing `|` or `:` (e.g. `SeriesSLA: 17:00 EST` — value itself contains `:`; **split on first `:` only**).
+
+---
+
+## 2b. Token & variable register (C29, 2026-08-11)
+
+**What this is.** A consolidated register of every metadata token and variable the standard
+asks a Control-M object to carry, with its carrier, its Oracle landing column, the ontology
+term the source documents propose, and — the column that matters most — an honest **status**
+saying whether DryDocs has actually built it.
+
+**Where it comes from.** Four company standards pages plus a four-item requirements page,
+captured verbatim (real values, real DLs) in the Internal capture
+`internal/controlm-config/reference/controlm-job-metadata-standards-capture.md`. That capture
+carries the source's own §8 summary table, its SQL DDL, its REGEXP parse statements, its Turtle,
+and the `[sic]` list of the source's internal inconsistencies. **This section is the sanitized
+mechanism view of it** — shapes and names only; every real address, account, route id, folder
+and job name lives in the values twin.
+
+> ⚠️ **Nothing here is ratified.** The `proposed` rows are one company draft's modeling, not a
+> DryDocs decision. No relationship-vocabulary entry, no property-term binding, and no loader
+> exists for any of them. The class question in particular is live — see §2b.5.
+
+### 2b.1 Carrier — the distinction this register exists to keep
+
+Three different mechanisms hold this metadata, and §2 above blurs them. They differ in change
+control, in grain, and in whether a loader can even see them:
+
+| Carrier | What it is | Grain | Read path |
+|---|---|---|---|
+| **description-token** | a `key: value` pair inside the 4000-char `DESCRIPTION` field | per job | XML export → parse (`drydocs_core.orchestration.controlm.description_tokens`, G66) |
+| **job-variable** | a `%%`-prefixed VARIABLE declared on the job | per job | already staged ordered by the G47 extractor |
+| **folder-variable** | a VARIABLE declared at folder / sub-folder scope | per folder | already staged ordered by the G47 extractor |
+
+**Why it matters:** `DESCRIPTION` is metadata-only and never runtime-accessible (§1), so it is
+safe to restructure but can never drive behavior. A VARIABLE is the opposite — it is live at
+execution, so changing one is a behavioral change requiring the equivalence proof the
+remediation module exists to produce. A register that conflates the two invites someone to
+"just rename a variable" the way you would edit prose.
+
+### 2b.2 FileWatcher jobs
+
+| Component | Token / variable | Carrier | SQL column | Ontology term | Ontology class | Vocabulary | Status | Notes |
+|---|---|---|---|---|---|---|---|---|
+| Delivery mechanism | `DELIVERY_MECHANISM` | description-token | `DELIVERY_MECHANISM` | `ex:fileDeliveredVia` | ControlMJob (FileWatcher) | `MFTS_AGENT` \| `SFTP_DIRECT` \| `API_GENERATED` | proposed | Always required. §2's observed spelling was `FileDeliveryMechanism` — the standard uses SCREAMING_SNAKE |
+| Transfer account | `USER` | description-token | `USER_ID` | `ex:systemUser` | prov:SoftwareAgent (the MFT agent) | free — service/functional account | proposed | Property of the *agent*, not the job |
+| Transfer environment | `ENV` | description-token | `ENV` | `ex:mftsEnv` | prov:SoftwareAgent | free — small env set | proposed | |
+| Inbound route | `INBOUND_ROUTE` | description-token | `MFTS_INBOUND_ROUTE_ID` | `ex:mftsRouteId` on `dprod:inputPort` | dprod:DataProductPort | route id, or literal `NULL` | proposed | MFTS only; literal `NULL` when not applicable |
+| Outbound route | `OUTBOUND_ROUTE` | description-token | `MFTS_OUTBOUND_ROUTE_ID` | `ex:mftsRouteId` on `dprod:outputPort` | dprod:DataProductPort | route id, or literal `NULL` | proposed | MFTS only |
+| Route direction | *(derived, no token)* | — | — | `ex:mftsRouteDirection` | dprod:DataProductPort | `INBOUND` \| `OUTBOUND` | proposed | Derived from which column the value came from |
+| L3 support DL | `EMAIL_DL_L3` | description-token | `EMAIL_DL_L3` | `ex:supportContact` | EmailDistributionList *(class unsettled — §2b.5)* | semicolon-separated addresses | proposed | Dev / Scrum team |
+| L2 support DL | `EMAIL_DL_L2` | description-token | `EMAIL_DL_L2` | `ex:supportContact` | EmailDistributionList *(unsettled)* | semicolon-separated addresses | proposed | Ops support group |
+| Source contact | `SOURCE_CONTACT` | description-token | `SOURCE_CONTACT` | `prov:wasAttributedTo` | dcat:Dataset → contact | semicolon-separated addresses | proposed | Origin file owner. **Would be a new `role` on the existing `WAS_ATTRIBUTED_TO` edge, not a new edge type** |
+| Watched token path | `%%FileWatch-FILE_PATH` | job-variable | — | *(none proposed)* | — | path expression | proposed | REQ-3. **Must be declared before `%%POSTCMD`** |
+| Post-command | `%%POSTCMD` | job-variable | — | *(none proposed)* | — | `cat %%FileWatch-FILE_PATH` | proposed | REQ-3. References the previous variable rather than repeating the path |
+
+**Landing table:** `CM_JOB_METADATA_FILE_WATCHERS`, `DESCRIPTION VARCHAR2(4000)` as the raw
+parse source, `JOB_NAME` primary key.
+
+### 2b.3 Publisher jobs
+
+| Component | Token | Carrier | SQL column | Ontology term | Ontology class | Vocabulary | Status | Notes |
+|---|---|---|---|---|---|---|---|---|
+| Job role | `JOB_ROLE` | description-token | `JOB_ROLE` | `ex:jobRole` | ControlMJob | `PUBLISHER` | proposed | The discriminator that says which table a job lands in |
+| L3 support DL | `EMAIL_DL_L3` | description-token | `EMAIL_DL_L3` | `ex:supportContact` | EmailDistributionList *(unsettled)* | semicolon-separated | proposed | Same token as FileWatcher |
+| L2 support DL | `EMAIL_DL_L2` | description-token | `EMAIL_DL_L2` | `ex:supportContact` | EmailDistributionList *(unsettled)* | semicolon-separated | proposed | Same token as FileWatcher |
+| Downstream consumers | `PDN_DL` | description-token | `PDN_DL` | `ex:consumerContact` on `dprod:outputPort` | EmailDistributionList *(unsettled)* | semicolon-separated | proposed | Notified on publish |
+| Downstream queue | `PDN_SNOW_QUEUE` | description-token | `PDN_SNOW_QUEUE` | `ex:serviceNowQueue` | ServiceNowQueue *(class unsettled)* | queue name, or literal `NULL` | proposed | **The token is mandatory even when the value is empty** — see §2b.6 |
+
+**Landing table:** `CM_JOB_METADATA_PUBLISHERS`, same 4000-char `DESCRIPTION` + `JOB_NAME` key.
+
+### 2b.4 ETL / `cmd` jobs — the one family that is already built
+
+| Component | Variable | Carrier | Staging key | Ontology term | Ontology class | Vocabulary | Status | Notes |
+|---|---|---|---|---|---|---|---|---|
+| Launcher path | `%%LAUNCHER_SCRIPT_PATH` | job-variable | `LAUNCHER_PATH` | `:Script.script_path` + `INVOKES` | Script `{script_role: launcher}` | path | **built** | FACT_REGISTRY, G16 |
+| Payload artifact | `%%ETL_ARTIFACT_URI` | job-variable | `ARTIFACT_URI` | `:Script.artifact_uri` + `USES_ARTIFACT` | Script `{script_role: payload}` | approved-repository URI or path | **built** | G16; edge active at `rua-load-shapes` §A4 |
+| Platform | `%%ETL_PLATFORM` | job-variable | `ETL_PLATFORM` | `:Script.platform` | Script (both roles) | `pyspark` \| `java` \| `abinitio` \| `informatica` | **built** | |
+| Artifact kind | `%%ETL_ARTIFACT_KIND` | job-variable | `ARTIFACT_KIND` | `:Script.artifact_kind` | Script (payload) | `wheel` \| `jar` \| `pset` \| `other` | **built** | |
+| Platform flags | `%%ETL_PLATFORM_FLAGS` | job-variable | `PLATFORM_FLAGS` | `:Script.platform_flags` | Script (launcher) | flag string, may be empty | **built** | Optional per REQ-4 |
+| Artifact hash | `%%ETL_ARTIFACT_SHA` | job-variable | `ARTIFACT_SHA` | *(corroboration input)* | Script (payload) | content hash | **built** | **DryDocs has this and the company standard does not name it** |
+| Informatica local interface | `%%INFA_INTERFACE_LOCAL` | job-variable | `INFA_INTERFACE_LOCAL` | NODE-KEY component | Script (payload) | interface id | proposed | Informatica only |
+| Informatica global interface | `%%INFA_INTERFACE_GLOBAL` | job-variable | `INFA_INTERFACE_GLOBAL` | NODE-KEY component | Script (payload) | interface id | proposed | Informatica only |
+| Informatica job | `%%INFA_JOB` | job-variable | `INFA_JOB` | NODE-KEY component | Script (payload) | job id | proposed | Informatica only |
+| Informatica database | `%%INFA_DATABASE` | job-variable | `INFA_DATABASE` | `:Script.infa_database` | Script (payload) | database id | proposed | Variant 2 only |
+
+**Landing:** `STG_APP_FACT`, keyed by the 30-char `fact_type`.
+
+**Two contracts pointing the same way.** The standard's rule is *declare the names uniformly,
+let the values differ by platform*. The FACT_REGISTRY's rule is *aliases suggest, values decide*
+— a variable's name is a hint and `_value_fact()` adjudicates. They are complements, not
+duplicates: the standard shrinks the alias tail the registry has to absorb, and the registry
+keeps working on the estate that never adopts the standard.
+
+### 2b.5 Folder-level metadata
+
+| Component | Variable | Carrier | Ontology term | Vocabulary | Status | Notes |
+|---|---|---|---|---|---|---|
+| Ownership project key | `DevX-project` | folder-variable | *(none proposed)* | project key | proposed | The stated purpose is ownership attribution where the platform app code makes the folder's owner unreadable |
+| L2 support DL | `L2_EMAIL_DL_NM` | folder-variable | `ex:supportContact` | semicolon-separated | proposed | **Different spelling and different carrier from the job-level `EMAIL_DL_L2`** |
+| L3 support DL | `L3_EMAIL_DL_NM` | folder-variable | `ex:supportContact` | semicolon-separated | proposed | Same |
+| Application | `SEAL` | folder-variable | joins `:Application` | SEAL id, variable width | *(pre-existing)* | Unchanged by these documents; §2's resolution hierarchy still governs |
+
+⚠️ **Unsettled: two carriers, two spellings, one concept.** Support DLs appear as folder
+variables (`L2_EMAIL_DL_NM` / `L3_EMAIL_DL_NM`) *and* as job description tokens (`EMAIL_DL_L2` /
+`EMAIL_DL_L3`). Nothing in the source states which wins. This is exactly the folder-vs-job grain
+question already open at gate `email-dl-contact-point` §B2, now with evidence on both sides;
+it is carried there as rider §G2 rather than decided here.
+
+⚠️ **Unsettled: the class.** The source models the DL as `ex:EmailDistributionList` with
+properties `ex:dlTier`, `ex:dlTierDesc`, `ex:dlAddress`, `ex:ctmVariableName`. The repo's own
+proposal — `email-dl-contact-point` §A1, **drafted 2026-07-22 and not signed** — is
+`dd:DistributionList` aligned to `vcard:Group`, keyed on the lower-cased SMTP address. One
+concept, two spellings, neither ratified. Carried as rider §G3.
+
+### 2b.6 Grammar rules the parser must honor
+
+These are the source's rules, restated as parser obligations. `parse_description()` in
+`drydocs_core/orchestration/controlm/description_tokens.py` (G66) implements them.
+
+1. **Pipe is the only delimiter.** Semicolons appear *inside* values — a multi-address DL is one
+   token, not several.
+2. **Split on the first colon only.** A value may contain colons (`SeriesSLA: 17:00 EST`).
+3. **Whitespace-tolerant on both sides.** Both `| USER: x` and `|USER:x` occur.
+4. **A key with an empty value still emits its token.** `PDN_SNOW_QUEUE: NULL` is mandatory even
+   when unassigned, so the parse always finds the key and returns a parseable result rather than
+   a missing match. The Oracle side does `NULLIF(..., 'NULL')`; the Python side returns `None`.
+5. **Unknown keys are preserved, never dropped.** §4's key-prefix governance makes a bare key a
+   legal team-local annotation — kept verbatim, never load-bearing.
+6. **A value outside its vocabulary is a finding, not an error.** Report it; do not raise, and do
+   not silently coerce.
+
+### 2b.7 Key-prefix migration (reconciles §4's C16 governance)
+
+C16 assigned every observed key a prefixed home. The captured standard uses bare spellings. Both
+are recorded so Phase-2 validation can recognize either during the transition — C16's own
+migration note grandfathers observed spellings until the template is ratified.
+
+| Observed in §2 (2026-06-11) | Used by the captured standard | C16 target | Class |
+|---|---|---|---|
+| `FileDeliveryMechanism` | `DELIVERY_MECHANISM` | `drydocs.fileDeliveredVia` | reserved core |
+| `USER` | `USER` | `mfts.user` | system-owned |
+| `ENV` | `ENV` | `mfts.env` | system-owned |
+| `ROUTE_ID` | `INBOUND_ROUTE` / `OUTBOUND_ROUTE` *(split into two)* | `mfts.routeId` *(needs a direction qualifier)* | system-owned |
+| `SourceContact` | `SOURCE_CONTACT` | `drydocs.sourceContact` | reserved core |
+| `SourceSnowQueue` | `PDN_SNOW_QUEUE` *(different subject — downstream, not source)* | `snow.assignmentQueue` | system-owned |
+| *(not observed)* | `EMAIL_DL_L2` / `EMAIL_DL_L3` | `drydocs.supportContactL2` / `L3` | reserved core |
+| *(not observed)* | `JOB_ROLE` | `drydocs.jobRole` | reserved core |
+| *(not observed)* | `PDN_DL` | `drydocs.consumerContact` | reserved core |
+
+Two of these are more than a rename. `ROUTE_ID` **split into a directional pair**, so a single
+C16 target no longer suffices. And `SourceSnowQueue` and `PDN_SNOW_QUEUE` are *different
+subjects* — the source system's queue versus the downstream consumer's — that a naive mapping
+would merge. Both go to the template ratification, not to a find-and-replace.
+
+---
+
+## 2c. File-name component standard (C29, 2026-08-11)
+
+A companion standard from the same corpus, governing how a watched file's name decomposes. It
+belongs here rather than in its own file because it is authored on the same objects, lands
+through the same carriers, and answers to the same ratification.
+
+### 2c.1 The decomposition
+
+```
+<PREFIX>_<BUSINESS_DATE>_<SEQ>.<EXT>.<COMPRESSION>
+```
+
+Worked shape (sanitized): `SAMPLE_SRC_SUBJECT_20260530_001.dat.gz`
+
+| Component | Variable name | SQL column | Ontology term | Ontology class | Vocabulary | Status | Notes |
+|---|---|---|---|---|---|---|---|
+| Full atomic name | `FileName` | `FILE_NAME` | `dcterms:title` | `dcat:Distribution` | free | proposed | What the OS sees; authoritative for arrival detection |
+| Watch glob | `FilePattern` | `FILE_PATTERN` | `ex:watchFilePattern` | ControlMJob (FileWatcher) | glob | proposed | Dynamic components replaced by wildcards |
+| Business identifier | `FilePrefix` | `FILE_PREFIX` | `ex:filePrefix` | `dcat:Distribution` | free | proposed | **Static** — never changes between runs |
+| Business date | `FileBusinessDate` | `FILE_BUSINESS_DATE` | `dcterms:temporal` | `dcat:Distribution` | `YYYYMMDD` | proposed | The date the **data** represents |
+| Sequence | `FileSequence` | `FILE_SEQUENCE` | `ex:fileSequence` | `dcat:Distribution` | zero-padded, 3 digits | proposed | Optional — multiple files per date |
+| Format extension | `FileExtension` | `FILE_EXTENSION` | `dcat:mediaType` | `dcat:Distribution` | `.dat` `.csv` `.txt` `.tok` `.ctl` `.done` | proposed | **Authoritative for classification** — not the job-name suffix |
+| Compression | `FileCompression` | `FILE_COMPRESSION` | `ex:fileCompression` | `dcat:Distribution` | `GZIP` \| `TAR` \| `TAR+GZIP` \| `ZIP` \| `NONE` | proposed | Independent of format |
+| Full suffix | `FileSuffix` | `FILE_SUFFIX` | `ex:fileSuffix` | `dcat:Distribution` | free | proposed | Everything after the prefix |
+| Distribution role | *(derived)* | `DISTRIBUTION_ROLE` | — | lookup `CM_DISTRIBUTION_TYPE_REF` | `DAT` \| `TOK` \| `CTL` \| `DONE` | proposed | Derived from `FILE_EXTENSION` |
+
+**Landing table:** `CM_JOB_FILE_NAME_STANDARD`, `JOB_NAME` primary key, `DISTRIBUTION_ROLE`
+foreign-keyed to a reference table.
+
+### 2c.2 The two rulings worth keeping
+
+**`FileBusinessDate`, never `FileDate`.** Three dates get conflated routinely and the standard
+names all three so they cannot be:
+
+| Variable | Meaning | Ontology term |
+|---|---|---|
+| `FileBusinessDate` | the date the **data** represents | `dcterms:temporal` |
+| `FileLoadDate` | the date the file was **processed** | `dcterms:modified` |
+| `FileArrivalDate` | the date the file **arrived** on disk | `prov:generatedAtTime` |
+
+**Format and compression are two concepts in one suffix.** Linux treats `.dat.gz` as one string;
+it encodes *what it contains* (`dcat:mediaType`) and *how it is stored* (`ex:fileCompression`)
+separately. A `.dat.gz` is still a `DAT` file. A parser that treats the suffix atomically loses
+the classification.
+
+### 2c.3 Relation to the legacy pattern §3 warns about
+
+§3's hazard #1 is dot-smuggling — a literal dot stored as a variable value so the concatenation
+operator does not eat it. This standard is the structural answer: name each component, derive
+the suffix, and never store punctuation as data. Worth noting honestly that the *new*
+requirement REQ-3 (captured in the Internal file) reintroduces a double-dot in one variable
+value, so the practice is not yet extinct in the standards themselves.
 
 ---
 

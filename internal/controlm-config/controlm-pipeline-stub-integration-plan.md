@@ -6,6 +6,18 @@
 [`reference/controlm-pipeline-stub-capture.md`](reference/controlm-pipeline-stub-capture.md)
 (verbatim; read it first). The stub package itself lives in the internal repo as
 a standalone project with 14/14 tests green.
+**Sibling capture — what the generator is being asked to emit:**
+[`reference/controlm-job-metadata-standards-capture.md`](reference/controlm-job-metadata-standards-capture.md)
+(2026-08-11, C29 — REQ-1…REQ-4 plus four standards pages). Read it alongside this
+plan: it is the *target* side of the same lifecycle, and it collides with **item E1
+below**. E1 uses the two literal `DESCRIPTION` strings the stub emits as a
+machine-generated provenance discriminator; the standard fills the same 4000-char
+field with pipe-delimited tokens. Add a token block and E1's exact-literal match
+breaks; require the literal and the token block has nowhere to go. Ruling needed
+before either lands — the exits are in that capture's Conflicts §4. The standard
+also **retires** part of what the stub emits (REQ-2 deletes `<SHOUT>`/`<DOSHOUT>`,
+which the stub already omits) and adds two ordered file-watcher variables (REQ-3)
+whose declaration order is load-bearing.
 
 ## Framing (the user's rulings, 2026-08-04)
 

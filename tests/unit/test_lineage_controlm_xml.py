@@ -10,7 +10,12 @@ sequential-assignment contract), (c) the scope_layers handoff — staging
 feeds the ONE shared resolver, guardrail 1 proven end to end, (d) cmd_line
 stays VERBATIM in staging, (e) every skip counted by reason, unknown
 elements tolerated-and-counted, (f) older-format tag synonyms, (g) ZERO
-graph writes — the API is graph-free.
+graph writes — the API is graph-free, (h) DESCRIPTION staged verbatim on
+folders and jobs with adoption counted (G66).
+
+Description values here are SYNTHETIC in the strong sense: the addresses use
+``example.invalid`` (an RFC-reserved domain that can never resolve) and the
+accounts and route ids are invented. The real corpus is Internal.
 """
 
 from __future__ import annotations
@@ -25,9 +30,32 @@ from drydocs_lineage.extractors import ControlMXmlDefsExtractor
 
 DC = "P032-E0700-DMA"
 
+#: A folder description in the standard's grammar — note the tight pipe
+#: (``|SeriesSLA``) and the colon INSIDE the value, both of which the
+#: split-on-first-colon rule has to survive.
+FOLDER_DESC = "datasetSeriesName: SAMPLE SERIES |SeriesSLA: 17:00 EST"
+
+#: A file-watcher description carrying the full token set.
+WATCHER_DESC = (
+    "DELIVERY_MECHANISM: MFTS_AGENT | USER: svc_mfts_sample | ENV: FTS0 | "
+    "INBOUND_ROUTE: MFTS_RT_IN_SAMPLE_001 | OUTBOUND_ROUTE: MFTS_RT_OUT_SAMPLE_001 | "
+    "EMAIL_DL_L3: l3_sample@example.invalid; l3_other@example.invalid | "
+    "EMAIL_DL_L2: l2_sample@example.invalid | "
+    "SOURCE_CONTACT: source_owner@example.invalid; source_support@example.invalid"
+)
+
+#: A publisher description — including the mandatory-even-when-empty queue.
+PUBLISHER_DESC = (
+    "JOB_ROLE: PUBLISHER | EMAIL_DL_L3: l3_sample@example.invalid | "
+    "EMAIL_DL_L2: l2_sample@example.invalid | "
+    "PDN_DL: consumer_a@example.invalid; consumer_b@example.invalid | "
+    "PDN_SNOW_QUEUE: NULL"
+)
+
 _EXPORT = f"""<?xml version="1.0" encoding="UTF-8"?>
 <DEFTABLE>
-  <SMART_FOLDER DATACENTER="{DC}" FOLDER_NAME="PRHLD1G">
+  <SMART_FOLDER DATACENTER="{DC}" FOLDER_NAME="PRHLD1G"
+                DESCRIPTION="{FOLDER_DESC}">
     <VARIABLE NAME="%%SCRIPT_DIR" VALUE="/apps/etl"/>
     <VARIABLE NAME="%%ENV_SUFFIX" VALUE="prod"/>
     <JOB JOBNAME="PRHLD1G001" TASKTYPE="Command" NODEID="host-hldm-01"
@@ -39,13 +67,18 @@ _EXPORT = f"""<?xml version="1.0" encoding="UTF-8"?>
     <SUB_FOLDER SUB_FOLDER_NAME="NESTED">
       <VARIABLE NAME="%%SCRIPT_DIR" VALUE="/apps/etl/nested"/>
       <JOB JOBNAME="PRHLD1G101" TASKTYPE="Command"
-           CMDLINE="%%SCRIPT_DIR/cleanup.sh">
+           CMDLINE="%%SCRIPT_DIR/cleanup.sh"
+           DESC="Cleanup step — prose, no tokens">
       </JOB>
     </SUB_FOLDER>
-    <JOB JOBNAME="PRHLD1G002" TASKTYPE="FileWatch">
+    <JOB JOBNAME="PRHLD1G002" TASKTYPE="FileWatch"
+         DESCRIPTION="{WATCHER_DESC}">
     </JOB>
-    <JOB TASKTYPE="Command" CMDLINE="ghost.sh"/>
-    <JOB JOBNAME="PRHLD1G001" TASKTYPE="Command" CMDLINE="dupe.sh"/>
+    <JOB JOBNAME="PRHLD1G003" TASKTYPE="Command" CMDLINE="publish.sh"
+         DESCRIPTION="{PUBLISHER_DESC}"/>
+    <JOB TASKTYPE="Command" CMDLINE="ghost.sh" DESCRIPTION="{WATCHER_DESC}"/>
+    <JOB JOBNAME="PRHLD1G001" TASKTYPE="Command" CMDLINE="dupe.sh"
+         DESCRIPTION="{WATCHER_DESC}"/>
     <VARIABLE VALUE="nameless"/>
     <SHOUT DEST="EM" MESSAGE="synthetic"/>
   </SMART_FOLDER>
@@ -91,7 +124,7 @@ def test_folders_and_jobs_staged_with_provenance(run) -> None:
     nested = jobs["PRHLD1G101"]
     assert nested.subfolder_path == "NESTED"
     assert run.coverage.folders == 2
-    assert run.coverage.jobs == 4
+    assert run.coverage.jobs == 5
 
 
 # -- (b) document order preserved (the sequential-assignment contract) ----------------
@@ -175,3 +208,33 @@ def test_staging_is_graph_free(run) -> None:
     params = inspect.signature(ControlMXmlDefsExtractor.extract).parameters
     assert set(params) == {"self", "source"}
     assert run.folders and run.jobs and run.variables  # flat records only
+
+
+# -- (h) DESCRIPTION staged verbatim, adoption counted (G66) ---------------------------
+
+
+def test_description_staged_verbatim_on_folders_and_jobs(run) -> None:
+    """The seam STAGES the field and does not touch its contents — same
+    contract as cmd_line. Parsing belongs to description_tokens, so a
+    pipe-delimited token string must arrive byte-identical, spacing quirks
+    and all."""
+    folder = next(f for f in run.folders if f.folder_name == "PRHLD1G")
+    assert folder.description == FOLDER_DESC
+    jobs = {j.job_name: j for j in run.jobs}
+    assert jobs["PRHLD1G002"].description == WATCHER_DESC
+    assert jobs["PRHLD1G003"].description == PUBLISHER_DESC
+    # DESC is accepted as a synonym, and prose is staged as readily as tokens
+    assert jobs["PRHLD1G101"].description == "Cleanup step — prose, no tokens"
+
+
+def test_absent_descriptions_counted_as_adoption_not_as_a_skip(run) -> None:
+    """A missing DESCRIPTION is normal, not a defect: the object is staged
+    either way and the counter reports how much of the export predates the
+    standard. One folder (LEGACY1G) and two jobs (PRHLD1G001, LEGACY1G001)
+    carry none. The ghost and duplicate jobs return BEFORE the description
+    is read, so they must not inflate the count."""
+    jobs = {j.job_name: j for j in run.jobs}
+    assert jobs["PRHLD1G001"].description == ""
+    assert next(f for f in run.folders if f.folder_name == "LEGACY1G").description == ""
+    assert run.coverage.descriptions_absent == 3
+    assert "no_description=3" in run.coverage.summary()

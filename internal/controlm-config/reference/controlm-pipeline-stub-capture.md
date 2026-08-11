@@ -10,6 +10,11 @@ screenshot cut a line, the cut is marked `[…]`. The package itself lives in th
 user's internal repo as a standalone project (`controlm-pipeline-stub`).
 **Companion:** the integration backlog plan at
 [`../controlm-pipeline-stub-integration-plan.md`](../controlm-pipeline-stub-integration-plan.md).
+**Sibling capture:** [`controlm-job-metadata-standards-capture.md`](controlm-job-metadata-standards-capture.md)
+(2026-08-11, C29) — the standards the generator is being asked to satisfy: REQ-1…REQ-4,
+NFR-CTM-001 v2, and three description/file-name/route standards. It is the *target*
+to this file's *as-built*, and the two `DESCRIPTION` string literals recorded below
+are exactly where they conflict.
 
 ---
 
