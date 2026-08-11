@@ -1152,7 +1152,9 @@ OWED COMPANY-SIDE:
   your graph. T10/T13: until a real export parses with zero mismatches, treat the
   field names as ASSUMED.
 
-STEP LEDGER — delta since `5417ef10` (steps 43–105 collapsed above). Each
+STEP LEDGER — delta since `ae21ee4` (steps 43–105 collapsed above; 106–123 are the
+`5417ef10..ae21ee4` range, already ported and MERGED company-side per step 128, kept
+for context). Steps 124–134 are the NEW delta this base certifies. Each
 sub-stream carries its producer-side verification status in [BRACKETS]; spend
 review on [UNRULED]. Grooms, claims, board/design renders and depgraph
 snapshots in the range are ritual — per-entry backlog union, derived
@@ -1272,6 +1274,147 @@ port** above. The live ledger restarts at 122, delta since `6f03264`.)
     The rest sit in captured transcripts and vendored skill packs and were inboxed
     (Idea-103) rather than edited — fixing somebody else's capture to satisfy a guard
     is a provenance call, not a formatting one. Same question applies on your side.
+
+124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
+    G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
+    an MCP server registered and live-verified, four dangling Docker volumes removed —
+    and their deliverable is a backlog close, not code. Nothing to apply your side;
+    re-run the equivalents against YOUR venue if you want the same assurance (J18:
+    a live-verification claim names its machine, and these name ours). `3304666` is
+    worth one line on its own: the G49 CLAIM commit shipped with its own guard red,
+    and the fix removes it from `next_ready` — the claim-before-work rule working as
+    intended, catching a bad claim rather than hiding it. `034eb70` is ADR 0011, the
+    SINGLE-DATABASE CONTINGENCY — written while there is time rather than under
+    pressure. Take it: it is the decision record for the topology question your side
+    also carries, and an ADR is cheaper to read now than to re-derive during an outage.
+
+125. O47 — THE /intake PAGE, SLICE 3 [like-for-like, canonical-producer]
+    (`c90cd1d` API, `ad7b1e4` web). `drydocs_api/query_specs.py` gains
+    `intake.area-tree.v1` — the area cascade in ONE call rather than a per-level
+    round trip — and the web half adds `routes/IntakeRoute.tsx`,
+    `components/IntakeStepper.tsx`, `lib/intakeApi.ts` and an `auth.ts` helper.
+    `web/**` is canonical-producer BUT read divergence #K7–K15 first: a wholesale
+    `git checkout cewilson/main -- web/src` re-adopts the held folder-attribution UI.
+    Take these files by name, not the directory.
+
+126. O53 + THE GRAPH-VS-FILES EXPERIMENT [like-for-like / default_ok] (`c9ea9fc`
+    O53, `c353956` the record, `3c440ad` the HTML view). O53 removes `HeroArt.tsx`
+    and adopts the experiment's ALPHA code set; `web/src/index.css` and
+    `tests/unit/test_ui_components.py` move with it, so the component COUNT changes —
+    if you carry the K7–K15 hold your total is producer's minus one, and this commit
+    shifts the number the hold is measured against. Re-derive it, do not copy the
+    assertion. `docs/reviews/graph-vs-files-experiment/**` is the full SME-reviewed
+    record plus a later HTML view: `default_ok`, take or skip freely, it binds nothing.
+
+127. L28 — KGoT REGISTERED, AND THE EXECUTIVE OVERVIEW GETS CITATIONS [reference]
+    (`75b4855`). `reference/REGISTRY.yaml` gains the Knowledge-Graph-of-Thoughts
+    entry and `reference/research/knowledge-graph-of-thoughts.md` the write-up.
+    `reference/**` is External-tier and canonical-producer — clean add, no conflict
+    expected. The overview change is the substantive half: claims that were bare now
+    cite something.
+
+128. PORT-LOOP BOOKKEEPING (`06d4469`). The `ae21ee4` port is recorded MERGED
+    company-side with its branch removed — `docs/port-prompt.md` only. Nothing to
+    apply; it is here because the ledger's ritual exemption is deliberately narrow
+    (`chore(port): roll|ledger` only), so a substantive `chore(port):` such as
+    retiring manifest rows still has to be told to you. This one is not substantive,
+    and saying so is cheaper than leaving you to check.
+
+129. THE SERVICENOW REPLICA EVIDENCE RUN [UNRULED — evidence, not a decision]
+    (`3d9fc97`, `5662e21`, `7d08fc6`, `9d4b2f7`, `7385412`, `ac24a12`, `ca3c65e`).
+    Seven commits building `knowledge/upgrade-plans/servicenow-replica-evidence.md`
+    from the K21 screenshots, plus read-only probes at
+    `drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql`. THREE
+    findings reverse earlier producer beliefs and are the reason this is a step and
+    not a footnote: (a) the edge vocabulary is 54 rows and the SHORTFALL is a question
+    about the replica itself, not about our mapping; (b) the API evidence REWRITES the
+    query plan — the edge table drops out of it; (c) the seed is ~200 applications,
+    not 14,683, which changes the mechanism and not just the number. `9d4b2f7` is a
+    correction worth reading before you run anything: the probes COULD NOT HAVE RUN as
+    first written — views are UPPERCASE and columns are quoted lowercase. The SQL is
+    adhoc and read-only; run it against YOUR replica or not at all. Every value here
+    is mechanism — no counts, no names crossed the boundary.
+
+130. G35 — TOM ROLES: ENUMERATION AND CARDINALITY, SIGNED OFF [GATE-AUTHORIZED]
+    (`f9b480b` release, `0b86f78` drafting, `6e7989e` round 1, `b737181` rounds 2–3,
+    `4c0c834` the inheritance ruling, `9268f94` SIGN-OFF). Guardrail 7 applies: this
+    is gate-authorized producer-side and your side runs its OWN gate — a producer
+    sign-off is not a company sign-off. THE ONE THING TO CHECK BEFORE APPLYING, and it
+    is a shape collision: G35 admits group-scoped role TYPES and mints NO graph shape;
+    the `(:BusinessApplication)-[:HAS_SUPPORT_QUEUE]->(:HpsmQueue)-[:RESOLVED_BY]->
+    (:ServiceNowGroup)` shape stays owned by your signed `snow-hpsm-queue-to-group`.
+    Confirm that gate and its loader still exist your side, and do NOT let G35 re-mint
+    a competing group→app shape. `4c0c834` carries a producer self-correction —
+    inheritance is COMPUTED, not typed, and the earlier E1b reading was wrong to doubt
+    the blank state. `config/gate-log.md` is per-entry union as always.
+
+131. THE CONTROL-M GREENFIELD JOB STANDARD — C29 → C32 + G66/G67 [UNRULED, and the
+    largest substantive block in this range] (`5613ea0` C29+G66, `4b39960` the casing
+    conflict, `e1d9ac0` C30+G67, `8471e40` C31, `5405ab6` the DOMAIL ruling, `5dfa9c6`
+    C32). Reads the estate's own standards corpus, the DPL generator capture and live
+    folders, and reconciles three sources that disagreed. What lands: the DESCRIPTION
+    read seam (`drydocs_lineage/extractors/controlm_xml.py` +
+    `drydocs_core/orchestration/controlm/description_tokens.py`, zero graph writes);
+    the greenfield standard as a publishable page; and R30–R40 with a working
+    conformance detector over real staged XML. FOUR SME RULINGS ride it and are
+    binding on any company adaptation: notification is REMOVED as a mechanism (the
+    ServiceNow incident is the call to action — never wire a DL to a `DOMAIL DEST`,
+    never bind the unset `%%NOTIFY`); PDN is Production DELAY Notification to
+    downstream BUSINESS users and is NOT a support tier; no ServiceNow queue belongs
+    in a Control-M variable, because the escalation DB owns technician routing; and the
+    post-execution `cat` is TOK/CTL only, never a data file. `internal/**` captures
+    carry the values; the `knowledge/**` twins carry the mechanism — verify the split
+    survives on your side, since your captures are the ones with real names in them.
+    `5405ab6` is the ruling that closed the last open item: `<DOMAIL>` goes with the
+    shouts, so R40 covers three tags. NOTE the correction inside C32 — the "deletion
+    costs nothing" rationale is TRUE of generated folders and FALSE of hand-built ones,
+    which declare a real address; a fix batch must separate the two populations.
+
+132. REMEDIATION BACKLOG ONLY — no code [per-entry union] (`95738a8` G68+O59,
+    `2d6cbb4` G69). Three items raised and deliberately NOT built: the folder-set
+    PROFILE seam, the `/remediation` intake surface behind it, and R41–R44 registered
+    AND detected in one change. `drydocs_remediation/overview_readme.md` arrives with
+    G69 and is the readable part — the governance ladder (open → provisional →
+    ratified), why status is independent of severity, and why a detector without a
+    registry entry cannot be signed off. Worth reading even if you never pull the items.
+
+133. THE COMPANY XML PROCESSORS, CAPTURED — AND TWO MECHANISM BACK-FLOWS BUILT
+    [TEST-PINNED] (`382cdb6` capture, `dbb57e2` the raise, `406cbd6` G75+G76 built).
+    THIS ONE IS ABOUT YOUR CODE, so read the three standing-divergence bullets above
+    before applying. The capture transcribes your three processors verbatim into
+    `internal/**`; from it, two PURE mechanisms came producer-side —
+    `drydocs_core/orchestration/controlm/audit_time.py` (BMC compact timestamp → ISO) and
+    `drydocs_core/orchestration/controlm/conditions.py` (`PL-`/`PG-` scope + a `condition_identity`
+    that makes "two LOCAL conditions sharing a name in different DCs are DISTINCT"
+    executable) — and `drydocs_core/orchestration/controlm/resource_pool.py` arrived as
+    MECHANISM-here / VOCABULARY-yours. Three consequences for you: your
+    `controlm_xml_adapter.py` is company-canonical and is NOT a back-flow target; the
+    `JOBISN=1` folder pseudo-job stays a deliberate producer gap with a trigger; and a
+    PORT-MANIFEST row that had pointed at `drydocs_core/controlm/**` since the S2
+    relocate is corrected to `orchestration/**` — which means the whole package was
+    silently evaluate-on-collision rather than canonical-producer, on both sides, for
+    as long as that row was wrong. Re-derive your dispositions for that package rather
+    than trusting the previous port's outcome. ONE DELIBERATE DIVERGENCE from your
+    code, stated so it does not read as a porting error: your `_ts` DOCUMENTS returning
+    None for an unparseable value but falls through to returning its input; the
+    producer version implements the documented promise and preserves the Oracle
+    pass-through by matching the ISO-ish shape explicitly.
+
+134. TRUNK REPAIR — READ THIS BEFORE CUTTING ANY RANGE THAT SPANS IT [TEST-PINNED]
+    (`ffc29b6`, `d05811a`). `docs/restructure/backlog.yaml` on producer `main` briefly
+    DID NOT PARSE: a concurrent two-machine push committed conflict markers
+    (`<<<<<<< Updated upstream` / `>>>>>>> Stashed changes`) into the summary block,
+    and the same push allocated G70–G74 over two ids the other machine had already
+    pushed, so the file carried two different G70 and two different G71. Both repaired
+    here — counts RECOMPUTED from items rather than merged textually, and the
+    DESKTOP pair renumbered to G75/G76 because `config/gate-log.md` cites G73/G74
+    inside a SIGNED-OFF gate record and a sign-off citation must not be falsified to
+    settle a numbering clash. WHY IT MATTERS TO YOU: a base cut anywhere inside
+    `9268f94..ffc29b6` lands mid-repair and inherits an unparseable backlog. The
+    certified `port-base-*` tag exists precisely to make that impossible — take the
+    tag, never a bare SHA or HEAD. `d05811a` inboxes the two guard gaps this exposed
+    (no guard asserts a PORT-MANIFEST path exists; the override-ordering check knows
+    only four hardcoded rows), now groomed as J47.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
