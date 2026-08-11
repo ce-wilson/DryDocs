@@ -27,6 +27,17 @@ trust_tier: internal / SME-asserted / planned
 > `status: planned` — the capture is a company draft (its own breadcrumb reads `WIP-DRAFT`),
 > nothing in it is ratified here, and no vocabulary entry or loader exists for any proposed term.
 
+> 🎯 **Superseded in part, same day (C30).** Where the corpus and a deployed folder disagreed, the
+> **[Control-M greenfield job standard](controlm-greenfield-job-standard.md)** rules the target
+> state across all four job types, and it has a working detector (R2, R30–R40). Four of §2b's rows
+> change there and the reasons are worth following rather than re-deriving: the per-job
+> `EMAIL_DL_L2`/`EMAIL_DL_L3` **description tokens** are dropped (they duplicate folder variables);
+> `PDN_SNOW_QUEUE` is dropped outright (ServiceNow technician routing belongs to the escalation DB);
+> the FileWatcher `INBOUND_ROUTE`/`OUTBOUND_ROUTE` pair is retired (a watcher is inherently inbound,
+> and the live token is `REC_ID`, a source-system reference); and the FW description's `ENV` becomes
+> `FTS_ID`, because `ENV` already means the deployment environment on the command jobs. §2b stays as
+> the transcription of what the corpus says; the greenfield standard is what to build.
+
 > ⚠️ **Trust tier:** internal / planned / SME-asserted. The "modern" examples below are the *target pattern* observed in early adopters — not yet validated estate-wide.
 
 > 🔒 **Split twin (J14, 2026-07-27):** this file is the publishable MECHANISM half.

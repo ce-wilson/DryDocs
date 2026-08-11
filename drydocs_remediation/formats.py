@@ -26,6 +26,13 @@ TRANSCRIPT_SCHEMA = "drydocs.remediation.transcript.v1"
 VariableDefs = list[tuple[str, str | None]]
 
 
+#: one link of the resolution chain: (scope, container, ordered definitions).
+#: Scope spellings match the resolver's — FOLDER | SUBFOLDER | JOB — and the
+#: list is ordered WIDEST FIRST, so the narrowest wins on a duplicate name
+#: (BMC resolution order: local, then SMART folder, then global).
+ScopeLayer = tuple[str, str, VariableDefs]
+
+
 @dataclass
 class JobDefinition:
     """One job's definition, format-independent.
@@ -38,14 +45,35 @@ class JobDefinition:
     job_type: str | None = None  # e.g. "FileWatcher"
     variables: VariableDefs = field(default_factory=list)
     watch_template: str | None = None  # FileWatcher watched-path template
+    #: DESCRIPTION verbatim — the description-metadata carrier
+    description: str = ""
+    #: CMDLINE verbatim — never resolved here
+    command_line: str = ""
+    #: post-execution command verbatim
+    post_command: str = ""
+    #: notification tags present on this job (REQ-2 evidence)
+    notification_tags: tuple[str, ...] = ()
+    #: "" at folder level, else "A" / "A/B" — which sub-folder holds the job
+    subfolder_path: str = ""
+    #: the full ordered resolution chain, widest first, INCLUDING this job's
+    #: own definitions as the last layer. Empty when the format cannot express
+    #: scope (a single-folder M0 transcript) — callers fall back to
+    #: :meth:`DefinitionSet.folder_variables` plus ``variables``.
+    scope_chain: list[ScopeLayer] = field(default_factory=list)
 
 
 @dataclass
 class FolderDefinition:
-    """The folder scope a job resolves under."""
+    """A scope a job resolves under — a folder or a sub-folder."""
 
     name: str
     variables: VariableDefs = field(default_factory=list)
+    #: "FOLDER" | "SUBFOLDER" — sub-folders resolve between folder and job
+    scope: str = "FOLDER"
+    #: DESCRIPTION verbatim
+    description: str = ""
+    #: notification tags at this container's own level (REQ-2 evidence)
+    notification_tags: tuple[str, ...] = ()
 
 
 @dataclass
@@ -57,11 +85,29 @@ class DefinitionSet:
     source: str | None = None  # provenance of the loaded artifact (path/export id)
 
     def folder_variables(self) -> VariableDefs:
-        """The folder-scope definitions jobs resolve under (M0: single folder)."""
+        """FOLDER-scope definitions only. Sub-folders now share ``folders``
+        (distinguished by ``scope``) and are deliberately excluded here: they
+        resolve BETWEEN folder and job, so folding them in would flatten the
+        chain this method's callers assume is one layer."""
         out: VariableDefs = []
         for folder in self.folders:
-            out.extend(folder.variables)
+            if folder.scope == "FOLDER":
+                out.extend(folder.variables)
         return out
+
+    def resolution_chain(self, job: JobDefinition) -> list[ScopeLayer]:
+        """The ordered scope chain for ``job``, widest first.
+
+        Prefers the chain the format supplied (the XML bridge carries the
+        extractor's own ``scope_layers``, which is the one authority on
+        sub-folder nesting). Falls back to folder-then-job for formats that
+        cannot express sub-folders — the M0 transcript shape."""
+        if job.scope_chain:
+            return job.scope_chain
+        return [
+            ("FOLDER", "", self.folder_variables()),
+            ("JOB", job.name, job.variables),
+        ]
 
 
 class DefinitionFormat(ABC):

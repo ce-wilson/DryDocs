@@ -27,6 +27,9 @@ def test_package_surface() -> None:
         "formats",
         "jira",
         "transform",
+        # G67: adapts a staged definition export into DefinitionSet. Reading
+        # was never the blocked half of the XML problem — dump() still raises.
+        "xml_bridge",
     }
 
 

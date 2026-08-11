@@ -23,12 +23,19 @@ the generator emits today*, this file is *what the standard says it should emit*
 | Part | Screens | Document | Sections captured |
 |---|---|---|---|
 | **A** | `job-req-1..2` | REQ-1 … REQ-4 (requirements page) | all four requirements, complete |
-| **B** | `job-variable-1..4` | **NFR-CTM-001 v2** — Control-M Command-Line & Variable Naming Convention | §1, §2, §3, §5, §6.1–6.5, §7.1–7.2, §8, §9, §10 — **§4 NOT CAPTURED** |
+| **B** | `job-variable-1..4` | **NFR-CTM-001 v2** — Control-M Command-Line & Variable Naming Convention | §1, §2, §3, §5, §6.1–6.5, §7.1–7.2, §8, §9, §10 — **§4 not screenshotted; recovered from the 2026-06-17 digest, see below** |
 | **C** | `job-variable-5..9` | File Name Component Standard — Variable Naming | §1–§9, complete |
 | **D** | `job-variable-10..14` | MFTS Route IDs — Table & DPROD Extension | §1–§8, complete |
 | **E** | `job-variable-15..20` | Source Contact & PDN Downstream | §1–§8, complete |
 
-> ⚠️ **Known hole — NFR-CTM-001 §4 was never screenshotted.** `job-variable-1` ends at §3 and
+> ✅ **Resolved 2026-08-11 (C30) — the §4 hole was a screenshot gap, not a repo gap.** The canonical
+> registry it holds is already digested at
+> [`../../remediation/governance/command-line-and-variables-standard.md`](../../remediation/governance/command-line-and-variables-standard.md)
+> §1 (2026-06-17), from the same Confluence page. Detail and the two caveats in the §4 section
+> below. The original warning is kept verbatim underneath because it is what the transcription
+> honestly showed at capture time.
+>
+> ⚠️ **Known hole (as recorded 2026-08-11) — NFR-CTM-001 §4 was never screenshotted.** `job-variable-1` ends at §3 and
 > `job-variable-2` opens at §5. §4 is, by every reference to it, **the canonical variable
 > registry** — §2 defines "canonical variable" as one "whose name appears in the canonical
 > registry", §5 maps those names to `fact_type` values, and §8 says `variables.py FACT_REGISTRY`
@@ -242,10 +249,29 @@ It defines three relationship semantics:
 Distinct labels (`INVOKES` vs `USES_ARTIFACT`), not single-label-with-role, are used to avoid the
 documented `RUNS_ON` overload risk.
 
-## §4 — **[NOT CAPTURED]**
+## §4 — not screenshotted, but **already in the repo** (corrected 2026-08-11, C30)
 
-No screenshot covers §4. See the warning at the head of this file: this is the canonical variable
-registry, referenced by §2 ("appears in the canonical registry"), §5, and §8.
+No screenshot covers §4 — `job-variable-1` ends at §3 and `job-variable-2` opens at §5. The original
+`[NOT CAPTURED]` marker was right about the screenshots and wrong about the repo.
+
+**The canonical registry it holds was digested on 2026-06-17** at
+[`../../remediation/governance/command-line-and-variables-standard.md`](../../remediation/governance/command-line-and-variables-standard.md)
+§1, from the same Confluence space and page — `CBTHLTAUTO` / "Control-M Command line and variables
+v2", the page REQ-4 cites as its own source. That digest carries the 22 core canonical names
+(`LAUNCHER_SCRIPT_PATH`, `ETL_PLATFORM`, `ETL_ARTIFACT_URI`, `ETL_ARTIFACT_KIND`,
+`ETL_PLATFORM_FLAGS`, `FID`, `ENV`, `PIPELINE_ID`, `BUS_DATE`, `ODATE`, `DATAFLOW`, `SEAL`,
+`CONF_PATH`, `COMPUTE`, `APPNAME`, `JOBNAME`, `ORDERID`, `RUNCOUNT`, `ABINITIO_GRAPH_FLAGS`,
+`START_DELAY`, `TIMEOUT`, `RESOURCE`) plus six Informatica names, the alias rollups, and the
+uppercase/case-sensitive ruling.
+
+So §4 is recoverable; only the screenshot is missing. Two caveats stay live:
+
+- The digest is a **paraphrase of a v2 page**, not the §4 table verbatim, so a name-by-name
+  reconciliation against the real §4 is still owed.
+- It already **disagrees with this repo** on two spellings — the digest says `APPNAME` and this
+  repo's `FACT_REGISTRY` says `APP_NAME`. Ruled at C30 in favour of `APP_NAME`, on the rule that the
+  variable name, the `fact_type`, the SQL column and the ontology property stem are one token; the
+  digest's spelling becomes a registered alias.
 
 ## §5 Ontology Mapping Summary
 
@@ -1255,6 +1281,79 @@ either observed-in-prose or absent, and the one class that has a repo-side propo
 gate nobody has signed.
 
 ---
+
+# The live folder (added 2026-08-11, C30) — and why it reverses the reading
+
+Five Control-M UI screenshots of a deployed SMART folder arrived after this capture was written
+(gitignored root pngs: `control-m-folder.png`, `control-m-job.png`, `control-m-job-fw-tok.png`,
+`control-m-job-plct.png`, `control-m-job-trust.png`). The folder, its values and its defect list are
+transcribed in the values twin at
+[`../../standards/technology/controlm-greenfield-job-standard.md`](../../standards/technology/controlm-greenfield-job-standard.md)
+§1–§3; the target state is the publishable mechanism half. Only the **finding that changes how this
+capture should be read** belongs here.
+
+**The DPL generator gets these right and the deployed folder has drifted away from it.** Reading
+[`controlm-pipeline-stub-capture.md`](controlm-pipeline-stub-capture.md) §B4 before the screenshots:
+the generator emits `%%DATAFLOW`, `%%IMAGE`, `%%PROID` and `%%TIMEOUT`, and orders `%%DS_ID` →
+dataset_id / `%%DS_VER` → dataset_version correctly. The deployed folder has `DATA_FLOW`, `IMG`,
+`proid`, no `TIMEOUT`, and the two dataset values swapped on one job. Not generator bugs — hand
+edits.
+
+**Why the hand edits happen is the real finding.** The generator emits a **partial** job: each
+builder's `CMDLINE` references tokens it does not declare, and expects the rest from a folder-level
+`AUTOEDIT` / `SET VAR` block that the stub never emits (capture §B7 gap 2). Its two builders do not
+even agree with each other — `placement.py` emits `%%FID %%CONF_PATH %%ENV %%BUS_DATE` at job scope
+while `aws_transformation_trigger.py` expects the same four from folder scope. With no declared
+contract for that boundary, people hand-add the missing variables job by job, and the copies drift.
+**Fix the contract, not the instances** — that is what C30's scope ladder does.
+
+**`pipelineId` is hardcoded by design.** Two independent points settle it: §B4 shows neither builder
+declares a `PIPELINE_ID` variable, and the undefined-CMDLINE-token list names
+`%%ENV %%APP_NAME %%ALIAS %%SEAL %%BUS_DATE %%FID %%CONF_PATH` and **not** `%%PIPELINE_ID` — which it
+would, if the command referenced one. NFR-CTM-001 §6.1/§6.2 say `-pipeline %%PIPELINE_ID` and are
+wrong; the deployed job carries both and the variable is therefore orphaned.
+
+**The on-premises watchers are a different provenance.** The generator's FW builder emits
+`%%WATCH_FILE` under a `…_AWS_FW` name and its grammar hardcodes `_AWS_`, so it cannot produce
+`_DAT_ONPM_FW` at all. Those two jobs are hand-built, which is why their failure mode differs —
+broken references rather than drift.
+
+> ⚠️ **The folder was mid-edit when captured.** The TOK watcher's unresolvable references are the
+> SME's own unfinished conversion to the `FILE_*` scheme, not deployed breakage. They are kept as
+> the clearest worked example of the failure the standard prevents, and they are the detector
+> fixtures — but they must not be written up as production defects.
+
+## Rulings recorded (C30)
+
+Where the deployed build and the requirements page disagree, **the deployed spelling wins and the
+page changes** — in each case it is shorter, legal under the BMC charset rule, and the only one that
+satisfies `UPPER_SNAKE`:
+
+| Requirements page | Ruled | Reason |
+|---|---|---|
+| `DevX-project` | **`DEVX_KEY`** | BMC forbids `-` in user-defined names |
+| `%%FileWatch-FILE_PATH` | **`FILE_PATH`** | forbidden `-`, and `FileWatch-` is a vendor plugin namespace |
+| `L2_EMAIL_DL_NM` / `L3_EMAIL_DL_NM` | **`EMAIL_DL_L2` / `EMAIL_DL_L3`** | one prefix, sortable, and it already has a third member (`EMAIL_DL_PDN`) |
+
+Four more, from the SME during the C30 design session:
+
+- **Notification is being removed as a mechanism.** REQ-2 deletes `<SHOUT>`/`<DOSHOUT>`; generated
+  mail is noise; **the failure raises a ServiceNow incident and that is the call to action.** So
+  `EMAIL_DL_*` are documentation-only, for runbook extraction, and the unset `%%NOTIFY` is an
+  ordinary unresolvable reference — never something to bind to a support DL. Whether `<DOMAIL>` goes
+  too is still open (REQ-2 says it remains).
+- **PDN = Production *Delay* Notification** — downstream *business* users, not a support tier. Part
+  E §8's role split (`ex:supportContact` for L2/L3, `ex:consumerContact` for PDN) is correct and
+  must survive the shared `EMAIL_DL_*` prefix.
+- **`PDN_SNOW_QUEUE` is dropped**, not relocated: ServiceNow technician routing lives in the
+  escalation DB (`EJOBNAME` join, SEAL via `ECOMPONENT`), with an HPSM-queue → SNOW-technician
+  mapping still to come. Part E paired a downstream business notification with a technician queue —
+  different audiences.
+- **A file watcher is inherently INBOUND**, so direction is carried by the job type. That retires
+  Part D's `INBOUND_ROUTE`/`OUTBOUND_ROUTE` pair on watchers; `REC_ID` is a multi-valued
+  source-system reference, not a directional pair. And the FW description's `ENV` becomes `FTS_ID`,
+  because `ENV` already means the deployment environment on the command jobs — the value is the bare
+  transfer id (`FTS1`, `FTS2`, `FTS6`, `FTS7`, `FTSCAT1`), version fragment dropped.
 
 # Conflicts this capture surfaces
 

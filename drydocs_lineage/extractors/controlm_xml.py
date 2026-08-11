@@ -34,12 +34,24 @@ a known reference gap):
   :mod:`drydocs_core.orchestration.controlm.description_tokens`, never this
   seam, for the same reason ``CMDLINE`` is staged unresolved — one parser,
   never a second engine in an adapter.
+- ``POSTCMD`` (observed spellings ``POST_CMD`` / ``POSTCOMMAND`` / the
+  ``POSCMD`` typo, the same set
+  :data:`drydocs_core.orchestration.controlm.variables.SHELL_VAR_NAMES`
+  already carries) and the FileWatcher watched-path ``FILE_PATH`` (synonym
+  ``WATCH_FILE``), both VERBATIM. The token-cat standard is a relationship
+  BETWEEN these two fields, so a conformance pass needs both staged.
 - Variables as ``VARIABLE`` elements (``NAME`` verbatim with its ``%%``
   prefix, ``VALUE``) at folder, sub-folder, and job scope. DOCUMENT ORDER IS
   THE CONTRACT: the resolver's sequential-assignment semantics depend on
   definition order, so ordinals are per-container document positions.
 - Elements this seam does not consume (INCOND/OUTCOND/SHOUT/ON/…) are
-  tolerated AND counted — present, just not this seam's business.
+  tolerated AND counted — present, just not this seam's business. ONE
+  exception is recorded by NAME rather than only counted (G67): the
+  notification family ``SHOUT`` / ``DOSHOUT`` / ``DOMAIL``, because REQ-2
+  requires generated definitions to emit ZERO ``SHOUT``/``DOSHOUT`` and a
+  count cannot answer "which". ``DOSHOUT``/``DOMAIL`` nest inside ``ON``, so
+  the scan descends — but stops at ``JOB``/``SUB_FOLDER`` boundaries, or a
+  folder would report its jobs' notifications as its own.
 
 Real exports are Internal (real folder/job names, command lines, variable
 values) and live in the G19 landing zone (``controlm-xml/``, resolver
@@ -65,6 +77,17 @@ _SUBFOLDER_TAGS = {"SUB_FOLDER", "SUBFOLDER"}
 _FOLDER_NAME_ATTRS = ("FOLDER_NAME", "TABLE_NAME")
 _SUBFOLDER_NAME_ATTRS = ("SUB_FOLDER_NAME", "FOLDER_NAME", "JOBNAME")
 _DESCRIPTION_ATTRS = ("DESCRIPTION", "DESC")
+#: post-execution command — the observed spellings, POSCMD typo included
+_POSTCMD_ATTRS = ("POSTCMD", "POST_CMD", "POSTCOMMAND", "POSCMD")
+#: FileWatcher watched-path template
+_WATCH_ATTRS = ("FILE_PATH", "WATCH_FILE")
+
+
+#: the notification family REQ-2 governs — recorded by name, not just counted
+_NOTIFICATION_TAGS = {"SHOUT", "DOSHOUT", "DOMAIL"}
+#: scanning for those stops at a nested job/sub-folder: their notifications
+#: belong to THEM, not to the container
+_SCAN_STOP_TAGS = _SUBFOLDER_TAGS | {"JOB"}
 
 
 def _attr(elem: ET.Element, *names: str) -> str:
@@ -73,6 +96,23 @@ def _attr(elem: ET.Element, *names: str) -> str:
         if value is not None and value.strip():
             return value.strip()
     return ""
+
+
+def _notification_tags(elem: ET.Element) -> tuple[str, ...]:
+    """Notification tags present under ``elem``, in document order, without
+    descending into nested jobs or sub-folders. Duplicates collapse — the
+    question REQ-2 asks is "which kinds are present", not "how many"."""
+    found: list[str] = []
+    stack = list(elem)
+    while stack:
+        child = stack.pop(0)
+        tag = child.tag.upper()
+        if tag in _SCAN_STOP_TAGS:
+            continue
+        if tag in _NOTIFICATION_TAGS and tag not in found:
+            found.append(tag)
+        stack = list(child) + stack
+    return tuple(found)
 
 
 @dataclass(frozen=True)
@@ -85,6 +125,8 @@ class XmlFolderRecord:
     source_file: str = ""
     #: DESCRIPTION verbatim — the description-metadata carrier, parsed elsewhere
     description: str = ""
+    #: notification tags at THIS container's level (REQ-2 evidence, G67)
+    notification_tags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -104,6 +146,12 @@ class XmlJobRecord:
     source_file: str = ""
     #: DESCRIPTION verbatim — the description-metadata carrier, parsed elsewhere
     description: str = ""
+    #: post-execution command VERBATIM — never resolved here (the cmd_line rule)
+    post_command: str = ""
+    #: FileWatcher watched-path template VERBATIM
+    watch_template: str = ""
+    #: notification tags on this job (REQ-2 evidence, G67)
+    notification_tags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -266,6 +314,7 @@ class ControlMXmlDefsExtractor:
                 kind="smart_folder" if tag in _SMART_TAGS else "folder",
                 source_file=path.as_posix(),
                 description=description,
+                notification_tags=_notification_tags(elem),
             )
         )
         coverage.folders += 1
@@ -386,6 +435,9 @@ class ControlMXmlDefsExtractor:
                 run_as=_attr(elem, "RUN_AS"),
                 source_file=path.as_posix(),
                 description=description,
+                post_command=_attr(elem, *_POSTCMD_ATTRS),
+                watch_template=_attr(elem, *_WATCH_ATTRS),
+                notification_tags=_notification_tags(elem),
             )
         )
         coverage.jobs += 1

@@ -81,6 +81,24 @@ AND (post_execution_command IS NULL
   (`controlm-runbook-automation` skill): each violating FileWatcher generates a proposed
   change (add the post-exec `cat`) through the review gate → the Jira fix package.
 
+## Amendment 2026-08-11 (C30) — the check is now an equality, and it has a detector
+
+Two changes, both from the [greenfield job standard](controlm-greenfield-job-standard.md):
+
+**The conformance predicate got simple.** "Post-execution command does not reference the watch-path
+variable expression" is nearly impossible to assert against a five-variable composition. Under the
+greenfield derived-handle pattern both fields are one token (`%%F_FQN_TOK`), so the check is string
+equality: `post_command == "cat " + watch_path`. Implemented as **R39a**.
+
+**The MUST NOT half is now enforced too, and it is the one with teeth.** A deployed `_DAT_ONPM_FW`
+job was found carrying `cat` on a `.txt` — DistributionRole DAT. Implemented as **R39b**, severity
+must-fix, because the risk in this standard sits in the forbidden clause rather than the required
+one: multi-GB into sysout.
+
+**Requirements-page correction:** REQ-3 mandates the post-command "for job type file_watcher"
+without qualification, which reads as *all* watchers and would cat data files. It needs the TOK/CTL
+scope this standard already states.
+
 ## Relationship to other standards
 
 - **File-name component standard** (proposed, website): supplies the DistributionRole

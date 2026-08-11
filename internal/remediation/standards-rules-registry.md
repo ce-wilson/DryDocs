@@ -1,6 +1,6 @@
 # Standards Rules Registry (machine-checkable) — DRAFT
 
-**Corpus:** INTERNAL. **Status:** 🟠 DRAFT — 2026-06-11; governance rules added 2026-06-17. **Branch:** `controlm-spinoff`.
+**Corpus:** INTERNAL. **Status:** 🟠 DRAFT — 2026-06-11; governance rules added 2026-06-17; **R30–R40 (the greenfield job standard) added 2026-08-11 with a working detector — G67**.
 The prose standards turned into a **checkable rule set** — the single source for both *validation* (Gate 2) and *greenfield generation* (Gate 3). Each rule: how the engine detects it, severity, the standard it comes from, the greenfield action, and ratification status. Built in M2; seeded here. **R1–R12** = resolver/naming/metadata core; **R13–R28** = the tier ③/④ governance standards (escalation routing, self-heal, critical-batch tiering, NFR catalog, FW time-limit, command-line/canonical-variables, artifact-source security) digested from the [governance/](governance/) corpus; **R29** = the first 🟣 greenfield *recommendation* rule (job numbering — [D5](governance/greenfield-recommendations.md)).
 
 **Status legend:** ✅ ratified · 🟡 provisional (observed, not signed off) · ❓ open (needs SME).
@@ -160,6 +160,101 @@ Surfaced while digesting the DAT/HLT governance corpus (2026-06-17). Provisional
 - **Engine:** dependency-DAG builder (prerequisite-loader output) + name parser; topological-order assertion. **Sev:** 🟡 (⚪ for cosmetic-tiebreak-only cases). **Status:** 🟡 **(🟣 recommendation — D5)**
 - **Source:** [governance/greenfield-recommendations §1](governance/greenfield-recommendations.md); HLT JobCode map; DAT `<SEQ_NO>`. Complements R12 (job naming) + R13 (token==intent): "the name must tell the truth about the resolved graph."
 - **Greenfield:** derive the number from the resolved DAG at Gate 3 (display order == run order by construction); validate inversions/padding at Gate 2.
+
+---
+
+# R30–R40 — the greenfield job standard (G67, 2026-08-11)
+
+The first block of rules with a **working detector**: `drydocs_remediation.detect.detect_conformance`,
+run over real staged definitions through `xml_bridge` (the G47 extractor's output adapted; reading
+definition XML stopped being blocked at G47, only emitting still needs the vendor schema). All 🟡
+provisional, all emitted `ratified=False` — machine-readable ratification is still the M1 deliverable.
+
+**Source:** [controlm-greenfield-job-standard](../standards/technology/controlm-greenfield-job-standard.md)
+(values twin) and its Internal-Public mechanism half; evidence in
+[controlm-job-metadata-standards-capture](../controlm-config/reference/controlm-job-metadata-standards-capture.md)
+and [controlm-pipeline-stub-capture §B4–B7](../controlm-config/reference/controlm-pipeline-stub-capture.md).
+Backlog: C30 (standard) · G67 (detectors).
+
+**Two failure classes, deliberately not merged.** Name drift produces **silence** — the name misses
+`FACT_REGISTRY`, no `STG_APP_FACT` row is written, lineage is simply absent (R2). A value-contract
+breach produces a **confidently wrong row** — the name resolves, so the graph gains a false fact
+(R34). The second is 🔴 and must never be filed as a lint warning beside a rename suggestion.
+
+**Two rules that deliberately do NOT exist.** Nothing binds `%%NOTIFY` to a distribution list:
+notification is being removed as a mechanism and the ServiceNow incident is the call to action, so
+a rule that "fixed" the unset destination would re-wire what REQ-2 removes — an unset `%%NOTIFY` is
+an ordinary R30 unresolvable reference, nothing more. And nothing asserts a ServiceNow queue on a
+Control-M object: technician routing belongs to the escalation DB via the `EJOBNAME` join.
+
+## R30 — Every `%%` reference resolves somewhere in the scope chain
+- **Check:** a plain `%%NAME` in `CMDLINE`, the watch path, `POSTCMD`, or any variable value in the job's chain, with no declaration at folder, sub-folder or job scope. System variables and `%%$`-tokens are excluded; `%%\GLOBAL` and `%%\\POOL\VAR` are out of view and never accused.
+- **Engine:** `_check_references` over `DefinitionSet.resolution_chain`. **Sev:** 🔴 **Status:** 🟡
+- **Why 🔴:** the vendor resolves an undefined reference to the reserved word `CTMERR`, so it reaches the agent as literal text — a runtime defect, not a lint.
+- **Greenfield:** declare at the widest scope that holds it (R35), or delete the reference.
+
+## R31 — No orphan declarations
+- **Check:** a job-scope variable referenced nowhere on that job, **excluding** registered facts (`FACT_REGISTRY`) and standard metadata fields (the `FILE_*` components, `DEVX_KEY`, `EMAIL_DL_*`).
+- **Engine:** `_check_references`. **Sev:** ⚪ **Status:** 🟡
+- **Why the exclusions:** a fact declared for the record is the standard working as designed — `FILE_EXTENSION` exists so the SQL parse can read it into `CM_JOB_FILE_NAME_STANDARD`, and flagging it would fight the rule that requires it. An orphan is a name that is BOTH unregistered and unused.
+- **Greenfield:** wire it up or drop it.
+
+## R32 — The required declaration set per job type
+- **Check:** command jobs carry `LAUNCHER_SCRIPT_PATH`, `ETL_PLATFORM`, `ETL_ARTIFACT_URI`, `ETL_ARTIFACT_KIND` (REQ-4; `ETL_PLATFORM_FLAGS` optional); FileWatchers carry `FILE_DIR`, `FILE_PREFIX`, `FILE_BUSINESS_DATE`, `FILE_EXTENSION`. Satisfied at ANY scope in the chain.
+- **Engine:** `_check_required`. **Sev:** 🟡 **Status:** 🟡
+- **Why any-scope:** under the ladder most of these live on the folder; demanding them locally would fight the standard this enforces.
+- **Greenfield:** add the missing declaration at its owning scope.
+
+## R33 — Exactly one carrier per fact
+- **Check:** a value present BOTH as a command literal and as a declared variable. The standard names the carrier per fact; for `pipelineId` it is the **literal**, so a `PIPELINE_ID` variable is the finding.
+- **Engine:** `_check_carriers` (`LITERAL_CARRIER_FACTS`). **Sev:** 🟡 **Status:** 🟡
+- **Source:** the DPL generator declares no `PIPELINE_ID` variable and its undefined-token list does not name one — the GUID is baked in at generation time from `PipelineDetails`. NFR-CTM-001 §6.1/§6.2 say `-pipeline %%PIPELINE_ID` and are wrong.
+- **Greenfield:** remove the variable. Two carriers can disagree silently; the command wins and the variable lies. **Rider:** the GUID is the DPL `dataset_flow` join key, so the standard grants one anchored `-pipeline <uuid>` extractor as a named exception to NFR §10 — otherwise the key never reaches `STG_APP_FACT`.
+
+## R34 — Value contract per canonical fact
+- **Check:** `DS_ID` is a UUID, `DS_VER` is dotted-numeric, an artifact URI is a URI and not a bare image name.
+- **Engine:** `_check_values` (`VALUE_CONTRACTS`). **Sev:** 🔴 **Status:** 🟡
+- **Why 🔴:** the NAME resolves, so a fact row IS written — with a false value. Catches the sibling-swap shape where two canonicals hold each other's values.
+- **Greenfield:** correct the value; check the sibling for the other half of the swap.
+
+## R35 — Invariants live at the widest scope that holds them
+- **Check:** the same `(name, value)` declared at JOB scope on two or more sibling jobs.
+- **Engine:** `_check_hoistable`. **Sev:** ⚪ **Status:** 🟡
+- **Why it matters more than ⚪ suggests:** this is the defect CLASS behind the drift the other rules catch one instance at a time. The generator emits a partial job and expects a folder `AUTOEDIT` block; where that block is missing, people hand-copy per job and one copy eventually differs.
+- **Greenfield:** hoist to folder (flow-invariant) or sub-folder (dataset identity).
+
+## R36 — A composed path is derived, never retyped
+- **Check:** one declaration's path value ends with another declaration's whole basename value (basename ≥ 12 chars, no `/`).
+- **Engine:** `_check_retyped_paths`. **Sev:** 🟡 **Status:** 🟡
+- **Greenfield:** declare the components once and derive the composed handle from them, so there is one place to change. Referencing rather than retyping is why the greenfield shape passes this rule structurally.
+
+## R37 — No adjacent `%%` references
+- **Check:** `ADJACENT_REF_RE` on any variable value, command line, watch path or post-command.
+- **Engine:** `_check_names`, reusing the core classifier's `DYNAMIC_NAME` hazard regex. **Sev:** 🟡 **Status:** 🟡
+- **Greenfield:** separate them with the concatenation delimiter; two abutting references may be read as one composed variable NAME.
+
+## R38 — Vendor charset legality of user-defined names
+- **Check:** forbidden characters ``< > [ ] { } ( ) = ; ` ~ | : ? . + - * / & ^ # @ ! , " '`` and blanks; length ≤ 38; and a user declaration inside a vendor application prefix (`FileWatch-`, `UCM-`, the `%%SAPR3-` form).
+- **Engine:** `_check_names`. **Sev:** 🔴 **Status:** 🟡
+- **Source:** [controlm-variables](../../external/orchestration/bmc-controlm/controlm-variables.md), authoritative section.
+- **Catches two requirements-page defects:** REQ-1's `DevX-project` and REQ-3's `%%FileWatch-FILE_PATH` are both illegal; the live build already uses the legal `DEVX_KEY` and `FILE_PATH`, so the standards page changes, not the jobs.
+
+## R39a — A TOK/CTL watcher cats the file it watched
+- **Check:** `post_command == "cat " + watch_path`, exactly.
+- **Engine:** `_check_post_exec` + `DISTRIBUTION_ROLES`. **Sev:** 🟡 **Status:** 🟡
+- **Source:** [filewatcher-postexec-token-cat](../../knowledge/standards/technology/filewatcher-postexec-token-cat.md).
+- **Note:** the old wording was "references the watch-path variable expression", which is hard to check. Once both sides are one derived handle (`%%F_FQN`) it becomes string equality — a rule you can actually enforce.
+
+## R39b — A DAT watcher does NOT cat
+- **Check:** a watcher whose DistributionRole is DAT with a `cat` post-command.
+- **Engine:** `_check_post_exec`. **Sev:** 🔴 **Status:** 🟡
+- **Why 🔴:** the same NFR's MUST NOT — data files can be multi-GB, and echoing one into sysout floods the log and can breach sysout limits. The operational risk sits in the *forbidden* clause, not the required one. REQ-3 says "for job type file_watcher" unqualified and needs this scope correction.
+
+## R40 — REQ-2: zero `SHOUT` / `DOSHOUT`
+- **Check:** either tag present on a folder or a job.
+- **Engine:** `_check_notifications`, over notification tags the extractor records BY NAME (a count cannot answer "which"), scanning into `ON` blocks but stopping at nested job/sub-folder boundaries.
+- **Sev:** 🟡 **Status:** 🟡
+- **Scope:** `DOMAIL` is **not** flagged. REQ-2 puts it out of scope and whether mail goes too is an SME ruling; the detector does not presume it.
 
 ---
 

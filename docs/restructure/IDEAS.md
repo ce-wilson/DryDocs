@@ -62,6 +62,17 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-106`** · 2026-08-11 · `[bug]` · **open** · prio? **Low** —
+  **`test_loader_run_log.py::test_naming_convention_and_collision_suffix` is clock-flaky.**
+  It calls `claim_log_path()` twice and asserts the second gets the `-2` collision
+  suffix — but the suffix only appears when both calls land in the SAME second, since
+  the name is stamped `YYYYMMDD-HHMMSS`. If the clock ticks between the two statements
+  the second call gets a fresh timestamp and no suffix, and the assertion fails.
+  Observed failing once and passing on the immediately following identical run
+  (2026-08-11, desktop, during the C30/G67 close-out). Fix: freeze the clock for the
+  two calls rather than racing it — the collision behaviour is what is under test, not
+  the timestamp.
+
 - **`Idea-105`** · 2026-08-11 · `[question]` · **open** · prio? **High** —
   **Two things claim the same 4000-char Control-M `DESCRIPTION` field on generated
   objects, and they cannot both hold.** The DPL generator stamps two literal strings
