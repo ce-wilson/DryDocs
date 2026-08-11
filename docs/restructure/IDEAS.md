@@ -3189,3 +3189,23 @@ question a 1,000-line file with the trail at the bottom could not answer.
   - Taxonomy-ontology-map audit (docs/reviews/tech-debt-taxonomy-ontology-map.md) → **C7**
     (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
     (c396d75, ede0b94).
+
+- **`Idea-86`** · 2026-08-11 · `[guard]` · prio? **Med** —
+  **No guard asserts that a `PORT-MANIFEST.yaml` path still exists.**
+  Found at G75: the row `drydocs_core/controlm/**` pointed at a path that has not
+  existed since the S2 / ADR 0008 relocate under `orchestration/`, so every module in
+  the Control-M package was silently falling through to the generic
+  `drydocs_core/**` evaluate-on-collision row instead of the canonical-producer row it
+  was written for. Nothing failed, because `tests/unit/test_port_manifest.py` checks
+  uniqueness, dispositions, notes and pins — never existence.
+  `test_runbook_currency.py::test_every_path_a_document_names_exists` already does
+  exactly this job for DOCUMENTS, and its FOREIGN_PATHS / HISTORICAL_PATHS escape
+  hatches are the right shape here too: a manifest legitimately names company-only
+  paths (`drydocs/docmeta/**`, `drydocs/scrapers/**`) and glob rows that match nothing
+  producer-side. So the guard is "every non-glob row resolves, every glob row matches
+  at least one path, unless allowlisted with a reason".
+  Second half, same family: `test_overrides_precede_their_broader_glob` only checks a
+  HARDCODED list of four overrides against `config/**`. A new specific row placed after
+  its broader glob passes today — verified at G75, where the ordering had to be fixed by
+  hand. Derive the pairs instead: any row whose path is a strict prefix-match of a later
+  glob row is an ordering defect.
