@@ -28,6 +28,13 @@ added when the platform migrates; do not bake XML assumptions into the engine.
 # `canonicalize_path` are the neutral functions bound to the Control-M
 # PathDialect in .paths.
 from ..shell import FileOp, Invocation, parse_command, pipeline_guid
+from .audit_time import normalize_export_timestamp
+from .conditions import (
+    SCOPE_PREFIXES,
+    ConditionScope,
+    condition_identity,
+    condition_scope,
+)
 from .facts import route_fact
 from .fields import extract_container_command
 from .folder_name import ParsedFolderName, parse_folder_name
@@ -38,6 +45,21 @@ from .resolver import (
     resolve_command_line,
     resolve_job,
     resolve_layers,
+)
+
+# `classify` is re-exported as `classify_pool`: the package already carries
+# classify_role / classify_variable, so a bare `classify` reads as ambiguous
+# at every call site. The module keeps the short name; the package qualifies it.
+from .resource_pool import (
+    CATEGORY_LABEL,
+    DEFAULT_APP_CODE_RE,
+    DEFAULT_RULES,
+    PoolCategory,
+    PoolClassification,
+    PoolRule,
+)
+from .resource_pool import (
+    classify as classify_pool,
 )
 from .variable_report import VariableCoverage
 from .variables import (
@@ -71,6 +93,20 @@ __all__ = [
     "canonicalize_path",
     "classify_role",
     "route_fact",
+    # G75 — XML-export field mechanics back-flowed from the company adapter
+    "normalize_export_timestamp",
+    "ConditionScope",
+    "SCOPE_PREFIXES",
+    "condition_scope",
+    "condition_identity",
+    # G76 — Quantitative Resource pool classification (vocabulary is caller-supplied)
+    "PoolCategory",
+    "PoolRule",
+    "PoolClassification",
+    "CATEGORY_LABEL",
+    "DEFAULT_RULES",
+    "DEFAULT_APP_CODE_RE",
+    "classify_pool",
 ]
 # NOTE (0002-a §6 borderline): the staging bundle builder (build_staging_bundle /
 # build_staging_rows / collect_jobs) is load-cadence-coupled and lives component-side

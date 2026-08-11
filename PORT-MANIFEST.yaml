@@ -321,9 +321,33 @@ rows:
       drydocs_core/adapters/) but keep the CONSUMER's file content at the new path.
 
   # ---- producer-canonical (take wholesale on collision) ---------------------
-  - path: "drydocs_core/controlm/**"
+  - path: "drydocs_core/orchestration/controlm/resource_pool.py"
     disposition: canonical-producer
-    note: "the normalization package (Phases A/B/C) is authored producer-side"
+    note: >
+      MECHANISM-here, VOCABULARY-yours (G76). Producer ships the grammar, the
+      PoolClassification contract and an ORDERED tuple[PoolRule, ...] the caller
+      supplies — defaulting to () so an un-configured deployment classifies
+      everything `unknown`. The company copy compiles its match regexes and
+      app-code prefix in; those are estate data and never flow producer-side.
+      Resolve a collision by taking the producer module and moving your table into
+      caller-supplied data. Do NOT re-inline your regexes into the ported file.
+      Rule ORDER is load-bearing (a broad rule ahead of a narrow one steals its
+      pools — proven both ways in tests/unit/test_controlm_resource_pool.py), so a
+      table keyed by category rather than sequenced is a defect, not a refactor.
+      CATEGORY_LABEL is the PROPOSED label vocabulary, not ratified producer-side.
+      THIS ROW PRECEDES orchestration/** DELIBERATELY — first match wins.
+  - path: "drydocs_core/orchestration/**"
+    disposition: canonical-producer
+    note: >
+      the normalization package (Phases A/B/C) is authored producer-side. PATH
+      CORRECTED 2026-08-11 (G75/G76): this row read drydocs_core/controlm/** — a
+      path that has not existed since the S2 / ADR 0008 relocate under
+      orchestration/ — so every module in the package was silently falling
+      through to the generic drydocs_core/** evaluate-on-collision row instead of
+      being canonical-producer. Widened to orchestration/** to cover the neutral
+      shell/ half that moved up with it. NOTE the two G76 exceptions below:
+      resource_pool.py is mechanism-here / vocabulary-yours, and the company's
+      controlm_xml_adapter.py is company-canonical and NOT a producer target.
   - path: "drydocs/staging.py"
     disposition: canonical-producer
     note: "the load-cadence staging bundle builder — relocated OUT of controlm/ in Phase B (0002-a §6 borderline); stays in the drydocs remainder"

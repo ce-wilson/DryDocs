@@ -600,6 +600,41 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   union in by id, but `done` never crosses unmodified — U9/C21 landed `todo`
   company-side with reconciliation notes because their deliverables are T18/T22
   deferred. Never "sync" statuses in either direction.
+- **The `JOBISN=1` FOLDER PSEUDO-JOB IS A DELIBERATE PRODUCER GAP, not a porting miss**
+  (registered 2026-08-11 at G75). Your `drydocs_core/adapters/controlm_xml_adapter.py`
+  builds a pseudo-job at `<folder_id>.1` so folder-level `PL-<folder>-OK` OUTCONDs
+  attach to a real node instead of dangling. G75 back-flowed the adapter's two PURE
+  mechanisms (`normalize_export_timestamp`, `condition_scope`/`condition_identity`) and
+  deliberately left this one behind: it is a LOADER idiom and the producer has no
+  XML-to-graph adapter to host it, so building it here would mean inventing the caller.
+  TRIGGER that retires this entry: the first producer-side loader that models
+  folder-level conditions. Until then the adapter itself stays company-only and is NOT
+  a back-flow candidate — see the next bullet for why.
+- **`controlm_xml_adapter.py` is company-canonical AND is not a producer target**
+  (2026-08-11, from the 19-screenshot capture at
+  `internal/controlm-config/reference/controlm-xml-processor-capture.md`). Three reasons,
+  recorded so no future port "helpfully" back-flows it: it encodes the description-token
+  model C30 RETIRED (`INBOUND_ROUTE`/`OUTBOUND_ROUTE`, `ENV` in its transfer-instance
+  meaning, `PDN_SNOW_QUEUE`); it flattens the C30 scope ladder into one dict per job; and
+  its `FOLDER_ORDER_METHOD` filter skips manual-order folders — right for a live-graph
+  load mirroring the Oracle `USER_DAILY IS NOT NULL` filter, WRONG for a conformance
+  pass, where hand-built and inactive folders are the entire drift population. The
+  producer conformance path is `drydocs_lineage/extractors/controlm_xml.py` +
+  `drydocs_remediation/xml_bridge.py` instead. Two loads with OPPOSITE correctness
+  conditions must not share an adapter.
+- **`drydocs_core/orchestration/controlm/resource_pool.py` exists BOTH SIDES and the
+  split is the contract** (G76, 2026-08-11). Company-side the module compiles its
+  vocabulary in — the match regexes and the app-code prefix are estate data. Producer
+  ships the MECHANISM only: the grammar, `PoolClassification`, and an ORDERED
+  `tuple[PoolRule, ...]` the caller supplies, defaulting to `()` so an un-configured
+  deployment classifies everything `unknown`. Resolve a collision by keeping the
+  producer module and moving your table into caller-supplied data; do NOT take the
+  producer file and then re-inline your regexes, and do NOT push your table producer-side.
+  The ordering is load-bearing — a broad rule placed before a narrow one silently steals
+  its pools (`test_controlm_resource_pool.py` proves it both ways), so a table stored as
+  a mapping keyed by category is a defect, not a refactor. `CATEGORY_LABEL` is the
+  PROPOSED label vocabulary and is not ratified producer-side: nothing there writes a
+  graph, and minting those labels is HITL-gate territory.
 - README.md: company one-line footer stays (producer's lives at internal/repo-README.md).
 - .github/**: adapt-rather-than-adopt — company CI/workflow config wins.
 - config/dev-environment.yaml: canonical-company on BOTH manifests since

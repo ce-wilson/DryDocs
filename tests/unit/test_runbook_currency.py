@@ -97,6 +97,13 @@ FOREIGN_PATHS: dict[str, str] = {
         "COMPANY-side test named in the same per-file-ignores inventory as absent "
         "producer-side, alongside a `test_snow_supp*` this pattern does not match"
     ),
+    "drydocs_core/adapters/controlm_xml_adapter.py": (
+        "COMPANY-side module (G75/G76, 2026-08-11). port-prompt names it to say it is "
+        "company-canonical and NOT a producer back-flow target — it encodes the "
+        "description-token model C30 retired, flattens the C30 scope ladder, and its "
+        "FOLDER_ORDER_METHOD filter skips exactly the folders a conformance pass needs. "
+        "Naming that absence is the point of the entry, not a stale claim"
+    ),
 }
 
 #: Extensions worth checking. Deliberately narrow: prose mentions plenty of
