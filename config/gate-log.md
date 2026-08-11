@@ -2783,3 +2783,65 @@ rather than stretched in silence.
 
 **Nothing is applied by this entry.** Every surface named above changes in its own logged commit
 under the items just listed. No graph write is authorized by signing.
+
+## 2026-08-11 — AMENDMENT to the G35 sign-off: G16 SRE is OPTIONAL and DERIVED, not required
+
+**Gate:** `tom-roles-enumeration-and-cardinality` (G35) · **SIGNED OFF above; this amends one
+register line.** The sign-off entry named G16 as a **residual — "required, with its KIND inferred
+rather than ruled"** — precisely so it could be corrected cheaply. The SME corrected it the same
+day. The original ruling stays readable above; this states what changed and why.
+
+**Subject — the status this entry flips:** register line **G16 Site Reliability Engineer**:
+`REQUIRED` → **`OPTIONAL`, and DERIVED rather than asserted**. No other line moves. Nothing else in
+the sign-off is reopened.
+
+### The correction
+
+> **SME, 2026-08-11:** ServiceNow has four default technician groups and our team is **reusing one**.
+> If there is an SRE team, it can be **derived from the TEAM NAMING CONVENTION** — a function
+> segment distinguishes support, development and support-SRE groups. **An SRE team serves 1:many
+> applications, roughly 20 to 60.**
+
+**Three reasons the required ruling was wrong, and they compound.**
+
+1. **The cardinality is inverted from every other line in the register.** Every other role class is a
+   per-application holding: the application has an Application Owner, a CTO, a Design Authority.
+   An SRE team covers **20–60 applications**. It is a shared function pointing at many applications,
+   not an accountability held by one. §B's required/optional split is about whether an application
+   must carry at least one holder, and that question does not apply cleanly to a many-to-one team.
+2. **It is DERIVABLE, so asserting it is the wrong mechanism.** The group naming convention encodes
+   the team's function class, so "does this application have SRE cover" is answerable by reading the
+   group name. A required flag would demand an assertion for a fact that is already computable —
+   and would put every application in breach until somebody made the assertion redundantly.
+3. **§G16's KIND question is now answered, and the answer is 'staffing, not accountable.'** The
+   sign-off inferred accountable from required-ness. It is the other one: a shared operational team
+   recorded on the same extract, which §G16 explicitly warned "is a different kind of fact" from
+   accountability for an application.
+
+### The evidence that makes this more than a preference
+
+**The role label and the group's function segment DISAGREE in the sampled data, and the group is
+right.** The TOM role `Incident Resolver – SRE / DevOps Team` resolves to a group whose function
+segment marks it a SUPPORT group, not a support-SRE one. That is the SME's "reusing one" visible in
+the data: an SRE-named role slot filled by a support technician group.
+
+**So a crosswalk that reads the ROLE NAME to decide whether SRE cover exists returns the wrong
+answer.** Only the GROUP NAME's function segment is reliable. This is the same defect class as §A3b
+(a role name that does not survive the canonicalizer) and §3.3 of the K21 evidence (a relationship
+type whose forward label does not identify it): **the label is not the identity.** Recorded here
+because the temptation to pattern-match on `%SRE%` in a role name is obvious and it is wrong.
+
+### Consequences
+
+- **G16 is OPTIONAL** in the register that G70 seeds, and carries a note that it is DERIVED.
+- **G70's acceptance is amended** to seed it that way rather than as required.
+- **G71's completeness report must not check it.** A derived, many-to-one fact has no place in a
+  per-application required-contact report; including it would generate a finding on every
+  application whose SRE team simply was not asserted.
+- **The naming convention becomes a real mechanism worth capturing** — it is how an abstract role
+  catalog gets realized as concrete groups, and it is the only reliable route to the team's function
+  class. Recorded in K21 §8.3 and §10; whether DryDocs parses it is a question for the
+  group-membership work under `snow-hpsm-queue-to-group`, not for this gate.
+
+**One residual from the sign-off remains open:** G5's unknown SEAL-risk ↔ ServiceNow-group mapping
+(simplest thing that works — crosswalk `Risk Manager` and stop). Unchanged by this amendment.

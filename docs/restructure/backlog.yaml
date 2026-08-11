@@ -9908,9 +9908,18 @@ items:
       memberships block, so the membership blocks move with it.
       (3) THE REGISTER IS SEEDED FROM THE SIGNED §G: REQUIRED = application_owner,
       primary_information_owner, backup_information_owner, cto, technology_risk_controls,
-      design_authority, backup_application_owner, site_reliability_engineer. OPTIONAL = the three
-      Operate Manager classes, chief_business_technologist, deployment_owner,
-      deployment_information_owner, application_module_owner.
+      design_authority, backup_application_owner. OPTIONAL = the three Operate Manager classes,
+      chief_business_technologist, deployment_owner, deployment_information_owner,
+      application_module_owner, and site_reliability_engineer.
+      SRE IS A SPECIAL CASE — AMENDED 2026-08-11 after the sign-off, see the gate-log amendment.
+      It is OPTIONAL *and DERIVED*: an SRE team serves 1:many applications (roughly 20-60), so it
+      is a shared function pointing at many apps rather than a per-application holding, and its
+      presence is READ FROM THE GROUP NAMING CONVENTION's function segment rather than asserted.
+      Seed it with a `derived: true` marker so G71's completeness report can EXCLUDE it — a
+      derived many-to-one fact in a per-application required-contact report generates a finding
+      on every application whose SRE team simply was not asserted. AND DO NOT PATTERN-MATCH THE
+      ROLE NAME: in the sampled data an SRE-named role resolves to a SUPPORT-function group (the
+      team reuses one), so the role label disagrees with the group and the GROUP is right.
       (4) THE OPERATE MANAGER SPLIT IS APPLIED: operate_manager becomes THREE concepts (L1, L2,
       bare); the `level` property and c7.levels retire with it. The bare class carries its ruled
       definition — responsibility scope (change, problem and incident resolution), not a level.

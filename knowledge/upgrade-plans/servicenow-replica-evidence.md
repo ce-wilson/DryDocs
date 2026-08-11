@@ -1066,3 +1066,75 @@ stays open.
 vocabulary with `Scope: Group`, so the register is complete and honest, and **mints no
 group→application graph shape**. The shape stays owned by the signed gate. A second shape for the
 same fact would collide at the next port, and the collision would be the producer's fault.
+
+---
+
+## 10. The group naming convention — and why the label is not the identity
+
+**SME, 2026-08-11.** ServiceNow ships four default technician groups; the team **reuses one** of
+them. Whether an application has SRE cover is **not asserted** — it is **derived from the team
+naming convention**, whose third segment is a function class:
+
+```
+<LOB>_<domain>_<function>[_<app>]        and, where the group serves a TOM role:
+<LOB>_<domain>_<function>_<app>: <TOM-function>
+
+function segment:
+  ASUP   support
+  SENG   development / software engineering
+  SSRE   support SRE   — serves 1:many applications, roughly 20 to 60
+```
+
+So the group name carries the LOB, the domain, **the team's function class**, the application or
+application-group it serves, and — after the colon — the TOM function it performs (Technician,
+Change Owner, Change Approver, Problem Owner, Service Owner). It is the bridge §8.1(a) implied: an
+abstract, estate-wide role catalog realized as concrete `sys_user_group` records.
+
+### 10.1 The finding: the role label and the group's function segment disagree
+
+In the sampled deployment, the TOM role **`Incident Resolver – SRE / DevOps Team`** resolves to a
+group whose function segment is **`ASUP` — support, not `SSRE`.** That is the SME's "reusing one",
+visible in the data: an SRE-named role slot filled by a support technician group.
+
+**The consequence for any crosswalk: reading the ROLE NAME to decide whether SRE cover exists returns
+the wrong answer.** Only the group name's function segment is reliable. Pattern-matching `%SRE%`
+against role names is the obvious implementation and it is wrong here.
+
+This is the third instance of one defect class in this document, and they are worth reading together
+because the next one will look different again:
+
+| Where | The label that isn't the identity |
+|---|---|
+| §3.3 | Two relationship types share `parent_descriptor`; the forward label does not identify the type |
+| G35 §A3b | A role name the canonicalizer cannot match kills its own row |
+| §10.1 | An SRE-named role resolves to a support-function group |
+
+**The rule they share: identify by the key, classify by the structured field, and treat the
+human-readable label as evidence rather than as identity.**
+
+### 10.2 Why this changed a signed ruling
+
+G35's register originally ruled **G16 Site Reliability Engineer REQUIRED**, inferring "accountable"
+from required-ness. Amended the same day to **OPTIONAL and DERIVED**, for three compounding reasons
+recorded in the gate-log:
+
+- **the cardinality is inverted** — every other register line is a per-application holding, while an
+  SRE team covers 20–60 applications: a shared function pointing at many, not an accountability held
+  by one;
+- **it is derivable, so asserting it is the wrong mechanism** — a required flag would demand a
+  redundant assertion for a computable fact, and would put every application in breach until
+  somebody made it;
+- **§G16's own KIND question is answered** — it is a *staffing* fact about a shared team, which
+  §G16 warned is "a different kind of fact" from accountability for an application.
+
+**And G71's completeness report must exclude it.** A derived, many-to-one fact has no place in a
+per-application required-contact check; including it would raise a finding on every application
+whose SRE team merely was not asserted — the noisy check §C6 warns gets weakened rather than fixed.
+
+### 10.3 What is NOT decided here
+
+Whether DryDocs **parses** the convention. Deriving a team's function class from its name is a
+capability, not a fact, and it belongs with the group-membership work under the company-signed
+`snow-hpsm-queue-to-group` (§9), not to G35. Two things to settle there rather than here: whether
+the segment vocabulary is closed (three function codes observed, more may exist), and whether a
+group name that does not parse is a data-quality finding or simply out of scope.
