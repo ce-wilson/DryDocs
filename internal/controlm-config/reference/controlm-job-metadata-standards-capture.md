@@ -1293,7 +1293,24 @@ C16 (ratified 2026-07-28) assigns `SourceSnowQueue → snow.assignmentQueue` and
 ratification, so this is a mapping to record rather than a contradiction — recorded in the
 register.
 
-**6. Internal inconsistencies in the source documents themselves.**
+**6. Casing: three namespaces, and the CamelCase one is not retired.**
+The corpus does not have one naming convention, it has three, and only two of them agree.
+
+| Namespace | Convention | Evidence |
+|---|---|---|
+| Control-M `%%` VARIABLES | **UPPERCASE, case-sensitive** | NFR §2: "Canonical variable … Uppercase." NFR §9: "Canonical names are uppercase ASCII; lookup case-sensitive — Accepted", rationale being that Control-M is case-sensitive at execution so normalizing would silently merge distinct bindings. NFR §7.1 documents the migration off the prior state: `%%img_path` *(lowercase, alias)* → `%%IMG_PATH` → `%%ETL_ARTIFACT_URI` |
+| DESCRIPTION metadata KEYS | **UPPER_SNAKE** in the 2026-08-11 standards | `DELIVERY_MECHANISM`, `SOURCE_CONTACT`, `PDN_SNOW_QUEUE`, `JOB_ROLE`, `INBOUND_ROUTE`. The 2026-06-11 production observation used **CamelCase** for the same concepts — `FileDeliveryMechanism`, `SourceContact`, `SourceSnowQueue`, `datasetSeriesName`, `SeriesSLA` — mixed with a few upper (`USER`, `ENV`, `ROUTE_ID`) |
+| File-name components (Part C) | **CamelCase — still** | Part C §3 verbatim: "Naming Convention: `File` prefix + component role in **CamelCase**", column headed "Variable Name", values `FileName` `FilePrefix` `FileBusinessDate` `FileSequence` `FileExtension` `FileCompression` `FileSuffix` `FilePattern` |
+
+So the *direction* of travel is real — CamelCase and lowercase both gave way to uppercase, and the NFR records the migration explicitly. But Part C is **in the same batch and is not superseded**: nothing in NFR-CTM-001 scopes it, and Part C prescribes CamelCase as current.
+
+Worse, Part C contradicts itself within three sections. §2's three-perspective table gives the **Control-M** spelling as `%%FILENAME`, `%%BDATE` — uppercase — and reserves "named properties on `dcat:Distribution`" for the ontology perspective. §3 then heads its column "Variable Name" and fills it with CamelCase. The charitable reading is that §3's names are **ontology property names, never `%%` variable spellings** — which §8 supports, since it maps CamelCase name → UPPER_SNAKE column → `ex:` term, i.e. three namespaces per row by design. But the section is titled "Recommended **Variable Name** Standard", so the document does call them variables. Unresolved in the source; ruling needed before any of them is authored on a job.
+
+Two things that look like casing evidence and are not:
+- `%%FileWatch-FILE_PATH` (REQ-3) is not a style choice — `%%FileWatch-` is a Control-M **plugin namespace** (the same PLUGIN_NS family as `%%UCM-*` that `drydocs_core/orchestration/controlm/variables.py` already classifies). The vendor owns that casing.
+- REQ-3's variables sit **outside the NFR's casing rule by the NFR's own scope statement** — §1 puts `PRECMD`/`POSTCMD` out of scope and §10 excludes plug-in tasks.
+
+**7. Internal inconsistencies in the source documents themselves.**
 Listed with `[sic]` at the point of transcription: REQ-2's text says "REQ-1" twice; REQ-3's
 acceptance list starts at item 2; NFR §1 points at "§11" for a section numbered §10; §6.4 uses
 `%%SRC_SYS_CD` where §6.5 uses `%%SOR_SYS_CD`; Part D §5 uses `ex:mftsUser` where the agent block

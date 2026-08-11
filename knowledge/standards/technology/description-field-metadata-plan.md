@@ -315,7 +315,33 @@ it encodes *what it contains* (`dcat:mediaType`) and *how it is stored* (`ex:fil
 separately. A `.dat.gz` is still a `DAT` file. A parser that treats the suffix atomically loses
 the classification.
 
-### 2c.3 Relation to the legacy pattern §3 warns about
+### 2c.3 ⚠️ Casing — this table is CamelCase and everything else here is not
+
+The names above are **CamelCase**, deliberately: the source states "Naming Convention: `File`
+prefix + component role in CamelCase". Every other name in §2b is UPPER_SNAKE, and
+NFR-CTM-001 requires Control-M canonical variables to be **uppercase ASCII with case-sensitive
+lookup** — so a `%%FileBusinessDate` would violate the variable standard as written.
+
+Three namespaces are in play and only two agree:
+
+| Namespace | Convention | Where ruled |
+|---|---|---|
+| Control-M `%%` variables | UPPERCASE, case-sensitive | NFR-CTM-001 §2, §9 (and §7.1 migrates `%%img_path` → `%%IMG_PATH` → canonical) |
+| DESCRIPTION metadata keys | UPPER_SNAKE (was CamelCase in the 2026-06-11 observation — see §2b.7) | the 2026-08-11 standards pages |
+| File-name components (this section) | **CamelCase** | the file-name standard, unsuperseded |
+
+The likely resolution is that these are **ontology property names, not `%%` variable spellings**
+— §2c.1's own mapping is CamelCase name → UPPER_SNAKE column → `ex:` term, three namespaces per
+row by design, and the source's perspective table gives the *Control-M* spelling of the same
+concepts as `%%FILENAME` / `%%BDATE`, uppercase. But the section that names them is titled
+"Recommended **Variable Name** Standard", so the source does call them variables.
+
+**Do not resolve this by normalizing.** Control-M is case-sensitive at execution, which is
+exactly why NFR-CTM-001 §9 rejected case folding: silently upper-casing a name merges bindings
+the estate may have intended to keep distinct. The ruling is which namespace each name belongs
+to, and it belongs with the Phase-1 template ratification alongside §2b.7's prefix migration.
+
+### 2c.4 Relation to the legacy pattern §3 warns about
 
 §3's hazard #1 is dot-smuggling — a literal dot stored as a variable value so the concatenation
 operator does not eat it. This standard is the structural answer: name each component, derive
