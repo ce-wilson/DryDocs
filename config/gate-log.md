@@ -2612,3 +2612,102 @@ than by this gate.
 **Nothing is applied.** The `tom_roles` scheme keeps its 7 concepts, both loader crosswalks are
 unchanged, `config/precedence.yaml` gains nothing yet, and no node class is created. Each follow-up
 lands as its own logged change after this gate is signed.
+
+## 2026-08-11 — RECORD: TOM roles (G35), walk rounds 2 and 3 — the register is ruled, and multiplicity turns out to be geography
+
+**Gate:** `tom-roles-enumeration-and-cardinality` (backlog G35) · **still UNSIGNED** — a RECORD
+entry. Eight further clauses confirmed at the same live walk; §H2 governs and nothing is applied.
+Continues the round-1 entry above.
+
+### The four modelling rulings
+
+- **§A2 / §G5 / §G12 RULED — RISK MANAGER AND `technology_risk_controls` ARE ONE CLASS.** The SEAL
+  extract's `Risk Manager` is the source's own name for the concept the scheme seeds as
+  `technology_risk_controls`; the crosswalk gains that branch. This closes both halves of the
+  longest-standing arithmetic problem on the page at once — the orphan concept nothing could write
+  gains a source, the orphan source name flagged unmapped on every load gains a concept, and §A5b's
+  count closes. **The ServiceNow evidence is what made this rulable:** Technology Risk & Controls is
+  a LIVE role type with a LIVE holder there, so the class is not a fiction of our scheme, and ruling
+  it required (below) no longer puts every application in breach on the first run.
+- **§E4 RULED — THE ANCESTOR IS A MODELLED EDGE, not a property.** Following the §E ruling that
+  inheritance is computed from authored rows, the lineage is load-bearing and the ancestor is a real
+  node. An edge makes "why does this application show a different owner than its parent" TRAVERSABLE,
+  which is precisely what §D2 says an operator cannot do today. The ancestor CIs this requires are
+  the same ones §E already commits the pull to taking.
+- **§C6 RULED — THE DENOMINATOR IS APPLICATIONS THE SOURCE ACTUALLY COVERED.** The completeness
+  graph-test runs only where a feed asserted something. An application no feed mentioned is a
+  CAPTURE gap and is reported separately, exactly as §C6 warned: a capture gap wearing a roster
+  gap's costume produces a noisy check, and the first response to a noisy check is to weaken it.
+- **§F3 / §F4 RULED — A NEW DEDICATED FILE, AND THE ORPHANED LIST IS DELETED.** The declared
+  vocabulary takes its own `config/taxonomy/` file, holding both registers (§A), `Scope`, `Type`,
+  the `required` flag and retirement state, with a reader and a drift guard. `roles:` in
+  `config/taxonomy/business-application.yaml` — read by NO code, and the surface that drifted twice
+  inside one gate without a test noticing (§A1b) — is **deleted**, not reinterpreted. §F3 named
+  leaving both as the one outcome to refuse.
+
+### The register (§G) — fourteen lines ruled
+
+**REQUIRED** (the application must carry at least one holder): **G1** Application Owner · **G2**
+Primary Information Owner · **G3** Backup Information Owner · **G4** CTO · **G5** Technology Risk &
+Controls · **G6** Design Authority · **G11** Backup Application Owner · **G16** Site Reliability
+Engineer.
+
+**OPTIONAL**: **G7** L1 Operate Manager · **G8** L2 Operate Manager · **G9** Operate Manager (bare) ·
+**G10** Chief Business Technologist *(ruled 2026-08-06)* · **G13** Deployment Owner · **G14**
+Deployment Information Owner · **G15** Application Module Owner.
+
+**G12** Risk Manager does not take a line of its own — it resolves into G5 per §A2 above.
+
+**G13/G14/G15 also gain their SUBJECT**, which §G15 asked for before required-ness could be ruled:
+the **Deployment Module** CI. The positional "these are optional" note from 2026-08-06 is now
+confirmed explicitly rather than left to be inferred from where it sat in a list.
+
+### Two riders on the register that are not ticks
+
+- **G5 CARRIES A CAVEAT, recorded rather than absorbed: the mapping between the SEAL risk role and
+  the ServiceNow groups is NOT KNOWN, and the direction is to implement the simplest thing that
+  works.** So G5 is required as a CLASS, and the loader should crosswalk `Risk Manager` to it and
+  stop there — no group resolution is designed for it in this gate. Note the ServiceNow evidence
+  shows Technology Risk & Controls held by an INDIVIDUAL, not a group, which is consistent with
+  there being no group mapping to find. **Open until confirmed.**
+- **G16 SRE was ruled REQUIRED, and its KIND question (§G16: accountable role, or a staffing fact
+  recorded on the same extract?) was not separately answered.** Ruling it required implies
+  accountable — a staffing fact would not belong in a completeness report. Recorded as an inference
+  to confirm, not as a ruling made.
+
+### §G7/§G8/§G9 — the answer explains the multiplicity, and the model has nowhere to put it
+
+The three Operate Manager classes are **OPTIONAL**, and the reason given is the finding:
+
+> *"In our apps there could be 1, 2, 3 depending on when coverage is needed"* — the holders differ by
+> **coverage window and geography** (an L2 in one region, an L2 in another).
+
+**This is a THIRD explanation for a multi-holder role class**, and the page had only two. §B1 says
+cardinality is one-or-more; §D2 asks how an operator can tell whether five holders means one roster
+with five people or two rosters disagreeing; §E adds inheritance as a third source of apparent
+duplication. Now there is a fourth, and it is the most benign and the most invisible: **the holders
+are genuinely different people covering different regions or hours, and nothing in the model records
+which.** An operator asking "who is the L2 Operate Manager" gets three names and no way to know that
+the right answer depends on the time of day.
+
+**Recorded as a candidate, not ruled:** a region / coverage-window qualifier on the holding. It is
+not in scope for this gate, it is not in the SEAL extract, and whether ServiceNow carries it is
+unknown. But §C4's completeness check counts to one and stops, which means it cannot tell a genuine
+24h gap from a satisfied one — and that is exactly the kind of finding that check exists to make.
+
+### And a second dimension, from the same answer
+
+> *"We created 4 HPSM technician queues so that when we had 4 support teams covering different
+> platforms the incidents would route to the correct team and associate with the correct business
+> application — but we are on the path to consolidate teams again."*
+
+Two things follow, both outside G35 and both worth having on the record. **The company crosswalk's
+per-platform `l2` array is not a modelling choice, it is a routing artifact** — the queues were split
+by PLATFORM so incidents reach the right team and bind to the right application. And **that split is
+being consolidated**, so the tier/platform dimension in the hand-verified crosswalk is in flux. Any
+model built to mirror four queues will be modelling a transitional state. This belongs to
+`snow-hpsm-queue-to-group` (see §9 of the K21 evidence doc and RELAY-6), and it strengthens the
+round-1 decision not to mint a competing shape here.
+
+**Nothing is applied.** The scheme keeps its 7 concepts, both loader crosswalks are unchanged, the
+new vocabulary file does not exist yet, and no graph write is authorized.
