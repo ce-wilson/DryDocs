@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T11:57:45",
+    "captured_at": "2026-08-11T12:52:11",
     "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2d6cbb4",
-      "full": "2d6cbb4c52de62c5f5a0e6137fd0169175500298",
+      "commit": "dbb57e2",
+      "full": "dbb57e2598272d25afb9ad9ab662d5141e134149",
       "branch": "main",
-      "describe": "port-base-20260810b-49-g2d6cbb4",
-      "subject": "backlog(remediation): G69 — R41-R44 registered AND detected in one change",
+      "describe": "port-base-20260810b-54-gdbb57e2",
+      "subject": "backlog(controlm): G70 + G71 ΓÇö the two mechanism back-flows the XML capture identified",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -13004,6 +13004,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/controlm-config/reference/controlm-xml-processor-capture.md",
+      "name": "controlm-xml-processor-capture.md",
+      "extension": ".md",
+      "rel_path": "internal/controlm-config/reference/controlm-xml-processor-capture.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/datalens-reference",
       "name": "datalens-reference",
       "extension": "",
@@ -13670,10 +13679,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-1141.json",
-      "name": "drydocs-20260811-1141.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "name": "drydocs-20260811.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-1141.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28249,6 +28258,11 @@
       "drydocs/internal/controlm-config/reference/controlm-refined-fanout-capture.md"
     ],
     [
+      "drydocs/internal/controlm-config/reference",
+      "CONTAINS",
+      "drydocs/internal/controlm-config/reference/controlm-xml-processor-capture.md"
+    ],
+    [
       "drydocs/internal/datalens-reference",
       "CONTAINS",
       "drydocs/internal/datalens-reference/HL-Datalens-ui-dataflow.png"
@@ -28596,7 +28610,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-1141.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -30573,13 +30587,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1652,
+    "files": 1653,
     "edges": 899,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1923,
+    "rels": 1924,
     "directories": 272
   }
 }
