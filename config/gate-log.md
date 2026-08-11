@@ -2711,3 +2711,75 @@ round-1 decision not to mint a competing shape here.
 
 **Nothing is applied.** The scheme keeps its 7 concepts, both loader crosswalks are unchanged, the
 new vocabulary file does not exist yet, and no graph write is authorized.
+
+## 2026-08-11 — GATE: tom-roles-enumeration-and-cardinality (G35) — SIGNED OFF
+
+**Gate:** `tom-roles-enumeration-and-cardinality` (backlog G35) · **SIGNED OFF** at a live SME walk,
+2026-08-11. Sections A–H ruled. The two RECORD entries above this one carry rounds 1–3 in full and
+are not repeated; this entry closes the remaining clauses, states the residuals, and names the
+follow-up set.
+
+**Subject — the statuses this entry flips:** `tom-roles-enumeration-and-cardinality` UNSIGNED →
+SIGNED OFF. It AMENDS §B of `seal-tom-attribution-reshape` (signed 2026-07-10, applied at K4
+2026-07-15); the original ruling stays readable and this amendment states what changed. It does NOT
+reopen the business-application-identity fence (§A1, 2026-07-27), the attribution_id 4-part key, the
+ATTRIBUTION_TIERS vocabulary, or K5/K6's Product Cabinet family.
+
+### The closing rulings
+
+- **§A3 / §F4 RULED — ADMIT FLAGGED, AND `SealRole` IS RETIRED AS THE ADMISSION GATE.** An
+  unrecognised role name LOADS, flagged undeclared, and surfaces on the review page — the existing
+  `unmapped_role` precedent used on purpose. The enum stops being the gate, because an enum cannot
+  admit a name declared at load (§F1); it is demoted to an alias convenience. `_ROLE_CANONICAL`
+  survives either way, since alias tolerance is a separate concern from vocabulary membership — and
+  it is where the §A4 and §A6 defects actually lived. **This reverses today's behaviour, which
+  silently costs four of the SME's thirteen classes (§A1d measured it).**
+- **§B7 RULED — THE DEFERRAL GETS AN OWNER.** A backlog item is groomed for employee-hierarchy
+  placement, so §B7 defers TO something rather than at nothing. The finding stands as written:
+  `:Employee` has no Employee-to-Employee edge anywhere in the vocabulary, no `REPORTS_TO`, and until
+  now no item that would create one.
+- **§G9 DEFINED — and the definition arrives with a live correction attached.** The bare Operate
+  Manager class is **defined by RESPONSIBILITY SCOPE, not by level**: it covers **change, problem and
+  incident resolution**. That is what distinguishes it from L1 and L2, which are levelled coverage
+  tiers. §A5c asked for exactly this and can be closed.
+
+  **THE CORRECTION IS THE MORE IMPORTANT HALF, and it is a caveat on the data rather than on the
+  model.** The SME reports the assignments are currently **wrong in a known way** — the team is
+  recorded as carrying responsibilities it does not own — and is working with the owners to scope it
+  so the team holds L1, L2 or OM **only for platforms it owns**. So **the TOM Operate Manager
+  assignments are mid-correction at source.** Any load taken now captures a state that is being
+  actively changed. This does not block the gate: the MODEL is what is signed here, and a model that
+  can represent the corrected state can represent the current one. But it means (a) the first load's
+  Operate Manager rows should not be treated as a baseline to reconcile against, and (b) §C4's
+  completeness report will produce findings that are real defects being fixed elsewhere, which the
+  report should say rather than imply DryDocs found them.
+
+### Residuals — signed WITH these open, deliberately
+
+1. **G5 Technology Risk & Controls is required, and the SEAL-risk ↔ ServiceNow-group mapping is NOT
+   known.** Direction: simplest thing that works — crosswalk `Risk Manager` to the class and stop; no
+   group resolution is designed for it here. Consistent with the evidence, which shows the role held
+   by an INDIVIDUAL. Confirm if that changes.
+2. **G16 SRE is required; its KIND was not separately ruled.** Required implies accountable, since a
+   staffing fact would not belong in a completeness report. Recorded as an inference.
+3. **`tom-subject-class` is unresolved and is settled by a query, not a ruling** — `GROUP BY
+   cmdb_ci.sys_class_name` over the TOM rows says whether the subject is a business-application CI
+   or a deployment-module CI. §G0e's fork turns on it. Signed without it because every ruling here
+   is about the register and its attributes, none of which move on the answer.
+4. **A REGION / COVERAGE-WINDOW QUALIFIER IS A CANDIDATE, NOT A RULING** (rounds 2–3 entry). Operate
+   Manager multiplicity is geography, and nothing records which holder covers which region. §C4
+   counts to one and stops, so it cannot distinguish a genuine 24h gap from a satisfied one.
+5. **The replica's completeness is unconfirmed** (K21 open question 9). Every ruling here is about
+   SHAPE, which survives a partial copy; counts do not — and §C4's report is a count by construction.
+
+### The follow-up set
+
+**§H3's rule holds: the vocabulary reshape lands as ONE unit**, because the surfaces are mutually
+inconsistent if it lands piecemeal. Groomed as **G70**. The genuinely separable pieces are **G71**
+(completeness report + graph-test), **G72** (three-valued surface discriminator + the precedence
+order), **G73** (inheritance: assertion mode, modelled ancestor edge, and the ancestor-CI pull
+widening), and **G74** (employee-hierarchy placement, §B7's new owner). K21 §7.4 is amended by G73
+rather than stretched in silence.
+
+**Nothing is applied by this entry.** Every surface named above changes in its own logged commit
+under the items just listed. No graph write is authorized by signing.
