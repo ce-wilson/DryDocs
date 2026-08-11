@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-10T09:27:47",
-    "date": "20260810",
+    "captured_at": "2026-08-11T00:33:35",
+    "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "75b4855",
-      "full": "75b4855b9a687d9a5bb2ed86e930bea0270505a2",
+      "commit": "5613ea0",
+      "full": "5613ea0a38c19b43409116fbcc94ad4fc730130c",
       "branch": "main",
-      "describe": "port-base-20260810b-14-g75b4855",
-      "subject": "docs(reference): L28 done — register KGoT, and give the executive overview cited references",
+      "describe": "port-base-20260810b-29-g5613ea0",
+      "subject": "feat(controlm): C29 + G66 — capture the job-metadata standards, publish the token register, open the DESCRIPTION read seam",
       "dirty": false,
-      "untracked_present": true,
+      "untracked_present": false,
       "pr": null
     },
     "depgraph": {
@@ -8594,10 +8594,28 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/PROTOCOL-sonnet-20260811.md",
+      "name": "PROTOCOL-sonnet-20260811.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/PROTOCOL-sonnet-20260811.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/PROTOCOL.md",
       "name": "PROTOCOL.md",
       "extension": ".md",
       "rel_path": "docs/reviews/graph-vs-files-experiment/PROTOCOL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/haiku-agent-traversal-experiment-20260810.html",
+      "name": "haiku-agent-traversal-experiment-20260810.html",
+      "extension": ".html",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/haiku-agent-traversal-experiment-20260810.html",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8610,6 +8628,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/prompts/coding-shared-o31.md",
+      "name": "coding-shared-o31.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/prompts/coding-shared-o31.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/prompts/coding-shared.md",
@@ -10565,6 +10592,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql",
+      "name": "servicenow_relationship_open_questions.sql",
+      "extension": ".sql",
+      "rel_path": "drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/sql/controlm_app_facts.sql",
       "name": "controlm_app_facts.sql",
       "extension": ".sql",
@@ -11496,6 +11532,15 @@
       "name": "__init__.py",
       "extension": ".py",
       "rel_path": "drydocs_core/orchestration/controlm/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/orchestration/controlm/description_tokens.py",
+      "name": "description_tokens.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/orchestration/controlm/description_tokens.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12734,6 +12779,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/internal/controlm-config/reference/controlm-job-metadata-standards-capture.md",
+      "name": "controlm-job-metadata-standards-capture.md",
+      "extension": ".md",
+      "rel_path": "internal/controlm-config/reference/controlm-job-metadata-standards-capture.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/controlm-config/reference/controlm-pipeline-stub-capture.md",
       "name": "controlm-pipeline-stub-capture.md",
       "extension": ".md",
@@ -13400,10 +13454,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260810-0437.json",
-      "name": "drydocs-20260810-0437.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260810.json",
+      "name": "drydocs-20260810.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260810-0437.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260810.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14637,6 +14691,15 @@
       "name": "test_depgraph_snapshots.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_depgraph_snapshots.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_description_tokens.py",
+      "name": "test_description_tokens.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_description_tokens.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15933,15 +15996,6 @@
       "name": "GraphSvg.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/GraphSvg.tsx",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/web/src/components/HeroArt.tsx",
-      "name": "HeroArt.tsx",
-      "extension": ".tsx",
-      "rel_path": "web/src/components/HeroArt.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18641,6 +18695,10 @@
     [
       "drydocs/tests/unit/test_database_names.py",
       "drydocs/drydocs_lineage/writer.py"
+    ],
+    [
+      "drydocs/tests/unit/test_description_tokens.py",
+      "drydocs/drydocs_core/orchestration/controlm/description_tokens.py"
     ],
     [
       "drydocs/tests/unit/test_design_doc.py",
@@ -25564,7 +25622,17 @@
     [
       "drydocs/docs/reviews/graph-vs-files-experiment",
       "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/PROTOCOL-sonnet-20260811.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment",
+      "CONTAINS",
       "drydocs/docs/reviews/graph-vs-files-experiment/PROTOCOL.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/haiku-agent-traversal-experiment-20260810.html"
     ],
     [
       "drydocs/docs/reviews/graph-vs-files-experiment",
@@ -25575,6 +25643,11 @@
       "drydocs/docs/reviews/graph-vs-files-experiment",
       "CONTAINS",
       "drydocs/docs/reviews/graph-vs-files-experiment/results"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/prompts",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/prompts/coding-shared-o31.md"
     ],
     [
       "drydocs/docs/reviews/graph-vs-files-experiment/prompts",
@@ -26682,6 +26755,11 @@
       "drydocs/drydocs/loaders/sql/adhoc/profile_cm_hosts.sql"
     ],
     [
+      "drydocs/drydocs/loaders/sql/adhoc",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql"
+    ],
+    [
       "drydocs/drydocs/loaders/sql/ddl",
       "CONTAINS",
       "drydocs/drydocs/loaders/sql/ddl/controlm_staging_ddl.sql"
@@ -27100,6 +27178,11 @@
       "drydocs/drydocs_core/orchestration/controlm",
       "CONTAINS",
       "drydocs/drydocs_core/orchestration/controlm/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_core/orchestration/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/orchestration/controlm/description_tokens.py"
     ],
     [
       "drydocs/drydocs_core/orchestration/controlm",
@@ -27759,6 +27842,11 @@
     [
       "drydocs/internal/controlm-config/reference",
       "CONTAINS",
+      "drydocs/internal/controlm-config/reference/controlm-job-metadata-standards-capture.md"
+    ],
+    [
+      "drydocs/internal/controlm-config/reference",
+      "CONTAINS",
       "drydocs/internal/controlm-config/reference/controlm-pipeline-stub-capture.md"
     ],
     [
@@ -28104,7 +28192,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260810-0437.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260810.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -28725,6 +28813,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_depgraph_snapshots.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_description_tokens.py"
     ],
     [
       "drydocs/tests/unit",
@@ -29554,11 +29647,6 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
-      "drydocs/web/src/components/HeroArt.tsx"
-    ],
-    [
-      "drydocs/web/src/components",
-      "CONTAINS",
       "drydocs/web/src/components/IntakeStepper.tsx"
     ],
     [
@@ -30061,13 +30149,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1619,
-    "edges": 890,
+    "files": 1625,
+    "edges": 891,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1889,
+    "rels": 1895,
     "directories": 271
   }
 }
