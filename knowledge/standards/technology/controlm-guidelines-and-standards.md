@@ -314,6 +314,30 @@ order. The number *reflects* the flow; conditions *enforce* it, and the two must
 **SHOULD**: leave gaps (0010, 0020, 0050) so a step can be inserted without renumbering every
 downstream job, its conditions and its escalation rows.
 
+### 5.5 The folder holds the whole process — channel is a **job** fact
+
+**MUST NOT** split a flow across folders so that each folder's name becomes true about where its
+jobs run. A flow that begins with an on-prem file watcher and ends in an S3 zone is **one folder**:
+the watcher, the placement and the trust ingestion succeed and fail together, and they are one thing
+to monitor.
+
+**Channel is stated once, per job, in the `{CHANNEL}` slot** (§5.4). The generator hardcodes `_AWS_`
+into every name it emits, which is why deployed on-prem watchers carry a name that misdescribes
+them. That is a defect in the grammar — the reason `{CHANNEL}` is a slot — and **not** an argument
+for a second folder.
+
+Two audiences read the folder, and both are served by keeping it whole:
+
+- **The Control-M operator** monitors folders. Seeing one logical process in one place beats
+  tracing it across neighbours.
+- **The SRE** reads folder placement as *where this runs*. It is a heuristic, and on a mixed flow it
+  is partly wrong — but splitting folders to make the heuristic literal spends monitoring legibility
+  to buy an approximation.
+
+**The graph already carries the exact answer**, per job: channel, host, zone, and the
+FW → PLCT → TRUST chain that joins them. That is what the folder name was being asked to approximate,
+and it no longer has to.
+
 ---
 
 ## 6. Job types
