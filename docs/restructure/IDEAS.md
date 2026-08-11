@@ -62,17 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-106`** · 2026-08-11 · `[bug]` · **open** · prio? **Low** —
-  **`test_loader_run_log.py::test_naming_convention_and_collision_suffix` is clock-flaky.**
-  It calls `claim_log_path()` twice and asserts the second gets the `-2` collision
-  suffix — but the suffix only appears when both calls land in the SAME second, since
-  the name is stamped `YYYYMMDD-HHMMSS`. If the clock ticks between the two statements
-  the second call gets a fresh timestamp and no suffix, and the assertion fails.
-  Observed failing once and passing on the immediately following identical run
-  (2026-08-11, desktop, during the C30/G67 close-out). Fix: freeze the clock for the
-  two calls rather than racing it — the collision behaviour is what is under test, not
-  the timestamp.
-
 - **`Idea-105`** · 2026-08-11 · `[question]` · **open** · prio? **High** —
   **Two things claim the same 4000-char Control-M `DESCRIPTION` field on generated
   objects, and they cannot both hold.** The DPL generator stamps two literal strings
@@ -94,6 +83,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   silently. Sibling finding: REQ-3 in the same capture reintroduces the dot-smuggling
   pattern (`…%%$NEXT..tok`) that the description-metadata plan §3 lists as hazard #1 —
   so the practice is not extinct in the *standards*, not just in the legacy estate.
+  **CHECKED AT THE 2026-08-11 GROOM — still open, and already carried in two places, which is why no item was minted.** C29's notes record the collision verbatim, and it rides `config/gate-prompts/email-dl-contact-point.yaml` as rider §G6 so a section-C ruling cannot presume an exit silently. There is still NO backlog item landing the stub plan's E1, so there is nothing to merge into; the three exits (exempt generated objects, fold the literal in as a `GENERATED_BY:` token, or move the discriminator off `DESCRIPTION`) have materially different costs on an estate that is mostly generated objects, so this is a user/SME ruling at that gate rather than a groom decision.
 
 - **`Idea-104`** · 2026-08-11 · `[question]` · **open** · prio? **Med** —
   **The MFT route id changed shape between the field observation and the standard, and
@@ -110,168 +100,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   problem, worth ruling together: `SourceSnowQueue` (the *source system's* queue,
   populated in production) and `PDN_SNOW_QUEUE` (the *downstream consumer's* queue,
   `NULL` in the standard) are DIFFERENT SUBJECTS that a naive key mapping would merge.
-
-- **`Idea-103`** · 2026-08-10 · `[bug]` · **open** · prio? **Low** —
-  **Five more unclosed markdown fences live outside the `docs/**` guard, in files this
-  repo did not author.** The J41 sweep that found the `port-prompt.md` defect
-  (`84ed7e3`, live five days and four ports) scanned all 507 tracked `.md` files and
-  found six. One was ours and is fixed (`docs/decisions/0002` carried an orphan trailing
-  fence). `tests/unit/test_markdown_fences.py` now guards `docs/**`. The rest were left
-  DELIBERATELY, and the reason is the interesting part: `internal/fcdo-reference/`
-  CONFLUENCE-TRANSCRIPT.md (opens 5140 of 5355) and TRANSCRIPT-1-ONTOLOGY.md (419 of
-  568) are CAPTURED transcripts, and `.claude/skills/data-context-extractor/references/`
-  is vendored skill material — editing either to satisfy a guard means editing somebody
-  else's capture, which is a provenance decision rather than a formatting one.
-  `SDLC-Docs/extracted/issue-driven-capture-loop.md` (181 of 181) is a trailing orphan
-  and probably safe. DECIDE: widen the guard with an explicit capture carve-out, or
-  leave captures unguarded and say so where the boundary lives.
-
-- **`Idea-102`** · 2026-08-09 · `[question]` · **open** · prio? **High** —
-  **The deployment grain has an SME-confirmed cardinality and no home — DryDocs has one
-  concept where the source has two.** K21 found `u_seal_deployment_id` sitting beside
-  `u_seal_application_id` on the CSDM Application Service row (`cmdb_ci_service_discovered`),
-  never on `cmdb_ci_business_app`. The SME then confirmed it directly: **one application,
-  multiple deployments is correct**, with the identifier reading as
-  `app_id(seal_id):deployment_id`. That closes the condition C10's gate-bound candidate #1 was
-  deferred on ("only when an environment-level use case lands"). **THE SAME SESSION ALSO SUPPLIED
-  THE CAVEAT THAT SHRINKS IT, and the caveat is the more valuable half:** *everything we map is
-  off the **application**; modules are referenced by default for changes but in practice are not
-  used as intended.* So the grain is ruled — attribution stays on the application,
-  `seal-tom-attribution-reshape`'s subject does NOT move, and `:BusinessApplication` is correct
-  as-is. What survives is much smaller than it first looked: **capture an identifier the source
-  carries and we discard**, not re-home attribution. Worth writing down precisely because the
-  expensive reading was the plausible one — this repo's grain corrections (K1/K2, and the
-  2026-07-22 move of SEAL attribution from job level to the folder→batch `:Port`) are exactly the
-  shape this looked like for about an hour. **What is left.** (1) **The key, and it still
-  blocks.** If the deployment id is scoped under the application id, a bare `deployment_id` is
-  NOT a business key and a loader keying on it alone MERGEs distinct deployments together — the
-  identity-gate §D2 / §C3 failure on a new axis. **UPDATED 2026-08-10 — the SME supplied the CI
-  topology and it answers the key question and renames the thing.** The CI class is the
-  **Deployment Module**: `Business Application [Instantiates] Deployment Module`, inverse
-  `[Instance of]`, and above it `[Contained by] area product`. Each Deployment Module carries its
-  OWN unique CI id, so the CI id is the key and `app_id:deployment_id` is the human-readable name
-  — which is itself the proof the deployment id is scoped, since a globally unique id would not
-  need the application in its name. **"Deployment" and "module" are ONE thing**, which means G35's
-  G13 (Deployment Owner), G14 (Deployment Information Owner) and G15 (Application Module Owner)
-  plausibly share ONE subject and could resolve together rather than one register line at a time.
-  **A CORRECTION THIS ENTRY MUST CARRY, because its first version had it backwards:** the module
-  reference being a form default applies to TRANSACTIONAL records — a Change, an Incident or a KB
-  article must name a deployment module, ServiceNow defaults it, and people accept the default. The
-  Deployment Module CI ITSELF is real, with its own id, its own place in the chain, and KB articles
-  attached. So the grain is sound and only the *counting of transactions per module* is not; the
-  earlier conclusion that §G15 needed no grain would have discarded a real CI class on the strength
-  of a defaulted foreign key. (2) **The label**, if we capture it: C10's standing advice holds —
-  adopt the CONCEPT, pick our own stable name, since the vendor's own label moved (Application
-  Service → Service Instance at Yokohama), and this instance's own inverse label (`Instance of`)
-  already differs from the one public material uses (`Instantiated by`). (3) **A rider on an
-  existing gate, not its own gate** — nothing changes an attribution subject. **AND A SEPARATE
-  THREAD WORTH ITS OWN ITEM:** KB articles link at Deployment Module grain and the SME called them
-  "more meaningful." A documented fix attached to the deployment that has the incident is squarely
-  what a production-support knowledge graph is for; it would promote the `kb_*` family from ring 3
-  to a real candidate. Check first whether the KB→module link is asserted or defaulted, since the
-  defect above would hit it identically. Evidence, and open questions 8 + 9:
-  `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
-
-- **`Idea-100`** · 2026-08-09 · `[bug]` · **open** · prio? **High** —
-  **The manifest has no way to say "gate-bound" — and that gap nearly shipped an unsigned
-  gate's ontology.** The best finding in PORT-REPORT-0d3761a9, caught company-side by their
-  own re-check rather than by any guard: their initial vocabulary reconcile ACTIVATED the
-  G55 `rua-load-shapes` lineage flips, because K8 (`seal-app-ref-edge-reshape`) *is* signed
-  company-side and the files looked takeable. `rua-load-shapes` is a DIFFERENT gate and is
-  still unsigned there. They reverted all three vocab fragments; the G23/rua code ported
-  inert because it is gate-bound and refuses `planned` labels — so the code's own guard
-  caught what the manifest did not. **The rule they wrote down is the one this repo should
-  encode: "identical to base" and "per-entry equivalent" are BOTH insufficient tests for a
-  gate-bound file.** A producer vocabulary or test file can be byte-identical to the port
-  base and still assume an active gate the consumer has not signed — status/id-set parity is
-  not field-and-gate parity. Today `PORT-MANIFEST.yaml` expresses disposition (who wins) but
-  nothing about PRECONDITION (what must be signed first), so
-  `drydocs_core/ontology/relationship_vocabulary/**` carries a disposition that is right
-  whenever the gates agree and dangerous exactly when they do not. Shape of the fix: a
-  `gate_bound:` key on those rows naming the gate id, and a reconcile-time check that
-  refuses to activate an entry whose gate is unsigned on the RECEIVING side. Note the near
-  miss honestly — this was caught by a human re-reading their own work, which is not a
-  control.
-
-- **`Idea-101`** · 2026-08-09 · `[question]` · **open** · prio? **Low** —
-  **Does the manifest vocabulary need a `derived` disposition?** Raised by the company's
-  send-back on the two roadmap rows and deliberately not settled unilaterally. Derived
-  renders — `docs/plan/board.html`, `docs/plan/roadmap.html`, the design-doc `.html` — all
-  carry `disposition: canonical-company`, which is a poor fit: there is no authored consumer
-  content to be canonical about, and the actual instruction in every one of their notes is
-  REGENERATE from the reconciled tree. `canonical-company` and "regenerate" differ in a way
-  that matters — the first says *keep what you have*, and keeping a stale render is as wrong
-  as taking the producer's. The `roadmap.yaml` row had the same class of defect and was a
-  clear enough case to fix outright (`evaluate` → `per-entry`, since its note already
-  prescribed a deterministic rule); this one is not, because splitting a single row away
-  from the board.html precedent would create a worse inconsistency than the imprecision.
-  Decide it across all the derived rows at once, or leave it and say why in the manifest.
-
-- **`Idea-98`** · 2026-08-09 · `[chore]` · **open** · prio? **Med** —
-  **The adhoc Ab Initio version loader — the build C25 authorized and deliberately did not do.**
-  Gate `software-version-context` signed the shape and nothing else:
-  `reg_appuser_uses_software` is registered `status: planned`, no loader exists, and the
-  `adhoc-sme-email` corpus stays `confirmed: false` for that reason alone. The build is:
-  the loader itself (MERGE key `{source, install_path}`, edge properties per §B3, `as_of`
-  from the email's sent date), the `:Document` minted from a hand-recorded citation, the
-  `evidence:` block's `as_of` filled in on the `abinitio` product row, registration in
-  `config/manual-loads/manifest.yaml` per §E4, and the §C1 install-path pattern rows in the
-  `invocation_patterns` shape. **Settle §Q3 before writing the MERGE key, not after** —
-  the gate deferred it with the consequence stated: if the estate re-points installs by
-  symlink, `install_path` is a poor key and identity moves to `(fid, version)`, which is a
-  re-key rather than an edit. Two things this build must NOT do: write the §F
-  application-level rollup (blocked on K17, and not behind a flag), and auto-append observed
-  versions to the curated `versions:` list (§C2).
-
-- **`Idea-99`** · 2026-08-09 · `[chore]` · **open** · prio? **Med** —
-  **Port relay owed: the producer is now canonical for the DPL and Snowflake registry
-  entries.** C25 registered the `dpl` and `snowflake` product rows, the `in-house` vendor
-  (no `publisher_url`, guard narrowed to third-party vendors), and the acronym
-  `DPL: "Data Pipeline Library"`. The SME began the same expansion company-side on
-  2026-08-07 and **stopped so the two copies would match** — so this is a deliberate
-  producer-first divergence with a waiting consumer, exactly the shape of the standing AIS
-  acronym relay (R1), whose lesson applies here too: that expansion had to be carried
-  ACROSS FILES rather than same-file overwritten, and this one may as well. Deliberately
-  NOT written into `docs/port-prompt.md` at the time it arose, because a port was in flight
-  against a fetched head and that file is a hand-merge surface — a relay added mid-port
-  lands in someone's conflict resolution instead of their checklist. **Add it once that
-  port merges**, together with the other post-port items (the staged clean-add rows, the
-  ledger roll, striking R4).
-
-- **`Idea-96`** · 2026-08-09 · `[chore]` · **open** · prio? **High** —
-  **The backlog union rule has no guard: nothing asserts that after a port the consumer's
-  item-id set is a superset of the producer's at the port base.** `PORT-MANIFEST.yaml`
-  states the rule unconditionally for `docs/restructure/backlog.yaml` — *"Union the items;
-  NEVER regress a status … or drop an entry"* — and `tests/unit/test_backlog.py` enforces
-  plenty about the file (schema, roll-up arithmetic, `next_ready`, unknown `depends_on`),
-  but every one of those checks looks at ONE copy in isolation. The union is a claim about
-  TWO copies, and no check ever compares them, so a port that quietly under-delivers items
-  leaves both sides internally consistent and passing. Textbook J26: a rule written in
-  prose and enforced by nobody, which is exactly the shape that survives unnoticed —
-  surfaced during a reconcile, where items present in the producer at the port base turned
-  out to be absent downstream and neither side's suite had anything to say about it. Note
-  the near-miss that makes this worse than it sounds: the dependency guard would have
-  caught it *if* any surviving item had depended on a missing one, so whether the gap is
-  visible at all is luck, not design. Shape of the fix: a port-time check (not a unit test
-  — the producer tree cannot see the consumer's) that diffs the two id sets at the recorded
-  port base and fails the port report on a non-empty producer-minus-consumer difference,
-  with a named allow-list for ids deliberately not carried. Cheap, and it converts the
-  union rule from a promise into an assertion. Mechanism only — the numbers and ids from
-  the occurrence stay in the port report, not here.
-
-- **`Idea-97`** · 2026-08-09 · `[bug]` · **open** · prio? **Low** —
-  **The review plan's doc-coverage baseline is two package generations stale — same disease
-  U18 just fixed one table over.** `docs/reviews/code-graph-review-plan.md` Phase 3 unit 3
-  still reads *"Six scan roots × DesignDoc coverage"* with per-root counts (`tests` 85,
-  `drydocs` 41, `drydocs_core` 35, `lineage` 12, `remediation` 7, `deepdoc` 3) that predate
-  BOTH `drydocs_api` and `drydocs_docmeta`. U18 widened the A1–A6 metric scope to eight
-  package roots and guarded the typed list against `pyproject.toml`, but that guard is
-  anchored on the `$packages` literal and this unit hard-codes its own root list in prose,
-  so it was out of the guard's reach and out of U18's stated surface. Left deliberately
-  rather than swept in. Fix is small: restate the unit on eight roots, re-measure the
-  per-root doc coverage, and decide whether the count belongs in prose at all or should be
-  derived like the metric scope now is — the third hand-typed root list in the same
-  document is the argument for deriving.
+  **CHECKED AT THE 2026-08-11 GROOM — still open, and now half-answered.** C30 (done, 2026-08-11) retires the INBOUND/OUTBOUND route pair ON WATCHERS, because a watcher is inherently inbound, and drops `PDN_SNOW_QUEUE` from the job token set — so the directional-pair half and the two-queues half both narrow. What C30 did NOT rule, and what still needs the SME, is the one this entry was raised for: whether the real route id is the numeric `372399` or the `MFTS_RT_*` string, which decides both what C16's single `mfts.routeId` prefix target points at and what a `dprod:DataProductPort` is keyed on. NOT groomed into an item, deliberately: the two readings lead to different prefix governance and a different port key, and a groom cannot pick between them.
 
 - **`Idea-93`** · 2026-08-08 · `[chore]` · **groomed → executed IN PLACE at the 2026-08-09 groom (14 stale `inputs:` fixed in backlog.yaml) + merged → L19 (the design-doc half); the E1 status question STAYS OPEN — user call** · prio? **High** —
   **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,
@@ -388,7 +217,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Registry schema change → gate territory; groom toward the config layer.
   (Source: company `gate-log.md` standing-divergence entry + PORT-REPORT-a14a8028
   fix close-out, ledgered in docs/port-prompt.md.)
-
 
 - **`Idea-79`** · 2026-08-06 · `[idea]` · **groomed → J34 (2026-08-07)** · prio? **Med** —
   **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering
@@ -580,6 +408,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   tier-1 rows and dropping it would let a blank target through as an ordinary attribution. Severity:
   the loader is correct, the gate is correct, the WRITE PATH is the gap; nothing is mis-written today
   because no producer-side platform code has been authored yet.
+
 - **`Idea-68`** · 2026-08-05 · `[question]` · **merged → K18** · prio? **Low** —
   **"tier" names three different things — but the VALUE SPACES do not
   collide, so this is naming hygiene, not the ambiguity I first claimed (corrected same day).** The
@@ -590,6 +419,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `tier=2` edge could mean "platform" or "matched by FID"; it cannot, because the edge carries the
   string. Still worth a rename (`row_kind` vs `match_tier`) for readers, and worth doing before
   either surfaces in a QuerySpec, but it is cosmetic rather than a correctness risk.
+
 - **`Idea-67`** · 2026-08-05 · `[question]` · **groomed → K19** · prio? **Med** —
   **A Control-M app code is NOT a durable identifier — the 3-char limit
   forces reuse (user, 2026-08-05).** Codes are a scarce namespace, so they get retired and reissued
@@ -627,6 +457,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   tier-2 resolving SEAL is a token inside the folder name, so per-folder resolution is derivable for
   the common case too. Mechanism written up in
   [`knowledge/standards/technology/folder-naming-convention.md`](../../knowledge/standards/technology/folder-naming-convention.md).
+
 - **`Idea-65`** · 2026-08-05 · `[source]` · **merged → C25** · prio? **Med** —
   **The Control-M SUB-APPLICATION field declares WHICH PLATFORM an application
   runs on — a first-pass C1 source, NOT a replacement for the version email.** ~~a far better
@@ -652,6 +483,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   products first. *[Corrected 2026-08-05 (user): AWS Snowflake is a TARGET DB platform (S3/Glue/
   Iceberg family), not an ETL product — the second row registers `snowflake` the data platform, not
   a "Snowflake ETL" tool. Recorded in C25's notes and both folder-naming twins.]*
+
 - **`Idea-64`** · 2026-08-05 · `[chore]` · **groomed → D9 (2026-08-07; the ordering decision routes through the gate)** · prio? **High** —
   **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
   `config/precedence.yaml` cannot express two internal tiers.** SME framing: Vendor → Company/Platform
@@ -661,6 +493,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   grammar, in what position 6 means, and in whether the app code carries the SEAL — nothing records
   which wins. Also corrected a real defect in the publishable standard: "frequency at position 6 =
   legacy" is true only of the DAT standard; under HLT a frequency letter at position 6 is CURRENT.
+
 - **`Idea-63a`** · 2026-08-05 · `[question]` · **closed — answered; the cardinality question is settled** · prio? **Med** —
   **Control-M app code → SEAL cardinality — CORRECTED 2026-08-05: `uniq -d`
   tests the registry key, NOT the tier, and is necessary but NOT sufficient.** `AOC` and `DCL` are each
@@ -675,6 +508,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   result proves only that the registry is a function, not that any code is tier 1. *(Split 2026-08-05:
   the `descr` half became `Idea-63b` — different disposition, since the cardinality question has an
   answer and the review queue is unbuilt work.)*
+
 - **`Idea-63b`** · 2026-08-05 · `[question]` · **merged → K18** · prio? **Med** —
   **The app-code CSV's `descr` column is a corroboration signal, never a validity
   test (user, 2026-08-05).**
@@ -684,6 +518,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the dangerous kind: it survives spot-checks and fails silently in the tail. Use the comparison only
   to produce a REVIEW QUEUE of disagreeing rows (candidate stale renames / decommissioned SEALs /
   copy-paste), each ruled by a human — same disposition as the §G5 disagreement classes.
+
 - **`Idea-62`** · 2026-08-05 · `[idea]` · **groomed → J32** · prio? **High** —
   **Generalize the registration/routing/attribution rule — three instances in two
   days.** (1) A FID is REGISTERED to the platform app while its jobs are ATTRIBUTED elsewhere
@@ -694,6 +529,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   appearing in a field is not an attribution claim unless that field's job is to attribute** —
   ownership, routing, and attribution are three different facts that all serialize as a SEAL id, and
   the graph has exactly one place (the confirmed app-code mapping) where the third is authored.
+
 - **`Idea-61`** · 2026-08-05 · `[source]` · **parked → AutoSys ingestion work resumes (row 12 is a crosswalk amendment gate; checked at the 2026-08-07 groom — no active AutoSys stream to hang it on)** · prio? **Med** —
   **AutoSys attributes at a NAME-PREFIX grain, not a folder grain — crosswalk
   row 12, needs a gate amendment.** Placeholder captured in
@@ -729,6 +565,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `evidence_doc_id` pointer with reification as the named upgrade path. Corpus `adhoc-sme-email`
   registered (`confirmed: false`, citation-only, connector `email`). App-level rollup deliberately
   BLOCKED on the FID gate. **Groom both gates + the doc-09 phases into backlog items once signed.**
+
 - **`Idea-59`** · 2026-08-04 · `[source]` · **groomed → K16, K17** · prio? **High** —
   *(census then gate session; the §G registration-vs-attribution
   finding and the six directory-owner questions ride the gate page, not this entry)* —
@@ -859,6 +696,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   15 `.sql` side by side, unconnected. depgraph does not emit the edge and the loader could not
   load it if it did (new edge type → gate). This is gate §H5's named future item, now with the
   nodes already in place — the remaining work is the edge, not the corpus.
+
 - **`Idea-46`** · 2026-08-01 · `[source]` · **merged → C22 (bug half) + C26 (back-flow half)** · prio? **Med** —
   **Company catalog-loader review (screenshots, same day as C17) — three
   back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
@@ -941,6 +779,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the first time, `-Tree` works). Semantic merge details in DryDocs `8a82e3b` and the depgraph
   merge commit; the `add_rel` signature/shape collision and three regions git auto-merged that
   should have conflicted are the parts worth re-reading if that code is touched again.
+
 - **`Idea-39`** · 2026-07-27 · `[idea]` · **groomed → C26, C27** · prio? **Med** —
   *(the whole entry is now covered: C26 writes the divergence
   down and reserves the four shapes as `planned` — actionable NOW, no trigger; C27 is the
@@ -1003,6 +842,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   of one supplement file. Explicitly **gate-worthy, not a refactor** — it changes what a
   supplement MEANS, so it routes through the HITL gate rather than a build item. Groom when
   the SME convenes it; G29 deliberately does not touch it.
+
 - **`Idea-36`** · 2026-07-25 · `[source]` · **closed — cited, no item of its own (confirmed at the 2026-07-25 groom)** · prio? **Low** —
   **Databricks Unity Catalog researched — full notes at
   [`reference/research/databricks-unity-catalog.md`](../../reference/research/databricks-unity-catalog.md)
@@ -1036,6 +876,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   SEAL stays the single issuing registry, so the property encoded a fact that cannot vary. The
   governed-namespace citation stands; its worked example moved to the source-field ledger shape
   instead.)
+
 - **`Idea-35`** · 2026-07-25 · `[idea]` · **merged → G34 (content inside its scaffold); parked → the gate-log Q6 ruling** · prio? **Med** —
   **Acronym catalog scoped by domain — so agents and humans stop colliding
   on the same three letters (SME, chat).** Direct fallout of the Q6 reopen below: `Ais` cost
@@ -1073,6 +914,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `planned`, schema public / definitions internal, deliberately defining NO terms. When Q6 is
   ruled and this line grooms, it becomes content INSIDE G34's scaffold (senses, scopes,
   does-NOT-mean notes as SKOS), not a new home.
+
 - **`Idea-34`** · 2026-07-25 · `[question]` · **open — SME rules** · prio? **Low** —
   **Q6 REOPENED: is the AIS acronym entry worth keeping at all?**
   (SME, chat). C12/Q6 ruled the expansion "Application Integration Streaming" survives as
@@ -1100,6 +942,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   spent and was retired from the tree — the acronym question is now free-standing and no
   longer gated by a pending session. Still open, still the SME's: groom when they rule — a
   Q6 amendment entry in `gate-log.md`, not a new gate.
+
 - **`Idea-33`** · 2026-07-24 · `[bug]` · **open — needs the user to point at the exact spot** · prio? **Low** —
   **Unlocated user-reported typo: "apply-catalog … at the bottom says
   apply ontology" (chat).** Searched cli.py docstrings/messages, runbook .md/.html both revs,
@@ -1120,6 +963,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   call and the order is enforced in code. Offered as the likely origin, NOT declared closed:
   if the user meant somewhere else, the report is still open. The runbook itself stays
   untouched and its three owed edits are the separate 2026-07-26 [doc] entry above.
+
 - **`Idea-32`** · 2026-07-23 · `[idea]` · **open — user/SME ruling: which scope (the controlm_jobs.sql direct pull vs the remediation staging reads); re-checked at the 2026-08-07 pm groom** · prio? **Med** —
   **Oracle connection for the lineage/remediation path (user note,
   chat pm).** The lineage jobs step still stages a CSV by hand through a JDBC client;
@@ -1129,6 +973,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `ingest-controlm --use-oracle` runs — runbook Rev 2 records the equivalence) plus
   the remediation-side staging reads (STG_APP_FACT-family fact tables per the
   company-side greenfield docs). Clarify scope with the SME before building.
+
 - **`Idea-31`** · 2026-07-23 · `[source]` · **parked → the remediation M2 generalization opens** · prio? **Med** —
   **Company-side greenfield remediation standards not yet
   producer-modeled.** Two docs live in the company `drydocs_remediation` path (seen in
@@ -1145,6 +990,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   standard and `transform.py` still notes the canonical variable map is "a company-side
   ratified value". Candidate: bring both docs in as the ratified maps when the
   remediation M2 generalization opens (FR-REM-5's schedule/command/conditions slice).
+
 - **`Idea-30a`** · 2026-07-22 · `[idea]` · **parked → cm_avg_run + calendar projection land** · prio? **Med** —
   **PDN trigger design: milestone/SLA grain + graph-computed slack,
   not per-job failure mail (SME, chat pm).** Current state: dev teams default ON/DO-MAIL
@@ -1166,6 +1012,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   delivers, DL from the email-dl-contact-point NOTIFIES mapping receives. Feeds: the DL
   gate B2 grain question (stream/milestone grain confirms folder-preference), the
   runbook module ETA logic, and the company-side probe list.
+
 - **`Idea-30b`** · 2026-07-23 · `[idea]` · **parked → cm_avg_run + calendar projection land** · prio? **Med** —
   **Deadline-calibration audit — the SAME slack computation that gates a PDN also tells you
   whether a deadline is honest.** *(Split from `Idea-30a` 2026-08-05: 30a designs the trigger,
@@ -1186,6 +1033,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (gate-worthy): an alert channel earns attention only with a low base rate AND
   actionable content (remaining slack + recovery action) — any mechanism without
   calibrated thresholds degrades to ignored noise.
+
 - **`Idea-29`** · 2026-07-22 · `[idea]` · **parked → gate email-dl-contact-point signs** · prio? **Med** —
   *(KEPT-UPDATED 2026-07-26: distinct from **Q10**, the email BODY as a
   document corpus. This entry is about DL MEMBERSHIP as an ontology mapping — the two touch
@@ -1206,6 +1054,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   runbooks / Jira sign-offs / email threads (brownfield bootstrap, rejected as end
   state). C2 keyed convention must SHARE the description-metadata plan's template
   phase (two 4000-char conventions must not fork).
+
 - **`Idea-28`** · 2026-07-22 · `[source]` · **open — SME data entry, not a backlog item** · prio? **High** —
   **Tier-1/tier-2 app-code rows: the SME still owes the enumeration.**
   (Re-inboxed slim 2026-08-04 from the groomed defined-mapping mega-entry — everything else
@@ -1421,6 +1270,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   + B1 var.text rule (company-side; adjudicates the real M0 unit's equivalence verdict —
   the resolver stays untouched until then). Groom into items only when their gates open;
   `docs/design/drydocs-remediation-tdd.md` §6/§7 is the tracking surface.
+
 - **`Idea-5`** · 2026-07-10 · `[idea]` · **parked → Phase C proper** · prio? **Low** —
   **Phase C packaging (deferred by ADR 0002-A-1 at the G2 relocate)**: the
   pieces deliberately NOT executed in Phase B — (a) make `drydocs-core` independently
@@ -1429,6 +1279,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   load's final name. UPDATED at the G3 close (same day): G3 completed IN-MONOREPO, so
   trigger (a) expired unfired — no early promotion needed; the whole line now waits for
   Phase C proper. Refs: ADR 0002-A-1 §Consequences, PORT-MANIFEST header sequencing note.
+
 - **`Idea-4`** · 2026-07-09 · `[idea]` · **parked → BMC EPD entitlement, or OQ-1 closes company-side** · prio? **Low** —
   **Control-M Workbench as the remediation greenfield test bed — PARKED**
   (user call, 2026-07-09). The Workbench Docker image (dev Control-M, plain `docker run`, no
@@ -1441,6 +1292,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   §Workbench + SYNTHESIZED notes), `drydocs-remediation-tdd.md` §HITL OQ-1. (Control-M for
   Kubernetes / Helm-chart offering deliberately SKIPPED — different product, agents-in-K8s,
   no current use case.)
+
 - **`Idea-3`** · 2026-07-08 · `[doc]` · **parked → the BRD shape settles upstream** · prio? **Low** —
   **BRD outline (Epic L, deferred)** — the third canonical doc type after
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
@@ -1449,6 +1301,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   brd.outline.yaml` (reuse the `drydocs.doc-outline.v1` schema + traceability spine) into Epic L.
   Seed from the corpus: `SDLC-Docs/BRD - Table of Contents.docx`, `business requirements document
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
+
 - **`Idea-2`** · 2026-07-06 · `[idea]` · **groomed → Q4, Q5, Q6 (P1–P3); P4–P7 stay plan-tracked** · prio? **Med** —
   **`drydocs-docmeta` component plan written** — full plan in
   `knowledge/upgrade-plans/docmeta-component.md`: component boundary (new `docmeta`
@@ -1476,7 +1329,210 @@ question a 1,000-line file with the trail at the bottom could not answer.
   plan-tracked until Q4–Q6 land. NEW RIDER (GraphAcademy advisor, 2026-07-17): when the docmeta
   loaders land, add existence constraints on `Document.trust_default` / `Chunk.tier_rule`
   (silent null = provenance undercount).
+
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-11 (desktop, weekly)** — worked the eleven ungroomed 2026-08-09..08-11 captures plus one misfiled entry found at the bottom of this file. **Promoted 10:** `Idea-96`→**J42** (the backlog union rule has no guard — a port-time id-set diff), `Idea-100`→**J43** (a `gate_bound:` precondition key on PORT-MANIFEST rows), `Idea-103`→**J44** (where the unclosed-fence guard's boundary sits for captured and vendored markdown), `Idea-99`→**J45** (the owed DPL/Snowflake port relay), `Idea-106`→**J46** (the clock-racing run-log collision test), `Idea-107`→**J47** (no guard asserts a PORT-MANIFEST path exists; the ordering check is hardcoded), `Idea-98`→**C33** (the adhoc Ab Initio version loader C25 authorized), `Idea-97`→**U20** (the review plan's six-scan-roots baseline, two package generations stale), `Idea-102`→**K22** + **K23** (the Deployment Module CI class via the gate, and the KB-article grain check). **Merged 2:** `Idea-101` into **J43** as clause (b) — same file, same vocabulary, same reviewer, so the derived-render disposition is decided in the same pass; `Idea-102`'s register-line finding into **G70**'s notes rather than its acceptance, because that acceptance mirrors a SIGNED gate register and a groom does not edit one. **Left open as questions for the user/SME: 2** — `Idea-104` (which MFT route-id shape is real, updated with what C30 did and did not settle) and `Idea-105` (the two claimants on the 4000-char `DESCRIPTION` field; three exits, already carried as gate rider §G6 and in C29's notes, with no item landing E1 to merge into). **One id repaired:** the 2026-08-11 manifest-guard capture had been filed as a second `Idea-86` and appended BELOW this audit trail — renumbered `Idea-107`, tagged `[bug]` instead of the non-vocabulary `[guard]`, and groomed. Every item raised here is dependency-free, so all ten enter `next_ready` on arrival; nothing raised decides an ontology question — K22 and K23 both register `planned` and route via the gate.
+
+- **`Idea-96`** · 2026-08-09 · `[chore]` · **groomed → J42** · prio? **High** —
+  **The backlog union rule has no guard: nothing asserts that after a port the consumer's
+  item-id set is a superset of the producer's at the port base.** `PORT-MANIFEST.yaml`
+  states the rule unconditionally for `docs/restructure/backlog.yaml` — *"Union the items;
+  NEVER regress a status … or drop an entry"* — and `tests/unit/test_backlog.py` enforces
+  plenty about the file (schema, roll-up arithmetic, `next_ready`, unknown `depends_on`),
+  but every one of those checks looks at ONE copy in isolation. The union is a claim about
+  TWO copies, and no check ever compares them, so a port that quietly under-delivers items
+  leaves both sides internally consistent and passing. Textbook J26: a rule written in
+  prose and enforced by nobody, which is exactly the shape that survives unnoticed —
+  surfaced during a reconcile, where items present in the producer at the port base turned
+  out to be absent downstream and neither side's suite had anything to say about it. Note
+  the near-miss that makes this worse than it sounds: the dependency guard would have
+  caught it *if* any surviving item had depended on a missing one, so whether the gap is
+  visible at all is luck, not design. Shape of the fix: a port-time check (not a unit test
+  — the producer tree cannot see the consumer's) that diffs the two id sets at the recorded
+  port base and fails the port report on a non-empty producer-minus-consumer difference,
+  with a named allow-list for ids deliberately not carried. Cheap, and it converts the
+  union rule from a promise into an assertion. Mechanism only — the numbers and ids from
+  the occurrence stay in the port report, not here.
+
+- **`Idea-97`** · 2026-08-09 · `[bug]` · **groomed → U20** · prio? **Low** —
+  **The review plan's doc-coverage baseline is two package generations stale — same disease
+  U18 just fixed one table over.** `docs/reviews/code-graph-review-plan.md` Phase 3 unit 3
+  still reads *"Six scan roots × DesignDoc coverage"* with per-root counts (`tests` 85,
+  `drydocs` 41, `drydocs_core` 35, `lineage` 12, `remediation` 7, `deepdoc` 3) that predate
+  BOTH `drydocs_api` and `drydocs_docmeta`. U18 widened the A1–A6 metric scope to eight
+  package roots and guarded the typed list against `pyproject.toml`, but that guard is
+  anchored on the `$packages` literal and this unit hard-codes its own root list in prose,
+  so it was out of the guard's reach and out of U18's stated surface. Left deliberately
+  rather than swept in. Fix is small: restate the unit on eight roots, re-measure the
+  per-root doc coverage, and decide whether the count belongs in prose at all or should be
+  derived like the metric scope now is — the third hand-typed root list in the same
+  document is the argument for deriving.
+
+- **`Idea-98`** · 2026-08-09 · `[chore]` · **groomed → C33** · prio? **Med** —
+  **The adhoc Ab Initio version loader — the build C25 authorized and deliberately did not do.**
+  Gate `software-version-context` signed the shape and nothing else:
+  `reg_appuser_uses_software` is registered `status: planned`, no loader exists, and the
+  `adhoc-sme-email` corpus stays `confirmed: false` for that reason alone. The build is:
+  the loader itself (MERGE key `{source, install_path}`, edge properties per §B3, `as_of`
+  from the email's sent date), the `:Document` minted from a hand-recorded citation, the
+  `evidence:` block's `as_of` filled in on the `abinitio` product row, registration in
+  `config/manual-loads/manifest.yaml` per §E4, and the §C1 install-path pattern rows in the
+  `invocation_patterns` shape. **Settle §Q3 before writing the MERGE key, not after** —
+  the gate deferred it with the consequence stated: if the estate re-points installs by
+  symlink, `install_path` is a poor key and identity moves to `(fid, version)`, which is a
+  re-key rather than an edit. Two things this build must NOT do: write the §F
+  application-level rollup (blocked on K17, and not behind a flag), and auto-append observed
+  versions to the curated `versions:` list (§C2).
+
+- **`Idea-99`** · 2026-08-09 · `[chore]` · **groomed → J45** · prio? **Med** —
+  **Port relay owed: the producer is now canonical for the DPL and Snowflake registry
+  entries.** C25 registered the `dpl` and `snowflake` product rows, the `in-house` vendor
+  (no `publisher_url`, guard narrowed to third-party vendors), and the acronym
+  `DPL: "Data Pipeline Library"`. The SME began the same expansion company-side on
+  2026-08-07 and **stopped so the two copies would match** — so this is a deliberate
+  producer-first divergence with a waiting consumer, exactly the shape of the standing AIS
+  acronym relay (R1), whose lesson applies here too: that expansion had to be carried
+  ACROSS FILES rather than same-file overwritten, and this one may as well. Deliberately
+  NOT written into `docs/port-prompt.md` at the time it arose, because a port was in flight
+  against a fetched head and that file is a hand-merge surface — a relay added mid-port
+  lands in someone's conflict resolution instead of their checklist. **Add it once that
+  port merges**, together with the other post-port items (the staged clean-add rows, the
+  ledger roll, striking R4).
+
+- **`Idea-100`** · 2026-08-09 · `[bug]` · **groomed → J43** · prio? **High** —
+  **The manifest has no way to say "gate-bound" — and that gap nearly shipped an unsigned
+  gate's ontology.** The best finding in PORT-REPORT-0d3761a9, caught company-side by their
+  own re-check rather than by any guard: their initial vocabulary reconcile ACTIVATED the
+  G55 `rua-load-shapes` lineage flips, because K8 (`seal-app-ref-edge-reshape`) *is* signed
+  company-side and the files looked takeable. `rua-load-shapes` is a DIFFERENT gate and is
+  still unsigned there. They reverted all three vocab fragments; the G23/rua code ported
+  inert because it is gate-bound and refuses `planned` labels — so the code's own guard
+  caught what the manifest did not. **The rule they wrote down is the one this repo should
+  encode: "identical to base" and "per-entry equivalent" are BOTH insufficient tests for a
+  gate-bound file.** A producer vocabulary or test file can be byte-identical to the port
+  base and still assume an active gate the consumer has not signed — status/id-set parity is
+  not field-and-gate parity. Today `PORT-MANIFEST.yaml` expresses disposition (who wins) but
+  nothing about PRECONDITION (what must be signed first), so
+  `drydocs_core/ontology/relationship_vocabulary/**` carries a disposition that is right
+  whenever the gates agree and dangerous exactly when they do not. Shape of the fix: a
+  `gate_bound:` key on those rows naming the gate id, and a reconcile-time check that
+  refuses to activate an entry whose gate is unsigned on the RECEIVING side. Note the near
+  miss honestly — this was caught by a human re-reading their own work, which is not a
+  control.
+
+- **`Idea-101`** · 2026-08-09 · `[question]` · **merged → J43 (clause b — the derived-render disposition, decided across every derived row in one pass)** · prio? **Low** —
+  **Does the manifest vocabulary need a `derived` disposition?** Raised by the company's
+  send-back on the two roadmap rows and deliberately not settled unilaterally. Derived
+  renders — `docs/plan/board.html`, `docs/plan/roadmap.html`, the design-doc `.html` — all
+  carry `disposition: canonical-company`, which is a poor fit: there is no authored consumer
+  content to be canonical about, and the actual instruction in every one of their notes is
+  REGENERATE from the reconciled tree. `canonical-company` and "regenerate" differ in a way
+  that matters — the first says *keep what you have*, and keeping a stale render is as wrong
+  as taking the producer's. The `roadmap.yaml` row had the same class of defect and was a
+  clear enough case to fix outright (`evaluate` → `per-entry`, since its note already
+  prescribed a deterministic rule); this one is not, because splitting a single row away
+  from the board.html precedent would create a worse inconsistency than the imprecision.
+  Decide it across all the derived rows at once, or leave it and say why in the manifest.
+
+- **`Idea-102`** · 2026-08-09 · `[question]` · **groomed → K22 (the CI class, via the gate) + K23 (the KB-article thread); merged → G70 (the shared-subject finding for §G13/G14/G15)** · prio? **High** —
+  **The deployment grain has an SME-confirmed cardinality and no home — DryDocs has one
+  concept where the source has two.** K21 found `u_seal_deployment_id` sitting beside
+  `u_seal_application_id` on the CSDM Application Service row (`cmdb_ci_service_discovered`),
+  never on `cmdb_ci_business_app`. The SME then confirmed it directly: **one application,
+  multiple deployments is correct**, with the identifier reading as
+  `app_id(seal_id):deployment_id`. That closes the condition C10's gate-bound candidate #1 was
+  deferred on ("only when an environment-level use case lands"). **THE SAME SESSION ALSO SUPPLIED
+  THE CAVEAT THAT SHRINKS IT, and the caveat is the more valuable half:** *everything we map is
+  off the **application**; modules are referenced by default for changes but in practice are not
+  used as intended.* So the grain is ruled — attribution stays on the application,
+  `seal-tom-attribution-reshape`'s subject does NOT move, and `:BusinessApplication` is correct
+  as-is. What survives is much smaller than it first looked: **capture an identifier the source
+  carries and we discard**, not re-home attribution. Worth writing down precisely because the
+  expensive reading was the plausible one — this repo's grain corrections (K1/K2, and the
+  2026-07-22 move of SEAL attribution from job level to the folder→batch `:Port`) are exactly the
+  shape this looked like for about an hour. **What is left.** (1) **The key, and it still
+  blocks.** If the deployment id is scoped under the application id, a bare `deployment_id` is
+  NOT a business key and a loader keying on it alone MERGEs distinct deployments together — the
+  identity-gate §D2 / §C3 failure on a new axis. **UPDATED 2026-08-10 — the SME supplied the CI
+  topology and it answers the key question and renames the thing.** The CI class is the
+  **Deployment Module**: `Business Application [Instantiates] Deployment Module`, inverse
+  `[Instance of]`, and above it `[Contained by] area product`. Each Deployment Module carries its
+  OWN unique CI id, so the CI id is the key and `app_id:deployment_id` is the human-readable name
+  — which is itself the proof the deployment id is scoped, since a globally unique id would not
+  need the application in its name. **"Deployment" and "module" are ONE thing**, which means G35's
+  G13 (Deployment Owner), G14 (Deployment Information Owner) and G15 (Application Module Owner)
+  plausibly share ONE subject and could resolve together rather than one register line at a time.
+  **A CORRECTION THIS ENTRY MUST CARRY, because its first version had it backwards:** the module
+  reference being a form default applies to TRANSACTIONAL records — a Change, an Incident or a KB
+  article must name a deployment module, ServiceNow defaults it, and people accept the default. The
+  Deployment Module CI ITSELF is real, with its own id, its own place in the chain, and KB articles
+  attached. So the grain is sound and only the *counting of transactions per module* is not; the
+  earlier conclusion that §G15 needed no grain would have discarded a real CI class on the strength
+  of a defaulted foreign key. (2) **The label**, if we capture it: C10's standing advice holds —
+  adopt the CONCEPT, pick our own stable name, since the vendor's own label moved (Application
+  Service → Service Instance at Yokohama), and this instance's own inverse label (`Instance of`)
+  already differs from the one public material uses (`Instantiated by`). (3) **A rider on an
+  existing gate, not its own gate** — nothing changes an attribution subject. **AND A SEPARATE
+  THREAD WORTH ITS OWN ITEM:** KB articles link at Deployment Module grain and the SME called them
+  "more meaningful." A documented fix attached to the deployment that has the incident is squarely
+  what a production-support knowledge graph is for; it would promote the `kb_*` family from ring 3
+  to a real candidate. Check first whether the KB→module link is asserted or defaulted, since the
+  defect above would hit it identically. Evidence, and open questions 8 + 9:
+  `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
+
+- **`Idea-103`** · 2026-08-10 · `[bug]` · **groomed → J44** · prio? **Low** —
+  **Five more unclosed markdown fences live outside the `docs/**` guard, in files this
+  repo did not author.** The J41 sweep that found the `port-prompt.md` defect
+  (`84ed7e3`, live five days and four ports) scanned all 507 tracked `.md` files and
+  found six. One was ours and is fixed (`docs/decisions/0002` carried an orphan trailing
+  fence). `tests/unit/test_markdown_fences.py` now guards `docs/**`. The rest were left
+  DELIBERATELY, and the reason is the interesting part: `internal/fcdo-reference/`
+  CONFLUENCE-TRANSCRIPT.md (opens 5140 of 5355) and TRANSCRIPT-1-ONTOLOGY.md (419 of
+  568) are CAPTURED transcripts, and `.claude/skills/data-context-extractor/references/`
+  is vendored skill material — editing either to satisfy a guard means editing somebody
+  else's capture, which is a provenance decision rather than a formatting one.
+  `SDLC-Docs/extracted/issue-driven-capture-loop.md` (181 of 181) is a trailing orphan
+  and probably safe. DECIDE: widen the guard with an explicit capture carve-out, or
+  leave captures unguarded and say so where the boundary lives.
+
+- **`Idea-106`** · 2026-08-11 · `[bug]` · **groomed → J46** · prio? **Low** —
+  **`test_loader_run_log.py::test_naming_convention_and_collision_suffix` is clock-flaky.**
+  It calls `claim_log_path()` twice and asserts the second gets the `-2` collision
+  suffix — but the suffix only appears when both calls land in the SAME second, since
+  the name is stamped `YYYYMMDD-HHMMSS`. If the clock ticks between the two statements
+  the second call gets a fresh timestamp and no suffix, and the assertion fails.
+  Observed failing once and passing on the immediately following identical run
+  (2026-08-11, desktop, during the C30/G67 close-out). Fix: freeze the clock for the
+  two calls rather than racing it — the collision behaviour is what is under test, not
+  the timestamp.
+
+- **`Idea-107`** · 2026-08-11 · `[bug]` · **groomed → J47** · prio? **Med** —
+  **No guard asserts that a `PORT-MANIFEST.yaml` path still exists.**
+  Found at G75: the row `drydocs_core/controlm/**` pointed at a path that has not
+  existed since the S2 / ADR 0008 relocate under `orchestration/`, so every module in
+  the Control-M package was silently falling through to the generic
+  `drydocs_core/**` evaluate-on-collision row instead of the canonical-producer row it
+  was written for. Nothing failed, because `tests/unit/test_port_manifest.py` checks
+  uniqueness, dispositions, notes and pins — never existence.
+  `test_runbook_currency.py::test_every_path_a_document_names_exists` already does
+  exactly this job for DOCUMENTS, and its FOREIGN_PATHS / HISTORICAL_PATHS escape
+  hatches are the right shape here too: a manifest legitimately names company-only
+  paths (`drydocs/docmeta/**`, `drydocs/scrapers/**`) and glob rows that match nothing
+  producer-side. So the guard is "every non-glob row resolves, every glob row matches
+  at least one path, unless allowlisted with a reason".
+  Second half, same family: `test_overrides_precede_their_broader_glob` only checks a
+  HARDCODED list of four overrides against `config/**`. A new specific row placed after
+  its broader glob passes today — verified at G75, where the ordering had to be fixed by
+  hand. Derive the pairs instead: any row whose path is a strict prefix-match of a later
+  glob row is an ordering defect.
+  RENUMBERED AT THE 2026-08-11 GROOM: captured as `Idea-86`, an id the 2026-08-07
+  `[source]` entry already held — the second two-session id collision in this file after
+  the duplicate `Idea-101` that J41 records. The older entry keeps the id; commit
+  `d05811a`'s message is the only surface carrying the short-lived spelling. It also
+  landed BELOW the audit trail rather than at the top of the inbox, and its `[guard]`
+  tag is not one of the six — both corrected here.
+
 
 - **GROOM 2026-08-09 (desktop, weekly)** — worked the six 2026-08-08 persona Run-2 captures plus the two `open` chores the 2026-08-07 pm groom left standing. **Promoted 11:** `Idea-91`→U18, `Idea-92`→U19, `Idea-94`(mechanism half)→L27, `Idea-95`(c)→V11, `Idea-85`→**G62/G63/G64/G65** (one item per gate session — the four post-G22 data-profile prompts were drafted 2026-08-07 and had no id, so the pull loop could not see them), `Idea-87`→J40, `Idea-90`→C28 + Q17. **Merged 3:** `Idea-94` and `Idea-95`(a,b) into **L19** (second filing — the sweep never ran and the drift got worse, so L19 was raised p3→p2 and re-stated with Run-2 numbers, and clause (f) now covers the S5 fragment-split re-cites); `Idea-90`’s location findings into **Z2** (mixed grain + the enumerable-site-vs-aggregate-claim line, as required confirmations). **Executed in place 1:** `Idea-93` — fourteen stale `inputs:` corrected directly in `backlog.yaml`; its E1 status question stays open and the entry stays in the inbox, marked. **Parked as a question: 0.** Two HITL-safe drafts, deciding nothing: C28 (business-layer ORG prompt, `status: planned` terms only, sign-off a separate session) and Q17 (a PROPOSED decision record the user rules) — the G27/W1/U16 precedent.
 
@@ -3190,22 +3246,3 @@ question a 1,000-line file with the trail at the bottom could not answer.
     (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
     (c396d75, ede0b94).
 
-- **`Idea-86`** · 2026-08-11 · `[guard]` · prio? **Med** —
-  **No guard asserts that a `PORT-MANIFEST.yaml` path still exists.**
-  Found at G75: the row `drydocs_core/controlm/**` pointed at a path that has not
-  existed since the S2 / ADR 0008 relocate under `orchestration/`, so every module in
-  the Control-M package was silently falling through to the generic
-  `drydocs_core/**` evaluate-on-collision row instead of the canonical-producer row it
-  was written for. Nothing failed, because `tests/unit/test_port_manifest.py` checks
-  uniqueness, dispositions, notes and pins — never existence.
-  `test_runbook_currency.py::test_every_path_a_document_names_exists` already does
-  exactly this job for DOCUMENTS, and its FOREIGN_PATHS / HISTORICAL_PATHS escape
-  hatches are the right shape here too: a manifest legitimately names company-only
-  paths (`drydocs/docmeta/**`, `drydocs/scrapers/**`) and glob rows that match nothing
-  producer-side. So the guard is "every non-glob row resolves, every glob row matches
-  at least one path, unless allowlisted with a reason".
-  Second half, same family: `test_overrides_precede_their_broader_glob` only checks a
-  HARDCODED list of four overrides against `config/**`. A new specific row placed after
-  its broader glob passes today — verified at G75, where the ordering had to be fixed by
-  hand. Derive the pairs instead: any row whose path is a strict prefix-match of a later
-  glob row is an ordering defect.
