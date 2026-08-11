@@ -1208,11 +1208,189 @@ Three pieces are mechanism, not ontology, and are good regardless of which era t
 
 ### E5. Loose ends
 
-- Adapter lines 1–26 not captured; company `controlm_xml.py` past line 375 not captured.
+Two closed by the SME on 2026-08-11:
+
+- **`controlm_xml.py` is complete as captured** — the company file ends at line 374, and 375 is
+  blank. So the company copy is **374 lines against the producer's 455**, and the 81-line
+  difference is G66 plus what followed. Not a capture gap.
+- **`resource_pool.py` captured in full** — see Part F, all 130 lines.
+
+Still open:
+
+- Adapter lines 1–26 not captured (the module docstring's opening).
 - `cli.py:2031` (`ingest-controlm-xml --path <file>`) not captured — only referenced.
-- `controlm_quantitatives.py` and `resource_pool.py` not captured at all; the pool classifier's
-  return shape is known only from its use site (`category`, `app_code`, `subsystem`,
-  `kind_suffix`, `secondary_label`).
+- `controlm_quantitatives.py` not captured.
 - The producer source-registry entry `controlm:deftable-xml-export` is `confirmed: false` behind
   the OPEN psgmgr-vs-XML precedence ruling; company-side the session reported it `confirmed: true`.
   That divergence is real and unresolved.
+
+---
+
+## Part F — `drydocs_core/orchestration/controlm/resource_pool.py` (130 lines, complete)
+
+**COMPANY-ONLY.** No producer counterpart. Captured 2026-08-11 from `resource-pool.png` and
+`resource-pool-2.png`; the file ends at 130.
+
+```python
+"""Classify a Control-M Quantitative Resource pool name into a category.
+
+A `<QUANTITATIVE NAME="...">` element on a `<JOB>` declares that the job
+consumes one or more slots from a named pool. Pool names follow a loose
+convention exercised across the PRDCL/CAF and PRSRV/MSP exports:
+
+    <APP_CODE>-<SUBSYSTEM>[-<MODIFIER>]*-<KIND>
+
+This module parses the pool name into a structured `PoolClassification`
+without any I/O. The categorisation drives the secondary label applied to
+the `:ResourcePool` node in Neo4j (`:TargetDatabase`, `:EtlPlatform`,
+`:SourcePlatform`, `:HostNode`, `:BusinessApplication`) and exposes the
+component tokens (`app_code`, `subsystem`, `kind_suffix`) as node
+properties.
+
+Rules are evaluated top-to-bottom; first match wins. See
+`/memories/session/plan.md` (Phase A) for the design rationale.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+from typing import Literal
+
+PoolCategory = Literal[
+    "target_database",
+    "etl_platform",
+    "source_platform",
+    "host_node",
+    "business_app",
+    "unknown",
+]
+
+# Secondary Neo4j label per category. `unknown` adds no secondary label.
+CATEGORY_LABEL: dict[str, str | None] = {
+    "target_database": "TargetDatabase",
+    "etl_platform": "EtlPlatform",
+    "source_platform": "SourcePlatform",
+    "host_node": "HostNode",
+    "business_app": "BusinessApplication",
+    "unknown": None,
+}
+
+# Match rules (regex on the raw pool name). Order matters — first match wins.
+_RULES: tuple[tuple[PoolCategory, re.Pattern[str]], ...] = (
+    # Oracle Exadata / "ORAC" target databases.
+    ("target_database", re.compile(r"(?:^|-)(?:ORAC|EXA)(?:-|$)", re.IGNORECASE)),
+    # ETL/orchestration controller pools (launch, compute, generic CTRL).
+    ("etl_platform", re.compile(r"-(?:LNCH-CTRL|COMPUTE-CTRL|CTRL)(?:-|$)", re.IGNORECASE)),
+    # Source-platform data-distribution throttles (e.g. PRAOC-DAT-VSI,
+    # PRDCL-DAT-DCL-VSI). Match -DAT- anywhere AFTER an ETL controller rule.
+    ("source_platform", re.compile(r"-DAT(?:-|$)", re.IGNORECASE)),
+    # Host / queue-side throttles. Terminal -VSI or -QR.
+    ("host_node", re.compile(r"-(?:VSI|QR)$", re.IGNORECASE)),
+)
+
+# App-code prefix: 3-5 alphanumeric chars beginning with "PR" at the start.
+_APP_CODE_RE = re.compile(r"^(PR[A-Z0-9]{1,3})(?:-|$)")
+
+
+@dataclass(frozen=True)
+class PoolClassification:
+    """Structured view of a parsed Quantitative Resource pool name.
+
+    Attributes carry the values the loader writes onto the
+    `:ResourcePool` node and onto its `:CONSUMES_FROM_POOL` edges.
+    """
+
+    name: str
+    category: PoolCategory
+    app_code: str | None  # parsed prefix, e.g. "PRDCL"
+    subsystem: str | None  # second token if present, e.g. "CAF" or "HLDM"
+    kind_suffix: str | None  # terminal token, e.g. "VSI", "EXA", "QR"
+    secondary_label: str | None  # multi-label tag for the Cypher MERGE
+
+
+def classify(pool_name: str) -> PoolClassification:
+    """Classify a pool name. Always returns a result.
+
+    Unrecognised names land in the `unknown` category with no secondary
+    label; the loader logs a WARN for those so misses surface in CI.
+    """
+    raw = (pool_name or "").strip()
+    if not raw:
+        return PoolClassification(
+            name="",
+            category="unknown",
+            app_code=None,
+            subsystem=None,
+            kind_suffix=None,
+            secondary_label=None,
+        )
+
+    tokens = raw.split("-")
+    # App code: parse from the head if it matches the PR<...> shape.
+    app_match = _APP_CODE_RE.match(raw)
+    app_code = app_match.group(1) if app_match else None
+    subsystem = tokens[1] if len(tokens) >= 2 else None
+    kind_suffix = tokens[-1] if len(tokens) >= 2 else None
+
+    category: PoolCategory = "unknown"
+    for cat, pattern in _RULES:
+        if pattern.search(raw):
+            category = cat
+            break
+
+    # `business_app` fallback: pure <APP>-<SUBSYSTEM> with no recognised
+    # suffix, and we did parse an app_code. (None observed yet, but
+    # reserve the slot so the contract is complete.)
+    if category == "unknown" and app_code and len(tokens) == 2:
+        category = "business_app"
+
+    return PoolClassification(
+        name=raw,
+        category=category,
+        app_code=app_code,
+        subsystem=subsystem,
+        kind_suffix=kind_suffix,
+        secondary_label=CATEGORY_LABEL[category],
+    )
+
+
+__all__ = [
+    "PoolCategory",
+    "PoolClassification",
+    "CATEGORY_LABEL",
+    "classify",
+]
+```
+
+### F1. What reproducing this producer-side has to solve
+
+**The module is a mechanism with company values compiled into it.** `_RULES` names `ORAC`, `EXA`,
+`LNCH-CTRL`, `COMPUTE-CTRL`, `CTRL`, `DAT`, `VSI`, `QR`; `_APP_CODE_RE` hardcodes the `PR` prefix;
+the docstring's worked examples are real pool names. Several of those tokens are on the
+never-outside-`internal/` list. A producer copy must be the **mechanism** — the grammar
+`<APP_CODE>-<SUBSYSTEM>[-<MODIFIER>]*-<KIND>`, the ordered first-match-wins table, the
+`PoolClassification` shape, the always-returns-a-result contract — with the rule table and the
+app-code prefix supplied as **data**, not literals.
+
+Three details are load-bearing and easy to lose in a rewrite:
+
+1. **Rule order is a correctness property, not style.** The `source_platform` rule matches `-DAT-`
+   *anywhere*, so it must stay after the ETL-controller rule; a pool that is both reads as ETL.
+   The module comments say so, which means a data-driven table has to preserve **ordering**, not
+   just membership — a dict keyed by category would silently lose it.
+2. **`unknown` is a first-class outcome, not an error.** It returns with `secondary_label=None`
+   so the loader adds no label and logs a WARN, which is how misses surface in CI. That is the
+   aliases-suggest / values-decide discipline the FACT_REGISTRY already follows.
+3. **`business_app` has never fired.** The comment says so outright — *"None observed yet, but
+   reserve the slot so the contract is complete."* A producer copy should carry the branch **and**
+   its honesty, or drop the branch; keeping it while dropping the comment ships a speculative
+   category as though it were observed.
+
+One inconsistency worth noting rather than silently fixing: `subsystem` and `kind_suffix` are both
+derived from a token split with `len(tokens) >= 2`, so a two-token name yields
+`subsystem == kind_suffix` — the same token in two fields. Whether that is intended is a question
+for the reproduction, not something to assume either way.
+
+The docstring also cites `/memories/session/plan.md` (Phase A) for the design rationale — a
+company-side path with no producer equivalent. The reproduction needs its own written warrant.
