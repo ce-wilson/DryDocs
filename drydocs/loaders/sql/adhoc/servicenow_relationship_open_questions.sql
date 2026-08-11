@@ -76,6 +76,30 @@ SELECT CURRENT_DATABASE() AS db, CURRENT_SCHEMA() AS schema,
 
 
 -- #############################################################################
+-- [ANSWERED 2026-08-11] §A VERDICT: NOT A CLEAN COPY — BUT NOT A FILTERED ONE
+-- EITHER, AND THE DIFFERENCE DECIDES WHAT IT MEANS.
+--   A1  843 dangling type refs.
+--   A2  970 dangling parent CIs, 9,093 dangling child CIs, 4,431,314 edges.
+--   A3  V_CMDB_REL_CI    4,431,328 rows, authorship lag 2 days.
+--       V_CMDB_REL_TYPE         54 rows, last AUTHORED 2022-05-26, last CARRIER
+--                                  LOAD 2026-04-15 -> lag 1,420 days.
+--       V_CMDB_CI      21,601,633 rows, authorship lag 0 days.
+--   A4  delete_flag = 'N' on all 54 type rows.
+-- READ IT THIS WAY. The dangling counts are 0.02% of edges (843 and 970) and
+-- 0.2% (9,093). A FILTERED view does not come out 99.98% complete — that is the
+-- signature of SOURCE-SIDE ORPHANS, which ServiceNow is independently known for
+-- (deleted CIs leaving cmdb_rel_ci rows behind). So the replica is faithful and
+-- the CMDB itself carries referential drift.
+-- THE ONE REAL STALENESS IS THE TYPE VIEW: its carrier load is FOUR MONTHS
+-- behind the edge view's. Upstream it has not been authored since 2022, so a
+-- stable vocabulary explains the old authorship date — but not the old LOAD
+-- date, which is the carrier refreshing that view on a different cadence.
+-- CONSEQUENCES, both of which hold whatever the cause: (1) a loader MUST handle
+-- an unresolvable parent/child/type — skip or tombstone, never assume. (2) Row
+-- counts DRIFT WITHIN A SESSION (4,431,314 / 4,431,328 / 4,431,668 across three
+-- runs minutes apart), so never compare two counts taken at different moments
+-- as though they were stable.
+-- #############################################################################
 -- §A — Q9. IS THE REPLICA A COMPLETE COPY, OR A FILTERED / STALE PROJECTION?
 --          Outranks everything else here (§6 Q9). Run first; if A1/A2 return
 --          non-zero, stop and raise it before ruling any pull scope.
@@ -155,7 +179,7 @@ SELECT COUNT_IF(UPPER(column_name) = 'PARENT_DESCRIPTOR') > 0 AS has_parent_desc
        COUNT_IF(UPPER(column_name) = 'END_POINT')         > 0 AS has_end_point,
        COUNT_IF(UPPER(column_name) = 'SYS_SCOPE')         > 0 AS has_sys_scope
 FROM   INFORMATION_SCHEMA.COLUMNS
-WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
+WHERE  UPPER(table_schema) = UPPER($cmdb_schema)
   AND  UPPER(table_name)   = 'V_CMDB_REL_TYPE';
 
 -- B2. The full column list, so a missing column is legible as a REPLICA
@@ -165,7 +189,7 @@ WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
 --     authoritative answer to the header's identifier rule.
 SELECT column_name, data_type, is_nullable, ordinal_position
 FROM   INFORMATION_SCHEMA.COLUMNS
-WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
+WHERE  UPPER(table_schema) = UPPER($cmdb_schema)
   AND  UPPER(table_name)   = 'V_CMDB_REL_TYPE'
 ORDER  BY ordinal_position;
 
@@ -196,6 +220,12 @@ FROM   V_CMDB_REL_TYPE
 GROUP  BY provenance, "delete_flag"
 ORDER  BY provenance, "delete_flag";
 
+-- [ANSWERED 2026-08-11] ZERO ROWS. `name` = parent || '::' || child holds for
+--     all 54, no descriptor contains '::', none is empty. The trap has NOT fired
+--     on this instance. K21's rule stands unchanged, but note WHY it stands: not
+--     because the concatenation is currently broken, but because nothing
+--     GUARANTEES it — and B6 found a different way for a name-based crosswalk to
+--     go wrong that this test would never have caught.
 -- B5. THE '::' TRAP, tested rather than assumed (§3.3). K21 rules: read the two
 --     descriptor columns, do NOT split `name`. These rows are the proof —
 --     a literal '::' inside a descriptor, an empty descriptor, or a `name`
@@ -221,6 +251,16 @@ WHERE  "parent_descriptor" LIKE '%::%'
    OR  COALESCE(TRIM("child_descriptor"),  '') = ''
    OR  "name" <> "parent_descriptor" || '::' || "child_descriptor";
 
+-- [ANSWERED 2026-08-11] THREE ROWS, AND THEY CORRECT K21 §1.4/§3.3:
+--     Contains::Contained by, Instantiates::Instantiated by, Instantiates::Instance of.
+--     BOTH Instantiates rows exist, BOTH are global/standard. So this is NOT
+--     "the vendor says one label, the instance says another" — the instance
+--     carries TWO DISTINCT RELATIONSHIP TYPES that share a parent_descriptor and
+--     differ only in the inverse. THE CROSSWALK CONSEQUENCE IS THE POINT:
+--     parent_descriptor does NOT identify a type, so a crosswalk keyed on the
+--     forward label alone MERGES two types. Key on sys_id, or on the PAIR.
+--     B7 then shows only ONE of the two is used (Instance of, 23,753 edges;
+--     Instantiated by, 0).
 -- B6. The §1.4 label trap, checked directly: public material writes the pair as
 --     'Instantiates::Instantiated by', this instance uses 'Instance of' as the
 --     inverse. Same relation, different label — the concrete reason to read the
@@ -233,6 +273,15 @@ WHERE  "parent_descriptor" ILIKE '%instantiat%'
    OR  "parent_descriptor" ILIKE '%contains%'
    OR  "child_descriptor"  ILIKE '%contained by%';
 
+-- [ANSWERED 2026-08-11] 21 OF 54 CARRY EDGES; 33 CARRY NONE. The live set is
+--     dominated by infrastructure: IP Connection::IP Connection 1,969,277,
+--     Hosted on::Hosts 1,186,735, Member of::Members 491,786, Located in::Houses
+--     301,509, In Rack::Rack contains 226,706, Contains::Contained by 115,113,
+--     Depends on::Used by 78,301, Instantiates::Instance of 23,753, then a tail
+--     down to single digits.
+--     ALL SIX CUSTOM TYPES CARRY ZERO EDGES. The company defined six and uses
+--     none, so the crosswalk's real input is 21 standard rows, not 54 — and the
+--     custom/standard split, while machine-readable, turns out to be moot.
 -- B7. WHICH OF THE 54 ARE LIVE. §3.2's rule applied to the vocabulary: only
 --     types that carry edges need a DryDocs decision. The sampled rows all
 --     showed ONE type value, so the live subset may be far smaller than 54.
@@ -245,6 +294,11 @@ LEFT JOIN  V_CMDB_REL_CI   r ON r."type" = t."sys_id"
 GROUP  BY t."parent_descriptor", t."child_descriptor", provenance
 ORDER  BY edge_count DESC, t."parent_descriptor";
 
+-- [ANSWERED 2026-08-11, IN THE NEGATIVE] end_point is FALSE on all 54 rows —
+--     one distinct value across the whole vocabulary. A single-valued column
+--     carries no information, so there is nothing to model and nothing to ask
+--     the SME about. Q6 closes: not "we don't know what it means" but "it does
+--     not discriminate anything here."
 -- B8. Q6 — WHAT IS end_point? No public vendor definition was found, so it is
 --     left unassigned rather than guessed. Its distribution against edge usage
 --     is the cheapest evidence available: a flag that is TRUE only for types
@@ -263,6 +317,14 @@ ORDER  BY type_count DESC;
 --      "The schema is not the contract; the populated schema is."
 -- #############################################################################
 
+-- [ANSWERED 2026-08-11 — AND IT CORRECTS K21 §3.2, which is the point of the
+--     block] 4,431,668 edges. u_hash POPULATED ON 2,151,933 (48.6%), NOT null
+--     throughout as the 200-row sample suggested. percent_outage populated 0.
+--     connection_strength 1 distinct value.
+--     §3.2 argued "the schema is not the contract; the populated schema is" and
+--     then drew its own example from 200 visible rows — which is the same error
+--     one level up. The rule survives; the illustration was wrong. u_hash is a
+--     real half-populated column and needs a meaning before anything reads it.
 -- C1. §3.2 at full-table scale, not the 200 visible rows. u_hash read as null
 --     throughout, percent_outage null throughout, connection_strength the
 --     constant 'always'. A schema-driven pull would ingest all three as
@@ -283,6 +345,15 @@ FROM   V_CMDB_REL_CI
 GROUP  BY "connection_strength", "percent_outage"
 ORDER  BY row_ct DESC;
 
+-- [ANSWERED 2026-08-11] delete_flag TAKES ONLY 'N' OR NULL. There is no 'Y'
+--     anywhere: V_CMDB_CI 21,475,298 N / 126,337 NULL; V_CMDB_REL_CI 4,170,886 N
+--     / 260,831 NULL; V_CMDB_REL_TYPE 54 N.
+--     So NO soft-deleted row is visible in the replica at all — deletes are
+--     either hard-removed upstream or the flag is never set. That makes §3.4's
+--     worry (ingesting dead edges as live) NOT CURRENTLY REAL, and C5's guessed
+--     predicate moot. What replaces it is a smaller, sharper question: NULL is a
+--     second state on 0.6% of CIs and 5.9% of edges, and nobody knows what it
+--     means. Rule NULL before relying on the flag, and do not assume N = live.
 -- C3. Q5 — delete_flag semantics across the three ring-1 views. What values it
 --     takes, and whether deleted rows are retained. Decides §3.4: a pull that
 --     ignores this ingests dead edges as live ones, and a dead edge makes two
@@ -344,6 +415,14 @@ LEFT JOIN  V_CMDB_CI               ci ON ci."sys_id" = tom_main."parent_id"
 GROUP  BY ci."sys_class_name"
 ORDER  BY tom_rows DESC;
 
+-- [ANSWERED 2026-08-11] 21,601,635 CIs in base. 14,683 also in
+--     cmdb_ci_business_app. 24,169 also in cmdb_ci_service_discovered. IN BOTH:
+--     ZERO. So a CI sits in exactly one class table, the multiplication trap is
+--     real but bounded, and no CI is both a business application and an
+--     application service — which rules out a reading §1.3(c) left open.
+--     THE SCALE IS THE HEADLINE: business applications are 0.07% of the CI
+--     table. That is the number behind the SME's 2026-08-11 scope ruling and the
+--     reason §3.6's ring model was rewritten — see §7.
 -- D2. §1.3(b) — THE CLASS-TABLE MULTIPLICATION TRAP, quantified. cmdb_ci,
 --     cmdb_ci_service_discovered and cmdb_ci_business_app share sys_id: one CI
 --     with class-specific attribute sets, NOT three entities. A pull that
@@ -419,7 +498,7 @@ FROM (
 --     Blocks §B6.
 SELECT column_name, data_type, is_nullable
 FROM   INFORMATION_SCHEMA.COLUMNS
-WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
+WHERE  UPPER(table_schema) = UPPER($cmdb_schema)
   AND  UPPER(table_name)   = UPPER($v_tom_main)
 ORDER  BY ordinal_position;
 

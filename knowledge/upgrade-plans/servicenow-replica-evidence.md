@@ -228,6 +228,24 @@ inverse. Different label, same relation. That is the concrete reason §3.3 says 
 descriptor columns rather than assume a vocabulary — a crosswalk built from the vendor's label set
 would miss this instance's actual value.
 
+> **MEASURED 2026-08-11 — right conclusion, wrong mechanism, and the real mechanism is worse.**
+> The instance carries **both** rows, both `sys_scope = global`:
+>
+> | `name` | `parent_descriptor` | `child_descriptor` | edges |
+> |---|---|---|---|
+> | `Instantiates::Instantiated by` | Instantiates | Instantiated by | **0** |
+> | `Instantiates::Instance of` | Instantiates | Instance of | **23,753** |
+>
+> So it is not "the vendor says one label, we say another." It is **two distinct relationship types
+> that share a forward label and differ only in the inverse**, with the estate using one and leaving
+> the other empty.
+>
+> **The crosswalk consequence is the finding: `parent_descriptor` does not identify a type.** A
+> mapping keyed on the forward label alone silently MERGES these two — and merging them would map an
+> unused type onto a live one, which is the quiet kind of wrong. Key the crosswalk on `sys_id`, or
+> on the descriptor **pair**; never on the forward label. Note also that §3.3's `::` test would never
+> have caught this: both names concatenate perfectly.
+
 **(iii) The deployment key question (§6 Q7) is answered.** Each Deployment Module carries **its own
 unique CI id**. So the CI `sys_id` is the technical key, and `app_id:deployment_id` is the
 human-readable **name** — which incidentally confirms the deployment id is scoped under the
@@ -362,6 +380,17 @@ nothing, and one value. This is the concrete form of what T10/T13 exist to preve
 not the contract; the populated schema is.** Any pull scope should be justified against observed
 population, not against column existence.
 
+> **THE RULE SURVIVED THE MEASUREMENT; THE ILLUSTRATION DID NOT (2026-08-11).** Run at full-table
+> scale: `u_hash` is populated on **2,151,933 of 4,431,668 rows — 48.6%**, not null throughout.
+> `percent_outage` is genuinely 0 populated and `connection_strength` genuinely has one distinct
+> value (`'always'`, with a single null row), so two of the three examples held.
+>
+> The u_hash claim was drawn from 200 visible rows in a screenshot — **the same error this section
+> exists to warn about, made one level up while making the warning.** Recorded rather than quietly
+> corrected, because it is the most useful demonstration in the document that a sample is not a
+> population, and because a half-populated column is a worse trap than an empty one: it looks
+> meaningful from either end. `u_hash` now needs a *meaning* before anything reads it.
+
 ### 3.3 The relationship-family ruling
 
 **Yes — `cmdb_rel_ci` and `cmdb_rel_type` belong in the pull.** A CMDB without its relationship rows
@@ -446,6 +475,15 @@ would record the replication job as the author of every record in the CMDB.
 ### 3.6 Proposed pull scope — three rings
 
 Offered as a **recommendation for the gate to rule**, not a decision.
+
+> **SUPERSEDED 2026-08-11 by the SME's scope ruling and the measured row counts — see §7.4.** The
+> three rings below were drafted before anyone knew the CI table holds **21.6 million rows**. Ring 1
+> as written is a 21.6M-node, 4.4M-edge wholesale take, which is precisely what the SME ruled out:
+> *"I'm not trying to ingest the company catalog for everything — that is WAY TOO MUCH data."* The
+> ring *ordering* survives as a statement of priority; the ring *contents* do not. §7.4 carries the
+> replacement, which is an **anchored** pull rather than a wholesale one. Kept here rather than
+> deleted because the reasoning below is still the reasoning — it was applied to the wrong estimate
+> of size, and a later reader should see that rather than meet a scope with no history.
 
 **Ring 1 — the graph core.** `cmdb_ci`, `cmdb_rel_ci`, `cmdb_rel_type`. Nodes and edges. Defensible
 on its own: it is the CMDB *as a graph*, it is stock and vendor-documented, and it stands up without
@@ -636,3 +674,106 @@ Two smaller ones, recorded so they are not rediscovered: whether any table appea
 `percent_outage` are populated anywhere beyond the constant-and-null sample (§3.2) — the CMDB models
 impact weight on the edge, and DryDocs has no equivalent, so it is worth knowing whether there is
 anything there before deciding we do not need one.
+
+---
+
+## 7. Measured — the 2026-08-11 probe run
+
+The probes in
+[`servicenow_relationship_open_questions.sql`](../../drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql)
+were run against the replica. Counts and conclusions only; no result rows, per §0. Each block is
+annotated `[ANSWERED 2026-08-11]` in the script itself.
+
+**Read the counts as approximate.** Total-edge counts came back as 4,431,314 / 4,431,328 / 4,431,668
+across three runs minutes apart — the replica reloads during a session. Never compare two counts
+taken at different moments as though they were stable.
+
+### 7.1 The estate, by size — the number that changes the plan
+
+| View | Rows |
+|---|---|
+| `cmdb_ci` (all CI classes) | **21,601,633** |
+| `cmdb_rel_ci` (all edges) | **4,431,328** |
+| `cmdb_ci_service_discovered` (deployment modules) | 24,169 |
+| `cmdb_ci_business_app` | **14,683** |
+| `cmdb_rel_type` | 54 |
+
+**Business applications are 0.07% of the CI table.** The CI class distribution explains the rest: the
+top classes are all cloud and infrastructure — database snapshots, deployment targets, OS images,
+storage volumes, endpoint blocks, ECS tasks — each in the hundreds of thousands. The estate is
+overwhelmingly technical inventory that DryDocs has no use for.
+
+**Zero CIs appear in both class tables.** A CI is in exactly one, so the §1.3(b) multiplication trap
+is real but bounded — and no CI is both a business application and an application service, which
+closes a reading §1.3(c) left open.
+
+### 7.2 Replica completeness (Q9) — faithful copy, drifting source
+
+| Probe | Result |
+|---|---|
+| Edges whose type is missing | 843 (0.019%) |
+| Edges whose parent CI is missing | 970 (0.02%) |
+| Edges whose child CI is missing | 9,093 (0.2%) |
+
+**Not a filtered projection.** A filtered view does not come out 99.98% complete. These proportions
+are the signature of **source-side orphans** — deleted CIs leaving `cmdb_rel_ci` rows behind, which
+ServiceNow is independently known for. The replica is faithful; the CMDB carries referential drift.
+
+**One genuine staleness, and it is the type view.** `cmdb_rel_type` was last *authored* 2022-05-26
+(a stable vocabulary, unsurprising) but last *carrier-loaded* 2026-04-15 — **four months behind** the
+edge view's daily load. The old authorship date is fine; the old load date means the carrier
+refreshes that view on a different cadence, and it is the thing to watch if a type is ever added.
+
+**The consequence holds whatever the cause:** a loader must handle an unresolvable parent, child or
+type — skip or tombstone, never assume resolution.
+
+### 7.3 The vocabulary, resolved
+
+- **54 types: 48 standard (`sys_scope = global`) + 6 custom.** Confirmed against the data.
+- **`name` = `parent_descriptor` || `'::'` || `child_descriptor` holds for all 54.** No descriptor
+  contains `::`, none is empty. The trap has not fired here — the rule stands because nothing
+  *guarantees* the concatenation, not because it is currently broken.
+- **Only 21 of 54 carry any edges.** The crosswalk's real input is 21 rows, not 54.
+- **All six custom types carry zero edges.** The company defined six and uses none — so the
+  standard/custom split, though machine-readable off `sys_scope` (§3.3), turns out to be moot.
+- **`end_point` is false on all 54.** Single-valued, so it discriminates nothing. Q6 closes not as
+  "we don't know what it means" but as "it carries no information here."
+- **`delete_flag` takes only `N` or NULL — there is no `Y` anywhere.** No soft-deleted row is visible
+  in the replica at all, which makes §3.4's worry *not currently real* and C5's guessed predicate
+  moot. It is replaced by a smaller question: NULL is a second state on 0.6% of CIs and 5.9% of
+  edges, and nobody knows what it means. Rule NULL before relying on the flag; do not assume `N`
+  means live.
+
+### 7.4 The pull scope, rewritten — anchored, not wholesale
+
+**SME ruling, 2026-08-11:** *not ingesting the company catalog — that is way too much data. Business
+applications and the product catalog in full are small. Control-M is the largest pull for now. Only
+a very small percentage of the technical hardware listed is in use.*
+
+That supersedes §3.6, which took `cmdb_ci` and `cmdb_rel_ci` whole and would have pulled 21.6M nodes
+and 4.4M edges. The replacement inverts the direction of travel: **seed from what we care about and
+traverse out**, rather than take the tables and filter down.
+
+| | Take | Rows | Why |
+|---|---|---|---|
+| **Vocabulary** | `cmdb_rel_type` **in full** | 54 | Trivial, and needed to read any edge. Take all 54 even though 21 are live — the unused ones cost nothing and their absence would look like a gap |
+| **Seed** | `cmdb_ci_business_app` **in full** | 14,683 | The anchor. Small, and the thing DryDocs is actually about |
+| **Seed** | the product catalog / area products **in full** | small | SME: small in full. The layer above the application in the §1.4 chain |
+| **One hop out** | `cmdb_ci_service_discovered` for seeded apps | ≤ 24,169 | The deployment modules `[Instance of]` a seeded application |
+| **Edges** | `cmdb_rel_ci` **restricted to both endpoints in the seeded set** | small fraction of 4.4M | Never the whole edge table |
+| **Attribution** | the TOM tables + `sys_user_group` + `core_company` | — | What G35 needs; unchanged from §3.6 ring 2 |
+| **NOT taken** | `cmdb_ci` as a table; the cloud/infrastructure classes; the `kb_*`, `cmn_*`, rota and SLA families | 21.5M | Out by SME ruling. Individual classes can be added later against a named use case |
+
+**Two things this shape gets right that the ring model did not.** It is bounded by *what we model*
+rather than by *what the source holds*, so it does not grow when the estate does — the cloud classes
+that dominate the CI table will keep growing and none of it reaches us. And it makes the edge pull a
+consequence of the node pull rather than a separate decision, which is the only way to keep 4.4M
+edges from arriving by default.
+
+**What it still does not settle:** the traversal depth. One hop from the seeded applications is
+defensible and cheap; two hops starts pulling infrastructure, which is exactly what is ruled out. If
+a support question ever needs "which server does this run on", that is a use case for adding a class
+by name, not a reason to widen the traversal.
+
+**Control-M stays where it is.** It is the largest pull and it comes from the Oracle `psgmgr`
+replica, not from here — nothing in this document changes that.
