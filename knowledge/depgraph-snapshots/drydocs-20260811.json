@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T03:22:34",
+    "captured_at": "2026-08-11T08:59:33",
     "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e1d9ac0",
-      "full": "e1d9ac0ca4af33d50358a217a589da2c44dfa941",
+      "commit": "8471e40",
+      "full": "8471e405b4c28b8ec5adbfe63f967abd0224fafb",
       "branch": "main",
-      "describe": "port-base-20260810b-35-ge1d9ac0",
-      "subject": "feat(controlm): C30 + G67 — the greenfield job standard, and R30-R40 with a working detector",
+      "describe": "port-base-20260810b-38-g8471e40",
+      "subject": "docs(controlm): C31 — one guidelines and standards page replacing five partial ones",
       "dirty": false,
-      "untracked_present": true,
+      "untracked_present": false,
       "pr": null
     },
     "depgraph": {
@@ -8711,10 +8711,109 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/GRADES.md",
+      "name": "GRADES.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/GRADES.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/RUN-LOG.md",
       "name": "RUN-LOG.md",
       "extension": ".md",
       "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/RUN-LOG.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/fable-review-1.md",
+      "name": "fable-review-1.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/fable-review-1.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-1-scratch.py",
+      "name": "o31-ALPHA-1-scratch.py",
+      "extension": ".py",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-1-scratch.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-2-scratch.py",
+      "name": "o31-ALPHA-2-scratch.py",
+      "extension": ".py",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-2-scratch.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-3-scratch.py",
+      "name": "o31-ALPHA-3-scratch.py",
+      "extension": ".py",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-3-scratch.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-4-scratch.py",
+      "name": "o31-ALPHA-4-scratch.py",
+      "extension": ".py",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-4-scratch.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-5-scratch.py",
+      "name": "o31-ALPHA-5-scratch.py",
+      "extension": ".py",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-5-scratch.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-report.md",
+      "name": "o31-ALPHA-report.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-report.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA.diff",
+      "name": "o31-ALPHA.diff",
+      "extension": ".diff",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA.diff",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-BETA-report.md",
+      "name": "o31-BETA-report.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-BETA-report.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-BETA.diff",
+      "name": "o31-BETA.diff",
+      "extension": ".diff",
+      "rel_path": "docs/reviews/graph-vs-files-experiment/results-sonnet/o31-BETA.diff",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13553,10 +13652,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
-      "name": "drydocs-20260811.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-0322.json",
+      "name": "drydocs-20260811-0322.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-0322.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13746,6 +13845,15 @@
       "name": "controlm-greenfield-job-standard.md",
       "extension": ".md",
       "rel_path": "knowledge/standards/technology/controlm-greenfield-job-standard.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/standards/technology/controlm-guidelines-and-standards.md",
+      "name": "controlm-guidelines-and-standards.md",
+      "extension": ".md",
+      "rel_path": "knowledge/standards/technology/controlm-guidelines-and-standards.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25905,7 +26013,62 @@
     [
       "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
       "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/GRADES.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
       "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/RUN-LOG.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/fable-review-1.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-1-scratch.py"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-2-scratch.py"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-3-scratch.py"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-4-scratch.py"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-5-scratch.py"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA-report.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-ALPHA.diff"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-BETA-report.md"
+    ],
+    [
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
+      "CONTAINS",
+      "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet/o31-BETA.diff"
     ],
     [
       "drydocs/docs/reviews/graph-vs-files-experiment/results-sonnet",
@@ -28405,7 +28568,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-0322.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -28486,6 +28649,11 @@
       "drydocs/knowledge/standards/technology",
       "CONTAINS",
       "drydocs/knowledge/standards/technology/controlm-greenfield-job-standard.md"
+    ],
+    [
+      "drydocs/knowledge/standards/technology",
+      "CONTAINS",
+      "drydocs/knowledge/standards/technology/controlm-guidelines-and-standards.md"
     ],
     [
       "drydocs/knowledge/standards/technology",
@@ -30377,13 +30545,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1638,
+    "files": 1650,
     "edges": 899,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1909,
+    "rels": 1921,
     "directories": 272
   }
 }
