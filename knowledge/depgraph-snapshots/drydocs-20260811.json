@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T11:41:49",
+    "captured_at": "2026-08-11T11:57:45",
     "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5dfa9c6",
-      "full": "5dfa9c63a7048fc50de1d28e3482e360c35f3a82",
+      "commit": "2d6cbb4",
+      "full": "2d6cbb4c52de62c5f5a0e6137fd0169175500298",
       "branch": "main",
-      "describe": "port-base-20260810b-47-g5dfa9c6",
-      "subject": "docs(controlm): C32 done — the downstream fan-out, and the correction it forces",
+      "describe": "port-base-20260810b-49-g2d6cbb4",
+      "subject": "backlog(remediation): G69 — R41-R44 registered AND detected in one change",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -12410,6 +12410,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_remediation/overview_readme.md",
+      "name": "overview_readme.md",
+      "extension": ".md",
+      "rel_path": "drydocs_remediation/overview_readme.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_remediation/transform.py",
       "name": "transform.py",
       "extension": ".py",
@@ -13661,10 +13670,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
-      "name": "drydocs-20260811.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-1141.json",
+      "name": "drydocs-20260811-1141.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-1141.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27882,6 +27891,11 @@
     [
       "drydocs/drydocs_remediation",
       "CONTAINS",
+      "drydocs/drydocs_remediation/overview_readme.md"
+    ],
+    [
+      "drydocs/drydocs_remediation",
+      "CONTAINS",
       "drydocs/drydocs_remediation/transform.py"
     ],
     [
@@ -28582,7 +28596,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-1141.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -30559,13 +30573,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1651,
+    "files": 1652,
     "edges": 899,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1922,
+    "rels": 1923,
     "directories": 272
   }
 }
