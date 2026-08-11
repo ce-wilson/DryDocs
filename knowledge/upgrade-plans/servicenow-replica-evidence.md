@@ -800,3 +800,112 @@ by name, not a reason to widen the traversal.
 
 **Control-M stays where it is.** It is the largest pull and it comes from the Oracle `psgmgr`
 replica, not from here — nothing in this document changes that.
+
+---
+
+## 8. The API evidence (2026-08-11) — and why it rewrites the query plan
+
+Before the SQL probes ran, the SME queried the **ServiceNow API** through an internal tool, against
+one SEAL application and one of its deployments. It answers more than the SQL did, because it
+followed references the SQL never traversed. Mechanism only — no names, SIDs, emails, group names,
+SEAL ids, CI ids or GUIDs are reproduced here.
+
+### 8.1 The five structural facts
+
+**(a) `tom_roles` is a GLOBAL MASTER CATALOG, not a per-application list.** It holds **100+ role-type
+definitions**, numbered `TR#######`, with **no application or SEAL column**. Applications instantiate
+these types; the catalog itself is estate-wide. Every count this project has argued over — 7, 9, 10,
+13, 14 — describes what the SEAL contact extract *surfaces*, not what the register *contains*.
+
+**(b) Every role type carries two classifying attributes DryDocs has no equivalent for.**
+
+| Attribute | Values seen |
+|---|---|
+| **Scope** | `Individual` or `Group` |
+| **Type** | `Accountable`, `Operational`, `Approval`, `Assignment`, other |
+
+**(c) `tom_main` has TWO holder columns, not one — `group` and `individual`.** Which one is populated
+is determined by the role type's **Scope**. This resolves §1.3(d): the SME's report query joined only
+`sys_user_group`, so the surface *looked* group-only; the table carries both.
+
+**(d) Inheritance runs application to deployment, and it is nearly total.** On the sampled deployment,
+**every** TOM assignment is `Inherited` from the parent business-application CI **except two** —
+`Deployment Owner` and `Deployment Information Owner` — which are set **Direct** on the deployment.
+
+**(e) The application-to-deployment link is a REFERENCE COLUMN, not an edge.**
+`cmdb_ci_service_discovered.u_business_application` points at the business-application CI directly.
+The deployment also carries `correlation_id` in `app_id:deployment_id` form, alongside
+`u_seal_application_id` and `u_seal_deployment_id` — and a `CI` id distinct from `sys_id`. It further
+carries `discovery_source` naming SEAL deployments, a `subcategory` of Deployment, and a
+`used_for` field valued Production.
+
+### 8.2 What this does to the query plan
+
+**The edge table drops out of the core pull entirely.** §7.4 had `cmdb_rel_ci` restricted to seeded
+endpoints. But the two hops that matter are both **reference columns**: application to deployment via
+`u_business_application`, and CI to TOM assignment via `tom_main.parent_id`. Neither needs
+`cmdb_rel_ci`. That removes a 4.4M-row table, its 843 dangling type refs and its 9,093 dangling child
+refs from the critical path. `cmdb_rel_ci` becomes optional — wanted only for the area-product hop
+and for infrastructure relationships, neither of which is in the first pull.
+
+**The plan is now four joins from a list we already hold:**
+
+```
+our ~200 SEAL app ids  (DryDocs already has these)
+  -> cmdb_ci_business_app          on u_seal_application_id
+  -> cmdb_ci_service_discovered    on u_business_application        (1:N, the deployments)
+  -> x_<scope>_cmdb_tom_main       on parent_id = CI sys_id         (the assignments)
+  -> x_<scope>_cmdb_tom_roles      on role = sys_id                 (~100 rows, take in full)
+       then EITHER sys_user_group  on group       (Scope = Group)
+       OR         sys_user         on individual  (Scope = Individual)
+```
+
+**Four consequences for how it must be written.**
+
+1. **Read BOTH holder columns, switched on the role's Scope.** A query that joins only `group`
+   silently drops every Individual-scoped accountability — which is most of the ones DryDocs
+   currently models. Joining only `individual` drops the entire operational-support layer. This is
+   the single most likely way to get the pull wrong now that the edge table is gone.
+2. **Inheritance must be handled, or accountability double-counts.** Because assignments inherit
+   application to deployment, pulling TOM at *both* levels returns the same accountability twice. The
+   plan must either read at application level and treat deployments as inheriting, or read at
+   deployment level and dedupe on the `Inherited` mode. Do not pull both and union.
+3. **Take `tom_roles` in full.** ~100 rows is a dimension table, and its Scope/Type columns are what
+   makes clause 1 executable.
+4. **`used_for` is an environment filter available at the deployment grain.** If only Production
+   matters, it cuts the deployment set before anything else joins — and it is the concrete form of
+   the environment concept C10's candidate #1 was parked on.
+
+### 8.3 What it does to G35 — five clauses move
+
+| Clause | What the API evidence shows |
+|---|---|
+| **§A enumeration** | The catalog holds **100+ role types**, so the "7 vs 9 vs 13" dispute is about what the SEAL extract surfaces, not about the register. The gate should say which it is ruling |
+| **§B6** — "a role holding always names a person" | **Answered: no.** Scope is a declared attribute of the role type, `Individual` or `Group`. Both are legitimate, and the model must admit an Organization-typed agent (§B6c already noted `prov:agent` allows it) |
+| **§A2 / §G5** — `technology_risk_controls`, "a concept with no source" | It is a **live role type with a live holder** in ServiceNow. The concept has a source after all; what it lacks is a crosswalk branch in the SEAL contact loader |
+| **§A5 / §B1b** — the three Operate Manager classes | **Confirmed on live data**: all three appear as distinct assignments, held by the same person. The SME's 2026-08-05 ruling now has instance evidence behind it |
+| **§G13 / §G14** — Deployment Owner, Deployment Information Owner | **These two are DIRECT on the deployment** while everything else inherits. That resolves §G0e's fork toward genuine deployment-grain attribution for these two specifically — not application-level roles that merely name a deployment concern |
+
+**And one whole family DryDocs has no home for.** The group-scoped roles on a single deployment
+include service ownership, change ownership, several distinct change-approval teams, an eCAB approval
+team, five distinct incident-resolver tiers, and four problem-owner variants. That is the
+**production-support ownership layer** — precisely what this project exists to answer — and none of
+it is in the `tom_roles` scheme's seven concepts. Group names follow a parseable convention
+(`<LOB>_<domain>_<function>_<app>: <TOM-function>`), and each group resolves to real members, so the
+path from an application to the people who actually carry its incidents is available today.
+
+**Recorded as scope, not as a proposal:** it is a large addition, it is exactly on-mission, and it
+belongs to a gate rather than to this document.
+
+### 8.4 Two things to reconcile before building
+
+1. **Inheritance was described at two different rungs.** The SME said on 2026-08-10 that `Inherited`
+   means the CI came from the **area product**; this evidence shows deployments inheriting from the
+   **business application**. Both are plausible — the same mechanism operating on two rungs of the
+   §1.4 chain — but the gate needs to know whether the chain is one inheritance relation applied
+   repeatedly or two different ones. G35 §E5 currently states only the area-product rung.
+2. **A count field disagrees with the row count.** The CI's `u_operational_responsibilities_count`
+   read 16 while the tool found 28 active assignments. Sixteen is exactly the number of *group-scoped*
+   assignments, so the field most likely counts operational responsibilities only — but that is an
+   inference, and a count field that means something narrower than its name is worth confirming
+   before anything trusts it.
