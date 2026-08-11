@@ -899,13 +899,94 @@ belongs to a gate rather than to this document.
 
 ### 8.4 Two things to reconcile before building
 
-1. **Inheritance was described at two different rungs.** The SME said on 2026-08-10 that `Inherited`
-   means the CI came from the **area product**; this evidence shows deployments inheriting from the
-   **business application**. Both are plausible — the same mechanism operating on two rungs of the
-   §1.4 chain — but the gate needs to know whether the chain is one inheritance relation applied
-   repeatedly or two different ones. G35 §E5 currently states only the area-product rung.
+1. ~~**Inheritance was described at two different rungs.**~~ **CLOSED 2026-08-11 — see §8.5.** It is
+   ONE mechanism ("copy from the nearest ancestor holding the role") applied repeatedly up an N-level
+   CI parent chain, not two relations. G35 §E5 states only the area-product rung and should state the
+   walk.
 2. **A count field disagrees with the row count.** The CI's `u_operational_responsibilities_count`
    read 16 while the tool found 28 active assignments. Sixteen is exactly the number of *group-scoped*
    assignments, so the field most likely counts operational responsibilities only — but that is an
    inference, and a count field that means something narrower than its name is worth confirming
    before anything trusts it.
+
+### 8.5 Inheritance, fully resolved (SME, 2026-08-11) — and §8.4's first item closes
+
+**`Inheritance` is COMPUTED, not typed.** It is not a field anyone fills in. The TOM engine walks the
+**CI parent chain upward** and copies each role's assignment down to child CIs, and every row records
+where it came from through two lineage references:
+
+| Field | Points at |
+|---|---|
+| `inherited_from_ci` | the ancestor **CI** that owns the original assignment |
+| `inherited_from` | the ancestor's specific **TOM row** that was copied |
+
+**Three states, and the blank one is real:**
+
+| Value | Meaning | How to spot it |
+|---|---|---|
+| *(blank)* = **Direct** | Origin row — defined on this CI itself, or fed in by a feed (a `u_source` value names it, e.g. the SEAL deployment-contacts feed) | both lineage fields **empty** |
+| **Inherited** | Copied down from the *nearest ancestor that has the role* | both lineage fields **populated** |
+| **Overridden** | Was inherited, then **locally edited** — a different group or person — breaking the link to the parent | recorded on the CI where the edit was made |
+
+**The rule that makes it non-trivial: a child always inherits the ancestor's CURRENT value — even
+when that ancestor value is itself an Override.** Overrides therefore propagate downward, and the
+effective holder at a deployment can differ from the definition at the top of the chain, with the
+lineage fields recording exactly where the divergence was introduced.
+
+**The chain is N-level, not two-level.** The sampled hierarchy runs an infrastructure/service CI at
+the top, then the business application, then the deployment — each linked by `parent` / `u_parent`,
+with the deployment additionally carrying `u_business_application`. Observed behaviours on one
+deployment:
+
+- most roles inherit from the **business application** one rung up;
+- **Service Owner Team** inherits from the CI **above** the application, where it is Direct — it
+  originates two rungs up and passes straight through;
+- **Change Owner Team** inherits from an application-level row that is itself **Overridden**, so the
+  deployment carries an overridden value rolled down;
+- **Deployment Owner** and **Deployment Information Owner** are **Direct** on the deployment, fed
+  from SEAL rather than inherited.
+
+**This closes §8.4 item 1.** The two rungs described separately — area product → application, and
+application → deployment — are **not two relations.** They are one mechanism, "copy from the nearest
+ancestor holding the role", applied repeatedly up whatever chain exists. G35 §E5 states only the
+area-product rung and should state the walk.
+
+#### What it changes for the load
+
+**1. Only two of the three states are assertions.** `Direct` and `Overridden` rows are *authored* —
+somebody decided them. `Inherited` rows are *derived copies* that carry pointers to their origin.
+So the honest load pulls the authored rows and treats inheritance as what it is: a computation. That
+is both a large volume reduction and the semantically correct choice — storing a derived fact as if
+it were asserted is how a graph starts disagreeing with its source.
+
+**The caveat that decides the design:** reconstructing an inherited holder requires the ancestor
+chain, and ancestors sit **above** our ~200 applications — including CIs owned by teams we do not
+support (§7.4). So either the pull widens to include ancestor CIs for their TOM rows only, or
+inherited rows are kept as materialized copies flagged derived. That is a real gate decision, and it
+is the first place the ~200-application boundary and the inheritance model actually conflict.
+
+**2. The PROV shape is now obvious.** An inherited assignment `prov:wasDerivedFrom` the ancestor
+assignment. G35 §E3's option (i) — an `assertion_mode` property plus an inherited-from pointer — is
+the right shape and needs **two** pointers, not one: the ancestor CI *and* the ancestor row.
+
+**3. `u_source` may already be the §D3 discriminator.** G35 §D3 proposes adding a surface
+discriminator so a roster disagreement is readable. Direct rows carry `u_source` naming the feed that
+produced them. If SEAL-fed and hand-authored rows are distinguishable there, the ServiceNow side
+already carries the fact §D3 wants to invent — and the gate should check before designing one.
+
+**4. Part of §D2's roster puzzle is answered by structure rather than by a discriminator.** §D2 asks
+how an operator can tell whether "five Operate Managers" is one roster with five people or two
+rosters disagreeing. Where the difference is an inheritance artifact, the lineage fields say so
+outright: the holder differs because an override was made at a named CI. That does not replace §D3,
+but it means some disagreements have an explanation already sitting in the data.
+
+#### A correction to this repo's own gate prompt
+
+G35 §E1 lists three inheritance values — `Inherited` / `Overridden` / *(empty)*. On 2026-08-10 this
+document's §E1b challenged the third, on the grounds that the evidence did not corroborate it, and
+asked the walk to "confirm or drop it."
+
+**The blank value is real, and it is the most important of the three** — blank *is* Direct, the
+origin state that every inherited copy ultimately points back to. §E1 was right as drafted and §E1b
+was wrong to question it. The gate prompt has been corrected so the walk is not asked to consider
+dropping a legitimate state.
