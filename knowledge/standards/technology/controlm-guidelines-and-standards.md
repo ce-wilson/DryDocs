@@ -620,6 +620,60 @@ replaced more than one, the token is multi-valued on the documented separator �
 **MUST NOT** be inferred from a name prefix. Two jobs sharing a legacy prefix are evidence, not a
 crosswalk, and a graph that treats a guess as an edge is worse than one with a gap.
 
+### 7.5 `DD1|` — the sentinel that says "this description is ours to read"
+
+**MUST**, as the first characters of any description authored to this standard:
+
+```
+DD1|DELIVERY_MECHANISM: MFTS_AGENT | FTS_ID: FTS2 | REC_ID: 70012
+```
+
+**The problem it solves.** Three different things write this field, and they cannot all be
+parsed the same way:
+
+| Description begins with | What it is | Who reads it |
+|---|---|---|
+| `DD1\|` | authored to this standard | the token parser |
+| the DPL generator's literal | machine-generated | the provenance discriminator, on an **exact match** |
+| anything else | legacy waterfall prose, now filler | nobody |
+
+Without a marker, adding a token block to a generated object breaks the exact-match
+discriminator, and requiring the literal leaves the token block nowhere to go. The prefix
+makes the three populations **disjoint**, so both readers keep working and **nothing already
+deployed has to change**.
+
+**The digit is a VERSION, not a template.** `DD1|` means "version 1 of this grammar" and
+nothing else. When the token vocabulary changes in a way that breaks existing parsers, `DD2|`
+is introduced and both are read side by side through the migration. **MUST NOT** be used to
+distinguish job types: the template is selected by `TASKTYPE` where that is sufficient, and by
+the `JOB_ROLE` token where it is not (§7.2). Spending the version slot on template identity
+means the first grammar change has no way to announce itself.
+
+**MUST** appear at position 0, with no leading whitespace, so the test is `startswith` rather
+than a substring search. Two reasons: a description that *quotes* this convention in prose
+cannot false-positive, and the check becomes the cheapest predicate available to a SQL scan
+over the whole estate.
+
+**SHOULD** be applied at **folder scope**. `get_description()` is generator-owned, so a tagged
+block on a *generated job* is overwritten at the next regeneration — the tag does not protect
+it. Folder descriptions are hand-held, which is where authored metadata survives. See §9.2 for
+the one vendor field that survives regeneration on a generated object.
+
+**Values MUST NOT contain the `|` delimiter.** An embedded pipe mis-splits the block. It
+degrades visibly rather than silently — the fragment surfaces as an unknown key, which the
+parser returns rather than dropping — but a visible defect is still a defect.
+
+> **Why this is worth doing when adoption will be partial.** It will be: several teams, 4000
+> free characters, no author-time enforcement to lean on (§9.1). The sentinel does not fix
+> that, it makes it *safe* — **untagged means unread**, so a team that ignores the standard
+> costs coverage rather than corrupting data. The measure is therefore *tagged folders ÷
+> folders*, a number that grows, instead of *how much of our metadata is wrong*, a number that
+> never closes. Fewer than ten folders carry the standard today; for proving the mechanism
+> that is a sample, not a shortfall. What is being proven is that the round trip is lossless
+> and the vocabulary holds **when** the field is filled — not that every team will fill it.
+
+---
+
 The remaining prose in those descriptions is the job's role in words — `JOB_ROLE` (§7.2), unstructured.
 
 ---

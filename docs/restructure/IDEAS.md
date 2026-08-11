@@ -84,6 +84,37 @@ question a 1,000-line file with the trail at the bottom could not answer.
   pattern (`…%%$NEXT..tok`) that the description-metadata plan §3 lists as hazard #1 —
   so the practice is not extinct in the *standards*, not just in the legacy estate.
   **CHECKED AT THE 2026-08-11 GROOM — still open, and already carried in two places, which is why no item was minted.** C29's notes record the collision verbatim, and it rides `config/gate-prompts/email-dl-contact-point.yaml` as rider §G6 so a section-C ruling cannot presume an exit silently. There is still NO backlog item landing the stub plan's E1, so there is nothing to merge into; the three exits (exempt generated objects, fold the literal in as a `GENERATED_BY:` token, or move the discriminator off `DESCRIPTION`) have materially different costs on an estate that is mostly generated objects, so this is a user/SME ruling at that gate rather than a groom decision.
+  **RESOLVED 2026-08-11 (SME design session) — EXIT (d), which none of the three recorded
+  exits describes: a VERSIONED SENTINEL PREFIX partitions the field, so both claims hold
+  unchanged and nothing already deployed migrates.** A description that begins `DD1|` is
+  authored to the token standard; one that does not is either the generator's literal or
+  legacy filler. E1 keeps its exact-match discriminator because generated descriptions
+  never carry the tag; the token parser never sees a generated object it would choke on;
+  and legacy waterfall prose becomes a third, correctly-ignored class. Cheaper than all
+  three recorded exits: (a) loses the metadata where the estate is densest, (b)
+  invalidates E1 on every object already generated, (c) needs a new carrier the generator
+  stamps — (d) costs one prefix and zero migrations. It also RETIRES C29's proposed
+  `GENERATED_BY` token: absence of the tag on a literal-match description already is the
+  provenance signal, so a token asserting it is a second carrier for one fact.
+  THE DESIGN THAT RIDES WITH IT, all SME-ruled the same session:
+  (1) the digit is a VERSION, not a template id — `DD1|` / `DD2|` parse side by side
+  through a grammar migration, and template selection is `TASKTYPE` (derived) plus the
+  already-registered `JOB_ROLE` token (declared), never the sentinel;
+  (2) anchored at position 0, so the check is `startswith` — the cheapest possible SQL
+  predicate at ~240K jobs, and prose that quotes the convention cannot false-positive;
+  (3) FOLDER SCOPE is preferred, because `get_description()` is generator-owned and a
+  tagged block on a generated JOB is overwritten at the next regeneration;
+  (4) the compliance objection dissolves rather than being solved — untagged means
+  unread, so multi-team inconsistency costs COVERAGE (a number that grows) instead of
+  corrupting data (a number that never closes). Under 10 folders carry the standard
+  today, which is a sample size, not a weakness: what is being proven is that the round
+  trip is lossless and the vocabulary holds WHEN the field is filled, never that teams
+  will comply.
+  Recorded at the gate as rider §G6 exit (d) and specified in
+  `knowledge/standards/technology/controlm-guidelines-and-standards.md` §7.5. The gate
+  still RULES it — this entry stops being an open question and becomes a recommendation
+  with a written warrant. NOTE for the company side: their copy of the gate prompt is
+  canonical-company and did not take the producer edits, so RELAY-7 carries this across.
 
 - **`Idea-104`** · 2026-08-11 · `[question]` · **open** · prio? **Med** —
   **The MFT route id changed shape between the field observation and the standard, and
