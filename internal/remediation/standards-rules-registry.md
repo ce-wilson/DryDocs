@@ -250,11 +250,12 @@ Control-M object: technician routing belongs to the escalation DB via the `EJOBN
 - **Engine:** `_check_post_exec`. **Sev:** 🔴 **Status:** 🟡
 - **Why 🔴:** the same NFR's MUST NOT — data files can be multi-GB, and echoing one into sysout floods the log and can breach sysout limits. The operational risk sits in the *forbidden* clause, not the required one. REQ-3 says "for job type file_watcher" unqualified and needs this scope correction.
 
-## R40 — REQ-2: zero `SHOUT` / `DOSHOUT`
-- **Check:** either tag present on a folder or a job.
+## R40 — zero `SHOUT` / `DOSHOUT` / `DOMAIL`
+- **Check:** any of the three tags present on a folder or a job.
 - **Engine:** `_check_notifications`, over notification tags the extractor records BY NAME (a count cannot answer "which"), scanning into `ON` blocks but stopping at nested job/sub-folder boundaries.
 - **Sev:** 🟡 **Status:** 🟡
-- **Scope:** `DOMAIL` is **not** flagged. REQ-2 puts it out of scope and whether mail goes too is an SME ruling; the detector does not presume it.
+- **Scope (widened 2026-08-11):** `DOMAIL` is now flagged with the shouts. REQ-2 removed only the shouts and left mail "out of scope"; the SME ruled mail goes too, so the rule enforces the ruling rather than the page it extends. Evidence that made it cheap: the mail destination has at least two spellings in the estate (`%%NOTIFY` from the generator, `%%EMAIL_GRP` on a deployed on-prem load job's On-Do action) and **neither is declared anywhere** — every such block already resolves to `CTMERR` and mails nothing.
+- **Greenfield action:** delete the `ON`/`DOMAIL` block. **Never** declare the destination to make it resolve — that repairs a mechanism being retired, and would first require ruling which of the two spellings is canonical. The job message says so explicitly so a fix-generator cannot read it the other way.
 
 ---
 

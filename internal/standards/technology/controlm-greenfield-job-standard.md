@@ -120,7 +120,10 @@ PLCT and TRUST, hand-copied.
 - `%%DROPBOX_DIR` and `%%DROPBOX_BKP_DIR` referenced by the TRUST post-command and declared at
   neither job nor folder scope.
 - `%%NOTIFY` — every generated job's `DOMAIL DEST` — declared nowhere. Per the SME this is **not** a
-  wiring gap to close: notification is being removed and the incident is the call to action.
+  wiring gap to close: notification is being removed and the incident is the call to action. As of
+  the 2026-08-11 ruling the `DOMAIL` block goes too, so the reference is deleted with it rather than
+  reported forever. A second spelling exists in the estate — `%%EMAIL_GRP`, on a deployed on-prem
+  load job's On-Do action — and is equally undeclared.
 - `ETL_ARTIFACT_URI` equivalent (`IMG`) holds a bare image name, so NF-SEC-2's approved-repository
   boundary cannot be evaluated.
 - Folder description truncated mid-sentence.

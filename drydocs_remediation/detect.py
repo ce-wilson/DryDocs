@@ -666,15 +666,24 @@ def _check_post_exec(definitions: DefinitionSet) -> list[Finding]:
     return findings
 
 
-# -- R40: REQ-2 conformance ---------------------------------------------------------------
+# -- R40: notification removal (REQ-2, extended to DOMAIL 2026-08-11) ---------------------
 
 
 def _check_notifications(definitions: DefinitionSet) -> list[Finding]:
-    """REQ-2 removes Control-M shouts outright: the ServiceNow incident is the
-    call to action, so a generated shout is noise. DOMAIL is NOT flagged here —
-    REQ-2 leaves it out of scope, and that ruling is the SME's to make."""
+    """Generated notification is removed outright: the ServiceNow incident the
+    failure raises is the call to action, so a shout or a mail is a second,
+    weaker signal nobody acts on.
+
+    DOMAIL is flagged alongside the shouts as of the SME ruling 2026-08-11.
+    REQ-2 originally left it out of scope; the ruling extends REQ-2 rather than
+    reinterpreting it, so the whole ``ON``/``DOMAIL`` block goes. The unresolved
+    destination that block references (``%%NOTIFY``, ``%%EMAIL_GRP``, or
+    whatever a given job spells it) is deleted WITH the block — never declared
+    to make it resolve. That repair would re-wire the mechanism being removed,
+    so no detector here proposes it.
+    """
     findings: list[Finding] = []
-    banned = {"SHOUT", "DOSHOUT"}
+    banned = {"SHOUT", "DOSHOUT", "DOMAIL"}
     for folder in definitions.folders:
         present = sorted(banned.intersection(folder.notification_tags))
         if present:
@@ -683,8 +692,8 @@ def _check_notifications(definitions: DefinitionSet) -> list[Finding]:
                     "R40",
                     "should-fix",
                     f"{folder.name}:notifications",
-                    f"emits {', '.join(present)}; REQ-2 requires zero of these — the "
-                    f"incident is the call to action, not the mail",
+                    f"emits {', '.join(present)}; the standard requires zero of these "
+                    f"— the incident is the call to action, not the mail",
                 )
             )
     for job in definitions.jobs:
@@ -695,7 +704,8 @@ def _check_notifications(definitions: DefinitionSet) -> list[Finding]:
                     "R40",
                     "should-fix",
                     f"{job.name}:notifications",
-                    f"emits {', '.join(present)}; REQ-2 requires zero of these",
+                    f"emits {', '.join(present)}; the standard requires zero of these "
+                    f"— delete the block, do not declare its destination",
                 )
             )
     return findings

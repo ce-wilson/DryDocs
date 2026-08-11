@@ -79,6 +79,9 @@ _DRIFTED = f"""<?xml version="1.0" encoding="UTF-8"?>
       <VARIABLE NAME="%%DS_VER" VALUE="{UUID}"/>
       <VARIABLE NAME="%%IMG_PATH" VALUE="synth-prod-img"/>
       <VARIABLE NAME="%%DAT_FILE_NM" VALUE="SAMPLE_LKP_20260811.txt"/>
+      <ON STMT="*" CODE="NOTOK">
+        <DOMAIL DEST="%%EMAIL_GRP" SUBJECT="synthetic"/>
+      </ON>
     </JOB>
   </SMART_FOLDER>
 </DEFTABLE>
@@ -275,13 +278,17 @@ def test_r39_requires_the_cat_on_tok_and_forbids_it_on_dat(drifted) -> None:
     assert "multi-GB" in dat.message
 
 
-def test_r40_checks_req2_and_leaves_domail_alone(drifted) -> None:
-    """REQ-2 removes SHOUT/DOSHOUT. It leaves DOMAIL out of scope, and whether
-    mail goes too is the SME's ruling — so no detector presumes it."""
-    (finding,) = _by_rule(detect_conformance(drifted))["R40"]
-    assert finding.target == "FOLDER-SYNTH-DRIFT:notifications"
-    assert "SHOUT" in finding.message
-    assert "DOMAIL" not in finding.message
+def test_r40_removes_every_generated_notification_including_domail(drifted) -> None:
+    """REQ-2 removed the shouts and left DOMAIL out of scope; the SME ruling of
+    2026-08-11 extends it to mail. Both kinds are reported, and the container
+    that emits one is named — a folder shout and a job's On-Do mail are two
+    different edits."""
+    by_target = {f.target: f for f in _by_rule(detect_conformance(drifted))["R40"]}
+    assert "SHOUT" in by_target["FOLDER-SYNTH-DRIFT:notifications"].message
+    job = by_target["JOB0021_SAMPLE_AWS_TRUST:notifications"]
+    assert "DOMAIL" in job.message
+    # the fix is deletion; declaring %%EMAIL_GRP would re-wire what is removed
+    assert "do not declare its destination" in job.message
 
 
 def test_nothing_binds_notify_to_a_distribution_list(drifted) -> None:

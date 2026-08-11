@@ -314,9 +314,10 @@ action.**
 So `EMAIL_DL_L2`, `EMAIL_DL_L3` and `EMAIL_DL_PDN` are **folder-scope documentation**, extracted
 later for runbooks. They are deliberately not wired to anything.
 
-**Do not "fix" the unset `%%NOTIFY` by pointing it at a support DL.** Every generated job emits
-`<DOMAIL DEST="%%NOTIFY">` and nothing assigns `%%NOTIFY`. Under this standard that is an ordinary
-unresolvable reference to report (R30) — never an invitation to re-wire the mechanism being removed.
+**Do not "fix" the unset mail destination by pointing it at a support DL.** Every generated job
+emits `<DOMAIL DEST="%%NOTIFY">` and nothing assigns `%%NOTIFY`. Under this standard that is an
+ordinary unresolvable reference to report (R30) — never an invitation to re-wire the mechanism being
+removed.
 
 **Two different kinds of contact, despite the shared prefix.** `EMAIL_DL_L2` / `EMAIL_DL_L3` are
 internal **support tiers** (`ex:supportContact`). `EMAIL_DL_PDN` is **Production Delay
@@ -329,9 +330,29 @@ mapping is a later step. `PDN_SNOW_QUEUE` is therefore **dropped** from the stan
 relocated: it paired a downstream *business* notification with a ServiceNow *technician* queue,
 which are different audiences.
 
-> **Open for SME ruling.** REQ-2 removes `<SHOUT>`/`<DOSHOUT>` and says `<DOMAIL>` is *"out of scope
-> for this requirement and remains"*. If mail goes too, the whole `ON`/`DOMAIL` block and `%%NOTIFY`
-> go with it. This standard carries the ruling; it does not guess it.
+### 5.3.1 `<DOMAIL>` goes too — SME ruling, 2026-08-11
+
+REQ-2 removed `<SHOUT>`/`<DOSHOUT>` and left `<DOMAIL>` *"out of scope for this requirement and
+remains"*. The SME has now ruled that mail goes with the shouts: the whole `ON … NOTOK` → `DOMAIL`
+block is deleted, and the destination reference goes with it. R40 is widened accordingly.
+
+Two things make this cheaper than it looks, and both are worth recording because they are the
+argument, not the decision:
+
+**The destination has more than one spelling, and none of them is declared.** The generator emits
+`%%NOTIFY`; a deployed on-prem load job carries an On-Do action reading *"When Job ended Not OK —
+Send mail notification to `%%EMAIL_GRP`"*; the live TRUST folder declares neither. So the mechanism
+is **already silently unbound wherever it is used** — each of those jobs resolves its destination to
+`CTMERR` and mails nothing. Deletion switches off nothing that was working; it removes a block whose
+only current effect is to generate R30 findings.
+
+**A second spelling is itself the R33 argument in miniature.** Two names for one concept, neither
+declared, is exactly the drift the one-name-per-concept rule exists to stop. Repairing the block
+would mean first ruling which name is canonical — paying the naming cost for a mechanism being
+retired.
+
+What survives is documentation: `EMAIL_DL_L2` / `EMAIL_DL_L3` / `EMAIL_DL_PDN` stay folder
+variables, read by the runbook extractor, wired to nothing.
 
 ---
 
@@ -407,12 +428,13 @@ return on the standard.
 
 ## 10. Open items
 
-1. **REQ-2 and `<DOMAIL>`** — removed alongside `<SHOUT>`, or retained? (§5.3)
-2. **`SOURCE_CONTACT`** — a DL rather than a named person? The observed value is an individual.
-3. **The dot convention** — `..` before the extension, or the dot stored inside `FILE_EXTENSION`?
+1. **`SOURCE_CONTACT`** — a DL rather than a named person? The observed value is an individual.
+2. **The dot convention** — `..` before the extension, or the dot stored inside `FILE_EXTENSION`?
    Both are legal; the estate should pick one. (§3)
-4. **Site Standards licensing** (§8).
-5. **Job-number band collision** — the generator's `FW=0001` vs HLT's House Keeping. (§7)
+3. **Site Standards licensing** (§8).
+4. **Job-number band collision** — the generator's `FW=0001` vs HLT's House Keeping. (§7)
+
+*Closed 2026-08-11:* **REQ-2 and `<DOMAIL>`** — mail is removed alongside the shouts (§5.3.1).
 
 Related: [[project-description-metadata-plan]], [[project-controlm-remediation-spinoff]],
 [[project-runbook-automation-usecase]], [[project-folder-naming-praocg]]

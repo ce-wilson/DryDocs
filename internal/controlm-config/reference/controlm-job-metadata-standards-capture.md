@@ -1209,6 +1209,11 @@ concept. Nothing in the corpus states which wins. This is carried to the gate as
 `<SHOUT>` and `<DOSHOUT>` are to disappear from generated XML entirely. `<DOMAIL>` (nested in
 `<ON STMT="*" CODE="NOTOK">`) is retained.
 
+> **Amended 2026-08-11 by SME ruling — `<DOMAIL>` goes too.** The retention above is the captured
+> REQ-2 text; the ruling extends it. All three elements disappear, and the `ON … NOTOK` block goes
+> with them. See the SME-rulings list below and R40 in the rules registry. The transcription is left
+> as captured — this note records the change, it does not rewrite the source.
+
 ---
 
 # Ontology coverage — what exists today
@@ -1335,13 +1340,20 @@ satisfies `UPPER_SNAKE`:
 | `%%FileWatch-FILE_PATH` | **`FILE_PATH`** | forbidden `-`, and `FileWatch-` is a vendor plugin namespace |
 | `L2_EMAIL_DL_NM` / `L3_EMAIL_DL_NM` | **`EMAIL_DL_L2` / `EMAIL_DL_L3`** | one prefix, sortable, and it already has a third member (`EMAIL_DL_PDN`) |
 
-Four more, from the SME during the C30 design session:
+Five more, from the SME during the C30 design session and the C31 close-out:
 
 - **Notification is being removed as a mechanism.** REQ-2 deletes `<SHOUT>`/`<DOSHOUT>`; generated
   mail is noise; **the failure raises a ServiceNow incident and that is the call to action.** So
-  `EMAIL_DL_*` are documentation-only, for runbook extraction, and the unset `%%NOTIFY` is an
-  ordinary unresolvable reference — never something to bind to a support DL. Whether `<DOMAIL>` goes
-  too is still open (REQ-2 says it remains).
+  `EMAIL_DL_*` are documentation-only, for runbook extraction, and an unset mail destination is an
+  ordinary unresolvable reference — never something to bind to a support DL.
+- **`<DOMAIL>` goes with the shouts** (ruled 2026-08-11, closing the open item above). Evidence
+  supplied with the ruling: a deployed on-prem load job
+  (`PSRVM0080_MSP_CPV_LOSS_MITG_CPLT_MO_POST_UPDATE_ONPM_TDLOAD`, Actions tab) carries an On-Do
+  action *"When Job ended Not OK — Send mail notification to `%%EMAIL_GRP`"*. That is a **second
+  spelling** of the destination the generator calls `%%NOTIFY`, and like `%%NOTIFY` it is **declared
+  nowhere** — so the block already resolves to `CTMERR` and mails nothing. Deleting it switches off
+  nothing that worked; repairing it would first require ruling which spelling is canonical, for a
+  mechanism being retired. R40 widened to all three tags.
 - **PDN = Production *Delay* Notification** — downstream *business* users, not a support tier. Part
   E §8's role split (`ex:supportContact` for L2/L3, `ex:consumerContact` for PDN) is correct and
   must survive the shared `EMAIL_DL_*` prefix.
@@ -1372,9 +1384,17 @@ REQ-1 → folder variables. Part E → job description tokens. `email-dl-contact
 this exact question and preferred folder grain with per-job exceptions. The corpus now has both
 and states no precedence.
 
-**3. REQ-2 deletes half of the gate's corroboration feed.**
+**3. REQ-2 deletes the gate's corroboration feed — all of it, after the 2026-08-11 ruling.**
 `email-dl-contact-point` §B2 treats DO-MAIL/SHOUT extraction as the *wired* evidence that
-corroborates *intended* routing. REQ-2 removes `<SHOUT>`/`<DOSHOUT>` entirely, leaving `<DOMAIL>`.
+corroborates *intended* routing. REQ-2 removed `<SHOUT>`/`<DOSHOUT>`, leaving `<DOMAIL>` as the last
+of it; the ruling removes that too. So the gate's *wired* side is gone entirely and only the
+*intended* side (the `EMAIL_DL_*` folder variables) survives, with no runtime artifact to
+corroborate it against. That is a change to what §B2 can decide, and it belongs in the gate rather
+than here — the corroboration question is now "against what?", not "which of the two wins".
+
+The observation that motivated the ruling cuts the same way: neither `%%NOTIFY` nor `%%EMAIL_GRP` is
+declared, so the *wired* feed was never carrying routing anyway. It corroborated nothing; it only
+looked like it did.
 
 **4. The DESCRIPTION field is claimed twice on generated objects.**
 `../controlm-pipeline-stub-integration-plan.md` item **E1** uses the two literal DESCRIPTION

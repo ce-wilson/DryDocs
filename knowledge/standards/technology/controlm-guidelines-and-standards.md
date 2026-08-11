@@ -431,9 +431,9 @@ for runbook documentation. They are deliberately not wired to anything.
 
 **MUST NOT** put contacts in a job description — that duplicates a folder fact per job.
 
-**MUST NOT** bind `%%NOTIFY` to a support DL. Where an unset `%%NOTIFY` is found it is an ordinary
-unresolvable reference to report (**R30**), never an invitation to re-wire the mechanism being
-removed.
+**MUST NOT** bind any of them to a `DOMAIL` destination. An unset destination — `%%NOTIFY`,
+`%%EMAIL_GRP`, whatever a given job spells it — is an ordinary unresolvable reference to report
+(**R30**), never an invitation to re-wire the mechanism being removed (§8).
 
 **Two different kinds of contact, despite the shared prefix:**
 
@@ -449,13 +449,24 @@ technician routing lives in the escalation database, joined on the job name.
 
 ## 8. Notifications
 
-**MUST** (**R40**): generated folder and job definitions contain **zero** `<SHOUT>` and `<DOSHOUT>`
-elements, for every job type. Email shouts are not the driving action for incident resolution — the
-ServiceNow incident is.
+**MUST** (**R40**): folder and job definitions contain **zero** `<SHOUT>`, `<DOSHOUT>` and
+`<DOMAIL>` elements, for every job type. The failure raises a ServiceNow incident, and **the
+incident is the call to action** — a generated mail is a second, weaker signal alongside it, and a
+signal nobody is required to act on is noise.
 
-> **Open — pending ruling.** `<DOMAIL>` is currently out of scope and remains. If mail goes too, the
-> `ON`/`DOMAIL` block and `%%NOTIFY` go with it. This page will carry that decision rather than
-> anticipate it.
+**Mail goes with the shouts** (SME ruling, 2026-08-11). REQ-2 removed `<SHOUT>`/`<DOSHOUT>` and left
+`<DOMAIL>` "out of scope"; this ruling extends REQ-2 to cover it. So the whole `ON … NOTOK` →
+`DOMAIL` block is deleted, not re-pointed.
+
+**MUST NOT** repair the destination. Delete the block and its destination reference goes with it,
+whatever that job spells it — the estate currently carries at least `%%NOTIFY` (what every generated
+job emits) and `%%EMAIL_GRP` (an On-Do action on a deployed load job). **Neither is declared
+anywhere.** That is the second argument for deletion rather than repair: the mechanism is already
+silently unbound wherever it is used, so nothing is being switched off that was working. Where such
+a reference is found it is reported as an ordinary unresolvable reference (**R30**) — evidence the
+block should not be there, never a missing variable to supply.
+
+Contacts survive this, at folder scope and as documentation only — see §7.3.
 
 ---
 
@@ -607,7 +618,7 @@ Before submitting a folder:
 - [ ] No two `%%` references side by side (**R37**)
 - [ ] No forbidden character in any variable name; none ≤ 38 chars exceeded (**R38**)
 - [ ] TOK/CTL watcher cats its watch path; **DAT watcher does not cat** (**R39a/b**)
-- [ ] Zero `<SHOUT>` / `<DOSHOUT>` (**R40**)
+- [ ] Zero `<SHOUT>` / `<DOSHOUT>` / `<DOMAIL>` (**R40**)
 - [ ] No variable value is bare punctuation (**R1**)
 - [ ] Job numbers zero-padded, gapped, and ordered like the dependency graph (**R29**)
 
@@ -615,12 +626,13 @@ Before submitting a folder:
 
 ## 12. Open items
 
-1. **`<DOMAIL>`** — removed alongside the shouts, or retained? (§8)
-2. **`SOURCE_CONTACT`** — must it be a DL rather than a named individual? (§7.1)
-3. **The dot convention** — `..` before the extension, or the dot stored inside `FILE_EXTENSION`?
+1. **`SOURCE_CONTACT`** — must it be a DL rather than a named individual? (§7.1)
+2. **The dot convention** — `..` before the extension, or the dot stored inside `FILE_EXTENSION`?
    Both are legal; the estate must pick one. (§3.2)
-4. **Site Standards licensing** (§9)
-5. **Job-number bands** — reconcile the generator's numbering with the functional bands. (§5.4)
+3. **Site Standards licensing** (§9)
+4. **Job-number bands** — reconcile the generator's numbering with the functional bands. (§5.4)
+
+*Closed:* `<DOMAIL>` — **removed alongside the shouts** (SME, 2026-08-11; §8).
 
 ---
 
