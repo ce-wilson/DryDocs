@@ -13,23 +13,66 @@
 -- Do NOT commit result ROWS — they are Internal (CI names, SEAL ids, company
 -- values, sys_id GUIDs). Commit conclusions and counts only.
 --
--- DIALECT: Snowflake, because the CARRIER is Snowflake. This is a property of
--- the carrier, never of ServiceNow — the same way psgmgr extraction SQL is
--- Oracle-shaped (K21 §1.5(3)). Unquoted identifiers resolve uppercase.
---
--- PLACEHOLDERS — fill locally, never commit the filled values (K21 §0):
---   <DB>            the replica database
---   <CMDB_SCHEMA>   the common/CMDB DW_*_DATA_VIEW schema (§2.2)
---   <SCOPE>         the company string filling ServiceNow's x_<scope>_ prefix
--- View naming rule (§2.1): V_ + the ServiceNow table name, uppercased; scoped
--- app tables keep their x_<scope>_ prefix INSIDE the view name.
---
 -- RUN ORDER MATTERS. §A gates everything: if the replica is an incomplete
 -- projection, every other answer here is measured against a partial copy.
 -- =============================================================================
+-- DIALECT: Snowflake, because the CARRIER is Snowflake. This is a property of
+-- the carrier, never of ServiceNow — the same way psgmgr extraction SQL is
+-- Oracle-shaped (K21 §1.5(3)).
+--
+-- IDENTIFIER CASE — THE RULE THAT DECIDES WHETHER ANY OF THIS RUNS.
+-- Snowflake folds UNQUOTED identifiers to UPPERCASE and matches quoted ones
+-- literally. This replica is MIXED, and the two halves go opposite ways:
+--
+--     VIEW names are stored UPPERCASE  -> write them unquoted:  V_CMDB_REL_CI
+--     COLUMN names are stored lowercase -> write them QUOTED:   r."sys_id"
+--
+-- Evidence, from the SME's own working query and the DBeaver navigator: the
+-- query writes tables unquoted and lowercase (<cmdb_schema>.v_cmdb_ci, which
+-- folds up and matches) while quoting EVERY column in lowercase
+-- (tom_main."number", resp."active", cmdbci."sys_class_name"). Those two
+-- choices only coexist if views are uppercase and columns are not. The
+-- navigator agrees: it lists V_CMDB_REL_CI in caps with parent / u_hash /
+-- sys_updated_on beneath it in lower.
+--
+-- WHY IT MATTERS MORE THAN IT LOOKS. An unquoted column reference fails LOUDLY
+-- (invalid identifier) and is easy to fix at the keyboard. But the same mistake
+-- inside an INFORMATION_SCHEMA predicate fails SILENTLY: comparing column_name
+-- against an UPPERCASE literal simply matches nothing, so §B1 would report that
+-- the replica has no parent_descriptor — the exact false negative that triggers
+-- K21 §3.3's fallback rule and would send the crosswalk off to split `name` on
+-- '::' for no reason. Every INFORMATION_SCHEMA comparison below is therefore
+-- wrapped in UPPER(), which is correct whichever way the identifiers are stored.
+-- =============================================================================
+-- HAND-EDIT BLOCK — the ONLY lines carrying Internal values. Fill these three,
+-- run, and never commit the filled file (K21 §0; the values are Internal —
+-- replica host, database, schema names and the company scope string).
+--
+-- Everything downstream reads these variables, so the scope string is written
+-- ONCE here rather than in each of the five TOM references it used to appear in.
+-- =============================================================================
 
-USE DATABASE <DB>;
-USE SCHEMA <CMDB_SCHEMA>;
+SET replica_db  = '<DB>';            -- the replica database
+SET cmdb_schema = '<CMDB_SCHEMA>';   -- the common/CMDB DW_*_DATA_VIEW schema (§2.2)
+SET tom_scope   = '<SCOPE>';         -- the company string filling ServiceNow's x_<scope>_ prefix
+
+-- Derived — do not edit. View naming rule (§2.1): V_ + the ServiceNow table
+-- name, uppercased; scoped-app tables keep their x_<scope>_ prefix INSIDE the
+-- view name.
+SET v_tom_main  = 'V_X_' || UPPER($tom_scope) || '_CMDB_TOM_MAIN';
+SET v_tom_roles = 'V_X_' || UPPER($tom_scope) || '_CMDB_TOM_ROLES';
+
+USE DATABASE IDENTIFIER($replica_db);
+USE SCHEMA   IDENTIFIER($cmdb_schema);
+
+-- Sanity check before anything else — confirms the three variables resolved and
+-- that the session is pointed where you think it is.
+SELECT CURRENT_DATABASE() AS db, CURRENT_SCHEMA() AS schema,
+       $v_tom_main        AS tom_main_view, $v_tom_roles AS tom_roles_view;
+
+-- FALLBACK: if IDENTIFIER($var) is rejected in a FROM clause on this account,
+-- drop the SET block and hand-substitute the literal view names instead — the
+-- affected lines are §D1, §E1, §E2, §E3 and §E4, and they are the only ones.
 
 
 -- #############################################################################
@@ -44,20 +87,20 @@ USE SCHEMA <CMDB_SCHEMA>;
 --     EXPECT 0. Non-zero => the type view does not carry every row.
 SELECT COUNT(*) AS dangling_type_refs
 FROM       V_CMDB_REL_CI   r
-LEFT JOIN  V_CMDB_REL_TYPE t ON r.type = t.sys_id
-WHERE t.sys_id IS NULL;
+LEFT JOIN  V_CMDB_REL_TYPE t ON r."type" = t."sys_id"
+WHERE t."sys_id" IS NULL;
 
 -- A2. The same test on the NODE side, which K21 §6 Q9 did not cover and which
 --     is the more serious half: an edge whose parent or child CI is absent
 --     from the CI view. A missing type mislabels an edge; a missing CI means
 --     the node view is short rows.
 --     EXPECT 0 / 0.
-SELECT COUNT_IF(pc.sys_id IS NULL) AS dangling_parent_cis,
-       COUNT_IF(cc.sys_id IS NULL) AS dangling_child_cis,
-       COUNT(*)                    AS total_edges
+SELECT COUNT_IF(pc."sys_id" IS NULL) AS dangling_parent_cis,
+       COUNT_IF(cc."sys_id" IS NULL) AS dangling_child_cis,
+       COUNT(*)                      AS total_edges
 FROM       V_CMDB_REL_CI r
-LEFT JOIN  V_CMDB_CI     pc ON r.parent = pc.sys_id
-LEFT JOIN  V_CMDB_CI     cc ON r.child  = cc.sys_id;
+LEFT JOIN  V_CMDB_CI     pc ON r."parent" = pc."sys_id"
+LEFT JOIN  V_CMDB_CI     cc ON r."child"  = cc."sys_id";
 
 -- A3. Filtered or stale? Authorship high-water vs carrier-load high-water.
 --     A recent load timestamp with an old authorship max reads STALE UPSTREAM;
@@ -66,28 +109,28 @@ LEFT JOIN  V_CMDB_CI     cc ON r.child  = cc.sys_id;
 --     dwintel_dl_* is capture.
 SELECT 'V_CMDB_REL_CI'                AS view_name,
        COUNT(*)                       AS row_count,
-       MAX(sys_created_on)            AS max_created,
-       MAX(sys_updated_on)            AS max_updated,
-       MAX(dwintel_dl_ld_ts)          AS max_carrier_load,
-       DATEDIFF('day', MAX(sys_updated_on), MAX(dwintel_dl_ld_ts)) AS authorship_lag_days
+       MAX("sys_created_on")          AS max_created,
+       MAX("sys_updated_on")          AS max_updated,
+       MAX("dwintel_dl_ld_ts")        AS max_carrier_load,
+       DATEDIFF('day', MAX("sys_updated_on"), MAX("dwintel_dl_ld_ts")) AS authorship_lag_days
 FROM V_CMDB_REL_CI
 UNION ALL
-SELECT 'V_CMDB_REL_TYPE', COUNT(*), MAX(sys_created_on), MAX(sys_updated_on),
-       MAX(dwintel_dl_ld_ts),
-       DATEDIFF('day', MAX(sys_updated_on), MAX(dwintel_dl_ld_ts))
+SELECT 'V_CMDB_REL_TYPE', COUNT(*), MAX("sys_created_on"), MAX("sys_updated_on"),
+       MAX("dwintel_dl_ld_ts"),
+       DATEDIFF('day', MAX("sys_updated_on"), MAX("dwintel_dl_ld_ts"))
 FROM V_CMDB_REL_TYPE
 UNION ALL
-SELECT 'V_CMDB_CI', COUNT(*), MAX(sys_created_on), MAX(sys_updated_on),
-       MAX(dwintel_dl_ld_ts),
-       DATEDIFF('day', MAX(sys_updated_on), MAX(dwintel_dl_ld_ts))
+SELECT 'V_CMDB_CI', COUNT(*), MAX("sys_created_on"), MAX("sys_updated_on"),
+       MAX("dwintel_dl_ld_ts"),
+       DATEDIFF('day', MAX("sys_updated_on"), MAX("dwintel_dl_ld_ts"))
 FROM V_CMDB_CI;
 
 -- A4. Does the type view HIDE soft-deleted rows or carry them? This is half of
 --     why the count came in under the older extract (§3.3 reading (c)).
 --     delete_flag is a VARCHAR, not a boolean (§3.1) — read the raw values.
-SELECT delete_flag, COUNT(*) AS row_ct
+SELECT "delete_flag", COUNT(*) AS row_ct
 FROM   V_CMDB_REL_TYPE
-GROUP  BY delete_flag
+GROUP  BY "delete_flag"
 ORDER  BY row_ct DESC;
 
 
@@ -104,21 +147,26 @@ ORDER  BY row_ct DESC;
 --     parent_descriptor the fallback is to ASK FOR THE COLUMN, never to start
 --     splitting `name` on '::'.
 --     EXPECT: has_parent_descriptor = TRUE.
-SELECT COUNT_IF(column_name = 'PARENT_DESCRIPTOR') > 0 AS has_parent_descriptor,
-       COUNT_IF(column_name = 'CHILD_DESCRIPTOR')  > 0 AS has_child_descriptor,
-       COUNT_IF(column_name = 'END_POINT')         > 0 AS has_end_point,
-       COUNT_IF(column_name = 'SYS_SCOPE')         > 0 AS has_sys_scope
+--     UPPER() on both sides: see the identifier-case note in the header — an
+--     uppercase literal compared against a lowercase stored name matches
+--     nothing and would report the column ABSENT rather than erroring.
+SELECT COUNT_IF(UPPER(column_name) = 'PARENT_DESCRIPTOR') > 0 AS has_parent_descriptor,
+       COUNT_IF(UPPER(column_name) = 'CHILD_DESCRIPTOR')  > 0 AS has_child_descriptor,
+       COUNT_IF(UPPER(column_name) = 'END_POINT')         > 0 AS has_end_point,
+       COUNT_IF(UPPER(column_name) = 'SYS_SCOPE')         > 0 AS has_sys_scope
 FROM   INFORMATION_SCHEMA.COLUMNS
-WHERE  table_schema = CURRENT_SCHEMA()
-  AND  table_name   = 'V_CMDB_REL_TYPE';
+WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
+  AND  UPPER(table_name)   = 'V_CMDB_REL_TYPE';
 
 -- B2. The full column list, so a missing column is legible as a REPLICA
 --     PROJECTION GAP rather than as an absent ServiceNow field. Compare
 --     against the vendor baseline in servicenow-cmdb-analysis.md (C10).
+--     Also read this for the CASE the columns are stored in — it is the
+--     authoritative answer to the header's identifier rule.
 SELECT column_name, data_type, is_nullable, ordinal_position
 FROM   INFORMATION_SCHEMA.COLUMNS
-WHERE  table_schema = CURRENT_SCHEMA()
-  AND  table_name   = 'V_CMDB_REL_TYPE'
+WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
+  AND  UPPER(table_name)   = 'V_CMDB_REL_TYPE'
 ORDER  BY ordinal_position;
 
 -- B3. THE CROSSWALK INPUT — the whole vocabulary, one row per type, with the
@@ -127,26 +175,26 @@ ORDER  BY ordinal_position;
 --     company-extension boundary needs no case-by-case decision here.
 --     Maps directly onto relationship_vocabulary: parent_descriptor ->
 --     neo4j_label, child_descriptor -> inverse_label.
-SELECT t.sys_id,
-       t.name                                          AS concatenated_name,
-       t.parent_descriptor,
-       t.child_descriptor,
-       t.sys_scope,
-       IFF(t.sys_scope ILIKE '%global%', 'standard', 'custom') AS provenance,
-       t.end_point,
-       t.delete_flag
+SELECT t."sys_id",
+       t."name"                                        AS concatenated_name,
+       t."parent_descriptor",
+       t."child_descriptor",
+       t."sys_scope",
+       IFF(t."sys_scope" ILIKE '%global%', 'standard', 'custom') AS provenance,
+       t."end_point",
+       t."delete_flag"
 FROM   V_CMDB_REL_TYPE t
-ORDER  BY provenance, t.parent_descriptor;
+ORDER  BY provenance, t."parent_descriptor";
 
 -- B4. The count the SME reported (48 standard + 6 custom = 54), reproduced
 --     from the data rather than from memory — and split by delete_flag so a
 --     soft-deleted row cannot silently pad or shrink the total.
-SELECT IFF(sys_scope ILIKE '%global%', 'standard', 'custom') AS provenance,
-       delete_flag,
+SELECT IFF("sys_scope" ILIKE '%global%', 'standard', 'custom') AS provenance,
+       "delete_flag",
        COUNT(*) AS row_ct
 FROM   V_CMDB_REL_TYPE
-GROUP  BY provenance, delete_flag
-ORDER  BY provenance, delete_flag;
+GROUP  BY provenance, "delete_flag"
+ORDER  BY provenance, "delete_flag";
 
 -- B5. THE '::' TRAP, tested rather than assumed (§3.3). K21 rules: read the two
 --     descriptor columns, do NOT split `name`. These rows are the proof —
@@ -155,58 +203,58 @@ ORDER  BY provenance, delete_flag;
 --     not the columns.
 --     ANY ROW HERE justifies the rule. Zero rows does NOT overturn it — it
 --     means the trap has not fired YET on this instance.
-SELECT sys_id,
-       name,
-       parent_descriptor,
-       child_descriptor,
+SELECT "sys_id",
+       "name",
+       "parent_descriptor",
+       "child_descriptor",
        CASE
-         WHEN parent_descriptor LIKE '%::%'
-           OR child_descriptor  LIKE '%::%'           THEN 'descriptor contains ::'
-         WHEN COALESCE(TRIM(parent_descriptor), '') = '' THEN 'parent_descriptor empty'
-         WHEN COALESCE(TRIM(child_descriptor),  '') = '' THEN 'child_descriptor empty'
+         WHEN "parent_descriptor" LIKE '%::%'
+           OR "child_descriptor"  LIKE '%::%'              THEN 'descriptor contains ::'
+         WHEN COALESCE(TRIM("parent_descriptor"), '') = '' THEN 'parent_descriptor empty'
+         WHEN COALESCE(TRIM("child_descriptor"),  '') = '' THEN 'child_descriptor empty'
          ELSE 'name != parent::child'
        END AS trap
 FROM   V_CMDB_REL_TYPE
-WHERE  parent_descriptor LIKE '%::%'
-   OR  child_descriptor  LIKE '%::%'
-   OR  COALESCE(TRIM(parent_descriptor), '') = ''
-   OR  COALESCE(TRIM(child_descriptor),  '') = ''
-   OR  name <> parent_descriptor || '::' || child_descriptor;
+WHERE  "parent_descriptor" LIKE '%::%'
+   OR  "child_descriptor"  LIKE '%::%'
+   OR  COALESCE(TRIM("parent_descriptor"), '') = ''
+   OR  COALESCE(TRIM("child_descriptor"),  '') = ''
+   OR  "name" <> "parent_descriptor" || '::' || "child_descriptor";
 
 -- B6. The §1.4 label trap, checked directly: public material writes the pair as
 --     'Instantiates::Instantiated by', this instance uses 'Instance of' as the
 --     inverse. Same relation, different label — the concrete reason to read the
 --     instance's descriptors rather than a vendor label set.
-SELECT sys_id, name, parent_descriptor, child_descriptor
+SELECT "sys_id", "name", "parent_descriptor", "child_descriptor"
 FROM   V_CMDB_REL_TYPE
-WHERE  parent_descriptor ILIKE '%instantiat%'
-   OR  child_descriptor  ILIKE '%instantiat%'
-   OR  child_descriptor  ILIKE '%instance of%'
-   OR  parent_descriptor ILIKE '%contains%'
-   OR  child_descriptor  ILIKE '%contained by%';
+WHERE  "parent_descriptor" ILIKE '%instantiat%'
+   OR  "child_descriptor"  ILIKE '%instantiat%'
+   OR  "child_descriptor"  ILIKE '%instance of%'
+   OR  "parent_descriptor" ILIKE '%contains%'
+   OR  "child_descriptor"  ILIKE '%contained by%';
 
 -- B7. WHICH OF THE 54 ARE LIVE. §3.2's rule applied to the vocabulary: only
 --     types that carry edges need a DryDocs decision. The sampled rows all
 --     showed ONE type value, so the live subset may be far smaller than 54.
-SELECT t.parent_descriptor,
-       t.child_descriptor,
-       IFF(t.sys_scope ILIKE '%global%', 'standard', 'custom') AS provenance,
-       COUNT(r.sys_id) AS edge_count
+SELECT t."parent_descriptor",
+       t."child_descriptor",
+       IFF(t."sys_scope" ILIKE '%global%', 'standard', 'custom') AS provenance,
+       COUNT(r."sys_id") AS edge_count
 FROM       V_CMDB_REL_TYPE t
-LEFT JOIN  V_CMDB_REL_CI   r ON r.type = t.sys_id
-GROUP  BY t.parent_descriptor, t.child_descriptor, provenance
-ORDER  BY edge_count DESC, t.parent_descriptor;
+LEFT JOIN  V_CMDB_REL_CI   r ON r."type" = t."sys_id"
+GROUP  BY t."parent_descriptor", t."child_descriptor", provenance
+ORDER  BY edge_count DESC, t."parent_descriptor";
 
 -- B8. Q6 — WHAT IS end_point? No public vendor definition was found, so it is
 --     left unassigned rather than guessed. Its distribution against edge usage
 --     is the cheapest evidence available: a flag that is TRUE only for types
 --     with no outbound edges means something different from one spread evenly.
-SELECT t.end_point,
-       COUNT(DISTINCT t.sys_id) AS type_count,
-       COUNT(r.sys_id)          AS edge_count
+SELECT t."end_point",
+       COUNT(DISTINCT t."sys_id") AS type_count,
+       COUNT(r."sys_id")          AS edge_count
 FROM       V_CMDB_REL_TYPE t
-LEFT JOIN  V_CMDB_REL_CI   r ON r.type = t.sys_id
-GROUP  BY t.end_point
+LEFT JOIN  V_CMDB_REL_CI   r ON r."type" = t."sys_id"
+GROUP  BY t."end_point"
 ORDER  BY type_count DESC;
 
 
@@ -221,18 +269,18 @@ ORDER  BY type_count DESC;
 --     meaningful. This decides whether DryDocs needs an impact-weight concept
 --     on edges at all (§6, closing paragraph) — do not conclude "we don't need
 --     one" from a sample.
-SELECT COUNT(*)                                   AS total_edges,
-       COUNT(u_hash)                              AS u_hash_populated,
-       COUNT(percent_outage)                      AS percent_outage_populated,
-       COUNT(DISTINCT percent_outage)             AS percent_outage_distinct,
-       COUNT(connection_strength)                 AS conn_strength_populated,
-       COUNT(DISTINCT connection_strength)        AS conn_strength_distinct
+SELECT COUNT(*)                                 AS total_edges,
+       COUNT("u_hash")                          AS u_hash_populated,
+       COUNT("percent_outage")                  AS percent_outage_populated,
+       COUNT(DISTINCT "percent_outage")         AS percent_outage_distinct,
+       COUNT("connection_strength")             AS conn_strength_populated,
+       COUNT(DISTINCT "connection_strength")    AS conn_strength_distinct
 FROM   V_CMDB_REL_CI;
 
 -- C2. If C1 shows connection_strength has more than one value, this names them.
-SELECT connection_strength, percent_outage, COUNT(*) AS row_ct
+SELECT "connection_strength", "percent_outage", COUNT(*) AS row_ct
 FROM   V_CMDB_REL_CI
-GROUP  BY connection_strength, percent_outage
+GROUP  BY "connection_strength", "percent_outage"
 ORDER  BY row_ct DESC;
 
 -- C3. Q5 — delete_flag semantics across the three ring-1 views. What values it
@@ -241,24 +289,24 @@ ORDER  BY row_ct DESC;
 --     live nodes look connected. The D7 tombstone idiom
 --     (removed_from_source_at) is the existing shape to reuse — do not invent
 --     a second one.
-SELECT 'V_CMDB_CI' AS view_name, delete_flag, COUNT(*) AS row_ct FROM V_CMDB_CI      GROUP BY delete_flag
+SELECT 'V_CMDB_CI' AS view_name, "delete_flag", COUNT(*) AS row_ct FROM V_CMDB_CI       GROUP BY "delete_flag"
 UNION ALL
-SELECT 'V_CMDB_REL_CI',          delete_flag, COUNT(*)        FROM V_CMDB_REL_CI    GROUP BY delete_flag
+SELECT 'V_CMDB_REL_CI',          "delete_flag", COUNT(*)          FROM V_CMDB_REL_CI    GROUP BY "delete_flag"
 UNION ALL
-SELECT 'V_CMDB_REL_TYPE',        delete_flag, COUNT(*)        FROM V_CMDB_REL_TYPE  GROUP BY delete_flag
+SELECT 'V_CMDB_REL_TYPE',        "delete_flag", COUNT(*)          FROM V_CMDB_REL_TYPE  GROUP BY "delete_flag"
 ORDER  BY view_name, row_ct DESC;
 
 -- C4. Does delete_flag interact with the carrier's snapshot trim? If deleted
 --     rows only ever appear in trimmed snapshots, retention is the answer to
 --     "are they kept indefinitely" and the pull needs a snapshot predicate,
 --     not just a flag predicate.
-SELECT delete_flag,
-       dwintel_dl_snapshot_trim,
-       COUNT(*)                      AS row_ct,
-       MIN(dwintel_dl_snapshot_dt)   AS first_snapshot,
-       MAX(dwintel_dl_snapshot_dt)   AS last_snapshot
+SELECT "delete_flag",
+       "dwintel_dl_snapshot_trim",
+       COUNT(*)                        AS row_ct,
+       MIN("dwintel_dl_snapshot_dt")   AS first_snapshot,
+       MAX("dwintel_dl_snapshot_dt")   AS last_snapshot
 FROM   V_CMDB_REL_CI
-GROUP  BY delete_flag, dwintel_dl_snapshot_trim
+GROUP  BY "delete_flag", "dwintel_dl_snapshot_trim"
 ORDER  BY row_ct DESC;
 
 -- C5. Are soft-deleted edges pointing at live CIs? This is the concrete harm in
@@ -266,11 +314,11 @@ ORDER  BY row_ct DESC;
 --     means the flag MUST be in the pull predicate, not a later cleanup.
 SELECT COUNT(*) AS deleted_edges_between_live_cis
 FROM       V_CMDB_REL_CI r
-INNER JOIN V_CMDB_CI     pc ON r.parent = pc.sys_id
-INNER JOIN V_CMDB_CI     cc ON r.child  = cc.sys_id
-WHERE  r.delete_flag  IS NOT NULL AND TRIM(r.delete_flag)  NOT IN ('', 'N', 'false', 'FALSE', '0')
-  AND (pc.delete_flag IS NULL     OR  TRIM(pc.delete_flag)     IN ('', 'N', 'false', 'FALSE', '0'))
-  AND (cc.delete_flag IS NULL     OR  TRIM(cc.delete_flag)     IN ('', 'N', 'false', 'FALSE', '0'));
+INNER JOIN V_CMDB_CI     pc ON r."parent" = pc."sys_id"
+INNER JOIN V_CMDB_CI     cc ON r."child"  = cc."sys_id"
+WHERE  r."delete_flag"  IS NOT NULL AND TRIM(r."delete_flag")  NOT IN ('', 'N', 'false', 'FALSE', '0')
+  AND (pc."delete_flag" IS NULL     OR  TRIM(pc."delete_flag")     IN ('', 'N', 'false', 'FALSE', '0'))
+  AND (cc."delete_flag" IS NULL     OR  TRIM(cc."delete_flag")     IN ('', 'N', 'false', 'FALSE', '0'));
 --     NOTE: the value lists above are a GUESS pending C3. Re-write this
 --     predicate from C3's actual values before trusting the number.
 
@@ -287,12 +335,13 @@ WHERE  r.delete_flag  IS NOT NULL AND TRIM(r.delete_flag)  NOT IN ('', 'N', 'fal
 --     (§1.3(c)), which would put the assignment at DEPLOYMENT grain in the
 --     SOURCE, while practice maps off the APPLICATION. Both can be true — the
 --     source may record finer than the operating model uses it.
-SELECT ci.sys_class_name,
-       COUNT(*)                        AS tom_rows,
-       COUNT(DISTINCT tom_main.parent_id) AS distinct_subject_cis
-FROM       V_X_<SCOPE>_CMDB_TOM_MAIN tom_main
-LEFT JOIN  V_CMDB_CI                 ci ON ci.sys_id = tom_main.parent_id
-GROUP  BY ci.sys_class_name
+--     THIS IS THE ONE TO RUN BEFORE WALKING G35: §G0e's fork turns on it.
+SELECT ci."sys_class_name",
+       COUNT(*)                             AS tom_rows,
+       COUNT(DISTINCT tom_main."parent_id") AS distinct_subject_cis
+FROM       IDENTIFIER($v_tom_main) tom_main
+LEFT JOIN  V_CMDB_CI               ci ON ci."sys_id" = tom_main."parent_id"
+GROUP  BY ci."sys_class_name"
 ORDER  BY tom_rows DESC;
 
 -- D2. §1.3(b) — THE CLASS-TABLE MULTIPLICATION TRAP, quantified. cmdb_ci,
@@ -302,22 +351,22 @@ ORDER  BY tom_rows DESC;
 --     by its class depth. This is the single most likely way to get the pull
 --     wrong, and it is invisible from the view list.
 --     Read: in_base should equal the class counts' union, never their sum.
-SELECT COUNT(DISTINCT ci.sys_id)    AS cis_in_base,
-       COUNT(DISTINCT bap.sys_id)   AS also_in_business_app,
-       COUNT(DISTINCT disco.sys_id) AS also_in_service_discovered,
-       COUNT(DISTINCT IFF(bap.sys_id IS NOT NULL AND disco.sys_id IS NOT NULL,
-                          ci.sys_id, NULL)) AS in_both_class_tables
+SELECT COUNT(DISTINCT ci."sys_id")    AS cis_in_base,
+       COUNT(DISTINCT bap."sys_id")   AS also_in_business_app,
+       COUNT(DISTINCT disco."sys_id") AS also_in_service_discovered,
+       COUNT(DISTINCT IFF(bap."sys_id" IS NOT NULL AND disco."sys_id" IS NOT NULL,
+                          ci."sys_id", NULL)) AS in_both_class_tables
 FROM       V_CMDB_CI                     ci
-LEFT JOIN  V_CMDB_CI_BUSINESS_APP        bap   ON bap.sys_id   = ci.sys_id
-LEFT JOIN  V_CMDB_CI_SERVICE_DISCOVERED  disco ON disco.sys_id = ci.sys_id;
+LEFT JOIN  V_CMDB_CI_BUSINESS_APP        bap   ON bap."sys_id"   = ci."sys_id"
+LEFT JOIN  V_CMDB_CI_SERVICE_DISCOVERED  disco ON disco."sys_id" = ci."sys_id";
 
 -- D3. Which CI classes actually exist, and how many of each. Ring 1 pulls
 --     cmdb_ci and gets EVERY class in one table; whether DryDocs wants all of
 --     them or only the classes it has node semantics for is a modeling
 --     decision for the gate (§3.6). This is the list that decision needs.
-SELECT sys_class_name, COUNT(*) AS cis
+SELECT "sys_class_name", COUNT(*) AS cis
 FROM   V_CMDB_CI
-GROUP  BY sys_class_name
+GROUP  BY "sys_class_name"
 ORDER  BY cis DESC;
 
 -- D4. §1.4 — THE RELATIONSHIP CHAIN, validated as data rather than as a
@@ -325,16 +374,16 @@ ORDER  BY cis DESC;
 --     application -[Instantiates]-> deployment module. This returns the actual
 --     class-to-class edge shapes, which is the real crosswalk unit: DryDocs
 --     maps (parent class, descriptor, child class) triples, not bare labels.
-SELECT pc.sys_class_name AS parent_class,
-       t.parent_descriptor,
-       t.child_descriptor,
-       cc.sys_class_name AS child_class,
-       COUNT(*)          AS edges
+SELECT pc."sys_class_name" AS parent_class,
+       t."parent_descriptor",
+       t."child_descriptor",
+       cc."sys_class_name" AS child_class,
+       COUNT(*)            AS edges
 FROM       V_CMDB_REL_CI   r
-LEFT JOIN  V_CMDB_REL_TYPE t  ON r.type   = t.sys_id
-LEFT JOIN  V_CMDB_CI       pc ON r.parent = pc.sys_id
-LEFT JOIN  V_CMDB_CI       cc ON r.child  = cc.sys_id
-GROUP  BY parent_class, t.parent_descriptor, t.child_descriptor, child_class
+LEFT JOIN  V_CMDB_REL_TYPE t  ON r."type"   = t."sys_id"
+LEFT JOIN  V_CMDB_CI       pc ON r."parent" = pc."sys_id"
+LEFT JOIN  V_CMDB_CI       cc ON r."child"  = cc."sys_id"
+GROUP  BY parent_class, t."parent_descriptor", t."child_descriptor", child_class
 ORDER  BY edges DESC;
 
 -- D5. Is the application -> deployment relation really 1:N, as the SME
@@ -342,17 +391,17 @@ ORDER  BY edges DESC;
 --     contradict it; a long tail of 1s with a few N is the expected shape.
 --     Fill the descriptor predicate from B6's actual value — 'Instantiates' is
 --     this instance's reading, not a vendor constant.
-SELECT COUNT(DISTINCT inst.parent)   AS parent_apps,
-       COUNT(*)                      AS child_links,
-       MAX(inst.child_count)         AS max_children_on_one_parent,
-       AVG(inst.child_count)         AS avg_children_per_parent
+SELECT COUNT(DISTINCT inst.parent_ci)  AS parent_apps,
+       COUNT(*)                        AS child_links,
+       MAX(inst.child_count)           AS max_children_on_one_parent,
+       AVG(inst.child_count)           AS avg_children_per_parent
 FROM (
-  SELECT r.parent,
-         r.child,
-         COUNT(*) OVER (PARTITION BY r.parent) AS child_count
+  SELECT r."parent" AS parent_ci,
+         r."child"  AS child_ci,
+         COUNT(*) OVER (PARTITION BY r."parent") AS child_count
   FROM       V_CMDB_REL_CI   r
-  INNER JOIN V_CMDB_REL_TYPE t ON r.type = t.sys_id
-  WHERE  t.parent_descriptor ILIKE '%instantiat%'
+  INNER JOIN V_CMDB_REL_TYPE t ON r."type" = t."sys_id"
+  WHERE  t."parent_descriptor" ILIKE '%instantiat%'
 ) inst;
 
 
@@ -370,18 +419,21 @@ FROM (
 --     Blocks §B6.
 SELECT column_name, data_type, is_nullable
 FROM   INFORMATION_SCHEMA.COLUMNS
-WHERE  table_schema = CURRENT_SCHEMA()
-  AND  table_name   = 'V_X_<SCOPE>_CMDB_TOM_MAIN'
+WHERE  UPPER(table_schema) = UPPER(CURRENT_SCHEMA())
+  AND  UPPER(table_name)   = UPPER($v_tom_main)
 ORDER  BY ordinal_position;
 
 -- E2. If E1 shows a user column, this says whether it is POPULATED — §3.2's
---     rule applies to the TOM tables too. Replace <USER_COL> with its name.
+--     rule applies to the TOM tables too. Replace <USER_COL> with its name,
+--     quoted and lowercase exactly as E1 reports it.
 --     Skip this block entirely if E1 returns no user column.
--- SELECT COUNT(*)              AS tom_rows,
---        COUNT(<USER_COL>)     AS user_populated,
---        COUNT("GROUP")        AS group_populated,
---        COUNT_IF(<USER_COL> IS NULL AND "GROUP" IS NOT NULL) AS group_only_rows
--- FROM   V_X_<SCOPE>_CMDB_TOM_MAIN;
+-- SELECT COUNT(*)                AS tom_rows,
+--        COUNT("<USER_COL>")     AS user_populated,
+--        COUNT("group")          AS group_populated,
+--        COUNT_IF("<USER_COL>" IS NULL AND "group" IS NOT NULL) AS group_only_rows
+-- FROM   IDENTIFIER($v_tom_main);
+--     NOTE: `group` is a reserved word AND stored lowercase, so it needs the
+--     quotes for both reasons — but lowercase inside them, not upper.
 
 -- E3. §1.3(e) — the inheritance columns, as distribution. SME 2026-08-10:
 --     'Inherited' = the CI came from the area product; 'Overridden' = set by
@@ -389,21 +441,24 @@ ORDER  BY ordinal_position;
 --     a blocked option into a modeling choice: if inherited_from_ci resolves to
 --     CIs DryDocs already holds as :AreaProduct, the pointer can be a real edge
 --     rather than a property.
-SELECT tom_main.inheritance,
-       COUNT(*)                                   AS row_ct,
-       COUNT(tom_main.inherited_from_ci)          AS parent_pointer_populated,
-       COUNT(DISTINCT parent_ci.sys_class_name)   AS distinct_parent_classes
-FROM       V_X_<SCOPE>_CMDB_TOM_MAIN tom_main
-LEFT JOIN  V_CMDB_CI                 parent_ci ON parent_ci.sys_id = tom_main.inherited_from_ci
-GROUP  BY tom_main.inheritance
+--     Watch for a THIRD value: G35 §E1 lists an empty mode that the evidence
+--     does not corroborate, and §E1b asks the walk to confirm or drop it. This
+--     query answers that too.
+SELECT tom_main."inheritance",
+       COUNT(*)                                    AS row_ct,
+       COUNT(tom_main."inherited_from_ci")         AS parent_pointer_populated,
+       COUNT(DISTINCT parent_ci."sys_class_name")  AS distinct_parent_classes
+FROM       IDENTIFIER($v_tom_main) tom_main
+LEFT JOIN  V_CMDB_CI               parent_ci ON parent_ci."sys_id" = tom_main."inherited_from_ci"
+GROUP  BY tom_main."inheritance"
 ORDER  BY row_ct DESC;
 
 -- E4. And WHICH classes the inherited-from parents are — the direct test of
---     "the parent is the area product". If one class dominates, E4's modelled
---     -node option has a named target.
-SELECT parent_ci.sys_class_name AS inherited_from_class, COUNT(*) AS row_ct
-FROM       V_X_<SCOPE>_CMDB_TOM_MAIN tom_main
-INNER JOIN V_CMDB_CI                 parent_ci ON parent_ci.sys_id = tom_main.inherited_from_ci
+--     "the parent is the area product". If one class dominates, G35 §E5's
+--     modelled-node option has a named target.
+SELECT parent_ci."sys_class_name" AS inherited_from_class, COUNT(*) AS row_ct
+FROM       IDENTIFIER($v_tom_main) tom_main
+INNER JOIN V_CMDB_CI               parent_ci ON parent_ci."sys_id" = tom_main."inherited_from_ci"
 GROUP  BY inherited_from_class
 ORDER  BY row_ct DESC;
 
@@ -414,7 +469,7 @@ SELECT table_name,
        COUNT(DISTINCT table_schema) AS schema_count,
        LISTAGG(table_schema, ', ') WITHIN GROUP (ORDER BY table_schema) AS schemas
 FROM   INFORMATION_SCHEMA.TABLES
-WHERE  table_schema RLIKE 'DW_.*_DATA_VIEW'   -- RLIKE: avoids Snowflake's backslash string-escape trap in LIKE
+WHERE  UPPER(table_schema) RLIKE 'DW_.*_DATA_VIEW'   -- RLIKE: avoids Snowflake's backslash string-escape trap in LIKE
 GROUP  BY table_name
 HAVING COUNT(DISTINCT table_schema) > 1
 ORDER  BY schema_count DESC, table_name;
@@ -427,18 +482,18 @@ ORDER  BY schema_count DESC, table_name;
 --     the same way.
 --     READ FOR SKEW: a healthy link spreads across many modules. One module
 --     holding a large share is the signature of a form default, not an
---     assertion. Adjust the join column to the instance's actual KB->CI
---     reference once E1-style column inspection names it.
--- SELECT ci.sys_class_name,
---        COUNT(*)                      AS kb_articles,
---        COUNT(DISTINCT kb.<CI_REF>)   AS distinct_cis,
---        MAX(per_ci.n)                 AS max_articles_on_one_ci
+--     assertion. Name the instance's actual KB->CI reference column first, with
+--     an E1-style column inspection against V_KB_KNOWLEDGE.
+-- SELECT ci."sys_class_name",
+--        COUNT(*)                        AS kb_articles,
+--        COUNT(DISTINCT kb."<CI_REF>")   AS distinct_cis,
+--        MAX(per_ci.n)                   AS max_articles_on_one_ci
 -- FROM       V_KB_KNOWLEDGE kb
--- LEFT JOIN  V_CMDB_CI      ci ON ci.sys_id = kb.<CI_REF>
--- LEFT JOIN (SELECT <CI_REF> AS ci_ref, COUNT(*) AS n
---            FROM V_KB_KNOWLEDGE GROUP BY <CI_REF>) per_ci
---        ON per_ci.ci_ref = kb.<CI_REF>
--- GROUP  BY ci.sys_class_name
+-- LEFT JOIN  V_CMDB_CI      ci ON ci."sys_id" = kb."<CI_REF>"
+-- LEFT JOIN (SELECT "<CI_REF>" AS ci_ref, COUNT(*) AS n
+--            FROM V_KB_KNOWLEDGE GROUP BY "<CI_REF>") per_ci
+--        ON per_ci.ci_ref = kb."<CI_REF>"
+-- GROUP  BY ci."sys_class_name"
 -- ORDER  BY kb_articles DESC;
 
 
@@ -456,4 +511,8 @@ ORDER  BY schema_count DESC, table_name;
 -- bugs in a contract (K21 §1.5): a wrong-alias active filter, two ANDed LIKEs
 -- reaching for one role family, and a WHERE clause referencing a SELECT alias.
 -- Transcribing it would inherit all three.
+--
+-- WHAT IT DOES BORROW FROM THAT QUERY is its IDENTIFIER CONVENTION, which is
+-- the one thing in it that is not a defect but a hard requirement of this
+-- replica: tables unquoted, columns quoted and lowercase. See the header.
 -- =============================================================================

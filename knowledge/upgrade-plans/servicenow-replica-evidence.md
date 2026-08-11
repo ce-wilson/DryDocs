@@ -256,6 +256,26 @@ carries defects that are harmless in a report and would be bugs in a contract.
    is Oracle. Any snow extraction SQL will be Snowflake-shaped for the same reason, and that is a
    property of the carrier, never of ServiceNow.
 
+**One thing in the sample is NOT a defect and must be copied exactly — the identifier convention.**
+The query writes **tables unquoted and lowercase** (`<cmdb_schema>.v_cmdb_ci`) while **quoting every
+column in lowercase** (`tom_main."number"`, `resp."active"`, `cmdbci."sys_class_name"`). Those two
+choices only coexist for one reason: Snowflake folds unquoted identifiers to UPPERCASE, so unquoted
+table names match views stored in caps, while quoted lowercase column names mean the columns are
+stored lowercase and an unquoted reference would not resolve. The DBeaver navigator corroborates —
+`V_CMDB_REL_CI` in caps, `parent` / `u_hash` / `sys_updated_on` in lower beneath it.
+
+> **VIEWS UPPERCASE, COLUMNS QUOTED LOWERCASE.** Any SQL written against this replica follows it or
+> does not run.
+
+**Why this is worth a callout rather than a footnote:** the failure is asymmetric. An unquoted column
+in a `SELECT` fails LOUDLY — invalid identifier, fixed at the keyboard. The same mistake inside an
+`INFORMATION_SCHEMA` predicate fails SILENTLY: comparing `column_name` against an uppercase literal
+simply matches nothing, so a probe asking "does this view carry `parent_descriptor`?" answers **no**
+for a column that is present. That is a confidently wrong answer, and in this case it would have
+triggered §3.3's fallback and sent the crosswalk off splitting `name` on `::` for no reason. Wrap
+`INFORMATION_SCHEMA` comparisons in `UPPER()` on both sides — correct whichever way the identifiers
+turn out to be stored.
+
 None of the three is a criticism of the SME's query, which did its job. They are the evidence for
 why clause (3) of the item exists.
 
