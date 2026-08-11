@@ -536,6 +536,14 @@ struck through rather than deleted** — the alternatives were live and a later 
 were ruled out rather than never considered. Q8 is the sharpest of the remainder: it reconciles the
 source's grain with the operating model's, and one `GROUP BY sys_class_name` settles it.
 
+> **The probes are written.** Every question below that a query can settle has one in
+> [`drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql`](../../drydocs/loaders/sql/adhoc/servicenow_relationship_open_questions.sql)
+> — Snowflake dialect (the carrier), read-only, placeholders for db/schema/scope, annotate-in-place
+> on the `preflight_open_questions.sql` precedent. Q9 is §A and runs first because it gates the rest.
+> Q1 → §E1, Q4 → §B1, Q5 → §C3, Q6 → §B8, Q8 → §D1, Q10 → §E6, §2.2 → §E5, §3.2 → §C1, §3.3 → §B3–B7.
+> The script is authored here and **run on the laptop** — the replica connection lives there, and the
+> result rows are Internal, so only conclusions come back.
+
 1. **Does `tom_main` carry a user/person column as well as `group`?** The sample joins only
    `sys_user_group`. This decides whether G35 §B6's "always names a person" is an invariant or a
    SEAL-side-only fact, and whether `HAS_AGENT` must admit an Organization. **Blocks §B6.**
