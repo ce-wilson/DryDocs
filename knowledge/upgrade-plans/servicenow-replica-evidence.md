@@ -698,10 +698,12 @@ taken at different moments as though they were stable.
 | `cmdb_ci_business_app` | **14,683** |
 | `cmdb_rel_type` | 54 |
 
-**Business applications are 0.07% of the CI table.** The CI class distribution explains the rest: the
-top classes are all cloud and infrastructure — database snapshots, deployment targets, OS images,
-storage volumes, endpoint blocks, ECS tasks — each in the hundreds of thousands. The estate is
-overwhelmingly technical inventory that DryDocs has no use for.
+**Business applications are 0.07% of the CI table** — and **ours are ~1.4% of those** (§7.4: roughly
+200 applications; the 14,683 span multiple LOBs). So the applications DryDocs models are on the order
+of **one in a hundred thousand CI rows**. The class distribution explains the rest: the top classes
+are all cloud and infrastructure — database snapshots, deployment targets, OS images, storage
+volumes, endpoint blocks, ECS tasks — each in the hundreds of thousands. The estate is overwhelmingly
+technical inventory that DryDocs has no use for.
 
 **Zero CIs appear in both class tables.** A CI is in exactly one, so the §1.3(b) multiplication trap
 is real but bounded — and no CI is both a business application and an application service, which
@@ -754,15 +756,36 @@ That supersedes §3.6, which took `cmdb_ci` and `cmdb_rel_ci` whole and would ha
 and 4.4M edges. The replacement inverts the direction of travel: **seed from what we care about and
 traverse out**, rather than take the tables and filter down.
 
+**AND THE SEED IS SMALLER THAN "ALL BUSINESS APPLICATIONS" — SME, 2026-08-11:** *there are roughly
+**200 applications** our teams support; the full list is for **multiple LOBs**.*
+
+That is the single most scope-reducing fact in this document, and it also changes the seed's
+*mechanism*. The 14,683 business applications are the whole company across every line of business.
+Ours are **~1.4% of them**, and DryDocs **already knows which ones** — they are the SEAL applications
+it holds today. So the seed is not a filter applied to ServiceNow's catalog; it is a **join from our
+side**, on `u_seal_application_id`. That reframes the whole pull: this is **enrichment of an
+application list we already have**, not ingestion of a CMDB.
+
 | | Take | Rows | Why |
 |---|---|---|---|
 | **Vocabulary** | `cmdb_rel_type` **in full** | 54 | Trivial, and needed to read any edge. Take all 54 even though 21 are live — the unused ones cost nothing and their absence would look like a gap |
-| **Seed** | `cmdb_ci_business_app` **in full** | 14,683 | The anchor. Small, and the thing DryDocs is actually about |
-| **Seed** | the product catalog / area products **in full** | small | SME: small in full. The layer above the application in the §1.4 chain |
-| **One hop out** | `cmdb_ci_service_discovered` for seeded apps | ≤ 24,169 | The deployment modules `[Instance of]` a seeded application |
-| **Edges** | `cmdb_rel_ci` **restricted to both endpoints in the seeded set** | small fraction of 4.4M | Never the whole edge table |
-| **Attribution** | the TOM tables + `sys_user_group` + `core_company` | — | What G35 needs; unchanged from §3.6 ring 2 |
-| **NOT taken** | `cmdb_ci` as a table; the cloud/infrastructure classes; the `kb_*`, `cmn_*`, rota and SLA families | 21.5M | Out by SME ruling. Individual classes can be added later against a named use case |
+| **Seed** | `cmdb_ci_business_app` **for OUR SEAL applications only** | **~200** | Joined on `u_seal_application_id` from the app list DryDocs already holds. NOT all 14,683 — those span multiple LOBs and are not ours to model |
+| **Seed** | the area products above those applications | small | The layer above in the §1.4 chain. Reached by traversal from the seed, not taken as a table |
+| **One hop out** | `cmdb_ci_service_discovered` for seeded apps | ~200 × deployments each | The deployment modules `[Instance of]` a seeded application (§1.3(c): 1:N) |
+| **Edges** | `cmdb_rel_ci` **restricted to both endpoints in the seeded set** | small | Never the whole edge table |
+| **Attribution** | the TOM tables + `sys_user_group` + `core_company`, for seeded apps | — | What G35 needs; unchanged from §3.6 ring 2 except that it too is seed-scoped |
+| **NOT taken** | `cmdb_ci` as a table; the other ~14,480 business applications; the cloud/infrastructure classes; the `kb_*`, `cmn_*`, rota and SLA families | 21.6M | Out by SME ruling. Individual classes can be added later against a named use case |
+
+**The scope has now collapsed by roughly four orders of magnitude** from §3.6's ring 1 — 21.6M CI
+rows to a low-thousands node set — and each step was a fact rather than a preference: the CI table's
+size, then "everything mapped is off the application", then "~200 applications, multiple LOBs."
+
+**Two consequences worth stating before anyone builds.** First, **the LOB boundary is a real
+publishing and modelling boundary, not just a volume filter** — the other ~14,480 applications belong
+to teams DryDocs does not support, and pulling them would be ingesting other people's ownership data
+with no use case. Second, **a join-from-our-side seed inverts the failure mode**: instead of "did we
+filter enough?", the question becomes "which of our ~200 are MISSING from the CMDB?" — and that
+question is worth answering, because an application we support that has no CI is a finding in itself.
 
 **Two things this shape gets right that the ring model did not.** It is bounded by *what we model*
 rather than by *what the source holds*, so it does not grow when the estate does — the cloud classes
