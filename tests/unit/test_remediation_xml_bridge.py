@@ -104,9 +104,13 @@ def test_provenance_points_at_the_export(definitions) -> None:
     assert definitions.source.endswith("export.xml")
 
 
-def test_dump_stays_blocked_reading_was_never_the_blocked_half() -> None:
-    """The bridge retires the READ half of the XML blocker. Emitting XML that
-    Control-M will import still needs the vendor schema, and inventing it is
-    exactly what the blocked message refuses."""
-    with pytest.raises(NotImplementedError, match="schema acquisition pending"):
+def test_dump_at_this_seam_stays_refused_by_design() -> None:
+    """xml_io retired the schema blocker on BOTH halves (splicing never authors
+    XML), but ``dump(definitions)`` at this seam stays refused for a different,
+    permanent reason: a bare DefinitionSet carries no original document and no
+    attributed change-set, so emitting from it would be the
+    regenerate-from-the-model path §XML rule 1 forbids. The message must say
+    so — a stale 'schema acquisition pending' would send the reader to fix the
+    wrong blocker."""
+    with pytest.raises(NotImplementedError, match="rule 1"):
         XmlDefinitionFormat().dump(None, Path("unused.xml"))

@@ -38,14 +38,24 @@ def test_definition_format_is_abstract() -> None:
         DefinitionFormat()  # type: ignore[abstract]
 
 
-def test_remaining_stubs_raise_not_implemented() -> None:
-    """XML I/O stays schema-acquisition-blocked (see formats.py)."""
-    ds = DefinitionSet()
+def test_xml_load_works_and_dump_stays_a_deliberate_seam(tmp_path: Path) -> None:
+    """``load`` reads real Control-M XML via xml_io (position-faithful
+    projection). ``dump`` still raises — not schema-blocked anymore, but
+    because a bare DefinitionSet cannot express the §XML splice contract:
+    emission needs the original document + an attributed edit script
+    (``xml_io.write``), never a regeneration from the model."""
+    src = tmp_path / "legacy.xml"
+    src.write_bytes(
+        b'<?xml version="1.0" encoding="UTF-8"?>\n<DEFTABLE>\n'
+        b'  <SMART_FOLDER DATACENTER="DC1" FOLDER_NAME="PRSCF1A">\n'
+        b'    <JOB JOBNAME="PRSCF1A001" TASKTYPE="Command" CMDLINE="run.sh"/>\n'
+        b"  </SMART_FOLDER>\n</DEFTABLE>\n"
+    )
     xml = XmlDefinitionFormat()
-    with pytest.raises(NotImplementedError):
-        xml.load(Path("legacy.xml"))
-    with pytest.raises(NotImplementedError):
-        xml.dump(ds, Path("greenfield.xml"))
+    definitions = xml.load(src)
+    assert [j.name for j in definitions.jobs] == ["PRSCF1A001"]
+    with pytest.raises(NotImplementedError, match="rule 1"):
+        xml.dump(DefinitionSet(), Path("greenfield.xml"))
 
 
 def test_finding_and_refs_are_value_objects() -> None:

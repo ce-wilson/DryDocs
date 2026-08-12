@@ -1,13 +1,16 @@
 """Staged Control-M XML → remediation :class:`DefinitionSet` (G67).
 
-WHY A BRIDGE AND NOT A LOADER. ``formats.XmlDefinitionFormat`` raises
-``NotImplementedError`` on both ``load`` and ``dump``, citing vendor-schema
-acquisition. That claim has been HALF STALE since G47: reading Control-M
-definition XML was solved in the lineage component's ``controlm_xml``
-extractor, which stages folders, jobs, ordered variables, descriptions and
-post-commands and already knows the sub-folder nesting. Only ``dump`` —
-emitting XML Control-M will import — genuinely needs ``Folder.xsd``, and it
-stays blocked.
+WHY A BRIDGE AND NOT A LOADER. This bridge adapts a STAGED extract (the
+lineage component's ``controlm_xml`` extractor output, consumed via the
+protocols below) into a curated ``DefinitionSet``. It predates ``xml_io``,
+which now reads definition XML directly inside this component — so the
+schema-acquisition blocker this docstring used to describe is fully retired:
+reading was solved twice over, and emission goes through ``xml_io``'s
+byte-splicing ``write`` (which never authors XML, so it never needed
+``Folder.xsd`` — the acquired schema's remaining role is validating emitted
+files, per ``module-requirements.md``). The bridge stays because a staged
+extract is still a legitimate second source: anything satisfying the
+protocols adapts, XML or not.
 
 WHY THERE IS NO IMPORT OF THE EXTRACTOR. Components may not import each other
 (``tests/unit/test_module_boundary.py``, group ``remediation``), and that rule
