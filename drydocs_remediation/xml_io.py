@@ -77,6 +77,25 @@ class LocatorNotFound(XmlIoError):
     """A Locator matched nothing."""
 
 
+class NoTemplateSibling(XmlIoError):
+    """An element insert found no same-tag element to clone style from.
+
+    Splicing never authors XML shapes; without a template the insert would be
+    an invented element — Tier-2/HITL territory, not a mechanical edit.
+    """
+
+
+class SelfCheckFailed(XmlIoError):
+    """The emitted document does not diff by exactly the intended changes.
+
+    Carries the full :class:`SelfCheckReport`; nothing was written.
+    """
+
+    def __init__(self, report: "SelfCheckReport") -> None:
+        self.report = report
+        super().__init__(report.summary())
+
+
 class AmbiguousLocator(XmlIoError):
     """A Locator matched more than one node and carried no ordinal.
 
@@ -588,6 +607,425 @@ def _project_job(
         subfolder_path=subfolder_path,
         scope_chain=[*chain_above, ("JOB", name, own)],
     )
+
+
+# --------------------------------------------------------------------------- #
+# Effects, the edit script, and the self-check (§XML rules 3 + 4)
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class Effect:
+    """One intended-or-observed structural consequence, comparable as a value.
+
+    The self-check is a MULTISET comparison of intended vs observed effects,
+    so both sides must normalize identically: element inserts/deletes carry
+    the PARENT's path (an inserted node's own ordinal is unknowable at intent
+    time), attribute effects carry the element's path.
+    """
+
+    kind: str  # attr-set | attr-add | attr-remove | element-insert | element-delete
+    path: str
+    detail: str  # attribute name, or inserted/deleted tag
+    old: str | None = None
+    new: str | None = None
+
+
+class EditScript:
+    """Accumulates attributed edits against one document.
+
+    ``change_id`` is a REQUIRED keyword on every method: xml_io does not know
+    what an approval is — ``changes.py`` owns that — but it is structurally
+    incapable of producing an unattributed edit (§XML rule 3 enforced by the
+    signature, not by review).
+    """
+
+    def __init__(self, doc: XmlDocument) -> None:
+        self._doc = doc
+        self._codec = _ENCODINGS[doc.encoding][0]
+        self._edits: list[Edit] = []
+        self._intended: list[Effect] = []
+        #: effects already true in the source (set-to-same-value): recorded so
+        #: re-running an approved change-set is idempotent instead of "missing".
+        self.satisfied: list[Effect] = []
+
+    # -- attribute edits ---------------------------------------------------- #
+
+    def set_attribute(self, node: XmlNode, name: str, value: str, *, change_id: str) -> Effect:
+        slot = node.attr(name)
+        if slot is None:
+            raise LocatorNotFound(
+                f"{node.path} has no attribute {name!r} — use add_attribute for new ones"
+            )
+        effect = Effect("attr-set", node.path, name, old=slot.value, new=value)
+        if slot.value == value:
+            self.satisfied.append(effect)
+            return effect
+        self._edits.append(
+            Edit(
+                span=slot.value_span,
+                replacement=escape_attr_value(value, slot.quote, self._codec),
+                change_id=change_id,
+                description=f"set {name} on {node.path}",
+            )
+        )
+        self._intended.append(effect)
+        return effect
+
+    def add_attribute(
+        self, node: XmlNode, name: str, value: str, *, change_id: str
+    ) -> Effect:
+        """Insert ``NAME="value"`` after the tag's last attribute, cloning that
+        attribute's own leading separator — a wrapped tag wraps the new
+        attribute at the same column; a one-line tag gets a single space."""
+        if node.attr(name) is not None:
+            raise XmlIoError(f"{node.path} already has {name!r} — use set_attribute")
+        source = self._doc.source
+        if node.attrs:
+            last = node.attrs[-1]
+            sep = last.slot_span.slice(source)[: last.name_span.start - last.slot_span.start]
+            pos = last.slot_span.end
+        else:
+            sep = b" "
+            pos = node.start_tag_span.end - (2 if node.empty else 1)
+            while source[pos - 1 : pos] in (b" ", b"\t"):
+                pos -= 1
+        payload = sep + name.encode("ascii") + b'="' + escape_attr_value(value, '"', self._codec) + b'"'
+        effect = Effect("attr-add", node.path, name, old=None, new=value)
+        self._edits.append(
+            Edit(Span(pos, pos), payload, change_id, f"add {name} on {node.path}")
+        )
+        self._intended.append(effect)
+        return effect
+
+    def remove_attribute(self, node: XmlNode, name: str, *, change_id: str) -> Effect:
+        slot = node.attr(name)
+        if slot is None:
+            raise LocatorNotFound(f"{node.path} has no attribute {name!r}")
+        effect = Effect("attr-remove", node.path, name, old=slot.value, new=None)
+        self._edits.append(
+            Edit(slot.slot_span, b"", change_id, f"remove {name} on {node.path}")
+        )
+        self._intended.append(effect)
+        return effect
+
+    # -- element edits ------------------------------------------------------ #
+
+    def _template_for(self, parent: XmlNode, tag: str) -> XmlNode:
+        """Style template: prefer a same-tag child of ``parent``, else any
+        same-tag element in the document. No template → refuse: inventing an
+        element shape is exactly what splicing exists to avoid."""
+        for child in parent.children:
+            if child.tag == tag:
+                return child
+        for node in self._doc.root.iter():
+            if node.tag == tag:
+                return node
+        raise NoTemplateSibling(
+            f"no <{tag}> element anywhere in the document to clone style from — "
+            "inserting one would author an element shape (HITL, not mechanical)"
+        )
+
+    def _indent_of(self, node: XmlNode) -> bytes:
+        """The whitespace run between the preceding newline and the node."""
+        source = self._doc.source
+        i = node.span.start
+        j = i
+        while j > 0 and source[j - 1 : j] in (b" ", b"\t"):
+            j -= 1
+        return source[j:i]
+
+    def insert_element(
+        self,
+        parent: XmlNode,
+        tag: str,
+        attrs: list[tuple[str, str]],
+        *,
+        after: XmlNode | None = None,
+        change_id: str,
+    ) -> Effect:
+        """Insert a new element as a child of ``parent``, cloned in style from
+        an existing same-tag element (indentation and empty-tag form)."""
+        if parent.empty:
+            raise XmlIoError(
+                f"{parent.path} is self-closed; converting it to a paired tag is "
+                "not a mechanical edit (HITL)"
+            )
+        template = self._template_for(parent, tag)
+        indent = self._indent_of(template)
+        closer = self._doc.source[template.start_tag_span.end - 3 : template.start_tag_span.end]
+        empty_form = b" />" if template.empty and closer == b" />" else b"/>"
+        body = b" ".join(
+            name.encode("ascii") + b'="' + escape_attr_value(value, '"', self._codec) + b'"'
+            for name, value in attrs
+        )
+        element = b"<" + tag.encode("ascii") + (b" " + body if body else b"") + empty_form
+        if after is not None:
+            pos = after.span.end
+        elif parent.children:
+            pos = parent.children[-1].span.end
+        else:
+            pos = parent.start_tag_span.end
+        payload = self._doc.newline + indent + element
+        name_attr = next((v for n, v in attrs if n == "NAME"), "")
+        effect = Effect("element-insert", parent.path, tag, old=None, new=name_attr)
+        self._edits.append(Edit(Span(pos, pos), payload, change_id, f"insert <{tag}> under {parent.path}"))
+        self._intended.append(effect)
+        return effect
+
+    def delete_element(self, node: XmlNode, *, change_id: str) -> Effect:
+        """Delete an element, extending backwards over the whitespace-only run
+        up to and including the preceding newline so no blank line is left."""
+        source = self._doc.source
+        start = node.span.start
+        j = start
+        while j > 0 and source[j - 1 : j] in (b" ", b"\t"):
+            j -= 1
+        if source[j - 1 : j] == b"\n":
+            j -= 1
+            if source[j - 1 : j] == b"\r":
+                j -= 1
+        effect = Effect(
+            "element-delete",
+            node.parent.path if node.parent else "",
+            node.tag,
+            old=node.attr_value("NAME") or None,
+            new=None,
+        )
+        self._edits.append(
+            Edit(Span(j, node.span.end), b"", change_id, f"delete <{node.tag}> at {node.path}")
+        )
+        self._intended.append(effect)
+        return effect
+
+    # -- compile ------------------------------------------------------------ #
+
+    def compile(self) -> list[Edit]:
+        """Sorted, overlap-checked edits. Overlaps raise here (render re-checks)."""
+        ordered = sorted(self._edits, key=lambda e: (e.span.start, e.span.end))
+        for prev, cur in zip(ordered, ordered[1:], strict=False):
+            if cur.span.start < prev.span.end:
+                raise XmlIoError(
+                    f"overlapping edits: {prev.description!r} and {cur.description!r}"
+                )
+        return ordered
+
+    @property
+    def intended_effects(self) -> list[Effect]:
+        return list(self._intended)
+
+
+# --------------------------------------------------------------------------- #
+# Structural diff + self-check
+# --------------------------------------------------------------------------- #
+
+
+def _signature(node: XmlNode) -> tuple[str, str]:
+    """Alignment key for sibling matching: tag + NAME (the Control-M identity
+    attribute where one exists). Deliberately excludes other attribute values
+    so an attr-set does not read as delete+insert."""
+    return (node.tag, node.attr_value("NAME"))
+
+
+def _diff_attrs(before: XmlNode, after: XmlNode, effects: list[Effect]) -> None:
+    before_names = [a.name for a in before.attrs]
+    after_names = [a.name for a in after.attrs]
+    common = [n for n in before_names if n in after_names]
+    common_after = [n for n in after_names if n in before_names]
+    if common != common_after:
+        raise SelfCheckFailed(
+            SelfCheckReport(
+                unexpected=[Effect("attr-reorder", before.path, ",".join(after_names))],
+                missing=[],
+            )
+        )
+    before_map = {a.name: a.value for a in before.attrs}
+    after_map = {a.name: a.value for a in after.attrs}
+    for name in before_names:
+        if name not in after_map:
+            effects.append(Effect("attr-remove", before.path, name, old=before_map[name], new=None))
+        elif before_map[name] != after_map[name]:
+            effects.append(
+                Effect("attr-set", before.path, name, old=before_map[name], new=after_map[name])
+            )
+    for name in after_names:
+        if name not in before_map:
+            effects.append(Effect("attr-add", before.path, name, old=None, new=after_map[name]))
+
+
+def _diff_children(before: XmlNode, after: XmlNode, effects: list[Effect]) -> None:
+    from difflib import SequenceMatcher
+
+    b_sigs = [_signature(c) for c in before.children]
+    a_sigs = [_signature(c) for c in after.children]
+    matcher = SequenceMatcher(a=b_sigs, b=a_sigs, autojunk=False)
+    deleted: list[tuple[str, str]] = []
+    inserted: list[tuple[str, str]] = []
+    for op, b1, b2, a1, a2 in matcher.get_opcodes():
+        if op == "equal":
+            for offset in range(b2 - b1):
+                _diff_node(before.children[b1 + offset], after.children[a1 + offset], effects)
+        elif (
+            op == "replace"
+            and (b2 - b1) == (a2 - a1)
+            and all(
+                before.children[b1 + k].tag == after.children[a1 + k].tag
+                for k in range(b2 - b1)
+            )
+        ):
+            # Same count, same tags, same position: these are the SAME elements
+            # whose identity attribute changed (e.g. a ratified rename rewriting
+            # VARIABLE NAME) — an attr-set, not a delete+insert.
+            for offset in range(b2 - b1):
+                _diff_node(before.children[b1 + offset], after.children[a1 + offset], effects)
+        else:
+            for child in before.children[b1:b2]:
+                deleted.append(_signature(child))
+                effects.append(
+                    Effect(
+                        "element-delete",
+                        before.path,
+                        child.tag,
+                        old=child.attr_value("NAME") or None,
+                        new=None,
+                    )
+                )
+            for child in after.children[a1:a2]:
+                inserted.append(_signature(child))
+                effects.append(
+                    Effect(
+                        "element-insert",
+                        before.path,
+                        child.tag,
+                        old=None,
+                        new=child.attr_value("NAME"),
+                    )
+                )
+    reordered = set(deleted) & set(inserted)
+    if reordered:
+        raise SelfCheckFailed(
+            SelfCheckReport(
+                unexpected=[
+                    Effect("sibling-reorder", before.path, f"{tag}[NAME={name!r}]")
+                    for tag, name in sorted(reordered)
+                ],
+                missing=[],
+            )
+        )
+
+
+def _diff_node(before: XmlNode, after: XmlNode, effects: list[Effect]) -> None:
+    if before.tag != after.tag:
+        raise SelfCheckFailed(
+            SelfCheckReport(
+                unexpected=[Effect("tag-rename", before.path, f"{before.tag}->{after.tag}")],
+                missing=[],
+            )
+        )
+    _diff_attrs(before, after, effects)
+    _diff_children(before, after, effects)
+
+
+def structural_diff(before: XmlDocument, after: XmlDocument) -> list[Effect]:
+    """Every structural difference between two documents as typed effects.
+
+    Tag renames and sibling reorders raise immediately: no approved change
+    kind can produce them, so observing one means the splicer corrupted the
+    document — that is not a diff to report, it is an abort.
+    """
+    effects: list[Effect] = []
+    _diff_node(before.root, after.root, effects)
+    return effects
+
+
+@dataclass
+class SelfCheckReport:
+    """What §XML rule 4 saw. ``ok`` only when the emitted file's structural
+    diff equals exactly the intended change list and every post-condition holds."""
+
+    unexpected: list[Effect] = field(default_factory=list)
+    missing: list[Effect] = field(default_factory=list)
+    violations: list[str] = field(default_factory=list)
+    changed_line_numbers: list[int] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        return not self.unexpected and not self.missing and not self.violations
+
+    def summary(self) -> str:
+        parts = []
+        if self.unexpected:
+            parts.append(f"{len(self.unexpected)} unexpected effect(s): {self.unexpected[:3]}")
+        if self.missing:
+            parts.append(f"{len(self.missing)} intended effect(s) missing: {self.missing[:3]}")
+        if self.violations:
+            parts.append(
+                f"{len(self.violations)} post-condition violation(s): {self.violations[:3]}"
+            )
+        return "; ".join(parts) or "ok"
+
+
+def self_check(
+    doc: XmlDocument, script: EditScript, emitted: bytes
+) -> SelfCheckReport:
+    """§XML rule 4: the emitted document must diff by exactly the intended list."""
+    from collections import Counter
+    from difflib import unified_diff
+
+    report = SelfCheckReport()
+    try:
+        after = load_document(emitted, origin=doc.origin)
+    except XmlIoError as exc:
+        report.violations.append(f"emitted document does not re-parse: {exc}")
+        return report
+    observed = Counter(structural_diff(doc, after))
+    intended = Counter(script.intended_effects)
+    report.unexpected = list((observed - intended).elements())
+    report.missing = list((intended - observed).elements())
+
+    newline = doc.newline.decode("ascii")
+    before_lines = doc.source.split(doc.newline)
+    after_lines = emitted.split(doc.newline)
+    lineno = 0
+    for line in unified_diff(
+        [line.decode(_ENCODINGS[doc.encoding][0], "replace") for line in before_lines],
+        [line.decode(_ENCODINGS[doc.encoding][0], "replace") for line in after_lines],
+        lineterm=newline,
+        n=0,
+    ):
+        if line.startswith("@@"):
+            lineno = int(line.split(" ")[1].lstrip("-").split(",")[0])
+        elif line.startswith("-") and not line.startswith("---"):
+            report.changed_line_numbers.append(lineno)
+            lineno += 1
+    return report
+
+
+def write(
+    doc: XmlDocument,
+    script: EditScript,
+    target: Path,
+) -> SelfCheckReport:
+    """Render, self-check FILE-TO-FILE, and only then let the file stand.
+
+    File-to-file is what makes layer 1 non-tautological: the bytes are read
+    back from disk, so an accidental text-mode open, BOM strip, or newline
+    translation fails here instead of in the developer's diff.
+    """
+    emitted = render(doc, script.compile())
+    tmp = target.with_suffix(target.suffix + ".selfcheck-tmp")
+    tmp.write_bytes(emitted)
+    try:
+        read_back = tmp.read_bytes()
+        report = self_check(doc, script, read_back)
+        if read_back != emitted:  # pragma: no cover - binary I/O is exact
+            report.violations.append("file round-trip altered bytes (I/O mode bug)")
+        if not report.ok:
+            raise SelfCheckFailed(report)
+        tmp.replace(target)
+    finally:
+        tmp.unlink(missing_ok=True)
+    return report
 
 
 def to_definition_set(doc: XmlDocument) -> DefinitionSet:
