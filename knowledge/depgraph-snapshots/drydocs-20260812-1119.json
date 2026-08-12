@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-12T08:40:54",
+    "captured_at": "2026-08-12T11:19:18",
     "date": "20260812",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "dd8d843",
-      "full": "dd8d843f63ba3b7c7af644fa0d30e3967fe3074c",
+      "commit": "6bf66fe",
+      "full": "6bf66fe5a969053b3f5a913aca5ce5ce2cf2986c",
       "branch": "main",
-      "describe": "port-base-20260811-30-gdd8d843",
-      "subject": "chore(ideas): Idea-108 CLOSED ΓÇö worktrees and branches pruned under user ruling",
+      "describe": "port-base-20260811-40-g6bf66fe",
+      "subject": "Merge feat/remediation-xml-io ΓÇö the Remediation Fix module epic (plan reactive-finding-shannon)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6830,6 +6830,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/remediation-fix-tracking.yaml",
+      "name": "remediation-fix-tracking.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/remediation-fix-tracking.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/repo-manifest-data-profile.yaml",
       "name": "repo-manifest-data-profile.yaml",
       "extension": ".yaml",
@@ -11825,6 +11834,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/orchestration/controlm/xml_vocab.py",
+      "name": "xml_vocab.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/orchestration/controlm/xml_vocab.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/orchestration/crosswalk.py",
       "name": "crosswalk.py",
       "extension": ".py",
@@ -12410,6 +12428,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_remediation/changedoc.py",
+      "name": "changedoc.py",
+      "extension": ".py",
+      "rel_path": "drydocs_remediation/changedoc.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_remediation/changes.py",
+      "name": "changes.py",
+      "extension": ".py",
+      "rel_path": "drydocs_remediation/changes.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_remediation/corroborate.py",
       "name": "corroborate.py",
       "extension": ".py",
@@ -12455,6 +12491,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_remediation/module-requirements.md",
+      "name": "module-requirements.md",
+      "extension": ".md",
+      "rel_path": "drydocs_remediation/module-requirements.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_remediation/overview_readme.md",
       "name": "overview_readme.md",
       "extension": ".md",
@@ -12477,6 +12522,15 @@
       "name": "xml_bridge.py",
       "extension": ".py",
       "rel_path": "drydocs_remediation/xml_bridge.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_remediation/xml_io.py",
+      "name": "xml_io.py",
+      "extension": ".py",
+      "rel_path": "drydocs_remediation/xml_io.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13733,10 +13787,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-2316.json",
-      "name": "drydocs-20260811-2316.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json",
+      "name": "drydocs-20260812.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-2316.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14579,6 +14633,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/render_remediation_diff.py",
+      "name": "render_remediation_diff.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_remediation_diff.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/render_roadmap.py",
       "name": "render_roadmap.py",
       "extension": ".py",
@@ -14790,6 +14853,15 @@
       "name": "conftest.py",
       "extension": ".py",
       "rel_path": "tests/unit/conftest.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/fixtures_controlm_xml.py",
+      "name": "fixtures_controlm_xml.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/fixtures_controlm_xml.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15668,6 +15740,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_remediation_changedoc.py",
+      "name": "test_remediation_changedoc.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_changedoc.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_remediation_changes.py",
+      "name": "test_remediation_changes.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_changes.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_remediation_conformance.py",
       "name": "test_remediation_conformance.py",
       "extension": ".py",
@@ -15681,6 +15771,24 @@
       "name": "test_remediation_corroborate.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_remediation_corroborate.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_remediation_diff_json.py",
+      "name": "test_remediation_diff_json.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_diff_json.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_remediation_equivalence_verdict.py",
+      "name": "test_remediation_equivalence_verdict.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_equivalence_verdict.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16023,6 +16131,33 @@
       "name": "test_vendor_docs.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_vendor_docs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_xml_io_edits.py",
+      "name": "test_xml_io_edits.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_xml_io_edits.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_xml_io_rename_sweep.py",
+      "name": "test_xml_io_rename_sweep.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_xml_io_rename_sweep.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_xml_io_roundtrip.py",
+      "name": "test_xml_io_roundtrip.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_xml_io_roundtrip.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16703,6 +16838,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/generated/remediation-diff.json",
+      "name": "remediation-diff.json",
+      "extension": ".json",
+      "rel_path": "web/src/generated/remediation-diff.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/generated/software-registry.json",
       "name": "software-registry.json",
       "extension": ".json",
@@ -17052,6 +17196,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/FixDiff.tsx",
+      "name": "FixDiff.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/remediation/FixDiff.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/web/src/remediation/demoRemediation.ts",
@@ -18648,6 +18801,10 @@
       "drydocs/drydocs_lineage/model.py"
     ],
     [
+      "drydocs/drydocs_lineage/extractors/controlm_xml.py",
+      "drydocs/drydocs_core/orchestration/controlm/xml_vocab.py"
+    ],
+    [
       "drydocs/drydocs_lineage/extractors/dpl_mac.py",
       "drydocs/drydocs_lineage/model.py"
     ],
@@ -18724,6 +18881,22 @@
       "drydocs/drydocs_lineage/model.py"
     ],
     [
+      "drydocs/drydocs_remediation/changedoc.py",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/changedoc.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/changes.py",
+      "drydocs/drydocs_remediation/corroborate.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/changes.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
       "drydocs/drydocs_remediation/corroborate.py",
       "drydocs/drydocs_core/neo4j_client.py"
     ],
@@ -18752,6 +18925,10 @@
       "drydocs/drydocs_remediation/formats.py"
     ],
     [
+      "drydocs/drydocs_remediation/formats.py",
+      "drydocs/drydocs_remediation/__init__.py"
+    ],
+    [
       "drydocs/drydocs_remediation/jira.py",
       "drydocs/drydocs_remediation/detect.py"
     ],
@@ -18765,6 +18942,14 @@
     ],
     [
       "drydocs/drydocs_remediation/xml_bridge.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/xml_io.py",
+      "drydocs/drydocs_core/orchestration/controlm/xml_vocab.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/xml_io.py",
       "drydocs/drydocs_remediation/formats.py"
     ],
     [
@@ -18825,6 +19010,10 @@
     ],
     [
       "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_remediation_diff.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
       "drydocs/scripts/render_roadmap.py"
     ],
     [
@@ -18854,6 +19043,14 @@
     [
       "drydocs/scripts/render_load_map.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_diff.py",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_diff.py",
+      "drydocs/drydocs_remediation/xml_io.py"
     ],
     [
       "drydocs/scripts/render_roadmap.py",
@@ -19752,6 +19949,46 @@
       "drydocs/drydocs_api/sessions.py"
     ],
     [
+      "drydocs/tests/unit/test_remediation_changedoc.py",
+      "drydocs/drydocs_remediation/changedoc.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changedoc.py",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changedoc.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changedoc.py",
+      "drydocs/tests/unit/fixtures_controlm_xml.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changes.py",
+      "drydocs/drydocs_remediation/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changes.py",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changes.py",
+      "drydocs/drydocs_remediation/corroborate.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changes.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changes.py",
+      "drydocs/tests/unit/fixtures_controlm_xml.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_changes.py",
+      "drydocs/tests/unit/test_remediation_no_graph_write.py"
+    ],
+    [
       "drydocs/tests/unit/test_remediation_conformance.py",
       "drydocs/drydocs_lineage/extractors/__init__.py"
     ],
@@ -19770,6 +20007,18 @@
     [
       "drydocs/tests/unit/test_remediation_corroborate.py",
       "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_equivalence_verdict.py",
+      "drydocs/drydocs_remediation/equivalence.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_equivalence_verdict.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_equivalence_verdict.py",
+      "drydocs/drydocs_remediation/transform.py"
     ],
     [
       "drydocs/tests/unit/test_remediation_handoff.py",
@@ -20082,6 +20331,38 @@
     [
       "drydocs/tests/unit/test_vendor_docs.py",
       "drydocs/scripts/external_vendor_scrape.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_edits.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_edits.py",
+      "drydocs/tests/unit/fixtures_controlm_xml.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_rename_sweep.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_rename_sweep.py",
+      "drydocs/drydocs_remediation/transform.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_rename_sweep.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_rename_sweep.py",
+      "drydocs/tests/unit/fixtures_controlm_xml.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_roundtrip.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/tests/unit/test_xml_io_roundtrip.py",
+      "drydocs/tests/unit/fixtures_controlm_xml.py"
     ],
     [
       "drydocs/tests/unit/test_yaml_fragments.py",
@@ -20858,6 +21139,10 @@
     [
       "drydocs/web/src/routes/RemediationRoute.tsx",
       "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/routes/RemediationRoute.tsx",
+      "drydocs/web/src/remediation/FixDiff.tsx"
     ],
     [
       "drydocs/web/src/routes/RemediationRoute.tsx",
@@ -25034,6 +25319,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/remediation-fix-tracking.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/repo-manifest-data-profile.yaml"
     ],
     [
@@ -27772,6 +28062,11 @@
       "drydocs/drydocs_core/orchestration/controlm/variables.py"
     ],
     [
+      "drydocs/drydocs_core/orchestration/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/orchestration/controlm/xml_vocab.py"
+    ],
+    [
       "drydocs/drydocs_core/schema",
       "CONTAINS",
       "drydocs/drydocs_core/schema/catalog_ontology_supplement.cypher"
@@ -28034,6 +28329,16 @@
     [
       "drydocs/drydocs_remediation",
       "CONTAINS",
+      "drydocs/drydocs_remediation/changedoc.py"
+    ],
+    [
+      "drydocs/drydocs_remediation",
+      "CONTAINS",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/drydocs_remediation",
+      "CONTAINS",
       "drydocs/drydocs_remediation/corroborate.py"
     ],
     [
@@ -28059,6 +28364,11 @@
     [
       "drydocs/drydocs_remediation",
       "CONTAINS",
+      "drydocs/drydocs_remediation/module-requirements.md"
+    ],
+    [
+      "drydocs/drydocs_remediation",
+      "CONTAINS",
       "drydocs/drydocs_remediation/overview_readme.md"
     ],
     [
@@ -28070,6 +28380,11 @@
       "drydocs/drydocs_remediation",
       "CONTAINS",
       "drydocs/drydocs_remediation/xml_bridge.py"
+    ],
+    [
+      "drydocs/drydocs_remediation",
+      "CONTAINS",
+      "drydocs/drydocs_remediation/xml_io.py"
     ],
     [
       "drydocs/external",
@@ -28774,7 +29089,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-2316.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -29184,6 +29499,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/render_remediation_diff.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/render_roadmap.py"
     ],
     [
@@ -29295,6 +29615,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/conftest.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/fixtures_controlm_xml.py"
     ],
     [
       "drydocs/tests/unit",
@@ -29784,12 +30109,32 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_remediation_changedoc.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_remediation_changes.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_remediation_conformance.py"
     ],
     [
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_remediation_corroborate.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_remediation_diff_json.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_remediation_equivalence_verdict.py"
     ],
     [
       "drydocs/tests/unit",
@@ -29980,6 +30325,21 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_vendor_docs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_xml_io_edits.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_xml_io_rename_sweep.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_xml_io_roundtrip.py"
     ],
     [
       "drydocs/tests/unit",
@@ -30444,6 +30804,11 @@
     [
       "drydocs/web/src/generated",
       "CONTAINS",
+      "drydocs/web/src/generated/remediation-diff.json"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
       "drydocs/web/src/generated/software-registry.json"
     ],
     [
@@ -30590,6 +30955,11 @@
       "drydocs/web/src/ownership",
       "CONTAINS",
       "drydocs/web/src/ownership/demoOwnership.ts"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/FixDiff.tsx"
     ],
     [
       "drydocs/web/src/remediation",
@@ -30771,13 +31141,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1663,
-    "edges": 910,
+    "files": 1680,
+    "edges": 943,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1934,
+    "rels": 1951,
     "directories": 272
   }
 }
