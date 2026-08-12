@@ -82,41 +82,78 @@ def canonical_variable_rename(
     mapping: Mapping[str, str], *, rule_id: str, ratified: bool
 ) -> Tier1Rule:
     """Tier-1 rule: rename variables to their canonical names, rewriting every
-    reference (other variable values + watch templates). Behavior-preserving by
-    construction — the equivalence proof is still asserted by the caller's tests.
+    reference on EVERY text-bearing surface and EVERY scope.
 
     ``mapping`` uses bare names (no ``%%``), old → canonical. The real map is a
     company-side ratified value (command-line-and-variables standard); tests use
-    synthetic pairs. Renaming onto a name that already exists in the same job is a
-    conflict and raises — a conflicting rename is Tier-2 judgment, not Tier-1.
+    synthetic pairs. Renaming onto a name that already exists in the same scope is
+    a conflict and raises — a conflicting rename is Tier-2 judgment, not Tier-1.
+
+    HISTORY (defect A′, found by the 2026-08-12 POC): the original rewrote only
+    job variable declarations/values and watch templates — ``command_line``,
+    ``post_command``, ``description``, folder- and sub-folder-scope variables,
+    and ``scope_chain`` all kept the old name, so the "behavior-preserving by
+    construction" claim was false exactly where ``prove_equivalence`` was blind
+    (command jobs). The rewrite below is surface-complete, and the DOCUMENT-level
+    guarantee lives in ``xml_io``'s post-conditions (``no-dangling-reference``
+    et al.), which scan the whole emitted file — modeled fields or not — so a
+    future field added to :class:`JobDefinition` cannot silently reopen the gap.
     """
+
+    def _rename_all(text: str) -> str:
+        for old, new in mapping.items():
+            text = _rename_in_text(text, old, new)
+        return text
+
+    def _rename_defs(defs) -> list:
+        out = []
+        for name, value in defs:
+            bare = mapping.get(_strip_pfx(name), _strip_pfx(name))
+            out.append((f"%%{bare}", _rename_all(value) if value is not None else None))
+        return out
+
+    def _check_conflicts(scope_desc: str, defs) -> None:
+        existing = {_strip_pfx(n) for n, _ in defs}
+        for old, new in mapping.items():
+            if old in existing and new in existing:
+                raise ValueError(
+                    f"{rule_id}: rename {old!r} -> {new!r} conflicts with an "
+                    f"existing definition in {scope_desc} (Tier-2 territory)"
+                )
 
     def _apply(definitions: DefinitionSet) -> DefinitionSet:
         def rename_job(job: JobDefinition) -> JobDefinition:
-            existing = {_strip_pfx(n) for n, _ in job.variables}
-            for old, new in mapping.items():
-                if old in existing and new in existing:
-                    raise ValueError(
-                        f"{rule_id}: rename {old!r} -> {new!r} conflicts with an "
-                        f"existing definition in job {job.name!r} (Tier-2 territory)"
-                    )
-            variables = []
-            for name, value in job.variables:
-                bare = _strip_pfx(name)
-                bare = mapping.get(bare, bare)
-                new_value = value
-                if new_value is not None:
-                    for old, new in mapping.items():
-                        new_value = _rename_in_text(new_value, old, new)
-                variables.append((f"%%{bare}", new_value))
+            _check_conflicts(f"job {job.name!r}", job.variables)
             template = job.watch_template
             if template is not None:
-                for old, new in mapping.items():
-                    template = _rename_in_text(template, old, new)
-            return replace(job, variables=variables, watch_template=template)
+                template = _rename_all(template)
+            return replace(
+                job,
+                variables=_rename_defs(job.variables),
+                watch_template=template,
+                command_line=_rename_all(job.command_line),
+                post_command=_rename_all(job.post_command),
+                description=_rename_all(job.description),
+                # scope_chain layers carry the same defs the folder/job entries
+                # do — resolution_chain() PREFERS this chain when populated, so
+                # leaving it stale hands downstream consumers the old names.
+                scope_chain=[
+                    (scope, container, _rename_defs(defs))
+                    for scope, container, defs in job.scope_chain
+                ],
+            )
+
+        def rename_folder(folder):
+            _check_conflicts(f"{folder.scope.lower()} {folder.name!r}", folder.variables)
+            return replace(
+                folder,
+                variables=_rename_defs(folder.variables),
+                description=_rename_all(folder.description),
+            )
 
         return replace(
             definitions,
+            folders=[rename_folder(f) for f in definitions.folders],
             jobs=[rename_job(j) for j in definitions.jobs],
         )
 

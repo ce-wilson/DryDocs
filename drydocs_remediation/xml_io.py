@@ -614,6 +614,22 @@ def _project_job(
 # --------------------------------------------------------------------------- #
 
 
+def _bare(name: str) -> str:
+    """Variable name without the %% prefix."""
+    return name[2:] if name.startswith("%%") else name
+
+
+#: every %%NAME / %%$NAME token, bare name captured — the post-conditions'
+#: whole-document scanner (ASCII by construction, so byte-true).
+_ANY_TOKEN_RE = re.compile(rb"%%\$?([A-Za-z_][A-Za-z0-9_]*)")
+
+
+def _token_re(bare: str) -> re.Pattern[bytes]:
+    """``%%NAME``/``%%$NAME`` with the boundary rule proven in
+    ``transform._rename_in_text``: %%DIR must not match inside %%DIR_A."""
+    return re.compile(rb"%%\$?" + re.escape(bare.encode("ascii")) + rb"(?![A-Za-z0-9_])")
+
+
 @dataclass(frozen=True)
 class Effect:
     """One intended-or-observed structural consequence, comparable as a value.
@@ -648,6 +664,10 @@ class EditScript:
         #: effects already true in the source (set-to-same-value): recorded so
         #: re-running an approved change-set is idempotent instead of "missing".
         self.satisfied: list[Effect] = []
+        #: post-condition obligations, accumulated as edits declare them
+        self._renames: dict[str, str] = {}  # bare OLD -> bare NEW
+        self._removed_vars: set[str] = set()  # bare names whose definition was removed
+        self._introduced: set[str] = set()  # bare names approved changes may add
 
     # -- attribute edits ---------------------------------------------------- #
 
@@ -768,6 +788,8 @@ class EditScript:
             pos = parent.start_tag_span.end
         payload = self._doc.newline + indent + element
         name_attr = next((v for n, v in attrs if n == "NAME"), "")
+        if tag.upper() == "VARIABLE" and name_attr:
+            self._introduced.add(_bare(name_attr))
         effect = Effect("element-insert", parent.path, tag, old=None, new=name_attr)
         self._edits.append(Edit(Span(pos, pos), payload, change_id, f"insert <{tag}> under {parent.path}"))
         self._intended.append(effect)
@@ -785,6 +807,8 @@ class EditScript:
             j -= 1
             if source[j - 1 : j] == b"\r":
                 j -= 1
+        if node.tag.upper() == "VARIABLE" and node.attr_value("NAME"):
+            self._removed_vars.add(_bare(node.attr_value("NAME")))
         effect = Effect(
             "element-delete",
             node.parent.path if node.parent else "",
@@ -797,6 +821,85 @@ class EditScript:
         )
         self._intended.append(effect)
         return effect
+
+    # -- reference sweep (defect A′) ----------------------------------------- #
+
+    def declare_rename(self, old: str, new: str) -> None:
+        """Register a rename OBLIGATION without performing it.
+
+        The post-conditions key on declared renames, so an executor that
+        rewrites only some reference sites (the shipped field-list rename's
+        exact defect) is rejected at write() with every surviving site named.
+        ``replace_reference_tokens`` declares automatically; this exists for
+        callers that apply parts of a rename through other edits.
+        """
+        self._renames[_bare(old)] = _bare(new)
+        self._introduced.add(_bare(new))
+
+    def replace_reference_tokens(
+        self, scope: XmlNode, old: str, new: str, *, change_id: str
+    ) -> list[Effect]:
+        """Rename ``%%OLD``/``%%$OLD`` in EVERY attribute value of every element
+        in the ``scope`` subtree — modeled or not.
+
+        This is what closes defect A′: there are no fields here, only attribute
+        values, all of them — ``CMDLINE``, ``POSTCMD``, ``DESCRIPTION``,
+        folder/sub-folder ``VARIABLE`` values, ``INCOND NAME``, ``DOMAIL DEST``
+        and anything never modeled. The definition site (``VARIABLE
+        NAME="%%OLD"``) is itself a matching value, so one sweep covers
+        definitions and references. Returns the Effect per rewritten attribute
+        so every site is enumerated for the change doc and the gate.
+        """
+        old_b, new_b = _bare(old), _bare(new)
+        self.declare_rename(old_b, new_b)
+        token = re.compile(rb"%%(\$?)" + re.escape(old_b.encode("ascii")) + rb"(?![A-Za-z0-9_])")
+        effects: list[Effect] = []
+        source = self._doc.source
+        for node in scope.iter():
+            for slot in node.attrs:
+                raw = slot.value_span.slice(source)
+                if slot.ref_spans:
+                    # entity refs make byte offsets unstable through decoding:
+                    # rewrite the DECODED value and re-escape the whole span.
+                    # Collateral normalization (e.g. &#65; -> A) is byte-level
+                    # only — the decoded value is unchanged there, so the
+                    # structural diff still sees exactly one attr-set.
+                    text_token = re.compile(
+                        rf"%%(\$?){re.escape(old_b)}(?![A-Za-z0-9_])"
+                    )
+                    if not text_token.search(slot.value):
+                        continue
+                    new_value = text_token.sub(rf"%%\1{new_b}", slot.value)
+                    self._edits.append(
+                        Edit(
+                            slot.value_span,
+                            escape_attr_value(new_value, slot.quote, self._codec),
+                            change_id,
+                            f"rename {old_b}->{new_b} in {slot.name} on {node.path} "
+                            "(escape-normalized: whole-value rewrite over entity refs)",
+                        )
+                    )
+                else:
+                    matches = list(token.finditer(raw))
+                    if not matches:
+                        continue
+                    for match in matches:
+                        start = slot.value_span.start + match.start()
+                        self._edits.append(
+                            Edit(
+                                Span(start, slot.value_span.start + match.end()),
+                                b"%%" + match.group(1) + new_b.encode("ascii"),
+                                change_id,
+                                f"rename {old_b}->{new_b} in {slot.name} on {node.path}",
+                            )
+                        )
+                    new_value = token.sub(
+                        rb"%%\1" + new_b.encode("ascii"), raw
+                    ).decode(self._codec)
+                effect = Effect("attr-set", node.path, slot.name, old=slot.value, new=new_value)
+                self._intended.append(effect)
+                effects.append(effect)
+        return effects
 
     # -- compile ------------------------------------------------------------ #
 
@@ -965,6 +1068,73 @@ class SelfCheckReport:
         return "; ".join(parts) or "ok"
 
 
+def _post_condition_violations(
+    doc: XmlDocument, after: XmlDocument, emitted: bytes, script: EditScript
+) -> list[str]:
+    """The four whole-document guarantees (defect A′'s general fix).
+
+    Byte scans over the FULL emitted document — possible only because splicing
+    keeps unmodeled residue present as bytes. Data-driven from the script's
+    declared obligations, so a new change kind needs no new condition.
+    """
+    violations: list[str] = []
+    before = doc.source
+
+    # 1. no-dangling-reference: after rename OLD->NEW, no %%OLD anywhere —
+    #    DESCRIPTION prose included (§VARS: descriptions are the human copy of
+    #    the same facts, so a stale token there is a defect, not noise).
+    for old, new in script._renames.items():
+        for match in _token_re(old).finditer(emitted):
+            line = emitted.count(b"\n", 0, match.start()) + 1
+            violations.append(
+                f"no-dangling-reference: %%{old} survives at byte {match.start()} "
+                f"(line {line}) after rename {old}->{new}"
+            )
+
+    # 2. no-orphan-reference: a removed variable may leave no consumer behind —
+    #    unless another definition of the same name survives (the §VARS
+    #    duplicate-cleanup case, where consumers still resolve).
+    surviving_defs = {
+        _bare(node.attr_value("NAME"))
+        for node in after.root.iter()
+        if node.tag.upper() == "VARIABLE" and node.attr_value("NAME")
+    }
+    for name in script._removed_vars:
+        if name in surviving_defs or name in script._renames:
+            continue
+        count = len(_token_re(name).findall(emitted))
+        if count:
+            violations.append(
+                f"no-orphan-reference: %%{name} was removed but {count} reference(s) survive"
+            )
+
+    # 3. reference-conservation: count(NEW after) == count(OLD before) +
+    #    count(NEW before) — catches under- AND over-rewriting, including a
+    #    collision with a pre-existing NEW.
+    for old, new in script._renames.items():
+        expected = len(_token_re(old).findall(before)) + len(_token_re(new).findall(before))
+        got = len(_token_re(new).findall(emitted))
+        if got != expected:
+            violations.append(
+                f"reference-conservation: expected {expected} %%{new} tokens after "
+                f"rename {old}->{new}, found {got}"
+            )
+
+    # 4. no-unapproved-new-reference: emitted tokens ⊆ before ∪ introduced —
+    #    catches a typo in any generated value.
+    before_tokens = {m.group(1).decode("ascii") for m in _ANY_TOKEN_RE.finditer(before)}
+    allowed = before_tokens | script._introduced
+    for match in _ANY_TOKEN_RE.finditer(emitted):
+        name = match.group(1).decode("ascii")
+        if name not in allowed:
+            violations.append(
+                f"no-unapproved-new-reference: %%{name} at byte {match.start()} "
+                "appears in no approved change and was not in the original"
+            )
+            allowed.add(name)  # one report per name
+    return violations
+
+
 def self_check(
     doc: XmlDocument, script: EditScript, emitted: bytes
 ) -> SelfCheckReport:
@@ -982,6 +1152,7 @@ def self_check(
     intended = Counter(script.intended_effects)
     report.unexpected = list((observed - intended).elements())
     report.missing = list((intended - observed).elements())
+    report.violations.extend(_post_condition_violations(doc, after, emitted, script))
 
     newline = doc.newline.decode("ascii")
     before_lines = doc.source.split(doc.newline)
