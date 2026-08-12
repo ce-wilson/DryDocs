@@ -29,6 +29,19 @@
 # Also refreshed: the registry has grown from 6 corpora to 7 since the draft
 # (`seal-pat-scrape`, registered as a stub by the N8 ruling 2026-08-06).
 #
+# SECOND REFRESH, same day — THE COUNT REOPENS DOWNWARD, and a sixth section.
+# R1 settled that there is no THIRD database. It did not settle that there are
+# two. The SME raised the fold to ONE on retrieval grounds: an agent that cannot
+# see captured context beside the structured graph in a single vector search may
+# not be able to answer the question at all. That argument is NOT the one
+# ADR 0002 D1 weighed when it rejected single-DB, and it is not the trigger
+# ADR 0011 (single-database contingency, PLANNED 2026-08-10) was written for
+# either — 0011 plans the fold for Enterprise becoming unavailable. §A now
+# carries ONE and TWO as live options with the fold costed; §F is new and rules
+# the consequence nobody would find until after the fold: there are TWO trust
+# vocabularies in this repo, they mean different things, and one of them is
+# already governing a trust boundary inside a single database today.
+#
 # Mechanism + database names only. The one company-adjacent id here
 # (jpmc-reports) is classification External in the registry: public SEC filings
 # with a public source_url. classification: Internal-Public.
@@ -44,13 +57,17 @@ summary: >
   what is left: with `dddocs` rejected (R1) there are TWO content-bearing
   databases, not three, and the draft's recommended fix for the false watermark
   is no longer available.
-  What remains to rule: (a) the two-database split confirmed and the `dddocs`
-  name retired everywhere it appears; (b) the ddcontext charter and the
-  watermark, which now cannot be made true by moving data, because ddcontext
-  keeps two VERBATIM corpora permanently; (c) the target_db of all seven
-  doc-source-registry rows; (d) an explicit acceptance of what the one remaining
-  boundary COSTS; and (e) the drydocs-deepdoc charter, which has drifted between
-  two ADRs that describe different products.
+  What remains to rule: (a) the database COUNT — two, or the fold to one that
+  the SME raised on retrieval grounds — and the `dddocs` name retired either
+  way; (b) the ddcontext charter and the watermark, which can no longer be made
+  true by moving data because ddcontext keeps two VERBATIM corpora permanently;
+  (c) the target_db of all seven doc-source-registry rows; (d) an explicit
+  acceptance of what a boundary COSTS, now conditional on (a); (e) the
+  drydocs-deepdoc charter, which has drifted between two ADRs that describe
+  different products; and (f) the reconciliation of the two trust vocabularies
+  the repo already carries — `origin` on authored mappings and `:Uncertain` on
+  derived findings — which measure different things and would be conflated the
+  first time someone writes a "trusted content" filter.
   The trigger for (b) is not theoretical. `drydocs_api` stamps every ddcontext
   read with the literal string "SYNTHESIZED — unverified", keyed on database
   name; two of the four corpora that stay there are VERBATIM captures. The API
@@ -60,7 +77,7 @@ summary: >
   follows as its own work.
 meta:
   Module: "graph-infra"
-  Source: "ADR 0002 (component database topology, D1/D2) + ADR 0006 (docmeta component and doc graph, §1); live state read 2026-08-05, re-read 2026-08-12 from config/doc-source-registry.yaml, config/dev-environment.yaml, drydocs_api/query_specs.py and drydocs_api/exports.py"
+  Source: "ADR 0002 (component database topology, D1/D2) + ADR 0006 (docmeta component and doc graph, §1) + ADR 0011 (single-database contingency, PLANNED 2026-08-10 — §A's fold option executes its clause 1 for a reason 0011 does not consider); live state read 2026-08-05, re-read 2026-08-12 from config/doc-source-registry.yaml, config/dev-environment.yaml, drydocs_api/query_specs.py, drydocs_api/exports.py, drydocs_core/mapping_store.py and drydocs/loaders/folder_attribution.py"
   Ruled pre-walk: "R1 `dddocs` rejected — two content databases, name retired (settles the draft's Q5 and decides §A) · R2 bmc-docs reloaded from source, with the two-bmc-sets caveat (settles Q2) · R3 the 27 DESCRIBES edges are deleted, not migrated. SME, in session, 2026-08-12"
   Registry ref: "config/doc-source-registry.yaml — 7 corpora (6 at the draft; seal-pat-scrape added 2026-08-06 by N8), target_db split dddocs×3 / ddcontext×4; `dddocs` appears in no provisioning script and in no SHOW DATABASES, and under R1 never will"
   Classification: "Internal-Public (database names, charters and mechanism only; no credentials, no host facts, no company values). jpmc-reports is registry-classification External — public SEC filings with a public source_url"
@@ -114,7 +131,7 @@ provenance:
 
 sections:
   - id: A
-    title: "TWO CONTENT DATABASES, not three — and the `dddocs` name goes"
+    title: "HOW MANY CONTENT DATABASES — R1 killed the third, and the SME reopened the count downward to ONE"
     body: >
       R1 settles the count and the name together. `drydocs` is the original
       database and the `dd*` names are its extensions, so a `dddocs` sitting
@@ -137,11 +154,72 @@ sections:
       because both are captured content and trust is a property of the SOURCE,
       declared per row in the registry. Storing by trust tier is what produced
       the current problem (§B).
+      ---
+      A-FOLD — THE COUNT REOPENS DOWNWARD, and this is the live choice. R1
+      settled that there is no THIRD database. It did not settle that there are
+      two. The SME's argument for ONE is a RETRIEVAL argument, and it is not the
+      argument ADR 0002 D1 weighed: if a vector search cannot see captured
+      context beside the structured graph, the agent may not be able to answer
+      the question. D1 optimized for trust isolation when the product was a load
+      pipeline; the product is now an agent answering support questions, and
+      that failure is silent and constant where the isolation failure is loud
+      and rare. Same facts, different objective.
+      THE INSTRUMENT IS A LABEL, NOT A PROPERTY, and it marks the EXCEPTION, not
+      every node. Three reasons, in order of weight: (1) Neo4j vector indexes are
+      created on a (label, property) pair, so a label is what lets you choose one
+      index over everything or one per realm — a property cannot scope an index
+      at all, which is the exact capability being bought; (2) a property on every
+      node must be written by every loader — around twenty surfaces to change and
+      twenty to forget — whereas ADR 0011's shape applies one label at the single
+      uncertain write boundary and ground-truth loaders change NOT AT ALL;
+      (3) labels are natively scanned, properties need their own index. Ground
+      truth is the default; context carries the mark.
+      WHAT THE FOLD COSTS, priced against the live tree rather than estimated:
+      NEARLY FREE, and the timing is unusually good — drydocs_deepdoc/writer.py
+      is a 17-line docstring stub. The contract is declared ("every written
+      node/edge carries reliability and trust; a finding without stamps is a
+      contract violation") and NOTHING is implemented, so the label discipline is
+      built in before the first uncertain write ever happens. No migration, no
+      backfill, no dual-write window.
+      MODERATE and mechanical — 30 QuerySpecs (28 targeting drydocs, 2 targeting
+      ddcontext) need the ground-truth exclusion, which ADR 0011 already says to
+      generate STRUCTURALLY into the registry rather than hand-editing 30
+      queries; the three clause-1 guards (spec exclusion, writer boundary, a
+      live audit spec counting :Uncertain nodes reachable from ground-truth
+      traversals, expected 0); and the watermark re-key, because with one
+      database WATERMARKED_DATABASES has no subject at all — the fold FORCES
+      §B-DURABLE rather than merely recommending it. One regression to price
+      honestly: docs-verify's `wrong-db` status loses its subject and must be
+      re-pointed at the realm label or that observability is simply gone.
+      AVOIDABLE — ADR 0011's hardest clause (clause 2: ddschema's exemplar nodes
+      carry real labels like :ControlMJob deliberately WITHOUT key properties, so
+      drydocs' NODE KEYs would reject them) fires ONLY if ddschema folds in too.
+      It is separately chartered (G51) and deliberately not a ddall constituent.
+      Leave it out and clause 2 never fires. That is the single largest cost
+      reduction available and it should be taken deliberately, not by omission.
+      IRREDUCIBLE, in ADR 0011's own words — today a transaction literally cannot
+      span databases; folded down, every protection is a check that must run and
+      pass. The guarantee moves from physics back to discipline. A bug that both
+      mislabels and slips the writer guard corrupts ground truth silently until
+      the audit fires. §F is where that risk is weighed against the fact that the
+      repo ALREADY runs exactly this mechanism, in production, for its most
+      governed edges.
+      THE ALTERNATIVE that keeps write-time physics is §D's analytical
+      projection: two authoritative databases plus one combined store rebuilt for
+      GDS and whole-corpus vector search, authoritative for nothing. For
+      retrieval, non-authoritative is arguably fine — you retrieve, then cite
+      back to the authoritative node by business key, which is the D1 proxy-node
+      pattern again. It costs a rebuild pipeline that does not exist, double
+      storage, and staleness in an operational support tool.
     confirmations:
-      - "TWO content-bearing databases: drydocs (structured ground truth + captured vendor/estate content) and ddcontext (reference/experiment/SME content + derived findings). ddschema and ddall unchanged."
-      - "`dddocs` is RETIRED — removed from the registry's target_db column, from cli.DOC_SWEEP_DATABASES, and from the test_database_names.py comment. No CREATE DATABASE, no ddall constituent."
+      - "THE COUNT: either TWO content-bearing databases (drydocs + ddcontext) or the FOLD TO ONE. Rule it here; §B, §C and §D all change shape with the answer."
+      - "`dddocs` is RETIRED under either outcome — removed from the registry's target_db column, from cli.DOC_SWEEP_DATABASES, and from the test_database_names.py comment. No CREATE DATABASE, no ddall constituent."
       - "The 2026-07-26 three-database direction is SUPERSEDED on naming grounds, and the load-separation / blast-radius arguments are accepted as satisfied by corpus-level scoping instead."
-      - "The split is by KIND (ground truth + what describes it / reference + derived), never by trust tier. Trust stays a per-source property in the registry."
+      - "The split — at whatever count — is by KIND, never by trust tier. Trust stays a per-source property in the registry."
+      - "IF THE FOLD: the instrument is a LABEL applied at the single uncertain write boundary, marking the exception; NOT a property on every node. A property cannot scope a vector index, which is the capability the fold exists to buy."
+      - "IF THE FOLD: ddschema stays its own database, so ADR 0011 clause 2 (exemplar labels vs NODE KEYs) never fires. Taken deliberately, recorded as taken."
+      - "IF THE FOLD: ADR 0011's three clause-1 guards are a HARD PRECONDITION of the fold, not a follow-up item, and the physics-to-discipline loss is accepted explicitly (see §F)."
+      - "IF THE FOLD: docs-verify's `wrong-db` check is re-pointed at the realm label rather than silently retired with its subject."
   - id: B
     title: "THE ddcontext CHARTER — the watermark makes a false claim today, and R1 removes the fix the draft recommended"
     body: >
@@ -183,6 +261,11 @@ sections:
       RECOMMENDED: take B-NOW at this gate — it ends a live false claim in one
       change — and commission B-DURABLE as its own backlog item in the same
       breath, so the cheap fix does not become the permanent one.
+      IF §A FOLDS TO ONE DATABASE, this section simplifies and hardens at the
+      same time: WATERMARKED_DATABASES has no subject left, so B-NOW is not
+      available even as a stopgap and B-DURABLE becomes MANDATORY. That is a
+      point in the fold's favour worth naming — it forces the honest fix instead
+      of permitting the cheap one.
     confirmations:
       - "The current state is a DEFECT, not a modelling preference: verbatim-captured material is exported stamped 'SYNTHESIZED — unverified'."
       - "R1 is accepted as removing the fix-the-data option: ddcontext keeps four captured corpora permanently, so its charter must change rather than its contents."
@@ -277,6 +360,12 @@ sections:
       whole-corpus vector search, authoritative for nothing. The right time to
       decide that is now, as part of accepting the cost, rather than improvising
       it the first time a query cannot be written.
+      EVERYTHING IN THIS SECTION IS CONDITIONAL ON §A ANSWERING "TWO". If the
+      fold lands there is no boundary left to price: relationships span
+      everything, GDS and path queries work over content and estate together,
+      one vector index covers every chunk, and the analytical projection is moot
+      because the live store already is one. §D then collapses to a single
+      confirmation — that the cost being accepted is §F's, not this one's.
     confirmations:
       - "Accepted: no relationship can span drydocs and ddcontext, and ddall reads are joins on returned values, not edge walks."
       - "Accepted as GAINED by R1: vendor/estate documentation and the structured graph share a database, so DESCRIBES, path queries, GDS and a single vector index work across them."
@@ -317,6 +406,72 @@ sections:
       - "The hard constraint is chartered: NO relationship is created unless its subject already exists in the grounded graph (ADR 0002 D1 proxy-node pattern)."
       - "deepdoc writes ddcontext and reads across BOTH databases — making it the first real consumer of the ddall federated read, and the first to pay §D's cost."
       - "GRAPH-SEEDED RETRIEVAL is named as a reusable pattern, citing both instances (2026-07-23 HR hierarchy; this one)."
+  - id: F
+    title: "THE TWO TRUST VOCABULARIES — `origin` measures authority, `:Uncertain` measures confidence, and one of them already governs a trust boundary inside a single database"
+    body: >
+      This section exists because the SME asked a question §A–§E could not
+      answer: we map KNOWN relationships, so how are the TEMPORARY ones flagged —
+      the manual pin of a folder to a SEAL app, or a support team to a SEAL app?
+      The answer turns out to decide how much risk the §A fold actually carries.
+      WHAT ALREADY EXISTS, and it is not thin. Every authored attribution carries
+      an `origin` from a four-value enum, CHECK-constrained in
+      drydocs_core/mapping_store.py and ruled at K7 §B3:
+      `manual-pin` (a human pinned it — the automated write is EXCLUDED for that
+      folder, and a derived match that disagrees surfaces as a PIN-CONFLICT),
+      `override` (authored, overriding a source value), `defined` (authored in
+      config/overrides/app-code-mappings.csv), and `matched-fallback` (derived by
+      the K2 match policy, tiers SEAL > FID > APP_NAME > ALIAS). Precedence is
+      explicit in drydocs/loaders/folder_attribution.py — manual-pin 3, override
+      2, defined 1. Riding with it: `match_method` on the edge, a `rationale`
+      REQUIRED on anything that is not `defined`, and `authored_by` /
+      `authored_on`. K7 stated the presentation rule as a principle: attribution
+      is NEVER presented without its origin.
+      THE TEMPORARINESS IS ENFORCED AT THE DOOR, which is the part worth
+      noticing. A manual CSV is loadable ONLY if registered in
+      config/manual-loads/manifest.yaml with a named `replaces_with` AUTOMATION
+      PATH and a loadable status. A manual mapping has to name the automation
+      that will retire it. Retirement is a human act. So the provisional joins
+      are not merely flagged — they are admitted on condition that their own
+      successor is named.
+      TWO AXES, NOT ONE, and this is what the gate must rule. `origin` measures
+      AUTHORITY — who asserted it — and on that axis `manual-pin` is the HIGHEST
+      standing: a human beats derivation. `:Uncertain` (ADR 0011 clause 1)
+      measures CONFIDENCE — machine-derived, unverified — and is the lowest.
+      They are genuinely orthogonal, and conflating them INVERTS the answer for
+      the most governed edges in the graph: a "trusted content" filter that reads
+      the confidence axis while meaning the authority axis would discard exactly
+      the assertions a human deliberately pinned. That is the failure this
+      section exists to prevent, and it is the kind that is found after the fold,
+      not before it.
+      THE PRECEDENT, and it is the strongest argument available for §A's fold.
+      Manual pins live inside `drydocs`, in ground truth, and always have. They
+      were NEVER protected by the database wall — the wall separates derived and
+      reference content from structured fact; it has never separated ASSERTED
+      from OBSERVED within the structured graph. Which means this repo already
+      governs a trust distinction inside a single database, by per-assertion
+      provenance plus a precedence ladder plus a required rationale plus a guard
+      that refuses the write without them. Shipped, tested, and applied to the
+      highest-stakes join in the graph. That reframes ADR 0002 D1's objection to
+      single-DB — "commingles trust; one bad query promotes noise" — because for
+      this class the answer was never a boundary. It was per-edge origin. The
+      fold would EXTEND a proven mechanism, not invent one. It does not make the
+      irreducible loss in §A go away; it means the mechanism replacing physics is
+      already running rather than being designed under duress.
+      AND THE RETRIEVAL CASE, concretely, because this is where the SME's
+      question and the fold meet. A pin's `rationale` is one sentence. The thing
+      that JUSTIFIES it — the SME email, the Confluence page, the escalation
+      thread — is a captured corpus sitting in ddcontext, on the far side of the
+      wall. So today an agent asked "who owns this folder, and why do we think
+      so?" retrieves the pin and its origin flag but cannot traverse to the
+      evidence. It gets the assertion without the reason, which for a PROVISIONAL
+      mapping is the half that matters. That is the use case §A's fold buys, and
+      it is worth more than the generic cross-corpus argument in §D.
+    confirmations:
+      - "TWO trust axes are named and kept distinct: `origin` = AUTHORITY (who asserted it), `:Uncertain` = CONFIDENCE (machine-derived, unverified). Neither is renamed into the other, and neither is collapsed into a single 'trust' flag."
+      - "`:Uncertain` NEVER applies to an authored mapping, however provisional — a manual-pin is a human act at the HIGHEST precedence, not an uncertain one."
+      - "Every guard, QuerySpec filter and console surface states WHICH axis it reads. A 'trusted content' filter that reads confidence while meaning authority would discard exactly the assertions a human pinned."
+      - "The existing origin enum + the manifest `replaces_with` admission rule are accepted as the PRECEDENT that per-assertion trust governance works inside one database — the mechanism §A's fold would extend, not invent."
+      - "Recorded as a named use case: an agent must be able to reach a provisional mapping AND the evidence justifying it in ONE retrieval. This is the concrete form of §A's retrieval argument."
 
 open_questions:
   - "Q1 — does anything besides deepdoc ever write ddcontext? Under R1 the answer matters less than it did: ddcontext is no longer an empty database waiting for a loader, it holds four corpora today. The question narrows to whether derived findings need their own label discipline to stay distinguishable from captured content now that they share a database — which is the mixed-database consequence §B is accepting."
@@ -325,6 +480,8 @@ open_questions:
   - "Q6 (NEW, created by R1) — does bmc_docs.cypher's DESCRIBES write stay as it is? It was never withdrawn; only vendor_docs.cypher refuses the edge. R1 makes the write unambiguously legal, so the question is whether the OTHER corpus should now get it too, or whether vendor_docs.cypher's refusal was about corpus shape rather than residency."
   - "Q7 (NEW, created by R1) — Q16 clause (b), the product->documentation pointer reaching the graph, closed as an explicit partial on 2026-08-07 with no successor item and is traceable only by prose. R1 makes it CHEAPER, not harder: the corpora and the products now share a database, so DESCRIBES may already be the whole answer (Q16's own 'cheapest possible answer, check FIRST'). Either mint the successor item at sign-off or record the decline — do not leave it in prose."
   - "Q8 (NEW, superseding the draft's Q5) — the naming logic R1 states ('drydocs is the original, dd* are extensions') is worth recording as a RULE in the ADR amendment, not just as this one rejection. It is the test the next proposed database has to pass."
+  - "Q9 (NEW, §F) — does the `origin` enum extend beyond attribution? It is CHECK-constrained on the mapping store's app-code rows today. The support-team -> SEAL edge the SME named is written by the PAT loader with `source: 'pat'` and no origin flag, so the two provisional-mapping classes are not governed the same way. Rule whether origin is the general authority vocabulary or an attribution-local one — the answer decides whether §F's confirmation 3 covers one surface or several."
+  - "Q10 (NEW, §A fold) — if the fold lands, ADR 0011 flips from PLANNED-contingency to EXECUTED-by-choice, for a trigger it does not contain. Amend 0011 with the retrieval rationale rather than letting the record say Enterprise became unavailable, which would be false."
 
 risks:
   - "Signing §B without §A/§C is still the worst outcome available: the charter would be restated while the target column keeps naming a database that does not exist. These three sections are one decision wearing three headings — the gate log should record them together or not at all."
@@ -333,6 +490,8 @@ risks:
   - "`dddocs` currently appears in cli.DOC_SWEEP_DATABASES, so docs-verify reports it as db-absent rather than raising. That graceful degradation has been HIDING the gap: the config has named a non-existent database for weeks without a single failure. Whatever is ruled, the guard should fail loudly on an unprovisioned target_db rather than reporting it as merely absent."
   - "Clause (e) has blocked the deepdoc scaffold. Ruling it unblocks work, which means a wrong ruling here gets built on quickly rather than sitting inert."
   - "R3 deletes 27 live edges on the strength of the reload re-creating them. If the reload is deferred after the delete, the graph spends that window with a capability it had before the gate — sequence the two in one session, on each machine, rather than across sessions."
+  - "§A's fold is a ONE-WAY DOOR in practice. Splitting a database later means re-homing loaded corpora and every edge that grew across the former wall; the two-database outcome can always fold later, at the same cost it would cost now. Asymmetric reversibility belongs in the decision, not discovered after it."
+  - "§F's two axes are the failure most likely to be found LATE, because nothing breaks when they are conflated — a filter reading the wrong axis returns a plausible, smaller answer. If the fold lands without §F's confirmation 3 (every filter states which axis it reads), the first 'trusted content' query silently drops every human-pinned mapping, which are the assertions with the highest standing in the graph."
   - "tests/unit/test_load_map_json.py::test_the_not_queryable_target_db_set_is_pinned pins the not-queryable set to exactly {dddocs} and WILL FAIL when this signs. That is deliberate: it is the alarm forcing web/src/software/softwareModel.ts (inGraphLabel) and the docs-coverage detail lines to be revisited rather than left saying 'not provisioned (G32)'. Under R1 the not-queryable set becomes EMPTY. Treat the failure as a task, not a break."
 
 status: awaiting-sme
