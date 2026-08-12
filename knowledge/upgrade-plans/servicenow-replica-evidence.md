@@ -812,8 +812,9 @@ SEAL ids, CI ids or GUIDs are reproduced here.
 
 ### 8.1 The five structural facts
 
-**(a) `tom_roles` is a GLOBAL MASTER CATALOG, not a per-application list.** It holds **100+ role-type
-definitions**, numbered `TR#######`, with **no application or SEAL column**. Applications instantiate
+**(a) `tom_roles` is a GLOBAL MASTER CATALOG, not a per-application list.** It holds **83 role-type
+definitions** (exported 2026-08-11; the SME's initial estimate of 100+ is corrected in §10.7),
+numbered `TR#######`, with **no application or SEAL column**. Applications instantiate
 these types; the catalog itself is estate-wide. Every count this project has argued over — 7, 9, 10,
 13, 14 — describes what the SEAL contact extract *surfaces*, not what the register *contains*.
 
@@ -1203,3 +1204,52 @@ adopt one. **The company may already have.** Recorded as an observation, not a c
 screenshots show the label in an edge shape, not its definition — and it is now the sharpest
 question for RELAY-6 to bring back, because two sides independently modelling a deployment concept
 is exactly the collision RELAY-6 exists to prevent.
+
+### 10.7 The catalog, exported (2026-08-11) — 83 rows, and it carries its own SEAL marker
+
+**The count is 83, not "100+".** §8.1(a) recorded the SME's initial estimate; the export corrects it.
+Columns: `name`, `scope`, `type`, `description`, plus audit fields.
+
+**`scope`** is `Individual` or `Group`, as §8.1(b) recorded. Roughly a quarter are Individual and the
+rest Group — so the catalog is mostly the **operational and approval layer**, not the accountable
+one.
+
+**`type`** takes `Accountable`, `Operational`, `Approval`, `Assignment`, `other` and NULL. **The
+overwhelming majority are `other`** — only a couple carry `Accountable`, and NULL appears on several.
+So `type` is present but weakly populated, and it is **not** a reliable classifier on its own. This
+is §3.2's rule again: the column exists, and what it carries is thinner than its name suggests.
+
+**THE USEFUL FINDING: the catalog says which roles come from SEAL, in its own description text.**
+A substantial block of the Individual-scoped rows are described as "… from SEAL" — Application
+Owner, the Information Risk Manager, CTO, Deployment Owner, Primary and Backup Information Owner,
+Design Authority, the Operate Manager family, Chief Business Technologist, Backup Application Owner.
+**That is the register mapping §A asked for, already written down by the source.** G70 does not have
+to reconstruct which of the two registers a role belongs to — it can read it, then verify rather
+than derive.
+
+**Also visible: role families this project has never seen** — third-party-website ownership, an
+RTM pair for external e-bonding, capacity planning, legal-entity approvals, a universal-request
+fulfilment ladder, and several central management teams. None is in scope; they are recorded because
+"the catalog is 83 roles, most of which are not ours" is the honest shape, and a vocabulary file
+seeded from it should mark what is out of scope rather than silently drop it.
+
+### 10.8 One thing to settle before G70 seeds the register: two different SREs
+
+The export shows **two distinct role types**, and this document may have conflated them:
+
+| Catalog row | `scope` | What it looks like |
+|---|---|---|
+| Site Reliability Engineer (SRE) | **Individual** | a named person, sitting among the other Individual accountable roles |
+| Incident Resolver – SRE / DevOps Team | **Group** | an operational team, alongside the other incident-resolver tiers |
+
+**G16's amendment (OPTIONAL and DERIVED) was argued from the GROUP one** — "an SRE team serves 20–60
+applications", which is a many-to-one shared function and correctly not a per-application assertion.
+
+**But the register line G16 came from the SME's thirteen-class list, which reads as the INDIVIDUAL
+one.** If that is right, the amendment's *ruling* still holds — optional — while its *reasoning* was
+about the other row, and an Individual-scoped SRE is a per-person holding like every other Individual
+role, not something derived from a group name.
+
+**This is flagged rather than ruled**, because it changes what G70 seeds. It does not reopen the
+gate: G16 is OPTIONAL either way, and nothing else in the register moves. See the open question in
+the gate-log amendment note.

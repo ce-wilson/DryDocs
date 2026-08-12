@@ -2845,3 +2845,31 @@ because the temptation to pattern-match on `%SRE%` in a role name is obvious and
 
 **One residual from the sign-off remains open:** G5's unknown SEAL-risk ↔ ServiceNow-group mapping
 (simplest thing that works — crosswalk `Risk Manager` and stop). Unchanged by this amendment.
+
+## 2026-08-11 — NOTE on the G35 sign-off: the role catalog is 83 rows, and one open question on G16
+
+**Gate:** `tom-roles-enumeration-and-cardinality` (G35) · **SIGNED OFF; this changes no ruling.** The
+catalog §A ruled DryDocs would model was exported the same day. Recorded because G70 seeds its
+vocabulary file from it, and two facts about it are worth having before that happens.
+
+- **THE COUNT IS 83, not "100+"** — the sign-off carried the SME's initial estimate. Corrected in
+  K21 §10.7. Nothing in §A turns on the number.
+- **THE CATALOG CARRIES ITS OWN REGISTER MARKER.** A block of the Individual-scoped rows are
+  described "… from SEAL" in the source's own description text. **That is the two-register mapping
+  §A asked for, already written down** — G70 can READ which register a role belongs to and verify,
+  rather than reconstruct it.
+- **`type` is weakly populated.** It takes Accountable / Operational / Approval / Assignment / other
+  / NULL, and the overwhelming majority are `other`. Present, but not a reliable classifier alone —
+  §3.2's rule on a new column.
+- **Most of the catalog is not ours**: third-party-website ownership, an RTM pair for external
+  e-bonding, capacity planning, legal-entity approvals, a universal-request fulfilment ladder. G70
+  should MARK out-of-scope rather than silently drop, so the file's coverage is legible.
+
+**OPEN QUESTION — TWO DIFFERENT SREs, and it decides what G70 seeds.** The export shows
+`Site Reliability Engineer (SRE)` at **Individual** scope AND `Incident Resolver – SRE / DevOps Team`
+at **Group** scope. The G16 amendment argued OPTIONAL-and-DERIVED from the GROUP one (a team serving
+20–60 applications). Register line G16 came from the SME's thirteen-class list, which reads as the
+INDIVIDUAL one. **If so the RULING stands — G16 is OPTIONAL either way — but its REASONING described
+the other row**, and an Individual-scoped SRE is a per-person holding like the other Individual
+roles rather than something derived from a group name. Flagged, not ruled; no register line moves
+and the gate is not reopened.
