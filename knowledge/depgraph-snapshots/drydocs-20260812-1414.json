@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-12T13:41:43",
+    "captured_at": "2026-08-12T14:14:24",
     "date": "20260812",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2daf8ba",
-      "full": "2daf8badf0734b8522a52af4432c272a24f3e89a",
+      "commit": "fac3d12",
+      "full": "fac3d12938b7c11d583d2b4a5f5477370e38ac05",
       "branch": "main",
-      "describe": "port-base-20260811-51-g2daf8ba",
-      "subject": "merge: vocabulary ratification — domains renamed, id policy ruled, both gates signed",
+      "describe": "port-base-20260811-56-gfac3d12",
+      "subject": "Merge fix/reconcile-before-dir-guard — a stale RECONCILE_BEFORE_DIR fails by name",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -5858,6 +5858,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/UI-WIP/claude-design-ui-prompt.md",
+      "name": "claude-design-ui-prompt.md",
+      "extension": ".md",
+      "rel_path": "UI-WIP/claude-design-ui-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/UI-WIP/codeflow-ui-reference.png",
       "name": "codeflow-ui-reference.png",
       "extension": ".png",
@@ -9971,15 +9980,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -9996,15 +9996,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10959,24 +10950,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -13805,10 +13778,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1119.json",
-      "name": "drydocs-20260812-1119.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json",
+      "name": "drydocs-20260812.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812-1119.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24769,6 +24742,11 @@
     [
       "drydocs/UI-WIP",
       "CONTAINS",
+      "drydocs/UI-WIP/claude-design-ui-prompt.md"
+    ],
+    [
+      "drydocs/UI-WIP",
+      "CONTAINS",
       "drydocs/UI-WIP/codeflow-ui-reference.png"
     ],
     [
@@ -26634,22 +26612,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -26710,16 +26678,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -29129,7 +29087,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1119.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -31181,13 +31139,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1682,
+    "files": 1683,
     "edges": 946,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1953,
-    "directories": 272
+    "rels": 1950,
+    "directories": 268
   }
 }
