@@ -1227,7 +1227,7 @@ Every term the five documents name, checked against this repo on 2026-08-11 (des
 |---|---|---|
 | `ETL_ARTIFACT_URI`, `ETL_ARTIFACT_KIND`, `ETL_PLATFORM`, `ETL_PLATFORM_FLAGS`, `LAUNCHER_SCRIPT_PATH` | `drydocs_core/orchestration/controlm/variables.py:180-230` (FACT_REGISTRY + alias rollups) | Built at G16 under gate `cmdline-nfr-vetting` (SIGNED 2026-07-21, 4/4) |
 | aliases-suggest-values-decide contract | `drydocs_core/orchestration/controlm/variables.py:238-247` | The NFR's §7 alias/migration behaviour, already implemented |
-| `USES_ARTIFACT` edge | `drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml:456` (`m7_uses_artifact`) | Activated at gate `rua-load-shapes` §A4 (2026-08-06) |
+| `USES_ARTIFACT` edge | `drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml (renamed 2026-08-12; was 40-local-controlm.yaml:456)` (`m7_uses_artifact`) | Activated at gate `rua-load-shapes` §A4 (2026-08-06) |
 | `INVOKES` edge | same fragment (`m3_invokes`) | Payload invocations migrate onto `USES_ARTIFACT`; launcher stays on `INVOKES` — the same launcher/payload split NFR §3 describes |
 | `:Script` `script_role {launcher, payload}` + `platform` / `artifact_uri` / `artifact_kind` / `platform_flags` / `script_path` | `drydocs/schema/ontology_supplement.cypher:275` and the `rua-load-shapes` §A4 riders | SME-ruled at `cmdline-nfr-vetting` SME-3 |
 | `ETL_ARTIFACT_SHA` | FACT_REGISTRY | **DryDocs has a canonical the NFR does not name** — a content hash the NFR's §5 table omits |
