@@ -41,7 +41,7 @@ The staging layer keys every job by **`(data_center, folder_id, job_id)`**
 **`folder_id` alone** for folders — `data_center` survives only as the `:SCHEDULED_ON`
 edge. If BMC `TABLE_ID` values collide across the 4 production DCs in the CM_ replica,
 the full multi-DC load will **silently merge cross-DC folders/jobs into one node**.
-The P012 single-DC pilot cannot expose this.
+The T012 single-DC pilot cannot expose this.
 
 **Action (company-side verification query, before any multi-DC load):**
 

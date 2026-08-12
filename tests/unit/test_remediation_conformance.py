@@ -32,7 +32,7 @@ from drydocs_remediation.detect import (
 )
 from drydocs_remediation.xml_bridge import to_definition_set
 
-DC = "P032-E0700-DMA"
+DC = "T032-E0700-DMA"
 #: unmistakably fake — a real dataset GUID would be an Internal identifier and
 #: this file is publishable
 UUID = "00000000-0000-4000-8000-000000000001"

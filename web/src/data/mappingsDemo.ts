@@ -85,8 +85,8 @@ export const DEMO_APP_ORCHESTRATORS: readonly AppOrchestratorRow[] = [
 ]
 
 export const DEMO_UNMAPPED_FOLDERS: readonly UnmappedFolderRow[] = [
-  { folder_id: '70001', folder: 'PRARAG-DAILY', app_code: 'ARA', data_center: 'P032-E0700-DMA', jobs: 14, run_as_users: 'svc_riskbatch' },
-  { folder_id: '70002', folder: 'PRARAG-MONTHLY', app_code: 'ARA', data_center: 'P032-E0700-DMA', jobs: 3, run_as_users: 'svc_riskbatch' },
-  { folder_id: '70003', folder: 'PRBCDE-NIGHTLY', app_code: 'BCD', data_center: 'P045-E0600-DMB', jobs: 22, run_as_users: 'svc_ledger, svc_archive' },
-  { folder_id: '70004', folder: 'PRXYZQ-WEEKLY', app_code: 'XYZ', data_center: 'P045-E0600-DMB', jobs: 5, run_as_users: 'svc_platform' },
+  { folder_id: '70001', folder: 'PRARAG-DAILY', app_code: 'ARA', data_center: 'T032-E0700-DMA', jobs: 14, run_as_users: 'svc_riskbatch' },
+  { folder_id: '70002', folder: 'PRARAG-MONTHLY', app_code: 'ARA', data_center: 'T032-E0700-DMA', jobs: 3, run_as_users: 'svc_riskbatch' },
+  { folder_id: '70003', folder: 'PRBCDE-NIGHTLY', app_code: 'BCD', data_center: 'T045-E0600-DMB', jobs: 22, run_as_users: 'svc_ledger, svc_archive' },
+  { folder_id: '70004', folder: 'PRXYZQ-WEEKLY', app_code: 'XYZ', data_center: 'T045-E0600-DMB', jobs: 5, run_as_users: 'svc_platform' },
 ]

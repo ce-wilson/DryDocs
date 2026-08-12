@@ -28,7 +28,7 @@ import pytest
 from drydocs_core.orchestration.controlm import resolve_command_line
 from drydocs_lineage.extractors import ControlMXmlDefsExtractor
 
-DC = "P032-E0700-DMA"
+DC = "T032-E0700-DMA"
 
 #: A folder description in the standard's grammar — note the tight pipe
 #: (``|SeriesSLA``) and the colon INSIDE the value, both of which the

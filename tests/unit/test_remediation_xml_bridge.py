@@ -21,7 +21,7 @@ from drydocs_lineage.extractors import ControlMXmlDefsExtractor
 from drydocs_remediation.formats import XmlDefinitionFormat
 from drydocs_remediation.xml_bridge import to_definition_set
 
-DC = "P032-E0700-DMA"
+DC = "T032-E0700-DMA"
 
 _EXPORT = f"""<?xml version="1.0" encoding="UTF-8"?>
 <DEFTABLE>

@@ -78,7 +78,7 @@ Deep links, export manifests, and any other outward-facing identifier for a
 graph node use:
 
 ```
-kind:namespace/name        e.g.  hostgroup:P032-E0700-DMA/BATCH-GRP-A
+kind:namespace/name        e.g.  hostgroup:T032-E0700-DMA/BATCH-GRP-A
 kind:name                  e.g.  application:0000012345
 ```
 

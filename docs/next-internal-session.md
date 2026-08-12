@@ -74,7 +74,7 @@
       folder by `folder_id` alone. Zero rows → document the uniqueness invariant in
       `controlm_folders.cypher`; any rows → cross-DC nodes would silently merge, and the
       fix is an identity change (`data_center` into the folder + job keys) → **HITL gate**
-      + constraint migration. The P012 single-DC pilot cannot expose this. Feeds item 1's
+      + constraint migration. The T012 single-DC pilot cannot expose this. Feeds item 1's
       DC scope call.
 
 ## Live-graph work (needs a running graph, not psgmgr)

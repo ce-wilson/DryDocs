@@ -130,8 +130,8 @@ stg_notification, stg_app_fact**.
      runtime-provided names (MONTH_END_DATE pattern) and FileWatch
      runtime tokens; anything else may be a missing folder header or a
      classifier gap.
-   - Pilot DC order: **P012-E0700-IB → P032 (variable-heavy, stresses the
-     resolver) → P014 → P021** (bimodal: ~23% of its jobs share one
+   - Pilot DC order: **T012-E0700-IB → T032 (variable-heavy, stresses the
+     resolver) → T014 → T021** (bimodal: ~23% of its jobs share one
      ~29-variable template — likely a single classifier rule in Phase C).
 
 ## Phase C entry criteria / first moves

@@ -217,7 +217,7 @@ def test_model_accepts_raw_extract_headers() -> None:
     row = ControlMVariableRow.model_validate(
         {
             "table_name": "185894",
-            "job_name": "PDCLD0003_70013_CMS_IDW_SCRA_REPORTING_CZ_AWS_TRUST",
+            "job_name": "TDCLD0003_70013_CMS_IDW_SCRA_REPORTING_CZ_AWS_TRUST",
             "job_id": "4",
             "appl_type": "OS",
             "name": "%%SEAL",

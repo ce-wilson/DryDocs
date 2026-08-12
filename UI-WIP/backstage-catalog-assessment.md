@@ -80,7 +80,7 @@ Spotify-scale-tested versions of rules DryDocs mostly already has.
 - **T3 — Stable string ref format + namespace-as-collision-bound.** `kind:namespace/name`
   with an explicitly-unstable internal uid mirrors lessons we already paid for
   (FID/ALIAS tiers). Two cheap borrows: (a) standardize a display/deep-link ref grammar
-  (`job:P012/<name>`-style — data center as the namespace is a natural fit for the
+  (`job:T012/<name>`-style — data center as the namespace is a natural fit for the
   4-DC name-collision case) for inspector URLs and export manifests; (b) keep graph
   element ids out of every external surface, stated as a rule.
 - **T4 — Inverse-pair *labels* in the relationship registry.** We store one directed

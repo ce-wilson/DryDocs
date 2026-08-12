@@ -164,7 +164,7 @@ not an editor.
 infrastructure) over: the evidence text + confirmed bindings + related-nodes
 result. It returns ranked **candidate assignments** — email → ControlMFolder /
 process — each with a confidence band and an evidence chain ("subject names
-P012-DLY-LOAD; job P012A01 failed 2026-08-02 in folder X; folder X belongs to
+T012-DLY-LOAD; job T012A01 failed 2026-08-02 in folder X; folder X belongs to
 SEAL 88123"). SME action per candidate: **Accept** / **Modify** (pick a different
 target from a scoped search) / **Reject all** (stays unassigned — always legal).
 

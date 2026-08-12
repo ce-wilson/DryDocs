@@ -93,6 +93,18 @@ sanitize:
   real_lob_product_name: "<LoB> or a generic role (e.g. 'a cards LoB')"
   real_system_codename:  "generic functional name (e.g. 'Business Catalog')"
   real_infra_object:     "placeholder or synthetic example"
+  # J13 class 2 (SME 2026-08-11). Control-M data-center names, application codes
+  # and job names encode the ENVIRONMENT in position 1. Swap that one character
+  # to the non-production letter and the identifier stops naming a live object
+  # while every parsing rule still reads true — the grammar is the publishable
+  # part, the environment value is not. Guarded by Scan E in
+  # tests/unit/test_publish_boundary_values.py. Real values: internal twin
+  # internal/standards/technology/data-center-inventory.md.
+  production_env_identifier: "swap position-1 environment letter (P -> T)"
+  # NOT a sanitize rule but the boundary beside it: per-data-center VOLUMETRICS
+  # (folder/job counts) are a distinct class and are NOT ruled publishable —
+  # totals stay, the per-DC split goes to the internal twin. See gate-log
+  # 2026-08-11 RECORD.
   roster_row:            "synthetic name, or omit"
   internal_ghe_repo_id:  "<internal-ghe>"
   real_location_row:     "synthetic or omit"

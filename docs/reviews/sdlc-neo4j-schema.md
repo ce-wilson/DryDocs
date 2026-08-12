@@ -600,7 +600,7 @@ sequenceDiagram
 | FR-NS-013 (SEAL graph attribution) | FR-OI-007 (STG_APP_FACT must be populated) | Graph attribution loader reads STG_APP_FACT; blocked if normalizer hasn't run or OQ-OI-1 unresolved |
 | FR-NS-008/017 (stale edge cleanup + JobRun annotation) | FR-OI-009/010/012 (Oracle HWM advance) | Graph incremental only runs after Oracle STG_LOAD_CONTROL HWM is valid |
 | FR-NS-015 (developer SID graph edge) | FR-OI-015 (JOB_DEVELOPER_VIEW + OQ-OI-3 resolved) | Graph cannot safely add SID edges until CREATION_USER/CHANGE_USERID confirmed on CM_DEF_VJOB |
-| FR-NS-001/002 (constraints applied) | FR-OI-018 (P012 pilot start) | Constraints must be idempotently applied before any loader runs on P012 |
+| FR-NS-001/002 (constraints applied) | FR-OI-018 (T012 pilot start) | Constraints must be idempotently applied before any loader runs on T012 |
 | FR-NS-012 (SCHEDULED_ON migration) | FR-OI-004 (folder extract; no direct dependency, but same loader) | Requires `controlm_folders.cypher` update — PARTIAL; fix before incremental ships (OQ-NS-1) |
 
 ### Shared open questions blocking both flows

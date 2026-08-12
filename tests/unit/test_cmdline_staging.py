@@ -32,7 +32,7 @@ ROWS = [
         "job_id": "1",
         "job_name": "SYN_DPL_DLY",
         "folder_name": "PRHLD1G",
-        "data_center": "P032-E0700-DMA",
+        "data_center": "T032-E0700-DMA",
         "task_type": "Job",
         "active": True,
         "cmd_line": f"/apps/dpl/dt-launcher.sh -pipeline {_GUID} -env prod -seal 70002 -i",
@@ -42,7 +42,7 @@ ROWS = [
         "job_id": "2",
         "job_name": "SYN_VAR_LAUNCH",
         "folder_name": "PRHLD1G",
-        "data_center": "P032-E0700-DMA",
+        "data_center": "T032-E0700-DMA",
         "task_type": "Job",
         "active": True,
         # launcher hidden in a folder variable — the GUID literal still decides
@@ -54,7 +54,7 @@ ROWS = [
         "job_id": "3",
         "job_name": "SYN_PY",
         "folder_name": "PRHLD1G",
-        "data_center": "P032-E0700-DMA",
+        "data_center": "T032-E0700-DMA",
         "task_type": "Job",
         "active": False,
         "cmd_line": "python /apps/syn/etl_step.py --conf /apps/syn/etl.json",
@@ -64,7 +64,7 @@ ROWS = [
         "job_id": "1",
         "job_name": "SYN_WATCHER",
         "folder_name": "PRHLD2G",
-        "data_center": "P045-E0700-DMB",
+        "data_center": "T045-E0700-DMB",
         "task_type": "Watcher",
         "active": True,
         "cmd_line": None,
@@ -74,7 +74,7 @@ ROWS = [
         "job_id": "2",
         "job_name": "SYN_UNKNOWN_BIN",
         "folder_name": "PRHLD2G",
-        "data_center": "P045-E0700-DMB",
+        "data_center": "T045-E0700-DMB",
         "task_type": "Job",
         "active": True,
         "cmd_line": "/apps/bin/mystery_widget --frob 7",
@@ -84,7 +84,7 @@ ROWS = [
         "job_id": "3",
         "job_name": "SYN_NOOP",
         "folder_name": "PRHLD2G",
-        "data_center": "P045-E0700-DMB",
+        "data_center": "T045-E0700-DMB",
         "task_type": "Job",
         "active": True,
         "cmd_line": "echo done",
@@ -356,7 +356,7 @@ RESOLVE_ROWS = [
         "job_id": "4",
         "job_name": "SYN_RESIDUE",
         "folder_name": "PRHLD1G",
-        "data_center": "P032-E0700-DMA",
+        "data_center": "T032-E0700-DMA",
         "task_type": "Job",
         "active": True,
         "cmd_line": "%%RUN_DIR/step.sh %%UNDEFINED_ARG",
@@ -375,7 +375,7 @@ RESOLVE_ROWS = [
 
 _RESOLVE_XML = f"""<?xml version="1.0" encoding="UTF-8"?>
 <DEFTABLE>
-  <SMART_FOLDER DATACENTER="P032-E0700-DMA" FOLDER_NAME="PRHLD1G">
+  <SMART_FOLDER DATACENTER="T032-E0700-DMA" FOLDER_NAME="PRHLD1G">
     <VARIABLE NAME="%%PY_LAUNCH" VALUE="/apps/py/py-launcher.sh"/>
     <VARIABLE NAME="%%RUN_DIR" VALUE="/apps/run"/>
     <JOB JOBNAME="SYN_VAR_LAUNCH"
@@ -385,7 +385,7 @@ _RESOLVE_XML = f"""<?xml version="1.0" encoding="UTF-8"?>
     <JOB JOBNAME="SYN_RESIDUE" CMDLINE="%%RUN_DIR/step.sh %%UNDEFINED_ARG"/>
     <JOB JOBNAME="SYN_DCLESS" CMDLINE="%%PY_LAUNCH -x"/>
   </SMART_FOLDER>
-  <SMART_FOLDER DATACENTER="P045-E0700-DMB" FOLDER_NAME="PRHLD2G">
+  <SMART_FOLDER DATACENTER="T045-E0700-DMB" FOLDER_NAME="PRHLD2G">
     <JOB JOBNAME="SYN_NOOP" CMDLINE="echo done"/>
     <SUB_FOLDER SUB_FOLDER_NAME="TWIN">
       <JOB JOBNAME="SYN_NOOP" CMDLINE="echo done"/>

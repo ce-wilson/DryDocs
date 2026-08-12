@@ -60,7 +60,7 @@ credentials, org names, or server addresses.
 | FR-OI-015 | System SHALL normalize developer SID attribution using `UPPER(REGEXP_REPLACE(sid,'p$',''))` to strip automation suffix | P2 | ACTIVE | `JOB_DETAILED_VIEW` inline expression | Automation accounts end in lowercase `p`; strip to get canonical employee SID |
 | FR-OI-016 | System SHALL handle legitimate duplicate `(job, var)` definitions across data centers without collision | P1 | ACTIVE | `STG_VARIABLE` PK design; pre-flight TABLE_ID check | Defensive composite key; 0.1 pre-flight verifies no cross-DC TABLE_ID collision |
 | FR-OI-017 | System SHALL support ~240K current-version jobs and ~1.1M variable rows across 4 data centers at full refresh | P0 | ACTIVE | Volume: <3M rows / <2GB; no partitioning needed currently | Volume baseline recorded here for capacity tracking |
-| FR-OI-018 | System SHALL pilot incremental ingestion on data center P012 first | P1 | PLANNED | Pilot scope | Per `project_controlm_c3_normalization.md` |
+| FR-OI-018 | System SHALL pilot incremental ingestion on data center T012 first | P1 | PLANNED | Pilot scope | Per `project_controlm_c3_normalization.md` |
 | FR-OI-019 | System SHALL derive transitive job-to-job dependencies using a recursive SQL query with cycle detection and materialize `:DEPENDS_ON` edges in Neo4j | P1 | ACTIVE | `drydocs/loaders/sql/controlm_dependencies_recursive.sql`; `drydocs/loaders/controlm_dependencies_derived.py`; `drydocs/loaders/cypher/controlm_dependencies_derived.cypher` | M3 part 2; run order: folders → jobs → conditions in/out → dependencies derived |
 
 ---
@@ -369,7 +369,7 @@ sequenceDiagram
         end
     end
 
-    Note over INC,NEO: ⬡ = all steps PLANNED; pilot data center = P012 (FR-OI-018)
+    Note over INC,NEO: ⬡ = all steps PLANNED; pilot data center = T012 (FR-OI-018)
     Note over HWM: Fallback: if VERSION_SERIAL unreliable → use hwm_capture_date (OQ-OI-2)
 ```
 
@@ -557,7 +557,7 @@ erDiagram
 | FR-OI-015 | UC-OI-001 | `JOB_DETAILED_VIEW` inline REGEXP_REPLACE (`controlm_staging_ddl.sql`); `JOB_DEVELOPER_VIEW` (`controlm_staging_supplement_ddl.sql` §3) | ACTIVE (view); PLANNED (full dev-SID flow) | OQ-OI-3 (CREATION_USER / CHANGE_USERID column existence) |
 | FR-OI-016 | UC-OI-001 | `controlm_staging_ddl.sql` §0.1 pre-flight; `STG_VARIABLE` surrogate PK design | ACTIVE | — |
 | FR-OI-017 | UC-OI-001 | `controlm_staging_ddl.sql` header (volume baseline); capacity tracked here | ACTIVE | — |
-| FR-OI-018 | UC-OI-002 | `drydocs/loaders/incremental_controlm.py` (PLANNED); pilot scope = P012 | PLANNED | — |
+| FR-OI-018 | UC-OI-002 | `drydocs/loaders/incremental_controlm.py` (PLANNED); pilot scope = T012 | PLANNED | — |
 | FR-OI-019 | UC-OI-001 | `drydocs/loaders/sql/controlm_dependencies_recursive.sql`; `drydocs/loaders/controlm_dependencies_derived.py`; `drydocs/loaders/cypher/controlm_dependencies_derived.cypher` | ACTIVE | — |
 
 ---
@@ -641,7 +641,7 @@ erDiagram
 | FR-OI-009/010/011/012 (Oracle incremental HWM) | FR-NS-008/017 (graph stale edge cleanup + :JobRun annotation) | Oracle HWM must exist and advance before graph incremental can safely re-assert edges |
 | FR-OI-015 (developer SID → JOB_DEVELOPER_VIEW) | FR-NS-015 (graph WAS_ASSOCIATED_WITH {role:owner} edge) | SID normalization confirmed and columns verified (OQ-OI-3) before graph edge can be added |
 | FR-OI-019 (dependencies derived from recursive SQL) | FR-NS-004/vocabulary WAS_INFORMED_BY | SQL produces rows consumed by graph loader; vocabulary WAS_INFORMED_BY edge type already declared active |
-| FR-OI-018 (P012 incremental pilot) | FR-NS-001/002 (constraints applied) | Graph schema DDL must be idempotently applied before any data loader runs |
+| FR-OI-018 (T012 incremental pilot) | FR-NS-001/002 (constraints applied) | Graph schema DDL must be idempotently applied before any data loader runs |
 
 ### Shared open questions blocking both flows
 

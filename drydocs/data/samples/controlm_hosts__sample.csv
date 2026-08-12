@@ -1,5 +1,5 @@
 data_center,grpname,nodeid,participation_type,capture_date
-P012-E0700-SYN,host-hldm-01,host-hldm-02,P,2026-04-29 03:00:00
-P012-E0700-SYN,host-hldm-01,host-hldm-03,P,2026-04-29 03:00:00
-P014-E0700-SYN,grp-auto,host-auto-01,P,2026-04-29 03:00:00
-P014-E0700-SYN,grp-auto,host-auto-02,P,2026-04-29 03:00:00
+T012-E0700-SYN,host-hldm-01,host-hldm-02,P,2026-04-29 03:00:00
+T012-E0700-SYN,host-hldm-01,host-hldm-03,P,2026-04-29 03:00:00
+T014-E0700-SYN,grp-auto,host-auto-01,P,2026-04-29 03:00:00
+T014-E0700-SYN,grp-auto,host-auto-02,P,2026-04-29 03:00:00

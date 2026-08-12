@@ -20,8 +20,16 @@
 --                  -- extract; carries its own IS_CURRENT_VERSION / VERSION_SERIAL.
 --
 -- Volumes (capture 2026-06, 4 data centers):
---   Folders : ~18,800   (P012: 2,230 / P014: 4,188 / P021: 7,914 / P032: 4,441)
---   Jobs    : ~240,600  (P012: 42,688 / P014: 52,976 / P021: 59,712 / P032: 85,202)
+--   NOTE (J13, 2026-08-11): the PER-DATA-CENTER breakdown of these two lines was
+--   removed from the publishable copy. The totals are what the sizing rationale
+--   below actually rests on; the per-DC split added nothing to it and amounted to
+--   a production estate map. Not covered by the SME's class-2 ruling (that ruled
+--   IDENTIFIERS, and swapping the environment letter had left real production
+--   counts labelled as though they came from a test DC — inaccurate as well as
+--   still disclosed). Flagged as a distinct value class; reverse this if the SME
+--   rules volumetrics publishable. The split is preserved internal/-side.
+--   Folders : ~18,800
+--   Jobs    : ~240,600
 --   Variable rows: ~1.1M (job-level ~1.03M + folder-level ~95K; max 67 per job)
 --   Staging estimate after normalization: < 3M rows total, < 2 GB incl. indexes.
 --   No partitioning required at this volume; plain heap tables + b-tree indexes.

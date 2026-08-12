@@ -43,29 +43,29 @@ class TestScope:
 class TestIdentity:
     def test_local_conditions_are_distinct_across_data_centers(self) -> None:
         """THE RULE THIS MODULE EXISTS FOR."""
-        one = condition_identity("PL-SAMPLE-OK", "P012-E0700-IB")
-        two = condition_identity("PL-SAMPLE-OK", "P032-E0700-DMA")
+        one = condition_identity("PL-SAMPLE-OK", "T012-E0700-IB")
+        two = condition_identity("PL-SAMPLE-OK", "T032-E0700-DMA")
         assert one != two
 
     def test_global_conditions_are_the_same_across_data_centers(self) -> None:
-        one = condition_identity("PG-SAMPLE-OK", "P012-E0700-IB")
-        two = condition_identity("PG-SAMPLE-OK", "P032-E0700-DMA")
+        one = condition_identity("PG-SAMPLE-OK", "T012-E0700-IB")
+        two = condition_identity("PG-SAMPLE-OK", "T032-E0700-DMA")
         assert one == two
 
     def test_global_identity_carries_no_data_center(self) -> None:
-        assert condition_identity("PG-SAMPLE-OK", "P012-E0700-IB") == ("PG-SAMPLE-OK", "")
+        assert condition_identity("PG-SAMPLE-OK", "T012-E0700-IB") == ("PG-SAMPLE-OK", "")
 
     def test_local_identity_carries_the_data_center(self) -> None:
-        assert condition_identity("PL-SAMPLE-OK", "P012-E0700-IB") == (
+        assert condition_identity("PL-SAMPLE-OK", "T012-E0700-IB") == (
             "PL-SAMPLE-OK",
-            "P012-E0700-IB",
+            "T012-E0700-IB",
         )
 
     def test_unknown_scope_is_qualified_by_data_center(self) -> None:
         """Assuming the global scope is what would MERGE two distinct
         conditions, so an unrecognized prefix stays data-center-qualified."""
-        one = condition_identity("SAMPLE-OK", "P012-E0700-IB")
-        two = condition_identity("SAMPLE-OK", "P032-E0700-DMA")
+        one = condition_identity("SAMPLE-OK", "T012-E0700-IB")
+        two = condition_identity("SAMPLE-OK", "T032-E0700-DMA")
         assert one != two
 
     def test_missing_data_center_does_not_raise(self) -> None:

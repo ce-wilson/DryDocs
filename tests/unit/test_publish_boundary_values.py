@@ -238,3 +238,36 @@ def test_seal_variable_values_in_tests_are_synthetic() -> None:
         "%%SEAL values outside the reserved synthetic block 70001-70099 in "
         "test files:\n" + "\n".join(sorted(set(violations)))
     )
+
+
+# Scan E (J13 class 2, SME ruling 2026-08-11): Control-M data-center names.
+# Shape: <env-letter><instance>-E<hhmm>-<suffix>, e.g. the page's own T032-E0700-DMA.
+# The SME ruled the publishable tree carries a NON-PRODUCTION environment letter in
+# position 1, so no published example names a live production data center. `P` is
+# production and is therefore the one letter banned here.
+#
+# Shape-guarded like every scan above: the rule is "position 1 is not P", so the test
+# names no real data center and cannot leak the inventory it protects. The real values
+# live in internal/standards/technology/data-center-inventory.md.
+_DC_NAME = re.compile(r"\b([A-Z])(\d{3})-E(\d{4})-([A-Z]{2,3})\b")
+PRODUCTION_ENV_LETTER = "P"
+
+
+def test_data_center_names_are_not_production() -> None:
+    """Scan E: no publishable file may carry a production-environment data-center
+    name. Position 1 of the DC name is the environment letter (see
+    knowledge/standards/technology/data-center-naming-convention.md); the swap to a
+    non-production letter is the sanitization, not a typo, so a `P` reappearing here
+    means a real value came back in — most likely pasted from a live query."""
+    violations: list[str] = []
+    for rel in _tracked_files():
+        for m in _DC_NAME.finditer(_read(rel)):
+            if m.group(1) == PRODUCTION_ENV_LETTER:
+                violations.append(f"{rel}: {m.group(0)}")
+    assert not violations, (
+        "production data-center name(s) in the publishable tree — position 1 must "
+        "not be the production environment letter. Swap position 1 to the "
+        "non-production letter (the grammar is unchanged; only the environment "
+        "value moves) and keep the real value in the internal/ twin:\n"
+        + "\n".join(sorted(set(violations)))
+    )

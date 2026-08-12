@@ -2908,3 +2908,54 @@ elsewhere rather than because it is unresolved: `tom-subject-class` (answered by
 TOM rows exist at every level of the chain, so the subject is whichever CI the row sits on); the
 region / coverage-window qualifier (a candidate for a future gate, not this one); and the replica's
 unconfirmed completeness (K21 Q9 — it touches counts, and every ruling here is about shape).
+
+## 2026-08-11 — RECORD: J13 publish-ceiling value classes 2, 3, 4 (no gate; SME ruled in-session)
+
+Not a gate sign-off. J13's acceptance carries a USER-GATED START — the user rules which
+flagged identifiers are real before any sweep — and three of its four value classes were
+still unruled. Recorded here so the rulings live somewhere durable rather than only in a
+backlog note. Class (1) (platform tokens) was ruled and recorded 2026-08-11 in
+`internal/standards/technology/folder-naming-convention.md`.
+
+- **CLASS 2 — data-center codes: RULED, SWEPT.** SME: *"change data center P to a T. and
+  job naming also."* Position 1 of a Control-M data-center name is the environment letter;
+  the publishable tree now carries a NON-PRODUCTION letter so no published example names a
+  live production object, while the grammar the page teaches (position 1 = environment,
+  `E####` = default time) is untouched. Swept across 19 tracked files outside `internal/`:
+  the four DCs, the application code, and the one real job name the J15 realness table had
+  PARKED for exactly this ruling (`internal/standards/technology/folder-naming-convention.md`,
+  "string-vocab ruling parked with the platform-vocabulary residual" — that park is now
+  discharged). Real values moved to the new internal twin
+  `internal/standards/technology/data-center-inventory.md`.
+  - **A FIFTH DATA CENTER WAS FOUND BY THE NEW GUARD, NOT BY THE SWEEP.** J13 named four
+    and the standards page inventories four; a `P045` DC sat in a test fixture and the web
+    demo data. The token-list sweep could not have caught it — only the shape scan did.
+    This is the J15 lesson arriving a third time: **enumerate the SHAPE, never the values.**
+  - **VOLUMETRICS ARE A DISTINCT CLASS AND ARE *NOT* RULED.** `controlm_staging_ddl.sql`
+    carried real per-data-center folder/job counts. The identifier swap alone would have
+    left production counts sitting under test-environment labels — inaccurate as well as
+    still disclosed — so the per-DC split was pulled to the internal twin and the totals
+    kept, because the sizing rationale rests on the totals and not on the split. Flagged
+    for the SME; reverse it if volumetrics are ruled publishable.
+- **CLASS 3 — schema/table/column identifiers: NO SWEEP OWED; already covered by a SIGNED
+  ruling.** J13 lists `psgmgr` / `cm_escalation_db` / `EJOBNAME` / `ECOMPONENT` as open. They
+  are not. The N9 `source-registry-v2` gate (SIGNED 2026-07-31, §Q1 id grammar) publishes
+  `{origin}@{db}.{schema}.{table}` with the DATABASE redacted to `[db]` and the schema kept
+  when it is established public vocabulary — and it names `psgmgr` as exactly that. **The
+  trap in J13's own framing:** `cm_escalation_db` reads as a database name because of the
+  `_db` suffix, but it is a TABLE inside `psgmgr` (`seal@[db].psgmgr.cm_escalation_db`), so
+  the signed grammar already covers it; `EJOBNAME` / `ECOMPONENT` are columns in that table.
+  The connection coordinate — the database — is redacted already. Class 3 is CLOSED as
+  ruled-elsewhere, not as newly decided.
+- **CLASS 4 — sample product/LOB names: RULED PUBLISHABLE (assistant's call under the SME's
+  "no preference").** `config/taxonomy/lob-product-team.yaml` pairs synthetic ids with real
+  LOB names and generic industry product names. LOB names are public company structure and
+  the product/team names are generic terms; the ids — the identity-bearing half — are already
+  in the reserved block and are pinned by the guard. The guard asserts IDS stay synthetic and
+  deliberately does not police NAMES. Recorded as a judgement call, not an SME ruling: flip it
+  if the SME disagrees, and the change would be a fixture rename with no id impact.
+
+**Guard grown so none of this can drift back:** `tests/unit/test_publish_boundary_values.py`
+gains Scan E — no publishable file may carry a data-center name whose position 1 is the
+production environment letter. Shape-guarded like every scan there, so the test embeds no
+real value and cannot leak the inventory it protects.

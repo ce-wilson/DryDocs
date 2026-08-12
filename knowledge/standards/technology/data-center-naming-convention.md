@@ -30,28 +30,39 @@ This is the time-of-day counterpart to ODATE: ordering/scheduling sets the **dat
 
 ## The convention
 
-Example DC name: **`P032-E0700-DMA`**
+Example DC name: **`T032-E0700-DMA`**
 
 | Segment | Example | Meaning |
 |---|---|---|
-| 1 | `P032` | **Environment + instance** — `P` = Production, `032` = data-center number/instance |
+| 1 | `T032` | **Environment + instance** — position 1 is the environment letter, `032` = data-center number/instance |
 | 2 | `E0700` | **Default time** — `E` = Eastern (all times EST), `0700` = **07:00 = 7:00 AM EST** |
 | 3 | `DMA` | **Ignored** — last 3 chars, out of scope for our use case |
 
-So `P032-E0700-DMA` → **Production DC #032, default time 7:00 AM EST.**
+So `T032-E0700-DMA` → **DC #032, default time 7:00 AM EST.**
+
+> **PUBLISHED EXAMPLES USE A NON-PRODUCTION ENVIRONMENT LETTER (J13 class 2, SME ruling
+> 2026-08-11).** Every data-center name and application code on this page carries a `T` in
+> position 1. The real inventory is production — position 1 is `P` there — and the SME
+> ruled that the publishable copy swaps that one character so no example names a live
+> production object. **The grammar is untouched and is the whole point of the page:**
+> position 1 encodes the environment, `E####` encodes the default time. Only the
+> environment VALUE is swapped, so every parsing rule below still reads true. Do not
+> "correct" these back to `P` — that is the sanitization, not a typo. The production
+> inventory lives internal/-side.
 
 Different data centers carry different `E####` times — the time segment is the meaningful part for scheduling defaults.
 
-**Observed DC inventory (2026-06-11 job-inventory query — the 4 production DCs, matching the C3 normalization scope):**
+**Observed DC inventory (2026-06-11 job-inventory query — the 4 data centers in the C3
+normalization scope; environment letter swapped per the note above):**
 
 | Data Center | Default time | Suffix (ignored) |
 |---|---|---|
-| `P012-E0700-IB` | 7:00 AM EST | IB |
-| `P014-E0700-ANY` | 7:00 AM EST | ANY |
-| `P021-E0800-ANY` | **8:00 AM EST** | ANY |
-| `P032-E0700-DMA` | 7:00 AM EST | DMA |
+| `T012-E0700-IB` | 7:00 AM EST | IB |
+| `T014-E0700-ANY` | 7:00 AM EST | ANY |
+| `T021-E0800-ANY` | **8:00 AM EST** | ANY |
+| `T032-E0700-DMA` | 7:00 AM EST | DMA |
 
-Application codes span DCs (e.g. PRICD in P012/P014/P032) — DC↔application is many-to-many.
+Application codes span DCs (e.g. TRICD in T012/T014/T032) — DC↔application is many-to-many.
 
 ---
 
