@@ -33,7 +33,7 @@ solo, and two real failures rode in the offered range invisibly (a `FORCE_COLOR`
 colour-vs-behaviour test failure, and a duplicate `Idea-101` from a two-session id
 collision that would have failed `test_idea_ids_are_unique` on apply). Run
 `poetry run python scripts/port_preflight.py --base <last-ported-head> --tag`; it
-performs all six and refuses to certify on any failure:
+performs all seven and refuses to certify on any failure:
 1. **Suite green** on the exact commit offered, **venue-stamped (J18)**.
 2. **Ledger rolled** through that commit, coverage verified COMMIT-BY-COMMIT.
 3. **Every producer action triggered by company state is landed** — anything the
@@ -42,7 +42,15 @@ performs all six and refuses to certify on any failure:
    apply phase takes wholesale, so the edit would have been reverted in the same session.
 4. **Renders current** (re-render, then `git diff --quiet`).
 5. **Relay basis tags** present on every live relay (see the RELAY section).
-6. **Base tagged `port-base-YYYYMMDD` and pushed.**
+6. **Cited paths resolve** in every document the range ADDS (2026-08-12). A merge
+   validates text overlap, never whether the prose still describes the tree: a doc
+   branch idle since 07-21 merged clean on 08-12 with two brand marks still listed
+   under *Approved / canonical* that main had deleted as rejected on 07-28. Docs
+   under `tests/unit/test_runbook_currency.py` are skipped (that guard resolves them
+   inside check 1, and one defect reported twice reads as two); a document whose
+   header declares `status: DATED RECORD` exempts itself, which is how a record gets
+   kept without pretending its paths are current.
+7. **Base tagged `port-base-YYYYMMDD` and pushed.**
 
 **THE BASE IS A TAG, NOT `HEAD` (J41).** The company still fetches fresh — never a
 cached ref, the 2026-08-05 lesson stands — but ports `<last-ported>..port-base-YYYYMMDD`,

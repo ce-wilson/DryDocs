@@ -78,6 +78,26 @@ question a 1,000-line file with the trail at the bottom could not answer.
   2026-07-21 to-do list. `kept-orbit-brand-sheet.png` + `kept-orbit-philosophy.md` remain
   the brand authority and are present. The general hazard below stands and is the residue
   worth keeping.
+  **THE RESIDUE IS NOW MECHANISED, same day.** The "cheap standing check" below is a
+  seventh port-preflight check, `cited paths resolve`: `drydocs.port_preflight` resolves
+  every backticked repo-relative path cited by each document the range **ADDS**, and
+  refuses to certify the base on any that resolve nowhere. Run against
+  `UI-WIP/claude-design-ui-prompt.md` **as it stood at its merge `429d829`** it returns
+  exactly `UI-WIP/drydocs-mark.svg` — the miss, reproduced. Two filters keep it actionable
+  and both were measured rather than guessed: a citation with no directory is a filename
+  mention (so `drydocs-mark-mini.svg` is deliberately NOT caught — the same line
+  `test_runbook_currency` draws), and a citation whose first segment is not a top-level
+  entry of this repo is relative to its own document or to a foreign codebase. ADDED-only
+  is the other half: added-or-modified reports **59** paths on `ae21ee4..HEAD`, nearly all
+  gate-log history and IDEAS entries naming an absence on purpose, while added-only reports
+  **1** — this one. Exemptions follow the existing idiom: `RECORD_PREFIXES`
+  (`docs/reviews/`, `internal/controlm-config/reference/`) each with its reason, plus
+  self-declaration — a header carrying `status: DATED RECORD` exempts its own document,
+  which is why the (c) ruling above ALSO closed the check's only live finding. Guards in
+  `tests/unit/test_port_preflight.py`, each of the six mechanisms proven to fail on an
+  injected defect before being trusted (J26). Documents already covered by
+  `test_runbook_currency` are skipped — not to save work, but so that one defect is not
+  reported under two check names.
   **`UI-WIP/claude-design-ui-prompt.md` cites two canonical brand assets that main deleted
   as REJECTED two and a half weeks before the doc was merged.** The doc names
   `UI-WIP/drydocs-mark.svg` + `drydocs-mark-mini.svg` as "final vector marks" under

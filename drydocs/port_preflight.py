@@ -14,14 +14,22 @@ This module is the opening sequence made executable, because prose alone is what
 J35 exists to correct — three consecutive ports closed without their required
 fields while the rule was only written down.
 
-Pure functions here take TEXT and COMMIT LISTS, never a repository, so the guards
-can exercise them without one. Only :func:`run_checks` shells out.
+A seventh check joined on 2026-08-12 from a different failure with the same shape:
+a doc branch idle since 07-21 merged textually clean, and its "Approved /
+canonical" list still pointed at two brand marks main had deleted as rejected in
+between (Idea-110). A merge validates text overlap, never whether the prose still
+describes the tree, so :func:`unresolved_citations` resolves the paths a newly
+added document cites before that document crosses the repo boundary.
+
+Pure functions here take TEXT, COMMIT LISTS and DOCUMENT MAPS, never a repository,
+so the guards can exercise them without one. Only :func:`run_checks` shells out.
 """
 
 from __future__ import annotations
 
 import re
 import subprocess
+from collections.abc import Callable, Container, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -58,6 +66,48 @@ BASIS_TAGS: tuple[str, ...] = (
     "[SME-REPORTED]",
     "[COMPANY-CONFIRMED]",
 )
+
+#: Extensions worth resolving. Deliberately narrow, the same call
+#: ``tests/unit/test_runbook_currency.py`` makes for its ``_PATH``: prose mentions
+#: plenty of things that look path-like, and a guard with false positives gets
+#: muted. Held as a separate literal rather than imported from that module because
+#: this one's import profile is stdlib-only by design (MODULE_MAP: "so its guards
+#: run without a repository"), and a component may not import a test.
+_CITED_EXTENSIONS = "py|md|yaml|yml|cypher|sql|json|html|ps1|sh|csv|xlsx|ts|tsx|svg|png"
+_CITED_PATH = re.compile(rf"`([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:{_CITED_EXTENSIONS}))`")
+
+#: Directory prefixes whose documents cite paths in ANOTHER tree or in a past
+#: session. Each carries its reason — the exemption IS the reason, the same idiom
+#: ``test_runbook_currency`` uses for HISTORICAL_PATHS / FOREIGN_PATHS, and the
+#: same call it already makes for the port-prompt ARCHIVE ("a record of steps 1-42
+#: as they were written, so its paths are statements about the past by
+#: construction"). Both entries were measured, not guessed: together they account
+#: for every finding the check reports on the ``ae21ee4..HEAD`` range but one.
+RECORD_PREFIXES: dict[str, str] = {
+    "docs/reviews/": (
+        "dated review and experiment captures. A capture's paths are facts about the "
+        "session that produced it — the graph-vs-files runs name scripts their agents "
+        "wrote inside worktrees and never committed (Idea-108), which is precisely what "
+        "the record records, not a claim that the file is in this tree"
+    ),
+    "internal/controlm-config/reference/": (
+        "VERBATIM captures of the company's own controlm_pipeline and XML-processor "
+        "repositories. Every path in them is that tree's, not this one's — the same "
+        "distinction FOREIGN_PATHS draws, applied to whole documents because these are "
+        "foreign end to end rather than in a line or two"
+    ),
+}
+
+#: A document may also declare itself a record in its own header, which beats a
+#: table entry here on both counts that matter: the caveat is visible to whoever
+#: READS the document, and it cannot rot out of sight inside a module nobody opens.
+#: The convention comes from Idea-110 (2026-08-12) — the doc that motivated this
+#: whole check was closed by annotating it as a record rather than by editing it.
+_RECORD_MARKER = re.compile(r"^\s*status:\s*DATED RECORD\b", re.M | re.I)
+
+#: Header only. A marker has to be a DECLARATION about the document; a document
+#: that merely quotes the phrase mid-body has declared nothing.
+_RECORD_HEADER_LINES = 30
 
 _SHA_IN_BACKTICKS = re.compile(r"`([0-9a-f]{7,40})`")
 _RELAY_HEADING = re.compile(r"^\s*-\s+(~~)?\*\*RELAY-(\d+)\b")
@@ -157,6 +207,81 @@ def relays_missing_basis(port_prompt_text: str) -> list[str]:
     return missing
 
 
+def is_record_document(rel_path: str, text: str) -> bool:
+    """True when this document's paths are not claims about the current tree."""
+    if any(rel_path.startswith(prefix) for prefix in RECORD_PREFIXES):
+        return True
+    header = "\n".join(text.splitlines()[:_RECORD_HEADER_LINES])
+    return bool(_RECORD_MARKER.search(header))
+
+
+def is_suite_guarded(rel_path: str) -> bool:
+    """True when ``tests/unit/test_runbook_currency.py`` already resolves this doc.
+
+    Skipping those is not a hole: that guard runs inside the suite, so a stale path
+    in a runbook or in ``port-prompt.md`` still fails this preflight — as "suite
+    green" rather than here. What the skip buys is that one defect is reported once.
+    A document leaving that guard's coverage falls back INTO this check, never out
+    of both, because this list is the narrower of the two.
+    """
+    return rel_path == "docs/port-prompt.md" or (
+        rel_path.startswith("docs/design/") and rel_path.endswith("-runbook.md")
+    )
+
+
+def cited_paths(text: str, repo_roots: Container[str]) -> set[str]:
+    """Backticked paths in *text* that CLAIM to name something in this tree.
+
+    Two filters, both measured against the live range rather than guessed, because
+    an unfiltered pass reports 112 paths and a check nobody can act on gets muted:
+
+    * a citation with **no directory** (``drydocs-mark-mini.svg``) is a filename
+      mention, not a repo-relative path — the same rule the currency guard uses;
+    * a citation whose **first segment is not a top-level entry** of this repo
+      (``results/GRADES.md``, ``jobs/base.py``, ``model/variable.py``) is relative
+      to the document's own directory or to a foreign codebase, and was never a
+      claim about this tree. That one discriminator removes 53 of the 59 findings
+      on ``ae21ee4..HEAD``, and none of them were defects.
+    """
+    found: set[str] = set()
+    for path in _CITED_PATH.findall(text):
+        head, _, rest = path.partition("/")
+        if not rest or head not in repo_roots:
+            continue
+        found.add(path)
+    return found
+
+
+def unresolved_citations(
+    docs: Mapping[str, str],
+    *,
+    repo_roots: Container[str],
+    exists: Callable[[str], bool],
+) -> list[tuple[str, str]]:
+    """``(document, path)`` for every cited path that resolves nowhere.
+
+    Mechanises the standing check Idea-110 asked for on 2026-08-12: *resolve the
+    paths a document cites before landing it*. That entry is the failure this
+    exists to catch — ``UI-WIP/claude-design-ui-prompt.md`` was authored on a
+    branch on 07-21, listed two brand marks under *Approved / canonical*, main
+    deleted both on 07-28 as rejected, and the branch merged clean on 08-12
+    because **a merge validates text overlap, never whether the prose still
+    describes the tree**. A designer following the doc's own reference list was
+    sent to two files that were not there.
+
+    Takes TEXT and a predicate, never a repository, so the guards exercise it
+    without one — the same contract the rest of this module keeps.
+    """
+    findings: list[tuple[str, str]] = []
+    for rel_path, text in sorted(docs.items()):
+        if is_suite_guarded(rel_path) or is_record_document(rel_path, text):
+            continue
+        for path in sorted(cited_paths(text, repo_roots)):
+            if not exists(path):
+                findings.append((rel_path, path))
+    return findings
+
+
 def _git(*args: str, cwd: Path | None = None) -> str:
     return subprocess.run(
         ["git", *args],
@@ -176,6 +301,30 @@ def range_commits(base: str, head: str = "HEAD", cwd: Path | None = None) -> lis
         if sha:
             commits.append(Commit(sha=sha, subject=subject))
     return commits
+
+
+def added_documents(base: str, head: str = "HEAD", cwd: Path | None = None) -> dict[str, str]:
+    """The markdown files the range ADDS, keyed by repo-relative path.
+
+    ADDED, not added-or-modified, and the distinction is the whole design rather
+    than a convenience. A document MODIFIED in the range is mostly older prose
+    whose citations are dated statements — on ``ae21ee4..HEAD`` the wider scope
+    reports 59 paths, of which the great majority are gate-log history, IDEAS
+    entries naming an absence deliberately, and pre-Phase-B review docs. A document
+    ADDED in the range is a fresh claim about the tree as it stands at the base
+    being certified, and it is exactly the shape Idea-110 describes: prose written
+    weeks earlier on a branch, landing now, against a tree that moved underneath it.
+    """
+    root = cwd or REPO_ROOT
+    raw = _git("diff", "--name-only", "--diff-filter=A", f"{base}..{head}", cwd=cwd)
+    docs: dict[str, str] = {}
+    for rel in raw.splitlines():
+        if not rel.endswith(".md"):
+            continue
+        path = root / rel
+        if path.exists():
+            docs[rel] = path.read_text(encoding="utf-8", errors="replace")
+    return docs
 
 
 def venue_line() -> str:
@@ -202,7 +351,7 @@ def venue_line() -> str:
 def run_checks(
     base: str, *, skip_tests: bool = False, will_tag: bool = False
 ) -> list[CheckResult]:
-    """The five structural checks plus the relay-basis check, in order.
+    """The five structural checks plus the relay-basis and cited-path checks.
 
     Ordered cheapest-first so a dirty tree fails in milliseconds rather than after
     a minute of pytest.
@@ -238,6 +387,21 @@ def run_checks(
             not uncited,
             "\n".join(f"    UNCITED {c.sha} {c.subject}" for c in uncited)
             or f"all {len(commits)} commits in {base}..HEAD are cited or ritual",
+        )
+    )
+
+    docs = added_documents(base)
+    unresolved = unresolved_citations(
+        docs,
+        repo_roots={entry.name for entry in REPO_ROOT.iterdir()},
+        exists=lambda rel: (REPO_ROOT / rel).exists(),
+    )
+    results.append(
+        CheckResult(
+            "cited paths resolve",
+            not unresolved,
+            "\n".join(f"    UNRESOLVED {doc}: `{path}`" for doc, path in unresolved)
+            or f"every path cited by the {len(docs)} document(s) this range adds resolves",
         )
     )
 
