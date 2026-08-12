@@ -17346,7 +17346,7 @@ items:
     agent: main
     model: sonnet
     priority: p2
-    status: todo
+    status: in_progress  # claimed 2026-08-12 (desktop) — sweep in progress
     depends_on: []
     inputs:
       - drydocs_core/repo_paths.py
