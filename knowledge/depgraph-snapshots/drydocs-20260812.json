@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-12T14:14:24",
+    "captured_at": "2026-08-12T18:28:28",
     "date": "20260812",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "fac3d12",
-      "full": "fac3d12938b7c11d583d2b4a5f5477370e38ac05",
+      "commit": "77f2ff8",
+      "full": "77f2ff826092f18cbdf90178770cefc8fd27c76a",
       "branch": "main",
-      "describe": "port-base-20260811-56-gfac3d12",
-      "subject": "Merge fix/reconcile-before-dir-guard — a stale RECONCILE_BEFORE_DIR fails by name",
+      "describe": "port-base-20260811-63-g77f2ff8",
+      "subject": "feat(port): seventh preflight check — resolve the paths a newly added doc cites",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -8378,6 +8378,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/port-xml-test-company-prompt.md",
+      "name": "port-xml-test-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/port-xml-test-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure",
       "name": "restructure",
       "extension": "",
@@ -13778,10 +13787,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json",
-      "name": "drydocs-20260812.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1414.json",
+      "name": "drydocs-20260812-1414.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812-1414.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25672,6 +25681,11 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/port-xml-test-company-prompt.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/restructure"
     ],
     [
@@ -29087,7 +29101,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1414.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -31139,13 +31153,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1683,
+    "files": 1684,
     "edges": 946,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1950,
+    "rels": 1951,
     "directories": 268
   }
 }
