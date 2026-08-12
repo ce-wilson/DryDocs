@@ -589,6 +589,26 @@
       "loaders": []
     },
     {
+      "id": "hr@[db].psgmgr.hr_phone_exp",
+      "home": "source-registry",
+      "system": "psgmgr",
+      "origin": "hr",
+      "kind": "table",
+      "authority": "ADS",
+      "derived": false,
+      "urn": "urn:drydocs:dataset:(psgmgr,hr_phone_exp,prod)",
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
+    },
+    {
       "id": "seal@[db].psgmgr.cm_escalation_db",
       "home": "source-registry",
       "system": "psgmgr",

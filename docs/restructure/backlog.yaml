@@ -2471,6 +2471,18 @@ items:
       counts disagreements mechanically and parks every one in `unruled` until an SME
       ruling is injected. The number still sitting in `unruled` is itself reportable: the
       never-silent rule applied to the report rather than to a load.
+      THE BLOCKER'S REASON CHANGED 2026-08-12 (SME evidence) — still blocked, much
+      smaller ask. The FID directory is not an external system needing an export or an
+      onboarding: it is `psgmgr.HR_PHONE_EXP`, functional rows `EMP_TYP_CD = 'FCT'`, in
+      the replica ALREADY IN SCOPE and already the Control-M source. So the census is a
+      SINGLE-SCHEMA JOIN — demand set (i) from CM_DEF_VJOB.OWNER against the directory
+      in the same schema — and no new source crosses the boundary. Status stays blocked
+      because the counts are Internal and this repo has no psgmgr access, which is
+      unchanged; what changed is that satisfying it no longer waits on a source
+      onboarding, only on someone running the query company-side.
+      RUN Q6 FIRST (gate fid-identity-and-scope): whether CM_DEF_VJOB.OWNER holds the
+      NAME or the ID decides the join key, and the two keys give different demand sets.
+      Measuring with the wrong one produces a confident wrong number.
       module: config is kept as the WORK AREA; the code module classifies as
       drydocs-review in test_module_boundary.py (it loads nothing and configures nothing
       — it produces the counts an SME rules from, the same reasoning that puts
@@ -2543,6 +2555,32 @@ items:
       is the directory extract filtered to accounts already named, which is the
       smallest confidential surface available and is the argument doc 09 makes for
       demand-driven scope in the first place.
+      SME INPUT (2) IS NOW PARTLY FALSIFIED — 2026-08-12, and the correction is the
+      point. It recorded that Oracle supplies the FID VALUE but NOT the FID RECORD,
+      because it 'carries no type, no status and no application assignment'. That is
+      true of CM_DEF_VJOB — the Control-M job table — and was generalized from it to
+      'Oracle'. `psgmgr.HR_PHONE_EXP` carries ALL THREE: EMP_TYP_CD (type, 'FCT' for
+      functional), EMP_STATUS_CD (status), CALC_LOB_NAME (LOB). So Oracle can source
+      the RECORD as well as the value, the §D2 census runs inside one schema, and Q3 is
+      answered with an option it did not offer. The half that still stands: the
+      directory being reachable says nothing about whether its assignment AGREES with
+      Control-M attribution — Q0/Q4 and the whole §G reading are untouched.
+      THE account->PERSON GAP HAS A COLUMN NOW. Input (1)(b) said the two-human-owners
+      rule 'has nothing to attach to yet' because doc 09 models account->APPLICATION
+      and never account->PERSON. EMP_MGRS_ID is the FID's owner, and the SME states
+      that owner RECERTIFIES ANNUALLY — so ownership arrives already as-of, with a
+      stated cadence, which is exactly §B's subject. Raised as Q7. It must NOT be swept
+      into doc 09's contact-column deferral: a recertifying manager is accountability,
+      not a contact point, and input (1)(b) already drew that line.
+      SEPARATE SURFACE, DO NOT CONFLATE: the SME also showed a FID MANAGEMENT TOOL
+      (not the Oracle table) whose record carries a Seal id + seal status, a
+      functional TYPE of Application|Component, support team/email/queue, and OWNER
+      ROLES drawn from the SAME TOM vocabulary as the G35 register (the SEAL* role
+      codes). Two consequences: the FID record and the application TOM register share
+      a role vocabulary, which G70's register seeding should know; and the support
+      team/email/queue columns are precisely §D3's 'OUT for now' set that belongs to
+      email-dl-contact-point. The tool is a THIRD surface beside the table and the
+      export — its columns are not evidence of what HR_PHONE_EXP projects.
 
   - id: K18
     epic: seal-attribution

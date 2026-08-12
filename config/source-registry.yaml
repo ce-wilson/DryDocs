@@ -463,6 +463,43 @@ datasets:
       the jobrun-observation mapping to cite; expensive view — every extract
       must bind an indexed predicate.
 
+  - id: "hr@[db].psgmgr.hr_phone_exp"
+    system: psgmgr
+    origin: hr
+    artifact: hr_phone_exp
+    artifact_kind: table
+    taxonomy_category: People & Org
+    asset_type: dcat:Dataset
+    authority: ADS
+    feeds_taxonomy: []
+    adapter: oracle
+    confirmed: false                    # no gate — this is the K17 gate's own subject (fid-identity-and-scope). Registered here so the K16 census has a source row to cite; NOTHING loads until K17 signs.
+    notes: >
+      THE FID DIRECTORY, AND IT WAS NEVER AN EXTERNAL SYSTEM (SME evidence
+      2026-08-12). Functional-account rows are `EMP_TYP_CD = 'FCT'`. This row
+      exists because K16/K17 were blocked on the belief that the FID directory
+      had to arrive as an export or an API from outside; it is a table in
+      psgmgr — the replica already in scope, already the Control-M source.
+      COLUMN SEMANTICS, SME-given (they do not read off the names):
+      EMP_ID = the functional id; EMP_FIRST_NAME = the DESCRIPTION;
+      EMP_LAST_NAME = the NAME, and the value used as the Control-M run-as
+      name; EMP_MGRS_ID / EMP_MGRS_FIRST_NAME = the FID's OWNER, who
+      RECERTIFIES ANNUALLY; EMP_TYP_CD = type; EMP_STATUS_CD = status;
+      CALC_LOB_NAME = LOB. Two of those are traps: the person columns carry
+      account metadata rather than a person, so FIRST/LAST NAME are description
+      and name, not a human's name.
+      FIRST ORIGIN IN psgmgr THAT IS NOT CONTROL-M. Every other psgmgr dataset
+      here is `controlm@` or `seal@`; the schema is a shared replica surface,
+      not a Control-M-only one, and the header's "Control-M -> psgmgr" framing
+      describes the first origin rather than the schema's scope.
+      OPEN AND IT DECIDES THE JOIN KEY: config/source-mappings/psgmgr.yaml calls
+      CM_DEF_VJOB.OWNER a "run-as tenant Functional ID", but the SME's mapping
+      puts the run-as value on EMP_LAST_NAME (the NAME) while the functional id
+      is EMP_ID. If OWNER holds the name, the census and the K2 tier-2
+      reconciler join OWNER = EMP_LAST_NAME and the ledger note is misleading.
+      Not verifiable producer-side (no psgmgr access here); one SME answer
+      settles it. Same defect class as RELAY-9 — the label is not the identity.
+
   - id: "seal@[db].psgmgr.cm_escalation_db"
     system: psgmgr
     origin: seal
