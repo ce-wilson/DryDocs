@@ -17425,6 +17425,15 @@ items:
       contradiction the operator is currently forced into. Implement the interface the TDDs
       ALREADY DESCRIBE and neither side built: --source <source-id> resolving its location from
       config/source-registry.yaml, with --samples-dir retained for fixtures only.
+      THE CORRECT BEHAVIOUR IS ALREADY IN THE REPO, ONE VERB AWAY, and this clause is closer to
+      making two commands agree than to designing an interface (SME-confirmed 2026-08-11:
+      "--csv works fine changing to a different path"). `drydocs load <name> --csv <path>` takes
+      an ARBITRARY path -- no directory convention, no filename convention, no fixture default --
+      and when neither --csv nor --sql is given it PRINTS AND EXITS 2 rather than guessing. It
+      also runs the confirmed-gate before any write. So the defect is not "loaders cannot take a
+      path"; it is that the SEQUENCED chain verb behaves worse than the manual verb beside it.
+      Copy the single-loader contract up into the chain: explicit path or fail, never a
+      plausible default. Do NOT rebuild what `load` already does correctly.
       (c) The run summary states, per step, WHICH path it read and how many rows it loaded, so
       "it succeeded" is falsifiable at a glance.
       Guard: a test proves a chain step with a missing required input FAILS BY NAME, and that a
@@ -17435,6 +17444,12 @@ items:
       producer-side. p0 because it is silent, it is live on both machines, and every downstream
       claim about what the graph contains rests on it. Independent of the naming epic -- this is
       correctness, that is generalization; do not couple them.
+      THERE IS A WORKING ESCAPE HATCH TODAY, and an operator blocked on this should be told
+      rather than left waiting for the fix: `drydocs load <name> --csv <arbitrary path>` loads a
+      single loader from any location, gated, with no fixture fallback. It is per-loader rather
+      than per-chain, so a full reference load is several invocations, but it is CORRECT where
+      the chain verb is not. That also bounds the item: the contract to copy already exists and
+      is one verb away, so this is two commands being made to agree, not an interface to design.
       STANDING DIVERGENCE FOUND WHILE CONFIRMING IT, and it is load-bearing for any shared
       fixture: the producer convention is DOUBLE underscore (catalog_lobs__sample.csv), the
       company convention is SINGLE (catalog_lobs_sample.csv) -- confirmed by the SME. The same
