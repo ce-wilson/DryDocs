@@ -201,18 +201,26 @@ def _normalize(name: str) -> str:
     same choice §D1 made for script paths, for the same reason.
 
     THE SME HAS SINCE RULED THAT CASE DOES NOT DISTINGUISH THESE ACCOUNTS
-    (2026-08-12): the directory join is
-    ``UPPER(HR_PHONE_EXP.EMP_LAST_NAME) = UPPER(<control-m job table>.OWNER)``.
-    This function is deliberately NOT changed, because the ruling changes how the
-    result is READ, not how it is measured — a census that folds silently can no
-    longer report how much folding it did, and that count is evidence the gate
-    asked for. **Consequence for whoever reads the numbers: under the SME's rule
-    the true intersection is ``demand_in_application + case_only_mismatches``, and
-    ``demand_in_application`` alone UNDERSTATES it by exactly that many accounts.**
-    ``reconciles()`` still balances, because a case-only near-miss is counted in
-    the remainder either way. If the gate later rules case-folding into the
-    MEASUREMENT, fold here and drop the counter together — never one without the
-    other, or the census silently loses the ability to show its own correction.
+    (2026-08-12), AND THE SKEW IS SYSTEMATIC RATHER THAN OCCASIONAL: psgmgr
+    stores ``CM_DEF_VJOB.OWNER`` ALL UPPER while the directory's
+    ``EMP_LAST_NAME`` is mixed case, so the join is
+    ``UPPER(EMP_LAST_NAME) = OWNER``.
+
+    **NORMALIZE THE DIRECTORY SIDE ON THE WAY IN — this is the caller's job, not
+    this module's.** Feed raw mixed-case directory rows against upper-case
+    ``run_as_owners`` and essentially EVERY REAL MATCH lands in
+    ``case_only_mismatches`` instead of ``demand_in_application``: the headline
+    number then reads "the directory barely covers the estate" when it may cover
+    it entirely. The arithmetic still recovers the truth
+    (``demand_in_application + case_only_mismatches``), but a number that needs a
+    footnote to not mislead is the wrong number to hand over.
+
+    This function stays trim-only on purpose. A census that folds silently cannot
+    report how much it folded, and once the caller normalizes, the counter regains
+    its designed meaning: a non-zero value is then a REAL spelling difference
+    beyond case — the identity question §D1 wanted surfaced. Fold here only if the
+    gate rules folding into the MEASUREMENT, and drop the counter in the same
+    change — never one without the other.
     """
     return name.strip()
 

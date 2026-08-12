@@ -141,9 +141,22 @@ every cell marked _pending_.
 
 ## Step 5 — three things to report even if they look like non-answers
 
-1. **`case_only_mismatches` > 0.** The tool reports spelling near-misses and never folds
-   case, because the directory and the scheduler are separate systems. A non-zero count
-   is an identity question for the gate — not a bug to paper over on your side.
+1. **`case_only_mismatches` > 0 — BUT NORMALIZE THE DIRECTORY SIDE FIRST (2026-08-12).**
+   psgmgr stores `CM_DEF_VJOB.OWNER` **all upper**, while `HR_PHONE_EXP.EMP_LAST_NAME`
+   is mixed case, and the SME has ruled the two are the SAME account
+   (`UPPER(EMP_LAST_NAME) = UPPER(OWNER)`, gate §Q6). **So `UPPER()` the directory side
+   in your extract query before feeding the census.** If you do not, essentially every
+   real match lands in `case_only_mismatches` instead of `demand_in_application`, and the
+   headline number reads as "the directory barely covers the estate" when it may cover it
+   completely. The arithmetic still recovers the truth —
+   `demand_in_application + case_only_mismatches` — but the honest fix is to normalize on
+   the way in.
+   **Once normalized, the counter regains its meaning: a non-zero value is then a REAL
+   spelling difference beyond case**, which is an identity question for the gate and not
+   a bug to paper over on your side. That is the number worth reporting.
+   The census tool itself deliberately does NOT fold case (`fid_census._normalize` trims
+   only) — a census that folds silently cannot report how much it folded. Normalizing is
+   your extract's job, not the tool's.
 2. **A non-application `account_type` in `run_as_owner_types`.** That answers gate §Q5 in
    the negative: if non-application types really do appear as run-as owners, type cannot
    be used even as an explanatory filter.

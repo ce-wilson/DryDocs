@@ -615,10 +615,22 @@ def _scope_binds(
     Operational employee identity (who *ran* actions, vs who authored the
     definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
     wire it on a future audit extract.
+
+    ``run_as`` IS UPPER-CASED HERE, and the reason is worth stating because the
+    obvious alternative is wrong. psgmgr stores ``CM_DEF_VJOB.OWNER`` ALL UPPER
+    (SME 2026-08-12), while the SQL binds ``J.OWNER = :run_as`` as an exact
+    match — so a lower-case ``--run-as`` silently returned ZERO ROWS and looked
+    like "that account runs nothing". Normalizing the BIND VALUE fixes it for
+    free: the column is untouched, so the predicate stays sargable on a ~240k-row
+    table. Wrapping the COLUMN (``UPPER(J.OWNER) = ...``) would fix the same
+    symptom while defeating a plain b-tree index — and would be pure loss here,
+    since a column already upper at rest makes ``UPPER()`` on it a no-op.
+    Case-folding the DIRECTORY side is a separate matter and does not belong in
+    this bind (gate fid-identity-and-scope §Q6).
     """
     return {
         "folder_filter": folder,
-        "run_as": run_as,
+        "run_as": run_as.upper() if run_as else run_as,
         "developer_sid": developer_sid,
         "row_cap": row_cap,
     }

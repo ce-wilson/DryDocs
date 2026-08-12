@@ -468,3 +468,29 @@ def test_m3_supplement_wires_to_prov_anchors() -> None:
     assert "SUBCLASS_OF" in text
     assert "http://www.w3.org/ns/prov#Collection" in text
     assert "http://www.w3.org/ns/prov#Activity" in text
+
+
+def test_run_as_bind_is_upper_cased_but_the_column_is_not() -> None:
+    """psgmgr stores CM_DEF_VJOB.OWNER all-upper (SME 2026-08-12) and the SQL
+    binds `J.OWNER = :run_as` as an exact match, so a lower-case --run-as
+    silently matched nothing. The BIND VALUE is normalized; the COLUMN must stay
+    bare so the predicate keeps using its index on a ~240k-row table."""
+    from drydocs.cli import _scope_binds
+
+    assert _scope_binds(run_as="a_lower_case_acct")["run_as"] == "A_LOWER_CASE_ACCT"
+    assert _scope_binds(run_as="ALREADY_UPPER")["run_as"] == "ALREADY_UPPER"
+    # None must survive as None — it means "no filter on this dimension", and
+    # "".upper() would turn a missing filter into an empty-string match.
+    assert _scope_binds(run_as=None)["run_as"] is None
+
+    for sql_name in ("controlm_jobs.sql", "controlm_dependencies_recursive.sql"):
+        code = "\n".join(
+            line
+            for line in (SQL_DIR / sql_name).read_text(encoding="utf-8").splitlines()
+            if not line.strip().startswith("--")
+        )
+        assert ":run_as" in code, sql_name
+        assert "UPPER(J.OWNER" not in code.upper().replace(" ", ""), (
+            f"{sql_name}: the OWNER column must not be wrapped in UPPER() — it is "
+            "already upper at rest, so the function is a no-op that costs the index"
+        )

@@ -493,8 +493,9 @@ datasets:
       not a Control-M-only one, and the header's "Control-M -> psgmgr" framing
       describes the first origin rather than the schema's scope.
       THE JOIN, SME-CONFIRMED 2026-08-12 (gate Q6, answered the day it was
-      raised): UPPER(HR_PHONE_EXP.EMP_LAST_NAME) = UPPER(CM_DEF_VJOB.OWNER) —
-      the NAME on both sides, CASE-INSENSITIVE. EMP_ID is what the crosswalk
+      raised): UPPER(HR_PHONE_EXP.EMP_LAST_NAME) = CM_DEF_VJOB.OWNER — the NAME
+      on both sides. OWNER is stored ALL UPPER in psgmgr and EMP_LAST_NAME is
+      mixed case, so only the DIRECTORY side is normalized. EMP_ID is what the crosswalk
       RESOLVES TO, never the join key. The psgmgr column ledger had called
       OWNER a "Functional ID" and is corrected; gate rua-load-shapes A1 had
       already ruled the same way on 2026-08-06, so the ledger was the outlier
