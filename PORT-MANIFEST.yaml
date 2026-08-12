@@ -726,3 +726,66 @@ default_ok:
       mirror (PUBLISH-BOUNDARY.md is what enforces that, not this manifest).
   - path: "external/ServiceNow/**"
     reason: "vendor reference stub; the populated vendor trees under external/orchestration/** have their own canonical-producer row"
+
+# =============================================================================
+# row_may_match_nothing — rows that match NO path on this side, ON PURPOSE
+# (Phase C prerequisite, 2026-08-12)
+#
+# The mirror of `default_ok`. That block answers "which paths match no row";
+# this one answers the inverse nobody had asked: **which rows match no path**.
+# A row whose glob matches nothing is unenforced, and it fails SILENTLY — the
+# paths it was written to govern fall through to whatever broader row catches
+# them next, which is usually the generic `evaluate` row, i.e. the wrong
+# disposition with no error anywhere.
+#
+# This is not hypothetical. It has happened twice:
+#   * `drydocs_core/controlm/**` (canonical-producer) pointed at a path that had
+#     not existed since the S2 / ADR 0008 relocate under `orchestration/`. The
+#     ENTIRE orchestration package silently fell through to the generic
+#     `drydocs_core/**` evaluate-on-collision row for months, caught by hand at
+#     G75/G76 on 2026-08-11.
+#   * The Phase B relocate (ADR 0002-a-1) got this right only because the rows
+#     were re-pathed in the SAME commit as the move — the "path-column diff"
+#     discipline. Nothing enforced that; it was remembered.
+#
+# Phase C (the deferred 4-component split of the `drydocs` remainder, ADR
+# 0002-a-1 "Revisit at Phase C") is the largest rename wave still ahead. This
+# guard is its prerequisite: after Phase C moves files, every row left pointing
+# at a pre-split path fails the suite instead of rotting quietly.
+#
+# `reason` is mandatory. A row belongs here only when matching nothing is the
+# INTENDED state — a company-only path, a side-local overlay slot, a gitignored
+# zone, or a one-time cross-side migration instruction. If a row matches nothing
+# because the files MOVED, the fix is to re-path the row, not to allowlist it.
+#
+# Guarded by tests/unit/test_port_reconcile_guards.py::
+#   test_no_manifest_row_matches_nothing (and its well-formedness twin).
+# =============================================================================
+row_may_match_nothing:
+  # ---- side-local by construction ------------------------------------------
+  - path: "PORT-MANIFEST.*.yaml"
+    reason: >
+      the J34 overlay slots. Each side tracks its OWN overlay and the other side's
+      is absent by design (that absence is the whole point of the seam — a
+      verbatim take of this file cannot drop rows that were never in it), so this
+      row matches nothing on whichever side has not created its overlay yet.
+  - path: "internal-local/**"
+    reason: "gitignored local zone — never tracked on either side, so it can never appear in the guard's population by construction"
+
+  # ---- company-only modules the producer will never hold --------------------
+  - path: "drydocs/locations.py"
+    reason: "never-port company-only module (real site/data-center values); producer-side absence is the intended state, not rot"
+  - path: "drydocs/seal_deployments.py"
+    reason: "never-port company-only module (real SEAL deployment values); producer-side absence is the intended state, not rot"
+  - path: "drydocs/controlm_app_codes.py"
+    reason: "never-port company-only module (real app-code vocabulary); producer-side absence is the intended state, not rot"
+
+  # ---- one-time cross-side migration instruction ---------------------------
+  - path: "docs/design/controlm-ingestion-tdd.print.html"
+    reason: >
+      DELIBERATELY zero-match producer-side and the row still has work to do: the
+      producer retired the .print.html at L13 (2026-07-18) when the render series
+      collapsed to one .html with @media print, and the row's note carries the
+      consumer's one-time instruction — DELETE the company-side twin at the next
+      port, then regenerate the single .html. RETIRE THIS ENTRY (and its row) once
+      a PORT-REPORT records that deletion; until then a zero match is correct.

@@ -362,8 +362,10 @@ def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
 
     Overlay rows append AFTER the manifest's rows (first match wins, so the
     producer manifest's dispositions keep precedence — an overlay adds
-    coverage, never overrides authority) and default_ok entries union. The
-    returned dict is a new view; the input is not mutated. Because an overlay
+    coverage, never overrides authority) and default_ok entries union;
+    ``row_may_match_nothing`` entries union the same way, so each side can
+    excuse its own deliberately-dead rows without touching the other's file.
+    The returned dict is a new view; the input is not mutated. Because an overlay
     lives OUTSIDE PORT-MANIFEST.yaml, a producer-manifest-verbatim apply
     structurally cannot drop its rows — the property the seam exists for
     (PORT-REPORT-a14a8028: 89 company-only default_ok paths dropped by a
@@ -373,6 +375,7 @@ def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
         **manifest,
         "rows": list(manifest.get("rows", [])),
         "default_ok": list(manifest.get("default_ok", [])),
+        "row_may_match_nothing": list(manifest.get("row_may_match_nothing", [])),
     }
     for declared in (manifest.get("overlay") or {}).get("files", []):
         overlay_file = repo / declared["path"]
@@ -381,6 +384,7 @@ def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
         overlay = yaml.safe_load(overlay_file.read_text(encoding="utf-8")) or {}
         view["rows"].extend(overlay.get("rows", []))
         view["default_ok"].extend(overlay.get("default_ok", []))
+        view["row_may_match_nothing"].extend(overlay.get("row_may_match_nothing", []))
     return view
 
 
@@ -512,6 +516,105 @@ def test_no_tracked_path_falls_through_silently(manifest: dict) -> None:
         "default_ok entry with a reason (the default is right and here is why) — "
         "or, for an [untracked] path that is local-only by intent, .gitignore it.\n  "
         + "\n  ".join(f"{p} [untracked]" if p in untracked else p for p in sorted(orphans)[:40])
+    )
+
+
+# --- Phase C prerequisite: the INVERSE of J16 — rows that match no path -----------
+#
+# J16 above asks "which paths match no row". Nobody had asked the mirror question,
+# "which rows match no path" — and an unmatched row is the more dangerous half,
+# because it fails SILENTLY in the wrong direction: the paths it was written to
+# govern do not go ungoverned, they fall through to whatever broader row catches
+# them next. Usually that is the generic `evaluate` row, so a canonical-producer
+# or never-port intent quietly degrades to hand-merge-on-collision with no error.
+#
+# Live instance: `drydocs_core/controlm/**` (canonical-producer) pointed at a path
+# that had not existed since the S2 / ADR 0008 relocate under `orchestration/`. The
+# whole orchestration package fell through to `drydocs_core/**` evaluate for months
+# and was caught by hand at G75/G76 (2026-08-11), not by any guard.
+#
+# The Phase B core relocate (ADR 0002-a-1) avoided this only because the rows were
+# re-pathed in the SAME commit as the 42 renames — the "path-column diff" the
+# manifest header promised. That discipline was remembered, never enforced. Phase C
+# (the deferred 4-component split of the `drydocs` remainder) is the biggest rename
+# wave still ahead, which is what makes this guard its prerequisite rather than a
+# nice-to-have: after Phase C moves files, a row left on a pre-split path FAILS.
+#
+# Deliberately-dead rows are real and legitimate — a company-only module, a
+# side-local overlay slot, a gitignored zone, a one-time cross-side migration
+# instruction — so this is default-deny with a reasoned allowlist, the same shape
+# as default_ok and as test_no_shadow_definitions (C18).
+
+
+def dead_rows(
+    rows: Iterable[Mapping[str, Any]],
+    paths: Iterable[str],
+    allowed: list[tuple[str, re.Pattern[str]]],
+) -> list[str]:
+    """Row paths matching nothing in ``paths`` and not excused by ``allowed``."""
+    population = list(paths)
+    out: list[str] = []
+    for row in rows:
+        pattern = row["path"]
+        rx = glob_to_regex(pattern)
+        if any(rx.match(p) for p in population):
+            continue
+        if resolve_path(pattern, allowed) is not None:
+            continue
+        out.append(pattern)
+    return out
+
+
+def test_dead_row_mechanics() -> None:
+    """Mechanics on fixtures, pinned away from the live tree so a matcher
+    regression cannot masquerade as a clean manifest (the J16 idiom)."""
+    paths = ["drydocs_core/orchestration/controlm/shell.py", "drydocs/loaders/catalog.py"]
+    rows = [
+        {"path": "drydocs_core/orchestration/**"},  # matches
+        {"path": "drydocs_core/controlm/**"},  # THE G75/G76 defect: pre-relocate path
+    ]
+    assert dead_rows(rows, paths, []) == ["drydocs_core/controlm/**"]
+
+    # an allowlisted row resolves — the reasoned-entry route, not silence
+    excused = _compiled([{"path": "drydocs_core/controlm/**"}])
+    assert dead_rows(rows, paths, excused) == []
+
+    # the allowlist is matched as a glob too, so one entry can excuse a family
+    family = _compiled([{"path": "PORT-MANIFEST.*.yaml"}])
+    assert dead_rows([{"path": "PORT-MANIFEST.company.yaml"}], paths, family) == []
+
+
+def test_row_may_match_nothing_entries_are_well_formed(manifest: dict) -> None:
+    """The allowlist is only worth anything if every entry says WHY."""
+    entries = manifest.get("row_may_match_nothing")
+    assert entries, (
+        "row_may_match_nothing must exist — it is what makes the guard below "
+        "meaningful (an unreasoned exemption is the silence it replaces)"
+    )
+    for entry in entries:
+        assert entry.get("path"), f"entry without a path: {entry}"
+        reason = (entry.get("reason") or "").strip()
+        assert len(reason) > 20, f"{entry.get('path')}: reason is mandatory and must be specific"
+
+
+def test_no_manifest_row_matches_nothing(manifest: dict) -> None:
+    """Every row governs at least one real path, or is allowlisted with a reason.
+
+    A row matching nothing is unenforced: its paths silently resolve to the next
+    broader row instead. This is what rotted `drydocs_core/controlm/**` across the
+    S2 relocate, and it is the failure Phase C's rename wave would reproduce at
+    scale.
+    """
+    allowed = _compiled(manifest["row_may_match_nothing"])
+    population = [*_tracked_files(), *_untracked_files()]
+    dead = dead_rows(manifest["rows"], population, allowed)
+    assert not dead, (
+        f"{len(dead)} PORT-MANIFEST row(s) match no path on this side, so they are "
+        "unenforced — the paths they were written to govern fall through to the next "
+        "broader row (usually the generic `evaluate`). If the files MOVED, re-path the "
+        "row in the same commit as the move (the path-column diff rule). If matching "
+        "nothing is intended, add a row_may_match_nothing entry with a reason.\n  "
+        + "\n  ".join(sorted(dead))
     )
 
 
