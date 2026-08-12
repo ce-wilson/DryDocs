@@ -1,5 +1,5 @@
 # SME gate-prompt spec — document/content database topology + the ddcontext
-# charter (backlog G32). DRAFTED 2026-08-05, awaiting SME.
+# charter (backlog G32). DRAFTED 2026-08-05. REFRESHED 2026-08-12.
 #
 # This gate rules a BOUNDARY, not an ontology term: how many content databases
 # exist, what each holds, and what the walls between them cost. It authorizes no
@@ -7,6 +7,27 @@
 # ADR 0002 and ADR 0006 (the ADR 0002 banner precedent — amendments, never body
 # rewrites), plus 01_databases.cypher, provisioning/README.md, the doc-source
 # registry's target_db column, and test_database_names.py.
+#
+# REFRESH 2026-08-12 — THREE THINGS THE SME RULED AHEAD OF THE WALK, in session.
+# They are recorded here as settled, not re-asked; the sections below are
+# rewritten around them rather than still arguing for the superseded proposal.
+#   R1 (was Q5, and it decides §A) — `dddocs` is REJECTED as a name and the
+#      third database with it. `drydocs` is the original; the `dd*` names are
+#      its extensions, so `dddocs` reads as an extension while holding what
+#      belongs in the original. Captured vendor/estate content stays in
+#      `drydocs`. The name is retired from the registry and from
+#      cli.DOC_SWEEP_DATABASES — the draft's own §A already named retirement as
+#      the alternative branch, so this is the branch it offered, taken.
+#   R2 (was Q2) — bmc-docs is RELOADED FROM SOURCE, not moved. Caveat the SME
+#      attached: there are TWO bmc sets, and they are not interchangeable —
+#      `bmc-docs` (26 pages converted to markdown, in the repo tree) and
+#      `bmc-controlm-utilities` (the full scrape, 1016 documents / 6.0 MB, held
+#      outside the repo tree). §C carries what that means for each.
+#   R3 (was close-checklist item 3) — the 27 live DESCRIBES edges are DELETED,
+#      not preserved through a migration. Under R1 the reload re-establishes
+#      them legitimately, so nothing is lost by deleting the residue.
+# Also refreshed: the registry has grown from 6 corpora to 7 since the draft
+# (`seal-pat-scrape`, registered as a stub by the N8 ruling 2026-08-06).
 #
 # Mechanism + database names only. The one company-adjacent id here
 # (jpmc-reports) is classification External in the registry: public SEC filings
@@ -17,55 +38,61 @@ id: document-content-topology
 title: "SME Gate — the document/content database topology, and what ddcontext is actually for"
 step: "ADR 0002 D1 amendment + ADR 0006 charter amendment — before G31 sizes the proxy-node spine"
 summary: >
-  Rules five coupled things the current topology leaves undecided or states
-  falsely: (a) how many document/content databases exist and what each holds;
-  (b) the ddcontext charter, which today says "isolated uncertain / SYNTHESIZED"
-  while holding four corpora of which NONE is synthesized; (c) the target_db of
-  every doc-source-registry row, two of which name a database that has never been
-  provisioned; (d) an explicit acceptance of what a database boundary COSTS,
-  recorded now rather than discovered when a query cannot be written; and (e) the
-  drydocs-deepdoc charter, which has drifted between two ADRs that describe
-  different products.
+  Rules four coupled things the current topology leaves undecided or states
+  falsely. Three of the draft's five open questions were ruled in session on
+  2026-08-12 and are recorded in `meta` as settled, which changes the shape of
+  what is left: with `dddocs` rejected (R1) there are TWO content-bearing
+  databases, not three, and the draft's recommended fix for the false watermark
+  is no longer available.
+  What remains to rule: (a) the two-database split confirmed and the `dddocs`
+  name retired everywhere it appears; (b) the ddcontext charter and the
+  watermark, which now cannot be made true by moving data, because ddcontext
+  keeps two VERBATIM corpora permanently; (c) the target_db of all seven
+  doc-source-registry rows; (d) an explicit acceptance of what the one remaining
+  boundary COSTS; and (e) the drydocs-deepdoc charter, which has drifted between
+  two ADRs that describe different products.
   The trigger for (b) is not theoretical. `drydocs_api` stamps every ddcontext
-  read with the literal string "SYNTHESIZED — unverified", keyed on database name;
-  two of the four corpora there are VERBATIM captures. The API is making a false
-  provenance claim about material it captured word for word, on the export path,
-  today. Confirming this gate authorizes NO graph write and moves no data — it
-  fixes the charter and the target column, and the moves follow as their own work.
+  read with the literal string "SYNTHESIZED — unverified", keyed on database
+  name; two of the four corpora that stay there are VERBATIM captures. The API
+  is making a false provenance claim about material it captured word for word,
+  on the export path, today. Confirming this gate authorizes NO graph write and
+  moves no data — it fixes the charter and the target column, and the reload
+  follows as its own work.
 meta:
   Module: "graph-infra"
-  Source: "ADR 0002 (component database topology, D1/D2) + ADR 0006 (docmeta component and doc graph, §1); live state read 2026-08-05 from config/doc-source-registry.yaml, config/dev-environment.yaml, drydocs_api/query_specs.py and drydocs_api/exports.py"
-  Registry ref: "config/doc-source-registry.yaml — 6 corpora, target_db split dddocs×2 / ddcontext×4; `dddocs` appears in no provisioning script and in no SHOW DATABASES"
+  Source: "ADR 0002 (component database topology, D1/D2) + ADR 0006 (docmeta component and doc graph, §1); live state read 2026-08-05, re-read 2026-08-12 from config/doc-source-registry.yaml, config/dev-environment.yaml, drydocs_api/query_specs.py and drydocs_api/exports.py"
+  Ruled pre-walk: "R1 `dddocs` rejected — two content databases, name retired (settles the draft's Q5 and decides §A) · R2 bmc-docs reloaded from source, with the two-bmc-sets caveat (settles Q2) · R3 the 27 DESCRIBES edges are deleted, not migrated. SME, in session, 2026-08-12"
+  Registry ref: "config/doc-source-registry.yaml — 7 corpora (6 at the draft; seal-pat-scrape added 2026-08-06 by N8), target_db split dddocs×3 / ddcontext×4; `dddocs` appears in no provisioning script and in no SHOW DATABASES, and under R1 never will"
   Classification: "Internal-Public (database names, charters and mechanism only; no credentials, no host facts, no company values). jpmc-reports is registry-classification External — public SEC filings with a public source_url"
-  Precedence: "ADR 0002 D1 is the standing rule this amends; the SME design session of 2026-07-26 already DIRECTED three databases (structured / unstructured-content / derived) for load separation and wipe blast-radius — this gate ratifies and names them rather than reopening that"
-  Blast radius: "G31 (the proxy-node spine cannot be sized until the database set is known) and through it Q9/Q10/Q11; G38 (the federated read proof)"
+  Precedence: "ADR 0002 D1 is the standing rule this amends. The SME design session of 2026-07-26 directed three databases for load separation and wipe blast-radius; R1 supersedes that count on naming grounds and this gate records the supersession explicitly rather than letting the two directions coexist"
+  Blast radius: "G31 (the proxy-node spine cannot be sized until the database set is known) and through it Q9/Q10/Q11; G38 (the federated read proof); Q16 clause (b), which has no successor item and is decided by §C"
 
-# The three-way split being ratified, one row per database.
+# The database set being ratified, one row per database. R1 applied.
 mapping:
   - n: 1
-    element: "drydocs — STRUCTURED ground truth"
-    target: "unchanged: the loaded estate graph (folders, jobs, conditions, apps, teams). Every write the main load makes"
-    edge: "—  [NO CHANGE — restated only so the three-way split is legible in one place]"
+    element: "drydocs — STRUCTURED GROUND TRUTH *and* CAPTURED VENDOR/ESTATE CONTENT"
+    target: "the loaded estate graph (folders, jobs, conditions, apps, teams) PLUS the Document -> Chunk lexical graph for every vendor/estate corpus: bmc-docs, bmc-controlm-utilities, seal-pat-scrape"
+    edge: "SCOPE WIDENED  [R1 — no new database; the corpora that declared `dddocs` resolve here, which is where bmc-docs already physically sits]"
   - n: 2
-    element: "dddocs — UNSTRUCTURED CONTENT (proposed)"
-    target: "Document -> Chunk lexical graphs for every captured corpus, whatever its trust tier: VERBATIM captures and GROUNDED extractions alike"
-    edge: "CREATE DATABASE  [PROPOSED — the name already exists in the registry and in cli.DOC_SWEEP_DATABASES but has NEVER been provisioned; this gate either makes it real or retires the name]"
+    element: "ddcontext — the EXTENSION: reference/experiment/SME content + derived findings"
+    target: "essential-graphrag, fcdo-frameworks, adhoc-sme-email, jpmc-reports — plus the derived findings (drydocs-deepdoc output) it was originally chartered for"
+    edge: "CHARTER RESTATED  [PROPOSED — §B: it holds a permanent MIX of captured content and derived findings, so a watermark keyed on database name can never be true for it]"
   - n: 3
-    element: "ddcontext — DERIVED findings"
-    target: "narrowed to what the SYNTHESIZED watermark already asserts: machine-derived, unverified findings (drydocs-deepdoc output). Holds no captured corpus"
-    edge: "CHARTER NARROWED  [PROPOSED — after the move it holds zero doc corpora, which is what makes its watermark true]"
+    element: "dddocs — RETIRED"
+    target: "nothing. The name is removed from config/doc-source-registry.yaml, from drydocs/cli.py DOC_SWEEP_DATABASES, and from the comment in tests/unit/test_database_names.py"
+    edge: "NAME RETIRED  [R1 — it has never been provisioned and now never will be; it cannot stay a name with nothing behind it]"
   - n: 4
     element: "ddschema — schema meta-graph"
     target: "unchanged and OUT OF SCOPE here (G51): describes the schema, not the estate; deliberately not a ddall constituent"
     edge: "—  [NO CHANGE — listed so the ruling's database count is unambiguous]"
   - n: 5
     element: "ddall — composite"
-    target: "read-only federation. Gains dddocs as a constituent if row 2 is confirmed"
-    edge: "ALIAS ADDED  [PROPOSED — and see §D: a composite read is a join on returned values, never an edge walk]"
+    target: "read-only federation over drydocs + ddcontext. Gains no new constituent under R1"
+    edge: "—  [NO CHANGE to membership; but see §B, its watermark is a live latent defect, and §D, a composite read is a join on returned values, never an edge walk]"
 
 provenance:
   - label: ":Document / :Chunk  [EXISTING node classes — the lexical graph ADR 0006 defines]"
-    source_object: "captured corpora declared in config/doc-source-registry.yaml (6 today: bmc-docs, bmc-controlm-utilities, essential-graphrag, fcdo-frameworks, adhoc-sme-email, jpmc-reports)"
+    source_object: "captured corpora declared in config/doc-source-registry.yaml (7 today: bmc-docs, bmc-controlm-utilities, essential-graphrag, fcdo-frameworks, seal-pat-scrape, adhoc-sme-email, jpmc-reports)"
     key: "doc id / chunk id from the capture manifest — a business key, so a corpus survives a rebuild and re-links (ADR 0002 D1 proxy-node pattern)"
     loader: "drydocs load-bmc-docs, load-vendor-docs, load-essential-graphrag (CANONICAL_LOAD_SEQUENCE steps)"
     properties:
@@ -73,7 +100,7 @@ provenance:
         origin: source
       - name: "trust_default (VERBATIM | GROUNDED) — declared per corpus in the registry, NOT inferred from where it is stored"
         origin: source
-      - name: "target_db — today a REGISTRY DECLARATION that does not match reality for 2 of 6 rows (see §C)"
+      - name: "target_db — today a REGISTRY DECLARATION that names a non-existent database on 3 of 7 rows (see §C)"
         origin: derived
   - label: ":Finding  [the derived-findings class ddcontext is chartered for — no loader exists yet]"
     source_object: "drydocs-deepdoc output; nothing writes this today, which is why the charter could drift unnoticed"
@@ -87,119 +114,174 @@ provenance:
 
 sections:
   - id: A
-    title: "HOW MANY CONTENT DATABASES, and what each one holds"
+    title: "TWO CONTENT DATABASES, not three — and the `dddocs` name goes"
     body: >
-      The 2026-07-26 design session already directed THREE — structured,
-      unstructured-content, derived — on two grounds that hold independently of
-      each other: separation of loads, and wipe blast-radius during testing
-      (retention turned out NOT to be an argument either way, per Q10). This gate
-      does not reopen that count; it names the three and writes down what each
-      holds, because the CURRENT state has a fourth name floating in the config
-      with no database behind it.
-      The proposal is rows 1-3 of the mapping above: `drydocs` keeps structured
-      ground truth, a newly provisioned `dddocs` holds every captured corpus, and
-      `ddcontext` narrows to derived findings only. `ddschema` and `ddall` are
-      unchanged and named only so the count is unambiguous.
+      R1 settles the count and the name together. `drydocs` is the original
+      database and the `dd*` names are its extensions, so a `dddocs` sitting
+      beside `ddcontext` and `ddschema` reads as an extension while holding
+      exactly what the original is for: the vendor and estate material the
+      structured graph is described BY. The draft proposed provisioning it; the
+      draft also named the alternative — "rejecting this means retiring the name
+      from the registry and cli.DOC_SWEEP_DATABASES instead; it cannot stay a
+      name with nothing behind it". That is the branch taken.
+      What this supersedes, said plainly so it is not rediscovered as a
+      contradiction: the 2026-07-26 design session directed THREE databases on
+      two grounds, load separation and wipe blast-radius during testing. R1
+      overrides the count. Both grounds survive at reduced strength — a corpus
+      reload is still a separate load, and a content wipe is still scoped by
+      corpus_id rather than by database. Whether that is enough is the one thing
+      §A asks the SME to look at squarely before confirming, because it is the
+      argument being traded away.
       Worth being explicit about one thing the split does NOT do: it does not
-      separate by TRUST. `dddocs` holds VERBATIM and GROUNDED corpora together,
+      separate by TRUST. `drydocs` holds VERBATIM and GROUNDED corpora together,
       because both are captured content and trust is a property of the SOURCE,
-      declared per row in the registry. Storing by trust tier is what produced the
-      current problem (§B).
+      declared per row in the registry. Storing by trust tier is what produced
+      the current problem (§B).
     confirmations:
-      - "Three content-bearing databases: drydocs (structured), dddocs (captured content), ddcontext (derived findings). ddschema and ddall unchanged."
-      - "`dddocs` is provisioned for real — CREATE DATABASE in 01_databases.cypher, added to the ddall composite, covered by test_database_names.py. (Rejecting this means retiring the name from the registry and cli.DOC_SWEEP_DATABASES instead; it cannot stay a name with nothing behind it.)"
-      - "The split is by KIND (structured / captured content / derived), never by trust tier. Trust stays a per-source property in the registry."
+      - "TWO content-bearing databases: drydocs (structured ground truth + captured vendor/estate content) and ddcontext (reference/experiment/SME content + derived findings). ddschema and ddall unchanged."
+      - "`dddocs` is RETIRED — removed from the registry's target_db column, from cli.DOC_SWEEP_DATABASES, and from the test_database_names.py comment. No CREATE DATABASE, no ddall constituent."
+      - "The 2026-07-26 three-database direction is SUPERSEDED on naming grounds, and the load-separation / blast-radius arguments are accepted as satisfied by corpus-level scoping instead."
+      - "The split is by KIND (ground truth + what describes it / reference + derived), never by trust tier. Trust stays a per-source property in the registry."
   - id: B
-    title: "THE ddcontext CHARTER — the watermark currently makes a false claim, and this is the live defect"
+    title: "THE ddcontext CHARTER — the watermark makes a false claim today, and R1 removes the fix the draft recommended"
     body: >
       ADR 0002 charters `drydocs_context` as the "isolated uncertain" graph at
       trust SYNTHESIZED / unverified, and the API implements that literally:
       `drydocs_api.query_specs.WATERMARKED_DATABASES` is {ddcontext, ddall}, and
       `exports.WATERMARK_VALUE` is the string "SYNTHESIZED — unverified", stamped
       onto every exported row of a watermarked spec.
-      Measured against the registry on 2026-08-05, ddcontext holds four corpora
-      and NOT ONE of them is synthesized: essential-graphrag GROUNDED,
-      fcdo-frameworks GROUNDED (activated by SME ruling the same day),
-      adhoc-sme-email VERBATIM, jpmc-reports VERBATIM. So an export of an SME
-      email that was captured word for word is stamped as machine-synthesized and
-      unverified. That is a false provenance claim on an outward-facing surface,
-      and it is the strongest single argument in this gate.
-      A SECOND, LATENT instance of the same defect: `ddall` is watermarked too, so
-      any future federated spec is stamped SYNTHESIZED even when every row it
+      Measured against the registry, ddcontext holds four corpora and NOT ONE of
+      them is synthesized: essential-graphrag GROUNDED, fcdo-frameworks GROUNDED
+      (activated by SME ruling 2026-08-05), adhoc-sme-email VERBATIM,
+      jpmc-reports VERBATIM. So an export of an SME email captured word for word
+      is stamped as machine-synthesized and unverified. That is a false
+      provenance claim on an outward-facing surface, and it is the strongest
+      single argument in this gate.
+      A SECOND, LATENT instance of the same defect: `ddall` is watermarked too,
+      so any future federated spec is stamped SYNTHESIZED even when every row it
       returns came from `drydocs` ground truth. It is latent only because no
       QuerySpec targets ddall yet (26 target drydocs, 2 target ddcontext) — G38
       would create the first one and trip it.
-      Two ways to stop lying, and they are not equivalent. FIX THE DATA (§A: move
-      captured content to dddocs, leaving ddcontext genuinely synthesized-only) —
-      the charter then becomes true and the watermark can stay exactly as it is.
-      Or FIX THE LABEL (restate the charter to UNCONFIRMED, meaning authority not
-      established whether captured verbatim or inferred, and change
-      WATERMARK_VALUE to match) — cheaper, no data moves, but it keeps content and
-      findings commingled, which is what §A's load-separation and blast-radius
-      arguments were about.
-      RECOMMENDED: fix the data, and additionally stop keying the watermark on
-      DATABASE NAME. Keying trust on storage location is the root cause of both
-      instances above; the honest key is the source's own declared trust_default.
-      That is a bigger change than this gate needs, so it is offered as a separate
-      confirmation rather than bundled.
+      HERE IS WHAT R1 CHANGED. The draft recommended FIX THE DATA: move captured
+      content out, leave ddcontext genuinely synthesized-only, and the existing
+      watermark becomes true with no code change. Under R1 that is no longer
+      available. The four corpora above STAY in ddcontext, two of them VERBATIM,
+      and derived findings will land beside them. ddcontext is now a permanent
+      MIX, which means a watermark keyed on database name can never be true for
+      it. Only two honest options remain, and they are not equivalent:
+      B-NOW — restate the charter to UNCONFIRMED (authority not established,
+      whether captured verbatim or inferred) and change WATERMARK_VALUE to
+      match. One string, one ADR amendment note, no data moves, no export-path
+      change. It is honest about every row it stamps, at the cost of saying
+      less.
+      B-DURABLE — stop keying the watermark on DATABASE NAME at all and key it
+      on the source's declared trust_default. Honest per row rather than per
+      database. This is the real fix: keying trust on storage location is the
+      root cause of both instances above. It is also materially larger, because
+      the export path must know which corpus each row came from, which it does
+      not today.
+      RECOMMENDED: take B-NOW at this gate — it ends a live false claim in one
+      change — and commission B-DURABLE as its own backlog item in the same
+      breath, so the cheap fix does not become the permanent one.
     confirmations:
       - "The current state is a DEFECT, not a modelling preference: verbatim-captured material is exported stamped 'SYNTHESIZED — unverified'."
-      - "Fix by moving the data (§A), not by weakening the charter: after the move ddcontext holds derived findings only, and its existing watermark becomes true."
-      - "The ddall watermark is a second, LATENT instance — a federated read of pure ground truth would be stamped synthesized. Fix it in the same change rather than waiting for G38 to trip it."
-      - "SEPARATE and optional: stop keying the watermark on database name at all, and key it on the source's declared trust_default. Confirm as direction, to be built as its own backlog item."
+      - "R1 is accepted as removing the fix-the-data option: ddcontext keeps four captured corpora permanently, so its charter must change rather than its contents."
+      - "B-NOW: the charter restates to UNCONFIRMED and exports.WATERMARK_VALUE follows. ADR 0002 D1 gets an amendment note recording that ddcontext is a mixed database by ruling, not by accident."
+      - "The ddall watermark is a second, LATENT instance — a federated read of pure ground truth would be stamped. Fix it in the same change rather than waiting for G38 to trip it."
+      - "B-DURABLE is commissioned as its own backlog item now (watermark keyed on the source's trust_default, not the database name), rather than left as direction in a gate log."
   - id: C
-    title: "target_db, ROW BY ROW — two rows name a database that does not exist"
+    title: "target_db, ROW BY ROW — all seven rows, and the two bmc sets are not the same job"
     body: >
       `config/doc-source-registry.yaml` declares a target_db per corpus. Read
       against the provisioned set (config/dev-environment.yaml: drydocs,
-      ddcontext, ddall, ddschema), two rows name `dddocs`, which has never been
-      created. The comment on `cli.DOC_SWEEP_DATABASES` admits this in passing —
-      "the registry admits dddocs | ddcontext as targets, but a corpus can only be
-      found in a database that EXISTS — and `drydocs` is where the bmc-docs corpus
-      actually lives today". So for bmc-docs the registry states one database, the
-      sweep expects another, and the data sits in a third.
-      Confirming §A makes the column honest rather than aspirational. Proposed
-      end state, all six rows to `dddocs`, because all six are captured content:
-      bmc-docs (GROUNDED, T1), bmc-controlm-utilities (VERBATIM, T1),
-      essential-graphrag (GROUNDED, T1), fcdo-frameworks (GROUNDED, T4),
-      adhoc-sme-email (VERBATIM, T4), jpmc-reports (VERBATIM, T1).
-      The consequence is worth stating plainly because it is the point: ddcontext
-      would then hold ZERO doc corpora. That is not an emptying-out, it is the
-      charter being enforced — derived findings are what it was always for, and
-      nothing has written one yet.
+      ddcontext, ddall, ddschema), three rows name `dddocs`, which has never been
+      created and under R1 never will be. The comment on `cli.DOC_SWEEP_DATABASES`
+      admits the gap in passing — "the registry admits dddocs | ddcontext as
+      targets, but a corpus can only be found in a database that EXISTS — and
+      `drydocs` is where the bmc-docs corpus actually lives today". So for
+      bmc-docs the registry states one database, the sweep expects another, and
+      the data sits in a third. R1 collapses all three onto the third.
+      PROPOSED END STATE, all seven rows:
+      to `drydocs` — bmc-docs (GROUNDED, T1), bmc-controlm-utilities (VERBATIM,
+      T1), seal-pat-scrape (VERBATIM, T2, stub);
+      unchanged in `ddcontext` — essential-graphrag (GROUNDED, T1),
+      fcdo-frameworks (GROUNDED, T4), adhoc-sme-email (VERBATIM, T4),
+      jpmc-reports (VERBATIM, T1).
+      THE TWO BMC SETS, per R2's caveat, because "reload from source" means a
+      different amount of work for each and the difference is not visible from
+      the registry column:
+      `bmc-docs` is the ORIGINAL, 26 pages converted to markdown and committed
+      IN the repo at external/orchestration/bmc-controlm/. Its source is
+      therefore reproducible on any machine from a clean checkout, which is what
+      makes reload-rather-than-move safe. It is the corpus that is loaded today,
+      and the one whose target column is currently a lie.
+      `bmc-controlm-utilities` is the SECOND, LARGER set: the book scraped in
+      total, 1016 documents / 1017 TOC nodes / 6.0 MB, held OUTSIDE the repo tree
+      under DRYDOCS_DATA_ROOT. It has never been loaded (`confirmed: false` — no
+      loader may write from it until a gate signs the doc-graph shape), so there
+      is nothing to migrate and nothing to delete. What it needs is different:
+      its capture is machine-local, so re-targeting it to `drydocs` is a
+      declaration that only becomes real on a machine that holds the capture.
+      Say so in the ruling rather than discovering it at the first load on the
+      other machine (J18: the two graphs are independent).
+      R3 APPLIED — THE 27 EDGES. The 27 live
+      (:Document)-[:DESCRIBES]->(:SoftwareProduct) edges are DELETED, not
+      preserved. They are residue from the residency accident, and deleting them
+      is safe precisely because R1 makes them legal: bmc_docs.cypher still writes
+      DESCRIBES (MATCH-only on :SoftwareProduct, never MERGE), so the reload
+      re-establishes them in the same database, under the ruled shape, with
+      fresh provenance. Note the asymmetry, since the draft blurred it:
+      vendor_docs.cypher — the loader for the OTHER bmc set — deliberately
+      writes no DESCRIBES edge at all, and that is unchanged by this ruling.
+      The downstream consequence is that docs_coverage's TRAVERSABLE_UNTIL_MOVE
+      status has no subject any more: the move never happens, so bmc-docs is
+      simply TRAVERSABLE. That status was invented to stop a temporary
+      capability being read as durable; it should be retired with the ruling,
+      not left as a rung nothing can reach.
     confirmations:
-      - "All six registry rows target dddocs; ddcontext's target_db count goes to zero."
-      - "bmc-docs is a MIGRATION, not a re-label: the corpus physically lives in `drydocs` today and has to be moved and verified, not just re-pointed in the registry."
-      - "cli.DOC_SWEEP_DATABASES is rewritten from the ruling rather than left to drift, and its comment admitting the mismatch is removed because the mismatch is gone."
+      - "Three rows re-target to `drydocs` (bmc-docs, bmc-controlm-utilities, seal-pat-scrape); four stay in `ddcontext`. No row anywhere names `dddocs`."
+      - "R2: bmc-docs is a RELOAD FROM SOURCE out of the repo tree, not a move — and the 27 DESCRIBES edges are deleted first (R3), then re-established by that reload."
+      - "bmc-controlm-utilities has never loaded and needs no migration; its re-target is a declaration that only becomes real on a machine holding the DRYDOCS_DATA_ROOT capture. Recorded, not assumed."
+      - "cli.DOC_SWEEP_DATABASES is rewritten to (drydocs, ddcontext) and its comment admitting the mismatch is removed, because the mismatch is gone."
+      - "docs_coverage's `traversable-until-move` status is retired from the ladder; bmc-docs reports `traversable`."
   - id: D
-    title: "WHAT THE BOUNDARY COSTS — accepted explicitly here, not discovered later"
+    title: "WHAT THE ONE REMAINING BOUNDARY COSTS — accepted explicitly here, not discovered later"
     body: >
       A database boundary in Neo4j is absolute: a relationship can NEVER span
       databases. `ddall` federates READS, but a composite query is a join on
       returned values, not an edge walk — the shape is the chained
       `CALL { USE ddall.x }` blocks in provisioning/smoke_drydocs_all.cypher.
-      What still works: every known-shape question, restated as an explicit join.
-      Every existing QuerySpec is fine.
-      What is LOST across the boundary: shortestPath and variable-length paths; all
-      of GDS (centrality, community detection, similarity); and a single vector
-      index spanning reference AND content chunks, which becomes two index queries
-      plus a client-side rerank. That last one deserves a straight look before
-      signing — the essential-graphrag corpus was ingested to do exactly that kind
-      of retrieval, so this gate makes an already-ingested experiment harder on
-      purpose.
-      What gets HARDER: text2cypher (Epic R / ADR 0007) must generate correct USE
-      clauses and business-key joins rather than a plain MATCH — a materially
-      larger generation problem than single-database Cypher.
+      R1 MOVES THE WALL rather than removing it, and moving it is genuinely
+      good news for one side and no news at all for the other. Vendor and estate
+      content now sits WITH the structured graph, so
+      (:Document)-[:DESCRIBES]->(:SoftwareProduct) is an ordinary edge again,
+      GDS and path queries work across documentation and estate together, and a
+      single vector index can span vendor docs and the graph they describe. That
+      is the capability the three-database proposal would have spent.
+      What is still LOST, across the drydocs↔ddcontext wall: shortestPath and
+      variable-length paths; all of GDS (centrality, community detection,
+      similarity); and a single vector index spanning drydocs content AND the
+      ddcontext corpora, which becomes two index queries plus a client-side
+      rerank. That last one deserves a straight look before signing, and R1 did
+      NOT soften it: essential-graphrag is the corpus ingested specifically to
+      test cross-corpus retrieval, and it is on the far side of the wall. The
+      cost the draft flagged as most likely to be waved through is the one cost
+      R1 leaves exactly where it was.
+      What gets HARDER: text2cypher (Epic R / ADR 0007) must generate correct
+      USE clauses and business-key joins rather than a plain MATCH whenever a
+      question crosses into ddcontext — a materially larger generation problem,
+      though now confined to a narrower class of question than under three
+      databases.
       If those costs matter, the mitigation is a single-database ANALYTICAL
       PROJECTION — one combined database rebuilt from the others for GDS and
       whole-corpus vector search, authoritative for nothing. The right time to
-      decide that is now, as part of accepting the cost, rather than improvising it
-      the first time a query cannot be written.
+      decide that is now, as part of accepting the cost, rather than improvising
+      it the first time a query cannot be written.
     confirmations:
-      - "Accepted: no relationship can span these databases, and ddall reads are joins on returned values, not edge walks."
-      - "Accepted: shortestPath, variable-length paths and all GDS stop working across the boundary."
-      - "Accepted: whole-corpus vector search becomes two index queries plus a client-side rerank — including for essential-graphrag, which was ingested for that retrieval shape."
-      - "Accepted: text2cypher (Epic R / ADR 0007) must emit USE clauses and business-key joins."
+      - "Accepted: no relationship can span drydocs and ddcontext, and ddall reads are joins on returned values, not edge walks."
+      - "Accepted as GAINED by R1: vendor/estate documentation and the structured graph share a database, so DESCRIBES, path queries, GDS and a single vector index work across them."
+      - "Accepted as still LOST: whole-corpus vector search including essential-graphrag becomes two index queries plus a client-side rerank — the corpus ingested for that retrieval shape is on the far side of the remaining wall."
+      - "Accepted: text2cypher (Epic R / ADR 0007) must emit USE clauses and business-key joins for any question reaching ddcontext."
       - "The analytical-projection mitigation is ruled NOW — either commissioned as a backlog item, or explicitly declined with the note that a later need reopens this ADR."
   - id: E
     title: "THE drydocs-deepdoc CHARTER — two ADRs describe two different products"
@@ -210,43 +292,55 @@ sections:
       corpus, citing Document/Chunk nodes. Those are different products, and the
       drift has been load-bearing: it is why the scaffold has not been built.
       The user's stated intent is narrower and clearer than either: profile a
-      Confluence space, then search it SEEDED from what the grounded graph already
-      knows — creating NO relationship unless the subject is already in the DryDocs
-      graph. That constraint is the ADR 0002 D1 proxy-node pattern, so the
-      mechanism already exists and needs no invention.
-      RECOMMENDED: rule deepdoc a CORPUS-DRIVEN RETRIEVER whose seeds come from the
-      grounded graph, and keep the parser-driven path as a separate input rather
-      than a rival definition. The two are not in conflict once the seeding rule is
-      the charter: a command line is just another seed.
+      Confluence space, then search it SEEDED from what the grounded graph
+      already knows — creating NO relationship unless the subject is already in
+      the DryDocs graph. That constraint is the ADR 0002 D1 proxy-node pattern,
+      so the mechanism already exists and needs no invention.
+      RECOMMENDED: rule deepdoc a CORPUS-DRIVEN RETRIEVER whose seeds come from
+      the grounded graph, and keep the parser-driven path as a separate input
+      rather than a rival definition. The two are not in conflict once the
+      seeding rule is the charter: a command line is just another seed.
+      R1 CHANGES THE CONCRETE TEST. The draft's test was "deepdoc writes
+      ddcontext and reads dddocs", which was how the three-way split earned its
+      keep. Under two databases deepdoc writes ddcontext and reads BOTH — the
+      vendor/estate content in drydocs and the reference corpora beside it in
+      ddcontext. That makes deepdoc the first real consumer of the federated
+      read, and therefore the first thing to feel §D's cost. Rule it knowing
+      that, because it also makes deepdoc the natural forcing function for G38.
       RIDER, worth naming rather than re-deriving a third time: graph-seeded
       retrieval is now the SECOND application of one idea — the first was the
       2026-07-23 HR-hierarchy graph-seeded resolution. Name it as a reusable
-      pattern in the ruling so the next instance cites it instead of rediscovering
-      it.
+      pattern in the ruling so the next instance cites it instead of
+      rediscovering it.
     confirmations:
       - "deepdoc is a corpus-driven retriever seeded from the grounded graph; the parser-driven command-line path is an input to it, not a competing definition."
       - "The hard constraint is chartered: NO relationship is created unless its subject already exists in the grounded graph (ADR 0002 D1 proxy-node pattern)."
-      - "deepdoc writes to ddcontext (derived findings) and reads dddocs (content) — which is the concrete test that §A's three-way split is the right one."
+      - "deepdoc writes ddcontext and reads across BOTH databases — making it the first real consumer of the ddall federated read, and the first to pay §D's cost."
       - "GRAPH-SEEDED RETRIEVAL is named as a reusable pattern, citing both instances (2026-07-23 HR hierarchy; this one)."
 
 open_questions:
-  - "Q1 — does anything besides deepdoc ever write ddcontext? If the honest answer is no, the database is empty until the deepdoc scaffold is built, and the SME may prefer to provision it later rather than run an empty database through every provisioning cycle. Deferring costs nothing except an ADR note saying so; provisioning early costs a database nobody reads."
-  - "Q2 — the bmc-docs migration (§C) needs a venue and a method: it is a live corpus in `drydocs` on both machines, and the two graphs are independent (J18). Re-load from source into dddocs is cleaner than a move, IF the corpus is reproducible from external/orchestration/bmc-controlm/. Confirm that it is before choosing."
-  - "Q3 — does the analytical projection (§D) subsume the vector-search cost, or is a cross-corpus vector index needed on the live path? The answer changes whether the projection is a batch convenience or a serving component, which is a much larger commitment."
-  - "Q4 — fcdo-frameworks was activated by SME ruling on 2026-08-05, hours before this draft, and lands in ddcontext under the current registry. If this gate is not signed soon it will be loaded into the database whose watermark misdescribes it. Not a blocker for the gate, but it sets the clock."
-  - "Q5 — should `dddocs` be the name at all? It is the name the registry already carries, so it costs nothing, but it reads as a sibling of ddschema/ddcontext while holding something quite different. Alternatives: ddcontent, ddcorpus. Naming is cheap now and expensive after provisioning."
+  - "Q1 — does anything besides deepdoc ever write ddcontext? Under R1 the answer matters less than it did: ddcontext is no longer an empty database waiting for a loader, it holds four corpora today. The question narrows to whether derived findings need their own label discipline to stay distinguishable from captured content now that they share a database — which is the mixed-database consequence §B is accepting."
+  - "Q3 — does the analytical projection (§D) subsume the vector-search cost, or is a cross-corpus vector index needed on the live path? The answer changes whether the projection is a batch convenience or a serving component, which is a much larger commitment. R1 did not touch this."
+  - "Q4 — fcdo-frameworks was activated by SME ruling on 2026-08-05 and lands in ddcontext, whose watermark misdescribes it. Under R1 it STAYS there, so the clock the draft started has not stopped: it is now §B-NOW that has to land, not a data move. A week has passed since the draft."
+  - "Q6 (NEW, created by R1) — does bmc_docs.cypher's DESCRIBES write stay as it is? It was never withdrawn; only vendor_docs.cypher refuses the edge. R1 makes the write unambiguously legal, so the question is whether the OTHER corpus should now get it too, or whether vendor_docs.cypher's refusal was about corpus shape rather than residency."
+  - "Q7 (NEW, created by R1) — Q16 clause (b), the product->documentation pointer reaching the graph, closed as an explicit partial on 2026-08-07 with no successor item and is traceable only by prose. R1 makes it CHEAPER, not harder: the corpora and the products now share a database, so DESCRIBES may already be the whole answer (Q16's own 'cheapest possible answer, check FIRST'). Either mint the successor item at sign-off or record the decline — do not leave it in prose."
+  - "Q8 (NEW, superseding the draft's Q5) — the naming logic R1 states ('drydocs is the original, dd* are extensions') is worth recording as a RULE in the ADR amendment, not just as this one rejection. It is the test the next proposed database has to pass."
 
 risks:
-  - "Signing §B without §A/§C is the worst outcome available: the charter would be restated to match data that then moves anyway, and the false watermark stays live in the meantime. These three sections are one decision wearing three headings — the gate log should record them together or not at all."
-  - "The vector-search cost (§D) is the one most likely to be waved through and regretted. essential-graphrag exists specifically to test cross-corpus retrieval, and this ruling makes that two queries and a rerank. If that experiment matters, the analytical projection is not optional and should be commissioned in the same breath."
-  - "`dddocs` currently appears in cli.DOC_SWEEP_DATABASES, so docs-verify already reports it as db-absent rather than raising. That is a graceful degradation which has been HIDING the gap: the config has named a non-existent database for weeks without a single failure. Whatever is ruled, the guard should fail loudly on an unprovisioned target_db rather than reporting it as merely absent."
+  - "Signing §B without §A/§C is still the worst outcome available: the charter would be restated while the target column keeps naming a database that does not exist. These three sections are one decision wearing three headings — the gate log should record them together or not at all."
+  - "B-NOW is a cheap fix to a live false claim, and cheap fixes to live claims are exactly the ones that become permanent. If B-DURABLE is not commissioned in the same sign-off, the watermark stays keyed on database name indefinitely and the root cause survives the gate that named it."
+  - "The vector-search cost (§D) is the one most likely to be waved through, and R1's good news makes that MORE likely, not less: it is easy to read 'the wall moved' as 'the wall went away'. essential-graphrag is still on the far side."
+  - "`dddocs` currently appears in cli.DOC_SWEEP_DATABASES, so docs-verify reports it as db-absent rather than raising. That graceful degradation has been HIDING the gap: the config has named a non-existent database for weeks without a single failure. Whatever is ruled, the guard should fail loudly on an unprovisioned target_db rather than reporting it as merely absent."
   - "Clause (e) has blocked the deepdoc scaffold. Ruling it unblocks work, which means a wrong ruling here gets built on quickly rather than sitting inert."
-  - "Migrating bmc-docs (§C) is the only step in this gate that touches live data on two independent machines. Every other consequence is config and DDL."
+  - "R3 deletes 27 live edges on the strength of the reload re-creating them. If the reload is deferred after the delete, the graph spends that window with a capability it had before the gate — sequence the two in one session, on each machine, rather than across sessions."
+  - "tests/unit/test_load_map_json.py::test_the_not_queryable_target_db_set_is_pinned pins the not-queryable set to exactly {dddocs} and WILL FAIL when this signs. That is deliberate: it is the alarm forcing web/src/software/softwareModel.ts (inGraphLabel) and the docs-coverage detail lines to be revisited rather than left saying 'not provisioned (G32)'. Under R1 the not-queryable set becomes EMPTY. Treat the failure as a task, not a break."
 
 status: awaiting-sme
 drafted: 2026-08-05
+refreshed: 2026-08-12
 unblocks:
   - "G31 — the proxy-node spine cannot be sized until the database set is known"
-  - "G38 — the ddall federated read proof (and it would trip the latent ddall watermark defect, §B)"
+  - "G38 — the ddall federated read proof (and it would trip the latent ddall watermark defect, §B); §E makes deepdoc its first real consumer"
   - "Q9 / Q10 / Q11 — the corpus re-file, email ingest and supersession items, all behind G31"
+  - "Q16 clause (b) — see Q7: R1 makes it cheaper, and it has no successor item until this signs"
   - "the drydocs-deepdoc scaffold, blocked on clause (e) since 2026-07-27"
