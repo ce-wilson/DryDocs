@@ -316,6 +316,20 @@ ritual silently writes to the main repo. Two independent tracks reproduced it wi
 half hour, and both recovered cleanly. That belongs in `IDEAS.md` regardless of which code
 set is adopted.
 
+> **Filed 2026-08-12 as `Idea-109`**, with the mechanism re-verified on this desktop: the
+> editable `drydocs.pth` pins the package to the main tree and `plan_board.py`'s
+> `_REPO_ROOT` is derived from `Path(__file__)`, so a `scripts/render_*.py` run — which
+> puts `scripts/` on `sys.path[0]` and never the cwd — resolves both its input and its
+> output paths to main no matter which worktree the caller stands in.
+>
+> **Capture correction, same date.** `o31-BETA.diff` as written was a plain `git diff`
+> plus a porcelain listing, so it *named* BETA's two untracked files but carried none of
+> their content — including `scripts/render_underhood_benchmark.py`, BETA's core
+> deliverable. `o31-ALPHA.diff` had already embedded ALPHA's equivalents in full. BETA's
+> capture has been brought up to ALPHA's format (744 insertions, 0 deletions; existing
+> bytes unchanged), so the two tracks are now captured to the same standard and are
+> comparable on the record rather than only in their dirty worktrees. See `Idea-108`.
+
 ## Phase 4 — fable final grade
 
 _pending_

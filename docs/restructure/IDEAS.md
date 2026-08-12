@@ -62,7 +62,58 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-108`** · 2026-08-12 · `[chore]` · **open — user triage: salvage or discard, and both directions are destructive** · prio? **High** —
+- **`Idea-109`** · 2026-08-12 · `[bug]` · **open** · prio? **High** —
+  **A worktree-isolated agent that runs the session-end render ritual writes its output
+  into the MAIN repo, not its own worktree.** Both `results-sonnet` tracks hit this
+  independently within the same half hour on 2026-08-11 and both recovered, which is why
+  the sonnet `RUN-LOG.md` calls it out as adoptable "independent of the graph-vs-files
+  question". Mechanism, re-verified on this desktop 2026-08-12: `drydocs` is installed
+  **editable** into `.venv` via a `drydocs.pth` pinned at the main tree, and
+  `drydocs/plan_board.py:34` sets `_REPO_ROOT = Path(__file__).resolve().parent.parent` —
+  so the defaults are anchored to *where the package file lives*, never to the cwd or to
+  the worktree the caller is standing in. Running `python scripts/render_board.py` puts
+  `scripts/` on `sys.path[0]` and does **not** put the cwd on the path, so the worktree's
+  own `drydocs/` is never shadowed in: the import falls through to the editable install.
+  Reproduced with cwd set to `.claude/worktrees/agent-a6fcf6daf8af92ce7` — `p.__file__`
+  and `DEFAULT_BOARD_PATH` both resolve under `C:\coding\projects\DryDocs\`, the main
+  tree. No database and no company data, so it re-runs anywhere (J18). It is silent: the
+  render succeeds, the worktree stays clean, and the main tree acquires an uncommitted
+  board/design-doc render nobody in that session wrote. `DEFAULT_BACKLOG_PATH` has the
+  same anchor, so the agent also *reads* main's backlog, not its own. Blast radius is
+  every `scripts/render_*.py` plus `snapshot.ps1`, which drives them — i.e. the whole
+  CLAUDE.md §0 session-end ritual, exactly the step an agent is most likely to run
+  unprompted. Candidate fixes, not yet ruled: derive `_REPO_ROOT` from `git rev-parse
+  --show-toplevel` at call time; or have the render scripts pass explicit paths resolved
+  from their own `__file__`; or refuse to write outside the caller's worktree. Related to
+  `Idea-108`, which is the wreckage this behaviour left behind.
+
+- **`Idea-108`** · 2026-08-12 · `[chore]` · **open — one destructive step left; the salvage half is DONE** · prio? **Med** —
+  **UPDATE 2026-08-12 (this desktop): the "both directions are destructive" dilemma is
+  resolved, because there was a third, non-destructive direction — finish the capture.**
+  The two worktrees are the ALPHA/BETA tracks of the `results-sonnet` O31 coding
+  comparison (`docs/reviews/graph-vs-files-experiment/`), whose protocol told each agent
+  to write a `<run>.diff` back to the main tree and **commit nothing**. Checking the two
+  captures against their live worktrees showed they were **not captured to the same
+  standard**: `agent-aa168e5039f906d30` = ALPHA, whose `o31-ALPHA.diff` is a structured
+  file (`=== git diff (tracked files) ===` / `=== NEW FILE: … ===` / `=== git status
+  --porcelain ===`) that **embeds both untracked files in full** — that worktree was
+  already 100% redundant. `agent-a6fcf6daf8af92ce7` = BETA, whose `o31-BETA.diff` was a
+  plain `git diff` plus a porcelain listing: it **named** `scripts/render_underhood_benchmark.py`
+  and `tests/unit/test_underhood_benchmark.py` as `??` but carried **none of their
+  content**, and BETA's report only describes the script. So 737 lines — the *core
+  deliverable* of half the comparison — existed nowhere but that dirty worktree, and the
+  prune this entry was raised to authorize would have destroyed it while the diff on disk
+  looked complete. **Done:** `o31-BETA.diff` rewritten into ALPHA's format with both files
+  embedded verbatim — **744 insertions, 0 deletions**, every pre-existing byte verified
+  byte-identical in place and both embedded files verified exact against the worktree.
+  **What is left is only the prune**, and it is now genuinely safe: both worktrees are
+  fully represented in tracked files, and all four `worktree-agent-*` branches are already
+  ancestors of `main`. Still the user's call because `git worktree prune` / branch deletion
+  is irreversible and touches another stream's trees. The separate render-path finding
+  these two runs surfaced is now filed as `Idea-109`. Sibling of `Idea-17` (post-squash
+  relic cleanup).
+
+  <!-- superseded framing, kept for the trail: -->
   **Two abandoned agent worktrees are holding UNCOMMITTED work that no branch and no
   `git log` will ever show.** Found at the 2026-08-12 groom, verified on this desktop:
   `git worktree list` reports `.claude/worktrees/agent-a6fcf6daf8af92ce7` and
