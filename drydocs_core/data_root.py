@@ -121,3 +121,27 @@ def controlm_xml_dir(*, create: bool = False) -> Path:
     arbitrarily-named generic ``.xml``, so the guard is this landing-zone
     convention itself plus the classification on the source entry."""
     return source_dir("controlm-xml", create=create)
+
+
+def remediation_incoming_dir(*, create: bool = False) -> Path:
+    """Landing zone for folder ``.xml`` exports awaiting a remediation pass.
+
+    Deliberately separate from :func:`controlm_xml_dir` (the INGESTION landing
+    zone): remediation inputs are per-fix working copies whose lifecycle is the
+    fix package, not the graph load — mixing them would make "which exports are
+    loaded?" unanswerable from the tree. Real definitions are Internal; nothing
+    here is ever committed."""
+    return source_dir("remediation", "incoming", create=create)
+
+
+def remediation_outgoing_dir(*, create: bool = False) -> Path:
+    """Output zone for emitted ``<folder>.updated.xml`` files — the
+    minimal-diff artifacts ``xml_io.write`` produced and self-checked. One
+    fix package's ``target/`` contents stage here before packaging."""
+    return source_dir("remediation", "outgoing", create=create)
+
+
+def remediation_recommendations_dir(*, create: bool = False) -> Path:
+    """Output zone for remediation recommendation documents (change docs,
+    equivalence reports, fix-tracking change-sets awaiting the loader)."""
+    return source_dir("remediation", "recommendations", create=create)

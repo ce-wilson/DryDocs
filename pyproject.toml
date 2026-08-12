@@ -51,6 +51,19 @@ httpx2 = ">=2.9"           # fastapi.testclient transport. starlette >=1.3 tries
                            # installed starlette what it actually resolved and fails if this disagrees.
 python-multipart = ">=0.0.9"
 
+# drydocs-remediation XML VALIDATION (optional, mirroring the api group):
+# lxml validates emitted <folder>.updated.xml against the acquired .dtd/.xsd —
+# it is the VALIDATOR, never the emitter. The minimal-diff emitter is xml_io's
+# stdlib byte-splicer, guarded by test_xml_io_imports_are_stdlib_core_and_formats_only
+# (lxml collapses multi-line attribute wrapping exactly as ElementTree does, so
+# "simplifying" the splicer into it would break the §XML contract).
+# `poetry install --with remediation`. See drydocs_remediation/module-requirements.md.
+[tool.poetry.group.remediation]
+optional = true
+
+[tool.poetry.group.remediation.dependencies]
+lxml = ">=5.3"
+
 [tool.poetry.scripts]
 drydocs = "drydocs.cli:app"
 
