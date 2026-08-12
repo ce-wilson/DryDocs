@@ -314,6 +314,26 @@ class PatProductMappingRow(BaseModel):
     product-line ID, and not before. Note ``extra="ignore"`` means the column is
     silently dropped when present, which is the intended handling but is only
     visible because it is written down here.
+
+    WHICH COLUMN FEEDS ``team_type`` — and the decoy beside it (SME evidence
+    2026-08-11, TEAM_DETAILS_REPORT). The alignment value comes from the column
+    named **Relationship Type**, whose values are exactly Aligned / Flex /
+    Dedicated. It does NOT come from **Team Type Name**, which the same report
+    also carries and which holds the team's DISCIPLINE — Technology, Product,
+    Design, Data & Analytics, Portfolio, SRE. Both columns are present, and the
+    one whose name matches this field is the wrong one; mapping by column-name
+    similarity picks the decoy every time. This is worth stating in the source
+    rather than left to a reader's judgement because the mistake is not
+    hypothetical: a company-side extract build hit it on 2026-08-11 and
+    concluded the report carried no alignment column at all. The two are
+    orthogonal facts about a team, not two spellings of one — a Technology team
+    may be Aligned, Flex or Dedicated.
+
+    The discipline is deliberately NOT modelled here. It is a property of the
+    TEAM, while every field on this row is a property of the team's RELATIONSHIP
+    to a product; adopting it would need its own home and its own gate.
+    ``extra="ignore"`` therefore drops it silently, same as Sponsoring Product
+    Line above.
     """
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
@@ -328,7 +348,11 @@ class PatProductMappingRow(BaseModel):
         description="SEAL app IDs (team-scoped; feeds arch_develops). Comma- or "
         "semicolon-delimited on input; normalized to commas.",
     )
-    team_type: str = Field(..., description="aligned | flex | dedicated")
+    team_type: str = Field(
+        ...,
+        description="aligned | flex | dedicated. SOURCE COLUMN: 'Relationship "
+        "Type' — NOT 'Team Type Name', which is the discipline (see docstring).",
+    )
     sponsored: bool = False
     sponsored_product_id: str | None = None
     sponsored_area_product_id: str | None = Field(
