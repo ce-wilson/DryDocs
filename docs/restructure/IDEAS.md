@@ -62,60 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-105`** · 2026-08-11 · `[question]` · **open** · prio? **High** —
-  **Two things claim the same 4000-char Control-M `DESCRIPTION` field on generated
-  objects, and they cannot both hold.** The DPL generator stamps two literal strings
-  (`Generated Control-M Folder`, `Generated job to trigger DPL …`), and
-  `internal/controlm-config/controlm-pipeline-stub-integration-plan.md` item **E1** keys
-  machine-generated provenance on an EXACT match of those literals. The company
-  description-metadata standard captured at C29
-  (`internal/controlm-config/reference/controlm-job-metadata-standards-capture.md`)
-  fills the same field with pipe-delimited `key: value` tokens. Add a token block and
-  E1's literal match breaks; require the literal and the token block has nowhere to go.
-  Neither document mentions the other. Three exits: (a) exempt generated objects from
-  the token standard — cheapest, but generated objects are the majority of the estate
-  and the metadata is most valuable exactly where nobody hand-authored anything;
-  (b) fold the literal in as one token (`GENERATED_BY: <generator>`) — keeps both, but
-  changes E1 from a string compare to a parse and invalidates the discriminator on every
-  object already generated; (c) move the discriminator off `DESCRIPTION` to something
-  else the generator also stamps. DECIDE with whichever item lands E1; raised as gate
-  rider `email-dl-contact-point` §G6 so a section-C ruling cannot presume an exit
-  silently. Sibling finding: REQ-3 in the same capture reintroduces the dot-smuggling
-  pattern (`…%%$NEXT..tok`) that the description-metadata plan §3 lists as hazard #1 —
-  so the practice is not extinct in the *standards*, not just in the legacy estate.
-  **CHECKED AT THE 2026-08-11 GROOM — still open, and already carried in two places, which is why no item was minted.** C29's notes record the collision verbatim, and it rides `config/gate-prompts/email-dl-contact-point.yaml` as rider §G6 so a section-C ruling cannot presume an exit silently. There is still NO backlog item landing the stub plan's E1, so there is nothing to merge into; the three exits (exempt generated objects, fold the literal in as a `GENERATED_BY:` token, or move the discriminator off `DESCRIPTION`) have materially different costs on an estate that is mostly generated objects, so this is a user/SME ruling at that gate rather than a groom decision.
-  **RESOLVED 2026-08-11 (SME design session) — EXIT (d), which none of the three recorded
-  exits describes: a VERSIONED SENTINEL PREFIX partitions the field, so both claims hold
-  unchanged and nothing already deployed migrates.** A description that begins `DD1|` is
-  authored to the token standard; one that does not is either the generator's literal or
-  legacy filler. E1 keeps its exact-match discriminator because generated descriptions
-  never carry the tag; the token parser never sees a generated object it would choke on;
-  and legacy waterfall prose becomes a third, correctly-ignored class. Cheaper than all
-  three recorded exits: (a) loses the metadata where the estate is densest, (b)
-  invalidates E1 on every object already generated, (c) needs a new carrier the generator
-  stamps — (d) costs one prefix and zero migrations. It also RETIRES C29's proposed
-  `GENERATED_BY` token: absence of the tag on a literal-match description already is the
-  provenance signal, so a token asserting it is a second carrier for one fact.
-  THE DESIGN THAT RIDES WITH IT, all SME-ruled the same session:
-  (1) the digit is a VERSION, not a template id — `DD1|` / `DD2|` parse side by side
-  through a grammar migration, and template selection is `TASKTYPE` (derived) plus the
-  already-registered `JOB_ROLE` token (declared), never the sentinel;
-  (2) anchored at position 0, so the check is `startswith` — the cheapest possible SQL
-  predicate at ~240K jobs, and prose that quotes the convention cannot false-positive;
-  (3) FOLDER SCOPE is preferred, because `get_description()` is generator-owned and a
-  tagged block on a generated JOB is overwritten at the next regeneration;
-  (4) the compliance objection dissolves rather than being solved — untagged means
-  unread, so multi-team inconsistency costs COVERAGE (a number that grows) instead of
-  corrupting data (a number that never closes). Under 10 folders carry the standard
-  today, which is a sample size, not a weakness: what is being proven is that the round
-  trip is lossless and the vocabulary holds WHEN the field is filled, never that teams
-  will comply.
-  Recorded at the gate as rider §G6 exit (d) and specified in
-  `knowledge/standards/technology/controlm-guidelines-and-standards.md` §7.5. The gate
-  still RULES it — this entry stops being an open question and becomes a recommendation
-  with a written warrant. NOTE for the company side: their copy of the gate prompt is
-  canonical-company and did not take the producer edits, so RELAY-7 carries this across.
-
 - **`Idea-104`** · 2026-08-11 · `[question]` · **open** · prio? **Med** —
   **The MFT route id changed shape between the field observation and the standard, and
   nobody has said which is real.** The 2026-06-11 production capture
@@ -132,6 +78,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   populated in production) and `PDN_SNOW_QUEUE` (the *downstream consumer's* queue,
   `NULL` in the standard) are DIFFERENT SUBJECTS that a naive key mapping would merge.
   **CHECKED AT THE 2026-08-11 GROOM — still open, and now half-answered.** C30 (done, 2026-08-11) retires the INBOUND/OUTBOUND route pair ON WATCHERS, because a watcher is inherently inbound, and drops `PDN_SNOW_QUEUE` from the job token set — so the directional-pair half and the two-queues half both narrow. What C30 did NOT rule, and what still needs the SME, is the one this entry was raised for: whether the real route id is the numeric `372399` or the `MFTS_RT_*` string, which decides both what C16's single `mfts.routeId` prefix target points at and what a `dprod:DataProductPort` is keyed on. NOT groomed into an item, deliberately: the two readings lead to different prefix governance and a different port key, and a groom cannot pick between them.
+  **RE-CHECKED AT THE 2026-08-12 GROOM — still the SME's, and now explicitly PROTECTED in an item rather than only in this file.** G83 applies C30's ruling to the parse contract, which means it touches exactly the two entries that carry this question. Its acceptance therefore says in writing that marking the route pair retired is NOT an answer to which route-id shape is real, and that whichever entry survives must keep the note recording the two unreconciled forms — so the evidence cannot be tidied away with the tokens. The question itself is unchanged and unowned.
 
 - **`Idea-93`** · 2026-08-08 · `[chore]` · **groomed → executed IN PLACE at the 2026-08-09 groom (14 stale `inputs:` fixed in backlog.yaml) + merged → L19 (the design-doc half); the E1 status question STAYS OPEN — user call** · prio? **High** —
   **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,
@@ -220,6 +167,12 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the ruling may reverse. When it unparks, the entry is tier **T2** (internal
   platform), connector **web**, curation **sme-confirm** (fixed per tier), and
   classification **Internal**.
+  TRIGGER RE-CHECKED 2026-08-12 (groom) — **NOT fired.** G32 is still `in_progress` (a drafted,
+  unsigned gate awaiting the SME), so `target_db` has no ruled value and the user's WAIT ruling
+  stands. Worth noting for whoever schedules that gate: the residency question now has a THIRD
+  waiting consumer — C34 §(b1) blocks its cross-corpus half on the same constraint (a Neo4j
+  relationship cannot span databases), alongside this entry and `Idea-88`. Three parked items on
+  one unsigned gate is the argument for scheduling it, not for pre-empting it.
 
 - **`Idea-83`** · 2026-08-07 · `[bug]` · **groomed → J33 (2026-08-07)** · prio? **Low** —
   **Three standing rich-ANSI test failures on this desktop, pre-existing (not
@@ -340,24 +293,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   O44 column 3 is permanently empty and its acceptance should say so, or (c) defer.
   Note this is ALSO the other half of G35 §D — the ServiceNow TOM Accountable view
   is the surface whose counts disagree with SEAL's, and neither is ingested today.
-
-- **`Idea-73`** · 2026-08-05 · `[source]` · **open — user decision, blocks O44 column 1** · prio? **High** —
-  **Where does the employee hierarchy come from, and does it live producer-side at
-  all?** Established while drafting G35: `:Employee` is a node class (`prov:Agent`)
-  with **no Employee-to-Employee edge anywhere** in the relationship vocabulary —
-  no `REPORTS_TO`, no manager edge, no source feeding one, no backlog item that
-  would create one. Two separate SME directions now depend on it: G35 §B7 ("if a
-  person is in the role, create the relationship to the employee hierarchy in a
-  later pass") and O44's first column, whose manager filter is its whole point.
-  The 2026-07-23 producer-session HR-hierarchy direction — single `:Employee`
-  spine, two-scope HR supplement, two-pass loader, `REPORTS_TO` current-state
-  sweep — was written for the **company** `hr-emp-hierarchy` gate, which is
-  probably why nothing landed here. Decide whether the producer repo gets a
-  hierarchy at all (with what source — `pat:people-report` carries teams, not
-  reporting lines), or whether both directions are company-side and the producer
-  records that explicitly. Marked High because two committed directions currently
-  defer to something that does not exist, and a deferral pointing at nothing is an
-  omission with better wording.
 
 - **`Idea-72`** · 2026-08-05 · `[doc]` · **groomed → L25 (2026-08-07, rider default per the step-83 precedent)** · prio? **Low** —
   **A SIGNED gate page cites line numbers that have since moved.** The
@@ -865,6 +800,19 @@ question a 1,000-line file with the trail at the bottom could not answer.
   ruling should cover: platform tokens, DC codes, schema/table/column identifiers, and
   synthetic-sample product NAMES that echo real ones ("Home Lending Servicing" in
   lob-product-team.yaml, paired only with synthetic ids).
+  KEPT-UPDATED 2026-08-12 (groom) — **ONE OF THE FOUR CLASSES IS NOW CLOSED, three remain.**
+  Class (1), the platform tokens this entry led with, was RULED by the SME on 2026-08-11:
+  `PRARAG`/`HLDM` are AUTHORED FIXTURE NAMES, not captured values, so no sweep is owed and the
+  proposed one was stopped (`PRARAG` sits in ~36 files including the bundled sample corpus, the
+  lineage fixtures and five tests that assert on it literally, so removing an authored name
+  would have rewritten the corpus and broken the parser's own pins). The ruling is recorded
+  where realness decisions live — beside the J15 realness table in
+  `internal/standards/technology/folder-naming-convention.md` — because that table replaced the
+  NUMERIC segments inside those folder names, and reading it alone makes the surviving tokens
+  look like an oversight. J13's notes already carry the closure. Classes (2) DC codes,
+  (3) schema/table/column identifiers and (4) the echoing product names are UNCHANGED and still
+  user-gated; the ruling deliberately did not dispose of them, and the DC-codes file is the live
+  one (it carries real DC codes AND a real app code, out of J14's scope by accident of scoping).
 
 - **`Idea-37`** · 2026-07-25 · `[idea]` · **parked → the SME convenes the supplement-shape gate** · prio? **Low** —
   **Supplement shape C — registration-vs-instance-seed re-slice** (the
@@ -1104,6 +1052,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
   DATA under one canonical node, not split identities (`job-dev`/`job-prod`
   anti-pattern). (Backstage assessment T8, UI-WIP/backstage-catalog-assessment.md §3;
   design constraint for the shell — attach to the env-toggle item when one exists.)
+  TRIGGER RE-CHECKED 2026-08-12 (groom) — **NOT fired, and the check is worth recording because
+  the toggle superficially looks built.** `O2` (done) shipped a **cosmetic** Prod|UAT|Dev toggle
+  in the console shell; it re-scopes nothing, so there is still no item that would decide node
+  identity, which is the only thing this entry constrains. Attaching the constraint to O2 now
+  would file it against a done item where no one implementing the real re-scope will read it.
 
 - **`Idea-25`** · 2026-07-22 · `[idea]` · **parked → a producer extractor starts consuming a temporal field** · prio? **Low** —
   **Control-M compact-timestamp normalization (mechanism, from the
@@ -1142,6 +1095,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
   forking to native datetimes), plus the two hardenings above.
   Trigger re-checked 2026-08-04 (Control-M inbox groom): `controlm_xml.py` still consumes
   no temporal fields — stays parked.
+  Trigger re-checked 2026-08-12 (groom): still NOT fired, and this check covers new ground —
+  the extractor was rewritten at **G66** (2026-08-11) to stage folder and job DESCRIPTIONS, so
+  it is no longer the same file that was checked in August. A search of it for timestamp /
+  datetime handling still returns nothing: the fields it consumes are folders, jobs, ordered
+  variables and now descriptions. Stays parked on the unchanged trigger.
 
 - **`Idea-23`** · 2026-07-21 · `[idea]` · **parked → the writer ETLProcess endpoint work makes the edge landable** · prio? **Med** —
   **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
@@ -1200,7 +1158,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   skips cleanly by design. After the first green scan: triage `snyk code` advisory
   findings and decide whether to gate it (the ruff-idiom follow-up).
 
-- **`Idea-15`** · 2026-07-20 · `[idea]` · **parked → two user decisions (display-label scope; placement is a plan change)** · prio? **Med** —
+- **`Idea-15`** · 2026-07-20 · `[idea]` · **parked → ONE user decision (display-label scope); the placement blocker is DISCHARGED — epic `generic-naming` now exists** · prio? **Med** —
   **Replace SEAL/PAT naming with industry-standard, SaaS-configurable
   terminology** (user request; web research DONE same day →
   `knowledge/upgrade-plans/generic-terminology-research.md`). Candidates validated:
@@ -1225,6 +1183,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `app_id` on the canonical node, with the per-source field-name ledger
   (`config/source-mappings/seal-extract.yaml`) carrying what each source CALLS it; build = S3.
   Decisions 1 (display-label scope) and 2 (placement/plan-change) remain the parked user calls.
+  KEPT-UPDATED 2026-08-12 (groom): **§Decision item 2 is DISCHARGED — this entry now has ONE
+  open question, not two.** Promoting it was blocked because "productization has NO epic/phase",
+  so any promotion was a plan change only the user could make. That is no longer true: epic
+  **`generic-naming`** was created 2026-08-11 on SME direction and **GN1 is DONE** — ADR 0012
+  names loaders, commands and sources by the DATA rather than the tool, on exactly this
+  entry's warrant ("company jargon entered a repo that was meant to be generic from the start —
+  seal, pat, m1/m3 — this is the standalone-generalization goal, not cosmetics"). So the
+  landing zone exists and the plan-change question is answered. What ADR 0012 does NOT cover is
+  this entry's subject: the DISPLAY layer (tenant-configurable labels over stable concept ids,
+  the Salesforce rename-tabs pattern) and the node-label/vocab-id question. Decision 1 — display
+  labels only, or also renaming `seal_*` vocabulary ids and domains, which is ADR-scale — is the
+  single remaining user call, and it is a genuine fork: one is config, the other rewrites the
+  ontology's identifiers. ADR 0012 §(f) is the warning worth reading before ruling it: source
+  registry ids are COMPANY-CANONICAL, so renaming `pat:*` is a cross-repo reconciliation minting
+  retired-id entries, not an edit.
 
 - **`Idea-14`** · 2026-07-19 · `[idea]` · **parked → depgraph work resumes** · prio? **Low** —
   **depgraph metric extensions (codeflow takeaways — ideas, not code)**:
@@ -1362,6 +1335,82 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-12 (desktop)** — a SMALL groom by design: the 2026-08-11 weekly pass consumed every new capture (Idea-96..Idea-107), and nothing has been captured since, so this pass worked the OPEN and PARKED tail plus one cross-check the inbox could not have produced. **Promoted 2:** both from the Control-M `DESCRIPTION` seam, both reproduced at the groom with a sample and no database (J18) so anyone can re-run the evidence. **G83** (p1 bug) — C30 ruled the description token set on 2026-08-11 and only the standards page moved: parsing a fully C30-conformant watcher description returns SEVEN findings (`FTS_ID` and `REC_ID` as unknown keys, `ENV` + both route ids + both `EMAIL_DL`s reported missing), and `G67`'s own conformance fixtures already emit `FTS_ID: FTS2`. The judgment call is written into the acceptance rather than left open: retired tokens are MARKED, never deleted, because the deployed estate still carries them and a greenfield standard cannot retroactively unwrite ~240K descriptions. **G84** — the `DD1|` sentinel from `Idea-105`'s SME resolution: today the parser reports the compliant marker itself as an `unparseable_segment`, and legacy prose containing a colon manufactures pseudo-tokens indistinguishable from a C16 team-local annotation. Fenced: a READ gate only, ratifying nothing, with the marker in ONE constant because gate `email-dl-contact-point` §G6 still rules it. **Merged 1:** `Idea-73` (the employee hierarchy) → **G74**, which was raised 2026-08-11 asking the same question from the other end; three findings ride across — O44 column 1 is a second waiting consumer, `pat:people-report` carries teams not reporting lines so it is NOT the source, and the 2026-07-23 HR-hierarchy direction was written for the COMPANY gate, which is why nothing landed here. **One dependency added:** `G77` now depends on `G84` as well as `C34` — its clause (a) registers a THEME token *inside* the `DD1|` block, and without the link two sessions implement the same sentinel differently in one file. **Left for the user/SME: 9** — `Idea-104` (which MFT route-id shape is real; G83 was written NOT to answer it), `Idea-74` (does DryDocs ingest the ServiceNow queue export, and on which side), `Idea-34`, `Idea-33`, `Idea-32`, `Idea-28`, `Idea-17`, `Idea-16`, and the `E1` status question inside `Idea-93`. **Four parked entries re-checked, none fired,** and two of them narrowed: `Idea-15`'s placement blocker is DISCHARGED (the `generic-naming` epic now exists), leaving one open user call instead of two; `Idea-38`'s class (1) is CLOSED by the 2026-08-11 authored-fixture ruling, leaving three; `Idea-25` and `Idea-27` re-verified unfired against the current tree. Nothing raised here decides an ontology question: both new items are pure-parse, zero graph writes, every token stays `proposed`.
+
+- **`Idea-105`** · 2026-08-11 · `[question]` · **groomed → G84 (2026-08-12, the READ gate only — the ruling itself stays the gate's, rider §G6)** · prio? **High** —
+  **Two things claim the same 4000-char Control-M `DESCRIPTION` field on generated
+  objects, and they cannot both hold.** The DPL generator stamps two literal strings
+  (`Generated Control-M Folder`, `Generated job to trigger DPL …`), and
+  `internal/controlm-config/controlm-pipeline-stub-integration-plan.md` item **E1** keys
+  machine-generated provenance on an EXACT match of those literals. The company
+  description-metadata standard captured at C29
+  (`internal/controlm-config/reference/controlm-job-metadata-standards-capture.md`)
+  fills the same field with pipe-delimited `key: value` tokens. Add a token block and
+  E1's literal match breaks; require the literal and the token block has nowhere to go.
+  Neither document mentions the other. Three exits: (a) exempt generated objects from
+  the token standard — cheapest, but generated objects are the majority of the estate
+  and the metadata is most valuable exactly where nobody hand-authored anything;
+  (b) fold the literal in as one token (`GENERATED_BY: <generator>`) — keeps both, but
+  changes E1 from a string compare to a parse and invalidates the discriminator on every
+  object already generated; (c) move the discriminator off `DESCRIPTION` to something
+  else the generator also stamps. DECIDE with whichever item lands E1; raised as gate
+  rider `email-dl-contact-point` §G6 so a section-C ruling cannot presume an exit
+  silently. Sibling finding: REQ-3 in the same capture reintroduces the dot-smuggling
+  pattern (`…%%$NEXT..tok`) that the description-metadata plan §3 lists as hazard #1 —
+  so the practice is not extinct in the *standards*, not just in the legacy estate.
+  **CHECKED AT THE 2026-08-11 GROOM — still open, and already carried in two places, which is why no item was minted.** C29's notes record the collision verbatim, and it rides `config/gate-prompts/email-dl-contact-point.yaml` as rider §G6 so a section-C ruling cannot presume an exit silently. There is still NO backlog item landing the stub plan's E1, so there is nothing to merge into; the three exits (exempt generated objects, fold the literal in as a `GENERATED_BY:` token, or move the discriminator off `DESCRIPTION`) have materially different costs on an estate that is mostly generated objects, so this is a user/SME ruling at that gate rather than a groom decision.
+  **RESOLVED 2026-08-11 (SME design session) — EXIT (d), which none of the three recorded
+  exits describes: a VERSIONED SENTINEL PREFIX partitions the field, so both claims hold
+  unchanged and nothing already deployed migrates.** A description that begins `DD1|` is
+  authored to the token standard; one that does not is either the generator's literal or
+  legacy filler. E1 keeps its exact-match discriminator because generated descriptions
+  never carry the tag; the token parser never sees a generated object it would choke on;
+  and legacy waterfall prose becomes a third, correctly-ignored class. Cheaper than all
+  three recorded exits: (a) loses the metadata where the estate is densest, (b)
+  invalidates E1 on every object already generated, (c) needs a new carrier the generator
+  stamps — (d) costs one prefix and zero migrations. It also RETIRES C29's proposed
+  `GENERATED_BY` token: absence of the tag on a literal-match description already is the
+  provenance signal, so a token asserting it is a second carrier for one fact.
+  THE DESIGN THAT RIDES WITH IT, all SME-ruled the same session:
+  (1) the digit is a VERSION, not a template id — `DD1|` / `DD2|` parse side by side
+  through a grammar migration, and template selection is `TASKTYPE` (derived) plus the
+  already-registered `JOB_ROLE` token (declared), never the sentinel;
+  (2) anchored at position 0, so the check is `startswith` — the cheapest possible SQL
+  predicate at ~240K jobs, and prose that quotes the convention cannot false-positive;
+  (3) FOLDER SCOPE is preferred, because `get_description()` is generator-owned and a
+  tagged block on a generated JOB is overwritten at the next regeneration;
+  (4) the compliance objection dissolves rather than being solved — untagged means
+  unread, so multi-team inconsistency costs COVERAGE (a number that grows) instead of
+  corrupting data (a number that never closes). Under 10 folders carry the standard
+  today, which is a sample size, not a weakness: what is being proven is that the round
+  trip is lossless and the vocabulary holds WHEN the field is filled, never that teams
+  will comply.
+  Recorded at the gate as rider §G6 exit (d) and specified in
+  `knowledge/standards/technology/controlm-guidelines-and-standards.md` §7.5. The gate
+  still RULES it — this entry stops being an open question and becomes a recommendation
+  with a written warrant. NOTE for the company side: their copy of the gate prompt is
+  canonical-company and did not take the producer edits, so RELAY-7 carries this across.
+
+
+- **`Idea-73`** · 2026-08-05 · `[source]` · **merged → G74 (2026-08-12) — the item that owns the :Employee spine now carries the source question, the O44 column-1 consumer and the company-side reading** · prio? **High** —
+  **Where does the employee hierarchy come from, and does it live producer-side at
+  all?** Established while drafting G35: `:Employee` is a node class (`prov:Agent`)
+  with **no Employee-to-Employee edge anywhere** in the relationship vocabulary —
+  no `REPORTS_TO`, no manager edge, no source feeding one, no backlog item that
+  would create one. Two separate SME directions now depend on it: G35 §B7 ("if a
+  person is in the role, create the relationship to the employee hierarchy in a
+  later pass") and O44's first column, whose manager filter is its whole point.
+  The 2026-07-23 producer-session HR-hierarchy direction — single `:Employee`
+  spine, two-scope HR supplement, two-pass loader, `REPORTS_TO` current-state
+  sweep — was written for the **company** `hr-emp-hierarchy` gate, which is
+  probably why nothing landed here. Decide whether the producer repo gets a
+  hierarchy at all (with what source — `pat:people-report` carries teams, not
+  reporting lines), or whether both directions are company-side and the producer
+  records that explicitly. Marked High because two committed directions currently
+  defer to something that does not exist, and a deferral pointing at nothing is an
+  omission with better wording.
+
 
 - **GROOM 2026-08-11 (desktop, weekly)** — worked the eleven ungroomed 2026-08-09..08-11 captures plus one misfiled entry found at the bottom of this file. **Promoted 10:** `Idea-96`→**J42** (the backlog union rule has no guard — a port-time id-set diff), `Idea-100`→**J43** (a `gate_bound:` precondition key on PORT-MANIFEST rows), `Idea-103`→**J44** (where the unclosed-fence guard's boundary sits for captured and vendored markdown), `Idea-99`→**J45** (the owed DPL/Snowflake port relay), `Idea-106`→**J46** (the clock-racing run-log collision test), `Idea-107`→**J47** (no guard asserts a PORT-MANIFEST path exists; the ordering check is hardcoded), `Idea-98`→**C33** (the adhoc Ab Initio version loader C25 authorized), `Idea-97`→**U20** (the review plan's six-scan-roots baseline, two package generations stale), `Idea-102`→**K22** + **K23** (the Deployment Module CI class via the gate, and the KB-article grain check). **Merged 2:** `Idea-101` into **J43** as clause (b) — same file, same vocabulary, same reviewer, so the derived-render disposition is decided in the same pass; `Idea-102`'s register-line finding into **G70**'s notes rather than its acceptance, because that acceptance mirrors a SIGNED gate register and a groom does not edit one. **Left open as questions for the user/SME: 2** — `Idea-104` (which MFT route-id shape is real, updated with what C30 did and did not settle) and `Idea-105` (the two claimants on the 4000-char `DESCRIPTION` field; three exits, already carried as gate rider §G6 and in C29's notes, with no item landing E1 to merge into). **One id repaired:** the 2026-08-11 manifest-guard capture had been filed as a second `Idea-86` and appended BELOW this audit trail — renumbered `Idea-107`, tagged `[bug]` instead of the non-vocabulary `[guard]`, and groomed. Every item raised here is dependency-free, so all ten enter `next_ready` on arrival; nothing raised decides an ontology question — K22 and K23 both register `planned` and route via the gate.
 
