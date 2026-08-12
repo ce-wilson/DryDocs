@@ -958,6 +958,38 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   E1's exact match is unaffected, with zero migration on any deployed object. Producer
   is writing that up; take it as an input to your gate rather than re-deriving it.
 
+- **RELAY-8 — `pat_app_links.cypher` IS STILL ON THE PRE-S3 KEY, and reordering the
+  loaders hides it rather than fixing it** `[VERIFIED-PRODUCER]` (raised 2026-08-11
+  from an SME load failure; a T23 residue). The SME hit
+  `ConstraintValidationFailed` loading `seal_applications` after PAT, diagnosed it
+  correctly company-side, and intends to reload in a different order. The order works.
+  The defect does not go away.
+  **What the producer can verify from here, and did:** the collision cannot occur
+  producer-side, for a reason worth knowing — `pat_product_mapping.cypher` L66 MERGEs
+  on `{app_id: trim(raw_app_id)}`, the SAME neutral key `seal_applications.cypher` L25
+  uses, dual-writing `seal_id` only as a deprecated alias `ON CREATE`. Same key both
+  sides of the join means no stub, no second node, no order dependency. Producer also
+  has NO `pat_app_links` loader or cypher at all.
+  **So the company's `MERGE (a:BusinessApplication {seal_id: row.seal_id})` with
+  `is_stub=true` is a loader that never got re-keyed at S3.** It mints a node with a
+  null `app_id`; the uniqueness constraint ignores nulls, so `seal_applications` cannot
+  match it, mints a second canonical node, and `SET a.seal_id` then collides on the
+  unique `seal_id`. THE FIX IS THE RE-KEY, not the ordering: point that MERGE at
+  `app_id` like every other site, and the load order stops mattering. Until then the
+  ordering rule below is a live workaround, and any NEW loader that stubs on `seal_id`
+  reintroduces it.
+  **The RuntimeError was the guard working, not a bug.** `app_identity.py`
+  `_assert_no_pre_cutover_applications` refused to load on finding null-`app_id`
+  `:BusinessApplication` nodes, which is exactly its job — it stopped a partially
+  doubled graph from being compounded. That guard IS producer-side and ports.
+  **The ordering rule, while the re-key is outstanding:** `seal_applications` loads
+  BEFORE any PAT loader that can mint a `:BusinessApplication`. Producer's
+  `REFRESH_REFERENCE_CHAIN` already satisfies it (seal_applications and seal_contacts
+  precede pat_product_mapping), so this is a company-side sequencing correction, not a
+  producer change. Note the company runbook's step 8 currently sequences the PAT block
+  BEFORE the SEAL block, which is what produced the failure.
+  Rides T23, which already carries the S3 re-key and its all-8-sites-in-one-apply rule.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
