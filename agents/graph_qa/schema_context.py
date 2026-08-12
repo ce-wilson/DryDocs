@@ -3,7 +3,8 @@
 NEVER whole-graph state (ADR 0007 gotcha 2 — KGoT's inject-everything trick
 only works on a toy task graph). Three bounded ingredients:
 
-1. ``relationship_vocabulary.yaml`` — the ACTIVE local_relationships rows:
+1. ``relationship_vocabulary/`` (the fragment registry) — the ACTIVE
+   local_relationships rows:
    the curated meaning of every edge (label, endpoints, role, note);
 2. live ``graph_schema()`` output — labels / relationship types / property
    keys actually present in the routed database;
@@ -21,7 +22,9 @@ from pathlib import Path
 import yaml
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-VOCABULARY_PATH = _REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary.yaml"
+# S5 split the monolith into per-domain fragments; the directory is the source
+# and yaml_fragments is the one reader (a fragment need not parse standalone).
+VOCABULARY_PATH = _REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
 
 MAX_VOCAB_ROWS = 80
 MAX_EXAMPLES = 6
@@ -37,8 +40,14 @@ SECTION_BUDGETS = {"vocab": 4_800, "live": 1_400, "by_label": 2_800, "examples":
 
 def load_vocabulary(path: Path | None = None) -> list[dict]:
     """Active relationship rows only — planned/deprecated edges must not be suggested."""
-    doc = yaml.safe_load((path or VOCABULARY_PATH).read_text(encoding="utf-8"))
-    rows = doc.get("local_relationships", []) or []
+    source = path or VOCABULARY_PATH
+    if source.is_dir():
+        from drydocs_core.yaml_fragments import load_yaml_source
+
+        doc = load_yaml_source(source)
+    else:  # a single-file vocabulary (tests hand one in)
+        doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    rows = (doc or {}).get("local_relationships", []) or []
     return [r for r in rows if r.get("status") == "active"]
 
 

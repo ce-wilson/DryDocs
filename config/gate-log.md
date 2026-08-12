@@ -2959,3 +2959,103 @@ backlog note. Class (1) (platform tokens) was ruled and recorded 2026-08-11 in
 gains Scan E — no publishable file may carry a data-center name whose position 1 is the
 production environment letter. Shape-guarded like every scan there, so the test embeds no
 real value and cannot leak the inventory it protects.
+
+## 2026-08-12 — GATE: vocabulary-domains-and-id-policy — SIGNED OFF, 19/19
+
+Ratifies the vocabulary's domain axis, the id convention, and the never-ruled planned tier.
+Prompt: `config/gate-prompts/vocabulary-domains-and-id-policy.yaml`; session run in-session
+(SME = user), rulings pre-taken 2026-08-12 for §A/§B and confirmed here.
+
+- **A1 CONFIRMED** — domain `controlm` → `scheduler` on all 27 entries; fragment renamed
+  `40-local-scheduler.yaml`. The partition is the scheduler tier, tool-agnostic (AutoSys/
+  Airflow file here via the BMC-baseline crosswalk). Node labels keep vendor prefixes —
+  ADR 0003/0008 unchanged; the retired `:Scheduler`/`:SchedulerKind` node concept stays retired.
+- **A2 CONFIRMED** — domain `seal` → `business_application` on all 10 entries; fragment
+  renamed `41-local-business-application.yaml`. Matches the canonical `:BusinessApplication`
+  label (K4) and the standalone-template goal.
+- **A3 CONFIRMED** — `human` registered in the domain enum for people/org edges (the G74
+  `:Employee` spine files there). No existing entries move; relocation rides the §B3 tech-debt
+  cleanup.
+- **A4 CONFIRMED** — the stale header enum (omitted registry/docs/quality) corrected to
+  `scheduler | business_application | catalog | architecture | registry | docs | quality |
+  context | all | human`; the JSON schema gains a matching enum.
+- **B1 CONFIRMED** — NEW entries use a domain-derived id prefix (`scheduler_*`,
+  `business_application_*`, `human_*`, plus the existing catalog_/arch_/reg_/docs_/doc_
+  conventions). Documented in the header and RELATIONSHIP_GUIDE Step 6.
+- **B2 CONFIRMED** — status is NEVER encoded in an id (a `planned_` prefix would force a
+  rename at every lifecycle flip; ids are the append-only audit join).
+- **B3 CONFIRMED** — existing epoch-tag ids (m3_ 21, p2_ 5, m7_ 1, u1_/u2_ 5, g22_ 1,
+  c23_ 4, prov_ 1, sosa_ 4) stay valid now; FORCED migration (add-new + deprecate-old across
+  the four ledgers) is a groomed tech-debt item, not natural attrition. SME ruling 2026-08-12.
+- **C1a KEEP-PLANNED** — the p2_ deployment tier (p2_deployed_by, p2_deployed_to,
+  p2_deploys_folder, p2_authored_by, p2_instance_of): the model is coherent and K22 feeds it.
+- **C1b HELD FOR REVIEW** — m3_depends_on_file, m3_executed_by: SME directed a file-based
+  review instead of an in-session ruling → `docs/reviews/vocabulary-planned-review.md`.
+  Entries stay planned until that review is ruled and transcribed back here.
+- **C1c DEFERRED** — seal_app_attributed_to_employee defers to the open
+  `seal-tom-attribution-reshape` gate, which owns that territory. Stays planned.
+- **C1d HELD FOR REVIEW** — catalog_has_area_product, catalog_area_product_has_dev_team,
+  catalog_dev_team_has_membership: same review file as C1b.
+- **C1e KEEP-PLANNED** — the architecture-mermaid trio (arch_owns_code, arch_stored_in,
+  arch_contains_service): SME kept all three (overriding the drafted deprecate
+  recommendation) — architecture-doc ingestion is still intended; the U1/U2 code graph
+  covers structure, not ownership/storage/services.
+- **C2 RECORDED** — the 16 gate-held / gate-ruled planned entries are not re-ruled here:
+  m3_delegates_to (rua-load-shapes §A1 hold → K17), arch_owns_directory + arch_sources
+  (rua-load-shapes §C1/§C2, registered at G55), m3_triggers (confirmed 2026-07-15, build
+  pending), m3_host_group_defined_on (confirmed 2026-07-09, loader blocked on DC-key parse),
+  sosa_* ×4 (E1 deferred), c23_* ×3 (C23 defer — no writer until a measurement feed),
+  catalog_has_application (K7 §G6), reg_appuser_uses_software (software-version-context;
+  build = C33), docs_has_document + docs_governed_by (held for the docmeta P4+ loader).
+- **C3 RECORDED (tech-debt)** — m3_triggers is planned yet live-consumed by a QuerySpec
+  (`drydocs_api/query_specs.py`, `MATCH …-[:TRIGGERS]->`): the spec returns empty rather
+  than wrong, but the surface implies data that cannot exist yet. Tech-debt item groomed:
+  demote the spec to demo-only or prioritize the build.
+- **D1 CONFIRMED** — the follow-up commit applies §A (git mv both fragments, 37 domain
+  edits, header enum + §B note), regenerates schema_graph.cypher, updates changed test pins.
+  No §C deprecations were ruled this session, so no status flips land.
+- **D2 CONFIRMED** — hygiene rides the build: JSON-schema domain enum + `removed` status +
+  required `inverse_label`; RELATIONSHIP_GUIDE Step 6 gains `inverse_label` + the new domain
+  list; `agents/graph_qa/schema_context.py` repointed from the retired monolith to the
+  fragment reader.
+- **D3 CONFIRMED** — tech-debt items groomed: forced id migration (§B3), human-domain
+  relocation (§A3), the m3_triggers QuerySpec conflict (§C3), plus the review-file
+  follow-up (§C1b/§C1d).
+- **D4 CONFIRMED** — this transcription; gates.json and the enforcement matrix regenerate
+  (default-paths render_board.py run).
+- **E SIGNED** — safe to transcribe.
+
+## 2026-08-12 — GATE: remediation-fix-tracking — SIGNED OFF, 10/10
+
+Rules the fix-tracking vocabulary the write-authorized loader applies from
+`drydocs.remediation.fix-tracking.v1` change-sets. Prompt:
+`config/gate-prompts/remediation-fix-tracking.yaml`; the SoD half (emit change-set,
+loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
+
+- **A1 RECORDED** — fix tracking is OUR intervention record, a fourth axis beside envelope
+  authorship, pull tracking, and load provenance. The envelope names
+  (source_created_by/at, source_updated_by/at) are never reused — fence already ratified
+  at controlm-q1q3-phase1 / envelope-property-terms.
+- **A2 RECORDED** — the emitting component stays no-graph-write: NFR-REM-1, the AST guard,
+  and the corroborate write-clause regex all UNCHANGED.
+- **B1 RULED as proposed** — `remediation_fix_id` (string, fix package / Jira reference),
+  `remediation_status`, `remediation_status_date`; the `remediation_` prefix keeps the axis
+  visually separate from `source_*` and `*_seen_at`.
+- **B2 RULED as proposed** — enum `proposed | in_progress | applied | verified`.
+  `applied` = the dev team imported the updated XML; `verified` = the equivalence proof
+  re-ran against the re-exported live definition. No `rejected` state on the node: a
+  rejected fix removes the properties (the package records the rejection).
+- **B3 RULED** — one `remediation_status_date` carrying the LAST transition; the full
+  history lives in the fix package.
+- **C1 RULED** — a dedicated drydocs-load loader consuming fix-tracking.v1 change-sets:
+  UNWIND $batch, MATCH on the NODE KEY (never MERGE-creating a target — a missing target
+  is an error, not a node to invent), SET the three properties, remove them on rejection.
+  Standard JobRun provenance applies. C2 (pass in an existing loader) declined.
+- **D1 RULED** — `dd:` local property_terms entries with prose definitions; standard-term
+  bindings revisited when an RDF export exists. `dct:` authorship terms are NOT candidates
+  (the envelope's family).
+- **E1 CONFIRMED** — the loader build is groomed as a backlog follow-up (not built at
+  sign-off); the fix-tracking.v1 artifact's GATE-BOUND banner flips to cite this gate;
+  property_terms gains the §D entries with the build.
+- **E2 CONFIRMED** — this transcription; gates.json and the enforcement matrix regenerate.
+- **F SIGNED** — safe to transcribe.

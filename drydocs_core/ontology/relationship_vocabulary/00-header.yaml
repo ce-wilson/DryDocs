@@ -38,7 +38,17 @@
 #                  opposite of retiring something on the record.
 #
 # Fields:
-#   id            unique snake_case identifier
+#   id            unique snake_case identifier. NEW entries take a
+#                 domain-derived prefix (scheduler_*, business_application_*,
+#                 human_*, catalog_*, arch_*, reg_*, docs_*/doc_*) — gate
+#                 vocabulary-domains-and-id-policy §B1, 2026-08-12. Status is
+#                 NEVER encoded in an id (§B2). Existing epoch-tag ids (m3_,
+#                 p2_, m7_, u1_/u2_, g22_, c23_, prov_, sosa_) stay valid;
+#                 their forced migration (add-new + deprecate-old) is a
+#                 groomed tech-debt item (§B3) — never rename an id in place,
+#                 it is the join key across the taxonomy-ontology-map, the
+#                 generated schema_graph.cypher, the SQLite mirror, and the
+#                 append-only gate log.
 #   neo4j_label   the Cypher relationship type
 #   inverse_label target-side display phrasing (SUPPORTS -> "supported by"),
 #                 read as "<target> <inverse_label> <source>". PRESENTATIONAL
@@ -53,7 +63,16 @@
 #   note          plain-English description + any gotchas
 #   supplement    schema file where LocalRelationship is declared (null = base PROV-O)
 #   loader        cypher file that writes this relationship
-#   domain        controlm | seal | catalog | architecture | context | all
+#   domain        scheduler | business_application | catalog | architecture |
+#                 registry | docs | quality | context | all | human
+#                 (renamed from controlm/seal at gate
+#                 vocabulary-domains-and-id-policy §A1/§A2, 2026-08-12; the
+#                 scheduler partition is tool-agnostic — AutoSys/Airflow edges
+#                 file there via the BMC-baseline crosswalk. `human` is
+#                 registered (§A3) for people/org edges; no entries moved at
+#                 registration. This is a file/loader PARTITION — not
+#                 rdfs:domain (from_node/to_node carry that) and not the BDAT
+#                 layer on source-registry SYSTEM rows.)
 #   status        planned | active | deprecated | removed
 #
 # EXPERIMENTAL / early adoption: SOSA/SSN (domain: context) terms are W3C but

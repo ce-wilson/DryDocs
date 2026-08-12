@@ -187,8 +187,8 @@
         "drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml",
         "drydocs_core/ontology/relationship_vocabulary/20-property-terms.yaml",
         "drydocs_core/ontology/relationship_vocabulary/30-prov-matrix.yaml",
-        "drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml",
-        "drydocs_core/ontology/relationship_vocabulary/41-local-seal.yaml",
+        "drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml",
+        "drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml",
         "drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml",
         "drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml",
         "drydocs_core/ontology/relationship_vocabulary/44-local-registry.yaml",
@@ -371,6 +371,7 @@
         "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml",
         "config/gate-prompts/ui-write-surface.yaml",
+        "config/gate-prompts/vocabulary-domains-and-id-policy.yaml",
         "config/gate-log.md"
       ],
       "content": null,

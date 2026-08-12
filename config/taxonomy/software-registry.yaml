@@ -401,7 +401,7 @@ products:
     # provision and reverse-provision types; transformations run on the Zilo
     # library (Spark-based), which refines rather than contradicts the
     # 2026-07-16 SME note "java zilo framework originally, -py routes to
-    # spark/pyspark" in relationship_vocabulary/40-local-controlm.yaml.
+    # spark/pyspark" in relationship_vocabulary/40-local-scheduler.yaml (renamed from 40-local-controlm.yaml, 2026-08-12).
     # Runtimes: EKS or GKP, with Hortonworks in heritage scenarios.
 
   - id: autosys

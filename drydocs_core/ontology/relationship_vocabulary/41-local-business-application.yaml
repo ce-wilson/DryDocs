@@ -1,5 +1,5 @@
 
-  # ── SEAL ─────────────────────────────────────────────────────────────────
+  # ── Business application (SEAL is the company instance name) ─────────────
 
   - id:           seal_has_port
     neo4j_label:  HAS_PORT
@@ -14,7 +14,7 @@
       No PROV-O equivalent; structural dprod relationship.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
-    domain:       seal
+    domain:       business_application
     status:       active
 
   - id:           seal_requires_scheduler
@@ -49,7 +49,7 @@
     superseded_by: reg_uses_software
     supplement:   ~                          # never declared — retired before any supplement block landed
     loader:       ~
-    domain:       seal
+    domain:       business_application
     status:       deprecated
     deprecated_at: 2026-07-21
 
@@ -75,7 +75,7 @@
       K4 clause-6 map flips.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
-    domain:       seal
+    domain:       business_application
     status:       deprecated
     deprecated_at: 2026-07-15
 
@@ -95,7 +95,7 @@
       Replacement: Attribution -[:HAD_ROLE]-> TOMRole (seal_attribution_had_role, active).
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
-    domain:       seal
+    domain:       business_application
     status:       deprecated
     deprecated_at: 2026-07-15
 
@@ -117,7 +117,7 @@
       reached via BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> Attribution.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
-    domain:       seal
+    domain:       business_application
     status:       deprecated
     deprecated_at: 2026-07-15
 
@@ -148,7 +148,7 @@
       Matrix row: Entity -> Entity = prov:wasDerivedFrom family.
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
-    domain:       seal
+    domain:       business_application
     status:       active
 
   - id:           seal_app_attributed_to_employee
@@ -168,7 +168,7 @@
       type-check under the CURRENT active classification.
     supplement:   ~
     loader:       ~
-    domain:       seal
+    domain:       business_application
     status:       planned
 
   - id:           seal_qualified_attribution
@@ -187,7 +187,7 @@
       form; the simple collapsed edge (seal_app_attributed_to_employee) stays optional/derivable.
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
-    domain:       seal
+    domain:       business_application
     status:       active
 
   - id:           seal_attribution_has_agent
@@ -208,7 +208,7 @@
       schema meta-graph refuses ambiguous duplicate triples).
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
-    domain:       seal
+    domain:       business_application
     status:       active
 
   - id:           seal_attribution_had_role
@@ -230,5 +230,5 @@
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
-    domain:       seal
+    domain:       business_application
     status:       active

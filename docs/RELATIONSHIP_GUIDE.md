@@ -246,8 +246,14 @@ Add an entry to `local_relationships` in the fragment for your edge's domain
 (`drydocs_core/ontology/relationship_vocabulary/4N-local-<domain>.yaml`):
 
 ```yaml
-- id:           domain_relationship_name        # unique snake_case id
+- id:           domain_relationship_name        # unique snake_case id, DOMAIN-DERIVED
+                                                # prefix (scheduler_*, business_application_*,
+                                                # human_*, catalog_*, ...); never encode
+                                                # status in an id (gate vocabulary-domains-
+                                                # and-id-policy §B, 2026-08-12)
   neo4j_label:  LABEL_FROM_MATRIX
+  inverse_label: "target-side phrasing"         # REQUIRED (test_schema.py + JSON schema);
+                                                # presentational only (C15)
   role:         role_value_or_null
   from_node:    SourceNodeLabel
   to_node:      TargetNodeLabel
@@ -255,7 +261,8 @@ Add an entry to `local_relationships` in the fragment for your edge's domain
   note:         "One sentence description."
   supplement:   domain_ontology_supplement.cypher
   loader:       loader_file.cypher
-  domain:       controlm | seal | catalog | ...
+  domain:       scheduler | business_application | catalog | architecture |
+                registry | docs | quality | context | all | human
   status:       planned                         # set to active after Steps 7–8
 ```
 

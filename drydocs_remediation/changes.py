@@ -17,11 +17,11 @@ a YAML change-set naming the target nodes by their NODE KEY — ``(folder_id,
 job_id)`` for ``:ControlMJob``, ``folder_id`` for ``:ControlMFolder``, per
 ``drydocs_core/schema/constraints.cypher`` — which a write-authorized loader
 applies with the standard idiom (UNWIND $batch, MERGE on the business key).
-The PROPERTY NAMES ride as ``proposed_properties``: there is no ratified
-vocabulary for "target of a remediation fix" (the four envelope properties are
-source-system authorship and fenced against reinterpretation), so the names
-are gate-bound and the artifact says so — a loader that applies them before
-the gate signs is the loader's violation, visibly, not this module's.
+The PROPERTY NAMES ride as ``proposed_properties`` and are RATIFIED — gate
+``remediation-fix-tracking`` SIGNED OFF 2026-08-12 ruled the three names, the
+status enum (:data:`FIX_STATUS_ENUM`), and the writer (a dedicated
+drydocs-load loader). The four envelope properties stay source-system
+authorship, fenced against reinterpretation (§A1).
 
 GRAPH ANCHORS are read-only: :func:`graph_anchors` resolves the fix's start
 and end points to real node identities (labels, node-key properties, display
@@ -43,20 +43,31 @@ from .xml_io import EditScript, Effect, Locator, XmlDocument, locate
 
 FIX_TRACKING_SCHEMA = "drydocs.remediation.fix-tracking.v1"
 
-#: relationship types a change doc may cite — the status: active entries of
-#: drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml.
-#: m3_triggers is still planned and deliberately absent.
-CITABLE_RELATIONSHIPS = (
-    "CONTAINS_JOB",
-    "CONTAINS_FOLDER",
-    "SCHEDULED_ON",
-    "REQUIRES_IN_CONDITION",
-    "EMITS_OUT_CONDITION",
-    "WAS_INFORMED_BY",
-    "BELONGS_TO_APPLICATION",
-    "INVOKES",
-    "RUNS_ON",
-)
+#: the status enum ruled at gate remediation-fix-tracking §B2 (SIGNED OFF
+#: 2026-08-12, config/gate-log.md). No "rejected" state: a rejected fix
+#: removes the properties; the package records the rejection.
+FIX_STATUS_ENUM = ("proposed", "in_progress", "applied", "verified")
+
+
+def _citable_relationships() -> tuple[str, ...]:
+    """The relationship types a change doc may cite: every ``status: active``
+    label of the scheduler domain, read from the registry itself. Derived, not
+    hand-mirrored — the hand-kept tuple drifted (it predated the G22 flips and
+    missed USES_ARTIFACT/READS_FROM/WRITES_TO/CONTAINS_HOST). Planned entries
+    (m3_triggers, ...) are absent because the filter says so, not by memory."""
+    from drydocs_core.ontology.schema_graph import DEFAULT_VOCAB_PATH
+    from drydocs_core.yaml_fragments import load_yaml_source
+
+    registry = load_yaml_source(DEFAULT_VOCAB_PATH)
+    labels: list[str] = []
+    for entry in registry["local_relationships"]:
+        if entry["domain"] == "scheduler" and entry["status"] == "active":
+            if entry["neo4j_label"] not in labels:
+                labels.append(entry["neo4j_label"])
+    return tuple(labels)
+
+
+CITABLE_RELATIONSHIPS = _citable_relationships()
 
 
 class UnanchoredFixError(RuntimeError):
@@ -242,21 +253,30 @@ class FixTrackingChangeset:
 def fix_tracking_changeset(changeset: FixTrackingChangeset, target: Path) -> Path:
     """Write the fix-tracking change-set artifact.
 
-    The property NAMES are deliberately marked proposed: no gate has ruled a
-    fix-tracking vocabulary (the envelope properties are source authorship and
-    fenced; pull tracking is a third axis). The artifact carries everything a
-    loader needs EXCEPT the authority to apply it — which is the point.
+    The property NAMES and status enum are RATIFIED (gate
+    remediation-fix-tracking, SIGNED OFF 2026-08-12 — §B1 names, §B2 enum,
+    §B3 one last-transition date, §C1 the dedicated drydocs-load writer that
+    MATCHes on the NODE KEY and never MERGE-creates a target). The artifact
+    still carries everything a loader needs EXCEPT the authority to apply it —
+    the SoD boundary is unchanged (§A2).
     """
+    if changeset.status not in FIX_STATUS_ENUM:
+        raise ValueError(
+            f"unknown remediation_status {changeset.status!r} — the ruled enum "
+            f"is {' | '.join(FIX_STATUS_ENUM)} (gate remediation-fix-tracking §B2; "
+            "there is no 'rejected' state: rejection removes the properties)"
+        )
     payload = {
         "schema": FIX_TRACKING_SCHEMA,
         "fix_id": changeset.fix_id,
         "gate": {
-            "status": "GATE-BOUND",
+            "status": "RATIFIED",
+            "ruling": "remediation-fix-tracking — SIGNED OFF 2026-08-12 (config/gate-log.md)",
             "note": (
-                "proposed_properties names are NOT ratified — a remediation-fix-"
-                "tracking gate must rule them before any loader applies this. "
-                "Envelope properties (source_created_by/at, source_updated_by/at) "
-                "are source-system authorship and MUST NOT be reused here."
+                "property names and status enum ruled at the gate; the writer is "
+                "the dedicated drydocs-load fix-tracking loader (§C1). Envelope "
+                "properties (source_created_by/at, source_updated_by/at) are "
+                "source-system authorship and MUST NOT be reused here."
             ),
         },
         "approvals": list(changeset.approvals),

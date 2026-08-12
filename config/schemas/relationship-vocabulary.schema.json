@@ -38,6 +38,7 @@
       "required": [
         "id",
         "neo4j_label",
+        "inverse_label",
         "from_node",
         "to_node",
         "status"
@@ -52,10 +53,8 @@
           "pattern": "^[A-Z][A-Z0-9_]*$"
         },
         "inverse_label": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string",
+          "minLength": 1
         },
         "from_node": {
           "type": "string"
@@ -79,11 +78,23 @@
           "enum": [
             "planned",
             "active",
-            "deprecated"
+            "deprecated",
+            "removed"
           ]
         },
         "domain": {
-          "type": "string"
+          "enum": [
+            "scheduler",
+            "business_application",
+            "catalog",
+            "architecture",
+            "registry",
+            "docs",
+            "quality",
+            "context",
+            "all",
+            "human"
+          ]
         },
         "supplement": {
           "type": [
