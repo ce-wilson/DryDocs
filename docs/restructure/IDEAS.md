@@ -62,6 +62,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-108`** · 2026-08-12 · `[chore]` · **open — user triage: salvage or discard, and both directions are destructive** · prio? **High** —
+  **Two abandoned agent worktrees are holding UNCOMMITTED work that no branch and no
+  `git log` will ever show.** Found at the 2026-08-12 groom, verified on this desktop:
+  `git worktree list` reports `.claude/worktrees/agent-a6fcf6daf8af92ce7` and
+  `.claude/worktrees/agent-aa168e5039f906d30`, both pinned at `6c24963` (2026-08-11)
+  while `main` is at `887a0e7`, and BOTH TREES ARE DIRTY — 6 and 8 changed paths
+  respectively, including an untracked new file `scripts/render_underhood_benchmark.py`
+  and modifications to `docs/restructure/backlog.yaml`, `docs/plan/board.html`,
+  `docs/plan/roadmap.html`, `tests/unit/test_render_determinism.py`, `CHANGELOG.md`
+  and two `web/src/underhood/` sources. All four `worktree-agent-*` branches are
+  ancestors of `main` (`git branch --merged main` lists every one), so the BRANCHES
+  carry no unique commits: the only unique content in the repo is that uncommitted
+  working-tree state. Two of the four branches have no worktree directory left at all.
+  Why it is worth a decision rather than a sweep: a `git worktree prune` or a routine
+  branch cleanup erases the untracked script silently, and the standing concurrent-sessions
+  rule is that no session touches another stream's uncommitted work — which is exactly why
+  the groom looked and did NOT act. What the user rules: is this a superseded
+  `render_underhood_benchmark.py` experiment that can go, or unlanded work to commit onto
+  a branch first? Sibling of `Idea-17` (post-squash relic cleanup), which this groom
+  narrowed the same day.
+
 - **`Idea-104`** · 2026-08-11 · `[question]` · **open** · prio? **Med** —
   **The MFT route id changed shape between the field observation and the standard, and
   nobody has said which is real.** The 2026-06-11 production capture
@@ -111,6 +132,17 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `blocked` may be the honest value). A groom does not move an item's status: status is the
   claim channel between the two machines, so that one is the user's call. The design-doc and
   traceability-matrix half of this entry rides L19 clause (f).
+  **RE-AUDITED 2026-08-12 (groom) — the 08-09 sweep has held, and the two new stale paths
+  found were fixed in place.** The check re-run across all 112 non-`done` items (leading path
+  token of every `inputs:` entry, existence-tested against the tree) returns THREE refs, down
+  from fourteen: `G63` and `G64` both cite `config/audit-fields/` as a DIRECTORY when the
+  ledger is the file `config/audit-fields.yaml` — every one of the other twelve references in
+  `backlog.yaml` spells it correctly, so this is a typo and not a planned split; both corrected
+  at this groom with the reason in a trailing comment. The third, `Y4`'s `backlog/items/`, is
+  NOT stale: it is the sharded directory `Y2`/`Y3` create, and an input that names a
+  deliberate future output is the one legitimate form of a non-existent path. Worth keeping as
+  a standing groom check — it is cheap, it caught two, and `L27`'s enforcement mechanism does
+  not cover `backlog.yaml` inputs. The E1 status question is untouched and still the user's.
 
 - **`Idea-89`** · 2026-08-07 · `[bug]` · **closed → fixed in place 2026-08-07 (SME ruling); no item minted** · prio **Med** —
   **`OverviewRoute` renders ALL modules unfiltered — the Overview pick-list offers
@@ -1118,7 +1150,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Epic O extension groom. Groom when the public site starts; the icon/logo direction
   should stay consistent with the O22 console glyph set.
 
-- **`Idea-20`** · 2026-07-21 · `[source]` · **groomed → G60 (2026-08-07 pm) — clause (c) ONLY; clauses (a) the ingestion-launcher classifier sample and (d) cross-job runtime threading stay OPEN** · prio? **Med** —
+- **`Idea-20`** · 2026-07-21 · `[source]` · **groomed → G60 (2026-08-07 pm) — clause (c) ONLY; clauses (a) and (d) re-read 2026-08-12 as PARKED, not open: (a) parked → a real CMD_LINE sample containing the `ingestion-launcher` jar, (d) parked → layer-4 context-graph work starts** · prio? **Med** —
   **DPL ingestion leg + AWS zone model traced** (company ingestion
   template; mechanism-only — values stay company-side). Upstream of the launcher spine:
   FM drop of a `.dat` + `.tok` landing pair → Control-M file-watcher condition grammar
@@ -1140,8 +1172,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (parquet + .tok → backup) — a G14-shaped surface G14 doesn't read (it parses
   CMD_LINE only); (d) cross-job `%%\\JOB\VAR` runtime threading (run GUIDs, record
   counts passed between jobs) — context-graph flavored, definition-level no-op.
+  RE-READ 2026-08-12 (groom) — **neither remaining clause is an open question; both are
+  waits, and saying so is the whole edit.** Clause (a) cannot be groomed into an item
+  because the item would have no input: a repo-wide search finds `ingestion-launcher`
+  ONLY in this entry and in the backlog text quoting it — no sample, no classifier row, no
+  fixture. It is parked on evidence arriving (a real `CMD_LINE` sample carrying that jar),
+  and the classifier entry is a ten-minute edit the day one does. Clause (d) is parked on
+  SCOPE, not evidence: cross-job runtime threading is layer-4 context-graph material by the
+  CLAUDE.md §1 split, and layer 4 has no owner agent and no phase work started, so an item
+  raised now would sit unstartable and distort `next_ready`. Marked so a future reader stops
+  re-litigating two lines that are each waiting on something nameable.
 
-- **`Idea-17`** · 2026-07-20 · `[chore]` · **open — user decision, destructive** · prio? **Low** —
+- **`Idea-17`** · 2026-07-20 · `[chore]` · **open — NARROWED 2026-08-12: the REMOTE half is discharged (both branches are already gone from origin) and the stash is gone; only two this-machine-local relics remain, still the user's destructive call** · prio? **Low** —
   **Post-squash ref cleanup (user decision, destructive)**: origin still
   carries two pre-squash-history branches — `feat/mapping-store` (SUPERSEDED: the Initial-import
   squash absorbed its content and main then evolved past it; its only unique file was the
@@ -1150,6 +1192,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   machine: branch `backup/ui-dark-local-3`, the stale stash noted at the 07-20 groom, and the
   new safety tag `archive/old-history-2026-07-20` (this machine's pre-squash history; the other
   machine has `archive/full-history`). Deleting the remote branches is the user's call.
+  RE-CHECKED 2026-08-12 (groom, desktop) — **most of this entry has already been executed,
+  and nobody recorded it.** `git ls-remote --heads origin` returns exactly two refs, `main`
+  and `feat/external-vendor-scraper`: BOTH pre-squash-history branches (`feat/mapping-store`,
+  `feature/provenance-audit-fields-plan`) are already gone from origin, so the destructive
+  remote decision this entry was raised for no longer exists. `git stash list` is EMPTY, so
+  the stale stash is gone too. What actually remains is two local relics on this desktop and
+  nothing else: the branch `backup/ui-dark-local-3` and the safety tag
+  `archive/old-history-2026-07-20`. Both are still the user's call — deleting the tag drops
+  this machine's only pointer to pre-squash history (the other machine holds
+  `archive/full-history`), which is precisely the kind of thing a groom must not decide.
+  Related finding from the same check, filed separately because it is live rather than
+  historical: `Idea-108`, four merged `worktree-agent-*` branches and two dirty worktrees.
 
 - **`Idea-16`** · 2026-07-20 · `[chore]` · **open — USER MANUAL STEP** · prio? **Med** —
   **USER MANUAL STEP: add the SNYK_TOKEN repo secret** so the new CI
@@ -1157,6 +1211,13 @@ question a 1,000-line file with the trail at the bottom could not answer.
   token) → repo Settings → Secrets and variables → Actions. Until then every scan step
   skips cleanly by design. After the first green scan: triage `snyk code` advisory
   findings and decide whether to gate it (the ruff-idiom follow-up).
+  RE-VERIFIED 2026-08-12 (groom) — **the entry still stands exactly as written, and it is
+  still the user's hand.** `.github/workflows/ci.yml` still carries the `snyk` job (the
+  `snyk/actions/setup` step, `snyk test --all-projects --severity-threshold=high`, and the
+  advisory `snyk code test`), and the file's own comment still names the missing repo secret
+  as a USER MANUAL STEP. Nothing in the repo can discharge this: no agent can set a GitHub
+  repo secret, so it neither grooms into an item nor closes itself. Checked because an open
+  entry that has quietly become obsolete is worse than one that is merely waiting.
 
 - **`Idea-15`** · 2026-07-20 · `[idea]` · **parked → ONE user decision (display-label scope); the placement blocker is DISCHARGED — epic `generic-naming` now exists** · prio? **Med** —
   **Replace SEAL/PAT naming with industry-standard, SaaS-configurable
@@ -1236,7 +1297,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   fits QuerySpec export) and DryDocs-as-template play à la create-context-graph ("pick your
   orchestrator, get a scaffolded support graph") for the standalone-generalization goal.
 
-- **`Idea-10`** · 2026-07-14 · `[source]` · **merged → K16, K17 (the FID half); the ALIAS tier stays open** · prio? **Med** —
+- **`Idea-10`** · 2026-07-14 · `[source]` · **merged → K16, K17 (the FID half); the ALIAS tier re-read 2026-08-12 as PARKED → a company-side alias table (or a producer-side substitute) actually exists** · prio? **Med** —
   **K2 FID / ALIAS reconciliation tables are company-side unblocks.**
   The attribution loader's TierReconcilers seam ships empty for FID and ALIAS (facts stay
   unresolved, counted in coverage) — tier 2 needs a FID -> seal_id source and tier 4 an
@@ -1246,6 +1307,14 @@ question a 1,000-line file with the trail at the bottom could not answer.
   are co-located in Control-M FOLDER VARIABLES (env-suffixed FID_D/Q/P alongside a SEAL
   value; the SEAL is also embedded in folder names) — a FID→seal_id pairing may be
   derivable from the already-ingested variables, not only from company tables.
+  RE-READ 2026-08-12 (groom) — **the ALIAS half is a wait, not an open question, and the
+  FID half has moved a long way since this was written.** Tier 4 resolves nothing until an
+  alias table exists to reconcile against; no such source is registered, so there is no item
+  to write and nothing for a groom to decide — parked on the source existing. The FID half
+  is live and has narrowed twice this week: `K16` (census) and `K17` (the gate) own it, and
+  the 2026-08-12 SME answers moved the join off the functional id entirely
+  (`UPPER(HR_PHONE_EXP.EMP_LAST_NAME) = CM_DEF_VJOB.OWNER`, directory side normalized only),
+  which is a stronger result than the "candidate source" note above anticipated.
 
 - **`Idea-9`** · 2026-07-12 · `[idea]` · **parked → website work starts** · prio? **Low** —
   **dry-docs.com site visual language**: seed from the whitepaper's
@@ -1335,6 +1404,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-12 (desktop, second pass — "finish any non-HITL open items")** — the inbox had NO new captures (the 08-11 weekly pass consumed Idea-96..Idea-107 and the earlier 08-12 pass worked the tail), so this run did the one thing left that is not the user's: walk every OPEN and residual-clause entry, verify its state against the tree, and either finish it or say precisely what it waits on. **Promoted 1, and it did not come from the inbox:** **K24** (p2 bug) — the `fid-identity-and-scope` gate page carries TWO questions numbered **Q6**, the SME answer landed 2026-08-12 by `887a0e7` and an older, still-open application-roll-up question that was never renumbered when the new one was appended, while FOUR other files cite "Q6" by number (`config/source-mappings/psgmgr.yaml`, `config/source-registry.yaml`, `docs/k16-fid-census-company-prompt.md`, and K16's own "RUN Q6 FIRST" line). Reproduced at the groom with a scan of every file in `config/gate-prompts/` — exactly one collision in the whole tree — so the evidence is re-runnable with no database and no company data (J18). It renumbers only the entry nobody cites and adds the duplicate-id guard to `tests/unit/test_gates_json.py`; it answers nothing, which matters because K17 is the next gate walked on that page. **Fixed in place, 2 stale `inputs:` paths** (the `Idea-93` class, re-audited across all 112 non-`done` items): `G63` and `G64` cited `config/audit-fields/` as a directory when the ledger is the file `config/audit-fields.yaml`. Three refs flagged, two were typos, one (`Y4`'s `backlog/items/`) is a legitimate future output — down from fourteen at the 08-09 sweep. **Two open entries narrowed by verification rather than by a ruling:** `Idea-17` — both pre-squash branches are ALREADY GONE from origin and the stash is empty, so the destructive REMOTE decision it was raised for no longer exists; two this-machine-local relics remain. `Idea-16` — re-verified the `snyk` job is still in `ci.yml` and still gated on the missing repo secret, so it is unchanged and undischargeable by any agent. **Three residual clauses re-read as PARKED with named triggers, not open:** `Idea-20`(a) → a real `CMD_LINE` sample carrying the `ingestion-launcher` jar (a repo-wide search finds that string only in this file and the backlog text quoting it, so an item today would have no input), `Idea-20`(d) → layer-4 context-graph work starting, `Idea-10`'s ALIAS tier → an alias source existing at all. **Inboxed 1:** `Idea-108` — two abandoned agent worktrees pinned at `6c24963` are holding UNCOMMITTED work (6 and 8 changed paths, including the untracked `scripts/render_underhood_benchmark.py`), while all four `worktree-agent-*` branches are already ancestors of `main`; parked rather than swept because the standing rule is that no session touches another stream's uncommitted work, and both salvage and prune are irreversible in one direction. **Left for the user/SME: 9, unchanged** — `Idea-104`, `Idea-74`, `Idea-34`, `Idea-33`, `Idea-32`, `Idea-28`, `Idea-17` (local half), `Idea-16`, the `E1` status question in `Idea-93` — plus `Idea-108` new. Nothing here decides an ontology question: K24 is identifier hygiene on a gate page and explicitly rules nothing the gate owns.
 
 - **GROOM 2026-08-12 (desktop)** — a SMALL groom by design: the 2026-08-11 weekly pass consumed every new capture (Idea-96..Idea-107), and nothing has been captured since, so this pass worked the OPEN and PARKED tail plus one cross-check the inbox could not have produced. **Promoted 2:** both from the Control-M `DESCRIPTION` seam, both reproduced at the groom with a sample and no database (J18) so anyone can re-run the evidence. **G83** (p1 bug) — C30 ruled the description token set on 2026-08-11 and only the standards page moved: parsing a fully C30-conformant watcher description returns SEVEN findings (`FTS_ID` and `REC_ID` as unknown keys, `ENV` + both route ids + both `EMAIL_DL`s reported missing), and `G67`'s own conformance fixtures already emit `FTS_ID: FTS2`. The judgment call is written into the acceptance rather than left open: retired tokens are MARKED, never deleted, because the deployed estate still carries them and a greenfield standard cannot retroactively unwrite ~240K descriptions. **G84** — the `DD1|` sentinel from `Idea-105`'s SME resolution: today the parser reports the compliant marker itself as an `unparseable_segment`, and legacy prose containing a colon manufactures pseudo-tokens indistinguishable from a C16 team-local annotation. Fenced: a READ gate only, ratifying nothing, with the marker in ONE constant because gate `email-dl-contact-point` §G6 still rules it. **Merged 1:** `Idea-73` (the employee hierarchy) → **G74**, which was raised 2026-08-11 asking the same question from the other end; three findings ride across — O44 column 1 is a second waiting consumer, `pat:people-report` carries teams not reporting lines so it is NOT the source, and the 2026-07-23 HR-hierarchy direction was written for the COMPANY gate, which is why nothing landed here. **One dependency added:** `G77` now depends on `G84` as well as `C34` — its clause (a) registers a THEME token *inside* the `DD1|` block, and without the link two sessions implement the same sentinel differently in one file. **Left for the user/SME: 9** — `Idea-104` (which MFT route-id shape is real; G83 was written NOT to answer it), `Idea-74` (does DryDocs ingest the ServiceNow queue export, and on which side), `Idea-34`, `Idea-33`, `Idea-32`, `Idea-28`, `Idea-17`, `Idea-16`, and the `E1` status question inside `Idea-93`. **Four parked entries re-checked, none fired,** and two of them narrowed: `Idea-15`'s placement blocker is DISCHARGED (the `generic-naming` epic now exists), leaving one open user call instead of two; `Idea-38`'s class (1) is CLOSED by the 2026-08-11 authored-fixture ruling, leaving three; `Idea-25` and `Idea-27` re-verified unfired against the current tree. Nothing raised here decides an ontology question: both new items are pure-parse, zero graph writes, every token stays `proposed`.
 
