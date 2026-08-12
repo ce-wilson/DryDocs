@@ -62,6 +62,33 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-110`** · 2026-08-12 · `[doc]` · **open** · prio? **Low** —
+  **`UI-WIP/claude-design-ui-prompt.md` cites two canonical brand assets that main deleted
+  as REJECTED two and a half weeks before the doc was merged.** The doc names
+  `UI-WIP/drydocs-mark.svg` + `drydocs-mark-mini.svg` as "final vector marks" under
+  *Approved / canonical*; `d6022c3` (2026-07-28, "drop three rejected marks") removed both
+  from main, and nothing on any branch has replaced them — they resolve nowhere in the tree
+  and are not gitignored. A designer following the doc's own reference list is sent to two
+  files that do not exist, listed under the heading that says they are approved.
+  **How it got here, which is the part worth keeping:** the doc was authored 2026-07-21
+  (`d9a2eac`) on a local branch, the marks were dropped from main 2026-07-28, and the branch
+  was merged 2026-08-12 (`429d829`). The merge was textually conflict-free — one new file,
+  no collision — so nothing flagged that its CONTENT referenced files main had since
+  removed. That is the general hazard: merging a long-idle branch validates text overlap,
+  never whether the prose still describes the tree. Cheap standing check before landing an
+  idle doc branch — resolve the paths it cites.
+  **Scope check done, so this is not vaguer than it is:** 33 of the doc's referenced paths
+  resolve fine, including `kept-orbit-brand-sheet.png`, `kept-orbit-philosophy.md`,
+  `web/src/layout/shellConfig.ts`, `components/ui/EmptyState.tsx`,
+  `routes/ModuleTemplate.tsx` and the `drydocs-icons/` registry. The mark pair is the only
+  genuine miss. The rest of the doc is a 2026-07-21 snapshot of the console and reads as
+  accurate.
+  **Decide:** (a) re-point the two lines at whatever the current mark is, if one exists
+  outside the tree; (b) mark the brand-asset bullet superseded and say the mark is unsettled;
+  or (c) leave it and reclassify the whole file as a dated record rather than a usable
+  starting prompt — in which case its header should say so, since it currently reads as
+  live instructions ("Copy everything below the line into Claude Design UI").
+
 - **`Idea-109`** · 2026-08-12 · `[bug]` · **open — the render ritual is FIXED same day; only the residue below remains** · prio? **Low** —
   **FIX 2026-08-12 (this desktop).** New `drydocs_core/repo_paths.py` — `repo_root(fallback)`
   climbs from the cwd to the nearest enclosing `.git` (an `.exists()` test, because a
