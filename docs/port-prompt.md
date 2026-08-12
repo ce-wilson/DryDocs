@@ -675,6 +675,32 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   a real producer defect inside this very range, when the step-134 ledger roll
   backticked three module paths in an abbreviated form that did not exist. Backticks
   are an existence claim on both sides.
+- **THE TWO COMPANY-ONLY SUPPLEMENTS ARE NOT A PAIR, and treating them as one is how
+  the wrong one gets dropped** (split 2026-08-11; the earlier framing, in G59's notes,
+  lumped them as "two supplements the producer does not run"). Producer's chain is five
+  — ontology / seal / catalog / registry / sosa — re-verified against the tree at this
+  split, not taken from the note. The company's two are in OPPOSITE states:
+  **`resource_pools_supplement` — LIVE and company-only.** It declares the
+  `:ResourcePool` ontology, the `:CONSUMES_FROM_POOL` term and the
+  `resource_pool_name` constraint, and it backs `controlm_quantitatives`, which is
+  wired solely into the company's `ingest-controlm-xml`. It MUST be in your chain, or
+  in your `CHAIN_EXCLUSIONS` with a written reason — G59's own warning is that adopting
+  `apply-supplements` as the one chain without adding it drops the supplement silently
+  and whatever MATCHes its terms goes quiet.
+  **`platforms_supplement` — RETIRED, and a no-op.** T12 ruled SUPERSEDE (2026-07-21):
+  the AIS layer is superseded by the software-registry model, role over class. Seeds are
+  commented out and audit-kept, so the verb is a NO-OP on a fresh graph and is no longer
+  a prerequisite for the Control-M app-code step. It belongs in `CHAIN_EXCLUSIONS` WITH
+  ITS REASON, not in the chain — an excluded-with-reason retired supplement and a
+  silently-absent live one look identical from the chain's point of view, which is
+  precisely what G59's written-reason requirement exists to separate.
+  **Why the producer has neither, and why that is correct rather than a gap:** the
+  producer XML path (`controlm_xml.py` staging + `resolve-cmdline-staging`) writes ZERO
+  graph by construction, so it can never need the pools supplement. Producer does carry
+  the classifier half — `drydocs_core/orchestration/controlm/resource_pool.py` (G76),
+  mechanism-only with an empty rule table — and stops there deliberately: the loader
+  writes `:ResourcePool` / `:CONSUMES_FROM_POOL`, and minting those labels is HITL-gate
+  territory, not a back-flow.
 - README.md: company one-line footer stays (producer's lives at internal/repo-README.md).
 - .github/**: adapt-rather-than-adopt — company CI/workflow config wins.
 - config/dev-environment.yaml: canonical-company on BOTH manifests since
@@ -1199,7 +1225,7 @@ OWED COMPANY-SIDE:
 | T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending (producer belief, as of 2026-08-01) |
 | T15 | G33 company code-graph load: run YOUR post-U6 `snapshot.ps1` (snapshot `*.json` is never-port BOTH ways; primary on-main checkout, never a worktree) → `drydocs load-code-snapshot` into your graph; second `:Project` root is INTENDED (gate §B3(a)); rides with the Tier A ratification entry (guardrail 6) | pending (producer belief, as of 2026-08-01) |
 | T16 | CM_DEF_VJOB_DETAIL built for real in psgmgr — retires the G39 staging stand-in as the feed (G40 parse stays as cross-check); premise correction folded into G22 prep. NOTE step 49g: if the XML export becomes a standing feed, this retirement gains a SECOND path — the unruled precedence question decides, not the port | pending (producer belief, as of 2026-08-01) |
-| T17 | AIS platform supplement follow-through (company-local; NO producer payload): (1) the back-flow REFUSAL — producer grounds formalized in `87ba693` (premise false: producer has no AIS layer; C12 took the direct route); (2) apply-platforms-supplement disposition (fold/delete/keep); (3) ais_* constraint CREATEs vs commented seeds on the scheduler_kind precedent, with EXPECTED_CONSTRAINTS arithmetic written in; (4) commit the company-local cli.py wording fix before the next port branch. One fact owed back: are any company Neo4j environments carried forward rather than rebuilt from bootstrap? | pending (producer belief, as of 2026-08-01) |
+| T17 | AIS platform supplement follow-through (company-local; NO producer payload): (1) the back-flow REFUSAL — producer grounds formalized in `87ba693` (premise false: producer has no AIS layer; C12 took the direct route); (2) apply-platforms-supplement disposition (fold/delete/keep); (3) ais_* constraint CREATEs vs commented seeds on the scheduler_kind precedent, with EXPECTED_CONSTRAINTS arithmetic written in; (4) commit the company-local cli.py wording fix before the next port branch. One fact owed back: are any company Neo4j environments carried forward rather than rebuilt from bootstrap? | **(2) DISPOSITION SETTLED 2026-08-11 (SME): the verb is DEPRECATED-IN-PLACE — no-op on a fresh graph, seeds commented out and audit-kept, kept in the sequence only for old-graph deprecate-in-place, optional to run. It belongs in `CHAIN_EXCLUSIONS` WITH ITS REASON, not in the chain (see the supplements bullet in the divergence ledger). Clauses (1), (3) and (4) remain producer belief as of 2026-08-01.** |
 | T18 | Depgraph fork capability catch-up (owed action 48e, PORT-REPORT-94132c80): your separately-owned depgraph fork lacks the U6 multi-root resolver (and `--tree`), and the producer remote is unreachable from it, so the port could not remediate. Until it catches up, `config/dev-environment.yaml` keeps `depgraph.capability_assert: false` (test skips, owed action recorded). When it gains the capabilities: flip the flag true and your `snapshot.ps1` refusal guard goes live | pending (producer belief, as of 2026-08-01) |
 | T19 | N3–N6 LOAD-MAP adoption gate — **narrowed 2026-08-01**: registry v2 is ADOPTED (N9 full-adopt at PORT-REPORT-57914bf4), so this row now covers ONLY the N3 class-declaration derivation, the N4/N5 renders and N6. The id-collision blocker is resolved by the v2 rename (`pat:product-catalog` / `pat:people-report`); what remains is the sourceless company-only loaders. Company `cli.py` still has no `COMMAND_LOADERS`/`CANONICAL_LOAD_SEQUENCE` and the load-map pair stays out of the company board render until this rules | pending (producer belief, as of 2026-08-01) |
 
