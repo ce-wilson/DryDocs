@@ -1041,6 +1041,59 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-12",
+      "title": "GATE: vocabulary-domains-and-id-policy — SIGNED OFF, 19/19",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml",
+        "config/gate-prompts/seal-tom-attribution-reshape.yaml",
+        "config/gate-prompts/software-version-context.yaml",
+        "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
+      ],
+      "log_ref": "config/gate-log.md:2963",
+      "unblocks": [
+        "K3",
+        "K7",
+        "K21",
+        "G22",
+        "G23",
+        "G35",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57",
+        "G58",
+        "C25",
+        "Z2",
+        "J43",
+        "C33",
+        "K22",
+        "G87",
+        "G88",
+        "G89",
+        "G91"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-12",
+      "title": "GATE: remediation-fix-tracking — SIGNED OFF, 10/10",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/controlm-q1q3-phase1.yaml",
+        "config/gate-prompts/envelope-property-terms.yaml",
+        "config/gate-prompts/remediation-fix-tracking.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3028",
+      "unblocks": [
+        "M4",
+        "N1",
+        "G90"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1154,17 +1207,6 @@
         "J32",
         "K24"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "remediation-fix-tracking (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/remediation-fix-tracking.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     },
     {
       "kind": "prompt-only",
