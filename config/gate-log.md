@@ -2873,3 +2873,38 @@ INDIVIDUAL one. **If so the RULING stands — G16 is OPTIONAL either way — but
 the other row**, and an Individual-scoped SRE is a per-person holding like the other Individual
 roles rather than something derived from a group name. Flagged, not ruled; no register line moves
 and the gate is not reopened.
+
+## 2026-08-11 — CLOSE-OUT of the G35 residuals: G16 stands, G5 closed, and one recorded revisit trigger
+
+**Gate:** `tom-roles-enumeration-and-cardinality` (G35) · **SIGNED OFF; both remaining residuals now
+closed.** No register line moves and no ruling changes. This entry exists so the residuals do not
+outlive the gate as open questions nobody owns.
+
+- **G16 STANDS AS RULED — OPTIONAL.** SME 2026-08-11: *SRE depends on how teams implement it; G16
+  stands for us as far as I know, but if something changes it would require a revisit.*
+  **The two catalog rows are not a contradiction to resolve — they are both live**, and which one an
+  application uses is a per-team implementation choice. So the earlier framing was wrong to treat it
+  as "which one did we mean": the answer is both, and the register does not have to choose.
+  **CONSEQUENCE FOR G70, and it makes the build simpler rather than harder: seed BOTH rows** — the
+  Individual-scoped Site Reliability Engineer and the Group-scoped SRE/DevOps incident-resolver team
+  — each with its own `scope` from the catalog. A team that changes how it implements SRE then moves
+  DATA, not VOCABULARY, which is the whole point of §F's "the vocabulary becomes data" direction.
+  A register that had picked one would need re-ruling every time a team reorganised.
+- **THE REVISIT TRIGGER, recorded rather than left as "we'll see"** — the repo grooms on stated
+  triggers, and an unstated one is an omission with better wording. **Revisit G16 when the HOLDER
+  SHAPE FLIPS for an application DryDocs supports** — an SRE accountability that was a named person
+  becoming a shared team, or the reverse. Two known reasons that could cause it, both from the SME:
+  SRE alignment differing across LOBs, and the in-flight consolidation of the support teams (see the
+  rounds 2–3 entry). Neither is a defect; both are ordinary reorganisation, and the model should
+  absorb them without a gate. If one ever forces a gate, that is itself the finding.
+- **G5 CLOSED on evidence already in hand.** The residual asked whether a SEAL-risk ↔
+  ServiceNow-group mapping exists. **It does not, and it cannot**: the catalog shows Technology Risk
+  & Controls at **Individual** scope, so there is no group to map to. The ruling is unchanged and now
+  unconditional — crosswalk `Risk Manager` to `technology_risk_controls` (§A2) and stop. No group
+  resolution is designed for it, and none is missing.
+
+**Three residuals remain from the sign-off and are NOT closed here**, each because it belongs
+elsewhere rather than because it is unresolved: `tom-subject-class` (answered by the API evidence —
+TOM rows exist at every level of the chain, so the subject is whichever CI the row sits on); the
+region / coverage-window qualifier (a candidate for a future gate, not this one); and the replica's
+unconfirmed completeness (K21 Q9 — it touches counts, and every ruling here is about shape).

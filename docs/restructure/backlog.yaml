@@ -9911,6 +9911,16 @@ items:
       design_authority, backup_application_owner. OPTIONAL = the three Operate Manager classes,
       chief_business_technologist, deployment_owner, deployment_information_owner,
       application_module_owner, and site_reliability_engineer.
+      SEED BOTH SRE ROWS (SME 2026-08-11): the catalog carries Site Reliability Engineer at
+      INDIVIDUAL scope AND an SRE/DevOps incident-resolver team at GROUP scope, and which one an
+      application uses is a PER-TEAM IMPLEMENTATION CHOICE. Seed both, each with its own scope
+      from the catalog, so a team that reorganises moves DATA rather than VOCABULARY. A register
+      that picked one would need re-ruling every time a team changed shape.
+      AND READ THE REGISTER MARKER RATHER THAN RECONSTRUCTING IT: the catalog's own description
+      text labels the SEAL-sourced rows ('... from SEAL'), which IS the two-register mapping §A
+      asked for. Read it and verify; do not derive it. Note `type` is weakly populated (mostly
+      'other'), so it is not a reliable classifier on its own, and most of the 83 rows are out of
+      scope — MARK those rather than dropping them, so the file's coverage stays legible.
       SRE IS A SPECIAL CASE — AMENDED 2026-08-11 after the sign-off, see the gate-log amendment.
       It is OPTIONAL *and DERIVED*: an SRE team serves 1:many applications (roughly 20-60), so it
       is a shared function pointing at many apps rather than a per-application holding, and its
