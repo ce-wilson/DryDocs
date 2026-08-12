@@ -96,8 +96,13 @@ depgraph:
   # Note WHY the probe below could not have caught the drift: both revisions
   # pass it, because the new commits add edge TYPES rather than a capability.
   # The pin is therefore the only check on instrument currency, and keeping it
-  # current is a maintenance obligation, not a formality. Nothing yet compares
-  # the checkout against this value automatically — that gap is in IDEAS.md.
+  # current is a maintenance obligation, not a formality. STALE CLAUSE STRUCK
+  # 2026-08-11: this used to end "nothing yet compares the checkout against this
+  # value automatically — that gap is in IDEAS.md". It was closed the same
+  # session it was raised — snapshot.ps1 reads `expected_commit` here and warns
+  # on ahead/behind/unknown (and it fired correctly tonight on an unfetched
+  # pin). Left as a struck note rather than deleted because the sentence had
+  # already misled a reader into believing the drift was unwatched.
   expected_branch: main
   # PIN BUMPED 2026-08-09 (U19): a56d2fc -> 6ee0af6, same main, clean
   # descendant. The extractor now resolves bare-name imports against the

@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T13:19:14",
+    "captured_at": "2026-08-11T23:16:39",
     "date": "20260811",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "d05811a",
-      "full": "d05811a11c47cfc20ef0623f7b609ed63e3455e8",
+      "commit": "b5c03f1",
+      "full": "b5c03f14f5dc375c2bb85c29f9e5c5e9ec9a3ba7",
       "branch": "main",
-      "describe": "port-base-20260810b-59-gd05811a",
-      "subject": "inbox(guards): Idea-86 ΓÇö no guard asserts a PORT-MANIFEST path exists, and the override-ordering check is hardcoded",
-      "dirty": true,
+      "describe": "port-base-20260811-18-gb5c03f1",
+      "subject": "docs(port): RELAY-9 — the PAT alignment column is 'Relationship Type', and 'Team Type Name' is a decoy",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -7604,6 +7604,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0012-data-named-load-surface.md",
+      "name": "0012-data-named-load-surface.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0012-data-named-load-surface.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/README.md",
       "name": "README.md",
       "extension": ".md",
@@ -9935,15 +9944,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -9960,15 +9960,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10923,24 +10914,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -13706,10 +13679,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-1252.json",
-      "name": "drydocs-20260811-1252.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "name": "drydocs-20260811.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-1252.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25452,6 +25425,11 @@
     [
       "drydocs/docs/decisions",
       "CONTAINS",
+      "drydocs/docs/decisions/0012-data-named-load-surface.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
       "drydocs/docs/decisions/README.md"
     ],
     [
@@ -26247,22 +26225,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -26323,16 +26291,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -28707,7 +28665,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-1252.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -30699,13 +30657,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1659,
+    "files": 1660,
     "edges": 906,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1930,
-    "directories": 272
+    "rels": 1927,
+    "directories": 268
   }
 }
