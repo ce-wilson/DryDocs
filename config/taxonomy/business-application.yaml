@@ -18,7 +18,7 @@
 # they were synthetic — verified against the SEAL portal by the SME. They have been
 # replaced with values from the RESERVED SYNTHETIC BLOCK 70001-70099, which SEAL does
 # not issue. The same real ids were embedded inside Control-M folder-name strings
-# (e.g. the numeric segment of PR[app]G-[DataArea]-<sealid>-...), which is why the earlier
+# (e.g. the numeric segment of PRARAG-HLDM-<sealid>-...), which is why the earlier
 # sample cleanup (9d59f53, "samples now synthetic-only") missed them: it searched for
 # the seal_id COLUMN, not for the value inside a composite string.
 #

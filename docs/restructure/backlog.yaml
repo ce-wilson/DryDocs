@@ -6894,7 +6894,15 @@ items:
       widens the term list the user must rule on beyond the SEALIDs J14/J15 already swept,
       to FOUR value classes deliberately left untouched by the 2026-07-27 sweep:
       (1) platform tokens (`HLDM`, `PRARAG`, `svc.hldm`, `/opt/scripts/hldm/`,
-      `host-hldm-01`); (2) datacenter codes — and note
+      `host-hldm-01`) — RULED 2026-08-11, SME: AUTHORED FIXTURE NAMES, NO SWEEP OWED. Class (1)
+      is CLOSED; the recorded ruling lives in internal/standards/technology/folder-naming-convention.md
+      beside the J15 realness table, because that table replaced the NUMERIC segments inside these
+      folder names and reading it alone suggests the surrounding tokens were left by oversight. They
+      were not — the ids were the real part and they are gone. A sweep of the tokens was proposed the
+      same day and stopped by the ruling: `PRARAG` sits in ~36 files including the bundled sample
+      corpus, the lineage fixtures and FIVE tests that assert on it literally, so removing an authored
+      name would have rewritten the corpus and broken the parser's own pins. The remaining THREE
+      classes are still user-gated; (2) datacenter codes — and note
       `knowledge/standards/technology/data-center-naming-convention.md` carries real DC
       codes AND a real app code, same class and same sibling directory, out of J14's scope
       by accident of scoping rather than by decision; (3) schema/table/column identifiers

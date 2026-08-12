@@ -153,6 +153,41 @@ keys with no external meaning — no SEAL/roster/credential semantics, join to
 nothing outside psgmgr — so they were allowlisted in the guard rather than
 resweeped. If the SME disagrees, flip the guard allowlist entries to a resweep.
 
+**PLATFORM TOKENS — RULED 2026-08-11, SME: `PRARAG-HLDM` IS AN AUTHORED FIXTURE
+NAME.** This closes the first of the four value classes J13's notes recorded as
+"deliberately left untouched by the 2026-07-27 sweep" and needing a user ruling.
+The tokens `PRARAG` and `HLDM` — and the sample-corpus values derived from them,
+`svc.hldm`, `/opt/scripts/hldm/`, `host-hldm-01` — are **authored, not captured**.
+No sweep is owed and none should be run.
+
+*Why this is worth a recorded line rather than silence.* The J15 table above
+replaced the **numeric segments** inside these folder names (85025 → 70011,
+94028 → 70012, 90001 → the block) because those were real or real-shaped SEAL
+ids. The surrounding tokens were left, and reading the table alone it is easy to
+infer they were left by oversight. They were not: the ids were the real part and
+they are gone. Corroborated independently — the backlog records "PRARAG fixture
+name already public" as the basis for committing a screenshot of the
+controlm-ingestion-tdd render.
+
+*What this prevents.* `PRARAG` appears in ~36 files across config, docs, loaders,
+the folder-name parser, five tests that assert on it literally, the bundled
+sample CSVs, the lineage fixtures, internal/, knowledge/, UI-WIP and the web demo
+data. A sweep would rewrite the sample corpus, break the tests that pin the
+parser's behaviour, and require a new synthetic prefix plus registry rows — all
+to remove a name nobody captured. That sweep was proposed on 2026-08-11 and
+stopped by this ruling.
+
+*One consequence, applied the same day.* A scrub of the token from
+`config/taxonomy/business-application.yaml`'s header comment (commit `f6b4285`)
+was **reverted**: it left the prose reading `PR[app]G-[DataArea]` while
+`config/taxonomy/controlm.yaml` carried the literal two directories away, which
+is worse than either state alone. The header now names the fixture family as the
+rest of the tree does.
+
+*Still unruled — the other three classes J13 named:* datacenter codes,
+schema/table/column identifiers, and the fourth in that list. This ruling covers
+platform tokens ONLY and should not be read as disposing of the rest.
+
 ## Real worked example (name-embedded SEAL)
 
 Folder `PRARAG-HLDM-89211-MLCM-ORIG-CRM-TRUST-DLY` (SMART, P032-E0700-DMA):
