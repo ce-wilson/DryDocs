@@ -41,7 +41,7 @@ def _package(equivalent: bool = True, owner: str | None = "Synthetic Dev Team"):
                 message="dot-smuggling",
             )
         ],
-        proof=EquivalenceReport(equivalent=equivalent, compared_jobs=1),
+        proof=EquivalenceReport(equivalent=equivalent, compared_jobs=1, proven_jobs=1),
         greenfield_artifact=Path("greenfield-sample.yaml"),
         owner=owner,
         scope="Folder: FOLDER-SYNTH-SAMPLE-DLY  Job: JOB0001_SAMPLE_FW",
@@ -55,7 +55,7 @@ def test_render_is_pure_and_deterministic() -> None:
     assert body1 == body2
     assert "[R1] should-fix" in body1
     assert "UNRATIFIED (warn-only)" in body1
-    assert "Offline equivalence: PASS (1 job(s) compared)" in body1
+    assert "Offline equivalence: PASS (1/1 job(s) proven)" in body1
     assert "[ ] Greenfield resolves to the baseline filename" in body1
 
 

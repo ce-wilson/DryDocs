@@ -91,10 +91,23 @@ def render_handoff(package: HandoffPackage) -> str:
         lines.append(package.change_summary)
         lines.append("")
     lines.append("-- Equivalence evidence " + "-" * 28)
-    verdict = "PASS" if package.proof.equivalent else "NOT PROVEN"
-    lines.append(f"Offline equivalence: {verdict} ({package.proof.compared_jobs} job(s) compared)")
+    # three-valued verdict (defect B′): DIVERGED and NOT PROVEN are different
+    # failures — one is evidence of breakage, the other is absence of evidence,
+    # and the reviewer must see which they are looking at.
+    if package.proof.equivalent:
+        verdict = "PASS"
+    elif package.proof.divergences:
+        verdict = "DIVERGED"
+    else:
+        verdict = "NOT PROVEN"
+    lines.append(
+        f"Offline equivalence: {verdict} "
+        f"({package.proof.proven_jobs}/{package.proof.compared_jobs} job(s) proven)"
+    )
     for d in package.proof.divergences:
         lines.append(f"divergence: {d}")
+    for np in package.proof.not_proven:
+        lines.append(f"not proven: {np}")
     lines.append("")
     if package.acceptance:
         lines.append("-- Acceptance criteria " + "-" * 29)
