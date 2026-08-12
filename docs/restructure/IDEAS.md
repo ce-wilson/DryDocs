@@ -116,7 +116,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   from their own `__file__`; or refuse to write outside the caller's worktree. Related to
   `Idea-108`, which is the wreckage this behaviour left behind.
 
-- **`Idea-108`** · 2026-08-12 · `[chore]` · **open — one destructive step left; the salvage half is DONE** · prio? **Med** —
+- **`Idea-108`** · 2026-08-12 · `[chore]` · **closed — salvaged, then pruned under user ruling, same day** · prio? **Low** —
+  **CLOSED 2026-08-12.** User ruled "prune worktrees + branches" once the salvage below
+  made it safe. Executed on this desktop after a final re-verification that all four
+  untracked files were byte-identical to their committed captures and all four branches
+  were ancestors of `main`: both `.claude/worktrees/agent-*` trees removed,
+  `git worktree prune` run, and all four `worktree-agent-*` branches deleted
+  (`6c24963` ×2, `23e14bb` ×2). `git worktree list` now reports only the main checkout and
+  no `worktree-agent-*` branch remains. Nothing unique was lost — the content lives in
+  `o31-ALPHA.diff` / `o31-BETA.diff`, committed and pushed first.
   **UPDATE 2026-08-12 (this desktop): the "both directions are destructive" dilemma is
   resolved, because there was a third, non-destructive direction — finish the capture.**
   The two worktrees are the ALPHA/BETA tracks of the `results-sonnet` O31 coding
