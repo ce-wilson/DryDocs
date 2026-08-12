@@ -50,6 +50,28 @@ Everything since `v0.3.0` (2026-07-09). Not yet cut as a release; the version in
   drift-guarded dev topology; PORT-MANIFEST.yaml as the machine-readable port authority;
   Essential GraphRAG lexical load + traversal experiment [Q1–Q2].
 
+### Fixed
+
+- **A render run from a git worktree no longer writes into the main checkout
+  [Idea-109].** `drydocs` is installed editable — a `drydocs.pth` pinned at the main tree
+  — so modules that anchored their default paths on `Path(__file__)` named the main tree
+  from anywhere, and `python scripts/render_board.py` puts `scripts/` on `sys.path[0]`
+  without the cwd, so a worktree's own `drydocs/` was never shadowed in. The damage was
+  *partial*, which is what made it silent: the five sibling scripts `render_board.py`
+  invokes anchor on their own `__file__` and wrote to the worktree correctly, while
+  `board.html`, `ideas.html` and `roadmap.html` routed through the installed package and
+  landed in main — one command, one torn render, two trees, and the worktree left clean.
+  Two agents hit this independently on 2026-08-11. New `drydocs_core/repo_paths.py`
+  resolves the checkout containing the cwd (nearest enclosing `.git`, validated as a
+  DryDocs tree so a sibling or parent repo can never capture the paths) and falls back to
+  the old `__file__` anchor whenever the cwd is outside a checkout, so installed-package
+  consumers are unaffected. Adopted by `plan_board`, `plan_ideas` and `plan_roadmap`;
+  package-internal resources such as `drydocs_core/schema/*.cypher` deliberately keep the
+  `__file__` anchor, since those travel with the package. `tests/unit/test_repo_paths.py`
+  drives a real `git worktree` through a real render and asserts the main tree comes back
+  byte-identical — verified to fail without the fix. The remaining `_REPO_ROOT` sites
+  outside the render ritual are catalogued in `Idea-109` and not yet converted.
+
 ### Changed
 
 - **One verified `apply-supplements` verb replaces the five per-file supplement verbs

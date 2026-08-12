@@ -62,7 +62,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-109`** · 2026-08-12 · `[bug]` · **open** · prio? **High** —
+- **`Idea-109`** · 2026-08-12 · `[bug]` · **open — the render ritual is FIXED same day; only the residue below remains** · prio? **Low** —
+  **FIX 2026-08-12 (this desktop).** New `drydocs_core/repo_paths.py` — `repo_root(fallback)`
+  climbs from the cwd to the nearest enclosing `.git` (an `.exists()` test, because a
+  worktree root carries a `.git` *file*, not a directory), validates it as a DryDocs
+  checkout via `drydocs/__init__.py` + `pyproject.toml`, and otherwise returns the caller's
+  old `__file__` anchor. It stops at the first `.git` whether or not that repo validates,
+  so neither the `depgraph` sibling nor an unrelated parent repo can capture the paths, and
+  installed-package consumers outside any checkout behave exactly as before. Adopted in
+  `plan_board`, `plan_ideas`, `plan_roadmap` — the three that route through the installed
+  package. Guard: `tests/unit/test_repo_paths.py`, 13 tests, including one that drives a
+  **real** `git worktree` through a **real** `scripts/render_board.py` and asserts main
+  comes back byte-identical; **verified to fail without the fix** with exactly the original
+  symptom (`wrote C:\coding\projects\DryDocs\docs\plan\board.html` from a worktree cwd).
+  Suite 1961 passed / 5 skipped. **What the fix also corrected in the diagnosis below:** the
+  damage was never "everything goes to main", it was a **torn render** — the five sibling
+  scripts `render_board.py` invokes (`render_gates`, `render_enforcement_matrix`,
+  `render_load_map`, `render_software_registry`, `render_context_types`) resolve out of the
+  worktree's own `scripts/` and anchor on their own `__file__`, so *those* were always
+  correct; only the three package-routed outputs went to main. Half the render in each tree
+  is why nobody noticed. **RESIDUE, still open:** ~17 other `_REPO_ROOT`/`REPO_ROOT` sites
+  share the raw `Path(__file__)` pattern (`gate_pages`, `graph_verify`, `review_labels`,
+  `source_mappings`, `seal_samples`, `port_preflight`, the four `drydocs/loaders/*`,
+  `drydocs_core` `precedence`/`source_registry`/`manual_mappings`/`mapping_store`,
+  `orchestration/crosswalk`+`shell`, `ontology/schema_graph`). They are NOT all bugs — the
+  rule is that repo-*content* paths follow the caller while package-*internal* resources
+  (e.g. `drydocs_core/schema/*.cypher`) rightly follow `__file__` — so each needs that
+  one-line judgement, which is why this was scoped to the ritual rather than swept.
+
+  <!-- original diagnosis, kept for the trail: -->
+
   **A worktree-isolated agent that runs the session-end render ritual writes its output
   into the MAIN repo, not its own worktree.** Both `results-sonnet` tracks hit this
   independently within the same half hour on 2026-08-11 and both recovered, which is why

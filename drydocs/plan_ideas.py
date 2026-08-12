@@ -28,8 +28,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from drydocs.design_doc import render_body
+from drydocs_core.repo_paths import repo_root
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+# Caller's checkout, not the installed package's — see plan_board / Idea-109.
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_IDEAS_PATH = _REPO_ROOT / "docs" / "restructure" / "IDEAS.md"
 DEFAULT_IDEAS_OUT_PATH = _REPO_ROOT / "docs" / "plan" / "ideas.html"
 

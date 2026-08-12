@@ -31,7 +31,12 @@ from typing import Any
 
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+from drydocs_core.repo_paths import repo_root
+
+# Resolve the checkout the CALLER is in, not the one this file was installed from —
+# the editable install pins ``__file__`` to the main tree, so a worktree run would
+# otherwise read main's backlog and write main's board (Idea-109).
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_BACKLOG_PATH = _REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
 DEFAULT_BOARD_PATH = _REPO_ROOT / "docs" / "plan" / "board.html"
 
