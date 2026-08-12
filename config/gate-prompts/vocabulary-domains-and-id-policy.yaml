@@ -1,0 +1,123 @@
+# SME gate-prompt spec — relationship-vocabulary domain names, id-prefix
+# policy, and planned-entry dispositions. GATE-BOUND: this page PROPOSES;
+# nothing is renamed, retired, or built by rendering it.
+#
+# THE GAP (raised 2026-08-12, vocabulary review before ratification): the
+# vocabulary's domain axis still carries source-system names — `controlm`
+# (the domain is really the scheduler/orchestration tier; AutoSys and Airflow
+# edges would file here via the BMC-baseline crosswalk) and `seal` (the
+# canonical node label is already :BusinessApplication; SEAL is one company's
+# registry name). The header enum at 00-header.yaml is stale (missing
+# registry/docs/quality), there is no `human` domain even though
+# Employee/Membership/Attribution edges exist, and the id prefixes (m3_, p2_,
+# m7_, u1_, g22_, c23_) are undocumented historical epic/gate tags with no
+# scheme. Separately, 30 entries sit `planned` — some gate-held, some ruled
+# elsewhere, ~14 never ruled at any gate.
+#
+# WHAT A DOMAIN IS HERE: a file/loader partition on vocabulary entries —
+# NOT rdfs:domain (from_node/to_node carry that), NOT the BDAT layer
+# (human|business|data|technology on source-registry SYSTEM rows), and NOT a
+# node label (ControlM* labels stay vendor-prefixed per ADR 0003/0008; the
+# vendor-neutral layer remains the crosswalk-to-baseline).
+#
+# WHAT AN ID IS HERE: a permanent join key across four ledgers — the
+# taxonomy-ontology-map fragments, the generated schema_graph.cypher
+# (r.vocab_id), the SQLite mapping mirror, and the APPEND-ONLY gate log —
+# so existing ids are never renamed in place; migration is add-new +
+# deprecate-old, and it is deferred to a scoped tech-debt cleanup.
+#
+# Mechanism-only: domain strings, id conventions, status dispositions; no data values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: vocabulary-domains-and-id-policy
+title: "SME Gate — vocabulary domain renames (scheduler, business_application, human), id-prefix policy, and planned-entry dispositions"
+step: "Vocabulary ratification (pre-remediation-loader) — renames the domain partitions to tool-agnostic names, rules the id convention for NEW entries, registers the human domain, and ratifies or retires every never-ruled planned entry"
+summary: >
+  Three coupled rulings. FIRST, domains: `controlm` becomes `scheduler` (the
+  partition is the scheduler tier, not one vendor — AutoSys/Airflow edges map
+  onto the same baseline concepts, so they file in the same domain; node
+  labels keep their vendor prefixes per ADR 0003/0008) and `seal` becomes
+  `business_application` (matching the canonical :BusinessApplication label
+  and the standalone-template goal); `human` is registered for people/org
+  edges (none move yet); the stale header enum is corrected. SECOND, ids:
+  new entries take a domain-derived prefix (scheduler_*,
+  business_application_*, human_*); status is NEVER encoded in an id (a
+  planned_ prefix would force a rename at every lifecycle flip); existing
+  epoch-tag ids (m3_, p2_, ...) stay valid and are force-migrated later in a
+  scoped tech-debt cleanup (add-new + deprecate-old across all four ledgers).
+  THIRD, dispositions: the ~14 planned entries never ruled at any gate are
+  walked one by one — keep-planned (build still intended) or deprecate
+  (retired unbuilt, kept as audit); the 16 already gate-held or gate-ruled
+  entries are RECORDED, not re-ruled. Nothing below is applied until ticked
+  and transcribed to config/gate-log.md.
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/ fragments + 00-header.yaml) + config/schemas/relationship-vocabulary.schema.json + docs/RELATIONSHIP_GUIDE.md"
+  Source: "the 13-fragment registry (89 entries: 50 active / 30 planned / 9 deprecated) read via drydocs_core/yaml_fragments.py"
+  Registry ref: "no source-registry change — the BDAT layer field (human|business|data|technology, gate source-registry-v2) is a different axis and is untouched"
+  Classification: "Internal-Public (domain strings, id conventions; no data values)"
+  Vocabulary: "renames the domain PARTITION values only; every id, neo4j_label, from/to node, status, and note is unchanged by §A"
+  Precedent: "C15 (inverse_label is presentational, not semantic — domain is likewise partition metadata) · ADR 0003/0008 (vendor-prefixed node labels; neutrality earned by the crosswalk, not asserted by a name) · K2/G55 flips-are-follow-ups (a gate authorizes; the status flip is a separately-logged commit) · 00-header lifecycle (deprecated keeps the entry as audit)"
+  Source of record: "config/gate-log.md (transcription target) · docs/RELATIONSHIP_GUIDE.md · 00-header.yaml field spec"
+
+mapping:
+  - n: 1
+    element: "domain: controlm (27 entries, 40-local-controlm.yaml)"
+    target: "PROPOSED: domain: scheduler; fragment renamed 40-local-scheduler.yaml (sort order preserved). PRE-RULED by the SME 2026-08-12 in-session; presented for confirmation and transcription"
+    edge: "domain partition rename  [§A1]"
+  - n: 2
+    element: "domain: seal (10 entries, 41-local-seal.yaml)"
+    target: "PROPOSED: domain: business_application; fragment renamed 41-local-business-application.yaml. PRE-RULED 2026-08-12"
+    edge: "domain partition rename  [§A2]"
+  - n: 3
+    element: "the human domain"
+    target: "PROPOSED: registered in the enum + JSON schema; no entries move now — relocation of the Employee/Membership/Attribution entries rides the id tech-debt cleanup. PRE-RULED 2026-08-12"
+    edge: "domain registration  [§A3]"
+  - n: 4
+    element: "id prefixes for NEW entries"
+    target: "PROPOSED: domain-derived prefix (scheduler_*, business_application_*, human_*, and the existing catalog_/arch_/reg_/docs_/doc_ conventions); status never encoded in an id; existing epoch-tag ids unchanged until the tech-debt migration"
+    edge: "id convention  [THE DECISION — §B]"
+  - n: 5
+    element: "the ~14 never-ruled planned entries"
+    target: "PROPOSED per-entry keep-planned or deprecate (§C1 walk); the 16 gate-held / gate-ruled planned entries recorded as-is (§C2)"
+    edge: "planned dispositions  [THE DECISION — §C]"
+
+provenance:
+  - label: "vocabulary entries (all 89; §A touches only the domain string on 37 of them)"
+    source_object: "drydocs_core/ontology/relationship_vocabulary/ fragments, concatenated by yaml_fragments.py (sorted filename order — the renames keep the numeric prefixes, so order is stable)"
+    key: "entry id (permanent; the four-ledger join key — untouched by every section of this page)"
+    loader: "~ (registry-only change; schema_graph.cypher regenerates, the SQLite mirror rebuilds from its content hash)"
+    properties:
+      - {name: domain, origin: derived, from: "the fragment partition", note: "renamed by §A on the scheduler and business_application fragments; consumed only by the schema-graph renderer, the SQLite mirror, and (after this gate) a JSON-schema enum"}
+      - {name: id, origin: derived, from: "the entry author", note: "convention ruled in §B for NEW entries only; existing ids are append-only audit joins and migrate later (tech-debt item)"}
+      - {name: status, origin: derived, from: "the lifecycle (00-header)", note: "§C flips are follow-up commits citing this gate (K2/G55 pattern); deprecate keeps the entry with deprecated_at + deprecation_note"}
+
+sections:
+  - title: "A. Domain renames (pre-ruled 2026-08-12 — confirm for the record)"
+    confirmations:
+      - "A1: domain controlm -> scheduler on all 27 entries of 40-local-controlm.yaml; the fragment becomes 40-local-scheduler.yaml. The partition is the scheduler tier, tool-agnostic: AutoSys/Airflow map to the BMC baseline via the confirmed crosswalks, so their edges file HERE. Node labels (ControlMJob, ControlMFolder, ...) keep their vendor prefixes — ADR 0003 rule 4 / ADR 0008 are unchanged, and the retired :Scheduler/:SchedulerKind node concept (Q3 closed, C12) stays retired: this is a lowercase partition string, not a label."
+      - "A2: domain seal -> business_application on all 10 entries of 41-local-seal.yaml; the fragment becomes 41-local-business-application.yaml. Matches the canonical :BusinessApplication label (K4) and the standalone-template goal; SEAL remains the company instance name in internal twins."
+      - "A3: `human` is registered in the domain enum (header + JSON schema) for people/org edges — the G74 :Employee spine files there when it lands. No existing entries move now: the Employee/Membership/Attribution entries in business_application/catalog keep their ids and fragments; relocation rides the §B tech-debt cleanup."
+      - "A4: the stale header enum (00-header.yaml, which omits registry/docs/quality) is corrected to the full ruled set: scheduler | business_application | catalog | architecture | registry | docs | quality | context | all | human — and the JSON schema gains a matching enum so an unregistered domain fails validation."
+  - title: "B. Id-prefix policy"
+    confirmations:
+      - "B1 [RECOMMENDED]: NEW entries use a domain-derived prefix — scheduler_*, business_application_*, human_* — alongside the already-domain-shaped catalog_/arch_/reg_/docs_/doc_ conventions. The convention is documented in 00-header.yaml and RELATIONSHIP_GUIDE Step 6 (which also gains the missing inverse_label line)."
+      - "B2: status is NEVER encoded in an id. A planned_ prefix (considered for p2_deployed_by) would force an id rename at every planned->active flip, and ids are the append-only audit join — the status field already carries the lifecycle."
+      - "B3: existing epoch-tag ids (m3_ 21, p2_ 5, m7_ 1, u1_/u2_ 5, g22_ 1, c23_ 4, prov_ 1, sosa_ 4) stay valid NOW and are force-migrated in a scoped tech-debt cleanup (backlog item groomed at sign-off): add-new + deprecate-old pairs across the taxonomy-ontology-map, the regenerated schema_graph.cypher, the SQLite mirror, and the test pins — the gate log is append-only and keeps the old spellings as history. SME ruling 2026-08-12: forced fall-off later, not natural attrition only."
+  - title: "C. Planned-entry dispositions"
+    confirmations:
+      - "C1a [scheduler deployment tier — 5 entries, walk]: p2_deployed_by, p2_deployed_to, p2_deploys_folder, p2_authored_by, p2_instance_of — the Change/CI-CD + history-API deployment model; no Deployment/Developer nodes exist yet; K22 (Deployment Module CI class) is the open capture item. RECOMMENDED: keep-planned as a set (the model is coherent and K22 feeds it) or deprecate as a set (retire unbuilt until a real feed exists)."
+      - "C1b [scheduler runtime/file — 2 entries, walk]: m3_depends_on_file (MFTS file-watcher dependency, USED role=file_dependency — normalized from the retired DEPENDS_ON) and m3_executed_by (run executed as service account; EPV feed). RECOMMENDED: keep-planned — both name real Control-M mechanics with identified feeds."
+      - "C1c [business_application — 1 entry, walk]: seal_app_attributed_to_employee (collapsed TOM attribution shortcut, coexists with the built qualified triple). NOTE: the open seal-tom-attribution-reshape gate claims this territory — RECOMMENDED: defer to that gate rather than rule here."
+      - "C1d [catalog — 3 entries, walk]: catalog_has_area_product, catalog_area_product_has_dev_team (both name their loader area_products.cypher), catalog_dev_team_has_membership (pat_team_roles.cypher) — the PAT AreaProduct / team-membership model. RECOMMENDED: keep-planned (loaders already named; build is sequenced work)."
+      - "C1e [architecture — 3 entries, walk]: arch_owns_code (Code->DevTeam, role=owner), arch_stored_in (Code->Bitbucket), arch_contains_service (Code->PipelineService) — the architecture-mermaid capture; no feed identified since. RECOMMENDED: SME's call — keep-planned if the architecture ingestion is still intended, deprecate if the mermaid capture is superseded by the U1/U2 code graph."
+      - "C2 [RECORDED, not re-ruled — 16 entries]: gate-held: m3_delegates_to (rua-load-shapes §A1 HOLD: subject has no agreed identity — K17), arch_owns_directory + arch_sources (rua-load-shapes §C1/§C2, registered at G55), m3_triggers (shape CONFIRMED 2026-07-15; build pending; pinned by test_yaml_fragments), m3_host_group_defined_on (CONFIRMED 2026-07-09; loader blocked on DC-key parse), sosa_* x4 (E1 DEFERRED 2026-07-14), c23_is_measurement_of/computed_on/has_quality (C23 DEFER: no writer until a measurement feed exists), catalog_has_application (K7 §G6 ruled the company reading; PAT build sequenced), reg_appuser_uses_software (ruled at software-version-context; build = backlog C33), docs_has_document + docs_governed_by (held for the docmeta P4+ loader; loads before the flip must refuse)."
+      - "C3 [conflict on the record]: m3_triggers is planned yet live-consumed by a QuerySpec (drydocs_api/query_specs.py — MATCH ...-[:TRIGGERS]->...). Planned means no loader writes it, so the spec returns empty rather than wrong — but the surface implies data that cannot exist yet. Recorded as tech-debt: demote the spec to demo-only or prioritize the m3_triggers build."
+  - title: "D. Consequences recorded at sign-off"
+    confirmations:
+      - "D1: the follow-up commit applies §A (git mv both fragments, 37 domain edits, header enum + §B convention note), regenerates schema_graph.cypher, applies every §C deprecation with deprecated_at + a note citing this gate, and updates the test pins the rulings change."
+      - "D2: hygiene rides the build — the JSON schema gains the domain enum, `removed` in the status enum (documented in the lifecycle but unschema'd today), and a required inverse_label (aligning with the pytest guard); RELATIONSHIP_GUIDE Step 6 gains inverse_label + the new domain list; the stale monolith path in agents/graph_qa/schema_context.py is repointed at the fragment reader."
+      - "D3: tech-debt items groomed into the backlog — TD id-migration (§B3), TD human-domain relocation (§A3), TD m3_triggers QuerySpec conflict (§C3)."
+      - "D4: the decision is transcribed to config/gate-log.md with per-item outcomes (A1-A4, B1-B3, C1a-C1e, C2-C3, D1-D4); gates.json and the enforcement matrix regenerate (default-paths render_board.py run)."
+  - title: "E. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md — safe to transcribe into config/gate-log.md."
