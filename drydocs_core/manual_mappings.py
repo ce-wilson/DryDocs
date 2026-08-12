@@ -29,8 +29,9 @@ import yaml
 import drydocs_core
 from drydocs_core import yaml_fragments
 from drydocs_core.models import ManualMappingRow
+from drydocs_core.repo_paths import repo_root
 
-_REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
+_REPO_ROOT = repo_root(Path(drydocs_core.__file__).resolve().parent.parent)
 DEFAULT_MANIFEST_PATH = _REPO_ROOT / "config" / "manual-loads" / "manifest.yaml"
 VOCABULARY_PATH = (
     Path(drydocs_core.__file__).resolve().parent / "ontology" / "relationship_vocabulary"

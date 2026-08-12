@@ -78,6 +78,7 @@ from drydocs_core.orchestration.controlm import (
     classify_job_variables,
     resolve_job,
 )
+from drydocs_core.repo_paths import repo_root
 from drydocs_core.run_log import LoaderRunLog
 from drydocs_core.schema.constraints import declared_constraint_names
 from drydocs_core.schema.supplements import (
@@ -200,9 +201,19 @@ SCHEMA_GRAPH_DATABASE = "ddschema"
 # registry (drydocs_core.schema.supplements), so the chain and its order have
 # exactly one home. G29.
 
+#: The checkout the CALLER is standing in, for the repo-CONTENT defaults below
+#: (Idea-109). The two package-internal constants in this module deliberately do
+#: NOT route through it — see each one's note.
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
+
 # Bundled CSV samples ship inside the package so dev-mode commands work
 # from any cwd — including from an installed wheel where there is no repo
 # root. Override with --samples-dir to point at an alternate fixture set.
+# PACKAGE-INTERNAL on purpose, and the sentence above is the reason: an
+# installed wheel HAS no checkout to follow, so `__file__` is the only anchor
+# that answers. (`drydocs.seal_samples.DEFAULT_SAMPLES_DIR` names the same
+# directory and DOES follow the caller — it is a build script's WRITE target,
+# not a runtime read default.)
 DEFAULT_SAMPLES_DIR = Path(__file__).resolve().parent / "data" / "samples"
 
 LOADER_REGISTRY: dict[str, type] = {
@@ -235,6 +246,7 @@ LOADER_REGISTRY: dict[str, type] = {
     "doc_feedback": DocFeedbackLoader,
 }
 
+# PACKAGE-INTERNAL: the .sql files are package data and travel with it.
 SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
 
 # Which source-registry entry each loader draws from. The confirmed-gate (D3)
@@ -1985,7 +1997,7 @@ def lineage_review(
     console.print(f"coverage: {coverage.summary()}")
 
 
-DOC_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "doc-source-registry.yaml"
+DOC_REGISTRY_PATH = _REPO_ROOT / "config" / "doc-source-registry.yaml"
 
 #: Databases docs-verify sweeps. The registry admits dddocs | ddcontext as
 #: targets, but a corpus can only be found in a database that EXISTS — and
@@ -2071,11 +2083,9 @@ def _docs_verify_run(sources: list[dict]) -> None:
         raise typer.Exit(code)
 
 
-SOFTWARE_REGISTRY_PATH = (
-    Path(__file__).resolve().parents[1] / "config" / "taxonomy" / "software-registry.yaml"
-)
-PLATFORMS_PATH = Path(__file__).resolve().parents[1] / "config" / "taxonomy" / "platforms.yaml"
-SOURCE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "source-registry.yaml"
+SOFTWARE_REGISTRY_PATH = _REPO_ROOT / "config" / "taxonomy" / "software-registry.yaml"
+PLATFORMS_PATH = _REPO_ROOT / "config" / "taxonomy" / "platforms.yaml"
+SOURCE_REGISTRY_PATH = _REPO_ROOT / "config" / "source-registry.yaml"
 
 
 @app.command(name="docs-coverage")
@@ -2084,9 +2094,7 @@ def docs_coverage(
         False, "--no-graph", help="Declaration layer only — never contacts Neo4j."
     ),
     product: str = typer.Option("", "--product", help="Filter to one product id."),
-    section: str = typer.Option(
-        "all", "--section", help="products | corpora | systems | all"
-    ),
+    section: str = typer.Option("all", "--section", help="products | corpora | systems | all"),
 ) -> None:
     """What documentation do we hold per software product, and what is blocking it.
 
@@ -2121,7 +2129,9 @@ def docs_coverage(
                     return cli.run(cypher, params)
 
         except Exception as exc:  # pragma: no cover - environment dependent
-            console.print(f"[yellow]graph not probed ({type(exc).__name__}); declaration layer only[/]")
+            console.print(
+                f"[yellow]graph not probed ({type(exc).__name__}); declaration layer only[/]"
+            )
 
     report = build_docs_coverage(
         software.get("products", []),
@@ -2163,7 +2173,9 @@ def docs_coverage(
                     f"registered - {', '.join(r.unregistered_doc_locators)}"
                 )
             if r.divergence:
-                console.print(f"  [magenta]{r.product_id}[/]: {', '.join(r.divergence)} - {r.detail}")
+                console.print(
+                    f"  [magenta]{r.product_id}[/]: {', '.join(r.divergence)} - {r.detail}"
+                )
 
     if section in ("all", "corpora") and report.corpora:
         table = Table(title="corpora no product declares")
@@ -2186,7 +2198,9 @@ def docs_coverage(
         for s in report.systems:
             table.add_row(s.system_id, str(s.layer or "-"), ", ".join(s.doc_locator_keys) or "-")
         console.print(table)
-        console.print("[dim]  candidates for a human ruling - no claim that any SHOULD be a product[/]")
+        console.print(
+            "[dim]  candidates for a human ruling - no claim that any SHOULD be a product[/]"
+        )
 
     console.print(f"coverage: {report.summary()}")
     if not report.reconciles():
@@ -2239,7 +2253,9 @@ def _read_column(path: Path, column: str, delimiter: str) -> list[str]:
 @app.command(name="fid-census")
 def fid_census_cmd(
     application: str = typer.Option(..., "--application", help="The ONE application to census."),
-    directory: Path = typer.Option(..., "--directory", help="Functional-id directory export (CSV)."),
+    directory: Path = typer.Option(
+        ..., "--directory", help="Functional-id directory export (CSV)."
+    ),
     map_spec: str = typer.Option(
         ...,
         "--map",
@@ -2249,10 +2265,14 @@ def fid_census_cmd(
             "account and application are required; type/status/owner optional."
         ),
     ),
-    delimiter: str = typer.Option(",", "--delimiter", help="Field delimiter; use '|' for raw exports."),
+    delimiter: str = typer.Option(
+        ",", "--delimiter", help="Field delimiter; use '|' for raw exports."
+    ),
     run_as: Path = typer.Option(None, "--run-as", help="Control-M job extract (demand set i)."),
     run_as_column: str = typer.Option("owner", "--run-as-column", help="CM_DEF_VJOB.OWNER alias."),
-    fid_facts: Path = typer.Option(None, "--fid-facts", help="Unresolved FID facts (demand set ii)."),
+    fid_facts: Path = typer.Option(
+        None, "--fid-facts", help="Unresolved FID facts (demand set ii)."
+    ),
     fid_facts_column: str = typer.Option("fact_value", "--fid-facts-column"),
     adhoc: Path = typer.Option(None, "--adhoc", help="Registered adhoc evidence (demand set iii)."),
     adhoc_column: str = typer.Option("account", "--adhoc-column"),
@@ -2288,7 +2308,9 @@ def fid_census_cmd(
         headers = reader.fieldnames or []
         unknown = [h for r, h in cols.items() if h not in headers]
         if unknown:
-            raise typer.BadParameter(f"--map names header(s) absent from {directory.name}: {unknown}")
+            raise typer.BadParameter(
+                f"--map names header(s) absent from {directory.name}: {unknown}"
+            )
         rows = [
             DirectoryRow(
                 account=r.get(cols["account"], ""),
@@ -2359,7 +2381,9 @@ def fid_census_cmd(
     if not census.reconciles():
         console.print("[red]census does not reconcile - an input assumption is wrong.[/]")
         raise typer.Exit(1)
-    console.print("[dim]counts only - no row left this command. Send as_dict() back to the producer.[/]")
+    console.print(
+        "[dim]counts only - no row left this command. Send as_dict() back to the producer.[/]"
+    )
 
 
 @app.command(name="m3-verify")

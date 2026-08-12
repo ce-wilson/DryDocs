@@ -33,7 +33,9 @@ from pathlib import Path
 
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+from drydocs_core.repo_paths import repo_root
+
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 DEFAULT_CROSSWALK_DIR = _REPO_ROOT / "config" / "crosswalks"
 
 SCHEMA_ID = "drydocs.crosswalk.v1"

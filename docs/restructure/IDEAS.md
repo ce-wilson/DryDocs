@@ -124,7 +124,37 @@ question a 1,000-line file with the trail at the bottom could not answer.
   starting prompt — in which case its header should say so, since it currently reads as
   live instructions ("Copy everything below the line into Claude Design UI").
 
-- **`Idea-109`** · 2026-08-12 · `[bug]` · **groomed → J48 (2026-08-12 pm — the RESIDUE only; the reported bug itself was fixed the same day at `841dc6e5`, before any item existed)** · prio? **Low** —
+- **`Idea-109`** · 2026-08-12 · `[bug]` · **closed — fix landed at 841dc6e5, residue swept as J48 the same day** · prio? **Low** —
+  **RESIDUE SWEPT 2026-08-12 (this desktop) — J48 `done`, and this entry closes.** 27
+  sites judged: 24 modules now route through `repo_root()`, and three were RULED and left
+  as written, which is the judgement this entry said each one needed — recorded at the
+  site, because "skipping a site is not a disposition": `ontology/schema_graph.py`
+  (vocabulary fragments + generated `.cypher` are package resources),
+  `scripts/external_vendor_scrape.py` (not an installed package, so `__file__` already
+  names the caller's tree — and it *cannot* adopt: those two lines put the root on
+  `sys.path` **before** `drydocs_core` is importable), and `drydocs_core/config.py`, the
+  one place where following the caller would be a **regression** — `.env` is untracked
+  machine-local credentials that a worktree never receives, so a worktree run would find
+  no `.env` at all. The mixed case came out repo-content: `var/mapping.db` is derived FROM
+  the committed YAML/CSV beside it, so a worktree reading its own `config/` and writing
+  main's `var/` is exactly the torn split this entry describes. Gitignored ≠ shared.
+  **This entry's own list was short by four**, all the same defect in the same editable
+  install: `drydocs_docmeta/registry.py`, `drydocs_docmeta/policy.py`,
+  `drydocs_api/intake.py`, and a `_repo_relative()` helper buried INSIDE a function body in
+  `drydocs_api/mappings.py` — found by the new derived guard *after* every listed file had
+  already been read by hand, which is the case for deriving rather than enumerating in one
+  incident.
+  **One mechanism finding worth keeping.** The worktree proof's first draft ran its probe
+  with `python -c`, which puts the CWD on `sys.path` — so the worktree's own `drydocs/`
+  shadowed the editable install, every import came back worktree-relative, and the control
+  passed for the wrong reason. The test now runs a probe FILE outside the worktree,
+  reproducing the incident's real condition (`sys.path[0]` is the script's directory, never
+  the cwd). That is the same asymmetry the original bug turned on, met from the other side.
+  **Verified live** (desktop, no database, no company data — re-runs anywhere): a real
+  `git worktree`, nine constants across four packages resolving inside it, and
+  `cli.DEFAULT_SAMPLES_DIR` correctly staying pinned at the install. A blanket
+  search-and-replace of every `__file__` anchor FAILS that test, so it checks the judgement
+  and not just the edit. Suite 2092 passed / 8 skipped.
   **FIX 2026-08-12 (this desktop).** New `drydocs_core/repo_paths.py` — `repo_root(fallback)`
   climbs from the cwd to the nearest enclosing `.git` (an `.exists()` test, because a
   worktree root carries a `.git` *file*, not a directory), validates it as a DryDocs
@@ -151,6 +181,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   rule is that repo-*content* paths follow the caller while package-*internal* resources
   (e.g. `drydocs_core/schema/*.cypher`) rightly follow `__file__` — so each needs that
   one-line judgement, which is why this was scoped to the ritual rather than swept.
+  *(Swept as J48 later the same day — see the top of this entry. The real count was 27, not
+  17, and the rule held: 24 adopted, 3 ruled package-internal or install-anchored.)*
 
   <!-- original diagnosis, kept for the trail: -->
 

@@ -20,9 +20,11 @@ from typing import Any
 
 import yaml
 
+from drydocs_core.repo_paths import repo_root
+
 from .connectors.base import FetchSource
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
 DEFAULT_LEDGER_PATH = _REPO_ROOT / "config" / "doc-source-registry.yaml"
 SCHEMA = "drydocs.doc-source-registry.v1"
 

@@ -49,6 +49,7 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 | `drydocs_core/adapters/` | source adapters (base, csv, oracle) — transform, no graph write |
 | `drydocs_core/neo4j_client.py` | driver/session lifecycle; caller passes the DB name |
 | `drydocs_core/config.py`, `precedence.py`, `source_registry.py` | declarative config layer (CLAUDE.md §4) |
+| `drydocs_core/repo_paths.py` | `repo_root(fallback)` — resolves the DryDocs checkout the CALLER is standing in, so repo-CONTENT defaults follow the caller instead of the editable install's main tree (Idea-109). pathlib-only, imports nothing. **The rule every module-level path anchor is judged against: repo content routes through this; package-internal resources (`drydocs_core/schema/*.cypher`, `drydocs/loaders/cypher/`, the bundled sample CSVs) keep their `__file__` anchor.** Default-deny guard: `tests/unit/test_repo_paths.py::test_no_module_anchors_repo_content_on_dunder_file` fails any `Path(__file__)` chain in an installed package that climbs to the repo root without it |
 | `drydocs_core/ontology/` | namespace / URN vocab + `relationship_vocabulary.yaml` |
 | `drydocs_core/manual_mappings.py` | pure tier-5 manual-CSV validation/parse (manifest gate, vocab check, K2 shape) — shared by the load component's loader and the mapping store |
 | `drydocs_core/mapping_store.py` | SQLite materialization of the mapping layer (plan M0–M4); derived from committed YAML/CSV, consumed by `load` (read seam) and `api` (/mappings) — core placement is WHY both may use it |

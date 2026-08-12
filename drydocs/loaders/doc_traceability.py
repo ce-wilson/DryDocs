@@ -38,6 +38,7 @@ from drydocs_core.models.doc_traceability import (
     FeedbackNoteRow,
     TraceabilityRow,
 )
+from drydocs_core.repo_paths import repo_root
 
 from .base import BaseLoader, LoadSummary, compute_row_checksum
 
@@ -48,7 +49,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 LOGGER = logging.getLogger(__name__)
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 DEFAULT_DESIGN_DIR = REPO_ROOT / "docs" / "design"
 DEFAULT_FEEDBACK_DIR = DEFAULT_DESIGN_DIR / "feedback"

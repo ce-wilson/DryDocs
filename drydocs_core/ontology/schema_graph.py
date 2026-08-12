@@ -66,6 +66,11 @@ from typing import Any
 
 from drydocs_core import yaml_fragments
 
+#: PACKAGE-INTERNAL, both of them — reviewed in the Idea-109 sweep and left alone.
+#: The vocabulary fragments and the generated ``.cypher`` live INSIDE
+#: ``drydocs_core/`` and travel with the package, so ``__file__`` is the anchor
+#: that is right rather than the one that is merely old. That is the other half of
+#: the Idea-109 rule: only repo CONTENT follows the caller's checkout.
 DEFAULT_VOCAB_PATH = Path(__file__).resolve().parent / "relationship_vocabulary"
 DEFAULT_OUTPUT_PATH = Path(__file__).resolve().parents[1] / "schema" / "schema_graph.cypher"
 

@@ -696,8 +696,12 @@ def _repo_relative(path: Path) -> str:
     """Repo-relative POSIX path for the diff header, with an absolute-path
     fallback so a fixture outside the repo still produces a readable diff."""
     import drydocs_core
+    from drydocs_core.repo_paths import repo_root
 
-    root = Path(drydocs_core.__file__).resolve().parent.parent
+    # Follows the CALLER's checkout (Idea-109): a fixture inside a worktree is
+    # repo-relative to THAT tree, and anchoring on the install would push it down
+    # the ValueError branch and print a bare filename in the diff header.
+    root = repo_root(Path(drydocs_core.__file__).resolve().parent.parent)
     try:
         return path.resolve().relative_to(root).as_posix()
     except ValueError:

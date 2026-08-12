@@ -23,7 +23,9 @@ from typing import Any
 
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+from drydocs_core.repo_paths import repo_root
+
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_PRECEDENCE_PATH = _REPO_ROOT / "config" / "precedence.yaml"
 
 # Values that mean "this authority has no opinion" and so cannot win.

@@ -33,6 +33,7 @@ from typing import TYPE_CHECKING, ClassVar
 import yaml
 
 from drydocs_core.models.registry import BatchPortOrchestratorRow
+from drydocs_core.repo_paths import repo_root
 
 from .base import BaseLoader, LoadSummary
 
@@ -44,7 +45,7 @@ if TYPE_CHECKING:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 DEFAULT_APPS_PATH = REPO_ROOT / "config" / "taxonomy" / "business-application.yaml"
 DEFAULT_PLATFORMS_PATH = REPO_ROOT / "config" / "taxonomy" / "platforms.yaml"
 

@@ -23,7 +23,9 @@ from typing import Any
 
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+from drydocs_core.repo_paths import repo_root
+
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_GATE_PROMPTS_DIR = _REPO_ROOT / "config" / "gate-prompts"
 
 

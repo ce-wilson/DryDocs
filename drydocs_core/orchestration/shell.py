@@ -34,6 +34,8 @@ from pathlib import Path
 
 import yaml
 
+from drydocs_core.repo_paths import repo_root
+
 # --- launcher registry --------------------------------------------------------
 
 # Each rule: (compiled pattern on the executable BASENAME, invocation_type,
@@ -43,7 +45,7 @@ import yaml
 # rules live in config/launcher-registry.yaml so teams add wrappers without
 # a code release; this module LOADS them at import, behavior unchanged.
 # Schema + rule-id stability are guarded by tests/unit/test_launcher_registry.py.
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 DEFAULT_LAUNCHER_REGISTRY_PATH = _REPO_ROOT / "config" / "launcher-registry.yaml"
 
 LAUNCHER_REGISTRY_SCHEMA = "drydocs.launcher-registry.v1"

@@ -107,8 +107,12 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # "plan", and the reason is the same one that moved plan_ideas to docgen:
     # classify by WHAT IT DOES, not by which documents it happens to read. It
     # renders nothing, publishes no surface, and reads port-prompt.md only as
-    # text. Import profile is stdlib + subprocess and nothing else — no component,
-    # not even config — which is what lets its guards run without a repository.
+    # text. Import profile is stdlib + subprocess plus ONE core import,
+    # drydocs_core.repo_paths (Idea-109 sweep, 2026-08-12) — no component and no
+    # config. That import is itself pathlib-only, so what the old "stdlib and
+    # nothing else" note was protecting still holds: the guards run without a
+    # repository, and now the checks run against the CALLER's checkout rather than
+    # certifying the main tree from inside a worktree.
     "port": ("drydocs.port_preflight",),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.

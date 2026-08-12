@@ -24,7 +24,9 @@ from typing import Any, Protocol, runtime_checkable
 
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+from drydocs_core.repo_paths import repo_root
+
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_GRAPH_TESTS_DIR = _REPO_ROOT / "graph-tests"
 
 

@@ -33,7 +33,9 @@ from collections.abc import Callable, Container, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from drydocs_core.repo_paths import repo_root
+
+REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
 PORT_PROMPT_PATH = REPO_ROOT / "docs" / "port-prompt.md"
 
 #: The ledger's own header exempts these: "Grooms, claims, board/design renders
@@ -348,9 +350,7 @@ def venue_line() -> str:
     )
 
 
-def run_checks(
-    base: str, *, skip_tests: bool = False, will_tag: bool = False
-) -> list[CheckResult]:
+def run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False) -> list[CheckResult]:
     """The five structural checks plus the relay-basis and cited-path checks.
 
     Ordered cheapest-first so a dirty tree fails in milliseconds rather than after
@@ -364,9 +364,7 @@ def run_checks(
     results: list[CheckResult] = []
 
     dirty = _git("status", "--porcelain")
-    results.append(
-        CheckResult("tree clean", not dirty, dirty or "nothing staged or modified")
-    )
+    results.append(CheckResult("tree clean", not dirty, dirty or "nothing staged or modified"))
 
     text = PORT_PROMPT_PATH.read_text(encoding="utf-8")
 
@@ -447,8 +445,11 @@ def run_checks(
             "certified base tag",
             bool(base_tags) or will_tag,
             ", ".join(base_tags)
-            or ("will be created on success (--tag)" if will_tag else
-                "no port-base-* tag at HEAD — run with --tag"),
+            or (
+                "will be created on success (--tag)"
+                if will_tag
+                else "no port-base-* tag at HEAD — run with --tag"
+            ),
         )
     )
 

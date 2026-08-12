@@ -42,13 +42,14 @@ from typing import TYPE_CHECKING, ClassVar
 from pydantic import BaseModel
 
 from drydocs_core.models.docs import BookChunkRow
+from drydocs_core.repo_paths import repo_root
 
 from .base import BaseLoader, compute_row_checksum
 
 if TYPE_CHECKING:  # pragma: no cover
     from types import TracebackType
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 DEFAULT_PDF = REPO_ROOT / "Essential-GraphRAG.pdf"
 

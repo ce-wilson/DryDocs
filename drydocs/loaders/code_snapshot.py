@@ -47,6 +47,7 @@ from drydocs_core.models.code_snapshot import CodeDirectoryRow, CodeModuleRow
 # whose loader lives across the drydocs_lineage import boundary — shared
 # mappings are core's.
 from drydocs_core.ontology.swo_adapter import EXTENSION_LANGUAGE_IRI
+from drydocs_core.repo_paths import repo_root
 
 from .base import BaseLoader
 
@@ -56,7 +57,8 @@ if TYPE_CHECKING:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
-DEFAULT_SNAPSHOT_DIR = Path(__file__).resolve().parents[2] / "knowledge" / "depgraph-snapshots"
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
+DEFAULT_SNAPSHOT_DIR = _REPO_ROOT / "knowledge" / "depgraph-snapshots"
 # v2 (first seen 2026-07-27, ritual snapshot 20260727-2019) is a SUPERSET of
 # v1 for this loader's concern: nodes/edges/meta are unchanged; v2 adds
 # lineage sections (processes/data_assets/hosts/rels) and stats. `rels` IS

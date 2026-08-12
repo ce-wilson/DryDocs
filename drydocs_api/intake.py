@@ -52,6 +52,7 @@ import yaml
 from drydocs_api.handlers import Forbidden
 from drydocs_api.sessions import InMemorySessionStore, Session
 from drydocs_core.data_root import context_intake_dir
+from drydocs_core.repo_paths import repo_root
 
 ORIGIN = "sme-intake"
 CLASSIFICATION = "Internal"  # stamped at creation, unconditionally
@@ -112,7 +113,7 @@ _UPLOAD_CLOSED = ("admin-accepted", "loaded", "no-new-value")
 _OVERLAP_MIN_FRACTION = 0.6
 _OVERLAP_MIN_LINES = 3
 
-_REPO = Path(__file__).resolve().parent.parent
+_REPO = repo_root(Path(__file__).resolve().parent.parent)
 _CONTEXT_TYPES_YAML = _REPO / "config" / "taxonomy" / "context-types.yaml"
 
 
@@ -143,8 +144,7 @@ def _active_context_types() -> set[str]:
 _DASH_TO_UNDERSCORE = str.maketrans("-", "_")
 
 _HEADER_RE = re.compile(
-    r"^(Subject|From|Date|Sent|Message-ID|In-Reply-To|References|Thread-Index)"
-    r":[ \t]*(.+?)\s*$",
+    r"^(Subject|From|Date|Sent|Message-ID|In-Reply-To|References|Thread-Index)" r":[ \t]*(.+?)\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -153,7 +153,10 @@ def _printable_runs(data: bytes) -> str:
     """Best-effort text from a binary .msg: printable runs from the latin-1
     view plus the UTF-16LE view (where MAPI stores its strings). Never raises."""
     out: list[str] = []
-    for text in (data.decode("latin-1", errors="ignore"), data.decode("utf-16-le", errors="ignore")):
+    for text in (
+        data.decode("latin-1", errors="ignore"),
+        data.decode("utf-16-le", errors="ignore"),
+    ):
         out.extend(re.findall(r"[\x20-\x7e\t]{4,}", text))
     return "\n".join(out)
 
@@ -176,9 +179,11 @@ def _parse_preview(kind: str, data: bytes) -> dict:
                 preview["keys"] = sorted(parsed.keys())
             else:
                 preview["keys"] = []
-                preview["shape"] = f"{type(parsed).__name__}[{len(parsed)}]" if isinstance(
-                    parsed, list
-                ) else type(parsed).__name__
+                preview["shape"] = (
+                    f"{type(parsed).__name__}[{len(parsed)}]"
+                    if isinstance(parsed, list)
+                    else type(parsed).__name__
+                )
         else:
             # str.translate, not str.replace: the ADR 0009 write-primitive
             # guard (test_no_endpoint_writes_a_tracked_file) bans `.replace()`
@@ -187,14 +192,25 @@ def _parse_preview(kind: str, data: bytes) -> dict:
                 m.group(1).lower().translate(_DASH_TO_UNDERSCORE): m.group(2)
                 for m in _HEADER_RE.finditer(text)
             }
-            for field in ("subject", "from", "date", "sent", "message_id", "in_reply_to", "references", "thread_index"):
+            for field in (
+                "subject",
+                "from",
+                "date",
+                "sent",
+                "message_id",
+                "in_reply_to",
+                "references",
+                "thread_index",
+            ):
                 if field in headers:
                     preview[field] = headers[field]
             if kind == "txt":
                 first = next((ln for ln in text.splitlines() if ln.strip()), "")
                 preview["first_line"] = first[:200]
             if kind == "msg" and "subject" not in preview:
-                preview["warnings"].append("no subject header recovered (MAPI parse is best-effort)")
+                preview["warnings"].append(
+                    "no subject header recovered (MAPI parse is best-effort)"
+                )
     except (ValueError, UnicodeError) as exc:
         preview["warnings"].append(f"parse failed: {exc}")
     return preview
@@ -269,9 +285,7 @@ class IntakeStore:
             # is compiled serialized (threadsafety 3): sharing is safe once
             # the same-thread check is relaxed, and keeping ONE connection
             # keeps each handler's multi-statement update a single commit.
-            self._conn = sqlite3.connect(
-                str(self.root / "intake.db"), check_same_thread=False
-            )
+            self._conn = sqlite3.connect(str(self.root / "intake.db"), check_same_thread=False)
             self._conn.row_factory = sqlite3.Row
             self._conn.executescript(
                 """
@@ -317,9 +331,7 @@ class IntakeStore:
     # -- records ------------------------------------------------------------
 
     def _record(self, intake_id: str) -> sqlite3.Row:
-        row = self.conn.execute(
-            "SELECT * FROM intake WHERE intake_id = ?", (intake_id,)
-        ).fetchone()
+        row = self.conn.execute("SELECT * FROM intake WHERE intake_id = ?", (intake_id,)).fetchone()
         if row is None:
             raise UnknownIntakeError(intake_id)
         return row
@@ -330,7 +342,9 @@ class IntakeStore:
             (intake_id, _now(), actor, action, detail),
         )
 
-    def evidence_rows(self, intake_id: str, *, include_superseded: bool = False) -> list[sqlite3.Row]:
+    def evidence_rows(
+        self, intake_id: str, *, include_superseded: bool = False
+    ) -> list[sqlite3.Row]:
         q = "SELECT * FROM evidence WHERE intake_id = ?"
         if not include_superseded:
             q += " AND superseded = 0"
@@ -364,9 +378,7 @@ def legal_transitions(record: dict, role: str) -> dict:
     server owns the machine (IntakeStepper decision, 2026-08-06)."""
     status = record["status"]
     allowed = [
-        {"to": to, "action": action}
-        for to, action, roles in TRANSITIONS[status]
-        if role in roles
+        {"to": to, "action": action} for to, action, roles in TRANSITIONS[status] if role in roles
     ]
     out = {
         "status": status,
@@ -533,9 +545,7 @@ def _check_thread(
     new_text = _extract_text(kind, data)
     new_lines = _content_lines(new_text)
     new_subject = normalized_subject(preview.get("subject", ""))
-    reply_refs = " ".join(
-        str(preview.get(f, "")) for f in ("in_reply_to", "references")
-    )
+    reply_refs = " ".join(str(preview.get(f, "")) for f in ("in_reply_to", "references"))
 
     matches: list[tuple[str, str]] = []  # (prior_intake_id, via)
     best_old_lines: list[str] | None = None
@@ -652,7 +662,11 @@ def transition(
     if row is None:
         raise IllegalTransitionError(
             f"{status} -> {to} is not a legal transition"
-            + (" (admin-accepted is parked until the Q10/G31/G32 gates clear)" if status == "admin-accepted" else "")
+            + (
+                " (admin-accepted is parked until the Q10/G31/G32 gates clear)"
+                if status == "admin-accepted"
+                else ""
+            )
         )
     if session.role not in row[2]:
         raise Forbidden(f"{status} -> {to} is {'/'.join(row[2])} only")

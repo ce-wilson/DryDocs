@@ -52,6 +52,14 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+# CORRECT AS WRITTEN — ruled, not skipped (J48 / Idea-109). `scripts/` is not an
+# installed package, so `python scripts/external_vendor_scrape.py` loads THIS file out
+# of the caller's own checkout and `__file__` already names it. Routing it through
+# `repo_root()` would be a no-op at best, and it cannot be done anyway: the whole point
+# of these two lines is to put the root on `sys.path` BEFORE `drydocs_core` is
+# importable, so the helper is not available yet. This is the class of site that was
+# never broken — the five sibling render scripts are why the original damage was a torn
+# render rather than a wholesale one.
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:  # allow `python scripts/...` without PYTHONPATH
     sys.path.insert(0, str(REPO_ROOT))

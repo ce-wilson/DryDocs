@@ -40,7 +40,9 @@ from typing import Any
 
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+from drydocs_core.repo_paths import repo_root
+
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_REGISTRY_PATH = _REPO_ROOT / "config" / "source-registry.yaml"
 DEFAULT_DOC_REGISTRY_PATH = _REPO_ROOT / "config" / "doc-source-registry.yaml"
 DEFAULT_OVERLAY_PATH = _REPO_ROOT / "config" / "loader-source-overlay.yaml"

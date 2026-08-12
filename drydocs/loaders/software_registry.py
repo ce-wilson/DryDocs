@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, ClassVar
 import yaml
 
 from drydocs_core.models.registry import SoftwareProductRow
+from drydocs_core.repo_paths import repo_root
 
 from .app_identity import PreCutoverApplicationGuard
 from .base import BaseLoader
@@ -28,10 +29,10 @@ from .base import BaseLoader
 if TYPE_CHECKING:  # pragma: no cover
     from types import TracebackType
 
+# PACKAGE-INTERNAL: the .cypher files are package data and travel with it.
 CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
-DEFAULT_REGISTRY_PATH = (
-    Path(__file__).resolve().parents[2] / "config" / "taxonomy" / "software-registry.yaml"
-)
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
+DEFAULT_REGISTRY_PATH = _REPO_ROOT / "config" / "taxonomy" / "software-registry.yaml"
 
 
 class RegistryYamlAdapter:

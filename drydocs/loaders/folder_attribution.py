@@ -78,6 +78,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from drydocs_core.models import FolderAttributionRow, StgAppFactRow
+from drydocs_core.repo_paths import repo_root
 
 from .base import BaseLoader
 from .seal_attribution import (
@@ -122,13 +123,8 @@ ORCHESTRATOR_PLATFORM_ID = "controlm"
 # in the Internal twin; this mechanism is publishable and the tests use
 # synthetic codes. A missing file degrades to an EMPTY set: the derivation
 # guard goes inert (pre-K18 behavior), it never invents codes.
-PLATFORM_CODES_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "internal"
-    / "standards"
-    / "technology"
-    / "platform-codes.yaml"
-)
+_REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
+PLATFORM_CODES_PATH = _REPO_ROOT / "internal" / "standards" / "technology" / "platform-codes.yaml"
 
 
 def load_platform_codes(path: Path | None = None) -> frozenset[str]:
@@ -524,9 +520,7 @@ def detect_mapping_age_suspects(
         else:
             covered = sorted(f for f, c in folder_codes.items() if c == code)
         postdating = sorted(
-            f
-            for f in covered
-            if str(folder_first_seen.get(f) or "")[:10] > authored_on
+            f for f in covered if str(folder_first_seen.get(f) or "")[:10] > authored_on
         )
         if not postdating:
             continue

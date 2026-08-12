@@ -16,6 +16,14 @@ from pathlib import Path
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+#: DELIBERATELY NOT routed through ``repo_paths.repo_root`` in the Idea-109 sweep,
+#: and it is the one site where following the caller would be a regression rather
+#: than a fix. ``.env`` is untracked machine-local credentials: a ``git worktree``
+#: gets the tracked tree and NOT this file, so a worktree run that followed the
+#: caller would find no ``.env`` at all and lose its database settings. The
+#: install's ``.env`` is the one that exists, which makes ``__file__`` the correct
+#: anchor here — the rule is repo CONTENT follows the caller, and an untracked
+#: local secret is not repo content.
 _ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 

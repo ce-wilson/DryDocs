@@ -60,8 +60,14 @@ from drydocs_core.manual_mappings import (
     parse_mapping_csv,
 )
 from drydocs_core.models import ManualMappingRow
+from drydocs_core.repo_paths import repo_root
 
-REPO_ROOT = Path(drydocs_core.__file__).resolve().parent.parent
+REPO_ROOT = repo_root(Path(drydocs_core.__file__).resolve().parent.parent)
+# J48 called `var/mapping.db` out as the genuinely mixed case — `config/` is plainly
+# repo content, but this is DERIVED runtime state. Ruled repo-content anyway, and for
+# the reason the whole entry exists: the db is built FROM the committed YAML/CSV beside
+# it, so a worktree that read its own `config/` and wrote main's `var/` would produce
+# exactly the torn split Idea-109 describes. Gitignored is not the same as shared.
 DEFAULT_DB_PATH = REPO_ROOT / "var" / "mapping.db"
 ONTOLOGY_MAP_PATH = REPO_ROOT / "config" / "taxonomy-ontology-map"
 SEAL_CONTACT_OVERRIDES_PATH = REPO_ROOT / "config" / "overrides" / "seal-contact-overrides.csv"
@@ -835,7 +841,11 @@ def validate_app_code_row(
     if not app_id:
         raise MappingStoreError(
             f"{where}: app_id is required on every row — a {row_kind} "
-            + ("declaration carries the platform's OWN SEAL (K18); " if row_kind == "platform" else "row ")
+            + (
+                "declaration carries the platform's OWN SEAL (K18); "
+                if row_kind == "platform"
+                else "row "
+            )
             + "declare-by-absence was retired at K18"
         )
     if row_kind == "seal-born":

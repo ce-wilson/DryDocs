@@ -37,7 +37,9 @@ from pathlib import Path
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from drydocs_core.repo_paths import repo_root
+
+REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
 DEFAULT_CAPTURE_PATH = REPO_ROOT / "config" / "taxonomy" / "business-application.yaml"
 DEFAULT_SAMPLES_DIR = REPO_ROOT / "drydocs" / "data" / "samples"
 
