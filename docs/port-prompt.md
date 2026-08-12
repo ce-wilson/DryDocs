@@ -989,6 +989,32 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   producer change. Note the company runbook's step 8 currently sequences the PAT block
   BEFORE the SEAL block, which is what produced the failure.
   Rides T23, which already carries the S3 re-key and its all-8-sites-in-one-apply rule.
+  **CORRECTION TO A COMPANY-SIDE MEMORY NOTE, 2026-08-11 — please strike it.** A
+  company session recorded `load-order-seal-before-pat.md` saying the fix "is
+  producer-owned — the canonical `CANONICAL_LOAD_SEQUENCE` will be corrected upstream
+  and port down; don't patch the company order ad hoc in the meantime." **No producer
+  correction is owed and none is coming.** Verified here: `REFRESH_REFERENCE_CHAIN`
+  already runs `seal_applications` and `seal_contacts` at positions 4-5 and
+  `pat_product_mapping` at 7, and producer's PAT loader MERGEs on `app_id` anyway, so
+  producer has neither the wrong order nor the collision. A session that waits for that
+  port waits forever, and the note's "don't patch ad hoc" clause argues against exactly
+  the v3 reorder that was correct. **The company order fix is company-owned; the
+  `pat_app_links` re-key is the durable half.**
+  **THE T23 BLAST RADIUS INCLUDES PROSE, and that is the reusable lesson.** The v2
+  runbook stated "running SEAL after PAT is safe either way" — TRUE before the S3
+  re-key and false after it, with nothing to catch the change. T23's
+  all-8-key-bearing-sites-in-one-apply rule covers CODE sites; a document asserting the
+  old invariant is a ninth site of a different kind. When the re-key lands, sweep the
+  prose for order and identity claims as well as the Cypher. Producer was checked at
+  this entry and carries no equivalent claim.
+  **One more, because fixing the page does not fix the source (the J37 family):** the v2
+  page is GENERATED from a repo fragment by the company's docs-publish verb (company-only;
+  not registered producer-side) and carries the
+  "generated" banner; v3 is a standalone manual page. Left as is, the authoritative-
+  looking page keeps republishing the buggy order while the correct one looks like
+  somebody's notes. Fix the fragment, then let v3 be the render — same reasoning as
+  "never parse a render", applied one step upstream. That fragment is company-only;
+  producer has no copy of it.
 
 OWED COMPANY-SIDE:
 
