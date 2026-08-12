@@ -1158,6 +1158,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "remediation-fix-tracking (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/remediation-fix-tracking.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "repo-manifest-data-profile (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

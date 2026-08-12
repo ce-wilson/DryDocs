@@ -1,0 +1,103 @@
+# SME gate-prompt spec — fix-tracking properties on Control-M nodes, and who
+# writes them. GATE-BOUND: this page PROPOSES; nothing is built, registered,
+# or written by rendering it.
+#
+# THE GAP (raised 2026-08-12, remediation xml_io epic): the user wants a fix's
+# targets trackable IN the graph — "target of a remediation fix", a status,
+# and dates — but no ratified vocabulary exists for any of it. The three
+# existing property axes are all fenced: the audit envelope
+# (source_created_by/at, source_updated_by/at) is SOURCE-SYSTEM authorship,
+# explicitly protected against reinterpretation; pull tracking
+# (first_seen_at/last_seen_at/last_run_id) is when WE saw the source; load
+# provenance (WAS_GENERATED_BY -> :JobRun) is delta-only load history. A
+# remediation fix is a fourth thing — OUR intervention on the source system —
+# and needs its own ruled names. The SoD half is already decided
+# (user ruling 2026-08-12): drydocs_remediation emits a change-set artifact
+# and a write-authorized loader applies it; this gate rules the VOCABULARY the
+# loader writes, not the boundary.
+#
+# Mechanism-only: property names and status enums; no real fix ids, no data values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: remediation-fix-tracking
+title: "SME Gate — fix-tracking properties for remediation targets (names, status enum, writer)"
+step: "Remediation fix module (xml_io epic) — rules the property names a write-authorized loader applies from drydocs.remediation.fix-tracking.v1 change-sets; the emitting component stays no-graph-write (NFR-REM-1, unchanged)"
+summary: >
+  A remediation fix needs its graph targets marked — which nodes are under a
+  fix, what state the fix is in, and since when — so support can ask "what is
+  under remediation right now" without opening fix packages. The component
+  that authors fixes writes NO graph (structural invariant, unchanged); it
+  emits a change-set naming targets by NODE KEY, and a loader with write
+  authority applies properties to them. This gate rules three things: the
+  property NAMES (proposed: remediation_fix_id, remediation_status,
+  remediation_status_date), the STATUS ENUM (proposed: proposed |
+  in_progress | applied | verified, mirroring the vocabulary-lifecycle
+  precedent of small ruled enums), and the WRITER (proposed: a drydocs-load
+  loader consuming fix-tracking change-sets with the standard UNWIND/MERGE
+  idiom). The envelope properties MUST NOT be reused — that fence is already
+  ratified and this page only records it. Nothing below is applied until
+  ticked and transcribed to config/gate-log.md.
+meta:
+  Module: "drydocs-load (the writer) + drydocs-remediation (the emitter, unchanged) + ontology property_terms (the binding home ruled at envelope-property-terms)"
+  Source: "drydocs.remediation.fix-tracking.v1 change-set artifacts (drydocs_remediation/changes.py) — targets addressed by NODE KEY: (folder_id, job_id) for :ControlMJob, folder_id for :ControlMFolder"
+  Registry ref: "no source-registry change — fix tracking is OUR intervention record, not an ingested source"
+  Classification: "Internal-Public (mechanism); real fix ids/dates in the graph are operational metadata"
+  Precedent: "ui-write-surface M1/M2 ladder (write-shaped affordances are gated) · envelope-property-terms (property bindings live in property_terms) · the loaders' UNWIND/MERGE-on-key idiom · vocabulary lifecycle enums (planned|active|deprecated|removed)"
+  Source of record: "backlog (remediation xml_io epic) · config/gate-log.md (transcription target) · drydocs_remediation/module-requirements.md"
+
+mapping:
+  - n: 1
+    element: "remediation_fix_id"
+    target: "PROPOSED: string property on :ControlMJob / :ControlMFolder — the fix package / Jira reference that put the node under remediation"
+    edge: "fix-tracking property  [PROPOSED]"
+  - n: 2
+    element: "remediation_status"
+    target: "PROPOSED: enum proposed | in_progress | applied | verified — 'verified' means the emitted XML was re-imported and the equivalence proof re-ran against the live definition"
+    edge: "fix-tracking property + enum  [THE DECISION — §B]"
+  - n: 3
+    element: "remediation_status_date"
+    target: "PROPOSED: ISO date of the LAST status transition (one property; the full history lives in the fix package, not the node)"
+    edge: "fix-tracking property  [THE DECISION — §B3]"
+  - n: 4
+    element: "the writer"
+    target: "PROPOSED: a drydocs-load loader consuming fix-tracking.v1 change-sets (UNWIND $batch, MERGE on the node key); ALTERNATIVE: extend an existing Control-M loader with a fix-tracking pass"
+    edge: "write authority  [THE DECISION — §C]"
+  - n: 5
+    element: "property-term bindings"
+    target: "PROPOSED: property_terms entries (the home ruled at envelope-property-terms), candidate terms prov:wasInfluencedBy-family qualified reading or dd: local terms — NOT dct: authorship terms"
+    edge: "ontology binding  [PROPOSED — §D]"
+
+provenance:
+  - label: "fix-tracking properties (nodes named in a fix change-set only)"
+    source_object: "drydocs.remediation.fix-tracking.v1 artifact — proposed_properties block, explicitly GATE-BOUND until this page signs"
+    key: "NODE KEY: (folder_id, job_id) / folder_id — the hand-made folder/job_name fallback identity is refused at emission (UnanchoredFixError)"
+    loader: "the ruled writer (§C) — never drydocs_remediation (AST guard + corroborate regex, both unchanged)"
+    properties:
+      - {name: remediation_fix_id, origin: derived, from: "the fix package id", note: "OUR intervention record — a fourth axis beside envelope authorship, pull tracking, and load provenance"}
+      - {name: remediation_status, origin: derived, from: "the fix lifecycle", note: "enum ruled in §B; small-ruled-enum precedent: planned|active|deprecated|removed"}
+      - {name: remediation_status_date, origin: derived, from: "the last transition", note: "one date, not a history — the package is the history"}
+
+sections:
+  - title: "A. Scope — what fix tracking is and is not"
+    confirmations:
+      - "A1: fix tracking is OUR intervention record — a fourth property axis beside source authorship (envelope), pull tracking (first/last_seen), and load provenance (WAS_GENERATED_BY). It never reuses the envelope names: source_created_by/at and source_updated_by/at stay source-system authorship (fence already ratified at controlm-q1q3-phase1 / envelope-property-terms; this row only RECORDS it)."
+      - "A2: the emitting component stays no-graph-write. NFR-REM-1, the AST guard, and the corroborate write-clause regex are all UNCHANGED by this gate — the change-set artifact carries everything a loader needs except the authority to apply it."
+  - title: "B. The property names and the status enum"
+    confirmations:
+      - "B1 [RECOMMENDED]: remediation_fix_id (string, the fix package / Jira reference), remediation_status, remediation_status_date — the remediation_ prefix keeps the axis visually separate from source_* (envelope) and *_seen_at (pull) on any node inspector."
+      - "B2 [RECOMMENDED enum]: proposed | in_progress | applied | verified. 'applied' = the dev team imported the updated XML; 'verified' = the equivalence proof re-ran against the re-exported live definition. No 'rejected' state on the node: a rejected fix removes the properties (the package records the rejection)."
+      - "B3: one remediation_status_date carrying the LAST transition; the full history lives in the fix package. ALTERNATIVE: per-status dates (remediation_applied_at, ...) — richer node, but the package already holds the history and per-status dates invite drift."
+  - title: "C. The writer"
+    confirmations:
+      - "C1 [RECOMMENDED]: a dedicated drydocs-load loader consuming fix-tracking.v1 change-sets — UNWIND $batch, MATCH on the NODE KEY (never MERGE-creating a target: a fix target that does not exist is an error, not a node to invent), SET the three properties, remove them on rejection. Standard JobRun provenance applies."
+      - "C2 [alternative]: a fix-tracking pass inside an existing Control-M loader — fewer moving parts, but couples fix cadence to ingest cadence, and a fix should be markable the hour its package ships."
+  - title: "D. Ontology binding"
+    confirmations:
+      - "D1: the ruled names get property_terms entries (the home envelope-property-terms ruled). dct: authorship terms are NOT candidates (that family is the envelope's). Candidates: dd: local terms with prose definitions, or a prov: qualified-influence reading recorded as a note. May be ruled 'dd: local, revisit when an RDF export exists' without blocking the build."
+  - title: "E. Consequences recorded at sign-off"
+    confirmations:
+      - "E1: the build ships the §C writer, the fix-tracking.v1 artifact loses its GATE-BOUND banner (the schema keeps the approvals list), property_terms gains the §D entries, and the enum lands beside the artifact schema with a drift guard."
+      - "E2: the decision is transcribed to config/gate-log.md with per-item outcomes (A1–A2, B1–B3, C1-or-C2, D1, E1); gates.json and the enforcement matrix regenerate (default-paths render_board.py run)."
+  - title: "F. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md — safe to transcribe into config/gate-log.md."

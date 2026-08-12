@@ -73,6 +73,7 @@ areas:
   - { id: ownership,     title: "Ownership module panes" }
   - { id: underhood,     title: "/under-the-hood benchmark showcase" }
   - { id: software,      title: "Software registry / documentation-coverage panes" }
+  - { id: remediation,   title: "Remediation module panes (the fix-diff working session)" }
 
 components:
   # --- entry (2) ---
@@ -172,3 +173,8 @@ components:
   - { id: StrategyCards,           area: underhood,    path: underhood/StrategyCards.tsx,                 module: underhood,  module_evidence: directory }
   - { id: ThinkingLogicPanel,      area: underhood,    path: underhood/ThinkingLogicPanel.tsx,            module: underhood,  module_evidence: directory }
   - { id: TokenMemoryChart,        area: underhood,    path: underhood/TokenMemoryChart.tsx,              module: underhood,  module_evidence: directory }
+
+  # --- remediation (1) ---
+  # (demo frames live in demoRemediation.ts, data-only; FixDiff is the first
+  # .tsx: the SME working-session diff over generated/remediation-diff.json)
+  - { id: FixDiff,                 area: remediation,  path: remediation/FixDiff.tsx,                     module: remediation, module_evidence: directory }

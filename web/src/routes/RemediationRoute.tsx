@@ -3,6 +3,7 @@ import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import MiniDag from '../components/MiniDag'
 import LinkedDemoFrame from '../components/LinkedDemoFrame'
+import FixDiff from '../remediation/FixDiff'
 import {
   BATCHES_FRAME,
   FINDINGS_FRAME,
@@ -46,6 +47,10 @@ export default function RemediationRoute() {
       tabContent={{
         Findings: <LinkedDemoFrame frame={FINDINGS_FRAME} notice={NOTICE} {...frameProps} />,
         'Fix batches': <LinkedDemoFrame frame={BATCHES_FRAME} notice={NOTICE} {...frameProps} />,
+        // The SME working-session diff (2026-08-12): generated-artifact-backed,
+        // not a demo fixture — the frame is computed by the real xml_io
+        // splice + self-check pipeline (over synthetic data) and drift-guarded.
+        'Fix diff': <FixDiff />,
         'Jira handoffs': <LinkedDemoFrame frame={JIRA_FRAME} notice={NOTICE} {...frameProps} />,
       }}
     />
