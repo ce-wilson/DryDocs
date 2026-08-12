@@ -12,11 +12,30 @@ DATA_CENTER folder-identity fix — so the company can test XML fix emission aga
 Control-M exports now, ahead of the next full range port.
 
 It is **not a ledger port**. It does not move "Last completed port" on either side, does
-not roll the step ledger, and uses no base tag. It is legitimate as a one-off because
-every code path taken is **`canonical-producer` in PORT-MANIFEST.yaml** — collisions
-resolve by taking the producer file wholesale — so the next full range port takes the
-same paths at a newer SHA and simply converges over this one. Nothing here needs to be
-unwound later.
+not roll the step ledger, and uses no base tag.
+
+**Dispositions under PORT-MANIFEST first-match-wins — three groups, not one** (corrected
+2026-08-12; the first draft over-claimed canonical-producer for everything):
+
+- **canonical-producer** (blind wholesale take is legitimate and the next full port
+  converges over it): `drydocs_core/orchestration/controlm/xml_vocab.py` (the
+  `drydocs_core/orchestration/**` row) and all of `drydocs_remediation/**`.
+- **evaluate** (the manifest FORBIDS a blind path checkout — diff first):
+  `drydocs_core/data_root.py` (falls to the `drydocs_core/**` default),
+  `drydocs_lineage/extractors/controlm_xml.py` (`drydocs_lineage/**` — "evaluate, do not
+  checkout"), and the six pre-existing test files
+  (`test_remediation_conformance/xml_bridge/scaffold/handoff`,
+  `test_lineage_controlm_xml`, `test_data_root`) under the `tests/**` default.
+- **clean-add** (absent on the consumer, applies untouched): the new test files —
+  `fixtures_controlm_xml.py`, the three `test_xml_io_*` files,
+  `test_remediation_changes/changedoc/equivalence_verdict`.
+
+For the evaluate group: **diff each path (company copy vs `3b9038b1`) before taking
+anything.** Take wholesale only where the diff is empty or the producer is a clean
+superset of the company copy; any real divergence (company-local expectations, values,
+or edits) is a hand-merge that keeps the company-side content and takes the producer
+logic. The "next full port converges" argument covers only the canonical-producer group
+— the full port evaluates these same paths too; it never blindly takes producer.
 
 ## Producer record (verification already performed producer-side)
 
@@ -58,7 +77,10 @@ unwound later.
 
 1. Branch: `git checkout -b drydocs-port-xmltest-20260812`.
 2. Fetch the producer remote fresh (never a cached ref), confirm `3b9038b1` is on its
-   `main`, then take the file states:
+   `main`. **First, the evaluate group:** diff the eight evaluate paths (listed above)
+   against `3b9038b1`; where identical or producer-clean-superset, include them in the
+   checkout below; where genuinely diverged, hand-merge per the manifest instead of
+   checking out. **Then** take the file states (drop any path you hand-merged):
 
    ```
    git checkout 3b9038b1 -- ^
@@ -114,9 +136,12 @@ unwound later.
      tests/unit/test_lineage_controlm_xml.py tests/unit/test_data_root.py
    ```
 
-   Expected: **164 passed** (producer-verified on the identical mixture). Then the full
-   suite: **no new failures against your own pre-port baseline** (the WP1.4/T19
-   infra-block, if still present, is pre-existing and not port-introduced).
+   Expected: **164 passed** (producer-verified on the identical mixture). That number is
+   exact only if every evaluate path came back identical/superset and was taken at
+   producer state; a hand-merged test file may legitimately shift its count — record the
+   delta and the reason. Then the full suite: **no new failures against your own
+   pre-port baseline** (the WP1.4/T19 infra-block, if still present, is pre-existing and
+   not port-introduced).
 6. Commit on the branch with the standard port-commit shape, citing this doc and source
    SHA `3b9038b1`; `--no-ff` merge per your normal review, or hold on the branch if the
    test is exploratory.
