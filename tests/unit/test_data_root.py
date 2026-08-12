@@ -15,6 +15,9 @@ from drydocs_core.data_root import (
     catalog_dir,
     controlm_xml_dir,
     dpl_registry_dir,
+    remediation_incoming_dir,
+    remediation_outgoing_dir,
+    remediation_recommendations_dir,
     resolve_data_root,
     rua_extracted_dir,
     rua_incoming_dir,
@@ -62,6 +65,15 @@ def test_controlm_xml_subfolder_convention(tmp_path, monkeypatch):
     # possible — the landing-zone convention itself is the guard
     monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path))
     assert controlm_xml_dir() == tmp_path / "controlm-xml"
+
+
+def test_remediation_subfolder_convention(tmp_path, monkeypatch):
+    # remediation working zones are deliberately separate from the ingestion
+    # landing zone (controlm-xml/): per-fix lifecycle, not graph-load lifecycle
+    monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path))
+    assert remediation_incoming_dir() == tmp_path / "remediation" / "incoming"
+    assert remediation_outgoing_dir() == tmp_path / "remediation" / "outgoing"
+    assert remediation_recommendations_dir() == tmp_path / "remediation" / "recommendations"
 
 
 def test_create_on_demand_only(tmp_path, monkeypatch):

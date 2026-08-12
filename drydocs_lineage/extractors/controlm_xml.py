@@ -68,26 +68,22 @@ import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-#: folder-level container tags (newer / older format synonyms)
-_FOLDER_TAGS = {"FOLDER", "SMART_FOLDER", "TABLE", "SMART_TABLE"}
-_SMART_TAGS = {"SMART_FOLDER", "SMART_TABLE"}
-_SUBFOLDER_TAGS = {"SUB_FOLDER", "SUBFOLDER"}
-
-#: attribute synonyms, first hit wins
-_FOLDER_NAME_ATTRS = ("FOLDER_NAME", "TABLE_NAME")
-_SUBFOLDER_NAME_ATTRS = ("SUB_FOLDER_NAME", "FOLDER_NAME", "JOBNAME")
-_DESCRIPTION_ATTRS = ("DESCRIPTION", "DESC")
-#: post-execution command — the observed spellings, POSCMD typo included
-_POSTCMD_ATTRS = ("POSTCMD", "POST_CMD", "POSTCOMMAND", "POSCMD")
-#: FileWatcher watched-path template
-_WATCH_ATTRS = ("FILE_PATH", "WATCH_FILE")
-
-
-#: the notification family REQ-2 governs — recorded by name, not just counted
-_NOTIFICATION_TAGS = {"SHOUT", "DOSHOUT", "DOMAIL"}
-#: scanning for those stops at a nested job/sub-folder: their notifications
-#: belong to THEM, not to the container
-_SCAN_STOP_TAGS = _SUBFOLDER_TAGS | {"JOB"}
+# The tag/attribute synonym VOCABULARY is shared with the remediation
+# component's xml_io (components never import each other, so it lives in
+# core — see xml_vocab's docstring). The leading-underscore aliases keep
+# this module's call sites and its tests' monkeypatch surface unchanged.
+from drydocs_core.orchestration.controlm.xml_vocab import (
+    DESCRIPTION_ATTRS as _DESCRIPTION_ATTRS,
+    FOLDER_NAME_ATTRS as _FOLDER_NAME_ATTRS,
+    FOLDER_TAGS as _FOLDER_TAGS,
+    NOTIFICATION_TAGS as _NOTIFICATION_TAGS,
+    POSTCMD_ATTRS as _POSTCMD_ATTRS,
+    SCAN_STOP_TAGS as _SCAN_STOP_TAGS,
+    SMART_TAGS as _SMART_TAGS,
+    SUBFOLDER_NAME_ATTRS as _SUBFOLDER_NAME_ATTRS,
+    SUBFOLDER_TAGS as _SUBFOLDER_TAGS,
+    WATCH_ATTRS as _WATCH_ATTRS,
+)
 
 
 def _attr(elem: ET.Element, *names: str) -> str:

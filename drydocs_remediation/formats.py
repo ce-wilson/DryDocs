@@ -206,21 +206,28 @@ class TranscriptDefinitionFormat(DefinitionFormat):
 class XmlDefinitionFormat(DefinitionFormat):
     """Control-M definition XML — the environment's current wire format.
 
-    BLOCKED on schema acquisition: the authoritative element schema (the EM
-    ``.dtd`` files or a real ``exportdeftable`` output) is company-side only;
-    the vendor doc fetch is 403-blocked (see the acquisition stub in
-    ``external/orchestration/bmc-controlm/``). Implementing this from memory
-    would ship SYNTHESIZED guesses as vendor ground truth — deliberately not done.
+    ``load`` delegates to ``xml_io.load_document`` + its position-faithful
+    projection: reading needs no vendor schema, only located bytes. ``dump``
+    remains deliberately unimplemented AT THIS SEAM — not because emission is
+    blocked (``xml_io.render`` splices the vendor's own file and never authors
+    XML), but because this interface cannot express the §XML contract: a
+    ``DefinitionSet`` alone carries no original document to splice into and no
+    approved change-set to attribute edits to, so any ``dump(definitions)``
+    here would be exactly the regenerate-from-the-model emission that §XML
+    rule 1 forbids. Emission goes through ``xml_io.write(doc, script)``.
     """
 
-    _BLOCKED = (
-        "XML schema acquisition pending — see external/orchestration/bmc-controlm/"
-        "controlm-xml-definition-format.md (company-side .dtd / exportdeftable are "
-        "the authoritative sources). Use TranscriptDefinitionFormat meanwhile."
+    _DUMP_SEAM = (
+        "emitting Control-M XML from a bare DefinitionSet would regenerate the "
+        "document from the model (forbidden by fix-package.md §XML rule 1). "
+        "Emission is xml_io.write(original_document, edit_script) — parse the "
+        "original, splice the approved changes, never re-serialize."
     )
 
     def load(self, source: Path) -> DefinitionSet:
-        raise NotImplementedError(self._BLOCKED)
+        from . import xml_io  # local: xml_io imports this module's dataclasses
+
+        return xml_io.to_definition_set(xml_io.load_document(source))
 
     def dump(self, definitions: DefinitionSet, target: Path) -> Path:
-        raise NotImplementedError(self._BLOCKED)
+        raise NotImplementedError(self._DUMP_SEAM)

@@ -357,6 +357,7 @@
         "config/gate-prompts/fid-identity-and-scope.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",
+        "config/gate-prompts/remediation-fix-tracking.yaml",
         "config/gate-prompts/repo-manifest-data-profile.yaml",
         "config/gate-prompts/rua-bundle-data-profile.yaml",
         "config/gate-prompts/rua-load-shapes.yaml",

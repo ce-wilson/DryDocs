@@ -58,6 +58,7 @@ def main() -> None:
         import render_gates
         import render_ideas
         import render_load_map
+        import render_remediation_diff
         import render_roadmap
         import render_software_registry
 
@@ -66,6 +67,11 @@ def main() -> None:
         render_load_map.main()
         render_software_registry.main()
         render_context_types.main()
+        # The remediation fix-diff frame (2026-08-12) rides here too: its
+        # content is computed by the real xml_io splice + self-check pipeline,
+        # so any change to that mechanism must re-render the committed frame
+        # or the drift guard (test_remediation_diff_json) goes red.
+        render_remediation_diff.main()
         # The inbox render (2026-08-05) rides here for the same reason as the
         # others: the board links to it, so a groom that edits IDEAS.md without
         # re-rendering would leave a committed page describing a stale inbox —

@@ -268,10 +268,13 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     Idea-77 -> graph-vs-files experiment ALPHA code set, SME-adopted). THIS pin
     move is the clause BOTH experiment runs missed — fixed at adoption, which
     is why adoption is a review step and not a merge.
+    69 -> 70 at the remediation xml_io epic (2026-08-12): FixDiff IS bound
+    (remediation/, directory evidence) — the SME working-session diff serves
+    exactly one module — so BOTH counts move by one, a fully-bound addition.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        29,
-        69,
+        30,
+        70,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
