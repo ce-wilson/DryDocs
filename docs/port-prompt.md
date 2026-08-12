@@ -1034,6 +1034,48 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   "never parse a render", applied one step upstream. That fragment is company-only;
   producer has no copy of it.
 
+- **RELAY-9 — THE PAT TEAM REPORT *DOES* CARRY aligned/flex/dedicated; it is named
+  `Relationship Type`, and the column that looks like ours is a decoy**
+  `[VERIFIED-PRODUCER]` (raised 2026-08-11; producer commit `2f33e5c` pins it).
+  A company session building the `dev_teams` / `pat_product_mapping` projection held
+  off loading the mapping half, concluding that neither `pat-team-member-details-report`
+  nor `TEAM_ACTIVE_SOURCES_REPORT` carries an alignment column and that `team_type`
+  therefore had no source. **Holding off was right; the premise is wrong.**
+  **The mapping, from the SME's TEAM_DETAILS_REPORT column layout:**
+  `Relationship Type` → `team_type` (values Aligned | Flex | Dedicated) ·
+  `Product ID` → `product_id` · `Supporting Area Product ID` → `area_product_id` ·
+  `Sponsoring Area Product ID` → `sponsored_area_product_id` · `Seal IDs` → `seal_ids`
+  (semicolon-delimited, 1..n — which is why `PatProductMappingRow` normalizes `;` → `,`).
+  **THE DECOY, and it is the whole reason this relay exists.** The same report also
+  carries **`Team Type Name`** — the team's DISCIPLINE (Technology, Product, Design,
+  Data & Analytics, Portfolio, SRE). It is not our field. Mapping by column-name
+  similarity picks it every time, because the correct column shares no words with
+  `team_type` and the wrong one matches it exactly. The two are orthogonal facts: a
+  Technology team may be Aligned, Flex or Dedicated.
+  **Do NOT take the "the ontology is stale" exit.** `docs/Product/Technology_Team_Types.md`
+  §3 is the governing PAT definition of Aligned / Dedicated / Flex and states that Team
+  Types are maintained in the PAT Product Catalog. Aligned/flex/dedicated is an asserted
+  governance fact (who prioritizes the backlog, who funds it), not the discipline and not
+  derivable from whether a `product_id` is populated.
+  **Producer-side the consequence is louder than a wrong edge property:**
+  `PatProductMappingRow._check_team_type` RAISES on anything outside
+  `{aligned, flex, dedicated}`, so feeding the discipline rejects EVERY row rather than
+  writing a bad value. If your row model kept that validator, the same is true your side.
+  **The discipline is deliberately not modelled** — it is a property of the TEAM, while
+  every field on that row is a property of the team's RELATIONSHIP to a product.
+  `extra="ignore"` drops it silently, same handling as Sponsoring Product Line. Adopting
+  it needs its own home and its own gate; do not bolt it onto this row.
+  **Two checks producer ran so you do not have to.** (a) The report's five `Sponsoring*`
+  columns reconcile EXACTLY to the G6-RIDER inventory — four ID+Name pairs plus two
+  name-only — so C17 §b/§c stand unchanged and there is no coverage gap. (b) The report
+  carries a **`Legacy Team ID`** (opaque UUID-shaped predecessor key), unmodelled either
+  side; `team_id` remains the only team key. Do not let it become a second one.
+  **STILL OPEN, and it is yours as much as ours:** `sponsored: bool` has no named source
+  column in the layout. It is plausibly derived from whether a sponsoring column is
+  populated, but that is inference — and since cypher §3a/§3b already hard-code
+  `sponsored = true` on their own edges, the flag may only be load-bearing on the §2
+  alignment edge. Confirm against the extract before deriving it.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
