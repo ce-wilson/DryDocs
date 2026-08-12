@@ -906,7 +906,10 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
 - **RELAY-6 — THE COMPANY HOLDS A SIGNED SERVICENOW MODEL THE PRODUCER CANNOT SEE,
   AND GUARDRAIL 6 HAS NO SLOT FOR THAT DIRECTION** `[SME-REPORTED]` (new 2026-08-11,
   from screenshots of a company session; the producer-side half IS verified — see
-  below). The company has built and SIGNED `snow-hpsm-queue-to-group` (2026-07-15):
+  below). The company has SIGNED `snow-hpsm-queue-to-group` (2026-07-15) and PARTIALLY
+  BUILT it — **corrected 2026-08-11: the loaders are marked DRAFT and the source entry stays
+  `confirmed: false` pending the final loader build, so "built and signed" overstated the build
+  half.** What exists:
   `snow_support_crosswalk.py` + `.cypher`, a `load-snow-support-crosswalk` CLI, the
   node classes `:ServiceNowGroup` and `:HpsmQueue`, and the shape
   `(:BusinessApplication {seal_id})-[:HAS_SUPPORT_QUEUE]->(:HpsmQueue)-[:RESOLVED_BY]->(:ServiceNowGroup)`,
@@ -928,7 +931,22 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   confirm the gate and loader still exist and are signed, and say whether the
   producer should hold a READ-ONLY record of the model (names, node classes, edge
   shape — no code) so producer-side gates stop drafting blind. Recorded producer-side
-  in `knowledge/upgrade-plans/servicenow-replica-evidence.md`.
+  in `knowledge/upgrade-plans/servicenow-replica-evidence.md` (§9, §10.4-§10.6).
+  **THREE ASKS ADDED 2026-08-11, each from a company code search the producer cannot repeat.**
+  (i) CONFIRM THE PATHS. Only one full path was ever shown to the producer; the rest were bare
+  filenames. Producer convention would put the gate at `config/gate-prompts/<id>.yaml`, the
+  loader under `drydocs/loaders/`, the cypher under `drydocs/loaders/cypher/` — INFERRED, never
+  observed. Confirm or correct, so producer-side documents stop citing names without homes.
+  (ii) THE TIER PARSER HAS A GAP AT THE SRE CASE. It derives L3 from a development token and L2
+  from a support token and returns None otherwise — the SME's support-SRE code is not among
+  them. G35 ruled SRE presence DERIVED from the group-name convention, so the derivation it
+  relies on does not currently cover that case. Rule whether the parser gains the token, or
+  whether SRE is derived some other way.
+  (iii) DOES `:LogicalDeployment` ALREADY EXIST COMPANY-SIDE? It appears in the primary-resolver
+  edge shape. DryDocs has NO deployment-grain node, and both C10's gate-bound candidate #1 and
+  Idea-101 are open questions about whether to adopt one. If the company already models a
+  deployment concept, two sides are about to model it independently — which is precisely the
+  collision this relay exists to prevent, and it is a bigger one than the group shape was.
   **A rider worth ruling while you are there:** the crosswalk is hand-verified YAML,
   per-machine and gitignored, while the ServiceNow TOM tables carry the same
   app→group→technician mapping FROM THE SOURCE, with the crosswalk's `l2`/`l3` tiers

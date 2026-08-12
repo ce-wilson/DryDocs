@@ -1138,3 +1138,68 @@ capability, not a fact, and it belongs with the group-membership work under the 
 `snow-hpsm-queue-to-group` (§9), not to G35. Two things to settle there rather than here: whether
 the segment vocabulary is closed (three function codes observed, more may exist), and whether a
 group name that does not parse is a data-quality finding or simply out of scope.
+
+### 10.4 The convention IS already parsed — partially, and not for the case that raised it
+
+**§10.3 asked whether DryDocs parses the naming convention and said it was a capability question for
+the group-membership work. It is already answered company-side, and the answer has a gap exactly
+where §10 needed it.**
+
+Evidence: a company-session code search, 2026-08-11. The tier derivation lives in the ServiceNow
+row model as a computed field, and its implementation is two lines:
+
+```
+_SENG  ->  "L3"     # Software Engineering
+_ASUP  ->  "L2"     # App Support
+otherwise -> None   # unknown, never guessed
+```
+
+**What it drives.** The derived tier is not decorative — it reaches the graph as an edge property on
+the support edges: the `:ServiceNowGroup.tier` property, a primary-resolver edge to the HPSM queue,
+the support-queue edge from the application, and a membership edge. So the `*_ASUP` / `*_SENG`
+suffix is a **load-bearing convention**: it sets the L2/L3 tier wherever support is modelled.
+
+**What it does NOT parse, and this is deliberate.** The division prefix and the domain segment are
+opaque. The function's own docstring says so: *"Derives ONLY the tier from the group name — the
+group name itself is never derived (names are irregular and used as-fetched)."* The **full group
+name string is the MERGE key**, used verbatim. There is no decomposition of division or domain.
+
+### 10.5 Three things this changes
+
+**(a) THE SRE CASE IS NOT COVERED.** The parser knows two tokens. The SME's third function code —
+support-SRE — is **not among them**, so an SRE group derives `tier = None`. §10 recorded that "is
+there SRE cover" is derivable from the convention; the derivation **exists for support and
+development and not for SRE**. That is a concrete, named gap rather than an open question, and it
+belongs to the company gate that owns the parser. G16's ruling (OPTIONAL and DERIVED) is unaffected
+— the fact remains derivable in principle — but anything that *depends* on the derivation working
+today would be depending on a branch that returns None.
+
+**(b) THE MATCH IS UNDERSCORE-DELIMITED, which is a fragility worth recording.** The token matches
+mid-name or trailing, but only in underscore form. A run-together name or a hyphenated variant does
+not match and yields `tier = None`. Combined with (a), the failure mode is uniform and quiet:
+**unknown tier is never guessed, it is null** — which is the right behaviour, and also means a
+missing tier is indistinguishable from an unparseable one unless something says which.
+
+**(c) THE `u_group` NAME IS THE JOIN, AND IT IS TAKEN AS-FETCHED.** Names being "irregular" is
+recorded in the source, not inferred by us. Any DryDocs-side parsing beyond the tier token would be
+re-deriving something the owning side deliberately declined to derive.
+
+### 10.6 A correction to RELAY-6 and §9: signed is not finished
+
+**§9 and RELAY-6 both say the company model is "built and signed". That overstates the build half,
+and the correction matters for anyone planning against it.** The gate is signed (2026-07-15) and the
+tier logic is implemented — but the **SNOW support loaders are marked DRAFT and the source entry
+stays `confirmed: false`**, pending the final loader build.
+
+So the accurate statement is: **the MODEL is signed and partially implemented; the LOAD is not
+finished.** That changes nothing about G35's decision not to mint a competing shape — a signed
+model is a position whether or not its loader is complete — but it does mean the company side is
+mid-build, and a producer-side item that assumed a finished loader would be wrong.
+
+**Also visible, and worth naming because it bears on a separate open question:** the company model
+carries a **`:LogicalDeployment` node class** on the primary-resolver edge. DryDocs has no
+deployment-grain node, and C10's gate-bound candidate #1 plus `Idea-101` are both about whether to
+adopt one. **The company may already have.** Recorded as an observation, not a conclusion — the
+screenshots show the label in an edge shape, not its definition — and it is now the sharpest
+question for RELAY-6 to bring back, because two sides independently modelling a deployment concept
+is exactly the collision RELAY-6 exists to prevent.
