@@ -187,12 +187,26 @@ poetry run python -c "from pathlib import Path; import os; from drydocs_core imp
 # 3. AFTER — the guards fail on any downgrade, dropped entry, or audit truncation
 $env:RECONCILE_BEFORE_DIR = "$env:TEMP/reconcile-before"
 poetry run pytest tests/unit/test_port_reconcile_guards.py -q
+
+# 4. TEARDOWN — clear the variable and drop the snapshot. Do not skip this.
+Remove-Item Env:RECONCILE_BEFORE_DIR
+Remove-Item -Recurse -Force "$env:TEMP/reconcile-before"
 ```
 
-Without `RECONCILE_BEFORE_DIR` the live checks skip and only the fixture-driven
-mechanics run — so the file is safe in every CI. The pyproject version-string
-rule is asserted separately in `test_port_manifest.py` (keep the consumer's
-version; producer `v*` tags never cherry-pick).
+**Step 4 is not tidiness.** The variable outliving its before-dir is a real
+recorded failure: a later, unrelated session in the same shell ran the full suite
+and got four reconcile-guard failures that had nothing to do with its work, and
+spent the time proving that before moving on. The guard now fails with
+"re-snapshot it or clear the variable" instead of a bare `FileNotFoundError`, but
+the cheap fix is still to not leave it set.
+
+With `RECONCILE_BEFORE_DIR` **unset** the live checks skip and only the
+fixture-driven mechanics run — so the file is safe in every CI. **Set but
+unusable** (missing dir, or a snapshot short of all four files) FAILS rather than
+skips, deliberately: a set variable claims the port's safety check is armed, and
+silently skipping it would report green on an unchecked merge. The pyproject
+version-string rule is asserted separately in `test_port_manifest.py` (keep the
+consumer's version; producer `v*` tags never cherry-pick).
 
 ## Track-2 (optional — real data, or fresh sample)
 

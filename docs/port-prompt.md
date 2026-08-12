@@ -1637,6 +1637,10 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   capability_assert=false skips per T18). A retired-id refusal from
   `SourceRegistry.from_yaml` is the D4 guard WORKING, not a port failure — rebind the
   loader in `loader-source-overlay.yaml`, never by re-adding the retired id.
+  Likewise four `test_port_reconcile_guards` failures naming a before-dir mean a
+  stale `RECONCILE_BEFORE_DIR` is still set in that shell from an earlier reconcile
+  — clear it (reconcile-port step 4) and re-run; that is the guard WORKING too, not
+  a port failure.
   Producer chain reference (like-for-like venue: CSV-PRESENT desktop, no
   RECONCILE_BEFORE_DIR) — at step 83, the ddlineage retirement:
   1539

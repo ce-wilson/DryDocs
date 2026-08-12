@@ -19,20 +19,25 @@ Three rules:
 
 Consumer-side usage during reconcile-port (documented in that skill):
 
-    1. BEFORE applying the port, snapshot the consumer copies:
+    1. BEFORE applying the port, snapshot the consumer copies — ALL FOUR; each
+       live check below reads one, and a missing file fails the run:
          mkdir %TEMP%/reconcile-before
          python -c "from pathlib import Path; from drydocs_core import yaml_fragments as yf; \
             Path('<before-dir>/relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); \
             Path('<before-dir>/taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
-         cp config/gate-log.md  <before-dir>/
+         cp docs/restructure/backlog.yaml config/gate-log.md  <before-dir>/
        (S5: both registries are fragment DIRECTORIES now — the snapshot is the
        MERGED document, so the before/after comparison stays file-shaped.)
     2. Apply the port range / resolve collisions.
     3. RECONCILE_BEFORE_DIR=<before-dir> pytest tests/unit/test_port_reconcile_guards.py -q
        → FAILS on any downgrade / dropped entry / audit truncation the merge introduced.
+    4. AFTER the reconcile, CLEAR the variable and drop the snapshot dir. Nothing
+       else does — and the variable outliving its before-dir is what makes the
+       next unrelated run in that shell report four broken-looking failures.
 
-Without RECONCILE_BEFORE_DIR the live-comparison tests SKIP; the fixture-driven
-mechanics tests run everywhere (producer CI included).
+With RECONCILE_BEFORE_DIR UNSET the live-comparison tests SKIP; the fixture-driven
+mechanics tests run everywhere (producer CI included). Set-but-unusable is NOT a
+skip — see ``before_text`` for why it fails loudly instead.
 """
 
 from __future__ import annotations
@@ -247,13 +252,55 @@ _needs_before = pytest.mark.skipif(
     reason=f"{BEFORE_DIR_ENV} not set — consumer-side reconcile check only",
 )
 
+# The four snapshots step 1 copies; named here so a missing one is reported as the
+# operator's next action rather than as a FileNotFoundError traceback.
+BEFORE_SNAPSHOTS = (
+    "relationship_vocabulary.yaml",
+    "taxonomy-ontology-map.yaml",
+    "backlog.yaml",
+    "gate-log.md",
+)
+
+
+def before_text(name: str) -> str:
+    """Read one snapshot out of <before-dir>, or fail saying what to do about it.
+
+    UNSET skips (``_needs_before``); set-but-unusable FAILS. The asymmetry is the
+    point. A set ``RECONCILE_BEFORE_DIR`` is a claim that a reconcile is in
+    progress and its guard is armed — so the two ways that claim can be false
+    need opposite treatment. Skipping a set-but-broken snapshot would silently
+    drop the port's own safety check while the run still reports green, which is
+    the J16/J22 default-deny failure exactly ("a deliberate default reads exactly
+    like an oversight").
+
+    What this replaces: the variable outlives the reconcile session — nothing in
+    the runbook cleared it until step 4 was added — the before-dir gets cleaned
+    up, and the next unrelated ``pytest`` in that shell raises FileNotFoundError
+    from four tests at once. That reads as four broken guards, and it cost a real
+    session the time to prove otherwise. Same failure, named at its cause.
+    """
+    before_dir = Path(os.environ[BEFORE_DIR_ENV])
+    if not before_dir.is_dir():
+        pytest.fail(
+            f"{BEFORE_DIR_ENV} is set to {before_dir}, which is not a directory. "
+            "Either re-snapshot it (reconcile-port step 1) or clear the variable "
+            "— a stale value left over from an earlier reconcile makes every "
+            "later run in this shell look broken."
+        )
+    snapshot = before_dir / name
+    if not snapshot.is_file():
+        pytest.fail(
+            f"{BEFORE_DIR_ENV} points at {before_dir}, which has no {name}. "
+            f"Step 1 must copy all four: {', '.join(BEFORE_SNAPSHOTS)}."
+        )
+    return snapshot.read_text(encoding="utf-8")
+
 
 @_needs_before
 def test_reconcile_vocab_no_downgrade_live() -> None:
-    before_dir = Path(os.environ[BEFORE_DIR_ENV])
-    before = yaml.safe_load(
-        (before_dir / "relationship_vocabulary.yaml").read_text(encoding="utf-8")
-    )
+    before = yaml.safe_load(before_text("relationship_vocabulary.yaml"))
+    # S5: VOCAB_FILE is a fragment DIRECTORY — the snapshot stays file-shaped,
+    # the live side must merge the fragments.
     after = yaml_fragments.load_yaml_source(VOCAB_FILE)
     violations = status_downgrades(
         vocab_entries(before), vocab_entries(after), key="id", downgrade_map=VOCAB_DOWNGRADES
@@ -263,8 +310,8 @@ def test_reconcile_vocab_no_downgrade_live() -> None:
 
 @_needs_before
 def test_reconcile_map_no_downgrade_live() -> None:
-    before_dir = Path(os.environ[BEFORE_DIR_ENV])
-    before = yaml.safe_load((before_dir / "taxonomy-ontology-map.yaml").read_text(encoding="utf-8"))
+    before = yaml.safe_load(before_text("taxonomy-ontology-map.yaml"))
+    # S5: MAP_FILE is a fragment DIRECTORY (see the vocab twin above).
     after = yaml_fragments.load_yaml_source(MAP_FILE)
     violations = status_downgrades(
         map_entries(before), map_entries(after), key="id", downgrade_map=MAP_DOWNGRADES
@@ -274,8 +321,7 @@ def test_reconcile_map_no_downgrade_live() -> None:
 
 @_needs_before
 def test_reconcile_backlog_no_regression_live() -> None:
-    before_dir = Path(os.environ[BEFORE_DIR_ENV])
-    before = yaml.safe_load((before_dir / "backlog.yaml").read_text(encoding="utf-8"))
+    before = yaml.safe_load(before_text("backlog.yaml"))
     after = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
     violations = status_downgrades(
         backlog_entries(before),
@@ -288,11 +334,44 @@ def test_reconcile_backlog_no_regression_live() -> None:
 
 @_needs_before
 def test_reconcile_gate_log_append_only_live() -> None:
-    before_dir = Path(os.environ[BEFORE_DIR_ENV])
-    before = (before_dir / "gate-log.md").read_text(encoding="utf-8")
+    before = before_text("gate-log.md")
     after = GATE_LOG.read_text(encoding="utf-8")
     violation = append_only_violation(before, after)
     assert violation is None, violation
+
+
+# --- before_text mechanics (run everywhere; these are what UNSET-vs-BROKEN means) --
+
+
+def test_before_text_reads_a_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    (tmp_path / "gate-log.md").write_text("# HITL gate log\n", encoding="utf-8")
+    monkeypatch.setenv(BEFORE_DIR_ENV, str(tmp_path))
+    assert before_text("gate-log.md") == "# HITL gate log\n"
+
+
+def test_before_text_missing_dir_says_resnapshot_or_clear(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The stale-variable case: fail, and name both ways out.
+
+    Previously a FileNotFoundError from four tests at once — indistinguishable
+    from four genuinely broken guards.
+    """
+    monkeypatch.setenv(BEFORE_DIR_ENV, str(REPO / "__no_such_before_dir__"))
+    # pytest.fail raises Failed, which subclasses BaseException — `Exception` misses it.
+    with pytest.raises(pytest.fail.Exception, match="not a directory") as exc:
+        before_text("gate-log.md")
+    assert "clear the variable" in str(exc.value)
+
+
+def test_before_text_missing_file_names_all_four(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An INCOMPLETE snapshot is the other half — the docstring's step 1 omitted
+    backlog.yaml, so following it literally produced this exact failure."""
+    monkeypatch.setenv(BEFORE_DIR_ENV, str(tmp_path))
+    with pytest.raises(pytest.fail.Exception, match="has no backlog.yaml") as exc:
+        before_text("backlog.yaml")
+    for name in BEFORE_SNAPSHOTS:
+        assert name in str(exc.value)
 
 
 # --- J16: no tracked path may silently resolve to `default:` ----------------------
