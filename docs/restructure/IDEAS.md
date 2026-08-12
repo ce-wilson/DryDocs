@@ -62,7 +62,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-110`** · 2026-08-12 · `[doc]` · **open** · prio? **Low** —
+- **`Idea-110`** · 2026-08-12 · `[doc]` · **closed — reclassified as a dated record, same day** · prio? **Low** —
+  **CLOSED 2026-08-12.** User ruled option (c): the file is a dated RECORD of the
+  2026-07-21 issue, not a usable starting prompt. Its header now says exactly that — a
+  `status: DATED RECORD` block with the capture and landing dates, an explicit "do not
+  paste as-is", and the reason it is kept anyway (it is the clearest single statement of
+  the approved design direction: Kept Orbit brand rules, locked stack, token palette,
+  layout anatomy — all of which still hold). The known drift is named in the header rather
+  than left for the next reader to chase: the two marks are gone, the final mark is
+  UNSETTLED, and mark references in the body are to be read as intent, not as pointers to
+  assets. The body is deliberately NOT rewritten — annotating a record beats editing one,
+  and the §2/§6 wording is part of what the record records. Two caveats added while there:
+  the 33-path check is stamped point-in-time rather than offered as a guarantee, and §7
+  ("what actually needs design work") is flagged as the most likely stale section, being a
+  2026-07-21 to-do list. `kept-orbit-brand-sheet.png` + `kept-orbit-philosophy.md` remain
+  the brand authority and are present. The general hazard below stands and is the residue
+  worth keeping.
   **`UI-WIP/claude-design-ui-prompt.md` cites two canonical brand assets that main deleted
   as REJECTED two and a half weeks before the doc was merged.** The doc names
   `UI-WIP/drydocs-mark.svg` + `drydocs-mark-mini.svg` as "final vector marks" under

@@ -1,7 +1,33 @@
-# Claude Design UI — starting prompt for the DryDocs Console
+# Claude Design UI starting prompt — RECORD of the 2026-07-21 issue
 
-> Copy everything below the line into Claude Design UI as the opening prompt.
-> The designated folder is the DryDocs repo root; every path below is relative to it.
+```yaml
+status: DATED RECORD      # not a live prompt — do not paste as-is
+captured: 2026-07-21      # authored at d9a2eac; describes the tree on that date
+landed:   2026-08-12      # merged to main at 429d829, unchanged
+```
+
+> **This is a record of the prompt as issued on 2026-07-21, not current instructions.**
+> It was written to be pasted into Claude Design UI against the repo root, and it is kept
+> because it is the clearest single statement of the approved design direction — the Kept
+> Orbit brand rules, the locked stack, the token palette, and the layout anatomy. Those
+> hold. What does not automatically hold is every **path** it cites: the file was authored
+> on a branch and merged three weeks later, so it describes the tree at capture date.
+>
+> **Reclassified 2026-08-12** (Idea-110). Reusing it means re-checking its references
+> first. The known drift, recorded so the next reader does not chase it:
+>
+> - **`UI-WIP/drydocs-mark.svg` and `drydocs-mark-mini.svg` no longer exist.** §2 and §6
+>   list them as the "final vector marks" under *Approved / canonical*. Commit `d6022c3`
+>   (2026-07-28) dropped them as rejected and nothing has replaced them, so the final mark
+>   is **unsettled** — treat any mark reference below as a description of intent, not as a
+>   pointer to an asset. `kept-orbit-brand-sheet.png` and `kept-orbit-philosophy.md` are
+>   present and remain the brand authority.
+> - Everything else it names resolved when this was checked (33 paths, 2026-08-12),
+>   including the component inventory in §3, the icon registry in §4 and the connection
+>   seams in §5. That check is a point-in-time result, not a guarantee.
+>
+> §7 ("What actually needs design work") is the part most likely to be stale — it is a
+> 2026-07-21 to-do list, and some of it may since be done.
 
 ---
 
