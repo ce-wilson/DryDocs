@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-12T11:19:18",
+    "captured_at": "2026-08-12T13:41:43",
     "date": "20260812",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6bf66fe",
-      "full": "6bf66fe5a969053b3f5a913aca5ce5ce2cf2986c",
+      "commit": "2daf8ba",
+      "full": "2daf8badf0734b8522a52af4432c272a24f3e89a",
       "branch": "main",
-      "describe": "port-base-20260811-40-g6bf66fe",
-      "subject": "Merge feat/remediation-xml-io ΓÇö the Remediation Fix module epic (plan reactive-finding-shannon)",
+      "describe": "port-base-20260811-51-g2daf8ba",
+      "subject": "merge: vocabulary ratification — domains renamed, id policy ruled, both gates signed",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6956,6 +6956,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/vocabulary-domains-and-id-policy.yaml",
+      "name": "vocabulary-domains-and-id-policy.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/vocabulary-domains-and-id-policy.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/launcher-registry.yaml",
       "name": "launcher-registry.yaml",
       "extension": ".yaml",
@@ -9147,6 +9156,15 @@
       "name": "tech-debt-taxonomy-ontology-map.md",
       "extension": ".md",
       "rel_path": "docs/reviews/tech-debt-taxonomy-ontology-map.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/vocabulary-planned-review.md",
+      "name": "vocabulary-planned-review.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/vocabulary-planned-review.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11600,19 +11618,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml",
-      "name": "40-local-controlm.yaml",
+      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml",
+      "name": "40-local-scheduler.yaml",
       "extension": ".yaml",
-      "rel_path": "drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml",
+      "rel_path": "drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/41-local-seal.yaml",
-      "name": "41-local-seal.yaml",
+      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml",
+      "name": "41-local-business-application.yaml",
       "extension": ".yaml",
-      "rel_path": "drydocs_core/ontology/relationship_vocabulary/41-local-seal.yaml",
+      "rel_path": "drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13787,10 +13805,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json",
-      "name": "drydocs-20260812.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1119.json",
+      "name": "drydocs-20260812-1119.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812-1119.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17773,6 +17791,10 @@
       "drydocs/agents/graph_qa/tier2.py"
     ],
     [
+      "drydocs/agents/graph_qa/schema_context.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
       "drydocs/agents/graph_qa/tier2.py",
       "drydocs/agents/graph_qa/task_graph.py"
     ],
@@ -18887,6 +18909,14 @@
     [
       "drydocs/drydocs_remediation/changedoc.py",
       "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/changes.py",
+      "drydocs/drydocs_core/ontology/schema_graph.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/changes.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
       "drydocs/drydocs_remediation/changes.py",
@@ -25387,6 +25417,11 @@
       "drydocs/config/gate-prompts/ui-write-surface.yaml"
     ],
     [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
+    ],
+    [
       "drydocs/config/manual-loads",
       "CONTAINS",
       "drydocs/config/manual-loads/README.md"
@@ -26340,6 +26375,11 @@
       "drydocs/docs/reviews",
       "CONTAINS",
       "drydocs/docs/reviews/tech-debt-taxonomy-ontology-map.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/vocabulary-planned-review.md"
     ],
     [
       "drydocs/docs/reviews/graph-vs-files-experiment",
@@ -27934,12 +27974,12 @@
     [
       "drydocs/drydocs_core/ontology/relationship_vocabulary",
       "CONTAINS",
-      "drydocs/drydocs_core/ontology/relationship_vocabulary/40-local-controlm.yaml"
+      "drydocs/drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml"
     ],
     [
       "drydocs/drydocs_core/ontology/relationship_vocabulary",
       "CONTAINS",
-      "drydocs/drydocs_core/ontology/relationship_vocabulary/41-local-seal.yaml"
+      "drydocs/drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml"
     ],
     [
       "drydocs/drydocs_core/ontology/relationship_vocabulary",
@@ -29089,7 +29129,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1119.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -31141,13 +31181,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1680,
-    "edges": 943,
+    "files": 1682,
+    "edges": 946,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1951,
+    "rels": 1953,
     "directories": 272
   }
 }
