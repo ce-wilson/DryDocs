@@ -184,6 +184,19 @@ units from `docs/restructure/backlog.yaml`. Each backlog item names its agent + 
 
 ## 6. Working agreements
 
+- **Where new code goes is dictated — read [`MODULE_MAP.md`](MODULE_MAP.md) before creating a
+  file.** §1's four layers are the *conceptual* routing; `MODULE_MAP.md` is the *physical* one,
+  and they answer different questions. It holds the per-module table, the invariant (**core
+  imports nothing from any component; components import only core, never each other**), and the
+  S7 rule for when a directory name must match its module name. The placement test, from ADR
+  0002-A §2: *pure parse / resolve / typed-model / driver / config → `drydocs_core/`; anything
+  that writes the graph or owns a run cadence → a component.* When unsure, leave it in the
+  component — over-extracting "to share early" recreates the tangle the split removed (0002-A §7).
+  Enforcement is [`tests/unit/test_module_boundary.py`](tests/unit/test_module_boundary.py), and it
+  is **default-deny**: a module classified into no bucket fails as UNCLASSIFIED, so new code means
+  adding its `MODULE_MAP.md` row and its prefix to `CORE_PREFIXES` or a `COMPONENT_GROUP` in the
+  same commit. A backlog item's `module:` field names the target component; the map says which
+  directory that is.
 - **Verify before asserting.** A recalled fact or stale doc that names a file/flag/column may
   be wrong — confirm it exists before relying on it.
 - **Live-verification claims name their venue (J18).** A "verified live" claim names the
