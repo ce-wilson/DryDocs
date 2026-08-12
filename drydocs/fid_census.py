@@ -198,7 +198,22 @@ def _normalize(name: str) -> str:
     """Trim only. Case is NOT folded: the directory and the scheduler are separate
     systems, and silently folding would convert a real identity question into an
     invisible match. Near-misses surface as ``case_only_mismatches`` instead — the
-    same choice §D1 made for script paths, for the same reason."""
+    same choice §D1 made for script paths, for the same reason.
+
+    THE SME HAS SINCE RULED THAT CASE DOES NOT DISTINGUISH THESE ACCOUNTS
+    (2026-08-12): the directory join is
+    ``UPPER(HR_PHONE_EXP.EMP_LAST_NAME) = UPPER(<control-m job table>.OWNER)``.
+    This function is deliberately NOT changed, because the ruling changes how the
+    result is READ, not how it is measured — a census that folds silently can no
+    longer report how much folding it did, and that count is evidence the gate
+    asked for. **Consequence for whoever reads the numbers: under the SME's rule
+    the true intersection is ``demand_in_application + case_only_mismatches``, and
+    ``demand_in_application`` alone UNDERSTATES it by exactly that many accounts.**
+    ``reconciles()`` still balances, because a case-only near-miss is counted in
+    the remainder either way. If the gate later rules case-folding into the
+    MEASUREMENT, fold here and drop the counter together — never one without the
+    other, or the census silently loses the ability to show its own correction.
+    """
     return name.strip()
 
 
