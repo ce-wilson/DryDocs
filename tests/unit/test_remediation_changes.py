@@ -250,7 +250,10 @@ def test_anchor_queries_pass_the_read_only_guard() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_fix_tracking_changeset_is_gate_bound_and_key_addressed(tmp_path) -> None:
+def test_fix_tracking_changeset_is_ratified_and_key_addressed(tmp_path) -> None:
+    """The gate block flipped GATE-BOUND -> RATIFIED at the remediation-fix-
+    tracking sign-off (2026-08-12): names, enum, and writer are ruled; the
+    envelope fence is still stated verbatim."""
     changeset = FixTrackingChangeset(
         fix_id="FIX-2026-001",
         status="proposed",
@@ -267,7 +270,8 @@ def test_fix_tracking_changeset_is_gate_bound_and_key_addressed(tmp_path) -> Non
     path = fix_tracking_changeset(changeset, tmp_path / "fix-tracking.yaml")
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     assert data["schema"] == "drydocs.remediation.fix-tracking.v1"
-    assert data["gate"]["status"] == "GATE-BOUND"
+    assert data["gate"]["status"] == "RATIFIED"
+    assert "remediation-fix-tracking" in data["gate"]["ruling"]
     assert "MUST NOT be reused" in data["gate"]["note"]
     target = data["targets"][0]
     assert target["node_key"] == {"folder_id": 4711, "job_id": 12}
@@ -277,6 +281,38 @@ def test_fix_tracking_changeset_is_gate_bound_and_key_addressed(tmp_path) -> Non
     assert props["remediation_status_date"] == "2026-08-12"
     # the artifact must never smuggle the envelope vocabulary
     assert not any(k.startswith("source_") for k in props)
+
+
+def test_unknown_fix_status_is_refused(tmp_path) -> None:
+    """The §B2 enum has no 'rejected': a rejected fix removes the properties.
+    Anything outside the ruled enum is refused at emission, not at the loader."""
+    changeset = FixTrackingChangeset(fix_id="FIX-2026-002", status="rejected", date="2026-08-12")
+    with pytest.raises(ValueError, match="ruled enum"):
+        fix_tracking_changeset(changeset, tmp_path / "fix-tracking.yaml")
+
+
+def test_citable_relationships_mirror_the_registry_actives() -> None:
+    """CITABLE_RELATIONSHIPS is DERIVED from the registry (the hand-kept tuple
+    drifted past the G22 flips). This pins the ruling content so a registry
+    change that alters the citable set surfaces here deliberately."""
+    from drydocs_remediation.changes import CITABLE_RELATIONSHIPS
+
+    assert set(CITABLE_RELATIONSHIPS) == {
+        "SCHEDULED_ON",
+        "CONTAINS_JOB",
+        "CONTAINS_FOLDER",
+        "REQUIRES_IN_CONDITION",
+        "EMITS_OUT_CONDITION",
+        "WAS_INFORMED_BY",
+        "BELONGS_TO_APPLICATION",
+        "INVOKES",
+        "USES_ARTIFACT",
+        "RUNS_ON",
+        "CONTAINS_HOST",
+        "READS_FROM",
+        "WRITES_TO",
+    }
+    assert "TRIGGERS" not in CITABLE_RELATIONSHIPS, "planned — the filter excludes it"
 
 
 def test_no_graph_write_guards_still_green_after_this_module() -> None:
