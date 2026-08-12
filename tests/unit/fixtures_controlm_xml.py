@@ -164,6 +164,19 @@ F10_UTF16 = (
     "</DEFTABLE>\n"
 ).encode("utf-16")  # carries the LE BOM
 
+#: F11 — the SAME folder name in TWO data centers: folder names are only
+#: unique per DC, so identity without DATACENTER is half an identity.
+F11_MULTI_DC = b"""<?xml version="1.0" encoding="UTF-8"?>
+<DEFTABLE>
+  <SMART_FOLDER DATACENTER="DC1" FOLDER_NAME="PRXYZ1A">
+    <JOB JOBNAME="PRXYZ1A001" TASKTYPE="Command" CMDLINE="dc1.sh"/>
+  </SMART_FOLDER>
+  <SMART_FOLDER DATACENTER="DC2" FOLDER_NAME="PRXYZ1A">
+    <JOB JOBNAME="PRXYZ1A001" TASKTYPE="Command" CMDLINE="dc2.sh"/>
+  </SMART_FOLDER>
+</DEFTABLE>
+"""
+
 #: The round-trip corpus: everything load_document must accept.
 ROUND_TRIP_FIXTURES: dict[str, bytes] = {
     "F1_minimal": F1_MINIMAL,
@@ -175,4 +188,5 @@ ROUND_TRIP_FIXTURES: dict[str, bytes] = {
     "F7_namespaces": F7_NAMESPACES,
     "F8_nesting": F8_NESTING,
     "F9_latin1": F9_LATIN1,
+    "F11_multi_dc": F11_MULTI_DC,
 }

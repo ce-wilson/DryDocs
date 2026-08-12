@@ -207,6 +207,35 @@ def test_unanchored_fix_refuses_invented_identity() -> None:
         graph_anchors(graph, "PRXYZ3C", [])
 
 
+def test_anchor_refuses_a_folder_name_on_multiple_servers() -> None:
+    """Folder names are only unique per data center. Two rows back without a
+    data_center given used to anchor the fix to rows[0] SILENTLY — the wrong-
+    anchor case; now it refuses and names the servers."""
+    graph = _graph(
+        folder_rows=[
+            {"folder_id": 4711, "sched_table": "PRXYZ3C", "data_center": "DC1"},
+            {"folder_id": 9200, "sched_table": "PRXYZ3C", "data_center": "DC2"},
+        ]
+    )
+    with pytest.raises(UnanchoredFixError, match="DC1, DC2"):
+        graph_anchors(graph, "PRXYZ3C", [])
+
+
+def test_anchor_queries_carry_the_data_center_parameter() -> None:
+    """The disambiguator joins through SCHEDULED_ON -> :ControlMServer (the
+    graph's own DC model — the folder node carries no data_center property)."""
+    client = _FakeClient(
+        {
+            "RETURN f.folder_id AS folder_id, f.sched_table": [
+                {"folder_id": 4711, "sched_table": "PRXYZ3C", "data_center": "DC1"}
+            ],
+            "CONTAINS_JOB": [],
+        }
+    )
+    graph_anchors(ReadOnlyGraph(client), "PRXYZ3C", [], data_center="DC1")
+    assert any("SCHEDULED_ON" in q and "ControlMServer" in q for q in client.queries)
+
+
 def test_anchor_queries_pass_the_read_only_guard() -> None:
     """The anchor queries run through ReadOnlyGraph — if one ever grew a write
     clause the corroborate regex would refuse it. Prove the guard sees them."""

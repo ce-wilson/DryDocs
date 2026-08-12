@@ -27,6 +27,7 @@ from tests.unit.fixtures_controlm_xml import (
     F6_DUPLICATES,
     F8_NESTING,
     F10_UTF16,
+    F11_MULTI_DC,
     ROUND_TRIP_FIXTURES,
 )
 
@@ -191,3 +192,39 @@ def test_entity_values_decode_correctly() -> None:
 def test_latin1_high_byte_decodes() -> None:
     doc = load_document(ROUND_TRIP_FIXTURES["F9_latin1"])
     assert locate(doc, Locator(folder="PRXYZ9I")).attr_value("DESCRIPTION") == "café"
+
+
+# --------------------------------------------------------------------------- #
+# data_center — the other half of the folder's identity (2026-08-12 check:
+# the bytes always carried it; the MODEL dropped it)
+# --------------------------------------------------------------------------- #
+
+
+def test_projection_carries_data_center() -> None:
+    """Folder names repeat across data centers, so a projection without the DC
+    collapses same-named folders into indistinguishable entries."""
+    definitions = to_definition_set(load_document(F11_MULTI_DC))
+    assert [(f.name, f.data_center) for f in definitions.folders] == [
+        ("PRXYZ1A", "DC1"),
+        ("PRXYZ1A", "DC2"),
+    ]
+    assert [(j.name, j.data_center, j.command_line) for j in definitions.jobs] == [
+        ("PRXYZ1A001", "DC1", "dc1.sh"),
+        ("PRXYZ1A001", "DC2", "dc2.sh"),
+    ]
+
+
+def test_projection_data_center_reaches_subfolders_and_nested_jobs() -> None:
+    definitions = to_definition_set(load_document(F3_RESIDUE))
+    assert all(f.data_center == "DC1" for f in definitions.folders)
+    assert all(j.data_center == "DC1" for j in definitions.jobs)
+
+
+def test_locator_disambiguates_same_named_folders_by_data_center() -> None:
+    doc = load_document(F11_MULTI_DC)
+    with pytest.raises(AmbiguousLocator, match="data_center"):
+        locate(doc, Locator(folder="PRXYZ1A"))
+    dc2_job = locate(doc, Locator(folder="PRXYZ1A", data_center="DC2", job="PRXYZ1A001"))
+    assert dc2_job.attr_value("CMDLINE") == "dc2.sh"
+    with pytest.raises(LocatorNotFound, match="DC9"):
+        locate(doc, Locator(folder="PRXYZ1A", data_center="DC9"))

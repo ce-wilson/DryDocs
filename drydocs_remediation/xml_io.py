@@ -471,6 +471,10 @@ class Locator:
     """
 
     folder: str
+    #: DATACENTER — folder names are only unique per data center, so a
+    #: multi-DC export with the same folder name twice is unaddressable
+    #: without this ("" = any; ambiguity still raises, never first-wins).
+    data_center: str = ""
     subfolder_path: str = ""
     job: str = ""
     element: str = ""  # e.g. "VARIABLE"; "" addresses the container itself
@@ -488,11 +492,23 @@ def _subfolder_name(node: XmlNode) -> str:
 
 def locate(doc: XmlDocument, loc: Locator) -> XmlNode:
     """Resolve a :class:`Locator` to exactly one node."""
-    containers = [n for n in _folder_nodes(doc) if n.attr_value(*FOLDER_NAME_ATTRS) == loc.folder]
+    containers = [
+        n
+        for n in _folder_nodes(doc)
+        if n.attr_value(*FOLDER_NAME_ATTRS) == loc.folder
+        and (not loc.data_center or n.attr_value("DATACENTER") == loc.data_center)
+    ]
     if not containers:
-        raise LocatorNotFound(f"folder {loc.folder!r} not in document")
+        raise LocatorNotFound(
+            f"folder {loc.folder!r}"
+            + (f" in data center {loc.data_center!r}" if loc.data_center else "")
+            + " not in document"
+        )
     if len(containers) > 1:
-        raise AmbiguousLocator(f"folder {loc.folder!r} appears {len(containers)} times")
+        raise AmbiguousLocator(
+            f"folder {loc.folder!r} appears {len(containers)} times — folder names "
+            "are only unique per data center; give data_center"
+        )
     node = containers[0]
     for part in filter(None, loc.subfolder_path.split("/")):
         subs = [
@@ -590,7 +606,7 @@ def _notifications_of(node: XmlNode) -> tuple[str, ...]:
 
 
 def _project_job(
-    node: XmlNode, chain_above: list[ScopeLayer], subfolder_path: str
+    node: XmlNode, chain_above: list[ScopeLayer], subfolder_path: str, data_center: str
 ) -> JobDefinition:
     own = _variables_of(node)
     name = node.attr_value("JOBNAME")
@@ -598,6 +614,7 @@ def _project_job(
     return JobDefinition(
         name=name,
         job_type=node.attr_value("TASKTYPE") or None,
+        data_center=data_center,
         variables=own,
         watch_template=watch.value if watch is not None else None,
         description=node.attr_value(*DESCRIPTION_ATTRS),
@@ -1209,11 +1226,13 @@ def to_definition_set(doc: XmlDocument) -> DefinitionSet:
     """
     definitions = DefinitionSet(source=str(doc.origin) if doc.origin else "<bytes>")
 
-    def walk(container: XmlNode, folder_name: str, chain: list[ScopeLayer], path: str) -> None:
+    def walk(
+        container: XmlNode, folder_name: str, dc: str, chain: list[ScopeLayer], path: str
+    ) -> None:
         for child in container.children:
             tag = child.tag.upper()
             if tag == "JOB":
-                definitions.jobs.append(_project_job(child, chain, path))
+                definitions.jobs.append(_project_job(child, chain, path, dc))
             elif tag in SUBFOLDER_TAGS:
                 sub_name = _subfolder_name(child)
                 sub_path = f"{path}/{sub_name}" if path else sub_name
@@ -1221,26 +1240,32 @@ def to_definition_set(doc: XmlDocument) -> DefinitionSet:
                 definitions.folders.append(
                     FolderDefinition(
                         name=f"{folder_name}/{sub_path}",
+                        data_center=dc,
                         variables=sub_vars,
                         scope="SUBFOLDER",
                         description=child.attr_value(*DESCRIPTION_ATTRS),
                         notification_tags=_notifications_of(child),
                     )
                 )
-                walk(child, folder_name, [*chain, ("SUBFOLDER", sub_path, sub_vars)], sub_path)
+                walk(child, folder_name, dc, [*chain, ("SUBFOLDER", sub_path, sub_vars)], sub_path)
 
     for folder in _folder_nodes(doc):
         folder_name = folder.attr_value(*FOLDER_NAME_ATTRS)
+        # DATACENTER is the other half of the folder's identity: names repeat
+        # across data centers, so a projection without it collapses same-named
+        # folders from different DCs into indistinguishable entries.
+        dc = folder.attr_value("DATACENTER")
         folder_vars = _variables_of(folder)
         definitions.folders.append(
             FolderDefinition(
                 name=folder_name,
+                data_center=dc,
                 variables=folder_vars,
                 scope="FOLDER",
                 description=folder.attr_value(*DESCRIPTION_ATTRS),
                 notification_tags=_notifications_of(folder),
             )
         )
-        walk(folder, folder_name, [("FOLDER", folder_name, folder_vars)], "")
+        walk(folder, folder_name, dc, [("FOLDER", folder_name, folder_vars)], "")
 
     return definitions

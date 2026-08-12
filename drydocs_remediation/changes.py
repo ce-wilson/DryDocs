@@ -147,33 +147,52 @@ class FixAnchor:
     relationships: tuple[str, ...] = ()  # citable, active types touching the node
 
 
+# DC disambiguation joins through the graph's own model — the folder node
+# carries no data_center property; the server node does (controlm_folders
+# cypher: one :ControlMServer per DATA_CENTER, folders SCHEDULED_ON it).
+# $data_center = '' matches any server, and ambiguity is REFUSED below.
 _JOB_ANCHOR_QUERY = """
 MATCH (f:ControlMFolder {sched_table: $folder_name})-[:CONTAINS_JOB]->(j:ControlMJob {job_name: $job_name})
+MATCH (f)-[:SCHEDULED_ON]->(srv:ControlMServer)
+WHERE $data_center = '' OR srv.name = $data_center
 RETURN f.folder_id AS folder_id, j.job_id AS job_id, j.job_name AS job_name
 """
 
 _FOLDER_ANCHOR_QUERY = """
-MATCH (f:ControlMFolder {sched_table: $folder_name})
-RETURN f.folder_id AS folder_id, f.sched_table AS sched_table
+MATCH (f:ControlMFolder {sched_table: $folder_name})-[:SCHEDULED_ON]->(srv:ControlMServer)
+WHERE $data_center = '' OR srv.name = $data_center
+RETURN f.folder_id AS folder_id, f.sched_table AS sched_table, srv.name AS data_center
 """
 
 
 def graph_anchors(
-    graph: ReadOnlyGraph, folder_name: str, job_names: list[str]
+    graph: ReadOnlyGraph, folder_name: str, job_names: list[str], *, data_center: str = ""
 ) -> list[FixAnchor]:
     """Resolve the fix's start/end points to canonical node identities.
 
     Refuses (``UnanchoredFixError``) when a target has no canonical key —
     the ``folder/job_name`` fallback identity is exactly what the lineage
     writer refuses, and a fix package citing an invented id would be worse
-    than one citing none.
+    than one citing none. Also refuses AMBIGUITY: folder names are only
+    unique per data center, so a name matching folders on more than one
+    server without ``data_center`` given would anchor the fix to whichever
+    row came back first — the silent wrong-anchor case.
     """
     anchors: list[FixAnchor] = []
-    folder_rows = graph.fetch(_FOLDER_ANCHOR_QUERY, {"folder_name": folder_name})
+    params = {"folder_name": folder_name, "data_center": data_center}
+    folder_rows = graph.fetch(_FOLDER_ANCHOR_QUERY, params)
     if not folder_rows:
         raise UnanchoredFixError(
-            f"folder {folder_name!r} has no :ControlMFolder node — load it before "
-            "anchoring a fix to it (canonical keys, not invented ids)"
+            f"folder {folder_name!r} has no :ControlMFolder node"
+            + (f" on server {data_center!r}" if data_center else "")
+            + " — load it before anchoring a fix to it (canonical keys, not invented ids)"
+        )
+    if len(folder_rows) > 1:
+        servers = sorted({r["data_center"] for r in folder_rows})
+        raise UnanchoredFixError(
+            f"folder {folder_name!r} exists on {len(folder_rows)} servers "
+            f"({', '.join(servers)}) — folder names are only unique per data "
+            "center; pass data_center"
         )
     row = folder_rows[0]
     anchors.append(
@@ -185,9 +204,7 @@ def graph_anchors(
         )
     )
     for job_name in job_names:
-        rows = graph.fetch(
-            _JOB_ANCHOR_QUERY, {"folder_name": folder_name, "job_name": job_name}
-        )
+        rows = graph.fetch(_JOB_ANCHOR_QUERY, {**params, "job_name": job_name})
         if not rows:
             raise UnanchoredFixError(
                 f"job {job_name!r} under {folder_name!r} has no :ControlMJob node"

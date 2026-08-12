@@ -43,6 +43,11 @@ class JobDefinition:
 
     name: str
     job_type: str | None = None  # e.g. "FileWatcher"
+    #: the folder's DATACENTER, inherited — folder/job names are only unique
+    #: PER DATA CENTER (the environment runs several), so a definition without
+    #: its DC is only half an identity. "" when the format cannot express it
+    #: (the M0 transcript shape).
+    data_center: str = ""
     variables: VariableDefs = field(default_factory=list)
     watch_template: str | None = None  # FileWatcher watched-path template
     #: DESCRIPTION verbatim — the description-metadata carrier
@@ -67,6 +72,9 @@ class FolderDefinition:
     """A scope a job resolves under — a folder or a sub-folder."""
 
     name: str
+    #: DATACENTER verbatim ("" when the format cannot express it) — the other
+    #: half of the folder's identity; names repeat across data centers.
+    data_center: str = ""
     variables: VariableDefs = field(default_factory=list)
     #: "FOLDER" | "SUBFOLDER" — sub-folders resolve between folder and job
     scope: str = "FOLDER"

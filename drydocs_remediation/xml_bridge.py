@@ -105,6 +105,7 @@ def to_definition_set(extract: StagedExtract, source: str | None = None) -> Defi
         definitions.folders.append(
             FolderDefinition(
                 name=record.folder_name,
+                data_center=record.data_center,
                 variables=_variables_at(
                     extract, record.data_center, record.folder_name, FOLDER_SCOPE, ""
                 ),
@@ -118,6 +119,7 @@ def to_definition_set(extract: StagedExtract, source: str | None = None) -> Defi
         definitions.folders.append(
             FolderDefinition(
                 name=f"{folder_name}/{path}",
+                data_center=data_center,
                 variables=_variables_at(
                     extract, data_center, folder_name, SUBFOLDER_SCOPE, path
                 ),
@@ -134,6 +136,7 @@ def to_definition_set(extract: StagedExtract, source: str | None = None) -> Defi
             JobDefinition(
                 name=job.job_name,
                 job_type=job.task_type or None,
+                data_center=job.data_center,
                 variables=list(chain[-1][2]) if chain else [],
                 watch_template=job.watch_template or None,
                 description=job.description,
