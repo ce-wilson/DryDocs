@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-11T23:16:39",
-    "date": "20260811",
+    "captured_at": "2026-08-12T08:40:54",
+    "date": "20260812",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "b5c03f1",
-      "full": "b5c03f14f5dc375c2bb85c29f9e5c5e9ec9a3ba7",
+      "commit": "dd8d843",
+      "full": "dd8d843f63ba3b7c7af644fa0d30e3967fe3074c",
       "branch": "main",
-      "describe": "port-base-20260811-18-gb5c03f1",
-      "subject": "docs(port): RELAY-9 — the PAT alignment column is 'Relationship Type', and 'Team Type Name' is a decoy",
+      "describe": "port-base-20260811-30-gdd8d843",
+      "subject": "chore(ideas): Idea-108 CLOSED ΓÇö worktrees and branches pruned under user ruling",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": true,
+      "untracked_present": false,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -9944,6 +9944,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -9960,6 +9969,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10916,6 +10934,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/plan_board.py",
       "name": "plan_board.py",
       "extension": ".py",
@@ -11820,6 +11856,15 @@
       "name": "precedence.py",
       "extension": ".py",
       "rel_path": "drydocs_core/precedence.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/repo_paths.py",
+      "name": "repo_paths.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/repo_paths.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13607,6 +13652,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/standards/technology/data-center-inventory.md",
+      "name": "data-center-inventory.md",
+      "extension": ".md",
+      "rel_path": "internal/standards/technology/data-center-inventory.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/standards/technology/description-field-metadata-plan.md",
       "name": "description-field-metadata-plan.md",
       "extension": ".md",
@@ -13679,10 +13733,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json",
-      "name": "drydocs-20260811.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-2316.json",
+      "name": "drydocs-20260811-2316.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260811-2316.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15690,6 +15744,15 @@
       "name": "test_render_determinism.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_render_determinism.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_repo_paths.py",
+      "name": "test_repo_paths.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_repo_paths.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18057,12 +18120,24 @@
       "drydocs/drydocs_core/source_registry.py"
     ],
     [
+      "drydocs/drydocs/plan_board.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs/plan_ideas.py",
       "drydocs/drydocs/design_doc.py"
     ],
     [
+      "drydocs/drydocs/plan_ideas.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs/plan_roadmap.py",
       "drydocs/drydocs/plan_board.py"
+    ],
+    [
+      "drydocs/drydocs/plan_roadmap.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/publishing/__init__.py",
@@ -19759,6 +19834,10 @@
     [
       "drydocs/tests/unit/test_remediation_xml_bridge.py",
       "drydocs/drydocs_remediation/xml_bridge.py"
+    ],
+    [
+      "drydocs/tests/unit/test_repo_paths.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/tests/unit/test_review_labels.py",
@@ -26225,12 +26304,22 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -26291,6 +26380,16 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -27396,6 +27495,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/precedence.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -28600,6 +28704,11 @@
     [
       "drydocs/internal/standards/technology",
       "CONTAINS",
+      "drydocs/internal/standards/technology/data-center-inventory.md"
+    ],
+    [
+      "drydocs/internal/standards/technology",
+      "CONTAINS",
       "drydocs/internal/standards/technology/description-field-metadata-plan.md"
     ],
     [
@@ -28665,7 +28774,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260811-2316.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -29720,6 +29829,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_repo_paths.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_review_labels.py"
     ],
     [
@@ -30657,13 +30771,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1660,
-    "edges": 906,
+    "files": 1663,
+    "edges": 910,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1927,
-    "directories": 268
+    "rels": 1934,
+    "directories": 272
   }
 }
