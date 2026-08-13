@@ -37,6 +37,35 @@ Copy-Item .env.example .env   # then edit: NEO4J_URI / NEO4J_USER / NEO4J_PASSWO
                               # (+ ORACLE_* only when using --use-oracle)
 ```
 
+### Editor line endings — install the EditorConfig extension
+
+Per-machine setup, easy to miss because nothing fails loudly without it.
+`.gitattributes` (`* text=auto eol=lf`) governs what git *checks out*; it does not
+govern what an editor writes when it creates a file, and VS Code on Windows
+defaults new files to CRLF. `.editorconfig` pins `end_of_line = lf` for every file
+type, and VS Code honors it only with the **EditorConfig extension**
+(`editorconfig.editorconfig`) installed — so install it on each machine.
+
+Skipping it does not corrupt anything: the attributes rule normalizes on the way
+into the index, so commits are LF regardless. What you get instead is CRLF churn in
+the working tree, which is how `ruff format --check` came to report every file as
+needing reformat purely on line endings (`docs/ruff-format-convergence.md`).
+
+**Once per machine after an EOL policy change.** A plain `git pull` rewrites only
+the files the incoming commits touched, so anything already checked out keeps its
+old endings. On a **clean tree** (`git status` empty — `reset --hard` discards
+uncommitted work):
+
+```powershell
+git rm --cached -r . -q
+git reset --hard
+```
+
+Expect zero blob changes and a clean `git status` afterward — the index has always
+held LF, so this only re-materializes the working tree. Verify with
+`git ls-files --eol`, which should show no `w/crlf` or `w/mixed` rows. Blob changes
+appearing here would mean something committed CRLF; investigate rather than commit.
+
 ## Quick start (bootstrap + sample ingest)
 
 Everything below runs against the package-bundled CSV samples — no Oracle needed.
