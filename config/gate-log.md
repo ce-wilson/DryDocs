@@ -2543,6 +2543,34 @@ that any application uses it or at what version.
   half. The relay is NOT written into `docs/port-prompt.md` yet because a port is in flight
   against a fetched head and that file is a hand-merge surface — add it once that port merges.
 
+## 2026-08-12 — RECORD: the downstream consumer contact attaches to a `:Port`, not to job/folder (email-dl-contact-point §G5; SME direction in-chat, 2026-08-12)
+
+- **What this records:** in-chat SME direction answering §G5 of the DRAFTED-AND-UNSIGNED
+  `email-dl-contact-point` gate. It is logged as a RECORD rather than a sign-off because a
+  confirmed clause inside an unsigned gate reaches no log otherwise — the failure mode found
+  2026-08-06. The gate stays unsigned; nothing else in it moves.
+- **The ruling:** the downstream consumer contact attaches to a **`:Port`** (the DPROD shape
+  the captured MFTS standard already uses), not to the job or folder (the §B1 contact-point
+  shape).
+- **Why, and the second reason is a constraint rather than a preference:** (i) the contact is
+  **unstructured** data; (ii) **no supernodes** — the B1 shape produces one at estate scale,
+  because a shared distribution list becomes a single node accreting an inbound edge from
+  every job or folder that notifies it, and the most-shared DLs are precisely the ones the
+  whole batch estate points at. Port-scoping bounds the fan-in by construction.
+- **Also a direction on §G2 (grain):** the **known `email_dl` comes from FOLDER METADATA** —
+  the folder variables (`L2_EMAIL_DL_NM` / `L3_EMAIL_DL_NM`) carry the known value, not the
+  per-job Description tokens. This does NOT settle the rest of G2: precedence when folder and
+  job disagree, whether both spellings survive, and what a loader does on disagreement are
+  all still open.
+- **Still open in §G5:** whether the port leg splits off into its own gate. Direction answers
+  the "which home" half only.
+- **Consequence for G44 (data catalog):** the fork §G5 warned about — "picking one without
+  seeing the other is how the two plans fork" — is now resolved in one direction, so the
+  data-catalog gate's clause A gains an A6 cross-reference recording that the sibling gate
+  has ruled `:Port` for the same class of downstream fact. Nothing loads from either gate.
+- **Nothing enacted:** no vocabulary entry registered, no status changed, no graph write. The
+  DPROD port shape still has no entries in the relationship vocabulary.
+
 ## 2026-08-11 — RECORD: TOM roles (G35), walk round 1 — six rulings, one of which changes the port
 
 **Gate:** `tom-roles-enumeration-and-cardinality` (backlog G35) · **still UNSIGNED** — a RECORD
