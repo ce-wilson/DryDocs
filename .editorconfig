@@ -1,0 +1,16 @@
+# EditorConfig — make editors emit LF everywhere (https://editorconfig.org).
+#
+# Companion to .gitattributes, which already pins *.py/*.sh/*.ksh to LF in the
+# working tree: this file covers what git attributes can't — the line ending an
+# EDITOR uses when it creates or saves a file. On Windows, VS Code defaults new
+# files to CRLF; with autocrlf=true those round-trip into "phantom" CRLF-vs-LF
+# noise in tools that read the working tree (ruff format --check, renderers,
+# the .sample.cfg/.md files under drydocs_core/). One rule, all file types.
+# VS Code honors this via the EditorConfig extension (editorconfig.editorconfig).
+
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
