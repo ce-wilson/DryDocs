@@ -62,6 +62,68 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-120`** · 2026-08-13 · `[chore]` · **open** · prio? **Med** —
+  **Debt metrics have no machine-readable history, so "is it getting better" is
+  unanswerable.** Newest-only snapshot retention (U12) is right for snapshots, but it
+  leaves the tech-debt skill's hand-typed prose as the ONLY trend record for A3/A4/A5.
+  That prose has been wrong twice in the direction that hides work — `drydocs_api` at
+  the U2 census, then `drydocs_docmeta` invisible to A3/A4/A5 for five days after
+  `d647171` — and on 2026-08-13 it blocked attribution of an A5 move from 29 to 31,
+  because there is no prior snapshot on disk to diff against. Proposed: `snapshot.ps1`
+  appends one row per run to a metrics JSONL beside the snapshot it just wrote (date,
+  commit, A3 top module + count, A4 package + first-party counts, A5 count, live
+  `IMPORTS` edge count). Append-only and cheap, and it turns every future `/tech-debt`
+  run into a diff instead of a re-derivation. U12 stays intact — a metrics ledger is
+  not a retained snapshot. Pairs with Idea-119, whose +2 this would have explained.
+
+- **`Idea-119`** · 2026-08-13 · `[chore]` · **open** · prio? **Med** —
+  **31 package modules have no direct test import, and five of them are loaders G78 is
+  about to change.** A5 measured 2026-08-13 at `bb9788b6`: 31, against the skill's 29
+  baseline at `2d104ef` (08-09). By package: `drydocs_core` 14, `drydocs` 10,
+  `drydocs_lineage` 4, `drydocs_docmeta` 2, `drydocs_api` 1. The pointed five are
+  `business_segments.py`, `controlm.py`, `controlm_dependencies_derived.py`,
+  `controlm_hosts.py` and `seal_contacts.py` — untested loaders, while G78 (p0) fixes a
+  chain step that silently skips a missing input and reports success. Highest
+  single-leverage gap: `drydocs_lineage/extractors/rua_inventory.py`, fan-in 5, no test
+  import. Two caveats ride with the number: A5 is a DIRECT-IMPORT proxy, so fixtures and
+  subprocess coverage do not show; and the +2 could not be attributed (see Idea-120).
+  Proposed disposition on groom: **merge the five loaders into G78/G79's acceptance**
+  rather than filing a coverage sweep — the tests belong with the fix that touches them.
+
+- **`Idea-118`** · 2026-08-13 · `[bug]` · **open** · prio? **High** —
+  **`IMPORTS` edges are never retracted, so fan-in inflates permanently and test debt
+  under-reports.** Found while cross-checking the freshly reloaded graph against the
+  snapshot it was loaded from. `drydocs/loaders/seal_attribution.py` still carries an
+  `IMPORTS` edge to `drydocs/loaders/base.py`; the file contains ZERO occurrences of the
+  string "base" (K8 removed it at `4df4df2`), and today's snapshot records no such edge.
+  **The edge survived a full `load-code-snapshot` re-run** — so this is not the staleness
+  in Idea-117 and a refresh does not fix it. The D7 sweep tombstones removed MODULES;
+  nothing sweeps removed EDGES, so the import graph only grows. Size today: 985 live
+  `IMPORTS` edges in the graph vs 982 in the snapshot — 3 ghosts, one of which put
+  `loaders/base.py` at fan_in 32 where the tree says 31, distorting the repo's #1
+  change-risk metric. **A5 is affected in the dangerous direction**: a module whose test
+  import was DELETED keeps the ghost edge and still counts as tested, so test debt reads
+  better than it is. Fix shape: retract edges absent from the loaded snapshot for any
+  module that snapshot DID include — a per-source sweep, never a global delete, since the
+  graph holds edges other loaders wrote.
+
+- **`Idea-117`** · 2026-08-13 · `[bug]` · **open** · prio? **High** —
+  **The code graph can go stale for weeks and nothing says so.** Found by `/tech-debt`
+  2026-08-13 (desktop, `neo4jtest`, `drydocs` DB): every `:CodeModule` carried
+  `last_seen_at = 2026-08-02T23:06:42Z` from ONE run id — loaded once on Aug 2 and never
+  refreshed, 11 days. The session first read A3's top fan-in as 28, which is the Aug-2
+  value (the skill's own baselines run 28 → 29 on 08-04 → 31 on 08-09); it looked current
+  and would have been reported as current. Same class as G78 — not a failed read, a read
+  that SUCCEEDED with the wrong data, and it sits underneath every architecture and debt
+  decision. `drydocs load-code-snapshot` repairs it in one command (run 2026-08-13; graph
+  now 1697 modules, 164 tombstones), but nothing compares `max(m.last_seen_at)` against
+  the newest snapshot's `meta.captured_at`. Proposed: a freshness assertion in
+  `tests/unit/test_code_graph_review_plan.py`, which already fails when the typed package
+  allow-list and `pyproject.toml` disagree — the shape exists, this is one more check in
+  it. Warn-vs-fail is a real call for the groom: the snapshot ritual's CI check is
+  warn-only on the argument that recording structure and passing a gate are different
+  jobs, and the same argument applies here.
+
 - **`Idea-116`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
   **Web UI: a swimlane data-flow layout for the lineage module — lanes Control-M |
   Data Layer | File Server / Database.** Captured from SME chat while testing the
