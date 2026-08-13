@@ -87,12 +87,26 @@ target-version = "py311"
 # formatter, 49% of the residual, and every one of the naming hits among them is
 # a required idiom (do_GET/do_POST are BaseHTTPRequestHandler overrides).
 # `.claude/skills/groom-backlog` is OURS and deliberately stays in scope.
+# Captured experiment records (2026-08-12). The 13 `.py` files under these two
+# directories are the scratch scripts the graph-vs-files comparison agents wrote
+# DURING the runs; they are kept verbatim as the record of what each track did,
+# and the repo has already ruled this class once — "fixing somebody else's
+# capture to satisfy a guard is a provenance call, not a formatting one" (port
+# ledger step 123, which inboxed the same question as Idea-103 rather than
+# editing the captures). Same reasoning as the vendored block above: we do not
+# author them, and reformatting them would rewrite evidence to please a linter.
+# Nothing imports them — verified before excluding. They were 13 of the 48
+# findings and 12 of the 44 unformatted files blocking CI.
+# If a future capture lands elsewhere under docs/, widen this to `docs` rather
+# than adding a third path — any `.py` under a documentation tree is an artifact.
 extend-exclude = [
     ".claude/skills/docx",
     ".claude/skills/pptx",
     ".claude/skills/xlsx",
     ".claude/skills/pdf",
     ".claude/skills/skill-creator",
+    "docs/reviews/graph-vs-files-experiment/results",
+    "docs/reviews/graph-vs-files-experiment/results-sonnet",
 ]
 
 [tool.ruff.lint]

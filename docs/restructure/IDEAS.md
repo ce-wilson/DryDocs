@@ -62,6 +62,48 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-111`** · 2026-08-12 · `[bug]` · **open — gate scope fixed today; the lint sweep is deferred by the user** · prio? **High** —
+  **CI has been RED on `main` since 2026-08-05 and nobody noticed for a week.** Last green
+  run `2026-08-05T06:10` (`test(currency): bring port-prompt under the currency guard`);
+  every one of the 100+ runs since has failed, including four pushed today before this was
+  checked. The failure is narrow and always the same: `ruff check` fails, so `ruff format
+  --check` never even runs. **Everything else is green** — unit suite, CLI imports, CLI
+  help, publish-boundary guard, schema/vocabulary guard. That is why it was survivable and
+  also why it was invisible: the job that matters most passes, and only the last two steps
+  red out.
+  **This is J10 stage 5 working as designed and then being ignored.** Stage 5 (`1fcbf63`,
+  2026-08-01) made both ruff gates blocking on purpose, after stages 1-4 cleared 362
+  findings and formatted the whole tree at the pinned ruff **0.5.7**
+  (`docs/ruff-format-convergence.md`). The debt then re-accumulated over eleven days of
+  agent-authored code that never went through the pinned formatter: **48 findings / 44
+  unformatted files** as measured 2026-08-12.
+  **A hypothesis worth killing before someone re-derives it:** the drift is NOT two ruff
+  versions disagreeing. There is exactly one ruff here — 0.5.7 in `pyproject.toml`,
+  `poetry.lock` and the installed binary, with no ruff on PATH, no pipx ruff and no
+  VS Code/Cursor bundled extension. New code is simply hand-written in the modern
+  `assert x, (msg)` shape that 0.5.7 rewrites to its own older style. One formatter, an
+  unformatted tail.
+  **FIXED TODAY — the gate's SCOPE, not the code.** `pyproject.toml` `extend-exclude` now
+  carries the two graph-vs-files capture directories (13 `.py` files, nothing imports them,
+  verified before excluding). They are agent scratch scripts kept verbatim as the record of
+  each track, and the repo already ruled this class once: *"fixing somebody else's capture
+  to satisfy a guard is a provenance call, not a formatting one"* (ledger step 123, which
+  inboxed the question as `Idea-103` rather than editing them). Same reasoning as the
+  vendored `.claude/skills` block. **48 -> 35 findings, 44 -> 32 files.**
+  **STILL OPEN — the sweep, deliberately deferred by the user.** ~1 hour: 10 auto-fixable
+  plus a 32-file mechanical format (+452/-320), then ~25 needing judgement — 14
+  `RUF002/003` (one character each, ambiguous Unicode in prose), 6 `N818`, 2 `RUF009`, 2
+  `RUF007`, 1 `N802`. **Sequencing matters: 22 of the 35 are in `drydocs_remediation`,
+  where a concurrent session is working right now** — including all 6 `N818`, which are
+  exception-class renames in `xml_io.py` (`MalformedXml`, `LocatorNotFound`,
+  `SelfCheckFailed`…) and therefore an API change, not a lint tidy. That session is already
+  fixing its own ruff findings, so the sweep should follow their work, not race it. Outside
+  their module only **13** remain: 8 `tests`, 2 `scripts`, 2 `drydocs`, 1 `drydocs_lineage`.
+  **The process question is the durable half, and it is the user's:** a blocking gate that
+  goes unwatched for a week is worth less than an advisory one that gets read. Options are
+  a notification on red, a session-ritual step that checks `gh run list` before pushing, or
+  accepting red-until-swept as a known state with an owner and a date.
+
 - **`Idea-110`** · 2026-08-12 · `[doc]` · **closed — reclassified as a dated record, same day** · prio? **Low** —
   **CLOSED 2026-08-12.** User ruled option (c): the file is a dated RECORD of the
   2026-07-21 issue, not a usable starting prompt. Its header now says exactly that — a
