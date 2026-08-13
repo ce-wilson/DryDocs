@@ -87,6 +87,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (`vendor_docs`, `publishing/*`, `schema_graph`, the `scripts/` scrapers) are a
   separate call, not automatic. Idea-120's proposed metrics JSONL writer should be
   born with `newline="\n"` rather than added to the queue.
+  **KEPT-UPDATED 2026-08-13 — it is not cosmetic after all: it poisons a committed
+  provenance field, and the LF refresh is what started it.** The session-end
+  `snapshot.ps1` renders the board and the design docs BEFORE it scans, so those
+  renders dirty 25 tracked files and the scan then records `meta.git.dirty: true`.
+  That field has one job, stated in the script's own comment: *"does the commit in
+  this header actually describe the code that was measured?"* Here the answer is yes
+  and the header says no — a reader is told the opposite of the truth, which is the
+  exact failure U15 split the field to prevent (the 20260805 snapshot, where the
+  "dirt" was three untracked paths). Same false alarm, new cause. The two snapshots
+  taken either side of the refresh prove the causation: `bb9788b6` at 02:20 recorded
+  `dirty: false`, `7d885c9` at 13:45 recorded `dirty: true`, same script and a clean
+  tree both times. Before the refresh the working tree held CRLF and the renderers
+  wrote CRLF, so a render changed nothing; afterwards the tree is LF and every render
+  dirties its output. So **every snapshot taken on Windows from now on carries a false
+  `dirty: true`** until the writers pass `newline="\n"`, and `drydocs-20260813-1344.json`
+  is the first one — committed knowingly, recorded here rather than silently. This
+  raises the priority question: the fix is ten call sites, and the thing it protects
+  is the provenance header of the whole snapshot series.
 
 - **`Idea-120`** · 2026-08-13 · `[chore]` · **open** · prio? **Med** —
   **Debt metrics have no machine-readable history, so "is it getting better" is
