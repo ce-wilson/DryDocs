@@ -169,54 +169,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   run into a diff instead of a re-derivation. U12 stays intact — a metrics ledger is
   not a retained snapshot. Pairs with Idea-119, whose +2 this would have explained.
 
-- **`Idea-119`** · 2026-08-13 · `[chore]` · **open** · prio? **Med** —
-  **31 package modules have no direct test import, and five of them are loaders G78 is
-  about to change.** A5 measured 2026-08-13 at `bb9788b6`: 31, against the skill's 29
-  baseline at `2d104ef` (08-09). By package: `drydocs_core` 14, `drydocs` 10,
-  `drydocs_lineage` 4, `drydocs_docmeta` 2, `drydocs_api` 1. The pointed five are
-  `business_segments.py`, `controlm.py`, `controlm_dependencies_derived.py`,
-  `controlm_hosts.py` and `seal_contacts.py` — untested loaders, while G78 (p0) fixes a
-  chain step that silently skips a missing input and reports success. Highest
-  single-leverage gap: `drydocs_lineage/extractors/rua_inventory.py`, fan-in 5, no test
-  import. Two caveats ride with the number: A5 is a DIRECT-IMPORT proxy, so fixtures and
-  subprocess coverage do not show; and the +2 could not be attributed (see Idea-120).
-  Proposed disposition on groom: **merge the five loaders into G78/G79's acceptance**
-  rather than filing a coverage sweep — the tests belong with the fix that touches them.
-
-- **`Idea-118`** · 2026-08-13 · `[bug]` · **open** · prio? **High** —
-  **`IMPORTS` edges are never retracted, so fan-in inflates permanently and test debt
-  under-reports.** Found while cross-checking the freshly reloaded graph against the
-  snapshot it was loaded from. `drydocs/loaders/seal_attribution.py` still carries an
-  `IMPORTS` edge to `drydocs/loaders/base.py`; the file contains ZERO occurrences of the
-  string "base" (K8 removed it at `4df4df2`), and today's snapshot records no such edge.
-  **The edge survived a full `load-code-snapshot` re-run** — so this is not the staleness
-  in Idea-117 and a refresh does not fix it. The D7 sweep tombstones removed MODULES;
-  nothing sweeps removed EDGES, so the import graph only grows. Size today: 985 live
-  `IMPORTS` edges in the graph vs 982 in the snapshot — 3 ghosts, one of which put
-  `loaders/base.py` at fan_in 32 where the tree says 31, distorting the repo's #1
-  change-risk metric. **A5 is affected in the dangerous direction**: a module whose test
-  import was DELETED keeps the ghost edge and still counts as tested, so test debt reads
-  better than it is. Fix shape: retract edges absent from the loaded snapshot for any
-  module that snapshot DID include — a per-source sweep, never a global delete, since the
-  graph holds edges other loaders wrote.
-
-- **`Idea-117`** · 2026-08-13 · `[bug]` · **open** · prio? **High** —
-  **The code graph can go stale for weeks and nothing says so.** Found by `/tech-debt`
-  2026-08-13 (desktop, `neo4jtest`, `drydocs` DB): every `:CodeModule` carried
-  `last_seen_at = 2026-08-02T23:06:42Z` from ONE run id — loaded once on Aug 2 and never
-  refreshed, 11 days. The session first read A3's top fan-in as 28, which is the Aug-2
-  value (the skill's own baselines run 28 → 29 on 08-04 → 31 on 08-09); it looked current
-  and would have been reported as current. Same class as G78 — not a failed read, a read
-  that SUCCEEDED with the wrong data, and it sits underneath every architecture and debt
-  decision. `drydocs load-code-snapshot` repairs it in one command (run 2026-08-13; graph
-  now 1697 modules, 164 tombstones), but nothing compares `max(m.last_seen_at)` against
-  the newest snapshot's `meta.captured_at`. Proposed: a freshness assertion in
-  `tests/unit/test_code_graph_review_plan.py`, which already fails when the typed package
-  allow-list and `pyproject.toml` disagree — the shape exists, this is one more check in
-  it. Warn-vs-fail is a real call for the groom: the snapshot ritual's CI check is
-  warn-only on the argument that recording structure and passing a gate are different
-  jobs, and the same argument applies here.
-
 - **`Idea-116`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
   **Web UI: a swimlane data-flow layout for the lineage module — lanes Control-M |
   Data Layer | File Server / Database.** Captured from SME chat while testing the
@@ -670,22 +622,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   what remained was a one-line `.filter(...)` making the pick-list agree with the
   aside — minting an item to close it the same minute is ceremony, not audit. The
   groom was right to flag the disagreement; the ruling is what dissolved it.
-
-- **`Idea-88`** · 2026-08-07 · `[idea]` · **parked → the G32 residency ruling, then Q14's term gate** · prio? **Med** —
-  **The only loaded software↔docs edge has NO registry declaration behind it — close
-  the gap with a `describes_product:` field.** The 27 live
-  `(:Document)-[:DESCRIBES]->(:SoftwareProduct)` edges for `controlm` are asserted by a
-  hardcoded Python constant — `drydocs/loaders/bmc_docs.py`
-  `SUBJECT_PRODUCT_ID = "controlm"` — and the corpus's `doc-source-registry.yaml` entry
-  carries only `taxonomy_path`, which NO file maps to a product id. So the one working
-  traversal in the estate is unreproducible from the ledger, and a report cannot
-  honestly infer the declaration (the /software page refuses to, deliberately — O56
-  honesty rule 4). Fix direction: a `describes_product:` field on doc-source-registry
-  entries, with the loader READING the registry instead of carrying the constant, plus
-  a guard that the id resolves to a real software-registry product. Parked rather than
-  groomed because it touches a loader AND a gated corpus behind two open rulings — G32
-  (which database corpora live in) and Q14 (which term carries the edge) — and this is
-  also where Q16's unshipped clause (b) will land. (Found at the Q16 close, 2026-08-07.)
 
 - **`Idea-86`** · 2026-08-07 · `[source]` · **parked → G32 rules `target_db`** · prio? **Med** —
   **Register the internal MWAA documentation as a doc corpus — blocked on `target_db`,
@@ -1189,14 +1125,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the desktop drifted silently. If the ruling is "re-point with a venue note", that gap is
   the thing worth an item.
 
-- **`Idea-47`** · 2026-08-02 · `[idea]` · **parked → gate §H5 (loader→cypher edge is a new edge type)** · prio? **Low** —
-  **The 45 `.cypher` files are now nodes with zero edges — nothing joins a
-  loader to the Cypher it executes**, even though the path is a literal in the `.py`
-  (`CYPHER_DIR / "code_snapshot.cypher"`). `drydocs/loaders/` holds 32 `.cypher` + 24 `.py` +
-  15 `.sql` side by side, unconnected. depgraph does not emit the edge and the loader could not
-  load it if it did (new edge type → gate). This is gate §H5's named future item, now with the
-  nodes already in place — the remaining work is the edge, not the corpus.
-
 - **`Idea-46`** · 2026-08-01 · `[source]` · **merged → C22 (bug half) + C26 (back-flow half)** · prio? **Med** —
   **Company catalog-loader review (screenshots, same day as C17) — three
   back-flow candidates and one confirmation.** CONFIRMS C17 §a from the other side: the company's
@@ -1635,14 +1563,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   datetime handling still returns nothing: the fields it consumes are folders, jobs, ordered
   variables and now descriptions. Stays parked on the unchanged trigger.
 
-- **`Idea-23`** · 2026-07-21 · `[idea]` · **parked → the writer ETLProcess endpoint work makes the edge landable** · prio? **Med** —
-  **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
-  payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
-  edge + stamp `script_role` {launcher, payload} and the artifact_* properties on :Script.
-  Feed now EXISTS (G16 value-contract facts + G15 launcher properties); groom once the
-  writer's ETLProcess endpoint work makes the edge landable — the vocab entry
-  `m7_uses_artifact` stays `planned` until that build's own flip.
-
 - **`Idea-22`** · 2026-07-21 · `[idea]` · **parked → the public site starts** · prio? **Low** —
   **Public marketing-site brand kit** captured in
   `UI-WIP/WEBSITE-IDEAS.MD` (3 logo directions incl. the core+orbit modernization, secondary
@@ -1907,6 +1827,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Recently groomed (audit trail)
 
+- **GROOM 2026-08-13 (desktop, targeted — "the open inbox entries that would impact or change the established node labels and the Cypher loaders")** — the filter was applied to the WHOLE open and parked tail, not only the new captures, and every claim below was re-verified against the tree at the groom rather than taken from the entry. **Promoted 5: `U21`, `U22`, `U23`, `G97`, `Q18`. Merged 1. Inboxed 0. Parked as a question 0.** Four of the five are dependency-free and enter `next_ready` on arrival; `Q18` deliberately does not. **`Idea-118` → `U21`** (p1 bug, `drydocs-load`, phase 16): the code-snapshot load sweeps NODES and never EDGES, so `IMPORTS` only grows — `seal_attribution.py` still carries an edge to `loaders/base.py` that survived a full re-load, against a file with zero occurrences of the string and a snapshot that records no such edge (985 live vs 982 in the snapshot; fan-in 32 where the tree says 31). Written as a PER-SOURCE retraction with the over-reach guard as its own test, because the graph holds edges other loaders wrote; the mark-vs-delete call is left to the item but must be RECORDED, and if edges are marked then the read paths filter them the way U13 made node queries filter. Verified at the groom: `stale_edge_cleanup.cypher` is the repo's only edge-retraction precedent and has NO live caller in the tracked tree, so the pattern exists as a file rather than as a mechanism. **`Idea-117` → `U22`** (p2 bug, `graph-infra`, phase 16): every `:CodeModule` carried one Aug-2 `last_seen_at` for eleven days and the session read A3's fan-in as the Aug-2 value believing it current — the G78 class, a read that SUCCEEDED with the wrong data. The entry explicitly handed the warn-vs-fail call to the groom: **RULED WARN**, on the same argument CLAUDE.md already makes for `snapshot.ps1`'s CI check (recording structure and passing a gate are unrelated jobs, and the check must not red a suite on a machine with no container). What is unit-testable is the COMPARISON over fixtures — fresh / stale / no snapshot / empty graph / database-unreachable, that last one a DISTINCT verdict and never "fresh" — so the mechanism is guarded with no database. Priority dropped to p2 from the entry's High with the reason in the notes: one existing command repairs it and did, so what is missing is detection. `module: graph-infra` chosen on SUBJECT (the loaded graph's currency, U15/U19's family) over `docs` (the review-plan file, U13/U20's) and the choice is recorded in the item, because both were plausible. **`Idea-47` → `U23`** (p3 task, `ontology`, phase 16, `fable`, `ontology-mapper`): the `.cypher` files are `:CodeModule` nodes with zero edges while each loader names its Cypher as a literal path — promoted as a **gate-rider DRAFT and only a draft**, on the G27 / N10 / G95 precedent, because a new relationship type is an ontology decision. Its clause (c) is what stops a signed rider with no path to a first row: the depgraph scanner does not emit the edge, so the prompt must say where it would come from and what an instrument change costs. Clause (d) fences it against gate `self-documentation-code-graph` §H5 — a loader→cypher edge is the FIRST half of the "which module loads this job" join and not the join. **`Idea-23` → `G97`** (p2 task, `drydocs-lineage`, phase 6): the parked trigger has FIRED and the entry was out of date — `m7_uses_artifact` has been `status: active` since 2026-08-07 (gate `rua-load-shapes` §A4, applied at G55), not `planned`, and `writer.py` MERGEs `:ETLProcess` on its token. G16's own notes name this item by description. NO gate is opened: `cmdline-nfr-vetting` ruled the distinct label and the `:Script` refinements, `rua-load-shapes` activated both entries together precisely so the launcher/payload split is right from first load. Verified ABSENT at the groom so this is a real build — the writer emits no `USES_ARTIFACT` edge and stamps `script_role` only for the rua profile case. **`Idea-88` → `Q18`** (p2 task, `drydocs-load`, phase 14) — **the parking is PRESERVED, not overridden**: the entry was parked behind two open rulings, and the item reproduces that as `depends_on: [G32, Q14]`, so it stays out of `next_ready` until both rule while the work becomes visible in the database instead of living only in this file. Its acceptance says in writing that the edge TERM is Q14's and residency is G32's, and it carries Q16's unshipped clause (b). **Merged 1: `Idea-119` → `G78` clause (d) + a rider note on `G79`** — the five loaders with no direct test import (`business_segments`, `controlm`, `controlm_dependencies_derived`, `controlm_hosts`, `seal_contacts`) ride the fix that touches them, which is the entry's own proposed disposition; A5 is named in the clause as a DIRECT-IMPORT proxy so the ask is an import-bearing test, not proof of total absence. `G79`'s note names the two the split re-homes, verified at the groom (`seal_contacts` is a `REFRESH_REFERENCE_CHAIN` member and `business_segments` is refreshed inside the same command, ahead of the chain tuple). **Deliberately NOT promoted, each for a stated reason:** `Idea-86` and the residency half of `Idea-88` stay behind `G32`, which is still `in_progress` (an unsigned drafted gate) — three parked consumers on one gate is an argument for scheduling it, not for pre-empting it; `Idea-7` (flipping the four `m3_*` lineage entries active) and `Idea-37` are HITL-scheduled by their own terms; `Idea-104` (which MFT route-id shape is real) and `Idea-34` (whether the AIS acronym entry survives, and what `:AisTool` ever meant) are label/identifier questions that only the SME can answer; `Idea-15`'s remaining call — display labels only, or renaming the `seal_*` vocabulary ids and domains — is ADR-scale and the user's; `Idea-25`, `Idea-27`, `Idea-31` and `Idea-61` were re-read and their triggers are still unfired. `Idea-122` and `Idea-123`, both captured the same day, DESCRIBE label chains rather than change them — they are UI-view work and belong with the console epic, so this run left them. **Nothing here decides an ontology question:** `U23` is a prompt that registers nothing, `G97` builds inside two signed gates and flips no entry, and `Q18` routes both of its open questions back to `Q14` and `G32` by dependency.
+
 - **GROOM 2026-08-12 (desktop, targeted — `Idea-112`, `Idea-113`, `Idea-114` only, not the open tail)** — three entries captured the same day from live work, all three actionable, so this run promoted rather than parked. **Promoted 4: `G92`, `G93`, `G94`, `G95`** — all four dependency-satisfied and in `next_ready` on arrival. **Inboxed 0, merged 0, parked-as-question 0.** Every claim below was re-verified against the tree at the groom rather than taken from the entry, and all of it is sample-reproducible with no database and no company data (J18). **`Idea-112` → `G92`** (p2 task, `drydocs-lineage`, phase 6, deps G14/G46/G60 all done): the entry's premise holds exactly — `_prepost_pass` in `drydocs_lineage/extractors/controlm_inventory.py` calls `parse_command(value)` on the RAW variables-CSV `var_value`, and `_file_op` keys the asset off that verbatim operand, so `%%R_PATH/out.dat` and `/data/r/out.dat` plan edges to two `DataAsset` nodes for one file; the CMD_LINE pass shares the defect, pre/post merely concentrates it. Written as a FEED change, not a new parser and not a new resolver: `resolve_layers` / `resolve_command_line` (G46, done) already return each definition's `resolved_value` with substitution provenance, and PRECMD/POSTCMD are themselves SETVAR definitions, so the chain that resolves the rest of the job resolves them in place. The acceptance carries the four things that make it reviewable — raw stays beside resolved (the G46 derived-fact shape), `{ODATE}`-class residue counted as EXPECTED and kept distinct from an unresolved user variable, `ResolveCoverage`-style per-run counters on the existing `ExtractCoverage` summary line, and both variables-CSV shapes feeding the scope chain (`var_scope` in the aliased projection; the `JOB_NAME == folder name` header rule in the raw export, per `drydocs/staging.py`). Endpoints unchanged, no new relationship type, `m3_reads_from` / `m3_writes_to` stay planned — no gate. `module: drydocs-lineage` recorded in the item: the change point is the extractor's pass, core's resolver is CALLED not modified. **`Idea-113` → `G93`** (p2 task, `drydocs-remediation`, phase 6, dependency-free): `render_handoff()` in `drydocs_remediation/jira.py` emits Findings / Scope / Change / Equivalence / Acceptance / Rollback and not one count of what the run processed, so the ticket carries no denominator — while the extractors already model exactly this (`ExtractCoverage.summary()` with the G60 `prepost_*` split, `XmlDefsCoverage`, findings by rule). Also verified: NOTHING under `drydocs_remediation/` imports `run_log` today (`drydocs/cli.py` is the only `LoaderRunLog` caller), so the batch-side run log is IN the item rather than assumed. Acceptance pins the five things that keep it honest — counts ride the run log not the console, they are recorded not recomputed at render time (proven by a test where the renderer gets a filtered finding list), skips counted with reasons, absence rendered as *not recorded* rather than omitted, and the equivalence proof NOT restated so a big denominator cannot read as evidence. **`Idea-114` → `G94` + `G95`, split on buildability.** `G94` (p2 task, `drydocs-core`, phase 6, deps G84 done) is the decision tree, and it is buildable now because the repo already has both inputs: `config/launcher-registry.yaml` classifies DPL / ABINITIO / INFORMATICA through `classify_executable()`, and `JOB_ROLES` is already the C30 discriminator set — the gap is that `required_tokens()` keys on `JobType` alone. Its most durable clause is the guardrail-as-test: §7.5 and G84(c) rule the DD digit a grammar VERSION that must not select a standard, so a test asserts the same job under `DD1|` and a hypothetical `DD2|` selects the SAME standard, and the per-engine token CONTENT is explicitly out of scope (an unruled engine inherits the generic set and REPORTS that it did). `G95` (p3 task, `config`, phase 6, `fable`, dependency-free) is the other half as a DRAFTED GATE PROMPT on the G27 / W1 / N10 / G61 precedent — drafting decides nothing — because standard identity and its carrier are a contract change to `TOKEN_REGISTRY`, whose docstring calls itself the single source parser and register both read from, guarded by the registry-vs-standard agreement test. The prompt puts four questions and pre-picks none: identity shape, carrier (versioned YAML under `config/` on the launcher-registry precedent vs. the SQLite table the user floated), ratifying the DD-digit fence explicitly *because a per-team registry is the exact pressure that would break it*, and whether a team profile may RELAX a company-required token or only add. `module: config` recorded in the item — the artifact under discussion is a registry/profile store and `config/` is the declared home for registries; the prompt DESCRIBES a change to a `drydocs-core` module without making one. **Nothing was parked as a question** — no `module` or `phase` was genuinely two-way, and the one decision the user has not made (where a standard lives) is routed to the SME as `G95` rather than guessed. **Left for the user/SME: unchanged from the third pass**, plus the `G95` gate itself.
 
 - **GROOM 2026-08-12 (desktop, third pass — the two entries captured after the second pass)** — the inbox gained exactly two entries since the morning runs, `Idea-110` and `Idea-109`, and they needed opposite dispositions. **Promoted 1: `J48`** (p2 chore, `drydocs-core`, phase 8, dependency-free) from `Idea-109`'s RESIDUE. The reported bug — a worktree-isolated agent running the session-end render ritual writes `board.html` / `ideas.html` / `roadmap.html` into the MAIN tree — was already FIXED the same day at `841dc6e5` (`drydocs_core/repo_paths.py`, adopted in `plan_board`/`plan_ideas`/`plan_roadmap`, 13 tests including one that drives a real `git worktree` through a real `render_board.py`), so what was left was never groomed into anything: **seventeen** other modules still anchor a default path on a raw `Path(__file__)` repo root. Re-counted at this groom rather than taken from the entry — a `grep` for `REPO_ROOT =` across `drydocs/`, `drydocs_core/` and `scripts/` returns 21 sites, of which 3 have adopted `repo_root()` and 1 is the docstring example in `repo_paths.py` itself, leaving 17 (plus `ontology/schema_graph.py`, which uses `Path(__file__)` without a `REPO_ROOT` name and is in the item's inputs for that reason). Evidence is re-runnable with no database and no company data (J18). The item is written as a **sweep with a judgement, not a mechanical replace**, because the entry is explicit that these are not all bugs: repo-*content* defaults follow the caller's checkout, package-*internal* resources rightly keep `__file__`, and each site gets that one-line ruling — with "correct as written" recorded as a package-internal disposition rather than a skip, plus a derived coverage test (the S10 precedent) so a NEW un-ruled site reds instead of passing by omission. Likely dispositions are written into the notes as NON-binding, so the sweep is not re-derived from scratch. `module: drydocs-core` chosen and recorded in the item: the convention, its one implementation and its guard all live in `drydocs_core/`, even though the sites span three trees. **Inboxed 0, merged 0.** `Idea-110` needed nothing — it was captured AND closed the same day (`b268cd36` reclassified `UI-WIP/claude-design-ui-prompt.md` as a dated record), and its residue is a standing habit ("resolve the paths a doc cites before landing an idle branch"), not an item. **Left for the user/SME: 9, unchanged from the second pass** — `Idea-104`, `Idea-74`, `Idea-34`, `Idea-33`, `Idea-32`, `Idea-28`, `Idea-17` (the two machine-local relics), `Idea-16` (the SNYK repo secret), and the `E1` status question inside `Idea-93`; all were re-verified against the tree hours earlier at the second pass, so this run did not re-walk them. Nothing here touches edge semantics: J48 is path resolution only — no graph write, no vocabulary entry, no gate.
@@ -1914,6 +1836,86 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **GROOM 2026-08-12 (desktop, second pass — "finish any non-HITL open items")** — the inbox had NO new captures (the 08-11 weekly pass consumed Idea-96..Idea-107 and the earlier 08-12 pass worked the tail), so this run did the one thing left that is not the user's: walk every OPEN and residual-clause entry, verify its state against the tree, and either finish it or say precisely what it waits on. **Promoted 1, and it did not come from the inbox:** **K24** (p2 bug) — the `fid-identity-and-scope` gate page carries TWO questions numbered **Q6**, the SME answer landed 2026-08-12 by `887a0e7` and an older, still-open application-roll-up question that was never renumbered when the new one was appended, while FOUR other files cite "Q6" by number (`config/source-mappings/psgmgr.yaml`, `config/source-registry.yaml`, `docs/k16-fid-census-company-prompt.md`, and K16's own "RUN Q6 FIRST" line). Reproduced at the groom with a scan of every file in `config/gate-prompts/` — exactly one collision in the whole tree — so the evidence is re-runnable with no database and no company data (J18). It renumbers only the entry nobody cites and adds the duplicate-id guard to `tests/unit/test_gates_json.py`; it answers nothing, which matters because K17 is the next gate walked on that page. **Fixed in place, 2 stale `inputs:` paths** (the `Idea-93` class, re-audited across all 112 non-`done` items): `G63` and `G64` cited `config/audit-fields/` as a directory when the ledger is the file `config/audit-fields.yaml`. Three refs flagged, two were typos, one (`Y4`'s `backlog/items/`) is a legitimate future output — down from fourteen at the 08-09 sweep. **Two open entries narrowed by verification rather than by a ruling:** `Idea-17` — both pre-squash branches are ALREADY GONE from origin and the stash is empty, so the destructive REMOTE decision it was raised for no longer exists; two this-machine-local relics remain. `Idea-16` — re-verified the `snyk` job is still in `ci.yml` and still gated on the missing repo secret, so it is unchanged and undischargeable by any agent. **Three residual clauses re-read as PARKED with named triggers, not open:** `Idea-20`(a) → a real `CMD_LINE` sample carrying the `ingestion-launcher` jar (a repo-wide search finds that string only in this file and the backlog text quoting it, so an item today would have no input), `Idea-20`(d) → layer-4 context-graph work starting, `Idea-10`'s ALIAS tier → an alias source existing at all. **Inboxed 1:** `Idea-108` — two abandoned agent worktrees pinned at `6c24963` are holding UNCOMMITTED work (6 and 8 changed paths, including the untracked `scripts/render_underhood_benchmark.py`), while all four `worktree-agent-*` branches are already ancestors of `main`; parked rather than swept because the standing rule is that no session touches another stream's uncommitted work, and both salvage and prune are irreversible in one direction. **Left for the user/SME: 9, unchanged** — `Idea-104`, `Idea-74`, `Idea-34`, `Idea-33`, `Idea-32`, `Idea-28`, `Idea-17` (local half), `Idea-16`, the `E1` status question in `Idea-93` — plus `Idea-108` new. Nothing here decides an ontology question: K24 is identifier hygiene on a gate page and explicitly rules nothing the gate owns.
 
 - **GROOM 2026-08-12 (desktop)** — a SMALL groom by design: the 2026-08-11 weekly pass consumed every new capture (Idea-96..Idea-107), and nothing has been captured since, so this pass worked the OPEN and PARKED tail plus one cross-check the inbox could not have produced. **Promoted 2:** both from the Control-M `DESCRIPTION` seam, both reproduced at the groom with a sample and no database (J18) so anyone can re-run the evidence. **G83** (p1 bug) — C30 ruled the description token set on 2026-08-11 and only the standards page moved: parsing a fully C30-conformant watcher description returns SEVEN findings (`FTS_ID` and `REC_ID` as unknown keys, `ENV` + both route ids + both `EMAIL_DL`s reported missing), and `G67`'s own conformance fixtures already emit `FTS_ID: FTS2`. The judgment call is written into the acceptance rather than left open: retired tokens are MARKED, never deleted, because the deployed estate still carries them and a greenfield standard cannot retroactively unwrite ~240K descriptions. **G84** — the `DD1|` sentinel from `Idea-105`'s SME resolution: today the parser reports the compliant marker itself as an `unparseable_segment`, and legacy prose containing a colon manufactures pseudo-tokens indistinguishable from a C16 team-local annotation. Fenced: a READ gate only, ratifying nothing, with the marker in ONE constant because gate `email-dl-contact-point` §G6 still rules it. **Merged 1:** `Idea-73` (the employee hierarchy) → **G74**, which was raised 2026-08-11 asking the same question from the other end; three findings ride across — O44 column 1 is a second waiting consumer, `pat:people-report` carries teams not reporting lines so it is NOT the source, and the 2026-07-23 HR-hierarchy direction was written for the COMPANY gate, which is why nothing landed here. **One dependency added:** `G77` now depends on `G84` as well as `C34` — its clause (a) registers a THEME token *inside* the `DD1|` block, and without the link two sessions implement the same sentinel differently in one file. **Left for the user/SME: 9** — `Idea-104` (which MFT route-id shape is real; G83 was written NOT to answer it), `Idea-74` (does DryDocs ingest the ServiceNow queue export, and on which side), `Idea-34`, `Idea-33`, `Idea-32`, `Idea-28`, `Idea-17`, `Idea-16`, and the `E1` status question inside `Idea-93`. **Four parked entries re-checked, none fired,** and two of them narrowed: `Idea-15`'s placement blocker is DISCHARGED (the `generic-naming` epic now exists), leaving one open user call instead of two; `Idea-38`'s class (1) is CLOSED by the 2026-08-11 authored-fixture ruling, leaving three; `Idea-25` and `Idea-27` re-verified unfired against the current tree. Nothing raised here decides an ontology question: both new items are pure-parse, zero graph writes, every token stays `proposed`.
+
+- **`Idea-119`** · 2026-08-13 · `[chore]` · **merged → G78 clause (d) + a rider note on G79 (2026-08-13) — the five untested loaders ride the fix that touches them, exactly as this entry proposed** · prio? **Med** —
+  **31 package modules have no direct test import, and five of them are loaders G78 is
+  about to change.** A5 measured 2026-08-13 at `bb9788b6`: 31, against the skill's 29
+  baseline at `2d104ef` (08-09). By package: `drydocs_core` 14, `drydocs` 10,
+  `drydocs_lineage` 4, `drydocs_docmeta` 2, `drydocs_api` 1. The pointed five are
+  `business_segments.py`, `controlm.py`, `controlm_dependencies_derived.py`,
+  `controlm_hosts.py` and `seal_contacts.py` — untested loaders, while G78 (p0) fixes a
+  chain step that silently skips a missing input and reports success. Highest
+  single-leverage gap: `drydocs_lineage/extractors/rua_inventory.py`, fan-in 5, no test
+  import. Two caveats ride with the number: A5 is a DIRECT-IMPORT proxy, so fixtures and
+  subprocess coverage do not show; and the +2 could not be attributed (see Idea-120).
+  Proposed disposition on groom: **merge the five loaders into G78/G79's acceptance**
+  rather than filing a coverage sweep — the tests belong with the fix that touches them.
+
+- **`Idea-118`** · 2026-08-13 · `[bug]` · **groomed → U21 (2026-08-13)** · prio? **High** —
+  **`IMPORTS` edges are never retracted, so fan-in inflates permanently and test debt
+  under-reports.** Found while cross-checking the freshly reloaded graph against the
+  snapshot it was loaded from. `drydocs/loaders/seal_attribution.py` still carries an
+  `IMPORTS` edge to `drydocs/loaders/base.py`; the file contains ZERO occurrences of the
+  string "base" (K8 removed it at `4df4df2`), and today's snapshot records no such edge.
+  **The edge survived a full `load-code-snapshot` re-run** — so this is not the staleness
+  in Idea-117 and a refresh does not fix it. The D7 sweep tombstones removed MODULES;
+  nothing sweeps removed EDGES, so the import graph only grows. Size today: 985 live
+  `IMPORTS` edges in the graph vs 982 in the snapshot — 3 ghosts, one of which put
+  `loaders/base.py` at fan_in 32 where the tree says 31, distorting the repo's #1
+  change-risk metric. **A5 is affected in the dangerous direction**: a module whose test
+  import was DELETED keeps the ghost edge and still counts as tested, so test debt reads
+  better than it is. Fix shape: retract edges absent from the loaded snapshot for any
+  module that snapshot DID include — a per-source sweep, never a global delete, since the
+  graph holds edges other loaders wrote.
+
+- **`Idea-117`** · 2026-08-13 · `[bug]` · **groomed → U22 (2026-08-13; the warn-vs-fail call this entry left to the groom is RULED WARN in the item's clause (b))** · prio? **High** —
+  **The code graph can go stale for weeks and nothing says so.** Found by `/tech-debt`
+  2026-08-13 (desktop, `neo4jtest`, `drydocs` DB): every `:CodeModule` carried
+  `last_seen_at = 2026-08-02T23:06:42Z` from ONE run id — loaded once on Aug 2 and never
+  refreshed, 11 days. The session first read A3's top fan-in as 28, which is the Aug-2
+  value (the skill's own baselines run 28 → 29 on 08-04 → 31 on 08-09); it looked current
+  and would have been reported as current. Same class as G78 — not a failed read, a read
+  that SUCCEEDED with the wrong data, and it sits underneath every architecture and debt
+  decision. `drydocs load-code-snapshot` repairs it in one command (run 2026-08-13; graph
+  now 1697 modules, 164 tombstones), but nothing compares `max(m.last_seen_at)` against
+  the newest snapshot's `meta.captured_at`. Proposed: a freshness assertion in
+  `tests/unit/test_code_graph_review_plan.py`, which already fails when the typed package
+  allow-list and `pyproject.toml` disagree — the shape exists, this is one more check in
+  it. Warn-vs-fail is a real call for the groom: the snapshot ritual's CI check is
+  warn-only on the argument that recording structure and passing a gate are different
+  jobs, and the same argument applies here.
+
+- **`Idea-88`** · 2026-08-07 · `[idea]` · **groomed → Q18 (2026-08-13), with the parking PRESERVED as `depends_on: [G32, Q14]` rather than overridden** · prio? **Med** —
+  **The only loaded software↔docs edge has NO registry declaration behind it — close
+  the gap with a `describes_product:` field.** The 27 live
+  `(:Document)-[:DESCRIBES]->(:SoftwareProduct)` edges for `controlm` are asserted by a
+  hardcoded Python constant — `drydocs/loaders/bmc_docs.py`
+  `SUBJECT_PRODUCT_ID = "controlm"` — and the corpus's `doc-source-registry.yaml` entry
+  carries only `taxonomy_path`, which NO file maps to a product id. So the one working
+  traversal in the estate is unreproducible from the ledger, and a report cannot
+  honestly infer the declaration (the /software page refuses to, deliberately — O56
+  honesty rule 4). Fix direction: a `describes_product:` field on doc-source-registry
+  entries, with the loader READING the registry instead of carrying the constant, plus
+  a guard that the id resolves to a real software-registry product. Parked rather than
+  groomed because it touches a loader AND a gated corpus behind two open rulings — G32
+  (which database corpora live in) and Q14 (which term carries the edge) — and this is
+  also where Q16's unshipped clause (b) will land. (Found at the Q16 close, 2026-08-07.)
+
+- **`Idea-47`** · 2026-08-02 · `[idea]` · **groomed → U23 (2026-08-13) — the gate-rider DRAFT only; the edge stays unregistered until the SME signs, and the emitter question rides the prompt** · prio? **Low** —
+  **The 45 `.cypher` files are now nodes with zero edges — nothing joins a
+  loader to the Cypher it executes**, even though the path is a literal in the `.py`
+  (`CYPHER_DIR / "code_snapshot.cypher"`). `drydocs/loaders/` holds 32 `.cypher` + 24 `.py` +
+  15 `.sql` side by side, unconnected. depgraph does not emit the edge and the loader could not
+  load it if it did (new edge type → gate). This is gate §H5's named future item, now with the
+  nodes already in place — the remaining work is the edge, not the corpus.
+
+- **`Idea-23`** · 2026-07-21 · `[idea]` · **groomed → G97 (2026-08-13) — TRIGGER FIRED: `m7_uses_artifact` has been `status: active` since 2026-08-07 (gate rua-load-shapes §A4, applied at G55), not `planned` as this entry recorded, and the writer MERGEs :ETLProcess on its token** · prio? **Med** —
+  **m7 build follow-up** (from gate `cmdline-nfr-vetting`): migrate
+  payload invocations out of the m3_invokes 1..n fold onto the registered `USES_ARTIFACT`
+  edge + stamp `script_role` {launcher, payload} and the artifact_* properties on :Script.
+  Feed now EXISTS (G16 value-contract facts + G15 launcher properties); groom once the
+  writer's ETLProcess endpoint work makes the edge landable — the vocab entry
+  `m7_uses_artifact` stays `planned` until that build's own flip.
 
 - **`Idea-105`** · 2026-08-11 · `[question]` · **groomed → G84 (2026-08-12, the READ gate only — the ruling itself stays the gate's, rider §G6)** · prio? **High** —
   **Two things claim the same 4000-char Control-M `DESCRIPTION` field on generated
