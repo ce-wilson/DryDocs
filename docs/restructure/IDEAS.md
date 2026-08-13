@@ -62,6 +62,42 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-115`** · 2026-08-12 · `[chore]` · **open** · prio? **Med** —
+  **The rua bundle's script-copy path is a CONVENTION the extractor re-derives, not a
+  column the collector declares — so if the two ever disagree, the pipeline reports an
+  empty bundle rather than a broken contract.** `drydocs_lineage/extractors/rua_inventory.py:384`
+  builds it by hand — `copy_rel = f"scripts{row['path']}"  # the collector mirrors the abs tree` —
+  and `scripts.tsv` carries no copy-path column to check it against: the collector writes
+  the header `path owner group perms size mtime sha256`
+  (`drydocs_lineage/collect/rua_inventory.sh:296`) and mirrors matched files under
+  `scripts/` separately. Both downstream consumers then read that derived path —
+  G21 `rua_code_ops.py:236` (`read_text` → parse code operations) and G24
+  `code_repo.py:235` (`read_bytes` → git blob sha1 → server-vs-repo corroboration).
+  **Why it is worth a line rather than a shrug:** the failure is SILENT and reads as the
+  wrong thing. Both extractors already handle a missing copy gracefully and correctly —
+  `scripts_unreadable` / `scripts_no_copy` in G21, `server_uncomputable` in G24 — because
+  an over-cap file is *listed but not copied* by design (`SCRIPT_COPY_MAX_BYTES`, default
+  1 MiB). That is the right behavior for the case it was built for, and it is exactly what
+  absorbs a layout change: every counter lands in the "too big to copy" bucket, the run
+  succeeds, and "the collector's mirror layout changed" is indistinguishable from "this
+  estate has large scripts". Nothing errors. Found 2026-08-12 tracing G24 end to end at the
+  user's ask; **nothing is wrong today** — the chain is correctly wired and this is a latent
+  coupling, not a live defect.
+  **The fix is not free, and the tension is the interesting part.** The obvious move — add a
+  `copy_path` column to `scripts.tsv` so the location is declared rather than guessed — is a
+  **bundle schema change**, and the collector stamps `COLLECTOR_VERSION=rua-inventory/v2`
+  precisely so consumers can version-detect. The script's own header already rules that an
+  extractor "must treat `scripts.tsv` and the `sha256` columns as OPTIONAL" so v1 bundles
+  stay ingestible; a new column means v3 and the same optional-column discipline again, for
+  a field every current bundle can already derive. **The cheaper candidate:** leave the wire
+  format alone and pin the CONVENTION with a guard — one test that builds a small bundle
+  (or uses a fixture) and asserts a `-n`-captured file is readable at
+  `scripts{path}` from the extractor's side, so a collector-side layout change reds a test
+  instead of quietly zeroing the counters. That is the S10/derived-coverage idiom the repo
+  already uses elsewhere. **Decide which**, or rule it accepted-as-is with the reason
+  recorded — all three are legitimate; what is not legitimate is the current state, where
+  the contract exists only as a comment on one line.
+
 - **`Idea-114`** · 2026-08-12 · `[idea]` · **groomed → G94 (the selection decision tree, buildable now) + G95 (the gate prompt for standard identity + per-team carrier — the contract change goes to the SME first, 2026-08-12)** · prio? **Med** —
   **DD1 standard selection is a decision tree, and standards need identity.** User
   direction at the 2026-08-12 session: under the `DD1|` tag, a FileWatcher job validates
