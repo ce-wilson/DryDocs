@@ -62,6 +62,47 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-114`** · 2026-08-12 · `[idea]` · **open** · prio? **Med** —
+  **DD1 standard selection is a decision tree, and standards need identity.** User
+  direction at the 2026-08-12 session: under the `DD1|` tag, a FileWatcher job validates
+  against the FW standard; a CMD job selects by ETL engine FIRST (DPL, Ab Initio,
+  Informatica — the launcher classification already names these), then falls back to a
+  generic standard that carries SOME shared tokens (DevX key, the EMAIL_DL contacts) but
+  not all. The standard itself then needs identity and storage: a config table (SQLite?)
+  keyed by a standard id, so a validation profile can be stored BY TEAM, with a
+  platform/product hierarchy later. Guardrail to carry into the groom: §7.5/G84 rule the
+  DD digit a grammar VERSION that MUST NOT select a template or standard — selection rides
+  TASKTYPE + JOB_ROLE + the launcher classification, so a standard id needs its OWN
+  carrier (the config table keyed by team/engine, or a registered token), never the
+  sentinel digit. Today the per-job-type sets live in code-as-data (`TOKEN_REGISTRY`, the
+  parse contract, guarded by the registry-vs-standard agreement test) — externalizing
+  them into a per-team registry is a contract change and gate-relevant. Relates: G77
+  (THEME token inside the DD1 block), the etlprocess-kind-enum rider (engine vocabulary).
+
+- **`Idea-113`** · 2026-08-12 · `[idea]` · **open** · prio? **Med** —
+  **Coverage counts belong in the Jira fix-package explanation.** User direction
+  2026-08-12: the per-run counters the extractors already emit (`ExtractCoverage.summary()`
+  with the new `prepost_*` source split, `XmlDefsCoverage`, the conformance finding counts
+  by rule) are the model for what a remediation batch should LOG when it is done — the
+  counts go into the Jira explanation of the fix package (the runbook-automation support→dev
+  handoff), carried through the run-log contract (`drydocs_core/run_log.py`) rather than
+  console output, so the explanation is generated from the same numbers the run recorded.
+
+- **`Idea-112`** · 2026-08-12 · `[idea]` · **open** · prio? **Med** —
+  **Resolve `%%` variables in PRECMD/POSTCMD (and CMD_LINE) before the G14 file-op
+  parse.** The G60 feed stages operands verbatim, so candidates carry unresolved names
+  (`%%R_PATH/...`, `%%$ODATE`) that cannot merge with their resolved twins. The one
+  resolver (`drydocs_core/orchestration/controlm/resolver.py` — "no caller may
+  re-implement substitution") already does everything needed: PRECMD/POSTCMD are
+  themselves SETVAR definitions, so `resolve_layers()` over the folder→job scope chain
+  returns each row's `resolved_value` in place — parse THAT instead of the raw value, keep
+  raw verbatim beside it (the G46 derived-fact shape), and `{ODATE}`-class canonical
+  tokens remain as expected symbolic residue in the operand. The SAME variables CSV
+  carries both the shell text and its bindings (`var_scope` splits FOLDER from JOB in the
+  aliased shape; the raw export's folder rows are the header row where JOB_NAME equals the
+  folder name). Count resolution quality per the `ResolveCoverage` precedent
+  (`drydocs/cmdline_staging.py`). Raised working through the G60 result with the user.
+
 - **`Idea-111`** · 2026-08-12 · `[bug]` · **open — gate scope fixed today; the lint sweep is deferred by the user** · prio? **High** —
   **CI has been RED on `main` since 2026-08-05 and nobody noticed for a week.** Last green
   run `2026-08-05T06:10` (`test(currency): bring port-prompt under the currency guard`);
