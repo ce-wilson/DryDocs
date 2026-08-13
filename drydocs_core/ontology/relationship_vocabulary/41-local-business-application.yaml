@@ -232,3 +232,44 @@
     loader:       ~
     domain:       business_application
     status:       active
+
+  # ── Downstream consumer contact on a data port (SME direction 2026-08-12) ──
+
+  - id:           business_application_port_has_contact_point
+    neo4j_label:  HAS_CONTACT_POINT
+    inverse_label: "contact point for"
+    role:         ~
+    from_node:    Port
+    to_node:      DistributionList
+    prov_maps_to: ~
+    note: >
+      The downstream consumer contact for a data port — the DPROD shape the
+      captured MFTS standard already uses (ex:consumerContact hung off a
+      dprod:outputPort). SME DIRECTION 2026-08-12 (config/gate-log.md RECORD;
+      email-dl-contact-point §G5): the contact attaches to a :Port, NOT to the
+      job or folder (§B1's shape). Two grounds — the contact is UNSTRUCTURED,
+      and NO SUPERNODES: the job/folder shape produces one at estate scale
+      because a shared distribution list accretes an inbound edge from every
+      job that notifies it, and the most-shared DLs are the ones the whole
+      batch estate points at. Port-scoping bounds the fan-in.
+      HONEST CAVEAT, because the direction's own reasoning does not fully
+      settle it: port-scoping REDUCES fan-in (ports are far fewer than jobs)
+      but does not eliminate it — one DL shared by many applications is still
+      a shared node with many inbound edges. If "unstructured" was meant to
+      rule out the node entirely, the alternative is a PORT PROPERTY and no
+      edge at all, which removes the supernode by construction and would
+      retire this entry. That is exactly what the gate must rule, and it is
+      why this stays planned.
+      VALUE SOURCE (§G2 direction, same day): the known email_dl comes from
+      FOLDER METADATA — the folder variables L2_EMAIL_DL_NM / L3_EMAIL_DL_NM
+      — not the per-job Description tokens. Precedence when folder and job
+      disagree is still open.
+      Entity→Entity (Port and DistributionList are both prov:Entity), so
+      prov_maps_to is null on the m3_belongs_to_application / SCHEDULED_ON
+      precedent rather than reaching for a weak PROV verb.
+      NOTHING LOADS: status planned until email-dl-contact-point signs off;
+      §G5's "does the port leg split to its own gate" half is also unruled.
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       planned

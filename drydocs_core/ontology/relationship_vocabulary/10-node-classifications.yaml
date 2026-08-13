@@ -211,6 +211,21 @@ node_classifications:
     prov_type:  Entity
     note:       "Data port (EventProcessing / BatchProcessing). dprod namespace is the EKGF working default pending the corporate IRI."
 
+  - label:      DistributionList
+    class:      "dd:DistributionList"
+    dual_class: "vcard:Group"
+    prov_type:  Entity
+    note: >
+      An email distribution list as a contact point. Registered with
+      business_application_port_has_contact_point (status: planned) so the edge
+      is not declared without its node — the gap closed for ControlMApplication
+      on 2026-07-09. Shape per email-dl-contact-point §A1 (keyed on the
+      lower-cased SMTP address, display_name + status as properties); the
+      captured company standard models the same thing as ex:EmailDistributionList
+      with a dlTier enum, and §G3 rules which name and whether dlTier folds into
+      `purpose`. NOTHING LOADS until that gate signs: the node class is declared
+      here because its edge is, not because anything creates it.
+
   # — SEAL reshape (ACTIVE at K4, 2026-07-15 — gate 2026-07-10 §B) —
   # (seal_had_primary_source targets :Document — declared ONCE in the docs-corpus section
   # below; the duplicate SEAL-reshape Document entry was merged into it 2026-07-09,

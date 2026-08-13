@@ -93,6 +93,8 @@ MERGE (n:SchemaMeta:Membership {name: 'Membership'})
   SET n.class = 'org:Membership', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:Port {name: 'Port'})
   SET n.class = 'dprod:Port', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:DistributionList {name: 'DistributionList'})
+  SET n.class = 'dd:DistributionList', n.dual_class = 'vcard:Group', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Attribution {name: 'Attribution'})
   SET n.class = 'prov:Attribution', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:TOMRole {name: 'TOMRole'})
@@ -309,6 +311,10 @@ MERGE (a)-[r:HAS_AGENT]->(b)
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'TOMRole'})
 MERGE (a)-[r:HAD_ROLE]->(b)
   SET r.vocab_id = 'seal_attribution_had_role', r.prov_maps_to = 'prov:hadRole', r.domain = 'business_application', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'DistributionList'})
+MERGE (a)-[r:HAS_CONTACT_POINT]->(b)
+  SET r.vocab_id = 'business_application_port_has_contact_point', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
 
 // ── domain: catalog ─────────────────────────────────────────────────────────
 
