@@ -62,6 +62,40 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-123`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
+  **Web UI example output: the "Ask the knowledge graph" file-name search report.**
+  SME supplied a real captured example (screenshot machine-local at
+  `internal-local/ui-examples/dd-ui-wip-user-query-for-file-name-result.png`,
+  transcribed — real SEAL ids/hosts/repo URLs — at
+  `internal-local/ui-examples/dd-ui-ask-graph-file-search-transcription-20260813.md`).
+  The use case: user searches a FILE NAME (or table) to find the business
+  application and process associated with it; the result points to a
+  file-transfer process fed by an event-based application, and the generated
+  "report" shows the code repos and development teams for BOTH processes so
+  support can escalate. Mechanism: a shortest-path traversal from an
+  Application anchor filtered on a fileName property (~22-node result spanning
+  application / product / dev-team / scheduler folder+job / file-transfer
+  route / pipeline / repo labels), plus a source→node-label legend table the
+  report view would carry. This is the concrete output target for the Ask
+  route — pairs with the Idea-116 swimlane view (same job→pipeline→asset
+  chain, report form instead of diagram form).
+
+- **`Idea-122`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
+  **Web UI example view: the product roll-up flow — which area a job/folder
+  supports and how it rolls up through the product catalog.** SME supplied a
+  rendered mermaid example (screenshot machine-local at
+  `internal-local/ui-examples/dd-ui-wip-user-view-product-mermaid.png`,
+  transcribed — real org-taxonomy values — at
+  `internal-local/ui-examples/dd-ui-product-rollup-mermaid-transcription-20260813.md`).
+  The view: folder token = PAT AreaProduct, rolling up AreaProduct → Product →
+  ProductLine → LOB, with the TWO roll-up shapes side by side — framework
+  applications (no direct SEAL; the AreaProduct token is the join) vs app-tied
+  applications (carry SEAL; the Control-M sub-application is the join) — the
+  folder-name grammar as the leaf, data classification beneath, and a dotted
+  cross-branch "aligns to platform" edge. Candidate UI shape: a mermaid/MiniDag
+  flow on the product page; ties to the PRAOCG folder grammar and the G94
+  standard-selection decision tree.
+
 - **`Idea-121`** · 2026-08-13 · `[bug]` · **open** · prio? **Med** —
   **RENDER HALF FIXED 2026-08-13; the remaining writers stay open, so this entry stays
   open too.** all 11 `write_text(` sites in
