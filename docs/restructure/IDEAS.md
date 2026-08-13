@@ -62,6 +62,32 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-121`** · 2026-08-13 · `[bug]` · **open** · prio? **Med** —
+  **The renderers write CRLF on Windows, so every render run dirties the committed
+  renders with line-ending-only churn.** Found the same day the LF policy landed
+  (`fcc8afa` .editorconfig, `b348b0c` `* text=auto eol=lf`): running
+  `render_board.py` + `render_ideas.py` left TEN files modified in `git status`, of
+  which exactly ONE — `ideas.html` — had a content change. The other nine
+  (`board.html`, `roadmap.html`, `load-map.html`, and six `web/src/generated/*.json`)
+  differed only in line endings. Mechanism: the writers call
+  `Path.write_text(..., encoding="utf-8")` with no `newline=`, so Python text mode
+  translates `\n` to `\r\n` on Windows; git normalizes it straight back to LF on
+  commit, which is why no blob ever changed and nobody noticed. **Correctness is not
+  at stake — legibility is.** The session ritual's stale-render check reads
+  `git status` / `git diff --quiet` after a re-render, and a step that reports ten
+  changed files when one changed is a step whose signal is buried in noise. That is
+  the Idea-111 failure shape (a gate nobody reads) arriving by a different route, and
+  it is exactly the "phantom CRLF-vs-LF noise in tools that read the working tree"
+  the `.editorconfig` commit named the same morning. Fix: pass `newline="\n"` —
+  available since Python 3.10, and the project is `^3.11` (verified present on
+  3.12.10). Nineteen `write_text(` sites repo-wide lack it; roughly ten produce
+  committed render surfaces (`plan_board` / `plan_ideas` / `plan_roadmap` /
+  `design_doc` plus the six `scripts/render_*.py` JSON generators). Sweep the
+  render/generated-surface writers as one unit; the remaining writers
+  (`vendor_docs`, `publishing/*`, `schema_graph`, the `scripts/` scrapers) are a
+  separate call, not automatic. Idea-120's proposed metrics JSONL writer should be
+  born with `newline="\n"` rather than added to the queue.
+
 - **`Idea-120`** · 2026-08-13 · `[chore]` · **open** · prio? **Med** —
   **Debt metrics have no machine-readable history, so "is it getting better" is
   unanswerable.** Newest-only snapshot retention (U12) is right for snapshots, but it
