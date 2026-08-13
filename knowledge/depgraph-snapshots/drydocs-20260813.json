@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-12T20:23:31",
-    "date": "20260812",
+    "captured_at": "2026-08-13T02:20:42",
+    "date": "20260813",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "c981964",
-      "full": "c9819645c9a248e33192cce9682c1ea8598edd9c",
+      "commit": "bb9788b6",
+      "full": "bb9788b6fe2030b100016724ea255f78b6c787f6",
       "branch": "main",
-      "describe": "port-base-20260811-79-gc981964",
-      "subject": "fix(lint): sweep to zero — both CI ruff gates exit 0 for the first time since 08-05",
-      "dirty": true,
+      "describe": "port-base-20260811-98-gbb9788b6",
+      "subject": "chore(backlog): G96 done — API-call framework built same session (claim 9093e0b9, build follows)",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": true,
+      "untracked_present": false,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -6191,6 +6191,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/UI-WIP/wireframes/out/dataflow.svg",
+      "name": "dataflow.svg",
+      "extension": ".svg",
+      "rel_path": "UI-WIP/wireframes/out/dataflow.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/UI-WIP/wireframes/out/landing.svg",
       "name": "landing.svg",
       "extension": ".svg",
@@ -6906,6 +6915,15 @@
       "name": "self-documentation-code-graph.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/self-documentation-code-graph.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/snowflake-data-catalog.yaml",
+      "name": "snowflake-data-catalog.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/snowflake-data-catalog.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9989,6 +10007,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -10005,6 +10032,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10961,6 +10997,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/plan_board.py",
       "name": "plan_board.py",
       "extension": ".py",
@@ -11325,6 +11379,60 @@
       "name": "base.py",
       "extension": ".py",
       "rel_path": "drydocs_core/adapters/base.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/adapters/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs_core/adapters/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/adapters/controlm/API-CALLS.md",
+      "name": "API-CALLS.md",
+      "extension": ".md",
+      "rel_path": "drydocs_core/adapters/controlm/API-CALLS.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/adapters/controlm/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "drydocs_core/adapters/controlm/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/adapters/controlm/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/adapters/controlm/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/adapters/controlm/api.py",
+      "name": "api.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/adapters/controlm/api.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/adapters/controlm/controlm_api.sample.cfg",
+      "name": "controlm_api.sample.cfg",
+      "extension": ".cfg",
+      "rel_path": "drydocs_core/adapters/controlm/controlm_api.sample.cfg",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12297,6 +12405,15 @@
       "name": "__init__.py",
       "extension": ".py",
       "rel_path": "drydocs_lineage/extractors/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py",
+      "name": "catalog_crosscheck.py",
+      "extension": ".py",
+      "rel_path": "drydocs_lineage/extractors/catalog_crosscheck.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13787,10 +13904,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json",
-      "name": "drydocs-20260812.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-2023.json",
+      "name": "drydocs-20260812-2023.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812-2023.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15011,6 +15128,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_controlm_api.py",
+      "name": "test_controlm_api.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_controlm_api.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_controlm_audit_time.py",
       "name": "test_controlm_audit_time.py",
       "extension": ".py",
@@ -15366,6 +15492,15 @@
       "name": "test_lineage_archival.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_lineage_archival.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_lineage_catalog_crosscheck.py",
+      "name": "test_lineage_catalog_crosscheck.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_catalog_crosscheck.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18593,6 +18728,14 @@
       "drydocs/drydocs_core/adapters/oracle_adapter.py"
     ],
     [
+      "drydocs/drydocs_core/adapters/controlm/__init__.py",
+      "drydocs/drydocs_core/adapters/controlm/api.py"
+    ],
+    [
+      "drydocs/drydocs_core/adapters/controlm/api.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
       "drydocs/drydocs_core/adapters/oracle_adapter.py",
       "drydocs/drydocs_core/adapters/sql_run_log.py"
     ],
@@ -18846,6 +18989,10 @@
     ],
     [
       "drydocs/drydocs_lineage/extractors/__init__.py",
+      "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors/__init__.py",
       "drydocs/drydocs_lineage/extractors/code_repo.py"
     ],
     [
@@ -18879,6 +19026,18 @@
     [
       "drydocs/drydocs_lineage/extractors/__init__.py",
       "drydocs/drydocs_lineage/extractors/snowflake_catalog.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py",
+      "drydocs/drydocs_lineage/extractors/glue_tables.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py",
+      "drydocs/drydocs_lineage/extractors/snowflake_catalog.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py",
+      "drydocs/drydocs_lineage/model.py"
     ],
     [
       "drydocs/drydocs_lineage/extractors/code_repo.py",
@@ -19349,6 +19508,14 @@
       "drydocs/drydocs_core/orchestration/shell.py"
     ],
     [
+      "drydocs/tests/unit/test_controlm_api.py",
+      "drydocs/drydocs_core/adapters/controlm/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_controlm_api.py",
+      "drydocs/drydocs_core/adapters/controlm/api.py"
+    ],
+    [
       "drydocs/tests/unit/test_controlm_audit_time.py",
       "drydocs/drydocs_core/orchestration/controlm/__init__.py"
     ],
@@ -19683,6 +19850,18 @@
     [
       "drydocs/tests/unit/test_lineage_archival.py",
       "drydocs/drydocs_lineage/review.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_catalog_crosscheck.py",
+      "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_catalog_crosscheck.py",
+      "drydocs/drydocs_lineage/extractors/snowflake_catalog.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_catalog_crosscheck.py",
+      "drydocs/drydocs_lineage/model.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_code_repo.py",
@@ -25046,6 +25225,11 @@
     [
       "drydocs/UI-WIP/wireframes/out",
       "CONTAINS",
+      "drydocs/UI-WIP/wireframes/out/dataflow.svg"
+    ],
+    [
+      "drydocs/UI-WIP/wireframes/out",
+      "CONTAINS",
       "drydocs/UI-WIP/wireframes/out/landing.svg"
     ],
     [
@@ -25472,6 +25656,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/self-documentation-code-graph.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/snowflake-data-catalog.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -26726,12 +26915,22 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -26792,6 +26991,16 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -27936,6 +28145,11 @@
     [
       "drydocs/drydocs_core/adapters",
       "CONTAINS",
+      "drydocs/drydocs_core/adapters/controlm"
+    ],
+    [
+      "drydocs/drydocs_core/adapters",
+      "CONTAINS",
       "drydocs/drydocs_core/adapters/csv_adapter.py"
     ],
     [
@@ -27947,6 +28161,31 @@
       "drydocs/drydocs_core/adapters",
       "CONTAINS",
       "drydocs/drydocs_core/adapters/sql_run_log.py"
+    ],
+    [
+      "drydocs/drydocs_core/adapters/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/adapters/controlm/API-CALLS.md"
+    ],
+    [
+      "drydocs/drydocs_core/adapters/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/adapters/controlm/README.md"
+    ],
+    [
+      "drydocs/drydocs_core/adapters/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/adapters/controlm/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_core/adapters/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/adapters/controlm/api.py"
+    ],
+    [
+      "drydocs/drydocs_core/adapters/controlm",
+      "CONTAINS",
+      "drydocs/drydocs_core/adapters/controlm/controlm_api.sample.cfg"
     ],
     [
       "drydocs/drydocs_core/docs",
@@ -28387,6 +28626,11 @@
       "drydocs/drydocs_lineage/extractors",
       "CONTAINS",
       "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors",
+      "CONTAINS",
+      "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py"
     ],
     [
       "drydocs/drydocs_lineage/extractors",
@@ -29201,7 +29445,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-2023.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -29816,6 +30060,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_controlm_api.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_controlm_audit_time.py"
     ],
     [
@@ -30012,6 +30261,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_lineage_archival.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_lineage_catalog_crosscheck.py"
     ],
     [
       "drydocs/tests/unit",
@@ -31253,13 +31507,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1684,
-    "edges": 971,
+    "files": 1694,
+    "edges": 982,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1951,
-    "directories": 268
+    "rels": 1966,
+    "directories": 273
   }
 }
