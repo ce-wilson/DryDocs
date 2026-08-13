@@ -648,6 +648,8 @@ default_ok:
     reason: "both sides accumulate their own ignore lines (consumer ignores company-specific data paths); union by hand on collision, never checkout"
   - path: ".gitattributes"
     reason: "same accumulate-and-union shape as .gitignore"
+  - path: ".editorconfig"
+    reason: "editor line-ending/charset policy (2026-08-13, with the * text=auto eol=lf attributes rule) — same accumulate-and-union shape as .gitignore; consumer may carry its own additions"
   - path: ".env.example"
     reason: "key-name template only, no values (PUBLISH-BOUNDARY). Consumer adds its own keys (Kerberos/RAC), so union on collision"
   - path: "poetry.lock"
