@@ -381,7 +381,14 @@ class RuaInventoryExtractor:
                 coverage.scripts_malformed += 1
                 continue
             coverage.scripts_rows += 1
-            copy_rel = f"scripts{row['path']}"  # the collector mirrors the abs tree
+            # DERIVED, not declared (Idea-115): the collector mirrors the abs tree
+            # under scripts/, and scripts.tsv carries no copy_path column to check
+            # this against — see the capture block in
+            # drydocs_lineage/collect/rua_inventory.sh. Both G21 (rua_code_ops) and
+            # G24 (code_repo) read what this produces, and a layout change here or
+            # there fails SILENTLY: the miss lands in the same counters as a file
+            # the collector skipped for being over SCRIPT_COPY_MAX_BYTES.
+            copy_rel = f"scripts{row['path']}"
             self._stage_artifact(
                 RUA_SCRIPT_KIND,
                 row["path"],

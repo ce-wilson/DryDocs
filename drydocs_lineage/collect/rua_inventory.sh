@@ -290,6 +290,16 @@ echo "directories_captured=$scan_count" >> "$META"
 # Same roots / depth / symlink flags / ignore list as the directory walk, but
 # for FILES matching the -n name globs. Metadata + sha256 into scripts.tsv;
 # copies (tree-mirrored under scripts/) are config-gated + size-capped.
+#
+# THE MIRROR LAYOUT IS A CONTRACT, and scripts.tsv does NOT declare it (Idea-115).
+# There is no copy_path column below: the consumer re-derives the copy location as
+# "scripts" + <path> — see drydocs_lineage/extractors/rua_inventory.py (the
+# `copy_rel` line), which G21 rua_code_ops.py and G24 code_repo.py then read.
+# So CHANGING THE MIRROR LAYOUT HERE BREAKS THEM SILENTLY: a copy the extractor
+# cannot find is indistinguishable from one this script deliberately skipped for
+# being over SCRIPT_COPY_MAX_BYTES, and the run still succeeds. If this layout
+# ever moves, move the extractor in the same commit — or land the copy_path
+# column, which is a v3 bundle-schema change (see the COLLECTOR_VERSION note).
 script_count=0
 if [ -n "$NAME_GLOBS" ]; then
     SCRIPTS_TSV="$BUNDLE/scripts.tsv"
