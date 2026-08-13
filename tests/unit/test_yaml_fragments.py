@@ -124,9 +124,7 @@ def test_no_entry_is_active_without_a_supplement() -> None:
     offenders = [
         e["id"]
         for e in _vocab_entries()
-        if e.get("status") == "active"
-        and not e.get("supplement")
-        and e["id"] not in CORE_SEEDED
+        if e.get("status") == "active" and not e.get("supplement") and e["id"] not in CORE_SEEDED
     ]
     assert not offenders, f"active without a supplement: {offenders}"
 

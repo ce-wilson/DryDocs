@@ -37,7 +37,7 @@ def test_schema_and_header():
     data = _data()
     assert data["schema"] == "drydocs.context-types.v1"
     assert data["classification"] == "Internal-Public"
-    assert "context_types" in data and data["context_types"]
+    assert data.get("context_types")
 
 
 def test_entries_are_complete():

@@ -146,7 +146,9 @@ def _extractors_module(default_names):
 
 
 def test_ts_imports_true_when_default_extractors_carry_it():
-    imp = _fake_importer({"depgraph.extractors": _extractors_module(["python-imports", "ts-imports"])})
+    imp = _fake_importer(
+        {"depgraph.extractors": _extractors_module(["python-imports", "ts-imports"])}
+    )
     assert probe_mod._probe_ts_imports(imp) is True
 
 

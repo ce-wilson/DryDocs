@@ -96,9 +96,7 @@ def test_mappings_coverage_spec_stays_retired():
         query_spec("mappings.attribution-coverage.v1")
 
     # No SURVIVING spec may read the retired job-grain edge (K15 acceptance).
-    job_grain = re.compile(
-        r"\(\s*j\s*:\s*ControlMJob\s*\)\s*-\s*\[\s*r?\s*:\s*WAS_ASSOCIATED_WITH"
-    )
+    job_grain = re.compile(r"\(\s*j\s*:\s*ControlMJob\s*\)\s*-\s*\[\s*r?\s*:\s*WAS_ASSOCIATED_WITH")
     offenders = [
         sid
         for sid, spec in QUERY_SPECS.items()

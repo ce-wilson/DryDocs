@@ -133,9 +133,7 @@ def test_the_not_queryable_target_db_set_is_pinned():
     from drydocs_api.query_specs import SPEC_DATABASES
 
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
-    declared = {
-        s["target_db"] for s in committed["sources"] if s.get("home") == "doc-registry"
-    }
+    declared = {s["target_db"] for s in committed["sources"] if s.get("home") == "doc-registry"}
     assert declared - set(SPEC_DATABASES) == {"dddocs"}, (
         "the set of doc-corpus target databases a QuerySpec cannot read has changed; "
         "revisit every surface that renders a 'not queried' label"

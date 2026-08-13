@@ -159,8 +159,11 @@ def test_section_headers_agree_with_the_rows_beneath_them() -> None:
         actual[comp["area"]] = actual.get(comp["area"], 0) + 1
     declared = {m.group(1): int(m.group(2)) for m in _HEADER.finditer(text)}
 
-    wrong = {a: (declared.get(a), actual.get(a, 0)) for a in set(declared) | set(actual)
-             if declared.get(a) != actual.get(a, 0)}
+    wrong = {
+        a: (declared.get(a), actual.get(a, 0))
+        for a in set(declared) | set(actual)
+        if declared.get(a) != actual.get(a, 0)
+    }
     assert not wrong, (
         "section header counts disagree with the rows — {area: (header says, actual)}: "
         f"{wrong}. A missing key means an area has no `# --- <area> (N) ---` block at all, "
@@ -185,8 +188,10 @@ def test_every_row_sits_under_its_own_area_header() -> None:
             continue
         row = _ROW.search(line)
         if row and current and row.group(2) != current:
-            misfiled.append(f"{UI_LEDGER.name}:{lineno} {row.group(1)} is area={row.group(2)} "
-                            f"under the '{current}' block")
+            misfiled.append(
+                f"{UI_LEDGER.name}:{lineno} {row.group(1)} is area={row.group(2)} "
+                f"under the '{current}' block"
+            )
     assert not misfiled, "rows filed under the wrong area header:\n  " + "\n  ".join(misfiled)
 
 

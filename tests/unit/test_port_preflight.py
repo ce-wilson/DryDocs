@@ -141,7 +141,7 @@ def test_coverage_matches_on_prefix_in_both_directions() -> None:
     assert uncited_commits([Commit(long_sha, "fix(api): O52")], LEDGER) == []
 
 
-def test_a_citation_buried_MID_sha_does_not_count_as_coverage() -> None:
+def test_a_citation_buried_mid_sha_does_not_count_as_coverage() -> None:
     """PREFIX, not substring — and the distinction is load-bearing.
 
     Under substring matching an unrelated commit whose sha merely CONTAINS a cited
@@ -232,11 +232,14 @@ def test_a_document_whose_every_citation_resolves_reports_nothing() -> None:
     """
     everything = PRESENT | {"UI-WIP/drydocs-mark.svg"}
     assert cited_paths(IDLE_DOC, ROOTS) == everything, "the doc must actually be scanned"
-    assert unresolved_citations(
-        {"UI-WIP/claude-design-ui-prompt.md": IDLE_DOC},
-        repo_roots=ROOTS,
-        exists=lambda rel: rel in everything,
-    ) == []
+    assert (
+        unresolved_citations(
+            {"UI-WIP/claude-design-ui-prompt.md": IDLE_DOC},
+            repo_roots=ROOTS,
+            exists=lambda rel: rel in everything,
+        )
+        == []
+    )
 
 
 # ---- the two filters, each with the case that separates it from its absence ----
@@ -307,9 +310,10 @@ def test_a_document_outside_every_record_prefix_is_still_checked() -> None:
 def test_the_documents_the_suite_already_resolves_are_not_reported_twice() -> None:
     assert is_suite_guarded("docs/port-prompt.md")
     assert is_suite_guarded("docs/design/drydocs-core-runbook.md")
-    assert unresolved_citations(
-        {"docs/port-prompt.md": IDLE_DOC}, repo_roots=ROOTS, exists=_exists
-    ) == []
+    assert (
+        unresolved_citations({"docs/port-prompt.md": IDLE_DOC}, repo_roots=ROOTS, exists=_exists)
+        == []
+    )
 
 
 def test_a_new_design_doc_that_is_not_a_runbook_is_this_check_s_to_catch() -> None:

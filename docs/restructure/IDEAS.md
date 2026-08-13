@@ -103,7 +103,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
   folder name). Count resolution quality per the `ResolveCoverage` precedent
   (`drydocs/cmdline_staging.py`). Raised working through the G60 result with the user.
 
-- **`Idea-111`** · 2026-08-12 · `[bug]` · **open — gate scope fixed today; the lint sweep is deferred by the user** · prio? **High** —
+- **`Idea-111`** · 2026-08-12 · `[bug]` · **closed — both CI ruff gates exit 0 again; only the process question is left, and it is the user's** · prio? **High** —
+  **SWEPT AND GREEN 2026-08-12 (this desktop).** `ruff check .` and `ruff format --check .`
+  both exit **0** — the first time since 2026-08-05. 35 findings and 31 unformatted files
+  to zero. The user's deferral was only ever about not racing the concurrent remediation
+  session; that session closed (G60/G83/G84 `done`), so the sweep ran the same evening.
+  **Fixed, not ignored (the default):** 10 auto-fixable; a 31-file `ruff format`; the 6
+  **N818** exception renames in `xml_io.py` at the user's explicit call —
+  `UnsupportedEncoding`→`…Error` and its five siblings, **54 references across 5 files**,
+  every name verified standalone first so a word-boundary rename could not clobber a longer
+  one; **RUF007** ×2 → `itertools.pairwise` (clearer and equivalent); **N802** ×1, a test
+  name of this session's own.
+  **Two things RULED as keepers rather than fixed, because ruff's suggestion was wrong —
+  not merely unnecessary.** This is the half worth reading:
+  - **RUF002/RUF003** (14, prose only) now ignored globally with the reason inline.
+    `defect A′` / `defect B′` are established identifiers carried in commit subjects
+    (`3ebb66d`, `d40c9cb`) and throughout `drydocs_remediation`; ruff proposes a BACKTICK,
+    which yields ``defect A` `` — nonsense, and CLAUDE.md is explicit that a style pass
+    never renames identifiers. `⊆`/`∪` are set notation in a comment *about* set semantics
+    ("emitted tokens ⊆ before ∪ introduced"); ruff proposes capital `U`, which reads as a
+    word. **RUF001 stays ENFORCED** and is the one that matters — ambiguous characters in
+    IDENTIFIERS are a hazard, in prose they are typography. Same split
+    `docs/ruff-format-convergence.md` already drew for RUF001/2/3.
+  - **RUF009** ×2 per-file-ignored on `xml_io.py`: the rule catches a shared MUTABLE
+    default, and `Span` is `@dataclass(frozen=True)`, so one shared immutable instance is
+    correct. Ruff does not special-case frozen dataclasses.
+  Suite 2110 passed / 8 skipped; renders verified non-drifting.
+  **STILL OPEN, and the only thing left here: the process question below.** A blocking gate
+  that nobody read for a week is the actual defect; the lint was just its symptom.
+  <!-- original entry, kept for the trail: -->
+
   **CI has been RED on `main` since 2026-08-05 and nobody noticed for a week.** Last green
   run `2026-08-05T06:10` (`test(currency): bring port-prompt under the currency guard`);
   every one of the 100+ runs since has failed, including four pushed today before this was

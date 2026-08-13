@@ -21,7 +21,7 @@ from drydocs_remediation.changes import (
     graph_anchors,
 )
 from drydocs_remediation.corroborate import GraphWriteAttemptError, ReadOnlyGraph
-from drydocs_remediation.xml_io import Locator, LocatorNotFound, load_document, write
+from drydocs_remediation.xml_io import Locator, LocatorNotFoundError, load_document, write
 from tests.unit.fixtures_controlm_xml import F3_RESIDUE
 
 
@@ -137,14 +137,12 @@ def test_compile_changes_rename_is_the_sweep_not_a_field_list(tmp_path) -> None:
     target = tmp_path / "updated.xml"
     report = write(doc, script, target)
     assert report.ok, "sweep passes the post-conditions on every surface"
-    assert b"%%SCRIPT_PATH" not in target.read_bytes().replace(
-        b"%%LAUNCHER_SCRIPT_PATH", b""
-    )
+    assert b"%%SCRIPT_PATH" not in target.read_bytes().replace(b"%%LAUNCHER_SCRIPT_PATH", b"")
 
 
 def test_stale_approval_raises_instead_of_best_effort() -> None:
     doc = load_document(F3_RESIDUE)
-    with pytest.raises(LocatorNotFound):
+    with pytest.raises(LocatorNotFoundError):
         compile_changes(
             doc,
             [

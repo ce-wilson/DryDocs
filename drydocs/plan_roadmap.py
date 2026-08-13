@@ -87,9 +87,7 @@ def load_roadmap(path: str | Path = DEFAULT_ROADMAP_PATH) -> dict[str, Any]:
             raise RoadmapError(f"roadmap entry needs a `module`: {entry!r}")
         stage = entry.get("stage")
         if stage not in STAGES:
-            raise RoadmapError(
-                f"[{name}] stage {stage!r} is not one of {sorted(STAGES)}"
-            )
+            raise RoadmapError(f"[{name}] stage {stage!r} is not one of {sorted(STAGES)}")
         if not str(entry.get("built", "")).strip():
             raise RoadmapError(f"[{name}] needs a `built` assessment")
         if not str(entry.get("remaining", "")).strip():
@@ -160,9 +158,7 @@ def _render_module(entry: dict[str, Any], items: tuple[WorkItem, ...]) -> str:
     open_items = _open_items(items, module)
     total = done + len(open_items)
     pct = round(100 * done / total) if total else 0
-    counts = (
-        f"{done} done &middot; {len(open_items)} open" if total else "no backlog items"
-    )
+    counts = f"{done} done &middot; {len(open_items)} open" if total else "no backlog items"
 
     open_html = ""
     if open_items:
@@ -257,12 +253,8 @@ def render_roadmap(roadmap: dict[str, Any], backlog_doc: dict[str, Any]) -> str:
     check_coverage(roadmap, backlog_doc)
     backlog = backlog_from_dict(backlog_doc)
     sections = "\n".join(_render_module(e, backlog.items) for e in roadmap["modules"])
-    stage_legend = "".join(
-        f"<dt>{_esc(k)}</dt><dd>{_esc(v)}</dd>" for k, v in STAGES.items()
-    )
-    est_legend = "".join(
-        f"<dt>{_esc(k)}</dt><dd>{_esc(v)}</dd>" for k, v in ESTIMATES.items()
-    )
+    stage_legend = "".join(f"<dt>{_esc(k)}</dt><dd>{_esc(v)}</dd>" for k, v in STAGES.items())
+    est_legend = "".join(f"<dt>{_esc(k)}</dt><dd>{_esc(v)}</dd>" for k, v in ESTIMATES.items())
     return (
         '<!doctype html>\n<html><head><meta charset="utf-8">\n'
         "<title>DryDocs — module roadmap</title>\n"

@@ -13,10 +13,10 @@ from pathlib import Path
 import pytest
 
 from drydocs_remediation.xml_io import (
-    AmbiguousLocator,
+    AmbiguousLocatorError,
     Locator,
-    LocatorNotFound,
-    UnsupportedEncoding,
+    LocatorNotFoundError,
+    UnsupportedEncodingError,
     load_document,
     locate,
     render,
@@ -59,7 +59,7 @@ def test_identity_round_trip_file_to_file(name: str, tmp_path: Path) -> None:
 
 def test_utf16_is_refused() -> None:
     """F10: byte-offset lexing is unsound for multi-byte-unit encodings."""
-    with pytest.raises(UnsupportedEncoding, match="utf-16"):
+    with pytest.raises(UnsupportedEncodingError, match="utf-16"):
         load_document(F10_UTF16)
 
 
@@ -101,7 +101,7 @@ def test_locator_resolves_through_three_levels_of_nesting() -> None:
 def test_locator_duplicate_variable_requires_ordinal() -> None:
     doc = load_document(F6_DUPLICATES)
     base = Locator(folder="PRXYZ6F", job="PRXYZ6F001", element="VARIABLE", name="%%DIR")
-    with pytest.raises(AmbiguousLocator, match="§VARS|first-class|give ordinal"):
+    with pytest.raises(AmbiguousLocatorError, match="§VARS|first-class|give ordinal"):
         locate(doc, base)
     first = locate(doc, Locator(**{**base.__dict__, "ordinal": 0}))
     second = locate(doc, Locator(**{**base.__dict__, "ordinal": 1}))
@@ -111,7 +111,7 @@ def test_locator_duplicate_variable_requires_ordinal() -> None:
 
 def test_locator_duplicate_job_requires_ordinal() -> None:
     doc = load_document(F6_DUPLICATES)
-    with pytest.raises(AmbiguousLocator, match="give ordinal"):
+    with pytest.raises(AmbiguousLocatorError, match="give ordinal"):
         locate(doc, Locator(folder="PRXYZ6F", job="PRXYZ6F002"))
     second = locate(doc, Locator(folder="PRXYZ6F", job="PRXYZ6F002", ordinal=1))
     assert second.attr_value("CMDLINE") == "two.sh"
@@ -121,20 +121,22 @@ def test_locator_element_lookup_refuses_a_duplicated_job() -> None:
     """ordinal belongs to the innermost coordinate, so a duplicated job cannot
     be resolved PAST — that would silently pick which job's variable to edit."""
     doc = load_document(F6_DUPLICATES)
-    with pytest.raises(AmbiguousLocator, match="unique job"):
+    with pytest.raises(AmbiguousLocatorError, match="unique job"):
         locate(doc, Locator(folder="PRXYZ6F", job="PRXYZ6F002", element="VARIABLE", name="%%X"))
 
 
 def test_locator_misses_are_loud() -> None:
     doc = load_document(F6_DUPLICATES)
-    with pytest.raises(LocatorNotFound):
+    with pytest.raises(LocatorNotFoundError):
         locate(doc, Locator(folder="NOPE"))
-    with pytest.raises(LocatorNotFound):
+    with pytest.raises(LocatorNotFoundError):
         locate(doc, Locator(folder="PRXYZ6F", job="GHOST"))
-    with pytest.raises(LocatorNotFound):
+    with pytest.raises(LocatorNotFoundError):
         locate(
             doc,
-            Locator(folder="PRXYZ6F", job="PRXYZ6F001", element="VARIABLE", name="%%DIR", ordinal=9),
+            Locator(
+                folder="PRXYZ6F", job="PRXYZ6F001", element="VARIABLE", name="%%DIR", ordinal=9
+            ),
         )
 
 
@@ -172,7 +174,13 @@ def test_projection_carries_the_curated_fields() -> None:
 def test_projection_scope_chain_three_levels() -> None:
     definitions = to_definition_set(load_document(F8_NESTING))
     job = definitions.jobs[0]
-    assert [layer[0] for layer in job.scope_chain] == ["FOLDER", "SUBFOLDER", "SUBFOLDER", "SUBFOLDER", "JOB"]
+    assert [layer[0] for layer in job.scope_chain] == [
+        "FOLDER",
+        "SUBFOLDER",
+        "SUBFOLDER",
+        "SUBFOLDER",
+        "JOB",
+    ]
     assert job.subfolder_path == "A/B/C"
     assert job.scope_chain[3][1] == "A/B/C"
 
@@ -222,9 +230,9 @@ def test_projection_data_center_reaches_subfolders_and_nested_jobs() -> None:
 
 def test_locator_disambiguates_same_named_folders_by_data_center() -> None:
     doc = load_document(F11_MULTI_DC)
-    with pytest.raises(AmbiguousLocator, match="data_center"):
+    with pytest.raises(AmbiguousLocatorError, match="data_center"):
         locate(doc, Locator(folder="PRXYZ1A"))
     dc2_job = locate(doc, Locator(folder="PRXYZ1A", data_center="DC2", job="PRXYZ1A001"))
     assert dc2_job.attr_value("CMDLINE") == "dc2.sh"
-    with pytest.raises(LocatorNotFound, match="DC9"):
+    with pytest.raises(LocatorNotFoundError, match="DC9"):
         locate(doc, Locator(folder="PRXYZ1A", data_center="DC9"))

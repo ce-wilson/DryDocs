@@ -16,7 +16,6 @@ import argparse
 import datetime as _dt
 import subprocess
 import sys
-from pathlib import Path
 
 from drydocs.port_preflight import REPO_ROOT, next_base_tag, run_checks
 

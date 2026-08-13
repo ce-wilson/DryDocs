@@ -205,9 +205,9 @@ def test_readme_documents_the_tracked_untracked_split() -> None:
     rather than the PowerShell. U12 already pins its currency; this pins the
     field the U15 change added."""
     readme = (SNAP_DIR / "README.md").read_text(encoding="utf-8")
-    assert readme.count('"untracked_present"') >= 2, (
-        "the documented meta shape still shows only `dirty` on one or both blocks"
-    )
+    assert (
+        readme.count('"untracked_present"') >= 2
+    ), "the documented meta shape still shows only `dirty` on one or both blocks"
     assert "TRACKED changes only" in readme, (
         "the README does not say what `dirty` now means, so a reader will keep the old "
         "reading of a field whose meaning changed"

@@ -68,9 +68,9 @@ def test_capture_hole_ledger_agrees_with_row_statuses() -> None:
     doc = _doc()
     blocked_by_status = {r["n"] for r in doc["rows"] if r["status"] == "blocked-on-recapture"}
     blocked_by_ledger = {n for h in doc["capture_holes"] for n in h["blocks_rows"]}
-    assert blocked_by_status == blocked_by_ledger, (
-        "a row and the capture-hole ledger disagree about what is blocked"
-    )
+    assert (
+        blocked_by_status == blocked_by_ledger
+    ), "a row and the capture-hole ledger disagree about what is blocked"
     assert blocked_by_status, "the Descriptive Metadata hole blocks row 5; the fixture is stale"
 
 
@@ -93,6 +93,6 @@ def test_committed_surfaces_are_mechanism_only() -> None:
 
 def test_orchestrator_runtime_skips_the_vocabulary_crosswalk() -> None:
     walks = load_crosswalks()
-    assert CROSSWALK not in {cw.path for cw in walks}, (
-        "the vocabulary crosswalk leaked into the orchestrator registry"
-    )
+    assert CROSSWALK not in {
+        cw.path for cw in walks
+    }, "the vocabulary crosswalk leaked into the orchestrator registry"

@@ -29,6 +29,7 @@ from drydocs_core.models.seal import _ROLE_CANONICAL, SealContactRow, SealRole, 
 # role classes, holdable by three different people or by one.
 OPERATE_MANAGER_CLASSES = ("L1 Operate Manager", "L2 Operate Manager", "Operate Manager")
 
+
 # How seal_contacts.cypher:55 builds the key. Duplicated here deliberately —
 # the point of these tests is the SHAPE of the key, and a test that imported
 # the shape from the code under test could not detect a change to it.
@@ -106,4 +107,6 @@ def test_an_unknown_role_name_is_still_refused_at_validation() -> None:
     SME's 2026-08-06 list contains four classes that hit this path today. When
     that question is ruled, this test is the one that should change."""
     with pytest.raises(ValidationError, match="unrecognised SEAL role"):
-        SealContactRow(app_id="70001", role_name="Site Reliability Engineer", employee_sid="K789012")
+        SealContactRow(
+            app_id="70001", role_name="Site Reliability Engineer", employee_sid="K789012"
+        )

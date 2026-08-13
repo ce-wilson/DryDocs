@@ -120,12 +120,35 @@ ignore = [
     # Every hit is `import xml.etree.ElementTree as ET` — the alias the stdlib's
     # own documentation uses. Renaming makes the code less recognisable, not more.
     "N817",
+    # RUF002 (docstrings) and RUF003 (comments) — ambiguous-Unicode in PROSE.
+    # Ruled 2026-08-12 after reading every hit: the suggested replacements are
+    # wrong here, not merely unnecessary. The characters are deliberate technical
+    # notation and the fix would corrupt meaning:
+    #   `defect A′` / `defect B′` — established identifiers for two remediation
+    #     defects, carried in commit subjects (3ebb66d, d40c9cb) and throughout
+    #     drydocs_remediation. Ruff proposes a BACKTICK, giving `defect A``.
+    #     CLAUDE.md is explicit that a style pass never renames identifiers.
+    #   `⊆` / `∪` — set notation in a comment describing set semantics ("emitted
+    #     tokens ⊆ before ∪ introduced"). Ruff proposes capital `U`, which reads
+    #     as a word and is actively misleading.
+    #   `−` (MINUS SIGN) — arithmetic in prose, "(a) − (b)".
+    # RUF001 stays ENFORCED and is the one that matters: ambiguous characters in
+    # IDENTIFIERS are a real hazard, where in prose they are typography. That
+    # split is the same one docs/ruff-format-convergence.md drew for RUF001/2/3.
+    "RUF002",
+    "RUF003",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Typer's API IS a call in the default: `def cmd(x: str = typer.Option(...))`.
 # B008 cannot be satisfied without abandoning the framework's calling convention.
 "drydocs/cli.py" = ["B008"]
+# RUF009 flags `span: Span = Span(0, 0)` on XmlNode. The rule exists to catch a
+# SHARED MUTABLE default, and `Span` is `@dataclass(frozen=True)` — an immutable
+# value object, so one shared instance is correct and a default_factory would
+# only allocate per node for no benefit. Ruff does not special-case frozen
+# dataclasses, so this is a true-positive rule firing on a safe construction.
+"drydocs_remediation/xml_io.py" = ["RUF009"]
 # `pytest.importorskip(...)` must run BEFORE the imports it guards, which is
 # exactly what E402 flags. The guard is the point: these modules skip cleanly
 # when an optional dependency is absent.

@@ -12,7 +12,6 @@ load boundary (admin-accepted parks; 'loaded' is unreachable here).
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -88,9 +87,7 @@ def _intake(sessions, store, token=None, **kw):
     kw.setdefault("context_type", "job-failure")
     kw.setdefault("area", {"seal": "70002"})
     kw.setdefault("note", "")
-    return token, create_intake(
-        kw["context_type"], kw["area"], kw["note"], token, sessions, store
-    )
+    return token, create_intake(kw["context_type"], kw["area"], kw["note"], token, sessions, store)
 
 
 # ── creation stamps + vocabulary ─────────────────────────────────────────────
@@ -285,12 +282,23 @@ def test_no_new_value_stops_but_the_record_survives(sessions, store):
 
 def test_subject_match_alone_flags_without_content_overlap(sessions, store):
     token_a, first = _intake(sessions, store)
-    add_evidence(first["intake_id"], "a.txt", b"Subject: nightly load missed\nbody A\n" * 2,
-                 token_a, sessions, store)
+    add_evidence(
+        first["intake_id"],
+        "a.txt",
+        b"Subject: nightly load missed\nbody A\n" * 2,
+        token_a,
+        sessions,
+        store,
+    )
     second = create_intake("missed-data-load", {}, "", token_a, sessions, store)
-    out = add_evidence(second["intake_id"], "b.txt",
-                       b"Subject: RE: nightly load missed\ncompletely different body\n",
-                       token_a, sessions, store)
+    out = add_evidence(
+        second["intake_id"],
+        "b.txt",
+        b"Subject: RE: nightly load missed\ncompletely different body\n",
+        token_a,
+        sessions,
+        store,
+    )
     assert out["thread_flagged"] is True
 
 
@@ -298,9 +306,14 @@ def test_unrelated_upload_is_not_flagged(sessions, store):
     token_a, first = _intake(sessions, store)
     add_evidence(first["intake_id"], "a.msg", FIRST_MAIL, token_a, sessions, store)
     second = create_intake("data-issue", {}, "", token_a, sessions, store)
-    out = add_evidence(second["intake_id"], "b.txt",
-                       b"Subject: reconciliation break in catalog feed\nrow counts differ\n",
-                       token_a, sessions, store)
+    out = add_evidence(
+        second["intake_id"],
+        "b.txt",
+        b"Subject: reconciliation break in catalog feed\nrow counts differ\n",
+        token_a,
+        sessions,
+        store,
+    )
     assert out["thread_flagged"] is False
 
 
@@ -371,7 +384,9 @@ def test_admin_accepted_parks_waiting_on_gate(sessions, store):
 def test_users_see_own_intakes_only(sessions, store):
     token_a, rec = _intake(sessions, store)
     other_user = _token(sessions, "jdoe4821")  # same persona, new session — still owner
-    assert get_intake(rec["intake_id"], other_user, sessions, store)["intake_id"] == rec["intake_id"]
+    assert (
+        get_intake(rec["intake_id"], other_user, sessions, store)["intake_id"] == rec["intake_id"]
+    )
     steward = _token(sessions, "kchen2190")
     assert len(list_intakes(steward, sessions, store)["intakes"]) == 1  # queue sees all
 

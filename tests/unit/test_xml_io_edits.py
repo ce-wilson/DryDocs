@@ -18,9 +18,9 @@ from drydocs_remediation.xml_io import (
     EditScript,
     Effect,
     Locator,
-    LocatorNotFound,
-    NoTemplateSibling,
-    SelfCheckFailed,
+    LocatorNotFoundError,
+    NoTemplateSiblingError,
+    SelfCheckFailedError,
     XmlIoError,
     load_document,
     locate,
@@ -81,7 +81,9 @@ def test_add_attribute_clones_the_separator_style() -> None:
     script = EditScript(doc)
     script.add_attribute(job, "APPLICATION", "XYZ", change_id="chg-1")
     out = render(doc, script.compile())
-    assert b'<JOB JOBNAME="PRXYZ2B002" TASKTYPE="Command" CMDLINE="a.sh" APPLICATION="XYZ" />' in out
+    assert (
+        b'<JOB JOBNAME="PRXYZ2B002" TASKTYPE="Command" CMDLINE="a.sh" APPLICATION="XYZ" />' in out
+    )
 
 
 def test_remove_attribute_takes_its_separator_with_it() -> None:
@@ -101,7 +103,11 @@ def test_insert_element_clones_sibling_style() -> None:
     )
     script = EditScript(doc)
     script.insert_element(
-        job, "VARIABLE", [("NAME", "%%REGION"), ("VALUE", "us-east")], after=sibling, change_id="chg-1"
+        job,
+        "VARIABLE",
+        [("NAME", "%%REGION"), ("VALUE", "us-east")],
+        after=sibling,
+        change_id="chg-1",
     )
     out = render(doc, script.compile())
     expected_line = (
@@ -113,13 +119,11 @@ def test_insert_element_clones_sibling_style() -> None:
 
 def test_delete_element_leaves_no_blank_line() -> None:
     doc = load_document(F3_RESIDUE)
-    var = locate(
-        doc, Locator(folder="PRXYZ3C", job="PRXYZ3C001", element="VARIABLE", name="%%ENV")
-    )
+    var = locate(doc, Locator(folder="PRXYZ3C", job="PRXYZ3C001", element="VARIABLE", name="%%ENV"))
     script = EditScript(doc)
     script.delete_element(var, change_id="chg-1")
     out = render(doc, script.compile())
-    assert b"%%ENV\" VALUE=\"prod\"" not in out
+    assert b'%%ENV" VALUE="prod"' not in out
     assert b"\n\n" not in out.replace(b"\r\n", b"\n"), "deletion left a blank line"
 
 
@@ -149,9 +153,9 @@ def test_escaping_is_minimal_and_quote_aware() -> None:
     script = EditScript(doc)
     script.set_attribute(job, "CMDLINE", 'run.sh --sql="a < b & c > d"', change_id="chg-1")
     out = render(doc, script.compile())
-    assert b'CMDLINE="run.sh --sql=&quot;a &lt; b &amp; c > d&quot;"' in out, (
-        "must escape & < and the delimiter quote; must NOT escape >"
-    )
+    assert (
+        b'CMDLINE="run.sh --sql=&quot;a &lt; b &amp; c > d&quot;"' in out
+    ), "must escape & < and the delimiter quote; must NOT escape >"
 
 
 def test_single_quoted_attribute_stays_single_quoted() -> None:
@@ -221,7 +225,7 @@ def test_write_aborts_and_leaves_no_file(tmp_path: Path) -> None:
     script.set_attribute(job, "CMDLINE", "new.sh", change_id="chg-1")
     script._intended.clear()
     target = tmp_path / "updated.xml"
-    with pytest.raises(SelfCheckFailed):
+    with pytest.raises(SelfCheckFailedError):
         write(doc, script, target)
     assert not target.exists(), "a failed self-check must write nothing"
     assert not target.with_suffix(".xml.selfcheck-tmp").exists()
@@ -235,7 +239,7 @@ def test_tag_corruption_cannot_pass_the_self_check() -> None:
     before = load_document(src)
 
     # route 1: root rename -> hard error from the aligned-pair check
-    with pytest.raises(SelfCheckFailed, match="tag-rename"):
+    with pytest.raises(SelfCheckFailedError, match="tag-rename"):
         structural_diff(before, load_document(src.replace(b"DEFTABLE>", b"DEFTABLES>")))
 
     # route 2: child rename -> delete+insert that self_check rejects as unexpected
@@ -303,14 +307,14 @@ def test_insert_with_no_template_is_refused() -> None:
 def test_set_on_a_missing_attribute_is_a_loud_miss() -> None:
     doc = load_document(F3_RESIDUE)
     job = locate(doc, Locator(folder="PRXYZ3C", job="PRXYZ3C001"))
-    with pytest.raises(LocatorNotFound, match="add_attribute"):
+    with pytest.raises(LocatorNotFoundError, match="add_attribute"):
         EditScript(doc).set_attribute(job, "GHOST", "x", change_id="chg-1")
 
 
 def test_no_template_sibling_error_type_exists_for_paired_parents() -> None:
     doc = load_document(F2_STYLE)
     job = locate(doc, Locator(folder="PRXYZ2B", job="PRXYZ2B003"))  # paired <JOB></JOB>
-    with pytest.raises(NoTemplateSibling):
+    with pytest.raises(NoTemplateSiblingError):
         EditScript(doc).insert_element(job, "INCOND", [("NAME", "X-OK")], change_id="chg-1")
 
 
@@ -342,9 +346,7 @@ def test_xml_io_imports_are_stdlib_core_and_formats_only() -> None:
     """lxml is the VALIDATOR's dependency, never the emitter's; lineage is a
     forbidden component import. Guarded here so 'simplifying' the splicer into
     a serializer cannot land quietly."""
-    module_path = (
-        Path(__file__).resolve().parents[2] / "drydocs_remediation" / "xml_io.py"
-    )
+    module_path = Path(__file__).resolve().parents[2] / "drydocs_remediation" / "xml_io.py"
     tree = ast.parse(module_path.read_text(encoding="utf-8"))
     roots: set[str] = set()
     for node in ast.walk(tree):

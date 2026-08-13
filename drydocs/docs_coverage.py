@@ -68,7 +68,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import asdict, dataclass, field
 
-from drydocs.docs_verify import count_query, locator_of
+from drydocs.docs_verify import locator_of
 
 #: The database the software registry writes (`software_registry.cypher`). The
 #: doc-registry guard constrains `target_db` to {dddocs, ddcontext}, so no corpus
@@ -242,11 +242,7 @@ class CoverageReport:
         return states == s["products"] and corpora == s["corpora_total"]
 
     def failing(self) -> list[ProductCoverageRow]:
-        return [
-            r
-            for r in self.products
-            if r.coverage in FAILING or r.currency == DRIFTED
-        ]
+        return [r for r in self.products if r.coverage in FAILING or r.currency == DRIFTED]
 
     def exit_code(self) -> int:
         return 1 if self.failing() else 0
@@ -262,7 +258,9 @@ class CoverageReport:
         }
 
 
-def _currency(versions: tuple[str, ...], docs_version: object, current_for: object) -> tuple[str, tuple[str, ...]]:
+def _currency(
+    versions: tuple[str, ...], docs_version: object, current_for: object
+) -> tuple[str, tuple[str, ...]]:
     """The original Q16 (a) computation, unchanged.
 
     `current_for` is only ever set by a human confirming a capture against a
@@ -362,9 +360,7 @@ def coverage(
         report.products.append(row)
 
     # --- corpora no product names ---------------------------------------------
-    edge_corpora_seen = {
-        cid for buckets in edges_by_product.values() for cid in buckets
-    }
+    edge_corpora_seen = {cid for buckets in edges_by_product.values() for cid in buckets}
     for cid, entry in corpora_by_id.items():
         if cid in declared_corpora:
             continue
@@ -457,14 +453,11 @@ def _product_row(
         row.currency = NO_DOCS
         blockers.append(NO_CORPUS)
         row.coverage = NO_CORPUS
-        row.detail = (
-            "no documentation pointer on the product"
-            + (
-                f"; {len(row.unregistered_doc_locators)} documentation locator(s) exist "
-                "on the source-registry system with no corpus registered"
-                if row.unregistered_doc_locators
-                else ""
-            )
+        row.detail = "no documentation pointer on the product" + (
+            f"; {len(row.unregistered_doc_locators)} documentation locator(s) exist "
+            "on the source-registry system with no corpus registered"
+            if row.unregistered_doc_locators
+            else ""
         )
         row.blockers = tuple(blockers)
         return row

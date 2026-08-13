@@ -26,7 +26,7 @@ BOUNDARIES. Stdlib + ``drydocs_core`` + ``.formats`` only — no lxml (that is t
 *validator's* dependency, never the emitter's), no ``drydocs_lineage`` (component
 boundary); the tag/attribute vocabulary is shared through
 ``drydocs_core.orchestration.controlm.xml_vocab``. Byte-mode I/O throughout;
-ASCII-superset encodings only — UTF-16 is refused (``UnsupportedEncoding``)
+ASCII-superset encodings only — UTF-16 is refused (``UnsupportedEncodingError``)
 because byte-offset lexing is unsound there.
 
 The projection ``to_definition_set`` is POSITION-FAITHFUL: a nameless or
@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from itertools import pairwise
 from pathlib import Path
 from xml.parsers import expat
 
@@ -65,19 +66,19 @@ class XmlIoError(RuntimeError):
     """Base for every xml_io failure."""
 
 
-class UnsupportedEncoding(XmlIoError):
+class UnsupportedEncodingError(XmlIoError):
     """The document's encoding cannot be byte-offset-lexed (UTF-16/32) or is unknown."""
 
 
-class MalformedXml(XmlIoError):
+class MalformedXmlError(XmlIoError):
     """expat rejected the document; position carried in the message."""
 
 
-class LocatorNotFound(XmlIoError):
+class LocatorNotFoundError(XmlIoError):
     """A Locator matched nothing."""
 
 
-class NoTemplateSibling(XmlIoError):
+class NoTemplateSiblingError(XmlIoError):
     """An element insert found no same-tag element to clone style from.
 
     Splicing never authors XML shapes; without a template the insert would be
@@ -85,18 +86,18 @@ class NoTemplateSibling(XmlIoError):
     """
 
 
-class SelfCheckFailed(XmlIoError):
+class SelfCheckFailedError(XmlIoError):
     """The emitted document does not diff by exactly the intended changes.
 
     Carries the full :class:`SelfCheckReport`; nothing was written.
     """
 
-    def __init__(self, report: "SelfCheckReport") -> None:
+    def __init__(self, report: SelfCheckReport) -> None:
         self.report = report
         super().__init__(report.summary())
 
 
-class AmbiguousLocator(XmlIoError):
+class AmbiguousLocatorError(XmlIoError):
     """A Locator matched more than one node and carried no ordinal.
 
     Never resolved by "first wins": §VARS makes duplicate (job, variable)
@@ -142,8 +143,8 @@ class XmlNode:
 
     tag: str
     attrs: list[AttrSlot] = field(default_factory=list)
-    children: list["XmlNode"] = field(default_factory=list)
-    parent: "XmlNode | None" = field(default=None, repr=False)
+    children: list[XmlNode] = field(default_factory=list)
+    parent: XmlNode | None = field(default=None, repr=False)
     span: Span = Span(0, 0)  # '<' .. past '/>' or '</tag>'
     start_tag_span: Span = Span(0, 0)  # '<' .. past '>'
     empty: bool = False  # self-closed IN THE SOURCE
@@ -218,10 +219,10 @@ _ENCODINGS: dict[str, tuple[str, str]] = {
 
 
 def _detect_encoding(source: bytes) -> tuple[str, str, bytes]:
-    """(declared name, python codec, bom) — or raise :class:`UnsupportedEncoding`."""
+    """(declared name, python codec, bom) — or raise :class:`UnsupportedEncodingError`."""
     for bom, name in _HOSTILE_BOMS:
         if source.startswith(bom):
-            raise UnsupportedEncoding(
+            raise UnsupportedEncodingError(
                 f"{name} (BOM detected): byte-offset lexing is unsound for "
                 "multi-byte-unit encodings — re-encode the export as UTF-8"
             )
@@ -229,7 +230,7 @@ def _detect_encoding(source: bytes) -> tuple[str, str, bytes]:
     match = _DECL_ENCODING_RE.search(source[:256])
     declared = match.group(1).decode("ascii").lower() if match else "utf-8"
     if declared not in _ENCODINGS:
-        raise UnsupportedEncoding(
+        raise UnsupportedEncodingError(
             f"declared encoding {declared!r} is not a supported ASCII superset "
             f"(supported: {', '.join(sorted(_ENCODINGS))})"
         )
@@ -326,7 +327,11 @@ def _lex_start_tag(source: bytes, start: int, codec: str) -> tuple[list[AttrSlot
         if source[i] == ord("/"):  # '/>' — well-formedness guarantees the '>'
             return slots, i + 2, True
         name_start = i
-        while i < n and source[i] not in (ord("="), ord(">"), ord("/")) and source[i : i + 1] not in _WS:
+        while (
+            i < n
+            and source[i] not in (ord("="), ord(">"), ord("/"))
+            and source[i : i + 1] not in _WS
+        ):
             i += 1
         name_span = Span(name_start, i)
         while i < n and source[i : i + 1] in _WS:
@@ -350,7 +355,7 @@ def _lex_start_tag(source: bytes, start: int, codec: str) -> tuple[list[AttrSlot
                 ref_spans=refs,
             )
         )
-    raise MalformedXml(f"unterminated start tag at byte {start}")  # pragma: no cover
+    raise MalformedXmlError(f"unterminated start tag at byte {start}")  # pragma: no cover
 
 
 # --------------------------------------------------------------------------- #
@@ -412,9 +417,9 @@ def load_document(src: Path | bytes, *, origin: Path | None = None) -> XmlDocume
     try:
         parser.Parse(source, True)
     except expat.ExpatError as exc:
-        raise MalformedXml(str(exc)) from exc
+        raise MalformedXmlError(str(exc)) from exc
     if root is None:  # pragma: no cover - expat errors first
-        raise MalformedXml("no root element")
+        raise MalformedXmlError("no root element")
     return XmlDocument(
         source=source,
         encoding=declared,
@@ -441,7 +446,7 @@ def render(doc: XmlDocument, edits: list[Edit] | None = None) -> bytes:
     if not edits:
         return doc.source
     ordered = sorted(edits, key=lambda e: (e.span.start, e.span.end))
-    for prev, cur in zip(ordered, ordered[1:], strict=False):
+    for prev, cur in pairwise(ordered):
         if cur.span.start < prev.span.end:
             raise XmlIoError(
                 f"overlapping edits: {prev.change_id!r} [{prev.span.start},{prev.span.end}) "
@@ -467,7 +472,7 @@ class Locator:
     """Address one element by Control-M coordinates.
 
     ``ordinal`` disambiguates duplicates; ``None`` means "must be unique" and
-    more than one match raises :class:`AmbiguousLocator`.
+    more than one match raises :class:`AmbiguousLocatorError`.
     """
 
     folder: str
@@ -499,41 +504,53 @@ def locate(doc: XmlDocument, loc: Locator) -> XmlNode:
         and (not loc.data_center or n.attr_value("DATACENTER") == loc.data_center)
     ]
     if not containers:
-        raise LocatorNotFound(
+        raise LocatorNotFoundError(
             f"folder {loc.folder!r}"
             + (f" in data center {loc.data_center!r}" if loc.data_center else "")
             + " not in document"
         )
     if len(containers) > 1:
-        raise AmbiguousLocator(
+        raise AmbiguousLocatorError(
             f"folder {loc.folder!r} appears {len(containers)} times — folder names "
             "are only unique per data center; give data_center"
         )
     node = containers[0]
     for part in filter(None, loc.subfolder_path.split("/")):
         subs = [
-            c for c in node.children if c.tag.upper() in SUBFOLDER_TAGS and _subfolder_name(c) == part
+            c
+            for c in node.children
+            if c.tag.upper() in SUBFOLDER_TAGS and _subfolder_name(c) == part
         ]
         if not subs:
-            raise LocatorNotFound(f"sub-folder {part!r} not under {node.path}")
+            raise LocatorNotFoundError(f"sub-folder {part!r} not under {node.path}")
         if len(subs) > 1:
-            raise AmbiguousLocator(f"sub-folder {part!r} appears {len(subs)} times under {node.path}")
+            raise AmbiguousLocatorError(
+                f"sub-folder {part!r} appears {len(subs)} times under {node.path}"
+            )
         node = subs[0]
     if loc.job:
-        jobs = [c for c in node.children if c.tag.upper() == "JOB" and c.attr_value("JOBNAME") == loc.job]
+        jobs = [
+            c
+            for c in node.children
+            if c.tag.upper() == "JOB" and c.attr_value("JOBNAME") == loc.job
+        ]
         if not jobs:
-            raise LocatorNotFound(f"job {loc.job!r} not under {node.path}")
+            raise LocatorNotFoundError(f"job {loc.job!r} not under {node.path}")
         if len(jobs) > 1:
             # ordinal disambiguates the INNERMOST coordinate; when an element
             # lookup follows, it belongs to the element, so a duplicated job
             # cannot be resolved past.
             if loc.element or loc.ordinal is None:
-                raise AmbiguousLocator(
+                raise AmbiguousLocatorError(
                     f"job {loc.job!r} appears {len(jobs)} times under {node.path}"
-                    + ("; give ordinal" if not loc.element else " — element lookup needs a unique job")
+                    + (
+                        "; give ordinal"
+                        if not loc.element
+                        else " — element lookup needs a unique job"
+                    )
                 )
             if loc.ordinal >= len(jobs):
-                raise LocatorNotFound(
+                raise LocatorNotFoundError(
                     f"job {loc.job!r} ordinal {loc.ordinal} out of range ({len(jobs)} matches)"
                 )
             node = jobs[loc.ordinal]
@@ -548,16 +565,16 @@ def locate(doc: XmlDocument, loc: Locator) -> XmlNode:
         and (not loc.name or c.attr_value("NAME") == loc.name)
     ]
     if not matches:
-        raise LocatorNotFound(f"{loc.element}[NAME={loc.name!r}] not under {node.path}")
+        raise LocatorNotFoundError(f"{loc.element}[NAME={loc.name!r}] not under {node.path}")
     if loc.ordinal is not None:
         if loc.ordinal >= len(matches):
-            raise LocatorNotFound(
+            raise LocatorNotFoundError(
                 f"{loc.element}[NAME={loc.name!r}] ordinal {loc.ordinal} out of range "
                 f"({len(matches)} matches under {node.path})"
             )
         return matches[loc.ordinal]
     if len(matches) > 1:
-        raise AmbiguousLocator(
+        raise AmbiguousLocatorError(
             f"{loc.element}[NAME={loc.name!r}] matches {len(matches)} elements under "
             f"{node.path} — duplicates are a first-class change kind (§VARS); give ordinal"
         )
@@ -691,7 +708,7 @@ class EditScript:
     def set_attribute(self, node: XmlNode, name: str, value: str, *, change_id: str) -> Effect:
         slot = node.attr(name)
         if slot is None:
-            raise LocatorNotFound(
+            raise LocatorNotFoundError(
                 f"{node.path} has no attribute {name!r} — use add_attribute for new ones"
             )
         effect = Effect("attr-set", node.path, name, old=slot.value, new=value)
@@ -709,9 +726,7 @@ class EditScript:
         self._intended.append(effect)
         return effect
 
-    def add_attribute(
-        self, node: XmlNode, name: str, value: str, *, change_id: str
-    ) -> Effect:
+    def add_attribute(self, node: XmlNode, name: str, value: str, *, change_id: str) -> Effect:
         """Insert ``NAME="value"`` after the tag's last attribute, cloning that
         attribute's own leading separator — a wrapped tag wraps the new
         attribute at the same column; a one-line tag gets a single space."""
@@ -727,22 +742,20 @@ class EditScript:
             pos = node.start_tag_span.end - (2 if node.empty else 1)
             while source[pos - 1 : pos] in (b" ", b"\t"):
                 pos -= 1
-        payload = sep + name.encode("ascii") + b'="' + escape_attr_value(value, '"', self._codec) + b'"'
-        effect = Effect("attr-add", node.path, name, old=None, new=value)
-        self._edits.append(
-            Edit(Span(pos, pos), payload, change_id, f"add {name} on {node.path}")
+        payload = (
+            sep + name.encode("ascii") + b'="' + escape_attr_value(value, '"', self._codec) + b'"'
         )
+        effect = Effect("attr-add", node.path, name, old=None, new=value)
+        self._edits.append(Edit(Span(pos, pos), payload, change_id, f"add {name} on {node.path}"))
         self._intended.append(effect)
         return effect
 
     def remove_attribute(self, node: XmlNode, name: str, *, change_id: str) -> Effect:
         slot = node.attr(name)
         if slot is None:
-            raise LocatorNotFound(f"{node.path} has no attribute {name!r}")
+            raise LocatorNotFoundError(f"{node.path} has no attribute {name!r}")
         effect = Effect("attr-remove", node.path, name, old=slot.value, new=None)
-        self._edits.append(
-            Edit(slot.slot_span, b"", change_id, f"remove {name} on {node.path}")
-        )
+        self._edits.append(Edit(slot.slot_span, b"", change_id, f"remove {name} on {node.path}"))
         self._intended.append(effect)
         return effect
 
@@ -758,7 +771,7 @@ class EditScript:
         for node in self._doc.root.iter():
             if node.tag == tag:
                 return node
-        raise NoTemplateSibling(
+        raise NoTemplateSiblingError(
             f"no <{tag}> element anywhere in the document to clone style from — "
             "inserting one would author an element shape (HITL, not mechanical)"
         )
@@ -808,7 +821,9 @@ class EditScript:
         if tag.upper() == "VARIABLE" and name_attr:
             self._introduced.add(_bare(name_attr))
         effect = Effect("element-insert", parent.path, tag, old=None, new=name_attr)
-        self._edits.append(Edit(Span(pos, pos), payload, change_id, f"insert <{tag}> under {parent.path}"))
+        self._edits.append(
+            Edit(Span(pos, pos), payload, change_id, f"insert <{tag}> under {parent.path}")
+        )
         self._intended.append(effect)
         return effect
 
@@ -881,9 +896,7 @@ class EditScript:
                     # Collateral normalization (e.g. &#65; -> A) is byte-level
                     # only — the decoded value is unchanged there, so the
                     # structural diff still sees exactly one attr-set.
-                    text_token = re.compile(
-                        rf"%%(\$?){re.escape(old_b)}(?![A-Za-z0-9_])"
-                    )
+                    text_token = re.compile(rf"%%(\$?){re.escape(old_b)}(?![A-Za-z0-9_])")
                     if not text_token.search(slot.value):
                         continue
                     new_value = text_token.sub(rf"%%\1{new_b}", slot.value)
@@ -910,9 +923,7 @@ class EditScript:
                                 f"rename {old_b}->{new_b} in {slot.name} on {node.path}",
                             )
                         )
-                    new_value = token.sub(
-                        rb"%%\1" + new_b.encode("ascii"), raw
-                    ).decode(self._codec)
+                    new_value = token.sub(rb"%%\1" + new_b.encode("ascii"), raw).decode(self._codec)
                 effect = Effect("attr-set", node.path, slot.name, old=slot.value, new=new_value)
                 self._intended.append(effect)
                 effects.append(effect)
@@ -923,11 +934,9 @@ class EditScript:
     def compile(self) -> list[Edit]:
         """Sorted, overlap-checked edits. Overlaps raise here (render re-checks)."""
         ordered = sorted(self._edits, key=lambda e: (e.span.start, e.span.end))
-        for prev, cur in zip(ordered, ordered[1:], strict=False):
+        for prev, cur in pairwise(ordered):
             if cur.span.start < prev.span.end:
-                raise XmlIoError(
-                    f"overlapping edits: {prev.description!r} and {cur.description!r}"
-                )
+                raise XmlIoError(f"overlapping edits: {prev.description!r} and {cur.description!r}")
         return ordered
 
     @property
@@ -953,7 +962,7 @@ def _diff_attrs(before: XmlNode, after: XmlNode, effects: list[Effect]) -> None:
     common = [n for n in before_names if n in after_names]
     common_after = [n for n in after_names if n in before_names]
     if common != common_after:
-        raise SelfCheckFailed(
+        raise SelfCheckFailedError(
             SelfCheckReport(
                 unexpected=[Effect("attr-reorder", before.path, ",".join(after_names))],
                 missing=[],
@@ -989,8 +998,7 @@ def _diff_children(before: XmlNode, after: XmlNode, effects: list[Effect]) -> No
             op == "replace"
             and (b2 - b1) == (a2 - a1)
             and all(
-                before.children[b1 + k].tag == after.children[a1 + k].tag
-                for k in range(b2 - b1)
+                before.children[b1 + k].tag == after.children[a1 + k].tag for k in range(b2 - b1)
             )
         ):
             # Same count, same tags, same position: these are the SAME elements
@@ -1023,7 +1031,7 @@ def _diff_children(before: XmlNode, after: XmlNode, effects: list[Effect]) -> No
                 )
     reordered = set(deleted) & set(inserted)
     if reordered:
-        raise SelfCheckFailed(
+        raise SelfCheckFailedError(
             SelfCheckReport(
                 unexpected=[
                     Effect("sibling-reorder", before.path, f"{tag}[NAME={name!r}]")
@@ -1036,7 +1044,7 @@ def _diff_children(before: XmlNode, after: XmlNode, effects: list[Effect]) -> No
 
 def _diff_node(before: XmlNode, after: XmlNode, effects: list[Effect]) -> None:
     if before.tag != after.tag:
-        raise SelfCheckFailed(
+        raise SelfCheckFailedError(
             SelfCheckReport(
                 unexpected=[Effect("tag-rename", before.path, f"{before.tag}->{after.tag}")],
                 missing=[],
@@ -1152,9 +1160,7 @@ def _post_condition_violations(
     return violations
 
 
-def self_check(
-    doc: XmlDocument, script: EditScript, emitted: bytes
-) -> SelfCheckReport:
+def self_check(doc: XmlDocument, script: EditScript, emitted: bytes) -> SelfCheckReport:
     """§XML rule 4: the emitted document must diff by exactly the intended list."""
     from collections import Counter
     from difflib import unified_diff
@@ -1209,7 +1215,7 @@ def write(
         if read_back != emitted:  # pragma: no cover - binary I/O is exact
             report.violations.append("file round-trip altered bytes (I/O mode bug)")
         if not report.ok:
-            raise SelfCheckFailed(report)
+            raise SelfCheckFailedError(report)
         tmp.replace(target)
     finally:
         tmp.unlink(missing_ok=True)

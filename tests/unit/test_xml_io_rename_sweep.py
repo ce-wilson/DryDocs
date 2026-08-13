@@ -16,7 +16,7 @@ from drydocs_remediation.transform import canonical_variable_rename, propose_gre
 from drydocs_remediation.xml_io import (
     EditScript,
     Locator,
-    SelfCheckFailed,
+    SelfCheckFailedError,
     load_document,
     locate,
     render,
@@ -61,7 +61,7 @@ def test_field_list_rename_is_rejected_with_every_surviving_site_named(tmp_path)
     assert conservation, "under-rewriting must also fail the conservation law"
 
     target = tmp_path / "updated.xml"
-    with pytest.raises(SelfCheckFailed):
+    with pytest.raises(SelfCheckFailedError):
         write(doc, script, target)
     assert not target.exists()
 
@@ -87,9 +87,9 @@ def test_reference_sweep_rewrites_every_surface_and_passes(tmp_path) -> None:
     report = write(doc, script, target)
     assert report.ok
     out = target.read_bytes()
-    assert b"%%SCRIPT_PATH" not in out.replace(b"%%LAUNCHER_SCRIPT_PATH", b""), (
-        "no dangling %%SCRIPT_PATH anywhere, residue included"
-    )
+    assert b"%%SCRIPT_PATH" not in out.replace(
+        b"%%LAUNCHER_SCRIPT_PATH", b""
+    ), "no dangling %%SCRIPT_PATH anywhere, residue included"
     # conservation: every original token became the new name
     assert out.count(b"%%LAUNCHER_SCRIPT_PATH") == F3_RESIDUE.count(b"%%SCRIPT_PATH")
     # the diff touches only lines that carried the token
@@ -117,9 +117,7 @@ def test_sweep_is_scoped_to_the_subtree() -> None:
     """A rename scoped to one job leaves the same token elsewhere alone —
     scope is the approved change's blast radius, not the whole file."""
     doc = load_document(F3_RESIDUE)
-    nested_job = locate(
-        doc, Locator(folder="PRXYZ3C", subfolder_path="NESTED", job="PRXYZ3C101")
-    )
+    nested_job = locate(doc, Locator(folder="PRXYZ3C", subfolder_path="NESTED", job="PRXYZ3C101"))
     script = EditScript(doc)
     script.replace_reference_tokens(nested_job, *RENAME, change_id="chg-1")
     emitted = render(doc, script.compile())

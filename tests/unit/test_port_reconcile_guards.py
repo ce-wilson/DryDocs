@@ -725,12 +725,12 @@ _PRODUCER_MANIFEST_V2 = {
 
 _COMPANY_OVERLAY = (
     "rows:\n"
-    "  - path: \"docs/site/**\"\n"
+    '  - path: "docs/site/**"\n'
     "    disposition: canonical-company\n"
-    "    note: \"company-only docs site\"\n"
+    '    note: "company-only docs site"\n'
     "default_ok:\n"
-    "  - path: \"PORT-REPORT-*.md\"\n"
-    "    reason: \"company port artifacts — theirs by construction\"\n"
+    '  - path: "PORT-REPORT-*.md"\n'
+    '    reason: "company port artifacts — theirs by construction"\n'
 )
 
 
@@ -757,9 +757,9 @@ def test_overlay_precedence_producer_rows_win(tmp_path: Path) -> None:
     overlay can add coverage but never override a producer disposition."""
     (tmp_path / "PORT-MANIFEST.company.yaml").write_text(
         "rows:\n"
-        "  - path: \"drydocs/loaders/**\"\n"
+        '  - path: "drydocs/loaders/**"\n'
         "    disposition: canonical-company\n"
-        "    note: \"an overlay may not seize this — the producer row must win\"\n",
+        '    note: "an overlay may not seize this — the producer row must win"\n',
         encoding="utf-8",
     )
     view = union_overlays(_PRODUCER_MANIFEST_V1, repo=tmp_path)
@@ -798,4 +798,6 @@ def test_live_overlay_declaration_is_well_formed(manifest: dict) -> None:
     # duplicate-path check across the union (the manifest fixture IS the union)
     paths = [r["path"] for r in manifest["rows"]]
     dupes = sorted({p for p in paths if paths.count(p) > 1})
-    assert not dupes, f"overlay row(s) duplicate a manifest row — first-match-wins hides them: {dupes}"
+    assert (
+        not dupes
+    ), f"overlay row(s) duplicate a manifest row — first-match-wins hides them: {dupes}"

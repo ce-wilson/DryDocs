@@ -133,9 +133,7 @@ def test_write_roadmap_writes_file(tmp_path: Path) -> None:
 
 def test_real_roadmap_covers_the_real_module_registry() -> None:
     roadmap = load_roadmap(DEFAULT_ROADMAP_PATH)
-    backlog_doc = yaml.safe_load(
-        DEFAULT_ROADMAP_BACKLOG_PATH.read_text(encoding="utf-8")
-    )
+    backlog_doc = yaml.safe_load(DEFAULT_ROADMAP_BACKLOG_PATH.read_text(encoding="utf-8"))
     # check_coverage runs inside render_roadmap; rendering IS the assertion.
     render_roadmap(roadmap, backlog_doc)
 
@@ -166,9 +164,7 @@ def test_real_roadmap_cites_only_live_inbox_ideas() -> None:
 def test_committed_roadmap_page_matches_its_sources() -> None:
     """The stale-render check from the CLAUDE.md session ritual, as a test."""
     roadmap = load_roadmap(DEFAULT_ROADMAP_PATH)
-    backlog_doc = yaml.safe_load(
-        DEFAULT_ROADMAP_BACKLOG_PATH.read_text(encoding="utf-8")
-    )
+    backlog_doc = yaml.safe_load(DEFAULT_ROADMAP_BACKLOG_PATH.read_text(encoding="utf-8"))
     expected = render_roadmap(roadmap, backlog_doc)
     committed = DEFAULT_ROADMAP_OUT_PATH.read_text(encoding="utf-8")
     assert committed == expected, (

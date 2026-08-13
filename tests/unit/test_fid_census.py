@@ -87,7 +87,9 @@ def test_demand_set_is_the_union_but_each_source_is_reported() -> None:
 
 
 def test_demanded_but_absent_from_the_directory_is_counted() -> None:
-    census = fid_census(APP, _rows(("svc.a", APP, "application", "active")), run_as_owners=["svc.ghost"])
+    census = fid_census(
+        APP, _rows(("svc.a", APP, "application", "active")), run_as_owners=["svc.ghost"]
+    )
     assert census.demand_not_in_directory == 1
     assert census.demand_in_application == 0
 
@@ -136,7 +138,7 @@ def test_an_account_with_one_owner_violates_the_rule_and_is_counted() -> None:
 
 
 def test_no_owner_column_is_unmeasurable_never_reported_as_compliant() -> None:
-    """"fewer than two owners" and "the export carried no owner column" are
+    """ "fewer than two owners" and "the export carried no owner column" are
     different facts. Folding them would report an UNMEASURED estate as a
     compliant one — the never-silent rule applied to a rule check."""
     census = fid_census(APP, _rows(("svc.a", APP, "application", "active")))
@@ -151,7 +153,9 @@ def test_no_owner_column_is_unmeasurable_never_reported_as_compliant() -> None:
 def test_case_only_mismatch_is_reported_and_never_folded() -> None:
     """The directory and the scheduler are separate systems. Folding case would turn
     an identity question the gate must rule into an invisible match."""
-    census = fid_census(APP, _rows(("SVC.A", APP, "application", "active")), run_as_owners=["svc.a"])
+    census = fid_census(
+        APP, _rows(("SVC.A", APP, "application", "active")), run_as_owners=["svc.a"]
+    )
     assert census.case_only_mismatches == 1
     assert census.demand_not_in_directory == 1
     assert census.demand_in_application == 0, "a case-only near-miss must NOT count as a match"

@@ -8,7 +8,6 @@ discipline `test_software_registry.py` uses for the version drift itself.
 
 from __future__ import annotations
 
-import pytest
 import yaml
 
 from drydocs.docs_coverage import (
@@ -26,7 +25,6 @@ from drydocs.docs_coverage import (
     NOT_PROBED,
     REGISTRY_DB,
     TRAVERSABLE,
-    TRAVERSABLE_UNTIL_MOVE,
     UNGATED,
     UNREGISTERED_CORPUS,
     UNVERIFIED,
@@ -367,16 +365,16 @@ def test_the_live_coverage_census_is_pinned() -> None:
         s["products_no-corpus"],
         s["corpora_total"],
         s["corpora_unclaimed"],
-    # PIN MOVED 2026-08-09 (C25): 13 -> 15 products and 12 -> 14 without a
-    # documentation pointer. Both deltas are the two prerequisite rows the
-    # software-version-context gate needed — `snowflake` and `dpl` — neither of
-    # which has a docs corpus. Corpora counts are unchanged.
-    # WORTH KNOWING, because the number looks like it should have moved: the
-    # same commit added an `evidence:` block to the `abinitio` row, and abinitio
-    # still counts as having NO documentation pointer. That is correct rather
-    # than a miss — `evidence:` points at hand-compiled rows that inform the
-    # product, `documentation:` points at a docs corpus that describes it. The
-    # gate's §C5 ruling turns on exactly that distinction.
+        # PIN MOVED 2026-08-09 (C25): 13 -> 15 products and 12 -> 14 without a
+        # documentation pointer. Both deltas are the two prerequisite rows the
+        # software-version-context gate needed — `snowflake` and `dpl` — neither of
+        # which has a docs corpus. Corpora counts are unchanged.
+        # WORTH KNOWING, because the number looks like it should have moved: the
+        # same commit added an `evidence:` block to the `abinitio` row, and abinitio
+        # still counts as having NO documentation pointer. That is correct rather
+        # than a miss — `evidence:` points at hand-compiled rows that inform the
+        # product, `documentation:` points at a docs corpus that describes it. The
+        # gate's §C5 ruling turns on exactly that distinction.
     ) == (15, 14, 7, 6), (
         f"coverage census changed: {s['products']} products, "
         f"{s['products_no-corpus']} with no documentation pointer, "

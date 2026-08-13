@@ -384,7 +384,10 @@ def test_app_code_round_trip_grid_and_migration_view(tmp_path: Path):
         ("PRA,F1,seal-born,APP-1,,defined,,u1,2026-08-03", "seal-born is code-level"),
         ("PRA,,seal-born,,,defined,,u1,2026-08-03", "seal-born needs app_id"),
         # K18: app_id is required on EVERY row — declare-by-absence retired.
-        ("PLT,,platform,,,defined,why,u1,2026-08-03", "declaration needs the platform's own app_id"),
+        (
+            "PLT,,platform,,,defined,why,u1,2026-08-03",
+            "declaration needs the platform's own app_id",
+        ),
         ("PLT,,platform,APP-1,,defined,,u1,2026-08-03", "declaration needs rationale"),
         ("PLT,F1,platform,,,defined,,u1,2026-08-03", "per-folder row needs app_id"),
         ("PRB,,dual-coded,APP-1,,defined,,u1,2026-08-03", "dual-coded needs end state"),

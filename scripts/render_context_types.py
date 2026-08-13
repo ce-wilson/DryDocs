@@ -41,9 +41,7 @@ def main() -> None:
     view = build_context_types()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(view, indent=2) + "\n", encoding="utf-8")
-    print(
-        f"wrote {OUT} ({len(view['context_types'])} active, {len(view['retired'])} retired)"
-    )
+    print(f"wrote {OUT} ({len(view['context_types'])} active, {len(view['retired'])} retired)")
 
 
 if __name__ == "__main__":

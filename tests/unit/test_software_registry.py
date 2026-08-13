@@ -91,9 +91,7 @@ def test_third_party_vendors_carry_publisher_url() -> None:
                 f"address — the exemption is not a licence for a placeholder."
             )
             continue
-        assert str(url or "").startswith(
-            "http"
-        ), f"vendor '{vendor['id']}' missing publisher_url"
+        assert str(url or "").startswith("http"), f"vendor '{vendor['id']}' missing publisher_url"
 
 
 def test_products_of_url_less_vendors_are_internal() -> None:

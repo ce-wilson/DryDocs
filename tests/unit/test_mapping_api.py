@@ -486,9 +486,7 @@ def test_no_endpoint_writes_a_tracked_file():
     # seam). ONLY the landing write is exempt, and only in intake.py:
     # delete/rename/replace stay banned there too (evidence is never edited).
     offenders = [
-        o
-        for o in offenders
-        if not (o.startswith("intake.py:") and o.endswith(".write_bytes()"))
+        o for o in offenders if not (o.startswith("intake.py:") and o.endswith(".write_bytes()"))
     ]
 
     assert not offenders, (

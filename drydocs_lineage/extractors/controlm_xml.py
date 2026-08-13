@@ -74,14 +74,32 @@ from pathlib import Path
 # this module's call sites and its tests' monkeypatch surface unchanged.
 from drydocs_core.orchestration.controlm.xml_vocab import (
     DESCRIPTION_ATTRS as _DESCRIPTION_ATTRS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     FOLDER_NAME_ATTRS as _FOLDER_NAME_ATTRS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     FOLDER_TAGS as _FOLDER_TAGS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     NOTIFICATION_TAGS as _NOTIFICATION_TAGS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     POSTCMD_ATTRS as _POSTCMD_ATTRS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     SCAN_STOP_TAGS as _SCAN_STOP_TAGS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     SMART_TAGS as _SMART_TAGS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     SUBFOLDER_NAME_ATTRS as _SUBFOLDER_NAME_ATTRS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     SUBFOLDER_TAGS as _SUBFOLDER_TAGS,
+)
+from drydocs_core.orchestration.controlm.xml_vocab import (
     WATCH_ATTRS as _WATCH_ATTRS,
 )
 

@@ -120,9 +120,7 @@ def to_definition_set(extract: StagedExtract, source: str | None = None) -> Defi
             FolderDefinition(
                 name=f"{folder_name}/{path}",
                 data_center=data_center,
-                variables=_variables_at(
-                    extract, data_center, folder_name, SUBFOLDER_SCOPE, path
-                ),
+                variables=_variables_at(extract, data_center, folder_name, SUBFOLDER_SCOPE, path),
                 scope=SUBFOLDER_SCOPE,
             )
         )

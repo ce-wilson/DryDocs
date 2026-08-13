@@ -116,14 +116,20 @@ def compile_changes(
         node = locate(doc, change.locator)
         if change.kind == "set-attribute":
             effects.append(
-                script.set_attribute(node, change.detail, change.value or "", change_id=change.approval_id)
+                script.set_attribute(
+                    node, change.detail, change.value or "", change_id=change.approval_id
+                )
             )
         elif change.kind == "add-attribute":
             effects.append(
-                script.add_attribute(node, change.detail, change.value or "", change_id=change.approval_id)
+                script.add_attribute(
+                    node, change.detail, change.value or "", change_id=change.approval_id
+                )
             )
         elif change.kind == "remove-attribute":
-            effects.append(script.remove_attribute(node, change.detail, change_id=change.approval_id))
+            effects.append(
+                script.remove_attribute(node, change.detail, change_id=change.approval_id)
+            )
         elif change.kind == "insert-element":
             effects.append(
                 script.insert_element(

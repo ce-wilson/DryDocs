@@ -433,9 +433,7 @@ def test_per_folder_row_is_aged_against_its_one_folder_only() -> None:
     # A sibling folder under the same code postdates the row, but the row
     # narrows to f_pin — only f_pin's date can age it.
     folder_codes = {"f_pin": "DPL", "f_other": "DPL"}
-    assert (
-        detect_mapping_age_suspects(authored, folder_codes, {"f_other": "2026-07-01"}) == []
-    )
+    assert detect_mapping_age_suspects(authored, folder_codes, {"f_other": "2026-07-01"}) == []
     suspects = detect_mapping_age_suspects(authored, folder_codes, {"f_pin": "2026-07-01"})
     assert len(suspects) == 1 and suspects[0].folders_covered == 1
 

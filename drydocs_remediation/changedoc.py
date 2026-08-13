@@ -45,8 +45,12 @@ def _excerpt(original: bytes, updated: bytes, newline: bytes, line_numbers: list
     out: list[str] = []
     for lineno in line_numbers:
         idx = lineno - 1
-        before = before_lines[idx].decode("utf-8", "replace").strip() if idx < len(before_lines) else ""
-        after = after_lines[idx].decode("utf-8", "replace").strip() if idx < len(after_lines) else ""
+        before = (
+            before_lines[idx].decode("utf-8", "replace").strip() if idx < len(before_lines) else ""
+        )
+        after = (
+            after_lines[idx].decode("utf-8", "replace").strip() if idx < len(after_lines) else ""
+        )
         out.append(f"```\nline {lineno}\n- {before}\n+ {after}\n```")
     return out
 
@@ -88,16 +92,24 @@ def render_change_doc(
             f"### {change.approval_id} — {change.kind}: {change.detail}",
             "",
             f"- **Target:** folder `{change.locator.folder}`"
-            + (f", sub-folder `{change.locator.subfolder_path}`" if change.locator.subfolder_path else "")
+            + (
+                f", sub-folder `{change.locator.subfolder_path}`"
+                if change.locator.subfolder_path
+                else ""
+            )
             + (f", job `{change.locator.job}`" if change.locator.job else ""),
         ]
         if change.value is not None:
             lines.append(f"- **New value:** `{change.value}`")
         if change.evidence:
             lines.append(f"- **Why / evidence:** {change.evidence}")
-        touched = [e for e in doc.effects if e.kind == "attr-set" and change.kind == "rename-variable"]
+        touched = [
+            e for e in doc.effects if e.kind == "attr-set" and change.kind == "rename-variable"
+        ]
         if change.kind == "rename-variable" and touched:
-            lines.append(f"- **Sites rewritten by the sweep:** {len(touched)} (every one enumerated below)")
+            lines.append(
+                f"- **Sites rewritten by the sweep:** {len(touched)} (every one enumerated below)"
+            )
         lines.append("")
 
     if doc.effects:

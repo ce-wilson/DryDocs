@@ -529,9 +529,9 @@ def test_committed_newest_snapshot_is_accepted_and_clean() -> None:
     # extension should be a conscious decision, not silent drift.
     for ext in EXTENSION_MEDIA_TYPE_IRI:
         assert ext not in adapter.unmapped_extensions, f"{ext} has a seeded term but was not bound"
-    assert sum(1 for r in rows if r.media_type_iri) > bound, (
-        "the non-.py majority should out-bind the language rows"
-    )
+    assert (
+        sum(1 for r in rows if r.media_type_iri) > bound
+    ), "the non-.py majority should out-bind the language rows"
 
 
 def test_committed_newest_snapshot_tree_loads_whole(tmp_path: Path) -> None:
@@ -582,9 +582,9 @@ def test_tree_loader_class_wiring() -> None:
     assert CodeTreeLoader.cypher_path == TREE_CYPHER_FILE
     assert CodeTreeLoader.row_model is CodeDirectoryRow
     assert CodeTreeLoader.sweep_label == "CodeDirectory"
-    assert CodeTreeLoader.source_id == CodeSnapshotLoader.source_id, (
-        "both passes read the same registered source"
-    )
+    assert (
+        CodeTreeLoader.source_id == CodeSnapshotLoader.source_id
+    ), "both passes read the same registered source"
     assert TREE_CYPHER_FILE.exists()
 
 

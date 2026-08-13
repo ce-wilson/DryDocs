@@ -88,15 +88,15 @@ F4_ENTITIES = (
 #: comments before and after the root, a PI, UTF-8 BOM, CRLF, no trailing newline.
 F5_PROLOG = (
     b"\xef\xbb\xbf<?xml version='1.0' encoding='UTF-8'?>\r\n"
-    b"<!DOCTYPE DEFTABLE SYSTEM \"deftable.dtd\" [\r\n"
+    b'<!DOCTYPE DEFTABLE SYSTEM "deftable.dtd" [\r\n'
     b"  <!ELEMENT DEFTABLE ANY>\r\n"
     b"]>\r\n"
     b"<!-- exported 2026-01-01 -->\r\n"
-    b"<?ctm version=\"9.0.21.300\"?>\r\n"
+    b'<?ctm version="9.0.21.300"?>\r\n'
     b"<DEFTABLE>\r\n"
     b"  <!-- folder comment -->\r\n"
-    b"  <SMART_FOLDER DATACENTER=\"DC1\" FOLDER_NAME=\"PRXYZ5E\">\r\n"
-    b"    <JOB JOBNAME=\"PRXYZ5E001\" TASKTYPE=\"Command\" CMDLINE=\"run.sh\"/>\r\n"
+    b'  <SMART_FOLDER DATACENTER="DC1" FOLDER_NAME="PRXYZ5E">\r\n'
+    b'    <JOB JOBNAME="PRXYZ5E001" TASKTYPE="Command" CMDLINE="run.sh"/>\r\n'
     b"  </SMART_FOLDER>\r\n"
     b"</DEFTABLE>\r\n"
     b"<!-- trailing comment -->"
