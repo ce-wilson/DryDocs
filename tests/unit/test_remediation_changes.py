@@ -319,7 +319,6 @@ def test_no_graph_write_guards_still_green_after_this_module() -> None:
     """The SoD proof: this module added graph-adjacent behavior and the two
     structural guards needed ZERO changes. Import them to pin the claim."""
     import tests.unit.test_remediation_no_graph_write as guard  # noqa: F401
-
     from drydocs_remediation import changes
 
     assert not hasattr(changes, "write_transaction")

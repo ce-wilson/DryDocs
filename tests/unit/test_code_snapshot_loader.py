@@ -16,10 +16,10 @@ from pathlib import Path
 import pytest
 
 from drydocs.loaders.code_snapshot import (
+    ASSET_EXTENSIONS_SKIPPED,
     DEFAULT_SNAPSHOT_DIR,
     EXTENSION_LANGUAGE_IRI,
     EXTENSION_MEDIA_TYPE_IRI,
-    ASSET_EXTENSIONS_SKIPPED,
     CodeSnapshotAdapter,
     CodeSnapshotError,
     CodeSnapshotLoader,
