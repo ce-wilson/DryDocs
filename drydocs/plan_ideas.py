@@ -98,5 +98,5 @@ def write_ideas(
     markdown = Path(ideas_path).read_text(encoding="utf-8")
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(render_ideas(markdown), encoding="utf-8")
+    out_path.write_text(render_ideas(markdown), encoding="utf-8", newline="\n")
     return out_path

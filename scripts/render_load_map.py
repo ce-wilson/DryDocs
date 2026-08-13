@@ -536,8 +536,10 @@ def build_load_map_html(data: dict) -> str:
 def main() -> int:
     data = build_load_map()
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    OUT_HTML.write_text(build_load_map_html(data), encoding="utf-8")
+    OUT.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
+    OUT_HTML.write_text(build_load_map_html(data), encoding="utf-8", newline="\n")
     n_ledger = sum(1 for s in data["sources"] if s["ledger"]["state"] == "ledger")
     n_pending = sum(1 for s in data["sources"] if s["ledger"]["state"] == "pending")
     print(

@@ -370,7 +370,9 @@ def build_matrix() -> dict:
 def main() -> int:
     matrix = build_matrix()
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(matrix, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUT.write_text(
+        json.dumps(matrix, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     print(f"wrote {OUT} ({len(matrix['surfaces'])} surfaces)")
     return 0
 

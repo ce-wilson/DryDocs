@@ -175,7 +175,9 @@ def build_gates() -> dict:
 def main() -> int:
     data = build_gates()
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUT.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     open_n = sum(1 for g in data["gates"] if g["status"] in ("open", "deferred", "pending"))
     print(f"wrote {OUT} ({len(data['gates'])} gates, {open_n} open/deferred/pending)")
     return 0

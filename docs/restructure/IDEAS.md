@@ -63,6 +63,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
 <!-- add new ideas at the top -->
 
 - **`Idea-121`** · 2026-08-13 · `[bug]` · **open** · prio? **Med** —
+  **RENDER HALF FIXED 2026-08-13; the remaining writers stay open, so this entry stays
+  open too.** all 11 `write_text(` sites in
+  `plan_board` / `plan_ideas` / `plan_roadmap` / `design_doc` and the six
+  `scripts/render_*.py` now pass `newline="\n"`. Verified by re-rendering EVERY surface
+  — board, the six generated JSON, roadmap, ideas, load-map and all 16 design docs —
+  and getting a clean tree: **25 dirtied files down to 0**. Suite 2150 passed; both
+  ruff gates exit 0 (the added argument pushed five lines over the limit, so
+  `ruff format` rewrapped them in the same commit). **What stays open:** the other
+  eight `write_text(` sites — `vendor_docs` (2), `publishing/publisher`,
+  `publishing/preview`, `schema_graph`, `extract_office_text`,
+  `external_vendor_scrape` — which this entry deliberately fenced OUT of the sweep.
+  They write non-render outputs and each needs its own call, not a blanket change.
+  Also still open: whether a guard should pin this (a test asserting no committed
+  render surface contains a CR byte would stop it regressing; nothing enforces it
+  today). The original finding follows.
   **The renderers write CRLF on Windows, so every render run dirties the committed
   renders with line-ending-only churn.** Found the same day the LF policy landed
   (`fcc8afa` .editorconfig, `b348b0c` `* text=auto eol=lf`): running

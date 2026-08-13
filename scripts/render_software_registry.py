@@ -134,7 +134,9 @@ def copy_assets(view: dict) -> list[str]:
 
 def main() -> None:
     view = build_software_registry_view()
-    OUT.write_text(json.dumps(view, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUT.write_text(
+        json.dumps(view, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     assets = copy_assets(view)
     print(
         f"wrote {OUT} ({len(view['vendors'])} vendors, {len(view['products'])} products, "

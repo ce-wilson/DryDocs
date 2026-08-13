@@ -569,5 +569,5 @@ def write_board(
     html_doc = render_board(backlog)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(html_doc, encoding="utf-8")
+    out_path.write_text(html_doc, encoding="utf-8", newline="\n")
     return out_path

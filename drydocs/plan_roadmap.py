@@ -288,5 +288,5 @@ def write_roadmap(
     backlog_doc = yaml.safe_load(Path(backlog_path).read_text(encoding="utf-8")) or {}
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(render_roadmap(roadmap, backlog_doc), encoding="utf-8")
+    out_path.write_text(render_roadmap(roadmap, backlog_doc), encoding="utf-8", newline="\n")
     return out_path

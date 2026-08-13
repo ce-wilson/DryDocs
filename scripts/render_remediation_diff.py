@@ -120,7 +120,9 @@ def build_remediation_diff() -> dict:
 
 def main() -> None:
     data = build_remediation_diff()
-    OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUT.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     print(
         f"wrote {OUT} ({len(data['effects'])} effect(s), "
         f"{len(data['changed_line_numbers'])} changed line(s), verdict {data['verdict']})"

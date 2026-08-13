@@ -681,5 +681,5 @@ def write_doc(md_path: str | Path, out_dir: str | Path | None = None) -> Path:
     md = md_path.read_text(encoding="utf-8")
     out_dir = Path(out_dir) if out_dir else md_path.parent
     html_path = out_dir / f"{md_path.stem}.html"
-    html_path.write_text(render_doc(md, doc_id=md_path.stem), encoding="utf-8")
+    html_path.write_text(render_doc(md, doc_id=md_path.stem), encoding="utf-8", newline="\n")
     return html_path
