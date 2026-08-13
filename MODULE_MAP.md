@@ -46,7 +46,7 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 | Module (physical) | Role |
 |---|---|
 | `drydocs_core/models/` | typed rows/entities (catalog, controlm, seal, docs, registry) |
-| `drydocs_core/adapters/` | source adapters (base, csv, oracle) — transform, no graph write |
+| `drydocs_core/adapters/` | source adapters (base, csv, oracle) + the `controlm/` API-call framework (G96 — config-resolved call surface the deploy/pull .sh invokes) — transform, no graph write |
 | `drydocs_core/neo4j_client.py` | driver/session lifecycle; caller passes the DB name |
 | `drydocs_core/config.py`, `precedence.py`, `source_registry.py` | declarative config layer (CLAUDE.md §4) |
 | `drydocs_core/repo_paths.py` | `repo_root(fallback)` — resolves the DryDocs checkout the CALLER is standing in, so repo-CONTENT defaults follow the caller instead of the editable install's main tree (Idea-109). pathlib-only, imports nothing. **The rule every module-level path anchor is judged against: repo content routes through this; package-internal resources (`drydocs_core/schema/*.cypher`, `drydocs/loaders/cypher/`, the bundled sample CSVs) keep their `__file__` anchor.** Default-deny guard: `tests/unit/test_repo_paths.py::test_no_module_anchors_repo_content_on_dunder_file` fails any `Path(__file__)` chain in an installed package that climbs to the repo root without it |
