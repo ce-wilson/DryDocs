@@ -1117,6 +1117,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-13",
+      "title": "RECORD: rua bundle data profile, §A opened — one bundle identified, the rest is company-side (G62; gate `rua-bundle-data-profile`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/rua-bundle-data-profile.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3091",
+      "unblocks": [
+        "G62"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1225,19 +1238,6 @@
       "log_ref": null,
       "unblocks": [
         "G63"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "rua-bundle-data-profile (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/rua-bundle-data-profile.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "G62"
       ]
     },
     {

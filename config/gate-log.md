@@ -3087,3 +3087,45 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   property_terms gains the §D entries with the build.
 - **E2 CONFIRMED** — this transcription; gates.json and the enforcement matrix regenerate.
 - **F SIGNED** — safe to transcribe.
+
+## 2026-08-13 — RECORD: rua bundle data profile, §A opened — one bundle identified, the rest is company-side (G62; gate `rua-bundle-data-profile`, still UNSIGNED)
+
+- **Why a RECORD and not a sign-off.** The SME convened the G62 session 2026-08-13
+  (the USER-GATED START; backlog claim `c480d570`) and walked part of §A before the
+  session reached the venue boundary: the remaining identify work and all of §B run
+  COMPANY-SIDE, where the bundles are. The gate is not signed; the G23 terminus
+  holds — no population beyond the walked samples loads.
+- **A1 — PARTIAL: 1 bundle named, by count and date.** The SME produced a partial
+  inventory identifying one bundle: **172 scripts / 1,528 directories, collected
+  2026-07-27T20:40Z**, single host, two scan roots, depth 4, ownership_sweep=no.
+  Real host/user/path values are recorded machine-local on the SME's desktop
+  (`internal-local/`, the company-side session note is the durable home), never
+  here. Outstanding: the rest of the population — at minimum the second walked
+  bundle, plus any bundles collected since.
+- **A1 finding — the named bundle IS G22 bundle #1.** Its script count (172) and
+  collection date (the evening before the 2026-07-28 company dry run) match the
+  walked-shapes baseline of 561 rows across two bundles (172 + 389). The SME's
+  A3 blocker — "I don't know what was captured then to compare against" — is
+  resolved by that record: the comparison basis is the 172 + 389 pair, and the
+  389-script twin's identity lives company-side.
+- **A2 — DEFERRED (SME).** Per-bundle collector provenance waits on the
+  company-side meta.txt sweep. Evidence in hand for bundle 1: `schema=
+  rua-inventory/v1`, collected by the run-as account — a v1 capture.
+- **PROFILE EVIDENCE, ahead of §B (recorded, not ruled): bundle 1 is hash-absent
+  AND body-absent.** Its listing is `scripts.csv` (`path|script|permission|date|size`
+  — no sha256, no owner/group) and the archive carries **no `scripts/` body
+  mirror**. Under the signed G22 rules that means: metadata-only staging (the
+  listing-is-a-fact rule), exclusion from G2 drift corroboration (hash-bearing
+  only), and nothing for the G21 code-ops parse or the G24 repo corroboration to
+  read. If the whole population is v1, the first real load is metadata-only end to
+  end. The v2 collector (`drydocs_lineage/collect/rua_inventory.sh`,
+  `COLLECTOR_VERSION=rua-inventory/v2`) emits `scripts.tsv` with sha256 and copies
+  bodies (≤ 1 MiB cap) — re-collection would make the population hash-bearing.
+- **A3 — DEFERRED (SME), with the comparison resolved.** Whether the two walked
+  bundles are in / out / re-collected is held until the full A1 population is
+  named company-side. The agent's recorded observation (not a ruling): the v1
+  evidence above argues re-collect.
+- **NEXT: company-side.** Complete A1 (name every bundle, by host, company-side),
+  run the A2 meta.txt sweep, then §B — the G20 extractor over the full population
+  in staging, zero graph writes — and bring the §B counters back to the page for
+  the §C rulings. G62 stays `in_progress` under the awaiting-HITL convention.
