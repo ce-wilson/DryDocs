@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-12T18:28:28",
+    "captured_at": "2026-08-12T19:00:00",
     "date": "20260812",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "77f2ff8",
-      "full": "77f2ff826092f18cbdf90178770cefc8fd27c76a",
+      "commit": "f9ef847",
+      "full": "f9ef847cc69a958853e6faf0a911728c66c6e673",
       "branch": "main",
-      "describe": "port-base-20260811-63-g77f2ff8",
-      "subject": "feat(port): seventh preflight check — resolve the paths a newly added doc cites",
+      "describe": "port-base-20260811-66-gf9ef847",
+      "subject": "chore(core): J48 — sweep the Idea-109 repo-root anchors, ruling each one",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -13787,10 +13787,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1414.json",
-      "name": "drydocs-20260812-1414.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json",
+      "name": "drydocs-20260812.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812-1414.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260812.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17930,6 +17930,10 @@
     ],
     [
       "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
       "drydocs/drydocs_core/run_log.py"
     ],
     [
@@ -17975,6 +17979,14 @@
     [
       "drydocs/drydocs/docs_coverage.py",
       "drydocs/drydocs/docs_verify.py"
+    ],
+    [
+      "drydocs/drydocs/gate_pages.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/graph_verify.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/loaders/__init__.py",
@@ -18030,6 +18042,10 @@
     ],
     [
       "drydocs/drydocs/loaders/batch_port_orchestrator.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/batch_port_orchestrator.py",
       "drydocs/drydocs_core/run_log.py"
     ],
     [
@@ -18039,6 +18055,10 @@
     [
       "drydocs/drydocs/loaders/bmc_docs.py",
       "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/bmc_docs.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/loaders/bmc_docs.py",
@@ -18071,6 +18091,10 @@
     [
       "drydocs/drydocs/loaders/code_snapshot.py",
       "drydocs/drydocs_core/ontology/swo_adapter.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/code_snapshot.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/loaders/controlm.py",
@@ -18162,6 +18186,10 @@
     ],
     [
       "drydocs/drydocs/loaders/doc_traceability.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/doc_traceability.py",
       "drydocs/drydocs_core/run_log.py"
     ],
     [
@@ -18171,6 +18199,10 @@
     [
       "drydocs/drydocs/loaders/essential_graphrag.py",
       "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/essential_graphrag.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/loaders/folder_attribution.py",
@@ -18191,6 +18223,10 @@
     [
       "drydocs/drydocs/loaders/folder_attribution.py",
       "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/folder_attribution.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/loaders/manual_loads.py",
@@ -18257,6 +18293,10 @@
       "drydocs/drydocs_core/models/registry.py"
     ],
     [
+      "drydocs/drydocs/loaders/software_registry.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs/loaders/vendor_docs.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -18297,6 +18337,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs/port_preflight.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs/publishing/__init__.py",
       "drydocs/drydocs/publishing/assembler.py"
     ],
@@ -18313,12 +18357,24 @@
       "drydocs/drydocs/publishing/validator.py"
     ],
     [
+      "drydocs/drydocs/review_labels.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/seal_samples.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs/snapshots/__init__.py",
       "drydocs/drydocs/snapshots/writer.py"
     ],
     [
       "drydocs/drydocs/snapshots/writer.py",
       "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/source_mappings.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/staging.py",
@@ -18481,6 +18537,10 @@
       "drydocs/drydocs_core/data_root.py"
     ],
     [
+      "drydocs/drydocs_api/intake.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs_api/mappings.py",
       "drydocs/drydocs_api/handlers.py"
     ],
@@ -18499,6 +18559,10 @@
     [
       "drydocs/drydocs_api/mappings.py",
       "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/drydocs_api/mappings.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_api/query_specs.py",
@@ -18546,6 +18610,10 @@
     ],
     [
       "drydocs/drydocs_core/manual_mappings.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/manual_mappings.py",
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
@@ -18563,6 +18631,10 @@
     [
       "drydocs/drydocs_core/mapping_store.py",
       "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/drydocs_core/mapping_store.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_core/mapping_store.py",
@@ -18689,8 +18761,24 @@
       "drydocs/drydocs_core/orchestration/shell.py"
     ],
     [
+      "drydocs/drydocs_core/orchestration/crosswalk.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/orchestration/shell.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/precedence.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs_core/schema/supplements.py",
       "drydocs/drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs/drydocs_core/source_registry.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_deepdoc/investigate.py",
@@ -18731,6 +18819,14 @@
     [
       "drydocs/drydocs_docmeta/manifest.py",
       "drydocs/drydocs_docmeta/connectors/base.py"
+    ],
+    [
+      "drydocs/drydocs_docmeta/policy.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_docmeta/registry.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_docmeta/registry.py",
@@ -29101,7 +29197,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812-1414.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260812.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -31154,7 +31250,7 @@
       "drydocs"
     ],
     "files": 1684,
-    "edges": 946,
+    "edges": 970,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
