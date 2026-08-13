@@ -1,5 +1,15 @@
 """Lineage extractors — re-homed from depgraph@feat/controlm-lineage (ADR 0002-C §4)."""
 
+from .catalog_crosscheck import (
+    AttributionCensus,
+    DplGuidCrossCheck,
+    PlacementCrossCheck,
+    RegistrationCensus,
+    attribution_census,
+    dpl_guid_crosscheck,
+    placement_crosscheck,
+    registration_census,
+)
 from .code_repo import (
     CodeRepoExtractor,
     CorroborationReport,
@@ -41,6 +51,8 @@ from .snowflake_catalog import (
 )
 
 __all__ = [
+    "attribution_census",
+    "AttributionCensus",
     "CatalogCoverage",
     "CatalogDatasetRecord",
     "CatalogDistributionRecord",
@@ -49,21 +61,29 @@ __all__ = [
     "CodeRepoExtractor",
     "ControlMInventoryExtractor",
     "ControlMXmlDefsExtractor",
-    "CorroborationReport",
-    "RepoManifestCoverage",
     "corroborate",
-    "git_blob_sha1",
+    "CorroborationReport",
+    "cross_check",
+    "dpl_guid_crosscheck",
+    "DplGuidCrossCheck",
     "DplMacExtractor",
     "DplRegistryExtractor",
     "ExtractCoverage",
+    "git_blob_sha1",
     "GlueInventoryCoverage",
     "GlueTableInventoryExtractor",
     "MacCoverage",
+    "parse_clone_folder",
     "parse_database_name",
+    "placement_crosscheck",
+    "PlacementCrossCheck",
+    "registration_census",
+    "RegistrationCensus",
     "RegistryCoverage",
     "RegistryCrossCheck",
     "RegistryExtract",
     "RegistryRecord",
+    "RepoManifestCoverage",
     "RuaCodeOps",
     "RuaCodeOpsCoverage",
     "RuaCodeOpsExtractor",
@@ -75,6 +95,4 @@ __all__ = [
     "XmlFolderRecord",
     "XmlJobRecord",
     "XmlVariableRecord",
-    "cross_check",
-    "parse_clone_folder",
 ]
