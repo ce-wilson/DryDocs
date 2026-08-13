@@ -119,10 +119,14 @@ def test_both_spacings_parse_identically() -> None:
     examples are inconsistent, so tolerance is not a nicety."""
     loose = parse_description("DELIVERY_MECHANISM:  MFTS_AGENT  |   USER:   svc_a  ")
     tight = parse_description("DELIVERY_MECHANISM:MFTS_AGENT|USER:svc_a")
-    assert loose.tokens == tight.tokens == {
-        "DELIVERY_MECHANISM": "MFTS_AGENT",
-        "USER": "svc_a",
-    }
+    assert (
+        loose.tokens
+        == tight.tokens
+        == {
+            "DELIVERY_MECHANISM": "MFTS_AGENT",
+            "USER": "svc_a",
+        }
+    )
 
 
 def test_empty_segments_are_skipped_not_reported() -> None:
@@ -244,7 +248,9 @@ def test_the_sentinel_only_counts_at_position_zero() -> None:
     """startswith, no strip, no substring search (§7.5): a description that
     QUOTES the convention in prose cannot false-positive, and the predicate
     stays the cheapest available to a SQL scan."""
-    quoted = parse_description(f"authored descriptions start with {GRAMMAR_SENTINEL} per the standard")
+    quoted = parse_description(
+        f"authored descriptions start with {GRAMMAR_SENTINEL} per the standard"
+    )
     assert quoted.population is DescriptionPopulation.UNTAGGED
     padded = parse_description(" DD1|USER: svc_a")
     assert padded.population is DescriptionPopulation.UNTAGGED
@@ -297,9 +303,7 @@ def test_empty_and_none_are_safe() -> None:
 def test_sentinel_coverage_is_tagged_over_total() -> None:
     """Adoption, not compliance: tagged ÷ total grows; 'how much metadata is
     wrong' never closes. None (no description at all) counts as untagged."""
-    cov = sentinel_coverage(
-        ["DD1|USER: svc_a", "legacy prose", None, "Generated Control-M Folder"]
-    )
+    cov = sentinel_coverage(["DD1|USER: svc_a", "legacy prose", None, "Generated Control-M Folder"])
     assert (cov.tagged, cov.total) == (1, 4)
     assert cov.ratio == 0.25
     assert sentinel_coverage([]).ratio == 0.0
@@ -362,7 +366,8 @@ def test_a_tagged_c30_command_job_validates_clean() -> None:
 def test_missing_required_tokens_are_named() -> None:
     parsed = parse_description("JOB_ROLE: PUBLISHER")
     missing = {
-        f.key for f in validate(parsed, JobType.PUBLISHER)
+        f.key
+        for f in validate(parsed, JobType.PUBLISHER)
         if f.kind is TokenFindingKind.MISSING_REQUIRED_TOKEN
     }
     assert missing == {"PDN_DL", "PDN_SNOW_QUEUE", "EMAIL_DL_L3", "EMAIL_DL_L2"}
@@ -489,7 +494,5 @@ def test_the_registry_and_the_greenfield_standard_agree() -> None:
     assert publisher == set(required_tokens(JobType.PUBLISHER))
     retired = {key for key, spec in TOKEN_REGISTRY.items() if spec.retired_by}
     assert not retired & (watcher | publisher), "a retired token reappeared in the standard"
-    roles = set(
-        re.findall(r"JOB_ROLE:\s*([A-Z_]+)", _example_block(text, "### 5.2", "### 5.3"))
-    )
+    roles = set(re.findall(r"JOB_ROLE:\s*([A-Z_]+)", _example_block(text, "### 5.2", "### 5.3")))
     assert roles <= set(JOB_ROLES)

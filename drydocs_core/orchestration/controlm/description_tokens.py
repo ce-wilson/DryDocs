@@ -666,10 +666,7 @@ def parse_description(text: str | None) -> ParsedDescription:
                 )
             )
 
-    if (
-        result.population is DescriptionPopulation.UNTAGGED
-        and not result.is_structured
-    ):
+    if result.population is DescriptionPopulation.UNTAGGED and not result.is_structured:
         # Legacy waterfall prose — untagged means unread. Keeping the
         # manufactured pairs would make prose indistinguishable from a
         # legitimate C16 annotation inside a real block.
@@ -706,9 +703,7 @@ def _legacy_required_tokens(job_type: JobType) -> tuple[str, ...]:
 
 #: Tokens whose presence marks a description as authored to C30 even without
 #: the sentinel (the greenfield corpus predating DD1| adoption).
-_C30_MARKER_TOKENS = frozenset(
-    key for key, spec in TOKEN_REGISTRY.items() if spec.introduced_by
-)
+_C30_MARKER_TOKENS = frozenset(key for key, spec in TOKEN_REGISTRY.items() if spec.introduced_by)
 
 
 def validate(parsed: ParsedDescription, job_type: JobType) -> list[TokenFinding]:
@@ -730,18 +725,13 @@ def validate(parsed: ParsedDescription, job_type: JobType) -> list[TokenFinding]
     findings = list(parsed.findings)
     if parsed.population is DescriptionPopulation.GENERATOR_LITERAL:
         return findings
-    if (
-        parsed.population is DescriptionPopulation.UNTAGGED
-        and not parsed.is_structured
-    ):
+    if parsed.population is DescriptionPopulation.UNTAGGED and not parsed.is_structured:
         return findings
 
     current_era = parsed.population is DescriptionPopulation.TAGGED or any(
         key in parsed.tokens for key in _C30_MARKER_TOKENS
     )
-    required = (
-        required_tokens(job_type) if current_era else _legacy_required_tokens(job_type)
-    )
+    required = required_tokens(job_type) if current_era else _legacy_required_tokens(job_type)
 
     mechanism = parsed.tokens.get("DELIVERY_MECHANISM")
     route_keys = {"INBOUND_ROUTE", "OUTBOUND_ROUTE"}
