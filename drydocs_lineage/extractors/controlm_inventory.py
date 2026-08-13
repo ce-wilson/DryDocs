@@ -19,6 +19,20 @@ unchanged. Operand patterns become ``local_file`` DataAssets verbatim ({ODATE}
 tokens and wildcards are curation material, not noise). Non-data-flow ops
 (DELETE/MKDIR/TRANSFORM/OTHER — job mechanics) are skipped AND counted.
 
+PRE/POST-EXECUTION SHELL TEXT (G60). CMD_LINE is not the only carrier of file
+operations: the EMBEDDED_SHELL variables ``PRECMD`` / ``POSTCMD`` (and the
+observed ``POSCMD`` typo — the spelling set is core's ``SHELL_VAR_NAMES``)
+hold the same shell text, and production uses them for exactly the mv/backup
+forms the CMD_LINE pass cannot see (parquet plus .tok moved to a backup
+path). When a variables CSV is present (explicit ``variables_csv=`` or
+discovered beside the jobs CSV), those values run through the SAME G14
+file-op grammar with the SAME endpoints — job → local_file, READS_FROM /
+WRITES_TO, NO new relationship types. Invocations found in pre/post text are
+deliberately NOT emitted: that would be a new candidate class, outside G14's
+signed endpoints. Coverage distinguishes the pre/post source from CMD_LINE so
+the added yield is measurable, and unparseable values are counted, never
+dropped (the house rule).
+
 Division of labor preserved (0002-C §4): the Oracle pull + pydantic row models stay
 in core/load; lineage consumes the CSV projection.
 
@@ -30,6 +44,10 @@ Mapping → ProcessNode:
     controlm-hosts-topology; resolved by the Epic P RUNS_ON pass, not here)
     owner→run_as   job_name→name   parent_table→folder
     application→application   cmd_line→command
+Variables column contract (either header shape; read via ``_var``, so the
+jobs-CSV drift guard's ``row.get`` scan stays scoped to the jobs loop):
+    aliased (controlm_variables.sql): folder_id, job_id, job_name, var_name, var_value
+    raw (CM_DEF_SETVAR export):       TABLE_NAME, JOB_ID, JOB_NAME, NAME, VALUE
 """
 
 from __future__ import annotations
@@ -39,12 +57,34 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from drydocs_core.orchestration.controlm import parse_command, pipeline_guid
+from drydocs_core.orchestration.controlm.variables import SHELL_VAR_NAMES
 from drydocs_core.orchestration.shell import dpl_properties as _dpl_properties
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
 # header tokens that identify a Control-M jobs CSV when searching a directory
 _JOBS_CSV_HINTS = ("job_name", "cmd_line", "node_id")
+
+# header-token sets that identify a Control-M variables CSV — either the
+# controlm_variables.sql aliased shape or the raw CM_DEF_SETVAR export shape
+# (the bundled sample). A candidate matches when EITHER tuple is fully present.
+_VARS_CSV_HINTS = (("var_name", "var_value"), ("table_name", "appl_type", "value"))
+
+# aliased-header field -> raw-export synonym, for the variables CSV only
+_VARS_RAW_SYNONYMS = {
+    "folder_id": "TABLE_NAME",
+    "job_id": "JOB_ID",
+    "job_name": "JOB_NAME",
+    "var_name": "NAME",
+    "var_value": "VALUE",
+}
+
+
+def _var(var_row: dict, field: str) -> str:
+    """Read a variables-CSV field under either header shape."""
+    value = var_row.get(field) or var_row.get(_VARS_RAW_SYNONYMS[field]) or ""
+    return value.strip()
+
 
 #: file-op types that carry data flow (src read, tgt written) — the unix
 #: move/copy/gzip wrapper forms named in the 2026-07-15 gate caveat (G14).
@@ -87,9 +127,16 @@ class ExtractCoverage:
     invocations_added: int = 0  # INVOKES candidates linked
     invocations_unresolved: int = 0  # added but kind UNKNOWN (review page warns)
     invocations_no_target: int = 0  # parsed invocation without a resolvable target
-    file_ops_added: int = 0  # READS_FROM/WRITES_TO candidates linked (G14)
+    file_ops_added: int = 0  # READS_FROM/WRITES_TO candidates linked (G14) — CMD_LINE source
     file_ops_skipped_non_dataflow: int = 0  # op parsed, but not a data-flow op (DELETE/MKDIR/...)
     file_ops_no_operand: int = 0  # data-flow op missing a usable src/tgt
+    # -- pre/post-execution shell text (G60) — counted apart from CMD_LINE so
+    #    the added yield is measurable, never folded into the counters above
+    prepost_rows_read: int = 0  # PRECMD/POSTCMD/POSCMD variable rows seen
+    prepost_jobs_unmatched: int = 0  # shell text whose job is not in this extract
+    prepost_commands_empty: int = 0  # shell variable present, value blank
+    prepost_commands_unparsed: int = 0  # value present but 0 invocations AND 0 file ops
+    prepost_file_ops_added: int = 0  # READS_FROM/WRITES_TO candidates from pre/post text
 
     def as_dict(self) -> dict[str, int]:
         return asdict(self)
@@ -104,7 +151,12 @@ class ExtractCoverage:
             f"empty={self.commands_empty} unparsed={self.commands_unparsed} | "
             f"file-ops: added={self.file_ops_added} "
             f"non_dataflow={self.file_ops_skipped_non_dataflow} "
-            f"no_operand={self.file_ops_no_operand}"
+            f"no_operand={self.file_ops_no_operand} | "
+            f"prepost: rows={self.prepost_rows_read} "
+            f"unmatched={self.prepost_jobs_unmatched} "
+            f"empty={self.prepost_commands_empty} "
+            f"unparsed={self.prepost_commands_unparsed} "
+            f"added={self.prepost_file_ops_added}"
         )
 
 
@@ -144,8 +196,18 @@ class ControlMInventoryExtractor:
 
     name = "controlm-inventory"
 
-    def extract(self, source: str | Path, into: LineageGraph) -> ExtractCoverage:
+    def extract(
+        self,
+        source: str | Path,
+        into: LineageGraph,
+        *,
+        variables_csv: str | Path | None = None,
+    ) -> ExtractCoverage:
         """``source`` is the jobs CSV (preferred) or a directory to search.
+
+        ``variables_csv`` names the variables export carrying the
+        PRECMD/POSTCMD shell text (G60); when omitted and ``source`` is a
+        directory, one is discovered beside the jobs CSV by header hints.
 
         Returns the run's :class:`ExtractCoverage` so callers can report what
         was read, added, and skipped (by reason) — nothing drops silently.
@@ -158,6 +220,11 @@ class ControlMInventoryExtractor:
             for row in csv.DictReader(fh):
                 coverage.rows_read += 1
                 self._row(row, into, coverage)
+        vars_path = self._resolve_variables_csv(
+            Path(variables_csv) if variables_csv is not None else Path(source)
+        )
+        if vars_path is not None:
+            self._prepost_pass(vars_path, into, coverage)
         return coverage
 
     # -- internals --------------------------------------------------------------
@@ -172,6 +239,27 @@ class ControlMInventoryExtractor:
                     continue
                 if all(h in header for h in _JOBS_CSV_HINTS):
                     return cand
+        return None
+
+    def _resolve_variables_csv(self, root: Path) -> Path | None:
+        # header-verified in BOTH shapes — an explicit path that is not a
+        # variables CSV (e.g. the jobs CSV itself) resolves to None rather
+        # than feeding job rows through the shell-variable pass.
+        if root.is_file():
+            candidates = [root]
+        elif root.is_dir():
+            candidates = sorted(root.glob("*.csv"))
+        else:
+            return None
+        for cand in candidates:
+            if cand.suffix.lower() != ".csv":
+                continue
+            try:
+                header = cand.open(encoding="utf-8-sig").readline().lower()
+            except OSError:
+                continue
+            if any(all(h in header for h in hints) for hints in _VARS_CSV_HINTS):
+                return cand
         return None
 
     def _row(self, row: dict, into: LineageGraph, coverage: ExtractCoverage) -> None:
@@ -244,13 +332,65 @@ class ControlMInventoryExtractor:
             if kind == "unknown":
                 coverage.invocations_unresolved += 1
 
-    def _file_op(self, jid: str, fop, into: LineageGraph, coverage: ExtractCoverage) -> None:
-        """One parsed CMD_LINE file op → READS_FROM/WRITES_TO candidates (G14).
+    def _prepost_pass(self, csv_path: Path, into: LineageGraph, coverage: ExtractCoverage) -> None:
+        """PRECMD/POSTCMD shell text → the SAME G14 file-op feed (G60).
 
-        The src endpoint is the JOB itself — a CMD_LINE file op is performed by
-        the job with no Script hop, the gate EDIT's file-ops case (from_node:
-        ControlMJob), so the writer's G13 resolution passes these through
-        unchanged. Every skip is counted by reason (the house rule).
+        Joins each EMBEDDED_SHELL variable row (spellings per core's
+        ``SHELL_VAR_NAMES``, which carries the observed ``POSCMD`` typo) to
+        its job by the (folder_id, job_id) node key, falling back to a UNIQUE
+        job name; an unmatched row is counted, never dropped. Invocations
+        parsed out of pre/post text are deliberately not emitted — file-op
+        candidates only, inside G14's signed endpoints.
+        """
+        by_name: dict[str, str | None] = {}
+        for node in into.processes.values():
+            if node.kind == "controlm_job":
+                by_name[node.name] = None if node.name in by_name else node.node_id
+        with csv_path.open(newline="", encoding="utf-8-sig") as fh:
+            for var_row in csv.DictReader(fh):
+                bare = _var(var_row, "var_name").removeprefix("%%").strip().upper()
+                if bare not in SHELL_VAR_NAMES:
+                    continue
+                coverage.prepost_rows_read += 1
+                folder_id = _var(var_row, "folder_id")
+                job_id = _var(var_row, "job_id")
+                jid = (
+                    process_id("controlm_job", f"{folder_id}.{job_id}")
+                    if folder_id and job_id
+                    else ""
+                )
+                if jid not in into.processes:
+                    jid = by_name.get(_var(var_row, "job_name")) or ""
+                if not jid:
+                    coverage.prepost_jobs_unmatched += 1
+                    continue
+                value = _var(var_row, "var_value")
+                if not value:
+                    coverage.prepost_commands_empty += 1
+                    continue
+                parsed = parse_command(value)
+                for fop in parsed.file_ops:
+                    self._file_op(jid, fop, into, coverage, prepost=True)
+                if not parsed.file_ops and not parsed.invocations:
+                    coverage.prepost_commands_unparsed += 1
+
+    def _file_op(
+        self,
+        jid: str,
+        fop,
+        into: LineageGraph,
+        coverage: ExtractCoverage,
+        *,
+        prepost: bool = False,
+    ) -> None:
+        """One parsed file op → READS_FROM/WRITES_TO candidates (G14).
+
+        The src endpoint is the JOB itself — a CMD_LINE or PRECMD/POSTCMD
+        file op is performed by the job with no Script hop, the gate EDIT's
+        file-ops case (from_node: ControlMJob), so the writer's G13 resolution
+        passes these through unchanged. Same endpoints for both sources; only
+        the COUNTER differs (``prepost``), so the pre/post yield is
+        measurable. Every skip is counted by reason (the house rule).
         """
         if fop.op_type not in _DATAFLOW_FILE_OPS:
             coverage.file_ops_skipped_non_dataflow += 1
@@ -269,4 +409,7 @@ class ControlMInventoryExtractor:
                 )
             )
             into.add_rel(jid, rel_type, aid)
-            coverage.file_ops_added += 1
+            if prepost:
+                coverage.prepost_file_ops_added += 1
+            else:
+                coverage.file_ops_added += 1

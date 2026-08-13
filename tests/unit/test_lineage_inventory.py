@@ -412,3 +412,87 @@ def test_onprem_argument_contract_properties(tmp_path) -> None:
     assert props["token_file_path"] == "/tok/t.tok"
     assert props["manifest_file_path"] == "/m/m.json"
     assert props["queue_name"] == "q1"
+
+
+# -- pre/post-execution shell text (G60 — the PRECMD/POSTCMD feed into G14) --------
+
+
+def test_postcmd_move_joins_the_candidate_stream(tmp_path) -> None:
+    """The G60 case: a job whose POSTCMD moves a file yields READS_FROM /
+    WRITES_TO candidates with the SAME endpoints as a CMD_LINE file op — the
+    job is the Activity, the operands are local_file assets, and no new
+    relationship type appears. The counters keep the two sources apart so the
+    pre/post yield is measurable."""
+    jobs = tmp_path / "jobs.csv"
+    jobs.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        "9,161947,JOB_MERGE,F1,svc.x,h1,/opt/scripts/merge.ksh,Y\n",
+        encoding="utf-8",
+    )
+    variables = tmp_path / "vars.csv"
+    variables.write_text(
+        "folder_id,job_id,job_name,var_name,var_value,appl_type\n"
+        '161947,9,JOB_MERGE,%%POSTCMD,"mv /data/out/items.dat /data/backup/items.dat",OS\n',
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(jobs, g, variables_csv=variables)
+    jid = "proc#controlm_job:161947.9"
+    assert (jid, "READS_FROM", "data#local_file:/data/out/items.dat") in g.rels
+    assert (jid, "WRITES_TO", "data#local_file:/data/backup/items.dat") in g.rels
+    assert cov.prepost_rows_read == 1
+    assert cov.prepost_file_ops_added == 2
+    # the CMD_LINE counter is untouched — the yield is measurable BY SOURCE
+    assert cov.file_ops_added == 0
+    assert cov.prepost_jobs_unmatched == 0 and cov.prepost_commands_unparsed == 0
+
+
+def test_prepost_pass_discovers_the_raw_variables_export(tmp_path) -> None:
+    """Directory mode with the bundled-sample header shape
+    (TABLE_NAME/NAME/VALUE): the POSCMD typo spelling still counts as shell
+    text (core's SHELL_VAR_NAMES), the triple-quoted CSV value is unwrapped by
+    the core parser's outer-quote strip, an unmatched job and an unparseable
+    value are counted rather than dropped, and a non-shell variable row never
+    enters the pass."""
+    (tmp_path / "controlm_jobs__sample.csv").write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        "9,161947,JOB_A,F1,svc.x,h1,/opt/scripts/a.ksh,Y\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "controlm_variables__sample.csv").write_text(
+        "TABLE_NAME,JOB_NAME,JOB_ID,APPL_TYPE,NAME,VALUE\n"
+        # the observed POSCMD typo, sample-shaped triple quoting, a backup mv
+        '161947,JOB_A,9,OS,%%POSCMD,"""cc /apps/pre; mv /data/a.parquet /data/backup/a.parquet;"""\n'
+        "161947,JOB_A,9,OS,%%PRECMD,echo starting\n"  # noop-only -> unparsed, counted
+        "161947,JOB_GONE,99,OS,%%POSTCMD,mv /a /b\n"  # no such job -> unmatched, counted
+        "161947,JOB_A,9,OS,%%TOK_FILE,/data/a.tok\n",  # not shell text -> not in the pass
+        encoding="utf-8",
+    )
+    g = LineageGraph()
+    cov = ControlMInventoryExtractor().extract(tmp_path, g)
+    jid = "proc#controlm_job:161947.9"
+    assert (jid, "READS_FROM", "data#local_file:/data/a.parquet") in g.rels
+    assert (jid, "WRITES_TO", "data#local_file:/data/backup/a.parquet") in g.rels
+    assert cov.prepost_rows_read == 3
+    assert cov.prepost_file_ops_added == 2
+    assert cov.prepost_commands_unparsed == 1
+    assert cov.prepost_jobs_unmatched == 1
+    assert "prepost: rows=3 unmatched=1 empty=0 unparsed=1 added=2" in cov.summary()
+    # no new relationship types — the G14 endpoints are the whole story
+    assert {r[1] for r in g.rels if r[0] == jid} <= {"INVOKES", "READS_FROM", "WRITES_TO"}
+
+
+def test_prepost_pass_never_mistakes_the_jobs_csv_for_variables(tmp_path) -> None:
+    """A jobs-CSV-only run (file OR directory) must not feed job rows through
+    the shell-variable pass: the variables CSV is header-verified in both
+    call shapes."""
+    jobs = tmp_path / "jobs.csv"
+    jobs.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+        "9,161947,JOB_A,F1,svc.x,h1,/opt/scripts/a.ksh,Y\n",
+        encoding="utf-8",
+    )
+    for source in (jobs, tmp_path):
+        cov = ControlMInventoryExtractor().extract(source, LineageGraph())
+        assert cov.prepost_rows_read == 0
+        assert cov.prepost_file_ops_added == 0
