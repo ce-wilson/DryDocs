@@ -151,7 +151,7 @@
       ],
       "gate_ref": "HITL gate (docs/restructure/03-hitl-sme-flow.md)",
       "status": "gate-pending",
-      "pending_entries": 15,
+      "pending_entries": 17,
       "env_refs": [],
       "files": [
         "config/taxonomy-ontology-map/00-header.yaml",

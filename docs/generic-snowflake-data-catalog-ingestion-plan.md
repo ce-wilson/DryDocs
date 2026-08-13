@@ -180,7 +180,9 @@ a. **One node or two:** logical dataset + physical distribution as a single Data
    across platforms is exactly what distributions model — properties flatten that.
 b. **Cross-authority unification:** does an AUTHORITY2 / null-origin dataset ever
    unify with a DPL GUID (name/path corroboration)? Default no; ruling required (the
-   G22 clause-f pattern).
+   G41 never-join-foreign-ids-into-GUID-space rule of §3 — an earlier draft cited
+   "the G22 clause-f pattern", which is GUID-vs-URN and the version axis, a different
+   question; corrected 2026-08-12 at the G44 ontology second pass).
 c. **Attribution edge:** `producedby_app_id` → `:BusinessApplication` — which K-family
    edge (`prov:wasAttributedTo` shape), and does catalog attribution corroborate or
    contradict the STG_APP_FACT SEAL facts (precedence ruling).

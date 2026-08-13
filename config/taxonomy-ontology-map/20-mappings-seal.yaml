@@ -271,3 +271,37 @@
       seal-app-ref-edge-reshape v2 — but ONLY §C1 (the 8-site inventory, which goes stale if
       the reshape re-targets seal_attribution) and §D2 (whose "leave it" is judged against
       today's attribution grain). §A4 carve-out: every other item ruled here is SEALED.
+
+  # ---- G44: catalog producedby_app_id → application attribution (PROPOSED) ----
+  - id: catalog-producedby-app
+    taxonomy:
+      source: "snowflake-data-catalog"
+      element: "A catalog dataset names the application that produces it (producedby_app_id — SEAL-shaped, but a CLAIM by the catalog rather than a fact from SEAL)"
+    ontology:
+      from_node: DataAsset
+      to_node: "OPEN — BusinessApplication or its BatchProcessing Port (gate clause C1)"
+      prov_type_from: Entity
+      prov_type_to: Entity                   # BusinessApplication was reclassed prov:Entity at K4 (2026-07-15)
+      matrix_row: "Entity→Entity, NOT Entity→Agent — which is exactly why prov:wasAttributedTo does not fit; m3_belongs_to_application resolves the identical tension with prov_maps_to: ~"
+      neo4j_label: "~ — deliberately unnamed until C1 rules target AND shape together"
+      role: ~
+      prov_maps_to: ~
+    precedence_authority: ~                  # C2 rules whether this needs a new config/precedence.yaml authority row or extends one
+    vocab_id: ~                              # no vocabulary entry until the gate rules — nothing may be registered from here
+    source_evidence: "drydocs_lineage/extractors/snowflake_catalog.py CatalogDatasetRecord.producedby_app_id; census + per-id dataset counts + SEAL-unknown ids in drydocs_lineage/extractors/catalog_crosscheck.py attribution_census (G43 report 3)"
+    status: proposed
+    gate_spec: config/gate-prompts/snowflake-data-catalog.yaml
+    provenance_note: >
+      Drafted at the G44 ontology second pass (2026-08-12), status: proposed per the
+      map's own lifecycle ("proposed = ontology-mapper drafted it", before sign-off) and
+      the email-dl-contact-point precedent. Registered NOW rather than after the gate
+      because it is INDEPENDENT of clause A: the producing-app fact attaches to the
+      logical dataset whether or not A later splits that into Dataset + Distribution.
+      Deliberately NOT registered: HAS_DISTRIBUTION, which IS A-dependent and would
+      pre-decide the gate's central ruling.
+    open_questions:
+      - "(1) TARGET — :BusinessApplication or its BatchProcessing :Port? The K7 close-out (seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) retired the direct-to-app edge m3_seal_app_ref (now status: deprecated) for m3_belongs_to_application onto :Port, because the app node is already the hub for SEAL record semantics. A new edge onto :BusinessApplication must argue the exception."
+      - "(2) SHAPE — prov:wasAttributedTo is ruled out by the PROV typing above (Entity→Entity). Null-PROV local (the m3_belongs_to_application / SCHEDULED_ON family) is the standing precedent; confirm or replace."
+      - "(3) J32 EXACTLY-ONE-PLACE — RELATIONSHIP_GUIDE J32 says the graph has exactly ONE place attribution is authored, and it names the K8 folder-attribution loader. This would be a SECOND authoring place at a different grain (dataset, not folder). Rule whether it authors, or only corroborates the confirmed mapping with disagreement as a first-class finding (J32's own remedy pattern). NOTE: producedby_app_id may be J32's first POSITIVE case — a field whose job genuinely IS to attribute — which sharpens rather than settles the question."
+      - "(4) PRECEDENCE vs the STG_APP_FACT SEAL facts when the two disagree (gate C2), and whether that needs a new config/precedence.yaml authority row or extends an existing one — seal-pat-source-of-record governs the docmeta-scraped corpus, a different source."
+      - "(5) UNKNOWN IDS — app ids the catalog asserts that SEAL has never heard of: refuse, load-and-flag, or load silently (gate C4). The per-id dataset counts are kept because one dataset and four hundred are different findings."

@@ -227,6 +227,55 @@ def test_a_dotted_namespace_does_not_silently_match_a_bare_glue_database() -> No
     assert report.glue_only == ["db.tbl"]
 
 
+def test_one_physical_table_reached_from_two_datasets_is_surfaced() -> None:
+    """Gate clause A5's evidence. The set arithmetic collapses both distributions to
+    ONE member of ``catalog_paths``, so without this the collision is invisible — and
+    A5 rules what the model does about it under both the one-node and two-node readings.
+
+    Found at the G44 ontology second pass: the gate cited a report field that did not
+    exist yet, which is the dangling-reference class Idea-110/115 are about.
+    """
+    catalog = CatalogExtract(
+        distributions=[
+            CatalogDistributionRecord(
+                dataset_guid="ds-A",
+                distribution_guid="d1",
+                candidate_asset_urn="urn:drydocs:dataasset:snow:db:shared",
+            ),
+            CatalogDistributionRecord(
+                dataset_guid="ds-B",
+                distribution_guid="d2",
+                candidate_asset_urn="urn:drydocs:dataasset:snow:db:shared",
+            ),
+        ]
+    )
+    report = placement_crosscheck(catalog, _graph(("n1", "raw", "db", "shared")))
+    assert report.paths_shared_by_datasets == {"db.shared": ["ds-A", "ds-B"]}
+    assert report.catalog_paths == 1, "the set genuinely collapses them — hence the field"
+    assert report.both == ["db.shared"]
+
+
+def test_two_distributions_of_the_same_dataset_are_not_a_collision() -> None:
+    """Two materializations of one logical dataset on one path is ordinary, not the
+    A5 case — flagging it would bury the real finding in noise."""
+    catalog = CatalogExtract(
+        distributions=[
+            CatalogDistributionRecord(
+                dataset_guid="ds-A",
+                distribution_guid="d1",
+                candidate_asset_urn="urn:drydocs:dataasset:snow:db:t",
+            ),
+            CatalogDistributionRecord(
+                dataset_guid="ds-A",
+                distribution_guid="d2",
+                candidate_asset_urn="urn:drydocs:dataasset:snow:db:t",
+            ),
+        ]
+    )
+    report = placement_crosscheck(catalog, _graph(("n1", "raw", "db", "t")))
+    assert report.paths_shared_by_datasets == {}
+
+
 def test_the_placement_crosscheck_never_mutates_the_graph() -> None:
     catalog = CatalogExtract(distributions=[_dist("d1", "urn:drydocs:dataasset:snow:db:tbl")])
     graph = _graph(("n1", "raw", "db", "tbl"))

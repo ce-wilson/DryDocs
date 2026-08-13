@@ -1691,6 +1691,12 @@
       "label": "HAS_CONTACT_POINT",
       "source": "outlook-dl",
       "exemption": "N8 ruling 2026-08-06 — NO FEED BY DESIGN, deliberately unregistered. The DL is defined only in Outlook/Exchange; no extract exists and none is planned (the gate's store-as-source discussion: HAS_CONTACT_POINT rows are steward-authored in the O24 store, which IS the source). Registering `outlook-dl` would fabricate a machine feed the source_evidence above explicitly says does not exist. The load-map render displays this reason (the SOURCELESS_LOADERS written-reason idiom); if the email-dl gate ever rules for extraction-fed candidate rows, that ruling replaces this exemption with a real registration."
+    },
+    {
+      "id": "catalog-producedby-app",
+      "status": "proposed",
+      "label": "~ — deliberately unnamed until C1 rules target AND shape together",
+      "source": "snowflake-data-catalog"
     }
   ]
 }

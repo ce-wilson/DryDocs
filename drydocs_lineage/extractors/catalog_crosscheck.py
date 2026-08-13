@@ -170,6 +170,13 @@ class PlacementCrossCheck:
     #: Distributions that cannot reach a path at all, held out of the arithmetic.
     distributions_no_urn: int = 0
     distributions_urn_unparsed: list[str] = field(default_factory=list)
+    #: One physical db.table reached from MORE THAN ONE logical dataset, as
+    #: ``{path: [dataset_guid, ...]}``. Added at the G44 ontology second pass: the set
+    #: arithmetic above collapses these to a single member, so the collision was
+    #: invisible — and gate clause A5 rules what the model does about it under BOTH the
+    #: one-node and two-node readings. A report that cannot show the case cannot inform
+    #: the ruling that depends on it.
+    paths_shared_by_datasets: dict[str, list[str]] = field(default_factory=dict)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -181,7 +188,8 @@ class PlacementCrossCheck:
             f"catalog_only={len(self.catalog_only)} "
             f"glue_only={len(self.glue_only)} | "
             f"unjoinable: no_urn={self.distributions_no_urn} "
-            f"unparsed={len(self.distributions_urn_unparsed)}"
+            f"unparsed={len(self.distributions_urn_unparsed)} | "
+            f"shared_paths={len(self.paths_shared_by_datasets)}"
         )
 
 
@@ -190,6 +198,7 @@ def placement_crosscheck(catalog: CatalogExtract, graph: LineageGraph) -> Placem
     catalog_paths: set[str] = set()
     no_urn = 0
     unparsed: list[str] = []
+    by_path: dict[str, set[str]] = {}
     for dist in catalog.distributions:
         urn = (dist.candidate_asset_urn or "").strip()
         if not urn:
@@ -200,6 +209,8 @@ def placement_crosscheck(catalog: CatalogExtract, graph: LineageGraph) -> Placem
             unparsed.append(dist.distribution_guid)
             continue
         catalog_paths.add(path)
+        by_path.setdefault(path, set()).add(dist.dataset_guid)
+    shared = {p: sorted(g for g in guids if g) for p, guids in by_path.items() if len(guids) > 1}
 
     glue = set(glue_placement_paths(graph))
     return PlacementCrossCheck(
@@ -210,6 +221,7 @@ def placement_crosscheck(catalog: CatalogExtract, graph: LineageGraph) -> Placem
         glue_only=sorted(glue - catalog_paths),
         distributions_no_urn=no_urn,
         distributions_urn_unparsed=sorted(unparsed),
+        paths_shared_by_datasets=dict(sorted(shared.items())),
     )
 
 
