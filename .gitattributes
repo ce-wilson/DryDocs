@@ -1,3 +1,9 @@
+# Default: every file git detects as text checks out LF (2026-08-13, with
+# .editorconfig — kills the CRLF-vs-LF churn between VS Code on Windows and
+# the tools that read the working tree). `auto` keeps git's binary detection,
+# so images and other binaries are untouched; explicit rules below still win.
+* text=auto eol=lf
+
 # Shell scripts must use LF — they run on Linux schedulers (Control-M / cron);
 # a CRLF in the shebang breaks execution.
 *.sh text eol=lf
