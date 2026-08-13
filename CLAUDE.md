@@ -59,10 +59,21 @@ things share the word *port* — never conflate them:
 3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)
    **and the design docs** (`poetry run python scripts/render_design_doc.py docs/design/*.md` — `.md` is the
    source of truth, the single `.html` (screen + `@media print`; L13) is a deterministic render; Epic L) — `snapshot.ps1` does
-   both — then commit + `git push`, then **run `knowledge/depgraph-snapshots/snapshot.ps1`** (writes
+   both — then commit + `git push`, then **check CI on what you just pushed** —
+   `gh run list --branch main --limit 5` — and only then **run
+   `knowledge/depgraph-snapshots/snapshot.ps1`** (writes
    `<project>-<date>.json` with a git-commit `meta` header for drift comparison — see
    [`knowledge/depgraph-snapshots/README.md`](knowledge/depgraph-snapshots/README.md); view with
    `viewer.html`). Anything unfinished or newly noticed → `IDEAS.md`.
+   *CI check — why it is a step and not a habit (Idea-111):* CI **blocks** on `ruff check`
+   and `ruff format --check` (J10 stage 5), and it ran **RED from 2026-08-05 to 08-12 —
+   100+ consecutive failing runs** — while sessions kept pushing past it. It stayed
+   invisible because the unit suite passed the whole time, so nothing *local* ever looked
+   wrong; only the last two CI steps were failing. `snapshot.ps1` now performs this check
+   itself, immediately before it writes, and it matches on **HEAD's sha** — so "green"
+   means green at *what you pushed*, never green at somebody else's older commit. It is
+   **warn-only** and never blocks the snapshot: recording repo structure and passing a lint
+   gate are unrelated jobs, and the failure being fixed here is nobody *looking*.
    *Stale-render check (renders are deterministic):* re-render, then `git diff --quiet docs/plan/board.html`
    (and the `docs/design/*.html`, `web/src/generated/gates.json`, `web/src/generated/enforcement-matrix.json`,
    `web/src/generated/load-map.json`, and `docs/plan/load-map.html` — a default-paths `render_board.py` run

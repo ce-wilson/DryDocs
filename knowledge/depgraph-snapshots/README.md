@@ -14,6 +14,14 @@ project to a Neo4j-style dependency model + machine-first JSON).
 .\snapshot.ps1 -CodeOnly  # -> drydocs-code-YYYYMMDD.json (legacy comparison shape: the 7 package roots, .py only)
 ```
 
+**It reports CI before it writes (Idea-111).** Immediately before the snapshot, the script runs
+`gh run list --branch main` and prints the conclusion of the run **for HEAD's own sha** — so
+"GREEN" means green at what you just pushed, never green at somebody else's older commit. It is
+**warn-only** and never blocks the snapshot; if `gh` is missing or unauthenticated it says so and
+carries on. The reason it is a script step rather than a habit: CI blocks on `ruff check` and
+`ruff format --check` (J10 stage 5) and ran red for a week (2026-08-05 → 08-12, 100+ consecutive
+failing runs) while the unit suite stayed green, so nothing local ever looked wrong.
+
 [`snapshot.ps1`](snapshot.ps1) runs depgraph and writes `<project>-<date>.json` with a **`meta`
 header** so each snapshot is self-identifying:
 

@@ -111,6 +111,64 @@ try {
   Write-Warning "design-doc refresh skipped: $($_.Exception.Message)"
 }
 
+# --- CI gate check (Idea-111) — runs BEFORE the snapshot ---------------------
+# The verdict is a pure function of (runs, head) so every branch is exercisable
+# without a network — the reporting half is the part that rots, and a check that
+# only ever prints GREEN on the machine that wrote it is how this got missed.
+function Get-CiVerdict {
+  param($Runs, [string]$Head)
+  $short = $Head.Substring(0, 7)
+  if (@($Runs).Count -eq 0) {
+    return @{ Color = "DarkGray"; Text = "ci: no runs readable (gh not authenticated?) - check skipped" }
+  }
+  $mine = @($Runs | Where-Object { $_.headSha -eq $Head })
+  if ($mine.Count -eq 0) {
+    return @{ Color = "Yellow"; Text = ("ci: no run yet for HEAD {0} - newest on main is {1} ({2})" -f `
+      $short, @($Runs)[0].conclusion, @($Runs)[0].displayTitle) }
+  }
+  if ($mine[0].status -ne "completed") {
+    return @{ Color = "Yellow"; Text = ("ci: run for HEAD {0} is {1} - re-check before you close the session" -f `
+      $short, $mine[0].status) }
+  }
+  if ($mine[0].conclusion -eq "success") {
+    return @{ Color = "Green"; Text = ("ci: GREEN at HEAD {0}" -f $short) }
+  }
+  return @{ Color = "Red"; Text = ("ci: {0} AT HEAD {1} - main is RED. Run 'gh run view --log-failed' before you stop." -f `
+    $mine[0].conclusion.ToUpper(), $short) }
+}
+
+# WARN-ONLY by design: this reports, it never blocks. A snapshot records repo
+# STRUCTURE; refusing to record it because a lint gate is red would couple two
+# unrelated jobs, and the failure mode this exists to fix is nobody LOOKING, not
+# somebody snapshotting.
+# Why it exists: CI is BLOCKING on `ruff check` + `ruff format --check` (J10
+# stage 5) and was RED from 2026-08-05 to 08-12 — 100+ consecutive failing runs —
+# while sessions kept pushing past it. It stayed invisible because the unit suite
+# passed the whole time, so nothing LOCAL ever looked wrong. The ritual now asks.
+# It matches on HEAD's sha, so "green" always means green AT WHAT YOU PUSHED,
+# never green at somebody else's older commit.
+try {
+  $ghCmd = $null
+  try { $ghCmd = Get-Command gh -ErrorAction Stop } catch { }
+  if ($null -eq $ghCmd) {
+    Write-Host "ci: gh not installed - check skipped" -ForegroundColor DarkGray
+  } else {
+    Push-Location $repo
+    $head = (& git rev-parse HEAD).Trim()
+    $raw = & gh run list --branch main --limit 10 --json headSha,conclusion,status,displayTitle
+    Pop-Location
+    $runs = @()
+    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
+      $runs = @($raw | ConvertFrom-Json)
+    }
+    $verdict = Get-CiVerdict -Runs $runs -Head $head
+    Write-Host $verdict.Text -ForegroundColor $verdict.Color
+  }
+} catch {
+  Pop-Location -ErrorAction SilentlyContinue
+  Write-Warning "ci check skipped: $($_.Exception.Message)"
+}
+
 $dep  = (Resolve-Path "$here\..\..\..\depgraph").Path
 
 # --- the configured instrument (config/dev-environment.yaml is the record) ----
