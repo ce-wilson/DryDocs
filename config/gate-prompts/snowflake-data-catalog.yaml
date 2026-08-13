@@ -1,0 +1,156 @@
+# SME gate-prompt spec — the data-catalog ontology rulings (backlog G44; the
+# ACTIVATION GATE for the G42 catalog seam). GATE-BOUND: this page PROPOSES;
+# rendering it builds, flips, and stamps nothing. DRAFTED 2026-08-12 for a future
+# SME session. Mechanism-only: <CATALOG> and AUTHORITY2 are the plan's
+# placeholders and every spelling below is synthetic — real system, database,
+# view and application names stay company-side (PUBLISH-BOUNDARY.md).
+#
+# NOTHING LOADS BEFORE SIGN-OFF, and that is deliberate rather than incidental:
+# the loader item stays UNGROOMED until this page rules, because clause A decides
+# whether the loader writes one node or two, and a loader built against the wrong
+# answer is not a fix-forward — it is a re-shape of everything it wrote.
+#
+# WHAT THIS GATE HAS THAT ITS PREDECESSORS DID NOT: an evidence pack. G43 measured
+# the four cross-checks (DPL-GUID overlap, distribution-URN vs G41 Glue placement,
+# producing-app census, registration/instrumentation census) BEFORE the modeling
+# session rather than after, so every clause below can be answered against counted
+# lists instead of intuition. Where a clause needs a number, it names the report.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: snowflake-data-catalog
+title: "SME Gate — data catalog: one node or two (dcat dataset/distribution), cross-authority unification, the producing-app attribution family and its precedence against SEAL, contact-point fold-in, and what is deferred to layer 4"
+step: "The activation gate for the G42 catalog seam: the extractor stages datasets + distributions with origin, registration source, candidate URNs and producing-app ids, and the G43 cross-checks measure how they line up against the G25 DPL registry, G41 Glue placements and SEAL — all candidate-side today, none graph-resident"
+summary: >
+  The catalog is the first source that describes the SAME asset at two levels —
+  a logical dataset and its physical materializations — and that is the ruling
+  this session exists for. Clause A decides one node or two, and every other
+  clause inherits it. The rest close the questions the plan deliberately left
+  open: (B) whether a second-authority or origin-less dataset may ever unify
+  with a DPL GUID, which the plan defaults to NO pending this ruling; (C) which
+  attribution edge the producing-app id earns and how it ranks against the
+  STG_APP_FACT SEAL facts when the two disagree; (D) that the contact email
+  folds into the already-drafted email-dl-contact-point gate rather than opening
+  a parallel concept; (E) that lifecycle and event views are layer-4 territory
+  and stage as properties only; and (F) that the publisher company name is a
+  property now, with the org-taxonomy join a later question. Nothing below is
+  applied until ticked and transcribed to config/gate-log.md; anything declined
+  stays candidate-only, and any vocabulary this page implies enters as
+  status: proposed via ontology-mapper — never active at this gate.
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/ · config/taxonomy-ontology-map/) — the loader is a FOLLOW-UP build that stays ungroomed until this page rules"
+  Source: "G42 snowflake-catalog extractor (CatalogDatasetRecord / CatalogDistributionRecord + CatalogCoverage) · G43 cross-check reports (drydocs_lineage/extractors/catalog_crosscheck.py) · G25 dpl-registry GUIDs · G41 Glue placements · SEAL BusinessApplication ids"
+  Precedent: "G41 placement-as-properties (the one-node reading) · DCAT dcat:distribution (the two-node reading) · G22 clause-f default-NO on cross-source unification · J32 registration is not attribution · ADR 0001 registry-GUID-as-business-key · D1 urn:drydocs:dataasset URN grammar"
+  Registry ref: "source-registry: the snowflake-data-catalog row arrives confirmed:false with THIS gate as the activation condition; clause rulings flip confirmed, never the build"
+  Classification: "Internal-Public page (mechanism + placeholders). The LOADED data is Internal: catalog exports carry real database, schema and table names plus producing-app ids — clause G rules the per-property handling"
+  Vocabulary: "every edge this page implies (clause A's HAS_DISTRIBUTION, clause C's attribution family) enters as status: proposed through docs/RELATIONSHIP_GUIDE.md + the relationship-vocabulary registry; NOTHING lands active at this gate"
+  Source of record: "backlog G44 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md · docs/generic-snowflake-data-catalog-ingestion-plan.md §5"
+
+mapping:
+  - n: 1
+    element: "Logical dataset (DATASET_IDENTIFIER + business name, publisher, description)"
+    target: "DataAsset with placement properties  [one-node reading]  OR  :Dataset  [two-node reading]"
+    edge: "ruling required  [clause A]"
+  - n: 2
+    element: "Physical materialization (DISTRIBUTION_IDENTIFIER + platform, namespace, asset, storage URI)"
+    target: "placement properties on the dataset node  OR  :Distribution -HAS_DISTRIBUTION- (dcat:distribution)"
+    edge: "ruling required  [clause A]"
+  - n: 3
+    element: "AUTHORITY2 / origin-less dataset that name- or path-corroborates a DPL GUID"
+    target: "the DPL-registered dataset node (unification)"
+    edge: "DEFAULT NO — ruling required  [clause B]"
+  - n: 4
+    element: "producedby_app_id on a catalog dataset"
+    target: ":BusinessApplication (prov:wasAttributedTo shape, K-family)"
+    edge: "proposed candidate + precedence ruling  [clause C]"
+  - n: 5
+    element: "Contact email on a catalog dataset"
+    target: "the email-dl-contact-point gate's concept — NOT a parallel one"
+    edge: "fold-in confirmation  [clause D]"
+  - n: 6
+    element: "registered / updated / deleted / certified event views, CONSUMABLE_INDICATOR"
+    target: "properties only; temporal modeling is layer 4"
+    edge: "deferral confirmation  [clause E]"
+  - n: 7
+    element: "PUBLISHER_COMPANY_NAME"
+    target: "property now; LOB→Product→Team join later"
+    edge: "confirmation  [clause F]"
+
+provenance:
+  - label: "What G42 stages today (every mechanism claim on this page)"
+    source_object: "drydocs_lineage/extractors/snowflake_catalog.py — CatalogDatasetRecord, CatalogDistributionRecord, CatalogCoverage"
+    key: "DATASET_IDENTIFIER (dataset) · DISTRIBUTION_IDENTIFIER (distribution); latest-per-GUID dedup already applied"
+    loader: "~ (deliberately none — this gate is why)"
+    properties:
+      - name: origin
+        origin: derived
+        from: "registration source vs the ruled three-way split (§3)"
+        note: "dpl | authority2 | catalog — clause B rules only the first two; the census in G43 report (4) gives the live distribution across them"
+      - name: registration_source_ref
+        origin: source
+        from: "REGISTRATIONSOURCESYSTEMDATAASSETIDENTIFIER"
+        note: "on DPL rows this IS the DPL GUID and is the join key G43 report (1) uses — the catalog's own guid is a CATALOG id and joining on it returns a clean-looking zero overlap"
+      - name: candidate_asset_urn
+        origin: derived
+        from: "platform + namespace + asset, lowercased"
+        note: "a FACT column only, never an identity ruling — clause A decides whether it becomes one. G43 report (2) measures how many resolve against G41 placements, and counts the underived separately"
+      - name: producedby_app_id
+        origin: source
+        from: "the catalog's producing-application field"
+        note: "SEAL-shaped, but a claim rather than a fact about SEAL — G43 report (3) is a census, deliberately edge-free, because Epic K owns what it means"
+      - name: shape
+        origin: derived
+        from: "which physical block is populated"
+        note: "table | file | s3 | '' — unresolved AND ambiguous are both counted, never silently picked; clause A2 asks whether an ambiguous shape may load at all"
+  - label: "What the G43 cross-checks measure (the evidence pack this session answers against)"
+    source_object: "drydocs_lineage/extractors/catalog_crosscheck.py — four READ-ONLY reports, no graph writes"
+    key: "DPL GUID · canonical lowercase db.table · app id · registration source"
+    loader: "~ (reports only, by design)"
+    properties:
+      - name: unjoinable_is_its_own_bucket
+        origin: derived
+        from: "the house rule all four reports share"
+        note: "a row that cannot participate in the join is held OUT of the set arithmetic — a DPL dataset with no ref, a distribution with no URN, an unparseable URN. Reading a cross-check WITHOUT this distinction overstates disagreement, which would push clause B toward a NO it has not earned"
+      - name: path_key_is_deliberately_dumb
+        origin: derived
+        from: "canonical_path()"
+        note: "it does NOT reconcile a db.schema namespace against a Glue database carrying only db; the difference surfaces as two one-sided rows. If clause A picks the two-node reading, that mismatch becomes an identity question rather than a reporting artifact"
+
+sections:
+  - title: "A. One node or two — the dataset/distribution ruling (plan §5a). EVERY OTHER CLAUSE INHERITS THIS."
+    confirmations:
+      - "A1. THE CHOICE, stated so neither side is the silent default. ONE NODE: a DataAsset carrying placement properties, the G41 precedent already live for Glue (glue_database_<zone> / glue_table_<zone>). TWO NODES: :Dataset + :Distribution joined by HAS_DISTRIBUTION (dcat:distribution), the DCAT reading. The trade-off the plan names: one dataset with N placements across platforms is exactly what distributions model, and properties flatten that — a per-zone property set can hold three placements, not an open set. Rule ONE, and record which."
+      - "A2. If ONE NODE: what happens to a distribution whose shape is unresolved or ambiguous? It has no placement to write. Does it load as a property-less occurrence, or is it refused and counted (the G42 coverage already counts both cases separately)?"
+      - "A3. If TWO NODES: what keys :Distribution — DISTRIBUTION_IDENTIFIER (the source's own key) or the derived candidate_asset_urn? The URN is currently a FACT column and clause A is what would promote it; note G43 report (2) counts distributions with no URN at all, and those cannot be URN-keyed."
+      - "A4. Either way: does HAS_DISTRIBUTION enter the vocabulary as status: proposed at this gate, or only once a loader is groomed? The standing rule is proposed-first via ontology-mapper; this clause confirms it rather than assuming it."
+  - title: "B. Cross-authority unification — may an AUTHORITY2 or origin-less dataset ever become a DPL-registered one? (plan §5b)"
+    confirmations:
+      - "B1. THE DEFAULT IS NO, and this clause exists to either confirm that or replace it. The G22 clause-f pattern: corroboration on name or path is EVIDENCE, not identity, and merging on it silently makes two records one with no way back."
+      - "B2. If NO (the default): the corroboration is still worth keeping as a counted, listed finding rather than discarded — confirm that G43 report (1)'s catalog_only / registry_only lists are the right home, and that nothing in the loader may act on them."
+      - "B3. If YES: name the corroboration that suffices (exact name? canonical path? both?), and rule what happens when two AUTHORITY2 records corroborate the SAME DPL GUID — that is a merge conflict the report can already surface but the model cannot currently express."
+      - "B4. Either way: the unjoinable bucket is NOT evidence for this clause. A DPL-origin dataset with no registration_source_ref cannot corroborate anything, and reading it as a miss would inflate the apparent gap the ruling is weighed against."
+  - title: "C. The producing-app attribution family, and its precedence against SEAL (plan §5c)"
+    confirmations:
+      - "C1. WHICH EDGE. producedby_app_id → :BusinessApplication is a prov:wasAttributedTo-shaped claim. Confirm the K-family member it maps to, and that it enters as status: proposed — Epic K owns the attribution vocabulary and this gate may propose into it, never around it."
+      - "C2. PRECEDENCE when the catalog and the SEAL STG_APP_FACT facts disagree about the producing application. config/precedence.yaml is the venue. State the ranking explicitly; 'they should agree' is not a ruling, and G43 report (3) exists because they will not."
+      - "C3. J32 APPLIES AND IS EASY TO LOSE HERE: registration is not attribution. The catalog registering a dataset under an application is a registration fact; whether that constitutes attribution is exactly what C1 rules. No transitive read (dataset → app → owner) is permitted before it."
+      - "C4. UNKNOWN IDS. G43 report (3) lists app ids the catalog asserts that SEAL has never heard of, WITH per-id dataset counts. Rule what the loader does with them: refuse, load-and-flag, or load silently. The counts matter — an unknown id on one dataset and the same id on four hundred are different findings and the report keeps them apart."
+  - title: "D. Contact email folds into the email-dl-contact-point gate — no parallel concept (plan §5d)"
+    confirmations:
+      - "D1. CONFIRM THE FOLD-IN. The catalog is a fixable, ingestible source in that gate's own terms; its contact email is the SAME concept, not a catalog-specific one. Opening a second contact concept here is the failure this clause prevents."
+      - "D2. Confirm that this gate therefore rules NOTHING about contact modeling — shape, identity and de-duplication all belong to email-dl-contact-point, and a ruling made here would be a second authority on one concept."
+      - "D3. Record the dependency direction: if email-dl-contact-point is unsigned when this gate signs, the catalog's contact field stages as a property and waits. It does not get a provisional model."
+  - title: "E. Lifecycle and event views — explicitly deferred to layer 4 (plan §5e)"
+    confirmations:
+      - "E1. CONFIRM THE DEFERRAL. registered / updated / deleted / certified are temporal facts — PROV activity or SOSA-style observation territory, which is layer 4 (the context graph) and not this layer's business."
+      - "E2. CONSUMABLE_INDICATOR and certification state stage as PROPERTIES ONLY, verbatim. Confirm that no lifecycle-derived edge, status label, or filter-on-load is introduced by this gate."
+      - "E3. Confirm what deferral MEANS operationally: the event views are not extracted at all yet, so this is a scope boundary rather than a staged-but-unused decision. If they are later extracted, they re-enter through a new gate."
+  - title: "F. Publisher company name — property now, taxonomy join later (plan §5f)"
+    confirmations:
+      - "F1. CONFIRM: PUBLISHER_COMPANY_NAME lands as a plain property, not a join into the LOB→Product→Team org taxonomy. The default is deliberate — the join needs a matching rule nobody has written, and a wrong join is harder to unpick than a late one."
+      - "F2. Confirm the residue is recorded rather than forgotten: the org-taxonomy join is a later question with its own gate, and this clause is the reason it exists."
+  - title: "G. Scope, classification, and the terminus — the standing clauses"
+    confirmations:
+      - "G1. THE TERMINUS HOLDS. Nothing catalog-shaped writes the graph before this page is signed and transcribed to config/gate-log.md. The loader item stays ungroomed until clause A rules, because A decides what the loader would write."
+      - "G2. VOCABULARY. Every edge this page implies enters status: proposed via docs/RELATIONSHIP_GUIDE.md + the relationship-vocabulary registry. Any taxonomy-ontology-map entries land status: proposed only. Nothing flips active at this gate."
+      - "G3. CLASSIFICATION ON LOAD. Catalog exports carry real database, schema and table names and real producing-app ids — Internal. Rule the per-property handling, and confirm real exports stay in the landing zone (DRYDOCS_DATA_ROOT/catalog/) with the repo carrying synthetic fixtures only."
+      - "G4. ANYTHING DECLINED STAYS CANDIDATE-ONLY. A declined clause is not a deferral to the loader's discretion; it means the fact stages and nothing reads it."

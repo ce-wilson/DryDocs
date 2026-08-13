@@ -428,6 +428,7 @@
         "config/gate-prompts/doc-traceability-feedback.yaml",
         "config/gate-prompts/seal-attribution-match-policy.yaml",
         "config/gate-prompts/self-documentation-code-graph.yaml",
+        "config/gate-prompts/snowflake-data-catalog.yaml",
         "config/gate-prompts/source-registry-v2.yaml"
       ],
       "log_ref": "config/gate-log.md:1105",
@@ -435,6 +436,7 @@
         "K2",
         "K17",
         "N1",
+        "N5",
         "N7",
         "N8",
         "N9",
@@ -449,6 +451,9 @@
         "J13",
         "S3",
         "G33",
+        "G42",
+        "G44",
+        "J17",
         "J25",
         "U10",
         "U11"
@@ -1249,6 +1254,22 @@
         "K21",
         "G35",
         "K22"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "snowflake-data-catalog (rulings/citations logged — gate sign-off not recorded)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/snowflake-data-catalog.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "N5",
+        "G42",
+        "G44",
+        "J17"
       ]
     },
     {

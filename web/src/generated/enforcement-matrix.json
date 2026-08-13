@@ -333,7 +333,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 88,
+      "pending_entries": 94,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -365,6 +365,7 @@
         "config/gate-prompts/seal-attribution-match-policy.yaml",
         "config/gate-prompts/seal-tom-attribution-reshape.yaml",
         "config/gate-prompts/self-documentation-code-graph.yaml",
+        "config/gate-prompts/snowflake-data-catalog.yaml",
         "config/gate-prompts/software-usage-patterns.yaml",
         "config/gate-prompts/software-version-context.yaml",
         "config/gate-prompts/sosa-jobrun-observation.yaml",
