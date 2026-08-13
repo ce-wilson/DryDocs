@@ -2124,7 +2124,10 @@ def docs_coverage(
             with _client(COVERAGE_REGISTRY_DB) as probe:
                 probe.run("RETURN 1 AS ok")
 
-            def run(database: str, cypher: str, params: dict) -> list[dict]:  # noqa: F811
+            # `run` is a None sentinel above, conditionally replaced by this function
+            # and passed to build_docs_coverage as the graph seam. It reads like a
+            # redefinition and is not one — F811 does not fire, so no directive here.
+            def run(database: str, cypher: str, params: dict) -> list[dict]:
                 with _client(database) as cli:
                     return cli.run(cypher, params)
 
