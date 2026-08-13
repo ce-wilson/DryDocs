@@ -62,6 +62,23 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-116`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
+  **Web UI: a swimlane data-flow layout for the lineage module — lanes Control-M |
+  Data Layer | File Server / Database.** Captured from SME chat while testing the
+  wireframe feedback loop (recorded as `FB-2026-08-13-01` in
+  `UI-WIP/wireframes/wireframes.json`); the idea traces to the user's original Full
+  Circle Docs document-portal concept, §7 Business Flow Diagrams (transcribed
+  machine-local at `internal-local/fullcircle-docs-scan-20260813.md`). The wireframe
+  half is DONE at capture time: `UI-WIP/wireframes/out/dataflow.svg` (keys
+  WF-DFL-01..17; the renderer gained `lane` + `arrow` primitives, spec v2). What
+  remains is the React build: a swimlane layout for `/lineage` (proposed
+  `lineage/SwimlaneView.tsx`) rendering job → pipeline → asset per data series —
+  FW job "detected by" join, launcher→pipeline token join (G15 contract),
+  condition edges per the BMC baseline — with READS/WRITES rendered dashed while
+  `m3_reads_from`/`m3_writes_to` stay `status: planned` (no gate is skipped by
+  drawing them). Wireframe-first is the point: SME feedback cites WF-DFL keys
+  before any component exists.
+
 - **`Idea-115`** · 2026-08-12 · `[chore]` · **open** · prio? **Med** —
   **The rua bundle's script-copy path is a CONVENTION the extractor re-derives, not a
   column the collector declares — so if the two ever disagree, the pipeline reports an

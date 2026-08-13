@@ -46,8 +46,26 @@ def wrap(text: str, width: int) -> list[str]:
 
 
 def el_svg(e: dict) -> list[str]:
-    x, y, w, h = e["x"], e["y"], e["w"], e["h"]
     kind = e.get("type", "box")
+    if kind == "arrow":
+        # flow edge: x,y -> x2,y2; key tag + single-line label sit at the midpoint
+        x, y, x2, y2 = e["x"], e["y"], e["x2"], e["y2"]
+        mx, my = (x + x2) // 2, (y + y2) // 2
+        return [
+            f'<line x1="{x}" y1="{y}" x2="{x2}" y2="{y2}" stroke="{MUT}" stroke-width="1.6" marker-end="url(#wfarrow)"/>',
+            f'<rect x="{mx + 8}" y="{my - 24}" width="{9 * len(e["key"]) + 10}" height="18" rx="4" fill="{KEYBG}"/>',
+            f'<text x="{mx + 13}" y="{my - 11}" font-family="monospace" font-size="12" fill="#ffffff">{esc(e["key"])}</text>',
+            f'<text x="{mx + 8}" y="{my + 8}" font-family="sans-serif" font-size="12" fill="{MUT}">{esc(e["label"])}</text>',
+        ]
+    x, y, w, h = e["x"], e["y"], e["w"], e["h"]
+    if kind == "lane":
+        # swimlane container: tinted, dashed, bold title; nodes listed after it draw on top
+        return [
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="#eef1f6" stroke="{EDGE}" stroke-width="1.4" stroke-dasharray="10 6"/>',
+            f'<rect x="{x}" y="{y - 16}" width="{9 * len(e["key"]) + 10}" height="18" rx="4" fill="{KEYBG}"/>',
+            f'<text x="{x + 5}" y="{y - 3}" font-family="monospace" font-size="12" fill="#ffffff">{esc(e["key"])}</text>',
+            f'<text x="{x + 12}" y="{y + 24}" font-family="sans-serif" font-size="14" font-weight="bold" fill="{INK}">{esc(e["label"])}</text>',
+        ]
     dash = ' stroke-dasharray="6 4"' if kind in ("text", "chip", "meter") else ""
     rx = 18 if kind in ("chip", "meter") else 6
     out = [
@@ -93,6 +111,10 @@ def render_view(v: dict, meta: dict) -> str:
         f'<text x="20" y="{ch - 14}" font-family="monospace" font-size="11" fill="{MUT}">'
         f'{esc(v["route"])} · wireframe spec v{esc(meta["spec_version"])} · {esc(meta["date"])} · {esc(meta["source_branch"])} · keys resolve in KEYS.md</text>',
     ]
+    if any(e.get("type") == "arrow" for e in v["elements"]):
+        parts.append(
+            f'<defs><marker id="wfarrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="{MUT}"/></marker></defs>'
+        )
     for e in v["elements"]:
         parts.extend(el_svg(e))
     parts.append("</svg>")

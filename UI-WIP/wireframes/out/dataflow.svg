@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 860" font-family="sans-serif">
+<rect width="1280" height="860" fill="#f4f6f9"/>
+<text x="20" y="826" font-size="15" font-weight="bold" fill="#111a26">Data Flow — swimlanes (PROPOSED, FB-2026-08-13-01; a lineage-module layout)</text>
+<text x="20" y="846" font-family="monospace" font-size="11" fill="#48566c">/lineage · layout: swimlane (proposed) · wireframe spec v2 · 2026-08-13 · main (O35-O41 shipped; landing/loads/underhood = as-built, dataflow = PROPOSED) · keys resolve in KEYS.md</text>
+<defs><marker id="wfarrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#48566c"/></marker></defs>
+<rect x="20" y="40" width="1240" height="48" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="20" y="24" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="25" y="37" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-01</text>
+<text x="32" y="60" font-family="sans-serif" font-size="13" fill="#111a26">Module toolbar: breadcrumb Home / Lineage · data-series picker · Layout: DAG | Swimlane · Fit · Export</text>
+<rect x="40" y="120" width="1200" height="190" rx="6" fill="#eef1f6" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="10 6"/>
+<rect x="40" y="104" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="117" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-02</text>
+<text x="52" y="144" font-family="sans-serif" font-size="14" font-weight="bold" fill="#111a26">Control-M — scheduler lane (folders, jobs, conditions)</text>
+<rect x="40" y="330" width="1200" height="190" rx="6" fill="#eef1f6" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="10 6"/>
+<rect x="40" y="314" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="327" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-03</text>
+<text x="52" y="354" font-family="sans-serif" font-size="14" font-weight="bold" fill="#111a26">Data Layer — pipeline lane (ETLProcess)</text>
+<rect x="40" y="540" width="1200" height="190" rx="6" fill="#eef1f6" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="10 6"/>
+<rect x="40" y="524" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="537" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-04</text>
+<text x="52" y="564" font-family="sans-serif" font-size="14" font-weight="bold" fill="#111a26">File Server / Database — asset lane (files, datasets)</text>
+<rect x="170" y="170" width="250" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="170" y="154" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="175" y="167" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-05</text>
+<text x="182" y="190" font-family="sans-serif" font-size="13" fill="#111a26">FileWatcher job — detects file</text>
+<text x="182" y="207" font-family="sans-serif" font-size="13" fill="#111a26">arrival, posts the trigger</text>
+<text x="182" y="224" font-family="sans-serif" font-size="13" fill="#111a26">condition</text>
+<rect x="540" y="170" width="260" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="540" y="154" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="545" y="167" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-06</text>
+<text x="552" y="190" font-family="sans-serif" font-size="13" fill="#111a26">ETL launcher job — CMDLINE carries</text>
+<text x="552" y="207" font-family="sans-serif" font-size="13" fill="#111a26">the pipeline token</text>
+<rect x="930" y="170" width="250" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="930" y="154" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="935" y="167" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-07</text>
+<text x="942" y="190" font-family="sans-serif" font-size="13" fill="#111a26">Downstream load job — waits on</text>
+<text x="942" y="207" font-family="sans-serif" font-size="13" fill="#111a26">the pipeline-complete condition</text>
+<rect x="540" y="380" width="260" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="540" y="364" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="545" y="377" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-08</text>
+<text x="552" y="400" font-family="sans-serif" font-size="13" fill="#111a26">ETLProcess (pipeline) — zone hops</text>
+<text x="552" y="417" font-family="sans-serif" font-size="13" fill="#111a26">RAW → TRUSTED → REFINED</text>
+<rect x="170" y="580" width="250" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="170" y="564" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="175" y="577" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-09</text>
+<text x="182" y="600" font-family="sans-serif" font-size="13" fill="#111a26">Source file on the file server</text>
+<text x="182" y="617" font-family="sans-serif" font-size="13" fill="#111a26">(.dat + control token)</text>
+<rect x="930" y="580" width="250" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
+<rect x="930" y="564" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="935" y="577" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-10</text>
+<text x="942" y="600" font-family="sans-serif" font-size="13" fill="#111a26">Target dataset — registry URN</text>
+<text x="942" y="617" font-family="sans-serif" font-size="13" fill="#111a26">(origin@db.schema.table)</text>
+<line x1="295" y1="578" x2="295" y2="272" stroke="#48566c" stroke-width="1.6" marker-end="url(#wfarrow)"/>
+<rect x="303" y="401" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="308" y="414" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-11</text>
+<text x="303" y="433" font-family="sans-serif" font-size="12" fill="#48566c">detected by</text>
+<line x1="422" y1="220" x2="538" y2="220" stroke="#48566c" stroke-width="1.6" marker-end="url(#wfarrow)"/>
+<rect x="488" y="196" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="493" y="209" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-12</text>
+<text x="488" y="228" font-family="sans-serif" font-size="12" fill="#48566c">condition</text>
+<line x1="670" y1="272" x2="670" y2="378" stroke="#48566c" stroke-width="1.6" marker-end="url(#wfarrow)"/>
+<rect x="678" y="301" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="683" y="314" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-13</text>
+<text x="678" y="333" font-family="sans-serif" font-size="12" fill="#48566c">launches</text>
+<line x1="422" y1="620" x2="538" y2="450" stroke="#48566c" stroke-width="1.6" marker-end="url(#wfarrow)"/>
+<rect x="488" y="511" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="493" y="524" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-14</text>
+<text x="488" y="543" font-family="sans-serif" font-size="12" fill="#48566c">READS (planned)</text>
+<line x1="802" y1="450" x2="928" y2="620" stroke="#48566c" stroke-width="1.6" marker-end="url(#wfarrow)"/>
+<rect x="873" y="511" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="878" y="524" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-15</text>
+<text x="873" y="543" font-family="sans-serif" font-size="12" fill="#48566c">WRITES (planned)</text>
+<line x1="802" y1="405" x2="928" y2="250" stroke="#48566c" stroke-width="1.6" marker-end="url(#wfarrow)"/>
+<rect x="873" y="303" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="878" y="316" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-16</text>
+<text x="873" y="335" font-family="sans-serif" font-size="12" fill="#48566c">pipeline-complete condition</text>
+<rect x="40" y="760" width="1200" height="40" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+<rect x="40" y="744" width="91" height="18" rx="4" fill="#2e6bc4"/>
+<text x="45" y="757" font-family="monospace" font-size="12" fill="#ffffff">WF-DFL-17</text>
+<text x="52" y="780" font-family="sans-serif" font-size="13" fill="#111a26">Mode tag + provenance footer: EXAMPLE DATA · ILLUSTRATIVE until the lineage QuerySpec lands; READS/WRITES render dashed while status=planned</text>
+</svg>

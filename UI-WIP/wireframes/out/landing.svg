@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 900" font-family="sans-serif">
 <rect width="1280" height="900" fill="#f4f6f9"/>
 <text x="20" y="866" font-size="15" font-weight="bold" fill="#111a26">Landing / Overview — category-first (AS BUILT, O35)</text>
-<text x="20" y="886" font-family="monospace" font-size="11" fill="#48566c">/ · wireframe spec v1 · 2026-07-29 · main (O35-O41 shipped; wireframes = as-built state) · keys resolve in KEYS.md</text>
+<text x="20" y="886" font-family="monospace" font-size="11" fill="#48566c">/ · wireframe spec v2 · 2026-08-13 · main (O35-O41 shipped; landing/loads/underhood = as-built, dataflow = PROPOSED) · keys resolve in KEYS.md</text>
 <rect x="20" y="20" width="1240" height="56" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.4"/>
 <rect x="20" y="4" width="91" height="18" rx="4" fill="#2e6bc4"/>
 <text x="25" y="17" font-family="monospace" font-size="12" fill="#ffffff">WF-LND-01</text>

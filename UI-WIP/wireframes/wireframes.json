@@ -1,10 +1,15 @@
 {
   "meta": {
     "title": "DryDocs console wireframes — SME review set",
-    "spec_version": "1",
-    "date": "2026-07-29",
-    "source_branch": "main (O35-O41 shipped; wireframes = as-built state)",
+    "spec_version": "2",
+    "date": "2026-08-13",
+    "source_branch": "main (O35-O41 shipped; landing/loads/underhood = as-built, dataflow = PROPOSED)",
     "feedback_addressed": [
+      {
+        "id": "FB-2026-08-13-01",
+        "text": "Show a data flow as swimlanes: Control-M | Data Layer | File Server / Database (SME chat 2026-08-13, testing the feedback loop; the idea traces to the original Full Circle Docs document-portal concept, section 7 Business Flow Diagrams)",
+        "disposition": "new dataflow view added (WF-DFL-01..17) as PROPOSED — renderer gained lane + arrow primitives; React build not started (inboxed as Idea-116)"
+      },
       {
         "id": "FB-2026-07-28-01",
         "text": "Landing hub image has too many items in it",
@@ -315,6 +320,272 @@
             "data": "QuerySpec error state",
             "react": "ModuleTemplate fallback banner",
             "graph": "n/a"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dataflow",
+      "title": "Data Flow — swimlanes (PROPOSED, FB-2026-08-13-01; a lineage-module layout)",
+      "route": "/lineage · layout: swimlane (proposed)",
+      "canvas": [
+        1280,
+        860
+      ],
+      "elements": [
+        {
+          "key": "WF-DFL-01",
+          "type": "box",
+          "x": 20,
+          "y": 40,
+          "w": 1240,
+          "h": 48,
+          "label": "Module toolbar: breadcrumb Home / Lineage · data-series picker · Layout: DAG | Swimlane · Fit · Export",
+          "meta": {
+            "label_src": "MODULES.lineage.label + layout toggle",
+            "data": "modules/registry.ts",
+            "react": "layout/ModuleToolbar.tsx (+ proposed layout toggle)",
+            "graph": "n/a"
+          }
+        },
+        {
+          "key": "WF-DFL-02",
+          "type": "lane",
+          "x": 40,
+          "y": 120,
+          "w": 1200,
+          "h": 190,
+          "label": "Control-M — scheduler lane (folders, jobs, conditions)",
+          "meta": {
+            "label_src": "lane title (static)",
+            "data": "controlm inventory extract (jobs, conditions)",
+            "react": "lineage/SwimlaneView.tsx (proposed)",
+            "graph": "(:Job)-[:IN_FOLDER]->(:Folder); condition semantics per BMC baseline"
+          }
+        },
+        {
+          "key": "WF-DFL-03",
+          "type": "lane",
+          "x": 40,
+          "y": 330,
+          "w": 1200,
+          "h": 190,
+          "label": "Data Layer — pipeline lane (ETLProcess)",
+          "meta": {
+            "label_src": "lane title (static)",
+            "data": "pipeline token from launcher CMDLINE (G15 contract)",
+            "react": "lineage/SwimlaneView.tsx (proposed)",
+            "graph": ":ETLProcess keyed by pipeline token"
+          }
+        },
+        {
+          "key": "WF-DFL-04",
+          "type": "lane",
+          "x": 40,
+          "y": 540,
+          "w": 1200,
+          "h": 190,
+          "label": "File Server / Database — asset lane (files, datasets)",
+          "meta": {
+            "label_src": "lane title (static)",
+            "data": "registry v2 datasets + file assets from job command parse",
+            "react": "lineage/SwimlaneView.tsx (proposed)",
+            "graph": ":DataAsset / :Dataset (registry URN grammar origin@db.schema.table)"
+          }
+        },
+        {
+          "key": "WF-DFL-05",
+          "type": "box",
+          "x": 170,
+          "y": 170,
+          "w": 250,
+          "h": 100,
+          "label": "FileWatcher job — detects file arrival, posts the trigger condition",
+          "meta": {
+            "label_src": "job name + FW role",
+            "data": "controlm inventory (FW role per C30 discriminators)",
+            "react": "SwimlaneNode (proposed)",
+            "graph": ":Job (FW role)"
+          }
+        },
+        {
+          "key": "WF-DFL-06",
+          "type": "box",
+          "x": 540,
+          "y": 170,
+          "w": 260,
+          "h": 100,
+          "label": "ETL launcher job — CMDLINE carries the pipeline token",
+          "meta": {
+            "label_src": "job name + launcher classification",
+            "data": "launcher-registry classification + G15 arg contract",
+            "react": "SwimlaneNode (proposed)",
+            "graph": ":Job → :ETLProcess (token join)"
+          }
+        },
+        {
+          "key": "WF-DFL-07",
+          "type": "box",
+          "x": 930,
+          "y": 170,
+          "w": 250,
+          "h": 100,
+          "label": "Downstream load job — waits on the pipeline-complete condition",
+          "meta": {
+            "label_src": "job name",
+            "data": "controlm inventory (in-conditions)",
+            "react": "SwimlaneNode (proposed)",
+            "graph": ":Job (condition wait, BMC baseline semantics)"
+          }
+        },
+        {
+          "key": "WF-DFL-08",
+          "type": "box",
+          "x": 540,
+          "y": 380,
+          "w": 260,
+          "h": 100,
+          "label": "ETLProcess (pipeline) — zone hops RAW → TRUSTED → REFINED",
+          "meta": {
+            "label_src": "pipeline token + kind (G12 discriminator)",
+            "data": "MAC set via dpl_mac.py seam (G17, ASSUMED contract)",
+            "react": "SwimlaneNode (proposed)",
+            "graph": ":ETLProcess {kind}"
+          }
+        },
+        {
+          "key": "WF-DFL-09",
+          "type": "box",
+          "x": 170,
+          "y": 580,
+          "w": 250,
+          "h": 100,
+          "label": "Source file on the file server (.dat + control token)",
+          "meta": {
+            "label_src": "resolved file path (mechanism-only in demo)",
+            "data": "command parse + %%var resolution (G46/G92 feed)",
+            "react": "SwimlaneNode (proposed)",
+            "graph": ":DataAsset (file)"
+          }
+        },
+        {
+          "key": "WF-DFL-10",
+          "type": "box",
+          "x": 930,
+          "y": 580,
+          "w": 250,
+          "h": 100,
+          "label": "Target dataset — registry URN (origin@db.schema.table)",
+          "meta": {
+            "label_src": "registry v2 dataset id",
+            "data": "config source registry (N9 shape)",
+            "react": "SwimlaneNode + IdChip (proposed)",
+            "graph": ":Dataset (registry URN)"
+          }
+        },
+        {
+          "key": "WF-DFL-11",
+          "type": "arrow",
+          "x": 295,
+          "y": 578,
+          "x2": 295,
+          "y2": 272,
+          "label": "detected by",
+          "meta": {
+            "label_src": "derived (FW watch path = file path)",
+            "data": "FW job watch target vs asset path",
+            "react": "SwimlaneEdge (proposed)",
+            "graph": "join, not an edge type"
+          }
+        },
+        {
+          "key": "WF-DFL-12",
+          "type": "arrow",
+          "x": 422,
+          "y": 220,
+          "x2": 538,
+          "y2": 220,
+          "label": "condition",
+          "meta": {
+            "label_src": "condition name (mechanism-only)",
+            "data": "controlm inventory out/in conditions",
+            "react": "SwimlaneEdge (proposed)",
+            "graph": "job→condition→job (BMC baseline)"
+          }
+        },
+        {
+          "key": "WF-DFL-13",
+          "type": "arrow",
+          "x": 670,
+          "y": 272,
+          "x2": 670,
+          "y2": 378,
+          "label": "launches",
+          "meta": {
+            "label_src": "derived (CMDLINE token join)",
+            "data": "G15 launcher arg contract",
+            "react": "SwimlaneEdge (proposed)",
+            "graph": "token join Job→ETLProcess"
+          }
+        },
+        {
+          "key": "WF-DFL-14",
+          "type": "arrow",
+          "x": 422,
+          "y": 620,
+          "x2": 538,
+          "y2": 450,
+          "label": "READS (planned)",
+          "meta": {
+            "label_src": "planned edge — not yet gated",
+            "data": "dataset_flow enrichment feed (DPL trace)",
+            "react": "SwimlaneEdge (proposed)",
+            "graph": "m3_reads_from — status: planned, gate pending"
+          }
+        },
+        {
+          "key": "WF-DFL-15",
+          "type": "arrow",
+          "x": 802,
+          "y": 450,
+          "x2": 928,
+          "y2": 620,
+          "label": "WRITES (planned)",
+          "meta": {
+            "label_src": "planned edge — not yet gated",
+            "data": "dataset_flow enrichment feed (DPL trace)",
+            "react": "SwimlaneEdge (proposed)",
+            "graph": "m3_writes_to — status: planned, gate pending"
+          }
+        },
+        {
+          "key": "WF-DFL-16",
+          "type": "arrow",
+          "x": 802,
+          "y": 405,
+          "x2": 928,
+          "y2": 250,
+          "label": "pipeline-complete condition",
+          "meta": {
+            "label_src": "condition name (mechanism-only)",
+            "data": "controlm inventory out/in conditions",
+            "react": "SwimlaneEdge (proposed)",
+            "graph": "job→condition→job (BMC baseline)"
+          }
+        },
+        {
+          "key": "WF-DFL-17",
+          "type": "text",
+          "x": 40,
+          "y": 760,
+          "w": 1200,
+          "h": 40,
+          "label": "Mode tag + provenance footer: EXAMPLE DATA · ILLUSTRATIVE until the lineage QuerySpec lands; READS/WRITES render dashed while status=planned",
+          "meta": {
+            "label_src": "live boolean + edge status",
+            "data": "QuerySpec reachability + relationship-vocabulary status",
+            "react": "ModuleTemplate fallback banner idiom",
+            "graph": "n/a (transport + vocabulary state)"
           }
         }
       ]
