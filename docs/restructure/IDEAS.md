@@ -62,6 +62,51 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-128`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
+  **Producer-side GitNexus trial on the DryDocs repo itself (dev tooling only).**
+  R5 of [`docs/reviews/gitnexus-depgraph-comparison.md`](../reviews/gitnexus-depgraph-comparison.md):
+  index the DryDocs repo with GitNexus (supports Python; clone at `sandbox/GitNexus`),
+  wire its MCP server, and evaluate `impact`/`detect_changes` before `drydocs_core`
+  refactors — symbol-grain impact analysis beside (not replacing) the depgraph drift
+  ritual. Check in the trial: Windows worker-pool behavior, index time, and that
+  `.gitnexus/` stays out of git (their analyzer edits `.gitignore` itself — publish
+  boundary). Never touches the estate graph or ontology.
+
+- **`Idea-127`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
+  **Read-time staleness hint on estate queries and snapshot HTML.** R4 of the GitNexus
+  comparison: surface "indexed at commit X / loaded at T; HEAD is Y / now is T+n" in
+  query answers and the depgraph html view — the GitNexus `staleness.ts` contract. Our
+  snapshot meta header already pins provenance harder (U7/U15); this is the missing
+  *read-time* half. Small; depgraph html profile + `drydocs_api`.
+
+- **`Idea-126`** · 2026-08-14 · `[idea]` · **open** · prio? **Med** —
+  **Declared-deps extractor DAG in depgraph (sibling-repo item).** R3 of the GitNexus
+  comparison: before the lineage forks multiply extractors, adopt the GitNexus runner
+  pattern — extractors/profiles declare `deps`, Kahn-validated, runner passes each one
+  only its declared upstream outputs (hidden coupling becomes an error, cycle diagnosis
+  prints the concrete path), per-phase timing. Lands in `../depgraph`, not DryDocs;
+  captured here because grooming happens here.
+
+- **`Idea-125`** · 2026-08-14 · `[idea]` · **open** · prio? **Med** —
+  **Named agent verbs over QuerySpecs (impact/context/trace analogs).** R2 of the
+  GitNexus comparison: expose reviewed `drydocs_api` QuerySpecs as purpose-built MCP
+  tools — `impact` (blast radius over job chains/conditions), `context` (one
+  job/asset/series: owners, schedule, upstream/downstream), `trace` (path between two
+  estate nodes) — so agents call named verbs instead of composing raw Cypher against
+  the generic neo4j-drydocs server. GitNexus evidence: the verb surface, not the graph,
+  is what makes agents actually use it. Pairs with Idea-124 (the verbs carry the
+  epistemic field).
+
+- **`Idea-124`** · 2026-08-14 · `[idea]` · **open** · prio? **High** —
+  **Epistemic labeling on query answers: `exact` vs `lower-bound` + causes.** R1 of
+  [`docs/reviews/gitnexus-depgraph-comparison.md`](../reviews/gitnexus-depgraph-comparison.md):
+  lineage/impact-style QuerySpec responses (and depgraph's JSON assertions) declare
+  whether the answer is complete — `epistemic: exact|lower-bound` plus a
+  machine-readable `causes` split (unparsed `cmd_line`s, unresolved invocations,
+  gate-pending edges). Extends the trust axis from the *graph* to the *answer*;
+  GitNexus doctrine: an empty result set is not evidence of absence when the causes
+  say the walk couldn't see. Ontology-cheap — a property on responses, not the graph.
+
 - **`Idea-123`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
   **Web UI example output: the "Ask the knowledge graph" file-name search report.**
   SME supplied a real captured example (screenshot machine-local at
