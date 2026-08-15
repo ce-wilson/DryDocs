@@ -71,6 +71,29 @@ question a 1,000-line file with the trail at the bottom could not answer.
   ritual. Check in the trial: Windows worker-pool behavior, index time, and that
   `.gitnexus/` stays out of git (their analyzer edits `.gitignore` itself — publish
   boundary). Never touches the estate graph or ontology.
+  **TRIAL RUN 2026-08-14 (desktop) — verdict: do NOT adopt as edit discipline; grooming
+  should close this as evaluated.** Mechanics all passed: global install clean (gitnexus
+  1.6.9; npm 11 allow-scripts gate skipped postinstalls but prebuilt binaries cover it),
+  Windows worker pool fine, DryDocs indexed in ~30s via `analyze --index-only` (16,737
+  nodes / 27,077 edges), working tree untouched (publish boundary safe), `.gitnexus/`
+  ~240 MB local cache. Quality on OUR Python is where it failed: class-grain
+  `impact Neo4jClient` was reasonable (48 impacted, import-grain), and the
+  ambiguous-name handling (`run_script` → 10 candidates, risk UNKNOWN until
+  disambiguated) is genuinely good design — but method-grain impact on the
+  disambiguated `Neo4jClient.run_script` returned impactedCount=1 labeled
+  `epistemic: "exact"` while missing real receiver-annotated production call sites
+  (`drydocs/loaders/base.py:442` `self.client.run_script(...)`, client: Neo4jClient;
+  ditto `runs_on_resolution.py`) that plain grep finds. The honesty mechanism we most
+  wanted (Idea-124's model) under-reports on Python receiver typing — "exact" was
+  false. `trace main → Neo4jClient` found no path (breaks at CLI dispatch, our
+  dominant pattern); `detect-changes` mixes markdown Section "symbols" into a
+  risk=high verdict (noisy); FTS/BM25 unavailable offline (LadybugDB extension wants
+  network). Net: for this codebase, module-boundary tests + grep remain stronger than
+  its method-grain graph, and a tool whose `exact` can be wrong cannot gate edits.
+  Idea-124 (epistemic labeling as a CONCEPT) is unaffected — ours must census its
+  blind spots better than this implementation did. Cleanup: `.gitnexus/` dirs in
+  DryDocs (~240 MB) and sandbox/GitNexus (~358 MB) are disposable caches; delete at
+  will, plus `npm uninstall -g gitnexus` if not wanted.
 
 - **`Idea-127`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
   **Read-time staleness hint on estate queries and snapshot HTML.** R4 of the GitNexus
