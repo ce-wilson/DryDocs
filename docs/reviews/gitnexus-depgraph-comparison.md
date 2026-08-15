@@ -136,9 +136,14 @@ job/script/asset, and the SME gate could not absorb symbol-grain volume).
 
 ## 7. Action items
 
-1. [ ] Groom R1–R5 into `IDEAS.md` → `backlog.yaml` (R1/R2 likely one epic; R3 is a
-       depgraph-repo item, not DryDocs).
-2. [ ] Decide keep/delete of the clone at `sandbox/GitNexus` (it is reference material,
+1. [x] ~~Groom R1–R5 into `IDEAS.md`~~ — captured as Idea-124..128 (2026-08-14).
+       Backlog promotion of 124–127 still pending grooming; **R5/Idea-128 RAN and
+       CLOSED same day — verdict: do not adopt** (method-grain `impact` claimed
+       `epistemic: "exact"` while missing receiver-annotated call sites grep finds;
+       see the Idea-128 audit-trail entry). §6's *Revisit* is thereby answered:
+       `detect_changes` supersedes nothing.
+2. [x] ~~Decide keep/delete of the clone at `sandbox/GitNexus`~~ — DELETED 2026-08-14
+       after the trial (it is reference material,
        not a dependency; this doc records everything cited).
 3. [ ] Add a one-line pointer to this review from `reference/research/README.md` if the
        R5 trial proceeds (external tool evaluation precedent).
