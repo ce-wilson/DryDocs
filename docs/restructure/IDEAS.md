@@ -62,39 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-128`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
-  **Producer-side GitNexus trial on the DryDocs repo itself (dev tooling only).**
-  R5 of [`docs/reviews/gitnexus-depgraph-comparison.md`](../reviews/gitnexus-depgraph-comparison.md):
-  index the DryDocs repo with GitNexus (supports Python; clone at `sandbox/GitNexus`),
-  wire its MCP server, and evaluate `impact`/`detect_changes` before `drydocs_core`
-  refactors — symbol-grain impact analysis beside (not replacing) the depgraph drift
-  ritual. Check in the trial: Windows worker-pool behavior, index time, and that
-  `.gitnexus/` stays out of git (their analyzer edits `.gitignore` itself — publish
-  boundary). Never touches the estate graph or ontology.
-  **TRIAL RUN 2026-08-14 (desktop) — verdict: do NOT adopt as edit discipline; grooming
-  should close this as evaluated.** Mechanics all passed: global install clean (gitnexus
-  1.6.9; npm 11 allow-scripts gate skipped postinstalls but prebuilt binaries cover it),
-  Windows worker pool fine, DryDocs indexed in ~30s via `analyze --index-only` (16,737
-  nodes / 27,077 edges), working tree untouched (publish boundary safe), `.gitnexus/`
-  ~240 MB local cache. Quality on OUR Python is where it failed: class-grain
-  `impact Neo4jClient` was reasonable (48 impacted, import-grain), and the
-  ambiguous-name handling (`run_script` → 10 candidates, risk UNKNOWN until
-  disambiguated) is genuinely good design — but method-grain impact on the
-  disambiguated `Neo4jClient.run_script` returned impactedCount=1 labeled
-  `epistemic: "exact"` while missing real receiver-annotated production call sites
-  (`drydocs/loaders/base.py:442` `self.client.run_script(...)`, client: Neo4jClient;
-  ditto `runs_on_resolution.py`) that plain grep finds. The honesty mechanism we most
-  wanted (Idea-124's model) under-reports on Python receiver typing — "exact" was
-  false. `trace main → Neo4jClient` found no path (breaks at CLI dispatch, our
-  dominant pattern); `detect-changes` mixes markdown Section "symbols" into a
-  risk=high verdict (noisy); FTS/BM25 unavailable offline (LadybugDB extension wants
-  network). Net: for this codebase, module-boundary tests + grep remain stronger than
-  its method-grain graph, and a tool whose `exact` can be wrong cannot gate edits.
-  Idea-124 (epistemic labeling as a CONCEPT) is unaffected — ours must census its
-  blind spots better than this implementation did. Cleanup: `.gitnexus/` dirs in
-  DryDocs (~240 MB) and sandbox/GitNexus (~358 MB) are disposable caches; delete at
-  will, plus `npm uninstall -g gitnexus` if not wanted.
-
 - **`Idea-127`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
   **Read-time staleness hint on estate queries and snapshot HTML.** R4 of the GitNexus
   comparison: surface "indexed at commit X / loaded at T; HEAD is Y / now is T+n" in
@@ -1894,6 +1861,41 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-14 (desktop, targeted — `Idea-128` only)** — closed `Idea-128` as **evaluated**: the producer-side GitNexus trial it proposed RAN on 2026-08-14 (desktop) and the entry's own body carries the full verdict, so the groom's whole job was the disposition. Mechanics all passed (clean global install, Windows worker pool fine, ~30s index of the DryDocs repo, working tree untouched so the publish boundary held, `.gitnexus/` a local cache) — but method-grain impact returned `epistemic: "exact"` while missing real receiver-annotated production call sites that plain grep finds, and a tool whose `exact` can be false cannot gate edits; **verdict: do NOT adopt as edit discipline.** **Promoted 0, inboxed 0, merged 0, closed 1.** No backlog item minted — module-boundary tests + grep remain the edit discipline on this codebase, and the entry's cleanup residue (disposable `.gitnexus/` caches, optional `npm uninstall -g gitnexus`) is delete-at-will hygiene, not an item. `Idea-124` (epistemic labeling as a CONCEPT) is explicitly unaffected by this close and stays open — ours must census its blind spots better than this implementation did. `backlog.yaml` is untouched, so `summary:` and `next_ready:` are unchanged by construction; the validator was still run. Nothing here decides an ontology question — the trial never touched the estate graph.
+
+- **`Idea-128`** · 2026-08-14 · `[idea]` · **closed — evaluated at the 2026-08-14 groom: trial ran, verdict recorded in the body, do NOT adopt, no item minted** · prio? **Low** —
+  **Producer-side GitNexus trial on the DryDocs repo itself (dev tooling only).**
+  R5 of [`docs/reviews/gitnexus-depgraph-comparison.md`](../reviews/gitnexus-depgraph-comparison.md):
+  index the DryDocs repo with GitNexus (supports Python; clone at `sandbox/GitNexus`),
+  wire its MCP server, and evaluate `impact`/`detect_changes` before `drydocs_core`
+  refactors — symbol-grain impact analysis beside (not replacing) the depgraph drift
+  ritual. Check in the trial: Windows worker-pool behavior, index time, and that
+  `.gitnexus/` stays out of git (their analyzer edits `.gitignore` itself — publish
+  boundary). Never touches the estate graph or ontology.
+  **TRIAL RUN 2026-08-14 (desktop) — verdict: do NOT adopt as edit discipline; grooming
+  should close this as evaluated.** Mechanics all passed: global install clean (gitnexus
+  1.6.9; npm 11 allow-scripts gate skipped postinstalls but prebuilt binaries cover it),
+  Windows worker pool fine, DryDocs indexed in ~30s via `analyze --index-only` (16,737
+  nodes / 27,077 edges), working tree untouched (publish boundary safe), `.gitnexus/`
+  ~240 MB local cache. Quality on OUR Python is where it failed: class-grain
+  `impact Neo4jClient` was reasonable (48 impacted, import-grain), and the
+  ambiguous-name handling (`run_script` → 10 candidates, risk UNKNOWN until
+  disambiguated) is genuinely good design — but method-grain impact on the
+  disambiguated `Neo4jClient.run_script` returned impactedCount=1 labeled
+  `epistemic: "exact"` while missing real receiver-annotated production call sites
+  (`drydocs/loaders/base.py:442` `self.client.run_script(...)`, client: Neo4jClient;
+  ditto `runs_on_resolution.py`) that plain grep finds. The honesty mechanism we most
+  wanted (Idea-124's model) under-reports on Python receiver typing — "exact" was
+  false. `trace main → Neo4jClient` found no path (breaks at CLI dispatch, our
+  dominant pattern); `detect-changes` mixes markdown Section "symbols" into a
+  risk=high verdict (noisy); FTS/BM25 unavailable offline (LadybugDB extension wants
+  network). Net: for this codebase, module-boundary tests + grep remain stronger than
+  its method-grain graph, and a tool whose `exact` can be wrong cannot gate edits.
+  Idea-124 (epistemic labeling as a CONCEPT) is unaffected — ours must census its
+  blind spots better than this implementation did. Cleanup: `.gitnexus/` dirs in
+  DryDocs (~240 MB) and sandbox/GitNexus (~358 MB) are disposable caches; delete at
+  will, plus `npm uninstall -g gitnexus` if not wanted.
 
 - **GROOM 2026-08-13 (desktop, targeted — "the open inbox entries that would impact or change the established node labels and the Cypher loaders")** — the filter was applied to the WHOLE open and parked tail, not only the new captures, and every claim below was re-verified against the tree at the groom rather than taken from the entry. **Promoted 5: `U21`, `U22`, `U23`, `G97`, `Q18`. Merged 1. Inboxed 0. Parked as a question 0.** Four of the five are dependency-free and enter `next_ready` on arrival; `Q18` deliberately does not. **`Idea-118` → `U21`** (p1 bug, `drydocs-load`, phase 16): the code-snapshot load sweeps NODES and never EDGES, so `IMPORTS` only grows — `seal_attribution.py` still carries an edge to `loaders/base.py` that survived a full re-load, against a file with zero occurrences of the string and a snapshot that records no such edge (985 live vs 982 in the snapshot; fan-in 32 where the tree says 31). Written as a PER-SOURCE retraction with the over-reach guard as its own test, because the graph holds edges other loaders wrote; the mark-vs-delete call is left to the item but must be RECORDED, and if edges are marked then the read paths filter them the way U13 made node queries filter. Verified at the groom: `stale_edge_cleanup.cypher` is the repo's only edge-retraction precedent and has NO live caller in the tracked tree, so the pattern exists as a file rather than as a mechanism. **`Idea-117` → `U22`** (p2 bug, `graph-infra`, phase 16): every `:CodeModule` carried one Aug-2 `last_seen_at` for eleven days and the session read A3's fan-in as the Aug-2 value believing it current — the G78 class, a read that SUCCEEDED with the wrong data. The entry explicitly handed the warn-vs-fail call to the groom: **RULED WARN**, on the same argument CLAUDE.md already makes for `snapshot.ps1`'s CI check (recording structure and passing a gate are unrelated jobs, and the check must not red a suite on a machine with no container). What is unit-testable is the COMPARISON over fixtures — fresh / stale / no snapshot / empty graph / database-unreachable, that last one a DISTINCT verdict and never "fresh" — so the mechanism is guarded with no database. Priority dropped to p2 from the entry's High with the reason in the notes: one existing command repairs it and did, so what is missing is detection. `module: graph-infra` chosen on SUBJECT (the loaded graph's currency, U15/U19's family) over `docs` (the review-plan file, U13/U20's) and the choice is recorded in the item, because both were plausible. **`Idea-47` → `U23`** (p3 task, `ontology`, phase 16, `fable`, `ontology-mapper`): the `.cypher` files are `:CodeModule` nodes with zero edges while each loader names its Cypher as a literal path — promoted as a **gate-rider DRAFT and only a draft**, on the G27 / N10 / G95 precedent, because a new relationship type is an ontology decision. Its clause (c) is what stops a signed rider with no path to a first row: the depgraph scanner does not emit the edge, so the prompt must say where it would come from and what an instrument change costs. Clause (d) fences it against gate `self-documentation-code-graph` §H5 — a loader→cypher edge is the FIRST half of the "which module loads this job" join and not the join. **`Idea-23` → `G97`** (p2 task, `drydocs-lineage`, phase 6): the parked trigger has FIRED and the entry was out of date — `m7_uses_artifact` has been `status: active` since 2026-08-07 (gate `rua-load-shapes` §A4, applied at G55), not `planned`, and `writer.py` MERGEs `:ETLProcess` on its token. G16's own notes name this item by description. NO gate is opened: `cmdline-nfr-vetting` ruled the distinct label and the `:Script` refinements, `rua-load-shapes` activated both entries together precisely so the launcher/payload split is right from first load. Verified ABSENT at the groom so this is a real build — the writer emits no `USES_ARTIFACT` edge and stamps `script_role` only for the rua profile case. **`Idea-88` → `Q18`** (p2 task, `drydocs-load`, phase 14) — **the parking is PRESERVED, not overridden**: the entry was parked behind two open rulings, and the item reproduces that as `depends_on: [G32, Q14]`, so it stays out of `next_ready` until both rule while the work becomes visible in the database instead of living only in this file. Its acceptance says in writing that the edge TERM is Q14's and residency is G32's, and it carries Q16's unshipped clause (b). **Merged 1: `Idea-119` → `G78` clause (d) + a rider note on `G79`** — the five loaders with no direct test import (`business_segments`, `controlm`, `controlm_dependencies_derived`, `controlm_hosts`, `seal_contacts`) ride the fix that touches them, which is the entry's own proposed disposition; A5 is named in the clause as a DIRECT-IMPORT proxy so the ask is an import-bearing test, not proof of total absence. `G79`'s note names the two the split re-homes, verified at the groom (`seal_contacts` is a `REFRESH_REFERENCE_CHAIN` member and `business_segments` is refreshed inside the same command, ahead of the chain tuple). **Deliberately NOT promoted, each for a stated reason:** `Idea-86` and the residency half of `Idea-88` stay behind `G32`, which is still `in_progress` (an unsigned drafted gate) — three parked consumers on one gate is an argument for scheduling it, not for pre-empting it; `Idea-7` (flipping the four `m3_*` lineage entries active) and `Idea-37` are HITL-scheduled by their own terms; `Idea-104` (which MFT route-id shape is real) and `Idea-34` (whether the AIS acronym entry survives, and what `:AisTool` ever meant) are label/identifier questions that only the SME can answer; `Idea-15`'s remaining call — display labels only, or renaming the `seal_*` vocabulary ids and domains — is ADR-scale and the user's; `Idea-25`, `Idea-27`, `Idea-31` and `Idea-61` were re-read and their triggers are still unfired. `Idea-122` and `Idea-123`, both captured the same day, DESCRIBE label chains rather than change them — they are UI-view work and belong with the console epic, so this run left them. **Nothing here decides an ontology question:** `U23` is a prompt that registers nothing, `G97` builds inside two signed gates and flips no entry, and `Q18` routes both of its open questions back to `Q14` and `G32` by dependency.
 
