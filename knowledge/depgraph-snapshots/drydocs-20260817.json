@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-13T13:45:01",
-    "date": "20260813",
+    "captured_at": "2026-08-17T14:19:39",
+    "date": "20260817",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "7d885c9",
-      "full": "7d885c90e0c3bf3900337c381a3fe3af9ce8ca4b",
+      "commit": "0c355f5",
+      "full": "0c355f5a7683414d853f57668938445b19ae2562",
       "branch": "main",
-      "describe": "port-base-20260811-105-g7d885c9",
-      "subject": "chore(ideas): Idea-121 — the renderers write CRLF, burying the stale-render signal",
-      "dirty": true,
+      "describe": "port-base-20260817",
+      "subject": "chore(port): roll the step ledger to caa0406..HEAD — steps 135-157",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -8657,6 +8657,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/gitnexus-depgraph-comparison.md",
+      "name": "gitnexus-depgraph-comparison.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/gitnexus-depgraph-comparison.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/graph-vs-files-experiment",
       "name": "graph-vs-files-experiment",
       "extension": "",
@@ -13877,10 +13886,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260813.json",
-      "name": "drydocs-20260813.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260813-1344.json",
+      "name": "drydocs-20260813-1344.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260813.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260813-1344.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14142,6 +14151,15 @@
       "name": "docmeta-p0-verdict.md",
       "extension": ".md",
       "rel_path": "knowledge/upgrade-plans/docmeta-p0-verdict.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/upgrade-plans/docmeta-p4-revision-single-db.md",
+      "name": "docmeta-p4-revision-single-db.md",
+      "extension": ".md",
+      "rel_path": "knowledge/upgrade-plans/docmeta-p4-revision-single-db.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26553,6 +26571,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/gitnexus-depgraph-comparison.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/graph-vs-files-experiment"
     ],
     [
@@ -29403,7 +29426,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260813.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260813-1344.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -29519,6 +29542,11 @@
       "drydocs/knowledge/upgrade-plans",
       "CONTAINS",
       "drydocs/knowledge/upgrade-plans/docmeta-p0-verdict.md"
+    ],
+    [
+      "drydocs/knowledge/upgrade-plans",
+      "CONTAINS",
+      "drydocs/knowledge/upgrade-plans/docmeta-p4-revision-single-db.md"
     ],
     [
       "drydocs/knowledge/upgrade-plans",
@@ -31465,13 +31493,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1695,
+    "files": 1697,
     "edges": 982,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1963,
+    "rels": 1965,
     "directories": 269
   }
 }
