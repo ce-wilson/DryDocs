@@ -62,6 +62,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-129`** · 2026-08-17 · `[bug]` · **open** · prio? **Low** —
+  **The depgraph snapshot JSON is still written CRLF — the surface Idea-121 did not
+  reach.** Idea-121 fixed the 11 Python `write_text(` render sites; the snapshot is
+  written by `snapshot.ps1:391` (`[System.IO.File]::WriteAllText`), which writes `$raw`
+  through unchanged, and `$raw` arrives CRLF from the depgraph tool. Measured on
+  `drydocs-20260817.json`: **31,505 CRLF, 0 bare LF**, and `git add` warned "CRLF will
+  be replaced by LF". Lower impact than Idea-121 — `.gitattributes` normalizes the blob
+  on commit, `meta.git.dirty` is computed BEFORE the write so it stays correct, and
+  newest-only retention means each snapshot is a fresh file rather than a re-dirtied
+  one. But it is the same defect class in the same ritual, and it leaves the working
+  tree disagreeing with the index on every snapshot. Fix is one line at the write
+  (normalize `$new` to `\n`), plus the question of whether the sibling depgraph repo
+  should emit LF at the source instead — which is where Idea-126 already points.
+
 - **`Idea-127`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
   **Read-time staleness hint on estate queries and snapshot HTML.** R4 of the GitNexus
   comparison: surface "indexed at commit X / loaded at T; HEAD is Y / now is T+n" in
