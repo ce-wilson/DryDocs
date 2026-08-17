@@ -75,30 +75,31 @@ finishes reading is not a control document. So:
 - a roll REPLACES the previous roll note; it does not stack another one;
 - if a section can only be understood by reading it twice, cut it rather than expand it.
 
-**Roll state (2026-08-10, the post-`ae21ee4` roll).** The ledger is rolled through
-the certified tag **`port-base-20260810b` (`ae21ee4`)** — the FIRST TAG-BASED PORT,
-and the opening sequence worked end-to-end: range verified at fetch time against
-the certified 9/15, zero J16 fall-through, the +39 suite delta = exactly the two
-new guard files. Steps **122-123 are APPLIED** (verified commit-by-commit: 9
-commits, 4 cited in steps 122/123, 5 ritual). Live ledger restarts at **124+**,
-delta since `ae21ee4`.
+**Roll state (2026-08-17, the post-`caa0406` roll).** The ledger is rolled through
+the certified tag **`port-base-20260811` (`caa0406`)**. Steps **124-134 are
+DELIVERED AND PRODUCER-REVIEWED** — PORT-REPORT-caa0406 exists and was reviewed at
+`ca7a121` (four divergences ledgered, RELAY-7 raised) — but **no close-out
+confirmation ever reached this file**, so unlike `ae21ee4` there is no "IS MERGED,
+branch removed" line below. Treat 124-134 as delivered, NOT as closed. Live ledger
+restarts at **135+**, delta since `caa0406` — **115 commits: 93 cited across steps
+135-157, 22 ritual.** This roll certifies a NEW base, tagged **`port-base-20260817`** at the roll
+commit itself (`python scripts/port_preflight.py --base caa0406 --tag`).
 
-> **`ae21ee4` IS MERGED (SME, 2026-08-10) — the port branch is REMOVED.** Port commit
-> `12420373` (+ report `297d25bc`) applied onto `main @ 308dda92`, `--no-ff` merged onto
-> company `main`, branch `drydocs-port-20260810` deleted at close-out. The port loop is
-> FULLY CAUGHT UP on both sides. `6f03264`'s port (`feeb0706`)
-> DID land: merged as `308dda92` and pushed BEFORE this port began, so Phase 0 was
-> satisfied on arrival.
-> **J41 landed `done` company-side** — deliberate call, correctly distinguished from
-> the U18/U19 `todo` shape: a script that exists-but-is-not-invoked is not an
-> unadopted enabling pin. Their `test_module_boundary.py` now carries BOTH component
-> groups (producer `port` + company-only `docmeta-acquire`) — the rework trap
-> handled as step 122 warned.
-> **Company fence pre-check: clean (11/11).** Their never-port `port-prompt.md` does
-> NOT carry the producer-lineage fence defect — independently maintained, verified
-> before their full suite ran.
+> **THE `caa0406` PORT'S CLOSE-OUT IS UNRECORDED — ask before assuming it landed.**
+> `ae21ee4` got an explicit `06d4469` "MERGED company-side, branch removed" commit.
+> `caa0406` got a report, a producer review, and then nothing. The producer cannot
+> see that repo, so this is a GAP IN THE RECORD, not evidence the port failed — but
+> two things ride on closing it. RELAY-7 (re-pose the `email-dl-contact-point` §G4
+> clause, which now asks a question the `5405ab6` DOMAIL ruling already answered) is
+> owed company-side and unconfirmed. And the four divergences at `ca7a121` —
+> `resource_pool` split, `description_tokens` UNION, `detect.py` shared-`Finding`
+> namespaces, `test_runbook_currency` deferred — are producer BELIEFS about company
+> state until somebody re-checks them. This is the T11 class: a fact whose only home
+> was a chat stops existing when the chat does. **First action at the next port:
+> fill the three UNRECORDED fields below.**
 
-**Last completed port — the four required fields (J35).**
+**Last CONFIRMED-COMPLETE port — the four required fields (J35).** Still the
+`ae21ee4` port, because `caa0406`'s close-out never reached this file (block above).
 - **Range:** `6f03264..ae21ee4` (= tag `port-base-20260810b`) — **9 commits / 15
   changed paths**, ledger steps 122-123; range verified AT FETCH TIME against the
   certified expectation, not only at report time.
@@ -113,13 +114,22 @@ delta since `ae21ee4`.
   + 11 markdown_fences; producer-verified). Track-1 **123/3/0**; J7 guards **21**;
   CI guards green; 0 J16 fall-through.
 
-**Steps 122-123, one line each.** 122 J41 opening-sequence machinery (module +
-guards + `port` group + SKILL.md certified-tag check; company runs nothing). 123 the
-markdown-fence fix + portable guard (company ran it against their own docs: clean).
+**Last DELIVERED port — `caa0406`, close-out UNRECORDED.** Range
+`ae21ee4..caa0406` (= tag `port-base-20260811`), ledger steps 124-134; report
+**PORT-REPORT-caa0406**; producer review `ca7a121` (2026-08-11). Port commit, backup
+tag and company acceptance figures never reached the producer — the `1946 passed / 5
+skipped` in that review commit is the PRODUCER's own tree, never a company number.
+Do not quote it as an acceptance figure.
 
-(Steps 116-121 collapsed at the prior roll — one-liners in PORT-REPORT-6f03264 and
-this file's git history. The FORCE_COLOR / Idea-101 findings that motivated J41 are
-recorded there too.)
+**Steps 124-134 stay live below rather than collapsing** — a step collapses once its
+range is confirmed merged, and this one is not. Collapsing them would retire the only
+producer-side description of work whose landing nobody has verified. They collapse at
+the roll after `caa0406` is confirmed.
+
+(Steps 106-123 collapsed AT THIS ROLL — the `5417ef10..ae21ee4` range, merged
+company-side per step 128 and confirmed at `06d4469`. One-liners live in
+PORT-REPORT-5417ef10, PORT-REPORT-ae21ee4 and this file's git history, along with the
+FORCE_COLOR / Idea-101 findings that motivated J41.)
 
 ## Last completed port
 
@@ -1365,128 +1375,13 @@ OWED COMPANY-SIDE:
   your graph. T10/T13: until a real export parses with zero mismatches, treat the
   field names as ASSUMED.
 
-STEP LEDGER — delta since `ae21ee4` (steps 43–105 collapsed above; 106–123 are the
-`5417ef10..ae21ee4` range, already ported and MERGED company-side per step 128, kept
-for context). Steps 124–134 are the NEW delta this base certifies. Each
-sub-stream carries its producer-side verification status in [BRACKETS]; spend
-review on [UNRULED]. Grooms, claims, board/design renders and depgraph
-snapshots in the range are ritual — per-entry backlog union, derived
+STEP LEDGER — delta since `caa0406` (steps 43–123 collapsed above; 124–134 are the
+`ae21ee4..caa0406` range, DELIVERED and producer-reviewed but with an unconfirmed
+close-out, kept live for exactly that reason). Steps 135+ are the NEW delta this
+base certifies. Each sub-stream carries its producer-side verification status in
+[BRACKETS]; spend review on [UNRULED]. Grooms, claims, board/design renders and
+depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step.
-
-106. G22 AFTERMATH TRIO — G55 vocabulary consequences + G23 curated load + G58
-    archival report [TEST-PINNED] (`2435a7d`, `ba7fbaf`, `461ea8e`). G55 applies
-    the signed gate's flips (guardrail 7: GATE-AUTHORIZED — do not run the
-    no-downgrade guards across it); G23 is the rua curated load per the signed
-    shapes (loads are always yours — T9); G58 the dead-script archival report
-    with the gate's safety bar. G23 depends on G55 — the ordering constraint is
-    recorded in the backlog (`6a65d4f`), verified in code, not prose.
-
-107. OLDEST-NON-HITL SWEEP — six small items [like-for-like] (O29 `afd6594`
-    trust-tier legend; O30 `74b0f1a` App.css retired; O32 `604c0b6` light-mode
-    cascade fix; S7 `31bd162` folder-vs-module naming rule in MODULE_MAP.md;
-    S6 `94924a5` JSON Schemas for the six config families; A4 `9f1bb62` dcat
-    per-standard README). web/** and MODULE_MAP.md are canonical-producer. S6's
-    schemas validate YOUR config copies at editor time — a squiggle on your
-    adapted values is the schema working; widen a schema only where your grammar
-    legitimately differs, and note it in the PORT-REPORT.
-
-108. PORT MACHINERY HOUSEKEEPING at the 5417ef10 review (`7934c41`): Relay #2
-    applied (config/audit-fields.yaml + test_module_boundary.py per-entry/union
-    rows). FIVE company packs staged (`2f3c385`, clean-add rows above the
-    never-port glob — REMOVE those five rows after this port merges) + FOUR
-    post-G22 data-profile gate prompts drafted (`b001eb8`) [UNRULED]. Six
-    DELIVERED company prompts retired to local archive (`6b3a957`) — the
-    deletions are covered by the `docs/gate-*-company-prompt.md` never-port row,
-    so your live copies are untouched by design; verify they survived the apply.
-
-109. K16 PRODUCER HALF — the FID census METHOD (`232e88f`) + `drydocs
-    fid-census` (`20f6431`) [TEST-PINNED]. Counts-only by return type; the
-    COUNTS are Internal and cannot be produced producer-side — the item sits
-    `blocked` on your directory extract, and the census prompt is
-    `docs/k16-fid-census-company-prompt.md` (in-tree, not a gate pack).
-    cli.py is evaluate: add the verb, keep yours.
-
-110. Q16(a) — `drydocs docs-coverage` + THE /software LEDGER PAGE (`b297268`,
-    `0ddf880`, `9b4cf59`, `71276d5`). Software→documentation coverage report;
-    the vendor→product→corpus→graph declared-vs-loaded console surface;
-    generated software-registry.json gains the doc-governance fields. The page
-    reads YOUR registry and corpora at render — regenerate under guardrail 5,
-    never take producer generated JSON. Overview pick-list persona-filter fix
-    rides along.
-
-111. SMALL GUARDS [TEST-PINNED, like-for-like] — G59 apply-supplements
-    completeness (`1490d02`: a supplement on disk can no longer be silently
-    skipped; the applied set is derived from the directory); J36 ryuk workaround
-    automatic (`9bf7ebb` — integration suite needs no manual prep); skip-guard
-    prose fix (`2c26e2f`); runbook-currency historical exemption (`cbb8b3d`).
-
-112. ROADMAP — THE THIRD PLANNING SURFACE (`3c60e2e`). drydocs/plan_roadmap.py
-    + scripts/render_roadmap.py join the default board render; authored
-    judgments live in docs/restructure/roadmap.yaml (module-coverage +
-    idea-citation guards in test_plan_roadmap.py). Manifest rows landed with
-    J34: the .html is a DERIVED canonical-company render; the .yaml is evaluate
-    — YOUR stage/remaining judgments describe YOUR tree, take structure only.
-    board.html links to the new page.
-
-113. BACKLOG RE-SHAPES [per-entry union as usual] — Epic Z groomed (`d95a64a`:
-    six server-location/geography items; the Z2 gate carries the standing
-    caution that the infrastructure data-center field is NOT the Control-M
-    same-named field) and G57 WITHDRAWN-CLOSED (`913861a`, user ruling): the
-    rua_*→bkup_* family rename is OFF THE BOOKS — the G22-session file rename
-    was a comparison maneuver, not a directive, and the rua_* names STAND. If
-    your rua-load-shapes ratification session queued a rename expectation,
-    strike it.
-
-114. REVIEWS + PROSE [default_ok / internal] — persona review Run 2 (three
-    `docs/reviews/persona-*-2026-08.md` files + checkpoint + Idea-91..95; the
-    tech-writer mandate now cites the US-English guide, `afc79c4`);
-    business-layer location experiment (`f156cc7`,
-    internal/context-graph-analysis/**); L24 exec overview rev 8 (`b2287fa`);
-    MWAA implementation-docs locator (`9674403` — value in internal/, pointers
-    everywhere else); G32 close checklist (`250e355`). docs/reviews/** is
-    default_ok — point-in-time records of the side that ran them.
-
-115. THE PORT-MACHINERY TRIO — J34 + J35 + J38, one branch, three commits
-    [STRUCTURE for your manifest copy]. J34: the overlay seam — your ONE-TIME
-    migration of the 89 company-only default_ok paths into
-    PORT-MANIFEST.company.yaml happens at THIS port (standing-divergence bullet
-    has the procedure). J35: this roll, the mandatory closing sequence (header)
-    and SHA-stamped citations (guardrail 8). J38: the RELAY section above the
-    tracker — read it at every port from now on.
-
-(Steps 116-121 are APPLIED at PORT-REPORT-6f03264 and collapse into **Last completed
-port** above. The live ledger restarts at 122, delta since `6f03264`.)
-
-122. J41 — THE OPENING SEQUENCE [TEST-PINNED] (`f32aadc` mechanism, `9a71479` docs).
-    The producer half J35 never had, and the three rules at the top of this file are
-    the payload: run the six checks before offering a base, port a `port-base-*` TAG
-    rather than `HEAD`, and name ONE OWNER PER PHASE. `drydocs.port_preflight` +
-    `scripts/port_preflight.py --base <last-ported> --tag` enforce it; the
-    ledger-coverage check mechanises the ROLL-PROCEDURE RULE.
-    **Nothing here is yours to run** — this is producer machinery, and the only part
-    that reaches you is the reconcile-port SKILL.md change: if the producer offers a
-    bare SHA or "HEAD" instead of a `port-base-*` tag, STOP and ask for the tag.
-    THE ONE CAUTION THAT WOULD COST YOU A REWORK: `tests/unit/test_module_boundary.py`
-    gains a new `port` component group. If your copy has diverged, take the GROUP with
-    the module or the classification guard fails on an unclassified `drydocs.port_preflight`.
-    Follow-up `c89cf9f`: the ledger-ROLL commit is ritual, found by running the check
-    against its own repo — the commit that writes the citations can never be among
-    them, so without the exemption the check never terminates.
-
-123. MARKDOWN FENCES — `docs/port-prompt.md` meant something other than what it said,
-    for five days [TEST-PINNED] (`40302a2`). The pasteable prompt is wrapped in a
-    ```` ```text ```` fence with a ```` ```powershell ```` example nested inside it,
-    BOTH three backticks — so the inner block's closer closed the OUTER one and 872
-    lines of guardrails, relays, tracker and ledger leaked out of the payload. Live
-    since `84ed7e3` (2026-08-05), through four ports. Nothing errored.
-    **The rule, and it is the whole fix: an outer fence must be LONGER than anything
-    nested inside it.** `tests/unit/test_markdown_fences.py` guards `docs/**` and is
-    the portable part — take it, then run it against YOUR docs tree, because the same
-    defect class is not producer-specific. A sweep of all 507 tracked `.md` files found
-    six; one more was ours (`docs/decisions/0002`, orphan trailing fence, fixed here).
-    The rest sit in captured transcripts and vendored skill packs and were inboxed
-    (Idea-103) rather than edited — fixing somebody else's capture to satisfy a guard
-    is a provenance call, not a formatting one. Same question applies on your side.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -1628,6 +1523,304 @@ port** above. The live ledger restarts at 122, delta since `6f03264`.)
     tag, never a bare SHA or HEAD. `d05811a` inboxes the two guard gaps this exposed
     (no guard asserts a PORT-MANIFEST path exists; the override-ordering check knows
     only four hardcoded rows), now groomed as J47.
+
+135. PORT MACHINERY — THREE GUARDS, A DOC, AND A MANIFEST ROW [TEST-PINNED]
+    (`3bb5982`+`fac3d12`, `928eca7`, `77f2ff8`, `3af009b`+`ce7857e`, `02e7896`).
+    `928eca7` is the one to take first: it asks J16's MIRROR question — which
+    manifest rows match NO path — and the unmatched row is the more dangerous half,
+    because it fails silently in the RIGHT-LOOKING direction. Its paths do not go
+    ungoverned; they fall through to whatever broader row catches them next, usually
+    generic `evaluate`, so a canonical-producer or never-port intent quietly degrades
+    to hand-merge with no error anywhere. That is exactly what happened to
+    `drydocs_core/controlm/**` for months (step 133). Run it against YOUR manifest
+    before Phase C, not after. `77f2ff8` adds the seventh preflight check — backticked
+    repo-relative paths in a NEWLY ADDED doc must resolve — and `3bb5982` makes a
+    stale `RECONCILE_BEFORE_DIR` fail by name instead of four FileNotFoundError
+    tracebacks that read as broken guards. `ce7857e` corrects the XML-test port doc:
+    it over-claimed canonical-producer, and only `xml_vocab.py` + `drydocs_remediation/**`
+    actually are — the rest fall to family `evaluate` defaults where a blind path
+    checkout is forbidden. Diff-first there.
+
+136. THE `caa0406` PORT REVIEW — RELAYS 7, 8 AND 9 [VERIFIED-PRODUCER]
+    (`ca7a121`, `9bee368`+`f015c7e`, `b5c03f1`, `2d60e5d`). All four are ABOUT YOUR
+    SIDE and cost you rework if skipped. RELAY-7: your `email-dl-contact-point` §G4
+    asks a question already answered — `5405ab6` removed `<DOMAIL>` with the shouts,
+    so the option that clause weighs no longer exists. Re-pose §G4; do NOT change the
+    canonical-company disposition, which was right. RELAY-8: the `pat` stub you hit
+    is a T23 re-key RESIDUE, not a load-order problem — reordering the load makes the
+    symptom go away and leaves the defect, because producer-side `pat_product_mapping.cypher`
+    MERGEs on the same neutral `app_id` key `seal_applications.cypher` uses, so no
+    stub can exist here at all. `f015c7e` strikes a company memory note that is
+    factually wrong. RELAY-9: the PAT alignment column is **`Relationship Type`**;
+    `Team Type Name` is a DECOY that matches `team_type` by name and carries the
+    team's discipline instead — column-name similarity picks the wrong one every
+    time. `2d60e5d` splits G59's lumped pair: `resource_pools_supplement` is LIVE and
+    company-only (must be in your chain or in CHAIN_EXCLUSIONS with a reason);
+    `platforms_supplement` is RETIRED (T12 supersede) and belongs in CHAIN_EXCLUSIONS.
+
+137. THE REMEDIATION xml_io EPIC — THE LARGEST BLOCK IN THIS RANGE [TEST-PINNED]
+    (`ad081e6` step 0 re-home, `0a4b0a3`, `e533fc2`, `3ebb66d`, `d40c9cb`, `be6b8f5`,
+    `bf37f49`, `339572e`, merge `6bf66fe`, then `3b9038b` DATA_CENTER). A lossless
+    byte-splicing Control-M XML reader with identity round-trip proven on a 10-fixture
+    hostile corpus, an EditScript with a three-layer self-check, and approved
+    change-set compilation with gate-bound fix tracking. TWO DEFECTS WERE FOUND AND
+    CLOSED INSIDE THE EPIC, and they are the part worth reading: A′, dangling rename
+    references (fixed by a reference sweep plus four whole-document post-conditions,
+    guard verified RED first), and B′, no-evidence-treated-as-proof (fixed by giving
+    `prove_equivalence` a THREE-VALUED verdict — equivalent / not-equivalent / cannot
+    tell — instead of letting silence read as pass). SEPARATION OF DUTIES IS
+    STRUCTURAL: C1 EMITS a change-set, a write-authorized loader APPLIES it; nothing
+    in xml_io writes a graph. `3b9038b` carries DATA_CENTER through model, locator and
+    anchors — the other half of a folder's identity, and a locator without it is
+    ambiguous across data centers. `drydocs_remediation/**` is canonical-producer.
+
+138. VOCABULARY RATIFICATION — TWO GATES SIGNED THE SAME DAY [GATE-AUTHORIZED]
+    (`b6b1423` draft, `26d7c39` sign-off 19/19 + 10/10, `496aa26` §A/§B, `35a1d2b`
+    §D2, `34a6dc0` fix-tracking consequences, merge `2daf8ba`). Guardrail 7 applies:
+    producer sign-off is not company sign-off, and your side runs its own gate. What
+    landed producer-side: the `scheduler` / `business_application` domain renames, the
+    `human` domain registered, an ID POLICY ruled (§B1), vocabulary hygiene at §D2,
+    and the fix-tracking artifact moved to RATIFIED. G87-G91 groomed as follow-ups.
+    IF YOU ADOPT THE DOMAIN RENAMES, adopt the id policy in the SAME change — the ids
+    encode the domain, so taking one without the other mints ids that no longer match
+    their fragment. `config/gate-log.md` is per-entry union as always.
+
+139. THE `DD1|` SENTINEL — Idea-105 EXITS ON A FOURTH OPTION [TEST-PINNED]
+    (`92d9296` the ruling + C34/G77, `3c4ef5d` G83+G84, `79020a7` format, `203d7bd`
+    the backlog close).
+    The 4000-char DESCRIPTION field had two claimants and three recorded exits, all
+    bad. The resolution PARTITIONS the field instead of choosing: a description
+    beginning `DD1|` is authored to the token standard; one that does not is the
+    generator's literal or legacy filler. E1 keeps its exact match UNCHANGED, the
+    parser never sees a generated object, and NOTHING ALREADY DEPLOYED MIGRATES.
+    It also retires the proposed GENERATED_BY token — absence of the tag already IS
+    the provenance signal. G83 then carries the C30 ruling into TOKEN_REGISTRY, which
+    still encoded the C29 capture and returned SEVEN FALSE FINDINGS on a conformant
+    description. Retired tokens are retired IN PLACE with the ruling named, never
+    deleted: the estate still carries them, and deleting an entry would reclassify
+    real data as a C16 annotation. Completeness is ERA-AWARE — an untagged legacy
+    description is held only to the C29 set it was authored to.
+
+140. G60 — PRECMD/POSTCMD FEED THE SAME G14 FILE-OP GRAMMAR AS CMD_LINE [TEST-PINNED]
+    (`91bbf7b`, close `85c9bfa`). The extractor's file-op pass read `CMD_LINE` only, while
+    the EMBEDDED_SHELL variables — PRECMD / POSTCMD, including the observed `POSCMD`
+    typo — carry the same shell text, and production uses them for exactly the
+    mv/backup forms the pass could not see. Same core parser, same endpoints, NO new
+    relationship types, and pre/post invocations deliberately NOT emitted: file-op
+    candidates only, inside G14's signed endpoints. Coverage keeps the two sources
+    apart (`prepost_*` counters) so the added yield is measurable, and unmatched jobs,
+    empty values and unparseable values are counted rather than dropped.
+
+141. G96 — THE CONTROL-M API-CALL FRAMEWORK [TEST-PINNED] (`4c0fc87`, backlog
+    `46f1466`/`9093e0b`/`bb9788b`). `drydocs_core/adapters/controlm` is the per-object
+    call surface YOUR deploy/pull `.sh` wrappers invoke: folder/job/variable/calendar
+    ops plus the in/out-condition seam, config-resolved in/out dirs off the data root.
+    THE SPLIT IS DELIBERATE AND IT IS YOURS TO COMPLETE — producer owns the framework,
+    the `.sh` and the filled config are company-side. Call shapes are CONFIG TEMPLATES
+    wherever the corpus lacks verified syntax, and the 9.0.21.300 availability
+    guardrail makes a templateless or no-corpus call **exit 3 as a REPORTED capability
+    gap** rather than fall back silently. Sample cfg is mechanism-only; a filled cfg
+    is never committed. 15 new tests.
+
+142. THE DATA-CATALOG STREAM — G43 REPORTS, G44 GATE PROMPT, THE `:Port` EDGE
+    [UNRULED] (`f4afd43` G43, `e7554f9`+`273eb87` G44, `7a59230`+`c3de648` the edge).
+    G43's four cross-check reports (`catalog_crosscheck.py`) are ALL READ-ONLY — no
+    graph writes, no edges — and share one shape worth copying: a row that cannot
+    participate in the join is held OUT of the set arithmetic and given its own
+    counted list, never folded into either side. Folding reports gaps that do not
+    exist; dropping hides real defects. G44 drafts the catalog ontology gate (7
+    sections, 24 confirmations) and renders OPEN, which is correct for an unsigned
+    page — clause A (one node or two: `DataAsset` vs `:Dataset`+`:Distribution`) is
+    written so neither reading wins silently, because every other clause inherits it.
+    `273eb87` is a self-catch: the first pass PRE-DECIDED a ruling signed nine days
+    earlier. The `:Port`→`:DistributionList` HAS_CONTACT_POINT edge is registered
+    `status: planned` and NOTHING LOADS FROM IT; the node class ships with the edge
+    deliberately, since declaring an edge whose label is unclassified is the exact gap
+    closed for ControlMApplication on 2026-07-09.
+
+143. G32 REOPENS DOWNWARD, AND THE FID JOIN IS THE NAME [UNRULED / VERIFIED-PRODUCER]
+    (`4d61395`, `0b67338` G32 §F, `c326584` K17, `77f53a9` Q6). The database COUNT
+    reopened downward to ONE on RETRIEVAL grounds — an agent that cannot see captured
+    context beside the structured graph in one vector search may not be able to answer
+    the question. That is NOT the argument ADR 0002 D1 weighed, and NOT the trigger
+    ADR 0011 was written for (0011 plans the fold for Enterprise becoming unavailable,
+    not for choosing it), so Q10 says amend 0011 with the real rationale rather than
+    let the record claim a trigger that never fired. §F rules the two trust axes.
+    THE FID HALF IS THE ACTIONABLE ONE: the join is `UPPER(EMP_LAST_NAME) =
+    UPPER(OWNER)` — the NAME on both sides, case-insensitive. `EMP_ID` is what the
+    crosswalk RESOLVES TO, never the join key, and the FID directory is a psgmgr
+    TABLE, not an external system. The ledger was the outlier: gate `rua-load-shapes`
+    A1 had already ruled run_as carries the linux tenant name while
+    `config/source-mappings/psgmgr.yaml` went on calling OWNER a "Functional ID" —
+    two records, one repo, opposite claims. Corrected here.
+
+144. G16 AMENDED, G35 RESIDUALS CLOSED, AND THE ROLE CATALOG EXPORTED
+    [GATE-AUTHORIZED] (`770d1cc`, `f71bfb6`, `2f9da55`, `7c96a31`). G16 moves REQUIRED
+    → **OPTIONAL and DERIVED** for SRE, and the reason is structural rather than a
+    preference: THE CARDINALITY IS INVERTED from every other line in the register.
+    Each of the others is a per-application holding; an SRE team covers 20-60
+    APPLICATIONS. It is a shared function pointing at many apps, not an accountability
+    held by one, so section B's required/optional split does not apply cleanly. The
+    original ruling stays readable and the amendment states what changed — no other
+    register line moves. `f71bfb6` closes the G35 residuals (G16 stands as amended,
+    G5 closed, revisit trigger recorded). The catalog export is 83 rows, NOT the
+    "100+" the sign-off carried from an estimate, and it names which roles come from
+    SEAL in its own description text. `2f9da55` corrects a producer belief: the naming
+    convention IS parsed company-side; the SRE branch is the part that is missing.
+
+145. THE LOAD-SURFACE RENAME — ADR 0012 AND THE `generic-naming` EPIC [UNRULED]
+    (`5bd0ab6` G78-G80 + GN1/GN2, `68c8204` ADR 0012, `c7ee73c` narrows G78).
+    READ THIS BEFORE IT REACHES CODE, because the verbs are a PUBLIC CONTRACT your
+    crons and the `run-drydocs` skill call ACROSS THE REPO BOUNDARY — a rename lands
+    on you as breakage, not as a refactor. The motivation is the SME's: company jargon
+    (`seal`, `pat`, `m1`/`m3`) entered a repo meant to be generic from the start, which
+    is the standalone-generalization goal rather than cosmetics. The model separates
+    three axes collapsed into one `LoadStep` today — the command names the SUBJECT,
+    the registry entry carries CADENCE and ACQUISITION, and a profile is DERIVED by
+    filtering cadence. Three bands (prepare / load / verify) and only `load` is
+    source-keyed. `m1-verify`/`m3-verify` rename with the rest, not exempted for being
+    internal. Nothing is renamed yet — GN1 is the ADR, GN2 the execution.
+
+146. THE PAT `team_type` COLUMN PIN — AND A REVERT WORTH READING [VERIFIED-PRODUCER]
+    (`f6b4285`, `58b8d3c` revert, `2f33e5c` the pin). The pin is RELAY-9's other half:
+    the source column behind `team_type` is `Relationship Type`. The revert is the
+    instructive part. A folder-name pattern was scrubbed from a header as a suspected
+    publish-boundary leak; the SME ruled `PRARAG-HLDM` an AUTHORED FIXTURE NAME, so
+    the scrub was unnecessary and the ~36-file sweep was never run. It was REVERTED
+    rather than left in place because the half-applied state — a placeholder in the
+    prose while `config/taxonomy/controlm.yaml` carried the literal two directories
+    away — is worse than either end state: it reads as though someone found a leak and
+    fixed one instance. Applies to your side too if you carry fixture families.
+
+147. TWO BACKLOG RULINGS THAT CONTRADICT LIVE LOADERS — G74, G82 [UNRULED]
+    (`417cb4e`, `c7278a5`). G74 gains the `:Employee` CREATION-POLICY clause because
+    the runbook forbids exactly what the loader does: "spine-and-enrich" says
+    `:Employee` is created ONLY by `load-employee-roster`, with SEAL attaching
+    enrich-only via OPTIONAL MATCH — "a SID not in the roster gets no edge, never a
+    stub" — while `seal_applications.cypher` MERGEs `:Employee` placeholders for the
+    owner, CTO and info-owner SIDs. Both surfaces are published; one of them is wrong,
+    and the gate decides which. G82 records that THE LOADER IS NOT THE INCOMPLETE
+    PART: `DevTeamsLoader` and `PatProductMappingLoader` both exist, wired, registered
+    and sample-tested — the missing piece is the PAT team-report PROJECTION, so the
+    dev-team load has never run on real data. Check whether that is also true your side.
+
+148. J13 DONE — THE PUBLISH CEILING'S FOUR VALUE CLASSES RULED [TEST-PINNED]
+    (`18d4eb5`). SME ruling: position 1 of a Control-M data-center name is the
+    ENVIRONMENT letter, so the publishable tree now carries a non-production letter —
+    no published example names a live production object, while the grammar the
+    standards page exists to teach is untouched. Swept across 19 tracked files outside
+    `internal/`; real values moved to `internal/standards/technology/data-center-inventory.md`.
+    THE FINDING THAT MATTERS: A FIFTH DATA CENTER WAS FOUND BY THE NEW GUARD, NOT BY
+    THE SWEEP — J13 named four, the standards page inventoried four, and a `P045` sat
+    in a test fixture and the web demo data. A token-list sweep could not have caught
+    it; only the SHAPE scan did. Third instance of the J15 lesson: enumerate the
+    SHAPE, never the values. Scan E in `test_publish_boundary_values.py` enforces it.
+
+149. THE `--run-as` BIND-VALUE FIX — A SILENT ZERO-ROW ANSWER [TEST-PINNED]
+    (`887a0e7`). `CM_DEF_VJOB.OWNER` is stored ALL UPPER in psgmgr while the
+    directory's `EMP_LAST_NAME` is mixed case. Three SQL files bind `J.OWNER =
+    :run_as` as an exact match, so a lower-case `--run-as` returned ZERO ROWS and read
+    as "that account runs no jobs" — a silent wrong answer, not an error. THE FIX GOES
+    ON THE BIND VALUE, NOT THE COLUMN: `_scope_binds()` upper-cases `run_as` and the
+    column stays bare on purpose, because it is already upper at rest and `UPPER(J.OWNER)`
+    would be a no-op costing the b-tree index on a ~240k-row table. `None` survives as
+    `None` — `"".upper()` would turn a missing filter into an empty-string match.
+
+150. THE WORKTREE RENDER LEAK + THE J48 ANCHOR SWEEP [TEST-PINNED] (`ced651f`,
+    `841dc6e`, `f9ef847`, `dd8d843` the close — worktrees and branches pruned under
+    a user ruling). `drydocs` is installed editable with a `.pth` pinned at the
+    MAIN tree, so a module anchoring default paths on `Path(__file__)` names the main
+    tree from anywhere — a render run inside a worktree wrote into main. What made it
+    silent is that the damage was PARTIAL: `render_board.py` invokes five sibling
+    scripts by bare name and those resolved correctly out of the worktree, so only
+    three HTML files routed wrong. J48 then swept all 27 repo-root anchors and RULED
+    each one: 24 now resolve through `drydocs_core.repo_paths.repo_root()`, and the 3
+    left as written are recorded AT THE SITE, because skipping a site is not a
+    disposition. Relevant to you if you run agents in worktrees or forks.
+
+151. LINE ENDINGS — THE RENDERERS WROTE CRLF AND BURIED THE STALE-RENDER SIGNAL
+    [TEST-PINNED] (`7d885c9` the raise, `fcc8afa` .editorconfig, `b348b0c`
+    .gitattributes, `ffca823`, `d0b2a93` the fix). All 11 `write_text(` sites producing a COMMITTED render
+    surface now pass `newline="\n"`. WHY IT IS NOT COSMETIC: Python text mode emits
+    `\r\n` on Windows, so every render rewrote its output as CRLF while the index held
+    LF, and git normalized it straight back on commit — no blob ever changed, so
+    nothing flagged it. The cost landed in the two places that read worktree state.
+    The session ritual's stale-render check reported **25 changed files when 0 had
+    changed**, and `snapshot.ps1` renders BEFORE it scans, so a snapshot recorded
+    `meta.git.dirty: true` against a clean tree — the field that answers "does this
+    header describe the code that was measured?" answering wrongly. Verified by
+    re-rendering everything and getting a clean tree: 25 → 0. If your renders run on
+    Windows, you have this defect too; the `.editorconfig`/`.gitattributes` pair is
+    accumulate-and-union in the manifest (`02e7896`), not a wholesale take.
+
+152. LINT TO ZERO, AND CI CHECKED BEFORE THE SNAPSHOT [TEST-PINNED] (`b7064bf`
+    RUF100, `929b5d3` I001, `0a52b6d`, `c981964`, `d9b2b31`). Both CI ruff gates exit 0 for the first time since
+    2026-08-05 — **100+ consecutive failing runs**, on exactly those two steps, while
+    everything else stayed green and the unit suite passed the whole time, so nothing
+    LOCAL ever looked wrong. 35 findings and 31 unformatted files to zero, FIXED not
+    ignored (including six N818 exception renames across 54 references, each verified
+    standalone first). `d9b2b31` is the process half: the session ritual now checks CI
+    on HEAD's own sha before the snapshot runs, warn-only, because the failure being
+    fixed is nobody LOOKING. Worth adopting whatever your lint posture is — the
+    mechanism is "green at what you just pushed", not "green at somebody's older commit".
+
+153. `MODULE_MAP.md` NAMED AS THE PHYSICAL PLACEMENT AUTHORITY [docs] (`5c7cb88`).
+    CLAUDE.md routed file placement by the four conceptual layers and never mentioned
+    the physical map, so agents answered "where does this file go" from the wrong
+    document. One-paragraph fix, but it is the routing brain — if your CLAUDE.md
+    forked from this one before 08-12, it likely carries the same gap.
+
+154. DOCS, GATE RECORDS AND WIP SURFACES [default_ok] (`d9a2eac`+`429d829`+`e774127`+
+    `b268cd3` the Claude Design UI prompt, `63050fa` the swimlane wireframe,
+    `14a702e` the rua copy-path contract, `317261c` docmeta P4 revision, `70bdef4`
+    G62 RECORD). Take or skip freely; none of it binds. Two are worth a look. The UI
+    prompt was RECLASSIFIED as a dated record rather than edited, because a doc branch
+    idle since 07-21 merged textually clean while still listing two brand marks main
+    had deleted as rejected — that near-miss is what motivated the `77f2ff8` preflight
+    check in step 135. `14a702e` is comment-only but closes a real gap: the rua
+    mirror-layout contract existed as a single derived expression with nothing at the
+    other end pointing back, so each half now names the other and says a layout change
+    breaks G21/G24. G62 §A opened and identified bundle 1; §B runs COMPANY-SIDE.
+
+155. THE GITNEXUS EVALUATION — VERDICT: DO NOT ADOPT [default_ok] (`dc0bdb0`,
+    `be64c85`, `9e83379`). An `/architecture` comparison of GitNexus against the
+    depgraph sibling + snapshot ritual, then an actual producer-side TRIAL. Honest
+    framing: different tools sharing a noun — symbol-grain agent dev-tooling vs
+    file-grain drift plus Control-M-seeded lineage under offline/stdlib constraints.
+    THE DECISIVE FINDING is a governance lesson, not a tooling one: its method-grain
+    impact claimed **epistemic `exact`** with `impactedCount=1` while missing
+    receiver-annotated production call sites that plain grep finds. The concept worth
+    keeping is the opposite of the verdict — label answers `exact` vs `lower-bound`,
+    and make our own census honest where that one was not (Idea-124, unaffected by the
+    rejection). Non-adoptions recorded explicitly: LadybugDB, community mining,
+    symbol-grain estate parsing.
+
+156. THE ROADMAP-ROW RETIREMENT — AND A DUPLICATE-COMMIT NOTE [TEST-PINNED]
+    (`63551c8`). `test_real_roadmap_cites_only_live_inbox_ideas` was RED on producer
+    `main` from 08-14 to 08-17: Idea-23 and Idea-47 had been groomed into backlog
+    items, so their `roadmap.yaml` estimate rows no longer pointed at a live inbox
+    entry. Rows retired, `roadmap.html` re-rendered, CI green at this sha. ONE THING
+    TO KNOW IF YOU CUT A RANGE THAT SPANS IT: an IDENTICAL fix was committed
+    independently on the producer's other machine and is still unpushed at this
+    writing, so a later producer push may add a duplicate/empty commit making the same
+    two deletions. It is benign — same bytes, merges clean or drops as empty — but do
+    not read it as a second change.
+
+157. IDEA-INBOX COMMITS — NOTHING TO APPLY, TWO THINGS TO KNOW [default_ok]
+    (`cae542d` Idea-117..120, `4676a53` Idea-112/113/114, `9718f04` Idea-115,
+    `4e99b87` Idea-117/118 UI examples, `6cdf3c8` a depgraph snapshot). These are
+    `IDEAS.md` inbox appends and one snapshot, and they are HERE ONLY BECAUSE THE
+    RITUAL EXEMPTION IS DELIBERATELY NARROW — it matches `chore(backlog): groom|claim`,
+    `chore(depgraph): snapshot`, `chore(render|board):` and the roll itself, on the
+    SUBJECT, so a substantive commit can never hide behind a prefix. `chore(ideas):`
+    is not on that list and `6cdf3c8` used `chore(snapshot):` rather than the matched
+    `chore(depgraph): snapshot`, so all five surfaced as uncited. Saying so is cheaper
+    than leaving you to check. TWO ARE WORTH READING even though nothing ships:
+    Idea-117..120 came out of a tech-debt audit and include **two graph-instrument
+    bugs**, and Idea-112 records that `%%var` resolution has to happen BEFORE the G14
+    parse — a sequencing constraint, not a wish. The SME-supplied UI examples in
+    `4e99b87` are references only; their images and transcriptions are machine-local
+    and deliberately never tracked.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
