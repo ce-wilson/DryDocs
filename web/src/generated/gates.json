@@ -1144,6 +1144,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-17",
+      "title": "RECORD: the corporate backbone, three partial rulings (G98; gate `corporate-backbone-vocabulary`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/corporate-backbone-vocabulary.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3134",
+      "unblocks": [
+        "G98"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1174,7 +1187,7 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "corporate-backbone-vocabulary (gate page rendered — session not yet run)",
+      "title": "corporate-backbone-vocabulary (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/corporate-backbone-vocabulary.yaml"

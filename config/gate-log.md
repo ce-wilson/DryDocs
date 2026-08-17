@@ -3129,3 +3129,49 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   run the A2 meta.txt sweep, then §B — the G20 extractor over the full population
   in staging, zero graph writes — and bring the §B counters back to the page for
   the §C rulings. G62 stays `in_progress` under the awaiting-HITL convention.
+
+
+## 2026-08-17 — RECORD: the corporate backbone, three partial rulings (G98; gate `corporate-backbone-vocabulary`, still UNSIGNED)
+
+- **Why a RECORD and not a sign-off.** The G98 session opened 2026-08-17 (laptop) and
+  ruled three clauses of eighteen before pausing. The gate is not signed and nothing is
+  registered: `:Company`, `HAS_BUSINESS_SEGMENT` and `HAS_BUSINESS_SEGMENT_HISTORICAL`
+  remain absent from the relationship vocabulary. Same convention as G22/G35 — a
+  confirmed clause inside an unsigned gate has no home in a log organised by sign-off,
+  so it is written here in the same commit as the page edit or it exists only in a YAML
+  file nobody re-reads.
+- **C1 — the `:Company` label is RIGHT and STAYS (SME).** A company is a real
+  ontological class; the fact that this deployment holds ONE instance is a property of
+  the deployment, not of the model, and another deployment seeds its own. The two
+  readings offered against it were declined: (b) drop the label and hang segments off an
+  existing org class, and (c) keep the class but move the instance out. This unblocks
+  clause A — the label is registrable — and moots nothing else.
+- **C2 — "JPMC" stays SEED DATA in `ontology.cypher` (SME).** Not config-resolved. The
+  cost is stated rather than hidden: `ontology.cypher` is canonical-producer and ports
+  wholesale, so a consuming deployment inherits this company's name in its schema
+  bootstrap until it edits the file, and that sits against ADR 0012's
+  standalone-generalization goal. Ruled the simpler way deliberately — **clause C3 is
+  therefore MOOT**: there is no seed change, so nothing to ledger as a bootstrap
+  behaviour change.
+- **A5 — the short name STAYS the uniqueness key (SME).** `name:'JPMC'` remains the key
+  and `constraints.cypher:29` is untouched, so nothing migrates and the four
+  `.claude/skills/data-context-extractor/` files' `{name:'JPMC'}` queries keep working.
+  The two alternatives were declined: adding `short_name`/`common_name`/`legal_name`
+  alongside the existing key, and re-keying onto a neutral identifier.
+- **What A5 leaves open, recorded because the session raised it and then ruled the
+  minimal way.** The clause exists because the SME supplied the fact at the walk:
+  **"JPMC is the short name of the company JP Morgan Chase."** So the identity property
+  holds an ABBREVIATION, `legal_name` holds "JPMorgan Chase & Co.", and the common name
+  the abbreviation stands for is **in this record and nowhere in the graph** — A5(ii),
+  whether a property carries it, was not taken up. That is a deliberate minimal ruling,
+  not an oversight, but it means the SKOS prefLabel/altLabel distinction W3C ORG
+  inherits is unmodelled here. A6 stands as written: an abbreviation is the least stable
+  of the three strings and the one that changes on a rebrand, so if this is revisited it
+  will be revisited as a re-key.
+- **Still open (15 clauses):** A1 (which org class — `org:FormalOrganization` per the
+  registered `:BusinessSegment` sibling, or `org:Organization`), A2, A3, A6, all of B
+  (one edge type discriminated by `effective_to`, or the two types the M0 seed wrote by
+  accident; plus which per-domain fragment houses them), C4, all of D (the endpoint
+  cross-check guard, explicitly SEPARABLE and not sequenced behind this page), and E
+  (the External-PUBLIC recording). G98 stays `in_progress` under the awaiting-HITL
+  convention.
