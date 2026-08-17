@@ -58,11 +58,6 @@ modules:
         note: Control-M compact-timestamp normalization (mechanism from the company
           XML-loader's second timestamp bug); lands when an extractor consumes a
           temporal field.
-      - id: Idea-23
-        estimate: M
-        note: m7_uses_artifact build follow-up — registered planned at the
-          cmdline-nfr-vetting gate; builds when the writer-endpoint work makes the
-          edge computable.
 
   - module: drydocs-review
     stage: steady
@@ -280,10 +275,6 @@ modules:
       Server and DataCenter shapes, geography grain, the Control-M node join
       rule). Throughput here is gate sessions, not build sessions.
     ideas:
-      - id: Idea-47
-        estimate: M
-        note: Join loaders to the Cypher they execute — a new edge type, parked on
-          the code-graph gate's H5 clause.
       - id: Idea-37
         estimate: M
         note: Supplement shape C, the registration-vs-instance-seed re-slice —
