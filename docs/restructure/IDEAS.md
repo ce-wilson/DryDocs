@@ -175,40 +175,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   GitNexus doctrine: an empty result set is not evidence of absence when the causes
   say the walk couldn't see. Ontology-cheap — a property on responses, not the graph.
 
-- **`Idea-123`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
-  **Web UI example output: the "Ask the knowledge graph" file-name search report.**
-  SME supplied a real captured example (screenshot machine-local at
-  `internal-local/ui-examples/dd-ui-wip-user-query-for-file-name-result.png`,
-  transcribed — real SEAL ids/hosts/repo URLs — at
-  `internal-local/ui-examples/dd-ui-ask-graph-file-search-transcription-20260813.md`).
-  The use case: user searches a FILE NAME (or table) to find the business
-  application and process associated with it; the result points to a
-  file-transfer process fed by an event-based application, and the generated
-  "report" shows the code repos and development teams for BOTH processes so
-  support can escalate. Mechanism: a shortest-path traversal from an
-  Application anchor filtered on a fileName property (~22-node result spanning
-  application / product / dev-team / scheduler folder+job / file-transfer
-  route / pipeline / repo labels), plus a source→node-label legend table the
-  report view would carry. This is the concrete output target for the Ask
-  route — pairs with the Idea-116 swimlane view (same job→pipeline→asset
-  chain, report form instead of diagram form).
-
-- **`Idea-122`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
-  **Web UI example view: the product roll-up flow — which area a job/folder
-  supports and how it rolls up through the product catalog.** SME supplied a
-  rendered mermaid example (screenshot machine-local at
-  `internal-local/ui-examples/dd-ui-wip-user-view-product-mermaid.png`,
-  transcribed — real org-taxonomy values — at
-  `internal-local/ui-examples/dd-ui-product-rollup-mermaid-transcription-20260813.md`).
-  The view: folder token = PAT AreaProduct, rolling up AreaProduct → Product →
-  ProductLine → LOB, with the TWO roll-up shapes side by side — framework
-  applications (no direct SEAL; the AreaProduct token is the join) vs app-tied
-  applications (carry SEAL; the Control-M sub-application is the join) — the
-  folder-name grammar as the leaf, data classification beneath, and a dotted
-  cross-branch "aligns to platform" edge. Candidate UI shape: a mermaid/MiniDag
-  flow on the product page; ties to the PRAOCG folder grammar and the G94
-  standard-selection decision tree.
-
 - **`Idea-121`** · 2026-08-13 · `[bug]` · **open** · prio? **Med** —
   **RENDER HALF FIXED 2026-08-13; the remaining writers stay open, so this entry stays
   open too.** all 11 `write_text(` sites in
@@ -281,23 +247,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `IMPORTS` edge count). Append-only and cheap, and it turns every future `/tech-debt`
   run into a diff instead of a re-derivation. U12 stays intact — a metrics ledger is
   not a retained snapshot. Pairs with Idea-119, whose +2 this would have explained.
-
-- **`Idea-116`** · 2026-08-13 · `[idea]` · **open** · prio? **Med** —
-  **Web UI: a swimlane data-flow layout for the lineage module — lanes Control-M |
-  Data Layer | File Server / Database.** Captured from SME chat while testing the
-  wireframe feedback loop (recorded as `FB-2026-08-13-01` in
-  `UI-WIP/wireframes/wireframes.json`); the idea traces to the user's original Full
-  Circle Docs document-portal concept, §7 Business Flow Diagrams (transcribed
-  machine-local at `internal-local/fullcircle-docs-scan-20260813.md`). The wireframe
-  half is DONE at capture time: `UI-WIP/wireframes/out/dataflow.svg` (keys
-  WF-DFL-01..17; the renderer gained `lane` + `arrow` primitives, spec v2). What
-  remains is the React build: a swimlane layout for `/lineage` (proposed
-  `lineage/SwimlaneView.tsx`) rendering job → pipeline → asset per data series —
-  FW job "detected by" join, launcher→pipeline token join (G15 contract),
-  condition edges per the BMC baseline — with READS/WRITES rendered dashed while
-  `m3_reads_from`/`m3_writes_to` stay `status: planned` (no gate is skipped by
-  drawing them). Wireframe-first is the point: SME feedback cites WF-DFL keys
-  before any component exists.
 
 - **`Idea-115`** · 2026-08-12 · `[chore]` · **open** · prio? **Med** —
   **The rua bundle's script-copy path is a CONVENTION the extractor re-derives, not a
@@ -1939,6 +1888,59 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-17 (desktop, targeted — the UI / UI-WIP inbox entries only, per the run's focus: console work that does not touch what other sessions hold)** — the three entries the 2026-08-13 groom explicitly left for a console-epic run ("UI-view work and belong with the console epic") are that run's whole scope, and all three promoted. **Promoted 3: `Idea-116` → `O60`, `Idea-122` → `O61`, `Idea-123` → `O62`** (all p2 task, `drydocs-web`, phase 12, epic web-console, sonnet) — all three dependency-free, so all three enter `next_ready` on arrival. **Inboxed 0, merged 0, parked-as-question 0, closed 0.** Verified against the tree at the groom rather than taken from the entries: `web/src/lineage/` + `routes/LineageRoute.tsx` exist (O60's landing), `UI-WIP/wireframes/wireframes.json` carries WF-DFL-01..17 + the `FB-2026-08-13-01` feedback record and `out/dataflow.svg` is present, `web/src/ownership/` + `MiniDag.tsx` exist and the module registry's own tagline for /ownership is "SEAL → PAT → team rollup" — the exact chain Idea-122 draws (O61's landing), and `web/src/ask/` + `routes/AskRoute.tsx` + `drydocs_api/query_specs.py` exist (O62's landing). **The O60/O62 pairing is kept explicit in both items** — one job → pipeline → asset chain, swimlane form vs report form. **Nothing here decides an ontology question, and two caveats are written into acceptances rather than left in this file:** O60 renders READS/WRITES dashed-and-labelled-planned for as long as `m3_reads_from`/`m3_writes_to` stay `status: planned` (drawing skips no gate), and O61's dotted "aligns to platform" cross-branch edge renders as a visually distinct annotation because no confirmed graph relationship backs it. **The sensitivity boundary is in every acceptance:** all three SME-supplied examples live machine-local under `internal-local/` with real SEAL ids/hosts/org values; the committed fixtures are SYNTHESIZED twins of shape only. Ties recorded as ties, not dependencies: O61 ↔ G94 (renders the roll-up, does not consume the selector), O62 ↔ Idea-125 (whether the report also becomes an Ask-agent named-verb answer stays open in the inbox). No existing item's status, id, or text was touched — additive only, by the run's own no-impact constraint.
+
+- **`Idea-123`** · 2026-08-13 · `[idea]` · **groomed → O62 (2026-08-17)** · prio? **Med** —
+  **Web UI example output: the "Ask the knowledge graph" file-name search report.**
+  SME supplied a real captured example (screenshot machine-local at
+  `internal-local/ui-examples/dd-ui-wip-user-query-for-file-name-result.png`,
+  transcribed — real SEAL ids/hosts/repo URLs — at
+  `internal-local/ui-examples/dd-ui-ask-graph-file-search-transcription-20260813.md`).
+  The use case: user searches a FILE NAME (or table) to find the business
+  application and process associated with it; the result points to a
+  file-transfer process fed by an event-based application, and the generated
+  "report" shows the code repos and development teams for BOTH processes so
+  support can escalate. Mechanism: a shortest-path traversal from an
+  Application anchor filtered on a fileName property (~22-node result spanning
+  application / product / dev-team / scheduler folder+job / file-transfer
+  route / pipeline / repo labels), plus a source→node-label legend table the
+  report view would carry. This is the concrete output target for the Ask
+  route — pairs with the Idea-116 swimlane view (same job→pipeline→asset
+  chain, report form instead of diagram form).
+
+- **`Idea-122`** · 2026-08-13 · `[idea]` · **groomed → O61 (2026-08-17)** · prio? **Med** —
+  **Web UI example view: the product roll-up flow — which area a job/folder
+  supports and how it rolls up through the product catalog.** SME supplied a
+  rendered mermaid example (screenshot machine-local at
+  `internal-local/ui-examples/dd-ui-wip-user-view-product-mermaid.png`,
+  transcribed — real org-taxonomy values — at
+  `internal-local/ui-examples/dd-ui-product-rollup-mermaid-transcription-20260813.md`).
+  The view: folder token = PAT AreaProduct, rolling up AreaProduct → Product →
+  ProductLine → LOB, with the TWO roll-up shapes side by side — framework
+  applications (no direct SEAL; the AreaProduct token is the join) vs app-tied
+  applications (carry SEAL; the Control-M sub-application is the join) — the
+  folder-name grammar as the leaf, data classification beneath, and a dotted
+  cross-branch "aligns to platform" edge. Candidate UI shape: a mermaid/MiniDag
+  flow on the product page; ties to the PRAOCG folder grammar and the G94
+  standard-selection decision tree.
+
+- **`Idea-116`** · 2026-08-13 · `[idea]` · **groomed → O60 (2026-08-17)** · prio? **Med** —
+  **Web UI: a swimlane data-flow layout for the lineage module — lanes Control-M |
+  Data Layer | File Server / Database.** Captured from SME chat while testing the
+  wireframe feedback loop (recorded as `FB-2026-08-13-01` in
+  `UI-WIP/wireframes/wireframes.json`); the idea traces to the user's original Full
+  Circle Docs document-portal concept, §7 Business Flow Diagrams (transcribed
+  machine-local at `internal-local/fullcircle-docs-scan-20260813.md`). The wireframe
+  half is DONE at capture time: `UI-WIP/wireframes/out/dataflow.svg` (keys
+  WF-DFL-01..17; the renderer gained `lane` + `arrow` primitives, spec v2). What
+  remains is the React build: a swimlane layout for `/lineage` (proposed
+  `lineage/SwimlaneView.tsx`) rendering job → pipeline → asset per data series —
+  FW job "detected by" join, launcher→pipeline token join (G15 contract),
+  condition edges per the BMC baseline — with READS/WRITES rendered dashed while
+  `m3_reads_from`/`m3_writes_to` stay `status: planned` (no gate is skipped by
+  drawing them). Wireframe-first is the point: SME feedback cites WF-DFL keys
+  before any component exists.
 
 - **GROOM 2026-08-14 (desktop, targeted — `Idea-128` only)** — closed `Idea-128` as **evaluated**: the producer-side GitNexus trial it proposed RAN on 2026-08-14 (desktop) and the entry's own body carries the full verdict, so the groom's whole job was the disposition. Mechanics all passed (clean global install, Windows worker pool fine, ~30s index of the DryDocs repo, working tree untouched so the publish boundary held, `.gitnexus/` a local cache) — but method-grain impact returned `epistemic: "exact"` while missing real receiver-annotated production call sites that plain grep finds, and a tool whose `exact` can be false cannot gate edits; **verdict: do NOT adopt as edit discipline.** **Promoted 0, inboxed 0, merged 0, closed 1.** No backlog item minted — module-boundary tests + grep remain the edit discipline on this codebase, and the entry's cleanup residue (disposable `.gitnexus/` caches, optional `npm uninstall -g gitnexus`) is delete-at-will hygiene, not an item. `Idea-124` (epistemic labeling as a CONCEPT) is explicitly unaffected by this close and stays open — ours must census its blind spots better than this implementation did. `backlog.yaml` is untouched, so `summary:` and `next_ready:` are unchanged by construction; the validator was still run. Nothing here decides an ontology question — the trial never touched the estate graph.
 
