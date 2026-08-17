@@ -19,9 +19,11 @@ re-render", committed on `main` and unpushed.
 
 **It is already handled — do not redo it and do not worry about the collision.**
 The identical fix was made on the laptop and pushed as `63551c8`. Same two row
-deletions, same re-render, byte-identical. When the desktop's push finally lands it
-will merge clean or drop as an empty duplicate. **Ledger step 156 records this** so a
-future range cut does not read the duplicate as a second change.
+deletions, same re-render, byte-identical. When the desktop's push finally lands:
+**pull-and-merge leaves an ordinary duplicate commit** making the same two deletions
+(harmless, but it IS a second commit); **`git pull --rebase` drops it as empty**.
+Prefer the rebase. **Ledger step 156 records this** so a future range cut does not
+read the duplicate as a second change.
 
 **The one thing a desktop session must NOT do when it comes back:** draft the ledger
 roll. That offer is superseded — the roll is done and pushed (§2). Pull first.
