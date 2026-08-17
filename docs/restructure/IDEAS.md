@@ -76,7 +76,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   External candidate for that slot, and it is gate-bound like the rest of P4.
   **Three facts that change the work, all in the registry entry:** (1) it is
   `confirmed: false`, which is the flag N9 says a future loader gates on; (2) its
-  current shape is `:DataAsset` slices, **NOT** the lexical `Document→Chunk` spine —
+  current shape is `:DataAsset` slices, **NOT** the lexical `Document→Chunk` shape —
   reshaping is the P4+ decision, not a load; (3) **the ingest path is gone** —
   `scripts/ingest_jpmc_reports.py` was REMOVED 2026-07-22 (recover via git history)
   and the two PDFs were never committed (root `/*.pdf` gitignore precedent), so
@@ -88,7 +88,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-131`** · 2026-08-17 · `[bug]` · **open** · prio? **Med** —
   **`:Company` and both `HAS_BUSINESS_SEGMENT*` edges execute but were NEVER
   registered in the relationship vocabulary — and no guard can see it.** The
-  corporate spine `(:Company {name:"JPMC"})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment)`
+  corporate backbone `(:Company {name:"JPMC"})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment)`
   is MERGEd by `drydocs_core/schema/ontology.cypher:205-232`, constrained by
   `constraints.cypher:29` (`company_name` uniqueness), documented as *the* corporate
   hierarchy across four `.claude/skills/data-context-extractor/` files, and live in the
@@ -105,7 +105,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `from_node`/`to_node` against the registered label set**, so a wholly absent endpoint
   raises no guard. `RECONCILES_TO` passes only because its endpoint happens to be
   registered. That endpoint cross-check is a cheap guard and is the part worth building
-  first; it generalizes past this one spine. This is the exact shape closed for
+  first; it generalizes past this one backbone. This is the exact shape closed for
   `ControlMApplication` (2026-07-09) and deliberately avoided for the `:Port` →
   `:DistributionList` edge, where the node class shipped WITH the edge for this reason.
   **Registering the label + two edges is gate territory** per `docs/RELATIONSHIP_GUIDE.md`

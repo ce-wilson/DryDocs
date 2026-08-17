@@ -1174,10 +1174,10 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "corporate-spine-vocabulary (gate page rendered — session not yet run)",
+      "title": "corporate-backbone-vocabulary (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
-        "config/gate-prompts/corporate-spine-vocabulary.yaml"
+        "config/gate-prompts/corporate-backbone-vocabulary.yaml"
       ],
       "log_ref": null,
       "unblocks": [

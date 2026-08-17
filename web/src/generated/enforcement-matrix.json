@@ -346,7 +346,7 @@
         "config/gate-prompts/controlm-avg-run-supplement.yaml",
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",
-        "config/gate-prompts/corporate-spine-vocabulary.yaml",
+        "config/gate-prompts/corporate-backbone-vocabulary.yaml",
         "config/gate-prompts/doc-traceability-feedback.yaml",
         "config/gate-prompts/document-content-topology.yaml",
         "config/gate-prompts/dpl-dataset-registry-contract.yaml",
