@@ -62,6 +62,55 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-130`** · 2026-08-17 · `[idea]` · **open** · prio? **Med** —
+  **`jpmc-reports` is an External-PUBLIC corpus, so it is the safest first docmeta
+  ingestion — SME direction 2026-08-17.** The annual-report / 10-K MD&A source is
+  already registered and classified: `config/doc-source-registry.yaml#jpmc-reports`,
+  `classification: External` ("public SEC filings / investor-relations PDFs"),
+  `source_url` present, `trust_default: VERBATIM`. **Why it is a good candidate
+  specifically:** an External corpus carries no publish-boundary risk, so the P4 load
+  path can be exercised end-to-end — chunker, embeddings, trust provenance, the
+  `:Uncertain` routing — without any of the redaction care an Internal corpus forces.
+  The P4 revision (`knowledge/upgrade-plans/docmeta-p4-revision-single-db.md`)
+  currently names only the BMC corpus for the end-to-end local load; this is a second
+  External candidate for that slot, and it is gate-bound like the rest of P4.
+  **Three facts that change the work, all in the registry entry:** (1) it is
+  `confirmed: false`, which is the flag N9 says a future loader gates on; (2) its
+  current shape is `:DataAsset` slices, **NOT** the lexical `Document→Chunk` spine —
+  reshaping is the P4+ decision, not a load; (3) **the ingest path is gone** —
+  `scripts/ingest_jpmc_reports.py` was REMOVED 2026-07-22 (recover via git history)
+  and the two PDFs were never committed (root `/*.pdf` gitignore precedent), so
+  "publishable" describes the DATA, not a runnable pipeline. Re-running it means
+  re-fetching the PDFs and writing a loader against the current module shape.
+  Related: this corpus seeded the effective-dated `Company`/`BusinessSegment` context
+  whose vocabulary registration is the gap in [[Idea-131]].
+
+- **`Idea-131`** · 2026-08-17 · `[bug]` · **open** · prio? **Med** —
+  **`:Company` and both `HAS_BUSINESS_SEGMENT*` edges execute but were NEVER
+  registered in the relationship vocabulary — and no guard can see it.** The
+  corporate spine `(:Company {name:"JPMC"})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment)`
+  is MERGEd by `drydocs_core/schema/ontology.cypher:205-232`, constrained by
+  `constraints.cypher:29` (`company_name` uniqueness), documented as *the* corporate
+  hierarchy across four `.claude/skills/data-context-extractor/` files, and live in the
+  graph (verified: laptop, `neo4jtest`, `drydocs` DB — 4 current + 4 historical edges).
+  But `10-node-classifications.yaml` registers `BusinessSegment` and `CatalogLOB` and
+  **not `Company`** (57 labels, absent), and no fragment registers either
+  `HAS_BUSINESS_SEGMENT` or `HAS_BUSINESS_SEGMENT_HISTORICAL` — only `RECONCILES_TO`
+  (`42-local-catalog.yaml`). **NOT a regression:** `git log -S "Company"` over the
+  vocabulary returns nothing, so it was never there and there is no ruling to find —
+  it is an M0 seed that predates the registry and never got back-registered.
+  **WHY NOTHING CAUGHT IT, which is the reusable half:**
+  `test_taxonomy_ontology_map.py:134` checks label UNIQUENESS and
+  `test_yaml_fragments.py:83` checks fragment KEYS — **nothing cross-checks an edge's
+  `from_node`/`to_node` against the registered label set**, so a wholly absent endpoint
+  raises no guard. `RECONCILES_TO` passes only because its endpoint happens to be
+  registered. That endpoint cross-check is a cheap guard and is the part worth building
+  first; it generalizes past this one spine. This is the exact shape closed for
+  `ControlMApplication` (2026-07-09) and deliberately avoided for the `:Port` →
+  `:DistributionList` edge, where the node class shipped WITH the edge for this reason.
+  **Registering the label + two edges is gate territory** per `docs/RELATIONSHIP_GUIDE.md`
+  (`status: planned` first), not a quiet add — but the guard is not.
+
 - **`Idea-129`** · 2026-08-17 · `[bug]` · **closed 2026-08-17** · prio? **Low** —
   **The depgraph snapshot JSON was written CRLF — the surface Idea-121 did not reach.
   FIXED, and the guard Idea-121 asked for now exists.** Measured before:
