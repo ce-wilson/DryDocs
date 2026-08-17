@@ -5,127 +5,86 @@
 > `docs/restructure/backlog.yaml` (the claim channel) and `docs/port-prompt.md`; this
 > is the narrative that git alone does not carry.
 >
-> **Written 2026-08-01 (laptop), producer head `fb798c5`.**
+> **Written 2026-08-17 (laptop), producer head `2d107ce`.**
 
-## 1. Do this before you write any Python — two one-time local steps
+## 1. Read this first — the desktop is push-blocked and holds one stranded commit
 
-**CI now BLOCKS on ruff.** `ruff check .` and `ruff format --check .` are both
-gating as of J10 stage 5. An unformatted commit reds the build; it no longer
-warns. `poetry run ruff format .` before committing, or expect the failure.
+The desktop's git credential helper cannot authenticate. **GCM stores tokens in
+Windows Credential Manager, so this is per-machine**: signing in on the laptop
+unblocked the laptop and did nothing for the desktop. The desktop stays blocked
+until someone is physically at a desktop session to finish the browser sign-in.
 
-Two settings live in *git config / the working tree*, not in the repo, so each
-clone needs them once. The desktop has had neither applied:
+**What is stranded there:** `5ca7dc8f`, "roadmap fix: Idea-23/47 rows retired +
+re-render", committed on `main` and unpushed.
 
-1. `git config blame.ignoreRevsFile .git-blame-ignore-revs` — worth setting, but
-   **the earlier version of this line overstated it and was corrected by
-   measurement** (desktop 2026-08-01, reproduced on the laptop). It claimed
-   blame would otherwise land on the reformat. It mostly does not.
+**It is already handled — do not redo it and do not worry about the collision.**
+The identical fix was made on the laptop and pushed as `63551c8`. Same two row
+deletions, same re-render, byte-identical. When the desktop's push finally lands it
+will merge clean or drop as an empty duplicate. **Ledger step 156 records this** so a
+future range cut does not read the duplicate as a second change.
 
-   On `drydocs/cli.py` — the most-reformatted file, untouched since stage 3 —
-   only **41 of 2,055 lines (2%)** trace to the reformat at all, and the setting
-   reattributes **zero** of them: identical counts with the config on and off,
-   and with an explicit `--ignore-rev`. The reason is structural, not a
-   misconfiguration: all 41 are lines the formatter *created* — 14 blank, 27
-   lone `(`/`)` continuation lines from exploding calls across lines — and a
-   line with no earlier version has nothing to reattribute to. The other 98%
-   never pointed at the reformat, because `ruff format` re-wrapped and
-   re-spaced far more than it rewrote.
+**The one thing a desktop session must NOT do when it comes back:** draft the ledger
+roll. That offer is superseded — the roll is done and pushed (§2). Pull first.
 
-   Keep the config: it is correct, costs nothing, GitHub's blame view honours
-   the file, and a future reformat that genuinely rewrites lines will have
-   something to reattribute. Just do not expect it to have rescued this one.
-   General rule worth carrying: ignore-revs pays off in proportion to how many
-   *existing* lines a mechanical commit modified, which for a formatter is
-   usually far fewer than the diffstat suggests.
-2. If `ruff format --check .` reports far more files than expected (~315 rather
-   than 0), the working tree is CRLF while the index is LF. Fix once:
-   `git add --renormalize .`, then delete and re-checkout the tracked `.py`
-   files. No committed bytes change. This bit the laptop; the desktop measured
-   clean, so it may already be fine.
+## 2. The port loop — a new base is CERTIFIED and pushed
 
-## 2. J10 ruff — DONE producer-side, and it found three real defects
+`port-base-20260817` @ `0c355f5`, pushed to origin. Preflight **7/7 CERTIFIED**
+(tree clean, relay basis tags, ledger coverage 116/116, cited paths resolve, renders
+current, suite green, tag). Offer that tag as the port base — never a bare SHA.
 
-All six commits are on `main` (merged `--no-ff` as `fb798c5`; never rebase that
-branch — `.git-blame-ignore-revs` records the stage-3 commit's own SHA).
-**1,017 findings → 0**, 284 of 328 files reformatted, suite 1270 passed / 7
-skipped unchanged at every stage.
+Ledger rolled to **steps 135-157** (115 commits since `caa0406`: 93 cited, 22
+ritual). Steps 106-123 collapsed; **124-134 deliberately stay live.**
 
-The user ruled the two open calls: E501 ignored-with-reason; keeper set decided
-**per-origin**, which the 2026-07-19 sizing could not have anticipated — **177
-of the 362 post-format findings (49%) were vendored** Anthropic skill scripts
-(`.claude/skills/{docx,pptx,xlsx,pdf,skill-creator}`, three near-identical copies
-of the same office validators). Those became an `extend-exclude`;
-`.claude/skills/groom-backlog` is ours and stays in scope. 30 findings in our own
-code were **fixed rather than ignored**.
+**The finding worth carrying forward:** the `caa0406` port's close-out never reached
+this repo. `ae21ee4` got an explicit "MERGED company-side, branch removed" commit
+(`06d4469`); `caa0406` got a report, a producer review (`ca7a121`), and then silence.
+So "Last completed port" is now split in two — the four J35 fields stay on `ae21ee4`
+where all four are known, and a new "Last DELIVERED port" block names `caa0406` with
+port commit / backup tag / acceptance marked **UNRECORDED rather than guessed**.
+RELAY-7 and the four `ca7a121` divergences are producer *beliefs* about company state
+until re-checked. **First action at the next port: fill those three fields.**
 
-Worth knowing because each would have been buried by the cheaper option:
+## 3. Ritual state — all green
 
-- **Ruff's F841 unsafe fix leaves dead code.** It strips the assignment target
-  but keeps the call — `holdout = data.get(...)` becomes a bare `data.get(...)`.
-  Six landed across three files. Diagnosis right every time, fix wrong every time.
-- **A `pytest.raises(Exception)` never proved what its name claimed** — it passes
-  on a typo'd attribute name too. Narrowed to `FrozenInstanceError`.
-- **RUF003 was hiding an encoding bug**, not a style nit: `â†’` in
-  `test_query_specs.py`, a double-encoded `->`. Tree sweep found no others.
+- Suite **2150 passed / 8 skipped**. Both ruff gates clean.
+- **CI GREEN at `0c355f5`** — and green at every commit this session. It had been RED
+  on origin from 08-14 to 08-17 on `test_real_roadmap_cites_only_live_inbox_ideas`.
+- Depgraph snapshot current: `drydocs-20260817.json` @ `0c355f5`, and it recorded
+  **`dirty: false`** on its own — the Idea-121 LF fix holding, exactly as step 151
+  predicted. Newest-only retention removed the 08-13 file.
+- Renders verified deterministic: re-rendering board + design docs produced zero drift.
 
-Also: the plan doc's E402 premise was **wrong** (it assumed `sys.path` setup in
-`scripts/`; all six hits are `pytest.importorskip` guards), and B008 had grown
-14 → 26 while CI was advisory. Both corrected in
-[`docs/ruff-format-convergence.md`](ruff-format-convergence.md).
+## 4. One new defect, filed not fixed
 
-**The live next action for this stream is the COMPANY side**, and nothing
-producer-side is waiting on it. Instructions are unchanged and now current in
-that doc: stages 1–3 regenerate locally, 0 and 4 port, 5 ports but only once
-their own residuals hit zero.
-
-## 3. The cross-repo port is CLOSED — nothing outstanding
-
-`PORT-REPORT-57914bf4` merged company-side as `7b85a034` **and was pushed**
-(confirmed 2026-08-01; `origin/main` at `7b85a034`, 0 commits between, parents
-`7ffd430c` first + `e2cf3485` — the intended `--no-ff` non-fast-forward shape).
-The producer ledger, T19 narrowing and the four v2 divergence rows are all rolled
-(`3882db5`). No producer-side item is waiting on the company.
-
-*Recorded as REPORTED, not verified.* The producer cannot see that repo, and the
-company session carrying the confirmation was deleted after it was read — so this
-line is the record. Same reason T11 went stale: a fact whose only home is a chat
-stops existing when the chat does.
-
-## 4. Ritual state
-
-- Depgraph snapshot **current**: `drydocs-20260801-1257.json` at `fb798c5`.
-- Renders verified deterministic — re-rendering board + design docs after the
-  commit produced zero drift.
-- Producer CI green. Suite 1270 passed / 7 skipped / 10 deselected.
-- Note the count differs from the desktop's 1272/5 on the same tree: two tests
-  skip here because their machine-local psgmgr sample CSVs are gitignored. Same
-  1277 total. Not a regression — do not chase it.
+**Idea-129** — the snapshot JSON is still written CRLF (31,505 CRLF / 0 bare LF in
+`drydocs-20260817.json`). `snapshot.ps1:391` passes the depgraph tool's `$raw`
+through `WriteAllText` unchanged, so Idea-121's fix to the 11 Python `write_text(`
+sites never reached it. Filed **Low** deliberately: `.gitattributes` normalizes the
+blob, `meta.git.dirty` is computed *before* the write so it stays honest, and
+newest-only retention means each snapshot is a new file rather than a re-dirtied one.
+So it does **not** reproduce Idea-121's actual harm — burying the stale-render signal.
+Same class, different surface, much smaller blast radius.
 
 ## 5. Board state
 
-**73 todo · 1 in progress (E1, gate-deferred) · 197 done.** J10 was the second
-in-progress item and is now closed.
+**119 todo · 4 in progress · 1 blocked · 313 done** (437 total).
 
-Oldest genuinely-pullable: **O27**/**O28** (2026-07-22, p3, dependency-free) or
-**Q7** (p2 — `docs-verify`: declared-vs-loaded per doc corpus, whose value rose
-when Q13 registered a corpus at `confirmed: false` and N9 made
-`doc-source-registry.yaml` the single home).
+In progress, all four SME/gate-bound rather than stalled builds: **E1** (SOSA),
+**G32** (the database-count gate, reopened downward to ONE on retrieval grounds —
+see step 143), **Y1**, **G62** (rua-bundle data profile; §A opened producer-side, §B
+runs company-side).
 
-Still parked with reasons: **Q6** (needs `DryDocs-bkup`. The desktop reported it
-absent; **searched the laptop this session and it is absent here too** — `C:` is
-the only mounted drive, nothing matching `DryDocs-bkup*` to depth 4. So Q6 is
-waiting on the *media*, not on being at the right machine — checking the other
-box will not unblock it), **J13** (skip until the user supplies the term-list
-confirmation).
+## 6. The pattern from this session
 
-## 6. The pattern from last session held, in a new form
-
-The previous handoff named it: *a record that can only be checked against itself.*
-J10 produced the inverse and it is worth carrying — **a check that fires
-correctly but whose remedy is wrong**. Ruff was right about all six F841 sites and
-right about RUF003; accepting its *fix* would have left dead code, and accepting
-the cheap *ignore* would have preserved an encoding bug. The J16 port-manifest
-guard was the good case: it caught `.git-blame-ignore-revs` having no
-disposition, and the remedy it forced — decide, and write down why — was the
-right one. Prefer guards that make you rule on something over guards that offer
-to clear themselves.
+The previous handoff named *a check that fires correctly but whose remedy is wrong*.
+This session's is narrower and worth keeping: **an exemption list is a claim about
+what does not matter, and it goes stale silently.** The port preflight's ledger-coverage
+check surfaced 11 "uncited" commits I had classified as ritual — `chore(ideas):`, a
+`chore(snapshot):` that should have been `chore(depgraph): snapshot`, `style(...)`,
+and `chore(backlog): <id> done`. The check was right and my classification was wrong,
+because the exemption matches on the commit SUBJECT and is deliberately narrow so a
+substantive commit can never hide behind a prefix. Two of those "ritual" commits
+turned out to carry real content for a consumer — two graph-instrument bugs, and a
+sequencing constraint about `%%var` resolution. They are cited now, in step 157, which
+says why they are there. **Prefer the guard that makes you rule on something over the
+classification you find convenient.**
