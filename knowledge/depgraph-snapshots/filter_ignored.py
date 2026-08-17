@@ -97,7 +97,14 @@ def main() -> int:
         if isinstance(doc.get("rels"), list):
             stats["rels"] = len(doc["rels"])
 
-    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    # newline="\n" or Python text mode emits \r\n on Windows and the committed
+    # artifact lands CRLF against an LF index (Idea-129, the Idea-121 class in the
+    # snapshot pipeline). This is the LAST writer on the ritual path, so it decides
+    # the committed bytes — except on the early return above, which is why
+    # snapshot.ps1 normalizes too.
+    path.write_text(
+        json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     print(f"dropped {len(drop)} git-ignored node(s); {len(doc['nodes'])} remain")
     return 0
 

@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-17T14:19:39",
+    "captured_at": "2026-08-17T14:42:31",
     "date": "20260817",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "0c355f5",
-      "full": "0c355f5a7683414d853f57668938445b19ae2562",
+      "commit": "e1b4a6a",
+      "full": "e1b4a6a47dd9da041be6b9aa0d3d427a01a681c2",
       "branch": "main",
-      "describe": "port-base-20260817",
-      "subject": "chore(port): roll the step ledger to caa0406..HEAD — steps 135-157",
-      "dirty": false,
+      "describe": "port-base-20260817-4-ge1b4a6a",
+      "subject": "docs(handoff): name the duplicate's actual fate — merge keeps it, rebase drops it",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -13886,10 +13886,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260813-1344.json",
-      "name": "drydocs-20260813-1344.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260817.json",
+      "name": "drydocs-20260817.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260813-1344.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260817.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -29426,7 +29426,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260813-1344.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260817.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",

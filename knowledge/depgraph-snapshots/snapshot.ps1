@@ -388,6 +388,14 @@ $new = $raw.Substring(0, $i+1) + "`n  ""meta"": $metaJson," + $raw.Substring($i+
 try { $null = $new | ConvertFrom-Json } catch {
   throw "post-processed snapshot is not valid JSON: $($_.Exception.Message)"
 }
+# Normalize to LF (Idea-129). $raw arrives CRLF from the depgraph tool while the
+# meta line above is injected with a bare `n, so the file would land mixed-ending
+# against an LF index. Safe as a byte replace: JSON forbids unescaped control
+# characters inside strings, so every CRLF here is structural, and ConvertFrom-Json
+# above has already proven the shape. filter_ignored.py rewrites this file on the
+# -Tree path and normalizes too, but it early-returns when nothing is dropped, and
+# a -CodeOnly run never calls it at all — so this is the only guarantee for both.
+$new = $new -replace "`r`n", "`n"
 [System.IO.File]::WriteAllText($out, $new, (New-Object System.Text.UTF8Encoding $false))
 
 # --- drop git-ignored paths (U9) ---------------------------------------------

@@ -126,3 +126,109 @@ def test_the_matrix_renderer_orders_a_mixed_case_directory_by_string() -> None:
     )
     # ...and byte order specifically means the capital-R file leads.
     assert names[0] == "README.md"
+
+
+# ---------------------------------------------------------------------------
+# LINE ENDINGS — the second way a committed surface picks up its author's OS.
+#
+# Ordering was the first (above). This is the second, and it went unguarded for
+# longer: `Path.write_text(...)` with no `newline=` emits \r\n on Windows, so a
+# committed render or snapshot lands CRLF against an LF index. Git normalizes it
+# back on commit, so no blob ever changes and NOTHING FLAGS IT — the reason
+# Idea-121 sat latent, and the reason Idea-129 (the same class in the snapshot
+# pipeline) was found by a stray `git add` warning rather than by a test.
+#
+# Idea-121 fixed the render half and recorded that nothing guarded it. This is
+# that guard. It is deliberately a DECLARED LIST rather than a repo sweep,
+# because Idea-121 fenced eight non-render writers OUT of the sweep on purpose
+# (vendor_docs, publishing/*, schema_graph, extract_office_text,
+# external_vendor_scrape) — they write uncommitted outputs and each needs its
+# own call. Adding a committed surface means adding its writer here.
+# ---------------------------------------------------------------------------
+
+#: Modules that write a COMMITTED surface. Repo-relative.
+COMMITTED_SURFACE_WRITERS = (
+    "drydocs/plan_board.py",
+    "drydocs/plan_ideas.py",
+    "drydocs/plan_roadmap.py",
+    "drydocs/design_doc.py",
+    "scripts/render_context_types.py",
+    "scripts/render_enforcement_matrix.py",
+    "scripts/render_gates.py",
+    "scripts/render_load_map.py",
+    "scripts/render_remediation_diff.py",
+    "scripts/render_software_registry.py",
+    "knowledge/depgraph-snapshots/filter_ignored.py",
+)
+
+#: Globs whose CONTENT is committed and must be byte-identical across platforms.
+COMMITTED_SURFACE_GLOBS = (
+    "docs/plan/*.html",
+    "docs/design/*.html",
+    "web/src/generated/*.json",
+    "knowledge/depgraph-snapshots/*.json",
+)
+
+
+def _write_text_calls_missing_newline(source: str) -> list[int]:
+    """Line numbers of `.write_text(...)` calls that do not pass `newline=`.
+
+    Matched on the attribute name rather than the receiver, because the receiver
+    is a local (`out`, `path`, `dest`) at every site and typing it would make the
+    check miss exactly the new site it exists to catch.
+    """
+    tree = ast.parse(source)
+    return sorted(
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "write_text"
+        and not any(kw.arg == "newline" for kw in node.keywords)
+    )
+
+
+def test_committed_surface_writers_pass_newline_lf() -> None:
+    """Every writer of a committed surface pins `newline="\n"`.
+
+    Static on purpose: the byte check below can only fail after someone actually
+    re-renders, so on a fresh checkout it is silent. This one fails the moment a
+    writer is added without the argument, on every platform including CI.
+    """
+    failures: list[str] = []
+    for rel in COMMITTED_SURFACE_WRITERS:
+        module = REPO / rel
+        assert module.exists(), f"{rel} is in COMMITTED_SURFACE_WRITERS but does not exist"
+        for line in _write_text_calls_missing_newline(module.read_text(encoding="utf-8")):
+            failures.append(f"{rel}:{line}")
+
+    assert not failures, (
+        "committed-surface writer(s) call write_text() with no newline=:\n  "
+        + "\n  ".join(failures)
+        + '\nPass newline="\n". Python text mode emits \r\n on Windows, so the '
+        "output lands CRLF against an LF index; git normalizes it back on commit, "
+        "so no blob changes and the stale-render check reports phantom drift "
+        "forever (Idea-121, and Idea-129 for the snapshot half)."
+    )
+
+
+def test_committed_surfaces_carry_no_cr_byte() -> None:
+    """The working-tree bytes agree with the LF index.
+
+    `.gitattributes` pins `* text=auto eol=lf`, so checkout gives LF regardless of
+    core.autocrlf. A CR byte here therefore means a WRITER put it there after
+    checkout — which is the defect, not a local git setting.
+    """
+    offenders: list[str] = []
+    for pattern in COMMITTED_SURFACE_GLOBS:
+        for path in sorted(REPO.glob(pattern), key=lambda p: p.as_posix()):
+            if b"\r" in path.read_bytes():
+                offenders.append(path.relative_to(REPO).as_posix())
+
+    assert not offenders, (
+        "committed surface(s) hold CR bytes in the working tree:\n  "
+        + "\n  ".join(offenders)
+        + '\nRe-run the writer after checking it passes newline="\\n". These files '
+        "commit as LF either way, which is exactly why this goes unnoticed: the "
+        "cost is a permanently-dirty stale-render check, not a wrong blob."
+    )
