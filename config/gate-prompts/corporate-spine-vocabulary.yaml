@@ -1,0 +1,147 @@
+# SME gate-prompt spec — the corporate spine: :Company, the two effective-dated
+# HAS_BUSINESS_SEGMENT edges, and whether a one-company label belongs in a repo
+# built to be portable (backlog G98). GATE-BOUND: this page PROPOSES; rendering it
+# registers, flips and stamps nothing.
+#
+# WHAT MAKES THIS GATE UNUSUAL, and it is worth reading before the clauses: the
+# shape is ALREADY EXECUTING. Most gates rule on something not yet built, so
+# declining costs nothing. Here the nodes are MERGEd at every bootstrap, a
+# uniqueness constraint is live, four agent-facing skill files document the
+# hierarchy, and the edges are in the graph. So the honest framing is not "may we
+# build this" but "the code already decided; does the ontology agree, and if not,
+# what changes" — which is a different question and a harder one to decline.
+#
+# NOT A REGRESSION, established before drafting rather than assumed: `git log -S
+# "Company"` over drydocs_core/ontology/relationship_vocabulary/ returns NOTHING.
+# The label was never registered and nothing retired it. This is an M0 seed that
+# predates the registry, so there is no earlier ruling to honour or overturn — the
+# reason a gate is needed at all rather than a correction.
+#
+# PUBLISH BOUNDARY: settled, not open. Clause E records the 2026-08-17 SME ruling
+# that the source is External-PUBLIC so the session does not re-litigate it. The
+# JPMC spellings on this page are therefore deliberate and publishable, which makes
+# this page unusual among gate prompts — it does NOT need placeholders.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: corporate-spine-vocabulary
+title: "SME Gate — the corporate spine: does :Company enter the vocabulary, is the effective-dated segment edge one type or two, and does a single-company label belong in a portable repo"
+step: "ontology.cypher has seeded (:Company {name:'JPMC'})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment) since M0 with a live uniqueness constraint; BusinessSegment and CatalogLOB are registered in the vocabulary, :Company and both segment edges are not — and no guard can see the gap"
+summary: >
+  Three rulings and one recording. Clause A asks whether :Company enters
+  10-node-classifications.yaml and under which class, with both readings stated
+  because its sibling BusinessSegment carries a note that the doc and the
+  supplement disagreed on exactly this choice. Clause B asks whether the
+  effective-dated pair is TWO edge types or ONE discriminated by effective_to —
+  the seed writes both shapes today, and the vocabulary will ratify whichever it
+  is told, so leaving it implicit ratifies an accident. Clause C is the one that
+  can change the answer to A: a one-node class naming a specific company sits
+  awkwardly in a repo whose stated goal (ADR 0012) is standalone generalization,
+  so the clause asks whether the label is right at all and whether "JPMC" is seed
+  data or configuration. Clause D records that the missing endpoint guard does
+  NOT wait on this page. Clause E records the External-PUBLIC ruling so it is not
+  reopened. Nothing enters the vocabulary active here: anything confirmed lands
+  status: planned per docs/RELATIONSHIP_GUIDE.md, and nothing is applied until
+  ticked and transcribed to config/gate-log.md.
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml · 42-local-catalog.yaml) — no loader is implied; the seed that writes this shape already exists and is not touched by this page"
+  Source: "drydocs_core/schema/ontology.cypher:204-234 (the M0 corporate-hierarchy seed) · constraints.cypher:29-30 (company_name + business_segment uniqueness) · config/doc-source-registry.yaml#jpmc-reports (External, the annual-report provenance) · config/taxonomy/lob-product-team.yaml (the catalog-LOB side, already registered)"
+  Precedent: "ControlMApplication 2026-07-09 — the same shape (an edge whose node label was unclassified), closed by registering the label · the :Port -> :DistributionList edge 2026-08-12, where the node class shipped WITH the edge deliberately to avoid re-opening it · BusinessSegment already registered as org:FormalOrganization / prov Agent, carrying the doc-vs-supplement note clause A inherits · RECONCILES_TO (42-local-catalog.yaml) — the only registered edge touching this spine · ADR 0012 name-the-load-surface-by-the-DATA, the standalone-generalization goal clause C weighs"
+  Registry ref: "doc-source-registry: jpmc-reports carries classification External and confirmed: false — clause E confirms the classification reading ONLY; the confirmed flag is Idea-130 / P4 territory and is NOT ruled here"
+  Classification: "Internal-Public page. Unusually for a gate prompt it carries REAL spellings (JPMC, the four segment codes) rather than placeholders, because clause E's source is External-PUBLIC — see the header note"
+  Vocabulary: "every entry this page implies enters status: planned per docs/RELATIONSHIP_GUIDE.md and the per-domain fragments (S5); NOTHING lands active at this gate. If clause C rules the label out, the correct outcome is that NOTHING is registered and the seed changes instead — that is a live outcome, not a failure of the gate"
+  Source of record: "backlog G98 · Idea-131 (the finding) · Idea-130 (the External-public corpus, adjacent and NOT ruled here) · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "The company node — (:Company {name:'JPMC', legal_name:'JPMorgan Chase & Co.', source:'annual report'})"
+    target: "UNREGISTERED today. Candidates: org:FormalOrganization (the BusinessSegment precedent) or org:Organization"
+    edge: "ruling required  [clause A, and clause C may remove the label entirely]"
+  - n: 2
+    element: "Current segment membership — 4 edges to CCB / CIB / AWM / Corp, effective_from 2024-04-01, effective_to null"
+    target: "HAS_BUSINESS_SEGMENT — unregistered"
+    edge: "ruling required  [clause B]"
+  - n: 3
+    element: "Pre-reorg membership — 4 edges to CCB / CIB / CB / AWM, effective_from 2010-01-01, effective_to 2024-03-31"
+    target: "HAS_BUSINESS_SEGMENT_HISTORICAL — unregistered"
+    edge: "ruling required  [clause B — one type or two]"
+  - n: 4
+    element: "Corporate segment (CCB / CIB / AWM / Corp, plus retired CB)"
+    target: ":BusinessSegment — ALREADY REGISTERED, org:FormalOrganization / prov Agent"
+    edge: "no ruling — shown so the asymmetry is visible: the child is classified and the parent is not"
+  - n: 5
+    element: "Catalog line of business (CCB / AWMCIB / CT / HR / ET)"
+    target: ":CatalogLOB — ALREADY REGISTERED, with RECONCILES_TO -> :BusinessSegment"
+    edge: "no ruling — the registered edge on this spine, and the reason the gap went unnoticed (see clause D)"
+
+provenance:
+  - label: "What ontology.cypher seeds today (every mechanism claim on this page)"
+    source_object: "drydocs_core/schema/ontology.cypher:204-234 — the corporate-hierarchy block"
+    key: "Company.name (unique, constraints.cypher:29) · BusinessSegment.code (unique, constraints.cypher:30)"
+    loader: "~ (none — this is a bootstrap seed, not a loader; business_segments.py is a read-only refresh COUNT and writes nothing)"
+    properties:
+      - name: company_name
+        origin: source
+        from: "the annual report / SEC filings (doc-source-registry#jpmc-reports, classification External)"
+        note: "'JPMC' is the node key and 'JPMorgan Chase & Co.' the legal_name. Clause C asks whether this is seed data or configuration — it is currently a literal in a canonical-producer schema file"
+      - name: segment_codes
+        origin: source
+        from: "the annual report's reported segments"
+        note: "CCB / CIB / AWM / Corp current; CB retired with the note 'merged into CIB'. The reorg is MODELLED rather than overwritten, which is what makes clause B a real question rather than bookkeeping"
+      - name: effective_from_to
+        origin: source
+        from: "the Q2-2024 reorg date, read from the report"
+        note: "2024-04-01 open-ended for current; 2010-01-01 -> 2024-03-31 for historical. The dates are source facts; the DECISION to carry them on two differently-named edge types is not, and is clause B"
+      - name: edge_type_split
+        origin: derived
+        from: "the seed's own authoring choice at M0"
+        note: "HAS_BUSINESS_SEGMENT vs HAS_BUSINESS_SEGMENT_HISTORICAL — nothing ruled this; it is the shape one commit happened to write. Clause B exists so ratification is a decision rather than an inheritance"
+  - label: "What the vocabulary currently declares (the gap, measured not asserted)"
+    source_object: "drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml · 42-local-catalog.yaml"
+    key: "label (node classifications) · neo4j_label (relationship fragments)"
+    loader: "~ (registry files; nothing loads from them directly)"
+    properties:
+      - name: registered_labels
+        origin: source
+        from: "10-node-classifications.yaml — 57 label entries"
+        note: "BusinessSegment (line 287) and CatalogLOB (282) are present; Company is ABSENT. Verified by enumeration, not by search-and-assume"
+      - name: registered_edges
+        origin: source
+        from: "the per-domain relationship fragments"
+        note: "RECONCILES_TO (42-local-catalog.yaml) is the ONLY registered edge touching this spine. Neither HAS_BUSINESS_SEGMENT nor HAS_BUSINESS_SEGMENT_HISTORICAL appears in any fragment"
+      - name: never_registered
+        origin: derived
+        from: "git log -S \"Company\" over relationship_vocabulary/"
+        note: "returns nothing — so this is an omission from M0, never a retirement. Establishing this BEFORE the session matters: a gate that reverses a prior ruling and a gate that fills a never-ruled gap carry different burdens of proof"
+      - name: why_no_guard_fired
+        origin: derived
+        from: "tests/unit/test_taxonomy_ontology_map.py:134 · tests/unit/test_yaml_fragments.py:83"
+        note: "the first checks label UNIQUENESS, the second checks fragment KEYS. NOTHING cross-checks an edge's from_node/to_node against the registered label set, so a wholly absent endpoint is invisible. RECONCILES_TO passes only because its endpoint happens to be registered — clause D"
+
+sections:
+  - title: "A. The label — does :Company enter the vocabulary, and as what?"
+    confirmations:
+      - "A1. THE CHOICE, stated so neither side is the silent default. REGISTER as org:FormalOrganization — the class already carried by its own child :BusinessSegment, and the more precise term for a legally-recognized organization (JPMorgan Chase & Co. is exactly that). REGISTER as org:Organization — the looser W3C ORG term, which the catalog_ontology_supplement comment used for the segment before FormalOrganization was adopted. The BusinessSegment entry's own note records that the documentation and the supplement disagreed on this and that FormalOrganization won 'as the more precise valid term'; this clause asks whether the parent follows the child or whether the parent's case differs. prov_type Agent is proposed for either reading, matching the sibling."
+      - "A2. If REGISTERED: it lands status: planned per RELATIONSHIP_GUIDE.md, in 10-node-classifications.yaml, with a note naming ontology.cypher as the writer. Confirm that placement rather than assume it — the seed is a SCHEMA file, not a loader, and every other entry in that fragment points at a loader or supplement, so this entry's note is shaped differently from its neighbours."
+      - "A3. THE ASYMMETRY THIS FIXES, worth stating because it is the practical cost of leaving it: today an agent reading the vocabulary sees :BusinessSegment classified and finds no parent, while four .claude/skills/data-context-extractor/ files tell it the parent is :Company and route queries through it. The registry and the agent-facing docs disagree, and the docs are the ones being followed. Confirm this is the gap being closed, and not merely a tidiness exercise."
+      - "A4. DEPENDENCY ON C: if clause C rules the label out, A1 does not apply and NOTHING is registered. Confirm the reading order — C is decided first in substance even though A is asked first — so the session does not register a label it then rules against."
+  - title: "B. The edges — one type discriminated by date, or two types?"
+    confirmations:
+      - "B1. THE SHAPE TODAY IS AN ACCIDENT OF AUTHORING, not a ruling: the M0 seed writes HAS_BUSINESS_SEGMENT (effective_to null) and HAS_BUSINESS_SEGMENT_HISTORICAL (effective_to 2024-03-31) as two distinct types, both carrying the same effective_from/effective_to property pair. Nothing ruled that. Rule ONE of: (a) TWO TYPES as written — the type name carries currency, queries filter by label; (b) ONE TYPE, HAS_BUSINESS_SEGMENT, with currency carried ONLY by effective_to — the properties already express it, and the second type is then redundant encoding of a fact the edge already holds. Record which, and note that (b) implies a seed change."
+      - "B2. THE ARGUMENT FOR (b) THAT SHOULD BE WEIGHED RATHER THAN ASSUMED: a fact encoded in two places can disagree. A HAS_BUSINESS_SEGMENT edge with a non-null effective_to, or a _HISTORICAL edge with a null one, are both writable today and neither is caught. Under (b) that state is unrepresentable. The counter-argument, equally real: type-level filtering is cheaper and more legible in Cypher than a date predicate, and the estate's existing queries (the four skill files) are written against the two-type shape — so (b) is a query-rewrite as well as a seed change."
+      - "B3. WHICHEVER IS RULED: the edge(s) enter as status: planned, in the fragment the SME names. There is no obvious home — 10-node-classifications is labels, 42-local-catalog is the CATALOG domain and this is the CORPORATE domain. Confirm whether this opens a new per-domain fragment (e.g. 41-local-corporate) or joins an existing one; the vocabulary-domains-and-id-policy gate (signed 2026-08-12) ruled the domain naming and id policy that this choice must satisfy."
+      - "B4. THE RETIRED SEGMENT IS NOT PART OF THIS CLAUSE, stated so it is not swept in: :BusinessSegment {code:'CB', retired:true} is a NODE property on an already-registered label, and how retirement is modelled on segments is out of scope here. Named only because the historical edge points at it and the two questions look adjacent."
+  - title: "C. Does a single-company label belong in this repo at all? (decide this first in substance)"
+    confirmations:
+      - "C1. THE TENSION, and it is not rhetorical. ADR 0012 states the standalone-generalization goal in its own words — company jargon 'entered a repo meant to be generic from the start' — and the load-surface rename exists to undo exactly that. :Company is a class with ONE instance, whose key is a specific company's name, seeded from that company's annual report. Rule: (a) the label is RIGHT — a company is a real ontological class, the fact that this deployment has one instance is a property of the deployment, not of the model, and another deployment seeds its own; (b) the label is WRONG — the segment spine should hang off an existing org class and the company node is redundant with the deployment itself; (c) right but MISPLACED — the class stays, the INSTANCE moves out of a canonical-producer schema file."
+      - "C2. IF (a) OR (c): is 'JPMC' SEED DATA or CONFIGURATION? Today it is a literal in drydocs_core/schema/ontology.cypher, which is canonical-producer and ports wholesale — so a consuming deployment inherits this company's name in its schema bootstrap unless it edits the file. The alternative is a config-resolved value (the config/ layer already holds the org taxonomy in lob-product-team.yaml). This clause matters MORE than A1 for portability, and it is the one a company-side session will feel first."
+      - "C3. THE PORT CONSEQUENCE, so it is ruled with eyes open: ontology.cypher is canonical-producer in the PORT-MANIFEST. If C2 rules 'configuration', the seed changes and the consuming side takes that change wholesale — which is the desired outcome but IS a behaviour change to their bootstrap, and it must be ledgered as one rather than arriving as a silent schema edit."
+      - "C4. WHAT IS NOT BEING ASKED: this clause is about PORTABILITY, never sensitivity. Clause E records that the values are publishable. Do not let 'should JPMC be in the schema file' collapse into 'is JPMC safe to publish' — they have opposite answers and different remedies, and conflating them is how a settled boundary question gets reopened."
+  - title: "D. The guard — recorded here, but it does not wait on this page"
+    confirmations:
+      - "D1. THE STRUCTURAL FINDING, which outlives whatever A/B/C rule: nothing cross-checks an edge's from_node / to_node against the registered label set. test_taxonomy_ontology_map.py:134 checks label UNIQUENESS; test_yaml_fragments.py:83 checks fragment KEYS. So an edge naming a completely unregistered endpoint raises nothing, and RECONCILES_TO passes only because its endpoint happens to be registered. This is why the gap survived from M0 to 2026-08-17 with a constraint, a seed, four skill files and live graph data all pointing at it."
+      - "D2. CONFIRM IT IS SEPARABLE: the guard is buildable WITHOUT this gate and should not be sequenced behind it. It is default-deny in the same spirit as test_module_boundary.py — an edge endpoint that classifies into no registered label fails — and it generalizes past this one spine, which is the whole value. Ruling A/B/C changes what the guard finds on its first run; it does not change whether the guard is correct."
+      - "D3. THE FIRST-RUN EXPECTATION, so a red guard is not mistaken for a broken guard: run against the tree as it stands TODAY, the check fails on HAS_BUSINESS_SEGMENT and HAS_BUSINESS_SEGMENT_HISTORICAL only if they are registered first — while they are absent entirely, the guard sees nothing to check. That asymmetry is worth ruling: does the guard ALSO scan the seeded .cypher for edges with no vocabulary entry at all, which is the direction that would actually have caught this? Answering yes makes it a genuinely new check rather than a stricter version of an existing one."
+  - title: "E. Publish boundary — a RECORDING, not an open question"
+    confirmations:
+      - "E1. SME RULING 2026-08-17: the source is External-PUBLIC. config/doc-source-registry.yaml#jpmc-reports already carries classification: External with the comment 'public SEC filings / investor-relations PDFs', a source_url, and trust_default: VERBATIM. The JPMC literals in ontology.cypher are therefore PUBLISHABLE and are not a boundary defect. Confirm the recording so this is not re-raised — it was raised once in the same session that found the vocabulary gap, and checking the code literal without checking the registry is precisely how it gets raised again."
+      - "E2. SCOPE FENCE: this clause confirms the CLASSIFICATION reading only. The registry entry's confirmed: false flag, the :DataAsset-vs-lexical-spine reshaping, and whether that corpus becomes a docmeta ingestion are Idea-130 and P4 territory and are NOT ruled here. Two reasons to keep them apart: the ingestion needs a re-fetch and a new loader (the ingest script was removed 2026-07-22 and the PDFs were never committed), and a vocabulary ruling should not carry a load-path decision on its signature."
