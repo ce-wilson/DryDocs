@@ -48,24 +48,37 @@ until re-checked. **First action at the next port: fill those three fields.**
 
 ## 3. Ritual state — all green
 
-- Suite **2150 passed / 8 skipped**. Both ruff gates clean.
-- **CI GREEN at `0c355f5`** — and green at every commit this session. It had been RED
-  on origin from 08-14 to 08-17 on `test_real_roadmap_cites_only_live_inbox_ideas`.
-- Depgraph snapshot current: `drydocs-20260817.json` @ `0c355f5`, and it recorded
-  **`dirty: false`** on its own — the Idea-121 LF fix holding, exactly as step 151
-  predicted. Newest-only retention removed the 08-13 file.
+- Suite **2152 passed / 8 skipped** (2150 plus the two new LF guards, §4). Both ruff
+  gates clean.
+- **CI GREEN at every commit this session.** It had been RED on origin from 08-14 to
+  08-17 on `test_real_roadmap_cites_only_live_inbox_ideas`.
+- Depgraph snapshot current: `drydocs-20260817-1442.json` @ `e1b4a6a`, written through
+  the fixed LF path, recording **`dirty: false`** on its own — the Idea-121 fix holding
+  exactly as step 151 predicted. Newest-only retention replaced the earlier 08-17 file.
 - Renders verified deterministic: re-rendering board + design docs produced zero drift.
 
-## 4. One new defect, filed not fixed
+## 4. Idea-129 — found, mis-diagnosed, fixed, and now guarded
 
-**Idea-129** — the snapshot JSON is still written CRLF (31,505 CRLF / 0 bare LF in
-`drydocs-20260817.json`). `snapshot.ps1:391` passes the depgraph tool's `$raw`
-through `WriteAllText` unchanged, so Idea-121's fix to the 11 Python `write_text(`
-sites never reached it. Filed **Low** deliberately: `.gitattributes` normalizes the
-blob, `meta.git.dirty` is computed *before* the write so it stays honest, and
-newest-only retention means each snapshot is a new file rather than a re-dirtied one.
-So it does **not** reproduce Idea-121's actual harm — burying the stale-render signal.
-Same class, different surface, much smaller blast radius.
+The snapshot JSON was written CRLF. **Fixed: 31,505 CRLF / 0 bare LF → 0 / 31,505.**
+
+**Worth reading because the first diagnosis was wrong.** The entry blamed
+`snapshot.ps1:391`. The real culprit on the ritual path is **`filter_ignored.py:100`**
+— `write_text(` with no `newline=`, the *exact* Idea-121 defect in a file that sweep
+never looked at. The tell was already in the original measurement: **0 bare LF** means
+one uniform writer produced every line, and `snapshot.ps1` injects its meta line with
+a bare `` `n `` — so had the PowerShell been last, at least one would have survived.
+Both sites are fixed anyway, and the second is not redundant: `filter_ignored.py`
+early-returns without rewriting when nothing is dropped, and `-CodeOnly` never calls
+it at all.
+
+**The durable half is the guard**, and it is the one Idea-121 recorded as missing
+("nothing guards this yet, so it can regress"). Idea-129 *was* that regression, found
+by a stray `git add` warning rather than a test. `tests/unit/test_render_determinism.py`
+now carries a STATIC check that every declared committed-surface writer passes
+`newline="\n"` (fails on CI, any platform, the moment a writer is added without it)
+plus a byte check for CRs. Verified RED before the fix, green after. **The writer list
+is declared, not swept** — Idea-121 fenced eight non-render writers out on purpose, so
+adding a committed surface means adding its writer to that tuple.
 
 ## 5. Board state
 
