@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-17T14:42:31",
-    "date": "20260817",
+    "captured_at": "2026-08-18T11:14:12",
+    "date": "20260818",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e1b4a6a",
-      "full": "e1b4a6a47dd9da041be6b9aa0d3d427a01a681c2",
+      "commit": "a3935569",
+      "full": "a39355696745fe3bec08b07be887fb2b94ba1f20",
       "branch": "main",
-      "describe": "port-base-20260817-4-ge1b4a6a",
-      "subject": "docs(handoff): name the duplicate's actual fate — merge keeps it, rebase drops it",
-      "dirty": true,
+      "describe": "port-base-20260817-33-ga3935569",
+      "subject": "docs(handoff): roll to 2026-08-18 — three gates closed, the ITSM family, stub-and-enrich",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -6758,6 +6758,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/corporate-backbone-vocabulary.yaml",
+      "name": "corporate-backbone-vocabulary.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/corporate-backbone-vocabulary.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/doc-traceability-feedback.yaml",
       "name": "doc-traceability-feedback.yaml",
       "extension": ".yaml",
@@ -8603,6 +8612,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/business-segments-csv-load-draft-2026-08-17.md",
+      "name": "business-segments-csv-load-draft-2026-08-17.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/business-segments-csv-load-draft-2026-08-17.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/code-graph-review-plan.md",
       "name": "code-graph-review-plan.md",
       "extension": ".md",
@@ -9156,6 +9174,15 @@
       "name": "persona-tech-writer-2026-08.md",
       "extension": ".md",
       "rel_path": "docs/reviews/persona-tech-writer-2026-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/schema-matrix-2026-08-17.md",
+      "name": "schema-matrix-2026-08-17.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/schema-matrix-2026-08-17.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11771,6 +11798,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml",
+      "name": "49-local-corporate.yaml",
+      "extension": ".yaml",
+      "rel_path": "drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml",
+      "name": "50-local-itsm.yaml",
+      "extension": ".yaml",
+      "rel_path": "drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/ontology/schema_graph.py",
       "name": "schema_graph.py",
       "extension": ".py",
@@ -13886,10 +13931,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260817.json",
-      "name": "drydocs-20260817.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260817-1442.json",
+      "name": "drydocs-20260817-1442.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260817.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260817-1442.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14606,6 +14651,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/build_schema_matrix.py",
+      "name": "build_schema_matrix.py",
+      "extension": ".py",
+      "rel_path": "scripts/build_schema_matrix.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/build_seal_samples.py",
       "name": "build_seal_samples.py",
       "extension": ".py",
@@ -14619,6 +14673,15 @@
       "name": "doc_to_pdf.py",
       "extension": ".py",
       "rel_path": "scripts/doc_to_pdf.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/doctor_scan.py",
+      "name": "doctor_scan.py",
+      "extension": ".py",
+      "rel_path": "scripts/doctor_scan.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16257,6 +16320,15 @@
       "name": "test_vendor_docs.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_vendor_docs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_vocabulary_endpoints.py",
+      "name": "test_vocabulary_endpoints.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_vocabulary_endpoints.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20613,6 +20685,10 @@
     [
       "drydocs/tests/unit/test_vendor_docs.py",
       "drydocs/scripts/external_vendor_scrape.py"
+    ],
+    [
+      "drydocs/tests/unit/test_vocabulary_endpoints.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
       "drydocs/tests/unit/test_xml_io_edits.py",
@@ -25561,6 +25637,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/corporate-backbone-vocabulary.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/doc-traceability-feedback.yaml"
     ],
     [
@@ -26541,6 +26622,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/business-segments-csv-load-draft-2026-08-17.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/code-graph-review-plan.md"
     ],
     [
@@ -26627,6 +26713,11 @@
       "drydocs/docs/reviews",
       "CONTAINS",
       "drydocs/docs/reviews/persona-tech-writer-2026-08.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/schema-matrix-2026-08-17.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -28309,6 +28400,16 @@
       "drydocs/drydocs_core/ontology/relationship_vocabulary/48-local-quality.yaml"
     ],
     [
+      "drydocs/drydocs_core/ontology/relationship_vocabulary",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml"
+    ],
+    [
+      "drydocs/drydocs_core/ontology/relationship_vocabulary",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml"
+    ],
+    [
       "drydocs/drydocs_core/orchestration",
       "CONTAINS",
       "drydocs/drydocs_core/orchestration/__init__.py"
@@ -29426,7 +29527,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260817.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260817-1442.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -29766,12 +29867,22 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/build_schema_matrix.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/build_seal_samples.py"
     ],
     [
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/doc_to_pdf.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/doctor_scan.py"
     ],
     [
       "drydocs/scripts",
@@ -30681,6 +30792,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_vocabulary_endpoints.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_xml_io_edits.py"
     ],
     [
@@ -31493,13 +31609,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1697,
-    "edges": 982,
+    "files": 1705,
+    "edges": 983,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1965,
+    "rels": 1973,
     "directories": 269
   }
 }
