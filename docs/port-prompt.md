@@ -1188,6 +1188,10 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   **ONE CHECK WORTH RUNNING YOUR SIDE:** the same merge that dropped the inbox middle
   may have clipped the AUDIT TRAIL region below it — after the union repair, diff
   your "Recently groomed" section against producer HEAD's and union that too.
+  **RIDER 2026-08-18, same day:** SME direction — company-side grooming is PAUSED;
+  the producer backlog is the active lane for now. So do not expect this repair to
+  have been done by a company groom pass: **the union repair becomes NEXT-PORT-SESSION
+  work**, performed with the port's IDEAS.md merge rather than waited on.
   **(7) STANDING TAIL:** `source_label: 'snowflake'` is a 13th value outside the
   declared `csv|oracle|agent|human` enum that 12 of 28 producer loaders already sit
   outside, unenforced — the re-sourcing pass is the moment to rule the field's
