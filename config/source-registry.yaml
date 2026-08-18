@@ -512,11 +512,34 @@ datasets:
     authority: ADS
     feeds_taxonomy: []
     adapter: ~
-    confirmed: false                    # future feed — no extractor/loader; registered because it is the gate's own worked example of a replica (origin seal, carrier psgmgr)
+    confirmed: false                    # future feed — no extractor/loader; registered as the gate's worked example of the replica GRAMMAR (the id shape), not as an endorsement of the origin value — see notes
     notes: >
-      Escalation/SCIM routing (EJOBNAME join, ECOMPONENT = SEAL). The user's
-      named case for the replica grammar: SEAL data landing in psgmgr is a
-      SEAL dataset ON a psgmgr carrier, not "a psgmgr table".
+      Escalation / incident-routing rows keyed to JOB NAME (EJOBNAME join;
+      ECOMPONENT = SEAL). NOT a BMC out-of-the-box object — it is company-local,
+      absent from the vendor baseline in external/orchestration/bmc-controlm/,
+      and it carries the failure incident raised ServiceNow-side against a job.
+      SME CORRECTION 2026-08-17 — WHAT THIS CAN AND CANNOT DO. A SEAL link read
+      from here SUPPLEMENTS the human folder→application mapping and NEVER
+      authors it. The join is EJOBNAME, which is JOB grain, and gate
+      seal-app-ref-edge-reshape (K7) SIGNED OFF 24/24 on 2026-08-03 ruled at §A1:
+      "attribution grain is FOLDER-level; jobs inherit via CONTAINS_JOB; no
+      per-job application edge is authored going forward. The K2 job-level model
+      is CORRECTED, not extended." Treating this table as an attribution source
+      would reinstate exactly the model that ruling closed.
+      ALSO NOT PROVENANCE: `ECOMPONENT = SEAL` is a COLUMN VALUE — a reference to
+      SEAL, not evidence the dataset came from SEAL. The prior note argued the
+      opposite ("SEAL data landing in psgmgr is a SEAL dataset ON a psgmgr
+      carrier"); by that reasoning any table with a seal_id column becomes a SEAL
+      dataset. J32 applies — registration is not attribution.
+      THE `origin: seal` VALUE AND THIS ROW'S ID ARE THEREFORE UNDER REVIEW and
+      are deliberately left unchanged here: the id string is pinned by the
+      retired `controlm-psgmgr` row's replaced_by list and by
+      tests/unit/test_source_registry.py, so re-keying it to
+      controlm@[db].psgmgr.cm_escalation_db is a coordinated change, not an edit.
+      Nothing loads from this row (confirmed: false, adapter: ~,
+      feeds_taxonomy: []), so no graph data is affected by the discrepancy — the
+      claim is what was wrong, and it is corrected here rather than left to be
+      read as licence.
 
   # ---- Control-M born-here export --------------------------------------------
   - id: "controlm:deftable-xml-export"
