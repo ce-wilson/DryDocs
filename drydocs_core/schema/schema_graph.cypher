@@ -107,6 +107,10 @@ MERGE (n:SchemaMeta:Company {name: 'Company'})
   SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:BusinessSegment {name: 'BusinessSegment'})
   SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
+MERGE (n:SchemaMeta:ServiceNowGroup {name: 'ServiceNowGroup'})
+  SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
+MERGE (n:SchemaMeta:SnowRole {name: 'SnowRole'})
+  SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:DevTeam {name: 'DevTeam'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:ProductLine {name: 'ProductLine'})
@@ -568,3 +572,13 @@ MERGE (a)-[r:HAS_BUSINESS_SEGMENT]->(b)
 MATCH (a:SchemaMeta {name: 'Company'}), (b:SchemaMeta {name: 'BusinessSegment'})
 MERGE (a)-[r:HAS_BUSINESS_SEGMENT_HISTORICAL]->(b)
   SET r.vocab_id = 'corporate_has_business_segment_historical', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+// ── domain: itsm ────────────────────────────────────────────────────────────
+
+MATCH (a:SchemaMeta {name: 'ServiceNowGroup'}), (b:SchemaMeta {name: 'Attribution'})
+MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
+  SET r.vocab_id = 'itsm_group_qualified_attribution', r.prov_maps_to = 'prov:qualifiedAttribution', r.domain = 'itsm', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'SnowRole'})
+MERGE (a)-[r:HAD_ROLE]->(b)
+  SET r.vocab_id = 'itsm_attribution_had_role', r.prov_maps_to = null, r.domain = 'itsm', r.status = 'planned';

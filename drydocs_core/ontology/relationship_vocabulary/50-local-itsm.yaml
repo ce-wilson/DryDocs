@@ -1,0 +1,81 @@
+
+  # ── ITSM / ServiceNow support staffing (G100; gate itsm-technician-group PENDING) ──
+  #
+  # Registered 2026-08-18 on SME direction, following the SAME shape G91 just ruled
+  # for the DevTeam leg: the organizational unit carries a QUALIFIED_ATTRIBUTION to a
+  # reified :Attribution, which holds the ROLE and the PERSON. Four families now share
+  # that pattern — SEAL applications (K4), PAT products/area products (K5), PAT dev
+  # teams (G91) and ITSM support groups (here).
+  #
+  # THE HAS_AGENT HOP IS NOT REGISTERED HERE, and that is the rule rather than an
+  # omission: Attribution -[HAS_AGENT]-> Employee is IDENTICAL to
+  # seal_attribution_has_agent, and the C8 meta-graph refuses ambiguous duplicate
+  # (from, label, to) triples (schema_graph.py raises on it). Identical triples are
+  # REUSED as shared qualified-attribution infrastructure; only the triples that
+  # DIFFER are registered. Same call K5 made for the Cabinet and G91 for DevTeam.
+  #
+  # ONE :Employee SPINE, KEYED ON THE SID. The SME's requirement is that ServiceNow
+  # technicians land on the SAME hr-employee-SID as their PAT and SEAL roles, and
+  # :Employee {employee_id} IS that SID (constraints.cypher). The company-side model
+  # reaches people through a separate :Worker {sid} label; the producer deliberately
+  # does NOT mint that second person class — a second spine is exactly what makes
+  # "which roles does this person hold" unanswerable in one traversal.
+  #
+  # THE GROUP -> APPLICATION LINK IS NOT REGISTERED HERE. SUPPORTED_BY /
+  # HAS_SUPPORT_QUEUE / RESOLVED_BY belong to the company's SIGNED
+  # snow-hpsm-queue-to-group gate. Re-minting a competing group->app shape producer-side
+  # is the trap G98 named when it warned G35 off exactly that. This family models WHO
+  # STAFFS A GROUP; what a group supports stays theirs.
+  #
+  # OOTB SOURCES for the producer-side lookup — no custom table needed:
+  #   sys_user_group    the assignment group
+  #   sys_user_grmember group membership (user <-> group)
+  #   sys_user          the person; carries the employee id the SID join uses
+  #   sys_user_has_role / sys_user_role   the role a member holds
+  # cmdb_ci_business_app is the application CI and belongs to the company's gate above.
+
+  - id:           itsm_group_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
+    role:         ~
+    from_node:    ServiceNowGroup
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      A ServiceNow assignment group's staffing as a qualified attribution — the reified
+      hop carrying WHO and IN WHICH SUPPORT ROLE. Triple differs from the three existing
+      QUALIFIED_ATTRIBUTION entries (BusinessApplication, Product | AreaProduct, DevTeam),
+      so it registers rather than reuses.
+      Feed is OOTB: sys_user_grmember joined to sys_user, with the person resolved to
+      :Employee on the SID. PLANNED — nothing loads until the ITSM gate signs and a
+      loader exists.
+    supplement:   ~
+    loader:       ~
+    domain:       itsm
+    status:       planned
+
+  - id:           itsm_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
+    role:         ~
+    from_node:    Attribution
+    to_node:      SnowRole
+    prov_maps_to: ~
+    note: >
+      The role leg of an ITSM staffing attribution. Targets :SnowRole — a register
+      distinct from TOMRole (SEAL governance), ProductRole (product cabinet) and :Role
+      (PAT engineering, G91): these are SUPPORT-TIER roles.
+      SME DIRECTION 2026-08-18, and it is the mapping rule this family exists to carry:
+      DEVELOPERS map to the SENG role, PRODUCTION SUPPORT maps to the ASUP roles. Those
+      two tokens are the seed of the register; the tier numbering that pairs with them
+      in the estate's group naming is COMPANY-SIDE and is deliberately not asserted here.
+      Triple differs from the three existing HAD_ROLE entries (Attribution -> TOMRole,
+      -> ProductRole, -> Role), so it registers rather than reuses.
+      prov_maps_to is null deliberately: prov:hadRole belongs to the qualified pattern as
+      a whole and the sibling entries' supplement already declares it.
+      PLANNED — the concept register is proposed, not ratified; the gate rules the closed
+      set (the K5 fixed-scheme precedent) before anything mints SnowRole nodes.
+    supplement:   ~
+    loader:       ~
+    domain:       itsm
+    status:       planned

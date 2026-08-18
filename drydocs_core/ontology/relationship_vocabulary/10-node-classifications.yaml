@@ -318,6 +318,32 @@ node_classifications:
       says org:Organization. FormalOrganization (legally-recognized org)
       adopted as the more precise valid term.
 
+  - label:      ServiceNowGroup
+    class:      "org:OrganizationalUnit"
+    prov_type:  Agent
+    note: >
+      A ServiceNow assignment group — the ITSM support unit technicians belong to.
+      Same class as :DevTeam: both are organizational units that hold people in
+      roles, and modelling them alike is what lets one :Employee carry PAT, SEAL
+      and ITSM roles off one spine. Registered at G100 (2026-08-18) with the
+      staffing edges, never an edge whose node class is unclassified (the
+      ControlMApplication lesson, 2026-07-09).
+      SOURCED OOTB: ServiceNow ships the group in sys_user_group, its membership in
+      sys_user_grmember and the person in sys_user — no custom table is required for
+      the producer-side lookup.
+
+  - label:      SnowRole
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      The ITSM support-role register a technician holds within an assignment group —
+      the ITSM sibling of TOMRole (SEAL) and ProductRole (Product Cabinet), and a
+      skos:Concept for the same reason both of those are.
+      A SEPARATE REGISTER ON PURPOSE, not a reuse of :Role: :Role now carries the PAT
+      ENGINEERING roles (G91 entry 5), while these are SUPPORT-TIER roles. SME
+      direction 2026-08-18: developers map to SENG, production support to ASUP.
+      Concepts stay proposed until the ITSM gate signs; nothing loads.
+
   - label:      DevTeam
     class:      "org:OrganizationalUnit"
     prov_type:  Agent

@@ -180,7 +180,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 35,
+      "pending_entries": 37,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
@@ -196,7 +196,8 @@
         "drydocs_core/ontology/relationship_vocabulary/46-local-all.yaml",
         "drydocs_core/ontology/relationship_vocabulary/47-local-context.yaml",
         "drydocs_core/ontology/relationship_vocabulary/48-local-quality.yaml",
-        "drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml"
+        "drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml",
+        "drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml"
       ],
       "content": null,
       "extra_contents": {}
