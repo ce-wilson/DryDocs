@@ -1,0 +1,108 @@
+# SME gate-prompt spec — the pending-source-correction lifecycle, ruled ONCE for
+# both flips (backlog N13). GATE-BOUND: this page PROPOSES; rendering it builds,
+# flips and stamps nothing.
+#
+# THE SHAPE THIS GATE RULES, in one sentence: DryDocs sometimes carries the
+# CORRECT model while the authoritative source is wrong or the feed is hand-fed —
+# and the placeholder that records that state must be FLIPPED by the source
+# catching up, never by wishful bookkeeping. Two instances exist today and they
+# are the same lifecycle:
+#   (i)  ACQUISITION — a source recorded acquisition.mode: manual (N12) becomes
+#        automated when the pull is built (Idea-132's ServiceNow re-sourcing is
+#        the live case);
+#   (ii) OVERRIDE — a steward correction carried because the SOURCE value is
+#        wrong (O24's SEAL L1/L2 operate-manager overrides) clears when the
+#        source is actually corrected.
+#
+# THE HOLE: K7 §E2 ruled overrides "may be PERMANENT in this domain … do NOT
+# implement the corrected-in-source flip here; it belongs to the domains where
+# permanence is temporary" — and NO item owned that flip until N13. O24 likewise
+# left graph-side influence out of scope as a gate question. This page is where
+# the deferred halves come back.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: pending-source-correction
+title: "SME Gate — the pending-source-correction lifecycle: one vocabulary for the manual→automated and override→source-corrected flips, what evidence flips each, who may flip, and how an unflipped placeholder is reported"
+step: "N12 landed acquisition.mode on all 29 dataset rows (15 automated/db, 14 manual) and O24's override store carries origin-flagged steward corrections with a source-corrections report — two placeholder states, no ruled flip for either"
+summary: >
+  Four rulings. Clause A decides whether ONE shared vocabulary covers both
+  placeholder states — "we model this correctly ourselves while the source is
+  wrong or hand-fed" — carrying the always-visible origin discipline O24
+  established. Clause B rules what EVIDENCE flips each state and WHO may flip it:
+  a steward action, a load observing the corrected source value, or a build
+  landing. Clause C rules how an unflipped placeholder is REPORTED and when it
+  goes stale. Clause D rules which domains are permanent-by-nature and therefore
+  exempt per K7 §E2. Nothing below is applied until ticked and transcribed to
+  config/gate-log.md; anything declined stays as it is today — recorded state,
+  no flip machinery.
+meta:
+  Module: "config (the registry rows) + drydocs-api (the mapping store) — the ruling spans both, which is why it is ruled once here rather than once per surface"
+  Source: "config/source-registry.yaml acquisition: blocks (N12, 2026-08-18) · config/overrides/seal-contact-overrides.csv + the mapping-store table (O24) · K7 gate §E2 (config/gate-log.md 2026-08-03) · the source-corrections report (O24's export for the AO who can fix SEAL)"
+  Precedent: "O24 origin-flagged source-vs-user rows, always visible, never silently replacing the source value · K7 §E2 'permanent in this domain' + its explicit deferral of the corrected-in-source flip · K9 (repeats the deferral) · N10's wired/ready axis — confirmed / wired / acquisition.mode are three axes that COMPOSE on one row · Idea-132: the ServiceNow manual→automated transition, the live flip with no field to flip it"
+  Registry ref: "acquisition.mode records STATE only until this gate rules; no pending-correction flag exists anywhere today"
+  Classification: "Internal-Public page, mechanism only — the O24 examples are named by their gate/backlog ids, never by data values"
+  Vocabulary: "NO graph vocabulary is implied — every store and flag here is config/store-side (registry yaml, mapping-store table). If a ruling ever wants the pending state IN the graph, that is a NEW proposal through docs/RELATIONSHIP_GUIDE.md, not this page"
+  Source of record: "backlog N13 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "acquisition.mode: manual on a dataset row (14 today)"
+    target: "flips to automated when the pull is built"
+    edge: "ruling required — clause B: what evidence, who flips"
+  - n: 2
+    element: "steward override row carried because the source value is wrong (O24)"
+    target: "clears (or archives) when the source is corrected"
+    edge: "ruling required — clause B; K7 §E2 deferred exactly this"
+  - n: 3
+    element: "the shared 'pending' vocabulary across both"
+    target: "one flag name + origin discipline, or two domain-local flags"
+    edge: "ruling required — clause A"
+  - n: 4
+    element: "permanent-by-nature domains (K9 app-code mapping: overrides MAY be permanent)"
+    target: "EXEMPT from the flip per K7 §E2"
+    edge: "ruling required — clause D confirms the exemption boundary"
+
+provenance:
+  - label: "What exists today (every mechanism claim on this page)"
+    source_object: "config/source-registry.yaml · config/overrides/seal-contact-overrides.csv · drydocs_api/mappings.py"
+    key: "dataset id (registry) · app seal_id + role/level (override rows)"
+    loader: "~ (nothing flips anything today — that is the finding)"
+    properties:
+      - name: acquisition_mode
+        origin: source
+        from: "N12 (2026-08-18) — all 29 dataset rows classified"
+        note: "15 automated/db, 14 manual. mode: manual is the EXPECTED first state of a source's exploratory lifecycle (profiling, ontology, mapping, trial loads ride a csv/json drop) — a flip records productionization, never pays down 'debt'"
+      - name: override_origin_flag
+        origin: source
+        from: "O24 — source (SEAL) vs user, always visible, never hidden"
+        note: "overrides never write the graph and never silently replace the source value; where both exist the surfaces show them side by side"
+      - name: source_corrections_report
+        origin: derived
+        from: "O24's export (artifact + manifest)"
+        note: "lists every override with the SEAL current value, the corrected value, author and rationale — formatted for the application owners who hold the AO privilege to fix SEAL. The REPORT is the pressure mechanism; the flip is what closes the loop it opens"
+      - name: the_deferral
+        origin: source
+        from: "K7 gate §E2, 2026-08-03 (config/gate-log.md)"
+        note: "'Override rows may be PERMANENT in this domain — do NOT implement the corrected-in-source flip here; it belongs to the domains where permanence is temporary.' The domain split — permanent-by-nature vs pending-by-nature — is already ruled; what was never ruled is the flip itself"
+
+sections:
+  - title: "A. One vocabulary or two — does 'pending source correction' name both states?"
+    confirmations:
+      - "A1. THE CHOICE, stated so neither side is the silent default. ONE VOCABULARY: a single flag concept — pending_source_correction (or the SME's preferred term) — carried on BOTH surfaces: on a manual acquisition row it means 'hand-fed until the pull exists', on an override row it means 'modelled correctly here until the source is fixed'. TWO VOCABULARIES: each domain keeps a local flag (acquisition.mode already IS the acquisition-side state; the override store adds its own), and the shared idea stays a pattern rather than a field. The ONE-vocabulary reading is what the SME direction of 2026-08-18 leaned toward ('a placeholder flag for manual data pending source correction'); the TWO reading costs nothing today because N12 already carries the acquisition state. Rule which."
+      - "A2. WHATEVER A1 RULES: the origin discipline is O24's and is not renegotiated — the placeholder state is ALWAYS VISIBLE on every surface that shows the value, and the corrected/automated state never silently replaces the record that a placeholder once existed (the flip is an EVENT with a date, not an overwrite)."
+      - "A3. SCOPE: this vocabulary lives in CONFIG AND STORES (registry yaml, mapping-store table). It does NOT enter the graph at this gate — if a ruling ever wants pending-ness queryable graph-side, that is a new proposal through RELATIONSHIP_GUIDE. Confirm the fence."
+  - title: "B. The flip — what evidence, and who may perform it"
+    confirmations:
+      - "B1. ACQUISITION manual → automated: the flip evidence is A BUILD LANDING (the pull exists: SQL file + rebind, or an adapter) — never a declaration of intent. Propose: the flip is a COMMIT that changes acquisition.mode WITH the build in the same change (the flips-are-follow-ups discipline N12 already follows), and the flipper is whoever lands the build. Confirm or replace."
+      - "B2. OVERRIDE → source-corrected: the flip evidence is A LOAD OBSERVING the corrected value in the source itself (the next extract shows the source agreeing with the override), never the steward's assertion that they asked for the fix. Propose: the load surfaces the agreement (override value == source value) as a REPORTED candidate, and a STEWARD confirms the retirement — two hands, the same discipline as HITL loads. Confirm or replace: auto-retire on observed agreement is the alternative — cheaper, but it removes the human check on coincidental agreement."
+      - "B3. WHO MAY FLIP, both domains: confirm that the flip is never automatic-and-silent. Every flip is either a commit (B1) or a steward action on a reported candidate (B2) — auditable, dated, attributable. An unattended job may PROPOSE a flip; it may not perform one."
+      - "B4. THE FLIPPED STATE KEEPS ITS HISTORY: a retired override row archives (dated, with the agreement evidence) rather than deletes; a flipped acquisition row keeps manual-era provenance in its notes. The registry's retired: list and O24's report are the precedents. Confirm."
+  - title: "C. Reporting — an unflipped placeholder must be visible, and staleness must have a clock"
+    confirmations:
+      - "C1. THE SOURCE-CORRECTIONS REPORT (O24) is the precedent and EXTENDS to acquisition: one report class lists every live placeholder — override rows awaiting source correction AND manual rows awaiting automation — each with its age. Confirm the union report, or keep two reports."
+      - "C2. STALENESS: propose a placeholder carries NO deadline (many are legitimately long-lived — the exploratory phase is EXPECTED, N12 acceptance f), but the report ORDERS by age and the SME reads it at their own cadence — no alerting, no SLA, no red badges. The alternative is a per-row review_by date. Confirm which; the manual-is-never-a-defect framing argues for no-deadline."
+      - "C3. WHERE: the report is a console/export surface fed from the registry + store — it does not gate loads, block CI, or fail tests. A placeholder is a recorded state, not an error (the whole point of this page). Confirm."
+  - title: "D. The permanent-by-nature exemption — K7 §E2's boundary, confirmed not reopened"
+    confirmations:
+      - "D1. K7 §E2 ruled the app-code mapping domain's overrides MAY BE PERMANENT (the folder→application platform-code case is the SME's own worked example): there is no source correction coming, because the mapping IS the authored truth. Confirm that domain stays EXEMPT — no pending flag, no report row, no staleness clock — and that the exemption is a PER-DOMAIN property, not per-row judgment."
+      - "D2. THE BOUNDARY RULE for future domains: a domain is pending-by-nature when an AUTHORITATIVE EXTERNAL SOURCE exists that could catch up (the source could be fixed; a pull could be built); permanent-by-nature when DryDocs/the steward IS the authority. New stores declare which at creation. Confirm the rule so the next store does not re-litigate it."

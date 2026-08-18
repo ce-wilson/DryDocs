@@ -1348,6 +1348,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "pending-source-correction (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/pending-source-correction.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "N13"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "repo-manifest-data-profile (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
