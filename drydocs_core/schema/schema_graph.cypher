@@ -89,8 +89,8 @@ MERGE (n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})
   SET n.class = 'prov:Entity', n.dual_class = 'dprod:DataProduct', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Employee {name: 'Employee'})
   SET n.class = 'prov:Agent', n.prov_type = 'Agent';
-MERGE (n:SchemaMeta:Membership {name: 'Membership'})
-  SET n.class = 'org:Membership', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:Role {name: 'Role'})
+  SET n.class = 'org:Role', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:Port {name: 'Port'})
   SET n.class = 'dprod:Port', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DistributionList {name: 'DistributionList'})
@@ -380,9 +380,13 @@ MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'AreaProduct'})
 MERGE (a)-[r:SUPPORTS]->(b)
   SET r.vocab_id = 'catalog_supports_area_product', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'active';
 
-MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Membership'})
-MERGE (a)-[r:HAS_MEMBERSHIP]->(b)
-  SET r.vocab_id = 'catalog_dev_team_has_membership', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+MATCH (a:SchemaMeta {name: 'DevTeam'}), (b:SchemaMeta {name: 'Attribution'})
+MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
+  SET r.vocab_id = 'catalog_dev_team_qualified_attribution', r.prov_maps_to = 'prov:qualifiedAttribution', r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'Role'})
+MERGE (a)-[r:HAD_ROLE]->(b)
+  SET r.vocab_id = 'catalog_dev_team_attribution_had_role', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
 // ── domain: architecture ────────────────────────────────────────────────────
 

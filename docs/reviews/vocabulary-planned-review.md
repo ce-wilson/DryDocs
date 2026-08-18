@@ -1,6 +1,6 @@
 # Planned-entry review — the five held at gate `vocabulary-domains-and-id-policy` (§C1b + §C1d)
 
-**Status: 4 of 5 RULED (2026-08-18, G91). Entry 5 remains open.** Rulings transcribed to
+**Status: ALL 5 RULED (2026-08-18, G91). Gate closed.** Rulings transcribed to
 `config/gate-log.md`. The "Evidence / Against" lines below were PRODUCER-DRAFTED to help the
 SME rule — they are not SME positions, and where the walk checked them against the code two
 did not survive (noted per entry).
@@ -162,4 +162,20 @@ was DEPRECATED 2026-07-15 in favor of qualified attribution — if PAT follows t
 pattern shift, this entry would be superseded by an attribution triple rather than built.
 This is the strongest candidate for re-shaping instead of keeping as-is.
 
-**Disposition:** _pending_
+**Checked at the walk — and the "cross-current" understated it in one direction and
+overstated it in another.** `pat_team_roles.cypher` ALREADY writes the full n-ary triple
+(`HAS_MEMBERSHIP`, `OF_ROLE`, `HELD_BY`) while only this leg is registered — but that is NOT
+a registration gap. The C8 rule says identical triples are REUSED, never twinned, and both
+other legs are identical to the SEAL ones. The real defect: the entries to be reused are
+DEPRECATED, so a loader would mint "no longer loaded" edges on every run — and the estate is
+truncate-and-reload, so nothing about that is benign.
+Two carve-outs had spared it: K4's own note (*"org: stays for the PAT product hierarchy only
+… NOT deprecated"*) and C20 (2026-07-28), which scoped the K4 retirement to the SEAL loaders
+and kept `:Role`/`:Membership` load-bearing catalog-side.
+
+**Disposition:** **re-shape onto qualified attribution** (SME, 2026-08-18) — superseding both
+carve-outs. This was the last holdout on the reified Membership pattern; SEAL moved at K4 and
+the PAT product side at K5, so one employee was reaching the graph by two different routes.
+Replaced by `catalog_dev_team_qualified_attribution` + `catalog_dev_team_attribution_had_role`,
+both planned, with the `HAS_AGENT` hop REUSED from `seal_attribution_has_agent` per C8.
+`pat_team_roles.cypher` is fenced do-not-run until rewritten.

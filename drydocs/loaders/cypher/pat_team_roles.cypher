@@ -1,4 +1,14 @@
 // =============================================================================
+// !! DO NOT RUN — WRITES A RETIRED SHAPE (G91, 2026-08-18) !!
+// This file writes DevTeam -[:HAS_MEMBERSHIP]-> Membership -[:OF_ROLE|:HELD_BY]->,
+// and ALL THREE legs are now deprecated in the vocabulary: catalog_dev_team_has_membership
+// was re-shaped onto qualified attribution at G91, and OF_ROLE / HELD_BY only ever existed
+// as seal_of_role / seal_held_by, deprecated at K4. The estate is TRUNCATE-AND-RELOAD, so
+// running this does not resurrect old data — it MINTS retired edges fresh on every load.
+// The replacement shape is DevTeam -[:QUALIFIED_ATTRIBUTION]-> Attribution, with
+// -[:HAD_ROLE]-> Role and the REUSED -[:HAS_AGENT]-> Employee hop. Rewriting this loader
+// to that shape is the follow-up build; until then this file is inert by intent.
+
 // pat_team_roles.cypher  —  PAT human role assignments on DevTeams.
 //
 // Writes the org:Membership n-ary pattern for PAT team staffing:

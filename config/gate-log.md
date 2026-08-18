@@ -3323,3 +3323,58 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   deprecated)"*. So the review's "strongest re-shape candidate" framing runs against a
   ruling that already spared it. G91's acceptance stands: a re-shape routes through
   RELATIONSHIP_GUIDE as a NEW proposal, not an edit of the held entry.
+
+
+## 2026-08-18 — GATE: the held planned-entry review — CLOSED 5/5 (G91; `vocabulary-domains-and-id-policy` §C1b/§C1d follow-up)
+
+- **Completes the RECORD above** (same date, four entries). Entry 5 is now ruled, so the
+  §C1b/§C1d hold is discharged and G91 closes.
+- **§C1d entry 5 — `catalog_dev_team_has_membership`: RE-SHAPE onto qualified attribution.**
+  The DevTeam leg was the LAST HOLDOUT on the reified W3C ORG Membership pattern: SEAL moved
+  at K4 (2026-07-10 §B/§C), the PAT product / area-product side at K5 (2026-07-20). One
+  employee was therefore reaching the graph by two different routes — `HAS_AGENT` off an
+  `:Attribution` for two families, `HELD_BY` off a `:Membership` for this one. Replaced by
+  `catalog_dev_team_qualified_attribution` (DevTeam → Attribution) and
+  `catalog_dev_team_attribution_had_role` (Attribution → Role), both **planned**.
+- **THE `HAS_AGENT` HOP IS REUSED, NOT TWINNED — and that is the rule, not a shortcut.**
+  `Attribution -[HAS_AGENT]-> Employee` is IDENTICAL to `seal_attribution_has_agent`, and the
+  C8 meta-graph refuses ambiguous duplicate (from, label, to) triples (enforced at
+  `schema_graph.py:248`). The K5 header block states the rule: siblings register only *where
+  the triples differ*; an identical triple REUSES the existing entry as shared
+  qualified-attribution infrastructure, rescoped family-agnostic. So OF_ROLE / HELD_BY being
+  separately unregistered was **correct by design** — the walk's first reading of it as a
+  "registration gap" was wrong and is corrected here.
+- **THE ACTUAL DEFECT, and why the entry could not simply activate.**
+  `pat_team_roles.cypher` writes all three legs, and the two it would reuse — `seal_of_role`,
+  `seal_held_by` — are DEPRECATED, i.e. "no longer loaded". A loader minting retired edge
+  types on every run is the contradiction. **The estate is TRUNCATE-AND-RELOAD** (SME,
+  2026-08-18; the same C13 precedent `constraints.cypher` already cites — "graphs rebuild
+  from bootstrap, they are never migrated"), so there is no legacy-data reading under which
+  that is benign: anything that should not be loaded does not stay.
+- **TWO CARVE-OUTS SUPERSEDED, named so this does not read as an oversight.** K4's own
+  deprecation note spared this entry verbatim — *"org: stays for the PAT product hierarchy
+  only (e.g. catalog_dev_team_has_membership — SAME labels, different vocab id, NOT
+  deprecated)"* — and C20 (2026-07-28, `constraints.cypher`) scoped the K4 retirement to the
+  SEAL attribution loaders, keeping `:Role` / `:Membership` load-bearing for the catalog
+  paths. Both are now overtaken. `constraints.cypher` carries a dated amendment saying so.
+- **WHY `:Role` RATHER THAN A THIRD ROLE SCHEME.** PAT team roles are ENGINEERING roles, a
+  different register from `TOMRole` (SEAL) and `ProductRole` (Product Cabinet). `:Role`
+  already has seeded canonical rows and live keys, and `Attribution -[HAD_ROLE]-> Role` is a
+  new triple against both existing HAD_ROLE entries, so it registers cleanly. This also gives
+  `:Role` a live purpose again — the thing C20's retention had been holding open for the
+  shape this ruling retires.
+- **CONSEQUENCES APPLIED IN THE RULING COMMIT.** `pat_team_roles.cypher` carries a
+  DO-NOT-RUN banner (it is inert by intent until rewritten); `constraints.cypher`'s C20 note
+  is amended; the `membership_id` key is deliberately LEFT IN PLACE — the loader rewrite
+  decides whether `:Membership` survives, and dropping a constraint ahead of its loader is
+  the S3 ordering trap run backwards.
+- **NOT RULED HERE — the two join paths, recorded because the SME named them.** The
+  traditional path DevTeam → SEAL is already established and untouched by this ruling
+  (`arch_develops`, ACTIVE: `BusinessApplication -[WAS_ATTRIBUTED_TO {role: developed_by}]->
+  DevTeam`, joined by SEAL id per C2+C3/C4). The SECOND path is a support-team case that
+  reaches applications through PEOPLE — team members, by SID, holding an operate-manager
+  role on the applications — rather than through a develops edge. It rides the same
+  `:Employee` spine this re-shape unifies (`:Employee {employee_id}` IS the SID,
+  `constraints.cypher:79`), which is what makes the re-shape load-bearing rather than
+  cosmetic. Modelling that path, and the ServiceNow technician-group family beside it, is
+  NOT in this gate — see the follow-up items.

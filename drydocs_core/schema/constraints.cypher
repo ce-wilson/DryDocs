@@ -86,6 +86,17 @@ CREATE CONSTRAINT jira_board_id       IF NOT EXISTS FOR (b:JiraBoard)           
 // replaced it there. These keys remain load-bearing for the catalog paths:
 // catalog_ontology_supplement.cypher seeds the canonical :Role rows and
 // pat_team_roles.cypher MERGEs :Membership on membership_id (PAT team roles).
+// AMENDED AT G91 (2026-08-18) — that second clause is now HISTORY. The SME ruled the
+// DevTeam leg onto qualified attribution, so catalog_dev_team_has_membership is deprecated
+// and pat_team_roles.cypher is marked do-not-run until rewritten. :Membership therefore has
+// NO live writer.
+// :Role KEEPS its keys and gains a new purpose: the replacement
+// catalog_dev_team_attribution_had_role targets Attribution -[:HAD_ROLE]-> :Role, so the
+// canonical rows the catalog supplement seeds are still the register that leg resolves
+// against. The membership_id key is left in place deliberately rather than dropped in the
+// same change — the loader rewrite is the follow-up that decides whether :Membership
+// survives at all, and dropping a constraint ahead of its loader is the S3 ordering trap
+// run backwards.
 // The earlier "kept for old graphs" phrase was void — graphs rebuild from
 // bootstrap, they are never migrated (the C13 precedent).
 CREATE CONSTRAINT role_name           IF NOT EXISTS FOR (r:Role)                REQUIRE r.name IS UNIQUE;

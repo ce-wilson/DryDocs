@@ -1223,6 +1223,22 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-18",
+      "title": "GATE: the held planned-entry review — CLOSED 5/5 (G91; `vocabulary-domains-and-id-policy` §C1b/§C1d follow-up)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3328",
+      "unblocks": [
+        "G87",
+        "G88",
+        "G89",
+        "G91"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

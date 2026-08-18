@@ -291,4 +291,84 @@
     supplement:   catalog_ontology_supplement.cypher
     loader:       pat_team_roles.cypher
     domain:       catalog
+    status:       deprecated
+    deprecated_at: 2026-08-18
+    deprecation_note: >
+      RE-SHAPED at G91 (2026-08-18, §C1d): the DevTeam leg JOINS THE QUALIFIED-ATTRIBUTION
+      PATTERN. It was the last holdout on the reified W3C ORG Membership shape — SEAL moved
+      at K4 (2026-07-10 §B/§C) and the PAT product / area-product side at K5 (2026-07-20), so
+      one employee reached the graph by two different routes: HAS_AGENT off an :Attribution
+      for two families, HELD_BY off a :Membership for this one.
+      THIS SUPERSEDES TWO EARLIER CARVE-OUTS, named so the change does not read as an
+      oversight. K4's own deprecation note spared this entry — "org: stays for the PAT
+      product hierarchy only (e.g. catalog_dev_team_has_membership — SAME labels, different
+      vocab id, NOT deprecated)" — and C20 (2026-07-28, constraints.cypher) scoped the K4
+      retirement to the SEAL attribution loaders, keeping :Role / :Membership load-bearing
+      for the catalog paths. The SME ruled otherwise on 2026-08-18.
+      WHY IT COULD NOT SIMPLY ACTIVATE: pat_team_roles.cypher writes a THREE-edge triple
+      (HAS_MEMBERSHIP, OF_ROLE, HELD_BY) and only this leg was ever registered — OF_ROLE and
+      HELD_BY exist solely as seal_of_role / seal_held_by, both DEPRECATED. That is NOT a
+      registration gap: the C8 rule (K5 header block above) says identical triples are
+      REUSED, never twinned, and both are identical to the SEAL ones. The defect was that
+      the entries to be reused say "no longer loaded" while a loader would write them fresh
+      on every run — and the estate is TRUNCATE-AND-RELOAD, so there is no legacy-data
+      reading under which that is benign. Anything that should not be loaded does not stay.
+      REPLACED BY catalog_dev_team_qualified_attribution + catalog_dev_team_attribution_had_role
+      below, both planned. Per G91's acceptance a re-shape enters as a NEW proposal through
+      docs/RELATIONSHIP_GUIDE.md, never as an edit of the held entry. Never built, so
+      nothing is deleted.
+
+  # — DevTeam staffing, re-shaped onto qualified attribution (G91, 2026-08-18) —
+  #   The HAS_AGENT hop is NOT twinned: Attribution -[HAS_AGENT]-> Employee is IDENTICAL to
+  #   seal_attribution_has_agent, and the C8 meta-graph refuses ambiguous duplicate
+  #   (from, label, to) triples, so this family REUSES that entry as shared
+  #   qualified-attribution infrastructure — the same move K5 made for the Product Cabinet.
+  #   Only the two triples that DIFFER are registered here.
+  - id:           catalog_dev_team_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
+    role:         ~
+    from_node:    DevTeam
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      A DevTeam's staffing as a qualified attribution — the reified hop carrying WHO and
+      IN WHICH ROLE, replacing DevTeam -[:HAS_MEMBERSHIP]-> :Membership. Raised at G91
+      (2026-08-18) as the re-shape of catalog_dev_team_has_membership; see that entry's
+      deprecation_note for the ruling and the two carve-outs it supersedes.
+      Triple differs from both existing QUALIFIED_ATTRIBUTION entries
+      (BusinessApplication → Attribution seal-side, Product | AreaProduct → Attribution
+      cabinet-side), so it registers rather than reuses.
+      PLANNED, NOT ACTIVE, and the gap is a real build: pat_team_roles.cypher still writes
+      the Membership shape. Nothing loads this until that loader is rewritten.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_dev_team_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
+    role:         ~
+    from_node:    Attribution
+    to_node:      Role
+    prov_maps_to: ~
+    note: >
+      The role leg of a DevTeam staffing attribution. Targets :Role — the org:Role class
+      whose canonical rows catalog_ontology_supplement.cypher already seeds and whose keys
+      constraints.cypher already carries — rather than minting a third role vocabulary
+      beside TOMRole (SEAL) and ProductRole (Product Cabinet). PAT-side team roles are
+      ENGINEERING roles (Tech Partner, Area Tech Partner, Software Engineering Manager,
+      Software Engineer, SRE Director and siblings), a different register from either.
+      Triple differs from both existing HAD_ROLE entries (Attribution → TOMRole,
+      Attribution → ProductRole), so it registers rather than reuses — and it gives :Role a
+      live purpose again, which the C20 scoped retention had been holding open for the
+      Membership shape this ruling retires.
+      prov_maps_to is null deliberately: prov:hadRole belongs to the qualified pattern as a
+      whole and the sibling entries' supplement already declares it; a second mapping here
+      would duplicate it.
+      PLANNED — same build dependency as its sibling above.
+    supplement:   catalog_ontology_supplement.cypher
+    loader:       ~
+    domain:       catalog
     status:       planned
