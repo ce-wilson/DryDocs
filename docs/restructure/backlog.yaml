@@ -19529,6 +19529,15 @@ items:
       change (flips-are-follow-ups).
       Nothing loads before sign-off; SnowRole concepts stay proposed.
     notes: >
+      SOURCE NOTE 2026-08-18 (SME), and it changes what clause (e) builds against: the
+      ServiceNow extracts are being re-sourced INTERNALLY from hand-pulled CSV/YAML onto SQL
+      over the Snowflake replica views. So the lookup here targets the SOURCED feed —
+      snow@[db].[schema].<servicenow_table> per the grammar the `snow` system row already
+      rules — not a CSV shape that is being retired underneath it. Name the dataset for the
+      ServiceNow TABLE, never the V_-prefixed view wrapper (same row). Row models do not
+      move; the SQL aliases columns onto existing field names. Full note: Idea-132, which
+      also carries the two NET-NEW areas (per-CI TOM responsibilities, incidents) that are
+      NOT part of this gate and need their own.
       Raised 2026-08-18 alongside the registration, at the G91 close. FOURTH family on the
       qualified-attribution pattern (SEAL K4, PAT products K5, PAT dev teams G91, ITSM here) —
       the shape is settled, so this gate rules the REGISTER and the identity join, not the

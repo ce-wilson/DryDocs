@@ -62,6 +62,35 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
+  **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
+  against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
+  load is a hand pull exported to CSV/YAML and then loaded; nothing queries the replica
+  directly. That is changing company-side — each hand-built extract becomes a SQL file, the
+  loader's `source_label` flips `csv`/`yaml` → `snowflake`, and an overlay rebinds each
+  dataset onto the replica.
+  **NOTHING IS OWED PRODUCER-SIDE TODAY** — there are no `snow_*` loaders here and the only
+  registered ServiceNow datasets are `snow:cmdb-ci-classes` and the `snowflake:` placeholder.
+  This is recorded because it changes what a FUTURE producer-side build should target, and
+  because two of the pieces are already scheduled: [[G100]] (the ITSM technician-group gate)
+  must build its lookup against the sourced feed, not against a CSV shape that is being
+  retired underneath it.
+  **THE GRAMMAR IS ALREADY RULED AND SHOULD NOT BE RE-DERIVED.** `config/source-registry.yaml`
+  (the `snow` system row) states it: ServiceNow → Snowflake replica → `snow@[db].[schema].<table>`,
+  origin stays `snow` with Snowflake as the CARRIER — the same shape as Control-M read from the
+  Oracle replica. And the naming rule is explicit: **name the dataset for the ServiceNow TABLE,
+  never for the `V_`-prefixed view wrapper.** The replica host, database and schema are Internal
+  and stay company-side.
+  **WHAT IS AND IS NOT A MODEL CHANGE:** the row models are unchanged — the SQL aliases columns
+  onto the existing field names — so this is a SOURCE swap, not a re-shape. Two areas ARE
+  net-new and have never been built: per-CI TOM responsibilities (a scoped-app extension table
+  resolved to application/deployment) and incidents. Each is a new graph shape and needs its own
+  HITL gate before any load, not a loader bolted onto this swap.
+  **ONE KNOCK-ON WORTH DECIDING WITH IT:** `source_label: snowflake` would be another value
+  outside the declared `'csv' | 'oracle' | 'agent' | 'human'` enum in `drydocs/loaders/base.py`
+  — 12 of 28 loaders are already outside it and nothing enforces it. Re-sourcing is the natural
+  moment to rule what that field means rather than adding a thirteenth exception.
+
 - **`Idea-130`** · 2026-08-17 · `[idea]` · **open** · prio? **Med** —
   **`jpmc-reports` is an External-PUBLIC corpus, so it is the safest first docmeta
   ingestion — SME direction 2026-08-17.** The annual-report / 10-K MD&A source is
