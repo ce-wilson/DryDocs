@@ -1257,7 +1257,9 @@
       ],
       "log_ref": "config/gate-log.md:3414",
       "unblocks": [
-        "N13"
+        "N13",
+        "N14",
+        "N15"
       ]
     },
     {

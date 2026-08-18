@@ -62,19 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-134`** · 2026-08-18 · `[idea]` · **open** · prio? **Med** —
-  **The pending-source-correction MECHANICS — the two builds the signed gate authorized
-  but did not build.** Gate `pending-source-correction` SIGNED 12/12 (2026-08-18, N13).
-  Ruled, now buildable: (1) the UNION REPORT — one report class listing every live
-  placeholder across both domains (override rows awaiting source correction + manual
-  acquisition rows awaiting automation), ordered by AGE, no deadline, never gating
-  anything (§C1-§C3); (2) AGREEMENT-CANDIDATE DETECTION — the load that consumes a
-  source carrying an overridden value surfaces override == source as a retirement
-  CANDIDATE for steward confirmation (§B2, two hands; an unattended job may propose,
-  never perform, §B3). Both flips keep history per §B4. The K7 §E2 permanent-by-nature
-  domains are exempt and must not appear in the report (§D1); new stores declare
-  pending-vs-permanent at creation (§D2).
-
 - **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
@@ -1931,6 +1918,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-18 (targeted — Idea-134 only, the mechanics the signed gate authorized; SME context supplied at dispatch)** — **Promoted 2: `Idea-134` → `N14` + `N15`** (both epic N / phase 11 / **p1** — SME-confirmed at dispatch, not proposed — agent `main`, sonnet, todo, `depends_on: [N12, N13, O24]`, all three done, so **both enter `next_ready` on arrival**). **Inboxed 0, merged 0, parked-as-question 0.** **TWO items rather than one because the gate's two authorized builds land in different modules:** N14 is a report/export surface (`drydocs-api`, the O24 report family) and N15 is loader-side detection (`drydocs-load`, which owns a run cadence — the MODULE_MAP placement test). They are independent; neither blocks the other. **N14 — the UNION REPORT:** one report class over BOTH domains (§A1's single `pending_source_correction` vocabulary — active `seal_contact_override` rows plus every registry dataset row still at `acquisition.mode: manual`), ordered by AGE with the age BASIS made explicit because it is asymmetric (override rows carry `authored_on`; a manual registry row carries no dated field today, so the build picks and documents one basis). The gate's fences are written into the ACCEPTANCE, not the notes: no deadline, SLA, alerting or per-row `review_by` (§C2 — per-row clocks were offered and declined); it never gates a load, blocks CI or fails a test (§C3); and per N12 clause (f) no column, wording or styling may present `manual` as a defect. The K7 §E2 exemption is ENFORCED rather than documented — a test asserts an `app_code_mapping` row can never appear (§D1), and the report reads each store's DECLARED pending-vs-permanent property (§D2) instead of hardcoding the one exemption. **N15 — AGREEMENT-CANDIDATE DETECTION:** `seal_contacts` + the O24 override store named as the first concrete surface; when a loaded SEAL holder equals the override's corrected holder the override becomes a retirement CANDIDATE. **Two hands made structural, not aspirational:** it rides the EXISTING draft mechanism (`add_draft` / the commit-by-replace override draft path), so an unattended run can only leave an open draft — a test asserts a detection run leaves every `seal_contact_override.status` untouched (§B2/§B3; auto-retire was offered at the gate and declined). Confirming archives the row dated with its agreement evidence, history kept (§B4) — which is what extends today's `('active','corrected-in-seal')` CHECK. **Nothing graph-side in either item (§A3):** pending-ness lives in config and stores only; a graph-side flag would be a new RELATIONSHIP_GUIDE proposal and its own gate. **No new gate is created and none is needed** — the lifecycle was SIGNED 12/12 the same day and these two implement it. Sonnet on both, recorded deliberately in N15's notes: it does change a store schema, but the gate already made that decision, so the schema-touch alone must not re-tier it to fable. Verified at the groom rather than recalled: the gate clause anchors come from `config/gate-log.md`, and the `v_source_corrections` view, the `app_code_mapping` DDL comment, the status CHECK and the thin `seal_contacts` loader were read out of the tree.
+
+- **`Idea-134`** · 2026-08-18 · `[idea]` · **groomed → N14 + N15 (2026-08-18)** · prio **High** —
+  **The pending-source-correction MECHANICS — the two builds the signed gate authorized
+  but did not build.** Gate `pending-source-correction` SIGNED 12/12 (2026-08-18, N13).
+  Ruled, now buildable: (1) the UNION REPORT — one report class listing every live
+  placeholder across both domains (override rows awaiting source correction + manual
+  acquisition rows awaiting automation), ordered by AGE, no deadline, never gating
+  anything (§C1-§C3); (2) AGREEMENT-CANDIDATE DETECTION — the load that consumes a
+  source carrying an overridden value surfaces override == source as a retirement
+  CANDIDATE for steward confirmation (§B2, two hands; an unattended job may propose,
+  never perform, §B3). Both flips keep history per §B4. The K7 §E2 permanent-by-nature
+  domains are exempt and must not appear in the report (§D1); new stores declare
+  pending-vs-permanent at creation (§D2).
 
 - **GROOM 2026-08-18 (targeted — Idea-133 only, with SME context supplied in-session)** — **Promoted 2: `Idea-133` → `N12` + `N13`** (both epic N / module `config` / phase 11 / p2 / todo, dependency-free, so both enter `next_ready` on arrival). **Inboxed 0, merged 0, parked-as-question 0.** N12 is the BUILD: a first-class `acquisition:` block on every dataset row of `config/source-registry.yaml` (`mode: manual | automated`; manual names `format: csv | ascii | json` + a landing-zone-relative `drop_dir`, automated names `via: api | db` with the pull's coordinates by reference), declared in the JSON Schema and ENFORCED in `tests/unit/test_source_registry.py` — the schema is shape-only (S6, no `additionalProperties: false`), so a block added to the YAML alone would validate silently. **The SME's exploratory-phase framing is written into the ACCEPTANCE, not just the notes:** `mode: manual` is the EXPECTED FIRST STATE of every source (profiling → ontology → mapping → trial loads, with a .csv/.json file as the natural manual Neo4j loader), never a defect — no test or render may present it as a violation. Fences kept from the entry: no watcher/mover is built, no real path is committed, and the doc-corpus ledger is out of scope. **N13 is the SIBLING the SME's second half asked for:** the acquisition manual→automated flip and the O24 override→source-corrected flip are ONE lifecycle shape, and K9 §E2 deferred that flip to "the domains where permanence is temporary" with NO item owning it — so N13 drafts one gate prompt covering both (drafting decides nothing; G27/W1/U11/N10 precedent) and nothing changes until the gate signs. Raised as a sibling rather than folded into N12 as a clause on purpose: folding it would make a buildable config item undeliverable without an SME session. Coordination recorded, not invented: N10's proposed wired/ready flag and `acquisition.mode` are DIFFERENT axes that compose on the same row, and Idea-132's `source_label` enum question stays open in the inbox.
 
