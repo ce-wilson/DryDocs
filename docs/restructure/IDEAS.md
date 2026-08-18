@@ -62,39 +62,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-133`** · 2026-08-18 · `[idea]` · **open** · prio? **Med** —
-  **Give every registry source a declared ACQUISITION PATH: manual sources name their
-  drop directory (CSV/ASCII, real path in the internal twin), automated sources name
-  their API/db pull.** SME ask 2026-08-18. Today the acquisition mode is smeared across
-  three half-fields that do not compose into an answer: `adapter` (csv/oracle/yaml/
-  markdown/json — 8 sources carry `~`), `connector` (only the doc corpora use it), and
-  `locator` (free-shape: `extract: ~`, `data_root:`, `mapping:` — each source invents
-  its own key). Nothing states the split the SME names: is this source a MANUAL drop
-  (someone exports a file into a directory) or AUTOMATED (an API call or a db pull the
-  pipeline runs)?
-  **THE SHAPE TO CONSIDER:** a first-class `acquisition:` block per dataset —
-  `mode: manual | automated`; for manual, `format: csv | ascii` plus `drop_dir:` where
-  the COMMITTED value is the landing-zone convention (`DRYDOCS_DATA_ROOT`-relative, the
-  `controlm-xml/` precedent, resolver in `drydocs_core/data_root.py`) and the REAL
-  internal path lives only in the internal twin (the `locator.extract: ~` discipline,
-  unchanged); for automated, `via: api | db` plus the pull's coordinates by reference
-  (the source's own dataset id already names the db object; the API case names the
-  call surface, e.g. the G96 framework for Control-M).
-  **WHY IT EARNS A FIELD RATHER THAN A CONVENTION:** Idea-115 already caught this class
-  once — the rua copy path existed only as a derived expression, and the fix was to
-  make both ends name each other. Idea-132 is the live driver: the ServiceNow extracts
-  are moving manual→automated (hand-pulled CSV → SQL over the replica), and TODAY that
-  transition has no field to flip — it shows up only as prose in `notes:`. A declared
-  `acquisition.mode` makes "what is still hand-fed?" a query instead of an audit, gives
-  the load-map/console an honest manual-vs-automated lens, and gives the
-  `source_label` enum question (Idea-132's knock-on) the axis it is actually trying to
-  encode — acquisition mode is a SOURCE fact and belongs on the registry row, not on
-  the loader class.
-  **FENCES:** schema change to `drydocs.source-registry.v2` rows + its JSON Schema +
-  `test_source_registry.py`, so it is a groomable item, not a quick edit; no real paths
-  ever committed (Scan D/J27 class); and it RECORDS mode per source — it does not build
-  any mover/watcher for the drop directories.
-
 - **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
@@ -123,6 +90,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   outside the declared `'csv' | 'oracle' | 'agent' | 'human'` enum in `drydocs/loaders/base.py`
   — 12 of 28 loaders are already outside it and nothing enforces it. Re-sourcing is the natural
   moment to rule what that field means rather than adding a thirteenth exception.
+  **KEPT-UPDATED 2026-08-18:** the ACQUISITION half of this entry now has an owner — Idea-133 groomed to [[N12]] (a declared `acquisition:` block per registry dataset row, so this swap becomes a `mode: manual` → `automated` flip rather than prose in `notes:`) and [[N13]] (the gate prompt ruling that flip once, with O24/K9's override→source-corrected flip). The `source_label` enum question is UNTOUCHED and stays open here.
 
 - **`Idea-130`** · 2026-08-17 · `[idea]` · **open** · prio? **Med** —
   **`jpmc-reports` is an External-PUBLIC corpus, so it is the safest first docmeta
@@ -1950,6 +1918,41 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **GROOM 2026-08-18 (targeted — Idea-133 only, with SME context supplied in-session)** — **Promoted 2: `Idea-133` → `N12` + `N13`** (both epic N / module `config` / phase 11 / p2 / todo, dependency-free, so both enter `next_ready` on arrival). **Inboxed 0, merged 0, parked-as-question 0.** N12 is the BUILD: a first-class `acquisition:` block on every dataset row of `config/source-registry.yaml` (`mode: manual | automated`; manual names `format: csv | ascii | json` + a landing-zone-relative `drop_dir`, automated names `via: api | db` with the pull's coordinates by reference), declared in the JSON Schema and ENFORCED in `tests/unit/test_source_registry.py` — the schema is shape-only (S6, no `additionalProperties: false`), so a block added to the YAML alone would validate silently. **The SME's exploratory-phase framing is written into the ACCEPTANCE, not just the notes:** `mode: manual` is the EXPECTED FIRST STATE of every source (profiling → ontology → mapping → trial loads, with a .csv/.json file as the natural manual Neo4j loader), never a defect — no test or render may present it as a violation. Fences kept from the entry: no watcher/mover is built, no real path is committed, and the doc-corpus ledger is out of scope. **N13 is the SIBLING the SME's second half asked for:** the acquisition manual→automated flip and the O24 override→source-corrected flip are ONE lifecycle shape, and K9 §E2 deferred that flip to "the domains where permanence is temporary" with NO item owning it — so N13 drafts one gate prompt covering both (drafting decides nothing; G27/W1/U11/N10 precedent) and nothing changes until the gate signs. Raised as a sibling rather than folded into N12 as a clause on purpose: folding it would make a buildable config item undeliverable without an SME session. Coordination recorded, not invented: N10's proposed wired/ready flag and `acquisition.mode` are DIFFERENT axes that compose on the same row, and Idea-132's `source_label` enum question stays open in the inbox.
+
+- **`Idea-133`** · 2026-08-18 · `[idea]` · **groomed → N12 + N13 (2026-08-18)** · prio? **Med** —
+  **Give every registry source a declared ACQUISITION PATH: manual sources name their
+  drop directory (CSV/ASCII, real path in the internal twin), automated sources name
+  their API/db pull.** SME ask 2026-08-18. Today the acquisition mode is smeared across
+  three half-fields that do not compose into an answer: `adapter` (csv/oracle/yaml/
+  markdown/json — 8 sources carry `~`), `connector` (only the doc corpora use it), and
+  `locator` (free-shape: `extract: ~`, `data_root:`, `mapping:` — each source invents
+  its own key). Nothing states the split the SME names: is this source a MANUAL drop
+  (someone exports a file into a directory) or AUTOMATED (an API call or a db pull the
+  pipeline runs)?
+  **THE SHAPE TO CONSIDER:** a first-class `acquisition:` block per dataset —
+  `mode: manual | automated`; for manual, `format: csv | ascii` plus `drop_dir:` where
+  the COMMITTED value is the landing-zone convention (`DRYDOCS_DATA_ROOT`-relative, the
+  `controlm-xml/` precedent, resolver in `drydocs_core/data_root.py`) and the REAL
+  internal path lives only in the internal twin (the `locator.extract: ~` discipline,
+  unchanged); for automated, `via: api | db` plus the pull's coordinates by reference
+  (the source's own dataset id already names the db object; the API case names the
+  call surface, e.g. the G96 framework for Control-M).
+  **WHY IT EARNS A FIELD RATHER THAN A CONVENTION:** Idea-115 already caught this class
+  once — the rua copy path existed only as a derived expression, and the fix was to
+  make both ends name each other. Idea-132 is the live driver: the ServiceNow extracts
+  are moving manual→automated (hand-pulled CSV → SQL over the replica), and TODAY that
+  transition has no field to flip — it shows up only as prose in `notes:`. A declared
+  `acquisition.mode` makes "what is still hand-fed?" a query instead of an audit, gives
+  the load-map/console an honest manual-vs-automated lens, and gives the
+  `source_label` enum question (Idea-132's knock-on) the axis it is actually trying to
+  encode — acquisition mode is a SOURCE fact and belongs on the registry row, not on
+  the loader class.
+  **FENCES:** schema change to `drydocs.source-registry.v2` rows + its JSON Schema +
+  `test_source_registry.py`, so it is a groomable item, not a quick edit; no real paths
+  ever committed (Scan D/J27 class); and it RECORDS mode per source — it does not build
+  any mover/watcher for the drop directories.
 
 - **GROOM 2026-08-17 (desktop, targeted — the UI / UI-WIP inbox entries only, per the run's focus: console work that does not touch what other sessions hold)** — the three entries the 2026-08-13 groom explicitly left for a console-epic run ("UI-view work and belong with the console epic") are that run's whole scope, and all three promoted. **Promoted 3: `Idea-116` → `O60`, `Idea-122` → `O61`, `Idea-123` → `O62`** (all p2 task, `drydocs-web`, phase 12, epic web-console, sonnet) — all three dependency-free, so all three enter `next_ready` on arrival. **Inboxed 0, merged 0, parked-as-question 0, closed 0.** Verified against the tree at the groom rather than taken from the entries: `web/src/lineage/` + `routes/LineageRoute.tsx` exist (O60's landing), `UI-WIP/wireframes/wireframes.json` carries WF-DFL-01..17 + the `FB-2026-08-13-01` feedback record and `out/dataflow.svg` is present, `web/src/ownership/` + `MiniDag.tsx` exist and the module registry's own tagline for /ownership is "SEAL → PAT → team rollup" — the exact chain Idea-122 draws (O61's landing), and `web/src/ask/` + `routes/AskRoute.tsx` + `drydocs_api/query_specs.py` exist (O62's landing). **The O60/O62 pairing is kept explicit in both items** — one job → pipeline → asset chain, swimlane form vs report form. **Nothing here decides an ontology question, and two caveats are written into acceptances rather than left in this file:** O60 renders READS/WRITES dashed-and-labelled-planned for as long as `m3_reads_from`/`m3_writes_to` stay `status: planned` (drawing skips no gate), and O61's dotted "aligns to platform" cross-branch edge renders as a visually distinct annotation because no confirmed graph relationship backs it. **The sensitivity boundary is in every acceptance:** all three SME-supplied examples live machine-local under `internal-local/` with real SEAL ids/hosts/org values; the committed fixtures are SYNTHESIZED twins of shape only. Ties recorded as ties, not dependencies: O61 ↔ G94 (renders the roll-up, does not consume the selector), O62 ↔ Idea-125 (whether the report also becomes an Ask-agent named-verb answer stays open in the inbox). No existing item's status, id, or text was touched — additive only, by the run's own no-impact constraint.
 
