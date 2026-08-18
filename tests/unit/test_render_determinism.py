@@ -159,6 +159,11 @@ COMMITTED_SURFACE_WRITERS = (
     "scripts/render_remediation_diff.py",
     "scripts/render_software_registry.py",
     "knowledge/depgraph-snapshots/filter_ignored.py",
+    # Added 2026-08-17: MISSED by the original list and by the Idea-129 pass, and
+    # found only by a `git add` CRLF warning while committing something else. The
+    # list being incomplete is the failure mode a DECLARED list has; the static
+    # check below cannot flag a writer nobody declared.
+    "drydocs_core/ontology/schema_graph.py",
 )
 
 #: Globs whose CONTENT is committed and must be byte-identical across platforms.
@@ -167,6 +172,9 @@ COMMITTED_SURFACE_GLOBS = (
     "docs/design/*.html",
     "web/src/generated/*.json",
     "knowledge/depgraph-snapshots/*.json",
+    # The generated meta-graph — a render like any other, and the surface whose
+    # CRLF warning exposed the gap in the writer list above.
+    "drydocs_core/schema/schema_graph.cypher",
 )
 
 

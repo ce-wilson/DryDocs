@@ -313,5 +313,9 @@ def write_schema_graph(
     text = render_schema_graph(vocab_path)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(text, encoding="utf-8")
+    # newline="\n" — schema_graph.cypher is a COMMITTED, drift-checked render, so
+    # it is the Idea-121 class (Idea-129 for the snapshot half). Missed by both
+    # earlier sweeps and caught by its own `git add` CRLF warning while committing
+    # the G98 consequences.
+    out_path.write_text(text, encoding="utf-8", newline="\n")
     return out_path
