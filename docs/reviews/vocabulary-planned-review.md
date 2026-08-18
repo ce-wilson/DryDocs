@@ -1,6 +1,11 @@
 # Planned-entry review — the five held at gate `vocabulary-domains-and-id-policy` (§C1b + §C1d)
 
-**Status: AWAITING SME REVIEW.** At the 2026-08-12 gate session the SME held these five
+**Status: 4 of 5 RULED (2026-08-18, G91). Entry 5 remains open.** Rulings transcribed to
+`config/gate-log.md`. The "Evidence / Against" lines below were PRODUCER-DRAFTED to help the
+SME rule — they are not SME positions, and where the walk checked them against the code two
+did not survive (noted per entry).
+
+**Status of record: AWAITING SME REVIEW.** At the 2026-08-12 gate session the SME held these five
 entries out for a file-based review instead of ruling them in-session. They stay
 `status: planned` until this review is ruled; the ruling is transcribed back to
 `config/gate-log.md` as a follow-up entry citing the gate slug, and any deprecation
@@ -32,7 +37,19 @@ rulings (C30/G67) treat FW as inherently inbound — a file-dependency edge is t
 counterpart. **Against:** no feed is wired; the MFTS `fmSubPathId` source has not been
 profiled.
 
-**Disposition:** _pending_
+**Checked at the walk, and the "against" understates it.** The FileWatcher model is BUILT
+producer-side except for this edge: `:File` carries a hand-written index
+(`constraints.cypher:140`, `file_arrival` on `f.arrived_at`), the job type is parsed
+(`description_tokens.py`, `JobType.FILE_WATCHER`), and the watched-path role resolves
+(`paths.py`, `FILEWATCH|WATCH|FW_` → `WATCH_INPUT`). The FileWatcher metadata LOADER is
+company-only, which is why nothing writes it here. And something already waits on the
+ruling: `config/gate-prompts/autosys-crosswalk.yaml:102` flags its `d(file)` row as
+approximate — *"may need a FileWatcher-job mapping instead"* — with §115 making resolve-or-defer
+a gate condition.
+
+**Disposition:** **keep-planned** (SME, 2026-08-18). Id migrated to
+`scheduler_depends_on_file`; `m3_depends_on_file` deprecated as an ID MIGRATION, not a
+semantic retirement.
 
 ---
 
@@ -54,7 +71,16 @@ Use Case='CONTROL-M'). Matrix row: Activity → Agent. Feed: Control-M history A
 producer-side, and `p2_instance_of` (the run→definition edge) is itself only planned,
 so this edge would dangle from a node type with no loader.
 
-**Disposition:** _pending_
+**The grain question the walk had to answer first:** this is the RUN-grain run-as (what a
+particular run executed as, from the Control-M history API) — NOT the job definition's
+configured account. Checking that surfaced a gap: the DEFINITION-level fact
+(`CM_DEF_VJOB.OWNER`, loadable from psgmgr today) had **no registered edge at all**; every
+`:AppUser` entry was run-grain, host-side, or unrelated.
+
+**Disposition:** **keep-planned / HOLD on K17** (SME, 2026-08-18), matching `m3_delegates_to`
+at rua-load-shapes §A1 — *"not declined — blocked on identity"*. Id migrated to
+`scheduler_executed_by`. A sibling `scheduler_runs_as` (ControlMJob → AppUser, the configured
+account) was RAISED in the same ruling, planned, carrying the same K17 keying fence.
 
 ---
 
@@ -75,7 +101,16 @@ Teams); the loader file is already named. **Against:** the PAT build has been se
 behind other work since the design landed; if AreaProduct is no longer wanted, all three
 catalog entries below retire together.
 
-**Disposition:** _pending_
+**The "Against" line did not survive checking, and it was never an SME position** — it was
+drafted here to prompt a ruling. `:AreaProduct` was already live in three ACTIVE entries
+(`catalog_supports_area_product`, and the two K5 Cabinet edges scoped `Product | AreaProduct`),
+so "no longer wanted" was not the live option. Nor do entries 3 and 4 stand or fall together:
+3 is WRITTEN (`area_products.cypher` MERGEs it with the C22 orphan sweep) and 4 has no writer
+at all.
+
+**Disposition:** **ACTIVATE** (SME, 2026-08-18). It already met this file's own bar —
+`active = supplement + loader both exist` — and was held as planned on a DATA gap, a different
+axis. The sample carries `area_products: 0`; the production PAT extract carries the layer.
 
 ---
 
@@ -94,7 +129,16 @@ catalog entries below retire together.
 **Evidence:** stands or falls with `catalog_has_area_product` (entry 3) — the same
 AreaProduct model and the same named loader.
 
-**Disposition:** _pending_
+**That pairing is wrong on both halves.** Entry 3 is written and entry 4 is not — the named
+loader `area_products.cypher` never wrote this edge, and its header claimed otherwise until
+corrected at this ruling. The only `HAS_DEV_TEAM` writer is `dev_teams.cypher`, parented on
+`:Product`.
+
+**Disposition:** **deprecate — redundant** (SME, 2026-08-18). DevTeam↔AreaProduct is already
+carried by the ACTIVE `catalog_supports_area_product` (`DevTeam -[:SUPPORTS]-> AreaProduct`,
+C4 2026-06-21); this entry declared the same pair in the opposite direction under a second
+label. Never built, so nothing is deleted. NOT a rejection of `:AreaProduct` — its sibling
+went active in the same ruling.
 
 ---
 

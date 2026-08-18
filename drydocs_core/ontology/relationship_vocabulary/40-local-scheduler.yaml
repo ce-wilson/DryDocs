@@ -149,6 +149,50 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-18
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT WAS KEPT, NOT REJECTED. Gate G91 (the held
+      planned-entry review, §C1b) ruled this entry KEEP-PLANNED on 2026-08-18, then
+      ruled the epoch-tag id retired in the same session. Per the id policy ratified
+      at vocabulary-domains-and-id-policy §B1/§B3 an id is NEVER renamed in place — it
+      is the join key across the taxonomy-ontology-map, the generated
+      schema_graph.cypher, the SQLite mirror and the append-only gate log — so the
+      migration is add-new + deprecate-old. The live entry is
+      `scheduler_depends_on_file` below, carrying the same shape and the same
+      planned status. Nothing was ever loaded here, so no data moves. Done under G91
+      rather than G87 because a planned, loaderless, dataless entry migrates for free;
+      G87 keeps the remaining epoch-tag ids.
+
+  - id:           scheduler_depends_on_file
+    neo4j_label:  USED
+    inverse_label: "used by"
+    role:         file_dependency
+    from_node:    ControlMJob
+    to_node:      File
+    prov_maps_to: "prov:used"
+    note: >
+      Job waits on a file delivered via MFTS agent (fmSubPathId). Matrix row
+      Activity → Entity = USED with role=file_dependency; the pre-ontology
+      "DEPENDS_ON" edge is retired (job→job is WAS_INFORMED_BY).
+      REPLACES m3_depends_on_file at G91 (2026-08-18) — id migration under the
+      §B1 domain-derived scheme, same shape, same planned status.
+      WHY THIS IS NOT A STALE IDEA, recorded because the review that held it read
+      the other way: the FileWatcher model is BUILT producer-side except for this
+      edge. :File carries a hand-written index (constraints.cypher:140,
+      file_arrival on f.arrived_at), the job type is parsed
+      (description_tokens.py JobType.FILE_WATCHER), and the watched-path role is
+      resolved (paths.py, FILEWATCH|WATCH|FW_ → WATCH_INPUT). What is missing is
+      exactly the predicate this entry declares. The FileWatcher METADATA LOADER is
+      company-only, which is why nothing writes it here yet.
+      SOMETHING ALREADY DEPENDS ON THE RULING: the AutoSys crosswalk flags its
+      `d(file)` row as approximate — "may need a FileWatcher-job mapping instead"
+      (config/gate-prompts/autosys-crosswalk.yaml:102) — and §115 makes resolving
+      or explicitly deferring it a gate condition. Stays planned until a feed is
+      profiled; the MFTS fmSubPathId source has not been.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       planned
 
   # ── M3 phase 2: execution lineage ────────────────────────────────────────
@@ -245,6 +289,73 @@ local_relationships:
       Use Case='CONTROL-M'). Matrix row: Activity → Agent.
       Feed: Control-M history API.
     supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-18
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT WAS HELD, NOT REJECTED. G91 §C1b ruled this
+      HOLD-pending-K17 on 2026-08-18 (the m3_delegates_to disposition at
+      rua-load-shapes §A1: "not declined — blocked on identity"), and retired the
+      epoch-tag id in the same session. Add-new + deprecate-old per
+      vocabulary-domains-and-id-policy §B1/§B3; never renamed in place. Live entry
+      is `scheduler_executed_by` below. Nothing was ever loaded.
+
+  - id:           scheduler_executed_by
+    neo4j_label:  EXECUTED_BY
+    inverse_label: "executed"
+    role:         ~
+    from_node:    ControlMJobRun
+    to_node:      AppUser
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      RUN-GRAIN run-as: the service account a PARTICULAR RUN executed as
+      (Run-as-User; EPV rows with Use Case='CONTROL-M'). Matrix row Activity →
+      Agent. Feed: Control-M history API. REPLACES m3_executed_by at G91
+      (2026-08-18) — id migration, same shape.
+      HELD, NOT DECLINED — TWO BLOCKERS, and the disposition matches its sibling
+      m3_delegates_to (rua-load-shapes §A1, "not declined — blocked on identity").
+      (1) IDENTITY: fid-identity-and-scope §A1/§A2 keys :AppUser on `fid` with
+      `fid_name` a property, and rua-load-shapes §A1 ruled run_as carries the linux
+      TENANT NAME, not the directory key. No :AppUser constraint is deployed, so
+      activating would key the node on the NAME by default — the silent split that
+      gate exists to prevent. K17 owns it. (2) THE RUN LAYER IS ABSENT:
+      :ControlMJobRun has no loader and p2_instance_of (run → definition) is itself
+      only planned, so this edge would hang off a node type nothing populates.
+      NOT THE SAME FACT AS `scheduler_runs_as` below — that one is the CONFIGURED
+      account on the job definition and is available today; this one is what a run
+      actually executed as, and needs runtime ingestion.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
+    status:       planned
+
+  - id:           scheduler_runs_as
+    neo4j_label:  RUNS_AS
+    inverse_label: "runs"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      AppUser
+    prov_maps_to: ~
+    note: >
+      DEFINITION-GRAIN run-as: the service account a job is CONFIGURED to run as
+      (CM_DEF_VJOB.OWNER). RAISED AT G91 (2026-08-18, SME direction) because the
+      review surfaced that this fact had NO REGISTERED EDGE AT ALL — every :AppUser
+      entry in the vocabulary was either run-grain (scheduler_executed_by), host-side
+      (m3_delegates_to), or unrelated (arch_owns_directory, reg_appuser_uses_software).
+      WHY IT MATTERS THAT THIS IS SEPARATE: it is loadable from psgmgr TODAY and needs
+      no runtime ingestion, unlike scheduler_executed_by. The column is already
+      load-bearing — the --run-as filter binds J.OWNER, and OWNER is stored ALL UPPER
+      in psgmgr, so the bind value is upper-cased (a lower-case value silently matched
+      zero rows before that fix).
+      SAME K17 FENCE APPLIES, and it is why this lands planned rather than active:
+      OWNER carries the linux tenant NAME, not the directory key, so keying :AppUser
+      off it would reproduce the exact split fid-identity-and-scope §A1/§A2 exists to
+      prevent. This entry declares the shape; K17 rules the identity.
+      prov_maps_to is null deliberately — the PROV verb for a PLAN's configured agent
+      is a qualified-association pattern, not a direct property, and reaching for a
+      weak term is the m3_belongs_to_application precedent this repo already set.
+    supplement:   ~
     loader:       ~
     domain:       scheduler
     status:       planned

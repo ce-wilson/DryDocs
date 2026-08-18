@@ -3251,3 +3251,75 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
 - **Terminus.** Both edges are `status: planned` and no loader writes them; the M0
   seed is unchanged. Nothing about this sign-off puts data in the graph that was not
   already there — it declares what was already being written.
+
+
+## 2026-08-18 — RECORD: the held planned-entry review, four of five ruled (G91; gate `vocabulary-domains-and-id-policy` §C1b/§C1d follow-up)
+
+- **Why a RECORD.** §C1b/§C1d held five entries out for a file-based review
+  (`docs/reviews/vocabulary-planned-review.md`). Four are ruled here; entry 5
+  (`catalog_dev_team_has_membership`) stays open, so G91 stays `in_progress` and this
+  is a follow-up entry rather than a sign-off.
+- **A CAUTION ABOUT THE REVIEW FILE ITSELF, recorded because it shaped the walk.** Its
+  "Evidence for keeping / Against" lines are PRODUCER-DRAFTED prompts, not SME positions,
+  and the file landed in one commit (`26d7c395`) with the gate sign-off. Two were checked
+  against the code and did not survive: entry 3's "if AreaProduct is no longer wanted, all
+  three retire together" (never stated by anyone, and already false — three ACTIVE entries
+  touched `:AreaProduct`), and entry 4's "stands or falls with entry 3" (3 was written, 4
+  had no writer). Read those lines as questions, never as findings.
+- **§C1b entry 1 — `m3_depends_on_file`: KEEP-PLANNED.** The FileWatcher model is built
+  producer-side *except* this edge: `:File` carries a hand-written index
+  (`constraints.cypher:140`), the job type parses (`JobType.FILE_WATCHER`), the watched-path
+  role resolves (`paths.py`, `FILEWATCH|WATCH|FW_` → `WATCH_INPUT`); only the metadata
+  LOADER is company-only. And the AutoSys crosswalk already depends on the ruling — its
+  `d(file)` row is flagged approximate, "may need a FileWatcher-job mapping instead"
+  (`autosys-crosswalk.yaml:102`), with §115 making resolve-or-defer a gate condition.
+- **§C1b entry 2 — `m3_executed_by`: KEEP-PLANNED, HOLD ON K17.** Matches `m3_delegates_to`
+  at rua-load-shapes §A1 — *"not declined — blocked on identity"* — on the same to-node and
+  the same blocker: `:AppUser` is keyed on `fid` per fid-identity-and-scope §A1/§A2 while
+  `run_as` carries the linux TENANT NAME, and no `:AppUser` constraint is deployed. Second
+  blocker: the run layer is absent (`:ControlMJobRun` has no loader; `p2_instance_of` is
+  planned).
+- **NEW ENTRY RAISED — `scheduler_runs_as` (ControlMJob → AppUser), planned.** Answering the
+  grain question exposed that the DEFINITION-level run-as (`CM_DEF_VJOB.OWNER`) had **no
+  registered edge at all** — every `:AppUser` entry was run-grain, host-side, or unrelated.
+  It is loadable from psgmgr today and needs no runtime ingestion, unlike its run-grain
+  sibling. Lands planned with the SAME K17 fence: OWNER is the tenant name, not the
+  directory key. `prov_maps_to: ~` deliberately — a plan's configured agent is a qualified
+  association, not a direct PROV property (the m3_belongs_to_application precedent for
+  declining a weak term).
+- **THE `m3_` EPOCH-TAG IDS ARE RETIRED FOR THESE TWO (SME direction, same session).**
+  `m3_depends_on_file` → `scheduler_depends_on_file`; `m3_executed_by` →
+  `scheduler_executed_by`. Add-new + deprecate-old per vocabulary-domains-and-id-policy
+  §B1/§B3 — **never renamed in place**, because the id is the join key across the
+  taxonomy-ontology-map, the generated `schema_graph.cypher`, the SQLite mirror and this
+  append-only log. Done under G91 rather than G87 because a planned, loaderless, dataless
+  entry migrates for free; **G87 stays open** for the remaining epoch-tag ids.
+  **READ THE DEPRECATIONS CORRECTLY:** both old rows are `deprecated` as an ID MIGRATION,
+  not as a rejection — the concepts were kept and held respectively, and each
+  `deprecation_note` says so.
+- **§C1d entry 3 — `catalog_has_area_product`: ACTIVATED.** It already met this file's own
+  bar (`active = supplement + loader both exist`): the supplement declares `#hasAreaProduct`
+  and `area_products.cypher` MERGEs it with the C22 orphan sweep. It was carried as `planned`
+  on a DATA gap — a different axis, and one K5 §B had already dispositioned ("loader entries
+  stay planned; independent lifecycles"). That gap is now closed: the lob-product-team SAMPLE
+  has `area_products: 0`, the production PAT extract carries the layer (SME, 2026-08-17).
+  Counts are Internal and stay in the internal twin. Shape backed by C2+C3 (SUPPORTS range =
+  AreaProduct, Product reached via Product ▸ AreaProduct ▸ DevTeam) and K5 §B (AreaProduct is
+  an attribution scope).
+- **§C1d entry 4 — `catalog_area_product_has_dev_team`: DEPRECATED as REDUNDANT.**
+  DevTeam↔AreaProduct is already carried by the ACTIVE `catalog_supports_area_product`
+  (`DevTeam -[:SUPPORTS]-> AreaProduct`, active since C4 2026-06-21). This entry declared the
+  same pair in the opposite direction under a second label. **Never built** — nothing is
+  deleted; the entry and its note stay as the audit trail (the never-built deprecate case,
+  rua-load-shapes §J). Its named loader never wrote it, and `area_products.cypher`'s header
+  claimed it did until corrected in the same commit. **NOT a rejection of `:AreaProduct`** —
+  its sibling activated in the same ruling.
+- **Still open — entry 5, `catalog_dev_team_has_membership`.** Not ruled. Two facts for
+  whoever takes it: `pat_team_roles.cypher` ALREADY writes the full n-ary triple
+  (`HAS_MEMBERSHIP`, `OF_ROLE`, `HELD_BY`) while only `HAS_MEMBERSHIP` is registered — the
+  other two legs exist solely as the DEPRECATED SEAL entries. And K4's own deprecation note
+  (2026-07-15) explicitly carved this one out: *"org: stays for the PAT product hierarchy
+  only (e.g. catalog_dev_team_has_membership — SAME labels, different vocab id, NOT
+  deprecated)"*. So the review's "strongest re-shape candidate" framing runs against a
+  ruling that already spared it. G91's acceptance stands: a re-shape routes through
+  RELATIONSHIP_GUIDE as a NEW proposal, not an edit of the held entry.

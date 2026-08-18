@@ -1187,6 +1187,42 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-18",
+      "title": "RECORD: the held planned-entry review, four of five ruled (G91; gate `vocabulary-domains-and-id-policy` §C1b/§C1d follow-up)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/autosys-crosswalk.yaml",
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/rua-load-shapes.yaml",
+        "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3256",
+      "unblocks": [
+        "K7",
+        "K16",
+        "K17",
+        "K19",
+        "G22",
+        "G23",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57",
+        "G58",
+        "C25",
+        "J32",
+        "J43",
+        "K24",
+        "G87",
+        "G88",
+        "G89",
+        "G91",
+        "G97"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

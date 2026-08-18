@@ -180,7 +180,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 35,
+      "pending_entries": 34,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",

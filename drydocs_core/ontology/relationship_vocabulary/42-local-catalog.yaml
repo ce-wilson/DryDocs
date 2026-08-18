@@ -108,11 +108,25 @@
     from_node:    Product
     to_node:      AreaProduct
     prov_maps_to: ~
-    note:         "Product contains Area Product Groups (Team of Teams). Local catalog hierarchy."
+    note: >
+      Product contains Area Product Groups (Team of Teams). Local catalog hierarchy.
+      ACTIVATED at G91 (2026-08-18) — and it had met the bar for some time. This
+      file's own lifecycle says active = "supplement + loader both exist": the
+      supplement declares it (catalog_ontology_supplement.cypher, the
+      #hasAreaProduct LocalRelationship) and area_products.cypher MERGEs it with
+      the C22 orphan sweep. It was carried as planned on a DATA gap, which is a
+      different axis — the lob-product-team SAMPLE has area_products: 0, while the
+      production PAT extract carries the layer (SME, 2026-08-17; counts are Internal
+      and stay in the internal twin). K5 §B had already ruled that split: "loader
+      entries stay planned; independent lifecycles".
+      TWO SIGNED RULINGS STAND BEHIND THE SHAPE: C2+C3 (2026-06-21) resolved
+      SUPPORTS range = AreaProduct with Product reached via Product ▸ AreaProduct ▸
+      DevTeam, and K5 §B (2026-07-20) made :AreaProduct a first-class attribution
+      scope (area_product_owner and tech_partner attach ONLY to it).
     supplement:   catalog_ontology_supplement.cypher
     loader:       area_products.cypher
     domain:       catalog
-    status:       planned
+    status:       active
 
   - id:           catalog_area_product_has_dev_team
     neo4j_label:  HAS_DEV_TEAM
@@ -125,7 +139,25 @@
     supplement:   catalog_ontology_supplement.cypher
     loader:       area_products.cypher
     domain:       catalog
-    status:       planned
+    status:       deprecated
+    deprecated_at: 2026-08-18
+    deprecation_note: >
+      RETIRED at G91 (2026-08-18, §C1d) as REDUNDANT, not as a rejection of
+      :AreaProduct — its sibling catalog_has_area_product went ACTIVE in the same
+      ruling. The DevTeam↔AreaProduct link is already carried by
+      catalog_supports_area_product (DevTeam -[:SUPPORTS]-> AreaProduct, ACTIVE since
+      C4 2026-06-21, loader pat_product_mapping.cypher). This entry declared the same
+      pair in the opposite direction under a second label, so building it would have
+      given one relationship two edges.
+      NEVER BUILT, so nothing is deleted and no data moves — the entry and this note
+      stay as the audit trail (the never-built deprecate case, gloss amended at
+      rua-load-shapes §J). Its named loader area_products.cypher does NOT write it:
+      the only HAS_DEV_TEAM writer producer-side is dev_teams.cypher, parented on
+      :Product. That file's header claimed otherwise and was corrected in the same
+      commit as this ruling.
+      IF THE SECOND HOP IS EVER WANTED as a containment fact distinct from support,
+      it returns as a NEW proposal through docs/RELATIONSHIP_GUIDE.md, not by
+      un-deprecating this row.
 
   # — Product Cabinet (K5 gate signed off 2026-07-20; ACTIVE via the K6 supplement;
   #   catalog-domain siblings of the seal_qualified_attribution / seal_attribution_had_role

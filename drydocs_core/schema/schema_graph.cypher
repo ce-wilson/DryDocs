@@ -206,7 +206,7 @@ MERGE (a)-[r:WAS_INFORMED_BY]->(a)
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'File'})
 MERGE (a)-[r:USED]->(b)
-  SET r.vocab_id = 'm3_depends_on_file', r.role = 'file_dependency', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_depends_on_file', r.role = 'file_dependency', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Deployment'}), (b:SchemaMeta {name: 'Developer'})
 MERGE (a)-[r:DEPLOYED_BY]->(b)
@@ -230,7 +230,11 @@ MERGE (a)-[r:INSTANCE_OF]->(b)
 
 MATCH (a:SchemaMeta {name: 'ControlMJobRun'}), (b:SchemaMeta {name: 'AppUser'})
 MERGE (a)-[r:EXECUTED_BY]->(b)
-  SET r.vocab_id = 'm3_executed_by', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_executed_by', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'scheduler', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'AppUser'})
+MERGE (a)-[r:RUNS_AS]->(b)
+  SET r.vocab_id = 'scheduler_runs_as', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'Port'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
@@ -346,11 +350,7 @@ MERGE (a)-[r:HAS_APPLICATION]->(b)
 
 MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'AreaProduct'})
 MERGE (a)-[r:HAS_AREA_PRODUCT]->(b)
-  SET r.vocab_id = 'catalog_has_area_product', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
-
-MATCH (a:SchemaMeta {name: 'AreaProduct'}), (b:SchemaMeta {name: 'DevTeam'})
-MERGE (a)-[r:HAS_DEV_TEAM]->(b)
-  SET r.vocab_id = 'catalog_area_product_has_dev_team', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+  SET r.vocab_id = 'catalog_has_area_product', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'Attribution'})
 MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)

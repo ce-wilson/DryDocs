@@ -2,9 +2,16 @@
 // area_products.cypher  —  Area Product Groups (Team of Teams).
 //
 // Creates AreaProduct nodes and wires them under their parent Product via
-// HAS_AREA_PRODUCT.  Optionally anchors DevTeams under their AreaProduct
-// via HAS_DEV_TEAM when area_product_id is present on DevTeamRow (written
-// by this loader on a second pass, or via pat_product_mapping).
+// HAS_AREA_PRODUCT.  That is ALL it writes.
+//
+// It does NOT anchor DevTeams under their AreaProduct. This header claimed it
+// did ("optionally anchors DevTeams ... via HAS_DEV_TEAM") and the body never
+// has; the only HAS_DEV_TEAM writer is dev_teams.cypher, parented on :Product.
+// Corrected at G91 (2026-08-18), which deprecated catalog_area_product_has_dev_team
+// as redundant — DevTeam<->AreaProduct is already carried by the ACTIVE
+// catalog_supports_area_product (DevTeam -[:SUPPORTS]-> AreaProduct, written by
+// pat_product_mapping.cypher). Do not add the second hop back here without a new
+// proposal through docs/RELATIONSHIP_GUIDE.md.
 //
 // The parent join takes the products.cypher shape (the C22 sweep): OPTIONAL
 // MATCH, the `orphan` flag written on EVERY run so a parent that disappears is
