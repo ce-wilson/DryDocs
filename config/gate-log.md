@@ -3409,3 +3409,48 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   `seal_applications.cypher`. The GROUP side of the company's §C (an unloaded
   `:ServiceNowGroup`) is load-ORDER, not roster coverage, and is not covered by this
   direction.
+
+
+## 2026-08-18 — GATE: pending-source-correction — SIGNED OFF 12/12 (N13)
+
+- **One ruling for both flips**, because they are one lifecycle: acquisition
+  `manual → automated` (N12's field; Idea-132's ServiceNow re-sourcing is the live
+  case) and O24's override → source-corrected (the flip K7 §E2 explicitly deferred —
+  "it belongs to the domains where permanence is temporary" — which nothing owned
+  until N13).
+- **§A1 — ONE VOCABULARY.** A single `pending_source_correction` concept spans both
+  surfaces: on a manual acquisition row it reads "hand-fed until the pull exists";
+  on an override row, "modelled correctly here until the source is fixed". One
+  report, one lifecycle, one query for "what are we carrying?". Two domain-local
+  flags were offered and declined.
+- **§A2/§A3 confirmed** — the O24 origin discipline is not renegotiated (the
+  placeholder state is ALWAYS VISIBLE; a flip is a dated EVENT, never an overwrite),
+  and the vocabulary lives in CONFIG AND STORES only. Nothing enters the graph at
+  this gate; graph-side pending-ness would be a new RELATIONSHIP_GUIDE proposal.
+- **§B1 confirmed** — acquisition flips BY THE COMMIT THAT LANDS THE BUILD (the
+  pull's SQL/adapter + the mode change in one change; flips-are-follow-ups). Intent
+  never flips anything.
+- **§B2 — TWO HANDS.** A load observing override == source value surfaces a
+  retirement CANDIDATE; a STEWARD confirms, and the row archives dated with the
+  agreement evidence. Auto-retire was offered and declined: coincidental agreement
+  must not silently retire a correction that was masking a different defect.
+- **§B3/§B4 confirmed** — no flip is automatic-and-silent (an unattended job may
+  PROPOSE, never perform), and the flipped state keeps its history (archived
+  override rows; manual-era provenance in registry notes).
+- **§C1/§C2/§C3 — ONE UNION REPORT, NO DEADLINE, NEVER A GATE.** One report class
+  lists every live placeholder across both domains, ordered by AGE, read at the
+  SME's cadence — no alerting, no SLA, no review_by dates (per-row clocks were
+  offered and declined: they manufacture urgency the exploratory-phase framing says
+  is false — `mode: manual` is the EXPECTED first state, N12 §f). The report never
+  gates loads, blocks CI, or fails tests: a placeholder is recorded state, not an
+  error.
+- **§D1/§D2 — the K7 §E2 exemption CONFIRMED, plus the boundary rule.** The
+  app-code mapping domain stays exempt (overrides MAY be permanent — the mapping IS
+  the authored truth), as a PER-DOMAIN property. The rule for every future store:
+  pending-by-nature when an authoritative external source exists that could catch
+  up; permanent-by-nature when DryDocs/the steward IS the authority — declared at
+  store creation, never re-litigated per row.
+- **Terminus.** This gate rules the LIFECYCLE; it builds nothing. The mechanics —
+  the union report surface and the agreement-candidate detection in the loads — are
+  follow-up builds (inboxed at sign-off), each of which flips nothing on its own
+  authority per §B3.

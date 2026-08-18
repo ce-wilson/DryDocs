@@ -1248,6 +1248,19 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-18",
+      "title": "GATE: pending-source-correction — SIGNED OFF 12/12 (N13)",
+      "status": "pending",
+      "prompt_files": [
+        "config/gate-prompts/pending-source-correction.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3414",
+      "unblocks": [
+        "N13"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1343,19 +1356,6 @@
         "C25",
         "J32",
         "K24"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "pending-source-correction (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/pending-source-correction.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "N13"
       ]
     },
     {

@@ -62,6 +62,19 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-134`** · 2026-08-18 · `[idea]` · **open** · prio? **Med** —
+  **The pending-source-correction MECHANICS — the two builds the signed gate authorized
+  but did not build.** Gate `pending-source-correction` SIGNED 12/12 (2026-08-18, N13).
+  Ruled, now buildable: (1) the UNION REPORT — one report class listing every live
+  placeholder across both domains (override rows awaiting source correction + manual
+  acquisition rows awaiting automation), ordered by AGE, no deadline, never gating
+  anything (§C1-§C3); (2) AGREEMENT-CANDIDATE DETECTION — the load that consumes a
+  source carrying an overridden value surfaces override == source as a retirement
+  CANDIDATE for steward confirmation (§B2, two hands; an unattended job may propose,
+  never perform, §B3). Both flips keep history per §B4. The K7 §E2 permanent-by-nature
+  domains are exempt and must not appear in the report (§D1); new stores declare
+  pending-vs-permanent at creation (§D2).
+
 - **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
