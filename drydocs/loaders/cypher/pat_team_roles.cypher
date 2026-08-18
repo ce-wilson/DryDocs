@@ -25,9 +25,12 @@
 // the key has to be reproducible from the source, not from load order.
 //
 // Role nodes must already exist (seeded by catalog_ontology_supplement.cypher).
-// Employee nodes must already exist (written by seal_applications.cypher) -- the
-// MATCH is strict on purpose, so a role assignment for an unknown SID is dropped
-// loudly rather than minting a stub person.
+// Employee is MERGE-STUB, not strict MATCH -- SME direction 2026-08-18 (gate-log
+// RECORD, G74 clause 2): the HR roster is ~300k rows and its load is deferred, so
+// people-referencing loads STUB the person on the SID and the HR supplement
+// enriches later. The first version of this rewrite used a strict MATCH citing
+// the runbook's no-stub rule; that reading lost, and strict-match here meant a
+// staffing row for anyone outside the SEAL-minted set silently vanished.
 //
 // Parameters: $batch (team_id, employee_sid, role_id, valid_from?, valid_to?),
 //             $run_id, $loaded_at, $loader, $source_label.
@@ -37,7 +40,9 @@ UNWIND $batch AS row
 
 MATCH (dt:DevTeam  {team_id:     row.team_id})
 MATCH (r:Role      {role_id:     row.role_id})
-MATCH (e:Employee  {employee_id: row.employee_sid})
+MERGE (e:Employee  {employee_id: row.employee_sid})
+  ON CREATE SET e.source        = 'pat',
+                e.first_seen_at = datetime($loaded_at)
 
 MERGE (att:Attribution {
     attribution_id: row.team_id + '|PAT|' + row.role_id + '|' + row.employee_sid

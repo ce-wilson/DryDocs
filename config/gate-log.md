@@ -3378,3 +3378,34 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   `constraints.cypher:79`), which is what makes the re-shape load-bearing rather than
   cosmetic. Modelling that path, and the ServiceNow technician-group family beside it, is
   NOT in this gate — see the follow-up items.
+
+
+## 2026-08-18 — RECORD: the :Employee creation policy — STUB-AND-ENRICH (SME direction in-chat; G74 clause 2 owns the formal transcription)
+
+- **What this records.** SME direction, given while ruling the company's
+  `snow-tom-responsibility` §C (unresolved agent): *"the HR database has ~300k
+  [people]; my expectation is that it will be the stub and supplemented with HR data
+  later."* On the G51/X1 RECORD idiom — direction, not a gate session — written here
+  because a direction that lives only in a chat stops existing when the chat does
+  (the 2026-08-06 Operate-Manager lesson, arriving again on schedule).
+- **What it settles.** G74's second clause named the contradiction: the runbook's
+  spine-and-enrich rule ("a SID not in the roster gets no edge, NEVER a stub") vs
+  `seal_applications.cypher`, which MERGEs `:Employee` placeholders. Both were
+  defensible; the direction sides with the LOADER: **a people-referencing load MERGEs
+  a stub `:Employee {employee_id: <SID>}` and the HR supplement enriches it later.**
+  The rationale is scale-and-sequencing, not preference — the roster is ~300k rows
+  and its load is deferred, so no-stub would leave every people edge waiting on a
+  load that has not been scheduled, or silently dropped.
+- **What it does NOT settle, so G74 stays open.** The runbook text still says the
+  opposite and must be harmonized (both v2 and published v3); the stub property
+  idiom (what marks a node as awaiting enrichment beyond `source`) is unruled; and
+  clause 1 — the REPORTS_TO hierarchy edge and its source — is untouched. G74 owns
+  all of it.
+- **Applied in the same commit:** `pat_team_roles.cypher`'s strict `MATCH (e:Employee)`
+  flips to the MERGE-stub idiom. It was written yesterday (G99) citing the runbook's
+  no-stub reading; under this direction that strict match is the silent-drop defect
+  the company's §C clause exists to avoid — a PAT staffing row for a person the HR
+  gap misses would vanish without a trace. Now it stubs and counts, matching
+  `seal_applications.cypher`. The GROUP side of the company's §C (an unloaded
+  `:ServiceNowGroup`) is load-ORDER, not roster coverage, and is not covered by this
+  direction.

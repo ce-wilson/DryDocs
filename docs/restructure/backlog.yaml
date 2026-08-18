@@ -10255,6 +10255,12 @@ items:
       roster gets no edge, never a stub". seal_applications.cypher does the OPPOSITE: it MERGEs
       (e:Employee {employee_id: <owner/CTO/info-owner SID>}) ON CREATE SET e.source = 'SEAL', minting
       placeholders.
+      DIRECTION LANDED 2026-08-18 (SME in-chat, gate-log RECORD same date): STUB-AND-ENRICH WINS.
+      "The HR database has ~300k; my expectation is that it will be the stub and supplemented with
+      HR data later." The loader behavior is the policy; the runbook text is what must change. What
+      this item still owes: harmonize the runbook (v2 + published v3), rule the stub property idiom
+      (what marks awaiting-enrichment beyond `source`), and clause 1 (REPORTS_TO + its source) in
+      full. pat_team_roles.cypher was flipped to the MERGE-stub idiom in the RECORD's commit.
       MEASURED STATE (desktop graph, 2026-08-11): 11,464 :Employee nodes, ALL source='SEAL', every one
       minted by the seal_applications load. They carry employee_id + full_name and NO REPORTS_TO — there
       is no HR spine yet. 11,445 are HAS_AGENT targets of ownership attributions; 19 are unattached

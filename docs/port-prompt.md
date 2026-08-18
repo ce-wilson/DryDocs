@@ -1145,6 +1145,16 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   that misses leaves an Attribution with no HAS_AGENT edge — a silent orphan. Ruled:
   flag + count (`unresolved_agent=true`, surfaced in the load summary), the SME
   choosing at the gate, symmetric with `unmapped_role`.
+  **RIDER 2026-08-18, same day — the SME refined the INDIVIDUAL half: STUB-AND-ENRICH.**
+  "The HR database has ~300k; my expectation is that it will be the stub and
+  supplemented with HR data later." So an Individual-scope miss does NOT leave an
+  edge-less Attribution: MERGE the stub `:Employee {employee_id: <SID>}` and let the
+  HR supplement enrich it — the `seal_applications.cypher` idiom, now ruled policy
+  (producer gate-log RECORD 2026-08-18; G74 clause 2 owns harmonizing the runbook,
+  whose "never a stub" phrasing LOST). `unresolved_agent` then means "agent is a
+  stub pending HR enrichment", not "no agent". The GROUP half is different: an
+  unloaded `:ServiceNowGroup` is load ORDER, not roster coverage — the direction
+  does not cover it, so flag-or-sequence stays the gate's call there.
   **(7) STANDING TAIL:** `source_label: 'snowflake'` is a 13th value outside the
   declared `csv|oracle|agent|human` enum that 12 of 28 producer loaders already sit
   outside, unenforced — the re-sourcing pass is the moment to rule the field's
