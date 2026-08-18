@@ -93,7 +93,8 @@
             "quality",
             "context",
             "all",
-            "human"
+            "human",
+            "corporate"
           ]
         },
         "supplement": {

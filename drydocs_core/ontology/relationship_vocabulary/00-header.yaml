@@ -64,7 +64,7 @@
 #   supplement    schema file where LocalRelationship is declared (null = base PROV-O)
 #   loader        cypher file that writes this relationship
 #   domain        scheduler | business_application | catalog | architecture |
-#                 registry | docs | quality | context | all | human
+#                 registry | docs | quality | context | all | human | corporate
 #                 (renamed from controlm/seal at gate
 #                 vocabulary-domains-and-id-policy §A1/§A2, 2026-08-12; the
 #                 scheduler partition is tool-agnostic — AutoSys/Airflow edges
