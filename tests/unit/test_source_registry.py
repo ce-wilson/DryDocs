@@ -611,3 +611,72 @@ def test_no_source_claims_snowflake_as_an_origin_without_being_born_there() -> N
         f"record; Snowflake merely holding the rows makes it the CARRIER. If one of "
         f"these really is Snowflake-native, add it to `born_here` with a reason."
     )
+
+
+# ---- N12: the acquisition block (2026-08-18) --------------------------------
+# The JSON Schema DECLARES the block but is shape-only and permissive (S6), so a
+# row added without it would validate silently — this test is the enforcement,
+# per N12 acceptance (d). mode: manual is the EXPECTED first state of a source's
+# exploratory lifecycle (SME framing, N12 (f)) — nothing here treats it as debt.
+
+
+def _real_dataset_rows() -> list[dict]:
+    import yaml
+
+    doc = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "config" / "source-registry.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    return doc["datasets"]
+
+
+def test_every_dataset_row_declares_acquisition() -> None:
+    missing = [r["id"] for r in _real_dataset_rows() if "acquisition" not in r]
+    assert not missing, (
+        f"dataset rows without an acquisition block: {missing} — N12 classifies EVERY "
+        "row, including adapter: ~ ones; how the data arrives is a source fact."
+    )
+
+
+def test_acquisition_mode_implies_its_fields() -> None:
+    """manual -> format + drop_dir; automated -> via. The conditional the schema
+    declares but cannot enforce."""
+    failures: list[str] = []
+    for r in _real_dataset_rows():
+        acq = r.get("acquisition") or {}
+        mode = acq.get("mode")
+        if mode == "manual":
+            if not acq.get("format") or not acq.get("drop_dir"):
+                failures.append(f"{r['id']}: manual without format+drop_dir")
+        elif mode == "automated":
+            if acq.get("via") not in ("api", "db"):
+                failures.append(f"{r['id']}: automated without via api|db")
+        else:
+            failures.append(f"{r['id']}: mode must be manual|automated, got {mode!r}")
+    assert not failures, "\n".join(failures)
+
+
+def test_drop_dir_stays_inside_the_landing_zone_convention() -> None:
+    """A committed drop_dir is a CONVENTION (DRYDOCS_DATA_ROOT-relative, or
+    repo-relative for repo: rows) — never a real machine path. Shape-checked
+    (the J15 rule: enumerate the shape, never the values): no absolute paths,
+    no drive letters, no UNC, no backslashes, no parent escapes."""
+    bad: list[str] = []
+    for r in _real_dataset_rows():
+        acq = r.get("acquisition") or {}
+        dd = acq.get("drop_dir")
+        if dd is None:
+            continue
+        if (
+            dd.startswith(("/", "\\"))
+            or "\\" in dd
+            or ".." in dd
+            or (len(dd) > 1 and dd[1] == ":")
+            or dd.startswith("//")
+        ):
+            bad.append(f"{r['id']}: {dd!r}")
+    assert not bad, (
+        "drop_dir values that look like real machine paths (real paths live in the "
+        "internal twin only):\n  " + "\n  ".join(bad)
+    )

@@ -327,6 +327,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [folders]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
@@ -345,6 +348,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [jobs]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
@@ -365,6 +371,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [conditions, dependencies]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
@@ -384,6 +393,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [conditions]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # gate controlm-q1q3-phase1 (2026-07-07) — transfers per Q6
@@ -400,6 +412,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [variables]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # covered by controlm-q1q3-phase1 (the five psgmgr extracts) + the C3/C4 normalization gates — transfers per Q6
@@ -419,6 +434,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [hosts]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # gate controlm-hosts-topology (2026-07-09); hosts loader + RUNS_ON shipped at P3 (2026-07-27) — transfers per Q6
@@ -435,6 +453,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [runtime_stats]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: config/source-mappings/psgmgr.yaml
     confirmed: true                     # gate controlm-avg-run-supplement SIGNED OFF 2026-07-14 (P2; 20 confirmations, §B ctlm_id join edit) — transfers per Q6. The v1 umbrella row's note still read "AWAITING SME": stale since 07-14, caught at this per-row confirmation sweep.
@@ -455,6 +476,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: []
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     confirmed: false                    # planned run-history feed (jobrun-observation mapping, status proposed); no extractor/loader yet
     notes: >
       Run history (DTSREMGR retired; JOB_MEM_NAME = JOB_NAME is the only
@@ -473,6 +497,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: []
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     confirmed: false                    # no gate — this is the K17 gate's own subject (fid-identity-and-scope). Registered here so the K16 census has a source row to cite; NOTHING loads until K17 signs.
     notes: >
       THE FID DIRECTORY, AND IT WAS NEVER AN EXTERNAL SYSTEM (SME evidence
@@ -512,6 +539,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: []
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     confirmed: false                    # future feed — no extractor/loader; registered as the gate's worked example of the replica GRAMMAR (the id shape), not as an endorsement of the origin value — see notes
     notes: >
       Escalation / incident-routing rows keyed to JOB NAME (EJOBNAME join;
@@ -552,6 +582,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [folders, jobs, variables]
     adapter: ~                          # G47 extractor (drydocs_lineage/extractors/controlm_xml.py) — taxonomy-first staging, no loader
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: ascii
+      drop_dir: controlm-xml/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # xml is text — `ascii` is the plain-text bucket; drop_dir is the existing controlm-xml/ landing zone (locator.data_root)
     locator:
       data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); controlm-xml/ = definition exports (arbitrarily-named .xml — landing-zone convention + classification are the guard)"
       resolver: drydocs_core/data_root.py   # controlm_xml_dir() (the G19 shared helper)
@@ -576,6 +611,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [folders, jobs, conditions, dependencies]
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: ascii
+      drop_dir: autosys/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # placeholder vendor — the convention is declared ahead of any real drop
     crosswalk: config/crosswalks/autosys-to-bmc.yaml
     gate_spec: config/gate-prompts/autosys-crosswalk.yaml
     confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (13 confirmations) — transfers per Q6; loader still unbuilt + separately gated
@@ -595,6 +635,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [folders, jobs, conditions, dependencies]
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: ascii
+      drop_dir: airflow/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # placeholder vendor — convention declared ahead of any real drop
     crosswalk: config/crosswalks/airflow-to-bmc.yaml
     gate_spec: config/gate-prompts/airflow-crosswalk.yaml
     confirmed: true                     # gate airflow-crosswalk SIGNED OFF 2026-07-14 (17 confirmations) — transfers per Q6; loader still unbuilt + separately gated
@@ -615,6 +660,10 @@ datasets:
     authority: SOR
     feeds_taxonomy: [applications, ports, memberships, roles, employees]
     adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: csv
+      drop_dir: seal/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
     locator:
       mapping: config/source-mappings/seal-extract.yaml   # column ledger (S3; gate business-application-identity §B1(c))
     confirmed: true                     # live since the M1 chain; transfers per Q6
@@ -637,6 +686,10 @@ datasets:
     authority: SOR
     feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams]
     adapter: csv
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: csv
+      drop_dir: pat/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
     locator:
       extract: ~                        # real report path/export coordinates — internal/ twin only
     confirmed: true                     # catalog-hierarchy gates (SME 2026-06-21 rulings; C9 2026-07-18) — transfers per Q6
@@ -665,6 +718,10 @@ datasets:
     authority: SOR
     feeds_taxonomy: [team_applications]
     adapter: csv
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: csv
+      drop_dir: pat/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
     locator:
       mapping: ~                        # team report: team_id, lob, seal_ids (1..n), jira board, Relationship Type (the alignment), status, agile framework — REAL rows never committed here
     confirmed: true                     # C9 gate (2026-07-18): the PAT team report as the team_applications feed — transfers per Q6
@@ -701,6 +758,10 @@ datasets:
     authority: SOR
     feeds_taxonomy: []
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: csv
+      drop_dir: snow/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
     confirmed: false                    # no gate yet — the sampled class export (internal/registry-redesign/samples/SNOW-CMDB.csv is the header-only capture)
     notes: >
       The CMDB class/relationship export (Q4). Doubles as the crosswalk
@@ -717,6 +778,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [vendors, software_products]
     adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: ascii
+      drop_dir: config/taxonomy/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # repo-committed source: the tracked path IS the landing zone (repo-relative, not data-root)
     confirmed: true                     # SME gate 2026-07-07 (ADR 0004) — transfers per Q6
     replaces: software-registry
     notes: >
@@ -734,6 +800,11 @@ datasets:
     derived: true                       # deterministic structural capture of code we control (Q3: authority omitted on derived stores)
     feeds_taxonomy: []                  # no config/taxonomy/ file — lands as ontology + loader (gate meta.Taxonomy)
     adapter: json                       # CodeSnapshotAdapter (newest-file selection + positive meta.tree discrimination)
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: json
+      drop_dir: knowledge/depgraph-snapshots/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # repo-committed: snapshot.ps1 writes it, git carries it — arrival is a commit, hence manual
     locator:
       mapping: config/source-mappings/depgraph-snapshot.yaml   # field ledger (doc 08)
     gate_spec: config/gate-prompts/self-documentation-code-graph.yaml
@@ -755,6 +826,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [design_docs, doc_sections, requirements, components, test_cases, feedback_notes]
     adapter: markdown                   # DesignDocSectionsAdapter / TraceabilityMatrixAdapter / DesignDocFeedbackAdapter
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: ascii
+      drop_dir: docs/design/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # repo-committed markdown corpus
     locator:
       mapping: config/source-mappings/design-docs.yaml   # field ledger (three parse streams)
     gate_spec: config/gate-prompts/doc-traceability-feedback.yaml
@@ -777,6 +853,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [scripts, hosts]
     adapter: ~                          # G20 extractor (drydocs_lineage/extractors/rua_inventory.py) — staging only; no loader before G22
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: archive
+      drop_dir: rua/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # rua_*.tar.gz — `archive` added to the enum for exactly this row; the tsv/text lives INSIDE the envelope
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — clauses a–g all ruled. Authority to load, NOT a loader: the curated build is G23 and adapter stays ~
     replaces: rua-inventory
     notes: >
@@ -796,6 +877,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [pipelines]
     adapter: ~                          # G25 extractor (drydocs_lineage/extractors/dpl_registry.py) — taxonomy-first staging, no loader
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: json
+      drop_dir: dpl/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # manual TODAY: hand-exported Swagger json per SEAL. Flips automated/api when a pull is built — the N13 flip, recorded not ruled
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §G ruled clause (f) GUID-vs-URN, §H ruled clause (g) three-signal usage. Field contract still ASSUMED (T13): the envelope entry is a ruled stub
     replaces: dpl-registry
     notes: >
@@ -815,6 +901,11 @@ datasets:
     authority: SOR
     feeds_taxonomy: [datasets]
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: json
+      drop_dir: dpl/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      # manual TODAY — same as its sibling; flips automated/api with the N13 flip
     confirmed: true                     # same activation condition as dpl:pipeline-registry — gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28)
     replaces: dpl-registry
     notes: "dataset_id.json Swagger exports (per SEAL); clone-lag caveat (SME 2026-07-23) — bulk export is the backup discovery source."
@@ -831,6 +922,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [datasets]
     adapter: ~                          # G42 extractor (drydocs_lineage/extractors/snowflake_catalog.py) — taxonomy-first staging, no loader
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     locator:
       mapping: docs/generic-snowflake-data-catalog-ingestion-plan.md   # the mapping ledger (field contract §2, identity model §3)
     confirmed: false                    # gate snowflake-data-catalog (plan §5 questions a–f; prompt not yet drafted) is the activation condition
@@ -852,6 +946,9 @@ datasets:
     authority: ADS
     feeds_taxonomy: [distributions]
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     confirmed: false                    # same activation condition as the datasets view
     replaces: snowflake-data-catalog
     notes: "The distribution/physical-coordinates view (HDFS paths, S3 buckets/ARNs — real values never in-tree)."
@@ -867,6 +964,10 @@ datasets:
     authority: SOR
     feeds_taxonomy: [scripts]
     adapter: ~                          # G24 extractor (drydocs_lineage/extractors/code_repo.py) — staging + corroboration report, no loader
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: manual
+      format: ascii
+      drop_dir: bitbucket/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §D1/§D2 ruled identity + occurrence grain, §E ruled precedence between origins. trusted_ref below stays null: only a human sets it
     replaces: code-repo
     trusted_ref: ~                      # HUMAN-BLESSED intent line (G24): the one ref this repo's team keeps clean.
@@ -888,6 +989,9 @@ datasets:
     authority: SOR
     feeds_taxonomy: [schemas, tables, scripts]
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     confirmed: false                    # ingestion pipeline planned (see backlog)
     replaces: oracle-schemas
     notes: "Oracle DB schemas/scripts as taxonomy -> DataAsset. Per-schema split is the future gate; real names are confidential."
@@ -902,6 +1006,9 @@ datasets:
     authority: SOR
     feeds_taxonomy: [schemas, tables]
     adapter: ~
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     confirmed: false
     replaces: snowflake
     notes: "Expansion placeholder."
@@ -917,6 +1024,9 @@ datasets:
     derived: true                       # Q3 ruling: derived store — @ grammar for visibility, authority omitted (not SOR/ADS; FCDO SOC checked, doesn't fit)
     feeds_taxonomy: [applications]      # semantic facts attribute a ControlMJob to an Application (SEAL)
     adapter: oracle
+    acquisition:                        # N12 (2026-08-18): how the data arrives
+      mode: automated
+      via: db                           # the row's own id names the qualified object
     gate_spec: config/gate-prompts/seal-attribution-match-policy.yaml
     loader: drydocs/loaders/folder_attribution.py   # K8 folder-grain loader; cypher folder_attribution.cypher (the K2 job-grain writer retired 2026-08-04)
     confirmed: true                     # gate seal-attribution-match-policy SIGNED OFF 24/24 (2026-07-14) — transfers per Q6

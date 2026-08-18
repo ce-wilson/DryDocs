@@ -155,6 +155,69 @@
           "trusted_ref": {},
           "notes": {
             "type": "string"
+          },
+          "acquisition": {
+            "description": "N12 (2026-08-18): HOW the data arrives. manual = a hand drop into a landing zone (the expected FIRST state of every source's exploratory phase — never a defect); automated = a pull the pipeline runs. Enforcement lives in test_source_registry.py (this schema is shape-only, S6). `archive` widens the groomed csv|ascii|json enum by one value for the rua tar.gz bundle.",
+            "type": "object",
+            "properties": {
+              "mode": {
+                "enum": [
+                  "manual",
+                  "automated"
+                ]
+              },
+              "format": {
+                "enum": [
+                  "csv",
+                  "ascii",
+                  "json",
+                  "archive"
+                ]
+              },
+              "drop_dir": {
+                "type": "string"
+              },
+              "via": {
+                "enum": [
+                  "api",
+                  "db"
+                ]
+              }
+            },
+            "required": [
+              "mode"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "mode": {
+                      "const": "manual"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "format",
+                    "drop_dir"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "mode": {
+                      "const": "automated"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "via"
+                  ]
+                }
+              }
+            ]
           }
         },
         "not": {
