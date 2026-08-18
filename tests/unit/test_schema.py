@@ -44,7 +44,9 @@ VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary"
 # port_unique -> port_app_key (a DROP + a rename, so the CREATE count is
 # unchanged by that half — see the trap comment in constraints.cypher).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 53
+EXPECTED_CONSTRAINTS = (
+    52  # 53 -> 52 at G99 (2026-08-18): membership_id dropped with its last writer
+)
 
 # SchedulerKind removed 2026-07-21 (C12 platforms-taxonomy gate): its seeds are
 # retired (commented, audit-kept) in ontology.cypher — no longer a seeded label.

@@ -339,12 +339,13 @@
       Triple differs from both existing QUALIFIED_ATTRIBUTION entries
       (BusinessApplication → Attribution seal-side, Product | AreaProduct → Attribution
       cabinet-side), so it registers rather than reuses.
-      PLANNED, NOT ACTIVE, and the gap is a real build: pat_team_roles.cypher still writes
-      the Membership shape. Nothing loads this until that loader is rewritten.
+      ACTIVE at G99 (2026-08-18): pat_team_roles.cypher was rewritten onto this shape in
+      the same change, so supplement and loader both exist — the bar this file's lifecycle
+      sets for active.
     supplement:   catalog_ontology_supplement.cypher
-    loader:       ~
     domain:       catalog
-    status:       planned
+    loader:       pat_team_roles.cypher
+    status:       active
 
   - id:           catalog_dev_team_attribution_had_role
     neo4j_label:  HAD_ROLE
@@ -367,8 +368,9 @@
       prov_maps_to is null deliberately: prov:hadRole belongs to the qualified pattern as a
       whole and the sibling entries' supplement already declares it; a second mapping here
       would duplicate it.
-      PLANNED — same build dependency as its sibling above.
+      ACTIVE at G99 (2026-08-18) alongside its sibling — the rewritten loader resolves the
+      role against the canonical :Role rows the catalog supplement seeds.
     supplement:   catalog_ontology_supplement.cypher
-    loader:       ~
     domain:       catalog
-    status:       planned
+    loader:       pat_team_roles.cypher
+    status:       active

@@ -101,7 +101,14 @@ CREATE CONSTRAINT jira_board_id       IF NOT EXISTS FOR (b:JiraBoard)           
 // bootstrap, they are never migrated (the C13 precedent).
 CREATE CONSTRAINT role_name           IF NOT EXISTS FOR (r:Role)                REQUIRE r.name IS UNIQUE;
 CREATE CONSTRAINT role_id             IF NOT EXISTS FOR (r:Role)                REQUIRE r.role_id IS UNIQUE;
-CREATE CONSTRAINT membership_id       IF NOT EXISTS FOR (m:Membership)          REQUIRE m.membership_id IS UNIQUE;
+// membership_id DROPPED at G99 (2026-08-18). pat_team_roles.cypher was the last
+// writer of :Membership and it now writes the qualified-attribution shape instead;
+// the two SEAL references that remain are comments. A uniqueness key on a label
+// nothing writes is dead schema, and the estate is truncate-and-reload so there is
+// no stored data to protect. Dropped WITH its last writer, never ahead of it — the
+// ordering caution above, honoured. :Membership stays REGISTERED in the vocabulary
+// because the deprecated entries still cite it as an endpoint; the label is history,
+// not a live target.
 
 // K4 (gate 2026-07-10 §B/§C): qualified-attribution replaces Membership/Role in
 // the SEAL loaders. These MERGE keys MUST be indexed — without them every
