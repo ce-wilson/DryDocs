@@ -103,6 +103,8 @@ MERGE (n:SchemaMeta:ProductRole {name: 'ProductRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
+MERGE (n:SchemaMeta:Company {name: 'Company'})
+  SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:BusinessSegment {name: 'BusinessSegment'})
   SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:DevTeam {name: 'DevTeam'})
@@ -552,3 +554,13 @@ MERGE (a)-[r:COMPUTED_ON]->(b)
 MATCH (a:SchemaMeta {name: 'Dataset'}), (b:SchemaMeta {name: 'QualityMeasurement'})
 MERGE (a)-[r:HAS_QUALITY]->(b)
   SET r.vocab_id = 'c23_has_quality', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
+
+// ── domain: corporate ───────────────────────────────────────────────────────
+
+MATCH (a:SchemaMeta {name: 'Company'}), (b:SchemaMeta {name: 'BusinessSegment'})
+MERGE (a)-[r:HAS_BUSINESS_SEGMENT]->(b)
+  SET r.vocab_id = 'corporate_has_business_segment', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Company'}), (b:SchemaMeta {name: 'BusinessSegment'})
+MERGE (a)-[r:HAS_BUSINESS_SEGMENT_HISTORICAL]->(b)
+  SET r.vocab_id = 'corporate_has_business_segment_historical', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';

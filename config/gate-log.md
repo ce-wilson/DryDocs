@@ -3175,3 +3175,79 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   cross-check guard, explicitly SEPARABLE and not sequenced behind this page), and E
   (the External-PUBLIC recording). G98 stays `in_progress` under the awaiting-HITL
   convention.
+
+
+## 2026-08-17 — GATE: corporate-backbone-vocabulary (backlog G98) — SIGNED OFF 19/19
+
+- **Supersedes the partial RECORD above** (same date). That entry captured C1/C2/A5
+  mid-walk under the unsigned-gate convention; the walk then completed and the SME
+  signed at 19/19. Both are kept: the RECORD is the audit trail of what was ruled
+  before the signature, which is the point of writing it in the first place.
+- **§C1 — the `:Company` label is RIGHT and STAYS.** One instance is a property of
+  THIS deployment, not of the model. Declined: dropping the label, and keeping the
+  class while moving the instance out.
+- **§C2 — "JPMC" stays SEED DATA in `ontology.cypher`**, not config-resolved. The
+  cost is accepted on the record: a consuming deployment inherits this company's
+  name in its schema bootstrap until it edits the file, which sits against ADR
+  0012's standalone-generalization goal. **§C3 is MOOT** — no seed change, so
+  nothing to ledger as a bootstrap behaviour change.
+- **§A1 — `:Company` registers as `org:FormalOrganization`, prov_type Agent.** Same
+  class and same reasoning as its own child `:BusinessSegment`: the more precise
+  term for a legally-recognized organization. `org:Organization` declined. APPLIED
+  to `10-node-classifications.yaml`.
+- **§A5 — `name` stays the uniqueness key**, `constraints.cypher:29` untouched,
+  nothing migrates. **The key is an ABBREVIATION and that is now on the record:**
+  the SME supplied the fact at the walk — "JPMC is the short name of the company JP
+  Morgan Chase" — so `name` holds the short form, `legal_name` holds "JPMorgan
+  Chase & Co.", and **the common name is in this log and NOT in the graph**. A5(ii)
+  (add `short_name`/`common_name`/`legal_name` as distinct properties) and the
+  re-key onto a neutral identifier were both offered and declined. §A6 stands: an
+  abbreviation is the least stable of the three strings, so a revisit is a re-key.
+- **§B1 — TWO edge types, as the M0 seed writes them.** `HAS_BUSINESS_SEGMENT`
+  (open-ended) and `HAS_BUSINESS_SEGMENT_HISTORICAL` (closed-dated) stay distinct;
+  the one-type, date-discriminated alternative was declined on legibility and on
+  the existing skill-file queries.
+- **§B2 — the cost of §B1, and the SME ruled a GRAPH-TEST for it.** Currency is now
+  encoded twice (type name AND `effective_to`) and the two can disagree; Neo4j
+  cannot express "this type implies this property is null", so it is a test, not a
+  constraint — the TOM-roles-singleton precedent. APPLIED to `drydocs m3-verify`.
+  **The first draft of that check was WRONG and live-running it caught it:** chained
+  MATCHes returned NO ROWS on a clean graph, so the `if rows:` guard skipped the
+  check and reported a silent pass. Rewritten with `COUNT {}` subqueries and
+  verified on the laptop / `neo4jtest` / `drydocs` DB — 0 and 0, with a row.
+- **§B3 — a NEW `corporate` domain and fragment**, `49-local-corporate.yaml`, with
+  `corporate_*` ids per the id policy ratified at vocabulary-domains-and-id-policy
+  §B1. Folding into `42-local-catalog.yaml` was declined: the segment appears there
+  as `RECONCILES_TO`'s to_node, but corporate structure is not the catalog domain
+  and a `catalog_*` prefix would misdescribe it. Both edges land **status: planned**
+  — no loader, nothing activates.
+- **§D3 — the endpoint guard reads BOTH directions**, and this is the clause with
+  the widest reach. Registry-side: every declared edge's endpoints must be
+  registered labels. Seed-side: every relationship type MERGEd in a schema
+  `.cypher` must have a vocabulary entry — the direction that would actually have
+  caught this gap, since the registry-side check sees nothing while an edge is
+  absent entirely. APPLIED as `tests/unit/test_vocabulary_endpoints.py`.
+- **WHAT THE GUARD FOUND ON ITS FIRST RUN, recorded because it is the real yield.**
+  Three false-positive classes in the guard itself, each fixed and pinned: endpoint
+  ALTERNATION (`"Script | ETLProcess"`, the rua-load-shapes §B2 two-endpoint-classes
+  convention) read as one opaque label; Cypher COMMENTS read as code; and string
+  LITERALS read as code (`n.notes = "Was DevTeam-[:DEVELOPS]-> pre-K4."`). Then the
+  genuine findings: **eight endpoint labels** named by declared edges and never
+  registered (QualityMeasurement, Dataset, Metric, Dimension, OntologyTerm,
+  SchedulerKind, SwoClass, MediaType) and **one seeded edge** with no entry
+  (`CAN_ACT_AS`, `sosa_experimental_supplement.cypher:86,91`). All are the same
+  defect class as `:Company`. **None is ruled here** — each needs its own gate, and
+  `CAN_ACT_AS` belongs to E1 (SOSA, in_progress). They are carried as DECLARED DEBT
+  lists that the guard fails against on anything new, so the debt can only shrink.
+- **§E1/§E2 — publish boundary RECORDED, not reopened.** The source is
+  External-PUBLIC (`doc-source-registry.yaml#jpmc-reports`: classification External,
+  public SEC filings / IR PDFs, `source_url`, trust VERBATIM), so the JPMC literals
+  in `ontology.cypher` are publishable and this gate page carries real spellings
+  rather than placeholders. The ingestion half — that entry's `confirmed: false`,
+  the `:DataAsset`-vs-lexical-`Document`/`Chunk` reshaping — is **Idea-130 / P4
+  territory and NOT ruled here**: the ingest script was removed 2026-07-22 and the
+  PDFs were never committed, so it needs a re-fetch and a new loader before it can
+  run at all.
+- **Terminus.** Both edges are `status: planned` and no loader writes them; the M0
+  seed is unchanged. Nothing about this sign-off puts data in the graph that was not
+  already there — it declares what was already being written.

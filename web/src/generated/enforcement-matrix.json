@@ -180,7 +180,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 33,
+      "pending_entries": 35,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
@@ -195,7 +195,8 @@
         "drydocs_core/ontology/relationship_vocabulary/45-local-docs.yaml",
         "drydocs_core/ontology/relationship_vocabulary/46-local-all.yaml",
         "drydocs_core/ontology/relationship_vocabulary/47-local-context.yaml",
-        "drydocs_core/ontology/relationship_vocabulary/48-local-quality.yaml"
+        "drydocs_core/ontology/relationship_vocabulary/48-local-quality.yaml",
+        "drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml"
       ],
       "content": null,
       "extra_contents": {}
@@ -333,7 +334,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 98,
+      "pending_entries": 100,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",

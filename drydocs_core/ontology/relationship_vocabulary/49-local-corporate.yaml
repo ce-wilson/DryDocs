@@ -1,0 +1,74 @@
+
+  # ── Corporate (Company → BusinessSegment; gate corporate-backbone-vocabulary) ─
+  #
+  # Registered 2026-08-17 at gate corporate-backbone-vocabulary (G98, SIGNED
+  # 19/19). NEW DOMAIN `corporate`, ruled at §B3 rather than folding into
+  # `catalog`: the segment already appears there as RECONCILES_TO's to_node, but
+  # corporate structure is not the catalog domain and a `catalog_*` id prefix
+  # would misdescribe it. Ids take the `corporate_` prefix per the id policy
+  # ratified at vocabulary-domains-and-id-policy §B1.
+  #
+  # WHY THESE ENTRIES ARE LATE, and it is the whole reason the gate ran: both
+  # edges have been MERGEd by drydocs_core/schema/ontology.cypher since M0, with
+  # a live uniqueness constraint on :Company and four
+  # .claude/skills/data-context-extractor/ files documenting the hierarchy — and
+  # neither was ever registered here. `git log -S "Company"` over this directory
+  # returns nothing, so this is an M0 omission, never a retirement. The gap
+  # survived because nothing cross-checks an edge's endpoints against the
+  # registered label set; that guard was ruled at §D and is separate work.
+
+  - id:           corporate_has_business_segment
+    neo4j_label:  HAS_BUSINESS_SEGMENT
+    inverse_label: "business segment of"
+    role:         ~
+    from_node:    Company
+    to_node:      BusinessSegment
+    prov_maps_to: ~
+    note: >
+      CURRENT reported segment membership, effective-dated and open-ended
+      (effective_from 2024-04-01, effective_to null on the four post-reorg
+      segments). Source is the annual report — doc-source-registry#jpmc-reports,
+      classification External, ruled PUBLISHABLE at §E1, which is why this entry
+      carries real spellings rather than placeholders.
+      TWO EDGE TYPES, NOT ONE, ruled at §B1: currency is carried by the TYPE
+      NAME as well as by effective_to, on the grounds that type-level filtering
+      is cheaper and more legible than a date predicate and the existing
+      skill-file queries are already written that way. The one-type alternative
+      (this label only, currency from effective_to alone) was declined.
+      THE COST OF THAT RULING IS ON THE RECORD (§B2): currency is now encoded
+      TWICE and the two encodings can disagree — a HAS_BUSINESS_SEGMENT edge
+      with a non-null effective_to is writable and means nothing coherent. The
+      SME ruled a GRAPH-TEST rather than a constraint (Neo4j cannot express it),
+      on the TOM-roles-singleton precedent. Harmless today because
+      ontology.cypher is the only writer and it writes both shapes correctly;
+      the exposure arrives with the first loader that writes these edges.
+      prov_maps_to is null: org:hasUnit / org:subOrganizationOf are the ORG
+      terms in the neighbourhood, but the effective-dating is the point of this
+      edge and neither carries it — the m3_belongs_to_application precedent for
+      declining a weak mapping rather than reaching for one.
+    supplement:   ~
+    loader:       ~
+    domain:       corporate
+    status:       planned
+
+  - id:           corporate_has_business_segment_historical
+    neo4j_label:  HAS_BUSINESS_SEGMENT_HISTORICAL
+    inverse_label: "historical business segment of"
+    role:         ~
+    from_node:    Company
+    to_node:      BusinessSegment
+    prov_maps_to: ~
+    note: >
+      PRE-REORG segment membership, closed-dated (effective_from 2010-01-01,
+      effective_to 2024-03-31) over the four pre-Q2-2024 segments — including
+      CB, which :BusinessSegment carries with retired: true and the note "merged
+      into CIB". The reorg is MODELLED rather than overwritten, which is what
+      makes the two-type shape a real choice rather than bookkeeping.
+      The §B1 sibling of corporate_has_business_segment; read that entry's note
+      for the ruling and its recorded cost. §B4 fenced the retired-segment NODE
+      property out of this gate: how retirement is modelled on :BusinessSegment
+      is a separate question, named here only because this edge points at one.
+    supplement:   ~
+    loader:       ~
+    domain:       corporate
+    status:       planned

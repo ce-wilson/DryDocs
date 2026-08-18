@@ -2620,6 +2620,50 @@ def m3_verify() -> None:
                 )
             )
 
+        # CORPORATE BACKBONE — the §B2 agreement check (gate
+        # corporate-backbone-vocabulary, SIGNED 19/19, 2026-08-17). NOT an M3
+        # invariant: it rides here because m3-verify is the only graph-assertion
+        # surface in the CLI and there is no m0/ontology equivalent. Naming
+        # inboxed rather than silently widened.
+        #
+        # §B1 ruled TWO edge types over one date-discriminated type, so currency
+        # is encoded TWICE — in the type NAME and in effective_to — and the two
+        # can disagree. The SME ruled a GRAPH-TEST rather than a constraint on
+        # the TOM-roles-singleton precedent: Neo4j cannot express "this type
+        # implies this property is null". Harmless today because ontology.cypher
+        # is the only writer and it writes both correctly; this exists for the
+        # first loader that writes these edges.
+        # COUNT{} subqueries, NOT chained MATCHes. The first draft of this check
+        # was `MATCH ... WITH count(r) ... MATCH ... RETURN` and returned NO ROWS
+        # on a clean graph, because a second MATCH that finds nothing eliminates
+        # the row — so `if rows:` skipped the check entirely and m3-verify
+        # reported a silent pass. Caught by running it live (laptop, neo4jtest,
+        # drydocs DB) rather than by reading it. A check that vanishes precisely
+        # when there is nothing to report is indistinguishable from one that
+        # vanishes when there is.
+        rows = cli.run("""
+            RETURN
+              COUNT {
+                MATCH (:Company)-[r:HAS_BUSINESS_SEGMENT]->(:BusinessSegment)
+                WHERE r.effective_to IS NOT NULL
+              } AS current_but_dated,
+              COUNT {
+                MATCH (:Company)-[h:HAS_BUSINESS_SEGMENT_HISTORICAL]->(:BusinessSegment)
+                WHERE h.effective_to IS NULL
+              } AS historical_but_open
+        """)
+        if rows:
+            r = rows[0]
+            disagreements = r["current_but_dated"] + r["historical_but_open"]
+            checks.append(
+                (
+                    "segment edge type agrees with effective_to",
+                    disagreements == 0,
+                    f"current_but_dated={r['current_but_dated']} "
+                    f"historical_but_open={r['historical_but_open']}",
+                )
+            )
+
     t = Table(title="M3 (part 1 + part 2) invariants")
     t.add_column("Check")
     t.add_column("OK", justify="center")

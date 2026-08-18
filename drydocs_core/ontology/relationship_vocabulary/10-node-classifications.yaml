@@ -284,6 +284,32 @@ node_classifications:
     prov_type:  Agent
     note:       "Line of business. catalog_ontology_supplement.cypher."
 
+  - label:      Company
+    class:      "org:FormalOrganization"
+    prov_type:  Agent
+    note: >
+      The corporate parent of BusinessSegment. Registered 2026-08-17 at gate
+      corporate-backbone-vocabulary §A1 (SIGNED 19/19) — the SAME class as its
+      own child below, on the same reasoning: org:FormalOrganization is the more
+      precise term for a legally-recognized organization, which
+      "JPMorgan Chase & Co." is. org:Organization was offered and declined.
+      LATE, NOT RETIRED-AND-RESTORED: (:Company) has been MERGEd by
+      ontology.cypher since M0 with a live uniqueness constraint
+      (constraints.cypher:29), and `git log -S "Company"` over this directory
+      returns nothing — it was simply never registered. Exactly the
+      ControlMApplication case closed on 2026-07-09 (the edge registered without
+      its node), arriving from the other direction: here the NODE was seeded and
+      neither it nor its edges were declared.
+      §C1 RULED THE CLASS STAYS: one instance is a property of THIS deployment,
+      not of the model — another deployment seeds its own. §C2 ruled the instance
+      stays SEED DATA in ontology.cypher rather than config-resolved, so a
+      consuming deployment inherits this company's name in its bootstrap until
+      it edits the file; that cost is accepted on the record, not overlooked.
+      §A5 RULED name STAYS THE KEY, and the key is an ABBREVIATION: "JPMC" is
+      the short name of JP Morgan Chase, legal_name carries
+      "JPMorgan Chase & Co.", and the common name is in the gate log and NOT in
+      the graph — A5(ii) was not taken up. ontology.cypher.
+
   - label:      BusinessSegment
     class:      "org:FormalOrganization"
     prov_type:  Agent
