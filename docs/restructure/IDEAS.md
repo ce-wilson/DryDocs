@@ -314,23 +314,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   recorded — all three are legitimate; what is not legitimate is the current state, where
   the contract exists only as a comment on one line.
 
-- **`Idea-114`** · 2026-08-12 · `[idea]` · **groomed → G94 (the selection decision tree, buildable now) + G95 (the gate prompt for standard identity + per-team carrier — the contract change goes to the SME first, 2026-08-12)** · prio? **Med** —
-  **DD1 standard selection is a decision tree, and standards need identity.** User
-  direction at the 2026-08-12 session: under the `DD1|` tag, a FileWatcher job validates
-  against the FW standard; a CMD job selects by ETL engine FIRST (DPL, Ab Initio,
-  Informatica — the launcher classification already names these), then falls back to a
-  generic standard that carries SOME shared tokens (DevX key, the EMAIL_DL contacts) but
-  not all. The standard itself then needs identity and storage: a config table (SQLite?)
-  keyed by a standard id, so a validation profile can be stored BY TEAM, with a
-  platform/product hierarchy later. Guardrail to carry into the groom: §7.5/G84 rule the
-  DD digit a grammar VERSION that MUST NOT select a template or standard — selection rides
-  TASKTYPE + JOB_ROLE + the launcher classification, so a standard id needs its OWN
-  carrier (the config table keyed by team/engine, or a registered token), never the
-  sentinel digit. Today the per-job-type sets live in code-as-data (`TOKEN_REGISTRY`, the
-  parse contract, guarded by the registry-vs-standard agreement test) — externalizing
-  them into a per-team registry is a contract change and gate-relevant. Relates: G77
-  (THEME token inside the DD1 block), the etlprocess-kind-enum rider (engine vocabulary).
-
 - **`Idea-113`** · 2026-08-12 · `[idea]` · **groomed → G93 (2026-08-12)** · prio? **Med** —
   **Coverage counts belong in the Jira fix-package explanation.** User direction
   2026-08-12: the per-run counters the extractors already emit (`ExtractCoverage.summary()`
@@ -339,21 +322,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   counts go into the Jira explanation of the fix package (the runbook-automation support→dev
   handoff), carried through the run-log contract (`drydocs_core/run_log.py`) rather than
   console output, so the explanation is generated from the same numbers the run recorded.
-
-- **`Idea-112`** · 2026-08-12 · `[idea]` · **groomed → G92 (2026-08-12)** · prio? **Med** —
-  **Resolve `%%` variables in PRECMD/POSTCMD (and CMD_LINE) before the G14 file-op
-  parse.** The G60 feed stages operands verbatim, so candidates carry unresolved names
-  (`%%R_PATH/...`, `%%$ODATE`) that cannot merge with their resolved twins. The one
-  resolver (`drydocs_core/orchestration/controlm/resolver.py` — "no caller may
-  re-implement substitution") already does everything needed: PRECMD/POSTCMD are
-  themselves SETVAR definitions, so `resolve_layers()` over the folder→job scope chain
-  returns each row's `resolved_value` in place — parse THAT instead of the raw value, keep
-  raw verbatim beside it (the G46 derived-fact shape), and `{ODATE}`-class canonical
-  tokens remain as expected symbolic residue in the operand. The SAME variables CSV
-  carries both the shell text and its bindings (`var_scope` splits FOLDER from JOB in the
-  aliased shape; the raw export's folder rows are the header row where JOB_NAME equals the
-  folder name). Count resolution quality per the `ResolveCoverage` precedent
-  (`drydocs/cmdline_staging.py`). Raised working through the G60 result with the user.
 
 - **`Idea-111`** · 2026-08-12 · `[bug]` · **closed — both CI ruff gates exit 0 again; only the process question is left, and it is the user's** · prio? **High** —
   **SWEPT AND GREEN 2026-08-12 (this desktop).** `ruff check .` and `ruff format --check .`
@@ -764,19 +732,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (Source: company `gate-log.md` standing-divergence entry + PORT-REPORT-a14a8028
   fix close-out, ledgered in docs/port-prompt.md.)
 
-- **`Idea-79`** · 2026-08-06 · `[idea]` · **groomed → J34 (2026-08-07)** · prio? **Med** —
-  **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering
-  company-only tracked-path rows.** PORT-REPORT-a14a8028's clobber audit found the take
-  dropped the company's `default_ok` section — quantified at the 2026-08-06 root-cause
-  run as **89 company-only paths** falling through `default:` (canonical-producer
-  disposition means the producer file wins verbatim), so company-only tracked paths fell
-  through their own J16 guard (`test_no_tracked_path_falls_through_silently`, the one
-  conscious deferral in that report). The company session re-adds the rows by
-  hand this time; the structural fix is a D2-registry-style overlay: producer manifest
-  stays canonical, company rows live in a separate company-side include the guard unions,
-  and a port can no longer delete them. Needs a small grammar decision (include file vs.
-  marked section), then a manifest + guard change on both sides.
-
 - **`Idea-77`** · 2026-08-06 · `[chore]` · **groomed → O53 (2026-08-07, default remove)** · prio? **Low** —
   **`web/src/components/HeroArt.tsx` is an orphan — the code graph's first
   front-end finding.** The O42 TS import edges went live (226 edges, depgraph
@@ -790,17 +745,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   query is `MATCH (m:CodeModule) WHERE m.extension IN ['.ts','.tsx'] AND NOT
   (m)-[:IMPORTS]-() ...` — vite.config.ts is the other hit and is legitimately
   edge-less.)*
-
-- **`Idea-76`** · 2026-08-06 · `[chore]` · **merged → J35 (2026-08-07, with Idea-56)** · prio? **Med** —
-  **The port ledger stops at step 101 / `a14a802`, and ten commits have landed
-  since — including the whole G22 gate session.** The internal port that started
-  2026-08-06 classified the range ending at `a14a802`, so everything after it is
-  outside what the company side has seen: `180f4ae` (the SEAL sample generator —
-  already flagged as owed step 102), the five G22 gate commits, the desktop's two
-  code-graph asset-skip rulings, and the `.ksh` → SWO binding in
-  `code_snapshot.py`. Two of those are code changes, not just gate prose. Roll the
-  ledger before the next port so the company side is classifying a range that ends
-  somewhere deliberate. *(Noticed at the G22 session close, laptop.)*
 
 - **`Idea-75`** · 2026-08-06 · `[bug]` · **groomed → K20 (2026-08-07, the amendment-gate DRAFT — K5 stays signed until sign-off)** · prio? **High** —
   **`tech_partner` is scoped to a node class that has no rows and no loader, and
@@ -947,70 +891,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `tier=2` edge could mean "platform" or "matched by FID"; it cannot, because the edge carries the
   string. Still worth a rename (`row_kind` vs `match_tier`) for readers, and worth doing before
   either surfaces in a QuerySpec, but it is cosmetic rather than a correctness risk.
-
-- **`Idea-67`** · 2026-08-05 · `[question]` · **groomed → K19** · prio? **Med** —
-  **A Control-M app code is NOT a durable identifier — the 3-char limit
-  forces reuse (user, 2026-08-05).** Codes are a scarce namespace, so they get retired and reissued
-  with a different meaning; `DDC` is the documented case (created for the PySpark conversion,
-  repurposed, nothing PySpark now). CONSEQUENCE for the K9 store, which is about to be hand-keyed:
-  a code→application mapping is an **as-of assertion**, not a fact — the same shape as the FID→SEAL
-  registration ruled in `fid-identity-and-scope` §B1, and the third current-state-only identifier
-  found this week. `authored_on` already gives the store an as_of; what nothing prevents is a REUSED
-  code silently inheriting its predecessor's mapping, and folders authored under the old meaning
-  keeping an attribution that is now wrong. Wants: effective dating on the mapping, or at minimum a
-  reuse detection that surfaces "this code's mapping predates folders that appeared under it".
-
-- **`Idea-66`** · 2026-08-05 · `[bug]` · **groomed → K18** · prio? **High** —
-  **The app-code CSV is TIER-1-SHAPED, and loading it as authored rows would
-  silently fan a platform code's own SEAL onto every consumer folder under it.** THE MECHANISM (built,
-  [`folder_attribution.py:216-224`](../../drydocs/loaders/folder_attribution.py)): the ONLY way to
-  declare a tier-2 platform code is an authored row with **`app_id` EMPTY** — a populated app_id is
-  read as a code-level tier-1 attribution and fans out. `internal/orchestration/controlm-app-codes-with-seal.csv`
-  (company-side) populates `seal_id` on every row, including the platform codes, so a straight
-  CSV→authored-rows conversion can NEVER produce a platform declaration. Confirmed real by the user
-  2026-08-05: `AOC` (registered to the CCB Cloud Data Processing Platform SEAL, the datalake seal for
-  Ab Initio) and `DCL` (the DPL launcher spine, registered to a consumer app) are both shared platform
-  codes whose folders serve many consuming applications. K7 ALREADY RULED THIS — tier 2, "e.g. the DPL
-  launcher spine", folders SURFACE for steward completion, never auto-picked
-  ([`k7-folder-mapping-decisions.md:14`](k7-folder-mapping-decisions.md)) — so the 1:1 graph-test does
-  NOT red; the defect is upstream, at tier assignment. FIX SHAPE: an explicit platform-code list
-  applied BEFORE conversion, dropping `seal_id` for those codes rather than carrying it. The failure is
-  silent and looks correct — `AOC→110777` is a true statement about the PLATFORM, just not about the
-  consumer folders it would be stamped on. The only in-file hint of platform-ness is the word
-  "Platform" in `descr`, which is the untrustworthy column (below). **UNBLOCKED SAME DAY:** the SME
-  supplied the DAT SRE standard's Framework → APPCODE table — the platform list is CLOSED AT SIX
-  codes (values in `internal/standards/technology/folder-naming-convention.md`), and tier is
-  MECHANICALLY DERIVABLE from the folder name: prefix positions 3–5 ∈ platform list → tier 2, else
-  tier 1. So the fix is a six-row list plus a name parse, NOT a steward capture exercise — and the
-  tier-2 resolving SEAL is a token inside the folder name, so per-folder resolution is derivable for
-  the common case too. Mechanism written up in
-  [`knowledge/standards/technology/folder-naming-convention.md`](../../knowledge/standards/technology/folder-naming-convention.md).
-
-- **`Idea-65`** · 2026-08-05 · `[source]` · **merged → C25** · prio? **Med** —
-  **The Control-M SUB-APPLICATION field declares WHICH PLATFORM an application
-  runs on — a first-pass C1 source, NOT a replacement for the version email.** ~~a far better
-  USES_SOFTWARE source than the adhoc version email~~ — **CORRECTED SAME DAY (user):** that
-  overclaimed it on both axes. Under the HLT standard the framework does not vanish when the app code
-  is application-tied; it moves to a sub-application `PR<Appcode>-<Platform App Code>`. **Documenting
-  the platform IS the intent of the naming standard** — so the field is a faithful, standards-backed,
-  at-scale statement of *app → platform*, and that is genuinely useful. What it is not:
-  - **It answers no versioning question.** `ABI` says Ab Initio, never `v4-3-2-2`. The version email
-    and this field are not two sources for one fact; they are two different facts (PRODUCT vs
-    VERSION), and only the email carries the one the readiness review actually asked for. Treating
-    this as "the better source" would have left the gate's whole subject unsourced.
-  - **Mapping it at sub-application grain manufactures a super node.** An app has MANY
-    sub-applications, all naming the same platform — fan every one into `:SoftwareProduct {abinitio}`
-    and that single node collects an edge per sub-application per app across the estate, which is a
-    traversal hazard, not just noise. If this is loaded, the edge is **one per (application, product),
-    deduped at app grain**, with the sub-application rows as supporting evidence rather than as edges.
-  Standing use: **fine for a first-pass C1 (container) diagram** — which apps sit on which ETL
-  platform, at estate scale, for free. Anything finer waits for a real source.
-  PREREQUISITE either way: two of the six framework codes have no
-  `config/taxonomy/software-registry.yaml` product row — DPL (the standing gap `invocation_patterns`
-  already records, now with a name and a framework table behind it) and Snowflake ETL. Register those
-  products first. *[Corrected 2026-08-05 (user): AWS Snowflake is a TARGET DB platform (S3/Glue/
-  Iceberg family), not an ETL product — the second row registers `snowflake` the data platform, not
-  a "Snowflake ETL" tool. Recorded in C25's notes and both folder-naming twins.]*
 
 - **`Idea-64`** · 2026-08-05 · `[chore]` · **groomed → D9 (2026-08-07; the ordering decision routes through the gate)** · prio? **High** —
   **`refines:` in the standards frontmatter is a CHAIN, not a flag — and
@@ -1918,6 +1798,132 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (silent null = provenance undercount).
 
 ## Recently groomed (audit trail)
+
+- **FILED 2026-08-18 (desktop — `Idea-114` + `Idea-112`, the 2026-08-12 pair whose lines never moved)** — **Promoted 0, inboxed 0, merged 0, parked 0: this run dispositions nothing.** Both entries were already groomed on 2026-08-12 and the trail already carries that run (**GROOM 2026-08-12, targeted — `Idea-112`, `Idea-113`, `Idea-114`**, below); what never happened is the second half of the ritual, the MOVE. They sat in the inbox marked `groomed →` for six days, which is exactly the state the “fully consumed → move to the audit trail” rule exists to prevent — a reader scanning the inbox for open work had to read and dismiss them each pass. Filed together at the user's grouping because they came out of ONE session (working through the G60 result) and split into work that still has to agree: `Idea-112` → **G92** (p2, `drydocs-lineage`, phase 6) resolves `%%` variables BEFORE the file-op parse so a variable path and its resolved twin stop planning two `DataAsset` nodes for one file; `Idea-114` → **G94** (p2, `drydocs-core`, phase 6, deps G84) the standard-selection decision tree **+ G95** (p3, `config`, dependency-free) the gate prompt for standard identity and its carrier. **All three items are still `todo`, so nothing here is retrospective** — the filing is bookkeeping, and the open work is in the backlog where it belongs. Guardrail restated because it survives the move: §7.5/G84 rule the DD digit a grammar VERSION that must never select a template or standard, so a standard id needs its own carrier and never the sentinel digit.
+
+- **`Idea-114`** · 2026-08-12 · `[idea]` · **groomed → G94 (the selection decision tree, buildable now) + G95 (the gate prompt for standard identity + per-team carrier — the contract change goes to the SME first, 2026-08-12)** · prio? **Med** —
+  **DD1 standard selection is a decision tree, and standards need identity.** User
+  direction at the 2026-08-12 session: under the `DD1|` tag, a FileWatcher job validates
+  against the FW standard; a CMD job selects by ETL engine FIRST (DPL, Ab Initio,
+  Informatica — the launcher classification already names these), then falls back to a
+  generic standard that carries SOME shared tokens (DevX key, the EMAIL_DL contacts) but
+  not all. The standard itself then needs identity and storage: a config table (SQLite?)
+  keyed by a standard id, so a validation profile can be stored BY TEAM, with a
+  platform/product hierarchy later. Guardrail to carry into the groom: §7.5/G84 rule the
+  DD digit a grammar VERSION that MUST NOT select a template or standard — selection rides
+  TASKTYPE + JOB_ROLE + the launcher classification, so a standard id needs its OWN
+  carrier (the config table keyed by team/engine, or a registered token), never the
+  sentinel digit. Today the per-job-type sets live in code-as-data (`TOKEN_REGISTRY`, the
+  parse contract, guarded by the registry-vs-standard agreement test) — externalizing
+  them into a per-team registry is a contract change and gate-relevant. Relates: G77
+  (THEME token inside the DD1 block), the etlprocess-kind-enum rider (engine vocabulary).
+
+- **`Idea-112`** · 2026-08-12 · `[idea]` · **groomed → G92 (2026-08-12)** · prio? **Med** —
+  **Resolve `%%` variables in PRECMD/POSTCMD (and CMD_LINE) before the G14 file-op
+  parse.** The G60 feed stages operands verbatim, so candidates carry unresolved names
+  (`%%R_PATH/...`, `%%$ODATE`) that cannot merge with their resolved twins. The one
+  resolver (`drydocs_core/orchestration/controlm/resolver.py` — "no caller may
+  re-implement substitution") already does everything needed: PRECMD/POSTCMD are
+  themselves SETVAR definitions, so `resolve_layers()` over the folder→job scope chain
+  returns each row's `resolved_value` in place — parse THAT instead of the raw value, keep
+  raw verbatim beside it (the G46 derived-fact shape), and `{ODATE}`-class canonical
+  tokens remain as expected symbolic residue in the operand. The SAME variables CSV
+  carries both the shell text and its bindings (`var_scope` splits FOLDER from JOB in the
+  aliased shape; the raw export's folder rows are the header row where JOB_NAME equals the
+  folder name). Count resolution quality per the `ResolveCoverage` precedent
+  (`drydocs/cmdline_staging.py`). Raised working through the G60 result with the user.
+
+- **FILED 2026-08-18 (desktop — `Idea-79` + `Idea-76`, the port-mechanics pair; both items shipped)** — **Promoted 0, inboxed 0, merged 0, parked 0.** Neither entry had a trail record at all: they were dispositioned on 2026-08-07 in a session that filed no groom entry (the only 2026-08-07 entry below is the laptop's Q16-session gaps run, which covers different ids), so this filing is also the retro-record. Grouped because they are one subject seen from two ends — what the port CARRIES and what the port has REACHED. `Idea-79` → **J34** (p2, `docs`, phase 8, **done**): the `PORT-MANIFEST.yaml` company-row overlay seam, raised after a clobber audit quantified **89 company-only paths** falling through `default:` and out of their own J16 guard. `Idea-76` → **J35** (p2, `docs`, phase 8, **done**, merged with `Idea-56`): the port ledger stopping at step 101 / `a14a802` with ten commits behind it, which J35 turned from a catch-up into a structural roll. **Both done, so the entries are fully consumed with no residue** — the reason they move rather than getting marked in place.
+
+- **`Idea-79`** · 2026-08-06 · `[idea]` · **groomed → J34 (2026-08-07)** · prio? **Med** —
+  **`PORT-MANIFEST.yaml` needs a company-row overlay seam — ports keep clobbering
+  company-only tracked-path rows.** PORT-REPORT-a14a8028's clobber audit found the take
+  dropped the company's `default_ok` section — quantified at the 2026-08-06 root-cause
+  run as **89 company-only paths** falling through `default:` (canonical-producer
+  disposition means the producer file wins verbatim), so company-only tracked paths fell
+  through their own J16 guard (`test_no_tracked_path_falls_through_silently`, the one
+  conscious deferral in that report). The company session re-adds the rows by
+  hand this time; the structural fix is a D2-registry-style overlay: producer manifest
+  stays canonical, company rows live in a separate company-side include the guard unions,
+  and a port can no longer delete them. Needs a small grammar decision (include file vs.
+  marked section), then a manifest + guard change on both sides.
+
+- **`Idea-76`** · 2026-08-06 · `[chore]` · **merged → J35 (2026-08-07, with Idea-56)** · prio? **Med** —
+  **The port ledger stops at step 101 / `a14a802`, and ten commits have landed
+  since — including the whole G22 gate session.** The internal port that started
+  2026-08-06 classified the range ending at `a14a802`, so everything after it is
+  outside what the company side has seen: `180f4ae` (the SEAL sample generator —
+  already flagged as owed step 102), the five G22 gate commits, the desktop's two
+  code-graph asset-skip rulings, and the `.ksh` → SWO binding in
+  `code_snapshot.py`. Two of those are code changes, not just gate prose. Roll the
+  ledger before the next port so the company side is classifying a range that ends
+  somewhere deliberate. *(Noticed at the G22 session close, laptop.)*
+
+- **FILED 2026-08-18 (desktop — `Idea-67` + `Idea-66` + `Idea-65`, the Control-M app-code cluster; all three items shipped)** — **Promoted 0, inboxed 0, merged 0, parked 0.** All three were dispositioned on 2026-08-05, before this trail's earliest entry, so they have never had a record here; this filing supplies it. Grouped because they are three readings of ONE identifier problem — a 3-character Control-M app code asked to carry more meaning than it can hold. **`Idea-66` → K18** (p1, `drydocs-load`, phase 9, **done**): the app-code CSV is tier-1-shaped, so a straight conversion would fan a PLATFORM code's own SEAL onto every consumer folder beneath it — silent, and it looks correct, because `AOC→110777` is a true statement about the platform and a false one about the folders. Unblocked the same day when the SME supplied the closed six-code platform list, turning a steward capture exercise into a name parse. **`Idea-67` → K19** (p2, `drydocs-load`, phase 9, **done**, deps K18): the same code is not DURABLE — a scarce 3-char namespace gets retired and reissued (`DDC` is the documented case), so a code→application mapping is an as-of assertion, not a fact, and a reused code can silently inherit its predecessor's mapping. **`Idea-65` → merged into C25** (p2, `ontology`, phase 2, **done**): the SUB-APPLICATION field is a standards-backed at-scale statement of app→platform — and the entry is worth keeping for its own CORRECTION, which the user made the same day: it was first overclaimed as a better USES_SOFTWARE source than the version email, and it answers no versioning question at all. PRODUCT and VERSION are two facts, not two sources for one. **All three items done; no residue, so all three move.**
+
+- **`Idea-67`** · 2026-08-05 · `[question]` · **groomed → K19** · prio? **Med** —
+  **A Control-M app code is NOT a durable identifier — the 3-char limit
+  forces reuse (user, 2026-08-05).** Codes are a scarce namespace, so they get retired and reissued
+  with a different meaning; `DDC` is the documented case (created for the PySpark conversion,
+  repurposed, nothing PySpark now). CONSEQUENCE for the K9 store, which is about to be hand-keyed:
+  a code→application mapping is an **as-of assertion**, not a fact — the same shape as the FID→SEAL
+  registration ruled in `fid-identity-and-scope` §B1, and the third current-state-only identifier
+  found this week. `authored_on` already gives the store an as_of; what nothing prevents is a REUSED
+  code silently inheriting its predecessor's mapping, and folders authored under the old meaning
+  keeping an attribution that is now wrong. Wants: effective dating on the mapping, or at minimum a
+  reuse detection that surfaces "this code's mapping predates folders that appeared under it".
+
+- **`Idea-66`** · 2026-08-05 · `[bug]` · **groomed → K18** · prio? **High** —
+  **The app-code CSV is TIER-1-SHAPED, and loading it as authored rows would
+  silently fan a platform code's own SEAL onto every consumer folder under it.** THE MECHANISM (built,
+  [`folder_attribution.py:216-224`](../../drydocs/loaders/folder_attribution.py)): the ONLY way to
+  declare a tier-2 platform code is an authored row with **`app_id` EMPTY** — a populated app_id is
+  read as a code-level tier-1 attribution and fans out. `internal/orchestration/controlm-app-codes-with-seal.csv`
+  (company-side) populates `seal_id` on every row, including the platform codes, so a straight
+  CSV→authored-rows conversion can NEVER produce a platform declaration. Confirmed real by the user
+  2026-08-05: `AOC` (registered to the CCB Cloud Data Processing Platform SEAL, the datalake seal for
+  Ab Initio) and `DCL` (the DPL launcher spine, registered to a consumer app) are both shared platform
+  codes whose folders serve many consuming applications. K7 ALREADY RULED THIS — tier 2, "e.g. the DPL
+  launcher spine", folders SURFACE for steward completion, never auto-picked
+  ([`k7-folder-mapping-decisions.md:14`](k7-folder-mapping-decisions.md)) — so the 1:1 graph-test does
+  NOT red; the defect is upstream, at tier assignment. FIX SHAPE: an explicit platform-code list
+  applied BEFORE conversion, dropping `seal_id` for those codes rather than carrying it. The failure is
+  silent and looks correct — `AOC→110777` is a true statement about the PLATFORM, just not about the
+  consumer folders it would be stamped on. The only in-file hint of platform-ness is the word
+  "Platform" in `descr`, which is the untrustworthy column (below). **UNBLOCKED SAME DAY:** the SME
+  supplied the DAT SRE standard's Framework → APPCODE table — the platform list is CLOSED AT SIX
+  codes (values in `internal/standards/technology/folder-naming-convention.md`), and tier is
+  MECHANICALLY DERIVABLE from the folder name: prefix positions 3–5 ∈ platform list → tier 2, else
+  tier 1. So the fix is a six-row list plus a name parse, NOT a steward capture exercise — and the
+  tier-2 resolving SEAL is a token inside the folder name, so per-folder resolution is derivable for
+  the common case too. Mechanism written up in
+  [`knowledge/standards/technology/folder-naming-convention.md`](../../knowledge/standards/technology/folder-naming-convention.md).
+
+- **`Idea-65`** · 2026-08-05 · `[source]` · **merged → C25** · prio? **Med** —
+  **The Control-M SUB-APPLICATION field declares WHICH PLATFORM an application
+  runs on — a first-pass C1 source, NOT a replacement for the version email.** ~~a far better
+  USES_SOFTWARE source than the adhoc version email~~ — **CORRECTED SAME DAY (user):** that
+  overclaimed it on both axes. Under the HLT standard the framework does not vanish when the app code
+  is application-tied; it moves to a sub-application `PR<Appcode>-<Platform App Code>`. **Documenting
+  the platform IS the intent of the naming standard** — so the field is a faithful, standards-backed,
+  at-scale statement of *app → platform*, and that is genuinely useful. What it is not:
+  - **It answers no versioning question.** `ABI` says Ab Initio, never `v4-3-2-2`. The version email
+    and this field are not two sources for one fact; they are two different facts (PRODUCT vs
+    VERSION), and only the email carries the one the readiness review actually asked for. Treating
+    this as "the better source" would have left the gate's whole subject unsourced.
+  - **Mapping it at sub-application grain manufactures a super node.** An app has MANY
+    sub-applications, all naming the same platform — fan every one into `:SoftwareProduct {abinitio}`
+    and that single node collects an edge per sub-application per app across the estate, which is a
+    traversal hazard, not just noise. If this is loaded, the edge is **one per (application, product),
+    deduped at app grain**, with the sub-application rows as supporting evidence rather than as edges.
+  Standing use: **fine for a first-pass C1 (container) diagram** — which apps sit on which ETL
+  platform, at estate scale, for free. Anything finer waits for a real source.
+  PREREQUISITE either way: two of the six framework codes have no
+  `config/taxonomy/software-registry.yaml` product row — DPL (the standing gap `invocation_patterns`
+  already records, now with a name and a framework table behind it) and Snowflake ETL. Register those
+  products first. *[Corrected 2026-08-05 (user): AWS Snowflake is a TARGET DB platform (S3/Glue/
+  Iceberg family), not an ETL product — the second row registers `snowflake` the data platform, not
+  a "Snowflake ETL" tool. Recorded in C25's notes and both folder-naming twins.]*
 
 - **GROOM 2026-08-18 (targeted — Idea-134 only, the mechanics the signed gate authorized; SME context supplied at dispatch)** — **Promoted 2: `Idea-134` → `N14` + `N15`** (both epic N / phase 11 / **p1** — SME-confirmed at dispatch, not proposed — agent `main`, sonnet, todo, `depends_on: [N12, N13, O24]`, all three done, so **both enter `next_ready` on arrival**). **Inboxed 0, merged 0, parked-as-question 0.** **TWO items rather than one because the gate's two authorized builds land in different modules:** N14 is a report/export surface (`drydocs-api`, the O24 report family) and N15 is loader-side detection (`drydocs-load`, which owns a run cadence — the MODULE_MAP placement test). They are independent; neither blocks the other. **N14 — the UNION REPORT:** one report class over BOTH domains (§A1's single `pending_source_correction` vocabulary — active `seal_contact_override` rows plus every registry dataset row still at `acquisition.mode: manual`), ordered by AGE with the age BASIS made explicit because it is asymmetric (override rows carry `authored_on`; a manual registry row carries no dated field today, so the build picks and documents one basis). The gate's fences are written into the ACCEPTANCE, not the notes: no deadline, SLA, alerting or per-row `review_by` (§C2 — per-row clocks were offered and declined); it never gates a load, blocks CI or fails a test (§C3); and per N12 clause (f) no column, wording or styling may present `manual` as a defect. The K7 §E2 exemption is ENFORCED rather than documented — a test asserts an `app_code_mapping` row can never appear (§D1), and the report reads each store's DECLARED pending-vs-permanent property (§D2) instead of hardcoding the one exemption. **N15 — AGREEMENT-CANDIDATE DETECTION:** `seal_contacts` + the O24 override store named as the first concrete surface; when a loaded SEAL holder equals the override's corrected holder the override becomes a retirement CANDIDATE. **Two hands made structural, not aspirational:** it rides the EXISTING draft mechanism (`add_draft` / the commit-by-replace override draft path), so an unattended run can only leave an open draft — a test asserts a detection run leaves every `seal_contact_override.status` untouched (§B2/§B3; auto-retire was offered at the gate and declined). Confirming archives the row dated with its agreement evidence, history kept (§B4) — which is what extends today's `('active','corrected-in-seal')` CHECK. **Nothing graph-side in either item (§A3):** pending-ness lives in config and stores only; a graph-side flag would be a new RELATIONSHIP_GUIDE proposal and its own gate. **No new gate is created and none is needed** — the lifecycle was SIGNED 12/12 the same day and these two implement it. Sonnet on both, recorded deliberately in N15's notes: it does change a store schema, but the gate already made that decision, so the schema-touch alone must not re-tier it to fable. Verified at the groom rather than recalled: the gate clause anchors come from `config/gate-log.md`, and the `v_source_corrections` view, the `app_code_mapping` DDL comment, the status CHECK and the thin `seal_contacts` loader were read out of the tree.
 
