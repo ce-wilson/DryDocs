@@ -25,6 +25,11 @@ MERGE (sp:SoftwareProduct {product_id: row.product_id})
   ON CREATE SET sp.first_seen_at = datetime($loaded_at),
                 sp.source     = 'registry'
 SET sp.name         = row.name,
+    // seal_id: the deployed instance's business-app registration id — a node
+    // property ONLY (J32: registration is not attribution; no edge minted, and
+    // USES_SOFTWARE below is unchanged). coalesce = the C24 sparse-refresh
+    // idiom: a row without the optional field never blanks a stored value.
+    sp.seal_id      = coalesce(row.seal_id, sp.seal_id),
     sp.category     = row.category,
     sp.role         = row.role,
     sp.type         = row.type,

@@ -9,8 +9,20 @@
 #
 # Field set (SME-gated 2026-07-07): product name, publisher, publisherURL,
 # category, version-if-known. Company governance columns (owner SIDs, gspcId,
-# sealId, support/EOL dates) are Phase-4 material — internal/-side only, never
-# here. Drivers/utilities/etc. (the catalog long tail) stay out by design.
+# support/EOL dates) are Phase-4 material — internal/-side only, never here.
+# Drivers/utilities/etc. (the catalog long tail) stay out by design.
+# AMENDED 2026-08-18 (SME direction): `seal_id` moves INTO the schema as an
+# OPTIONAL per-product field — the business-application registration id for the
+# deployed instance of the product. THE FIELD is in-schema; real VALUES are not:
+# producer-side it carries the `[seal-id]` placeholder (the source-registry
+# systems-block convention) and the company copy reconciles it at port time,
+# exactly the drydocs_application_id pattern below. It loads as a NODE PROPERTY
+# on :SoftwareProduct only — a registration REFERENCE, never attribution (J32),
+# and deliberately NOT an edge: USES_SOFTWARE is unchanged, and any future
+# :SoftwareProduct -> :BusinessApplication join is an ontology decision through
+# the gate (the data-catalog clause-F "property now, org join later" pattern).
+# Scan A (test_publish_boundary_values) already covers config/taxonomy/, so a
+# real-looking id here fails the boundary guard without a new one.
 #
 # Vendor ids match drydocs-icons/manifest.json where an icon exists — the SOFT
 # LINK for UI rendering (user directive 2026-07-31): by-id convention, with an
@@ -161,6 +173,10 @@ products:
     versions: ["9.0.21.300"]      # company runtime — known
     used_by_drydocs: true         # the baseline orchestration source we ingest
     stack: [source]               # ingested FROM, not built ON
+    # The worked example for the 2026-08-18 seal_id field (header note): the
+    # deployed Control-M instance has a company registration; the value here is
+    # the placeholder, reconciled company-side at port.
+    seal_id: "[seal-id]"
     # Which captured vendor documentation describes this product, and for which
     # RUNTIME versions a human has confirmed it still applies. The point of
     # keeping this beside `versions:` is that the drift is then local and

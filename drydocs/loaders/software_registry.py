@@ -75,6 +75,9 @@ class RegistryYamlAdapter:
                 "vendor_id": vendor.get("id"),
                 "vendor_name": vendor.get("name"),
                 "publisher_url": vendor.get("publisher_url", ""),
+                # registration REFERENCE, not attribution (J32) — lands as a node
+                # property only; USES_SOFTWARE is deliberately untouched (2026-08-18)
+                "seal_id": product.get("seal_id"),
                 "used_by_app_id": app_id if product.get("used_by_drydocs") else None,
             }
 

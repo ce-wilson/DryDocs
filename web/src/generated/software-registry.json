@@ -179,6 +179,7 @@
         "5.x"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "backend",
@@ -196,6 +197,7 @@
         "2.x"
       ],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     },
@@ -210,6 +212,7 @@
         "9.0.21.300"
       ],
       "used_by_drydocs": true,
+      "seal_id": "[seal-id]",
       "documentation": {
         "corpus": "bmc-controlm-utilities",
         "docs_version": "9.0.20",
@@ -280,6 +283,7 @@
         "19c"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "backend"
@@ -296,6 +300,7 @@
         "19.2.7"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -312,6 +317,7 @@
         "free tier"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -328,6 +334,7 @@
         "12.11.2"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -344,6 +351,7 @@
         "4.1.16"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -360,6 +368,7 @@
         "3.11+"
       ],
       "used_by_drydocs": true,
+      "seal_id": null,
       "documentation": null,
       "stack": [
         "backend"
@@ -374,6 +383,7 @@
       "type": "commercial",
       "versions": [],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     },
@@ -386,6 +396,7 @@
       "type": "commercial",
       "versions": [],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     },
@@ -400,6 +411,7 @@
         "3.x"
       ],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     },
@@ -412,6 +424,7 @@
       "type": "commercial",
       "versions": [],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     },
@@ -424,6 +437,7 @@
       "type": "internal",
       "versions": [],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     },
@@ -436,6 +450,7 @@
       "type": "commercial",
       "versions": [],
       "used_by_drydocs": false,
+      "seal_id": null,
       "documentation": null,
       "stack": []
     }
