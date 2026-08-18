@@ -356,6 +356,17 @@ Lives in `drydocs_core/controlm/` (`variables.py`, `resolver.py`, `commands.py`,
 poetry run pytest tests/unit/ -v
 ```
 
+> **Run the suite in the project venv.** `poetry.toml` sets `virtualenvs.in-project = true`,
+> so the interpreter is `.venv/` at the repo root — click 8.1.8 + typer 0.12.5, as `poetry.lock`
+> pins them. Poetry honors an already-activated `VIRTUAL_ENV` ahead of the project one, so a
+> shell with another venv active silently runs the suite against that environment instead. Under
+> click >= 8.3 the CLI tests then fail on typer 0.12's secondary flags (`TypeError: Secondary
+> flag is not valid for non-boolean flag`) and report about 20 red tests that are not real.
+> Confirm the interpreter with `poetry env info --path`; clear the override with
+> `Remove-Item Env:VIRTUAL_ENV`, or pin it directly:
+> `.venv\Scripts\python.exe -m pytest tests/unit -q`. CI never hits this — it installs fresh
+> per run.
+
 Coverage highlights:
 - `test_controlm_models.py` / `test_controlm_cypher.py` — structural-lineage row models and Cypher (idempotent `UNWIND $batch` + MERGE; `SCHED_TABLE` on the folder side; shared `:Condition` key; recursive SQL cycle guard).
 - `test_variable_classifier.py` / `test_variable_resolver.py` / `test_variable_staging.py` / `test_command_parser.py` — the C3/C4 normalization stream. A few sample-backed tests skip when the production CSV is absent.
