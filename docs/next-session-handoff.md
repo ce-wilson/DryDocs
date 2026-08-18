@@ -5,101 +5,73 @@
 > `docs/restructure/backlog.yaml` (the claim channel) and `docs/port-prompt.md`; this
 > is the narrative that git alone does not carry.
 >
-> **Written 2026-08-17 (laptop), producer head `2d107ce`.**
+> **Written 2026-08-18 (laptop), producer head `d5e7966d`.**
 
-## 1. Read this first — the desktop is push-blocked and holds one stranded commit
+## 1. The desktop may still be push-blocked
 
-The desktop's git credential helper cannot authenticate. **GCM stores tokens in
-Windows Credential Manager, so this is per-machine**: signing in on the laptop
-unblocked the laptop and did nothing for the desktop. The desktop stays blocked
-until someone is physically at a desktop session to finish the browser sign-in.
+Unchanged from yesterday unless someone completed the browser sign-in at a desktop
+session: GCM is per-machine, so the laptop's login did not unblock it. Its stranded
+`5ca7dc8f` is already superseded (identical fix shipped as `63551c8`); a revived
+desktop session should `git pull --rebase` and its duplicate drops as empty.
 
-**What is stranded there:** `5ca7dc8f`, "roadmap fix: Idea-23/47 rows retired +
-re-render", committed on `main` and unpushed.
+## 2. Port loop
 
-**It is already handled — do not redo it and do not worry about the collision.**
-The identical fix was made on the laptop and pushed as `63551c8`. Same two row
-deletions, same re-render, byte-identical. When the desktop's push finally lands:
-**pull-and-merge leaves an ordinary duplicate commit** making the same two deletions
-(harmless, but it IS a second commit); **`git pull --rebase` drops it as empty**.
-Prefer the rebase. **Ledger step 156 records this** so a future range cut does not
-read the duplicate as a second change.
+`port-base-20260817` @ `0c355f5` remains the certified base. Everything since rides
+the NEXT roll — and today added a lot: **RELAY-10** (the ServiceNow TOM build
+decisions + its stub-and-enrich rider) is the piece the company session depends on;
+it travels the J38 channel at the next port.
 
-**The one thing a desktop session must NOT do when it comes back:** draft the ledger
-roll. That offer is superseded — the roll is done and pushed (§2). Pull first.
+## 3. What landed today (all pushed, CI green at every commit)
 
-## 2. The port loop — a new base is CERTIFIED and pushed
+- **G98 SIGNED 19/19** — the corporate-backbone gate. :Company registered
+  (org:FormalOrganization), new `corporate` domain (49-local-corporate.yaml), the
+  §D3 endpoint guard (`test_vocabulary_endpoints.py`, both directions, with declared
+  debt lists), the §B2 agreement check in `m3-verify`.
+- **G91 CLOSED 5/5** — the held planned-entry review. Keep-planned ×2 (with the
+  `m3_` → `scheduler_` id migrations and the new `scheduler_runs_as` raised),
+  `catalog_has_area_product` ACTIVATED, `catalog_area_product_has_dev_team`
+  deprecated-redundant, and entry 5 **re-shaped onto qualified attribution**
+  (superseding the K4 carve-out and C20 retention — both named in the gate log).
+- **G99 DONE** — `pat_team_roles.cypher` rewritten onto the attribution shape;
+  both new entries active; `membership_id` constraint dropped with its last writer
+  (53 → 52).
+- **The ITSM technician-group family registered** (`50-local-itsm.yaml`, `itsm`
+  domain): :ServiceNowGroup + :SnowRole (SENG/ASUP), both edges planned. **G100** is
+  the gate that ratifies the register and builds the OOTB lookup — build against the
+  SOURCED replica feed (Idea-132), not the retiring CSVs.
+- **STUB-AND-ENRICH ruled** (SME direction, gate-log RECORD 2026-08-18): the HR DB
+  is ~300k and deferred, so people-referencing loads MERGE the stub :Employee on the
+  SID and HR enriches later. G74 clause 2 answered in direction; G74 still owes the
+  runbook harmonization, the stub property idiom, and clause 1 (REPORTS_TO).
+  `pat_team_roles.cypher` flipped from strict MATCH to MERGE-stub accordingly.
+- **cm_escalation_db note corrected** — job-grain SUPPLEMENTS the folder mapping,
+  never authors (K7 §A1); origin/id re-key flagged under-review, deliberately not
+  done. **Idea-130/131/132** inboxed (External-public corpus; the :Company finding;
+  the ServiceNow extract re-sourcing).
 
-`port-base-20260817` @ `0c355f5`, pushed to origin. Preflight **7/7 CERTIFIED**
-(tree clean, relay basis tags, ledger coverage 116/116, cited paths resolve, renders
-current, suite green, tag). Offer that tag as the port base — never a bare SHA.
+## 4. The company session's gate (`snow-tom-responsibility`) — where it stands
 
-Ledger rolled to **steps 135-157** (115 commits since `caa0406`: 93 cited, 22
-ritual). Steps 106-123 collapsed; **124-134 deliberately stay live.**
-
-**The finding worth carrying forward:** the `caa0406` port's close-out never reached
-this repo. `ae21ee4` got an explicit "MERGED company-side, branch removed" commit
-(`06d4469`); `caa0406` got a report, a producer review (`ca7a121`), and then silence.
-So "Last completed port" is now split in two — the four J35 fields stay on `ae21ee4`
-where all four are known, and a new "Last DELIVERED port" block names `caa0406` with
-port commit / backup tag / acceptance marked **UNRECORDED rather than guessed**.
-RELAY-7 and the four `ca7a121` divergences are producer *beliefs* about company state
-until re-checked. **First action at the next port: fill those three fields.**
-
-## 3. Ritual state — all green
-
-- Suite **2152 passed / 8 skipped** (2150 plus the two new LF guards, §4). Both ruff
-  gates clean.
-- **CI GREEN at every commit this session.** It had been RED on origin from 08-14 to
-  08-17 on `test_real_roadmap_cites_only_live_inbox_ideas`.
-- Depgraph snapshot current: `drydocs-20260817-1442.json` @ `e1b4a6a`, written through
-  the fixed LF path, recording **`dirty: false`** on its own — the Idea-121 fix holding
-  exactly as step 151 predicted. Newest-only retention replaced the earlier 08-17 file.
-- Renders verified deterministic: re-rendering board + design docs produced zero drift.
-
-## 4. Idea-129 — found, mis-diagnosed, fixed, and now guarded
-
-The snapshot JSON was written CRLF. **Fixed: 31,505 CRLF / 0 bare LF → 0 / 31,505.**
-
-**Worth reading because the first diagnosis was wrong.** The entry blamed
-`snapshot.ps1:391`. The real culprit on the ritual path is **`filter_ignored.py:100`**
-— `write_text(` with no `newline=`, the *exact* Idea-121 defect in a file that sweep
-never looked at. The tell was already in the original measurement: **0 bare LF** means
-one uniform writer produced every line, and `snapshot.ps1` injects its meta line with
-a bare `` `n `` — so had the PowerShell been last, at least one would have survived.
-Both sites are fixed anyway, and the second is not redundant: `filter_ignored.py`
-early-returns without rewriting when nothing is dropped, and `-CodeOnly` never calls
-it at all.
-
-**The durable half is the guard**, and it is the one Idea-121 recorded as missing
-("nothing guards this yet, so it can regress"). Idea-129 *was* that regression, found
-by a stray `git add` warning rather than a test. `tests/unit/test_render_determinism.py`
-now carries a STATIC check that every declared committed-surface writer passes
-`newline="\n"` (fails on CI, any platform, the moment a writer is added without it)
-plus a byte check for CRs. Verified RED before the fix, green after. **The writer list
-is declared, not swept** — Idea-121 fenced eight non-render writers out on purpose, so
-adding a committed surface means adding its writer to that tuple.
+§A/§D/§F/§G/§H ticked; §C ruled stub-and-enrich for Individual scope (Group half —
+an unloaded :ServiceNowGroup — is load ORDER, deliberately not covered; flag or
+sequence, still theirs to rule). **Open: §B grain and §E inheritance.** Producer
+recommendations relayed in-chat and in RELAY-10: §B deployment-with-app-fallback
+(K7 §C1 supernode reasoning, from-node class recorded on the edge); §E
+authored-only with the ancestor-CI pull taken as a SEPARATE coverage decision, no
+materialization (inheritance is COMPUTED, `4c0c834`).
 
 ## 5. Board state
 
-**119 todo · 4 in progress · 1 blocked · 313 done** (437 total).
-
-In progress, all four SME/gate-bound rather than stalled builds: **E1** (SOSA),
-**G32** (the database-count gate, reopened downward to ONE on retrieval grounds —
-see step 143), **Y1**, **G62** (rua-bundle data profile; §A opened producer-side, §B
-runs company-side).
+**~122 todo · 4 in progress (E1, G32, Y1, G62 — all SME/gate-bound) · 1 blocked
+(K16) · 316 done.** Oldest pullable unchanged; new ready items: **G100** (the ITSM
+gate) and the O60-O62 UI trio.
 
 ## 6. The pattern from this session
 
-The previous handoff named *a check that fires correctly but whose remedy is wrong*.
-This session's is narrower and worth keeping: **an exemption list is a claim about
-what does not matter, and it goes stale silently.** The port preflight's ledger-coverage
-check surfaced 11 "uncited" commits I had classified as ritual — `chore(ideas):`, a
-`chore(snapshot):` that should have been `chore(depgraph): snapshot`, `style(...)`,
-and `chore(backlog): <id> done`. The check was right and my classification was wrong,
-because the exemption matches on the commit SUBJECT and is deliberately narrow so a
-substantive commit can never hide behind a prefix. Two of those "ritual" commits
-turned out to carry real content for a consumer — two graph-instrument bugs, and a
-sequencing constraint about `%%var` resolution. They are cited now, in step 157, which
-says why they are there. **Prefer the guard that makes you rule on something over the
-classification you find convenient.**
+Three times today a drafted framing failed against the code: the review file's
+"all three retire together" (never an SME position), my own "OF_ROLE/HELD_BY are a
+registration gap" (C8 reuse made non-registration CORRECT), and yesterday's
+strict-MATCH no-stub reading (the direction went the other way within a day).
+Same lesson each time: **drafted prose and even fresh code embed a side of an
+unruled question — check which side before citing either as settled.** The fix that
+sticks is putting the ruling where the next reader looks: the gate log, the entry
+note, the relay — never the chat.
