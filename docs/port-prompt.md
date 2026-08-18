@@ -551,6 +551,29 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
 - **NEVER `git clean` during a port.** The company tree carries ~25 untracked paths
   including the `internal/**` data corpora and `UI-WIP/**`. `git reset --hard` leaves
   untracked files alone; `git clean -fd` destroys them with NO reflog recovery.
+  **This rule has been here since J22 and the extracts were deleted anyway**, so treat
+  it as a reminder attached to a control, not as the control. The mechanics that make
+  it enforceable:
+  - **`.gitignore` is NOT protection.** `git clean -fd` takes untracked, non-ignored
+    files; `git clean -fdx` takes untracked files *including ignored ones*. A source
+    payload can never be tracked (PUBLISH-BOUNDARY.md), so in-tree it is always in one
+    of those two buckets. Whether a given CSV survived a past sweep was down to whether
+    it happened to be ignored and whether that sweep carried `-x` — luck, not design.
+  - **Run `drydocs landing-zones --check` before AND after any port step that touches
+    the working tree.** It resolves every `acquisition.mode: manual` row in
+    `config/source-registry.yaml` and reports what is actually in each zone. `absent`
+    is the healthy first state of a source nobody has dropped into yet; **`EMPTY` — the
+    folder present, its contents gone — is the wipe signature**, and `--check` exits 1
+    on it. That is the difference between noticing at the next load and noticing now.
+  - **The real fix is location, and it is declared:** `acquisition.drop_dir_base`
+    states whether a zone is rooted at `DRYDOCS_DATA_ROOT` (outside the tree, where no
+    git operation of any strength can reach it) or at the repo (permitted only when the
+    contents are TRACKED artifacts, which survive every clean).
+    `tests/unit/test_landing_zones.py` enforces both halves, so a new manual source
+    cannot quietly declare an untracked in-tree corpus as its landing zone.
+  - **Company-side action if a zone reads `EMPTY`:** the payload is not in the reflog and
+    `git clean` writes no log. Re-export from the source system, or recover from the
+    internal twin — then re-run `--check` to confirm the zone is green before loading.
 - **`config/loader-source-overlay.yaml` (NEW at N9, 2026-07-31): canonical-PER-SIDE by
   design.** The file itself ports (it is the D2 mechanism + its guard); its CONTENTS
   never do. Producer ships `overrides: {}` because producer class defaults already are

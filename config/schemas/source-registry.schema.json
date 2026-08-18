@@ -182,6 +182,13 @@
                   "api",
                   "db"
                 ]
+              },
+              "drop_dir_base": {
+                "description": "Where drop_dir is rooted. `data_root` = under DRYDOCS_DATA_ROOT, OUTSIDE the repo working tree, which keeps a hand-carried payload out of reach of `git clean` at any strength (-fdx deletes ignored files too, so no .gitignore rule protects an in-tree drop). `repo` = repo-relative, permitted ONLY for zones whose contents are TRACKED artifacts, since tracked files survive every clean. Enforced in tests/unit/test_landing_zones.py; shape-only here (S6).",
+                "enum": [
+                  "data_root",
+                  "repo"
+                ]
               }
             },
             "required": [
@@ -199,7 +206,8 @@
                 "then": {
                   "required": [
                     "format",
-                    "drop_dir"
+                    "drop_dir",
+                    "drop_dir_base"
                   ]
                 }
               },

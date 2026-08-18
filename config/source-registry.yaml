@@ -585,7 +585,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
-      drop_dir: controlm-xml/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: controlm-xml/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # xml is text — `ascii` is the plain-text bucket; drop_dir is the existing controlm-xml/ landing zone (locator.data_root)
     locator:
       data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); controlm-xml/ = definition exports (arbitrarily-named .xml — landing-zone convention + classification are the guard)"
@@ -614,7 +615,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
-      drop_dir: autosys/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: autosys/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # placeholder vendor — the convention is declared ahead of any real drop
     crosswalk: config/crosswalks/autosys-to-bmc.yaml
     gate_spec: config/gate-prompts/autosys-crosswalk.yaml
@@ -638,7 +640,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
-      drop_dir: airflow/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: airflow/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # placeholder vendor — convention declared ahead of any real drop
     crosswalk: config/crosswalks/airflow-to-bmc.yaml
     gate_spec: config/gate-prompts/airflow-crosswalk.yaml
@@ -663,7 +666,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
-      drop_dir: seal/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: seal/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       mapping: config/source-mappings/seal-extract.yaml   # column ledger (S3; gate business-application-identity §B1(c))
     confirmed: true                     # live since the M1 chain; transfers per Q6
@@ -689,7 +693,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
-      drop_dir: pat/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: pat/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       extract: ~                        # real report path/export coordinates — internal/ twin only
     confirmed: true                     # catalog-hierarchy gates (SME 2026-06-21 rulings; C9 2026-07-18) — transfers per Q6
@@ -721,7 +726,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
-      drop_dir: pat/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: pat/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       mapping: ~                        # team report: team_id, lob, seal_ids (1..n), jira board, Relationship Type (the alignment), status, agile framework — REAL rows never committed here
     confirmed: true                     # C9 gate (2026-07-18): the PAT team report as the team_applications feed — transfers per Q6
@@ -761,7 +767,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
-      drop_dir: snow/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: snow/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     confirmed: false                    # no gate yet — the sampled class export (internal/registry-redesign/samples/SNOW-CMDB.csv is the header-only capture)
     notes: >
       The CMDB class/relationship export (Q4). Doubles as the crosswalk
@@ -781,7 +788,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
-      drop_dir: config/taxonomy/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: config/taxonomy/
+      drop_dir_base: repo       # repo-relative: contents are TRACKED artifacts, which is what makes an in-tree zone safe
       # repo-committed source: the tracked path IS the landing zone (repo-relative, not data-root)
     confirmed: true                     # SME gate 2026-07-07 (ADR 0004) — transfers per Q6
     replaces: software-registry
@@ -803,7 +811,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: knowledge/depgraph-snapshots/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: knowledge/depgraph-snapshots/
+      drop_dir_base: repo       # repo-relative: contents are TRACKED artifacts, which is what makes an in-tree zone safe
       # repo-committed: snapshot.ps1 writes it, git carries it — arrival is a commit, hence manual
     locator:
       mapping: config/source-mappings/depgraph-snapshot.yaml   # field ledger (doc 08)
@@ -829,7 +838,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
-      drop_dir: docs/design/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: docs/design/
+      drop_dir_base: repo       # repo-relative: contents are TRACKED artifacts, which is what makes an in-tree zone safe
       # repo-committed markdown corpus
     locator:
       mapping: config/source-mappings/design-docs.yaml   # field ledger (three parse streams)
@@ -856,7 +866,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: archive
-      drop_dir: rua/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: rua/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # rua_*.tar.gz — `archive` added to the enum for exactly this row; the tsv/text lives INSIDE the envelope
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — clauses a–g all ruled. Authority to load, NOT a loader: the curated build is G23 and adapter stays ~
     replaces: rua-inventory
@@ -880,7 +891,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: dpl/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: dpl/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # manual TODAY: hand-exported Swagger json per SEAL. Flips automated/api when a pull is built — the N13 flip, recorded not ruled
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §G ruled clause (f) GUID-vs-URN, §H ruled clause (g) three-signal usage. Field contract still ASSUMED (T13): the envelope entry is a ruled stub
     replaces: dpl-registry
@@ -904,7 +916,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: dpl/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: dpl/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # manual TODAY — same as its sibling; flips automated/api with the N13 flip
     confirmed: true                     # same activation condition as dpl:pipeline-registry — gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28)
     replaces: dpl-registry
@@ -967,7 +980,8 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
-      drop_dir: bitbucket/                # DRYDOCS_DATA_ROOT-relative convention (repo-relative for repo: rows); real path internal-twin only
+      drop_dir: bitbucket/
+      drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §D1/§D2 ruled identity + occurrence grain, §E ruled precedence between origins. trusted_ref below stays null: only a human sets it
     replaces: code-repo
     trusted_ref: ~                      # HUMAN-BLESSED intent line (G24): the one ref this repo's team keeps clean.
