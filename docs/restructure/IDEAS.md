@@ -62,6 +62,39 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-133`** · 2026-08-18 · `[idea]` · **open** · prio? **Med** —
+  **Give every registry source a declared ACQUISITION PATH: manual sources name their
+  drop directory (CSV/ASCII, real path in the internal twin), automated sources name
+  their API/db pull.** SME ask 2026-08-18. Today the acquisition mode is smeared across
+  three half-fields that do not compose into an answer: `adapter` (csv/oracle/yaml/
+  markdown/json — 8 sources carry `~`), `connector` (only the doc corpora use it), and
+  `locator` (free-shape: `extract: ~`, `data_root:`, `mapping:` — each source invents
+  its own key). Nothing states the split the SME names: is this source a MANUAL drop
+  (someone exports a file into a directory) or AUTOMATED (an API call or a db pull the
+  pipeline runs)?
+  **THE SHAPE TO CONSIDER:** a first-class `acquisition:` block per dataset —
+  `mode: manual | automated`; for manual, `format: csv | ascii` plus `drop_dir:` where
+  the COMMITTED value is the landing-zone convention (`DRYDOCS_DATA_ROOT`-relative, the
+  `controlm-xml/` precedent, resolver in `drydocs_core/data_root.py`) and the REAL
+  internal path lives only in the internal twin (the `locator.extract: ~` discipline,
+  unchanged); for automated, `via: api | db` plus the pull's coordinates by reference
+  (the source's own dataset id already names the db object; the API case names the
+  call surface, e.g. the G96 framework for Control-M).
+  **WHY IT EARNS A FIELD RATHER THAN A CONVENTION:** Idea-115 already caught this class
+  once — the rua copy path existed only as a derived expression, and the fix was to
+  make both ends name each other. Idea-132 is the live driver: the ServiceNow extracts
+  are moving manual→automated (hand-pulled CSV → SQL over the replica), and TODAY that
+  transition has no field to flip — it shows up only as prose in `notes:`. A declared
+  `acquisition.mode` makes "what is still hand-fed?" a query instead of an audit, gives
+  the load-map/console an honest manual-vs-automated lens, and gives the
+  `source_label` enum question (Idea-132's knock-on) the axis it is actually trying to
+  encode — acquisition mode is a SOURCE fact and belongs on the registry row, not on
+  the loader class.
+  **FENCES:** schema change to `drydocs.source-registry.v2` rows + its JSON Schema +
+  `test_source_registry.py`, so it is a groomable item, not a quick edit; no real paths
+  ever committed (Scan D/J27 class); and it RECORDS mode per source — it does not build
+  any mover/watcher for the drop directories.
+
 - **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
