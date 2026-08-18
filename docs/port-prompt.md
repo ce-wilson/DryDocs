@@ -1094,6 +1094,64 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   `sponsored = true` on their own edges, the flag may only be load-bearing on the §2
   alignment edge. Confirm against the extract before deriving it.
 
+- **RELAY-10 — THE SERVICENOW TOM-RESPONSIBILITY BUILD: the decisions your session
+  took with the producer in-chat, written down so they outlive the chat**
+  `[SME-REPORTED]` (raised 2026-08-18; the producer-side facts below are each marked
+  where independently verified). Your session is building the sourced ServiceNow TOM
+  loaders (the scoped-app `x_<scope>_cmdb_tom_main` / `_tom_roles` extension tables on
+  the Snowflake replica, per the `snow` system row's ruled grammar). Seven artifacts,
+  gate-bound, DO-NOT-RUN until the `snow-tom-responsibility` gate signs. These are the
+  rulings that shaped them:
+  **(1) ONE PERSON SPINE — `:Worker {sid}` was DROPPED for `:Employee`.** The draft
+  minted a second person class; the SME's own finding killed it (`user_name` IS the
+  SID, which is `:Employee`'s key — verified producer-side: `constraints.cypher`
+  `employee_id` unique, `seal_applications.cypher` MERGEs on the SID). Two labels on
+  one SID would have made "which roles does this person hold across PAT / SEAL / ITSM"
+  unanswerable in one traversal. If `:Worker` survives anywhere in your tree, it is a
+  residue of the draft, not a decision.
+  **(2) THE THREE OPERATE-MANAGER ROLES ARE NEVER NORMALIZED** — SME instruction,
+  2026-08-18. L1 Operate Manager / L2 Operate Manager / Operate Manager are THREE
+  `:TOMRole` concepts; collapsing them was the coercion G35 fixed, and
+  `Attribution.level` was retired as a discriminator. Match on the FULL role name;
+  anything outside the confirmed set flags `unmapped_role=true`, never a stripped
+  prefix. **DUAL CITATION ANCHORS, both real:** the producer gate-log carries a
+  dedicated `2026-08-06` RECORD for this ruling; YOUR gate-log carries it inside the
+  2026-08-11 G35 round-2/3 record (§G7/§G8/§G9) after your session removed its own
+  duplicate. The two logs are never-port and independently maintained — a port review
+  seeing different anchors for one ruling is correct, not a discrepancy.
+  **(3) THE RESPONSIBILITY ROLE JOINS `:TOMRole`; `:SnowRole` IS A DIFFERENT
+  REGISTER.** TOM responsibilities join the G35-ruled register (9 concepts), not a
+  string and not a new scheme. `:SnowRole` (producer-registered, planned) stays for
+  TECHNICIAN-GROUP support roles — the SENG/ASUP mapping — and is not in competition:
+  "app has an L2 Operate Manager" and "this person is in the group as SENG" are
+  different facts. Precedence across the three surfaces is G35 §D4, CITED not
+  re-derived: hand-verified > ServiceNow TOM > SEAL extract.
+  **(4) TWO NEW TRIPLES, DECLARED NOT REUSED** `[VERIFIED-PRODUCER]` (the C8 check:
+  `schema_graph.py` refuses duplicate (from, label, to)). `Attribution -[HAS_AGENT]->
+  :ServiceNowGroup` is a different to_node from the registered Employee triple, so it
+  needs its own entry (yours: `snow_attribution_has_group_agent`); and if the gate
+  lands the grain on `:LogicalDeployment`, that QUALIFIED_ATTRIBUTION triple is also
+  new vs the registered `:BusinessApplication` one. **Producer naming divergence,
+  yours to keep:** the producer's sibling family sits under `itsm_*` ids
+  (`50-local-itsm.yaml`); your `snow_*` prefix is your registry's convention.
+  `:LogicalDeployment` itself is company-only — producer registers `:Deployment`.
+  **(5) THE ATTRIBUTION KEY carries SCOPE and AGENT** —
+  `{anchor}|SNOW-TOM|{role_source_name}|{scope}|{agent_key}` — or a Group and an
+  Individual responsibility for the same app+role collide on one node. Row-derived
+  end to end (truncate-and-reload discipline). `{role_source_name}` over the
+  crosswalked id is correct BY NECESSITY, do not "fix" it: an `unmapped_role=true`
+  row has no id, so keying on crosswalk output would collide every unmapped role.
+  **(6) UNRESOLVED AGENT IS A GATE CLAUSE, NOT A LOADER DEFAULT.** An OPTIONAL MATCH
+  that misses leaves an Attribution with no HAS_AGENT edge — a silent orphan. Ruled:
+  flag + count (`unresolved_agent=true`, surfaced in the load summary), the SME
+  choosing at the gate, symmetric with `unmapped_role`.
+  **(7) STANDING TAIL:** `source_label: 'snowflake'` is a 13th value outside the
+  declared `csv|oracle|agent|human` enum that 12 of 28 producer loaders already sit
+  outside, unenforced — the re-sourcing pass is the moment to rule the field's
+  meaning (producer Idea-132 carries it). And the wider extract re-sourcing
+  (hand-pulled CSV/YAML → SQL over the replica) is Idea-132's subject; the producer's
+  G100 technician-group lookup builds against the SOURCED feed for the same reason.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
