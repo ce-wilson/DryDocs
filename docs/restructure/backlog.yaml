@@ -17132,7 +17132,18 @@ items:
       table and not two the reader has to join by hand; (d) CONTACTS -- every EMAIL_DL_* value
       and every DOMAIL destination found, split by contact kind (support tier vs Production
       Delay Notification consumer) and labelled documentation-only, since R40 now deletes the
-      block that would have used them.
+      block that would have used them; (e) INVOCATIONS (merged from Idea-140,
+      2026-08-19) -- distinct invoked script paths derived from cmd_line, each with its
+      JOB FAN-OUT (how many jobs share the wrapper) and, for every SHARED wrapper,
+      which parameters/variables VARY per job -- the identity-grade candidates.
+      Motivation: on the Informatica platform the invoked .ksh wrappers are the same
+      generic few for ALL business applications (SME 2026-08-19), so script-path
+      identity distinguishes nothing, and the G12 wrapper-payload family (Ab
+      Initio/DPL: kind-scoped token, path never identity) likely needs a third kind --
+      WHICH parameter is the token is a LINEAGE-GATE ruling this census must inform,
+      never make. A wrapper with fan-out 1 is reported too: one-to-one wrappers are
+      the evidence that script-path identity IS sufficient for that kind, which is as
+      decision-relevant as the converse.
       Then the half the census cannot produce: a SUBSTITUTION SLOT list -- the facts the XML
       does not carry and only the SME can supply (DEVX_KEY, the MFTS set FTS_ID / REC_ID / USER
       / DELIVERY_MECHANISM, EMAIL_DL_L2 / L3 / PDN, SOURCE_CONTACT). Each slot names its current
@@ -17170,7 +17181,12 @@ items:
       class split that a flat run_as census would blur into "two accounts". The
       FileWatcher x platform-account pairing is the designed pattern; a payload job on
       the platform account is the finding. K25 owns the cross-application detection;
-      this profile is where the raw (job type, run_as) pairs surface for an SME.
+      this profile is where the raw (job type, run_as) pairs surface for an SME. MERGED
+      2026-08-19 (groom): Idea-140's measurement half became census (e) INVOCATIONS --
+      the wrapper fan-out and per-wrapper varying-parameter census that tells the
+      lineage gate which parameters are identity-grade on a generic-wrapper platform.
+      The informatica-kind RULING itself stays with the lineage gate (G12's inboxed
+      m3_invokes to_node broadening); this item only measures.
   - id: O59
     epic: web-console
     title: "The /remediation intake surface: an SME reads the folder-set profile (FIDs, variables, emails) and supplies the substitutions the XML cannot carry"

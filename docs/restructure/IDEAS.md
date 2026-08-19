@@ -92,7 +92,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-140`** · 2026-08-19 · `[source]` · **open** · prio? **Med** —
+- **`Idea-140`** · 2026-08-19 · `[source]` · **merged → G68 census (e) (2026-08-19, the measurement half: wrapper fan-out + per-wrapper varying parameters); the informatica-kind RULING stays parked → the lineage gate (G12's inboxed m3_invokes to_node broadening)** · prio? **Med** —
   **Informatica invocations are the same generic few `.ksh` wrappers for ALL business
   applications on that platform — script-path identity is non-distinguishing, which is
   the G12 wrapper-payload problem arriving on a third platform.** SME direction
