@@ -3919,7 +3919,7 @@ never edit the prompt).
   current-version jobs in actively-scheduled folders. Tally: §A 4/4 · §B 5/5 ·
   §C 4/4 · §D 6/6 (D6 added in-session) · §E 3/3 (E1 reshaped
   dataset-on-replica) · §F 3/3 · §G 8/8 (G7/G8 added in-session). Round
-  details in the five session RECORD entries above (rounds 1–7); this entry
+  details in the four session RECORD entries above (rounds 1–7); this entry
   closes rounds 8–10 and the sign-off.
 - **§G2 CONFIRMED** — no transitive read of registration onto jobs; the two
   facts meet on the job and nowhere else.

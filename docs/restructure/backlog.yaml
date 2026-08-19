@@ -18492,7 +18492,11 @@ items:
       mixed-case correction's code half) -- do not duplicate them here. The pull
       itself runs company-side; producer-side this item ships mechanism + fixtures,
       the same split K16 uses. Opus: multi-surface build against a 33-clause ruling
-      set with a signed-gate amendment in the middle.
+      set with a signed-gate amendment in the middle. MAP ENTRY IS A CREATE, NOT A
+      FLIP: the gate meta cites "config/taxonomy-ontology-map.yaml fid-directory
+      (proposed 2026-08-04)" but no such entry exists in any map fragment (verified
+      at sign-off, 2026-08-19) -- the signed yaml keeps the stale pointer per N13,
+      and this build creates the entry in 20-mappings-seal.yaml as part of wiring.
 
   - id: G81
     epic: component-topology
