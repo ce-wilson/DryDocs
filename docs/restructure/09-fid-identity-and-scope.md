@@ -356,9 +356,12 @@ GROUP BY CASE WHEN REGEXP_LIKE(J.OWNER, '^[A-Za-z][0-9]{6}$')
 Two fences. **Definition grain only** — these read what jobs are CONFIGURED to
 run as; what a run ACTUALLY executed as is the run-grain question
 (`scheduler_executed_by`), needs the history feed, and none of this SQL answers
-it. And **OWNER is stored ALL UPPER** in psgmgr (the committed extract's
-`--run-as` bind upper-cases for exactly this reason) — any join against the
-directory's name column must normalize case on both sides, and the census
+it. And **OWNER is stored MIXED CASE at rest** (corrected 2026-08-19, K17 session
+round 2 — the earlier ALL-UPPER note recorded the normalization plan, not the
+storage state; the committed extract's `--run-as` bind upper-cases
+unconditionally and is therefore a K16 FIX ITEM, not a feature: it silently
+returns zero rows for every lower-stored owner) — any join against the
+directory's name column must normalize case on BOTH sides, and the census
 reports case-only mismatches rather than folding them.
 
 ## Phases

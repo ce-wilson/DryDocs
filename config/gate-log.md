@@ -3826,3 +3826,35 @@ never edit the prompt).
   designed-vs-stale ratio CANNOT be ruled this session — pending, with the
   Control-M numbers stated. Also fixed: the page carried two questions numbered
   Q6; the roll-up question is renumbered Q8.
+
+## 2026-08-19 — RECORD: FID gate round 2 — four clauses ticked, the case-fence sweep executed (K17; gate `fid-identity-and-scope`, still UNSIGNED)
+
+- **TICKED — the amended Q6 join clause.** OWNER is mixed-case at rest; every
+  join to the directory normalizes to UPPER on BOTH sides; DryDocs stores the
+  RAW owner value as the property and keys joins/crosswalks on the upper-cased
+  form; the census still reports fold counts. Swept in this commit: the psgmgr
+  ledger note, source-registry, the K16 company prompt, doc 09's fence, the
+  K17 backlog note. NOT swept, deliberately: `cli._scope_binds` /
+  `fid_census.py` docstrings and the bind fix itself — K16 is desktop-claimed
+  and the fix is build work; the company-side ledger correction rides the
+  port channel.
+- **TICKED — §G7, the connection-profile-resolved run_as class.** Plugin-typed
+  jobs (APPL_TYPE families; estate example K8SEPV) carry their identity in the
+  Connection Profile's vault-managed credential; OWNER is vestigial. Excluded
+  from the FID directory join (12% of the estate rides on this — 62,936 jobs).
+  APPL_TYPE is K25's classification axis; `controlm_jobs.sql` must project it
+  (build rides K25/K16). The variable-deferred bucket stays separate until
+  evidence says otherwise.
+- **TICKED — §G8, ranked-then-curated platform recognition.** S3 breadth
+  ranking feeds SME curation; confirmed literals live values-twin under
+  internal/ (K18 precedent); review threshold app_codes >= 10 plus the
+  per-server scheduler family; the directory's type columns become a check,
+  never the primary recognition.
+- **TICKED — §D6, estate-wide demand set with a per-scheduling-DC census cut.**
+  The pull list stays the union; every census output gains the DC breakdown
+  (platform accounts are per-server-instance; the estate concentrates on 3-4
+  scheduling DCs). The server-location §B4 fence rides along.
+- **Session state after round 2:** closed or amended — §D2 (census classes),
+  §D6, §G7, §G8, Q5, Q6 (amended + ticked), Q8 renumbered. Still to walk —
+  §A1-A4, §B1-B5, §C1-C4, §E1-E3, §F1-F3, §G1-G6, and open questions Q0
+  (pending on the directory half by scope fence), Q1, Q2, Q7, Q8.

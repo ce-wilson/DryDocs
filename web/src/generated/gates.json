@@ -1384,6 +1384,25 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "RECORD: FID gate round 2 — four clauses ticked, the case-fence sweep executed (K17; gate `fid-identity-and-scope`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3830",
+      "unblocks": [
+        "K16",
+        "K17",
+        "K19",
+        "C25",
+        "J32",
+        "K24",
+        "K25"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

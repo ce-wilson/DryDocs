@@ -141,10 +141,11 @@ every cell marked _pending_.
 
 ## Step 5 — three things to report even if they look like non-answers
 
-1. **`case_only_mismatches` > 0 — BUT NORMALIZE THE DIRECTORY SIDE FIRST (2026-08-12).**
-   psgmgr stores `CM_DEF_VJOB.OWNER` **all upper**, while `HR_PHONE_EXP.EMP_LAST_NAME`
-   is mixed case, and the SME has ruled the two are the SAME account
-   (`UPPER(EMP_LAST_NAME) = UPPER(OWNER)`, gate §Q6). **So `UPPER()` the directory side
+1. **`case_only_mismatches` > 0 — BUT NORMALIZE BOTH SIDES FIRST (corrected 2026-08-19).**
+   `CM_DEF_VJOB.OWNER` is **mixed case at rest** — the earlier all-upper note recorded
+   the normalization PLAN, not the storage state (K17 session round 2, replica
+   evidence) — and the SME has ruled the two are the SAME account
+   (`UPPER(EMP_LAST_NAME) = UPPER(OWNER)`, gate §Q6). **So `UPPER()` BOTH sides
    in your extract query before feeding the census.** If you do not, essentially every
    real match lands in `case_only_mismatches` instead of `demand_in_application`, and the
    headline number reads as "the directory barely covers the estate" when it may cover it

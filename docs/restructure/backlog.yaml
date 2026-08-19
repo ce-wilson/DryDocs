@@ -2643,8 +2643,8 @@ items:
       than name heuristics), S4 the per-owner application-code spread (the Control-M
       half of the §Q0/§G5 disagreement join), S5 the personal-vs-service owner-shape
       triage (§Q5). Run them where the replica lives, counts only; definition grain
-      only, and OWNER is ALL UPPER so the directory-name join normalizes case on
-      both sides.
+      only, and OWNER is MIXED CASE at rest (corrected in-session 2026-08-19,
+      round 2) so the directory-name join normalizes case on both sides.
 
   - id: K18
     epic: seal-attribution
