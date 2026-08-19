@@ -92,6 +92,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-136`** · 2026-08-19 · `[bug]` · **open** · prio? **Low** —
+  **`snapshot.ps1`'s RED warn line prints `System.Object[]` where the conclusion belongs.**
+  Observed at the 2026-08-19 snapshot: `ci: System.Object[] AT HEAD e0ae9ba - main is RED...`
+  — the `-f` arg `$mine[0].conclusion.ToUpper()` (line ~136) stringified as an array, so the
+  warn names no conclusion. Cosmetic only (warn-only by design, the RED itself was the known
+  billing block: jobs "fail" in 3-5s with no logs), but the line exists so a human reads WHY
+  main is red, and right now it can't say. Likely PS 5.1 member-enumeration on `$mine[0]`
+  when `gh run list --json` yields nested arrays — pin with `@($mine)[0]` or select the
+  property explicitly, then re-run the snapshot to confirm the text.
+
 - **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
