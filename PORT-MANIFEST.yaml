@@ -393,6 +393,30 @@ rows:
       (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — at
       PORT-REPORT-5417ef10) are never dropped by a port.
     note: "was canonical-producer until Relay #2 of PORT-REPORT-5417ef10 — taking it wholesale failed the company guard on their extended groups"
+  - path: "tests/unit/test_plan_ideas.py"
+    disposition: per-entry
+    entry_rule: >
+      The render/header guards are producer-canonical and port whole. The
+      ALLOCATOR-BAND block does NOT: PRODUCER_BAND_CEILING and
+      PORTED_COMPANY_IDS are per-side by construction. Producer asserts its own
+      ids stay at or below 9999; the company asserts ITS ids start at 10000, so
+      the company's copy inverts the comparison and keeps its own exemption set.
+      Taking this file wholesale would make the company's suite demand that its
+      own 10000+ ids are illegal.
+    note: >
+      Bands added 2026-08-18 after Idea-59 was found to mean the FID directory
+      producer-side and snow_tom_responsibilities company-side, with IDEAS.md at
+      union-append. Producer's was the uncited side and renumbered to Idea-135
+      (G75/G76 precedent); the company's is grandfathered below the boundary.
+  - path: "tests/unit/test_backlog.py"
+    disposition: per-entry
+    entry_rule: >
+      Schema/rollup/next_ready guards are producer-canonical. The ALLOCATOR-BAND
+      block is per-side for the same reason as test_plan_ideas.py — producer
+      asserts <= 9999, the company asserts >= 10000, and each keeps its own
+      PORTED_COMPANY_IDS. This file's own entry_rule above already records why:
+      "both sides run their own plan against OVERLAPPING ids". The bands remove
+      the id collision; that rule still governs genuinely shared items.
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"

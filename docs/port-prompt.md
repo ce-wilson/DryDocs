@@ -1192,6 +1192,22 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   the producer backlog is the active lane for now. So do not expect this repair to
   have been done by a company groom pass: **the union repair becomes NEXT-PORT-SESSION
   work**, performed with the port's IDEAS.md merge rather than waited on.
+  **RIDER 2 — 2026-08-18, later the same day: THAT ENTRY IS NOW `Idea-135`, NOT
+  `Idea-59`, AND THE RENUMBER IS WHAT MAKES THIS REPAIR SAFE FOR YOU.** The producer
+  allocator bands landed after this relay was written (`IDEAS.md` header, "Allocator
+  bands"): producer allocates **1-9999**, company **10000+**, and the one live
+  cross-side collision was settled at the same time. Producer's `Idea-59` (the FID
+  directory ingest, groomed → K16 + K17) **moved to `Idea-135`** — its capture date
+  is unchanged at 2026-08-04, and it now sits in the audit trail, not the inbox.
+  Producer's was the side that moved because yours is the cited one: your `Idea-59`
+  is `snow_tom_responsibilities`, which your own grooming is citing right now.
+  **What this changes about the union repair above:** the `Idea-50..75` block you
+  pull from producer HEAD **no longer contains a 59** — do not read that gap as a
+  second loss, and do not manufacture an entry to fill it (same rule as `Idea-63`).
+  Take the FID entry from `Idea-135` in the audit trail instead. Everything else in
+  the block is unchanged. Had the renumber NOT happened, this repair would have
+  merged two different ideas into one number in a `union-append` file — which is the
+  precise failure the bands exist to prevent, arriving one port later.
   **(7) STANDING TAIL:** `source_label: 'snowflake'` is a 13th value outside the
   declared `csv|oracle|agent|human` enum that 12 of 28 producer loaders already sit
   outside, unenforced — the re-sourcing pass is the moment to rule the field's
