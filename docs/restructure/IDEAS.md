@@ -92,7 +92,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-139`** · 2026-08-19 · `[idea]` · **open** · prio? **Low** —
+- **`Idea-139`** · 2026-08-19 · `[idea]` · **groomed → J50 (2026-08-19, same session)** · prio? **Low** —
   **`gates.json`'s `unblocks` edge is a MENTION SCAN, and this repo already knows that is
   not good enough — it fixed the same class one edge over.** `scripts/render_gates.py`'s
   `unblocks()` serialises each backlog item to JSON and matches the gate slug anywhere in
