@@ -263,6 +263,104 @@ for one. The §G registration-vs-attribution machinery is unchanged. Cross-appli
 run-as — a job whose run-as account belongs to a DIFFERENT application than the
 folder's — is now a first-class census output rather than a footnote: K25 carries it.
 
+## Session SQL — the psgmgr queries that put numbers in front of the gate
+
+Generic samples for the K17 session, written against the columns the committed
+extract already projects (`drydocs/loaders/sql/controlm_jobs.sql`:
+`psgmgr.CM_DEF_VJOB J` joined to `CM_DEF_VTAB T`, filtered
+`J.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL` — current-version jobs
+in actively-scheduled folders, the same population every other number in this
+plan uses). **Counts only, run where the replica lives; no output row carries a
+name that leaves that machine.** Each query names the gate question it feeds.
+
+**S1 — the run-as demand set, weighted (§D, census leg i).** Every distinct
+run-as owner with its footprint — the list the directory join starts from:
+
+```sql
+SELECT   J.OWNER,
+         COUNT(*)                    AS jobs,
+         COUNT(DISTINCT J.TABLE_ID)  AS folders,
+         COUNT(DISTINCT J.APPLICATION) AS app_codes
+FROM     psgmgr.CM_DEF_VJOB J
+JOIN     psgmgr.CM_DEF_VTAB T ON J.TABLE_ID = T.TABLE_ID
+WHERE    J.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
+GROUP BY J.OWNER
+ORDER BY jobs DESC;
+```
+
+**S2 — run-as class × job type (§G's job-type dimension; K25's first cut).**
+The worked example predicts FileWatcher-type jobs on the platform account beside
+payload jobs on application accounts — this shows whether that pattern holds
+estate-wide, per owner:
+
+```sql
+SELECT   J.OWNER, J.TASK_TYPE, COUNT(*) AS jobs
+FROM     psgmgr.CM_DEF_VJOB J
+JOIN     psgmgr.CM_DEF_VTAB T ON J.TABLE_ID = T.TABLE_ID
+WHERE    J.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
+GROUP BY J.OWNER, J.TASK_TYPE
+ORDER BY J.OWNER, jobs DESC;
+```
+
+**S3 — the platform-account signature (§D/§G: how is a platform account
+RECOGNIZED?).** A platform account's shape is breadth: one owner spanning many
+folders and application codes. Owners ranked by spread — the top of this list is
+the candidate platform-account set the SME confirms or corrects, which is
+cheaper and more honest than any name heuristic:
+
+```sql
+SELECT   J.OWNER,
+         COUNT(DISTINCT J.APPLICATION)     AS app_codes,
+         COUNT(DISTINCT T.SCHED_TABLE)     AS folder_names,
+         COUNT(*)                          AS jobs
+FROM     psgmgr.CM_DEF_VJOB J
+JOIN     psgmgr.CM_DEF_VTAB T ON J.TABLE_ID = T.TABLE_ID
+WHERE    J.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
+GROUP BY J.OWNER
+HAVING   COUNT(DISTINCT J.APPLICATION) > 1
+ORDER BY app_codes DESC, folder_names DESC;
+```
+
+**S4 — the cross-application seam, per owner (§Q0/§G5 feed; K25's join).** For
+each owner, the distinct folder-derived application codes it runs under — the
+Control-M half of the disagreement census. The directory half (the owner's
+assigned application) comes from the id-owner export, and the join key is the
+NAME, exactly as the two-source section warns:
+
+```sql
+SELECT   J.OWNER, J.APPLICATION, COUNT(*) AS jobs
+FROM     psgmgr.CM_DEF_VJOB J
+JOIN     psgmgr.CM_DEF_VTAB T ON J.TABLE_ID = T.TABLE_ID
+WHERE    J.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
+GROUP BY J.OWNER, J.APPLICATION
+ORDER BY J.OWNER, jobs DESC;
+```
+
+**S5 — owner-shape split (§Q5: do PERSONAL ids ever run jobs?).** The repo's own
+extract notes that developer SIDs are lowercase-initial letter-plus-digits; a
+service/tenant name is anything else. This is a SHAPE heuristic for triage only
+— §Q5's real answer joins the directory's type column — but it flags candidates
+for the SME in one pass:
+
+```sql
+SELECT   CASE WHEN REGEXP_LIKE(J.OWNER, '^[A-Za-z][0-9]{6}$')
+              THEN 'personal-id-shaped' ELSE 'service-shaped' END AS owner_shape,
+         COUNT(DISTINCT J.OWNER) AS owners, COUNT(*) AS jobs
+FROM     psgmgr.CM_DEF_VJOB J
+JOIN     psgmgr.CM_DEF_VTAB T ON J.TABLE_ID = T.TABLE_ID
+WHERE    J.IS_CURRENT_VERSION = 'Y' AND T.USER_DAILY IS NOT NULL
+GROUP BY CASE WHEN REGEXP_LIKE(J.OWNER, '^[A-Za-z][0-9]{6}$')
+              THEN 'personal-id-shaped' ELSE 'service-shaped' END;
+```
+
+Two fences. **Definition grain only** — these read what jobs are CONFIGURED to
+run as; what a run ACTUALLY executed as is the run-grain question
+(`scheduler_executed_by`), needs the history feed, and none of this SQL answers
+it. And **OWNER is stored ALL UPPER** in psgmgr (the committed extract's
+`--run-as` bind upper-cases for exactly this reason) — any join against the
+directory's name column must normalize case on both sides, and the census
+reports case-only mismatches rather than folding them.
+
 ## Phases
 
 | Phase | Work | Gate state |

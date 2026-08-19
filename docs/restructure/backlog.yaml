@@ -2635,7 +2635,16 @@ items:
       (the 171-way name), and knowledge/standards/technology/
       functional-id-concepts.md for the ownership-role and succession doctrine §B
       leans on. Everything decision-shaped stays with this gate; the captures are
-      evidence, not exhibits to commit.
+      evidence, not exhibits to commit. SESSION SQL (added 2026-08-19, same session):
+      doc 09 now carries five generic psgmgr queries (its "Session SQL" section) that
+      put numbers in front of the gate's measurable halves — S1 the weighted run-as
+      demand set (§D), S2 run-as class x job type (§G/K25), S3 the platform-account
+      breadth signature (the §D/§G recognition question answered by ranking rather
+      than name heuristics), S4 the per-owner application-code spread (the Control-M
+      half of the §Q0/§G5 disagreement join), S5 the personal-vs-service owner-shape
+      triage (§Q5). Run them where the replica lives, counts only; definition grain
+      only, and OWNER is ALL UPPER so the directory-name join normalizes case on
+      both sides.
 
   - id: K18
     epic: seal-attribution
