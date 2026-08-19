@@ -85,6 +85,21 @@ restarts at **135+**, delta since `caa0406` — **115 commits: 93 cited across s
 135-157, 22 ritual.** This roll certifies a NEW base, tagged **`port-base-20260817`** at the roll
 commit itself (`python scripts/port_preflight.py --base caa0406 --tag`).
 
+**LEDGER EXTENDED 2026-08-19 (desktop, pre-K17) — NOT a base certification.**
+Steps **158-170** cover the **116-commit delta `port-base-20260817..a4e65d26`**,
+verified commit-by-commit: every non-ritual commit is cited in exactly one step,
+ritual commits (grooms, claims, renders, snapshots, PR merge commits, handoff
+rolls) fall under the standing exemption; the four `docs(port):` commits
+(`9dda538e` RELAY-10, `be0c39ae` RELAY-11, `7c6eb730` its first rider,
+`991d59e6` RIDER 2) are SELF-DOCUMENTING — their payload IS the relay text in
+this file's relay section, cited there rather than in a step; and step 170 is a
+DELIBERATE
+RESERVATION — the six FID K-series commits are held open because K17 is being
+run producer-side and its outcome rewrites what that step must say. **After K17
+signs: restate step 170 with the gate outcome, then run
+`port_preflight.py --base 0c355f5a --tag` to certify the next base.** That
+restatement is the only addition this file needs before the port.
+
 > **THE `caa0406` PORT'S CLOSE-OUT IS UNRECORDED — ask before assuming it landed.**
 > `ae21ee4` got an explicit `06d4469` "MERGED company-side, branch removed" commit.
 > `caa0406` got a report, a producer review, and then nothing. The producer cannot
@@ -1973,6 +1988,190 @@ regeneration, never-port outputs — and get no step.
     `4e99b87` are references only; their images and transcriptions are machine-local
     and deliberately never tracked.
 
+158. THE CONTENT-TOPOLOGY FOLD — ONE CONTENT DATABASE [GATE-AUTHORIZED, and the
+    biggest structural change in this range] (`30f18c1e` G32 SIGNED 32/32,
+    `0316fca6` G102(a) the three ADR 0011 clause-1 guards, `988bf0d6` G102(b-d)
+    the fold itself, `4763e63e` G102 verified live, `8d596c37` G31 the D1
+    business-key spine re-scoped for one database, `ad2b52fe` Q20
+    satisfied-by-fold, `50ed3589` G38 closed satisfied-by-fold — the ddall
+    retirement swept and locked). The document-content topology FOLDS TO ONE
+    DATABASE: the watermark is re-keyed on trust, and the federated ddall read
+    path is retired with its name locked in SUPERSEDED_NAMES (which database is
+    the one is the gate page's ruling — read it there, not here). The gate prompt
+    (`document-content-topology.yaml`, 45KB) and ADR 0011 carry the reasoning.
+    YOUR SIDE: the code and guards port wholesale; whether YOUR graph folds is
+    your own Tier-A review against the signed gate — the clause-1 guards land
+    first either way and refuse the mixed state. G31's spine guard and Q20's
+    trace close ride the same review.
+
+159. THE Z-SERIES — SERVER INVENTORY, LOCATION ONTOLOGY, THE TIERED
+    ExecutionHost JOIN [GATE-AUTHORIZED + TEST-PINNED] (`3f2a647d` Z1 the
+    infrastructure server export registered + hierarchy captured + fixture
+    guarded, `7ff11d14` Z2 gate prompt + three planned vocabulary entries,
+    `f93939ed` Z2 SIGNED 12/12 — C2 reshaped to the technology port, `a30dd952`
+    Z3 the server-inventory loader + tiered ExecutionHost join, e2e green and
+    idempotent). A new registry source (the server export), a signed
+    server/location ontology, and a loader that joins Control-M hosts to a
+    tiered ExecutionHost. Loader + vocabulary port; your server export and its
+    confirmed flip are yours.
+
+160. THE ID-SPACE PARTITION — PRODUCER 1-9999, COMPANY 10000+ [TEST-PINNED /
+    **ACTION-REQUIRED, and it is YOUR half that completes it**] (`02f55975` the
+    bands + the Idea-59 -> Idea-135 renumber, `8fc1fef0` merge; RELAY-11 RIDER 2
+    is the companion read). Every id series (Idea-, every backlog letter) is now
+    range-partitioned by allocator: producer mints 1-9999, company 10000+ —
+    five digits or more reads as yours at a glance. Producer-side guards assert
+    `<= 9999` in `test_plan_ideas.py` + `test_backlog.py`; BOTH band blocks are
+    `per-entry` in PORT-MANIFEST (rows added in this range) and MUST NOT port
+    wholesale — taking them as-is would declare your own ids illegal. **YOUR
+    ACTION: write the MIRROR assertion (`n >= 10000`, grandfathering your
+    existing low ids as a committed constant) and allocate new ids at 10000+.**
+    Until that lands the partition is one-sided and the next Idea-59-class
+    collision is a matter of time. The one live collision was settled by the
+    G75/G76 precedent — producer's uncited side moved (Idea-135); YOUR Idea-59
+    stays.
+
+161. MANUAL LANDING ZONES FIRST-CLASS [TEST-PINNED / ACTION-REQUIRED]
+    (`fabb1e4e` the build, `09e7a609` the wipe-signature correction). Every
+    `acquisition.mode: manual` registry row now declares `drop_dir_base`
+    (data_root|repo); `drydocs_core/landing_zones.py` resolves them,
+    `drydocs landing-zones [--check]` inspects them (exit 2 on a data_root zone
+    inside the tree, exit 1 with --check on EMPTY), and
+    `test_landing_zones.py` enforces that repo-based zones hold TRACKED files.
+    The correction commit matters as much as the build: a `git clean -fd`
+    removes the DIRECTORY, so a swept zone reads `absent` (indistinguishable
+    from never-used), NOT `EMPTY` — detection is the weak half, LOCATION is the
+    control. **YOUR ACTION: set your own `DRYDOCS_DATA_ROOT`, and run
+    `drydocs landing-zones --check` before AND after any port step that touches
+    the working tree** (the guardrail bullet above was extended in this range).
+
+162. FIVE GATES SIGNED IN-RANGE [GATE-AUTHORIZED] — adopt via your own gate-log
+    review, per gate:
+    (a) `corporate-backbone-vocabulary` 19/19 (`9d9208d6` draft, `3e208524`
+        walk, `0622a655` backbone-not-spine rename, `faa0bdd8` consequences:
+        :Company registered org:FormalOrganization, new 49-local-corporate.yaml,
+        the §D3 endpoint guard — which found 8 unregistered endpoint labels,
+        carried as DECLARED DEBT, not fixed silently; `1099d68d` the missing
+        `corporate` domain registration CI caught; `1e29ba63`+`1cdfe277` the
+        08-17 schema matrix made durable + its regenerator).
+    (b) `pending-source-correction` 12/12 (`a10b0191` N12 — every registry
+        dataset declares its ACQUISITION PATH, `0ce3b38a` N13 draft, `2b1430aa`
+        signed; the confirmed-flip rule is now gated).
+    (c) `email-folder-assignment` 8/8 (`dfdda0d1`) — the CONCERNS edge RULED,
+        NOTHING WRITTEN: `docs_email_concerns` stays planned until its writer
+        builds; aboutness is never attribution (the K7 §A1 fence held).
+    (d) B5 medallion-stage vocabulary 6/6 (`dd7663e3`).
+    (e) Z2 server/location 12/12 — step 159.
+
+163. THE HELD-ENTRIES REVIEW AND THE ATTRIBUTION FAMILY [GATE-AUTHORIZED]
+    (`4b731b91` G91 four of five held entries ruled + the m3_ ids retired,
+    `38013e45` G91 closed 5/5 — the DevTeam leg joins qualified attribution,
+    `fdfb419a` the claim commit shipped with its own guard red and was fixed —
+    the claim-before-work rule catching a bad claim, `b17f24e5` the ITSM
+    technician-group family lands fourth on the qualified-attribution pattern,
+    `b0cfa37d` G99 pat_team_roles rewritten onto qualified attribution).
+    NAMING NOTE for your vocab merge: `m3_executed_by` is DEPRECATED (id
+    migration, concept held) — the live entries are `scheduler_executed_by`
+    (run-grain, planned, double-blocked) and `scheduler_runs_as`
+    (definition-grain, planned, NEW in this range — CM_DEF_VJOB.OWNER had no
+    registered edge at all until G91's review caught it). Both fence on the
+    fid-identity gate (the reserved step below).
+
+164. S11 — THREE COMPONENT PACKAGES EXTRACTED [TEST-PINNED, path moves]
+    (`97fb4f02`, merged `2ea4ecd9`). `drydocs_plan/`, `drydocs_docgen/` and
+    `drydocs_port/` are now real packages — declared components that had never
+    been extracted. Files MOVED; MODULE_MAP rows moved with them. Your apply
+    takes the moves wholesale, but any local edit you carry against the old
+    paths needs re-pointing at merge time — the collision ledger's business.
+
+165. THE DOCMETA TRIO + THE CORPUS-ID GRAMMAR [TEST-PINNED] (`519bac3b` the
+    corpus-id grammar — vendor doc sets become siblings, `bmc-docs` KEPT ITS
+    NAME deliberately so the P0 benchmark record stays citable, `c1f6fa05` Q11
+    document supersession registered planned + gate drafted, `65b7bccf` Q9 the
+    Essential GraphRAG re-file as vendor documentation hooked to its product,
+    `bb7200be` Q10 the failure/activity email corpus loads as the LEXICAL shape
+    — Document→Chunk only, assignment deliberately absent until the (c) gate
+    signs, `7fada596` Idea-136: snapshot.ps1's RED warn prints System.Object[],
+    inboxed not fixed). Loaders and shapes port; the email corpus's msg/extract
+    pair is a company-side system of record with a backup obligation.
+
+166. Q19 — THE P0 BENCHMARK RE-RUN WITH A REAL PERSONA [TEST-PINNED]
+    (`4f89105d` the direct add, `61a8df15` a count recompute, `0200f183` the
+    run, merged `7671336b`). A Sonnet persona given ONLY schema + questions
+    scored **11/12 mechanical vs the original hand-written 10/12 mechanical
+    (12/12 after its two disclosed adjudications)** — recall held; the hidden
+    cost was CONTEXT VOLUME, 6.6x. Quote "~27x token efficiency" as the
+    hand-written CEILING with the persona floor beside it — your own
+    PORT-REPORT-e60822fc comparisons should treat the persona numbers as the
+    producer floor. New explainer `graph-retrieval-benchmark-persona-rerun.md`
+    + persona_queries.json + results beside the originals.
+
+167. N10 + N11 — THE WIRING-READINESS GATE PROMPT READS ON *YOUR* Q1-B PIN
+    [TEST-PINNED / gate prompt] (`0268e305` N11, `6f0dbd26` N10, merged
+    `826634c3`). N10 drafts `registry-wiring-readiness.yaml` (15
+    confirmations): split pipeline-wiring readiness out of the semantic
+    `confirmed` flag. ITS MOTIVATING CASE IS YOUR STANDING PIN — `cm_hosts`
+    semantically signed yet false your side because your host stage is unwired,
+    overwritten by canonical-producer every port and surviving only by your
+    manual pin + re-arm trigger. If the gate signs, that pin CLASS retires
+    (your gate-log records the retirement; entries are never deleted). Prompt
+    is a clean-add under the manifest's gate-prompts rule; nothing applied.
+    N11: the load-sequence surfaces guard's ingest.sh half was structurally
+    dead (the derive-don't-list design guaranteed an empty scan that was
+    unioned in as coverage) — the empty set now has to prove the derivation.
+
+168. K23 — THE `kb_*` VERDICT [VERIFIED-SME / docs] (`3e467026` the export
+    profile lands on the item's premise, `5ba443e1` evidence-doc §11 —
+    attribution case FAILS: every purpose-built SEAL column 0-of-200, the
+    de-facto link is application-grain owning-not-subject, recommendation OUT
+    as attribution with the reason recorded, `1d429d17` §11.5 — the runbook
+    baseline: remediation searches KB by Control-M folder, archives BEFORE
+    replacing, capture-before-replace is a failed step if it fails, the archive
+    is a SOURCE with a retention obligation, and G68's censuses give staleness
+    a measured meaning). Reads on your §9 ServiceNow model; the profile ran on
+    the SME machine — shapes only in the tree.
+
+169. SMALL FIXES, POLICY AND HYGIENE [TEST-PINNED / docs] (`d3b443a4`+
+    `6bacdb45` Idea-129 closed — the depgraph snapshot and schema_graph
+    renderer write LF, the guard Idea-121 asked for exists; `2d107ce4`+
+    `51be2fba`+`9474e467`+`dacca1b1` inbox appends — Idea-129/130/131/132/133,
+    the last two of which became N12/N13 and the re-sourcing record; `b84a3ba5`
+    S12 the environment-drift guard: the suite fails loudly when the
+    interpreter's packages disagree with poetry.lock (born from a REAL
+    cross-venv incident — the S13 "defect" it replaced was retracted as
+    environment drift, recorded in S12's notes); `d5e7966d` the :Employee
+    creation policy is STUB-AND-ENRICH, SME direction recorded and applied;
+    `e298e217` seal_id joins the software registry as a NODE PROPERTY,
+    USES_SOFTWARE untouched; `42405fc2` the cm_escalation_db registry note
+    corrected — job-grain SUPPLEMENTS, never authors; `82512caf` repo-README:
+    run the suite in the project venv; `fd57e0e5` G101 the seal_* vocabulary
+    id migration item + the G87 title/priority fix; `b3b5e47b` L19 partial —
+    clauses (c)(e)(f): all 19 design-doc references to the two S5-retired
+    monoliths re-pointed at the fragment directories, the C9 HAS_APPLICATION
+    row restated, the lineage model cited; (a)(b)(d) stay honestly open;
+    `56cbeddd`+`9a7b4ab5` the IDEAS filing passes — 29 consumed entries to the
+    audit trail, 7 partials kept in place, and the S12-era phantom
+    PYTHONPATH defect RETRACTED with proof; `d1497925`+`e1b4a6a4`+`c4145090`+
+    `a3935569` handoff rolls, never-port). Grooms (`7a3e2cf3`, `11cc9543`,
+    `094bc3a3`, `01536824`, `3e409ba8`, `a4e65d26` — the last two include J50:
+    gates.json's `unblocks` is a mention-scan, the J28 class opposite
+    direction), claims, board/design renders, PR merge commits and depgraph
+    snapshots in this range are ritual per the standing exemption.
+
+170. RESERVED — THE FID K-SERIES [OPEN: lands as ONE addition at the K17
+    close]. The commits `7b0c4ae3`, `5fe364b3`, `76e343df`, `25239da5`,
+    `1176a53d`, `8ae771de` (K16 unblocked by two-source SME evidence; the
+    platform-account run_as class, job-grain, cross-platform; K25 added;
+    doc 09's two-source section + worked example + session SQL; the generic
+    functional-id concepts doc; K17's session-materials note) are DELIBERATELY
+    NOT ledgered as final here — K17 is being run producer-side and its
+    outcome rewrites what this step must say (the identity key, the K2 tier
+    ruling, the ingest scope, RELAY treatment of `hr_phone_exp`, and the K16
+    census counts). Coverage audit: these six commits are accounted for BY THIS
+    RESERVATION; anything else claiming them is double-counting. When K17
+    signs, restate this step with the gate outcome and it is the ONLY addition
+    this ledger needs before the next base is certified.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -1983,7 +2182,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   sample-backed tests skip without the CSV — at step 48 the CSV-absent figure was
   114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
-- Full `pytest tests/unit/` — ZERO failures is the contract; skips are
+- Full `pytest tests/unit/` — ZERO failures is the contract;
+  producer reference at the 158-170 extension (`a4e65d26`, desktop, 2026-08-19):
+  **2224 passed / 5 skipped / 13 deselected** with the production CSV present and
+  no RECONCILE_BEFORE_DIR — your figure lands ABOVE your own e60822fc baseline,
+  never compared against ours; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
   optional dep, essential-graphrag PDF, J7 guards without RECONCILE_BEFORE_DIR,
   capability_assert=false skips per T18). A retired-id refusal from
