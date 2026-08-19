@@ -135,7 +135,7 @@ never "zero"** — the distinction the whole gate turns on.
 
 | Measurement | Value | Source field on `FidCensus` |
 |---|---|---|
-| (a) total directory rows for the application | _pending_ | `directory_rows_total` |
+| (a) total directory rows for the application | **measured for four applications: 555 · 500 · 209 · 59** (SME id-owner captures 2026-08-19; upper bounds — all environments and subtypes included). Per-census-application value still _pending_ the company run | `directory_rows_total` |
 | (b) \|demand set ∩ that application\| | _pending_ | `demand_in_application` |
 | — of which, per demand set (i / ii / iii) | _pending_ | `demand_by_source` |
 | demanded but absent from the directory | _pending_ | `demand_not_in_directory` |
@@ -158,6 +158,73 @@ Two things the census settles for free:
 - the **disagreement rate** between the directory's application assignment and the
   Control-M-derived attribution where both exist (gate §Q4). That is the cheapest
   available measure of how far either source can be trusted.
+
+## Two sources, two grains (SME evidence, 2026-08-19)
+
+The plan above was written against ONE source — the id-owner directory. The SME's
+2026-08-19 direction and captures establish there are **two pull surfaces**, different
+in grain, key, and blind spots. Venue (J18): every number below was read off SME
+captures made on the SME's machine; the captures live outside the tree under the data
+root (`fid/screenshots/`), and no extract is in this repo. Shapes and counts only.
+
+**Source A — the HR employee-data custom solution.** FIDs are carried IN the HR
+employee record system as functional-type entries:
+
+- The FID **name** (no application id anywhere in the row) sits in the employee
+  name field; the **type** column marks the row functional; the **manager** field
+  is repurposed to hold the standard id of the employee who **owns or manages the
+  account**. LOB, department, and cost-center columns come along for free.
+- Measured shape of the profiled extract: 227 rows, 23 columns, every row
+  functional-type and active, every employee-id value unique — while the NAME
+  column holds only 54 distinct values. **One agent-account name is registered 171
+  separate times (75% of the extract), each to a different manager and cost
+  center.** 50 names are 1:1 with their id; 3 more names carry small duplicates.
+- Consequences: the grain is **(account id, owner)** — exactly the multi-owner
+  scenario `fid_census.py` was built for; the name is the Control-M `run_as` join
+  key but is NOT unique; and **this source cannot answer "which application"** —
+  no application id exists in the row. It answers *who owns this account*.
+
+**Source B — the id-owner application, searched by application id.** The read
+surface over the directory proper:
+
+- Returns, per application: record id, FID, functional **type**, functional
+  **purpose** (free text), **name**, description. The name column joins to Source
+  A's name and to Control-M `run_as`.
+- **Measured by-application totals from four captures:** 555, 500, 209, and 59
+  FIDs for four different applications. "About two hundred per application" was
+  the estimate; the real spread is roughly an order of magnitude.
+- **The SME's caveat, verbatim in substance:** a by-application listing contains
+  ALL FIDs for that application for ALL environments — including ids used to
+  connect to OTHER applications, app-to-app connection ids, and human shared
+  accounts. So (a) in the census is an upper bound by construction, and the §D
+  scope ruling (which subtypes count) decides how far above the demand set it
+  sits.
+
+**How the two map — proposal for the K17 gate, deciding nothing here:**
+
+| Question | Source | Join |
+|---|---|---|
+| Who owns/manages this run-as account? | A (HR) | `run_as` name -> A.name -> A.manager (owner's standard id) — at (account id, owner) grain |
+| Which application is this FID assigned to? | B (id-owner) | `run_as` name -> B.name -> the search's application id; B is the K2 tier-2 candidate |
+| Identity spine | B's ids | the FID/record id keys the `:AppUser` node (the doc's standing rule); A's employee-id is a per-row key of the HR carrier, not the identity |
+| Census (a) | B | by-application total (over-broad; §D filters rule what counts) |
+| Census owner-side counts | A | owner fan-out, name collisions, LOB/cost-center distribution |
+
+Neither source alone is sufficient: A has owners but no applications; B has
+applications but its owner columns are role-derived views (see the concepts doc
+`knowledge/standards/technology/functional-id-concepts.md` §6 — a listing does not
+say whether ownership is individual or catalog-role). The join between them is the
+NAME — the key §A of the gate already rules is unsafe as identity. That is not a
+contradiction: the name is the *join*, the id is the *identity*, and the census can
+measure how lossy the join is (name collisions are already measured at 171-way for
+one value).
+
+**What this changes in the plan:** the census gains an owner-side half from Source A
+(no new questions — it answers the §Q0 "who owns it" leg the demand-set intersection
+needed anyway), and (a) is now measured for four applications instead of estimated
+for one. The §G registration-vs-attribution machinery is unchanged. Cross-application
+run-as — a job whose run-as account belongs to a DIFFERENT application than the
+folder's — is now a first-class census output rather than a footnote: K25 carries it.
 
 ## Phases
 
