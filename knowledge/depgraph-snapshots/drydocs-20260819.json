@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-18T11:14:12",
-    "date": "20260818",
+    "captured_at": "2026-08-19T01:28:04",
+    "date": "20260819",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a3935569",
-      "full": "a39355696745fe3bec08b07be887fb2b94ba1f20",
+      "commit": "e0ae9bab",
+      "full": "e0ae9bab6a9702d344c92228e938dc98fa78e917",
       "branch": "main",
-      "describe": "port-base-20260817-33-ga3935569",
-      "subject": "docs(handoff): roll to 2026-08-18 — three gates closed, the ITSM family, stub-and-enrich",
+      "describe": "port-base-20260817-73-ge0ae9bab",
+      "subject": "chore(backlog): close Q9 + Q10 + Q11 ΓÇö the G31-unblocked docmeta trio, delivered in one session",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6785,6 +6785,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/document-supersession.yaml",
+      "name": "document-supersession.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/document-supersession.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/dpl-dataset-registry-contract.yaml",
       "name": "dpl-dataset-registry-contract.yaml",
       "extension": ".yaml",
@@ -6807,6 +6816,15 @@
       "name": "email-dl-contact-point.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/email-dl-contact-point.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/email-folder-assignment.yaml",
+      "name": "email-folder-assignment.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/email-folder-assignment.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -6843,6 +6861,15 @@
       "name": "fid-identity-and-scope.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/fid-identity-and-scope.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/pending-source-correction.yaml",
+      "name": "pending-source-correction.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/pending-source-correction.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10160,6 +10187,33 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/data/samples/email-extracts",
+      "name": "email-extracts",
+      "extension": "",
+      "rel_path": "drydocs/data/samples/email-extracts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/data/samples/email-extracts/sample-activity-no-hint.json",
+      "name": "sample-activity-no-hint.json",
+      "extension": ".json",
+      "rel_path": "drydocs/data/samples/email-extracts/sample-activity-no-hint.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/data/samples/email-extracts/sample-failure-with-hint.json",
+      "name": "sample-failure-with-hint.json",
+      "extension": ".json",
+      "rel_path": "drydocs/data/samples/email-extracts/sample-failure-with-hint.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/data/samples/pat_product_mapping__sample.csv",
       "name": "pat_product_mapping__sample.csv",
       "extension": ".csv",
@@ -10574,6 +10628,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/email_extracts.cypher",
+      "name": "email_extracts.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/email_extracts.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/essential_graphrag.cypher",
       "name": "essential_graphrag.cypher",
       "extension": ".cypher",
@@ -10731,6 +10794,15 @@
       "name": "doc_traceability.py",
       "extension": ".py",
       "rel_path": "drydocs/loaders/doc_traceability.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/email_extracts.py",
+      "name": "email_extracts.py",
+      "extension": ".py",
+      "rel_path": "drydocs/loaders/email_extracts.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13931,10 +14003,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260817-1442.json",
-      "name": "drydocs-20260817-1442.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260818.json",
+      "name": "drydocs-20260818.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260817-1442.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260818.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15110,6 +15182,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_business_key_spine.py",
+      "name": "test_business_key_spine.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_business_key_spine.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_catalog_keying.py",
       "name": "test_catalog_keying.py",
       "extension": ".py",
@@ -15384,6 +15465,15 @@
       "name": "test_drydocs_api.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_drydocs_api.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_email_extracts.py",
+      "name": "test_email_extracts.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_email_extracts.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16284,6 +16374,15 @@
       "name": "test_ui_tests_ledger.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_ui_tests_ledger.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_uncertain_boundary.py",
+      "name": "test_uncertain_boundary.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_uncertain_boundary.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18056,6 +18155,10 @@
     ],
     [
       "drydocs/drydocs/cli.py",
+      "drydocs/drydocs/loaders/email_extracts.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/essential_graphrag.py"
     ],
     [
@@ -18391,6 +18494,18 @@
       "drydocs/drydocs_core/run_log.py"
     ],
     [
+      "drydocs/drydocs/loaders/email_extracts.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/email_extracts.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/email_extracts.py",
+      "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
       "drydocs/drydocs/loaders/essential_graphrag.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -18705,6 +18820,10 @@
     [
       "drydocs/drydocs_api/exports.py",
       "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/drydocs_api/exports.py",
+      "drydocs/drydocs_core/source_registry.py"
     ],
     [
       "drydocs/drydocs_api/handlers.py",
@@ -19747,6 +19866,18 @@
       "drydocs/drydocs_api/sessions.py"
     ],
     [
+      "drydocs/tests/unit/test_email_extracts.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_email_extracts.py",
+      "drydocs/drydocs/loaders/email_extracts.py"
+    ],
+    [
+      "drydocs/tests/unit/test_email_extracts.py",
+      "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
       "drydocs/tests/unit/test_ephemeral_specs.py",
       "drydocs/drydocs_api/app.py"
     ],
@@ -20633,6 +20764,10 @@
     [
       "drydocs/tests/unit/test_transcribe_doc_markup.py",
       "drydocs/drydocs/design_doc.py"
+    ],
+    [
+      "drydocs/tests/unit/test_uncertain_boundary.py",
+      "drydocs/drydocs_api/query_specs.py"
     ],
     [
       "drydocs/tests/unit/test_variable_classifier.py",
@@ -25652,6 +25787,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/document-supersession.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/dpl-dataset-registry-contract.yaml"
     ],
     [
@@ -25663,6 +25803,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/email-dl-contact-point.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/email-folder-assignment.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -25683,6 +25828,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/fid-identity-and-scope.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/pending-source-correction.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -27567,6 +27717,11 @@
     [
       "drydocs/drydocs/data/samples",
       "CONTAINS",
+      "drydocs/drydocs/data/samples/email-extracts"
+    ],
+    [
+      "drydocs/drydocs/data/samples",
+      "CONTAINS",
       "drydocs/drydocs/data/samples/pat_product_mapping__sample.csv"
     ],
     [
@@ -27578,6 +27733,16 @@
       "drydocs/drydocs/data/samples",
       "CONTAINS",
       "drydocs/drydocs/data/samples/products__sample.csv"
+    ],
+    [
+      "drydocs/drydocs/data/samples/email-extracts",
+      "CONTAINS",
+      "drydocs/drydocs/data/samples/email-extracts/sample-activity-no-hint.json"
+    ],
+    [
+      "drydocs/drydocs/data/samples/email-extracts",
+      "CONTAINS",
+      "drydocs/drydocs/data/samples/email-extracts/sample-failure-with-hint.json"
     ],
     [
       "drydocs/drydocs/loaders",
@@ -27668,6 +27833,11 @@
       "drydocs/drydocs/loaders",
       "CONTAINS",
       "drydocs/drydocs/loaders/doc_traceability.py"
+    ],
+    [
+      "drydocs/drydocs/loaders",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/email_extracts.py"
     ],
     [
       "drydocs/drydocs/loaders",
@@ -27803,6 +27973,11 @@
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
       "drydocs/drydocs/loaders/cypher/doc_traceability.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/email_extracts.cypher"
     ],
     [
       "drydocs/drydocs/loaders/cypher",
@@ -29527,7 +29702,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260817-1442.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260818.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -30117,6 +30292,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_business_key_spine.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_catalog_keying.py"
     ],
     [
@@ -30268,6 +30448,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_drydocs_api.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_email_extracts.py"
     ],
     [
       "drydocs/tests/unit",
@@ -30768,6 +30953,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_ui_tests_ledger.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_uncertain_boundary.py"
     ],
     [
       "drydocs/tests/unit",
@@ -31609,13 +31799,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1705,
-    "edges": 983,
+    "files": 1715,
+    "edges": 992,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 1973,
-    "directories": 269
+    "rels": 1984,
+    "directories": 270
   }
 }
