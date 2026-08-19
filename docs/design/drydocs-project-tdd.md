@@ -54,7 +54,7 @@ This TDD covers the *whole frame* rather than one layer:
 | Layer | Answers | System of record | Guard |
 |---|---|---|---|
 | 1 Taxonomy | what category | `config/taxonomy/*.yaml` | importers classify only — no meaning edges |
-| 2 Ontology | what edges mean | `drydocs_core/ontology/relationship_vocabulary.yaml` + `config/taxonomy-ontology-map.yaml` | `test_schema.py`, `test_taxonomy_ontology_map.py`, the HITL gate |
+| 2 Ontology | what edges mean | `drydocs_core/ontology/relationship_vocabulary/` + `config/taxonomy-ontology-map/` (both fragment directories since S5) | `test_schema.py`, `test_taxonomy_ontology_map.py`, the HITL gate |
 | 3 Knowledge graph | what is connected & what it means | Neo4j (`drydocs` DB; EE container) | `graph-tests/*.yaml` acceptance, `m3-verify` |
 | 4 Context graph | what matters now | planned projections (SOSA runs, timing, windows) | gate E1 pending; phase 13 |
 
@@ -126,11 +126,11 @@ test.
 platforms). Rule: no relationship types at import time — a capture that needs an edge is an
 ontology question and stops.
 
-**3. Ontology contract.** `relationship_vocabulary.yaml` holds node classifications
+**3. Ontology contract.** `drydocs_core/ontology/relationship_vocabulary/` (per-domain fragments; formerly one YAML, split at S5) holds node classifications
 (each label → a standards CURIE + PROV behavioural type) and the relationship registry
 (lifecycle planned → active → deprecated; every active entry must have its supplement block —
 drift-guarded). New edges are chosen via the 9-row PROV decision matrix, then proposed in
-`config/taxonomy-ontology-map.yaml` (lifecycle proposed → confirmed → applied, computed
+`config/taxonomy-ontology-map/` (lifecycle proposed → confirmed → applied, computed
 summary, `vocab_id` referential check, map↔vocabulary label agreement — all test-enforced).
 Confirmation happens only at a gate; the gate log is append-only audit.
 
@@ -246,9 +246,10 @@ backlog — never resolved silently.
 | Four-layer separation; no meaning at import | context-frame | `config/taxonomy/` + importer rule | tests/unit/test_schema.py (vocab↔supplement drift) | active |
 | Loads fail closed on unregistered/unconfirmed sources | detailed-design | `config/source-registry.yaml` | tests/unit/test_source_registry.py | active |
 | Every source carries a sensitivity classification | classification-security | `config/classification.yaml` | tests/unit/test_classification.py | active |
-| No edge loads before SME confirmation | hitl-gate | `config/taxonomy-ontology-map.yaml` | tests/unit/test_taxonomy_ontology_map.py | active |
+| No edge loads before SME confirmation | hitl-gate | `config/taxonomy-ontology-map/` | tests/unit/test_taxonomy_ontology_map.py | active |
 | Per-column source dispositions | detailed-design | `config/source-mappings/` | tests/unit/test_source_mappings.py | active |
-| Delta-only run provenance (no `:JobRun` supernode) | detailed-design | loaders `base.py` (`row_checksum`) | tests/unit/test_row_checksum.py + graph-tests/provenance-diet.yaml | active |
+| Delta-only run provenance (no `:JobRun` supernode) | detailed-design | `drydocs/loaders/base.py` (`row_checksum` — the shared loader base every concrete loader inherits) | tests/unit/test_row_checksum.py + graph-tests/provenance-diet.yaml | active |
+| Lineage identity + gate-bound edge vocabulary (INVOKES/TRIGGERS/READS_FROM/WRITES_TO stay `planned` until their gate) | detailed-design | `drydocs_lineage/model.py` (the C2 identity/ontology contract — fan-in 24, the G22-reshape fan-out surface; L19 clause (c) closed the citation gap 2026-08-19) | tests/unit/test_lineage_archival.py + test_lineage_catalog_crosscheck.py (both import the model) | active |
 | Source audit envelope (authorship properties) | detailed-design | `config/audit-fields.yaml` | tests/unit/test_audit_fields.py | active |
 | Component boundary, default-deny | detailed-design | `MODULE_MAP.md` | tests/unit/test_module_boundary.py | active |
 | Cross-repo port dispositions machine-readable | detailed-design | `PORT-MANIFEST.yaml` | tests/unit/test_port_manifest.py | active |

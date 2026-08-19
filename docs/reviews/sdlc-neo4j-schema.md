@@ -550,7 +550,7 @@ sequenceDiagram
 | `drydocs/loaders/cypher/controlm_conditions_out.cypher` | :Condition MERGE; EMITS_OUT_CONDITION edge | ACTIVE | Same as above |
 | `drydocs/loaders/cypher/stale_edge_cleanup.cypher` | Delete condition/invocation edges before re-assert | **NEEDED** | New file required for incremental (FR-NS-008) |
 | `drydocs/loaders/cypher/area_products.cypher` | MERGE :AreaProduct + HAS_AREA_PRODUCT (Product→AreaProduct) + HAS_DEV_TEAM (AreaProduct→DevTeam) | PLANNED | Part of PAT org hierarchy load |
-| `drydocs/loaders/cypher/pat_product_mapping.cypher` | MERGE HAS_APPLICATION (Product→Application) + SUPPORTS (DevTeam→Product/AreaProduct) | PLANNED | PAT application attribution |
+| `drydocs/loaders/cypher/pat_product_mapping.cypher` | MERGE SUPPORTS (DevTeam→Product/AreaProduct) — team-scoped support only. Product→HAS_APPLICATION is NOT written here: removed at the C9 gate (2026-07-18) because the row's seal_ids are TEAM-scoped and attributing them to the Product conflated two PAT screens (the loader file's own comment says so; `catalog_has_application` stays `planned` until a product-scoped extract is onboarded) | ACTIVE | PAT team→product support (the K13 reading); application attribution deferred to a product-scoped source |
 | `drydocs/loaders/cypher/pat_team_roles.cypher` | MERGE HAS_MEMBERSHIP (DevTeam→Membership) + OF_ROLE + HELD_BY for PAT role holders | PLANNED | PAT team role membership load |
 | `drydocs/loaders/controlm_folders.py` | Python wrapper for folders loader | ACTIVE | — |
 | `drydocs/loaders/controlm_jobs.py` | Python wrapper for jobs loader | ACTIVE | — |

@@ -240,7 +240,7 @@ graph, rerun freely); step 5 is the gated write.
 
 - **`GateBoundVocabularyError` at step 5** → not a bug; the vocabulary is still
   `planned`. See the unlock path in step 5. If it raises AFTER the gate flipped,
-  the registry edit didn't land — check `relationship_vocabulary.yaml` statuses.
+  the registry edit didn't land — check the statuses in `drydocs_core/ontology/relationship_vocabulary/` (per-domain fragments since S5).
 - **`TrustBoundaryError`** → the client points at a database other than
   `drydocs`. Fix the connection; the writer will not follow you.
 - **MAC `unmatched` unexpectedly high** → the jobs CSV and MAC export cover

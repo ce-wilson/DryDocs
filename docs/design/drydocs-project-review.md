@@ -337,7 +337,7 @@ So when a new relationship is needed, the question is never "what shall we call 
 term without inventing a new one.
 
 All of this is recorded in a single registry —
-`drydocs_core/ontology/relationship_vocabulary.yaml` — where every declared edge type
+`drydocs_core/ontology/relationship_vocabulary/` (per-domain fragments since the S5 split) — where every declared edge type
 carries a lifecycle status: **planned → active → deprecated → removed**. A pytest guard
 cross-checks the registry against the actual schema files, so the vocabulary and the
 database can never silently disagree. New relationship types follow the eight-step
