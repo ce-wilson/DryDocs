@@ -137,6 +137,16 @@ CREATE CONSTRAINT controlmjob_key     IF NOT EXISTS FOR (j:ControlMJob)         
 
 DROP CONSTRAINT condition_key IF EXISTS;
 CREATE CONSTRAINT condition_key       IF NOT EXISTS FOR (c:Condition)           REQUIRE (c.folder_id, c.name) IS NODE KEY;
+
+// The D1 business-key spine (G31, 2026-08-18). Moved here from
+// provisioning/02_proxy_constraints.cypher when the G102 fold retired that
+// file's charter (cross-database joins need matching keys in BOTH databases;
+// there is one database now). The DISCIPLINE it carried survives intact:
+// identity is always a BUSINESS key (ADR 0001), never an internal node id —
+// it is what lets a corpus rebuild and re-link (truncate-and-reload), and what
+// deepdoc's graph-seeded retrieval cites back to. The URN grammar:
+// urn:drydocs:dataasset:{platform}:{namespace}:{name}.
+CREATE CONSTRAINT dataasset_id        IF NOT EXISTS FOR (a:DataAsset)           REQUIRE a.assetId IS UNIQUE;
 CREATE INDEX      job_name            IF NOT EXISTS FOR (j:ControlMJob)         ON  (j.job_name);
 
 // Host topology (P3; gate controlm-hosts-topology 2026-07-09). Group grain is

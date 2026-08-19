@@ -15,8 +15,8 @@ Authoring + structure only — **no data load** here.
 > the gap the G28/G30 drift classes grew in. On a host that still carries it, drop it
 > per the Epic X items (alias out of `ddall` first, behind a zero-node emptiness probe).
 
-| `02_proxy_constraints.cypher` | **each** of `drydocs`, `ddcontext` | proxy-node business keys: `DataAsset.assetId` UNIQUE, `ControlMJob (folder_id, job_id)` NODE KEY |
-| `smoke_drydocs_all.cypher` | `ddall` | read-only federated query — reads both constituents, writes none |
+| `02_proxy_constraints.cypher` | — (RETIRED at G31/G102, 2026-08-18) | tombstone — the cross-db charter died with the fold; both keys live in `constraints.cypher` (`drydocs bootstrap`) |
+| `smoke_drydocs_all.cypher` | — (RETIRED with `ddall`) | the federated smoke had nothing left to federate |
 
 > **`ddschema` is in the topology but in neither the proxy-constraint pass nor `ddall`**
 > (G51, 2026-08-03). It holds the schema meta-graph written by `drydocs

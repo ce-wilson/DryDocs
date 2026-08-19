@@ -39,7 +39,7 @@ kind-scoped stable token ``controlm_inventory._stable_invocation_key`` already
 computes for Ab Initio/DPL invocations (G12; gate-log 2026-07-16
 "cmdline-lineage-review" §b) — full path / dataflow / config-JSON path ride as
 properties, never identity; ``DataAsset.assetId`` — the D1 proxy URN,
-``provisioning/02_proxy_constraints.cypher``), with their constraints ensured
+``constraints.cypher (dataasset_id — the D1 key, re-homed at G31)``), with their constraints ensured
 first (constraint-on-key rule).
 
 File-ops endpoint resolution (G13; gate-log 2026-07-15 "reads/writes shapes
@@ -163,7 +163,7 @@ def _job_composite(node_id: str) -> tuple[str, str]:
 
 def asset_urn(kind: str, location: str) -> str:
     """DataAsset proxy URN — ``urn:drydocs:dataasset:{platform}:{namespace}:{name}``
-    (the D1 key shape, ``provisioning/02_proxy_constraints.cypher``). Namespace is
+    (the D1 key shape, ``constraints.cypher (dataasset_id — the D1 key, re-homed at G31)``). Namespace is
     the location's parent path (``-`` when flat); the mapping is deterministic and
     reviewed at the same HITL gate that opens the vocabulary."""
     loc = location.replace("\\", "/").rstrip("/")

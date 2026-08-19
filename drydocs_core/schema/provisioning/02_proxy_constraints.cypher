@@ -1,22 +1,20 @@
 // =============================================================================
-// provisioning/02_proxy_constraints.cypher  —  G1 (ADR 0002 D1, proxy-node keys)
+// provisioning/02_proxy_constraints.cypher — RETIRED at G31 (2026-08-18).
 //
-// Run in EACH data database — BOTH drydocs AND ddcontext:
-//   cypher-shell -d drydocs         -f 02_proxy_constraints.cypher
-//   cypher-shell -d ddcontext -f 02_proxy_constraints.cypher
+// This file's charter was CROSS-DATABASE joins: the composite joined drydocs and
+// ddcontext by business key, so BOTH databases had to carry the same uniqueness
+// on the join keys, and this file was run against each. Gate
+// document-content-topology (G32, SIGNED 32/32) folded the content topology to
+// ONE database (applied at G102), so the charter lost its subject: there is no
+// second database to mirror a key into, and no composite to join across.
 //
-// The composite joins the two DBs by BUSINESS KEY (proxy-node pattern) — never by
-// internal node id — so both DBs must carry the same uniqueness on the join keys, and
-// `ddcontext` records survive every `drydocs` rebuild and re-link automatically.
+// THE KEYS DID NOT RETIRE — the file did. Both live in constraints.cypher, the
+// one home for one-database keys: `controlmjob_key` was always there (this file
+// duplicated it), and `dataasset_id` moved there at G31 with the D1 note. The
+// D1 discipline (identity is always a business key, never an internal node id)
+// survives as tests/unit/test_business_key_spine.py: every label a shipped
+// loader MATCHes as a join target must carry a constrained key.
 //
-// Identity is the EXISTING canonical business key (ADR 0001: "identity is always a
-// business key"); no identity is invented here:
-//   * DataAsset   -> assetId  (URN: urn:drydocs:dataasset:{platform}:{namespace}:{name})
-//   * ControlMJob -> (folder_id, job_id)  (the canonical key from constraints.cypher)
-//
-// Idempotent; Neo4j 5.x. (A UNIQUE / NODE KEY constraint creates its own backing range
-// index, so the join keys are indexed without separate CREATE INDEX statements.)
+// Kept as a tombstone rather than deleted so the provisioning sequence numbers
+// stay stable and the retirement is on the record where the file was.
 // =============================================================================
-
-CREATE CONSTRAINT dataasset_id    IF NOT EXISTS FOR (a:DataAsset)   REQUIRE a.assetId IS UNIQUE;
-CREATE CONSTRAINT controlmjob_key IF NOT EXISTS FOR (j:ControlMJob) REQUIRE (j.folder_id, j.job_id) IS NODE KEY;
