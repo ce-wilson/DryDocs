@@ -1374,13 +1374,106 @@ it wants different things from an ingestion consumer:
    `PUBLISH-BOUNDARY.md` it is Internal and cannot sit in the repo tree. The natural home is the
    out-of-repo data root as a declared landing zone (`drydocs_core/landing_zones.py`), which would
    make it a first-class manual source rather than an ad-hoc download directory.
-3. **Whether the archived copy is a source or a citation.** If remediation only ever *cites* an
-   article id, the archive is a convenience; if a fix package *quotes* it, the archive is evidence
-   and acquires a retention obligation. Different rulings, and the second is the one with
-   consequences.
+3. ~~**Whether the archived copy is a source or a citation.**~~ **RULED 2026-08-19 — it is a
+   SOURCE, and the retention obligation is real. See §11.5.** The original is replaced, so the
+   archive becomes the only surviving record of what the runbook said, and the accuracy/staleness
+   metrics are measured against it.
 4. **The duplicate test.** "Search before authoring" implies a bar for *this article already covers
    this defect*, and a LIKE pattern over `short_description` is a weak instrument for it. Nothing
    here rules what "already covered" means.
 
 **None of this reopens §11.3.** The retrieval case is a reason to READ the KB, not a reason to
 ingest it as attribution — and keeping the two apart is the whole point of recording both.
+
+### 11.5 The runbook baseline — §11.4's question 3, ruled (SME, 2026-08-19)
+
+**SME direction.** The articles expected back are **runbooks, found by Control-M folder**. A
+remediation batch **extracts the runbook, saves it to the fix Jira as a BASELINE, and replaces it**
+— capturing **accuracy and staleness metrics** along the way, so the estate can gauge how much
+cleanup is left and how far it has got.
+
+That settles §11.4's third question, and settles it at the harder end.
+
+**The archive is a SOURCE, not a citation.** Three independent reasons, and any one is sufficient:
+
+1. **It is the before-half of a before/after pair.** A baseline exists to be compared against; a
+   citation does not.
+2. **The original is REPLACED.** After the batch runs, the archived copy is the only surviving
+   record of what the runbook said. There is nothing left to re-fetch.
+3. **The metrics are measured against it.** An accuracy or staleness number that cannot be re-derived
+   from the artifact it scored is an assertion, not a measurement.
+
+**The consequence is a retention obligation, and it is stronger than the email-extract precedent.**
+The `email-folder-assignment` gate ruled the msg/extract pair a system of record with a backup
+obligation because the upstream purges on a 6–18 month cycle. Here the upstream is not purged on a
+timer — **we overwrite it ourselves, deliberately, as the last step of the fix**. Losing the archive
+is not degraded provenance; it is destroying the only evidence that the fix improved anything.
+
+Two capture rules follow directly, and both are ordering constraints rather than storage ones:
+
+- **Capture BEFORE replace, and treat a failed capture as a failed step.** A batch that replaces a
+  runbook it did not successfully archive has destroyed its own baseline. This is the one place in
+  the flow where the safe default is to stop.
+- **The archived copy is immutable once written.** It is evidence about a moment; a later re-fetch
+  is a different artifact, not a correction of this one.
+
+**Where it lands** is now decided by §11.4's question 2 rather than open alongside it: a KB body is
+company prose (Internal), so the archive belongs in the out-of-repo data root as a **declared
+landing zone** — `config/source-registry.yaml` with `drop_dir_base: data_root`, guarded by
+`tests/unit/test_landing_zones.py`. That is not a filing preference. A baseline that a port-time
+`git clean` can reach is a baseline that disappears without a log, and the landing-zone work
+(2026-08-19) exists precisely because that already happened to other manual payloads.
+
+#### The metrics are the part that needs definition, and one of them is nearly free
+
+"Accuracy" and "staleness" are not self-defining, and the cheap reading of staleness is the one the
+SME already rejected. Q11's problem statement is verbatim: *"2 or 3 different versions … is stale
+and the only indication is DATE."* A last-updated timestamp is exactly the signal that failed.
+
+**A MEASURED staleness is available, and the instrument already exists in the backlog.** G68 profiles
+a folder set into four censuses — shape, identity (FIDs / run-as / SEAL), variables by scope, and
+contacts — each carrying **where-used** rather than bare distinct values. That census is a ground
+truth for the same folder the runbook documents. So:
+
+- **Accuracy** = of the entities a runbook names (FIDs, variables, email contacts, job and folder
+  names), how many still exist in the folder set and still mean what the runbook says they mean.
+- **Staleness** = the drift between the runbook's picture of the folder and G68's current one —
+  computed, dated by evidence rather than by a timestamp nobody maintains.
+
+That reframes the metric from an aspiration into something derivable from two artifacts that are
+already specified. **It also gives the cleanup effort a denominator**, which is the exact gap G93
+records: `render_handoff()` today emits Findings, Scope, Change, Equivalence, Acceptance and
+Rollback and *not one count*, so a reviewer cannot tell whether a batch touched nine jobs or nine
+hundred. A documentation denominator — how many folders have a runbook, how many of those are
+measurably stale, how many this batch replaced — is the same defect answered on the documentation
+axis, and it should ride G93's run-log contract rather than growing a second reporting path.
+
+#### What this hands to two other items
+
+**Q11 (`document-supersession`, gate prompt drafted) gets its clause C answered from an angle the
+prompt did not anticipate.** Clause C asks who ASSERTS supersession: *a capture pipeline observing a
+replacement, or an SME ruling that two captures are versions of one thing.* Remediation is neither —
+it **performs** the replacement, so it does not infer supersession, it **knows** it, and it can name
+the fix that caused it. That is the most reliable assertion class the edge will ever get, and it is
+worth putting to that gate: `(new)-[:SUPERSEDES]->(old)` asserted by a batch that authored the new
+one against the old one it archived, with the fix id as the basis. Note the fence still holds in the
+other direction — this says nothing about KB→application attribution, which §11.3 ruled out.
+
+**G68 gains a candidate fifth census, and it should be proposed to that item rather than assumed
+here:** *documentation* — which folders in the set have a runbook, which do not, and how each scores.
+It is the same where-used discipline applied to prose, and G68's profile is where a reader already
+looks to answer "what is in this folder set".
+
+#### Still open after this ruling
+
+- **The scoring rules themselves.** "Still means what the runbook says" is a judgement in the general
+  case; the tractable subset is entity existence (does this FID / variable / folder still exist),
+  and the rest may need an SME in the loop. Rule the tractable subset first and say the rest is not
+  scored, rather than inventing a similarity number.
+- **Whether a runbook with NO KB article is a finding.** §11.2's 56%-with-no-SEAL-link is about
+  attribution, but the retrieval analogue — a Control-M folder with no runbook at all — is arguably
+  the more valuable output of the whole exercise, and it is a *gap* report rather than a *staleness*
+  one.
+- **The duplicate/coverage bar** (§11.4 question 4) is unchanged and still open: a LIKE pattern over
+  `short_description` decides whether a runbook was FOUND, and a false negative there silently
+  becomes "this folder has no runbook" in the gap report above.

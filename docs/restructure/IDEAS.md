@@ -92,6 +92,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-139`** · 2026-08-19 · `[idea]` · **open** · prio? **Low** —
+  **`gates.json`'s `unblocks` edge is a MENTION SCAN, and this repo already knows that is
+  not good enough — it fixed the same class one edge over.** `scripts/render_gates.py`'s
+  `unblocks()` serialises each backlog item to JSON and matches the gate slug anywhere in
+  it, so **any prose citation of a gate becomes a dependency edge**. Found by causing it:
+  writing K23's runbook-baseline note, which HANDS INFORMATION TO the
+  `document-supersession` gate, made that gate read as though it *unblocks* K23. In this
+  one case the edge happens to be defensible (the runbook replacement really does need the
+  `SUPERSEDES` edge signed), which is exactly what makes the pattern worth recording rather
+  than the instance — a heuristic that is right by luck is still a heuristic. **The repo
+  has already ruled this distinction for the other direction:** the same function's caller
+  carries `# J28: only an entry ABOUT the gate closes it -- a citation never does`, and
+  `section_accounts_for()` implements it. So "about vs citation" is a solved problem here
+  for gate-log sections and an unsolved one for backlog items, in adjacent lines of the
+  same file. **The cheap fix is probably a declared field rather than better matching** —
+  an item that genuinely waits on a gate could say so (`gates: [document-supersession]`)
+  and the scan could stop guessing; that also makes the edge visible in `backlog.yaml`
+  where a reader is, instead of only in a generated surface. Worth checking how many
+  current `unblocks` edges are citations before spending anything: if it is one or two, a
+  note is enough.
+
 - **`Idea-132`** · 2026-08-18 · `[source]` · **groomed → N16 (2026-08-19) — the `source_label` enum question ONLY; the re-sourcing record itself STAYS STANDING, because nothing is owed producer-side today and it is what a future build must read** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived

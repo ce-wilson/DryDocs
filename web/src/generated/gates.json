@@ -1371,7 +1371,9 @@
         "config/gate-prompts/document-supersession.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "K23"
+      ]
     },
     {
       "kind": "prompt-only",
