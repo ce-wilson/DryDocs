@@ -363,6 +363,7 @@
         "config/gate-prompts/pending-source-correction.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",
+        "config/gate-prompts/registry-wiring-readiness.yaml",
         "config/gate-prompts/remediation-fix-tracking.yaml",
         "config/gate-prompts/repo-manifest-data-profile.yaml",
         "config/gate-prompts/rua-bundle-data-profile.yaml",

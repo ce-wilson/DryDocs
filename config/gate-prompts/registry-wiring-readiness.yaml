@@ -1,0 +1,103 @@
+# SME gate-prompt spec — split PIPELINE-WIRING readiness out of the semantic
+# `confirmed` flag on source-registry rows (backlog N10). GATE-BOUND AND
+# DECIDES NOTHING: drafting a prompt is not a schema change (the G27/W1/U11
+# precedent). config/source-registry.yaml and its schema change ONLY when this
+# page signs — nothing in this file is applied by writing it.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: registry-wiring-readiness
+title: "SME Gate — one flag, two facts: does a source-registry row need a WIRED field separate from `confirmed`?"
+step: "config/source-registry.yaml v2 is live with a single boolean `confirmed` per DATASET row. It is the runtime load gate (require_confirmed -> exit 2) AND the record that an SME gate signed the row's meaning. Nine producer rows sit false today for at least four different reasons. Nothing changes before this page signs."
+summary: >
+  `confirmed` is answering two questions that have different owners, different
+  evidence, and — the part that costs real work — OPPOSITE port dispositions.
+  Clause A asks the SME to confirm the diagnosis against the census below.
+  Clause B rules the SHAPE of the fix: whether a second field is warranted at
+  all, what it is called, whether it carries a written reason, and what the
+  runtime load gate becomes. Clause C rules the port half, which is the half
+  that pays for the change: a semantic ruling TRANSFERS across sides (Q6) while
+  wiring readiness is per-side machine state that must never port, and one
+  field cannot hold two dispositions. Clause D fences the scope.
+meta:
+  Module: "config (the registry schema + drydocs_core/source_registry.py's gate) — no ontology or graph surface is touched"
+  Source: "config/source-registry.yaml (29 dataset rows, 20 true / 9 false) · config/schemas/source-registry.schema.json · drydocs_core/source_registry.py (require_confirmed) · docs/port-prompt.md (the a14a8028 fix session, decision 1)"
+  Precedent: "Q6 — signed-off gates TRANSFER across renames (config/gate-log.md, source-registry-v2) · the SOURCELESS_LOADERS idiom — an exemption without a written reason is the silent omission a guard exists to end · G27/W1/U11 — a drafted prompt decides nothing"
+  Registry ref: "no row's `confirmed` value changes at this gate; the field's MEANING is what is on the table"
+  Classification: "Internal-Public — mechanism only. The motivating divergence is described by its shape (a company loader tier not yet built); no company host names, SIDs or server addresses appear here"
+  Vocabulary: "no relationship vocabulary is involved — this is a config-layer field, not an ontology edge"
+  Source of record: "backlog N10 · config/gate-log.md (transcription target) · docs/port-prompt.md divergence ledger"
+
+mapping:
+  - n: 1
+    element: "A row whose meaning an SME gate has signed AND whose loader is built"
+    target: "loads today — `confirmed: true`"
+    edge: "no change proposed; 20 of 29 rows"
+  - n: 2
+    element: "A row whose meaning no gate has signed yet"
+    target: "must not load — semantic hold"
+    edge: "clause B: this is what `confirmed: false` should mean, and ONLY this"
+  - n: 3
+    element: "A row whose meaning IS settled but whose extractor/loader is not built"
+    target: "must not load — wiring hold"
+    edge: "clause B — ruling required: today this is also spelled `confirmed: false`, which is the conflation"
+  - n: 4
+    element: "The same row, held on one side and live on the other"
+    target: "a STANDING DIVERGENCE, pinned by hand in the company gate-log with re-arm triggers"
+    edge: "clause C — the port disposition is the decisive argument"
+
+provenance:
+  - label: "The motivating case, confirmed from both sides (not assumed)"
+    source_object: "controlm@[db].psgmgr.cm_hosts"
+    key: "the a14a8028 fix session, decision 1 — the Q1-B standing divergence"
+    loader: "producer: hosts loader + RUNS_ON shipped at P3 (2026-07-27), row reads confirmed: true"
+    properties:
+      - name: the company's value
+        origin: source
+        from: "their own PORT-REPORT, describing loader-tier state the producer cannot see"
+        note: "their CM_HOSTS extract is staging-only — the host stage is not wired — so the row reads confirmed: false. The MEANING is not in dispute: gate controlm-hosts-topology signed 2026-07-09 and, per Q6, a signed gate transfers. They are using the semantic flag to express a wiring fact because it is the only flag that stops a load."
+      - name: the cost, as paid
+        origin: derived
+        from: "the same session"
+        note: "the divergence had to be registered in the company gate-log and its guards PINNED with re-arm triggers. A SECOND, MASKED divergence of the same shape surfaced in the same pass (controlm:deftable-xml-export) — which is the argument that this is a mechanism fault, not a one-row accident: the first one was known and the second was not, and nothing distinguishes them."
+  - label: "The census — the conflation is already live PRODUCER-side too, not only across the port"
+    source_object: "the 9 producer rows reading confirmed: false, 2026-08-19"
+    key: "grouped by the reason their own inline comment gives"
+    loader: "none — this is a read of the committed file"
+    properties:
+      - name: "SEMANTIC hold (5 rows)"
+        origin: source
+        from: "hr_phone_exp, snow:cmdb-ci-classes, catalog datasets_v, catalog distributions_v, controlm:deftable-xml-export"
+        note: "'no gate', 'no gate yet', 'the gate is the activation condition', 'OPEN precedence ruling'. These are what the field was designed to say."
+      - name: "WIRING hold (3 rows)"
+        origin: source
+        from: "cm_hist_vw, oracle:schema-inventory, snowflake:schema-inventory"
+        note: "'no extractor/loader yet', 'ingestion pipeline planned', 'Expansion placeholder'. Nothing about meaning. The comment is carrying the distinction the field cannot — and a comment is not queryable, not portable, and not testable."
+      - name: "NEITHER (1 row)"
+        origin: source
+        from: "cm_escalation_db"
+        note: "registered as the gate's worked example of the replica id GRAMMAR, explicitly NOT as an endorsement of the feed. A third meaning on the same boolean — worth naming so clause B's answer does not assume there are only two."
+
+sections:
+  - title: "A. The diagnosis — confirm the finding before ruling the fix"
+    confirmations:
+      - "A1. ONE FIELD, TWO QUESTIONS. `confirmed` answers 'has an SME ruled what this data MEANS?' and 'is the pipeline that reads it BUILT?'. Different owners (SME vs engineering), different evidence (a signed gate page vs a loader that exists), different lifetimes. Confirm this is a real conflation and not a distinction without a difference."
+      - "A2. THE CENSUS IS THE EVIDENCE, NOT THE ARGUMENT. Of 9 producer rows at false: 5 semantic, 3 wiring, 1 neither. Confirm the grouping above is right — particularly cm_escalation_db, which the drafter read as a third kind. If the SME reads any row differently, the shape in clause B has to change with it."
+      - "A3. THE COMMENTS ARE DOING THE FIELD'S JOB. Every wiring-hold row explains itself in a YAML comment. That is the tell: the information is known, needed, and written down — just not anywhere a test, a query, or a port can reach it. Confirm that as the failure, rather than 'the flag is overloaded' in the abstract."
+  - title: "B. The shape of the fix — this is the ruling that matters"
+    confirmations:
+      - "B1. IS A SECOND FIELD WARRANTED AT ALL? The alternative is legitimate and should be rejected explicitly rather than by omission: keep one flag and put the reason in a required `hold_reason` string. That fixes auditability and costs no schema surface, but it does NOT fix the port asymmetry in clause C — a single field still has a single disposition. Rule which problem is being solved."
+      - "B2. IF A SECOND FIELD: NAME AND POLARITY. `wired: true|false` (states a fact about the pipeline) is proposed over `ready` (states a conclusion, and invites 'ready for what?'). Both are proposed over a `stage:` enum, which would re-collapse the two axes into one ordered scale and lose the ability to say 'meaning settled, pipeline not built' distinctly from 'pipeline built, meaning not settled' — a state that is rare but not impossible."
+      - "B3. WHAT THE RUNTIME GATE BECOMES. Today require_confirmed() refuses on `confirmed: false` and exits 2. Proposed: it refuses unless `confirmed AND wired`, and its ERROR MESSAGE names which of the two failed and what would clear it. An operator who hits this needs to know whether to go find an SME or go build a loader; today the message cannot tell them."
+      - "B4. DOES `wired` CARRY A WRITTEN REASON WHEN FALSE? Proposed yes, following the SOURCELESS_LOADERS idiom already used twice in this repo: a bare false is a fact, a false with a reason is a decision someone can re-read and reverse. This is the cheapest half of the change and the half most likely to be dropped for being cosmetic — it is not."
+      - "B5. THE DEFAULT FOR THE 20 CONFIRMED ROWS, and whether `wired` is required or optional in the schema. A required field forces every row to answer, which is the point, but it is also the whole 29-row migration. An optional field with a default of true is a smaller diff that lets a new row stay silent — which is how confirmed rows acquire unstated wiring holds. Rule the trade explicitly."
+  - title: "C. The port half — the argument that makes this worth doing"
+    confirmations:
+      - "C1. THE TWO FACTS HAVE OPPOSITE PORT DISPOSITIONS, and that is not a preference. A signed gate ruling TRANSFERS across sides — Q6 says so, and it is the same ruling on the same data whichever repo reads it. Pipeline-wiring readiness is a fact about ONE side's tree and can never be true of the other by inference. Confirm this asymmetry."
+      - "C2. ONE FIELD CANNOT HAVE TWO DISPOSITIONS, so today the manifest is wrong in one direction on every port. config/source-registry.yaml falls under PORT-MANIFEST.yaml's `config/**` default, which is canonical-producer: the producer's file wins wholesale. So the company's cm_hosts wiring hold is OVERWRITTEN by the producer's confirmed: true at every port, and survives only because a human pinned it and armed a re-arm trigger. That manual pin is the recurring cost this gate would remove."
+      - "C3. THE NEW FIELD'S OWN DISPOSITION must be ruled here and written into PORT-MANIFEST.yaml in the same change, or the fix reproduces the defect one field over. Proposed: `wired` is PER-SIDE and never ports — each repo states its own, and neither side's value is evidence about the other's. A registry row would then port its semantics (canonical-producer) while keeping its wiring (per-side), which is the first time the file's two halves could travel correctly."
+      - "C4. WHAT HAPPENS TO THE EXISTING PINS. If this signs, the cm_hosts and controlm:deftable-xml-export divergences stop being divergences — both sides would hold the same `confirmed`, differing only in a field that is SUPPOSED to differ. Confirm that retiring those pins (and their re-arm triggers) is the intended outcome, and that the company gate-log records the retirement rather than the entries being deleted."
+  - title: "D. Scope fence — what this gate does NOT do"
+    confirmations:
+      - "D1. NO ROW'S LOAD STATE CHANGES AT THIS GATE. Every row that loads today loads tomorrow; every row held today stays held. This gate rules a FIELD's meaning, and the migration that follows is mechanical and reversible."
+      - "D2. THE SCHEMA CHANGES ONLY WHEN THIS PAGE SIGNS. config/schemas/source-registry.schema.json, the registry file, and require_confirmed() are untouched until then — N10 drafts, it does not build. The build is its own backlog item with its own acceptance."
+      - "D3. NOT IN SCOPE: the acquisition.mode / drop_dir_base family (N12/N13's declared-acquisition work), the confirmed-gate's exit code, and any change to what an SME gate page itself looks like. If the SME wants the wiring fact surfaced on the rendered board or the load map, that is a separate item — say so and it gets one, rather than being folded in here."

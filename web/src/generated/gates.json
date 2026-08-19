@@ -1424,6 +1424,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "registry-wiring-readiness (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/registry-wiring-readiness.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "N10"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "repo-manifest-data-profile (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [
