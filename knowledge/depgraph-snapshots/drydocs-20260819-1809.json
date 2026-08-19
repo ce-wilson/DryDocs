@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-19T11:29:03",
+    "captured_at": "2026-08-19T18:09:16",
     "date": "20260819",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a30dd952",
-      "full": "a30dd952481784b4112858675e9315474e72b79e",
+      "commit": "d9cb2740",
+      "full": "d9cb27400d6688dc3ecb3fbc840030112589ce2b",
       "branch": "main",
-      "describe": "port-base-20260817-111-ga30dd952",
-      "subject": "feat(load): Z3 ΓÇö the server-inventory loader + tiered ExecutionHost join, e2e green and idempotent",
+      "describe": "port-base-20260817-123-gd9cb2740",
+      "subject": "docs(gate): fid-identity-and-scope SIGNED OFF 33/33 — K17 done, K2 tier amended, two entries planned, K26 groomed",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -14147,10 +14147,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260819-0706.json",
-      "name": "drydocs-20260819-0706.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260819.json",
+      "name": "drydocs-20260819.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260819-0706.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260819.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -30084,7 +30084,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260819-0706.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260819.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
