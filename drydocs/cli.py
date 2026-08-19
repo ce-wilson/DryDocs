@@ -714,6 +714,102 @@ def check() -> None:
         console.print("[green]APOC OK.[/]")
 
 
+@app.command(name="landing-zones")
+def landing_zones_cmd(
+    as_json: bool = typer.Option(False, "--json", help="machine-readable inventory"),
+    check: bool = typer.Option(
+        False, "--check", help="exit 1 when a declared zone is missing or empty"
+    ),
+) -> None:
+    """Where every MANUAL source drops, and what is actually there right now.
+
+    Read-only: it never creates a zone, because a doctor that repairs the tree it
+    is inspecting reports health on damage it just hid. ``--check`` is the
+    before/after call for a port -- an emptied zone is the signature of a
+    ``git clean``, and the reflog cannot recover it (see docs/port-prompt.md).
+    """
+    from drydocs_core.landing_zones import BASES, inventory, manual_zones
+
+    zones = manual_zones()
+    undeclared = [z.source_id for z in zones if z.base not in BASES]
+    if undeclared:
+        console.print(
+            f"[red]{len(undeclared)} manual row(s) without acquisition.drop_dir_base: "
+            f"{', '.join(undeclared)} — cannot resolve a zone that does not say where "
+            "it is rooted.[/]"
+        )
+        raise typer.Exit(2)
+
+    statuses = inventory(zones)
+    if as_json:
+        console.print_json(
+            data=[
+                {
+                    "source_id": s.zone.source_id,
+                    "format": s.zone.fmt,
+                    "base": s.zone.base,
+                    "drop_dir": s.zone.drop_dir,
+                    "path": str(s.zone.path),
+                    "inside_repo": s.zone.inside_repo,
+                    "exists": s.exists,
+                    "file_count": s.file_count,
+                    "empty": s.empty,
+                }
+                for s in statuses
+            ]
+        )
+    else:
+        t = Table(title="Manual landing zones (acquisition.mode: manual)")
+        for col in ("source", "fmt", "base", "path", "state"):
+            t.add_column(col, overflow="fold")
+        for s in statuses:
+            if not s.exists:
+                state = "[dim]absent[/]"
+            elif s.empty:
+                state = "[yellow]EMPTY[/]"
+            else:
+                state = f"[green]{s.file_count} file(s)[/]"
+            t.add_row(s.zone.source_id, s.zone.fmt, s.zone.base, str(s.zone.path), state)
+        console.print(t)
+        console.print(
+            "[dim]absent = the directory is not there. That is the healthy first state of "
+            "a zone nobody has dropped into yet — AND it is also what a `git clean -fd` "
+            "leaves behind, because -d removes the untracked directory itself. Without a "
+            "baseline the two are indistinguishable here, so absent is never a defect.[/]"
+        )
+        console.print(
+            "[dim]EMPTY = the directory is present and holds nothing. That is the narrower "
+            "signature — a selective delete, a half-finished restore — and --check exits 1 "
+            "on it.[/]"
+        )
+        console.print(
+            "[dim]Detection is the weaker half. What prevents the loss is location: "
+            "data_root zones sit outside the tree where no clean can reach them, and repo "
+            "zones hold TRACKED files, which no clean removes at any strength.[/]"
+        )
+
+    # A zone INSIDE the tree is a standing defect regardless of --check: it is
+    # reachable by `git clean -fdx` no matter what .gitignore says.
+    exposed = [
+        s.zone.source_id for s in statuses if s.zone.base == "data_root" and s.zone.inside_repo
+    ]
+    if exposed:
+        console.print(
+            f"[red]{len(exposed)} data_root zone(s) resolve INSIDE the repo tree "
+            f"({', '.join(exposed)}) — DRYDOCS_DATA_ROOT is pointed at the working "
+            "tree, so a port-time clean can delete them.[/]"
+        )
+        raise typer.Exit(2)
+
+    if check:
+        emptied = [s.zone.source_id for s in statuses if s.empty]
+        if emptied:
+            console.print(
+                f"[yellow]{len(emptied)} zone(s) exist but are empty: " f"{', '.join(emptied)}[/]"
+            )
+            raise typer.Exit(1)
+
+
 @app.command()
 def bootstrap(
     skip_constraints: bool = typer.Option(False),
