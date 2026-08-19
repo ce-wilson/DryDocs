@@ -1401,7 +1401,7 @@
         "match": "doc_id",
         "value": "essential-graphrag"
       },
-      "taxonomy_path": null,
+      "taxonomy_path": "technology/graph-platform/neo4j",
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": [

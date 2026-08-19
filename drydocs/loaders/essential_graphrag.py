@@ -54,6 +54,7 @@ CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 DEFAULT_PDF = REPO_ROOT / "Essential-GraphRAG.pdf"
 
 DOC_ID = "essential-graphrag"
+SUBJECT_PRODUCT_ID = "neo4j"  # Q9 (2026-08-19): the vendor re-file — the book is Neo4j-SPONSORED vendor documentation (SME 2026-07-26), so it gains the bmc-docs product hook; the loader MATCHes, never MERGEs, the product
 TITLE = "Essential GraphRAG: Knowledge Graph-Enhanced RAG"
 AUTHORS = "Tomaž Bratanič, Oskar Hane"
 PUBLISHER = "Manning"
@@ -302,6 +303,7 @@ class EssentialGraphragAdapter:
             chunk_id = f"{DOC_ID}#{seq:03d}"
             yield {
                 "doc_id": DOC_ID,
+                "subject_product_id": SUBJECT_PRODUCT_ID,  # Q9 DESCRIBES hook (MATCH-only in the cypher)
                 "title": TITLE,
                 "authors": AUTHORS,
                 "publisher": PUBLISHER,

@@ -109,4 +109,24 @@ MERGE (doc)-[fc:FIRST_CHUNK]->(c)
                 fc.source        = 'pdf',
                 fc.loader        = $loader
 SET fc.last_seen_at = datetime($loaded_at),
-    fc.last_run_id  = $run_id;
+    fc.last_run_id  = $run_id
+
+// Q9 (2026-08-19): the vendor-documentation hook — the book DESCRIBES the
+// Neo4j product (SME re-file 2026-07-26; ADR 0006 §2 amendment). The bmc_docs
+// idiom verbatim: MATCH the product, NEVER MERGE it — a missing registry drops
+// the edge for this doc rather than minting a stub, and the loader-level
+// registry-present guard makes the wholesale-absent case loud. Rides the
+// seq=0 tail so it fires once per document, not per chunk. No target_version:
+// a book documents the platform, not a pinned release — edition rides the
+// Document's published property.
+WITH row, doc
+OPTIONAL MATCH (sp:SoftwareProduct {product_id: row.subject_product_id})
+WHERE NOT sp:SchemaMeta
+FOREACH (_ IN CASE WHEN sp IS NOT NULL THEN [1] ELSE [] END |
+    MERGE (doc)-[d:DESCRIBES]->(sp)
+      ON CREATE SET d.first_seen_at = datetime($loaded_at),
+                    d.source        = 'pdf',
+                    d.loader        = $loader
+    SET d.last_seen_at = datetime($loaded_at),
+        d.last_run_id  = $run_id
+);

@@ -27,6 +27,17 @@ affects:
 > (3) Corpus ids follow the doc-registry ID GRAMMAR of the same date
 > ({vendor}-docs[-{scope}]); this ADR's corpus names are historical.
 
+> **AMENDED 2026-08-19 — Q9, the Essential GraphRAG re-file (overturns a §2 filing
+> signed 2026-07-18).** The book is re-filed as VENDOR documentation for Neo4j, on
+> the SME's 2026-07-26 reasoning verbatim: it is Neo4j-sponsored and teaches
+> implementation ON their graph — "it's not written to load into a competitor like
+> TigerGraph" — vendor documentation wearing a book jacket, tier T1, same as
+> bmc-docs. The original filing erred by FORMAT (a PDF book → reference shelf)
+> rather than by SUBJECT (Neo4j the product). Consequences: taxonomy_path
+> technology/graph-platform/neo4j, and the loader gains the bmc-docs DESCRIBES
+> hook (MATCH-only on the neo4j SoftwareProduct). The re-file's target_db half
+> (dddocs) was overtaken by the G32/G102 fold and is satisfied-by-fold.
+
 ## Context
 
 The docmeta P0 benchmark verdict (2026-07-16,

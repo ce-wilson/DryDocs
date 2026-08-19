@@ -135,6 +135,15 @@ class BookChunkRow(BaseModel):
 
     # --- Document fields (denormalized onto every chunk row) ---
     doc_id: str = Field(..., min_length=1, description="Stable id, e.g. 'essential-graphrag'.")
+    subject_product_id: str | None = Field(
+        default=None,
+        description=(
+            "Q9 (2026-08-19): the DESCRIBES hook target — the SoftwareProduct this "
+            "book is vendor documentation FOR (MATCH-only in the cypher; None keeps "
+            "a book hook-less). extra='ignore' silently DROPPED this field before it "
+            "was declared, which is why the first live reload wrote no edge."
+        ),
+    )
     title: str = Field(..., min_length=1, description="Book title (subtitle included).")
     authors: str = Field(..., min_length=1, description="Comma-separated author names.")
     publisher: str = Field(..., min_length=1, description="e.g. 'Manning'.")

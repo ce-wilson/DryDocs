@@ -3552,3 +3552,27 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   only) → G32 close-checklist entry (2026-08-07, the user's ruling) → Q20 minted
   at the sign-off (2026-08-18) → checked and recorded here. No prose-only link
   remains.
+
+
+## 2026-08-19 — RECORD: the Essential GraphRAG re-file — VENDOR documentation for Neo4j (Q9; ADR 0006 §2 amendment)
+
+- **What this records.** The SME decision of 2026-07-26, applied at Q9: the book
+  (`neo4j-docs-essential-graphrag`, renamed 2026-08-18) is re-filed from "reference/
+  methodology" to VENDOR documentation, reasoning verbatim: *"it's not written to
+  load into a competitor like TigerGraph"* — Neo4j-sponsored, teaches implementation
+  ON their graph, tier T1, same class as bmc-docs. This OVERTURNS a filing inside a
+  signed decision (ADR 0006 §2, 2026-07-18), so it lands as an ADR amendment note,
+  never an edit — the G30 discipline.
+- **Applied:** `taxonomy_path: technology/graph-platform/neo4j`; the "deliberately
+  no DESCRIBES" note replaced with the vendor rationale; the loader gains the
+  bmc-docs product hook — `(:Document)-[:DESCRIBES]->(:SoftwareProduct
+  {product_id: neo4j})`, MATCH-only, once per document on the seq-0 tail, no
+  target_version (a book documents the platform, not a pinned release). The old
+  test that PINNED the omission flipped to pin the hook.
+- **Overtaken, recorded not re-done:** the acceptance's `target_db: dddocs` half —
+  `dddocs` was rejected at G32 R1 and every corpus lands in the one database since
+  the G102 fold. Satisfied-by-fold.
+- **Q18 NOTE:** the hook uses the bmc idiom deliberately, hardcoded
+  `SUBJECT_PRODUCT_ID` included — Q18 (the `describes_product` registry field,
+  behind Q14) now covers TWO call sites instead of one, and sweeping both in one
+  change is exactly why the idiom was matched rather than half-fixed here.

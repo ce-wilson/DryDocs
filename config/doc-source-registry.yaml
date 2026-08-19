@@ -158,7 +158,7 @@ sources:
     curation: none
     target_db: drydocs                  # G102 fold (was ddcontext — folded 2026-08-18; content realm is now the one database)
     refresh: manual
-    taxonomy_path: ~                    # a methodology book — deliberately no DESCRIBES / product taxonomy hook
+    taxonomy_path: technology/graph-platform/neo4j   # Q9 re-file (2026-08-19): VENDOR documentation, not a neutral methodology book — see notes
     graph_locator:                      # one Document for the whole book
       match: doc_id
       value: essential-graphrag         # UNCHANGED at the 2026-08-18 rename: doc_id is the graph BUSINESS KEY (D1 — keys survive), the registry id is the governance name; the locator is what joins them
@@ -167,6 +167,17 @@ sources:
       The Q2 agent-traversal experiment corpus; fed the docmeta P0 benchmark
       verdict (traversal arm). Pattern notes mined from the same book:
       reference/research/essential-graphrag-notes.md (Q1).
+      Q9 RE-FILE (2026-08-19, SME reasoning of 2026-07-26 verbatim): the book
+      is Neo4j-SPONSORED and teaches implementation ON their graph — "it's not
+      written to load into a competitor like TigerGraph" — so it is VENDOR
+      documentation wearing a book jacket, tier T1, same as bmc-docs. The old
+      "deliberately no DESCRIBES" note filed it by FORMAT (a PDF book) rather
+      than by SUBJECT (Neo4j the product); the same class of error as the
+      ddcontext placement itself. The loader now writes the bmc-docs product
+      hook: (:Document)-[:DESCRIBES]->(:SoftwareProduct {product_id: neo4j}),
+      MATCH-only. The acceptance's target_db half (dddocs) was OVERTAKEN by the
+      G102 fold — every corpus already lands in the one database — and is
+      recorded as satisfied-by-fold, not re-done.
       RENAMED essential-graphrag -> neo4j-docs-essential-graphrag 2026-08-18
       (header grammar: the Neo4j-published book follows the same vendor-docs
       convention as the BMC sets). GOVERNANCE NAME ONLY: the loaded Document

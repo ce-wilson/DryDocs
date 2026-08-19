@@ -112,8 +112,13 @@ def test_loader_cypher_is_single_statement():
     cypher = EssentialGraphragLoader.cypher_path.read_text(encoding="utf-8")
     # single code ';' => BaseLoader dispatches plain run(), never runMany
     assert _code_semicolons(cypher) == 1
-    # the DESCRIBES hook must not exist as a written edge (deliberately omitted)
-    assert "MERGE (doc)-[d:DESCRIBES" not in cypher
+    # Q9 (2026-08-19) OVERTURNED the deliberate omission: the book is vendor
+    # documentation (SME 2026-07-26), so the DESCRIBES hook now MUST exist —
+    # and MATCH-only: the product is never MERGEd (a missing registry drops
+    # the edge, never mints a stub).
+    assert "MERGE (doc)-[d:DESCRIBES" in cypher
+    assert "OPTIONAL MATCH (sp:SoftwareProduct" in cypher
+    assert "MERGE (sp:SoftwareProduct" not in cypher
 
 
 @pytest.mark.skipif(not DEFAULT_PDF.exists(), reason="local gitignored PDF absent")

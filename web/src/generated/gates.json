@@ -1296,6 +1296,15 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "RECORD: the Essential GraphRAG re-file — VENDOR documentation for Neo4j (Q9; ADR 0006 §2 amendment)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:3557",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
