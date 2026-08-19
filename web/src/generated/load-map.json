@@ -1697,6 +1697,12 @@
       "status": "proposed",
       "label": "~ — deliberately unnamed until C1 rules target AND shape together",
       "source": "snowflake-data-catalog"
+    },
+    {
+      "id": "doc-supersedes-doc",
+      "status": "proposed",
+      "label": "SUPERSEDES",
+      "source": "any multi-version corpus (the internal process pages are the named case)"
     }
   ]
 }

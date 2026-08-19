@@ -510,6 +510,10 @@ MATCH (a:SchemaMeta {name: 'FeedbackNote'}), (b:SchemaMeta {name: 'Employee'})
 MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
   SET r.vocab_id = 'doc_feedback_authored_by', r.role = 'feedback_author', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'docs', r.status = 'active';
 
+MATCH (a:SchemaMeta {name: 'Document'})
+MERGE (a)-[r:SUPERSEDES]->(a)
+  SET r.vocab_id = 'docs_supersedes', r.prov_maps_to = 'prov:wasRevisionOf', r.domain = 'docs', r.status = 'planned';
+
 // ── domain: all ─────────────────────────────────────────────────────────────
 
 // prov_was_generated_by: from_node "*" — representative exemplar edges;

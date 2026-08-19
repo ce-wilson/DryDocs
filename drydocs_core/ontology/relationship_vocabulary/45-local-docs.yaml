@@ -249,3 +249,41 @@
     loader:       doc_feedback.cypher
     domain:       docs
     status:       active   # gate doc-traceability-feedback signed off 2026-07-20 (config/gate-log.md)
+
+  # ── Document supersession + currency (Q11, 2026-08-19; gate document-supersession PENDING) ─
+
+  - id:           docs_supersedes
+    neo4j_label:  SUPERSEDES
+    inverse_label: "superseded by"
+    role:         ~
+    from_node:    Document
+    to_node:      Document
+    prov_maps_to: "prov:wasRevisionOf"
+    note: >
+      THE NEWER document SUPERSEDES the older: (new)-[:SUPERSEDES]->(old), the
+      prov:wasRevisionOf direction exactly (a revision derives from what it
+      revises), with dct:replaces as the documentation-standard twin recorded
+      here rather than in prov_maps_to (one mapping per entry; the dct pair
+      dct:replaces / dct:isReplacedBy matches label and inverse_label).
+      THE PROBLEM IT MODELS (SME, 2026-07-26): "internally I've seen 2 or 3
+      different versions with the same referenced person/team/process, but is
+      stale and the only indication is date." QUARANTINING DOES NOT
+      DISAMBIGUATE — all versions in one place are still ambiguous; the
+      separation protected other corpora, it never said which one is current.
+      That is a modeling problem, and this edge is the model.
+      CURRENCY IS STRUCTURAL FIRST: current = a Document with NO incoming
+      SUPERSEDES edge —
+        MATCH (d:Document) WHERE NOT (d)<-[:SUPERSEDES]-(:Document)
+      — never captured_at ordering (dates are the failure mode this exists to
+      replace). A stamped is_current cache property is the gate's clause B
+      choice (index-friendly, but a SECOND encoding of one fact — the §B2
+      segment-edge lesson applies verbatim); the structural read stays the
+      truth either way.
+      PLANNED: no loader writes this until gate document-supersession signs.
+      Chains supersede pairwise (v3->v2->v1), never star-shaped v3->v1 — the
+      gate confirms transitivity is TRAVERSED, not materialized.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+

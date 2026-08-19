@@ -163,3 +163,21 @@
     applied_on: 2026-07-08
     confirmed_by: SME
     confirmed_on: 2026-07-08
+
+  # ---- document supersession (Q11, 2026-08-19 — GATE PREP, SME not yet run) --
+  # The multi-version staleness problem (SME 2026-07-26). Gate spec:
+  # config/gate-prompts/document-supersession.yaml. Stops at proposed.
+
+  - id: doc-supersedes-doc
+    taxonomy: { source: "any multi-version corpus (the internal process pages are the named case)", element: "A newer capture of the same page/process supersedes the older capture" }
+    ontology:
+      from_node: Document                    # prov:Entity
+      to_node: Document                      # prov:Entity
+      matrix_row: "Entity -> Entity revision: prov:wasRevisionOf (the one PROV derivation subtype that means exactly this); dct:replaces twin"
+      neo4j_label: SUPERSEDES
+      prov_maps_to: "prov:wasRevisionOf"
+      edge_properties: { superseded_on: "when the newer version took effect (source fact where the page carries it; capture date is the FALLBACK, not the model)" }
+    precedence_authority: internal-standards
+    vocab_id: docs_supersedes
+    status: proposed
+

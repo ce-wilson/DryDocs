@@ -1326,6 +1326,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "document-supersession (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/document-supersession.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "dpl-dataset-registry-contract (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

@@ -1,0 +1,78 @@
+# SME gate-prompt spec — document supersession and currency (backlog Q11).
+# GATE-BOUND: this page PROPOSES; rendering it builds, flips and stamps nothing.
+#
+# THE PROBLEM, in the SME's words (2026-07-26): "internally I've seen 2 or 3
+# different versions with the same referenced person/team/process, but is stale
+# and the only indication is date." The point that made this its own item:
+# QUARANTINING DOES NOT DISAMBIGUATE — putting all three versions in one place
+# protects other corpora from them; it does not say which one is current. That
+# is a modeling problem, and it needs modeling whatever the topology is — which
+# is why the G102 fold changed WHERE the nodes live and changed nothing here.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: document-supersession
+title: "SME Gate — document supersession: the SUPERSEDES edge, what 'current' means structurally, and whether a cached currency flag is worth a second encoding"
+step: "docs_supersedes registered status: planned (45-local-docs) + map row doc-supersedes-doc proposed (40-mappings-docs) — nothing loads until this page signs"
+summary: >
+  Three rulings. Clause A fixes the edge: direction (newer SUPERSEDES older, the
+  prov:wasRevisionOf direction), spelling, and the pairwise-chain shape. Clause B
+  fixes what CURRENT means: structurally, a Document with no incoming SUPERSEDES
+  edge — and rules whether a stamped is_current cache rides beside it, knowing
+  that a second encoding of one fact is exactly the disagreement class the
+  segment-edge ruling (§B2, corporate-backbone) already priced. Clause C fixes
+  who ASSERTS supersession — a capture pipeline observing a replacement, or an
+  SME ruling two captures are versions of one thing — because wrong
+  supersession is worse than none: it HIDES a document that is still live.
+meta:
+  Module: "ontology (45-local-docs · 40-mappings-docs) — no loader exists or is implied; the first writer is a follow-up build after sign-off"
+  Source: "SME problem statement 2026-07-26 (verbatim in the vocab note) · the multi-version internal process pages are the named case"
+  Precedent: "prov:wasRevisionOf (the exact PROV derivation subtype) · dct:replaces / dct:isReplacedBy (the documentation-standard twin, matching label + inverse_label) · the §B2 two-encodings lesson (corporate-backbone gate): a cached flag and a structural fact can disagree, and nothing catches it without a check · ADR 0006 §4 freshness (sha-change re-queues curation) — freshness is about ONE document changing; supersession is about TWO documents being versions of one thing; the gate keeps them distinct"
+  Registry ref: "no doc-source-registry change — supersession is corpus-agnostic; any multi-version corpus gains it when its loader adopts the signed shape"
+  Classification: "Internal-Public page, mechanism only"
+  Vocabulary: "docs_supersedes enters active ONLY at this gate + a loader; the currency property (if clause B takes the cache) is registered as a property term in the same follow-up"
+  Source of record: "backlog Q11 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "A newer capture of the same page/process"
+    target: "(new:Document)-[:SUPERSEDES]->(old:Document)"
+    edge: "ruling required — clause A (direction, spelling, chain shape)"
+  - n: 2
+    element: "'The current version' as a query"
+    target: "MATCH (d:Document) WHERE NOT (d)<-[:SUPERSEDES]-(:Document) — structural, never captured_at ordering"
+    edge: "ruling required — clause B (and whether a cached is_current rides beside it)"
+  - n: 3
+    element: "The assertion itself — who says v2 replaces v1"
+    target: "SME ruling or pipeline observation, recorded on the edge"
+    edge: "ruling required — clause C"
+
+provenance:
+  - label: "What exists today (nothing loads; the ambiguity is live)"
+    source_object: "the internal multi-version process pages (company-side; the named case) · every corpus in config/doc-source-registry.yaml is single-version today"
+    key: "Document.doc_id (the D1 business key, constrained)"
+    loader: "~ (none — that is the point of the gate)"
+    properties:
+      - name: captured_at
+        origin: source
+        from: "each capture's own metadata"
+        note: "the ONLY currency signal today, and the SME's problem statement is that it is not enough — a reader must know the versions are versions of one thing before a date means anything"
+      - name: superseded_on
+        origin: derived
+        from: "the newer page where it states effect; capture date as FALLBACK only"
+        note: "an edge property, proposed in the map row — the fallback must be marked as such or the model quietly becomes date-ordering again"
+
+sections:
+  - title: "A. The edge — direction, spelling, and the chain shape"
+    confirmations:
+      - "A1. DIRECTION: the NEWER document points at the OLDER — (new)-[:SUPERSEDES]->(old) — which is exactly prov:wasRevisionOf (a revision derives from what it revises). The inverse reading (old points at new, dct:isReplacedBy) is the same fact displayed from the other end and is carried by inverse_label, never by a second edge."
+      - "A2. SPELLING: SUPERSEDES, with dct:replaces recorded as the documentation-standard twin in the note. Confirm or replace the spelling — the vocabulary id (docs_supersedes) survives either way."
+      - "A3. CHAIN SHAPE: versions supersede PAIRWISE (v3->v2->v1). Transitive reach (v3 supersedes v1) is TRAVERSED, never materialized — a star of edges to every ancestor is the stored-closure defect the WAS_INFORMED_BY loader already retired once (2026-07-23)."
+  - title: "B. Currency — structural truth, and whether a cache rides beside it"
+    confirmations:
+      - "B1. CURRENT IS STRUCTURAL: a Document with no incoming SUPERSEDES edge. The retrieval the SME's problem needs — return ONLY the current version — is `WHERE NOT (d)<-[:SUPERSEDES]-(:Document)`, and it never consults captured_at. Dates remain display metadata, not the model."
+      - "B2. THE CACHE QUESTION, priced honestly: a stamped is_current boolean is index-friendly and legible, and it is a SECOND ENCODING of the structural fact — the corporate-backbone §B2 lesson verbatim (two encodings can disagree; nothing catches it without a check). If the cache is taken, the writer that flips an edge MUST flip both flags in the same transaction and a graph-test asserts edge/flag agreement, expected 0 disagreements. If declined, the structural query is the only read and this clause records that the cost (no direct index on currency) was accepted."
+      - "B3. FRESHNESS IS NOT SUPERSESSION: ADR 0006 §4's sha-change re-queue is about ONE document changing under its identity; SUPERSEDES is about TWO documents being versions of one thing. A re-captured page keeps its doc_id and re-queues curation; a REPLACEMENT page gets a new doc_id and a SUPERSEDES edge. Confirm the boundary so a loader never mints a new Document for what is a refresh."
+  - title: "C. Who asserts supersession — wrong is worse than missing"
+    confirmations:
+      - "C1. A false SUPERSEDES edge HIDES a live document from every current-only retrieval — strictly worse than the ambiguity it replaces. So the edge is ASSERTED, never inferred from similarity: either an SME rules two captures are versions of one thing (the HITL surface, a later slice), or a capture pipeline observes an explicit replacement signal (the page says so; the source system versions it). Title/URL/content similarity may PROPOSE, never write — the B3-class discipline (unattended jobs propose, humans perform) applies verbatim."
+      - "C2. THE EDGE RECORDS ITS BASIS: asserted_by (sme | source-signal) + the evidence pointer (the replacement notice, the ruling note). An edge that cannot say why it exists cannot be audited when a hidden document turns out to be live."
