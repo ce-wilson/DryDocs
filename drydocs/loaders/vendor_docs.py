@@ -19,7 +19,7 @@ tail is what makes "idempotent" a REPORTED fact rather than a claim — see the
 tail note in ``cypher/vendor_docs.cypher``.
 
 A CAPTURE IS NOT A CORPUS. ``bmc-controlm-9.0.20-utilities`` is one fetch of
-one tree at one version; ``bmc-controlm-utilities`` is the registry entry that
+one tree at one version; ``bmc-docs-controlm-utilities`` is the registry entry that
 governs it and the id ``docs-verify`` searches for. Both ride every row, and
 the capture id scopes ``doc_id`` so two versions of a topic cannot merge onto
 one node — see :func:`resolve_corpus_id`.
@@ -72,10 +72,10 @@ def resolve_corpus_id(capture_id: str, *, registry: SourceRegistry | None = None
 
     Two ids, and conflating them is a silent reporting bug rather than a
     crash. ``bmc-controlm-9.0.20-utilities`` is a CAPTURE — one fetch of one
-    tree at one version. ``bmc-controlm-utilities`` is the CORPUS — the
+    tree at one version. ``bmc-docs-controlm-utilities`` is the CORPUS — the
     doc-source-registry entry that governs it, and the id ``drydocs
     docs-verify`` searches for, because that entry's ``graph_locator`` says
-    ``match: corpus_id, value: bmc-controlm-utilities`` (Q7). A graph keyed by
+    ``match: corpus_id, value: bmc-docs-controlm-utilities`` (Q7). A graph keyed by
     the capture id therefore answers "corpus missing" for a corpus that is
     fully loaded — the reconciliation check reporting a false negative, which
     is worse than not having run it.
@@ -316,7 +316,9 @@ class VendorDocsLoader(BaseLoader):
     """Loads a converted vendor capture as :Document + :Chunk + TOC hierarchy."""
 
     name: ClassVar[str] = "vendor_docs.v1"
-    source_id: ClassVar[str | None] = "bmc-controlm-utilities"
+    source_id: ClassVar[str | None] = (
+        "bmc-docs-controlm-utilities"  # renamed 2026-08-18 (doc-registry id grammar)
+    )
     cypher_path: ClassVar[Path] = CYPHER_DIR / "vendor_docs.cypher"
     row_model: ClassVar[type] = VendorDocChunkRow
     source_label: ClassVar[str] = "vendor-docs"

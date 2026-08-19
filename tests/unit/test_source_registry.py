@@ -350,7 +350,7 @@ def test_doc_ledger_union_gates_doc_corpora() -> None:
     bmc = reg.require_confirmed("bmc-docs")  # gate bmc-docs-lexical-load
     assert bmc.home == "doc-registry"
     assert bmc.urn is None  # doc corpora keep docmeta identity
-    reg.require_confirmed("essential-graphrag")
+    reg.require_confirmed("neo4j-docs-essential-graphrag")
     # ACTIVATED 2026-08-05 (user ruling in-chat, gate-log RECORD): the covering
     # crosswalk gate (fcdo-crosswalk) signed the same day; before that, this
     # line pinned the UnconfirmedSourceError refusal.

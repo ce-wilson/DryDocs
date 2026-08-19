@@ -163,7 +163,7 @@ def fake_capture(tmp_path: Path) -> Path:
     pages.mkdir()
     (pages / "16200.htm").write_text(FIXTURE_HTML, encoding="utf-8")
     manifest = {
-        "corpus_id": "bmc-controlm-utilities",
+        "corpus_id": "bmc-docs-controlm-utilities",
         "vendor": "BMC",
         "product": "Control-M",
         "version": "9.0.20",
@@ -255,7 +255,7 @@ REAL_CAPTURE = "bmc-controlm-9.0.20-utilities"
 
 
 def test_resolve_corpus_id_finds_the_registry_entry_that_names_the_capture():
-    assert resolve_corpus_id(REAL_CAPTURE) == "bmc-controlm-utilities"
+    assert resolve_corpus_id(REAL_CAPTURE) == "bmc-docs-controlm-utilities"
 
 
 def test_unregistered_capture_refuses_rather_than_inventing_an_id():
@@ -276,7 +276,7 @@ def test_graph_corpus_id_is_what_docs_verify_searches_for():
     import yaml
 
     registry = yaml.safe_load(REGISTRY_PATH.read_text(encoding="utf-8"))
-    entry = next(s for s in registry["sources"] if s["id"] == "bmc-controlm-utilities")
+    entry = next(s for s in registry["sources"] if s["id"] == "bmc-docs-controlm-utilities")
     locator = entry["graph_locator"]
     assert locator["match"] == "corpus_id", "this guard assumes the corpus_id locator"
     assert resolve_corpus_id(REAL_CAPTURE) == locator["value"]
@@ -287,7 +287,7 @@ def test_capture_declares_its_corpus_so_conversion_needs_no_lookup():
     is the contract between stages, so the corpus travels with the capture."""
     from scripts.external_vendor_scrape import TREES
 
-    assert TREES[REAL_CAPTURE].corpus_id == "bmc-controlm-utilities"
+    assert TREES[REAL_CAPTURE].corpus_id == "bmc-docs-controlm-utilities"
 
 
 def test_explicit_corpus_id_beats_the_manifest(fake_capture: Path):
@@ -317,7 +317,7 @@ def test_rows_carry_both_ids(fake_capture: Path):
     convert_capture("fake", root=fake_capture)
     with VendorDocsAdapter("fake", root=fake_capture) as adapter:
         row = next(iter(adapter.rows()))
-    assert row["corpus_id"] == "bmc-controlm-utilities"  # what docs-verify searches
+    assert row["corpus_id"] == "bmc-docs-controlm-utilities"  # what docs-verify searches
     assert row["capture_id"] == "fake"  # which fetch produced it
 
 
@@ -331,7 +331,7 @@ def test_registry_lookup_is_used_when_the_manifest_predates_the_field(fake_captu
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
     summary = convert_capture(REAL_CAPTURE, root=fake_capture)
-    assert summary.corpus_id == "bmc-controlm-utilities"
+    assert summary.corpus_id == "bmc-docs-controlm-utilities"
 
 
 def test_resolution_order_never_derives_from_the_capture_id(fake_capture: Path):
@@ -455,7 +455,7 @@ def test_two_loads_of_one_capture_send_identical_checksums(fake_capture: Path):
 # --------------------------------------------------------------------------- #
 def test_loader_wiring():
     assert VendorDocsLoader.cypher_path == CYPHER and CYPHER.exists()
-    assert VendorDocsLoader.source_id == "bmc-controlm-utilities"
+    assert VendorDocsLoader.source_id == "bmc-docs-controlm-utilities"
     assert VendorDocsLoader.source_label == "vendor-docs"
 
 

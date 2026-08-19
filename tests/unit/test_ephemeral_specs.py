@@ -76,7 +76,10 @@ def test_ref_is_hash_addressed_and_idempotent():
     c = ephemerals.register("tok", CYPHER, "drydocs", params={"limit": 6})
     assert a.ref == b.ref and is_ephemeral_ref(a.ref)
     assert c.ref != a.ref  # params are part of the address
-    assert ephemerals.register("tok", CYPHER, "ddcontext").ref != a.ref  # so is the db
+    # (pre-G102 a second database varied the ref; the fold left ONE spec
+    # database, so the db dimension is now a rejection, tested below)
+    with pytest.raises(EphemeralValidationError):
+        ephemerals.register("tok", CYPHER, "ddcontext")  # retired at the fold
 
 
 def test_resolve_is_owner_scoped():
@@ -176,8 +179,8 @@ def test_register_handler_payload():
         "k",
         "k",
         token,
-        CYPHER,
-        "ddcontext",
+        "MATCH (n:Uncertain) RETURN n.run_id AS job_name LIMIT $limit",
+        "drydocs",
         {"limit": 5},
         "agent query",
         ["job_name"],
@@ -186,7 +189,7 @@ def test_register_handler_payload():
     )
     assert is_ephemeral_ref(out["explore_ref"])
     assert out["classification"] == EPHEMERAL_CLASSIFICATION  # fail-closed ceiling
-    assert out["watermarked"] is True  # ddcontext stays watermarked
+    assert out["watermarked"] is True  # G102: derived — the cypher touches :Uncertain
     assert out["expires_at"].endswith("+00:00")
 
 

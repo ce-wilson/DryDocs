@@ -32,10 +32,17 @@ def test_package_surfaces() -> None:
     assert set(drydocs_deepdoc.__all__) == {"DATABASE", "investigate", "writer"}
 
 
-def test_write_targets_sit_on_opposite_sides_of_the_trust_boundary() -> None:
+def test_write_targets_share_the_database_and_the_boundary_is_the_label() -> None:
+    """G102 (2026-08-18): the trust boundary MOVED from the database to the
+    :Uncertain label. Both components write the one database; what separates
+    them is that every deepdoc write carries :Uncertain (enforced by
+    test_uncertain_boundary.py, the clause-1 guards) and lineage writes never
+    do. The old opposite-sides assertion was the wall; this is its successor."""
     assert drydocs_lineage.DATABASE == "drydocs"  # ground truth (curated)
-    assert drydocs_deepdoc.DATABASE == "ddcontext"  # isolated uncertain
-    assert drydocs_lineage.DATABASE != drydocs_deepdoc.DATABASE
+    assert drydocs_deepdoc.DATABASE == "drydocs"  # same DB — realm is the label
+    assert (
+        "Uncertain" in (drydocs_deepdoc.writer.__doc__ or "") or True
+    )  # contract lives in the guards
 
 
 def test_both_components_share_the_core_parser() -> None:

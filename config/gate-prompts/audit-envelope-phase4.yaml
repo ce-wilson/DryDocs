@@ -35,7 +35,7 @@ meta:
   Source: "seal:app-extract (DECO_SEAL_APP_INFO + the contact extract) · pat:product-catalog · pat:people-report · repo:software-registry — all config/source-registry.yaml v2 dataset ids"
   Registry ref: "all four registered; seal + both pat rows are classification Internal (confidential handling), software-registry is repo-committed"
   Classification: "Internal-Public (loader-field mechanism only; the ledger's naming-basis caveat applies — census pending)"
-  Precedent: "controlm-q1q3-phase1 (envelope + CAPTURE_DATE rule) · CM_DEF_VTAB partial mapping (updated-side only) · seal-extract.yaml sox_reportable row (one column, two properties) · bmc-docs / essential-graphrag / repo:design-docs / repo:depgraph-snapshot (ruled permanent stubs with the gate cited in notes)"
+  Precedent: "controlm-q1q3-phase1 (envelope + CAPTURE_DATE rule) · CM_DEF_VTAB partial mapping (updated-side only) · seal-extract.yaml sox_reportable row (one column, two properties) · bmc-docs / neo4j-docs-essential-graphrag / repo:design-docs / repo:depgraph-snapshot (ruled permanent stubs with the gate cited in notes)"
   Source of record: "backlog M3 · config/audit-fields.yaml · config/gate-log.md (transcription target) · docs/restructure/06-provenance-source-audit-fields.md Phase 4"
 
 mapping:

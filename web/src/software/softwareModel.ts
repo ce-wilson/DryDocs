@@ -18,7 +18,7 @@ import loadMapData from '../generated/load-map.json'
 // Databases a QuerySpec can read (drydocs_api.query_specs.SPEC_DATABASES).
 // `dddocs` is deliberately absent: schema/provisioning never creates it, which
 // is the open topology question G32 exists to rule on.
-export const QUERYABLE_DATABASES = new Set(['drydocs', 'ddcontext', 'ddall'])
+export const QUERYABLE_DATABASES = new Set(['drydocs']) // G102 (2026-08-18): the fold — ddcontext/ddall retired; the uncertain realm is the :Uncertain label
 export const REGISTRY_DB = 'drydocs'
 
 export interface VendorIconDef {
@@ -168,7 +168,10 @@ export function inGraphLabel(
 ): { text: string; numeric: boolean } {
   const corpus = corpusOf(p)
   if (corpus && !isQueryable(corpus.target_db)) {
-    return { text: `not queried — ${corpus.target_db} is not provisioned (G32)`, numeric: false }
+    // Post-G102 this branch should be UNREACHABLE: the fold put every corpus in
+    // the one spec-readable database. It is kept as a belt for a row that misses
+    // a future re-target — with honest wording, not the retired G32 label.
+    return { text: `not queried — ${corpus.target_db} is not spec-readable`, numeric: false }
   }
   if (!live) return { text: 'not queried', numeric: false }
   return { text: String(live.get(p.id) ?? 0), numeric: true }

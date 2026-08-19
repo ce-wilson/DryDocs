@@ -59,6 +59,16 @@ recommendations relayed in-chat and in RELAY-10: §B deployment-with-app-fallbac
 authored-only with the ancestor-CI pull taken as a SEPARATE coverage decision, no
 materialization (inheritance is COMPUTED, `4c0c834`).
 
+## 4b. Working direction (SME, 2026-08-18 late)
+
+**Producer backlog only for now — company-side grooming is paused.** Consequences:
+the RELAY-11 IDEAS.md union repair becomes next-port-session work (rider on the
+relay says so); K16 stays blocked (its counts are company-side); the caa0406
+close-out confirmation and the snow-tom-responsibility §B/§E rulings arrive
+whenever company work resumes, not before. GitHub Actions is billing-blocked
+(jobs die at dispatch) — every push since `50d7831a` is locally verified only;
+one green run at HEAD covers them all once billing is fixed.
+
 ## 5. Board state
 
 **~122 todo · 4 in progress (E1, G32, Y1, G62 — all SME/gate-bound) · 1 blocked

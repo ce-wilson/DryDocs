@@ -228,9 +228,10 @@ class GraphQaPipeline:
         step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
         self._push_step(envelope, step)
         timings["retrieve"] += step.ms
-        trust = (
-            "SYNTHESIZED" if spec.database in specs_catalog.WATERMARKED_DATABASES else "CONFIRMED"
-        )
+        # G102: the trust signal is the spec's own declaration, not its database
+        # (the watermark re-key). UNCERTAIN replaces the retired SYNTHESIZED
+        # stamp — the old value falsely described verbatim captures.
+        trust = "UNCERTAIN" if specs_catalog.is_watermarked(spec) else "CONFIRMED"
         envelope.sources.append(SourceRecord(document=f"spec:{spec.id}", trust=trust))
         return result
 

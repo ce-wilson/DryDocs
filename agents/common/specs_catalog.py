@@ -23,13 +23,13 @@ if str(_REPO_ROOT) not in sys.path:
 from drydocs_api.guard import WriteRejected, ensure_read_only  # noqa: E402
 from drydocs_api.query_specs import (  # noqa: E402
     QUERY_SPECS,
-    WATERMARKED_DATABASES,
     QuerySpec,
+    is_watermarked,
 )
 
 __all__ = [
     "QUERY_SPECS",
-    "WATERMARKED_DATABASES",
+    "is_watermarked",
     "QuerySpec",
     "WriteRejected",
     "ensure_read_only",

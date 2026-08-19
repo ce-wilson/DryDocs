@@ -49,10 +49,12 @@ from drydocs_api.queries import ParamSpec
 # provisioned-but-written-by-nothing (curated lineage lands in `drydocs` per D1/D2).
 # Keeping the allow-list explicit makes a new database a deliberate edit rather than
 # a typo; `tests/unit/test_database_names.py` proves the read set has a writer.
-SPEC_DATABASES: frozenset[str] = frozenset({"drydocs", "ddcontext", "ddall"})
-# Databases whose content is synthesized/uncertain — results carry the
-# SYNTHESIZED watermark in the manifest AND as a grid-visible column.
-WATERMARKED_DATABASES: frozenset[str] = frozenset({"ddcontext", "ddall"})
+SPEC_DATABASES: frozenset[str] = frozenset({"drydocs"})
+# G102 (2026-08-18): `ddcontext` and `ddall` RETIRED with the fold — the
+# uncertain realm is the :Uncertain LABEL inside the one database, and the
+# watermark trigger is each spec's own `uncertain=True` declaration
+# (ADR 0011 §117). WATERMARKED_DATABASES is gone: keying trust on storage
+# location was the root cause the gate's §B named.
 # The publish-boundary vocabulary. This is a SECOND copy of what
 # config/classification.yaml defines — the API is pure and does not read the
 # config at import — so tests/unit/test_classification.py asserts the two agree.
@@ -79,6 +81,11 @@ class QuerySpec:
     columns: tuple[ColumnDef, ...]
     classification: str
     params: tuple[ParamSpec, ...] = field(default=())
+    #: G102 / ADR 0011 clause 1: True ONLY for specs that deliberately read the
+    #: :Uncertain realm (the re-homed context specs and the audit spec). Such a
+    #: spec is EXEMPT from the structural ground-truth exclusion below and its
+    #: exports carry the trust watermark. Ground-truth specs leave the default.
+    uncertain: bool = False
 
 
 class UnknownSpecError(KeyError):
@@ -87,8 +94,42 @@ class UnknownSpecError(KeyError):
 
 _LIMIT = (ParamSpec("limit", "int", required=False, default=500),)
 
+
+def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:
+    """ADR 0011 clause 1 guard (a), applied at REGISTRY BUILD — never by hand.
+
+    Post-fold, ground truth and :Uncertain context share one database, so every
+    ground-truth spec must exclude :Uncertain. Hand-editing ~30 queries is the
+    exact failure the clause names; instead this rides the :SchemaMeta exclusion
+    idiom that test_schema_meta_exclusion already forces onto every bound label
+    var: each `NOT x:SchemaMeta` becomes `NOT x:SchemaMeta AND NOT x:Uncertain`.
+    Specs declaring `uncertain=True` are exempt — they exist to read that realm.
+    tests/unit/test_uncertain_boundary.py proves the transform landed on every
+    ground-truth spec and that none mentions :Uncertain any other way.
+    """
+    if spec.uncertain or spec.database != "drydocs":
+        return spec
+    cypher = re.sub(
+        r"NOT\s+(\w+):SchemaMeta(?!\s+AND\s+NOT\s+\1:Uncertain)",
+        r"NOT \1:SchemaMeta AND NOT \1:Uncertain",
+        spec.cypher,
+    )
+    if cypher == spec.cypher:
+        return spec
+    return QuerySpec(
+        id=spec.id,
+        database=spec.database,
+        description=spec.description,
+        cypher=cypher,
+        columns=spec.columns,
+        classification=spec.classification,
+        params=spec.params,
+        uncertain=spec.uncertain,
+    )
+
+
 QUERY_SPECS: dict[str, QuerySpec] = {
-    s.id: s
+    s.id: _with_ground_truth_exclusion(s)
     for s in (
         QuerySpec(
             id="explorer.applications.v1",
@@ -868,7 +909,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="console.agent-runs.v1",
-            database="ddcontext",  # R1 gate ruling 2026-07-23: :AgentRun lands in ddcontext, never drydocs
+            database="drydocs",  # G102 fold (2026-08-18): the R1 ruling's substance ("never in ground truth") survives as :Uncertain on the write; uncertain=True below is the watermark trigger
             description=(
                 "R3 agent-run telemetry for the admin view: one :AgentRun per "
                 "answered question (kind 'qa', mirroring :JobRun), newest first. "
@@ -902,17 +943,19 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("question_chars", "int", "Chars"),
             ),
             classification="internal",
+            uncertain=True,
             params=_LIMIT,
         ),
         QuerySpec(
             id="context.label-census.v1",
-            database="ddcontext",
+            database="drydocs",  # G102 fold: the census re-scopes to the :Uncertain realm
             description=(
-                "Label census of the synthesized context database — the reviewed "
-                "ddcontext example (results watermark SYNTHESIZED by rule)."
+                "Label census of the :Uncertain realm — post-fold (G102) the "
+                "uncertain content is a LABEL inside the one database, so the "
+                "census matches it directly; exports carry the trust watermark."
             ),
             cypher=(
-                "MATCH (n) WHERE NOT n:SchemaMeta "
+                "MATCH (n:Uncertain) WHERE NOT n:SchemaMeta "
                 "RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC"
             ),
             columns=(
@@ -920,6 +963,31 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("count", "int", "Nodes"),
             ),
             classification="internal-public",
+            uncertain=True,
+        ),
+        QuerySpec(
+            id="audit.uncertain-reachable.v1",
+            database="drydocs",
+            description=(
+                "ADR 0011 clause-1 guard (c), the live audit for the G102 fold: "
+                ":Uncertain nodes sharing ANY relationship with a non-Uncertain "
+                "node. EXPECTED 0 — any hit is a promotion that skipped the HITL "
+                "gate, the exact bug class the fold trades the database wall for. "
+                "uncertain=True: this spec exists to read that realm and is exempt "
+                "from the structural ground-truth exclusion."
+            ),
+            cypher=(
+                "OPTIONAL MATCH (u:Uncertain) WITH count(u) AS uncertain_total "
+                "OPTIONAL MATCH (b:Uncertain)--(g) "
+                "WHERE NOT g:Uncertain AND NOT g:SchemaMeta "
+                "RETURN uncertain_total, count(DISTINCT b) AS breaching"
+            ),
+            columns=(
+                ColumnDef("uncertain_total", "int", "Uncertain nodes"),
+                ColumnDef("breaching", "int", "Reachable from ground truth (expect 0)"),
+            ),
+            classification="internal-public",
+            uncertain=True,
         ),
     )
 }
@@ -952,4 +1020,7 @@ def query_spec(spec_id: str) -> QuerySpec:
 
 
 def is_watermarked(spec: QuerySpec) -> bool:
-    return spec.database in WATERMARKED_DATABASES
+    # G102: the trigger is the spec's own declaration (ADR 0011 §117 — "a spec
+    # is watermarked iff its Cypher touches :Uncertain, declared per row").
+    # The database-name trigger retired with the fold.
+    return spec.uncertain

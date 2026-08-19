@@ -127,14 +127,17 @@ def test_doc_corpus_rows_carry_the_doc_governance_fields():
 
 
 def test_the_not_queryable_target_db_set_is_pinned():
-    """When G32 rules and dddocs is provisioned (or the corpora re-target), this
-    fails — which forces the "not provisioned (G32)" labels on any surface to be
-    revisited instead of quietly going stale."""
+    """THE ALARM FIRED 2026-08-18 AND WAS ANSWERED: G32 ruled (the fold, G102),
+    the corpora re-targeted, and both surfaces this pin protects were revisited
+    in the same change — softwareModel.ts inGraphLabel and the docs-coverage
+    detail lines no longer render 'not provisioned (G32)'. The pin now holds the
+    ruled state: EVERY doc-corpus target is spec-readable; the set is EMPTY."""
     from drydocs_api.query_specs import SPEC_DATABASES
 
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     declared = {s["target_db"] for s in committed["sources"] if s.get("home") == "doc-registry"}
-    assert declared - set(SPEC_DATABASES) == {"dddocs"}, (
-        "the set of doc-corpus target databases a QuerySpec cannot read has changed; "
+    assert declared - set(SPEC_DATABASES) == set(), (
+        "a doc corpus declares a target database no QuerySpec can read — post-G102 "
+        "that means a row missed the fold or a new realm arrived without a gate; "
         "revisit every surface that renders a 'not queried' label"
     )

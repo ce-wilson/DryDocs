@@ -118,6 +118,13 @@ class EphemeralSpec:
             columns=self.columns,
             classification=EPHEMERAL_CLASSIFICATION,
             params=(),
+            # G102: watermarking is per ADR 0011 §117 — a spec is watermarked
+            # iff its Cypher touches :Uncertain. For registry specs that is a
+            # reviewed declaration; an ephemeral is machine-generated, so it is
+            # DERIVED from the text (fail-open toward flagging: any mention
+            # counts, exclusions included — a false watermark is honest noise,
+            # a missing one is a false trust claim).
+            uncertain=":Uncertain" in self.cypher,
         )
 
     def expires_at_iso(self) -> str:

@@ -228,7 +228,7 @@ class VendorDocChunkRow(BaseModel):
         ...,
         min_length=1,
         description=(
-            "The doc-source-registry CORPUS id, e.g. 'bmc-controlm-utilities' — NOT the "
+            "The doc-source-registry CORPUS id, e.g. 'bmc-docs-controlm-utilities' — NOT the "
             "capture id. `drydocs docs-verify` looks a corpus up through its registry "
             "entry's graph_locator (Q7), so a graph keyed by capture id reports a loaded "
             "corpus as MISSING."

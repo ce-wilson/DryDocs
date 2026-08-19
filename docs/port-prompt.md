@@ -1155,6 +1155,43 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   stub pending HR enrichment", not "no agent". The GROUP half is different: an
   unloaded `:ServiceNowGroup` is load ORDER, not roster coverage — the direction
   does not cover it, so flag-or-sequence stays the gate's call there.
+
+- **RELAY-11 — YOUR IDEAS.md IS MISSING THE Idea-50..75 BLOCK, and it was lost at
+  the a14a8028 PORT MERGE** `[VERIFIED-PRODUCER]` (raised 2026-08-18, from your own
+  report that the inbox numbering jumps 49 → 76). The block is REAL and LIVE
+  producer-side — verified by enumeration, not assumption. What happened, dated:
+  **`deeb808a` (2026-08-05) numbered the whole inbox IN PLACE** — "number the inbox,
+  give every entry a status + priority, review all 69" — an EDIT of ~75 existing
+  lines, not an append. That commit rode the `5f79d145..a14a8028` range applied as
+  PORT-REPORT-a14a8028 (2026-08-06). IDEAS.md is `union-append` in the manifest and a
+  proven conflict site (3x on 2026-07-09), and your copy is a known UNION-SUPERSET
+  (it retains blocks the producer had already groomed — the acceptance-check note in
+  this file says exactly that). An in-place sweep across a superset copy is the
+  maximal conflict surface, and the middle of the inbox lost the producer side of the
+  merge. Ideas 76+ appended cleanly at the top afterward, which is why your gap has
+  clean edges.
+  **THE REPAIR IS A TEXTUAL UNION FROM PRODUCER HEAD, not a replay of `deeb808a`** —
+  three weeks of edits have moved entries since. Take the `Idea-50..75` entries from
+  the producer's current `docs/restructure/IDEAS.md` (inbox + audit trail both) and
+  re-insert them into yours, keeping your own entries untouched. **Idea-63 is NOT
+  missing** — it was never minted (the sweep skipped it; `git log -S` finds nothing),
+  so do not manufacture one.
+  **BEFORE GROOMING ANY RECOVERED ENTRY, CHECK ITS STATUS LINE — the double-capture
+  trap is live and Idea-59 is the proof.** Idea-59 (the FID directory ingest) was
+  groomed producer-side on 2026-08-04 into **K16 + K17**: K16 is the FID census that
+  is BLOCKED awaiting YOUR counts, and K17 is the fid-identity gate that
+  rua-load-shapes §A1 and this file's step records repeatedly cite. Grooming Idea-59
+  fresh on your side would mint duplicates of both and fork the K17 identity work the
+  ports keep converging on. Producer-consumed in the block so far: 51, 52, 54, 55, 59
+  (→ K16/K17), 73 (→ G74). The standing rule at the acceptance-check note applies:
+  annotate recovered blocks "groomed producer-side → <ids>" rather than re-capturing.
+  **ONE CHECK WORTH RUNNING YOUR SIDE:** the same merge that dropped the inbox middle
+  may have clipped the AUDIT TRAIL region below it — after the union repair, diff
+  your "Recently groomed" section against producer HEAD's and union that too.
+  **RIDER 2026-08-18, same day:** SME direction — company-side grooming is PAUSED;
+  the producer backlog is the active lane for now. So do not expect this repair to
+  have been done by a company groom pass: **the union repair becomes NEXT-PORT-SESSION
+  work**, performed with the port's IDEAS.md merge rather than waited on.
   **(7) STANDING TAIL:** `source_label: 'snowflake'` is a 13th value outside the
   declared `csv|oracle|agent|human` enum that 12 of 28 producer loaders already sit
   outside, unenforced — the re-sourcing pass is the moment to rule the field's

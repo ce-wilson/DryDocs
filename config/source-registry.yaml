@@ -1083,7 +1083,8 @@ retired:
   - id: design-docs
     replaced_by: ["repo:design-docs"]
     reason: "born-here grammar (pipeline-side only per Q5)"
-  # NOTE — bmc-docs / essential-graphrag / fcdo-frameworks are NOT retired:
+  # NOTE — bmc-docs / neo4j-docs-essential-graphrag (formerly essential-graphrag,
+# renamed 2026-08-18 in its one home) / fcdo-frameworks are NOT retired:
   # those ids stay LIVE in their one home (config/doc-source-registry.yaml);
   # only the pipeline twin rows dropped. The runtime registry unions the doc
   # ledger, so loaders bound to them still resolve and gate.

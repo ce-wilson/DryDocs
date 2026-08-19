@@ -84,7 +84,8 @@ NO_LOCATOR = "no-locator"
 NOT_LOADED = "not-loaded"
 PRODUCT_NODE_ABSENT = "product-node-absent"
 LOADED_NO_EDGE = "loaded-no-edge"
-TRAVERSABLE_UNTIL_MOVE = "traversable-until-move"
+# TRAVERSABLE_UNTIL_MOVE retired at G102 (2026-08-18): the move never happens —
+# the fold makes residency permanent, so the rung had nothing left to reach.
 TRAVERSABLE = "traversable"
 NOT_PROBED = "not-probed"
 
@@ -97,7 +98,6 @@ LADDER: tuple[str, ...] = (
     NOT_LOADED,
     PRODUCT_NODE_ABSENT,
     LOADED_NO_EDGE,
-    TRAVERSABLE_UNTIL_MOVE,
     TRAVERSABLE,
     NOT_PROBED,
 )
@@ -517,9 +517,9 @@ def _product_row(
         row.coverage = PRODUCT_NODE_ABSENT
     elif not buckets:
         row.coverage = LOADED_NO_EDGE
-    elif row.corpus_target_db != registry_db:
-        row.coverage = TRAVERSABLE_UNTIL_MOVE
     else:
+        # G102: the target_db != registry_db branch (traversable-until-move)
+        # retired with the fold — every corpus's declared home IS the database.
         row.coverage = TRAVERSABLE
 
     row.blockers = tuple(b for b in BLOCKER_ORDER if b in blockers)
@@ -532,7 +532,8 @@ def _detail(row: ProductCoverageRow) -> str:
     if row.coverage == CROSS_DB_BLOCKED:
         return (
             f"corpus targets {row.corpus_target_db}, registry writes {row.registry_db} — "
-            "a relationship cannot span Neo4j databases; G32 owns the residency ruling"
+            "a relationship cannot span Neo4j databases. G32 RULED 2026-08-18 (the fold, "
+            "applied at G102): post-fold this state means a row missed the re-target"
         )
     if row.coverage == UNGATED:
         return "corpus registered but confirmed: false — no loader may write from it"

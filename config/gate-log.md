@@ -3454,3 +3454,71 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   the union report surface and the agreement-candidate detection in the loads — are
   follow-up builds (inboxed at sign-off), each of which flips nothing on its own
   authority per §B3.
+
+
+## 2026-08-18 — GATE: document-content-topology — SIGNED OFF 32/32 (G32)
+
+- **THE COUNT FOLDS TO ONE (§A).** One content-bearing database. The SME's own
+  retrieval argument carried it: an agent that cannot see captured context beside the
+  structured graph in a single vector search may not answer at all — a silent,
+  constant failure where the isolation failure is loud and rare. ADR 0002 D1
+  optimized for a load pipeline; the product is an agent. §F supplied the decisive
+  precedent: the graph's MOST governed edges (manual pins) always lived inside one
+  database, protected by per-edge `origin` + precedence + required rationale — the
+  wall never protected them. The fold EXTENDS a proven mechanism.
+  Pre-walk rulings stand: R1 `dddocs` rejected and retired; R2 bmc-docs reloads from
+  source; R3 the 27 DESCRIBES edges delete (the reload re-establishes them).
+  `ddschema` stays OUT (deliberate — ADR 0011 clause 2 never fires). The 2026-07-26
+  three-database direction is superseded; load-separation and blast-radius are
+  satisfied by corpus_id scoping. The ONE-WAY-DOOR asymmetry was presented and
+  accepted. THE HARD PRECONDITION: ADR 0011's three clause-1 guards (QuerySpec
+  ground-truth exclusion, the writer boundary, the live :Uncertain audit spec) land
+  BEFORE the fold build, not after — staged as G102 with guards-first sequencing.
+  The instrument is a LABEL at the single uncertain write boundary, never a
+  property on every node; docs-verify's `wrong-db` check re-points at the realm
+  label rather than silently retiring.
+- **§B — B-DURABLE IS FORCED, and that counted FOR the fold.** With one database,
+  WATERMARKED_DATABASES has no subject: the watermark re-keys on the source's
+  declared trust_default, per row — the honest fix, made mandatory instead of
+  optional. The live false claim (VERBATIM SME email exported "SYNTHESIZED —
+  unverified") and the latent ddall instance both end in the same change. Staged in
+  G102 (the export path must learn which corpus a row came from).
+- **§C — the seven registry rows land in the ONE database** (final names, renamed
+  the same day to the doc-registry id grammar: bmc-docs, bmc-docs-controlm-utilities,
+  neo4j-docs-essential-graphrag, essential… reference set intact). The re-target is
+  a REGISTRY DECLARATION whose graph half only becomes real per machine (J18);
+  bmc-docs-controlm-utilities has never loaded and needs no migration.
+  `cli.DOC_SWEEP_DATABASES` rewrites; `traversable-until-move` retires from the
+  docs-coverage ladder. R3's delete + reload sequence in ONE session per machine.
+- **§D — COLLAPSED BY THE FOLD**, exactly as the section provided: no boundary
+  remains to price; the accepted cost is §F's discipline, not §D's wall. The
+  analytical projection is MOOT (the live store is one). Recorded as the §D single
+  confirmation.
+- **§E — deepdoc is a CORPUS-DRIVEN RETRIEVER seeded from the grounded graph.** The
+  hard constraint is chartered: NO relationship is created unless its subject
+  already exists in the grounded graph (the ADR 0002 D1 proxy-node pattern). The
+  parser-driven command-line path is an INPUT (one more seed), not a rival
+  definition. GRAPH-SEEDED RETRIEVAL is named a REUSABLE PATTERN — second instance,
+  after the 2026-07-23 HR-hierarchy graph-seeded resolution. The scaffold unblocks.
+- **§F — TWO TRUST AXES, kept distinct and now load-bearing.** `origin` = AUTHORITY
+  (who asserted; manual-pin is the HIGHEST standing), `:Uncertain` = CONFIDENCE
+  (machine-derived, unverified; the LOWEST). Never conflated, never collapsed into
+  one flag; every guard/filter/surface states WHICH axis it reads. `:Uncertain`
+  never applies to an authored mapping. **Q9 RULED: `origin` is the GENERAL
+  authority vocabulary**, declared now, adopted per-surface as each is touched —
+  the PAT support-team edge (source:'pat', no origin flag today) is first in line.
+- **Q6 — vendor_docs' DESCRIBES refusal STANDS.** It was about corpus shape, not
+  residency; bmc-docs-controlm-utilities is confirmed:false and its doc-graph gate
+  is unsigned. The fold made the write legal, not ruled.
+- **Q16(b) — SUCCESSOR MINTED (Q20):** check FIRST whether the live DESCRIBES edges
+  already satisfy the product→documentation pointer under the fold; only if not,
+  build. Ends the prose-only trace open since 2026-08-07.
+- **Q8 — THE NAMING RULE enters ADR 0002's amendment:** `drydocs` is the ORIGINAL;
+  `dd*` names are its extensions. The test every future database proposal passes.
+- **Q10 — ADR 0011 flips PLANNED → EXECUTED-BY-CHOICE**, amended with the REAL
+  rationale (retrieval), never the false trigger (Enterprise unavailability).
+- **Terminus.** Signing moves NO data and writes NO graph. The apply is staged:
+  G102 (guards first, then the fold build + registry re-target + watermark re-key +
+  the pinned test_load_map_json alarm treated as a task), G103 is folded INTO G102's
+  watermark clause, Q20 (the Q16(b) check-first). G31 unblocks; the deepdoc
+  scaffold unblocks.

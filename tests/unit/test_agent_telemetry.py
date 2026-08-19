@@ -201,24 +201,35 @@ def test_agent_run_props_mirror_the_acceptance_fields(tmp_path):
     assert "jdoe4821" not in json.dumps({k: v for k, v in props.items() if k != "user_id_chars"})
 
 
-def test_writer_refuses_drydocs_from_env_and_argument(tmp_path, monkeypatch):
-    monkeypatch.setenv(agent_run_writer.AGENT_RUN_DB_ENV, "drydocs")
-    with pytest.raises(ValueError, match="never lands in 'drydocs'"):
+def test_writer_refuses_stale_databases_from_env_and_argument(tmp_path, monkeypatch):
+    """G102 INVERTED this refusal. Pre-fold the writer refused `drydocs` (R1:
+    never in ground truth); post-fold the R1 substance rides the :Uncertain
+    label and the defect to refuse is a STALE env var still naming the retired
+    `ddcontext` — telemetry written there lands where nothing reads."""
+    monkeypatch.setenv(agent_run_writer.AGENT_RUN_DB_ENV, "ddcontext")
+    with pytest.raises(ValueError, match="is stale"):
         agent_run_writer.agent_run_db()
     monkeypatch.delenv(agent_run_writer.AGENT_RUN_DB_ENV)
-    assert agent_run_writer.agent_run_db() == "ddcontext"  # the R1 ruling default
+    assert agent_run_writer.agent_run_db() == "drydocs"  # the G102 fold target
     envelope = _answer(tmp_path)
-    with pytest.raises(ValueError, match="never lands in 'drydocs'"):
-        agent_run_writer.write_agent_run(envelope, database="drydocs")
+    with pytest.raises(ValueError, match="lands ONLY in 'drydocs'"):
+        agent_run_writer.write_agent_run(envelope, database="ddcontext")
+
+
+def test_merge_carries_the_uncertain_label():
+    """The R1 ruling's substance, post-fold: the MERGE itself applies :Uncertain,
+    so no telemetry row can ever exist unlabelled in ground truth."""
+    assert ":AgentRun:Uncertain" in agent_run_writer._MERGE_AGENT_RUN
 
 
 # ── console.agent-runs.v1 ────────────────────────────────────────────────────
 
 
-def test_agent_runs_spec_registered_on_ddcontext():
+def test_agent_runs_spec_registered_uncertain():
     spec = QUERY_SPECS["console.agent-runs.v1"]
-    assert spec.database == "ddcontext"  # the R1 ruling's DB, never drydocs
-    assert is_watermarked(spec)  # ddcontext reads carry the standard watermark
+    assert spec.database == "drydocs"  # G102 fold; the realm is the label now
+    assert spec.uncertain  # declared — the ADR 0011 §117 watermark trigger
+    assert is_watermarked(spec)
     assert "question_sha256" in spec.cypher and "question_chars" in spec.cypher
     assert "r.kind = 'qa'" in spec.cypher and "NOT r:SchemaMeta" in spec.cypher
     # registry-wide read-only/classification validation already ran at import;

@@ -119,7 +119,7 @@
       "command": "load-essential-graphrag",
       "mode": "optional",
       "profiles": [],
-      "note": "Q2 experiment -> ddcontext database",
+      "note": "Q2 book corpus -> drydocs (G102 fold)",
       "loaders": [
         "essential_graphrag.v1"
       ]
@@ -1294,7 +1294,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "web",
-      "target_db": "dddocs",
+      "target_db": "drydocs",
       "trust_default": "GROUNDED",
       "graph_locator": {
         "match": "path_prefix",
@@ -1337,7 +1337,7 @@
       ]
     },
     {
-      "id": "bmc-controlm-utilities",
+      "id": "bmc-docs-controlm-utilities",
       "home": "doc-registry",
       "system": null,
       "origin": null,
@@ -1355,11 +1355,11 @@
       "tier": "T1",
       "curation": "none",
       "connector": "web",
-      "target_db": "dddocs",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "corpus_id",
-        "value": "bmc-controlm-utilities"
+        "value": "bmc-docs-controlm-utilities"
       },
       "taxonomy_path": "technology/orchestration/control-m",
       "taxonomy_captures": [],
@@ -1377,7 +1377,7 @@
       ]
     },
     {
-      "id": "essential-graphrag",
+      "id": "neo4j-docs-essential-graphrag",
       "home": "doc-registry",
       "system": null,
       "origin": null,
@@ -1395,7 +1395,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "filedrop",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "GROUNDED",
       "graph_locator": {
         "match": "doc_id",
@@ -1435,7 +1435,7 @@
       "tier": "T4",
       "curation": "sme-confirm",
       "connector": "confluence",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "GROUNDED",
       "graph_locator": {
         "match": "none",
@@ -1465,7 +1465,7 @@
       "tier": "T2",
       "curation": "sme-confirm",
       "connector": "web",
-      "target_db": "dddocs",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",
@@ -1501,7 +1501,7 @@
       "tier": "T4",
       "curation": "sme-confirm",
       "connector": "email",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",
@@ -1531,7 +1531,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "filedrop",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",

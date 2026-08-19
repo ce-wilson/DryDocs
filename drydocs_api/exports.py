@@ -12,7 +12,7 @@ next to the data file.
 Classification rules (PUBLISH-BOUNDARY.md wired in):
 - ``internal`` exports carry a banner row and the ``INTERNAL__`` filename
   prefix (``internal-confidential`` retired into ``internal`` at J23)
-- anything read from a watermarked database (ddcontext/ddall) gains a
+- anything read by an uncertain-declared spec (G102: the :Uncertain realm) gains a
   grid-visible ``trust_watermark`` column and ``SYNTHESIZED`` in the
   manifest's trust tiers
 """
@@ -37,7 +37,13 @@ from drydocs_api.query_specs import QuerySpec, UnknownSpecError, is_watermarked,
 from drydocs_api.sessions import InMemorySessionStore
 
 WATERMARK_COLUMN = "trust_watermark"
-WATERMARK_VALUE = "SYNTHESIZED — unverified"
+# G102 / gate §B (B-DURABLE): the false per-database claim is gone. A spec-level
+# watermark says UNCERTAIN (machine-derived realm, the :Uncertain label); a row
+# whose corpus is known is stamped from the SOURCE's declared trust_default via
+# corpus_trust_watermark() — honest per row, keyed on the registry, never on
+# storage location. "SYNTHESIZED — unverified" was retired because two of the
+# corpora it stamped were VERBATIM captures (the gate's strongest argument).
+WATERMARK_VALUE = "UNCERTAIN — machine-derived, unverified"
 _TRUST_KEYS = frozenset({"trust", "trust_tier", "trust_tiers", WATERMARK_COLUMN})
 
 try:  # single source for the manifest's app_version
@@ -97,6 +103,26 @@ def _rows_iter(
     return keys, iter(rows)
 
 
+def corpus_trust_watermark(corpus_id: str) -> str | None:
+    """B-DURABLE (gate document-content-topology §B): the per-row watermark for a
+    doc-content row, keyed on the SOURCE's declared trust_default in
+    config/doc-source-registry.yaml — never on where the row was stored.
+    Returns None for an unknown corpus (the caller falls back to the spec-level
+    value rather than inventing trust)."""
+    from drydocs_core.source_registry import SourceRegistry
+
+    try:
+        src = SourceRegistry.from_yaml().get(corpus_id)
+    except Exception:
+        return None
+    if src is None:
+        return None
+    trust = (src.data or {}).get("trust_default")
+    if not isinstance(trust, str) or not trust:
+        return None
+    return f"{trust} — per the source's declared trust_default"
+
+
 def _apply_watermark(spec: QuerySpec, keys: list[str], rows: Iterable[dict[str, object]]):
     if not is_watermarked(spec):
         return keys, rows
@@ -104,7 +130,11 @@ def _apply_watermark(spec: QuerySpec, keys: list[str], rows: Iterable[dict[str, 
 
     def gen() -> Iterator[dict[str, object]]:
         for row in rows:
-            yield {**row, WATERMARK_COLUMN: WATERMARK_VALUE}
+            # per-row honesty first: a row that names its corpus is stamped from
+            # the registry's declared trust, not the realm default (B-DURABLE)
+            corpus = row.get("corpus_id")
+            stamp = corpus_trust_watermark(corpus) if isinstance(corpus, str) else None
+            yield {**row, WATERMARK_COLUMN: stamp or WATERMARK_VALUE}
 
     return keys, gen()
 
@@ -112,7 +142,7 @@ def _apply_watermark(spec: QuerySpec, keys: list[str], rows: Iterable[dict[str, 
 def _trust_tiers(spec: QuerySpec, seen: set[str]) -> list[str]:
     tiers = set(seen)
     if is_watermarked(spec):
-        tiers.add("SYNTHESIZED")
+        tiers.add("UNCERTAIN")  # G102: SYNTHESIZED retired — it falsely described verbatim captures
     return sorted(tiers)
 
 
@@ -294,7 +324,7 @@ def list_specs() -> list[dict[str, object]]:
                 {"name": p.name, "type": p.type, "required": p.required, "default": p.default}
                 for p in s.params
             ],
-            "watermarked": s.database in ("ddcontext", "ddall"),
+            "watermarked": is_watermarked(s),  # G102: the declaration, never the database
         }
         for s in QUERY_SPECS.values()
     ]
