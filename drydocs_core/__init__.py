@@ -17,7 +17,7 @@ Usage::
 
     from drydocs_core import models, orchestration
     from drydocs_core.orchestration import controlm
-    client = drydocs_core.Neo4jClient(uri, user, password, database="ddcontext")
+    client = drydocs_core.Neo4jClient(uri, user, password, database="drydocs")
 """
 
 from . import adapters, config, models, ontology, orchestration, precedence, source_registry

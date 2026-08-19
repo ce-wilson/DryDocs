@@ -56,6 +56,8 @@ SUPERSEDED_NAMES: frozenset[str] = frozenset(
         "drydocs_all",  # -> ddall       (same)
         "drydocs_docs",  # -> dddocs      (docmeta plan working name; ADR 0006 §1 renamed it)
         "ddlineage",  # retired outright 2026-08-04 (ADR 0002 X1 amendment; no successor)
+        "ddcontext",  # folded 2026-08-18 (G32/G102): the uncertain realm is the :Uncertain LABEL in the one database
+        "ddall",  # retired 2026-08-18 with its second constituent (G32/G102); joined here at the G38 close
     }
 )
 

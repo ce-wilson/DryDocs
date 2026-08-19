@@ -11,8 +11,10 @@ Registry rules (asserted at import, so a bad spec can never ship):
 - ids are versioned like loaders: ``<area>.<frame>.v<N>``
 - cypher passes the read-only guard (defense in depth — these are ours)
 - database comes from the reviewed set (the routing.py philosophy: a spec that
-  reads uncertain ``ddcontext``/``ddall`` content is an explicit, reviewed row
-  here — never a default; those results are watermarked SYNTHESIZED)
+  reads uncertain content declares ``uncertain=True`` as an explicit, reviewed
+  row here — never a default; those results are watermarked. Pre-fold this
+  meant reading the retired ``ddcontext``/``ddall`` databases; since G102 the
+  uncertain realm is the :Uncertain label — ADR 0011 §117)
 - classification comes from the config/classification.yaml vocabulary
 - a spec that binds a label the schema meta-graph stamps on a ``:SchemaMeta``
   exemplar (``drydocs_core/schema/schema_graph.cypher`` — applied manually,
@@ -915,8 +917,8 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "answered question (kind 'qa', mirroring :JobRun), newest first. "
                 "Question and caller identity appear as sha256 + length ONLY — "
                 "full text lives solely in the local JSONL ledger. Reads "
-                "ddcontext, so rows carry the standard SYNTHESIZED watermark; "
-                "the telemetry values themselves are measured, not synthesized."
+                ":Uncertain rows (uncertain=True), so rows carry the UNCERTAIN "
+                "watermark; the telemetry values themselves are measured."
             ),
             cypher=(
                 "MATCH (r:AgentRun) WHERE NOT r:SchemaMeta AND r.kind = 'qa' "

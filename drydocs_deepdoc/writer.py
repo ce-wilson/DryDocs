@@ -1,4 +1,5 @@
-"""The deepdoc write boundary — stamped findings → ``ddcontext`` only.
+"""The deepdoc write boundary — stamped :Uncertain findings only
+(the retired ``ddcontext`` residency ended at the G102 fold).
 
 This is the ONLY module in the component that writes a database, and it writes only
 :data:`drydocs_deepdoc.DATABASE`. Every written node/edge carries ``reliability`` and

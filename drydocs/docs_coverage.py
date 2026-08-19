@@ -24,11 +24,15 @@ generalizing, none of which is a bug:
    live label and ``docs_has_document`` is ``planned`` with ``loader: ~``.
 3. The vendor-docs corpus is staged and gate-blocked, and ``vendor_docs.cypher``
    DELIBERATELY writes no DESCRIBES edge: *a relationship cannot span Neo4j
-   databases* (the Q8 finding). The registry writes ``drydocs``; ADR 0006
-   re-targets doc corpora to ``dddocs``/``ddcontext``.
-4. So no corpus can currently DECLARE its way to a traversable edge —
-   ``target_db`` is constrained to ``{dddocs, ddcontext}`` by the doc-registry
-   guard, and the registry writes ``drydocs``. **G32 owns that residency ruling.**
+   databases* (the Q8 finding). As found, the registry wrote ``drydocs`` while
+   ADR 0006 re-targeted doc corpora to the since-retired ``dddocs``/``ddcontext``
+   names.
+4. So, as found, no corpus could DECLARE its way to a traversable edge —
+   ``target_db`` was constrained to the retired ``{dddocs, ddcontext}`` pair by
+   the doc-registry guard while the registry wrote ``drydocs``. **G32 owned that
+   residency ruling and ended the mismatch (the G102 fold, 2026-08-18): the
+   guard now pins ``{drydocs}`` and every corpus shares the one database.** The
+   residency wall is gone; walls 1–2 are what remain of the four.
 
 TWO LAYERS, AND THE BLOCKER LIVES IN THE PURE ONE
 -------------------------------------------------
@@ -70,9 +74,13 @@ from dataclasses import asdict, dataclass, field
 
 from drydocs.docs_verify import locator_of
 
-#: The database the software registry writes (`software_registry.cypher`). The
-#: doc-registry guard constrains `target_db` to {dddocs, ddcontext}, so no corpus
-#: can name this one — see `test_no_corpus_can_declare_the_registry_database`.
+#: The database the software registry writes (`software_registry.cypher`).
+#: Pre-fold the doc-registry guard constrained `target_db` to the
+#: retired {dddocs, ddcontext} pair, so no corpus could name this one and the ladder's
+#: `cross-db-blocked` rung was the governing wall. Since G102 the guard pins
+#: {drydocs}: registry and corpora share the one database, so that rung can no
+#: longer arise from residency (the rung itself stays — a registry row that
+#: declared some other db would still be caught; retiring it is its own call).
 REGISTRY_DB = "drydocs"
 
 # --- the coverage ladder (first match governs) --------------------------------

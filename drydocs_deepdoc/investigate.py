@@ -18,7 +18,7 @@ from drydocs_core.orchestration.controlm import (  # noqa: F401
 
 @dataclass(frozen=True)
 class ContextFinding:
-    """One uncertain finding, ready for the ddcontext write."""
+    """One uncertain finding, ready for the :Uncertain-labeled write."""
 
     subject_urn: str  # proxy-node business key (shared DryDocs URN)
     predicate: str  # the proposed relationship/observation, mechanism vocabulary

@@ -1,6 +1,8 @@
 <#
-  provision.ps1 — apply the G1 multi-DB topology (ADR 0002 D1) to a Neo4j ENTERPRISE
-  DBMS, then run the read-only smoke. Idempotent (safe to re-run).
+  provision.ps1 — apply the database topology (ADR 0002 D1; folded to
+  drydocs + ddschema at G32/G102, 2026-08-18) to a Neo4j ENTERPRISE DBMS.
+  Idempotent (safe to re-run). The read-only federated smoke this header used
+  to promise retired with the `ddall` composite.
 
   REQUIRES:
     * a Neo4j ENTERPRISE instance — multi-database + composite are Enterprise-only.

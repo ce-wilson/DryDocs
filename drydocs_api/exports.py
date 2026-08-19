@@ -185,7 +185,8 @@ def run_spec(
     """Run a QuerySpec for a data frame: any authenticated role; params fail
     closed; database comes from the SPEC (a reviewed registry row, or the
     session's own ephemeral registration); watermark column appended for
-    ddcontext/ddall reads."""
+    specs that declare uncertain=True (pre-fold this keyed on the
+    retired ddcontext/ddall database names — ADR 0011 §117)."""
     _authenticate(token, store)
     spec, fixed = _resolve_spec(spec_id, token, ephemerals)
     bound = {**fixed, **validate_params(spec, params)}
