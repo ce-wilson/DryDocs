@@ -1283,6 +1283,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-18",
+      "title": "RECORD: Q16 clause (b) — SATISFIED BY THE FOLD (Q20; the G32 sign-off's minted successor, closed)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/document-content-topology.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3527",
+      "unblocks": [
+        "G102"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

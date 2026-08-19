@@ -3522,3 +3522,33 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   the pinned test_load_map_json alarm treated as a task), G103 is folded INTO G102's
   watermark clause, Q20 (the Q16(b) check-first). G31 unblocks; the deepdoc
   scaffold unblocks.
+
+
+## 2026-08-18 — RECORD: Q16 clause (b) — SATISFIED BY THE FOLD (Q20; the G32 sign-off's minted successor, closed)
+
+- **What this records.** Gate `document-content-topology` minted Q20 at sign-off to
+  run Q16's own "cheapest possible answer, check FIRST" before any pointer build.
+  The check ran 2026-08-18 against the live graph (laptop, `neo4jtest`, `drydocs`
+  DB — J18 venue; the declaration-layer half is sample-reproducible via
+  `drydocs docs-coverage` with the database off).
+- **THE TRAVERSAL CLAUSE (b) ASKED FOR EXISTS, LIVE AND DURABLE.**
+  `(:SoftwareProduct {product_id:'controlm'})<-[:DESCRIBES]-(:Document)` returns
+  the 27 bmc-docs documents. An agent can traverse from the product to the docs
+  describing it in one hop, in ground truth, under the ruled shape — and the fold
+  made it PERMANENT (the `traversable-until-move` rung retired at G102; these are
+  the R3-reloaded edges, not the residency-accident residue). Q16(b) is
+  **satisfied-by-fold**; no pointer build is needed.
+- **WHAT IS DELIBERATELY NOT CLAIMED, because the coverage census says so:**
+  `products_traversable: 0`. The DECLARATION layer does not yet bind the live
+  edges — the software registry's `controlm` row declares the SCRAPE corpus
+  (`bmc-docs-controlm-utilities`, ungated), while `bmc-docs`, the corpus actually
+  carrying the edges, is declared by no product row; and the loader still writes
+  DESCRIBES from a hardcoded `SUBJECT_PRODUCT_ID` rather than a registry field.
+  That is **Q18's existing scope** (the `describes_product` field the loader
+  READS; Idea-88's parked mechanism), now HALF-unblocked: G32 ruled, Q14 (the
+  entity-spine term) still owed. Nothing new is minted — the successor for the
+  declaration half predates this check and keeps its dependencies.
+- **The Q16(b) trace is now CLOSED end to end:** partial close (2026-08-07, prose
+  only) → G32 close-checklist entry (2026-08-07, the user's ruling) → Q20 minted
+  at the sign-off (2026-08-18) → checked and recorded here. No prose-only link
+  remains.
