@@ -13,7 +13,7 @@ ever ceasing to be the truth. ·
 `docs/design/drydocs-mapping-store-runbook.md` (operate it);
 `docs/design/drydocs-mapping-demo-runbook.md` (the `/demo` page it backs).
 
-Worked example throughout: an SME edits `config/taxonomy-ontology-map.yaml`, flipping one
+Worked example throughout: an SME edits a fragment in `config/taxonomy-ontology-map/` (the S5 fragment directory), flipping one
 entry from `proposed` to `rejected`. Nothing rebuilds the store explicitly — the next
 `/mappings` request notices the source-hash drift (`is_current()` → False), rebuilds
 `var/mapping.db` in place, and `v_status_summary` answers `applied 8 · confirmed 22 ·
@@ -54,8 +54,8 @@ assertions) into a queryable form. It holds no layer-3 knowledge-graph content a
 writes the graph — the loader remains the only graph writer, and the store's own writes
 are confined to the derived file under `var/`.
 
-Upstream: the committed config ledgers (`config/taxonomy-ontology-map.yaml`,
-`drydocs_core/ontology/relationship_vocabulary.yaml`, `config/manual-loads/`,
+Upstream: the committed config ledgers (`config/taxonomy-ontology-map/`,
+`drydocs_core/ontology/relationship_vocabulary/` — both fragment directories since S5, `config/manual-loads/`,
 `config/overrides/seal-contact-overrides.csv`). Downstream: `drydocs_api` `/mappings/*`
 (the O13 stewardship surface and O24 override grid), the tier-5 loader's read seam, and
 the M4 DuckDB analytics path. It lives in `drydocs_core` because both the load component
@@ -85,7 +85,7 @@ boundary).
 ```
 committed sources (git = truth)                 var/mapping.db (derived)
 ────────────────────────────────                ─────────────────────────
-config/taxonomy-ontology-map.yaml ──┐           7 tables + 7 views
+config/taxonomy-ontology-map/ ────┐           7 tables + 7 views
 ontology/relationship_vocabulary ───┤  build()  ┌──────────────────────┐
 config/manual-loads/ (manifest+CSV) ├─────────► │ meta (source hashes) │
 config/overrides/seal-contact-…csv ─┘           └──────────┬───────────┘
@@ -147,9 +147,9 @@ extension — one store, two engines, identical answers.
 
 | Source (committed) | Table | Column handling |
 |---|---|---|
-| `taxonomy-ontology-map.yaml` `mappings[]` | `ontology_mapping` | `id`; `seq` = file order; `taxonomy.source/element`; `ontology.from_node/to_node/neo4j_label/role/prov_maps_to/matrix_row`; `precedence_authority`; `vocab_id`; `status` (CHECK enum) + `confirmed_by/on`, `applied_on`. Nullable columns mirror the YAML's reality (property supplements have no target, infrastructure edges no PROV term). |
-| `relationship_vocabulary.yaml` `local_relationships[]` | `relationship_vocabulary` | `id`, `neo4j_label`, `role`, `from_node`, `to_node`, `prov_maps_to`, `sosa_maps_to`, `domain`, `status`, `note` — verbatim. |
-| `relationship_vocabulary.yaml` `node_classifications[]` | `node_classification` | `label` (PK), `class`, `prov_type`, `note`. |
+| `taxonomy-ontology-map/` fragments' `mappings[]` | `ontology_mapping` | `id`; `seq` = file order; `taxonomy.source/element`; `ontology.from_node/to_node/neo4j_label/role/prov_maps_to/matrix_row`; `precedence_authority`; `vocab_id`; `status` (CHECK enum) + `confirmed_by/on`, `applied_on`. Nullable columns mirror the YAML's reality (property supplements have no target, infrastructure edges no PROV term). |
+| `relationship_vocabulary/` fragments' `local_relationships[]` | `relationship_vocabulary` | `id`, `neo4j_label`, `role`, `from_node`, `to_node`, `prov_maps_to`, `sosa_maps_to`, `domain`, `status`, `note` — verbatim. |
+| `relationship_vocabulary/` fragments' `node_classifications[]` | `node_classification` | `label` (PK), `class`, `prov_type`, `note`. |
 | `manual-loads/manifest.yaml` `files[]` | `manual_load_file` | every entry registered (audit); only `pending-load`/`loaded` materialize rows. |
 | each loadable manual CSV | `manual_mapping` | via `parse_mapping_csv`: `folder_id`, `job_id`, `seal_id`, `create_target_if_missing` (0/1), `authored_by/on`, `note`; PK `(file, line_no)`, FK → `manual_load_file`. |
 | `overrides/seal-contact-overrides.csv` | `seal_contact_override` | `line_no` (PK), `app_seal_id`, `role_name` (canonicalized), `seal_holder_sid` (captured source value), `override_holder_sid/name`, `rationale`, `authored_by/on`, `status` (CHECK enum). |

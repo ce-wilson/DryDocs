@@ -11105,6 +11105,24 @@ items:
       verification sweep, which is the argument for regenerating §DEP rather than
       patching it. The docmeta half of Idea-95 (drydocs_docmeta has neither design
       doc nor runbook) is NOT here — it went to V11, where runbook coverage lives.
+      PARTIAL DELIVERY 2026-08-19 (desktop, pre-port pickup; timeboxed against an 08:00
+      port). CLAUSES (c), (e), (f) DONE, verified against the tree, not the clause text:
+      (f) all 19 design-doc references to the two S5-retired monoliths re-pointed at the
+      fragment DIRECTORIES — grep for either .yaml path under docs/design/*.md now
+      returns zero; (e) the sdlc-neo4j-schema.md pat_product_mapping row restated once
+      to the K13 team-scoped SUPPORTS reading with the C9 removal explained inline, and
+      corrected PLANNED -> ACTIVE while there (the loader is registered in
+      cli.LOADER_REGISTRY — the row was stale on status too, which the clause did not
+      know); (c) base.py's half-landed cite made path-explicit and
+      drydocs_lineage/model.py added to the project-tdd traceability matrix, its test
+      cell naming the two REAL test files that import the model (a first draft cited a
+      nonexistent test_lineage_model.py — caught by checking before commit).
+      STILL OPEN — (a), (b), (d), each research-shaped rather than mechanical: (a) the
+      six pre-squash re-cites need per-cite judgment about WHICH reachable commit each
+      pin means; (b) the sdlc DEP regeneration is regenerate-from-tree, not row
+      patching, per the clause's own instruction; (d) the two S3 falsehoods plus the K8
+      RIDER restatement are rev-bump surfaces on governed docs and deserve an unhurried
+      pass. Touched docs re-rendered; 2214 passed; ruff clean.
   - id: D8
     epic: config-loaders
     title: "Bootstrap constraint-count guard: count SHOW CONSTRAINTS against constraints.cypher declarations and refuse loudly on mismatch (the supplement-chain guard pattern)"

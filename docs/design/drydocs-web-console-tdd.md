@@ -59,8 +59,8 @@ projections are planned to land **server-side** (per ADR 0005 the thin API is wh
 task-scoped shaping belongs), not in the browser.
 
 Upstream neighbours: the Neo4j EE container (`drydocs` DB, ground truth), and the config
-ledgers (`config/taxonomy-ontology-map.yaml`, `config/manual-loads/`,
-`drydocs_core/ontology/relationship_vocabulary.yaml`) via the mapping-store
+ledgers (`config/taxonomy-ontology-map/`, `config/manual-loads/`,
+`drydocs_core/ontology/relationship_vocabulary/` — the first and last are fragment directories since S5) via the mapping-store
 materialization. Downstream: support/SME users in a browser; drafted changesets travel
 git → K2 gate → `manual_loads` loader.
 
@@ -191,7 +191,7 @@ grid → draft tray → submitted changeset rendered back with a client-side CSV
 
 The console ingests nothing — the one materialization it reads is built by
 `drydocs_core.mapping_store.build()`: committed YAML/CSV sources
-(`relationship_vocabulary.yaml`, `config/taxonomy-ontology-map.yaml`,
+(`drydocs_core/ontology/relationship_vocabulary/`, `config/taxonomy-ontology-map/`,
 `config/manual-loads/*.csv` + manifest) → six SQLite tables + analytics views, with a
 source-hash meta row and deterministic byte-identical rebuilds; `dump_csv` writes the
 gate-reviewable text twin per table. Grid columns surfaced to the browser are the table

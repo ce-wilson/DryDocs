@@ -112,7 +112,7 @@ and the file is derived by construction.
 poetry run python -c "from drydocs_core.mapping_store import DEFAULT_DB_PATH, is_current; print(is_current(DEFAULT_DB_PATH))"
 # -> True
 
-# Lifecycle summary — canonical expected values live in config/taxonomy-ontology-map.yaml
+# Lifecycle summary — canonical expected values live in config/taxonomy-ontology-map/ (fragment dir)
 poetry run python -m sqlite3 var/mapping.db "SELECT * FROM v_status_summary"
 # -> ('applied', 8) ('confirmed', 22) ('proposed', 2) ('rejected', 1)   [as of Rev 1]
 

@@ -117,7 +117,7 @@ poetry install            # core deps only; no api group, no container, no .env 
 poetry run python -c &quot;from drydocs_core.mapping_store import DEFAULT_DB_PATH, is_current; print(is_current(DEFAULT_DB_PATH))&quot;
 # -&gt; True
 
-# Lifecycle summary — canonical expected values live in config/taxonomy-ontology-map.yaml
+# Lifecycle summary — canonical expected values live in config/taxonomy-ontology-map/ (fragment dir)
 poetry run python -m sqlite3 var/mapping.db &quot;SELECT * FROM v_status_summary&quot;
 # -&gt; (&#x27;applied&#x27;, 8) (&#x27;confirmed&#x27;, 22) (&#x27;proposed&#x27;, 2) (&#x27;rejected&#x27;, 1)   [as of Rev 1]
 

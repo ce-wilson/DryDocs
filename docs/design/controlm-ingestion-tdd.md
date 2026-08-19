@@ -85,7 +85,7 @@ in order:
 | Layer | This chain's contribution | Artifact |
 |-------|---------------------------|----------|
 | **1. Taxonomy** (what *category*) | `ControlMApplication`, `ControlMServer > ControlMFolder > ControlMJob`; `Condition` entity | `config/taxonomy/controlm.yaml` |
-| **2. Ontology** (what edges *mean*) | PROV binding per edge, HITL-confirmed | `config/taxonomy-ontology-map.yaml` |
+| **2. Ontology** (what edges *mean*) | PROV binding per edge, HITL-confirmed | `config/taxonomy-ontology-map/` (fragment dir; S5) |
 | **3. Knowledge graph** (both) | the populated Neo4j nodes + edges | Neo4j |
 | **4. Context graph** (what matters *now*) | — (future) | — |
 
@@ -110,8 +110,8 @@ taxonomy→ontology map.
 | `m3-verify` | the post-load graph-invariant check (`drydocs … m3-verify`) |
 
 **References.** Companion `docs/controlm-staging-ingestion-flow.md` (§3a — the load-order
-contract); `config/taxonomy/controlm.yaml` (taxonomy); `config/taxonomy-ontology-map.yaml`
-(confirmed bindings); `CLAUDE.md` §1 (four-layer model); ADR 0003 (`ControlMFolder` naming).
+contract); `config/taxonomy/controlm.yaml` (taxonomy); `config/taxonomy-ontology-map/` (confirmed bindings — the fragment directory;
+the former single YAML was split at S5, 2026-08-06); `CLAUDE.md` §1 (four-layer model); ADR 0003 (`ControlMFolder` naming).
 
 <!-- anchor: detailed-design -->
 ## 2. Source system — the `psgmgr` CM_ replica
@@ -320,7 +320,7 @@ Example folders in the sample: **161015** `PRARAG-HLDM-70011-PEX-TRUST-DLY` (P12
 <!-- anchor: hitl-gate -->
 ## 6. Ontology (layer 2) — HITL gate & what's not yet live
 
-`config/taxonomy-ontology-map.yaml` is the HITL-confirmed bridge. Lifecycle
+`config/taxonomy-ontology-map/` (the fragment directory — one file per domain since the S5 split) is the HITL-confirmed bridge. Lifecycle
 `proposed → confirmed → applied` — a taxonomy never becomes edges until confirmed.
 
 | Edge (Neo4j) | From → To (PROV) | Decision-matrix row | PROV term | Status |
@@ -481,7 +481,7 @@ ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated 
 | FR-CMI-003 | Folder pass derives two grouping nodes: `:ControlMServer` + `:ControlMApplication` | design-data-mapping | `controlm_folders.cypher`, `folder_name.py` | `m3-verify` no-orphan-`:ControlMApplication` | done |
 | FR-CMI-004 | Job identity is folder-scoped `(folder_id, job_id)`; child pass MATCHes its folder | design-data-mapping | `controlm_jobs.cypher`, `constraints.cypher` | `m3-verify`; NODE KEY constraint | done |
 | FR-CMI-005 | Derive job→job `WAS_INFORMED_BY` from the IN=OUT condition seam, edge-only | design-data-mapping | `controlm_dependencies_derived.cypher` | `m3-verify` `via_condition` check | done |
-| FR-CMI-006 | Every edge traces to a HITL-confirmed taxonomy→ontology binding | hitl-gate | `config/taxonomy-ontology-map.yaml`, `gate-log.md` | `test_schema.py` drift guard | done |
+| FR-CMI-006 | Every edge traces to a HITL-confirmed taxonomy→ontology binding | hitl-gate | `config/taxonomy-ontology-map/`, `gate-log.md` | `test_schema.py` drift guard | done |
 | NFR-CMI-001 | No real SIDs/servers committed; Internal classification; SQL injection-safe | classification-security | `config/classification.yaml`, `oracle_adapter.py` | `test_classification.py` | done |
 | FR-CMI-007 | SEAL attribution runs only after jobs + `:Application` exist, gate-confirmed | hitl-gate | K2 loader (`seal_attribution.cypher`, `load-seal-attribution`) | gate `seal-attribution-match-policy` (2026-07-14); `graph-tests/seal-attribution-coverage.yaml` | done |
 | FR-CMI-008 | Cross-folder dependency edges load in a deferred, unscoped `--phase relationships` pass (direct pairs only; ctlm_id-keyed) | design-summary | `cli.ingest_controlm --phase`, `controlm_dependencies_recursive.sql` | `test_dependencies_sql_is_direct_only`, `test_dependencies_match_on_the_composite_node_key` | done |
