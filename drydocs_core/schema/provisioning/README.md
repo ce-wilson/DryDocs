@@ -1,13 +1,13 @@
 # schema/provisioning — multi-DB topology (Epic G1 · ADR 0002 D1)
 
-Provisions the multi-database topology from
-[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — two estate
-databases, the schema meta-graph, and one composite — on a **Neo4j Enterprise** DBMS.
-Authoring + structure only — **no data load** here.
+Provisions the database topology from
+[ADR 0002](../../../docs/decisions/0002-component-database-topology.md) — since the
+G102 fold (2026-08-18): the one content database plus the schema meta-graph database —
+on a **Neo4j Enterprise** DBMS. Authoring + structure only — **no data load** here.
 
 | File | Run against | Purpose |
 |---|---|---|
-| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddcontext`, `ddschema`, `CREATE COMPOSITE DATABASE ddall` + aliases |
+| `01_databases.cypher` | `system` | `CREATE DATABASE drydocs`, `ddschema` (pre-fold it also created `ddcontext` + the `ddall` composite — retired 2026-08-18, G32/G102; the file header keeps that record) |
 
 > **`ddlineage` was retired 2026-08-04** (ADR 0002 X1 amendment, superseding the G30
 > "provisioned but not live" disposition). Curated lineage writes land in `drydocs` per
@@ -16,16 +16,17 @@ Authoring + structure only — **no data load** here.
 > per the Epic X items (alias out of `ddall` first, behind a zero-node emptiness probe).
 
 | `02_proxy_constraints.cypher` | — (RETIRED at G31/G102, 2026-08-18) | tombstone — the cross-db charter died with the fold; both keys live in `constraints.cypher` (`drydocs bootstrap`) |
-| `smoke_drydocs_all.cypher` | — (RETIRED with `ddall`) | the federated smoke had nothing left to federate |
+| `smoke_drydocs_all.cypher` | — (RETIRED with `ddall`; file DELETED at the G38 close, 2026-08-19 — recover via git history) | the federated smoke had nothing left to federate |
 
 > **`ddschema` is in the topology but in neither the proxy-constraint pass nor `ddall`**
 > (G51, 2026-08-03). It holds the schema meta-graph written by `drydocs
 > bootstrap-schema-graph`, where exemplar nodes carry a real label beside `:SchemaMeta`.
 > Two consequences, both deliberate: the `drydocs` NODE KEYs would reject those exemplars,
 > so its one constraint (`schemameta_name`) lives in `schema_graph.cypher` rather than
-> here; and it is not a `ddall` constituent, because it describes the schema, not the
-> estate — a federated support query would present labels as data.
-| `provision.ps1` | — | runner: applies 01 → 02 (×2) → smoke via `cypher-shell` |
+> here; and it was never a constituent of the retired `ddall` composite, because it
+> describes the schema, not the estate — a federated support query would have
+> presented labels as data.
+| `provision.ps1` | — | runner: applies 01 via `cypher-shell` (the 02 pass and the smoke are retired — its own comments keep the record) |
 
 ## Run
 
@@ -34,8 +35,9 @@ Authoring + structure only — **no data load** here.
 .\provision.ps1 -Uri bolt://localhost:7687 -User neo4j -Password password
 ```
 
-Idempotent (`IF NOT EXISTS` throughout). On a fresh topology the smoke returns `0 / 0 / 0`;
-success is that the federated query **runs** (both aliases resolve, no write).
+Idempotent (`IF NOT EXISTS` throughout). Success is `SHOW DATABASES` listing `drydocs`
+and `ddschema` online. (The federated smoke this section used to describe retired with
+`ddall` at the fold.)
 
 **Docker-only host? Nothing to do — the script handles it (G54, fixed 2026-08-04).**
 `cypher-shell` ships inside the image at `/var/lib/neo4j/bin/cypher-shell`, so a machine
@@ -61,32 +63,26 @@ cd drydocs_core\schema\provisioning
 $c  = "<your-container>"
 $pw = "<your-password>"     # or read it from .env; never commit it
 
-# 1. databases + composite  ->  the SYSTEM database (this is what creates ddschema)
+# 1. databases  ->  the SYSTEM database (this is what creates drydocs + ddschema).
+#    Pre-fold there were three more steps here — the 02 proxy-constraint pass
+#    against drydocs AND the retired ddcontext, and the federated smoke against
+#    the retired ddall composite. Both retired at G32/G102 (2026-08-18); the
+#    NODE KEYs now ship in constraints.cypher via `drydocs bootstrap`.
 docker cp .\01_databases.cypher "${c}:/tmp/01_databases.cypher"
 docker exec $c cypher-shell -u neo4j -p $pw -d system -f /tmp/01_databases.cypher
 
-# 2. proxy-node constraints  ->  each ESTATE database, one call per database.
-#    ddschema is NOT in this list on purpose: its exemplar nodes would fail the
-#    NODE KEYs, so its one constraint ships in schema_graph.cypher and is applied
-#    by `drydocs bootstrap-schema-graph` (G51). Its absence is a decision.
-docker cp .\02_proxy_constraints.cypher "${c}:/tmp/02_proxy_constraints.cypher"
-docker exec $c cypher-shell -u neo4j -p $pw -d drydocs   -f /tmp/02_proxy_constraints.cypher
-docker exec $c cypher-shell -u neo4j -p $pw -d ddcontext -f /tmp/02_proxy_constraints.cypher
-
-# 3. read-only smoke  ->  the COMPOSITE
-docker cp .\smoke_drydocs_all.cypher "${c}:/tmp/smoke_drydocs_all.cypher"
-docker exec $c cypher-shell -u neo4j -p $pw -d ddall -f /tmp/smoke_drydocs_all.cypher
-
-# 4. populate the meta-graph (creates nothing — step 1 already made the database)
+# 2. populate the meta-graph (creates nothing — step 1 already made the database)
 cd ..\..\..
 poetry run drydocs bootstrap-schema-graph
 
 docker exec $c sh -c "rm -f /tmp/*.cypher"    # tidy up
 ```
 
-Verified end to end 2026-08-04 (laptop, container `neo4jtest`, Neo4j 2026.05.0 Enterprise):
-all six `cypher-shell` calls exit 0 and the smoke federates `2218 / 0 / 46` across the
-composite.
+Historical: the PRE-FOLD walkthrough was verified end to end 2026-08-04 (laptop,
+container `neo4jtest`, Neo4j 2026.05.0 Enterprise) — all six `cypher-shell` calls
+exited 0 and the smoke federated `2218 / 0 / 46` across the then-live composite. The
+folded topology has no equivalent end-to-end record yet; `provision.ps1` is the
+covered path.
 
 > **Copy the file in and use `-f`. Piping works on some hosts and not others.**
 >

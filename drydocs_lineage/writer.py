@@ -21,7 +21,10 @@ Refusals (each is a contract, not a warning):
   composite (``folder_id.job_id``); the hand-made-CSV fallback identity
   (``folder/job_name``) is refused — canonical keys, not invented ids.
 - **Trust boundary** (D2): the client must be bound to ``drydocs`` —
-  :class:`TrustBoundaryError` otherwise. Never ``ddcontext``.
+  :class:`TrustBoundaryError` otherwise. Curated results are ground truth:
+  this writer never stamps :Uncertain, the label the G102 fold made the
+  uncertain realm (it retired the old ``ddcontext`` residency this clause
+  used to forbid).
 - **Gate-bound vocabulary**: every rel label a load writes is checked against
   its registered status (``model.VOCAB_IDS`` / ``RUA_VOCAB_IDS``); a live
   load raises :class:`GateBoundVocabularyError` for any label not ``active``

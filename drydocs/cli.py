@@ -1801,7 +1801,7 @@ def load_essential_graphrag(
         "drydocs",
         "--database",
         help="Target database (G102 fold, 2026-08-18: ONE content database — the "
-        "old ddcontext default was the residency the gate ended; reference "
+        "retired ddcontext default was the residency the gate ended; reference "
         "content is distinguished per source by trust_default, never by DB).",
     ),
 ) -> None:
@@ -2139,12 +2139,12 @@ DOC_REGISTRY_PATH = _REPO_ROOT / "config" / "doc-source-registry.yaml"
 #: Databases docs-verify sweeps. G102 (2026-08-18): the fold — one content
 #: database. The old comment admitted a three-way mismatch (registry said one
 #: db, the sweep expected another, the data sat in a third); the mismatch is
-#: gone, so the admission goes with it. `ddcontext` still appears ONE more
-#: time per machine: the sweep visits it while it exists so a corpus stranded
-#: there post-fold reports wrong-db loudly instead of vanishing; it drops out
-#: automatically once the inert database is dropped (SHOW DATABASES
+#: gone, so the admission goes with it. The retired `ddcontext` still appears
+#: ONE more time per machine: the sweep visits it while it exists so a corpus
+#: stranded there post-fold reports wrong-db loudly instead of vanishing; it
+#: drops out automatically once the inert database is dropped (SHOW DATABASES
 #: intersection).
-DOC_SWEEP_DATABASES = ("drydocs", "ddcontext")
+DOC_SWEEP_DATABASES = ("drydocs", "ddcontext")  # deliberately sweeps the retired db while it exists
 
 
 @app.command(name="docs-verify")
