@@ -9276,9 +9276,20 @@ items:
       mismatched install that happens to sit in the right folder. Drift is the defect; the
       path is only its most common cause, and belongs in the failure MESSAGE rather than the
       assertion.
-      SEPARATE, do not fold in: `poetry run pytest` needs PYTHONPATH=. locally or
-      tests/unit/conftest.py cannot import drydocs_core, while `poetry run python -c "import
-      drydocs_core"` succeeds. CI does not hit it. Different defect, own item.
+      RETRACTED 2026-08-18, and the retraction is EVIDENCE FOR THIS ITEM. These notes
+      previously carried a second finding -- "`poetry run pytest` needs PYTHONPATH=. locally
+      or tests/unit/conftest.py cannot import drydocs_core" -- filed as a separate defect
+      wanting its own backlog item. It is not a defect and there is no second item. Re-run
+      cleanly: with VIRTUAL_ENV and PYTHONPATH both unset, `poetry env info --path` resolves
+      to DryDocs/.venv and `poetry run pytest tests/unit` is 2176 passed / 5 skipped, with
+      `import drydocs_core` succeeding on the bare interpreter -- the package is installed in
+      the project venv, so no PYTHONPATH was ever required. The original ModuleNotFoundError
+      came from poetry resolving to the INHERITED sandbox venv, which has no DryDocs install:
+      the same root cause this item guards, wearing a different mask. Kept rather than
+      deleted because it is the sharpest argument the item has -- the wrong environment did
+      not merely produce twenty false failures, it manufactured a phantom SECOND defect that
+      was written down and nearly scheduled. A guard that names sys.prefix on drift would
+      have closed the question in one line instead.
 
   - id: G28
     epic: component-topology
