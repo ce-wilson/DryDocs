@@ -1305,6 +1305,22 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "GATE: email-folder-assignment — SIGNED OFF 8/8 (Q10's gated half)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/email-folder-assignment.yaml",
+        "config/gate-prompts/pending-source-correction.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3581",
+      "unblocks": [
+        "N13",
+        "N14",
+        "N15"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1368,17 +1384,6 @@
       "unblocks": [
         "G64"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "email-folder-assignment (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/email-folder-assignment.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     },
     {
       "kind": "prompt-only",

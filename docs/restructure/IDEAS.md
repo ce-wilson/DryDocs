@@ -92,6 +92,31 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-138`** · 2026-08-19 · `[idea]` · **open** · prio? **Med** —
+  **The SME email-assignment surface — the later slice whose CONTRACT gate
+  `email-folder-assignment` just ruled (§B2, signed 8/8 2026-08-19).** The build presents:
+  the email (subject, sent_at, the msg/extract CITATIONS — never the content), the
+  propose-only candidates WITH their evidence (prose hits are candidates, never edges —
+  §B1), and the unassigned state as first-class (never a nag, never a default). An SME
+  action here is one of only two hands that may perform the CONCERNS write (the other:
+  a structured-field source signal, which today's assumed contract doesn't have). Grooming
+  note: this is company-side-facing (real extracts live there); the producer side owns the
+  contract shape and any shared surface plumbing.
+
+- **`Idea-137`** · 2026-08-19 · `[idea]` · **open** · prio? **Med** —
+  **The `docs_email_concerns` writer build — the commit that flips the vocab entry
+  `planned -> active` (N13 §B1: the build lands the flip; intent never flips anything).**
+  Gate `email-folder-assignment` SIGNED 8/8 (2026-08-19): CONCERNS spelling, endpoints
+  ControlMFolder | ETLProcess with the class recorded on the edge (rua §B2), required
+  `assigned_by` (sme | source-signal) + evidence pointer (O24), and the §B1 bar —
+  structured field only performs; prose/subject mentions are propose-only. Since the
+  assumed extract contract has NO structured folder/process field, in practice every
+  assignment starts SME-performed via the Idea-138 surface. The writer also owns wiring
+  the unassigned count into the N13 union report (mechanics = Idea-134's build), and it
+  must remove the forbidden-token fence in `test_email_extracts.py` ONLY for its own new
+  cypher file — `email_extracts.cypher` itself stays fenced forever (the lexical loader
+  never gains the write).
+
 - **`Idea-136`** · 2026-08-19 · `[bug]` · **open** · prio? **Low** —
   **`snapshot.ps1`'s RED warn line prints `System.Object[]` where the conclusion belongs.**
   Observed at the 2026-08-19 snapshot: `ci: System.Object[] AT HEAD e0ae9ba - main is RED...`

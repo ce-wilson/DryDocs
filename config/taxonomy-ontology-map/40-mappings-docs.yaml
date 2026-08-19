@@ -181,18 +181,46 @@
     vocab_id: docs_supersedes
     status: proposed
 
-  # ---- email → subject assignment (Q10, 2026-08-19 — GATE PREP, SME not yet run)
+  # ---- email → subject assignment (Q10, 2026-08-19 — gate SIGNED 8/8 same day)
 
   - id: email-concerns-subject
     taxonomy: { source: ops-email-extracts, element: "A failure/activity email is ABOUT a Control-M folder or a process" }
     ontology:
       from_node: Document                    # prov:Entity
-      to_node: "ControlMFolder | ETLProcess" # two endpoint classes, endpoint recorded on the edge (rua §B2)
+      to_node: "ControlMFolder | ETLProcess" # two endpoint classes, endpoint recorded on the edge (rua §B2) — A2 confirmed ETLProcess as the process class
       matrix_row: "Entity -> Entity/Activity aboutness — no PROV row (the docs_describes precedent; not derivation, not attribution)"
-      neo4j_label: CONCERNS
+      neo4j_label: CONCERNS                  # A1 ruled: aboutness semantics, the docs_describes family; ASSIGNED_TO declined as workflow-in-the-type-name
       prov_maps_to: ~
-      edge_properties: { assigned_by: "sme | source-signal — never inferred-similarity (the B3 propose-vs-perform discipline)" }
+      edge_properties:
+        assigned_by: "sme | source-signal — REQUIRED (A3); source-signal means a folder/process name in a STRUCTURED field of the extract only (B1) — subject/body prose is propose-only, never inferred-similarity"
+        evidence: "REQUIRED with assigned_by (A3, O24 origin visibility): the extract line (source-signal) or the ruling note (sme) — no anonymous assignment"
     precedence_authority: internal-standards
     vocab_id: docs_email_concerns
-    status: proposed
+    status: confirmed
+    proposed_at: 2026-08-19
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-08-19   # gate session, all 8 confirmations (A1-A3, B1-B3, C1-C2) — transcribed in config/gate-log.md
+    gate_spec: config/gate-prompts/email-folder-assignment.yaml
+    capture: >
+      waived — the classification source is the synthetic contract samples
+      (drydocs/data/samples/email-extracts/, the G47 ASSUMED-contract precedent) plus the
+      ops-email-extracts registry row (config/doc-source-registry.yaml); neither is a
+      config/taxonomy/ import, so no capture file exists in that directory — the
+      taxonomy-first gap this field records rather than hides (the L7 doc-traceability
+      disposition). A real extract confirming the field semantics company-side is the
+      event that could replace this waiver with a capture.
+    note: >
+      CONFIRMED MAPPING, NOT YET WRITTEN: the vocab entry stays status: planned until the
+      writer build lands (flips-are-follow-ups, N13 §B1 — the build's commit flips it; this
+      gate ruled the meaning, it built nothing). Since the assumed extract contract has no
+      structured folder/process field, in practice every assignment starts SME-performed
+      via the assignment surface (contract ruled at §B2, build inboxed Idea-138; writer
+      inboxed Idea-137). Two fences ride the sign-off verbatim: aboutness is NEVER
+      attribution (C1 — the K7 §A1 fence; email evidence SUPPLEMENTS the human
+      folder→application mapping, never authors it; traversal is legitimate reading, a
+      shortcut edge is not), and unassigned NEVER decays into guessed (B3 — no best-match
+      sweep; the count is REPORTED via the pending-source-correction union report once its
+      mechanics build, never auto-drained). C2: the assignment is also the retention key —
+      purge is project/process-scoped, so an unassigned email is unpurgeable by scope and
+      is surfaced by the report, never deleted by a default.
 

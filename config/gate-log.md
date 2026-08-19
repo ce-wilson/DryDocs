@@ -3576,3 +3576,53 @@ loader applies) was ruled 2026-08-12 at the xml_io epic and is unchanged here.
   `SUBJECT_PRODUCT_ID` included — Q18 (the `describes_product` registry field,
   behind Q14) now covers TWO call sites instead of one, and sweeping both in one
   change is exactly why the idiom was matched rather than half-fixed here.
+
+
+## 2026-08-19 — GATE: email-folder-assignment — SIGNED OFF 8/8 (Q10's gated half)
+
+The gate Q10 drafted and deliberately did not run: the corpus loads TODAY as the
+lexical shape (covering-gate reuse, unassigned a valid resting state), and this
+page ruled only the assignment edge. All eight confirmations, no held clauses.
+
+- **§A1 — CONCERNS.** Aboutness semantics, the docs_describes family. ASSIGNED_TO
+  was offered and declined: it names the workflow act rather than the meaning, and
+  a source-signal edge was never "assigned" by anyone. The assertion mechanics live
+  in edge properties, not the type name. `docs_email_concerns` survives unchanged.
+- **§A2 — ETLProcess confirmed** as the process endpoint class:
+  `ControlMFolder | ETLProcess`, two endpoint classes, one meaning, the endpoint
+  class recorded on the edge (rua §B2 — the same pair rua already uses).
+- **§A3 — the recorded basis is REQUIRED**: `assigned_by` (sme | source-signal)
+  plus the evidence pointer (the extract line, or the ruling note) on every write.
+  No anonymous assignments — the O24 origin-visibility discipline. "assigned_by
+  only" was offered and declined.
+- **§B1 — STRUCTURED FIELD ONLY performs.** An extraction pass may PROPOSE, never
+  perform: prose mentions anywhere (body OR subject line) are candidates surfaced
+  to the SME, not edges. Only a folder/process name in a structured field of the
+  extract qualifies as a source signal — and the assumed contract (the G47
+  synthetic samples) has no such field, so in practice every assignment starts
+  SME-performed. Exact-match-subject was offered and declined.
+- **§B2 — the SME surface CONTRACT confirmed** (the build is a later slice,
+  inboxed Idea-138): present the email (subject, sent_at, the msg/extract
+  CITATIONS), the candidates WITH their evidence, and the unassigned state as
+  first-class — never a nag, never a default.
+- **§B3 — UNASSIGNED NEVER DECAYS INTO GUESSED.** No batch job sweeps old
+  unassigned emails onto best-match folders; the count is REPORTED — natural home
+  the pending-source-correction union report once its mechanics build (N13's
+  lifecycle; Idea-134) — never auto-drained.
+- **§C1 — the K7 §A1 fence CONFIRMED.** This edge says what an email is ABOUT; it
+  never authors folder→application attribution, ownership, or support routing.
+  The cm_escalation_db correction (2026-08-17) is the standing precedent: email
+  and job-name evidence SUPPLEMENTS the human mapping. Traversing
+  email→folder→application is legitimate READING; writing a shortcut edge from it
+  is not — no derived ownership edge may ever cite a CONCERNS edge as its basis.
+- **§C2 — RETENTION RIDES THE ASSIGNMENT.** Purge is project/process-scoped, so
+  the assignment is also the retention key: an unassigned email is UNPURGEABLE by
+  scope — surfaced by the report, never deleted by a default. After the 6-18
+  month Outlook purge the file-server pair is the only copy; a default-expiry
+  sweep of unassigned would be unrecoverable. A future purge build inherits this
+  clause as a constraint, not a suggestion.
+- **What flipped, what didn't (flips-are-follow-ups, N13 §B1):** the map row
+  `email-concerns-subject` → `status: confirmed`; the vocab entry
+  `docs_email_concerns` stays `status: planned` until the writer build lands
+  (Idea-137) — this gate ruled the meaning, it built nothing.
+  `email_extracts.cypher` stays test-guarded against ever gaining the write.

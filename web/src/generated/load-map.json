@@ -1551,7 +1551,7 @@
       "ontology_mappings": [
         {
           "id": "email-concerns-subject",
-          "status": "proposed",
+          "status": "confirmed",
           "label": "CONCERNS"
         }
       ],

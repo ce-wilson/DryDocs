@@ -287,7 +287,7 @@
     domain:       docs
     status:       planned
 
-  # ── Email → subject assignment (Q10, 2026-08-19; gate email-folder-assignment PENDING) ─
+  # ── Email → subject assignment (Q10, 2026-08-19; gate email-folder-assignment SIGNED 8/8 2026-08-19) ─
 
   - id:           docs_email_concerns
     neo4j_label:  CONCERNS
@@ -302,17 +302,26 @@
       Two endpoint classes, one meaning, endpoint recorded on the edge — the
       rua-load-shapes §B2 convention. Aboutness, not derivation: no PROV row
       (the docs_describes precedent).
-      TWO FENCES, both load-bearing. (1) ABOUTNESS IS NEVER ATTRIBUTION: per
-      the cm_escalation_db correction (2026-08-17) and K7 §A1, email evidence
-      SUPPLEMENTS the human folder→application mapping — this edge says what an
-      email is about, never who owns anything. (2) NEVER GUESSED: an email with
-      no extractable subject stays UNASSIGNED (a valid resting state); an
-      extraction pass may PROPOSE an assignment, only an SME or an explicit
-      source signal performs one (the B3 discipline). Spelling (CONCERNS vs
-      ASSIGNED_TO), the process-endpoint class, and the proposal surface are
-      the gate's clauses.
-      PLANNED: no loader writes this until gate email-folder-assignment signs —
-      email_extracts.cypher is test-guarded against ever gaining the write.
+      GATE SIGNED 8/8, 2026-08-19 (email-folder-assignment; gate-log is the
+      transcription): CONCERNS confirmed over ASSIGNED_TO (aboutness, not
+      workflow — A1); ETLProcess confirmed as the process endpoint class (A2);
+      assigned_by (sme | source-signal) + an evidence pointer are REQUIRED on
+      every write (A3, O24); and the B1 signal bar is STRUCTURED FIELD ONLY —
+      subject/body prose proposes, never performs, and the assumed contract has
+      no such field today, so in practice every assignment starts SME-performed.
+      TWO FENCES, both confirmed at the gate. (1) ABOUTNESS IS NEVER
+      ATTRIBUTION (C1): per the cm_escalation_db correction (2026-08-17) and
+      K7 §A1, email evidence SUPPLEMENTS the human folder→application mapping —
+      this edge says what an email is about, never who owns anything; traversal
+      is legitimate reading, a shortcut edge is not. (2) NEVER GUESSED (B3): an
+      email with no extractable subject stays UNASSIGNED (a valid resting
+      state); no best-match sweep may drain it — the count is reported, and per
+      C2 the assignment is also the retention key, so unassigned is unpurgeable
+      by scope.
+      PLANNED until the writer build lands (flips-are-follow-ups, N13 §B1 —
+      Idea-137 owns the writer, Idea-138 the SME surface whose contract §B2
+      ruled). email_extracts.cypher stays test-guarded against ever gaining
+      the write — the lexical loader is fenced forever.
     supplement:   ~
     loader:       ~
     domain:       docs
