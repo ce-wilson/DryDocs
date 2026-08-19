@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Persona Re-Run — What the 12/12 Looks Like Without the Author in the Loop</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>The Persona Re-Run — What the 12/12 Looks Like Without the Author in the Loop</h1>
+<p><strong>Explainer · Rev 1 · 2026-08-19 · backlog Q19 · Classification: Internal-Public (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in this document).</strong></p>
+<blockquote><p>The P0 benchmark&#x27;s headline — <em>traversal won 12/12</em> — carried two disclosed caveats: the author hand-wrote the Cypher (as a text2cypher stand-in) and the author judged the answers. On 2026-08-19 we re-ran the same 12 questions against the same corpus with a real persona in the loop: an agent that saw only the schema and the question, generating its own Cypher, scored by the original regex ground truths with no human judge. The SME&#x27;s prompt for this run: <em>&quot;the accuracy was 100% in the graph, but in practice our own personas are not getting that close based on the last few days of gotchas.&quot;</em> This document reports what the gap actually is — and it is not where the caveats pointed. The parent explainer is <a href="graph-retrieval-benchmark-explainer.md"><code>graph-retrieval-benchmark-explainer.md</code></a>; the persona queries, runner and raw results are committed beside the originals in <code>knowledge/upgrade-plans/p0-benchmark/</code>.</p></blockquote>
+<h2 id="headline"><span class="dd-margin-tag" aria-hidden="true">headline</span>1. The headline: recall held, efficiency did not</h2>
+<p><strong>Persona recall: 11/12 mechanical.</strong> Original hand-written traversal on the <em>same mechanical rule</em>: <strong>10/12</strong>, published as 12/12 after two disclosed author adjudications. So on the only apples-to-apples comparison available — the mechanical scorer both runs share — the persona <em>matched</em> the hand-written queries within one question, in both directions.</p>
+<p><strong>The gap the stand-in actually hid is context volume.</strong> The persona retrieved <strong>102,060 chars (~25.5k tokens)</strong> of context across the 12 questions where the hand-written queries retrieved <strong>15,354 (~3.8k tokens)</strong> — <strong>6.6× more</strong>. Not knowing the corpus, the persona compensated with breadth: <code>LIMIT 25</code>, multi-term <code>OR</code> clauses, and whole-chunk excerpts. Every one of those choices is individually reasonable, and collectively they spend the token-efficiency advantage that was the P0 verdict&#x27;s second headline (traversal at ~27× manifest efficiency). A persona in the loop keeps the recall; it gives back a large slice of the efficiency.</p>
+<table><thead><tr><th>Q</th><th>Persona</th><th>Original (mechanical)</th><th>Persona chars</th><th>Original chars</th><th>Persona ms</th><th>Original ms</th></tr></thead><tbody><tr><td>SA1</td><td>HIT</td><td>HIT</td><td>149</td><td>67</td><td>215.6</td><td>110.4</td></tr><tr><td>SA2</td><td>HIT</td><td>HIT</td><td>206</td><td>179</td><td>39.8</td><td>49.2</td></tr><tr><td>EL1</td><td>HIT</td><td>HIT</td><td>2,482</td><td>3,526</td><td>75.0</td><td>51.7</td></tr><tr><td>EL2</td><td><strong>miss</strong></td><td>HIT</td><td>882</td><td>1,312</td><td>82.1</td><td>20.1</td></tr><tr><td>EL3</td><td>HIT</td><td>HIT</td><td>6,535</td><td>1,750</td><td>65.5</td><td>76.0</td></tr><tr><td>PC1</td><td>HIT</td><td>HIT</td><td>20,434</td><td>1,309</td><td>68.7</td><td>48.8</td></tr><tr><td>PC2</td><td>HIT</td><td>HIT</td><td>19,372</td><td>2,086</td><td>46.0</td><td>74.8</td></tr><tr><td>PC3</td><td>HIT</td><td>HIT</td><td>9,933</td><td>2,118</td><td>50.3</td><td>75.0</td></tr><tr><td>MD1</td><td>HIT</td><td><strong>miss</strong> (adjudicated ✔)</td><td>14,364</td><td>446</td><td>82.5</td><td>108.5</td></tr><tr><td>MD2</td><td>HIT</td><td>HIT</td><td>3,684</td><td>1,506</td><td>78.9</td><td>97.7</td></tr><tr><td>PV1</td><td>HIT</td><td><strong>miss</strong> (adjudicated ✔)</td><td>24,017</td><td>1,053</td><td>105.9</td><td>81.1</td></tr><tr><td>OS1</td><td>abstain ✔</td><td>abstain ✔</td><td>2</td><td>2</td><td>49.3</td><td>16.5</td></tr><tr><td><strong>Recall</strong></td><td><strong>11/12</strong></td><td><strong>10/12 mech · 12/12 adj</strong></td><td><strong>102,060</strong></td><td><strong>15,354</strong></td><td>med 74</td><td>med 75</td></tr></tbody></table>
+<p>Latency is a wash — median 74ms vs 75ms, single warm runs, spike-grade.</p>
+<h2 id="el2"><span class="dd-margin-tag" aria-hidden="true">el2</span>2. The persona&#x27;s one miss — and why it was not adjudicated up</h2>
+<p><strong>EL2 (&quot;What does the ctmcreate utility do?&quot;) is the informative failure.</strong> The persona&#x27;s query found the <em>right chunk</em> — the general-parameters chunk whose text defines <code>ctmcreate</code> — and then handed over <code>left(c.text, 600)</code> as the excerpt. The term first appears at <strong>character 891</strong>. The persona located the answer and truncated it out of the context it returned; a downstream answerer reading the persona&#x27;s output could not answer the question.</p>
+<p>The original hand-written query used a <strong>1,200-character window</strong> on the same chunk family, comfortably past 891. That is not a coincidence and it is not cheating — it is what a stand-in author does without noticing: <strong>sizes the window to where the answer is, because they know where the answer is.</strong> The persona did not know, chose 600, and lost the answer. This single question is the caveat made concrete.</p>
+<p><strong>Adjudication considered and DECLINED, recorded per the P0 discipline.</strong> The original run&#x27;s two adjudications (MD1, PV1) corrected a <em>scorer artifact</em>: the hand-written queries returned correct answers — document lists, counts — whose output columns did not echo the marker literal. The content handed to an answerer was sufficient; the regex was looking in the wrong place. EL2 is the opposite class: the context handed to an answerer is genuinely missing the answer. Scoring it up would erase exactly the persona behavior this run exists to measure. Mechanical 11/12 stands.</p>
+<p>There is a symmetric footnote on the other side of the table: the persona &quot;won&quot; MD1 and PV1 mechanically by returning enormous windows (14k and 24k chars) that happened to contain the marker literal. Breadth rescued the regex there the same way narrowness killed it on EL2. Recall numbers this close are best read as <em>equal, with different failure surfaces</em> — which is precisely the answer to the SME&#x27;s question.</p>
+<h2 id="gotchas"><span class="dd-margin-tag" aria-hidden="true">gotchas</span>3. The motivating gotchas, now with a number</h2>
+<p>Two observations prompted Q19, and the run reproduces both mechanisms:</p>
+<ul><li><strong>The Idea-128 GitNexus lesson</strong> — a tool claimed epistemic <code>exact</code> with <code>impactedCount=1</code> while a plain grep found call sites it missed: <em>success-shaped output with the substance absent.</em> EL2 is that lesson in retrieval form. The persona&#x27;s answer for EL2 <em>looks</em> complete — one row, the right document, a clean excerpt — and the substance (the <code>ctmcreate</code> definition) is not in it. Nothing in the output&#x27;s shape distinguishes it from a correct retrieval; only the ground-truth check catches it.</li><li><strong>The SME&#x27;s persona misses</strong> — <em>&quot;our own personas are not getting that close.&quot;</em> The measured answer: on recall the personas ARE that close (11/12 vs 10/12 mechanical, on the friendliest corpus we have — small, clean, single-vendor). The practical gap that reads as &quot;missing&quot; in daily use is the other two columns: 6.6× context volume (an answer buried in 20k chars of near-miss chunks reads as a miss to a human skimming it) and the EL2 class, where the retrieval is right and the handed-over context still lacks the answer.</li></ul>
+<h2 id="method"><span class="dd-margin-tag" aria-hidden="true">method</span>4. Method, exactly</h2>
+<ul><li><strong>Corpus:</strong> <code>bmc-docs</code> — 27 documents / 374 chunks, the id deliberately retained at the 2026-08-18 corpus-id rename so the P0 record stays citable. Same corpus, same 12 questions, same markers.</li><li><strong>Persona (acceptance a):</strong> a Sonnet subagent in a <em>fresh context</em> — it never saw the hand-written Cypher, the markers, or this repo (0 tool uses in its transcript). Input: the live schema (labels, properties, relationships, pulled from the database that morning) and the 12 question texts. Output: one read-only Cypher per question, committed verbatim as <code>persona_queries.json</code>.</li><li><strong>Grading (acceptance b):</strong> mechanical — <code>benchmark_p0_persona.py</code> executes each query inside <code>execute_read</code> (a write attempt fails rather than writes) and applies the original regexes unchanged. OS1 scores correct on abstention (empty result). No human judge; the one adjudication candidate is recorded and declined in §2, not applied.</li><li><strong>Venue (J18):</strong> desktop, Neo4j 5.26.27, database <code>drydocs</code>. Single warm runs; latency is spike-grade, not a load test.</li><li><strong>Scope fences (acceptance e):</strong> this is a throwaway spike beside the original, not a harness — O31 remains open and unblocked by this run, and <code>GRADES.md</code>&#x27;s re-run prerequisite belongs to the graph-vs-files code-graph experiment, untouched here.</li></ul>
+<h2 id="verdict"><span class="dd-margin-tag" aria-hidden="true">verdict</span>5. What this changes</h2>
+<p>The P0 verdict — build docmeta, bet on traversal — <strong>survives, with its second headline revised</strong>. Traversal&#x27;s recall advantage is real and persona-robust. Traversal&#x27;s token advantage is not free: it was partly an artifact of author-written queries, and a real persona spends a large fraction of it on breadth. Anyone quoting &quot;~27× token efficiency&quot; should quote it as the <em>hand-written ceiling</em>, with ~4× less as the measured persona floor on this corpus — and anyone building the answering side should assume the EL2 class exists: retrieval that is right, context that is wrong, and output whose shape cannot tell you.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>graph-retrieval-benchmark-persona-rerun-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<script>
+
+(function(){
+  var DOC="graph-retrieval-benchmark-persona-rerun", FILE="graph-retrieval-benchmark-persona-rerun-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

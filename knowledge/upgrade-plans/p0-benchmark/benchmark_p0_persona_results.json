@@ -1,0 +1,242 @@
+[
+ {
+  "id": "SA1",
+  "cypher": "MATCH (d:Document) WITH count(d) AS totalDocs MATCH (c:Chunk)-[:PART_OF]->(d2:Document) WITH totalDocs, d2, sum(c.char_count) AS totalChars, count(c) AS chunkCount ORDER BY totalChars DESC LIMIT 1 RETURN totalDocs, d2.doc_id AS topDoc, d2.title AS topTitle, chunkCount, totalChars",
+  "note": "Count all Document nodes, then aggregate char_count per document via PART_OF chunks to find the largest by total content.",
+  "error": null,
+  "rows": 1,
+  "ms": 70.0,
+  "chars": 149,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"totalDocs\": 27, \"topDoc\": \"controlm-variables\", \"topTitle\": \"Control-M Variables - Vendor Specifications\", \"chunkCount\": 16, \"totalChars\": 20842}]",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 67,
+   "original_ms": 110.4,
+   "chars_delta": 82,
+   "ms_delta": -40.4
+  }
+ },
+ {
+  "id": "SA2",
+  "cypher": "MATCH (c:Chunk) RETURN c.provenance AS provenance, count(c) AS chunkCount, sum(c.char_count) AS totalChars ORDER BY totalChars DESC",
+  "note": "Group all chunks by their provenance property (e.g. SYNTHESIZED vs vendor-grounded) and sum char_count to show corpus proportion.",
+  "error": null,
+  "rows": 3,
+  "ms": 3.8,
+  "chars": 206,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"provenance\": \"GROUNDED\", \"chunkCount\": 257, \"totalChars\": 194516}, {\"provenance\": \"SYNTHESIZED\", \"chunkCount\": 115, \"totalChars\": 100310}, {\"provenance\": \"VERBATIM\", \"chunkCount\": 2, \"totalChars\": 7597}]",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 179,
+   "original_ms": 49.2,
+   "chars_delta": 27,
+   "ms_delta": -45.4
+  }
+ },
+ {
+  "id": "EL1",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE c.text CONTAINS '%%LIBMEMSYM' OR c.heading CONTAINS '%%LIBMEMSYM' OR c.text CONTAINS 'LIBMEMSYM' RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 20",
+  "note": "Literal substring search for the LIBMEMSYM token across chunk text and headings, since it looks like a Control-M %% variable.",
+  "error": null,
+  "rows": 3,
+  "ms": 4.0,
+  "chars": 2482,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-variables\", \"d.title\": \"Control-M Variables - Vendor Specifications\", \"c.chunk_id\": \"controlm-variables#002\", \"c.heading\": \"✅ Authoritative Corrections — Classic Parameter Reference (2026-06-11)\", \"c.seq\": 2, \"excerpt\": \"## ✅ Authoritative Corrections — Classic Parameter Refe",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 3526,
+   "original_ms": 51.7,
+   "chars_delta": -1044,
+   "ms_delta": -47.7
+  }
+ },
+ {
+  "id": "EL2",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE toLower(c.text) CONTAINS 'ctmcreate' OR toLower(c.heading) CONTAINS 'ctmcreate' RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 20",
+  "note": "Case-insensitive search for the ctmcreate utility name in chunk text/headings.",
+  "error": null,
+  "rows": 1,
+  "ms": 4.9,
+  "chars": 882,
+  "marker_found": false,
+  "empty": false,
+  "correct": false,
+  "sample": "[{\"d.doc_id\": \"controlm-general-parameters\", \"d.title\": \"Control-M General Parameters — Job Name · Folder Name · Priority · Description (Classic Parameter Reference)\", \"c.chunk_id\": \"controlm-general-parameters#002\", \"c.heading\": \"Job Name\", \"c.seq\": 2, \"excerpt\": \"## Job Name\\n\\n> Defines the name ",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 1312,
+   "original_ms": 20.1,
+   "chars_delta": -430,
+   "ms_delta": -15.2
+  }
+ },
+ {
+  "id": "EL3",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE c.text CONTAINS 'ODAT' OR c.heading CONTAINS 'ODAT' RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 20",
+  "note": "Literal (case-sensitive, since ODAT is an acronym) substring search for ODAT in chunk text/headings.",
+  "error": null,
+  "rows": 8,
+  "ms": 4.2,
+  "chars": 6535,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-api-job-properties\", \"d.title\": \"Control-M Job Properties API - Code Reference\", \"c.chunk_id\": \"controlm-api-job-properties#012\", \"c.heading\": \"Variable System\", \"c.seq\": 12, \"excerpt\": \"## Variable System\\n\\n### Variable Definition Levels\\n\\n#### Job-Level Variables\\n\\n```js",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 1750,
+   "original_ms": 76.0,
+   "chars_delta": 4785,
+   "ms_delta": -71.8
+  }
+ },
+ {
+  "id": "PC1",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE toLower(c.text) CONTAINS 'condition' AND (toLower(c.text) CONTAINS 'wait' OR toLower(c.text) CONTAINS 'predecessor' OR toLower(c.text) CONTAINS 'depend') RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 25",
+  "note": "Search chunks mentioning job conditions plus wait/predecessor/dependency terms, the typical Control-M job-dependency mechanism.",
+  "error": null,
+  "rows": 25,
+  "ms": 5.6,
+  "chars": 20434,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-api-job-properties\", \"d.title\": \"Control-M Job Properties API - Code Reference\", \"c.chunk_id\": \"controlm-api-job-properties#002\", \"c.heading\": \"📑 Provenance Classification\", \"c.seq\": 2, \"excerpt\": \"## 📑 Provenance Classification\\n\\nProduced by WebFetch of one BMC page + Claud",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 1309,
+   "original_ms": 48.8,
+   "chars_delta": 19125,
+   "ms_delta": -43.2
+  }
+ },
+ {
+  "id": "PC2",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE toLower(c.text) CONTAINS 'file' AND (toLower(c.text) CONTAINS 'trigger' OR toLower(c.text) CONTAINS 'watch' OR toLower(c.text) CONTAINS 'arrival') RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 25",
+  "note": "Search for file-arrival triggering concepts (file watcher/trigger/arrival) combined with 'file' to find job-triggering-by-file docs.",
+  "error": null,
+  "rows": 25,
+  "ms": 5.4,
+  "chars": 19372,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-api-connection-profiles\", \"d.title\": \"Control-M Connection Profiles - Code Reference\", \"c.chunk_id\": \"controlm-api-connection-profiles#005\", \"c.heading\": \"Container Orchestration Profiles\", \"c.seq\": 5, \"excerpt\": \"## Container Orchestration Profiles\\n\\n### 1. AWS ECS (Elastic",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 2086,
+   "original_ms": 74.8,
+   "chars_delta": 17286,
+   "ms_delta": -69.4
+  }
+ },
+ {
+  "id": "PC3",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE toLower(c.text) CONTAINS 'holiday' RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 25",
+  "note": "Direct substring search for 'holiday' to surface calendar/holiday-exclusion scheduling chunks.",
+  "error": null,
+  "rows": 12,
+  "ms": 4.7,
+  "chars": 9933,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-calendars\", \"d.title\": \"Control-M Calendars - Vendor Specifications\", \"c.chunk_id\": \"controlm-calendars#003\", \"c.heading\": \"Calendar Definition and Purpose\", \"c.seq\": 3, \"excerpt\": \"## Calendar Definition and Purpose\\n\\nControl-M calendars are \\\"user-defined timetables, which",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 2118,
+   "original_ms": 75.0,
+   "chars_delta": 7815,
+   "ms_delta": -70.3
+  }
+ },
+ {
+  "id": "MD1",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE toLower(c.text) CONTAINS 'pool' AND toLower(c.text) CONTAINS 'variable' RETURN DISTINCT d.doc_id, d.title, d.purpose, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 25",
+  "note": "Find chunks mentioning both 'pool' and 'variable' to surface docs covering pool variables and their relation to %% user variables.",
+  "error": null,
+  "rows": 16,
+  "ms": 5.2,
+  "chars": 14364,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-api-job-properties\", \"d.title\": \"Control-M Job Properties API - Code Reference\", \"d.purpose\": \"Job object structure, JSON properties, and API integration reference\", \"c.chunk_id\": \"controlm-api-job-properties#002\", \"c.heading\": \"📑 Provenance Classification\", \"c.seq\": 2, \"exce",
+  "delta_vs_original_traversal": {
+   "original_marker_found": false,
+   "original_chars": 446,
+   "original_ms": 108.5,
+   "chars_delta": 13918,
+   "ms_delta": -103.3
+  }
+ },
+ {
+  "id": "MD2",
+  "cypher": "MATCH (d:Document) WITH collect(DISTINCT d.target_version) AS versions, collect(DISTINCT d.subject_product_id) AS products MATCH (c:Chunk)-[:PART_OF]->(d2:Document) WHERE toLower(c.text) CONTAINS 'automation api' AND (toLower(c.text) CONTAINS 'compat' OR toLower(c.text) CONTAINS 'version') RETURN versions, products, d2.doc_id, d2.title, d2.target_version, c.chunk_id, c.heading, left(c.text, 600) AS excerpt ORDER BY d2.doc_id, c.seq LIMIT 25",
+  "note": "Collect distinct target_version/subject_product_id across all documents, then find chunks discussing Automation API compatibility.",
+  "error": null,
+  "rows": 4,
+  "ms": 4.5,
+  "chars": 3684,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"versions\": [\"9.0.21.300\"], \"products\": [\"controlm\"], \"d2.doc_id\": \"controlm-api-installation\", \"d2.title\": \"Control-M Automation API Installation - Vendor Specifications\", \"d2.target_version\": \"9.0.21.300\", \"c.chunk_id\": \"controlm-api-installation#000\", \"c.heading\": \"(preamble)\", \"excerpt\": \"# Co",
+  "delta_vs_original_traversal": {
+   "original_marker_found": true,
+   "original_chars": 1506,
+   "original_ms": 97.7,
+   "chars_delta": 2178,
+   "ms_delta": -93.2
+  }
+ },
+ {
+  "id": "PV1",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE (toLower(d.title) CONTAINS 'api' OR toLower(d.path) CONTAINS 'api') AND toLower(c.text) CONTAINS 'json' AND toLower(c.text) CONTAINS 'job' RETURN d.doc_id, d.title, d.trust_default, d.classification, d.source, c.chunk_id, c.heading, c.provenance, c.tier_rule, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 25",
+  "note": "Find JSON job-definition example chunks within API-titled/pathed documents and surface their provenance/tier_rule and document trust_default/classification/source to judge vendor-groundedness.",
+  "error": null,
+  "rows": 25,
+  "ms": 3.9,
+  "chars": 24017,
+  "marker_found": true,
+  "empty": false,
+  "correct": true,
+  "sample": "[{\"d.doc_id\": \"controlm-api-connection-profiles\", \"d.title\": \"Control-M Connection Profiles - Code Reference\", \"d.trust_default\": \"GROUNDED\", \"d.classification\": \"External\", \"d.source\": \"markdown\", \"c.chunk_id\": \"controlm-api-connection-profiles#002\", \"c.heading\": \"📑 Provenance Classification\", \"c.p",
+  "delta_vs_original_traversal": {
+   "original_marker_found": false,
+   "original_chars": 1053,
+   "original_ms": 81.1,
+   "chars_delta": 22964,
+   "ms_delta": -77.2
+  }
+ },
+ {
+  "id": "OS1",
+  "cypher": "MATCH (c:Chunk)-[:PART_OF]->(d:Document) WHERE toLower(c.text) CONTAINS 'autosys' AND toLower(c.text) CONTAINS 'global variable' RETURN d.doc_id, d.title, c.chunk_id, c.heading, c.seq, left(c.text, 600) AS excerpt ORDER BY d.doc_id, c.seq LIMIT 25",
+  "note": "Search for AutoSys global variable chunks; if the corpus is Control-M-only this will likely return empty, which is itself informative.",
+  "error": null,
+  "rows": 0,
+  "ms": 4.5,
+  "chars": 2,
+  "marker_found": null,
+  "empty": true,
+  "correct": true,
+  "sample": "[]",
+  "delta_vs_original_traversal": {
+   "original_marker_found": null,
+   "original_chars": 2,
+   "original_ms": 16.5,
+   "chars_delta": 0,
+   "ms_delta": -12.0
+  }
+ }
+]
