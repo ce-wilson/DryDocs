@@ -3767,3 +3767,62 @@ never edit the prompt).
   fragment and node-classification notes. ALL THREE infra_ entries stay
   status: planned — the flips belong to the Z3 build (N13: flips are
   follow-ups). The dataset stays confirmed: false until Z3.
+
+## 2026-08-19 — RECORD: FID gate round 1 — census classes ruled, Q5 answered, the case fence corrected (K17; gate `fid-identity-and-scope`, still UNSIGNED)
+
+- **Venue and evidence (J18).** The SME ran doc 09's five Session SQL queries
+  (S1–S5, committed at `8ae771de`) on the replica where it lives and brought the
+  results to the session as captures. The captures carry real account names and
+  scheduling-DC codes, so they stay machine-local (repo-root, ignore-covered,
+  never committed); this record is counts and shapes only. Population measured:
+  **2,003 distinct owner values, 518,744 current-version jobs in
+  actively-scheduled folders** (S5's two rows sum to the whole). The SME notes
+  the estate concentrates on 3–4 scheduling data centers — the Control-M
+  server dimension, which per the server-location gate's §B4 fence never joins
+  physical geography.
+- **RULED — §D2 amendment: non-account owner values become named census
+  classes,** outside the directory-join denominator: null/inherited (8,501
+  jobs / 7,297 folders / 810 app codes — owner unset at job grain),
+  folder-header rows (the 63 SMART Table entries — excluded entirely, a folder
+  header does not execute), variable-deferred (a profile variable as the owner
+  value, 1,232 jobs), template placeholders, and the connection-profile
+  placeholder class below. Counted, reported, never joined.
+- **ANSWERED — Q5, YES: personal-shaped ids run jobs.** 143 personal-id-shaped
+  owners / 11,948 jobs (2.3%); one SID-shaped owner alone carries 8,411 jobs on
+  a single application code (recorded as a §G4-style report candidate).
+  Consequence confirmed: the directory type column is never a pull filter, only
+  the §D2 breakdown lens. SME kept the triage regex as-is — domain-prefixed and
+  machine-account forms stay in the service bucket; the real answer joins the
+  directory type column at census time.
+- **CORRECTED (evidence) — the ALL-UPPER fence.** OWNER is mixed-case at rest
+  estate-wide; the recorded 2026-08-12 Q6 half conflated the normalization PLAN
+  (SME this session: "force everything to upper ... to make sure joins work")
+  with the storage state. The consequence lands on the build: the `--run-as`
+  bind's unconditional upper-case against an exact-match predicate now CAUSES
+  the silent-zero-rows trap for every lower-stored owner — fix rides K16, not
+  this gate. The precise join clause (raw retained, upper join key, fold counts
+  reported) is restated for tick in round 2; the stale fence's eight committed
+  surfaces sweep with that tick.
+- **SME DIRECTION (recorded; class ruling restated for tick in round 2) — the
+  top-1 owner value is the Connection Profile placeholder.** 62,936 jobs (12%
+  of the estate), 698 application codes, ~11–12 jobs per code — a stamped
+  uniform spread. Per the SME: the value comes from the Connection Profile form
+  bound to plugin job types (APPL_TYPE families; estate example K8SEPV), where
+  identity is the profile's vault-managed credential and OWNER carries no
+  account — corroborated by the BMC corpus (connection profiles = centralized
+  credential management; `controlm-api-connection-profiles.md`). APPL_TYPE is
+  the classification axis (FileWatch = watchers, OS = command), which also
+  redirects K25's detection off TASK_TYPE. Build note: `controlm_jobs.sql` does
+  not project APPL_TYPE today — only the variables extract does; the projection
+  change rides K25/K16.
+- **HOMEWORK handed to the SME (counts only, replica-side, same WHERE clause):**
+  (a) global `GROUP BY TASK_TYPE` census — does a watcher type exist at that
+  column at all; (b) the null-owner bucket cut by TASK_TYPE — tests the
+  folder-inheritance hypothesis; (c) `GROUP BY UPPER(OWNER) HAVING
+  COUNT(DISTINCT OWNER) > 1` — whether 2,003 owners double-counts casings of
+  one account.
+- **SCOPE FENCE for the session:** S4 supplies only the Control-M half of the
+  §Q0/§G5 disagreement census; the directory half does not exist yet, so the
+  designed-vs-stale ratio CANNOT be ruled this session — pending, with the
+  Control-M numbers stated. Also fixed: the page carried two questions numbered
+  Q6; the roll-up question is renumbered Q8.
