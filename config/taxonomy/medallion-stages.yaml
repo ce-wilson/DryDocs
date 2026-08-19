@@ -1,0 +1,86 @@
+# =============================================================================
+# config/taxonomy/medallion-stages.yaml — the medallion stage vocabulary.
+#
+# CONFIRMED at the medallion-stage-vocabulary gate (2026-08-19, 6/6;
+# config/gate-log.md — backlog B5). Pure classification, the Epic B idiom: no
+# meaning edges, nothing loads this file, and NO dataset/job stage-attribution
+# edge exists anywhere — not even planned — until its own gate (ruling C1).
+#
+# THE STRUCTURE IS THE POINT (ruling A2 — "not four of a kind"): RAW/TRUSTED/
+# REFINED are S3 zone PREFIXES (one bucket, zone prefixes; each hop its own DPL
+# pipeline — the Idea-20 trace), while PROVISIONED is a stage with NO prefix: a
+# DB-load into a consumption target. A flat enum would misrepresent the last
+# stage, which is why zone_prefix is a per-stage field rather than implied.
+#
+# THE C25 FENCE RIDES THE CAPTURE (ruling A3): no platform, warehouse or
+# target-DB name may ever occupy a stage slot. The pre-correction set ended in
+# SNOWFLAKE — a consumption TARGET promoted into a STAGE slot, the same error
+# class C25 called on 'Snowflake ETL' (2026-08-09 SME correction; PROVISIONED
+# is the stage, Snowflake is one of several targets a Provision pipeline can
+# write to). A consumption target is a property of a provision hop at load
+# time, never a stage.
+#
+# ONE VOCABULARY, PLATFORM-SCOPED ZONES (ruling B1): the estate has ONE stage
+# vocabulary — the four stages below. Zone names are platform-local SPELLINGS
+# that map into stages (zones are physical residency; stages are logical).
+# The on-prem set (conformed / semantic / analytic) was observed in the
+# 2026-08-09 vendor-doc read; only `conformed` has an in-repo mapping basis
+# (the legacy dataset_flow FILE->CONFORMED ≈ the RAW->TRUSTED hop, Idea-20),
+# so the other two rows carry stage: ~ until evidence lands — captured
+# faithfully, never improved (the taxonomy import rule).
+#
+# FCDO's Raw / Conformed-Silver / Consumable-Gold framing
+# (internal/fcdo-reference/) is a THIRD, external vocabulary — crosswalk
+# context only, deliberately NOT rows here (ruling B2).
+#
+# SOURCE BOUNDARY: mechanism only. Sites, URLs, bucket names, GUIDs and every
+# company identifier stay company-side (PUBLISH-BOUNDARY.md).
+#
+# UI half: O38 (stage names render identically everywhere in the console).
+# =============================================================================
+
+schema: drydocs.medallion-stages.v1
+taxonomy: medallion-stages
+source: dpl                      # the v2 SYSTEM id — the zone model is DPL's
+authority: internal-standards    # config/precedence.yaml
+confirmed: 2026-08-19            # gate medallion-stage-vocabulary, 6/6
+
+stages:
+  - id: RAW
+    seq: 1
+    zone_prefix: raw             # S3 — the ingestion-launcher publish target
+  - id: TRUSTED
+    seq: 2
+    zone_prefix: trusted         # S3 — the RAW->TRUSTED hop is its own DPL pipeline
+  - id: REFINED
+    seq: 3
+    zone_prefix: refined         # S3 — the TRUSTED->REFINED hop is its own DPL pipeline
+  - id: PROVISIONED
+    seq: 4
+    zone_prefix: ~               # NOT a prefix (ruling A2): a DB-load into a
+                                 # consumption target; the target platform is a
+                                 # load-time property elsewhere, never a stage (A3)
+
+# Platform-scoped zone spellings -> stages (ruling B1: one vocabulary; zones
+# are spellings-of, not a second stage set).
+zones:
+  - name: raw
+    platform: s3
+    stage: RAW
+  - name: trusted
+    platform: s3
+    stage: TRUSTED
+  - name: refined
+    platform: s3
+    stage: REFINED
+  - name: conformed
+    platform: on-prem
+    stage: TRUSTED               # evidenced: legacy dataset_flow FILE->CONFORMED
+                                 # ≈ the RAW->TRUSTED hop (Idea-20)
+  - name: semantic
+    platform: on-prem
+    stage: ~                     # UNMAPPED — observed 2026-08-09; no in-repo
+                                 # mapping basis yet. Faithful capture, not a guess.
+  - name: analytic
+    platform: on-prem
+    stage: ~                     # UNMAPPED — same basis as `semantic`

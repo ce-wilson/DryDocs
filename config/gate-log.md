@@ -3626,3 +3626,48 @@ page ruled only the assignment edge. All eight confirmations, no held clauses.
   `docs_email_concerns` stays `status: planned` until the writer build lands
   (Idea-137) — this gate ruled the meaning, it built nothing.
   `email_extracts.cypher` stays test-guarded against ever gaining the write.
+
+
+## 2026-08-19 — GATE: medallion-stage-vocabulary — SIGNED OFF 6/6 (B5)
+
+The Epic B capture gate: the canonical stage set the estate's neighbor tools
+already display, confirmed before any graph attribution can ever cite it. All
+six confirmations (A1-A3, B1-B2, C1), no held clauses.
+
+- **§A1 — THE SET: RAW -> TRUSTED -> REFINED -> PROVISIONED.** The 2026-08-09
+  correction stands as ruled vocabulary: the terminal stage is PROVISIONED,
+  never a platform name. The pre-correction set ended in SNOWFLAKE — a
+  consumption TARGET promoted into a STAGE slot, the C25 error class one level
+  up (Snowflake is one of several targets a Provision pipeline can write to).
+- **§A2 — NOT FOUR OF A KIND, recorded structurally.** RAW/TRUSTED/REFINED are
+  S3 zone PREFIXES (one bucket, zone prefixes; each hop its own DPL pipeline —
+  the Idea-20 trace); PROVISIONED is a stage with NO prefix (a DB-load into a
+  consumption target). The capture carries zone_prefix per stage — present on
+  three, null on the fourth — so a flat enum can never misrepresent the last
+  stage. A flat-enum capture was offered and declined.
+- **§A3 — THE C25 FENCE RIDES THE CAPTURE:** no platform, warehouse or
+  target-DB name may ever occupy a stage slot; a consumption target is a
+  load-time property of a provision hop, never a stage.
+- **§B1 — ONE VOCABULARY, PLATFORM-SCOPED ZONES.** The estate has ONE stage
+  vocabulary; zone names (on-prem AND S3) are platform-local spellings that
+  map into stages — zones are physical residency, stages are logical.
+  Two-vocabularies-plus-crosswalk and evidenced-set-only were both offered and
+  declined. Faithfulness rider on the apply: of the on-prem set
+  (conformed / semantic / analytic, observed at the 2026-08-09 vendor-doc
+  read), only `conformed` has an in-repo mapping basis (legacy dataset_flow
+  FILE->CONFORMED ≈ the RAW->TRUSTED hop, Idea-20) — `semantic` and `analytic`
+  are captured with stage: ~ until evidence lands, per the
+  keep-imports-faithful rule; their mapping is a capture UPDATE when a real
+  artifact arrives, not a re-gate.
+- **§B2 — FCDO IS CONTEXT, NOT ESTATE TRUTH:** the Raw / Conformed-Silver /
+  Consumable-Gold mesh framing (internal/fcdo-reference/) is a third, external
+  vocabulary — crosswalk context only; nothing from it enters the stage set.
+- **§C1 — THE FENCE: NO EDGE, NOT EVEN PLANNED.** This capture declares no
+  dataset/job stage-attribution edge anywhere. When a consumer actually needs
+  stage attribution in the graph, the edge enters the relationship vocabulary
+  as status: planned behind its own gate. Register-planned-now was offered and
+  declined — pure classification today, the ontology decision stays whole for
+  its own gate.
+- **What landed at the apply:** config/taxonomy/medallion-stages.yaml
+  (schema drydocs.medallion-stages.v1; source: dpl; authority:
+  internal-standards). Nothing loads it; the UI half stays O38.

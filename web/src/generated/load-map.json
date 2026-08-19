@@ -258,7 +258,9 @@
       "name": "DPL pipeline/dataset taxonomy registry",
       "layer": "technology",
       "classification": "Internal",
-      "taxonomy_captures": []
+      "taxonomy_captures": [
+        "config/taxonomy/medallion-stages.yaml"
+      ]
     },
     {
       "id": "snowflake",

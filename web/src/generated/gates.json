@@ -1324,6 +1324,17 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "GATE: medallion-stage-vocabulary — SIGNED OFF 6/6 (B5)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/medallion-stage-vocabulary.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3631",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

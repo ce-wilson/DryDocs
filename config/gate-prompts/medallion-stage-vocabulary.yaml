@@ -1,0 +1,72 @@
+# SME gate-prompt spec — the medallion stage vocabulary (backlog B5). GATE-BOUND:
+# this page PROPOSES; the capture in config/taxonomy/ lands only what the SME
+# confirms, and no stage-attribution edge exists anywhere until its own gate.
+#
+# SOURCE BOUNDARY (PUBLISH-BOUNDARY.md): the evidence is company-internal DPL
+# documentation plus two neighbor-tool UIs. Only the stage/zone MECHANISM appears
+# here — the site, its URLs, and every identifier on it stay company-side. The
+# stage and zone NAMES themselves were cleared for the public backlog at the
+# 2026-08-09 re-reference and are reused here on that precedent.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: medallion-stage-vocabulary
+title: "SME Gate — the medallion stage vocabulary: the canonical set, the not-four-of-a-kind structure, and whether the estate has one zone vocabulary or two"
+step: "B5 captures the stage taxonomy in config/taxonomy/ as pure classification (the Epic B idiom); the canonical set needs SME confirmation before any dataset/job stage-attribution edge may ever be declared (planned-only, behind its own gate)"
+summary: >
+  Three rulings. Clause A fixes the canonical stage set (RAW -> TRUSTED ->
+  REFINED -> PROVISIONED) and its structure — three of the four are S3 zone
+  prefixes, the fourth is not a prefix at all, so a flat enum would
+  misrepresent it. Clause B settles the 2026-08-09 finding that there appear
+  to be TWO zone vocabularies (an on-prem set and an off-prem S3 set)
+  converging on a shared provision stage: one vocabulary with platform-scoped
+  zone names, two with a crosswalk, or capture-what-has-evidence. Clause C
+  confirms the fence: this capture declares NO stage-attribution edge — any
+  such edge enters the relationship vocabulary as status: planned behind its
+  own gate.
+meta:
+  Module: "taxonomy (config/taxonomy/, the Epic B capture idiom — no meaning edges)"
+  Source: "the DPL zone model (system id `dpl`, config/source-registry.yaml) · the 2026-07 DPL ingestion-leg trace (IDEAS.md Idea-20, mechanism-only) · internal/datalens-reference/continuity.md DL-11 (both neighbor tools expose the same stage vocabulary) · the 2026-08-09 SME direction with vendor-doc evidence in hand (recorded on B5)"
+  Precedent: "C25 (Snowflake is a TARGET DB PLATFORM, not a product/stage — the error class this vocabulary must fence out) · C12 platforms-taxonomy (a class layer was removed unbuilt; role over class) · the Epic B idiom (taxonomy imports are reversible; ontology edges are not casual)"
+  Registry ref: "system `dpl` (config/source-registry.yaml) is the capture's source: — the zone model is DPL's. Nothing about this page changes any registry flag; the capture is config-only and nothing loads it"
+  Classification: "Internal-Public page, mechanism only — stage/zone names are cleared vocabulary; sites, URLs, bucket names, GUIDs stay company-side"
+  Vocabulary: "NOTHING enters the relationship vocabulary at this gate. A future dataset/job stage-attribution edge enters as status: planned behind its own gate (the B5 acceptance's own condition)"
+  Source of record: "backlog B5 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "The stage a dataset/pipeline hop is in (DataLens pipeline cards; DSI stage KPI row)"
+    target: "config/taxonomy/medallion-stages.yaml — pure classification, one node per stage"
+    edge: "ruling required — clause A the set and its structure"
+  - n: 2
+    element: "The on-prem zone names vs the off-prem S3 zone prefixes"
+    target: "one vocabulary with platform-scoped zone names, two vocabularies with a crosswalk, or the evidenced set only"
+    edge: "ruling required — clause B"
+  - n: 3
+    element: "A dataset/job carrying stage attribution in the graph"
+    target: "NOT AT THIS GATE — a future edge, planned-only behind its own gate"
+    edge: "clause C — confirm the fence"
+
+provenance:
+  - label: "What is captured (pure classification, reversible)"
+    source_object: "config/taxonomy/medallion-stages.yaml (written to match the rulings)"
+    key: "stage id (stable, upper-case as displayed by both neighbor tools)"
+    loader: "NONE — taxonomy capture only; nothing loads this at B5"
+    properties:
+      - name: zone_prefix
+        origin: source
+        from: "the DPL bucket layout (one bucket, zone prefixes; per-zone Glue databases)"
+        note: "present on RAW/TRUSTED/REFINED, ABSENT on PROVISIONED — the structural fact clause A records; Provisioned is a DB-load into a consumption target, not a prefix"
+
+sections:
+  - title: "A. The canonical set and its structure"
+    confirmations:
+      - "A1. THE SET: RAW -> TRUSTED -> REFINED -> PROVISIONED is the estate's canonical stage sequence (the 2026-08-09 correction standing: PROVISIONED, never a platform name — the C25 error class; Snowflake is one of several targets a Provision pipeline can write to)."
+      - "A2. NOT FOUR OF A KIND: RAW/TRUSTED/REFINED are S3 zone PREFIXES (each hop its own DPL pipeline); PROVISIONED is a stage with no prefix. The capture records this structurally (zone_prefix present on three, absent on the fourth), so a flat enum can never misrepresent the last stage."
+      - "A3. THE C25 FENCE RIDES THE CAPTURE: no platform, warehouse or target-DB name may ever occupy a stage slot; a consumption target is recorded as a property of a provision hop (elsewhere, at load time), never as a stage."
+  - title: "B. One zone vocabulary or two"
+    confirmations:
+      - "B1. THE 2026-08-09 FINDING, to rule: an on-prem set (conformed / semantic / analytic) and an off-prem S3 set (trusted / refined) appear to converge on a shared provision stage. Rule the model: (i) ONE estate stage vocabulary, with platform-scoped ZONE names mapping into stages; (ii) TWO vocabularies with a crosswalk; or (iii) capture only the DPL/S3 set now — the on-prem names have no in-repo artifact yet, so they wait for evidence (the Idea-20 clause-(a) parking precedent)."
+      - "B2. CONTEXT, NOT ESTATE TRUTH: the FCDO mesh framing (Raw / Conformed-Silver / Consumable-Gold, internal/fcdo-reference/) is a THIRD external vocabulary. It is crosswalk context only; nothing from it enters the estate's stage set at this gate."
+  - title: "C. The fence — classification now, attribution never by default"
+    confirmations:
+      - "C1. THIS CAPTURE DECLARES NO EDGE: no dataset/job stage-attribution edge exists, not even planned, at B5. When one is wanted it enters the relationship vocabulary as status: planned behind its own gate — the B5 acceptance's own condition, confirmed rather than assumed."
