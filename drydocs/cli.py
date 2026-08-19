@@ -763,9 +763,20 @@ def landing_zones_cmd(
             t.add_row(s.zone.source_id, s.zone.fmt, s.zone.base, str(s.zone.path), state)
         console.print(t)
         console.print(
-            "[dim]absent = never dropped yet (the expected first state, never a defect). "
-            "EMPTY = the folder exists but its contents are gone — that is the wipe "
-            "signature, not a fresh zone.[/]"
+            "[dim]absent = the directory is not there. That is the healthy first state of "
+            "a zone nobody has dropped into yet — AND it is also what a `git clean -fd` "
+            "leaves behind, because -d removes the untracked directory itself. Without a "
+            "baseline the two are indistinguishable here, so absent is never a defect.[/]"
+        )
+        console.print(
+            "[dim]EMPTY = the directory is present and holds nothing. That is the narrower "
+            "signature — a selective delete, a half-finished restore — and --check exits 1 "
+            "on it.[/]"
+        )
+        console.print(
+            "[dim]Detection is the weaker half. What prevents the loss is location: "
+            "data_root zones sit outside the tree where no clean can reach them, and repo "
+            "zones hold TRACKED files, which no clean removes at any strength.[/]"
         )
 
     # A zone INSIDE the tree is a standing defect regardless of --check: it is

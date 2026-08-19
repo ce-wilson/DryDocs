@@ -562,16 +562,23 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   - **Run `drydocs landing-zones --check` before AND after any port step that touches
     the working tree.** It resolves every `acquisition.mode: manual` row in
     `config/source-registry.yaml` and reports what is actually in each zone. `absent`
-    is the healthy first state of a source nobody has dropped into yet; **`EMPTY` — the
-    folder present, its contents gone — is the wipe signature**, and `--check` exits 1
-    on it. That is the difference between noticing at the next load and noticing now.
+    is the healthy first state of a source nobody has dropped into yet — **and, stated
+    plainly because the first draft of this bullet got it wrong, it is ALSO what a
+    `git clean -fd` leaves behind**: `-d` removes the untracked directory itself, so a
+    swept zone and a never-used zone look identical without a baseline. `--check` does
+    not fail on `absent` for that reason. **`EMPTY` — the folder present, its contents
+    gone — is the narrower signature** (a selective delete, a half-finished restore),
+    and `--check` exits 1 on it. So treat the doctor as the weaker half of this control:
+    it catches the partial case now instead of at the next load, and the bullet below is
+    what actually removes the broad one.
   - **The real fix is location, and it is declared:** `acquisition.drop_dir_base`
     states whether a zone is rooted at `DRYDOCS_DATA_ROOT` (outside the tree, where no
     git operation of any strength can reach it) or at the repo (permitted only when the
     contents are TRACKED artifacts, which survive every clean).
     `tests/unit/test_landing_zones.py` enforces both halves, so a new manual source
     cannot quietly declare an untracked in-tree corpus as its landing zone.
-  - **Company-side action if a zone reads `EMPTY`:** the payload is not in the reflog and
+  - **Company-side action if a zone reads `EMPTY`, or reads `absent` where you know you
+    dropped files:** the payload is not in the reflog and
     `git clean` writes no log. Re-export from the source system, or recover from the
     internal twin — then re-run `--check` to confirm the zone is green before loading.
 - **`config/loader-source-overlay.yaml` (NEW at N9, 2026-07-31): canonical-PER-SIDE by
