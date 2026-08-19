@@ -2529,7 +2529,7 @@ items:
     agent: main
     model: fable
     priority: p1
-    status: todo
+    status: in_progress                 # 2026-08-19 (laptop): SME-directed pickup with the session numbers IN HAND -- the S1-S5 psgmgr runs (8ae771de's Session SQL) came back as captures; the walk starts from the evidence sections (SS D/G, Q0/Q5/Q6). K16 stays in_progress in parallel: its census BUILD is not this item's blocker once the raw counts exist, and the SME directed the pickup.
     depends_on: [K16]
     inputs: [config/gate-prompts/fid-identity-and-scope.yaml, docs/restructure/09-fid-identity-and-scope.md, config/gate-log.md, drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml]  # path corrected at the 2026-08-19 groom -- the seal domain was renamed business_application
     acceptance: >
