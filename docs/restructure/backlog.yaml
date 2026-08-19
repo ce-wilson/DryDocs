@@ -18045,6 +18045,7 @@ items:
       base/content owner? The illustrative rows suggest the latter, which is exactly the
       defect this item was written to look for -- arriving on a different field than the
       one it was aimed at.
+    notes: >
       Groomed 2026-08-11 from Idea-102's separate thread. The SME called KB articles at
       deployment grain "more meaningful", and a documented fix attached to the deployment
       that has the incident is squarely what a production-support knowledge graph is for --
@@ -18087,8 +18088,39 @@ items:
       DIRECTION OF TRAVEL: this evidence points at "leave the kb_* family in ring 3, with
       the reason recorded" rather than at promotion. The item is NOT closed by it -- the
       acceptance puts the verdict in
-      knowledge/upgrade-plans/servicenow-replica-evidence.md beside Q8/Q9, and that
-      write-up has not been done.
+      knowledge/upgrade-plans/servicenow-replica-evidence.md beside Q8/Q9.
+      VERDICT RECORDED 2026-08-19 as evidence-doc section 11 -- 11.1 why the
+      ASSERTED-vs-DEFAULTED question dissolved, 11.2 what the export does carry, 11.3 the
+      recommendation, 11.4 the surviving use case. Section 7.4's NOT-TAKEN row now points
+      at it, so a reader of the pull scope meets the ruling rather than the deferral.
+      RECOMMENDATION: leave the kb_* family OUT as an attribution source, with the REASON
+      recorded rather than the deferral -- routed to the gate that rules pull scope, not
+      enacted here. Nothing activated: no registry row, no loader, no edge.
+      K23 STAYS OPEN AND ITS SCOPE HAS MOVED (user direction 2026-08-19). The attribution
+      question is answered; what remains is the named use case that keeps the family alive.
+      THE REMEDIATION MODULE searches the existing KB for articles covering the same defect,
+      DOWNLOADS them for reference and archiving, and only then authors a new article. That
+      consumer is untouched by everything the profile found: it wants the article as a
+      DOCUMENT to find, read, cite and retain, not as a node to attach to an application,
+      and the KB SQL that already exists matches on short_description with a body-text
+      fallback while ignoring the SEAL columns entirely. So the 0-of-200 finding does not
+      reach it, the owning-vs-subject caveat does not reach it, and 44% coverage stops being
+      a blocker because the denominator is articles that MATCH THE DEFECT, not articles that
+      carry a key.
+      WHAT THIS ITEM NOW OWES, per section 11.4, none of it settled: the READ PATH (the
+      Snowflake view vs the ServiceNow API vs an offline export -- different freshness and
+      permission consequences); WHERE A DOWNLOADED ARTICLE LANDS, which is a publish-boundary
+      question with a ready answer -- a KB body is company prose, so it belongs in the
+      out-of-repo data root as a DECLARED landing zone (drydocs_core/landing_zones.py) rather
+      than an ad-hoc download directory; whether the archived copy is a CITATION (a
+      convenience) or a SOURCE a fix package quotes (evidence, carrying a retention
+      obligation -- the different ruling, and the one with consequences); and the DUPLICATE
+      TEST, since "search before authoring" implies a bar for "already covered" that a LIKE
+      pattern over short_description is a weak instrument for.
+      MODULE NOTE: the work has moved out of taxonomy and into drydocs-remediation (detect ->
+      transform -> prove -> Jira, ADR 0002-B). Left at module: taxonomy for now because
+      re-homing an item is a groom decision, not a side effect of recording a verdict --
+      flagged here so the next groom moves it deliberately.
 
   - id: K24
     epic: seal-attribution

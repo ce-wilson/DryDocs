@@ -774,7 +774,7 @@ application list we already have**, not ingestion of a CMDB.
 | **One hop out** | `cmdb_ci_service_discovered` for seeded apps | ~200 × deployments each | The deployment modules `[Instance of]` a seeded application (§1.3(c): 1:N) |
 | **Edges** | `cmdb_rel_ci` **restricted to both endpoints in the seeded set** | small | Never the whole edge table |
 | **Attribution** | the TOM tables + `sys_user_group` + `core_company`, for seeded apps | — | What G35 needs; unchanged from §3.6 ring 2 except that it too is seed-scoped |
-| **NOT taken** | `cmdb_ci` as a table; the other ~14,480 business applications; the cloud/infrastructure classes; the `kb_*`, `cmn_*`, rota and SLA families | 21.6M | Out by SME ruling. Individual classes can be added later against a named use case |
+| **NOT taken** | `cmdb_ci` as a table; the other ~14,480 business applications; the cloud/infrastructure classes; the `kb_*`, `cmn_*`, rota and SLA families | 21.6M | Out by SME ruling. Individual classes can be added later against a named use case. **The kb_* family now HAS one, and a verdict with it — see §11: out as ATTRIBUTION (the designed columns are 0-of-200 filled), alive as remediation REFERENCE/ARCHIVE, which is a read rather than a pull.** |
 
 **The scope has now collapsed by roughly four orders of magnitude** from §3.6's ring 1 — 21.6M CI
 rows to a low-thousands node set — and each step was a fact rather than a preference: the CI table's
@@ -1253,3 +1253,134 @@ role, not something derived from a group name.
 **This is flagged rather than ruled**, because it changes what G70 seeds. It does not reopen the
 gate: G16 is OPTIONAL either way, and nothing else in the register moves. See the open question in
 the gate-log amendment note.
+
+---
+
+## 11. The `kb_*` verdict (K23, 2026-08-19) — the attribution case fails, the retrieval case survives
+
+**This is the recorded verdict backlog K23 asks for.** It sits here rather than in the backlog
+because §3.6 put the `kb_*` family in ring 3 and §7.4 moved it to NOT TAKEN with the standing
+condition *"individual classes can be added later against a named use case."* This section answers
+whether attribution is that use case (it is not), and records the one that is.
+
+**Venue, stated first (J18).** The evidence is an export profile the SME ran **on their own
+machine** against a dated CSV extract of the ServiceNow KB view. The file is **not in this tree**
+and none of these numbers were re-derived producer-side. Everything below is a shape: the view's
+real database and schema, every SEAL id value, the KB article numbers, the content-owner SID and
+the support-group names stay out of this repo per `PUBLISH-BOUNDARY.md`. In registry grammar the
+object is `snow@[db].[schema].v_kb_knowledge`.
+
+### 11.1 The question K23 asked, and why it dissolved
+
+K23 asked whether the KB-article-to-Deployment-Module link is **ASSERTED** by an author or
+**DEFAULTED** by the form — the §3.2 defect, applied to a new family. The profile makes the
+dichotomy moot, because there is no link of either kind:
+
+| Purpose-built column | Filled |
+|---|---|
+| `u_seal_id` | **0 / 200** |
+| `u_do_you_have_seal_id` | **0 / 200** |
+| `u_business_application` | **0 / 200** |
+| `u_product_owner` | **0 / 200** |
+| `u_assignment_group` | **0 / 200** |
+
+An empty field is neither asserted nor defaulted. **§3.2's caution generalises one step further
+than it was written:** a `u_` column existing does not mean it carries data — and here, five of
+them exist, are named exactly for this purpose, and carry nothing at all.
+
+**Deployment grain is not merely unevidenced; this export cannot express it.** §6 Q7 established
+the capture rule: a Deployment Module link surfaces as the composite `app:deployment` name, or as
+the CI id. Every populated value in this export is a **bare application id with no deployment
+segment**. So the SME's *"KB articles at deployment grain are more meaningful"* premise — the
+statement that earned K23 its own item — has no carrier in the data.
+
+### 11.2 What the export does carry
+
+The working link is `u_correlation_id`: **88 of 200 articles (44%)**, **77 distinct values**, all
+numeric and 4–6 digits — SEAL-shaped, at **application** grain. **112 of 200 (56%) carry no SEAL
+link on any field.**
+
+The secondary signals do not rescue it. The KB-base field is 100% filled but holds only **15
+distinct values with the top three covering 131 of 200** — a base grouping, at best a coarse
+owning-domain proxy. `u_content_owner` is 48% filled free text (person / SID / group), which
+reaches an application only indirectly through the support group, and `ownership_group` is 4.5%.
+
+**And the caveat is the one that decides it: `u_correlation_id` reads as the OWNING application's
+SEAL, not the article's SUBJECT SEAL.** Two sampled rows cite a *different* SEAL inside the article
+title than the field holds. If that generalises, the 44% is answering *who owns this article*
+rather than *what is this article about* — and an edge built on it would attach documented fixes to
+the wrong application **while looking well populated**. That is precisely the K23 defect, arriving
+one grain up from where the item was aimed.
+
+**So the original ASSERTED-vs-DEFAULTED question survives, one field over**, and it is now the
+cheap check that would settle any future attribution case: is `u_correlation_id` authored per
+article, or defaulted from the article's owning base or content owner? The illustrative rows point
+at defaulted.
+
+### 11.3 Verdict — `kb_*` stays out as an attribution source
+
+**Recommendation to the gate that rules pull scope, not a decision taken here:** leave the `kb_*`
+family where §7.4 put it, and record the reason rather than the deferral. Three findings, any one
+of which would be enough:
+
+1. The designed attribution columns are empty, so there is nothing to ingest as attribution.
+2. The de-facto link is at application grain, which the graph already has from better sources — it
+   adds no grain the estate lacks.
+3. Its semantics are probably *owning*, not *subject*, so it would mis-attach fixes while
+   presenting as well-populated. A 44%-covered edge that is right about who owns the document and
+   wrong about what the document concerns is worse than no edge, because it invites the traversal
+   it cannot support.
+
+**This does not close K23.** It closes the attribution question. See §11.4.
+
+### 11.4 The named use case that keeps `kb_*` alive — remediation reference and archive
+
+**SME direction, 2026-08-19.** The KB family has a consumer after all, and it is not attribution:
+the **remediation module** (`drydocs_remediation`, ADR 0002-B — detect → transform → prove → Jira).
+Before a remediation batch creates a NEW knowledge article, it should **search the existing KB for
+articles covering the same defect, and download them for reference and archiving.**
+
+**Why this use case is untouched by everything in §11.1–11.3.** It needs the article as a
+**document to find, read, cite and retain** — not as a node to attach to an application. The KB SQL
+that already exists searches `short_description` and falls back to the article body by job name;
+both are LIKE-pattern text searches that **ignore the SEAL columns entirely**. So the retrieval path
+never depended on the linkage that turned out to be missing. **The 0-of-200 finding does not touch
+it, and neither does the owning-vs-subject caveat** — a human reading a retrieved article judges its
+relevance directly.
+
+**What that changes about the shape of the pull.** This is a *reference and archival* consumer, and
+it wants different things from an ingestion consumer:
+
+- **Retrieval is by TEXT, not by key.** The seed-and-traverse model of §7.4 does not apply; there is
+  no join from our side, because the match is a search over article prose.
+- **Archival makes retention a first-class requirement, not a side effect.** The point of
+  downloading before authoring is that the referenced article is preserved as it stood — an article
+  later edited or retired must not silently change what a fix package cited. That is the same
+  obligation the email-extract pair carries (the `email-folder-assignment` gate: the msg/extract
+  pair as a system of record with a backup obligation), and it should be ruled the same way.
+- **The unit is the article and its provenance**, not a SEAL edge: article id, title, retrieved-at,
+  and the query that found it. Provenance here is *what we searched and what came back*, which is
+  the O24 origin-visibility discipline applied to a retrieval rather than to an assertion.
+- **Coverage stops being a blocker.** 44% SEAL coverage sank the attribution case; it is irrelevant
+  to search, where the denominator is "articles that match the defect", not "articles that carry a
+  key".
+
+**What still has to be settled before anything is built**, none of it settled here:
+
+1. **Read path.** The existing KB SQL runs against the Snowflake view. Whether remediation reads
+   that view, the ServiceNow API (§8), or an offline export is an open choice with different
+   freshness and permission consequences.
+2. **Where a downloaded article lands.** A KB article body is company prose; under
+   `PUBLISH-BOUNDARY.md` it is Internal and cannot sit in the repo tree. The natural home is the
+   out-of-repo data root as a declared landing zone (`drydocs_core/landing_zones.py`), which would
+   make it a first-class manual source rather than an ad-hoc download directory.
+3. **Whether the archived copy is a source or a citation.** If remediation only ever *cites* an
+   article id, the archive is a convenience; if a fix package *quotes* it, the archive is evidence
+   and acquires a retention obligation. Different rulings, and the second is the one with
+   consequences.
+4. **The duplicate test.** "Search before authoring" implies a bar for *this article already covers
+   this defect*, and a LIKE pattern over `short_description` is a weak instrument for it. Nothing
+   here rules what "already covered" means.
+
+**None of this reopens §11.3.** The retrieval case is a reason to READ the KB, not a reason to
+ingest it as attribution — and keeping the two apart is the whole point of recording both.
