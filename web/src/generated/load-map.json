@@ -119,7 +119,7 @@
       "command": "load-essential-graphrag",
       "mode": "optional",
       "profiles": [],
-      "note": "Q2 experiment -> ddcontext database",
+      "note": "Q2 book corpus -> drydocs (G102 fold)",
       "loaders": [
         "essential_graphrag.v1"
       ]

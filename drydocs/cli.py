@@ -488,7 +488,7 @@ CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
         "Q13 captured vendor documentation (verbatim, out-of-repo capture -> "
         "convert -> load); taxonomy only, gated until its corpus is confirmed",
     ),
-    LoadStep("load-essential-graphrag", "optional", _NONE, "Q2 experiment -> ddcontext database"),
+    LoadStep("load-essential-graphrag", "optional", _NONE, "Q2 book corpus -> drydocs (G102 fold)"),
     LoadStep(
         "load-doc-traceability",
         "optional",
@@ -569,7 +569,8 @@ def _gate_loader(cls: type) -> None:
 
 def _client(database: str | None = None) -> Neo4jClient:
     """Build the Neo4j client from settings; ``database`` overrides the
-    configured target DB (e.g. ``ddcontext`` for context-graph loads)."""
+    configured target DB (post-G102 every content load targets ``drydocs``;
+    the override survives for ``ddschema`` and transitional sweeps)."""
     cfg, _, _ = load_settings()
     pw = cfg.password.get_secret_value()
     if not pw:
@@ -1692,10 +1693,11 @@ def load_essential_graphrag(
         help="The local (gitignored) Essential GraphRAG PDF (defaults to the repo root copy).",
     ),
     database: str = typer.Option(
-        "ddcontext",
+        "drydocs",
         "--database",
-        help="Target database (Q2 decision: ddcontext — experiment content stays "
-        "out of the ground-truth drydocs DB).",
+        help="Target database (G102 fold, 2026-08-18: ONE content database — the "
+        "old ddcontext default was the residency the gate ended; reference "
+        "content is distinguished per source by trust_default, never by DB).",
     ),
 ) -> None:
     """Load the Essential GraphRAG ebook as a Document -> Chunk lexical graph (Q2).
