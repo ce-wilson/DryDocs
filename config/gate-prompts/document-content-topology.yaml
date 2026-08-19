@@ -21,7 +21,7 @@
 #   R2 (was Q2) — bmc-docs is RELOADED FROM SOURCE, not moved. Caveat the SME
 #      attached: there are TWO bmc sets, and they are not interchangeable —
 #      `bmc-docs` (26 pages converted to markdown, in the repo tree) and
-#      `bmc-controlm-utilities` (the full scrape, 1016 documents / 6.0 MB, held
+#      `bmc-docs-controlm-utilities` (the full scrape, 1016 documents / 6.0 MB, held
 #      outside the repo tree). §C carries what that means for each.
 #   R3 (was close-checklist item 3) — the 27 live DESCRIBES edges are DELETED,
 #      not preserved through a migration. Under R1 the reload re-establishes
@@ -88,11 +88,11 @@ meta:
 mapping:
   - n: 1
     element: "drydocs — STRUCTURED GROUND TRUTH *and* CAPTURED VENDOR/ESTATE CONTENT"
-    target: "the loaded estate graph (folders, jobs, conditions, apps, teams) PLUS the Document -> Chunk lexical graph for every vendor/estate corpus: bmc-docs, bmc-controlm-utilities, seal-pat-scrape"
+    target: "the loaded estate graph (folders, jobs, conditions, apps, teams) PLUS the Document -> Chunk lexical graph for every vendor/estate corpus: bmc-docs, bmc-docs-controlm-utilities, seal-pat-scrape"
     edge: "SCOPE WIDENED  [R1 — no new database; the corpora that declared `dddocs` resolve here, which is where bmc-docs already physically sits]"
   - n: 2
     element: "ddcontext — the EXTENSION: reference/experiment/SME content + derived findings"
-    target: "essential-graphrag, fcdo-frameworks, adhoc-sme-email, jpmc-reports — plus the derived findings (drydocs-deepdoc output) it was originally chartered for"
+    target: "neo4j-docs-essential-graphrag, fcdo-frameworks, adhoc-sme-email, jpmc-reports — plus the derived findings (drydocs-deepdoc output) it was originally chartered for"
     edge: "CHARTER RESTATED  [PROPOSED — §B: it holds a permanent MIX of captured content and derived findings, so a watermark keyed on database name can never be true for it]"
   - n: 3
     element: "dddocs — RETIRED"
@@ -109,9 +109,9 @@ mapping:
 
 provenance:
   - label: ":Document / :Chunk  [EXISTING node classes — the lexical graph ADR 0006 defines]"
-    source_object: "captured corpora declared in config/doc-source-registry.yaml (7 today: bmc-docs, bmc-controlm-utilities, essential-graphrag, fcdo-frameworks, seal-pat-scrape, adhoc-sme-email, jpmc-reports)"
+    source_object: "captured corpora declared in config/doc-source-registry.yaml (7 today: bmc-docs, bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag, fcdo-frameworks, seal-pat-scrape, adhoc-sme-email, jpmc-reports)"
     key: "doc id / chunk id from the capture manifest — a business key, so a corpus survives a rebuild and re-links (ADR 0002 D1 proxy-node pattern)"
-    loader: "drydocs load-bmc-docs, load-vendor-docs, load-essential-graphrag (CANONICAL_LOAD_SEQUENCE steps)"
+    loader: "drydocs load-bmc-docs, load-vendor-docs, load-essential-graphrag (CANONICAL_LOAD_SEQUENCE steps — verbs are the ADR 0012 public contract and did NOT rename with the corpus ids)"
     properties:
       - name: "text / title / captured_at / source_url"
         origin: source
@@ -229,7 +229,7 @@ sections:
       `exports.WATERMARK_VALUE` is the string "SYNTHESIZED — unverified", stamped
       onto every exported row of a watermarked spec.
       Measured against the registry, ddcontext holds four corpora and NOT ONE of
-      them is synthesized: essential-graphrag GROUNDED, fcdo-frameworks GROUNDED
+      them is synthesized: neo4j-docs-essential-graphrag GROUNDED, fcdo-frameworks GROUNDED
       (activated by SME ruling 2026-08-05), adhoc-sme-email VERBATIM,
       jpmc-reports VERBATIM. So an export of an SME email captured word for word
       is stamped as machine-synthesized and unverified. That is a false
@@ -285,9 +285,9 @@ sections:
       bmc-docs the registry states one database, the sweep expects another, and
       the data sits in a third. R1 collapses all three onto the third.
       PROPOSED END STATE, all seven rows:
-      to `drydocs` — bmc-docs (GROUNDED, T1), bmc-controlm-utilities (VERBATIM,
+      to `drydocs` — bmc-docs (GROUNDED, T1), bmc-docs-controlm-utilities (VERBATIM,
       T1), seal-pat-scrape (VERBATIM, T2, stub);
-      unchanged in `ddcontext` — essential-graphrag (GROUNDED, T1),
+      unchanged in `ddcontext` — neo4j-docs-essential-graphrag (GROUNDED, T1),
       fcdo-frameworks (GROUNDED, T4), adhoc-sme-email (VERBATIM, T4),
       jpmc-reports (VERBATIM, T1).
       THE TWO BMC SETS, per R2's caveat, because "reload from source" means a
@@ -298,7 +298,7 @@ sections:
       therefore reproducible on any machine from a clean checkout, which is what
       makes reload-rather-than-move safe. It is the corpus that is loaded today,
       and the one whose target column is currently a lie.
-      `bmc-controlm-utilities` is the SECOND, LARGER set: the book scraped in
+      `bmc-docs-controlm-utilities` is the SECOND, LARGER set: the book scraped in
       total, 1016 documents / 1017 TOC nodes / 6.0 MB, held OUTSIDE the repo tree
       under DRYDOCS_DATA_ROOT. It has never been loaded (`confirmed: false` — no
       loader may write from it until a gate signs the doc-graph shape), so there
@@ -322,9 +322,9 @@ sections:
       capability being read as durable; it should be retired with the ruling,
       not left as a rung nothing can reach.
     confirmations:
-      - "Three rows re-target to `drydocs` (bmc-docs, bmc-controlm-utilities, seal-pat-scrape); four stay in `ddcontext`. No row anywhere names `dddocs`."
+      - "Three rows re-target to `drydocs` (bmc-docs, bmc-docs-controlm-utilities, seal-pat-scrape); four stay in `ddcontext`. No row anywhere names `dddocs`."
       - "R2: bmc-docs is a RELOAD FROM SOURCE out of the repo tree, not a move — and the 27 DESCRIBES edges are deleted first (R3), then re-established by that reload."
-      - "bmc-controlm-utilities has never loaded and needs no migration; its re-target is a declaration that only becomes real on a machine holding the DRYDOCS_DATA_ROOT capture. Recorded, not assumed."
+      - "bmc-docs-controlm-utilities has never loaded and needs no migration; its re-target is a declaration that only becomes real on a machine holding the DRYDOCS_DATA_ROOT capture. Recorded, not assumed."
       - "cli.DOC_SWEEP_DATABASES is rewritten to (drydocs, ddcontext) and its comment admitting the mismatch is removed, because the mismatch is gone."
       - "docs_coverage's `traversable-until-move` status is retired from the ladder; bmc-docs reports `traversable`."
   - id: D
@@ -346,7 +346,7 @@ sections:
       similarity); and a single vector index spanning drydocs content AND the
       ddcontext corpora, which becomes two index queries plus a client-side
       rerank. That last one deserves a straight look before signing, and R1 did
-      NOT soften it: essential-graphrag is the corpus ingested specifically to
+      NOT soften it: neo4j-docs-essential-graphrag is the corpus ingested specifically to
       test cross-corpus retrieval, and it is on the far side of the wall. The
       cost the draft flagged as most likely to be waved through is the one cost
       R1 leaves exactly where it was.
@@ -369,7 +369,7 @@ sections:
     confirmations:
       - "Accepted: no relationship can span drydocs and ddcontext, and ddall reads are joins on returned values, not edge walks."
       - "Accepted as GAINED by R1: vendor/estate documentation and the structured graph share a database, so DESCRIBES, path queries, GDS and a single vector index work across them."
-      - "Accepted as still LOST: whole-corpus vector search including essential-graphrag becomes two index queries plus a client-side rerank — the corpus ingested for that retrieval shape is on the far side of the remaining wall."
+      - "Accepted as still LOST: whole-corpus vector search including neo4j-docs-essential-graphrag becomes two index queries plus a client-side rerank — the corpus ingested for that retrieval shape is on the far side of the remaining wall."
       - "Accepted: text2cypher (Epic R / ADR 0007) must emit USE clauses and business-key joins for any question reaching ddcontext."
       - "The analytical-projection mitigation is ruled NOW — either commissioned as a backlog item, or explicitly declined with the note that a later need reopens this ADR."
   - id: E
@@ -486,7 +486,7 @@ open_questions:
 risks:
   - "Signing §B without §A/§C is still the worst outcome available: the charter would be restated while the target column keeps naming a database that does not exist. These three sections are one decision wearing three headings — the gate log should record them together or not at all."
   - "B-NOW is a cheap fix to a live false claim, and cheap fixes to live claims are exactly the ones that become permanent. If B-DURABLE is not commissioned in the same sign-off, the watermark stays keyed on database name indefinitely and the root cause survives the gate that named it."
-  - "The vector-search cost (§D) is the one most likely to be waved through, and R1's good news makes that MORE likely, not less: it is easy to read 'the wall moved' as 'the wall went away'. essential-graphrag is still on the far side."
+  - "The vector-search cost (§D) is the one most likely to be waved through, and R1's good news makes that MORE likely, not less: it is easy to read 'the wall moved' as 'the wall went away'. neo4j-docs-essential-graphrag is still on the far side."
   - "`dddocs` currently appears in cli.DOC_SWEEP_DATABASES, so docs-verify reports it as db-absent rather than raising. That graceful degradation has been HIDING the gap: the config has named a non-existent database for weeks without a single failure. Whatever is ruled, the guard should fail loudly on an unprovisioned target_db rather than reporting it as merely absent."
   - "Clause (e) has blocked the deepdoc scaffold. Ruling it unblocks work, which means a wrong ruling here gets built on quickly rather than sitting inert."
   - "R3 deletes 27 live edges on the strength of the reload re-creating them. If the reload is deferred after the delete, the graph spends that window with a capability it had before the gate — sequence the two in one session, on each machine, rather than across sessions."
@@ -496,7 +496,7 @@ risks:
 
 status: awaiting-sme
 drafted: 2026-08-05
-refreshed: 2026-08-12
+refreshed: 2026-08-18   # corpus ids renamed to the doc-registry id grammar (bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag); bmc-docs retained (P0 benchmark record)
 unblocks:
   - "G31 — the proxy-node spine cannot be sized until the database set is known"
   - "G38 — the ddall federated read proof (and it would trip the latent ddall watermark defect, §B); §E makes deepdoc its first real consumer"

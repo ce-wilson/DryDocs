@@ -111,7 +111,7 @@ TREES: dict[str, VendorTree] = {
     for t in [
         VendorTree(
             id="bmc-controlm-9.0.20-utilities",
-            corpus_id="bmc-controlm-utilities",
+            corpus_id="bmc-docs-controlm-utilities",
             vendor="BMC",
             product="Control-M",
             version="9.0.20",

@@ -328,7 +328,9 @@ class EssentialGraphragAdapter:
 
 class EssentialGraphragLoader(BaseLoader):
     name: ClassVar[str] = "essential_graphrag.v1"
-    source_id: ClassVar[str | None] = "essential-graphrag"
+    source_id: ClassVar[str | None] = (
+        "neo4j-docs-essential-graphrag"  # the REGISTRY id (renamed 2026-08-18); DOC_ID above is the graph key and deliberately did not move
+    )
     cypher_path: ClassVar[Path] = CYPHER_DIR / "essential_graphrag.cypher"
     row_model: ClassVar[type] = BookChunkRow
     source_label: ClassVar[str] = "pdf"

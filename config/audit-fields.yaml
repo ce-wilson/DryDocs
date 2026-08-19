@@ -147,7 +147,7 @@ sources:
       envelope (BMC page authorship) is not exposed by the source; decide whether the
       stub is permanent at a doc-06 Phase 4 gate.
 
-  - id: essential-graphrag
+  - id: neo4j-docs-essential-graphrag
     status: stub                             # published book: authorship IS the citation (authors/publisher/published on :Document); no source-system envelope exists
     notes: >
       Confirmed 2026-07-16 (Q2 groom decision; covering gate bmc-docs-lexical-load —

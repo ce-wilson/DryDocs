@@ -1337,7 +1337,7 @@
       ]
     },
     {
-      "id": "bmc-controlm-utilities",
+      "id": "bmc-docs-controlm-utilities",
       "home": "doc-registry",
       "system": null,
       "origin": null,
@@ -1359,7 +1359,7 @@
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "corpus_id",
-        "value": "bmc-controlm-utilities"
+        "value": "bmc-docs-controlm-utilities"
       },
       "taxonomy_path": "technology/orchestration/control-m",
       "taxonomy_captures": [],
@@ -1377,7 +1377,7 @@
       ]
     },
     {
-      "id": "essential-graphrag",
+      "id": "neo4j-docs-essential-graphrag",
       "home": "doc-registry",
       "system": null,
       "origin": null,

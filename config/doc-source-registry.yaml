@@ -4,9 +4,24 @@
 # The docmeta ledger (ADR 0006; knowledge/upgrade-plans/docmeta-component.md §1.4):
 # where the pipeline registry (config/source-registry.yaml) declares DATA FEEDS,
 # this file declares DOC CORPORA — content ingested as Document → Chunk lexical
-# graphs (or queued to be). Ids match the pipeline registry where a corpus
-# appears in both (bmc-docs, essential-graphrag); the pipeline entry stays the
-# feed/adapter/gate record, THIS entry is the doc-governance record.
+# graphs (or queued to be). This file is each corpus's ONE home (N9 dropped the
+# pipeline twins), so the id rule lives HERE:
+#
+# ID GRAMMAR (SME direction 2026-08-18 — the corpus-id convention):
+#   VENDOR-PUBLISHED corpora:  {vendor}-docs[-{scope}]
+#     - the BARE form {vendor}-docs is RESERVED for the curated, repo-committed
+#       core reference set — reproducible from a clean checkout (bmc-docs is
+#       exactly that, and keeps its name: the docmeta P0 benchmark record cites
+#       it — knowledge/upgrade-plans/docmeta-p0-verdict.md).
+#     - every captured/scraped external artifact takes a -{scope} suffix naming
+#       the ARTIFACT (the book/guide), never the adapter or capture version:
+#       bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag.
+#   NON-VENDOR corpora (SME/internal/public-filing classes) keep class-based
+#   ids (adhoc-sme-email, jpmc-reports, fcdo-frameworks, seal-pat-scrape) —
+#   deliberately OUT of the vendor grammar, recorded so it does not creep.
+#   RENAMES are add-new + retire-old: the renamed row carries `replaces:`, the
+#   old string enters `retired:` below and can NEVER re-mint with a different
+#   meaning (the source-registry v2 D4 semantics, imported).
 #
 # REQUIRED on every entry (enforced by tests/unit/test_doc_registry.py):
 #   classification — config/classification.yaml level (External ⇒ source_url + captured_at)
@@ -43,7 +58,7 @@
 # =============================================================================
 
 schema: drydocs.doc-source-registry.v1
-updated: 2026-08-06
+updated: 2026-08-18
 
 sources:
   # ---- Currently ingested corpora (backfill, Q5) ----------------------------
@@ -70,7 +85,8 @@ sources:
       lexical shape: (:Chunk)-[:PART_OF]->(:Document) + FIRST_CHUNK/NEXT_CHUNK,
       (:Document)-[:DESCRIBES]->(:SoftwareProduct).
 
-  - id: bmc-controlm-utilities
+  - id: bmc-docs-controlm-utilities
+    replaces: bmc-controlm-utilities   # 2026-08-18 id-grammar rename (header); never loaded, so no graph value existed under the old id
     classification: External            # public BMC documentation; robots.txt allows /supportu/9.0.20/*
     source: "DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/pages/ (1016 documents / 1017 TOC nodes, 6.0 MB — OUT of the repo tree)"
     source_url: "https://documents.bmc.com/supportu/9.0.20/help/Main_help/en-US/ (Utilities book; per-topic URLs in the capture manifest)"
@@ -85,7 +101,7 @@ sources:
     taxonomy_path: technology/orchestration/control-m
     graph_locator:                      # the Q13 loader writes corpus_id on :Document/:Chunk/:DocSection
       match: corpus_id
-      value: bmc-controlm-utilities
+      value: bmc-docs-controlm-utilities   # renamed WITH the id — never loaded, so id == locator value == future stamps stay aligned
     confirmed: false                    # NOT gated yet — no loader may write from this entry until an SME gate signs the doc-graph shape
     notes: >
       Captured 2026-07-31 by scripts/external_vendor_scrape.py (capture id
@@ -116,8 +132,18 @@ sources:
       whose XML contract is currently ASSUMED and defined only by synthetic
       fixtures ("XML schema docs are a known reference gap"). exportdefjob is
       the likely producer of the estate's own exports.
+      ROLE (SME, 2026-08-18): the PRIMARY reference for the command-line
+      utilities feeding G14 command-line lineage and the R-rule remediation
+      detectors — more load-bearing for lineage/remediation than the curated
+      bmc-docs set. RENAMED bmc-controlm-utilities -> bmc-docs-controlm-utilities
+      the same day (header grammar; the two BMC sets now read as siblings).
+      The existing machine-local capture manifest embeds the OLD corpus_id
+      string, which is INFORMATIONAL only — resolve_corpus_id() owns captures
+      by manifest PATH and returns the registry id, so the capture needs no
+      re-manifest; the scraper writes the new id on future captures.
 
-  - id: essential-graphrag
+  - id: neo4j-docs-essential-graphrag
+    replaces: essential-graphrag   # 2026-08-18 id-grammar rename; the GRAPH doc_id deliberately does NOT rename — see notes
     classification: External            # published Manning/Neo4j-sponsored ebook; PDF is LOCAL-ONLY (root /*.pdf gitignore) — cite source_url, never commit
     source: "Essential-GraphRAG.pdf (repo root, gitignored local copy; Bratanič & Hane, Manning 2025)"
     source_url: "https://www.manning.com/books/essential-graphrag"
@@ -130,14 +156,20 @@ sources:
     target_db: ddcontext                # experiment/reference content stays out of ground truth (Q2 decision; ADR 0006 §2 keeps it here)
     refresh: manual
     taxonomy_path: ~                    # a methodology book — deliberately no DESCRIBES / product taxonomy hook
-    graph_locator:                      # one Document for the whole book; its doc_id IS the corpus id
+    graph_locator:                      # one Document for the whole book
       match: doc_id
-      value: essential-graphrag
+      value: essential-graphrag         # UNCHANGED at the 2026-08-18 rename: doc_id is the graph BUSINESS KEY (D1 — keys survive), the registry id is the governance name; the locator is what joins them
     confirmed: true                     # Q2 groom decision 2026-07-16: pure REUSE of the ACTIVE docs_* vocabulary — covering gate = bmc-docs-lexical-load (moved here from the dropped pipeline twin, N9)
     notes: >
       The Q2 agent-traversal experiment corpus; fed the docmeta P0 benchmark
       verdict (traversal arm). Pattern notes mined from the same book:
       reference/research/essential-graphrag-notes.md (Q1).
+      RENAMED essential-graphrag -> neo4j-docs-essential-graphrag 2026-08-18
+      (header grammar: the Neo4j-published book follows the same vendor-docs
+      convention as the BMC sets). GOVERNANCE NAME ONLY: the loaded Document
+      keeps doc_id 'essential-graphrag' and the chunk_id prefix with it — the
+      business key survives the rename by design, and the loader's DOC_ID
+      constant matches the graph, not this id.
 
   # ---- Queued corpora (registered, not yet ingested) ------------------------
   - id: fcdo-frameworks
@@ -282,3 +314,15 @@ sources:
       here (Q5) so every live corpus traces to a registry entry; reshaping it
       onto the lexical spine is a P4+ decision. The script still carries the
       pre-restructure repo path for its PDFs — update on next run.
+
+# ---------------------------------------------------------------------------
+# Retired corpus ids (the source-registry v2 D4 semantics, imported at the
+# 2026-08-18 id-grammar rename): a retired string can NEVER be re-minted with
+# a different meaning. Loaders bound to a retired id do not resolve.
+retired:
+  - id: bmc-controlm-utilities
+    replaced_by: ["bmc-docs-controlm-utilities"]
+    reason: "id-grammar rename (vendor-docs sibling form); never loaded, so no graph value carried the old string"
+  - id: essential-graphrag
+    replaced_by: ["neo4j-docs-essential-graphrag"]
+    reason: "id-grammar rename; RETIRED AS A REGISTRY ID ONLY — the string stays LIVE in the graph as the Document's doc_id business key and in the loader's DOC_ID constant"

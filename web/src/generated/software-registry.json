@@ -214,7 +214,7 @@
       "used_by_drydocs": true,
       "seal_id": "[seal-id]",
       "documentation": {
-        "corpus": "bmc-controlm-utilities",
+        "corpus": "bmc-docs-controlm-utilities",
         "docs_version": "9.0.20",
         "current_for": [],
         "available_versions": [

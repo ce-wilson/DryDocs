@@ -186,7 +186,7 @@ products:
     # by parsing version strings, because "does 9.0.20 documentation still
     # describe 9.0.21.300?" is a judgement, not a string comparison.
     documentation:
-      corpus: bmc-controlm-utilities   # -> config/doc-source-registry.yaml id
+      corpus: bmc-docs-controlm-utilities   # -> config/doc-source-registry.yaml id
       docs_version: "9.0.20"           # the VENDOR DOC version captured
       current_for: []                  # EMPTY = unverified. Known drift TODAY: the
                                        # capture is 9.0.20 (BMC ships no Utilities

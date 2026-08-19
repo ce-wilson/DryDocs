@@ -45,7 +45,7 @@ CURATION_BY_TIER = {
 
 # The corpora known to be ingested as of Q5 (the backfill guard). EXTEND this set
 # when a new corpus loads — the ledger entry and this pin land in the same commit.
-INGESTED_CORPORA = {"bmc-docs", "essential-graphrag", "jpmc-reports"}
+INGESTED_CORPORA = {"bmc-docs", "neo4j-docs-essential-graphrag", "jpmc-reports"}
 
 
 def _registry() -> dict:
