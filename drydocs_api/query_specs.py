@@ -910,6 +910,47 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
+            id="infra.app-job-host-locations.v1",
+            database="drydocs",
+            description=(
+                "Z3 (gate server-location-ontology): the distinct job hosts for one "
+                "business application, each carrying its resolved physical location "
+                "when the tiered ExecutionHost->Server join found one and an explicit "
+                "UNMATCHED marker when it did not — the selection that feeds the Z4 "
+                "nslookup resolver. Traversal per gate SS C3: app -> folder attribution "
+                "-> jobs -> RUNS_ON host/group -> RESOLVES_TO_SERVER -> LOCATED_IN."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication {app_id: $app_id}) WHERE NOT a:SchemaMeta "
+                "MATCH (a)-[:HAS_PORT]->(bp:Port)<-[:BELONGS_TO_APPLICATION]-(f:ControlMFolder) "
+                "WHERE NOT bp:SchemaMeta AND NOT f:SchemaMeta "
+                "MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob)-[:RUNS_ON]->(t) "
+                "WHERE NOT j:SchemaMeta AND NOT t:SchemaMeta "
+                "OPTIONAL MATCH (t)-[:CONTAINS_HOST]->(m:ExecutionHost) WHERE NOT m:SchemaMeta "
+                "WITH DISTINCT CASE WHEN t:ExecutionHost THEN t ELSE m END AS h "
+                "WHERE h IS NOT NULL "
+                "OPTIONAL MATCH (h)-[res:RESOLVES_TO_SERVER]->(s:Server)-[loc:LOCATED_IN]->(dc:DataCenter) "
+                "WHERE NOT s:SchemaMeta AND NOT dc:SchemaMeta "
+                "RETURN h.nodeid AS job_host, "
+                "CASE WHEN res IS NULL THEN 'UNMATCHED' ELSE res.match_tier END AS match_tier, "
+                "s.name AS server, dc.name AS data_center, dc.city AS city, "
+                "dc.state AS state, dc.country AS country, dc.location_grain AS location_grain "
+                "ORDER BY job_host LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("job_host", "string", "Job host (nodeid)"),
+                ColumnDef("match_tier", "string", "Join tier / UNMATCHED"),
+                ColumnDef("server", "string", "Inventory server"),
+                ColumnDef("data_center", "string", "Data center (physical)"),
+                ColumnDef("city", "string", "City"),
+                ColumnDef("state", "string", "State"),
+                ColumnDef("country", "string", "Country"),
+                ColumnDef("location_grain", "string", "Declared grain"),
+            ),
+            classification="internal",
+            params=(ParamSpec("app_id", "string"), *_LIMIT),
+        ),
+        QuerySpec(
             id="console.agent-runs.v1",
             database="drydocs",  # G102 fold (2026-08-18): the R1 ruling's substance ("never in ground truth") survives as :Uncertain on the write; uncertain=True below is the watermark trigger
             description=(

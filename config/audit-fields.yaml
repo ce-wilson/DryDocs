@@ -30,7 +30,7 @@
 # =============================================================================
 schema: drydocs.audit-fields.v1
 classification: Internal-Public
-updated: 2026-08-07                    # G22 §J SIGN-OFF: bitbucket:repo-objects-manifest + the two dpl registries RULED stub (gate rua-load-shapes, 28/28) — the §D4 preconditions. 2026-08-06 G22 §D4: exec-hosts:rua-bundle RULED stub (gate rua-load-shapes). 2026-08-04 M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
+updated: 2026-08-19                    # Z3: infra:server-export registered stub (confirmed at the loader build; envelope gate never ran). Prior: G22 §J SIGN-OFF: bitbucket:repo-objects-manifest + the two dpl registries RULED stub (gate rua-load-shapes, 28/28) — the §D4 preconditions. 2026-08-06 G22 §D4: exec-hosts:rua-bundle RULED stub (gate rua-load-shapes). 2026-08-04 M3: the four Phase-4 rulings (gate audit-envelope-phase4). Earlier N9: re-keyed to the v2 dataset ids (gate source-registry-v2; Q6 transfers)
 
 # The four envelope property names, frozen (test-enforced).
 envelope:
@@ -308,3 +308,16 @@ sources:
       reasoning. Recorded as its OWN entry rather than a cross-reference because
       the guard keys on ids: a source without its own row is a source with no
       envelope decision, whatever a neighbouring note says.
+
+  - id: "infra:server-export"
+    status: stub                             # registered at the Z3 build (gate server-location-ontology, 2026-08-19); the ENVELOPE gate has not run
+    notes: >
+      Confirmed source, stub envelope — the autosys/airflow/dpl shape: the
+      server-location gate (12/12, 2026-08-19) ruled the SHAPES and the Z3
+      build ships the loader, but no envelope gate has ruled the export's
+      native audit columns. The Z1 field contract
+      (config/taxonomy/server-location.yaml) enumerates domain fields only;
+      whether the site's export carries created-by/updated-by columns is
+      unknown until a real download's header is recorded company-side (the
+      loose->strict clause on the capture). Claiming an envelope OR its
+      permanent absence would be a guess; stub is the state that says so.

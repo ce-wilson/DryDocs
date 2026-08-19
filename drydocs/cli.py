@@ -38,6 +38,8 @@ Ingest commands:
                                     (config/manual-loads/, PIN semantics)
   drydocs load-code-snapshot      — G33 self-documentation: newest depgraph
                                     snapshot -> :Project / :CodeModule subgraph
+  drydocs load-server-inventory   — Z3: infra server export -> :Server /
+                                    :DataCenter + the tiered ExecutionHost join
   drydocs export-cmdline-staging  — G39: graph :ControlMJob rows -> the
                                     TEMPORARY job-detail staging store (SQLite
                                     under DRYDOCS_DATA_ROOT; stand-in for the
@@ -178,6 +180,9 @@ from .loaders.seal_attribution import (
     TierReconcilers,
     fetch_app_name_reconciler,
 )
+from .loaders.server_inventory import COVERAGE_QUERY as SERVER_COVERAGE_QUERY
+from .loaders.server_inventory import ServerInventoryLoader
+from .loaders.server_resolution import ServerResolutionPass
 from .loaders.software_registry import (
     DEFAULT_REGISTRY_PATH,
     RegistryYamlAdapter,
@@ -237,6 +242,8 @@ LOADER_REGISTRY: dict[str, type] = {
     "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
     # P3 (host topology; gate controlm-hosts-topology):
     "controlm_hosts": ControlMHostsLoader,
+    # Z3 (server inventory; gate server-location-ontology):
+    "server_inventory": ServerInventoryLoader,
     # bmc-docs lexical graph (Document -> Chunk):
     "bmc_docs": BmcDocsLoader,
     # Essential GraphRAG ebook lexical graph (Q2 experiment):
@@ -365,6 +372,7 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
     "load-email-extracts": (EmailExtractsLoader,),
     "load-essential-graphrag": (EssentialGraphragLoader,),
     "load-folder-attribution": (FolderAttributionLoader,),
+    "load-server-inventory": (ServerInventoryLoader,),
     "load-manual-mappings": (ManualSealAttributionLoader,),
 }
 
@@ -520,6 +528,16 @@ CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
         "(config/overrides/app-code-mappings.csv) + the stg_app_fact fallback "
         "feed need ingest-controlm + refresh-reference first (gate §E "
         "preconditions)",
+    ),
+    LoadStep(
+        "load-server-inventory",
+        "optional",
+        _NONE,
+        "Z3 server inventory: per-application infra exports (the "
+        "internal/server-inventory/ landing zone) -> :Server/:DataCenter + "
+        "the tiered ExecutionHost join; the app port leg is MATCH-only, so "
+        "refresh-reference (SEAL) and ingest-controlm (hosts) first make it "
+        "complete rather than valid",
     ),
     LoadStep("m1-verify", "standing", _ALL, "M1 invariants"),
     LoadStep("m3-verify", "standing", _ALL, "M3 invariants"),
@@ -1855,6 +1873,54 @@ def load_email_extracts(
         for name, reason in adapter.rejected:
             console.print(f"  {name}: {reason}")
     console.print(summary.as_dict())
+
+
+@app.command(name="load-server-inventory")
+def load_server_inventory(
+    export_path: Path = typer.Option(
+        ...,
+        "--export",
+        help="A per-application server-export CSV, or a directory of them "
+        "(the internal/server-inventory/ landing zone; the bundled synthetic "
+        "sample is tests/fixtures/server_inventory/).",
+    ),
+    batch_size: int = typer.Option(1000, "--batch-size"),
+    skip_resolution: bool = typer.Option(
+        False,
+        "--skip-resolution",
+        help="Load inventory only; skip the derived ExecutionHost join pass.",
+    ),
+) -> None:
+    """Z3: load the infra server export + the tiered ExecutionHost join.
+
+    Gate server-location-ontology (SIGNED OFF 12/12, 2026-08-19): :Server is
+    the inventory spine (§A1), :DataCenter carries geography + the Idea-90
+    location_grain declaration (§B1/§B2), and the §C2 technology-port leg —
+    (:BusinessApplication)-[:HAS_PORT]->(:Port {kind:'Technology'})-
+    [:RUNS_ON {role:'technology_port'}]->(:Server) — is MATCH-only on the
+    app (apps absent from the graph are COUNTED, never minted). One CSV =
+    one application's download (both PROD and DR rows). The derived
+    resolution pass then joins :ExecutionHost -> :Server under the §C1
+    tiers (T1 exact, T2 normalized short-name with the ambiguity guard; T3
+    dns-resolved arrives with the Z4 collector) — evidence on every edge,
+    unmatched reported, never guessed.
+    """
+    _gate_loader(ServerInventoryLoader)  # confirmed-gate (overlay-aware) before any DB write
+    files = sorted(export_path.glob("*.csv")) if export_path.is_dir() else [export_path]
+    if not files or not all(f.exists() for f in files):
+        console.print(f"[red]No CSV export found at {export_path}[/]")
+        raise typer.Exit(1)
+    with _client() as cli:
+        for f in files:
+            summary = ServerInventoryLoader(cli, _csv_adapter(f), batch_size=batch_size).load()
+            console.print({f.name: summary.as_dict()})
+        rows = cli.run(SERVER_COVERAGE_QUERY)
+        if rows:
+            console.print({"inventory_coverage": rows[0]})
+        if not skip_resolution:
+            console.print("[cyan]>> server_resolution (T1 exact / T2 normalized; T3 = Z4)[/]")
+            coverage = ServerResolutionPass(cli).run()
+            console.print({"server_resolution_coverage": coverage.as_dict()})
 
 
 @app.command(name="load-folder-attribution")

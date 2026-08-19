@@ -38,10 +38,12 @@ from .controlm import (
     ControlMVariableRow,
 )
 from .docs import BmcDocChunkRow
+from .infrastructure import ServerInventoryRow
 from .registry import SoftwareProductRow
 from .seal import SealApplicationRow, SealContactRow
 
 __all__ = [
+    "ServerInventoryRow",
     # SEAL
     "SealApplicationRow",
     "SealContactRow",

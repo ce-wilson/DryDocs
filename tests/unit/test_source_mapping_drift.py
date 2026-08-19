@@ -277,6 +277,13 @@ LEDGER_PENDING = frozenset(
         "bitbucket:repo-objects-manifest",
         "dpl:pipeline-registry",
         "dpl:dataset-registry",
+        # Z3 (2026-08-19, gate server-location-ontology): confirmed at the
+        # loader build; the column ledger waits on the FIRST REAL DOWNLOAD —
+        # the Z1 capture's loose->strict clause records the site's physical
+        # header spellings company-side, and the doc-08 ledger is authored
+        # from that, not from the synthetic fixture. Removal condition: the
+        # ledger lands as config/source-mappings/server-inventory.yaml.
+        "infra:server-export",
     }
 )
 

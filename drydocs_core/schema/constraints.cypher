@@ -54,8 +54,10 @@ DROP INDEX businessapplication_status IF EXISTS;
 DROP INDEX businessapplication_risk   IF EXISTS;
 DROP INDEX businessapplication_name   IF EXISTS;
 
-// Two-port pattern: each Application has exactly one EventProcessing and one
-// BatchProcessing child. Composite uniqueness on (parent_app_id, kind) lets
+// Port pattern: each Application has exactly one port per KIND — EventProcessing
+// and BatchProcessing (the SEAL data ports), plus Technology since the Z3 build
+// (gate server-location-ontology §C2, 2026-08-19 — the infrastructure attachment
+// surface, minted by the server-inventory loader for apps the export names). Composite uniqueness on (parent_app_id, kind) lets
 // us enforce that without modeling the relationship inside the constraint.
 //
 // TRAP (gate §D1, and the reason the DROP below is not optional): `CREATE CONSTRAINT
@@ -194,3 +196,14 @@ CREATE CONSTRAINT codemodule_file_id  IF NOT EXISTS FOR (m:CodeModule)          
 // repo-relative paths; a path is a dir or a file, never both — SME ruling
 // 2026-08-05, admitting the containment tree the G33 gate deferred).
 CREATE CONSTRAINT codedirectory_file_id IF NOT EXISTS FOR (d:CodeDirectory)     REQUIRE d.file_id IS UNIQUE;
+// --- Infrastructure / server location (Z3; gate server-location-ontology
+// SIGNED OFF 12/12, 2026-08-19). :Server is the INVENTORY spine (§A1), keyed
+// on name — the Z2 join key; deliberately NOT ExecutionHost's nodeid key
+// (identity joins are the RESOLVES_TO_SERVER evidence edge, never a shared
+// key). :DataCenter is the PHYSICAL building (§B1) — never the Control-M
+// scheduling DC (§B4; the two never join by field name). The technology
+// port (§C2) needs no new constraint: port_app_key's (parent_app_id, kind)
+// composite already admits kind='Technology' — the two-port comment above
+// predates the third kind.
+CREATE CONSTRAINT server_name         IF NOT EXISTS FOR (s:Server)              REQUIRE s.name IS UNIQUE;
+CREATE CONSTRAINT datacenter_name     IF NOT EXISTS FOR (d:DataCenter)          REQUIRE d.name IS UNIQUE;

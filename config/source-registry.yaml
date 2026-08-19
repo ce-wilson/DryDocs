@@ -57,7 +57,7 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v2
-updated: 2026-08-19     # Z1: system `infra` + dataset infra:server-export registered (confirmed: false — everything meaning-bearing waits on the Z2 gate). Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
+updated: 2026-08-19     # Z3: infra:server-export flips confirmed: true (gate server-location-ontology 12/12 + the loader build, same day). Prior same day, Z1: system `infra` + dataset infra:server-export registered confirmed: false. Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
 
 # ---------------------------------------------------------------------------
 # SYSTEMS — the things we connect to. layer = BDAT four-value view
@@ -1088,7 +1088,7 @@ datasets:
     asset_type: dcat:Dataset
     authority: SOR                      # caveat on the system row: SOR-vs-ADS (site-vs-CMDB provenance) is a Z2 gate question
     feeds_taxonomy: [servers, locations]   # deliberately NOT `hosts` — that is the Control-M side of a join Z2 has not ruled
-    adapter: ~                          # no loader before the Z2 gate signs; the loader is Z3
+    adapter: csv                        # drydocs/loaders/server_inventory.py (Z3; CsvAdapter — the export is a hand download)
     acquisition:                        # how the data arrives (N12)
       mode: manual
       format: csv                       # expected; if the site hands another format, widen the enum at the first real drop (the `archive` precedent)
@@ -1098,7 +1098,8 @@ datasets:
       # filtered on prod, and each download's rows carry BOTH prod and DR servers.
       # One file per application — that grain is the contract, never merged.
     gate_spec: config/gate-prompts/server-location-ontology.yaml
-    confirmed: false                    # gate server-location-ontology SIGNED OFF 12/12 (2026-08-19) — authority for the SHAPES; the flip belongs to the Z3 loader build (N13: flips are follow-ups)
+    loader: drydocs/loaders/server_inventory.py   # + the server_resolution.v1 derived pass (the tiered ExecutionHost join)
+    confirmed: true                     # gate server-location-ontology SIGNED OFF 12/12 (2026-08-19) + the Z3 build the same day (N13: the build's commit flips)
     notes: >
       Per-application server export. FIELD CONTRACT (enumerated with the
       hierarchy capture, config/taxonomy/server-location.yaml): server name;

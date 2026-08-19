@@ -603,12 +603,12 @@ MERGE (a)-[r:HAD_ROLE]->(b)
 
 MATCH (a:SchemaMeta {name: 'ExecutionHost'}), (b:SchemaMeta {name: 'Server'})
 MERGE (a)-[r:RESOLVES_TO_SERVER]->(b)
-  SET r.vocab_id = 'infra_resolves_to_server', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
+  SET r.vocab_id = 'infra_resolves_to_server', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'Server'})
 MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'infra_port_runs_on_server', r.role = 'technology_port', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
+  SET r.vocab_id = 'infra_port_runs_on_server', r.role = 'technology_port', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Server'}), (b:SchemaMeta {name: 'DataCenter'})
 MERGE (a)-[r:LOCATED_IN]->(b)
-  SET r.vocab_id = 'infra_located_in', r.prov_maps_to = 'prov:atLocation', r.domain = 'infrastructure', r.status = 'planned';
+  SET r.vocab_id = 'infra_located_in', r.prov_maps_to = 'prov:atLocation', r.domain = 'infrastructure', r.status = 'active';

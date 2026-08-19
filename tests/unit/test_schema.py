@@ -44,7 +44,7 @@ VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary"
 # port_unique -> port_app_key (a DROP + a rename, so the CREATE count is
 # unchanged by that half — see the trap comment in constraints.cypher).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 53
+EXPECTED_CONSTRAINTS = 55
 # 52 -> 53 at G31 (2026-08-18): dataasset_id moved HOME from the retired
 # 02_proxy_constraints.cypher (the G102 fold killed the cross-db charter; the
 # key itself never retired). Prior: 53 -> 52 at G99 (membership_id dropped

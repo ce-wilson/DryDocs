@@ -1,9 +1,10 @@
   # ── Infrastructure / server location (Epic Z; gate server-location-ontology
   # ── SIGNED OFF 12/12, 2026-08-19 — config/gate-log.md) ──
   #
-  # Registered 2026-08-19 at Z2 and ruled the SAME SESSION. Status stays
-  # planned throughout: sign-off authorizes the SHAPES; the flips belong to the
-  # Z3 loader build (flips are follow-ups, the N13 rule). The domain
+  # Registered 2026-08-19 at Z2 and ruled the SAME SESSION; flipped ACTIVE at
+  # the Z3 build the same day (the N13 rule: the gate authorizes the SHAPES,
+  # the build's commit flips the status — loader server_inventory.v1 + the
+  # server_resolution.v1 derived pass). The domain
   # `infrastructure` was registered at the gate (§C5): physical
   # placement/geography is neither `scheduler` (tool-agnostic scheduling
   # semantics) nor `architecture` (app/code/team ownership flow).
@@ -47,10 +48,10 @@
       load-balancer alias resolves to MANY Servers (the Z4 case); unmatched
       hosts get NO edge and stay visibly unmatched in the Z3 query — never
       dropped, never guessed.
-    supplement:   ~
-    loader:       ~
+    supplement:   infrastructure_ontology_supplement.cypher
+    loader:       server_resolution.v1
     domain:       infrastructure
-    status:       planned
+    status:       active
 
   - id:           infra_port_runs_on_server
     neo4j_label:  RUNS_ON
@@ -77,10 +78,10 @@
       stays with the arch_/seal_ attribution family. Both prod and DR servers
       get the edge; designation lives on the Server node (§A3), never here
       (port-per-environment was offered and declined).
-    supplement:   ~
-    loader:       ~
+    supplement:   infrastructure_ontology_supplement.cypher
+    loader:       server_inventory.v1
     domain:       infrastructure
-    status:       planned
+    status:       active
 
   - id:           infra_located_in
     neo4j_label:  LOCATED_IN
@@ -100,7 +101,7 @@
       term; DataCenter functions as the prov:Location. THE Z5 MAP CONTRACT
       hangs here: "a located label" means reaches-geography-via-LOCATED_IN —
       one contract, so the map module reads no per-label special cases.
-    supplement:   ~
-    loader:       ~
+    supplement:   infrastructure_ontology_supplement.cypher
+    loader:       server_inventory.v1
     domain:       infrastructure
-    status:       planned
+    status:       active

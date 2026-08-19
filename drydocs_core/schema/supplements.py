@@ -86,6 +86,15 @@ SUPPLEMENTS: tuple[Supplement, ...] = (
         summary="software-registry terms (Vendor, SoftwareProduct, MADE_BY, USES_SOFTWARE)",
     ),
     Supplement(
+        name="infrastructure",
+        filename="infrastructure_ontology_supplement.cypher",
+        # No pre-G29 history — the verb is minted WITH the supplement (Z3,
+        # gate server-location-ontology 2026-08-19) and registered by the same
+        # cli loop as the true legacy aliases.
+        legacy_verb="apply-infrastructure-supplement",
+        summary="server-location terms (Server, DataCenter, RESOLVES_TO_SERVER, LOCATED_IN, the technology-port RUNS_ON)",
+    ),
+    Supplement(
         name="sosa",
         filename="sosa_experimental_supplement.cypher",
         legacy_verb="apply-sosa-supplement",

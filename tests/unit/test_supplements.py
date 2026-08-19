@@ -38,6 +38,7 @@ def test_registry_order_is_the_documented_chain() -> None:
         "seal",
         "catalog",
         "registry",
+        "infrastructure",  # Z3 (gate server-location-ontology, 2026-08-19)
         "sosa",
     ]
     # The reason the order exists — catalog reuses seal's Attribution/#hasAgent.
@@ -48,7 +49,13 @@ def test_registry_order_is_the_documented_chain() -> None:
 
 def test_sosa_is_opt_in_and_never_in_the_default_chain() -> None:
     assert sup.BY_NAME["sosa"].opt_in is True
-    assert [s.name for s in sup.default_chain()] == ["base", "seal", "catalog", "registry"]
+    assert [s.name for s in sup.default_chain()] == [
+        "base",
+        "seal",
+        "catalog",
+        "registry",
+        "infrastructure",
+    ]
     assert all(not s.opt_in for s in sup.default_chain())
 
 
@@ -151,6 +158,7 @@ def test_legacy_verb_names_are_the_ones_the_docs_publish() -> None:
         "apply-seal-supplement",
         "apply-catalog-supplement",
         "apply-registry-supplement",
+        "apply-infrastructure-supplement",  # minted WITH its supplement (Z3) — no pre-G29 history
         "apply-sosa-supplement",
     }
 
@@ -207,7 +215,7 @@ def test_chain_applies_in_registry_order(fake_client, tmp_path, monkeypatch) -> 
     result = runner.invoke(cli_mod.app, ["apply-supplements"])
     assert result.exit_code == 0, result.output
     assert client.applied == [s.filename for s in sup.default_chain()]
-    assert "4 supplement(s) applied and verified." in result.output
+    assert "5 supplement(s) applied and verified." in result.output
 
 
 def test_chain_writes_the_run_log_envelope(fake_client, tmp_path, monkeypatch) -> None:

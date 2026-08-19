@@ -166,6 +166,15 @@
       ]
     },
     {
+      "command": "load-server-inventory",
+      "mode": "optional",
+      "profiles": [],
+      "note": "Z3 server inventory: per-application infra exports (the internal/server-inventory/ landing zone) -> :Server/:DataCenter + the tiered ExecutionHost join; the app port leg is MATCH-only, so refresh-reference (SEAL) and ingest-controlm (hosts) first make it complete rather than valid",
+      "loaders": [
+        "server_inventory.v1"
+      ]
+    },
+    {
       "command": "m1-verify",
       "mode": "standing",
       "profiles": [
@@ -1306,14 +1315,24 @@
       "urn": "urn:drydocs:dataset:(infra,server-export,prod)",
       "replaces": null,
       "classification": "Internal",
-      "confirmed": false,
+      "confirmed": true,
       "ledger": {
-        "state": "placeholder",
+        "state": "pending",
         "path": null
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [
+        {
+          "name": "server_inventory.v1",
+          "class": "ServerInventoryLoader",
+          "cli_name": "server_inventory",
+          "source_label": "csv",
+          "commands": [
+            "load-server-inventory"
+          ]
+        }
+      ]
     },
     {
       "id": "bmc-docs",
