@@ -2613,6 +2613,29 @@ items:
       team/email/queue columns are precisely §D3's 'OUT for now' set that belongs to
       email-dl-contact-point. The tool is a THIRD surface beside the table and the
       export — its columns are not evidence of what HR_PHONE_EXP projects.
+      SESSION MATERIALS (added 2026-08-19, desktop) — what the gate runner needs IN
+      FRONT OF THEM, and where it physically is. The evidence captures are
+      DESKTOP-LOCAL files under the data root (DRYDOCS_DATA_ROOT, subfolder
+      fid/screenshots/, 15 files as of 2026-08-19) — they carry real account names,
+      folder/job names, a server, paths, emails and SIDs, so they are NOT in this
+      repo and NOT on the laptop; running the gate from another machine means
+      carrying them over or re-capturing. THE ONE TO HAVE OPEN is the
+      folder-variables capture (a live legacy-LOB folder's definition view): one
+      screen is simultaneously the evidence for THREE decisions this gate touches —
+      (1) §G / K25: the job-grain run_as class split, the FileWatcher on the
+      platform account beside a folder default on the application account; (2) the
+      G68 identity census target: the (job type, run_as) pairs the profile should
+      surface; (3) Idea-140: the folder variables (interface name, source-system
+      code, package id) that are the candidate identity-grade parameters for
+      Informatica lineage, since the invoked wrappers are generic. One ruling
+      wearing three hats — the SME should see it once, not be asked three times.
+      ALSO AT HAND: doc 09's "Two sources, two grains" section + its worked example
+      (the repo-safe narration of those captures), the sibling by-application
+      listing captures (the 555/500/209/59 totals), the HR-extract profile capture
+      (the 171-way name), and knowledge/standards/technology/
+      functional-id-concepts.md for the ownership-role and succession doctrine §B
+      leans on. Everything decision-shaped stays with this gate; the captures are
+      evidence, not exhibits to commit.
 
   - id: K18
     epic: seal-attribution
