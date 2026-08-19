@@ -125,6 +125,15 @@
       ]
     },
     {
+      "command": "load-email-extracts",
+      "mode": "optional",
+      "profiles": [],
+      "note": "Q10 failure/activity email extracts -> lexical graph (assignment edge gated)",
+      "loaders": [
+        "email_extracts.v1"
+      ]
+    },
+    {
       "command": "load-doc-traceability",
       "mode": "optional",
       "profiles": [
@@ -1511,6 +1520,52 @@
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": []
+    },
+    {
+      "id": "ops-email-extracts",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": true,
+      "ledger": {
+        "state": "pending",
+        "path": null
+      },
+      "tier": "T4",
+      "curation": "sme-confirm",
+      "connector": "email",
+      "target_db": "drydocs",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "corpus_id",
+        "value": "ops-email-extracts"
+      },
+      "taxonomy_path": null,
+      "taxonomy_captures": [],
+      "ontology_mappings": [
+        {
+          "id": "email-concerns-subject",
+          "status": "proposed",
+          "label": "CONCERNS"
+        }
+      ],
+      "loaders": [
+        {
+          "name": "email_extracts.v1",
+          "class": "EmailExtractsLoader",
+          "cli_name": "email_extracts",
+          "source_label": "json",
+          "commands": [
+            "load-email-extracts"
+          ]
+        }
+      ]
     },
     {
       "id": "jpmc-reports",

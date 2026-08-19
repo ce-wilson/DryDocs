@@ -301,3 +301,55 @@ class VendorDocChunkRow(BaseModel):
     text: str = Field(...)
     char_count: int = Field(..., ge=0)
     prev_chunk_id: str | None = Field(None)
+
+
+class EmailExtractRow(BaseModel):
+    """One chunk of one failure/activity email extract (Q10).
+
+    Same one-ROW-=-one-CHUNK contract as the other lexical rows. The SOURCE is
+    the Copilot JSON extract on the file server; the original .msg is referenced
+    by path and NEVER copied or parsed — after the 6-18 month Outlook purge the
+    file-server pair is the only copy (a system of record, not a cache), so the
+    loader treats both paths as citations.
+
+    DELIBERATELY ABSENT: any folder/process assignment field. An email whose
+    subject is not extractable loads UNASSIGNED — the assignment edge is new
+    relationship semantics owned by gate email-folder-assignment, and no loader
+    field may exist for it before that gate signs (the invent-a-relationship-
+    during-import failure CLAUDE.md §1 forbids).
+    """
+
+    model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
+
+    # --- Document fields (denormalized onto every chunk row) ---
+    doc_id: str = Field(
+        ...,
+        min_length=1,
+        description="'email:<12-hex digest>' — deterministic from (subject, sent_at), truncate-and-reload safe.",
+    )
+    subject: str = Field(..., min_length=1)
+    sent_at: str = Field(
+        ...,
+        min_length=1,
+        description="ISO timestamp from the extract; freshness metadata, never identity.",
+    )
+    msg_path: str = Field(
+        ...,
+        min_length=1,
+        description="File-server path of the original .msg — a CITATION, never opened by the loader.",
+    )
+    extract_path: str = Field(
+        ..., min_length=1, description="Path of the JSON extract this row was read from."
+    )
+    trust_default: str = Field(
+        default="VERBATIM", description="The extract is the sender's own words as extracted."
+    )
+    classification: str = Field(default="Internal")
+
+    # --- Chunk fields (vary per row) ---
+    chunk_id: str = Field(..., min_length=1, description="'<doc_id>#<seq>' zero-padded.")
+    seq: int = Field(..., ge=0)
+    text: str = Field(..., min_length=1)
+    char_count: int = Field(..., ge=0)
+    prev_chunk_id: str | None = Field(default=None)
+    row_checksum: str = Field(..., min_length=1)

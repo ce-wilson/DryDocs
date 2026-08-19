@@ -304,6 +304,45 @@ sources:
       shape difference becomes a per-Document property — which is why the fold
       is cheap TODAY and expensive after either has loaded.
 
+  - id: ops-email-extracts
+    classification: Internal              # failure/incident email: real names, folder names, incident detail (confidential handling — the J23 collapsed tier; note per CLAUDE.md §3)
+    source: "DRYDOCS_DATA_ROOT/email-extracts/ — Copilot JSON extracts beside their original .msg files, mirrored from the file-server pair (real coordinates internal-twin only)"
+    connector: email
+    manifest: ~                           # no capture manifest — the extract file IS the record; each Document carries msg_path + extract_path as citations
+    trust_default: VERBATIM               # the extract is the sender's own words as extracted
+    tier: T4
+    curation: sme-confirm                 # T4 ladder (ADR 0006 §4)
+    target_db: drydocs
+    refresh: manual
+    taxonomy_path: ~
+    graph_locator:                        # the loader stamps corpus_id on :Document and :Chunk
+      match: corpus_id
+      value: ops-email-extracts
+    confirmed: true                       # Q10 (2026-08-19): pure REUSE of the ACTIVE docs_* lexical vocabulary — the Q2/essential-graphrag covering-gate precedent (bmc-docs-lexical-load), carried per N9. The ASSIGNMENT edge is separately gated (email-folder-assignment) and stays planned.
+    notes: >
+      Q10 (SME source 2026-07-26): "we get emails that reference a failure or
+      activity and I've extracted those as json files and save the original
+      msg format... it may require an SME assigning it to a particular folder
+      or process if it's not extractable from the email."
+      RETENTION, AND WHY THE SOURCE PAIR MATTERS: Outlook purges at 6-18
+      months, but the extracts are deliberately preserved on the file server
+      until the PROCESS OR PROJECT retires — after ~18 months the file server
+      holds the ONLY copy and becomes a SYSTEM OF RECORD with a backup
+      obligation, not a cache. Purge is therefore project/process-scoped (a
+      property-scoped delete keyed on the assignment once it exists), NEVER a
+      database drop — the reason retention was no argument for a separate
+      database, and unchanged by the G102 fold.
+      UNASSIGNED IS A VALID RESTING STATE: an email whose folder/process is not
+      extractable loads without an assignment — never rejected, never guessed.
+      The assignment edge (docs_email_concerns, CONCERNS ->
+      ControlMFolder | ETLProcess) is status: planned behind gate
+      email-folder-assignment; and per the cm_escalation_db correction
+      (2026-08-17), email evidence SUPPLEMENTS the human folder mapping — an
+      assignment is aboutness, never attribution (K7 §A1 fence).
+      The extract contract is ASSUMED from the synthetic samples
+      (drydocs/data/samples/email-extracts/, the G47 precedent) — confirm
+      against a real extract before treating field semantics as estate truth.
+
   - id: jpmc-reports
     classification: External            # public SEC filings / investor-relations PDFs
     source: "scripts/ingest_jpmc_reports.py (REMOVED 2026-07-22 — one-off script with hardcoded connection, superseded by module loaders; recover via git history if needed. 2 local-only PDFs: annualreport-2024 + mda10k-2024; never committed — the root /*.pdf gitignore precedent)"

@@ -1,0 +1,7 @@
+{
+  "message_id": "SYNTH-0001@sample.local",
+  "subject": "SYNTHETIC: nightly batch failure - folder hint present",
+  "sent_at": "2026-08-01T06:15:00Z",
+  "msg_file": "sample-failure-with-hint.msg",
+  "body_text": "SYNTHETIC SAMPLE - defines the ASSUMED extract contract (G47 precedent).\n\nThe overnight run ended NOT OK. The failing step names a folder in prose, which a FUTURE assignment pass may propose from - but the loader never parses it.\n\nRestart guidance was attached in the original message."
+}

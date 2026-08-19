@@ -1,0 +1,70 @@
+# SME gate-prompt spec — the email → folder/process assignment edge (backlog
+# Q10's gated half). GATE-BOUND: this page PROPOSES; the corpus loads TODAY
+# without it — unassigned is a valid resting state, and that is the design.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: email-folder-assignment
+title: "SME Gate — the email assignment edge: what CONCERNS means, who may assert it, and the fence between aboutness and attribution"
+step: "ops-email-extracts loads as the ACTIVE lexical shape (Document→Chunk, covering-gate reuse); docs_email_concerns is registered status: planned and email_extracts.cypher is test-guarded against ever writing it before this page signs"
+summary: >
+  Three rulings. Clause A fixes the edge: spelling (CONCERNS vs ASSIGNED_TO),
+  the two endpoint classes (ControlMFolder | ETLProcess, the rua §B2
+  one-meaning-two-endpoints convention), and what the edge records about its own
+  basis. Clause B fixes WHO asserts an assignment — the SME surface, or an
+  explicit signal extracted from the email itself — under the standing
+  propose-vs-perform discipline. Clause C confirms the fence that keeps this
+  edge honest at estate scale: aboutness is NEVER attribution, and an email can
+  never author who owns anything.
+meta:
+  Module: "ontology (45-local-docs · 40-mappings-docs) + the future SME surface (a later slice, its own item)"
+  Source: "the SME's 2026-07-26 source statement (verbatim on the registry row) · ops-email-extracts (config/doc-source-registry.yaml) · the synthetic contract samples (drydocs/data/samples/email-extracts/)"
+  Precedent: "docs_describes (aboutness, no PROV row) · rua-load-shapes §B2 (two endpoint classes, endpoint recorded on the edge) · the B3 discipline (an unattended job may PROPOSE, never perform) · K7 §A1 + the cm_escalation_db correction 2026-08-17 (job/email evidence SUPPLEMENTS the human folder mapping, never authors it) · O24 origin visibility (an assignment is presented WITH its basis)"
+  Registry ref: "ops-email-extracts is confirmed: true for the LEXICAL shape only (covering-gate reuse); nothing about this page changes that flag"
+  Classification: "Internal-Public page, mechanism only — real subjects, folder names and incident detail stay in the machine-local extracts"
+  Vocabulary: "docs_email_concerns flips planned -> active ONLY at this gate + its writer build; the map row email-concerns-subject stops at proposed until then"
+  Source of record: "backlog Q10 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "A failure/activity email whose subject IS extractable"
+    target: "(email:Document)-[:CONCERNS {assigned_by: source-signal}]->(:ControlMFolder | :ETLProcess)"
+    edge: "ruling required — clause A spelling/shape, clause B the signal bar"
+  - n: 2
+    element: "An email whose subject is NOT extractable"
+    target: "loads UNASSIGNED — a valid resting state, surfaced for SME assignment"
+    edge: "confirmed by design at Q10; clause B rules the SME surface's shape"
+  - n: 3
+    element: "What the assignment may NEVER do"
+    target: "author ownership/attribution — the K7 §A1 fence"
+    edge: "clause C — confirm, not negotiate"
+
+provenance:
+  - label: "What loads today (the ungated half, shipped at Q10)"
+    source_object: "drydocs/loaders/email_extracts.py + email_extracts.cypher — the ACTIVE lexical shape only"
+    key: "doc_id 'email:<12-hex>' — deterministic from message_id or (subject, sent_at); truncate-and-reload safe"
+    loader: "load-email-extracts (LoadStep optional; corpus confirmed for the lexical shape via the covering gate)"
+    properties:
+      - name: msg_path / extract_path
+        origin: source
+        from: "the file-server pair"
+        note: "CITATIONS — the loader never opens the .msg. After the 6-18 month Outlook purge the pair is the ONLY copy: a system of record with a backup obligation, not a cache. Purge is project/process-scoped, never a database drop."
+      - name: unassigned
+        origin: derived
+        from: "the absence of any assignment field — deliberate"
+        note: "no folder/process field exists on the row model or in the cypher, and a test forbids the tokens — the edge cannot arrive by accident before this page signs"
+
+sections:
+  - title: "A. The edge — spelling, endpoints, and the recorded basis"
+    confirmations:
+      - "A1. SPELLING: CONCERNS is proposed (aboutness — the docs_describes family); ASSIGNED_TO is the alternative and reads as workflow rather than semantics. Rule which; the vocabulary id (docs_email_concerns) survives either."
+      - "A2. ENDPOINTS: ControlMFolder | ETLProcess — two endpoint classes, one meaning, the endpoint class recorded on the edge (rua §B2). Confirm the PROCESS class is ETLProcess, or name the class the estate actually means by 'process' here."
+      - "A3. THE EDGE RECORDS ITS BASIS: assigned_by (sme | source-signal) plus the evidence pointer (the extract line or the ruling note). An assignment that cannot say why it exists cannot be audited when it turns out wrong — the O24 origin-visibility discipline."
+  - title: "B. Who asserts — the propose-vs-perform line"
+    confirmations:
+      - "B1. AN EXTRACTION PASS MAY PROPOSE, NEVER PERFORM: prose mentions of a folder in the body are candidates surfaced to the SME, not edges. Only an SME action, or an explicit structured signal in the source (rule what qualifies — a folder name in a structured field, not in prose), performs the write."
+      - "B2. THE SME SURFACE is a later slice with its own item: this page rules its CONTRACT (present the email, the candidates with their evidence, and the unassigned state as first-class), not its build."
+      - "B3. UNASSIGNED NEVER DECAYS INTO GUESSED: no batch job may sweep old unassigned emails onto best-match folders. The count of unassigned emails is REPORTED (the pending-source-correction union report is the natural home once its mechanics build — Idea-134), never auto-drained."
+  - title: "C. The fence — aboutness is not attribution"
+    confirmations:
+      - "C1. CONFIRM THE K7 §A1 FENCE: this edge says what an email is ABOUT; it never authors folder→application attribution, ownership, or support routing. The cm_escalation_db correction (2026-08-17) is the standing precedent: email/job-name evidence SUPPLEMENTS the human mapping. A traversal from an email through its folder to an application is legitimate READING; writing any shortcut edge from it is not."
+      - "C2. RETENTION RIDES THE ASSIGNMENT: purge is project/process-scoped, so the assignment is also the retention key — an unassigned email is unpurgeable by scope and must be surfaced by the report rather than deleted by a default. Confirm so the purge build (when it comes) cannot treat unassigned as expired."

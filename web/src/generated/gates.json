@@ -1372,6 +1372,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "email-folder-assignment (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/email-folder-assignment.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "etlprocess-kind-enum (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

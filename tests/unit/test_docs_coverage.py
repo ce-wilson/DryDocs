@@ -377,7 +377,12 @@ def test_the_live_coverage_census_is_pinned() -> None:
         # than a miss — `evidence:` points at hand-compiled rows that inform the
         # product, `documentation:` points at a docs corpus that describes it. The
         # gate's §C5 ruling turns on exactly that distinction.
-    ) == (15, 14, 7, 6), (
+    ) == (
+        15,
+        14,
+        8,  # 7->8 corpora at Q10 (ops-email-extracts, 2026-08-19)
+        7,  # unclaimed 6->7 — an email corpus is evidence, not product documentation
+    ), (
         f"coverage census changed: {s['products']} products, "
         f"{s['products_no-corpus']} with no documentation pointer, "
         f"{s['corpora_total']} corpora of which {s['corpora_unclaimed']} are claimed by no "

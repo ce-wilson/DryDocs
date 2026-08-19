@@ -514,6 +514,14 @@ MATCH (a:SchemaMeta {name: 'Document'})
 MERGE (a)-[r:SUPERSEDES]->(a)
   SET r.vocab_id = 'docs_supersedes', r.prov_maps_to = 'prov:wasRevisionOf', r.domain = 'docs', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ControlMFolder'})
+MERGE (a)-[r:CONCERNS]->(b)
+  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ETLProcess'})
+MERGE (a)-[r:CONCERNS]->(b)
+  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
 // ── domain: all ─────────────────────────────────────────────────────────────
 
 // prov_was_generated_by: from_node "*" — representative exemplar edges;

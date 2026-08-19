@@ -287,3 +287,34 @@
     domain:       docs
     status:       planned
 
+  # ── Email → subject assignment (Q10, 2026-08-19; gate email-folder-assignment PENDING) ─
+
+  - id:           docs_email_concerns
+    neo4j_label:  CONCERNS
+    inverse_label: "concerned by"
+    role:         ~
+    from_node:    Document
+    to_node:      "ControlMFolder | ETLProcess"
+    prov_maps_to: ~
+    note: >
+      A failure/activity email Document is ABOUT a folder or process — the
+      SME-assigned (or source-extractable) subject of the incident it reports.
+      Two endpoint classes, one meaning, endpoint recorded on the edge — the
+      rua-load-shapes §B2 convention. Aboutness, not derivation: no PROV row
+      (the docs_describes precedent).
+      TWO FENCES, both load-bearing. (1) ABOUTNESS IS NEVER ATTRIBUTION: per
+      the cm_escalation_db correction (2026-08-17) and K7 §A1, email evidence
+      SUPPLEMENTS the human folder→application mapping — this edge says what an
+      email is about, never who owns anything. (2) NEVER GUESSED: an email with
+      no extractable subject stays UNASSIGNED (a valid resting state); an
+      extraction pass may PROPOSE an assignment, only an SME or an explicit
+      source signal performs one (the B3 discipline). Spelling (CONCERNS vs
+      ASSIGNED_TO), the process-endpoint class, and the proposal surface are
+      the gate's clauses.
+      PLANNED: no loader writes this until gate email-folder-assignment signs —
+      email_extracts.cypher is test-guarded against ever gaining the write.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+

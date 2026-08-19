@@ -114,6 +114,13 @@ def context_intake_dir(*, create: bool = False) -> Path:
     return source_dir("context-intake", create=create)
 
 
+def email_extracts_dir(*, create: bool = False) -> Path:
+    """DRYDOCS_DATA_ROOT/email-extracts/ — the Q10 landing zone: Copilot JSON
+    extracts beside their original .msg files. Machine-local; the repo carries
+    only synthetic samples (drydocs/data/samples/email-extracts/)."""
+    return source_dir("email-extracts", create=create)
+
+
 def controlm_xml_dir(*, create: bool = False) -> Path:
     """Landing zone for Control-M XML definition exports (G47 — the
     9.0.21.300 config SoR; real folder/job/variable values are Internal).

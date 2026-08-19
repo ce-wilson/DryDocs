@@ -181,3 +181,18 @@
     vocab_id: docs_supersedes
     status: proposed
 
+  # ---- email → subject assignment (Q10, 2026-08-19 — GATE PREP, SME not yet run)
+
+  - id: email-concerns-subject
+    taxonomy: { source: ops-email-extracts, element: "A failure/activity email is ABOUT a Control-M folder or a process" }
+    ontology:
+      from_node: Document                    # prov:Entity
+      to_node: "ControlMFolder | ETLProcess" # two endpoint classes, endpoint recorded on the edge (rua §B2)
+      matrix_row: "Entity -> Entity/Activity aboutness — no PROV row (the docs_describes precedent; not derivation, not attribution)"
+      neo4j_label: CONCERNS
+      prov_maps_to: ~
+      edge_properties: { assigned_by: "sme | source-signal — never inferred-similarity (the B3 propose-vs-perform discipline)" }
+    precedence_authority: internal-standards
+    vocab_id: docs_email_concerns
+    status: proposed
+

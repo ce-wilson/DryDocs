@@ -151,6 +151,7 @@ from .loaders.doc_traceability import (
     DocTraceabilityLoader,
     TraceabilityMatrixAdapter,
 )
+from .loaders.email_extracts import EmailExtractsAdapter, EmailExtractsLoader
 from .loaders.essential_graphrag import (
     DEFAULT_PDF,
     EssentialGraphragAdapter,
@@ -239,6 +240,7 @@ LOADER_REGISTRY: dict[str, type] = {
     # bmc-docs lexical graph (Document -> Chunk):
     "bmc_docs": BmcDocsLoader,
     # Essential GraphRAG ebook lexical graph (Q2 experiment):
+    "email_extracts": EmailExtractsLoader,
     "essential_graphrag": EssentialGraphragLoader,
     # Doc traceability + review feedback (L7 connector #1):
     "doc_sections": DesignDocSectionsLoader,
@@ -360,6 +362,7 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
     "load-bmc-docs": (BmcDocsLoader,),
     "load-vendor-docs": (VendorDocsLoader,),
     "load-doc-traceability": tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
+    "load-email-extracts": (EmailExtractsLoader,),
     "load-essential-graphrag": (EssentialGraphragLoader,),
     "load-folder-attribution": (FolderAttributionLoader,),
     "load-manual-mappings": (ManualSealAttributionLoader,),
@@ -489,6 +492,12 @@ CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
         "convert -> load); taxonomy only, gated until its corpus is confirmed",
     ),
     LoadStep("load-essential-graphrag", "optional", _NONE, "Q2 book corpus -> drydocs (G102 fold)"),
+    LoadStep(
+        "load-email-extracts",
+        "optional",
+        _NONE,
+        "Q10 failure/activity email extracts -> lexical graph (assignment edge gated)",
+    ),
     LoadStep(
         "load-doc-traceability",
         "optional",
@@ -1719,6 +1728,36 @@ def load_essential_graphrag(
     adapter = EssentialGraphragAdapter(pdf_path)
     with _client(database) as cli:
         summary = EssentialGraphragLoader(cli, adapter).load()
+    console.print(summary.as_dict())
+
+
+@app.command(name="load-email-extracts")
+def load_email_extracts(
+    extracts_dir: Path | None = typer.Option(
+        None,
+        "--dir",
+        help="Extract landing zone (defaults to DRYDOCS_DATA_ROOT/email-extracts/; "
+        "the repo carries only synthetic samples under drydocs/data/samples/).",
+    ),
+    database: str = typer.Option("drydocs", "--database"),
+) -> None:
+    """Q10: load failure/activity email extracts as the lexical graph.
+
+    Copilot JSON extracts beside their preserved .msg originals — the pair is
+    the ONLY copy after the Outlook purge, so both paths land as citations and
+    nothing is copied. Emails load UNASSIGNED; the folder/process assignment
+    edge is gated (email-folder-assignment) and this loader never writes it.
+    """
+    _gate_loader(EmailExtractsLoader)
+    adapter = EmailExtractsAdapter(extracts_dir)
+    with _client(database) as cli:
+        summary = EmailExtractsLoader(cli, adapter).load()
+    if adapter.rejected:
+        console.print(
+            f"[yellow]{len(adapter.rejected)} extract(s) rejected (counted, never guessed):[/]"
+        )
+        for name, reason in adapter.rejected:
+            console.print(f"  {name}: {reason}")
     console.print(summary.as_dict())
 
 

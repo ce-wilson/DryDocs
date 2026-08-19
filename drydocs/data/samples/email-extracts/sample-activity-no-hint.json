@@ -1,0 +1,6 @@
+{
+  "subject": "SYNTHETIC: activity note - nothing extractable",
+  "sent_at": "2026-08-02T14:30:00Z",
+  "msg_file": "sample-activity-no-hint.msg",
+  "body_text": "SYNTHETIC SAMPLE - the unassigned case. No folder, no process, no identifiers of any kind. This email must LOAD, landing unassigned, rather than being rejected or guessed."
+}
