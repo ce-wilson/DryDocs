@@ -1,0 +1,96 @@
+  # ── Infrastructure / server location (Epic Z; gate server-location-ontology PENDING) ──
+  #
+  # Registered 2026-08-19 at Z2, status: planned throughout — NOTHING here loads
+  # before the gate signs and the Z3 loader builds (flips are follow-ups, the N13
+  # rule). The domain `infrastructure` is itself registered AT this gate (its §C
+  # clause): physical placement/geography is neither `scheduler` (tool-agnostic
+  # scheduling semantics) nor `architecture` (app/code/team ownership flow).
+  #
+  # THE FAMILY, in one sentence: the infrastructure site's per-application server
+  # export (infra:server-export, confirmed: false) supplies physical servers and
+  # their geography; jobs reach geography through the topology that ALREADY
+  # exists — job -RUNS_ON-> ExecutionHost/ControlMHostGroup (ACTIVE since P3) —
+  # joined to the inventory by an EXPLICIT, evidence-carrying identity edge.
+  #
+  # DELIBERATELY NOT REGISTERED — a direct job -> Server placement edge. "Where
+  # does this run" already has its label (RUNS_ON, roles agent_host|host_group),
+  # and gate rua-load-shapes §A2 killed m3_runs_on_etl_host for exactly the
+  # synonym-splitting a second placement edge would reintroduce. A job's physical
+  # location is a TRAVERSAL (RUNS_ON -> resolution -> LOCATED_IN), not an edge.
+  #
+  # THE STANDING CAUTION (Epic Z; verbatim on infra:server-export): the export's
+  # data-center field is NOT the Control-M field of the same name — CM_HOSTS.
+  # DATA_CENTER / ControlMHostGroup's DC key / ControlMServer.data_center encode
+  # SCHEDULING semantics (default run time, the T032-E0700-DMA grammar), while
+  # :DataCenter below is PHYSICAL geography. Never join or crosswalk the two by
+  # field name; any future physical<->scheduling association is its own SME-mapped
+  # decision (the orchestrator-mapping steward-cascade precedent), never a name join.
+
+  - id:           infra_resolves_to_server
+    neo4j_label:  RESOLVES_TO_SERVER
+    inverse_label: "inventoried as"
+    role:         ~
+    from_node:    ExecutionHost
+    to_node:      Server
+    prov_maps_to: ~
+    note: >
+      GATE-BOUND (server-location-ontology §C1): the identity join between
+      Control-M's view of a host (ExecutionHost, keyed on nodeid) and the
+      inventory's physical server. An EDGE, deliberately not a node merge: a
+      tiered match can be wrong, and an edge with evidence is reversible and
+      auditable where a MERGE is neither (the K2 match-policy precedent).
+      Carries match_tier (exact | normalized | dns-resolved), match_evidence
+      (what matched what, e.g. the normalization applied or the Z4 nslookup
+      transcript line) and resolved_at. One ExecutionHost whose nodeid is a
+      load-balancer alias resolves to MANY Servers (the Z4 case); unmatched
+      hosts get NO edge and stay visibly unmatched in the Z3 query — never
+      dropped, never guessed.
+    supplement:   ~
+    loader:       ~
+    domain:       infrastructure
+    status:       planned
+
+  - id:           infra_app_runs_on_server
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         application
+    from_node:    BusinessApplication
+    to_node:      Server
+    prov_maps_to: ~
+    note: >
+      GATE-BOUND (server-location-ontology §C2): the export's own grain — the
+      download is pulled per business application and every row carries the
+      owning application. Same RUNS_ON label as the scheduler placement family
+      (roles agent_host | host_group), role=application disambiguates; the
+      (from, label, to) triple is novel so the C8 meta-graph stays clean.
+      Placement, not attribution: who OWNS/develops the application is the
+      arch_/seal_ attribution family's business, and this edge never carries
+      it. Both prod and DR servers get the edge; designation lives on the
+      Server node (gate §A3), not here.
+    supplement:   ~
+    loader:       ~
+    domain:       infrastructure
+    status:       planned
+
+  - id:           infra_located_in
+    neo4j_label:  LOCATED_IN
+    inverse_label: "houses"
+    role:         ~
+    from_node:    Server
+    to_node:      DataCenter
+    prov_maps_to: "prov:atLocation"
+    note: >
+      GATE-BOUND (server-location-ontology §B1): physical placement — the
+      server sits in a data center/building. DataCenter carries the geography
+      properties (building, city, state, country) plus location_grain, the
+      Idea-90 mixed-grain declaration: a located node names the FINEST level
+      its source actually supplied instead of implying levels it does not
+      know. rack rides this edge (placement detail within the building),
+      pending the gate's grain ruling. prov:atLocation is the natural PROV
+      term; DataCenter functions as the prov:Location. THE Z5 MAP CONTRACT
+      hangs here: "a located label" means reaches-geography-via-LOCATED_IN —
+      one contract, so the map module reads no per-label special cases.
+    supplement:   ~
+    loader:       ~
+    domain:       infrastructure
+    status:       planned

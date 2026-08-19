@@ -180,7 +180,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 37,
+      "pending_entries": 41,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
@@ -197,7 +197,8 @@
         "drydocs_core/ontology/relationship_vocabulary/47-local-context.yaml",
         "drydocs_core/ontology/relationship_vocabulary/48-local-quality.yaml",
         "drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml",
-        "drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml"
+        "drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml",
+        "drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml"
       ],
       "content": null,
       "extra_contents": {}
@@ -337,7 +338,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 107,
+      "pending_entries": 110,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -375,6 +376,7 @@
         "config/gate-prompts/seal-attribution-match-policy.yaml",
         "config/gate-prompts/seal-tom-attribution-reshape.yaml",
         "config/gate-prompts/self-documentation-code-graph.yaml",
+        "config/gate-prompts/server-location-ontology.yaml",
         "config/gate-prompts/snowflake-data-catalog.yaml",
         "config/gate-prompts/software-usage-patterns.yaml",
         "config/gate-prompts/software-version-context.yaml",

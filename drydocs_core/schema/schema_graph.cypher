@@ -165,6 +165,10 @@ MERGE (n:SchemaMeta:CodeModule {name: 'CodeModule'})
   SET n.class = 'dd:CodeModule', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:CodeDirectory {name: 'CodeDirectory'})
   SET n.class = 'dd:CodeDirectory', n.prov_type = 'Collection';
+MERGE (n:SchemaMeta:Server {name: 'Server'})
+  SET n.class = 'dd:Server', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:DataCenter {name: 'DataCenter'})
+  SET n.class = 'dd:DataCenter', n.prov_type = 'n/a';
 // (no node_classifications entry)
 MERGE (n:SchemaMeta:MediaType {name: 'MediaType'});
 // (no node_classifications entry)
@@ -594,3 +598,17 @@ MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'SnowRole'})
 MERGE (a)-[r:HAD_ROLE]->(b)
   SET r.vocab_id = 'itsm_attribution_had_role', r.prov_maps_to = null, r.domain = 'itsm', r.status = 'planned';
+
+// ── domain: infrastructure ──────────────────────────────────────────────────
+
+MATCH (a:SchemaMeta {name: 'ExecutionHost'}), (b:SchemaMeta {name: 'Server'})
+MERGE (a)-[r:RESOLVES_TO_SERVER]->(b)
+  SET r.vocab_id = 'infra_resolves_to_server', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Server'})
+MERGE (a)-[r:RUNS_ON]->(b)
+  SET r.vocab_id = 'infra_app_runs_on_server', r.role = 'application', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Server'}), (b:SchemaMeta {name: 'DataCenter'})
+MERGE (a)-[r:LOCATED_IN]->(b)
+  SET r.vocab_id = 'infra_located_in', r.prov_maps_to = 'prov:atLocation', r.domain = 'infrastructure', r.status = 'planned';

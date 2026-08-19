@@ -95,7 +95,8 @@
             "all",
             "human",
             "corporate",
-            "itsm"
+            "itsm",
+            "infrastructure"
           ]
         },
         "supplement": {

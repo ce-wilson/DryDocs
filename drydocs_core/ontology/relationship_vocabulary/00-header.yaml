@@ -65,7 +65,11 @@
 #   loader        cypher file that writes this relationship
 #   domain        scheduler | business_application | catalog | architecture |
 #                 registry | docs | quality | context | all | human | corporate |
-#                 itsm
+#                 itsm | infrastructure
+#                 (`infrastructure` registered at gate server-location-ontology
+#                 (Z2, 2026-08-19) for physical placement/geography — neither
+#                 scheduler (tool-agnostic scheduling semantics) nor
+#                 architecture (app/code/team ownership flow).)
 #                 (renamed from controlm/seal at gate
 #                 vocabulary-domains-and-id-policy §A1/§A2, 2026-08-12; the
 #                 scheduler partition is tool-agnostic — AutoSys/Airflow edges

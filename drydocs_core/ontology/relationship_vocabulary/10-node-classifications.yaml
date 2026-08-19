@@ -629,3 +629,36 @@ node_classifications:
       decision"). The repo ROOT directory is NOT a CodeDirectory — the tree
       loader maps it onto the existing single :Project node, so gate §B1(a)
       (one root, nothing else hangs off it) holds unchanged.
+
+  # — Infrastructure / server location (Epic Z; gate server-location-ontology PENDING) —
+  - label: Server
+    class: "dd:Server"
+    prov_type: n/a
+    note: >
+      GATE-BOUND (server-location-ontology, Z2): a PHYSICAL/VIRTUAL server from
+      the infrastructure site's per-application export (infra:server-export) —
+      the INVENTORY spine. Deliberately distinct from THREE near-neighbors, and
+      the distinctions are the point: (1) ExecutionHost is Control-M's VIEW of
+      a host (prov:SoftwareAgent, keyed on nodeid; may be an LB alias) — the
+      two join ONLY via infra_resolves_to_server's evidence-carrying edge,
+      never by minting one node from two sources; (2) ControlMServer is a
+      SCHEDULER INSTANCE (P12 …), not hardware; (3) ControlMHostGroup is a
+      load-balancing set. Local infrastructure class, no W3C equivalent
+      (ControlMServer precedent); prov_type n/a — placement edges carry no
+      PROV mapping (the RUNS_ON family precedent). Carries designation
+      (PROD | DR — property, not node, pending gate §A3) and the os_product /
+      os_version pair pending gate §A2.
+
+  - label: DataCenter
+    class: "dd:DataCenter"
+    prov_type: n/a
+    note: >
+      GATE-BOUND (server-location-ontology, Z2): a PHYSICAL data
+      center/building — functions as the prov:Location target of
+      infra_located_in (prov:atLocation). Carries the geography ladder as
+      properties (building, city, state, country) plus location_grain, the
+      Idea-90 mixed-grain declaration (name the finest level the source
+      supplied; imply nothing). NEVER the Control-M "data center": CM_HOSTS.
+      DATA_CENTER and the ControlMServer/ControlMHostGroup DC keys are
+      SCHEDULING concepts (default-run-time grammar) — the Epic Z standing
+      caution fences the two apart, and no crosswalk joins them by field name.

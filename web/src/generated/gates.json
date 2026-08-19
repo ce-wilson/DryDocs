@@ -1481,6 +1481,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "server-location-ontology (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/server-location-ontology.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "snowflake-data-catalog (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [

@@ -1,0 +1,86 @@
+# SME gate-prompt spec — server/location ontology (backlog Z2). GATE-BOUND: this
+# page PROPOSES; the vocabulary entries ship status: planned and NOTHING loads
+# before sign-off + the Z3 build (flips are follow-ups, the N13 rule).
+#
+# SOURCE BOUNDARY (PUBLISH-BOUNDARY.md): the evidence is the infrastructure
+# site's per-application server export (infra:server-export, registered at Z1,
+# confirmed: false). Mechanism only — the site name/URL, real hostnames, racks,
+# building locations and geography values stay company-side (the real exports
+# commit under internal/server-inventory/, excluded from any public push).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: server-location-ontology
+title: "SME Gate — server/location ontology: the Server identity spine, the geography grain and located-node contract, and the Control-M join rule"
+step: "Z2 rules every meaning edge for the Z1-registered server export BEFORE the Z3 loader exists: what a Server IS (vs ExecutionHost / ControlMServer / ControlMHostGroup), how geography is carried and declared, and how the inventory joins Control-M's host topology — with the explicit two-DCs fence"
+summary: >
+  Three clause groups. Clause A fixes identity: what an export row becomes (a
+  new :Server inventory spine joined to :ExecutionHost by an evidence-carrying
+  edge, never a merge), where OS product/version lives (the software-registry
+  tie the C25 version-context ruling implies), and prod/DR as property vs
+  node. Clause B fixes geography: nodes vs properties for
+  rack/building/city/state/country, the Idea-90 mixed-grain declaration
+  (location_grain), the aggregate-presence-claim rule ("177 locations" is a
+  claim, never 177 nodes), and the EXPLICIT ruling that the export's
+  data-center field and the Control-M same-named field are distinct concepts
+  that never crosswalk by name. Clause C fixes the join: match tiers with
+  recorded evidence (the K2 match-policy precedent), the export's
+  application->server edge, the DECLINED direct job->Server edge (the
+  rua-load-shapes §A2 synonym-splitting precedent), the SOR-vs-ADS site
+  provenance parked at Z1, and the new `infrastructure` vocabulary domain.
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml — three entries, all status: planned; node classifications Server + DataCenter)"
+  Source: "infra:server-export (config/source-registry.yaml, Z1, confirmed: false) · config/taxonomy/server-location.yaml (the Z1 hierarchy + field contract) · the 2026-08-08 user directive (Epic Z groom) · Idea-90's two location findings (merged 2026-08-09 into the Z2 acceptance) · the P3 host topology already ACTIVE (CM_HOSTS: ExecutionHost, ControlMHostGroup, RUNS_ON roles agent_host|host_group)"
+  Precedent: "K2 seal-attribution-match-policy (tiered match + recorded evidence, fallback demoted) · rua-load-shapes §A2 (m3_runs_on_etl_host DECLINED — never split 'where does this run' across synonym edges) · controlm-hosts-topology (the Control-M side of the join, 2026-07-09) · C25 (a platform/target name never occupies a concept slot; version context ties to the software registry) · the one-spine rule (ITSM family, 50-local-itsm.yaml: a second identity spine makes one-traversal questions unanswerable)"
+  Registry ref: "dataset infra:server-export stays confirmed: false at this gate — sign-off authorizes the SHAPES; the flip belongs to the Z3 loader build (N13: flips are follow-ups). The two Z1-parked open questions (SOR-vs-ADS site provenance; the os_product software-registry tie) are clauses C4/A2 here"
+  Classification: "Internal-Public page, mechanism only — no site name/URL, hostname, rack, building or geography value; the synthetic fixture (tests/fixtures/server_inventory/) is the only sampled shape"
+  Vocabulary: "infra_resolves_to_server, infra_app_runs_on_server, infra_located_in — registered status: planned in 51-local-infrastructure.yaml; they stay planned until the Z3 build. Domain `infrastructure` is registered AT this gate (clause C5). NO direct job->Server edge is registered, and clause C3 confirms that refusal"
+  Source of record: "backlog Z2 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "One export row (a server with OS, rack, geography, designation, owning application)"
+    target: ":Server (new inventory spine) + infra_located_in -> :DataCenter + infra_app_runs_on_server from :BusinessApplication"
+    edge: "ruling required — clauses A1/A3, B1, C2"
+  - n: 2
+    element: "The same physical box as Control-M sees it (NODE_ID / CM_HOSTS nodeid, possibly an LB alias)"
+    target: ":ExecutionHost -[:RESOLVES_TO_SERVER {match_tier, match_evidence}]-> :Server — an edge, never a node merge"
+    edge: "ruling required — clauses A1, C1"
+  - n: 3
+    element: "The export's data-center/location field"
+    target: ":DataCenter (PHYSICAL) — never CM_HOSTS.DATA_CENTER / the ControlMServer or ControlMHostGroup DC keys (SCHEDULING)"
+    edge: "clause B3 — confirm the fence EXPLICITLY (the Z2 acceptance requires it by name)"
+
+provenance:
+  - label: "What is proposed (all planned; nothing loads before Z3)"
+    source_object: "drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml + the Server/DataCenter node classifications"
+    key: "server_name (the Z2 join key; the Z1 field contract's first column)"
+    loader: "NONE — Z3 builds the loader only after this gate signs"
+    properties:
+      - name: match_tier
+        origin: derived
+        from: "the C1 join rule (exact | normalized | dns-resolved)"
+        note: "on infra_resolves_to_server, with match_evidence + resolved_at — the K2 evidence discipline; unmatched hosts get NO edge and stay visible in the Z3 query"
+      - name: location_grain
+        origin: source
+        from: "which geography fields the export actually filled for this row"
+        note: "on :DataCenter — the Idea-90 finding (i): a located node DECLARES the finest level its source supplied, never implying levels it lacks"
+
+sections:
+  - title: "A. Identity — the Server spine, the OS, prod/DR"
+    confirmations:
+      - "A1. THE SPINE: an export row mints a NEW :Server label (the inventory spine), and the join to Control-M's :ExecutionHost is an EDGE carrying evidence (infra_resolves_to_server), never a node merge — a tiered match can be wrong, and an edge is reversible/auditable where a MERGE is neither (K2 precedent). The one-spine rule is honored per CONCEPT: ExecutionHost is Control-M's VIEW of a host (often an LB alias — not 1:1 with hardware), :ControlMServer is a scheduler instance, :ControlMHostGroup a load-balancing set; :Server is the physical/virtual box. Four labels, four concepts — the alternative (adding :Server as a second label on matched ExecutionHosts) collapses an alias onto hardware exactly where the LB case makes them differ."
+      - "A2. THE OS: os_product/os_version land as plain :Server properties AT Z3, and the software-registry tie (an OS row + a USES_SOFTWARE edge per the C25 version-context ruling — the patching use case: 'which servers still run RHEL <major>') is registered as a FOLLOW-UP direction, not built now: the software registry has no OS row today (checked at Z1), and minting one is a registry decision this gate records but does not execute."
+      - "A3. PROD/DR: designation is a PROPERTY on :Server (values PROD | DR, from the export), not a node and not an edge property on the application link — both prod and DR servers carry infra_app_runs_on_server, and the Z3 query filters on the property. A DR-pairing edge (which DR server mirrors which prod server) is NOT in the export's contract and is not invented here."
+  - title: "B. Geography — grain, claims, and the two-DCs fence"
+    confirmations:
+      - "B1. THE GRAIN: :DataCenter is the ONLY new geography node; building, city, state, country are PROPERTIES on it, rack rides the infra_located_in edge (placement detail within the building), and NO City/State/Country nodes are minted at Z2 — the seven-level taxonomy capture (Z1) stays the classification record, and promoting geography levels to nodes is a future ruling if a real query needs to traverse them. THE Z5 MAP CONTRACT: 'a located label' = reaches-geography-via-LOCATED_IN; the map module reads that one contract, no per-label special cases."
+      - "B2. MIXED GRAIN DECLARED (Idea-90 finding i): real location data arrives at mixed grain — street address, city and country all appear as 'the location' in one source. Every :DataCenter carries location_grain naming the FINEST level its source actually supplied (building | city | state | country); absent levels stay null and are never inferred. A consumer (the Z5 map) renders at the declared grain, never below it."
+      - "B3. AGGREGATE PRESENCE CLAIMS (Idea-90 finding ii): a source stating 'N locations' is a claim ABOUT sites — it lands as a recorded claim (property/annotation with source + date) on the claiming node, and is NEVER exploded into N :DataCenter nodes. Exploding a count manufactures data; the graph holds enumerable sites and holds claims as claims."
+      - "B4. THE TWO-DCs FENCE, ruled EXPLICITLY (the Z2 acceptance requires this by name): the export's data-center field and the Control-M same-named field are DISTINCT CONCEPTS that never crosswalk by field name. CM_HOSTS.DATA_CENTER / ControlMServer.data_center / ControlMHostGroup's DC key are SCHEDULING (the default-run-time grammar, T032-E0700-DMA); :DataCenter is PHYSICAL geography. Any future association between a scheduling DC and a physical site is its own SME-mapped decision (the orchestrator-mapping steward-cascade precedent) — never a name join, never automated."
+  - title: "C. The join, the app edge, the refusals, the domain"
+    confirmations:
+      - "C1. THE JOIN RULE (K2 precedent — tiers + evidence, nothing silent): ExecutionHost -> Server matches in declared tiers — T1 exact (nodeid == server_name, case-normalized); T2 normalized (deterministic short-name/FQDN rule: strip the DNS suffix, nothing fuzzier); T3 dns-resolved (the Z4 nslookup evidence file: the LB alias's resolved hostnames matched at T1/T2). Every infra_resolves_to_server edge records match_tier + match_evidence + resolved_at; a host with no match gets NO edge and appears as explicitly unmatched in the Z3 coverage query — visible, never dropped, never guessed."
+      - "C2. THE APP EDGE: (BusinessApplication)-[:RUNS_ON {role: application}]->(:Server) (infra_app_runs_on_server) carries the export's own grain — the download is per-application and every row names its owner. Same RUNS_ON label as the scheduler placement family, role disambiguates (novel triple, C8-clean). PLACEMENT, not attribution: ownership/development stays with the arch_/seal_ attribution family; this edge never carries it."
+      - "C3. THE REFUSAL, confirmed rather than assumed: NO direct job -> Server placement edge exists, not even planned. 'Where does this run' already has its label (RUNS_ON roles agent_host | host_group, ACTIVE since P3), and rua-load-shapes §A2 killed m3_runs_on_etl_host for exactly this synonym split. A job's physical location is the TRAVERSAL job -RUNS_ON-> host/group -RESOLVES_TO_SERVER-> server -LOCATED_IN-> data center."
+      - "C4. SITE PROVENANCE (parked at Z1): infra:server-export keeps authority: SOR with the recorded caveat — whether the site originates server/placement facts or fronts a CMDB is unresolved, and the flip to ADS happens only on evidence (a company-side confirmation of what backs the site), recorded on the registry row when it lands. No re-gate needed for that flip; this clause pre-authorizes it as an update-not-ruling."
+      - "C5. THE DOMAIN: `infrastructure` is registered as a vocabulary domain (fragment 51-local-infrastructure.yaml, prefix infra_) — physical placement/geography is neither `scheduler` (tool-agnostic scheduling semantics) nor `architecture` (app/code/team ownership flow), and filing it under either would misfile every future rack/power/network edge with it."
