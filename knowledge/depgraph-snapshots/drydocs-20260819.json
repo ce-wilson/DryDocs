@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-19T07:06:59",
+    "captured_at": "2026-08-19T11:29:03",
     "date": "20260819",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "b3b5e47b",
-      "full": "b3b5e47bc1ba32e205412ff98206f7ac3623b158",
+      "commit": "a30dd952",
+      "full": "a30dd952481784b4112858675e9315474e72b79e",
       "branch": "main",
-      "describe": "port-base-20260817-100-gb3b5e47b",
-      "subject": "docs(sweep): L19 clauses (c)(e)(f) — retired paths re-pointed, the C9 row restated, the lineage model cited",
+      "describe": "port-base-20260817-111-ga30dd952",
+      "subject": "feat(load): Z3 ΓÇö the server-inventory loader + tiered ExecutionHost join, e2e green and idempotent",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -8099,6 +8099,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/graph-retrieval-benchmark-persona-rerun.html",
+      "name": "graph-retrieval-benchmark-persona-rerun.html",
+      "extension": ".html",
+      "rel_path": "docs/design/graph-retrieval-benchmark-persona-rerun.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/graph-retrieval-benchmark-persona-rerun.md",
+      "name": "graph-retrieval-benchmark-persona-rerun.md",
+      "extension": ".md",
+      "rel_path": "docs/design/graph-retrieval-benchmark-persona-rerun.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/templates",
       "name": "templates",
       "extension": "",
@@ -10124,15 +10142,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -10149,15 +10158,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -10826,6 +10826,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/server_inventory.cypher",
+      "name": "server_inventory.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/server_inventory.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/cypher/server_resolution.cypher",
+      "name": "server_resolution.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/server_resolution.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/software_registry.cypher",
       "name": "software_registry.cypher",
       "extension": ".cypher",
@@ -10938,6 +10956,24 @@
       "name": "seal_contacts.py",
       "extension": ".py",
       "rel_path": "drydocs/loaders/seal_contacts.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/server_inventory.py",
+      "name": "server_inventory.py",
+      "extension": ".py",
+      "rel_path": "drydocs/loaders/server_inventory.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/server_resolution.py",
+      "name": "server_resolution.py",
+      "extension": ".py",
+      "rel_path": "drydocs/loaders/server_resolution.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11157,24 +11193,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -11780,6 +11798,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/models/infrastructure.py",
+      "name": "infrastructure.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/models/infrastructure.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/models/registry.py",
       "name": "registry.py",
       "extension": ".py",
@@ -12234,6 +12261,15 @@
       "name": "constraints.py",
       "extension": ".py",
       "rel_path": "drydocs_core/schema/constraints.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/schema/infrastructure_ontology_supplement.cypher",
+      "name": "infrastructure_ontology_supplement.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs_core/schema/infrastructure_ontology_supplement.cypher",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14111,10 +14147,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260819.json",
-      "name": "drydocs-20260819.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260819-0706.json",
+      "name": "drydocs-20260819-0706.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260819.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260819-0706.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14354,6 +14390,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/knowledge/standards/technology/functional-id-concepts.md",
+      "name": "functional-id-concepts.md",
+      "extension": ".md",
+      "rel_path": "knowledge/standards/technology/functional-id-concepts.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/knowledge/upgrade-plans",
       "name": "upgrade-plans",
       "extension": "",
@@ -14453,10 +14498,37 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona.py",
+      "name": "benchmark_p0_persona.py",
+      "extension": ".py",
+      "rel_path": "knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona_results.json",
+      "name": "benchmark_p0_persona_results.json",
+      "extension": ".json",
+      "rel_path": "knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona_results.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json",
       "name": "benchmark_p0_results.json",
       "extension": ".json",
       "rel_path": "knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/upgrade-plans/p0-benchmark/persona_queries.json",
+      "name": "persona_queries.json",
+      "extension": ".json",
+      "rel_path": "knowledge/upgrade-plans/p0-benchmark/persona_queries.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15195,6 +15267,15 @@
       "name": "test_meta_graph_exclusion.py",
       "extension": ".py",
       "rel_path": "tests/integration/test_meta_graph_exclusion.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/integration/test_server_inventory_e2e.py",
+      "name": "test_server_inventory_e2e.py",
+      "extension": ".py",
+      "rel_path": "tests/integration/test_server_inventory_e2e.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16383,6 +16464,15 @@
       "name": "test_server_inventory_fixture.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_server_inventory_fixture.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_server_inventory_load.py",
+      "name": "test_server_inventory_load.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_server_inventory_load.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18327,6 +18417,14 @@
     ],
     [
       "drydocs/drydocs/cli.py",
+      "drydocs/drydocs/loaders/server_inventory.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs/loaders/server_resolution.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/software_registry.py"
     ],
     [
@@ -18742,6 +18840,14 @@
       "drydocs/drydocs_core/models/__init__.py"
     ],
     [
+      "drydocs/drydocs/loaders/server_inventory.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/server_inventory.py",
+      "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
       "drydocs/drydocs/loaders/software_registry.py",
       "drydocs/drydocs/loaders/app_identity.py"
     ],
@@ -19136,6 +19242,10 @@
     [
       "drydocs/drydocs_core/models/__init__.py",
       "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/drydocs_core/models/__init__.py",
+      "drydocs/drydocs_core/models/infrastructure.py"
     ],
     [
       "drydocs/drydocs_core/models/__init__.py",
@@ -19562,6 +19672,10 @@
       "drydocs/drydocs_remediation/formats.py"
     ],
     [
+      "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
       "drydocs/libs/oracle_kerberos/__init__.py",
       "drydocs/libs/oracle_kerberos/spider_login.py"
     ],
@@ -19703,6 +19817,14 @@
     ],
     [
       "drydocs/tests/integration/test_meta_graph_exclusion.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/integration/test_server_inventory_e2e.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/integration/test_server_inventory_e2e.py",
       "drydocs/drydocs_core/neo4j_client.py"
     ],
     [
@@ -20844,6 +20966,26 @@
     [
       "drydocs/tests/unit/test_seal_samples.py",
       "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/tests/unit/test_server_inventory_load.py",
+      "drydocs/drydocs/loaders/server_inventory.py"
+    ],
+    [
+      "drydocs/tests/unit/test_server_inventory_load.py",
+      "drydocs/drydocs/loaders/server_resolution.py"
+    ],
+    [
+      "drydocs/tests/unit/test_server_inventory_load.py",
+      "drydocs/drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_server_inventory_load.py",
+      "drydocs/drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs/tests/unit/test_server_inventory_load.py",
+      "drydocs/drydocs_core/models/__init__.py"
     ],
     [
       "drydocs/tests/unit/test_sme_notes.py",
@@ -26697,6 +26839,16 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/graph-retrieval-benchmark-persona-rerun.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/graph-retrieval-benchmark-persona-rerun.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/templates"
     ],
     [
@@ -27342,22 +27494,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -27418,16 +27560,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -28087,6 +28219,16 @@
     [
       "drydocs/drydocs/loaders",
       "CONTAINS",
+      "drydocs/drydocs/loaders/server_inventory.py"
+    ],
+    [
+      "drydocs/drydocs/loaders",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/server_resolution.py"
+    ],
+    [
+      "drydocs/drydocs/loaders",
+      "CONTAINS",
       "drydocs/drydocs/loaders/software_registry.py"
     ],
     [
@@ -28253,6 +28395,16 @@
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
       "drydocs/drydocs/loaders/cypher/seal_contacts.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/server_inventory.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/server_resolution.cypher"
     ],
     [
       "drydocs/drydocs/loaders/cypher",
@@ -28687,6 +28839,11 @@
     [
       "drydocs/drydocs_core/models",
       "CONTAINS",
+      "drydocs/drydocs_core/models/infrastructure.py"
+    ],
+    [
+      "drydocs/drydocs_core/models",
+      "CONTAINS",
       "drydocs/drydocs_core/models/registry.py"
     ],
     [
@@ -28903,6 +29060,11 @@
       "drydocs/drydocs_core/schema",
       "CONTAINS",
       "drydocs/drydocs_core/schema/constraints.py"
+    ],
+    [
+      "drydocs/drydocs_core/schema",
+      "CONTAINS",
+      "drydocs/drydocs_core/schema/infrastructure_ontology_supplement.cypher"
     ],
     [
       "drydocs/drydocs_core/schema",
@@ -29922,7 +30084,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260819.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260819-0706.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -30030,6 +30192,11 @@
       "drydocs/knowledge/standards/technology/folder-naming-convention.md"
     ],
     [
+      "drydocs/knowledge/standards/technology",
+      "CONTAINS",
+      "drydocs/knowledge/standards/technology/functional-id-concepts.md"
+    ],
+    [
       "drydocs/knowledge/upgrade-plans",
       "CONTAINS",
       "drydocs/knowledge/upgrade-plans/docmeta-component.md"
@@ -30097,7 +30264,22 @@
     [
       "drydocs/knowledge/upgrade-plans/p0-benchmark",
       "CONTAINS",
+      "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona.py"
+    ],
+    [
+      "drydocs/knowledge/upgrade-plans/p0-benchmark",
+      "CONTAINS",
+      "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona_results.json"
+    ],
+    [
+      "drydocs/knowledge/upgrade-plans/p0-benchmark",
+      "CONTAINS",
       "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json"
+    ],
+    [
+      "drydocs/knowledge/upgrade-plans/p0-benchmark",
+      "CONTAINS",
+      "drydocs/knowledge/upgrade-plans/p0-benchmark/persona_queries.json"
     ],
     [
       "drydocs/libs",
@@ -30463,6 +30645,11 @@
       "drydocs/tests/integration",
       "CONTAINS",
       "drydocs/tests/integration/test_meta_graph_exclusion.py"
+    ],
+    [
+      "drydocs/tests/integration",
+      "CONTAINS",
+      "drydocs/tests/integration/test_server_inventory_e2e.py"
     ],
     [
       "drydocs/tests/unit",
@@ -31118,6 +31305,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_server_inventory_fixture.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_server_inventory_load.py"
     ],
     [
       "drydocs/tests/unit",
@@ -32039,13 +32231,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 1725,
-    "edges": 996,
+    "files": 1739,
+    "edges": 1009,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2000,
-    "directories": 276
+    "rels": 2010,
+    "directories": 272
   }
 }
