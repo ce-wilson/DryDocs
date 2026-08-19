@@ -1,7 +1,7 @@
 # ADR 0011 — Single-database contingency: the fold-down plan if multi-DB becomes unavailable
 
 ```yaml
-status: PLANNED           # a contingency on the shelf, not a decision to execute
+status: EXECUTED-BY-CHOICE   # 2026-08-18, gate document-content-topology (G32) — see the amendment note below; was PLANNED
 date: 2026-08-10
 authored_by: G53 session (desktop, autonomous; SME-directed pull)
 deciders: []              # execution requires an SME gate; nothing here is pre-approved
@@ -15,6 +15,20 @@ trigger: >
   constraint or a cost ruling). NOT the 2026-08-01 laptop eval expiry — that is
   a local license matter, explicitly out of scope per the G53 groom note.
 ```
+
+> **AMENDED 2026-08-18 — EXECUTED BY CHOICE, for a trigger this record does not
+> contain (gate `document-content-topology` / G32, Q10).** The fold this ADR shelved
+> was chosen deliberately, and the reason MUST be recorded here because it is not
+> the one below: Enterprise did NOT become unavailable. The SME ruled the fold on
+> RETRIEVAL grounds — an agent that cannot see captured context beside the
+> structured graph in one vector search fails silently — and on the §F precedent
+> that per-assertion `origin` governance already protects the graph's most governed
+> edges inside one database. Scope differences from the shelf plan: `ddschema` does
+> NOT fold (clause 2 never fires — the single largest cost avoided, taken
+> deliberately); the three clause-1 guards are a HARD PRECONDITION of the apply
+> (G102, guards first), not a follow-up; and clause 1's `:Uncertain` label lands at
+> the single uncertain write boundary exactly as written here. A future reader
+> asking "did Enterprise go away?" — no. This executed because the plan was good.
 
 ## What this is, and is not
 

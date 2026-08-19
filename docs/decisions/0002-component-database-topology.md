@@ -13,6 +13,24 @@
 > (added 2026-07-26, backlog G28, after `drydocs_deepdoc.DATABASE` was found still pointing at
 > a database provisioning never creates).
 
+> **AMENDED 2026-08-18 — gate `document-content-topology` (G32), SIGNED 32/32: the
+> CONTENT topology folds to ONE database.** D1's decision record stands as history;
+> its multi-database conclusion is superseded FOR THE CONTENT AXIS by an argument it
+> never weighed: retrieval. The product is now an agent answering support questions,
+> and an agent that cannot see captured context beside the structured graph in one
+> vector search fails silently and constantly, where the isolation failure D1 priced
+> is loud and rare. The trust distinction D1 bought with a wall was ALREADY governed
+> inside one database for the graph's most governed edges — the manual pins run on
+> per-edge `origin` + precedence + required rationale, never on the boundary — so
+> the fold extends a shipped mechanism (see the gate's §F). `ddschema` stays its own
+> database (G51; ADR 0011 clause 2 deliberately never fires). `ddcontext`'s charter
+> restates per the gate's §B: the watermark re-keys on each source's declared
+> `trust_default`, never on database name. **THE NAMING RULE (gate Q8), recorded as
+> a rule and not one rejection: `drydocs` is the ORIGINAL database; `dd*` names are
+> its EXTENSIONS — a proposed database whose contents belong in the original fails
+> this test, which is how `dddocs` was rejected and retired.** Apply is staged
+> (backlog G102, guards-first); nothing moved at signing.
+
 ```yaml
 status: ACCEPTED        # PROPOSED | ACCEPTED | SUPERSEDED
 date: 2026-06-26

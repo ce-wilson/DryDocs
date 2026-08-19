@@ -1270,6 +1270,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-18",
+      "title": "GATE: document-content-topology — SIGNED OFF 32/32 (G32)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/document-content-topology.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3459",
+      "unblocks": [
+        "G102"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1296,17 +1309,6 @@
         "U10",
         "U11"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "document-content-topology (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/document-content-topology.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     },
     {
       "kind": "prompt-only",

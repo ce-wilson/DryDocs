@@ -13,6 +13,20 @@ affects:
   - docs/restructure/backlog.yaml                   # Q4 (this gate) -> Q5/Q6
 ```
 
+> **AMENDED 2026-08-18 — gate `document-content-topology` (G32), SIGNED 32/32.**
+> Three of this ADR's declarations are superseded, none of its vocabulary: (1) the
+> "docs database" (`dddocs`) is REJECTED and retired — captured vendor/estate
+> corpora live in `drydocs`, and under the gate's §A fold the content topology is
+> ONE database; `target_db` in `config/doc-source-registry.yaml` follows at the
+> G102 apply. (2) §1's description of drydocs-deepdoc as a corpus consumer is now
+> the RULED charter, completed: deepdoc is a CORPUS-DRIVEN RETRIEVER seeded from
+> the grounded graph, creating NO relationship unless the subject already exists
+> (the ADR 0002 D1 proxy-node pattern); the parser-driven command-line reading in
+> ADR 0002 is an INPUT to it, not a rival product. GRAPH-SEEDED RETRIEVAL is a
+> named reusable pattern (first instance: the 2026-07-23 HR-hierarchy resolution).
+> (3) Corpus ids follow the doc-registry ID GRAMMAR of the same date
+> ({vendor}-docs[-{scope}]); this ADR's corpus names are historical.
+
 ## Context
 
 The docmeta P0 benchmark verdict (2026-07-16,

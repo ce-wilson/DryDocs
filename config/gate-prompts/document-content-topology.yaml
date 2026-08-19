@@ -494,7 +494,7 @@ risks:
   - "§F's two axes are the failure most likely to be found LATE, because nothing breaks when they are conflated — a filter reading the wrong axis returns a plausible, smaller answer. If the fold lands without §F's confirmation 3 (every filter states which axis it reads), the first 'trusted content' query silently drops every human-pinned mapping, which are the assertions with the highest standing in the graph."
   - "tests/unit/test_load_map_json.py::test_the_not_queryable_target_db_set_is_pinned pins the not-queryable set to exactly {dddocs} and WILL FAIL when this signs. That is deliberate: it is the alarm forcing web/src/software/softwareModel.ts (inGraphLabel) and the docs-coverage detail lines to be revisited rather than left saying 'not provisioned (G32)'. Under R1 the not-queryable set becomes EMPTY. Treat the failure as a task, not a break."
 
-status: awaiting-sme
+status: signed-off   # 2026-08-18, 32/32 — config/gate-log.md same date; apply staged as G102 (guards first) + Q20
 drafted: 2026-08-05
 refreshed: 2026-08-18   # corpus ids renamed to the doc-registry id grammar (bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag); bmc-docs retained (P0 benchmark record)
 unblocks:
