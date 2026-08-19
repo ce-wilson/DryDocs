@@ -92,6 +92,26 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-140`** · 2026-08-19 · `[source]` · **open** · prio? **Med** —
+  **Informatica invocations are the same generic few `.ksh` wrappers for ALL business
+  applications on that platform — script-path identity is non-distinguishing, which is
+  the G12 wrapper-payload problem arriving on a third platform.** SME direction
+  2026-08-19 at the K16 two-source session. G12 already ruled this shape for two kinds:
+  Ab Initio and DPL invocations land on `:ETLProcess` keyed on a kind-scoped stable
+  token (pset/graph basename; pipeline GUID) with the path kept as a property, never
+  identity — because the invoked path is a wrapper and the real identity is in the
+  parameters. Informatica is the same family: every business application's Control-M
+  jobs invoke the same handful of generic shell wrappers, so `m3_invokes` targets
+  would converge on a few shared `:Script` nodes that distinguish NOTHING — while the
+  actual identity (interface name, source-system code, package id) rides the folder
+  variables (worked example in doc 09's two-source section, captures in the data
+  root). Candidate ruling for the next lineage gate/groom: an `informatica` kind in
+  the G12 classification with its own kind-scoped token derived from the invocation
+  parameters — and the open question of WHICH parameter(s) are identity-grade is
+  exactly the kind of thing the G68 folder profile can measure before anyone rules.
+  G12's own close note already inboxed the `m3_invokes` to_node broadening question;
+  this entry adds the third kind and its evidence.
+
 - **`Idea-139`** · 2026-08-19 · `[idea]` · **groomed → J50 (2026-08-19, same session)** · prio? **Low** —
   **`gates.json`'s `unblocks` edge is a MENTION SCAN, and this repo already knows that is
   not good enough — it fixed the same class one edge over.** `scripts/render_gates.py`'s

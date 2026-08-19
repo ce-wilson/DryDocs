@@ -17131,6 +17131,14 @@ items:
       pending the vendor schema, and the profile plus the SME's substitutions are a PROPOSAL,
       which is what the equivalence proof already consumes.
 
+      EVIDENCE RIDER 2026-08-19 (desktop, the K16 two-source session): the identity
+      census (b) should report run_as BY JOB TYPE, not as a flat distinct list. A live
+      legacy-LOB folder shows the FileWatcher job running as the Control-M platform
+      account while the folder default runs as the application account — job-grain
+      class split that a flat run_as census would blur into "two accounts". The
+      FileWatcher x platform-account pairing is the designed pattern; a payload job on
+      the platform account is the finding. K25 owns the cross-application detection;
+      this profile is where the raw (job type, run_as) pairs surface for an SME.
   - id: O59
     epic: web-console
     title: "The /remediation intake surface: an SME reads the folder-set profile (FIDs, variables, emails) and supplies the substitutions the XML cannot carry"
@@ -18365,7 +18373,15 @@ items:
       counts are themselves a deliverable (how much of the estate runs as the
       platform is a number nobody has). How a platform account is RECOGNIZED (curated
       list vs the directory's type/purpose columns) is a K17 §D/§G ruling this item
-      must not preempt — it may propose, with evidence.
+      must not preempt — it may propose, with evidence. JOB-GRAIN EVIDENCE 2026-08-19
+      (SME captures, a live legacy-LOB folder): the class splits INSIDE one folder —
+      the FileWatcher job runs as the platform account while the folder default (the
+      payload jobs) runs as the application's account. So (e) the detector classifies
+      PER JOB, never per folder, and reports run_as class BY JOB TYPE: FileWatcher x
+      platform-account is the designed pattern (file watching is a platform service);
+      the countable anomaly is a PAYLOAD job running as the platform. A folder-grain
+      read would have reported this folder as application-run and missed the split
+      entirely.
     notes: >
       Direct add 2026-08-19 (desktop, SME direction at the K16 two-source evidence
       session). depends_on K16 because the detection runs over the same census join the

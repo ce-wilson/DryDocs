@@ -197,6 +197,25 @@ employee record system as functional-type entries:
   carries the detection; which classes exist and how a platform account is
   recognized (a curated list? the directory's own type/purpose columns?) is a
   K17 §D/§G question.
+
+  **Worked example (SME captures, 2026-08-19 — a live folder from a legacy
+  line-of-business estate; captures in the data root, values stay there).** One
+  folder, two run_as classes, split BY JOB: the FileWatcher job runs as the
+  Control-M platform account, while the folder's default run_as — what the next
+  job in the chain uses — is the application's own account. Three consequences:
+  (1) **run_as class is JOB-grain.** A folder-level read reports the
+  application account and misses the platform-run watcher entirely; any census
+  or detector must classify per job. (2) **Job TYPE co-varies with the class.**
+  File watching is a platform service, so FileWatcher × platform-account is the
+  designed pattern, not an anomaly — the countable anomaly class is a PAYLOAD
+  job running as the platform. (3) **The application identity lives in the
+  folder's variables, not in the platform-run job's identity.** The watcher's
+  watch-path is composed from folder variables, and the folder carries the
+  application-specific parametrization (environment paths, an
+  interface/source-system code, database users, notification groups) — which is
+  also where the estate's Informatica feed shows up: the archive path points
+  into an Informatica staging area, connecting this pattern to the
+  platform-account class on that platform too.
 - Consequences: the grain is **(account id, owner)** — exactly the multi-owner
   scenario `fid_census.py` was built for; the name is the Control-M `run_as` join
   key but is NOT unique; and **this source cannot answer "which application"** —

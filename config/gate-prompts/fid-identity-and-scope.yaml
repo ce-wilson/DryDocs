@@ -25,6 +25,19 @@
 # wrong; they answer different questions. This retires the draft's working assumption
 # that the directory's application column is evidence of a JOB's application — and it
 # means the signed K2 FID tier is mis-specified, not merely unimplemented (§G3).
+# AMENDED 2026-08-19 (user, two-source evidence session): the PLATFORM-ACCOUNT run_as
+# class. The 171-way name in the HR extract is the Control-M platform user — jobs that
+# run as Control-M itself carry no application signal in their run_as, so resolving
+# them through any FID -> application join attributes the job to the PLATFORM (§G's
+# counterexample generalized to a class). A live folder capture shows the class is
+# JOB-GRAIN: the FileWatcher job runs as the platform account while the folder default
+# runs as the application account, and job TYPE co-varies (file watching is a platform
+# service — that pairing is designed, not anomalous). The class is CROSS-PLATFORM:
+# Informatica carries several platform accounts under which business-application jobs
+# run — so §D's scope framing (drawn from the Control-M demand set) must state whether
+# its classification rule binds other platforms' demand sets too, and §G gains the
+# job-type dimension. Detection/counts: K25. Evidence: doc 09 "Two sources, two
+# grains" + the worked example; captures in the data root.
 # GATE-BOUND: no node class change, no edge, no loader, no pull until every section signs.
 # Mechanism-only: no real functional ids, names, SEAL ids, SIDs, or addresses in this
 # repo — real rows are Internal and live company-side.
