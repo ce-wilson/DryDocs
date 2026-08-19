@@ -173,6 +173,50 @@ def test_items_have_valid_v2_fields() -> None:
     assert not failures, f"{len(failures)} item error(s):\n" + "\n".join(failures)
 
 
+# ---- allocator bands (2026-08-18) -------------------------------------------
+# Same partition as the idea inbox, same reason: three allocators
+# (producer-desktop, producer-laptop, company) mint from one counter with no lock.
+# PORT-MANIFEST.yaml records the consequence as normal operation for THIS file --
+# "both sides run their own plan against OVERLAPPING ids" -- and it has already
+# cost a forced renumber: a concurrent push produced two different G70 and two
+# different G71, and the desktop pair moved to G75/G76 because config/gate-log.md
+# cited G73/G74 inside a SIGNED-OFF record (docs/port-prompt.md). Bands make
+# allocation need no coordination: producer 1-9999, company 10000+, readable by
+# LENGTH so there is no boundary to remember.
+
+#: Producer allocates at or below this, in EVERY letter series. Company is above it.
+PRODUCER_BAND_CEILING = 9999
+
+#: Company items that have legitimately arrived through a per-entry port merge.
+#: EMPTY today and hand-maintained on purpose -- a company item appearing in the
+#: producer backlog is worth one human look, and a typed exemption is what forces it.
+PORTED_COMPANY_IDS: frozenset[str] = frozenset()
+
+
+def test_producer_allocates_below_the_company_band() -> None:
+    """No item minted here may take a company number.
+
+    Forward-only: historical ids are never renumbered (they are join keys -- the G87
+    ruling, and config/gate-log.md cites them inside signed records), so a low number
+    means "allocated before the partition", not "producer". The rule governs the NEXT
+    id in each series.
+    """
+    doc = _load()
+    stray = []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        if iid in PORTED_COMPANY_IDS:
+            continue
+        digits = "".join(ch for ch in iid if ch.isdigit())
+        if digits and int(digits) > PRODUCER_BAND_CEILING:
+            stray.append(iid)
+    assert not stray, (
+        f"backlog ids in the COMPANY band (>{PRODUCER_BAND_CEILING}): {sorted(stray)}. "
+        "Producer allocates 1-9999 in every series. If these arrived through a port, "
+        "add them to PORTED_COMPANY_IDS rather than widening the band."
+    )
+
+
 def test_dependencies_resolve_and_are_acyclic() -> None:
     doc = _load()
     items = {item["id"]: item for item in doc.get("items", [])}

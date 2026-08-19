@@ -103,6 +103,13 @@ def _inbox_entries() -> list[str]:
     return [line for line in lines[start:end] if line.startswith("- ")]
 
 
+def _all_idea_ids() -> list[str]:
+    """Every `Idea-<n>` header in the file — inbox AND audit trail."""
+    return re.findall(
+        r"^- \*\*`(Idea-\d+[a-z]?)`\*\* ·", DEFAULT_IDEAS_PATH.read_text(encoding="utf-8"), re.M
+    )
+
+
 def test_every_inbox_entry_carries_the_header() -> None:
     """The Idea-<n> / status / prio scheme (user direction 2026-08-05) is only useful if
     it is COMPLETE. One unheadered entry and "scan the inbox by priority" stops working
@@ -114,10 +121,68 @@ def test_every_inbox_entry_carries_the_header() -> None:
 
 def test_idea_ids_are_unique() -> None:
     """Ids are stable references — the backlog notes and the audit trail cite them by
-    number, so reusing one silently re-points every citation of it."""
-    ids = [_HEADER.match(line).group(1) for line in _inbox_entries()]  # type: ignore[union-attr]
+    number, so reusing one silently re-points every citation of it.
+
+    Scans the WHOLE file, not just the inbox. A groomed entry moves to the audit trail
+    and keeps its id, so an inbox-only check stops seeing half the namespace the moment
+    a filing pass runs — and this file is `union-append` at port time, which is exactly
+    when a second entry carrying an existing number arrives.
+    """
+    ids = _all_idea_ids()
     dupes = sorted({i for i in ids if ids.count(i) > 1})
     assert not dupes, f"duplicate Idea ids: {dupes}"
+
+
+# ---- allocator bands (2026-08-18) -------------------------------------------
+# Three allocators mint from one counter with no lock (producer-desktop,
+# producer-laptop, company). Git serializes the first two only AFTER both have
+# pushed, and never serializes the third. Bands remove the collision by making
+# allocation need no coordination: producer 1-9999, company 10000+ — readable by
+# LENGTH (five digits or more is company), so there is no boundary to remember.
+
+#: Producer allocates at or below this. Company allocates above it.
+PRODUCER_BAND_CEILING = 9999
+
+#: Company ids that have legitimately arrived here through a `union-append` port.
+#: EMPTY today and deliberately a hand-maintained list rather than a rule: a ported
+#: company entry landing in the producer inbox is a thing a human should look at
+#: once, and an exemption that must be typed is what forces that look.
+PORTED_COMPANY_IDS: frozenset[int] = frozenset()
+
+
+def test_producer_allocates_below_the_company_band() -> None:
+    """Nothing minted here may take a company number.
+
+    Forward-only by construction: historical ids are all far below the ceiling and
+    are never renumbered (ids are join keys — the G87 ruling), so a low number means
+    "allocated before the partition", not "producer". The rule governs the NEXT id.
+    """
+    stray = sorted(
+        n
+        for n in (
+            int(i.removeprefix("Idea-").rstrip("abcdefghijklmnopqrstuvwxyz"))
+            for i in _all_idea_ids()
+        )
+        if n > PRODUCER_BAND_CEILING and n not in PORTED_COMPANY_IDS
+    )
+    assert not stray, (
+        f"Idea ids in the COMPANY band (>{PRODUCER_BAND_CEILING}): {stray}. Producer "
+        "allocates 1-9999. If these arrived through a port, add them to "
+        "PORTED_COMPANY_IDS — the exemption is hand-maintained on purpose, so a "
+        "company entry landing in this inbox gets looked at once."
+    )
+
+
+def test_the_bands_are_documented_where_a_capturer_will_read_them() -> None:
+    """A convention nobody can find is re-broken by the next person to add an entry,
+    and this one is only load-bearing at PORT time — months after the capture that
+    breaks it. So the numbers live in the file that people actually open."""
+    text = DEFAULT_IDEAS_PATH.read_text(encoding="utf-8")
+    for token in ("9999", "10000+", "union-append"):
+        assert token in text, (
+            f"IDEAS.md no longer states {token!r} — the allocator-band rule has to be "
+            "readable next to the capture format it constrains, not only in a test."
+        )
 
 
 def test_no_markdown_escape_leaks_into_the_render() -> None:
