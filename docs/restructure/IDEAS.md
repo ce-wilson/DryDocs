@@ -92,42 +92,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-138`** · 2026-08-19 · `[idea]` · **open** · prio? **Med** —
-  **The SME email-assignment surface — the later slice whose CONTRACT gate
-  `email-folder-assignment` just ruled (§B2, signed 8/8 2026-08-19).** The build presents:
-  the email (subject, sent_at, the msg/extract CITATIONS — never the content), the
-  propose-only candidates WITH their evidence (prose hits are candidates, never edges —
-  §B1), and the unassigned state as first-class (never a nag, never a default). An SME
-  action here is one of only two hands that may perform the CONCERNS write (the other:
-  a structured-field source signal, which today's assumed contract doesn't have). Grooming
-  note: this is company-side-facing (real extracts live there); the producer side owns the
-  contract shape and any shared surface plumbing.
-
-- **`Idea-137`** · 2026-08-19 · `[idea]` · **open** · prio? **Med** —
-  **The `docs_email_concerns` writer build — the commit that flips the vocab entry
-  `planned -> active` (N13 §B1: the build lands the flip; intent never flips anything).**
-  Gate `email-folder-assignment` SIGNED 8/8 (2026-08-19): CONCERNS spelling, endpoints
-  ControlMFolder | ETLProcess with the class recorded on the edge (rua §B2), required
-  `assigned_by` (sme | source-signal) + evidence pointer (O24), and the §B1 bar —
-  structured field only performs; prose/subject mentions are propose-only. Since the
-  assumed extract contract has NO structured folder/process field, in practice every
-  assignment starts SME-performed via the Idea-138 surface. The writer also owns wiring
-  the unassigned count into the N13 union report (mechanics = Idea-134's build), and it
-  must remove the forbidden-token fence in `test_email_extracts.py` ONLY for its own new
-  cypher file — `email_extracts.cypher` itself stays fenced forever (the lexical loader
-  never gains the write).
-
-- **`Idea-136`** · 2026-08-19 · `[bug]` · **open** · prio? **Low** —
-  **`snapshot.ps1`'s RED warn line prints `System.Object[]` where the conclusion belongs.**
-  Observed at the 2026-08-19 snapshot: `ci: System.Object[] AT HEAD e0ae9ba - main is RED...`
-  — the `-f` arg `$mine[0].conclusion.ToUpper()` (line ~136) stringified as an array, so the
-  warn names no conclusion. Cosmetic only (warn-only by design, the RED itself was the known
-  billing block: jobs "fail" in 3-5s with no logs), but the line exists so a human reads WHY
-  main is red, and right now it can't say. Likely PS 5.1 member-enumeration on `$mine[0]`
-  when `gh run list --json` yields nested arrays — pin with `@($mine)[0]` or select the
-  property explicitly, then re-run the snapshot to confirm the text.
-
-- **`Idea-132`** · 2026-08-18 · `[source]` · **open** · prio? **Med** —
+- **`Idea-132`** · 2026-08-18 · `[source]` · **groomed → N16 (2026-08-19) — the `source_label` enum question ONLY; the re-sourcing record itself STAYS STANDING, because nothing is owed producer-side today and it is what a future build must read** · prio? **Med** —
   **The ServiceNow extracts are being re-sourced INTERNALLY: hand-pulled CSV/YAML → SQL
   against the Snowflake replica views. SME note 2026-08-18.** Today every ServiceNow-derived
   load is a hand pull exported to CSV/YAML and then loaded; nothing queries the replica
@@ -156,55 +121,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   — 12 of 28 loaders are already outside it and nothing enforces it. Re-sourcing is the natural
   moment to rule what that field means rather than adding a thirteenth exception.
   **KEPT-UPDATED 2026-08-18:** the ACQUISITION half of this entry now has an owner — Idea-133 groomed to [[N12]] (a declared `acquisition:` block per registry dataset row, so this swap becomes a `mode: manual` → `automated` flip rather than prose in `notes:`) and [[N13]] (the gate prompt ruling that flip once, with O24/K9's override→source-corrected flip). The `source_label` enum question is UNTOUCHED and stays open here.
-
-- **`Idea-130`** · 2026-08-17 · `[idea]` · **open** · prio? **Med** —
-  **`jpmc-reports` is an External-PUBLIC corpus, so it is the safest first docmeta
-  ingestion — SME direction 2026-08-17.** The annual-report / 10-K MD&A source is
-  already registered and classified: `config/doc-source-registry.yaml#jpmc-reports`,
-  `classification: External` ("public SEC filings / investor-relations PDFs"),
-  `source_url` present, `trust_default: VERBATIM`. **Why it is a good candidate
-  specifically:** an External corpus carries no publish-boundary risk, so the P4 load
-  path can be exercised end-to-end — chunker, embeddings, trust provenance, the
-  `:Uncertain` routing — without any of the redaction care an Internal corpus forces.
-  The P4 revision (`knowledge/upgrade-plans/docmeta-p4-revision-single-db.md`)
-  currently names only the BMC corpus for the end-to-end local load; this is a second
-  External candidate for that slot, and it is gate-bound like the rest of P4.
-  **Three facts that change the work, all in the registry entry:** (1) it is
-  `confirmed: false`, which is the flag N9 says a future loader gates on; (2) its
-  current shape is `:DataAsset` slices, **NOT** the lexical `Document→Chunk` shape —
-  reshaping is the P4+ decision, not a load; (3) **the ingest path is gone** —
-  `scripts/ingest_jpmc_reports.py` was REMOVED 2026-07-22 (recover via git history)
-  and the two PDFs were never committed (root `/*.pdf` gitignore precedent), so
-  "publishable" describes the DATA, not a runnable pipeline. Re-running it means
-  re-fetching the PDFs and writing a loader against the current module shape.
-  Related: this corpus seeded the effective-dated `Company`/`BusinessSegment` context
-  whose vocabulary registration is the gap in [[Idea-131]].
-
-- **`Idea-131`** · 2026-08-17 · `[bug]` · **open** · prio? **Med** —
-  **`:Company` and both `HAS_BUSINESS_SEGMENT*` edges execute but were NEVER
-  registered in the relationship vocabulary — and no guard can see it.** The
-  corporate backbone `(:Company {name:"JPMC"})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment)`
-  is MERGEd by `drydocs_core/schema/ontology.cypher:205-232`, constrained by
-  `constraints.cypher:29` (`company_name` uniqueness), documented as *the* corporate
-  hierarchy across four `.claude/skills/data-context-extractor/` files, and live in the
-  graph (verified: laptop, `neo4jtest`, `drydocs` DB — 4 current + 4 historical edges).
-  But `10-node-classifications.yaml` registers `BusinessSegment` and `CatalogLOB` and
-  **not `Company`** (57 labels, absent), and no fragment registers either
-  `HAS_BUSINESS_SEGMENT` or `HAS_BUSINESS_SEGMENT_HISTORICAL` — only `RECONCILES_TO`
-  (`42-local-catalog.yaml`). **NOT a regression:** `git log -S "Company"` over the
-  vocabulary returns nothing, so it was never there and there is no ruling to find —
-  it is an M0 seed that predates the registry and never got back-registered.
-  **WHY NOTHING CAUGHT IT, which is the reusable half:**
-  `test_taxonomy_ontology_map.py:134` checks label UNIQUENESS and
-  `test_yaml_fragments.py:83` checks fragment KEYS — **nothing cross-checks an edge's
-  `from_node`/`to_node` against the registered label set**, so a wholly absent endpoint
-  raises no guard. `RECONCILES_TO` passes only because its endpoint happens to be
-  registered. That endpoint cross-check is a cheap guard and is the part worth building
-  first; it generalizes past this one backbone. This is the exact shape closed for
-  `ControlMApplication` (2026-07-09) and deliberately avoided for the `:Port` →
-  `:DistributionList` edge, where the node class shipped WITH the edge for this reason.
-  **Registering the label + two edges is gate territory** per `docs/RELATIONSHIP_GUIDE.md`
-  (`status: planned` first), not a quiet add — but the guard is not.
 
 - **`Idea-129`** · 2026-08-17 · `[bug]` · **closed 2026-08-17** · prio? **Low** —
   **The depgraph snapshot JSON was written CRLF — the surface Idea-121 did not reach.
@@ -235,149 +151,13 @@ question a 1,000-line file with the trail at the bottom could not answer.
   **Left open deliberately:** whether the sibling depgraph repo should emit LF at
   source (Idea-126 territory) — we normalize on arrival either way.
 
-- **`Idea-127`** · 2026-08-14 · `[idea]` · **open** · prio? **Low** —
-  **Read-time staleness hint on estate queries and snapshot HTML.** R4 of the GitNexus
-  comparison: surface "indexed at commit X / loaded at T; HEAD is Y / now is T+n" in
-  query answers and the depgraph html view — the GitNexus `staleness.ts` contract. Our
-  snapshot meta header already pins provenance harder (U7/U15); this is the missing
-  *read-time* half. Small; depgraph html profile + `drydocs_api`.
-
-- **`Idea-126`** · 2026-08-14 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-126`** · 2026-08-14 · `[idea]` · **parked → sibling-repo work resumes in `../depgraph` — it lands there, not in this repo, so it is deliberately not a backlog item here (re-checked 2026-08-19)** · prio? **Med** —
   **Declared-deps extractor DAG in depgraph (sibling-repo item).** R3 of the GitNexus
   comparison: before the lineage forks multiply extractors, adopt the GitNexus runner
   pattern — extractors/profiles declare `deps`, Kahn-validated, runner passes each one
   only its declared upstream outputs (hidden coupling becomes an error, cycle diagnosis
   prints the concrete path), per-phase timing. Lands in `../depgraph`, not DryDocs;
   captured here because grooming happens here.
-
-- **`Idea-125`** · 2026-08-14 · `[idea]` · **open** · prio? **Med** —
-  **Named agent verbs over QuerySpecs (impact/context/trace analogs).** R2 of the
-  GitNexus comparison: expose reviewed `drydocs_api` QuerySpecs as purpose-built MCP
-  tools — `impact` (blast radius over job chains/conditions), `context` (one
-  job/asset/series: owners, schedule, upstream/downstream), `trace` (path between two
-  estate nodes) — so agents call named verbs instead of composing raw Cypher against
-  the generic neo4j-drydocs server. GitNexus evidence: the verb surface, not the graph,
-  is what makes agents actually use it. Pairs with Idea-124 (the verbs carry the
-  epistemic field).
-
-- **`Idea-124`** · 2026-08-14 · `[idea]` · **open** · prio? **High** —
-  **Epistemic labeling on query answers: `exact` vs `lower-bound` + causes.** R1 of
-  [`docs/reviews/gitnexus-depgraph-comparison.md`](../reviews/gitnexus-depgraph-comparison.md):
-  lineage/impact-style QuerySpec responses (and depgraph's JSON assertions) declare
-  whether the answer is complete — `epistemic: exact|lower-bound` plus a
-  machine-readable `causes` split (unparsed `cmd_line`s, unresolved invocations,
-  gate-pending edges). Extends the trust axis from the *graph* to the *answer*;
-  GitNexus doctrine: an empty result set is not evidence of absence when the causes
-  say the walk couldn't see. Ontology-cheap — a property on responses, not the graph.
-
-- **`Idea-121`** · 2026-08-13 · `[bug]` · **open** · prio? **Med** —
-  **RENDER HALF FIXED 2026-08-13; the remaining writers stay open, so this entry stays
-  open too.** all 11 `write_text(` sites in
-  `plan_board` / `plan_ideas` / `plan_roadmap` / `design_doc` and the six
-  `scripts/render_*.py` now pass `newline="\n"`. Verified by re-rendering EVERY surface
-  — board, the six generated JSON, roadmap, ideas, load-map and all 16 design docs —
-  and getting a clean tree: **25 dirtied files down to 0**. Suite 2150 passed; both
-  ruff gates exit 0 (the added argument pushed five lines over the limit, so
-  `ruff format` rewrapped them in the same commit). **What stays open:** the other
-  eight `write_text(` sites — `vendor_docs` (2), `publishing/publisher`,
-  `publishing/preview`, `schema_graph`, `extract_office_text`,
-  `external_vendor_scrape` — which this entry deliberately fenced OUT of the sweep.
-  They write non-render outputs and each needs its own call, not a blanket change.
-  Also still open: whether a guard should pin this (a test asserting no committed
-  render surface contains a CR byte would stop it regressing; nothing enforces it
-  today). The original finding follows.
-  **The renderers write CRLF on Windows, so every render run dirties the committed
-  renders with line-ending-only churn.** Found the same day the LF policy landed
-  (`fcc8afa` .editorconfig, `b348b0c` `* text=auto eol=lf`): running
-  `render_board.py` + `render_ideas.py` left TEN files modified in `git status`, of
-  which exactly ONE — `ideas.html` — had a content change. The other nine
-  (`board.html`, `roadmap.html`, `load-map.html`, and six `web/src/generated/*.json`)
-  differed only in line endings. Mechanism: the writers call
-  `Path.write_text(..., encoding="utf-8")` with no `newline=`, so Python text mode
-  translates `\n` to `\r\n` on Windows; git normalizes it straight back to LF on
-  commit, which is why no blob ever changed and nobody noticed. **Correctness is not
-  at stake — legibility is.** The session ritual's stale-render check reads
-  `git status` / `git diff --quiet` after a re-render, and a step that reports ten
-  changed files when one changed is a step whose signal is buried in noise. That is
-  the Idea-111 failure shape (a gate nobody reads) arriving by a different route, and
-  it is exactly the "phantom CRLF-vs-LF noise in tools that read the working tree"
-  the `.editorconfig` commit named the same morning. Fix: pass `newline="\n"` —
-  available since Python 3.10, and the project is `^3.11` (verified present on
-  3.12.10). Nineteen `write_text(` sites repo-wide lack it; roughly ten produce
-  committed render surfaces (`plan_board` / `plan_ideas` / `plan_roadmap` /
-  `design_doc` plus the six `scripts/render_*.py` JSON generators). Sweep the
-  render/generated-surface writers as one unit; the remaining writers
-  (`vendor_docs`, `publishing/*`, `schema_graph`, the `scripts/` scrapers) are a
-  separate call, not automatic. Idea-120's proposed metrics JSONL writer should be
-  born with `newline="\n"` rather than added to the queue.
-  **KEPT-UPDATED 2026-08-13 — it is not cosmetic after all: it poisons a committed
-  provenance field, and the LF refresh is what started it.** The session-end
-  `snapshot.ps1` renders the board and the design docs BEFORE it scans, so those
-  renders dirty 25 tracked files and the scan then records `meta.git.dirty: true`.
-  That field has one job, stated in the script's own comment: *"does the commit in
-  this header actually describe the code that was measured?"* Here the answer is yes
-  and the header says no — a reader is told the opposite of the truth, which is the
-  exact failure U15 split the field to prevent (the 20260805 snapshot, where the
-  "dirt" was three untracked paths). Same false alarm, new cause. The two snapshots
-  taken either side of the refresh prove the causation: `bb9788b6` at 02:20 recorded
-  `dirty: false`, `7d885c9` at 13:45 recorded `dirty: true`, same script and a clean
-  tree both times. Before the refresh the working tree held CRLF and the renderers
-  wrote CRLF, so a render changed nothing; afterwards the tree is LF and every render
-  dirties its output. So **every snapshot taken on Windows from now on carries a false
-  `dirty: true`** until the writers pass `newline="\n"`, and `drydocs-20260813-1344.json`
-  is the first one — committed knowingly, recorded here rather than silently. This
-  raises the priority question: the fix is ten call sites, and the thing it protects
-  is the provenance header of the whole snapshot series.
-
-- **`Idea-120`** · 2026-08-13 · `[chore]` · **open** · prio? **Med** —
-  **Debt metrics have no machine-readable history, so "is it getting better" is
-  unanswerable.** Newest-only snapshot retention (U12) is right for snapshots, but it
-  leaves the tech-debt skill's hand-typed prose as the ONLY trend record for A3/A4/A5.
-  That prose has been wrong twice in the direction that hides work — `drydocs_api` at
-  the U2 census, then `drydocs_docmeta` invisible to A3/A4/A5 for five days after
-  `d647171` — and on 2026-08-13 it blocked attribution of an A5 move from 29 to 31,
-  because there is no prior snapshot on disk to diff against. Proposed: `snapshot.ps1`
-  appends one row per run to a metrics JSONL beside the snapshot it just wrote (date,
-  commit, A3 top module + count, A4 package + first-party counts, A5 count, live
-  `IMPORTS` edge count). Append-only and cheap, and it turns every future `/tech-debt`
-  run into a diff instead of a re-derivation. U12 stays intact — a metrics ledger is
-  not a retained snapshot. Pairs with Idea-119, whose +2 this would have explained.
-
-- **`Idea-115`** · 2026-08-12 · `[chore]` · **open** · prio? **Med** —
-  **The rua bundle's script-copy path is a CONVENTION the extractor re-derives, not a
-  column the collector declares — so if the two ever disagree, the pipeline reports an
-  empty bundle rather than a broken contract.** `drydocs_lineage/extractors/rua_inventory.py:384`
-  builds it by hand — `copy_rel = f"scripts{row['path']}"  # the collector mirrors the abs tree` —
-  and `scripts.tsv` carries no copy-path column to check it against: the collector writes
-  the header `path owner group perms size mtime sha256`
-  (`drydocs_lineage/collect/rua_inventory.sh:296`) and mirrors matched files under
-  `scripts/` separately. Both downstream consumers then read that derived path —
-  G21 `rua_code_ops.py:236` (`read_text` → parse code operations) and G24
-  `code_repo.py:235` (`read_bytes` → git blob sha1 → server-vs-repo corroboration).
-  **Why it is worth a line rather than a shrug:** the failure is SILENT and reads as the
-  wrong thing. Both extractors already handle a missing copy gracefully and correctly —
-  `scripts_unreadable` / `scripts_no_copy` in G21, `server_uncomputable` in G24 — because
-  an over-cap file is *listed but not copied* by design (`SCRIPT_COPY_MAX_BYTES`, default
-  1 MiB). That is the right behavior for the case it was built for, and it is exactly what
-  absorbs a layout change: every counter lands in the "too big to copy" bucket, the run
-  succeeds, and "the collector's mirror layout changed" is indistinguishable from "this
-  estate has large scripts". Nothing errors. Found 2026-08-12 tracing G24 end to end at the
-  user's ask; **nothing is wrong today** — the chain is correctly wired and this is a latent
-  coupling, not a live defect.
-  **The fix is not free, and the tension is the interesting part.** The obvious move — add a
-  `copy_path` column to `scripts.tsv` so the location is declared rather than guessed — is a
-  **bundle schema change**, and the collector stamps `COLLECTOR_VERSION=rua-inventory/v2`
-  precisely so consumers can version-detect. The script's own header already rules that an
-  extractor "must treat `scripts.tsv` and the `sha256` columns as OPTIONAL" so v1 bundles
-  stay ingestible; a new column means v3 and the same optional-column discipline again, for
-  a field every current bundle can already derive. **The cheaper candidate:** leave the wire
-  format alone and pin the CONVENTION with a guard — one test that builds a small bundle
-  (or uses a fixture) and asserts a `-n`-captured file is readable at
-  `scripts{path}` from the extractor's side, so a collector-side layout change reds a test
-  instead of quietly zeroing the counters. That is the S10/derived-coverage idiom the repo
-  already uses elsewhere. **Decide which**, or rule it accepted-as-is with the reason
-  recorded — all three are legitimate; what is not legitimate is the current state, where
-  the contract exists only as a comment on one line.
 
 - **`Idea-111`** · 2026-08-12 · `[bug]` · **closed — both CI ruff gates exit 0 again; only the process question is left, and it is the user's** · prio? **High** —
   **SWEPT AND GREEN 2026-08-12 (this desktop).** `ruff check .` and `ruff format --check .`
@@ -713,6 +493,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   deliberate future output is the one legitimate form of a non-existent path. Worth keeping as
   a standing groom check — it is cheap, it caught two, and `L27`'s enforcement mechanism does
   not cover `backlog.yaml` inputs. The E1 status question is untouched and still the user's.
+  **RE-AUDITED 2026-08-19 (groom, desktop) — the standing check ran a third time and found THREE refs, of which TWO were false positives of the check itself.** The real staleness: `K17`, `G70` and `G73` all cite `drydocs_core/ontology/relationship_vocabulary/41-local-seal.yaml`, and that fragment was RENAMED to `41-local-business-application.yaml` when gate vocabulary-domains-and-id-policy §A2 renamed the domain `seal` → `business_application` — the same rename G101 exists to finish on the ids. All three corrected in place at this groom with the reason in a trailing comment, the 08-12 precedent. The two NON-findings are worth recording so the next run does not re-raise them: `Y4`'s `backlog/items/` is the sharded directory Y2/Y3 CREATE (an input naming a deliberate future output, ruled legitimate on 2026-08-12), and `O59`'s entry carries a parenthetical after the path, which the leading-token test reads as part of it. Three runs, three different causes, fourteen → two → three refs: the check keeps earning its place. The E1 status question is untouched and still the user's.
 
 - **`Idea-89`** · 2026-08-07 · `[bug]` · **closed → fixed in place 2026-08-07 (SME ruling); no item minted** · prio **Med** —
   **`OverviewRoute` renders ALL modules unfiltered — the Overview pick-list offers
@@ -1447,6 +1228,228 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **FILED 2026-08-19 (desktop, weekly groom of the whole `## Inbox`)** — **Promoted 10, inboxed 0 new, merged 3, closed 1, parked 1.** New items: **Q21** (the `docs_email_concerns` writer — the build the SIGNED `email-folder-assignment` gate authorized and did not build) and **Q22** (the SME assignment surface, the slice the gate named at §B2); **U24** (snapshot.ps1's RED warn prints `System.Object[]`) and **U25** (the debt-metrics ledger); **J49** (the non-render `write_text` sites); **G103** (the rua script-copy convention); **R15/R16/R17** (the gitnexus review's R1/R2/R4 — epistemic labeling, named agent verbs, read-time staleness); **N16** (rule what `source_label` means). **Three merges, deliberately riders rather than new items:** Idea-130 → **Q17** (jpmc-reports as the External-PUBLIC P4 end-to-end candidate — Q17 already owns that corpus's shape decision); Idea-137's union-report half → **N14** (gate §B3 named that report as the home for the unassigned email count, and N14 is still `todo`, so this is a rider and NOT a `depends_on` that would strand Q21); Idea-127's viewer half → **U22** (`viewer.html` already renders the commit; the missing AGE belongs with the detection). **One closed:** Idea-131 was consumed by **G98** the same day it was captured — the gate signed 19/19, `:Company` is registered, both `HAS_BUSINESS_SEGMENT*` edges are entered `status: planned`, and the §D3 endpoint guard the entry called "the reusable half" is built (`tests/unit/test_vocabulary_endpoints.py::test_every_declared_edge_endpoint_is_a_registered_label`); all four verified at this groom rather than taken from the close note. **One parked:** Idea-126 lands in `../depgraph`, not this repo. **Two marked in place, not moved:** Idea-132 (only the `source_label` question groomed out; the ServiceNow re-sourcing record stays standing because nothing is owed producer-side today) and Idea-93 (a third run of its standing stale-`inputs:` check — three refs, two of them false positives of the check; the E1 status question is still the user's). **Nine of the ten enter `next_ready`;** Q22 does not, because it depends on Q21 — the surface has no second write path. **No plan change:** every item lands in an existing epic and phase. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-104 (which MFT route-id shape is real), Idea-74 (does DryDocs ingest the SNOW queue/group export, and which side), Idea-34 (the AIS acronym entry), Idea-33 (the unlocated typo), Idea-32 (the Oracle-connection scope), Idea-28 (the tier-1/tier-2 app-code enumeration — SME data entry), Idea-17 and Idea-16 (both destructive or manual by nature), and E1's status from Idea-93.
+
+- **`Idea-138`** · 2026-08-19 · `[idea]` · **groomed → Q22 (2026-08-19)** · prio? **Med** —
+  **The SME email-assignment surface — the later slice whose CONTRACT gate
+  `email-folder-assignment` just ruled (§B2, signed 8/8 2026-08-19).** The build presents:
+  the email (subject, sent_at, the msg/extract CITATIONS — never the content), the
+  propose-only candidates WITH their evidence (prose hits are candidates, never edges —
+  §B1), and the unassigned state as first-class (never a nag, never a default). An SME
+  action here is one of only two hands that may perform the CONCERNS write (the other:
+  a structured-field source signal, which today's assumed contract doesn't have). Grooming
+  note: this is company-side-facing (real extracts live there); the producer side owns the
+  contract shape and any shared surface plumbing.
+
+- **`Idea-137`** · 2026-08-19 · `[idea]` · **groomed → Q21 (2026-08-19)** · prio? **Med** —
+  **The `docs_email_concerns` writer build — the commit that flips the vocab entry
+  `planned -> active` (N13 §B1: the build lands the flip; intent never flips anything).**
+  Gate `email-folder-assignment` SIGNED 8/8 (2026-08-19): CONCERNS spelling, endpoints
+  ControlMFolder | ETLProcess with the class recorded on the edge (rua §B2), required
+  `assigned_by` (sme | source-signal) + evidence pointer (O24), and the §B1 bar —
+  structured field only performs; prose/subject mentions are propose-only. Since the
+  assumed extract contract has NO structured folder/process field, in practice every
+  assignment starts SME-performed via the Idea-138 surface. The writer also owns wiring
+  the unassigned count into the N13 union report (mechanics = Idea-134's build), and it
+  must remove the forbidden-token fence in `test_email_extracts.py` ONLY for its own new
+  cypher file — `email_extracts.cypher` itself stays fenced forever (the lexical loader
+  never gains the write).
+
+- **`Idea-136`** · 2026-08-19 · `[bug]` · **groomed → U24 (2026-08-19)** · prio? **Low** —
+  **`snapshot.ps1`'s RED warn line prints `System.Object[]` where the conclusion belongs.**
+  Observed at the 2026-08-19 snapshot: `ci: System.Object[] AT HEAD e0ae9ba - main is RED...`
+  — the `-f` arg `$mine[0].conclusion.ToUpper()` (line ~136) stringified as an array, so the
+  warn names no conclusion. Cosmetic only (warn-only by design, the RED itself was the known
+  billing block: jobs "fail" in 3-5s with no logs), but the line exists so a human reads WHY
+  main is red, and right now it can't say. Likely PS 5.1 member-enumeration on `$mine[0]`
+  when `gh run list --json` yields nested arrays — pin with `@($mine)[0]` or select the
+  property explicitly, then re-run the snapshot to confirm the text.
+
+- **`Idea-131`** · 2026-08-17 · `[bug]` · **closed — consumed by G98 before this entry was ever groomed: gate corporate-backbone-vocabulary SIGNED 19/19 (2026-08-17), :Company registered, both edges entered status: planned, and the §D3 endpoint guard BUILT — verified at the 2026-08-19 groom** · prio? **Med** —
+  **`:Company` and both `HAS_BUSINESS_SEGMENT*` edges execute but were NEVER
+  registered in the relationship vocabulary — and no guard can see it.** The
+  corporate backbone `(:Company {name:"JPMC"})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment)`
+  is MERGEd by `drydocs_core/schema/ontology.cypher:205-232`, constrained by
+  `constraints.cypher:29` (`company_name` uniqueness), documented as *the* corporate
+  hierarchy across four `.claude/skills/data-context-extractor/` files, and live in the
+  graph (verified: laptop, `neo4jtest`, `drydocs` DB — 4 current + 4 historical edges).
+  But `10-node-classifications.yaml` registers `BusinessSegment` and `CatalogLOB` and
+  **not `Company`** (57 labels, absent), and no fragment registers either
+  `HAS_BUSINESS_SEGMENT` or `HAS_BUSINESS_SEGMENT_HISTORICAL` — only `RECONCILES_TO`
+  (`42-local-catalog.yaml`). **NOT a regression:** `git log -S "Company"` over the
+  vocabulary returns nothing, so it was never there and there is no ruling to find —
+  it is an M0 seed that predates the registry and never got back-registered.
+  **WHY NOTHING CAUGHT IT, which is the reusable half:**
+  `test_taxonomy_ontology_map.py:134` checks label UNIQUENESS and
+  `test_yaml_fragments.py:83` checks fragment KEYS — **nothing cross-checks an edge's
+  `from_node`/`to_node` against the registered label set**, so a wholly absent endpoint
+  raises no guard. `RECONCILES_TO` passes only because its endpoint happens to be
+  registered. That endpoint cross-check is a cheap guard and is the part worth building
+  first; it generalizes past this one backbone. This is the exact shape closed for
+  `ControlMApplication` (2026-07-09) and deliberately avoided for the `:Port` →
+  `:DistributionList` edge, where the node class shipped WITH the edge for this reason.
+  **Registering the label + two edges is gate territory** per `docs/RELATIONSHIP_GUIDE.md`
+  (`status: planned` first), not a quiet add — but the guard is not.
+
+- **`Idea-130`** · 2026-08-17 · `[idea]` · **merged → Q17 (2026-08-19, as the P4 end-to-end-candidacy rider)** · prio? **Med** —
+  **`jpmc-reports` is an External-PUBLIC corpus, so it is the safest first docmeta
+  ingestion — SME direction 2026-08-17.** The annual-report / 10-K MD&A source is
+  already registered and classified: `config/doc-source-registry.yaml#jpmc-reports`,
+  `classification: External` ("public SEC filings / investor-relations PDFs"),
+  `source_url` present, `trust_default: VERBATIM`. **Why it is a good candidate
+  specifically:** an External corpus carries no publish-boundary risk, so the P4 load
+  path can be exercised end-to-end — chunker, embeddings, trust provenance, the
+  `:Uncertain` routing — without any of the redaction care an Internal corpus forces.
+  The P4 revision (`knowledge/upgrade-plans/docmeta-p4-revision-single-db.md`)
+  currently names only the BMC corpus for the end-to-end local load; this is a second
+  External candidate for that slot, and it is gate-bound like the rest of P4.
+  **Three facts that change the work, all in the registry entry:** (1) it is
+  `confirmed: false`, which is the flag N9 says a future loader gates on; (2) its
+  current shape is `:DataAsset` slices, **NOT** the lexical `Document→Chunk` shape —
+  reshaping is the P4+ decision, not a load; (3) **the ingest path is gone** —
+  `scripts/ingest_jpmc_reports.py` was REMOVED 2026-07-22 (recover via git history)
+  and the two PDFs were never committed (root `/*.pdf` gitignore precedent), so
+  "publishable" describes the DATA, not a runnable pipeline. Re-running it means
+  re-fetching the PDFs and writing a loader against the current module shape.
+  Related: this corpus seeded the effective-dated `Company`/`BusinessSegment` context
+  whose vocabulary registration is the gap in [[Idea-131]].
+
+- **`Idea-127`** · 2026-08-14 · `[idea]` · **groomed → R17 (2026-08-19) + merged → U22 (the viewer half, as a rider)** · prio? **Low** —
+  **Read-time staleness hint on estate queries and snapshot HTML.** R4 of the GitNexus
+  comparison: surface "indexed at commit X / loaded at T; HEAD is Y / now is T+n" in
+  query answers and the depgraph html view — the GitNexus `staleness.ts` contract. Our
+  snapshot meta header already pins provenance harder (U7/U15); this is the missing
+  *read-time* half. Small; depgraph html profile + `drydocs_api`.
+
+- **`Idea-125`** · 2026-08-14 · `[idea]` · **groomed → R16 (2026-08-19)** · prio? **Med** —
+  **Named agent verbs over QuerySpecs (impact/context/trace analogs).** R2 of the
+  GitNexus comparison: expose reviewed `drydocs_api` QuerySpecs as purpose-built MCP
+  tools — `impact` (blast radius over job chains/conditions), `context` (one
+  job/asset/series: owners, schedule, upstream/downstream), `trace` (path between two
+  estate nodes) — so agents call named verbs instead of composing raw Cypher against
+  the generic neo4j-drydocs server. GitNexus evidence: the verb surface, not the graph,
+  is what makes agents actually use it. Pairs with Idea-124 (the verbs carry the
+  epistemic field).
+
+- **`Idea-124`** · 2026-08-14 · `[idea]` · **groomed → R15 (2026-08-19; filed p2 against this entry's proposed High — the reason is in the item's notes and is reversible)** · prio? **High** —
+  **Epistemic labeling on query answers: `exact` vs `lower-bound` + causes.** R1 of
+  [`docs/reviews/gitnexus-depgraph-comparison.md`](../reviews/gitnexus-depgraph-comparison.md):
+  lineage/impact-style QuerySpec responses (and depgraph's JSON assertions) declare
+  whether the answer is complete — `epistemic: exact|lower-bound` plus a
+  machine-readable `causes` split (unparsed `cmd_line`s, unresolved invocations,
+  gate-pending edges). Extends the trust axis from the *graph* to the *answer*;
+  GitNexus doctrine: an empty result set is not evidence of absence when the causes
+  say the walk couldn't see. Ontology-cheap — a property on responses, not the graph.
+
+- **`Idea-121`** · 2026-08-13 · `[bug]` · **groomed → J49 (2026-08-19) — the remaining write_text sites, re-censused at the groom as TEN not eight; the render half landed 2026-08-13 and the guard this entry asked for now exists** · prio? **Med** —
+  **RENDER HALF FIXED 2026-08-13; the remaining writers stay open, so this entry stays
+  open too.** all 11 `write_text(` sites in
+  `plan_board` / `plan_ideas` / `plan_roadmap` / `design_doc` and the six
+  `scripts/render_*.py` now pass `newline="\n"`. Verified by re-rendering EVERY surface
+  — board, the six generated JSON, roadmap, ideas, load-map and all 16 design docs —
+  and getting a clean tree: **25 dirtied files down to 0**. Suite 2150 passed; both
+  ruff gates exit 0 (the added argument pushed five lines over the limit, so
+  `ruff format` rewrapped them in the same commit). **What stays open:** the other
+  eight `write_text(` sites — `vendor_docs` (2), `publishing/publisher`,
+  `publishing/preview`, `schema_graph`, `extract_office_text`,
+  `external_vendor_scrape` — which this entry deliberately fenced OUT of the sweep.
+  They write non-render outputs and each needs its own call, not a blanket change.
+  Also still open: whether a guard should pin this (a test asserting no committed
+  render surface contains a CR byte would stop it regressing; nothing enforces it
+  today). The original finding follows.
+  **The renderers write CRLF on Windows, so every render run dirties the committed
+  renders with line-ending-only churn.** Found the same day the LF policy landed
+  (`fcc8afa` .editorconfig, `b348b0c` `* text=auto eol=lf`): running
+  `render_board.py` + `render_ideas.py` left TEN files modified in `git status`, of
+  which exactly ONE — `ideas.html` — had a content change. The other nine
+  (`board.html`, `roadmap.html`, `load-map.html`, and six `web/src/generated/*.json`)
+  differed only in line endings. Mechanism: the writers call
+  `Path.write_text(..., encoding="utf-8")` with no `newline=`, so Python text mode
+  translates `\n` to `\r\n` on Windows; git normalizes it straight back to LF on
+  commit, which is why no blob ever changed and nobody noticed. **Correctness is not
+  at stake — legibility is.** The session ritual's stale-render check reads
+  `git status` / `git diff --quiet` after a re-render, and a step that reports ten
+  changed files when one changed is a step whose signal is buried in noise. That is
+  the Idea-111 failure shape (a gate nobody reads) arriving by a different route, and
+  it is exactly the "phantom CRLF-vs-LF noise in tools that read the working tree"
+  the `.editorconfig` commit named the same morning. Fix: pass `newline="\n"` —
+  available since Python 3.10, and the project is `^3.11` (verified present on
+  3.12.10). Nineteen `write_text(` sites repo-wide lack it; roughly ten produce
+  committed render surfaces (`plan_board` / `plan_ideas` / `plan_roadmap` /
+  `design_doc` plus the six `scripts/render_*.py` JSON generators). Sweep the
+  render/generated-surface writers as one unit; the remaining writers
+  (`vendor_docs`, `publishing/*`, `schema_graph`, the `scripts/` scrapers) are a
+  separate call, not automatic. Idea-120's proposed metrics JSONL writer should be
+  born with `newline="\n"` rather than added to the queue.
+  **KEPT-UPDATED 2026-08-13 — it is not cosmetic after all: it poisons a committed
+  provenance field, and the LF refresh is what started it.** The session-end
+  `snapshot.ps1` renders the board and the design docs BEFORE it scans, so those
+  renders dirty 25 tracked files and the scan then records `meta.git.dirty: true`.
+  That field has one job, stated in the script's own comment: *"does the commit in
+  this header actually describe the code that was measured?"* Here the answer is yes
+  and the header says no — a reader is told the opposite of the truth, which is the
+  exact failure U15 split the field to prevent (the 20260805 snapshot, where the
+  "dirt" was three untracked paths). Same false alarm, new cause. The two snapshots
+  taken either side of the refresh prove the causation: `bb9788b6` at 02:20 recorded
+  `dirty: false`, `7d885c9` at 13:45 recorded `dirty: true`, same script and a clean
+  tree both times. Before the refresh the working tree held CRLF and the renderers
+  wrote CRLF, so a render changed nothing; afterwards the tree is LF and every render
+  dirties its output. So **every snapshot taken on Windows from now on carries a false
+  `dirty: true`** until the writers pass `newline="\n"`, and `drydocs-20260813-1344.json`
+  is the first one — committed knowingly, recorded here rather than silently. This
+  raises the priority question: the fix is ten call sites, and the thing it protects
+  is the provenance header of the whole snapshot series.
+
+- **`Idea-120`** · 2026-08-13 · `[chore]` · **groomed → U25 (2026-08-19)** · prio? **Med** —
+  **Debt metrics have no machine-readable history, so "is it getting better" is
+  unanswerable.** Newest-only snapshot retention (U12) is right for snapshots, but it
+  leaves the tech-debt skill's hand-typed prose as the ONLY trend record for A3/A4/A5.
+  That prose has been wrong twice in the direction that hides work — `drydocs_api` at
+  the U2 census, then `drydocs_docmeta` invisible to A3/A4/A5 for five days after
+  `d647171` — and on 2026-08-13 it blocked attribution of an A5 move from 29 to 31,
+  because there is no prior snapshot on disk to diff against. Proposed: `snapshot.ps1`
+  appends one row per run to a metrics JSONL beside the snapshot it just wrote (date,
+  commit, A3 top module + count, A4 package + first-party counts, A5 count, live
+  `IMPORTS` edge count). Append-only and cheap, and it turns every future `/tech-debt`
+  run into a diff instead of a re-derivation. U12 stays intact — a metrics ledger is
+  not a retained snapshot. Pairs with Idea-119, whose +2 this would have explained.
+
+- **`Idea-115`** · 2026-08-12 · `[chore]` · **groomed → G103 (2026-08-19)** · prio? **Med** —
+  **The rua bundle's script-copy path is a CONVENTION the extractor re-derives, not a
+  column the collector declares — so if the two ever disagree, the pipeline reports an
+  empty bundle rather than a broken contract.** `drydocs_lineage/extractors/rua_inventory.py:384`
+  builds it by hand — `copy_rel = f"scripts{row['path']}"  # the collector mirrors the abs tree` —
+  and `scripts.tsv` carries no copy-path column to check it against: the collector writes
+  the header `path owner group perms size mtime sha256`
+  (`drydocs_lineage/collect/rua_inventory.sh:296`) and mirrors matched files under
+  `scripts/` separately. Both downstream consumers then read that derived path —
+  G21 `rua_code_ops.py:236` (`read_text` → parse code operations) and G24
+  `code_repo.py:235` (`read_bytes` → git blob sha1 → server-vs-repo corroboration).
+  **Why it is worth a line rather than a shrug:** the failure is SILENT and reads as the
+  wrong thing. Both extractors already handle a missing copy gracefully and correctly —
+  `scripts_unreadable` / `scripts_no_copy` in G21, `server_uncomputable` in G24 — because
+  an over-cap file is *listed but not copied* by design (`SCRIPT_COPY_MAX_BYTES`, default
+  1 MiB). That is the right behavior for the case it was built for, and it is exactly what
+  absorbs a layout change: every counter lands in the "too big to copy" bucket, the run
+  succeeds, and "the collector's mirror layout changed" is indistinguishable from "this
+  estate has large scripts". Nothing errors. Found 2026-08-12 tracing G24 end to end at the
+  user's ask; **nothing is wrong today** — the chain is correctly wired and this is a latent
+  coupling, not a live defect.
+  **The fix is not free, and the tension is the interesting part.** The obvious move — add a
+  `copy_path` column to `scripts.tsv` so the location is declared rather than guessed — is a
+  **bundle schema change**, and the collector stamps `COLLECTOR_VERSION=rua-inventory/v2`
+  precisely so consumers can version-detect. The script's own header already rules that an
+  extractor "must treat `scripts.tsv` and the `sha256` columns as OPTIONAL" so v1 bundles
+  stay ingestible; a new column means v3 and the same optional-column discipline again, for
+  a field every current bundle can already derive. **The cheaper candidate:** leave the wire
+  format alone and pin the CONVENTION with a guard — one test that builds a small bundle
+  (or uses a fixture) and asserts a `-n`-captured file is readable at
+  `scripts{path}` from the extractor's side, so a collector-side layout change reds a test
+  instead of quietly zeroing the counters. That is the S10/derived-coverage idiom the repo
+  already uses elsewhere. **Decide which**, or rule it accepted-as-is with the reason
+  recorded — all three are legitimate; what is not legitimate is the current state, where
+  the contract exists only as a comment on one line.
 
 - **FILED 2026-08-18 (desktop, second pass — the whole consumed tail, per the user's “clear the rest”)** — **Promoted 0, inboxed 0, merged 0, parked 0. Twenty-two entries moved, seven deliberately left behind.** After the morning's seven-entry filing the inbox still held **79 entries, 29 of them already marked `groomed →` or `merged →`** — dispositioned work that a reader scanning for open items had to re-read and re-dismiss on every pass. This clears that tail. **Moved (22):** `Idea-113` (→ G93), `Idea-83` (→ J33), `Idea-81` (→ N10), `Idea-77` (→ O53), `Idea-75` (→ K20), `Idea-72` (→ L25), `Idea-71` (→ O52), `Idea-69` (→ K18), `Idea-68` (→ K18), `Idea-64` (→ D9), `Idea-63b` (→ K18), `Idea-62` (→ J32), `Idea-135` (→ K16+K17, filed as `Idea-59` and renumbered later the same day), `Idea-58` (→ U15), `Idea-56` (→ J35), `Idea-53` (→ S10), `Idea-46` (→ C22+C26), `Idea-45` (→ C26+C27), `Idea-39` (→ C26+C27), `Idea-38` (→ J13), `Idea-12` (→ the provenance-audit-fields plan, docs 06/06a), `Idea-2` (→ Q4+Q5+Q6). **THE SEVEN THAT STAY, and why — this is the half worth reading.** The ritual says *fully consumed → move; partially consumed → mark in place and say what stays open*, so a `groomed →` header is NOT by itself a licence to file. Each of these carries a live remainder in its own header: `Idea-93` (L19 took the design-doc half; **the E1 status question stays open — user call**), `Idea-60` (**C25 took the gate SESSION only**; the sub-application USES_SOFTWARE source and the two missing product rows are explicitly not in it), `Idea-57` (J35 took the SHA-citation half; **the company-side credential fix is the company's hand**), `Idea-41` (J34 took the overlay-grammar requirement; **the disposition ruling itself stays the user's**), `Idea-35` (G34 took the content; **the rest parks on the gate-log Q6 ruling**), `Idea-20` (**clause (c) ONLY** to G60 — (a) and (d) re-read 2026-08-12 as parked, not open), `Idea-10` (K16/K17 took the FID half; **the ALIAS tier parks until a company-side alias table exists**). Filing any of those seven would bury an open user decision under a heading nobody reads for open work — the precise failure the mark-in-place rule exists to prevent. **Four judgement calls made explicit so they can be reversed.** `Idea-69`'s body says “WHAT SURVIVES” and reads like residue; it is not — the survivor is the narrow code-level platform declaration, and that is exactly what K18 (done) was groomed to carry. `Idea-135` (`Idea-59` when filed) carries “six open questions [that] need the directory owner”; they ride K16 (blocked) and K17 (todo), which is tracking, not inbox work. `Idea-45` and `Idea-39` both contain the word *parked* about a DIFFERENT entry's trigger — the company catalog gate — and `Idea-39` states in its own header that nothing stays open as inbox work. `Idea-12` merged into a PLAN document rather than a backlog item, and `Idea-2` left P4–P7 plan-tracked; both are dispositioned elsewhere, which is consumption, not residue. **Result: the inbox drops 79 → 57 and now holds open work, parked work and closed-for-the-record only — no entry whose disposition is already complete.** Verified by census rather than assertion: 57 inbox + 79 trail = 136 entries, the same 136 as before the pass, with zero duplicated and zero lost.
 
