@@ -321,11 +321,14 @@ systems:
     sdlc: ~
     notes: >
       The internal site whose per-business-application server export feeds
-      Epic Z (server location & geography). PROVENANCE OPEN QUESTION, routed
-      to the Z2 gate: whether this site ORIGINATES server/placement facts or
-      fronts a CMDB (which would make it ADS, not SOR) is not established —
-      the dataset row ships authority: SOR with that caveat recorded.
-      Mechanism only: no site name, URL, hostname or rack value here.
+      Epic Z (server location & geography). PROVENANCE: whether this site
+      ORIGINATES server/placement facts or fronts a CMDB (which would make it
+      ADS, not SOR) is not established — gate server-location-ontology §C4
+      (SIGNED 2026-08-19) keeps authority: SOR with the caveat and
+      PRE-AUTHORIZES the evidence-based flip to ADS as an update-not-ruling:
+      when a company-side confirmation of what backs the site lands, record
+      it here and flip, no re-gate. Mechanism only: no site name, URL,
+      hostname or rack value here.
 
 # ---------------------------------------------------------------------------
 # DATASETS — what loaders read and gates rule. `confirmed` is PER DATASET.
@@ -1094,7 +1097,8 @@ datasets:
       # pulled PER BUSINESS APPLICATION from the site UI: the application list is
       # filtered on prod, and each download's rows carry BOTH prod and DR servers.
       # One file per application — that grain is the contract, never merged.
-    confirmed: false                    # nothing loads before the Z2 server/location ontology gate signs
+    gate_spec: config/gate-prompts/server-location-ontology.yaml
+    confirmed: false                    # gate server-location-ontology SIGNED OFF 12/12 (2026-08-19) — authority for the SHAPES; the flip belongs to the Z3 loader build (N13: flips are follow-ups)
     notes: >
       Per-application server export. FIELD CONTRACT (enumerated with the
       hierarchy capture, config/taxonomy/server-location.yaml): server name;

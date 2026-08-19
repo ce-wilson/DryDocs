@@ -1335,6 +1335,31 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "GATE: server-location-ontology — SIGNED OFF 12/12 (Z2)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/rua-load-shapes.yaml",
+        "config/gate-prompts/server-location-ontology.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3675",
+      "unblocks": [
+        "K7",
+        "G22",
+        "G23",
+        "G45",
+        "J24",
+        "G55",
+        "G56",
+        "G57",
+        "G58",
+        "Z2",
+        "J43",
+        "G97"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1477,17 +1502,6 @@
         "K22",
         "G101"
       ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "server-location-ontology (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/server-location-ontology.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
     },
     {
       "kind": "prompt-only",

@@ -605,9 +605,9 @@ MATCH (a:SchemaMeta {name: 'ExecutionHost'}), (b:SchemaMeta {name: 'Server'})
 MERGE (a)-[r:RESOLVES_TO_SERVER]->(b)
   SET r.vocab_id = 'infra_resolves_to_server', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
 
-MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Server'})
+MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'Server'})
 MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'infra_app_runs_on_server', r.role = 'application', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
+  SET r.vocab_id = 'infra_port_runs_on_server', r.role = 'technology_port', r.prov_maps_to = null, r.domain = 'infrastructure', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Server'}), (b:SchemaMeta {name: 'DataCenter'})
 MERGE (a)-[r:LOCATED_IN]->(b)

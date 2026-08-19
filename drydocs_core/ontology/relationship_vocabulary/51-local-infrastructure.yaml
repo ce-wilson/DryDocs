@@ -1,10 +1,12 @@
-  # ── Infrastructure / server location (Epic Z; gate server-location-ontology PENDING) ──
+  # ── Infrastructure / server location (Epic Z; gate server-location-ontology
+  # ── SIGNED OFF 12/12, 2026-08-19 — config/gate-log.md) ──
   #
-  # Registered 2026-08-19 at Z2, status: planned throughout — NOTHING here loads
-  # before the gate signs and the Z3 loader builds (flips are follow-ups, the N13
-  # rule). The domain `infrastructure` is itself registered AT this gate (its §C
-  # clause): physical placement/geography is neither `scheduler` (tool-agnostic
-  # scheduling semantics) nor `architecture` (app/code/team ownership flow).
+  # Registered 2026-08-19 at Z2 and ruled the SAME SESSION. Status stays
+  # planned throughout: sign-off authorizes the SHAPES; the flips belong to the
+  # Z3 loader build (flips are follow-ups, the N13 rule). The domain
+  # `infrastructure` was registered at the gate (§C5): physical
+  # placement/geography is neither `scheduler` (tool-agnostic scheduling
+  # semantics) nor `architecture` (app/code/team ownership flow).
   #
   # THE FAMILY, in one sentence: the infrastructure site's per-application server
   # export (infra:server-export, confirmed: false) supplies physical servers and
@@ -34,7 +36,7 @@
     to_node:      Server
     prov_maps_to: ~
     note: >
-      GATE-BOUND (server-location-ontology §C1): the identity join between
+      RULED at gate server-location-ontology §C1/§A1 (SIGNED 2026-08-19): the identity join between
       Control-M's view of a host (ExecutionHost, keyed on nodeid) and the
       inventory's physical server. An EDGE, deliberately not a node merge: a
       tiered match can be wrong, and an edge with evidence is reversible and
@@ -50,23 +52,31 @@
     domain:       infrastructure
     status:       planned
 
-  - id:           infra_app_runs_on_server
+  - id:           infra_port_runs_on_server
     neo4j_label:  RUNS_ON
     inverse_label: "runs"
-    role:         application
-    from_node:    BusinessApplication
+    role:         technology_port
+    from_node:    Port
     to_node:      Server
     prov_maps_to: ~
     note: >
-      GATE-BOUND (server-location-ontology §C2): the export's own grain — the
-      download is pulled per business application and every row carries the
-      owning application. Same RUNS_ON label as the scheduler placement family
-      (roles agent_host | host_group), role=application disambiguates; the
-      (from, label, to) triple is novel so the C8 meta-graph stays clean.
-      Placement, not attribution: who OWNS/develops the application is the
-      arch_/seal_ attribution family's business, and this edge never carries
-      it. Both prod and DR servers get the edge; designation lives on the
-      Server node (gate §A3), not here.
+      RULED at gate server-location-ontology §C2 (SIGNED 2026-08-19) in the
+      SME-RESHAPED form — "similar to dataport, but technology port". The full
+      shape: (BusinessApplication)-[:HAS_PORT]->(:Port {kind: Technology})
+      -[:RUNS_ON {role: technology_port}]->(:Server). The HAS_PORT hop REUSES
+      the active seal_has_port edge (identical triple — the C8 reuse rule;
+      kinds widened by the same ruling), so ONLY the port->server leg is
+      registered here. REPLACES the draft entry infra_app_runs_on_server
+      (BusinessApplication -> Server direct, registered planned earlier the
+      same day, reshaped at the gate before anything joined on the id — the
+      gate log carries the reshape record). Same RUNS_ON label as the
+      scheduler placement family (roles agent_host | host_group),
+      role=technology_port disambiguates; novel triple, C8-clean. The Z3
+      loader mints ONE technology port per application (the inventory
+      attachment surface). Placement, not attribution: ownership/development
+      stays with the arch_/seal_ attribution family. Both prod and DR servers
+      get the edge; designation lives on the Server node (§A3), never here
+      (port-per-environment was offered and declined).
     supplement:   ~
     loader:       ~
     domain:       infrastructure
@@ -80,13 +90,13 @@
     to_node:      DataCenter
     prov_maps_to: "prov:atLocation"
     note: >
-      GATE-BOUND (server-location-ontology §B1): physical placement — the
+      RULED at gate server-location-ontology §B1/§B2 (SIGNED 2026-08-19): physical placement — the
       server sits in a data center/building. DataCenter carries the geography
       properties (building, city, state, country) plus location_grain, the
       Idea-90 mixed-grain declaration: a located node names the FINEST level
       its source actually supplied instead of implying levels it does not
       know. rack rides this edge (placement detail within the building),
-      pending the gate's grain ruling. prov:atLocation is the natural PROV
+      per the §B1 grain ruling. prov:atLocation is the natural PROV
       term; DataCenter functions as the prov:Location. THE Z5 MAP CONTRACT
       hangs here: "a located label" means reaches-geography-via-LOCATED_IN —
       one contract, so the map module reads no per-label special cases.

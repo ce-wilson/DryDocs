@@ -9,9 +9,16 @@
     to_node:      Port
     prov_maps_to: ~
     note: >
-      Application exposes a data port (EventProcessing or BatchProcessing).
-      Maps to dprod:hasPort pattern. Port kind is stored as a node property.
-      No PROV-O equivalent; structural dprod relationship.
+      Application exposes a port. Maps to dprod:hasPort pattern. Port kind is
+      stored as a node property — kinds: EventProcessing | BatchProcessing
+      (data ports) + Technology, the infrastructure attachment surface (kind
+      WIDENED by ruled amendment at gate server-location-ontology §C2,
+      2026-08-19: the SME directed the app->server link through a technology
+      port rather than a direct edge; this entry is REUSED for that hop per
+      the C8 identical-triple rule, and the port->server leg is
+      infra_port_runs_on_server in 51-local-infrastructure.yaml). The Z3
+      loader mints one Technology port per application. No PROV-O equivalent;
+      structural dprod relationship.
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       business_application

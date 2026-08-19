@@ -3671,3 +3671,99 @@ six confirmations (A1-A3, B1-B2, C1), no held clauses.
 - **What landed at the apply:** config/taxonomy/medallion-stages.yaml
   (schema drydocs.medallion-stages.v1; source: dpl; authority:
   internal-standards). Nothing loads it; the UI half stays O38.
+
+## 2026-08-19 — GATE: server-location-ontology — SIGNED OFF 12/12 (Z2)
+
+**Prompt:** `config/gate-prompts/server-location-ontology.yaml` · **Backlog:** Z2
+(Epic Z, server location & geography; user directive 2026-08-08) · **Session:**
+producer laptop, three AskUserQuestion rounds + one reshape follow-up, same
+session as the Z1 registration. All twelve confirmations ruled; one clause (C2)
+was ruled in an SME-RESHAPED form — the reshape is the ruling of record and the
+prompt page keeps the original proposal as history (the N13 rule: sign-offs
+never edit the prompt).
+
+- **§A1 — THE SERVER SPINE.** An export row mints a NEW `:Server` label (the
+  inventory spine); the join to Control-M's `:ExecutionHost` is the
+  evidence-carrying EDGE `infra_resolves_to_server`, never a node merge — a
+  tiered match can be wrong, and an edge is reversible/auditable where a MERGE
+  is neither (K2 precedent). Four labels, four concepts: ExecutionHost =
+  Control-M's view (often an LB alias, not 1:1 with hardware), ControlMServer =
+  scheduler instance, ControlMHostGroup = load-balancing set, Server = the
+  physical/virtual box. Label-union and enrich-in-place were offered and
+  declined.
+- **§A2 — THE OS.** os_product/os_version land as plain `:Server` properties at
+  Z3. The software-registry tie (an OS row + USES_SOFTWARE per the C25
+  version-context ruling — the patching query) is RECORDED as a follow-up
+  direction, not built: the registry has no OS row today and minting one is a
+  registry decision this gate records but does not execute.
+- **§A3 — PROD/DR.** `designation` is a PROPERTY on `:Server` (PROD | DR), not
+  a node, not an edge property. Both prod and DR servers attach; queries filter
+  the property. No DR-pairing edge is invented — not in the export's contract.
+- **§B1 — THE GEOGRAPHY GRAIN.** `:DataCenter` is the ONLY new geography node;
+  building/city/state/country are PROPERTIES on it; rack rides the
+  `infra_located_in` edge. NO City/State/Country nodes at Z2 — promotion is a
+  future ruling if a real query needs the traversal. THE Z5 MAP CONTRACT: "a
+  located label" = reaches-geography-via-LOCATED_IN; one contract, no per-label
+  special cases.
+- **§B2 — MIXED GRAIN DECLARED (Idea-90 i).** Every `:DataCenter` carries
+  `location_grain` naming the FINEST level its source actually supplied
+  (building | city | state | country); absent levels stay null and are never
+  inferred; consumers render at the declared grain, never below it.
+- **§B3 — AGGREGATE PRESENCE CLAIMS (Idea-90 ii).** "N locations" is a claim
+  ABOUT sites: recorded as a claim (property/annotation + source + date) on the
+  claiming node, NEVER exploded into N nodes. Placeholder-node explosion was
+  offered and declined.
+- **§B4 — THE TWO-DCs FENCE, ruled explicitly** (the Z2 acceptance requires it
+  by name): the export's data-center field and the Control-M same-named field
+  are DISTINCT CONCEPTS that never crosswalk by field name.
+  CM_HOSTS.DATA_CENTER / ControlMServer.data_center / ControlMHostGroup's DC
+  key = SCHEDULING (default-run-time grammar); `:DataCenter` = PHYSICAL
+  geography. Any future association is its own SME-mapped decision (the
+  orchestrator-mapping steward-cascade precedent) — never a name join, never
+  automated. The fixture guard already enforces the fence in test form
+  (tests/unit/test_server_inventory_fixture.py).
+- **§C1 — THE JOIN RULE (K2: tiers + evidence, nothing silent).** T1 exact
+  (nodeid == server_name, case-normalized); T2 normalized (deterministic
+  short-name/FQDN suffix-strip, nothing fuzzier); T3 dns-resolved (the Z4
+  nslookup evidence file, resolved names matched at T1/T2). Every
+  `infra_resolves_to_server` edge records match_tier + match_evidence +
+  resolved_at; unmatched hosts get NO edge and appear explicitly unmatched in
+  the Z3 coverage query. Two-tiers-only and an added manual tier were offered;
+  the three-tier form was confirmed as proposed.
+- **§C2 — THE TECHNOLOGY PORT (SME-RESHAPED, the ruling of record).** The
+  proposal was a direct (BusinessApplication)-[:RUNS_ON {role:
+  application}]->(:Server) edge. The SME redirected: model it through the PORT
+  pattern — "similar to dataport, but technology port." Ruled shape:
+  `(BusinessApplication)-[:HAS_PORT]->(:Port {kind: Technology})-[:RUNS_ON
+  {role: technology_port}]->(:Server)`. The HAS_PORT hop REUSES the active
+  `seal_has_port` edge (identical triple — the C8 reuse rule; its note gains a
+  ruled amendment widening kinds from EventProcessing | BatchProcessing to
+  include Technology). The planned entry is `infra_port_runs_on_server`
+  (Port -> Server), REPLACING the drafted `infra_app_runs_on_server` before
+  anything ever joined on that id (registered planned same-day, reshaped at
+  the gate — the replacement is recorded in the entry note, not a rename of a
+  live join key). The Z3 loader mints ONE technology port per application;
+  prod/DR stays on `:Server` per §A3. Port-per-environment was offered and
+  declined. Placement, not attribution — unchanged from the proposal.
+- **§C3 — THE REFUSAL, confirmed rather than assumed.** NO direct job ->
+  Server placement edge exists, not even planned ("where does this run"
+  already has its label — RUNS_ON roles agent_host | host_group, ACTIVE since
+  P3; rua-load-shapes §A2 killed the synonym split). A job's physical location
+  is the TRAVERSAL: job -RUNS_ON-> host/group -RESOLVES_TO_SERVER-> server
+  -LOCATED_IN-> data center. A derived convenience edge without a gate was
+  offered and declined.
+- **§C4 — SITE PROVENANCE (parked at Z1).** infra:server-export keeps
+  authority: SOR with the recorded caveat; the flip to ADS happens only on
+  evidence, recorded on the registry row when it lands — PRE-AUTHORIZED as an
+  update-not-ruling, no re-gate needed.
+- **§C5 — THE DOMAIN.** `infrastructure` is REGISTERED as a vocabulary domain
+  (fragment 51-local-infrastructure.yaml, prefix infra_; schema enum + header
+  twin updated at the draft). Physical placement/geography is neither
+  scheduler nor architecture.
+- **What lands at the apply:** the C2 reshape in the vocabulary fragment
+  (infra_port_runs_on_server replaces infra_app_runs_on_server; seal_has_port
+  note amendment; Port node-classification kind note widened), gate_spec on
+  the infra:server-export registry row, PENDING -> signed citations in the
+  fragment and node-classification notes. ALL THREE infra_ entries stay
+  status: planned — the flips belong to the Z3 build (N13: flips are
+  follow-ups). The dataset stays confirmed: false until Z3.

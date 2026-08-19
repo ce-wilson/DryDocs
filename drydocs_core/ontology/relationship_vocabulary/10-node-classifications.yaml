@@ -209,7 +209,7 @@ node_classifications:
   - label:      Port
     class:      "dprod:Port"
     prov_type:  Entity
-    note:       "Data port (EventProcessing / BatchProcessing). dprod namespace is the EKGF working default pending the corporate IRI."
+    note:       "Application port. Kinds: EventProcessing / BatchProcessing (data ports) + Technology (the infrastructure attachment surface — kind WIDENED at gate server-location-ontology §C2, 2026-08-19; see infra_port_runs_on_server). dprod namespace is the EKGF working default pending the corporate IRI."
 
   - label:      DistributionList
     class:      "dd:DistributionList"
@@ -630,12 +630,12 @@ node_classifications:
       loader maps it onto the existing single :Project node, so gate §B1(a)
       (one root, nothing else hangs off it) holds unchanged.
 
-  # — Infrastructure / server location (Epic Z; gate server-location-ontology PENDING) —
+  # — Infrastructure / server location (Epic Z; gate server-location-ontology SIGNED OFF 12/12, 2026-08-19) —
   - label: Server
     class: "dd:Server"
     prov_type: n/a
     note: >
-      GATE-BOUND (server-location-ontology, Z2): a PHYSICAL/VIRTUAL server from
+      RULED at gate server-location-ontology §A1 (SIGNED 2026-08-19): a PHYSICAL/VIRTUAL server from
       the infrastructure site's per-application export (infra:server-export) —
       the INVENTORY spine. Deliberately distinct from THREE near-neighbors, and
       the distinctions are the point: (1) ExecutionHost is Control-M's VIEW of
@@ -646,14 +646,15 @@ node_classifications:
       load-balancing set. Local infrastructure class, no W3C equivalent
       (ControlMServer precedent); prov_type n/a — placement edges carry no
       PROV mapping (the RUNS_ON family precedent). Carries designation
-      (PROD | DR — property, not node, pending gate §A3) and the os_product /
-      os_version pair pending gate §A2.
+      (PROD | DR — property, not node, ruled §A3) and the os_product /
+      os_version pair as plain properties (§A2; the software-registry OS row
+      is a recorded follow-up direction, not built).
 
   - label: DataCenter
     class: "dd:DataCenter"
     prov_type: n/a
     note: >
-      GATE-BOUND (server-location-ontology, Z2): a PHYSICAL data
+      RULED at gate server-location-ontology §B1/§B2/§B4 (SIGNED 2026-08-19): a PHYSICAL data
       center/building — functions as the prov:Location target of
       infra_located_in (prov:atLocation). Carries the geography ladder as
       properties (building, city, state, country) plus location_grain, the
