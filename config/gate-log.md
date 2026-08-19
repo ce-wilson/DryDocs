@@ -3890,3 +3890,23 @@ never edit the prompt).
   fact, not batch wiring. C3: N:1, never a schema constraint — a graph test if
   anything (the TOM-roles lesson); mid-transfer states are normal.
 - C4 (the K2 reconciler feeds from the SAME crosswalk) walks next round with §E.
+
+## 2026-08-19 — RECORD: FID gate rounds 6-7 — §C closed 4/4, §E closed 3/3 (E1 reshaped), §F closed 3/3, §G1 (K17; gate `fid-identity-and-scope`, still UNSIGNED)
+
+- **C4 CONFIRMED — one crosswalk.** TierReconcilers.fid populates from this
+  ingest (name -> app_id via §A2 then §C1); no second mapping table;
+  match_method 'fid' unchanged. The tier's re-scope is §G3's business.
+- **§E CLOSED 3/3 — registration, with E1 RESHAPED by Q3's answer.** E1: the
+  directory is a table in the replica already in scope, so the registration is
+  a DATASET on the existing replica system (layer human on the dataset row),
+  not a new system row — no new connection surface; classification Internal,
+  authority SOR for account identity, confirmed: false until sign-off. E2:
+  audit-fields entry status stub until confirmed object-by-object; the
+  envelope says the record changed, never what it changed from. E3: extracts
+  live under internal/ company-side; this repo carries mechanism only.
+- **§F CLOSED 3/3 — the mislabeled evidence.** F1 verbatim (a corrected copy
+  is no longer evidence); F2 the correction is a recorded mapping (column
+  labeled FID reads as fid_name through the §A2 crosswalk, noted on the
+  corpus's known-defect note); F3 unresolved rows load nothing, never fuzzy.
+- **G1 CONFIRMED — registration, never consumption,** with
+  `assignment_kind: 'registration'` explicit on the edge data.
