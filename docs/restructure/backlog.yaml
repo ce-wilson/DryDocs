@@ -2497,7 +2497,12 @@ items:
       rows / 23 cols, every id unique, only 54 distinct names, ONE agent-account name
       registered 171 separate ways (75%) each to a different manager+cost center — so
       the grain is (account id, owner), exactly what fid_census.py was built for, and
-      this source answers WHO OWNS, never WHICH APPLICATION. (B) the id-owner
+      this source answers WHO OWNS, never WHICH APPLICATION. SME clarification
+      2026-08-19: that 171-way name is the Control-M PLATFORM user (jobs running as
+      Control-M itself), a run_as CLASS the plan had not separated — and it is
+      cross-platform (Informatica carries several such accounts for
+      business-application jobs). Doc 09's two-source section carries the consequence;
+      K25's detector now classifies run_as by class first. (B) the id-owner
       application searched BY application id — record id / FID / type / purpose /
       name; measured by-application totals 555, 500, 209, 59 across four captures
       (the "about two hundred" estimate spans an order of magnitude); SME caveat -- a
@@ -18332,7 +18337,18 @@ items:
       a finding: a shared platform FID serving many applications' folders is the
       EXPECTED shape of that account class, so the detector must separate
       account-class-expected sharing from genuine cross-application anomalies, or the
-      report drowns.
+      report drowns. SME CLARIFICATION 2026-08-19, and it upgrades (d) from a filter to
+      a CLASSIFICATION: the 171-way name IS the Control-M platform user — the account
+      jobs run as when they run as Control-M itself — and the class is cross-platform
+      (Informatica carries several platform accounts under which business-application
+      jobs run). So the detector's first cut is run_as CLASS (application FID /
+      platform-user account / unresolvable), the platform-user bucket is EXPECTED to
+      disagree with folder attribution by construction and resolves through the
+      platform's own attribution chain instead of the directory, and the by-class
+      counts are themselves a deliverable (how much of the estate runs as the
+      platform is a number nobody has). How a platform account is RECOGNIZED (curated
+      list vs the directory's type/purpose columns) is a K17 §D/§G ruling this item
+      must not preempt — it may propose, with evidence.
     notes: >
       Direct add 2026-08-19 (desktop, SME direction at the K16 two-source evidence
       session). depends_on K16 because the detection runs over the same census join the

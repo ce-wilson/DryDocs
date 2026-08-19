@@ -176,9 +176,27 @@ employee record system as functional-type entries:
   account**. LOB, department, and cost-center columns come along for free.
 - Measured shape of the profiled extract: 227 rows, 23 columns, every row
   functional-type and active, every employee-id value unique — while the NAME
-  column holds only 54 distinct values. **One agent-account name is registered 171
-  separate times (75% of the extract), each to a different manager and cost
-  center.** 50 names are 1:1 with their id; 3 more names carry small duplicates.
+  column holds only 54 distinct values. **One name is registered 171 separate
+  times (75% of the extract), each to a different manager and cost center — and
+  the SME identifies it (2026-08-19) as the Control-M PLATFORM user: the account
+  jobs run as when they run as Control-M itself, not as any business
+  application's FID.** 50 names are 1:1 with their id; 3 more names carry small
+  duplicates.
+
+  That identification names a **run_as class this plan had not separated: the
+  platform-user account.** A job whose run_as is the platform's own account
+  carries no application signal in its run_as at all — resolving it through any
+  FID -> application join would attribute the job to the PLATFORM, which is the
+  §G registration-vs-attribution counterexample generalized from one account to
+  a whole class. And the class is cross-platform, per the SME: **Informatica
+  carries several platform accounts under which business-application jobs run.**
+  Consequence for the census and the K2 tier alike: run_as must be CLASSIFIED
+  (application FID vs platform-user account vs unresolvable) before any join is
+  attempted, and the platform-user bucket is resolved by the platform's own
+  attribution chain (folder/workflow ownership), never by the directory. K25
+  carries the detection; which classes exist and how a platform account is
+  recognized (a curated list? the directory's own type/purpose columns?) is a
+  K17 §D/§G question.
 - Consequences: the grain is **(account id, owner)** — exactly the multi-owner
   scenario `fid_census.py` was built for; the name is the Control-M `run_as` join
   key but is NOT unique; and **this source cannot answer "which application"** —
@@ -216,7 +234,7 @@ applications but its owner columns are role-derived views (see the concepts doc
 say whether ownership is individual or catalog-role). The join between them is the
 NAME — the key §A of the gate already rules is unsafe as identity. That is not a
 contradiction: the name is the *join*, the id is the *identity*, and the census can
-measure how lossy the join is (name collisions are already measured at 171-way for
+measure how lossy the join is (the platform-user account alone is measured at 171-way for
 one value).
 
 **What this changes in the plan:** the census gains an owner-side half from Source A
