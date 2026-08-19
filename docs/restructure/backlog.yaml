@@ -18035,13 +18035,60 @@ items:
       written to config/source-registry.yaml, no loader, no edge. Any edge the
       recommendation implies is registered status: planned and goes through
       docs/RELATIONSHIP_GUIDE.md and the HITL gate.
-    notes: >
+      AMENDED 2026-08-19 by the export profile below. The ASSERTED-vs-DEFAULTED
+      dichotomy is MOOT for the designed columns, because they are not populated at all
+      -- an empty field is neither asserted nor defaulted. The live question the verdict
+      must now answer is narrower and sharper: given that the only working SEAL link is
+      at APPLICATION grain with 44% coverage and owning-not-subject semantics, does the
+      kb_* family leave ring 3? The original question survives only for u_correlation_id
+      itself: is that value authored per article, or defaulted from the article's owning
+      base/content owner? The illustrative rows suggest the latter, which is exactly the
+      defect this item was written to look for -- arriving on a different field than the
+      one it was aimed at.
       Groomed 2026-08-11 from Idea-102's separate thread. The SME called KB articles at
       deployment grain "more meaningful", and a documented fix attached to the deployment
       that has the incident is squarely what a production-support knowledge graph is for --
       which is why it earns an item rather than a line inside K22. Deliberately an
       ASSESSMENT and not an ingestion: ring 3 is where the family sits today, and the value
       of the item is that it is allowed to come back "leave it there" with evidence.
+      EVIDENCE ARRIVED 2026-08-19 (SME screenshots; profiling ran on the SME's own machine
+      against a dated CSV export of the KB view, NOT in this tree -- the file is not
+      present here and these numbers could not be re-derived producer-side, J18). Shapes
+      only per the publish boundary: the view's real db/schema, the SEAL id values, the
+      KB article numbers, the content-owner SID and the support-group names all stay out
+      of this repo. Registry grammar for the object is snow@[db].[schema].v_kb_knowledge.
+      THE HEADLINE, and it lands on K23's premise rather than beside it: EVERY
+      purpose-built SEAL/attribution column is 0-of-200 filled -- u_seal_id,
+      u_do_you_have_seal_id, u_business_application, u_product_owner, u_assignment_group.
+      The designed linkage does not exist in the export. Deployment grain in particular is
+      unreachable: evidence-doc Q7 established that a deployment link shows as the
+      composite app:deployment name (or the CI id), and every populated value here is a
+      BARE app id with no deployment segment. So the SME's "KB articles at deployment
+      grain" premise is not merely unconfirmed -- this export cannot express it.
+      WHAT DOES CARRY A LINK: u_correlation_id, 88 of 200 (44%), 77 distinct values, all
+      numeric and 4-6 digits, i.e. SEAL-shaped at APPLICATION grain. 112 of 200 (56%) have
+      no SEAL link on any field. Secondary signals, none of them a substitute: the KB base
+      field is 100% filled with 15 distinct values (a base grouping, at best a coarse
+      owning-domain proxy, and the top 3 hold 131 of 200); u_content_owner 48% as free
+      text (person / SID / group, so it reaches an app only indirectly via the support
+      group); ownership_group 4.5%.
+      THE CAVEAT THAT DECIDES THE VERDICT: u_correlation_id looks like the OWNING app's
+      SEAL, not the article's SUBJECT SEAL. Two sampled rows cite a different SEAL inside
+      the article title than the one in u_correlation_id. If that generalises, then even
+      the 44% is answering "who owns this article" rather than "what is this article
+      about" -- and an edge built on it would attach documented fixes to the wrong
+      application while looking well populated, which is the K23 defect exactly, one grain
+      up from where the item expected it.
+      NOT SETTLED, and the write-up must say so: whether the 200-article export is the
+      whole KB or a projection (the same completeness doubt as evidence-doc Q9, one level
+      down), and whether the owning-vs-subject reading holds beyond the two sampled rows.
+      A subject-precise mapping would require parsing the SEAL out of the article title or
+      body, which is a different and much weaker capture than a structured foreign key.
+      DIRECTION OF TRAVEL: this evidence points at "leave the kb_* family in ring 3, with
+      the reason recorded" rather than at promotion. The item is NOT closed by it -- the
+      acceptance puts the verdict in
+      knowledge/upgrade-plans/servicenow-replica-evidence.md beside Q8/Q9, and that
+      write-up has not been done.
 
   - id: K24
     epic: seal-attribution
