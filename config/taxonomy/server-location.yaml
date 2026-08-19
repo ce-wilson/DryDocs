@@ -1,0 +1,112 @@
+# =============================================================================
+# config/taxonomy/server-location.yaml — server/location hierarchy (Z1)
+#
+# PURE CLASSIFICATION ONLY: the nesting the infrastructure site's per-application
+# server export itself carries — BusinessApplication ▸ Server ▸ Rack ▸ DataCenter ▸
+# City ▸ State ▸ Country. No meaning edges: whether "application ▸ server" becomes
+# ownership/RUNS_ON, whether rack/city/state/country are nodes or properties, the
+# prod/DR shape, and the server-name ⟷ Control-M node JOIN RULE are all Z2 gate
+# decisions (config/gate-prompts/, ontology-mapper). This file records the source's
+# grouping, faithfully, and nothing more.
+#
+# STANDING CAUTION (verbatim from the Epic Z groom): the export's
+# data-center/location field is NOT the Control-M field of the same name — the
+# Control-M "DC" is a SCHEDULING concept (its name encodes the default run time,
+# e.g. T032-E0700-DMA), while this source carries PHYSICAL geography (rack,
+# building, city/state/country). Never join or crosswalk the two by field name.
+# (knowledge/standards/technology/data-center-naming-convention.md documents the
+# SCHEDULING concept; this capture is the OTHER one.)
+#
+# Built from the SYNTHETIC sample shape (tests/fixtures/server_inventory/
+# synthetic-server-export.csv — guard: tests/unit/test_server_inventory_fixture.py).
+# SOURCE (infra) is Internal (confidential handling): real hostnames, racks and
+# building locations live under internal/server-inventory/, never here.
+# =============================================================================
+
+taxonomy: server-location
+domain: technology
+taxonomy_path_root: technology/infrastructure/server-location
+source: infra                    # config/source-registry.yaml v2 SYSTEM id (dataset infra:server-export)
+# authority: DELIBERATELY OMITTED — no config/precedence.yaml authority governs
+# physical geography. internal-standards is the closest by name, but it governs
+# `data-center-codes` in the SCHEDULING sense (the Control-M DC naming standard),
+# which is exactly the name-collision this capture fences. If server/location
+# facts ever conflict across sources, registering an authority is that moment's
+# precedence decision, not this import's.
+classification: Internal         # confidential handling: real hostnames/racks/buildings (synthetic shape here)
+classification_only: true
+captured: 2026-08-19             # backlog Z1 (user directive 2026-08-08); gate = Z2, not yet run
+
+# ---------------------------------------------------------------------------
+# THE HIERARCHY — seven levels, exactly as the export nests them. Levels are
+# declared rather than sampled exhaustively; the nodes below carry one
+# synthetic path end-to-end so the shape is testable without any real value.
+# ---------------------------------------------------------------------------
+levels:
+  - { seq: 1, id: BusinessApplication, note: "the download grain — one export per application; the app is the export's owner column, not (yet) an ownership edge" }
+  - { seq: 2, id: Server,              note: "one row per server; both prod and DR rows appear in one download. THE JOIN KEY to Control-M nodes — join rule = Z2" }
+  - { seq: 3, id: Rack }
+  - { seq: 4, id: DataCenter,          note: "PHYSICAL building — never the Control-M scheduling DC (the standing caution above)" }
+  - { seq: 5, id: City }
+  - { seq: 6, id: State }
+  - { seq: 7, id: Country }
+
+# ---------------------------------------------------------------------------
+# FIELD CONTRACT — what one export carries (backlog Z1 acceptance). These are
+# the FIELDS of the contract; the site's physical column-header spellings are
+# recorded company-side at the first real drop (loose -> strict), and the
+# synthetic fixture's header must match this list exactly (test-enforced).
+# ---------------------------------------------------------------------------
+fields:
+  - { name: server_name,          contract: "server name — the Z2 join key" }
+  - { name: os_product,           contract: "OS product (e.g. RHEL) — software-registry tie is an open question below" }
+  - { name: os_version,           contract: "OS version (e.g. 8.4) — version context per the C25 ruling" }
+  - { name: rack,                 contract: "rack identifier" }
+  - { name: data_center,          contract: "data-center/building — PHYSICAL, never the Control-M scheduling DC" }
+  - { name: city,                 contract: "city" }
+  - { name: state,                contract: "state" }
+  - { name: country,              contract: "country" }
+  - { name: designation,          contract: "prod/DR designation — both appear in one prod-filtered download" }
+  - { name: business_application, contract: "owning business application — the download grain" }
+
+# One synthetic end-to-end path (shape only; ids in the reserved 70001-70099 block).
+nodes:
+  applications:
+    - { id: 70055, name: "Synthetic App 70055" }
+  servers:
+    - { id: srv-synth-01, parent_application: 70055, designation: PROD, rack: R-101 }
+    - { id: srv-synth-51, parent_application: 70055, designation: DR,   rack: R-901 }
+  racks:
+    - { id: R-101, parent_data_center: SYNTH-BLDG-A }
+    - { id: R-901, parent_data_center: SYNTH-BLDG-B }
+  data_centers:
+    - { id: SYNTH-BLDG-A, parent_city: Sampleville }
+    - { id: SYNTH-BLDG-B, parent_city: Modelton }
+  cities:
+    - { id: Sampleville, parent_state: SV }
+    - { id: Modelton,    parent_state: MD2 }
+  states:
+    - { id: SV,  parent_country: SYN }
+    - { id: MD2, parent_country: SYN }
+  countries:
+    - { id: SYN }
+
+open_questions:
+  - id: os-software-registry-tie
+    note: >
+      The contract's os_product/os_version pair should tie to
+      config/taxonomy/software-registry.yaml per the C25 version-context ruling,
+      but the registry has no OS row today (checked 2026-08-19). Whether an OS
+      is a software-registry product or a plain Server property is a Z2
+      decision; no registry row is added at Z1.
+  - id: site-provenance
+    note: >
+      Whether the infrastructure site ORIGINATES server/placement facts or
+      fronts a CMDB (SOR vs ADS on infra:server-export) — routed to Z2, noted
+      on the `infra` system row.
+  - id: geography-grain
+    note: >
+      Nodes vs properties for rack/building/city/state/country, plus the two
+      Idea-90 findings (mixed-grain location declarations; aggregate presence
+      claims) — already written into Z2's acceptance; listed here only so this
+      capture points at where its levels get their meaning.

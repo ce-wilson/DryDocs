@@ -310,6 +310,15 @@
       "layer": "technology",
       "classification": "Internal-Public",
       "taxonomy_captures": []
+    },
+    {
+      "id": "infra",
+      "name": "Infrastructure inventory site (per-application server export)",
+      "layer": "technology",
+      "classification": "Internal",
+      "taxonomy_captures": [
+        "config/taxonomy/server-location.yaml"
+      ]
     }
   ],
   "sources": [
@@ -1285,6 +1294,26 @@
           ]
         }
       ]
+    },
+    {
+      "id": "infra:server-export",
+      "home": "source-registry",
+      "system": "infra",
+      "origin": "infra",
+      "kind": "file",
+      "authority": "SOR",
+      "derived": false,
+      "urn": "urn:drydocs:dataset:(infra,server-export,prod)",
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
     },
     {
       "id": "bmc-docs",

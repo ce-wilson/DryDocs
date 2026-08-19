@@ -57,7 +57,7 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v2
-updated: 2026-08-07     # gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
+updated: 2026-08-19     # Z1: system `infra` + dataset infra:server-export registered (confirmed: false — everything meaning-bearing waits on the Z2 gate). Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
 
 # ---------------------------------------------------------------------------
 # SYSTEMS — the things we connect to. layer = BDAT four-value view
@@ -308,6 +308,24 @@ systems:
     locator: {}
     sdlc: ~
     notes: "Born-here datasets: the software-registry ledger, depgraph snapshots, design docs (tenant 0)."
+
+  - id: infra
+    name: "Infrastructure inventory site (per-application server export)"
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal            # confidential handling: real hostnames, racks, building locations, owning-app identifiers
+    locator:
+      hosting: internal-web             # an internal inventory UI; the site name/URL live ONLY in the internal/ twin (pointer-never-the-value)
+      drop_readme: internal/server-inventory/README.md   # the landing zone's tracked procedure doc (Z1)
+    sdlc: ~
+    notes: >
+      The internal site whose per-business-application server export feeds
+      Epic Z (server location & geography). PROVENANCE OPEN QUESTION, routed
+      to the Z2 gate: whether this site ORIGINATES server/placement facts or
+      fronts a CMDB (which would make it ADS, not SOR) is not established —
+      the dataset row ships authority: SOR with that caveat recorded.
+      Mechanism only: no site name, URL, hostname or rack value here.
 
 # ---------------------------------------------------------------------------
 # DATASETS — what loaders read and gates rule. `confirmed` is PER DATASET.
@@ -1056,6 +1074,43 @@ datasets:
       Mechanism-only here — no real SEAL/FID/app-name values. Extract:
       drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = tie-break
       contract).
+
+  # ---- Infrastructure server inventory (Epic Z) -------------------------------
+  - id: "infra:server-export"
+    system: infra
+    origin: infra
+    artifact: server-export
+    artifact_kind: file
+    taxonomy_category: Infrastructure
+    asset_type: dcat:Dataset
+    authority: SOR                      # caveat on the system row: SOR-vs-ADS (site-vs-CMDB provenance) is a Z2 gate question
+    feeds_taxonomy: [servers, locations]   # deliberately NOT `hosts` — that is the Control-M side of a join Z2 has not ruled
+    adapter: ~                          # no loader before the Z2 gate signs; the loader is Z3
+    acquisition:                        # how the data arrives (N12)
+      mode: manual
+      format: csv                       # expected; if the site hands another format, widen the enum at the first real drop (the `archive` precedent)
+      drop_dir: internal/server-inventory/
+      drop_dir_base: repo               # TRACKED in-tree zone — the real exports commit under internal/ (PUBLISH-BOUNDARY.md: raw extracts live there, excluded from any public push), which is what survives git clean
+      # pulled PER BUSINESS APPLICATION from the site UI: the application list is
+      # filtered on prod, and each download's rows carry BOTH prod and DR servers.
+      # One file per application — that grain is the contract, never merged.
+    confirmed: false                    # nothing loads before the Z2 server/location ontology gate signs
+    notes: >
+      Per-application server export. FIELD CONTRACT (enumerated with the
+      hierarchy capture, config/taxonomy/server-location.yaml): server name;
+      OS product + version (e.g. RHEL x.x — version context ties to the
+      software registry per the C25 ruling; no OS row exists there yet, an
+      open question parked for Z2); rack; data-center/building; city; state;
+      country; prod/DR designation; owning business application. STANDING
+      CAUTION (verbatim from the Epic Z groom): the export's
+      data-center/location field is NOT the Control-M field of the same name
+      — the Control-M "DC" is a SCHEDULING concept (its name encodes the
+      default run time, e.g. T032-E0700-DMA), while this source carries
+      PHYSICAL geography (rack, building, city/state/country). Never join or
+      crosswalk the two by field name. Server name is the join key to
+      Control-M nodes, but the JOIN RULE is a Z2 decision, not an import-time
+      invention. Sanitized sample:
+      tests/fixtures/server_inventory/synthetic-server-export.csv.
 
 # ---------------------------------------------------------------------------
 # RETIRED IDS (D4) — the refusal list. SourceRegistry.from_yaml and the
