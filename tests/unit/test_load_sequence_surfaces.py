@@ -72,6 +72,58 @@ def _appendix_b_verbs() -> list[str]:
     return _VERB.findall(match.group(1))
 
 
+def _operator_surface_verbs() -> set[str]:
+    """Every verb an operator surface really runs — from BOTH surfaces, and
+    honest about how each one answers.
+
+    N11, 2026-08-19. The runbook is prose and names its verbs literally, so a
+    regex is the only way to read it. ``ingest.sh`` is the opposite case and
+    scanning it was quietly meaningless: N6 made it derive the sequence at run
+    time (``"${DRYDOCS[@]}" "$cmd"`` out of ``load_profile``), and the sibling
+    guard ``test_ingest_sh_reads_the_declaration_instead_of_listing_steps``
+    ENFORCES that it never grows a literal call back. So ``_SH_VERB`` over that
+    file was guaranteed to return the empty set, and the caller unioned it in
+    as if it were coverage.
+
+    Nothing was being missed — a surface that reads ``CANONICAL_LOAD_SEQUENCE``
+    cannot name a verb the declaration omits, which is a STRONGER guarantee
+    than any regex over it. What was wrong is that the guard could not tell the
+    two reasons for an empty result apart: "derives, so there is nothing to
+    scan" and "the regex stopped matching". Assert the derivation instead, so
+    the empty set has to earn its silence — that indistinguishability is the
+    same shape as the defect this module exists for (N6's docstring: a
+    deliberate subset and a forgotten step look identical from outside).
+    """
+    sh_text = INGEST_SH.read_text(encoding="utf-8")
+    literal = set(_SH_VERB.findall(sh_text))
+    if not literal:
+        assert "load_profile" in sh_text, (
+            "scripts/ingest.sh names no verb literally AND no longer derives "
+            "from cli.load_profile — so this guard is reading an empty set as "
+            "coverage of a surface it has in fact stopped checking. Either it "
+            "derives (N6) or its verbs must be scannable by _SH_VERB; silently "
+            "neither is how bootstrap-schema-graph stayed undeclared for months."
+        )
+    return literal | set(_VERB.findall(RUNBOOK.read_text(encoding="utf-8")))
+
+
+def test_the_ingest_sh_half_of_the_surface_scan_cannot_pass_by_being_empty():
+    """The helper's own guard, exercised — a scan that returns nothing must
+    prove the surface derives rather than banking the empty result (N11)."""
+    verbs = _operator_surface_verbs()
+    assert verbs, "the surface scan found no verbs at all — both readers are dead"
+
+    sh_text = INGEST_SH.read_text(encoding="utf-8")
+    assert not _SH_VERB.findall(sh_text), (
+        "scripts/ingest.sh now names verbs literally, so _operator_surface_verbs "
+        "takes its scanning branch — this test's premise (the derived branch) is "
+        "stale and the derivation assertion above needs re-reading."
+    )
+    assert (
+        "load_profile" in sh_text
+    ), "the derived branch is the live one and its own precondition is false"
+
+
 # ---- the profile declarations themselves -------------------------------------
 
 
@@ -220,8 +272,7 @@ def test_every_verb_an_operator_surface_names_is_declared():
     operator really runs, missing from the declaration
     (`bootstrap-schema-graph`, found 2026-08-04)."""
     sequenced = {step.command for step in cli.CANONICAL_LOAD_SEQUENCE}
-    named = set(_VERB.findall(RUNBOOK.read_text(encoding="utf-8")))
-    named |= set(_SH_VERB.findall(INGEST_SH.read_text(encoding="utf-8")))
+    named = _operator_surface_verbs()
     undeclared = sorted(
         verb
         for verb in named
