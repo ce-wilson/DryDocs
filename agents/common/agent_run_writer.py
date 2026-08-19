@@ -23,10 +23,10 @@ import hashlib
 import os
 
 AGENT_RUN_DB_ENV = "DRYDOCS_AGENTRUN_DB"
-DEFAULT_AGENT_RUN_DB = "ddcontext"  # R1 gate ruling 2026-07-23 (config/gate-log.md)
+DEFAULT_AGENT_RUN_DB = "drydocs"  # G102 (2026-08-18): the fold. The R1 ruling's SUBSTANCE (":AgentRun lands never-in-ground-truth") survives as the :Uncertain label per ADR 0011 §118 — this module is the second entry on the uncertain-writer allowlist
 
 _MERGE_AGENT_RUN = (
-    "MERGE (r:AgentRun {run_id: $run_id}) " "SET r += $props, r.recorded_at = datetime()"
+    "MERGE (r:AgentRun:Uncertain {run_id: $run_id}) " "SET r += $props, r.recorded_at = datetime()"
 )
 
 
@@ -35,12 +35,21 @@ def _sha256(text: str) -> str:
 
 
 def agent_run_db() -> str:
-    """The ruled target database; refuses ``drydocs`` no matter what the env says."""
+    """The ruled target database; refuses anything else no matter what the env says.
+
+    THE REFUSAL INVERTED AT G102 (2026-08-18). Pre-fold this function refused
+    `drydocs` (the R1 ruling: :AgentRun never in ground truth). Post-fold the
+    R1 substance survives as the :Uncertain label on the MERGE, and the ruled
+    database IS `drydocs` — so the defect to refuse is now a STALE env var
+    still pointing at the retired `ddcontext`, which would write telemetry
+    into a database nothing reads.
+    """
     db = os.getenv(AGENT_RUN_DB_ENV, DEFAULT_AGENT_RUN_DB).strip() or DEFAULT_AGENT_RUN_DB
-    if db == "drydocs":
+    if db != DEFAULT_AGENT_RUN_DB:
         raise ValueError(
-            ":AgentRun never lands in 'drydocs' (R1 gate ruling: ddcontext) — "
-            f"fix {AGENT_RUN_DB_ENV}"
+            f":AgentRun lands ONLY in '{DEFAULT_AGENT_RUN_DB}' carrying :Uncertain "
+            f"(G102 fold; R1's never-in-ground-truth survives as the label) — "
+            f"'{db}' is stale, fix {AGENT_RUN_DB_ENV}"
         )
     return db
 
@@ -103,8 +112,11 @@ def write_agent_run(envelope, user_id: str = "", database: str | None = None) ->
     from common.neo4j_tool import get_driver
 
     db = database or agent_run_db()
-    if db == "drydocs":  # an explicit argument doesn't bypass the ruling either
-        raise ValueError(":AgentRun never lands in 'drydocs' (R1 gate ruling: ddcontext)")
+    if db != DEFAULT_AGENT_RUN_DB:  # an explicit argument doesn't bypass the ruling either
+        raise ValueError(
+            f":AgentRun lands ONLY in '{DEFAULT_AGENT_RUN_DB}' (G102 fold; the "
+            ":Uncertain label carries the R1 ruling) — got " + repr(db)
+        )
     props = agent_run_props(envelope, user_id=user_id)
     run_id = props.pop("run_id")
     props = {k: v for k, v in props.items() if v is not None}

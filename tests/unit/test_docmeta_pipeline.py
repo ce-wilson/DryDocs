@@ -244,7 +244,9 @@ def test_every_shipped_entry_loads_typed():
     assert "bmc-docs" in entries
     for entry in entries.values():
         assert entry.tier in registry.CURATION_BY_TIER
-        assert entry.target_db in {"dddocs", "ddcontext"}
+        assert (
+            entry.target_db == "drydocs"
+        )  # G102 fold: one content database (was {dddocs, ddcontext})
 
 
 def test_the_curation_ladder_is_derived_not_declared():

@@ -41,11 +41,17 @@ LOADED = "loaded"
 MISSING = "missing"
 STALE = "stale"
 WRONG_DB = "wrong-db"
+#: G102 (gate §A confirmation 8): the wrong-db check's REPLACEMENT subject after
+#: the fold — a captured corpus whose nodes carry :Uncertain is in the wrong
+#: REALM (captured content is never machine-derived), the exact defect class
+#: wrong-db caught when realms were databases.
+WRONG_REALM = "wrong-realm"
 UNSHAPED = "unshaped"
 DB_ABSENT = "db-absent"
 
-#: only this one fails the command (acceptance: "exits non-zero on any wrong-db")
-FAILING = frozenset({WRONG_DB})
+#: these fail the command (acceptance: "exits non-zero on any wrong-db"; G102
+#: extends the same severity to the realm check that replaced its subject)
+FAILING = frozenset({WRONG_DB, WRONG_REALM})
 
 # --- locator vocabulary ------------------------------------------------------
 # How a corpus's :Document nodes are found. Declared per entry under
@@ -113,6 +119,7 @@ def count_query(kind: str) -> str:
         WHERE {_PREDICATES[kind]}
         RETURN count(d) AS documents,
                sum(COUNT {{ (:Chunk)-[:PART_OF]->(d) }}) AS chunks,
+               sum(CASE WHEN d:Uncertain THEN 1 ELSE 0 END) AS uncertain_documents,
                collect(DISTINCT toString(d.captured_at)) AS captured_at
     """
 
@@ -120,11 +127,12 @@ def count_query(kind: str) -> str:
 def _probe(run: Callable[[str, str, dict], list[dict]], db: str, kind: str, value: str) -> dict:
     rows = run(db, count_query(kind), {"value": value})
     if not rows:
-        return {"documents": 0, "chunks": 0, "captured_at": []}
+        return {"documents": 0, "chunks": 0, "uncertain_documents": 0, "captured_at": []}
     row = rows[0]
     return {
         "documents": int(row.get("documents") or 0),
         "chunks": int(row.get("chunks") or 0),
+        "uncertain_documents": int(row.get("uncertain_documents") or 0),
         "captured_at": [c for c in (row.get("captured_at") or []) if c],
     }
 
@@ -238,7 +246,16 @@ def verify(
         stale, why = _freshness(src.get("captured_at"), here["captured_at"])
         # A corpus in the right DB *and* somewhere else is still wrong-db: the
         # stray copy is the defect, and reporting `loaded` would hide it.
-        if elsewhere:
+        if here.get("uncertain_documents"):
+            # G102: captured content carrying :Uncertain is in the wrong REALM —
+            # the fold's replacement for the database-residency defect class.
+            status, detail = (
+                WRONG_REALM,
+                f"{here['uncertain_documents']} document(s) carry :Uncertain — captured "
+                "content is never machine-derived; only the deepdoc/telemetry writers "
+                "apply that label",
+            )
+        elif elsewhere:
             status, detail = WRONG_DB, f"also present in {list(elsewhere)} (declared {target} only)"
         elif stale:
             status, detail = STALE, why

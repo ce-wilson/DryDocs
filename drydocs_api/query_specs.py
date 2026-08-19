@@ -49,10 +49,12 @@ from drydocs_api.queries import ParamSpec
 # provisioned-but-written-by-nothing (curated lineage lands in `drydocs` per D1/D2).
 # Keeping the allow-list explicit makes a new database a deliberate edit rather than
 # a typo; `tests/unit/test_database_names.py` proves the read set has a writer.
-SPEC_DATABASES: frozenset[str] = frozenset({"drydocs", "ddcontext", "ddall"})
-# Databases whose content is synthesized/uncertain — results carry the
-# SYNTHESIZED watermark in the manifest AND as a grid-visible column.
-WATERMARKED_DATABASES: frozenset[str] = frozenset({"ddcontext", "ddall"})
+SPEC_DATABASES: frozenset[str] = frozenset({"drydocs"})
+# G102 (2026-08-18): `ddcontext` and `ddall` RETIRED with the fold — the
+# uncertain realm is the :Uncertain LABEL inside the one database, and the
+# watermark trigger is each spec's own `uncertain=True` declaration
+# (ADR 0011 §117). WATERMARKED_DATABASES is gone: keying trust on storage
+# location was the root cause the gate's §B named.
 # The publish-boundary vocabulary. This is a SECOND copy of what
 # config/classification.yaml defines — the API is pure and does not read the
 # config at import — so tests/unit/test_classification.py asserts the two agree.
@@ -907,7 +909,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
         ),
         QuerySpec(
             id="console.agent-runs.v1",
-            database="ddcontext",  # R1 gate ruling 2026-07-23: :AgentRun lands in ddcontext, never drydocs
+            database="drydocs",  # G102 fold (2026-08-18): the R1 ruling's substance ("never in ground truth") survives as :Uncertain on the write; uncertain=True below is the watermark trigger
             description=(
                 "R3 agent-run telemetry for the admin view: one :AgentRun per "
                 "answered question (kind 'qa', mirroring :JobRun), newest first. "
@@ -941,17 +943,19 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("question_chars", "int", "Chars"),
             ),
             classification="internal",
+            uncertain=True,
             params=_LIMIT,
         ),
         QuerySpec(
             id="context.label-census.v1",
-            database="ddcontext",
+            database="drydocs",  # G102 fold: the census re-scopes to the :Uncertain realm
             description=(
-                "Label census of the synthesized context database — the reviewed "
-                "ddcontext example (results watermark SYNTHESIZED by rule)."
+                "Label census of the :Uncertain realm — post-fold (G102) the "
+                "uncertain content is a LABEL inside the one database, so the "
+                "census matches it directly; exports carry the trust watermark."
             ),
             cypher=(
-                "MATCH (n) WHERE NOT n:SchemaMeta "
+                "MATCH (n:Uncertain) WHERE NOT n:SchemaMeta "
                 "RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC"
             ),
             columns=(
@@ -959,6 +963,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("count", "int", "Nodes"),
             ),
             classification="internal-public",
+            uncertain=True,
         ),
         QuerySpec(
             id="audit.uncertain-reachable.v1",
@@ -1015,8 +1020,7 @@ def query_spec(spec_id: str) -> QuerySpec:
 
 
 def is_watermarked(spec: QuerySpec) -> bool:
-    # G102: the durable trigger is the spec's own declaration (ADR 0011 §117 —
-    # "a spec is watermarked iff its Cypher touches :Uncertain, declared per
-    # row"); the database-name half is the legacy trigger and retires with the
-    # fold commit.
-    return spec.uncertain or spec.database in WATERMARKED_DATABASES
+    # G102: the trigger is the spec's own declaration (ADR 0011 §117 — "a spec
+    # is watermarked iff its Cypher touches :Uncertain, declared per row").
+    # The database-name trigger retired with the fold.
+    return spec.uncertain

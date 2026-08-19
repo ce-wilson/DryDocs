@@ -2,7 +2,7 @@
 
 Every DOCUMENT corpus must carry classification + connector + curation tier (the Q5
 acceptance trio) plus the ADR 0006 field semantics: target_db restricted to
-dddocs | ddcontext, the curation ladder fixed per tier, and the External ⇒
+drydocs (one database since the G102 fold), the curation ladder fixed per tier, and the External ⇒
 source_url + captured_at rule shared with test_classification.py. The backfill
 guard pins the corpora known to be ingested — a new corpus loaded without a
 registry entry should fail HERE, not be discovered in the graph.
@@ -31,7 +31,9 @@ CLASSIFICATION = CONFIG_DIR / "classification.yaml"
 CONNECTORS = {"web", "filedrop", "confluence", "sharepoint", "teams", "email"}
 LOCATOR_KINDS = {"corpus_id", "doc_id", "path_prefix", "none"}
 TIERS = {"T1", "T2", "T3", "T4"}
-TARGET_DBS = {"dddocs", "ddcontext"}  # ADR 0006 §2 — nothing else, ever
+TARGET_DBS = {
+    "drydocs"
+}  # G102 (2026-08-18): the fold — ONE content database. ADR 0006 §2 superseded by the gate; dddocs retired at R1, ddcontext folded
 TRUSTS = {"VERBATIM", "GROUNDED", "SYNTHESIZED"}
 _REFRESH = re.compile(r"^(manual|on-demand|scheduled\(.+\))$")
 

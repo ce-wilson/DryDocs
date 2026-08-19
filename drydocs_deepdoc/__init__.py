@@ -32,6 +32,6 @@ from . import investigate, writer
 #: ADR 0002's original ``drydocs_context`` was superseded by the G6/G7 deploy and
 #: that supersession is recorded in ADR 0006 §1 + the gate-log dd*-convention entry.
 #: ``tests/unit/test_database_names.py`` pins this to what provisioning creates.
-DATABASE = "ddcontext"
+DATABASE = "drydocs"  # G102 (2026-08-18): the fold — uncertain writes land in ground truth CARRYING :Uncertain (writer contract); was "ddcontext"
 
 __all__ = ["DATABASE", "investigate", "writer"]

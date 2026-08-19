@@ -1294,7 +1294,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "web",
-      "target_db": "dddocs",
+      "target_db": "drydocs",
       "trust_default": "GROUNDED",
       "graph_locator": {
         "match": "path_prefix",
@@ -1355,7 +1355,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "web",
-      "target_db": "dddocs",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "corpus_id",
@@ -1395,7 +1395,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "filedrop",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "GROUNDED",
       "graph_locator": {
         "match": "doc_id",
@@ -1435,7 +1435,7 @@
       "tier": "T4",
       "curation": "sme-confirm",
       "connector": "confluence",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "GROUNDED",
       "graph_locator": {
         "match": "none",
@@ -1465,7 +1465,7 @@
       "tier": "T2",
       "curation": "sme-confirm",
       "connector": "web",
-      "target_db": "dddocs",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",
@@ -1501,7 +1501,7 @@
       "tier": "T4",
       "curation": "sme-confirm",
       "connector": "email",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",
@@ -1531,7 +1531,7 @@
       "tier": "T1",
       "curation": "none",
       "connector": "filedrop",
-      "target_db": "ddcontext",
+      "target_db": "drydocs",
       "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",

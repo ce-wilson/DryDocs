@@ -20,10 +20,13 @@ CREATE DATABASE drydocs IF NOT EXISTS;
 // trigger: a :ControlMJob proxy-node spine), recreate it here with its ddall alias —
 // the design is the expensive part, the DDL is two lines.
 
-// Isolated uncertain context (drydocs-deepdoc, on-demand). Trust: SYNTHESIZED/unverified.
-// Its own transaction domain: a transaction cannot span databases, so uncertain data
-// here can NEVER be written into `drydocs` by accident (the trust axis = the DB boundary).
-CREATE DATABASE ddcontext IF NOT EXISTS;
+// `ddcontext` RETIRED 2026-08-18 — gate document-content-topology (G32) §A, applied
+// at G102. The content topology FOLDS TO ONE database: uncertain content lives in
+// `drydocs` under the :Uncertain label, guarded by the three ADR 0011 clause-1
+// guards (structural QuerySpec exclusion, the write-boundary allowlist, the live
+// audit spec) — the same per-assertion discipline that always governed the manual
+// pins. Existing per-machine ddcontext databases are left in place INERT (nothing
+// reads or writes them); dropping them is per-machine cleanup, G50-class.
 
 // Schema meta-graph (drydocs bootstrap-schema-graph) — G51, SME direction "2 different
 // graphs" 2026-08-02. Exemplar nodes carry REAL labels beside :SchemaMeta, and drydocs'
@@ -34,12 +37,9 @@ CREATE DATABASE ddcontext IF NOT EXISTS;
 // nodes with real jobs would present labels as data.
 CREATE DATABASE ddschema IF NOT EXISTS;
 
-// Composite — stores no data of its own; aliases both constituents. The platform
-// enforces read-from-many / write-to-one, so support queries read all while writes
-// still land in exactly one constituent (no cross-DB writes).
-CREATE COMPOSITE DATABASE ddall IF NOT EXISTS;
-CREATE ALIAS ddall.drydocs    IF NOT EXISTS FOR DATABASE drydocs;
-CREATE ALIAS ddall.ddcontext  IF NOT EXISTS FOR DATABASE ddcontext;
+// `ddall` RETIRED 2026-08-18 with its second constituent (G32/G102): a composite
+// over one database federates nothing. The G38 federated-read proof retires with
+// it — post-fold every read is an ordinary single-database read.
 
 // Verify (optional):
 //   SHOW DATABASES YIELD name, type, currentStatus WHERE name STARTS WITH 'drydocs';

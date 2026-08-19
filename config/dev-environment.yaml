@@ -41,9 +41,17 @@ neo4j:
   databases:              # ADR 0002 topology — provisioned, not implicit
     # (a `lineage: ddlineage` row lived here until 2026-08-04 — retired, ADR 0002 X1
     # amendment; curated lineage writes land in ground_truth per D1/D2)
-    ground_truth: drydocs      # main load + lineage writers; default load target
-    uncertain_context: ddcontext  # SYNTHESIZED/unverified only (drydocs_deepdoc)
-    composite: ddall           # read-only federation of both estate databases
+    ground_truth: drydocs      # main load + lineage writers; default load target;
+                               # ALSO the uncertain realm since G102 (2026-08-18):
+                               # gate document-content-topology folded the content
+                               # topology to one database — uncertain writes carry
+                               # :Uncertain (deepdoc + agent telemetry, the ruled
+                               # allowlist) and every ground-truth QuerySpec
+                               # excludes the label structurally.
+    # uncertain_context: ddcontext — RETIRED at G102 (was: SYNTHESIZED-only,
+    #   drydocs_deepdoc). Existing per-machine databases left inert.
+    # composite: ddall — RETIRED at G102: a composite over one database
+    #   federates nothing.
     # Schema meta-graph (`drydocs bootstrap-schema-graph`, C21/G51). Its own database
     # because exemplar nodes carry REAL labels beside :SchemaMeta and `drydocs`' NODE
     # KEYs enforce property existence the exemplars don't have. Deliberately NOT an

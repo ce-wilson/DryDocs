@@ -46,11 +46,12 @@ def test_schema_and_required_fields():
     assert isinstance(neo["ports"]["bolt"], int)
     assert isinstance(neo["ports"]["http"], int)
     dbs = neo["databases"]
-    # "lineage" left this set 2026-08-04 (X2) — ddlineage retired, ADR 0002 X1 amendment.
+    # "lineage" left 2026-08-04 (X2 — ddlineage retired); "uncertain_context" and
+    # "composite" left 2026-08-18 (G102 — the fold: the uncertain realm is the
+    # :Uncertain label inside ground_truth, and a composite over one database
+    # federates nothing).
     assert set(dbs) == {
         "ground_truth",
-        "uncertain_context",
-        "composite",
         "schema_meta",
     }
 

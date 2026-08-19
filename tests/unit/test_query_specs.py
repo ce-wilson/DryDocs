@@ -340,13 +340,13 @@ def test_run_spec_rejects_unknown_params():
         run_spec("explorer.jobs.v2", {"evil": 1}, _token(store), store, FakeRunner())
 
 
-def test_ddcontext_results_carry_grid_visible_watermark():
+def test_uncertain_results_carry_grid_visible_watermark():  # G102: realm is the label, not a database
     store = InMemorySessionStore()
     runner = FakeRunner(keys=["labels", "count"], rows=[{"labels": ["X"], "count": 2}])
     out = run_spec("context.label-census.v1", {}, _token(store), store, runner)
     assert out["watermarked"] is True
     assert WATERMARK_COLUMN in out["keys"]
-    assert all(r[WATERMARK_COLUMN].startswith("SYNTHESIZED") for r in out["rows"])
+    assert all(r[WATERMARK_COLUMN].startswith("UNCERTAIN") for r in out["rows"])  # G102 re-key
 
 
 # ── classification rules ─────────────────────────────────────────────────────
@@ -402,7 +402,7 @@ def test_csv_export_streams_banner_header_rows_and_registers_manifest():
     assert manifest["executed_at"]
 
 
-def test_jsonl_export_watermarks_ddcontext_and_reports_trust_tier():
+def test_jsonl_export_watermarks_uncertain_and_reports_trust_tier():
     store = InMemorySessionStore()
     ledger = ExportLedger()
     runner = FakeRunner(keys=["labels", "count"], rows=[{"labels": ["X"], "count": 2}])
@@ -411,10 +411,10 @@ def test_jsonl_export_watermarks_ddcontext_and_reports_trust_tier():
     lines = "".join(job.chunks).splitlines()
     assert len(lines) == 1  # internal-public -> no banner object
     row = json.loads(lines[0])
-    assert row[WATERMARK_COLUMN].startswith("SYNTHESIZED")
+    assert row[WATERMARK_COLUMN].startswith("UNCERTAIN")  # G102 re-key
 
     manifest = export_manifest(job.export_id, token, store, ledger)
-    assert "SYNTHESIZED" in manifest["trust_tiers_present"]
+    assert "UNCERTAIN" in manifest["trust_tiers_present"]  # G102 re-key
     assert job.filename == "context.label-census.v1.jsonl"
 
 

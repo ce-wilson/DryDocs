@@ -99,11 +99,15 @@ def _names_a_database(identifier: str) -> bool:
 
 
 def test_provisioning_creates_the_expected_topology() -> None:
-    """Anchor the other tests: ADR 0002 (+ 0006 §1 renames, + the G51/X1 amendments).
+    """Anchor the other tests: ADR 0002 (+ 0006 §1 renames, + the amendments).
 
-    5 -> 4 names at X2: ``ddlineage`` retired (ADR 0002 X1 amendment, 2026-08-04).
+    5 -> 4 names at X2 (``ddlineage`` retired, 2026-08-04); 4 -> 2 at G102
+    (2026-08-18): gate document-content-topology folded the content topology to
+    ONE database — ``ddcontext`` folded (the realm is the :Uncertain label) and
+    ``ddall`` retired with its second constituent. ``ddschema`` stays: G51, and
+    keeping it out is what stops ADR 0011 clause 2 from ever firing.
     """
-    assert _provisioned() == {"drydocs", "ddcontext", "ddall", "ddschema"}
+    assert _provisioned() == {"drydocs", "ddschema"}
 
 
 def test_module_level_database_constants_are_provisioned() -> None:
@@ -172,11 +176,9 @@ def test_read_targets_and_write_targets_agree() -> None:
     from drydocs_api.query_specs import QUERY_SPECS, SPEC_DATABASES
 
     written = _write_targets()
-    # The composite stores no data of its own; it federates constituents that DO
-    # have writers, so it is a legitimate read target with no writer.
-    composite = {"ddall"}
-
-    unwritten = SPEC_DATABASES - written - composite
+    # (pre-G102 a `composite = {"ddall"}` carve-out lived here — the composite
+    # stored nothing and federated written constituents. Retired with ddall.)
+    unwritten = SPEC_DATABASES - written
     assert not unwritten, (
         f"SPEC_DATABASES allows {sorted(unwritten)}, which no module writes — a spec "
         f"pointed there reads an empty database forever. Written: {sorted(written)}"
@@ -185,7 +187,7 @@ def test_read_targets_and_write_targets_agree() -> None:
     offenders = [
         f"{s.id}: reads {s.database!r}, which nothing writes"
         for s in QUERY_SPECS.values()
-        if s.database not in written | composite
+        if s.database not in written
     ]
     assert not offenders, "query spec reads a database nothing writes:\n" + "\n".join(offenders)
 

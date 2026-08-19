@@ -1999,13 +1999,15 @@ def lineage_review(
 
 DOC_REGISTRY_PATH = _REPO_ROOT / "config" / "doc-source-registry.yaml"
 
-#: Databases docs-verify sweeps. The registry admits dddocs | ddcontext as
-#: targets, but a corpus can only be found in a database that EXISTS — and
-#: `drydocs` is where the bmc-docs corpus actually lives today. The sweep is
-#: intersected with SHOW DATABASES at runtime, so an unprovisioned name here is
-#: reported as db-absent rather than raising from the driver.
-#: (`ddlineage` retired 2026-08-04, ADR 0002 X1 amendment — swept here until then.)
-DOC_SWEEP_DATABASES = ("drydocs", "dddocs", "ddcontext")
+#: Databases docs-verify sweeps. G102 (2026-08-18): the fold — one content
+#: database. The old comment admitted a three-way mismatch (registry said one
+#: db, the sweep expected another, the data sat in a third); the mismatch is
+#: gone, so the admission goes with it. `ddcontext` still appears ONE more
+#: time per machine: the sweep visits it while it exists so a corpus stranded
+#: there post-fold reports wrong-db loudly instead of vanishing; it drops out
+#: automatically once the inert database is dropped (SHOW DATABASES
+#: intersection).
+DOC_SWEEP_DATABASES = ("drydocs", "ddcontext")
 
 
 @app.command(name="docs-verify")

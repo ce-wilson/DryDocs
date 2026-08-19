@@ -340,16 +340,18 @@ def test_summary_counts_reconcile() -> None:
 # --- 7. the G32 fact, pinned ---------------------------------------------------
 
 
-def test_no_corpus_can_declare_the_registry_database() -> None:
-    """The finding, as an executable fact: the doc-registry guard constrains
-    target_db to {dddocs, ddcontext} and the software registry writes `drydocs`,
-    so `traversable` is UNREACHABLE by declaration today. When G32 rules and this
-    stops being true, this test fails and says so — which is the point."""
+def test_every_corpus_declares_the_one_database() -> None:
+    """THE ALARM FIRED AND WAS ANSWERED. This test's previous form asserted the
+    inverse (no corpus may declare the registry database) precisely so it would
+    fail the day G32 ruled — it did, 2026-08-18, and the ruling was the FOLD.
+    Now the pin is the ruled state: every corpus declares the ONE database, so
+    `traversable` is reachable by declaration and the until-move rung is gone."""
     doc = yaml.safe_load(DOC_REGISTRY.read_text(encoding="utf-8"))
     declared = {s.get("target_db") for s in doc["sources"] if s.get("target_db")}
-    assert REGISTRY_DB not in declared, (
-        "a corpus now declares the software registry's database — the G32 residency "
-        "ruling has moved. Re-check the ladder and the docs-coverage detail lines."
+    assert declared == {REGISTRY_DB}, (
+        f"corpora declare {declared} — post-G102 the content topology is ONE "
+        "database and a second value means a row missed the fold (or a new realm "
+        "arrived without a gate)."
     )
 
 

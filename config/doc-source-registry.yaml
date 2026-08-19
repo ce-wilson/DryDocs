@@ -30,7 +30,10 @@
 #   tier           — T1 vendor | T2 internal-platform | T3 product/process | T4 SME-context
 #   curation       — the ADR 0006 §4 ladder, FIXED per tier:
 #                      T1 → none · T2/T3/T4 → sme-confirm (the +confidential rider retired with the J23 tier collapse 2026-07-31)
-#   target_db      — dddocs | ddcontext (ADR 0006 §2; never any other DB)
+#   target_db      — drydocs (G102, 2026-08-18: gate document-content-topology
+#                    folded the content topology to ONE database — dddocs was
+#                    rejected/retired at R1 and ddcontext folded; the uncertain
+#                    realm is the :Uncertain LABEL, not a database)
 #   refresh        — manual | on-demand | scheduled(<cron>)
 #   trust_default  — VERBATIM | GROUNDED | SYNTHESIZED (per-chunk overrides live in
 #                    the corpus SOURCE-MANIFEST where one exists)
@@ -72,7 +75,7 @@ sources:
     trust_default: GROUNDED             # conversion is mechanical but lossy; per-chunk tier per the manifest rule
     tier: T1
     curation: none
-    target_db: dddocs                   # ADR 0006 §2 — demonstrated in `drydocs` today; RE-TARGETS to dddocs at the P4 loader build (idempotent reload, not a migration)
+    target_db: drydocs                  # G102 fold (was dddocs — never provisioned; R1 retired the name)
     refresh: manual
     taxonomy_path: technology/orchestration/control-m
     graph_locator:                      # pre-dates corpus_id; pages are identified by their repo path
@@ -96,7 +99,7 @@ sources:
     trust_default: VERBATIM             # a scrape is the vendor's OWN words — unlike bmc-docs, which is our lossy paraphrase
     tier: T1
     curation: none                      # T1 ladder (ADR 0006 §4)
-    target_db: dddocs
+    target_db: drydocs                  # G102 fold (was dddocs — never provisioned; R1 retired the name)
     refresh: on-demand
     taxonomy_path: technology/orchestration/control-m
     graph_locator:                      # the Q13 loader writes corpus_id on :Document/:Chunk/:DocSection
@@ -153,7 +156,7 @@ sources:
     trust_default: GROUNDED             # pdf-extract-grounded-v1: pypdf extraction is mechanical but lossy
     tier: T1
     curation: none
-    target_db: ddcontext                # experiment/reference content stays out of ground truth (Q2 decision; ADR 0006 §2 keeps it here)
+    target_db: drydocs                  # G102 fold (was ddcontext — folded 2026-08-18; content realm is now the one database)
     refresh: manual
     taxonomy_path: ~                    # a methodology book — deliberately no DESCRIBES / product taxonomy hook
     graph_locator:                      # one Document for the whole book
@@ -180,7 +183,7 @@ sources:
     trust_default: GROUNDED               # screenshot transcription is faithful but partial; a direct Confluence fetch upgrades to VERBATIM
     tier: T4
     curation: sme-confirm                 # T4 ladder post-J23 (+confidential rider retired with the tier)
-    target_db: ddcontext                  # reference/standards content, never ground truth
+    target_db: drydocs                  # G102 fold (was ddcontext — folded 2026-08-18; content realm is now the one database)
     refresh: on-demand
     taxonomy_path: ~
     graph_locator:                      # no connector has run — nothing to locate until the confluence fetch exists
@@ -204,7 +207,7 @@ sources:
     trust_default: VERBATIM               # a direct page fetch, stored as fetched
     tier: T2
     curation: sme-confirm                 # T2 ladder (ADR 0006 §4)
-    target_db: dddocs                     # Document->Chunk spine (docmeta component)
+    target_db: drydocs                  # G102 fold (was dddocs — never provisioned; R1 retired the name)
     refresh: on-demand
     taxonomy_path: ~
     graph_locator:                        # nothing scraped, nothing loaded — locator lands with the connector
@@ -230,7 +233,7 @@ sources:
     trust_default: VERBATIM               # the document is the SME's own words, stored as sent
     tier: T4
     curation: sme-confirm                 # T4 ladder (ADR 0006 §4)
-    target_db: ddcontext                  # SME context, never ground truth
+    target_db: drydocs                  # G102 fold (was ddcontext — folded 2026-08-18; content realm is now the one database)
     refresh: manual
     taxonomy_path: ~
     graph_locator:                        # nothing has loaded — no connector exists; locator lands with the first citation write
@@ -300,7 +303,7 @@ sources:
     trust_default: VERBATIM             # direct text extraction; derived segment metrics are GROUNDED (per the script's own tiering)
     tier: T1
     curation: none
-    target_db: ddcontext                # the original ddcontext precedent the Q2 book load cited
+    target_db: drydocs                  # G102 fold (was ddcontext — folded 2026-08-18; content realm is now the one database)
     refresh: manual
     taxonomy_path: ~
     graph_locator:                      # :DataAsset slices, NOT Document->Chunk — see notes; reshaping is P4+
