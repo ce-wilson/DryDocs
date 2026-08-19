@@ -3858,3 +3858,35 @@ never edit the prompt).
   §D6, §G7, §G8, Q5, Q6 (amended + ticked), Q8 renumbered. Still to walk —
   §A1-A4, §B1-B5, §C1-C4, §E1-E3, §F1-F3, §G1-G6, and open questions Q0
   (pending on the directory half by scope fence), Q1, Q2, Q7, Q8.
+
+## 2026-08-19 — RECORD: FID gate rounds 3-5 — §A closed 4/4, §B closed 5/5, §C1-C3 (K17; gate `fid-identity-and-scope`, still UNSIGNED)
+
+- **§A CLOSED 4/4 — identity.** A1: :AppUser keyed on the directory id (the
+  id-owner application's own record key, Source B); Source A's employee-id is
+  the HR carrier's per-row key, never the identity; uniqueness constraint on
+  AppUser.fid. A2: fid_name is a property; name -> id resolution is an explicit
+  crosswalk reported like a match tier, run AFTER the G7/G8 class gate so the
+  miss rate measures real accounts only — the 171-way platform name is the
+  measured proof it is never 1:1. A3: the uniqueness half is now SETTLED BY
+  MEASUREMENT (54 distinct names on 227 rows — names are not unique at a point
+  in time); the crosswalk carries a time qualifier and reports multi-candidate
+  names, never picks one; the reuse-after-retirement half stays open as Q1
+  with assume-not-safe standing. A4: the environment triplet stays three
+  :AppUser nodes; a logical-service grouping node is deferred, not decided.
+- **§B CLOSED 5/5 — ownership over time.** B1: as-of assertion, extract date,
+  origin declared, inherited by every derived fact. B2: snapshot disagreement
+  is a TRANSFER, reported, current edge updated, trail never silently
+  overwritten. B3: extracts retained as dated snapshots (depgraph precedent);
+  Q2 (a real history surface?) stays worth one question before diffing is
+  built. B4: originating application UNKNOWN, never inferred — no back-dating,
+  no name-prefix origin. B5: retired accounts IN scope; status is a property,
+  never a pull filter.
+- **§C1-C3 CONFIRMED — the edge.** C1: `seal_appuser_belongs_to_application`
+  registered status: planned (AppUser -> BusinessApplication,
+  BELONGS_TO_APPLICATION, role service_account, LOCAL Agent -> Entity, domain
+  business_application; the C8 identical-triple rule on the shared label; the
+  N13 flips-are-follow-ups pattern — no loader inside K17). C2: target is
+  :BusinessApplication, not the BatchProcessing Port — an ownership-record
+  fact, not batch wiring. C3: N:1, never a schema constraint — a graph test if
+  anything (the TOM-roles lesson); mid-transfer states are normal.
+- C4 (the K2 reconciler feeds from the SAME crosswalk) walks next round with §E.
