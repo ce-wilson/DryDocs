@@ -330,6 +330,14 @@ MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'DistributionList'})
 MERGE (a)-[r:HAS_CONTACT_POINT]->(b)
   SET r.vocab_id = 'business_application_port_has_contact_point', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'BusinessApplication'})
+MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
+  SET r.vocab_id = 'seal_appuser_belongs_to_application', r.role = 'service_account', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'Employee'})
+MERGE (a)-[r:OWNED_BY]->(b)
+  SET r.vocab_id = 'seal_appuser_owned_by', r.role = 'fid_owner', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
 // ── domain: catalog ─────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'CatalogLOB'}), (b:SchemaMeta {name: 'BusinessSegment'})

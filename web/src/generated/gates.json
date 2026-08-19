@@ -651,6 +651,7 @@
         "J43",
         "K24",
         "K25",
+        "K26",
         "G97"
       ]
     },
@@ -826,6 +827,7 @@
         "J43",
         "K24",
         "K25",
+        "K26",
         "G97"
       ]
     },
@@ -912,6 +914,7 @@
         "J43",
         "K24",
         "K25",
+        "K26",
         "G97"
       ]
     },
@@ -939,7 +942,8 @@
         "G64",
         "C33",
         "K24",
-        "K25"
+        "K25",
+        "K26"
       ]
     },
     {
@@ -1225,6 +1229,7 @@
         "J43",
         "K24",
         "K25",
+        "K26",
         "G87",
         "G88",
         "G89",
@@ -1380,7 +1385,8 @@
         "C25",
         "J32",
         "K24",
-        "K25"
+        "K25",
+        "K26"
       ]
     },
     {
@@ -1399,7 +1405,97 @@
         "C25",
         "J32",
         "K24",
-        "K25"
+        "K25",
+        "K26"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "RECORD: FID gate rounds 3-5 — §A closed 4/4, §B closed 5/5, §C1-C3 (K17; gate `fid-identity-and-scope`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3862",
+      "unblocks": [
+        "K16",
+        "K17",
+        "K19",
+        "C25",
+        "J32",
+        "K24",
+        "K25",
+        "K26"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "RECORD: FID gate rounds 6-7 — §C closed 4/4, §E closed 3/3 (E1 reshaped), §F closed 3/3, §G1 (K17; gate `fid-identity-and-scope`, still UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3894",
+      "unblocks": [
+        "K16",
+        "K17",
+        "K19",
+        "C25",
+        "J32",
+        "K24",
+        "K25",
+        "K26"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "GATE: fid-identity-and-scope — SIGNED OFF 33/33 (K17)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/seal-attribution-match-policy.yaml",
+        "config/gate-prompts/software-version-context.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3914",
+      "unblocks": [
+        "K2",
+        "K16",
+        "K17",
+        "K19",
+        "S3",
+        "C25",
+        "J32",
+        "Z2",
+        "C33",
+        "K24",
+        "K25",
+        "K26"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-19",
+      "title": "AMENDMENT to the seal-attribution-match-policy sign-off: the FID tier is re-scoped (fid-identity-and-scope §G3)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/seal-attribution-match-policy.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3965",
+      "unblocks": [
+        "K2",
+        "K16",
+        "K17",
+        "K19",
+        "S3",
+        "C25",
+        "J32",
+        "K24",
+        "K25",
+        "K26"
       ]
     },
     {

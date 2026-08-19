@@ -285,8 +285,8 @@ risks:
   - "Confidential surface: the directory carries employee SIDs, mailbox addresses, and support-team names. §D3 narrows the columns; §E3 keeps rows out of this repo."
   - "Two crosswalks: building a private name->application map for the version work while K2's TierReconcilers.fid stays empty would fork the join. §C4 forbids it."
 
-decision: ~          # transcribed to config/gate-log.md on sign-off
-status: awaiting-sme
+decision: "SIGNED OFF 33/33 (A4 B5 C4 D6 E3 F3 G8), 2026-08-19 — transcribed to config/gate-log.md same date; K2 FID-tier amendment recorded there (G3); two vocabulary entries planned (seal_appuser_belongs_to_application, seal_appuser_owned_by); build groomed as K26"
+status: signed-off   # 2026-08-19, 33/33 — config/gate-log.md same date; Q0/Q1 recorded still-open with consequences
 drafted: 2026-08-04
 unblocks:
   - "seal-attribution-match-policy tier 2 (TierReconcilers.fid — empty producer-side since the K2 build)"

@@ -3910,3 +3910,74 @@ never edit the prompt).
   corpus's known-defect note); F3 unresolved rows load nothing, never fuzzy.
 - **G1 CONFIRMED — registration, never consumption,** with
   `assignment_kind: 'registration'` explicit on the edge data.
+
+## 2026-08-19 — GATE: fid-identity-and-scope — SIGNED OFF 33/33 (K17)
+
+- **Walked in one session, ten rounds, evidence-first**: the SME ran doc 09's
+  five Session SQL queries (S1–S5, `8ae771de`) on the replica and the walk
+  started from the numbers — population 2,003 distinct owner values / 518,744
+  current-version jobs in actively-scheduled folders. Tally: §A 4/4 · §B 5/5 ·
+  §C 4/4 · §D 6/6 (D6 added in-session) · §E 3/3 (E1 reshaped
+  dataset-on-replica) · §F 3/3 · §G 8/8 (G7/G8 added in-session). Round
+  details in the five session RECORD entries above (rounds 1–7); this entry
+  closes rounds 8–10 and the sign-off.
+- **§G2 CONFIRMED** — no transitive read of registration onto jobs; the two
+  facts meet on the job and nowhere else.
+- **§G3 RULED — the K2 FID tier is re-scoped**; formal amendment to the
+  signed seal-attribution-match-policy gate recorded in the next entry.
+- **§G4/§G5/§G6 CONFIRMED** — the disagreement is a first-class finding;
+  three readings distinguished per case by a human; no derived third fact
+  authored (a report until its own gate).
+- **Open questions closed or held**: Q0 PENDING by the session scope fence
+  (only the Control-M half of the disagreement join exists; consequence: the
+  §G5 designed-vs-stale ratio waits on the directory half). Q1 STILL OPEN
+  (name reuse after retirement; consequence: the crosswalk keeps its time
+  qualifier and multi-candidate reporting — A3's assume-not-safe stands).
+  Q2 ANSWERED: NO history surface exists — §B3's snapshot diffing is the
+  design, not the fallback, and D4's retention is the only transfer record
+  anywhere. Q5 ANSWERED YES (round 1). Q6 ANSWERED + AMENDED (rounds 1–2).
+  Q7 RULED: the recertifying manager is the OWNER-OF-RECORD — an
+  accountability fact, never swept into the contact deferral; the
+  account -> person edge registers planned and the two-human-owners rule
+  becomes a graph test against it. Q8 ANSWERED: the id-owner application
+  supports by-application roll-up (the four listing captures prove it);
+  the census is one query per surface.
+- **Vocabulary minted, N13 flips-are-follow-ups**: `seal_appuser_belongs_to_application`
+  (AppUser -> BusinessApplication, BELONGS_TO_APPLICATION role
+  service_account, assignment_kind 'registration' on the data, as_of +
+  origin declared) and `seal_appuser_owned_by` (AppUser -> Employee,
+  OWNED_BY role fid_owner, the Q7 ruling) — both status: planned in
+  41-local-business-application.yaml; NOTHING loads inside K17.
+- **Held-entry consequence recorded**: `scheduler_executed_by`'s identity
+  blocker (blocker 1) is CLEARED by §A1/§A2; its run-layer blocker stands —
+  the entry remains planned.
+- **Build groomed as K26** (the acceptance's follow-up): dataset-on-replica
+  registration per E1, the demand-set pull with the D2/G7 class gate, the
+  crosswalk + TierReconcilers.fid under the amended scope, retained
+  snapshots per B3/D4, the owner-of-record leg, and the planned-entry flips
+  in the build commit. The `--run-as` bind fix, the APPL_TYPE projection,
+  and the code docstring sweep ride K16 (desktop-claimed).
+- **Unblocked by this sign-off**: seal-attribution-match-policy tier 2
+  (under the amended scope) and software-version-context §F (the
+  application-level version rollup) — both wait on the K26 build, not on
+  further rulings.
+
+## 2026-08-19 — AMENDMENT to the seal-attribution-match-policy sign-off: the FID tier is re-scoped (fid-identity-and-scope §G3)
+
+- **What changes.** The signed gate (2026-07-14) ordered SEAL > FID >
+  APP_NAME > ALIAS as evidence of the JOB's application. The
+  fid-identity-and-scope evidence (§G, 2026-08-05 counterexample; §G7's
+  platform/connection-profile classes, 2026-08-19) shows the FID tier
+  carries REGISTRATION, not attribution — filling it as specified would
+  resolve a job to the account's owning application and contradict
+  confirmed app-code mappings.
+- **The amendment (G3, ruled 2026-08-19).** FID evidence resolves ONLY where
+  no confirmed folder attribution exists, and never overrides one; a
+  FID-tier result that disagrees with a confirmed mapping is reported as a
+  disagreement (§G4's report), never written. The class gate (§D2/§G7/§G8)
+  runs BEFORE the tier fires, so placeholder and platform classes never
+  enter it.
+- **What does NOT change.** The precedence ORDER and the match_method
+  vocabulary are untouched; `match_method: 'fid'` keeps its meaning; the
+  signed gate's yaml is not edited (N13) — this entry is the amendment
+  record, on the G35-amendment precedent.

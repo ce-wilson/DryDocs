@@ -325,6 +325,11 @@ local_relationships:
       NOT THE SAME FACT AS `scheduler_runs_as` below — that one is the CONFIGURED
       account on the job definition and is available today; this one is what a run
       actually executed as, and needs runtime ingestion.
+      BLOCKER (1) CLEARED 2026-08-19: fid-identity-and-scope SIGNED 33/33 —
+      :AppUser is keyed on the directory id (§A1, uniqueness constraint on
+      AppUser.fid) with the name -> id crosswalk explicit and reported (§A2).
+      Blocker (2) STANDS: the run layer is still absent, so this entry stays
+      planned until runtime ingestion exists.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler

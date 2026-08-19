@@ -280,3 +280,64 @@
     loader:       ~
     domain:       business_application
     status:       planned
+
+  # ── FID / functional-id family (gate fid-identity-and-scope, SIGNED 2026-08-19) ──
+
+  - id:           seal_appuser_belongs_to_application
+    neo4j_label:  BELONGS_TO_APPLICATION
+    inverse_label: "owns account"
+    role:         service_account
+    from_node:    AppUser
+    to_node:      BusinessApplication
+    prov_maps_to: ~
+    note: >
+      The directory's application (SEAL) assignment for a functional id — an
+      OWNERSHIP-RECORD fact, as of the extract (gate fid-identity-and-scope
+      §C1-§C3, SIGNED 2026-08-19). ASSERTS REGISTRATION, NEVER CONSUMPTION
+      (§G1): edge property assignment_kind: 'registration' rides on the data,
+      plus as_of (the EXTRACT date, never load date) and origin: 'declared'
+      (§B1). Same label as m3_belongs_to_application (ControlMFolder -> Port)
+      but a different triple — the C8 identical-triple rule; role
+      disambiguates. Target is :BusinessApplication, NOT the BatchProcessing
+      Port: ownership record, not batch wiring (§C2). N:1, graph-test only —
+      never a schema constraint (§C3, the TOM-roles lesson). NO TRANSITIVE
+      READ onto jobs (§G2): the registration and the folder attribution meet
+      ON THE JOB and nowhere else. Agent -> Entity, the family with no PROV
+      row (reg_uses_software's recorded reasoning). Feeds TierReconcilers.fid
+      from the SAME crosswalk (§C4) under the amended K2 scope (fill gaps
+      only, never override a confirmed mapping — the G3 amendment).
+      NOTHING LOADS: planned until the build item lands (N13
+      flips-are-follow-ups).
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       planned
+
+  - id:           seal_appuser_owned_by
+    neo4j_label:  OWNED_BY
+    inverse_label: "owner of record for"
+    role:         fid_owner
+    from_node:    AppUser
+    to_node:      Employee
+    prov_maps_to: ~
+    note: >
+      The functional id's human OWNER-OF-RECORD — the manager the directory
+      names against the account, who RECERTIFIES ANNUALLY (gate
+      fid-identity-and-scope Q7, RULED 2026-08-19: owner-of-record, not mere
+      attestor). Accountability, NOT a contact point — explicitly not swept
+      into the email-dl-contact-point deferral. Ownership arrives natively
+      as-of (recertification cadence), so the edge carries as_of like its
+      §C1 sibling. THE TWO-HUMAN-OWNERS RULE FINALLY ATTACHES HERE: the SME
+      input (every FID carries at least two human owners) becomes a GRAPH
+      TEST against this edge — minimum cardinality is never a constraint
+      (the TOM-roles lesson); the census keeps accounts_below_owner_minimum
+      separate from accounts_with_no_owner_recorded so an unmeasurable
+      estate never reads as compliant. Agent -> Agent, but ownership is not
+      delegation of action, so no prov:actedOnBehalfOf — null-PROV on the
+      recorded local-meaning precedent. NOTHING LOADS: planned until the
+      build item lands.
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       planned
+
