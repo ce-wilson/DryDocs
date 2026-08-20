@@ -94,11 +94,13 @@ rolls) fall under the standing exemption; the four `docs(port):` commits
 `991d59e6` RIDER 2) are SELF-DOCUMENTING — their payload IS the relay text in
 this file's relay section, cited there rather than in a step; and step 170 is a
 DELIBERATE
-RESERVATION — the six FID K-series commits are held open because K17 is being
-run producer-side and its outcome rewrites what that step must say. **After K17
-signs: restate step 170 with the gate outcome, then run
-`port_preflight.py --base 0c355f5a --tag` to certify the next base.** That
-restatement is the only addition this file needs before the port.
+RESERVATION — DISCHARGED 2026-08-19 evening: K17 SIGNED 33/33 and step 170 is
+restated with the outcome (steps extended through `337d6a6f` + the gate
+commits). Next: `port_preflight.py --base 0c355f5a --tag` certifies the base.
+**CI NOTE:** the Actions billing block that made everything in this range
+local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-off
+and both commits after it all passed). Earlier acceptance claims in this range
+remain local-run statements as written; from here CI corroborates.
 
 > **THE `caa0406` PORT'S CLOSE-OUT IS UNRECORDED — ask before assuming it landed.**
 > `ae21ee4` got an explicit `06d4469` "MERGED company-side, branch removed" commit.
@@ -2158,19 +2160,62 @@ regeneration, never-port outputs — and get no step.
     direction), claims, board/design renders, PR merge commits and depgraph
     snapshots in this range are ritual per the standing exemption.
 
-170. RESERVED — THE FID K-SERIES [OPEN: lands as ONE addition at the K17
-    close]. The commits `7b0c4ae3`, `5fe364b3`, `76e343df`, `25239da5`,
-    `1176a53d`, `8ae771de` (K16 unblocked by two-source SME evidence; the
-    platform-account run_as class, job-grain, cross-platform; K25 added;
-    doc 09's two-source section + worked example + session SQL; the generic
-    functional-id concepts doc; K17's session-materials note) are DELIBERATELY
-    NOT ledgered as final here — K17 is being run producer-side and its
-    outcome rewrites what this step must say (the identity key, the K2 tier
-    ruling, the ingest scope, RELAY treatment of `hr_phone_exp`, and the K16
-    census counts). Coverage audit: these six commits are accounted for BY THIS
-    RESERVATION; anything else claiming them is double-counting. When K17
-    signs, restate this step with the gate outcome and it is the ONLY addition
-    this ledger needs before the next base is certified.
+170. THE FID K-SERIES — `fid-identity-and-scope` SIGNED OFF 33/33
+    [GATE-AUTHORIZED; this range's other structural ruling beside the fold]
+    (evidence: `7b0c4ae3` K16 unblocked, `5fe364b3` the two-source model,
+    `76e343df` the platform-user clarification, `25239da5` job-grain run_as
+    evidence landed on five surfaces, `1176a53d` session materials, `8ae771de`
+    the S1-S5 session SQL; the gate: `b36ef388` round 1, `0b4746cc` round 2,
+    `f857ff4b` rounds 3-5, `27c006ee` rounds 6-7, `d9cb2740`
+    SIGNED, `337d6a6f` close-out residue). Ten rounds, one session,
+    EVIDENCE-FIRST: the SME ran the session SQL on the replica and every
+    section walked from numbers. Tally A4 B5 C4 D6 E3 F3 G8 (D6/G7/G8 added
+    in-session).
+    WHAT YOUR MERGE MUST KNOW, in order of blast radius:
+    (a) **A SIGNED GATE IS FORMALLY AMENDED.** `seal-attribution-match-policy`
+        §G3: the FID tier FILLS GAPS ONLY — it never overrides a confirmed
+        mapping; disagreements are REPORTED, never written; the precedence
+        order and match_method vocabulary are unchanged; the signed YAML is
+        untouched (the amendment lives as a gate-log entry, N13 discipline).
+        Your gate-log union-append must take that AMENDMENT entry with the
+        sign-off entry — one without the other mis-states the tier.
+    (b) **Identity ruled:** `:AppUser` keys on `fid`, `fid_name` is a property
+        (§A1/§A2) — which CLEARS `scheduler_executed_by`'s identity blocker
+        (its run-layer blocker stands; entry stays planned) and sets the key
+        `scheduler_runs_as` builds against.
+    (c) **Two new planned entries in fragment 41:**
+        `seal_appuser_belongs_to_application` (BELONGS_TO_APPLICATION, role
+        service_account, assignment_kind registration, as_of + origin) and
+        `seal_appuser_owned_by` (OWNED_BY, role fid_owner — the Q7
+        owner-of-record ruling; the two-human-owners rule attaches as a graph
+        test). Both flip ACTIVE only at K26's build (flips-are-follow-ups).
+    (d) **§D2 census classes:** non-account owner values are NAMED CLASSES
+        outside the directory-join denominator (null/inherited, folder-header
+        rows, variable-deferred, template placeholders, connection-profile
+        placeholder) — counted, never joined. The platform-account curated
+        list lives as a values-twin under `internal/`.
+    (e) **§Q5 answered YES, with numbers:** 143 personal-id-shaped owners run
+        11,948 jobs (2.3% of the estate); one SID-shaped owner carries 8,411
+        jobs on a single app code (a G4-class report candidate). The type
+        column is never a pull filter.
+    (f) **A CORRECTION THAT MAY REACH YOUR COPY:** `OWNER` is MIXED-CASE at
+        rest — the earlier ALL-UPPER claim recorded the normalization PLAN,
+        not the data (doc 09 line ~360 carries the correction; a mixed-case
+        sweep executed in round 2). If your side copied the ALL-UPPER fence
+        from the session-SQL section, re-read it.
+    (g) **E1 reshaped:** the directory dataset registers DATASET-ON-REPLICA
+        (on the existing replica system row, layer human, Internal, SOR for
+        account identity); `confirmed` flips with K26's build.
+    OPEN, honestly: Q0's DIRECTORY half is pending (K16 stays in_progress —
+    the directory-side counts are the one owed piece; the census company
+    prompt in this range now asks for exactly that and nothing already
+    answered), Q1 open with its consequence recorded, Q2 answered (no history
+    surface exists — snapshot diffing IS the design). Follow-ups groomed:
+    K26 (the build: registration, class-gated demand-set pull, name<->id
+    crosswalk, the amended tier, the owner leg, retained snapshots — the
+    fid-directory map entry is a CREATE there, it never existed) and K25
+    (cross-application run_as detection) ride the same join. Your side adopts
+    the gate via your own review, per your §9 model.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):

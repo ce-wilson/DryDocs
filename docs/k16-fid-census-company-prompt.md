@@ -10,6 +10,31 @@
 > estimate it cannot rule on. The census turns it into *"N of ~200, and here is what the
 > other rows are."* It also blocks **K17**, and K17 blocks the K2 tier-2 unblock.
 
+> **RIDER 2026-08-19 — THE GATE HAS SIGNED (33/33) AND HALF THIS CENSUS ALREADY
+> RAN. READ THIS BEFORE RUNNING ANYTHING.** The producer SME ran the Control-M
+> half live on the replica (the S1-S5 session SQL in doc 09) and the gate walked
+> from those numbers, so the paragraph above is now HISTORY: the gate no longer
+> waits on this prompt. **What remains owed is the DIRECTORY half only** — the
+> counts that need the id-owner/directory extract this repo and the producer
+> machine do not hold: (a) total directory rows for the census application,
+> (c) the remainder breakdown by the directory's own type/status columns, and
+> the Q0 disagreement legs that need the directory's application assignment.
+> Do NOT re-run the Control-M half; its numbers are in the gate record.
+> Four corrections from the gate session bind your run: (1) there are TWO
+> sources (doc 09 "Two sources, two grains") — the HR functional-type extract
+> answers WHO OWNS and can never answer WHICH APPLICATION; the id-owner listing
+> is the application side, and a by-application listing over-returns (all
+> environments, all subtypes, ids connecting to OTHER applications). (2) §D2
+> census classes: non-account owner values (null/inherited, folder-header rows,
+> variable-deferred, template placeholders, connection-profile placeholders)
+> are NAMED CLASSES counted OUTSIDE the join denominator — exclude them before
+> any join or the rates are wrong. (3) `OWNER` is MIXED-CASE at rest — the old
+> ALL-UPPER note recorded a normalization plan, not the data; normalize case on
+> BOTH sides of the name join and report case-only mismatches, never fold them.
+> (4) The 171-way name is the Control-M PLATFORM account (a run_as CLASS, not
+> an anomaly) — classify run_as per JOB before joining; FileWatcher-type on the
+> platform account is the designed pattern.
+
 Venue: company `<org>/DryDocs`, current `main`. Name the venue in every claim (J18).
 
 ## Step 0 — the command
