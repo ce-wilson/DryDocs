@@ -12,6 +12,23 @@ into [`backlog.yaml`](backlog.yaml) with an id, owner agent, inputs, and an acce
 capture here (any surface)  ──groom──▶  backlog.yaml item  ──▶  agent pulls it
 ```
 
+- **`Idea-143`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+  Ask loses the last completed question and answer when navigating to Explorer and back because
+  `AskRoute` keeps turns only in component state. Persist the last completed turn per persona in
+  browser-local storage for this phase; do not persist in-progress or failed turns, and keep the
+  existing TTL-bound explore-ref behavior explicit.
+
+- **`Idea-144`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+  Ask test question `how many folders and jobs does each tower support?` routes to
+  `explorer.folder-applications.v1`, gets 0 rows, then falls back to schema-grounded Cypher that
+  references stale graph vocabulary: `BELONGS_TO_APPLICATION`, `HAS_PORT`, `:Port`,
+  `:SchemaMeta`, and `active_state`. Neo4j emits four non-fatal warnings, so the answer presents
+  an empty result while Explorer can show synthesized data. Admins cannot currently see those
+  warnings: Ask renders only rows/errors, the API runner discards Neo4j notifications, and
+  `AgentRun` telemetry stores no warning payload. Fix the registered spec against the current
+  graph schema, add a live vocabulary/spec smoke check, and surface warning diagnostics to the
+  admin review path without exposing them as an end-user error.
+
 **Grooming ritual** (you, or an Opus `main` session, ~weekly): read this list top to bottom;
 for each idea either (a) promote it to a `backlog.yaml` item, (b) merge it into an existing
 item, or (c) drop it. Strike through or delete what's been groomed so the inbox stays short.
@@ -92,7 +109,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-147`** · 2026-08-20 · `[idea]` · **open** · prio? **Medium** —
+- **`Idea-148`** · 2026-08-20 · `[idea]` · **open** · prio? **Medium** —
   **A scrape run and the registry row it fulfils are not joined — `drydocs-scrape` should
   stamp the `doc-source-registry` id in its run manifest, and the row should carry
   `captured_at` + `manifest` the way `bmc-docs-controlm-utilities` already does.** Found at
@@ -106,24 +123,39 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `--registry-id` (or resolves `--purpose` to one) and writes it into the run manifest;
   (b) the registry row gains `captured_at` + `manifest` at capture and `graph_locator` at
   load, so a VERBATIM claim traces to a run id instead of to prose ("the 2026-08-19 fetch").
-  Numbered 147 because the ui-workstream branch holds Idea-143..146 unmerged. Sibling of
+  Numbered 148 at the ui-workstream merge: that branch had already minted Idea-143..147, so the 147 this entry first carried collided and was re-issued here. Sibling of
   the J51 doc-source-registry finding (same review): the fields (b) adds are COMPANY-owned
   facts, which is why that file needs a per-entry row before they exist.
 
 - **`Idea-142`** · 2026-08-20 · `[bug]` · **GROOMED → J51 (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
-  **`canonical-producer` files the company legitimately EXTENDS are silently truncated
-  by every wholesale apply — found live at the 135-170 port.** The company's apply
-  session took `constraints.cypher` wholesale and dropped their snow-hpsm constraints
-  (`hpsm_queue_key`, `sn_group_name` — RELAY-10 work their loaders depend on); a
-  mid-port diff caught it and their session is now censusing every canonical-producer
-  path with company divergence since `caa0406` (they flag the source/software
-  registries and UI components as further candidates). `constraints.cypher` is
-  re-dispositioned per-entry in PORT-MANIFEST (2026-08-20, same session). WHAT REMAINS:
-  when their PORT-REPORT lands, act on the census — every path it names either gets a
-  per-entry/union row with an entry_rule, or a recorded reason why wholesale stays
-  right. The class is the registry wired-field problem one file over (one disposition
-  cannot carry two sides' facts), and the fix pattern is the same: declare the seam,
-  never widen the default.
+- **`Idea-145`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+  Dark-mode UI contrast defect: the shared React controls on the left vertical rail and the Source
+  panel at the bottom right retain the same light-surface styling as light mode. The off-white
+  control box is stark against the dark page and does not provide an intentional dark-mode surface.
+  Audit the shared control/source styles and theme tokens; dark mode should use the page's dark
+  panel/background tokens while preserving readable text, borders, focus states, and source
+  affordances. Verify both light and dark screenshots after the fix.
+
+- **`Idea-146`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+  Ask question `how many towers are there` returned `0` from generated Cypher
+  `MATCH (t:TOMRole) WHERE t.name CONTAINS 'Tower' OR t.name CONTAINS 'tower' RETURN count(DISTINCT t) AS tower_count`,
+  while `/explorer` defines Tower as a synthesized UI concept (`Tower / app drill-down graph · backs onto drydocs`)
+  backed by the in-repo `TOWERS` definitions. No registered QuerySpec matched, so the router correctly
+  escalated to Tier 1; the text2cypher model then selected the real `TOMRole` graph label as a proxy for
+  the UI term, but TOMRole is not the Explorer Tower definition. The answer therefore reports 0 towers
+  without explaining the semantic mismatch. The UI exposes the safe execution trace (router, generated
+  Cypher, rows, timings, source) but not model prompts or chain-of-thought. Add an explicit Tower
+  definition/source contract and a registered count spec or semantic mapping so this question cannot
+  silently cross from synthesized UI taxonomy to TOM ontology.
+
+- **`Idea-147`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+  Ownership graph relationship labels are occluded by nodes in the left-to-right K4 qualified-
+  attribution layout. `/ownership` shows `EXAMPLE DATA · ILLUSTRATIVE — K4 qualified-attribution
+  shape`, but relationship names render behind nodes and are unreadable. Explorer's
+  `Tower / app drill-down graph · backs onto drydocs` and Lineage's `Source → target DAG · backs
+  onto drydocs` keep relationship names readable as overlays. Ownership should use the same
+  readable overlay treatment while preserving dark/light theme tokens, arrows, and the existing
+  left-to-right relationship direction.
 
 - **`Idea-141`** · 2026-08-20 · `[idea]` · **open — architect review DONE 2026-08-20, verdict: do-not-recommend as framed** · prio? **Low** —
   **Should `agents/` stop carrying its own venv + `requirements.txt` and become an optional
@@ -160,6 +192,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
     the sleeper, since that runtime is the one being leak-tested. Poetry also has no
     `--only-binary` equivalent, so the documented Windows litellm wheel-only workaround
     (`agents/README.md:25-27`) cannot be expressed; a hard pin is the only substitute.
+  - **MEASURED 2026-08-20 — two of those three hazards are now confirmed, not predicted.**
+    The agents venv was built the same session (Python 3.14.6, `pip install --only-binary :all:
+    -r requirements.txt`, clean) and what it resolved settles two open questions without a
+    `poetry lock --dry-run`: **`click 8.4.2`**, against `pyproject.toml:18`'s
+    `click = ">=8.0,<8.2"` — so hazard (1) is a HARD CONFLICT, not a maybe, and it cannot be
+    resolved without moving `typer ^0.12` too; and **`neo4j 6.2.0`**, confirming the agent
+    runtime genuinely runs driver 6.x today, so hazard (3)'s silent downgrade to `^5.20` is
+    real. Hazard (2) did NOT materialise: `litellm 1.97.0`, `tokenizers 0.23.1` and
+    `google-adk 2.7.1` all had cp314 wheels, so `python = "^3.11"` reaching 3.14 is currently
+    survivable — with the caveat that pip picked those versions freely, which is exactly the
+    freedom a shared lock removes. Net: the verdict is unchanged but better founded — the
+    click pin alone blocks the group as framed.
   - **Worth doing regardless of the verdict.** (a) `MODULE_MAP.md:158` is WRONG today: it says
     `agents/` is absent from the boundary test, which `tests/unit/test_module_boundary.py:38`
     (agents in `PKG_ROOTS`) and `MODULE_MAP.md:100` both contradict. (b)

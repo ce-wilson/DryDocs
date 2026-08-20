@@ -17,6 +17,13 @@ import os
 import time
 from dataclasses import dataclass
 
+from dotenv import dotenv_values
+
+_ROOT_ENV = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+for _name, _value in dotenv_values(_ROOT_ENV).items():
+    if _value and not os.getenv(_name):
+        os.environ[_name] = _value
+
 PROVIDERS = ("anthropic", "azure")
 
 
