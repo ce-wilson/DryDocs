@@ -5,9 +5,11 @@
 > (`docs/reviews/port-review-7c18ff4b-20260820.md`, reaches you at the next port):
 > **mergeable as committed.** Nothing below blocks the `--no-ff` merge — the SME
 > makes that call. These are conditions on YOUR follow-up list, two of which it
-> does not carry, and one ask. Guardrails stand: nothing pushes to `cewilson`,
-> the HR files stay stashed until the tree is settled, `port-prompt.md` is
-> retired, never refreshed.
+> does not carry. **Everything here is recorded in YOUR upgrade ledger
+> (`port-exec-state.md` / the PORT-REPORT) and stays there — nothing in this
+> prompt sends anything to the producer.** Guardrails stand: nothing pushes to
+> `cewilson`, the HR files stay stashed until the tree is settled,
+> `port-prompt.md` is retired, never refreshed.
 
 ## 1. The FID ratification is not done until it is in the gate-log — as ONE commit
 
@@ -41,31 +43,38 @@ those paths. Why it matters: the next reconcile runs a divergence census against
 and get re-litigated. This is an append to the report, not a rewrite — a third
 small commit on the branch before the merge, or the first after it.
 
-## 3. One ask: the `drydocs-scrape` connector back-flow
+## 3. Note for your ledger: the `drydocs-scrape` connector is a back-flow candidate
 
-The 2026-08-19 live fetch that closed the `fcdo-frameworks` capture holes ran on
-connector code that exists only on your side. The producer wants the
-**mechanism** back (transport-injectable `Connector`, the SSRF allow-list, the
-run-manifest shape) with no realm, space id, URL, or payload — the same
-mechanism-not-instance rule every back-flow follows. When convenient: a sanitized
-patch or a pointer to the files and their tests, so the producer can reproduce
-it generically. Not urgent; ride it with the next relay.
+The live fetch that closed the `fcdo-frameworks` capture holes ran on connector
+code that exists only on your side. Record it in your upgrade ledger as a
+**back-flow candidate, mechanism only** — the `Connector` protocol with an
+injectable transport, the SSRF scheme allow-list, the run-manifest shape, and
+their offline tests. **Do not name a space, corpus, URL, realm, or purpose
+string in that entry, and do not put one in any producer-facing text** — the
+mechanism is the candidate, never the instance (the same rule every back-flow
+follows, and the reason the producer side holds only sanitized templates). If
+and when a sanitized patch is prepared, that is a company decision made
+company-side; this prompt asks for nothing to be sent.
 
 ## What you do NOT need to do
 
 - No manifest rows — the five divergences the `caa0406` report named
   (`description_tokens.py`, `detect.py`, `test_runbook_currency.py`,
-  `email-dl-contact-point.yaml`, `ui-components.yaml`) get their
-  `PORT-MANIFEST.yaml` rows **producer-side** (Idea-142) and reach you at the
-  next port. Keep your kept-divergence list in the report as is; that is the
-  input.
+  `email-dl-contact-point.yaml`, `ui-components.yaml`) are **groomed
+  producer-side as J51** (2026-08-20) and their rows reach you at the next
+  port. Keep your kept-divergence list in the report as is; that is the input.
 - No answer on "done never crosses" vs. "keep the further-along" for the 12
-  shared backlog ids — that is a producer ADR question (0013 Clause 4), and the
-  SME rules it. Your union stands as applied.
+  shared backlog ids — **ruled producer-side 2026-08-20 (ADR 0013 Clause 4):
+  status is per-repo; a port never writes it.** Your union stands as applied,
+  and it was already the right rule.
+- **Neither F3 nor F4 is yours** — both are done on the producer and were never
+  in your lane; do not reach into `IDEAS.md`, `backlog.yaml`, or the ADRs for
+  them.
 
 ## Done when
 
 Gate-log holds the FID pair in one commit and the board is regenerated; the
 PORT-REPORT carries the not-port-introduced section; `stash@{0}` is popped and
 the three HR files are back and still untracked; the stale `port-prompt.md` is
-retired. Reply with the three commit SHAs.
+retired. **Record the close-out in `port-exec-state.md` as you have been** — that
+ledger is the record, and it is yours. Nothing is reported back.
