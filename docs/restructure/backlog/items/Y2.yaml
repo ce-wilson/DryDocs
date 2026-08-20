@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - Y1
 inputs:
@@ -25,8 +25,10 @@ acceptance: |
 notes: |
   Groomed 2026-08-04. The claim-collision shrink is the payoff to state at close: after this item, two machines claiming DISJOINT items touch disjoint files and cannot conflict; only a same-item race remains, and J31's wip-branch check already covers the visible half of that.
 annotations:
-  status: 'claimed 2026-08-20 (desktop, pushed before work) — precondition MET: the 7c18ff4b PORT-REPORT
-    is reviewed (docs/reviews/port-review-7c18ff4b-20260820.md); build on feat/backlog-shard, --no-ff
-    merge; backlog.yaml is FROZEN for every session and both machines from this claim until the merge'
+  status: 'done 2026-08-20 (desktop): built on feat/backlog-shard and --no-ff merged — the first status
+    flip ever made in an item file. Prior: claimed 2026-08-20 (desktop, pushed before work) — precondition
+    MET: the 7c18ff4b PORT-REPORT is reviewed (docs/reviews/port-review-7c18ff4b-20260820.md); build on
+    feat/backlog-shard, --no-ff merge; backlog.yaml is FROZEN for every session and both machines from
+    this claim until the merge'
   inputs[]:
   - docs/decisions/0013-backlog-sharding.md — the ruling this build executes (2026-08-20)
