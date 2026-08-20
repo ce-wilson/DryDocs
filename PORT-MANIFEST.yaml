@@ -379,9 +379,24 @@ rows:
   - path: "drydocs/loaders/**"
     disposition: canonical-producer
     note: "Control-M loaders/SQL/DDL/cypher incl. base.py (provenance diet) — producer-authored"
+  - path: "drydocs_core/schema/constraints.cypher"
+    disposition: per-entry
+    entry_rule: >
+      An ENTRY is one named CREATE CONSTRAINT statement; resolve by constraint
+      NAME. Producer-named constraints are canonical-producer; a constraint the
+      producer file does not carry is COMPANY-CANONICAL and SURVIVES the port
+      (their loaders depend on it) until its subject ports or their gate retires
+      it. RE-DISPOSITIONED 2026-08-20, found LIVE at the 135-170 apply: the
+      wholesale take dropped the company's snow-hpsm constraints
+      (hpsm_queue_key, sn_group_name — their RELAY-10 build, Tier-B
+      company-canonical) and only a mid-port diff caught it. The old note
+      ("consumer evaluates constraint-count deltas") detects the damage after
+      the fact at best; a per-entry union prevents it. Same class as the
+      registry wired-field problem (registry-wiring-readiness gate prompt): one
+      disposition cannot carry two sides' facts.
   - path: "drydocs_core/schema/**"
     disposition: canonical-producer
-    note: "supplements + constraints; consumer evaluates constraint-count deltas via its own test_schema expectations"
+    note: "supplements + the schema meta-graph; constraints.cypher carved out per-entry ABOVE (first match wins) after the 2026-08-20 drop"
   - path: "tests/unit/test_variable_*.py"
     disposition: canonical-producer
     note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"

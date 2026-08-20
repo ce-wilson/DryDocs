@@ -92,6 +92,68 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-142`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+  **`canonical-producer` files the company legitimately EXTENDS are silently truncated
+  by every wholesale apply — found live at the 135-170 port.** The company's apply
+  session took `constraints.cypher` wholesale and dropped their snow-hpsm constraints
+  (`hpsm_queue_key`, `sn_group_name` — RELAY-10 work their loaders depend on); a
+  mid-port diff caught it and their session is now censusing every canonical-producer
+  path with company divergence since `caa0406` (they flag the source/software
+  registries and UI components as further candidates). `constraints.cypher` is
+  re-dispositioned per-entry in PORT-MANIFEST (2026-08-20, same session). WHAT REMAINS:
+  when their PORT-REPORT lands, act on the census — every path it names either gets a
+  per-entry/union row with an entry_rule, or a recorded reason why wholesale stays
+  right. The class is the registry wired-field problem one file over (one disposition
+  cannot carry two sides' facts), and the fix pattern is the same: declare the seam,
+  never widen the default.
+
+- **`Idea-141`** · 2026-08-20 · `[idea]` · **open — architect review DONE 2026-08-20, verdict: do-not-recommend as framed** · prio? **Low** —
+  **Should `agents/` stop carrying its own venv + `requirements.txt` and become an optional
+  poetry group (`poetry install --with agents`), matching `[tool.poetry.group.api]` and
+  `[tool.poetry.group.remediation]`?** Raised 2026-08-20 when the Ask spoke would not answer and
+  the documented launch path turned out to be `pip install -r agents/requirements.txt` rather
+  than poetry. **Reviewed the same day; the answer is leave it alone** — recorded here rather
+  than groomed into an item, because the reasons are worth keeping even though nothing is owed.
+  - **No ADR rules the split.** `docs/decisions/` contains nothing on venvs or poetry groups;
+    ADR 0007 names `agents/` as the Q&A app's home and is silent on packaging. The authority is
+    prose only — `agents/README.md:5-7`, `agents/requirements.txt:1`, `MODULE_MAP.md:100,158`.
+    So this needs no ADR to reverse: it is a lighter change than it looks, which is exactly why
+    the reason NOT to make it should be written down.
+  - **The README's stated reason does not hold as written.** "its own venv so the agent runtime
+    can be profiled/leak-tested in isolation" describes PROCESS isolation, and `adk api_server`
+    is a separate OS process under either scheme (`agents/README.md:43-46` — memray on the ADK
+    process, DevTools on the React page, `docker stats` on Neo4j). Installed-but-unimported
+    packages cost a memray profile nothing. The rationale is real but mislabelled as a
+    dependency concern.
+  - **The reason to leave it alone is the PORT, not the venv.** `pyproject.toml` merges
+    per-entry as a union of dependencies keeping the consumer's version string
+    (`PORT-MANIFEST.yaml:151-155`), so the group itself would land cleanly — but `poetry.lock`
+    carries "re-lock after the merge instead" (`:679-681`), which would oblige the company side
+    to resolve `google-adk` and `litellm` on its internal index at every port. Today that choice
+    is quarantined inside `agents/**`. ADK is only "the OSS base of the company-internal Fusion
+    SmartSDK" (`agents/README.md:4`) — the consumer may not install `google-adk` at all, and
+    whether it can reach it is unanswerable from this repo.
+  - **Three resolver hazards, if anyone revisits.** Optional groups are not separate resolution
+    universes — `poetry lock` solves all groups into one lock. (1) `click = ">=8.0,<8.2"`
+    (`pyproject.toml:18`, held down by `typer ^0.12`) against whatever click the ADK/litellm
+    tree wants. (2) `python = "^3.11"` spans up to 3.14 while litellm's tokenizers/tiktoken tree
+    commonly caps below it. (3) `neo4j = "^5.20"` would silently DOWNGRADE the agent runtime,
+    which today resolves driver 6.x from the bare `neo4j` line in `agents/requirements.txt:5` —
+    the sleeper, since that runtime is the one being leak-tested. Poetry also has no
+    `--only-binary` equivalent, so the documented Windows litellm wheel-only workaround
+    (`agents/README.md:25-27`) cannot be expressed; a hard pin is the only substitute.
+  - **Worth doing regardless of the verdict.** (a) `MODULE_MAP.md:158` is WRONG today: it says
+    `agents/` is absent from the boundary test, which `tests/unit/test_module_boundary.py:38`
+    (agents in `PKG_ROOTS`) and `MODULE_MAP.md:100` both contradict. (b)
+    `agents/requirements.txt:5` is a bare `neo4j`, so the agent runtime's driver version is
+    unpinned and unreproducible — pin it where it already lives, no group needed; same for
+    `litellm`, whose known-good version is recorded in README prose but nowhere a tool reads.
+  - **Open questions that would flip this to recommend:** does the company side install
+    `google-adk` or SmartSDK, and can it reach those distributions? Is the agent runtime meant
+    to stay on neo4j driver 6.x (if yes, the group is impossible without loosening
+    `neo4j = "^5.20"` repo-wide)? Is "one machine holds the only agents venv" permanent, or is
+    broad agent-dev access the goal?
+
 - **`Idea-140`** · 2026-08-19 · `[source]` · **merged → G68 census (e) (2026-08-19, the measurement half: wrapper fan-out + per-wrapper varying parameters); the informatica-kind RULING stays parked → the lineage gate (G12's inboxed m3_invokes to_node broadening)** · prio? **Med** —
   **Informatica invocations are the same generic few `.ksh` wrappers for ALL business
   applications on that platform — script-path identity is non-distinguishing, which is
