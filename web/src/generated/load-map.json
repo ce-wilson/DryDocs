@@ -1495,7 +1495,7 @@
       "curation": "sme-confirm",
       "connector": "confluence",
       "target_db": "drydocs",
-      "trust_default": "GROUNDED",
+      "trust_default": "VERBATIM",
       "graph_locator": {
         "match": "none",
         "value": null
