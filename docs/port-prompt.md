@@ -101,8 +101,10 @@ Ritual/self-referential commits cited for the coverage check, none carrying
 apply-content: `30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim,
 close and next_ready backlog flips — the work itself is step 165), `8c84adef`
 (the PR #7 merge — content at step 161), `f21b3e3a` `6e7735bd` `f1d777bc`
-(summary-block merge resolutions, recompute-from-items each time), `3680e9a3`
-and `04f92515` (this roll and its step-170 restatement).
+(summary-block merge resolutions, recompute-from-items each time), `3680e9a3`,
+`04f92515` and `c82648d7` (this roll, its step-170 restatement, and the
+coverage-line addendum — the roll write itself terminates via the script's
+chore(port): roll exemption).
 **CI NOTE:** the Actions billing block that made everything in this range
 local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-off
 and both commits after it all passed). Earlier acceptance claims in this range
