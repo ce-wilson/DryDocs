@@ -92,7 +92,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-142`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
+- **`Idea-142`** · 2026-08-20 · `[bug]` · **GROOMED → J51 (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
   **`canonical-producer` files the company legitimately EXTENDS are silently truncated
   by every wholesale apply — found live at the 135-170 port.** The company's apply
   session took `constraints.cypher` wholesale and dropped their snow-hpsm constraints

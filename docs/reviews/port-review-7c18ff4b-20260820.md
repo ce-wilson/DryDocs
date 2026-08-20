@@ -73,9 +73,11 @@ The `caa0406` report: *12 shared ids with status diff KEPT at company status (do
 crosses)*. The manifest entry_rule says keep the one **further along**. If producer-`done`
 items were kept at company-`todo`, that is the opposite rule — and it may be the *right*
 rule for build items, because `done` is a per-repo fact (built here ≠ wired there). The
-two rules cannot both stand in one entry_rule. **Question for the SME / Y2:** is `status`
-per-repo for `type: build` items? ADR 0013 Clause 4 inherits "never regress" for the
-per-file rule and should carry the answer.
+two rules cannot both stand in one entry_rule. **RULED 2026-08-20 (user): status is
+per-repo; a port never writes it** — the company's status stands, the producer's folds
+into notes. `type` cannot key it (task/chore/bug/requirement only), so the rule is
+unconditional. Recorded in ADR 0013 Clause 4 + 6 and the manifest entry_rule; the
+company's union stands as applied.
 
 ### F5 — Handoff items not visible in the summary
 Not confirmed by anything I can see: that `PORT-REPORT-7c18ff4b.md` carries *every kept

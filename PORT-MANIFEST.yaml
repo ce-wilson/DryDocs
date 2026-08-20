@@ -158,11 +158,17 @@ rows:
     entry_rule: >
       id-keyed (items[].id). Both sides run their own plan against OVERLAPPING
       ids, so a path-level checkout silently deletes one side's work — the same
-      hazard the taxonomy-ontology-map row exists for. Union the items; NEVER
-      regress a status (done -> in_progress/todo) or drop an entry; when both
-      sides hold the same id, keep the one that is FURTHER ALONG and fold the
-      other's notes in. The `summary` block (counts, next_ready) is COMPUTED —
-      recount after any merge (test_backlog.py enforces), never hand-merge it.
+      hazard the taxonomy-ontology-map row exists for. Union the items; never
+      drop an entry. STATUS IS PER-REPO (ADR 0013 Clause 4, F4 ruling 2026-08-20):
+      when both sides hold the same id, the CONSUMER's `status` stands — a port
+      never writes status, because the same id names the same work with two
+      independent completions (the company runs its own gates, loads, suite) —
+      and the producer's status + date fold into `notes` as information. This is
+      what the 2026-08-11 union did for 12 shared ids ("done never crosses"); the
+      earlier "keep the further-along" wording was the intra-repo two-machine
+      rule, which still holds there. The `summary` block (counts, next_ready) is
+      COMPUTED — recount after any merge (test_backlog.py enforces), never
+      hand-merge it.
     note: >
       had NO row until 2026-07-28 (J16) — the machine-readable source of truth
       for what is done was resolving to `default:`, i.e. the manifest was

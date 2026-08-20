@@ -127,10 +127,22 @@ longer touch a shared line, so the 2026-08-04 class of conflict cannot occur.
 
 **What remains, and how it resolves:** two sessions claiming the **same** item
 still race. That race is now a conflict on one small file that git reports as
-such, and the resolution rule is the one the PORT-MANIFEST row already states for
-the monolith — **a status never regresses** (`done` → `in_progress`/`todo` is
-forbidden); when both sides advanced, keep the version that is further along and
-fold the other's notes in. The 2026-07-28 C19 double-build was a *visibility*
+such, and the resolution rule **within one repo** (two machines, one plan) is —
+**a status never regresses** (`done` → `in_progress`/`todo` is forbidden); when
+both sides advanced, keep the version that is further along and fold the other's
+notes in.
+
+**Across repos the rule is different, and this is the F4 ruling (2026-08-20,
+port review `7c18ff4b`): status is per-repo; a port never writes it.** The same
+id names the same *work* with two independent *completions* — the company runs
+its own gates, its own loads, its own suite, and a port carries code and prose,
+never the act of accepting them. At a port the company's `status` stands
+untouched and the producer's status and date fold into `notes` as information
+("producer: done 2026-08-11"). `type` cannot carry this distinction (it is only
+task / chore / bug / requirement), so the rule is unconditional rather than
+keyed. This is what the 2026-08-11 union already did for 12 shared ids ("done
+never crosses"); the alternative — keep the further-along across repos — would
+mark the company `done` on gates it has not signed. The 2026-07-28 C19 double-build was a *visibility*
 failure (a local-only claim), which the push-before-work rule addresses; this
 clause does not claim to prevent it.
 
@@ -185,7 +197,9 @@ describe exactly that one-time sequence, and a new row
 `docs/restructure/backlog/items/*.yaml` takes over for every port after it with
 disposition **per-entry where the entry is the file**: disjoint ids are ordinary
 git adds and modifications; the same id on both sides is one small conflict
-resolved by the Clause 4 rule. `backlog/epics/*.yaml` is union-append
+resolved by the Clause 4 **cross-repo** rule — the company's `status` stands, the
+producer's folds into `notes`. The one-time step 1 union above applies the same
+rule. `backlog/epics/*.yaml` is union-append
 (`groom_log` is an audit trail; both sides append). `plan.yaml` and
 `modules.yaml` keep the monolith's present per-entry semantics.
 
