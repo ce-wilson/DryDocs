@@ -2225,6 +2225,16 @@ regeneration, never-port outputs — and get no step.
     (cross-application run_as detection) ride the same join. Your side adopts
     the gate via your own review, per your §9 model.
 
+LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
+this range, cited here because the coverage check reads ONLY this section:
+`30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim/close/next_ready
+backlog flips; the work is step 165), `8c84adef` (the PR #7 merge; content at
+step 161), `f21b3e3a` `6e7735bd` `f1d777bc` (summary-block merge resolutions,
+recompute-from-items each), `3680e9a3` `04f92515` `c82648d7` (the ledger roll,
+its step-170 restatement, and the first coverage addendum — all three used
+docs(port) subjects, which the termination exemption deliberately does not
+match; the terminating write is the chore(port) commit that adds this footnote).
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
