@@ -1,0 +1,25 @@
+id: G73
+epic: seal-attribution
+title: 'Inheritance: assertion mode + a modelled ancestor edge, authored rows only — and the ancestor-CI
+  widening that K21 §7.4 needs'
+type: task
+module: ontology
+phase: 9
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- G70
+inputs:
+- config/gate-log.md
+- knowledge/upgrade-plans/servicenow-replica-evidence.md
+- drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml
+acceptance: |
+  Per the signed §E. THE LOAD STORES AUTHORED ROWS ONLY: of the three Inheritance states, Direct (blank) and Overridden are AUTHORED; Inherited rows are DERIVED COPIES carrying two lineage pointers. Inheritance is computed, not materialised — storing a derived fact as though asserted is how a graph starts disagreeing with its source. THE ANCESTOR IS A MODELLED EDGE, not a property (§E4 ruled), so "why does this application show a different owner than its parent" is TRAVERSABLE — which is what §D2 says an operator cannot do today. Both lineage references are load-bearing: the ancestor CI and the ancestor ROW. IT IS ONE MECHANISM UP AN N-LEVEL CHAIN, not a two-level relation (§E1e): "copy from the nearest ancestor holding the role", applied repeatedly. A model built for a fixed application→deployment relation cannot represent the observed pass-through case, where a role originates two rungs up and passes straight through the application untouched. OVERRIDES PROPAGATE: a child inherits the ancestor's CURRENT value even when that value is itself an Override, so the effective holder can differ from the top of the chain. AND IT AMENDS THE PULL SCOPE — this is the item that carries it. Reconstructing an inherited holder requires ANCESTOR CIs, which sit ABOVE the ~200 applications DryDocs supports, including CIs owned by teams it does not. K21 §7.4 is amended to take ancestor CIs FOR THEIR TOM ROWS ONLY, and the amendment is written there rather than left implicit.
+notes: |
+  Raised 2026-08-11 at the G35 sign-off. This is the first place the ~200-application boundary and the inheritance model actually conflict, and the gate crossed it deliberately rather than quietly. The alternative — materialise inherited rows and flag them derived — stays inside the boundary and was considered and rejected: it duplicates, and it drifts when an ancestor changes.
+annotations:
+  inputs[]:
+  - drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml — was 41-local-seal.yaml
+    -- fragment renamed at gate vocabulary-domains-and-id-policy §A2; corrected at the 2026-08-19 groom

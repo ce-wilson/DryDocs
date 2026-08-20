@@ -1,4 +1,4 @@
-"""render_board.py — render docs/restructure/backlog.yaml to docs/plan/board.html.
+"""render_board.py — render docs/restructure/backlog/ (the sharded tree, ADR 0013) to docs/plan/board.html.
 
 Thin CLI entry point beside ``knowledge/depgraph-snapshots/snapshot.ps1`` (see backlog
 item I2 / CLAUDE.md §0 session ritual) until the ``drydocs/cli.py`` entrypoint-boundary
@@ -22,7 +22,7 @@ One command refreshes all four; an explicit ``--backlog``/``--out`` run
 
 Usage:
     python scripts/render_board.py
-    python scripts/render_board.py --backlog path/to/backlog.yaml --out path/to/board.html
+    python scripts/render_board.py --backlog path/to/backlog-dir-or-file --out path/to/board.html
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ def main() -> None:
         "--backlog",
         type=Path,
         default=DEFAULT_BACKLOG_PATH,
-        help="path to backlog.yaml (default: docs/restructure/backlog.yaml)",
+        help="backlog tree or single file (default: docs/restructure/backlog/)",
     )
     parser.add_argument(
         "--out",

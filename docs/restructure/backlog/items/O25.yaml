@@ -1,0 +1,29 @@
+id: O25
+epic: web-console
+title: 'Gate-page M1 drafting affordance: a Draft-gate-log-entry button on rendered gate pages assembling
+  the sign-off snippet from ticked confirmations'
+type: task
+module: drydocs-review
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O20
+inputs:
+- drydocs/gate_pages.py
+- tests/unit/test_gate_pages.py
+- config/gate-log.md
+- config/gate-prompts/ui-write-surface.yaml
+acceptance: |
+  Rendered gate pages (render_gate_page) gain the M1 affordance the O20 gate signed off (SME-2, 2026-07-21): a Draft-gate-log-entry control that assembles a config/gate-log.md entry SNIPPET client-side from the page's ticked confirmations (heading in the house format, per-section ticked/unticked summary, date placeholder) and offers copy-to-clipboard and/or file download — the SME reviews, edits, and commits it; the page writes NOTHING server-side (ticks stay browser-local; M1 exactly, per the gate ruling — an M2 upgrade would be its own decision). Unit tests cover the snippet content (all-ticked and partially-ticked shapes); existing checkbox-count and format guards stay green. Full suite green.
+notes: |
+  Groomed 2026-07-21 pm at the O20 sign-off (gate-log SME-2): gate pages are NECESSARY for building and confirming (no upfront spec), so the drafting affordance is first-class. Pure renderer work in drydocs/gate_pages.py (module drydocs-review — the H4 gate-page generator's home); zero api surface.
+annotations:
+  status: '2026-07-21 pm (`632def3`): Draft-gate-log-entry + Copy-snippet + Download-.md on every rendered
+    gate page; client-side ONLY (M1 exactly — ticks browser-local, zero server writes); house-format heading
+    with in-browser date, per-section [x]/[ ] lines + counts, all-ticked→SIGNED OFF else PENDING; drift-proofed
+    — Python prebuilds every emittable line (JS selects/joins only) and draft_gate_log_entry() is the
+    pinned reference (+4 tests: all-ticked, partial, empty-spec, page-embedding); count guards hold; suite
+    819 green; O20 page re-rendered + smoked.'

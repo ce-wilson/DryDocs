@@ -1,0 +1,21 @@
+id: S5
+epic: structure-remediation
+title: Split the two monolith config YAMLs by domain behind a deterministic concatenating loader (F7/F8)
+type: chore
+module: ontology
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- S1
+inputs:
+- config/taxonomy-ontology-map.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- PORT-MANIFEST.yaml
+acceptance: |
+  config/taxonomy-ontology-map.yaml (1,013 lines) and drydocs_core/ontology/relationship_vocabulary.yaml (2,111 lines) each become a directory of per-domain files (controlm / catalog / seal / registry / docs, or the domains that actually exist), read by ONE loader that concatenates in deterministic sorted-filename order and fails loudly on a duplicate key. A test proves the concatenated result parses equal to the pre-split file's content. Every existing consumer and test passes unchanged. PORT-MANIFEST.yaml records the split so the company side applies the same shape rather than resolving it as a conflict.
+notes: |
+  The problem is granularity, not size or format: one file serving many domains means two concurrent sessions collide, and a cross-repo port conflict lands as one big hunk instead of one small one. Splitting shrinks the conflict to the domain that changed. Module recorded as `ontology` (not `config`) because the registry defines that work area as "drydocs_core/schema/, relationship vocabulary, mappings" — which names both files — even though one of them lives under config/.
+  DONE 2026-08-04 (d84d86b): both files are per-domain fragment DIRECTORIES read by drydocs_core/yaml_fragments.py (sorted-filename concatenation; loud on duplicate top-level keys and entry ids; single files stay first-class). Split-time proof: 83 + 38 entries deep-equal to the pre-split parse; only entry ORDER changed (domain-grouped), schema_graph.cypher + matrix + load-map regenerated same commit. PORT-MANIFEST rows now glob the directories and record the split; reconcile-port snapshots the MERGED documents. Suite 1515.

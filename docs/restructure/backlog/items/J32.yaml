@@ -1,0 +1,23 @@
+id: J32
+epic: release-infrastructure
+title: 'Write down the registration / routing / attribution rule: a SEAL id in a field is not an attribution
+  claim unless that field''s job is to attribute'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/RELATIONSHIP_GUIDE.md
+- knowledge/standards/
+- config/gate-prompts/fid-identity-and-scope.yaml
+- external/orchestration/autosys/README.md
+acceptance: |
+  A short standing rule lands in docs/RELATIONSHIP_GUIDE.md (or a knowledge/standards note it links, if that reads better) stating that ownership, routing and attribution are three different facts that all serialize as a SEAL id, and that the graph has exactly ONE place where the third is authored — the confirmed app-code mapping. It carries the three observed instances as evidence, not as hypotheticals: (1) a FID is REGISTERED to the platform application while its jobs are ATTRIBUTED elsewhere (`fid-identity-and-scope` §G); (2) an AutoSys failure alert carries TWO SEAL ids as escalation ROUTING (`SEAL=<a>_<b>` in the incident payload) — ingested naively that manufactures a job belonging to two applications; (3) the Control-M escalation DB routes by SEAL for the same reason. It also states the test to apply to any NEW source: ask what the field's job is, not what it contains. Prose only — no vocabulary entry, no map entry, no loader change.
+notes: |
+  Groomed 2026-08-05 (desktop) from Idea-62. Promoted rather than parked because all three instances are already observed and written up, so there is nothing left to learn before writing it — and because the cost of NOT having it is concrete: each of the three was re-derived independently, and the AutoSys one is a load that has not happened yet, which is the cheapest possible moment to be holding the rule. Type is `chore` and NOT a gate: the rule describes how to READ a source field, which is an ingestion-discipline question, not a decision about what an edge MEANS. Nothing here changes a relationship type or a mapping status. If applying it later argues for a vocabulary change, that is the gate's business, not this item's. RELATED, deliberately not folded in: the same shape appears a fourth time as the "majority-not-always" caveat on the five cross-system joins in knowledge/standards/technology/folder-naming-convention.md. That one is about a join's RELIABILITY; this is about a field's MEANING. Cross-reference them, do not merge them.
+progress: |
+  2026-08-05 — DONE (desktop, claimed same day). Landed in docs/RELATIONSHIP_GUIDE.md as § "The field-meaning rule — ownership, routing, and attribution (J32)", a sibling of the join-restatement methodology section (same class: a reading rule, not a relationship type). Carries the rule, the ask-what-the-field's-job-is test, the three observed instances with their in-repo citations (§G registration-vs-work; the AutoSys SEAL=<a>_<b> routing payload; cm_escalation_db ECOMPONENT routing), and the deliberate cross-reference to the folder-naming norms-not-invariants rule (meaning first, then reliability — apply both). One rider: the AutoSys README's "standing rule" mention now points at the guide section as the canonical home instead of only at §G. Prose only, exactly as scoped.

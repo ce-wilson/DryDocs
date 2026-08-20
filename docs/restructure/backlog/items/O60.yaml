@@ -1,0 +1,23 @@
+id: O60
+epic: web-console
+title: '/lineage swimlane data-flow view: lanes Control-M | Data Layer | File Server / Database, rendering
+  job -> pipeline -> asset per data series'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/lineage/
+- web/src/routes/LineageRoute.tsx
+- UI-WIP/wireframes/wireframes.json
+- UI-WIP/wireframes/out/dataflow.svg
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  /lineage gains a swimlane layout (proposed lineage/SwimlaneView.tsx; the final filename is recorded at build) with three lanes -- Control-M | Data Layer | File Server / Database -- rendering job -> pipeline -> asset per data series: the FW job "detected by" join, the launcher->pipeline token join per the G15 contract, and condition edges per the BMC baseline. READS/WRITES edges render DASHED and visibly marked as planned for as long as m3_reads_from / m3_writes_to carry status: planned in the relationship vocabulary -- drawing them skips no gate, and the view says so ON the surface, not only in code. Each rendered region traces to its WF-DFL-01..17 wireframe key so SME feedback (the FB-2026-08-13-01 convention in UI-WIP/wireframes/wireframes.json) re-attaches to a component that now exists. Demo data stays SYNTHESIZED (the demoLineage idiom -- no real folder/job/host values). Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
+notes: |
+  Groomed 2026-08-17 (targeted groom -- the UI / UI-WIP inbox entries only) from Idea-116, captured 2026-08-13 from SME chat while testing the wireframe feedback loop; traces to the user's original Full Circle Docs document-portal concept, §7 Business Flow Diagrams (transcription is machine-local at internal-local/fullcircle-docs-scan-20260813.md, by design -- never committed). The wireframe half was DONE at capture: UI-WIP/wireframes/out/dataflow.svg, keys WF-DFL-01..17, renderer spec v2 (lane + arrow primitives). This item is the React half only. Wireframe-first is the point: SME feedback cites WF-DFL keys before any component exists. No ontology decision rides here -- the planned-status caveat in the acceptance is what keeps the drawn READS/WRITES edges from becoming a done deal ahead of their gate.

@@ -1,0 +1,23 @@
+id: N4
+epic: source-column-mappings
+title: 'Render the load map: one generated artifact joining sources, loaders, commands, order and column
+  ledgers'
+type: task
+module: drydocs-docgen
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- N3
+inputs:
+- config/source-registry.yaml
+- config/source-mappings/
+- drydocs/source_mappings.py
+- scripts/render_gates.py
+- scripts/render_enforcement_matrix.py
+acceptance: |
+  A scripts/render_*.py emits web/src/generated/load-map.json joining the N3 declarations to the registry and the column ledgers, plus a committed==regenerated guard (the gates.json / enforcement-matrix.json precedent, and J17's lesson: wire it into the default board render so a groom cannot leave it stale). Ledger coverage is rendered in the THREE states governance already defines, never omitted: has a ledger (3 — controlm-psgmgr, depgraph-snapshot, design-docs), confirmed but on the frozen shrink-only LEDGER_PENDING list (8), unconfirmed placeholder (5). A source that is silently absent from the render is a defect. WIDENED 2026-07-29: the per-source row also joins the source's taxonomy capture (its config/taxonomy/ file, when one exists) and its config/taxonomy-ontology-map.yaml entries with their status (proposed/planned/confirmed) — so the one surface answers taxonomy-by-source, ontology, extract AND load, not just the load half.
+notes: |
+  Deliberately reuses existing governance instead of inventing a "no ledger yet" concept: LEDGER_PENDING and test_every_confirmed_source_has_a_ledger_or_is_named_pending (N2) already carry that state, and the list is frozen shrink-only, so the render inherits the guarantee. Module drydocs-docgen — it is a renderer of the L3 class, even though its inputs are config. MERGE 2026-07-29: the user restated the ask as "one view of all of the taxonomy by source, ontology, extract and loads in one place" — the 2026-07-28 groom had scoped only loaders/order/commands/ledgers, so the taxonomy + ontology-map joins were added here rather than as a new item. The map file and taxonomy captures are already status-bearing YAML; no gate is implied (the render displays statuses, it never rules them). DONE 2026-07-29 (same session as N3): scripts/render_load_map.py emits web/src/generated/load-map.json — 18 sources in registry order (4 with ledgers / 8 pending / 6 placeholders — counts grew past the groom's 3/8/5 as the registry did; states DERIVED from locator.mapping + confirmed, so the render tracks the registry by construction), each row joining ledger state, taxonomy captures (their own top-level source: key), taxonomy-ontology-map entries with status, loaders (from N3 source_id) and the commands that run them; the 14-step sequence + ad-hoc commands + the named sourceless exemption ride along. Wired into the default-paths render_board.py run (now board + gates + matrix + load-map — one entry point). Guard tests/unit/test_load_map_json.py: committed==regenerated, every registered source has a row in order, three governed ledger states only, every concrete loader appears exactly once, sequence mirrors the declaration. BONUS FINDING the surface caught on day one: 4 map entries cite source ids that are NOT registry entries (controlm-variable-normalization, seal-pat-scrape, design-doc-outline, outlook-dl) — rendered under map_entries_without_registry_source, never dropped; registering them (or re-pointing the entries) is follow-up grooming. Suite 1160 passed / 5 skipped.

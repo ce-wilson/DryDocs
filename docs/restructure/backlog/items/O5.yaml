@@ -1,0 +1,23 @@
+id: O5
+epic: web-console
+title: 'Thin-API component scaffold: read endpoints, per-view DB routing, gated raw-Cypher, session-auth
+  stub'
+type: requirement
+module: drydocs-api
+phase: 12
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on:
+- O3
+inputs:
+- docs/decisions/0005-browser-neo4j-access-path.md
+- docs/decisions/0002-component-database-topology.md
+- agents/common/neo4j_tool.py
+- drydocs_core/
+- MODULE_MAP.md
+acceptance: |
+  A new monorepo component (working name drydocs-api; final name at scaffold, per the ADR 0002 components-on-core pattern) exists: imports drydocs_core only; its own COMPONENT_GROUP in tests/unit/test_module_boundary.py + MODULE_MAP row; server-side Neo4j driver with credentials from server env (never a browser); READ-ONLY enforced at the endpoint layer (generalizing the agents/common/neo4j_tool.py write-token guard) with per-view database routing (drydocs vs drydocs_all) decided server-side; named query endpoints shaped for the console's views (towers, drill-down, C4/graph payload) + a raw-Cypher endpoint gated to admin; a session-auth stub replaces the browser as role authority for the api path (synthetic personas server-side; enterprise OIDC remains a company-side twin per the ADR Evidence). Offline unit tests (pure handlers + duck-typed graph runner, the graph_verify idiom); build/run documented; full suite green.
+notes: |
+  Groomed 2026-07-14 from ADR 0005 Action item 3 (the ADR explicitly defers this item to the groom-backlog flow). Model fable per the component-boundary precedent (G3/G4 re-tiers): new COMPONENT_GROUP + MODULE_MAP boundary work. NOT an ADK api_server extension — shared guard pattern only. New module drydocs-api registered this groom. DONE 2026-07-14 (same day, branch feat/o5-drydocs-api, d7c21f3): drydocs_api/ — guard (code-regions write-token check; READ routing = 2nd layer), routing (fail-closed per-view DB map), queries (overview-counts, folder-census + dependency-chain from the live-proven IDEAS capture, c4-graph for O6), auth stub (personas drift-guarded against web auth.ts by a TS-parsing test; opaque tokens, role server-side), pure handlers + optional-group FastAPI wiring (poetry --with api; CORS for the console origins). REAL wiring smoke caught + fixed a PEP-563/FastAPI body-detection bug the pure tests couldn't see. 22 offline tests + TestClient smoke; suite 655/3; boundary green with the new `api` group; lock regenerated. LIVE-DB exercise deferred to O6 (Docker down today; LiveRunner is env-config only).

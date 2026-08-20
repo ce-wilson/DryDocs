@@ -1,0 +1,20 @@
+id: J21
+epic: release-infrastructure
+title: 'Source-registry pk check: duplicate ids refuse loudly, and the one-off loader: field is guarded
+  against the N3 class binding'
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/source_registry.py
+- config/source-registry.yaml
+- tests/unit/test_source_registry.py
+acceptance: |
+  (1) SourceRegistry.from_yaml REFUSES a duplicate source id with a clear error naming the id — today it silently last-one-wins overwrites, so a duplicated entry with different confirmed values would decide the D3 gate by file position; a fixture test pins the refusal and a schema test pins uniqueness on the shipped registry (the test_backlog / test_taxonomy_ontology_map house idiom — source-registry was the only per-entry registry without it). (2) Registry entries carrying a loader: field are guarded to AGREE with the named loader module's class-level source_id (the N3 binding) — no second unguarded home for the loader<->source join; today stg-app-fact is the one such entry. (3) The stale autosys-export / airflow-mwaa notes ("Placeholder… Activate (confirmed: true) only after…") are corrected to the recorded 2026-07-14 crosswalk-gate sign-off facts. Full suite green.
+notes: |
+  Groomed + claimed 2026-07-30 from the 2026-07-29 registry review (chat): the pk check answers the user's "should we add something like a pk check"; scope deliberately EXCLUDES the two gate-adjacent companions — the cross-repo identity handle (URN field) and the reconcile-guard same-id/ changed-meaning check — which stay inboxed with the N7 overlay candidate until the company's T19 gate rules. BUILT + CLOSED same day (087a685): DuplicateSourceIdError refusal + shipped-registry uniqueness pin + loader-field/N3-binding agreement guard + both stale placeholder notes corrected to the 2026-07-14 sign-off facts; suite green 1163. The user's same-day ruling "the id field as is does not work" (system vs extracted dataset per ontology domain) is captured as the registry-redesign IDEAS entry — design session + HITL, bundled with N7/URN/reconcile-guard.

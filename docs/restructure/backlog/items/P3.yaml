@@ -1,0 +1,20 @@
+id: P3
+epic: runtime-topology
+title: Hosts loader + derived RUNS_ON resolution pass (group wins; coverage-reported)
+type: task
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- P1
+inputs:
+- drydocs/loaders/sql/controlm_hosts.sql
+- config/gate-prompts/controlm-hosts-topology.yaml
+- config/gate-log.md
+acceptance: |
+  Loader MERGEs :ControlMHostGroup {data_center,name} + :ExecutionHost {nodeid} + CONTAINS_HOST {participation_type,last_capture_date} (+ DEFINED_ON only per the P1 DC-key verification); the derived pass (runs AFTER jobs+hosts) writes RUNS_ON {role: host_group|agent_host, derived:true} per the gate's group-wins rule; UNMATCHED/NULL reported as coverage, never guessed; vocabulary m3_runs_on_host_group / m3_host_group_contains_host (+ agent_host) flip planned→active with supplement blocks (test_schema green); map entries flip confirmed→applied with applied_on (test_taxonomy_ontology_map green).
+notes: |
+  CLOSED 2026-07-27. Built: ControlMHostsLoader (controlm_hosts.v1, sweep on ControlMHostGroup) + controlm_hosts.cypher; RunsOnResolutionPass (runs_on_resolution.v1) as a graph-side derived pass — coverage dataclass with the reconciles() partition invariant, counts stamped on its :JobRun (seal_attribution precedent), P4 both-match census and the multi-DC group-name ambiguity count reported alongside; ingest-controlm gained the controlm_hosts node stage + the resolution stage in the relationships phase; constraints controlmhostgroup_key (data_center,name) NODE KEY + executionhost_nodeid (EXPECTED 47→49); supplement class anchors (ControlMHostGroup, ExecutionHost) + RUNS_ON / CONTAINS_HOST LocalRelationship terms; sample controlm_hosts__sample.csv exercises all three outcomes. Live sample run (desktop, neo4jtest, drydocs DB — retro-tagged 2026-08-04 at J18; sample-reproducible: re-ingesting the bundled samples reproduces these counts, proven at the P5 close): 9 host_group / 7 agent_host / 1 UNMATCHED / 0 collisions, reconciles=true, 16 edges. DEFINED_ON deliberately NOT written — m3_host_group_defined_on stays planned on the open gate-log residuals (DC value-domain probe untranscribed producer-side + the 22-DC scope call); ledger CM_HOSTS retargeted staging:* → graph targets.

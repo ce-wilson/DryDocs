@@ -1,0 +1,18 @@
+id: L18
+epic: doc-infrastructure
+title: Component-cell comma-split shears refs holding commas/semicolons inside parentheticals — 8 of 56
+  Component.ref values truncate, corrupting (origin, ref) node identity
+type: bug
+module: drydocs-load
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/doc_traceability.py
+acceptance: |
+  _split_cell no longer shears refs whose commas/semicolons sit inside parentheticals (extend it with the same _PAREN_QUALIFIER_RE strip the section cells already use, or an equivalent explicitly-recorded authoring convention); the 8 known sheared Component.ref values load whole; a regression test pins a parenthetical-comma ref; full suite green.
+notes: |
+  Groomed 2026-07-28 from the same-day U3-census [bug] inbox line. Sits beside L17 in the doc-loader defect family. CLOSED 2026-07-28: _split_cell is now depth-0 (paren-aware) for BOTH separators (component ',' and test ';'); the parenthetical stays part of the ref — stripping would re-key every benign qualifier ref. Census reconciliation, measured against today's tree: exactly ONE committed shear existed (FR-CMI-007's K2 loader ref -> 2 corrupt values); the census's "8 of 56" counted damaged-LOOKING values broadly (balanced prose-fragment refs included — an authoring-convention matter, not a loader defect). Post-fix probe: zero unbalanced refs across all docs; 2 regression tests incl. a conformance guard over the real matrices (unbalanced parens now fail before any load). Suite 1081 green.

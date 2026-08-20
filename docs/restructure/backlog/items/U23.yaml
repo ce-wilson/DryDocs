@@ -1,0 +1,24 @@
+id: U23
+epic: self-documentation
+title: Nothing joins a loader to the Cypher it executes — draft the gate rider for a loader-to-cypher-file
+  edge, the .cypher nodes that carry zero edges
+type: task
+module: ontology
+phase: 16
+agent: ontology-mapper
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- config/gate-prompts/self-documentation-code-graph.yaml
+- drydocs_core/ontology/relationship_vocabulary/
+- config/taxonomy-ontology-map/
+- docs/RELATIONSHIP_GUIDE.md
+- docs/restructure/03-hitl-sme-flow.md
+- drydocs/loaders/
+- knowledge/depgraph-snapshots/README.md
+acceptance: |
+  A gate rider is DRAFTED and nothing else. Drafting decides nothing (the G27 / W1 / N10 / G95 precedent): no vocabulary entry leaves `planned`, no edge is written, and if the gate does not sit, the drafted rider IS the deliverable. VIA THE GATE is the whole point -- a new relationship type is an ontology decision under CLAUDE.md section 6, never an import convenience. It carries four things. (a) THE FACT, RE-MEASURED rather than copied from the 2026-08-02 note that raised it: `drydocs/loaders/` holds .py loaders, their .cypher files and their .sql side by side; the .cypher files are :CodeModule nodes with NO edges at all, while each loader names its Cypher as a literal path in Python (the CYPHER_DIR / "<name>.cypher" idiom). The prompt states the current counts and the date it counted them. (b) THE EDGE QUESTION, put as a question: what does the edge MEAN -- "executes", "reads as a resource", something narrower -- and does the .sql beside it carry the same edge or a different one? Direction, cardinality, and whether one label with a role property beats two labels (the documented RUNS_ON-overload risk is the standing worked example on this side). (c) THE EMITTER, because the edge has nowhere to come from today: the depgraph scanner does not emit it, so the prompt says where it would -- a static read of the CYPHER_DIR literal, in the instrument (the sibling repo, which means an expected_commit bump) or in the loader that reads the snapshot -- and what each costs. This is the clause that stops the rider being signed with no path to a first row. (d) WHAT IT UNLOCKS AND WHAT IT DOES NOT, stated plainly so the item is never judged against a promise it did not make: gate `self-documentation-code-graph` section H5 already records that :CodeModule to the OPERATIONAL graph -- "which module loads this Control-M job" -- is NOT delivered by that gate and needs a second item, precisely because the module-to-label mapping lives in the loaders' Cypher rather than in their imports. A loader-to-cypher edge is the FIRST half of that join and not the join; the prompt says so.
+notes: |
+  Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-47, which had been parked with "gate section H5's named future item" as its trigger. Promoted as a DRAFT and only a draft: the entry's own two blockers are unchanged -- the instrument emits nothing and the loader could not load the edge if it did -- so what is groomable is the QUESTION, put to the SME with the evidence attached, rather than a build that would have no input. MODULE ontology: the deliverable is a relationship-vocabulary decision. The emitter change the rider scopes is drydocs-load / graph-infra work and belongs to whatever item the gate produces, not to this one. p3 on the entry's own Low priority -- the nodes have sat edgeless since 2026-08-02 with no consequence beyond an unanswerable query, and the H5 question it feeds is not scheduled.

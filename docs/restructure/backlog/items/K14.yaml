@@ -1,0 +1,22 @@
+id: K14
+epic: seal-attribution
+title: 'Composite-key conformance sweep: every serialized (folder_id, job_id) pair uses the ctlm_id dot
+  form'
+type: task
+module: drydocs-web
+phase: 9
+agent: main
+model: sonnet
+priority: p3
+status: done
+closed: 2026-08-04
+depends_on: []
+inputs:
+- knowledge/standards/technology/composite-key-serialization.md
+- web/src/
+- drydocs_api/
+- drydocs/loaders/
+acceptance: |
+  Every surface that renders the ControlMJob (folder_id, job_id) node key as ONE string conforms to the composite-key-serialization standard (SME-ruled 2026-08-03): the ctlm_id dot form folder_id.job_id — no colon/pipe/underscore sibling grammars. Known stray at grooming: the web mapping tray's internal React list key (MappingsRoute.tsx, `${r.folder_id}:${r.job_id}`). The sweep covers web/src, drydocs_api and the loaders; each hit is either converted or recorded in the standard's stray list with why it is exempt (adhoc profiling SQL is pre-exempted by the standard). Suite green.
+notes: |
+  Groomed 2026-08-03 from the SME's two in-chat rulings during the K9 session: (1) the dot composite IS the standard (the psgmgr ctlm_id convention, P2 gate §B precedent), (2) key-cell PAIRS join with ':' not ';' (semicolon is the SQL statement terminator). Ruling (2) was BUILT the same session — _parse_key flipped while zero manual CSVs were committed, so no migration; this item owns only the remaining VALUE-form sweep. The parked internal-side ctlm_id ripple (docs/next-internal-session.md item 4 — which other CM_ views carry the derived column) stays separate: it needs Oracle access. CLOSED 2026-08-04 (desktop): swept web/src, drydocs_api and drydocs/loaders. TWO strays converted to the dot form — the known MappingsRoute.tsx colon-joined React key (plus its interface comment) and a second the sweep found: the static mapping demo's slash join (mapping_demo.html). No other sibling grammars; the conforming surfaces (controlm_dependencies_recursive.sql, the derived-deps cypher) verified unchanged. The standard's stray list updated to record the sweep. Web build green.

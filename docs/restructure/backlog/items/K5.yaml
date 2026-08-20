@@ -1,0 +1,24 @@
+id: K5
+epic: seal-attribution
+title: Product Cabinet attribution model (product-scoped ProductRole scheme + cross-role reporting edges
+  + DevTeam matrix)
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/gate-log.md
+- config/taxonomy/lob-product-team.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+acceptance: |
+  A ProductRole skos ConceptScheme (Area Product Owner, Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead; CTO shared with the TOMRole scheme) is proposed and SME-confirmed via its OWN HITL gate, scoped to the PAT hierarchy nodes (:Product / :AreaProduct, NOT :Application), with Area Product Owner explicitly NOT tying to a business application; the cross-family reporting edges (Tech Partner manages Application Owner; TOM Information Owner reports to Data Owner; Data Certifier relates to the app Information Owner) are modeled as org:reportsTo-style edges or explicitly recorded as deferred; the DevTeam -> BusinessApplication matrix (M:N) is confirmed. No graph write before the gate; drift guards green.
+notes: |
+  Split out of K3 at the 2026-07-10 gate (SME "ok to split"). Product Cabinet is PAT/Product-layer, distinct from the SEAL app reshape (K3/K4). CTO is the shared concept between the TOMRole and ProductRole schemes. Related to Epic C (catalog hierarchy) — the :Product/:AreaProduct nodes come from config/taxonomy/lob-product-team.yaml. DONE 2026-07-20 (in-session chat gate, run off the 2026-07-19 gate-prep; page rendered via gate_pages.py; 24 confirmed / 0 edited / 0 rejected — gate-log 2026-07-20). SME AMENDMENTS vs this item's original wording: (a) CTO is NOT shared — the families are INDEPENDENT (shared-cto dropped for now; rename history: area-product Tech Partner formerly named "CTO" in SEAL, SEAL's CTO now the product-level role — supersedes the 2026-07-10 §B record); (b) scheme FIXED; tech_partner joins area_product_owner as :AreaProduct-only; (c) BOTH attribution forms confirmed (reified chain + collapsed catalog_cabinet_attributed_to — deviation from the K4 qualified-only resolution); (d) reporting edges recorded DEFERRED (option b — internal-side once a person-level cabinet extract exists); (e) DevTeam<->BusinessApplication M:N confirmed. Map entry confirmed; 3 vocab entries + ProductRole classification stay planned -> K6 supplement follow-up; no graph write; suite 735.
+annotations:
+  status: DONE 2026-07-20 — gate product-cabinet-attribution §F SIGNED OFF (in-session chat gate; gate-log
+    2026-07-20)

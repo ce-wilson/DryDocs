@@ -1,0 +1,25 @@
+id: U9
+epic: self-documentation
+title: Scanner takes the WHOLE REPO by default + drops git-ignored paths, and the 101-file snapshot series
+  retires to one
+type: task
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-02
+depends_on:
+- U7
+- U8
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- knowledge/depgraph-snapshots/filter_ignored.py
+- drydocs/loaders/code_snapshot.py
+- drydocs_core/models/code_snapshot.py
+- tests/unit/test_code_snapshot_loader.py
+acceptance: |
+  snapshot.ps1 scans the repository root by default (the hand-maintained root list survives only behind -CodeOnly, writing a DIFFERENT filename so the two shapes cannot collide); a post-processing step drops git-ignored paths through `git check-ignore`, so the rule set is the repo's own and cannot drift from it; exactly one snapshot stays committed; and the loader accepts a tree-shaped artifact, strips the repository prefix from file_id so a mode switch MERGEs instead of forking the ruled key, and SKIPS-AND-COUNTS kind:'dir' nodes rather than inventing a node class. Full suite green.
+notes: |
+  Groomed RETROSPECTIVELY 2026-08-02 — the work landed at e3f65af on SME direction ("update the scanner to pull all files, so that we can create the tree. the old dep snapshots can be removed this was the intent") and three committed files already cite "U9" by id. No sibling-repo change was needed: depgraph already reported tree: true, and tree mode is a strict SUPERSET. WHY THE FILTER: depgraph excludes .git and .venv but knows nothing about .gitignore, so the first whole-repo scan collected 649 ignored nodes, 386 of them .ruff_cache — ~18% of the artifact. Filtered in snapshot.ps1 rather than the loader so the committed JSON, viewer.html and the graph all show the same thing. Two Windows traps, both load-bearing: text=True translates \n to \r\n into stdin so git receives '.env\r', and in line mode git QUOTES unusual names and hands back '".env\r"' — either alone made the filter report "no git-ignored paths" against a snapshot holding 386. `-z` with binary input kills both. TWO DEFECTS INTRODUCED AND FIXED IN-RUN, both live-verified: the key FORKED (tree file_ids arrive as 'drydocs/drydocs/cli.py'; loaded raw that made two :CodeModule nodes for one file, side by side, NEITHER SWEPT — caught by asking why the count read 2410 instead of 2200), and `project` lost its meaning (it was "the scan root, one of six", a concept that existed only because of the hand-maintained list; the first fix was worse than the bug, labelling README.md a scan root). Result: 1457 :CodeModule (was 210), 458 IMPORTS, and all 45 .cypher files present as nodes for the first time. The tree is in the ARTIFACT (251 directories, 1956 CONTAINS) and deliberately NOT in the graph — U10 owns that gate. Doc drift left behind: U12.

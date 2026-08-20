@@ -1,0 +1,22 @@
+id: G3
+epic: component-topology
+title: Rebase the remediation spinoff onto drydocs-core
+type: requirement
+module: drydocs-remediation
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on:
+- G2
+inputs:
+- docs/decisions/0002-b-spinoff-rebase-checklist.md
+- ce-wilson/DryDocs-v0-archive@controlm-spinoff
+acceptance: |
+  Per 0002-B: drydocs-remediation runs detect → transform → prove → Jira using ONLY drydocs-core for parsing + read-only corroboration; no-graph-write test, Jira-only test, and offline-equivalence proof all pass; boundary test holds for the new package.
+output: remediation/ (drydocs-remediation)
+notes: |
+  ADR 0002 follow-up #3; checklist = 0002-B. Re-home its Control-M parsing onto core (drop the spinoff's own parser); keep only remediation logic. Writes NO graph; Jira = SoR. See reconcile-port skill. On done: mark the controlm-spinoff archive superseded. RE-TIERED opus -> fable 2026-07-10 (user call): the matrix top slot (boundary-changing judgment) now points at the Mythos-class tier; G2 (same class) ran on fable end-to-end. MODELS enum extended in test_backlog.py + validate.py; G4/K4 are re-tier candidates at their next groom touch.
+progress: |
+  2026-07-10 — PULLED; 0002-B preconditions all ticked (ADR 0002 ACCEPTED; core physical; archive readable at 3e6a39a). STEP 2 INVENTORY DONE (0002-B §4 filled): the archive has NO remediation code — its IP is the R1-R29 rules registry (the Gate-2/Gate-3 rule source) + the governance corpus (10 docs, NOT carried) + 6 remediation plan docs (~630 lines). Parser diff: current core strictly ahead, zero archive-only deltas -> §2 step 3 is a no-op, no core PRs. 2026-07-10 (later) — DOC PORT DONE: 17 docs VERBATIM -> internal/remediation/ (+governance/), classification Internal (content check found real folder/job/QR/VR values throughout — nothing knowledge/-eligible unsanitized); provenance README records the rule (unratified R-rules stay gate-bound; TDD wins on conflict). HELD for user classification review: governance/escalation-scim-reference.md + scim-hpsm-queue-registry.md (candidate Internal-Confidential). Held-docs decision: KEPT OUT (user call, same day) — re-entry is G10 (sanitized). 2026-07-10 (later) — §2 STEP 1 SCAFFOLD DONE (in-monorepo, user call): top-level drydocs_remediation/ package (naming per the drydocs_core convention, note in 0002-B) — formats (DefinitionFormat seam) / detect / transform / equivalence / jira (only side-effect boundary), contracts in docstrings, bodies NotImplementedError; pyproject + boundary-test `remediation` group + MODULE_MAP row + test_remediation_scaffold.py. 2026-07-10 (later) — M0 SLICE IMPLEMENTED: TranscriptDefinitionFormat (gate-1 fallback; XML impl BLOCKED on vendor schema acquisition — corpus stub), R1 dot-smuggling detector (core classifier), order-paired equivalence proof (core resolver, __DRYDOCS_WATCH__ probe). Engine run on the REAL M0 unit reproduces the worked example verbatim — legacy baseline clean, R1 fires, shipped modern rewrite still diverges (MATCH=False) — recorded internal/remediation/m0/engine-run-2026-07-10.md; sanitized twins pinned as test_remediation_m0.py (6 tests). Verdict PENDING A3 ground truth + B1 var.text rule (company-side; core resolver deliberately untouched). 2026-07-10 (later) — TIER-1/HANDOFF SLICE DONE (TDD FR-REM-3/6 + NFR-REM-1; archive "M1 repo split" noted SUPERSEDED by 0002-B): ratified-only Tier-1 engine + canonical-rename rule (idempotent, equivalence- preserving; unratified skipped loudly; rule values company-side, registry shape = OQ-2 open), Jira handoff boundary (pure render, JiraSubmitter sole wire, unproven packages refuse, ownership surfaced-not-guessed), structural no-graph-write guard; TDD traceability matrix statuses updated + re-rendered. 2026-07-10 (close) — CORROBORATION WIRED (reconcile_variables + ReadOnlyGraph: the sole graph path, write Cypher refused BEFORE the driver — the runtime half of NFR-REM-1; live schema queries = Track-2 company-side) and G3 CLOSED: 0002-B §2/§3 all ticked, status DONE; controlm-spinoff archive recorded SUPERSEDED in ADR 0002 (stop maintaining; readable as source material only). Acceptance met: detect -> transform -> prove -> Jira all core-only; no-graph-write (structural + runtime), Jira-only, equivalence tests pass; boundary holds. CARRIED FORWARD (not G3): Tier-2 agentic lane (FR-REM-4, TDD), XML I/O (schema acquisition), A3/B1 ground truth + the real M0 unit's verdict (company-side), M2 generalization — TDD tracks these.

@@ -1,0 +1,25 @@
+id: Q4
+epic: docmeta
+title: 'Docmeta gate session + the docmeta ADR: component name (docmeta vs deepdoc fold-in), drydocs_docs
+  DB, planned doc-graph vocabulary entries'
+type: task
+module: ontology
+phase: 14
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on:
+- Q3
+inputs:
+- knowledge/upgrade-plans/docmeta-component.md
+- knowledge/upgrade-plans/docmeta-p0-verdict.md
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- docs/decisions/
+- config/gate-log.md
+acceptance: |
+  The docmeta ADR is authored (next free number — the plan's reserved "0004" was taken by the software-registry ADR) adopting what the P0 verdict names, and is SME-accepted with the status flip recorded; the gate session decides component name (docmeta vs drydocs-deepdoc fold-in), the drydocs_docs DB target, and the curation-ladder->gate mapping; the plan's doc-graph relationship entries (HAS_DOCUMENT, HAS_CHUNK, DESCRIBES, GOVERNED_BY) are reconciled against the already-active docs_* vocabulary (no double registration) and any new entries land status: planned ONLY — nothing flips confirmed outside the gate; config/gate-log.md carries the session record.
+notes: |
+  Groomed 2026-07-18 — docmeta plan P1. Model fable per the matrix: component boundary + ontology decisions (the G3/O5 precedent). The bmc-docs gate (2026-07-08) already activated docs_chunk_part_of / docs_first_chunk / docs_next_chunk / docs_describes — the gate reconciles, not re-registers. DONE 2026-07-18 same day: ADR 0006 authored PROPOSED, SME reviewed in-session and ACCEPTED AS WRITTEN on all four recommended options — (a) separate drydocs-docmeta component (deepdoc consumes); (b) NEW dddocs DB (drydocs_docs renamed to the live dd* convention; bmc-docs corpus re-targets at P4 via idempotent reload); (c) vocabulary reconciled: HAS_CHUNK superseded by the active lexical shape, docs_has_document + docs_governed_by registered planned (+ DocSource node classification), chunk-level DESCRIBES deferred to its own gate at extraction design; (d) curation ladder -> gate mapping + the P0-verdict adoption list. Gate-log entry appended; decisions README row added; plan §1.1 annotated. Nothing flipped active — both new entries are K2-pattern flips-are- follow-ups at their P4+ loader builds.
+annotations:
+  status: DONE 2026-07-18 — gate SIGNED OFF in-session, ADR 0006 ACCEPTED

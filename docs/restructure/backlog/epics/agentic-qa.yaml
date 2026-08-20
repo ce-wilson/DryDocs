@@ -1,0 +1,13 @@
+id: agentic-qa
+letter: R
+title: Agentic Q&A console
+order: 17
+groom_log:
+- date: '2026-07-23'
+  note: |-
+    ── Epic R — Agentic Q&A console (ADR 0007; phase 15) ──────────────────────
+    Groomed 2026-07-23 from the llm-graph-builder vs knowledge-graph-of-thoughts
+    comparative analysis (dossier linked in ADR 0007). Tiered read-only agent:
+    QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts
+    loop. O20 (UI zero graph writes) stands throughout the epic.
+  attached_at: R1

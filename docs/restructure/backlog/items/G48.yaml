@@ -1,0 +1,22 @@
+id: G48
+epic: component-topology
+title: 'resolve-cmdline-staging: populate the G39 store''s cmd_line_resolved from XML-staged variables
+  via the shared resolver (store schema v3 adds folder_name + resolution provenance)'
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G46
+- G47
+inputs:
+- drydocs/cmdline_staging.py
+- drydocs_lineage/extractors/controlm_xml.py
+- drydocs_core/controlm/resolver.py
+acceptance: |
+  A CLI verb `drydocs resolve-cmdline-staging` joins XML-staged folder/job variables to job_detail rows on (data_center, folder_name, job_name) and populates cmd_line_resolved via resolve_command_line (G46) — cmd_line stays VERBATIM beside it (guardrail 2), and NEW provenance columns record resolution_source, substituted names, and unresolved residue per job. Store schema bumps to v3: job_detail gains folder_name (graph j.parent_table rides the G39 export; a v2 file is refused by resolve/parse — re-export). Coverage counted by reason, never silent: jobs matched/resolved, no-xml-match, ambiguous-match (two XML jobs hit one store row — skipped, counted), nothing-to-substitute, unresolved-residue. G40 parse benefits unchanged (parsed_from already records resolved|raw). NO graph writes; the store stays under the G19 data root; the RETIREMENT and re-export-clears caveats stay intact. The psgmgr-vs-XML precedence ruling stays OPEN (guardrail 3): this verb fills a nullable derived column and decides no source-of-truth question.
+notes: |
+  CLAIMED in_progress 2026-07-29 (deps G46/G47 closed same session; pushed-claim discipline). Groomed 2026-07-29 from the XML-fed cmd-line resolution idea. This deliberately amends G39's "variables pull stays deferred" sequencing as its own item (never folded silently) and touches T16: if XML becomes the standing feed, the CM_DEF_VJOB_DETAIL retirement note gains a second path — recorded here, ruled at the precedence question. CLOSED 2026-07-29 same session: store v3 (job_detail.folder_name from graph j.parent_table — psgmgr projection gains J.PARENT_TABLE too; resolution_quality provenance table: verdict/resolution_source/ matched_via/substituted/unresolved/canonical-tokens JSON; older stores refused by resolve AND parse with a re-export hint). resolve_job_detail takes the XML extract DUCK-TYPED (the module-boundary seam: cli.py, the exempt composition root, wires drydocs_lineage's extractor in; cmdline_staging imports only core) and resolves the STORE-verbatim cmd_line via resolve_command_line — the XML job's own CMDLINE is compared, counted on disagreement (cmd_line_mismatch = measured precedence evidence), never substituted. Verdicts: resolved/residue/nothing_to_substitute/ no_xml_match/ambiguous_match (subfolder twins skipped)/no_cmd_line + dc_fallback and no_folder_name counters; deterministic re-runs (column + quality table cleared first); re-export clears both. CLI verb resolve-cmdline-staging (run-log v1, run BEFORE parse). 8 new tests incl. the full chain resolve-then-parse (parsed_from = resolved for the %%VAR-launcher job). Suite 1144 passed / 5 skipped. NOT DONE HERE by design: the psgmgr-vs-XML precedence ruling (guardrail 3, IDEAS question) and any graph write (G22 terminus).

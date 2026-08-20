@@ -1,0 +1,20 @@
+id: U7
+epic: self-documentation
+title: 'snapshot.ps1 records and probes its own instrument: depgraph {commit, branch, dirty} in the meta
+  header + a capability probe so a regressed scanner cannot write a silent snapshot'
+type: bug
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- config/dev-environment.yaml
+- knowledge/depgraph-snapshots/README.md
+acceptance: |
+  snapshot.ps1 emits a depgraph {commit, branch, dirty} block inside the meta header (gathered the way the DryDocs git block already is) AND refuses to scan when the checked-out depgraph lacks the capability the run needs — a capability probe, not a version string: multi-root resolution for a normal scan, --tree support when -Tree is passed. The expected instrument revision is recorded in config/dev-environment.yaml. A snapshot taken with a regressed scanner can no longer be written silently (the 105-edge near-commit of 2026-07-28).
+notes: |
+  Groomed 2026-07-28 pm (post-UI-merge pass) from the laptop's instrument-unpinned [bug] line (fd2834d). The sibling-repo fork merge (depgraph feat/controlm-lineage + feat/p0-vector -> main) stays inboxed — different repo, user's call. Pairs with U8. LANDED 2026-07-28 (laptop): probe_instrument.py reports capabilities as JSON (behavioural, injectable importer, 16 unit tests incl. a live check that FAILS when this machine's instrument has regressed); snapshot.ps1 refuses with exit 1 and writes nothing — proven against the real -Tree gap on feat/controlm-lineage; meta.depgraph records commit/branch/dirty/version/capabilities. The fork merge stays inboxed (different repo, user's call).

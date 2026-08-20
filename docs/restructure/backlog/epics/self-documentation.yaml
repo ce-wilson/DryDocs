@@ -1,0 +1,41 @@
+id: self-documentation
+letter: G/U
+title: Self-documentation
+order: 19
+groom_log:
+- date: '2026-07-27'
+  note: |-
+    ── Epic U — Self-documentation (phase 16; opened by G33, which keeps its G id) ──
+    U1-U3 = the three phases of docs/reviews/code-graph-review-plan.md (groomed
+    2026-07-27 from the IDEAS hook, same session as the G33 build). U4/U5 = the
+    plan's two OPTIONAL skill-edit follow-ups, gated on their phase proving the
+    queries earn their keep. All read-only analysis — findings route through
+    IDEAS, never direct backlog/graph edits; none is HITL.
+  attached_at: U1
+- date: '2026-07-28'
+  note: |-
+    --- 2026-07-28 pm post-UI-merge groom: instrument hardening (U7/U8), the SME
+    --- landing revision + DataLens/DSI continuity (O35-O41, B5), the agent query
+    --- surface (R9), process fixes (J18/J19), doc-loader guard (L20), runbook
+    --- Rev 4 (L21). DL-7 was a merge, executed on-branch (bc61408) pre-groom.
+  attached_at: U7
+- date: '2026-08-02'
+  note: |-
+    ── appended at the 2026-08-02 groom run (weekly inbox + the self-doc session) ─
+    Nine items. TWO ARE RETROSPECTIVE CLOSES (U9, C21): that work landed at e3f65af
+    before any item existed, and committed code already cites "U9" as an id —
+    filter_ignored.py's first line, snapshot.ps1's U9 block, and the package-layer
+    gate page — an id nothing defined. The groom's own cross-check then found what
+    rode along unseen: G51. U10 IS A GATE SESSION (never auto-decided); U11 drafts a
+    gate prompt and decides nothing; C22 consolidates two inbox lines onto the same
+    three files rather than booking two passes over them.
+  attached_at: U9
+- date: '2026-08-09'
+  note: |-
+    --- 2026-08-09 weekly groom: the persona Run-2 findings (U18 docmeta scope
+    --- gap, U19 scanner sys.path roots, L27 cite guard, V11 docmeta runbook),
+    --- the four post-G22 data-profile gate SESSIONS Idea-85 asked to be given
+    --- ids (G62-G65), the company docmeta port divergence (J40), and the two
+    --- halves of the business-layer location experiment that are not Z2's
+    --- (C28 org structure, Q17 corpus reshape).
+  attached_at: U18

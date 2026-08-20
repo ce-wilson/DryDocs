@@ -1,0 +1,16 @@
+id: A1
+epic: reference-hygiene
+title: Audit reference registry paths for staleness
+type: chore
+module: reference
+phase: 0
+agent: reference-librarian
+model: haiku
+priority: p2
+status: done
+depends_on: []
+inputs:
+- reference/REGISTRY.yaml
+acceptance: every entry marked ok/stale; stale paths fixed or flagged
+notes: 'Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified:
+  2026-06-21 in REGISTRY.yaml.'

@@ -1,0 +1,20 @@
+id: D3
+epic: config-loaders
+title: Fail fast when loading an unconfirmed source
+type: task
+module: config
+phase: 3
+agent: pipeline-config
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- C4
+- D1
+inputs:
+- config/source-registry.yaml
+- drydocs/cli.py
+acceptance: loading a source with confirmed:false fails fast with a clear message
+output: drydocs_core/source_registry.py
+notes: |
+  Done 2026-06-21. New drydocs_core/source_registry.py: SourceRegistry.require_confirmed(id) raises UnconfirmedSourceError (clear message + crosswalk pointer) for confirmed:false or missing-flag (fail-closed), UnknownSourceError for undeclared ids. cli.py: LOADER_SOURCE map + _gate_source() wired into load / refresh-reference / ingest-controlm — gate fires BEFORE any adapter/Neo4j touch (exit 2). test_source_registry.py (6) incl. a CliRunner test proving `drydocs load` fails fast for an unconfirmed source. 180 passed.

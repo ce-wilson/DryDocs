@@ -1,0 +1,23 @@
+id: L11
+epic: doc-infrastructure
+title: 'Design-doc feedback: per-subsection annotate controls when a section has >2 subsections'
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L5
+inputs:
+- drydocs/design_doc.py
+- drydocs/doc_outline.py
+- docs/design/feedback/README.md
+- tests/unit/test_design_doc.py
+acceptance: |
+  when a rendered section contains MORE THAN TWO subsections (nested sub-headings like 1.a/1.b/1.c/1.d, or a numbered step list 1/2/3), the screen .html renders an annotate (pencil) control on EACH subsection, not just the section header, so the exported feedback keys to the specific subsection (tighter control); each subsection control uses a STABLE derived anchor (parent anchor + deterministic subsection suffix — never positional-only, so notes survive re-renders and subsection insertion), and that derived-anchor namespace is accepted by the feedback_yaml format / doc_outline anchor validation and documented in docs/design/feedback/README.md; sections with two or fewer subsections keep the single section-level control; print output unchanged; render stays deterministic; test_design_doc.py extended (cases: 3+ sub-headings, numbered step list, <=2 subsections unchanged); full suite green.
+notes: |
+  Groomed 2026-07-09 from a chat note (follow-on to L10, same review pass). Threshold is the user's ">2" (examples given: 1.a-1.d, steps 1-3); confirm the exact boundary (>2 vs >=2) with the user at implementation if it matters in practice. The anchor derivation is the design core: feedback re-attaches by anchor, so subsection anchors must be as stable as the authored section anchors.
+progress: |
+  2026-07-09 — DONE. design_doc.py: _inject_subsection_anchors (screen-only post-pass) derives <parent>--<slug-of-subsection-text> ids for sub-headings one level down and for top-level items of numbered lists, when the group has >2 members; anchored subheadings count toward the threshold but keep their authored id; dedupe -2/-3 deterministic; JS attach() gained an LI branch (button afterbegin / box beforeend). doc_outline.py: DERIVED_ANCHOR_SEP + feedback_anchor_valid (a derived note degrades to its parent section if the slug changes; "--" now reserved in authored ids). Verified at runtime (headless-Edge DOM dump: 29/29 ids present, controls on all derived h3s + 9 list items; print surface byte-identical to pre-change). 7+3 new tests; feedback README documents the namespace.

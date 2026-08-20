@@ -1,0 +1,21 @@
+id: N2
+epic: source-column-mappings
+title: 'Column-ledger drift guards: coverage vs profile census + SQL SELECT-list parse + registry pointer'
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- N1
+inputs:
+- config/source-mappings/
+- drydocs/loaders/sql/
+- config/source-registry.yaml
+- drydocs_lineage/extractors/controlm_inventory.py
+acceptance: |
+  Per doc 08 Phase 1: coverage test (every profiled column accounted for; new columns since last census must be dispositioned by name, never swept); SQL drift guard (loader SELECT ... AS list set-equals the ledger's projected columns; strict regex first, sqlglot only if it lies); source-registry entries gain a mapping: pointer and a test requires a ledger for every confirmed source. The guard ALSO covers the lineage extractor's CSV column contract — the header names drydocs_lineage/extractors/controlm_inventory.py expects must set-match the controlm_jobs.sql aliases (today they are duplicated as strings and a renamed alias fails by silent drop). Full suite green.
+notes: |
+  Doc 08 Phase 1. Profile-census refresh via the db skill is doc-08 Phase 2 (not this item). MERGED 2026-07-11: G9 tech-debt finding #2 (extractor CSV-contract drift) — same guard, one more consumer of the same SELECT list. DONE 2026-07-11: tests/unit/test_source_mapping_drift.py — (1) SQL drift guard: strict paren-aware item grammar (QUAL.COL AS alias source items; expression items classify derived, internals deferred like WHERE parsing); per-object UNION across loader SQLs set-equals the ledger's projected columns (holds exactly on the real ledger — CM_DEF_VJOB spans jobs+variables SQLs; folders' H alias = the header-row join); (2) census reconciliation via new census_failures() accessor method (pending -> [], recorded census must balance explicit + sweep count:, so new columns disposition BY NAME); (3) registry test: every confirmed source has a locator.mapping ledger or sits on the frozen shrink-only LEDGER_PENDING list (seal/catalog/software- registry/bmc-docs — pre-doc-08 legacy, named debt); (4) the merged extractor CSV contract: CSV_CONTRACT constant AST-matched to the code's row.get() keys and subset-checked against controlm_jobs.sql aliases.

@@ -1,0 +1,26 @@
+id: J23
+epic: release-infrastructure
+title: 'Classification collapses to three levels (External / Internal-Public / Internal): drop the Internal-Confidential
+  tier everywhere, publish boundary unchanged'
+type: chore
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/classification.yaml
+- config/source-registry.yaml
+- config/doc-source-registry.yaml
+- tests/unit/test_classification.py
+- tests/unit/test_doc_registry.py
+- PUBLISH-BOUNDARY.md
+- internal/registry-redesign/REGISTRY-PLAN.md
+acceptance: |
+  config/classification.yaml defines exactly three levels (External, Internal-Public, Internal) with the publish rule unchanged (publishable = External + Internal-Public); no entry in config/source-registry.yaml or config/doc-source-registry.yaml carries Internal-Confidential (relabels to Internal, keeping a confidential-handling comment where rosters/SIDs/ SEAL values warrant it); test_classification.py + test_doc_registry.py updated (CURATION_BY_TIER T4 becomes sme-confirm — the +confidential rider retires with the level); the internal/ capture READMEs (fcdo-reference, registry-redesign) restate Internal; PUBLISH-BOUNDARY.md records the collapse and that a fourth tier can return if a real handling difference ever materializes. Full suite green.
+notes: |
+  Groomed 2026-07-31 from the same-day inbox chore — registry-plan Phase 1 (internal/registry-redesign/REGISTRY-PLAN.md §Classification). The DECISION is a recorded user ruling 2026-07-31 ("for now leave as External or Internal Public, or Internal") — not a gate question: the tier bought handling ceremony, not a different publish behavior. Deliberately allowed to land ahead of the N7 schema-v2 gate — it removes machinery, adds none. ADDED RATIONALE (user, 2026-07-31 pm): Internal-Confidential actively PREVENTS storing relevant information — its pointer-never-the-data discipline pushes real values (SEAL ids, object names, report coordinates) out of the repo entirely, so the internal/ twins stay thinner than the work needs. After content moves under internal/, its classification changes to Internal and the real values may live there in-tree — the private repo + publish boundary is the protection, not the extra tier. Per-source out-of-tree rules (rua bundles, view exports) survive where SIZE or PII justifies them — noted per source, no longer tier-forced. CLOSED 2026-07-31 (desktop): classification.yaml = exactly 3 levels (Internal's description absorbs the confidential material + the handling-note rule); 7 source-registry + 1 doc-registry entries relabeled Internal with confidential-handling comments kept; 3 taxonomy captures (business-application, oracle-schemas, lob-product-team) relabeled; test_classification level set + test_doc_registry CURATION_BY_TIER T4=sme-confirm updated; CLAUDE.md §3 + PUBLISH-BOUNDARY.md + config/README.md tables collapsed to 3 rows with the tier-can-return note; fcdo-reference README/ALIGNMENT-PLAN headers restated Internal; live code/test docstrings reworded (9 files); gate-log/gate-prompts/whitepaper/port archives left as HISTORY (records of what was signed, not live guidance). Renders refreshed (load-map + enforcement matrix pick up the new labels). Suite 1188.
+annotations:
+  status: claimed + closed 2026-07-31 (desktop session, pushed claim before work)

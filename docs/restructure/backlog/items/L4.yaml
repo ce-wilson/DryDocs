@@ -1,0 +1,22 @@
+id: L4
+epic: doc-infrastructure
+title: Deterministic PDF step (.print.html -> .pdf, pinned headless)
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L3
+inputs:
+- scripts/render_design_doc.py
+- PUBLISH-BOUNDARY.md
+- config/classification.yaml
+acceptance: |
+  scripts/doc_to_pdf.py renders .print.html -> .pdf via a PINNED headless-Chrome invocation with fixed flags; the PDF /CreationDate is normalized so re-runs are STRUCTURALLY identical (stable layout + anchor positions — NOT byte-identical, by design, per the user's intent); a documented regeneration command; the blank .pdf is build-on-demand (gitignored or Rev-boundary commit only) per PUBLISH-BOUNDARY, while scanned annotated PDFs are captured input; full suite green.
+notes: |
+  The paper bridge: print -> pen -> scan. The blank pdf is a reproducible throwaway; the SCANNED pdf is the valuable artifact that L6 feeds back by anchor.
+progress: |
+  2026-07-08 — DONE (user sign-off). drydocs/doc_pdf.py (browser discovery Edge/Chrome-first — Brave HANGS headless on this box, 2x 180s; Edge rendered in 3.5s; fixed --headless=new print flags; /CreationDate+/ModDate normalized) + scripts/doc_to_pdf.py + tests/unit/test_doc_pdf.py (4). PDF is BUILD-ON-DEMAND (option A): docs/design/*.pdf gitignored + untracked. Structurally reproducible, not byte-identical (trailer /ID varies, by design).

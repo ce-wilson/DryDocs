@@ -1,0 +1,19 @@
+modules:
+- drydocs-core
+- drydocs-load
+- drydocs-review
+- drydocs-plan
+- drydocs-docgen
+- drydocs-lineage
+- drydocs-deepdoc
+- drydocs-remediation
+- drydocs-web
+- drydocs-api
+- drydocs-agents
+- drydocs-docmeta
+- reference
+- taxonomy
+- ontology
+- config
+- graph-infra
+- docs

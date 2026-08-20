@@ -1,0 +1,18 @@
+id: J6
+epic: release-infrastructure
+title: Drop the unused streamlit dependencies (streamlit + streamlit-agraph)
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- pyproject.toml
+- poetry.lock
+acceptance: |
+  streamlit and streamlit-agraph are removed from pyproject.toml [tool.poetry.dependencies] and poetry.lock is regenerated (poetry remove / poetry lock); a repo grep confirms neither is imported anywhere; pandas and pypdf are RETAINED (pandas kept deliberately for analytical work per drydocs_core/adapters/csv_adapter.py; pypdf is used by scripts/ingest_jpmc_reports.py); poetry run pytest -q stays green and drydocs --help works.
+notes: |
+  Groomed 2026-07-09 from the parked unused-deps IDEAS line, SCOPED after verification: the original note also named pandas (intentional — csv_adapter.py:6-8) and pypdf (now imported by scripts/ingest_jpmc_reports.py:27), so only the two streamlit packages are actually dead (imported nowhere). Removes the heaviest unused install weight. DONE 2026-07-11: poetry remove streamlit streamlit-agraph (lock regenerated, transitive deps pruned); import scan clean; pandas + pypdf retained; suite 566/3 + drydocs --help green.

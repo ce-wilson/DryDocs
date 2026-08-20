@@ -1,0 +1,20 @@
+id: J50
+epic: release-infrastructure
+title: 'gates.json''s `unblocks` edge is a mention scan: any prose citation of a gate becomes a dependency
+  edge (the J28 class, opposite direction)'
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- scripts/render_gates.py
+- web/src/generated/gates.json
+- docs/restructure/backlog.yaml
+acceptance: |
+  FOUND BY CAUSING IT (2026-08-19): writing K23's runbook-baseline note, which HANDS INFORMATION TO the document-supersession gate, made gates.json show that gate as UNBLOCKING K23 -- because render_gates.py's unblocks() serialises each backlog item to JSON and matches the gate slug ANYWHERE in it, so a prose citation becomes a dependency edge. In that instance the edge is defensible by luck (the runbook replacement really does want SUPERSEDES signed), which is what makes the pattern the defect rather than the instance. The SAME FILE already rules this distinction one edge over: J28 established "only an entry ABOUT the gate closes it -- a citation never does" and section_accounts_for() implements it for gate-log sections; backlog items got no equivalent. (a) CENSUS FIRST: classify every current unblocks edge as genuine (the item waits on the gate) or citation (the item merely mentions it), and record the split in the item's close note -- if it is one or two citations, a comment in render_gates.py plus this record MAY be ruled sufficient and the rest of this acceptance lapses, stated explicitly rather than silently. (b) Otherwise the edge becomes DECLARED rather than inferred: an item that genuinely waits on a gate says so in a field (e.g. gates: [document-supersession]) validated against config/gate-prompts/*.yaml slugs, unblocks() reads ONLY that field, and the K23 case is re-expressed as a declaration if it is ruled genuine. (c) A test pins the behaviour: an item whose PROSE cites a slug it does not declare produces NO edge. (d) gates.json regenerated; the stale-render check stays clean.
+notes: |
+  Groomed 2026-08-19 (pre-port session) from Idea-139, captured minutes earlier in the same session. Sonnet: the acceptance is a written pass/fail. J-series because J28 IS this bug's precedent -- same renderer, same about-vs-citation distinction, opposite edge; phase and module follow it. The census-first clause is deliberate: the fix is allowed to be "a comment and a record" if the blast radius is one edge, and the item says so up front rather than discovering restraint later.

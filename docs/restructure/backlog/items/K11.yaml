@@ -1,0 +1,22 @@
+id: K11
+epic: seal-attribution
+title: 'Steward mapping screen: the orchestrator-first cascade, unmapped-only folder filter, and lifecycle
+  chips as confirmation provenance'
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-04
+depends_on:
+- K9
+inputs:
+- web/src/
+- drydocs_api/mappings.py
+- config/gate-prompts/seal-app-ref-edge-reshape.yaml
+acceptance: |
+  The /mappings console gains the app-code mapping domain as a cascade: Product Line -> Product -> Business Application -> ORCHESTRATOR -> folder filter -> folder -> SME check/approval with notes. The orchestrator is picked BEFORE the folder filter and that choice AUTHORS the USES_SOFTWARE orchestrator edge (§G1); the SEAL-declared batch_orchestrator string only PREFILLS it (§G2). The Business Application picker returns a LIST, never a single application (§G6). "Available folders" = unmapped only, with naming-pattern as an OPTIONAL filter layered on top — never primary. run_as_user is surfaced as a sort option (SME addition at the gate). The O13 mandatory-rationale and lifecycle chips (draft -> submitted -> gated -> loaded) ARE the confirmed edge's provenance and satisfy K10's confirmation stamp — one mechanism, not two. The screen drafts store rows only; the loader writes (§E3/§G7).
+notes: |
+  Opened BY the K7 gate (§F2), 2026-08-03. Sections A-F of the gate are Control-M-shaped; §G generalizes the ACT so AutoSys drops in as a sibling domain without re-opening the grain ruling. Company-side evidence reviewed at the gate shows the split has already been built twice (a Control-M app-code loader and an AutoSys twin), so this formalizes an established shape rather than inventing one. CLOSED 2026-08-04 (desktop): AppCodeCascadePane on /mappings (domain app-code-mapping) walks the cascade exactly as §G ruled — Product Line -> Product -> the product's application LIST (§G6; producer-side catalog_has_application is still planned so the pane says so and degrades to full application search, K13 unchanged) -> orchestrator BEFORE the folder filter (§G1), prefilled from the declared 'batch-port' edge with the §G2 "prefill never authors" note on the surface, several orchestrators shown as normal mid-migration (§G3) -> unmapped-only folders (spec-enforced, §G7) with the naming-pattern filter OPTIONAL and layered on top and run_as_user as a sort key (aggregated from job owners — folders carry no run-as; jobs do) -> SME approval dialog (tier per §B2, mandatory rationale) -> per-user tray with the lifecycle chips, 'loaded' verified against the committed grid + live unmapped queue. Drafts travel draftAppCode -> POST /mappings/app-code/draft — a route K9's pure handler NEVER HAD (found and wired here, with a route-presence test). THE BUILD'S BIGGEST PIECE WAS NOT THE SCREEN: §G1's "the choice AUTHORS the USES_SOFTWARE edge" had landed NOWHERE (K8 closed without it), so both attribution writers now author (:BusinessApplication)-[:USES_SOFTWARE {source: 'app-code-mapping', origin: 'confirmed'}]->(sp) when a folder edge lands — one mechanism with the K10 port confirmation, stamps ON CREATE only, FOREACH-guarded with the shortfall stamped on the JobRun (orchestrator_edges) and warned. The orchestrator ref is resolved from platforms.yaml ('controlm', C12-confirmed) via a new BaseLoader extra_cypher_params hook — never hardcoded in Cypher. batch_port_orchestrator.cypher now stamps its edges origin='declared' (§G2's vocabulary made real). Four new QuerySpecs (mappings.catalog-cascade/orchestrators/app-orchestrators/unmapped-folders.v1), TC-12 (confirmed-edge two-way agreement), reg_uses_software note/loader updated, component ledgered (64->65 unbound, like its parent route). FOUND IN PASSING, inboxed not hot-fixed: the job-application pane is now fully legacy (its coverage spec still reads the retired job-grain edge). Suite 1410 (+7), web build + oxlint clean.

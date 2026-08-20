@@ -1,0 +1,20 @@
+id: J9
+epic: release-infrastructure
+title: End-to-end CSV -> Neo4j load integration test via testcontainers (opt-in, Docker-gated)
+type: task
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- tests/
+- drydocs/loaders/
+- drydocs/data/samples/
+- pyproject.toml
+acceptance: |
+  An integration-marked pytest module spins a testcontainers[neo4j] instance, runs bootstrap + the M3 sample chain (bundled CSVs, no Oracle) end-to-end, and asserts the m3-verify invariants against the loaded graph — covering the Cypher-execution path (Neo4jClient.run/run_script + loader cypher) the unit suite never executes. Auto-SKIPS (never fails) when Docker is unavailable; excluded from the default `pytest tests/unit -q` run so its timing is unchanged; how-to-run documented (README or run-drydocs SKILL). Full unit suite stays green.
+notes: |
+  Promoted 2026-07-11 under the "groom remaining non-HITL items" directive — parked since the 2026-07-01 review; testcontainers[neo4j] verified an unused dev dep 2026-07-09. No HITL surface: sample CSVs + existing loaders only, no new edge meanings. DONE 2026-07-11 (same day): tests/integration/test_e2e_load.py — testcontainers Neo4j (community 5.26 + APOC), the REAL CLI chain (check/bootstrap/ apply-ontology-supplement/ingest-controlm) via CliRunner, the m3-verify core invariants asserted directly + m3-verify smoke; integration marker deselected by default (pyproject addopts), auto-skips without Docker; run documented in README + run-drydocs SKILL. VERIFIED LIVE (3 passed, ~25s warm) — and the run CAUGHT TWO REAL BUGS, both fixed with regression pins: (1) BaseLoader's run()/runMany dispatch counted semicolons inside comments — the doc-06 audit-envelope comment in controlm_folders.cypher routed a single-statement template to apoc.cypher.runMany, which sheared it mid-comment (every folders load on stock APOC failed); _code_semicolons() now counts code semicolons only. (2) m3-verify's dupe check grouped (job_id, version_serial) — stale vs the (folder_id, job_id) NODE KEY; the sample's legitimate DLY/CYC promoted pair (job_id 22 in two folders) proved it; check now groups the composite. CORRECTED 2026-07-27: the fixture's Community image was wrong and the suite had rotted to 3 errors — constraints.cypher has declared `port_unique ... IS NODE KEY` since the 2026-05-05 initial commit, and NODE KEY is Enterprise-only, so `bootstrap` could not complete. (Community was never a supported target: ADR 0002 commits the project to EE and records Community single-DB only as a rejected alternative.) The fixture now reads its image from config/dev-environment.yaml — the declared single source of truth for local infra, so it cannot drift again — and sets NEO4J_ACCEPT_LICENSE_AGREEMENT=eval, matching the local neo4jtest container. Re-verified live 2026-07-27: 3 passed (~38s), full integration suite 6 passed. How the 2026-07-11 "verified live on community" run above ever passed is unresolved; the likeliest cause is that bootstrap's error handling changed underneath it (the D5 client-side split gave each statement its own auto-commit transaction, where the earlier apoc.cypher.runMany path could swallow the constraint failure).

@@ -1,0 +1,11 @@
+id: config-loaders
+letter: D
+title: Config-driven loaders
+order: 3
+groom_log:
+- date: ''
+  note: ── Epic D — Config-driven loaders (pipeline-config + main) — Phase 3 ──────
+  attached_at: D1
+- date: '2026-07-15'
+  note: (D5/D6 groomed 2026-07-15 pm — findings from the first live EE bootstrap, O6 session.)
+  attached_at: D5

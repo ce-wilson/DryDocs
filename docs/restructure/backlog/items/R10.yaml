@@ -1,0 +1,19 @@
+id: R10
+epic: agentic-qa
+title: 'Agent-runtime alignment chores from the passed ADR 0007 revisit check: pin google-adk to >=2,<3
+  and date-stamp the revisit clause'
+type: chore
+module: drydocs-agents
+phase: 15
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- agents/requirements.txt
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  agents/requirements.txt pins google-adk>=2,<3 (currently unpinned while ADK 2.0 breaking changes land upstream — an unpinned install can drift under the app shape); ADR 0007's Revisit-if section carries a dated note that the trigger fired 2026-07-28 and PASSED (convergence, not divergence), citing the internal review by path only (internal/agent-platform/smartsdk-3-adr0007-compatibility.md).
+notes: |
+  Groomed 2026-07-28 evening from the agent-runtime target-state [idea] line's follow-ups; the third follow-up (R3 caller-identity slot) was MERGED into R3's acceptance in the same groom. CLOSED 2026-07-28 evening: requirements.txt pins google-adk>=2,<3 with the R10 rationale comment; ADR 0007's Revisit-if section carries the dated PASSED sub-bullet citing the internal review by path, trigger kept live for the next major. (agents/ has its own venv — the pin takes effect at that venv's next pip install, by design.)

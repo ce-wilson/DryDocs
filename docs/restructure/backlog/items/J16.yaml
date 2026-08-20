@@ -1,0 +1,20 @@
+id: J16
+epic: release-infrastructure
+title: 'PORT-MANIFEST fall-through guard — no tracked path may silently resolve to `default: clean-add`;
+  the inverse question nobody has asked'
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- tests/unit/test_port_reconcile_guards.py
+- git-readme.md
+acceptance: |
+  A guard in tests/unit/test_port_reconcile_guards.py walks the tracked tree, resolves every path FIRST-MATCH against PORT-MANIFEST.yaml's rows, and FAILS on any path that falls through to `default:` unless the path (or a covering pattern) is on a written allowlist with a reason per entry — the test_no_shadow_definitions shape (C18) applied to port dispositions. Making it green forces the backlog of judgment calls into rows: whatever falls through today gets an explicit row or an allowlist entry, including the standing DECISION that git-readme.md is deliberately uncovered (the WHY guide for the cross-repo model, both sides benefit) — currently written down nowhere but the idea inbox. Runs in the default suite, no live services, no consumer-side env vars required.
+notes: |
+  Groomed 2026-07-28 from the 2026-07-27 inbox. The motivating incidents: depgraph snapshots and docs/port-*.md were both silently on clean-add — the manifest was instructing the consumer to commit the producer's port INSTRUCTIONS as payload — found by accident one at a time, and a prose "do NOT clean-add" workaround in step 43 stood in for the missing row for a week. Both rows are fixed (378f4ba, bf3fd34); this item is the inverse question: which paths match NO row? Until it exists every port re-derives the same judgment calls and the manifest keeps disagreeing with practice. DONE 2026-07-28. Measured answer: 398 of 1415 tracked paths (28%) took `default:` with nothing written down. FOUR became real rows, and the first is the finding that justifies the item on its own — docs/restructure/backlog.yaml HAD NO ROW, so the manifest was telling the consumer that a blind checkout of the producer's plan was an acceptable resolution for a file whose ids overlap both sides; it is now per-entry with an entry_rule modelled on the taxonomy-ontology-map row. Also new rows: docs/plan/board.html (derived — regenerate, never take the producer render), docs/design/** and libs/oracle_kerberos/** (evaluate + warning notes; the second records that the oracle_adapter.py port-freeze does NOT extend there). Everything else became a `default_ok:` entry — BEHAVIOR-PRESERVING by construction, recording why the default is right rather than changing it — including the git-readme.md standing decision, which now has its own regression test. Guard proven to bite against an uncovered probe file, not just in principle.

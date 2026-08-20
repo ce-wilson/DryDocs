@@ -8,7 +8,7 @@ judgments, never commitments.
 
 TWO SOURCES, ONE RULE EACH. ``docs/restructure/roadmap.yaml`` carries what only a
 human judgment can: the stage call, the built/remaining prose, the idea estimates.
-``docs/restructure/backlog.yaml`` carries what must never be transcribed: item
+``docs/restructure/backlog/`` carries what must never be transcribed: item
 counts, statuses, and open-item titles are read live at render time, so the numbers
 on the page cannot rot in the authored file. The coverage guard in
 ``tests/unit/test_plan_roadmap.py`` closes the loop: every module in the backlog's
@@ -34,12 +34,13 @@ from typing import Any
 import yaml
 
 from drydocs.plan_board import WorkItem, backlog_from_dict
+from drydocs_core.backlog_store import DEFAULT_BACKLOG_DIR, load_backlog_document
 from drydocs_core.repo_paths import repo_root
 
 # Caller's checkout, not the installed package's — see plan_board / Idea-109.
 _REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 DEFAULT_ROADMAP_PATH = _REPO_ROOT / "docs" / "restructure" / "roadmap.yaml"
-DEFAULT_ROADMAP_BACKLOG_PATH = _REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
+DEFAULT_ROADMAP_BACKLOG_PATH = DEFAULT_BACKLOG_DIR  # the sharded tree (ADR 0013)
 DEFAULT_ROADMAP_OUT_PATH = _REPO_ROOT / "docs" / "plan" / "roadmap.html"
 
 STAGES: dict[str, str] = {
@@ -266,7 +267,7 @@ def render_roadmap(roadmap: dict[str, Any], backlog_doc: dict[str, Any]) -> str:
         "estimates for open ideas. Assessments from "
         f"<code>docs/restructure/roadmap.yaml</code> (updated "
         f"{_esc(roadmap['updated'])}); counts and open items read live from "
-        f"<code>backlog.yaml</code> (updated {_esc(backlog.updated)}). "
+        f"<code>backlog/</code>{(' (updated ' + _esc(backlog.updated) + ')') if backlog.updated else ''}. "
         "A roadmap without target dates — stages and sizes are relative "
         "judgments, not commitments.</p>\n"
         '<p class="subtitle"><strong>INTERNAL</strong> — idea summaries ride along '
@@ -285,7 +286,7 @@ def write_roadmap(
 ) -> Path:
     """Load both sources, render, write the HTML to ``out_path``. Returns the path."""
     roadmap = load_roadmap(roadmap_path)
-    backlog_doc = yaml.safe_load(Path(backlog_path).read_text(encoding="utf-8")) or {}
+    backlog_doc = load_backlog_document(backlog_path) or {}
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(render_roadmap(roadmap, backlog_doc), encoding="utf-8", newline="\n")

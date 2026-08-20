@@ -1,0 +1,24 @@
+id: C31
+epic: ontology-mapping
+title: One Control-M Guidelines and Standards page to replace the out-of-date set, with the scope-and-variable-flow
+  diagram and a worked folder-to-job resolution trace
+type: task
+module: docs
+phase: 2
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on:
+- C30
+inputs:
+- knowledge/standards/technology/controlm-greenfield-job-standard.md
+- knowledge/standards/technology/description-field-metadata-plan.md
+- knowledge/standards/technology/filewatcher-postexec-token-cat.md
+- knowledge/standards/technology/folder-naming-convention.md
+- internal/remediation/standards-rules-registry.md
+- external/orchestration/bmc-controlm/controlm-variables.md
+acceptance: |
+  ONE publishable, normative page a Control-M job author can follow end to end, replacing the fragmented corpus the SME now considers out of date -- NFR-CTM-001 v2, the file-name component standard, the MFTS route page, the contacts page and REQ-1..REQ-4 currently say overlapping and in places contradictory things across five documents. It must be written in MUST/SHOULD normative voice rather than as analysis, since the reader is authoring a job and not reviewing a decision, and it must carry: (a) a MERMAID diagram of the scope ladder and the variable flow -- what each of folder, sub-folder and job contributes, the vendor resolution order that joins them, and where the derived file handles sit; (b) a DETAILED worked folder-to-job trace showing a single reference resolving through the chain step by step, including the narrowest-scope-wins rule and what happens when a name is declared at no scope; (c) the normative rules for every job type, each cross-referenced to its enforcing rule id in the registry so a reader can see what is machine-checked; (d) the naming, casing and vendor-legality rules; (e) the description token sets, with contacts recorded as documentation-only. Mechanism-only and publishable: synthetic SEAL block 70001-70099 and example.invalid addresses throughout, real values staying in the C30 values twin. Rationale is NOT duplicated -- it stays in the greenfield standard, which this page links to, so the two cannot drift into two arguments.
+notes: |
+  Raised and claimed 2026-08-11 (desktop) on SME direction: "my standards are out of date". DIVISION OF LABOUR, recorded so the two documents do not converge into one bloated page: this is the NORMATIVE page a job author reads, C30's greenfield standard is the RATIONALE and the decision record, and the rules registry is the ENFORCEMENT. Each rule here cites its registry id, so what is checked and what is merely advised are visible at a glance. The design-doc renderer treats a mermaid fence as a code block, so the markdown source is the diagram's real home and the page is also published as an artifact where the diagram renders -- the SME publishes onward from there. POST-CLOSE AMENDMENT 2026-08-11 (same day, no reopen -- an SME ruling on an open item the page itself raised): DOMAIL is REMOVED alongside the shouts, closing section 12 item 1. REQ-2 had left mail "out of scope"; the ruling extends REQ-2 rather than reinterpreting it, so the whole ON/NOTOK block goes and R40 widens from two tags to three. The evidence that made it cheap, and the reason no repair option was weighed: the mail destination has at least TWO spellings in the estate -- %%NOTIFY from the generator and %%EMAIL_GRP on a deployed on-prem load job's On-Do action -- and NEITHER is declared anywhere, so every such block already resolves to CTMERR and mails nothing. Deleting it switches off nothing that worked. Touched: the guidelines page section 8 + checklist + open items, C30's greenfield standard 5.3.1 (rationale) and its internal twin, R40 in the rules registry, the _check_notifications detector plus its fixture and test, the C29 capture (amendment note against the verbatim REQ-2 transcription, which is NOT rewritten), and gate prompt email-dl-contact-point G4 -- whose DOMAIL-only option no longer exists, so the question is re-posed rather than left to waste the SME's time at sign-off.

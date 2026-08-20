@@ -1,0 +1,17 @@
+id: G88
+epic: ontology-mapping
+title: 'Tech-debt: relocate the Employee/Membership/Attribution entries into the human domain'
+type: chore
+module: ontology
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- G87
+inputs:
+- drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml
+- drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml
+acceptance: |
+  Gate vocabulary-domains-and-id-policy §A3 (SIGNED 2026-08-12) registered the human domain with NO entries moved. This item does the move: the people/org entries (the attribution/membership family in business_application and catalog) relocate to a human fragment (e.g. 49-local-human.yaml) with domain: human. Depends on G87 BY DESIGN: ids change there, so relocating in the same pass avoids touching the same entries twice; if G87 is descoped this item may run alone with ids unchanged (domain + fragment move only). schema_graph.cypher regenerates; the fragment sort order stays stable.

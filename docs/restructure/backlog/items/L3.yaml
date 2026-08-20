@@ -1,0 +1,24 @@
+id: L3
+epic: doc-infrastructure
+title: Deterministic design-doc renderer (.md -> .html/.print.html) + stale-check + ritual hook
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- L1
+inputs:
+- scripts/render_board.py
+- drydocs/plan_board.py
+- drydocs/gate_pages.py
+- docs/design/controlm-ingestion-tdd.md
+acceptance: |
+  scripts/render_design_doc.py renders a doc .md -> .html + .print.html through a shared print-CSS template, PURE and deterministic (no build timestamps — Rev/commit passed in, like the board's `updated:`), emitting each outline section's stable anchor as the element id; offline unit tests on a fixture doc; the .md becomes the single committed source (the hand-maintained .print.html is retired); a stale-check (re-render + `git diff --quiet`) is wired into the session ritual beside the board regen; full suite green.
+output: scripts/render_design_doc.py + drydocs/design_doc.py
+notes: |
+  Renderer approach = B2 (user, 2026-07-08): stdlib hand-rolled markdown-SUBSET renderer, NO new dependency — determinism is intrinsic (no library version to drift) and matches the repo's hand-built-HTML pattern. Subset: headings, GFM tables, fenced code, bold, italic, inline code, links, blockquotes, ordered/unordered (nested) lists, hr, anchors.
+progress: |
+  2026-07-08 — DONE (user sign-off; option 1 — the generated print.html is accepted as the single-source-derived artifact, retiring the hand-crafted one). drydocs/design_doc.py (render_body/render_doc/write_doc; `<!-- anchor: id -->` -> element id; screen + print CSS, print CSS reuses the prior hand-tuned look); scripts/ render_design_doc.py CLI; tests/unit/test_design_doc.py (14 tests) pass via direct driver; render is byte-identical across re-runs (deterministic). Generated controlm-ingestion-tdd. {html,print.html} from the .md — the .md is now the SINGLE SOURCE (hand-maintained print.html RETIRED; it loses the bespoke page-1/callout/footer chrome that was hand-authored and never in the md). Ritual hook: snapshot.ps1 refreshes docs/design/*.md + the CLAUDE.md stale-render check extended. boundary 4/4; backlog green.

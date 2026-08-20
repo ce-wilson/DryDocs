@@ -1,0 +1,25 @@
+id: O12
+epic: web-console
+title: 'Admin configuration page: read-only view of the config layer with a GENERATED enforcement matrix
+  (config file -> code consumer -> guard test -> gate)'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O8
+inputs:
+- UI-WIP/wf-admin-config-01.md
+- UI-WIP/wf-admin-config-01.html
+- config/
+- tests/unit/
+- web/src/
+acceptance: |
+  /admin/config exists behind the admin persona (O2 gating) and instantiates the shared subpage template: graph pane renders the selected surface's traceability chain (config file -> code consumer(s) -> guard test(s) -> gate reference); data-frame tabs show (a) the enforcement matrix, (b) the selected surface's file content read-only (rendered verbatim - secrets are .env-only so config files carry env-var REFERENCES, never values; the matrix lists each surface's expected env keys by name), (c) the gate log. The matrix is GENERATED - a script scans config/ + tests/unit/ and emits enforcement-matrix.json - and a unit test fails when a config surface has no matrix row or a row references a missing file/test (the matrix cannot drift from the repo). Guard-test freshness shows as LAST-RUN metadata from the most recent CI artifact (no live CI polling). Status column distinguishes enforced / unguarded / gate-pending; the code-resident launcher registry renders as the visible unguarded-config example. NO edit controls anywhere - each surface links to its repo path + gate flow (config-as-code stays behind the gates).
+notes: |
+  Groomed 2026-07-17 from the 2026-07-16 launcher-registry IDEAS line's "admin screen in the web console (Epic O candidate)" end-state - its stated trigger ("groom when the web console picks up admin surfaces") fired with the site-plan build-out. The config-file launcher-registry migration itself stays inboxed (drydocs-core work, separate groom). Wireframes are the item spec. 2026-07-17 user decisions folded in: CI = last-run metadata; secrets .env-only (redaction question dissolved). 2026-07-20 (L7 SaaS reframe, user direction) - this page is ALSO the home of the SME/tenant configuration surfaces that reframe planned: (a) per-source doc-connector config (origin registration + per-source requirement_id pattern, replacing the global loose/strict mode); (b) display-label/terminology config (the generic-terminology-research Salesforce pattern - stable internal labels, per-tenant display names); (c) the Jira-board mapping - each BusinessApplication or DevTeam MAY have a Jira board, keyed off the Jira PROJECT NAME (the join key the future Jira connector uses against the ownership graph; gate doc-traceability-feedback section D). When those config files land in config/, the generated enforcement matrix picks them up as surfaces automatically - read-only here like everything else, edits stay gate-bound. DONE 2026-07-21 (Epic-O finish session): scripts/render_enforcement_matrix.py scans a 14-surface registry against the repo (missing file/consumer/test = generation fails closed; every top-level config/ entry must be covered) and emits web/src/generated/enforcement-matrix.json with per-surface status (enforced / unguarded / gate-pending w/ pending-entry count from status: proposed|planned|placeholder markers), env-var references (explicit ${VAR} / os.environ / env: forms only), embedded verbatim file content (single-file surfaces; dirs list files), and the gate log. tests/unit/test_enforcement_matrix.py (4 tests) = the drift guard: regeneration equality, config/ completeness, referenced-path existence, and launcher-registry-is-the-unguarded-example. /admin/config renders the artifact on the shared template: React Flow traceability chain (config file -> consumers -> guard tests -> gate; a red NO-GUARD-TEST node for unguarded surfaces), matrix tab with the honest no-CI-artifact note (last-run metadata only — never polls), verbatim surface-detail tab, gate-log tab, right-sidebar inspector with copy-repo-path + gate-flow links, zero edit controls. Crosswalks surface honestly renders unguarded too (gate-signed, no drift test). Verified: suite 796 green; build+lint green; headless-Edge smoke as admin (screenshot) + steward-redirect proof. The L7 SaaS-reframe surfaces (doc-connector config, display-label config, Jira-board mapping) auto-join the matrix when their files land in config/ — the completeness test forces a registry row then.
+annotations:
+  status: DONE 2026-07-21 (Epic-O finish session) — see notes

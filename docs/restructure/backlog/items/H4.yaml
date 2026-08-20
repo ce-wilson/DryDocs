@@ -1,0 +1,21 @@
+id: H4
+epic: drydocs-review-backflow
+title: Reproduce the HITL gate-page generator
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: opus
+priority: p3
+status: done
+depends_on:
+- H1
+- H2
+inputs:
+- docs/restructure/04-sme-checklist-and-load-plan.md
+- config/taxonomy-ontology-map.yaml
+- config/classification.yaml
+acceptance: |
+  HITL prompt-page GENERATOR reproduced: a renderer over 04-sme-checklist-and-load-plan.md + taxonomy-ontology-map.yaml + classification.yaml that emits interactive checklist pages (localStorage persistence, "no graph write until confirmed", parent-index + per-step-child structure). Example page seeded from vendor-bmc, never real data. Producer already owns all three inputs + gate-log.md record.
+notes: |
+  Done 2026-07-01. drydocs/gate_pages.py: GateSpec + render_gate_page → self-contained interactive HTML (checkbox per confirmation, localStorage persistence, progress bar, classification badge, mapping table, "no graph write until confirmed" banner). Example config/gate-prompts/vendor-bmc-example.yaml (Internal-Public). 6 unit tests. GATED/DEFERRED: rendering pages from REAL PAT/SEAL steps (Internal- Confidential) → gitignored twin, through the HITL gate; not built.

@@ -1,0 +1,23 @@
+id: R3
+epic: agentic-qa
+title: 'Agent run telemetry: per-LLM-call JSONL ledger in DRYDOCS_LOGDIR + :AgentRun envelope node + console.agent-runs.v1
+  QuerySpec'
+type: requirement
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- R2
+inputs:
+- drydocs_core/run_log.py
+- drydocs_api/query_specs.py
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  Every LLM call appends one JSONL line (run_id, step, model, prompt_tokens, completion_tokens, cost_est, duration_ms, iteration) to DRYDOCS_LOGDIR — never the repo. One :AgentRun node per question (kind 'qa', mirroring :JobRun) carries question sha256 + length ONLY (full text solely in the local ledger), tier, iterations, llm_calls, token totals, context/memory sizes, cypher count, fix retries, specs used, dbs touched, timings, staleness flags — written to the DB the R1 ruling names (never drydocs) via a dedicated writer boundary. A console.agent-runs.v1 QuerySpec returns runs for the admin view. The envelope also RESERVES a hashed caller-identity slot (user_id sha256 + length, mirroring the question-text rule) — ADK 2.0 run_async takes user_id per call; full identity never lands in the graph.
+notes: |
+  MERGED 2026-07-28 (groom): the caller-identity slot from the agent-runtime target-state review (ADR 0007 revisit check PASSED; detail in internal/agent-platform/, never public). 2026-07-30 build: agents/common/llm_ledger.py (LlmLedger — one JSONL line per LLM call with step router/text2cypher/fix/answer + one run line per question; day-file qa.graph_qa.<date>.jsonl via drydocs_core.run_log.resolve_log_dir; the run line is the ONLY home of full question text; owns the model->price map, unknown model = None never a guess) + agents/common/agent_run_writer.py (the dedicated WRITE boundary — agent_run_props pure/offline-testable, kind='qa' mirroring :JobRun, MERGE on run_id into ddcontext; refuses 'drydocs' from BOTH env and argument) + pipeline ledger hook (cost accumulates into metrics.cost_est_usd; telemetry failure never kills an answer) + envelope user_id_sha256/user_id_chars filled from ADK ctx.user_id + console.agent-runs.v1 spec on ddcontext (watermarked by the standard rule). stale_sources=0 honest until R7. 8 new unit tests (test_agent_telemetry.py). Live :AgentRun write rides the next agent session against the EE container.
+annotations:
+  status: 2026-07-30, desktop session (claimed + built same day)

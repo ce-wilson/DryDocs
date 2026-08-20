@@ -1,0 +1,21 @@
+id: Z4
+epic: server-location
+title: 'Load-balancer nslookup resolver: resolve LB names to real servers, match against the inventory,
+  attribute job locations'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- Z3
+inputs:
+- drydocs_lineage/collect
+- drydocs_lineage/extractors
+- tests/fixtures
+acceptance: |
+  A collector-style probe (the bkup-collector precedent: shell collection, Python parsing) takes the distinct job hosts for an application (the Z3 query), runs Linux nslookup against each name that is a load balancer, parses the resolved hostnames, and matches them against the ingested server list — so a job scheduled against an LB name resolves to the physical servers, and therefore the LOCATIONS, it actually runs on. The mechanism is sample-reproducible: tests run against a canned nslookup transcript fixture, never live DNS; the live run is company-side by construction. Output is an evidence file (which hosts resolved where, which did not resolve or did not match — unmatched is reported, not dropped); any graph write goes through the Z2-gated shapes only.
+notes: |
+  User directive 2026-08-08. This is the piece that turns "the job runs on node X" into "the job runs in city Y" when X is a load-balancer alias. Also the natural module seam for the console: the resolver's OUTPUT feeds the Z5 map panel; the resolver itself stays a collector, not a web dependency.

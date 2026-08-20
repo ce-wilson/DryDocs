@@ -1,0 +1,26 @@
+id: G63
+epic: component-topology
+title: 'Run the repo-manifest data-profile gate: name the repos, bless trusted_ref (the field only a human
+  may set), then rule corroboration and the commit-date stub'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- G22
+- G24
+inputs:
+- config/gate-prompts/repo-manifest-data-profile.yaml
+- config/gate-log.md
+- config/source-registry.yaml
+- config/audit-fields.yaml
+acceptance: |
+  USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then. The drafted repo-manifest-data-profile page is walked in its two-step order: section A the SME identifies the in-scope repos and, per repo, the one ref the team keeps clean (Internal, company-side); section B the agent runs the G24 object sweep per repo in staging, zero graph writes, and brings back the census — object counts, ref tips, content-hash corroboration against server occurrences, clone-lag, and the commit-date evidence the audit stub waits on; section C sets or declines trusted_ref PER REPO (this page is the only venue where a human may set it), rules the corroboration thresholds, and closes or re-scopes the audit stub on that evidence. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate.
+notes: |
+  Groomed 2026-08-09 from Idea-85. The load-bearing clause is trusted_ref: the registry field is null on purpose — server-extract-only truth until a human blesses a ref — and a mechanical sweep may NAME a candidate but may not bless one. Company-side session (real repo names and Bitbucket access are Internal).
+annotations:
+  inputs[]:
+  - 'config/audit-fields.yaml — path corrected 2026-08-12 (groom): the ledger is a FILE, never a directory'

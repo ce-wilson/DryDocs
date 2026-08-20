@@ -1,0 +1,56 @@
+id: N6
+epic: source-column-mappings
+title: 'Retire the two disagreeing load sequences: ingest.sh and the startup runbook both derive from
+  the declared one'
+type: chore
+module: docs
+phase: 11
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- N3
+inputs:
+- scripts/ingest.sh
+- docs/design/drydocs-startup-refresh-runbook.md
+- drydocs/cli.py
+acceptance: |
+  scripts/ingest.sh and the startup/refresh runbook stop carrying independent sequences and derive from the one declared at N3 (cli.CANONICAL_LOAD_SEQUENCE) — a guard proves they agree, and the guard is as much the deliverable as the derivation is. STATE RE-MEASURED 2026-08-04. The original text described a pre-L21 world and was wrong twice over: the runbook no longer "expands the supplements into three separate commands" (L21 / Rev 5 collapsed that to apply-supplements), and its ingest.sh enumeration omitted bootstrap-schema-graph, which ingest.sh does run. Measured today:
+    DECLARATION (standing): check, bootstrap, bootstrap-schema-graph,
+      apply-supplements, refresh-reference, ingest-controlm, load-software-registry,
+      load-bmc-docs, m1-verify, m3-verify, docs-verify
+    INGEST.SH: the first four, then ingest-controlm, m1-verify, m3-verify — omits
+      refresh-reference, load-software-registry, load-bmc-docs, docs-verify
+    RUNBOOK APPENDIX B: the declaration's standing set plus load-doc-traceability
+      (legitimate — it is `optional` in the declaration), MINUS docs-verify
+  The disagreement is therefore narrow and specific rather than broad: the runbook is one standing step short, and ingest.sh omits four. Whether ingest.sh's omissions are DELIBERATE — a scheduled Control-M ingest arguably should not run the corpora loaders — is the ruling this item must make and RECORD. Nothing states it today, so a deliberate subset is indistinguishable from drift, which is the actual defect rather than the step counts. Also in scope, because it is why the drift went unseen: the existing guard (tests/unit/test_load_map_declarations.py) checks that every DECLARED step is a real command and that every LOADER-BACKED command is sequenced — but the completeness half never reaches non-loader verbs, so bootstrap-schema-graph sat missing from the declaration while both operator surfaces ran it (found and fixed 2026-08-04).
+notes: |
+  p3 and last because it is the only phase that changes behaviour rather than adding a surface, and it touches a GOVERNED render (the runbook — Rev bump + change note + pinned rev in test_doc_traceability_loader.py). Without it the load map is accurate the day it ships and drifts the first time either sequence is edited, which is the failure mode N3-N5 exist to end. SEQUENCING NOTE (2026-07-29, at the N3-N5 close): N3 is done, so this is next_ready and the declared sequence it derives from EXISTS (cli.CANONICAL_LOAD_SEQUENCE, on the human surface at docs/plan/load-map.html). BUNDLING NOTE SPENT (2026-08-04): L21 is DONE and the startup-refresh runbook has since reached Rev 8, so this item no longer rides another edit — it needs its own Rev bump and change note on that governed render. The original instruction was to bundle with L21 so the L5/L6 loop reviewed one Rev rather than two; that window has closed.
+annotations:
+  status: 'closed 2026-08-04 (laptop). THE RULING FIRST, since the item existed to make one: ingest.sh''s
+    shorter list is DELIBERATE, and the four standing steps it skips now carry written reasons in cli.SCHEDULED_INGEST_EXCLUSIONS
+    — refresh-reference is a weekly chain on a different cadence (declared on the command itself), load-software-registry
+    and load-bmc-docs are repo-triggered corpora that move with the repo rather than the batch estate,
+    and docs-verify would FAIL that path by design (it loads no doc corpora, and under `set -e` a non-zero
+    exit would abort a Control-M ingest over a reconciliation never meant to hold there). The runbook''s
+    omission was NOT deliberate: docs-verify is standing and a cold start is exactly when the corpora
+    load, so Appendix B gains it. MECHANISM: CANONICAL_LOAD_SEQUENCE steps widened from 3-tuples to a
+    named LoadStep carrying `profiles`, plus LOAD_PROFILES (scheduled-ingest = ingest.sh, cold-start =
+    Appendix B) and load_profile(). scripts/ingest.sh now READS its profile at run time and has no list
+    left to drift — verified by stubbing the CLI: it reproduces the previous 7 steps in the previous order,
+    and argument forwarding still reaches ingest-controlm alone. Appendix B is prose and can derive nothing,
+    so tests/unit/test_load_sequence_surfaces.py (11 tests, the deliverable half of the acceptance) holds
+    it to the declaration. THE GUARD GAP the item also named is closed by DIRECTION rather than by patching:
+    the old completeness check walks COMMAND_LOADERS and so only ever reaches loader-backed verbs; the
+    new one starts at the operator surfaces and works inward, so a non-loader verb an operator really
+    runs (bootstrap-schema-graph, the exhibit) cannot go undeclared. Negative-tested with the anchor asserted
+    first (the 2026-08-04 silent-no-op lesson): dropping docs-verify from Appendix B fails, and a literal
+    verb grown back into ingest.sh fails. TWO THINGS FOUND ALONG THE WAY, both fixed here. (1) test_runbook_currency.py::_cli_verbs
+    had NEVER run successfully on this machine — `text=True` decodes with cp1252 and Typer''s rich box
+    char `┐` is 0x90, so stdout came back None; and the rows start with `│`, not `|`, so the pattern matched
+    nothing, which would have made every documented verb look unregistered. Now reads app.registered_commands:
+    no render to parse. (2) drydocs-load-runbook.md (V3, hours old) told readers to run a one-liner that
+    the widening broke, and still said N6 had not landed — Rev 2. GOVERNED RENDER: startup-refresh runbook
+    Rev 10 with a change note, its pinned rev in test_doc_traceability_loader.py bumped 9 -> 10. Full
+    suite 1551 passed / 7 skipped, ruff clean, all renders deterministic.'

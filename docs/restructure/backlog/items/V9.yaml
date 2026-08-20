@@ -1,0 +1,18 @@
+id: V9
+epic: sme-runbooks
+title: 'SME runbook: drydocs-agents — ADK service venv, run, console wiring, agent smoke checks'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- agents/
+- docs/design/templates/runbook.outline.yaml
+acceptance: |
+  docs/design/drydocs-agents-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-agents off RUNBOOK_PENDING. Covers: the module's own venv (pinned google-adk per R10), starting the service, wiring the console to it (VITE_ADK_URL, names only), the read-only contract, and a smoke check per registered app with expected output shape — including the ADK-unreachable fallback behaviour the console surfaces (SYNTHESIZED demo trace + banner).
+notes: Groomed 2026-07-29 (Epic V).

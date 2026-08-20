@@ -1,0 +1,42 @@
+id: S4
+epic: structure-remediation
+title: 'Give the console a durable draft substrate: a draft table in mapping.db as write-ahead buffer,
+  promoted by emitting a YAML/CSV diff (ADR 0009, F3)'
+type: task
+module: drydocs-core
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- S1
+inputs:
+- drydocs_core/mapping_store.py
+- scripts/build_mapping_db.py
+- drydocs_api/mappings.py
+- docs/decisions/0009-configuration-substrate.md
+acceptance: |
+  mapping.db carries a `draft` table built and rebuilt by scripts/build_mapping_db.py with the rest of the derived database (still gitignored, still deletable); the override-draft endpoint writes a ROW instead of returning a whole replacement file; a promote path emits the YAML/CSV diff for a branch, and a test proves the emitted diff applies cleanly to the committed file and round-trips to the same parsed content. Git remains the only commit target — a test asserts no endpoint writes a tracked file directly. Concurrent drafts from two sessions both survive (the property commit-by-replace cannot offer).
+notes: |
+  The review found the config/DB architecture already CORRECT for the read path — mapping_store.py materializes committed YAML/CSV into var/mapping.db as a derived, rebuildable read model with a round-trip parity test. That is a materialized view over a git source of truth, which is the right answer. The unsolved half is the WRITE path: POST /mappings/overrides/draft today returns the complete updated file, which is correct for a small override list and does not survive a second concurrent editor. This is the one piece to design BEFORE the console grows write surfaces. ADR 0009 §"propose in the DB, land in git".
+annotations:
+  status: 'closed 2026-08-04 same session (laptop). `draft` table in mapping.db (schema v2, bumped so
+    a pre-S4 file reads stale and REBUILDS rather than failing at first write); build() carries draft
+    rows ACROSS a rebuild — the one exception to the destructive rebuild, because any source edit makes
+    the store stale, so discarding pending work would defeat the buffer exactly when it is doing its job.
+    Both write endpoints moved off commit-by-replace: draft_override and draft_app_code_mapping write
+    ROWS and return a receipt; promote_draft emits an ADDITIVE unified diff (committed text carried through
+    verbatim, drafted rows appended) with GET /mappings/drafts and POST /mappings/drafts/{id}/promote
+    wired. WIDER THAN THE ACCEPTANCE''S LETTER, deliberately: the acceptance names the override endpoint,
+    but the K9 app-code endpoint is the same mechanism on a sibling file and both share promote_draft
+    — leaving one on commit-by-replace would have left two write models in one module, which is the confusion
+    ADR 0009 exists to remove. Console updated (its ONLY consumer): mappingsApi.ts loses OverrideArtifact/AppCodeArtifact
+    for DraftReceipt/PromotedDiff, both panes draft-then-promote and download a .patch. Deleting var/mapping.db
+    still discards unpromoted drafts — the deletable-without-data-loss contract holds for everything DERIVED,
+    and that limit is written into the DDL comment and the ADR rather than glossed. Tests +12: rebuild
+    survival, two concurrent sessions not colliding, diff applies via an INDEPENDENT unified-diff applier
+    AND via real `git apply`, promotion is idempotent-closed, pre-S4/foreign DB carry-over tolerated,
+    draft excluded from the deterministic dumps, and an AST guard that drydocs_api calls no filesystem
+    write primitive at all (proven red on a probe). ADR 0009 action item 2 marked done. Suite 1527 green,
+    ruff clean, tsc --noEmit + oxlint clean.'

@@ -1,0 +1,21 @@
+id: backlog-sharding
+letter: Y
+title: backlog sharding
+order: 23
+groom_log:
+- date: '2026-08-04'
+  note: |-
+    ── Epic Y — backlog sharding (main / drydocs-plan) — phase 8 ────────────────
+    Groomed 2026-08-04 on the user's direction, un-parking the 2026-08-03 IDEAS
+    EPIC entry (kept-parked at the 2026-08-04 weekly groom, un-parked in-chat the
+    same day). The trigger class is measured, not hypothetical: agents regex-splice
+    a shared 12k-line mutable blob; the company port shipped a duplicate-`summary:`
+    key that pyyaml's last-wins parsing hid from test_backlog (phase-1 guard closed
+    that class, `c5b689e`, port step 55); and on 2026-08-04 alone the two machines
+    hit THREE same-afternoon rebase conflicts (X1-claim/V8, X2-close/V2,
+    X3-close/V3) — every one of them in the derived summary/next_ready block that
+    sharding removes from storage entirely. Phases here: Y1 design ruling ->
+    Y2 the shard build -> Y3 graph vocabulary via the gate -> Y4 the query
+    surface. Cross-repo law from the idea entry: BOTH repos must move together at
+    Y2 — the port carries the shard as a structure-breaking step, like S5's.
+  attached_at: Y1

@@ -1,0 +1,22 @@
+id: S9
+epic: structure-remediation
+title: 'Repo-root docs hygiene: UI-WIP/ into docs/design/ui-exploration/ and the loose docs/*.md into
+  their subdirectory homes (F10/F13)'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- UI-WIP/
+- docs/
+- PORT-MANIFEST.yaml
+- docs/port-prompt.md
+- docs/plan/board.html
+acceptance: |
+  UI-WIP/ lives at docs/design/ui-exploration/ and the loose docs/controlm-*.md / docs/port-*.md files are grouped into subdirectory homes. All 31 tracked references updated — including PORT-MANIFEST.yaml, the two gate-prompt specs, drydocs_api/app.py, backlog.yaml (45 hits) and the governed docs/design/* renders, which are REGENERATED from their .md sources, never hand-edited. board.html regenerated. `git grep -l "UI-WIP"` returns only deliberate historical mentions (the port archive and the IDEAS audit trail). Full suite green. Done on a branch with a port-prompt step added — never directly on main.
+notes: |
+  Scored Effort=1 in the review and CORRECTED to 3-4 the same day when the attempt measured the reference sweep: the score had priced the git mv and ignored the 31 tracked files. Because the sweep crosses governed renders and the cross-repo port machinery, this is branch work under docs/port-prompt.md, not a tidy-up commit — which is exactly why it is p3 and carries no dependency: it can wait, and it can start whenever someone has a clean branch. The root-level scratch-screenshot half of F10 was already closed 2026-07-25 (bbf29cf).

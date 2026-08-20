@@ -1,0 +1,19 @@
+id: G8
+epic: component-topology
+title: Fold the depgraph parser deltas into the core Control-M parser
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0002-c-depgraph-lineage-rehome.md
+- drydocs_core/controlm/commands.py
+- ce-wilson/depgraph@feat/controlm-lineage:depgraph/controlm/commands.py
+acceptance: |
+  The three depgraph parser deltas are folded into the drydocs-core Control-M parser (drydocs_core/controlm/commands.py, re-exported by drydocs_core): (1) .pset -> ABINITIO launcher rule; (2) _looks_script() so `spark-submit --master yarn x.py` resolves x.py NOT yarn (a live correctness bug) — with a regression test; (3) +pset in the direct-script extension regex. Core parser reproduces depgraph's test_controlm.py outputs (25 processes / 13 INVOKES on the 13-job sample). Gates green; boundary test unaffected.
+notes: |
+  ADR 0002-C §3. Independently valuable — fixes a live spark-submit bug DryDocs still has and collapses the dual-parser sync tax depgraph itself flags ("keep in sync with DryDocs"). Fold is a CORE change, never a component-side parser fork (0002-A §4). Do early; does not need the G2 physical relocate (the shim re-exports the file). BLOCKS the clean G9 re-home.

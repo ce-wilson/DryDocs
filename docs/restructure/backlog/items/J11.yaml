@@ -1,0 +1,19 @@
+id: J11
+epic: release-infrastructure
+title: Move the resolved controlm-loader-flow baseline doc to docs/history/ and repoint inbound links
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- docs/controlm-loader-flow.md
+- README.md
+- internal/remediation/governance/command-line-and-variables-standard.md
+acceptance: |
+  docs/controlm-loader-flow.md is git-mv'd to docs/history/ keeping its 2026-07-15 resolution banner (the M1-Fix-README precedent); the two inbound references are repointed (README.md + internal/remediation/governance/command-line-and-variables- standard.md — verified by grep 2026-07-15; the depgraph snapshot JSONs refresh themselves); a repo grep shows no stale docs/controlm-loader-flow.md path outside history/audit prose; full suite green.
+notes: |
+  Groomed 2026-07-15 from the same-day IDEAS line (captured at the controlm docs status-refresh sweep e3e7bec: all §4 corrections resolved, resolution banner added — the doc carries no live content; the TDD + staging-flow §3a are the current descriptions). Inbound-linker correction during grooming: grep says README.md + the internal governance doc, NOT CHECKPOINT/reviews as the inbox line guessed. DONE 2026-07-19 (main session, direct): git-mv'd with banner intact; both inbound references repointed (README tree line + Further-reading line; governance doc link also depth-corrected — it was ../../ from a 3-deep dir, broken since authoring); the two banner-internal relative links gained ../ so they survive the move; a row added to docs/history/README.md's index table (M1-Fix-README precedent). Stale-path grep clean outside backlog/board/depgraph-snapshot prose. NOTE: J10 was next in queue order but is user-gated on port-lull timing (notes' preserved TIMING flag) — skipped, stays todo/ready.

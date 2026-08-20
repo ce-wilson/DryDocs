@@ -1,0 +1,21 @@
+id: G72
+epic: seal-attribution
+title: The three-valued surface discriminator + the precedence order — make a roster disagreement a readable
+  fact
+type: task
+module: ontology
+phase: 9
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- G70
+inputs:
+- config/gate-log.md
+- config/precedence.yaml
+- knowledge/upgrade-plans/servicenow-replica-evidence.md
+acceptance: |
+  Per the signed §D3/§D4. THE SURFACES ARE THREE, not the two §D1 described: hand-verified crosswalk, SEAL contact extract, ServiceNow TOM. Every Attribution records which asserted it — today Attribution.source is the literal string 'SEAL' at both loader sites regardless, so a count difference is unattributable. TRUST RIDES ON EXISTING VOCABULARY, NOT A NEW ONE: the company crosswalk already carries `verified` / `cert_status` / `cert_next_date`. Reuse rather than mint — the same discipline that reads cmdb_rel_type's descriptor columns instead of splitting `name`. PRECEDENCE IS RULED AND GOES INTO config/precedence.yaml: hand-verified > ServiceNow TOM > SEAL extract. §A's both-registers ruling made this MANDATORY rather than deferrable — two ingested surfaces that disagree with no rule is the one outcome §D4 refuses. CHECK BEFORE BUILDING (§E1g): ServiceNow's Direct rows carry `u_source` naming the feed that produced them, which may already be the discriminator this item would otherwise invent. THE CONSUMER IS O44, the four-column reconciliation alluvial — a disagreement renders as a ribbon that STOPS, so the discriminator must distinguish "this surface did not assert it" from "this surface was never read". A diagram cannot draw a difference the data does not carry.
+notes: |
+  Raised 2026-08-11 at the G35 sign-off. NOTE THE THIRD SURFACE IS COMPANY-SIDE ONLY: the hand-verified crosswalk belongs to gate snow-hpsm-queue-to-group, which the producer repo does not hold (RELAY-6, and §9 of the evidence doc). So the discriminator must be able to NAME a surface this repo cannot itself load.

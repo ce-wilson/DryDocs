@@ -1,0 +1,18 @@
+id: F1
+epic: orchestrator-expansion
+title: Map the AutoSys crosswalk to the BMC baseline
+type: requirement
+module: config
+phase: 5
+agent: pipeline-config
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- C1
+inputs:
+- external/orchestration/autosys/README.md
+- config/source-registry.yaml
+acceptance: AutoSys crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true
+annotations:
+  status: 'gate autosys-crosswalk SIGNED OFF 2026-07-14 (gate-log); autosys-export confirmed: true'

@@ -1,0 +1,23 @@
+id: U11
+epic: self-documentation
+title: 'Draft the gate prompt for the artifact chain: which .py executes which .cypher, and which labels
+  that .cypher writes (parent gate §H5, deferred)'
+type: task
+module: ontology
+phase: 16
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on:
+- U9
+inputs:
+- config/gate-prompts/self-documentation-code-graph.yaml
+- config/gate-prompts/code-graph-package-layer.yaml
+- drydocs/loaders/
+- drydocs/loaders/cypher/
+- drydocs_core/ontology/relationship_vocabulary/
+acceptance: |
+  A drydocs.gate-prompt.v1 spec exists proposing the code -> artifact -> label chain the parent gate deferred at §H5, drafted the way the package-layer page was: mechanism only, every number verified against the committed artifact, nothing written, no vocabulary term past `status: planned`. It must put four things to the SME: (a) whether a .cypher file is an ordinary :CodeModule or its own class; (b) the edge names and directions for "this module executes that file" and "that file writes this label"; (c) how the join to the DOMAIN graph is expressed given a label is not a node — the thing that would finally answer "which module loads this job"; and (d) what the loader does with declarations it cannot resolve statically. gates.json + the enforcement matrix regenerate; the SIGN-OFF is a separate SME session.
+notes: |
+  Groomed 2026-08-02. The chain is STATICALLY DERIVABLE — checked before grooming, not assumed: 26 of 27 `cypher_path` declarations resolve to a literal filename by AST, 39 labels are written across the 45 .cypher files, 16 are read-only, and 9 of 32 loader scripts yield no write-label at all (edge-only or migrations). That residue is exactly what (d) has to rule on, and it is the reason this cannot be a build item. Only possible NOW: .cypher files became graph nodes for the first time at U9 — the old scan saw Python only, so the artifact could not express the chain at all. G27/W1 precedent: drafting a prompt decides nothing.

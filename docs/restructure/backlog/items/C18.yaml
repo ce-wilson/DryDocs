@@ -1,0 +1,24 @@
+id: C18
+epic: ontology-mapping
+title: Delete the stale shadow catalog row models in drydocs_core/models/catalog.py (unused, already drifted
+  past C9 §d) — one definition, imported like every other loader
+type: chore
+module: drydocs-core
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/models/catalog.py
+- drydocs/loaders/catalog.py
+- tests/unit/test_pat_product_mapping.py
+- docs/adr/
+acceptance: |
+  Exactly ONE definition of each catalog row model survives, and the loaders import it the way every other loader does (from drydocs_core.models) or the shadow is deleted outright — no duplicate class names across the two modules. A test pins that pat_product_mapping's row model carries sponsored_area_product_id (the C9 §d field) and the ';' -> ',' seal_ids normalizer, so a future move cannot silently lose either. Full suite green; import drydocs.cli and drydocs --help both OK.
+notes: |
+  Filed 2026-07-27. All 8 catalog row classes exist twice — in drydocs_core/models/catalog.py and again in drydocs/loaders/catalog.py — and NOTHING imports the drydocs_core copies. The shadow has already drifted past a signed gate: its PatProductMappingRow is missing sponsored_area_product_id (C9 §d, 2026-07-18) and lacks the ';' -> ',' seal_ids normalizer the real PAT report needs. Because model_config is extra="ignore", switching to it would drop that column SILENTLY at validation and leave pat_product_mapping.cypher §3b permanently dead with no error — the "succeeds loudly, does nothing" family again, this time pre-armed rather than live. p2 not p3 because the ADR 0002-A-1 migration direction is TOWARD drydocs_core, so a Phase-C move makes the stale copy win by default. Every other loader (controlm_*, seal_*, manual_loads, cli) already imports from drydocs_core.models — the catalog loaders are the only ones defining models locally. 2026-07-27 — DONE. drydocs_core/models/catalog.py DELETED (its 5 re-exports removed from models/__init__.py with the reasoning kept inline); nothing imported it, so no runtime change. Deleted rather than re-synced: two definitions is the defect, not which one is stale. Scoped deliberately SMALL — the live models stay in drydocs/loaders/catalog.py and the "catalog loaders are the odd ones out" inconsistency is left for the Phase-C move (ADR 0002-A-1), which should MOVE them, not copy. Generalized per the SME's step-1 direction: new tests/unit/test_no_shadow_definitions.py fails on ANY top-level class name defined in two production modules (drydocs/ + drydocs_core/, public names only — test-local fakes and private names are legitimately per-module), with an EMPTY allowlist that requires a written reason per entry, plus a path pin so the specific file cannot come back unnoticed. The C9 §d field and the ';'->',' normalizer were ALREADY pinned by test_pat_product_mapping.py — those pins tested the live copy, which is exactly why the shadow drifted invisibly; the guard closes that, no new pin needed. Suite 979 (+3), ruff-neutral, drydocs --help OK.
+annotations:
+  status: 2026-07-27 (CLI session) — shadow deleted + the wider no-shadow guard; also step 1 of the "did
+    the gate land?" plan

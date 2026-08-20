@@ -1,0 +1,22 @@
+id: R1
+epic: agentic-qa
+title: 'SME gate session: review ADR 0007 (agentic Q&A architecture) and rule the three open axes — context-graph
+  escalation residency, :AgentRun target DB, LLM key strategy'
+type: task
+module: docs
+phase: 15
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0007-agentic-qa-architecture.md
+- docs/restructure/IDEAS.md
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  ADR 0007 status flipped to ACCEPTED (or SME edits recorded and the ADR re-drafted) in a gate session; the three axes it leaves open are ruled and recorded in the ADR body — (a) context-graph escalation residency (in-process only vs ddcontext SYNTHESIZED envelope with session tag + TTL sweep), (b) :AgentRun envelope target DB (proposal ddcontext; never drydocs), (c) LLM key strategy for the ADK agents (Gemini vs Anthropic via LiteLLM) — closing the 2026-07-03 IDEAS.md key question into the ruling.
+notes: |
+  Decision item → fable per the model matrix (residency + key strategy change component boundaries). Reference clones live in the sandbox beside this repo (llm-graph-builder, knowledge-graph-of-thoughts). DONE 2026-07-23 — accepted as written; rulings: (a) in-process-only task-graph residency (ddcontext persistence deferred, new gate if ever), (b) :AgentRun -> ddcontext via a dedicated writer boundary, (c) LLM keys environment-split — local/producer Anthropic, company Azure OpenAI, Gemini NOT the default (supersedes the 2026-07-03 IDEAS assumption); provider adapter + usage-extractor seam must cover both from day one.
+annotations:
+  status: gate session 2026-07-23 — ADR 0007 ACCEPTED as written; rulings in config/gate-log.md

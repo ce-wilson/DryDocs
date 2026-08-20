@@ -1,0 +1,20 @@
+id: O54
+epic: web-console
+title: The enforcement matrix cannot show a guarded code-resident surface as enforced — and the canonical
+  load sequence is exactly that surface
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- scripts/render_enforcement_matrix.py
+- drydocs/cli.py
+- web/src/generated/enforcement-matrix.json
+acceptance: |
+  A surface row for the canonical load sequence (cli.CANONICAL_LOAD_SEQUENCE with LOAD_PROFILES and SCHEDULED_INGEST_EXCLUSIONS) is in the generated matrix, and it renders `enforced` rather than `unguarded`: today the renderer forces status="unguarded" for ANY row flagged code_resident regardless of its guards, which is now simply wrong — N3/N6 gave that surface real guard tests. The status logic separates "config living in code" (a fact about WHERE it lives) from "nothing guards it" (a fact about whether it is tested), the page's KPI wording is updated to match, and the render stays deterministic with its drift test green.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-55. The blocker the entry named — "the registry needs to accept a module path" — was checked at the groom and is NOT the blocker: the renderer only requires the declared path to exist, and drydocs/cli.py does. The real blocker is the unconditional code_resident -> unguarded branch in render_enforcement_matrix.py. Module drydocs-web and epic O because the matrix is the O12 admin surface's generated artifact; the row's SUBJECT living in drydocs/cli.py is the whole point of the row.

@@ -1,0 +1,21 @@
+id: G1
+epic: component-topology
+title: Author and locally validate the multi-DB topology
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0002-component-database-topology.md
+- drydocs_core/schema/
+- drydocs_core/neo4j_client.py
+acceptance: |
+  Provisioning authored + validated on a LOCAL Neo4j Enterprise (Docker, free dev license): CREATE DATABASE drydocs + drydocs_context, CREATE COMPOSITE DATABASE drydocs_all aliasing both; assetId/jobId uniqueness constraints + indexes in BOTH data DBs (proxy-node keys); a drydocs_all smoke query reads both constituents and writes neither. Scripts are target-agnostic (run unchanged against any multi-DB-capable DBMS).
+notes: |
+  ADR 0002 follow-up #1, split for infra reality. TESTING is capped at ONE database on the live Aura tier (single node) — multi-DB + composite are Enterprise-only features. So the topology is authored + proven on a LOCAL Enterprise instance now; the LIVE deploy is G7 (blocked on infra). No data load — provisioning + proxy-node constraints only. See memory drydocs1-live-neo4j.
+progress: |
+  2026-06-28 — AUTHORED: drydocs_core/schema/provisioning/ (01_databases.cypher, 02_proxy_constraints.cypher, smoke_drydocs_all.cypher, provision.ps1, README.md). Proxy-node keys reuse canonical identity (DataAsset.assetId, ControlMJob(folder_id,job_id)) — no identity invented. 2026-07-01 — VALIDATED, DONE: scripts executed in provision.ps1 order via cypher-shell inside a local Docker Neo4j 2026.05.0 ENTERPRISE (container neo4j-drydocs-ee, host ports 7476/7689). drydocs + ddlineage + ddcontext + ddall composite all online; proxy constraints verified in all three data DBs (controlmjob_key NODE_KEY, dataasset_id UNIQUE); federated smoke over ddall read all constituents (0/0/0, empty topology) and wrote nothing. Live deploy remains G7 (blocked).

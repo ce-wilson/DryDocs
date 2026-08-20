@@ -1,0 +1,19 @@
+id: D9
+epic: config-loaders
+title: 'Precedence: express the internal refines chain (vendor <- platform team <- support group) instead
+  of one flat internal tier'
+type: task
+module: config
+phase: 3
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/precedence.yaml
+- knowledge/standards/technology/folder-naming-convention.md
+acceptance: |
+  A proposal lands for how config/precedence.yaml expresses two internal levels (the DAT SRE platform standard refining the BMC baseline, the HLT support-group standard refining DAT) so that where the two internal standards disagree — folder grammar, position-6 meaning, whether the app code carries the SEAL — the file records which wins; the ordering decision itself routes through the HITL gate (docs/restructure/03-hitl-sme-flow.md) and precedence.yaml changes only when confirmed; the position-6 "frequency = legacy" claim in the publishable folder-naming standard is verified against both source standards and corrected or annotated per-standard if still wrong.
+notes: |
+  Groomed 2026-08-07 from Idea-64 (SME framing: Vendor -> Company/Platform team -> Lower support group; both internal levels sit at precedence tier 2 today). Fable: conflict-resolution semantics. The refines: frontmatter chain in knowledge/standards is the input evidence.

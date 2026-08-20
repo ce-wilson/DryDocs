@@ -1,0 +1,26 @@
+id: C10
+epic: ontology-mapping
+title: Convert the external/ServiceNow doc set to readable text and mine each file for CMDB/CSDM concepts
+  DryDocs should adopt
+type: task
+module: reference
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- 'external/ServiceNow/ (6 files, downloaded 2026-07-20: CMDB - Process Guide.docx, CMDB - Product Architecture.pptx,
+  CMDB Data Manager.pptx, CMDB Governance Workshop.pptx, ITAM - SAM - Product Integration Options - Yokohama.pptx,
+  What are services and service offerings.pdf)'
+- knowledge/upgrade-plans/generic-terminology-research.md
+- external/orchestration/bmc-controlm/SOURCE-MANIFEST.md
+- config/classification.yaml
+- reference/REGISTRY.yaml
+acceptance: |
+  (1) HOUSING: external/ServiceNow/ is a registered source — a README/SOURCE-MANIFEST per the bmc-controlm pattern records per-file provenance (source_url where known, download date 2026-07-20, vendor = ServiceNow), the trust axis, and a sensitivity classification SET at execution (External expected — vendor material — but the PDF/PPTX redistribution question is decided and recorded, not assumed); classification guards green. (2) CONVERSION: every file has a readable-text twin (extracted/*.txt or .md — the SDLC-Docs/extracted idiom; pdf via the pypdf precedent, docx/pptx extractor chosen at execution) so agents can grep and read it without binary parsing. (3) ANALYSIS: a per-file detailed analysis note exists (knowledge/upgrade-plans/servicenow-cmdb-analysis.md or similar) — for EACH file the key concepts it defines (service vs service offering, CMDB CI classes, CSDM domains, data-manager/governance practices, ITAM/SAM integration shapes), each dispositioned incorporate/park/reject with its DryDocs target (taxonomy capture, ontology term, terminology-research cross-ref, or ops/console practice); the CSDM service/service-offering model explicitly cross-referenced against the generic-terminology research note (Business Application / Application Portfolio) and our existing labels. (4) THE HARD RULE: nothing is adopted by this item — any concept implying node/edge meaning lands as status: planned/proposed and routes to the HITL gate; the analysis note lists those candidates. Full suite green.
+notes: |
+  Groomed 2026-07-20 directly from chat (the C9 direct-promotion precedent). User context: during full-circle-docs planning the user considered shipping DryDocs as a ServiceNow Marketplace app (research only — no plan existed) and referenced the CMDB for the taxonomy to create a corresponding ontology; this doc set is that reference material, downloaded 2026-07-20. Feeds the parked generic-terminology idea (SEAL -> Application Portfolio / PAT -> Product Taxonomy) — the CSDM service/service-offering layer is the missing piece of that research. Files stay UNTRACKED until this item's housing step decides classification (no binaries committed before the redistribution question is answered; the extracted text twins may become the committed form if the binaries stay local). Epic/phase call: ontology-mapping / phase 2 because the mining target is ontology correspondence — a future productization epic may adopt the follow-on work. DONE 2026-07-20: (1) HOUSING — external/ServiceNow/README.md is the SOURCE-MANIFEST (Now Create asset numbers 0003948/0002024/0003551/0001261/0001397; classification External, captured_at 2026-07-20; REDISTRIBUTION DECIDED per the BMC-poster rule: binaries AND verbatim extracted twins gitignored local-only — a full-text dump is the vendor's words; committed record = manifest + analysis). (2) CONVERSION — scripts/extract_office_text.py (stdlib docx/pptx + pypdf) wrote 6 local text twins (~200k chars). (3) ANALYSIS — knowledge/upgrade-plans/servicenow-cmdb-analysis.md: per-file concepts dispositioned incorporate/park/reject + the CSDM<->DryDocs correspondence table (BusinessApplication ALIGNED with cmdb_ci_business_app; Information Object ~= DataAsset; CCB/RACI validates the HITL gate; Yokohama renamed Application Service -> Service Instance — adopt concepts, not vendor labels). (4) Five gate-bound/follow-up candidates listed — NOTHING adopted: deployed-instance concept + attestation practice = gate; per-attribute lineage -> provenance-plan next touch; verify-vocabulary alignment + InformationObject annotation = docs/note-level. Two large files read via subagents. Suite 738.
+annotations:
+  status: DONE 2026-07-20 same session — housing + extraction + analysis committed

@@ -1,0 +1,18 @@
+id: L26
+epic: doc-infrastructure
+title: The documentation skill has no white-paper type, though the repo has a white paper
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/documentation/SKILL.md
+- docs/whitepaper/drydocs-whitepaper.md
+acceptance: |
+  The documentation skill gains a "White paper" document type alongside README, API, runbook, architecture and onboarding, with its section sequence stated (executive summary, problem, approach, architecture, governance, roadmap) and docs/whitepaper/drydocs-whitepaper.md named as the worked example that sequence was derived from; the skill's type list and its type-selection prose agree, so a future white paper is not re-derived from the architecture type by hand.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-8. The whitepaper was written by deriving structure from the architecture type plus general white-paper convention — the derivation worked, it just was never written down. The optional half of the entry (an Epic L outline, whitepaper.outline.yaml, so the render pipeline validates it) is deliberately NOT in this item: outlines govern design docs, and the whitepaper is explicitly a non-governed outward-facing document where editorial treatment is allowed (CLAUDE.md, governed renders).

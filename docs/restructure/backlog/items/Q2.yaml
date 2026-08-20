@@ -1,0 +1,24 @@
+id: Q2
+epic: docmeta
+title: 'Experiment: load the Essential GraphRAG ebook as a Document→Chunk lexical graph; test agent traversal
+  over it'
+type: task
+module: drydocs-load
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- Essential-GraphRAG.pdf (repo root — local-only, gitignored)
+- drydocs/loaders/bmc_docs.py
+- drydocs/loaders/cypher/bmc_docs.cypher
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/source-registry.yaml
+acceptance: |
+  The ebook is text-extracted (pypdf — the ingest_jpmc_reports.py precedent) and chunked with the DETERMINISTIC lexical pattern the bmc-docs gate accepted (section-based, seq-0 preamble; no LLM/embeddings in the load), then loaded under a NEWLY registered source entry (config/source-registry.yaml, classification External; the confirmed flip cites this groom's user decision or a mini-gate note in config/gate-log.md — decided at execution) REUSING ONLY active docs_* vocabulary (docs_chunk_part_of / docs_first_chunk / docs_next_chunk; docs_describes only if a registry SoftwareProduct target genuinely applies) — zero new relationship types; any new edge meaning aborts to the HITL gate. Target DB decided at execution — drydocs (co-locate, the bmc-docs precedent) vs ddcontext (the user's "our own unstructured context graph" phrasing) — with the choice + rationale recorded in these notes. Then the experiment: an agent-traversal test session answers >=5 retrieval questions by graph traversal over the loaded chunks (MCP read tools or an ADK agent), with transcript + findings recorded as docmeta P0 benchmark evidence (the traversal arm) and pointed to from the docmeta plan. Full suite green.
+notes: |
+  Groomed 2026-07-16 (same inbox line as Q1; user intent: "an experiment to load into our own unstructured context graph for testing agent traversal"). Deliberately vocabulary-reusing — the bmc-docs-lexical-load gate (2026-07-08) activated the lexical model, so no gate is needed unless a new edge meaning appears. The one methodological delta from bmc_docs (which chunked .md by H2) is PDF sectioning — extraction choices belong in the run notes. DONE 2026-07-16. TARGET DB DECIDED: ddcontext — experiment/reference content stays out of the ground-truth drydocs DB; matches the user's "our own unstructured context graph" phrasing + the jpmc-reports ddcontext precedent (drydocs co-location rejected: the book is not operational ground truth and has no SoftwareProduct DESCRIBES target). CONFIRMED FLIP: registry-note citation of the Q2 groom user decision (covering gate bmc-docs-lexical-load; no gate-log entry — no new edge meaning). Built: EssentialGraphragAdapter/ Loader (pdf-lexical-v1: 8 chapter openers via "This chapter covers", monotonic section scan immune to glued running heads, appendix A.1-A.4, front/back matter) + essential_graphrag.cypher (bmc_docs minus DESCRIBES, + chapter/ section/page_start) + CLI load-essential-graphrag (--database, default ddcontext) + registry/audit-fields/LEDGER_PENDING entries + 8 unit tests (synthetic pages + skip-guarded real-PDF test). Loaded live: 43 chunks, 42-edge NEXT_CHUNK chain, 0 rejects, idempotent re-run rows_changed=0. Traversal session: 7/7 questions via MCP read-cypher with USE ddcontext (structure/sequence/aggregation/provenance exact; content scans bounded at exact-substring — the vector arm's case; front-matter pollution lesson). Evidence: docs/reviews/essential-graphrag-traversal-experiment.md, pointed from the docmeta plan P0 row. Suite 667 passed / 6 skipped.
+annotations:
+  status: DONE 2026-07-16 same day (main session; loaded live + traversal session run)

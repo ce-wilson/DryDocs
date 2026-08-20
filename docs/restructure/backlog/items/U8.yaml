@@ -1,0 +1,20 @@
+id: U8
+epic: self-documentation
+title: Committed depgraph snapshots carry no machine-absolute paths — strip/relativize abs_path so cross-machine
+  and worktree snapshots stop producing 100%-false node diffs
+type: bug
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- drydocs/loaders/code_snapshot.py
+- knowledge/depgraph-snapshots/README.md
+acceptance: |
+  Committed snapshot JSON carries no machine-absolute paths — snapshot.ps1 post-processes abs_path out (or relativizes to the repo root) the same way it already injects the meta header; two snapshots of identical code taken from different checkout locations differ only in their meta block; the G33 code_snapshot loader stays green (it already drops abs_path at load); the README documents the change as an instrument-change boundary marker so the diff jump is not read as growth.
+notes: |
+  Groomed 2026-07-28 pm from the abs_path [bug] line — twice ritual-blocking that day (laptop cross-machine diff; P5 worktree deferral). Closing this unblocks session-end snapshots from worktrees. LANDED 2026-07-28 (laptop): abs_path stripped textually before write (formatting preserved, exactly like the meta injection), with a loud refusal if any survive and a JSON-validity check. Proven cross-machine — the laptop snapshot and the desktop's committed drydocs-20260728.json now differ by exactly ONE node (the test file genuinely added) where the same pair would have differed by all 209.

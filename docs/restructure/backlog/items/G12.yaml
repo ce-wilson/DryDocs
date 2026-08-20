@@ -1,0 +1,22 @@
+id: G12
+epic: component-topology
+title: Lineage writer ETLProcess endpoint class — TRIGGERS targets stop collapsing to :Script
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/writer.py
+- drydocs_lineage/model.py
+- tests/unit/test_lineage_writer.py
+- config/gate-log.md
+- drydocs_core/ontology/relationship_vocabulary.yaml
+acceptance: |
+  drydocs_lineage.writer maps TRIGGERS targets to :ETLProcess endpoints per the two 2026-07 gate decisions (gate-log 2026-07-15 "Lineage rel vocabulary gate" + 2026-07-16 "cmdline-lineage-review"): identity = the kind-scoped stable token (Ab Initio pset/graph BASENAME; DPL -pipeline GUID) with kind (etl|utility|notification) stamped and full path / dataflow / config JSON kept as properties; every other non-job process still MERGEs as :Script keyed by full path (multi-mount duplicates stay separate for review). The gate-bound refusal is UNCHANGED — m3_* stay planned and write_curated keeps raising GateBoundVocabularyError until the flips land with the curated-load build. Unit tests prove the endpoint mapping on plan_curated output (duck-typed, no live DB); full suite green.
+notes: |
+  Groomed 2026-07-16 from the 2026-07-15 inbox line (lineage vocab gate residual); the business-key half was decided at cmdline-lineage-review and implemented extractor-side (_stable_invocation_key) — THIS item is the writer half. Shapes are gate-confirmed, so sonnet with a written acceptance; no ontology decision remains.
+  DONE 2026-07-19 — executed by a general-purpose subagent (sonnet), diff reviewed in-session. Classification is node-kind-based: abinitio|dpl processes MERGE as :ETLProcess {token} (the extractor's _stable_invocation_key token; kind/engine/name/ path/dataflow/config_path as properties, etlprocess_token constraint); every other non-job process stays :Script by full path. Consequence: INVOKES targets of those kinds also land on :ETLProcess (wrapper-payload expansion) — the m3_invokes to_node broadening question and the kind='etl' constant discriminator are inboxed in IDEAS.md for the next gate/groom. Gate-bound refusal and vocabulary untouched. Suite 730 green (+2 endpoint-mapping tests).

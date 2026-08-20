@@ -1,0 +1,20 @@
+id: U6
+epic: self-documentation
+title: 'Fix the depgraph scanner''s three blind spots so the code graph tells the truth: cross-root IMPORTS
+  edges, function-level imports, and the missing drydocs_api scan root'
+type: bug
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- docs/reviews/persona-python-architect-2026-07.md
+- docs/reviews/persona-project-manager-2026-07.md
+acceptance: |
+  A regenerated snapshot loaded via drydocs load-code-snapshot yields all of: (a) IMPORTS edges that CROSS scan roots — the probe "drydocs/ modules importing drydocs_core/" returns rows and its module count matches a fresh grep ground truth (24 files as of 2026-07-28); (b) function-level imports recorded — the known case drydocs_core/neo4j_client.py -> drydocs_core/cypher_split.py has an edge; (c) drydocs_api/ modules present as :CodeModule with project drydocs_api (snapshot.ps1 target list + its Phase-B comment updated); (d) the U1 orphan query re-run shows none of the 24 dispositioned false positives as importer-less unless the U1 report classed it a genuine entry point; (e) scanner-side regression tests covering (a)+(b) live in the depgraph repo's own suite.
+notes: |
+  Groomed 2026-07-28 from the U1/U2 "one fix, three symptoms" IDEAS line, confirmed live by the graph-navigation benchmark (graph said 0 cross-root drydocs->drydocs_core imports vs grep's true 24). The work splits across two repos: (a)+(b) are import-resolution changes in the EXTERNAL depgraph tool (local at C:/coding/projects/depgraph, own git history — invoked by snapshot.ps1 as python -m depgraph.cli scan); (c) is a one-line target-list edit in snapshot.ps1. Module graph-infra chosen over docs: the snapshot pipeline feeds the graph, it is not process prose. Unblocks U4 (re-sequenced onto this item) and makes graph-first agent navigation safe (see the companion IDEAS line, still inboxed). Verify with tests/integration + the live drydocs db; the IMPORTS caveat (gate D2 — never read an edge as breaks-if-removed) still applies after the fix. CLOSED 2026-07-28 same day (built + verified live): root cause was ONE defect — scan() ran each root in isolation, so absolute imports naming a sibling root (cross-root) OR the file's own package dir (the function-level neo4j_client case) never resolved; ast.walk was never the problem. Fix = shared-namespace extract_many in the depgraph repo (python_imports.py + scan(); 7 regression tests, committed on its feat/controlm-lineage branch) + drydocs_api added to snapshot.ps1 targets. Live acceptance all four clauses: (a) 24 modules / 49 edges drydocs->drydocs_core, matching grep module-for-module; (b) neo4j_client->cypher_split edge present; (c) 11 drydocs_api :CodeModule; (d) orphan re-run = ONLY tests/* files (pytest entry points) — all 24 U1 false positives now have importers. Snapshot drydocs-20260728-0848.json: 205 modules, 370 IMPORTS (was 194/105), still 0 cycles; layering clean (zero drydocs_core->upward edges) — A1 is now answerable from the graph.

@@ -1,0 +1,34 @@
+id: G53
+epic: component-topology
+title: 'Contingency plan: fold every database into one if multi-DB is ever unavailable'
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: opus
+priority: p3
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0002-component-database-topology.md
+- drydocs_core/schema/provisioning/01_databases.cypher
+- drydocs_core/schema/schema_graph.cypher
+- config/dev-environment.yaml
+acceptance: |
+  A written consolidation plan (an ADR 0002 amendment or its own ADR) that answers each of these with a concrete mechanism rather than an intention: (1) HOW THE TRUST BOUNDARY SURVIVES — ADR 0002 D1 rejected the single-DB option because it commingles trust, so name the label namespace, the trust property, and the guard tests that would replace the transaction domain, and state plainly what protection is lost (the ADR's own words: multi-DB moves the guarantee "from discipline to physics", and one DB moves it back); (2) HOW ddschema's EXEMPLAR NODES COEXIST WITH drydocs' NODE KEYs — exemplars carry real labels WITHOUT the properties those keys require, which is the stated reason ddschema is its own database (G51), so this is a hard constraint conflict, not a naming collision; (3) WHAT REPLACES ddall — an enumeration of every QuerySpec, loader, and console route that names a non-default database or federates through the composite; (4) THE CONFIG CHANGE POINT — dev-environment.yaml's db-name map, and whether one map can serve both topologies so the fallback is a config switch rather than a code fork. Plan only: no provisioning, loader, or schema changes land from this item.
+notes: |
+  Worst-case contingency, groomed 2026-08-04 on the user's direction after the laptop's Neo4j Enterprise 30-day eval trial expired (2026-08-01). THE EXPIRY IS NOT THE TRIGGER and is explicitly out of scope — it is a local-testing license matter, the server keeps running, and writes were verified working after it (laptop, neo4jtest, drydocs DB: 2218 nodes, an Enterprise-only existence constraint created then dropped, six user databases online). What this plans for is Enterprise becoming genuinely unavailable — a company-side edition constraint or a cost ruling — because Community allows exactly ONE user database. That would collapse drydocs + ddlineage + ddcontext + ddschema into one store and remove the ddall composite entirely. ADR 0002 already priced this option and rejected it: "Community single DB + reliability property + :Candidate label namespace" is a listed D1 alternative, rejected because it commingles trust and "one bad query promotes noise". So this item does NOT re-open the decision — ADR 0002 stays accepted. It writes down the fallback we would otherwise have to improvise under duress, while there is time to think about it properly. The honest output may well be "consolidation costs us X and here is the sequence"; a plan that concludes the trust guarantee cannot be preserved in one database is a valid and useful result, provided it says so explicitly instead of papering over it.
+annotations:
+  status: 'closed 2026-08-10 (desktop, 04:07 session). ADR 0011 (its own record — 0002 stays ACCEPTED,
+    nothing re-opened), status PLANNED, execution SME-gated. All four clauses answered with mechanisms:
+    (1) trust boundary = :Uncertain label namespace + mandatory reliability property (existence-constraint
+    where available, S10-pattern writer refusal on true Community) + three guards incl. a structural WHERE
+    NOT n:Uncertain generated into the spec registry — and the loss stated plainly: physics -> discipline,
+    with the residual double-fault window named; (2) ddschema exemplars fold by moving REAL labels into
+    describes_label property (NODE KEYs never see them; dropping the keys rejected in advance on the T23
+    crash class); (3) ddall consumer enumeration = full grep sweep (query_specs SPEC/WATERMARKED sets,
+    the two ddcontext literals at 833/871, exports.py:297, routing.py review rule, cli.py verbs, deepdoc
+    DATABASE, schema_graph.py, docs_coverage) each with its re-key — invariant: trust signal moves from
+    WHERE a query runs to WHAT it matches; (4) dev-environment.yaml databases map = the single switch
+    (one map serves both topologies) with two named preconditions (the two spec literals through the map;
+    a topology guard for the half-folded case). No provisioning/loader/schema change landed.'

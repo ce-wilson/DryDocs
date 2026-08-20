@@ -1,0 +1,23 @@
+id: Q12
+epic: docmeta
+title: 'Doc-capture scale guardrail: the web connector refuses a bulk scrape above a threshold instead
+  of silently fetching thousands of vendor pages'
+type: task
+module: drydocs-docmeta
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- Q6
+inputs:
+- config/doc-source-registry.yaml
+- knowledge/upgrade-plans/docmeta-component.md
+acceptance: |
+  The web-capture entrypoint resolves its FULL target page list from the publisher's own manifest (e.g. the Author-it `toc.json`) BEFORE issuing any content request, and prints tree, page count, and estimated bytes + wall-clock at the configured delay. It REFUSES to proceed (non-zero exit, count named in the message) when the resolved count exceeds a configured threshold unless an explicit opt-in flag is passed; the threshold and the per-request delay are config values, never hardcoded literals. A `--dry-run` prints the same plan and exits 0 having fetched no content. Unit tests drive refusal-above and pass-below against a fixture manifest with NO network (the Track-1 portable rule). No capture script may land before this guard exists — Q6's acceptance carries the same clause.
+notes: |
+  User-requested 2026-07-31 after a live feasibility probe of the BMC help trees: "stop or warn the user if they try to scan that many with the script." The numbers are the argument, and they were measured, not estimated — documents.bmc.com publishes a machine-readable `toc.json` per tree, so the page count is knowable BEFORE fetching anything, which is exactly what makes a pre-flight refusal cheap and a post-hoc abort unnecessary: /supportu/INC/ (INCONTROL mainframe) = 10,912 pages ~210 MB raw; /supportu/9.0.20/ (distributed, complete) = 3,860 pages ~74 MB; /supportu/9.0.21/ (distributed, trimmed — no Utilities book) = 1,965 pages ~38 MB. Sampled pages averaged ~19 KB raw / ~6.9 KB extracted text. Two distinct harms the guard prevents, both real: hammering a third-party vendor site (robots.txt ALLOWS these paths, so politeness is entirely on us — there is no server-side backstop), and committing tens of MB of vendor copyright into a repo that is private-but-sometimes-published. A THIRD hazard motivated the request and belongs in the warning text: the operator can pick the wrong tree entirely and not notice. /supportu/INC/ is the INCONTROL MAINFRAME family (Control-D, Control-O, Control-M/Tape, JCL Verify) — its "Control-M" subtree at 40498.htm is Control-M **for z/OS** administration (CTMPLEX/Sysplex, started tasks, user exits, allocated datasets), NOT the distributed estate DryDocs models. So the pre-flight summary must name the TREE and its top-level books, not just a number — a count alone would not have caught this. . DONE 2026-08-04 (LAPTOP), and it closed in two halves rather than one build. THE REFUSAL ITSELF ALREADY EXISTED: scripts/external_vendor_scrape.py shipped it 2026-07-31 (e549f07) with --dry-run, the manifest-resolved page list, the book-by-book pre-flight naming the tree, and 14 offline tests — built ahead of this item's dependency because the capture needed it that day. What was NOT met was the acceptance's other clause, and it is the one that matters for a guardrail: "the threshold and the per-request delay are config values, never hardcoded literals". They were module constants (DEFAULT_MAX_PAGES = 600, DEFAULT_DELAY_SECONDS = 1.0). . WHY THAT CLAUSE IS NOT PEDANTRY, and the reason this closed WITH Q6 rather than before it: Q6 gave the repo a SECOND door to the same third party — the component's web connector. Two doors with two literals is two different notions of "too many pages", decided by which entrypoint the operator happened to use. So the numbers moved to config/doc-capture.yaml (schema drydocs.doc-capture.v1: max_pages, delay_seconds, timeout, retries, user_agent, and the SSRF scheme allow-list), both consumers read it, and a test asserts BOTH files reference CapturePolicy so a future third door cannot quietly re-hardcode. The refusal type moved with it — one rule, one exception class, raised from one place. . The scraper's own fetch() now also enforces the scheme allow-list, which it never did: it would have followed a file:// URL in a tree definition. . Registered as an enforcement-matrix surface (config/doc-capture.yaml -> scripts/external_vendor_scrape.py + drydocs_docmeta/connectors/web.py), so the config-surface guard covers it like every other governed config file.
+annotations:
+  status: DONE 2026-08-04 (LAPTOP) — the refusal shipped 2026-07-31 in scripts/; this close moved its
+    numbers into config and gave the component's connector the same rule

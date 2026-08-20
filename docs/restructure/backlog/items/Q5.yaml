@@ -1,0 +1,22 @@
+id: Q5
+epic: docmeta
+title: 'Doc-source registry ledger: config/doc-source-registry.yaml + guard test; backfill every ingested
+  corpus; house or evict root-level stray PDFs'
+type: task
+module: config
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- Q4
+inputs:
+- knowledge/upgrade-plans/docmeta-component.md
+- config/source-registry.yaml
+- config/classification.yaml
+- reference/research/README.md
+acceptance: |
+  config/doc-source-registry.yaml exists with a tests/unit/test_doc_registry.py guard enforcing classification + connector + curation tier on EVERY entry; all currently ingested doc corpora (bmc-docs, essential-graphrag, jpmc reports) are backfilled; remaining root-level stray PDFs are registered, housed, or gitignored (the Q1 /*.pdf precedent) — zero unregistered corpora. Full suite green.
+notes: |
+  Groomed 2026-07-18 — docmeta plan P2, the ledger house pattern (machine- readable config + a test that fails on drift). Sequenced after the Q4 gate so the registry schema matches what the ADR adopts. 2026-07-18 — DONE (commit 3e424f5, same-day as the gate). Ledger built on ADR 0006 semantics: target_db dddocs|ddcontext only, curation FIXED per tier (§4 ladder — the guard derives it, entries can't soften their gate), External => source_url+captured_at. Backfilled bmc-docs (dddocs target, P4 reload note), essential-graphrag + jpmc-reports (ddcontext; jpmc was the unregistered pre-docmeta ingestion — captured_at from e419ec7). Guard adds an INGESTED_CORPORA pin: a loaded-but-unregistered corpus fails CI. Root strays: only the gitignored+now-registered ebook PDF; tracked PDFs are the two UI-WIP wireframes (purposeful home). Suite 712.

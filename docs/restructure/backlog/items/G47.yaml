@@ -1,0 +1,21 @@
+id: G47
+epic: component-topology
+title: 'Control-M XML export ingestion seam: register controlm-xml-export + taxonomy-first extractor staging
+  folder/job definitions AND variables from the 9.0.21.300 XML config SoR'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/dpl_registry.py
+- drydocs_core/controlm/resolver.py
+- config/source-registry.yaml
+- docs/restructure/IDEAS.md
+acceptance: |
+  Source controlm-xml-export is registered in config/source-registry.yaml (Internal, kind orchestration, orchestrator bmc-controlm, confirmed: false; notes name the OPEN precedence ruling vs controlm-psgmgr as the HITL question — guardrail 3, never auto-decided here). A ControlMXmlDefsExtractor (drydocs_lineage/extractors/controlm_xml.py) stages, taxonomy-first with ZERO graph writes: folders (name, data_center), jobs (folder, name, task_type, cmd_line VERBATIM, node/application facts as present), and ORDERED variable definitions at folder and job scope (definition order preserved — the resolver's sequential-assignment contract depends on it). ASSUMED XML contract defined by SYNTHETIC fixtures (the dpl_mac discipline; the company's real 9.0.21.300 export validates or amends it — XML schema docs are a known gap). Coverage counts every skip by reason: files invalid, jobs without names, variables without names, unknown elements tolerated-and-counted. Real exports live under DRYDOCS_DATA_ROOT/controlm-xml/ (landing-zone registration; no filename-fingerprint sweep possible for generic .xml — reason documented). Unit tests green.
+notes: |
+  Groomed 2026-07-29 from the XML-fed cmd-line resolution idea. The company XML loader exists company-side (run-log tee + _ts() normalizer hardening rounds); this producer seam is the sanitized mechanism twin that makes the resolution step testable and portable. Guardrail 1: the extractor STAGES ordered defs only — substitution happens exclusively in drydocs_core.controlm.resolver. CLOSED 2026-07-29 (claimed same day): controlm-xml-export registered (Internal, orchestrator bmc-controlm, confirmed: false behind the precedence question); controlm_xml_dir() landing zone (no-sweep limitation documented in the helper + the registry entry); ControlMXmlDefsExtractor stages XmlFolderRecord / XmlJobRecord (cmd_line VERBATIM) / XmlVariableRecord (per-container document ordinals) with older-format TABLE/TABLE_NAME synonyms, SUB_FOLDER nesting, and every skip counted (no-name folders/jobs/variables, duplicate jobs first-wins, no-cmd_line staged-and-counted, non-consumed elements tolerated-and-counted). XmlDefsExtract.scope_layers(job) emits exactly the resolver's layers shape — the guardrail-1 handoff is proven end to end in tests (XML fixture -> scope_layers -> resolve_command_line -> resolved text, incl. subfolder-overrides-folder attribution). 8 synthetic-fixture tests; extract API graph-free by construction.

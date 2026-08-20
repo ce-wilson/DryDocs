@@ -1,0 +1,28 @@
+id: G98
+epic: component-topology
+title: 'The corporate-backbone gate prompt: :Company and both HAS_BUSINESS_SEGMENT* edges execute, are
+  constrained and are live in the graph, but were never registered in the relationship vocabulary'
+type: task
+module: ontology
+phase: 6
+agent: ontology-mapper
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/ontology.cypher
+- drydocs_core/schema/constraints.cypher
+- drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml
+- drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml
+- config/taxonomy-ontology-map/30-mappings-catalog.yaml
+- config/doc-source-registry.yaml
+- docs/RELATIONSHIP_GUIDE.md
+- config/gate-log.md
+acceptance: |
+  config/gate-prompts/corporate-backbone-vocabulary.yaml drafts the rulings as confirmations to be SIGNED, never pre-decided. GATE-BOUND: drafting and rendering this page registers nothing. THE FINDING IT EXISTS FOR: (:Company {name:"JPMC"})-[:HAS_BUSINESS_SEGMENT]-> (:BusinessSegment) is MERGEd by ontology.cypher:205-232, carries a uniqueness constraint (constraints.cypher:29), is documented as THE corporate hierarchy across four .claude/skills/data-context-extractor/ files, and is live in the graph — while 10-node-classifications.yaml registers BusinessSegment and CatalogLOB and NOT Company, and no fragment registers HAS_BUSINESS_SEGMENT or its _HISTORICAL twin. NOT a regression: git log -S "Company" over the vocabulary returns nothing, so it is an M0 seed that predates the registry — there is no prior ruling to honour or overturn, which is exactly why it needs one. (a) THE LABEL: does :Company enter 10-node-classifications.yaml, and under which class? BusinessSegment is already org:FormalOrganization / prov Agent, and the note there records that the doc said FormalOrganization while the supplement comment said org:Organization — the same choice recurs here and the clause must state both readings rather than inherit one. (b) THE TWO EDGES: HAS_BUSINESS_SEGMENT and HAS_BUSINESS_SEGMENT_HISTORICAL enter as status: planned per RELATIONSHIP_GUIDE.md. The clause must ask whether the effective-dated pair is TWO edge types or ONE type discriminated by effective_to, because the seed already writes both shapes and the vocabulary would ratify whichever it is told. (c) THE SINGLETON QUESTION, which is why this is not purely clerical: :Company is a one-node class in a repo built to be generic and portable to another company (ADR 0012's standalone-generalization goal). Rule whether the label is right at all, or whether the segment backbone should hang off an existing org class — and if :Company stays, whether "JPMC" is seed data or configuration. (d) THE GUARD, separable from the ruling and buildable WITHOUT it: nothing cross-checks an edge's from_node/to_node against the registered label set — test_taxonomy_ontology_map.py checks label UNIQUENESS and test_yaml_fragments.py checks fragment KEYS, so a wholly absent endpoint raises nothing and RECONCILES_TO passes only because its endpoint happens to be registered. Record that the guard does not wait on this page. (e) PUBLISH BOUNDARY, ruled 2026-08-17 and recorded so it is not re-litigated: the source is External-PUBLIC (config/doc-source-registry.yaml#jpmc-reports — classification: External, public SEC filings / IR PDFs, source_url present), so the JPMC literals in ontology.cypher are publishable. This clause CONFIRMS that reading rather than reopening it; clause (c) is about portability, not sensitivity. NOTHING enters the vocabulary active at this gate, and nothing is transcribed to config/gate-log.md until ticked.
+annotations:
+  status: '2026-08-17 (laptop): gate corporate-backbone-vocabulary SIGNED OFF 19/19; consequences applied
+    — :Company registered org:FormalOrganization, new 49-local-corporate.yaml with both edges status:planned,
+    the §D3 endpoint guard built (found 8 unregistered endpoint labels + CAN_ACT_AS, carried as declared
+    debt), the §B2 agreement check in m3-verify'

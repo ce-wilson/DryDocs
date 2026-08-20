@@ -1,0 +1,20 @@
+id: J5
+epic: release-infrastructure
+title: 'CI: GitHub Actions running the CLAUDE.md gates + the classification publish-boundary guard'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- pyproject.toml
+- tests/unit/
+- CLAUDE.md
+- tests/unit/test_classification.py
+acceptance: |
+  A .github/workflows/ci.yml runs on push + pull_request: checkout, set up Python (3.11 + 3.12) + Poetry (cached), poetry install, then the CLAUDE.md acceptance gates — poetry run pytest -q, python -c "import drydocs.cli", drydocs --help, and ruff check — plus the publish-boundary guard (test_classification.py) and test_schema.py; the network-dependent Neo4j steps are excluded (unit-test scope only); the workflow is green on main with no test/code changes required to pass.
+notes: |
+  Groomed 2026-07-09 from the parked IDEAS CI line (2026-07-01 architecture review; user confirmed promote 2026-07-09). Turns the CLAUDE.md §6 gates into an enforced push guard; the classification test is the automated half of the publish boundary (PUBLISH-BOUNDARY.md). DONE 2026-07-11: .github/workflows/ci.yml — push+PR, Python 3.11+3.12 matrix, Poetry cached, blocking gates (pytest -q, import drydocs.cli, drydocs --help, classification + schema subsets surfaced as named steps). ONE deliberate deviation from the groomed acceptance: ruff check runs ADVISORY (continue-on-error) — 757 pre-existing findings make a blocking lint gate impossible without a mass fix that would churn the whole port surface; the cleanup is inboxed (IDEAS 2026-07-11) and the step flips to blocking when it lands. Local verification: yaml parses, every blocking command green; the live green-on-main run triggers on this push (verify in Actions).

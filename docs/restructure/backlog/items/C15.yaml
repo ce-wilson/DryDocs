@@ -1,0 +1,21 @@
+id: C15
+epic: ontology-mapping
+title: relationship_vocabulary.yaml gains a display-only inverse_label per entry (SUPPORTS -> 'supported
+  by') for endpoint-correct edge phrasing
+type: task
+module: ontology
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- tests/unit/test_schema.py
+- docs/RELATIONSHIP_GUIDE.md
+- UI-WIP/backstage-catalog-assessment.md
+acceptance: |
+  Every relationship_vocabulary.yaml entry carries inverse_label — the target-side display phrasing (e.g. SUPPORTS -> "supported by") — with presence enforced by the vocabulary schema test; RELATIONSHIP_GUIDE.md documents the field as PRESENTATIONAL ONLY (no direction, type, status, or semantics change; storage stays one directed edge; explicitly not a gate matter, recorded as such); full suite green. Consumption (the node inspector phrasing incoming edges from the target side) rides the next inspector touch in Epic O, not this item.
+notes: |
+  Groomed 2026-07-22 from assessment T4 (Backstage inverse-pair naming, ownedBy/ownerOf). Labels-not-semantics, hence sonnet and no gate. CLOSED 2026-07-28: all 78 entries carry inverse_label (read as "<target> <inverse_label> <source>"); presence enforced by test_vocabulary_every_entry_has_inverse_label; field documented in the vocab header + a RELATIONSHIP_GUIDE "Maintaining" subsection recording PRESENTATIONAL ONLY / not-a-gate-matter explicitly; enforcement matrix regenerated (it keys on the vocab file). Inspector consumption rides the next Epic O touch per the acceptance. Suite 1082 green.

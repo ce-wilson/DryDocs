@@ -1,0 +1,26 @@
+id: L9
+epic: doc-infrastructure
+title: Design-doc screen HTML renders partial in Chrome (Brave renders it correctly)
+type: bug
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L3
+inputs:
+- docs/design/controlm-ingestion-tdd.html
+- drydocs/design_doc.py
+acceptance: |
+  The L3 screen .html renders full-page in current Chrome (root cause identified — likely CSS/print-view/file:// quirk, markup already validated), or the screen CSS is adjusted; the L4 PDF path stays pinned to Edge/Chrome headless (Brave hangs headless --print-to-pdf on this box, confirmed 2x 180s timeouts). Renderer tests green.
+notes: Groomed 2026-07-08 from IDEAS (seen same day; Brave = reference viewer for now).
+annotations:
+  status: '2026-07-21 pm — NO LONGER REPRODUCES: controlm-ingestion-tdd.html renders FULL-PAGE in Chrome
+    150.0.7871.129 (headless=new, 1200x2000 viewport + 1200x17000 full-height capture reaching the doc
+    end; evidence l9-chrome-*.png, session scratchpad). Root cause attribution: the report (2026-07-08)
+    predates the L13 single-html rework that REPLACED the L3-era screen CSS — the stylesheet the bug was
+    filed against no longer exists. No CSS change made; L4 PDF path untouched (stays pinned Edge/Chrome
+    headless; the Brave headless hang note stands); renderer tests green. CAVEAT recorded: verified headless
+    — if it still reproduces in INTERACTIVE Chrome, re-open with a screenshot.'

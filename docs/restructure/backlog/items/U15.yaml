@@ -1,0 +1,18 @@
+id: U15
+epic: self-documentation
+title: Snapshot meta.depgraph.dirty conflates untracked-files-present with instrument-differs-from-pin
+type: bug
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/README.md
+- knowledge/depgraph-snapshots/snapshot.ps1
+acceptance: |
+  The depgraph snapshot meta header computes its dirty flag from TRACKED changes only (git status --porcelain --untracked-files=no) or splits it into dirty_tracked / untracked_present; a snapshot taken with only untracked paths present reads as clean-tracked; the fix lands in the sibling depgraph instrument with the producer's snapshot ritual re-verified on this desktop (venue named per J18).
+notes: |
+  Groomed 2026-08-07 from Idea-58 (the 20260805 snapshot: dirty true at exactly the pin, the dirt being three untracked paths). Third finding in the instrument-provenance class — the entry argues for one grooming pass over the whole meta header; this item fixes the flag and records that larger pass as a candidate rather than doing it. DONE 2026-08-09 (desktop): the acceptance offered tracked-only OR a split; BOTH were done, because either alone loses something. `dirty` now counts TRACKED changes only (`git status --porcelain --untracked-files=no`) and `untracked_present` is recorded beside it (`git ls-files --others --exclude-standard`), on BOTH header blocks. The name `dirty` was deliberately NOT renamed to dirty_tracked: it lands on :Project as git_dirty (code_snapshot.cypher) and the whole committed series carries it, so a rename breaks every reader to fix a meaning — what changed is that it now means what its readers already assumed. ACCEPTANCE CORRECTION, recorded rather than worked around: the item says 'the fix lands in the sibling depgraph instrument'. It does not and could not — the dirty flag is computed in the PRODUCER's snapshot.ps1 (pre-change lines 111 and 221), and nothing in the sibling was touched. SCOPE WIDENED for the same reason: the title names meta.depgraph.dirty, but meta.git.dirty carried the identical defect one screen away, so fixing only the named one would have left the bug in place under a different key. NEW OBSERVATION worth the record: on the INSTRUMENT side untracked_present is closer to provenance than housekeeping — depgraph is run out of that checkout, so an untracked .py there is code that can join the scan while belonging to no commit; the refusal and drift messages now print the two states separately. PROOF, venue named per J18: desktop, against the sibling depgraph repo (C:\coding\projects\depgraph, main @ a56d2fc = the pin, otherwise clean) with one untracked scratch file present — old conflated view 1 line, new tracked-only view 0 lines, helper returns {dirty:false, untracked_present:true}, which is the acceptance's reads-as-clean-tracked case exactly; scratch removed, sibling left clean. Three guards added to test_depgraph_snapshots.py (tracked-only computation incl. a regex for the bare --porcelain call, both blocks record untracked_present, README states the new meaning), all three PROVEN to fail on the reintroduced defect before being trusted (J26). test_depgraph_snapshots 7 -> 10 passed.

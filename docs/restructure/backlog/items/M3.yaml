@@ -1,0 +1,22 @@
+id: M3
+epic: provenance-audit
+title: Audit envelope for the remaining sources (SEAL, catalog) via per-source gates
+type: requirement
+module: config
+phase: 11
+agent: pipeline-config
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/audit-fields.yaml
+- config/source-registry.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  The seal-extract and catalog-pat audit-fields stubs are resolved through per-source HITL gates (real column mappings authored in the internal twin — Internal, and confidential-handling, so never producer-side; producer entries flip stub -> confirmed with gate ids); their loaders SET the envelope; software-registry's stub gets an explicit decision (git history as audit trail). Doc 06 Phase 5 docs (loader README, port-prompt/ git-readme disposition row) land with it. test_audit_fields green both sides.
+notes: |
+  Doc 06 Phase 4 + 5. Gates are per-source pauses — sequence producer-first per port-prompt step 15. CLOSED 2026-08-04 (desktop): gate audit-envelope-phase4 SIGNED OFF 13/13 in-chat. The acceptance was OVERTAKEN BY EVIDENCE on both of its premises, recorded rather than papered over. (1) "flip stub -> confirmed": the SME evidence REVERSED the page's B1 recommendation — the SEAL registry's date fields are onboarding-LIFECYCLE milestones with two-era capture (legacy applications lack them; three live examples shown in-session), so creation_date is not record authorship and NO honest mapping exists to confirm; all four entries are RULED stubs with the why and the revisit trigger in their notes (SEAL's trigger: the registry UI exposes a per-application audit download — a true record-audit trail exists source-side, unextracted). "Resolved through per-source gates" is met; "confirmed" was never available. (2) the internal-twin clause was discharged as not-needed (gate §A2): the field inventories were already committed Internal-Public as loader-field mechanism by the S3 §B1(c) ledger and the catalog row models. PAT pair = stub-until-projected (zero audit columns in the report extracts; the C17 lesson keeps it non-permanent; valid_from/to pinned as validity-never- authorship); software-registry = ruled PERMANENT stub closing the repo-committed trio. No loader change (the B2 branch). Phase 5: loader README envelope section + doc 06 phase marks; the port "disposition row" is superseded by PORT-MANIFEST config/** canonical-producer (recorded in doc 06). Controlm-family stubs stay open as the Phase-4 residual. test_audit_fields green producer-side; company runs its own gate per the two-tier doctrine.
+annotations:
+  status: '2026-08-04 (desktop): gate audit-envelope-phase4 SIGNED OFF 13/13 in-chat, same session as
+    the claim'

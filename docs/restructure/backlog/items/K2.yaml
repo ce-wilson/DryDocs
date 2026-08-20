@@ -1,0 +1,24 @@
+id: K2
+epic: seal-attribution
+title: 'SEAL attribution loader: STG_APP_FACT facts -> job WAS_ASSOCIATED_WITH edges'
+type: requirement
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- K1
+- K3
+inputs:
+- drydocs/staging.py
+- drydocs/loaders/
+- config/source-registry.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  Gate sequence honored: the match policy (SEAL-fact precedence; one-to-one accepted, zero unmatched surfaced, multi-hit -> deterministic conflict triage or precedence resolution) is SME-confirmed via the HITL gate and logged BEFORE activation; the K1 vocabulary entry flips planned -> active with supplement + loader recorded. Loader consumes STG_APP_FACT rows (fact_type SEAL), matches job by (folder_id, job_id) node key and Application by seal_id, writes the agreed shape (MERGE with role; ON CREATE first_seen_at/source/match_method; SET last_seen_at/last_run_id); runs AFTER jobs + SEAL reference in the chain with JobRun provenance. Verify gains a coverage invariant (edge count + unmatched count, no silent drops). Offline unit tests on a fixture batch; full suite green.
+notes: |
+  Write shape + UC-NS-005 one-hop/recursive query shapes from the company reconciliation (2026-07-01) — document them (parameterized) beside the loader. Fidelity notes adopted: never key off job.APPLICATION without a declared reconciliation policy; keep source/match_method explicit so mixed pipelines stay auditable; attribution loads only after both job and application identities exist. 2026-07-08 TYPE CONFLICT (see taxonomy-ontology-map job-seal-app-ref type_conflict_note): wasAssociatedWith needs :Application to be a prov:Agent, but the K3 reshape reclasses it prov:Entity/dprod:DataProduct — run the K3 gate FIRST; the match-policy gate spec (seal-attribution-match-policy) may need its edge shape revised to the reshaped form before ticking. depends_on gains K3. 2026-07-10: K3 gate SIGNED OFF — the reshape IS confirmed needed (post-reclass wasAssociatedWith no longer type-checks against an Entity target), but the specific edge shape (a: prov:used vs b: local BELONGS_TO_APPLICATION) is DEFERRED to a K2 follow-up gate. K2 stays in_progress: still needs (1) that deferred edge-shape decision and (2) its own match-policy gate before the loader is built. 2026-07-14: match-policy gate SIGNED OFF 24/24 (config/gate-log.md) — the shape question resolved as: current WAS_ASSOCIATED_WITH shape type-checks TODAY, the K4 reclass re-opens it at its own follow-up gate; the confirmed policy is shape-agnostic. Loader build unblocked.
+progress: |
+  2026-07-14 — BUILT + DONE (branch feat/k2-seal-attribution-loader, same day as the gate): drydocs/loaders/seal_attribution.py (pure resolver — tier precedence, SEAL-alone, one-to-one accept, deterministic tie-break flagged for audit, TierReconcilers seam: APP_NAME from the loaded SEAL reference, FID/ALIAS await company-side tables; PIN-aware) + seal_attribution.cypher (gate §D shape exactly, MATCH-only endpoints, manual-pin guard) + manual_loads.py/manual_seal_attribution.cypher (§F tier 5: manifest-gated, never-mint-a-relationship, manually_created stamps) + controlm_app_facts.sql (ORDER BY = the tie-break contract) + CLI load-seal-attribution/load-manual-mappings (§E sequencing precondition). m3_seal_app_ref planned -> ACTIVE (supplement + loader recorded; K3/K4 rider intact); stg-app-fact confirmed: true per its own recorded activation condition, as ONE unit with the audit-fields stub + LEDGER_PENDING + registry-pin test. Coverage invariant joined graph_verify (graph-tests/seal-attribution-coverage.yaml, 6 TCs; JobRun stamps matched+unmatched+pinned=eligible, edges_written/dropped_in_graph). 37 offline tests on the synthetic fixture; suite 625/6. Acceptance met at build scope: the LIVE load (edges in the company graph) is Track-2 — map entry job-seal-app-ref stays confirmed (flips applied only when a live run writes it).

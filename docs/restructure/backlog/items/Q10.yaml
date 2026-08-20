@@ -1,0 +1,31 @@
+id: Q10
+epic: docmeta
+title: Ingest the failure/activity email corpus (.msg + Copilot JSON) with an SME surface for assigning
+  an email to a folder or process
+type: requirement
+module: drydocs-docmeta
+phase: 14
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on:
+- G31
+inputs:
+- config/doc-source-registry.yaml
+- docs/restructure/03-hitl-sme-flow.md
+- config/gate-prompts/
+- drydocs_core/ontology/relationship_vocabulary/
+acceptance: |
+  A doc-source-registry entry declares the email corpus with its classification, connector: email, tier, curation ladder, target_db and retention note; the corpus loads as the ACTIVE lexical shape (Document → Chunk) with the source .msg/JSON pair referenced by path, never copied into the repo; and an email whose folder/process is NOT extractable is loadable WITHOUT an assignment, landing unassigned rather than being rejected or guessed. The assignment edge (email Document → ControlMFolder / process) is NEW relationship semantics and goes through the HITL gate: registered `status: planned` in relationship_vocabulary.yaml with a gate-prompt spec, and no loader writes it until the gate confirms. The SME assignment surface itself may be a later slice — this item's floor is "ingested, unassigned, and gate-registered".
+notes: |
+  User source 2026-07-26: "we get emails that reference a failure or activity and I've extracted those as json files and save the original msg format... it may require an SME assigning it to a particular folder or process if it's not extractable from the email." RETENTION, and it is the reason the source pair matters: Outlook purges at 6-18 months, but the extracts are deliberately preserved on a file server until the PROCESS OR PROJECT retires — so after ~18 months the file server holds the only copy and becomes a system of record with a backup obligation, not a cache. Purge is therefore project/process-scoped (a property-scoped delete), NOT a database drop — which is why retention did NOT end up being an argument for a separate database, contrary to the initial guess in that session. Same instinct as the "always keep the original requirement" rule. CLASSIFICATION: production-failure email almost certainly Internal- Confidential (real names, real folder names, incident detail). The .msg/JSON originals live OUTSIDE the repo — the gitignored-PDF precedent — and only mechanism-level references are committed. Distinct from the 2026-07-22 email-DL contact-point idea already in IDEAS: that one is about DL membership as an ontology mapping; this is the email BODY as a document corpus. SIBLING CORPUS NOW EXISTS — READ BEFORE BUILDING (2026-08-05, user flagged the relation): `adhoc-sme-email` was registered in config/doc-source-registry.yaml for a one-off SME evidence email, with connector: email and citation-only shape. This item's acceptance says "a doc-source-registry entry declares THE email corpus", singular, so the first decision here is EXTEND vs ADD — not a discovery to make mid-build. Four properties differ (shape: citation-only vs the ACTIVE Document→Chunk spine; cadence: one-off vs recurring feed; retention: only Q10's extracts carry the post-purge backup obligation; assignment: only Q10 needs the email→folder/process edge), which is why they are two entries today. If the SME folds them, the shape difference becomes a per-Document property — cheap now, expensive once either has loaded.
+annotations:
+  status: '2026-08-19 (laptop): floor delivered in full: ops-email-extracts registered (confirmed via
+    the Q2 covering-gate precedent, lexical reuse only; retention note verbatim — the file-server pair
+    is the system of record after the Outlook purge, purge is project-scoped never a db drop); EmailExtractsLoader
+    + email_extracts.cypher load Document->Chunk with msg/extract paths as citations; UNASSIGNED is a
+    loadable resting state (no assignment field exists anywhere, test-forbidden tokens in the cypher);
+    docs_email_concerns registered planned (CONCERNS -> ControlMFolder | ETLProcess) + map row + gate
+    email-folder-assignment drafted with the K7 §A1 aboutness-never-attribution fence; synthetic samples
+    define the ASSUMED contract (G47 precedent); the SME surface stays a later slice per the item'

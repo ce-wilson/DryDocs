@@ -1,0 +1,25 @@
+id: G51
+epic: component-topology
+title: The meta-graph database is named by shipped code and created by nothing — provision it, and widen
+  the guard that let an unprovisioned name through
+type: bug
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- C21
+inputs:
+- drydocs_core/schema/provisioning/01_databases.cypher
+- drydocs/cli.py
+- tests/unit/test_database_names.py
+- docs/decisions/0002-component-database-topology.md
+- config/gate-log.md
+- docs/design/drydocs-startup-refresh-runbook.md
+- .claude/skills/run-drydocs/SKILL.md
+acceptance: |
+  EITHER 01_databases.cypher creates the meta-graph database (with the ADR 0002 topology record amended and test_database_names.py's test_provisioning_creates_the_expected_topology moved from four names to five in the SAME commit — that assertion is the deliberate speed bump, not an obstacle), OR the meta-graph is re-homed onto a provisioned database and drydocs/cli.py follows. Either way the name a shipped verb targets is one provisioning creates. AND the guard that should have caught this is widened: test_module_level_database_constants_are_provisioned keys on the exact identifier `DATABASE`, so a constant named SCHEMA_GRAPH_DATABASE walked straight past it — after this item, a module-level constant naming an unprovisioned database fails the suite whatever it is called. The SME direction that created a second graph ("2 different graphs", 2026-08-02) is recorded in config/gate-log.md, and the startup-refresh runbook + the run-drydocs skill name `bootstrap-schema-graph` in their chains.
+notes: |
+  Groomed 2026-08-02 from the groom's own cross-check, not from the inbox. This is the Q7 family exactly — a database DECLARED by code and never provisioned — and it is live rather than theoretical: the standing fact of record is TWO MACHINES, TWO GRAPHS, so the desktop's `drydocs bootstrap-schema-graph` targets a database only the laptop has, created by hand during the C21 session. It fails loudly, which is the one mercy. THE GUARD FIX MATTERS MORE THAN THE CONSTANT: the constant is one line; the blind spot admits the next one, and it is the same family J26 sweeps — a guard whose docstring promises more than its pattern matches.

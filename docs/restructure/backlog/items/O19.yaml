@@ -1,0 +1,25 @@
+id: O19
+epic: web-console
+title: 'Gates module page (READ-ONLY): gate dependency graph + gate-log frames from a generated gates.json
+  — zero action controls'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- O9
+inputs:
+- UI-WIP/site-plan.md
+- web/src/
+- config/gate-log.md
+- config/gate-prompts/
+- docs/restructure/backlog.yaml
+acceptance: |
+  /gates instantiates the shared template READ-ONLY: graph pane renders the gate dependency graph (gates -> the backlog items / vocabulary entries they unblock); data-frame tabs Open gates / Signed off / Gate log. Data is a GENERATED gates.json (a script scans config/gate-log.md + config/gate-prompts/ + backlog.yaml — the O12 enforcement-matrix pattern) with a unit test that fails when a gate-log entry or gate-prompt file has no row (no drift). ZERO action controls — no sign-off, no edits; each gate links to its repo artifacts. Write-shaped gate actions are explicitly out of scope: they belong to the O20 gate decision.
+notes: |
+  site-plan.md P3 wave 2 (module 7). The read-only render is ungated; acting on gates from the UI is exactly what O20 decides. DONE 2026-07-21 (Epic-O finish session): scripts/render_gates.py scans config/gate-log.md (one row per ## entry, status derived from the heading VERBATIM: signed-off/deferred/pending/recorded — the page never reinterprets the record) + config/gate-prompts/ (prompt files with no log mention = status open) + backlog.yaml (items mentioning a gate slug = the "references" edges) -> web/src/generated/gates.json (25 gates, 5 open/deferred/pending at generation). tests/unit/test_gates_json.py = the drift guard (regeneration equality; every log entry + prompt file has a row). GatesRoute renders READ-ONLY on the shared template: gate dependency MiniDag for the selected row, Open gates / Signed off / Gate log frames, zero action controls, artifacts as repo-path text. Suite + build + lint green; headless-Edge smoked (deferred SOSA gate visible in the open queue).
+annotations:
+  status: DONE 2026-07-21 (Epic-O finish session) — see notes

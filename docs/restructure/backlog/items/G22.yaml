@@ -1,0 +1,37 @@
+id: G22
+epic: component-topology
+title: 'HITL gate session: rua load shapes — ownership + profile-dependency edge meanings, planned-tier
+  activation scope'
+type: requirement
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on:
+- G21
+- G24
+- G25
+inputs:
+- docs/restructure/03-hitl-sme-flow.md
+- config/gate-log.md
+- drydocs_core/schema/schema_graph.cypher
+- docs/RELATIONSHIP_GUIDE.md
+- config/precedence.yaml
+- drydocs_core/schema/provisioning/02_proxy_constraints.cypher
+acceptance: |
+  A HITL gate session rules the graph shape for rua data before ANY load: (a) which existing planned vocabulary the load may activate for these facts (candidates: AppUser -DELEGATES_TO-> ExecutionHost, ControlMJob -RUNS_ON-> ExecutionHost, ControlMJob -INVOKES-> Script, m7 USES_ARTIFACT, m3 READS_FROM/WRITES_TO); (b) the NEW edge meanings the bundle implies and the vocabulary lacks — run-as user owns home/directory DataAssets (WAS_ATTRIBUTED_TO {role} per the arch_owns_code precedent, or a new type), and profile sources/invokes script (G21's flagged dependency candidates) — proposed via ontology-mapper as status: planned first, per the RELATIONSHIP_GUIDE registry flow; (c) the SCRIPT IDENTITY + DEDUP contract: a DryDocs URN for the logical script (extending the D1 urn:drydocs:dataasset pattern — the gate rules the URN segments, e.g. urn:drydocs:script:{...}) so the SAME file arriving from the server extract (G20), the code repo (G24), and CMD_LINE/variable references (G21/G16 SCRIPT_PATH facts) MERGES to ONE node — never duplicate labels/nodes — while every source occurrence is recorded WITH its origin (server-extract | code-repo) and full path (host+path vs repo+branch+commit+path); plus identity keys for the other nodes (ExecutionHost by fqdn?, AppUser by (user, uid)?) and how the meta.txt provenance envelope lands (properties vs the provenance-audit-fields envelope plan); (d) the SOURCE-PRECEDENCE ruling recorded in config/precedence.yaml terms: the server extract is the truth for "latest code that actually runs"; the code repo is the truth for intent/history ONLY where the team maintains a clean branch (a per-team/per-repo trust flag, not a global assumption) — and the usage axis stays SEPARATE: present-on-server does not mean used, and G21/G16 reference facts decide "what calls it"; a script with no references is FLAGGED unreferenced, never auto-judged unused; (e) classification handling on load — which properties are internal-confidential and must never reach a publishable export (ties to the O11 spec classification vocabulary); (f) GUID-vs-URN identity for registry-known pipelines/datasets (G25): where an asset is DPL-managed the registry GUID IS the business key per ADR 0001 and the gate rules where it sits (URN segment vs property), with the urn:drydocs:dataasset pattern as the fallback for everything else — and the CONTENT HASH rides on source-occurrence records as the version discriminator (same URN + different hashes = drift, queryable); versions do NOT become their own nodes unless this gate rules otherwise; (g) the THREE-SIGNAL usage ruling: referenced (G21/G16 facts), registry-active (G25 flag), and present-on-server (G20) stay SEPARATE axes, corroborated never conflated — active=false-but-referenced and active=true-but-unreferenced are findings, not errors. Decisions in config/gate-log.md; anything declined stays candidate-only.
+notes: |
+  THE TERMINUS of this groom — G18-G21 + G24 are all candidate-side and buildable ungated; nothing writes the graph before this session. fable per the matrix (ontology decisions). The 2026-07-21 SME-chat evidence motivating (c)/(d), mechanism-only: a production script referenced by a job-definition folder VARIABLE was not findable in the code repo — the team's code-fetch tooling keys on pipeline-id, which this job family lacks — so repo completeness can never be assumed and the server extract is the reliable "what runs" source. PREMISE CORRECTION 2026-07-27 (user): the planning around this gate assumed a psgmgr CM_DEF_VJOB_DETAIL-style table (split by job type: file_watcher, cmd_line, ...) would exist company-side. IT WAS NEVER BUILT. The G39 temporary staging store (graph-sourced cmd_line) + the G40 Python parse stand in until it is — the gate's CMD_LINE-fact clauses (a)/(g) read from that seam in the interim. The folder/job VARIABLES pull stays deferred exactly as originally sequenced; neither G39 nor G40 touches it, and neither writes the graph — this gate remains the terminus. TWO RIDERS merged from the inbox 2026-07-28, for this session's agenda: (R1, Script->SWO) when clause (b)/(c) lands :Script nodes, propose (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path extension — the G33 §E1(b) precedent applied verbatim to the second software-artifact class (.sh -> SWO_0000124 Shell, .sql -> SWO_0000126 SQL, binding two of the three seeded-but-unused terms; the adapter mechanism exists, EXTENSION_LANGUAGE_IRI in code_snapshot.py). Boundary already ruled in that discussion: run_as/J.OWNER is Agent territory (PROV/ORG), NEVER an SWO binding; unreferenced Scripts are the dead-script detection FEATURE per clause (d)'s flagged-never-auto-judged rule. (R2, m3_invokes endpoint) clause (a) activates m3_invokes — rule whether its to_node broadens Script -> Script|ETLProcess: the abioncloud wrapper-payload expansion means INVOKES sometimes lands directly on an :ETLProcess with no Script hop (G12 implements exactly that; 2026-07-19 subagent finding). Vocabulary-shape decisions, so they ride THIS gate, never an auto-edit. PROMPT DRAFTED 2026-07-28 (config/gate-prompts/rua-load-shapes.yaml): clauses a-g as sections A/C-H, riders R1/R2 as C3/B, the G39/G40 interim-seam premise carried in the header + I3. Session-ready — sign-off is the SME's, in its own session; item stays todo until then.
+annotations:
+  status: '2026-08-07 (LAPTOP): gate rua-load-shapes SIGNED OFF, 28/28 (config/gate-log.md). Walked A→J
+    across two days, each section transcribed to the page and recorded as it closed (nine RECORD entries
+    + the sign-off). Outcomes: 3 activate (A3/A4/A5), 1 declined (A2), 1 HELD behind K17 (A1), 1 already
+    active before the session; C1–C3 mint new meanings at status: planned; D1–D4 settle identity, occurrence
+    grain, the host join and the envelope. Sign-off also settled its own three preconditions: the bitbucket
+    + two dpl audit-fields entries (all ruled stub, three different reasons), the G55 lifecycle question
+    (RULED deprecated, reversing this session''s own `removed` recommendation — K7 had already answered
+    it 2026-08-03), and the four source-registry confirmed flips. NOT unblocked by this: A1 and C1''s
+    build both still wait on K17. Follow-ups: G55 (vocabulary), G23 (curated load + the D2 extractor fix),
+    G56, G57.'

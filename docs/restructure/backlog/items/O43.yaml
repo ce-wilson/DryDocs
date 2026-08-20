@@ -1,0 +1,20 @@
+id: O43
+epic: web-console
+title: Seed the remaining 9 UI test suites from verified behaviour, and decide whether a UI test runner
+  is worth introducing
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/taxonomy/ui-tests.yaml
+- config/taxonomy/ui-components.yaml
+- web/package.json
+acceptance: |
+  (a) Each of the 9 declared-but-empty suites (explorer, lineage, ownership, runbooks, remediation, docs, gates, ask, underhood) gains at least one case, and every case cites a `source` — a close note, screenshot check or SME observation recording behaviour someone actually watched work. A case with no source is not acceptable: that is how a checklist becomes fiction. Seed a suite when its module is next worked on rather than in one sitting. (b) A recorded decision on whether the console gets an automated runner (Vitest/Playwright) or stays manual. If automated, cases gain `automated_by` and `execution` moves per case, never per file; if manual, the reason is written down. The coverage pin in tests/unit/test_ui_tests_ledger.py updates with each seeding.
+notes: |
+  User directive 2026-07-31: the Process/Testing domains of the uploaded Miller process model were admitted for INTERNAL use — "if this framework works internally use it… it may help me when I'm testing the UI" — with the standing reason that the source projects lack good test cases, which is why Jira is not yet a feed. BUILT ALREADY (same session): config/taxonomy/ui-tests.yaml with the TestSuite -> Feature join realized as suite.module -> web/src/modules/registry.ts, 2 of 11 suites seeded from verified close notes (O36/O35/O37 shell, O40/O41 loads), and a guard that exercises the real payoff — component -> module -> suite -> cases — rather than only checking the file parses. KNOWN LIMITATION, pinned by a test rather than left to be discovered: the 36 unbound components (shell, ui primitives, shared) resolve to NO cases. StatTiles is the sharp example — TC-LOADS-01 exercises it, but it lives in the shared folder so no evidence-based module binding exists, and the lookup returns empty. Closing that needs import edges, i.e. O42's TS resolver. Until then "no cases" means "unknown", not "none". The Process half of the model (CheckIn/Release -> affected features) is deliberately NOT adopted yet: its value depends on that same complete component->module mapping, so it would answer confidently and wrongly.

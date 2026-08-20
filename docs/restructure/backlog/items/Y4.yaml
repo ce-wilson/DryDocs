@@ -1,0 +1,21 @@
+id: Y4
+epic: backlog-sharding
+title: 'The query surface: backlog loader writes the projection, next_ready becomes a one-hop Cypher,
+  agents query instead of reading 12k lines'
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- Y3
+inputs:
+- backlog/items/
+- drydocs_api/query_specs.py
+- .claude/skills/groom-backlog/SKILL.md
+acceptance: |
+  After the Y3 gate signs: a loader (registered in the load map, L17-guarded) projects the sharded items into :BacklogItem + DEPENDS_ON on the ruled database; a QuerySpec answers next_ready as a one-hop query whose result set is proven equal to render_board.py's derived list on the same tree (the derivation and the projection must never disagree); the groom skill's optional graph cross-check section re-points at the projection; the loader is idempotent and a full wipe-rebuild reproduces it. The projection stays read-only toward process: no code path anywhere flips an item status from graph state.
+notes: |
+  Groomed 2026-08-04. Explicitly the trivial-after-Y2 phase from the idea entry; kept as its own item so Y2 can close without a Neo4j container running.

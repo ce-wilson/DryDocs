@@ -1,0 +1,34 @@
+id: X3
+epic: ddlineage-retirement
+title: 'Live drop, desktop: remove ddlineage from the ddall composite and drop it on the desktop container,
+  venue-tagged'
+type: chore
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- X2
+inputs:
+- drydocs_core/schema/provisioning/README.md
+- config/dev-environment.yaml
+acceptance: |
+  On the desktop container (venue named in the close note per J18): an emptiness probe against ddlineage returns zero nodes BEFORE anything destructive (the ADR says nothing writes it — verify, don't trust); the ddall composite's ddlineage alias is dropped first, then DROP DATABASE ddlineage; SHOW DATABASES afterwards lists the four-name topology plus system, ddall stays online, and smoke_drydocs_all.cypher passes against the post-X2 script. A non-empty probe result STOPS the item — that is a defect report (something wrote a database nothing should write), not a cleanup.
+notes: |
+  Groomed 2026-08-04. Venue-pinned per the G50/G52 precedent — X4 is the laptop twin. DESKTOP CAVEAT: the desktop neo4jtest venue is the diverged one (5.26.27 vs the pinned 2026.05.0, ddschema missing post-G51 — the parked IDEAS decision). If the user resolves that divergence by recreating the container on the pinned image, the post-X2 provisioning never creates ddlineage and this item closes by verification (SHOW DATABASES + smoke) instead of by drop — either path meets the acceptance.
+annotations:
+  status: 'closed 2026-08-04 (desktop, same session as the claim). VENUE (J18): desktop, container `neo4jtest`
+    (image neo4j:5.26-enterprise-ubi10 — the diverged image; the container was UP, so the drop path applied,
+    not the recreate-by-verification path). Sequence as the acceptance ordered it: emptiness probe FIRST
+    — `MATCH (n) RETURN count(n)` on ddlineage returned 0, confirming the ADR record before anything destructive;
+    `DROP ALIAS ddall.ddlineage IF EXISTS FOR DATABASE`; `DROP DATABASE ddlineage IF EXISTS`; SHOW DATABASES
+    then listed exactly ddall/ddcontext/ddschema/drydocs (+ the EE home db `neo4j` + system), all online;
+    the post-X2 two-constituent smoke ran green over ddall (drydocs 2574 nodes, ddcontext 0 — success
+    is that the federated read runs at all). FRESH OBSERVATION for the parked desktop-divergence IDEAS
+    line: `ddschema` EXISTS on this container now (someone provisioned it since that note was written),
+    so the divergence is down to the image pin (5.26 vs 2026.05.0) — the note''s "ddschema missing" half
+    is stale. Ops note: on Git Bash, `docker exec ... -f /tmp/x` gets MSYS path-mangled into the host
+    Temp dir — MSYS_NO_PATHCONV=1 required (the J29 docker cp + -f protocol otherwise held). X4 (laptop
+    twin) remains next_ready.'

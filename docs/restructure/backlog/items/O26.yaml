@@ -1,0 +1,28 @@
+id: O26
+epic: web-console
+title: 'App-to-app path runbook view: Runbooks-page tab with source/target application pickers, shortest-path
+  TECHNICAL/DATA lanes, and a generated runbook grid citing path nodes'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O11
+- O17
+inputs:
+- UI-WIP/wf-runbook-path-01.md
+- UI-WIP/wf-runbook-path-01.html
+- web/src/routes/RunbooksRoute.tsx
+- drydocs_api/query_specs.py
+- web/src/runbooks/demoRunbooks.ts
+acceptance: |
+  The /runbooks page gains an App-path tab implementing the wf-runbook-path-01 wireframe: source/target BusinessApplication pickers -> a shortest-path query registered as QuerySpec runbooks.app-path.v1 (the O11 registry, provenance manifest included) -> the path rendered in two lanes (TECHNICAL and DATA) -> a GENERATED runbook grid in which every step cites the path node it derives from. Lane partition derives from LABEL SETS ONLY — the layer/c4_level node-property idea stays a flagged open gate question (no new node properties, no ontology writes, no new edge types). Works against the demo dataset without Neo4j (the O9 pattern); tests cover the spec registration and the lane partition; full suite green.
+notes: |
+  Groomed 2026-07-21 pm from the wireframe inbox line (wireframe committed with the Epic O landings, dc89191). Mechanism-only twin of the internal search-for-file-name use case — the root screenshot stays uncommitted; the file-name-contains anchor rides the same tab. O17 (/runbooks) and O11 (QuerySpec registry) are done, so the seat exists.
+annotations:
+  status: 'SME HOLD 2026-07-22: runbook template shape goes through a HITL template session BEFORE this
+    view is built — deps are done but do NOT pull this item until that session rules (see summary groom
+    note)'

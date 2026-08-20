@@ -1,0 +1,27 @@
+id: structure-remediation
+letter: G/S
+title: Pre-UI structure remediation
+order: 18
+groom_log:
+- date: '2026-07-25'
+  note: |-
+    ── Epic S — Pre-UI structure remediation (main; ADRs 0008/0009/0010) ──────
+    Source: docs/reviews/architecture-structure-review-2026-07-25.md — a scored
+    /architecture + /tech-debt pass over the tree, run because the console is being
+    built and the API contract + graph property names harden once routes and
+    fixtures depend on them.
+
+    Grouped as its own epic rather than folded into G (component-topology) because
+    these share ONE review document, ONE phased plan (its §5), and THREE ADRs whose
+    acceptance gates the build items — the board should show that sequencing as a
+    unit. Each item still carries its correct existing plan phase, so the roadmap
+    strip is unaffected.
+
+    Findings deliberately WITHOUT an item:
+      F4  / F9 / F10-part  DONE 2026-07-25 (432ea43 boundary-guard fix, bbf29cf gitignore)
+      F5  drydocs/ 4-component flat namespace — deferred to Phase C by ADR 0002-a-1;
+          the review's §6 "what NOT to do" says explicitly not to reopen it mid-UI-build
+      F15 two test roots — tests/ (pytest) and graph-tests/ (YAML acceptance runner)
+          are two different mechanisms, not duplication; scored lowest, recorded only
+      F11 depgraph-snapshot retention — a user call about audit history, re-inboxed
+  attached_at: S1

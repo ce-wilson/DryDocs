@@ -1,0 +1,29 @@
+id: L28
+epic: doc-infrastructure
+title: 'Cite the external code references: register spcl/knowledge-graph-of-thoughts in reference/research/,
+  and give the executive overview a cited-references footer'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- reference/research/README.md
+- reference/REGISTRY.yaml
+- docs/decisions/0007-agentic-qa-architecture.md
+- docs/overview/drydocs-executive-overview.html
+- agents/graph_qa/task_graph.py
+- agents/common/llm_ledger.py
+acceptance: |
+  (a) spcl/knowledge-graph-of-thoughts (KGoT) has a full entry under reference/research/ — a dedicated note file on the databricks-unity-catalog.md precedent, carrying the verified citation (paper, authors, arXiv id, doi), the REPO LICENSE (BSD 3-Clause, (c) 2025 ETH Zurich), what DryDocs ADOPTED, what it REJECTED and why, and a crosswalk naming ADR 0007 plus the four agents/ files that already carry KGoT-derived design. Link-only — no pasted full text, per the research README's standing rule. (b) reference/research/README.md gains a row for it, and reference/REGISTRY.yaml's research: STUB (docs: + note: only, no entries today) becomes a real entry list with kgot as its first entry; the file's top-level classification: External is unchanged, so tests/unit/test_classification.py still passes. (c) ADR 0007 resolves its KGoT mention to a citation footnote beside the existing one; the ADR is ACCEPTED and its argument is NOT re-adjudicated. (d) docs/overview/drydocs-executive-overview.html gains a References block in its footer covering EVERY external work it leans on — KGoT and llm-graph-builder (the agents module), Databricks Unity Catalog (both the comparison AND the quoted line, uncited today), the three Neo4j layer-model articles, and the four ontology standards in the section-04 table. URLs reused from reference/research/README.md rather than re-sourced. No new CSS: the footer's .revs pattern and the existing `a` rule carry it, and it renders in both themes. (e) All THREE revision surfaces bump to rev 9 per the L22/L24 convention — the REVISIONS comment block at the top of the file, the masthead Revision/Date line, and a new rev line at the head of the footer history with prior lines verbatim.
+notes: |
+  Raised 2026-08-10 (desktop) by direct user request, scope confirmed in session: full reference set for the overview footer, dedicated note file for the entry. WHY THIS IS A REAL GAP AND NOT HOUSEKEEPING: KGoT is already load-bearing and wholly uncited. ADR 0007 analyzes it by name as one of two reference architectures, and four source files carry its design in their docstrings — task_graph.py (the NetworkX task-scoped working memory), llm_ledger.py (the collect_stats JSONL cost ledger), and providers.py + schema_context.py, which name KGoT TRAPS we deliberately avoided (a hardcoded tool model; whole-graph state injected into every prompt). reference/research/README.md's own rule is "cite these in ADRs", so an ADR citing an unregistered work inverts the arrangement. The overview is a NON-GOVERNED outward-facing doc (CLAUDE.md 6), so editorial treatment is legal there — the publish-VERBATIM rule binds the design renders, gate pages and board.html, none of which this item touches. It is also hand-authored HTML and its own single source (no .md twin; L24 verified this). OUT OF SCOPE, deliberately: docs/whitepaper/ has no citations either — a separate item, not a widening of this one.
+annotations:
+  status: 'DONE 2026-08-10 (desktop) same session: KGoT registered (note file + research README row +
+    REGISTRY.yaml research: entries — the stub became a real list, Unity Catalog and Essential GraphRAG
+    backfilled); ADR 0007 footnote 2 added; overview rev 9 = References block (14 refs, 4 groups) + 5
+    inline sup markers, both previously-uncited Databricks claims attributed; footer verified in headless
+    Edge, light AND dark; suite 1836 passed'

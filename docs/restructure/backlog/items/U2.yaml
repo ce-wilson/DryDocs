@@ -1,0 +1,19 @@
+id: U2
+epic: self-documentation
+title: 'Project-manager audit: does backlog.yaml tell the truth about done and todo, checked against the
+  code graph (Phase 2)'
+type: task
+module: docs
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/code-graph-review-plan.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  docs/reviews/persona-project-manager-2026-07.md contains the drift table (item -> claim -> graph verdict) covering all four units: (1) every item closed in the last ~30 days whose close_note names files verified against :CodeModule file_ids; (2) the modules: registry censused against the six project values + top-level file_id prefixes both directions; (3) every next_ready item's inputs: paths confirmed to exist; (4) the per-epic code footprint view. Every mismatch has a tagged IDEAS line; ZERO direct backlog.yaml edits (the groom owns those).
+notes: |
+  Sonnet: mechanical cross-checks with a written pass/fail acceptance. D7 makes deletions visible (removed_from_source_at) — use it in unit 2. CLOSED 2026-07-28 (run 1): the backlog is telling the truth — 80 recent done items / 91 path claims, ZERO false done-claims (8 mechanical flags all dispositioned: matcher artifacts, recorded relocations, or files whose ABSENCE was the acceptance); 30/30 next_ready inputs alive; D7 removed count 0. Census gap: drydocs_api is a real package with no scan root — folded into the U1 scanner IDEAS line (one fix, three symptoms). No epic footprint contradicts its charter.

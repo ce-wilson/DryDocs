@@ -1,0 +1,20 @@
+id: O45
+epic: web-console
+title: 'Context-type vocabulary: config/taxonomy/context-types.yaml + guard + generated artifact for the
+  intake dropdown'
+type: task
+module: taxonomy
+phase: 1
+agent: taxonomy-importer
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- UI-WIP/sme-intake-page-plan.md
+- config/taxonomy/
+- tests/unit/
+acceptance: |
+  config/taxonomy/context-types.yaml exists (schema drydocs.context-types.v1) seeded with job-failure, missed-data-load, missed-file, data-issue — each entry id + label + description + status (active|retired; values are never deleted, only retired). A unit guard (tests/unit/test_context_types.py) pins the schema, id uniqueness, and the status enum. The list is served to the console as a generated artifact with a drift test (the gates.json pattern) — the page never hardcodes the vocabulary. Pure classification: adding a value is a config edit + SME nod, never a gate.
+notes: |
+  Slice 1 of the intake plan (UI-WIP/sme-intake-page-plan.md §2). Filed phase 1 / module taxonomy because it IS a layer-1 capture (the consumer being a console dropdown does not change the layer); the epic stays web-console so the intake slices read as one group. The dropdown carries an Other/not-listed option whose free text lands in the intake note — vocabulary-growth signal for the admin queue, not a hidden new value. . CLOSED 2026-08-06 (desktop, a4108fc): built exactly as accepted — context-types.yaml (v1, 4 active seeds), scripts/render_context_types.py emits web/src/generated/context-types.json riding the default render_board.py run, tests/unit/test_context_types.py = 7 guards (schema pin, field completeness, id uniqueness, status enum, seed-value permanence — retire never delete, drift, active-only dropdown list). Unit suite 1643 passed at the close.

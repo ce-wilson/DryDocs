@@ -1,0 +1,20 @@
+id: G11
+epic: component-topology
+title: Lineage inventory extractor reports its skips — coverage accounting, never silent drops
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- G9
+inputs:
+- drydocs_lineage/extractors/controlm_inventory.py
+- tests/unit/test_lineage_inventory.py
+- tests/fixtures/lineage/jobs.csv
+acceptance: |
+  ControlMInventoryExtractor.extract exposes a coverage summary — rows read, current jobs added, and every skip BY REASON (stale version_serial, nameless row, invocation with no resolvable target, unparsed cmd_line) — so nothing is dropped silently (the STG_PARSE_QUALITY / UNMATCHED house rule: report, never drop). Counts pinned by tests on the synthetic fixture (5 rows -> 4 current jobs + 1 stale skip); the `drydocs lineage-review` CLI prints the summary alongside the graph stats. Full suite green.
+notes: |
+  Groomed 2026-07-11 from the 2026-07-10 /tech-debt review of G9 slice 1 (finding #3; findings #1/#4 were fixed same day, #2 merged into N2). Non-HITL: pure reporting on the candidate side — curation/write semantics untouched. DONE 2026-07-11 (same day): ExtractCoverage dataclass (rows/jobs/skips-by-reason/invocations incl. unresolved + no-target, plus empty/unparsed command buckets); extract() returns it; CLI prints "coverage: ..." after the graph stats; fixture counts pinned (5 rows -> 4 jobs + 1 stale) + synthetic nameless/empty/unknown case + row-bucket totality check.

@@ -1,0 +1,21 @@
+id: G39
+epic: component-topology
+title: Temporary CMD_LINE job-detail staging store — the seam that stands in for the unbuilt psgmgr CM_DEF_VJOB_DETAIL
+  table
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/cypher/controlm_jobs.cypher
+- drydocs_core/data_root.py
+- drydocs_core/mapping_store.py
+- config/source-registry.yaml
+acceptance: |
+  A CLI verb (working name `drydocs export-cmdline-staging`) materializes the TEMPORARY job-detail staging store: one row per loaded job carrying the identity keys (folder_id, job_id, job_name, data_center where present), the job/task type discriminator (file_watcher vs cmd_line etc.), and the VERBATIM cmd_line — sourced FROM THE GRAPH (j.cmd_line is already loaded, controlm_jobs.cypher), with the equivalent psgmgr CM_DEF_VJOB SQL projection documented beside it as the company-side source for the same shape. The store lives under the G19 data root (DRYDOCS_DATA_ROOT — real command lines are Internal; NEVER in-repo), is deterministic (same graph -> same rows), reports its counts (the never-silent rule), and carries an explicit RETIREMENT note: this store is deleted the day a real psgmgr CM_DEF_VJOB_DETAIL-style table exists. EXPLICITLY OUT OF SCOPE, by design not omission: folder/job VARIABLE columns — the variables pull stays deferred exactly as the original G18->G22 plan sequenced it.
+notes: |
+  PREMISE CORRECTION (user, 2026-07-27): the G18->G22 rua/cmdline plan assumed a company-side psgmgr detail table (CM_DEF_VJOB split by job type) would exist by now. It was never built — this seam stands in until it is, and the graph is a legitimate interim source precisely because the jobs loader already lands cmd_line verbatim. SQLite via the mapping-store precedent (M2) or a flat file both satisfy the acceptance; pick at build. Groomed from user chat notes 2026-07-27 (audit trail in IDEAS.md). G37 deliberately NOT allocated — skipped in the sequence (G38 exists), possibly reserved by the concurrent session; ids are cheap, collisions are not. CLOSED 2026-07-27 (same day): drydocs/cmdline_staging.py (SQLite per the mapping-store precedent) + CLI `drydocs export-cmdline-staging`. Store = <DRYDOCS_DATA_ROOT>/cmdline-staging/job_detail.db; job_detail keyed (folder_id, job_id) with job_name, data_center (= graph instance_name), task_type discriminator, active, VERBATIM cmd_line; meta carries schema_version + the RETIREMENT note + the psgmgr CM_DEF_VJOB projection (PSGMGR_PROJECTION_SQL, documented beside the store per acceptance) + the variables-out-of-scope declaration. Deterministic (node-key order, no wall-clock values); counts via ExportReport + LoaderRunLog; loud yellow on 0 jobs. Classified into the load bucket (MODULE_MAP + boundary guard). 12 fixture tests; suite 1019 green. CAVEAT AMENDED 2026-07-28 (user; store schema v2): "variables out of scope" was overstated. Precisely: variable COLUMNS / the variables pull stay deferred (G18->G22 sequencing unchanged), but RESOLVED command lines are in scope as an INPUT — the user has an internal (company-side) %%VAR resolution query; job_detail gained the nullable cmd_line_resolved landing column for it. This module never resolves; cmd_line stays verbatim beside the resolved value (O24 source-vs- derived discipline); re-export rebuilds the store, so resolution re-runs after each export (documented loudly — temporary plumbing, not a system of record).

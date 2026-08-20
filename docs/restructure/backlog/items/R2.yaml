@@ -1,0 +1,24 @@
+id: R2
+epic: agentic-qa
+title: 'graph_qa ADK app: Tier-0 QuerySpec router + Tier-1 schema-grounded text2cypher with server-enforced
+  READ mode, fix loop, and the response envelope'
+type: requirement
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- R1
+inputs:
+- agents/
+- drydocs_api/query_specs.py
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- docs/decisions/0007-agentic-qa-architecture.md
+notes: |
+  2026-07-23 build landed: agents/graph_qa (pipeline, envelope, providers, schema_context, ADK agent, README=envelope contract), common/graph_read (READ-access-mode executor = the server-side write boundary; row cap 100, tx timeout 15s), common/specs_catalog (imports the drydocs_api registry — zero agent-owned named Cypher). Verified: 8 unit tests (fakes; Tier-0 verbatim, prompt grounding+bounds, fix cap 2, pre-flight, contract, usage extractor) + 3 live integration tests (server rejects CREATE(x) and CALL db.createLabel probes that evade the token guards) + agents-venv structural smoke over live drydocs rows. DONE 2026-07-23 after the user keyed agents/.env: live two-question smoke (Tier-0 spec verbatim, 7 rows; Tier-1 text2cypher after a 0-row spec fall-through, correct sched_table aggregation) + full transport smoke through adk api_server (/run returned the envelope; session memory events counted). Live findings fixed in-item: (1) 0-row spec now falls through to Tier-1 (insufficient-context rule); (2) per-label properties added to the schema prompt (graph_schema_detailed); (3) prompt section budgets — whole-prompt truncation had silently dropped schema+examples (regression test added). Router force-fit tuning -> R8 ledger work. litellm gotcha: install wheels only (--only-binary), sdist needs Rust on Windows.
+acceptance: |
+  The envelope contract is documented and returned per question: answer + steps[] (each with cypher, database, rows, ms, fix_retries) + sources (trust tier) + metrics (tokens prompt/completion/total, context size in tokens + chunks/rows, memory size in session events + tokens, timing breakdown). A question matching a registered spec routes to it and shows the spec Cypher verbatim (Tier 0). Tier-1 prompts are assembled from the ontology vocabulary + live graph_schema + few-shot spec examples — never whole-graph state. A write-shaped query is rejected server-side by READ access mode (a test proves the token guard alone is NOT the boundary); fix loop capped at 2; row caps + query timeout applied. The agent consumes the QuerySpec registry — it defines no named Cypher of its own.
+annotations:
+  status: live-verified 2026-07-23 (real model + real graph + api_server transport)

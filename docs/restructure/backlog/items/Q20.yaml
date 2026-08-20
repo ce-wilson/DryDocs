@@ -1,0 +1,26 @@
+id: Q20
+epic: docmeta
+title: Q16 clause (b) successor — check FIRST whether the live DESCRIBES edges already satisfy the product->documentation
+  pointer under the fold
+type: task
+module: docs
+phase: 14
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- G102
+inputs:
+- config/gate-log.md
+- drydocs/docs_coverage.py
+- drydocs/loaders/cypher/bmc_docs.cypher
+acceptance: |
+  Minted at the G32 sign-off (gate Q7/Q16(b)): after G102 lands, verify whether the reloaded (:Document)-[:DESCRIBES]->(:SoftwareProduct) edges already give an agent the product->documentation traversal Q16 clause (b) wanted — Q16's own "cheapest possible answer, check FIRST". If yes: record it in the gate log as satisfied-by-fold and close. If no: re-scope the pointer as a build item THEN, with the check's findings as its inputs. Ends the prose-only trace open since Q16 closed partial on 2026-08-07.
+notes: |
+  Depends on G102 because the check is meaningless before the delete+reload lands the edges under the ruled shape.
+annotations:
+  status: '2026-08-18 (laptop): SATISFIED-BY-FOLD, recorded in config/gate-log.md same date — the traversal
+    exists live (27 DESCRIBES docs from product controlm, verified laptop/neo4jtest/drydocs); the DECLARATION
+    half stays Q18''s (describes_product field; G32 done, Q14 still owed); no pointer build needed, nothing
+    new minted'

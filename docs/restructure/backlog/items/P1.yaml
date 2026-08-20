@@ -1,0 +1,22 @@
+id: P1
+epic: runtime-topology
+title: Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call
+type: task
+module: config
+phase: 13
+agent: main
+model: haiku
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/sql/adhoc/profile_cm_hosts.sql
+- drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql
+acceptance: |
+  Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user's performance flag) in the two gate specs' provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
+notes: User-run on the internal network (no producer-side psgmgr access); agent transcribes.
+annotations:
+  status: 'DONE COMPANY-SIDE — learned from the 2026-07-20 bundle-port readout (company PORT-REPORT-bd7952f.md:
+    "Restored P1 + P4 to done ... company''s completion status + notes win"); resolves the 07-18 "concurrent
+    Epic P session" observation — it was the company machine. Producer never runs these probes (internal-only
+    by design); status mirrors the company SoR.'

@@ -1,0 +1,22 @@
+id: G2
+epic: component-topology
+title: Extract drydocs-core behind the boundary shim
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0002-a-drydocs-core-extraction-plan.md
+- drydocs/
+- tests/
+acceptance: |
+  Per 0002-A done criteria: drydocs-core imports cleanly with NO component dependency; drydocs-load runs the existing pipeline unchanged; tests/unit/test_module_boundary.py passes; gates green (pytest -q, package import, --help).
+output: drydocs_core/ (physical core) + drydocs/ (component remainder — thin layout per ADR 0002-A-1)
+notes: |
+  ADR 0002 follow-up #2; plan = 0002-A (thin, zero behavior change). BLOCKS G3 + G4. Shim/ re-export first, then relocate; borderline staging.py + snapshots/writer.py → load (0002-A §6).
+progress: |
+  2026-06-28 — STEP 1 DONE (0002-A §6 step 1, the zero-risk shim): drydocs_core/ package added, re-exports the core surface (models, adapters, controlm parser, neo4j, config/precedence/ source_registry, ontology) from drydocs/.* with NO file moves; pyproject packages updated; test_module_boundary.py extended to scan drydocs_core (passes, stdlib). REMAINING: physical relocate (Phase B step 2+, when core stabilizes) + run full gates (poetry pytest -q, import, --help) to confirm pipeline unchanged — deferred (poetry/deps absent in the authoring env). 2026-07-10 — FULL GATES RUN, ALL GREEN (toolchain fixed 2026-07-09): poetry run pytest -q = 483 passed / 3 skipped (expected gitignored-CSV skips); test_module_boundary.py 4 passed; import drydocs.cli + drydocs_core OK; drydocs --help renders and the CLI exits 0 via CliRunner (the Store-venv drydocs.cmd wrapper mis-reports exit -1 — wrapper artifact, not a CLI defect). REMAINING: only the physical relocate (Phase B step 2+, when core stabilizes). 2026-07-10 — PHYSICAL RELOCATE DONE (branch feat/g2-core-relocate; thin variant ratified as ADR 0002-A-1, amends 0002-A §6 step 4): 42 git renames move models/adapters/controlm/ontology/ schema/neo4j_client/config/precedence/source_registry into drydocs_core/ (shim -> real package); staging.py -> drydocs/staging.py (load side, §6 borderline as decided); remainder KEEPS the drydocs name (4 component groups; rename + per-component packaging = Phase C). Boundary test enforces CORE_PREFIXES=drydocs_core; PORT-MANIFEST re-pathed (the promised path-column diff) + git-readme rename-wave rules. ALL GATES GREEN post-move: 483/3, imports, --help. ITEM COMPLETE — G3 + G4 unblocked.

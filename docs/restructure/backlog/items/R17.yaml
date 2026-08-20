@@ -1,0 +1,21 @@
+id: R17
+epic: agentic-qa
+title: 'Read-time staleness on answers: say when the data was loaded and how far behind its source it
+  is, instead of presenting every answer as current'
+type: task
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/gitnexus-depgraph-comparison.md
+- drydocs_api/
+- knowledge/depgraph-snapshots/README.md
+- knowledge/depgraph-snapshots/viewer.html
+acceptance: |
+  (a) A query answer states its CURRENCY -- loaded at T, and where the subject is the code graph, indexed at commit X -- against now / HEAD, so a reader can tell a fresh answer from a six-week-old one without leaving the answer. (b) THE SNAPSHOT META HEADER IS THE SOURCE, not a new field: U7 and U15 already pin provenance harder than the GitNexus staleness contract this comes from (commit, branch, dirty, captured_at). This item is the missing READ-TIME half and must read those fields rather than mint parallel ones. (c) TWO NEIGHBOURS IT MUST NOT ABSORB, named so a later groom does not merge them: U22 owns DETECTION for the code graph (the newest last_seen_at against the newest snapshot's captured_at) and this item consumes that answer rather than re-deriving it; R7 owns DOCUMENT-SOURCE freshness and rescrape, which asks a different question -- is the source document newer than what we chunked? (d) THE VIEWER HALF IS A RIDER ON U22, NOT THIS ITEM: knowledge/depgraph-snapshots/viewer.html already renders the commit and branch from the meta header, so what is missing there is the AGE, and it belongs with the detection. (e) NO GRAPH WRITE of any kind, and a missing or unreadable provenance field yields "unknown" -- never a guessed date.
+notes: |
+  Groomed 2026-08-19 from Idea-127 (R4 of the gitnexus comparison). Deliberately NOT folded into R15: epistemic labeling answers "could the walk see everything", staleness answers "how old is what it saw". Two different failure modes that happen to share an envelope, and adjacency is not a reason to merge them. p3 per the capture. Module drydocs-api because the answer envelope lives there; the in-repo viewer half is a merge onto U22 rather than a second module on this row.

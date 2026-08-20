@@ -1,0 +1,20 @@
+id: P2
+epic: runtime-topology
+title: CM_AVG_RUN supplement gate session (controlm-avg-run-supplement) — SME review
+type: task
+module: ontology
+phase: 13
+agent: main
+model: opus
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/gate-prompts/controlm-avg-run-supplement.yaml
+- config/gate-log.md
+acceptance: |
+  SME records Confirm/edit/reject per section (A landing shape, B weak-key join policy, C normalization rules, D refresh, E use case) in config/gate-log.md; map entry job-runtime-stats-supplement flips proposed→confirmed only then.
+notes: in_progress = awaiting HITL (the E1/F1/F2/K2 pattern); gate page rendered + delivered 2026-07-09.
+annotations:
+  status: SIGNED OFF 2026-07-14, 1 SME edit (§B ctlm_id join upgrade); map entry confirmed; loader still
+    blocked on P1 probes

@@ -1,0 +1,21 @@
+id: G86
+epic: web-console
+title: 'Calendars: can a RULE_BASED_CALENDAR be validated, and can it render as an actual calendar in
+  the console?'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- external/orchestration/bmc-controlm/controlm-calendars.md
+- drydocs_remediation/xml_io.py
+- tests/unit/fixtures_controlm_xml.py
+acceptance: |
+  TWO QUESTIONS, ANSWERED SEPARATELY (a spike ruling counts; building both is not required to close this): (1) VALIDATION -- now that RULE_BASED_CALENDAR(S) elements survive import verbatim (xml_io splicing keeps them as bytes; the F3 fixture carries one), can a calendar definition be checked for internal consistency, and can a job's schedule be validated against the calendar it names? Deliverable: a written ruling with a worked synthetic example, or the validator itself. (2) RENDERING -- can it draw as an actual calendar in the console? CONSTRAINTS ALREADY KNOWN from the vendor corpus (controlm-calendars.md): three calendar types (Regular / Periodic / Rule-Based) with four RBC rule types and eight exception policies, so "render a calendar" is really three renderers -- scope a spike to RBC only first; and calendars are defined against EXPLICIT YEARS, so a projection may only extend as far as the calendar's year coverage -- a UI that silently projects past it is WRONG and the spike must show the boundary behavior. Related prior art: the calendar- projection plan (scheduling plane exact, prereq plane out of scope) and the data-center-naming default-time finding (DC names encode a default EST run time for folders without an explicit one; real DC names are Internal).
+output: docs/ ruling or web/ (drydocs-web) spike
+notes: |
+  Groomed from the 2026-08-12 user follow-up ("add a backlog task to test if the calenders can be validated or rendered as a calendar in the ui"). Split validate-vs-render on purpose: validation is graph/model work, rendering is a console surface, and either can ship without the other.

@@ -1,0 +1,18 @@
+id: J35
+epic: release-infrastructure
+title: 'Port ledger: roll it through a deliberate range end, make the roll a structural closing step,
+  and require SHA-stamped producer citations'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/port-prompt.md
+acceptance: |
+  (a) docs/port-prompt.md's ledger covers every producer commit after a14a8028 through a NAMED deliberate end commit (the G22 gate session, the SEAL sample generator, the code-graph asset rulings, the .ksh SWO binding all classified); (b) the port prompt's closing sequence gains a mandatory ledger-roll step whose required fields (range, port commit, backup tag, acceptance numbers) are listed, so a port cannot close unrecorded — the three-in-a-row reconstruction failures (f71967db, 6713c142, 5f79d145) are named as the motivating class; (c) the prompt requires every producer-tree citation in a company report to quote the SHA it was read at, so a cached-ref read announces itself.
+notes: |
+  Groomed 2026-08-07 consolidating Idea-56 (structural roll), Idea-76 (the pending range) and the design half of Idea-57 (SHA-stamped citations; the company-side credential fix stays with the company). Range/backup/acceptance data for the two historic unrecorded ports is unrecoverable — the roll records that gap rather than inventing values. DONE 2026-08-09 (desktop, 9673bcc on feat/port-machinery-trio, merged 09c1be1): (a) ledger rolled through NAMED end 5417ef10 — steps 55-105 collapsed to one-liners (55-83 via the reported-only ports, gap recorded not repaired; 84-105 at the two producer-verified ports), the unledgered a14a8028..5417ef10 range ledgered as steps 102-105 (G22 gate session incl. the .ksh SWO binding a4328dd, SEAL sample generator 180f4ae, code-graph asset rulings 5359b00+6a11064, remainder), live ledger = 106-115 classifying all 61 pending commits + the trio, file 1512->758 lines; (b) MANDATORY CLOSING SEQUENCE in the header with the four required fields (range, port commit, backup tag, acceptance numbers), f71967db/6713c142/5f79d145 named as the motivating class; (c) guardrail 8 requires SHA-stamped producer citations.

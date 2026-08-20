@@ -1,0 +1,20 @@
+id: D10
+epic: config-loaders
+title: 'Draft the precedence gate prompt: when the Control-M XML export and the psgmgr replica disagree
+  about an object, which one is the definition source of record?'
+type: task
+module: config
+phase: 3
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- config/precedence.yaml
+- docs/restructure/03-hitl-sme-flow.md
+- docs/port-prompt.md
+acceptance: |
+  A gate prompt is drafted (drafting decides nothing; config/precedence.yaml is unchanged until sign-off) that puts ONE question to the SME per object class — which source wins when the XML export and the Oracle replica disagree — with a candidate answer stated for them to accept or reject ("the XML export is the definition source of record; the replica remains the runtime/stats feed") rather than an open essay question. The prompt names the two riders the ruling must carry: a named OWNER and a SUNSET for the dual-definition path (the dual-ingestion rule of thumb), and the consequence for T16 — if XML becomes the standing feed, the CM_DEF_VJOB_DETAIL retirement note gains a second path.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-43, which says plainly that this is HITL and never a groom's call — so the ITEM is the prompt, not the ruling. Guardrail 3 of the XML-fed cmd-line resolution work (G46/G47/G48): those builds fill a nullable derived column and decide no source-of-truth question, so they are NOT blocked on this. Epic D and module config because precedence.yaml is the artifact; sibling of D9, which asks the adjacent question about two INTERNAL tiers.

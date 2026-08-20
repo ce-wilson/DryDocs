@@ -1,0 +1,22 @@
+id: G79
+epic: component-topology
+title: Split refresh-reference by SOURCE — one command per subject, and wire the two loaders that belong
+  to no chain at all
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on:
+- G78
+inputs:
+- drydocs/cli.py
+- config/source-registry.yaml
+- config/taxonomy/lob-product-team.yaml
+- scripts/render_load_map.py
+acceptance: |
+  refresh-reference bundles SEVEN loaders across THREE unrelated sources with different natural refresh cadences. That bundle has no organising principle, which is why a loader can fall out of it and nothing notices. Split it so each command covers ONE source. (a) The split, by subject rather than by chain accident: the product catalog tier (catalog LOBs, product lines, products), the organisation tier (dev teams, team roles), and the business-application tier (applications, contacts). These are SEPARATE COMMANDS even where two share a source system, because the SME's cadence argument is per subject: business applications are not created daily, the operational estate can be. (b) WIRE THE TWO ORPHANS. pat_team_roles is gate-confirmed (C9, 2026-07-18), has a loader class and cypher, is reachable as `drydocs load pat_team_roles` -- and belongs to NO chain and NO profile, so no operator path has ever run it. area_products is in the same state. Either wire each into its subject command or record a written reason it is excluded; the one thing not allowed is the current silence. area_products has a plausible reason ready to be written down (lob-product-team.yaml records area_products: 0 with the standing area-product-missing open question); pat_team_roles has none that this item could find. (c) Cadence moves OFF the hand-assigned profile tuples and ONTO the source registry entry, so load_profile() DERIVES its steps by filtering on cadence instead of reading a literal maintained by hand. This is what makes "the source dictates how often it refreshes" true in code rather than true in a comment. (d) Acquisition mode joins it on the registry entry (file-drop | db-pull | api-pull | repo | scrape), so the anticipated CSV-to-database move for business-application data is a registry edit plus an adapter swap, with the loader, the command name, the sequence position and the cadence all unchanged. (e) PRESERVE ONE LOAD-ORDER INVARIANT ACROSS THE SPLIT, and state it where the split happens: seal_applications loads BEFORE any loader that can mint a :BusinessApplication. Producer satisfies it today by accident of chain order rather than by declaration, and the split is exactly when an accident gets lost. Producer is additionally safe because pat_product_mapping.cypher MERGEs on the SAME neutral app_id key seal_applications uses -- so no stub, no second node, no ordering dependency. The company is NOT safe: pat_app_links.cypher still MERGEs on the pre-S3 seal_id with is_stub=true, mints a null-app_id node the uniqueness constraint cannot match, and the subsequent SET collides (SME hit it live 2026-08-11; RELAY-8, a T23 residue). Once commands are keyed to sources, the constraint is expressible as a declared dependency rather than a position in a tuple -- state it that way, so the next reorder cannot silently break it. NAMING IS DELIBERATELY OUT OF SCOPE -- this item splits and wires using CURRENT names. Renaming is GN1/GN2 and is frozen-and-ported as one unit; doing both at once makes an already wide port surface unreviewable.
+notes: |
+  Raised 2026-08-11 (desktop) on SME direction. Depends on G78 because splitting a chain that silently skips its inputs just gives you more places to skip silently. The SME asked whether product and org structure can be separate commands while sharing sources -- yes, and that is the point: the COMMAND is keyed to the subject, the SOURCE is a property of the data, and two subjects may legitimately draw on one source system. What must not happen is the reverse, which is what exists now: one command spanning three sources, so nothing can say whether the command is complete. RIDER NOTE 2026-08-13 (targeted groom, from Idea-119): two of the five loaders named in G78 clause (d) are ones THIS split re-homes -- seal_contacts (a REFRESH_REFERENCE_CHAIN member) and business_segments (refreshed inside the same command, ahead of the chain tuple). If G78's coverage clause has not closed by the time this runs, the tests move WITH the loaders into their new subject command rather than being left pointing at a command that no longer exists.

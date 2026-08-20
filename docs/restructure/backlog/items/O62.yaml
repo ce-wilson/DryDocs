@@ -1,0 +1,22 @@
+id: O62
+epic: web-console
+title: 'The Ask report view: a file-name search resolves to the owning application and process, and the
+  report shows code repos and dev teams for BOTH processes so support can escalate'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/ask/
+- web/src/routes/AskRoute.tsx
+- drydocs_api/query_specs.py
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  The Ask surface gains a REPORT rendering for the file-name search use case: a user searches a file name (or table) and the result renders as a structured report naming the business application and process associated with it -- and when the chain crosses processes (the captured example: a file-transfer process fed by an event-based application), the report shows the code repos and development teams for BOTH processes, because escalation is the point. The traversal binds via a reviewed read-only drydocs_api QuerySpec (shortest-path from an Application anchor filtered on a fileName property -- the captured example spans ~22 nodes across application / product / dev-team / scheduler folder+job / file-transfer route / pipeline / repo labels), never raw Cypher composed in the browser. The report carries the source -> node-label legend table the captured example shows, so a reader can tell which source system asserted each row. Absence renders honestly: a leg the graph cannot supply renders as "not found via <spec>", never as an empty section that reads as "none exists". Committed fixtures are SYNTHESIZED twins of the captured example's SHAPE -- no real SEAL ids, hosts, or repo URLs from the machine-local transcription. Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
+notes: |
+  Groomed 2026-08-17 (targeted groom -- the UI / UI-WIP inbox entries only) from Idea-123: the SME supplied a real captured example (screenshot + transcription machine-local at internal-local/ui-examples/, real SEAL ids/hosts/repo URLs -- never committed). This is the concrete output target for the Ask route: report form of the same job -> pipeline -> asset chain O60 draws as a swimlane diagram -- the pair is deliberate, one chain, two presentations. module drydocs-web with the QuerySpec half explicitly in scope the way other O-series frames bind specs; if the spec grows past a straightforward reviewed traversal, splitting a drydocs-api item out is the builder's call to record. Whether this report also becomes an Ask-agent tool answer (the Idea-125 named-verbs direction) is NOT decided here -- this item renders the report; the agent-tool question stays in the inbox.

@@ -1,0 +1,19 @@
+id: L21
+epic: doc-infrastructure
+title: 'Startup-refresh runbook Rev 4: collapse the per-file supplement verbs to the single apply-supplements
+  chain (G29) — also retires Appendix B''s missing registry-supplement gap'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- docs/design/drydocs-startup-refresh-runbook.md
+- scripts/render_design_doc.py
+acceptance: |
+  Runbook Rev 4: the per-file supplement verb block (step 4 + Appendix B) collapses to the single verified `poetry run drydocs apply-supplements` chain (G29), which also retires Appendix B's long-standing missing apply-registry-supplement gap; the Refresh/ingest demonstrable-content step names `drydocs load-doc-traceability` (shipped by L7 after Rev 2 was signed); rendered HTML regenerated and the stale-render check passes.
+notes: |
+  Groomed 2026-07-28 pm from the held 2026-07-26 [doc] line — the hold (SME review in flight) lifted when the review closed; edit 3 of its trio (container facts) already landed via L16 Rev 3, this is the remaining two as one revision. MERGED IN 2026-07-31 (weekly groom): the 2026-07-20 [doc] inbox line — mention `drydocs load-doc-traceability` in the Refresh/ingest step. It was parked explicitly to "ride the next feedback loop rather than bump a fresh Rev for one line", and this IS that revision, so it becomes a clause of L21's acceptance rather than an item of its own.

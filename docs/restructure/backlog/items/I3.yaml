@@ -1,0 +1,20 @@
+id: I3
+epic: project-board
+title: 'Groom-backlog skill: raw notes -> backlog items'
+type: requirement
+module: docs
+phase: 8
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on:
+- I1
+inputs:
+- docs/restructure/IDEAS.md
+- docs/restructure/backlog.yaml
+- docs/restructure/02-backlog.md
+acceptance: |
+  .claude/skills/groom-backlog/SKILL.md exists: takes raw notes (pasted text, IDEAS.md inbox, or a transcribed photo of paper notes), emits either IDEAS.md inbox lines or full v2 items (title/type/module/phase/acceptance), asks the user only when module/phase is genuinely ambiguous, moves groomed lines to the IDEAS.md audit trail, updates summary/next_ready, and regenerates the board once I2 has landed. test_backlog.py green after a groom run.
+notes: |
+  Done 2026-07-01 (authored on opus per the model matrix; routine runs on sonnet). .claude/skills/groom-backlog/SKILL.md (promote/inbox/merge procedure, field guide, ambiguity + HITL rules, groom-run mechanics) + validate.py (standalone schema gate for envs without pytest — test_backlog.py wins on disagreement). Demonstration groom run: IDEAS inbox fragment-cleanup line -> J1 (Epic J, release-infrastructure); audit trail updated; validator green; board regenerated.

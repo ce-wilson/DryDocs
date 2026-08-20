@@ -1,0 +1,27 @@
+id: J49
+epic: release-infrastructure
+title: Rule the ten non-render write_text sites the LF sweep fenced out — explicit LF or a recorded reason;
+  three of them were never in the census
+type: chore
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs/cli.py
+- drydocs/loaders/vendor_docs.py
+- drydocs/publishing/preview.py
+- drydocs/publishing/publisher.py
+- drydocs_docmeta/manifest.py
+- drydocs_remediation/changes.py
+- drydocs_remediation/formats.py
+- scripts/external_vendor_scrape.py
+- scripts/extract_office_text.py
+- tests/unit/test_render_determinism.py
+acceptance: |
+  THE CENSUS IS CORRECTED AT THE GROOM, and the correction is why this is not a re-run of the sweep: `write_text(` without a newline argument, across drydocs*/ and scripts/, returns TEN sites, not the eight Idea-121 fenced out -- drydocs/cli.py:2032 (the schema-graph html), drydocs/loaders/vendor_docs.py:188 and :227, drydocs/publishing/preview.py:12, drydocs/publishing/publisher.py:56, scripts/external_vendor_scrape.py:384, scripts/extract_office_text.py:105, plus THREE the original list never named: drydocs_docmeta/manifest.py:101, drydocs_remediation/changes.py:303 and drydocs_remediation/formats.py:207. (a) EACH SITE GETS ITS OWN CALL, recorded: pass newline="\n", or state in an inline comment why this writer must not. The sweep fenced these out deliberately -- they write non-render outputs and a blanket change is exactly what the fence refused. (b) THE RULING THAT MATTERS: for each site, does it produce a COMMITTED artifact? If it does, its writer joins the DECLARED tuple in tests/unit/test_render_determinism.py -- that list is declared and never swept (Idea-121's fence), so a committed surface whose writer is absent from the tuple is invisible to BOTH guards, the static one and the byte one. drydocs_docmeta/manifest.py and the two drydocs_remediation writers are the live candidates and must be ruled explicitly rather than passed over. (c) Both guards stay green, no committed surface holds a CR byte, and re-running every render still leaves a clean tree.
+notes: |
+  Groomed 2026-08-19 from Idea-121's remaining half. The render half landed 2026-08-13 (d0b2a93 -- 25 dirtied files down to 0), and the guard that entry asked for now exists: tests/unit/test_render_determinism.py carries the static writer check and the CR byte check, built at the Idea-129 fix. What is left is exactly this per-site ruling. MODULE, choice recorded, and the spread is real: the ten sites sit in drydocs/ (5), scripts/ (2), drydocs_docmeta/ (1) and drydocs_remediation/ (2) -- no single MODULE_MAP component owns them. drydocs-load holds the plurality (cli.py plus loaders/vendor_docs.py) and is where the sweep starts; J48 is the precedent for filing a repo-wide sweep under one module rather than splitting it four ways. p3, NOT p2: the half that poisoned a committed provenance field -- meta.git.dirty reading true on every Windows snapshot -- is fixed, and what remains is legibility on outputs nobody diffs. Clause (b) is the escape hatch: if a site turns out to write a COMMITTED artifact, that site is a different priority and the close note should say so.

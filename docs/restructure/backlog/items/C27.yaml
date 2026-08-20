@@ -1,0 +1,24 @@
+id: C27
+epic: ontology-mapping
+title: 'Reconcile the catalog divergence through a gate once the company gate signs: the Sub-LoB grain,
+  the LOB label ruling, and the app_id key in ONE pass'
+type: task
+module: ontology
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- C26
+inputs:
+- config/gate-prompts/
+- config/taxonomy-ontology-map/30-mappings-catalog.yaml
+- drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml
+- drydocs/loaders/cypher/catalog_lobs.cypher
+- drydocs/loaders/cypher/product_lines.cypher
+- config/gate-log.md
+acceptance: |
+  A gate prompt is drafted and RUN, and its outcome transcribed to config/gate-log.md under a slug-named heading. It rules, in one session because they interact: (a) whether `:SubLOB` + `HAS_SUB_LOB` enter the producer ontology and with what range widening on HAS_PRODUCT_LINE; (b) the label ruling `:LOB` vs `:CatalogLOB` — the two sides write DIFFERENT labels for the same thing, so the company's `:LOB {lob_id}` fallback branch and our `catalog_lobs.cypher` cannot both be right; (c) the map-id reconciliation; and (d) how the S3 `app_id` key lands on shapes authored before the rename. Confirmed entries flip from `planned` to `confirmed` with their loader builds groomed as follow-ups; anything deferred is recorded with the consequence stated. The C22/C24 coalesce and orphan-flag conventions are applied to any loader this touches, not re-litigated.
+notes: |
+  TRIGGER, and it is external: the COMPANY gate's own sign-off. Producer sign-off is not company sign-off (the standing rule — their tracker is T1-T8/DD*), and adopting a shape from an UNSIGNED company gate page would import a proposal as if it were a ruling. So this item stays `todo` and simply does not become ready until C26 is done AND the trigger fires; do not "unblock" it by relaxing the dependency. WHY THE FLATTENING IS URGENT ENOUGH TO GATE RATHER THAN SHRUG AT: our chain runs BusinessSegment → CatalogLOB → ProductLine → Product → AreaProduct while the source runs LoB → Sub-LoB → Product Line → …, so we silently flatten one level — and the flattening is INVISIBLE rather than merely absent, because `parent_lob_id` on a product line will carry whatever the extract puts there. A sub-LoB id landing in a `:CatalogLOB`-keyed field MERGEs a phantom LOB that looks exactly like a real one. Corroborated three ways (SME statement 2026-08-01, the FCDO capture's "5-level hierarchy … native IDs at each level", and the company's own gate page).

@@ -1,0 +1,20 @@
+id: C5
+epic: ontology-mapping
+title: Rule for relationships between nodes derived from the SAME source row (city/state/country pattern)
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/RELATIONSHIP_GUIDE.md
+- drydocs/loaders/cypher/controlm_folders.cypher
+- config/taxonomy-ontology-map.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  A generic rule for same-row-derived node relationships (chain the hierarchy vs star-to-entity; when a direct derived-node edge restates a join and is banned) is documented in RELATIONSHIP_GUIDE.md and SME-confirmed via the HITL gate; existing loaders audited against it (live case: CM_DEF_VTAB row -> folder + ControlMServer + ControlMApplication — should app<->server relate directly or only through the folder?); an m3-verify or graph-tests invariant added, or its omission recorded in the gate log. Full suite green.
+notes: |
+  Groomed 2026-07-08 from the IDEAS question (captured 2026-07-07 while landing the folder-pass ControlMApplication extension). Re-opens phase 2 — methodology gap, not a new source. 2026-07-18 — DONE (gate same-row-derived-edges SIGNED OFF; ontology-mapper drafted, SME confirmed as written). Rule live in RELATIONSHIP_GUIDE.md (hierarchy: chain, no skip-level; star: satellites relate to the subject only; exceptions gate-only with an independent source). Live case: NO direct ControlMApplication<->ControlMServer edge — the SME's what-would- it-mean probe resolved to "nothing the per-folder traversal doesn't already say"; m3-verify guard added. Audit: 22 cypher files, all conform EXCEPT pat_product_mapping.cypher (writes the 2026-06-21-deprecated catalog_supports every run + planned catalog_has_application) — SME supplied PAT evidence reframing it as possibly independently-asserted; spun out as C9 (p1, fable) rather than fixed blind. Vocabulary untouched.

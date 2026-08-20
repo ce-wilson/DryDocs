@@ -1,0 +1,24 @@
+id: U10
+epic: self-documentation
+title: 'Run the code-graph package-layer gate to sign-off: does the PACKAGE become a node, and how is
+  one recognised offline'
+type: task
+module: ontology
+phase: 16
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- U9
+inputs:
+- config/gate-prompts/code-graph-package-layer.yaml
+- config/gate-prompts/self-documentation-code-graph.yaml
+- config/gate-log.md
+- drydocs_core/ontology/relationship_vocabulary/
+- config/taxonomy-ontology-map/
+- knowledge/depgraph-snapshots/
+acceptance: |
+  All 30 confirmations of config/gate-prompts/code-graph-package-layer.yaml are ruled with the SME and recorded in config/gate-log.md — including §C2, the page's own "real decision" (how a package is recognised OFFLINE, given __init__.py presence is UNSOUND here: drydocs_core/schema is a live PEP 420 namespace package with none, imported by the CLI), and the question the U9 scanner change added: whether the containment level loads as :CodePackage, as the :Directory nodes the artifact now carries, or both. Then per the page's §I: the proposed terms (u1_has_package, u1_defines_package, and the u1_has_module revision) are registered `status: planned` ONLY; the taxonomy-ontology-map entry is AMENDED per §H4 rather than duplicated; the parent gate's §B1/§B2/§C4 are annotated in place as re-opened-and-superseded-by-this-gate with the date; a BUILD item is added to backlog.yaml naming this gate as its dependency; and gates.json + the enforcement matrix regenerate. NOTHING is written to the graph at the gate itself.
+notes: |
+  HITL — the sign-off is an SME session, never auto-decided (CLAUDE.md §6), and no build item is opened ahead of it because §I says the gate opens it. Trigger was the SME reading the LIVE GRAPH 2026-08-02: ":HAS_MODULE is overused ... I thought module described the next highest group under the project." The page corrects the vocabulary before answering — in Python a module IS what `import` binds, so drydocs/cli.py genuinely is the module drydocs.cli and the file nodes are correctly typed; the level the question points at is the PACKAGE, and the one place the model is factually wrong is __init__.py, which is not a module named __init__ but the thing that makes its directory a package. §A4 asks the SME to accept that correction FIRST, because §C is written against it. Not drift: the parent gate (signed 36/36 2026-07-27) named this exact cost in writing at §C1 and declined the two-level option at §B1(c) on COST, not correctness — a recorded, accepted cost that is later felt is precisely what a re-open is for. Fable: a new node class, two new edge types, and an ACTIVE vocabulary entry re-pointed.

@@ -1,0 +1,22 @@
+id: O8
+epic: web-console
+title: 'Site shell rebuild on the locked UI stack: ReUI/Tailwind zone shell, system-default theming, 9-module
+  routing skeleton'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O6
+inputs:
+- UI-WIP/site-plan.md
+- UI-WIP/layout-anatomy-checklist.md
+- UI-WIP/design-review.md
+- web/src/
+acceptance: |
+  web/ runs on the locked single-track stack (Vite + React + Tailwind + ReUI free — Salt dropped): the zone shell from layout-anatomy-checklist.md (aside / header / page-owned toolbar / content / right-sidebar slot, one typed layout config driving every zone); theming = dark + light token sheets behind a pre-paint boot script defaulting to the system scheme with a 3-state System/Dark/Light toggle (dark tokens carried from drydocs-landing-dark.html, --faint contrast fix applied); IBM Plex self-hosted; all 9 module routes from site-plan §3 exist as real deep-linkable routes (back-button safe; focus moves to the view h2 on route change); view components still reach the graph only through the O4 GraphAccess seam.
+notes: |
+  site-plan.md P0. Evolves the existing web/ console (O2/O6 surfaces survive as routes or are consciously retired in the shell PR — no silent deletion). 2026-07-18 — DONE (agent worktree 423000f, merged --no-ff as feat/o8-web-shell, merge 408e8fc; build re-verified on main post-merge). Zone shell in web/src/layout/ driven by one typed shellConfig.ts; dark tokens carried from drydocs-landing-dark.html with the --faint contrast fix (#5C6B7E -> #71809A); pre-paint boot script + System/Dark/Light toggle; IBM Plex via @fontsource; all 9 site-plan §3 routes real + deep-linkable, focus-to-h2 on route change; GraphAccess seam untouched. Kept: GraphExplorer (/explorer/live), TowerDrill (/explorer/tower/:key), MyApps (/ownership), CypherConsole (/console). Consciously retired (reasons in the branch commit): Landing.tsx, Governance.tsx, old components/Shell.tsx, hash-router half of views.ts. NOTE — layout-anatomy-checklist.md named in inputs was NEVER COMMITTED (Cowork artifact); zones built from the acceptance + site-plan + wf-*.md. Disclosed gaps: no mobile off-canvas aside (desktop-first call), light tokens derived not contrast-verified (site-plan follow-up), no browser screenshot (no extension in the worktree env — verified via tsc/build/ lint + curl route checks).

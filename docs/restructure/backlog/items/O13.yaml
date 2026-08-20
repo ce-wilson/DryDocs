@@ -1,0 +1,28 @@
+id: O13
+epic: web-console
+title: 'Manual mapping stewardship screen (power-user): draft job->application / FID / ALIAS entries into
+  a gate-bound manual-loads changeset - never a direct graph write'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O8
+inputs:
+- UI-WIP/wf-mapping-01.md
+- UI-WIP/wf-mapping-01.html
+- config/manual-loads/
+- drydocs/loaders/manual_loads.py
+- config/gate-prompts/
+- web/src/
+acceptance: |
+  /mappings exists behind a new steward (power-user) persona extending the O2 mock auth (admin also sees it; steward does NOT see /admin/config or the Cypher sandbox). A registry-driven domain strip lists the reconciler-consumed manual tables (K2 tier model: tier-5 manual job->application CSV in config/manual-loads/, FID tier-2, ALIAS tier-4). The attribution-coverage grid shows every job's current resolution (tier + evidence) with unresolved and conflict rows as work queues; assigning a target BusinessApplication (searchable by seal_id/name, rationale REQUIRED) drafts entries (source key, target, rationale, author, timestamp) into a per-user changeset tray; the assign dialog states the precedence honesty rule (manual = tier 5, never overrides SEAL evidence). Submit emits a config/manual-loads/ change ARTIFACT (drydocs-api draft endpoint or file-download fallback) that travels git + gate review + merge, applied by the NEXT LOAD RUN - the UI performs zero graph writes (the loader remains the only writer). Entry lifecycle draft/submitted/gated/loaded is visible, with loaded self-verified by the grid's tier flipping to manual after the load. Dropdowns/options read mapping.db via drydocs-api (the mapping-store plan §6 acceptance rider — M2 landed 2026-07-18).
+notes: |
+  Groomed 2026-07-17 from chat (power-user mapping screen). "Code->application" joins the domain strip when that mapping table exists as a reconciler input - same mechanics, registry entry only. Open items in wf-mapping-01.md: draft endpoint shape (PR-creating vs artifact download - decide at build per GHE posture); conflict-row escalation semantics.
+progress: |
+  2026-07-18 — the API + store half LANDED pre-O8 (branch feat/mapping-store, 807e050; mapping-store plan M0-M4 executed): drydocs_core/mapping_store.py (SQLite materialization, deterministic dumps) + drydocs_api /mappings/* (steward/admin gate, grid/options reads, POST changeset -> CSV+manifest ARTIFACT, zero server writes) + static/mapping_demo.html at /demo (the wf-mapping-01 live-data twin) + test_mapping_store.py / test_mapping_api.py. The draft-endpoint open item resolved conservatively: artifact download, no server-side git. REMAINING for O13: the real /mappings React screen on the O8 shell per the acceptance (coverage grid with tier/evidence, work queues, lifecycle visibility). Documented: docs/runbook-mapping-demo.md + docs/design/drydocs-web-console-tdd.md. DONE 2026-07-21 (Epic-O finish session): /mappings React screen on the O8 shell — steward+admin route guard (steward still has NO /console; the server enforces 403 below steward anyway); registry-driven domain strip from GET /mappings/domains (available rows + not-built tier-2/4 placeholders); coverage grid binds the NEW spec mappings.attribution-coverage.v1 (status resolved/unresolved/conflict + match_method tier evidence over the gated K2 edge; unresolved/conflict as one-click work queues); assign dialog searches explorer.applications.v1 (free-text seal_id fallback when the list is unavailable), rationale REQUIRED, the K2 precedence-honesty rule stated up front + an already-resolves-at-higher-tier warning; per-user localStorage changeset tray; submit POSTs /mappings/changeset and downloads the CSV + manifest-snippet ARTIFACT (zero graph writes — the loader stays the only writer); lifecycle chips draft/submitted/gated(bookkeeping)/loaded, with loaded DERIVED live from the coverage grid flipping the job's tier to manual. graphApi refactor: shared createApiClient token client (ONE auth policy for GraphAccess + the mappings client). DEV-only ?as=<personaId> sign-in affordance for headless verification (the boltAllowed construction — baked out of prod bundles). Verified: suite 791 green; web build + lint green; headless-Edge smoke against the live api (mapping.db vocabulary footer live: applied 8 / confirmed 22 / proposed 3; SYNTHESIZED demo coverage fallback shows honestly on the empty graph; screenshots captured steward persona).
+annotations:
+  status: DONE 2026-07-21 (Epic-O finish session) — see notes

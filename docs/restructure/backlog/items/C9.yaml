@@ -1,0 +1,25 @@
+id: C9
+epic: ontology-mapping
+title: 'Reconcile pat_product_mapping with the PAT model: teams map to BusinessApplications (team report),
+  area-product alignment volatile + relationship-typed — retire or re-gate the deprecated DevTeam->Product
+  write'
+type: task
+module: drydocs-load
+phase: 2
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on:
+- C5
+inputs:
+- drydocs/loaders/cypher/pat_product_mapping.cypher
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- docs/RELATIONSHIP_GUIDE.md
+- config/gate-log.md
+- config/source-registry.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  pat_product_mapping.cypher no longer writes edges whose vocabulary entry is deprecated (catalog_supports) or merely planned (catalog_has_application) without a gate decision making each ACTIVE or removing the write; existing DevTeam->SUPPORTS->Product edges are swept from live graphs if the deprecation stands. The PAT reality is modeled through the gate: DevTeam->BusinessApplication mapping from the PAT team report (source registered in config/source-registry.yaml with a locator; real SEAL ids and rosters stay in the internal/ twin per the publish boundary); area-product alignment stays volatile-aware (relationship type dedicated|aligned|flex on the edge, changes tracked rather than frozen); supporting vs sponsoring distinguished. Whether DevTeam->Product SUPPORTS survives as an independently-asserted PAT fact (PAT's own Supporting Product column — the C5 rule's exception path) or stays deprecated is THE gate question, decided by the SME and recorded in gate-log + vocabulary. Full suite green.
+notes: |
+  Filed 2026-07-18 from the C5 gate session (gate same-row-derived-edges §c): the C5 audit found pat_product_mapping.cypher still writing the 2026-06-21-deprecated catalog_supports edge on every load. SME context in-session with PAT screenshots (Internal-Confidential — held OUT of the repo): dev teams map to ONE OR MORE business applications via the PAT team report (the stable mapping to load); team->area-product alignment changes over time and is hard to pin; PAT models Supporting Product and Supporting Area Product as SEPARATE columns with a relationship type plus distinct sponsoring fields — so the deprecated edge may be independently asserted, not a same-row join-restatement. Model fable: re-gates SUPPORTS semantics AND onboards a source. p1 because every load re-creates a deprecated edge. 2026-07-18 — DONE (gate pat-reconcile SIGNED OFF, same day). The SME's ladder reconciled: seal_ids feed the ACTIVE arch_develops (loader finally wired — no second label); catalog_supports re-activated FALLBACK-ONLY (no area product on the row); HAS_APPLICATION write removed (entry stays planned for a product-scoped extract); sponsoring extended to area products; per-team volatile-alignment sweep each load; anchor apps source:pat + m1-verify ports check scoped to source:SEAL; new m1-verify join-restatement guard. migrate_pat_alignment_c9.cypher applied live. Synthetic 4-row sample covers every ladder branch; refresh-reference chain now exercises the loader; live shape verified exact. Suite 718.

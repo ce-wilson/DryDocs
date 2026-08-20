@@ -1,0 +1,21 @@
+id: S1
+epic: structure-remediation
+title: Rule on ADRs 0008 (orchestration parent) / 0009 (config substrate) / 0010 (app_id + id_authority)
+type: task
+module: docs
+phase: 6
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/reviews/architecture-structure-review-2026-07-25.md
+- docs/decisions/0008-orchestration-module-boundary.md
+- docs/decisions/0009-configuration-substrate.md
+- docs/decisions/0010-internal-source-term-abstraction.md
+- docs/decisions/README.md
+acceptance: |
+  Each of the three ADRs carries a Status other than Proposed — Accepted, Accepted-with-amendments, or Rejected — with the deciding session and date recorded in the ADR itself and in docs/decisions/README.md; an amended ADR is EDITED to the ruling, not annotated around it. ADR 0010 additionally names the HITL gate that owns its property-term binding (S3 runs it): this item authorizes the SHAPE, the gate authorizes the graph write. No code moves here — a rejection is a valid outcome and closes S2/S4/S5/S6/S7 with it.
+notes: |
+  RULED 2026-08-01 (laptop; user ruling "move S1 to accepted"). All three ADRs now carry a status and a deciding date, and docs/decisions/README.md matches. 0008 ACCEPTED as proposed (orchestration parent, no rename) -> unblocks S2. 0009 ACCEPTED as proposed (git text stays source of truth permanently; mapping.db stays derived/gitignored) -> unblocks S4. 0010 ACCEPTED WITH AMENDMENTS -> unblocks S3. . WHY 0010 COULD NOT BE ACCEPTED AS WRITTEN, and what changed: its own body carried a "PARTIALLY SUPERSEDED - do not build from this ADR as written" banner saying an amendment was OWED AT THIS ITEM. The business-application-identity gate had already SIGNED OFF 2026-07-27 (22/22, 0 edits) and overruled the ADR's central mechanism, so ratifying the text verbatim would have written a WITHDRAWN property (`id_authority`) into the decision record as accepted. S1's own acceptance requires an amended ADR to be EDITED to the ruling, not annotated around it - so the body was edited: title, Decision block, the six rules, the migration table, Option B/C dispositions, Consequences and Action items. The banner is replaced by an ACCEPTED-WITH-AMENDMENTS record that keeps WHY each thing changed. . The gate's substance, now in the ADR: the rule is TWO-PART - (i) identity takes a neutral name, (ii) evidence/provenance vocabulary KEEPS the source's own term, so ATTRIBUTION_TIERS 'SEAL' and match_method 'seal' STAY. This reverses v1 action item 3, which told the implementer to reword match_method. `id_authority` withdrawn (one permanent registry - the authority is declared once in the taxonomy file plus a seal-extract column ledger, which B6 records as DECLARATIVE, not a runtime mapping). `app_urn` deferred with a named trigger. Cutover is 8 key-bearing sites (4 MERGE, 4 MATCH) in ONE atomic change, because a Neo4j uniqueness constraint IGNORES NULLS and a partial flip silently DOUBLES the canonical node. :Port follows now, and DROP its constraint first - CREATE CONSTRAINT ... IF NOT EXISTS matches on NAME and would no-op. . Also corrected while editing: the ADR cited config/taxonomy/business-application.yaml as the layer that "already got this right", quoting `identifier: SEALID`. Checked the live file - it reads `identifier: "Application ID"`, corrected at the gate sign-off, and NOT to `app_id`. That is the two-part rule in miniature: the taxonomy entry is evidence so it keeps the source's header, while the graph property is identity so it is neutral. . The sequencing inverted relative to the plan: S1 was created 2026-07-25 to rule the SHAPE before its gate authorized the graph write, and the gate ran first (07-27). For 0010 this item therefore RECORDED a decision rather than making one. Worth noting as a pattern - a decision item ahead of its gate only holds if the gate actually waits. . Created 2026-07-25 groom from the pre-UI structure review. The R1 precedent: a decision item ahead of its build items, so nothing gets groomed into a done deal. The review's own recommendations are: 0008 no rename, add a parent; 0009 keep git YAML as source of truth, widen the derived SQLite read model; 0010 app_id + id_authority instead of seal_id. S8/S9 deliberately do NOT depend on this item — neither needs an ADR ruling to start.

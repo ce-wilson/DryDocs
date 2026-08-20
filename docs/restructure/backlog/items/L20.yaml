@@ -1,0 +1,19 @@
+id: L20
+epic: doc-infrastructure
+title: 'feedback/ stray-file guard: files matching no expected -rev<N>.yaml pattern are reported as findings,
+  not silently ignored'
+type: task
+module: drydocs-load
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/doc_traceability.py
+- docs/design/feedback/
+acceptance: |
+  The feedback adapter (or a companion check in the same loader family) reports files under docs/design/feedback/ that match no expected -rev<N>.yaml pattern as findings instead of silently ignoring them — the misnamed Copy-feedback export dead end (resolved 2026-07-28) becomes detectable; a test pins a stray-file fixture producing a finding; suite green.
+notes: |
+  Groomed 2026-07-28 pm from the resolved misnamed-export [chore] line's latent gap: the L5 Copy-feedback path trusts the human to name the file, and a wrong name is invisible today. Sits in the L17/L18 loud-refusal family. DONE 2026-08-04 (c075ee2): DesignDocFeedbackAdapter.stray_files() censuses top-level files that are neither <doc>-rev<N>.yaml nor README.md (subdirs like scans/ excluded by shape); DocFeedbackLoader reports the census after load — stray_feedback_files + WARNING naming each file, duck-typed for fake adapters. Tests pin the stray fixture at adapter and loader level, plus a standing assert that the committed feedback/ tree is stray-free. Suite 1505.

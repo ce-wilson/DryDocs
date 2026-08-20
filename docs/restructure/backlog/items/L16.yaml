@@ -1,0 +1,19 @@
+id: L16
+epic: doc-infrastructure
+title: Refresh the startup/refresh runbook's container name + ports to match the neo4jtest recreation
+  (neo4j-drydocs-ee/7476/7689 -> neo4jtest/7474/7687)
+type: chore
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- docs/design/drydocs-startup-refresh-runbook.md
+- scripts/render_design_doc.py
+acceptance: |
+  docs/design/drydocs-startup-refresh-runbook.md's container table and start commands reference container `neo4jtest` on ports 7474/7687 (not `neo4j-drydocs-ee`/7476/7689); the doc's Rev is bumped with a change note per its own cadence; re-rendered via scripts/render_design_doc.py (deterministic — git diff clean after regen); doc_outline validation + full suite green.
+notes: |
+  Groomed 2026-07-23 from the IDEAS.md Neo4j-container-recreation entry (2026-07-23): the container migration itself is already done (data moved to named volume neo4j-testdata, canonical container `neo4jtest` on default ports; local .env/agents/.env/web/.env.local/MCP config re-pointed 7689->7687) — this item is documentation-only catch-up through the governed doc pipeline (CLAUDE.md L13 idiom: one .html, deterministic render, no hand-restyling). DONE 2026-07-28: Rev 2 -> Rev 3. Container/ports fixed in prerequisite 1, the NEO4J_URI example, Startup step 1, Rollback step 3, Appendix A and Appendix B. Appendix A is now stated as a RENDER of config/dev-environment.yaml rather than an independently-maintained table — the drift happened because the doc kept its own copy of facts that file already owns. Render proven deterministic (rendered twice, byte-identical). test_doc_traceability_loader.py pins the parsed rev, so its expected value moved with the bump.

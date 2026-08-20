@@ -1,0 +1,24 @@
+id: Q22
+epic: docmeta
+title: 'The SME email-assignment surface: the email and its citations, propose-only candidates with their
+  evidence, and unassigned as a first-class resting state'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- Q21
+inputs:
+- web/src/routes/
+- drydocs/loaders/email_extracts.py
+- drydocs/data/samples/email-extracts/
+- config/gate-prompts/email-folder-assignment.yaml
+- config/gate-log.md
+- config/doc-source-registry.yaml
+acceptance: |
+  The later slice the signed gate named in §B2 (config/gate-log.md 2026-08-19): the surface through which an SME performs an assignment, built to the contract the gate confirmed rather than to a designer's guess. (a) WHAT IS PRESENTED: the email -- subject, sent_at, and the .msg / extract CITATIONS by path. The originals live OUTSIDE the repo and are referenced, never copied (Q10's rule), so the surface cites them and does not host them. (b) CANDIDATES CARRY THEIR EVIDENCE AND ARE PROPOSALS (§B1): a prose or subject-line hit is shown with the matched text and where it was found, and its propose-only status is legible in the UI. Nothing is pre-selected -- selecting a candidate is an SME ACT. (c) UNASSIGNED IS FIRST-CLASS: a normal resting state, never a nag, never a default. No count, column header, wording or styling may present unassigned as a defect or as debt -- the same discipline N12 clause (f) fixed for `acquisition.mode: manual`. (d) THE WRITE IS THE SME's HAND, THROUGH ONE PATH: an action here performs the CONCERNS write with assigned_by: sme plus the evidence pointer (§A3) via Q21's writer. The surface never opens a second write path, and it cannot write without an explicit action. (e) VENUE FENCE: the real extracts are company-side, so the producer side ships the surface and its contract-shaped view against the bundled SYNTHETIC samples. No real email subject, body or folder name is committed here. (f) Tests cover candidate rendering with evidence, the unassigned resting state, the no-default assertion, and that no write occurs without an explicit action.
+notes: |
+  Groomed 2026-08-19 from Idea-138 -- the slice the gate itself deferred at §B2. An SME action here is one of only TWO hands that may perform the write; the other is a structured-field source signal, which today's assumed contract does not have, so in practice every assignment starts SME-performed. MODULE/PHASE, choice recorded: drydocs-web / phase 12 under epic docmeta -- exactly the K11 shape, where a steward screen is filed under its DOMAIN epic while the module and phase follow the SURFACE. Epic web-console / an O id was the alternative and was rejected: the subject is the email corpus, and filing it there would separate it from the gate and the writer it implements. depends_on [Q21] because clause (d) has no second write path: the basis requirement (§A3) is enforced in the writer, and a surface built ahead of it would either duplicate that enforcement or bypass it.

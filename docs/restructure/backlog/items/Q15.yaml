@@ -1,0 +1,22 @@
+id: Q15
+epic: docmeta
+title: 'Agent navigation QuerySpecs over the doc spine: name-addressable lookup, section browse, role
+  siblings, search as FALLBACK'
+type: task
+module: drydocs-api
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- Q13
+inputs:
+- knowledge/upgrade-plans/vendor-docs-agent-navigation.md
+- drydocs_api/
+- web/src/ask/
+- web/src/routes/AskRoute.tsx
+acceptance: |
+  Four registered QuerySpecs — docs.utility-lookup.v1 (exact name -> docs grouped by page_role), docs.section-browse.v1 (section -> siblings, one hop), docs.role-siblings.v1 (doc -> same-subject docs of another role), and docs.search.v1 (full-text/vector, explicitly the FALLBACK for "I don't know the name"). All four: bounded expansion with no unbounded variable-length traversal; every row carries source_url + doc_version + trust so the R5 citation surface renders provenance; chunk text is NOT returned by default — the agent asks for it as a deliberate second step. Proven against the loaded corpus, and reachable from /ask without touching /raw-cypher.
+notes: |
+  Section 4 of the plan. The point is that an agent usually arrives already knowing the noun ("how do I use exportdefjob?"), and a vector search for a known exact identifier is both slower and less reliable than an indexed exact match — so similarity search is demoted to the fallback path rather than being the only door in. Chunk-free by default because agent context is the scarce resource: triage on abstract + page_role, spend context on text only after choosing. Specs over raw Cypher per the R4/R5 design (ephemeral specs + citations carrying trust and classification) — this keeps doc answers citable and keeps agents off /raw-cypher.

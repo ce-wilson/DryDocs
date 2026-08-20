@@ -1,0 +1,21 @@
+id: K12
+epic: seal-attribution
+title: Capture :ControlMApplication as taxonomy — the app-code classification the ontology map had to
+  waive
+type: task
+module: taxonomy
+phase: 9
+agent: taxonomy-importer
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-04
+depends_on: []
+inputs:
+- config/taxonomy/controlm.yaml
+- config/taxonomy-ontology-map.yaml
+- drydocs/loaders/cypher/controlm_folders.cypher
+acceptance: |
+  config/taxonomy/controlm.yaml gains the app-code grouping (:ControlMApplication) as PURE CLASSIFICATION — no meaning-bearing edges — alongside the servers/folders/jobs/conditions it already captures. The app-code-defined-mapping entry in config/taxonomy-ontology-map.yaml then replaces its capture WAIVER with the real path, and the post-cutoff capture guard (test_taxonomy_ontology_map.py::test_post_cutoff_mappings_declare_capture) passes on the path rather than on the waiver.
+notes: |
+  Found at the K7 sign-off 2026-08-03: :ControlMApplication is LOADED but was never captured taxonomy-first — controlm.yaml predates the 2026-07-07 folder-pass extension that added the app code. Same F5 gap job-seal-app-ref records. The mapping's capture was waived explicitly rather than silently, per the guard's own "waived — <reason>" form; this item closes the waiver. Note what is owed is a capture of the app-code CLASSIFICATION, not of the defined mapping — the mapping has no machine feed and the steward store IS its source of record (§E2). CLOSED 2026-08-04 (desktop): controlm.yaml gained the applications: section (4 codes, pure classification, faithful to the REDUCED sample — the sample folders CSV carries no APPLICATION column, so codes are observed via the jobs' application column and jobless folders are name-DERIVED and flagged, honoring the naming standard's a-name-is-not-a-key warning). The map entry's capture waiver replaced with the real path; the post-cutoff capture guard passes on the path.

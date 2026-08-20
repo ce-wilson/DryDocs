@@ -1,0 +1,85 @@
+schema: drydocs.backlog.v3
+plan:
+  phases:
+  - id: 0
+    title: Restructure scaffolding
+    goal: Four-layer model, external/internal split, config layer, publish boundary, sub-agents.
+    status: done
+  - id: 1
+    title: Taxonomy capture
+    goal: Live sources captured in config/taxonomy/ as pure classification (Epic B).
+    status: done
+  - id: 2
+    title: Ontology mapping + HITL
+    goal: Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).
+    status: in_progress
+  - id: 3
+    title: Config-driven loaders
+    goal: Precedence + source gating read config/, not hardcoded logic (Epic D).
+    status: done
+  - id: 4
+    title: Context graph pilot
+    goal: SOSA/SSN observation modeling answers one live support question (Epic E).
+    status: todo
+  - id: 5
+    title: Orchestrator expansion
+    goal: AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).
+    status: todo
+  - id: 6
+    title: Modular architecture / component topology
+    goal: ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).
+    status: in_progress
+  - id: 7
+    title: Review toolkit back-flow
+    goal: Company SME-review/HITL toolkit reproduced generically, offline (Epic H).
+    status: done
+  - id: 8
+    title: Planning & release infrastructure
+    goal: Repo-native project board + capture loop; groundwork for versioned releases (Epic I).
+    status: in_progress
+    release: v0.3.0
+  - id: 9
+    title: Application attribution
+    goal: Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy,
+      loader, verify coverage (Epic K).
+    status: in_progress
+  - id: 10
+    title: Documentation infrastructure
+    goal: Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF
+      render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability spine (Epic
+      L).
+    status: in_progress
+  - id: 11
+    title: Source governance ledgers
+    goal: 'Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M)
+      and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.'
+    status: in_progress
+  - id: 12
+    title: Web console / graph visualization
+    goal: 'Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j
+      access path (bolt-from-browser vs a thin API).'
+    status: in_progress
+  - id: 13
+    title: Runtime topology & maintenance windows
+    goal: Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their
+      gates; the maintenance-window question (best patch window for a host/group) answerable from the
+      graph (Epic P).
+    status: in_progress
+  - id: 14
+    title: Document ingestion & doc-graph benchmarks
+    goal: 'Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed
+      md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component''s
+      P1+ phases once the verdict + docmeta ADR gate them (Epic Q).'
+    status: in_progress
+  - id: 15
+    title: Agentic Q&A console
+    goal: Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded
+      text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs,
+      per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).
+    status: todo
+  - id: 16
+    title: Self-documentation — DryDocs' own code in the graph
+    goal: 'DryDocs documents ITSELF the way it documents Control-M: the project''s code-dependency snapshot
+      enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so
+      ''which module loads this job'' is a query rather than a JSON file a human reads (Epic U).'
+    status: todo

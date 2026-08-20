@@ -1,0 +1,27 @@
+id: Q11
+epic: docmeta
+title: Model document supersession and currency so 2-3 stale versions of the same internal process page
+  are distinguishable by more than a date
+type: requirement
+module: ontology
+phase: 14
+agent: ontology-mapper
+model: fable
+priority: p3
+status: done
+depends_on:
+- G31
+inputs:
+- docs/RELATIONSHIP_GUIDE.md
+- drydocs_core/ontology/relationship_vocabulary/
+- config/doc-source-registry.yaml
+acceptance: |
+  A SUPERSEDES (or gate-chosen spelling) Document→Document relationship plus a currency signal on :Document is registered `status: planned` in relationship_vocabulary.yaml with a decision-matrix entry and a gate-prompt spec; a retrieval over a multi-version corpus can return ONLY the current version without relying on captured_at ordering alone. No loader writes the edge until the HITL gate confirms it.
+notes: |
+  User problem statement 2026-07-26: "internally i've seen 2 or 3 different versions with the same referenced person/team/process, but is stale and the only indication is date." The point that decided this is its own item rather than a rider on the database question: QUARANTINING DOES NOT DISAMBIGUATE. Putting all three versions in an unstructured-content database leaves all three versions sitting together, still ambiguous — the separation protects OTHER corpora from them, it does not tell you which one is current. That is a modeling problem and needs modeling, whatever the topology ends up being. Hence depends_on G31 only for where the nodes live, not for the semantics.
+annotations:
+  status: '2026-08-19 (laptop): docs_supersedes registered planned ((new)-[:SUPERSEDES]->(old), prov:wasRevisionOf;
+    dct:replaces twin) + map row + summary; currency is STRUCTURAL (no incoming SUPERSEDES — never captured_at
+    ordering, the acceptance''s retrieval met by the model); gate document-supersession drafted: pairwise
+    chains only, the is_current cache priced against the §B2 two-encodings lesson, and wrong-is-worse-than-missing
+    (similarity may propose, never write)'

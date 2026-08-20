@@ -1,0 +1,25 @@
+id: J36
+epic: release-infrastructure
+title: Integration tests need a manual ryuk workaround on this desktop — decide the fix and make it automatic
+type: bug
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- tests/integration/test_e2e_load.py
+- tests/conftest.py
+- internal/repo-README.md
+acceptance: |
+  A testcontainers integration test (the J9 family or the G23 e2e) starts on this desktop with NO manual step: either TESTCONTAINERS_RYUK_DISABLED is set where the suite can see it (conftest, or a documented environment note that names the machine class per J18), or the underlying port-8080 conflict with the ryuk reaper is fixed and the env var is proved unnecessary. Whichever is chosen, the reason is written down next to the setting — a bare env var with no note reads as cargo cult — and the stale-ryuk-container cleanup is documented for the next occurrence.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-84, captured at the G23 e2e close on this desktop: startup failed with "Port mapping ... port 8080 is not available" for the ryuk reaper, reproduced identically on an existing J9 test, so pre-existing environment trouble rather than the new test; removing stale ryuk containers and setting the env var ran the new e2e green in 22s. Venue-specific by nature, so J18 applies — whatever lands names the machine it was observed on.
+annotations:
+  status: '2026-08-07 pm (desktop): tests/integration/conftest.py defaults TESTCONTAINERS_RYUK_DISABLED=true
+    via setdefault (overridable with =false) — full why in the docstring (J18 venue: producer Windows
+    desktops; intermittent WinNAT excluded-range / stale-reaper port failure; ryuk only buys crash-reaping,
+    ordinary teardown unaffected) + stale-container cleanup one-liners there and in internal/repo-README.md.
+    PROVEN: e2e ran 4 passed / 29.8s cold with no manual step, env var unset in the shell'

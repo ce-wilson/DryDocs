@@ -1,0 +1,28 @@
+id: docmeta
+letter: Q
+title: Document ingestion & doc-graph benchmarks
+order: 16
+groom_log:
+- date: '2026-07-16'
+  note: |-
+    ── Epic Q — Document ingestion & doc-graph benchmarks (docmeta) — Phase 14 ─
+    Born 2026-07-16: the Essential GraphRAG ebook groomed on user-decided intents,
+    with the phase-14 plan change user-approved in-session (the phase-12/13 idiom).
+    The docmeta component plan (knowledge/upgrade-plans/docmeta-component.md) grooms
+    its P1+ phases HERE once the P0 WRITTEN verdict + the docmeta ADR land.
+  attached_at: Q1
+- date: '2026-07-18'
+  note: |-
+    (Q4–Q6 groomed 2026-07-18 — the docmeta plan's P1–P3, promoted on the recorded
+    trigger: Q3's P0 verdict = BUILD. P4–P7 stay plan-tracked until these land.)
+  attached_at: Q4
+- date: '2026-07-26'
+  note: |-
+    ── appended at the 2026-07-26 groom run (docs-residency design session) ───
+    Eight items from the 2026-07-26 chat that followed G28/G29/G30. The session
+    theme was ONE failure pattern found three times — "succeeds loudly, does
+    nothing": G29 (a supplement that runs and seeds no terms), G30 (a spec that
+    reads a database nothing writes), and Q8 below (an OPTIONAL MATCH whose
+    target class is in another database). Q8 is the ready-now bug; G32 is the
+    decision everything else waits on.
+  attached_at: Q7

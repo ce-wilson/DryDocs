@@ -1,0 +1,23 @@
+id: J42
+epic: release-infrastructure
+title: 'Nothing checks the backlog union rule a port promises: diff the two repos'' item-id sets at the
+  port base and fail the report on a gap'
+type: task
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- docs/restructure/backlog.yaml
+- tests/unit/test_backlog.py
+- scripts/port_preflight.py
+- .claude/skills/reconcile-port/SKILL.md
+- docs/port-prompt.md
+acceptance: |
+  A PORT-TIME check -- not a unit test, because the producer tree cannot see the consumer's -- that reads both repos' docs/restructure/backlog.yaml at the RECORDED PORT BASE, diffs the items[].id sets, and FAILS the port report when producer-minus-consumer is non-empty, naming every missing id. An explicit allow-list carries ids deliberately not carried across, each with its reason, so that "no difference" and "a difference somebody accepted" are distinguishable in the output rather than both rendering as silence. It runs from the reconcile side, where both trees are reachable, and is named in .claude/skills/reconcile-port/SKILL.md and docs/port-prompt.md so a session that never opens the manifest still runs it. Proven to FAIL on an injected defect -- one id deleted from the consumer copy -- before it is trusted (J26).
+notes: |
+  Groomed 2026-08-11 from Idea-96. PORT-MANIFEST.yaml states the union rule unconditionally for docs/restructure/backlog.yaml ("Union the items; NEVER regress a status ... or drop an entry"), and tests/unit/test_backlog.py enforces plenty about the file -- schema, roll-up arithmetic, next_ready, unknown depends_on -- but every one of those checks looks at ONE copy in isolation. The union is a claim about TWO copies and nothing compares them, so a port that quietly under-delivers items leaves both sides internally consistent and green. Textbook J26: a rule written in prose and enforced by nobody. The near miss that makes it worse -- the dependency guard would have caught it only if a surviving item happened to depend on a missing one, so whether the gap is visible at all is luck rather than design. Mechanism only; the numbers and ids from the occurrence stay in the port report, not here.

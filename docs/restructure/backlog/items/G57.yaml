@@ -1,0 +1,24 @@
+id: G57
+epic: component-topology
+title: Rename the rua_* family to bkup_* across the collector, extractor, staged kinds and envelope properties
+type: chore
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/collect/rua_inventory.sh
+- drydocs_lineage/extractors/rua_inventory.py
+- drydocs_lineage/extractors/rua_code_ops.py
+- drydocs_core/data_root.py
+- config/source-registry.yaml
+- config/gate-prompts/rua-load-shapes.yaml
+- config/gate-log.md
+- MODULE_MAP.md
+acceptance: |
+  The `rua` prefix is gone from names the repo AUTHORS, and the rename is recorded rather than silent. Scope measured at groom: 24 tracked files carry the token in code, config and docs — the collector script + conf + README, the two extractors, `rua_extracted_dir`, the `RuaCoverage` / `RuaInventoryExtractor` classes, the staged kinds (`rua_path`/`rua_profile`/`rua_script`), the `rua_*` envelope property family, the source-registry row, dev-environment, the runbooks and the backlog/IDEAS prose. TWO THINGS ARE DELIBERATELY NOT RENAMED: (a) history in `config/gate-log.md` — a log entry records what was decided on a date and rewriting it falsifies the record; (b) the SIGNED-GATE IDENTITY question follows the source-registry v2 §Q6 precedent — a rename is identity refactoring, not meaning change, so gates TRANSFER with ONE gate-log amendment entry mapping old→new, and nothing is re-gated. The gate page `rua-load-shapes.yaml` renames only if §Q6's amendment entry is written in the same commit. A test asserts no source file outside the history/amendment set still names the old prefix, so it cannot drift back.
+notes: |
+  Groomed 2026-08-06 (laptop) at the G22 session — the SME renamed `rua_inventory` to `bkup_inventory`, dropping the `rua` prefix. Producer side still carries `rua` everywhere; this item closes the divergence. NOW IS THE CHEAP MOMENT, and it will not come again: nothing has been loaded, so the staged kinds and `rua_*` envelope properties exist in NO graph. Renaming a property that is already on nodes is a migration; renaming one that has never been written is an edit. DELIBERATELY NOT DONE INSIDE THE GATE SESSION: it would rename the page being actively ruled on, mid-ruling. It is also a chore rather than a task with judgment in it — the only judgment is the not-renamed set above, which this acceptance already fixes. WITHDRAWN 2026-08-08 (user ruling), closed with NO rename performed: the groom over-read the G22-session file rename. The SME renamed `rua_inventory` to `bkup_inventory` as a WORKING MANEUVER — freeing the name so a fresh version could be written and compared against the bkup file — not as a directive to rename the rua_* family. The producer tree keeps the `rua` prefix; the acceptance above is retained as the record of what a real rename would have required (the §Q6 transfer mechanics stand as precedent if the question ever genuinely reopens).

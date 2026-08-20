@@ -1,0 +1,29 @@
+id: O53
+epic: web-console
+title: 'HeroArt is the code graph''s first front-end orphan: remove it or wire it in (default remove)'
+type: chore
+module: drydocs-web
+phase: 12
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src/components/HeroArt.tsx
+- web/src/index.css
+- config/taxonomy/ui-components.yaml
+acceptance: |
+  web/src/components/HeroArt.tsx is either imported by a live route again or DELETED together with its index.css hero-net rule and its ui-components.yaml row (coverage pin moved with the history-line convention); the orphan query over the TS import edges then returns only vite.config.ts; build + lint green.
+notes: |
+  Groomed 2026-08-07 from Idea-77. Default is delete — OverviewRoute's own comment demoted the radial hub, only a css comment still cites the file, and O30's App.css retirement already recorded its remaining rules as dead.
+annotations:
+  status: 'closed 2026-08-10 (desktop). SME ruled: adopt the experiment ALPHA (files-track) code set —
+    verified-before-delete on record, fable 6v4 over BETA. Applied on the POST-O47 tree, not verbatim
+    (the diffs were cut pre-O47): HeroArt.tsx deleted, index.css hero-net keyframe+rule replaced with
+    the deletion stub, ui-components row out with component 16->15, and the coverage pin 70->69 WITH its
+    changelog line — the clause BOTH experiment runs missed, fixed at adoption. Orphan claim verified
+    by grep BEFORE the delete (only OverviewRoute''s demotion comment) and re-verified after. Build green,
+    lint = the 3 pre-existing warnings, suite 1836/5. The acceptance''s depgraph orphan-query check rides
+    the next snapshot: HeroArt leaves the graph as a soft-delete tombstone, and vite.config.ts stays the
+    sole TS orphan.'

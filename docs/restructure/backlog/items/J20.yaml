@@ -1,0 +1,20 @@
+id: J20
+epic: release-infrastructure
+title: 'One render entry point, part 2: enforcement-matrix.json joins the default-paths board render (the
+  J17 fold applied to the second generated surface)'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- scripts/render_board.py
+- scripts/render_enforcement_matrix.py
+- CLAUDE.md
+acceptance: |
+  A default-paths scripts/render_board.py run also refreshes web/src/generated/enforcement-matrix.json (explicit --backlog/--out runs stay board-only, the J17 rule); after the change, adding a gate-prompt file or editing a matrix source followed by the documented ritual leaves tests/unit/test_enforcement_matrix.py green with no separately remembered step; the CLAUDE.md stale-render line names the matrix alongside gates.json.
+notes: |
+  Groomed 2026-07-28 evening from the same-day [chore] line: the stale-render check caught exactly this drift live (49667dd regenerated gates.json but not the matrix; swept in a90fdad). Same defect shape J17 closed for gates.json. CLOSED 2026-07-28 evening: default-paths render_board.py now runs render_gates + render_enforcement_matrix (explicit-path runs stay board-only); docstring + CLAUDE.md stale-render line name all three surfaces. Verified: one command wrote board + gates + matrix, all guards green, matrix regen produced zero diff (was in sync).

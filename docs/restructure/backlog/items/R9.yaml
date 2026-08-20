@@ -1,0 +1,20 @@
+id: R9
+epic: agentic-qa
+title: 'Read-only agent query command over the O33-guarded QuerySpecs: one deterministic, testable graph-navigation
+  surface for agents (MCP recorded as the later option)'
+type: task
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- tests/unit/test_module_boundary.py
+- docs/reviews/persona-python-architect-2026-07.md
+acceptance: |
+  A read-only, deterministic query command over the O33-guarded QuerySpecs, placed so the module boundary holds (drydocs_api owns the specs; test_module_boundary stays green): each spec addressable by name with typed params, stable JSON output, refuses unknown specs/params, zero write paths; unit tests drive it against a fake client; a short agent-facing usage note documents it as the graph-navigation surface. MCP (mcp-neo4j-cypher) explicitly out of scope, recorded as the richer later option.
+notes: |
+  Groomed 2026-07-28 pm from the live-benchmarked [idea] line (5 questions ~410ms/~1.2k chars vs grep's noisy equivalents; safe now that U6 fixed the cross-root blind spot). CLI-vs-MCP resolved toward CLI by the line's own analysis: MCP adds config + write-risk surface.

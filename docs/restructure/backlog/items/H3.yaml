@@ -1,0 +1,18 @@
+id: H3
+epic: drydocs-review-backflow
+title: Reproduce the SME-notes harvester
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: opus
+priority: p3
+status: done
+depends_on:
+- H1
+inputs:
+- docs/restructure/05-drydocs-review-backflow.md
+acceptance: |
+  sme_notes harvester reproduced: scans repo for owner-attributed notes, routes typed sub-tags to $FR/$UC/$OQ/$NOTES; SID format is generic/synthetic, no real SIDs committed. Unit test on a fixture tree.
+notes: |
+  Done 2026-07-01. drydocs/sme_notes.py: SME[sid] $FR/$UC/$OQ/$NOTES grammar; harvest_text/file/tree (read-only, excludes data/ + non-source exts) + route(). 5 unit tests (synthetic SIDs). Boundary group.

@@ -1,0 +1,24 @@
+id: G18
+epic: component-topology
+title: 'rua collector v2 parity: script-file capture (-n name glob) back-ported from the observed company-side
+  run'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/collect/rua_inventory.sh
+- drydocs_lineage/collect/rua_inventory.conf
+- drydocs_lineage/collect/README.md
+acceptance: |
+  rua_inventory.sh gains the script-capture feature observed in the 2026-07-20 company-side run (screenshots -> reproduce generically, the drydocs-review back-flow discipline): a -n <glob> flag (repeatable or space-separated) captures FILES matching the name glob under the scan roots into scripts.tsv (path, owner, group, perms, size, mtime, sha256) plus copies under scripts/ in the bundle (copy behavior config-gated like COPY_PROFILES; size cap configurable so a stray large file never bloats the bundle); profiles.tsv gains the same sha256 column (content hash = the version discriminator and the anchor for G24's all-refs repo blob sweep; v1 captures no hashes — verified 2026-07-21); the run summary prints a "scripts: N captured" line; COLLECTOR_VERSION bumps to rua-inventory/v2 with v1 bundles explicitly still ingestible (the extractor treats scripts.tsv as optional); README documents the flag and the bundle addition. POSIX sh / ksh compatible, still strictly read-only outside -o.
+notes: |
+  The company copy already runs this (observed: -n '*.py' -> 35 scripts captured beside 17 directories); producer v1 lacks it. Script CONTENT is what feeds G21's code-operations pass, so this lands first. Exact company implementation unseen — reproduce from observed CLI + summary behavior, don't guess internals.
+annotations:
+  status: '2026-07-23: -n glob capture -> scripts.tsv (+sha256) + tree-mirrored copies (COPY_SCRIPTS gate,
+    SCRIPT_COPY_MAX_BYTES cap), profiles.tsv sha256, COLLECTOR_VERSION v2 (v1 stays ingestible), summary
+    line, README; smoke-tested in Git Bash (globs/ignores/cap/repeatable -n/no -n/v1 mode)'

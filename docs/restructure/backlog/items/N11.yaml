@@ -1,0 +1,20 @@
+id: N11
+epic: source-column-mappings
+title: 'The load-sequence completeness guard is one-directional: a non-loader verb can go missing from
+  the declaration and no test notices'
+type: bug
+module: docs
+phase: 11
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- tests/unit/test_load_map_declarations.py
+- drydocs/cli.py
+- scripts/ingest.sh
+acceptance: |
+  A guard catches a command that the operator surfaces run but the declaration omits — the case that actually happened: bootstrap-schema-graph was in scripts/ingest.sh AND the startup runbook's Appendix B and missing ONLY from cli.CANONICAL_LOAD_SEQUENCE, so the generated load map published 15 steps while both real paths ran 16, and no test could see it because the completeness check only reaches LOADER-backed commands. The new guard reasons from the operator surfaces (or their declared derivation), so a schema-level verb absent from the declaration fails it; the existing loader-side checks are left alone.
+notes: |
+  Groomed 2026-08-07 (pm) from the still-open half of Idea-51. N6 closed the divergence itself on 2026-08-04 — ingest.sh's shorter list was ruled DELIBERATE and the skipped steps now carry written reasons — but N6 did not close why nothing caught the omission, which is this item. Epic N and module docs follow N6, its parent. CLOSED 2026-08-19 (desktop). THE GROOM'S PREMISE WAS WRONG, and saying so is most of this item's value: N6 DID close it, in the same commit (7884b230, 2026-08-04) that ruled the divergence — tests/unit/test_load_sequence_surfaces.py shipped with test_every_verb_an_operator_surface_names_is_declared, written from the surfaces inward exactly as the acceptance asks. N11 was groomed 2026-08-07, THREE DAYS LATER, from the still-open half of Idea-51, and nobody re-read N6's delivery before writing it up. Verified rather than assumed, by injection: deleting the bootstrap-schema-graph LoadStep from cli.CANONICAL_LOAD_SEQUENCE fails the surfaces guard BY NAME while the whole loader-side family (test_load_map_declarations.py, 11 tests) still passes green — the exact asymmetry the acceptance describes, reproduced on demand. WHAT N11 ACTUALLY DELIVERED, since the guard already existed: that guard read TWO surfaces, and one of the two reads was structurally dead. `_SH_VERB` over scripts/ingest.sh can never match, because N6 made ingest.sh derive at run time ("${DRYDOCS[@]}" "$cmd" from load_profile) and its sibling guard ENFORCES that it never grows a literal call back. The empty result was unioned in as if it were coverage. Nothing was being missed — a derived surface cannot name an undeclared verb, which is stronger than any regex — but the guard could not distinguish "derives, nothing to scan" from "the regex stopped matching", and that indistinguishability is the same shape as the defect this module exists for. _operator_surface_verbs() now makes the empty set earn its silence by asserting the derivation, with its own test; proven by injection too (renaming load_profile in ingest.sh fires it with the reason named).

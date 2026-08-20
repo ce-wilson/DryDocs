@@ -1,0 +1,17 @@
+id: G6
+epic: component-topology
+title: Cross-link the rejected topology alternatives
+type: chore
+module: docs
+phase: 6
+agent: reference-librarian
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0002-component-database-topology.md
+acceptance: |
+  The three rejected alternatives (Community single-DB, two-mode capability, polyrepo) are discoverable from the architecture entry point (linked/cross-referenced from the restructure index or README), not only inside the ADR — so they are not re-litigated.
+notes: |
+  ADR 0002 follow-up #6. The ADR already records them in Options Considered; this just adds a durable pointer. Small hygiene task.

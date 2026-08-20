@@ -1,0 +1,22 @@
+id: G81
+epic: component-topology
+title: 'DATA LOSS: every path the system reads or writes must be DECLARED in configuration with a mode,
+  and no write path may contain a read path'
+type: bug
+module: drydocs-core
+phase: 6
+agent: main
+model: opus
+priority: p0
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/data_root.py
+- config/source-registry.yaml
+- config/dev-environment.yaml
+- docs/decisions/0012-data-named-load-surface.md
+- docs/reviews/persona-python-architect-2026-08.md
+acceptance: |
+  INCIDENT, 2026-08-11: the SME's internal folder holding extracted CSV source data was OVERWRITTEN. Recovery is from a backup, so the data is not lost, but the class is live and it fires again the moment the backup is restored to the same place. This is the most severe defect class the repo has produced — every other failure this week was a wrong READ; this one destroyed a source. (a) RECONSTRUCT FIRST, do not guess. Establish what wrote over what, from the code, and record it. The write-capable surface to walk: drydocs_core/data_root.py declares ten-plus path helpers IN PYTHON, several taking create=True so they mkdir, and rua_extracted_dir() names an "extracted" area that a re-run may legitimately rebuild. Reconstruction is part of the deliverable, not a preamble to it — a guard written against a guessed mechanism guards the wrong thing. (b) DECLARE EVERY PATH IN CONFIGURATION, not in code, each carrying a MODE: read (source data the system may NEVER write), write (outputs it owns and may rebuild), scratch (disposable). Three families the SME named, all currently scattered: LOGS (DRYDOCS_LOGDIR, env-only), LOADER INPUT DATA (per source), and REMEDIATION OUTPUT (the greenfield artifact and Jira handoff). Moving the declaration out of Python is the point: today a path is whatever a helper returns, so no reader can enumerate what the system touches, which is why an overlap was invisible until it destroyed something. (c) THE INVARIANT THAT WOULD HAVE PREVENTED IT: no write-mode path may EQUAL OR CONTAIN a read-mode path. Guarded, with the failure naming both paths. This is the whole defect in one sentence and it is mechanically checkable. (d) NO SILENT DEFAULT ROOT. resolve_data_root() falls back to ~/data/DryDocs whenever DRYDOCS_DATA_ROOT is unset or empty, so a missing environment variable silently relocates every read and write to a plausible-looking wrong place — the SAME defect family as G78's fixture-directory default, one layer down. An unset root must FAIL, naming the variable. (e) Any path a create=True helper may build is write-mode BY CONSTRUCTION. A read-mode path must be reachable through a helper that cannot create, cannot clean and cannot write. Ties to ADR 0012: a source declaring acquisition file-drop needs a declared location, and that location is read-mode by definition — so (b) supplies what the ADR's acquisition axis assumes exists.
+notes: |
+  Raised 2026-08-11 (desktop) from an SME incident report. p0 on IRREVERSIBILITY, which is the axis that separates it from G78: a wrong load is re-runnable, a destroyed source directory is recoverable only as far as the last backup, and if that backup had been stale or absent the loss would be permanent. G78 is louder; this one is worse. SME DIRECTION ON SEQUENCING: the layout must be planned with the ARCHITECT PERSONA, and it must be planned WITH the loader restructure rather than after it — G79 moves loaders between chains and ADR 0012 puts acquisition on the source entry, so both touch exactly the paths this item declares. Doing the declaration afterwards means declaring a layout that was just rearranged. The persona review is docs/reviews/persona-python-architect — a layout question, not a graph-modelling one, so the Python architect rather than the Neo4j architect. SCOPE FENCE: this declares paths and guards the overlap. It does not relocate anyone's data — a config change that silently moved a root would be the same class of defect the item exists to close.

@@ -1,0 +1,26 @@
+id: L24
+epic: doc-infrastructure
+title: State the production-estate target state as a goal in the executive overview
+type: chore
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/overview/drydocs-executive-overview.html
+- docs/style/us-business-english.md
+- config/gate-log.md
+acceptance: |
+  The executive overview states, as a named TARGET STATE goal, that the production estate should hold only actively used code — replaced code having been archived to git/storage and removed from the server. (a) It reads as a GOAL, not a shipped fact. The overview's own convention for not-yet-true material is explicit ("Dashed borders mark what is proposed, planned, or gate-pending; as each closes, it flips to solid and a revision line is added above") — honour it, or state the goal in prose that is unambiguously forward-looking. (b) It is stated in PLAIN ENGLISH per docs/style/us-business-english.md, with NO coined status term. Coining an estate-level word here would be a vocabulary decision, and that is deliberately not this item's to make (see G58's notes). (c) The honest limit rides with the goal rather than being left to the reader: measuring it depends on scan coverage, because an absence observed by one feed is not an absence in the world (G22 §H1). The overview already carries an "Honest about the gaps" section — that is the natural companion placement. (d) BOTH revision surfaces are updated: the "Revision N" line in the body and the rev-history entry at the foot, with prior rev lines kept verbatim (the L22 convention). Renders unaffected — this file is not renderer output (see notes).
+notes: |
+  Groomed 2026-08-07 (laptop) from Idea-82, on explicit user direction that the target state appear in the executive overview as a goal and not only as a backlog item. TWO FACTS TO KNOW BEFORE OPENING THE FILE, both verified at the groom. (1) docs/overview/drydocs-executive-overview.html is HAND-AUTHORED HTML and its OWN SINGLE SOURCE — there is NO .md twin (unlike docs/whitepaper/), it is not renderer output, and scripts/render_design_doc.py does not cover docs/overview/. Edit the HTML directly; the file's own header says so, and L22 recorded the HTML-stays-source decision in its rev-7 line. (2) It is a NON-GOVERNED outward-facing doc (CLAUDE.md §6), so editorial and design treatment DO apply here — the publish-VERBATIM rule binds the design renders, gate pages and board.html, never this file. This is one of the few surfaces where an artifact-design pass is legitimate. PLACEMENT: no target-state section exists today. Nearest existing homes are "The loop that makes it a system, not an inventory" (the operational-outcome section) and "Honest about the gaps" (for (c)); a short section of its own is also reasonable. DEPENDENCY-FREE ON PURPOSE: stating a goal needs neither the report (G58) nor a formal term. If a coined term ever lands, it rides a gate and the overview follows it, not the other way round. CLOSED 2026-08-07 (laptop) as overview rev 8. THREE DECISIONS TAKEN AT THE BUILD, recorded because the acceptance left each open. (i) PLACEMENT: the end of §06's prose, not §03's "Honest about the gaps". §06 closes on what the loops achieve, so an outcome statement belongs there — and clause (c) asked for the limit to ride WITH the goal, which splitting the two across sections would have defeated. §03's gaps section is about VOCABULARY mapping gaps; a scan-coverage caveat would have read as off-topic there. (ii) THE FORWARD-LOOKING MARKER IS PROSE, not a dashed border. The dashed convention is a mermaid classDef (stroke-dasharray on diagram nodes) with NO prose equivalent in this file's CSS, so clause (a)'s second option was taken: the text says so outright. (iii) TENSE CORRECTED AGAINST REALITY at the build: G58 landed on desktop the same day (drydocs_lineage/archival.py), so the REPORT is real and the GOAL is what remains unreached. The section says the system can report progress as a number — verified against the shipped docstring rather than described from the backlog item. Filed under Epic L because the overview is a documentation surface; the report that MEASURES the goal is G58, in the component-topology epic with the rest of the rua chain.
+annotations:
+  status: '2026-08-07 (LAPTOP): overview rev 8. §06 gains "Target state: only actively used code on the
+    production server" — stated as a GOAL ("a target the loops above move toward, not a description of
+    today"), in plain English with NO coined term, with the coverage limit kept WITH the goal rather than
+    exiled to §03''s gaps section, and the three review outcomes named. Both revision surfaces updated
+    + the header REVISIONS block; rev 1-7 kept verbatim. Style-checked against the banned-vocabulary list;
+    tag balance verified'

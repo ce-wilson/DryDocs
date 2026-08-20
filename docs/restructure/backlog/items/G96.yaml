@@ -1,0 +1,30 @@
+id: G96
+epic: component-topology
+title: Control-M API-call framework the deploy/pull shell scripts can call — generic .sh, config-resolved
+  in/out directories, calls discovered from the reference corpus (folder, job, calendar)
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/adapters/
+- drydocs_core/data_root.py
+- external/orchestration/bmc-controlm/controlm-api-folder-reference.md
+- external/orchestration/bmc-controlm/controlm-api-job-properties.md
+- external/orchestration/bmc-controlm/controlm-api-connection-profiles.md
+- external/orchestration/bmc-controlm/controlm-api-installation.md
+- external/orchestration/bmc-controlm/controlm-calendars.md
+- config/classification.yaml
+acceptance: |
+  A producer-side API-call framework the Control-M shell scripts can call, built MECHANISM-ONLY (the scripts themselves — controlm_common.sh, controlm_deploy_lite.sh, controlm_folder_pull.sh with a filled controlm_deploy.cfg — are company-side; verified 2026-08-12 that this tree carries no .sh at the root and no adapters/scripts/ directory, so what lands here is the framework and the generic sample, never the instance). (a) FIRST, THE NOTE, before any code: record the convention that keeps the .sh GENERIC — an internal shell-script home and a directory that stores the API artifacts, with the INPUT and OUTPUT directories resolved from CONFIG, never hardcoded. The producer mechanism for that convention already exists and is named in the note: drydocs_core/data_root.py (remediation_incoming_dir / remediation_outgoing_dir / controlm_xml_dir under DRYDOCS_DATA_ROOT, logs under DRYDOCS_LOGDIR), with the company-side script home recorded as the vendor-namespaced scripts directory beside the adapters and the filled config staying untracked (sample committed, real values never). The note lives where the next builder looks: the framework module docstring plus a README beside the sample config. (b) THE FRAMEWORK: a Python call surface under drydocs_core/adapters/ that a generic wrapper .sh can invoke per operation, taking its endpoint/profile from config and its in/out directories from the data-root conventions, returning machine-readable results the scripts can test. Connection-profile handling is mechanism-only: shape from the corpus doc, no real endpoints, hostnames or credentials anywhere in the tree (classification boundary; secrets discipline). (c) THE DISCOVERY, in the item because the user put it there: search the knowledge graph — and where the graph does not yet hold the vendor corpus, the corpus files directly — for EXAMPLE API CALLS usable for FOLDER, JOB and CALENDAR operations, and write the candidates up as a short mechanism reference (operation, call shape, corpus source) that the framework's per-object surface is then built against. The corpus already carries controlm-api-folder-reference.md, controlm-api-job-properties.md and controlm-calendars.md plus the connection-profile and installation pages, so the search has ground truth to cite. (d) VERSION GUARDRAIL, so the framework does not assume an API the company does not run: the company orchestrator is 9.0.21.300 XML-first (the JSON/SaaS API files were demoted to conceptual reference once that was established), so the discovery step must state per candidate call whether it is available at that version, and the framework's contract must degrade honestly — an unavailable call is a reported capability gap, not a silent fallback. Tests cover the config resolution (in/out dirs from data-root, no repo-tree writes), the generic-wrapper contract, and the discovery reference existing with per-call version notes. Zero graph writes.
+notes: |
+  Added STRAIGHT to the backlog by user direction 2026-08-12 ("add this straight to the backlog if possible G96") — the inbox was deliberately skipped, so this entry carries its own capture context. The driving scenario: the company-side remediation deploy/pull scripts (folder pull to the remediation incoming zone, deploy of fixed XML from the outgoing zone) should call an API surface instead of growing bespoke logic per script, and the .sh layer stays generic because the config supplies the directories. The company session of the same day planned the scripts' home (vendor-namespaced scripts directory beside the adapters, out-of-repo landing zones, sample cfg committed and the filled cfg ignored) — that plan is company-side; this item is its producer mechanism twin, on the standing mechanism-not-instance sanitization rule. MODULE drydocs-core on the company plan's own placement reasoning: both lineage and remediation consume it, and shell scripts do not trip the Python import boundary. RELATED: G86 (calendar validate/render spike — the calendar half of the discovery feeds it), G93 (the run-log counts the deploy flow should log), the controlm-runbook-automation skill (the support→dev fix package this deploy path serves). PORT CARE: nothing here ports on its own; the company side keeps its scripts, the producer keeps the framework, and the sample cfg must never acquire real values on either side.
+annotations:
+  status: '2026-08-13 (desktop): BUILT — drydocs_core/adapters/controlm/ (api.py call surface: folder/job/variable/calendar
+    + condition seam; config templates for corpus-gap syntax; exit-3 reported capability gaps; README
+    + API-CALLS.md discovery reference; sample cfg mechanism-only; 15 tests). The .sh wrappers + filled
+    cfg stay company-side by design'

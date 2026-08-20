@@ -1,0 +1,22 @@
+id: O41
+epic: web-console
+title: DL-12 one status-vocabulary → StatusChip token mapping, documented and conformed (Ready/Failed/Processing/Pending/Not
+  Scheduled)
+type: chore
+module: drydocs-web
+phase: 12
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src/components/ui/StatusChip.tsx
+- UI-WIP/site-plan.md
+- internal/datalens-reference/continuity.md
+acceptance: |
+  One ecosystem-status → StatusChip token mapping table is documented (site-plan or a UI-WIP note): Ready→green, Failed→status-fail-soft, Processing→teal, Pending→yellow, Not Scheduled→muted; StatusChip call sites conform and no surface invents a divergent status→token pairing (grep-checked).
+notes: |
+  Groomed 2026-07-28 pm from the DSI addendum DL-12.
+annotations:
+  status: DONE 2026-07-29 UI sweep (commits 77f68c5..c8b0e67)

@@ -1,0 +1,20 @@
+id: J45
+epic: release-infrastructure
+title: Relay the producer-canonical DPL and Snowflake registry entries into the port prompt's standing
+  relay list, now that the port that blocked it has merged
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/port-prompt.md
+- config/taxonomy/software-registry.yaml
+- config/gate-log.md
+acceptance: |
+  docs/port-prompt.md's STANDING RELAYS section (J38) gains the C25 relay as a numbered entry beside R1-R4: the producer is canonical for the `dpl` and `snowflake` product rows, the `in-house` vendor (no publisher_url, guard narrowed to third-party vendors) and the acronym DPL = "Data Pipeline Library". It is written as a VALUE TRANSPLANT ACROSS FILES, never a same-file overwrite -- the standing R1 AIS lesson, which applies identically because the company's home for these is a different file. The entry states the deliberate producer-first divergence with a waiting consumer: the SME began the same expansion company-side on 2026-08-07 and STOPPED so the two copies would match. Every existing relay is RE-VERIFIED at the same touch per the section's own rule, and the other post-port items ride along -- the staged clean-add rows, the ledger roll, and striking R4 if the J34 overlay migration has landed. Nothing is relayed from memory; a stale relay is worse than none.
+notes: |
+  Groomed 2026-08-11 from Idea-99. Deliberately NOT written into docs/port-prompt.md when it arose: a port was in flight against a fetched head and that file is a hand-merge surface, so a relay added mid-port lands in someone's conflict resolution instead of their checklist. FIRST ACTION IS THEREFORE A CHECK -- confirm the port has merged; if it has not, the item waits rather than repeating the mistake it exists to avoid.

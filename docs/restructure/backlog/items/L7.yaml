@@ -1,0 +1,25 @@
+id: L7
+epic: doc-infrastructure
+title: Ingest the traceability matrix + feedback as DryDocs context (via the gate)
+type: requirement
+module: ontology
+phase: 10
+agent: ontology-mapper
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L1
+- L5
+inputs:
+- docs/design/templates/tdd.outline.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  the requirements traceability matrix (requirement -> design-section anchor -> component/module -> test) and the anchor-keyed feedback are modeled as DryDocs graph edges THROUGH the HITL gate (relationship vocab registered planned -> confirmed), correlating each annotation to its requirement node; NO edge is written before gate confirmation; the mapping is logged in config/gate-log.md.
+notes: |
+  Dogfoods DryDocs — the docs about the system become queryable context in it. Ties to Epic E (context graph). Later phase; an ontology/edge-meaning decision => the gate, never auto-decided.
+annotations:
+  status: DONE 2026-07-20 — gate doc-traceability-feedback SIGNED OFF (21/21, SaaS product-plane reframe);
+    vocab active + supplement + 3-pass loader load-doc-traceability; live-loaded + verified (95 sections
+    / 41 requirements / 44 SPECIFIED_IN, 0 unlinked)

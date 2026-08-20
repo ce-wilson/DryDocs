@@ -1,0 +1,21 @@
+id: G42
+epic: component-topology
+title: 'Snowflake data-catalog seam: register the snowflake-data-catalog source + taxonomy-first extractor
+  for the dataset/distribution curated views — staging only, no graph writes'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/generic-snowflake-data-catalog-ingestion-plan.md
+- drydocs_lineage/extractors/dpl_registry.py
+- drydocs_lineage/extractors/glue_tables.py
+- config/source-registry.yaml
+acceptance: |
+  Source snowflake-data-catalog is registered in config/source-registry.yaml (Internal-Confidential, kind registry, confirmed: false with its gate as the activation condition, locator = DRYDOCS_DATA_ROOT/catalog/ + the plan doc as mapping ledger). A SnowflakeCatalogExtractor (drydocs_lineage/extractors/snowflake_catalog.py) stages CatalogDatasetRecord + CatalogDistributionRecord per plan section 4 phase 1: three physical shapes (table/file/s3) discriminated, the NOT INSTRUMENTED sentinel nulled AND counted, union duplicates latest-per-GUID with dupes counted, origin in {dpl, authority2, catalog} (never joining foreign ids into DPL GUID space), candidate_asset_urn staged as a fact column only; coverage counts every skip by reason; synthetic fixtures define the assumed field contract; ZERO graph writes; tests/unit/test_data_root.py sweep extended to catalog/ artifacts; unit tests green.
+notes: |
+  Groomed 2026-07-28 from the same-day [source] inbox line (plan doc = docs/generic-snowflake-data-catalog-ingestion-plan.md, from the SME screenshot walkthrough; screenshots live in DRYDOCS_DATA_ROOT/catalog/ screenshots/, out of tree). The fourth registry seam beside G17/G25/G41, same taxonomy-first discipline. Real system/view names stay company-side per the twin convention — producer side uses the generic names. BUILT + CLOSED 2026-07-28: source snowflake-data-catalog registered (Internal-Confidential, kind registry, confirmed: false with the snowflake-data-catalog gate as activation, locator = catalog_dir() + the plan doc as mapping ledger); catalog_dir() added to drydocs_core/data_root.py (catalog/ + catalog/screenshots/); SnowflakeCatalogExtractor stages CatalogDatasetRecord + CatalogDistributionRecord from CSV view exports (header decides the view; JSON deferred until a real sample pins its shape). Three shapes discriminated by name-bearing key columns, zero/multiple populated -> shape "" with shape_unresolved/shape_ambiguous counters; NOT INSTRUMENTED nulled by the cell reader AND counted eagerly per row (so an occurrence in an unread column still counts); union dupes latest-per-GUID on both views (both observed ts formats; unparseable counted, loses ties); origin = dpl | authority2 (any non-DPL authority, verbatim name kept for the census) | catalog, foreign refs never join DPL GUID space; candidate_asset_urn fact-column only, schema-less table rows keep the G41 canonical db namespace for the G43 join; dpl_refs() helper pre-wires G43. 13 synthetic-fixture tests (tmp_path only, app id 70001); test_data_root.py gains catalog_dir convention + the *_DATASETS_V/*_DISTRIBUTIONS_V export sweep; the extract API is graph-free by construction (no LineageGraph parameter exists). Suite 1121 passed / 5 skipped after the matrix re-render (the new source entry surfaces in enforcement-matrix.json).

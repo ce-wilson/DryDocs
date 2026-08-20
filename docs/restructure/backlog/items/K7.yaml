@@ -1,0 +1,28 @@
+id: K7
+epic: seal-attribution
+title: 'Run the Application ↔ Control-M attribution close-out gate to sign-off (seal-app-ref-edge-reshape
+  v3): folder grain, app-code defined mapping, edge shape, steward overrides, orchestrator authorship'
+type: task
+module: ontology
+phase: 9
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/gate-prompts/seal-app-ref-edge-reshape.yaml
+- config/gate-log.md
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- drydocs/loaders/seal_attribution.py
+- drydocs/loaders/cypher/seal_attribution.cypher
+- knowledge/standards/technology/folder-naming-convention.md
+acceptance: |
+  The 24 still-unruled confirmations of config/gate-prompts/seal-app-ref-edge-reshape.yaml are ruled with the SME and transcribed to config/gate-log.md as a SIGN-OFF entry, not a third partial ruling: §A grain (the folder, not the job), §B authoring (the app-code DEFINED mapping replaces fuzzy matching as primary), §C what a tier-1 row points at, §D edge shape + PROV term (the surviving K3 §F deferral), §E steward overrides (the "manually overwritten until fixed" half of the user's own framing), §F migration + follow-through, the nine unruled §G confirmations, and §H itself. §G6-RIDER is ALREADY RULED (2026-08-01, PAT grain keying) and is NOT re-opened; neither is the K2 match policy, which the page demotes to a fallback tier unchanged. Per the page's own gate-bound clause: proposed vocabulary lands status planned ONLY, the taxonomy-ontology-map entry is AMENDED rather than duplicated, BUILD items are opened BY the gate rather than ahead of it, and gates.json + the enforcement matrix regenerate. NOTHING is written to the graph at the gate itself.
+notes: |
+  Groomed 2026-08-03 on user request ("I need to close that out"). THE GAP THIS CLOSES IS PROCEDURAL: the gate spec has existed since 2026-07-15 and reached v3 on 2026-07-27, but no backlog item ever owned RUNNING it — C17, S3 and J24 cite the prompt file and are all done, so the work had no claim channel and no acceptance test. Every comparable gate has an owning item (U10 runs code-graph-package-layer, G22 runs rua-load-shapes, O23 runs rollup-shape); this one had none. The spec's own header records the user direction that created v2 (2026-07-22): close out the mapping for any relationships that need to be defined or manually overwritten until fixed — the application to Control-M folders. v1 framed only the K3 §F job-edge SHAPE question; the grain correction superseded that framing and the shape question survives as §D. PUBLISH BOUNDARY: §G's evidence basis is a company-side session (screenshots) plus source-system report headers carrying real application ids, SIDs, names and team/LoB values. STRUCTURE ONLY reaches the gate log — nothing from those captures is transcribed anywhere in the publishable tree (PUBLISH-BOUNDARY.md, the sealid-in-strings lesson). Sibling open item in this epic: G35 (TOM-roles) is a DIFFERENT subject (role enumeration + cardinality) and is not a dependency in either direction. J28 owns the renderer defect that kept this gate off the open-gates surface.
+annotations:
+  status: DONE 2026-08-03 — gate seal-app-ref-edge-reshape SIGNED OFF 24/24 (in-session chat gate, user
+    as SME); gate-log entry + vocab m3_belongs_to_application planned + map app-code-defined-mapping confirmed;
+    build items K8-K13 opened BY the gate

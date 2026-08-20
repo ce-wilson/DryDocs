@@ -1,0 +1,29 @@
+id: C13
+epic: ontology-mapping
+title: 'SchedulerKind retirement build: deprecate the ontology.cypher seeds + scheduler_kind constraint,
+  retire seal_requires_scheduler and the requires-scheduler map entry, sweep the Ais* stragglers'
+type: task
+module: ontology
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- C12
+inputs:
+- drydocs_core/schema/ontology.cypher
+- drydocs_core/schema/constraints.cypher
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- config/gate-log.md
+- knowledge/ontology/NODE_QUICK_REFERENCE.md
+acceptance: |
+  Per the C12 sign-off (gate-log 2026-07-21): the :SchedulerKind seeds in ontology.cypher and the scheduler_kind constraint are retired the audit-kept way (deprecated, not silently deleted — the company 06-29 precedent); vocab entry seal_requires_scheduler flips planned -> retired/superseded with superseded_by: reg_uses_software, and the requires-scheduler map entry records the same closure; reg_uses_software's note keeps the source: 'batch-port' convention as the landing (no typing change — B4). The Ais* straggler sweep lands: README / NODE_QUICK_REFERENCE / LoadPlanV3-era references to REQUIRES_SCHEDULER-> SchedulerKind or the Ais* classes updated to the registry model (the acronym survives ONLY in software-registry.yaml#acronyms). Drift guards (test_schema, gates/matrix) + full suite green. No graph writes in this item.
+notes: |
+  Groomed 2026-07-21 pm at the C12 sign-off (section-C consequence; the K2 flips-are-follow-ups pattern). Everything here executes decisions already ruled — no new SME calls; anything ambiguous found mid-sweep goes back to the inbox, not auto-decided.
+annotations:
+  status: 'DONE 2026-07-21 pm — seeds retired audit-kept (commented; constraint stays for old graphs);
+    seal_requires_scheduler deprecated + superseded_by: reg_uses_software; map entry rejected/superseded
+    with all 3 OQs resolved; sweep: config/taxonomy/README, internal/repo-README, LoadPlanV3 banner, cli
+    verify check retired; schema_graph regenerated (REQUIRES_SCHEDULER excluded); suite 831 green'

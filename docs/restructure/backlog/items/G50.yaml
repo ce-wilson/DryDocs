@@ -1,0 +1,27 @@
+id: G50
+epic: component-topology
+title: Delete the rollback container neo4j-drydocs-ee + its anonymous volumes; verify-then-prune the four
+  orphan neo4j volumes
+type: chore
+module: graph-infra
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/dev-environment.yaml
+acceptance: |
+  Container neo4j-drydocs-ee (stopped, restart=no) and its two anonymous volumes are removed. The four orphan volumes (neo4j_data, neo4j_logs, neo4j2_data, neo4j2_logs) are each VERIFIED attached to nothing before any prune — pruned, or kept with a written reason. Close note carries the docker ps -a / docker volume ls evidence and names the machine (J18 convention). neo4jtest is untouched.
+notes: |
+  Groomed 2026-07-30 from the 2026-07-23 [chore]: the user decision was "delete once neo4jtest has survived a week of normal use" — the week was up ~2026-07-30 and neo4jtest has been the live container throughout (including the APOC fix + full reload). Destructive but pre-decided; the only judgment left is the orphan-volume verification. The password chore merged into this line 2026-07-28 retires with the container. Machine-local (this desktop).
+annotations:
+  status: 'closed 2026-08-10 (desktop — J18). PREMISE DRIFTED, RESOLVED ON EVIDENCE: neo4j-drydocs-ee
+    did NOT exist (docker inspect: No such object — removed at some earlier point) and none of the four
+    NAMED volumes (neo4j_data/neo4j_logs/neo4j2_data/neo4j2_logs) existed either. What did: 5 anonymous
+    volumes + neo4j-testdata. Attachment-verified EVERY one (docker ps -a --filter volume=): neo4j-testdata
+    -> neo4jtest /data KEEP; 451ffc86 -> neo4jtest /logs KEEP; four dangling attached to NOTHING (20a8acc6+55bc4913+e93d8d98
+    created 07-07 = the ee era; e059635e 07-16 15:29 = the logs volume two minutes before neo4jtest current
+    15:31) — all four removed, with a per-volume re-check immediately before each rm. neo4jtest untouched
+    (Up, both mounts intact). Out of scope, noted to IDEAS: stopped container MCP (exited 5wk, no volumes).'

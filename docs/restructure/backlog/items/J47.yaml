@@ -1,0 +1,20 @@
+id: J47
+epic: release-infrastructure
+title: No guard asserts a PORT-MANIFEST path still exists, and the override-ordering check only knows
+  four hardcoded rows
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- tests/unit/test_port_manifest.py
+- tests/unit/test_runbook_currency.py
+acceptance: |
+  Two guards in tests/unit/test_port_manifest.py, each proven to FAIL on an injected defect before it is trusted (J26). (a) EXISTENCE: every non-glob row resolves to a path that exists and every glob row matches at least one path, unless the row is allow-listed with a reason -- the FOREIGN_PATHS / HISTORICAL_PATHS idiom test_runbook_currency.py::test_every_path_a_document_names_exists already uses, which this manifest needs because it legitimately names company-only paths (drydocs/docmeta/**, drydocs/scrapers/**) and globs that match nothing producer-side. (b) ORDERING, DERIVED rather than listed: any row whose path is a strict prefix-match of a LATER glob row is an ordering defect, replacing test_overrides_precede_their_broader_glob's hardcoded list of four overrides against config/**.
+notes: |
+  Groomed 2026-08-11 from Idea-107 -- captured 2026-08-11 under the id Idea-86, which a 2026-08-07 [source] entry already held, and RENUMBERED at this groom (the older entry keeps the id; commit d05811a's message is the only surface carrying the short-lived spelling). That is the second two-session id collision in IDEAS.md after the duplicate Idea-101 J41 records. FOUND AT G75, not by a test: the row drydocs_core/controlm/** had pointed at a path that has not existed since the S2 / ADR 0008 relocate under orchestration/, so every module in the Control-M package was silently falling through to the generic drydocs_core/** evaluate-on-collision row instead of the canonical-producer row it was written for. Nothing failed, because test_port_manifest.py checks uniqueness, dispositions, notes and pins -- never existence. The ordering half was verified the same way: at G75 the order had to be fixed by hand. Sibling of J43, which adds a precondition key to the same file; separable because this is a producer-side unit-test guard while J43 changes the manifest vocabulary and the reconcile behaviour.

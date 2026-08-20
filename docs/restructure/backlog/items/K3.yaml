@@ -1,0 +1,21 @@
+id: K3
+epic: seal-attribution
+title: Run the BusinessApplication entity-reshape gate (:Application -> Entity/DataProduct; TOM roles
+  -> qualifiedAttribution)
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/gate-prompts/seal-tom-attribution-reshape.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- knowledge/upgrade-plans/docmeta-component.md
+acceptance: |
+  The seal-tom-attribution-reshape gate is SME-run and transcribed: gate-log entry; the :Application node class flips to prov:Entity/dprod:DataProduct (or the SME's edit); TOM governance roles bind via prov:qualifiedAttribution + prov:hadRole (Role = shared skos vocab, org:Membership stays PAT-only); seal_has_membership/seal_of_role/seal_held_by deprecation recorded; hadPrimarySource/wasAttributedTo/qualifiedAttribution vocabulary entries flip per the SME calls; the job-seal-app-ref map entry is re-shaped consistently (unblocks K2). Drift guards green.
+notes: |
+  Groomed 2026-07-08 from the IDEAS reshape question. Agent-side prep already landed (0986d6d): gate spec + planned vocabulary registrations + map type_conflict_note. The remaining action is the SME gate session itself + transcription — the most consequential pending gate (three incompatible PROV types on one node today). 2026-07-10: STARTED — in_progress = awaiting HITL (the E1/F1/F2/K2/P2 pattern); the agent-side prep is complete, only the SME gate session remains. No graph/vocab write until the gate is signed off and transcribed to config/gate-log.md. 2026-07-10 (user request): RENAMED "SEAL entity-reshape" -> "BusinessApplication entity-reshape gate" to normalize to the ontology naming convention for internally-developed applications — the taxonomy concept is BusinessApplication (config/taxonomy/business-application.yaml, key SEALID) while the graph node label is still :Application (relationship_vocabulary.yaml node_classifications:174; the vocab already flags the mismatch at :1292 "DevTeam develops a BusinessApplication (graph label :Application)"). NEW gate open-question this rename raises: alongside the class reclass (prov:SoftwareAgent -> prov:Entity/dprod:DataProduct, gate section A), the SME should decide whether to normalize the node LABEL :Application -> :BusinessApplication. A node-label change is an ontology/node-meaning decision -> gate-bound, NOT auto-applied; the label stays :Application until the gate confirms. The gate spec (seal-tom-attribution-reshape.yaml) does not yet carry this label question — add it to section A before the SME session. 2026-07-10: GATE SIGNED OFF (SME chad.wilson) — full transcription in config/gate-log.md (2026-07-10 entry). Outcome: A confirmed (Entity/DataProduct); B confirmed with a REVISED two-family role model (7 SEAL Technical Operational roles on :Application via qualified attribution + a TOMRole scheme; CTO shared; Product Cabinet split out -> K5); C confirmed (deprecate the 3 seal_* edges, keep seal_has_port); D confirmed (hadPrimarySource + docmeta now a required dependency); E decided FLIP arch_develops -> WAS_ATTRIBUTED_TO {role: developed_by}; F/K2 edge shape DEFERRED; label normalization :Application -> :BusinessApplication confirmed-direction. K3 = run+transcribe the gate = DONE. The mechanical application of every flip is K4; the Product Cabinet is K5.

@@ -1,0 +1,21 @@
+id: O7
+epic: web-console
+title: Ship the two live-proven support queries as named drydocs-api endpoints
+type: task
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O5
+inputs:
+- drydocs_api/queries.py
+- docs/restructure/IDEAS.md
+acceptance: |
+  Two read endpoints land in drydocs-api with unit tests: (1) dependency-chain finder — two job_names in, undirected shortestPath over WAS_INFORMED_BY (bounded hops), returns hop job names + per-edge via_condition + hop count; (2) folder-scoped dependency census — sched_table filter in, returns dependency-edge count / distinct successors / cross-folder edge count. Mechanism-only fixtures; guarded like the existing read endpoints.
+notes: |
+  Groomed 2026-07-15 from the 2026-07-14 inbox note (both queries proven single-digit-ms on the internal graph; the ~69% cross-folder-dependency stat is a whitepaper headline candidate). Also candidates for controlm-runbook-automation — reference, don't duplicate. CLOSED same day as groomed: the acceptance was ALREADY MET by the O5 scaffold — drydocs_api/queries.py ships folder-census + dependency-chain as named, param-validated view queries (its module docstring cites the same IDEAS capture), covered by test_drydocs_api.py. The inbox note predated the O5 build by hours and was stale when groomed. Item kept (ids are stable) as the audit-trail record; no new code.
+annotations:
+  status: closed 2026-07-15 — already SHIPPED by O5 (see notes)

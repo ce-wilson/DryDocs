@@ -1,0 +1,24 @@
+id: GN2
+epic: generic-naming
+title: Execute the rename as ONE frozen unit and port it as one unit — data-named commands, loaders and
+  source ids
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: todo
+depends_on:
+- GN1
+- G79
+inputs:
+- drydocs/cli.py
+- drydocs/loaders/
+- config/source-registry.yaml
+- docs/port-prompt.md
+- PORT-MANIFEST.yaml
+acceptance: |
+  The mechanical rename ADR 0012 authorises, executed as a SINGLE frozen change and ported as a SINGLE unit -- the SME's condition, and the right one: a wide rename landing in pieces leaves the two repos disagreeing about verb names for as long as the pieces take. Scope, in the layer order the ADR rules: CLI verbs (with deprecated aliases per the policy), LOADER_REGISTRY keys and loader class names, milestone-id verify commands, and -- only if the ADR rules them in the same unit -- source registry ids via the cross-repo path. Every derived surface regenerates and is proven current: load-map.json, load-map.html, ingest.sh, the startup runbook Appendix B (held by test_load_sequence_surfaces), the load runbook, and the skills that name verbs. MUST NOT overlap an in-flight port. The change freezes other producer work, lands, is ported, and only then does normal work resume.
+notes: |
+  Raised 2026-08-11 with GN1. depends_on G79 as well as GN1 so the split lands under the OLD names first: splitting and renaming together makes the port diff unreviewable, and the split is the part that carries behavioural risk while the rename is mechanical.

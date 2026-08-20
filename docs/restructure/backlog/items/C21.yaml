@@ -1,0 +1,24 @@
+id: C21
+epic: ontology-mapping
+title: The schema meta-graph gets its own database and a bootstrap verb, because its exemplars cannot
+  satisfy the domain graph's NODE KEYs
+type: task
+module: ontology
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-02
+depends_on:
+- C8
+inputs:
+- drydocs_core/ontology/schema_graph.py
+- drydocs_core/schema/schema_graph.cypher
+- drydocs/cli.py
+- tests/unit/test_schema_graph.py
+- tests/unit/test_schema.py
+acceptance: |
+  A `drydocs bootstrap-schema-graph` verb applies schema_graph.cypher to a database of its own and REFUSES (exit 2) if no :SchemaMeta node results; the meta-graph carries its own uniqueness constraint; constraints.cypher and test_schema.py's EXPECTED_CONSTRAINTS are untouched; the domain graph holds zero :SchemaMeta nodes afterwards; the generated file names its target database in its own header and the byte-match drift guard stays green.
+notes: |
+  Groomed RETROSPECTIVELY 2026-08-02 (landed at e3f65af). The SME direction was "promote the meta-graph into bootstrap" — and doing that literally is IMPOSSIBLE, for a reason that is the direction's own point arriving as an error. Every exemplar MERGEs the REAL label beside the marker (:SchemaMeta:ControlMJob {name: ...}) because the real label is exactly what db.schema.visualization() reads; controlmjob_key is a NODE KEY, and a NODE KEY enforces EXISTENCE, not just uniqueness, while the exemplar carries only `name`. Proven LIVE on a throwaway label rather than inferred — "Node with label ZZProbe must have the properties (folder_id, job_id)" — then the probe constraint was dropped and zero nodes/constraints leaked. Dropping the real label would satisfy the constraint and destroy the feature. Hence two graphs, which is what the SME then said independently: "the schema graph is for the project labels and relationships with different constraints and the DryDocs project has different code and constraints, 2 different graphs". Verified after apply: 53 label nodes, 79 exemplar edges, visualization renders 54/288, and the domain graph's 17 :ControlMJob untouched. THE DATABASE IT TARGETS IS NOT PROVISIONED — G51.

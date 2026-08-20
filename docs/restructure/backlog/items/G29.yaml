@@ -1,0 +1,22 @@
+id: G29
+epic: component-topology
+title: Consolidate the supplement verbs into one data-driven apply-supplements, with the legacy verbs
+  kept as delegating aliases
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/cli.py
+- drydocs_core/run_log.py
+- drydocs_core/schema/
+- .claude/skills/run-drydocs/SKILL.md
+- internal/repo-README.md
+acceptance: |
+  One `apply-supplements` verb applies a data-driven ordered list (base → seal → catalog → registry, with SOSA staying opt-in behind a flag); every legacy verb still works as a delegating alias; the run asserts the post-apply OntologyTerm count and fails if it does not move as expected; the run writes a load.supplement.<stamp>.log envelope through drydocs_core/run_log.py — today NO supplement or bootstrap verb writes a log file at all (execute_file is debug-and-console only); the run-drydocs skill and internal/repo-README.md command chains are updated; the e2e test switches to the new verb.
+notes: |
+  Shape A, designed and user-reviewed 2026-07-24 with the riders agreed in that review (count assertion, run-log envelope, skill + README chain update, e2e switch); groundwork already landed the same day (9f5ebe1 stale refs + supplement header charter + the missing org#member anchor; 76be07c catalog docstring). Shape C — the registration-vs-instance-seed re-slice — is deliberately NOT here: it is gate-worthy, not a refactor, and stays in IDEAS. Rider: this rewrites the verb set the startup-refresh runbook's Appendix B lists, which is where the unlocated "apply-catalog says apply ontology" typo report most likely points — fold that check into the runbook update rather than hot-editing a doc that is mid-SME-review. DONE 2026-07-26. The registry is drydocs_core/schema/supplements.py (core, not CLI: the order is a schema fact, the verb is a caller); `apply-supplements` walks it with --only NAME (repeatable, registry order wins over flag order) and --with-sosa; all five legacy verbs are generated as delegating aliases from the same registry, so they inherit the verification and the log rather than duplicating four lines each. The acceptance said "asserts the post-apply OntologyTerm count and fails if it does not move as expected" — implemented as PRESENCE, not delta, and that is the honest reading: supplements are idempotent, so a re-run legitimately moves the total by zero and a delta assertion would fail every second run. Instead declared_terms() parses the :OntologyTerm IRIs each .cypher MERGEs and the run asserts every one is present afterwards; the total is still reported before/after per file. The parser reads code only — drydocs_core.cypher_split gained strip_comments() so a commented-out MERGE (how a term is retired) is not turned into a term the graph is then required to hold forever. Found while doing it: the run-drydocs skill listed the chain in the WRONG ORDER (catalog before seal, which breaks catalog's reuse of seal's :Attribution class + #hasAgent term) — the order living in prose in four places is exactly why it is now data. New tests: tests/unit/test_supplements.py (19) + 4 strip_comments cases in test_cypher_split.py; suite 905 -> 928. Verified load-bearing: neutering the presence check fails test_a_supplement_that_seeds_nothing_fails_the_command. Runbook NOT touched — it is mid-SME-review (L5/L6 anchors); the three things it now needs are parked in IDEAS for the post-review revision.

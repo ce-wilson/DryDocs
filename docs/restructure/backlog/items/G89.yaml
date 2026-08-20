@@ -1,0 +1,16 @@
+id: G89
+epic: ontology-mapping
+title: 'Tech-debt: resolve the m3_triggers conflict — a planned edge is live-consumed by a QuerySpec'
+type: chore
+module: drydocs-api
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml
+acceptance: |
+  Recorded at gate vocabulary-domains-and-id-policy §C3 (2026-08-12): m3_triggers is status planned (no loader may write it; the lineage writer refuses it as gate-bound) yet a live QuerySpec MATCHes [:TRIGGERS] -- the spec returns empty rather than wrong, but the surface implies data that cannot exist. RESOLVE ONE WAY: (a) demote the spec to demo-only / remove it until the m3_triggers build, or (b) prioritize the m3_triggers build (its shape was confirmed 2026-07-15; the cmdline-derivation caveat is in its note). A ruling plus the matching code change closes this; do not flip the entry active without its supplement + loader.

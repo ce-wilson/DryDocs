@@ -1,0 +1,20 @@
+id: V10
+epic: sme-runbooks
+title: 'SME runbook: drydocs-web — audit the existing web-console runbook current (post O35-O41, FB-03/FB-04
+  access model)'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- docs/design/drydocs-web-console-runbook.md
+- web/
+acceptance: |
+  The web-console runbook is audited against the shipped state and Rev-bumped where stale: category-first landing (O35), the FB-03 page-role/access designations, the standalone agent-test page's build/ship path (FB-04 re-ruling), and current build/verify commands; rendered, stale-render-clean; drydocs-web marked COVERED in V1's map.
+notes: |
+  Groomed 2026-07-29 (Epic V). COORDINATE: a parallel session is actively working the standalone agent-test page — audit only after its stream lands; do not describe in-flight state.

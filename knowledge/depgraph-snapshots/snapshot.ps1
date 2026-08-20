@@ -85,7 +85,7 @@ function Get-WorktreeState {
 }
 
 # --- refresh the project board (best-effort; part of the session-end ritual) --
-# backlog.yaml -> docs/plan/board.html. Deterministic render: a resulting git
+# docs/restructure/backlog/ -> docs/plan/board.html. Deterministic render: a resulting git
 # diff on board.html means the committed board was stale — commit the refresh.
 try {
   Push-Location $repo

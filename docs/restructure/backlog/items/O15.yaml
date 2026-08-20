@@ -1,0 +1,26 @@
+id: O15
+epic: web-console
+title: 'Ownership module page: SEAL->PAT rollup graph rendering the K4 qualified-attribution shape over
+  team/attribution data frames'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O9
+- O11
+inputs:
+- UI-WIP/site-plan.md
+- web/src/
+- drydocs/loaders/cypher/seal_applications.cypher
+- drydocs/loaders/cypher/seal_contacts.cypher
+- drydocs_core/schema/seal_ontology_supplement.cypher
+acceptance: |
+  /ownership evolves the kept MyApps view into the shared subpage template: graph pane renders the ownership rollup (CatalogLOB -> Product -> AreaProduct -> DevTeam -> BusinessApplication) using the K4 qualified-attribution shape — Attribution nodes keyed attribution_id with their TOMRole, and unmapped_role=true attributions visibly flagged, never hidden; data-frame tabs (Teams / Attributions / Escalation routing) bind to QuerySpecs, with honest empty states when a source (e.g. escalation routing) isn't loaded in the target DB; selection linking works as in Explorer; both themes pass.
+notes: |
+  site-plan.md P3 wave 1 (module 3). Deliberately sequenced after the K4 constraint fix (4abe1aa) — the page reads the exact MERGE keys the constraints now back. MyApps at /ownership survived O8; this is its template-instantiation upgrade, not a new surface. DONE 2026-07-21 (Epic-O finish session): OwnershipRoute on the shared template — OwnershipGraphPane renders the acceptance rollup chain (CatalogLOB -> Product -> AreaProduct -> DevTeam -> BusinessApplication) in the K4 qualified-attribution shape: Attribution nodes keyed attribution_id, HAD_ROLE -> TOMRole, and an unmapped_role=true example VISIBLY red-flagged (never hidden); MyApps kept as the pane's toggled alternate view (evolution, not teardown). Three NEW QuerySpecs: ownership.teams.v1 (DEVELOPS counts), ownership.attributions.v1 (internal-confidential; holder by SID only, unmapped rows float to top), ownership.escalation-routing.v1 (ServiceNowGroup — zero rows is the honest producer state, company-side source). Registry tab renamed Memberships -> Attributions (tracks the K4 model). Selection links graph <-> frames as in Explorer. Verified: spec tests green, build+lint green, headless-Edge smoke (rollup + unmapped flag + live spec fallback).
+annotations:
+  status: DONE 2026-07-21 (Epic-O finish session) — see notes

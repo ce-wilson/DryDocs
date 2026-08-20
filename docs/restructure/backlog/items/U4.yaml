@@ -1,0 +1,21 @@
+id: U4
+epic: self-documentation
+title: 'OPTIONAL: add a ''DryDocs graph evidence'' section to the tech-debt skill (query pack + offline
+  fallback)'
+type: chore
+module: docs
+phase: 16
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on:
+- U1
+- U6
+inputs:
+- .claude/skills/tech-debt/SKILL.md
+- docs/reviews/code-graph-review-plan.md
+acceptance: |
+  .claude/skills/tech-debt/SKILL.md gains a DryDocs-specific graph-evidence section carrying the Phase-1 query pack (A1-A6) with one-line "what debt category this measures" notes, AND an explicit no-database fallback (snapshot JSON + viewer.html) so the skill never hard-depends on Neo4j — the same decoupling rule as the session ritual (gate H3). Skill loads and reads coherently offline.
+notes: |
+  Gated on U1 proving the queries earn their keep (the plan's own condition). Haiku: transcription of already-written queries + a caveat, no judgment. RE-SEQUENCED 2026-07-28 groom: also depends on U6 — U1's verdict was that A1/A5/A6 are vacuous until the scanner fix lands, so transcribing the query pack now would enshrine vacuous queries. CLOSED 2026-07-28 (same day as U6): section added with the A1-A6 pack NOT transcribed verbatim — hardened with the O33 NOT :SchemaMeta guards, the D2 IMPORTS caveat, the scripts/-unscanned caveat, and post-U6 baselines (205/370). All 7 probes (A2 = two) executed live against `drydocs`: A1=0, cycles=0, A4 dead-code candidates=0, A5=26 no-direct-test-importer modules (real future audit signal), A6=12 cross-root pairs. Offline fallback documented (snapshot JSON fields + viewer.html; exemplars absent from JSON so no guard needed there).

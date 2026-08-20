@@ -1,0 +1,22 @@
+id: Q14
+epic: docmeta
+title: 'Draft the vendor-docs entity-spine gate prompt: is a documented utility a first-class node, and
+  which edge carries it'
+type: task
+module: ontology
+phase: 14
+agent: ontology-mapper
+model: fable
+priority: p2
+status: todo
+depends_on:
+- Q13
+inputs:
+- knowledge/upgrade-plans/vendor-docs-agent-navigation.md
+- drydocs_core/ontology/relationship_vocabulary/
+- config/gate-prompts/
+- docs/RELATIONSHIP_GUIDE.md
+acceptance: |
+  A gate prompt in config/gate-prompts/ puts four questions to the SME with evidence drawn from the LOADED layer-1 spine (real counts, real titles): (a) is a documented utility a new :ControlMUtility label, or an instance of the existing software-registry model — inventing a label for convenience is what CLAUDE.md §1 warns against; (b) DOCUMENTS as a new edge vs reusing the registered :Document->:SoftwareProduct DESCRIBES; (c) whether a vendor's own in-page cross-link is an assertion we carry as SEE_ALSO or merely presentation; (d) the layer-3 estate join (job CMD_LINE -> the page describing its utility) recorded as BLOCKED on G32 with the reason stated. Every proposed term is registered `status: planned` in relationship_vocabulary.yaml with a decision-matrix entry; NOTHING is flipped and no loader writes an edge. The SIGN-OFF is a separate SME session — this item only drafts (the G27 precedent).
+notes: |
+  Layer 2 of the plan. Depends on Q13 so the gate argues from loaded evidence rather than from a proposal — the pattern that made the K2/P2 gates decidable in one sitting. Layer 3 is deliberately NOT its own item: Q8's close note established that a relationship cannot span Neo4j databases, and ADR 0006 re-targets doc corpora to dddocs while the software registry keeps writing drydocs, so the estate join would silently drop every edge. G32 owns that ruling; this item's job is to record the dependency honestly, not to route around it.

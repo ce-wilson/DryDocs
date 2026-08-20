@@ -1,0 +1,19 @@
+id: O3
+epic: web-console
+title: 'Ratify ADR 0005 (browser↔Neo4j access path): SME accept/edit/reject + status flip'
+type: task
+module: docs
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0005-browser-neo4j-access-path.md
+- docs/decisions/README.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  The SME reviews ADR 0005 and its status flips PROPOSED -> ACCEPTED (or the SME's edits land first and then it flips; a rejection instead reopens the O1 crux with the rejection reason recorded in the ADR). The decisions README row drops its PROPOSED marker; O1's "decision recorded" acceptance clause is satisfied and noted in O1 progress. No code in this item.
+notes: |
+  Groomed 2026-07-14 from ADR 0005 Action item 1. in_progress = awaiting the SME (the E1/P2 idiom): the ADR is authored by the SME (rewrite b5235f4) and delivered; only the ratification act remains. Gates O4/O5 — the decision must be ACCEPTED before code implements it. DONE 2026-07-14 (same day): SME (chad.wilson) accepted 0005 AS WRITTEN, in-session; status flipped ACCEPTED (Action item 1 ticked), README row already PROPOSED-free, O1 "decision recorded" clause satisfied (noted in O1 progress). O4 + O5 now next_ready.

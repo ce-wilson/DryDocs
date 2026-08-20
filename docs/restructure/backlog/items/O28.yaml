@@ -1,0 +1,23 @@
+id: O28
+epic: web-console
+title: 'Node status envelope for the inspector + hub health glyphs: per-source namespaced status items,
+  derived never hand-authored (status.items pattern)'
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- UI-WIP/backstage-catalog-assessment.md
+- UI-WIP/site-plan.md
+- web/src/
+- drydocs_api/
+acceptance: |
+  A documented node-status envelope — a list of per-source items {type (source-namespaced), level (info|warning|error), message, error?}, always DERIVED by a producing system, never hand-authored — is adopted as the contract for the inspector sidebar's status section and the landing hub's spoke health glyphs; at least ONE real producer is wired end-to-end (first candidate: the loader per-run WARN/reject stream attaching to its :JobRun / loaded nodes) through a QuerySpec returning that shape; the envelope doc records the Backstage status.items precedent and the rule that new sources add namespaced types, never new shapes.
+notes: |
+  Groomed 2026-07-22 from assessment T5. Requirement (future capability) — the layer-4 context-graph surface in the UI; p3 until a module needs live health. CLOSED 2026-08-01. Contract in knowledge/standards/node-status-envelope.md (Backstage status.items precedent recorded, plus the two rules: always DERIVED by a producing system, and new sources add NAMESPACED TYPES never new shapes). Producer = BaseLoader._close_run via status_items_for(), a PURE function of the run summary — which is what makes "always derived" a testable property rather than a promise (8 tests, no database). Wire = loads.status-items.v1, live end-to-end as the /loads Status frame: loader derives -> rides the :JobRun -> spec unwinds -> SpecGrid renders. UI adoption via one shared component (StatusItems + HealthGlyph) used by BOTH the Explorer inspector's status section and the landing hub's spoke glyphs, so a new producer lights both with no UI change. Four design decisions worth keeping: (1) A PROPERTY on :JobRun, not a node + relationship. A relationship type is an ontology decision that goes through the HITL gate (CLAUDE.md §1), and a derived health signal has no ontological meaning to gate — modelling it as an edge would have made every future producer's rollout gate-bound for no semantic gain. This is why O28 could close without a gate session. (2) JSON strings, not parallel lists. Neo4j cannot hold a map inside a list property; parallel lists (status_types/status_levels/...) would put the envelope's integrity in the ALIGNMENT of three lists, where one mismatched append silently mislabels an item's severity. One string per item cannot desynchronise. (3) NO all-clear item. A clean run stores an empty list, so "healthy" (a producer ran, nothing to report) stays distinguishable from "unknown" (no :JobRun at all). Collapsing them is how a dashboard ends up green because nothing is watching — the hub renders every spoke except loads as UNKNOWN today, deliberately, rather than a false green. (4) The demo inspector is fed through the SAME parser as the live path (demoStatus.ts authors JSON strings, parseStatusItems reads them), so a shape change breaks the demo surface loudly instead of leaving it rendering a format nothing produces. Scope note: the Explorer inspector's items are demo-derived because that canvas is the SYNTHESIZED demo graph — wiring it to live data needs a demo->live selection bridge that does not exist. That is graph plumbing, not contract work; the acceptance's "at least ONE real producer wired end-to-end" is met by the /loads Status frame, which is fully live. The O42 component-ledger guard fired on the new component and was answered rather than silenced: StatusItems is registered UNBOUND (26/63) because it serves two modules, so binding it to either would misstate it. Suite 1285 passed / 5 skipped; ruff clean; tsc + vite build clean.
+annotations:
+  status: closed 2026-08-01 (desktop session)

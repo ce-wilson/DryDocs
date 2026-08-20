@@ -1,0 +1,18 @@
+id: U3
+epic: self-documentation
+title: 'Technical-writer doc-status board: join the docs subgraph to the code graph (Phase 3)'
+type: task
+module: docs
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/code-graph-review-plan.md
+- docs/design/
+acceptance: |
+  Precondition executed and shown: drydocs load-doc-traceability against `drydocs` (the DesignDoc/Requirement/Component subgraph was EMPTY at plan time). docs/reviews/persona-tech-writer-2026-07.md contains the doc-status board (doc -> last commit -> cited components alive? -> fresh/stale/ orphaned) for every docs/design/*.md, the Component.ref <-> file_id join results both directions (stale citations + heavily-imported modules no doc cites), the staleness ranking vs Project.git_commit, and the sdlc-*.md SDEP-section regeneration check. Mismatches -> tagged IDEAS lines.
+notes: |
+  Independent of U1/U2 — runnable in parallel. The code<->Control-M join (gate H5) does NOT exist; the plan forbids faking it with string matching. CLOSED 2026-07-28 (run 1): precondition run shown — sections 148 + matrix 51 loaded; the feedback pass REFUSED via the L17 :Employee guard (first live firing — recorded as evidence, the honest producer state). Board: 5 docs cite pre-squash commits that dangle off main, startup-refresh edited same day still cites 07-20, mapping-demo has no cite; ZERO dead component citations both directions; 8/56 Component refs sheared by the comma-split convention; base.py + lineage/model.py cited by no component; sdlc-*.md par-DEP stale in 3 rows. Four IDEAS lines filed.

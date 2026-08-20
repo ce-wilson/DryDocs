@@ -1,0 +1,20 @@
+id: C2
+epic: ontology-mapping
+title: Confirm SEAL mappings against DPROD/ORG terms
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- B2
+inputs:
+- config/taxonomy/business-application.yaml
+- reference/standards/dprod-ekgf/README.md
+- reference/standards/w3c-org/README.md
+acceptance: DPROD/ORG terms cited; mappings confirmed
+output: config/taxonomy-ontology-map.yaml
+notes: |
+  Done 2026-06-21 via HITL gate. 4 confirmed (batch, reuse active seal_*): HAS_PORT (dprod), HAS_MEMBERSHIP (org), OF_ROLE (org), HELD_BY (org). Concept BusinessApplication / SEALID.

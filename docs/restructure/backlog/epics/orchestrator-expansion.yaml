@@ -1,0 +1,8 @@
+id: orchestrator-expansion
+letter: F
+title: Orchestrator expansion
+order: 5
+groom_log:
+- date: ''
+  note: ── Epic F — Orchestrator expansion (pipeline-config) — Phase 5 ────────────
+  attached_at: F1

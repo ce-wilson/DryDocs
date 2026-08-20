@@ -1,0 +1,38 @@
+id: V3
+epic: sme-runbooks
+title: 'SME runbook: drydocs-load — loaders, CLI chain, snapshots; rule the overlap with the system-level
+  startup-refresh runbook'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- V1
+inputs:
+- drydocs/
+- docs/design/drydocs-startup-refresh-runbook.md
+- docs/design/templates/runbook.outline.yaml
+acceptance: |
+  Per V1's disposition: EITHER the startup-refresh runbook is declared the drydocs-load runbook (then this item brings it current with module framing + a coverage note, Rev bump per the governed-render rules) OR a distinct docs/design/drydocs-load-runbook.md is authored (outline- conformant, rendered, stale-render-clean) and the two cross-reference without duplicating the load sequence — N3's declared canonical sequence is the single source once it lands. drydocs-load off RUNBOOK_PENDING.
+notes: |
+  Groomed 2026-07-29 (Epic V). Coordinate with N6 (the two disagreeing load sequences) — this runbook must not become a third one.
+annotations:
+  status: 'closed 2026-08-04 (laptop). RULED AUTHOR-DISTINCT: declaring the startup/refresh runbook this
+    module''s runbook would have needed it NARROWED (it owns Docker and provisioning, which are not drydocs-load)
+    or this module WIDENED to own the container (which is not either) — neither is honest, so the two
+    are distinct and cross-reference. The division in one line: startup/refresh answers ''run the chain'',
+    docs/design/drydocs-load-runbook.md answers ''run, read and repair ONE loader''. THE N6 CONSTRAINT
+    WAS THE DESIGN DRIVER and the item''s own note demanded it: this runbook restates NO sequence. Two
+    hand-maintained copies already exist (ingest.sh, Appendix B) and N6 exists to retire them; a third
+    would make that job worse. It points at cli.CANONICAL_LOAD_SEQUENCE and ships the one-liner that prints
+    it (run before commit). The justification is not fastidiousness — it is an incident from the SAME
+    SESSION: V2''s runbook copied the topology database list inline and X1 retired ddlineage hours later,
+    so that copy was stale before the day ended (corrected to a read of dev-environment.yaml at this item''s
+    claim). Covers what the cold start does not: the run envelope and status items, rejected rows, idempotency,
+    the soft-delete/sweep-removed split with the warning that a source OUTAGE looks identical to a deletion,
+    snapshots, docs-verify as a cheap NEO4J_DATABASE check. Troubleshooting carries the live constraint-violation
+    shape T23 is hitting company-side and the open C24 sparse-refresh caveat. Every claim verified against
+    code/CLI before writing. drydocs-load off RUNBOOK_PENDING (6 remain). Suite 1537 green.'

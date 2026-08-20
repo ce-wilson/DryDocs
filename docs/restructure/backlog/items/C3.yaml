@@ -1,0 +1,20 @@
+id: C3
+epic: ontology-mapping
+title: Confirm catalog hierarchy mappings; resolve SUPPORTS range
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- B3
+inputs:
+- config/taxonomy/lob-product-team.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+acceptance: no free-text union ranges (resolve SUPPORTS Product-vs-AreaProduct); each edge has precise
+  from/to + authority tag
+output: config/taxonomy-ontology-map.yaml
+notes: |
+  Done 2026-06-21 via HITL gate. 4 hierarchy edges confirmed + SUPPORTS range RESOLVED: SUPPORTS → AreaProduct ('aligned to' = team_type=aligned); NEW DevTeam DEVELOPS BusinessApplication joined by SEALID. C4 must set catalog_supports_area_product + arch_develops active and deprecate catalog_supports (DevTeam→Product). Gate logged.

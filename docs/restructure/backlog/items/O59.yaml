@@ -1,0 +1,24 @@
+id: O59
+epic: web-console
+title: 'The /remediation intake surface: an SME reads the folder-set profile (FIDs, variables, emails)
+  and supplies the substitutions the XML cannot carry'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on:
+- G68
+inputs:
+- web/src/routes/ (the existing /remediation route from O17)
+- web/src/modules/registry.ts
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+- knowledge/standards/technology/controlm-guidelines-and-standards.md
+- internal/remediation/standards-rules-registry.md
+acceptance: |
+  /remediation gains a FILE-BACKED input beside its existing flow pane: given G68's profile artifact for a staged folder set, an SME sees three frames and fills one form. PROFILE frames render G68's four censuses -- shape, identity (FIDs / run-as / SEAL), variables by scope with their R30/R31 state inline, contacts split by kind and labelled documentation-only. FINDINGS renders detect_all() output grouped by rule id with severity visible, each row citing the rule id so the reader can reach the registry entry; the two failure classes are NOT flattened into one list, because name drift produces SILENCE (no row loads) while a value-contract breach produces a CONFIDENTLY WRONG row, and a page that ranks them together teaches the reader the wrong triage order. SUBSTITUTIONS is a form over G68's slot list: current value or ABSENT, the shape rule shown beside the input (FTS_ID matches its shape, DEVX_KEY is UPPER_SNAKE and hyphen-free, a DL is an address), and the affected job count. Its output is a PROPOSAL the SME can export -- never an applied change, and nothing on this page writes XML or a graph. Honesty rules inherited from O56/O58 and restated because they are what makes the page trustworthy: a slot with no value renders "not supplied", never a default or a guess; a census the profile did not compute renders "not profiled", never 0. Access designation 'sme' with the reason recorded. The O17 deviation STANDS and is not quietly reversed: the remediation frames bind no QuerySpec, because drydocs_remediation writes zero graph and minting :Finding / :FixBatch labels in a spec would smuggle an ontology decision past the HITL gate. Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
+notes: |
+  Raised 2026-08-11 on SME direction ("update the backlog for the UI-WEB remediate"), as the SME-facing half of G68. The remediation module page has existed since O17 (2026-07-21) on SYNTHESIZED fixtures with no real input path; this is that input path, and it arrives as a FILE rather than a graph binding, which is exactly why O17's no-spec deviation survives rather than being an embarrassment to fix. THE LOOP THIS CLOSES, in the SME's own framing: remediate bad coding and accidental typos today, and author new Control-M jobs that populate the flow automatically on ingest -- no manual mapping step. The profile is what makes the second half credible: if the estate's real variable names and scopes are visible before the standard is applied, the standard is being written against what exists rather than against what a screenshot suggested. Deliberately NOT specified: whether the profile arrives by upload or by pointing at a generated artifact path. That follows G68's transport choice and must not be pre-empted here -- an upload widget built against a transport that turns out to be a CLI artifact is thrown away.

@@ -1,0 +1,22 @@
+id: L5
+epic: doc-infrastructure
+title: 'Digital HITL: per-section SAVE/annotate control keyed to anchors'
+type: requirement
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L3
+inputs:
+- drydocs/gate_pages.py
+- drydocs/plan_board.py
+- scripts/render_design_doc.py
+acceptance: |
+  the rendered .html gains a per-section annotate control with localStorage persistence (the gate_pages.py pattern) that EXPORTS a paste-ready, anchor-keyed feedback line (clipboard, the board quick-capture pattern) into docs/design/feedback/<doc>-rev<N>.yaml; offline unit test on the emitted feedback structure; full suite green.
+notes: |
+  Closes the gap the user flagged — HTML reads well for humans+agents but is hard to mark up; this is the WIP "save button", COMPOSED from two existing primitives rather than invented.
+progress: |
+  2026-07-08 — DONE (user sign-off). design_doc.py screen render gained a per-anchor annotate control (localStorage) + "Copy feedback" clipboard export in the feedback_yaml format; print output stays clean. docs/design/feedback/README.md documents the format. test_design_doc.py now 17 tests (3 new). Verified live (✎ buttons + toolbar render).

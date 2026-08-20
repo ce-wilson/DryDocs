@@ -1,0 +1,22 @@
+id: Z2
+epic: server-location
+title: 'Server/location ontology gate: Server, DataCenter, geography grain, prod/DR, the Control-M node
+  join rule, and the not-the-same-field ruling'
+type: task
+module: ontology
+phase: 6
+agent: ontology-mapper
+model: opus
+priority: p2
+status: done
+depends_on:
+- Z1
+inputs:
+- drydocs_core/ontology/relationship_vocabulary
+- docs/RELATIONSHIP_GUIDE.md
+- config/gate-prompts
+- config/taxonomy
+acceptance: |
+  A gate prompt in config/gate-prompts/ plus vocabulary entries registered status: planned covering: the Server node (and whether OS/version hangs off the software registry per the C25 software-version-context ruling); DataCenter and the geography grain (nodes vs properties for rack / building / city / state / country); prod/DR designation (property vs node); the edge names (server-hosts-job, server-located-in, application-runs-on or their ruled equivalents); the server-name <-> Control-M node identity join rule with match tiers and evidence, following the K2 match-policy precedent; and an EXPLICIT ruling that the export's data-center field and the Control-M same-named field are distinct concepts that never crosswalk by name. Two findings from the 2026-08-08 business-layer location experiment ride this gate as required confirmations (merged at the 2026-08-09 groom, from Idea-90): (i) real-world location data arrives at MIXED GRAIN — street address, city and country all appear as "the location" in one source — so the question is not only which levels exist but how a located node DECLARES the grain it carries; and (ii) the epistemic line between an enumerable site and an AGGREGATE PRESENCE CLAIM: a source stating "177 locations" is a claim ABOUT sites, and exploding it into 177 nodes manufactures data, so the gate rules how such a claim is held without becoming fake sites. Nothing loads before sign-off; everything ambiguous routes to the SME session.
+notes: |
+  User directive 2026-08-08. The world/country map module (Z5) keys on "a node label that has a location" — the gate should say WHICH labels carry location and in what shape, so the map component reads one contract instead of per-label special cases. MERGED 2026-08-09 (Idea-90, the business-layer location experiment written up in internal/context-graph-analysis/business-layer-location-experiment.md): the hand-applied W3C ORG + location pass over public annual-report sources produced a coherent business layer with no technical layer at all, which is worth knowing here for two reasons — it proves the Z5 map contract is satisfiable from the business layer alone (a located-nodes world map needs no servers), and it supplies the two location findings now written into the acceptance. The ORG-structure half of that experiment (org units = the LOB layer verbatim, plus an effective-dated org:ChangeEvent for a segment merge) is deliberately NOT here — it is a different subject and went to C28. CLOSED 2026-08-19 (laptop): gate server-location-ontology SIGNED OFF 12/12 the same session (three rounds + one reshape follow-up; config/gate-log.md). Rulings: :Server inventory spine joined to :ExecutionHost by the evidence-carrying infra_resolves_to_server edge, never a merge (A1); OS as properties, software-registry OS row recorded-not-built (A2); designation property (A3); :DataCenter the only geography node, properties + the Idea-90 location_grain declaration, rack on the edge (B1/B2); aggregate presence claims never explode into nodes (B3); the two-DCs fence ruled EXPLICITLY, name-joins forbidden forever (B4); K2-style three-tier join with evidence, unmatched visible (C1); C2 SME-RESHAPED at the gate — the app->server link rides a TECHNOLOGY PORT (seal_has_port reused, kinds widened; new entry infra_port_runs_on_server replaces the drafted direct edge); NO job->Server edge, location is a traversal (C3); SOR kept, ADS flip pre-authorized on evidence (C4); domain `infrastructure` registered (C5). All three infra_ entries stay planned — flips are the Z3 build's (N13). Sample-reproducible: schema/vocab guards green on the committed fragments; no graph write occurred.

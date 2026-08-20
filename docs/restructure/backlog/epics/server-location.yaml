@@ -1,0 +1,18 @@
+id: server-location
+letter: Z
+title: server location & geography
+order: 24
+groom_log:
+- date: '2026-08-08'
+  note: |-
+    ── Epic Z — server location & geography (infrastructure export → map surfaces) ──
+    User directive 2026-08-08 (desktop chat), groomed direct-to-backlog: ingest the
+    infrastructure site's per-business-application server export, join server names
+    to Control-M job hosts, resolve load-balancer names to real servers via
+    nslookup, and surface locations on reusable console map modules.
+    STANDING CAUTION on every item: the export's data-center/location field is NOT
+    the Control-M field of the same name — the Control-M "DC" is a SCHEDULING
+    concept (its name encodes the default run time, e.g. T032-E0700-DMA), while
+    this source carries PHYSICAL geography (rack, building, city/state/country).
+    Never join or crosswalk the two by field name.
+  attached_at: Z1

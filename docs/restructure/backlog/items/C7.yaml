@@ -1,0 +1,19 @@
+id: C7
+epic: ontology-mapping
+title: 'Structured map fields at the next gate: vocab_id required, capture taxonomy-or-waived'
+type: chore
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/taxonomy-ontology-map.yaml
+- tests/unit/test_taxonomy_ontology_map.py
+- .claude/skills/add-source-object/SKILL.md
+acceptance: |
+  test_taxonomy_ontology_map extended: every mapping confirmed after 2026-07-10 must carry vocab_id (or explicit ~ with a reason note) AND a capture field naming its config/taxonomy/ file or waived-with-reason — the taxonomy-first erosion fix (audit F5; the platforms.yaml retrofit precedent); add-source-object step 3 and the ontology-mapper agent instructions updated to fill both.
+notes: |
+  docs/reviews/tech-debt-taxonomy-ontology-map.md Phase 3. DONE 2026-07-19 (general-purpose subagent, reviewed in-session): two new guards in test_taxonomy_ontology_map.py (cutoff 2026-07-10 exclusive; vocab_id entry-level or ~ + vocab_id_reason; capture = existing config/taxonomy/ file or "waived — <reason>"); both post-cutoff entries (job-seal-app-ref, job-runtime-stats-supplement) backfilled with honest F5 waivers — retrofitting real captures stays taxonomy-importer work. SKILL step 3 + ontology-mapper Method step 6 updated. Suite 721 green.

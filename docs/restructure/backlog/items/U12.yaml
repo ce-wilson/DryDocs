@@ -1,0 +1,22 @@
+id: U12
+epic: self-documentation
+title: Make the ruled snapshot retention true in the script as well as the prose — the README documents
+  a retired ritual and snapshot.ps1 still accumulates a series
+type: chore
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-04
+depends_on:
+- U9
+inputs:
+- knowledge/depgraph-snapshots/README.md
+- knowledge/depgraph-snapshots/snapshot.ps1
+- knowledge/depgraph-snapshots/filter_ignored.py
+acceptance: |
+  (a) snapshot.ps1 ENFORCES the ruled retention — newest all-files snapshot only (SME 2026-08-02) — instead of relying on a human to delete: today a second run on the same day writes `<project>-<date>-<HHmm>.json` beside the first, which is precisely how the 101-file series accumulated, so the ruling survives only until the next double-run. The -CodeOnly comparison shape keeps its own filename and is exempt (it is not the ritual). Whatever the mechanism, an unexpected extra file is not the outcome. (b) knowledge/depgraph-snapshots/README.md matches what the script now does: the command block documents the whole-repo default and -CodeOnly (the -Tree flag it currently shows was REMOVED), the meta example reads tree: true, the "focused scan = the seven package roots" paragraph is rewritten, the git-ignore step is documented beside U7's probe and U8's abs_path strip, and the Housekeeping "prune ... keep the last ~10" line is replaced by the ruled retention. (c) The three citations to files this repo no longer contains (tree-original.json, tree-this-version.json, and the drydocs1-20260621.json baseline) are removed or restated as history recoverable from git, and a fourth instrument-change marker records the all-files boundary in the same voice as the three already there — the node count goes 238 -> 1457 on unchanged code, and nobody should read that as growth.
+notes: |
+  Groomed 2026-08-02 — drift left behind by U9's own commit and found by this groom, not by the inbox. p2 rather than p3 because this README is the surface the session-end ritual points at and three of its links now resolve to nothing. CLOSED 2026-08-04 (desktop). By close time the defect had reproduced FOUR times (twice 2026-08-03, twice 2026-08-04 — each caught by hand at the ritual), which is the item's own argument made empirically. (a) snapshot.ps1 now enforces the ruling itself: after a successful write+filter (deliberately AFTER, so a failed run can never delete the only good snapshot — source order pinned by test), every other <project>-<date>[-HHmm].json is deleted with a per-file retention message; the pattern is anchored so -CodeOnly (<project>-code-*) and the retired drydocs1-* names never match. PROVEN LIVE in proof order: the enforcement run deleted FIVE stale snapshots (20260802, three same-day 20260803s the manual ritual had missed, and 20260804-0920), leaving exactly one. (b) README trued up: command block = whole-repo default + -CodeOnly (-Tree flag gone), meta example reads tree: true with the one-root scan list, the seven-roots paragraph rewritten as the retired comparison shape, U8/U9 documented beside U7 as the three post-processing steps, Housekeeping's "keep the last ~10" replaced by the ruled retention with the recovery commands. (c) tree-original.json / tree-this-version.json / the drydocs1-20260621.json baseline all restated as history recoverable from git (recovery one-liner included); the 2026-07-28 marker's tense fixed. Fourth instrument-change marker added in the existing voice: all-files default 2026-08-02 (U9, e3f65af), 238 -> 1457 nodes on unchanged code = the instrument seeing, not growth. NEW GUARD tests/unit/test_depgraph_snapshots.py (+3): exactly-one committed snapshot, script retention present AND after-the-write, README currency (no link to an absent .json). Suite 1410 -> 1413. Clause (a) was raised while regenerating the board AT the groom: the retention question (open since 2026-07-25) is now RULED, and a rule enforced only by whoever remembers it is the same shape as the hand-maintained scan-root list U9 just deleted. Widened from a docs chore to graph-infra for that reason.

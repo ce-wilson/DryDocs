@@ -1,0 +1,19 @@
+id: J46
+epic: release-infrastructure
+title: 'De-flake the run-log collision test: it races the clock instead of freezing it, so the -2 suffix
+  it asserts only appears when both calls land in the same second'
+type: bug
+module: drydocs-core
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_loader_run_log.py
+- drydocs_core/run_log.py
+acceptance: |
+  tests/unit/test_loader_run_log.py::test_naming_convention_and_collision_suffix passes DETERMINISTICALLY because the clock is frozen (or the timestamp source is injected) across the two claim_log_path() calls, not because the two calls usually land inside the same second. What is under test is unchanged -- the second claim of an existing name gets the -2 suffix, and the YYYYMMDD-HHMMSS naming assertion stays. Proof it was a race and not a rewrite: with the collision logic removed, the frozen-clock version still fails. Any sibling assertion in the same file that depends on wall-clock timing gets the same treatment, or an explicit note saying why it does not need it.
+notes: |
+  Groomed 2026-08-11 from Idea-106. Observed failing once and passing on the immediately following identical run (2026-08-11, desktop, during the C30/G67 close-out) -- the shape that costs an hour later, when it fails inside someone else's suite and reads as a real defect introduced by their change. module drydocs-core because claim_log_path lives in drydocs_core/run_log.py; epic J because this is suite hygiene, not a run-log capability change.

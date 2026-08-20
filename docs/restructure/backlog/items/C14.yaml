@@ -1,0 +1,29 @@
+id: C14
+epic: ontology-mapping
+title: 'Batch-port orchestrator migration: load USES_SOFTWARE {source: ''batch-port''} edges from the
+  SEAL batch-port orchestrator strings to registry SoftwareProducts'
+type: task
+module: drydocs-load
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- C12
+inputs:
+- drydocs/loaders/software_registry.py
+- drydocs/loaders/cypher/software_registry.cypher
+- config/taxonomy/platforms.yaml
+- config/taxonomy/business-application.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+acceptance: |
+  Per the C12 sign-off: a loader pass migrates the SEAL batch-port orchestrator string to app-level edges (:BusinessApplication)-[:USES_SOFTWARE {source: 'batch-port'}]-> (:SoftwareProduct) via the platforms.yaml seed rows' software_registry_ref links (controlm/autosys/airflow); the source property distinguishes these declared-orchestrator edges from DRYDOCS-SELF stack rows and future 'controlm-cmdline' detections on the same edge type; idempotent MERGE (re-run safe); an unmapped orchestrator string is REPORTED, never guessed (the coverage-policy pattern). Tests cover the mapping, the source stamping, and the unmapped path; live verify against the EE container; full suite green.
+notes: |
+  Groomed 2026-07-21 pm at the C12 sign-off. Zero new edge or node types — reg_uses_software is active and B4 confirmed its typing; this is purely a new source value on an existing edge. Module drydocs-load (loader work); ontology epic keeps the gate lineage visible.
+annotations:
+  status: DONE 2026-07-21 pm — batch_port_orchestrator loader + cypher (MATCH-only endpoints, MERGE keyed
+    {source:'batch-port'}); crosswalk from platforms.yaml seed rows; unmapped = flagged + reported, never
+    guessed; registry cypher hardened to key {source:'registry'} (live shared pair DRYDOCS-SELF->controlm);
+    live-verified on the EE container (3 batch-port + 4 registry edges, idempotent re-runs both writers);
+    9 new tests; suite 840 green

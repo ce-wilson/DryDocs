@@ -1,0 +1,22 @@
+id: V11
+epic: sme-runbooks
+title: 'SME runbook: drydocs_docmeta — connectors, cleaner, tokenizer, manifest, policy, registry and
+  the live CLI verbs'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- drydocs_docmeta/
+- docs/design/templates/runbook.outline.yaml
+- tests/unit/test_runbook_coverage.py
+- docs/decisions/0006-docmeta-component-and-doc-graph.md
+acceptance: |
+  docs/design/drydocs-docmeta-runbook.md exists, outline-conformant, rendered and stale-render-clean, and drydocs-docmeta comes OFF the RUNBOOK_PENDING list in tests/unit/test_runbook_coverage.py — the frozen list shrinks, which is the only direction it is allowed to move. Covers: the two generic connectors (web and filedrop) and what each refuses, the cleaner and tokenizer contracts, the manifest/registry shape a corpus must satisfy before it loads, the curation policy tiers, and the live CLI verbs with a worked end-to-end capture on a sample corpus. Mechanism only — no real corpus values.
+notes: |
+  Groomed 2026-08-09 from Idea-95 clause (c). The gap is already recorded in the coverage test, which carries drydocs-docmeta with the comment "BUILT at Q6; no V-item yet, so this list is where it is visible" — this item is that V-item. Same growth stage that produced the drydocs-core runbook after persona Run 1: a package reaches ten modules and live verbs, and its runbook is the thing nobody minted.

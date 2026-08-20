@@ -1,0 +1,23 @@
+id: R6
+epic: agentic-qa
+title: 'Tier-2 bounded graph-of-thoughts loop: enhance/solve controller with hard caps and the task-scoped
+  context graph per the R1 residency ruling'
+type: requirement
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- R2
+- R3
+inputs:
+- docs/decisions/0007-agentic-qa-architecture.md
+- agents/graph_qa/
+acceptance: |
+  The loop engages only when Tier-1 context is insufficient; hard caps enforced (iterations <=2, next-step vote x3, fix loop <=2, per-question token budget) with a forced-solve fallback so every run terminates with an answer or an explicit "cannot answer"; the enhance branch writes ONLY the task-scoped context graph named by the R1 ruling (never drydocs / ddlineage — a test proves it); per-iteration snapshots are captured and renderable in the existing d3 graph pane; the R3 ledger records per-iteration cost so caps are tunable from data.
+notes: |
+  CLOSED 2026-08-01. tier2.py is a PURE controller taking llm/retrieve callables rather than the pipeline, so the whole loop is testable with fakes and the private coupling stays in pipeline.py; retrieval REUSES Tier 1, which is why the <=2 fix loop and the read-only pre-flight are inherited rather than reimplemented — there is exactly one path that runs Cypher, and a test pins the executed sequence. Two bounding decisions the acceptance did not settle, both stated in the module docstring: (1) a tie or unparseable vote counts as SOLVE — the failure mode of voting is not a wrong answer, it is a loop that will not stop, so ambiguity resolves toward terminating; (2) the token budget bounds EXPLORATION, not the whole run — once spent the loop stops enhancing, but evidence already bought still gets one final answer call, deliberately over budget and recorded as budget.exhausted. Refusing that last call would spend the budget gathering evidence and then discard it unanswered. With NO evidence and no budget the run makes zero calls. The R1 residency proof is STRUCTURAL, not behavioural: task_graph.py has no driver, session, database name or Cypher in it, and the test reads the source and fails if any appears. A comment saying "do not persist this" is not a control; a module with nothing to persist with is. Also fixed a real gap the acceptance named only in passing — the ledger recorded iteration=1 for EVERY call, so per-iteration cost was unavailable and the caps were untunable from data. The loop now drives the iteration counter and a test pins round 2's calls to round 2. Every cap reports whether it BIT (forced_solve, budget.exhausted), and the budget is reported on runs it never touched — a limit you can only see once it has bitten is one nobody can tune before it does. Web: rather than a second d3 copy, the deterministic placement engine moved to lib/forceLayout.ts and GraphExplorer now consumes it; the new ask/TaskGraphPane keeps its OWN visual language on purpose, because a viewer who mistakes a synthesized sub-question for a real graph node has been actively misled. Snapshots are cumulative per phase (start / iteration N / final) so any frame renders alone. Suite 1315; tsc + build clean; O42 ledger 27/64 (TaskGraphPane bound to ask/).
+annotations:
+  status: 2026-08-01 (desktop)

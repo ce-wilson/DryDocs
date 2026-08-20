@@ -1,0 +1,37 @@
+id: O29
+epic: web-console
+title: Trust-tier / edge-provenance legend surfaced live in-UI on the lineage and docs graph canvases
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- O10
+- O18
+inputs:
+- web/src/
+- UI-WIP/two-track-ui-plan.md
+- internal/context-graph-analysis/ui-architecture-analysis.md
+acceptance: |
+  A legend component (declared vs observed / trust-tier color key) renders on both the /lineage and /docs graph-pane canvases, reusing the existing tier vocabulary (VERBATIM/GROUNDED/SYNTHESIZED, the KIND_TOKEN palette) rather than inventing new colors; tokens read the theme CSS variables so it renders correctly in both dark and light mode; visible on the canvas itself, not only in the export manifest; suite + build + lint green.
+notes: |
+  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-5 (adopt of context-graph's declared/observed legend pattern, per internal/context-graph-analysis/ui-architecture-analysis.md). Sonnet- able — reuses existing tier vocab and canvases (O10/O18 both done), no new ontology or edge semantics.
+annotations:
+  status: 'closed 2026-08-07 (desktop, same session as the claim). BUILT: web/src/components/TrustLegend.tsx
+    — the adopt of context-graph''s declared/observed legend pattern (ui-architecture-analysis.md "surface
+    that in the live UI too, not only in the export manifest"). Tier palette REUSED from underhood/benchmarkData.ts
+    (VERBATIM --green / GROUNDED --blue-br / SYNTHESIZED --yellow — no new colors), edge-provenance key
+    = declared solid / observed dashed, all colors via theme CSS variables. Wiring: LineageGraphPane renders
+    it directly; MiniDag gained an opt-in `legend` prop and ONLY DocsRoute passes it (Gates/Remediation/Runbooks
+    consumers unchanged — they opt in when their content mixes trust). Rendered inside the ReactFlow canvas
+    as a bottom-left Panel (!ml-12 clears the zoom controls — the first screenshot caught the overlap).
+    VERIFIED LIVE (headless-Edge, dev server + ?as= affordance): DOM dumps show the legend on /lineage
+    and /docs; BOTH THEMES live-verified — dark via the OS scheme, light via a throwaway public/ probe
+    page seeding drydocs.theme.v1 before redirect (deleted after; data-theme-mode="light" confirmed in
+    the dump); screenshots in the session record. Ledger: TrustLegend registered in ui-components.yaml
+    (deliberately UNBOUND — serves two modules) and the coverage pin moved 65->66 with the O29 line in
+    its history. Suite 1698/3/5 (the 3 = the standing Idea-83 rich-ANSI env failures, untouched); web
+    build + oxlint green (only-export-components warning = the same pre-existing class as rightSidebarContext/HubGlyphs).'

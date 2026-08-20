@@ -1,0 +1,23 @@
+id: O58
+epic: web-console
+title: 'A console surface for docs-verify: which declared corpora are actually loaded and where - the
+  answer a single-database QuerySpec cannot give'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/docs_verify.py
+- drydocs/cli.py
+- drydocs_api/query_specs.py
+- drydocs_api/app.py
+- config/doc-source-registry.yaml
+- docs/decisions/0005-browser-neo4j-access-path.md
+acceptance: |
+  A console surface answers "which declared doc corpora are actually loaded, and in which database" with the same six states drydocs/docs_verify.py computes — loaded | missing | stale | wrong-db | unshaped | db-absent — and renders wrong-db as the alarm the CLI's non-zero exit means. THE TRANSPORT IS THIS ITEM'S REAL CONTENT, and it must be chosen and written down, not defaulted: the reconciliation is inherently MULTI-database (it sweeps drydocs, dddocs and ddcontext precisely so a corpus sitting in a database it did not declare is visible, a result unobtainable from any single one of them), while a registered QuerySpec carries exactly one `database:` field by construction and SPEC_DATABASES does not even admit dddocs — so this cannot be a plain spec-backed page. The item names ONE of: (a) a server-side sweep endpoint in drydocs_api reusing docs_verify.verify(), whose `run(database, cypher, params)` is already its only I/O seam, making the reuse exact; (b) N registered specs, one per swept database, joined client-side with the join rule written down; or (c) a generated JSON artifact refreshed by the session ritual, the /software precedent. Whichever is chosen, the commit body records the choice AND its cost against ADR 0005 — option (a) adds a non-spec read path to an API whose standing rule is that /raw-cypher is the only interactive Cypher surface, and that is a boundary change, not a detail. Two things are never invented: a database that was not queried renders "not queried", never 0 (the O56 honesty rule); and a guard asserts the surface's state set against docs_verify.py's constants, so a seventh status cannot appear in the CLI and silently miss the page.
+notes: |
+  Groomed 2026-08-07 from the Q16 session. Q7 shipped the registry-vs-graph reconciliation as a CLI verb only (drydocs docs-verify, 2026-08-01) and no item ever claimed a surface for it — the same invisible-rather-than-deferred gap O56 records for /software. Model fable, not sonnet, and the reason is specific: the transport choice can change the drydocs_api read-path boundary. Options (b) and (c) leave it intact; option (a) does not. A groom cannot make that call for the builder, so the acceptance forces it to be made explicitly and costed. Module drydocs-web / epic web-console by the O54 precedent (file by the surface delivered) even though the hard work may land in drydocs_api — recorded here so the choice is visible rather than looking like a mis-bin. NOT gate-bound and NOT blocked on G32: this surface REPORTS the residency situation G32 owns (db-absent is a true statement about the world today, exactly as docs_verify.py already treats it) rather than resolving it. It should be readable before the ruling, which is when it is most useful.

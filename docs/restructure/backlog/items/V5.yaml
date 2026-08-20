@@ -1,0 +1,22 @@
+id: V5
+epic: sme-runbooks
+title: 'SME runbook: drydocs-docgen — design-doc render chain, outline validation, the L5/L6 feedback
+  loop'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- scripts/render_design_doc.py
+- scripts/render_board.py
+- docs/design/templates/
+- docs/design/feedback/
+acceptance: |
+  docs/design/drydocs-docgen-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-docgen off RUNBOOK_PENDING. Covers: the md-is-source / html-is-render contract, the default-paths board render and everything that rides it (gates.json, enforcement matrix — J17/J20), the stale-render check, and both feedback halves (L5 save-button export, L6 scan + transcribe-doc-markup) back to anchor-keyed YAML.
+notes: Groomed 2026-07-29 (Epic V). This one documents the machinery the other runbooks are rendered BY
+  — author it early.

@@ -1,0 +1,21 @@
+id: R15
+epic: agentic-qa
+title: 'Epistemic labeling on query answers: every lineage/impact-style answer declares exact vs lower-bound
+  and names the causes that limited the walk'
+type: task
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/gitnexus-depgraph-comparison.md
+- drydocs_api/
+- agents/graph_qa/
+- web/src/ask/
+acceptance: |
+  (a) Lineage- and impact-style QuerySpec responses carry `epistemic: exact | lower-bound` plus a machine-readable `causes` list naming what the walk could NOT see. The DryDocs cause classes are concrete, not generic: unparsed cmd_line values, unresolved invocations, and gate-pending (status: planned) edges. (b) THE DOCTRINE IS IN THE CONTRACT, not only in prose: an empty result set is not evidence of absence when the causes say the walk could not see. A consumer must be able to distinguish a lower-bound answer with zero rows from an exact answer with zero rows. (c) ONTOLOGY-CHEAP BY CONSTRUCTION: this is a property on the ANSWER, never on the graph -- no node, property or edge expresses epistemic state -- so no gate is needed. If a later proposal wants it graph-side, that is a RELATIONSHIP_GUIDE proposal with its own gate. (d) CONSUMERS RE-READ ONE FIELD: the Ask spoke (R5) and any exported spec render the label as given rather than inventing their own wording for it. (e) Tests cover an exact answer, a lower-bound answer for each cause class, and the zero-rows-but-lower-bound case that clause (b) exists for.
+notes: |
+  Groomed 2026-08-19 from Idea-124 -- R1, the top-ranked adoption recommendation of docs/reviews/gitnexus-depgraph-comparison.md. It extends the trust axis (VERBATIM/GROUNDED/SYNTHESIZED, which grades the SOURCE) to the ANSWER, which nothing grades today. PRIORITY, recorded because it differs from the capture: the entry proposed High; filed p2 because nothing blocks on it and the whole of phase 15's tail is todo. Raise it when the console's answers start being quoted outward. The trial that came with this review is this item's best argument: Idea-128 RAN GitNexus on this repo and was rejected, and the verdict was that its method-grain `impact` claimed `epistemic: "exact"` while missing receiver-annotated call sites that grep finds. A label is only worth having if the causes are honest.

@@ -1,0 +1,26 @@
+id: G14
+epic: component-topology
+title: 'Lineage extractor file-ops pass: CMD_LINE move/gzip parsing emits READS_FROM/WRITES_TO candidates
+  (activates G13''s dormant resolution)'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G12
+- G13
+inputs:
+- drydocs_lineage/extractors/controlm_inventory.py
+- drydocs_core/controlm/commands.py
+- drydocs_lineage/writer.py
+- tests/unit/test_lineage_inventory.py
+- config/gate-log.md
+acceptance: |
+  The inventory extractor emits READS_FROM / WRITES_TO candidates from CMD_LINE file-operation parsing (the unix move/copy/gzip wrapper forms named in the 2026-07-15 lineage-vocabulary gate caveat — "unix file operations (move, gzip) with no ETL engine involved"), dst as DataAsset; endpoints exactly per the gate EDIT (ETLProcess | ControlMJob -> DataAsset), no new relationship types. G13's owning-job resolution activates on the feed: a unit test proves a job whose CMD_LINE moves a file plans job->asset edges in plan_curated output. Unparseable/skipped file-ops are counted, never dropped silently (the coverage house rule), and WritePlan.unresolved_file_ops is surfaced on a human review surface (lineage-review page or plan report) so the drop count no longer sits unread. Refusal semantics unchanged — m3_reads_from / m3_writes_to stay planned until the curated-load gate. Full suite green.
+notes: |
+  Groomed 2026-07-19 from two G13-subagent inbox findings: the missing-feed line (only INVOKES/TRIGGERS emitted today, so G13's resolution logic is built + tested but dormant) promoted as this item; the sibling surface-unresolved_file_ops line FOLDED into this acceptance rather than itemized separately — the feed is what makes the counter worth reading. Edge meanings were confirmed at the 2026-07-15/16 gates; pure candidate-side extraction, no ontology decision remains, hence sonnet. DONE 2026-07-20: core parser gains gzip/gunzip -> COMPRESS (deterministic .gz-twin derivation; -c stream forms keep tgt None) beside the existing MOVE/COPY; the extractor's new file-ops pass emits READS_FROM/WRITES_TO with the JOB as the Activity (the gate EDIT's file-ops case — CMD_LINE ops have no Script hop, so G13's resolution passes them through to the ControlMJob MATCH shape), operands -> local_file DataAssets verbatim. Skips counted by reason (file_ops_skipped_non_dataflow / no_operand; DELETE/MKDIR/TRANSFORM/OTHER = job mechanics, not flow). Surfacing: writer.unresolved_file_op_candidates() (mirrors the plan-time drop) + a fifth lineage-review assertion row, so the counter is read pre-plan; the CLI's coverage line carries the new counters for free. Activation proven by test_cmdline_file_op_feed_plans_job_to_asset_edges; live lineage-review smoke rendered 4 candidates + 3 assets. Vocab untouched (all four m3_* stay planned); suite 761 green.
+annotations:
+  status: DONE 2026-07-20 (main session, same day as the pull)

@@ -1,0 +1,20 @@
+id: G13
+epic: component-topology
+title: Lineage writer file-ops resolution — script-level reads/writes attribute to the owning job
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/writer.py
+- tests/unit/test_lineage_writer.py
+- config/gate-log.md
+- drydocs_core/ontology/relationship_vocabulary.yaml
+acceptance: |
+  Per the 2026-07-15 gate EDIT (m3_reads_from / m3_writes_to endpoints are "ETLProcess | ControlMJob" -> DataAsset): plan_curated resolves script-level READS_FROM / WRITES_TO candidates to the OWNING ControlMJob via its INVOKES edge before write — a :Script (prov:Entity) never carries prov:used/generated; the ETL case keeps its ETLProcess Activity. A unit test proves a script->asset candidate plans as job->asset and an ETL-case candidate stays ETLProcess->asset; refusal semantics unchanged (m3_* planned until the curated-load build). Full suite green.
+notes: |
+  Groomed 2026-07-16 from the 2026-07-15 inbox line (same gate, second residual). Pure type-correctness resolution on the candidate side — the edge meanings were confirmed at the gate; no new relationship types. DONE 2026-07-19 — executed by a general-purpose subagent (sonnet), diff reviewed in-session. plan_curated resolves script-src READS_FROM/WRITES_TO to the owning ControlMJob(s) via graph INVOKES topology (not the confirmed batch); multi-job owners fan out (each job-run is a distinct Activity); no-owner candidates drop into WritePlan.unresolved_file_ops (never silent); non-DataAsset dst raises. rels keeps the confirmed audit count; rel_types/statements reflect the resolved set. Refusal + vocabulary untouched. Feed gap (no extractor emits file-ops yet) and the unresolved-counter surfacing are inboxed in IDEAS.md. Suite 735 green (+5 file-ops tests).

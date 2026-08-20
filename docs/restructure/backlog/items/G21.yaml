@@ -1,0 +1,22 @@
+id: G21
+epic: component-topology
+title: 'rua code-operations pass: captured scripts + profiles through the software-ontology mappers (launcher
+  registry, ETL_* facts, file-ops)'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G20
+inputs:
+- drydocs_core/controlm/commands.py
+- drydocs_core/controlm/variables.py
+- drydocs_lineage/extractors/rua_inventory.py
+- config/gate-log.md
+acceptance: |
+  A code-operations pass runs over the bundle's captured script and profile CONTENT and maps what it finds onto the existing software ontology surfaces — reusing, not duplicating, the G14/G15/G16 machinery: (a) launcher/interpreter invocations found inside scripts classify via LAUNCHER_REGISTRY (DPL GUID identity per G15 where present); (b) variable assignments classify via FACT_REGISTRY ETL_* canonicals with G16 value contracts (values decide, WARN stream); (c) file operations (move/copy/gzip and kin) emit READS_FROM / WRITES_TO candidates with endpoints exactly per the 2026-07-15 gate EDIT — no new relationship types, all m3_*/m7 statuses untouched; (d) profile parsing captures PATH mutations and sourced/invoked scripts as script-to-script DEPENDENCY CANDIDATES (flagged needs-vocabulary — the edge meaning is G22's, never auto-decided); (e) every skipped/unparseable construct is counted by reason. Unit tests on synthetic script/profile fixtures; full suite green.
+notes: |
+  "Extract the code operations as they map to the software ontology" (user, 2026-07-21). Static analysis of shell/python text is best-effort by design — coverage counters make the miss rate visible instead of implying completeness. Candidate-side only, hence sonnet. CLOSED 2026-07-27: drydocs_lineage/extractors/rua_code_ops.py — RuaCodeOpsExtractor runs on the SAME LineageGraph after the G20 inventory pass, reading each staged artifact's rua_copy content. Scripts: INVOKES candidates via the shared parse_command / LAUNCHER_REGISTRY (DPL keeps GUID identity + G15 property flags, reusing controlm_inventory's _stable_invocation_key/_dpl_properties); assignments via classify_variable (FACT_REGISTRY + G16 value contracts — mismatch/alias WARN counters + a facts candidate list); dataflow file ops → READS_FROM/WRITES_TO from the script node (G14 idiom, gate-EDIT endpoints). Profiles stage NO rels: PATH mutations + sourced/invoked scripts land as dependency_candidates flagged needs_vocabulary (G22's edge meaning). Coverage counts every skip by reason (no-copy, unreadable, comment/blank/continuation, non-dataflow, profile-op-skipped, unparsed). 5 fixture tests; suite 949 green.

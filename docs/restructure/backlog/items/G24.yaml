@@ -1,0 +1,22 @@
+id: G24
+epic: component-topology
+title: 'Code-repo source seam + server/repo corroboration: same staging shape, origin=code-repo, drift
+  report'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G20
+inputs:
+- drydocs_lineage/extractors/rua_inventory.py
+- drydocs_lineage/model.py
+- config/source-registry.yaml
+- tests/unit/test_lineage_inventory.py
+acceptance: |
+  A code-repo source seam emits script-artifact staging records in the SAME shape as G20's server-extract records, differing only in the provenance origin: origin=code-repo with repo + branch + commit + path (vs origin=server-extract with host + path + mtime). Driven by SYNTHETIC fixtures modeled on the observed shapes (a repo file listing/manifest and job-definition XML carrying script paths via folder VARIABLEs — mechanism-only; real Bitbucket access stays company-side behind this seam). A corroboration report joins the two origins on CONTENT HASH (compute the git blob hash of each server file and sweep ALL refs in one pass — git rev-list --all --objects — never branch guesswork; path-tail matching only as fallback until the G22 URN is ruled) into verdict buckets — found-at-refs (WITH the matching refs + commit dates: names the de-facto current branch mechanically), behind (only older commits match = running code ahead of everything committed), never-committed (the observed failure mode: production code absent from the repo), and repo-only — per-team hash drift IS the "clean branch" signal. The trust flag is a nullable per-repo trusted_ref field on the source-registry entry (the human-blessed intent line; null = server-extract-only truth — covers the stale-main case: main exists but dead, real code scattered across feature branches; the sweep names the candidate ref, a human blesses it), never inferred. NO graph writes, no new relationship types; unmatched records counted, never dropped. Full suite green.
+notes: |
+  Groomed 2026-07-21 from the SME-chat evidence (mechanism-only): a script running in production was not findable in the code repo — code-fetch tooling keys on pipeline-id, which that job family lacks. The repo is a valid source ONLY where the team keeps a clean branch (the trust flag); production servers always have the latest RUNNING code — but "what calls it / is it used" stays the reference graph's question (G21/G16 facts), never this seam's. Amended same day from the stale-repo use case (team migrated to GitHub in sync, then the manager + best-practice devs left; main untouched >1yr, latest likely scattered in feature branches): content-hash blob sweep replaces path-only matching, trusted_ref replaces the boolean flag. Feeds the G22 gate (identity/dedup + precedence rulings). Candidate-side, hence sonnet. CLOSED 2026-07-27: drydocs_lineage/extractors/code_repo.py — CodeRepoExtractor stages repo_script records from the repo_objects.tsv manifest contract (rev-list --all sweep + ref tips; live-tip rows vs empty-ref historical rows), same LineageGraph shape as G20 with origin=code-repo (G20 artifacts now stamp origin=server-extract); corroborate() joins on git blob sha1 of the carried-back copies into found_at_refs (refs + commit dates; candidate_ref = most recent tip, mechanical) / behind (history-only match) / never_committed (with path-tail hints as the weak fallback) / repo_only; uncomputable and malformed counted. trusted_ref added as a nullable HUMAN-BLESSED field on the new code-repo source-registry entry (Internal, confirmed:false) and only checked, never inferred. Honest limit recorded: content hashing cannot tell edited-after-checkout from never-committed — both bucket to never_committed with hints. No rels, no graph writes. 6 fixture tests; suite 955 green. G22 (gate) now unblocked.

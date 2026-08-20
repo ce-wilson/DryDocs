@@ -1,0 +1,8 @@
+id: ontology-mapping
+letter: C/G
+title: Ontology mapping + HITL
+order: 2
+groom_log:
+- date: ''
+  note: ── Epic C — Ontology mapping + HITL (ontology-mapper, sonnet) — Phase 2 ───
+  attached_at: C1

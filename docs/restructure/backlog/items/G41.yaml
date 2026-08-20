@@ -1,0 +1,21 @@
+id: G41
+epic: component-topology
+title: 'AWS Glue base-table inventory seam: stage the dataset POPULATION (per-zone glue db/table placements)
+  onto the GUID-keyed dpl_dataset DataAssets, path-keyed fallback for GUID-less rows — nodes only, no
+  edges, no graph writes'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- G17
+inputs:
+- drydocs_lineage/extractors/dpl_mac.py
+- drydocs_lineage/model.py
+acceptance: |
+  A GlueTableInventoryExtractor consumes the three observed sheet variants (GUID-bearing inventory / GUID-less consumption inventory / normalized appId load sheet) through one header-synonym contract; rows whose tableDatasetIdSource is datasetGuid land per-zone glue placements (glue_database_/glue_table_/glue_path_<zone>) as PROPERTIES on the SAME dpl_dataset DataAsset the G17 MAC seam stages (identity = GUID alone); GUID-less rows key on the canonical lowercase db.table path as glue_table DataAssets, joining an already-staged GUID placement when the path matches; appId lands as a seal property FACT (never an edge); a coverage dataclass counts every skip/mismatch by reason; the extractor adds ZERO relationships and performs NO graph writes; unit tests pin all of it on synthetic fixtures (70001-70099 SEAL block).
+notes: |
+  Built + closed 2026-07-28 from the user's three sheet screenshots (real sheets are Internal-Confidential; screenshots moved to internal-local/, mechanism only in-repo). Load-bearing observation captured in the module docstring: a *_RAW_TRUSTED table appears in BOTH the RAW__ and TRUSTED__ databases with the SAME dataset GUID — one dataset, two zone placements (measures the FILE->CONFORMED ~ RAW->TRUSTED note); REFINED placements carry their own GUID. The GUID is the join key that makes G17's READS_FROM/WRITES_TO candidates land on these same nodes — relationships come from the join, never from this loader; SEAL attribution edges stay Epic K; path-vs-GUID identity unification rides G22 clause f; every graph write stays behind G22. databaseName grammar: <ZONE>__<LOB>__<segments>__<name> on double underscore; tableName numeric prefix is a cross-check against appId only (legacy 1_* family proves it is not always a SEAL).

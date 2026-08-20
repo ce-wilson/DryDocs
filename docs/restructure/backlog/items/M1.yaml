@@ -1,0 +1,19 @@
+id: M1
+epic: provenance-audit
+title: 'Provenance-edge diet: WAS_GENERATED_BY only on create/change (delta detection)'
+type: task
+module: drydocs-load
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/restructure/06-provenance-source-audit-fields.md
+- drydocs/loaders/
+- drydocs_core/ontology/relationship_vocabulary.yaml
+acceptance: |
+  Loaders detect record change (checksum or version compare, e.g. VERSION_SERIAL) and write WAS_GENERATED_BY -> :JobRun only on create/actual change; full-refresh runs record counts on the :JobRun node instead of blanket membership edges; the prov_was_generated_by vocabulary note is updated via the gate; offline unit tests prove no-change rows write no provenance edge. Full suite green.
+notes: |
+  Doc 06 Phase 2 — the fix for the full-refresh supernode (persona review Issue 3). Done 2026-07-08 (sonnet agent): sha256 row_checksum in to_params (volatile fields excluded: capture_date + batch/bookkeeping params); WAS_GENERATED_BY guarded by FOREACH-over-CASE on checksum change in all 4 node-writing cyphers (dependencies_derived never had the tail); JobRun.rows_changed derived from the actual edge count at _close_run; prov_was_generated_by note updated (note-only); graph-tests/provenance-diet.yaml live suite. 40 new tests.

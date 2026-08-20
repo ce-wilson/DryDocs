@@ -1,0 +1,28 @@
+id: J27
+epic: release-infrastructure
+title: Two .gitignore comments name the real organisation and its internal domain — apply the CLAUDE.md
+  §3 rule, or record the exception once
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- .gitignore
+- PUBLISH-BOUNDARY.md
+- CLAUDE.md
+- tests/unit/test_publish_boundary_values.py
+acceptance: |
+  Neither .gitignore comment names the organisation or its internal domain: both are reworded to describe the CORPUS they explain (which is the useful half anyway), OR — if the user rules that a private producer repo may carry them — PUBLISH-BOUNDARY.md states that exception explicitly, once, naming the lines it covers. What is not acceptable is the current state, which is neither. If the ruling admits a guardable shape, J15's value-shape guard is extended to it.
+notes: |
+  Groomed 2026-08-02 from the 2026-08-01 [chore] line — seen at J24 while rewording the retired-tier labels on those same lines and deliberately left alone there, because half-redacting one line while the next still carries the domain is worse than leaving both. NOT a decision item by default: CLAUDE.md §3 already bans real org names outside internal/, and .gitignore sits at the root of a repo that is sometimes published — so the rule exists and this applies it. The exception branch stays available because the boundary is the user's to set.
+annotations:
+  status: 'closed 2026-08-04 same session (desktop, J-series batch): DEFAULT branch taken — both comment
+    lines reworded to describe the corpus (employer-internal SDLC source docs; the reword says in-line
+    why it names nothing), no exception recorded; the guardable shape WAS guardable, so J15''s guard gained
+    scan D: .gitignore may name NO domain-shaped token (empty allowlist; the test embeds no real value
+    and was proven against the removed line before the reword landed — regex catches the exact string
+    that was there).'

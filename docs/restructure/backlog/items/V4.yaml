@@ -1,0 +1,22 @@
+id: V4
+epic: sme-runbooks
+title: 'SME runbook: drydocs-review — gate pages, graph verify, review labels, publishing flow'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- drydocs/graph_review.py
+- drydocs/graph_verify.py
+- drydocs/review_labels.py
+- drydocs/gate_pages.py
+- drydocs/publishing/
+- docs/design/templates/runbook.outline.yaml
+acceptance: |
+  docs/design/drydocs-review-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-review off RUNBOOK_PENDING. Covers: generating a gate page from a gate prompt, the no-write-until-confirmed contract, graph_verify/review_labels runs and where their output lands, and the Confluence publishing path (mechanism only — base URL as config).
+notes: Groomed 2026-07-29 (Epic V).

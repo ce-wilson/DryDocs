@@ -1,0 +1,26 @@
+id: C30
+epic: ontology-mapping
+title: 'The Control-M greenfield job standard: one scope ladder and one naming rule across FileWatcher,
+  Placement and Trust, publishable as the revised standards page'
+type: task
+module: docs
+phase: 2
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on:
+- C29
+inputs:
+- internal/controlm-config/reference/controlm-job-metadata-standards-capture.md
+- internal/controlm-config/reference/controlm-pipeline-stub-capture.md
+- internal/remediation/governance/command-line-and-variables-standard.md
+- internal/remediation/governance/greenfield-recommendations.md
+- knowledge/standards/technology/description-field-metadata-plan.md
+- knowledge/standards/technology/filewatcher-postexec-token-cat.md
+- external/orchestration/bmc-controlm/controlm-variables.md
+- drydocs_core/orchestration/controlm/variables.py
+acceptance: |
+  A twinned standard -- knowledge/standards/technology/controlm-greenfield-job-standard.md (mechanism, Internal-Public) and its values twin under internal/ -- written AS a standards page so the SME can publish it without rewriting, reconciling three sources that currently disagree: the 22-screenshot corpus (what jobs should carry), the DPL generator (what it emits for Placement and Trust), and one live SMART folder (what is deployed). It must carry: (a) the SCOPE LADDER -- flow-invariants at SMART-folder scope, dataset identity at sub-folder scope, only per-job values on the job -- presented as making explicit the split the generator already performs via the folder AUTOEDIT block it assumes but never emits, with the BMC resolution order as the warrant and the VARIABLE_INC_SEC caveat stated (folder scope resolves for job processing parameters; resolving inside a job SCRIPT needs the server setting); (b) the HYBRID NAMING rule -- file-name components keep the names that map 1:1 to the CM_JOB_FILE_NAME_STANDARD columns so the SQL parse is a straight column copy, while short derived handles carry the composed path into commands, generalizing the idiom REQ-3 already uses; (c) the CANONICAL rule -- one name per concept, UPPER_SNAKE, with the variable name, the STG_APP_FACT fact_type, the SQL column and the ontology property stem being the same token, and the launcher FLAG recorded as a per-framework binding, never as the variable's name; (d) a before/after variable register per job type, every row citing both the live value it replaces and the generator builder that emits it; (e) the description token set per job type under the rule that the description carries only facts with no runtime role and no other home -- which drops the corpus's per-job EMAIL_DL tokens, drops PDN_SNOW_QUEUE, retires the INBOUND/OUTBOUND route pair on watchers because a watcher is inherently inbound, and renames the watcher's ENV to FTS_ID because ENV already means the deployment environment on the command jobs; (f) the pipelineId carrier ruling -- the CMDLINE literal is the carrier, any PIPELINE_ID variable is removed, and the DPL join key is recovered by a single anchored -pipeline extractor declared as an exception to NFR section 10 rather than a reopening of it; (g) contacts recorded as documentation-only for runbook extraction, with the support-tier versus Production-Delay-Notification split preserved as distinct contact kinds, and with the open REQ-2 question -- whether DOMAIL is removed alongside SHOUT -- left for the SME rather than assumed. Publish-boundary check clean: the live screenshots add a service account, a run-as, a SEAL, a FID, an author SID and two GUIDs to the strings that may never leave internal/.
+notes: |
+  Claimed 2026-08-11 (desktop) from SME direction with five live Control-M screenshots attached. THE REFRAME THAT MATTERS, and the reason this is not simply "fix the live folder": reading the generator capture before the live folder reverses most of the critique. The generator emits the canonical spellings (DATAFLOW, IMAGE, PROID, TIMEOUT) and orders DS_ID/DS_VER correctly; the live folder has the drifted ones. Every defect is hand-edit drift away from generator output, and it happens because the generator emits a PARTIAL job that depends on a folder AUTOEDIT block nothing declares -- so people hand-add the missing variables job by job and diverge. Fix the contract, not the instances. SME rulings recorded during design and binding on the write-up: notification is being REMOVED (the ServiceNow incident is the call to action, so nothing may wire a DL to a DOMAIL DEST or bind the unset NOTIFY); PDN is Production DELAY Notification to downstream business users and is not a support tier; no ServiceNow queue belongs in a Control-M variable because the escalation DB owns technician routing; the post-execution cat is TOK/CTL only and never a data file; and the live folder was mid-edit when captured, so some watcher findings are an unfinished conversion rather than deployed breakage and must not be written up as production defects.

@@ -1,0 +1,21 @@
+id: O46
+epic: web-console
+title: 'Intake API + origin-flagged intake store: multipart upload to the data root, digests, classification
+  stamp, draft records'
+type: task
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- UI-WIP/sme-intake-page-plan.md
+- drydocs_api/
+- drydocs_core/mapping_store.py
+- config/classification.yaml
+acceptance: |
+  A drydocs_api multipart endpoint streams .msg/.json/.txt evidence to DRYDOCS_DATA_ROOT/context-intake/<intake_id>/ — never the repo tree; the .msg/.json Copilot pair auto-links by basename; every file gets a sha256 at upload and a re-upload of changed bytes re-queues review rather than silently replacing. Every intake record is stamped classification: Internal at creation (no unlabeled default). Records land in an origin-flagged store (origin: sme-intake, the O24 shape) with the draft → … → admin-accepted status machine from the plan; parse-preview (.msg subject/sent_at/from best-effort, .json keys) is display-only and a parse failure is a warning, not a rejection. THREAD REUSE → INGEST THE DIFF (user direction 2026-08-06): ingest detects thread identity (conversation headers where present, normalized subject, quoted-content overlap against stored evidence) and, on a match, links the new intake to the prior one(s) and computes the DELTA — the new content above the quoted tail — as the review payload; the original file still lands WHOLE (evidence is never edited; a trimmed copy of evidence is no longer evidence). Detection flags, never auto-decides: the SME's add-value ruling is O47's surface. The API returns a legal-transitions map per record so the UI never encodes the status machine a second time. NO graph write anywhere; unit-tested without Neo4j.
+notes: |
+  Slice 2 (plan §3 + §7's store half). The corpus REGISTRY entry is deliberately NOT this item: extend-vs-add against adhoc-sme-email is Q10's first decision, pre-analyzed in Q10's notes. .txt evidence class is an open question in the plan — accept the file, tag kind: note, revisit. STORAGE RULED 2026-08-06 (plan "File storage" section): local data root for dev, company-side backed-up Linux share is the deployment plan of record, object storage a later candidate — so storage stays behind ONE configured base path + the digest identity; records carry the relative key only, no filesystem assumption above the seam (local -> share -> object store must be a config change, never a code change). Demo/test fixtures: SYNTHETIC evidence in tests/fixtures/intake/ referencing only reserved-block ids + sample names — one corpus for tests and demos (the plan's Demo script section). . CLOSED 2026-08-06 (desktop, fd29f3a): drydocs_api/intake.py (store + framework-free handlers) + thin FastAPI shell + context_intake_dir landing zone. Every acceptance clause landed: origin/classification stamps, sha256 + relative-key seam, whole-file rule, pair auto-link, changed-bytes re-queue, display-only preview (warning never rejection), thread-delta detection (headers/subject/overlap, flags never decides, SME decision surfaced via thread-decision), server-owned status machine with per-role legal-transitions map, admin-accepted parked (loaded unreachable), zero graph writes (pinned). 31 guards in tests/unit/test_intake_api.py; the ADR 0009 write-primitive guard in test_mapping_api.py carries the argued evidence-landing exemption (write_bytes in intake.py only). Synthetic fixtures inline in the test (reserved-block SEAL 70002 + sample job names); a shared tests/fixtures/intake/ corpus lands with the O47/O50 demo work. Full suite 1674 passed; TestClient multipart smoke green.

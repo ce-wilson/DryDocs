@@ -1,0 +1,25 @@
+id: J18
+epic: release-infrastructure
+title: Live-verification claims name their machine/container/database — convention written down, recent
+  close notes retro-tagged, sample-reproducible evidence preferred
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- CLAUDE.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  The live-verification convention is written down where claims are made (backlog header comment + a CLAUDE.md working-agreements line): a VERIFIED LIVE claim names the machine/container/database it ran on, and sample-reproducible evidence ("ingest-controlm reproduces X") is preferred over machine-pinned claims; the P3/P5/G33 close notes are retro-tagged as the worked examples.
+notes: |
+  Groomed 2026-07-28 pm from the two-graphs [idea] line — an audit read the laptop's graph and nearly recorded G33 (desktop-built) as a defect.
+annotations:
+  status: 'closed 2026-08-04 same session (desktop, J-series batch): convention written as backlog-header
+    pull-rule step 5 + a CLAUDE.md §6 working agreement (venue = machine/container/database; sample-reproducible
+    evidence preferred over machine-pinned); P3 and G33 close notes retro-tagged (desktop, neo4jtest,
+    drydocs DB) — G33''s tag names it as the claim the laptop audit nearly filed as a defect; P5 needed
+    no edit, it was tagged at close and is cited as the worked example.'

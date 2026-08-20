@@ -1,0 +1,41 @@
+id: S6
+epic: structure-remediation
+title: JSON Schema for each config family, so a malformed entry fails in the editor rather than in pytest
+  (F14)
+type: task
+module: config
+phase: 6
+agent: pipeline-config
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- S1
+inputs:
+- config/source-registry.yaml
+- config/precedence.yaml
+- config/classification.yaml
+- config/source-mappings/
+- config/taxonomy-ontology-map.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+acceptance: |
+  Each config family has a JSON Schema under config/schemas/; the existing Python guards VALIDATE AGAINST IT rather than re-implementing shape checks in assertions; a deliberately malformed fixture fails with a path-precise message naming the offending key. A test proves the schemas are usable without importing drydocs_core, so the console's admin surface and the agent tier can validate without a Python dependency on the package.
+notes: |
+  Complements rather than replaces the test guards: the tests own semantics (classification present, vocab id resolves, precedence order valid), the schema owns shape. Easier after S5 splits the monoliths, but not dependent on it.
+annotations:
+  status: 'closed 2026-08-07 (desktop, same session as the claim). BUILT: config/schemas/ with six draft-2020-12
+    schemas — source-registry (v2 two-level shape, urn-refusal expressed as `not: required: [urn]` mirroring
+    from_yaml), precedence, classification, source-mapping (the doc-08 disposition enum projected|filter-only|excluded|deferred;
+    default_disposition is an OBJECT), taxonomy-ontology-map and relationship-vocabulary (both FRAGMENT-AWARE:
+    a fragment is a keyed mapping, a BARE LIST of entries — the 20-50 map files and 41-48 vocab domain
+    files — or the comment-only header, i.e. null). Guard: tests/unit/test_config_schemas.py (16 tests)
+    — every live family file validates; six deliberately-malformed fixtures fail PATH-PRECISE (json_path
+    names the offending key, e.g. $.objects[0].columns[0].disposition); a subprocess test proves validation
+    with ONLY yaml+jsonschema, cwd outside the repo, drydocs_core never in sys.modules; the module polices
+    itself core-free. Split of labor per the notes: schemas own SHAPE, tests keep SEMANTICS — test_classification''s
+    publishable-bool loop swapped for a pointer at the schema (the three-level id pin STAYS, it is policy
+    not shape). jsonschema added as a dev-group dependency. Registered as enforcement-matrix surface `config-schemas`
+    (the matrix''s own completeness check caught the missing row — the guard working as designed); matrix
+    regenerated. Field realities the schemas encode from the census, not guesses: `updated` arrives as
+    a YAML date object; vocab role/inverse/prov_maps_to are nullable; vocab_id may be a LIST (one map
+    entry activating several registry rows). Suite 1714/3/5 (the 3 = standing Idea-83); ruff clean.'

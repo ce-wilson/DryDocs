@@ -1,0 +1,21 @@
+id: G26
+epic: component-topology
+title: 'Launcher registry becomes a config file: move LAUNCHER_REGISTRY out of commands.py into a schema-guarded
+  config so teams add wrappers without a code release'
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/controlm/commands.py
+- config/taxonomy/software-registry.yaml
+- scripts/render_enforcement_matrix.py
+- tests/unit/test_command_parser.py
+acceptance: |
+  LAUNCHER_REGISTRY rules live in a config file (the config/ pattern, e.g. config/launcher-registry.yaml) with a schema-guard unit test; commands.py LOADS the registry instead of defining it, with no behavior change (the existing parser/classifier suite stays green untouched); every classifier_rule id referenced by software-registry.yaml invocation_patterns rows still resolves (a test asserts the id set — those rows pin rule ids for gate review and must not silently break); the O12 enforcement matrix flips the launcher-registry surface from the code-resident unguarded-config example to a guarded config surface (matrix regenerated, drift test green). End state: adding a wrapper rule is a config edit plus a test run, no Python change.
+notes: |
+  Groomed 2026-07-21 pm from the 2026-07-16 SME requirement line (captured at the cmdline-lineage-review mini-gate); its admin-screen end state landed as O12 (done, cd76c91), which renders this registry as the visible unguarded-config example — this item is the migration that retires that example. Epic G / phase 6 per the G15/G16 precedent (the same drydocs_core/controlm engine). CLOSED 2026-07-27: config/launcher-registry.yaml (schema drydocs.launcher-registry.v1; ordered rules, ignore_case flag, named_launcher marks the G16 value-contract subset) + commands.py load_launcher_registry() (loud ValueError on schema mismatch/empty — a silently-empty registry would classify everything UNKNOWN); tests/unit/test_launcher_registry.py guards shape, id uniqueness, module/file parity, and the invocation_patterns rule-id set; matrix surface flipped to guarded (test updated to assert the inverse it used to pin). BONUS CATCH on first run: the proposed abinitio-dtlaunch-wrapper pattern row referenced the extinct abinitio.dtlaunch_accelerator rule AND contradicted the 2026-07-16 DPL-is-not-AbInitio ruling — row removed with an audit comment (DPL joins the gate spec candidates-without-a-product open question). Parser suite green untouched (no behavior change); suite 960.
