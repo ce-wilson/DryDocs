@@ -25,6 +25,23 @@ interface Turn {
   running: boolean
 }
 
+const LAST_TURN_PREFIX = 'drydocs.ask.last-turn.v1.'
+
+function lastTurnKey(personaId: string): string {
+  return `${LAST_TURN_PREFIX}${personaId}`
+}
+
+function loadLastTurn(personaId: string): Turn[] {
+  try {
+    const raw = localStorage.getItem(lastTurnKey(personaId))
+    if (!raw) return []
+    const turn = JSON.parse(raw) as Turn
+    return turn && typeof turn.question === 'string' && turn.envelope ? [{ ...turn, running: false }] : []
+  } catch {
+    return []
+  }
+}
+
 const STEP_LABEL: Record<string, string> = {
   router: 'Routing onto a registered QuerySpec',
   spec: 'Running registered QuerySpec',
@@ -63,7 +80,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
   )
 
   const [question, setQuestion] = useState('')
-  const [turns, setTurns] = useState<Turn[]>([])
+  const [turns, setTurns] = useState<Turn[]>(() => loadLastTurn(persona.id))
   const nextId = useRef(1)
   const running = turns.some((t) => t.running)
 
@@ -100,6 +117,17 @@ export default function AskRoute({ persona }: { persona: Persona }) {
         patch((t) => ({ ...t, error: envelope.error ?? 'agent error', running: false }))
       } else {
         // the final envelope's steps are authoritative (streamed ones were live previews)
+        const completed: Turn = {
+          id,
+          question: q,
+          envelope,
+          steps: envelope.steps ?? [],
+          error: null,
+          running: false,
+        }
+        try {
+          localStorage.setItem(lastTurnKey(persona.id), JSON.stringify(completed))
+        } catch {}
         patch((t) => ({ ...t, envelope, steps: envelope.steps ?? t.steps, running: false }))
       }
     } catch (e) {

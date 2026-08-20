@@ -10,9 +10,14 @@ should show a flat baseline under repeated tool calls).
 import os
 
 import neo4j
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+_AGENTS_ENV = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env"))
+_ROOT_ENV = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+load_dotenv(_AGENTS_ENV)
+for _name, _value in dotenv_values(_ROOT_ENV).items():
+    if _value and not os.getenv(_name):
+        os.environ[_name] = _value
 
 _driver: neo4j.Driver | None = None
 

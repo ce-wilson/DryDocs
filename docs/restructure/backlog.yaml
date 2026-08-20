@@ -619,8 +619,6 @@ items:
       live (the 2026-07-10 live check verified the SETVAR view's name/columns, not the
       value domain). Closes staging-ingestion-flow open point 0.3.
       Done 2026-07-15: flipped 11 SQL files (extracts + DDL views + adhoc probes incl.
-      profile_cm_avg_run), controlm_jobs.cypher .active derivation, constraints.cypher
-      comment, models description, source-mappings ledger (gate §Q2 probe closed),
       controlm-db + reconcile-port skill refs, TDD/staging-flow/C3/git-readme docs;
       fixtures flipped '1'/'0'→'Y'/'N' (36 rows, 4 CSVs); lineage extractor accepts
       ('Y','1') for legacy synthetic CSVs; SETVAR preflight comment added; superseded
@@ -21241,6 +21239,83 @@ items:
       and adjacency is not a reason to merge them.
       p3 per the capture. Module drydocs-api because the answer envelope lives there; the
       in-repo viewer half is a merge onto U22 rather than a second module on this row.
+
+  - id: R18
+    epic: agentic-qa
+    title: "Ask debug trace: opt-in verbose decision log correlated to run_id and session_id"
+    type: requirement
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [R3, R5]
+    inputs:
+      - agents/graph_qa/
+      - agents/common/llm_ledger.py
+      - agents/common/agent_run_writer.py
+      - web/src/ask/
+      - docs/decisions/0007-agentic-qa-architecture.md
+    acceptance: >
+      (a) An explicit opt-in `--debug` / `--verbose` runtime option (or the equivalent
+      documented service setting for the ADK server) enables an append-only diagnostic trace
+      for one Ask run, correlated on every record by the existing `run_id` and `session_id`.
+      (b) The trace captures the observable decision path: normalized question, router outcome
+      and candidate/spec rationale, schema/vocabulary inputs selected for text2cypher, generated
+      Cypher, validation/fix attempts and errors, executed row counts, answer inputs, and final
+      envelope status/timing. It must not capture hidden chain-of-thought or provider secrets.
+      (c) Default behavior remains the current minimal telemetry contract; debug is off unless
+      explicitly enabled, and sensitive question/answer content follows the existing local-log
+      classification and retention rules.
+      (d) An admin can retrieve or download the trace by run_id/session_id and distinguish one
+      question from concurrent sessions; the Ask UI links the visible run id to the trace when
+      debug is enabled. Unit tests cover correlation, disabled-by-default behavior, redaction,
+      and a full router -> query -> answer trace.
+    notes: >
+      Follow-on to R3, which is DONE and already writes per-call JSONL plus the :AgentRun
+      summary, and R5, which exposes the safe per-step Cypher in the Ask UI. This item fills the
+      current gap between those surfaces and the richer diagnostic evidence needed to explain
+      routing and generated-query decisions. "Thinking" means an auditable decision trace, not
+      unrestricted model chain-of-thought.
+
+  - id: R19
+    epic: agentic-qa
+    title: "Ask clarification loop for unresolved acronyms and graph-label intent"
+    type: requirement
+    module: drydocs-agents
+    phase: 15
+    agent: main
+    model: sonnet
+    priority: p1
+    status: todo
+    depends_on: [R2, R5]
+    inputs:
+      - agents/graph_qa/
+      - agents/graph_qa/schema_context.py
+      - drydocs_api/query_specs.py
+      - config/taxonomy/software-registry.yaml
+      - web/src/ask/
+    acceptance: >
+      (a) When the initial question contains an acronym, label, or domain term that does not
+      resolve to a registered QuerySpec, active vocabulary row, live label/property, or approved
+      acronym sense, the agent does not silently choose a near match; it returns a structured
+      clarification request with the unresolved term, the detected candidate senses/labels, and
+      one or more concise choices.
+      (b) The Ask UI renders the clarification as an actionable question, preserves the pending
+      question/session, and submits the user's selection or free-text clarification as the next
+      turn. A confirmed clarification is visible in the trace and is used for the subsequent
+      router/text2cypher decision.
+      (c) If the user declines or no clarification is possible, the answer states the ambiguity
+      and does not present a zero-row near-match as a definitive answer. Existing clear questions
+      remain single-pass and unchanged.
+      (d) Tests cover unknown acronym, ambiguous label with multiple candidates, user selection,
+      cancellation, session persistence, and the no-clarification regression path.
+    notes: >
+      Requested as a companion to R18 after the Tower/TOMRole mismatch: the Explorer's
+      synthesized Tower concept was silently mapped to the real TOMRole label. This is a
+      disambiguation contract, not permission for the agent to invent ontology or relationship
+      meanings; unresolved meaning still routes to the SME/HITL path.
 
   - id: N16
     epic: source-column-mappings
