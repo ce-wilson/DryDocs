@@ -2237,7 +2237,9 @@ match; the terminating write is the chore(port) commit that adds this footnote);
 `9dda538e` `be0c39ae` `7c6eb730` `991d59e6` (the RELAY-10/RELAY-11 writes and
 riders — self-documenting, their payload IS the relay text in the STANDING
 RELAYS section); `47b08085` `2cad34fb` (the PR #6 merge and the id-space
-branch's merge-from-main; content at steps 169 and 160 respectively).
+branch's merge-from-main; content at steps 169 and 160 respectively);
+`74491c32` `4b7b0f9a` `c264fc33` (the PR #3/#4/#5 merges — content at
+step 169's README/venv note, S12 drift guard, and G101 respectively).
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
