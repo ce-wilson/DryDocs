@@ -1,0 +1,34 @@
+id: N8
+epic: source-column-mappings
+title: 'Resolve the 4 taxonomy-ontology-map entries citing unregistered source ids (N4 render day-one
+  finding): register, re-point, or exempt — ruled per entry'
+type: chore
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- config/taxonomy-ontology-map.yaml
+- config/source-registry.yaml
+- scripts/render_load_map.py
+- web/src/generated/load-map.json
+acceptance: |
+  After the fix, the regenerated load-map.json's map_entries_without_registry_source is empty, or contains ONLY entries carrying an explicit recorded exemption the render displays (the SOURCELESS_LOADERS written-reason idiom). Each of the four is ruled per entry, never swept: job-seal-app-ref -> controlm-variable-normalization, seal-doc-source-of-record -> seal-pat-scrape, doc-traceability-feedback -> design-doc-outline (each: register the feed — lightweight registry stub or add-source-object walkthrough — OR re-point taxonomy.source at the registered feed it actually rides); dl-contact-point -> outlook-dl (expected outcome: explicit exemption — no feed by design per the DL gate's store-as-source discussion). Full suite green; board/load-map re-rendered clean.
+notes: |
+  Groomed 2026-07-30 from the 2026-07-29 [chore] inbox line. COORDINATE with N7: anything registered here is current-shape (v1) and gets re-mapped by the redesign; J21's pk/binding guards cover the interim, so closing the render defect now is safe. Independent of N7 by design — the defect is live on the committed load-map surface today.
+progress: 'DONE 2026-08-06 (desktop): all four ruled per entry, exactly the acceptance''s prescriptions.
+  job-seal-app-ref RE-POINTED to controlm@[db].drydocs_stg.stg_app_fact (its own source_evidence already
+  named STG_APP_FACT as the ridden feed; the normalization stream is that dataset''s producer, not a source
+  id). doc-traceability-feedback RE-POINTED to repo:design-docs (whose registry entry names this very
+  mapping as its gate_spec). seal-doc-source-of-record: seal-pat-scrape REGISTERED as a lightweight doc-source-registry
+  stub (Internal / web / T2 sme-confirm / dddocs / confirmed: false - the docmeta component gate stays
+  the activation gate; the stub only closes the forward-reference). dl-contact-point: source_exemption
+  RECORDED on the map entry (no feed by design - Outlook-only definition, store-as-source posture) and
+  the render now DISPLAYS exemptions: map_entries_without_registry_source rows carry the reason, the html
+  splits ruled-exempt from drift, and the warn box only shows unruled rows. Regenerated load-map: the
+  defect list holds ONLY the exempt dl-contact-point row; the three re-pointed mappings now ride their
+  sources'' ontology_mappings (35 sources, +1 = the stub). Suite 1636 passed / 5 skipped; board/load-map
+  re-rendered clean.'

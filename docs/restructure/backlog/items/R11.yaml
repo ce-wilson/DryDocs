@@ -1,0 +1,21 @@
+id: R11
+epic: agentic-qa
+title: 'Ask spoke LLM-in-the-loop smoke on the agents-venv machine: two live questions through the real
+  graph_qa streaming path'
+type: chore
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- agents/
+- web/src/ask/
+- web/src/routes/AskRoute.tsx
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  On the machine where agents/.env exists (the R2 live-smoke precedent), with real drydocs-api + Neo4j + the real ADK service: two free-text questions asked through the /ask route as a non-admin persona. Verified live: step events STREAM during the run (arrive before the answer envelope, not buffered), the answer renders citations with trust tier + classification, at least one step's explore_ref opens in Explorer via the ephemeral spec, and the metrics chip populates (time, tokens, iterations). Close note names machine, container, and database (the J18 convention).
+notes: |
+  Groomed 2026-07-30 from the R5 close's own follow-up (inboxed at the R5 commit): desktop e2e was wire-level via stub ADK because that machine has no agents venv — the LLM-in-the-loop half of the path is the one thing R5 could not verify.

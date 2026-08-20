@@ -1,0 +1,31 @@
+id: G31
+epic: component-topology
+title: Extend the proxy-node spine beyond DataAsset + ControlMJob before any corpus moves database
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- G32
+inputs:
+- drydocs_core/schema/provisioning/02_proxy_constraints.cypher
+- drydocs_core/schema/provisioning/README.md
+- drydocs_core/schema/constraints.cypher
+- docs/decisions/0002-component-database-topology.md
+- tests/unit/test_database_names.py
+acceptance: |
+  02_proxy_constraints.cypher declares a constrained business key for every class that must be joinable ACROSS the database boundaries G32 rules — at minimum SoftwareProduct.product_id, Vendor.vendor_id, Document.doc_id and ControlMFolder.folder_id alongside the existing DataAsset.assetId and ControlMJob(folder_id, job_id) — its header names every database it must be run against (it currently names only drydocs and ddcontext, omitting ddlineage), and provision.ps1 runs it against each. A test asserts the proxy set covers every class that appears on BOTH sides of a cross-database relationship in the shipped loaders, so adding such a relationship without a proxy key fails.
+notes: |
+  MEASURED 2026-07-26: 02_proxy_constraints.cypher — the file whose entire job is making cross-database joins possible — declares exactly TWO keys (DataAsset.assetId, ControlMJob NODE KEY) and its header names only drydocs and ddcontext. No SoftwareProduct, no Vendor, no Document, no ControlMFolder, no Employee. ADR 0006's existing plan to re-target the bmc-docs corpus to dddocs already depends on a SoftwareProduct proxy that nobody wrote down; see Q8 for what that omission does at runtime (silently drops every DESCRIBES edge). BUILD ORDER IS THE POINT: spine first, corpora second. The reverse order is how you get a green load that wrote nothing — the pattern this session hit three times. Q9/Q10/Q11 all depend on this item for exactly that reason.
+annotations:
+  status: '2026-08-18 (laptop): RE-SCOPED AND DELIVERED — the acceptance''s cross-database premise died
+    at the G32 fold; the surviving substance (the D1 business-key spine) shipped in full. Four of the
+    six named keys ALREADY existed (the 07-26 measurement went stale between then and now); dataasset_id
+    moved HOME to constraints.cypher (52->53); 02_proxy_constraints.cypher tombstoned (its charter, not
+    its keys, retired); provision.ps1''s ddcontext/ddall invocations + the federated smoke removed (G102
+    had missed the provisioner); the acceptance''s guard reshaped for one database as test_business_key_spine.py
+    — every loader MATCH-only join target must carry a constrained key, first run classified ONE exemption
+    (patch_window''s node_id FILTER) and confirmed all six spine keys home'

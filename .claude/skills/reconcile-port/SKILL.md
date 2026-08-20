@@ -178,7 +178,9 @@ instead of eyeballing:
 ```
 # 1. BEFORE applying the port — snapshot the consumer copies
 mkdir "$env:TEMP/reconcile-before"
-cp docs/restructure/backlog.yaml, config/gate-log.md "$env:TEMP/reconcile-before/"
+cp config/gate-log.md "$env:TEMP/reconcile-before/"
+# ADR 0013: the backlog is a sharded TREE — snapshot the ASSEMBLED document under the old name:
+poetry run python -c "from pathlib import Path; import os; from drydocs_core.backlog_store import dump_document; (Path(os.environ['TEMP'])/'reconcile-before'/'backlog.yaml').write_text(dump_document(), encoding='utf-8')"
 # S5: the two registries are fragment DIRECTORIES — snapshot the MERGED documents:
 poetry run python -c "from pathlib import Path; import os; from drydocs_core import yaml_fragments as yf; d = Path(os.environ['TEMP'])/'reconcile-before'; (d/'relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); (d/'taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
 

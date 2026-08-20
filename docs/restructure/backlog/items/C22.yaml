@@ -1,0 +1,41 @@
+id: C22
+epic: ontology-mapping
+title: 'Catalog loader sweep: the silent parent joins and the unconditional name SET that C17 fixed in
+  products.cypher and nowhere else'
+type: bug
+module: drydocs-load
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- C17
+inputs:
+- drydocs/loaders/cypher/product_lines.cypher
+- drydocs/loaders/cypher/area_products.cypher
+- drydocs/loaders/cypher/products.cypher
+- drydocs/loaders/catalog.py
+- drydocs/loaders/base.py
+- knowledge/standards/node-status-envelope.md
+- tests/unit/test_catalog_keying.py
+- tests/unit/test_node_status_envelope.py
+acceptance: |
+  (a) product_lines.cypher (parent :CatalogLOB) and area_products.cypher (parent :Product) take the products.cypher shape — OPTIONAL MATCH, an orphan flag written on EVERY run rather than only ON CREATE, and the unresolved parent id KEPT on the node. The defect: a hard MATCH placed AFTER the node MERGE leaves an unparented node still carrying `orphan: false` from ON CREATE, a flag no code path could ever set true. (b) All THREE catalog loaders stop blanking values on a sparse refresh — `SET x.name = row.name` becomes `coalesce(row.name, x.name)`, and the same treatment covers any other enrichment property a partial extract may omit. (c) The question C17 did not answer is answered and recorded: whether the unresolved-parent count is emitted as a `drydocs.loader/unresolved-parent` item in the O28 status envelope (a namespaced type, no new fields — inside the ruled contract, so no gate) or stays a node property only. Loader tests cover a row whose parent is absent and a row whose name is null.
+notes: |
+  Groomed 2026-08-02 consolidating TWO inbox lines that land on the same files — one pass, one review (the L19 precedent): the 2026-08-01 [bug] parent-join sweep and the [source] company-comparison finding. C17 deliberately did not sweep ("changing four loaders' write behaviour on one item's authority is a drive-by") and inboxed it instead. VERIFIED AT THE GROOM rather than transcribed: the hard MATCH is live at product_lines.cypher:27 and area_products.cypher:22, and the unconditional name SET at products.cypher:28, product_lines.cypher:22 AND area_products.cypher:17 — so (b) covers three files, not the two the inbox line named. product_lines.cypher even carries a comment saying it is "the same silent-miss shape products.cypher just" fixed. The coalesce idiom is borrowed from the company comparison; no code is.
+annotations:
+  status: 'closed 2026-08-04 same session (desktop): (a) both parent joins take the products.cypher orphan
+    shape — OPTIONAL MATCH, flag written EVERY run, unresolved id kept (pl.orphan_parent_lob_id / ap.orphan_parent_product_id);
+    (b) coalesce(row.name, x.name) in all three files, AND the row models had to move with it — a required
+    `name` would make a sparse refresh WORSE than blanking (whole-row reject, last-seen never advances),
+    so ProductLineRow/ProductRow/AreaProductRow name went optional with ''''-to-None normalization, ids
+    stay required so optionality cannot leak into keying; (c) RULED EMIT — unresolved-parent counts ride
+    the O28 envelope as `drydocs.loader/unresolved-parent` (warning, run-scoped via last_run_id, derived
+    from the graph at close like rows_changed; the per-node flag stays the durable record), BaseLoader
+    gains orphan_label + _count_unresolved_parents, envelope standard doc updated — the ruling recorded
+    there and in status_items_for; namespaced type, no new envelope fields, no gate per the item''s own
+    analysis. Tests: parametrized orphan-shape + coalesce pins over all three files + null-name model
+    + envelope item (+7 net, suite 1420/5). FOUND OUT OF SCOPE and inboxed (C17 precedent): dev_teams.cypher
+    + catalog_lobs.cypher carry the same unconditional enrichment SETs, catalog_lobs blanking TODAY since
+    its model already allows None.'

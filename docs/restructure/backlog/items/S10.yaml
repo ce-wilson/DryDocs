@@ -1,0 +1,27 @@
+id: S10
+epic: structure-remediation
+title: The four :BusinessApplication MERGE loaders refuse to run against a pre-cutover graph, instead
+  of minting the silent twin S3 argued about but never guarded
+type: bug
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/seal_applications.py
+- drydocs/loaders/manual_loads.py
+- drydocs/loaders/catalog.py
+- drydocs/loaders/software_registry.py
+- drydocs/loaders/base.py
+- graph-tests/business-application-identity.yaml
+- docs/port-prompt.md
+acceptance: |
+  Every loader that MERGEs `:BusinessApplication {app_id}` — seal_applications.v1, manual_seal_attribution.v1, pat_product_mapping.v1, software_registry.v1 — refuses up front when the target database holds any `:BusinessApplication` with a null `app_id`, i.e. a node a pre-S3 loader created. The refusal follows the established idiom (`batch_port_orchestrator._assert_endpoint_registries_present`): it runs BEFORE `super()._load`, so a refused run writes nothing at all — not even the :JobRun — and the message names the remediation (backfill `app_id = seal_id` on the pre-cutover nodes, or rebuild, and count first) rather than only the symptom. The count excludes `:SchemaMeta` exemplars, which carry the real label with no key and would otherwise red every load (the `_count_real_nodes` precedent). Unit tests cover both directions per loader against a fake client — refuses on a dirty graph, proceeds on a clean one — plus one test asserting the refusal happens before any write. Full suite green.
+notes: |
+  WHY THIS IS A BUG AND NOT AN ENHANCEMENT: it fired. The company ran `drydocs load seal_applications` against a graph that took the S3 CODE but never the S3 re-key and got `Neo.ClientError.Schema.ConstraintValidationFailed` mid-load — after partial commits, because batches commit per flush. S3's own §C2 states the mechanism exactly ("a uniqueness constraint IGNORES NULLS, so a loader still MERGEing on seal_id would silently create a SECOND node rather than fail") and seal_applications.cypher:23 repeats it in a comment, but nothing enforces it at load time. WHAT ALREADY EXISTS AND WHY IT IS NOT ENOUGH: graph-tests/business-application-identity TC-01 detects exactly this condition — but it is a POST-HOC verification run, so it reports the damage after the loader has done it. A detector that only runs when someone remembers to run graph-verify is not the guard the null-tolerance argument implies. SCOPED OUT: the four MATCH-only sites (batch_port_orchestrator, seal_attribution, seal_contacts, folder_attribution) do not mint twins — a MATCH miss writes nothing. They have the opposite failure (silent no-op), which their own registry-presence refusals already cover. Also out of scope: retiring the seal_id alias (§G3, a separate later gate) and any migration/backfill verb — this item REFUSES, it does not repair. Worth fixing in passing if trivial: `batch_port_orchestrator._assert_endpoint_registries_present` still counts on the pre-S3 key (`_count_real_nodes("BusinessApplication", "seal_id")`), which works only while the alias is dual-written. COMPANY-SIDE READ: this is producer payload that lands with the next port; it does not substitute for the T23 migration, which is live-state repair on their graph. BUILT 2026-08-05 (desktop). `drydocs/loaders/app_identity.py` carries `PreCutoverApplicationGuard`, mixed in BEFORE BaseLoader on all four MERGE-site loaders so its `_load` reaches the MRO first — the refusal lands ahead of `_preflight_indexes` as well as `_open_run`, which a test pins: a graph this broken should not be reported as an index problem. 15 tests in `tests/unit/test_app_identity_guard.py`, three of them parametrized across all four loaders (refuses dirty / proceeds clean / writes nothing), plus a message test (count + backfill + rebuild + the TC-03 pointer) and a COVERAGE test that re-derives the MERGE-site list from the .cypher files rather than trusting the enumeration — a fifth MERGE site added without the guard reds that test instead of passing by omission. Suite 1575 passed / 5 skipped. FIXED IN PASSING, as the item's own note anticipated: `batch_port_orchestrator`'s endpoint probe counted on the deprecated `seal_id`. It works today only because the alias is dual-written; it would have started reporting an empty registry against a good graph the day §G3 retires it. Now counts on `app_id`.
+annotations:
+  status: DONE 2026-08-05 (desktop) — drydocs/loaders/app_identity.py + 4 loaders + 15 tests; the batch_port
+    stale-key nit fixed in passing

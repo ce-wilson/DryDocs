@@ -1,6 +1,6 @@
 """Backlog project-board renderer (``drydocs-plan`` component).
 
-Renders ``docs/restructure/backlog.yaml`` (schema ``drydocs.backlog.v2`` — the
+Renders ``docs/restructure/backlog/`` (schema ``drydocs.backlog.v3``, sharded per ADR 0013 — the
 machine-readable SOURCE OF TRUTH for work items, CLAUDE.md §0) into a **self-contained
 interactive HTML project board**: a roadmap strip (one card per ``plan.phase``, with a
 computed done/total progress bar) above a kanban board (todo / in_progress / blocked /
@@ -9,17 +9,19 @@ quick-capture box that formats a paste-ready ``docs/restructure/IDEAS.md`` line 
 clipboard. This is the human view that **replaces ``02-backlog.md``** once it lands
 (see backlog item I2).
 
-Pure/offline — no Neo4j, no graph write, no network calls. **The repo (``backlog.yaml``)
+Pure/offline — no Neo4j, no graph write, no network calls. **The repo (``backlog/``)
 is the system of record; the browser is a working aid** — filters and quick-capture text
 live in ``localStorage`` for convenience only, and quick-capture never writes to the repo
 directly; it copies a line for a human to paste into ``IDEAS.md``. classification:
 Internal-Public — the renderer is generic and the backlog itself carries no secrets
-(SIDs/schemas/credentials live in ``internal/``, never in ``backlog.yaml``).
+(SIDs/schemas/credentials live in ``internal/``, never in the backlog).
 
-Rendering is **deterministic**: given the same ``backlog.yaml``, ``render_board`` always
+Rendering is **deterministic**: given the same backlog tree, ``render_board`` always
 produces byte-identical HTML — no build timestamps, no randomness. The board is committed
 to git, so its diffs must reflect real backlog changes, not render noise. The backlog's
-own ``updated:`` date is shown in the header instead of a build time.
+item count is shown in the header instead of a build time (ADR 0013 dropped the hand-set
+``updated:`` date — git holds it). Roll-ups (counts, ``next_ready``) are DERIVED here and
+rendered; nothing stores them.
 """
 
 from __future__ import annotations
@@ -29,15 +31,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import yaml
-
+from drydocs_core.backlog_store import DEFAULT_BACKLOG_DIR, derive_summary, load_backlog_document
 from drydocs_core.repo_paths import repo_root
 
 # Resolve the checkout the CALLER is in, not the one this file was installed from —
 # the editable install pins ``__file__`` to the main tree, so a worktree run would
 # otherwise read main's backlog and write main's board (Idea-109).
 _REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
-DEFAULT_BACKLOG_PATH = _REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
+DEFAULT_BACKLOG_PATH = DEFAULT_BACKLOG_DIR  # the sharded tree (ADR 0013); a single file still loads
 DEFAULT_BOARD_PATH = _REPO_ROOT / "docs" / "plan" / "board.html"
 
 STATUS_COLUMNS: tuple[str, ...] = ("todo", "in_progress", "blocked", "done")
@@ -89,11 +90,14 @@ class Backlog:
 
 
 def load_backlog(path: str | Path = DEFAULT_BACKLOG_PATH) -> Backlog:
-    """Parse ``backlog.yaml``. Pure — no graph access, no network."""
+    """Load the backlog tree (or one monolith-shaped file). Pure — no graph, no network."""
     path = Path(path)
     if not path.exists():
-        raise BoardError(f"backlog file not found: {path}")
-    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        raise BoardError(f"backlog source not found: {path}")
+    try:
+        doc = load_backlog_document(path) or {}
+    except Exception as exc:  # BacklogStoreError / YAML errors — one failure type for callers
+        raise BoardError(str(exc)) from exc
     return backlog_from_dict(doc)
 
 
@@ -104,9 +108,9 @@ def backlog_from_dict(doc: dict[str, Any]) -> Backlog:
             f"unexpected backlog schema {schema!r} — expected it to start with "
             "'drydocs.backlog.'"
         )
-    updated = str(doc.get("updated", ""))
-    if not updated:
-        raise BoardError("backlog is missing an `updated:` date")
+    # ADR 0013: the hand-set `updated:` date is gone from storage; an old single-file
+    # document may still carry one and it is shown if present.
+    updated = str(doc.get("updated", "") or "")
 
     raw_phases = doc.get("plan", {}).get("phases") or []
     if not isinstance(raw_phases, list) or not raw_phases:
@@ -311,6 +315,8 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .column-head{display:flex;justify-content:space-between;align-items:center;padding:.5rem .7rem;
   border-bottom:1px solid #e2e2e2}
 .count{background:#e5e7eb;border-radius:10px;padding:0 .5rem;font-size:.78rem}
+.ready-strip{margin:.6rem 0;padding:.5rem .8rem;border:1px dashed #a7f3d0;border-radius:8px;background:#f0fdf4;font-size:.85rem;line-height:1.9}
+.ready-id{text-decoration:none;margin-right:.15rem}
 .column-body{padding:.5rem;display:flex;flex-direction:column;gap:.5rem}
 .card{border:1px solid #e2e2e2;border-radius:6px;padding:.5rem .6rem;background:#fff;cursor:pointer;
   font-size:.85rem}
@@ -347,6 +353,10 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 """.strip()
 
 
+def _item_dict(it: WorkItem) -> dict[str, Any]:
+    return {"id": it.id, "status": it.status, "depends_on": list(it.depends_on)}
+
+
 def render_board(backlog: Backlog) -> str:
     """Render a self-contained interactive project board. Pure — deterministic output."""
     ready_ids = _ready_ids(backlog.items)
@@ -364,6 +374,17 @@ def render_board(backlog: Backlog) -> str:
     tag_opts = "\n".join(f'<option value="{_esc(t)}">{_esc(t)}</option>' for t in CAPTURE_TAGS)
 
     total_items = len(backlog.items)
+    # ADR 0013 Clause 3: the roll-ups are renderer OUTPUT. Counts from the same items the
+    # columns show; `next_ready` from the same rule the ready-badge uses, listed once so a
+    # session picking work reads it here instead of from a stored block nothing keeps honest.
+    summary = derive_summary({"items": [_item_dict(it) for it in backlog.items]})
+    ready_strip = (
+        " ".join(
+            f'<a class="ready-id" href="#{_esc(i)}"><code>{_esc(i)}</code></a>'
+            for i in summary["next_ready"]
+        )
+        or "<em>nothing is dependency-ready</em>"
+    )
 
     js = r"""
 const FILTER_KEY = "drydocs.board.filters";
@@ -510,8 +531,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "<title>DryDocs — project board</title>\n"
         f"<style>{_CSS}</style>\n</head><body>\n"
         "<h1>DryDocs — project board</h1>\n"
-        f'<p class="subtitle">Rendered from <code>docs/restructure/backlog.yaml</code> '
-        f"(updated {_esc(backlog.updated)}) &middot; {total_items} items. "
+        f'<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> '
+        f"{('(updated ' + _esc(backlog.updated) + ') &middot; ') if backlog.updated else ''}"
+        f"{total_items} items &middot; {summary['todo']} todo / {summary['in_progress']} in progress / "
+        f"{summary['blocked']} blocked / {summary['done']} done. "
         "The repo is the system of record; this page is a working aid.</p>\n"
         # Self-locating URL: filled client-side so the committed HTML stays
         # byte-identical across machines (producer C:\ vs company I:\) and the
@@ -527,6 +550,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "Module roadmap &rarr;</a> "
         '<a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>\n'
         f'<div class="roadmap">\n{roadmap}\n</div>\n'
+        f'<div class="ready-strip"><strong>Ready to pull</strong> ({len(summary["next_ready"])}; '
+        "<code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): "
+        f"{ready_strip}</div>\n"
         '<div class="filters">\n'
         '  <label>Module<select id="f-module"><option value="">All</option>\n'
         f"{module_opts}\n</select></label>\n"

@@ -1,0 +1,22 @@
+id: G43
+epic: component-topology
+title: 'Data-catalog cross-check reports: catalog vs DPL-registry GUIDs, distribution URNs vs Glue placements,
+  producing-app ids vs SEAL applications, registration-source + instrumentation census'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G42
+inputs:
+- drydocs_lineage/extractors/dpl_registry.py
+- drydocs_lineage/extractors/glue_tables.py
+acceptance: |
+  Reports per plan section 4 phase 2, every bucket counted AND listed, never silent: (1) catalog DPL-origin dataset GUIDs vs the G25 registry (both-sides / catalog-only / registry-only); (2) distribution candidate_asset_urn vs G41 glue placements on the canonical lowercase db.table path; (3) producedby_app_id vs SEAL BusinessApplication ids — an attribution CENSUS, fact only, no edges (Epic K owns attribution); (4) registration-source census (dpl/authority2/null) + instrumentation coverage (NOT INSTRUMENTED + empty-shape counts). Proven on synthetic fixtures in tests; real exports stay in the landing zone.
+notes: |
+  The puzzle-pieces deliverable while lineage completes — measured lists instead of guesses (the G25 cross-check precedent). No graph writes.
+annotations:
+  status: done 2026-08-12 (desktop), same session as the claim

@@ -1,0 +1,25 @@
+id: G19
+epic: component-topology
+title: 'Out-of-repo landing zone for rua bundles: DRYDOCS_DATA_ROOT + source registration'
+type: task
+module: config
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/adapters/sql_run_log.py
+- config/source-registry.yaml
+- config/classification.yaml
+- drydocs_lineage/collect/README.md
+- PUBLISH-BOUNDARY.md
+acceptance: |
+  A data-root convention exists mirroring the sql_run_log logs idiom (DEFAULT_LOGDIR = ~/logs/DryDocs, env-overridable): default ~/data/DryDocs, override via DRYDOCS_DATA_ROOT, resolved by ONE shared helper in drydocs_core (unit-tested), with per-source subfolders — rua/incoming/ for tarballs, rua/extracted/<bundle>/ for unpacked bundles. The rua source is registered in config/source-registry.yaml with classification internal-confidential (bundles hold real hostnames, uids, home paths, profile + script copies) and the registration records that DATA NEVER ENTERS THE REPO — only the pointer does (the internal-local hand-carry note covers transport). collect/README gains a "where bundles live" section; a guard test asserts the repo tree contains no rua_*.tar.gz / extracted bundle (publish-boundary safety net, same spirit as the root-image rule).
+notes: |
+  User call 2026-07-21: bundle output is not the structured seal/pat csv shape, can be big, and belongs outside the project like the logs. ~/data/DryDocs (not internal-local/) because internal-local is the hand-carry WORKING area inside the tree — big binary bundles get a real out-of-tree home; internal-local keeps only pointers/notes.
+annotations:
+  status: '2026-07-22: drydocs_core/data_root.py (one shared resolver + rua subfolders), rua-inventory
+    registered internal-confidential confirmed:false (G22 = activation), collect/README "Where bundles
+    live", test_data_root.py guard sweep'

@@ -1,0 +1,23 @@
+id: L1
+epic: doc-infrastructure
+title: Canonical TDD outline + completeness/traceability validator; refit the Control-M TDD
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: opus
+priority: p1
+status: done
+depends_on: []
+inputs:
+- SDLC-Docs/extracted/Technical Design Doc Template.doc.txt
+- SDLC-Docs/extracted/Technical Design.docx.txt
+- docs/design/controlm-ingestion-tdd.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  docs/design/templates/tdd.outline.yaml defines the canonical TDD outline (schema drydocs.doc-outline.v1: ordered sections, each a STABLE authored anchor + required flag + guidance), modernized from the SDLC corpus (MERGES the enterprise Preface→…→Traceability-Matrix shape with the agile Background→DoR/DoD→Component- Changes→Tests shape) and adds the DryDocs-specific sections (four-layer frame, classification, HITL gate); a completeness validator asserts a given TDD contains every required anchor and fails listing gaps, plus a traceability rule (every requirement id appears once in the matrix section); docs/design/ controlm-ingestion-tdd.md is refit to the outline and passes; validator is test-enforced (tests/unit/test_doc_outline.py); full suite green.
+output: docs/design/templates/tdd.outline.yaml + drydocs/doc_outline.py
+notes: |
+  Traceability matrix is first-class (the §6 both SDLC TDDs orbit). drydocs-docgen classified in test_module_boundary.py (docgen group) + MODULE_MAP.md.
+progress: |
+  2026-07-08 — DONE (user sign-off; committed + folded into main). Outline reviewed with the user; 5 decisions applied: (1) dropped org-standard/agile sections; (2) required-with-`N/A`-escape; (3) traceability is `mode: loose` now (matrix shape only), tightens to strict once the ingestion loop surfaces real requirements; (4) merged `data-config` INTO `detailed-design` + a `design-data-mapping` column-level subsection (the ingestion-layer view); (5) numbering deferred. Result: tdd.outline.yaml = 12 sections / 10 required (+1 optional subsection) + loose/strict traceability contract; validator drydocs/doc_outline.py (anchor `<!-- anchor: id -->`, completeness + loose/strict traceability, CLI); tests/unit/test_doc_outline.py (10 tests incl. real-TDD-conforms + loose-mode) pass via direct driver (pytest absent on this box); controlm-ingestion-tdd.md refit (Rev 3) VALIDATES clean; boundary guard 4/4 green. Full `poetry pytest -q` not runnable here.

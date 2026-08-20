@@ -1,0 +1,21 @@
+id: Z1
+epic: server-location
+title: 'Register the infrastructure server export: per-application download, prod-filtered with prod +
+  DR, server/OS/rack/data-center/geography fields'
+type: task
+module: config
+phase: 6
+agent: pipeline-config
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- config/classification.yaml
+- config/taxonomy
+- PUBLISH-BOUNDARY.md
+acceptance: |
+  A source-registry row exists for the infrastructure site's server export with its locator, download procedure (pulled PER BUSINESS APPLICATION, list filtered on prod, rows carry BOTH prod and DR servers), and classification set at registration (expected internal — server names, racks and building locations are operational metadata; the real export lands under internal/, never in a public path). The dataset contract enumerates the fields: server name, OS product + version (e.g. RHEL x.x — version context ties to the software registry and the C25 ruling), rack, data-center/building, city, state, country, prod/DR designation, owning business application. The registry row carries the standing caution verbatim: the data-center field is not the Control-M field of the same name. The hierarchy (application -> server -> rack -> data center -> city -> state -> country) is captured under config/taxonomy/ as PURE CLASSIFICATION — no meaning edges. A sanitized sample fixture is committed for tests.
+notes: |
+  User directive 2026-08-08. Taxonomy first, ontology second (CLAUDE.md section 1): this item only registers and classifies; every edge meaning waits on Z2's gate. Server name is the join key to Control-M nodes, but the JOIN RULE is a Z2 decision, not an import-time invention. CLOSED 2026-08-19 (laptop): system `infra` + dataset infra:server-export registered confirmed: false (acquisition manual/csv; landing zone internal/server-inventory/ with drop_dir_base: repo — PUBLISH-BOUNDARY.md puts raw extracts under internal/, and a TRACKED zone is what survives git clean, so the README seed commits with the row). Standing caution verbatim on the row. Hierarchy + field contract: config/taxonomy/server-location.yaml (authority DELIBERATELY omitted — internal-standards governs the SCHEDULING dc-codes, the very collision fenced). Sanitized fixture tests/fixtures/server_inventory/ + tests/unit/test_server_inventory_fixture.py: header==contract pin, the 70001-70099 value sweep (tests/fixtures/ is OUTSIDE publish-boundary scan A, so the test IS the sweep), one-app-per-file grain, PROD+DR presence, and no data_center value matching the Control-M DC grammar. SOR-vs-ADS site provenance + the os_product software-registry tie parked as open questions for Z2. Sample-reproducible: the fixture tests run anywhere; no graph write occurred.

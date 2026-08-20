@@ -1,0 +1,20 @@
+id: V6
+epic: sme-runbooks
+title: 'SME runbook: drydocs-lineage — module-wide operate surface; index or absorb the chain-scoped lineage-mac
+  and cmdline-resolution runbooks'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- drydocs_lineage/
+- docs/design/drydocs-lineage-mac-runbook.md
+- docs/design/drydocs-cmdline-resolution-runbook.md
+acceptance: |
+  Per V1's disposition: a module-level drydocs-lineage runbook exists that either absorbs or explicitly indexes the two chain-scoped runbooks (lineage-mac, cmdline-resolution) so an SME landing on the module finds one entry point; outline-conformant, rendered, stale-render-clean; drydocs-lineage off RUNBOOK_PENDING. No procedure duplicated across the three — chain runbooks keep their depth, the module runbook routes.
+notes: Groomed 2026-07-29 (Epic V).

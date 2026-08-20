@@ -1,0 +1,22 @@
+id: J44
+epic: release-infrastructure
+title: 'The unclosed-fence guard stops at docs/: say where the boundary sits for captured and vendored
+  markdown, and fix the one orphan that is ours'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_markdown_fences.py
+- tests/unit/test_runbook_currency.py
+- SDLC-Docs/extracted/issue-driven-capture-loop.md
+- internal/fcdo-reference/
+- .claude/skills/data-context-extractor/references/
+acceptance: |
+  The J41 sweep scanned all 507 tracked .md files and found six unclosed fences; one was ours and is fixed, and tests/unit/test_markdown_fences.py guards docs/** only. This item disposes of the other five EXPLICITLY, one of two ways, with the choice recorded where the guard lives: widen the scope to all tracked markdown with a named carve-out list -- the FOREIGN_PATHS / HISTORICAL_PATHS idiom test_runbook_currency.py::test_every_path_a_document_names_exists already uses -- each entry carrying its reason; or leave captures unguarded and write the boundary into the guard's docstring so the next sweep does not re-litigate it. Either way, internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md and TRANSCRIPT-1-ONTOLOGY.md and the .claude/skills/data-context-extractor/references/ material are NOT edited to satisfy a guard: editing somebody else's capture is a provenance decision, not a formatting one, and the carve-out exists to say exactly that. SDLC-Docs/extracted/issue-driven-capture-loop.md is a trailing orphan and is either fixed or carved out on its own merits, said either way. If the scope widens, the widened guard is proven to fail on an injected unclosed fence inside the new scope (J26).
+notes: |
+  Groomed 2026-08-11 from Idea-103. The decision is small but it is a real one, and it is the interesting half of the entry: the reason those five were left alone at J41 was not effort. Two of them are CAPTURED transcripts and one is vendored skill material, so "make the guard pass" and "keep the capture verbatim" are in direct conflict, and the repo's answer to that conflict should be written down once instead of re-argued at every sweep. Deliberately p3 -- nothing is broken today; what is missing is a stated boundary.

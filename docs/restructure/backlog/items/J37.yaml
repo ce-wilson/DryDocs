@@ -1,0 +1,20 @@
+id: J37
+epic: release-infrastructure
+title: 'Guards that shell out and parse human-facing output: sweep them, and write the never-parse-a-render
+  rule down'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_runbook_currency.py
+- CLAUDE.md
+- docs/style/us-business-english.md
+acceptance: |
+  Every guard that shells out to a DryDocs command and parses its RENDERED output is enumerated, and each one is either converted to read the importable object (the N6 fix: app.registered_commands instead of parsing `drydocs --help`) or carries a written reason why the render itself is the thing under test; the rule — never parse a render when the object is importable — lands in the repo's working agreements where the next test author will read it.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-54. The motivating guard failed twice at once on the laptop, having never actually executed there: text=True decodes cp1252 and cannot decode Typer's rich box character, so stdout came back None, AND the table rows start with U+2502 rather than '|', so the pattern would have matched nothing anyway — which makes every documented verb look unregistered. A guard that passes by accident on one machine and cannot run on the other is the class. J33 is its sibling on the assertion side (plain substrings vs ANSI-colored output).

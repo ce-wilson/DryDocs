@@ -1,0 +1,18 @@
+id: H5
+epic: drydocs-review-backflow
+title: Reproduce the publishing pipeline with a pluggable publisher
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: opus
+priority: p3
+status: done
+depends_on:
+- H4
+inputs:
+- docs/restructure/05-drydocs-review-backflow.md
+acceptance: |
+  drydocs/publishing/ pipeline reproduced (assembler/validator/preview) with the Confluence push ABSTRACTED behind a generic pluggable publisher interface — no toby_publish_confluence, no space coords. Local preview + XML/macro-allow-list validation covered by a unit test.
+notes: |
+  Done 2026-07-01. drydocs/publishing/ package: assemble() (template wrap), validator (well-formed XML + macro allow-list), write_preview(), Publisher Protocol + NoopPublisher/LocalPublisher (Confluence push abstracted — no toby_publish_confluence / space coords). 10 unit tests. GATED/DEFERRED: a real ConfluencePublisher (space coords, auth, internal wrapper) → company gitignored twin; not built.

@@ -1,0 +1,18 @@
+id: E1
+epic: context-graph
+title: Register SOSA/SSN observation terms via the gate
+type: task
+module: ontology
+phase: 4
+agent: ontology-mapper
+model: sonnet
+priority: p2
+status: in_progress
+depends_on:
+- C1
+inputs:
+- reference/standards/sosa-ssn/README.md
+- drydocs_core/ontology/relationship_vocabulary/
+acceptance: sosa:* terms present with IRIs; status planned->confirmed via gate
+notes: |
+  Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:"experimental"); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned->confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).

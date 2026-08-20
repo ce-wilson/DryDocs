@@ -1,0 +1,21 @@
+id: G36
+epic: component-topology
+title: Drop the three never-consulted :BusinessApplication indexes (risk_level/status/name) and decide
+  coverage for the one property that IS a predicate, manually_created
+type: chore
+module: ontology
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- S3
+inputs:
+- drydocs_core/schema/constraints.cypher
+- drydocs/loaders/manual_loads.py
+- drydocs_api/query_specs.py
+acceptance: |
+  constraints.cypher no longer declares businessapplication_risk, businessapplication_status, or businessapplication_name (lines 37-39 today); a grep confirms no QuerySpec, loader, or web/src read binds on those properties (today zero do — they appear only in SET clauses and RETURN projections, where an index cannot help). A recorded decision (in the commit body) rules whether manual_loads.py:113's `{manually_created: true}` predicate — the one real predicate with no index — gets one; if yes it exists under a NEW name (the CREATE-IF-NOT-EXISTS name-match trap). Bootstrap schema re-run against the live container succeeds; suite green.
+notes: |
+  User finding 2026-07-26 reading constraints.cypher during the business-application-identity gate review: every bind on :BusinessApplication goes through the key property, already covered by the UNIQUE constraint's backing index, and explorer.applications.v1 is an unfiltered label scan no name/status index can accelerate. A declared index READS AS A CLAIM the property is queried, so it mis-maps access patterns for the next reader; at registry cardinality a label scan is sub-millisecond. Original intent unrecoverable — git log -L reaches only the 2026-07-20 squash root. depends_on S3 because S3 rewrites the SAME file (key flip seal_id -> app_id + new uniqueness constraint + :Port NODE KEY): one bootstrap re-run instead of two, and no drive-by edit racing the atomic cutover. DONE 2026-08-04 (ea66764): three indexes removed AND explicitly DROPped (the port_unique belt-and-braces precedent — removing the CREATE alone leaves live DBs carrying the stale claim). Predicate census in the commit body; the one name-bind is the single-node SchemaMeta bootstrap MERGE. RECORDED DECISION: manually_created gets NO index — both consumers are offline reporting paths at registry cardinality; same ruling for batch_orchestrator_last_run_id, the other non-key predicate the sweep surfaced. Live re-run verified (desktop, neo4jtest, drydocs DB): bootstrap succeeded, SHOW INDEXES returns only the two constraint-backed indexes. Suite 1501.

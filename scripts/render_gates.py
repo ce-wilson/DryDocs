@@ -2,7 +2,7 @@
 
 Scans config/gate-log.md (one row per ``## `` entry), config/gate-prompts/
 (one row per prompt file, joined to log entries by slug mention), and
-backlog.yaml (which items mention each gate slug -> the "unblocks" edges of
+backlog/ (which items mention each gate slug -> the "unblocks" edges of
 the gate dependency graph) and emits ``web/src/generated/gates.json``.
 ``tests/unit/test_gates_json.py`` is the drift guard: a gate-log entry or
 gate-prompt file with no row fails the build.
@@ -42,12 +42,14 @@ import re
 import sys
 from pathlib import Path
 
-import yaml
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from drydocs_core.backlog_store import load_backlog_document
 
 REPO = Path(__file__).resolve().parent.parent
 LOG = REPO / "config" / "gate-log.md"
 PROMPTS = REPO / "config" / "gate-prompts"
-BACKLOG = REPO / "docs" / "restructure" / "backlog.yaml"
+BACKLOG = REPO / "docs" / "restructure" / "backlog"  # the sharded tree (ADR 0013)
 OUT = REPO / "web" / "src" / "generated" / "gates.json"
 
 _HEADING_RE = re.compile(r"^## (\d{4}-\d{2}-\d{2})(?:[^\S\n]*[—-][^\S\n]*)(.+)$", re.MULTILINE)
@@ -92,7 +94,7 @@ def _status_for(heading: str) -> str:
 
 def build_gates() -> dict:
     log_text = LOG.read_text(encoding="utf-8")
-    backlog_items = yaml.safe_load(BACKLOG.read_text(encoding="utf-8"))["items"]
+    backlog_items = load_backlog_document(BACKLOG)["items"]
 
     # split the log into (date, heading, body) sections
     sections: list[dict] = []

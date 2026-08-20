@@ -1,0 +1,18 @@
+id: L25
+epic: doc-infrastructure
+title: 'Signed gate pages get riders, not edits: apply the step-83 rider pattern to the business-application-identity
+  §D2 line-number drift and write the rule down'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  The business-application-identity gate page's §D2 citation (seal_applications.cypher 124/147/170 + seal_contacts.cypher 53, now 152/175/198 + 55) gains a dated rider correcting the line numbers WITHOUT editing the signed text; the rule — a signed gate page is a historical record, drifted citations are corrected by rider, never in place — lands in docs/restructure/03-hitl-sme-flow.md where L19's doc-drift sweep will find it.
+notes: |
+  Groomed 2026-08-07 from Idea-72. The rider default follows the step-83 precedent the entry names; if the SME prefers in-place correction for pure line numbers, the rule doc is the place to record that instead.

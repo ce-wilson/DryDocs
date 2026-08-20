@@ -1,17 +1,19 @@
-"""Enforce the backlog schema (drydocs.backlog.v2) — no Neo4j required.
+"""Enforce the backlog schema (drydocs.backlog.v3, the sharded tree — ADR 0013) — no Neo4j.
 
-docs/restructure/backlog.yaml is the machine-readable SOURCE OF TRUTH for work
-items (CLAUDE.md §0); the HTML board and 02-backlog.md are renders of it. This
-guard keeps the database honest so those renders can trust it:
+docs/restructure/backlog/ is the machine-readable SOURCE OF TRUTH for work items
+(CLAUDE.md §0): one item per file under items/<id>.yaml, epics under epics/,
+plan.yaml + modules.yaml. The board is a render of it. This guard keeps it honest:
 
-- every item carries the v2 fields (title/type/module/phase + the v1 core);
-- ids are unique, dependencies resolve and are acyclic;
-- module values come from the `modules:` registry, phases from `plan.phases`;
-- the `summary:` roll-up and `next_ready:` list are COMPUTED views — they must
-  match the items exactly, so they can never silently drift again;
-- no mapping anywhere in the file carries a duplicate key — PyYAML is
-  last-key-wins, so a duplicated block is INVISIBLE to every guard above
-  (they validate whichever copy parsed last).
+- every item carries the v2/v3 fields (title/type/module/phase + the v1 core);
+- the path IS the identity: items/<id>.yaml declares that same `id`; epics likewise;
+- ids are unique, dependencies resolve and are acyclic; every `epic:` has a file;
+- module values come from modules.yaml, phases from plan.yaml;
+- NO ROLL-UP IS STORED (Clause 3): `summary:` / `next_ready:` / `updated:` exist
+  nowhere in the tree — the board derives them. The old "recompute from items"
+  guards inverted into this one: a stored roll-up is the defect now;
+- no mapping in any file carries a duplicate key (PyYAML is last-key-wins; the
+  store's loader refuses, and this test proves it on the live tree);
+- the retired monolith stays a TOMBSTONE — it must never grow an `items:` key again.
 """
 
 from __future__ import annotations
@@ -27,8 +29,11 @@ try:
 except ImportError:
     _YAML_AVAILABLE = False
 
+from drydocs_core import backlog_store
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
+BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog"
+TOMBSTONE = REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
 AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 
 STATUSES = {"todo", "in_progress", "blocked", "done"}
@@ -59,8 +64,8 @@ pytestmark = pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installe
 
 
 def _load() -> dict:
-    assert BACKLOG.exists(), f"Missing backlog: {BACKLOG}"
-    return yaml.safe_load(BACKLOG.read_text(encoding="utf-8"))
+    assert BACKLOG.is_dir(), f"Missing backlog tree: {BACKLOG}"
+    return backlog_store.load_backlog_document(BACKLOG)
 
 
 def _find_duplicate_keys(text: str) -> list[str]:
@@ -89,12 +94,23 @@ def _agents() -> set[str]:
     return roster | {"main"}
 
 
-def test_schema_is_v2() -> None:
+def test_schema_is_v3() -> None:
     doc = _load()
     assert (
-        doc.get("schema") == "drydocs.backlog.v2"
+        doc.get("schema") == "drydocs.backlog.v3"
     ), f"backlog schema drifted: {doc.get('schema')!r}"
-    assert doc.get("updated"), "backlog.yaml missing `updated:` date"
+
+
+def test_path_is_the_identity() -> None:
+    """items/<id>.yaml must declare that id; epics/<epic>.yaml likewise. The store raises
+    on mismatch; this asserts the live tree passes and that every item's epic has a file."""
+    doc = _load()
+    epics = {e["id"] for e in doc["epics"]}
+    used = {i["epic"] for i in doc["items"]}
+    assert used <= epics, f"items name epics with no epics/<epic>.yaml: {sorted(used - epics)}"
+    assert epics <= used, f"epic files with no items: {sorted(epics - used)}"
+    for path in (BACKLOG / "items").glob("*.yaml"):
+        assert yaml.safe_load(path.read_text(encoding="utf-8"))["id"] == path.stem, path
 
 
 def test_plan_phases_shape() -> None:
@@ -251,47 +267,53 @@ def test_dependencies_resolve_and_are_acyclic() -> None:
 def test_no_duplicate_mapping_keys() -> None:
     """A duplicated block passes every other guard here, so it needs its own.
 
-    PyYAML keeps the LAST value for a duplicated key, so a second `summary:`
-    (or `items:`, or a repeated field inside one item) silently shadows the
-    first and the roll-up guards validate the survivor. A port merge script
-    shipped exactly that — two `summary:` blocks — through a green suite
-    (company PORT-REPORT-40c35724 follow-up, 2026-08-03).
+    PyYAML keeps the LAST value for a duplicated key, so a repeated field inside
+    one item silently shadows the first. A port merge script shipped exactly that
+    — two `summary:` blocks in the monolith — through a green suite (company
+    PORT-REPORT-40c35724 follow-up, 2026-08-03). Per file now, every file.
     """
-    dupes = _find_duplicate_keys(BACKLOG.read_text(encoding="utf-8"))
-    assert not dupes, f"{len(dupes)} duplicate YAML key(s) in backlog.yaml:\n" + "\n".join(dupes)
+    dupes: list[str] = []
+    for path in sorted(BACKLOG.rglob("*.yaml")):
+        dupes += [
+            f"{path.name}: {d}" for d in _find_duplicate_keys(path.read_text(encoding="utf-8"))
+        ]
+    assert not dupes, f"{len(dupes)} duplicate YAML key(s):\n" + "\n".join(dupes)
 
 
-def test_summary_rollup_matches_items() -> None:
-    """The summary: block is a computed view — it may never drift from the items."""
+def test_no_stored_rollup() -> None:
+    """ADR 0013 Clause 3, the inversion of the old recompute guards: counts and
+    next_ready are renderer OUTPUT. A `summary:`/`next_ready:`/`updated:` key
+    anywhere in the tree is the defect — it is the line two sessions collide on."""
+    offenders = []
+    for path in sorted(BACKLOG.rglob("*.yaml")):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        for key in ("summary", "next_ready", "updated"):
+            if isinstance(doc, dict) and key in doc:
+                offenders.append(f"{path.relative_to(REPO_ROOT)}: `{key}:`")
+    assert not offenders, "stored roll-ups found (derive them — ADR 0013):\n" + "\n".join(offenders)
+
+
+def test_derived_summary_is_consistent() -> None:
+    """The derivation itself: counts sum to the item total; next_ready is exactly the
+    todo items whose every dependency is done."""
     doc = _load()
-    items = doc.get("items", [])
-    summary = doc.get("summary", {})
-
-    computed = {status: 0 for status in STATUSES}
-    for item in items:
-        computed[item["status"]] += 1
-
-    failures = [
-        f"summary.{status}={summary.get(status)} but items say {computed[status]}"
-        for status in sorted(STATUSES)
-        if summary.get(status) != computed[status]
-    ]
-    assert not failures, "summary roll-up drifted:\n" + "\n".join(failures)
-
-
-def test_next_ready_is_computed() -> None:
-    """next_ready = exactly the todo items whose every depends_on is done."""
-    doc = _load()
-    items = {item["id"]: item for item in doc.get("items", [])}
-
+    summary = backlog_store.derive_summary(doc)
+    items = {i["id"]: i for i in doc["items"]}
+    assert sum(summary[s] for s in STATUSES) == len(items)
     expected = {
         iid
         for iid, item in items.items()
         if item["status"] == "todo"
         and all(items[dep]["status"] == "done" for dep in item.get("depends_on", []))
     }
-    actual = set(doc.get("summary", {}).get("next_ready", []))
-    assert actual == expected, (
-        f"next_ready drifted — listed-but-not-ready: {sorted(actual - expected)}; "
-        f"ready-but-missing: {sorted(expected - actual)}"
-    )
+    assert set(summary["next_ready"]) == expected
+
+
+def test_monolith_is_a_tombstone() -> None:
+    """The retired backlog.yaml must stay a pointer. A re-grown `items:` key means
+    someone (or a port) resurrected the monolith beside the tree — two sources of
+    truth, which is the 2026-08-04 collision with a second copy."""
+    assert TOMBSTONE.exists(), "the tombstone file must remain (ports and docs point at it)"
+    doc = yaml.safe_load(TOMBSTONE.read_text(encoding="utf-8")) or {}
+    assert doc.get("schema") == "drydocs.backlog.tombstone", "backlog.yaml is not the tombstone"
+    assert "items" not in doc, "backlog.yaml grew an `items:` key — the monolith was resurrected"

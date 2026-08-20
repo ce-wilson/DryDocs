@@ -1,0 +1,35 @@
+id: G38
+epic: component-topology
+title: Prove the ddall federated read path with one real cross-database QuerySpec — or record that the
+  composite is unnecessary and retire the unused watermark machinery
+type: task
+module: drydocs-api
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G32
+inputs:
+- drydocs_api/query_specs.py
+- drydocs_api/exports.py
+- drydocs_core/schema/provisioning/smoke_drydocs_all.cypher
+- tests/unit/test_database_names.py
+acceptance: |
+  Either: one QuerySpec answers a real support question by reading `ddall` across at least two member databases (chained `CALL { USE ddall.x }` value-join per the smoke-file shape), carries the trust_watermark column end to end, and is covered by a test — OR, if G32's ruling makes the composite unnecessary, that is recorded and the consumer-less machinery (WATERMARKED_DATABASES, the export banner path for ddall) is retired. Either outcome closes the item; leaving the machinery built-but-unread does not.
+notes: |
+  Measured at the G30 close: 22 of 23 QuerySpecs read drydocs, 1 reads ddcontext, ZERO read the composite — the federated watermark machinery is fully built and tested against a surface no spec uses. Same shape as the G30 finding (infrastructure with no consumer), and it gets more expensive to leave alone if G32 adds a third data database. Written AFTER G32 so it targets the ruled database set; it is also the honest end-to-end test of G32's acceptance clause (d), the recorded cost of the database boundary.
+annotations:
+  status: '2026-08-19 (laptop): SATISFIED-BY-FOLD on the item''s own second arm. Arm 1 is now impossible
+    (ddall retired 2026-08-18, G32/G102) and arm 2 was substantively discharged there: zero specs ever
+    read the composite, WATERMARKED_DATABASES deleted, the watermark keys on each spec''s own uncertain=True
+    declaration (ADR 0011 §117). This close swept what the "built-but-unread does not close" clause still
+    owed: smoke_drydocs_all.cypher DELETED (README tombstone kept; the pre-fold 2026-08-04 end-to-end
+    verification requalified as historical per J18), the provisioning README + provision.ps1 walkthroughs
+    now describe the folded topology, 13 stale prose sites across 10 files stopped describing ddcontext/ddall
+    as live (including the user-facing console.agent-runs.v1 description, which also still claimed the
+    retired SYNTHESIZED watermark), and the retirement is LOCKED: ddcontext + ddall joined SUPERSEDED_NAMES
+    in test_database_names.py (the ddlineage/X2 precedent) so any future source line naming them must
+    say they are retired. DOC_SWEEP_DATABASES keeps ddcontext DELIBERATELY (sweeps the retired db while
+    it exists so a stranded corpus reports wrong-db loudly). Nothing depended on G38; no unblocks.'

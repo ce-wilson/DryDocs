@@ -1,0 +1,20 @@
+id: O33
+epic: web-console
+title: SchemaMeta exemplar nodes contaminate unfiltered QuerySpecs — the applications frame would list
+  the :BusinessApplication exemplar as an app with a null id; add exclusion predicates and audit all ~20
+  exemplars
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/schema_graph.cypher
+- drydocs_api/query_specs.py
+acceptance: |
+  Every QuerySpec whose MATCH binds a label that schema_graph.cypher also stamps on a :SchemaMeta exemplar (schema_graph.cypher:39+ MERGEs `:SchemaMeta:<RealLabel>` pairs — ~20 of them) excludes the exemplar, preferring the rename-proof label predicate (`WHERE NOT n:SchemaMeta`) over a non-null-key predicate. The audit covers ALL exemplar labels against ALL specs, not just explorer.applications.v1 — AND (merged 2026-07-28) prereq/guard queries in LOADERS: any loader guard that counts a label the meta-graph stamps must exclude exemplars the way Q8 shipped (`WHERE NOT sp:SchemaMeta AND sp.product_id IS NOT NULL`), else a keyless exemplar waves an empty registry through. A test proves it: with the meta-graph applied to a test database, no spec returns a :SchemaMeta node and no loader guard is satisfied by exemplars alone. The meta-graph itself is KEPT — it is applied manually by design and removable with `MATCH (n:SchemaMeta) DETACH DELETE n`.
+notes: |
+  Found 2026-07-26 alongside the G36 index note. LATENT, not live: the file header says "Applied MANUALLY only — never part of drydocs bootstrap", but whenever it IS applied, the exemplar carries the real label with no key property, and the UNIQUE constraint does not stop it because Neo4j uniqueness ignores nulls (the same null-blindness behind the identity gate's §C2 partial-cutover hazard). Key-predicate wording would change under S3's seal_id -> app_id flip — another reason the label predicate is the primary fix. MERGED 2026-07-28 (inbox line, Q8 build finding): the contamination defeats WRITE-side guards too, hence the loader-guard audit clause above. Root-fix option to weigh during the audit: give the exemplars their key properties (a keyless exemplar is indistinguishable from a real node with an unset key) — if taken, record it in the commit body; the label predicate stays the belt either way. CLOSED 2026-07-28: 22 of 23 specs gained the label predicate (only ownership.escalation-routing binds no stamped label); the audit found the meta-graph also MERGEs property-qualified exemplar EDGES ({role:'seal_app_ref'}), so pattern specs were exposed too — worse than the single-node case the item described. Root fix REJECTED with reasoning: fake keys would satisfy the key-based loader guards (the exact Q8/L17 family) — keyless + label predicate is strictly safer. Residual write path fixed: runs_on_resolution's name-keyed group MATCH could edge a job with node_id='ControlMHostGroup' to the exemplar (cypher + both census queries guarded). Enforcement: test_schema_meta_exclusion.py audits ALL specs against labels parsed from the committed meta-graph (regeneration re-audits automatically); test_meta_graph_exclusion.py (integration, Docker-gated) proves it live — meta-graph applied to a real EE container: every spec returns ZERO rows, no guard satisfied, the bait job edges nowhere. Note for Windows runs: TESTCONTAINERS_RYUK_DISABLED=true needed (Reaper port mapping fails on this Docker Desktop).

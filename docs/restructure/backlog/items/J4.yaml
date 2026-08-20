@@ -1,0 +1,18 @@
+id: J4
+epic: release-infrastructure
+title: 'Refresh the run-drydocs skill: stale test counts, PyYAML gotcha, dropped Aura, m3-supplement rename'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- .claude/skills/run-drydocs/SKILL.md
+- pyproject.toml
+acceptance: |
+  .claude/skills/run-drydocs/SKILL.md is reconciled to current reality: the two "PyYAML not installed / 4 skipped" Gotchas are removed (PyYAML is a runtime dep since D2 — pyproject.toml [tool.poetry.dependencies]); the "159 pass, 4 skipped" counts (lines 30, 99) are refreshed to the current suite; the dropped Neo4j Aura references (Aura ruled out 2026-07-06) are repointed to the Docker EE / local-Neo4j path; and the stale apply-m3-supplement command (line 65) is reconciled to apply-ontology-supplement. No functional change to the skill; smoke.ps1 still runs.
+notes: |
+  Groomed 2026-07-09 from the IDEAS line. Verified 2026-07-09: SKILL.md still asserts PyYAML uninstalled (x2), "159 pass", Aura, and apply-m3-supplement — all stale. Same doc-drift hygiene class as J1/J2. DONE 2026-07-11: all four staleness classes fixed (counts now count-free "suite green + expected sample skips"; PyYAML gotchas replaced by the real skip reason; Aura → local Docker EE with the port-remap gotcha; supplement chain reconciled to the real commands incl. apply-registry-supplement). BONUS finding fixed in-scope: smoke.ps1 + the direct-invocation snippet still imported pre-relocate drydocs.models/adapters/controlm — broken since Phase B; repointed to drydocs_core, smoke PASSES again (566/3).

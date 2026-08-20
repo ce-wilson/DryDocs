@@ -1,0 +1,18 @@
+id: H2
+epic: drydocs-review-backflow
+title: Reproduce the graph_review HTML renderer
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on:
+- H1
+inputs:
+- docs/restructure/05-drydocs-review-backflow.md
+acceptance: |
+  graph_review reproduced: pure HTML renderer (no Neo4j in module — CLI hands it rows), one section per DATA label, hidden_props stripped; offline unit test renders a fixture row set. classification set.
+notes: |
+  Done 2026-07-01. drydocs/graph_review.py: render_review({label: [props]}) → self-contained HTML, DEFAULT_HIDDEN_PROPS + `_`-prefixed keys stripped, provenance from the review spine on each header; group_rows() helper. 6 unit tests. Added to review boundary group.

@@ -1,0 +1,26 @@
+id: L8
+epic: doc-infrastructure
+title: 'Runbook outline + author the DryDocs startup/refresh runbook (capstone: 2nd doc type)'
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- L1
+- L5
+- L6
+inputs:
+- docs/design/templates/tdd.outline.yaml
+- internal/helpmeloginlocalneo4j.md
+- scripts/ingest.sh
+- knowledge/depgraph-snapshots/snapshot.ps1
+- README.md
+acceptance: |
+  docs/design/templates/runbook.outline.yaml defines the canonical Runbook outline (stable anchors: purpose/scope, prerequisites, startup, refresh/ingest, verify, rollback, troubleshooting, contacts/escalation) reusing the L1 doc-outline schema; a REAL DryDocs startup/refresh runbook is authored to it (Neo4j Docker bring-up + .env, the ingest-controlm chain, board + depgraph snapshot refresh, m1/m3-verify), rendered via L3 and exercised through BOTH feedback loops (L5 digital, L6 paper), and passes the completeness validator; classification set; full suite green.
+notes: |
+  Resequenced 2026-07-08 (was L2) to run AFTER the full render+feedback pipeline, per the user: the runbook is the CAPSTONE proving the outline system generalizes to a second doc type end-to-end. depends_on covers the outline (L1) + both feedback loops (L5→L3 renderer, L6→L4 pdf); intentionally NOT gated on L7 (context ingest), which the runbook doesn't need — say the word to make it strictly last. DONE 2026-07-20 (e6bcb24): runbook.outline.yaml = front-matter + the 8 acceptance anchors + optional appendices; decisions recorded in its header — front-matter carried from the TDD outline (the L6 footer derives from it), NO traceability block (procedures, not requirements; verify is the runbook's proof surface — add the block later rather than invent a per-doc format). Exemplar docs/design/drydocs-startup-refresh-runbook.md (classification Internal, the helpmeloginlocalneo4j class; secrets .env-only) rendered via L3; both loops verified IN the emitted html (annotate/Copy feedback; dd-margin-tag + dd-print-footer "Rev 1 · commit 0acc0f8"). test_doc_outline.py sweeps *-runbook.md (3 new tests). Suite 738. LANDING FIRES two parked inbox triggers for the next groom: the runbook-mapping-demo refit and the review.outline.yaml consideration (both lines cite "when L8 lands").
+annotations:
+  status: 'DONE 2026-07-20 (e6bcb24) — the capstone: 2nd doc type through the outline system'

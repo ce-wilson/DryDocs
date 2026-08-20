@@ -1,0 +1,16 @@
+id: E2
+epic: context-graph
+title: Answer one folder health/freshness question with a context query
+type: requirement
+module: ontology
+phase: 4
+agent: main
+model: opus
+priority: p2
+status: todo
+depends_on:
+- E1
+inputs:
+- config/taxonomy-ontology-map/
+acceptance: one Cypher query returns latest result + resultTime per folder on sample data; documented
+  in docs/

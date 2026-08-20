@@ -1,0 +1,19 @@
+id: G52
+epic: component-topology
+title: 'Laptop Docker cleanup: the superseded 5.26 images, the eleven orphan neo4j volumes, and the retired
+  neo4j-drydocs-ee data volume'
+type: chore
+module: graph-infra
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/dev-environment.yaml
+- docs/design/drydocs-startup-refresh-runbook.md
+acceptance: |
+  Every artifact VERIFIED unreferenced before removal (contents inspected, not just link counts); neo4jtest and its three live volumes untouched; the graph re-checked online afterwards. Close note carries the docker evidence and names the machine (J18).
+notes: |
+  DONE 2026-08-04 on the LAPTOP. This is NOT G50 — G50 is the desktop's equivalent and stays open; the two machines hold independent Docker state. Removed: (1) images neo4j:5.26-enterprise, neo4j:5.26, neo4j:5.26-ubi10, ~3.3GB, none referenced — dev-environment.yaml pins 2026.05.0-enterprise and BOTH integration tests read that tag out of it, so nothing could have used them; (2) container awesome_williams (Exited 1 — a Docker Desktop run with no NEO4J_ACCEPT_LICENSE_AGREEMENT) with its two empty anonymous volumes; (3) eleven zero-link volumes, ~3.5GB. Verification was by MOUNTING each, not by trusting Links=0: neo4j_data / neo4j2_data / 6004d1bb / 7e41bea3 held only default neo4j+system stores dated 2026-06-29, and six small ones were log directories. The eleventh, anonymous e335b5d8 (1.353GB), held the real topology — drydocs/ddlineage/ddcontext dated 2026-07-02 — i.e. the DATA VOLUME of the retired neo4j-drydocs-ee, the rollback copy the runbook described. It outlived its container (the container itself is long gone from this machine). Flagged to the user as materially different from scratch and deleted on their explicit ruling; it was a month stale and strictly poorer than neo4j-testdata (predates ddschema entirely). Consequence, and why the runbook moved with it: NO rollback copy now exists on the laptop, so Appendix A's rollback paragraph was false here — runbook Rev 8. Final state: 3 images / 1 container / 3 volumes, 0B reclaimable; drydocs 2218 nodes and all seven databases online after the prune (laptop, neo4jtest).

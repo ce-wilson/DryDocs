@@ -1,0 +1,18 @@
+id: B3
+epic: taxonomy-capture
+title: Capture the LOB→Product→Team hierarchy as taxonomy
+type: task
+module: taxonomy
+phase: 1
+agent: taxonomy-importer
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/data/samples/{catalog_lobs,product_lines,products,dev_teams}_*.csv
+- config/source-registry.yaml#catalog-pat
+acceptance: hierarchy matches catalog samples; confidential names referenced by id, not value
+output: config/taxonomy/lob-product-team.yaml
+notes: |
+  Done 2026-06-20. LOB ▸ ProductLine ▸ Product ▸ DevTeam: 5/5/6/6. AreaProduct + BusinessSegment NOT in sample (flagged OQ). classification: Internal-Confidential.

@@ -1,0 +1,25 @@
+id: Q3
+epic: docmeta
+title: 'Write the docmeta P0 benchmark verdict: traversal vs manifest-routed markdown vs vector RAG, with
+  a build/shrink recommendation'
+type: task
+module: docs
+phase: 14
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on:
+- Q1
+- Q2
+inputs:
+- knowledge/upgrade-plans/docmeta-component.md
+- reference/research/essential-graphrag-notes.md
+- docs/reviews/essential-graphrag-traversal-experiment.md
+- external/orchestration/bmc-controlm/SOURCE-MANIFEST.md
+acceptance: |
+  The docmeta plan's P0 acceptance is met by a WRITTEN comparison document (knowledge/upgrade-plans/docmeta-p0-verdict.md, linked from the plan's P0 row): a FIXED support-question set (>=10 questions spanning the ch.8-style stage classes: structure/aggregation, exact lookup, paraphrase/conceptual, multi-doc, provenance, out-of-scope) is run over the LIVE bmc-docs corpus for every arm that can run in this environment — graph traversal (Cypher over Document→Chunk) and manifest-routed markdown at minimum, plus a full-text-index arm as the no-embedding lexical component of the vector arm; the embedding-proper vector arm may be assessed analytically ONLY with the blocker named (no committed embedding/LLM key — the open LLM-key-strategy inbox question). Per-question per-arm scoring covers context recall (ground-truth marker presence), token cost (retrieved chars), and latency; the document closes with an explicit build / shrink-to-registry-only recommendation and names what the docmeta ADR (P1) should adopt. Any throwaway index created for the benchmark is dropped or its retention recorded. Full suite green.
+notes: |
+  Groomed 2026-07-16 on the user's "start the P0 written verdict" order — the phase-14 capstone the phase goal names; model fable per the matrix (the build-vs-shrink recommendation is a component-boundary decision, the G3/O5 precedent). The verdict + the docmeta ADR are the recorded gate for promoting docmeta P1-P3 to this epic (IDEAS docmeta line + the plan's own instruction). DONE 2026-07-16: knowledge/upgrade-plans/docmeta-p0-verdict.md — VERDICT = BUILD. Benchmark run live: the current EE container was found WITHOUT the docs corpus (fresh O6 bootstrap), so the P0 spike's own load step ran first (software-registry 9 rows, bmc-docs 374 chunks / 0 rejects into drydocs); 12 fixed questions x 3 live arms (handwritten-Cypher traversal, throwaway fulltext index — created + DROPPED, DB left as found, manifest-routed file reading), vector-proper assessed analytically (blocker named: the open LLM-key-strategy question). Adjudicated: traversal 12/12 recall (~16.4k chars total, median 75ms; only arm answering aggregation/provenance/version classes; paraphrase needs term-mapping — naive CONTAINS 0-row runs recorded); fulltext 7/12 (ranking dilution, paraphrase gap, confident noise on out-of-scope); manifest 10/12+2-partial at ~449.5k chars (~27x traversal). Two scorer artifacts corrected in adjudication + disclosed. ADR-adoption list + limitations written. Plan P0 row updated; IDEAS docmeta line updated: P1-P3 now groomable. Suite green.
+annotations:
+  status: DONE 2026-07-16 same day (main fable session; benchmark run live, verdict = BUILD)

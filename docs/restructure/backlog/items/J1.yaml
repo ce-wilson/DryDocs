@@ -1,0 +1,22 @@
+id: J1
+epic: release-infrastructure
+title: Sweep the iteration fragments (naming drift, superseded banners)
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p2
+status: done
+depends_on: []
+inputs:
+- CLAUDE.md
+- docs/restructure/01-project-plan.md
+- knowledge/depgraph-snapshots/snapshot.ps1
+- README.md
+- docs/reviews/
+- SDLC-Docs/
+acceptance: |
+  DryDocs1 -> DryDocs in CLAUDE.md:1 and 01-project-plan.md (title, repo URL; merged-branch line removed); drydocs1 -> drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README (existing drydocs1-*.json snapshot files left untouched as history); the stray "@claude - <Aura console URL>" line removed from README.md:1; a "Superseded by the Phase 0-5 restructure plan" banner on docs/reviews/drydocs-consolidated-plan.md and the persona/SDLC review docs; a README in SDLC-Docs/ marking it a frozen reference corpus that fed the ADRs. Tests stay green.
+notes: |
+  Done 2026-07-01 (haiku agent per the model matrix; opus review pass). 19 files: renames (CLAUDE.md, 01-project-plan.md incl. URL + merged-branch line, snapshot.ps1 + README + viewer.html, reference/REGISTRY.yaml — a residual the sweep caught beyond the checklist), README.md stray console-URL line removed, 11 docs/reviews/ superseded banners, SDLC-Docs/README.md created (frozen corpus). Residuals justified: historical drydocs1-*.json snapshots, the drydocs1-live-neo4j memory name, docs/history/. m1/m3-verify renames stay parked for the v1.0 window.

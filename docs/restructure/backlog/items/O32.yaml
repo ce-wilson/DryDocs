@@ -1,0 +1,39 @@
+id: O32
+epic: web-console
+title: Light-mode design pass across the console (dark stays canonical; light is currently derived, not
+  designed)
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src/
+- UI-WIP/site-plan.md
+- UI-WIP/two-track-ui-plan.md
+acceptance: |
+  Every themed surface in web/src/ (shell/header, landing hub, the shared module template, the lineage/docs graph canvases, /under-the-hood) gets an intentional light-mode design pass rather than the automatic dark-token inversion in place today; verified via a light-mode headless-Edge smoke across at least the shell, one module page, and the lineage/docs canvases; dark mode remains the default/canonical theme and is visually unchanged; build + lint green in both themes.
+notes: |
+  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-6 and the 2026-07-23 UI-acceleration session's open follow-up ("light verified functional today, but derived, not designed"). Not previously tracked as its own item (checked backlog.yaml — only a passing site-plan §2 mention of the equivalent solid-outline treatment). DL-7 merge (2026-07-28, internal/datalens-reference/continuity.md): the light pass should land on (or consciously near) the runtime monitor's observed values — bg ~#F4F6FA, tinted table headers #EEF2F7, threshold green/--status-fail semantics per DL-2 — light mode is the bridge surface between the console and the SRE runtime view, and theme polarity is the harshest transition between the two tools.
+annotations:
+  status: 'closed 2026-08-07 (desktop, same session as the claim). THE FINDING THAT REFRAMED THE ITEM:
+    the light sheet already sat ON the DL-7 bridge values — --bg #f4f6f9 (~runtime monitor #F4F6FA) and
+    --panel2 #eef2f7 (= its #EEF2F7 header tint) landed with the 2026-07-28 DL quick-wins, and the named
+    surfaces are fully token-routed (hex census: zero hardcodes outside the Idea-77 orphan HeroArt). So
+    the pass became what it should be: a surface-by-surface light-mode review — hub, shell, module template
+    via the lineage AND docs canvas pages (incl. the O29 legend), /under-the-hood — against the DL-7 targets.
+    ONE REAL DEFECT found and fixed, and it was a CASCADE bug, not a token: index.css''s element defaults
+    (a/code/table/button/inputs) sat UN-LAYERED and out-cascaded every layered Tailwind utility — the
+    same root-cause class as O36''s margin reset, one comment block apart — so `a {color: --blue-br}`
+    ate every authored link color; the Overview CTA rendered navy-on-blue in light (unreadable) and wrong-blue-on-blue
+    in dark. Fixed by moving those defaults into @layer base (utilities now win, as authored). HONEST
+    DARK DELTA: dark is otherwise pixel-unchanged, but the CTA is now white-on-blue there too — that is
+    the authored text-white applying for the first time, a defect fix, not a redesign. tokens.css header
+    records the pass (light is no longer "derived, not designed"); the tower-drill mockup pages alone
+    keep dark hardcodes (recorded in the App.css retirement stub, O30). two-track plan rows T1-5/6/7 marked
+    DONE. VERIFIED headless-Edge both themes (light via a parameterized probe page seeding drydocs.theme.v1,
+    deleted after): light hub/lineage/docs/underhood + re-shot hub after the fix, dark hub for the unchanged
+    check; screenshots in the session record. Build + oxlint green; suite 1698/3/5 (the 3 = standing Idea-83).'

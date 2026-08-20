@@ -1,0 +1,19 @@
+id: K1
+epic: seal-attribution
+title: Register the seal_app_ref attribution edge (planned) + mapping proposal
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- docs/RELATIONSHIP_GUIDE.md
+acceptance: |
+  m3_seal_app_ref registered in relationship_vocabulary.yaml (WAS_ASSOCIATED_WITH, role seal_app_ref, ControlMJob -> Application, prov:wasAssociatedWith, status planned) using the company-confirmed generic shape; a taxonomy-ontology-map entry drafted status: proposed citing the 2026-07-01 company reconciliation; test_schema.py drift guard green (planned entries carry no supplement/loader claims).
+notes: |
+  Done 2026-07-01 (ontology-mapper agent, sonnet; opus review). m3_seal_app_ref registered planned (no supplement/loader claims); map entry job-seal-app-ref status proposed with the three gate open-questions (match policy / zero-unmatched surfacing / multi-hit triage); map summary proposed 2->3, counts verified vs computed. RELATIONSHIP_GUIDE needed no change (generic matrix only). FLAGGED for K2: config/source-registry.yaml has NO STG_APP_FACT / variable-normalization-stream source entry yet — register it (pipeline-config) before the loader.

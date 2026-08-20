@@ -1,0 +1,23 @@
+id: R19
+epic: agentic-qa
+title: Ask clarification loop for unresolved acronyms and graph-label intent
+type: requirement
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on:
+- R2
+- R5
+inputs:
+- agents/graph_qa/
+- agents/graph_qa/schema_context.py
+- drydocs_api/query_specs.py
+- config/taxonomy/software-registry.yaml
+- web/src/ask/
+acceptance: |
+  (a) When the initial question contains an acronym, label, or domain term that does not resolve to a registered QuerySpec, active vocabulary row, live label/property, or approved acronym sense, the agent does not silently choose a near match; it returns a structured clarification request with the unresolved term, the detected candidate senses/labels, and one or more concise choices. (b) The Ask UI renders the clarification as an actionable question, preserves the pending question/session, and submits the user's selection or free-text clarification as the next turn. A confirmed clarification is visible in the trace and is used for the subsequent router/text2cypher decision. (c) If the user declines or no clarification is possible, the answer states the ambiguity and does not present a zero-row near-match as a definitive answer. Existing clear questions remain single-pass and unchanged. (d) Tests cover unknown acronym, ambiguous label with multiple candidates, user selection, cancellation, session persistence, and the no-clarification regression path.
+notes: |
+  Requested as a companion to R18 after the Tower/TOMRole mismatch: the Explorer's synthesized Tower concept was silently mapped to the real TOMRole label. This is a disambiguation contract, not permission for the agent to invent ontology or relationship meanings; unresolved meaning still routes to the SME/HITL path.

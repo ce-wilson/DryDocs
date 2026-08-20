@@ -1,0 +1,18 @@
+id: R14
+epic: agentic-qa
+title: agents/common shows up in the ADK app list, though it is a shared-tools package and not an app
+type: chore
+module: drydocs-agents
+phase: 15
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- agents/common/
+- agents/README.md
+acceptance: |
+  ADK app discovery (the /list-apps surface) lists only the real agent apps — graph_qa, core_ingest, controlm_fix, graph_query — and not the shared-tools package `common`, by whichever of hiding or restructuring the ADK supports WITHOUT moving the shared tooling out of import reach of the apps that use it (tests/conftest.py closes common.neo4j_tool's driver singleton by module name, so the import path may not silently change); agents/README.md states the convention so the next shared package is not created as an app by accident.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-1, the OLDEST entry in the inbox (2026-07-03) — cosmetic, deferred at four grooms, and small enough that carrying it costs more than doing it. Haiku with a hard constraint: the import path is load-bearing for the session-teardown hook, so "restructure" may not mean "move it somewhere the apps cannot import".

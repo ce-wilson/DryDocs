@@ -15,7 +15,7 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
+BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog"  # the sharded tree (ADR 0013)
 AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 
 STATUSES = {"todo", "in_progress", "blocked", "done"}
@@ -40,12 +40,13 @@ REQUIRED = (
 
 def main() -> int:
     fails: list[str] = []
-    doc = yaml.safe_load(BACKLOG.read_text(encoding="utf-8"))
+    sys.path.insert(0, str(REPO_ROOT))
+    from drydocs_core.backlog_store import derive_summary, load_backlog_document
 
-    if doc.get("schema") != "drydocs.backlog.v2":
+    doc = load_backlog_document(BACKLOG)
+
+    if doc.get("schema") != "drydocs.backlog.v3":
         fails.append(f"schema drifted: {doc.get('schema')!r}")
-    if not doc.get("updated"):
-        fails.append("missing updated:")
 
     phases = doc.get("plan", {}).get("phases", [])
     pids: set[int] = set()
@@ -111,26 +112,23 @@ def main() -> int:
         if color[iid] == white:
             visit(iid, [])
 
-    summary = doc.get("summary", {})
-    computed = {s: 0 for s in STATUSES}
-    for it in items:
-        computed[it["status"]] += 1
-    for s in sorted(STATUSES):
-        if summary.get(s) != computed[s]:
-            fails.append(f"summary.{s}={summary.get(s)} but items say {computed[s]}")
-
-    expected = {
-        iid
-        for iid, it in by_id.items()
-        if it["status"] == "todo"
-        and all(by_id[d]["status"] == "done" for d in it.get("depends_on", []))
-    }
-    actual = set(summary.get("next_ready", []))
-    if actual != expected:
-        fails.append(
-            f"next_ready drifted — listed-but-not-ready: {sorted(actual - expected)}; "
-            f"ready-but-missing: {sorted(expected - actual)}"
-        )
+    # ADR 0013 Clause 3: nothing stores a roll-up; the derived one is printed so the
+    # groomer can read next_ready without opening the board.
+    derived = derive_summary(doc)
+    for path in sorted(BACKLOG.rglob("*.yaml")):
+        d = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        for key in ("summary", "next_ready", "updated"):
+            if isinstance(d, dict) and key in d:
+                fails.append(f"{path.name}: stored `{key}:` — roll-ups are derived, never stored")
+    for path in (BACKLOG / "items").glob("*.yaml"):
+        d = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if d.get("id") != path.stem:
+            fails.append(f"{path.name}: id {d.get('id')!r} != filename")
+    print(
+        "derived: "
+        + " ".join(f"{k}={derived[k]}" for k in ("todo", "in_progress", "blocked", "done"))
+        + f" next_ready={len(derived['next_ready'])}"
+    )
 
     print(f"items={len(items)} phases={len(phases)} modules={len(modules)}")
     if fails:

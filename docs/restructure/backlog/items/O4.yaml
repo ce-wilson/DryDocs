@@ -1,0 +1,22 @@
+id: O4
+epic: web-console
+title: 'GraphAccess seam refit in web/src/lib: bolt becomes a dev-mode adapter; raw Cypher gated behind
+  admin + dev flag'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O3
+inputs:
+- docs/decisions/0005-browser-neo4j-access-path.md
+- web/src/lib/neo4j.ts
+- web/src/components/CypherConsole.tsx
+- web/README.md
+acceptance: |
+  Per ADR 0005 Action items 2/4/5: one GraphAccess interface in web/src/lib/ is the only way console code reads the graph — view components never import neo4j-driver directly; neo4j.ts is refitted as the bolt adapter behind it, activating ONLY on an explicit dev flag + admin role; an api adapter stub exists against the O5 endpoint shape (may throw not-implemented until O5 lands, but the seam + a bolt/api conformance test are real); the CypherConsole raw-Cypher panel is gated behind admin + dev flag; a repo check confirms no VITE_NEO4J_PASSWORD in any committed env file and web/README.md documents the dev-mode credential rule (localhost form-entry only, never committed/CI-injected). npm run build + lint green; the CDP drive's login/role checks still pass.
+notes: |
+  Groomed 2026-07-14 from ADR 0005 Action items 2, 4, 5 (the ADR assigns the refit to O1's code stream; this item carries it so O1 stays the umbrella). The seam conformance test is the ADR's "two adapters kept honest" consequence. DONE 2026-07-14 (same day, branch feat/o4-graphaccess-seam, c553a32): graph.ts (interface + boltAllowed = DEV && admin — production bundles compile the bolt path out by construction), neo4j.ts refitted (only createBoltAccess exported; driver internal), graphApi.ts fail-loud stub, CypherConsole panel gated + env password seeding removed, .env.example + README carry the never-commit rule. Conformance = `satisfies GraphAccess` in both adapters (tsc-enforced; no vitest per the O2 precedent — noted deviation from the groomed wording, mechanism equivalent) + the runtime drives. VERIFIED: dev build panel PRESENT/password empty, PRODUCTION PREVIEW panel ABSENT + explanation shown (3/3+3/3), 27/27 login/role regression, zero VITE_NEO4J_PASSWORD assignments.

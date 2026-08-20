@@ -1,0 +1,23 @@
+id: K19
+epic: seal-attribution
+title: 'An app-code mapping is an as-of assertion, not a fact: detect a reused 3-char code inheriting
+  its predecessor''s application'
+type: bug
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- K18
+inputs:
+- drydocs_api/mappings.py
+- drydocs/loaders/folder_attribution.py
+- config/overrides/app-code-mappings.csv
+acceptance: |
+  The store can answer "is this code's mapping older than the folders it is being applied to?" and says so where a steward will see it. Concretely: a check that reports any app_code whose mapping `authored_on` PREDATES the first-seen date of folders now carrying that code, as a review queue with counts — never an automatic re-attribution, because a reissued code and a genuinely growing application are indistinguishable without a human. Either effective dating on the mapping row (valid_from/valid_to) or the detection alone, with the choice recorded in the item's close note and the reason. A test builds the reuse case from fixtures: one code, two eras, folders on both sides.
+notes: |
+  Groomed 2026-08-05 (desktop) from Idea-67 (user, same day). THE SOURCE FACT: a Control-M app code is a 3-character namespace, which is scarce, so codes are retired and REISSUED with a different meaning — `DDC` is the documented case (created for the PySpark conversion, repurposed, nothing PySpark now). That makes a code -> application mapping an as-of assertion, the same shape as the FID -> SEAL registration ruled in `fid-identity-and-scope` §B1 and the third current-state-only identifier found in one week. `authored_on` already gives the store an as-of; what nothing prevents is a reused code silently inheriting its predecessor's mapping while folders authored under the OLD meaning keep an attribution that is now wrong. DEPENDS ON K18 for a practical reason, not a logical one: K18 touches the same store entry shape, and doing the two in one pass avoids migrating the row format twice. NOT IN SCOPE: deciding whether history should be preserved (a retired mapping kept valid_to-stamped) or overwritten. That is an ontology-flavored question about whether the graph records past attributions at all, and it goes to a gate if the answer is anything but "detect and report".
+progress: |
+  2026-08-05 — DONE (desktop, claimed same day). CHOICE: detection alone, NO valid_from/valid_to effective dating. Reasons: (1) effective dating IS preserved mapping history, which this item's own scope note routes to a gate if the answer is anything but "detect and report" — choosing it here would pre-empt that gate; (2) it would be a second committed-CSV format break (v4) landing on the company right behind K18's v3, for a file that is header-only producer-side; (3) dating buys no automatic power anyway — a reissued code and a growing application stay indistinguishable without a human. BUILT: detect_mapping_age_suspects() (pure, folder_attribution.py) answers "is this row older than the folders it is applied to?" per authored ROW (each row is its own as-of assertion; same-day is not postdating; no date on either side = no age claim; per-folder rows age against their one folder). Queue surfaces as MappingAgeSuspect entries on the coverage (count in as_dict + stamped run.mapping_age_suspects + LOGGER warning), and the CLI prints the full mapping_age_review_queue after the coverage dict — reported, never re-attributed; suspect folders stay attributed, so the queue rides OUTSIDE the coverage invariant. Folder dates come from ControlMFolder.first_seen_at (fetch_folder_first_seen, date part only). Tests: the acceptance's reuse case verbatim (one code DDC, two eras, folders on both sides — flagged AND still attributed) + inertness cases.

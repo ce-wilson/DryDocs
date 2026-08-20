@@ -1,0 +1,29 @@
+id: C12
+epic: ontology-mapping
+title: 'Run the platforms-taxonomy HITL gate: retire SchedulerKind into the software-registry model (confirm
+  the 2026-07-21 rulings; B4/B5 residual), then groom the build follow-ups'
+type: task
+module: ontology
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on:
+- C6
+- C11
+inputs:
+- config/gate-prompts/platforms-taxonomy.yaml
+- config/taxonomy/platforms.yaml
+- config/taxonomy/software-registry.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- config/gate-log.md
+acceptance: |
+  USER-GATED START — the SME convenes the gate session (the pull loop skips this item until then; the J13/C11 idiom). The rendered platforms-taxonomy gate page is walked in-session: section A plus the 2026-07-21 pm rulings (B1 USES_TOOL retired -> the ACTIVE USES_SOFTWARE edge with source: 'batch-port'; B2 no capability node layer — role: orchestrator carries the classification; B3 merge into :SoftwareProduct; Q6 Ais* removed both sides, acronym preserved only in software-registry.yaml#acronyms) are confirmed AS WRITTEN or amended; B4 (typing note) and B5 (airflow row) are ruled. Sign-off transcribed to config/gate-log.md; gates.json + enforcement matrix regenerated; platforms.yaml flips confirmed: true. The build follow-ups are GROOMED as items, not built here: SchedulerKind seed/constraint retirement, the USES_SOFTWARE batch-port loader migration, seal_requires_scheduler + requires-scheduler map-entry retirement, and the Ais* straggler sweep (README / NODE_QUICK_REFERENCE / LoadPlanV3 refs). Nothing flips active inside this item; full suite green.
+notes: |
+  Groomed 2026-07-21 pm from the SchedulerKind-deprecation inbox line (parked since 2026-07-09; its groom-condition fully fired same day: C11 captured the company shape in the morning, the SME ruled the reshape in-chat in the afternoon — Ais* removed both sides, registry model wins, gate prompt reshaped to confirm-as-written). Model fable per the matrix: the session ratifies ontology/class decisions. The K5 gate-RUN item is the precedent for itemizing a gate session.
+annotations:
+  status: 'DONE 2026-07-21 pm — gate RUN in-chat same session as the pre-rulings: 3/3 as recommended (A+B1–B3
+    as written; B4 existing typing covers; B5 airflow row stays); gate-log entry appended; platforms.yaml
+    confirmed: true; follow-ups groomed C13/C14; gates.json + matrix regenerated'

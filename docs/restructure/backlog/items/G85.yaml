@@ -1,0 +1,21 @@
+id: G85
+epic: web-console
+title: Agent lookup beside the fix diff — cite the vendor→standards→team chain from the verified BMC corpus
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: opus
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- external/orchestration/bmc-controlm/SOURCE-MANIFEST.md
+- drydocs_remediation/module-requirements.md
+- web/src/remediation/FixDiff.tsx
+- scripts/render_remediation_diff.py
+acceptance: |
+  DETERMINISTIC FIRST, AGENT SECOND (user direction 2026-08-12): every remediation decision stays with the rules engine and the xml_io post-conditions; the agent never decides. It answers "why is this the rule?" and "does the vendor actually say that?" beside the SME diff, walking the three tiers that are ALREADY the ratified precedence order (CLAUDE.md section 4) -- (1) VENDOR: what BMC says the object is, from external/orchestration/bmc-controlm/ (the BASELINE); (2) PLATFORM STANDARDS APPLIED: how knowledge/standards/ + the R1-R28 rules registry refine it; (3) TEAM: who owns the thing being changed (LOB->Product->Team, SEAL/escalation routing). So the surface is a visualization of the existing precedence chain, not a new concept. HARD REQUIREMENTS: (a) every answer cites its corpus doc AND its trust level -- an answer sourced from a [GROUNDED search-snippets-only] capture (e.g. the XML-definition stub) must say so, never present it as vendor ground truth (the SOURCE-MANIFEST trust ladder is the contract); (b) read-only, no graph write -- consistent with the remediation module invariant; (c) precomputed material rides the generated-artifact pattern; a live agent call is its own seam, never a QuerySpec; (d) the FULL BMC scrape is loaded first -- declared as this feature's substrate in drydocs_remediation/module-requirements.md section 3, with the 403- blocked fetch list re-run from a network that reaches documents.bmc.com. GATED BEHIND the fix-diff surface existing (it reviews a diff; without one it reviews nothing). Precedents: the Q&A console for the answer surface; docmeta for citation handling.
+output: web/ (drydocs-web) + agents/ integration seam
+notes: |
+  Groomed from the 2026-08-12 user follow-up ("an agent query against the verified bmc documentation, to show vendor, then the platform standards applied, then the team"). Scope-noted as its own epic slice, larger than the defect fixes it rode in with; most useful once a real (non-demo) fix diff exists to review beside it.

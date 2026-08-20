@@ -1,0 +1,21 @@
+id: U20
+epic: self-documentation
+title: 'The code-graph review plan still says six scan roots: restate its doc-coverage unit on eight package
+  roots, or derive the list the way U18 derived the metric scope'
+type: bug
+module: docs
+phase: 16
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/code-graph-review-plan.md
+- tests/unit/test_code_graph_review_plan.py
+- pyproject.toml
+- .claude/skills/tech-debt/SKILL.md
+acceptance: |
+  Phase 3 unit 3 of docs/reviews/code-graph-review-plan.md no longer reads "Six scan roots x DesignDoc coverage" with per-root counts that predate BOTH drydocs_api and drydocs_docmeta (tests 85, drydocs 41, drydocs_core 35, lineage 12, remediation 7, deepdoc 3). It is restated on the EIGHT package roots U18 established, the per-root doc coverage is RE-MEASURED rather than re-typed (venue named per J18), and every other "six scan roots" phrase in the same document is swept with it -- the Phase 1 mandate is a second instance, and the U9 scope note already says the snapshot is the whole repo tree. The item also DECIDES, and records, whether a per-root count belongs in prose at all: if it stays, it comes under tests/unit/test_code_graph_review_plan.py the way U18 anchored the typed scope on pyproject's packages; if it goes, the document says where the number is derived instead. A third hand-typed root list in one document is the argument for deriving, and this item is where that argument is settled rather than restated.
+notes: |
+  Groomed 2026-08-11 from Idea-97, which U18's own close note inboxed rather than swept in -- same disease, one table over. U18 widened the A1-A6 metric scope to eight roots and guarded the typed list against pyproject.toml, but that guard is anchored on the $packages literal while this unit hard-codes its own root list in prose, so it sat outside both the guard's reach and U18's stated surface. Left deliberately, filed honestly, and cheap to close.

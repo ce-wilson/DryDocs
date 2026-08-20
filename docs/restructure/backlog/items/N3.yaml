@@ -1,0 +1,22 @@
+id: N3
+epic: source-column-mappings
+title: 'Declare the three joins a load map needs: loader->source_id, command->loaders, and the canonical
+  load sequence'
+type: task
+module: drydocs-load
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/base.py
+- drydocs/loaders/
+- drydocs/cli.py
+- config/source-registry.yaml
+- scripts/ingest.sh
+acceptance: |
+  The three facts a load map is built from become machine-readable, because none of them are today. (1) Every BaseLoader subclass declares source_id resolving to a config/source-registry.yaml id — BaseLoader carries name (e.g. controlm_jobs.v1) and source_label ('csv'|'oracle'|'agent'|'human') but NOTHING tying a loader to its registered source, so loader->source->column-ledger cannot be traversed at all. (2) Each Typer command that runs loaders declares which ones, in order (today it is only in the function body). (3) ONE canonical ordered load sequence is declared once. Guards: every declared source_id resolves in the registry; every sequence step is a real registered command; every loader is either declared or explicitly exempt (base/abstract) — no silent omissions.
+notes: |
+  Counts at groom time: 25 BaseLoader subclasses across 21 modules, 32 registered Typer commands, 16 registry sources. Module drydocs-load (the declarations live on loader classes) rather than config like N1/N2 — the ledgers are config, the joins are code. The guard catches an UNRESOLVABLE source_id, not a WRONG one, so assign each from the loader's own SQL/adapter and review in one pass. Startable now: N1/N2 are done. DONE 2026-07-29: (1) BaseLoader.source_id ClassVar declared on all 25 concrete loaders, assigned from each loader's own gate/adapter (batch_port_orchestrator -> seal-extract per its taxonomy feed; seal_attribution -> stg-app-fact; code_snapshot -> depgraph-snapshot); ManualSealAttributionLoader is the ONE named exemption (SOURCELESS_LOADERS with written reason — manifest-gated human source, not a registry feed; honest deviation from the "exempt = base/abstract only" wording). (2) refresh-reference / ingest-controlm / doc-traceability chains lifted to module-level constants the command bodies CONSUME (declaration == behavior); COMMAND_LOADERS derives from them; every dedicated command's _gate_source literal now reads cls.source_id; LOADER_SOURCE is a projection of the classes, never hand-kept. (3) CANONICAL_LOAD_SEQUENCE (14 steps, mode standing|optional|gated with notes). Guards: tests/unit/test_load_map_declarations.py (11 tests — resolution, exemption reasons, projection tie, chain/registry binding, command reality, reachability/no-orphans, sequence validity); the old text-scan chain-order test rewritten against the declarations. Suite 1155 passed / 5 skipped. N4 same session: scripts/render_load_map.py -> web/src/generated/load-map.json.

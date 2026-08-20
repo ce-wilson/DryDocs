@@ -1,0 +1,71 @@
+id: release-infrastructure
+letter: J
+title: Release infrastructure
+order: 9
+groom_log:
+- date: '2026-07-01'
+  note: |-
+    ── Epic J — Release infrastructure (main) — Phase 8 ──────────────────────
+    Groomed 2026-07-01 from the IDEAS inbox (architecture-review follow-ups) via the
+    groom-backlog skill (I3's demonstration run). Sibling inbox lines (versioning
+    reset, CI, cli regroup) stay parked pending user decisions (semver start, rename
+    window) — promote them here when decided.
+  attached_at: J1
+- date: '2026-07-09'
+  note: (J7/J8 groomed 2026-07-09 — tech-debt remediation tails, docs/reviews/*.md)
+  attached_at: J7
+- date: '2026-07-15'
+  note: (J11/J12/C8 groomed 2026-07-15 — weekly inbox groom.)
+  attached_at: J11
+- date: '2026-07-27'
+  note: |-
+    ── appended at the 2026-07-27 groom run (weekly inbox groom) ──────────────
+    Sources: the two 2026-07-27 publish-boundary inbox entries (→ J14/J15), the
+    2026-07-26 schema/spec findings from the identity-gate review session
+    (→ G36/O33/G38), plus one merge (deepdoc charter drift → G32 clause e).
+    The catalog-gate drift entry stays inboxed on its company-sign-off trigger
+    (its coordinate-first constraint lifted — the laptop session landed 07-27).
+  attached_at: J14
+- date: '2026-07-30'
+  note: |-
+    --- 2026-07-30 groom (user go-ahead on the registry-review observations):
+    --- the source-registry pk check + binding-agreement guard, one item.
+  attached_at: J21
+- date: '2026-07-30'
+  note: |-
+    --- 2026-07-30 weekly groom: the R5 follow-up trio (R11-R13), the J16 guard's
+    --- tracked-only blind spot (J22), and two time-parked infra chores whose
+    --- triggers fired today (G49 MCP verify — port review done; G50 rollback
+    --- container — the neo4jtest probation week is up).
+  attached_at: J22
+- date: '2026-08-04'
+  note: |-
+    ── Epic X — ddlineage retirement (main, graph-infra) ────────────────────────
+    Groomed 2026-08-04 on the user's direction ("create a backlog epic to remove
+    it"), immediately after a confirmation pass proved the standing fact: ddlineage
+    is provisioned but WRITTEN BY NOTHING. The lineage writer pins DATABASE =
+    "drydocs" and raises TrustBoundaryError on anything else (ADR 0002 D2); the
+    four specs that once read ddlineage were repointed at G30; the read-set
+    allow-list in query_specs.py deliberately excludes it; test_database_names.py
+    proves every read target has a writer. The database's only remaining role is
+    to exist, empty, on every provisioned host. ADR 0002's residency clarification
+    says this topology changes "as an amendment, through the SME gate — not by
+    drift" — X1 is that amendment, recording the user's 2026-08-04 in-chat ruling.
+    Removal is cheap BY THE ADR'S OWN ACCOUNTING: "ddlineage is empty, so choosing
+    it later costs a design, not a data migration" — and recreating it later costs
+    one CREATE DATABASE line, while the design question (a :ControlMJob proxy-node
+    spine) was never answered and stays owned by the named revisit trigger.
+    Sequencing: X1 (decision record) → X2 (repo sweep) → X3/X4 (live drops, one
+    per machine — the G50/G52 venue-pinned precedent; the two machines hold
+    independent graphs, so one item cannot close both).
+  attached_at: J33
+- date: '2026-08-11'
+  note: |-
+    ── appended at the 2026-08-11 groom run (weekly inbox groom) ──────────────
+    Sources: the eleven ungroomed 2026-08-09..08-11 inbox captures. Port/guard
+    family → J42-J47; the C25 loader follow-up → C33; the review-plan root list
+    → U20; the deployment-grain thread → K22/K23 (its register-line finding
+    merged into G70). Idea-101 merged into J43. Two questions stay OPEN in the
+    inbox for a user/SME ruling: Idea-104 (MFT route-id shape) and Idea-105
+    (the DESCRIPTION field's two claimants).
+  attached_at: J42

@@ -1,0 +1,22 @@
+id: J29
+epic: release-infrastructure
+title: 'Encoding standard for loader-read text formats: UTF-8 WITHOUT BOM on every .cypher/.sql/.csv,
+  guarded'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- tests/unit/test_file_encoding.py
+- internal/registry-redesign/samples/
+acceptance: |
+  No tracked or untracked-not-ignored .cypher/.sql/.csv file starts with a UTF-8 BOM; a guard test walks the tree (the J22 tracked+untracked walk) and reds any offender with a fix message; existing BOM carriers in those formats are stripped; vendor .xsd captures are exempt with the reason recorded. Guard proven live on a BOM'd probe before close.
+notes: |
+  SME ruling 2026-08-04 in-chat: UTF-8 was the SME's deliberate readability choice when asked; the BOM was never part of it — standardize all Cypher/CSV import surfaces on UTF-8 WITHOUT BOM now. DIAGNOSIS CORRECTED at build: the 2026-08-04 M3-reload incident's BOM did NOT come from the provisioning files (byte-scan: every tracked .cypher and .sql is clean) — it was injected by a PowerShell 5.1 pipe into docker exec, which is precisely the writer-artifact class the guard fences (Out-File/'>' default UTF8-with-BOM, Excel CSV export). Real carriers found and stripped: the three internal/registry-redesign/samples CSVs (a BOM'd CSV read with plain utf-8 keeps U+FEFF glued to the first header, silently breaking populate_by_name matching). The nine vendor .xsd captures keep their BOMs: XML self-declares encoding, parsers consume the BOM, and they are VERBATIM-trust captures we do not edit. Guard = tests/unit/test_file_encoding.py, proven red on an untracked probe then green. The provision.ps1 cypher-shell-on-PATH gap stays inboxed separately. (Groomed 2026-08-04 as G54.)
+annotations:
+  status: groomed straight to done 2026-08-04 (desktop, the G52 landed-in-one-pass precedent) — user directive
+    during the M3-reload follow-up

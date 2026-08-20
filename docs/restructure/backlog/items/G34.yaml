@@ -1,0 +1,23 @@
+id: G34
+epic: ontology-mapping
+title: 'Scaffold the business glossary NOW so the internal port cannot collide on a name or a backlog
+  slot: reserve CatalogBusinessTerm + its edges as status: planned, schema public / definitions internal'
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/patterns/data-catalog/enterprise-data-catalog-ontology.md
+- drydocs_core/ontology/relationship_vocabulary/
+- docs/RELATIONSHIP_GUIDE.md
+- config/taxonomy-ontology-map/
+- reference/standards/
+- config/gate-log.md
+acceptance: |
+  RESERVATION ONLY — this item deliberately does NOT define terms or build a glossary. It claims the names and the slot so a later internal port cannot collide, then stops. Specifically: (a) `CatalogBusinessTerm` keyed by `term_id` is registered as a `proposed` taxonomy-ontology-map entry, taking the shape the data-catalog pattern already defines rather than inventing one; (b) its three edges — CatalogElement IS_REPRESENTED_AS, CatalogValidValue HAS_ALLOWED_VALUES, CatalogBusinessTerm DEFINED_FOR — are registered in drydocs_core/ontology/relationship_vocabulary.yaml at `status: planned`, the documented pre-gate step (SOSA/SSN precedent, the only other planned entry); (c) the classification split is written down: the glossary SCHEMA (label, key, edge terms, YAML shape) is Internal-Public and ports to the company repo, the term DEFINITIONS are Internal and live in internal/, and industry-standard terms bind to SKOS, already a declared reference standard in reference/standards/; (d) the file locations for both halves exist with a README stating the split. NO term is defined, no loader writes anything, and the HITL gate that would confirm the edges is NOT run here. Suite green.
+notes: |
+  Raised at the business-application-identity gate §F2 (SIGNED OFF 2026-07-27). SME reason, verbatim in substance: the glossary will for the most part be internal unless there are industry-standard acronyms or names, and doing the scaffolding producer-side now means the internal ports do not collide later with either a name or a backlog item. That is a PORT-SEQUENCING argument, not an ontology one — which is why reservation is the whole deliverable. WHY IT IS AN ITEM RATHER THAN AN ACT OF THAT GATE: the identity gate's §A1 states it "creates no relationship-vocabulary term". Registering the edges inside it would have falsified A1 and re-opened a ruled scope item, so the registration was pushed here, where `status: planned` needs no gate of its own. Substance this feeds: F2's finding that the durable home for what an acronym MEANS is a CatalogBusinessTerm-shaped glossary, the same conclusion the reopened gate-log Q6 acronym question circles, plus the Unity Catalog takeaway that a controlled vocabulary needs an enforcement point or it rots. The identity gate is itself the evidence: "SEAL" was found carrying THREE distinct meanings across three homes (the issuing authority, the source id, and an ecosystem referencing convention used in Control-M CMDLINEs), and nothing in the repo recorded that they were different things. MERGED IN 2026-08-05 (desktop, Idea-35 — the acronym-catalog line): that entry is CONTENT for this scaffold, not a second home, and it names the shape the scaffold should be able to hold — which is worth knowing while building the empty version. Its requirement: key by acronym, carry MANY senses per key, and tag each sense with its scope (`area`, `business-domain`, `technical-domain`, `industry` — what an outsider would assume). Plus, wherever a misreading has actually happened, an explicit **does-NOT-mean** note; that note, not the expansion, is the protective sentence. AIS is the worked example and the reason: "as-is" (a standard modeling idiom) vs "Application Integration Streaming" (an org platform family), with our own `:AisTool` label having meant NEITHER. Today `software-registry.yaml#acronyms` is a one-key section with no scope dimension, so it can record expansions but not COLLISIONS — and collisions are the failure mode that bites. This is a SKOS job (prefLabel / altLabel / definition / scopeNote, senses as concepts in a scheme); SKOS is declared in reference/standards/README.md but has NO fetched local copy yet, unlike prov-o / w3c-org / dprod-ekgf / sosa-ssn — fetching it belongs with the content pass. SCAFFOLD-ONLY STILL HOLDS: this item defines no terms, so nothing above changes its acceptance. The content pass stays parked on its own trigger, the gate-log Q6 ruling (which decides whether `#acronyms` survives at all), and lands INSIDE this scaffold.

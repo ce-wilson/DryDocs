@@ -1,0 +1,21 @@
+id: N16
+epic: source-column-mappings
+title: 'Rule what source_label means before a thirteenth value is added: the declared four-value enum
+  has eight undeclared values in the tree and nothing enforces it'
+type: chore
+module: drydocs-load
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/base.py
+- config/source-registry.yaml
+- drydocs_api/mappings.py
+- drydocs_core/mapping_store.py
+acceptance: |
+  THE MEASURED STATE, taken at the groom rather than recalled: drydocs/loaders/base.py:212 declares `source_label: ClassVar[str] = "csv"` with the enum in a COMMENT -- 'csv' | 'oracle' | 'agent' | 'human' -- and thirteen loader classes override it with EIGHT values that comment never names: taxonomy, markdown, pat, snapshot, json, pdf, registry, vendor-docs. Nothing enforces the comment, and `agent` is declared but unused. EXACTLY ONE resolution lands, recorded in the close note (the A4 idiom): (a) WIDEN AND ENFORCE -- the field becomes a declared enum covering the values actually in use, with a test that a loader cannot ship an undeclared one; (b) RE-DEFINE -- the field means the acquisition CARRIER rather than the file format, and the format values move to where N12's `acquisition.format` already records them, so the two ledgers stop describing the same fact differently; (c) RETIRE THE COMMENT -- the field is free text by design, the comment goes, and what the value is FOR is written down instead. TWO FINDINGS THE RULING MUST CARRY, both surfaced at the groom: (i) THE NAME IS ALREADY TAKEN, for a different subject: `source_label` in drydocs_api/mappings.py and drydocs_core/mapping_store.py means the SOURCE NODE LABEL of a mapping ("ControlMFolder"), not a provenance carrier. Whatever is ruled must state the collision so a reader of either does not import the other's meaning. (ii) THE VALUE REACHES THE GRAPH: base.py sets `run.source = $source_label` on the run envelope, so this is not a code-local label -- it is provenance a consumer reads. SCOPE FENCE: this rules the FIELD. It builds no Snowflake loader and re-sources nothing.
+notes: |
+  Groomed 2026-08-19 from Idea-132's one open question. The ACQUISITION half of that entry already has owners -- N12 (the declared acquisition block, done) and N13 (the signed lifecycle gate) -- and nothing else in it is owed producer-side today: there are no snow_* loaders here and the ServiceNow re-sourcing is company-side work. The entry stays in the inbox as the standing record of that swap; only this question is groomed out of it. Module drydocs-load / phase 11 / epic source-column-mappings: the code is the loader base class, and the SUBJECT is per-source governance metadata, which is what Epic N is for. HITL-free -- the field records how data arrived and no edge meaning moves. p2 despite the driver being company-side: the fix is cheap, the value is already written to the graph's run envelope, and the next value (`snowflake`) arrives WITH the re-sourcing rather than after it -- ruling afterwards means ruling with a thirteenth exception already in the tree.

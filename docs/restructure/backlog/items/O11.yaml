@@ -1,0 +1,25 @@
+id: O11
+epic: web-console
+title: QuerySpec registry + two-path Neo4j data-frame export (client view export; streamed full export
+  with provenance manifest)
+type: task
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O9
+inputs:
+- UI-WIP/site-plan.md
+- drydocs_api/
+- web/src/
+- PUBLISH-BOUNDARY.md
+- config/classification.yaml
+acceptance: |
+  Every data frame binds to a versioned QuerySpec (id, database, parameterized read-only cypher, columns, classification) and the UI renders only registry results; the toolbar/grid [Export] offers (a) client-side CSV/JSON of the current grid state and (b) a drydocs-api export endpoint that re-runs the spec server-side and STREAMS csv/jsonl (driver streaming — not apoc.export, which writes on the DB server) with a provenance manifest (spec id, cypher hash, params, database, executed_at, row_count, classification, trust tiers present); internal / internal-confidential exports carry the banner + filename prefix; anything readable from ddcontext is watermarked SYNTHESIZED; a "Copy as Cypher" action exposes the spec's query + params; unit tests cover manifest content and the classification rules.
+notes: |
+  site-plan.md P2, export half. The plan §4 "until O3 resolves, the ADK tool layer IS the API" caveat is OBSOLETE — ADR 0005 is ratified and drydocs-api shipped (O5), so export endpoints land there directly; the ADK agent layer is a later, separate concern (site-plan corrected this groom). DONE 2026-07-21: drydocs_api/query_specs.py (registry — versioned ids, spec-owned database from the reviewed set, read-only-guard-validated cypher, classification vocabulary; invariants asserted at import) + drydocs_api/exports.py (run_spec with the ddcontext/ddall grid-visible trust_watermark column; export_spec streaming csv/jsonl generators; ExportLedger registers the manifest only when the stream COMPLETES — served at GET /exports/{id}/manifest as the sidecar; banner row + INTERNAL__/INTERNAL-CONFIDENTIAL__ filename prefixes) + LiveRunner.stream (session.run driver streaming, READ pinned, session owned by the generator — NOT apoc.export, NOT buffered execute_query). Web: GraphAccess seam gains runSpec/exportSpec (bolt adapter fails loud); SpecGrid binds all four Explorer tabs to their specs with both export paths + client-built view manifest + Copy-as-Cypher + classification banner; O9 demo frames survive as the VISIBLE fallback when the api is down or the spec returns zero rows (empty local graph) — never silent. Tests: test_query_specs.py (15 — registry invariants, watermark, banner/ prefix rules, csv/jsonl stream content, manifest fields incl. cypher sha256 + exported_by, ledger bounds); suite 787 passed. Live-verified: uvicorn against neo4jtest — INTERNAL__ csv with banner + manifest, ddcontext jsonl with SYNTHESIZED tier; browser end-to-end (auth → spec run → zero-row fallback notice). Local DBs are empty so the LIVE grid path is covered by tests + the server round-trip, not yet by eyeballed populated frames. Toolbar [Export] stays disabled — grid-level export per frame is the shipped surface (acceptance's "toolbar/grid" either/or). SME CORRECTION same day (user review of the field mapping): jobs + conditions bumped v2 — folder resolved through the :ControlMFolder node (f.sched_table, not the denormalized folder_id join key), jobs gains data_center via the folder's SCHEDULED_ON :ControlMServer (the reified DATA_CENTER field); NEW explorer.folder-applications.v1 = the ControlMFolder -> BusinessApplication crosswalk over the gated edges (CONTAINS_JOB + WAS_ASSOCIATED_WITH {seal_app_ref}), bound to a new Folders tab (reviewed fifth Explorer tab — site-plan §3 listed four). SECOND SME CORRECTION same day: explorer.controlm-app-codes.v1 + App codes tab — the two-pattern code model (dedicated code = direct 1:1 vs shared platform code = many apps), pattern DERIVED from observed cardinality over gated edges only; the authoritative code->application edge is inboxed as a gate candidate (IDEAS 2026-07-21, feeds K2 tiers + the O13 code->application mapping-domain hook). SME: these frames = the power-user/SME mapping surface needed soonest -> O13 screen next.
+annotations:
+  status: DONE 2026-07-21 (launchable-site session, follows O9) — see notes

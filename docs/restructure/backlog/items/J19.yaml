@@ -1,0 +1,19 @@
+id: J19
+epic: release-infrastructure
+title: Pull rule states the claim is pushed BEFORE work starts — the pushed-claim discipline becomes the
+  written rule, not session lore
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- CLAUDE.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  CLAUDE.md's pull rule and the backlog.yaml header comment both say the in_progress claim is COMMITTED AND PUSHED before work starts, not written at close, and name why (two sessions independently built C19 ten minutes apart on 2026-07-28).
+notes: |
+  Groomed 2026-07-28 pm from the duplicate-C19 [idea] line. 2026-07-30 EXECUTION RECORD — acceptance and inputs were REVISED DURING execution (bff98f5), so the closed item is not graded against the text it was groomed with; recording that here because the diff alone reads as a clean pass. Two changes, both substantive: (a) the original clause "and the groom-backlog skill where it restates it" was VACUOUS — that skill covers grooming, not pulling, and never restated the pull rule; it was deliberately left untouched rather than have a pull-rule section invented in it to satisfy the wording. (b) the real third edit site was this file's own "HOW AN AGENT PULLS WORK" header comment — the block agents actually read on pull, whose step 2 still said "(commit that change)"; it was absent from inputs. FOLLOW-UP in the same session: the sub-agent's edits stated only the abstract mechanism and dropped the named incident, so the retained "names why" clause was NOT met at bff98f5 — both sites now name the 2026-07-28 duplicate-C19 build explicitly. Naming the incident is the point of the item's own title (rule, not lore): an abstract sync-layer note reads as theoretical, the incident does not.

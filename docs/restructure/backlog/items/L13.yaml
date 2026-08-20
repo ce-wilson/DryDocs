@@ -1,0 +1,25 @@
+id: L13
+epic: doc-infrastructure
+title: 'Collapse the design-doc dual-HTML render to ONE file: .print.html misrenders; the screen .html
+  already print-adapts — retire the .print.html series'
+type: bug
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/design_doc.py
+- drydocs/doc_outline.py
+- scripts/render_design_doc.py
+- scripts/doc_to_pdf.py
+- docs/design/
+- tests/unit/test_design_doc.py
+- tests/unit/test_doc_pdf.py
+- CLAUDE.md
+acceptance: |
+  write_doc emits a SINGLE .html per design doc (the .print.html twin retired): on screen it keeps the current dark theme + the L5 annotate/save layer; under @media print it renders black-on-white (already true of today's screen html) AND carries the L6 print-margin anchor tags currently injected only into the .print.html — the paper HITL loop (print, pen, scan, transcribe-doc-markup re-attach) must survive the collapse unchanged, and the doc's own "How to read" boilerplate updates to name one file for both uses. scripts/doc_to_pdf.py re-points to the single html (PDF output visually equivalent to today's print render). All committed docs/design/*.print.html files are git-rm'd and the renderer never writes them again; the session ritual/stale-render wording (CLAUDE.md) and render/pdf/transcribe tests update to the one-file world. Regenerated renders committed; full suite green.
+notes: |
+  Filed 2026-07-18 from SME chat + screenshot evidence (root-level drydocs-project-review-print-html-bug.png, local-only per the root-images gitignore): drydocs-project-review.print.html renders WRONG in the browser, while the plain .html renders correctly on screen (white-on- black) and already converts to black-on-white when printed — two surfaces where one suffices, and the broken one is the redundant one. SME call in chat: "we only need one — remove the .print.html series." Related but distinct: L9 (screen html partial-render in Chrome specifically) — fixing L13 does not close L9; check both at execution since the single file becomes the only surface. Design intent stays deterministic renders + anchor-keyed HITL (Epic L invariants), only the file count changes. 2026-07-18 — DONE (commit 71750bd). _PRINT_CSS became an @media print block LAST in the merged sheet (variable block lists every theme selector, so the light palette beats OS-dark and the toggle); L6 margin tags injected into the one body BEFORE the L11 pass (printed gutter stays authored-only), screen-hidden by base CSS; Rev/commit footer always emitted, print-shown. doc_pdf re-pointed (with_suffix). PDF equivalence live-verified: 8 pages old vs 8 pages new on controlm-ingestion-tdd (the screen layout would paginate far past 8 — the print sheet drove it). 6 committed .print.html git-rm'd; renders regenerated; ritual/skill/README/MODULE_MAP/PORT-MANIFEST wording moved to one-file world; suite 708 green. L9 remains open.

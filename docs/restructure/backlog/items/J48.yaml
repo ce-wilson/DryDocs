@@ -1,0 +1,40 @@
+id: J48
+epic: release-infrastructure
+title: 'Finish the worktree render fix: rule each of the seventeen remaining repo-root anchors as repo-content
+  or package-internal, and guard the classification'
+type: chore
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/repo_paths.py
+- tests/unit/test_repo_paths.py
+- drydocs/gate_pages.py
+- drydocs/graph_verify.py
+- drydocs/review_labels.py
+- drydocs/source_mappings.py
+- drydocs/seal_samples.py
+- drydocs/port_preflight.py
+- drydocs/loaders/batch_port_orchestrator.py
+- drydocs/loaders/bmc_docs.py
+- drydocs/loaders/doc_traceability.py
+- drydocs/loaders/essential_graphrag.py
+- drydocs_core/precedence.py
+- drydocs_core/source_registry.py
+- drydocs_core/manual_mappings.py
+- drydocs_core/mapping_store.py
+- drydocs_core/orchestration/crosswalk.py
+- drydocs_core/orchestration/shell.py
+- drydocs_core/ontology/schema_graph.py
+- scripts/external_vendor_scrape.py
+acceptance: |
+  Every module listed in inputs that anchors a default path on a raw Path(__file__) repo root carries an EXPLICIT one-line classification, and the classification is enforced rather than asserted. (a) RULED: each site is either repo-CONTENT (defaults resolve docs/, config/, knowledge/, internal/ or another tracked tree) -- in which case it routes through drydocs_core.repo_paths.repo_root(<its existing __file__ anchor>), passing that anchor as the required fallback -- or package-INTERNAL (drydocs_core/schema/*.cypher, the relationship_vocabulary fragments, and anything else that genuinely travels with the installed package), in which case the __file__ anchor STAYS and a one-line comment at the site says why. Skipping a site is not a disposition; "correct as written" is recorded as the package-internal ruling. (b) PROVEN: for every site ruled repo-content, a test drives a REAL git worktree the way tests/unit/test_repo_paths.py already does for the board render and asserts the resolved default lands inside the worktree, with the main tree byte-identical afterwards. Each new guard is shown to FAIL without its fix before it is trusted (J26). (c) COVERAGE, derived not listed (the S10 precedent): a test re-derives the set of repo-root anchor sites from the source tree rather than trusting an enumeration, so a NEW module that anchors a repo-content default on a bare Path(__file__) reds that test instead of passing by omission. (d) The rule itself is stated once, in drydocs_core/repo_paths.py's docstring, and CLAUDE.md's session-end ritual is unchanged -- this item adds no verb and no flag. Full suite green.
+notes: |
+  Groomed 2026-08-12 (pm) from Idea-109, whose FIX half already landed the same day at 841dc6e5 without a backlog item: drydocs_core/repo_paths.py plus adoption in plan_board / plan_ideas / plan_roadmap and 13 tests, which closed the reported symptom (a worktree-isolated agent running the session-end render ritual wrote board.html, ideas.html and roadmap.html into the MAIN tree). This item is the residue that fix deliberately did not sweep, and it is a SWEEP WITH A JUDGEMENT, not a mechanical replace -- the entry is explicit that the ~17 remaining sites are NOT all bugs. WHY IT IS WORTH FINISHING RATHER THAN LEAVING: the failure is silent in both directions. The original damage was a TORN render -- the five sibling scripts render_board.py invokes anchor on their own __file__ and were always correct, so half the output landed in the worktree and half in main, which is why nobody noticed for a day across two independent agent runs. Any un-ruled site reproduces exactly that shape the first time an agent runs in a worktree. MODULE CHOICE (recorded per the groom rule): drydocs-core, because the convention, its single implementation and its guard all live in drydocs_core/, even though the sites themselves span drydocs/, drydocs_core/ and scripts/. It is not a boundary change -- MODULE_MAP.md's core/component invariant is untouched, since callers import core, which is the existing direction. LIKELY DISPOSITIONS, offered so the sweep is not re-derived from scratch and NOT binding: the four drydocs/loaders/* roots and gate_pages / graph_verify / review_labels / source_mappings / seal_samples / port_preflight read repo content and probably adopt; drydocs_core/ontology/schema_graph.py's DEFAULT_VOCAB_PATH and DEFAULT_OUTPUT_PATH both name package-internal resources and probably keep; scripts/external_vendor_scrape.py is a script that already resolves out of the caller's own tree, which is the correct anchor. precedence / source_registry / manual_mappings / mapping_store are the genuinely mixed cases -- config/ is repo content, but mapping.db is runtime state -- so rule them one at a time. No graph write, no ontology decision, no gate: this is path resolution only.
+  DONE 2026-08-12 (desktop). 27 sites judged: 24 modules newly route through repo_root() (27 call sites in the tree, 3 of them the pre-existing plan_* fix), and three RULED and left as-is, recorded at the site rather than skipped: ontology/schema_graph.py (vocabulary fragments + generated .cypher are package resources), scripts/external_vendor_scrape.py (not an installed package, so __file__ already names the caller's tree -- and it CANNOT adopt: those two lines put the root on sys.path before drydocs_core is importable), and drydocs_core/config.py, the one site where following the caller would be a REGRESSION -- .env is untracked machine-local credentials that a worktree never receives, so a worktree run would find no .env at all. The mixed case the notes flagged came out repo-content: var/mapping.db is derived FROM the committed YAML/CSV beside it, so a worktree reading its own config/ and writing main's var/ is the torn split this item exists to prevent; gitignored is not the same as shared. THE INPUTS LIST WAS SHORT BY FOUR, all the same defect in the same editable install: drydocs_docmeta/registry.py, drydocs_docmeta/policy.py, drydocs_api/intake.py, and a _repo_relative() helper INSIDE a function body in drydocs_api/mappings.py that no file-level read would surface -- clause (c)'s derived guard found it after every listed file had already been read, which is the argument for (c) in one incident. (b) is tests/unit/test_repo_paths.py::test_swept_defaults_resolve_inside_a_real_worktree: a real git worktree, nine constants across four packages, plus a CONTROL -- cli.DEFAULT_SAMPLES_DIR names the same directory as seal_samples.DEFAULT_SAMPLES_DIR and must NOT move (a runtime read default must still answer from a wheel; the other is a build script's write target). So a blanket search-and-replace FAILS this test, which makes it a check on the judgement and not just on the edit. Both directions proven by injection (J26): reverting precedence.py fails it, over-sweeping cli.py fails it. ONE MECHANISM FINDING worth carrying: the first draft of that test ran the probe with `python -c`, which puts the CWD on sys.path -- so the worktree's own drydocs/ shadowed the editable install and EVERY import came back worktree-relative, control included. The test now runs a probe FILE outside the worktree, reproducing the incident's real condition (sys.path[0] is the script's directory, never the cwd). (c) test_no_module_anchors_repo_content_on_dunder_file parses every .py in all seven installed packages and fails any Path(__file__) chain landing on the repo root without repo_root(). Landing at the root IS the signal, so it needs no allow-list of the ~40 legitimate package-internal anchors. Ledger grew 7 -> 40 constants. MODULE_MAP.md gained the repo_paths.py row it never had. Suite 2092 passed / 8 skipped.
+annotations:
+  status: done 2026-08-12 (desktop), same session as the claim

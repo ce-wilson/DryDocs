@@ -1,0 +1,21 @@
+id: N5
+epic: source-column-mappings
+title: 'The human load-map surface: a readable page generated from load-map.json, wired into the session
+  ritual'
+type: task
+module: drydocs-docgen
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- N4
+inputs:
+- web/src/generated/load-map.json
+- scripts/render_design_doc.py
+- knowledge/depgraph-snapshots/snapshot.ps1
+acceptance: |
+  A readable rendered page (screen + print, PDF-able for the SME loop) generated from load-map.json and refreshed by the session ritual alongside the board and design docs; re-render leaves a clean tree. It does NOT live under docs/design/ as a generated .md: that tree's contract is hand-authored .md as the single source of truth, validated against the outline templates, so a generated file there would break both the contract and test_doc_outline. Either a separate home or an explicit generated-doc carve-out — decide and record which.
+notes: |
+  The placement question is the real content of this item; the rendering is mechanical. Answers the original ask (one surface with loaders, order, commands and source->target mapping) and supersedes reading three docs plus three YAML ledgers. DONE 2026-07-29 (same session as N3/N4). PLACEMENT DECIDED: docs/plan/load-map.html — docs/plan/ is the committed generated-surface home (board.html is the precedent); docs/design/ rejected because that tree's contract is hand-authored .md validated against outline templates (a generated file there breaks the contract and test_doc_outline). Recorded in the renderer docstring. Screen + @media print in the board.html house style, generated from the same build_load_map() data as the json (one joiner, two surfaces); rides the default-paths render_board.py run, so the session ritual refreshes it with the board (CLAUDE.md ritual text updated); committed==regenerated guard added to test_load_map_json.py; page verified in headless Edge (screenshot in session record). Faithful-render note: the 4th "ledger" is snowflake-data-catalog, whose registry locator.mapping points at its plan .md — displayed as committed, not reinterpreted.

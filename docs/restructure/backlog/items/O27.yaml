@@ -1,0 +1,22 @@
+id: O27
+epic: web-console
+title: 'QuerySpec authoring conventions: consume gated edges not raw staging columns; canonical external
+  ref grammar; no graph element ids on external surfaces'
+type: chore
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- UI-WIP/backstage-catalog-assessment.md
+- web/src/
+acceptance: |
+  A conventions section (drydocs_api/ docstring or a sibling doc, discoverable from query_specs.py) records three rules with rationale: (a) specs read gate-confirmed materialized edges and properties, never re-derive meaning from raw staged columns (precedence resolution lives in the loaders — the Backstage consume-the-relation-not-the-spec-field rule); (b) a canonical external ref grammar kind:namespace/name (namespace = data center where names collide across the 4 DCs) is defined for deep links and export manifests; (c) graph-internal element ids / uids never appear in URLs, manifests, or exports (documented as unstable). Existing registry specs are audited against (a) with violations fixed or flagged; a registry invariant or unit test enforces (c) where mechanical.
+notes: |
+  Groomed 2026-07-22 from assessment T2+T3 (one conventions home: two consumption rules + the ref grammar). p3 — largely codifies what O11 already does. CLOSED 2026-08-01. drydocs_api/AUTHORING.md holds the three rules with rationale, linked from query_specs.py's module docstring. The audit found the registry ALREADY compliant on all three — which was the point worth writing down: compliance was a property of careful authoring, not of the system, so nothing would have caught the first violation. Three things the work changed relative to how the item was framed: (1) The ref-grammar namespace is NOT the data center. O27 was groomed "namespace = data center where names collide across the 4 DCs"; checked against drydocs_core/schema/constraints.cypher that holds for exactly ONE node kind (ControlMHostGroup's (data_center, name) NODE KEY). ControlMJob and Condition — the two kinds most likely to appear in a deep link — are FOLDER-scoped ((folder_id, job_id) and (folder_id, name)). The rule shipped as "namespace = the declared uniqueness scope", which yields the data center where the key says so and the folder where it does not, and self-maintains because a new loader's NODE KEY already states its namespace. The doc's table is held to the constraint file by test_authoring_doc_namespace_table_matches_declared_keys — otherwise it would be a record checkable only against itself. (2) Rule (a) needed its NON-violations stated, or it would push authors into worse Cypher. explorer.conditions.v2's property join looks like a violation and is not: folder_id is a declared NODE KEY component, so the join resolves identity rather than re-deriving a relationship. Flagged not fixed — no folder->condition edge exists (conditions attach to JOBS via REQUIRES_IN_CONDITION/EMITS_OUT_CONDITION), and materialising one is an ontology decision for the gate, never a read-spec edit. (3) The element-id guard went where the RISK is, not where the item pointed. The acceptance said "a registry invariant"; the registry is hand-authored and reviewed and had zero violations, while the ephemeral path (R4) carries LLM-authored Cypher into the same export/manifest code. Guarding only the registry would have put the check on the path that cannot fail. Both paths now call one guard.ensure_no_element_ids — placed in guard.py beside ensure_read_only, which also earns it _code_regions' comment/string stripping (RETURN 'id(' as data cannot false-positive; the ADR 0003 lesson) and its lower-casing, which is what makes the check case-insensitive across ElementId( / ID( spellings. The text2cypher prompt carries the rule too: the prompt prevents, the guard catches. Zero first-party elementId uses exist repo-wide, so all of it is regression-only. Suite 1277 passed / 5 skipped (was 1272); ruff check + format clean.
+annotations:
+  status: closed 2026-08-01 (desktop session)

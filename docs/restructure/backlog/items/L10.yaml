@@ -1,0 +1,22 @@
+id: L10
+epic: doc-infrastructure
+title: 'Design-doc feedback widget: appendix ''SME - Feedback'' panel with notes field + paste destination'
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L5
+inputs:
+- drydocs/design_doc.py
+- docs/design/feedback/README.md
+- tests/unit/test_design_doc.py
+acceptance: |
+  the screen .html gains an "SME - Feedback" section below the appendix / last outline section, separated by a divider line, containing a SHORT static instruction block telling the reviewer exactly what to do with their annotations — numbered steps in plain language, concretely: annotate sections with the per-section pencil control; click "Copy feedback" (bottom toolbar); create the file docs/design/feedback/<doc-stem>-rev<N>.yaml (YAML — not markdown; the exact per-doc filename with the doc's current Rev is rendered into the instructions, ready to copy); paste the clipboard contents in and save/commit. Print output unchanged; render stays deterministic (Rev comes from front matter, no git/timestamp reads); test_design_doc.py extended; full suite green.
+notes: |
+  Groomed 2026-07-09 from a chat note after reviewing docs/design/feedback/scans/; amended same day — the panel is a static HOW-TO instruction block, NOT a free-text notes area (user call: the anchor-keyed notes already capture content; the panel's job is walking the SME through create-file/copy/paste). Enhances L5 (copy button verified working by the user). Answers the note's open question: the export extension is .yaml (drydocs.design_doc.feedback_yaml), not .md.
+progress: |
+  2026-07-09 — DONE. design_doc.py: _sme_feedback_panel + sme_feedback_filename (Rev from front matter, deterministic; placeholder rev<N> when undeclared); appended after the last section in screen mode only, no element ids inside so the annotate layer never attaches to its own instructions. Verified at runtime (headless-Edge DOM dump: panel present, 0 controls inside; exact filename controlm-ingestion-tdd-rev3.yaml rendered). 3 new tests; feedback README updated.

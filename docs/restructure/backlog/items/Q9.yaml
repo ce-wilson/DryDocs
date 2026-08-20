@@ -1,0 +1,28 @@
+id: Q9
+epic: docmeta
+title: 'Re-file the Essential GraphRAG corpus as VENDOR documentation for Neo4j: dddocs + a DESCRIBES
+  product hook, amending ADR 0006 §2'
+type: task
+module: config
+phase: 14
+agent: pipeline-config
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G31
+inputs:
+- config/doc-source-registry.yaml
+- docs/decisions/0006-docmeta-component-and-doc-graph.md
+- config/gate-log.md
+- drydocs/loaders/cypher/essential_graphrag.cypher
+acceptance: |
+  config/doc-source-registry.yaml#essential-graphrag carries target_db: dddocs, a taxonomy_path under the graph-platform/neo4j branch, and its `taxonomy_path: ~` + "deliberately no DESCRIBES / product taxonomy hook" note replaced with the vendor rationale; the loader template's DELIBERATELY-NO- DESCRIBES block is replaced with the bmc-docs product hook (which requires Q8 to be done first, or the hook drops silently); a config/gate-log.md entry records the ADR 0006 §2 amendment with the SME's reasoning; ADR 0006 gains a short amendment note rather than a body rewrite (the ADR 0002 banner precedent). test_doc_registry.py stays green.
+notes: |
+  SME decision in session 2026-07-26, reasoning recorded verbatim in intent: the book is Neo4j-SPONSORED and teaches implementation ON their graph — "it's not written to load into a competitor like TigerGraph" — so it is vendor documentation wearing a book jacket, tier T1, same as bmc-docs. The existing registry entry already agrees on every OTHER axis (tier: T1, curation: none, trust_default: GROUNDED) and differs only in target_db, which it inherited from the jpmc-reports ddcontext precedent rather than from the tier model. The filing error was by FORMAT (a PDF book) rather than by SUBJECT (Neo4j the product) — the same class of error as the ddcontext placement itself. This OVERTURNS a signed-off decision (ADR 0006 §2, SME 2026-07-18), so it goes through the gate as an amendment, never by edit — the discipline G30 established. depends_on G31 because dddocs must exist and carry a SoftwareProduct proxy before the hook can bind.
+annotations:
+  status: '2026-08-19 (laptop): gate follow-through: vendor re-file APPLIED (taxonomy_path graph-platform/neo4j;
+    DESCRIBES hook MATCH-only on the neo4j product, live-verified laptop/neo4jtest/drydocs after the extra=ignore
+    field-drop was caught); ADR 0006 amendment note + gate-log RECORD; target_db half satisfied-by-fold
+    (dddocs died at G32 R1); the omission-pinning test flipped to pin the hook; Q18 now covers two hardcoded-SUBJECT
+    sites by design'

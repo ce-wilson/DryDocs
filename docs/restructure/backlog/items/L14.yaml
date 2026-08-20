@@ -1,0 +1,29 @@
+id: L14
+epic: doc-infrastructure
+title: Refit docs/runbook-mapping-demo.md to the runbook outline (2nd runbook exemplar)
+type: chore
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- L8
+inputs:
+- docs/runbook-mapping-demo.md
+- docs/design/templates/runbook.outline.yaml
+- docs/design/drydocs-startup-refresh-runbook.md
+- drydocs/doc_outline.py
+- scripts/render_design_doc.py
+acceptance: |
+  The mapping-demo runbook conforms to runbook.outline.yaml — python -m drydocs.doc_outline --outline docs/design/templates/runbook.outline.yaml --doc <the doc> passes — carrying the outline's front-matter + required anchors with the existing content (demo steps, steward flow) preserved under them. Whether it relocates to docs/design/ and renders through the Epic L pipeline is decided at execution (the D6 either/or idiom) and recorded in the doc header; classification set; doc tests + full suite green.
+notes: |
+  Groomed 2026-07-20 from the 2026-07-18 inbox line (runbook authored FREE-FORM in the mapping-store session, pre-L8 by design). Trigger = L8 landing the runbook outline, fired 2026-07-20 (e6bcb24). Second exemplar beside the startup/refresh runbook — proves the outline generalizes beyond its authoring doc.
+annotations:
+  status: '2026-07-21 pm — D6 either/or DECIDED: RELOCATED to docs/design/drydocs-mapping-demo-runbook.md
+    (joins the *-runbook.md validation sweep + the Epic L render pipeline; decision recorded in the doc''s
+    front-matter). Conforms to runbook.outline.yaml (doc_outline passes); all 8 required anchors authored;
+    content preserved + refreshed (5-domain verify incl. the O24 seal-contact-override, stale feat/mapping-store
+    branch ref dropped, rollback section = derived-file story); classification Internal-Public; the 2
+    referencing docs re-pointed + re-rendered; outline sweep 17 green.'

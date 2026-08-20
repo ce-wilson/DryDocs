@@ -1,0 +1,27 @@
+id: N12
+epic: source-column-mappings
+title: 'Declare every registry dataset''s ACQUISITION PATH: manual drops name their format + landing-zone
+  directory, automated pulls name api-or-db'
+type: task
+module: config
+phase: 11
+agent: pipeline-config
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- config/schemas/source-registry.schema.json
+- tests/unit/test_source_registry.py
+- drydocs_core/source_registry.py
+- drydocs_core/data_root.py
+acceptance: |
+  Every DATASET row in config/source-registry.yaml carries a first-class `acquisition:` block stating HOW the data arrives, replacing today's smear across three half-fields that do not compose into an answer (`adapter` -- csv/oracle/yaml/markdown/json, 8 rows carrying `~`; `connector` -- doc corpora only; `locator` -- free-shape, each source inventing its own key). (a) `mode: manual | automated` on EVERY dataset row, including the `adapter: ~` ones: the build CLASSIFIES the existing rows, it does not add the field only to new ones. That per-row classification IS the payoff -- "what is still hand-fed?" becomes a query instead of an audit. (b) MANUAL rows carry `format: csv | ascii | json` plus `drop_dir:`, whose COMMITTED value is the landing-zone CONVENTION -- DRYDOCS_DATA_ROOT-relative, the `controlm-xml/` precedent, resolved by drydocs_core/data_root.py. The real directory lives ONLY in the internal twin (the `locator.extract: ~` discipline, unchanged): no real path, host or share name is ever committed (Scan D / J27 class). (c) AUTOMATED rows carry `via: api | db` plus the pull's coordinates BY REFERENCE, never restated -- for `db` the row's own dataset id already names the qualified object ({origin}@{db}.{schema}.{table}); for `api` the row names the CALL SURFACE, with the G96 Control-M adapter (drydocs_core/adapters/controlm/api.py) as the worked example. (d) ENFORCEMENT IS THE TEST, NOT THE SCHEMA. config/schemas/source-registry.schema.json is shape-only and permissive by design (S6 -- no `additionalProperties: false`), so a block added to the YAML alone would validate silently. The schema DECLARES the block (enums + the conditional required keys) and tests/unit/test_source_registry.py is what FAILS: every dataset row has `acquisition`; manual implies `format` + `drop_dir`; automated implies `via`; and a committed `drop_dir` that is absolute or otherwise escapes the landing-zone convention fails the boundary check. (e) SCOPE FENCE -- config/source-registry.yaml DATASET rows only. SYSTEM rows are unchanged, and the doc corpora in config/doc-source-registry.yaml are OUT of scope here (they already carry `connector:`); extending the field to that ledger is a separate call. (f) `mode: manual` IS THE EXPECTED FIRST STATE, NEVER A DEFECT (SME framing 2026-08-18): every new source has an exploratory phase -- profiling, ontology work, mapping, trial Neo4j loads -- and a .csv or .json file is the natural manual loader for it. The field RECORDS where a source sits in that lifecycle (manual exploratory -> automated productionized), so no test, report or render may present `manual` as a violation or as debt to be eliminated. (g) TWO FENCES. This item RECORDS mode -- it builds NO watcher, mover or copier for the drop directories. And it does NOT rule the FLIP (who flips manual -> automated, on what evidence, and how that relates to the override -> source-corrected flip): that ruling is N13's, via the gate. Full suite green.
+notes: |
+  Groomed 2026-08-18 from Idea-133 (SME ask the same day), with the exploratory-phase framing supplied in-session. Idea-132 is the live driver: the ServiceNow extracts are moving hand-pulled-CSV -> SQL over the replica, and TODAY that transition has no field to flip -- it shows up only as prose in `notes:`. Idea-115 caught this class once already (the rua copy path existed only as a derived expression; the fix was to make both ends name each other). MODULE/PHASE/EPIC follow N10, which pins exactly this combination for registry-schema work (the v2 registry is N7/N9's artifact); agent pipeline-config per its config layer. HITL-FREE BY CONSTRUCTION: this adds a config field recording an operational fact -- no edge is created, no relationship meaning changes -- and the field itself is SME-directed (2026-08-18), the J23 pre-decided-ruling precedent. THREE AXES, ONE ROW, ALL DIFFERENT: `confirmed` = semantic gate sign-off; the wired/ready flag N10 proposes = pipeline-wiring readiness; `acquisition.mode` = how the data physically arrives. If N10's gate signs, the two fields COMPOSE on the same row -- neither subsumes the other -- and whichever lands second says so in the registry header. Follow-on deliberately out of scope: giving the load-map and console surfaces an honest manual-vs-automated lens once the field exists.
+annotations:
+  priority: raised from the groom's proposed p2 — SME confirm 2026-08-18, close-out directed
+  status: '2026-08-18 (laptop): gate follow-through: all 29 dataset rows classified (15 automated/db,
+    14 manual incl. the archive enum widening for the rua bundle), schema declaration + 3 enforcing tests;
+    commit a10b0191'

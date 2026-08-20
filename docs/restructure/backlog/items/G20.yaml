@@ -1,0 +1,27 @@
+id: G20
+epic: component-topology
+title: 'rua_inventory extractor: bundle -> staging records with the meta.txt provenance envelope'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G18
+- G19
+inputs:
+- drydocs_lineage/extractors/controlm_inventory.py
+- drydocs_lineage/model.py
+- drydocs_lineage/writer.py
+- tests/unit/test_lineage_inventory.py
+acceptance: |
+  drydocs_lineage/extractors/rua_inventory.py reads a bundle (tarball or extracted dir) from the G19 landing zone and emits staging records in the controlm_inventory idiom: meta.txt parsed into a provenance envelope carried on every record (schema version, collected_at/by, user, uid, groups, shell, host, fqdn, os/kernel, scan roots — the "metadata as nodes" raw material); directories.tsv -> DataAsset candidates; profiles.tsv + profiles/ -> profile artifacts; scripts.tsv + scripts/ -> script artifacts (optional, v1 bundles accepted); ownership_dirs.tsv consumed when present. v1 AND v2 bundles both parse (fixture per version, synthetic values only); malformed/missing sections are counted, never silently dropped (the coverage house rule). NO graph writes and NO new relationship types — candidates only, refusal semantics unchanged. Full suite green.
+notes: |
+  The extractor the collect/README has promised since the ADR 0002-C re-home. Join keys downstream: (host, user) -> ControlMJob run_as + node_target (Epic P hosts-topology), script path -> CMD_LINE / launcher references. Pure candidate-side parsing, hence sonnet.
+annotations:
+  status: '2026-07-23: extractors/rua_inventory.py — tarball (filter="data") or dir; meta.txt envelope
+    stamped rua_* on every record + full meta kept for G23; directories/ownership -> rua_path assets,
+    profiles/scripts -> rua_profile/rua_script artifacts (sha256 + rua_copy pointers); v1+v2 fixtures;
+    malformed/missing/cross-host counted; NODES only'

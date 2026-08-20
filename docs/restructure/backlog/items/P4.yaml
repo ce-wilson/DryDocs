@@ -1,0 +1,22 @@
+id: P4
+epic: runtime-topology
+title: 'CM_AVG_RUN property-supplement loader: normalized timings + day-of-week medians + folder windows'
+type: task
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- P1
+- P2
+inputs:
+- drydocs/loaders/sql/controlm_avg_run.sql
+- config/gate-prompts/controlm-avg-run-supplement.yaml
+acceptance: |
+  Supplement pass MATCHes existing :ControlMJob on (parent_table, job_name) — never MERGEs; index on ControlMJob(parent_table, job_name) created BEFORE the estate-wide run; >24h clock normalized in Python (avg_start_time + start_next_day); FileWatcher rows flagged via APPL_TYPE and excluded from blended stats; day-of-week medians derived from SAMPLES_*; ControlMFolder.window_start/window_end rolled up with the DC-default-time fallback (knowledge/standards/technology/data-center-naming-convention.md); unmatched stats rows = coverage metric; map entry flips confirmed→applied.
+annotations:
+  status: DONE COMPANY-SIDE (same 2026-07-20 bundle-port readout as P1 — their probes + supplement loader
+    shipped). Producer mechanism back-port, if ever wanted, is a reconcile-port/backflow concern, not
+    a re-open.

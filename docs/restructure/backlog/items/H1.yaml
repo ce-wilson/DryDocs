@@ -1,0 +1,18 @@
+id: H1
+epic: drydocs-review-backflow
+title: Reproduce graph_verify + review_labels (offline spine)
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/restructure/05-drydocs-review-backflow.md
+- config/classification.yaml
+acceptance: |
+  graph_verify + review_labels reproduced generically (offline spine): review_labels is a typed accessor over a sanitized review-labels.yaml (vendor-bmc seed, no internal sources); graph_verify loads YAML TC-* suites + evaluate is pure/offline with unit tests; both carry a classification entry; Track-1 stays green. No real SIDs / sources / Confluence coords.
+notes: |
+  Done 2026-07-01. drydocs/review_labels.py + drydocs/graph_verify.py (pure load/evaluate; run_* takes a duck-typed GraphRunner so no Neo4j import), config/review-labels.yaml + graph-tests/vendor-bmc-smoke.yaml (both classification: Internal-Public), tests/unit/test_review_labels.py + test_graph_verify.py (27 tests). NOT wired into cli.py (entrypoint-boundary decision — see H-TODO). Full suite 214 passed.

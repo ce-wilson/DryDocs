@@ -1,0 +1,21 @@
+id: R8
+epic: agentic-qa
+title: 'Answer evaluation + cap tuning: on-demand answer metrics over stored question/context/answer,
+  agent-runs admin view, promotion feed of recurring Tier-1 Cypher into gate-reviewed permanent specs'
+type: requirement
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- R3
+- R5
+inputs:
+- drydocs_api/query_specs.py
+- docs/design/graph-retrieval-benchmark-explainer.md
+acceptance: |
+  Evaluation (faithfulness / answer-relevancy style) runs on demand from the stored question/context/answer triple — never inline in the answer path; an admin view lists runs from console.agent-runs.v1 with cost and latency; the promotion feed ranks recurring Tier-1 Cypher by frequency and emits spec CANDIDATES for review — gate-bound, never auto-registered as permanent specs; loop caps re-tuned from ledger data with the change recorded in notes.
+notes: |
+  Ties into the /under-the-hood retrieval-benchmark narrative (Q3 verdict) — the evaluation harness should reuse its question set where possible.

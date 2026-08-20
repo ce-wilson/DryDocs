@@ -1,0 +1,23 @@
+id: K9
+epic: seal-attribution
+title: 'Defined-mapping store: the app-code mapping domain in mapping.db, the K2_SHAPE update, and the
+  manual-loads template rekeyed to app_code'
+type: requirement
+module: drydocs-api
+phase: 9
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- K7
+inputs:
+- drydocs_api/mappings.py
+- config/overrides/
+- drydocs/loaders/manual_loads.py
+- config/manual-loads/
+- config/gate-log.md
+acceptance: |
+  The steward-defined app-code mapping exists as a first-class store domain, reusing the O24 origin-flagged pattern verbatim per gate §E1: committed CSV in config/overrides/ -> mapping.db table -> the /mappings console domain. A row carries the app code, its tier (seal-born | platform | dual-coded), the target, and an origin flag (defined | matched-fallback | override | manual-pin). Tier-3 rows carry the DECLARED end state §B2 requires, so a stalled migration is visible rather than silently permanent. Override rows may be PERMANENT in this domain (§E2) — do NOT implement the corrected-in-source flip here; it belongs to the domains where permanence is temporary. K2_SHAPE in drydocs_api/mappings.py updates to the ruled edge shape, and the manual-loads template is rekeyed from job identity to app_code. Store rows never write the graph (§E3). Offline tests on fixtures; full suite green.
+notes: |
+  Opened BY the K7 gate (§F2), 2026-08-03 — the gate opens its build items rather than being preceded by them. This is the AUTHORING half; K8 is the loading half and depends on it. The store IS the source of record for this domain: there is no machine feed to defer to, which is exactly why §E2 ruled defined rows graph-loadable. Claim RELEASED 2026-08-03 (night): the remote claude.ai session that claimed it (3608ae5) was interrupted by an API failure before any work landed — the claim commit is that session's last; no K9 work was committed. Back to todo/next_ready untouched.

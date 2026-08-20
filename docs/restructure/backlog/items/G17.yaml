@@ -1,0 +1,22 @@
+id: G17
+epic: component-topology
+title: 'DPL Metadata-As-Code ingest seam: dataset-flow READS/WRITES enrichment, pipeline-JSON kind discriminator,
+  SEAL attribution facts'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G15
+inputs:
+- drydocs_lineage/
+- drydocs_core/controlm/commands.py
+- tests/unit/test_lineage_inventory.py
+- config/gate-log.md
+acceptance: |
+  A MAC (Metadata-As-Code) ingest seam exists in the lineage component, driven by SYNTHETIC fixtures modeled on the traced 6-JSON-per-pipeline shape (mechanism-only — real values stay company-side; publish boundary clean): (a) the JSON set is keyed by the launcher --pipeline-id GUID and joins to the ETLProcess identity G15 captures — an unmatched GUID is counted, never silently dropped; (b) dataset_flow.json input/output datasets (GUID + version + zone) become dataset-level READS_FROM / WRITES_TO CANDIDATES for that ETLProcess, endpoints exactly per the 2026-07-15 gate EDIT (ETLProcess | ControlMJob -> DataAsset), no new relationship types, all m3_* vocabulary statuses untouched (refusal semantics unchanged until the curated-load gate); (c) pipeline.json pipelineType/subType land as ETLProcess PROPERTIES and drive a recorded kind-derivation rule where MAC metadata exists (provisioning subtype = DB load with no transform — the G12 constant kind='etl' stops being stamped blind there; jobs without MAC keep today's default), with any enum-semantics question surfaced as a gate rider, never auto-decided; (d) the pipeline.json owner SEAL id is captured as an attribution FACT/property beside G15's -seal note — never an attribution edge (Epic K owns those). Full suite green.
+notes: |
+  Groomed 2026-07-21 from two inbox lines merged: the same-day DPL runtime-trace [source] line (company-side agent doc, mechanism only here; its own "groom candidates" named this extractor + the kind wiring) and the 2026-07-19 "ETLProcess kind discriminator needs a real signal" [idea], whose trigger FIRED — pipeline.json subType is the discriminating signal G12 lacked. The DPL ingestion-leg inbox line's open item (b) (DataAsset zone/glue-table shapes for the enrichment feed) rides this item. Candidate-side parsing on gate-confirmed endpoint shapes, hence sonnet.

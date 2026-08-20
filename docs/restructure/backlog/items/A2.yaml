@@ -1,0 +1,15 @@
+id: A2
+epic: reference-hygiene
+title: Account for every BMC doc in the source manifest
+type: chore
+module: reference
+phase: 0
+agent: reference-librarian
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- external/orchestration/bmc-controlm/SOURCE-MANIFEST.md
+acceptance: every .md in bmc-controlm/ accounted for in the manifest
+notes: Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).

@@ -1,0 +1,19 @@
+id: J8
+epic: release-infrastructure
+title: 'Skip-guard policy test: tests reading gitignored assets must skip, not fail'
+type: chore
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- tests/unit/
+- .gitignore
+- PORT-MANIFEST.yaml
+acceptance: |
+  A policy test scans tests/unit/ for references to drydocs/data/ or internal-local/ and fails if the referencing test lacks a skipif/importorskip guard — the exact failure a prior port hit (skip guard lost, FileNotFoundError instead of skip).
+notes: |
+  docs/reviews/tech-debt-port-boundary.md Phase 4 (Class E). DONE 2026-07-11: tests/unit/test_skip_guard_policy.py — file-level guard requirement over concrete drydocs/data/ + internal-local/ references (single-literal AND segment-chained construction both matched; glob literals like the port-manifest "drydocs/data/**" row excluded as pattern rows, not filesystem reads); checker self-test pins the port-failure shape (unguarded -> flagged, guarded/glob/clean -> not).

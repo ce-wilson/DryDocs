@@ -1,0 +1,28 @@
+id: source-column-mappings
+letter: N
+title: Source column mappings
+order: 13
+groom_log:
+- date: '2026-07-08'
+  note: |-
+    ── Epic N — Source column mappings (doc 08) — Phase 11 ────────────────────
+    Groomed 2026-07-08 from the 2026-07-07 IDEAS line; plan = docs/restructure/
+    08-source-column-mappings.md (Phases 0-1 promoted per the plan's own note;
+    profile integration / render / ODCS export stay in the plan doc until these land).
+  attached_at: N1
+- date: '2026-07-28'
+  note: |-
+    Groomed 2026-07-28 pm from the in-session "one document with loaders, order,
+    commands, source→target mapping?" scope. Answer was NO — it is split across
+    internal/repo-README.md (CLI reference + Control-M run order), the startup/refresh
+    runbook (operational chain), 04-sme-checklist-and-load-plan.md (sequential plan)
+    and config/source-mappings/*.yaml (the column ledgers). N3-N6 build it as a
+    RENDER rather than a fourth hand-written doc — hand-authoring it would create
+    exactly the drift this session fixed twice (README scan roots, provision.ps1).
+  attached_at: N3
+- date: '2026-07-30'
+  note: |-
+    --- 2026-07-30 groom: source-registry v2 (user directive "the flat id does not
+    --- work") + the N4 render's day-one finding. N7 is the DESIGN SESSION bundling
+    --- the four coupled registry decisions the J21 close note parked together.
+  attached_at: N7

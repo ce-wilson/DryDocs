@@ -1,0 +1,20 @@
+id: D2
+epic: config-loaders
+title: Drive catalog reconciliation from precedence.yaml
+type: task
+module: config
+phase: 3
+agent: pipeline-config
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- C3
+- D1
+inputs:
+- config/precedence.yaml
+- drydocs/loaders/cypher/catalog_lobs.cypher
+acceptance: 'flipping order: in precedence.yaml changes RECONCILES_TO resolution with no code edit'
+output: drydocs_core/precedence.py
+notes: |
+  Done 2026-06-21. New drydocs_core/precedence.py: PrecedenceResolver reads config/precedence.yaml (order + active toggles + conflict_policy); resolve(claims) -> highest active authority with an opinion wins, losers kept as aliases (skos:closeMatch, never dropped). Wired into the RECONCILES_TO path: CatalogLOBsLoader.to_params resolves via resolve_lob_reconciliation; catalog_lobs.cypher now records r.authority + r.aliases. test_precedence.py (10 tests) proves the acceptance — flipping order: in a YAML (loaded via from_yaml) flips both the resolver winner AND the catalog reconciled segment, no code edit. pyyaml promoted to a runtime dep. 174 passed.

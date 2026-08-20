@@ -1,0 +1,23 @@
+id: G67
+epic: component-topology
+title: Control-M conformance detectors R30-R40 on real staged XML, with the read bridge that unblocks
+  the remediation module
+type: task
+module: drydocs-remediation
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on:
+- G66
+inputs:
+- drydocs_remediation/detect.py
+- drydocs_remediation/formats.py
+- drydocs_lineage/extractors/controlm_xml.py
+- drydocs_core/orchestration/controlm/variables.py
+- internal/remediation/standards-rules-registry.md
+acceptance: |
+  The remediation module gains a working Gate-2 conformance pass over REAL staged definitions. A new read-only bridge turns the G47 extractor's XmlDefsExtract into a DefinitionSet, reusing XmlDefsExtract.scope_layers() rather than reimplementing scope resolution -- which retires a stale blocker, since XmlDefinitionFormat.load() still raises on vendor-schema grounds although G47 solved reading; dump() STAYS blocked because emitting importable XML is the half that genuinely needs the vendor schema. JobDefinition gains description / command_line / post_command and DefinitionSet gains sub-folder scope, all defaulted so no existing caller breaks. detect.py gains R30-R40 beside the existing R1, reusing the SAME Finding dataclass (test_no_shadow_definitions forbids a second class) and the same ratified=False discipline, because registry ratification is gate territory: unresolvable reference in the scope chain, orphan declaration, required declaration set per job type, exactly-one-carrier-per-fact, value contracts per canonical, scope hoisting, retyped composed path, adjacent references, vendor charset legality, the two-clause post-exec cat rule (required on TOK/CTL, FORBIDDEN on DAT), and REQ-2 zero SHOUT/DOSHOUT. Name drift and value swaps report as DIFFERENT classes -- drift produces silence, a swap produces a confidently wrong row, and the second must not be filed as a lint warning. R30-R40 are registered in the internal rules registry in the existing entry shape, all provisional. The proof that the standard is reachable and not merely describable: a synthetic DEFTABLE reproducing the live folder's shape raises every rule, and the same fixture rebuilt to the C30 ladder raises ZERO. Full suite green.
+notes: |
+  Claimed 2026-08-11 (desktop) alongside C30, which supplies the rules this enforces. Deliberately NOT in scope: emitting corrected XML. Two detectors are deliberately absent and the absence is the point -- nothing binds the NOTIFY variable to a distribution list, because email is being removed as a mechanism and a rule that "fixed" the unset destination would re-wire it; and nothing asserts a ServiceNow queue on a Control-M object, because that routing belongs to the escalation DB via the EJOBNAME join. NOTIFY is reported as an ordinary unresolvable reference, nothing more.

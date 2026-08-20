@@ -1,0 +1,40 @@
+id: V1
+epic: sme-runbooks
+title: 'SME-runbook coverage rule: every module in the registry maps to a governed runbook or sits on
+  a frozen shrink-only RUNBOOK_PENDING list'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/restructure/backlog.yaml
+- docs/design/
+- docs/design/templates/runbook.outline.yaml
+- tests/unit/test_doc_outline.py
+acceptance: |
+  A unit test maps every entry in the backlog modules: registry to exactly one of three states, none silently absent: (1) COVERED — a governed docs/design/*-runbook.md names the module in its front matter; (2) EXEMPT — an explicit list with a reason per entry (work areas by rule: reference/taxonomy/ontology/config/graph-infra/docs are captures and registries, not operable components; placeholder modules with no code to operate: drydocs-plan, drydocs-docmeta, and drydocs-deepdoc if still placeholder); (3) RUNBOOK_PENDING — real modules awaiting authorship, frozen shrink-only per the N2 LEDGER_PENDING idiom. The map also dispositions the five existing runbooks (web-console -> drydocs-web; mapping-store/mapping-demo -> decide; lineage-mac + cmdline-resolution = chain-scoped, decide whether they satisfy drydocs-lineage or index under it; startup-refresh = system-level, decide whether it counts for drydocs-load). Suite green.
+notes: |
+  Groomed 2026-07-29 from the user directive "create a SME-Runbook for each module". The mapping decisions here gate V2-V10's scope (extend an existing runbook vs author a new one), which is why they depend on this. Module docs (the rule is about the doc corpus), phase 10 with Epic L — no plan change.
+annotations:
+  status: 'closed 2026-08-04 (laptop). tests/unit/test_runbook_coverage.py maps all 18 registry modules
+    to exactly one of COVERED / EXEMPT / RUNBOOK_PENDING, with a second map dispositioning every docs/design/*-runbook.md
+    — because ''operates part of a module'' and ''IS the module runbook'' are different claims and conflating
+    them is how a module looks covered while most of it is not. COVERAGE IS A SELF-CLAIM: the test reads
+    a `- **Module:** <name>` front-matter line and nothing else, so a rename cannot silently break the
+    map; the runbook outline template now teaches the convention. DISPOSITIONS RULED (the six runbooks,
+    not five — the acceptance miscounted): web-console SATISFIES drydocs-web (the only COVERED module
+    today); mapping-store is single-ARTIFACT scoped (it scopes HTTP out itself) so drydocs-core stays
+    pending for V2; mapping-demo covers the /demo page only, so drydocs-api stays pending and V8 rules
+    extend-vs-author; lineage-mac and cmdline-resolution are CHAIN-scoped so V6 indexes them rather than
+    being discharged by them; startup-refresh is SYSTEM-level across modules, so V3 must rule the overlap
+    as its own title demands. EXEMPT = the 6 work areas by rule + drydocs-plan (no package) and drydocs-deepdoc
+    (86 lines, no CLI verb, no importer). THE ''IF STILL PLACEHOLDER'' RE-CHECK PAID: drydocs-docmeta
+    was listed as a placeholder in this item''s OWN acceptance and has been BUILT since (Q6, ADR 0006)
+    — moved to RUNBOOK_PENDING and the stale `# planned` registry comment corrected. RUNBOOK_PENDING is
+    frozen SHRINK-ONLY per N2''s LEDGER_PENDING idiom: gaining a runbook forces removal. Guard proven
+    RED on a probe (a partial runbook claiming a module fails three ways at once) then green. Suite 1535
+    (+6).'

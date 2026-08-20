@@ -1,0 +1,19 @@
+id: R13
+epic: agentic-qa
+title: 'ADK session growth from step events: check whether ADK 2.x offers a partial/non-persisted event
+  mode for the step stream'
+type: task
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- agents/
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  A written finding (ADR 0007 notes or agents/ docs): does google-adk 2.x support yielding events that are NOT persisted into session history (partial=True or equivalent) suitable for the per-step stream? If YES: either applied — long Ask sessions stop inflating memory_events/memory_chars (shown flat via the R3 metrics across a multi-question session) — or a follow-up item groomed with the applied-change scope. If NO: a dated note confirming the R3-telemetry-as-tripwire design stands (ADR 0007's DB-backed-session-store-before-soak clause), nothing else changed.
+notes: |
+  Groomed 2026-07-30 from the R5 follow-up [question]: agent.py yields one event per pipeline step and ADK persists yielded events, so step streaming trades session-memory growth for UX — deliberate, telemetered, but worth one look at the 2.x event API before any soak.

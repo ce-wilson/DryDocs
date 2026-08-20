@@ -1,0 +1,24 @@
+id: K15
+epic: seal-attribution
+title: Retire or re-bind the legacy /mappings job-application pane — its coverage grid and assign flow
+  still read the retired job-grain edge
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-05
+depends_on: []
+inputs:
+- web/src/
+- drydocs_api/query_specs.py
+- drydocs_api/mappings.py
+- config/gate-prompts/seal-app-ref-edge-reshape.yaml
+acceptance: |
+  No /mappings surface reads the retired job-grain WAS_ASSOCIATED_WITH {seal_app_ref} edge or drafts the retired job-grain changeset. Either the coverage grid (mappings.attribution-coverage.v1) is re-bound to the folder-grain BELONGS_TO_APPLICATION truth with jobs inheriting their folder's attribution, or the pane is retired and app-code-mapping becomes the default /mappings domain — the direction is confirmed with the user at build and recorded in the close note. The MappingsRoute derivedLifecycle self-verification is re-bound to the same source either way. Suite + web build green.
+notes: |
+  Groomed 2026-08-04 (Control-M inbox groom, desktop) from the finding K11's close inboxed rather than hot-fixed: post-K8 the job-grain edge is retired (TC-08 asserts none exist), so the pane's coverage grid reads every row as "unresolved" and its assign flow drafts a changeset the server refuses — a live misreporting surface, hence type bug. Leaning at grooming: re-bind the coverage grid as the jobs VIEW of the K8 folder-grain truth (support still asks "which app owns this job") and retire the job-grain assign flow in favor of the K11 cascade, making app-code-mapping the default /mappings domain. DIRECTION CONFIRMED 2026-08-05 (user, in-session — the acceptance's "confirmed with the user at build"): RETIRE, not re-bind. The grooming lean was to keep a jobs view; the SME fact that settled it is that A FOLDER AND ITS JOBS CARRY THE SAME APP CODE, so a job-grain grid is N× rows carrying ONE folder-level fact — not a finer answer, the same answer repeated — and a grid that looks per-job invites being read as per-job truth, which is exactly the model K7 §A1 corrected. "Which application owns this job" stays answerable as a one-hop traversal (job -> CONTAINS_JOB -> folder -> BELONGS_TO_APPLICATION); it does not need a maintained grid.
+progress: |
+  CLOSED 2026-08-05 (desktop, same session as the K-series review that found it). RETIRED end to end: QuerySpec mappings.attribution-coverage.v1 DELETED (it read the job-grain WAS_ASSOCIATED_WITH {seal_app_ref} edge K8 retired); the drydocs_api domain row job-application flipped available: false — KEPT in the registry rather than deleted, so a bookmarked ?domain=job-application renders a visibly retired tab instead of vanishing and reading as a bug; MappingsRoute lost the coverage grid, the assign dialog, the job-grain changeset tray + its localStorage key, derivedLifecycle, StatusChip/LifecycleChip and AssignDialog (~495 lines), and defaults to app-code-mapping; the CoverageRow/DEMO_COVERAGE demo fixture went with it (a demo fixture for a retired surface renders convincingly and describes nothing that exists). TWO TESTS RE-POINTED, both INVERTED rather than deleted: test_mappings_coverage_spec_registered -> test_mappings_coverage_spec_stays_retired (asserts the spec is absent AND that no surviving spec reads the job-grain edge — the K15 acceptance as a guard, because the failure mode is someone re-adding a job-grain grid when the folder grid "looks empty"); the schema-meta exemplar guard now ENUMERATES specs riding role='seal_app_ref' instead of naming a hardcoded pair, which is why it went stale here at all. Suite 1542, web build + oxlint green.

@@ -1,0 +1,20 @@
+id: N1
+epic: source-column-mappings
+title: Column-ledger schema + accessor + the Control-M ledger (transcription, no gate)
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/restructure/08-source-column-mappings.md
+- drydocs/loaders/sql/
+- config/gate-prompts/controlm-q1q3-phase1.yaml
+- docs/restructure/06a-controlm-source-er-review.md
+acceptance: |
+  drydocs.source-mapping.v1 schema + typed accessor (pattern: review_labels.py) + unit tests; config/source-mappings/controlm-psgmgr.yaml seeded by TRANSCRIBING already-gated decisions (q1q3 envelope, employee_sid, MEMNAME demotion, filter columns, phase-1 scope sweep) + the SQL headers' scope rules — no new gate needed; dispositions projected/filter-only/excluded/deferred with origin source|derived; classification Internal-Public, mechanism-only. Full suite green.
+notes: |
+  Doc 08 Phase 0. Done 2026-07-08 (sonnet agent): drydocs/source_mappings.py (review group per the default-deny guard; MODULE_MAP row) + config/source-mappings/controlm-psgmgr.yaml (5 objects, 69 projected rows, census pending). Honest deviation from the plan sketch, ledger matches the REAL SQL: IS_CURRENT_VERSION/USER_DAILY are projected (they are SELECTed, not filter-only), with filter roles in notes; LNKI/LNKO IS_CURRENT_VERSION targets staging:is_current_version (never SET on the graph); bind params + the var_scope CASE documented as notes, not fake column rows. 27 new tests.

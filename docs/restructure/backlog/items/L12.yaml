@@ -1,0 +1,27 @@
+id: L12
+epic: doc-infrastructure
+title: 'Document the governed-render-fidelity rule: governed surfaces publish verbatim; editorial styling
+  only for outward-facing docs'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p2
+status: done
+depends_on: []
+inputs:
+- CLAUDE.md
+- docs/design/
+- docs/plan/board.html
+- docs/whitepaper/drydocs-whitepaper.md
+acceptance: |
+  A governed-render-fidelity rule is documented where agents will hit it (CLAUDE.md working agreements and/or the docgen-adjacent skill docs — placement recorded in these notes when done): governed surfaces (docs/design/* renders, gate pages, docs/plan/board.html) are published/shared VERBATIM from their deterministic renderers — never restyled, summarized, or editorially reworked — because the HITL loop keys anchors on them (L5 digital / L6 paper feedback re-attachment); editorial/design treatment (artifact-design pass, the whitepaper's visual identity) applies ONLY to non-governed outward-facing docs (whitepaper, website). The rule names both surface classes. No renderer code change.
+notes: |
+  Groomed 2026-07-13 from the 2026-07-12 IDEAS line (artifact-design review, sub-item 1 of 3). Sub-item 2 merged into O1 (design-lens note); sub-item 3 (whitepaper "overnight ledger" identity as the dry-docs.com visual seed) re-inboxed, parked until website work starts.
+annotations:
+  status: '2026-07-21 pm — PLACEMENT: CLAUDE.md §6 Working agreements (new bullet ''Governed renders publish
+    VERBATIM'', right after verify-before-asserting — the spot every session reads); names both surface
+    classes (governed = docs/design/* renders + gate pages + board.html, verbatim because L5/L6 feedback
+    re-attachment keys anchors on them; non-governed outward-facing = whitepaper/website, the only editorial-treatment
+    surfaces). No renderer code change.'

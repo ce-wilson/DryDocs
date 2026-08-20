@@ -1,0 +1,30 @@
+id: G49
+epic: component-topology
+title: Verify the neo4j-drydocs MCP server actually works post-APOC-fix, and rule the GDS disposition
+  (available vs earns a seat)
+type: chore
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/dev-environment.yaml
+- drydocs_core/schema/provisioning/
+acceptance: |
+  The neo4j-drydocs MCP server (user-scope ~/.claude.json, stdio, mcp/neo4j:latest, NEO4J_DATABASE=drydocs) connects and returns a live query against the freshly reloaded graph — a nonzero :CodeModule count consistent with the latest load is the marker. The port is re-confirmed from `docker port neo4jtest` (the container was RECREATED — never trust the config value). Second, in the same pass: a recorded disposition for GDS (471 procs, newly present, nothing calls it) — either an inbox/backlog line seating it (Epic R graph-retrieval benchmark is the candidate) or an explicit "available, unused" note. Close note names machine + container + database (J18 convention).
+notes: |
+  Groomed 2026-07-30 from the 2026-07-28 parked [chore] — parked "until after the port review", which completed (PORT-REPORT-e60822fc; port-prompt rolled 2026-07-30). Why it needs verifying at all: APOC was silently absent from neo4jtest for weeks (fixed 33cfc68 — plugins now a mounted volume), so the server CANNOT have worked in that window and has never been checked since. Machine-local (this desktop) — the config lives outside the repo.
+annotations:
+  status: 'closed 2026-08-10 (desktop, container neo4jtest, database drydocs — J18). FINDING: the server
+    was ABSENT from every config scope (user ~/.claude.json held only graphacademy) — ''verify it works''
+    was unfalsifiable until re-registered. Re-registered user-scope (stdio, neo4j/mcp:latest — note: the
+    image is neo4j/mcp, the item''s mcp/neo4j spelling was reversed; env-passthrough form so the password
+    lives in the config, host.docker.internal URI so the container reaches the host bolt). Live MCP stdio
+    smoke: tools [get-schema, list-gds-procedures, read-cypher, write-cypher]; read-cypher returned total
+    1447 / live 1434 :CodeModule — exactly the 2026-08-10 load. Port re-confirmed from docker port neo4jtest:
+    7474+7687 both mapped. GDS: 423 procs live (item said 471 — version drift, recounted), nothing calls
+    them: AVAILABLE, UNUSED; Epic R benchmark remains the seat candidate, and the MCP server exposes list-gds-procedures
+    when it does.'

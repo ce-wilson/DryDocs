@@ -1,0 +1,30 @@
+id: seal-attribution
+letter: G/K
+title: SEAL application attribution
+order: 10
+groom_log:
+- date: '2026-07-01'
+  note: |-
+    ── Epic K — SEAL application attribution (seal_app_ref) — Phase 9 ────────
+    Groomed 2026-07-01 from the company reconciliation answers (SME-run prompt).
+    KEY CORRECTION: the edge is SPEC-LEVEL on BOTH sides — company FR-NS-013/UC-NS-005
+    docs read ACTIVE but no loader/vocab/gate exists there either. job.APPLICATION is
+    NOT reliable SEAL identity; the feed is STG_APP_FACT semantic facts (C3/C4 variable
+    normalization: fact types SEAL/FID/APP_NAME/ALIAS). Company gate sequence adopted:
+    vocabulary registration -> match-policy gate -> loader activation -> verify thresholds.
+  attached_at: K1
+- date: '2026-07-08'
+  note: |-
+    ── Epic L — Documentation infrastructure (main) — Phase 10 ───────────────
+    Groomed 2026-07-08 from the deterministic-documentation design conversation.
+    THREE senses of "deterministic", unified by ONE contract: a canonical per-doc-type
+    OUTLINE (docs/design/templates/*.outline.yaml) whose stable section/requirement
+    ANCHORS are the id namespace the render pipeline emits, the traceability matrix
+    keys on, and HITL markup (digital save-button OR scanned pen notes) re-attaches to.
+    Source of truth = the .md; HTML/PDF are DERIVED (kills today's three-hand-maintained-
+    copies drift on the Control-M TDD). Sequence (updated 2026-07-08 by the user): TDD
+    (L1) -> render/feedback pipeline (L3-L7) -> Runbook (L8, the capstone that proves the
+    system generalizes to a 2nd doc type); BRD is a LATER phase (inbox-parked, WIP upstream).
+    NOT the planned drydocs-docmeta component: that INGESTS docs into the graph; Epic L
+    AUTHORS ours. They meet only at L7 (docs-as-context, through the gate).
+  attached_at: K9

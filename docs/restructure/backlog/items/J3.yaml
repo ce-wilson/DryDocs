@@ -1,0 +1,19 @@
+id: J3
+epic: release-infrastructure
+title: 'Adopt SemVer + cut the first release tag (v0.3.0): VERSIONING.md, CHANGELOG.md, pyproject bump'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p2
+status: done
+depends_on: []
+inputs:
+- pyproject.toml
+- docs/plan/board.html
+- docs/restructure/backlog.yaml
+acceptance: |
+  VERSIONING.md documents the SemVer policy (single source = pyproject.toml version, annotated vX.Y.Z tags mirror it, 0.x pre-1.0 bump rules, the public surface, the release ritual); pyproject.toml version bumped 0.1.0 → 0.3.0; CHANGELOG.md (Keep a Changelog) back-filled from the completed epics under [0.3.0]; an annotated git tag v0.3.0 cut at the release commit and pushed. Aligns with plan phase 8's release: v0.3.0.
+notes: |
+  Done 2026-07-09 (user decision: v0.3.0 over v0.2.0 — matches phase 8's release: field; 0.1.0 was the poetry-init stub, 0.2.0 skipped). Promoted from the parked IDEAS versioning-reset line. Sibling parked lines (cli.py regroup) remain in the inbox pending their own decisions; CI + unused-dep removal promoted 2026-07-09 (J5, J6).

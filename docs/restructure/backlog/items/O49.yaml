@@ -1,0 +1,21 @@
+id: O49
+epic: web-console
+title: Related-nodes QuerySpec panel + agent first-pass correlation with accept / modify / stay-unassigned
+type: requirement
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O48
+inputs:
+- UI-WIP/sme-intake-page-plan.md
+- drydocs_api/query_specs.py
+- agents/
+- web/src/components/
+acceptance: |
+  A parameterized read-only QuerySpec (intake.related_nodes.v1, O33-guarded — never free-text Cypher from the browser) resolves the confirmed entities + area hints against the structured graph and renders candidate related nodes with a compact neighborhood preview (the MiniDag reuse pattern) and the actual Cypher + parameters visible read-only under a disclosure. "Correlate" runs the ADK graph_qa wiring over evidence + bindings + related nodes and returns RANKED candidate assignments (email → ControlMFolder / process) each with a confidence band and an evidence chain; SME action per candidate is Accept / Modify (scoped re-pick) / Reject-all (stays unassigned — always legal). Agent unavailable → skip chip, manual assignment still works, the page never blocks. The accepted assignment is a CANDIDATE on the intake record; the assignment edge itself stays gate-registered planned (Q10) and nothing here writes the graph.
+notes: |
+  Slice 5 (plan §5-§6). Mock-able behind the same interface — R11 (agents live smoke) helps but is deliberately not a dependency. Module filed drydocs-api (the QuerySpec + correlation endpoint are the deliverable); the panel halves ride drydocs-web, recorded here rather than split into a second item.

@@ -1,0 +1,19 @@
+id: J34
+epic: release-infrastructure
+title: 'PORT-MANIFEST company-row overlay seam: company-only tracked paths live in an include the guard
+  unions, so a port cannot clobber them'
+type: task
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- docs/port-prompt.md
+acceptance: |
+  Producer PORT-MANIFEST.yaml stays canonical; company-only rows move to a separate company-side include whose rows the J16 guard (test_no_tracked_path_falls_through_silently) unions with the producer manifest; a test proves a producer-manifest-verbatim apply CANNOT drop a company include row; the grammar decision (include file vs marked section) is recorded in the manifest header; port-prompt.md documents the seam for the company session that re-adds the 89 dropped rows.
+notes: |
+  Groomed 2026-08-07 from Idea-79 (PORT-REPORT-a14a8028 clobber audit: the take dropped the company default_ok section — 89 company-only paths fell through their own guard, the report's one conscious deferral). Include-file chosen over marked-section as the default: it is the D2-registry overlay precedent the entry itself names; revisit at build only if the company side objects. MERGED IN 2026-08-07 (pm groom, Idea-41): the grammar this item picks must also be able to express a PRODUCER-LOCAL file, because config/** is canonical-producer and config/dev-environment.yaml is now producer-local infrastructure (sibling repo path, expected instrument commit, container name, host ports) that a port applies wholesale — and the L16 runbook's Appendix A is a RENDER of it, so a producer value propagates into consumer documentation, which is the exact drift Appendix A was restated to prevent. The file has no id-keyed grain, so the plausible units are SECTIONS (`neo4j:` and `depgraph:` are environment-specific; `services:` ports are arguably shared). WHAT THIS ITEM MAY NOT DO: choose that file's disposition — per-entry row, canonical-company row, or split into a portable contract plus a local overlay (cleanest, most work). J16's own rule stands: a disposition is a decision, not a default, and it is the user's. This item only ensures the grammar can express the answer. DONE 2026-08-09 (desktop, 7d7c8db on feat/port-machinery-trio, --no-ff merged 09c1be1): overlay: block declares one never-port slot per side (include-file over marked-section — the D2 loader-source-overlay precedent, recorded in the manifest header); union_overlays() in test_port_reconcile_guards.py unions overlay rows AFTER producer rows + default_ok; acceptance proof test replaces the manifest wholesale (v1->v2) and the company overlay row survives by construction; Idea-41 rider satisfied (producer slot declared, dev-environment.yaml disposition deliberately NOT chosen); port-prompt standing-divergence bullet carries the one-time 89-row company migration. Rode along: manifest rows for the roadmap pair the J16 guard caught (roadmap.html canonical-company derived, roadmap.yaml evaluate).

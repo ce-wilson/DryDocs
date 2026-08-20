@@ -1,0 +1,22 @@
+id: Q8
+epic: docmeta
+title: 'BUG: the bmc-docs DESCRIBES edge is silently dropped when SoftwareProduct is absent — a whole-corpus
+  miss is indistinguishable from success'
+type: bug
+module: drydocs-load
+phase: 14
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/cypher/bmc_docs.cypher
+- drydocs/loaders/bmc_docs.py
+- tests/unit/test_bmc_docs.py
+acceptance: |
+  A bmc-docs load in which ZERO :SoftwareProduct nodes are reachable fails loudly instead of reporting success with no DESCRIBES edges — either a hard error or a summary count the caller asserts on. Per-ROW misses (a single misspelled subject_product_id) must still be tolerated as they are today, so the fix distinguishes "this one row found no product" from "the product registry is not in this database at all". A test proves both halves: one row with a bad product id still loads its Document/Chunks and reports the miss; an empty-registry graph fails.
+notes: |
+  MEASURED 2026-07-26, drydocs/loaders/cypher/bmc_docs.cypher:97 — `OPTIONAL MATCH (sp:SoftwareProduct {product_id: row.subject_product_id})` guarded by `FOREACH (_ IN CASE WHEN sp IS NOT NULL ...)`. The template's own header already warns that a misspelled id silently drops the edge for that row; the same mechanism fires for an entire absent database and nobody noticed. Harmless TODAY (both the corpus and the software registry live in `drydocs`), which is exactly why it is worth fixing before anything moves: ADR 0006 already plans to re-target bmc-docs to `dddocs` at the P4 loader build while load-software-registry keeps writing `drydocs`, and a relationship cannot span databases — so that move would silently drop EVERY DESCRIBES edge and take the vendor→product routing spine with it. Third instance this session of "succeeds loudly, does nothing" (see G29, G30). Ready now and independent of the G32 topology ruling.
+annotations:
+  status: 2026-07-27 (CLI session) — loader-side prereq refusal + per-run missing-edge report; 6 new tests

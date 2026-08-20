@@ -1,6 +1,6 @@
 ---
 name: groom-backlog
-description: Groom raw notes into the DryDocs backlog. Use when the user pastes rough to-dos or a photo of paper notes, says "groom my notes" / "groom the backlog" / "add this to the backlog", or when IDEAS.md inbox lines need promoting into backlog.yaml v2 items (title/type/module/phase). Also the weekly grooming ritual.
+description: Groom raw notes into the DryDocs backlog. Use when the user pastes rough to-dos or a photo of paper notes, says "groom my notes" / "groom the backlog" / "add this to the backlog", or when IDEAS.md inbox lines need promoting into backlog/items/<id>.yaml v3 items (title/type/module/phase). Also the weekly grooming ritual.
 context: fork
 agent: backlog-groomer
 background: false
@@ -8,8 +8,9 @@ background: false
 
 # groom-backlog — raw notes → the backlog database
 
-**The mental model (CLAUDE.md §0):** `docs/restructure/backlog.yaml` is the DATABASE
-(schema `drydocs.backlog.v2`, guarded by `tests/unit/test_backlog.py`); `docs/restructure/IDEAS.md`
+**The mental model (CLAUDE.md §0):** `docs/restructure/backlog/` is the DATABASE — one item per
+file, `items/<id>.yaml` (schema `drydocs.backlog.v3`, ADR 0013; guarded by `tests/unit/test_backlog.py`);
+`docs/restructure/IDEAS.md`
 is the zero-schema INBOX; `docs/plan/board.html` is a deterministic RENDER of the database.
 Grooming is the transcription step in between — the user brain-dumps, this skill does the rest.
 The user should never have to hand-edit YAML.
@@ -35,7 +36,7 @@ transcription text as the arguments; pasted/spoken notes → pass them through v
 ## Per-note decision procedure
 
 For each note, decide: **promote** (full backlog item), **inbox** (park in IDEAS.md), or
-**merge** (fold into an existing item's acceptance/notes — search `backlog.yaml` by keyword first).
+**merge** (fold into an existing item's acceptance/notes — `grep -rl <keyword> docs/restructure/backlog/items/` first).
 
 **Promote** when the note is actionable and scoped enough to write a pass/fail acceptance test.
 **Inbox** when it is a direction, question, or needs a decision the user hasn't made — format
@@ -49,7 +50,7 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 | `id` | Next free number in the matching epic's letter; new theme → next free letter with an epic comment header. NEVER allocate the DD-series (`DD1`, `DD2`, …) — reserved for company-side-only items (cross-repo convention 2026-07-20, git-readme.md). |
 | `title` | Plain English, understandable in 6 months with zero context. Never rely on codenames. |
 | `type` | `requirement` (future capability ask) / `task` (concrete work) / `chore` (hygiene, docs, renames) / `bug` (defect). |
-| `module` | From the `modules:` registry in backlog.yaml. Code work → the MODULE_MAP component; non-code → a work area (taxonomy/ontology/config/reference/graph-infra/docs). |
+| `module` | From `docs/restructure/backlog/modules.yaml`. Code work → the MODULE_MAP component; non-code → a work area (taxonomy/ontology/config/reference/graph-infra/docs). |
 | `phase` | From `plan.phases`. A note that fits no phase is a **plan change** — propose a new phase to the user, never invent one silently. |
 | `agent` | A `.claude/agents/` name for scoped layer work, else `main`. |
 | `model` | The model matrix: **fable** (Mythos-class, the top tier since 2026-07-10) only where a decision changes schema/ontology/boundary; **opus** = the former top tier, still valid on existing items (re-tier to fable when a groom touches them); **sonnet** for work with a written acceptance test; **haiku** for lookups, renames, ritual wiring. |
@@ -70,11 +71,14 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 
 ## Mechanics of a groom run (in order)
 
-1. **Edit `backlog.yaml`**: add promoted items under their epic (keep the epic comment headers);
-   apply merges.
-2. **Recompute the roll-ups** (test-enforced, they may not drift):
-   - `summary:` counts = exact item counts per status;
-   - `next_ready:` = exactly the `todo` items whose every `depends_on` is `done`.
+1. **Write one file per promoted item**: `docs/restructure/backlog/items/<id>.yaml`, a
+   standalone mapping (`id`, `epic`, `title`, `type`, `module`, `phase`, `agent`, `model`,
+   `priority`, `status`, `depends_on`, `inputs`, `acceptance`, `notes`). The filename IS the
+   id. Merges edit the existing item's file. A groom note about the epic goes to
+   `epics/<epic>.yaml` → `groom_log` (date + note) — that replaces the old comment headers.
+2. **Nothing to recompute.** Roll-ups (`summary`, `next_ready`) are DERIVED by
+   `render_board.py` and never stored (ADR 0013 Clause 3) — a stored one FAILS the guard.
+   `python .claude/skills/groom-backlog/validate.py` prints the derived counts.
 3. **Update `IDEAS.md`**: new parked notes go to `## Inbox` (top); every groomed line MOVES to
    `## Recently groomed (audit trail)` with the date and resulting id(s), e.g.
    `- 2026-07-01 — [chore] fragment cleanup → J1.`

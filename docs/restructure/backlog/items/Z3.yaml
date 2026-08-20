@@ -1,0 +1,22 @@
+id: Z3
+epic: server-location
+title: 'Server-inventory loader + Control-M node join: ingest the export, tie servers to job hosts, distinct-hosts-per-application
+  query'
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- Z1
+- Z2
+inputs:
+- drydocs/loaders
+- config/source-registry.yaml
+- tests/fixtures
+acceptance: |
+  A loader ingests the registered export per Z2's signed shapes, idempotently, with the sanitized fixture e2e green. Server names join to Control-M nodes/job hosts under the gate's match tiers, with match evidence recorded rather than silent. A query (QuerySpec or CLI verb per the read-surface conventions) answers "the distinct job hosts for a given application" — the selection that feeds the Z4 resolver — and its result carries each host's resolved location when the join found one and an explicit unmatched marker when it did not, so coverage gaps are visible instead of dropped.
+notes: |
+  User directive 2026-08-08. Prod filter applied at ingestion per the Z1 contract; both prod and DR rows load, distinguished per the Z2 ruling. CLOSED 2026-08-19 (laptop): the full chain landed the same session as the Z2 gate. ServerInventoryLoader (server_inventory.v1, CsvAdapter; MATCH-only app leg -> the SS C2 technology port; sweep_label None BY DESIGN — per-app files) + the server_resolution.v1 derived pass (T1 exact / T2 normalized with the exactly-one-candidate ambiguity guard; T3 dns-resolved is Z4's; match_tier/match_evidence/resolved_at on every edge; unmatched = no edge, counted). CLI verb load-server-inventory (sequence step, load-map row); QuerySpec infra.app-job-host-locations.v1 answers the distinct-job-hosts question with resolved location or the explicit UNMATCHED marker — the Z4 resolver's feed. Vocabulary: all three infra_ entries flipped ACTIVE (N13, the build's commit); supplement infrastructure_ontology_supplement.cypher = chain step 5; constraints server_name + datacenter_name (53 -> 55); registry confirmed: true + audit-fields stub; LEDGER_PENDING entry with the removal condition (the doc-08 ledger authors from the first REAL download's headers). E2E green + IDEMPOTENT (run-twice census diff zero) — sample-reproducible: tests/integration/test_server_inventory_e2e.py on a throwaway EE testcontainer (ran on the laptop, 2 passed); unit suite 2222.

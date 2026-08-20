@@ -1,0 +1,22 @@
+id: M4
+epic: provenance-audit
+title: Property-level ontology terms for the audit envelope (dct:/prov:, via the gate)
+type: task
+module: ontology
+phase: 11
+agent: ontology-mapper
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/audit-fields.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- reference/standards/
+acceptance: |
+  The four envelope properties carry standard-term bindings — dct:creator/dct:created/ dct:modified or PROV qualified attribution — decided via the HITL gate, including WHERE property-term bindings live (own registry vs a vocabulary-file section: relationship_vocabulary.yaml covers edges only today). SOSA explicitly ruled out in the record (authorship provenance, not observation). Drift guards green.
+notes: |
+  Groomed 2026-07-08 from the 2026-07-07 IDEAS line (raised while answering 'where are the SOSA mappings for created by?'). CLOSED 2026-08-04 (desktop): gate envelope-property-terms SIGNED OFF 10/10 in-chat (same session as M3). Rulings: the dct trio (creator/created/modified) + the contested updated_by row ruled dct:contributor with the imprecision RECORDED in the entry note (DCMI defines no 'modifier') over the prov qualified-attribution alternative; the WHERE question ruled C1 — a new property_terms section (0b) in relationship_vocabulary.yaml, on the node_classifications precedent that the file is the ontology registry, not literally a relationship list. SOSA ruled OUT in the record (§A2). Build: dct: registered in namespaces.py + the ontology.cypher header sync (documentation-grade — no dct: OntologyTerm nodes seeded); reference/standards/dcmi-terms/ stub + REGISTRY.yaml row + standards README table row; three drift guards in test_audit_fields.py (every envelope property bound, every CURIE expands via namespaces.expand() with a gate id, the four rulings pinned). Found in passing + inboxed: REGISTRY.yaml has cited reference/standards/dcat/README.md since before this item — the file does not exist.
+annotations:
+  status: '2026-08-04 (desktop): gate envelope-property-terms SIGNED OFF 10/10 in-chat, same session as
+    M3'

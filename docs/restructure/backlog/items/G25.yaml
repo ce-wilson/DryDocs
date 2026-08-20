@@ -1,0 +1,29 @@
+id: G25
+epic: component-topology
+title: 'DPL registry ingestion source: per-SEAL Swagger JSON (pipeline/dataset GUID, version, active flag)
+  + GUID cross-check'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G19
+inputs:
+- config/source-registry.yaml
+- config/classification.yaml
+- drydocs_lineage/
+- drydocs_core/controlm/commands.py
+- tests/unit/test_lineage_inventory.py
+acceptance: |
+  The DPL taxonomy registry becomes a registered ingestion source: per-SEAL Swagger JSON exports of the registry DB (pipeline GUID / dataset GUID, version, active|inactive flag, keyed by SEAL) are ingested TAXONOMY-FIRST (pure classification, no meaning edges) into staging records (guid, kind=pipeline|dataset, version, active, seal, provenance envelope). Downloads land in the G19 out-of-tree zone (dpl-registry/ subfolder); the source-registry entry carries classification internal-confidential (real SEALs + GUIDs + lifecycle state) and records that data never enters the repo; fixtures are SYNTHETIC. A cross-check report joins registry GUIDs against the GUIDs G15 observes in launcher CMD_LINEs: observed-not-registered and registered-not-observed are each counted and listed, never dropped — the registry is also the truth table for which job families carry pipeline ids at all (the code-fetch tooling gap from the SME chat). The active flag is staged as a THIRD usage signal (beside referenced and present-on-server) — staged only; any conflation with "used" is a G22 ruling. NO graph writes. Full suite green.
+notes: |
+  Groomed 2026-07-21 from the user's registry disclosure: the DPL taxonomy lives in a database showing version + active/inactive flag by SEAL, exportable per-SEAL as Swagger JSON. Independent of the collector track (only needs the G19 landing zone), so it can run in parallel. Complements G17 — G17 reads each pipeline's own MAC JSON set, G25 reads the registry ABOVE the pipelines; the shared join key is the same GUID G15 extracts. Feeds G22 clauses (f)/(g). Candidate-side, hence sonnet.
+annotations:
+  status: '2026-07-23: extractors/dpl_registry.py (assumed contract: <seal>/pipeline_id.json + dataset_id.json,
+    bare or wrapped lists; seal from field else folder; active normalized, unknown counted) + cross_check
+    report (observed-not-registered / registered-not-observed / clone-lag third column per the SME caveat)
+    + dpl_registry_dir() + dpl-registry source registration (internal-confidential, confirmed:false, G22
+    f/g); synthetic fixtures; NO graph writes'

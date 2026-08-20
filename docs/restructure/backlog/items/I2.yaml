@@ -1,0 +1,20 @@
+id: I2
+epic: project-board
+title: Render the backlog as an HTML project board
+type: requirement
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- I1
+inputs:
+- docs/restructure/backlog.yaml
+- drydocs/gate_pages.py
+- MODULE_MAP.md
+acceptance: |
+  drydocs/plan_board.py renders backlog.yaml -> docs/plan/board.html, self-contained (roadmap strip from plan: with computed per-phase progress, kanban columns by status, client-side filters by module/phase/epic/type, depends_on rendered as links, quick-capture box that formats a paste-ready IDEAS.md line to clipboard); module classified in MODULE_MAP.md + test_module_boundary.py (new `plan` component group — default-deny will force it); offline unit tests on a fixture backlog; the rendered board is committed. Entry point = thin script beside snapshot.ps1 until the cli.py entrypoint-boundary TODO (MODULE_MAP.md) is resolved.
+notes: |
+  Done 2026-07-01. Built by a sonnet agent per the model matrix; opus review pass done. drydocs/plan_board.py (pure, deterministic — no build timestamps, backlog `updated:` shown instead) + scripts/render_board.py + tests/unit/test_plan_board.py (16 tests) + `plan` COMPONENT_GROUP in test_module_boundary.py + MODULE_MAP.md row. Board committed at docs/plan/board.html. Board replaces 02-backlog.md as the human view.

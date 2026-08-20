@@ -1,0 +1,23 @@
+id: K10
+epic: seal-attribution
+title: 'Port activation cutover: active_state (declared|confirmed) per port replaces the never-read active
+  boolean'
+type: task
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-04
+depends_on:
+- K7
+inputs:
+- drydocs/loaders/cypher/seal_applications.cypher
+- drydocs/loaders/cypher/folder_attribution.cypher
+- graph-tests/folder-attribution-coverage.yaml
+- config/gate-log.md
+acceptance: |
+  seal_applications.cypher stops seeding Port.active (a boolean created false and never written true or read anywhere producer-side) and seeds active_state instead, PER PORT: declared | confirmed, with declared_by/declared_at and confirmed_by/confirmed_at/ confirmed_run_id (§G4). Confirmation is DERIVED from the BELONGS_TO_APPLICATION edge landing on the port — no separate trigger, which is what §C1(b) bought (§G5). The EventProcessing port is declared-only until an event source is onboarded, and a declared-but-unconfirmed port is visibly distinct from a confirmed one on every surface. Drift guards green.
+notes: |
+  Opened BY the K7 gate (§F2), 2026-08-03. Per PORT, not per orchestrator (SME correction at the gate): the port answers "does this app run batch", the 1:N reg_uses_software edges answer "scheduled by whom" — putting the orchestrator on the port would duplicate it. COMPANY-SIDE this is a live-behaviour change, not a formalization: two loaders (controlm_app_codes.cypher and an AutoSys twin) already write the boolean by derivation. Their already-active ports grandfather as confirmed with the Control-M app-code link as provenance (§G4-RIDER), unambiguous because the initial series loads Control-M only. CLOSED 2026-08-04 (desktop): seal_applications.cypher seeds active_state='declared' + declared_by/declared_at ON CREATE only (a SEAL reload never resets a confirmation) and never writes 'confirmed'; BOTH edge writers (folder_attribution.cypher, the manual cypher) stamp the port confirmed when the edge lands — no separate trigger, §G5 — with coalesce-stable first-confirmation stamps (confirmed_by = the authoring steward via the new FolderAttributionRow.authored_by, else the loader for matched-fallback; confirmed_run_id = the confirming run). Suite TCs 09-11 added (state enum + declared stamps + no retired boolean; confirmation<->edge two-way agreement; EventProcessing declared-only); explorer.folder-applications.v1 surfaces port_state so declared-vs-confirmed is visibly distinct. Suite 1403 (+4), ruff clean. The company grandfathering (§G4-RIDER) stays theirs — ledger step 65.

@@ -1,0 +1,24 @@
+id: D4
+epic: config-loaders
+title: 'Fix psgmgr version filter: IS_CURRENT_VERSION = ''Y'' (was ''1'') across extracts, DDL, cypher,
+  and references'
+type: bug
+module: drydocs-load
+phase: 3
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/sql/
+- drydocs/loaders/cypher/controlm_jobs.cypher
+- docs/design/controlm-ingestion-tdd.md
+- docs/controlm-staging-ingestion-flow.md
+- .claude/skills/controlm-db/SKILL.md
+acceptance: |
+  All psgmgr version filters compare IS_CURRENT_VERSION = 'Y': extracts (controlm_folders/jobs/conditions_in/conditions_out/variables/variables_scenarios + adhoc probes), staging DDL views, controlm_jobs.cypher .active derivation, models/controlm.py field description, controlm-db skill (SKILL.md, query-cookbook, schema-crosswalk, ingest), the TDD "two filters" section, and C3/status + port-guide docs; no IS_CURRENT_VERSION = '1' remains outside history/audit prose; test_controlm_cypher asserts 'Y'; staging-ingestion-flow preflight 0.3 marked RESOLVED = 'Y'; the CM_DEF_SETVAR_VW extracts carry a comment flagging the view's own domain for a one-line company preflight (SELECT DISTINCT IS_CURRENT_VERSION) before the production variables run; design-doc renders regenerated; full suite green.
+notes: |
+  Groomed 2026-07-15 from the finalized company Control-M ingestion TDD (captured LOCAL-ONLY at internal-local/company-backflow/controlm-ingestion-tdd.md — gitignored). Evidence: the company's finalized extracts filter 'Y' on CM_DEF_VJOB (incl. the JOB_ID=1 header join) and CM_DEF_LNKI/LNKO_P_VW, and their worked example returned the real 2-folder/8-job population — 'Y' is live-verified; producer '1' never ran live (the 2026-07-10 live check verified the SETVAR view's name/columns, not the value domain). Closes staging-ingestion-flow open point 0.3. Done 2026-07-15: flipped 11 SQL files (extracts + DDL views + adhoc probes incl. controlm-db + reconcile-port skill refs, TDD/staging-flow/C3/git-readme docs; fixtures flipped '1'/'0'→'Y'/'N' (36 rows, 4 CSVs); lineage extractor accepts ('Y','1') for legacy synthetic CSVs; SETVAR preflight comment added; superseded docs/reviews left as history. 655 tests pass; design renders regenerated.
+annotations:
+  status: done 2026-07-15, same session as the groom (main/fable)

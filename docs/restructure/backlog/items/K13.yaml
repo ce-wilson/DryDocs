@@ -1,0 +1,23 @@
+id: K13
+epic: seal-attribution
+title: 'catalog_has_application back-flow: adopt the company''s structural SUPPORT reading and the loader
+  that already exists there'
+type: task
+module: ontology
+phase: 9
+agent: main
+model: fable
+priority: p3
+status: done
+closed: 2026-08-04
+depends_on:
+- K7
+inputs:
+- config/taxonomy-ontology-map.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- drydocs/loaders/cypher/products.cypher
+- config/gate-log.md
+acceptance: |
+  catalog_has_application ((:Product)-[:HAS_APPLICATION]->(:BusinessApplication)) is reconciled to the ONE reading the gate signed (§G6): a structural SUPPORT link — a Product is supported by 2 or more applications, front-end/back-end — NOT "a Product owns a set of SEAL-registered applications". The vocabulary note and the ontology-map entry both state the support reading; the edge is documented 1:many BY DESIGN (the source extract's application-id column is multi-valued). Whether the producer entry leaves status: planned is decided by whether a product-scoped extract is onboarded here — the C9 condition is unchanged by this item; only the SEMANTICS are.
+notes: |
+  Opened BY the K7 gate (§G6), 2026-08-03 — explicitly a BACK-FLOW/divergence item, not new build. Company-side the C9 precondition is already met: a product-scoped extract feeds a dedicated loader and the edge is ACTIVE there. The two sides worded the semantics differently and the gate ruled the company reading, because it is backed by a live extract and loader where the producer's was an unbuilt intention. The picker in K11 means a different thing under each reading, which is why one had to be chosen. CLOSED 2026-08-04 (desktop): every producer surface now states the support reading. (1) The ontology map gained its FIRST catalog_has_application entry — product-has-application, status: confirmed (chad.wilson 2026-08-03, the K7 sign-off), capture waived with the C9 reason, decision_resolved carrying the §G6 ruling verbatim; map summary confirmed 23 -> 24. The map had NO entry for this edge at all — the acceptance's "the ontology-map entry" was an entry that had to be created, not edited. (2) relationship_vocabulary note rewritten: support reading + 1:many BY DESIGN lead; the old WAS_ATTRIBUTED_TO matrix hint is recorded as FALLEN (both ends are Entities post-K4, so no PROV row — consistent with the entry's existing prov_maps_to: ~); C9 history and the planned status kept verbatim. (3) catalog_ontology_supplement's OntologyTerm notes rewritten the same way — which also removed a FALSE claim: "Written by pat_product_mapping loader" had been untrue since C9 removed that write. (4) The data-context-extractor skill's two "product owns" lines fixed. (5) The K11 surfaces (cascade spec description, pane comment + notice) re-aimed from "the K13 back-flow" to the real remaining condition — loading waits on the C9 product-scoped extract. Status UNCHANGED everywhere: vocabulary stays planned, no loader, no graph write — the C9 condition is untouched, exactly as the acceptance requires. Renders regenerated (the enforcement-matrix drift guard fired on the vocabulary note first, as designed); suite 1410 green. Left as history: git-readme port-step prose and docs/history/*. Inboxed: sdlc-neo4j-schema.md still claims pat_product_mapping.cypher MERGEs HAS_APPLICATION (stale since C9 — that living doc belongs to the SDLC cron stream).

@@ -1,0 +1,18 @@
+id: G5
+epic: component-topology
+title: Document the context→ground-truth promotion path
+type: chore
+module: docs
+phase: 6
+agent: ontology-mapper
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/restructure/03-hitl-sme-flow.md
+- docs/decisions/0002-component-database-topology.md
+acceptance: |
+  03-hitl-sme-flow.md gains a "promotion: drydocs_context → drydocs" section stating an uncertain node is promoted ONLY via a gate-confirmed WRITE to drydocs (status: proposed → loader), never an in-place cross-DB edit; includes the per-item decision presentation + the gate-log audit requirement.
+notes: |
+  ADR 0002 follow-up #5. Documents the trust-promotion path (trust axis = DB boundary). No code. Writable now; references G1's DBs conceptually, not as a hard dep.

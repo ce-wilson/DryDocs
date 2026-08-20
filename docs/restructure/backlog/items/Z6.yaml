@@ -1,0 +1,20 @@
+id: Z6
+epic: server-location
+title: 'Global time-zone runtime map: folder/job start-to-end spans across a world time-zone view, rendered
+  in the browser''s local time zone'
+type: task
+module: drydocs-web
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- Z5
+inputs:
+- web/src/components
+- drydocs_api
+acceptance: |
+  Reusing the Z5 map core: for a selected folder or job, its runtime span (start to end) renders across a global time-zone map, and the display converts to the viewing browser's local time zone (read from the browser, never hardcoded). Spans that cross midnight or span zones render without truncation. Runtime data comes from the temporal sources already ruled (the cm_avg_run dataset family) where available; where a folder has no explicit time, the Control-M DC-name default-time semantics (e.g. T032-E0700-DMA = default 07:00 EST) may seed the span ONLY if labeled as a default, never presented as an observed runtime.
+notes: |
+  User directive 2026-08-08. This is where the two meanings of "DC" earn their keep in one view: the SCHEDULING default time comes from the Control-M DC name, the PHYSICAL place from the Z1 export — the map shows both without conflating them.

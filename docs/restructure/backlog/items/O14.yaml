@@ -1,0 +1,23 @@
+id: O14
+epic: web-console
+title: 'Mapping-store staleness guard: detect source-hash drift in var/mapping.db and rebuild, so /mappings
+  never serves stale grids'
+type: chore
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs_core/mapping_store.py
+- drydocs_api/mappings.py
+- tests/unit/test_mapping_store.py
+- knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md
+acceptance: |
+  MappingStore detects that var/mapping.db was built from sources whose hash no longer matches the committed YAML/CSV (the source-hash meta row already stored at build) and EITHER rebuilds automatically on next connect OR refuses with a clear rebuild instruction — either/or decided at execution. A unit test edits a source, hits the store, and proves the served result reflects the edit (or the refusal fires). The plan M2 bullet's "DB rebuilt post-merge (CI/ritual)" is either wired or explicitly recorded as superseded by this guard. Full suite green.
+notes: |
+  Groomed 2026-07-18 as the mapping-store plan residual: the store auto-builds only when the FILE IS ABSENT — a stale file serves stale grids until deleted (the docs/runbook-mapping-demo.md workaround). Derived artifact, no gate. DONE 2026-07-18 same session: source_hashes() + is_current() in drydocs_core.mapping_store (expected-meta computed WITHOUT building; exact dict compare so added/removed manifest CSVs count as drift; missing/corrupt/ foreign file -> False); MappingStore._connect rebuilds when not current — the either/or decided as AUTO-REBUILD over refusal (the derived-artifact doctrine; corrupt files heal the same way). Tests: core drift test edits a fixture source and proves the rebuild serves the edit; api test tampers the meta and proves a read rebuilds + restores current hashes. Plan M2's CI/ritual rebuild bullet recorded SUPERSEDED in the plan header; runbook troubleshooting updated. Suite 693 passed / 6 expected skips.
+annotations:
+  status: DONE 2026-07-18 same session it was groomed (main fable, post-merge)

@@ -1,0 +1,19 @@
+id: G60
+epic: component-topology
+title: Lineage file-ops pass reads CMD_LINE only — PRECMD/POSTCMD shell text carries the same file operations
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/controlm_inventory.py
+- drydocs_core/orchestration/shell.py
+- drydocs_core/orchestration/controlm/variables.py
+acceptance: |
+  The inventory extractor feeds pre/post-execution command text (the EMBEDDED_SHELL variables PRECMD / POSTCMD, including the observed POSCMD typo spelling) through the same G14 file-op grammar as CMD_LINE, with the SAME endpoints and NO new relationship types — so the mv/backup forms G14 cannot see today (parquet plus .tok to a backup path) become READS_FROM / WRITES_TO candidates. Coverage counters distinguish the CMD_LINE source from the pre/post source so the added yield is measurable, unparseable values are counted rather than dropped (the coverage house rule), and a unit test on a sample job whose POSTCMD moves a file proves the candidate is planned.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-20 clause (c). Verified at the groom: the extractor builds ONE command string per job (controlm_inventory.py, the `cmd` field) and nothing under drydocs_lineage/ references PRECMD or POSTCMD, while drydocs_core/orchestration/shell.py already parses that shell text and controlm/variables.py already names all three spellings — so this is a feed, not a new parser, and it stays inside G14's signed endpoints. Idea-20's other clauses stay in the inbox: (a) the ingestion-launcher jar classifier entry waits on a real sample, (d) cross-job runtime variable threading is context-graph work and a definition-level no-op.

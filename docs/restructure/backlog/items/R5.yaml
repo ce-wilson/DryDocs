@@ -1,0 +1,25 @@
+id: R5
+epic: agentic-qa
+title: 'Ask spoke in the web console: chat panel with streamed agent steps, answer with citations + trust
+  watermark, per-step Cypher panel, metrics chip'
+type: requirement
+module: drydocs-web
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- R2
+- R4
+inputs:
+- web/src/
+- web/src/lib/adk.ts
+- web/src/lib/graphApi.ts
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  A non-admin persona asks a free-text question and sees: streamed agent steps while it runs; the answer with source citations carrying trust tier + classification; a "How I got this" panel showing every executed Cypher with database, rows, ms (and fix history when repaired); Open-in-Explorer / Export per step via the ephemeral explore_ref through the GraphAccess api adapter; a metrics chip (time, tokens, iterations). Zero graph writes from the UI path (cites O20). The admin console bench panel remains as-is for dev use.
+notes: |
+  2026-07-30 build. Agent side: pipeline on_step observer (steps stream the moment they land; observer failure never kills an answer) + graph_qa/control.py (part 0 = question, later part = drydocs_control JSON with api_token/api_url — the R4 owner-token handshake, in-band so the shape is repo-owned on both ends and never reaches the LLM) + agent.py bridges the sync pipeline onto the ADK event stream via thread+queue, yielding {"kind":"step"} events then the envelope; per-request pipeline binds make_register to the ASKING session's token. Web side: /ask route for EVERY persona ('ask' module registry entry, retrieval:agent), adk.ts grows parts + /run_sse SSE parsing (buffered /run fallback), graphApi ApiClient.getToken + shared-client createApiAccess (one session for token AND runSpec — the ownership requirement), ask/askApi.ts envelope types + event parsing, AskRoute renders streamed steps, answer w/ SYNTHESIZED watermark + source citation chips (trust tier + classification via GET /specs; agent Cypher = internal-confidential ceiling), "How I got this" per-step panel w/ Cypher + fix history, Open-in-Explorer/Export = the SAME SpecGrid pointed at the eph. ref (run + both exports + manifest), metrics chip. VERIFIED on this machine: 1187 unit tests, tsc+vite build, oxlint clean; wire-level live e2e (real drydocs-api + real Neo4j + stub ADK because no agents venv here): non-admin login -> control handshake -> SSE steps arrive incrementally -> explore_ref -> runSpec 10 live rows -> export w/ cypher_sha256 manifest -> foreign session 404; headless-Edge render check of /ask?as=jdoe4821. Full LLM-in-the-loop smoke rides the agents-venv machine next session.
+annotations:
+  status: 2026-07-30, desktop session (claimed + built same day; third of the R4->R3->R5 run)

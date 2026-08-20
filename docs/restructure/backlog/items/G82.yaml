@@ -1,0 +1,22 @@
+id: G82
+epic: seal-attribution
+title: The PAT team-report PROJECTION is missing — DevTeamsLoader and PatProductMappingLoader are real,
+  tested and have never run on real data
+type: task
+module: drydocs-load
+phase: 9
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/catalog.py
+- drydocs/loaders/cypher/dev_teams.cypher
+- drydocs/loaders/cypher/pat_product_mapping.cypher
+- config/source-registry.yaml
+- drydocs/data/samples/dev_teams__sample.csv
+acceptance: |
+  BUILD THE RAW -> PROJECTED EXTRACTION FOR THE PAT TEAM REPORT, which is the one link missing between a real source file and two loaders that are otherwise complete. THE STATE, verified producer-side 2026-08-11 rather than assumed. Both loaders EXIST and are wired: DevTeamsLoader (drydocs/loaders/catalog.py, source_id `pat:product-catalog`, cypher dev_teams.cypher) and PatProductMappingLoader (same file, source_id `pat:people-report`, cypher pat_product_mapping.cypher, guarded by PreCutoverApplicationGuard). Both SOURCES are registered and `pat:people-report` is already `confirmed: true` (C9 gate, 2026-07-18). A sample fixture exists (drydocs/data/samples/dev_teams__sample.csv), so sample-mode runs. WHAT DOES NOT EXIST, ON EITHER SIDE: the script that projects the raw PAT team report CSV into the two files the loaders actually read. It is referenced by the loader docstrings company-side and was never built. CONSEQUENCE, and it is the finding rather than the task: THE DEV-TEAM LOAD HAS NEVER RUN AGAINST REAL DATA. Everything green about it today is green against a fixture. CORROBORATION ALREADY IN THE REPO: `pat:people-report` carries `locator.mapping: ~` — no field ledger. A confirmed source with no column mapping is exactly the fingerprint of a feed nothing has ever read for real, and it went unnoticed because the loaders pass on the sample. DELIVERABLES. (1) Read both row models (DevTeamRow, PatProductMappingRow) for the exact columns required. (2) Read the raw report header. (3) Write the projection — a script, or emit the two CSVs directly; the choice is whether the projection is a repeatable step or a one-off. (4) Fill `locator.mapping` for `pat:people-report` from what the projection actually reads, so the ledger stops being null. (5) Run the load against real data and report what changed versus the fixture. NO REAL VALUES IN THE REPO: the raw report and the projected CSVs are Internal and stay company-side; only the projection MECHANISM and the column ledger land here.
+notes: |
+  Raised 2026-08-11 (SME: "another loader that I thought was built is not complete"). THE LOADER IS NOT THE INCOMPLETE PART - that is the useful distinction. The loaders, their cypher, their row models, their source registrations and their tests are all real; the INPUT PIPELINE is missing, one step upstream of everything that gets tested. WHY IT SURVIVED, and it generalises beyond this item: a sample fixture makes a loader test green independently of whether any real file can reach it. So "the loader is built and tested" and "the load has never run" are both true at once, and nothing in the suite can tell them apart. Worth asking, once this is fixed, which OTHER confirmed sources carry `locator.mapping: ~` - that null is the cheapest available signal for the same condition elsewhere. SCOPE NOTE: this is producer-side buildable. Unlike G74 and RELAY-6, nothing here is company-only - both loaders, both sources and the fixture are in this tree. Only the DATA is company-side, which is the normal split rather than an asymmetry.

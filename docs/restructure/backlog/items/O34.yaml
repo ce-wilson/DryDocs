@@ -1,0 +1,19 @@
+id: O34
+epic: web-console
+title: 'web/ dependency hygiene: clear the 3 high-severity npm advisories (bundle code-splitting explicitly
+  NOT included — design call)'
+type: chore
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- web/package.json
+- web/package-lock.json
+acceptance: |
+  `npm audit` in web/ reports ZERO high-severity advisories; `npm run build` passes; the lockfile diff is reviewed and any major-version bump is named in the commit body (audit-fix moves versions — that is the verification pass the fix was deferred for). EXPLICITLY OUT OF SCOPE: the 1,485 kB main bundle (390 kB gzipped, past Vite's 500 kB warning) — code-splitting is a design call for the UI workstream, recorded here so it is not lost, not smuggled into a dependency chore.
+notes: |
+  Groomed 2026-07-28 from the 2026-07-27 inbox (found while removing the never-committed check/no-op junk deps; sibling of J1 unused-deps). The advisories predate that cleanup. If `npm audit fix` cannot clear a high-severity advisory without a breaking major bump, say so and stop — that escalates to the UI workstream, not a forced upgrade. CLOSED 2026-07-28 via the stop clause: postcss advisory cleared (8.5.16 -> 8.5.23; nanoid 3.3.15 -> 3.3.16 rode along — patches only, no major moved), `npm run build` passes (bundle unchanged, still the out-of-scope 1,487 kB). The react-router advisory (GHSA-qwww-vcr4-c8h2) CANNOT clear without the v7 -> v8 major: v8 absorbs react-router-dom, whose latest (7.18.1) sits inside the vulnerable range, so audit fix is a no-op — escalated to the UI workstream via the IDEAS inbox (2026-07-28 chore line; likely moot in practice, the console is a Vite SPA with no RSC actions, but the audit stays red until ruled).

@@ -1,0 +1,21 @@
+id: L17
+epic: doc-infrastructure
+title: doc_traceability + doc_feedback load 'successfully' with every anchor link silently dropped when
+  their cross-loader prereqs are absent — add the Q8 loud-refusal guards
+type: bug
+module: drydocs-load
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/doc_traceability.py
+- drydocs/loaders/cypher/doc_traceability.cypher
+- drydocs/loaders/cypher/doc_feedback.cypher
+- drydocs/loaders/batch_port_orchestrator.py
+acceptance: |
+  DocTraceabilityLoader and DocFeedbackLoader (today bare class bodies, doc_traceability.py:376,383 — no prereq check) refuse loudly BEFORE writing when a cross-loader prerequisite set is absent, per the Q8 / batch_port_orchestrator precedent: doc_traceability.cypher:69 and doc_feedback.cypher:37 both OPTIONAL MATCH (:DocSection) written by a DIFFERENT loader (doc_sections.v1), and doc_feedback.cypher:49 does the same for (:Employee) — an absent set currently drops every anchor link and still reports OK. After the guard: absent prereq -> loud refusal (exit 2, nothing written); present prereq -> per-row unmatched anchors COUNTED in the load report, never silent. Tests pin both paths for both loaders. Full suite green.
+notes: |
+  Groomed 2026-07-28 from the 2026-07-27 sweep that fixed batch_port_orchestrator (same defect family, instances five-through- seven of the "succeeds loudly, does nothing" through-line: G29, G30, Q8, both batch_port halves, these two). doc_feedback matters MOST: it IS the L5/L6 re-attachment loop, so its failure mode is SME feedback loading "successfully" while silently detached from the doc it annotates. Cleared as NOT defective by the same sweep: the prev:Chunk self-references (bmc_docs.cypher:94, essential_graphrag.cypher:80, same-loader same-run) and pat_product_mapping.cypher:129,133 (stale-edge cleanup, not prereq joins). CLOSED 2026-07-28: _SectionPrereqLoader shared guard (refusal before _open_run, so a refused load leaves no :JobRun; probes exclude :SchemaMeta exemplars per the O33 write-side clause) + per-row unmatched-anchor reporting on both loaders; DocFeedbackLoader additionally refuses an AUTHORED batch against an empty :Employee registry (author-less batches load fine — gate C1 keeps attribution optional) and reports unknown authors. CLI load-doc-traceability: refusal -> red + exit 2; per-row misses -> yellow report. Both cypher headers now point at the enforcing loader methods (the batch_port header convention, test-pinned). 9 guard tests, no Neo4j.

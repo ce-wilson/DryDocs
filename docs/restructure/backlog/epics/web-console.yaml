@@ -1,0 +1,52 @@
+id: web-console
+letter: G/O
+title: Web console / graph visualization
+order: 14
+groom_log:
+- date: '2026-07-09'
+  note: |-
+    ── Epic O — Web console / graph visualization (main) — Phase 12 ───────────
+    Groomed 2026-07-09 (user decision: promote to a module + phase — the web/ front-end
+    design pass is in flight on branches). NEW module drydocs-web (JS/TS under web/, not a
+    Python package, so absent from MODULE_MAP.md/test_module_boundary.py). This is the
+    browser surface over the graph — distinct from every Python component.
+  attached_at: O1
+- date: '2026-07-14'
+  note: (O3–O6 groomed 2026-07-14 from ADR 0005's Action items, at the design-pass merge.)
+  attached_at: O3
+- date: '2026-07-17'
+  note: |-
+    O8–O11: the site-plan build-out (UI-WIP/site-plan.md, groomed 2026-07-17 from
+    the IDEAS UI DECISION line — single-track ReUI, Salt dropped). Module choice:
+    the EXISTING drydocs-web / drydocs-api registry entries, not a new drydocs-ui
+    module (site-plan §6's suggested id superseded by this groom).
+  attached_at: O8
+- date: '2026-07-21'
+  note: |-
+    O15–O22: the site-plan P3 extension (groomed 2026-07-21 from chat + the new
+    UI-WIP corpus: DryDocs_UI_Development_Specs.md, gemini-wire-frame.md, icons.md,
+    layout-anatomy-checklist.md now on disk). Covers every remaining console
+    surface buildable WITHOUT a gate; the chain terminates at O20 — the HITL gate
+    deciding the UI write-surface boundary. Until O20 signs off, every console
+    surface is read-only / artifact-only (the O13 doctrine).
+  attached_at: O15
+- date: '2026-07-23'
+  note: |-
+    Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md Track 1 (T1-5/T1-6/T1-7/
+    T1-8) — the "UI acceleration session" groom candidates, misfiled below the
+    audit trail in IDEAS.md and folded back into the inbox groom.
+  attached_at: O29
+- date: '2026-08-05'
+  note: ── appended at the 2026-08-05 groom (SME direction, in-chat during G35) ────
+  attached_at: O44
+- date: '2026-08-06'
+  note: |-
+    ── appended at the 2026-08-06 groom (Idea-78 — the SME Context-Intake page plan,
+       UI-WIP/sme-intake-page-plan.md; user direction in-session. The console surface
+       for the Q10 unstructured email corpus: seven page sections, NO graph writes
+       anywhere — corpus load stays Q10's (blocked G32→G31), the assignment edge is
+       gate-registered planned per Q10's own acceptance.) ──────────────────────
+  attached_at: O45
+- date: '2026-08-12'
+  note: ── 2026-08-12 remediation-fix-module groom (xml_io epic; plan reactive-finding-shannon) ──
+  attached_at: G85

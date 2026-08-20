@@ -1,0 +1,29 @@
+id: L22
+epic: doc-infrastructure
+title: 'Adopt the U.S. business-English style guide: wire it into the writing path, rewrite the executive
+  overview, inventory the idioms elsewhere — without renaming mechanisms'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/style/us-business-english.md
+- docs/overview/drydocs-executive-overview.html
+- docs/whitepaper/
+- CLAUDE.md
+- .claude/skills/documentation
+- UI-WIP/site-plan.md
+acceptance: |
+  (a) The committed guide (docs/style/us-business-english.md, landed with this groom) is WIRED into the writing path: CLAUDE.md's working agreements point at it for outward-facing prose, and the documentation skill references it — so the next doc Claude writes follows it without being told. (b) The executive overview is rewritten per the guide: its 21 counted occurrences of spine/plane/crosswalk/guardrail/gate-confirmed drop to zero outside fenced-mechanism references; NOTE it is HTML-only today (no .md source) — decide and record whether the rewrite establishes an .md source or edits the HTML directly (it is a NON-GOVERNED editorial surface per CLAUDE.md §6, so direct edit is legal; the decision just has to be written down). (c) The idiom inventory runs across the OUTWARD-FACING set only — overview, whitepaper, website seed content — each hit rewritten or fence-noted. (d) THE FENCE HOLDS: no mechanism is renamed by this item — the HITL status value `confirmed`, port-prompt guardrail numbering, and any identifier in code/config/schema keep their names; the sweep OUTPUTS a candidate-rename list (term, where it lives, what a rename would touch) for the user to rule on separately if wanted. "Crosswalk(s)" is NOT a hit and NOT a candidate: SME-approved 2026-08-03 (matches company-internal service/lookup terminology) — the guide records the exception. Governed surfaces (docs/design/* renders, gate pages, board) are OUT of scope — their prose changes ride their own rev process, per the VERBATIM rule.
+notes: |
+  Groomed 2026-08-03 by user directive, the second of the day: the user read the executive overview, hit "spine" and friends, accepted them at the time, then had another LLM articulate why the idioms fail a U.S. enterprise audience — the resulting instruction set is committed verbatim-faithful as docs/style/us-business-english.md in this same groom (with a DryDocs scope fence added on top: several banned words are load-bearing mechanism names here, which is exactly why the user predicted this "will probably touch way more than documentation"). Style-vs-mechanism is the whole judgment of this item; the acceptance encodes it so sonnet can execute. The overview counts 21 flagged occurrences today (measured at the groom). Memory updated in the same session so future sessions write to the guide from the start.
+annotations:
+  status: 'closed 2026-08-03 same session (desktop): (a) guide wired into CLAUDE.md §6 + documentation
+    skill; (b) overview rev 7 — 21 occurrences rewritten, HTML-stays-source decision recorded in the rev
+    line, rev history kept verbatim; (c) whitepaper''s 2 "rot" hits rewritten in .md + both renders, site-plan
+    clean; (d) fence held — nothing renamed, candidate list at docs/style/l22-idiom-inventory.md (review
+    spine, lexical spine, guardrail N, gate-confirmed, HITL `confirmed`)'

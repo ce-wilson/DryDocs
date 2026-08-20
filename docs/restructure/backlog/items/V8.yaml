@@ -1,0 +1,36 @@
+id: V8
+epic: sme-runbooks
+title: 'SME runbook: drydocs-api — server run + mappings API; rule the overlap with the mapping-store
+  runbook'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- V1
+inputs:
+- drydocs_api/
+- docs/design/drydocs-mapping-store-runbook.md
+acceptance: |
+  Per V1's disposition: EITHER the mapping-store runbook is extended to be the drydocs-api module runbook (Rev bump) OR a distinct drydocs-api-runbook.md is authored; outline-conformant, rendered, stale-render-clean; drydocs-api off RUNBOOK_PENDING. Covers: starting the thin API, its read-only vs store-write surfaces, and the loader-stays-the-only-graph-writer contract as the operating rule.
+notes: Groomed 2026-07-29 (Epic V).
+annotations:
+  status: 'closed 2026-08-04 (laptop). RULED AUTHOR-DISTINCT, not extend: the mapping-store runbook scopes
+    HTTP serving OUT in its own words, so widening it would have meant reversing its stated scope, and
+    the mapping-demo runbook covers /demo — one route of twenty-two. Either extension produces a document
+    whose title no longer describes it, so docs/design/drydocs-api-runbook.md is new, outline-conformant,
+    rendered, stale-render-clean. Covers the three things the acceptance names: starting the thin API
+    (the optional [tool.poetry.group.api] install and the --factory flag are both real first-run failures),
+    the read-vs-write surfaces (every route classified by whether it needs Neo4j; the S4 draft buffer
+    is the ONE write and its survives-rebuild / dies-on-delete asymmetry is stated), and loader-stays-the-only-graph-writer
+    promoted to THE operating rule with its three enforcement layers listed under Verify — because an
+    operator''s job is to confirm they are still in place, not to assume it. Every factual claim re-derived
+    from the code before writing, and the route table ships with the one-liner that regenerates it plus
+    the rule that the code wins on disagreement. V1''s guard did its job unprompted: adding the file failed
+    FOUR tests at once (undispositioned runbook, drydocs-api still on the shrink-only pending list, two
+    state checks) — the coverage rule catching its own successor item, which is the behaviour V1 was built
+    for. drydocs-api off RUNBOOK_PENDING; the mapping-demo disposition reason updated from ''V8 rules
+    whether...'' to the ruling. Suite 1537 green.'

@@ -1,0 +1,27 @@
+id: Y1
+epic: backlog-sharding
+title: 'Sharding design ruled: one-item-per-file layout, derived roll-ups, claim mechanics, migration
+  + port sequencing — an ADR, decided with the user'
+type: task
+module: docs
+phase: 8
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/restructure/IDEAS.md
+- docs/restructure/backlog.yaml
+- tests/unit/test_backlog.py
+- scripts/render_board.py
+- .claude/skills/groom-backlog/SKILL.md
+- PORT-MANIFEST.yaml
+acceptance: |
+  An accepted ADR (next free number) that rules, with the user, each mechanism the IDEAS entry names as open: (1) FILE LAYOUT — backlog/items/<id>.yaml one item per file, plus where the non-item material lives (plan.phases, the modules registry, epic comment headers — headers are prose today and MUST survive as something a renderer can show); (2) DERIVED ROLL-UPS — summary counts and next_ready become render_board.py OUTPUT, never stored where agents append (the three 2026-08-04 same-afternoon rebase conflicts are the exhibit: every one was in the stored roll-up block); (3) CLAIM MECHANICS — a claim becomes a one-file status flip, and the ADR states plainly what collision window remains (two sessions claiming the SAME item still race; disjoint items stop colliding entirely); (4) MIGRATION — one-shot splitter with an entry-level deep-equality proof against the monolith before deletion (the S5 proof pattern), and the monolith's tombstone guard; (5) PORT SEQUENCING — how both repos move together: the PORT-MANIFEST row shape, whether the company applies the splitter or receives the sharded tree, and what happens to a company-side port that is mid-flight when Y2 lands. Plan only — no file moves from this item.
+notes: |
+  Groomed 2026-08-04 (desktop, user directive un-parking the IDEAS entry; next free epic letter Y — X taken by ddlineage-retirement the same day). The park condition is CARRIED FORWARD as a Y2 precondition, not a depends_on: the idea's ruling said the shard is better timed after the in-flight 40c35724..6713c14 port's PORT-REPORT is reviewed, because phase 2 rewrites exactly the files that port carries. Y1 is paper work and starts now; Y2 holds until that review is on the record. Model fable: this is a plan change re-shaping the claim channel both machines depend on.
+  CLOSED 2026-08-20 (desktop): docs/decisions/0013-backlog-sharding.md ACCEPTED. Rulings: (1) one STANDALONE mapping per item, FLAT backlog/items/<id>.yaml — flat ruled on graph grounds (epic: is a field, Y4 mints IN_EPIC from it; a per-epic path duplicates the fact); plan/modules get own files, updated: dropped for git. (2) Epic header comments become DATA in backlog/epics/<epic>.yaml (groom_log) — renderable, a real :Epic. (3) summary/next_ready DELETED from storage, derived by the board; the two roll-up guards invert. (4) Claim = one-file flip; residual same-item race is one small git conflict under "status never regresses". (5) Splitter + S5 deep-equality proof + tombstone; the splitter PORTS AS CODE and each side shards its OWN per-entry-unioned monolith at the first post-Y2 port — the company never receives the producer tree. Clause 5 names every reader/guard/writer Y2 re-points in one commit.
+annotations:
+  status: '2026-08-20 (desktop): ADR 0013 accepted — the five mechanisms ruled with the user in session;
+    Y2 is the build and keeps its PORT-REPORT precondition'

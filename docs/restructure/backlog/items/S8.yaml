@@ -1,0 +1,20 @@
+id: S8
+epic: structure-remediation
+title: Split cli.py into a thin composition root plus per-domain command modules, with non-milestone verb
+  names (F6 + the parked cli.py regroup note)
+type: chore
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs/cli.py
+- tests/unit/test_module_boundary.py
+- internal/repo-README.md
+acceptance: |
+  drydocs/cli.py is a thin root registering per-domain Typer sub-apps (schema / ingest / verify / variables / docs / plan), each in its own module; `drydocs --help` lists the same commands under the same names as before; the milestone-named verbs m1-verify / m3-verify gain verify-reference / verify-controlm aliases with the old names deprecated but still working; `python -c "import drydocs.cli"` clean; cli.py remains the composition root and remains exempt under ENTRYPOINT_MODULES (not a new exemption); full suite green.
+notes: |
+  MERGE at the 2026-07-25 groom: the review's F6 (cli.py, 1,519 lines, 27 commands) and the long-parked IDEAS line "cli.py regroup: split the 937-line flat command list into domain subcommand groups — NOT milestone names" are the same work. The file has grown 582 lines since that note was written, which is the argument for doing it. Deliberately NOT dependent on S1 — no ADR ruling is needed to reorganize a CLI. Deprecation aliases were the original note's condition; keep them.

@@ -1,0 +1,32 @@
+id: B5
+epic: taxonomy-capture
+title: Capture the medallion stage vocabulary (RAW → TRUSTED → REFINED → PROVISIONED) as pure classification
+  in config/taxonomy/ — the estate's canonical stage set, SME-confirmed via the gate
+type: requirement
+module: taxonomy
+phase: 1
+agent: taxonomy-importer
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/taxonomy/
+- internal/datalens-reference/continuity.md
+- internal/dsi-reference/
+acceptance: |
+  The medallion stage vocabulary is captured as pure classification in config/taxonomy/ (the Epic B idiom — no meaning edges), registered per the taxonomy capture rules, with the canonical stage set SME-confirmed via the gate before any dataset/job stage-attribution edge is declared; any such edge enters relationship_vocabulary.yaml as status: planned only.
+notes: |
+  Groomed 2026-07-28 pm from the DSI addendum DL-11(b) — both neighbor tools (DataLens pipeline cards, DSI stage KPI row) expose the same stage vocabulary; likely intersects the Snowflake data-catalog seam (G42-G44) and the DPL S3 zone prefixes. UI half is O38. RE-REFERENCED 2026-08-09 (desktop, SME direction with vendor-doc evidence in hand): the terminal stage is PROVISIONED, not SNOWFLAKE — title corrected, and the same correction applied to docs/restructure/roadmap.yaml, which carried the old set. THE ERROR CLASS IS ONE THE SME ALREADY CALLED ONCE, one level down: at C25 the ruling was that Snowflake is a TARGET DB PLATFORM and the 'Snowflake ETL' label names the loads-into-Snowflake JOB FAMILY, not a software product. Same mistake here — a consumption TARGET was promoted into a STAGE slot, so the vocabulary asserted that every dataset's final stage is one particular warehouse. PROVISIONED is the stage; Snowflake is one of several platforms a Provision pipeline can write to (the internal DPL documentation's consumption zone lists relational and MPP targets alongside it). THE REPO ALREADY KNEW, which is why this is a correction rather than a discovery: the 2026-07 DPL ingestion-leg trace in IDEAS.md states 'PROVISIONING DB-load lands the consumption target (Provisioned ≠ an S3 prefix)' — B5's title simply never caught up, and roadmap.yaml inherited the stale set. That is also the substantive point for the capture: RAW/TRUSTED/REFINED are S3 zone PREFIXES while PROVISIONED is not a prefix at all, so the four names are not four of a kind and a flat enum would misrepresent the last one. NEW FINDING the capture must settle, from the same evidence: there appear to be TWO zone vocabularies, not one — an on-prem set (conformed / semantic / analytic) and an off-prem S3 set (trusted / refined), converging on a shared provision stage. So 'the estate's canonical stage set' may not be a single list, and the gate should rule whether they are one vocabulary with platform-scoped names or two that map onto each other. SOURCE BOUNDARY: the evidence is company-internal documentation; only the stage/zone MECHANISM is recorded here — the site, its URLs, and every identifier on it stay company-side (PUBLISH-BOUNDARY.md).
+annotations:
+  status: '2026-08-19 (laptop): gate medallion-stage-vocabulary SIGNED OFF 6/6 same session (config/gate-log.md);
+    capture landed as config/taxonomy/medallion-stages.yaml (schema drydocs.medallion-stages.v1, source:
+    dpl, authority: internal-standards). Rulings: the four-stage set canonical with the structural prefix
+    distinction (zone_prefix on three, null on PROVISIONED — flat enum declined); the C25 fence rides
+    the capture (no platform name in a stage slot, ever); ONE estate vocabulary with platform-scoped zone
+    spellings mapping into stages (two-vocabs and evidenced-only both declined) — faithfulness rider:
+    on-prem `conformed` maps to TRUSTED on the Idea-20 legacy-flow basis, `semantic`/`analytic` captured
+    stage: ~ pending in-repo evidence (update-not-regate); FCDO framing is crosswalk context only; NO
+    stage-attribution edge declared, not even planned (register-planned-now declined) — the future edge
+    enters planned behind its own gate, exactly the acceptance''s condition. Nothing loads the file; the
+    UI half stays O38.'

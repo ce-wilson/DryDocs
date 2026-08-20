@@ -32,6 +32,10 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from drydocs_core.backlog_store import load_backlog_document
+
 REPO = Path(__file__).resolve().parents[1]
 OUT = (
     Path(sys.argv[1])
@@ -205,7 +209,7 @@ def clean(v: str) -> str:
 
 # backlog association: item ids whose full text mentions the vocab_id (precise) or,
 # failing that, the relationship type name as a whole word (noisier, marked ~)
-_backlog = yaml.safe_load((REPO / "docs/restructure/backlog.yaml").read_text(encoding="utf-8"))
+_backlog = load_backlog_document(REPO / "docs/restructure/backlog")  # the sharded tree (ADR 0013)
 _items = _backlog["items"] if isinstance(_backlog, dict) and "items" in _backlog else _backlog
 ITEM_TEXT = {
     it["id"]: yaml.dump(it, default_flow_style=False)
@@ -241,7 +245,7 @@ lines = [
     "**Label source** = what writes nodes of that label; **Relationship source** = "
     "the registered source + loader whose ontology mapping carries the edge (with "
     "its gate status), or `vocab only` when the edge is registered in the "
-    "vocabulary but no source mapping is wired yet. **Backlog** = backlog.yaml "
+    "vocabulary but no source mapping is wired yet. **Backlog** = backlog/ "
     "item ids whose text cites the vocab id (exact); a `~` prefix means the match "
     "is on the relationship NAME only (noisier); `—` = no item mentions it.",
     "",

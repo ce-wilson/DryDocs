@@ -1,0 +1,40 @@
+id: O47
+epic: web-console
+title: 'Intake page shell: /intake route, sme persona, area cascade (PAT + SEAL) and context-type + upload
+  sections'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O45
+- O46
+inputs:
+- UI-WIP/sme-intake-page-plan.md
+- web/src/routes/
+- web/src/lib/auth.ts
+- drydocs_api/query_specs.py
+- UI-WIP/ui-conventions.md
+acceptance: |
+  Route /intake renders in the Shell; the mock-auth roster gains an sme persona (?as=sme) whose towerId scopes the area default, and steward/admin can open the page. Sections 1-3 work end to end against O45/O46: cascading Product Line → Product → Area Product from a new intake.area_tree.v1 QuerySpec (O33-guarded), searchable SEAL select that back-fills PAT levels where the mapping exists and FLAGS (never blocks) a conflict, and "unknown" selectable at every level; context-type dropdown from the O45 generated artifact; drag-drop upload wired to the O46 endpoint with the paired-evidence row display. When O46 flags a thread continuation, the upload row shows "continues the thread of intake <id>" with an INLINE DIFF (new content highlighted against the prior evidence) and the SME decides: Adds-value (the delta proceeds as this intake's content) or No-new-value (linkage + decision recorded, intake STOPS — nothing proposed; a third bounce of the same thread shows both prior decisions). The status machine renders through an IntakeStepper adapted from LoadsTimeline (StatusChip tokens; action buttons from the API's legal-transitions map — no client-side workflow library, decided 2026-08-06). Identifiers render as IdChip, statuses per the ui-conventions token map. Sections 4-7 render as disabled placeholders naming their slice — never silently absent.
+notes: |
+  Slice 3 (plan §1-§3). The area selector is a HINT channel by design — Q10 rules that unattributable email lands unassigned, never guessed; the open question "can the hint override an extractable assignment" is answered hint-only unless the SME rules otherwise at O49.
+annotations:
+  status: 'closed 2026-08-10 (desktop, 04:07 session). /intake renders in the Shell behind canAccessIntake
+    (sme persona via ?as=sme, or steward/admin — SME is a PERSONA, not a fourth role tier; API personas.py
+    mirrors it, roster-drift guard green). Section 1: cascade from intake.area-tree.v1 (NOTE: acceptance
+    spelled area_tree; the registry id convention is kebab-case, enforced at import, and wins) with Unknown
+    first-class at every level and the area-product level honestly empty until the extract lands; SEAL
+    search from explorer.applications.v1, back-fill from catalog-cascade rows, conflicts FLAG never block.
+    Section 2: context types from the O45 generated artifact + Other/not-listed free text into the note.
+    Section 3: drag-drop multipart upload to the O46 endpoint (new intakeApi.ts — authedPost pins JSON
+    so upload builds its own fetch on the shared bearer), pair_key grouping = one row two format chips,
+    thread continuation with inline delta diff + Adds-value/No-new-value + prior decisions fetched per
+    thread_of id. IntakeStepper adapted from LoadsTimeline (ordered stages, ui-conventions tokens, actions
+    from the API legal-transitions map — no client workflow). Sections 4-8 disabled placeholders naming
+    O48/O49/O49/O50/O51. Ledger route 21 + component 16, coverage pin 68->70 unbound (intake is not a
+    registry module — deep-link page, like mappings). Build + lint green; suite 1836/5. NOTE the towerKey/towerId
+    naming: the roster field is towerKey; the plan says towerId; field name wins, comment at the persona.'

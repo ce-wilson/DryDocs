@@ -1,0 +1,27 @@
+id: G99
+epic: ontology-mapping
+title: Rewrite pat_team_roles.cypher onto qualified attribution — the G91 entry-5 consequence; the loader
+  is fenced do-not-run until it lands
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/cypher/pat_team_roles.cypher
+- drydocs/loaders/catalog.py
+- drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml
+- drydocs_core/schema/catalog_ontology_supplement.cypher
+- drydocs_core/schema/constraints.cypher
+- config/gate-log.md
+acceptance: |
+  G91 (2026-08-18) re-shaped the DevTeam staffing leg onto qualified attribution and DEPRECATED catalog_dev_team_has_membership. pat_team_roles.cypher still writes the retired shape and carries a DO-NOT-RUN banner; this item makes it match the ruling. (a) THE NEW SHAPE: DevTeam -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) with -[:HAD_ROLE]-> (:Role) and -[:HAS_AGENT]-> (:Employee). The HAS_AGENT hop REUSES seal_attribution_has_agent — do NOT mint a catalog twin, the C8 meta-graph refuses duplicate (from, label, to) triples and schema_graph.py:248 raises on it. (b) attribution_id needs a deterministic key on the same idiom as the SEAL and Cabinet loaders, so a re-run is idempotent; the estate is truncate-and-reload, so the key must be derivable from the row, never from a counter. (c) FLIP catalog_dev_team_qualified_attribution and catalog_dev_team_attribution_had_role planned -> active WITH their supplement refs in the same change (the flips-are-follow-ups pattern), and remove the DO-NOT-RUN banner in that commit and no earlier. (d) RULE :Membership's fate. It has no live writer once this lands. Either drop the membership_id constraint WITH the loader change, or record why it stays. Do not drop it ahead of the loader — that is the S3 ordering trap run backwards, and constraints.cypher already carries that caution. (e) The canonical :Role rows the catalog supplement seeds are the register the HAD_ROLE leg resolves against; confirm the PAT engineering-role spellings against that register rather than inventing values at load.
+notes: |
+  Raised 2026-08-18 at the G91 close. Not a gate item — the ontology is ruled; this is the build that makes the loader agree with it. Until it lands the loader is inert BY INTENT, which is a deliberate state and not a bug to be "fixed" by running it.
+annotations:
+  status: '2026-08-18 (laptop): loader rewritten onto qualified attribution (attribution_id on the SEAL
+    subject|FAMILY|role|person idiom), both entries flipped planned -> active, DO-NOT-RUN banner removed,
+    membership_id constraint dropped with its last writer (53 -> 52)'

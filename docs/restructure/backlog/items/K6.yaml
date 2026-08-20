@@ -1,0 +1,24 @@
+id: K6
+epic: seal-attribution
+title: 'Product Cabinet supplement: seed the ProductRole scheme (fixed 7, no cto, tech_partner changeNote)
+  and flip the catalog_cabinet_* entries planned -> active'
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/gate-log.md
+- config/gate-prompts/product-cabinet-attribution.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- drydocs_core/schema/seal_ontology_supplement.cypher
+- config/taxonomy-ontology-map.yaml
+acceptance: |
+  Per the 2026-07-20 K5 gate sign-off (config/gate-log.md), a supplement block (catalog-side, the K4 seal_ontology_supplement idiom) idempotently seeds: the product_roles SkosConceptScheme + EXACTLY the 7 ProductRole concepts (no cto — scheme FIXED, new roles require a new gate); the tech_partner skos:changeNote carrying the rename history verbatim; the :AreaProduct-only scope notes for area_product_owner + tech_partner; and the LocalRelationship terms for the two reified hops + the collapsed form. The three catalog_cabinet_* vocabulary entries flip planned -> active WITH their supplement refs (registration, not data — the K4 idiom); the ProductRole node_classifications entry drops its PLANNED marker; schema_graph re-rendered; drift guards + full suite green. NO attribution loader and NO map flip to applied — the loader stays blocked company-side until a person-level PAT cabinet extract exists (honest-lifecycle rule).
+notes: |
+  Groomed 2026-07-20 directly from the K5 gate sign-off (section F follow-up list; the C9 direct-promotion precedent). The AreaProduct data gap (no rows in the lob-product-team sample; catalog_has_area_product still planned) does NOT block the scheme seed — vocabulary and loader are independent lifecycles (gate §B). The cross-family reporting edges stay DEFERRED (gate §D, internal-side later); nothing in this item touches them. DONE 2026-07-20 (202175e): Product Cabinet section appended to catalog_ontology_supplement.cypher (ProductRole LocalClass; #cabinetQualifiedAttribution / #cabinetHadRole / #cabinetAttributedTo LocalRelationship terms MAPS_TO their PROV properties; product_roles SkosConceptScheme fixed=true + exactly 7 concepts, scope property on area_product_owner + tech_partner, tech_partner change_note verbatim; HAS_AGENT deliberately not re-declared — reuses the seal #hasAgent term). Three catalog_cabinet_* entries active with supplement refs; ProductRole classification ACTIVE; schema_graph re-rendered; map entry stays confirmed (loader blocked company-side). Drift guards + suite green (735). Live EE re-apply of the catalog supplement refreshes the container whenever it next runs (idempotent).
+annotations:
+  status: DONE 2026-07-20 (same session as the K5 sign-off; commit 202175e)

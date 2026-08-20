@@ -1,0 +1,29 @@
+id: G76
+epic: component-topology
+title: 'Reproduce the Quantitative Resource pool classifier producer-side as a mechanism/values twin:
+  the grammar and the ordered rule table are ours, the pool vocabulary is not'
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- internal/controlm-config/reference/controlm-xml-processor-capture.md
+- drydocs_core/orchestration/controlm/folder_name.py
+- drydocs_core/orchestration/controlm/description_tokens.py
+- config/taxonomy/
+acceptance: |
+  A producer drydocs_core/orchestration/controlm/resource_pool.py reproducing the company classifier's MECHANISM with its vocabulary supplied as DATA. A QUANTITATIVE element on a job declares that the job consumes N slots from a named pool, and pool names follow <APP_CODE>-<SUBSYSTEM>[-<MODIFIER>]*-<KIND>; the classifier parses that into a frozen PoolClassification (name, category, app_code, subsystem, kind_suffix, secondary_label) with no I/O. THE SPLIT IS THE ITEM. The company module compiles its vocabulary into the source -- the match regexes name real target-database, controller, distribution and host tokens, and the app-code regex hardcodes a real two-letter prefix. Those are Internal and may not land in the repo. The producer copy carries the grammar, the classification contract and an EMPTY or synthetic rule table, with the real table loaded from config (the values twin lives under internal/). A test proves the module classifies correctly against a synthetic table and returns unknown for everything when the table is empty -- which is also the honest default for a repo that does not have the vocabulary. THREE PROPERTIES ARE LOAD-BEARING AND MUST SURVIVE THE REWRITE, each with its own test: (a) RULE ORDER IS CORRECTNESS, NOT STYLE. Rules are first-match-wins and one of them matches a token ANYWHERE in the name, so it must be evaluated after the more specific ones -- a pool that satisfies both reads as the earlier category. A config table must therefore be an ORDERED SEQUENCE; a mapping keyed by category would silently lose the ordering and the loss would be invisible until a misclassified pool reached the graph. (b) unknown IS A FIRST-CLASS OUTCOME, NOT AN ERROR. It returns with secondary_label None so the loader adds no label and logs a WARN, which is how misses surface in CI. Same aliases-suggest / values-decide discipline the FACT_REGISTRY next door follows. classify() always returns, including on empty and whitespace input. (c) A SPECULATIVE CATEGORY STAYS LABELLED SPECULATIVE. The company's business_app fallback has never fired -- its own comment says "None observed yet, but reserve the slot so the contract is complete". Carry the branch WITH that honesty or drop it; keeping the branch and losing the comment ships a never-observed category as though it were evidence. One inconsistency is RULED here rather than copied blind: subsystem and kind_suffix are both derived from the same token split, so a two-token name yields the same token in both fields. Decide whether that is intended and say so in the docstring; do not reproduce it silently. No graph writes; the loader-side CONSUMES_FROM_POOL edge and the five secondary labels are NOT in scope -- the labels are an ontology decision and go through the HITL gate, not a back-flow. This item ships the classifier and its contract only.
+notes: |
+  Raised 2026-08-11 (desktop) at SME request, from a complete 130-line capture the SME supplied specifically so this could be reproduced. The module has NO producer counterpart, and neither does controlm_quantitatives.py, which consumes it -- verified by path check. WHY IT IS WORTH REPRODUCING WHEN THE ADAPTER IS NOT: this one is a parser plus a lookup table, and the era problem that disqualifies the adapter does not apply -- pool-name grammar is not the description-token model and did not change at C30. It also gives a SECOND, INDEPENDENT platform signal: C32 established that a quantitative pool names the target platform separately from the job name, so the two cross-check, and a job whose name and pool disagree is a finding neither source could raise alone. That is the standing use for it, and it is why the classifier is worth having before the loader edge exists. The company docstring cites a company-side path for its design rationale, so the producer copy needs its own written warrant rather than a dangling citation.
+annotations:
+  status: '2026-08-11 (desktop): resource_pool.py, mechanism-here / vocabulary-yours — DEFAULT_RULES is
+    () and DEFAULT_APP_CODE_RE is None, so an un-configured deployment classifies everything unknown.
+    31 tests, all on SYNTHETIC pool names. Rule ORDER proven both directions (same rules + same input
+    + reversed order = different category), unknown proven first-class with no label, the never-observed
+    business_app branch kept WITH its speculative caveat. The subsystem/kind_suffix collision on two-token
+    names is RULED intended and documented rather than copied blind. CATEGORY_LABEL carried as PROPOSED
+    vocabulary only — minting those labels is gate territory and nothing here writes a graph.'

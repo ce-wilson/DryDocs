@@ -1,0 +1,21 @@
+id: G66
+epic: component-topology
+title: 'Open the DESCRIPTION read seam: the Control-M XML extractor stages folder and job descriptions,
+  and a pure parser shreds the pipe-delimited token grammar'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/controlm_xml.py
+- drydocs_core/orchestration/controlm/variables.py
+- tests/unit/test_lineage_controlm_xml.py
+- knowledge/standards/technology/description-field-metadata-plan.md
+acceptance: |
+  The G47 extractor stages the one field the description-metadata standard is built on. XmlFolderRecord and XmlJobRecord gain a defaulted description read through the existing attribute-synonym helper, the module docstring's ASSUMED XML CONTRACT block is amended to say so (adding an attribute without amending it is exactly the drift that block exists to prevent), and XmlDefsCoverage gains a descriptions_absent counter -- an adoption signal, not a skip reason, in keeping with the count-every-skip-by-reason discipline. A new pure module drydocs_core/orchestration/controlm/description_tokens.py carries a TOKEN_REGISTRY (token key -> canonical name, carrier, job type, controlled value set, target SQL column) and parse_description(): split on pipe, split each part on the FIRST colon only so a time-valued token survives, whitespace-tolerant on both sides because both spacings occur in the wild, the literal string NULL parsing to Python None to reproduce the Oracle NULLIF behaviour, semicolon-separated addresses staying inside one token value, and unknown keys RETURNED rather than dropped because C16's team-local class is legal and preserved verbatim though never load-bearing. Vocabulary violations are returned as findings, never raised -- the aliases-suggest-values-decide and WARN-stream discipline the FACT_REGISTRY next door already follows. Tests: the existing inline DEFTABLE fixture gains DESCRIPTION on a folder, a FileWatcher job and a Publisher job plus one job without one, with verbatim staging and the counter asserted; a new tests/unit/test_description_tokens.py covers every rule above. ZERO graph writes -- the extractor stays staging-only and test_staging_is_graph_free still passes; the full suite is green.
+notes: |
+  Claimed 2026-08-11 (desktop) alongside C29, which supplies the token grammar this parses. Scoped deliberately to the READ half. Emitting a corrected XML -- the other half of the user's stated goal -- is NOT in this item: XmlDefinitionFormat in drydocs_remediation/formats.py raises NotImplementedError by design pending the vendor Folder.xsd, and writing an emitter now would mean inventing the vendor contract that the blocked message exists to refuse. Its real unblock is the DPL stub's schema (Idea-50), so the emitter is a separate follow-up rather than a guess bolted onto this one. Both dataclasses are frozen with defaulted trailing fields, so the added field is backward-compatible with every existing construction site.

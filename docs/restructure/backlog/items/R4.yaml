@@ -1,0 +1,24 @@
+id: R4
+epic: agentic-qa
+title: 'Ephemeral session-scoped QuerySpecs in drydocs_api: agent-executed Cypher becomes re-runnable/exportable
+  through the existing /specs paths'
+type: requirement
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- R2
+inputs:
+- drydocs_api/query_specs.py
+- drydocs_api/app.py
+- drydocs_api/exports.py
+- drydocs_api/sessions.py
+acceptance: |
+  The agent registers each executed Cypher server-side and receives a hash-addressed explore_ref; /specs/{ref}/run and /specs/{ref}/export work for the owning session only, re-validated read-only, TTL-bounded; the export manifest carries cypher_sha256 + provenance exactly like permanent specs; the browser never submits raw Cypher and the /raw-cypher admin+dev gate is byte-for-byte unchanged (ADR 0005).
+notes: |
+  2026-07-30 build: drydocs_api/ephemeral_specs.py (EphemeralSpecStore — ref = eph.<sha256(db+cypher+params)[:16]>, keyed (owner_token, ref), TTL 30min + capacity 500, params FROZEN at registration so run-time params fail closed) + pure register_ephemeral handler. Registration is a trusted-caller surface: POST /specs/ephemeral requires the DRYDOCS_AGENT_REG_KEY header (env unset = endpoint disabled), so a browser bearer token can never register Cypher — the design choice that keeps /raw-cypher (untouched in the diff) the only interactive Cypher surface. Classification = internal-confidential fail-closed ceiling (banner + filename prefix follow). run/export resolve eph. refs through the SAME exports.py code path (one manifest builder); foreign/expired/unknown all map to the same 404. Agent side: pipeline register_cypher hook fills StepRecord.explore_ref (failure degrades to null, never kills an answer) + stdlib urllib client agents/common/ephemeral_client.make_register; live wiring waits on R5 forwarding the console session token to the agent. 12 new unit tests (test_ephemeral_specs.py incl. FastAPI end-to-end) + 1 pipeline test.
+annotations:
+  status: 2026-07-30, desktop session (claimed + built same day)

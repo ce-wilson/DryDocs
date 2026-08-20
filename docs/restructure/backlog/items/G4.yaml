@@ -1,0 +1,22 @@
+id: G4
+epic: component-topology
+title: Scaffold the lineage and deepdoc component packages
+type: requirement
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p3
+status: done
+depends_on:
+- G1
+- G2
+inputs:
+- docs/decisions/0002-component-database-topology.md
+- drydocs_core/controlm/commands.py
+acceptance: |
+  drydocs-lineage and drydocs-deepdoc exist as separate packages that import ONLY drydocs-core and SHARE the core command-line/lineage parser; lineage writes curated lineage to drydocs; deepdoc writes to drydocs_context stamping reliability/trust; neither imports the other; boundary test passes.
+notes: |
+  ADR 0002 follow-up #4 (D2). Scaffold only — wiring the real triggers (phased curation for lineage; on-failure for deepdoc) is later. deepdoc needs drydocs_context (G1). The lineage package is then populated by re-homing the depgraph prototype — see G9 + ADR 0002-C. RE-TIERED opus -> fable 2026-07-10 on pull (groom-touch policy from the G3 re-tier).
+progress: |
+  2026-07-10 — SCAFFOLDED + DONE (commit range 22a35df..): top-level drydocs_lineage/ (extract candidates via the shared core parser; CurationStatus proposed/confirmed/rejected; writer = sole write boundary, CONFIRMED-only -> drydocs) and drydocs_deepdoc/ (investigate on-failure via the shared parser; ContextFinding with mandatory reliability/trust stamps, SYNTHESIZED-origin; writer sole boundary -> drydocs_context; proxy-node URN keys; promotion = HITL gate, never cross-DB edit). Boundary test: lineage + deepdoc COMPONENT_GROUPS — the components-don't-import-each-other rule IS the D2 separation. Parser sharing asserted by identity in test_lineage_deepdoc_scaffold.py (5 tests). pyproject 5 packages; MODULE_MAP future-rows made real. Acceptance met at scaffold scope per notes: packages exist, import ONLY core, share the parser, declared write targets across the trust boundary, boundary test green (521/3 full suite). Trigger wiring + population deferred by design: lineage -> G9/0002-C (now READY), deepdoc on-failure -> future item.

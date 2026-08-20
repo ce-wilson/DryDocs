@@ -1,0 +1,21 @@
+id: J22
+epic: release-infrastructure
+title: 'J16 manifest-coverage guard also sweeps untracked-but-not-ignored paths: a new file must fail
+  the suite BEFORE commit, not after'
+type: bug
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- tests/unit/test_port_reconcile_guards.py
+- PORT-MANIFEST.yaml
+acceptance: |
+  test_no_tracked_path_falls_through_silently (or a sibling) widens its walk from `git ls-files` to ALSO include `git ls-files --others --exclude-standard`, so a new not-yet-added file with no manifest disposition fails the PRE-commit run — same fall-through semantics, wider walk. A test pins the behaviour (fixture or monkeypatched file list). Verified against false positives on legitimately transient untracked files (e.g. scratch at repo root): either they resolve via existing manifest rows/allowlist or a scoped rule is added WITH a written reason — no silent widening of the allowlist. Full suite green.
+notes: |
+  Groomed 2026-07-30 from the 2026-07-29 [bug] inbox line. Live incident: the N5 session ran the suite green pre-commit, committed docs/plan/load-map.html, and the very NEXT full run failed the guard — the defect window is "on main until someone runs the suite again", which inverts the guard's purpose. CLOSED 2026-07-30 (desktop): the guard's walk is now tracked + `git ls-files --others --exclude-standard`; orphan computation extracted pure (fall_through_orphans) and pinned by test_untracked_new_file_is_caught_before_add (dispositioned path clean / new undispositioned sibling caught / allowlisted transient clean). Untracked orphans are tagged [untracked] in the failure message with the third legitimate resolution named (.gitignore — local-only by intent); no allowlist entries added or widened. Live-proven both ways: a probe file under docs/plan/ failed the guard BEFORE git add and the clean tree passes (zero untracked orphans today = no false positives). Suite 1188.
+annotations:
+  status: claimed + closed 2026-07-30 (desktop session, pushed claim before work)

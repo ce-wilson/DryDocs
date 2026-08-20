@@ -1,0 +1,21 @@
+id: G40
+epic: component-topology
+title: Parse the staged command lines in Python into structured job-detail columns (launcher / payload
+  / args), loaded back into the staging store
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- G39
+inputs:
+- drydocs_core/controlm/commands.py
+- config/launcher-registry (G26)
+- docs/restructure/backlog.yaml
+acceptance: |
+  Every cmd_line row in the G39 store decomposes through the EXISTING machinery — the G26 launcher registry + the G15 DPL launcher arg contract (both GUID spellings, %%VAR-launcher fallback, launch_mode + props) — into structured detail columns: launcher, launch_mode, payload/script_path, artifact kind, and the argument map. The G16 values-decide contract holds (aliases suggest, VALUES decide — never the variable name alone); unparseable/partial rows go to the WARN stream and are COUNTED, never silently dropped; a coverage line (parsed / partial / unparsed) prints on every run. Output lands as the detail columns/table beside the G39 rows. NO graph writes — the SCRIPT_PATH/artifact facts this produces feed the m7_uses_artifact and G22 rulings later; G22 stays the terminus gate for anything entering Neo4j.
+notes: |
+  The company-side end state — loading this parser's output into the real psgmgr detail table once it is built — is a company-side follow-up (their tracker / DD-series), recorded here so the intent is not lost; producer ships the parser + the temporary landing. Groomed from the same 2026-07-27 user chat notes as G39. CLOSED 2026-07-27 (same day): parse_job_detail in drydocs/cmdline_staging.py + CLI `drydocs parse-cmdline-staging`. Reuses the shared core parser end to end; to satisfy MODULE_MAP (components import core only) the G15 DPL arg contract was PROMOTED from drydocs_lineage.extractors.controlm_inventory into drydocs_core.controlm.commands.dpl_properties — lineage now imports it back from core, ONE contract for both consumers. Detail columns: invocation_type/classifier_rule (G26), launcher, launch_mode (own column, popped from props), script_path, config_path, artifact_kind, pipeline_guid (both spellings; the %%VAR-launcher fallback pinned by test), props_json/args_json, raw_command; per-job parse_quality verdict (parsed/partial/unparsed/no_cmd_line — every row bucketed, never dropped) + WARN stream counted + coverage line on every run. NO graph writes (pinned by test: read seam is one MATCH; parse takes no client). G22 stays the terminus. AMENDED 2026-07-28 (with the G39 caveat fix): the parser now prefers cmd_line_resolved when the internal resolution query has populated it, else the verbatim cmd_line (the core parser is designed for resolved values — resolution improves coverage); parse_quality gained parsed_from (resolved|raw) and the coverage line reports the from-resolved count.

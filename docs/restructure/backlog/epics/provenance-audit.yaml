@@ -1,0 +1,13 @@
+id: provenance-audit
+letter: M
+title: provenance audit
+order: 12
+groom_log:
+- date: '2026-07-08'
+  note: |-
+    Groomed 2026-07-08 from the 2026-07-05 IDEAS line + the 2026-07-07 property-terms
+    line. Doc 06 Phases 0-1 (Control-M envelope: audit-fields.yaml + jobs/folders
+    extraction) shipped 2026-07-07 PRE-groom (gate controlm-q1q3-phase1) — recorded
+    here for traceability, not re-itemized. M1/M2 = doc 06 Phases 2/3; M3 = Phase 4
+    (+ Phase 5 docs folded in); M4 = the property-term bindings.
+  attached_at: M1

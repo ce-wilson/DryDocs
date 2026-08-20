@@ -1,0 +1,19 @@
+id: G87
+epic: ontology-mapping
+title: 'Tech-debt: force the epoch-tag vocabulary ids (m3_/p2_/m7_/u1_/u2_/g22_/c23_/prov_/sosa_) onto
+  the domain-derived scheme'
+type: chore
+module: ontology
+phase: 2
+agent: main
+model: opus
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/ontology/relationship_vocabulary/00-header.yaml
+- config/taxonomy-ontology-map/
+- drydocs_lineage/model.py
+- drydocs_lineage/writer.py
+acceptance: |
+  Gate vocabulary-domains-and-id-policy §B3 (SIGNED 2026-08-12) ruled FORCED fall-off, not natural attrition: every epoch-tag id migrates to the domain-derived scheme (scheduler_*, business_application_*, ...) as ADD-NEW + DEPRECATE-OLD pairs -- never a rename in place, because ids are the join key across four ledgers. DONE MEANS: (a) each old entry is status deprecated with a note naming its replacement id; (b) the taxonomy-ontology-map vocab_id joins point at the new ids; (c) schema_graph.cypher regenerated; (d) the SQLite mirror rebuilds (content hash); (e) the hardcoded id table drydocs_lineage/model.py VOCAB_IDS and every test pin (test_yaml_fragments dispositions, test_schema_graph expected sets, lineage-writer vocab_id asserts) updated with a comment citing this item; (f) the port guard stays green (no id vanishes -- old entries remain as deprecated audit rows); (g) the append-only gate log keeps old spellings as history, untouched. Fold G88's relocation into the same pass where the same entries are touched.

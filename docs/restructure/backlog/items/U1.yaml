@@ -1,0 +1,19 @@
+id: U1
+epic: self-documentation
+title: Run the python-architect structural review over the live code graph (code-graph review plan, Phase
+  1)
+type: task
+module: docs
+phase: 16
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/code-graph-review-plan.md
+- knowledge/depgraph-snapshots/
+acceptance: |
+  docs/reviews/persona-python-architect-2026-07.md exists and answers all six seed units (A1 layering, A2 circular cross-check, A3 fan-in ranking, A4 the 24 orphan candidates each dispositioned entry-point/dead/blind-spot by a human read, A5 test-coverage shape, A6 cross-root coupling vs MODULE_MAP), recording the plan's probed baselines next to current values so drift is visible. Every finding carries the query that found it AND the confirming file read; findings are ranked by the tech-debt skill's (Impact+Risk)x(6-Effort) score; each actionable one lands as a tagged IDEAS inbox line. Zero backlog.yaml or graph edits.
+notes: |
+  Fresh-graph precondition: snapshot.ps1 -> drydocs load-code-snapshot (idempotent). Model opus, not sonnet: A4/A6 dispositions are judgment reads, not checklist work; not fable — no schema/boundary decision rides on it. IMPORTS caveat (gate D2) applies to every conclusion: never read an edge as "breaks if removed". CLOSED 2026-07-28 (run 1, all six units): headline = the snapshot records ZERO cross-root IMPORTS edges and no function-level imports, and drydocs_api is not a scan root — A1/A5/A6 vacuous, A4's 24 orphans = 24 false positives (each dispositioned with grep evidence); A2 healthy (scanner + live graph agree, 0 cycles); A3 base.py 18->19, lineage/model.py 9 = new second hotspot. Findings ranked; scanner-fix IDEAS line filed — U4 should wait on that fix or the query pack enshrines vacuous queries. Zero graph/backlog edits from the review.

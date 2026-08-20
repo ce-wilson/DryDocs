@@ -1,0 +1,37 @@
+id: J30
+epic: release-infrastructure
+title: 'Dispose of wip/k9-laptop: lift anything worth keeping off the second K9 implementation, then delete
+  the branch local and remote'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- CLAUDE.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  A written per-file comparison of the two K9 implementations that says what the laptop branch does differently and whether it is worth keeping; anything worth keeping lands on main as its own commit citing the branch; then `wip/k9-laptop` is deleted both locally and on origin, and the deletion is recorded in this item's close note WITH the branch tip SHA, so the comparison stays reconstructible from history alone. "Nothing worth keeping" is a valid result — state it explicitly with the reason. Do not delete silently.
+notes: |
+  Groomed 2026-08-04 (weekly groom). VERIFIED at the groom: the branch exists both locally and as remotes/origin/wip/k9-laptop at bfb2f0b, "wip(k9): preserve the laptop's unpushed K9 implementation"; main carries the desktop's shipped implementation at 17d9e08. The divergence is a REWRITE, not a rebase — mappings.py 334 lines apart, mapping_store.py 348, net -726/+419 across 8 files — so the disposition is a comparison, not a merge. Sequencing note, NOT a dependency: J31 uses this branch as its worked example, so read J31 before deleting. Neither item blocks the other from starting. This is the second occurrence of the C19 collision class (the first: two sessions built C19 about ten minutes apart, 2026-07-28), and the two failed differently — C19 was two sessions claiming nothing, K9 was a claim that WAS pushed, went dark, and got released as dead while the work existed locally. J31 owns that gap.
+annotations:
+  status: 'closed 2026-08-04 (laptop). PER-FILE COMPARISON, both vs their common base 3608ae5 (the claim
+    commit — so neither is derived from the other): SHIPPED 17d9e08 = 658 insertions / 12 files; LAPTOP
+    bfb2f0b = 447 insertions / 115 deletions / 8 files. Shipped wins on three counts and it is not close:
+    (a) TESTS — +106 lines of store tests and +160 API vs the branch''s +1 and +77, and the branch DELETED
+    test lines it did not replace; (b) LAYERING — the branch duplicated APP_CODE_TIERS/APP_CODE_ORIGINS
+    into drydocs_api, where shipped keeps them in drydocs_core and shares validate_app_code_row, so the
+    API cannot drift from the store''s own rule set; (c) RITUAL — shipped regenerated the enforcement
+    matrix, re-rendered the board and closed the item; the branch did none of it. The branch''s READMEs
+    are longer but document `target_app_id`, a column main does not have, so lifting that prose would
+    have introduced a wrong schema. ONE THING WAS WORTH KEEPING and it is LIFTED: `app_code_migration_report`
+    + its store accessor — the K7 §B2 readback. Tier 3 was admitted ON THE CONDITION that the end state
+    is DECLARED, and shipped built the v_dual_coded_migrations view plus the UI that writes declared_end_state
+    but NO reader: the view''s only consumer in the whole tree was a unit test. Landed as GET /mappings/app-code/migrations,
+    adapted to main''s view name (the branch queried v_app_code_migrations) and post-S4 shape, +2 tests,
+    citing bfb2f0b in the docstring. BRANCH DELETED local + remote; tip was bfb2f0b "wip(k9): preserve
+    the laptop''s unpushed K9 implementation", reconstructible from this note and git history alone. Suite
+    1529 green.'

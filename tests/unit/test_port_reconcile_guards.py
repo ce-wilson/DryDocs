@@ -22,10 +22,11 @@ Consumer-side usage during reconcile-port (documented in that skill):
     1. BEFORE applying the port, snapshot the consumer copies — ALL FOUR; each
        live check below reads one, and a missing file fails the run:
          mkdir %TEMP%/reconcile-before
-         python -c "from pathlib import Path; from drydocs_core import yaml_fragments as yf; \
+         python -c "from pathlib import Path; from drydocs_core import backlog_store, yaml_fragments as yf; \
             Path('<before-dir>/relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); \
             Path('<before-dir>/taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
-         cp docs/restructure/backlog.yaml config/gate-log.md  <before-dir>/
+         poetry run python -c "from drydocs_core.backlog_store import dump_document as d; print(d(), end='')" > <before-dir>/backlog.yaml
+         cp config/gate-log.md  <before-dir>/
        (S5: both registries are fragment DIRECTORIES now — the snapshot is the
        MERGED document, so the before/after comparison stays file-shaped.)
     2. Apply the port range / resolve collisions.
@@ -51,7 +52,7 @@ from typing import Any
 
 import pytest
 
-from drydocs_core import yaml_fragments
+from drydocs_core import backlog_store, yaml_fragments
 
 yaml = pytest.importorskip("yaml")
 
@@ -59,7 +60,9 @@ REPO = Path(__file__).resolve().parents[2]
 MANIFEST_FILE = REPO / "PORT-MANIFEST.yaml"
 VOCAB_FILE = REPO / "drydocs_core" / "ontology" / "relationship_vocabulary"
 MAP_FILE = REPO / "config" / "taxonomy-ontology-map"
-BACKLOG_FILE = REPO / "docs" / "restructure" / "backlog.yaml"
+BACKLOG_TREE = (
+    REPO / "docs" / "restructure" / "backlog"
+)  # sharded (ADR 0013); read through the store
 GATE_LOG = REPO / "config" / "gate-log.md"
 
 BEFORE_DIR_ENV = "RECONCILE_BEFORE_DIR"
@@ -231,7 +234,7 @@ def test_current_files_pass_their_own_rules() -> None:
         )
         == []
     )
-    backlog = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
+    backlog = backlog_store.load_backlog_document(BACKLOG_TREE)
     assert (
         status_downgrades(
             backlog_entries(backlog),
@@ -257,7 +260,7 @@ _needs_before = pytest.mark.skipif(
 BEFORE_SNAPSHOTS = (
     "relationship_vocabulary.yaml",
     "taxonomy-ontology-map.yaml",
-    "backlog.yaml",
+    "backlog.yaml",  # since ADR 0013: the ASSEMBLED tree, written by backlog_store.dump_document()
     "gate-log.md",
 )
 
@@ -322,7 +325,7 @@ def test_reconcile_map_no_downgrade_live() -> None:
 @_needs_before
 def test_reconcile_backlog_no_regression_live() -> None:
     before = yaml.safe_load(before_text("backlog.yaml"))
-    after = yaml.safe_load(BACKLOG_FILE.read_text(encoding="utf-8"))
+    after = backlog_store.load_backlog_document(BACKLOG_TREE)
     violations = status_downgrades(
         backlog_entries(before),
         backlog_entries(after),

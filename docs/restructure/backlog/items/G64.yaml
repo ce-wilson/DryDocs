@@ -1,0 +1,26 @@
+id: G64
+epic: component-topology
+title: 'Run the dpl pipeline-registry contract gate: validate the ASSUMED field contract against a real
+  export and discharge tracker T13'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- G22
+- G25
+inputs:
+- config/gate-prompts/dpl-pipeline-registry-contract.yaml
+- config/gate-log.md
+- drydocs_lineage/extractors/dpl_registry.py
+- config/audit-fields.yaml
+acceptance: |
+  USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then. The drafted dpl-pipeline-registry-contract page is walked: section A the SME identifies a real pipeline_id.json export (which SEALs, which registry DB, pulled when — Internal, company-side; the run names its venue per J18); section B the agent parses it against the ASSUMED contract and profiles it — per-field census (present / absent / present-but-empty), version and active-flag distributions, and GUID join coverage against the G15/G17 staged pipeline tokens — with zero graph writes; section C closes or re-scopes T13 on that evidence, closes or stands the dpl audit stub, and keeps the active flag the third usage signal G22 ruled it to be. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. The registry row's confirmed flag is NOT re-opened.
+notes: |
+  Groomed 2026-08-09 from Idea-85. This is the T13 discharge venue: the field contract has been assumed since G25 and never validated, which is exactly WHY the two dpl entries in audit-envelope-phase4 are ruled stubs — claiming that createdBy/lastModifiedBy exist, or that they do not, is a guess until a real export parses. Company-side session (GUIDs, SEAL ids and registry URLs are Internal).
+annotations:
+  inputs[]:
+  - 'config/audit-fields.yaml — path corrected 2026-08-12 (groom): the ledger is a FILE, never a directory'

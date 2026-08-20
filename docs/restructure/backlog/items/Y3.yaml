@@ -1,0 +1,22 @@
+id: Y3
+epic: backlog-sharding
+title: 'Backlog graph vocabulary via the gate: :BacklogItem + DEPENDS_ON registered planned, gate prompt
+  drafted — projection semantics, git stays the claim channel'
+type: task
+module: ontology
+phase: 8
+agent: ontology-mapper
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- Y2
+inputs:
+- drydocs_core/ontology/relationship_vocabulary/
+- config/taxonomy-ontology-map/
+- config/gate-prompts/
+- docs/RELATIONSHIP_GUIDE.md
+acceptance: |
+  Vocabulary entries for :BacklogItem and DEPENDS_ON (and the mapping rows) registered status: planned in the fragment registries, with the projection rule written into the entry notes verbatim: the graph is a DERIVED read surface only — git remains the sole source of truth and claim channel, a graph write is even less cross-machine-visible than an unpushed commit, and no loader may flip a status. A gate prompt in config/gate-prompts/ covers the label, the edge, the PROV classing, and the projection rule; NOTHING flips confirmed except the SME gate session (gate-log entry). Schema/vocabulary tests green.
+notes: |
+  Groomed 2026-08-04. Routed through the gate because a new node label and relationship type are ontology decisions (CLAUDE.md §1 rule), even for a projection. p3: Y2 delivers the operational payoff; this phase is query convenience and can wait for a natural gate session.

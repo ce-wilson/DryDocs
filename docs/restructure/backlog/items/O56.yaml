@@ -1,0 +1,28 @@
+id: O56
+epic: web-console
+title: 'The /software console page: vendor to product to corpus to graph on one screen, declared state
+  and loaded state as separate columns'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- Q16
+inputs:
+- web/src/routes/SoftwareRoute.tsx
+- web/src/software/softwareModel.ts
+- web/src/software/VendorIcon.tsx
+- web/src/generated/software-registry.json
+- web/src/generated/load-map.json
+- drydocs_api/query_specs.py
+- web/src/modules/registry.ts
+acceptance: |
+  A `/software` route, registered in web/src/modules/registry.ts with `access: 'sme'` (steward + admin) and route-guarded in App.tsx, renders four tabs — Products, Vendors, Documentation coverage, Corpora — over the generated software-registry.json plus the `doc-corpus` rows of load-map.json, with exactly ONE live graph read (the registered QuerySpec `software.doc-coverage.v1`) for the in-graph column. It is a JOIN surface, not a second corpus browser: /docs already browses corpora, and the cells worth rendering are the intersections (a product whose declared corpus can never produce an edge; a product with no docs at all; corpora no product names). FOUR HONESTY RULES hold, each of which a naive build gets wrong: (1) gate state and edge state are INDEPENDENT columns, never one chip — a corpus can be both gate-blocked and permanently edge-less, and one "blocked" chip would falsely imply that signing the gate produces coverage; (2) a deliberately withheld edge renders as a RULING (teal, citing G32), never as a red gap; (3) a database the page cannot read never shows "0 documents" — an unprovisioned dddocs reads "not queried", because 0 is a false claim of absence; (4) an undeclared link is REPORTED, never inferred — the page does not derive bmc-docs -> controlm from taxonomy_path, since no file maps a taxonomy path to a product id. Ledger rows land with the code (ui-components.yaml, ui-tests.yaml and their coverage pins); `npm run build` (tsc -b) and oxlint are clean and the full suite is green.
+notes: |
+  Groomed 2026-08-07 as ALREADY DONE — the retro-groom case. software-registry.json and load-map.json were generated, drift-guarded and committed with ZERO consumers, five vendor icons sat in web/public/vendor-icons/ referenced by nothing, and no backlog item had ever claimed a page for either: the gap was invisible rather than deferred, which is precisely the state an item exists to prevent. Filed `done` with its close evidence rather than left unrecorded, so the surface has an id that O57, O58 and any later /software work can cite. depends_on Q16 because the page consumes the generated fields Q16's session emitted (commit 0ddf880) — notably target_db reaching the JSON, without which honesty rule (3) is unimplementable. ModuleIcon gained a `software` case; noted at the build that the switch has no `default`, so a missing case vanishes silently with no compiler error — a latent trap for the next module, not a defect of this one.
+annotations:
+  status: DONE 2026-08-07 (laptop) at commit 9b4cf59 — BUILT BEFORE ANY ITEM CLAIMED IT, groomed here
+    so the ledger carries the surface. See notes

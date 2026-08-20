@@ -1,0 +1,18 @@
+id: B4
+epic: taxonomy-capture
+title: Capture the Oracle schema shape template as taxonomy
+type: task
+module: taxonomy
+phase: 1
+agent: taxonomy-importer
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- config/source-registry.yaml#oracle-schemas
+- internal/schemas/
+acceptance: structure present; no real schema/table/SID values committed outside internal/
+output: config/taxonomy/oracle-schemas.yaml
+notes: |
+  Done 2026-06-20 as a SHAPE TEMPLATE (no sample; source confirmed:false). Schema ▸ Table; Script with placeholder ids; real names -> internal/schemas/ by id. classification: Internal-Confidential.

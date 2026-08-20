@@ -1,0 +1,21 @@
+id: G80
+epic: component-topology
+title: 'The unchained-loader guard: a loader registered but in no chain and no profile fails the suite,
+  and the load map renders it as a defect'
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/cli.py
+- scripts/render_load_map.py
+- tests/unit/test_supplements.py
+- web/src/generated/load-map.json
+acceptance: |
+  G59 built exactly this guard for SUPPLEMENTS -- unchained_supplement_files() fails when a supplement exists on disk but is absent from the chain. There is NO equivalent for LOADERS, which is why pat_team_roles and area_products sit in LOADER_REGISTRY, reachable by name, belonging to no sequence, with nothing turning red. (a) A guard fails when a loader is registered but appears in no chain and no profile, NAMING the loader rather than reporting a count -- the G59 shape. A deliberate exclusion stays expressible and carries a WRITTEN REASON, the SCHEDULED_INGEST_EXCLUSIONS idiom. (b) The same two facts become defect classes in web/src/generated/load-map.json, beside the sourceless_loaders and map_entries_without_registry_source lists it already carries: unchained loaders, and steps whose declared input is absent (G78's other half). O57 already renders that JSON's defect lists rather than dropping them, so this is what makes the console page an honest inventory instead of a tidy one. (c) Portable: the guard must hold in a consumer repo whose chains legitimately differ -- the company chain carries sub_lobs where the producer carries pat_product_mapping, so a guard that hardcodes producer membership fails there for being right.
+notes: |
+  Raised 2026-08-11 (desktop). Dependency-free deliberately: the guard is worth having BEFORE G79 moves loaders between chains, because that is exactly when one goes missing. Same family as G59 and as J47 (no guard asserts a PORT-MANIFEST path exists) -- three instances now of "a thing is declared, nothing checks it is reachable".

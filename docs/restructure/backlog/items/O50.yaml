@@ -1,0 +1,22 @@
+id: O50
+epic: web-console
+title: 'Admin review queue for intake records: diff view, accept / return with note, and the waiting-on-gate
+  park'
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O46
+- O47
+inputs:
+- UI-WIP/sme-intake-page-plan.md
+- web/src/routes/AdminConfigRoute.tsx
+- UI-WIP/ui-conventions.md
+acceptance: |
+  ?as=admin sees the intake queue rail: sme-confirmed records with a diff-style display of what the SME confirmed vs what the extractor proposed, and two actions — accept (→ admin-accepted) or return with a required note (→ admin-returned, back to the SME's drafts). The full status machine renders with the ui-conventions StatusChip vocabulary. THE LOAD BOUNDARY IS HONEST: admin-accepted records PARK with a "waiting on gate" chip naming what they wait on (corpus load = Q10 ← G31 ← G32; assignment edge = Q10's HITL gate) — acceptance here never triggers a load, and no code path from this surface writes the graph.
+notes: |
+  Slice 6 (plan §7). Ends at admin-accepted by design; the load half belongs to Q10 and stays there.

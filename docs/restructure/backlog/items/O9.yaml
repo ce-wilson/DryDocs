@@ -1,0 +1,28 @@
+id: O9
+epic: web-console
+title: Radial-hub landing + Explorer module page on the shared subpage template (graph pane over data
+  frames, linked selection)
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O8
+inputs:
+- UI-WIP/site-plan.md
+- UI-WIP/Gemini_Generated_Landing-Favorite.png
+- UI-WIP/Gemini-generated-subpage.png
+- UI-WIP/codeflow-ui-reference.png
+- UI-WIP/DryDocs_UI_Development_Specs.md
+- UI-WIP/gemini-wire-frame.md
+- UI-WIP/icons.md
+- web/src/
+acceptance: |
+  Landing renders the radial hub (red brand core, one spoke per module, spoke = the same route as the aside-nav item; SVG rebuild, not the raster mock) with a generic Explore CTA; the shared module-subpage template exists ONCE and Explorer instantiates it: page-owned toolbar (breadcrumbs + page actions), React Flow graph pane over ReUI data-frame tabs with a resizable divider, right node-inspector panel keyed by node type; graph and grid share one selection store (node click filters rows, row select highlights the node); demo tower content keeps its SYNTHESIZED/illustrative tags; screenshot parity with the mock in BOTH dark and light.
+notes: |
+  site-plan.md P1. Towers are Explorer demo content, not modules. 2026-07-19 groom merge: UI-WIP/codeflow-ui-reference.png (classification External; screenshot from the MIT-licensed codeflow repo, source cited in the IDEAS audit trail) kept as the worked example of exactly this subpage shape — left explorer+stats rail, center graph pane with view-mode tabs, right per-selection detail panel with a blast-radius card, linked selection, dark tokens. Cite, don't imitate branding. 2026-07-21 groom merge (UI extension): DryDocs_UI_Development_Specs.md = the demo tower CONTENT spec (4 SYNTHESIZED pages — Global Enterprise / Cards / Home Lending / Auto — with table shapes + node palettes for the Explorer demo data); gemini-wire-frame.md = expanded-landing options (4 benefit cards, onboarding checklist, posture panel -> feeds the spoke health glyphs); icons.md glyphs are their own item (O22). DONE 2026-07-21: landing already had the SVG radial hub + generic CTA from O8; this pass added the onboarding checklist (5 steps, localStorage) and the 4 gemini-wire-frame benefit cards. Explorer now truly instantiates the template: React Flow (@xyflow/react) tower graph with tower chips, custom token-styled nodes (KIND_TOKEN map — kind->token, NOT the stored demo hex), edges labeled with rel names; four data frames (Applications/Jobs/ Conditions/Servers) from the SYNTHESIZED tower set; ONE lifted selection store — node click filters rows (explicit clear chip) + breadcrumb gains the selection, row click highlights/re-frames the node (cross-tower jump verified), right inspector keyed by node kind with a connections list. TowerDemoGrid placeholder consciously retired (chips + drill/live links replace it). All verified live in the preview, both themes (RF pane bg + node borders flip token values; JS-verified). DEVIATIONS: (1) data grid is the hand-authored ReUI-pattern stand-in, consistent with the O8 Tabs/ ResizableSplit convention (real ReUI copy-in still open); (2) acceptance's "screenshot parity" verified structurally + via computed styles because the Browser pane's screenshot capture times out this session — dark AND light checked, pixels not captured. QuerySpec binding is O11 by design.
+annotations:
+  status: DONE 2026-07-21 ("create a launchable site" session) — see notes for the two disclosed deviations

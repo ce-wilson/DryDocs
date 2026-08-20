@@ -38,24 +38,29 @@ things share the word *port* — never conflate them:
   (the idea inbox). Use **Projects** for this when away from the repo.
 
 **The backlog (what agents pull from):**
-- [`docs/restructure/backlog.yaml`](docs/restructure/backlog.yaml) — machine-readable source of
-  truth (schema `drydocs.backlog.v2`, guarded by `tests/unit/test_backlog.py`). The human view is
-  the rendered board [`docs/plan/board.html`](docs/plan/board.html) (`02-backlog.md` is the legacy
-  text view); `IDEAS.md` is the inbox, groomed into the yaml via the **`groom-backlog` skill**.
+- [`docs/restructure/backlog/`](docs/restructure/backlog/) — machine-readable source of truth,
+  **one item per file** (`items/<id>.yaml`; schema `drydocs.backlog.v3`, ADR 0013, guarded by
+  `tests/unit/test_backlog.py`). Read it through `drydocs_core.backlog_store`; roll-ups (counts,
+  `next_ready`) are DERIVED by the board and never stored. The human view is the rendered board
+  [`docs/plan/board.html`](docs/plan/board.html) — its **Ready to pull** strip is `next_ready`;
+  `IDEAS.md` is the inbox, groomed into item files via the **`groom-backlog` skill**.
+  `backlog.yaml` is a tombstone.
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
-  `backlog.yaml` whose every `depends_on` is `done`; **commit and push** `status: in_progress`
+  `docs/restructure/backlog/items/` whose every `depends_on` is `done` (the board's Ready-to-pull
+  strip lists them); **commit and push** `status: in_progress` in that one item file
   **before starting work**; do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL
   gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
-  **Pushed, not merely committed — why:** `backlog.yaml` status is the only claim channel between
+  **Pushed, not merely committed — why:** the item file's `status` is the only claim channel between
   concurrent sessions on the two machines, and git is the only sync layer, so a local-only claim is
   invisible to the other machine. This is not hypothetical: on **2026-07-28 two sessions independently
   built C19 about ten minutes apart.** Same at the close — push `done`, don't sit on it.
 
 **Session ritual (keeps every platform aligned):**
-1. **Start:** `git pull` → read this file → read `backlog.yaml`, pick the next ready item.
+1. **Start:** `git pull` → read this file → open the board's Ready-to-pull strip (or run
+   `python .claude/skills/groom-backlog/validate.py` for the derived list), pick the next ready item.
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
-   from the durable `backlog.yaml`.
+   from the durable item file.
 3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)
    **and the design docs** (`poetry run python scripts/render_design_doc.py docs/design/*.md` — `.md` is the
    source of truth, the single `.html` (screen + `@media print`; L13) is a deterministic render; Epic L) — `snapshot.ps1` does
@@ -189,7 +194,7 @@ Defined in [`.claude/agents/`](.claude/agents/) — each agent's frontmatter car
 description, tools, and model; the layer table in §1 names the owner agent. Dispatch by layer.
 
 **Orchestration stays with the main (Opus) session.** Sub-agents do scoped, well-specified
-units from `docs/restructure/backlog.yaml`. Each backlog item names its agent + acceptance test.
+units from `docs/restructure/backlog/items/`. Each backlog item names its agent + acceptance test.
 
 ---
 

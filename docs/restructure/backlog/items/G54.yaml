@@ -1,0 +1,51 @@
+id: G54
+epic: component-topology
+title: 'provision.ps1 cannot run as documented on a Docker-only host: it shells out to cypher-shell on
+  the host PATH'
+type: bug
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/provisioning/provision.ps1
+- config/dev-environment.yaml
+- tests/unit/test_dev_environment.py
+- tests/unit/test_file_encoding.py
+acceptance: |
+  A host running the neo4jtest container with NO local Neo4j install can provision the topology by following the script's own header. Exactly one of two resolutions: (a) the script becomes exec-aware — detect that cypher-shell is absent from the host PATH and fall back to `docker cp` of the .cypher file plus `docker exec … cypher-shell -f`, reading the container name from config/dev-environment.yaml rather than hardcoding it; or (b) the header's REQUIRES block stops presenting host cypher-shell as satisfied by "bundled in the Neo4j Docker image" — it is bundled INSIDE the image, which is not the host PATH — and documents the docker-exec invocation as the supported Docker-host form. (a) is preferred, since the header already owns the `docker run` commands and therefore already assumes Docker on this path. Either way the fix respects and states the J29 trap: do NOT pipe file content into `docker exec`; copy the file in and use `-f`, because a PowerShell 5.1 pipe injects a UTF-8 BOM that cypher-shell then rejects.
+notes: |
+  Reported 2026-08-04 from the desktop M3 reload, where the documented invocation failed and the session worked around it with docker cp + docker exec cypher-shell -f. VERIFIED at the groom (laptop, static read — no database needed): the REQUIRES block at provision.ps1:6 says "cypher-shell on PATH (bundled in the Neo4j Docker image and tarball)" while the runner at :57 invokes bare `cypher-shell -a $Uri … -f`. On a Windows host whose only Neo4j is the container, that binary is not on PATH and the script cannot complete. The BOM half of the original inbox report was WRONG and is already closed: J29's byte-scan proved every tracked .cypher and .sql is clean, and the BOM came from the PS 5.1 pipe rather than from the repo. That is exactly why the trap belongs in this item's header text — the workaround shape and the encoding standard are one lesson, and J29's own close note says this gap "stays inboxed separately". p2 rather than p1: both machines already hold working topologies, so nothing is blocked today. What is broken is the documented path for a fresh host. WORKAROUND DOCUMENTED 2026-08-04 (does NOT close this item — the script itself is unchanged): the provisioning README now carries the explicit per-file docker cp + docker exec -f block, verified end to end (laptop, neo4jtest, 2026.05.0 EE — six cypher-shell calls exit 0, smoke federates 2218/0/46). It also records the J29 pipe trap with the MEASURED cause rather than the inferred one: PS 5.1's [Console]::OutputEncoding is UTF-8 WITH a 3-byte preamble that is written ahead of the first line on stdin redirection, and neither `Get-Content -Raw`, nor $OutputEncoding (already preamble-free), nor reassigning [Console]::OutputEncoding mid-session fixes it. That measurement belongs in this item's fix.
+annotations:
+  status: 'closed 2026-08-04 (laptop) via resolution (a), the preferred one. provision.ps1 detects whether
+    cypher-shell is on the host PATH and, when it is not, falls back to docker cp + docker exec -f, reading
+    the container name from config/dev-environment.yaml (neo4j.container) rather than hardcoding it; -Container
+    overrides, -ForceDockerExec takes the path unconditionally, and the run announces which transport
+    it chose. ONE THING THE ACCEPTANCE DID NOT ANTICIPATE and it would have bitten: inside the container
+    the server is always on bolt 7687, so the HOST port mapping in dev-environment.yaml must NOT be passed
+    through — the fallback pins bolt://localhost:7687 for the exec path and says so, which is the difference
+    between working and failing on any container whose ports were remapped (the retired 7476/7689 one).
+    VERIFIED end to end on the acceptance''s own terms (laptop, neo4jtest, 2026.05.0 EE): a plain `provision.ps1
+    -Password ...` with NO flags, on a host with no cypher-shell, auto-detected, provisioned all five
+    databases + the composite and passed the federated smoke (2218/0/46), exit 0; a bogus -Container fails
+    fast naming the step. J29 respected and now GUARDED, not remembered: two new tests assert the script
+    detects the PATH, resolves the container from config, executes the COPIED file with -f, and contains
+    no Get-Content|docker exec pipe in executable code (comment lines exempt — the script documents the
+    broken form, and a guard that reds on its own warning is useless). Both proven red on a probe first;
+    the FIRST probe silently no-op''d on a wrong indent and passed, which is why the second asserts its
+    anchor. The measured cause is recorded in the script: PS 5.1''s [Console]::OutputEncoding carries
+    a 3-byte preamble written ahead of the first line on stdin redirection; -Raw fails identically and
+    neither $OutputEncoding nor a mid-session reassignment fixes it. CORRECTED SAME DAY, after a company
+    host ran the piped form successfully: the BOM injection is HOST-DEPENDENT, not a property of PS 5.1.
+    It happens where the console output encoding carries a preamble (chcp 65001 -> [Console]::OutputEncoding.GetPreamble().Length
+    == 3) and not on a default ANSI-codepage console. The guard and the docker cp choice both STAND —
+    a provisioning script must not work only on the console its author happened to have — but the stated
+    reason was over-general, and a rule stated too broadly gets ignored the first time someone watches
+    it not apply. Script comment, README and test docstring all rewritten to the narrower claim, with
+    the one-liner to check your own host. Header rewritten: the old REQUIRES claimed the Docker image
+    satisfied ''cypher-shell on PATH'' (true of the IMAGE, not the PATH), and it now carries the OTHER-ENVIRONMENTS
+    note that the script is portable while the docker run block must be re-authored per side. Suite 1537
+    (+2).'

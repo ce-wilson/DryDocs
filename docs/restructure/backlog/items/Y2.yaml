@@ -1,0 +1,34 @@
+id: Y2
+epic: backlog-sharding
+title: 'The shard built: items split one-per-file, roll-ups derived by the board render, validators and
+  groom skill re-pointed, monolith tombstoned'
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- Y1
+inputs:
+- docs/decisions/0013-backlog-sharding.md
+- docs/restructure/backlog.yaml
+- tests/unit/test_backlog.py
+- .claude/skills/groom-backlog/validate.py
+- scripts/render_board.py
+- tests/unit/test_port_manifest.py
+- PORT-MANIFEST.yaml
+- docs/port-prompt.md
+acceptance: |
+  The Y1 ADR enacted in one migration commit: backlog/items/<id>.yaml per item with the non-item material where Y1 ruled it; the splitter's entry-level deep-equality proof recorded (every item field-identical to its monolith form) BEFORE backlog.yaml is deleted, and a tombstone guard refuses its resurrection (the S5 monoliths-are-gone pattern); render_board.py DERIVES summary counts and next_ready from the item files — nothing stores them — and the board render is byte-deterministic as before; test_backlog.py and the groom skill's validate.py validate the sharded form (same checks, new reader) with the roll-up drift checks RETIRED as no-longer-possible rather than re-pointed; the groom-backlog skill, CLAUDE.md §0 pull rule, and backlog header prose describe the one-file claim flip; PORT-MANIFEST rows cover backlog/items/** with an entry_rule carrying the split shape (the S5 precedent) and the port-prompt gains a ledger step marked STRUCTURE-BREAKING with the company-side apply instruction Y1 ruled. Full suite green. PRECONDITION carried from the groom (prose, not depends_on): do not land until the in-flight port's PORT-REPORT review is on the record — this item rewrites exactly the files that port carries.
+notes: |
+  Groomed 2026-08-04. The claim-collision shrink is the payoff to state at close: after this item, two machines claiming DISJOINT items touch disjoint files and cannot conflict; only a same-item race remains, and J31's wip-branch check already covers the visible half of that.
+annotations:
+  status: 'done 2026-08-20 (desktop): built on feat/backlog-shard and --no-ff merged — the first status
+    flip ever made in an item file. Prior: claimed 2026-08-20 (desktop, pushed before work) — precondition
+    MET: the 7c18ff4b PORT-REPORT is reviewed (docs/reviews/port-review-7c18ff4b-20260820.md); build on
+    feat/backlog-shard, --no-ff merge; backlog.yaml is FROZEN for every session and both machines from
+    this claim until the merge'
+  inputs[]:
+  - docs/decisions/0013-backlog-sharding.md — the ruling this build executes (2026-08-20)

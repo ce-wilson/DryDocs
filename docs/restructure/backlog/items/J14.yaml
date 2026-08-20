@@ -1,0 +1,21 @@
+id: J14
+epic: release-infrastructure
+title: Split the two knowledge/standards/technology docs that carry real SEALIDs — mechanism stays public,
+  registry tables and real values move to internal/ (blocks any public push)
+type: task
+module: docs
+phase: 8
+agent: main
+model: fable
+priority: p0
+status: done
+depends_on: []
+inputs:
+- knowledge/standards/technology/description-field-metadata-plan.md
+- knowledge/standards/technology/folder-naming-convention.md
+- PUBLISH-BOUNDARY.md
+- config/classification.yaml
+acceptance: |
+  Both files are split per option (b) of the 2026-07-27 inbox entry: the MECHANISM halves (the naming grammar, the positional-code semantics, the escalation-table join SHAPE) stay under knowledge/ as Internal-Public; the app-code -> SEAL registry rows, real application names, the SEALID format/width disclosure, and the real Oracle table/column/value details move to internal/ twins, each half cross-referencing the other (the established `ccb-` twin convention). After the split, a grep of the publishable tree for each moved value returns hits ONLY under internal/; neither public half claims anything no longer true once the values are gone (the "document that no longer says anything true" failure is the reason sanitize-in-place was rejected). Suite green, including tests/unit/test_classification.py.
+notes: |
+  Found 2026-07-27 while sweeping the SEALID publish-boundary breach — the other 13 files were sanitized in that sweep; these two were deliberately left because the real mappings ARE the knowledge, making this a RELOCATE-vs-SANITIZE decision, not a find-and-replace. Options considered: (a) move both files wholesale with a stub left behind, (c) reclassify the whole knowledge/standards/technology/ directory as Internal. (b) chosen because it is the shape the repo already uses elsewhere; the diff is the user's review surface if they prefer (a) or (c). DELIBERATELY OUT OF SCOPE: the adjacent internal-platform-vocabulary question (HLDM/PRARAG tokens etc. in the sample corpus) — a different value class, not ruled on, re-inboxed as its own IDEAS question. Model fable per the matrix: this changes what the publish boundary contains, a boundary decision, even though the mechanics are file moves. CLOSED 2026-07-27 (same-day build). Twins at internal/standards/technology/ (Internal-Confidential, incl. the real<->synthetic id key); public halves keep the grammar/plan with sanitized examples drawn from the sample corpus's own conventions (70001-70099 block, PRARAG-HLDM-70002-... shapes). Moved-value grep clean outside internal/ with two recorded exceptions, both left for the residual identifier-class ruling, not silently: (1) the escalation-table schema identifiers were GENERALIZED out of these two files but remain in 6+ other tracked files (skills, gate prompts, taxonomy-ontology map, remediation TDD) — an identifier class, not a data value, same residual class as the platform vocabulary; (2) the phrase "Home Lending Servicing" persists in the declared-synthetic sample taxonomy paired ONLY with synthetic ids (a product-name class, predates J14). New out-of-scope finds re-inboxed 2026-07-27: real person name + internal DLs in docs/Product/product-overview.md and two test fixtures; two sample folder ids outside the synthetic block in config/taxonomy/controlm.yaml.

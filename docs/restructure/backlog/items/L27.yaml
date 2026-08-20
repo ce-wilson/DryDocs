@@ -1,0 +1,21 @@
+id: L27
+epic: doc-infrastructure
+title: A design doc may not cite a commit that is not reachable from HEAD — make the render pipeline fail
+  on a dangling commit citation
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- L19
+inputs:
+- scripts/render_design_doc.py
+- tests/unit/test_doc_outline.py
+- docs/design/
+acceptance: |
+  A guard — a unit test, or the design-doc renderer itself — FAILS when a governed design doc's commit citation is not reachable from HEAD, naming the document and the dangling hash. Its behavior in a history-less environment is stated and tested rather than left to chance: a shallow clone or a checkout without the commit's ancestry must SKIP with a stated reason, never pass silently and never fail spuriously in CI. A document with no commit citation at all is disposed of explicitly — either required or allowed, with the choice written down. The suite is green when the guard lands, which is why L19 (the one-time sweep) is a dependency rather than a sibling.
+notes: |
+  Groomed 2026-08-09 from Idea-94's mechanism half (persona Run 2, U-tw). The sweep half stayed in L19, which is its home; this item exists because the entry's real finding is BEHAVIORAL — rev bumps happen, cite refreshes do not (drydocs-startup-refresh-runbook took seven bumps still citing squash-day a135a6d) — and a one-time sweep does not change a behavior. Related but distinct from U17, which decides WHICH commit the staleness ranking reads; this one only asks that whichever commit a doc claims actually exists.

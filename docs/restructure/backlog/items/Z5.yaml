@@ -1,0 +1,21 @@
+id: Z5
+epic: server-location
+title: 'Reusable location-map console module: world + country map for any located node label, relationship
+  dropdown with job/person/building icons'
+type: task
+module: drydocs-web
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- Z3
+inputs:
+- web/src/components
+- web/src/modules/registry.ts
+- drydocs_api
+acceptance: |
+  A self-contained console map component, insertable into any page: given a node label that carries location (the Z2 contract), it renders a world map and a drill-down country map, and a selection dropdown shows the relationship from a job or person/team (person/team icon) to the city, with a building icon for a data center or office location. Map assets are embedded (SVG), no external tile or font fetch — the console must work offline, same rule as every committed render surface. Data arrives through a read-only QuerySpec (O33 guard); the component takes label + relationship as props so the next located label reuses it unchanged.
+notes: |
+  User directive 2026-08-08. Explicitly designed as a module first, pages second — the directive names reuse as the point. First consumers: the application server-location view (via Z3/Z4 data) and the Z6 runtime map.

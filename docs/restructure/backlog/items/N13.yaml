@@ -1,0 +1,28 @@
+id: N13
+epic: source-column-mappings
+title: 'Rule the pending-source-correction lifecycle flip ONCE: draft the gate prompt covering both the
+  acquisition manual->automated flip and the override->source-corrected flip'
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/gate-prompts/
+- config/gate-log.md
+- config/overrides/seal-contact-overrides.csv
+- drydocs_api/mappings.py
+- config/source-registry.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  A gate prompt is DRAFTED (G27 / W1 / U11 / N10 precedent -- drafting decides nothing) for ONE ruling covering BOTH flips, because they are the same lifecycle shape: (i) ACQUISITION -- a source recorded `acquisition.mode: manual` (N12) becomes `automated` when the pull is built; (ii) OVERRIDE -- a steward correction carried because the SOURCE is wrong (O24's SEAL L1/L2 operate-manager overrides: origin-flagged source-vs-user rows feeding a source-corrections report to the AO who holds the privilege to fix SEAL) clears when the source is actually corrected. THE HOLE THE PROMPT NAMES: the K7 gate ruled §E2 "overrides may be PERMANENT in this domain ... do NOT implement the corrected-in-source flip here; it belongs to the domains where permanence is temporary" (config/gate-log.md; K9's acceptance repeats it) -- and NO ITEM OWNS THAT FLIP TODAY. O24 likewise left "whether overrides ever influence graph-side attribution" explicitly out of scope as a gate question. THE PROMPT PUTS TO THE SME: (a) whether ONE shared vocabulary covers both -- a placeholder/pending flag meaning "we model this correctly ourselves while the source is wrong or hand-fed" -- carrying the same always-visible origin discipline O24 established; (b) what EVIDENCE flips it in each domain and WHO may flip it (a steward action, a load observing the corrected source value, or a build landing); (c) whether an unflipped placeholder is REPORTED (the source-corrections report is the precedent) and when it becomes stale; (d) which domains are permanent-by-nature and therefore exempt per §E2 -- the folder-to-application platform-code case is the SME's own worked example of permanence. NOTHING CHANGES UNTIL THE GATE SIGNS: this item builds no registry field, no store column and no report, and N12 is unaffected -- N12 records mode and mints no pending-correction flag. The prompt lands in config/gate-prompts/ in the house shape; the sign-off is an SME session.
+notes: |
+  Groomed 2026-08-18 as N12's sibling, on SME direction that the acquisition manual->automated flip and the override->source-corrected flip are ONE lifecycle shape and should be ruled once, not twice. Raised as a SIBLING rather than folded into N12 as a clause on purpose: folding it would make a buildable config item undeliverable without an SME session, and K9 deferred this flip AT a gate (§E2), so it comes back at one. Fable: the ruling sets a boundary spanning the source registry (config) and the steward mapping store (drydocs-api) and decides what a flag MEANS in both. Module config / phase 11 / epic N because the artifact is a config/gate-prompts/ prompt and the registry is the anchor; Epic K was the alternative and was rejected -- the ruling is cross-domain, not SEAL-attribution build work. Dependency-free by design: the prompt can be drafted before or after N12 lands.
+annotations:
+  priority: raised from the groom's proposed p2 — SME confirm 2026-08-18, close-out directed
+  status: '2026-08-18 (laptop): gate pending-source-correction SIGNED 12/12 same session (one vocabulary;
+    two-hands override retirement; age-ordered no-deadline union report; K7 §E2 exemption confirmed with
+    the D2 boundary rule); prompt + sign-off transcribed'

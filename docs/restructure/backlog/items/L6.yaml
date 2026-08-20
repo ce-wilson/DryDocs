@@ -1,0 +1,20 @@
+id: L6
+epic: doc-infrastructure
+title: 'Paper HITL: print-margin anchors + scan->transcribe skill'
+type: requirement
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L4
+inputs:
+- scripts/doc_to_pdf.py
+- .claude/skills/groom-backlog/SKILL.md
+- config/classification.yaml
+acceptance: |
+  the .print.html renders each section's stable anchor in the print margin plus a Rev/commit footer; a .claude/skills/transcribe-doc-markup skill turns a scanned annotated PDF into anchor-keyed lines in docs/design/feedback/<doc>-rev<N>.yaml (faithful transcription shown FIRST, per the groom pattern); scans stored under docs/design/feedback/scans/ classification-aware (Internal → not published); demonstrated on a fixture scan.
+notes: |
+  The pen/paper loop the user works best in; annotations re-attach to requirements by anchor, surviving re-renders. Done 2026-07-08 (sonnet agent): print-only margin anchors + front-matter-derived Rev/commit footer in design_doc.py (deterministic — no git/timestamp reads); transcribe-doc-markup skill emits via the SAME feedback_yaml() as L5 so paper/digital are shape-identical; scans dir triple-guarded (gitignore + classification excluded_paths + README). 11 new tests.

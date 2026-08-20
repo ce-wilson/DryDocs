@@ -1,0 +1,29 @@
+id: L15
+epic: doc-infrastructure
+title: Canonical outline for the whole-project review doc (review.outline.yaml, 3rd doc type) + a recorded
+  refresh cadence
+type: task
+module: drydocs-docgen
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- L8
+inputs:
+- docs/design/drydocs-project-review.md
+- docs/design/templates/tdd.outline.yaml
+- docs/design/templates/runbook.outline.yaml
+- drydocs/doc_outline.py
+acceptance: |
+  docs/design/templates/review.outline.yaml exists (schema drydocs.doc-outline.v1; stable anchors derived from the current review's sections); drydocs-project-review.md conforms (doc_outline validation passes) and re-renders deterministically; a refresh cadence is decided and recorded in the outline header (candidate: Rev bump per epic close — facts pinned to a commit go stale quietly); full suite green.
+notes: |
+  Groomed 2026-07-20 from the 2026-07-14 inbox line; trigger = L8 introducing the second doc type, fired 2026-07-20. Third canonical type after TDD (L1) and Runbook (L8); the BRD outline stays parked (upstream WIP, user call). p3 — completeness/traceability hygiene, nothing downstream blocks on it.
+annotations:
+  status: '2026-07-21 pm — review.outline.yaml exists (drydocs.doc-outline.v1; 16 sections + 9 subsections,
+    anchors derived from Rev 1''s authored set — retrofit-free except ONE added front-matter anchor marker);
+    drydocs-project-review.md conforms (doc_outline passes) and re-renders deterministically (1-line html
+    delta = the anchor). CADENCE RECORDED in the outline header: Rev bump per EPIC CLOSE (epic completion
+    is what changes the review''s story — status/roadmap refresh minimum; no hot-editing facts between
+    Revs). Exemplar-pin tests added (the third doc type through the same contract).'

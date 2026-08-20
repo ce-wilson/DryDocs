@@ -1,0 +1,8 @@
+id: taxonomy-capture
+letter: B
+title: Taxonomy capture
+order: 1
+groom_log:
+- date: ''
+  note: ── Epic B — Taxonomy capture (taxonomy-importer, sonnet) — Phase 1 ────────
+  attached_at: B1

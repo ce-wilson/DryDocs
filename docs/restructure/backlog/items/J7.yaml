@@ -1,0 +1,20 @@
+id: J7
+epic: release-infrastructure
+title: 'Per-entry port reconciler guards: status no-downgrade + gate-log append-only + version-string
+  rule'
+type: chore
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- tests/unit/test_taxonomy_ontology_map.py
+- config/gate-log.md
+acceptance: |
+  Executable checks behind the PORT-MANIFEST per-entry entry_rules, REUSING the map guard's loaders (no second YAML parser): (1) a fixture-driven test proving a vocabulary/map merge that downgrades active/confirmed→planned/proposed FAILS; (2) gate-log append-only check (existing entries are a prefix of the merged file); (3) the pyproject version-string rule asserted in the manifest test. Rules runnable consumer-side during reconcile-port (documented in that skill).
+notes: |
+  docs/reviews/tech-debt-port-boundary.md Phase 2; sequenced AFTER the map guard (landed ede0b94) by design. DONE 2026-07-11: tests/unit/test_port_reconcile_guards.py — executable entry rules (vocab active no-downgrade + map confirmed/applied no-downgrade + no dropped entries + gate-log byte-prefix append-only), fixture-proven both directions, plus env-gated LIVE comparison (RECONCILE_BEFORE_DIR=<snapshot dir>) verified pass AND fail against a doctored snapshot; version-string rule asserted in test_port_manifest.py; consumer-side usage documented in the reconcile-port skill.

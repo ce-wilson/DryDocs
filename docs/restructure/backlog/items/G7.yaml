@@ -1,0 +1,18 @@
+id: G7
+epic: component-topology
+title: Deploy the multi-DB topology to the live target
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on:
+- G1
+inputs:
+- docs/decisions/0002-component-database-topology.md
+acceptance: |
+  The G1 topology (drydocs + drydocs_context + drydocs_all composite + proxy-node constraints) is deployed to the production target and a drydocs_all smoke query passes there.
+notes: |
+  ADR 0002 follow-up #1 (LIVE deploy). Was BLOCKED on the Aura single-DB tier; Aura was dropped 2026-07-06 (Docker EE is the committed enterprise path), which RE-SCOPES the producer-side live target to the self-managed EE container. DONE 2026-07-08, verified live: container neo4jtest (neo4j:5.26-enterprise-ubi10, named volume neo4j-testdata) — drydocs + ddlineage + ddcontext + ddall composite all online; the provisioning smoke read all three constituents through ddall (0/0/0, pre-ingest) and wrote nothing. The COMPANY-side live target remains a port concern (multi-DB Enterprise there — see docmeta plan / port-prompt), not a producer backlog item.

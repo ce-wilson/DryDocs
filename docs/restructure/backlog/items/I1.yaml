@@ -1,0 +1,19 @@
+id: I1
+epic: project-board
+title: 'Backlog schema v2: plan, modules, titles, validation'
+type: task
+module: docs
+phase: 8
+agent: main
+model: opus
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/restructure/backlog.yaml
+- MODULE_MAP.md
+- tests/unit/test_classification.py
+acceptance: |
+  backlog.yaml declares drydocs.backlog.v2 with a plan: (phases incl. goal/status) and a modules: registry; every item carries title/type/module/phase; tests/unit/test_backlog.py validates the schema (unique ids, deps resolve + acyclic, module/phase/enums valid, summary + next_ready computed-consistent) and passes; full suite stays green.
+notes: |
+  Done 2026-07-01 (this change). Fields chosen so a future to-do lands as type: requirement + module + phase — requirement-to-module traceability without leaving git. summary/next_ready are now test-enforced, no longer hand-trusted.

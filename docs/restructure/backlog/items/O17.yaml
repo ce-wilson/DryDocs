@@ -1,0 +1,25 @@
+id: O17
+epic: web-console
+title: 'Runbooks + Remediation module pages: provisioning-chain and finding->fix-batch flows on the shared
+  template'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O9
+- O11
+inputs:
+- UI-WIP/site-plan.md
+- web/src/
+- drydocs_remediation/
+- .claude/skills/controlm-runbook-automation/SKILL.md
+acceptance: |
+  /runbooks and /remediation both instantiate the shared template. Runbooks: graph pane = the data-series provisioning chain (FileWatcher -> RAW -> ING -> LD), frames Series / Generated runbooks / Metadata completeness. Remediation: graph pane = finding -> fix-batch flow, frames Findings / Fix batches / Jira handoffs, reading drydocs_remediation outputs through drydocs-api QuerySpecs. Mechanism-only fixtures where the live data is company-side, tagged SYNTHESIZED/illustrative like the Explorer towers; both themes.
+notes: |
+  site-plan.md P3 wave 1 (modules 4+5), combined: both back onto the remediation/runbook pipeline domain and are pure template instantiations. DONE 2026-07-21 (Epic-O finish session): both pages on the shared template via the NEW shared MiniDag + LinkedDemoFrame components (extracted here — 4th copy of the boilerplate was the signal). Runbooks: FW -> RAW -> ING -> LD provisioning-chain pane; NEW specs runbooks.series.v1 (ddlineage, zero rows honest pre-gate) + runbooks.metadata-completeness.v1 (drydocs description-field coverage, missing rows float to top — the fix-in-batches queue); the Generated-runbooks frame lists the repo's REAL runbook artifacts (files, not graph rows — no spec by design). Remediation: finding -> fix-batch -> package -> Jira SoD flow; ONE CONSCIOUS DEVIATION from the acceptance letter, recorded: all remediation frames are SYNTHESIZED fixtures with no QuerySpec binding, because drydocs_remediation writes ZERO graph (its invariant) and inventing :Finding/:FixBatch labels in a spec would smuggle an ontology decision past the HITL gate — specs bind if/when a remediation graph shape is gate-confirmed (TDD §6/§7). Route wiring rode the concurrent session's 3bca511 (shared App.tsx). Suite + build + lint green; both pages headless-Edge smoked.
+annotations:
+  status: DONE 2026-07-21 (Epic-O finish session) — see notes

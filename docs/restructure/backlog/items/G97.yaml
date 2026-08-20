@@ -1,0 +1,23 @@
+id: G97
+epic: component-topology
+title: 'The m7 payload build: launcher and payload stop sharing the INVOKES fold — USES_ARTIFACT edges
+  plus script_role and the artifact properties on :Script'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/writer.py
+- drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml
+- drydocs_core/schema/constraints.cypher
+- config/gate-log.md
+- config/launcher-registry.yaml
+- tests/unit/test_lineage_writer.py
+acceptance: |
+  NO GATE IS OPENED OR REOPENED -- this builds what two signed gates already ruled. cmdline-nfr-vetting (2026-07-21, SME-2 / SME-3) ruled the DISTINCT label rather than a single label with a role, and adopted the :Script refinements with it; rua-load-shapes (2026-08-07, 28/28, applied at G55) ACTIVATED m3_invokes and m7_uses_artifact in the same breath, on the stated reasoning that activating INVOKES alone would land payloads in the 1..n fold first and force an in-graph migration. G16's own notes name this item: "the m7 build (payload migration to USES_ARTIFACT, script_role stamping) is its own follow-up item once the writer endpoint work lands." (a) THE SPLIT: the writer emits USES_ARTIFACT from the job to the PAYLOAD artifact the launcher dispatches, while INVOKES keeps the LAUNCHER only. The discrimination comes from the G16 FACT_REGISTRY canonicals (ETL_ARTIFACT_URI / ETL_ARTIFACT_KIND / ETL_ARTIFACT_SHA and the ETL_PLATFORM pair) under the aliases-suggest-values-decide contract, plus the G15 launcher properties -- NEVER from a variable NAME alone, which is the 2,384-variable gap analysis' one durable finding: names lie. (b) :Script GAINS script_role {launcher, payload} and the gate-adopted artifact properties (platform / artifact_uri / artifact_kind / platform_flags / script_path). The property already exists -- the writer stamps script_role='profile' for the rua profile case (G23, section C2) -- so this EXTENDS a value set rather than inventing a property. Script identity stays PATH-keyed; that ruling is not touched. (c) ENDPOINT CLASS PER EDGE: to_node is Script | ETLProcess per rua-load-shapes section B2 -- one edge meaning, two endpoint classes, the endpoint RECORDED on the edge -- with the raw evidence string (the command line or variable form that produced it) kept VERBATIM per section B3, which is what keeps the endpoint choice re-checkable later. (d) EXISTING GRAPHS: state the position rather than assume a clean load. Where a live graph already folded payloads into a 1..n INVOKES set, either an idempotent re-load (MERGE-keyed) or a named migration step covers it -- whichever, it is written down and the counts are reported. A silent double-representation (payload on both labels) is the one outcome that must be impossible. (e) COUNTS AND A WARN STREAM: invocations classified launcher, classified payload, and UNCLASSIFIED. An unclassified invocation stays exactly where it is today and is reported; it is never promoted to a payload on a guess. TESTS: a fixture command line carrying both a launcher and a payload yields exactly one INVOKES and one USES_ARTIFACT edge with script_role stamped on both endpoints; a payload-less command line yields no USES_ARTIFACT edge at all; the vocabulary guard (write_curated raises GateBoundVocabularyError on a non-active entry) still holds. Full suite green.
+notes: |
+  Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-23, whose parked trigger -- "once the writer's ETLProcess endpoint work makes the edge landable" -- has FIRED, verified two ways at the groom rather than assumed. (1) m7_uses_artifact is `status: active` in drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml, activated 2026-08-07, where the inbox entry recorded it as `planned`. (2) drydocs_lineage/writer.py MERGEs :ETLProcess on its token and carries the union-endpoint machinery, so the endpoint class the edge needs exists. ALSO VERIFIED ABSENT, so this is a real build and not a re-close: the writer emits NO USES_ARTIFACT edge today and stamps script_role only for the rua profile case -- a grep of writer.py on 2026-08-13 returns the profile stamp and nothing else. MODULE drydocs-lineage: the change point is the writer's plan/write surface. The G14 / G16 extractor facts it consumes are already produced; core's parser is CALLED, not modified. RELATED: G23 (the curated rua load this extends), G55 (the activation), G16 (the fact feed), G12 (which already lands INVOKES on :ETLProcess for the wrapper-payload expansion and is the precedent for clause (c)).

@@ -1,0 +1,22 @@
+id: C28
+epic: ontology-mapping
+title: 'Draft the business-layer org-structure gate prompt: W3C ORG units over the existing LOB layer,
+  and how a re-org is recorded without rewriting history'
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- internal/context-graph-analysis/business-layer-location-experiment.md
+- reference/standards/
+- drydocs_core/ontology/relationship_vocabulary/
+- config/taxonomy/lob-product-team.yaml
+- config/gate-prompts/
+acceptance: |
+  A drydocs.gate-prompt.v1 spec in config/gate-prompts/ that DRAFTS ONLY — it decides nothing, and the SIGN-OFF is a separate SME session (the G27/U11/Q14 precedent) — putting three questions to the SME with the experiment's evidence attached: (a) whether W3C ORG org-unit terms bind to the LOB layer the repo already holds (the experiment found the annual report's org units ARE that layer, "managed on an LOB basis") or to a new class, given the CLAUDE.md warning about inventing a label for convenience; (b) how a structural change is expressed — the experiment's effective-dated org change event for a segment merge — so that a re-org ADDS a fact instead of rewriting the previous one; and (c) what the as-of/effective-dating shape is for org membership, reusing the as-of-assertion idiom already ruled for FID ownership rather than inventing a second one. Every proposed term is registered `status: planned` in the relationship-vocabulary fragments with a decision-matrix entry; nothing is flipped, no loader writes an edge, and the location half of the experiment is explicitly out of scope (it rides Z2).
+notes: |
+  Groomed 2026-08-09 from Idea-90's org half. MODULE/EPIC CHOICE RECORDED, since the entry itself offered two homes ("a business-layer gate or E-epic item"): filed under ontology-mapping / phase 2 because a W3C ORG binding is an ontology-mapping decision of exactly the kind phase 2 exists for, and NOT under Epic Z, which is about physical server location, nor Epic E (context graph), whose subject is task-scoped projections rather than a standing org model. If the SME wants it run as one combined business-layer session with Z2, that is a scheduling choice the two prompts can accommodate — the drafts stay separable because their subjects are. Evidence base is public-source only (annual-report material), so the prompt itself is mechanism-and-public-fact and stays Internal-Public.

@@ -1,0 +1,20 @@
+id: G91
+epic: ontology-mapping
+title: Rule the held planned-entry review (gate §C1b/§C1d) and transcribe the outcome
+type: task
+module: ontology
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/vocabulary-planned-review.md
+- config/gate-log.md
+acceptance: |
+  HITL: the SME rules each of the five entries held at gate vocabulary-domains-and-id-policy (m3_depends_on_file, m3_executed_by, catalog_has_area_product, catalog_area_product_has_dev_team, catalog_dev_team_has_membership) keep-planned or deprecate, in docs/reviews/vocabulary-planned-review.md. The ruling is transcribed to config/gate-log.md as a follow-up entry citing the gate slug; any deprecation lands with deprecated_at + a note citing that entry; gates.json and the board regenerate. Note the review file flags catalog_dev_team_has_membership as a re-shape candidate (the SEAL-side HAS_MEMBERSHIP chain was deprecated for qualified attribution) -- a re-shape ruling routes through RELATIONSHIP_GUIDE as a NEW proposal, not an edit of the held entry.
+annotations:
+  status: '2026-08-18 (laptop): gate CLOSED 5/5 — 2 keep-planned, 1 activated, 1 deprecated-redundant,
+    1 re-shaped onto qualified attribution; m3_ ids retired for the two §C1b entries; scheduler_runs_as
+    raised; rulings transcribed to config/gate-log.md'

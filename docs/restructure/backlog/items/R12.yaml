@@ -1,0 +1,21 @@
+id: R12
+epic: agentic-qa
+title: 'Promote the R5 stub-ADK harness into a committed fixture: live-verify the web Ask wiring with
+  no LLM key'
+type: task
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- web/src/lib/adk.ts
+- web/src/ask/
+- web/src/routes/AskRoute.tsx
+- drydocs_api/query_specs.py
+acceptance: |
+  The stub-ADK harness (FastAPI serving /run_sse SSE with control-part handling and REAL ephemeral-spec registration against drydocs-api) is a committed, reusable fixture — placement decided and recorded (tests/ integration vs a dev-fixture script) — with a documented invocation. A repeatable check (integration test, or a documented manual flow if live services are required) drives the Ask-spoke wiring against it end to end with NO LLM key. Full suite green; the stub never ships in web/dist.
+notes: |
+  Groomed 2026-07-30 from the R5 follow-up [idea]: the R5 session's scratchpad stub proved the wiring live without an agents venv — worth owning instead of re-inventing per session. Re-author from the R5 session record if the scratchpad copy is gone; the design (SSE shape + control part + registration) is documented in the R5 close note.

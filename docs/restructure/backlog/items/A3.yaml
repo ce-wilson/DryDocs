@@ -1,0 +1,16 @@
+id: A3
+epic: reference-hygiene
+title: Seed the research index with linked rationale
+type: chore
+module: reference
+phase: 0
+agent: reference-librarian
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- reference/research/README.md
+- docs/restructure/00-conceptual-model.md
+acceptance: '>=5 rows, each with a working link and a ''why it matters'''
+notes: Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.

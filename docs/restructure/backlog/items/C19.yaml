@@ -1,0 +1,19 @@
+id: C19
+epic: ontology-mapping
+title: ontology.cypher describes an SWO load step that cannot run — the referenced swo_sdlc_ontology.cypher
+  was never created; fix the comment, record the subset question
+type: chore
+module: ontology
+phase: 2
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/ontology.cypher
+- config/gate-prompts/self-documentation-code-graph.yaml
+acceptance: |
+  The comment above the 13 seeded SWO anchor terms (ontology.cypher:109 today) no longer describes loading a file that does not exist — `ontology/reference/swo_sdlc_ontology.cypher` is referenced nowhere in the tracked tree (grep-verified), and the rewritten comment states reality: the anchors are the seeded set; a wider ~250-term SDLC subset WOULD HAVE TO BE BUILT (it is not a load step), and whether it is worth building is an OPEN question recorded in the comment, not silently dropped. Suite green; apply-supplements unaffected (comment-only edit).
+notes: |
+  Found drafting the G33 gate spec (2026-07-27 inbox): §A4 scoped "the wider set" out, and this finding retroactively justifies it — the M0 framing dates the dangling reference to the earliest phase. Context has moved since the sibling §E0 zero-consumers finding: G33 shipped the FIRST SWO consumer (IS_ENCODED_IN -> the Python term), so the anchors are no longer decoration. Whether the SDLC subset is built at all stays a user/SME call — this chore only stops the comment lying to readers. CLOSED 2026-07-28 (same day): comment rewritten — the 13 anchors ARE the seeded set, no wider load step exists; provenance recovered from docs/history/M0-README.md (the ~250-term file lived only in the pre-repo SAVEPOINT and was never ported — a port that never happened, not a file that vanished); the open build-it-at-all question recorded in the comment itself, plus the first-consumer state (G33 Python binding live; Shell/SQL await G22 rider R1). The stale "Streamlit pages" claim went with it. Remaining grep hits for the old path are correct by design: gate-log.md:1014 + gate §A4 QUOTE the finding on append-only audit surfaces, and docs/history/* accurately describe the savepoint plan. Comment-only edit; regenerating gates.json picked up C19's gate-prompt input (unblocks list) — drift introduced at the groom, caught by test_gates_json. Suite green.

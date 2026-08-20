@@ -1,0 +1,29 @@
+id: C23
+epic: ontology-mapping
+title: 'The DQV quality seed floats: :Metric/:Dimension ship at bootstrap with no upstream measurement
+  leg and no vocabulary entries — rule its disposition'
+type: task
+module: ontology
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/ontology.cypher
+- drydocs_core/schema/constraints.cypher
+- docs/history/LoadPlanV2.md
+- docs/reviews/sdlc-neo4j-schema.md
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  An SME-ruled disposition exists for the DQV measurement leg — exactly one of: (a) BUILD — the writers for the designed upstream chain (:QualityMeasurement -IS_MEASUREMENT_OF-> :Metric, COMPUTED_ON, HAS_QUALITY per LoadPlanV2 §DQV) are groomed as items naming their real feeds; (b) DEFER — the seed stays, with the trigger that revives it recorded where the next reader looks (ADR or ontology.cypher header); or (c) PRUNE — the seed rows, metric_name/ dimension_name constraints (EXPECTED_CONSTRAINTS moves with them), and the LoadPlanV2 citation are retired together via the gate. Whatever the ruling: the vocabulary gap closes — IN_DIMENSION is a live bootstrap-written edge ABSENT from relationship_vocabulary.yaml, so it (and the three designed edges, if kept) get entries at the status the ruling assigns, through the HITL gate, never auto-decided. sdlc-neo4j-schema.md's declared-but-never-loaded row cites the ruling.
+notes: |
+  Groomed 2026-08-03 by user directive, in-chat, minutes after the user wiped the local graphs: the one query that survived in memory was MATCH (:Metric)-[:IN_DIMENSION]->(:Dimension), and the user could not tell what the metrics were ASSOCIATED with — because nothing is. Verified at the groom rather than transcribed: ontology.cypher seeds 10 :Metric + 5 :Dimension + 10 IN_DIMENSION edges at bootstrap; the upstream leg LoadPlanV2 designed has NO writer (sdlc-neo4j-schema.md lists :QualityMeasurement/:Metric/:Dimension as constraints-declared-but-never-loaded); and none of the four DQV edge types appears in relationship_vocabulary.yaml — the seed predates the vocabulary discipline entirely. Model fable + HITL routing because every branch is an ontology decision (build = new edge semantics, prune = retiring ruled seed content); the TDQ metrics themselves (rowcount_match, freshness_sla, …) are exactly the control-file checks the temporal-runtime and TDQ planning already care about, so (a) has a real customer — that adjacency is for the ruling to weigh, not this groom.
+annotations:
+  status: 'closed 2026-08-03 same session (desktop): SME RULED DEFER in-chat — seed stays as a reference
+    catalog; revival trigger (first measurement feed = temporal-runtime freshness observations) recorded
+    in ontology.cypher above the seed; vocabulary gap closed with four c23_* entries (IN_DIMENSION active,
+    the three measurement-leg edges planned, new `quality` domain); gate-log entry dqv-seed-disposition;
+    sdlc-neo4j-schema.md''s declared-but-never-loaded row cites the ruling; EXPECTED_CONSTRAINTS unchanged'

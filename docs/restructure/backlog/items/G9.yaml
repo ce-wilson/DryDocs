@@ -1,0 +1,22 @@
+id: G9
+epic: component-topology
+title: Re-home the depgraph lineage assets onto drydocs-core
+type: requirement
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p3
+status: done
+depends_on:
+- G4
+- G8
+inputs:
+- docs/decisions/0002-c-depgraph-lineage-rehome.md
+- ce-wilson/depgraph@feat/controlm-lineage
+acceptance: |
+  depgraph's lineage assets are re-homed into the lineage/ package on drydocs-core (per 0002-C §4): model v2 (ProcessNode/DataAssetNode/typed rels) reconciled to DryDocs identity (assetId / ControlMJob(folder_id,job_id) URNs), controlm_inventory extractor, html-review SME surface, the curated drydocs-DB load (depgraph's planned Fork-3 profile), and the RHEL run-as-user collector. lineage imports ONLY drydocs_core.* and contains no Control-M parse code of its own; writes ground truth ONLY to drydocs; shared-parser + boundary + ground-truth tests pass; gates green. depgraph feat/controlm-lineage recorded as superseded source material.
+notes: |
+  ADR 0002-C (Option A — absorb). Re-home, not merge: histories disjoint, use reconcile-port. Parser is dropped (already in core via G8). Validate the ProcessNode/DataAsset -> DCAT/PROV/SWO mapping with neo4j-modeling before authoring load Cypher with neo4j-cypher (MERGE, UNWIND, no CYPHER 25). On done: mark depgraph PR #2 superseded for the lineage assets in ADR 0002 rollout. RE-TIERED opus -> fable 2026-07-10 on pull (groom-touch policy).
+progress: |
+  2026-07-10 — PULLED; branch port/depgraph-lineage-rehome (external-work-in rule); 0002-C preconditions ticked; depgraph@feat/controlm-lineage cloned read-only (tip 5b09a0d). SLICE 1 DONE (29faffe): model.py ported (lineage layer only; identity = ControlMJob NODE-KEY composite; rels normalized to the REGISTERED planned vocabulary m3_invokes/m3_triggers/ m3_reads_from/m3_writes_to — no new edge types invented; code layer left behind) + extractors/controlm_inventory.py (shared core parser; scaffold extract.py superseded). Core fold delta #4: Invocation.target property + regression test (0002-C §3 rule). Oracle ported + GREEN against core (ADR count correction recorded: real figures 4 jobs / 7 processes / 4 INVOKES); §5 gates: shared-parser, boundary, parser-equivalence, suite all ticked; ground-truth-only pends the writer. Suite 532/3. REMAINING for G9 close: review.py (html_review port), collect/ port, Fork-3 writer build (rel vocab gate-bound — no live load before the HITL gate), 0002-C DONE + depgraph PR #2 superseded record, merge --no-ff. 2026-07-11 — SLICE 2 + CLOSE: review.py ported (SME surface; node_target wording, registered rel spellings; CLI drydocs lineage-review) + collect/ ported (shell verbatim, LF pinned, bundle schema unchanged) + Fork-3 writer BUILT (plan_curated pure review + write_curated: constraint-on-key MERGE/UNWIND, job endpoints MATCHed, vocab_id stamped; REFUSES live load while m3_* ids are planned — GateBoundVocabularyError — and any DB but drydocs — TrustBoundaryError). §5 ground-truth-only gate ticked structurally (test_lineage_writer). 0002-C DONE; depgraph PR #2 (tip 5b09a0d) recorded SUPERSEDED in 0002-C §6 + ADR 0002 affects. Suite 566/3. Acceptance met — curate() cadence stub is G4 trigger-wiring scope, not G9.

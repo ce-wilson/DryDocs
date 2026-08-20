@@ -1,0 +1,27 @@
+id: O20
+epic: web-console
+title: 'HITL gate session: the UI write-surface boundary — which console actions may ever write, and through
+  what mechanism'
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: fable
+priority: p3
+status: done
+depends_on:
+- O13
+- O19
+progress: |
+  2026-07-21 (Epic-O finish session) — GATE-PREPPED, awaiting the SME: config/gate-prompts/ui-write-surface.yaml authored (doctrine reaffirmation + four candidate affordances C1 gate-sign-off-drafting / C2 SME notes / C3 steward PR-creation / C4 admin edits, each against the mechanism tiers M1 artifact-only / M2 non-graph drafts / M3 direct write-NEVER; conservative recommendations recorded as recommendations, every ruling open). Page rendered to var/gate-ui-write-surface.html (10 confirmations). gates.json regenerated — the new gate correctly appears as `open` on /gates (the O19 auto-pickup proving itself). Declining every extension is a valid sign-off; the item completes when the session runs and transcribes to config/gate-log.md. SME REVIEW SAME DAY (pre-session): scope clarified console-wide (title + summary now explicit — NOT just the /gates page); file-identity footer added to the gate-page renderer (path + copy button, +test); then AMENDED with in-session direction (gate pages necessary; SaaS super-user page expected = new C5; M2 origin-flagged store ratified; override lists -> source-corrections reports; O24 promoted). DONE 2026-07-21 pm — SIGNED OFF via the in-chat guided walk-through (AskUserQuestion, 4/4 as recommended; transcribed to config/gate-log.md same day): SME-1 doctrine + C4-never + C5-expectation confirmed as written; SME-2 C1 = M1 artifact-drafting (groomed O25); SME-3 C2 = M2 origin-flagged non-graph store (first instance O24); SME-4 C3 = defer server-side git (M2 + report is the path). M3 direct graph write REFUSED standing. The Epic O phase-12 chain is COMPLETE end to end.
+inputs:
+- docs/restructure/03-hitl-sme-flow.md
+- config/gate-log.md
+- UI-WIP/site-plan.md
+- docs/restructure/backlog.yaml
+acceptance: |
+  A HITL gate session (docs/restructure/03-hitl-sme-flow.md) decides the UI write-surface boundary and records it in config/gate-log.md: which write-shaped console actions, if any, are ever permitted (gate sign-off from /gates, SME annotations/notes, steward drafting beyond the O13 artifact-download) and the mechanism each must use (gate-bound change artifact per the O13 doctrine vs a direct API write). The standing rule "the UI performs zero graph writes" is the default the gate either re-affirms or consciously amends PER SURFACE. Until signed off, every console surface stays read-only / artifact-only, and any future UI item proposing a write must cite this gate id.
+notes: |
+  THE TERMINUS of the 2026-07-21 UI extension groom — everything before it is buildable ungated; nothing write-shaped proceeds past it. Also the home for the O12-noted L7 SaaS-reframe config surfaces IF any of them ever grows an edit control (today they are read-only by design).
+annotations:
+  status: SIGNED OFF 2026-07-21 pm (in-chat guided session, 4/4 as recommended) — gate-log transcribed

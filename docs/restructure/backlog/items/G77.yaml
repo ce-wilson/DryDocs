@@ -1,0 +1,23 @@
+id: G77
+epic: component-topology
+title: 'One theme vocabulary, two corpora: dcat:theme on the Control-M folder block AND the scraped-document
+  envelope, joined by concept IRI'
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: todo
+depends_on:
+- C34
+- G84
+inputs:
+- config/taxonomy/lob-product-team.yaml
+- drydocs_core/orchestration/controlm/description_tokens.py
+- knowledge/standards/technology/controlm-guidelines-and-standards.md
+- knowledge/standards/technology/description-field-metadata-plan.md
+acceptance: |
+  One vocabulary classifies BOTH corpora -- that is the point, and it is what ties the structured estate to the unstructured one. (a) CONTROL-M, folder scope: a THEME token inside the DD1| folder block (guidelines section 7.5), registered in TOKEN_REGISTRY like any other token, multi-valued on the documented inner separator, values checked against the concept scheme with an unrecognised value RETURNED as a finding rather than raised -- the standing aliases-suggest / values-decide discipline. This is the folder-level block C29 originally intended for a Data Series roll-up that was never commonly defined. (b) SCRAPED DOCUMENTS: the same field on the document metadata envelope. The two-corpus architecture already rules that the vendor and Confluence corpora stay EPISTEMICALLY SEPARATE and merge only through a shared metadata envelope -- a theme is exactly such a field, which is why it fits rather than being bolted on. THE DISCIPLINE THAT MUST BE WRITTEN DOWN OR SOMEONE WILL BUILD PAST IT: the join is at the CLASSIFICATION, never the content. A document and a folder sharing a theme are both ABOUT that subject; that is not an assertion that the document describes the folder, and no edge may imply it. Trust tiers do not merge because two things share a subject. (c) The unclassified / out-of-scope split from C34 (c) is implemented on the scraper side, where it actually bites, and coverage reports the two apart. (d) Joined by CONCEPT IRI, never by label -- so this item works unchanged under one database or two, and label drift between corpora cannot fork the join. Zero graph writes: the field, its validation and the coverage split. The edge waits on C34.
+notes: |
+  Raised 2026-08-11 with C34, same session. Depends on C34 because a theme field populated against an undeclared scheme is free text with a schema-shaped name. DELIBERATELY NOT RAISED YET: the SME-facing classification UI, which the session described as possibly two pages. Building a classification surface before C34 rules residency and the Product-vs-Concept typing is the O59 mistake in a new place -- a widget built against a shape that turns out otherwise is thrown away. It grooms once C34 signs, and the two-page question then answers itself from the residency ruling rather than from taste. RAISED AT THE 2026-08-12 GROOM, and the reason depends_on grew: clause (a) reads a THEME token "inside the DD1| folder block", and nothing in the parser knows what that block is. G84 builds the block gate; this item registers a token on top of it. Without the dependency, two sessions implement the same sentinel differently in one file.

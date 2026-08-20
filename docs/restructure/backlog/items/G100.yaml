@@ -1,0 +1,21 @@
+id: G100
+epic: ontology-mapping
+title: 'ITSM technician-group gate: ratify the SnowRole register (SENG / ASUP) and the ServiceNow staffing
+  attribution, then build the OOTB lookup'
+type: task
+module: ontology
+phase: 6
+agent: ontology-mapper
+model: opus
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml
+- drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml
+- config/gate-log.md
+- docs/RELATIONSHIP_GUIDE.md
+acceptance: |
+  The vocabulary half LANDED 2026-08-18 on SME direction (G100 registration commit): :ServiceNowGroup + :SnowRole node classes, itsm_group_qualified_attribution and itsm_attribution_had_role, all status: planned, in a new `itsm` domain. This item is the GATE that ratifies them plus the build behind it. (a) RATIFY THE REGISTER as a closed set on the K5 fixed-scheme precedent: SME direction is developers -> SENG, production support -> ASUP. Rule whether those two are the whole set or a seed, and whether the tier numbering that pairs with them in the estate's group naming is modelled at all producer-side (it is deliberately NOT asserted today). (b) CONFIRM THE ONE-SPINE RULING: technicians resolve to :Employee on the SID, NOT to a second person class. The company model reaches people through :Worker {sid}; the producer does not mint that. This is what makes "which roles does this person hold across PAT, SEAL and ITSM" one traversal instead of three. (c) THE HAS_AGENT HOP IS REUSED, never twinned (C8 refuses duplicate (from,label,to); schema_graph.py raises). Confirm rather than re-derive. (d) FENCE HOLDS: the group -> application link (SUPPORTED_BY / HAS_SUPPORT_QUEUE / RESOLVED_BY) belongs to the company's SIGNED snow-hpsm-queue-to-group gate. This family models WHO STAFFS A GROUP only. Do not re-mint a competing group->app shape — the trap G98 named when it warned G35 off the same thing. (e) THE BUILD, after sign-off: an OOTB lookup over sys_user_group / sys_user_grmember / sys_user (no custom table), resolving members to :Employee by SID and emitting the attribution triple. Entries flip planned -> active WITH their supplement in the same change (flips-are-follow-ups). Nothing loads before sign-off; SnowRole concepts stay proposed.
+notes: |
+  SOURCE NOTE 2026-08-18 (SME), and it changes what clause (e) builds against: the ServiceNow extracts are being re-sourced INTERNALLY from hand-pulled CSV/YAML onto SQL over the Snowflake replica views. So the lookup here targets the SOURCED feed — snow@[db].[schema].<servicenow_table> per the grammar the `snow` system row already rules — not a CSV shape that is being retired underneath it. Name the dataset for the ServiceNow TABLE, never the V_-prefixed view wrapper (same row). Row models do not move; the SQL aliases columns onto existing field names. Full note: Idea-132, which also carries the two NET-NEW areas (per-CI TOM responsibilities, incidents) that are NOT part of this gate and need their own. Raised 2026-08-18 alongside the registration, at the G91 close. FOURTH family on the qualified-attribution pattern (SEAL K4, PAT products K5, PAT dev teams G91, ITSM here) — the shape is settled, so this gate rules the REGISTER and the identity join, not the modelling pattern. The SME's stated use case is a support team reaching applications through PEOPLE (members holding an operate-manager role) rather than through a develops edge, which is why the single :Employee spine is the load-bearing part.

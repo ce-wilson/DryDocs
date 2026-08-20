@@ -1,0 +1,42 @@
+id: O30
+epic: web-console
+title: Retire App.css legacy mockup classes into the Tailwind/token idiom (SignIn, MyApps, GraphExplorer,
+  TowerDrill, CypherConsole)
+type: chore
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src/App.css
+- web/src/components/SignIn.tsx
+- web/src/components/MyApps.tsx
+- web/src/components/GraphExplorer.tsx
+- web/src/components/TowerDrill.tsx
+- web/src/components/CypherConsole.tsx
+acceptance: |
+  web/src/App.css is deleted (or reduced to a comment-only stub recording the migration) and the five named surfaces (SignIn / MyApps / GraphExplorer / TowerDrill / CypherConsole) style entirely through the Tailwind/token classes already used elsewhere in web/src/; no visual regression on any of the five (before/after screenshot or headless-Edge smoke in both themes); build + lint green.
+notes: |
+  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-7. Pure hygiene/consistency chore — no new component behavior.
+annotations:
+  status: 'closed 2026-08-07 (desktop, same session as the claim). App.css is now a COMMENT-ONLY STUB
+    recording the migration; all five surfaces (SignIn / MyApps / GraphExplorer / TowerDrill / CypherConsole)
+    style inline through the Tailwind/token idiom. Mechanics worth keeping: the shared SVG text styles
+    moved to GraphSvg.tsx as exported GNODE/GSUB/GEDGE consts (GraphExplorer reuses them); the cypher-syntax
+    spans (.kw/.lbl/.rel/.str) live inside data/towers.ts HTML literals, so they are styled FROM TowerDrill''s
+    <pre> via Tailwind arbitrary-variant descendant selectors ([&_.kw]:text-...) rather than a stylesheet;
+    the dynamic role/badge variants became lookup records (ROLE_BADGE/SNOW_BADGE). Mockup dark hardcodes
+    (#c8d2de, #0a111b, syntax colors) kept VERBATIM for pixel parity — O32 owns the light redesign. DELIBERATE
+    delta beyond the five: App.css''s global table/th/td rules used to cascade forced 11.5px mono cells
+    and dark-hardcoded text over every self-styled table in the console (Gates/Mappings/Admin/etc.) —
+    removal moves those tables to their authored Tailwind intent, which also un-breaks their light mode
+    (the hardcodes were dark-only); recorded in the stub. Dead rules (.hero/.features/.tower*, last referent
+    = the Idea-77 orphan HeroArt) died with the file. VERIFIED (headless-Edge, dev server, ?as= affordance):
+    screenshots of all five — signin, console (admin), tower drill (cypher colors + all three table treatments),
+    explorer (error-panel state; the live graph pane needs the API, but its text classes are the GraphSvg
+    ones verified in the tower shot), and MyApps via a temporary toggle-default flip on the ownership
+    pane (reverted, git-verified clean). Build + oxlint green; UI ledger guards green (no inventory change
+    — no files added/removed).'

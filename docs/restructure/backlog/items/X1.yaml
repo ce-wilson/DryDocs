@@ -1,0 +1,34 @@
+id: X1
+epic: ddlineage-retirement
+title: 'ADR 0002 amendment: retire ddlineage from the deployed topology — provisioned-for-later ends,
+  recreate-if-ever-needed begins'
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: opus
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/decisions/0002-component-database-topology.md
+- docs/decisions/0006-docmeta-component-and-doc-graph.md
+- config/gate-log.md
+acceptance: |
+  ADR 0002 gains a dated amendment section recording the retirement: the decision (ddlineage removed from the provisioned topology, user ruling 2026-08-04 in-chat), the standing evidence (nothing writes it — writer pinned to drydocs with TrustBoundaryError, G30 repointed the four readers, the read-set excludes it, the read-targets-have-writers guard holds), and the reversal path (recreation = one CREATE DATABASE line + the ddall alias; the proxy-node-spine design question the original "provisioned-for-later" ruling deferred REMAINS deferred and transfers to the named revisit trigger — retirement answers where the database went, not that question). config/gate-log.md carries a record entry on the G51 idiom (a record, not a gate — no ontology change, no graph write). ADR 0006 §1's topology cross-ref updated if it enumerates ddlineage as deployed. History (gate-log entries, closed items, port archives, CHANGELOG) stays as written — the amendment supersedes, it does not rewrite.
+notes: |
+  Groomed 2026-08-04 (desktop, user directive in-chat — the directive IS the SME ruling this amendment records; the ADR's own revisit clause routes topology change through an amendment, and G51's dated-section + gate-log-record shape is the precedent). Do NOT edit G53's notes: its enumeration ("drydocs + ddlineage + ddcontext + ddschema") is a snapshot in its own prose; the G53 plan, when written, reads the topology as it stands at that build.
+annotations:
+  status: 'closed 2026-08-04 (desktop, same session as the claim). ADR 0002 carries the dated amendment
+    section (after G51''s): the deployed set becomes drydocs/ddcontext/ddall/ddschema; the residency clarification''s
+    "stays provisioned and aliased" disposition named as the superseded line, everything above it left
+    as written; the standing evidence restated from the record (writer pinned w/ TrustBoundaryError, G30
+    repointed readers, read-set exclusion, read-targets-have-writers guard) plus the honest observation
+    that empty-but-provisioned is the exact gap the G28/G30 drift classes grew in; the reversal path states
+    the DIRECTION change (reopening now recreates — one DDL line + the ddall alias — rather than finds
+    it waiting) and the proxy-spine design question transfers INTACT to the named revisit trigger, which
+    stands. gate-log RECORD entry on the G51 idiom (direction, not a gate — no ontology change, no graph
+    write; enactment owned by X2-X4). ADR 0006 §1''s enumeration got the as-of-date parenthetical (ddschema
+    added G51, ddlineage retired X1 — the convention point stands) rather than a rewrite. gates.json re-rendered
+    (the new log entry''s row rode the default board render; its absence failed the J17 drift guards first,
+    as designed). Suite 1542 green. X2 now next_ready.'

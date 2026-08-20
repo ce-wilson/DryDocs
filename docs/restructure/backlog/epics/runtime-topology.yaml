@@ -1,0 +1,12 @@
+id: runtime-topology
+letter: P
+title: Runtime topology & maintenance windows
+order: 15
+groom_log:
+- date: '2026-07-09'
+  note: |-
+    ── Epic P — Runtime topology & maintenance windows — Phase 13 ─────────────
+    Born 2026-07-09: CM_HOSTS + CM_AVG_RUN onboarded via the add-source-object
+    walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
+    (config/gate-log.md); gate controlm-avg-run-supplement prepped, awaiting SME.
+  attached_at: P1

@@ -1,0 +1,28 @@
+id: G27
+epic: component-topology
+title: 'ETLProcess kind-enum rider gate brief: extend the kind enum vs keep it closed with a governed
+  discriminator (Backstage closed-kind/open-type precedent)'
+type: task
+module: ontology
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on: []
+inputs:
+- UI-WIP/backstage-catalog-assessment.md
+- config/gate-prompts/
+- drydocs_lineage/writer.py
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/gate-log.md
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  A drydocs.gate-prompt.v1 spec exists (config/gate-prompts/etlprocess-kind-enum.yaml) for the kind-enum rider G17(c) surfaced: whether the :ETLProcess kind value set (etl|utility|notification) EXTENDS per MAC pipeline.json subType values (provisioning = DB load with no transform) or stays a small closed set with subtype carried as a separately governed property. The brief frames both options with a recommendation and cites the Backstage precedent verified 2026-07-22 (kinds few and closed + spec.type open-but-governed; explicit anti-catch-all-"Other" guidance) as external prior art, plus the G12/G17 history. The DECISION stays gate-bound: no enum, vocabulary, or writer change lands from this item — build follow-ups are groomed at sign-off (the K2 flips-are-follow-ups pattern).
+notes: |
+  Groomed 2026-07-22 from assessment T1; started the same session (user pull). Fable per the matrix — the brief frames an ontology/schema decision. The rider originates from G17(c) acceptance ("any enum-semantics question surfaced as a gate rider, never auto-decided").
+annotations:
+  status: DONE 2026-07-22 same session — config/gate-prompts/etlprocess-kind-enum.yaml drafted (A context
+    / B1 admit-the-value RECOMMENDED vs B2 hold-the-3-set / C consequences / D sign-off); gates.json +
+    enforcement-matrix.json regenerated (28 gates); suite 864 green. The GATE SESSION itself is still
+    awaiting the SME.

@@ -1,0 +1,36 @@
+id: G35
+epic: seal-attribution
+title: 'Open the TOM-roles gate: the live registry shows 9 distinct accountable role classes against the
+  signed 7, and cardinality is a per-role-class attribute rather than a global rule'
+type: requirement
+module: ontology
+phase: 9
+agent: main
+model: fable
+priority: p1
+status: done
+depends_on: []
+inputs:
+- config/gate-log.md
+- config/taxonomy/business-application.yaml
+- drydocs/loaders/cypher/seal_contacts.cypher
+- drydocs/loaders/cypher/seal_applications.cypher
+- config/gate-prompts/seal-tom-attribution-reshape.yaml
+- knowledge/upgrade-plans/servicenow-replica-evidence.md
+- knowledge/upgrade-plans/servicenow-cmdb-analysis.md
+acceptance: |
+  A gate-prompt spec is authored and walked with the SME. It must rule: (a) the ROLE ENUMERATION — the signed 2026-07-10 §B list of 7 is contradicted by the live registry, which shows 9 distinct accountable role classes including L1 Operate manager, L2 Operate manager and Operate Manager as THREE separate concepts rather than one with a level attribute; (b) CARDINALITY as a PER-ROLE-CLASS attribute, not a global singleton rule — the same application legitimately carries four different people in one role class (Backup Information Owner) while other classes are effectively singleton; (c) that the singleton constraint, where it applies, is expressed as a GRAPH-TEST and not a database constraint, because Neo4j cannot express "at most one per (app, role)" declaratively; (d) the ROSTER-DISAGREEMENT question — SEAL's own Application Contacts view and the ServiceNow TOM Accountable view return different counts for the same application, and nothing in the model records which surface an attribution came from; (e) whether INHERITANCE is modelled at all — the ServiceNow view carries Inherited / Overridden / (empty) plus an "Inherited from CI" parent, and DryDocs today models attribution as a flat assertion with no way to say an assignment was inherited rather than directly asserted. config/taxonomy/business-application.yaml's `roles:` list is reconciled to whatever is ruled. Nothing loads until sign-off.
+notes: |
+  Carried over from the business-application-identity gate (SIGNED OFF 2026-07-27) and deliberately NOT folded into S3: that gate's §A1 declares the signed seal-tom-attribution-reshape ruling (2026-07-10) UNCHANGED, so an item that re-opens its §B role enumeration cannot live inside it. Evidence is SME screenshots of the live registry, reviewed 2026-07-27 — Internal-Confidential, so no values are recorded here or in any committed file; only the SHAPE of the finding. Note the taxonomy file's current `roles:` list is itself divergent (it carries Chief Business Technologist and Risk Manager, which the live surfaces do not show under those names). Adjacent, already ruled and NOT reopened by this: §D2 of the identity gate pinned attribution_id's 4-part shape precisely BECAUSE of (b) — one person across three accountable roles collides if the role segment is dropped, and four people in one role class collide if the sid is dropped. Whatever this gate rules about role classes must keep that key shape valid. DRAFTING HALF DELIVERED 2026-08-10 (LAPTOP). STATUS STAYS in_progress ON PURPOSE — under the awaiting-HITL convention it was released from, because the acceptance says the spec is "authored AND WALKED with the SME" and only the authoring is done. Nothing is signed, nothing loads, and business-application.yaml's roles: list is deliberately NOT reconciled, since §H4 reconciles it to whatever §A rules and §A is still open. WHAT THE PASS DID: brought the K21 ServiceNow evidence onto the page, which is the reason this item was routed to the laptop. Clauses (d) and (e) were the two the release note named, and both were written from DESCRIPTION rather than evidence — (e) turned out to be wrong. §E4 reasoned the inherited-from parent is estate data DryDocs does not have and treated the modelled-node option as blocked on acquiring it; the parent is the AREA PRODUCT and :AreaProduct is a K6-signed node class we already hold, so the option was never blocked. The false premise is kept above its correction per the §A4 precedent, and §E5b states the K6 boundary explicitly so an inheritance edge to :AreaProduct is not later misread as merging the two role families K6 declared independent. Also landed: §D5/§D5b (the ServiceNow side specified end to end — and the two rosters differ in KIND of holder, not only in count), §B6b/§B6c (the TOM row names a GROUP, so §B6's always-a-person invariant needs its scope ruled before a loader relies on it; the PROV shape survives either way since prov:agent admits an Organization), §G0d-§G0f (G13/G14/G15 gain a named subject — the Deployment Module — which §G15 explicitly asked for, plus what that does NOT authorize and a correction to a reading that would have ruled §G15 by dissolving its subject), §F6/§F6b (the vocabulary-as-data target already running on the ServiceNow side, carrying a role RETIREMENT flag DryDocs has no equivalent for, which bears on §A2/§G5/§G12), §E1c (the TOM tables are a company scoped app with NO vendor baseline, so every TOM fact is an SME or instance fact), mapping rows 5-6, one new open question and one new risk. THE NEW OPEN QUESTION SHOULD BE SETTLED BEFORE THE WALK, not during it: is the TOM row's subject a Business Application CI or a Deployment Module CI? One GROUP BY cmdb_ci.sys_class_name answers it, and §G0e's fork turns on it. THE NEW RISK is filed rather than hidden: all of this evidence comes through a replica whose completeness is unconfirmed (K21 open question 9). Every ruling here is about SHAPE, which survives a partial copy; counts do not — including §C4's completeness report, which is a count by construction. Suite green at 1811 passed.
+annotations:
+  status: 'SIGNED OFF 2026-08-11 at a live SME walk (gate-log: two RECORD entries + the GATE entry). Prior:
+    CLAIMED 2026-08-10 (LAPTOP, pushed before work) — the release note''s intended puller. Drafting half
+    only: the gate-prompt spec is brought to a walkable state carrying the K21 evidence; the SME walks
+    it afterwards and nothing loads until sign-off. Prior: RELEASED 2026-08-10 (SME direction) for the
+    LAPTOP to pull. Was in_progress under this repo''s awaiting-HITL convention (the E1/F1/F2/K2 pattern)
+    -- NOT an abandoned claim, and no work is being discarded. Released because the DRAFTING half is pullable:
+    the deliverable is a gate-prompt spec, and the SME walks it afterwards (the same drafting-only rule
+    the 2026-08-10 sweep used for G62-G65). It goes to the laptop specifically because that machine holds
+    the K21 evidence -- the DBeaver screenshots are gitignored and live only there -- and clauses (d)
+    roster disagreement and (e) inheritance are exactly what that evidence speaks to. Whoever pulls it:
+    claim in_progress and PUSH before starting, per the pull rule.'

@@ -1,0 +1,17 @@
+id: G90
+epic: structure-remediation
+title: Build the fix-tracking loader the remediation-fix-tracking gate authorized (§C1)
+type: requirement
+module: drydocs-load
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_remediation/changes.py
+- config/gate-prompts/remediation-fix-tracking.yaml
+- drydocs_core/ontology/relationship_vocabulary/20-property-terms.yaml
+acceptance: |
+  Gate remediation-fix-tracking SIGNED 2026-08-12. A dedicated drydocs-load loader consumes drydocs.remediation.fix-tracking.v1 change-sets: UNWIND $batch, MATCH on the NODE KEY ((folder_id, job_id) / folder_id) -- NEVER MERGE-creating a target (a missing target is an error, not a node to invent), SET the three ruled properties (remediation_fix_id, remediation_status, remediation_status_date), REMOVE them on rejection. Standard JobRun provenance applies. The §D1 dd: local property_terms entries land with this build (section 0b, prose definitions, revisit standard terms at RDF export). The emitter stays no-graph-write -- the AST guard and corroborate regex are untouched. Enum drift is already refused at emission (FIX_STATUS_ENUM); the loader validates the same enum on intake.

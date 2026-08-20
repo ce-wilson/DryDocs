@@ -1,0 +1,21 @@
+id: C20
+epic: ontology-mapping
+title: 'constraints.cypher''s ''deprecated by K4 — kept for old graphs'' comment is under-scoped: role/membership
+  keys are live catalog writes; re-scope the comment to what K4 actually deprecated'
+type: chore
+module: ontology
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/constraints.cypher
+- config/gate-log.md
+- drydocs_core/schema/catalog_ontology_supplement.cypher
+- drydocs/loaders/cypher/pat_team_roles.cypher
+acceptance: |
+  The comment heading role_name / role_id / membership_id in constraints.cypher names the ACTUAL K4 scope (verified against the K4 gate-log entry): the reified-membership pattern is deprecated in the SEAL attribution loaders specifically, while :Role seeds (catalog_ontology_supplement) and :Membership writes (pat_team_roles.cypher) remain live catalog paths; the void phrase "kept for old graphs" is gone (the C13 precedent — graphs rebuild from bootstrap, never migrate); test_schema stays green with EXPECTED_CONSTRAINTS unchanged (comment-only edit).
+notes: |
+  Groomed 2026-07-28 evening from the same-day [question] line (noticed during the AIS back-flow check, 87ba693; deliberately not hot-fixed there). Same comment-accuracy family as C19. CLOSED 2026-07-28 evening: comment re-scoped against the K4 record (the adjacent K4 block itself says "in the SEAL loaders" — gate 2026-07-10 §B/§C) and the verified live writers (catalog_ontology_supplement :Role seeds; pat_team_roles.cypher:24 :Membership MERGE on membership_id); "kept for old graphs" dropped per the C13 rebuild-not-migrate precedent. Comment-only: EXPECTED_CONSTRAINTS unchanged at 51, schema tests green.

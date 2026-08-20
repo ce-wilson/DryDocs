@@ -1,0 +1,22 @@
+id: O10
+epic: web-console
+title: 'Lineage module page: React Flow source-to-target DAG over lineage data frames'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O9
+inputs:
+- UI-WIP/site-plan.md
+- UI-WIP/Gemini-generated-subpage-2.png
+- web/src/
+acceptance: |
+  /lineage instantiates the shared template: a React Flow source-to-target DAG (mock subpage-2 pattern) with node/edge styles reading the theme tokens in both schemes; its data frames (hops, data assets, schema definition) served through the GraphAccess seam; /lineage/asset/:assetId deep links resolve; selection linking works as in Explorer.
+notes: |
+  site-plan.md P2, canvas half. DONE 2026-07-21 (Epic-O finish session): LineageRoute on the shared template — LineageGraphPane renders the mechanism-only data-series chain (FW job -> landing pair -> ingest -> RAW -> transform -> REFINED -> provision -> mart) as a React Flow DAG, kind colors via theme tokens (Explorer's KIND_TOKEN vocabulary), ILLUSTRATIVE badge; three NEW ddlineage QuerySpecs (lineage.hops.v1 / data-assets.v1 / schema-definition.v1 — the schema spec says honestly it carries node-schema only until the G17 MAC feed) bound via SpecGrid with the SYNTHESIZED demo frames as linked-selection fallbacks; Row-level preview stays the template's honest empty state (needs source platforms, not ddlineage). /lineage/asset/:assetId resolves to a selection (crumb + node glow). Verified: suite green (+lineage spec test), build+lint green, headless-Edge smoke — live spec ran against empty ddlineage and fell back honestly; deep-link screenshot shows crumb + highlighted node.
+annotations:
+  status: DONE 2026-07-21 (Epic-O finish session) — see notes

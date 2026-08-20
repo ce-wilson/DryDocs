@@ -1,0 +1,49 @@
+id: X2
+epic: ddlineage-retirement
+title: 'Repo sweep: ddlineage out of provisioning, code, config, tests, and live docs — history stays
+  history'
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- X1
+inputs:
+- drydocs_core/schema/provisioning/01_databases.cypher
+- drydocs_core/schema/provisioning/provision.ps1
+- drydocs_core/schema/provisioning/README.md
+- drydocs_core/schema/provisioning/smoke_drydocs_all.cypher
+- drydocs/cli.py
+- drydocs_api/query_specs.py
+- drydocs_deepdoc/__init__.py
+- config/dev-environment.yaml
+- tests/unit/test_database_names.py
+- docs/port-prompt.md
+acceptance: |
+  Provisioning no longer creates ddlineage nor aliases it into ddall (01_databases.cypher, provision.ps1, provisioning README, smoke_drydocs_all.cypher all agree); cli.py's DOC_SWEEP_DATABASES drops it; the drydocs_deepdoc docstring topology list and config/dev-environment.yaml stop naming it; query_specs.py's read-set comment block re-grounds on the X1 amendment (the exclusion rationale changes from "provisioned but written by nothing" to "retired at X1") without weakening the allow-list; the test_database_names.py topology anchor steps 5 -> 4 names and the whole guard family (query-specs, docs-verify, tier2) goes green against the shrunk topology; renders that embed the topology (enforcement matrix, board, design-doc runbooks with rev pins — bump any pinned rev the edit trips) are regenerated in the same commit; the port-prompt ledger gains a step carrying the company-side caution: their ddlineage exists live and their G30-repointed specs read drydocs, so the port hands them a provisioning diff plus an instruction to run their own X3-equivalent drop — producer sign-off is not company sign-off. Sweep scope is LIVE SURFACES ONLY (the J23/J24 idiom): gate-log, gate prompts, CHANGELOG, port archives, IDEAS audit trail, and closed-item notes keep the name as history. Full suite + ruff green.
+notes: |
+  Groomed 2026-08-04. The reference census at the groom found ~30 files naming ddlineage; the inputs list is the live-surface subset — the sweep re-runs the census (git grep -il ddlineage) and classifies each hit live-vs-history rather than trusting this list, per the J24 "the item's own framing undersold it" lesson.
+annotations:
+  status: 'closed 2026-08-04 (desktop, same session as the claim). The re-run census found 31 files; every
+    live surface swept, history left as written (J23/J24 idiom — gate-log, gate prompts, CHANGELOG, port
+    archive, IDEAS, exec-overview REV-HISTORY block, G52 volume-contents notes). Provisioning: DDL create
+    + ddall alias removed (a NOTE comment marks the retirement + recreation path), provision.ps1 runs
+    02 twice with the retirement noted, smoke reads two constituents, README re-tabled. Code: cli DOC_SWEEP_DATABASES
+    4->3, deepdoc docstring topology, dev-environment databases map (lineage row removed; the test''s
+    key-set speed bump updated with it), query_specs read-set comment re-grounded on X1 + four spec comments
+    tense-fixed, web registry.ts comment. Tests: topology anchor 5->4; ddlineage JOINED SUPERSEDED_NAMES
+    with the escape regex widened to "retire" (no successor name, so "superseded" would be the wrong admission)
+    — the guard then CAUGHT this item''s own cli.py comment wrapping the admission onto the next line,
+    proof it bites; docs-verify fixture tuple shrunk (no test keyed on it); startup-refresh runbook Rev
+    9 (topology enumerations + the provisioning-never-drops asymmetry written into step 4; pin bumped
+    8->9, it caught the edit); project-review table updated to the current four (ddschema row added, retirement
+    parenthetical), review outline guidance updated; site-plan backs-onto + TS union fixed. Port ledger
+    step 83 with the company caution (their live ddlineage survives a green provision run — manual drop
+    by their hand, alias-first + zero-node probe, non-empty = defect report; SUPERSEDED_NAMES will red
+    their local stragglers) + acceptance-gate head reference rolled to 1539/5. Both design-doc renders
+    + board regenerated. Suite 1539/5, ruff + format clean (two pre-existing hygiene nits in touched files
+    fixed in passing: F541 + format drift in test_dev_environment.py, format drift in filter_ignored.py).
+    X3/X4 now next_ready.'

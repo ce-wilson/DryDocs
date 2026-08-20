@@ -1,0 +1,22 @@
+id: L23
+epic: doc-infrastructure
+title: 'controlm-runbook-automation-SDLC skill: generate the long-form Application Run Book from the graph
+  — the sibling the -excel skill already promises'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/design/templates/sdlc-app-runbook.outline.yaml
+- docs/design/templates/sdlc-app-runbook.example.md
+- .claude/skills/controlm-runbook-automation-excel/
+- .claude/skills/controlm-runbook-automation/
+- tests/unit/test_doc_outline.py
+acceptance: |
+  A `.claude/skills/controlm-runbook-automation-SDLC/` skill that emits an outline-conformant SDLC-Runbook .md per application/folder from the graph, proven by the validation that already exists: a document generated for a sample folder passes sdlc-app-runbook.outline.yaml validation with no hand-editing. The skill labels every outline section GRAPH-DERIVED or SME-RESIDUE, the way -excel's template-spec.yaml labels every column — per-workflow blocks (Control-M job, schedule, param file, src-stg-target schema@DB, table grain, task table), the schedule table (trigger files, alert windows) and the SLA table are graph-derived; contacts, vault safes and special-case recovery are named as SME capture with a placeholder shape. Where a query overlaps the -excel skill it is SHARED or cited, never re-written: two skills disagreeing about the same runbook fact is the failure this clause exists to prevent. Committed files stay mechanism-only; a FILLED runbook is Internal and lives in internal/ or internal-local/, the rule -excel already carries. The -excel SKILL.md's forward reference to this sibling resolves once it lands.
+notes: |
+  Groomed 2026-08-04 (weekly groom). Not a speculative shape — the shipped -excel skill's own frontmatter names it: "a future -SDLC sibling owns the long-form Word/markdown run book". VERIFIED at the groom: both sibling skills exist producer-side (.claude/skills/controlm-runbook-automation/ and .claude/skills/controlm-runbook-automation-excel/, the latter carrying template-spec.yaml + generate_template.py + controlm-runbook-template.xlsx), and the doc type landed the same day at 995eb9a — sdlc-app-runbook.outline.yaml (385 lines), a 631-line worked example, and 32 lines of outline tests. Contract, exemplar and precedent are all in place; the generator is what is missing. Feeds are the ones -excel already uses (the Control-M graph, cm_avg_run, the escalation DB), and -excel's measured coverage — 31 of 35 job columns graph-derivable — is the honest expectation to carry over with one correction: the long form has MORE prose sections, so its SME residue is proportionally LARGER, not smaller. Filed under Epic L because the outline system and its doc types live there. This is a doc GENERATOR and stays distinct from drydocs-docmeta, which ingests documents.

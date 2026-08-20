@@ -1,0 +1,22 @@
+id: O22
+epic: web-console
+title: 'Icon set: export the 7 hub glyphs from icons.md as recolorable SVG components consumed by the
+  radial hub + aside nav'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- O8
+inputs:
+- UI-WIP/icons.md
+- web/src/
+acceptance: |
+  The 7 glyphs in icons.md (brand mark, Tower Auto, Infrastructure, Home Lending, Data Lineage, Credit Cards + the reused infrastructure variant) exist as standalone recolorable SVG assets/components under web/src — stroke + palette via the O8 theme tokens, no hard-coded hex — and the aside-nav module items (and the radial hub, once O9 lands) consume them; the icons.md status checklist is updated; both themes verified (glow layer gets the light-mode solid-outline equivalent per site-plan §2).
+notes: |
+  Groomed from icons.md's open checklist. Coordinate with O9: whichever lands first, the other consumes the shared assets (dep is O8 so icon work can run in parallel with the landing build). DONE 2026-07-21: web/src/components/icons/HubGlyphs.tsx — 7 glyphs as inline-SVG components (120x120, ~2.2 stroke per icons.md), token-only (palette mapping icons.md->tokens.css in the header; zero hex in rendered SVGs, JS-verified); accent layers use currentColor so the dark-only .glyph-accent drop-shadow glows each accent's own hue; light = filter:none solid outline (site-plan §2). TowerIcon + BrandMark rewired to consume (their old hard-coded hex removed; 'shared' tower -> Infrastructure glyph per the icons.md reuse rule); HUB_GLYPHS export = the 7-slot hub composition ready for O9. icons.md checklist updated (fonts line superseded by the IBM Plex decision). Verified: npm build green; both themes checked via computed styles in the live preview (screenshot capture timed out in the pane — DOM/style verification instead, disclosed).
+annotations:
+  status: DONE 2026-07-21 same session groomed

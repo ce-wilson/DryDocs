@@ -1,0 +1,31 @@
+id: G75
+epic: component-topology
+title: 'Back-flow the two homeless Control-M parsing mechanisms the company adapter carries: BMC compact-timestamp
+  normalization and the PL-/PG- condition-scope rule'
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- internal/controlm-config/reference/controlm-xml-processor-capture.md
+- drydocs_core/orchestration/controlm/
+- drydocs_lineage/extractors/controlm_xml.py
+- .claude/skills/reconcile-port/SKILL.md
+acceptance: |
+  Two pure functions the company's controlm_xml_adapter.py carries and the producer has NO equivalent of (verified 2026-08-11 by search, not assumed) land in drydocs_core/orchestration/controlm/ as mechanism, with the reasoning that makes each one correct written down rather than reconstructed later. (a) BMC COMPACT-TIMESTAMP NORMALIZATION. A BMC XML export stamps audit times as YYYYMMDDHHMMSS optionally suffixed with a zone token (UTC / Z / +hhmm) -- a form Neo4j datetime() cannot parse. The port must preserve all four decisions, because each one is a failure mode someone already hit: UTC and Z both normalize to Z while a NUMERIC offset is kept verbatim; an 8-digit date-only value becomes midnight; a value that is NOT the compact BMC form is HANDED THROUGH UNTOUCHED (the Oracle projections already deliver "YYYY-MM-DD HH:MM:SS" and the loaders' Cypher handles the space->T itself); and anything else unparseable returns None so the loaders' existing null-guard drops ONE ROW rather than a malformed string reaching the driver and aborting the whole load. That last clause is the one worth a test of its own -- it is the difference between a bad row and a dead load. (b) CONDITION SCOPE FROM THE NAME PREFIX. PL- = LOCAL (resolves within the emitting folder's DATACENTER) and PG- = GLOBAL (resolves across DCs by name), anything else UNKNOWN. The consequence is the part that must survive: two LOCAL conditions sharing a name in different data centers are DISTINCT, so any key derived from a condition name is incomplete without the data center, and UNKNOWN must stay a returned value rather than a raised error. Both are pure, both get unit tests covering every branch including the pass-through and the None, and neither writes a graph. NO company values: the two prefixes are a documented BMC naming convention, not internal data, and the docstrings cite the capture rather than quoting a real condition or pool name. THE THIRD MECHANISM IS DISPOSITIONED, NOT BUILT. The company adapter's folder pseudo-job (JOBISN=1, so folder-level PL-<folder>-OK OUTCONDs attach to a real node instead of dangling) is a LOADER idiom and needs a graph-write context the producer does not have -- there is no producer XML-to-graph adapter to put it in. It is recorded in the reconcile-port divergence ledger with its trigger (the first producer-side loader that models folder-level conditions), per J39's disposition rule. Recording it is the deliverable; building it here would mean inventing the caller.
+notes: |
+  Raised 2026-08-11 (desktop) at SME request, from the 19-screenshot capture of the company's three XML processors. WHY THESE TWO AND NOT THE ADAPTER: the adapter itself is the wrong base and the capture says why -- it encodes the description-token model C30 retired (INBOUND_ROUTE / OUTBOUND_ROUTE, ENV in its transfer-instance meaning, PDN_SNOW_QUEUE), it flattens the C30 scope ladder into one dict per job, and its FOLDER_ORDER_METHOD filter skips manual-order folders, which is right for a live-graph load mirroring the Oracle USER_DAILY IS NOT NULL filter and WRONG for a conformance pass, where hand-built and inactive folders are the whole drift population. That is not theoretical: the SME's own 22-job export carries no FOLDER_ORDER_METHOD, so the adapter would skip the folder entire while the lineage extractor stages all 22 jobs. So the adapter is scaffold, per the SME's framing -- "use it for the scaffold not the goal, ontology and mapping have changed" -- and these two functions are the parts that are mechanism rather than ontology, correct whatever era they came from, and currently reachable only through a module we are declining to adopt.
+annotations:
+  status: '2026-08-11 (desktop): normalize_export_timestamp (audit_time.py) + condition_scope/condition_identity
+    (conditions.py), 34 tests. TWO FINDINGS ON THE WAY: (1) the captured original DOCUMENTS returning
+    None for an unparseable value but falls through to returning its input, so only None/empty ever produced
+    None — the J26 promise-vs-code family; the promise is implemented here and the Oracle pass-through
+    preserved by matching the ISO-ish shape explicitly rather than by falling through. (2) condition_identity
+    added so "two LOCAL conditions sharing a name in different DCs are distinct" is executable rather
+    than prose a caller must remember. The JOBISN=1 pseudo-job is DISPOSITIONED in the port-prompt divergence
+    ledger with its trigger (the first producer loader that models folder-level conditions), not built
+    — it needs a caller that does not exist here.'

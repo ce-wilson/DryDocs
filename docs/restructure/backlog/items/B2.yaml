@@ -1,0 +1,18 @@
+id: B2
+epic: taxonomy-capture
+title: Capture SEAL business applications as taxonomy
+type: task
+module: taxonomy
+phase: 1
+agent: taxonomy-importer
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/data/samples/seal_*.csv
+- config/source-registry.yaml#seal-extract
+acceptance: every BusinessApplication has its two-port classification; no ownership semantics asserted
+output: config/taxonomy/business-application.yaml
+notes: |
+  Done 2026-06-20. Generic concept BusinessApplication (SEAL = source of record, id = SEALID, per SME note). 3 apps / 2 ports each / 15 memberships / 6 roles. Employees by SID (real names confidential -> internal/). classification: Internal-Confidential. Noted SEAL's own info_classification correlates with the sensitivity axis (flag for C2).

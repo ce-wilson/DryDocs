@@ -1,0 +1,20 @@
+id: G61
+epic: component-topology
+title: 'Draft the gate prompt for two provenance gaps: artifact-not-in-source-control, and path-keyed
+  Script identity where no pipeline id exists'
+type: task
+module: ontology
+phase: 6
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- internal/remediation/governance/nfr-consistency-and-greenfield.md
+- drydocs_core/ontology/relationship_vocabulary/
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  A gate prompt is drafted — drafting decides nothing (the G27 / W1 / N10 precedent), and nothing is written to the graph until sign-off — covering the two provenance gap classes the live FW-really-API case surfaced: (a) a flag for a payload script DEPLOYED on the execution host but ABSENT from source control, where a code search finds only the XML variable reference: what it is called, what it attaches to, and what a consumer may conclude from it; (b) Script identity for non-DPL jobs, which have no pipeline-id key at all: whether the PATH is the identity fallback, and whether the GUID-vs-path boundary is the kind discriminator. Every vocabulary or property term the prompt proposes is registered `planned` and stays planned until the gate signs.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-21. The anti-pattern itself is already codified (_FW-really-API plus design principle 8 — intent from resolved flow, flag the name-token disagreement); what is NOT settled is either gap class, and both are keying/meaning decisions, so they route through the gate rather than through a build. Checked at the groom: nothing under drydocs_lineage/ or config/ carries an in-source-control flag today, so the prompt starts from a clean sheet.

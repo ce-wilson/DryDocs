@@ -1,0 +1,27 @@
+id: G28
+epic: component-topology
+title: 'Close the multi-database naming drift: code and docs still name drydocs_context / drydocs_all,
+  which provisioning never creates'
+type: bug
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/provisioning/01_databases.cypher
+- drydocs_deepdoc/__init__.py
+- drydocs_api/routing.py
+- drydocs_lineage/writer.py
+- drydocs_api/query_specs.py
+- MODULE_MAP.md
+- docs/decisions/0002-component-database-topology.md
+acceptance: |
+  Every database name in code, tests and docs matches the DEPLOYED topology — drydocs / ddlineage / ddcontext / ddall, created by provisioning/01_databases.cypher (plus dddocs, planned per ADR 0006). A new test asserts no source file names a superseded database and no module-level DATABASE constant points at one provisioning does not create, so this cannot drift back. NOTE (2026-07-26): the clause about whether drydocs_lineage.writer should target ddlineage was SPLIT OUT to G30 — see notes.
+notes: |
+  Found 2026-07-25 while writing the executive overview against the live gated convention. Measured, not recalled - drydocs_deepdoc.DATABASE = "drydocs_context" and tests/unit/test_lineage_deepdoc_scaffold.py PINS that value, so the suite PROTECTED a database name provisioning never creates; deepdoc would fail or silently create a stray DB on its first live write. NOT a trust-boundary hole: drydocs_lineage.writer refuses on an allowlist (database != "drydocs" raises TrustBoundaryError), so the stale name in its test fixture was harmless — any wrong name triggers the guard. DONE 2026-07-26. The "one naming ruling" the original acceptance asked for turned out NOT to be needed: the dd* convention was already RULED and recorded — ADR 0006 §1 states the deployed topology outright ("the plan's working name predates the deploy") and the gate-log carries the rename. So this was pure drift cleanup against an existing decision, not a decision. ADR 0002 keeps its original names in the body (an accepted decision record is not rewritten) with a superseded-names banner added at the top pointing at ADR 0006 and the provisioning DDL. SCOPE SPLIT, recorded honestly: the acceptance ALSO bundled "does drydocs_lineage.writer target ddlineage" — that is a data-RESIDENCY decision, not a naming fix, and bundling them was an error in my own grooming. Split to G30 rather than quietly satisfied or quietly dropped. Guard: tests/unit/test_database_names.py (4 tests) — verified load-bearing by restoring the old constant and watching two of them fail. Its first draft used a generic drydocs_*|dd* regex and flagged the CSS colour #ddd and the column drydocs_application_id; the shipped version hunts the three explicitly-named superseded databases instead, with an escape hatch only for lines that SAY the name is superseded. Also fixed two pre-existing ruff errors in drydocs_deepdoc/investigate.py (import sort, en-dash) while in the file.
+annotations:
+  status: DONE 2026-07-26 — naming drift closed + guard added; the ddlineage residency clause SPLIT OUT
+    to G30

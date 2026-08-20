@@ -7,7 +7,7 @@ data" safety rule. Neither was caught by anything; both were caught by a person
 asking "is the runbook current?". A question you have to remember to ask is not
 a control.
 
-So: `modules:` in backlog.yaml is the census, and every entry lands in exactly
+So: `modules:` in backlog/modules.yaml is the census, and every entry lands in exactly
 one of three states, none silently absent.
 
 * **COVERED** — a governed ``docs/design/*-runbook.md`` names the module in its
@@ -42,7 +42,9 @@ except ImportError:
     _YAML_AVAILABLE = False
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
+BACKLOG = (
+    REPO_ROOT / "docs" / "restructure" / "backlog" / "modules.yaml"
+)  # the sharded census (ADR 0013)
 DESIGN_DIR = REPO_ROOT / "docs" / "design"
 
 pytestmark = pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")

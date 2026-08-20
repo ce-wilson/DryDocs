@@ -1,0 +1,18 @@
+id: J12
+epic: release-infrastructure
+title: 'Fix the session-ritual render invocations: bare python -> poetry run python (CLAUDE.md + snapshot.ps1)'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- CLAUDE.md
+- knowledge/depgraph-snapshots/snapshot.ps1
+acceptance: |
+  The CLAUDE.md session-ritual step 3 render commands (render_board.py + render_design_doc.py — lines 54-55 today) and snapshot.ps1's two `& python` invocations (lines 28/42) run via `poetry run python` (or an equivalently venv-robust invocation) so they work without an activated venv; snapshot.ps1 executes end-to-end on this machine; a grep confirms no bare `python scripts/` ritual invocation remains in either file.
+notes: |
+  Groomed 2026-07-15 from the 2026-07-14 IDEAS line. Re-verified live this session: bare `python scripts/render_design_doc.py` fails outside the venv (ModuleNotFoundError: drydocs); `poetry run python` succeeds. EXECUTION CAUTION: CLAUDE.md carried uncommitted user edits in the working tree at groom time — coordinate before committing so the fix doesn't sweep unrelated changes. DONE 2026-07-19 (main session, direct): all four render invocations now `poetry run python scripts/...` (CLAUDE.md ritual step 3 x2; snapshot.ps1 lines 28/42). The groom-time caution was moot — tree was clean at execution. snapshot.ps1 verified end-to-end on this machine (board + 6 design docs + depgraph snapshot wrote with meta header; renders came out byte-identical to the committed ones; test snapshot JSON deleted as an artifact). snapshot.ps1's third `& python` (line 81, depgraph CLI) deliberately untouched — it runs in the separate depgraph repo where DryDocs' poetry env does not apply, and the acceptance scopes to the two render invocations. Acceptance grep clean: no bare `python scripts/` remains in either file.

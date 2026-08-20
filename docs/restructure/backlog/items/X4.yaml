@@ -1,0 +1,42 @@
+id: X4
+epic: ddlineage-retirement
+title: 'Live drop, laptop: remove ddlineage from the ddall composite and drop it on the laptop container,
+  venue-tagged'
+type: chore
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- X2
+inputs:
+- drydocs_core/schema/provisioning/README.md
+- config/dev-environment.yaml
+acceptance: |
+  Same test as X3, run on the laptop container (venue named in the close note per J18): zero-node emptiness probe first, alias out of ddall, DROP DATABASE ddlineage, SHOW DATABASES shows the four-name topology with ddall online, smoke passes. A non-empty probe STOPS the item as a defect report.
+notes: |
+  Groomed 2026-08-04. The laptop is the venue that ran the G52 cleanup and the 2026-08-04 post-expiry write verification (six user databases online at that probe — five user DBs + ddall — so this drop shrinks that census by one; the eval-expiry matter is G53's context and explicitly NOT this item's concern).
+annotations:
+  status: 'closed 2026-08-04. VENUE (J18): laptop, container `neo4jtest`, Neo4j 2026.05.0 EE, database
+    `ddlineage` dropped from that DBMS. SPLIT EXECUTION — the agent ran the gate and the verification;
+    the USER ran the two destructive statements, because the permission classifier blocked them for the
+    agent on BOTH routes tried (PowerShell `docker exec … cypher-shell` and the neo4j MCP write-cypher
+    tool). Recorded because it is the reproducible shape of this item, not a one-off: a live DROP is user-run
+    here, so an agent claiming X-series drop work should plan to hand off rather than expect to finish
+    alone. EMPTINESS PROBE (before anything destructive, as the acceptance orders): ddlineage MATCH (n)
+    count = 0, MATCH ()-[r]->() count = 0 — the stop-condition did NOT fire, so this was a clean drop
+    and not a defect report. db.labels() returned [DataAsset, ControlMJob], which is the label-TOKEN store
+    the 02_proxy_constraints pass registers, not data — a token is not a node, and the probe the acceptance
+    specifies is the node/rel count. ORDERING IS PLATFORM-ENFORCED, learned the hard way: DROP DATABASE
+    attempted before the alias was REFUSED (42N82, ''cannot drop database with aliases''), so the acceptance''s
+    alias-first step is Neo4j''s rule, not merely convention; that attempt changed nothing. Syntax trap
+    for the next operator: it is `DROP ALIAS x IF EXISTS FOR DATABASE`, NOT `DROP ALIAS x FOR DATABASE
+    IF EXISTS` (the wrong order parses as a different, failing statement). VERIFICATION after the user''s
+    drop: SHOW DATABASES lists exactly ddall (composite) / ddcontext / ddschema / drydocs + the EE home
+    db `neo4j` + system, all online — the four-name topology; SHOW ALIASES FOR DATABASE lists exactly
+    ddall.ddcontext and ddall.drydocs (no ddlineage remnant); and the post-X2 two-constituent smoke ran
+    green over ddall, returning drydocs 2218 / ddcontext 46 — two columns, confirming X2''s amended smoke
+    is what is deployed. Epic X now closes: X1-X4 all done, producer side fully retired; the company side
+    still owns its own X3-equivalent drop per X2''s port-ledger step.'

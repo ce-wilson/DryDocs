@@ -1,0 +1,22 @@
+id: D5
+epic: config-loaders
+title: Harden Neo4jClient.run_script against APOC's comment-';' statement split (Cypher 25 rejects the
+  empty fragment)
+type: bug
+module: drydocs-core
+phase: 3
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/neo4j_client.py
+- drydocs/loaders/base.py
+- drydocs_core/schema/
+acceptance: |
+  run_script no longer hands the raw script to apoc.cypher.runMany: it splits statements CLIENT-SIDE with a comment/string-aware scanner (generalize base.py::_code_semicolons into one shared helper — split points, not just a count) and executes per-statement, preserving the DDL+DML-in-one-file behavior the docstring promises. A unit test (duck-typed client, no live DB) proves a script containing an end-of-line ';' inside a // comment plus a trailing ';' yields no empty statement and every real statement exactly once; the loaders' run()/runMany dispatch keeps its existing guard tests. The protective wording added to ontology_supplement.cypher (8478204) may then be relaxed to a plain comment. Full suite green.
+notes: |
+  Groomed 2026-07-15 pm from the same-day inbox bug. Seen live: the first EE-container bootstrap (Neo4j 2026.05.0 / Cypher 25) failed apply-ontology-supplement because runMany splits on every end-of-line ';' including inside // comments, and the new server rejects the comment-only fragment as an empty statement ("CYPHER 25" + nothing) — 5.x tolerated it. One-line comment reword shipped on main (8478204) as the unblock; THIS item is the class fix so supplement/schema files can't re-trip it. DONE 2026-07-18: drydocs_core/cypher_split.py — the ONE shared comment/string-aware scanner (split points + count + has_code + split_statements); run_script now splits CLIENT-SIDE and executes per-statement in auto-commit transactions (DDL+DML-in-one- file preserved; the APOC runMany dependency dropped from run_script entirely, so a comment ';' can never shear again and comment-only fragments never reach the server); base.py imports the shared count (private alias kept — tested surface); ontology_supplement.cypher protective wording relaxed to a plain note. tests/unit/test_cypher_split.py covers the acceptance script shape incl. the duck-typed-driver run_script proof; existing dispatch guards untouched. Suite 707.
+annotations:
+  status: DONE 2026-07-18 (main fable session, D5-D7 batch)

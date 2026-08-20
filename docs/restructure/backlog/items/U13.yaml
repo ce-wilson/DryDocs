@@ -1,0 +1,21 @@
+id: U13
+epic: self-documentation
+title: Review-plan seed queries ignore D7 tombstones — every query pack filters removed_from_source_at,
+  or says why it wants the dead
+type: bug
+module: docs
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: done
+closed: 2026-08-04
+depends_on: []
+inputs:
+- docs/reviews/code-graph-review-plan.md
+- .claude/skills/tech-debt/SKILL.md
+- drydocs/loaders/code_snapshot.py
+acceptance: |
+  Every seed query in docs/reviews/code-graph-review-plan.md (and the A1-A6 pack the tech-debt skill copied from it at U4) either filters `removed_from_source_at IS NULL` or carries a one-line note saying why tombstones belong in that answer. The demonstrated defect is the proof case: re-running the A3 fan-in ranking against the current snapshot no longer ranks the DEAD drydocs_core/controlm/__init__.py (tombstoned by S2's move to orchestration/controlm/) in the results. No graph or loader change — the D7 sweep is working; only the query text is wrong.
+notes: |
+  Groomed 2026-08-04 from the 2026-08-02 [bug] inbox line, demonstrated live: the unfiltered A3 query ranked the dead __init__.py at #6 with fan-in 13, one slot below its live replacement at 14 (graph: 1465 :CodeModule, 1457 live). The tombstones only became big enough to change an answer after U9's whole-tree scan + S2's package move landed in the same week. CLOSED 2026-08-04 (desktop, batch with U14 — one edit to the shared pack). Every seed query now filters removed_from_source_at IS NULL or says why the dead belong: tech-debt A1-A6 all filtered (both ends where two nodes anchor); the plan's table carries the filters + a standing-rules preamble; Phase 2 units 1-2 are the "why the dead belong" cases and now say so (unit 1 RETURNS the tombstone stamp to split existed-then-removed from never-existed; unit 2 queries IS NOT NULL deliberately); the groom-backlog skill's census + close-note checks got the same treatment (in-scope: U4 built them from the same plan). PROOF CASE DISCHARGED WITH A FINDING: the acceptance's A3 re-run shows NO dead module — but not only because of the filter. The 2026-08-03 manual Neo4j wipe (G51 session) rebuilt the graph with ZERO tombstones (census 1467/1467 live, probed after a fresh load), so the demonstrated defect's specific tombstone no longer exists anywhere. The filter is still right — tombstones re-accumulate with every load after a move or delete — and the skill's rule notes the post-wipe zero honestly so nobody reads an empty tombstone census as the filter being unnecessary. No graph or loader change, exactly as scoped.

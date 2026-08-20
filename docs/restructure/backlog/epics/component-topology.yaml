@@ -1,0 +1,65 @@
+id: component-topology
+letter: G
+title: Modular architecture / component topology
+order: 6
+groom_log:
+- date: '2026-06-26'
+  note: |-
+    ── Epic G — Modular architecture / component topology (main + ADR 0002) ───
+    Groomed 2026-06-26 from ADR 0002 follow-ups 1–6 (docs/decisions/0002-*.md), accepted
+    via the SME gate (config/gate-log.md, 2026-06-26). Edition = Neo4j Enterprise (committed).
+  attached_at: G1
+- date: '2026-07-16'
+  note: |-
+    (G12/G13 groomed 2026-07-16 — the two pre-flip writer build blockers recorded by the
+     2026-07-15 lineage vocab gate + resolved/refined by the 2026-07-16 cmdline-lineage-review.)
+  attached_at: G12
+- date: '2026-07-21'
+  note: ── appended at the 2026-07-21 groom run (weekly-style inbox groom) ───────
+  attached_at: G17
+- date: '2026-07-21'
+  note: |-
+    ── rua-extract ingest phase (groomed 2026-07-21 from the company-side
+       collector run + PuTTY readout; mechanism-only — real host/user values
+       stay company-side / internal-local) ──────────────────────────────────
+  attached_at: G18
+- date: '2026-07-22'
+  note: |-
+    ── appended at the 2026-07-22 groom (Backstage catalog assessment T1–T8;
+       source = UI-WIP/backstage-catalog-assessment.md — the shallow clone was
+       deleted the same day, the assessment doc is the durable record) ────────
+  attached_at: G27
+- date: '2026-07-26'
+  note: |-
+    ── appended at the 2026-07-26 groom run (docs-residency design session) ───
+    The topology half of that session. G32 is the ruling; G31 is the prerequisite
+    every corpus move depends on; G33 is independent and startable now.
+  attached_at: G31
+- date: '2026-07-28'
+  note: |-
+    ---- 2026-07-28 pm groom (epic close-out run): Snowflake data-catalog seam
+    (G42-G44, from docs/generic-snowflake-data-catalog-ingestion-plan.md) +
+    fresh 07-28 inbox findings (L18/L19/D8/J17). U5 executed in-run. ----
+  attached_at: G42
+- date: '2026-07-28'
+  note: |-
+    --- 2026-07-28 evening groom (post-rebase): the rua listing fallback (G45),
+    --- the K4-comment scope fix (C20), the render-entry-point fold part 2
+    --- (J20), and the agent-runtime alignment chores (R10). R3 gained the
+    --- caller-identity merge in place.
+  attached_at: G45
+- date: '2026-07-31'
+  note: |-
+    ── Epic W — FCDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
+    Groomed 2026-07-31 from the FCDO capture (internal/fcdo-reference/, 8abc05f)
+    and its ALIGNMENT-PLAN.md: align producer ontology to the internal governance
+    group's firmwide frameworks ON PLANNED ITEMS ONLY (user rule: don't add what
+    we won't use). Every confirmation routes through the SME gate; the plan's
+    explicit skip list is BINDING (Business Processes, mapping path expressions,
+    SHACL artifacts, JDI producer-side, FIBO, Data Authority classes, telemetry,
+    naming renames). The live-scrape [source] line stays parked in IDEAS.md —
+    company-side connector work, not producer-actionable.
+  attached_at: G58
+- date: '2026-08-12'
+  note: ── 2026-08-12 targeted groom (Idea-112 / Idea-113 / Idea-114) ──────────────
+  attached_at: G92

@@ -1,0 +1,22 @@
+id: O51
+epic: web-console
+title: 'Reviewer-quality signals + admin block: auto-accept / too-fast / admin-return rates over a rolling
+  window, limits flag, admin blocks'
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O46
+- O50
+inputs:
+- UI-WIP/sme-intake-page-plan.md
+- config/
+- web/src/routes/AdminConfigRoute.tsx
+acceptance: |
+  Per-SME quality signals derive from intake records the store already holds — no new data entry: submissions in a rolling window, auto-accept rate (agent candidates accepted with zero modification), too-fast rate (confirm faster than a floor scaled to evidence size), and admin-return rate. Limits live in config/review-quality.yaml (admin-editable via the AdminConfig surface, versioned, unit-guarded). Crossing a limit FLAGS the SME on the admin queue's quality rail with the metric that tripped (Meter + StatusChip); the ADMIN — never the machine — can block the persona from submitting: drafts survive, the block records who/when/why, and unblock requires a note. No auto-block exists in any code path. The admin-only per-user panel (submissions, auto-accept rate, return rate, median review time) uses the StatTiles/Meter patterns. The store keeps PER-DECISION detail (accepted/modified fields, durations), not just rollups — the future confirmation-weight trust model needs it.
+notes: |
+  Slice 7 (plan §8). User requirement 2026-08-06: recalled as a backlog item ranking auto-acceptance from a QA-testing session — searched backlog/IDEAS/gates/git history, never captured (closest neighbors: R8 answer-evaluation, FB-04 agent test), so the intake plan §8 + this item are now the requirement's home. Measure-then-decide posture throughout: thresholds are tripwires, the human is the judge.

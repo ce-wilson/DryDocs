@@ -1,0 +1,19 @@
+id: P5
+epic: runtime-topology
+title: 'Maintenance-window query: best patch window for a host or host group'
+type: requirement
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- P3
+- P4
+inputs:
+- config/gate-prompts/controlm-hosts-topology.yaml
+acceptance: |
+  Given a host (nodeid) or group name, a committed query/utility returns every job that can land on it (2-hop group + 1-hop hard-coded) with normalized folder windows and the computed quiet window(s); window math is critical-path based, never a path sum (the standing TDQ-ETA rule); demonstrated against sample data with the NODE_GROUP↔RUNS_ON cross-validation reported as a metadata-findings list (remediation feeder).
+notes: |
+  CLOSED 2026-07-28 (worktree p5-main) — EPIC P COMPLETE 5/5. Built: drydocs/loaders/patch_window.py + committed READ-ONLY cypher/patch_window.cypher (named sections, every anchor O33-guarded; the writing pass remains runs_on_resolution) + `drydocs patch-window --host|--group [--json]`. Busy time = interval UNION on the wrapping 24h clock — the critical-path extent, never a sum (test_union_never_a_sum pins two chained 2h jobs overlapping 1h = 3h busy, not 4h). Placement order: job avg_start_time/avg_run_time -> folder window_start/window_end -> NO_TIMING_DATA finding; runtime outliers >= 24h (the gate's P3c junk class) are excluded AND flagged so one bad stat can never silently declare the whole clock busy. Findings vocabulary: no_timing_data / unparseable_timing / runtime_outlier / hardcoded_bypass / intent_without_edge / stale_edge / multi_dc_group. LIVE (desktop, neo4jtest, drydocs DB — machine named per the VERIFIED-LIVE inbox lesson): bundled samples re-ingested reproducing the P3 close-note coverage exactly (9 host_group / 7 agent_host / 1 UNMATCHED); group grp-auto = 4 pinned jobs, each doubling as a hardcoded_bypass finding; host host-hldm-02 = 12 jobs across BOTH paths (3 direct + 9 via the host-hldm-01 group). The P4 timing supplement is company-side only (note 15043cd), so live rows place 0 jobs — the report says so loudly (whole-day quiet + CAVEAT + per-job findings = the remediation feeder in action); the math clauses are pinned by 19 unit tests. Full unit suite green (1070 pre-existing + 19 new); import + CLI help clean.

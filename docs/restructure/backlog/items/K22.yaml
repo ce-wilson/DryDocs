@@ -1,0 +1,23 @@
+id: K22
+epic: seal-attribution
+title: Capture the Deployment Module CI class -- the identifier the source carries and we discard -- without
+  moving attribution off the application
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- knowledge/upgrade-plans/servicenow-replica-evidence.md
+- docs/restructure/03-hitl-sme-flow.md
+- docs/RELATIONSHIP_GUIDE.md
+- drydocs_core/ontology/relationship_vocabulary/
+- config/taxonomy-ontology-map/
+- config/gate-prompts/
+acceptance: |
+  A PROPOSAL registered status: planned and routed VIA THE GATE as a rider on an existing SEAL/CI gate -- not a gate of its own, because nothing here changes an attribution subject. Nothing is loaded, no vocabulary entry is flipped active, and if the gate does not sit, the drafted rider IS the deliverable. It carries five things, in this order. (1) WHAT IS ALREADY RULED AND IS NOT REOPENED: one application, many deployments is correct (SME-confirmed), and everything DryDocs maps is off the APPLICATION -- so :BusinessApplication stays the attribution subject and seal-tom-attribution-reshape's subject does NOT move. This item captures an identifier the source carries and we discard; it does not re-home attribution. (2) THE KEY, which is why the item exists at all: each Deployment Module CI carries its OWN unique CI id, so the CI id is the business key and app_id(seal_id):deployment_id is a HUMAN-READABLE NAME. A loader keying on a bare deployment_id MERGEs distinct deployments together -- the identity gate's D2/C3 failure on a new axis -- so the proposal states the key explicitly and refuses the composite-name-as-key reading. (3) THE CI TOPOLOGY as the SME gave it: Business Application [Instantiates] Deployment Module, inverse [Instance of], and above it [Contained by] area product. "Deployment" and "module" are ONE thing. (4) THE LABEL: adopt the CONCEPT and pick our own stable name -- C10's standing advice, proven twice on this instance, since the vendor's own class label moved (Application Service -> Service Instance at Yokohama) and this instance's inverse label ([Instance of]) already differs from the one the public material uses ([Instantiated by]). (5) THE CORRECTION IT MUST CARRY rather than quietly drop: the module reference being a form default applies to TRANSACTIONAL records -- a Change, an Incident or a KB article must name a deployment module and people accept the default. The CI itself is real, with its own id, its own place in the chain and KB articles attached. So the grain is sound, and only the COUNTING OF TRANSACTIONS PER MODULE is not.
+notes: |
+  Groomed 2026-08-11 from Idea-102; the same entry's register-line finding was MERGED into G70 in this pass, and its KB-article thread became K23. The evidence and open questions 8 and 9 live in knowledge/upgrade-plans/servicenow-replica-evidence.md (K21). WHY THE ITEM IS SMALL: the expensive reading was the plausible one. K21 found u_seal_deployment_id sitting beside u_seal_application_id on the CSDM Application Service row and never on cmdb_ci_business_app, which is exactly the shape of this repo's past grain corrections (K1/K2, and the 2026-07-22 move of SEAL attribution from job level to the folder->batch :Port) -- and it read that way for about an hour. The SME's caveat is what shrank it, and the caveat is the more valuable half. The earlier reading of section G15 -- that it needed no grain -- would have discarded a real CI class on the strength of a defaulted foreign key, which is why (5) is written into the acceptance rather than left in a note.

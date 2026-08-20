@@ -1,0 +1,23 @@
+id: O57
+epic: web-console
+title: 'A console page for the load map: the pipeline sources, systems, retired ids and load sequence
+  in load-map.json that no web/ surface reads'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/generated/load-map.json
+- scripts/render_load_map.py
+- docs/plan/load-map.html
+- web/src/modules/registry.ts
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  A console route renders the part of web/src/generated/load-map.json that no web/ code reads today: the 28 non-doc-corpus `sources` rows (kinds table, view, file, report, api, query — with home, system, origin, authority, classification, confirmed, ledger, taxonomy_captures, ontology_mappings and loaders), the 15 `systems`, the 17 `retired` ids and the 17 `sequence` steps with their `ad_hoc_commands`. The two defect lists the JSON already carries — `sourceless_loaders` and `map_entries_without_registry_source` — RENDER AS DEFECTS rather than being dropped, since a surface that silently omits the known-broken rows is worse than no surface. The page reads the committed JSON only and never re-derives from the registries, so it cannot disagree with docs/plan/load-map.html; it does NOT replace that page, which is N5's print/PDF surface for the SME loop and keeps its own audience. Registered in web/src/modules/registry.ts with an access designation and a stated reason, ui-components.yaml + ui-tests.yaml rows with their coverage pins moved, and a test asserting the rendered row counts against the JSON so a new registry entry cannot silently fall off the page. `npm run build` and oxlint clean.
+notes: |
+  Groomed 2026-08-07 from the Q16 session. THE GAP, stated precisely: N4 generated load-map.json for web/ and N5 then chose docs/plan/load-map.html — a rendered page, not a console route — so the JSON's console consumer was never scoped by any item. The /software page (O56) is the first web/ code to import load-map.json at all, and it deliberately filters to the 7 `doc-corpus` rows, which leaves the other 28 sources plus systems, retired and sequence unconsumed. Module drydocs-web / epic web-console / phase 12 by the O54 precedent: file the item by the SURFACE it delivers, not by where the data it reads is produced. Deliberately NOT specified here: which module id and access level it takes, and whether it is a new nav module or a tab under /loads. Both are page-design calls that belong with the person building it, and the acceptance forces the decision to be recorded rather than defaulted.

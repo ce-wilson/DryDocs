@@ -1,0 +1,19 @@
+id: H6
+epic: drydocs-review-backflow
+title: Close the module-boundary blind spot (default-deny)
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- H1
+inputs:
+- tests/unit/test_module_boundary.py
+- MODULE_MAP.md
+acceptance: |
+  Boundary guard closes the blind spot: (a) a `review` COMPONENT_GROUP added to test_module_boundary.py + MODULE_MAP.md rows for the landed drydocs-review modules; (b) a new default-deny test asserts every scanned .py resolves to exactly one bucket (core or a component group), failing with the list of stragglers, exempting package __init__.py. Passes on producer today (only drydocs/__init__.py unclassified). Track-1 stays green.
+notes: |
+  Done 2026-07-01. review group = (graph_verify, review_labels); test_every_module_is_classified added (default-deny, flags UNCLASSIFIED + AMBIGUOUS). MODULE_MAP.md rows + note added. Boundary guard 3 passed; Track-1 92 passed / 0 failed. graph_review (H2) / publishing (H5) get added to the review group when they land — the default-deny test now FORCES that.

@@ -1,0 +1,19 @@
+id: U5
+epic: self-documentation
+title: 'OPTIONAL: add an optional graph cross-check subsection to the groom-backlog skill'
+type: chore
+module: docs
+phase: 16
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on:
+- U2
+inputs:
+- .claude/skills/groom-backlog/SKILL.md
+- docs/reviews/code-graph-review-plan.md
+acceptance: |
+  The groom-backlog skill gains a short "graph cross-check (optional, needs Neo4j)" subsection in its mechanics: (a) sanity-check an item's module: against the graph census, (b) verify close_note file claims before flipping done — both marked EXPLICITLY optional so a groom with no database running is never blocked. The skill's validator/test flow is unchanged.
+notes: |
+  Gated on U2 (same earn-their-keep condition). The groom itself stays offline-first — grooming is yaml transcription; the graph only validates. CLOSED 2026-07-28 (executed inside the epic-close-out groom run — the last open Epic U item, Epic U now 6/6): SKILL.md gains the "Graph cross-check (optional, needs Neo4j)" section with exactly the two checks (module-census sanity, close-note file-claim spot-check), both explicitly optional/skip-silently, offline flow and validator untouched.

@@ -1,0 +1,23 @@
+id: G59
+epic: component-topology
+title: apply-supplements must not silently skip a supplement file that exists on disk
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/supplements.py
+- tests/unit/test_supplements.py
+acceptance: |
+  A guard fails when a supplement file present in the schema directory is absent from the ordered chain, so a locally added supplement cannot be quietly omitted; a deliberate exclusion stays expressible and carries a written reason (the SCHEDULED_INGEST_EXCLUSIONS idiom), and the failure names the omitted file rather than reporting a count. The guard is portable — it must hold in a consumer repo whose chain carries supplements the producer does not have.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-52. The company runs two supplements the producer does not (Control-M quantitative resource pools, which feeds controlm_quantitatives; and the superseded platforms supplement, T12) — verified 2026-08-04 as genuinely company-local, not producer staleness. If they adopt apply-supplements as their one chain without adding those to their own list, resource-pools is omitted and whatever MATCHes its terms goes quiet, which is exactly how the pre-G29 three-verb block left load-software-registry MATCHing terms nothing had seeded. This guard catches the class on either side, which is why it is worth building producer-side.
+annotations:
+  status: '2026-08-07 pm (desktop): CHAIN_EXCLUSIONS + unchained_supplement_files() in drydocs_core/schema/supplements.py
+    (discovery lives with the registry so a consumer chain guards itself); 3 guards in tests/unit/test_supplements.py
+    — silent-omission fails BY NAME (tmp-dir proof), exclusion hygiene (exists / not-chained / written
+    reason). Suite green minus the two standing J33 ANSI fails'

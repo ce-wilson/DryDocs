@@ -1,0 +1,21 @@
+id: U25
+epic: self-documentation
+title: 'Debt metrics have no machine-readable history, so ''is it getting better'' is unanswerable: snapshot.ps1
+  appends one metrics row per run'
+type: chore
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- knowledge/depgraph-snapshots/README.md
+- .claude/skills/tech-debt/SKILL.md
+- tests/unit/test_render_determinism.py
+acceptance: |
+  (a) ONE APPEND-ONLY ROW PER RUN in a metrics JSONL beside the snapshot the run just wrote, carrying at minimum: date, git commit, the A3 top module and its count, the A4 package plus first-party counts, the A5 count, and the live IMPORTS edge count. (b) U12 STAYS INTACT AND IS SAID SO IN WRITING: newest-only snapshot retention is unchanged and the ledger is never pruned by the retention sweep -- a metrics ledger is not a retained snapshot. The README states that beside the retention rule, so a later reader does not "tidy" the ledger under U12's own ruling. (c) BORN WITH AN EXPLICIT LF NEWLINE (Idea-121's standing instruction) and CR-free. This item RULES whether the ledger is a COMMITTED surface or gitignored, with the reason recorded: if committed, its writer joins the declared writer tuple in tests/unit/test_render_determinism.py, because that list is declared and never swept. (d) A RUN WITH NO DATABASE writes the row it can write, or skips cleanly and says so -- never a half-row of zeros presented as a measurement, and never a blocked snapshot. (e) THE PAYOFF IS THE CONSUMER: the /tech-debt skill's A3/A4/A5 sections read the previous row and report the DELTA instead of re-deriving prose.
+notes: |
+  Groomed 2026-08-19 from Idea-120. WHY IT EARNS AN ITEM rather than a shrug: the hand-typed prose has been wrong twice in the direction that HIDES work -- drydocs_api at the U2 census, then drydocs_docmeta invisible to A3/A4/A5 for five days after d647171 -- and on 2026-08-13 it blocked attribution of an A5 move from 29 to 31 because no prior snapshot existed on disk to diff against. Newest-only retention is right for snapshots and is the direct cause of that gap; a ledger closes it without reopening U12. Module/phase/epic follow U7/U12/U15. Pairs with Idea-119, whose +2 this would have explained at the time it was noticed.

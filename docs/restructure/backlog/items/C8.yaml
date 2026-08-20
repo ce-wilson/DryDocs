@@ -1,0 +1,20 @@
+id: C8
+epic: ontology-mapping
+title: 'Resolve schema_graph.cypher staleness: regenerate from the vocabulary + drift guard, or mark point-in-time'
+type: chore
+module: ontology
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- drydocs_core/schema/schema_graph.cypher
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- git-readme.md
+- docs/port-prompt.md
+acceptance: |
+  EITHER schema_graph.cypher is regenerated from relationship_vocabulary.yaml (the absent docs_* edges, m3_runs_on_*, seal_requires_scheduler, and the ACTIVE m3_seal_app_ref all present) with a test-enforced drift guard so it cannot silently stale again, OR it carries an explicit point-in-time banner (generated 2026-06-09) and every reference implying "regenerate when the vocabulary changes" (git-readme.md, docs/port-prompt.md, the file's own header) is reconciled to the chosen stance; which branch was taken is recorded in these notes. Presentation/ hygiene only — no edge meaning changes, no gate needed (the vocabulary is the confirmed source; this file is a derived view). Full suite green.
+notes: |
+  Groomed 2026-07-15 from the 2026-07-14 IDEAS line (found during the K2 build: generated 2026-06-09, the vocabulary has moved on, no drift guard covers it). The either/or is deliberately in the acceptance — decide at execution. DONE 2026-07-19 (general-purpose subagent, reviewed in-session): REGENERATE branch taken — file is pure derived view, nothing hand-authored. New deterministic renderer drydocs_core/ontology/schema_graph.py + scripts/render_schema_graph.py (render_board idiom) + byte-match drift guard tests/unit/test_schema_graph.py (7 tests). Inclusion rule: active+planned render (status on edge), deprecated/removed excluded; pipe-union endpoints fan out; wildcard from_node uses fixed exemplars. All acceptance edges present incl. ACTIVE m3_seal_app_ref. Not executed by bootstrap (manual Browser apply only — verified). git-readme/port-prompt refs left: historical port records, not policy claims (reconcile clause belongs to the untaken banner branch). Suite 728.

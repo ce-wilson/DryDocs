@@ -1,0 +1,18 @@
+id: J33
+epic: release-infrastructure
+title: Three CLI guard tests assert plain substrings against rich-colored output and fail on this desktop
+type: bug
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_supplements.py
+- tests/unit/test_bootstrap_guard.py
+acceptance: |
+  The three tests named in Idea-83 (test_supplements chain-order + unknown-name, test_bootstrap_guard declared-count) pass on the desktop where rich interleaves ANSI codes into captured CLI output — fixed by stripping ANSI in the assertions or forcing a non-terminal console under pytest, NEVER by loosening the asserted messages; a sweep finds any other test asserting substrings against rich-rendered output and applies the same treatment.
+notes: |
+  Groomed 2026-08-07 from Idea-83. Fails under both `python -m pytest` and `poetry run pytest`, on a stashed clean tree, NO_COLOR=1 inert — a rich/typer console-detection difference on this desktop. The three failures have ridden every suite run since 2026-08-07 as "standing Idea-83 failures"; this item retires that caveat.

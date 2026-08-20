@@ -1,0 +1,18 @@
+id: sme-runbooks
+letter: V
+title: SME runbooks per module
+order: 20
+groom_log:
+- date: '2026-07-29'
+  note: |-
+    ── Epic V — SME runbooks per module (main) — Phase 10 ─────────────────────
+    Groomed 2026-07-29 (user directive, chat): "create a SME-Runbook for each
+    module." Runbooks are the Epic L governed-doc class (runbook.outline.yaml,
+    test_doc_outline auto-sweep, deterministic render, L5/L6 feedback loop) —
+    this epic makes coverage PER MODULE a rule rather than an accident. Five
+    runbooks already exist (startup-refresh, web-console, mapping-store,
+    mapping-demo, lineage-mac, cmdline-resolution) but they are chain- or
+    system-scoped; V1 maps them onto the modules registry and the per-module
+    items fill the gaps. Pending-list idiom reused from N2's LEDGER_PENDING
+    (frozen, shrink-only) so the guard ships day one without lying.
+  attached_at: V1

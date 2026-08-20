@@ -1,0 +1,23 @@
+id: G44
+epic: component-topology
+title: 'Data-catalog gate prompt + proposed ontology entries: the dcat dataset/distribution ruling (one
+  node or two), second-authority unification, attribution-edge family, contact-point fold-in'
+type: task
+module: ontology
+phase: 6
+agent: ontology-mapper
+model: fable
+priority: p2
+status: done
+depends_on:
+- G43
+inputs:
+- docs/generic-snowflake-data-catalog-ingestion-plan.md
+- config/gate-prompts/email-dl-contact-point.yaml
+- drydocs_core/ontology/relationship_vocabulary/
+acceptance: |
+  config/gate-prompts/snowflake-data-catalog.yaml drafts the plan section 5 rulings as confirmations to be signed, never pre-decided: (a) logical dataset + physical distribution = one DataAsset with placement properties (G41 pattern) vs Dataset/Distribution nodes with HAS_DISTRIBUTION (dcat:distribution); (b) authority2/null-origin unification with DPL GUIDs default-NO pending ruling; (c) the producedby attribution edge family + precedence vs STG_APP_FACT; (d) contact email folds into the email-dl-contact-point gate, no parallel concept; (e) lifecycle/event views explicitly deferred to layer 4; (f) publisher org mapping = property now. Any taxonomy-ontology-map entries land status: proposed only. NOTHING loads before sign-off; the loader item stays ungroomed until the gate rules.
+notes: |
+  fable per the matrix — the draft frames an ontology boundary (the J14 precedent: the boundary decision rides in the item). Cross-check numbers from G43 are the gate's evidence pack, hence the dependency.
+annotations:
+  status: done 2026-08-12 (desktop), same session as the claim

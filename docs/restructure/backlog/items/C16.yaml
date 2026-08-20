@@ -1,0 +1,19 @@
+id: C16
+epic: ontology-mapping
+title: Description-field metadata standard gains key-prefix governance (reserved core prefix; system-owned
+  prefixes; unprefixed = team-local)
+type: chore
+module: docs
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- knowledge/standards/technology/description-field-metadata-plan.md
+- UI-WIP/backstage-catalog-assessment.md
+acceptance: |
+  The description-field metadata plan's template phase includes a key-governance section modeled on annotation-naming governance: a reserved drydocs prefix for keys the template/graph owns; keys owned by external systems carry that system's prefix (the scim / jira / seal families); a bare unprefixed key is team-local and never load-bearing for ingestion; the plan's validation phase states it will enforce these rules. Doc-only — no loader or template build lands from this item.
+notes: |
+  Groomed 2026-07-22 from assessment T7 (Backstage annotation/label key governance). Chore on the standards doc; the 3-phase plan itself stays PLANNED and un-groomed until activated. Epic ontology-mapping = closest governance home (naming-standard vocabulary), module docs — recorded here per the ask-only-when-ambiguous rule. CLOSED 2026-07-28: Phase 1 gains the key-prefix governance subsection (drydocs. reserved core; scim./jira./seal. + observed snow./mfts. system families; unprefixed = team-local, never load-bearing) with a grandfathering/migration note for the observed unprefixed inventory; Phase 2 states the enforcement rules (unregistered drydocs.*, bad system-value format, loader keying on unprefixed = findings; team-local keys informational only). Doc-only per acceptance — no loader or template build; the plan stays PLANNED until ratified.

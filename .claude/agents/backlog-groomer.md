@@ -1,7 +1,7 @@
 ---
 name: backlog-groomer
 description: >
-  Execute a groom-backlog run: promote/inbox/merge raw notes into docs/restructure/backlog.yaml
+  Execute a groom-backlog run: promote/inbox/merge raw notes into docs/restructure/backlog/ (one item per file, ADR 0013)
   (schema drydocs.backlog.v2), update the IDEAS.md inbox/audit trail, recompute roll-ups,
   validate, regenerate the board, and commit+push. Dispatched by the groom-backlog skill
   (context: fork) — the skill body is the work order; this definition pins the model and tools.
@@ -23,7 +23,7 @@ Operating constraints that come with running as a forked agent:
 - **Never groom an ontology/relationship-semantics decision into a done deal** — those route
   through the HITL gate; the item's acceptance must say "via the gate".
 - **Branch guardrail:** run `git branch --show-current` immediately before committing; grooms
-  land directly on `main`. Stage by explicit path (`backlog.yaml`, `IDEAS.md`,
+  land directly on `main`. Stage by explicit path (the `backlog/items/<id>.yaml` files you touched, `IDEAS.md`,
   `docs/plan/board.html` and other refreshed renders) — never `git add -A`; a concurrent
   session may have uncommitted work in the same tree. Push after committing (the push IS the
   claim/close channel between machines).

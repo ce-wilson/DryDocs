@@ -1,0 +1,27 @@
+id: J15
+epic: release-infrastructure
+title: Boundary guard test — grep the publishable tree for the VALUE shapes real ids take and fail on
+  any id outside the reserved synthetic block (70001-70099)
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: done
+closed: 2026-07-27
+close_note: |
+  BUILT: tests/unit/test_publish_boundary_values.py — three scans over the git-tracked publishable tree (bare 5-6 digit ids in taxonomy/samples/ knowledge; folder-name-parser numeric segments EVERYWHERE — the historical miss class; %%SEAL-paired values in tests), block 70001-70099 or allowlist-with-reason, no real values embedded in the test. Building it forced 14 resweeps (values now internal-side only): the two flagged folder-name ids (unknown realness, treated real), a %%SEAL value + a FID triplet + an RFID + a job-name segment CONFIRMED real against the untracked production extract, five authored pre-block strays, and the PAT sample's out-of-block seal_ids. Real↔synthetic key rows recorded in the internal/standards twin. Recorded ruling (SME may flip): 6-digit Control-M surrogate folder TABLE KEYS stay, allowlisted.
+depends_on:
+- J14
+inputs:
+- tests/unit/test_classification.py
+- config/classification.yaml
+- PUBLISH-BOUNDARY.md
+- drydocs/data/samples/
+- config/taxonomy/
+- drydocs_core/controlm/folder_name.py
+acceptance: |
+  A unit test in the classification/boundary family scans the publishable tree (everything outside internal/ and gitignored paths) for the shapes real identifiers take — bare 5-6 digit ids in taxonomy/sample/knowledge files, and the numeric segment of any string the folder-name parser decomposes — and FAILS when a value falls outside the reserved synthetic block (70001-70099), unless the specific file+value is allowlisted with a recorded reason. It must catch the historical miss: a SEALID embedded inside a Control-M folder-name string (PRARAG-HLDM-<id>-...) that no grep for the field name `seal_id` can see. Runs in the default suite with no live services; green on the tree as left by J14.
+notes: |
+  Lesson entry 2026-07-27: two sweeps (9d59f53 and the 2026-07-27 one) failed the same way — they searched for the FIELD, not the VALUE, so real ids survived for months inside folder-name strings. Same failure family as the "succeeds loudly, does nothing" session through-line, and the same conclusion as the identity gate's §F2 / the Unity Catalog takeaway: a convention violated twice needs an enforcement point or it rots. depends_on J14 because the test is red today on the two files J14 relocates — landing it first would just document the breach in CI.

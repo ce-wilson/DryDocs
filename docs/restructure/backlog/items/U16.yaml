@@ -1,0 +1,20 @@
+id: U16
+epic: self-documentation
+title: 'Size the trade: bring the depgraph SCANNER in-house, or keep the sibling repo and the wrapper
+  that has grown around it'
+type: task
+module: docs
+phase: 16
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- knowledge/depgraph-snapshots/README.md
+- docs/decisions/0002-c-depgraph-lineage-rehome.md
+acceptance: |
+  A decision record lands PROPOSED in docs/decisions/ — never accepted from a groom; the user rules this — sizing both options with numbers rather than adjectives: what vendoring the scanner into the repo (drydocs_core/codegraph or a pinned package) costs in files, tests and lock changes; which depgraph surfaces DryDocs does not use and would inherit or drop; and what the status quo costs, which today is THREE producer-side post-processing steps wrapped around the sibling tool (U7's capability probe, U8's abs_path strip, U9's git-ignore filter), none of which could live upstream because each encodes something about THIS repo rather than about scanning. The record states a recommendation and the trigger that should force the call (a fourth wrapper step), and addresses the ADR 0002-C "absorb the assets, not the tool" precedent rather than ignoring it.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-42, whose own words are "a real trade, not a cleanup — size it before committing": this item SIZES and recommends, the user decides. Fable because it moves a component boundary. Precondition already satisfied — the depgraph fork is consolidated (depgraph 5006567, one branch), so there is a single revision to vendor from. Related but distinct: U15 fixes the dirty-flag defect that the split instrument makes easy to hit, and U7's 105-edge undercount is the defect class the in-housing argument is built on.

@@ -1,0 +1,21 @@
+id: R16
+epic: agentic-qa
+title: 'Named agent verbs over the reviewed QuerySpecs: impact, context and trace as purpose-built tools
+  instead of raw Cypher against the generic MCP server'
+type: task
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/gitnexus-depgraph-comparison.md
+- drydocs_api/
+- .mcp.json
+- agents/graph_qa/
+acceptance: |
+  (a) THREE VERBS, DEFINED AT THE ESTATE's GRAIN rather than a code repo's: `impact` (blast radius over job chains and conditions), `context` (one job / asset / series with its owners, schedule and upstream-downstream neighbours), `trace` (the path between two estate nodes). (b) EACH VERB IS A REVIEWED QuerySpec, never new free Cypher: the verbs are a naming and exposure layer over drydocs_api's existing spec paths, so the read-only guarantee and the every-executed-Cypher-is-exposed property are INHERITED rather than re-implemented. R4's ephemeral session-scoped specs remain the escape hatch for everything the verbs do not cover. (c) The generic neo4j-drydocs MCP server stays available and unchanged for exploration -- this adds a surface, it removes nothing. (d) THE SEAM WITH R15: if R15 has landed, the verbs carry its epistemic field; if it has not, the verbs must not invent a second wording for the same idea -- the field arrives with R15. (e) Tests: each verb's spec is reviewed and read-only, each returns its documented shape, and no verb accepts caller-supplied Cypher.
+notes: |
+  Groomed 2026-08-19 from Idea-125 (R2 of the gitnexus comparison). The review's evidence for it is the whole point: the VERB surface, not the graph, is what makes agents actually use a knowledge graph. Dependency-free deliberately -- it pairs with R15 but does not need it (clause (d) is the seam), and R2 and R4 are both done, so the router and the spec execution paths already exist. Module drydocs-api because the specs and their read-only execution boundary live there; MCP registration is configuration beside it, not a new component.

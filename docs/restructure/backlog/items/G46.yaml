@@ -1,0 +1,20 @@
+id: G46
+epic: component-topology
+title: 'Public command-line resolution API on the shared Control-M resolver: resolve a verbatim CMD_LINE
+  against a job''s variable scope chain, with substitution provenance'
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_core/controlm/resolver.py
+- drydocs_core/controlm/variables.py
+- drydocs/cmdline_staging.py
+acceptance: |
+  drydocs_core/controlm/resolver.py exposes resolve_command_line(layers, cmd_line) -> ResolvedCommandLine: builds the scope environment through the SAME machinery resolve_layers uses (guardrail 1 — one resolver, never a second substitution engine) and resolves the command text through the SAME fixed-point pass, returning resolved text + provenance (names substituted with their binding scope, unresolved user names, external %%\\ refs kept verbatim, canonical {ODATE}-class residue distinguished from failures, depth). Verbatim input is never mutated (guardrail 2 — derived beside, never replacement). Tests cover: a launcher line resolving through folder+job scopes, the %%VAR-launcher case (resolution turns an unparseable launcher ref into a parseable path), runtime tokens as expected residue, an unresolved name staying visible and reported, and the concat delimiter inside a command argument. No graph writes.
+notes: |
+  CLAIMED in_progress 2026-07-29 (pushed-claim discipline, with G47). Groomed 2026-07-29 from the XML-fed cmd-line resolution idea (user direction 2026-07-28 pm). The C3 Phase B resolver already implements AutoEdit semantics for variable DEFINITIONS; this adds the public command-text entry point both paths (Oracle staging, XML export) call, so the G39 store's cmd_line_resolved column gets ONE producer. CLOSED 2026-07-29: resolve_layers refactored over a shared _resolve_scope_chain (returns the final env + each name's LAST binding scope — the walk exists ONCE); _resolve_value_traced adds the substituted-name trace under the unchanged _resolve_value wrapper; resolve_command_line(layers, cmd_line) -> ResolvedCommandLine {raw untouched, resolved, is_fully_resolved, depth, substituted (name, scope) pairs, unresolved, external_refs, canonical_tokens, env variants}. 7 new tests incl. the %%VAR-launcher round-trip (raw hides the launcher; the resolved text parses to executable_path via parse_command) and winning-scope attribution on rebinding. Exported from drydocs_core.controlm. 42 resolver+staging tests green.

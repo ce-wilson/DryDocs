@@ -1,0 +1,28 @@
+id: A4
+epic: reference-hygiene
+title: REGISTRY.yaml points the dcat row at a per-standard README that was never written
+type: chore
+module: reference
+phase: 0
+agent: reference-librarian
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- reference/REGISTRY.yaml
+- reference/standards/README.md
+- reference/standards/dcmi-terms/README.md
+acceptance: |
+  reference/REGISTRY.yaml's dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row's `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
+notes: |
+  Groomed 2026-08-04 (weekly groom); noticed during the M4 build. VERIFIED at the groom: reference/standards/ holds dcmi-terms, dprod-ekgf, prov-o, sosa-ssn, w3c-org and README.md — no dcat directory — while REGISTRY.yaml:88 reads `docs: reference/standards/dcat/README.md`. dcat already has a registry row and a row in the standards README table, so the gap is the per-standard file only. Which resolution is right is the reference-librarian's call at build: write the stub if DCAT is load-bearing for us (dcat:Distribution appears in the company filename-component standard, dcat:contactPoint in the email-DL gate prompt), or re-point the row if it is a cited vocabulary only, like skos. Worth doing inside A1's registry-path audit if that item is picked up first — every `docs:` path in the registry should resolve, and this is the one that does not.
+annotations:
+  status: 'closed 2026-08-07 (desktop, same session as the claim). RESOLUTION (a) — the per-standard page
+    was written, reference/standards/dcat/README.md, because DCAT is LOAD-BEARING here, not decorative:
+    the namespace is registered in namespaces.py and `asset_type: dcat:Dataset` is stamped on ~42 registry
+    dataset rows, with Distribution/DataService/Catalog/CatalogRecord in the catalog crosswalk, contactPoint
+    in the pending email-DL gate direction, and mediaType on capture adapters — a standard carrying that
+    weight deserves the dcmi-terms treatment (M4 pattern: IRI + spec source_url + where-used table + discipline
+    block), not a README re-point. REGISTRY.yaml''s dcat row is UNCHANGED — its docs: path simply resolves
+    now. Guards green.'

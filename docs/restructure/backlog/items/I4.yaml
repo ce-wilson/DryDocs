@@ -1,0 +1,19 @@
+id: I4
+epic: project-board
+title: Regenerate the board in the session-end ritual
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on:
+- I2
+inputs:
+- CLAUDE.md
+- knowledge/depgraph-snapshots/snapshot.ps1
+acceptance: |
+  The CLAUDE.md session ritual regenerates docs/plan/board.html at session end alongside the depgraph snapshot (render script wired next to snapshot.ps1), so the committed board can never go stale for more than one session.
+notes: |
+  Done 2026-07-01. snapshot.ps1 now refreshes the board first (best-effort try/catch, before the depgraph dependency, so it works even where depgraph is absent); CLAUDE.md §0 backlog pointer updated (board = human view, groom-backlog skill named) and ritual step 3 gains the regen + the deterministic stale-board check (re-render, git diff --quiet board.html). Epic I complete — the planning loop is closed.

@@ -1,0 +1,19 @@
+id: N10
+epic: source-column-mappings
+title: 'Draft the registry wired/ready gate prompt: split pipeline-wiring readiness out of the semantic
+  confirmed flag'
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- docs/port-prompt.md
+acceptance: |
+  A gate prompt is drafted (G27/W1/U11 precedent — drafting decides nothing) proposing a separate wired/ready field on registry entries so semantic confirmation (gate-signed, transfers per Q6) and pipeline-wiring readiness stop sharing one flag; the prompt cites the a14a8028 fix session's Q1-B ruling and the cm_hosts standing divergence (semantically confirmed yet false company-side because their P3 host stage is unwired) as the motivating case; the registry schema changes ONLY when the gate signs.
+notes: |
+  Groomed 2026-08-07 from Idea-81. Fable: registry schema/meaning boundary. Epic N because the registry v2 schema is N7/N9's artifact; the company suggestion is endorsed at Q1-B but a schema field is gate territory. DONE 2026-08-19 (desktop). Drafted config/gate-prompts/registry-wiring-readiness.yaml — 4 sections, 15 confirmations; it loads via gate_pages.load_gate_spec and RENDERS (32KB, 15 checkboxes, progress seeded 0/15), so it is a usable HITL page and not just a file. Nothing was applied: the registry, its schema and require_confirmed() are untouched, per the G27/W1/U11 precedent and the prompt's own clause D2. THE ARGUMENT THE PROMPT LEADS WITH is the port asymmetry, which is stronger than "the flag is overloaded": a signed gate ruling TRANSFERS across sides (Q6), while pipeline-wiring readiness is a fact about one side's tree that can never be true of the other by inference — and ONE FIELD CANNOT CARRY TWO DISPOSITIONS. config/source-registry.yaml falls under PORT-MANIFEST.yaml's config/** default, which is canonical-producer, so the company's cm_hosts wiring hold is OVERWRITTEN by the producer's confirmed: true at every port and survives only because a human pinned it and armed a re-arm trigger. That recurring manual pin is the cost the gate would remove. Clause C3 rules the NEW field's own disposition in the same change, so the fix cannot reproduce the defect one field over. FOUND WHILE DRAFTING, and it strengthens the case: the conflation is ALREADY LIVE PRODUCER-SIDE, not only across the port. Census of the 9 rows reading confirmed: false — 5 semantic ("no gate", "OPEN precedence ruling"), 3 WIRING ("no extractor/loader yet", "ingestion pipeline planned", "Expansion placeholder"), and 1 NEITHER (cm_escalation_db, registered as the id-grammar worked example, not as a feed). A third kind nobody had named. In every wiring case the YAML COMMENT carries the distinction the field cannot — the real tell: the information is known, needed and written down, just nowhere a test, a query or a port can reach it. Clause A3 puts that to the SME as the finding rather than as an abstraction.

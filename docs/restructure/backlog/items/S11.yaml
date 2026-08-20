@@ -1,0 +1,31 @@
+id: S11
+epic: structure-remediation
+title: Extract drydocs_plan/, drydocs_docgen/ and drydocs_port/ — the three declared components that never
+  got a package
+type: chore
+module: drydocs-docgen
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- S8
+inputs:
+- drydocs/plan_board.py
+- drydocs/plan_roadmap.py
+- drydocs/plan_ideas.py
+- drydocs/doc_outline.py
+- drydocs/design_doc.py
+- drydocs/doc_pdf.py
+- drydocs/port_preflight.py
+- tests/unit/test_module_boundary.py
+- MODULE_MAP.md
+- pyproject.toml
+- scripts/
+- PORT-MANIFEST.yaml
+- docs/port-prompt.md
+acceptance: |
+  Three first-party packages exist and the seven modules no longer sit at drydocs/ root: drydocs_plan/ (plan_board, plan_roadmap), drydocs_docgen/ (doc_outline, design_doc, doc_pdf, plan_ideas — plan_ideas stays with docgen, the 2026-08-05 ruling stands) and drydocs_port/ (port_preflight). test_module_boundary.py classifies all three BY PACKAGE ROOT and the hand-maintained "plan" / "docgen" / "port" module-name tuples are DELETED, not re-pointed — that deletion is the acceptance signal that the physical tree now carries the classification the test was carrying by hand. pyproject packages updated; the five scripts/render_*.py wrappers, scripts/doc_to_pdf.py and the six unit test modules import the new paths; `drydocs --help` lists the same commands under the same names. Zero behaviour change is PROVEN, not asserted: docs/plan/board.html, ideas.html, roadmap.html and docs/design/*.html regenerate byte-identical from the moved code. MODULE_MAP.md's "Module (today)" table gains three package rows and drops the per-file drydocs/ rows they replace. Full suite green. Lands as ONE frozen unit and is ported as ONE unit (GN2's discipline — a wide move landing in pieces leaves the two repos disagreeing about import paths for as long as the pieces take).
+notes: |
+  Raised 2026-08-18 from a module-ownership read of drydocs/. drydocs-plan, drydocs-docgen and drydocs-port are DECLARED in `modules:` and enforced as logical groups by test_module_boundary.py, but they are the only components with no physical directory — every other one was extracted (drydocs_api, drydocs_lineage, drydocs_deepdoc, drydocs_docmeta, drydocs_remediation). G2 extracted core and stopped, so drydocs/ still carries five components' worth of loose modules and the boundary test compensates with a curated list of module names. NOT into drydocs_core, and the reason is what core is FOR: models, adapters, neo4j lifecycle, config/precedence/source_registry, ontology, schema DDL, orchestration — the DOMAIN core, whose value is that importing it carries no opinion about presentation. An HTML renderer and a headless-Chromium shell-out would spend exactly that guarantee. Sibling packages follow the precedent every other component already set. Cheap by construction: design_doc and doc_pdf are pure stdlib; doc_outline and plan_board are yaml plus one drydocs_core import; plan_roadmap and plan_ideas import siblings. No graph access, no loader coupling, no component imports. Dependency direction after the move is drydocs_plan -> drydocs_docgen -> stdlib/core: one edge, pointing the right way. The sweep is ~11 tracked importers, not S9's 31 — but score the sweep before committing to an effort number, which is the lesson S9 recorded the hard way. depends_on S8 so cli.py is a thin composition root with per-domain sub-apps BEFORE the files move; the other order makes S8 split a CLI across three packages instead of one. Not a hard blocker on correctness — if S8 stalls, this can be re-scored and run first. port_preflight rides along ON PURPOSE: identical position (own group, own declared component, stdlib + subprocess + one repo_paths import), and extracting two of the three guarantees a repeat visit. Cut it from scope only if the SME rules drydocs-port folds into another component. S7 is what makes this a rename rather than a preference: module names name COMPONENTS, directories name CODE ROOTS, and they must coincide for first-party Python packages precisely because test_module_boundary.py classifies by package root. REJECTED ALTERNATIVE: one drydocs_docs/ package holding all three groups. Fewer top-level entries, but it invents a fourth component name that the ledgers, runbooks, guards and backlog `modules:` list do not know, so every one of them would need updating for no structural gain. Follow the declared components.

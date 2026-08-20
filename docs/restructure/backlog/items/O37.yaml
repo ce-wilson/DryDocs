@@ -1,0 +1,23 @@
+id: O37
+epic: web-console
+title: 'DL-5 radius tokens + soften pass: --radius-sm/--radius-md, cards to md, no pill buttons or gradient
+  headers'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src/styles/tokens.css
+- web/src/index.css
+- web/src/App.css
+- internal/datalens-reference/continuity.md
+acceptance: |
+  --radius-sm/--radius-md tokens exist and every hard-coded border-radius in web/src resolves through them; cards/panels lift to --radius-md while inputs/small controls stay --radius-sm; before/after screenshots in both themes attached to the review; pill buttons and gradient headers explicitly NOT adopted (the continuity doc's ruled-out list); build + lint green.
+notes: |
+  Groomed 2026-07-28 pm from continuity.md DL-5. Coordinate with O30 — both touch every surface's chrome; whichever lands second re-verifies the other's surfaces.
+annotations:
+  status: DONE 2026-07-29 UI sweep (commits 77f68c5..c8b0e67)

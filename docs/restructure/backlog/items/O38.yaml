@@ -1,0 +1,22 @@
+id: O38
+epic: web-console
+title: 'DL-6 entity-rendering convention: identifiers as mono IdChips colored by the shared status vocabulary;
+  medallion stage names ride the same convention (DL-11a)'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src/
+- internal/datalens-reference/continuity.md
+- UI-WIP/site-plan.md
+acceptance: |
+  A documented identifier-rendering convention (site-plan or a UI-WIP note) plus an IdChip component: Control-M/product identifiers render in Plex Mono inside a subtle chip colored by the shared status vocabulary; adopted on the node inspector and at least one graph/list surface with no bespoke identifier styling left on the touched surfaces; medallion stage names (RAW/TRUSTED/REFINED/SNOWFLAKE — DL-11a) render as flat mono badges through the same convention; both themes verified; build + lint green.
+notes: |
+  Groomed 2026-07-28 pm from continuity.md DL-6 + the DSI addendum's DL-11(a) fold. DL-3 (its dependency) shipped on the branch, so this is dependency-free. The graph-model half of DL-11 is B5.
+annotations:
+  status: DONE 2026-07-29 UI sweep (commits 77f68c5..c8b0e67)

@@ -1,0 +1,25 @@
+id: K8
+epic: seal-attribution
+title: 'Folder-grain attribution loader: BELONGS_TO_APPLICATION onto the Batch Port, the 1:1 graph-test,
+  and the K2 job-edge migration'
+type: requirement
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p1
+status: done
+closed: 2026-08-04
+depends_on:
+- K7
+- K9
+inputs:
+- drydocs/loaders/folder_attribution.py
+- drydocs/loaders/cypher/folder_attribution.cypher
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- graph-tests/folder-attribution-coverage.yaml
+- config/gate-log.md
+acceptance: |
+  A loader writes (:ControlMFolder)-[:BELONGS_TO_APPLICATION {role: seal_app_ref, origin, match_method, tier, first_seen_at, last_seen_at, source}]->(:Port) at the FOLDER grain, derived by fanning ONE app-code row out over m3_contains_folder (§B1). Jobs inherit via CONTAINS_JOB; no per-job application edge is authored (§A1). m3_belongs_to_application flips planned -> active with supplement + loader recorded. The K2 fuzzy matcher DEMOTES to a fallback tier for codes with no defined row, and every fallback value carries origin=matched-fallback so it is DISCLOSED rather than presented as defined (§B3). A GRAPH-TEST asserts folder->application is 1:1 (never a constraint — Neo4j cannot declare relationship cardinality); a folder with two application edges FAILS. Live K2 job edges are migrated at the new grain preserving every property. Coverage invariant joins graph_verify. Offline tests on fixtures; full suite green.
+notes: |
+  Opened BY the K7 gate (§F2), 2026-08-03. Target is the Batch :Port, NOT :BusinessApplication — supernode avoidance, §C1(b); the app node already hubs TOM roles, contacts, product links and orchestrator edges. :AreaProduct is a ROUTING step in the steward UI and NEVER an edge target (there is no direct mapping of batch technical components to area product). PRODUCER-SIDE the migration is a reload under wipe-and-rebuild (§F1); the company's real migration is theirs under guardrail 6 / T23. CLOSED 2026-08-04 (desktop): built as drydocs/loaders/folder_attribution.py + folder_attribution.cypher (MATCH-only, ONE edge MERGE, pin backstop, origin/match_method/ tier ON CREATE) with `drydocs load-folder-attribution` replacing load-seal-attribution in the canonical sequence. The K2 module DEMOTED to the pure match-policy resolver (its writer + cypher deleted; m3_seal_app_ref active->deprecated under the gate's own authority clause, m3_belongs_to_application planned->active with supplement + loader). Resolver semantics chosen where the gate left room, each written into a test: authored precedence manual-pin > override > defined; an equal-precedence tie between different apps is a CONFLICT (1:1, never auto-picked); a DECLARED platform code's unresolved folders surface as platform-unresolved rather than falling back (§B3's fallback applies only to codes with NO defined row); fallback needs per-folder unanimity of K2 decisions and carries the winning tier's match_method. Manual tier-5 chain rekeyed end to end (SUPPORTED_SHAPE, parser, store table, manual cypher fan-out) closing K9's deliberate fail-closed queue; explorer specs re-bound (§A2); graph-tests suite rewritten as folder-attribution-coverage (8 TCs incl. the 1:1 test and a no-job-grain-residue guard). BONUS FINDING: the publish-boundary bare-id guard caught a REAL psgmgr folder id in the composite-key standard's examples (committed 2026-08-03) — replaced with a synthetic value in this commit. Suite 1399, ruff clean. Governed-doc staleness (TDD "K2 live" statements) recorded on L19, not hot-edited.

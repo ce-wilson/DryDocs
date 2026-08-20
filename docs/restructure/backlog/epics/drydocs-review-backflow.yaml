@@ -1,0 +1,12 @@
+id: drydocs-review-backflow
+letter: H
+title: drydocs-review back-flow
+order: 7
+groom_log:
+- date: ''
+  note: |-
+    ── Epic H — drydocs-review back-flow (main, opus) ────────────────────────
+    REVERSE of the normal port: reproduce the company-authored generic SME-review/
+    HITL toolkit GENERICALLY in this public producer. Re-implement from screenshots/
+    descriptions — never copy company code. See docs/restructure/05-drydocs-review-backflow.md.
+  attached_at: H1

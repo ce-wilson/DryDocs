@@ -1,0 +1,23 @@
+id: C11
+epic: ontology-mapping
+title: Capture the company-confirmed AisCapability/AiTool platform taxonomy as the seed answer for the
+  platforms gate
+type: task
+module: taxonomy
+phase: 2
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/taxonomy/platforms.yaml
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  USER-GATED START — the user supplies the company-side confirmed platforms.yaml shape via the screenshot/describe channel (mechanism-only; no company values committed). Then config/taxonomy/platforms.yaml is upgraded from status: placeholder to a captured taxonomy carrying the confirmed AisCapability/AiTool classes as the PROPOSED seed answer to its recorded open questions; the C6 requires-scheduler map entry's provisional to_node and the SchedulerKind-deprecation inbox line reference the captured shape as their gate input. THE HARD RULE: pure classification — nothing flips active, no vocabulary status changes, no graph writes; the platforms/SchedulerKind HITL gate decides. Sensitivity classification set on the source; drift guards + full suite green. DONE 2026-07-21 pm: user supplied the company session report (screenshot channel) — richer than expected: company CONFIRMED + BUILT the taxonomy at its 2026-06-29 AIS gate (platforms_supplement.cypher; real labels AisCapability skos:Concept / AisTool prov:SoftwareAgent — with the s; capability areas orchestration/etl/file-transfer; 7 tools incl. 2 internal MFT products, names held company-side; USES_TOOL app edge + IN_CAPABILITY roll-up; SchedulerKind deprecated there same day). Captured sanitized in platforms.yaml#company_confirmed (status: captured, confirmed: false); Q1-Q5 open questions updated (Q2/Q3 corroborated, Q1 granularity conflict + Q4 software-registry overlap = the remaining gate questions); C6 map entry + IDEAS line re-pointed. Nothing flipped active.
+notes: |
+  Groomed 2026-07-21 from the AIS-taxonomy back-flow inbox line (flagged in the 66acea8 port report 2026-07-10, unactioned since). The company's platforms.yaml is AHEAD with a confirmed AisCapability/AiTool taxonomy while the producer still holds the deprecated :SchedulerKind placeholder — bring the evolved model across so the gate session decides from it instead of re-deriving. The backlog pull loop SKIPS this item until the user supplies the material (the J13/J10 confirm-at-start idiom). The sibling SchedulerKind-deprecation inbox line stays parked on that same gate.
+annotations:
+  status: 2026-07-21 pm — see the DONE paragraph in acceptance; VS Code session

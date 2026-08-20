@@ -1,0 +1,23 @@
+id: M2
+epic: provenance-audit
+title: 'Migrate existing graphs: delete blanket WAS_GENERATED_BY edges, backfill envelope'
+type: task
+module: drydocs-load
+phase: 11
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- M1
+inputs:
+- drydocs/migrations/
+- docs/restructure/06-provenance-source-audit-fields.md
+acceptance: |
+  A drydocs/migrations/ file (pattern: the ControlMFolder rename) batch-deletes blanket WAS_GENERATED_BY edges on existing sandbox graphs — destructive, so HITL-confirmed before running; envelope properties backfilled where recoverable; m3-verify updated; the raw-named folder props (last_updated/last_updated_user) retired in favor of the envelope pair. Migration idempotent; suite green.
+notes: Doc 06 Phase 3. Also absorbs the first_seen_at naming standardization deferred from Phase 1.
+annotations:
+  status: 'DONE 2026-07-21 pm — migration built + HITL-confirmed + RUN live: 0 blanket edges (sandbox
+    reloaded post-M1; step protects older graphs + company copy), 8 raw-prop retirements, 816 created_at->first_seen_at
+    renames (snapshot labels excluded); idempotent re-run 0 effects; m3-verify +3 Phase-3 invariants all
+    green; 20 loader cyphers standardized; suite 844 green'

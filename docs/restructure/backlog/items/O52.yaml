@@ -1,0 +1,19 @@
+id: O52
+epic: web-console
+title: ownership.attributions.v1 returns an always-null holder_sid column (e.sid is never written; every
+  site keys employee_id)
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- drydocs/loaders/cypher/seal_contacts.cypher
+acceptance: |
+  The QuerySpec ends employee_id-based (e.employee_id AS holder_sid, matching mappings.seal-contact-roles.v1); a regression guard keeps the two specs' holder_sid expressions agreeing so the typo class cannot recur silently; the K4 attribution review surface's Holder SID column populates on a loaded graph.
+notes: |
+  Groomed 2026-08-07 from Idea-71. The larger class (a QuerySpec naming a property no loader writes stays green in every unit test) is the J26 promise-vs-assertion family — recorded here, scoped out; the one-word fix plus the pairwise guard is this item. DONE 2026-08-09 (desktop): one-word fix + TWO guards. `ownership.attributions.v1` now returns `e.employee_id AS holder_sid`, matching `mappings.seal-contact-roles.v1`. Verified against the loader rather than assumed: `seal_contacts.cypher:31` MERGEs `(:Employee {employee_id: row.employee_sid})`, and a tree-wide grep found NO writer of a `sid` property anywhere in drydocs/loaders/cypher/ or drydocs_core/schema/ — so the column was always null on any loaded graph, exactly as the item said. Root cause named for the record: the SOURCE column is `employee_sid` and the GRAPH property is `employee_id`; the spec author carried the source spelling across the MERGE. Guards: (1) pairwise — both holder_sid-bearing specs must carry the identical expression, so a future edit to one announces itself; (2) registry-wide — no spec may read a `<alias>.sid` property at all, which is the rule rather than today's instance. Both guards were PROVEN to fail on the reintroduced defect before being trusted (the J26 promise-vs-assertion discipline). Suite: test_query_specs 24->26 passed; full unit 1759 passed / 5 skipped with the one standing desktop bootstrap-guard failure (pre-existing, unrelated, reproduces without this change). NOT changed, recorded instead: the ownership spec's OPTIONAL MATCH leaves `(e)` unlabeled where the sibling uses `(e:Employee)` — harmless (HAS_AGENT has one endpoint class) and outside the item's stated one-word scope.

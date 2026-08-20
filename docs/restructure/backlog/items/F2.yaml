@@ -1,0 +1,18 @@
+id: F2
+epic: orchestrator-expansion
+title: Map the Airflow/MWAA crosswalk to the BMC baseline
+type: requirement
+module: config
+phase: 5
+agent: pipeline-config
+model: sonnet
+priority: p3
+status: done
+depends_on:
+- C1
+inputs:
+- external/orchestration/airflow/README.md
+- config/source-registry.yaml
+acceptance: Airflow/MWAA crosswalk fully mapped to baseline; no invented concepts; gate logged; confirmed:true
+annotations:
+  status: 'gate airflow-crosswalk SIGNED OFF 2026-07-14 (gate-log); airflow-mwaa confirmed: true'

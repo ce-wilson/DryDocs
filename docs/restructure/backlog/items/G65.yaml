@@ -1,0 +1,23 @@
+id: G65
+epic: component-topology
+title: 'Run the dpl dataset-registry contract gate: validate the ASSUMED contract, rule the audit stub,
+  and rule per-SEAL-vs-bulk discovery precedence'
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- G22
+- G25
+inputs:
+- config/gate-prompts/dpl-dataset-registry-contract.yaml
+- config/gate-log.md
+- config/precedence.yaml
+- drydocs_lineage/extractors/dpl_registry.py
+acceptance: |
+  USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then. The drafted dpl-dataset-registry-contract page is walked: section A the SME identifies a real dataset_id.json export (which SEALs, per-SEAL API or bulk export, pulled when — Internal, company-side, venue named per J18); section B the agent parses and profiles it — field census against the ASSUMED contract, createdBy/lastModifiedBy evidence for the audit stub, and GUID join coverage against the G17 dataset_flow READS/WRITES candidates with their zone distribution and the catalog registration views' dpl_dataset identities — zero graph writes; section C confirms or amends the contract, closes or stands the audit stub, and rules per-SEAL-vs-bulk discovery precedence in config/precedence.yaml terms. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate.
+notes: |
+  Groomed 2026-08-09 from Idea-85. Run SEPARATELY from its pipeline sibling (G64) on the prompt's own reasoning: different artifact, different assumed contract, different join target — datasets join the G17 MAC dataset_flow evidence and the catalog registration views, not the launcher tokens. Carries its own caveat, the 2026-07-23 clone-lag ruling that the bulk export is the backup discovery source when per-SEAL pulls lag. Company-side session.

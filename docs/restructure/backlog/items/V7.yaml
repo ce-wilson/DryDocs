@@ -1,0 +1,18 @@
+id: V7
+epic: sme-runbooks
+title: 'SME runbook: drydocs-remediation — detector, transform engine, corroboration, Jira handoff'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- V1
+inputs:
+- drydocs_remediation/
+- docs/design/templates/runbook.outline.yaml
+acceptance: |
+  docs/design/drydocs-remediation-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-remediation off RUNBOOK_PENDING. Covers: the two-tier fix model, running the R1 detector, the transform engine's before/after artifacts, corroboration, and the SoD boundary (we analyze, dev implements) at the Jira handoff. Mechanism-only — real instances stay internal/.
+notes: Groomed 2026-07-29 (Epic V).

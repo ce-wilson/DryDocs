@@ -1,0 +1,24 @@
+id: N9
+epic: source-column-mappings
+title: 'Source-registry schema v2 BUILD: system/dataset rows, qualified replica ids, overlay seam, retired-id
+  refusal, URN render — migrating all 18 entries with per-row confirmation'
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- internal/registry-redesign/REGISTRY-PLAN.md
+- config/gate-prompts/source-registry-v2.yaml
+- config/gate-log.md
+- config/source-registry.yaml
+- drydocs_core/source_registry.py
+- config/doc-source-registry.yaml
+- scripts/render_load_map.py
+acceptance: |
+  Implements the N7 gate rulings exactly (gate-log source-registry-v2, 2026-07-31) — no re-deciding: (1) SourceRegistry schema v2 with SYSTEM rows (id/name/seal_id PLACEHOLDER (real values internal-twin only)/cmdb_ci/ layer(BDAT four-value)/classification/locator/sdlc) and DATASET rows (id/system/origin/artifact+kind/taxonomy_category/asset_type/authority SOR|ADS/feeds_taxonomy scoped per dataset/adapter/crosswalk/confirmed/urn); loaders bind to dataset ids. (2) Id grammar: replica/derived = {origin}@{db}.{schema}.{table} lowercase with [db].[schema] placeholders committed (real values internal twin); born-here = {system}:{artifact}; derived stores carry derived: true with authority omitted. (3) The per-side loader->source_id config overlay winning over class defaults, guarded to resolve to registered dataset ids (extends the J21 agreement guard). (4) replaces: back-pointers + retired-id refusal list — from_yaml AND the overlay guard refuse every legacy flat id (catalog-pat, controlm-psgmgr, seal-extract, ... — the full v1 id set retires). (5) URN derived render urn:drydocs:dataset:({carrier-or-origin},{artifact},prod), lowercase, never hand-maintained. (6) Migration of all 18 rows per the plan table with PER-ROW confirmation (the N7 residual): previously signed gate rows transfer confirmed per Q6 with ONE gate-log amendment entry mapping old->new ids; everything else lands confirmed: false. Catalog family lands as pat:product-catalog + pat:people-report (the T19 naming ruling). snow system row (SaaS) + snow:cmdb-ci-classes dataset added. Doc twins (bmc-docs, essential-graphrag, fcdo-frameworks) drop to doc-source-registry only; design-docs stays pipeline-side only. (7) Renders (load-map/board/matrix/software-registry surfaces) + guards updated; full suite green.
+notes: |
+  Groomed 2026-07-31 at the N7 close — the build the gate authorized. Sonnet: every decision is ruled and written (gate-log + plan RULED section); this is execution against a written acceptance. The per-row confirmation sweep is record-keeping against the plan table, not new gating — anything that turns out to CHANGE meaning (not just rename) stops and goes back to the SME (the D4 boundary). Company side: never port this — T19 rules their adoption. CLOSED 2026-07-31 same session (desktop): registry v2 SHIPPED — 15 systems (incl. snow SaaS per Q4) / 28 datasets / 17-id retired refusal list (both T19 legacy strings). SourceRegistry v2: doc-ledger union (twins dropped, confirmed moved to doc rows), retired refusal on parse+lookup+overlay, derived URN (hand-carried urn: refused), loader-source-overlay.yaml D2 seam (shipped empty, guarded). 14 loader modules re-bound to dataset ids (pat_product_mapping + pat_team_roles -> pat:people-report); CLI gates overlay-aware (_gate_loader), ingest-controlm gates every stage dataset. Ledger renamed psgmgr.yaml (carrier scope); audit-fields re-keyed + 8 new stubs; taxonomy captures + ~30 ontology-map entries re-pointed (N8's 4 unmatched preserved verbatim). Per-row sweep findings: cm_avg_run gate actually SIGNED 2026-07-14 (P2) — v1 umbrella note was stale ("AWAITING SME"), corrected; new rows seal@[db].psgmgr.cm_escalation_db + cm_hist_vw registered unconfirmed. Q6 amendment entry appended to gate-log (old->new map). Load-map v2 (systems + datasets + retired tables); enforcement matrix +1 surface (17). Suite 1204 passed / 5 skipped. No meaning changes arose — nothing went back to the SME.

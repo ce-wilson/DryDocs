@@ -1,0 +1,14 @@
+id: project-board
+letter: I
+title: Project board & planning infrastructure
+order: 8
+groom_log:
+- date: '2026-07-01'
+  note: |-
+    ── Epic I — Project board & planning infrastructure (main) — Phase 8 ─────
+    Groomed 2026-07-01 from the architecture review: the backlog is the database,
+    the board is a render of it, capture/transcription is an agent job. Model
+    discipline (daily-usage limits): opus/fable only where a decision changes the
+    schema or a boundary; sonnet for anything with an acceptance test already
+    written; haiku for lookups, renames, ritual wiring.
+  attached_at: I1

@@ -1,0 +1,22 @@
+id: D7
+epic: config-loaders
+title: 'Incremental-delete path for removed-from-source jobs: full-diff soft-delete mark + retention-window
+  hard-delete sweep'
+type: requirement
+module: drydocs-load
+phase: 3
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs/loaders/base.py
+- drydocs/loaders/
+- knowledge/upgrade-plans/neo4j-advisor-confirmation-2026-07-17.md
+acceptance: |
+  After an ingest run whose extract no longer contains a previously loaded job or folder, the graph node is NOT silently left active: a full-diff ID set (graph minus extract, scoped to what the extract declares — full vs folder-filtered) marks it soft-deleted (property mark + timestamp; no node deletion) in the same run, and a separate sweep command hard-deletes marks older than a configurable retention window. Both paths report counts (marked / re-activated / swept / retained — never silent drops, the STG_PARSE_QUALITY house rule); unit tests cover mark, re-appear (mark cleared), filtered-extract scoping (out-of-scope nodes untouched), and sweep retention. Property-only mechanism — any edge-meaning change aborts to the HITL gate. Full suite green.
+notes: |
+  Groomed 2026-07-18 from the GraphAcademy advisor findings (2026-07-17 inbox; confirmation doc in knowledge/upgrade-plans/). Today removed-from-source jobs stay `active` forever. Soft-delete property naming is loader mechanics (no new edge types); surface at a gate only if a meaning question appears. DONE 2026-07-18: BaseLoader opt-in mark pass — sweep_label + sweep_scope_property classvars; the full-diff falls out of the last_run_id bookkeeping every template writes (in-scope node on an older run id = removed from source). Jobs scope to the extract's own folder set; unscoped loaders (folders) mark only under full_extract=True, which ingest-controlm passes when no --folder filter is set. Mark = removed_from_source_at + removed_by_run_id (property-only, checksum-excluded); re-appeared nodes auto-clear; counts reported on LoadSummary + the JobRun envelope + console. sweep_removed() + CLI `sweep-removed` (--days/--label/--dry-run/--yes; DETACH DELETE past retention; swept/retained table). 9 unit tests (mark/reactivate/scoping/full-extract gate/empty-extract-declares-nothing/ sweep + dry-run). VERIFIED LIVE: a reduced extract marked exactly AUTO_TRUST_LOAD (160501/12, scope folder_id x7), the full reload reactivated it, sweep --dry-run reported 0/0. Suite 707 passed.
+annotations:
+  status: DONE 2026-07-18 (main fable session, D5-D7 batch)

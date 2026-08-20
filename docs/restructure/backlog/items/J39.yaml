@@ -1,0 +1,19 @@
+id: J39
+epic: release-infrastructure
+title: 'Disposition the six un-back-flowed company advances: reproduce mechanism-only, or ledger each
+  with a reason'
+type: task
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/reconcile-port/SKILL.md
+- docs/port-prompt.md
+acceptance: |
+  Each of the six advances is DISPOSITIONED — reproduced producer-side mechanism-only (no company values) or recorded in the reconcile-port divergence ledger with the reason and the trigger that would change it: the snow-support schema supplement pair (hpsm_queue_key / sn_group_name) plus the snow-snowflake-itsm source stub; the drydocs_remediation DPL watch-drift rule and its tests; the graph_verify Assertion refactor; the docgen deviations against the finalized company TDD; the CONFLUENCE_BASE_URL config seam (mechanism = base-URL as config, the value stays company-side); and the controlm_folders.sql `J` table alias. None is left undecided, and anything that touches edge meaning is registered `planned` and routed to its gate rather than adopted here.
+notes: |
+  Groomed 2026-08-07 (pm) from Idea-19 (bd7952f follow-up 3). Module docs and epic J because the deliverable is a disposition record per advance, not one component's code — the reproductions that follow are separate items in their own modules. Motivation, in the entry's own words: until these land, every port repeats the squash-reconcile instead of a clean linear apply. The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely because they never came back.

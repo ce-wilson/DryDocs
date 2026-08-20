@@ -1,0 +1,20 @@
+id: C4
+epic: ontology-mapping
+title: Reconcile the relationship vocabulary with the confirmed map
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- C1
+- C2
+- C3
+inputs:
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+acceptance: test_schema.py drift guard green; map summary == vocabulary active count
+notes: |
+  Done 2026-06-21. Reconciled vocabulary to the confirmed map: catalog_supports_area_product + arch_develops set active (added DEVELOPS block to catalog_ontology_supplement.cypher); catalog_supports (DevTeam→Product) deprecated. Drift guard green (9 passed); 164 passed. Remaining phase-2 `planned` entries (m3_invokes/triggers, p2_*, etc.) stay planned until their taxonomy is captured — not re-gated now (no data). Epic C complete.

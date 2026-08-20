@@ -1,0 +1,26 @@
+id: K4
+epic: seal-attribution
+title: Apply the BusinessApplication entity-reshape gate outcome (reclass + label + TOMRole attribution
+  + deprecations + provenance + precedence)
+type: task
+module: ontology
+phase: 9
+agent: ontology-mapper
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- K3
+inputs:
+- config/gate-log.md
+- drydocs_core/ontology/relationship_vocabulary.yaml
+- config/taxonomy-ontology-map.yaml
+- drydocs_core/schema/
+- config/precedence.yaml
+acceptance: |
+  Per the 2026-07-10 gate sign-off (config/gate-log.md), each applied as its OWN logged change with drift guards green: (1) node_classifications#Application class flips prov:SoftwareAgent -> prov:Entity/dprod:DataProduct AND the label normalizes :Application -> :BusinessApplication across the vocabulary, loaders, supplements and tests; (2) a TOMRole skos ConceptScheme (the 7 SEAL Technical Operational roles; CTO shared with K5's ProductRole scheme) + the qualifiedAttribution/hadRole supplement land (seal_qualified_attribution / seal_attribution_has_agent / seal_attribution_had_role planned -> active with supplement blocks); (3) seal_has_membership / seal_of_role / seal_held_by deprecated (RELATIONSHIP_GUIDE steps; seal_has_port KEPT); (4) seal_had_primary_source activated as an edge (Document nodes wait on the drydocs-docmeta component); (5) arch_develops flips to (:Application)-[:WAS_ATTRIBUTED_TO {role: developed_by}]->(:DevTeam); (6) map entries application-as-dataproduct / seal-tom-attribution / seal-doc-source-of-record flip proposed -> confirmed (carrying vocab_id + capture per F5/C7) -> applied with loaders; (7) the SEAL/PAT precedence proposed_additions block wired into the live order/active chain. Full suite green.
+notes: |
+  Created 2026-07-10 from the K3 gate sign-off. The gate confirmed the DIRECTION; this is the mechanical APPLICATION, each flip its own logged change (gate section G discipline). Does NOT include the K2 job->app edge (deferred) or the Product Cabinet (K5). CTO is shared between the TOMRole (here) and ProductRole (K5) schemes — coordinate the two. PORT NARRATIVE (added 2026-07-10 review): when the :Application -> :BusinessApplication rename applies, ALSO update git-readme.md's SEAL-reshape section (currently instructs the consumer "do NOT take as applied" — becomes wrong), add the port-prompt step, and check PORT-MANIFEST per-entry notes — the prose-mirror drift class from docs/reviews/tech-debt-port-boundary.md. BRANCH (2026-07-15 pm groom): feat/k4-businessapplication-reshape is reserved for this item. The remote stub pointed at 40fe038 (73 commits behind, predating K2's attribution edges this item re-shapes) with zero commits of its own — re-based onto main a683384 at the groom; work starts from there. DONE 2026-07-15 pm (all 7 clauses + port narrative, each its own logged commit; 655 tests green throughout). DEVIATIONS/RESIDUALS: (a) seal-doc-source-of-record flipped only to CONFIRMED, not applied — applied = a loader wrote the graph, and the Document loader waits on docmeta (honest-lifecycle rule); (b) contact roles outside the fixed 7 (CBT, Backup App Owner, Risk Manager) load flagged unmapped_role=true — whether any subsume into the scheme is a future SME call; (c) company-side live-graph node-label migration is THEIRS (port-prompt step 35); (d) precedence placement: seal-pat wired at authority 3 above lob-product-team (identity beats catalog) — the open placement question resolved by the governs rationale, flag if SME disagrees.
+annotations:
+  status: done 2026-07-15 pm — 8 commits on feat/k4-businessapplication-reshape (K4(1)..K4(7) + port narrative),
+    branch pending --no-ff merge

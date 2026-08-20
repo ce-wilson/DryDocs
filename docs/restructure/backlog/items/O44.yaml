@@ -1,0 +1,50 @@
+id: O44
+epic: web-console
+title: 'Ownership reconciliation ALLUVIAL diagram (a Sankey variant): four ordered columns — employee
+  hierarchy | SEAL/TOM contacts | ServiceNow queues + technicians | PAT structure — with ribbons where
+  an entity appears in both, and a terminating ribbon where it does not'
+type: requirement
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G35
+inputs:
+- web/src/routes/OwnershipRoute.tsx
+- web/src/ownership/OwnershipGraphPane.tsx
+- web/src/routes/AppCodeCascadePane.tsx
+- drydocs_api/query_specs.py
+- config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml
+- config/source-registry.yaml
+acceptance: |
+  THE DIAGRAM TYPE IS NAMED, and it is not decoration: this is an ALLUVIAL diagram — the Sankey family variant for CATEGORICAL data across several ordered dimensions, where the same entities are re-partitioned column by column and ribbons carry membership from one partition to the next. (SME 2026-08-05, correcting this item's first draft, which described the shape and never named it.) Sankey is the family; alluvial is the member, and the distinction decides the data contract — a general Sankey moves a QUANTITY between distinct nodes, an alluvial moves the SAME ENTITIES between categorizations. Build to the alluvial contract: nodes = (column, category), links = (source category, target category, the entity set that is in both). A console pane rendering FOUR ordered columns over the same applications and people, each column a different system's view of who owns what, with a ribbon drawn ONLY where the entity is actually present in both adjacent columns' lists (the SME framing). THE TERMINATING RIBBON IS THE PRODUCT. An entity that appears in one column and not the next does not fade out quietly — a flow that stops IS the finding, and it must be visually distinct from a flow that continues. That is what makes this the reconciliation surface for G35 §D: a SEAL contact with no ServiceNow counterpart is a roster disagreement made legible, and a diagram that only draws matches would hide precisely the case it exists for. (1) EMPLOYEE HIERARCHY, filterable by manager. (2) SEAL/TOM CONTACTS, filterable by SEAL id, LOB, product line, product and contact role. (3) SERVICENOW: the queues/assignment groups matching the applications in column 1's list, showing their technician roles. (4) PAT STRUCTURE with its SEALs. SHIP IN PHASES, and the phase boundary is a DATA boundary, not a UI one — columns 2 and 4 are buildable today, columns 1 and 3 are not (see notes). Phase 1 acceptance is columns 2+4 with the cross-column relationship drawn and the two missing columns shown as EXPLICITLY EMPTY WITH A REASON, never omitted: a four-column pane silently rendering two columns is the failure this acceptance exists to prevent. Every column names its source system and the freshness of its load. Full suite green.
+notes: |
+  SME direction 2026-08-05, in-chat during the G35 gate draft. This is the surface where G35 §D's roster disagreement becomes VISIBLE rather than inferred — §D3 proposes recording which surface an attribution came from, and this pane is what consumes it, which is why it depends_on G35 rather than merely citing it. DATA STATE, measured 2026-08-05 (this is the whole reason it ships in phases): * COLUMN 2 (SEAL/TOM) — EXISTS. Attribution/TOMRole/Employee load today, and
+    every requested filter is backed by a real node: CatalogLOB, ProductLine,
+    Product, BusinessApplication, and the contact role itself. The K11 steward
+    cascade already implements Product Line -> Product -> Business Application,
+    so the filter chain is a reuse, not a build.
+  * COLUMN 4 (PAT) — EXISTS. Product/AreaProduct/DevTeam load via
+    pat_product_mapping.cypher + area_products.cypher, and pat:people-report
+    carries team-scoped seal_ids. Caveat recorded at C17: the people report
+    projects Sponsoring Product Line as a NAME ONLY, so that grain stays
+    unmodelled and the column cannot filter on it.
+  * COLUMN 1 (EMPLOYEE HIERARCHY) — DOES NOT EXIST. :Employee is a node class
+    (prov:Agent) with NO Employee-to-Employee edge anywhere in the relationship
+    vocabulary: no REPORTS_TO, no manager edge, no source feeding one, and no
+    backlog item that would create one. The manager filter is the column's
+    whole point and there is nothing to filter on. G35 §B7 defers hierarchy
+    placement to "a later pass" on SME direction; this item is the first
+    consumer that makes the missing owner concrete.
+  * COLUMN 3 (SERVICENOW) — NOT INGESTED. snow:cmdb-ci-classes is registered
+    (Q4 ruling, 2026-07-31) but confirmed: false, adapter: ~, and it is a
+    header-only capture of CMDB CLASSES — not queues, not assignment groups,
+    not people. The "SEAL technician roles" the SME describes appear in the
+    repo only as prose: the runbook skill's template-spec cites AO/RE Snow
+    queues with a Technician role, and internal/remediation names a SNOW
+    technician group + CTASK. That is enough to know the concept is real and
+    not enough to build a column.
+  RIBBON WEIGHT IS AN OPEN DESIGN QUESTION, flagged rather than assumed: in a Sankey the ribbon THICKNESS encodes a quantity, and this diagram has more than one candidate — count of people, count of applications, or unweighted equal-width membership bands. Pick before building; retrofitting a weight changes the layout engine's input, not just a style. NO LIBRARY IN THE STACK DOES THIS. web/package.json carries @xyflow/react (node-and-edge graphs, not flows) and d3-force (force layout). An alluvial needs d3-sankey or a hand-rolled SVG with a crossing-minimisation pass — readable column ordering is most of the work in this diagram, and it is the part a naive implementation gets wrong. A new dependency also lands in the software registry, which is the third-party ledger, so it is a registration as well as an install. NOT SPLIT INTO SEPARATE ITEMS on purpose: the two missing columns are SOURCE questions (does DryDocs ingest the HR hierarchy and the SNOW queue export, producer-side or company-side?) and that is a user decision, not an agent's. Both are inboxed against this item rather than groomed into speculative work. If the answer is company-side for either, this item's phase 1 IS its final scope and the acceptance says so.

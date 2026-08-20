@@ -1,0 +1,18 @@
+id: B1
+epic: taxonomy-capture
+title: Capture Control-M folders/jobs/conditions as taxonomy
+type: task
+module: taxonomy
+phase: 1
+agent: taxonomy-importer
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- drydocs/data/samples/controlm_*.csv
+- config/source-registry.yaml#controlm-psgmgr
+acceptance: faithful classification of the source CSVs; zero meaning edges in the file
+output: config/taxonomy/controlm.yaml
+notes: |
+  Done 2026-06-20. Captured 4 servers / 8 folders / 13 jobs / 15 conditions (7 distinct names), classification only. Count drift RESOLVED: bundled sample treated as canonical; README m3-verify block reconciled (8/13/15/10). Residual flagged: sample is reduced (folders 161020, 160501 active-but-jobless -> m3-verify empty=2) — regenerate from psgmgr to restore. See controlm.yaml open_questions#count-drift-vs-doc (status: resolved-2026-06-20).

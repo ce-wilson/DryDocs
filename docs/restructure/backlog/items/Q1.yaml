@@ -1,0 +1,21 @@
+id: Q1
+epic: docmeta
+title: Mine the Essential GraphRAG ebook for applicable patterns; feed the docmeta P0 benchmark verdict
+type: task
+module: reference
+phase: 14
+agent: reference-librarian
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- Essential-GraphRAG.pdf (repo root — local-only, gitignored)
+- reference/research/README.md
+- knowledge/upgrade-plans/docmeta-component.md
+acceptance: |
+  A notes file under reference/research/ (link-cited, classification External, no copyrighted full text pasted — the research README house rule) inventories the book's applicable patterns at chapter/section level: lexical-graph construction, retrieval strategies (traversal / hybrid / vector), agentic traversal, and evaluation method — each mapped to its DryDocs consumer (which docmeta P0 benchmark arm it informs; whether it confirms or corrects the neo4j-skills graphrag approach). The docmeta plan's P0 section gains a pointer to the notes, and the user's open question ("are there more examples of how to do it properly?") gets an explicit answer with the list.
+notes: |
+  Groomed 2026-07-16 from the same-day Essential-GraphRAG [source] inbox line after the user decided housing + intent. Registration EXECUTED at the groom: research README seed-table row (Manning link verified 2026-07-16) + the root-level /*.pdf gitignore blanket rule (root-images precedent; tracked UI-WIP/*.pdf unaffected). Book: Bratanič & Hane, Manning 2025 (Neo4j-sponsored ebook), 179 pp. DONE 2026-07-16: reference/research/essential-graphrag-notes.md written by reference-librarian (full-text pypdf extract read chapter-by-chapter; no copyrighted passages pasted) — 8-chapter pattern inventory with page cites, consumer-mapping table (P0 arm / confirms-corrects / Q2 relevance), and the SME question answered: YES, 8 worked patterns beyond current bmc-docs practice (notes §3). Headline finding: ch.8's RAGAS + Cypher-as-ground-truth design fills the P0 acceptance's previously unnamed accuracy methodology. Pointer added to the docmeta plan's P0 row by main (the plan is outside the librarian's write surface). Chunking + HITL entity-resolution stances independently CONFIRM the bmc-docs deterministic lexical load; communities/GDS stay correctly deferred.
+annotations:
+  status: DONE 2026-07-16 same day (reference-librarian on sonnet, dispatched by main)

@@ -1,0 +1,22 @@
+id: G95
+epic: component-topology
+title: 'Draft the gate prompt for standard IDENTITY and its carrier: can a validation profile be stored
+  per team, and what may legitimately select a standard?'
+type: task
+module: config
+phase: 6
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/orchestration/controlm/description_tokens.py
+- knowledge/standards/technology/controlm-guidelines-and-standards.md
+- config/taxonomy/lob-product-team.yaml
+- docs/restructure/03-hitl-sme-flow.md
+- config/gate-log.md
+acceptance: |
+  A gate prompt is DRAFTED -- drafting decides nothing (the G27 / W1 / N10 / G61 precedent), nothing is written to the graph, and no entry leaves `planned` until the SME signs. The prompt must put four questions, each with the evidence already in the repo: (a) IDENTITY: does a standard get a stable id, and what is its shape? Today the per-job-type sets are CODE-AS-DATA in TOKEN_REGISTRY, whose own docstring calls itself "the single source both the parser and the published register read from, so code and document cannot drift" -- guarded by the registry-vs-standard agreement test. Giving a standard an id outside that module is a CONTRACT CHANGE and the prompt must say so plainly, with what the agreement test would then be guarding. (b) CARRIER: user direction 2026-08-12 proposes a config table (SQLite was floated) keyed by standard id, holding a validation profile BY TEAM, with a platform / product hierarchy later. The prompt lays the candidate carriers side by side -- versioned YAML under config/ (the launcher-registry precedent: schema-pinned, test-guarded, teams add rows without a code change) versus a database table -- against what each costs at review time and at port time, and asks the SME to rule. It does not pre-pick one. (c) WHAT MAY SELECT A STANDARD, restated as a fence rather than assumed: section 7.5 and G84 rule the DD digit a grammar VERSION and forbid it selecting a template or a standard, so a standard id needs its OWN carrier. The prompt asks the SME to ratify that fence explicitly, because a per-team registry is exactly the pressure that would break it. (d) DIVERGENCE POLICY: if a team may hold its own profile, what may it change? Adding a team-local token is the C16 annotation case the parser already knows; RELAXING a required token of the company standard is a governance decision, and the prompt must ask whether that is permitted at all, and if so who ratifies it. Every term or entry the prompt proposes is registered `planned` and stays planned until the gate signs. The deliverable is the prompt file plus its gate-log stub -- no code, no registry, no schema.
+notes: |
+  Groomed 2026-08-12 (targeted groom) from Idea-114, clause 2 (identity + storage). Split from G94 deliberately: the selection tree is derivable from data the repo already has, while identity and carrier change the parse contract and are gate-relevant, which the inbox entry itself says. Promoting the DRAFT rather than the build is the standing pattern -- a prompt decides nothing, and it puts the question in front of the SME with the evidence attached instead of leaving it as an inbox line nobody can act on. MODULE: config, chosen because the artifact under discussion is a registry / profile store and config/ is the declared home for precedence, registries and crosswalks (the launcher-registry.yaml precedent is the closest existing shape). The prompt DESCRIBES a change to a drydocs-core module; it does not make one, so it is not filed there. RELATED: G94 (the selector this would eventually feed), G77 (a THEME token inside the same DD1 block), the etlprocess-kind-enum rider (engine vocabulary, which is where the engine names would have to agree if per-engine standards get ids).

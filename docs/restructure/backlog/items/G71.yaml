@@ -1,0 +1,20 @@
+id: G71
+epic: seal-attribution
+title: The required-contact completeness report + the presence graph-test — the first surface that can
+  say an application is missing an accountable owner
+type: task
+module: drydocs-review
+phase: 9
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- G70
+inputs:
+- config/gate-log.md
+- config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml
+acceptance: |
+  A per-application completeness report and the graph-test behind it, per the signed §B5/§C4/§C6. THE CHECK COUNTS TO ONE AND STOPS: a REQUIRED class with zero holders on a covered application is REPORTED, never refused at write time — §C1 closed the constraint route on platform grounds (Neo4j cannot declare a count over a traversal in either direction), and §C3 refused the tempting re-key because multiple holders are the NORMAL shape. THE DENOMINATOR IS RULED (§C6): only applications a feed actually covered. An application no feed mentioned is a CAPTURE gap and is reported SEPARATELY — merging the two produces a noisy check, and the first response to a noisy check is to weaken it. IT JOINS THE EXISTING REVIEW SURFACE rather than opening a new one (§C5): ownership.attributions.v1 already orders unmapped rows first, so an operator reads ONE page for "what is wrong with this application's contacts". TWO CAVEATS THE REPORT MUST CARRY IN ITS OWN OUTPUT, both from the sign-off. (a) The Operate Manager assignments are MID-CORRECTION AT SOURCE (the SME is rescoping the team to platforms it owns), so findings there are real defects being fixed elsewhere — the report should say so rather than imply DryDocs discovered them. (b) The check cannot distinguish a genuine 24h coverage gap from a satisfied one, because Operate Manager multiplicity is GEOGRAPHY and nothing records which holder covers which region (signed residual 4).
+notes: |
+  Raised 2026-08-11 at the G35 sign-off. Has no counterpart today: nothing checks per-application completeness at all, which is why a missing required contact is currently invisible while an unreadable role name kills its row — the exact inversion §B5 ruled against.

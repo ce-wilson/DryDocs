@@ -1,0 +1,37 @@
+id: V2
+epic: sme-runbooks
+title: 'SME runbook: drydocs-core — config/env roots, schema provisioning, vocabulary registry, run logs'
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- V1
+inputs:
+- drydocs_core/
+- docs/design/templates/runbook.outline.yaml
+- drydocs_core/schema/provisioning/
+acceptance: |
+  docs/design/drydocs-core-runbook.md conforming to runbook.outline.yaml (test_doc_outline auto-sweep), rendered .html committed and stale-render-clean, drydocs-core removed from RUNBOOK_PENDING. Covers the module's operate surface: Neo4jSettings/env-root configuration (names only, no secrets), manual DB provisioning + when to re-run it, the relationship-vocabulary registry checks, and the run-log family (DRYDOCS_LOGDIR chain) as the review surface.
+notes: 'Groomed 2026-07-29 (Epic V). SME-facing: operate + verify, not API docs.'
+annotations:
+  status: 'closed 2026-08-04 (laptop). docs/design/drydocs-core-runbook.md, outline-conformant, rendered,
+    stale-render-clean; drydocs-core off RUNBOOK_PENDING. Covers the four surfaces the acceptance names:
+    Neo4jSettings + the env roots (NAMES only — the doc''s own rule), provisioning and when to re-apply,
+    the relationship-vocabulary registry, and the run-log family. ORGANISED AROUND SILENCE, which is the
+    honest shape for a library: core has no process and almost no exceptions — its failure modes are a
+    loader that writes nothing, a MATCH that finds nothing, a log written where nobody looked — so each
+    section leads with the silence it prevents. Highest-value entries are the ones that have actually
+    bitten: NEO4J_DATABASE unset writes to the EE home db where no query surface looks; a same-name constraint
+    re-declare succeeds and does nothing, so a definition change needs an explicit DROP first; DRYDOCS_LOGDIR
+    falls back to SPIDERP_LOGDIR so ''missing'' logs are usually the legacy name; apply-supplements VERIFIES
+    declared IRIs and the per-file verbs are how `registry` went unseeded for weeks. Both shipped one-liners
+    were RUN before commit (config resolution, supplement order) and the config one prints no secret —
+    password is SecretStr. Appendix tables carry the re-derive command plus the rule that the code wins,
+    the treatment adopted after the mapping-store inventory drifted a day unnoticed. V1''s guard again
+    refused the file until it was dispositioned and the module left the shrink-only list. mapping-store''s
+    disposition reason updated: it is NOT superseded — both are correct at their own scope, which is what
+    the two-map split exists to record. Suite 1537 green.'
