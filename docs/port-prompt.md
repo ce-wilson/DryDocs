@@ -2233,7 +2233,11 @@ step 161), `f21b3e3a` `6e7735bd` `f1d777bc` (summary-block merge resolutions,
 recompute-from-items each), `3680e9a3` `04f92515` `c82648d7` (the ledger roll,
 its step-170 restatement, and the first coverage addendum — all three used
 docs(port) subjects, which the termination exemption deliberately does not
-match; the terminating write is the chore(port) commit that adds this footnote).
+match; the terminating write is the chore(port) commit that adds this footnote);
+`9dda538e` `be0c39ae` `7c6eb730` `991d59e6` (the RELAY-10/RELAY-11 writes and
+riders — self-documenting, their payload IS the relay text in the STANDING
+RELAYS section); `47b08085` `2cad34fb` (the PR #6 merge and the id-space
+branch's merge-from-main; content at steps 169 and 160 respectively).
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
