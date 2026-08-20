@@ -96,7 +96,12 @@ this file's relay section, cited there rather than in a step; and step 170 is a
 DELIBERATE
 RESERVATION — DISCHARGED 2026-08-19 evening: K17 SIGNED 33/33 and step 170 is
 restated with the outcome (steps extended through `337d6a6f` + the gate
-commits). Next: `port_preflight.py --base 0c355f5a --tag` certifies the base.
+commits). **CERTIFIED 2026-08-19 evening: `port-base-20260819` @ `7c18ff4b`,
+preflight 7/7 green (tree clean, relay basis tags, ledger coverage 131/131
+cited-or-ritual, cited paths resolve, renders current, suite 2224/5 venue MSI,
+tag pushed).** Steps 135-170 are ONE offerable range: `caa0406..port-base-20260819`.
+A company plan drafted against the pre-certification wording of this paragraph
+("158-170 ride the next port") is superseded — take the whole range in one port.
 Ritual/self-referential commits cited for the coverage check, none carrying
 apply-content: `30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim,
 close and next_ready backlog flips — the work itself is step 165), `8c84adef`
