@@ -21,6 +21,19 @@
 # the J17/J20/N4 one-entry-point idiom); the page never hardcodes this list.
 # Guard: tests/unit/test_context_types.py (schema pin, id uniqueness, status
 # enum, generated-artifact drift).
+#
+# NAMING RULE (user ruling 2026-08-20): "context" is load-bearing in THREE
+# senses already — this file's context_type (support-situation intake
+# vocabulary), the layer-4 CONTEXT GRAPH (CLAUDE.md §1, task-scoped
+# projection), and the retired ddcontext database (G102 fold,
+# SUPERSEDED_NAMES). Therefore "context" NEVER appears in a NEW id — not a
+# QuerySpec id, corpus id, route name, or vocabulary id (ids are join keys).
+# The corpus-retrieval capability discussed as "context search" is named
+# THEME SEARCH: dcat:theme-scoped retrieval over the standards corpus, riding
+# the C34 skos:ConceptScheme declaration. UI labels may say what they like;
+# ids may not. (The word "port" carries the same two-meanings warning in
+# CLAUDE.md §0 — same disease, same cure: fix the vocabulary before the
+# first id ships, not after.)
 # =============================================================================
 
 schema: drydocs.context-types.v1

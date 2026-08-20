@@ -18918,6 +18918,21 @@ items:
       SCOPE FENCE: declares and drafts. Does not populate real values (Internal), does not write
       the edge, does not build UI.
 
+      AMENDED 2026-08-20 (user direction, the theme-search ruling). THREE UPDATES:
+      (1) QUESTION (b1) IS ANSWERED BY THE G102 FOLD — the residency blocker was
+      written against the two-database design, and content + structure are ONE
+      database since 2026-08-18, so dcat:theme can be a plain edge to a shared
+      Concept; the prompt should record (b1) as answered-by-fold, not pose it.
+      (2) THE EVIDENCE UPGRADED: the firm's Taxonomy Framework (v21) and its
+      sibling standards are now VERBATIM-captured (the 2026-08-19 live fetch,
+      fcdo-frameworks row) — the scheme declaration can cite the published
+      standard directly instead of a partial transcription.
+      (3) THE CONSUMER IS NAMED: the retrieval capability over this scheme is
+      THEME SEARCH (dcat:theme-scoped retrieval over the standards corpus) —
+      deliberately NOT "context search"; the naming rule and its three-senses
+      census live in config/taxonomy/context-types.yaml's header. Groom the
+      theme-search build as its own item once this gate signs; "context" never
+      appears in its ids.
   - id: G77
     epic: component-topology
     title: "One theme vocabulary, two corpora: dcat:theme on the Control-M folder block AND the scraped-document envelope, joined by concept IRI"

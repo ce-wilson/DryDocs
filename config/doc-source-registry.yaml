@@ -188,10 +188,10 @@ sources:
   # ---- Queued corpora (registered, not yet ingested) ------------------------
   - id: fcdo-frameworks
     classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the capture (J23 collapse)
-    source: "internal/fcdo-reference/*.md (2026-07-30 screenshot transcriptions; live-page scrape target list = the page-ID table in internal/fcdo-reference/README.md)"
+    source: "the 2026-08-19 live Confluence fetch (company-side capture, J18: drydocs-scrape on the company checkout — consolidated HTML + manifest run-20260819T215955Z under internal/knowledge/data/<space>/); supersedes the 2026-07-30 screenshot transcriptions in internal/fcdo-reference/*.md, which remain the provenance trail"
     connector: confluence                 # company-network only; scrape supersedes the transcripts
     manifest: ~                           # provenance + gap ledger lives in internal/fcdo-reference/README.md
-    trust_default: GROUNDED               # screenshot transcription is faithful but partial; a direct Confluence fetch upgrades to VERBATIM
+    trust_default: VERBATIM               # upgraded 2026-08-19 per this row's own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0 failed). Was GROUNDED while the capture was screenshot transcription
     tier: T4
     curation: sme-confirm                 # T4 ladder post-J23 (+confidential rider retired with the tier)
     target_db: drydocs                  # G102 fold (was ddcontext — folded 2026-08-18; content realm is now the one database)
@@ -209,6 +209,13 @@ sources:
       when the confluence connector runs: Descriptive Metadata, Data Quality,
       Data Contracts (DPROD) frameworks + the Taxonomy Framework property
       tables — the known capture holes that block crosswalk sign-off.
+      RECAPTURE DONE 2026-08-19: the live fetch captured all four targets whole
+      (Descriptive Metadata + its WIP CDAO twin, Data Quality, Data Contracts/
+      DPROD, Taxonomy Framework v21) — the crosswalk's capture holes are closed.
+      One page came back 0 bytes (the drafts/upcoming index) — QA'd company-side.
+      LOAD PATH: docs/fcdo-frameworks-load-company-prompt.md (the load is
+      company-side by guardrail 6 — the capture never leaves the company
+      network); graph_locator fills when that load runs.
 
   - id: seal-pat-scrape
     classification: Internal              # SEAL/PAT pages carry app records, SEAL ids, owner names
