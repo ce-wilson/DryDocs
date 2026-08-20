@@ -9,7 +9,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -25,5 +25,6 @@ annotations:
   inputs[]:
   - docs/reviews/port-review-7c18ff4b-20260820.md — F3 table = the proposed dispositions
   - docs/restructure/IDEAS.md — Idea-142 (the class) — the constraints.cypher live drop
-  status: claimed 2026-08-20 (desktop, pushed before work) — the six manifest rows; must precede the next
-    base certification
+  status: 'done 2026-08-20 (desktop): six rows + two no-drop guards + step 171; Idea-142 closed. Prior:
+    claimed 2026-08-20 (desktop, pushed before work) — the six manifest rows; must precede the next base
+    certification'

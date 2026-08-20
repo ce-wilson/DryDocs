@@ -40,7 +40,16 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-08-09   # 2026-08-09 (J34): the OVERLAY SEAM — side-local rows live in a
+updated: 2026-08-20   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
+                      # company legitimately EXTENDS (Idea-142's class): description_tokens
+                      # (per function), detect.py + __init__ (per detector id), test_runbook_
+                      # currency (per exemption table, retirement trigger named), email-dl-
+                      # contact-point (company keeps the file, producer SME intent crosses by
+                      # section), ui-components (the K7-K15 hold IS the rule), doc-source-
+                      # registry (field split: company owns graph_locator/captured_at/manifest/
+                      # source; confirmed is per-repo). Same day: the backlog rows for the
+                      # Y2 shard (ADR 0013) and the F4 per-repo-status ruling.
+                      # 2026-08-09 (J34): the OVERLAY SEAM — side-local rows live in a
                       # separate include file the J16 guard UNIONS with this manifest
                       # (`overlay:` block below). GRAMMAR DECISION, recorded here per the
                       # item's acceptance: include FILE over marked section — the include
@@ -262,6 +271,25 @@ rows:
   - path: "config/review-labels.yaml"
     disposition: canonical-company
     note: "real labels consumer-side"
+  # ---- J51 (2026-08-20): canonical-producer paths the company legitimately EXTENDS ----
+  # Idea-142's class, found live at the 135-170 port (constraints.cypher lost two company
+  # constraints to a wholesale take) and named five more times in PORT-REPORT-caa0406 +
+  # once at the 7c18ff4b review. Rule: declare the seam, never widen the default.
+  - path: "config/gate-prompts/email-dl-contact-point.yaml"
+    disposition: canonical-company
+    entry_rule: >
+      KEEP the company file — it is the real gate spec — but APPLY producer
+      Section G / the G4 re-pose into its body: those are SME INTENT recorded
+      producer-side (the 2026-08-11 ruling removes <DOMAIL> alongside the shouts
+      because the ServiceNow incident is the call to action), crossing INTO a
+      company-canonical file. Section by section, never the whole file; a
+      producer section the company already holds in different words is evaluated,
+      not duplicated. Precedent: commit 5405ab6 re-posed G4 this way.
+    note: >
+      J51 (2026-08-20). The gate-prompts/** default below says "consumer wins";
+      this row says the SAME and adds the one direction that default cannot
+      express — SME intent authored on the producer side still reaches the
+      company prompt.
   - path: "config/gate-prompts/**"
     disposition: canonical-company
     note: "consumer's real gate specs win; producer specs are prep/templates — new producer specs that don't collide are clean-adds"
@@ -378,6 +406,24 @@ rows:
       table keyed by category rather than sequenced is a defect, not a refactor.
       CATEGORY_LABEL is the PROPOSED label vocabulary, not ratified producer-side.
       THIS ROW PRECEDES orchestration/** DELIBERATELY — first match wins.
+  - path: "drydocs_core/orchestration/controlm/description_tokens.py"
+    disposition: per-entry
+    entry_rule: >
+      Per FUNCTION / CLASS name. Two models coexist in one module today: the
+      producer's C30 CONFORMANCE model (parse_description / required_tokens /
+      TokenSpec / ParsedDescription / TokenFinding*) and the company's LIVE-LOAD
+      parser (parse_tokens / classify_job_role — the C30-retired shape the company
+      adapter still imports). Zero name overlap, so the union is mechanical: take
+      every producer definition by name, keep every company definition by name,
+      never delete a name the other side's imports resolve. A producer change to a
+      company-named function is a defect, not a collision. Back-flow candidate
+      (inboxed): split the two models into separate modules producer-side, after
+      which the company half is clean-add + canonical-company and this row retires.
+    note: >
+      J51 (2026-08-20). PORT-REPORT-caa0406 union-merged this by hand; the
+      orchestration/** canonical-producer row below would have dropped the
+      company parser on the next take. The description_tokens half of the
+      resource_pool G76 pattern (mechanism here, the live shape yours).
   - path: "drydocs_core/orchestration/**"
     disposition: canonical-producer
     note: >
@@ -393,6 +439,20 @@ rows:
   - path: "drydocs/staging.py"
     disposition: canonical-producer
     note: "the load-cadence staging bundle builder — relocated OUT of controlm/ in Phase B (0002-a §6 borderline); stays in the drydocs remainder"
+  - path: "drydocs_remediation/detect.py"
+    disposition: per-entry
+    entry_rule: >
+      Per DETECTOR, keyed by rule id. Producer ships CONFORMANCE_RULE_IDS (R2,
+      R30-R40) and their detect_* functions; the company adds detect_dpl_findings
+      / dpl_review with DPL-* ids (and the report-order list grows by union, never
+      by replacement). The shared `Finding` dataclass IS the contract — a producer
+      change to its fields is a breaking change and ports as evaluate, with the
+      company's detectors checked against the new shape before the take.
+      __init__.py exports union the same way.
+    note: "J51 (2026-08-20). caa0406 unioned this by hand; drydocs_remediation/** below would drop the DPL detectors."
+  - path: "drydocs_remediation/__init__.py"
+    disposition: per-entry
+    entry_rule: "export list is a UNION of both sides' public names; never drop a name the company's callers import."
   - path: "drydocs_remediation/**"
     disposition: canonical-producer
     note: "the remediation component (G3/0002-B): producer-authored mechanism; rule VALUES + Jira REST + live corroboration queries stay company-side and never flow back"
@@ -465,6 +525,19 @@ rows:
       producer-side and snow_tom_responsibilities company-side, with IDEAS.md at
       union-append. Producer's was the uncited side and renumbered to Idea-135
       (G75/G76 precedent); the company's is grandfathered below the boundary.
+  - path: "tests/unit/test_runbook_currency.py"
+    disposition: per-entry
+    entry_rule: >
+      The GUARD is producer-canonical; the three EXEMPTION tables are per-side data:
+      HISTORICAL_PATHS (company carries T19 reasons for the four load-map/load-
+      sequence surfaces), FOREIGN_PATHS (emptied company-side — every producer
+      entry exists there), and the company's DEFERRED_VERBS (T22: sweep-removed,
+      load-essential-graphrag, with its still-cited guard). Union by KEY, keep each
+      side's reasons verbatim. RETIREMENT TRIGGER, and the row's own exit: when
+      T19 / T22 land company-side the exemptions go and this row reverts to the
+      tests/** default. Shrink-only guard semantics stay — an entry is removed
+      when its subject is gone, never to silence the test.
+    note: "J51 (2026-08-20). caa0406 ADAPTED this file rather than dropping it (SME 2026-08-11); the tests/** default_ok would take the producer copy and reopen the four T19 failures."
   - path: "tests/unit/test_backlog.py"
     disposition: per-entry
     entry_rule: >
@@ -510,6 +583,36 @@ rows:
   - path: "UI-WIP/**"
     disposition: canonical-producer
     note: "web-console design record (wireframes, nav flow, dark landing mock; step 31) — static reference material"
+  - path: "config/taxonomy/ui-components.yaml"
+    disposition: per-entry
+    entry_rule: >
+      components[] keyed by id. The K7-K15 Tier-B HOLD is the entry_rule: the
+      company = the producer MINUS the held AppCodeCascadePane route row (the
+      m3_belongs_to_application tier stays planned there). Take every producer
+      entry except those under a named hold; keep company-only entries. The
+      counts are TRACKED (company 68/29 vs producer 69/29 at caa0406), never
+      asserted equal — test_ui_components.py's assertion is per-side.
+    note: "J51 (2026-08-20). Resolved to config/** canonical-producer by omission; caa0406 kept the hold by hand."
+  - path: "config/doc-source-registry.yaml"
+    disposition: per-entry
+    entry_rule: >
+      sources[] keyed by id, with a FIELD SPLIT. Producer-owned (cross on take):
+      trust_default, tier, curation, refresh, taxonomy_path, target_db, connector,
+      notes. Company-owned (NEVER overwritten by a port): graph_locator,
+      captured_at, manifest, source (the where — a space or data-root path is
+      estate data), and the inline comment on confirmed. `confirmed` itself is
+      PER-REPO (the F4 rule one file over — the company ratifies its own
+      activations; the 2026-08-19 company ratification of fcdo-frameworks stands
+      beside the producer's 2026-08-05 ruling, both true). Company-only ids are
+      kept; producer-only ids are clean-adds. Precedent: source-registry v2's
+      company-canonical ids + the D2 overlay seam.
+    note: >
+      J51 (2026-08-20), found at the 7c18ff4b review: the producer row for
+      fcdo-frameworks reads VERBATIM while the company row — where the run
+      happened — still read GROUNDED / "no connector has run" with its own
+      ratification citation; config/** would have overwritten the citation and,
+      after their load, graph_locator, at every port. Idea-148 (the run <-> row
+      join) adds the fields this split protects.
   - path: "config/**"
     disposition: canonical-producer
     note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log, dev-environment (first match wins). A file of LOCAL infrastructure facts does not belong under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port"

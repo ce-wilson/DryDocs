@@ -127,7 +127,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the J51 doc-source-registry finding (same review): the fields (b) adds are COMPANY-owned
   facts, which is why that file needs a per-entry row before they exist.
 
-- **`Idea-142`** · 2026-08-20 · `[bug]` · **groomed → J51 (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
+- **`Idea-142`** · 2026-08-20 · `[bug]` · **closed → J51 DONE 2026-08-20 (six rows landed, same day it was groomed (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
 - **`Idea-145`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
   Dark-mode UI contrast defect: the shared React controls on the left vertical rail and the Source
   panel at the bottom right retain the same light-surface styling as light mode. The off-white

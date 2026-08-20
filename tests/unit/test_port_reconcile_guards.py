@@ -343,6 +343,78 @@ def test_reconcile_gate_log_append_only_live() -> None:
     assert violation is None, violation
 
 
+# --- J51 (2026-08-20): list-shaped per-entry rows — "never drop a name" as code ---------
+# Two of the six J51 rows govern Python files whose entries are LISTS the company
+# extends: drydocs_remediation/detect.py (CONFORMANCE_RULE_IDS + the DPL-* ids the
+# company appends) and tests/unit/test_runbook_currency.py (the three exemption
+# tables, keyed by path / verb). The rule is no-drop by key. The before-snapshots
+# are OPTIONAL (the four above stay the mandatory contract): step 1 may write
+# `detect-rule-ids.txt` and `runbook-exemption-keys.txt` into <before-dir>; when
+# present, the live checks compare; when absent, they skip and say how to arm them.
+
+
+def dropped_names(before: Iterable[str], after: Iterable[str]) -> list[str]:
+    """Names present before the merge and absent after it — the per-entry violation."""
+    after_set = set(after)
+    return sorted(n for n in before if n not in after_set)
+
+
+def detect_rule_ids() -> list[str]:
+    from drydocs_remediation import detect
+
+    return list(detect.CONFORMANCE_RULE_IDS)
+
+
+def runbook_exemption_keys() -> list[str]:
+    import importlib
+
+    mod = importlib.import_module("tests.unit.test_runbook_currency")
+    keys: list[str] = []
+    for table in ("HISTORICAL_PATHS", "FOREIGN_PATHS", "DEFERRED_VERBS"):
+        keys += [f"{table}:{k}" for k in sorted(getattr(mod, table, {}) or {})]
+    return keys
+
+
+def test_dropped_names_mechanics() -> None:
+    assert dropped_names(["R2", "R30", "DPL-1"], ["R2", "R30", "R31"]) == ["DPL-1"]
+    assert dropped_names(["R2"], ["R2", "R99"]) == []
+
+
+def test_list_shaped_rows_read_their_live_lists() -> None:
+    """The two lists the J51 rows govern are importable and non-empty — the live
+    checks below would otherwise pass vacuously on an import error."""
+    assert "R30" in detect_rule_ids()
+    keys = runbook_exemption_keys()
+    assert any(k.startswith("HISTORICAL_PATHS:") for k in keys)
+
+
+def _optional_before(name: str) -> list[str] | None:
+    before_dir = os.environ.get(BEFORE_DIR_ENV)
+    if not before_dir:
+        return None
+    path = Path(before_dir) / name
+    if not path.is_file():
+        pytest.skip(
+            f"{name} not in {BEFORE_DIR_ENV} — optional J51 snapshot; arm it in step 1 by "
+            "writing the pre-merge list there, one name per line"
+        )
+    return [ln.strip() for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+
+
+@_needs_before
+def test_reconcile_detect_rule_ids_no_drop_live() -> None:
+    before = _optional_before("detect-rule-ids.txt")
+    dropped = dropped_names(before or [], detect_rule_ids())
+    assert not dropped, f"detect.py rule ids DROPPED by the merge: {dropped}"
+
+
+@_needs_before
+def test_reconcile_runbook_exemptions_no_drop_live() -> None:
+    before = _optional_before("runbook-exemption-keys.txt")
+    dropped = dropped_names(before or [], runbook_exemption_keys())
+    assert not dropped, f"test_runbook_currency exemption keys DROPPED by the merge: {dropped}"
+
+
 # --- before_text mechanics (run everywhere; these are what UNSET-vs-BROKEN means) --
 
 

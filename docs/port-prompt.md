@@ -2230,6 +2230,25 @@ regeneration, never-port outputs — and get no step.
     (cross-application run_as detection) ride the same join. Your side adopts
     the gate via your own review, per your §9 model.
 
+171. J51 — SIX PER-ENTRY MANIFEST ROWS FOR PATHS THE COMPANY LEGITIMATELY EXTENDS
+    [FIRST STEP OF THE NEXT RANGE, base not yet certified; lands BEFORE the base so
+    the rows govern collisions inside the range that carries them]
+    (evidence: the J51 commit — PORT-MANIFEST rows for description_tokens.py (per
+    function), detect.py + __init__.py (per detector id), test_runbook_currency.py
+    (per exemption table, retirement trigger named), email-dl-contact-point.yaml
+    (company keeps the file; producer SME intent crosses by section),
+    ui-components.yaml (the K7-K15 hold IS the rule), doc-source-registry.yaml
+    (field split: graph_locator / captured_at / manifest / source are company-owned,
+    `confirmed` per-repo); test_port_reconcile_guards gains no-drop checks for the
+    two list-shaped files, live-gated on OPTIONAL before-snapshots.)
+    Idea-142's class (constraints.cypher, step-170 range) closed as a manifest
+    obligation rather than a reconcile habit. SAME DAY, same next range: the Y2
+    backlog shard (ADR 0013, merge `01cfd7dc`) — its ONE-TIME apply sequence rides
+    the `docs/restructure/backlog.yaml` manifest row and the hand prompt
+    `docs/port-backlog-shard-company-prompt.md`; it gets its own step when the base
+    is certified.
+
+
 LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
 this range, cited here because the coverage check reads ONLY this section:
 `30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim/close/next_ready
