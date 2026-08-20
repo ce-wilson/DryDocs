@@ -5,83 +5,69 @@
 > `docs/restructure/backlog.yaml` (the claim channel) and `docs/port-prompt.md`; this
 > is the narrative that git alone does not carry.
 >
-> **Written 2026-08-18 (laptop), producer head `d5e7966d`.**
+> **Written 2026-08-20 (desktop, pre-reboot), producer head `963e93ca`.**
 
-## 1. The desktop may still be push-blocked
+## 1. A PORT IS IN FLIGHT — the company apply session is mid-range
 
-Unchanged from yesterday unless someone completed the browser sign-in at a desktop
-session: GCM is per-machine, so the laptop's login did not unblock it. Its stranded
-`5ca7dc8f` is already superseded (identical fix shipped as `63551c8`); a revived
-desktop session should `git pull --rebase` and its duplicate drops as empty.
+Certified base **`port-base-20260819` @ `7c18ff4b`** (preflight 7/7; the range is
+`caa0406..port-base-20260819`, steps 135-170 — ONE port, per the corrected roll
+note). The company session runs on their branch `drydocs-port-20260820`,
+reversible via their tag `pre-cewilson-port-20260820`; **their own
+`port-exec-state.md` is the apply-side tracker** and survives any reboot here.
 
-## 2. Port loop
+**Confirmed done there** (producer-reviewed checkpoints): ~214 paths applied;
+constraints per-entry union (58 = 55 producer − 2 host-topology pins + 5
+company-only, all named); the three overwritten vocab Tier-B holds RESTORED
+(field-level diff, not status-only); `cli.py` company-base + graft (4 new verbs,
+`load-folder-attribution` held per K7-K15); taxonomy-map / module-boundary
+per-entry done; flags A-D all closed (gate-log pin for the 2 host constraints
+with re-arm; schema_graph to be REGENERATED from merged vocab, never
+hand-reconciled; T19 deferrals as skip-with-reason; the WIP `.py` captures
+ignored as not-port-introduced).
 
-`port-base-20260817` @ `0c355f5` remains the certified base. Everything since rides
-the NEXT roll — and today added a lot: **RELAY-10** (the ServiceNow TOM build
-decisions + its stub-and-enrich rider) is the piece the company session depends on;
-it travels the J38 channel at the next port.
+**Remaining there, in their stated order:** per-entry remainder (backlog,
+roadmap, audit-fields, pyproject + the N12 acquisition reconcile) → 2
+union-appends incl. the RELAY-11 `Idea-50..75` repair (pull the FID entry from
+`Idea-135`, never manufacture a 59) → `poetry.lock` then **`poetry install
+--sync` BEFORE acceptance** (S12's drift guard is IN this range) → Phase-5
+regeneration → re-survey → draft the 6 gate entries with provenance checks →
+**ratify the FID sign-off + G3 amendment as an atomic pair AFTER the suite is
+green** → PORT-REPORT (head `7c18ff4b`; every kept divergence in the census;
+fill `caa0406`'s four missing fields; RETIRE their stale step-43 in-repo
+port-prompt copy, never refresh it).
 
-## 3. What landed today (all pushed, CI green at every commit)
+**Producer owes on the report:** act on the divergence census — every named
+canonical-producer path with company divergence gets a per-entry/union manifest
+row or a recorded reason (Idea-142, High). The `drydocs-scrape` connector
+back-flow ask rides the same report.
 
-- **G98 SIGNED 19/19** — the corporate-backbone gate. :Company registered
-  (org:FormalOrganization), new `corporate` domain (49-local-corporate.yaml), the
-  §D3 endpoint guard (`test_vocabulary_endpoints.py`, both directions, with declared
-  debt lists), the §B2 agreement check in `m3-verify`.
-- **G91 CLOSED 5/5** — the held planned-entry review. Keep-planned ×2 (with the
-  `m3_` → `scheduler_` id migrations and the new `scheduler_runs_as` raised),
-  `catalog_has_area_product` ACTIVATED, `catalog_area_product_has_dev_team`
-  deprecated-redundant, and entry 5 **re-shaped onto qualified attribution**
-  (superseding the K4 carve-out and C20 retention — both named in the gate log).
-- **G99 DONE** — `pat_team_roles.cypher` rewritten onto the attribution shape;
-  both new entries active; `membership_id` constraint dropped with its last writer
-  (53 → 52).
-- **The ITSM technician-group family registered** (`50-local-itsm.yaml`, `itsm`
-  domain): :ServiceNowGroup + :SnowRole (SENG/ASUP), both edges planned. **G100** is
-  the gate that ratifies the register and builds the OOTB lookup — build against the
-  SOURCED replica feed (Idea-132), not the retiring CSVs.
-- **STUB-AND-ENRICH ruled** (SME direction, gate-log RECORD 2026-08-18): the HR DB
-  is ~300k and deferred, so people-referencing loads MERGE the stub :Employee on the
-  SID and HR enriches later. G74 clause 2 answered in direction; G74 still owes the
-  runbook harmonization, the stub property idiom, and clause 1 (REPORTS_TO).
-  `pat_team_roles.cypher` flipped from strict MATCH to MERGE-stub accordingly.
-- **cm_escalation_db note corrected** — job-grain SUPPLEMENTS the folder mapping,
-  never authors (K7 §A1); origin/id re-key flagged under-review, deliberately not
-  done. **Idea-130/131/132** inboxed (External-public corpus; the :Company finding;
-  the ServiceNow extract re-sourcing).
+## 2. What landed producer-side today (all pushed, CI green)
 
-## 4. The company session's gate (`snow-tom-responsibility`) — where it stands
+- **K17 SIGNED 33/33** → step 170 restated, base certified/tagged, the K16
+  company census prompt got its rider (directory half only remains). K26 is the
+  build follow-up; K25 waits on K16.
+- **PORT-MANIFEST:** `constraints.cypher` re-dispositioned per-entry after the
+  live drop at the apply (the schema/** wholesale row was wrong).
+- **The theme-search ruling:** `fcdo-frameworks` row upgraded to VERBATIM (the
+  2026-08-19 company scrape closed the four crosswalk capture holes); the
+  "context"-never-in-an-id naming rule lives in
+  `config/taxonomy/context-types.yaml`'s header; C34 amended ((b1) answered by
+  the G102 fold); the company LOAD is a hand prompt —
+  `docs/fcdo-frameworks-load-company-prompt.md`.
 
-§A/§D/§F/§G/§H ticked; §C ruled stub-and-enrich for Individual scope (Group half —
-an unloaded :ServiceNowGroup — is load ORDER, deliberately not covered; flag or
-sequence, still theirs to rule). **Open: §B grain and §E inheritance.** Producer
-recommendations relayed in-chat and in RELAY-10: §B deployment-with-app-fallback
-(K7 §C1 supernode reasoning, from-node class recorded on the edge); §E
-authored-only with the ancestor-CI pull taken as a SEPARATE coverage decision, no
-materialization (inheritance is COMPUTED, `4c0c834`).
+## 3. Machine state (desktop)
 
-## 4b. Working direction (SME, 2026-08-18 late)
+- **This venv was upgraded outside poetry and repaired** (pydantic-core +
+  httpx2 force-reinstalled to lock). If anything shares this venv, expect S12
+  to fire until the culprit is found.
+- **Worktree `ui-workstream`** carries another session's UNCOMMITTED work
+  (agents/AskRoute code, R18/R19, Idea-143..146) — do not clean worktrees; its
+  branch sits on current main.
+- The 15 FID evidence captures + the port screenshots live under the data root
+  (`fid/screenshots/` etc.), desktop-local — K17's session-materials note says
+  what needs them.
 
-**Producer backlog only for now — company-side grooming is paused.** Consequences:
-the RELAY-11 IDEAS.md union repair becomes next-port-session work (rider on the
-relay says so); K16 stays blocked (its counts are company-side); the caa0406
-close-out confirmation and the snow-tom-responsibility §B/§E rulings arrive
-whenever company work resumes, not before. GitHub Actions is billing-blocked
-(jobs die at dispatch) — every push since `50d7831a` is locally verified only;
-one green run at HEAD covers them all once billing is fixed.
+## 4. Open in-progress claims
 
-## 5. Board state
-
-**~122 todo · 4 in progress (E1, G32, Y1, G62 — all SME/gate-bound) · 1 blocked
-(K16) · 316 done.** Oldest pullable unchanged; new ready items: **G100** (the ITSM
-gate) and the O60-O62 UI trio.
-
-## 6. The pattern from this session
-
-Three times today a drafted framing failed against the code: the review file's
-"all three retire together" (never an SME position), my own "OF_ROLE/HELD_BY are a
-registration gap" (C8 reuse made non-registration CORRECT), and yesterday's
-strict-MATCH no-stub reading (the direction went the other way within a day).
-Same lesson each time: **drafted prose and even fresh code embed a side of an
-unruled question — check which side before citing either as settled.** The fix that
-sticks is putting the ruling where the next reader looks: the gate log, the entry
-note, the relay — never the chat.
+K16 (desktop — directory-half counts owed company-side), L19 (desktop — clauses
+(a)(b)(d) parked with reasons), Z-series done, laptop claims per the board.
