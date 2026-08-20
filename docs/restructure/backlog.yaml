@@ -20990,7 +20990,7 @@ items:
 
   - id: J51
     epic: release-infrastructure
-    title: PORT-MANIFEST rows for the five canonical-producer paths the company legitimately extends — description_tokens, detect, test_runbook_currency, email-dl-contact-point, ui-components (the Idea-142 census action)
+    title: PORT-MANIFEST rows for the six canonical-producer paths the company legitimately extends — description_tokens, detect, test_runbook_currency, email-dl-contact-point, ui-components, doc-source-registry (the Idea-142 census action)
     type: task
     module: config
     phase: 8
@@ -21031,7 +21031,18 @@ items:
       the company applies producer additions to the prompt body; it never takes the file.
       (5) config/taxonomy/ui-components.yaml — per-entry; the K7-K15 Tier-B hold IS the
       entry_rule (company = producer minus the held AppCodeCascadePane route; counts
-      68/29 tracked, never asserted equal). Guards: test_port_manifest.py well-formedness
+      68/29 tracked, never asserted equal). (6) ADDED AT THE SAME REVIEW (2026-08-20,
+      company registry screenshots reviewed; same Idea-142 class, found by resolving the
+      glob): config/doc-source-registry.yaml has NO row and falls to the config/**
+      canonical-producer default. The company row for fcdo-frameworks carries its OWN
+      ratification record (confirmed: true, company gate-log citation 2026-08-19) and will
+      carry `graph_locator` + `captured_at` + `manifest` once their load runs — all
+      COMPANY-owned facts a wholesale take erases at every port; the producer owns
+      trust_default / tier / curation / notes (the producer row is ahead on VERBATIM, the
+      company row still reads GROUNDED + "no connector has run"). Rule it per-entry by id
+      with a FIELD split in the entry_rule: producer fields cross, company fields never do,
+      confirmed + its comment are per-repo (the F4 rule one file over). The source-registry
+      v2 row is the precedent (company-canonical ids + the D2 overlay seam). Guards: test_port_manifest.py well-formedness
       green; the J16 fall-through guard sees no new default; each new per-entry row's
       entry_rule is exercised by test_port_reconcile_guards.py where the file shape allows
       (detector ids and exemption lists are list-shaped — assert no-drop). PORT-MANIFEST

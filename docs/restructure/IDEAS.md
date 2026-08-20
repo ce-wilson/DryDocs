@@ -92,6 +92,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-147`** · 2026-08-20 · `[idea]` · **open** · prio? **Medium** —
+  **A scrape run and the registry row it fulfils are not joined — `drydocs-scrape` should
+  stamp the `doc-source-registry` id in its run manifest, and the row should carry
+  `captured_at` + `manifest` the way `bmc-docs-controlm-utilities` already does.** Found at
+  the 7c18ff4b port review: the `fcdo-frameworks` row was upgraded to VERBATIM producer-side
+  on 2026-08-19 on the strength of a company run that was keyed by SPACE + a free-text
+  `--purpose` string, neither of which is a registry id — the SME chose the space by hand
+  because the tie-in to the row was not expressible. The join precedent EXISTS one row over:
+  `bmc-docs-controlm-utilities` carries `captured_at`, a `manifest:` path to its
+  `capture-manifest.json` (capture id stamped by `external_vendor_scrape.py`), and a
+  `graph_locator` by `corpus_id`. The fix is mechanism-only: (a) the scrape tool takes a
+  `--registry-id` (or resolves `--purpose` to one) and writes it into the run manifest;
+  (b) the registry row gains `captured_at` + `manifest` at capture and `graph_locator` at
+  load, so a VERBATIM claim traces to a run id instead of to prose ("the 2026-08-19 fetch").
+  Numbered 147 because the ui-workstream branch holds Idea-143..146 unmerged. Sibling of
+  the J51 doc-source-registry finding (same review): the fields (b) adds are COMPANY-owned
+  facts, which is why that file needs a per-entry row before they exist.
+
 - **`Idea-142`** · 2026-08-20 · `[bug]` · **GROOMED → J51 (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
   **`canonical-producer` files the company legitimately EXTENDS are silently truncated
   by every wholesale apply — found live at the 135-170 port.** The company's apply
