@@ -180,7 +180,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 39,
+      "pending_entries": 40,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
@@ -352,6 +352,7 @@
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",
         "config/gate-prompts/corporate-backbone-vocabulary.yaml",
+        "config/gate-prompts/dcat-theme-subject-scheme.yaml",
         "config/gate-prompts/doc-traceability-feedback.yaml",
         "config/gate-prompts/document-content-topology.yaml",
         "config/gate-prompts/document-supersession.yaml",

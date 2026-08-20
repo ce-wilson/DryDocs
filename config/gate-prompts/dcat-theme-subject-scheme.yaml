@@ -1,0 +1,147 @@
+# SME gate-prompt spec — dcat:theme over the lob-product-team concept scheme.
+# GATE-BOUND: this page PROPOSES; no edge is written, no loader built, by
+# rendering it. DRAFTED 2026-08-20 (C34 (b)); UNSIGNED.
+#
+# THE FINDING THAT SHAPES THIS GATE, verified before the item was raised: the
+# hierarchy the SME proposed for subject classification — LOB, Product Line,
+# Product — ALREADY EXISTS as config/taxonomy/lob-product-team.yaml (B3, captured
+# 2026-06-20), and the SME's vernacular examples are already ProductLine rows in
+# it. C34 (a) declared that file a skos:ConceptScheme (layer 1, no gate). This
+# gate rules the MEANING edge that points at it: dcat:theme.
+#
+# WHY THIS MATTERS (the SME's own observation, 2026-08-11): folder-level runbooks
+# are >90% automatable and the roll-up axis was going to be "Data Series" — an
+# entity nobody defines. Teams think in source name instead, which is why the
+# ProductLine tier fits: it is both the vernacular people already use AND already
+# captured. The roll-up falls out of the concept scheme without Data Series ever
+# being defined — protect that in review. A theme is a PROJECTION AXIS: "everything
+# in this subject, right now" becomes a layer-4 slice instead of a new entity, and
+# themes are multi-valued by nature, so a process serving two subjects appears in
+# both slices with nothing duplicated — which one Data Series field could never do.
+#
+# CONSUMER NAMED (2026-08-20 ruling): the retrieval capability over this scheme is
+# THEME SEARCH — dcat:theme-scoped retrieval over the standards corpus —
+# deliberately NOT "context search" (config/taxonomy/context-types.yaml header
+# holds the naming rule and its three-senses census). Groom the theme-search build
+# as its own item once this gate signs; "context" never appears in its ids.
+
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: dcat-theme-subject-scheme
+title: "SME Gate — dcat:theme: is a Product a Concept or does it HAVE one, annotation depth, the per-subject cap as a detector, and unclassified vs out-of-scope"
+step: "Ontology mapping (C34) — rules the dcat:theme edge over the already-declared lob-product-team skos:ConceptScheme; registers HAS_THEME active or re-targets it; no loader until a follow-up build item"
+summary: >
+  Four rulings and one record. THE RECORD (§A): residency — the question that
+  BLOCKED this edge when it was drafted against the two-database design (a Neo4j
+  relationship cannot span databases, Q8) — is ANSWERED BY THE G102 FOLD: content
+  and structure are one database since 2026-08-18, so dcat:theme is a plain edge
+  to a shared concept node. The concept IRI (urn:drydocs:scheme:lob-product-team
+  + notation) is still the join key and stays stable, so the vocabulary is portable
+  if residency is ever re-split; nothing is stranded either way. THE RULINGS: (§B)
+  is a Product a skos:Concept, or does it HAVE one — the draft registers :Theme as
+  its own label (TOMRole/ProductRole precedent; dual-typing a business entity with
+  owners and teams muddies what the node is) with skos:exactMatch to the business
+  row; the SME may collapse it. (§C) ANNOTATION DEPTH is the real control on grain:
+  annotate at ONE tier and derive the rest by skos:broader, so tagging a folder at
+  Product yields its ProductLine and LOB free — that stops a deep vocabulary from
+  multiplying annotations and beats capping vocabulary size, which forces a lie the
+  moment the business has more rows than the cap. (§D) THE CARDINALITY ASK IS
+  PREMATURE AT THE TIER NAMED, and this page says why rather than silently
+  declining: the SME asked for a limit under 5 at the AreaProduct level, but
+  lob-product-team.yaml records area_products: 0 and carries a STANDING OPEN
+  QUESTION (area-product-missing) on whether that tier applies outside production
+  PAT at all — rule the tier before capping it. What CAN be ruled now is the
+  ANNOTATION cap (themes per subject), enforced as a DETECTOR, not a schema
+  constraint: a folder carrying six themes is evidence the folder does too much or
+  the tagger hedged — a finding worth reading, not a write to refuse. (§E)
+  UNCLASSIFIED IS FIRST-CLASS, and out-of-scope is a DIFFERENT value from
+  not-yet-classified: external-vendor and unrelated pages are permanently out of
+  scope; an unclassified internal page is pending. Collapsing them makes coverage
+  unmeasurable. Nothing below is applied until ticked and transcribed to
+  config/gate-log.md.
+meta:
+  Module: "ontology — drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml (catalog_has_theme, planned) + 10-node-classifications.yaml (:Theme, planned); config/taxonomy/lob-product-team.yaml concept_scheme (declared, layer 1)"
+  Source: "config/taxonomy/lob-product-team.yaml (CatalogLOB > ProductLine > Product; 5/5/6 in the synthetic sample; DevTeam excluded from the scheme) — classification: Internal, the sample is publishable shape only"
+  Registry ref: "source pat (config/source-registry.yaml v2: pat:product-catalog + pat:people-report) for the tree; fcdo-frameworks (config/doc-source-registry.yaml, VERBATIM since 2026-08-19) for the Taxonomy Framework the declaration cites — cite the row, never a page"
+  Classification: "Internal-Public (the mechanism and the synthetic ids; real LOB/product names and the theme assignments over real folders are Internal and load company-side only)"
+  Vocabulary: "catalog_has_theme (HAS_THEME, dcat:theme) PLANNED; :Theme (skos:Concept) PLANNED; BROADER (skos:broader) between Themes rides the same build if §B keeps :Theme; nothing active until transcribed"
+  Precedent: "K4 tom_roles + K5 product_roles (a concept scheme gets its OWN label, not a generic :Concept; schemes FIXED, new members need a gate) · RECONCILES_TO as skos:closeMatch (this file's open question business-segment) · resource_pool.classify returning unknown with no label + a WARN (the §E discipline) · G102 fold (ADR 0011 not triggered — the fold was ruled on its own merits 2026-08-18)"
+  Source of record: "config/gate-log.md (transcription target) · docs/RELATIONSHIP_GUIDE.md · config/taxonomy/context-types.yaml (naming rule)"
+
+mapping:
+  - n: 1
+    element: "config/taxonomy/lob-product-team.yaml — CatalogLOB / ProductLine / Product rows"
+    target: "DECLARED (C34 (a), no gate): skos:ConceptScheme urn:drydocs:scheme:lob-product-team; parent_* links read as skos:broader; top concepts = lobs; DevTeam excluded"
+    edge: "concept scheme declaration  [record only — §A cites it]"
+  - n: 2
+    element: "the residency question (b1)"
+    target: "ANSWERED BY FOLD (2026-08-18, G102): one database — dcat:theme is a plain edge; IRI stays the join key regardless"
+    edge: "record, not a ruling  [§A]"
+  - n: 3
+    element: "Product / ProductLine / CatalogLOB nodes vs :Theme"
+    target: "PROPOSED: :Theme is its OWN label (skos:Concept), one per business row, skos:exactMatch to it; the SME may collapse onto the tiers (dual-typing)"
+    edge: "HAS_THEME target shape  [THE DECISION — §B]"
+  - n: 4
+    element: "annotation depth"
+    target: "PROPOSED: annotate at ONE tier (the most specific the tagger can defend); ProductLine and LOB are DERIVED by skos:broader, never stored as second edges"
+    edge: "grain control  [THE DECISION — §C]"
+  - n: 5
+    element: "the SME's cardinality ask (< 5 at AreaProduct)"
+    target: "DEFERRED with reason (the tier is unruled: area_products: 0, open question area-product-missing); the ANNOTATION cap is ruled instead, as a DETECTOR (default threshold proposed: > 3 themes on one subject = a finding)"
+    edge: "cap semantics  [THE DECISION — §D]"
+  - n: 6
+    element: "the unclassified states"
+    target: "PROPOSED: two distinct values — `pending` (internal, not yet tagged: backlog) and `out_of_scope` (external-vendor / unrelated: permanent); neither is a HAS_THEME edge; both are a property on the subject so coverage = tagged / (tagged + pending)"
+    edge: "coverage semantics  [THE DECISION — §E]"
+
+provenance:
+  - label: "concept rows (16 in the synthetic sample: 5 LOB + 5 ProductLine + 6 Product)"
+    source_object: "config/taxonomy/lob-product-team.yaml nodes.lobs / product_lines / products"
+    key: "id (LOB001, PL_AUTO, PROD_AUTO_05 …) — skos:notation = code where present, else id; the IRI is urn:drydocs:scheme:lob-product-team#<notation>"
+    loader: "~ (none until the follow-up build item; the scheme is declared, not loaded)"
+    properties:
+      - {name: pref_label, origin: source, from: "name", note: "skos:prefLabel"}
+      - {name: broader, origin: derived, from: "parent_lob / parent_product_line", note: "skos:broader; transitive closure is the §C derivation"}
+      - {name: exact_match, origin: derived, from: "the business row the Theme stands for", note: "skos:exactMatch — only if §B keeps :Theme as its own label"}
+  - label: "theme assignments (none exist; the edge is planned)"
+    source_object: "HAS_THEME from Document | ControlMFolder | ETLProcess — tagged by an SME, a rule, or a classifier; the origin is a property on the edge"
+    key: "(subject id, theme notation)"
+    loader: "~ (follow-up build item groomed at sign-off)"
+    properties:
+      - {name: origin, origin: derived, from: "who tagged it (sme | rule | classifier)", note: "a classifier tag is GROUNDED at best; an SME tag is VERBATIM — trust rides the edge"}
+      - {name: asserted_at, origin: derived, from: "the tagging run", note: "the layer-4 slice is 'right now' — tags age"}
+
+sections:
+  - title: "A. Residency — answered by the fold (record for the sign-off, not a question)"
+    confirmations:
+      - "A1: The blocker this gate was first drafted against — structured and unstructured context in TWO databases, and a Neo4j relationship cannot span databases (Q8, the same constraint behind G32's estate join) — no longer holds: the G102 fold put content and structure in ONE database on 2026-08-18. dcat:theme is therefore a plain edge to a shared :Theme. RECORDED, not ruled."
+      - "A2: The concept IRI (urn:drydocs:scheme:lob-product-team#<notation>) remains the JOIN KEY and stays stable whatever residency does later: if the databases are ever re-split, the scheme duplicates per database under identical IRIs or the theme rides as an IRI-valued property joined application-side — either way no tag is stranded. The IRI form is confirmed here so the follow-up loader mints it once."
+  - title: "B. Is a Product a skos:Concept, or does it HAVE one?"
+    confirmations:
+      - "B1 [RECOMMENDED — the draft's shape]: a Product HAS a concept. :Theme is its OWN label (skos:Concept, in scheme lob-product-team), one per CatalogLOB / ProductLine / Product row, linked to the business row by skos:exactMatch. Why: ProductLine and Product are business entities with owners, teams and applications (org:OrganizationalUnit-like); dual-typing them as skos:Concept is legal RDF and muddies what the node is — a query for 'subjects' would return org nodes, and a query for 'owners' would find concepts. Precedent: TOMRole and ProductRole are their own labels, never folded onto the thing they classify."
+      - "B2 [ALTERNATIVE]: a Product IS the concept — add skos:Concept to the CatalogLOB / ProductLine / Product labels, HAS_THEME targets them directly, :Theme retires unbuilt. One fewer node class; the cost is B1's ambiguity. If ruled, the planned :Theme classification is deprecated at transcription and catalog_has_theme re-targets 'CatalogLOB | ProductLine | Product'."
+      - "B3: DevTeam is NEVER a theme target under either ruling — it is an org unit, not a subject; the declaration already excludes it (not_concepts)."
+  - title: "C. Annotation depth — the real control on grain"
+    confirmations:
+      - "C1 [RECOMMENDED]: a subject is annotated at ONE tier — the most specific the tagger can defend — and its ProductLine and LOB are DERIVED by skos:broader at query time, never stored as second and third HAS_THEME edges. Tagging a folder at Product yields its ProductLine and LOB free; tagging at ProductLine (the vernacular tier) is legitimate when Product is unknown. This is what stops a deep vocabulary from multiplying annotations."
+      - "C2: depth is NOT controlled by capping the vocabulary's size. A size cap forces a lie the moment the business genuinely has more rows than the cap; the scheme takes every row the taxonomy has, and grain is controlled at the annotation, not the vocabulary."
+      - "C3: a subject MAY carry themes at different tiers when they are genuinely different subjects (a process serving Card Risk and the whole of Home Lending) — that is the multi-valued case §D's detector reads, not a depth violation."
+  - title: "D. Cardinality — the tier is unruled; the annotation cap is a detector"
+    confirmations:
+      - "D1 [DEFERRED, with the reason on the record]: the SME asked for a limit under 5 at the AreaProduct level. lob-product-team.yaml records area_products: 0 and carries the STANDING open question area-product-missing — whether the Team-of-Teams tier applies outside production PAT at all. A cap on a tier that may not exist is not a ruling; the tier is ruled first (its own gate or an amendment here once production PAT is captured), and the cap follows."
+      - "D2 [RECOMMENDED]: the ANNOTATION cap — how many themes one subject may carry — IS ruled now, and it is a DETECTOR, not a schema constraint. A folder carrying six themes is evidence the folder does too much or the tagger hedged; that is a finding worth reading (the remediation register's shape, a registry entry + a detector), not a write to refuse. Proposed default: > 3 distinct themes on one subject raises the finding; the threshold is a detector parameter the SME can move without a gate."
+      - "D3: a constraint is the wrong tool here for the same reason constraints ignore nulls were the wrong tool at ADR 0010's cutover: it would refuse the honest record of an over-broad folder and lose the signal the runbook automation wants most."
+  - title: "E. Unclassified is first-class; out-of-scope is a different value"
+    confirmations:
+      - "E1 [RECOMMENDED]: two distinct states, neither of which is a HAS_THEME edge: `pending` — an internal subject not yet classified (backlog; counts against coverage) — and `out_of_scope` — external-vendor pages, unrelated material (permanent; never counts). Both are a property on the subject (theme_state), set explicitly; the absence of both AND of an edge is a defect the loader WARNs on, the resource_pool.classify discipline (unknown with no label and a WARN, never a guess)."
+      - "E2: coverage is MEASURABLE only because the two are distinct: coverage = tagged / (tagged + pending). Collapsing pending and out_of_scope into one 'unclassified' makes the number stop distinguishing backlog from scope — the failure this section exists to prevent."
+      - "E3: out_of_scope is itself reviewable — it is a claim about the subject, carries origin and asserted_at like a tag, and a later SME may move it to pending. It is permanent by intent, not by mechanism."
+  - title: "F. Consequences recorded at sign-off"
+    confirmations:
+      - "F1: per §B — either catalog_has_theme + :Theme flip planned -> active (B1) or :Theme is deprecated unbuilt and the edge re-targets the tiers (B2); BROADER (skos:broader, Theme -> Theme) is registered alongside under B1. All in 42-local-catalog.yaml / 10-node-classifications.yaml; schema_graph.cypher regenerates."
+      - "F2: a BUILD item is groomed (loader: mint Themes from the taxonomy + the IRI rule of §A2; theme_state on subjects; the §D2 detector in the remediation register) and a THEME SEARCH item (retrieval scoped by dcat:theme over the standards corpus; 'context' nowhere in its id — context-types.yaml header). Neither ships from this gate."
+      - "F3: the area-product-missing open question gains a pointer to §D1 so the tier ruling, when it comes, knows a cap is waiting on it."
+      - "F4: the decision is transcribed to config/gate-log.md with per-item outcomes (A1-A2 recorded, B1-B3, C1-C3, D1-D3, E1-E3, F1-F4)."
+  - title: "G. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md — safe to transcribe into config/gate-log.md as a dated entry; nothing is loaded until the F2 build item closes."

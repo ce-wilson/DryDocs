@@ -69,6 +69,9 @@ open_questions:
       The ontology has Product ▸ AreaProduct ▸ DevTeam, but this sample is Product ▸ DevTeam
       direct (no AreaProduct rows). SME: confirm whether the AreaProduct (Team-of-Teams) layer
       applies here or only in production PAT data.
+      C34 (2026-08-20): the dcat-theme gate's §D1 DEFERS a cardinality cap on this tier until
+      it is ruled — rule the tier, and the cap (config/gate-prompts/dcat-theme-subject-scheme.yaml)
+      follows.
   - id: business-segment
     note: >
       reconciles_to_segment (CCB/AWM/Corp) references BusinessSegment with a confidence, but no
@@ -76,3 +79,34 @@ open_questions:
       Note LOB002 confidence 0.5 (AWMCIB splits across segments).
   - id: confidential-rosters
     note: "Team names here are synthetic. Production rosters/people are confidential -> internal/."
+
+# -----------------------------------------------------------------------------
+# SKOS concept scheme (C34 (a), 2026-08-20 — taxonomy, layer 1, no gate).
+# The tree above IS a concept scheme in all but name: classification_only, id-keyed,
+# labelled, hierarchical via parent_lob / parent_product_line / parent_product. This
+# block declares that, so dcat:theme has something standards-valid to point at. It
+# adds NO edge and NO meaning — skos:broader is the parent link the rows already
+# carry, read as a SKOS relation; whether a Product IS a skos:Concept or HAS one, how
+# deep a subject is annotated, and the annotation cap are the GATE's
+# (config/gate-prompts/dcat-theme-subject-scheme.yaml). SKOS is already precedent
+# in this file (RECONCILES_TO is skos:closeMatch, open question business-segment)
+# and in the vocabulary (10-node-classifications.yaml: skos:Concept classes).
+# Standard cited VERBATIM: the firm's Taxonomy Framework in the fcdo-frameworks
+# corpus (config/doc-source-registry.yaml, trust VERBATIM since 2026-08-19) — cite
+# the registry row, never the page.
+# -----------------------------------------------------------------------------
+concept_scheme:
+  rdf_type: skos:ConceptScheme
+  uri: urn:drydocs:scheme:lob-product-team      # the stable join key — portable whichever
+                                                 # residency rules (answered-by-fold, 2026-08-18)
+  pref_label: "Line of business / product line / product"
+  notation_from: code                            # skos:notation = `code` where present, else `id`
+  top_concepts: lobs                             # skos:hasTopConcept = every row under nodes.lobs
+  concept_tiers:                                 # every row in these lists is a candidate skos:Concept;
+    - { tier: lobs,          broader: ~ }        # tier membership is data, the Concept-vs-HAS question
+    - { tier: product_lines, broader: parent_lob }            # is ruled at the gate (§B)
+    - { tier: products,      broader: parent_product_line }
+  not_concepts: [dev_teams]                      # org:OrganizationalUnit, never a subject
+  broader_is: "the parent_* link, read as skos:broader; transitive closure gives LOB from Product for free (§C annotation depth)"
+  in_scheme_of: "dcat:theme targets (gate-bound: the edge is the gate's, this declaration is not)"
+  standard: fcdo-frameworks                      # doc-source-registry id; Taxonomy Framework, VERBATIM

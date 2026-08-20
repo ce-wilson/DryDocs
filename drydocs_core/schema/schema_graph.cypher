@@ -99,6 +99,8 @@ MERGE (n:SchemaMeta:Attribution {name: 'Attribution'})
   SET n.class = 'prov:Attribution', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:TOMRole {name: 'TOMRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:Theme {name: 'Theme'})
+  SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:ProductRole {name: 'ProductRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
@@ -403,6 +405,18 @@ MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'Role'})
 MERGE (a)-[r:HAD_ROLE]->(b)
   SET r.vocab_id = 'catalog_dev_team_attribution_had_role', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'Theme'})
+MERGE (a)-[r:HAS_THEME]->(b)
+  SET r.vocab_id = 'catalog_has_theme', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'Theme'})
+MERGE (a)-[r:HAS_THEME]->(b)
+  SET r.vocab_id = 'catalog_has_theme', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'Theme'})
+MERGE (a)-[r:HAS_THEME]->(b)
+  SET r.vocab_id = 'catalog_has_theme', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
 // ── domain: architecture ────────────────────────────────────────────────────
 

@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/taxonomy/lob-product-team.yaml
@@ -21,3 +21,8 @@ acceptance: |
 notes: |
   Raised 2026-08-11 from an SME design session that began on Idea-105 and opened a second thread. THE ORIGINAL INTENT: folder-level runbooks are >90% automatable, and the roll-up axis was going to be "Data Series" -- an entity that is not commonly defined. Teams think in source name instead, which is why the existing ProductLine tier fits: it is both the vernacular people already use AND already captured. The roll-up therefore falls out of the concept scheme without Data Series ever being defined, which is the part to protect in review. WHY IT REACHES THE CONTEXT GRAPH (SME observation, and it is right): a theme is a PROJECTION AXIS, so "everything in this subject, right now" becomes a layer-4 slice instead of needing a new entity to hang it on. Themes are multi-valued by nature, so a process serving two subjects appears in both slices with nothing duplicated -- which a single Data Series field could never have done. SCOPE FENCE: declares and drafts. Does not populate real values (Internal), does not write the edge, does not build UI.
   AMENDED 2026-08-20 (user direction, the theme-search ruling). THREE UPDATES: (1) QUESTION (b1) IS ANSWERED BY THE G102 FOLD — the residency blocker was written against the two-database design, and content + structure are ONE database since 2026-08-18, so dcat:theme can be a plain edge to a shared Concept; the prompt should record (b1) as answered-by-fold, not pose it. (2) THE EVIDENCE UPGRADED: the firm's Taxonomy Framework (v21) and its sibling standards are now VERBATIM-captured (the 2026-08-19 live fetch, fcdo-frameworks row) — the scheme declaration can cite the published standard directly instead of a partial transcription. (3) THE CONSUMER IS NAMED: the retrieval capability over this scheme is THEME SEARCH (dcat:theme-scoped retrieval over the standards corpus) — deliberately NOT "context search"; the naming rule and its three-senses census live in config/taxonomy/context-types.yaml's header. Groom the theme-search build as its own item once this gate signs; "context" never appears in its ids.
+annotations:
+  status: 'claimed 2026-08-20 (desktop, pushed before work; first item of the post-reboot session). done
+    2026-08-20 (desktop): (a) concept_scheme declared on lob-product-team.yaml (layer 1, no gate); (b)
+    gate dcat-theme-subject-scheme DRAFTED unsigned — (b1) recorded answered-by-fold, (b2)-(b4) + (c)
+    posed; catalog_has_theme + :Theme registered PLANNED on the TOMRole/ProductRole own-label precedent'

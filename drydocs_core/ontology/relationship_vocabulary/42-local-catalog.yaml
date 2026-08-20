@@ -374,3 +374,30 @@
     domain:       catalog
     loader:       pat_team_roles.cypher
     status:       active
+
+  # --- C34 (2026-08-20): dcat:theme — registered PLANNED; the gate rules it ---------
+  - id:           catalog_has_theme
+    neo4j_label:  HAS_THEME
+    inverse_label: "theme of"
+    role:         ~
+    from_node:    "Document | ControlMFolder | ETLProcess"
+    to_node:      Theme
+    prov_maps_to: ~
+    note: >
+      dcat:theme — a subject (Document, folder, process) is classified under a
+      :Theme (skos:Concept) of the lob-product-team concept scheme
+      (config/taxonomy/lob-product-team.yaml concept_scheme). A PROJECTION AXIS:
+      "everything in this subject, right now" becomes a layer-4 slice instead of
+      a new entity; multi-valued by nature, so one process serving two subjects
+      appears in both slices with nothing duplicated. Gate-bound: whether a
+      Product IS the Concept or HAS one (skos:exactMatch), the annotation depth
+      (tag at one tier, derive the rest by skos:broader), and the per-subject cap
+      (a DETECTOR, not a constraint) are ruled in
+      config/gate-prompts/dcat-theme-subject-scheme.yaml. Residency answered by
+      the G102 fold (one database since 2026-08-18): a plain edge to a shared
+      Concept. The consumer is THEME SEARCH (never "context search" —
+      config/taxonomy/context-types.yaml header).
+    supplement:   ~
+    domain:       catalog
+    loader:       ~
+    status:       planned   # C34 2026-08-20; gate dcat-theme-subject-scheme drafted, unsigned

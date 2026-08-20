@@ -1558,6 +1558,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "dcat-theme-subject-scheme (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/dcat-theme-subject-scheme.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "C34"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "document-supersession (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

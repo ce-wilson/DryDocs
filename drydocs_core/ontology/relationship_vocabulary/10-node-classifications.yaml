@@ -258,6 +258,24 @@ node_classifications:
       :ProductRole — do not conflate. Reached via Attribution -[:HAD_ROLE]-> TOMRole
       (prov:hadRole). Supplement: seal_ontology_supplement.cypher.
 
+  # — Subject themes (C34, 2026-08-20; gate dcat-theme-subject-scheme DRAFTED, unsigned) —
+  - label:      Theme
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      PLANNED (C34, 2026-08-20): a subject concept in scheme lob-product-team
+      (config/taxonomy/lob-product-team.yaml `concept_scheme`, urn:drydocs:scheme:
+      lob-product-team) — the dcat:theme target. Registered as its OWN label on the
+      TOMRole / ProductRole precedent (a concept per business row, skos:exactMatch to
+      the CatalogLOB / ProductLine / Product it stands for) rather than dual-typing
+      those org nodes, which are business entities with owners, teams and
+      applications. THE GATE MAY COLLAPSE THIS: its §B poses IS-a-Concept vs HAS-a-
+      Concept; if the SME rules "is", this label retires unbuilt and HAS_THEME
+      re-targets the three tiers directly. Reached via <subject> -[:HAS_THEME]-> Theme
+      (dcat:theme); Theme -[:BROADER]-> Theme (skos:broader) follows the parent_*
+      links so tagging at Product yields ProductLine and LOB free (§C). Never a
+      DevTeam (org unit, not a subject).
+
   # — Product Cabinet (K5 gate signed off 2026-07-20; supplement landed K6) —
   - label:      ProductRole
     class:      "skos:Concept"
