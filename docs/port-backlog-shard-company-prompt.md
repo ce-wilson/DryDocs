@@ -1,8 +1,8 @@
 # Company-side prompt — apply the port that carries the backlog shard (Y2, ADR 0013)
 
 > Producer-drafted 2026-08-20 for the company-side assistant. Paste or read whole.
-> **Placeholders in `⟨angle brackets⟩` are filled at base certification** — do not
-> start until they are. This port is different from every prior one in exactly one
+> **Filled at base certification 2026-08-20.** The remaining `⟨…⟩` are YOUR values
+> (your apply date, your branch/backup names) — fill them as you start. This port is different from every prior one in exactly one
 > place: **the backlog step**. The `docs/restructure/backlog.yaml` you hold is a
 > 21k-line monolith; the producer's is an 11-line tombstone beside a directory of
 > one-file items. The manifest row for that path carries a ONE-TIME sequence, spelled
@@ -14,10 +14,10 @@
 
 | | |
 |---|---|
-| Certified base | `⟨port-base-YYYYMMDD⟩` @ `⟨sha⟩` (producer preflight green) |
-| Range | `⟨prior-base-sha⟩..⟨port-base-YYYYMMDD⟩` |
-| Your branch / backup | `drydocs-port-⟨YYYYMMDD⟩`; tag `pre-cewilson-port-⟨YYYYMMDD⟩` before anything |
-| Read authorities at | `cewilson/main @ ⟨sha⟩`: `PORT-MANIFEST.yaml`, `docs/decisions/0013-backlog-sharding.md`, `docs/restructure/backlog/README.md` |
+| Certified base | tag **`port-base-20260820`** (producer preflight 7/7 green 2026-08-20; a tag is immutable — `git rev-parse port-base-20260820` is the sha, fetch it fresh) |
+| Range | `7c18ff4b..port-base-20260820` — 25 commits incl. the roll, 544 paths; six ledger steps 171-176 |
+| Your branch / backup | `drydocs-port-⟨your date⟩`; tag `pre-cewilson-port-⟨your date⟩` before anything |
+| Read authorities at | `cewilson/port-base-20260820` (the tag, never a cached ref): `PORT-MANIFEST.yaml`, `docs/decisions/0013-backlog-sharding.md`, `docs/restructure/backlog/README.md` |
 
 **Freeze precondition — check it before step 1, not after.** The backlog sequence
 below is only safe on a **committed, quiet** monolith. Last port your tree carried
@@ -34,8 +34,8 @@ It is four steps and the third one is a gate.
 
 **1. Union the monolith under the OLD rule, one last time.** Your `backlog.yaml`
 vs. the producer's last monolith state — which is the parent of the Y2 merge commit
-in the range, `git show ⟨y2-parent-sha⟩:docs/restructure/backlog.yaml` (the producer
-fills this sha; the tombstone itself holds no items). Id-keyed `items[]`; never drop
+in the range, `git show 4040c47e:docs/restructure/backlog.yaml` (`4040c47e` is the Y2 claim commit,
+the last commit that touched the monolith as a monolith; the tombstone itself holds no items). Id-keyed `items[]`; never drop
 an entry; **your `status` stands** — a port never writes status (the F4 ruling,
 Clause 4: same id, same work, two independent completions); the producer's status +
 date fold into `notes` as information. Company-only items stay. Write the result
@@ -46,7 +46,7 @@ recoverable on its own.
 **2. Run the PORTED splitter on that union.**
 
 ```
-poetry run python scripts/shard_backlog.py --date ⟨YYYY-MM-DD⟩
+poetry run python scripts/shard_backlog.py --date ⟨your apply date, YYYY-MM-DD⟩
 ```
 
 It writes `docs/restructure/backlog/` (items/, epics/, plan.yaml, modules.yaml,
@@ -68,7 +68,7 @@ re-run) and a duplicate mapping key the old loader tolerated (fix it in step 1).
 **4. Tombstone.**
 
 ```
-poetry run python scripts/shard_backlog.py --date ⟨YYYY-MM-DD⟩ --tombstone
+poetry run python scripts/shard_backlog.py --date ⟨your apply date, YYYY-MM-DD⟩ --tombstone
 ```
 
 Re-runs the proof, then replaces `backlog.yaml` with the 11-line pointer. Commit
@@ -97,12 +97,27 @@ the new rows: `backlog/items/*.yaml` **per-entry where the entry is the file**
 
 ## Also in this range (the rest is ordinary)
 
-`⟨filled at certification: the other notable paths in the range — at minimum J51's six
-new PORT-MANIFEST rows (description_tokens, detect, test_runbook_currency,
-email-dl-contact-point, ui-components, doc-source-registry) which land BEFORE this
-port and govern collisions inside it; and the ui-workstream merge if it is in.⟩`
+Six ledger steps (docs/port-prompt.md 171-176); read them in order, they are short:
 
-Apply those by the manifest as usual — read it first (`git show cewilson/main:
+- **171** — `constraints.cypher` is now per-entry by constraint name (your two
+  snow-hpsm constraints stay); the `fcdo-frameworks` doc-source row reads VERBATIM
+  and its LOAD is a hand prompt you already hold.
+- **172** — ADR 0013, the sharding design (clean-add).
+- **173** — the 7c18ff4b port review + the two follow-up prompts (clean-add; their
+  conditions are already in your ledger).
+- **174** — **J51's six PER-ENTRY rows land in `PORT-MANIFEST.yaml`** for
+  `description_tokens.py`, `detect.py` + `__init__.py`, `test_runbook_currency.py`,
+  `email-dl-contact-point.yaml`, `ui-components.yaml`, `doc-source-registry.yaml` —
+  the six files caa0406 unioned by hand. The manifest is canonical-producer: take it
+  FIRST, then resolve those six by their new rows. Also the F4 ruling (status is
+  per-repo at a port — what your 2026-08-11 union already did).
+- **175** — the shard itself: this prompt.
+- **176** — C34: `lob-product-team.yaml` gains a `concept_scheme` block (per-entry —
+  your real LOB rows stay, the block is mechanism); a new gate prompt
+  `dcat-theme-subject-scheme.yaml` (clean-add; you run your own gate); two PLANNED
+  vocabulary entries. The ui-workstream merge trio rides here as ritual.
+
+Apply those by the manifest as usual — read it first (`git show port-base-20260820:
 PORT-MANIFEST.yaml`), per-entry rows resolve inside the file, canonical-company rows
 keep yours. Nothing else in this range has a special sequence.
 

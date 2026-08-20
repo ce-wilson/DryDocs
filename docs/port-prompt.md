@@ -115,6 +115,19 @@ local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-of
 and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
+**LEDGER ROLLED AND CERTIFIED 2026-08-20 (desktop, post-reboot).** Steps **171-176**
+cover the **24-commit delta `7c18ff4b..main`** (18 cited across the six steps, 6
+ritual under the standing exemption: `0fdfe7a2` the 20260819 roll, `963e93ca` a
+render follow, `16f370d0` the handoff roll, `b0c823da` `4040c47e` `4dac320c` claims),
+verified commit-by-commit by `port_preflight.py`. The base is tagged
+**`port-base-20260820`** at the roll commit (`python scripts/port_preflight.py
+--base 7c18ff4b --tag`). **THIS RANGE HAS ONE STEP WITH ITS OWN APPLY SEQUENCE —
+step 175, the backlog shard** — carried in full by
+`docs/port-backlog-shard-company-prompt.md`; everything else applies by the
+manifest as usual. PRECONDITION on your side: the 135-170 port
+(`drydocs-port-20260820`) is `--no-ff` MERGED to your main with its follow-ups
+done before this range starts — a mid-apply range finishes on the monolith.
+
 > **THE `caa0406` PORT'S CLOSE-OUT IS UNRECORDED — ask before assuming it landed.**
 > `ae21ee4` got an explicit `06d4469` "MERGED company-side, branch removed" commit.
 > `caa0406` got a report, a producer review, and then nothing. The producer cannot
@@ -2230,24 +2243,126 @@ regeneration, never-port outputs — and get no step.
     (cross-application run_as detection) ride the same join. Your side adopts
     the gate via your own review, per your §9 model.
 
-171. J51 — SIX PER-ENTRY MANIFEST ROWS FOR PATHS THE COMPANY LEGITIMATELY EXTENDS
-    [FIRST STEP OF THE NEXT RANGE, base not yet certified; lands BEFORE the base so
-    the rows govern collisions inside the range that carries them]
-    (evidence: the J51 commit — PORT-MANIFEST rows for description_tokens.py (per
-    function), detect.py + __init__.py (per detector id), test_runbook_currency.py
-    (per exemption table, retirement trigger named), email-dl-contact-point.yaml
-    (company keeps the file; producer SME intent crosses by section),
-    ui-components.yaml (the K7-K15 hold IS the rule), doc-source-registry.yaml
-    (field split: graph_locator / captured_at / manifest / source are company-owned,
-    `confirmed` per-repo); test_port_reconcile_guards gains no-drop checks for the
-    two list-shaped files, live-gated on OPTIONAL before-snapshots.)
-    Idea-142's class (constraints.cypher, step-170 range) closed as a manifest
-    obligation rather than a reconcile habit. SAME DAY, same next range: the Y2
-    backlog shard (ADR 0013, merge `01cfd7dc`) — its ONE-TIME apply sequence rides
-    the `docs/restructure/backlog.yaml` manifest row and the hand prompt
-    `docs/port-backlog-shard-company-prompt.md`; it gets its own step when the base
-    is certified.
+171. THE PORT-BOUNDARY FIXES THAT CLOSED THE 135-170 APPLY [config / docmeta]
+    (`25556622` constraints.cypher re-dispositioned PER-ENTRY — the wholesale take at
+    the 135-170 apply dropped two live company constraints (hpsm_queue_key,
+    sn_group_name); the row now unions by constraint name. `bdb5886a` the
+    fcdo-frameworks doc-source row goes VERBATIM on the 2026-08-19 company fetch
+    (the four crosswalk capture holes closed), the "context"-never-in-an-id naming
+    rule lands in config/taxonomy/context-types.yaml's header, and the LOAD is a
+    hand prompt (docs/fcdo-frameworks-load-company-prompt.md) — loads are always
+    yours; `963e93ca` the registry-embedding renders follow.)
+    APPLY: constraints per-entry by name (your two stay); doc-source-registry now
+    has its OWN per-entry row at step 175 — read that before taking this file.
 
+172. ADR 0013 — THE BACKLOG SHARDING DESIGN, RULED WITH THE USER [docs / decisions]
+    (`6d599c58` Y1 done: docs/decisions/0013-backlog-sharding.md ACCEPTED. Five
+    mechanisms: one STANDALONE mapping per item, FLAT backlog/items/<id>.yaml (flat
+    on graph grounds — epic: is a field, Y4 mints IN_EPIC from it); epic header
+    comments become DATA (epics/<epic>.yaml groom_log); summary/next_ready DELETED
+    from storage, derived by the board; a claim is a one-file flip; splitter + S5
+    deep-equality proof + tombstone, and the splitter PORTS AS CODE — each side
+    shards its OWN per-entry-unioned monolith, never receives the other's tree.
+    Same day, the F4 amendment (step 174). Ritual beside it: `b0c823da` the C34
+    claim, `16f370d0` the pre-reboot handoff roll.)
+    APPLY: clean-add. The design; the build is step 175 and its apply sequence is
+    the ONE thing in this range that is not "read the manifest as usual".
+
+173. THE 7c18ff4b PORT REVIEW AND ITS TWO HAND PROMPTS [docs / review]
+    (`5568be09` docs/reviews/port-review-7c18ff4b-20260820.md — range verified
+    247/316 producer-side, five findings, verdict mergeable with conditions on the
+    follow-up; `195e5561` + `bc14b6c8` docs/port-7c18ff4b-followup-company-prompt.md
+    — the FID pair lands as ONE gate-log commit, the company-local fixes get a
+    not-port-introduced section; REWRITTEN the same day so it asks for nothing
+    back: records live in YOUR ledger, instance names nowhere (the standing rule
+    from here on for every producer-facing text). `94f3d51b` Idea-147 (the scrape
+    run <-> registry row join; re-issued as Idea-148 at the UI merge, step 176)
+    and J51 widened to six paths.)
+    APPLY: clean-add, all three. The review's F1/F2 are conditions on YOUR
+    7c18ff4b follow-up, already in your ledger; nothing here changes your apply.
+
+174. F4 RULED — STATUS IS PER-REPO AT A PORT; J51 THE SIX PER-ENTRY ROWS [config / manifest]
+    (`46a2c2ef` the ruling (user, 2026-08-20): when both repos hold the same
+    backlog id, the CONSUMER's status stands — a port never writes status, the
+    producer's status + date fold into notes; what your 2026-08-11 union already
+    did for 12 ids ("done never crosses"). Landed in ADR 0013 Clause 4 + 6 and
+    the manifest entry_rule; "keep the further-along" is the intra-repo
+    two-machine rule and still holds there. `0242fa43` J51 done: PORT-MANIFEST
+    rows for description_tokens.py (per function), detect.py + __init__.py (per
+    detector id), test_runbook_currency.py (per exemption table, retirement
+    trigger named), email-dl-contact-point.yaml (you keep the file; producer SME
+    intent crosses by section), ui-components.yaml (the K7-K15 hold IS the rule),
+    doc-source-registry.yaml (field split: graph_locator / captured_at / manifest
+    / source are yours; confirmed is per-repo). test_port_reconcile_guards gains
+    no-drop checks for the two list-shaped files, live-gated on OPTIONAL
+    before-snapshots (step 1 of the reconcile-port skill shows how to arm them).
+    `4dac320c` its claim.)
+    APPLY: PORT-MANIFEST is canonical-producer — take it; these rows are what
+    resolve the six collisions caa0406 unioned by hand, so read them BEFORE those
+    files. Idea-142 closed by this step.
+
+175. Y2 — THE BACKLOG IS SHARDED; backlog.yaml IS A TOMBSTONE [drydocs-core / plan / guards]
+    [THE ONE STEP WITH ITS OWN APPLY SEQUENCE — read docs/port-backlog-shard-
+    company-prompt.md whole before touching the backlog]
+    (`8a6b592d` the build: docs/restructure/backlog/ — items/<id>.yaml x469,
+    epics/<epic>.yaml x26 (54 header blocks as groom_log data), plan.yaml,
+    modules.yaml; drydocs_core/backlog_store.py the ONE reader (assembles the
+    monolith's document shape, derives the roll-ups, dumps the assembled document
+    for the reconcile guard; S5's duplicate-key loader; anchored on repo_root per
+    Idea-109); scripts/shard_backlog.py the splitter with the deep-equality proof
+    (469 items field-for-field, 157 inline comments harvested into an additive
+    `annotations` field and checked, plan/modules identical, derived summary ==
+    stored counts AND next_ready set) — run BEFORE the tombstone, and again at it;
+    readers re-pointed (plan_board: derived counts + a "Ready to pull" strip =
+    next_ready, `updated:` dropped; plan_roadmap; render_gates;
+    build_schema_matrix; render_board CLI); guards (test_backlog: schema v3,
+    path-is-identity, per-file duplicate keys, NO STORED ROLL-UP — the two
+    recompute guards inverted —, derived-summary consistency, monolith-is-a-
+    tombstone; test_runbook_coverage; test_port_reconcile_guards after-side via
+    the store; test_plan_roadmap); writers (groom-backlog SKILL + validate.py,
+    backlog-groomer agent); CLAUDE.md §0 pull rule + ritual; MODULE_MAP core row;
+    reconcile-port before-snapshot = backlog_store.dump_document(); the manifest
+    rows (items per-entry where THE ENTRY IS THE FILE, epics union-append,
+    plan/modules per-entry, backlog.yaml carries the one-time sequence).
+    `01cfd7dc` the --no-ff merge; `931883a8` Y2 done — the first one-file status
+    flip; `4040c47e` the claim that FROZE backlog.yaml for the build; `df447e7d`
+    the lull-port hand prompt. gates.json reorders once (unblocks lists follow
+    item order) and is deterministic after.)
+    APPLY — in this order and no other: (1) per-entry UNION your monolith with
+    the producer's LAST monolith state, `git show 4040c47e:docs/restructure/
+    backlog.yaml`, under the old rule — id-keyed, never drop, YOUR status stands,
+    producer status + date into notes; commit that union on its own. (2) run the
+    PORTED `scripts/shard_backlog.py --date <today>` on it — your items survive by
+    construction. (3) the proof must print PROOF OK; a failure STOPS the port at
+    this step, recorded in your ledger, monolith left in place. (4) `--tombstone`;
+    commit tree + tombstone together. NEVER copy a file from the producer's
+    backlog/ tree — the tree is each side's own output. If a range is mid-apply
+    when you read this, finish it on the monolith; this is the first step of the
+    NEXT range. After it, claims are one-file flips and the reconcile before-
+    snapshot is the dumped document.
+
+176. C34 — THE lob-product-team TREE DECLARED A skos:ConceptScheme; THE dcat:theme GATE DRAFTED
+    [ontology / taxonomy] (`6e912c1d`: (a) config/taxonomy/lob-product-team.yaml
+    gains `concept_scheme` — skos:ConceptScheme urn:drydocs:scheme:lob-product-team,
+    top concepts = lobs, parent_* read as skos:broader, DevTeam excluded, the
+    Taxonomy Framework cited by its fcdo-frameworks registry row — layer 1, no
+    gate, no edge; (b) config/gate-prompts/dcat-theme-subject-scheme.yaml DRAFTED,
+    unsigned — §A records residency as ANSWERED BY THE G102 FOLD, §B IS-vs-HAS a
+    concept (:Theme as its own label recommended, the TOMRole/ProductRole
+    precedent), §C annotation depth as the grain control, §D the AreaProduct cap
+    DEFERRED with reason + the annotation cap as a DETECTOR, §E pending vs
+    out_of_scope; catalog_has_theme (HAS_THEME) + :Theme registered PLANNED;
+    schema_graph.cypher / enforcement matrix / gates.json regenerated, 96 gates.
+    The UI-branch merge trio rides here as ritual: `7f52f6d6` the WIP capture
+    (agents read the root .env as fallback; the ownership pane's custom edge type;
+    /ask last-turn persistence), `5a708ab4` its roll-up recount, `423192db` the
+    --no-ff merge that put R18/R19 + Idea-143..147 into the monolith BEFORE the
+    shard, and `fcdfe88c` two Idea-header slips fixed (Med not Medium; lowercase
+    groomed).)
+    APPLY: taxonomy/lob-product-team.yaml is per-entry (your real LOB rows stay;
+    the `concept_scheme` block is mechanism — take it whole); gate-prompts/** is
+    yours, the new prompt is a clean-add; the vocabulary fragments per-entry as
+    always (two PLANNED entries, nothing active). You run your own gate on it.
 
 LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
 this range, cited here because the coverage check reads ONLY this section:
