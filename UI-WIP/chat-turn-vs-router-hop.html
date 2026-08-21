@@ -158,6 +158,55 @@
     min-width: max-content;
   }
 
+  /* Mermaid is initialized by the host, whose theme may be dark; its palette
+     arrives in a <style> block inside the generated SVG. Override it here so
+     the figures stay legible no matter what theme the host picked. Shape fills
+     are deliberately NOT !important - per-node classDef fills must still win. */
+  .plate .nodeLabel,
+  .plate .edgeLabel,
+  .plate .cluster-label,
+  .plate .label,
+  .plate foreignObject div,
+  .plate text {
+    color: #14171c !important;
+    fill: #14171c !important;
+  }
+
+  .plate .edgeLabel rect,
+  .plate .edgeLabel .label-container,
+  .plate .labelBkg {
+    fill: #f7f8fa !important;
+    background-color: #f7f8fa !important;
+    opacity: 1 !important;
+  }
+
+  .plate .node rect,
+  .plate .node polygon,
+  .plate .node circle,
+  .plate .node ellipse,
+  .plate .node path {
+    fill: #ffffff;
+    stroke: #8f9aa6;
+  }
+
+  .plate .cluster rect {
+    fill: #eef1f4 !important;
+    stroke: #c8d0d8 !important;
+  }
+
+  .plate .edgePath path,
+  .plate path.flowchart-link,
+  .plate .flowchart-link {
+    stroke: #6b7683 !important;
+  }
+
+  .plate marker path,
+  .plate .marker,
+  .plate defs marker path {
+    fill: #6b7683 !important;
+    stroke: #6b7683 !important;
+  }
+
   .figcap {
     font-family: var(--f-mono);
     font-size: 0.75rem;
@@ -349,9 +398,14 @@ flowchart LR
   MODE -->|Plan| PLAN["PLAN<br/>TOOLDEF: read-only<br/>GATE: none, nothing writes<br/>LOOP: over reads<br/>FINAL: plan awaiting approval"]
   MODE -->|Agent| AGENT["AGENT<br/>TOOLDEF: read + write + execute<br/>GATE: on writes and commands<br/>LOOP: until done<br/>FINAL: summary of changes"]
   PLAN -.->|on approval| AGENT
-  style ASK fill:#eef1f4,stroke:#8f9aa6
-  style PLAN fill:#eef1f4,stroke:#8f9aa6
-  style AGENT fill:#dcece3,stroke:#2c6f52
+  classDef plain fill:#ffffff,stroke:#8f9aa6,color:#14171c
+  classDef muted fill:#eef1f4,stroke:#8f9aa6,color:#14171c
+  classDef good  fill:#dcece3,stroke:#2c6f52,color:#14351f
+  classDef warn  fill:#f3e7cf,stroke:#8a5d16,color:#3d2a08
+  classDef bad   fill:#f2dedc,stroke:#9d3f38,color:#3d1714
+  class MODE plain
+  class ASK,PLAN muted
+  class AGENT good
 </pre>
     </div>
     <div class="figcap"><b>Figure 1</b><span>Mode sets capability, not personality. Plan hands off to Agent; Ask never does.</span></div>
@@ -386,10 +440,15 @@ flowchart TB
   LOOP -->|no, try again| INFER
   LOOP -->|yes| FINAL["FINAL<br/>final message"]
   FINAL --> XCRIPT["XCRIPT<br/>persisted transcript<br/>prompts, replies, tool I/O"]
-  style THINK fill:#f3e7cf,stroke:#8a5d16
-  style LOOP fill:#dcece3,stroke:#2c6f52
-  style TOOLDEF fill:#dcece3,stroke:#2c6f52
-  style GATE fill:#dcece3,stroke:#2c6f52
+  classDef plain fill:#ffffff,stroke:#8f9aa6,color:#14171c
+  classDef muted fill:#eef1f4,stroke:#8f9aa6,color:#14171c
+  classDef good  fill:#dcece3,stroke:#2c6f52,color:#14351f
+  classDef warn  fill:#f3e7cf,stroke:#8a5d16,color:#3d2a08
+  classDef bad   fill:#f2dedc,stroke:#9d3f38,color:#3d1714
+  class PROMPT,SYS,HIST,CTXPACK,INFER,EMIT,ACT,OBS,FINAL,XCRIPT plain
+  class THINK warn
+  class TOOLDEF,GATE,LOOP good
+  style ASSEMBLE fill:#eef1f4,stroke:#c8d0d8,color:#14171c
 </pre>
     </div>
     <div class="figcap"><b>Figure 2</b><span>Highlighted blocks are the four the router has no equivalent for.</span></div>
@@ -423,9 +482,15 @@ flowchart TB
   AOUT --> ENV["ENV<br/>envelope: steps, sources, metrics<br/>question reduced to sha256 + length"]
   ENV --> LEDGER["LEDGER<br/>R3 JSONL in DRYDOCS_LOGDIR<br/>the only sink with full question text"]
   ENV --> SESS["SESS<br/>ADK session events<br/>steps and answer, not prompts"]
-  style RDEC fill:#f2dedc,stroke:#9d3f38
-  style TIER2 fill:#f3e7cf,stroke:#8a5d16
-  style TSPEC fill:#dcece3,stroke:#2c6f52
+  classDef plain fill:#ffffff,stroke:#8f9aa6,color:#14171c
+  classDef muted fill:#eef1f4,stroke:#8f9aa6,color:#14171c
+  classDef good  fill:#dcece3,stroke:#2c6f52,color:#14351f
+  classDef warn  fill:#f3e7cf,stroke:#8a5d16,color:#3d2a08
+  classDef bad   fill:#f2dedc,stroke:#9d3f38,color:#3d1714
+  class QIN,CTRL,RCAT,SESSMEM,RSYS,TGEN,TFIX,EXEC,SUFF,ASYS,AOUT,ENV,LEDGER,SESS plain
+  class RDEC bad
+  class TIER2 warn
+  class TSPEC good
 </pre>
     </div>
     <div class="figcap"><b>Figure 3</b><span>R-DEC in red is the single irreversible choice. Tier 2 in amber is the only loop, and most runs never reach it.</span></div>
