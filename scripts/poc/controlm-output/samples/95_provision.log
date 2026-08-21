@@ -2,7 +2,7 @@ PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG
 
 00001 2026/08/20 16:10 - 2026/08/20 16:13 Size: 5358 Status: 0
 
-+ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline 14a83971-0000-468e-8cb4-000000000005 -appName appb\
++ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline 55555555-0000-4000-a000-000000000005 -appName appb\
  -seal 67890 -dataflow FLOW_BETA_DLY -img img-67890-aws-PC -bd 20260819 -od 20260819 -fid A000002 -timeout 3 -slee\
 p 1 -t -compute /apps/tenants/tenant_a/cfg/compute_67890_GKP_PROD.json -conf /apps/tenants/tenant_a/cfg/67890-epv-conf.json
 Deployment path /apps/tenants/dpl_utils/dt-accelerators
@@ -24,5 +24,5 @@ Using active install in slot A.
         "spark.namespace.alias": "gkp-ns"
     }
 }
-2026-08-20 20:11:02,988 [INFO] TaskService: Submitting job to: https://task.example/shared-functions/provision-data/v2/clusters/launch/pipelineId=14a83971-0000-468e-8cb4-000000000005
-2026-08-20 20:11:16,644 [INFO] TaskService: Submission response: {'pipelineID': '14a83971-0000-468e-8cb4-000000000005', 'jobID': '86030208913936523', 'oDate': '20260819', 'businessDate': '20260819', 'userId': 'A000002', 'httpStatus': 'CREATED', 'cluster': 'mt-p13.region-c02'}
+2026-08-20 20:11:02,988 [INFO] TaskService: Submitting job to: https://task.example/shared-functions/provision-data/v2/clusters/launch/pipelineId=55555555-0000-4000-a000-000000000005
+2026-08-20 20:11:16,644 [INFO] TaskService: Submission response: {'pipelineID': '55555555-0000-4000-a000-000000000005', 'jobID': '90000000000000001', 'oDate': '20260819', 'businessDate': '20260819', 'userId': 'A000002', 'httpStatus': 'CREATED', 'cluster': 'cluster-p01.region-c02'}

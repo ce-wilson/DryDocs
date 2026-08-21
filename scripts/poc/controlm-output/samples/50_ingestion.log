@@ -2,8 +2,8 @@ PJOB0050_FLOW_ALPHA_AWS_TRUST
 
 00001 2026/08/20 15:41 - 2026/08/20 16:02 Size: 12505 Status: 0
 
-+ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline d1cfdc57-0000-4ea7-be62-000000000001 -appName appa -\
-alias aws-eks -seal 12345 -dataflow FLOW_ALPHA -img img-12345-aws-PC -bd 20260820 -od 20260819 -fid A000001 -proId 9878a0ce-0000-4a31-8391-000000000003 -timeout 3 -sleep 1 -i -conf /apps/tenants/tenant_a/cfg/12345-epv-conf.json -compute /apps/tenants/tenant_a/cfg/compute_ing_medium.json
++ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline 11111111-0000-4000-a000-000000000001 -appName appa -\
+alias aws-eks -seal 12345 -dataflow FLOW_ALPHA -img img-12345-aws-PC -bd 20260820 -od 20260819 -fid A000001 -proId 33333333-0000-4000-a000-000000000003 -timeout 3 -sleep 1 -i -conf /apps/tenants/tenant_a/cfg/12345-epv-conf.json -compute /apps/tenants/tenant_a/cfg/compute_ing_medium.json
 Deployment path /apps/tenants/dpl_utils/dt-accelerators
 Using active install in slot A.
 
