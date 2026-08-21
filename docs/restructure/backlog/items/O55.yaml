@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/package.json
@@ -18,3 +18,12 @@ acceptance: |
   `npm audit` in web/ reports ZERO high-severity advisories, reached one of two ways with the choice named in the commit body: (a) the migration — router imports rewritten against react-router@8 (v8 absorbs react-router-dom, whose latest 7.18.1 sits inside the vulnerable 7.12.0-8.2.0 range, which is why `npm audit fix` is a no-op), `npm run build` passing and every route still reachable; or (b) an explicit recorded waiver naming why GHSA-qwww-vcr4-c8h2 cannot apply to this console (the RSC-mode CSRF path — the console is a Vite SPA with no RSC actions). A red audit is never the resting state.
 notes: |
   Groomed 2026-08-07 (pm) from Idea-40, escalated out of O34 by that item's own stop clause (the postcss/nanoid patches landed there; this one needs a major bump). Both branches are legitimate — the entry's own reading is "likely moot in practice" — so the acceptance refuses to force the migration and forbids only leaving the audit red AND undecided. Pairs with the bundle code-splitting design call O34 also parked.
+  DONE 2026-08-21 (desktop). A THIRD WAY the item could not see when groomed: upstream patched it.
+  react-router-dom 7.18.2 (released after the groom) sits OUTSIDE the advisory range
+  7.12.0-7.18.1, so `npm audit fix` is no longer a no-op -- it moved react-router / react-router-dom
+  7.18.1 -> 7.18.2 and nanoid -> 3.3.18 (a second high, GHSA-2v37-7h3g-55p8, that appeared in the
+  meantime) in package-lock.json only; package.json's `^7.9.5` already admits 7.18.2. `npm audit
+  --audit-level=high`: found 0 vulnerabilities. `npm run build`: built in 499 ms; oxlint exit 0 (two
+  pre-existing fast-refresh warnings, unchanged). The v8 migration (a) was therefore not taken -- a
+  major bump for a patch that arrived in-range -- and no waiver (b) was needed. Chosen path named in
+  the commit body. Every route stays as before: no source file changed.
