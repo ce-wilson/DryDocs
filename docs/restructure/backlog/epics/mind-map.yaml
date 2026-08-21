@@ -1,0 +1,19 @@
+id: mind-map
+letter: MM
+title: Mind-map — graph-seeded investigation and the data-flow overview record
+order: 26
+groom_log:
+- date: '2026-08-21'
+  note: |-
+    ── Epic MM — mind-map (deepdoc leaves the placeholder) — Phase 17 ───────────
+    Born 2026-08-21 from Idea-153: a 48-frame production deep-dive (email → Control-M
+    client → Jira → Bitbucket → Confluence → chat assistant) transcribed verbatim
+    machine-local and synthesized mechanism-only in
+    docs/design/deepdoc-data-flow-overview.md. User rulings at the groom: the epic is
+    a research/retrieval stream, not data lineage (hence MM, not a DF letter); scope
+    reaches integration into the unstructured knowledge graph with ontology-proposed
+    labels, a reliability weight, SME input, and a provenance breadcrumb per finding;
+    Fable owns the synthesis, the Opus "3-tool update plan" is an input (MM3/MM4).
+    Sanitization rule for every tracked artifact: SEAL → APP_ID, Jira keys → <JIRA-nnnn>,
+    the DevX project/space → Auto.
+  attached_at: MM1

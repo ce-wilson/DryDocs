@@ -1,0 +1,24 @@
+id: MM8
+epic: mind-map
+title: |-
+  R13 in detect.py, plus its second consequence: an internally-fed FileWatcher (watched path = a predecessor's written path) proposes load_bearing=false and a self-asserted TDQ flag — SME-ruled, never auto-applied
+type: task
+module: drydocs-remediation
+phase: 17
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- MM2
+- MM7
+inputs:
+- internal/remediation/standards-rules-registry.md
+- internal/remediation/governance/hlt-naming-standard.md
+- drydocs_remediation/detect.py
+- drydocs_remediation/transform.py
+- docs/design/deepdoc-data-flow-overview.md
+acceptance: |-
+  detect.py implements R13 over the resolved flow: a watcher-typed job whose predecessor's resolved command is an HTTP-client call, or whose watched path equals a path a same-folder predecessor writes (from CMDLINE file-ops or the MM7 output facts), yields a Finding with rule_id R13 and an `internally_fed: true` detail; a second detail `tdq_self_asserted: true` when the token file and the data file share a writer. The per-flow `load_bearing` value is emitted as a PROPOSAL (`unruled` → `false` proposed) and the transform engine offers the greenfield shape (drop the watcher, add a producer-side row-count/checksum step) only behind an approved change — compile_changes refuses it unanchored. Synthetic fixtures cover: externally pushed file (no finding), API pull with internally fed watchers (finding), API pull whose watcher path differs from the writer (no finding, counted as `ambiguous`). The two non-rule defects the session surfaced — a job Description naming a different dataset than its runtime artifacts, and a production submission whose appname/namespace alias is a test literal — are added as findings under existing carriers (R-series value contracts), not as new rules. Idea-31's clause on the company greenfield rules is marked un-parked for this family in IDEAS.md.
+notes: |-
+  R13 exists in the internal registry since 2026-06-17 (provisional) and was never implemented; its greenfield said only 'retoken'. The deep-dive supplies the sharper test and the new consequence. Depends on MM7 because the written-path evidence comes from the Output log where CMDLINE is variable-driven.

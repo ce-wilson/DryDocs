@@ -1,0 +1,22 @@
+id: MM9
+epic: mind-map
+title: |-
+  Email corpus → data-flow binding: the Q10 SME surface assigns a support thread to a :DataFlow record and seeds support_dls, producer_contact and the failure signature with an evidence ref
+type: task
+module: drydocs-docmeta
+phase: 17
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- MM2
+- Q10
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- docs/restructure/backlog/items/Q10.yaml
+- internal-local/deepdoc/2026-08-20-session-1/transcripts/email-origin-capture.md
+acceptance: |-
+  The Q10 assignment surface offers a :DataFlow target beside folder/process; assigning a thread writes, through drydocs_deepdoc/writer.py under :Uncertain, the thread's distribution lists as support_dls, the first sender outside them as producer_contact candidate, and the error signature line as a failure fact, each with `evidence_ref = email:<extract-id>` and reliability set from whether the job name in the subject matched a graph job exactly. A test over a synthetic extract (controlm-email-json-v1 schema, mechanism-only) proves the three facts, the evidence ref, and that nothing is written when the subject's job is not in the graph (graph-seeded: no new subject).
+notes: |-
+  The session's research log already consumed an email extract by path; this makes that a mechanism. p3 because MM2 must rule the record first.

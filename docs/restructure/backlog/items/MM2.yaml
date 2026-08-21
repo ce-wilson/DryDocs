@@ -1,0 +1,25 @@
+id: MM2
+epic: mind-map
+title: |-
+  Gate prompt data-flow-overview: the per-data-flow record (keyed on %%DATAFLOW), the ingest_mode enum, the planned :DataFlow vocabulary, and the evidence-breadcrumb grammar
+type: task
+module: ontology
+phase: 17
+agent: ontology-mapper
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- docs/patterns/data-catalog/lineage-design-top3.md
+- knowledge/standards/technology/controlm-greenfield-job-standard.md
+- .claude/skills/controlm-runbook-automation/references/plan.md
+- drydocs_api/query_specs.py
+- drydocs_core/orchestration/controlm/variables.py
+- docs/decisions/0011-single-database-contingency.md
+- config/gate-prompts/document-content-topology.yaml
+acceptance: |-
+  config/gate-prompts/data-flow-overview.yaml exists, renders through drydocs/gate_pages.py into the standard four-part page (tests/unit/test_gate_pages.py green), and puts to the SME, pre-picking none: (a) the label and key — `:DataFlow` on the %%DATAFLOW value versus folding into :AppDataFlow's dataflowUrn, and whether the value is unique firm-wide or per application; (b) the `ingest_mode` enum (api-pull | file-push | internal-generated | unknown, or a richer set) with the rule that it is NEVER derived from the name token and that `unknown` is a value, not a default; (c) every field of the design doc §2 table badged SOURCE or DERIVED with its source object or rule named; (d) the five proposed edges, each registered `status: planned` in the relationship vocabulary with a PROV-O mapping, HAS_DATA_FLOW and ORCHESTRATES cited to the lineage-design-top3 pattern; (e) the evidence-breadcrumb grammar — one `evidence_ref` URN per source kind (email, log excerpt, jira, commit, confluence page, transcript file) versus prov:wasDerivedFrom to :Document/:Chunk for every kind; (f) the watcher `load_bearing` field as SME-ruled with `unruled` the default. The prompt names the feed-grain inventory workbook (folder → refined jobs → frequency → warehouse/DB/schema → target/view → publish target) as the import seed and lists its blank columns as the SME fields. No vocabulary entry flips past `planned` in this item.
+notes: |-
+  The record reconciles three grains that exist unreconciled today — %%DATAFLOW (variable fact), :AppDataFlow (designed, zero code), the runbook 'data series' (traversal, no identity). The investigation supplied the deciding fact: the launcher itself names the flow (-dataflow, task-service DataFlow) across zones and across applications. Fable because the choice fixes an identity that O60/O62 and the runbook skill will key on.

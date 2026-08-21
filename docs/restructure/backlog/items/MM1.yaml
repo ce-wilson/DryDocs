@@ -1,0 +1,24 @@
+id: MM1
+epic: mind-map
+title: |-
+  Restate the deepdoc charter where the code and the maps still say the old one — ddcontext is gone, 'reactive on-failure' was demoted to an input at G32
+type: chore
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_deepdoc/__init__.py
+- MODULE_MAP.md
+- tests/unit/test_module_boundary.py
+- docs/restructure/roadmap.yaml
+- docs/decisions/0006-docmeta-component-and-doc-graph.md
+- config/gate-prompts/document-content-topology.yaml
+- docs/design/deepdoc-data-flow-overview.md
+acceptance: |-
+  The drydocs_deepdoc package docstring, the MODULE_MAP.md row for drydocs_deepdoc/**, the COMPONENT_GROUP comment in tests/unit/test_module_boundary.py and the roadmap.yaml entry all state the G32-ruled charter (corpus-driven retriever seeded from the grounded graph; the parser-driven command-line reading is an INPUT; no relationship whose subject is not already in the graph) and name the write target `drydocs` with the :Uncertain label as the boundary — `git grep -n ddcontext -- MODULE_MAP.md tests/unit/test_module_boundary.py drydocs_deepdoc` returns nothing. The roadmap entry points at docs/design/deepdoc-data-flow-overview.md and lists the MM items instead of 'zero backlog items have ever targeted this module'. test_lineage_deepdoc_scaffold.py, test_uncertain_boundary.py and test_runbook_coverage.py stay green unchanged (the EXEMPT entry stays until a verb exists).
+notes: |-
+  Drift found at the 2026-08-21 exploration: MODULE_MAP.md:97 and test_module_boundary.py:140 still say ddcontext + 'reactive on-failure deep dive' three days after G102 folded the database. Prose only, no guard catches it — which is why it is its own chore and first in the epic.

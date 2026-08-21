@@ -1,0 +1,26 @@
+id: MM10
+epic: mind-map
+title: |-
+  investigate() v1 — the graph-seeded retrieval loop: seed from a graph node, pick the open slot with the highest expected novelty, run connectors IDs-in→references-out, write :Uncertain findings with breadcrumbs, hand the record and the open slots to the gate
+type: requirement
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- MM2
+- MM3
+- MM5
+- MM6
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- drydocs_deepdoc/investigate.py
+- drydocs_deepdoc/writer.py
+- docs/decisions/0006-docmeta-component-and-doc-graph.md
+- docs/decisions/0011-single-database-contingency.md
+acceptance: |-
+  drydocs_deepdoc.investigate.investigate(seed) no longer raises: it accepts only a seed that resolves to an existing graph node (folder, job, APP_ID or file name — a free string is refused with a typed error), loads or creates the MM3 mind-map state for the record fields still unknown, and loops — pick the open slot with the highest expected novelty, run the connector(s) that can fill it (MM4/MM5 fakes in tests), extract entities, score, append ContextFindings whose subject is an existing proxy node and whose evidence carries a breadcrumb and a `phase: build|run` — until no slot changes or a budget is spent. writer.py writes them with :Uncertain, reliability and trust (test_uncertain_boundary.py green; the audit spec expected 0 on ground-truth specs still holds). An end-to-end test over recorded fixtures reproduces the session's arc in miniature: lexical twin hits flagged signpost, the producer/consumer split filled from a title-extracted application id, the full-vs-delta slot left open and reported. The CLI gains a verb; test_runbook_coverage.py moves drydocs-deepdoc from EXEMPT to RUNBOOK_PENDING in the same commit.
+notes: |-
+  ADR 0006's charter made procedural; the design doc §6 is the skeleton. Fable because this is the module's first real behavior and it must honor three rulings at once (G32 charter, ADR 0011 guards, D1 proxy-node pattern).

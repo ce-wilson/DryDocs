@@ -1,0 +1,23 @@
+id: MM6
+epic: mind-map
+title: |-
+  Ontology proposals for what the investigation surfaces: :SdlcProject with a binding type, :JiraIssue as a signpost, :CodeCommit, evidence edges to proxies — planned only, through the gate
+type: task
+module: ontology
+phase: 17
+agent: ontology-mapper
+model: fable
+priority: p2
+status: todo
+depends_on:
+- MM2
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- drydocs_core/ontology/relationship_vocabulary/
+- docs/RELATIONSHIP_GUIDE.md
+- internal/pat-evidence/README.md
+- docs/decisions/0011-single-database-contingency.md
+acceptance: |-
+  A gate prompt (or a rider on data-flow-overview) proposes, each `status: planned` with a PROV-O/ORG/DCAT term and a SOURCE/DERIVED badge: `:SdlcProject {system: jira|bitbucket|confluence, key, binding: collaboration|seal-bound|none}` keyed one APP_ID → many projects/spaces, with the binding read from the DevX project page and dated; `:JiraIssue` carrying match_confidence, novelty and signpost and NEVER an ownership edge; `:CodeCommit {sha, author_ref, message_key}` as the code anchor; and the evidence edge family from a finding to the existing proxies only (:Application, :ControlMJob, :DataAsset, :Document/:Chunk). Every proposed node class states its reliability and trust defaults and that it is written only through drydocs_deepdoc/writer.py under :Uncertain (test_uncertain_boundary.py allowlist unchanged). The PAT-evidence Jira-board-per-team join is named as the first seed for :SdlcProject. Nothing flips past planned.
+notes: |-
+  The user ruling that widened the epic: integrate discovered facts into the unstructured knowledge graph with proper ontology, weighting and SME input, plus a breadcrumb back to the source. Fable because four node classes and their PROV mappings are an ontology decision.

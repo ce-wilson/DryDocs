@@ -1,0 +1,21 @@
+id: MM5
+epic: mind-map
+title: |-
+  Re-home the three session search scripts (Jira / Bitbucket / Confluence, shared CSV log) as mechanism-only deepdoc connectors; real hosts and config stay in internal-local
+type: chore
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- MM1
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- internal-local/deepdoc/2026-08-20-session-1/transcripts/sdlc-tools-build-capture.md
+- PUBLISH-BOUNDARY.md
+acceptance: |-
+  The three scripts exist under drydocs_deepdoc/connectors/ with every host, cluster, project, space, vendor binary path and credential read from a config file whose committed copy is a sample with placeholders and whose real copy is gitignored under internal-local/; a git grep for company host suffixes, cluster ids and restricted-domain addresses over drydocs_deepdoc returns nothing; a smoke test runs each script in dry-run mode with no network and asserts the log row shape (tool, search, theme, results, date) and the `IDs in → references out` contract (stdin ids in, a references list out). The transcript file is cited in the module docstring as the provenance of the design, by file name.
+notes: |-
+  The scripts were written on the company side during the session (PowerShell, 'KISS, one per tool'); this is the back-flow of the mechanism, not the instances — the standing sanitization rule.

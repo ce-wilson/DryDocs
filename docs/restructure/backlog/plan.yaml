@@ -83,3 +83,10 @@ plan:
       enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so
       ''which module loads this job'' is a query rather than a JSON file a human reads (Epic U).'
     status: todo
+  - id: 17
+    title: Mind-map — deepdoc leaves the placeholder
+    goal: 'The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven
+      investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs)
+      whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source;
+      promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).'
+    status: todo

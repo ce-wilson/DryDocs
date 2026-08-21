@@ -1,0 +1,21 @@
+id: MM3
+epic: mind-map
+title: |-
+  Mind-map state file + the shared entity/ID extractor + novelty and theme columns on the search log — the mind map becomes the driver, not documentation
+type: task
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: opus
+priority: p2
+status: todo
+depends_on:
+- MM1
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- drydocs_deepdoc/investigate.py
+- drydocs_core/run_log.py
+acceptance: |-
+  (1) A mind-map state file schema (YAML, `drydocs.deepdoc.mindmap.v1`) with a root question, named branches, and slots that are `open` (the trailing-? of the session) or `filled` with an evidence ref and a date; a pure reader/writer in drydocs_deepdoc; a test that a slot cannot move to `filled` without an evidence ref. (2) A pure entity/ID extractor in drydocs_core (mechanism only: application-id tokens, issue keys `<PROJECT>-<n>`, folder-name positional tokens via the existing PRAOCG decode, table names, distribution-list names, GUIDs) returning typed matches with spans; table-driven tests on synthetic strings; its MODULE_MAP row and CORE_PREFIXES entry land in the same commit. (3) The search log gains `novelty` (new ids vs the graph + the record) and `theme` (= the mind-map slot targeted) columns beside tool/search/results/date, written through the existing run-log contract under DRYDOCS_LOGDIR, with a test that a row without a theme is refused. No connector calls any network in this item.
+notes: |-
+  The 3-tool plan's section D, the 'real leverage'. Extractor goes to core (pure parse, ADR 0002-A §2); the state file and the log columns stay in the component. Opus: the slot/novelty semantics are the part that has to be right; the code is small.

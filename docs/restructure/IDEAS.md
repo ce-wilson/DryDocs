@@ -93,6 +93,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-153`** · 2026-08-21 · `[idea]` · **groomed → MM1–MM10** · prio **High** —
+  **Deepdoc leaves the placeholder: the per-data-flow overview record, grounded in one
+  production deep-dive.** A support thread (daily pre-processor failing on an API pull) was run to
+  ground by hand across the Control-M client, Jira, Bitbucket, Confluence and a chat assistant; the
+  48-frame session is transcribed verbatim machine-local
+  (`internal-local/deepdoc/2026-08-20-session-1/transcripts/*-capture.md`) and synthesized
+  mechanism-only in `docs/design/deepdoc-data-flow-overview.md`. Findings: the job name token
+  cannot tell an API pull from a pushed file (the FileWatchers watch files the predecessor wrote on
+  the same host — R13's second consequence); the Control-M Output tab carries what CMDLINE cannot
+  (launcher job KIND, provenance GUID chain, landing prefix, compute target) = iteration 2 of the
+  launcher contract; collaboration-type Jira projects have no application binding, so Jira is a
+  signpost and Bitbucket commit-inspect is the code anchor; the owning team's Confluence space held
+  nothing while the producer's space held the feed register — which documents the LEGACY file feed.
+  Three grains already exist unreconciled (`%%DATAFLOW`, `:AppDataFlow`, the runbook "data series"
+  traversal); the record keys on `%%DATAFLOW`. Groomed same day into the new epic MM (mind-map).
+
 - **`Idea-142`** · 2026-08-20 · `[bug]` · **closed → J51 DONE 2026-08-20 (six rows landed, same day it was groomed (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
 - **`Idea-141`** · 2026-08-20 · `[idea]` · **open — architect review DONE 2026-08-20, verdict: do-not-recommend as framed; the “worth doing regardless” residue groomed → G110 (2026-08-21); the four open questions stay the user’s** · prio? **Low** —
   **Should `agents/` stop carrying its own venv + `requirements.txt` and become an optional

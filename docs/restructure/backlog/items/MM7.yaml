@@ -1,0 +1,25 @@
+id: MM7
+epic: mind-map
+title: |-
+  Control-M Output-tab log extractor — launcher job KIND, resolved arguments, provenance-GUID chain, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted
+type: task
+module: drydocs-lineage
+phase: 17
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on:
+- G17
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- drydocs_lineage/extractors/dpl_mac.py
+- drydocs_lineage/extractors/controlm_inventory.py
+- drydocs_core/orchestration/shell.py
+- drydocs_lineage/curation.py
+- drydocs/cli.py
+- internal-local/deepdoc/2026-08-20-session-1/transcripts/controlm-evidence-capture.md
+acceptance: |-
+  drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per <job, order-id, run>, and joins onto already-staged DPL processes on the pipeline GUID (falling back to <job, run> when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted). It sets PROPERTIES only — launcher_kind (from the `Identified '<KIND>' Job` line), compute_target, provenance_guid (placement response) and the -proId it is threaded to, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a provenance chain across two jobs, a transform that logs no provenance id, and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py's stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.
+notes: |-
+  Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.

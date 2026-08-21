@@ -1315,7 +1315,9 @@
       "log_ref": "config/gate-log.md:3459",
       "unblocks": [
         "G32",
-        "G102"
+        "G102",
+        "MM1",
+        "MM2"
       ]
     },
     {
@@ -1329,7 +1331,9 @@
       "log_ref": "config/gate-log.md:3527",
       "unblocks": [
         "G32",
-        "G102"
+        "G102",
+        "MM1",
+        "MM2"
       ]
     },
     {

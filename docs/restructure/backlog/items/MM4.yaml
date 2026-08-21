@@ -1,0 +1,22 @@
+id: MM4
+epic: mind-map
+title: |-
+  Per-tool connector upgrades as mechanism-only specs: Jira MatchConfidence/Novelty split + signpost flag, Bitbucket commit-inspect by issue key OR folder name, Confluence firm-wide default with space distribution and APP_ID-from-title
+type: task
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- MM3
+- MM5
+inputs:
+- docs/design/deepdoc-data-flow-overview.md
+- drydocs_remediation/jira.py
+- drydocs_lineage/extractors/code_repo.py
+acceptance: |-
+  Each of the three connectors has an interface + fake pair in drydocs_deepdoc (the jira.py precedent: wire impl company-side, producer ships interface and fakes) and a test over recorded fixtures proving the upgrade: Jira — a hit scores separately on match_confidence and novelty and a high-match/templated-description hit is flagged `signpost`, with description and comments in the scored text; Bitbucket — given an issue key OR a folder name the connector's primary path is commit inspect/analyze returning author, date, message key and changed paths, and a code search of an issue key returning 0 is reported as `expected_zero` not as a miss; Confluence — the default scope is firm-wide, the result carries the per-space hit distribution, and application-id tokens are extracted from page titles through the MM3 extractor. Every search writes an MM3 log row. No real host, space, project or credential appears in the tracked tree.
+notes: |-
+  Sections A–C of the 3-tool plan. Depends on MM5 (the scripts re-homed first) and MM3 (the extractor and log columns they emit).
