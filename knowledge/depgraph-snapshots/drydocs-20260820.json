@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-20T19:49:12",
+    "captured_at": "2026-08-20T21:49:43",
     "date": "20260820",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f46b9cec",
-      "full": "f46b9cecd4bdc36bf2d21f2b6c8f6dfe4d354aac",
+      "commit": "5c0308e6",
+      "full": "5c0308e6b75dbcc4633670011a01dfeb473a36e3",
       "branch": "main",
-      "describe": "port-base-20260820-5-gf46b9cec",
-      "subject": "docs(handoff): roll to 2026-08-20 session close — company close-out mostly met, 'retire' defined, two items await the user's word",
-      "dirty": false,
-      "untracked_present": false,
+      "describe": "port-base-20260820-21-g5c0308e6",
+      "subject": "fix(snapshot): CI-check false GREEN, the actual boundary — PS 5.1 ConvertFrom-Json emits a JSON array as ONE wrapped item even in argument form (the prior fix missed), so enumerate the parsed object to unroll it. Verified live both ways: FAILURE at red HEAD 22b8ad7, GREEN at green c1cc811",
+      "dirty": true,
+      "untracked_present": true,
       "pr": null
     },
     "depgraph": {
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -6740,6 +6740,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/controlm-definition-precedence.yaml",
+      "name": "controlm-definition-precedence.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/controlm-definition-precedence.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/controlm-hosts-topology.yaml",
       "name": "controlm-hosts-topology.yaml",
       "extension": ".yaml",
@@ -12149,6 +12158,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/O63.yaml",
+      "name": "O63.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O63.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/O7.yaml",
       "name": "O7.yaml",
       "extension": ".yaml",
@@ -14705,15 +14723,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -14730,15 +14739,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -15774,24 +15774,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -18755,10 +18737,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260820.json",
-      "name": "drydocs-20260820.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260820-2148.json",
+      "name": "drydocs-20260820-2148.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260820.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260820-2148.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20600,6 +20582,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_load_map_console.py",
+      "name": "test_load_map_console.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_load_map_console.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_load_map_declarations.py",
       "name": "test_load_map_declarations.py",
       "extension": ".py",
@@ -22238,6 +22229,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/loadmap",
+      "name": "loadmap",
+      "extension": "",
+      "rel_path": "web/src/loadmap",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/loadmap/loadMapModel.ts",
+      "name": "loadMapModel.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/loadmap/loadMapModel.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/loads",
       "name": "loads",
       "extension": "",
@@ -22449,6 +22458,15 @@
       "name": "LineageRoute.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/routes/LineageRoute.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/routes/LoadMapRoute.tsx",
+      "name": "LoadMapRoute.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/routes/LoadMapRoute.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25886,6 +25904,10 @@
     ],
     [
       "drydocs/web/src/App.tsx",
+      "drydocs/web/src/routes/LoadMapRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/App.tsx",
       "drydocs/web/src/routes/LoadsRoute.tsx"
     ],
     [
@@ -26434,6 +26456,26 @@
     ],
     [
       "drydocs/web/src/routes/LineageRoute.tsx",
+      "drydocs/web/src/routes/ModuleTemplate.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/LoadMapRoute.tsx",
+      "drydocs/web/src/components/StatTiles.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/LoadMapRoute.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/LoadMapRoute.tsx",
+      "drydocs/web/src/loadmap/loadMapModel.ts"
+    ],
+    [
+      "drydocs/web/src/routes/LoadMapRoute.tsx",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/routes/LoadMapRoute.tsx",
       "drydocs/web/src/routes/ModuleTemplate.tsx"
     ],
     [
@@ -30737,6 +30779,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/controlm-definition-precedence.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/controlm-hosts-topology.yaml"
     ],
     [
@@ -33722,6 +33769,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O63.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/O7.yaml"
     ],
     [
@@ -34702,22 +34754,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -34778,16 +34820,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -37317,7 +37349,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260820.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260820-2148.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -38277,6 +38309,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_load_map_console.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_load_map_declarations.py"
     ],
     [
@@ -38862,6 +38899,11 @@
     [
       "drydocs/web/src",
       "CONTAINS",
+      "drydocs/web/src/loadmap"
+    ],
+    [
+      "drydocs/web/src",
+      "CONTAINS",
       "drydocs/web/src/loads"
     ],
     [
@@ -39250,6 +39292,11 @@
       "drydocs/web/src/lineage/demoLineage.ts"
     ],
     [
+      "drydocs/web/src/loadmap",
+      "CONTAINS",
+      "drydocs/web/src/loadmap/loadMapModel.ts"
+    ],
+    [
       "drydocs/web/src/loads",
       "CONTAINS",
       "drydocs/web/src/loads/LoadsTimeline.tsx"
@@ -39338,6 +39385,11 @@
       "drydocs/web/src/routes",
       "CONTAINS",
       "drydocs/web/src/routes/LineageRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/routes",
+      "CONTAINS",
+      "drydocs/web/src/routes/LoadMapRoute.tsx"
     ],
     [
       "drydocs/web/src/routes",
@@ -39469,13 +39521,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2245,
-    "edges": 1023,
+    "files": 2250,
+    "edges": 1029,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2523,
-    "directories": 279
+    "rels": 2525,
+    "directories": 276
   }
 }
