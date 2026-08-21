@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-21T01:46:43",
+    "captured_at": "2026-08-21T03:33:37",
     "date": "20260821",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "cf58e4d8",
-      "full": "cf58e4d8d353edc0035e90468b77c628e9f5261e",
+      "commit": "d6f40b1b",
+      "full": "d6f40b1b507f57a483e2dd8f40daa16f76c1c700",
       "branch": "main",
-      "describe": "port-base-20260820-27-gcf58e4d8",
-      "subject": "docs(deepdoc): Epic MM (mind-map) — deepdoc leaves the placeholder; the data-flow overview record synthesized from one production deep-dive, MM1–MM10 minted",
+      "describe": "port-base-20260820-47-gd6f40b1b",
+      "subject": "docs(ideas): Idea-154 ΓÇö the extension-connected Chrome served a non-laptop DryDocs root at localhost:5173 (isLocal flag wrong?); ideas/board re-rendered",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -7077,6 +7077,42 @@
       "name": "vocabulary-domains-and-id-policy.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/vocabulary-domains-and-id-policy.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/glossary",
+      "name": "glossary",
+      "extension": "",
+      "rel_path": "config/glossary",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/config/glossary/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "config/glossary/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/glossary/schema.yaml",
+      "name": "schema.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/glossary/schema.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/glossary/terms-public.yaml",
+      "name": "terms-public.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/glossary/terms-public.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14993,15 +15029,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -15018,15 +15045,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -15623,6 +15641,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher",
+      "name": "migrate_vocab_ids_g87.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/pat_product_mapping.cypher",
       "name": "pat_product_mapping.cypher",
       "extension": ".cypher",
@@ -16062,24 +16089,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -18530,6 +18539,33 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/glossary",
+      "name": "glossary",
+      "extension": "",
+      "rel_path": "internal/glossary",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/internal/glossary/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "internal/glossary/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/glossary/terms.yaml",
+      "name": "terms.yaml",
+      "extension": ".yaml",
+      "rel_path": "internal/glossary/terms.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/helpmeloginlocalneo4j.md",
       "name": "helpmeloginlocalneo4j.md",
       "extension": ".md",
@@ -19043,10 +19079,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
-      "name": "drydocs-20260821.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0146.json",
+      "name": "drydocs-20260821-0146.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821-0146.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21972,6 +22008,15 @@
       "name": "MyApps.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/MyApps.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/RelEdge.tsx",
+      "name": "RelEdge.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/RelEdge.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26382,6 +26427,10 @@
     ],
     [
       "drydocs/web/src/explorer/ExplorerGraphPane.tsx",
+      "drydocs/web/src/components/RelEdge.tsx"
+    ],
+    [
+      "drydocs/web/src/explorer/ExplorerGraphPane.tsx",
       "drydocs/web/src/data/towers.ts"
     ],
     [
@@ -26526,6 +26575,10 @@
     ],
     [
       "drydocs/web/src/lineage/LineageGraphPane.tsx",
+      "drydocs/web/src/components/RelEdge.tsx"
+    ],
+    [
+      "drydocs/web/src/lineage/LineageGraphPane.tsx",
       "drydocs/web/src/components/TrustLegend.tsx"
     ],
     [
@@ -26559,6 +26612,10 @@
     [
       "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
       "drydocs/web/src/components/MyApps.tsx"
+    ],
+    [
+      "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
+      "drydocs/web/src/components/RelEdge.tsx"
     ],
     [
       "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
@@ -30975,6 +31032,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/glossary"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/launcher-registry.yaml"
     ],
     [
@@ -31271,6 +31333,21 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
+    ],
+    [
+      "drydocs/config/glossary",
+      "CONTAINS",
+      "drydocs/config/glossary/README.md"
+    ],
+    [
+      "drydocs/config/glossary",
+      "CONTAINS",
+      "drydocs/config/glossary/schema.yaml"
+    ],
+    [
+      "drydocs/config/glossary",
+      "CONTAINS",
+      "drydocs/config/glossary/terms-public.yaml"
     ],
     [
       "drydocs/config/manual-loads",
@@ -35210,22 +35287,12 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -35286,16 +35353,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -36091,6 +36148,11 @@
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
       "drydocs/drydocs/loaders/cypher/migrate_runs_on_to_scheduled_on.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher"
     ],
     [
       "drydocs/drydocs/loaders/cypher",
@@ -37375,6 +37437,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/glossary"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/helpmeloginlocalneo4j.md"
     ],
     [
@@ -37551,6 +37618,16 @@
       "drydocs/internal/fcdo-reference",
       "CONTAINS",
       "drydocs/internal/fcdo-reference/TRANSCRIPT-4-MISC.md"
+    ],
+    [
+      "drydocs/internal/glossary",
+      "CONTAINS",
+      "drydocs/internal/glossary/README.md"
+    ],
+    [
+      "drydocs/internal/glossary",
+      "CONTAINS",
+      "drydocs/internal/glossary/terms.yaml"
     ],
     [
       "drydocs/internal/org",
@@ -37825,7 +37902,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0146.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -39500,6 +39577,11 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/RelEdge.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/SignIn.tsx"
     ],
     [
@@ -39997,13 +40079,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2280,
-    "edges": 1029,
+    "files": 2287,
+    "edges": 1032,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2559,
-    "directories": 280
+    "rels": 2564,
+    "directories": 278
   }
 }
