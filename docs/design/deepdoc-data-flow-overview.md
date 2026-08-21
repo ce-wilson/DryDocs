@@ -75,9 +75,15 @@ pulled a **full** extract every day instead of a delta.
 
 **The two findings that make this a DryDocs problem, not a one-off.**
 
-1. **The name token cannot tell an API pull from a pushed file.** The folder holds a
-   `_PREPROC` job, two `_FW` FileWatchers (`DAT` and `TOK`), a `_PLCT` placement and a `_TRUST`
-   ingestion. The watchers were written for an inbound file transfer. Here the pre-processor
+1. **The name token cannot tell an API pull from a pushed file — because the token was misused.**
+   This folder holds a `_PREPROC` job, two `_FW` FileWatchers (`DAT` and `TOK`), a `_PLCT`
+   placement and a `_TRUST` ingestion; the count varies by flow and team. SME ruling (2026-08-21):
+   `_PREPROC`'s intent is *file preparation* — cleaning special characters and whitespace,
+   splitting, downloading an already-delivered file, prepping for ingestion — **not** calling an
+   API. API pulls were meant to carry their own, deliberately non-intuitive tokens: **`_DLMD`**
+   (download external data) or **`_MON`** (monitoring API). Teams reused `_PREPROC` for the pull,
+   so the downstream shape looks like a file-push flow. The watchers were written for an inbound
+   file transfer. Here the pre-processor
    **writes** the `.csv` and `.tok` to the local drop directory itself, and the watchers then
    "watch" files that already exist on the same host (`File … exists, it's current size is …`,
    then a two-minute size-stability confirmation). The TDQ token the watcher gates on was produced
@@ -204,6 +210,10 @@ consequence and a sharper test:
   true | false | unruled`. `false` proposes a greenfield transform (drop the watcher, keep a
   post-write checksum/row-count step on the producer side); `true` keeps it with the reason
   recorded; `unruled` is the default and the board shows it.
+- **Greenfield token (SME-ruled):** R13's "retoken to match intent" now has a target — an API
+  pull is `_DLMD` (download external data) or `_MON` (monitoring API), never `_PREPROC`; the
+  `_PREPROC` token is reserved for file preparation. The token pair goes to the greenfield job
+  standard as a `planned` vocabulary entry before any detector proposes it.
 - **Carrier:** `ingest_mode` must become an explicit fact the job carries — a description-metadata
   key (`ingest.mode=api-pull`, under the C16 key-prefix governance) or a folder variable — so the
   next analyst does not rediscover it from a log. The name token stays what R13 says it is: not
