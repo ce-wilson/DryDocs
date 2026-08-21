@@ -192,13 +192,38 @@ suites:
           both pages or on neither.
         source: "O57 build 2026-08-20 - desktop, counts read off both pages; the sum is pinned Python-side"
 
+  # ---------------------------------------------------------------------------
+  - id: TS-OWNERSHIP
+    module: ownership
+    description: >
+      SEAL->PAT->team rollup + asset search. Seeded at O66 (2026-08-21), the
+      relationship-label readability fix — in-browser verification on the fix
+      itself, per the ledger's seeding rule.
+    cases:
+      - id: TC-OWNERSHIP-01
+        description: Every relationship name on the K4 rollup is readable, in both themes
+        steps:
+          - Open /ownership (Rollup (K4 shape) view) in dark mode, then light.
+          - Read every relationship name along the left-to-right chain.
+        expect: >
+          All eight names (HAS_PRODUCT_LINE, HAS_PRODUCT, HAS_AREA_PRODUCT
+          (planned), SUPPORTS, WAS_ATTRIBUTED_TO (developed_by), both
+          QUALIFIED_ATTRIBUTIONs, HAD_ROLE) render as overlay chips ON TOP of
+          the layout — the shared RelEdge component (components/RelEdge.tsx),
+          which the explorer and lineage canvases also use, with an explicit
+          zIndex above the node layer. Built-in SVG labels paint UNDER nodes
+          and clipped there before the fix. Left-to-right direction and
+          arrowheads preserved; the EXAMPLE DATA · ILLUSTRATIVE banner is
+          untouched; edge MEANING is K4's gate-confirmed shape and never moves
+          with a rendering pass.
+        source: "O66 fix 2026-08-21 — laptop, headless Chrome vs Vite :5199, both themes screenshot-checked (chips z-index 10 probed on all three graph canvases)"
+
   # --- declared, not yet seeded ----------------------------------------------
   # Present so the coverage gap is a number, not an absence. Seed each from
   # verified behaviour when that module is next worked on — never by inventing
   # cases that nobody has watched pass.
   - { id: TS-EXPLORER,    module: explorer,    description: "Explorer tower/app drill-down + inspector.", cases: [] }
   - { id: TS-LINEAGE,     module: lineage,     description: "Lineage source->target DAG canvas.", cases: [] }
-  - { id: TS-OWNERSHIP,   module: ownership,   description: "SEAL->PAT->team rollup + asset search.", cases: [] }
   - { id: TS-RUNBOOKS,    module: runbooks,    description: "Data-series provisioning chain views.", cases: [] }
   - { id: TS-REMEDIATION, module: remediation, description: "Finding -> fix-batch flow.", cases: [] }
   - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }

@@ -103,7 +103,9 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # in-browser observation at the build rather than from a commit message.
     # Both numbers move together — a new module adds a suite by the
     # every-module-has-a-suite rule below, and this one is not an empty one.
-    assert (len(seeded), len(suites)) == (4, 13), (
+    # 4/13 -> 5/13 at O66 (2026-08-21): TS-OWNERSHIP seeded from the label-
+    # readability fix's own in-browser verification (laptop, headless Chrome).
+    assert (len(seeded), len(suites)) == (5, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )

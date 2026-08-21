@@ -6,12 +6,12 @@ import {
   Handle,
   Position,
   ReactFlow,
-  type Edge,
   type Node,
   type NodeProps,
   MarkerType,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { relEdgeTypes, type RelFlowEdge } from '../components/RelEdge'
 import type { Persona } from '../lib/auth'
 import { canDrill } from '../lib/views'
 import { TOWERS, TOWER_KEYS, type TowerKey } from '../data/towers'
@@ -73,16 +73,15 @@ export default function ExplorerGraphPane({ persona, tower, onTowerChange, selec
     [tower, selection],
   )
 
-  const edges: Edge[] = useMemo(
+  const edges: RelFlowEdge[] = useMemo(
     () =>
       towerEdges(tower).map((e) => ({
         id: e.id,
+        type: 'rel' as const,
         source: e.source,
         target: e.target,
-        label: e.rel,
-        style: { stroke: 'var(--faint)', strokeWidth: 1.4 },
-        labelStyle: { fill: 'var(--muted)', fontSize: 10, fontFamily: 'var(--mono)' },
-        labelBgStyle: { fill: 'var(--panel)', fillOpacity: 0.85 },
+        // O66: name + stroke render via the shared RelEdge overlay chip
+        data: { rel: e.rel },
         markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--faint)', width: 16, height: 16 },
       })),
     [tower],
@@ -129,6 +128,7 @@ export default function ExplorerGraphPane({ persona, tower, onTowerChange, selec
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          edgeTypes={relEdgeTypes}
           onNodeClick={(_, node) => {
             const dn = towerNodes(tower).find((n) => n.id === node.id)
             if (dn) onSelect({ id: dn.id, label: dn.label, kind: dn.kind, tower })

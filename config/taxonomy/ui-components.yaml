@@ -121,7 +121,7 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (15) ---
+  # --- component (16) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
@@ -131,6 +131,9 @@ components:
   - { id: MiniDag,                 area: component,    path: components/MiniDag.tsx }
   - { id: ModuleIcon,              area: component,    path: components/ModuleIcon.tsx }
   - { id: MyApps,                  area: component,    path: components/MyApps.tsx }
+  # O66: the one relationship-label edge for every graph canvas (ownership +
+  # explorer + lineage adopt it) — deliberately UNBOUND, same rule as TrustLegend
+  - { id: RelEdge,                 area: component,    path: components/RelEdge.tsx }
   - { id: SignIn,                  area: component,    path: components/SignIn.tsx }
   - { id: StatTiles,               area: component,    path: components/StatTiles.tsx }
   - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }

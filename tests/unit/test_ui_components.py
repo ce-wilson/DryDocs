@@ -281,10 +281,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     counts move by one again. Its sibling loadmap/loadMapModel.ts is NOT here
     and that is not an omission: the ledger's scan boundary is .tsx only (see
     the SCOPE CAVEAT in the yaml header), and widening it waits on O42.
+    71 -> 72 at O66: RelEdge is deliberately UNBOUND — the shared
+    relationship-label edge renders on the ownership, explorer, AND lineage
+    canvases (the one-treatment rule that item lands), so binding it to any
+    one module would misstate it. Same rule as TrustLegend.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         31,
-        71,
+        72,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

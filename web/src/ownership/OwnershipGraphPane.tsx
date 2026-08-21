@@ -1,15 +1,10 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 import {
   Background,
-  BaseEdge,
   Controls,
-  EdgeLabelRenderer,
   Handle,
   Position,
   ReactFlow,
-  getStraightPath,
-  type Edge,
-  type EdgeProps,
   type Node,
   type NodeProps,
   MarkerType,
@@ -17,6 +12,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import type { Persona } from '../lib/auth'
 import MyApps from '../components/MyApps'
+import { relEdgeTypes, type RelFlowEdge } from '../components/RelEdge'
 import {
   OWNERSHIP_EDGES,
   OWNERSHIP_KIND_TOKEN,
@@ -32,8 +28,6 @@ import {
 
 type OwnNodeData = { label: string; kind: string; token: string; unmapped: boolean; selected: boolean }
 type OwnRFNode = Node<OwnNodeData, 'own'>
-type OwnEdgeData = { rel: string }
-type OwnRFEdge = Edge<OwnEdgeData, 'ownership'>
 
 function OwnNode({ data }: NodeProps<OwnRFNode>) {
   return (
@@ -71,25 +65,6 @@ function OwnNode({ data }: NodeProps<OwnRFNode>) {
 
 const nodeTypes = { own: OwnNode }
 
-function OwnershipEdge({ sourceX, sourceY, targetX, targetY, markerEnd, data }: EdgeProps<OwnRFEdge>) {
-  const [path, labelX, labelY] = getStraightPath({ sourceX, sourceY, targetX, targetY })
-  return (
-    <>
-      <BaseEdge path={path} markerEnd={markerEnd} style={{ stroke: 'var(--faint)', strokeWidth: 1.4 }} />
-      <EdgeLabelRenderer>
-        <div
-          className="pointer-events-none absolute whitespace-nowrap rounded border border-edge bg-panel px-1.5 py-0.5 font-mono text-[10px] text-muted shadow-sm"
-          style={{ transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)` }}
-        >
-          {data?.rel}
-        </div>
-      </EdgeLabelRenderer>
-    </>
-  )
-}
-
-const edgeTypes = { ownership: OwnershipEdge }
-
 export default function OwnershipGraphPane({
   persona,
   selection,
@@ -118,16 +93,18 @@ export default function OwnershipGraphPane({
     [selection],
   )
 
-  const edges: OwnRFEdge[] = useMemo(
+  const edges: RelFlowEdge[] = useMemo(
     () =>
       OWNERSHIP_EDGES.map((e) => ({
         id: e.id,
-        type: 'ownership' as const,
+        // O66: the shared RelEdge overlay chip (straight path — the chain
+        // layout reads left-to-right and a bezier would wander through nodes)
+        type: 'rel' as const,
         source: e.source,
         target: e.target,
         sourceHandle: e.dir === 'rtl' ? 'sl' : 'sr',
         targetHandle: e.dir === 'rtl' ? 'tr' : 'tl',
-        data: { rel: e.rel },
+        data: { rel: e.rel, path: 'straight' as const },
         markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--faint)', width: 16, height: 16 },
       })),
     [],
@@ -173,7 +150,7 @@ export default function OwnershipGraphPane({
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
+            edgeTypes={relEdgeTypes}
             onNodeClick={(_, node) => {
               const dn = OWNERSHIP_NODES.find((n) => n.id === node.id)
               if (dn) onSelect({ id: dn.id, label: dn.label, kind: dn.kind })
