@@ -164,6 +164,10 @@ COMMITTED_SURFACE_WRITERS = (
     # list being incomplete is the failure mode a DECLARED list has; the static
     # check below cannot flag a writer nobody declared.
     "drydocs_core/ontology/schema_graph.py",
+    # U25 (2026-08-21): the debt-metrics ledger writer. Appends through an LF
+    # open(); declared here because the ledger is a COMMITTED surface and this
+    # list is declared, never swept.
+    "knowledge/depgraph-snapshots/metrics_ledger.py",
 )
 
 #: Globs whose CONTENT is committed and must be byte-identical across platforms.
@@ -172,6 +176,7 @@ COMMITTED_SURFACE_GLOBS = (
     "docs/design/*.html",
     "web/src/generated/*.json",
     "knowledge/depgraph-snapshots/*.json",
+    "knowledge/depgraph-snapshots/*.jsonl",  # U25: the committed metrics ledger
     # The generated meta-graph — a render like any other, and the surface whose
     # CRLF warning exposed the gap in the writer list above.
     "drydocs_core/schema/schema_graph.cypher",

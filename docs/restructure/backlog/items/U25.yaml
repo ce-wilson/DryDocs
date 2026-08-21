@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -19,3 +19,21 @@ acceptance: |
   (a) ONE APPEND-ONLY ROW PER RUN in a metrics JSONL beside the snapshot the run just wrote, carrying at minimum: date, git commit, the A3 top module and its count, the A4 package plus first-party counts, the A5 count, and the live IMPORTS edge count. (b) U12 STAYS INTACT AND IS SAID SO IN WRITING: newest-only snapshot retention is unchanged and the ledger is never pruned by the retention sweep -- a metrics ledger is not a retained snapshot. The README states that beside the retention rule, so a later reader does not "tidy" the ledger under U12's own ruling. (c) BORN WITH AN EXPLICIT LF NEWLINE (Idea-121's standing instruction) and CR-free. This item RULES whether the ledger is a COMMITTED surface or gitignored, with the reason recorded: if committed, its writer joins the declared writer tuple in tests/unit/test_render_determinism.py, because that list is declared and never swept. (d) A RUN WITH NO DATABASE writes the row it can write, or skips cleanly and says so -- never a half-row of zeros presented as a measurement, and never a blocked snapshot. (e) THE PAYOFF IS THE CONSUMER: the /tech-debt skill's A3/A4/A5 sections read the previous row and report the DELTA instead of re-deriving prose.
 notes: |
   Groomed 2026-08-19 from Idea-120. WHY IT EARNS AN ITEM rather than a shrug: the hand-typed prose has been wrong twice in the direction that HIDES work -- drydocs_api at the U2 census, then drydocs_docmeta invisible to A3/A4/A5 for five days after d647171 -- and on 2026-08-13 it blocked attribution of an A5 move from 29 to 31 because no prior snapshot existed on disk to diff against. Newest-only retention is right for snapshots and is the direct cause of that gap; a ledger closes it without reopening U12. Module/phase/epic follow U7/U12/U15. Pairs with Idea-119, whose +2 this would have explained at the time it was noticed.
+  DONE 2026-08-21 (desktop). (a) knowledge/depgraph-snapshots/metrics_ledger.py appends ONE row per
+  snapshot.ps1 run to debt-metrics.jsonl beside the snapshot: date, commit, snapshot, snapshot_imports,
+  live_imports, a3_top_module + a3_fan_in, a4_package_orphans + a4_first_party_orphans, a5_untested,
+  the U22 freshness verdict, venue. snapshot.ps1 calls it after the write + retention, warn-only.
+  (b) U12 intact and SAID: the retention pattern matches `<project>-<date>[-HHmm].json` only; the
+  README's Housekeeping rule now states beside it that the ledger is not a snapshot and the sweep never
+  touches it. (c) RULED COMMITTED -- history across both machines is the whole point; rows are born LF
+  through open(newline="
+"), CR-free, and .gitattributes marks the file `merge=union` so two
+  machines appending in one window both keep their rows (each carries its own date + commit). The
+  writer is declared in COMMITTED_SURFACE_WRITERS and *.jsonl joins the CR-byte glob. (d) no database
+  -> "debt-metrics: no row written -- database unreachable (...)", exit 0, nothing appended (tested
+  against bolt://nowhere.invalid). (e) CONSUMER: `metrics_ledger.py --delta` prints A3/A4/A5 + IMPORTS
+  deltas between the last two rows; the tech-debt skill's Step 0b tells the reader to report THAT
+  and treat the table's hand-typed baselines as pre-ledger history. FIRST ROW, live (desktop MSI,
+  bolt://localhost:7687/drydocs, snapshot drydocs-20260821-0340.json, graph FRESH): A3 base.py 34,
+  A4 package 0 / first-party 5, A5 32, live IMPORTS 1032 = snapshot 1032. Tests: test_metrics_ledger
+  (4). Suite 2322 passed.

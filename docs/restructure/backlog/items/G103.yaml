@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/extractors/rua_inventory.py
@@ -20,3 +20,16 @@ acceptance: |
   EXACTLY ONE of three resolutions lands, and WHICH is recorded in the close note (the A4 idiom). All three are legitimate; what is not legitimate is the current state, where the contract exists only as a comment on one line. (a) DECLARE IT -- add a copy-path column to scripts.tsv so the location is stated rather than guessed. That is a bundle SCHEMA change: COLLECTOR_VERSION goes to rua-inventory/v3 and the script's own optional-column discipline (v1 bundles stay ingestible; scripts.tsv and the sha256 columns are treated as OPTIONAL) applies to the new column too. (b) PIN THE CONVENTION -- leave the wire format alone and add one test that builds or fixtures a small bundle and asserts a captured file is readable at the derived path from the EXTRACTOR's side, so a collector-side layout change reds a test instead of silently zeroing the counters. The cheaper candidate, and the S10 / derived-coverage idiom the repo already uses elsewhere. (c) ACCEPT AS IS -- with the reason written where the coupling lives, not only in a close note. WHAT THE RESOLUTION MUST CARRY EITHER WAY, because it is the reason this is worth an item: the failure is SILENT and reads as something else. Both consumers already handle a missing copy correctly -- scripts_unreadable / scripts_no_copy in G21's rua_code_ops.py, server_uncomputable in G24's code_repo.py -- because an over-cap file is LISTED but not COPIED by design (SCRIPT_COPY_MAX_BYTES, 1 MiB default). So a mirror-layout change lands every counter in the "too big to copy" bucket, the run SUCCEEDS, and "the collector's layout changed" is indistinguishable from "this estate has large scripts". NOTHING IS WRONG TODAY: the chain is correctly wired and this is a latent coupling, not a live defect -- the item exists so it stays that way.
 notes: |
   Groomed 2026-08-19 from Idea-115 (found 2026-08-12 tracing G24 end to end at the user's ask). VERIFIED AT THE GROOM, not recalled: rua_inventory.py:380-390 already carries a comment naming this as "DERIVED, not declared (Idea-115)", and drydocs_lineage/collect/rua_inventory.sh still writes the header path/owner/group/perms/size/mtime/sha256 with the mirror built separately. Module drydocs-lineage / phase 6 / epic component-topology follows G21, G24 and G97 -- the items on either side of this chain. N12's notes already cite this entry as the precedent for the class (a contract that existed only as a derived expression, fixed by making both ends name each other); this item is that class's own instance.
+  DONE 2026-08-21 (desktop). RESOLUTION (b) PIN THE CONVENTION -- the wire format is unchanged
+  (COLLECTOR_VERSION stays rua-inventory/v2, no new column), and the contract that lived as one
+  comment is now held by a test that reads BOTH halves: tests/unit/test_lineage_rua.py::
+  test_collector_mirror_layout_and_extractor_derivation_are_the_same_convention parses the
+  collector's literal `dest="$BUNDLE/scripts$path"` (drydocs_lineage/collect/rua_inventory.sh) and
+  the extractor's `copy_rel = f"scripts{row['path']}"` (rua_inventory.py) and fails when either moves,
+  naming the other side; test_derived_copy_path_is_readable_from_the_extractor_side proves the derived
+  pointer resolves to a real readable file on a collector-shaped fixture bundle. So a layout change on
+  either side now reds a test instead of landing every counter in the "too big to copy" bucket
+  (scripts_no_copy / scripts_unreadable / server_uncomputable), which read as "this estate has large
+  scripts". Why (b) over (a): a v3 schema bump for a column whose only reader is the repo that writes
+  the collector is cost without a second consumer; over (c): a comment is what failed. The coupling
+  site carries a comment pointing at the test. Nothing was wrong today; it stays that way by guard.

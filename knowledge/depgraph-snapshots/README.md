@@ -229,6 +229,13 @@ domain graph (distinct labels, no overlap). Native visualization:
   was made, and a 101-file series accumulated once before it. Structural history stays fully
   diffable — every superseded snapshot is in **git history** (see the Historical note under
   Compare for the recovery commands). `-CodeOnly` comparison files (`drydocs-code-*`) are exempt.
+  **`debt-metrics.jsonl` is NOT a snapshot and the retention sweep never touches it (U25,
+  2026-08-21):** it is the append-only metrics ledger — one row per `snapshot.ps1` run (date,
+  commit, snapshot, A3 top module + fan-in, A4 package + first-party orphans, A5 untested, live vs
+  snapshot IMPORTS, U22 freshness) written by `metrics_ledger.py`, committed, LF, `merge=union`.
+  A run with no reachable database appends nothing and says so; it never writes a row of zeros.
+  Read the delta with `poetry run python knowledge/depgraph-snapshots/metrics_ledger.py --delta`
+  (the tech-debt skill's A3/A4/A5 sections report that delta instead of re-deriving prose).
 - Historical baseline: `drydocs1-20260621.json` — 49 files, 70 import edges, 0 circular — is in
   git history, not this directory. (Filename corrected 2026-07-28: this line once said
   `depgraph.20260621-091057.json`, which never existed; the counts were right. Being pre-U6 it

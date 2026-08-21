@@ -106,6 +106,13 @@ A1–A6 number. It is warn-only and never refreshes anything: a STALE verdict
 means `drydocs load-code-snapshot` first — the 2026-08-13 reading of A3 = 28 was
 an eleven-day-old graph that looked current, and UNREACHABLE is never "fresh".
 
+**Step 0b — the delta, not the prose (U25).** `poetry run python
+knowledge/depgraph-snapshots/metrics_ledger.py --delta` prints A3/A4/A5 and
+live-vs-snapshot IMPORTS between the last two `debt-metrics.jsonl` rows (one
+row per `snapshot.ps1` run). Report THAT delta in the A3/A4/A5 sections and
+quote the row's commit; the hand-typed baselines in the table below are history
+from before the ledger existed, not numbers to re-derive.
+
 How to run: no CLI query command exists yet — use a short scratchpad script
 with `Neo4jSettings` from `drydocs_core.config` (reads `.env`; raw
 `os.environ` lacks the password) and `Neo4jClient` as a context manager.

@@ -483,3 +483,22 @@ if ($Tree) {
 
 $prTxt = if ($pr) { ", PR#$pr" } else { "" }
 Write-Host "wrote $(Split-Path $out -Leaf)  (commit $commit, branch $branch$prTxt)" -ForegroundColor Green
+
+# --- debt-metrics ledger (U25): one append-only row per run, warn-only ---------
+# Beside the snapshot just written: A3 top module + fan-in, A4 orphans, A5
+# untested, live vs snapshot IMPORTS, the U22 verdict. No database = no row
+# (the script says so); never a half-row, never a blocked snapshot. Retention
+# above never touches the ledger (README, Housekeeping).
+if ($Tree) {
+  try {
+    Push-Location $repo
+    & poetry run python (Join-Path $here "metrics_ledger.py") $out 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -match "debt-metrics" } | ForEach-Object {
+      $c = if ($_ -match "appended row") { "Green" } else { "Yellow" }
+      Write-Host $_ -ForegroundColor $c
+    }
+    Pop-Location
+  } catch {
+    Pop-Location -ErrorAction SilentlyContinue
+    Write-Warning "debt-metrics row skipped: $($_.Exception.Message)"
+  }
+}

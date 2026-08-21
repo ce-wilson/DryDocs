@@ -330,3 +330,53 @@ def test_scripts_csv_malformed_rows_counted_never_dropped(tmp_path: Path) -> Non
     cov = RuaInventoryExtractor().extract(bundle, g)
     assert cov.scripts_staged == 1
     assert cov.scripts_malformed == 2
+
+
+# --- G103: the script-copy path is ONE convention held by two files ----------------
+
+
+def test_collector_mirror_layout_and_extractor_derivation_are_the_same_convention() -> None:
+    """G103 (2026-08-21), resolution (b) PIN THE CONVENTION. scripts.tsv carries
+    no copy_path column: the collector mirrors the absolute tree under
+    `scripts/` (rua_inventory.sh: dest="$BUNDLE/scripts$path") and the extractor
+    RE-DERIVES that location (rua_inventory.py: copy_rel = f"scripts{path}").
+    A change on either side used to fail SILENTLY — the miss lands in the same
+    counters as an over-cap file the collector listed but did not copy
+    (SCRIPT_COPY_MAX_BYTES), so "the layout changed" read as "this estate has
+    large scripts". Both halves live in this repo, so the contract is pinned by
+    reading both: the collector's literal and the extractor's f-string must
+    agree, and the fixture walk below proves the derived path is readable."""
+    import re
+
+    repo = Path(__file__).resolve().parents[2]
+    collector = (repo / "drydocs_lineage" / "collect" / "rua_inventory.sh").read_text(
+        encoding="utf-8"
+    )
+    extractor = (repo / "drydocs_lineage" / "extractors" / "rua_inventory.py").read_text(
+        encoding="utf-8"
+    )
+    dest = re.search(r'dest="\$BUNDLE/(scripts)\$path"', collector)
+    assert dest, "collector no longer mirrors scripts under $BUNDLE/scripts$path — update the extractor AND this test together"
+    derived = re.search(r'copy_rel = f"(scripts)\{row\[.path.\]\}"', extractor)
+    assert (
+        derived
+    ), "extractor no longer derives scripts{path} — update the collector AND this test together"
+    assert dest.group(1) == derived.group(1) == "scripts"
+
+
+def test_derived_copy_path_is_readable_from_the_extractor_side(tmp_path: Path) -> None:
+    """The other half of (b): on a bundle laid out the collector's way, the
+    extractor's pointer resolves to a real, readable file (so a layout drift
+    would surface here as an unreadable/no-copy count, not pass unseen)."""
+    bundle_dir = _write_bundle(tmp_path, v2=True)
+    graph = LineageGraph()
+    coverage = RuaInventoryExtractor().extract(bundle_dir, graph)
+    copied = next(
+        n
+        for n in graph.processes.values()
+        if n.properties.get("rua_copy", "").startswith("scripts/")
+    )
+    target = bundle_dir / copied.properties["rua_copy"]
+    assert target.is_file(), f"derived copy path {target} is not a file"
+    assert target.read_text(encoding="utf-8")
+    assert coverage.script_copies_present >= 1

@@ -22,3 +22,6 @@
 
 # Binary documents — never eol-normalize (autocrlf=true would corrupt them).
 *.pdf binary
+# U25: the debt-metrics ledger is append-only JSONL; two machines appending in the same
+# window must both survive a merge (rows carry their own date + commit, order is irrelevant).
+knowledge/depgraph-snapshots/debt-metrics.jsonl merge=union

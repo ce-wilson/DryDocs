@@ -388,6 +388,9 @@ class RuaInventoryExtractor:
             # G24 (code_repo) read what this produces, and a layout change here or
             # there fails SILENTLY: the miss lands in the same counters as a file
             # the collector skipped for being over SCRIPT_COPY_MAX_BYTES.
+            # G103 (2026-08-21), resolution (b): the convention is PINNED, not
+            # declared — tests/unit/test_lineage_rua.py reads this f-string and the
+            # collector's `dest="$BUNDLE/scripts$path"` and fails when they differ.
             copy_rel = f"scripts{row['path']}"
             self._stage_artifact(
                 RUA_SCRIPT_KIND,
