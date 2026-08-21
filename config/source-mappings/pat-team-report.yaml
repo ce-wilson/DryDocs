@@ -1,0 +1,106 @@
+# =============================================================================
+# config/source-mappings/pat-team-report.yaml — the column ledger for the PAT
+# team report (config/source-registry.yaml v2 dataset id `pat:people-report`).
+#
+# WHY THIS FILE EXISTS (G82, 2026-08-21). The row carried `locator.mapping: ~`
+# while `confirmed: true` (C9 gate, 2026-07-18) — a confirmed source with no
+# field ledger, which is the fingerprint of a feed nothing has ever read for
+# real. The projection that turns the raw report into the two loader files
+# (drydocs/pat_projection.py) now exists, and this ledger is authored from
+# WHAT THAT PROJECTION READS — not invented.
+#
+# HEADER BASIS — the honest limit, same as seal-extract.yaml. Only FOUR raw
+# headers are SME-pinned (registry row notes, C17 + the 2026-08-11 TEAM_DETAILS_
+# REPORT evidence): `Relationship Type`, `Team Type Name`, `Legacy Team ID`, and
+# the semicolon-delimited SEAL-id column. Every other `name:` below is the
+# projection's DEFAULT_HEADER_MAP belief, transcribed from the C17 gate record
+# (ID + Name pairs for Product / Supporting Area Product / Sponsoring Area
+# Product / Sponsoring Product; Product Line and Sponsoring Product Line as
+# names only). The first real run (company-side, the data is Internal) pins the
+# physical spellings via --header-map; THEN this file is corrected to them and
+# `census: pending` closes with the real column_count. Until then `pinned: false`
+# rows are beliefs and say so.
+#
+# Column names are mechanism (Internal-Public); the report's rows are Internal
+# and never land in the tree. Typed accessor: drydocs/source_mappings.py.
+# Guarded by tests/unit/test_source_mapping_drift.py (registry pointer + census
+# reconciliation) and tests/unit/test_pat_projection.py (the projection's
+# header map and this ledger's projected rows agree).
+# =============================================================================
+schema: drydocs.source-mapping.v1
+source: "pat:people-report"     # v2 DATASET id — PatProductMappingLoader binds to it; DevTeamsLoader binds to pat:product-catalog but reads the SAME report's team columns (see note)
+classification: Internal-Public
+updated: 2026-08-21
+
+objects:
+  # ---------------------------------------------------------------------------
+  # TEAM_DETAILS_REPORT — the PAT team report export, one row per team. ONE raw
+  # file feeds TWO loader inputs: team identity columns -> dev_teams__sample.csv
+  # (DevTeamsLoader, registered under pat:product-catalog because the DevTeam
+  # node is catalog hierarchy) and alignment columns -> pat_product_mapping__sample.csv
+  # (PatProductMappingLoader, this dataset). Recorded here once, because the
+  # split is a PROJECTION choice, not two source files.
+  # Projection: drydocs/pat_projection.py (+ scripts/project_pat_team_report.py).
+  # ---------------------------------------------------------------------------
+  - name: TEAM_DETAILS_REPORT
+    kind: extract
+    profile:
+      profiled_on: ~
+      via: "drydocs/pat_projection.py DEFAULT_HEADER_MAP + KNOWN_DROPPED, transcribed from the C17 record and the 2026-08-11 SME evidence — no census run against a real export (the data is company-side)"
+      column_count: ~
+      census: pending
+    note: >
+      KEYS: team_id and product_id are required by both row models; the projection
+      REFUSES (raises) when either header is absent rather than writing a key-less
+      row into a MERGE. The alignment value is `Relationship Type` and NEVER `Team
+      Type Name` — both are present, the one whose name matches the field is the
+      decoy, and a company-side build picked it on 2026-08-11.
+    columns:
+      # --- dev_teams__sample.csv (DevTeamsLoader) ---
+      - {name: "Team ID", disposition: projected, origin: source, target: "DevTeam.team_id",
+         note: "pinned: false. Logical team_id. ALSO the join key on the mapping file (one raw row -> one row in each output)"}
+      - {name: "Team Name", disposition: projected, origin: source, target: "DevTeam.name",
+         note: "pinned: false. Optional since C24 (sparse refresh carries id without name)"}
+      - {name: "JIRA Board", disposition: projected, origin: source, target: "DevTeam.jira_board_id",
+         note: "pinned: false. The pat-evidence README reads 'JIRA instance/board' — one or two columns is a census question"}
+      # --- pat_product_mapping__sample.csv (PatProductMappingLoader) ---
+      - {name: "Product ID", disposition: projected, origin: source, target: "Product.product_id",
+         note: "pinned: false. Required. Lands twice: PatProductMappingRow.product_id AND DevTeamRow.parent_product_id (the HAS_DEV_TEAM anchor)"}
+      - {name: "Supporting Area Product ID", disposition: projected, origin: source, target: "AreaProduct.area_product_id",
+         decided_by: seal-app-ref-edge-reshape,
+         note: "pinned: false. C17 §b: area_product_id is the SUPPORTING one (the team's own alignment); the unqualified field name is the union of both report spellings"}
+      - {name: "SEAL IDs", disposition: projected, origin: source, target: "staging:seal_ids",
+         note: "PINNED delimiter (pat-evidence README): semicolon-separated; PatProductMappingRow normalises ';' -> ',' at the row boundary and the cypher splits on ','. Feeds the ACTIVE arch_develops edge. Values are Internal"}
+      - {name: "Relationship Type", disposition: projected, origin: source, target: "staging:team_type",
+         decided_by: "SME evidence 2026-08-11 (TEAM_DETAILS_REPORT)",
+         note: "PINNED. Aligned | Flex | Dedicated -> lower-cased team_type; the row model's validator is the authority on the enum, the projection only counts unrecognised values"}
+      - {name: "Sponsoring Product ID", disposition: projected, origin: source, target: "staging:sponsored_product_id",
+         note: "pinned: false. C9 §d sponsoring form 1; `sponsored` is DERIVED true when either sponsoring id is present"}
+      - {name: "Sponsoring Area Product ID", disposition: projected, origin: source, target: "staging:sponsored_area_product_id",
+         note: "pinned: false. C9 §d sponsoring form 2 (C17: co-populated with the supporting one; cypher 3a/3b fire independently)"}
+      # --- dropped (mirrors drydocs/pat_projection.py KNOWN_DROPPED). `reason:` is the accessor's closed
+      #     enum: `scope` = not this feed's concern / ruled out, `duplicate` = a display name beside the id; the WHY is in note ---
+      - {name: "Team Type Name", disposition: excluded, origin: source, reason: scope,
+         note: "PINNED decoy: the team's DISCIPLINE (Technology/Product/Design/D&A/Portfolio/SRE), a property of the TEAM not of its product relationship — own home, own gate; never the alignment"}
+      - {name: "Legacy Team ID", disposition: excluded, origin: source, reason: scope,
+         note: "PINNED: opaque UUID-shaped predecessor key; team_id remains the only team key"}
+      - {name: "Product Line", disposition: excluded, origin: source, reason: scope,
+         note: "name-only in this report; a :ProductLine is never keyed by name (C17 §a) — the product-line grain comes from an id-bearing extract"}
+      - {name: "Sponsoring Product Line", disposition: excluded, origin: source, reason: scope,
+         note: "name-only; the third sponsoring form is OUT OF SCOPE until the extract carries its id (C17 §c)"}
+      - {name: "Product Name", disposition: excluded, origin: source, reason: duplicate,
+         note: "display name beside the id; the id is the key"}
+      - {name: "Supporting Area Product Name", disposition: excluded, origin: source, reason: duplicate,
+         note: "display name beside the id"}
+      - {name: "Sponsoring Area Product Name", disposition: excluded, origin: source, reason: duplicate,
+         note: "display name beside the id"}
+      - {name: "Sponsoring Product Name", disposition: excluded, origin: source, reason: duplicate,
+         note: "display name beside the id"}
+      - {name: "LOB", disposition: excluded, origin: source, reason: scope,
+         note: "neither row model consumes it; the LOB tier is catalog hierarchy (catalog_lobs.cypher)"}
+      - {name: "Status", disposition: excluded, origin: source, reason: scope,
+         note: "not consumed by either row model"}
+      - {name: "Agile Framework", disposition: excluded, origin: source, reason: scope,
+         note: "not consumed by either row model"}
+      - {name: "JIRA Instance", disposition: excluded, origin: source, reason: scope,
+         note: "not consumed; jira_board_id is the modelled field"}

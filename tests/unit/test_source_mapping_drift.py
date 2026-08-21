@@ -268,7 +268,9 @@ LEDGER_PENDING = frozenset(
         # config/source-mappings/seal-extract.yaml, the ledger gate
         # business-application-identity §B1(c) required.
         "pat:product-catalog",
-        "pat:people-report",
+        # pat:people-report left this list 2026-08-21 (G82) — it gained
+        # config/source-mappings/pat-team-report.yaml, authored from the
+        # projection drydocs/pat_projection.py actually reads.
         "repo:software-registry",
         "airflow:dag-export",
         "autosys:export",

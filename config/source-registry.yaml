@@ -751,7 +751,7 @@ datasets:
       drop_dir: pat/
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
-      mapping: ~                        # team report: team_id, lob, seal_ids (1..n), jira board, Relationship Type (the alignment), status, agile framework — REAL rows never committed here
+      mapping: config/source-mappings/pat-team-report.yaml   # G82 (2026-08-21): authored from what drydocs/pat_projection.py reads; header spellings pinned at the first real run — REAL rows never committed here
     confirmed: true                     # C9 gate (2026-07-18): the PAT team report as the team_applications feed — transfers per Q6
     replaces: catalog-pat
     notes: >

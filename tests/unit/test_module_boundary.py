@@ -70,6 +70,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.cmdline_staging",
         "drydocs.docs_verify",
         "drydocs.seal_samples",
+        # drydocs.pat_projection = projects the raw PAT team report into the two
+        # files REFRESH_REFERENCE_CHAIN reads (G82). Load, same bucket and same
+        # reason as seal_samples: loader INPUT, output filenames are the chain's.
+        "drydocs.pat_projection",
         # drydocs.docs_coverage = the Q16 software->documentation coverage report.
         # Same bucket as docs_verify for the same recorded reason, and it IMPORTS
         # docs_verify (count_query/locator_of) so the two verbs can never disagree
