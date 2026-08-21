@@ -11,7 +11,7 @@ status: todo
 depends_on:
 - O48
 inputs:
-- UI-WIP/sme-intake-page-plan.md
+- docs/design/ui-exploration/sme-intake-page-plan.md
 - drydocs_api/query_specs.py
 - agents/
 - web/src/components/

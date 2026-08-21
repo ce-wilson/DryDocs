@@ -8,7 +8,7 @@ rows are"*.
 WHAT THIS MODULE IS. The METHOD only. Every input is INJECTED — this module opens no
 file, contacts no database, and writes nothing. The counts it produces are Internal
 and are computed company-side (backlog K16 notes; the runner is
-``docs/k16-fid-census-company-prompt.md``). That split is the reason the module is
+``docs/company-prompts/k16-fid-census-company-prompt.md``). That split is the reason the module is
 pure: the producer repo can hold, test and port the measurement without ever holding
 the measured values.
 

@@ -1,6 +1,6 @@
 """port_preflight.py — J41: certify a producer base BEFORE a company session starts.
 
-``docs/port-prompt.md`` has carried a mandatory CLOSING sequence since J35 and
+``docs/port/port-prompt.md`` has carried a mandatory CLOSING sequence since J35 and
 nothing at the front, so every port began on an uncertified base. On 2026-08-09
 that cost a full cycle: a company session was handed a thorough 8-phase plan and
 could not run it solo, because one phase asked it to edit ``PORT-MANIFEST.yaml``
@@ -36,7 +36,7 @@ from pathlib import Path
 from drydocs_core.repo_paths import repo_root
 
 REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
-PORT_PROMPT_PATH = REPO_ROOT / "docs" / "port-prompt.md"
+PORT_PROMPT_PATH = REPO_ROOT / "docs" / "port" / "port-prompt.md"
 
 #: The ledger's own header exempts these: "Grooms, claims, board/design renders
 #: and depgraph snapshots in the range are ritual ... and get no step." Matched on
@@ -226,7 +226,7 @@ def is_suite_guarded(rel_path: str) -> bool:
     A document leaving that guard's coverage falls back INTO this check, never out
     of both, because this list is the narrower of the two.
     """
-    return rel_path == "docs/port-prompt.md" or (
+    return rel_path == "docs/port/port-prompt.md" or (
         rel_path.startswith("docs/design/") and rel_path.endswith("-runbook.md")
     )
 
@@ -264,7 +264,7 @@ def unresolved_citations(
 
     Mechanises the standing check Idea-110 asked for on 2026-08-12: *resolve the
     paths a document cites before landing it*. That entry is the failure this
-    exists to catch — ``UI-WIP/claude-design-ui-prompt.md`` was authored on a
+    exists to catch — ``docs/design/ui-exploration/claude-design-ui-prompt.md`` was authored on a
     branch on 07-21, listed two brand marks under *Approved / canonical*, main
     deleted both on 07-28 as rejected, and the branch merged clean on 08-12
     because **a merge validates text overlap, never whether the prose still

@@ -11,8 +11,8 @@ status: done
 depends_on:
 - O9
 inputs:
-- UI-WIP/site-plan.md
-- UI-WIP/Gemini-generated-subpage-2.png
+- docs/design/ui-exploration/site-plan.md
+- docs/design/ui-exploration/Gemini-generated-subpage-2.png
 - web/src/
 acceptance: |
   /lineage instantiates the shared template: a React Flow source-to-target DAG (mock subpage-2 pattern) with node/edge styles reading the theme tokens in both schemes; its data frames (hops, data assets, schema definition) served through the GraphAccess seam; /lineage/asset/:assetId deep links resolve; selection linking works as in Explorer.

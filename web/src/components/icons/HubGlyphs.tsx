@@ -1,4 +1,4 @@
-// The 7 hub glyphs from UI-WIP/icons.md (O22), replicated as inline SVG so the
+// The 7 hub glyphs from docs/design/ui-exploration/icons.md (O22), replicated as inline SVG so the
 // set is reusable, recolorable, and crisp at any size. Conventions carried from
 // icons.md: 120×120 viewBox, ~2.2px stroke. Palette is TOKEN-ONLY (no hard-coded
 // hex — the O8 token sheet themes them for free):
@@ -43,7 +43,7 @@ function accent(token: string) {
 
 /** 1. Brand mark — the Kept Orbit mark, small-size (3-stave) variant: red core
  *  wrapped by keel-navy and community-green staves (generated geometry from
- *  UI-WIP/drydocs-mark-mini.svg; philosophy UI-WIP/kept-orbit-philosophy.md —
+ *  docs/design/ui-exploration/drydocs-mark-mini.svg; philosophy docs/design/ui-exploration/kept-orbit-philosophy.md —
  *  palette after the community graph, a tribute, not a copy). Brand-constant
  *  tokens (--brand-navy/--brand-green, same both themes, like --red); the core
  *  is flat token fill + token highlight, no gradient — the one-ink test. */

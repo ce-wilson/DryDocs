@@ -2,7 +2,7 @@
 # G17(c) surfaced: "any enum-semantics question surfaced as a gate rider, never
 # auto-decided"). GATE-BOUND: this page PROPOSES; nothing is built, flipped, or
 # stamped differently by rendering it. DRAFTED 2026-07-22 with the Backstage
-# catalog-model survey (UI-WIP/backstage-catalog-assessment.md, T1) as external
+# catalog-model survey (docs/design/ui-exploration/backstage-catalog-assessment.md, T1) as external
 # prior art — the clone was verified and deleted the same day; the assessment
 # doc is the durable citation.
 # Mechanism-only: subType spellings here are the SYNTHETIC-contract values the
@@ -37,7 +37,7 @@ summary: >
 meta:
   Module: "ontology + lineage writer (drydocs_core/ontology/ · drydocs_lineage/writer.py · drydocs_lineage/extractors/dpl_mac.py)"
   Source: "G17 MAC seam (synthetic fixtures on the traced 6-JSON shape; _KIND_BY_SUBTYPE + the rider path) + gate-log 2026-07-16 cmdline-lineage-review §a (the 3-value ruling) + G12 (the blind-default ambiguity call)"
-  Precedent: "UI-WIP/backstage-catalog-assessment.md T1 — Backstage closed kinds / open-but-governed spec.type; anti-catch-all guidance; Spotify's types grew (data pipelines, ML models…) while kinds stayed fixed"
+  Precedent: "docs/design/ui-exploration/backstage-catalog-assessment.md T1 — Backstage closed kinds / open-but-governed spec.type; anti-catch-all guidance; Spotify's types grew (data pipelines, ML models…) while kinds stayed fixed"
   Registry ref: "no source-registry change from this gate — kind values live at the writer/extractor contract (_KIND_BY_SUBTYPE); when G26 moves the launcher registry into config, the ruled value set rides that file"
   Classification: "Internal-Public (mechanism + synthetic subType spellings; real pipeline values company-side)"
   Vocabulary: "kind is a node PROPERTY value set, not a relationship — no relationship_vocabulary.yaml entry changes at this gate; the value set is recorded at the writer/extractor contract and in the gate log"
@@ -71,7 +71,7 @@ provenance:
       - {name: blind_default, origin: source, from: "G12 guardrail-5 ambiguity call (writer _DEFAULT_ETL_KIND)", note: "no-signal nodes stamp 'etl'; the engine alone cannot distinguish ETL from utility"}
       - {name: mac_signal, origin: source, from: "G17 dpl_mac extractor", note: "subType -> mac_kind via _KIND_BY_SUBTYPE (enum-safe rows only); unmapped subType -> mac_kind_rider + kind_riders count; writer consults mac_kind first"}
       - {name: axes_already_ruled, origin: source, from: "gate-log 2026-07-21 cmdline-nfr-vetting SME-4", note: "%%ETL_PLATFORM = execution-tech axis; ETLProcess.kind stays a separate launcher-derived graph axis — the perceived enum mismatch dissolved"}
-      - {name: backstage_precedent, origin: derived, from: "UI-WIP/backstage-catalog-assessment.md (clone survey 2026-07-22)", note: "closed kind layer + one open-but-governed type field; specific values over catch-alls because behavior/views key off them; label:=their-kind, kind-property:=their-spec.type is the correct analogy"}
+      - {name: backstage_precedent, origin: derived, from: "docs/design/ui-exploration/backstage-catalog-assessment.md (clone survey 2026-07-22)", note: "closed kind layer + one open-but-governed type field; specific values over catch-alls because behavior/views key off them; label:=their-kind, kind-property:=their-spec.type is the correct analogy"}
 
 sections:
   - title: "A. Context — confirm the as-built mechanism this decision sits on"

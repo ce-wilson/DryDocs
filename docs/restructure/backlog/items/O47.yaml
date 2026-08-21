@@ -13,11 +13,11 @@ depends_on:
 - O45
 - O46
 inputs:
-- UI-WIP/sme-intake-page-plan.md
+- docs/design/ui-exploration/sme-intake-page-plan.md
 - web/src/routes/
 - web/src/lib/auth.ts
 - drydocs_api/query_specs.py
-- UI-WIP/ui-conventions.md
+- docs/design/ui-exploration/ui-conventions.md
 acceptance: |
   Route /intake renders in the Shell; the mock-auth roster gains an sme persona (?as=sme) whose towerId scopes the area default, and steward/admin can open the page. Sections 1-3 work end to end against O45/O46: cascading Product Line → Product → Area Product from a new intake.area_tree.v1 QuerySpec (O33-guarded), searchable SEAL select that back-fills PAT levels where the mapping exists and FLAGS (never blocks) a conflict, and "unknown" selectable at every level; context-type dropdown from the O45 generated artifact; drag-drop upload wired to the O46 endpoint with the paired-evidence row display. When O46 flags a thread continuation, the upload row shows "continues the thread of intake <id>" with an INLINE DIFF (new content highlighted against the prior evidence) and the SME decides: Adds-value (the delta proceeds as this intake's content) or No-new-value (linkage + decision recorded, intake STOPS — nothing proposed; a third bounce of the same thread shows both prior decisions). The status machine renders through an IntakeStepper adapted from LoadsTimeline (StatusChip tokens; action buttons from the API's legal-transitions map — no client-side workflow library, decided 2026-08-06). Identifiers render as IdChip, statuses per the ui-conventions token map. Sections 4-7 render as disabled placeholders naming their slice — never silently absent.
 notes: |

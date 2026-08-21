@@ -13,7 +13,7 @@ depends_on: []
 inputs:
 - config/precedence.yaml
 - docs/restructure/03-hitl-sme-flow.md
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   A gate prompt is drafted (drafting decides nothing; config/precedence.yaml is unchanged until sign-off) that puts ONE question to the SME per object class — which source wins when the XML export and the Oracle replica disagree — with a candidate answer stated for them to accept or reject ("the XML export is the definition source of record; the replica remains the runtime/stats feed") rather than an open essay question. The prompt names the two riders the ruling must carry: a named OWNER and a SUNSET for the dual-definition path (the dual-ingestion rule of thumb), and the consequence for T16 — if XML becomes the standing feed, the CM_DEF_VJOB_DETAIL retirement note gains a second path.
 notes: |

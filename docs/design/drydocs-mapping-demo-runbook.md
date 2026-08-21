@@ -13,7 +13,7 @@
 - **Companion:** `docs/design/drydocs-web-console-runbook.md` (the full React console —
   this demo page is its single-page predecessor), `docs/design/drydocs-startup-refresh-runbook.md`
   (the graph-backed startup this one deliberately avoids needing),
-  `UI-WIP/wf-mapping-01.html` (the wireframe this demo is the live-data twin of)
+  `docs/design/ui-exploration/wf-mapping-01.html` (the wireframe this demo is the live-data twin of)
 
 <!-- anchor: purpose-scope -->
 ## Purpose & scope
@@ -123,5 +123,5 @@ Role-based, per the repo's standing flow: the repo owner/SME owns this procedure
 anything touching **edge meaning or mapping semantics** routes to the HITL gate
 (`docs/restructure/03-hitl-sme-flow.md`) — the demo's drafted change artifacts travel
 git → the K2 match-policy gate → the loader, never a direct write. Steward-flow design
-questions belong to `UI-WIP/wf-mapping-01.md`; escalation beyond the repo is not
+questions belong to `docs/design/ui-exploration/wf-mapping-01.md`; escalation beyond the repo is not
 applicable (local demo, no shared infrastructure).

@@ -7,7 +7,7 @@ Rev 4's two-phase loader, same day; reflects commit `c1c3a0a`) ·
 **Classification:** Internal (mirrors `config/taxonomy/controlm.yaml`; uses only the
 committed sample fixtures — no real SIDs/servers) ·
 **Audience:** production-support / development-support engineers reading the graph. ·
-**Companion:** `docs/controlm-staging-ingestion-flow.md` (§3a is the load-order contract).
+**Companion:** `docs/controlm/controlm-staging-ingestion-flow.md` (§3a is the load-order contract).
 
 Worked example throughout:
 
@@ -109,7 +109,7 @@ taxonomy→ontology map.
 | PROV | W3C PROV-O; label duals (`:Collection`/`:Activity`/`:Entity`) encode PROV type |
 | `m3-verify` | the post-load graph-invariant check (`drydocs … m3-verify`) |
 
-**References.** Companion `docs/controlm-staging-ingestion-flow.md` (§3a — the load-order
+**References.** Companion `docs/controlm/controlm-staging-ingestion-flow.md` (§3a — the load-order
 contract); `config/taxonomy/controlm.yaml` (taxonomy); `config/taxonomy-ontology-map/` (confirmed bindings — the fragment directory;
 the former single YAML was split at S5, 2026-08-06); `CLAUDE.md` §1 (four-layer model); ADR 0003 (`ControlMFolder` naming).
 
@@ -200,7 +200,7 @@ pass 4 is the `--phase relationships` set (Rev 4). `--phase all` (default) runs 
 `--skip-part2` still stops after folders + jobs. Both grouping nodes exist **before** the
 jobs pass, keeping pass 2 a pure child pass. `m3-verify` gained a
 no-orphan-`:ControlMApplication` check. (Contract detailed in
-`docs/controlm-staging-ingestion-flow.md` §3a.)
+`docs/controlm/controlm-staging-ingestion-flow.md` §3a.)
 
 ### 3c. Target graph model (Rev 2)
 

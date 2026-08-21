@@ -1,6 +1,6 @@
 """SME Context-Intake — the O46 origin-flagged store + framework-free handlers.
 
-The store half of the intake page (UI-WIP/sme-intake-page-plan.md §3 + §7):
+The store half of the intake page (docs/design/ui-exploration/sme-intake-page-plan.md §3 + §7):
 evidence files land under the data root (never the repo tree), records land in
 a SQLite store beside them, and every record is stamped at creation —
 ``origin: sme-intake`` (the O24 origin-flag precedent) and ``classification:

@@ -11,9 +11,9 @@ priority: p3
 status: done
 depends_on: []
 inputs:
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 - config/gate-log.md
 acceptance: |
-  A copy-paste-ready ratification entry for the company gate-log exists as a committed fenced block reachable from docs/port-prompt.md (beside the §6 Tier-A doctrine or in the T11 tracker row), carrying all four elements that doctrine requires — subject (6 doc_* edges + 6 doc node classes active, doc-traceability-feedback confirmed), the producer gate reference (gate 0252d29 via PORT-REPORT-6fd3270), the checks the port performed, and a sign-off line — with the company-side fill-ins marked as placeholders rather than invented. The T11 tracker row points at it instead of at a past chat session.
+  A copy-paste-ready ratification entry for the company gate-log exists as a committed fenced block reachable from docs/port/port-prompt.md (beside the §6 Tier-A doctrine or in the T11 tracker row), carrying all four elements that doctrine requires — subject (6 doc_* edges + 6 doc node classes active, doc-traceability-feedback confirmed), the producer gate reference (gate 0252d29 via PORT-REPORT-6fd3270), the checks the port performed, and a sign-off line — with the company-side fill-ins marked as placeholders rather than invented. The T11 tracker row points at it instead of at a past chat session.
 notes: |
   Groomed 2026-07-31 (weekly groom) from the 2026-07-24 inbox chore. The gap is durability, not content: port-prompt.md records that the snippet was "provided in the producer session 2026-07-21" and §6 describes the four required elements, but the block itself was never committed — a repo-wide search for 0252d29 / PORT-REPORT-6fd3270 finds only prose references. So the company gate pack cites an artifact that no company session can actually open, and T11 has read `pending` since 2026-07-21. Producer-side authoring only: the entry LANDS in the company gate-log at their next port, and their sign-off remains theirs (producer sign-off is never company sign-off).

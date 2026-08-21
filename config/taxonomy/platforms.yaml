@@ -13,7 +13,7 @@
 # history (rev 2026-07-21). The companion T12 session pack that also held it was
 # retired from the tree 2026-07-27 once the company gate ruled SUPERSEDE
 # (2026-07-21) and the excision was applied company-side — see the T12 tracker
-# row in docs/port-prompt.md; the pack itself survives in git history.
+# row in docs/port/port-prompt.md; the pack itself survives in git history.
 #
 # THE HARD RULE still holds: this file is pure classification. Nothing here is
 # loaded directly; the seed rows below feed the batch-port orchestrator

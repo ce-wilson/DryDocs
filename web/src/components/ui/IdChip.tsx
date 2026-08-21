@@ -1,7 +1,7 @@
 import { runtimeViewUrl, type RuntimeKind } from '../../lib/runtimeView'
 
 // IdChip — the identifier-rendering convention (O38 / DL-6 + DL-11a;
-// UI-WIP/ui-conventions.md §2): Control-M / product / run identifiers render
+// docs/design/ui-exploration/ui-conventions.md §2): Control-M / product / run identifiers render
 // in Plex Mono inside a subtle chip, colored ONLY through the shared status
 // vocabulary tokens (§1) — same object, same look, on every surface. When the
 // O39 runtime-view template is configured (VITE_RUNTIME_VIEW_URL_TEMPLATE),

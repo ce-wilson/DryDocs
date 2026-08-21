@@ -21,7 +21,7 @@ stripped-back print version is the right thing to draw on.
 | 4. Mockup | Look & feel, tokens | Themed HTML like `drydocs-landing-dark.html` |
 
 Each rung is a commit. Name them so they sort:
-`UI-WIP/wf-<view>-<nn>.<ext>` → `wf-landing-01.md`, `wf-myapps-02.svg`.
+`docs/design/ui-exploration/wf-<view>-<nn>.<ext>` → `wf-landing-01.md`, `wf-myapps-02.svg`.
 
 ## 3. Text wireframes (rung 2) — the workhorse
 
@@ -64,7 +64,7 @@ Yes, this works, and it's a good habit:
 4. **Ask Claude** to: transcribe every annotation into a numbered change list, apply
    the changes to the text wireframe / mockup, and flag anything ambiguous instead of
    guessing (that's your HITL gate for design).
-5. **Commit** the updated wireframe + the scan itself (`UI-WIP/scans/wf-landing-01-annotated.pdf`)
+5. **Commit** the updated wireframe + the scan itself (`docs/design/ui-exploration/scans/wf-landing-01-annotated.pdf`)
    so the decision trail survives.
 
 Tips for scans Claude reads well: dark pen (not pencil), write in the margins rather

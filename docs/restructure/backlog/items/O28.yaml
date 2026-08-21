@@ -11,8 +11,8 @@ priority: p3
 status: done
 depends_on: []
 inputs:
-- UI-WIP/backstage-catalog-assessment.md
-- UI-WIP/site-plan.md
+- docs/design/ui-exploration/backstage-catalog-assessment.md
+- docs/design/ui-exploration/site-plan.md
 - web/src/
 - drydocs_api/
 acceptance: |

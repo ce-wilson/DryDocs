@@ -1,6 +1,6 @@
 # SME Runbook — Agent Test (standalone page)
 
-> 2026-07-29 · companion to `UI-WIP/sme-ui-launch-guide.md`. How to run a live
+> 2026-07-29 · companion to `docs/design/ui-exploration/sme-ui-launch-guide.md`. How to run a live
 > agent test and read every panel. Surface ruled by SME gate sign-off 2026-07-29
 > (`config/gate-log.md`): standalone, dark-only, **no auth**, read-only (O20).
 > Page: `web/public/agent-test.html` — ships verbatim inside `web/dist`.

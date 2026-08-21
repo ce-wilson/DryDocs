@@ -13,7 +13,7 @@ payloads can never be tracked (PUBLISH-BOUNDARY.md), so inside a working tree
 they are always in one of those two categories — which means **no combination
 of .gitignore rules protects a manual drop from a port-time clean**. Whether a
 given CSV survived a sweep came down to whether it happened to be ignored and
-whether the sweep carried ``-x``: luck, not design. ``docs/port-prompt.md`` has
+whether the sweep carried ``-x``: luck, not design. ``docs/port/port-prompt.md`` has
 said "NEVER ``git clean`` during a port" since the J22 lesson and the files were
 deleted anyway, which is the argument for a control rather than another warning.
 

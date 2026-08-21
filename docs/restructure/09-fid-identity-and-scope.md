@@ -369,7 +369,7 @@ reports case-only mismatches rather than folding them.
 | Phase | Work | Gate state |
 |-------|------|-----------|
 | **0** | Census on one application (counts only); answer the six gate open questions with the directory owner | before sign-off |
-| **0-method** | ✅ **METHOD DELIVERED 2026-08-07 (K16, producer side)** — `drydocs/fid_census.py`, guarded by `tests/unit/test_fid_census.py`. Pure: no file, no database, no writes; every input injected. Run it with [`docs/k16-fid-census-company-prompt.md`](../k16-fid-census-company-prompt.md) | before sign-off |
+| **0-method** | ✅ **METHOD DELIVERED 2026-08-07 (K16, producer side)** — `drydocs/fid_census.py`, guarded by `tests/unit/test_fid_census.py`. Pure: no file, no database, no writes; every input injected. Run it with [`docs/company-prompts/k16-fid-census-company-prompt.md`](../k16-fid-census-company-prompt.md) | before sign-off |
 | **0-counts** | ⬜ **AWAITING THE COMPANY-SIDE RUN** — the numbers are Internal and cannot be produced in this repo, which holds no directory extract. The table below fills in from that run | before sign-off |
 | **1** | Register the system + dataset (`config/source-registry.yaml` v2, `confirmed: false`); register the audit-envelope entry as `stub` | at sign-off |
 | **2** | Demand-set extract → dated retained snapshot under `internal/` company-side | after sign-off |

@@ -12,9 +12,9 @@ status: done
 depends_on:
 - O6
 inputs:
-- UI-WIP/site-plan.md
-- UI-WIP/layout-anatomy-checklist.md
-- UI-WIP/design-review.md
+- docs/design/ui-exploration/site-plan.md
+- docs/design/ui-exploration/layout-anatomy-checklist.md
+- docs/design/ui-exploration/design-review.md
 - web/src/
 acceptance: |
   web/ runs on the locked single-track stack (Vite + React + Tailwind + ReUI free — Salt dropped): the zone shell from layout-anatomy-checklist.md (aside / header / page-owned toolbar / content / right-sidebar slot, one typed layout config driving every zone); theming = dark + light token sheets behind a pre-paint boot script defaulting to the system scheme with a 3-state System/Dark/Light toggle (dark tokens carried from drydocs-landing-dark.html, --faint contrast fix applied); IBM Plex self-hosted; all 9 module routes from site-plan §3 exist as real deep-linkable routes (back-button safe; focus moves to the view h2 on route change); view components still reach the graph only through the O4 GraphAccess seam.

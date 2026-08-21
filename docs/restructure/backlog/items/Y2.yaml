@@ -19,7 +19,7 @@ inputs:
 - scripts/render_board.py
 - tests/unit/test_port_manifest.py
 - PORT-MANIFEST.yaml
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   The Y1 ADR enacted in one migration commit: backlog/items/<id>.yaml per item with the non-item material where Y1 ruled it; the splitter's entry-level deep-equality proof recorded (every item field-identical to its monolith form) BEFORE backlog.yaml is deleted, and a tombstone guard refuses its resurrection (the S5 monoliths-are-gone pattern); render_board.py DERIVES summary counts and next_ready from the item files — nothing stores them — and the board render is byte-deterministic as before; test_backlog.py and the groom skill's validate.py validate the sharded form (same checks, new reader) with the roll-up drift checks RETIRED as no-longer-possible rather than re-pointed; the groom-backlog skill, CLAUDE.md §0 pull rule, and backlog header prose describe the one-file claim flip; PORT-MANIFEST rows cover backlog/items/** with an entry_rule carrying the split shape (the S5 precedent) and the port-prompt gains a ledger step marked STRUCTURE-BREAKING with the company-side apply instruction Y1 ruled. Full suite green. PRECONDITION carried from the groom (prose, not depends_on): do not land until the in-flight port's PORT-REPORT review is on the record — this item rewrites exactly the files that port carries.
 notes: |

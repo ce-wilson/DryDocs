@@ -1,5 +1,5 @@
 // SYNTHESIZED DATA — no real applications, SEALs, teams, towers, or SIDs
-// (publish boundary). Values mirror the UI-WIP dark-landing mockup's My Apps
+// (publish boundary). Values mirror the dark-landing mockup's My Apps
 // panel (commit dd270b2) so the eventual design-pass port is a restyle, not a
 // remodel: ServiceNow-derived app access rolling up to a CTO tower, dev teams
 // sourced from PAT.

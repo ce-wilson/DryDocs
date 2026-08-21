@@ -206,7 +206,7 @@ module 7) goes through the existing gate flow, not the UI directly.
       phase 12, existing modules `drydocs-web`/`drydocs-api`; the `drydocs-ui`
       module suggestion below is superseded — the registry already names the
       front-end component).
-- [ ] LFS the 19 MB `start-react-free-reference.fig` before UI-WIP is committed wholesale
+- [ ] LFS the 19 MB `start-react-free-reference.fig` before docs/design/ui-exploration is committed wholesale
       — groomed 2026-07-21 as **O21** (whole-corpus commit chore, per-file publish-boundary check).
 - [ ] Retire the Salt two-track language from the IDEAS entry at next groom (decision
       note added to IDEAS now).

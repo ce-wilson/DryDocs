@@ -185,7 +185,7 @@ point; the diff is mechanical and testable.
 **Cons:** import churn across loaders, tests, and `MODULE_MAP.md` (mechanical — the
 `ControlMFolder` rename playbook applies: baseline-grep → move → re-grep → tests); one
 genuine judgment call in splitting `commands.py`; a company-side port must apply the same
-move (coordinate via `docs/port-prompt.md`).
+move (coordinate via `docs/port/port-prompt.md`).
 
 ## Trade-off analysis
 
@@ -216,7 +216,7 @@ defer the split — the value is mostly in the parent.
 **Harder**
 - One more level of nesting; imports get longer.
 - The company port must apply the same move or diverge structurally (this is exactly the
-  kind of change `docs/port-prompt.md` exists to sequence).
+  kind of change `docs/port/port-prompt.md` exists to sequence).
 - `commands.py` briefly has two homes during the split.
 
 **To revisit**
@@ -235,4 +235,4 @@ defer the split — the value is mostly in the parent.
 4. [x] **DONE (S2), narrowed.** `MODULE_MAP.md` carries both new core rows. The guard is `test_module_boundary.py::test_neutral_orchestration_never_imports_a_vendor` plus a shape guard that fails if `drydocs_core/controlm/` reappears at the top level. **Narrowed deliberately:** this item said "nothing outside `orchestration/controlm/` imports Control-M-specific modules", which taken literally fails on its first run — `drydocs/staging.py`, `drydocs/cli.py` and the lineage extractors all import the Control-M parser and are right to, because they ingest Control-M. The enforceable invariant is the WITHIN-CORE direction: the neutral level must never import the vendor. That is what makes a second vendor possible.
 5. [ ] **NOT DONE — and it is a decision, not a chore.** The folder-vs-module inconsistency (`web/` ↔ `drydocs-web`, `agents/` ↔ `drydocs-agents`, `libs/`) asks whether the DIRECTORY moves or the backlog `module:` value does. The second option rewrites `module:` on live backlog items, which is governance, and S2's acceptance does not cover it. Route it as its own item.
 6. [ ] Phase 3: `drydocs/loaders/orchestration/controlm/` for the loaders, `sql/`, and `cypher/` assets. Unblocked by S2 — the core parent now exists for it to mirror.
-7. [ ] Sequence the company-side application through `docs/port-prompt.md` before any other structural port lands. **S2 is now the second structural change queued** (S3's identity cutover is the first), and the two touch disjoint trees — S3 is loader Cypher + schema + API/web, S2 is a core package move — so they can port in either order, but neither should ride alongside a third.
+7. [ ] Sequence the company-side application through `docs/port/port-prompt.md` before any other structural port lands. **S2 is now the second structural change queued** (S3's identity cutover is the first), and the two touch disjoint trees — S3 is loader Cypher + schema + API/web, S2 is a core package move — so they can port in either order, but neither should ride alongside a third.

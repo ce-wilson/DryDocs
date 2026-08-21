@@ -1,5 +1,5 @@
 // SYNTHESIZED DATA — no real systems, SEALs, folder/job names, or org data
-// (publish boundary). Verbatim port of the UI-WIP dark-landing mockup's TOWERS
+// (publish boundary). Verbatim port of the dark-landing mockup's TOWERS
 // dataset (commit dd270b2): four CTO towers, each with an illustrative lineage
 // query, graph, schema, and anonymized row preview.
 

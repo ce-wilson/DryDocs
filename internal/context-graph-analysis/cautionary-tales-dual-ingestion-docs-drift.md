@@ -133,7 +133,7 @@ We are unusually well-defended, mostly because the repo treats derived facts as
 
 Where we've already shown the same symptom, small-scale:
 
-- **`UI-WIP/site-plan.md` phasing went stale** — the console inventory (2026-07-23)
+- **`docs/design/ui-exploration/site-plan.md` phasing went stale** — the console inventory (2026-07-23)
   found the plan's P0–P3 checklist describes work as future that is entirely built.
   Harmless today; it's the identical mechanism (plan written as roadmap, reality moved,
   doc didn't). Groomed follow-ups now live in the backlog, but the plan file itself

@@ -17,14 +17,14 @@ inputs:
 acceptance: |
   MODULE_MAP.md states the rule once — why web/ is the module drydocs-web and agents/ is drydocs-agents, and under what condition a directory must instead match its module name — and the backlog `modules:` comments point at that rule instead of re-explaining it. No directory is renamed by this item.
 notes: |
-  Cosmetic but pre-UI: a new contributor reading the root listing cannot currently tell which of UI-WIP/ and web/ is the real console (S9 fixes the other half of that confusion). Cheapest item in the epic; grouped here because ADR 0008 is where the naming question was raised.
+  Cosmetic but pre-UI: a new contributor reading the root listing cannot currently tell which of UI-WIP/ and web/ is the real console (S9 fixes the other half of that confusion, and did — UI-WIP/ is now docs/design/ui-exploration/). Cheapest item in the epic; grouped here because ADR 0008 is where the naming question was raised.
 annotations:
   status: 'closed 2026-08-07 (desktop, same session as the claim). MODULE_MAP.md gained ''§Naming: folder
     name vs module name'' right under the Invariant: module names name COMPONENTS (guard-enforced boundaries),
     directories name CODE ROOTS, and they must coincide ONLY for first-party Python packages — test_module_boundary.py
     classifies by package root, so that is the one condition forcing a rename; non-Python surfaces (web/=drydocs-web,
     agents/=drydocs-agents) keep ecosystem-conventional names because no guard keys on them and their
-    identity lives in the ledgers. The UI-WIP/-vs-web/ confusion is answered in the section (S9 owns the
+    identity lives in the ledgers. The docs/design/ui-exploration/-vs-web/ confusion is answered in the section (S9 owns the
     re-home). Both backlog modules: comments now cite the section instead of re-explaining (the web comment''s
     ''absent from MODULE_MAP.md'' claim was ALSO stale — O42 added the Non-Python surfaces table — fixed
     by the re-point). No directory renamed. Guards green (backlog + module-boundary).'

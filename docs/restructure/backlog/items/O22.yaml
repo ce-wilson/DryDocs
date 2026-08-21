@@ -12,7 +12,7 @@ status: done
 depends_on:
 - O8
 inputs:
-- UI-WIP/icons.md
+- docs/design/ui-exploration/icons.md
 - web/src/
 acceptance: |
   The 7 glyphs in icons.md (brand mark, Tower Auto, Infrastructure, Home Lending, Data Lineage, Credit Cards + the reused infrastructure variant) exist as standalone recolorable SVG assets/components under web/src — stroke + palette via the O8 theme tokens, no hard-coded hex — and the aside-nav module items (and the radial hub, once O9 lands) consume them; the icons.md status checklist is updated; both themes verified (glow layer gets the light-mode solid-outline equivalent per site-plan §2).

@@ -26,7 +26,7 @@ groom_log:
 - date: '2026-07-22'
   note: |-
     ── appended at the 2026-07-22 groom (Backstage catalog assessment T1–T8;
-       source = UI-WIP/backstage-catalog-assessment.md — the shallow clone was
+       source = docs/design/ui-exploration/backstage-catalog-assessment.md — the shallow clone was
        deleted the same day, the assessment doc is the durable record) ────────
   attached_at: G27
 - date: '2026-07-26'

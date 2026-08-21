@@ -12,7 +12,7 @@ status: todo
 depends_on: []
 inputs:
 - .claude/skills/reconcile-port/SKILL.md
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   Each of the six advances is DISPOSITIONED — reproduced producer-side mechanism-only (no company values) or recorded in the reconcile-port divergence ledger with the reason and the trigger that would change it: the snow-support schema supplement pair (hpsm_queue_key / sn_group_name) plus the snow-snowflake-itsm source stub; the drydocs_remediation DPL watch-drift rule and its tests; the graph_verify Assertion refactor; the docgen deviations against the finalized company TDD; the CONFLUENCE_BASE_URL config seam (mechanism = base-URL as config, the value stays company-side); and the controlm_folders.sql `J` table alias. None is left undecided, and anything that touches edge meaning is registered `planned` and routed to its gate rather than adopted here.
 notes: |

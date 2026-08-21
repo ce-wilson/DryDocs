@@ -4,7 +4,7 @@
 // partial-name match, so a support user is never string-searching all assets.
 // SYNTHESIZED demo inventory (the SpecGrid demo-first idiom); the live twin is
 // a future inventory QuerySpec + the runbooks.app-path.v1 path spec
-// (UI-WIP/wf-runbook-path-01.md).
+// (docs/design/ui-exploration/wf-runbook-path-01.md).
 
 export interface AssetProduct {
   id: string

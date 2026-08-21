@@ -82,7 +82,7 @@ ledger (that recreates the two-ledger divergence that made your step-43 copy
 stale). Archive your steps-43+ content to `docs/port-prompt-archive-company-
 steps-43-NN.md` with a `status: DATED RECORD` header, and replace
 `docs/port-prompt.md` with a short POINTER: the port authority is the producer's
-`docs/port-prompt.md` read at the certified tag + `PORT-MANIFEST.yaml` + the
+`docs/port/port-prompt.md` read at the certified tag + `PORT-MANIFEST.yaml` + the
 `reconcile-port` skill; your port history lives in `port-exec-state.md` and
 `PORT-REPORT-*.md`. References keep resolving; it never becomes a ledger again —
 that is what "never refresh" means. The same tombstone-pointer shape `backlog.yaml`

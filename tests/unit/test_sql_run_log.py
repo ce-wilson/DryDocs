@@ -5,7 +5,7 @@ python-oracledb path. Pins:
 
 * ``render_sql`` substitutes binds ONLY in code regions — the company
   hardening ("don't treat :tokens in SQL comments/strings as binds",
-  docs/port-prompt.md item 14) must hold from day one, byte-identical on the
+  docs/port/port-prompt.md item 14) must hold from day one, byte-identical on the
   real ``controlm_dependencies_recursive.sql``.
 * ``SqlRunLog`` writes one self-contained log per run under SPIDERP_LOGDIR:
   header -> handshake -> statement -> result (csv) -> footer.

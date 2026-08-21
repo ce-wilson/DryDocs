@@ -8,7 +8,7 @@ layer: 2-ontology
 affects:
   - docs/RELATIONSHIP_GUIDE.md
   - config/taxonomy-ontology-map.yaml
-  - docs/port-prompt.md            # company-side adapter fix + ControlMFolder rename
+  - docs/port/port-prompt.md            # company-side adapter fix + ControlMFolder rename
 ```
 
 ## Context
@@ -114,7 +114,7 @@ company originals. The renderer fix supersedes it.
 - `ControlMFolder` completes the source-prefix pattern for BMC labels.
   **Producer-side rename `JobFolder` → `ControlMFolder` is required before
   the next port** — the cypher loaders are Canonical-here, and porting them
-  unrenamed would clobber the company rename (see docs/port-prompt.md).
+  unrenamed would clobber the company rename (see docs/port/port-prompt.md).
 - `:Application` remains colloquially ambiguous in conversation; readers
   learn "in the graph, `:Application` = SEAL."
 

@@ -16,7 +16,7 @@ landed:   2026-08-12      # merged to main at 429d829, unchanged
 > **Reclassified 2026-08-12** (Idea-110). Reusing it means re-checking its references
 > first. The known drift, recorded so the next reader does not chase it:
 >
-> - **`UI-WIP/drydocs-mark.svg` and `drydocs-mark-mini.svg` no longer exist.** §2 and §6
+> - **`docs/design/ui-exploration/drydocs-mark.svg` and `drydocs-mark-mini.svg` no longer exist.** §2 and §6
 >   list them as the "final vector marks" under *Approved / canonical*. Commit `d6022c3`
 >   (2026-07-28) dropped them as rejected and nothing has replaced them, so the final mark
 >   is **unsettled** — treat any mark reference below as a description of intent, not as a
@@ -38,7 +38,7 @@ to **refine and extend the existing design system, not invent a new one**. The b
 direction, palette, typography, and layout anatomy are APPROVED and locked — work
 within them.
 
-## 1. Tech stack (locked — decision 2026-07-17, `UI-WIP/site-plan.md` §1)
+## 1. Tech stack (locked — decision 2026-07-17, `docs/design/ui-exploration/site-plan.md` §1)
 
 - **React 19 + TypeScript ~6 + Vite 8** (`web/package.json`), dev server :5173
 - **Tailwind CSS 4** via `@tailwindcss/vite`, themed entirely through **CSS custom
@@ -54,8 +54,8 @@ within them.
 
 ## 2. Design system — current choices (APPROVED)
 
-**Brand: "Kept Orbit"** (`UI-WIP/kept-orbit-philosophy.md`, brand plate
-`UI-WIP/kept-orbit-brand-sheet.png`, final mark `UI-WIP/drydocs-mark.svg` +
+**Brand: "Kept Orbit"** (`docs/design/ui-exploration/kept-orbit-philosophy.md`, brand plate
+`docs/design/ui-exploration/kept-orbit-brand-sheet.png`, final mark `docs/design/ui-exploration/drydocs-mark.svg` +
 `drydocs-mark-mini.svg`). A small saturated **red core sphere** orbited by exact
 elliptical-arc panel "staves" that never touch it. Hard rules: the core's red is used
 for brand (and alert) ONLY — no decorative red anywhere else; panels are mathematical
@@ -84,7 +84,7 @@ pre-paint boot script in `web/index.html` (localStorage `drydocs.theme.v1`), all
 Flow chrome routed through tokens. Dark-mode-only icon glow via `.glyph-accent`
 drop-shadow; light mode gets solid outlines. `prefers-reduced-motion` kills animation.
 
-**Layout anatomy** (`UI-WIP/layout-anatomy-checklist.md`, implemented in
+**Layout anatomy** (`docs/design/ui-exploration/layout-anatomy-checklist.md`, implemented in
 `web/src/layout/Shell.tsx` + `shellConfig.ts`): banner (yellow MOCK AUTH · SYNTHESIZED
 strip) → **header 64px** (logo, global search, env toggle Prod|UAT|Dev, theme toggle,
 persona chip) → three columns: **aside 240px** (collapsible to 64px, module nav) ·
@@ -181,7 +181,7 @@ server-side routing decision — never surfaced as a client choice.** The consol
 fully without a live graph: every frame falls back to visibly-badged SYNTHESIZED demo
 data (`web/src/**/demo*.ts`, `web/src/data/*`).
 
-## 6. References & screenshots (all in `UI-WIP/` unless noted)
+## 6. References & screenshots (all in `docs/design/ui-exploration/` unless noted)
 
 **Approved / canonical:**
 - `kept-orbit-brand-sheet.png` — the brand plate (mark geometry, stave table, palette)

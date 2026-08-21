@@ -17,7 +17,7 @@ progress: |
 inputs:
 - docs/restructure/03-hitl-sme-flow.md
 - config/gate-log.md
-- UI-WIP/site-plan.md
+- docs/design/ui-exploration/site-plan.md
 - docs/restructure/backlog.yaml
 acceptance: |
   A HITL gate session (docs/restructure/03-hitl-sme-flow.md) decides the UI write-surface boundary and records it in config/gate-log.md: which write-shaped console actions, if any, are ever permitted (gate sign-off from /gates, SME annotations/notes, steward drafting beyond the O13 artifact-download) and the mechanism each must use (gate-bound change artifact per the O13 doctrine vs a direct API write). The standing rule "the UI performs zero graph writes" is the default the gate either re-affirms or consciously amends PER SURFACE. Until signed off, every console surface stays read-only / artifact-only, and any future UI item proposing a write must cite this gate id.

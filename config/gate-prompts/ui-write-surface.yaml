@@ -63,7 +63,7 @@ summary: >
   transcribed to config/gate-log.md.
 meta:
   Module: "drydocs-web + drydocs-api (the console surfaces and their thin API)"
-  Source: "UI-WIP/site-plan.md §5 (P3 chain, O20 terminus) + UI-WIP/wf-mapping-01.md (the one rule: loader stays the only graph writer) + UI-WIP/wf-admin-config-01.md (no edit controls by design)"
+  Source: "docs/design/ui-exploration/site-plan.md §5 (P3 chain, O20 terminus) + docs/design/ui-exploration/wf-mapping-01.md (the one rule: loader stays the only graph writer) + docs/design/ui-exploration/wf-admin-config-01.md (no edit controls by design)"
   Registry ref: "no source-registry change — this gate rules on console affordances, not data sources"
   Classification: "Internal-Public (this page, mechanism only)"
   Taxonomy: "n/a — no taxonomy capture is touched by this gate"
@@ -94,12 +94,12 @@ mapping:
 
 provenance:
   - label: "The read-only/artifact-only doctrine (mapping row 1)"
-    source_object: "UI-WIP/wf-mapping-01.md (the one rule) + UI-WIP/wf-admin-config-01.md (no edit controls) + UI-WIP/site-plan.md §5 (O20 terminus)"
+    source_object: "docs/design/ui-exploration/wf-mapping-01.md (the one rule) + docs/design/ui-exploration/wf-admin-config-01.md (no edit controls) + docs/design/ui-exploration/site-plan.md §5 (O20 terminus)"
     key: "doctrine — not a data object; provenance here tracks WHERE each claim on this page comes from"
     loader: "~ (no loader — this gate rules on console affordances, not data)"
     properties:
-      - {name: loader_is_only_writer, origin: source, from: "UI-WIP/wf-mapping-01.md — 'the loader stays the ONLY graph writer'", note: "verbatim standing rule; reaffirmed as confirmation A"}
-      - {name: no_edit_controls, origin: source, from: "UI-WIP/wf-admin-config-01.md — 'the page therefore has no edit controls'", note: "the admin-page doctrine C4 reaffirms as NEVER"}
+      - {name: loader_is_only_writer, origin: source, from: "docs/design/ui-exploration/wf-mapping-01.md — 'the loader stays the ONLY graph writer'", note: "verbatim standing rule; reaffirmed as confirmation A"}
+      - {name: no_edit_controls, origin: source, from: "docs/design/ui-exploration/wf-admin-config-01.md — 'the page therefore has no edit controls'", note: "the admin-page doctrine C4 reaffirms as NEVER"}
       - {name: mechanism_tiers, origin: derived, from: "this page's framing (M1 artifact-only / M2 non-graph drafts / M3 direct write)", note: "drafted by the Epic-O finish session as the decision vocabulary — the SME may reshape the tiers themselves"}
       - {name: candidate_recommendations, origin: derived, from: "the O13 artifact-download build + the L5 feedback-export precedent + the wf-mapping-01 GHE-posture open item", note: "C1 M1-at-most, C2 M1/M2, C3 defer, C4 never — recommendations only, every one an open SME ruling"}
 

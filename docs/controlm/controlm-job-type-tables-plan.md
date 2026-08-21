@@ -1,7 +1,7 @@
 # Control-M Job-Type Detail Tables — Plan (Phase C/D extension)
 
 **Created:** 2026-07-15
-**Extends:** `docs/controlm-c3-normalization-status.md` (the C3/C4 runbook, 2026-06-11)
+**Extends:** `docs/controlm/controlm-c3-normalization-status.md` (the C3/C4 runbook, 2026-06-11)
 **Motivation:** command lines cannot be parsed in SQL — variable resolution has
 Control-M-specific semantics (the concatenation-delimiter period / smuggled-dot
 pattern, SME-confirmed 2026-06-11, `drydocs_core/controlm/resolver.py`; plus

@@ -13,8 +13,8 @@ depends_on:
 - O11
 - O17
 inputs:
-- UI-WIP/wf-runbook-path-01.md
-- UI-WIP/wf-runbook-path-01.html
+- docs/design/ui-exploration/wf-runbook-path-01.md
+- docs/design/ui-exploration/wf-runbook-path-01.html
 - web/src/routes/RunbooksRoute.tsx
 - drydocs_api/query_specs.py
 - web/src/runbooks/demoRunbooks.ts

@@ -81,7 +81,7 @@ Steps 2–4 exist today (C3 Phases A/B/C). **New build:** legacy XML **import/pa
 | `tests/unit/test_variable_*`, `test_command_parser`, `test_controlm_*` | (in 3,678) | ✅ | | Engine tests follow the engine |
 | `vendor-bmc/` (26 docs) | — | ✅ | | BMC capability corpus (validates the model) |
 | `internal-standards/` (5 plans) | — | ✅ | | Conformance corpus (naming, DC time, metadata, calendar, this plan) |
-| `docs/controlm-c3-normalization-status.md` | — | ✅ | | Runbook |
+| `docs/controlm/controlm-c3-normalization-status.md` | — | ✅ | | Runbook |
 | `cli.py` (Control-M commands) | — | split | ✅ | Carve `analyze-variables` / `ingest-controlm` into the new CLI; leave graph commands |
 | PAT/SEAL ontology, `relationship_vocabulary.yaml`, schema, `neo4j_client` | — | | ✅ | Not Control-M; the SEAL join is via staging facts |
 

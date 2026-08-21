@@ -119,7 +119,7 @@ producer → company port — and the resolution is the **reverse** of most rows
 > company wholesale.
 
 This rule is mirrored in [`git-readme.md`](../../git-readme.md) (the port guide the
-company reads) and [`docs/port-prompt.md`](../port-prompt.md), and in the
+company reads) and [`docs/port/port-prompt.md`](../port-prompt.md), and in the
 `reconcile-port` skill's divergence ledger.
 
 ## Status

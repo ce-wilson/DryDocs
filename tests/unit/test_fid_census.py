@@ -1,7 +1,7 @@
 """K16 — the FID directory census method (doc 09 Phase 0). Pure; no Neo4j, no files.
 
 Every fixture below is SYNTHETIC. The real counts are Internal and are produced
-company-side (``docs/k16-fid-census-company-prompt.md``); what the producer repo
+company-side (``docs/company-prompts/k16-fid-census-company-prompt.md``); what the producer repo
 carries and guards is the METHOD.
 """
 

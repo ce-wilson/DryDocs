@@ -12,10 +12,10 @@ status: done
 depends_on: []
 inputs:
 - web/src/components/ui/StatusChip.tsx
-- UI-WIP/site-plan.md
+- docs/design/ui-exploration/site-plan.md
 - internal/datalens-reference/continuity.md
 acceptance: |
-  One ecosystem-status → StatusChip token mapping table is documented (site-plan or a UI-WIP note): Ready→green, Failed→status-fail-soft, Processing→teal, Pending→yellow, Not Scheduled→muted; StatusChip call sites conform and no surface invents a divergent status→token pairing (grep-checked).
+  One ecosystem-status → StatusChip token mapping table is documented (site-plan or a docs/design/ui-exploration note): Ready→green, Failed→status-fail-soft, Processing→teal, Pending→yellow, Not Scheduled→muted; StatusChip call sites conform and no surface invents a divergent status→token pairing (grep-checked).
 notes: |
   Groomed 2026-07-28 pm from the DSI addendum DL-12.
 annotations:

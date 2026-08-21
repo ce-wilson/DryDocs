@@ -11,7 +11,7 @@ priority: p2
 status: done
 depends_on: []
 inputs:
-- UI-WIP/sme-intake-page-plan.md
+- docs/design/ui-exploration/sme-intake-page-plan.md
 - drydocs_api/
 - drydocs_core/mapping_store.py
 - config/classification.yaml

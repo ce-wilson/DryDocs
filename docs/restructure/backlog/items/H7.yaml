@@ -11,7 +11,7 @@ status: done
 depends_on: []
 inputs:
 - git-readme.md
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 - .claude/skills/reconcile-port/SKILL.md
 acceptance: |
   The back-flow reconciliation direction (Canonical-COMPANY for all drydocs-review paths — keep company's originals, do not overwrite with the sanitized public template) is documented in the port guide, the port prompt, and the reconcile-port divergence ledger.

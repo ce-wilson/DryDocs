@@ -13,9 +13,9 @@ depends_on:
 - O46
 - O47
 inputs:
-- UI-WIP/sme-intake-page-plan.md
+- docs/design/ui-exploration/sme-intake-page-plan.md
 - web/src/routes/AdminConfigRoute.tsx
-- UI-WIP/ui-conventions.md
+- docs/design/ui-exploration/ui-conventions.md
 acceptance: |
   ?as=admin sees the intake queue rail: sme-confirmed records with a diff-style display of what the SME confirmed vs what the extractor proposed, and two actions — accept (→ admin-accepted) or return with a required note (→ admin-returned, back to the SME's drafts). The full status machine renders with the ui-conventions StatusChip vocabulary. THE LOAD BOUNDARY IS HONEST: admin-accepted records PARK with a "waiting on gate" chip naming what they wait on (corpus load = Q10 ← G31 ← G32; assignment edge = Q10's HITL gate) — acceptance here never triggers a load, and no code path from this surface writes the graph.
 notes: |

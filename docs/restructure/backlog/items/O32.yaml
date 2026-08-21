@@ -12,12 +12,12 @@ status: done
 depends_on: []
 inputs:
 - web/src/
-- UI-WIP/site-plan.md
-- UI-WIP/two-track-ui-plan.md
+- docs/design/ui-exploration/site-plan.md
+- docs/design/ui-exploration/two-track-ui-plan.md
 acceptance: |
   Every themed surface in web/src/ (shell/header, landing hub, the shared module template, the lineage/docs graph canvases, /under-the-hood) gets an intentional light-mode design pass rather than the automatic dark-token inversion in place today; verified via a light-mode headless-Edge smoke across at least the shell, one module page, and the lineage/docs canvases; dark mode remains the default/canonical theme and is visually unchanged; build + lint green in both themes.
 notes: |
-  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-6 and the 2026-07-23 UI-acceleration session's open follow-up ("light verified functional today, but derived, not designed"). Not previously tracked as its own item (checked backlog.yaml — only a passing site-plan §2 mention of the equivalent solid-outline treatment). DL-7 merge (2026-07-28, internal/datalens-reference/continuity.md): the light pass should land on (or consciously near) the runtime monitor's observed values — bg ~#F4F6FA, tinted table headers #EEF2F7, threshold green/--status-fail semantics per DL-2 — light mode is the bridge surface between the console and the SRE runtime view, and theme polarity is the harshest transition between the two tools.
+  Groomed 2026-07-23 from docs/design/ui-exploration/two-track-ui-plan.md T1-6 and the 2026-07-23 UI-acceleration session's open follow-up ("light verified functional today, but derived, not designed"). Not previously tracked as its own item (checked backlog.yaml — only a passing site-plan §2 mention of the equivalent solid-outline treatment). DL-7 merge (2026-07-28, internal/datalens-reference/continuity.md): the light pass should land on (or consciously near) the runtime monitor's observed values — bg ~#F4F6FA, tinted table headers #EEF2F7, threshold green/--status-fail semantics per DL-2 — light mode is the bridge surface between the console and the SRE runtime view, and theme polarity is the harshest transition between the two tools.
 annotations:
   status: 'closed 2026-08-07 (desktop, same session as the claim). THE FINDING THAT REFRAMED THE ITEM:
     the light sheet already sat ON the DL-7 bridge values — --bg #f4f6f9 (~runtime monitor #F4F6FA) and

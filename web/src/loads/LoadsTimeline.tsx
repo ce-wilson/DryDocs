@@ -9,7 +9,7 @@ import IdChip from '../components/ui/IdChip'
 // frame linking, the Explorer contract).
 
 function statusToken(status: RunRow['status']): string {
-  // The shared status vocabulary (O41 / DL-12, UI-WIP/ui-conventions.md §1):
+  // The shared status vocabulary (O41 / DL-12, docs/design/ui-exploration/ui-conventions.md §1):
   // COMPLETED/Ready → green · FAILED → status-fail-soft (never brand --red,
   // DL-2) · STARTED/Processing → teal · anything pending-shaped → yellow.
   return status === 'COMPLETED'

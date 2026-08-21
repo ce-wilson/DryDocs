@@ -13,7 +13,7 @@ depends_on:
 - O46
 - O50
 inputs:
-- UI-WIP/sme-intake-page-plan.md
+- docs/design/ui-exploration/sme-intake-page-plan.md
 - config/
 - web/src/routes/AdminConfigRoute.tsx
 acceptance: |

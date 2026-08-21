@@ -9,8 +9,8 @@
 > O29–O32 precedent groomed from `two-track-ui-plan.md`).
 >
 > Source: four DataLens screenshots (this folder, `HL-Datalens-ui-*.png`) reviewed against
-> `web/src/styles/tokens.css`, `web/src/index.css`, `UI-WIP/design-review.md`,
-> `UI-WIP/site-plan.md`, `UI-WIP/two-track-ui-plan.md`. Per the two-track back-flow rule
+> `web/src/styles/tokens.css`, `web/src/index.css`, `docs/design/ui-exploration/design-review.md`,
+> `docs/design/ui-exploration/site-plan.md`, `docs/design/ui-exploration/two-track-ui-plan.md`. Per the two-track back-flow rule
 > (company → producer is **mechanism-only reproduction**), this doc records patterns to
 > reproduce generically — no files, assets, or styles copied. See DL-9 for the
 > classification question this raises.
@@ -78,7 +78,7 @@ worse. Resolve it now, in the token sheet, while the console is small:
 
 - type: task · module: drydocs-web · phase: 12 · agent: main · model: sonnet · priority: p2
   (p2 because DL-3/DL-4 build on it)
-- depends_on: `[]` · inputs: `web/src/styles/tokens.css`, `UI-WIP/design-review.md` (consistency table), `UI-WIP/site-plan.md` §2
+- depends_on: `[]` · inputs: `web/src/styles/tokens.css`, `docs/design/ui-exploration/design-review.md` (consistency table), `docs/design/ui-exploration/site-plan.md` §2
 - acceptance sketch: `--status-fail` exists in both token sheets with the Tailwind
   `@theme` alias; a repo grep shows no non-brand surface consuming `--red`/`--color-brand`
   for error/danger semantics; both themes contrast-checked (≥4.5:1 on `--panel` for text
@@ -142,7 +142,7 @@ rows, search results. Same object, different lens, instant recognition.
 - type: task · module: drydocs-web · phase: 12 · agent: main · model: sonnet · priority: p3
 - depends_on: DL-3 · inputs: `web/src/` (inspector, lineage, loads, ownership surfaces), `docs/RELATIONSHIP_GUIDE.md` (naming), `knowledge/standards/`
 - acceptance sketch: a documented convention (one short section in site-plan or a
-  UI-WIP note) + an `IdChip` component; adopted on the node inspector and one graph/list
+  docs/design/ui-exploration note) + an `IdChip` component; adopted on the node inspector and one graph/list
   surface; no per-surface bespoke identifier styling remains on the touched surfaces;
   both themes verified; build + lint green.
 
@@ -166,7 +166,7 @@ two-track seam rule: a page is "ported" when it renders company config with zero
 component edits.
 
 - type: requirement · module: drydocs-web · phase: 12 · agent: main · model: sonnet · priority: p3
-- depends_on: DL-6 · inputs: `web/src/`, `UI-WIP/two-track-ui-plan.md` (Track-2 table)
+- depends_on: DL-6 · inputs: `web/src/`, `docs/design/ui-exploration/two-track-ui-plan.md` (Track-2 table)
 - acceptance sketch: a config/env-driven URL-template slot renders an external-link
   affordance on entity surfaces when set and nothing when unset; template documented in
   `.env.example`; no company URL or hostname appears anywhere in the repo; build + lint
@@ -180,7 +180,7 @@ that is **Internal at minimum**, and they carry real product codes and job names
 should live under `internal/` (e.g. `internal/datalens-reference/`) with a
 `SOURCE-MANIFEST` + classification entry, not at root where a public push would carry
 them. Groom should also rule where THIS doc lives: it names the company tool and quotes
-identifier shapes, so either sanitize it for `UI-WIP/` (ports company-ward) or move it
+identifier shapes, so either sanitize it for `docs/design/ui-exploration/` (ports company-ward) or move it
 to `internal/` alongside the screenshots.
 
 - type: chore · module: repo-hygiene (or nearest) · agent: main · model: haiku · priority: p2
@@ -287,7 +287,7 @@ DSI's status set is richer than DataLens's: Ready / Failed / Processing / Pendin
 Not Scheduled (vs Completed / Not Completed). Document one mapping table —
 ecosystem status term → StatusChip token (Ready→`--green`, Failed→`--status-fail-soft`,
 Processing→`--teal`, Pending→`--yellow`, Not Scheduled→`--muted`) — in the site-plan
-(or a UI-WIP note) so every surface colors the same state the same way, and chips read
+(or a docs/design/ui-exploration note) so every surface colors the same state the same way, and chips read
 identically across all three tools.
 
 - type: chore · module: drydocs-web · phase: 12 · agent: main · model: haiku · priority: p3

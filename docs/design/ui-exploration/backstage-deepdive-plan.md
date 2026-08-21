@@ -96,7 +96,7 @@ WP-1/WP-2 feed everything else; WP-7 is external and can run in parallel.
   contributions. **This determines whether question 3 (distribution) is real.**
   Mechanism-only notes come back to producer per the sanitization rules; real names/URLs
   stay in `internal-local/`.
-- **WP-8 — Synthesis memo** (½ session). Output: `UI-WIP/backstage-comparison.md` with
+- **WP-8 — Synthesis memo** (½ session). Output: `docs/design/ui-exploration/backstage-comparison.md` with
   three verdict sections matching the three questions (validate / mine / distribute), plus
   groomable backlog candidates. Distribution verdict is explicitly conditional on WP-7.
 
@@ -121,8 +121,8 @@ WP-1/WP-2 feed everything else; WP-7 is external and can run in parallel.
   `git -C C:\coding\projects\backstage pull --depth 1` at dive start. If WP-2/WP-4 need
   it, shallow-clone `backstage/community-plugins` alongside (graphiql/graphql-voyager
   workspaces are the closest graph-adjacent prior art there).
-- Dives run read-only against the clone; all outputs land in `UI-WIP/` (this file's
-  sibling notes) and IDEAS.md inbox lines — commit under the normal UI-WIP flow (O21
+- Dives run read-only against the clone; all outputs land in `docs/design/ui-exploration/` (this file's
+  sibling notes) and IDEAS.md inbox lines — commit under the normal docs/design/ui-exploration flow (O21
   boundary check applies before any wholesale commit).
 - Suggested sequencing: WP-1 → WP-2 in one sitting; kick off WP-7 the same day (it has
   external latency); WP-3–WP-6 as one follow-up session; WP-8 after WP-7 answers.

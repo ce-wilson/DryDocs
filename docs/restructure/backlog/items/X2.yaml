@@ -21,7 +21,7 @@ inputs:
 - drydocs_deepdoc/__init__.py
 - config/dev-environment.yaml
 - tests/unit/test_database_names.py
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   Provisioning no longer creates ddlineage nor aliases it into ddall (01_databases.cypher, provision.ps1, provisioning README, smoke_drydocs_all.cypher all agree); cli.py's DOC_SWEEP_DATABASES drops it; the drydocs_deepdoc docstring topology list and config/dev-environment.yaml stop naming it; query_specs.py's read-set comment block re-grounds on the X1 amendment (the exclusion rationale changes from "provisioned but written by nothing" to "retired at X1") without weakening the allow-list; the test_database_names.py topology anchor steps 5 -> 4 names and the whole guard family (query-specs, docs-verify, tier2) goes green against the shrunk topology; renders that embed the topology (enforcement matrix, board, design-doc runbooks with rev pins — bump any pinned rev the edit trips) are regenerated in the same commit; the port-prompt ledger gains a step carrying the company-side caution: their ddlineage exists live and their G30-repointed specs read drydocs, so the port hands them a provisioning diff plus an instruction to run their own X3-equivalent drop — producer sign-off is not company sign-off. Sweep scope is LIVE SURFACES ONLY (the J23/J24 idiom): gate-log, gate prompts, CHANGELOG, port archives, IDEAS audit trail, and closed-item notes keep the name as history. Full suite + ruff green.
 notes: |

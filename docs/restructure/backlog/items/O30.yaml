@@ -20,7 +20,7 @@ inputs:
 acceptance: |
   web/src/App.css is deleted (or reduced to a comment-only stub recording the migration) and the five named surfaces (SignIn / MyApps / GraphExplorer / TowerDrill / CypherConsole) style entirely through the Tailwind/token classes already used elsewhere in web/src/; no visual regression on any of the five (before/after screenshot or headless-Edge smoke in both themes); build + lint green.
 notes: |
-  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-7. Pure hygiene/consistency chore — no new component behavior.
+  Groomed 2026-07-23 from docs/design/ui-exploration/two-track-ui-plan.md T1-7. Pure hygiene/consistency chore — no new component behavior.
 annotations:
   status: 'closed 2026-08-07 (desktop, same session as the claim). App.css is now a COMMENT-ONLY STUB
     recording the migration; all five surfaces (SignIn / MyApps / GraphExplorer / TowerDrill / CypherConsole)

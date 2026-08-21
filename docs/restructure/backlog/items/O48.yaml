@@ -12,7 +12,7 @@ status: todo
 depends_on:
 - O47
 inputs:
-- UI-WIP/sme-intake-page-plan.md
+- docs/design/ui-exploration/sme-intake-page-plan.md
 - drydocs_api/
 - drydocs_core/ontology/relationship_vocabulary/
 - config/taxonomy/context-types.yaml

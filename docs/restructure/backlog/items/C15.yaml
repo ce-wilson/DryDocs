@@ -14,7 +14,7 @@ inputs:
 - drydocs_core/ontology/relationship_vocabulary.yaml
 - tests/unit/test_schema.py
 - docs/RELATIONSHIP_GUIDE.md
-- UI-WIP/backstage-catalog-assessment.md
+- docs/design/ui-exploration/backstage-catalog-assessment.md
 acceptance: |
   Every relationship_vocabulary.yaml entry carries inverse_label — the target-side display phrasing (e.g. SUPPORTS -> "supported by") — with presence enforced by the vocabulary schema test; RELATIONSHIP_GUIDE.md documents the field as PRESENTATIONAL ONLY (no direction, type, status, or semantics change; storage stays one directed edge; explicitly not a gate matter, recorded as such); full suite green. Consumption (the node inspector phrasing incoming edges from the target side) rides the next inspector touch in Epic O, not this item.
 notes: |

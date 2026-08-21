@@ -12,7 +12,7 @@ import ModuleToolbar from '../layout/ModuleToolbar'
 import BrandMark from '../components/BrandMark'
 
 // The Overview / landing route (`/`) — O35 category-first rebuild per SME
-// feedback FB-2026-07-28-01/02 (UI-WIP/wireframes/, keys WF-LND-*): the dense
+// feedback FB-2026-07-28-01/02 (docs/design/ui-exploration/wireframes/, keys WF-LND-*): the dense
 // radial hub (HeroArt + spoke ring) is DEMOTED to a small decorative mark
 // (WF-LND-04), the product name renders exactly ONCE (the header wordmark —
 // this page's h1 is the value proposition, WF-LND-02), and navigation is two

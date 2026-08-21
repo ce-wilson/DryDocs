@@ -12,8 +12,8 @@ status: done
 depends_on:
 - O8
 inputs:
-- UI-WIP/wf-admin-config-01.md
-- UI-WIP/wf-admin-config-01.html
+- docs/design/ui-exploration/wf-admin-config-01.md
+- docs/design/ui-exploration/wf-admin-config-01.html
 - config/
 - tests/unit/
 - web/src/

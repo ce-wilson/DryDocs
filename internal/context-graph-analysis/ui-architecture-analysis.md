@@ -320,7 +320,7 @@ confirmed on screen: **10 product lines, 217 SEALs, 3,841 repositories**.
 
 ## 5. Adopt / adapt / avoid — judged against DryDocs' locked stack
 
-DryDocs' stack (from `UI-WIP/site-plan.md`, locked 2026-07-17): Vite + React +
+DryDocs' stack (from `docs/design/ui-exploration/site-plan.md`, locked 2026-07-17): Vite + React +
 TS, Tailwind 4 + CSS custom-property tokens, ReUI/shadcn components, React Flow
 for graph canvases, `drydocs-api` (FastAPI) backend via a `GraphAccess` seam, a
 `QuerySpec` registry with export provenance manifests, dark-first
