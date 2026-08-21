@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: haiku
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - web/src/
