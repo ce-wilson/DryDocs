@@ -62,9 +62,9 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
       )
     case 'software':
       // A package outline (the product) with a document mark (its docs) — the
-      // join this page exists to render. NOTE: this switch has no `default`, so
-      // a missing case returns undefined and the glyph silently vanishes from
-      // both the aside and the Overview hub with no compiler error.
+      // join this page exists to render. NOTE: the `default` branch below is
+      // an exhaustiveness guard (O67) — a ModuleId with no case here is a
+      // compile error at this switch, not a silently vanished glyph.
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
           <path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5Z" />
@@ -86,9 +86,9 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
     case 'loadmap':
       // A folded map — deliberately unlike `loads` (bar-chart run timeline)
       // and `lineage` (branching DAG): this page is the territory, not the
-      // traffic. The hazard the `software` note above describes is exactly
-      // what this case exists to avoid: without it the Load map nav entry
-      // renders as bare text, with no error anywhere.
+      // traffic. This case was originally MISSING (the Load map nav entry
+      // rendered as bare text, no error anywhere — noticed at O57); the
+      // `default` guard below is what now makes that omission a compile error.
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
           <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20Z" />
@@ -112,5 +112,14 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
           <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2.1 2.1M16.9 16.9 19 19M19 5l-2.1 2.1M7.1 16.9 5 19" />
         </svg>
       )
+    default: {
+      // O67 exhaustiveness guard: assigning to `never` makes a ModuleId with
+      // no case above a COMPILE error at this switch — the point of omission —
+      // instead of an undefined return that silently drops the glyph from the
+      // aside and the Overview hub. No placeholder glyph on purpose: a visible
+      // fallback would reintroduce the silent-gap defect through the fix.
+      const unhandled: never = id
+      throw new Error(`ModuleIcon: no glyph case for module id ${String(unhandled)}`)
+    }
   }
 }
