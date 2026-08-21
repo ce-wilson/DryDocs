@@ -107,7 +107,11 @@
                               module raises on an unmapped concept; S4 draft table +
                               promote diff; S3 app_id + id_authority key). §07 is restated
                               from "if accepted" to "what changed".
-                          NEW DIAGRAMS: §04 module map redrawn on the one-database shape;
+                          NEW DIAGRAMS: §04 module map redrawn on the one-database shape —
+                          EXECUTIVE flow by default (in → pipeline → one database → the two
+                          loops → out), the full component map behind a "Show every module"
+                          checkbox (user direction: not every component belongs on an
+                          executive flow). CSS :has() does the switch; both render at load;
                           §03 gains the AGENT DECISION TREE (R22 declared terms → Tier 0
                           router → Tier 1 text2cypher → Tier 2 bounded loop → unanswered),
                           cited to Besta et al. 2025 [1] with the paper and repository
@@ -269,6 +273,19 @@
     overflow-x: auto;
   }
   .canvas pre.mermaid { margin: 0; background: transparent; text-align: center; }
+  /* Light-only diagrams, regardless of how the HOST initialized mermaid. The host
+     may have picked a dark theme, and it emits its palette in a style block inside
+     the generated SVG, so the %%init%% directive alone does not always win
+     (found on UI-WIP/chat-turn-vs-router-hop.html, 2026-08-21). Shape fills are
+     deliberately not !important so a per-node classDef can still win. */
+  .canvas .node rect, .canvas .node polygon, .canvas .node circle,
+  .canvas .node ellipse, .canvas .node path { fill: #ffffff; stroke: #8f9aa6; }
+  .canvas .cluster rect { fill: #f4f6f9 !important; stroke: #c9d2dc !important; }
+  .canvas .nodeLabel, .canvas .cluster-label, .canvas .edgeLabel,
+  .canvas .label text, .canvas text { color: #111a26 !important; fill: #111a26 !important; }
+  .canvas .edgeLabel, .canvas .edgeLabel p, .canvas .edgeLabel span { background: #ffffff !important; }
+  .canvas .flowchart-link, .canvas path.path { stroke: #5b6777 !important; }
+  .canvas .marker { fill: #5b6777 !important; stroke: #5b6777 !important; }
   figcaption {
     font-family: var(--mono); font-size: 0.735rem; line-height: 1.55;
     color: var(--faint); letter-spacing: 0.015em; max-width: 44rem;
@@ -312,6 +329,21 @@
   }
 
   hr.rule { border: none; border-top: 1px solid var(--edge); margin: 0.5rem 0; }
+
+  /* ── Executive / full toggle on the module map (rev 10) ───────────────────
+     Both diagrams are in the DOM and both render at load; the inactive one is
+     collapsed to zero height (not display:none, which would stop mermaid from
+     measuring it). No script is needed for the default: CSS does the switch. */
+  .toggle {
+    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.04em;
+    color: var(--muted); display: flex; align-items: center; gap: 0.55rem; cursor: pointer;
+  }
+  .toggle input { width: 1rem; height: 1rem; accent-color: var(--teal); margin: 0; }
+  .toggle span { color: var(--faint); font-size: 0.72rem; }
+  figure:has(#show-modules:not(:checked)) .view-full,
+  figure:has(#show-modules:checked) .view-exec {
+    height: 0; padding: 0; border-width: 0; overflow: hidden;
+  }
 
   footer {
     border-top: 1px solid var(--edge); padding-top: 1.6rem;
@@ -829,7 +861,63 @@ flowchart TD
     <h2>Modules: who does what</h2>
 
     <figure>
-      <div class="canvas">
+      <label class="toggle"><input type="checkbox" id="show-modules" /> Show every module <span>— the executive flow is the default; the full component map is one click away</span></label>
+      <div class="canvas view-exec">
+<pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
+flowchart TB
+  subgraph IN["WHAT COMES IN"]
+    direction LR
+    Struct[("Structured extracts<br/>scheduler · catalog · registry · routing")]
+    Docs[("Documents<br/>vendor · registry pages · frameworks · email")]
+  end
+
+  subgraph PIPE["THE PIPELINE — parse, classify, load"]
+    direction LR
+    Load["Loaders + curated lineage<br/>re-derived on every ingest"]
+    DocMeta["Document ingestion<br/>acquire · clean · chunk"]
+  end
+
+  subgraph DB["ONE DATABASE — a structural trust label"]
+    direction LR
+    GT[("GROUND TRUTH<br/>gate-ratified")]
+    Corp[("DOCUMENT CORPORA<br/>trust declared per corpus")]
+    Unc[("DERIVED FINDINGS<br/>:Uncertain")]
+  end
+
+  subgraph LOOPS["THE TWO LOOPS"]
+    direction LR
+    DeepDoc["Investigate<br/>seeded from the graph<br/>writes only under the label"]
+    Remed["Remediate<br/>detect → prove → Jira<br/>writes no graph"]
+  end
+
+  subgraph OUT["WHAT COMES OUT — all read-only"]
+    direction LR
+    API["API + console<br/>ground truth excludes :Uncertain<br/>by a generated clause"]
+    Agents["Q&amp;A agent<br/>the decision tree in §03"]
+    Jira["Jira<br/>system of record for fixes"]
+  end
+
+  Struct --> Load --> GT
+  Docs --> DocMeta --> Corp
+  GT -->|seeds| DeepDoc
+  Corp -->|cites| DeepDoc
+  DeepDoc -.-> Unc
+  Unc -.->|promotion is a human gate| GT
+  GT --> Remed --> Jira
+  GT --> API
+  Corp --> API
+  API --> Agents
+  DeepDoc ~~~ API
+  Unc ~~~ Agents
+
+  classDef proposed stroke-dasharray:5 3
+  classDef unc stroke-width:2.5px,stroke-dasharray:5 3
+  class DeepDoc proposed
+  class Unc unc
+</pre>
+      </div>
+      <div class="canvas view-full">
 <pre class="mermaid">
 %%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
 flowchart TB
@@ -896,8 +984,8 @@ flowchart TB
 </pre>
       </div>
       <figcaption>
-        Dashed = planned or gate-pending. Note what is <b>absent</b>: no component writes to
-        another component&rsquo;s realm, remediation writes to no database at all, and the only
+        Dashed = planned or gate-pending. Note what is <b>absent</b>: nothing writes to another
+        component&rsquo;s realm, remediation writes to no database at all, and the only
         path from a derived finding to ground truth runs through a human gate. The API routes each
         view explicitly — ground truth alone, or the <code>:Uncertain</code> findings when a view
         deliberately surfaces them. There is no default.
