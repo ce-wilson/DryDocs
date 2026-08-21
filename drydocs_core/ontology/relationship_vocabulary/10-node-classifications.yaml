@@ -337,6 +337,24 @@ node_classifications:
     prov_type:  Agent
     note:       "Line of business. catalog_ontology_supplement.cypher."
 
+  # — Sub-LoB grain (C26, 2026-08-21; RESERVATION ONLY — no loader, no capture column) —
+  - label:      CatalogSubLOB
+    class:      "org:OrganizationalUnit"
+    prov_type:  Agent
+    note: >
+      PLANNED (C26, 2026-08-21): the Sub-LoB tier between a line of business and its
+      product lines — a real, id-keyed grain at source (SME 2026-08-01: LoB, Sub-LoB,
+      Product Line, Product and Area Product EACH carry a numeric id; FCDO capture
+      "5-level hierarchy, native IDs at each level") that the producer does not model.
+      The COMPANY already builds it as `:SubLOB {sub_lob_id}` ("only CIB and AWM have
+      them"); the label is reserved here under the producer's Catalog* convention so
+      the name cannot be taken by accident, and WHICH spelling survives is the C27
+      gate's LABEL ruling (`:LOB` vs `:CatalogLOB`), which must be settled together
+      with the S3 `app_id` KEY ruling — never one without the other. Reached via
+      CatalogLOB -[:HAS_SUB_LOB]-> CatalogSubLOB (catalog_has_sub_lob, planned) and
+      CatalogSubLOB -[:HAS_PRODUCT_LINE]-> ProductLine (catalog_sub_lob_has_product_line,
+      planned). Divergence ledger: .claude/skills/reconcile-port/SKILL.md.
+
   - label:      Company
     class:      "org:FormalOrganization"
     prov_type:  Agent

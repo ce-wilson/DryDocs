@@ -8,7 +8,7 @@ phase: 2
 agent: ontology-mapper
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/reconcile-port/SKILL.md
@@ -21,3 +21,18 @@ acceptance: |
   The catalog divergence between the company gate page (`internal/org/catalog/`, dated 2026-06-25) and the producer catalog ontology is RECORDED in two places a future port cannot miss, and NOTHING is adopted. (a) A divergence-ledger entry in the reconcile-port skill naming all five differences: the `:SubLOB` + `HAS_SUB_LOB` grain we do not model, the widened `HAS_PRODUCT_LINE` range `(:SubLOB|:LOB)`, the label split `:LOB {lob_id, name}` vs our `:CatalogLOB {lob_id, code, name}`, the map-id pair (`sub-lob-org-unit` / `catalog-lob-reconciles-segment` vs our `lob-has-product-line` / `lob-reconciles-to-segment`), and the 5-field `pat_lob_sublob_productline.csv` grain our `lob-product-team.yaml` capture lacks a Sub-LoB Name column for. (b) The divergent relationship shapes are registered `status: planned` in the vocabulary and the catalog mapping file, each carrying the trigger that would confirm it — reserving the NAME so the port cannot collide on it, which is exactly the G34 glossary-scaffold argument, and asserting no meaning (that is what `planned` is for). (c) Two rulings are named in the entry as things the eventual gate must settle TOGETHER, not one at a time: the label ruling (`:LOB` vs `:CatalogLOB`) and the key ruling (the S3 `app_id` rename the company page pre-dates). (d) The two relayable findings are stated as relay items, not producer work: the page's functional-org target "Corporate" is ambiguous against our seeded `:BusinessSegment {code:"Corp"}` and MERGEs a phantom segment if read as a code, and the page's `drydocs/schema/ontology.cypher` path is period-correct for its date (pre-G2 Phase-B relocate), so refresh it only if the prompt is revised. No loader changes, no taxonomy capture rewritten, no map entry flipped to `confirmed`.
 notes: |
   Groomed 2026-08-05 (desktop) on the user's direction to close out the catalog mapping area. This is the ACTIONABLE HALF of the parked 2026-07-27 IDEAS entry. The parked entry's trigger — the COMPANY gate's own sign-off — still gates ADOPTION, which is C27; it does not gate writing the divergence down, and leaving it written only in an inbox line is how a port silently picks a side. Two sibling IDEAS entries explicitly said "fold into that back-flow item; do not open a second one" and are absorbed HERE plus C27: the 2026-08-01 Sub-LoB entry (confirmed built company-side — `parent_sub_lob_id` anchoring under `MERGE (sl:SubLOB …)` with a `:LOB {lob_id}` fallback, both via HAS_PRODUCT_LINE) and the three producer-side gaps parked in the 2026-08-02 entry (`pat_app_links` stub governance, `pat_product_owners`, the `products` step-2a supplement fields). WHAT IS ALREADY SETTLED AND MUST NOT BE RE-OPENED: the C17 gate-log entry (2026-08-01) already records "NOT decided here … it already belongs to the parked company-catalog back-flow item", so this item is that entry's designated home — the ruling stays unmade, it just stops being unfindable. The gate MECHANICS matched all the way through (localStorage ticks, no-write-until-confirmed, `{confidence, authority, aliases}` on RECONCILES_TO, skos:closeMatch aliases, precedence winner `lob-product-team`) — content drifted, mechanism did not, so nothing about gate_pages.py is in question. ONE FREE RESULT worth taking while here: the company page shows CIB and AWM as SEPARATE LoBs with 1.0 exact matches, which resolves the LOB002 AWMCIB open question (legacy, 0.5) in `lob-product-team.yaml` — a taxonomy capture fix, reversible, no edge meaning.
+  DONE 2026-08-21 (desktop). (a) Divergence-ledger row added to .claude/skills/reconcile-port/SKILL.md
+  naming all five differences (grain, range, label, map ids, capture grain), the two joint rulings, the
+  two relay items, and the three absorbed 2026-08-02 gaps. (b) Reserved as NAMES only: vocabulary
+  `catalog_has_sub_lob` (CatalogLOB -HAS_SUB_LOB-> CatalogSubLOB) and `catalog_sub_lob_has_product_line`
+  (CatalogSubLOB -HAS_PRODUCT_LINE-> ProductLine) `planned` in 42-local-catalog.yaml; node label
+  `CatalogSubLOB` `planned` in 10-node-classifications.yaml (producer Catalog* spelling; the company's
+  `:SubLOB` spelling is the label ruling's to settle); map ids `sub-lob-org-unit` and
+  `catalog-lob-reconciles-segment` as `proposed` in 30-mappings-catalog.yaml -- the map lifecycle enum
+  is proposed|confirmed|applied|rejected and has no `planned`, so `proposed` is the map's reservation
+  state exactly as G34 used it; summary recounted 6->8. (c) Label + key named as ONE ruling in the
+  ledger, the node note, both vocab notes and the map open_questions. (d) Both relay items stated as
+  relay. Free result taken: LOB002 AWMCIB@0.5 split into LOB002 AWM@1.0 + LOB006 CIB@1.0 in
+  lob-product-team.yaml and catalog_lobs__sample.csv (taxonomy capture, reversible; test_precedence's
+  AWMCIB fixture is a test value and untouched). Not touched: loaders, `confirmed` flags, capture columns.
+  Renders regenerated: schema_graph.cypher, enforcement-matrix.json, load-map. Suite 2233 passed.

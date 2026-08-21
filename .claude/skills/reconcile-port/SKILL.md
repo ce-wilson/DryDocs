@@ -142,6 +142,45 @@ stay skipped — confirm with the operator if a new one appears.
     (or has a live loader for it), that specific entry is a back-flow COLLISION — keep
     the company's active version; do NOT downgrade it to the producer's `planned` state.**
     Reconcile per-entry, not by taking the whole file blindly.
+- **PAT catalog ontology — company is AHEAD and the producer has ADOPTED NOTHING (C26,
+  2026-08-21; adoption = C27, gated on the COMPANY catalog gate's own sign-off).** The
+  company gate page `internal/org/catalog/_catalog_gate_page.html` (dated 2026-06-25, "SME
+  Gate Prompt — PAT Catalog Loader", step 1 of 3) diverges from the producer catalog
+  ontology in FIVE ways. Keep company on every one; do not "reconcile" them into the
+  producer shape, and do not let a port pick a side by accident:
+  1. **Grain** — company models `:SubLOB` + `HAS_SUB_LOB` (LOB→SubLOB, "only CIB and AWM have
+     them"; `product_lines.cypher` anchors on `parent_sub_lob_id` with a `:LOB {lob_id}`
+     fallback). Producer flattens `LoB → Sub-LoB → Product Line` to `CatalogLOB → ProductLine`,
+     and the flattening is INVISIBLE: a sub-LoB id in `parent_lob_id` MERGEs a phantom LOB.
+  2. **Range** — company widens `HAS_PRODUCT_LINE` to `(:SubLOB|:LOB) → ProductLine`; producer
+     `catalog_has_product_line` is `CatalogLOB → ProductLine` only.
+  3. **Label** — company writes `:LOB {lob_id, name}`; producer writes `:CatalogLOB {lob_id,
+     code, name}` (`catalog_lobs.cypher`). Same thing, two labels — the fallback branch in
+     (1) and our loader cannot both be right.
+  4. **Map ids** — company page expects `sub-lob-org-unit` and `catalog-lob-reconciles-segment`;
+     producer has `lob-has-product-line` and `lob-reconciles-to-segment` (confirmed 2026-06-21).
+     Both company ids are now RESERVED `proposed` in `30-mappings-catalog.yaml` so a port
+     collides on a deliberate placeholder instead of silently adding a duplicate concept.
+  5. **Capture grain** — company ingests the 5-field `pat_lob_sublob_productline.csv` (164
+     rows, with a Sub-LoB Name column); producer `config/taxonomy/lob-product-team.yaml`
+     has no Sub-LoB column at all.
+  Producer reservations (NAMES only, no meaning): vocabulary `catalog_has_sub_lob` and
+  `catalog_sub_lob_has_product_line` (`planned`, 42-local-catalog.yaml), node label
+  `CatalogSubLOB` (`planned`, 10-node-classifications.yaml), the two map ids above
+  (`proposed`). **Two rulings the C27 gate must settle TOGETHER, never one at a time:** the
+  LABEL ruling (`:LOB` vs `:CatalogLOB`) and the KEY ruling (the S3 `app_id` rename, signed
+  2026-07-27, which the company page PRE-DATES) — a label decision made before the key
+  decision re-opens the moment the key lands on the shapes. **Relay items (company-side
+  fixes, not producer work):** (i) the page's functional-org target "Corporate" is ambiguous
+  against the seeded `:BusinessSegment {code:"Corp", name:"Corporate"}` — read as a code it
+  MERGEs a phantom segment; (ii) the page's `drydocs/schema/ontology.cypher` path is
+  period-correct for 2026-06-25 (pre-G2 Phase-B relocate, 2026-07-10) — refresh it only if
+  the prompt is revised. Gate MECHANICS match `gate_pages.py` throughout (localStorage ticks,
+  no-write-until-confirmed, `{confidence, authority, aliases}` on RECONCILES_TO,
+  skos:closeMatch aliases, precedence winner `lob-product-team`): content drifted, mechanism
+  did not. Also absorbed here (from the 2026-08-02 inbox line): `pat_app_links` stub
+  governance, `pat_product_owners`, and the `products` step-2a supplement fields — all ride
+  C27's trigger.
 
 ## Track-1 acceptance (the contract)
 

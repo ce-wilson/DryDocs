@@ -25,7 +25,8 @@ nodes:
   # CatalogLOB — top of the org hierarchy. reconciles_to_segment is a meaning edge (deferred).
   lobs:
     - { id: LOB001, code: CCB,    name: Consumer & Community Banking, reconciles_to_segment: CCB, confidence: 1.0 }
-    - { id: LOB002, code: AWMCIB, name: "Asset & Wealth Management + Commercial & Investment Bank (legacy)", reconciles_to_segment: AWM, confidence: 0.5 }
+    - { id: LOB002, code: AWM,    name: Asset & Wealth Management,      reconciles_to_segment: AWM, confidence: 1.0 }   # C26 2026-08-21: was AWMCIB @0.5 (legacy combined code); the company catalog page shows AWM and CIB as SEPARATE LoBs, each an exact match
+    - { id: LOB006, code: CIB,    name: Commercial & Investment Bank,   reconciles_to_segment: CIB, confidence: 1.0 }   # C26 2026-08-21: the other half of the former AWMCIB row
     - { id: LOB003, code: CT,     name: Corporate Technology, reconciles_to_segment: Corp, confidence: 1.0 }
     - { id: LOB004, code: HR,     name: Human Resources (Other Corporate), reconciles_to_segment: Corp, confidence: 1.0 }
     - { id: LOB005, code: ET,     name: Enterprise Technology, reconciles_to_segment: Corp, confidence: 1.0 }
@@ -76,7 +77,9 @@ open_questions:
     note: >
       reconciles_to_segment (CCB/AWM/Corp) references BusinessSegment with a confidence, but no
       segment nodes are sampled. RECONCILES_TO is a meaning edge (skos:closeMatch) -> ontology (C3).
-      Note LOB002 confidence 0.5 (AWMCIB splits across segments).
+      The former LOB002 AWMCIB row (confidence 0.5, "splits across segments") was split at
+      C26 (2026-08-21) into LOB002 AWM and LOB006 CIB, both 1.0 -- the company catalog gate
+      page lists them as separate LoBs with exact matches. Taxonomy capture fix; reversible.
   - id: confidential-rosters
     note: "Team names here are synthetic. Production rosters/people are confidential -> internal/."
 

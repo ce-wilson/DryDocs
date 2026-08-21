@@ -855,6 +855,16 @@
           "id": "product-has-application",
           "status": "confirmed",
           "label": "HAS_APPLICATION"
+        },
+        {
+          "id": "sub-lob-org-unit",
+          "status": "proposed",
+          "label": "HAS_SUB_LOB"
+        },
+        {
+          "id": "catalog-lob-reconciles-segment",
+          "status": "proposed",
+          "label": "RECONCILES_TO"
         }
       ],
       "loaders": [

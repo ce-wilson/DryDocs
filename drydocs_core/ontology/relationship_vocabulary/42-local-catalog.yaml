@@ -31,6 +31,52 @@
     domain:       catalog
     status:       active
 
+  # ---- C26 (2026-08-21): company-catalog divergence — NAMES RESERVED, nothing adopted ----
+  # The company catalog gate page (2026-06-25) models a Sub-LoB tier the producer
+  # flattens away. These two entries reserve the shapes as `planned` so a port cannot
+  # collide on them; they assert NO meaning. Trigger that confirms either: the C27
+  # adoption gate, which rules the LABEL (`:LOB` vs `:CatalogLOB`) and the KEY (S3
+  # `app_id`) questions in the SAME session. Full ledger: reconcile-port SKILL.md.
+
+  - id:           catalog_has_sub_lob
+    neo4j_label:  HAS_SUB_LOB
+    inverse_label: "sub-LoB of"
+    role:         ~
+    from_node:    CatalogLOB
+    to_node:      CatalogSubLOB
+    prov_maps_to: ~
+    note: >
+      PLANNED (C26, 2026-08-21) — reservation only. LOB contains sub-LoBs; at source
+      "only CIB and AWM have them". The company gate page introduces it as
+      (:LOB)-[:HAS_SUB_LOB]->(:SubLOB); the producer registers the NAME under its own
+      label convention and adopts nothing. TRIGGER: the C27 gate's joint label + key
+      ruling. Until then the producer chain stays CatalogLOB -> ProductLine and the
+      flattening is recorded as a known divergence, not a bug.
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_sub_lob_has_product_line
+    neo4j_label:  HAS_PRODUCT_LINE
+    inverse_label: "product line of"
+    role:         ~
+    from_node:    CatalogSubLOB
+    to_node:      ProductLine
+    prov_maps_to: ~
+    note: >
+      PLANNED (C26, 2026-08-21) — reservation only. The company's WIDENED range:
+      HAS_PRODUCT_LINE from (:SubLOB|:LOB), its product_lines.cypher anchoring on
+      parent_sub_lob_id when populated and falling back to the LOB otherwise.
+      Registered as a SEPARATE (from, label, to) triple beside catalog_has_product_line
+      (the C8 meta-graph refuses duplicate triples, so the widening has to be its own
+      entry). TRIGGER: the C27 gate. If confirmed, the producer must also decide how
+      the lob-product-team.yaml capture gains the Sub-LoB column it lacks (ledger item 5).
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
   - id:           catalog_has_product
     neo4j_label:  HAS_PRODUCT
     inverse_label: "product of"

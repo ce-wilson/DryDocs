@@ -113,6 +113,8 @@ MERGE (n:SchemaMeta:ProductRole {name: 'ProductRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
+MERGE (n:SchemaMeta:CatalogSubLOB {name: 'CatalogSubLOB'})
+  SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:Company {name: 'Company'})
   SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:BusinessSegment {name: 'BusinessSegment'})
@@ -337,6 +339,14 @@ MERGE (a)-[r:RECONCILES_TO]->(b)
 MATCH (a:SchemaMeta {name: 'CatalogLOB'}), (b:SchemaMeta {name: 'ProductLine'})
 MERGE (a)-[r:HAS_PRODUCT_LINE]->(b)
   SET r.vocab_id = 'catalog_has_product_line', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'CatalogLOB'}), (b:SchemaMeta {name: 'CatalogSubLOB'})
+MERGE (a)-[r:HAS_SUB_LOB]->(b)
+  SET r.vocab_id = 'catalog_has_sub_lob', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'CatalogSubLOB'}), (b:SchemaMeta {name: 'ProductLine'})
+MERGE (a)-[r:HAS_PRODUCT_LINE]->(b)
+  SET r.vocab_id = 'catalog_sub_lob_has_product_line', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ProductLine'}), (b:SchemaMeta {name: 'Product'})
 MERGE (a)-[r:HAS_PRODUCT]->(b)

@@ -151,7 +151,7 @@
       ],
       "gate_ref": "HITL gate (docs/restructure/03-hitl-sme-flow.md)",
       "status": "gate-pending",
-      "pending_entries": 20,
+      "pending_entries": 22,
       "env_refs": [],
       "files": [
         "config/taxonomy-ontology-map/00-header.yaml",
@@ -180,7 +180,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 43,
+      "pending_entries": 45,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
