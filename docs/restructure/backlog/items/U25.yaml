@@ -26,8 +26,7 @@ notes: |
   (b) U12 intact and SAID: the retention pattern matches `<project>-<date>[-HHmm].json` only; the
   README's Housekeeping rule now states beside it that the ledger is not a snapshot and the sweep never
   touches it. (c) RULED COMMITTED -- history across both machines is the whole point; rows are born LF
-  through open(newline="
-"), CR-free, and .gitattributes marks the file `merge=union` so two
+  through an LF open(), CR-free, and .gitattributes marks the file `merge=union` so two
   machines appending in one window both keep their rows (each carries its own date + commit). The
   writer is declared in COMMITTED_SURFACE_WRITERS and *.jsonl joins the CR-byte glob. (d) no database
   -> "debt-metrics: no row written -- database unreachable (...)", exit 0, nothing appended (tested
