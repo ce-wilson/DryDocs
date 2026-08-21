@@ -13,12 +13,22 @@ rejection against a live graph).
 from __future__ import annotations
 
 import os
+import sys
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import neo4j
 
 from common.neo4j_tool import get_driver
+
+# R21: the notification shape lives in core so the API runner, this helper and
+# the :AgentRun writer cannot drift apart. Same REPO_ROOT idiom as llm_ledger.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from drydocs_core.notifications import from_summary, to_payload  # noqa: E402
 
 DEFAULT_ROW_CAP = 100
 DEFAULT_TIMEOUT_S = 15.0
@@ -39,6 +49,9 @@ class ReadResult:
     row_count: int = 0
     truncated: bool = False
     ms: int = 0
+    #: R21: the driver's non-fatal notifications for this statement, as plain
+    #: dicts (drydocs_core.notifications). ``[]`` is a clean run.
+    notifications: list[dict] = field(default_factory=list)
 
 
 def run_read(
@@ -53,7 +66,7 @@ def run_read(
     started = time.perf_counter()
 
     @neo4j.unit_of_work(timeout=timeout_s)
-    def _work(tx: neo4j.ManagedTransaction) -> tuple[list[dict], list[str], bool]:
+    def _work(tx: neo4j.ManagedTransaction) -> tuple[list[dict], list[str], bool, list[dict]]:
         result = tx.run(cypher, **(params or {}))
         rows: list[dict] = []
         truncated = False
@@ -62,11 +75,15 @@ def run_read(
                 truncated = True
                 break
             rows.append(record.data())
-        return rows, list(result.keys()), truncated
+        keys = list(result.keys())
+        # R21: consume() yields the summary — and with it the notifications an
+        # unknown label or property produces. They used to be dropped here.
+        notes = to_payload(from_summary(result.consume()))
+        return rows, keys, truncated, notes
 
     try:
         with get_driver().session(database=db, default_access_mode=neo4j.READ_ACCESS) as session:
-            rows, keys, truncated = session.execute_read(_work)
+            rows, keys, truncated, notes = session.execute_read(_work)
     except neo4j.exceptions.Neo4jError as exc:
         raise CypherReadError(str(exc), code=getattr(exc, "code", None)) from exc
     except Exception as exc:  # driver/transport errors — same fix-loop path
@@ -78,4 +95,5 @@ def run_read(
         row_count=len(rows),
         truncated=truncated,
         ms=int((time.perf_counter() - started) * 1000),
+        notifications=notes,
     )

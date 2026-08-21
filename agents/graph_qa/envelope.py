@@ -41,6 +41,10 @@ class StepRecord:
     # R4 ephemeral session spec ref (eph.<hash>) for /specs/{ref}/run|export;
     # None when the registration surface isn't configured (pre-R5 wiring).
     explore_ref: str | None = None
+    # R21: Neo4j's non-fatal notifications for this step's Cypher (code, title,
+    # severity, position, description, category) — an unknown label that
+    # presents as 0 rows is visible HERE, not lost. [] is a clean step.
+    notifications: list[dict] = field(default_factory=list)
 
 
 @dataclass

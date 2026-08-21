@@ -225,6 +225,7 @@ class GraphQaPipeline:
             self._push_step(envelope, step)
             return None
         step.rows, step.truncated, step.ms = result.row_count, result.truncated, result.ms
+        step.notifications = list(getattr(result, "notifications", []) or [])
         step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
         self._push_step(envelope, step)
         timings["retrieve"] += step.ms
@@ -268,6 +269,7 @@ class GraphQaPipeline:
                     result.truncated,
                     result.ms,
                 )
+                step.notifications = list(getattr(result, "notifications", []) or [])
                 step.explore_ref = self._explore_ref(cypher, self.default_db, {})
                 self._push_step(envelope, step)
                 timings["retrieve"] += step.ms

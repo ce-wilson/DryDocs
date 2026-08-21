@@ -20,6 +20,7 @@ Privacy rules carried in the props, not the caller's discipline:
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 
 AGENT_RUN_DB_ENV = "DRYDOCS_AGENTRUN_DB"
@@ -80,6 +81,16 @@ def agent_run_props(envelope, user_id: str = "") -> dict:
         "memory_events": metrics.memory.get("events", 0),
         "memory_tokens_est": metrics.memory.get("tokens_est", 0),
         "cypher_count": len(executed),
+        # R21: the notifications Neo4j raised on any executed step, one JSON
+        # string each (a Neo4j list property must be homogeneous) tagged with
+        # the step index; and their count. A clean run carries [] and 0 — an
+        # empty payload, never a missing field.
+        "warnings": [
+            json.dumps({"step": s.i, **n}, sort_keys=True, separators=(",", ":"))
+            for s in steps
+            for n in (getattr(s, "notifications", None) or [])
+        ],
+        "warning_count": sum(len(getattr(s, "notifications", None) or []) for s in steps),
         "fix_retries": max((s.fix_retries for s in steps), default=0),
         "specs_used": sorted({s.spec_id for s in steps if s.kind == "spec" and s.spec_id}),
         "dbs_touched": sorted({s.database for s in executed if s.database}),

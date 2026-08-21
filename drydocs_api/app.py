@@ -72,6 +72,7 @@ from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQuer
 from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError
 from drydocs_core.config import Neo4jSettings
+from drydocs_core.notifications import from_summary, to_payload
 
 
 class LoginBody(BaseModel):
@@ -139,13 +140,24 @@ class LiveRunner:
     def run(
         self, cypher: str, params: Mapping[str, object], database: str
     ) -> tuple[list[str], list[dict[str, object]]]:
+        keys, rows, _ = self.run_with_diagnostics(cypher, params, database)
+        return keys, rows
+
+    def run_with_diagnostics(
+        self, cypher: str, params: Mapping[str, object], database: str
+    ) -> tuple[list[str], list[dict[str, object]], list[dict[str, object]]]:
+        """R21: rows AND the driver's notifications. The summary used to be
+        discarded here, which is how four unknown-label warnings presented as
+        a clean empty answer on 2026-08-20. Non-fatal: never raised, always
+        carried; ``[]`` is a clean run, not a missing field."""
         result = self.driver.execute_query(
             cypher,
             parameters_=dict(params),
             database_=database,
             routing_=neo4j.RoutingControl.READ,
         )
-        return list(result.keys), [r.data() for r in result.records]
+        notifications = to_payload(from_summary(result.summary))
+        return list(result.keys), [r.data() for r in result.records], notifications
 
     def stream(self, cypher: str, params: Mapping[str, object], database: str):
         """Driver streaming for exports (O11): rows are yielded as the driver

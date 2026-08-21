@@ -25,6 +25,18 @@ class GraphRunner(Protocol):
     ) -> tuple[list[str], list[dict[str, object]]]: ...
 
 
+def run_with_diagnostics(
+    runner: GraphRunner, cypher: str, params: Mapping[str, object], database: str
+) -> tuple[list[str], list[dict[str, object]], list[dict[str, object]]]:
+    """R21: prefer a runner that carries the driver's notifications; a plain
+    ``run`` runner (every duck-typed fake) yields an empty diagnostics list."""
+    rich = getattr(runner, "run_with_diagnostics", None)
+    if rich is not None:
+        return rich(cypher, params, database)
+    keys, rows = runner.run(cypher, params, database)
+    return keys, rows, []
+
+
 class Forbidden(PermissionError):
     """Raised when the session's role may not use the endpoint."""
 
@@ -59,8 +71,14 @@ def run_named(
     bound = validate_params(query, params)
     ensure_read_only(query.cypher)  # defense in depth — named queries are ours, assert anyway
     database = database_for(query_id)
-    keys, rows = runner.run(query.cypher, bound, database)
-    return {"query_id": query_id, "database": database, "keys": keys, "rows": rows}
+    keys, rows, notes = run_with_diagnostics(runner, query.cypher, bound, database)
+    return {
+        "query_id": query_id,
+        "database": database,
+        "keys": keys,
+        "rows": rows,
+        "diagnostics": {"notifications": notes},
+    }
 
 
 def run_raw(
@@ -76,5 +94,11 @@ def run_raw(
         raise Forbidden("raw Cypher is admin-only")
     ensure_read_only(cypher)
     database = database_for("raw-cypher")
-    keys, rows = runner.run(cypher, {}, database)
-    return {"query_id": "raw-cypher", "database": database, "keys": keys, "rows": rows}
+    keys, rows, notes = run_with_diagnostics(runner, cypher, {}, database)
+    return {
+        "query_id": "raw-cypher",
+        "database": database,
+        "keys": keys,
+        "rows": rows,
+        "diagnostics": {"notifications": notes},
+    }

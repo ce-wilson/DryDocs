@@ -986,6 +986,10 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             description=(
                 "R3 agent-run telemetry for the admin view: one :AgentRun per "
                 "answered question (kind 'qa', mirroring :JobRun), newest first. "
+                "R21 (2026-08-21): carries warning_count + warnings — the Neo4j "
+                "notifications each executed step raised (unknown label / type / "
+                "property, cartesian product), so an empty answer built on vocabulary "
+                "the graph does not hold is diagnosable here instead of reading as clean. "
                 "Question and caller identity appear as sha256 + length ONLY — "
                 "full text lives solely in the local JSONL ledger. Reads "
                 ":Uncertain rows (uncertain=True), so rows carry the UNCERTAIN "
@@ -997,6 +1001,9 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "r.tier AS tier, r.model AS model, r.llm_calls AS llm_calls, "
                 "r.tokens_total AS tokens_total, r.cost_est_usd AS cost_est_usd, "
                 "r.cypher_count AS cypher_count, r.fix_retries AS fix_retries, "
+                "coalesce(r.warning_count, 0) AS warning_count, "
+                "reduce(s = '', w IN coalesce(r.warnings, []) | "
+                "s + CASE WHEN s = '' THEN '' ELSE ' | ' END + w) AS warnings, "
                 "r.response_ms_total AS response_ms_total, "
                 "r.question_sha256 AS question_sha256, r.question_chars AS question_chars "
                 "ORDER BY r.recorded_at DESC LIMIT $limit"
@@ -1011,6 +1018,11 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("cost_est_usd", "string", "Cost (est)"),
                 ColumnDef("cypher_count", "int", "Cyphers"),
                 ColumnDef("fix_retries", "int", "Fix retries"),
+                # R21: Neo4j's non-fatal notifications, carried through the
+                # runner and the envelope onto the run — the ADMIN path. The
+                # end-user answer is never turned into an error by them.
+                ColumnDef("warning_count", "int", "Warnings"),
+                ColumnDef("warnings", "string", "Neo4j notifications (JSON, ' | '-joined)"),
                 ColumnDef("response_ms_total", "int", "Total ms"),
                 ColumnDef("question_sha256", "string", "Question sha256"),
                 ColumnDef("question_chars", "int", "Chars"),

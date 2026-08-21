@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/
@@ -30,3 +30,23 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-144's second half (see R20 for the first). Module drydocs-api because the runner is where the notifications are dropped first and every downstream fix depends on that one; the `agent_run_writer` and console edits ride along. Epic agentic-qa, phase 15.
 
   Worth keeping in view for whoever pulls it: `agents/graph_qa/agent.py` swallows telemetry failures bare (same survey, Idea-152 finding (c)), so a telemetry write that fails while storing these warnings would itself be silent. G105 makes that swallow log at warning; the two items are independent but this one is less useful without it.
+  DONE 2026-08-21 (desktop). ONE SHAPE, drydocs_core/notifications.py (Neo4jNotification: code, title,
+  severity, description, position "line:column", category; from_summary() never raises, [] for a clean
+  run; as_json() gives the homogeneous strings a Neo4j list property can hold). (1) RUNNER: LiveRunner
+  gains run_with_diagnostics() -> (keys, rows, notifications) from execute_query's summary, run()
+  delegates to it; handlers prefer it and fall back to plain run() so every duck-typed fake keeps
+  working; run_named/run_raw responses carry diagnostics.notifications. The agents' graph_read.run_read
+  consumes the result summary inside the read transaction and ReadResult.notifications carries it.
+  (2) ENVELOPE -> :AgentRun: StepRecord.notifications set at both read sites in the pipeline (spec and
+  text2cypher); agent_run_props writes `warnings` (one JSON string per notification, tagged with the
+  step index) and `warning_count`; a clean run writes [] and 0 -- the writer drops None, never [], so
+  the field reaches the node. (3) ADMIN PATH: console.agent-runs.v1 returns warning_count and the
+  ' | '-joined warnings payload -- that spec IS the admin review path today (the R8 admin frame, still
+  todo, reads it). The end-user Ask answer is unchanged: no error, no new affordance, and the exposure
+  boundary holds (notifications are Neo4j's output about the query). TESTS,
+  tests/unit/test_notifications_carry_through.py (8): shape + round-trip, step->props payload tagged by
+  step, clean run = empty payload, admin spec columns, handlers with rich and plain runners, and TWO
+  LIVE checks that ran here (bolt://localhost:7687 / drydocs, host MSI): MATCH (n:NoSuchLabelR21)
+  produced the UnknownLabelWarning through run_read AND through LiveRunner; they skip naming the venue
+  elsewhere (J18). npm build / oxlint not exercised: no web file changed (the admin surface is R8's).
+  Suite green.
