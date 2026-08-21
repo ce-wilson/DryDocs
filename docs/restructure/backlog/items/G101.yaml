@@ -8,7 +8,7 @@ phase: 2
 agent: ontology-mapper
 model: sonnet
 priority: p3
-status: todo
+status: in_progress
 depends_on:
 - G87
 - G88
