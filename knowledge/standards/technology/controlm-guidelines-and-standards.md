@@ -672,6 +672,21 @@ parser returns rather than dropping — but a visible defect is still a defect.
 > that is a sample, not a shortfall. What is being proven is that the round trip is lossless
 > and the vocabulary holds **when** the field is filled — not that every team will fill it.
 
+**`THEME` — the folder-level subject token (G77, 2026-08-21).** A folder block **MAY** carry
+`THEME: <notation>[; <notation>…]`, each value a concept of the lob-product-team subject scheme
+(`config/taxonomy/lob-product-team.yaml`, `concept_scheme`) — a LOB, product-line or product
+**code/id such as `CCB` or `PL_AUTO`, never a display name**. This is the folder-scope roll-up
+the token standard first intended for a "Data Series" that was never commonly defined; the
+product-line tier is that roll-up, and teams already speak it. Several values on one folder are
+normal: a theme is a projection axis, not an entity, so a folder serving two subjects appears in
+both slices. **The same vocabulary classifies scraped documents** (the document-capture envelope
+carries the same field), and the two corpora meet **only at the classification, by concept IRI —
+never at the content**: a document and a folder sharing a theme are both *about* that subject,
+which says nothing about whether the document describes the folder, and no edge follows from
+it. Optional — coverage, not compliance: an unrecognised value is returned as a finding, and a
+tagged folder without a `THEME` is pending, not wrong. The `dcat:theme` *edge* is the
+`dcat-theme-subject-scheme` gate's; this token only carries the value.
+
 ---
 
 The remaining prose in those descriptions is the job's role in words — `JOB_ROLE` (§7.2), unstructured.

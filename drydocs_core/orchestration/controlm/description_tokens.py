@@ -115,6 +115,25 @@ THE GRAMMAR (six rules, all from the standard, all load-bearing):
    (``FTS_ID``), the shape decides and the vocabulary tuple documents known
    members without closing the set.
 
+THEME — ONE VOCABULARY, TWO CORPORA (G77, 2026-08-21). The folder-scope
+``THEME`` token classifies a folder under the lob-product-team
+``skos:ConceptScheme`` (C34 (a), ``config/taxonomy/lob-product-team.yaml``)
+— the SAME scheme the docmeta capture envelope classifies scraped documents
+under (:mod:`drydocs_docmeta.manifest`), resolved through the same reader
+(:mod:`drydocs_core.ontology.concept_scheme`). This is the folder-level block
+C29 intended for a "Data Series" roll-up that was never commonly defined; the
+existing ProductLine tier is that roll-up. THE DISCIPLINE, written down so
+nobody builds past it: **the join is at the CLASSIFICATION, never the
+content.** A document and a folder sharing a theme are both ABOUT that
+subject; that is not an assertion that the document describes the folder, and
+no edge may imply it — trust tiers do not merge because two things share a
+subject. Values resolve to CONCEPT IRIs (``<scheme>#<notation>``), never to
+labels, so label drift between corpora cannot fork the join and the field
+works unchanged under one database or two. A value the scheme does not know
+is RETURNED as a finding (rule 6), never raised. ``JobType.FOLDER`` keeps the
+token out of every job-level required set: it is coverage, not compliance,
+and the dcat:theme EDGE stays the ``dcat-theme-subject-scheme`` gate's.
+
 DELIBERATE NON-GOALS. No escaping convention is defined by the standard for a
 value that itself contains ``|`` — guidelines §7.5 rules the embedded pipe a
 visible defect (the fragment surfaces as an unknown key, returned rather than
@@ -130,6 +149,12 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
+
+from drydocs_core.ontology.concept_scheme import (
+    LOB_PRODUCT_TEAM_SCHEME,
+    ConceptScheme,
+    load_concept_scheme,
+)
 
 #: The token the standard uses to say "this key is deliberately unassigned".
 #: Distinct from an absent key — see grammar rule 4.
@@ -197,6 +222,11 @@ class JobType(str, Enum):
     PUBLISHER = "publisher"
     #: appears on both file-watcher and publisher descriptions
     BOTH = "both"
+    #: a FOLDER-scope token (guidelines §7.5: folder descriptions are
+    #: hand-held, so that is where authored metadata survives). Never part of
+    #: a job-level required set — ``_registry_for`` matches a job type or
+    #: BOTH, and FOLDER is neither.
+    FOLDER = "folder"
 
 
 @dataclass(frozen=True)
@@ -237,6 +267,14 @@ class TokenSpec:
     #: legacy description is never held to a token that did not exist when it
     #: was authored.
     introduced_by: str = ""
+    #: True when the token is COVERAGE rather than COMPLIANCE — its absence
+    #: is never a MISSING_REQUIRED_TOKEN finding. ``THEME`` is the first.
+    optional: bool = False
+    #: the skos:ConceptScheme URI a value must resolve into (full concept IRI
+    #: or bare notation — NEVER a label), or ``None`` for a tuple/shape
+    #: vocabulary. Resolution goes through drydocs_core.ontology.concept_scheme
+    #: so both corpora read one vocabulary.
+    concept_scheme: str | None = None
     note: str = ""
     carrier: Carrier = Carrier.DESCRIPTION
 
@@ -405,6 +443,25 @@ TOKEN_REGISTRY: dict[str, TokenSpec] = {
             retired_by="C30 (2026-08-11) §5.3 — contacts are folder-scope documentation; see FOLDER_VARIABLES['EMAIL_DL_L2']",
             note="Ops support group. Folder-variable twin was spelled L2_EMAIL_DL_NM pre-C30.",
         ),
+        # -- Folder scope: subject classification (G77) --------------------
+        TokenSpec(
+            key="THEME",
+            job_type=JobType.FOLDER,
+            sql_column="THEME",
+            ontology_term="dcat:theme",
+            multivalued=True,
+            optional=True,
+            concept_scheme=LOB_PRODUCT_TEAM_SCHEME,
+            introduced_by="G77 (2026-08-21) — guidelines §7.5 folder block; dcat:theme over the C34 concept scheme",
+            note=(
+                "FOLDER scope. Values are concept notations (CCB, PL_AUTO, …) or full "
+                "concept IRIs of urn:drydocs:scheme:lob-product-team — never labels. "
+                "Multi-valued on ';' (one folder, several subjects: a projection axis, "
+                "not an entity). The join to the scraped-document corpus is by IRI at "
+                "the CLASSIFICATION, never the content — no edge between a folder and a "
+                "document follows from a shared theme. Coverage, not compliance: optional."
+            ),
+        ),
     )
 }
 
@@ -560,6 +617,15 @@ class ParsedDescription:
         separator = spec.separator if spec else ";"
         return [part.strip() for part in raw.split(separator) if part.strip()]
 
+    def theme_iris(self, scheme: ConceptScheme | None = None) -> tuple[str, ...]:
+        """The folder's ``THEME`` values resolved to concept IRIs — the join
+        key shared with the docmeta envelope. Unresolvable values are already
+        in ``findings``; here they are simply absent."""
+        values = self.values("THEME")
+        if not values:
+            return ()
+        return (scheme or load_concept_scheme()).resolve_all(values).iris
+
     def as_columns(self) -> dict[str, str | None]:
         """Registered tokens keyed by their Oracle landing column — the shape
         the company's REGEXP UPDATE statements produce, so a Python-side
@@ -646,7 +712,22 @@ def parse_description(text: str | None) -> ParsedDescription:
             continue
 
         result.tokens[key] = value or None
-        if value and spec.value_shape is not None:
+        if value and spec.concept_scheme is not None:
+            # G77: resolve each inner value into the shared concept scheme.
+            # Full IRI or bare notation resolves; a LABEL never does (labels
+            # drift; the join is by IRI). Unrecognised values are returned.
+            resolution = load_concept_scheme().resolve_all(
+                [part.strip() for part in value.split(spec.separator) if part.strip()]
+            )
+            for bad in resolution.unrecognised:
+                result.findings.append(
+                    TokenFinding(
+                        TokenFindingKind.VALUE_NOT_IN_VOCABULARY,
+                        key=key,
+                        detail=f"{bad!r} is not a concept notation or IRI of {spec.concept_scheme}",
+                    )
+                )
+        elif value and spec.value_shape is not None:
             # Grammar rule 6, shape form: the shape decides, the vocabulary
             # tuple only documents known members.
             if re.fullmatch(spec.value_shape, value) is None:
@@ -690,7 +771,9 @@ def required_tokens(job_type: JobType) -> tuple[str, ...]:
     exclusion: a retired token is NEVER demanded here — a job authored to C30
     validates clean without it, while :func:`validate` still holds a legacy
     description to the set it was authored to."""
-    return tuple(spec.key for spec in _registry_for(job_type) if not spec.retired_by)
+    return tuple(
+        spec.key for spec in _registry_for(job_type) if not spec.retired_by and not spec.optional
+    )
 
 
 def _legacy_required_tokens(job_type: JobType) -> tuple[str, ...]:
@@ -698,7 +781,9 @@ def _legacy_required_tokens(job_type: JobType) -> tuple[str, ...]:
     retired or not, EXCLUDING anything a later ruling introduced — a legacy
     description is never held to a token that did not exist when it was
     authored."""
-    return tuple(spec.key for spec in _registry_for(job_type) if not spec.introduced_by)
+    return tuple(
+        spec.key for spec in _registry_for(job_type) if not spec.introduced_by and not spec.optional
+    )
 
 
 #: Tokens whose presence marks a description as authored to C30 even without
@@ -763,6 +848,46 @@ class SentinelCoverage:
     @property
     def ratio(self) -> float:
         return self.tagged / self.total if self.total else 0.0
+
+
+@dataclass(frozen=True)
+class ThemeCoverage:
+    """Theme adoption over a set of FOLDER descriptions (G77). Same shape as
+    :class:`SentinelCoverage`: a number that grows. ``classified`` carries at
+    least one resolved theme; ``unclassified`` is tagged but theme-less
+    (pending); ``unread`` is the untagged / generator population, which is
+    not pending work on the token standard at all and is reported apart so
+    the ratio never confuses backlog with scope (C34 (c), estate side)."""
+
+    classified: int = 0
+    unclassified: int = 0
+    unread: int = 0
+
+    @property
+    def total(self) -> int:
+        return self.classified + self.unclassified + self.unread
+
+    @property
+    def ratio(self) -> float:
+        """classified ÷ tagged — adoption among the folders that can carry it."""
+        tagged = self.classified + self.unclassified
+        return self.classified / tagged if tagged else 0.0
+
+
+def theme_coverage(
+    descriptions: Iterable[str | None], scheme: ConceptScheme | None = None
+) -> ThemeCoverage:
+    scheme = scheme or load_concept_scheme()
+    classified = unclassified = unread = 0
+    for text in descriptions:
+        parsed = parse_description(text)
+        if parsed.population is not DescriptionPopulation.TAGGED:
+            unread += 1
+        elif parsed.theme_iris(scheme):
+            classified += 1
+        else:
+            unclassified += 1
+    return ThemeCoverage(classified=classified, unclassified=unclassified, unread=unread)
 
 
 def sentinel_coverage(descriptions: Iterable[str | None]) -> SentinelCoverage:

@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - C34
 - G84
@@ -21,3 +21,26 @@ acceptance: |
   One vocabulary classifies BOTH corpora -- that is the point, and it is what ties the structured estate to the unstructured one. (a) CONTROL-M, folder scope: a THEME token inside the DD1| folder block (guidelines section 7.5), registered in TOKEN_REGISTRY like any other token, multi-valued on the documented inner separator, values checked against the concept scheme with an unrecognised value RETURNED as a finding rather than raised -- the standing aliases-suggest / values-decide discipline. This is the folder-level block C29 originally intended for a Data Series roll-up that was never commonly defined. (b) SCRAPED DOCUMENTS: the same field on the document metadata envelope. The two-corpus architecture already rules that the vendor and Confluence corpora stay EPISTEMICALLY SEPARATE and merge only through a shared metadata envelope -- a theme is exactly such a field, which is why it fits rather than being bolted on. THE DISCIPLINE THAT MUST BE WRITTEN DOWN OR SOMEONE WILL BUILD PAST IT: the join is at the CLASSIFICATION, never the content. A document and a folder sharing a theme are both ABOUT that subject; that is not an assertion that the document describes the folder, and no edge may imply it. Trust tiers do not merge because two things share a subject. (c) The unclassified / out-of-scope split from C34 (c) is implemented on the scraper side, where it actually bites, and coverage reports the two apart. (d) Joined by CONCEPT IRI, never by label -- so this item works unchanged under one database or two, and label drift between corpora cannot fork the join. Zero graph writes: the field, its validation and the coverage split. The edge waits on C34.
 notes: |
   Raised 2026-08-11 with C34, same session. Depends on C34 because a theme field populated against an undeclared scheme is free text with a schema-shaped name. DELIBERATELY NOT RAISED YET: the SME-facing classification UI, which the session described as possibly two pages. Building a classification surface before C34 rules residency and the Product-vs-Concept typing is the O59 mistake in a new place -- a widget built against a shape that turns out otherwise is thrown away. It grooms once C34 signs, and the two-page question then answers itself from the residency ruling rather than from taste. RAISED AT THE 2026-08-12 GROOM, and the reason depends_on grew: clause (a) reads a THEME token "inside the DD1| folder block", and nothing in the parser knows what that block is. G84 builds the block gate; this item registers a token on top of it. Without the dependency, two sessions implement the same sentinel differently in one file.
+  DONE 2026-08-21 (desktop; sample-reproducible, zero graph writes). ONE READER FOR BOTH CORPORA:
+  new drydocs_core/ontology/concept_scheme.py loads the lob-product-team `concept_scheme` block
+  (C34 (a)) and mints concept IRIs in the gate's confirmed §A2 form `urn:drydocs:scheme:lob-product-team#<notation>`
+  (17 concepts over the three tiers; dev_teams excluded per not_concepts); `resolve()` accepts a
+  full IRI or a bare notation and NEVER a label (d); `resolve_all()` RETURNS unrecognised values;
+  `broader_closure()` is the parent_* link read as skos:broader. (a) CONTROL-M: `THEME` TokenSpec in
+  TOKEN_REGISTRY — multivalued on ';', `concept_scheme=` field on TokenSpec drives resolution in the
+  parse loop, unknown values land as VALUE_NOT_IN_VOCABULARY findings. Registered under a NEW
+  `JobType.FOLDER` plus a new `optional` flag: FOLDER never matches a job-level `_registry_for`, and
+  `required_tokens()` skips optional — so the watcher/publisher required sets and the G83
+  registry-vs-standard agreement test are untouched, and a tagged folder without THEME is pending,
+  not a defect. `ParsedDescription.theme_iris()` + `theme_coverage()` (classified / unclassified /
+  unread reported apart). (b) SCRAPED DOCUMENTS: `PageRecord.themes` (IRIs) + `theme_status` on the
+  docmeta capture manifest; `CaptureManifest.build(themes=…)` resolves at capture, drops what does
+  not resolve, `theme_findings()` surfaces it; pre-G77 manifests read as unclassified (round-trip
+  guarded). (c) `ThemeStatus` = classified | unclassified | out_of_scope decided ONCE in
+  `theme_status()`: an External source is out of scope permanently whatever its theme field says;
+  `CaptureManifest.theme_coverage()` reports the three apart and `ratio` = classified ÷ in-scope.
+  THE DISCIPLINE is written in three places (concept_scheme docstring, description_tokens
+  docstring, guidelines §7.5 new THEME paragraph): the join is at the classification, never the
+  content; no edge follows from a shared theme; trust tiers do not merge. Tests:
+  tests/unit/test_theme_vocabulary.py (11). MODULE_MAP row updated. Suite 2246 passed. The edge
+  still waits on gate dcat-theme-subject-scheme; the SME classification UI stays un-raised per notes.
