@@ -83,6 +83,18 @@ export default function ModuleIcon({ id, className }: { id: ModuleId; className?
           <path d="M4 18h16M6 18V9l3-3 3 3v9M12 18v-5l3-3 3 3v5" />
         </svg>
       )
+    case 'loadmap':
+      // A folded map — deliberately unlike `loads` (bar-chart run timeline)
+      // and `lineage` (branching DAG): this page is the territory, not the
+      // traffic. The hazard the `software` note above describes is exactly
+      // what this case exists to avoid: without it the Load map nav entry
+      // renders as bare text, with no error anywhere.
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+          <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20Z" />
+          <path d="M9 4v13.5M15 6.5V20" />
+        </svg>
+      )
     case 'underhood':
       // gauge/speedometer — the benchmark's efficiency framing (needle biased
       // toward the low-cost side, the traversal win)

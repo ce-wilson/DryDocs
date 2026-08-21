@@ -276,10 +276,15 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     69 -> 70 at the remediation xml_io epic (2026-08-12): FixDiff IS bound
     (remediation/, directory evidence) — the SME working-session diff serves
     exactly one module — so BOTH counts move by one, a fully-bound addition.
+    70 -> 71 at O57 (2026-08-20): LoadMapRoute, bound to the new `loadmap`
+    module by route-name evidence — another fully-bound addition, so both
+    counts move by one again. Its sibling loadmap/loadMapModel.ts is NOT here
+    and that is not an omission: the ledger's scan boundary is .tsx only (see
+    the SCOPE CAVEAT in the yaml header), and widening it waits on O42.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        30,
-        70,
+        31,
+        71,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

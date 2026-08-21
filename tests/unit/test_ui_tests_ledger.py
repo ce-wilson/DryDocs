@@ -99,7 +99,11 @@ def test_every_case_cites_verified_behaviour() -> None:
 def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     suites = _tests()["suites"]
     seeded = [s for s in suites if s["cases"]]
-    assert (len(seeded), len(suites)) == (3, 12), (
+    # 3/12 -> 4/13 at O57 (2026-08-20): TS-LOADMAP arrives SEEDED, from
+    # in-browser observation at the build rather than from a commit message.
+    # Both numbers move together — a new module adds a suite by the
+    # every-module-has-a-suite rule below, and this one is not an empty one.
+    assert (len(seeded), len(suites)) == (4, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )

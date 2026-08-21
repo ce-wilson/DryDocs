@@ -15,6 +15,7 @@ export type ModuleId =
   | 'software'
   | 'gates'
   | 'loads'
+  | 'loadmap'
   | 'underhood'
   // admin surfaces reuse the shared template (ModuleDef shape) but are NOT
   // nav modules/spokes — deliberately absent from MODULES below (O12).
@@ -170,6 +171,31 @@ export const MODULES: readonly ModuleDef[] = [
     backsOnto: "BaseLoader :JobRuns",
     tabs: ['Runs', 'Rejects', 'Drift/coverage', 'Status'],
     phase: 2,
+  },
+  {
+    // O57: the console consumer load-map.json never had. N4 generated the file
+    // for web/ and N5 rendered docs/plan/load-map.html — a page, not a route —
+    // so everything except the doc-corpus rows /software keeps went unread.
+    //
+    // A NEW MODULE, NOT A TAB UNDER /loads, and the reason is the backsOnto
+    // column: /loads backs onto :JobRun — records of executions that happened.
+    // This backs onto a generated declaration artifact and can say nothing
+    // about any run. Folding it in would make one of the two backsOnto claims
+    // false, and "did it load?" vs "what is registered to load?" are different
+    // questions asked by people in different situations.
+    id: 'loadmap',
+    label: 'Load map',
+    path: '/load-map',
+    tagline: 'Registered sources, load order, retired ids — declared, not run',
+    backsOnto: 'load-map.json (generated) · config/source-registry + the doc-ledger union',
+    tabs: ['Sources', 'Systems', 'Load sequence', 'Retired ids', 'Defects'],
+    phase: 3,
+    // FB-03, same argument as /software: every column is governance state —
+    // confirmed-or-not, ledger tier, pipeline reach, and two lists of declared
+    // defects with written exemptions. An end user reading "registered only"
+    // or a defect row without that context reads breakage where there is a
+    // ruling. Opening this later is one line; the reverse is a retraction.
+    access: 'sme',
   },
   {
     id: 'underhood',
