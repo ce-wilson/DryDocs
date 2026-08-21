@@ -8,7 +8,7 @@ phase: 17
 agent: ontology-mapper
 model: fable
 priority: p1
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - docs/design/deepdoc-data-flow-overview.md
