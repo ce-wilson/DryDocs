@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p2
-status: todo
+status: in_progress
 depends_on:
 - C34
 - G84
