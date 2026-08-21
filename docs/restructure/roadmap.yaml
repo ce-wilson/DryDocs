@@ -126,15 +126,28 @@ modules:
           build starts landing.
 
   - module: drydocs-deepdoc
-    stage: parked
+    stage: early
     built: >
-      Package scaffold only — three modules in the code graph and a charter
-      (reactive on-failure deep dive into ddcontext, ADR 0002 D2 C3), with the
-      component-boundary guard already enforcing its separation from lineage.
+      Package scaffold (G4) with the charter RULED at gate document-content-topology
+      (G32, 2026-08-18) and restated in code and maps (MM1, 2026-08-21): a
+      corpus-driven investigator seeded from the grounded graph — it starts from a
+      subject already in `drydocs`, searches the document corpus and the SDLC
+      surfaces, creates no relationship whose subject is not already in the graph,
+      and lands findings :Uncertain with reliability/trust stamps; the core
+      command-line parser is an input, not a rival. The first investigation was
+      run by hand on 2026-08-20 and synthesised in
+      docs/design/deepdoc-data-flow-overview.md (epic MM — mind-map).
     remaining: >
-      Zero backlog items have ever targeted this module. First real work waits on
-      the G32 residency ruling (which database ddcontext content lives in) and a
-      charter restatement — both explicitly named inside G32.
+      Epic MM, groomed 2026-08-21 from that synthesis: MM2 the data-flow-overview
+      gate prompt (ontology); MM3 mind-map state file + shared entity/ID extractor
+      + novelty/theme columns on the search log; MM4 per-tool connector upgrades
+      (Jira signpost scoring, Bitbucket by Jira-or-folder, Confluence firm-wide);
+      MM5 re-home the three session search scripts as deepdoc connectors; MM6
+      ontology proposals for what an investigation surfaces (:SdlcProject binding
+      type, :JiraIssue as signpost, :CodeCommit); MM7 the Control-M Output-tab log
+      extractor (lineage); MM8 R13 + the internally-fed FileWatcher consequence
+      (remediation); MM9 email-corpus -> data-flow binding (docmeta); MM10
+      investigate() v1 — the graph-seeded retrieval skeleton.
     ideas: []
 
   - module: drydocs-remediation

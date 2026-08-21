@@ -8,7 +8,7 @@ phase: 17
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_deepdoc/__init__.py
@@ -22,3 +22,15 @@ acceptance: |-
   The drydocs_deepdoc package docstring, the MODULE_MAP.md row for drydocs_deepdoc/**, the COMPONENT_GROUP comment in tests/unit/test_module_boundary.py and the roadmap.yaml entry all state the G32-ruled charter (corpus-driven retriever seeded from the grounded graph; the parser-driven command-line reading is an INPUT; no relationship whose subject is not already in the graph) and name the write target `drydocs` with the :Uncertain label as the boundary — `git grep -n ddcontext -- MODULE_MAP.md tests/unit/test_module_boundary.py drydocs_deepdoc` returns nothing. The roadmap entry points at docs/design/deepdoc-data-flow-overview.md and lists the MM items instead of 'zero backlog items have ever targeted this module'. test_lineage_deepdoc_scaffold.py, test_uncertain_boundary.py and test_runbook_coverage.py stay green unchanged (the EXEMPT entry stays until a verb exists).
 notes: |-
   Drift found at the 2026-08-21 exploration: MODULE_MAP.md:97 and test_module_boundary.py:140 still say ddcontext + 'reactive on-failure deep dive' three days after G102 folded the database. Prose only, no guard catches it — which is why it is its own chore and first in the epic.
+  DONE 2026-08-21 (desktop). All four surfaces now state the G32 charter in the same words: corpus-driven
+  retriever seeded from the grounded graph; the parser-driven command-line reading is an INPUT; no
+  relationship whose subject is not already in the graph; write target `drydocs`, the :Uncertain label
+  as the boundary. drydocs_deepdoc/__init__.py docstring rewritten (also names the method from the
+  2026-08-20 investigation and the MM item map); MODULE_MAP.md row; the COMPONENT_GROUPS comment in
+  test_module_boundary.py; roadmap.yaml entry (stage parked -> early; built = the ruled charter + the
+  hand-run investigation + the design doc; remaining = MM2-MM10 listed by name instead of "zero
+  backlog items have ever targeted this module"). `git grep -n ddcontext -- MODULE_MAP.md
+  tests/unit/test_module_boundary.py drydocs_deepdoc` returns nothing -- the two residual history
+  mentions in __init__.py / writer.py were reworded to "the pre-fold separate database", with the
+  retired name itself still pinned where it belongs (test_database_names.py). test_lineage_deepdoc_
+  scaffold, test_uncertain_boundary and test_runbook_coverage green unchanged; the EXEMPT entry stays.

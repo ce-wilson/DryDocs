@@ -156,9 +156,12 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "remediation": ("drydocs_remediation",),
     # drydocs-lineage — proactive/curated cmd-line lineage → drydocs (ADR 0002 D2 C2, G4).
     "lineage": ("drydocs_lineage",),
-    # drydocs-deepdoc — reactive on-failure deep dive → ddcontext with
-    # reliability/trust stamps (ADR 0002 D2 C3, G4). Never imports lineage — the
-    # components-don't-import-each-other test IS the D2 separation.
+    # drydocs-deepdoc — the corpus-driven investigator seeded from the grounded
+    # graph (ADR 0002 D2 C3, G4; charter ruled at gate document-content-topology
+    # G32, restated MM1): writes :Uncertain-labelled findings into `drydocs` with
+    # reliability/trust stamps, never a relationship whose subject is not already
+    # there. Never imports lineage — the components-don't-import-each-other test
+    # IS the D2 separation; the core parser is an INPUT it shares, not a call.
     "deepdoc": ("drydocs_deepdoc",),
     # drydocs-docmeta — proactive document-corpus ingestion (ADR 0006, Q6).
     # Separate from deepdoc by the Q4 gate ruling: different duty cycles and
