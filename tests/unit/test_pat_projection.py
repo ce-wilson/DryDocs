@@ -193,10 +193,11 @@ def test_file_round_trip_writes_the_two_names_the_refresh_chain_reads(tmp_path: 
     # the committed fixtures and the projection share one header, so the
     # loaders cannot tell a projected file from a fixture — that is the point
     fixture = REPO / "drydocs" / "data" / "samples" / PAT_PRODUCT_MAPPING_FILE
-    if fixture.exists():
-        assert fixture.read_text(encoding="utf-8").splitlines()[0] == ",".join(
-            PAT_PRODUCT_MAPPING_COLUMNS
-        )
+    if not fixture.exists():
+        pytest.skip("sample fixture absent on this machine (drydocs/data/ is gitignored)")
+    assert fixture.read_text(encoding="utf-8").splitlines()[0] == ",".join(
+        PAT_PRODUCT_MAPPING_COLUMNS
+    )
 
 
 def test_the_ledger_is_authored_from_what_the_projection_reads():
