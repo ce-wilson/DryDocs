@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/query_specs.py
@@ -32,3 +32,26 @@ notes: |
   MODULE, verified rather than assumed: the QuerySpec registry is `drydocs_api/query_specs.py` (confirmed at this groom), so this is drydocs-api work filed under the agentic-qa epic and phase 15, the Q15 precedent for an api-module item under a non-api epic.
 
   The router behaved CORRECTLY in the reported incident — no spec matched, so it escalated to Tier 1. What failed was the registered spec's grounding and the silence around the fallback. R22 covers the third thread from the same incident (the model proxying a UI term onto a graph label).
+  DONE 2026-08-21 (desktop). THE AUDIT, all 32 registered specs, each term checked against the
+  relationship-vocabulary registry (non-deprecated entries + node_classifications) and against the
+  live schema on neo4jtest / drydocs: (a) TWO specs were stale, both fixed. ownership.teams.v1 asked
+  [:DEVELOPS], a type that was NEVER registered -- the ruled shape is (:BusinessApplication)-
+  [:WAS_ATTRIBUTED_TO {role:'developed_by'}]->(:DevTeam) (arch_develops), so every team read 0;
+  repointed, columns unchanged. mappings.catalog-cascade.v1 asks HAS_APPLICATION, which is PLANNED
+  ONLY (catalog_has_application, no loader): its description already declared the null leg and the
+  pane degrades, so it is now WRITTEN DOWN on the spec via a new QuerySpec.planned_terms field rather
+  than retired. THE PREMISE CORRECTED: explorer.folder-applications.v1 is NOT stale --
+  BELONGS_TO_APPLICATION {role:'seal_app_ref'}, HAS_PORT, :Port and Port.active_state are the current
+  K7/K8 + S3 vocabulary; the 2026-08-20 zero and the four Neo4j notifications were "unknown label /
+  relationship" warnings, i.e. load-folder-attribution and the SEAL extract had not run on that graph.
+  A load gap presented as 0 -- which is R21's to surface. The 30 other specs are current. (b) GUARDS,
+  tests/unit/test_query_spec_vocabulary.py: STATIC (always) -- every label/type a spec names is
+  declared (four infrastructure labels allow-listed: SchemaMeta, Uncertain, JobRun, AgentRun), a
+  planned-only type must be in planned_terms and planned_terms must shrink when the loader lands,
+  and every ACTIVE type a spec names is still written by some template in the repo; LIVE (skips
+  naming the venue per J18; ran here against bolt://localhost:7687 / drydocs on MSI) -- per spec,
+  every term absent from db.labels()/relationshipTypes()/propertyKeys() is classified: DRIFT (absent,
+  its loader ran here, no template writes it any more) FAILS; not-loaded-here and
+  conditional-no-qualifying-row are printed as a census (47 on this desktop: folder attribution,
+  SEAL ports, attributions, lineage, infra not loaded; CONTAINS_FOLDER needs the Oracle header-row
+  join the bundled sample lacks). No term was added to the vocabulary. Suite 2279 passed.

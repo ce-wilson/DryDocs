@@ -88,6 +88,14 @@ class QuerySpec:
     #: spec is EXEMPT from the structural ground-truth exclusion below and its
     #: exports carry the trust watermark. Ground-truth specs leave the default.
     uncertain: bool = False
+    #: R20: relationship types this spec names that the vocabulary registers as
+    #: PLANNED ONLY (no loader yet). Naming one is allowed solely inside an
+    #: OPTIONAL MATCH whose null result the description explains — a written-
+    #: down degradation, never an accident. The static guard in
+    #: tests/unit/test_query_spec_vocabulary.py fails on any planned-only type
+    #: that is not listed here, and on any listed type that has since gone
+    #: active (the list must shrink when the loader lands).
+    planned_terms: tuple[str, ...] = ()
 
 
 class UnknownSpecError(KeyError):
@@ -127,6 +135,7 @@ def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:
         classification=spec.classification,
         params=spec.params,
         uncertain=spec.uncertain,
+        planned_terms=spec.planned_terms,
     )
 
 
@@ -211,7 +220,11 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "application's BatchProcessing Port (K7/K8 — re-bound from the retired "
                 "job-grain derivation per gate §A2), with the ORIGIN disclosure flag "
                 "(§B3), the folder's data center and job count. Jobs inherit the "
-                "attribution via CONTAINS_JOB (§A1)."
+                "attribution via CONTAINS_JOB (§A1). R20 (2026-08-21): audited against the "
+                "declared vocabulary and found CURRENT — BELONGS_TO_APPLICATION, HAS_PORT, "
+                ":Port and Port.active_state are the K7/K8 + S3 shapes; an empty answer means "
+                "load-folder-attribution / the SEAL extract have not run on THAT graph (Neo4j "
+                "says so as unknown-label notifications), not that the vocabulary moved."
             ),
             cypher=(
                 "MATCH (f:ControlMFolder)-[r:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]"
@@ -389,6 +402,8 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             classification="internal",
             params=_LIMIT,
+            # the third leg is OPTIONAL and null by contract until the C9 extract lands
+            planned_terms=("HAS_APPLICATION",),
         ),
         QuerySpec(
             id="mappings.orchestrators.v1",
@@ -495,12 +510,18 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             id="ownership.teams.v1",
             database="drydocs",
             description=(
-                "Dev teams with their DEVELOPS application count (arch_develops, C3 gate). "
-                "Team rosters are confidential material — Internal handling (J23)."
+                "Dev teams with the count of applications attributed to them as developer "
+                "(arch_develops = (:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: "
+                "'developed_by'}]->(:DevTeam), C3 gate; M:N both ways per the K5 §E "
+                "ruling). R20 (2026-08-21): this spec formerly asked a DEVELOPS edge "
+                "that was never registered — the vocabulary names the PROV attribution "
+                "shape, so every team read 0. Team rosters are confidential material — "
+                "Internal handling (J23)."
             ),
             cypher=(
                 "MATCH (dt:DevTeam) WHERE NOT dt:SchemaMeta "
-                "OPTIONAL MATCH (dt)-[:DEVELOPS]->(a:BusinessApplication) "
+                "OPTIONAL MATCH (a:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: 'developed_by'}]"
+                "->(dt) "
                 "RETURN dt.team_id AS team_id, dt.name AS team, "
                 "count(DISTINCT a) AS applications "
                 "ORDER BY team LIMIT $limit"
