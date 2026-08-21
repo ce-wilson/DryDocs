@@ -1,0 +1,86 @@
+id: O63
+epic: web-console
+title: 'Ask should diagnose its own failure instead of printing a bare "Failed to fetch": show the
+  error verbatim, then ping the agent server red/green, then surface the next-stage error and a
+  support hand-off'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/routes/AskRoute.tsx
+- web/src/ask/askApi.ts
+- web/src/lib/adk.ts
+- agents/graph_qa/providers.py
+- UI-WIP/sme-ui-launch-guide.md
+acceptance: |
+  When an Ask request fails, the surface runs a STAGED self-diagnosis in place of the single red
+  line it shows today, in this order:
+
+  (a) The originating error renders FIRST and VERBATIM — "Failed to fetch" stays "Failed to fetch".
+      It is never re-worded, prefixed or "friendlied": that exact string is what the user will paste
+      into a search or a support ticket, and the browser's own wording is the honest report of what
+      the browser saw.
+  (b) A `checking…` state appears immediately and is visibly distinct from both success and failure,
+      so a slow probe never looks like a verdict.
+  (c) The console pings the ADK agent server (VITE_ADK_URL, default http://localhost:8000 —
+      `GET /list-apps` is the cheapest liveness call and needs no session) and renders RED or GREEN.
+      Green additionally asserts the `graph_qa` app is in the returned list: a server that is up but
+      does not serve this agent is not a green for this page's purpose.
+  (d) If the transport is green, the NEXT stage's error is surfaced AS-IS — the worked example is
+      `ANTHROPIC_API_KEY is not set (agents/.env)`, which is `providers.ProviderConfigError` text
+      raised server-side. Verbatim matters twice here: the string names the exact key AND the exact
+      file to put it in, and any paraphrase loses one or both.
+  (e) The ladder ends with a `contact DryDocs support` hand-off once the checks stop being
+      self-serviceable.
+
+  THREE RULES THE LADDER MUST NOT BREAK:
+  1. NEVER INVENT A GREEN. A probe that could not run renders "not checked", never green and never
+     0 — the O56 honesty rule, applied to liveness instead of counts.
+  2. The two failures are DIFFERENT and must not collapse into one message: nothing listening on
+     :8000 (transport down — the agent service was never started) versus the service up and its
+     provider misconfigured. Both printed "the Ask page is broken" before this item; only the second
+     is fixable by editing a file.
+  3. NO SECRET EVER REACHES THE PAGE. The diagnosis reports that a key is unset — never its value,
+     length, prefix or a masked form of it. ADR 0005's reason for VITE_NEO4J_PASSWORD applies to any
+     value a bundle could inline.
+
+  A test covers the ladder's STATE MACHINE (error -> checking -> probe verdict -> next error ->
+  hand-off) rather than its copy, and the ui-tests.yaml TS-ASK suite — declared but empty today —
+  gains its first cases from whatever is actually watched working.
+notes: |
+  Raised 2026-08-20 from a live failure in the ui-workstream session, and the sequence in the
+  acceptance is the debugging path a human actually walked, turned into the page's own behaviour.
+
+  WHAT HAPPENED, because it is the whole argument for the item: the console came up with Neo4j, the
+  API and Vite all green, every other view live against the graph. Ask returned "Failed to fetch"
+  and nothing else. The cause was a FOURTH service nobody had started — the ADK agent server
+  (`cd agents && adk api_server --allow_origins http://localhost:5173`), which only the Ask spoke
+  talks to; every other page goes through drydocs-api. Starting it moved the failure to
+  "ANTHROPIC_API_KEY is not set (agents/.env)" — a completely different problem with a completely
+  different fix, reached only by reading source and grepping .env files.
+
+  "Failed to fetch" is the browser's generic network-error text. It is TRUE and nearly useless: it
+  cannot distinguish a service that was never started from a crashed one, a CORS rejection, or a
+  wrong VITE_ADK_URL. The console already knows which URL it dialled and can simply ask — which is
+  what turns a dead end into a two-line answer.
+
+  DELIBERATELY NOT SPECIFIED: whether the ladder renders inline in the answer pane or in a
+  collapsible diagnostics panel, and whether it re-runs on demand or once per failure. Both are page
+  design and belong with the builder.
+
+  ONE THING TO RULE WHEN BUILDING, not at the groom: `contact DryDocs support` is a placeholder
+  string for the producer console, where "support" is the person reading the screen. If it should
+  resolve to a real destination it becomes config (the VITE_RUNTIME_VIEW_URL_TEMPLATE precedent —
+  unset means no affordance renders), and a company hostname is never committed here.
+
+  Ties to Idea-141 (should agents/ stop carrying its own venv) without depending on it: that entry
+  argues the service is easy to forget because it is installed differently from everything else.
+  This item makes forgetting it cheap to diagnose rather than preventing the forgetting.
+
+  NOT gate-bound: nothing here touches edge semantics, the ontology, or a graph write. The page
+  stays read-only (O20).
