@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - UI-WIP/
@@ -20,3 +20,32 @@ acceptance: |
   UI-WIP/ lives at docs/design/ui-exploration/ and the loose docs/controlm-*.md / docs/port-*.md files are grouped into subdirectory homes. All 31 tracked references updated — including PORT-MANIFEST.yaml, the two gate-prompt specs, drydocs_api/app.py, backlog.yaml (45 hits) and the governed docs/design/* renders, which are REGENERATED from their .md sources, never hand-edited. board.html regenerated. `git grep -l "UI-WIP"` returns only deliberate historical mentions (the port archive and the IDEAS audit trail). Full suite green. Done on a branch with a port-prompt step added — never directly on main.
 notes: |
   Scored Effort=1 in the review and CORRECTED to 3-4 the same day when the attempt measured the reference sweep: the score had priced the git mv and ignored the 31 tracked files. Because the sweep crosses governed renders and the cross-repo port machinery, this is branch work under docs/port-prompt.md, not a tidy-up commit — which is exactly why it is p3 and carries no dependency: it can wait, and it can start whenever someone has a clean branch. The root-level scratch-screenshot half of F10 was already closed 2026-07-25 (bbf29cf).
+  DONE 2026-08-21 on branch feat/s9-docs-hygiene (c3cd5521 the move + sweep, then the
+  port step). Four homes, not two: UI-WIP/ -> docs/design/ui-exploration/, docs/port/
+  (prompt + steps-1-42 archive), docs/company-prompts/ (all eight *-company-prompt.md,
+  including the four gate/fcdo/k16 files F13 did not name but which are the same kind),
+  docs/controlm/. 169 files carried the rename, not the 31 the review estimated.
+  Left loose at the docs root on purpose: RELATIONSHIP_GUIDE.md (CLAUDE.md cites it by
+  that path), oracle-sql-logging.md, ruff-format-convergence.md, the snowflake plan, and
+  the two never-port session files that hold their own manifest rows. F13 named only the
+  controlm-* and port-* families.
+  THE PORT MACHINERY WAS THE ITEM, exactly as the note predicted. PORT-MANIFEST rows are
+  re-pathed in the same commit as the move per its own path-column diff rule; the two
+  reconcile guards found every stale row (5) and orphaned path (13) without being asked.
+  Two findings the acceptance had not anticipated. First, drydocs/port_preflight.py built
+  PORT_PROMPT_PATH from path SEGMENTS, so no textual sweep could see it and the suite did
+  not catch it either — that module is the mandatory port opening sequence and would have
+  raised FileNotFoundError at the next certification. Second, a blanket sweep FALSIFIES
+  records: run over docs/reviews/** it rewrote a dated D9 finding into a false claim and
+  minted docs/controlm/controlm-loader-flow.md, a path J11 had moved to docs/history/.
+  Reverted, and docs/reviews/** is now exempt wholesale on the manifest's own grounds
+  (point-in-time artifacts) — alongside IDEAS.md, the steps-1-42 archive, gate-log.md, the
+  graph-vs-files transcripts and the depgraph snapshots. The acceptance clause naming only
+  two deliberate historical mentions was written before anyone measured; six classes is
+  the honest answer.
+  The reconcile-port skill cites the prompt by NAME, never by path, so it needed no edit.
+  Port step 177 carries the company action: the re-pathed docs/port/** and
+  docs/company-prompts/** rows govern nothing in their flat tree, so their dead-row guard
+  goes red the moment they take the manifest — mirror the move, or overlay
+  row_may_match_nothing via the J34 seam. Their choice, recorded in their PORT-REPORT.
+  Suite 2327/10, ruff clean, web build green, renders regenerated from source.

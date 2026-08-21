@@ -84,6 +84,13 @@ HISTORICAL_PATHS: dict[str, str] = {
 #: cross-repo excuse. Every entry here must be a path the document asserts is
 #: absent producer-side or names in a sibling — never one we simply deleted.
 FOREIGN_PATHS: dict[str, str] = {
+    "docs/port-prompt.md": (
+        "COMPANY-side path, and the ONE the S9 move created (step 177): the producer's "
+        "prompt now lives at docs/port/port-prompt.md, while the company's copy is still "
+        "at the flat docs root. Step 177 names the flat path to tell that side which of "
+        "ITS files the re-pathed manifest rows stop governing — naming their path is the "
+        "instruction, not a stale claim about this tree"
+    ),
     "drydocs/docmeta/connectors/base.py": (
         "COMPANY-side module. port-prompt names it in the per-file-ignores inventory "
         "precisely to say `drydocs/docmeta/` does not exist producer-side — naming an "

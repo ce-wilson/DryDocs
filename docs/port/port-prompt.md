@@ -2365,6 +2365,55 @@ regeneration, never-port outputs — and get no step.
     yours, the new prompt is a clean-add; the vocabulary fragments per-entry as
     always (two PLANNED entries, nothing active). You run your own gate on it.
 
+177. S9 — THE DOCS ROOT IS GROUPED; FOUR MANIFEST ROWS ARE RE-PATHED
+    [docs / manifest — ACTION-REQUIRED, and the action is on YOUR paths, not ours]
+    (`c3cd5521`: producer-side moves only — `UI-WIP/` -> `docs/design/ui-exploration/`,
+    `docs/port-prompt.md` + its steps-1-42 archive -> `docs/port/`, the eight
+    `*-company-prompt.md` -> `docs/company-prompts/`, `docs/controlm-*.md` ->
+    `docs/controlm/`; 169 files carried the rename; `drydocs/port_preflight.py`'s
+    `PORT_PROMPT_PATH` re-pointed — it is built from path SEGMENTS, so no textual
+    sweep sees it and the suite does not either.)
+
+    WHY THIS STEP EXISTS. `PORT-MANIFEST.yaml` is `canonical-producer` — your apply
+    phase takes it WHOLESALE — and four of its rows changed path here:
+      `UI-WIP/**`                        -> `docs/design/ui-exploration/**`
+      `docs/gate-*-company-prompt.md`    -> `docs/company-prompts/**`
+      `docs/port-*.md`                   -> `docs/port/**`
+      (new) `docs/controlm/**` in `default_ok:`; the `docs/*.md` entry re-scoped.
+    The first still matches on your side. The middle two are PRODUCER-shaped
+    directories that DO NOT EXIST in your tree, so the moment you take this manifest
+    your `test_no_manifest_row_matches_nothing` goes RED on two dead rows — the rows
+    that used to govern your `docs/port-prompt.md` and your delivered gate packs now
+    govern nothing, and those files fall through to the next broader row. This is the
+    exact rot that check was written for; it is not a false alarm.
+
+    APPLY — pick ONE, and record which in your PORT-REPORT:
+    (a) MIRROR THE MOVE (recommended if you still keep those docs): `git mv` your
+        `docs/port-prompt.md` -> `docs/port/`, your `*-company-prompt.md` ->
+        `docs/company-prompts/`, sweep your own references, done — the taken rows
+        then govern real paths and both sides read the same shape.
+    (b) OVERLAY IT: add `row_may_match_nothing:` entries for `docs/company-prompts/**`
+        and `docs/port/**` to YOUR `PORT-MANIFEST.<side>.yaml` (the J34 seam, step
+        160) with the reason "producer-shaped directory; this side keeps the flat
+        docs-root layout". Correct, and cheaper, but the two trees stay divergent.
+    Option (a) is the better fit if you are already acting on the
+    `docs/company-prompts/port-7c18ff4b-followup-company-prompt.md` instruction to retire your `port-prompt.md` to a
+    pointer — do the retirement and the move in one commit rather than twice.
+
+    WHAT DOES NOT MOVE, and is worth knowing before you go looking:
+    - `docs/port/**` and `docs/company-prompts/**` are BOTH `never-port`. None of
+      these files crosses. This step changes where the ROWS point, nothing else.
+    - The `reconcile-port` skill cites the port prompt by NAME, never by path, so it
+      needs no edit on either side. Same for `git-readme.md`'s narrative mentions.
+    - Producer-side historical records were deliberately left naming the OLD paths —
+      `IDEAS.md`, the steps-1-42 archive, `docs/reviews/**`, `config/gate-log.md`, the
+      depgraph snapshots. If you diff those and see `UI-WIP/`, that is intended, not a
+      missed sweep. (The producer's own sweep proved the point: run over
+      `docs/reviews/**` it turned a dated finding into a false claim and minted a path
+      that never existed. Reverted.)
+    - Your `docs/controlm-*.md`, if you hold your own, are governed by the re-scoped
+      `docs/*.md` `default_ok` entry until you move them; nothing forces you to.
+
 LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
 this range, cited here because the coverage check reads ONLY this section:
 `30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim/close/next_ready
