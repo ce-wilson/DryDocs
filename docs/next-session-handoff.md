@@ -5,8 +5,8 @@
 > `docs/restructure/backlog/` (the claim channel — ONE FILE PER ITEM since today) and
 > `docs/port-prompt.md`; this is the narrative that git alone does not carry.
 >
-> **Written 2026-08-20 (desktop, end of the post-reboot session), producer head `213e1d12`
-> = tag `port-base-20260820`.**
+> **Written 2026-08-20 (desktop, session close), producer head `11229bbd`; certified base
+> = tag `port-base-20260820` @ `213e1d12` (four ritual commits after it ride the next port).**
 
 ## 1. A CERTIFIED BASE IS WAITING — the lull port is ready on our side
 
@@ -22,13 +22,18 @@ ONE-TIME sequence — union the monolith under the old rule → run the PORTED
 `--tombstone`. The tree is each side's own output; never copied. Everything else
 in the range applies by the manifest as usual.
 
-**Company-side precondition before it starts:** their 135-170 port
-(`drydocs-port-20260820`, reviewed by us in
-`docs/reviews/port-review-7c18ff4b-20260820.md`, verdict mergeable) must be
-`--no-ff` MERGED to their main with its follow-ups done — the FID pair as ONE
-gate-log commit, the not-port-introduced section, stash pop, `port-prompt.md`
-retired (their prompt: `docs/port-7c18ff4b-followup-company-prompt.md`). A
-mid-apply range finishes on the monolith; ours is the first step of the next.
+**Company-side precondition — MOSTLY MET as of this evening (per their session's
+close-out, recorded in THEIR ledger, no ids carried here):** the 135-170 port is
+`--no-ff` merged to their main; the FID pair landed as ONE gate-log commit; the
+not-port-introduced section is in their PORT-REPORT; the stash was handled by-path
+(correctly — a wholesale pop would have clobbered tracked state). TWO items await
+the user's word to that session: (b) `port-prompt.md` "retire" — now DEFINED in
+`docs/port-7c18ff4b-followup-company-prompt.md`: archive their steps-43+ as a
+`DATED RECORD` + replace the file with a POINTER to the producer ledger-at-tag,
+never `git rm` (97 refs / 32 files), never a fresh living ledger; (c) the seven
+deferred-gate DEFER records — authorized by the prompt, the session was
+conservative. Once (b) lands, paste `docs/port-backlog-shard-company-prompt.md`.
+Their `origin` is the producer remote but CANNOT push (user-confirmed); no action.
 
 **Standing rule from today (memory `hand-prompts-ask-nothing-back`):** producer-
 facing text never asks for anything back — no SHAs, no replies, no instance names.
@@ -56,6 +61,13 @@ Records live in THEIR ledger. The user will clean `port-prompt.md`'s older wordi
   `catalog_has_theme` + `:Theme` registered PLANNED.
 - Port review of 7c18ff4b (five findings) + two hand prompts; Idea-148 (scrape run
   <-> registry row join) inboxed.
+- **Standing rule, saved as memory `hand-prompts-ask-nothing-back`:** producer-facing
+  text never asks for SHAs/replies/instance names back; records live in THEIR ledger.
+  Applied: both prompts and this file carry zero company commit ids (grep-verified).
+- Email storage question answered from the registry (no change): `adhoc-sme-email`
+  = raw under company `internal/`, CITATION-ONLY :Document, no body; `ops-email-
+  extracts` = `DRYDOCS_DATA_ROOT/email-extracts/`. Unfixed: a subpath/filename
+  convention for ad-hoc emails — not inboxed, the user did not ask for one.
 
 ## 3. Machine state (desktop)
 
