@@ -1,0 +1,23 @@
+# Business glossary — PUBLIC terms (Internal-Public / External sources). Shape: schema.yaml (drydocs.glossary.v1).
+# Only senses whose expansion and source are public belong here; everything company-specific goes to
+# internal/glossary/terms.yaml. First entry added 2026-08-21 by user ruling (the scaffold G34 defined none).
+schema: drydocs.glossary.v1
+classification: Internal-Public
+terms:
+  - acronym: DRY
+    senses:
+      - term_id: "urn:drydocs:term:technical-domain:DRY:1"
+        scope: technical-domain
+        pref_label: "Don't Repeat Yourself"
+        alt_labels: ["DRY principle"]
+        definition: >
+          Software-engineering principle (Hunt & Thomas, The Pragmatic Programmer): every piece of
+          knowledge has a single, unambiguous, authoritative representation within a system. The
+          name DryDocs takes its first syllable from it — one ledger per fact, derived views never
+          hand-maintained.
+        does_not_mean: []
+        correlates_to: [project-name]
+        evidence_ref: ["standard:https://en.wikipedia.org/wiki/Don%27t_repeat_yourself"]
+        confidence: confirmed
+        confirmed_by: user
+        confirmed_on: 2026-08-21

@@ -1,7 +1,7 @@
 # Business glossary — the SCHEMA half (Internal-Public)
 
-**Status: scaffold only (G34, 2026-08-21).** This directory holds the *shape* of the DryDocs
-business glossary and nothing else: no term is defined here. Reserved so the internal port cannot
+**Status: scaffold (G34, 2026-08-21) + public senses.** This directory holds the *shape* of the DryDocs
+business glossary and the few senses that are safe to publish; company-specific senses never live here. Reserved so the internal port cannot
 collide on a name or a backlog slot (gate `business-application-identity` §F2, 2026-07-27).
 
 ## The split
@@ -9,6 +9,7 @@ collide on a name or a backlog slot (gate `business-application-identity` §F2, 
 | Half | Where | Classification | Ports to the company repo? |
 |---|---|---|---|
 | Schema — label, key, edge terms, YAML shape | `config/glossary/schema.yaml` (this dir) | Internal-Public | yes |
+| Public senses — expansion AND source are public (first entry: `DRY`, the project's own name) | `config/glossary/terms-public.yaml` (this dir) | Internal-Public | yes |
 | Definitions — the actual senses, expansions, does-NOT-mean notes | `internal/glossary/terms.yaml` | Internal | no (excluded before any public push) |
 | Industry-standard terms | bind to SKOS (`reference/standards/` — declared; local copy fetched with the content pass) | External | yes |
 
