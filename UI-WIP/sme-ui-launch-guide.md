@@ -1,10 +1,18 @@
 # SME — UI Launch Guide
 
-> 2026-07-28 · branch `feat/datalens-quickwins`. How to run the DryDocs console for an
-> SME review session — in today's **fixture mode** (no graph needed) or **live mode**
-> (Neo4j + API). Written now so it's ready the moment the live wiring (Track-2 T2-1)
-> lands; every step below already works against the producer stack. Ungoverned WIP doc —
-> enters the Epic L render pipeline when the live wiring is real.
+> 2026-07-28, revised 2026-08-20 · branch `feat/ui-workstream`. How to run the DryDocs
+> console for an SME review session — in today's **fixture mode** (no graph needed) or
+> **live mode** (Neo4j + API + the agent server). Ungoverned WIP doc — enters the Epic L
+> render pipeline when the live wiring is real.
+>
+> **2026-08-20 revision, and why it is not a tidy-up:** live mode ran green here on
+> Neo4j, drydocs-api and Vite with every view reading the graph — and `/ask` still
+> failed, because the guide listed **three** services and the stack has **four**. The
+> agent server was missing from this page entirely, so the console that this document
+> called "live" was one silent step short of it. Step 3 below is that step. Verified end
+> to end on the desktop against container `neo4jtest` / database `drydocs`: Loads shows
+> `LIVE — :JobRun envelope`, and Ask answers from a registered QuerySpec with its source
+> cited.
 
 ## TL;DR — fixture mode (works today, 2 commands)
 
@@ -18,9 +26,11 @@ Open http://localhost:5173, pick a persona (see §Personas), review. Every synth
 surface is tagged `EXAMPLE DATA · ILLUSTRATIVE` — that tag is the honesty convention,
 not an error.
 
-## Live mode (adds the graph + API under the same UI)
+## Live mode (adds the graph + API + agent under the same UI)
 
-Run each in its own terminal, in this order:
+**Four services, each in its own terminal, in this order.** Three of them serve every
+view; the fourth serves exactly one. Missing the fourth does not look like breakage
+anywhere except `/ask`.
 
 1. **Neo4j** (the local Docker EE container):
    ```powershell
@@ -34,12 +44,34 @@ Run each in its own terminal, in this order:
    poetry install --with api               # first time only
    poetry run uvicorn drydocs_api.app:create_app --factory --port 8001
    ```
-3. **Web** (same as fixture mode):
+3. **ADK agent server** (port 8000) — **only needed for the Ask spoke**, and easy to
+   forget precisely because nothing else uses it. Every other view reaches the graph
+   through drydocs-api; `/ask` is the one page that talks to the `graph_qa` agent
+   instead, so skipping this step leaves a console that looks entirely healthy until
+   someone asks a question:
+   ```powershell
+   cd agents
+   .venv\Scripts\Activate.ps1              # first time: python -m venv .venv; pip install -r requirements.txt
+   adk api_server --allow_origins http://localhost:5173
+   ```
+   Two things here are deliberately unlike the rest of the repo, and both bite once:
+   - **Its own venv, not the poetry env** (`agents/README.md`) — `poetry run adk` will
+     not find it. Whether that separation is worth keeping is open as Idea-141.
+   - **Its own `agents/.env`**, separate from the repo-root `.env`: `NEO4J_*` plus
+     `GRAPHQA_PROVIDER` / `GRAPHQA_MODEL` / `ANTHROPIC_API_KEY`. Both files are
+     gitignored, so **a fresh clone or a new git worktree has neither** and each needs
+     its own — the venv and the key do not travel with the branch.
+
+   Confirm it before opening the page: `curl http://localhost:8000/list-apps` should
+   list `graph_qa`. An unset provider key does not stop the server — it starts fine and
+   fails at the first question with `ANTHROPIC_API_KEY is not set (agents/.env)`.
+4. **Web** (same as fixture mode):
    ```powershell
    cd web; npm run dev                     # → http://localhost:5173
    ```
    If the API is not on `http://localhost:8001`, set `VITE_API_URL` in `web/.env`
-   (see `web/.env.example`).
+   (see `web/.env.example`). Same for the agent server and `VITE_ADK_URL` (default
+   `http://localhost:8000`).
 
 **How you know you're live:** module headers switch from the yellow
 `EXAMPLE DATA · ILLUSTRATIVE` tag to `LIVE — …` (e.g. `LIVE — :JobRun envelope` on
@@ -70,6 +102,9 @@ Sign-out is in the header. The mock-auth banner across the top is intentional.
 | Docs | `/docs` | docmeta | partial |
 | Gates | `/gates` | HITL/review | fixture |
 | Loads | `/loads` | BaseLoader `:JobRun`s | QuerySpec-ready (`loads.runs.v1`) |
+| Ask | `/ask` | `graph_qa` (ADK) → drydocs | live — **needs step 3**, the only view that does |
+| Software | `/software` | generated JSON + one spec | live (SME/admin only) |
+| Load map | `/load-map` | `load-map.json` (generated) | live, declaration-only (SME/admin only; O57) |
 | Under the Hood | `/under-the-hood` | docmeta P0 benchmark | fixture by design (O31 refresh path) |
 
 ## Running an SME feedback pass
@@ -96,6 +131,13 @@ Sign-out is in the header. The mock-auth banner across the top is intentional.
 - **Port 5173 busy** → `npm run dev -- --port 5174`.
 - **API up but views stay EXAMPLE DATA** → check `VITE_API_URL`, then the API log; the
   fallback banner names the exact QuerySpec id that failed.
+- **Ask says `Failed to fetch`, every other page is fine** → step 3 is not running.
+  That string is the browser's generic network error, so it means "nothing answered at
+  `VITE_ADK_URL`" and nothing more; check `curl http://localhost:8000/list-apps` first.
+  Once the server is up the same question returns a *different* error if the provider
+  key is unset — `ANTHROPIC_API_KEY is not set (agents/.env)`, which is a config
+  problem, not a transport one. Backlog **O63** makes the page run this ladder itself
+  instead of leaving it to a reader.
 - **Neo4j auth/connection** → the API reads the standard env (`.env`); verify bolt 7687
   is reachable before suspecting the UI.
 - **Blank page after pulling** → `npm install` (deps moved), then hard-refresh.
