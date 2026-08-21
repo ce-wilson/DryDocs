@@ -1,0 +1,238 @@
+schema: drydocs.benchmark-verdicts.v1
+source_run: knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json
+verdict_record:
+- docs/design/graph-retrieval-benchmark-explainer.md (Rev 2, commit 0e036ff)
+- knowledge/upgrade-plans/docmeta-p0-verdict.md
+strategies:
+- id: manifest
+  label: Manifest-routed reading
+  kicker: unstructured files · human index
+  how: Read the human-maintained SOURCE-MANIFEST, pick the likely file(s), read them whole.
+  failureModes: Aggregation/provenance questions come back as "the rule says…", not numbers — the tally
+    lives nowhere.
+  token: --yellow
+- id: fulltext
+  label: Full-text search
+  kicker: indexed chunks · Lucene top-3
+  how: Keyword index over chunk heading/text (Neo4j’s built-in Lucene index); return the top-3 matches.
+  failureModes: Ranking dilution, the paraphrase gap, and confident noise on out-of-scope questions (the
+    worst failure mode).
+  token: --blue-br
+- id: traversal
+  label: Graph traversal
+  kicker: structured lexical graph · Cypher
+  how: Document→Chunk graph with trust tiers as properties; fetch or compute over exactly the chunks that
+    answer the question.
+  failureModes: 'Query quality: naive keyword phrasing misses paraphrased questions until support vocabulary
+    is mapped to document vocabulary.'
+  token: --green
+corpus:
+  docCount: 26
+  label: 26 Control-M docs + manifest
+  totalChars: 313350
+  chunkCount: 374
+  tiers:
+  - tier: GROUNDED
+    chunks: 257
+    chars: 194516
+    token: --blue-br
+  - tier: SYNTHESIZED
+    chunks: 115
+    chars: 100310
+    token: --yellow
+  - tier: VERBATIM
+    chunks: 2
+    chars: 7597
+    token: --green
+class_token:
+  structure/aggregation: --teal
+  exact lookup: --blue-br
+  paraphrase: --yellow
+  multi-doc: --green
+  provenance: --red
+  out-of-scope: --faint
+efficiency_per_question_range: 28×–60×
+questions:
+- id: SA1
+  cls: structure/aggregation
+  traversal:
+    kind: pass
+  fulltext:
+    kind: fail
+  manifest:
+    kind: pass
+  note: 'graph-only: aggregation over doc/chunk properties; manifest = read SOURCE-MANIFEST + hand count'
+- id: SA2
+  cls: structure/aggregation
+  traversal:
+    kind: pass
+  fulltext:
+    kind: fail
+  manifest:
+    kind: partial
+    qualifier: rule only
+    chars_override: 0
+  note: 'graph-only: provenance is a per-chunk property; files don''t record the tally anywhere'
+  cypher:
+  - label: traversal — aggregation
+    code: 'MATCH (c:Chunk)
+
+      RETURN c.provenance AS tier, count(*) AS chunks, sum(c.char_count) AS chars
+
+      ORDER BY chars DESC'
+- id: EL1
+  cls: exact lookup
+  traversal:
+    kind: pass
+  fulltext:
+    kind: pass
+  manifest:
+    kind: pass
+  note: manifest reads entire controlm-variables.md for one definition
+  cypher:
+  - label: traversal — CONTAINS lookup
+    code: 'MATCH (c:Chunk)
+
+      WHERE c.text CONTAINS ''%%LIBMEMSYM''
+
+      RETURN c.heading, c.text'
+  - label: full-text — top-3
+    code: 'CALL db.index.fulltext.queryNodes(''p0_chunk_ft'', ''LIBMEMSYM'')
+
+      YIELD node, score
+
+      RETURN node.heading, node.text, score
+
+      ORDER BY score DESC
+
+      LIMIT 3'
+- id: EL2
+  cls: exact lookup
+  traversal:
+    kind: pass
+  fulltext:
+    kind: fail
+  manifest:
+    kind: pass
+  note: 'full-text ranking dilution: ''utility''-dense chunk outranked the rare term ctmcreate'
+- id: EL3
+  cls: exact lookup
+  traversal:
+    kind: pass
+  fulltext:
+    kind: pass
+  manifest:
+    kind: pass
+  note: —
+- id: PC1
+  cls: paraphrase
+  traversal:
+    kind: pass
+    qualifier: informed
+  fulltext:
+    kind: fail
+  manifest:
+    kind: pass
+  note: naive traversal ('wait for another job') → 0 rows; informed ('prerequisite condition') → correct.
+    The paraphrase gap.
+  cypher:
+  - label: traversal — naive (0 rows)
+    code: 'MATCH (c:Chunk)
+
+      WHERE c.text CONTAINS ''wait for another job''
+
+      RETURN c.heading, c.text'
+  - label: traversal — informed (correct)
+    code: 'MATCH (c:Chunk)
+
+      WHERE c.text CONTAINS ''prerequisite condition''
+
+      RETURN c.heading, c.text'
+- id: PC2
+  cls: paraphrase
+  traversal:
+    kind: pass
+    qualifier: informed
+  fulltext:
+    kind: pass
+  manifest:
+    kind: pass
+  note: naive → 0 rows; informed ('file watcher') → correct
+- id: PC3
+  cls: paraphrase
+  traversal:
+    kind: pass
+  fulltext:
+    kind: pass
+  manifest:
+    kind: pass
+  note: —
+- id: MD1
+  cls: multi-doc
+  traversal:
+    kind: pass
+  fulltext:
+    kind: pass
+  manifest:
+    kind: pass
+  note: 'hand-adjudicated: mechanical scorer missed marker in traversal''s 446-char structural answer;
+    3 whole files for manifest'
+- id: MD2
+  cls: multi-doc
+  traversal:
+    kind: pass
+  fulltext:
+    kind: pass
+  manifest:
+    kind: pass
+  note: hand-adjudicated; traversal returns target_version property 9.0.21.300 directly
+- id: PV1
+  cls: provenance
+  traversal:
+    kind: pass
+  fulltext:
+    kind: fail
+  manifest:
+    kind: partial
+    qualifier: rule only
+    chars_override: 0
+  note: 'graph-only: filter chunks by provenance=''SYNTHESIZED''; answer: no — they are our inference'
+  cypher:
+  - label: traversal — provenance filter
+    code: 'MATCH (c:Chunk)
+
+      WHERE c.heading CONTAINS ''JSON job definition'' AND c.provenance = ''SYNTHESIZED''
+
+      RETURN c.heading, c.provenance, c.text'
+- id: OS1
+  cls: out-of-scope
+  traversal:
+    kind: abstain
+    qualifier: correct
+    chars_override: 0
+  fulltext:
+    kind: hallucination
+  manifest:
+    kind: abstain
+    qualifier: correct
+  note: full-text returned 3,678 chars of confident, irrelevant Control-M variable text at score 4.24
+    — the worst support-agent failure mode
+  cypher:
+  - label: traversal — empty-result abstention
+    code: 'MATCH (c:Chunk)
+
+      WHERE c.text CONTAINS ''AutoSys'' AND c.text CONTAINS ''global variable''
+
+      RETURN c.heading, c.text
+
+      // 0 rows -> "not covered in this corpus"'
+  - label: full-text — confident noise (score 4.24)
+    code: 'CALL db.index.fulltext.queryNodes(''p0_chunk_ft'', ''AutoSys global variable'')
+
+      YIELD node, score
+
+      RETURN node.heading, node.text, score
+
+      ORDER BY score DESC
+
+      LIMIT 3'

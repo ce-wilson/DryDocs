@@ -168,6 +168,8 @@ COMMITTED_SURFACE_WRITERS = (
     # open(); declared here because the ledger is a COMMITTED surface and this
     # list is declared, never swept.
     "knowledge/depgraph-snapshots/metrics_ledger.py",
+    # O31 (2026-08-21): benchmarkData.ts is a render (harness run + verdicts.yaml).
+    "scripts/render_benchmark_data.py",
 )
 
 #: Globs whose CONTENT is committed and must be byte-identical across platforms.
@@ -177,6 +179,7 @@ COMMITTED_SURFACE_GLOBS = (
     "web/src/generated/*.json",
     "knowledge/depgraph-snapshots/*.json",
     "knowledge/depgraph-snapshots/*.jsonl",  # U25: the committed metrics ledger
+    "web/src/underhood/benchmarkData.ts",  # O31: rendered from the P0 harness run
     # The generated meta-graph — a render like any other, and the surface whose
     # CRLF warning exposed the gap in the writer list above.
     "drydocs_core/schema/schema_graph.cypher",

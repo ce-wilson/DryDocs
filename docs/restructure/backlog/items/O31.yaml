@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/underhood/benchmarkData.ts
@@ -18,3 +18,18 @@ acceptance: |
   benchmarkData.ts is produced by a documented regeneration step (a script, or a recorded manual procedure in the file header/a sibling README) that reads a real evaluation-harness run rather than the hand-carried P0-verdict numbers; the /under-the-hood scoreboard renders unchanged in shape from the regenerated data; build + lint green.
 notes: |
   Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-8. No standalone "docmeta evaluation harness" backlog item exists yet (checked: R8 "Answer evaluation + cap tuning" evaluates the Q&A console's OWN runs, not a reusable docmeta benchmark harness — a different surface) — per the groom instruction the dependency is recorded here as prose rather than a fabricated id; depends_on is left [] and this item is in practice blocked on that harness existing until one is groomed and this item's depends_on is updated to point at it.
+  DONE 2026-08-21 (desktop). REGENERATION STEP: scripts/render_benchmark_data.py reads the REAL
+  harness run knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json (chars + latency per
+  question per arm, the 2026-07-16 live run) plus a new machine-readable verdict ledger
+  knowledge/upgrade-plans/p0-benchmark/verdicts.yaml (the human pass/fail/partial/abstain/
+  hallucination per cell, qualifiers, notes, the 8 shown Cypher snippets, strategy prose, corpus
+  tiers -- lifted verbatim from the hand-carried file, with the three places it re-scored a measured
+  cell declared as chars_override: SA2 + PV1 manifest "rule only" and OS1 traversal "correct" at 0).
+  TOTALS / recall / latency medians / EFFICIENCY are DERIVED from those inputs, never typed. WHAT
+  CHANGED ON THE SCOREBOARD, and why it is the point: the hand-carried totals 16,400 / 31,400 /
+  449,500 chars (27.4x) and full-text recall 7/12 did not match the run (15,354 / 34,195 / 450,550,
+  29.3x) nor even the file's own rows (six full-text passes) -- the derived page cannot disagree with
+  its rows. Shape unchanged (every export the route and panels import is still there, PROVENANCE_LINE
+  now names both inputs and the script); `npm run build` built in 484 ms, oxlint exit 0. Guards:
+  tests/unit/test_benchmark_data.py (committed == regeneration; run ids == verdict ids; recall derived
+  from cells); the writer joins COMMITTED_SURFACE_WRITERS and the .ts joins the CR-byte globs.
