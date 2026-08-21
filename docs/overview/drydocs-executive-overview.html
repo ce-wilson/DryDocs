@@ -87,6 +87,38 @@
                           rule carry the block; <sup> uses browser defaults, so both
                           themes are unaffected. Content claims NOT refreshed — rev 7's
                           note still applies, and the ADR statuses are as of rev 6.
+       rev 10 2026-08-21  CONTENT REFRESH — the first since rev 6. Three design changes
+                          had landed that the page contradicted:
+                          (1) ONE DATABASE. Gate document-content-topology (SIGNED
+                              2026-08-18, 32/32) folded the content topology: ddcontext,
+                              dddocs and the ddall composite are RETIRED; `drydocs` holds
+                              ground truth, the captured document corpora and the
+                              derived findings, which carry the :Uncertain LABEL (ADR
+                              0011 clause 1, executed by choice on retrieval grounds —
+                              Enterprise did not go away). ddschema stays separate. §00's
+                              three-graph table, §04's module diagram and trust-boundary
+                              paragraph, §06's trust cycle, and every "database boundary"
+                              sentence are rewritten around the label.
+                          (2) DEEPDOC RE-CHARTERED (G32 §E, restated MM1 2026-08-21): a
+                              corpus-driven investigator seeded from the grounded graph,
+                              not a "reactive on-failure dive". docmeta is live (eight
+                              corpora in the doc-source registry).
+                          (3) ADRs 0008 / 0009 / 0010 are ACCEPTED AND BUILT (S2 crosswalk
+                              module raises on an unmapped concept; S4 draft table +
+                              promote diff; S3 app_id + id_authority key). §07 is restated
+                              from "if accepted" to "what changed".
+                          NEW DIAGRAMS: §04 module map redrawn on the one-database shape;
+                          §03 gains the AGENT DECISION TREE (R22 declared terms → Tier 0
+                          router → Tier 1 text2cypher → Tier 2 bounded loop → unanswered),
+                          cited to Besta et al. 2025 [1] with the paper and repository
+                          links directly beneath it; §06 loop redrawn with the findings
+                          landing in the same database under the label.
+                          LIGHT MODE ONLY for this revision — the dark token blocks are
+                          removed so readability can be tested on one palette; the
+                          mermaid blocks carry an explicit light init directive. Dark
+                          returns in a later revision once the light pass is approved.
+                          Style: U.S. business English per docs/style/us-business-english.md
+                          (judgment → judgment; no idiom reintroduced).
 
      CONVENTION: dashed borders = proposed or planned. As each dotted line
      closes, flip it to solid, add a revision line above, and republish the
@@ -95,10 +127,11 @@
 
 <style>
   /* ── Tokens lifted verbatim from web/src/styles/tokens.css ──────────────
-     The console treats :root as light and .dark as the override. Here the
-     same token names are re-bound for the artifact viewer, which stamps
-     data-theme on the root element and must win over the OS media query. */
-  :root {
+     REV 10: LIGHT MODE ONLY. The dark media-query and data-theme blocks are
+     removed for the readability pass — one palette, deliberately committed,
+     and painted explicitly so the viewer's own ground never shows through.
+     Dark returns in a later revision once this pass is approved. */
+  :root, :root[data-theme="dark"], :root[data-theme="light"] {
     --bg:#f4f6f9; --bg2:#eaeef4; --panel:#ffffff; --panel2:#eef2f7;
     --edge:#d3dce6; --edge-soft:#e3e9f0;
     --text:#111a26; --muted:#48566c; --faint:#64728a;
@@ -107,32 +140,6 @@
     --brand-navy:#1e3a5c; --brand-green:#2bb673;
     --mono:'IBM Plex Mono', ui-monospace, Consolas, 'Cascadia Mono', monospace;
     --sans:'IBM Plex Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg:#0d1520; --bg2:#0f1b29; --panel:#121e2e; --panel2:#152335;
-      --edge:#203045; --edge-soft:#1a2739;
-      --text:#e8edf3; --muted:#8a97a8; --faint:#71809a;
-      --blue:#4d8be0; --blue-br:#4d8be0; --teal:#2ab3a6; --green:#3aae6b;
-      --yellow:#d9b831; --red:#c8202e; --red-soft:#e4525d;
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg:#0d1520; --bg2:#0f1b29; --panel:#121e2e; --panel2:#152335;
-    --edge:#203045; --edge-soft:#1a2739;
-    --text:#e8edf3; --muted:#8a97a8; --faint:#71809a;
-    --blue:#4d8be0; --blue-br:#4d8be0; --teal:#2ab3a6; --green:#3aae6b;
-    --yellow:#d9b831; --red:#c8202e; --red-soft:#e4525d;
-    color-scheme: dark;
-  }
-  :root[data-theme="light"] {
-    --bg:#f4f6f9; --bg2:#eaeef4; --panel:#ffffff; --panel2:#eef2f7;
-    --edge:#d3dce6; --edge-soft:#e3e9f0;
-    --text:#111a26; --muted:#48566c; --faint:#64728a;
-    --blue:#2e6bc4; --blue-br:#1d4f93; --teal:#167f73; --green:#1f7a46;
-    --yellow:#8a6a0c; --red:#c8202e; --red-soft:#a81824;
     color-scheme: light;
   }
 
@@ -339,8 +346,8 @@
     <p class="log">
       <span><b>Audience:</b> Leadership · Production Support · Engineering · SME</span>
       <span><b>Classification</b> Internal-Public</span>
-      <span><b>Date</b> 2026-08-10</span>
-      <span><b>Revision</b> 9</span>
+      <span><b>Date</b> 2026-08-21</span>
+      <span><b>Revision</b> 10 · light-mode readability pass</span>
     </p>
   </header>
 
@@ -380,32 +387,33 @@
 
     <div class="prose">
       <p>
-        What that idea became is not one graph but <strong>three</strong>, separated by how far you can
-        trust what is in them — and separated by the <em>database boundary</em>, not by a confidence
-        field, because a property filter is one forgotten clause away from failing.
+        What that idea became is <strong>one graph holding three kinds of content</strong>, separated
+        by how far you can trust each — and the separation is <em>structural</em>: derived findings
+        carry a label that every ground-truth query excludes by construction, not a confidence
+        field a query can forget to filter on.
       </p>
     </div>
 
     <div class="tablewrap">
       <table class="tight">
         <thead>
-          <tr><th scope="col">Graph</th><th scope="col">What lives there</th><th scope="col">Trust</th></tr>
+          <tr><th scope="col">Content</th><th scope="col">What it is</th><th scope="col">Trust</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td><code>drydocs</code><br /><span class="chip live">live</span></td>
-            <td><strong>Ground truth — structured.</strong> Derived from the scheduler, catalog, and registry records, plus curated cross-platform lineage</td>
+            <td>Ground truth<br /><span class="chip live">live</span></td>
+            <td><strong>Structured.</strong> Derived from the scheduler, catalog, and registry records, plus curated cross-platform lineage. Loaded by the pipeline; every edge gate-ratified</td>
             <td>Verbatim / grounded</td>
           </tr>
           <tr>
-            <td><code>ddcontext</code><br /><span class="chip build">live, in build</span></td>
-            <td><strong>Context — uncertain.</strong> What the system inferred on a failure but cannot stand behind. Its own transaction domain, so it can never leak into ground truth by accident</td>
-            <td>Synthesized / unverified</td>
+            <td>Document corpora<br /><span class="chip live">live</span></td>
+            <td><strong>Unstructured.</strong> Vendor documentation, scraped registry pages, governance frameworks, operational email — chunked and linked back to what they describe. Trust is declared per corpus in the registry, never inferred from where it is stored</td>
+            <td>Verbatim or grounded, per corpus</td>
           </tr>
           <tr>
-            <td><code>dddocs</code><br /><span class="chip plan">planned</span></td>
-            <td><strong>Documents — unstructured.</strong> The prose corpus: scraped registry pages, design docs, runbooks, vendor documentation, chunked and linked back to what they describe</td>
-            <td>Verbatim, with a curation ladder</td>
+            <td>Derived findings<br /><span class="chip build">in build</span></td>
+            <td><strong>Uncertain.</strong> What the system inferred from the corpora but cannot stand behind. Every such node carries the <code>:Uncertain</code> label plus its reliability and evidence; promotion is a human gate, never a label strip</td>
+            <td>Synthesized / unverified</td>
           </tr>
         </tbody>
       </table>
@@ -413,9 +421,14 @@
 
     <div class="prose">
       <p>
-        A read-only composite (<code>ddall</code>) federates them, so a support question can read
-        across all three while any single write still lands in exactly one. Three words carry the
-        definition of what they add up to:
+        All three live in one database, <code>drydocs</code>, so a single retrieval — a traversal
+        or a vector search — can see the captured context beside the structured fact it
+        explains. That was the deciding argument when the earlier three-database design was
+        folded (ADR 0011, 2026-08-18): an agent that cannot see the context next to the fact
+        fails silently, and a silent, constant failure outweighs a loud, rare one. A second
+        database, <code>ddschema</code>, holds only the schema meta-graph and describes the
+        estate rather than being part of it. Three words carry the definition of what the graph
+        adds up to:
       </p>
     </div>
 
@@ -494,7 +507,9 @@
         primary Data &amp; Analytics orchestrator today, and its parser sits in the shared core with
         no parent and no sibling — while AutoSys is in a later phase, and AWS Airflow is a
         placeholder with less visibility under tenant-level access restrictions. Both crosswalks
-        are already validated through the SME gate on paper, and neither has anywhere to land in code.
+        are validated through the SME gate, and the code now honors them the strict way: the
+        crosswalk module <em>raises</em> on a concept with no mapped equivalent instead of
+        letting a near match be invented (ADR 0008, built).
       </p>
     </div>
   </section>
@@ -507,6 +522,7 @@
     <figure>
       <div class="canvas">
 <pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
 flowchart TB
   subgraph HUMAN["◆ PEOPLE &amp; TEAMS — who is accountable"]
     Employee[":Employee"]
@@ -677,6 +693,7 @@ flowchart TB
     <figure>
       <div class="canvas">
 <pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
 flowchart LR
   subgraph STRUCT["STRUCTURED INTAKE"]
     direction TB
@@ -739,6 +756,71 @@ flowchart LR
         produces a confident sentence nobody can verify.
       </p>
     </div>
+
+    <h3>How the agent decides: cheapest honest answer first</h3>
+    <div class="prose">
+      <p>
+        The agent is read-only and tiered. Each tier is tried only when the one before it could not
+        answer, every executed query is shown verbatim, and when nothing answers the agent says so
+        instead of composing a guess. The expensive machinery sits at the bottom of the tree on
+        purpose: most support questions should end at the first or second step.
+      </p>
+    </div>
+
+    <figure>
+      <div class="canvas">
+<pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
+flowchart TD
+  Q(["Question arrives"])
+  Declared{"Term with a DECLARED<br/>non-graph source?"}
+  T0a["Answer from the declaration<br/>no Cypher · no model call"]
+  Router{"A registered QuerySpec<br/>fits the question?"}
+  T0b["TIER 0<br/>run the spec's Cypher verbatim"]
+  T1["TIER 1<br/>schema-grounded text2cypher<br/>vocabulary + live schema + examples"]
+  Fix{"Execution<br/>error?"}
+  FixLoop["fix the Cypher<br/>≤ 2 attempts"]
+  Enough{"Context sufficient<br/>to answer?"}
+  T2["TIER 2<br/>bounded enhance / solve loop<br/>≤ 2 iterations · 3-vote next step<br/>token budget · forced-solve fallback"]
+  TG[("task-scoped<br/>working memory<br/>in-process only")]
+  Got{"Gathered<br/>an answer?"}
+  Ans["ANSWER<br/>citations · trust tier<br/>every Cypher exposed"]
+  Un["UNANSWERED<br/>every attempt and error returned"]
+
+  Q --> Declared
+  Declared -->|yes| T0a --> Ans
+  Declared -->|no| Router
+  Router -->|yes| T0b --> Ans
+  Router -->|no · or empty| T1
+  T1 --> Fix
+  Fix -->|yes| FixLoop --> T1
+  Fix -->|no| Enough
+  Enough -->|yes| Ans
+  Enough -->|no| T2
+  T2 <--> TG
+  T2 --> Got
+  Got -->|yes| Ans
+  Got -->|no| Un
+
+  classDef gate stroke-width:2.5px
+  class Enough,Got gate
+</pre>
+      </div>
+      <figcaption>
+        <b>Thick</b> = the two points where the agent decides it has not earned an answer yet.
+        Two guards apply at every tier and are not steps: every query runs in READ access mode,
+        and every ground-truth query excludes <code>:Uncertain</code> by a generated clause, never
+        a remembered one. The task-scoped working memory and the per-call cost ledger follow <b>Besta
+        <em>et al.</em>, &ldquo;Affordable AI Assistants with Knowledge Graph of
+        Thoughts&rdquo; (2025)</b><sup><a href="#refs">[1]</a></sup> — paper:
+        <a href="https://arxiv.org/abs/2504.02670">arxiv.org/abs/2504.02670</a>; repository:
+        <a href="https://github.com/spcl/knowledge-graph-of-thoughts">github.com/spcl/knowledge-graph-of-thoughts</a>
+        (SPCL, ETH Zurich; BSD 3-Clause). Adopted: the tiered escalation into a bounded loop, the
+        vote-based next-step decision, the forced-solve fallback, and the cost ledger. Rejected:
+        its write branch (nothing here writes ground truth) and whole-graph prompting (the prompt
+        carries vocabulary and schema, never graph state).
+      </figcaption>
+    </figure>
   </section>
 
   <!-- ══ 04 · MODULES ═════════════════════════════════════════════════════ -->
@@ -749,93 +831,76 @@ flowchart LR
     <figure>
       <div class="canvas">
 <pre class="mermaid">
-flowchart LR
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
+flowchart TB
   subgraph SOURCES["SOURCES"]
-    direction TB
-    Oracle[("Orchestration replica<br/>scheduler definition views")]
-    Catalog[("Catalog / product extract<br/>+ team report")]
-    AppReg[("Application registry extract<br/>apps · ports · TOM roles")]
-    Escal[("Escalation routing<br/>ServiceNow groups")]
-    HR[("HR hierarchy extract<br/>employee hierarchy · REPORTS_TO")]
-    VendorDocs[("Vendor docs<br/>standards · research")]
+    direction LR
+    Struct[("Structured extracts<br/>scheduler replica · catalog · application<br/>registry · escalation routing")]
+    HR[("HR hierarchy<br/>at the gate")]
+    Docs[("Documents<br/>vendor · registry pages · frameworks · email")]
   end
 
-  subgraph CORE["drydocs_core — shared · imports no component"]
-    direction TB
-    Adapters["adapters/<br/>csv · oracle · run-log"]
-    Models["models/<br/>typed rows"]
-    OrchP["orchestration/ — ADR 0008<br/>shell · paths · crosswalk"]
-    CtlM["orchestration/controlm/<br/>variables · resolver · facts"]
-    Ont["ontology/<br/>relationship vocabulary"]
-    Store["mapping_store<br/>SQLite read model"]
+  subgraph CORE["drydocs_core — shared, imports no component"]
+    direction LR
+    Core["adapters · typed models<br/>orchestration parsers + crosswalk (ADR 0008)<br/>ontology vocabulary · mapping store"]
   end
 
   subgraph COMPONENTS["COMPONENTS — import core only, never each other"]
-    direction TB
-    Load["drydocs-load<br/>loaders → ground truth"]
-    Lineage["drydocs-lineage<br/>proactive curated lineage"]
-    DeepDoc["drydocs-deepdoc<br/>reactive on-failure dive"]
-    Review["drydocs-review<br/>gate pages · verify · publish"]
-    DocGen["drydocs-docgen<br/>md → deterministic html/pdf"]
-    Plan["drydocs-plan<br/>backlog → board"]
-    Remed["drydocs-remediation<br/>detect → prove → Jira"]
-    DocMeta["drydocs-docmeta<br/>scraped doc graph"]
+    direction LR
+    Load["drydocs-load + lineage<br/>extracts → ground truth<br/>curated command-line lineage"]
+    DocMeta["drydocs-docmeta<br/>acquire · clean · chunk · manifest"]
+    DeepDoc["drydocs-deepdoc<br/>investigator seeded from the graph<br/>writes only under the label"]
+    Remed["drydocs-remediation<br/>detect → prove → Jira<br/>writes no graph"]
+    Review["drydocs-review + docgen<br/>gate pages · checks · deterministic renders"]
   end
 
-  subgraph GRAPH["NEO4J — the trust boundary is structural"]
-    direction TB
-    DBmain[("drydocs<br/>GROUND TRUTH")]
-    DBctx[("ddcontext<br/>uncertain · candidate")]
-    DBdocs[("dddocs<br/>document corpus")]
-    DBall[("ddall<br/>read-only composite")]
+  subgraph GRAPH["NEO4J · drydocs — one database"]
+    direction LR
+    GT[("GROUND TRUTH<br/>gate-ratified")]
+    Corp[("DOCUMENT CORPORA<br/>trust declared per corpus")]
+    Unc[("DERIVED FINDINGS<br/>:Uncertain")]
+  end
+  Schema[("ddschema<br/>schema meta-graph")]
+
+  subgraph SURFACES["SURFACES — all read-only"]
+    direction LR
+    API["drydocs-api<br/>ground-truth views exclude<br/>:Uncertain by a generated clause"]
+    Web["web console"]
+    Agents["agents<br/>the decision tree in §03"]
+    Jira["Jira<br/>system of record for fixes"]
   end
 
-  subgraph SURFACES["SURFACES"]
-    direction TB
-    API["drydocs-api<br/>read-only · DB routing"]
-    Web["web console<br/>explorer · mappings · gates"]
-    Agents["agents<br/>QuerySpec → text2cypher"]
-    JiraS["Jira<br/>system of record for fixes"]
-  end
-
-  Oracle --> Adapters
-  Catalog --> Adapters
-  AppReg --> Adapters
-  Escal -.-> Adapters
-  HR -.-> Adapters
-  VendorDocs --> DocMeta
-  Adapters --> Models --> Load
-  OrchP --> CtlM
-  CtlM --> Load
-  CtlM --> Lineage
-  CtlM --> DeepDoc
-  Ont --> Load
-  Load --> DBmain
-  Lineage --> DBmain
-  DeepDoc --> DBctx
-  DocMeta -.-> DBdocs
-  DBmain --> Review
-  DBmain --> DBall
-  DBctx --> DBall
-  DBdocs -.-> DBall
-  DBmain --> API
-  DBall --> API
-  Store --> API
+  Struct --> Core
+  HR -.-> Core
+  Core --> Load
+  Docs --> DocMeta
+  Load --> GT
+  DocMeta --> Corp
+  GT -->|seeds| DeepDoc
+  Corp -->|cites| DeepDoc
+  DeepDoc -.-> Unc
+  Unc -.->|promotion is a gate| GT
+  Core -.-> Schema
+  GT --> Review
+  GT --> Remed --> Jira
+  GT --> API
+  Corp --> API
+  Unc -.->|only where a view asks| API
   API --> Web
   API --> Agents
-  DBmain --> Remed
-  Remed --> JiraS
-  Review --> DocGen
 
   classDef proposed stroke-dasharray:5 3
-  class OrchP,DocMeta,DBdocs,Escal,HR proposed
+  classDef unc stroke-width:2.5px,stroke-dasharray:5 3
+  class HR,DeepDoc proposed
+  class Unc unc
 </pre>
       </div>
       <figcaption>
-        Dashed = proposed, planned, or gate-pending. Note what is <b>absent</b>: no component
-        writes to another component&rsquo;s database, and remediation writes to no database at all.
-        The API routes each view explicitly — ground truth alone, or the composite when a view
-        deliberately surfaces uncertain context. There is no default.
+        Dashed = planned or gate-pending. Note what is <b>absent</b>: no component writes to
+        another component&rsquo;s realm, remediation writes to no database at all, and the only
+        path from a derived finding to ground truth runs through a human gate. The API routes each
+        view explicitly — ground truth alone, or the <code>:Uncertain</code> findings when a view
+        deliberately surfaces them. There is no default.
       </figcaption>
     </figure>
 
@@ -862,15 +927,15 @@ flowchart LR
           <tr><td>drydocs_core</td><td>Parse, model, resolve config. Imports no component — an invariant a default-deny test enforces</td><td>—</td><td><span class="chip live">live</span></td></tr>
           <tr><td>drydocs-load</td><td>Turns source extracts into ground-truth graph writes; owns the CLI</td><td><code>drydocs</code></td><td><span class="chip live">live</span></td></tr>
           <tr><td>drydocs-lineage</td><td><em>Proactive</em> — derives curated command-line lineage; writes only confirmed facts</td><td><code>drydocs</code></td><td><span class="chip live">live</span></td></tr>
-          <tr><td>drydocs-deepdoc</td><td><em>Reactive</em> — on a failure, dives deeper and records what it is unsure of</td><td><code>ddcontext</code></td><td><span class="chip build">scaffolded</span></td></tr>
+          <tr><td>drydocs-docmeta</td><td>Document-corpus ingestion: acquire → clean → chunk → manifest, over a registry that declares each corpus&rsquo;s trust and refresh policy</td><td><code>drydocs</code> corpora</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-deepdoc</td><td>Corpus-driven investigator: starts from a subject already in the graph, searches the corpora, records what it found as a finding it cannot yet stand behind. First product: the per-data-flow overview record</td><td><code>drydocs</code>, <code>:Uncertain</code> only</td><td><span class="chip build">in build</span></td></tr>
           <tr><td>drydocs-review</td><td>Renders SME gate pages, runs Cypher acceptance checks, publishes docs</td><td>gate pages</td><td><span class="chip live">live</span></td></tr>
           <tr><td>drydocs-docgen</td><td>Markdown → deterministic HTML/PDF; the anchors the paper feedback loop keys on</td><td><code>docs/design/*</code></td><td><span class="chip live">live</span></td></tr>
           <tr><td>drydocs-plan</td><td>Backlog → the project board</td><td><code>board.html</code></td><td><span class="chip live">live</span></td></tr>
-          <tr><td>drydocs-remediation</td><td>Detect a defect → transform → prove equivalence offline → file a Jira. <strong>Writes no graph</strong></td><td>Jira only</td><td><span class="chip build">scaffolded</span></td></tr>
-          <tr><td>drydocs-docmeta</td><td>Scraped registry and product pages as a document graph</td><td><code>dddocs</code></td><td><span class="chip plan">planned</span></td></tr>
-          <tr><td>drydocs-api</td><td>Read-only projection; server-side credentials, per-view DB routing</td><td>—</td><td><span class="chip live">live</span></td></tr>
-          <tr><td>web console</td><td>Explorer, mappings, gates, lineage, runbooks</td><td>drafts only</td><td><span class="chip build">in build</span></td></tr>
-          <tr><td>agents</td><td>Tiered read-only Q&amp;A: QuerySpec router → schema-grounded text2cypher<sup><a href="#refs">[1,&thinsp;2]</a></sup></td><td>—</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>drydocs-remediation</td><td>Detect a defect → transform → prove equivalence offline → file a Jira. <strong>Writes no graph</strong></td><td>Jira only</td><td><span class="chip build">built, first rules live</span></td></tr>
+          <tr><td>drydocs-api</td><td>Read-only projection; server-side credentials; every ground-truth view excludes <code>:Uncertain</code> by a generated clause</td><td>—</td><td><span class="chip live">live</span></td></tr>
+          <tr><td>web console</td><td>Explorer, mappings, gates, lineage, runbooks, ask</td><td>drafts only</td><td><span class="chip build">in build</span></td></tr>
+          <tr><td>agents</td><td>Tiered read-only Q&amp;A: declared terms → QuerySpec router → schema-grounded text2cypher → bounded loop (the decision tree in §03)<sup><a href="#refs">[1,&thinsp;2]</a></sup></td><td>—</td><td><span class="chip live">live</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -878,10 +943,14 @@ flowchart LR
     <div class="prose">
       <h3>The trust boundary is structural, not a property</h3>
       <p>
-        Curated facts and uncertain candidates live in <em>different databases</em>, not behind a
-        confidence field — because one bad query on a shared database promotes noise into ground
-        truth, and a property filter is one forgotten <code>WHERE</code> clause away from failing.
-        Promotion from context to ground truth is a human gate, never a cross-database edit.
+        Curated facts and uncertain findings share one database, and the boundary between them is
+        a <em>label</em>, not a confidence field. The difference matters: a property filter is one
+        forgotten <code>WHERE</code> clause away from failing, so the exclusion is not written by
+        hand. Every ground-truth query has its <code>NOT n:Uncertain</code> clause generated, only
+        an allow-listed set of writers may apply the label, and an audit counts the labeled nodes
+        so a leak is a number, not a suspicion. Those three guards were the precondition of the
+        fold, not a follow-up. Promotion from finding to ground truth is a human gate, never a
+        label strip.
       </p>
     </div>
   </section>
@@ -901,6 +970,7 @@ flowchart LR
     <figure>
       <div class="canvas">
 <pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
 flowchart LR
   subgraph SOT["SOURCE OF TRUTH — committed git text"]
     direction TB
@@ -935,18 +1005,16 @@ flowchart LR
   Cls --> Db
   Db -->|SQL| Console
   Console -->|edit| Draft
-  Draft -.->|promote| Diff
+  Draft -->|promote| Diff
   Diff --> Gate
   Gate -->|sign-off| Main
   Main --> Reg
-
-  classDef proposed stroke-dasharray:5 3
-  class Draft,Diff proposed
 </pre>
       </div>
       <figcaption>
         The loop is closed on purpose: config governs what may be written to the graph, so it can
-        never be generated <b>from</b> the graph.
+        never be generated <b>from</b> the graph. Every line is solid now: the draft table and the
+        promote-to-diff path were built in August (ADR 0009).
       </figcaption>
     </figure>
 
@@ -963,10 +1031,12 @@ flowchart LR
       </p>
       <p>
         What a database <em>does</em> give — fast, joinable, ad-hoc query — is already delivered by the
-        derived SQLite model, deletable at any moment without data loss. The genuine gap is the
-        arrow marked <em>promote</em>: a console that edits governed configuration needs somewhere
-        durable to keep an unfinished edit. That is the piece to build before the console grows
-        more write surfaces.
+        derived SQLite model, deletable at any moment without data loss. The arrow marked
+        <em>promote</em> was the one genuine gap: a console that edits governed configuration needs
+        somewhere durable to keep an unfinished edit. It is built. A draft is a row that survives a
+        rebuild; promoting it emits a unified diff the SME reads on a branch; and deleting the
+        SQLite file still discards only work that had not reached git — which is exactly the
+        contract a derived store should have.
       </p>
     </div>
   </section>
@@ -979,12 +1049,13 @@ flowchart LR
     <figure>
       <div class="canvas">
 <pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
 flowchart TB
   Ingest["1 · CAPTURE<br/>Re-derive from the scheduler record.<br/>Never hand-declared."]
   Graph[("2 · GRAPH<br/>ground truth")]
   Detect["3 · DETECT<br/>Conformance rules over the graph:<br/>naming · escalation routing ·<br/>missing description metadata"]
-  Dive["3b · DEEP DIVE<br/>On failure, investigate and record<br/>what the system is unsure of"]
-  Ctx[("uncertain<br/>candidates")]
+  Dive["3b · INVESTIGATE<br/>Start from a subject already in the graph,<br/>search the document corpora,<br/>record what was found and how sure it is"]
+  Ctx[("derived findings<br/>:Uncertain · same database")]
   Doc["4 · DOCUMENT<br/>Generate the runbook / gate page<br/>from graph data, deterministically"]
   Human{{"5 · HUMAN REVIEW<br/>Digital: save-button export<br/>Paper: print, pen, scan back<br/>both key on the same anchors"}}
   Feedback["6 · FEEDBACK<br/>anchor-keyed YAML re-attaches<br/>to the exact section"]
@@ -998,7 +1069,7 @@ flowchart TB
   Graph --> Doc
   Detect --> Dive
   Dive --> Ctx
-  Ctx -.->|promotion is a gate,<br/>never an edit| Graph
+  Ctx -.->|promotion is a gate,<br/>never a label strip| Graph
   Doc --> Human
   Human --> Feedback
   Feedback --> Doc
@@ -1016,7 +1087,7 @@ flowchart TB
       </div>
       <figcaption>
         Thick borders mark the two points where the system refuses to proceed on its own
-        judgement: <b>human review</b> and <b>offline proof</b>.
+        judgment: <b>human review</b> and <b>offline proof</b>.
       </figcaption>
     </figure>
 
@@ -1035,9 +1106,10 @@ flowchart TB
           document section that states it, <code>VERIFIED_BY</code> links it to the test case that
           proves it, and <code>IMPLEMENTED_BY</code> links it to the component that satisfies it. All
           three are active edges today. The document-database half — the corpus those sections live
-          in — is <code>dddocs</code>, decided and pending build; it is the last dotted line in this
-          particular circle. The design drawn for a fifteen-year audit trail and the design an agent
-          needs to answer a question turned out to be the same design.</p>
+          in — is loaded too: eight corpora in the doc-source registry, chunked into the same
+          database as the facts they describe, so the last dotted line in this particular circle is
+          now solid. The design drawn for a fifteen-year audit trail and the design an agent needs
+          to answer a question turned out to be the same design.</p>
       </div>
       <div class="cycle">
         <div class="hd"><b>The remediation cycle</b><span class="path">3 → 7 → 8 → 9 → 1</span></div>
@@ -1049,9 +1121,14 @@ flowchart TB
           confirms the fix landed.</p>
       </div>
       <div class="cycle">
-        <div class="hd"><b>The trust cycle</b><span class="path">3b → context → gate → graph</span></div>
-        <p>Anything the system inferred but cannot stand behind goes to a separate database and
-          stays there until a human promotes it.</p>
+        <div class="hd"><b>The trust cycle</b><span class="path">3b → finding → gate → ground truth</span></div>
+        <p>Anything the system inferred but cannot stand behind is written under the
+          <code>:Uncertain</code> label with its reliability and the evidence it was read from, and
+          stays invisible to every ground-truth query until a human promotes it. The first
+          findings this cycle will produce are per-data-flow overview records — which application
+          produces a feed, which consumes it, how it is ingested, and whether its watcher steps are
+          load-bearing — the one artifact a recent production investigation proved was missing
+          from every surface it crossed.</p>
       </div>
     </div>
 
@@ -1092,36 +1169,41 @@ flowchart TB
         <strong>deployed to the wrong server</strong> and should be relocated instead of deleted,
         and code no command line names but a captured script body does call. Merging those three
         would turn a cleanup into an outage, which is the same reason nothing here deletes on its
-        own judgement.
+        own judgment.
       </p>
     </div>
   </section>
 
   <!-- ══ 07 · WHAT CHANGES ════════════════════════════════════════════════ -->
   <section>
-    <p class="eyebrow"><span>07</span> The decision on the table</p>
-    <h2>What changes if the three ADRs are accepted</h2>
+    <p class="eyebrow"><span>07</span> The decisions, taken</p>
+    <h2>What changed when the four ADRs were accepted</h2>
 
     <div class="tablewrap">
       <table>
         <thead>
-          <tr><th scope="col">Area</th><th scope="col">Today</th><th scope="col">After</th></tr>
+          <tr><th scope="col">Area</th><th scope="col">Before</th><th scope="col">Now</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td>Orchestration<br /><span class="chip plan">ADR 0008</span></td>
-            <td>The Control-M parser sits in core with no parent; AutoSys and Airflow crosswalks have no runtime consumer</td>
-            <td>An <code>orchestration/</code> parent with neutral shell and path parsers, plus a crosswalk module that <em>raises</em> on an unmapped concept instead of letting one be invented</td>
+            <td>Orchestration<br /><span class="chip live">ADR 0008 · built</span></td>
+            <td>The Control-M parser sat in core with no parent; AutoSys and Airflow crosswalks had no runtime consumer</td>
+            <td>An <code>orchestration/</code> parent with neutral shell and path parsers, and a crosswalk module that <em>raises</em> on an unmapped concept — and refuses a crosswalk still marked proposed — instead of letting one be invented</td>
           </tr>
           <tr>
-            <td>Configuration<br /><span class="chip plan">ADR 0009</span></td>
-            <td>YAML is the ledger, SQLite is the index, and UI writes return whole files</td>
-            <td>Same ledger, wider index, and a durable draft buffer so the console can edit governed config safely</td>
+            <td>Configuration<br /><span class="chip live">ADR 0009 · built</span></td>
+            <td>YAML was the ledger, SQLite the index, and UI writes returned whole files</td>
+            <td>Same ledger, wider index, and a durable draft buffer: the console edits a row, promotion emits a diff, the SME signs the diff</td>
           </tr>
           <tr>
-            <td>Identity<br /><span class="chip plan">ADR 0010</span></td>
-            <td>The canonical application node is keyed by a property named after the internal registry</td>
-            <td>Keyed by <code>app_id</code> + <code>id_authority</code>, so a registry rename becomes a data migration, a dual-registry transition is representable, and a second group&rsquo;s graph can compose with this one</td>
+            <td>Identity<br /><span class="chip live">ADR 0010 · built</span></td>
+            <td>The canonical application node was keyed by a property named after the internal registry</td>
+            <td>Keyed by <code>app_id</code> + <code>id_authority</code>, so a registry rename is a data migration, a dual-registry transition is representable, and a second group&rsquo;s graph can compose with this one. The old key&rsquo;s retirement is still gate-bound</td>
+          </tr>
+          <tr>
+            <td>Topology<br /><span class="chip live">ADR 0011 · executed by choice</span></td>
+            <td>Three content databases separated trust by transaction domain; a fourth federated them read-only</td>
+            <td>One database holds ground truth, corpora, and labeled findings; the trust boundary is a generated clause, an allow-list, and an audit. The schema meta-graph stays in its own database. Chosen on retrieval grounds, not forced by licensing</td>
           </tr>
         </tbody>
       </table>
@@ -1129,8 +1211,10 @@ flowchart TB
 
     <div class="prose">
       <p>
-        None of the three changes the model. All three change what the model costs to extend —
-        which is why the time to decide them is before the console hardens around today&rsquo;s shape.
+        None of the four changed the model. All four changed what the model costs to extend — and
+        the one-database fold is the only one that is a one-way door in practice: splitting later
+        means re-homing every edge that grew across the former wall, which is why the guards
+        landed first and the decision is recorded with its real reason.
       </p>
     </div>
   </section>
@@ -1138,6 +1222,7 @@ flowchart TB
   <footer>
     <div class="revs">
       <span><b>Revisions</b></span>
+      <span>rev 10 · 2026-08-21 — <b>content refresh</b>, the first since rev 6, on three landed design changes: (1) the content topology folded to <b>one database</b> at gate <code>document-content-topology</code> (signed 2026-08-18; ADR 0011 executed by choice on retrieval grounds) — <code>ddcontext</code>, <code>dddocs</code> and <code>ddall</code> retired, derived findings carry the <code>:Uncertain</code> label behind a generated clause, an allow-list and an audit, <code>ddschema</code> stays separate; (2) deepdoc re-chartered as the corpus-driven investigator seeded from the grounded graph (G32 §E, MM1), docmeta live with eight corpora; (3) ADRs 0008 / 0009 / 0010 accepted and built, so §07 reads as what changed, not what would. New diagrams: the §04 module map on the one-database shape, the §03 <b>agent decision tree</b> (declared terms → spec → text2cypher → bounded loop → unanswered) cited to Besta <em>et al.</em> 2025 with the paper and repository beneath it, and the §06 loop with findings landing in the same database under the label. <b>Light mode only</b> for this revision, so readability can be judged on one palette; dark returns once the pass is approved. Style per <code>docs/style/us-business-english.md</code></span>
       <span>rev 9 · 2026-08-10 — a <b>References</b> section added to this footer, covering every external work the document draws on (backlog L28): the two agent reference architectures, the Databricks catalog precedent, the three articles behind the layer model, and the seven ontology standards in §03. Two claims that were uncited until now are attributed — the Unity Catalog comparison in §01 and the quoted Databricks sentence in §03 — and inline markers anchor the four places the document leans on outside work. The reason it was raised: <code>spcl/knowledge-graph-of-thoughts</code> was already load-bearing (ADR 0007 analyzes it; four <code>agents/</code> modules carry its design or name its traps) and cited nowhere, so it is now registered at <code>reference/research/knowledge-graph-of-thoughts.md</code> with its paper, BSD 3-Clause license, and what we adopted versus rejected. No content claims refreshed; rev 7&rsquo;s note still applies</span>
       <span>rev 8 · 2026-08-07 — §06 gains a stated <b>target state</b>: a production estate holding only actively used code, with replaced code archived to version control and storage (backlog L24, user direction). Written as a goal, not a current state. Carries its own limit: the three usage signals show presence only, each bounded by what its feed scanned, so an absence recorded by one feed is not an absence in the estate — and the three review outcomes (dead / misdeployed / dynamically called) stay separate for the same reason. Grounded in the <code>rua-load-shapes</code> gate (signed 2026-08-07) and the archival report built at G58; no other content claims refreshed</span>
       <span>rev 7 · 2026-08-03 — U.S. business-English style pass per <code>docs/style/us-business-english.md</code> (L22): spine→backbone, planes→layers, decays/rots→goes stale/becomes outdated, gate-confirmed→validated through the SME gate, UK spellings Americanized; HTML stays the single hand-authored source (no .md established); content claims unchanged from rev 6</span>
@@ -1172,7 +1257,7 @@ flowchart TB
 
     <div class="revs">
       <span><b>Tracking</b></span>
-      <span>Structure shown reflects the current repository plus ADR 0008 (orchestration boundary), ADR 0009 (configuration substrate), and ADR 0010 (source-term abstraction). Dashed borders mark what is proposed, planned, or gate-pending; as each closes, it flips to solid and a revision line is added above.</span>
+      <span>Structure shown reflects the repository as of 2026-08-21, including ADR 0008 (orchestration boundary), ADR 0009 (configuration substrate), ADR 0010 (source-term abstraction) and ADR 0011 (one-database topology, executed by choice) — all accepted and built. Dashed borders mark what is still planned or gate-pending (the HR hierarchy feed, the deepdoc writer and its data-flow-overview gate, the old application key&rsquo;s retirement); as each closes, it flips to solid and a revision line is added above.</span>
       <span>Source of truth: <code>docs/overview/drydocs-executive-overview.html</code> — hand-authored, not renderer output.</span>
     </div>
     <div class="revs">
