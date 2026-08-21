@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-20T18:52:57",
+    "captured_at": "2026-08-20T19:49:12",
     "date": "20260820",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "b06cbb5d",
-      "full": "b06cbb5dece98c14780697c4f654ddf52e332fe5",
+      "commit": "f46b9cec",
+      "full": "f46b9cecd4bdc36bf2d21f2b6c8f6dfe4d354aac",
       "branch": "main",
-      "describe": "port-base-20260820-1-gb06cbb5d",
-      "subject": "docs(handoff): roll to 2026-08-20 end of session — a certified base is waiting (port-base-20260820), the backlog is sharded, claims are one-file flips",
+      "describe": "port-base-20260820-5-gf46b9cec",
+      "subject": "docs(handoff): roll to 2026-08-20 session close — company close-out mostly met, 'retire' defined, two items await the user's word",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -18755,10 +18755,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260819-1809.json",
-      "name": "drydocs-20260819-1809.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260820.json",
+      "name": "drydocs-20260820.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260819-1809.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260820.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -37317,7 +37317,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260819-1809.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260820.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
