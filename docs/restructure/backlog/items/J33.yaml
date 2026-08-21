@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_supplements.py
@@ -16,3 +16,16 @@ acceptance: |
   The three tests named in Idea-83 (test_supplements chain-order + unknown-name, test_bootstrap_guard declared-count) pass on the desktop where rich interleaves ANSI codes into captured CLI output — fixed by stripping ANSI in the assertions or forcing a non-terminal console under pytest, NEVER by loosening the asserted messages; a sweep finds any other test asserting substrings against rich-rendered output and applies the same treatment.
 notes: |
   Groomed 2026-08-07 from Idea-83. Fails under both `python -m pytest` and `poetry run pytest`, on a stashed clean tree, NO_COLOR=1 inert — a rich/typer console-detection difference on this desktop. The three failures have ridden every suite run since 2026-08-07 as "standing Idea-83 failures"; this item retires that caveat.
+  DONE 2026-08-21 (desktop). ROOT CAUSE, pinned rather than guessed: the desktop exports FORCE_COLOR=3,
+  and rich 13.9 honours FORCE_COLOR over NO_COLOR (which only drops colour and keeps the bold/italic
+  escapes that were inside the matched phrases), over CliRunner's non-tty stream and over TERM -- which
+  is why NO_COLOR=1 read as inert in Idea-83. Reproduced on demand: `FORCE_COLOR=3 pytest tests/unit`
+  fails exactly test_supplements::test_chain_applies_in_registry_order and
+  ::test_unknown_only_name_exits_2_without_touching_the_graph; the third named test
+  (test_bootstrap_guard declared-count) had already been patched at e87800f9 (2026-08-09) by
+  stripping ANSI locally. FIX (the "force a non-terminal console under pytest" direction, suite-wide,
+  messages untouched): tests/unit/conftest.py pops FORCE_COLOR and sets TERM=dumb AT IMPORT TIME --
+  a fixture is too late because drydocs.cli builds its module-level Console() during collection.
+  SWEEP: under FORCE_COLOR=3 the whole unit suite now passes 2259/2259, so no other test asserts
+  plain substrings against a rich-coloured stream; the e87800f9 strip stays as harmless belt-and-braces.
+  Retires the "standing Idea-83 failures" caveat.
