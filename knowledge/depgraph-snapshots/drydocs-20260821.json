@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-21T03:40:24",
+    "captured_at": "2026-08-21T06:36:40",
     "date": "20260821",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "9ba88772",
-      "full": "9ba88772807df95b1026c9eba4f89753a3ddfaa7",
+      "commit": "6efc1b2b",
+      "full": "6efc1b2b5c136229d0addfcadaf92f6ac673d45a",
       "branch": "main",
-      "describe": "port-base-20260820-53-g9ba88772",
-      "subject": "fix(G89): runbooks.series.v1 matched the planned TRIGGERS edge (and the wrong from_node) — repointed onto the active INVOKES edge (scheduler_invokes); TRIGGERS entry untouched",
+      "describe": "port-base-20260820-107-g6efc1b2b",
+      "subject": "chore(R14): /list-apps lists only the real agent apps — agents/serve.py hands the API server ADK's own NestedAgentLoader (the adk-web loader: agent.py dirs only), so the shared common/ package stays where the apps import it and disappears from discovery; README states the app-vs-shared convention; guard added; proven on the installed ADK",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6461,6 +6461,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/agents/graph_qa/declared_terms.py",
+      "name": "declared_terms.py",
+      "extension": ".py",
+      "rel_path": "agents/graph_qa/declared_terms.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/agents/graph_qa/envelope.py",
       "name": "envelope.py",
       "extension": ".py",
@@ -6546,6 +6555,15 @@
       "name": "requirements.txt",
       "extension": ".txt",
       "rel_path": "agents/requirements.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/agents/serve.py",
+      "name": "serve.py",
+      "extension": ".py",
+      "rel_path": "agents/serve.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -7316,6 +7334,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/source-mappings/pat-team-report.yaml",
+      "name": "pat-team-report.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/source-mappings/pat-team-report.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/source-mappings/psgmgr.yaml",
       "name": "psgmgr.yaml",
       "extension": ".yaml",
@@ -7518,6 +7545,15 @@
       "name": "ui-components.yaml",
       "extension": ".yaml",
       "rel_path": "config/taxonomy/ui-components.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/taxonomy/ui-concepts.yaml",
+      "name": "ui-concepts.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy/ui-concepts.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15038,6 +15074,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/drydocs/chain_inputs.py",
+      "name": "chain_inputs.py",
+      "extension": ".py",
+      "rel_path": "drydocs/chain_inputs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -15047,10 +15092,73 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/cli_docs.py",
+      "name": "cli_docs.py",
+      "extension": ".py",
+      "rel_path": "drydocs/cli_docs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/cli_ingest.py",
+      "name": "cli_ingest.py",
+      "extension": ".py",
+      "rel_path": "drydocs/cli_ingest.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/cli_plan.py",
+      "name": "cli_plan.py",
+      "extension": ".py",
+      "rel_path": "drydocs/cli_plan.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/cli_schema.py",
+      "name": "cli_schema.py",
+      "extension": ".py",
+      "rel_path": "drydocs/cli_schema.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/cli_variables.py",
+      "name": "cli_variables.py",
+      "extension": ".py",
+      "rel_path": "drydocs/cli_variables.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/cli_verify.py",
+      "name": "cli_verify.py",
+      "extension": ".py",
+      "rel_path": "drydocs/cli_verify.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/cmdline_staging.py",
       "name": "cmdline_staging.py",
       "extension": ".py",
       "rel_path": "drydocs/cmdline_staging.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/code_graph_freshness.py",
+      "name": "code_graph_freshness.py",
+      "extension": ".py",
+      "rel_path": "drydocs/code_graph_freshness.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16136,6 +16244,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/drydocs/pat_projection.py",
+      "name": "pat_projection.py",
+      "extension": ".py",
+      "rel_path": "drydocs/pat_projection.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/plan_board.py",
       "name": "plan_board.py",
       "extension": ".py",
@@ -16784,6 +16901,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/notifications.py",
+      "name": "notifications.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/notifications.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/ontology",
       "name": "ontology",
       "extension": "",
@@ -16797,6 +16923,15 @@
       "name": "__init__.py",
       "extension": ".py",
       "rel_path": "drydocs_core/ontology/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/ontology/concept_scheme.py",
+      "name": "concept_scheme.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/ontology/concept_scheme.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17346,6 +17481,15 @@
       "name": "source_registry.py",
       "extension": ".py",
       "rel_path": "drydocs_core/source_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/ui_concepts.py",
+      "name": "ui_concepts.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/ui_concepts.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19133,10 +19277,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
-      "name": "drydocs-20260821.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/debt-metrics.jsonl",
+      "name": "debt-metrics.jsonl",
+      "extension": ".jsonl",
+      "rel_path": "knowledge/depgraph-snapshots/debt-metrics.jsonl",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0340.json",
+      "name": "drydocs-20260821-0340.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821-0340.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19146,6 +19299,15 @@
       "name": "filter_ignored.py",
       "extension": ".py",
       "rel_path": "knowledge/depgraph-snapshots/filter_ignored.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/depgraph-snapshots/metrics_ledger.py",
+      "name": "metrics_ledger.py",
+      "extension": ".py",
+      "rel_path": "knowledge/depgraph-snapshots/metrics_ledger.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19515,6 +19677,15 @@
       "name": "persona_queries.json",
       "extension": ".json",
       "rel_path": "knowledge/upgrade-plans/p0-benchmark/persona_queries.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/upgrade-plans/p0-benchmark/verdicts.yaml",
+      "name": "verdicts.yaml",
+      "extension": ".yaml",
+      "rel_path": "knowledge/upgrade-plans/p0-benchmark/verdicts.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19979,6 +20150,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/project_pat_team_report.py",
+      "name": "project_pat_team_report.py",
+      "extension": ".py",
+      "rel_path": "scripts/project_pat_team_report.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/render_benchmark_data.py",
+      "name": "render_benchmark_data.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_benchmark_data.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/render_board.py",
       "name": "render_board.py",
       "extension": ".py",
@@ -20100,6 +20289,15 @@
       "name": "conftest.py",
       "extension": ".py",
       "rel_path": "tests/conftest.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/env_drift.py",
+      "name": "env_drift.py",
+      "extension": ".py",
+      "rel_path": "tests/env_drift.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20240,6 +20438,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/integration/test_code_snapshot_retraction.py",
+      "name": "test_code_snapshot_retraction.py",
+      "extension": ".py",
+      "rel_path": "tests/integration/test_code_snapshot_retraction.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/integration/test_e2e_load.py",
       "name": "test_e2e_load.py",
       "extension": ".py",
@@ -20321,6 +20528,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_agents_app_discovery.py",
+      "name": "test_agents_app_discovery.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_agents_app_discovery.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_app_identity_guard.py",
       "name": "test_app_identity_guard.py",
       "extension": ".py",
@@ -20366,6 +20582,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_benchmark_data.py",
+      "name": "test_benchmark_data.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_benchmark_data.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_bmc_docs.py",
       "name": "test_bmc_docs.py",
       "extension": ".py",
@@ -20402,6 +20627,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_chain_inputs.py",
+      "name": "test_chain_inputs.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_chain_inputs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_classification.py",
       "name": "test_classification.py",
       "extension": ".py",
@@ -20420,6 +20654,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_code_graph_freshness.py",
+      "name": "test_code_graph_freshness.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_code_graph_freshness.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_code_graph_review_plan.py",
       "name": "test_code_graph_review_plan.py",
       "extension": ".py",
@@ -20433,6 +20676,15 @@
       "name": "test_code_snapshot_loader.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_code_snapshot_loader.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_code_snapshot_retraction.py",
+      "name": "test_code_snapshot_retraction.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_code_snapshot_retraction.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20685,6 +20937,15 @@
       "name": "test_enforcement_matrix.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_enforcement_matrix.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_env_drift.py",
+      "name": "test_env_drift.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_env_drift.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21059,6 +21320,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_metrics_ledger.py",
+      "name": "test_metrics_ledger.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_metrics_ledger.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_module_boundary.py",
       "name": "test_module_boundary.py",
       "extension": ".py",
@@ -21077,6 +21347,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_no_render_parsing.py",
+      "name": "test_no_render_parsing.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_no_render_parsing.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_no_shadow_definitions.py",
       "name": "test_no_shadow_definitions.py",
       "extension": ".py",
@@ -21090,6 +21369,15 @@
       "name": "test_node_status_envelope.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_node_status_envelope.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_notifications_carry_through.py",
+      "name": "test_notifications_carry_through.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_notifications_carry_through.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21117,6 +21405,15 @@
       "name": "test_pat_product_mapping.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_pat_product_mapping.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_pat_projection.py",
+      "name": "test_pat_projection.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_pat_projection.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21225,6 +21522,15 @@
       "name": "test_publishing.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_publishing.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_query_spec_vocabulary.py",
+      "name": "test_query_spec_vocabulary.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_query_spec_vocabulary.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21518,6 +21824,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_source_labels.py",
+      "name": "test_source_labels.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_source_labels.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_source_mapping_drift.py",
       "name": "test_source_mapping_drift.py",
       "extension": ".py",
@@ -21581,6 +21896,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_theme_vocabulary.py",
+      "name": "test_theme_vocabulary.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_theme_vocabulary.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_tier2.py",
       "name": "test_tier2.py",
       "extension": ".py",
@@ -21603,6 +21927,15 @@
       "name": "test_ui_components.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_ui_components.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_ui_concepts.py",
+      "name": "test_ui_concepts.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_ui_concepts.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23272,6 +23605,10 @@
       "drydocs/agents/common/neo4j_tool.py"
     ],
     [
+      "drydocs/agents/common/graph_read.py",
+      "drydocs/drydocs_core/notifications.py"
+    ],
+    [
       "drydocs/agents/common/llm_ledger.py",
       "drydocs/drydocs_core/run_log.py"
     ],
@@ -23328,12 +23665,24 @@
       "drydocs/agents/graph_qa/providers.py"
     ],
     [
+      "drydocs/agents/graph_qa/declared_terms.py",
+      "drydocs/agents/graph_qa/envelope.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/declared_terms.py",
+      "drydocs/drydocs_core/ui_concepts.py"
+    ],
+    [
       "drydocs/agents/graph_qa/pipeline.py",
       "drydocs/agents/common/__init__.py"
     ],
     [
       "drydocs/agents/graph_qa/pipeline.py",
       "drydocs/agents/common/specs_catalog.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/graph_qa/declared_terms.py"
     ],
     [
       "drydocs/agents/graph_qa/pipeline.py",
@@ -23349,6 +23698,10 @@
     ],
     [
       "drydocs/agents/graph_qa/schema_context.py",
+      "drydocs/drydocs_core/ui_concepts.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/schema_context.py",
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
@@ -23360,16 +23713,20 @@
       "drydocs/agents/common/neo4j_tool.py"
     ],
     [
+      "drydocs/drydocs/chain_inputs.py",
+      "drydocs/drydocs_core/landing_zones.py"
+    ],
+    [
+      "drydocs/drydocs/chain_inputs.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs/cmdline_staging.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/docs_coverage.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/docs_verify.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -23381,19 +23738,11 @@
     ],
     [
       "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/loaders/base.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/batch_port_orchestrator.py"
     ],
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/bmc_docs.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/loaders/business_segments.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -23449,23 +23798,7 @@
     ],
     [
       "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/loaders/patch_window.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/loaders/runs_on_resolution.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/loaders/seal_attribution.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/server_inventory.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/loaders/server_resolution.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -23474,14 +23807,6 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs/loaders/vendor_docs.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/snapshots/__init__.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs/staging.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -23501,23 +23826,7 @@
     ],
     [
       "drydocs/drydocs/cli.py",
-      "drydocs/drydocs_core/landing_zones.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs_core/mapping_store.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs_core/models/__init__.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
       "drydocs/drydocs_core/neo4j_client.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs_core/orchestration/controlm/__init__.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -23526,14 +23835,6 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs_core/run_log.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs_core/schema/constraints.py"
-    ],
-    [
-      "drydocs/drydocs/cli.py",
-      "drydocs/drydocs_core/schema/supplements.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -23552,6 +23853,226 @@
       "drydocs/drydocs_lineage/review.py"
     ],
     [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/docs_coverage.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/docs_verify.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/loaders/bmc_docs.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/loaders/doc_traceability.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/loaders/email_extracts.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/loaders/essential_graphrag.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs/loaders/vendor_docs.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/chain_inputs.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/batch_port_orchestrator.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/business_segments.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/code_snapshot.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/folder_attribution.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/manual_loads.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/patch_window.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/runs_on_resolution.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/seal_attribution.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/server_inventory.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/server_resolution.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/software_registry.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/snapshots/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs_core/mapping_store.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs_core/schema/supplements.py"
+    ],
+    [
+      "drydocs/drydocs/cli_plan.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_plan.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/drydocs/cli_plan.py",
+      "drydocs/drydocs/code_graph_freshness.py"
+    ],
+    [
+      "drydocs/drydocs/cli_plan.py",
+      "drydocs/drydocs/loaders/code_snapshot.py"
+    ],
+    [
+      "drydocs/drydocs/cli_plan.py",
+      "drydocs/drydocs/snapshots/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_plan.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/landing_zones.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/schema/constraints.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs/staging.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs_core/orchestration/controlm/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_variables.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs/cli_verify.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_verify.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/drydocs/cli_verify.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
       "drydocs/drydocs/cmdline_staging.py",
       "drydocs/drydocs_core/data_root.py"
     ],
@@ -23562,6 +24083,10 @@
     [
       "drydocs/drydocs/cmdline_staging.py",
       "drydocs/drydocs_core/orchestration/shell.py"
+    ],
+    [
+      "drydocs/drydocs/code_graph_freshness.py",
+      "drydocs/drydocs/loaders/code_snapshot.py"
     ],
     [
       "drydocs/drydocs/doc_outline.py",
@@ -24084,6 +24609,10 @@
       "drydocs/drydocs_core/config.py"
     ],
     [
+      "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_core/notifications.py"
+    ],
+    [
       "drydocs/drydocs_api/ephemeral_specs.py",
       "drydocs/drydocs_api/guard.py"
     ],
@@ -24320,6 +24849,10 @@
       "drydocs/drydocs_core/cypher_split.py"
     ],
     [
+      "drydocs/drydocs_core/ontology/concept_scheme.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs_core/ontology/schema_graph.py",
       "drydocs/drydocs_core/__init__.py"
     ],
@@ -24384,6 +24917,10 @@
       "drydocs/drydocs_core/orchestration/shell.py"
     ],
     [
+      "drydocs/drydocs_core/orchestration/controlm/description_tokens.py",
+      "drydocs/drydocs_core/ontology/concept_scheme.py"
+    ],
+    [
       "drydocs/drydocs_core/orchestration/controlm/facts.py",
       "drydocs/drydocs_core/orchestration/controlm/variables.py"
     ],
@@ -24432,6 +24969,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/ui_concepts.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs_deepdoc/investigate.py",
       "drydocs/drydocs_core/orchestration/controlm/__init__.py"
     ],
@@ -24466,6 +25007,10 @@
     [
       "drydocs/drydocs_docmeta/connectors/web.py",
       "drydocs/drydocs_docmeta/policy.py"
+    ],
+    [
+      "drydocs/drydocs_docmeta/manifest.py",
+      "drydocs/drydocs_core/ontology/concept_scheme.py"
     ],
     [
       "drydocs/drydocs_docmeta/manifest.py",
@@ -24732,6 +25277,18 @@
       "drydocs/drydocs_remediation/formats.py"
     ],
     [
+      "drydocs/knowledge/depgraph-snapshots/metrics_ledger.py",
+      "drydocs/drydocs/code_graph_freshness.py"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots/metrics_ledger.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots/metrics_ledger.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
       "drydocs/knowledge/upgrade-plans/p0-benchmark/benchmark_p0_persona.py",
       "drydocs/drydocs_core/config.py"
     ],
@@ -24770,6 +25327,10 @@
     [
       "drydocs/scripts/port_preflight.py",
       "drydocs/drydocs/port_preflight.py"
+    ],
+    [
+      "drydocs/scripts/project_pat_team_report.py",
+      "drydocs/drydocs/pat_projection.py"
     ],
     [
       "drydocs/scripts/render_board.py",
@@ -24854,6 +25415,18 @@
     [
       "drydocs/scripts/shard_backlog.py",
       "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/tests/conftest.py",
+      "drydocs/tests/env_drift.py"
+    ],
+    [
+      "drydocs/tests/integration/test_code_snapshot_retraction.py",
+      "drydocs/drydocs/loaders/code_snapshot.py"
+    ],
+    [
+      "drydocs/tests/integration/test_code_snapshot_retraction.py",
+      "drydocs/tests/integration/test_e2e_load.py"
     ],
     [
       "drydocs/tests/integration/test_e2e_load.py",
@@ -24996,6 +25569,46 @@
       "drydocs/drydocs_core/cypher_split.py"
     ],
     [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/chain_inputs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/loaders/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/loaders/business_segments.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/loaders/controlm.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/loaders/controlm_dependencies_derived.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/loaders/controlm_hosts.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs/loaders/seal_contacts.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chain_inputs.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
       "drydocs/tests/unit/test_classification.py",
       "drydocs/drydocs_api/ephemeral_specs.py"
     ],
@@ -25016,12 +25629,24 @@
       "drydocs/drydocs_lineage/extractors/__init__.py"
     ],
     [
+      "drydocs/tests/unit/test_code_graph_freshness.py",
+      "drydocs/drydocs/code_graph_freshness.py"
+    ],
+    [
       "drydocs/tests/unit/test_code_snapshot_loader.py",
       "drydocs/drydocs/loaders/code_snapshot.py"
     ],
     [
       "drydocs/tests/unit/test_code_snapshot_loader.py",
       "drydocs/drydocs_core/models/code_snapshot.py"
+    ],
+    [
+      "drydocs/tests/unit/test_code_snapshot_retraction.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_code_snapshot_retraction.py",
+      "drydocs/drydocs/loaders/code_snapshot.py"
     ],
     [
       "drydocs/tests/unit/test_command_parser.py",
@@ -25234,6 +25859,10 @@
     [
       "drydocs/tests/unit/test_email_extracts.py",
       "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_drift.py",
+      "drydocs/tests/env_drift.py"
     ],
     [
       "drydocs/tests/unit/test_ephemeral_specs.py",
@@ -25712,6 +26341,34 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_api/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/unit/test_notifications_carry_through.py",
+      "drydocs/drydocs_core/notifications.py"
+    ],
+    [
       "drydocs/tests/unit/test_oracle_kerberos_login.py",
       "drydocs/libs/oracle_kerberos/__init__.py"
     ],
@@ -25726,6 +26383,14 @@
     [
       "drydocs/tests/unit/test_pat_product_mapping.py",
       "drydocs/drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/tests/unit/test_pat_projection.py",
+      "drydocs/drydocs/loaders/catalog.py"
+    ],
+    [
+      "drydocs/tests/unit/test_pat_projection.py",
+      "drydocs/drydocs/pat_projection.py"
     ],
     [
       "drydocs/tests/unit/test_patch_window.py",
@@ -25746,6 +26411,10 @@
     [
       "drydocs/tests/unit/test_plan_roadmap.py",
       "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_manifest.py",
+      "drydocs/tests/unit/test_port_reconcile_guards.py"
     ],
     [
       "drydocs/tests/unit/test_port_preflight.py",
@@ -25790,6 +26459,26 @@
     [
       "drydocs/tests/unit/test_publishing.py",
       "drydocs/drydocs/publishing/publisher.py"
+    ],
+    [
+      "drydocs/tests/unit/test_query_spec_vocabulary.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_query_spec_vocabulary.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/tests/unit/test_query_spec_vocabulary.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/unit/test_query_spec_vocabulary.py",
+      "drydocs/drydocs_core/ontology/schema_graph.py"
+    ],
+    [
+      "drydocs/tests/unit/test_query_spec_vocabulary.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
       "drydocs/tests/unit/test_query_specs.py",
@@ -26096,6 +26785,18 @@
       "drydocs/drydocs_core/models/registry.py"
     ],
     [
+      "drydocs/tests/unit/test_source_labels.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_labels.py",
+      "drydocs/drydocs/loaders/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_labels.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
       "drydocs/tests/unit/test_source_mapping_drift.py",
       "drydocs/drydocs/source_mappings.py"
     ],
@@ -26160,8 +26861,28 @@
       "drydocs/drydocs_core/schema/constraints.py"
     ],
     [
+      "drydocs/tests/unit/test_theme_vocabulary.py",
+      "drydocs/drydocs_core/ontology/concept_scheme.py"
+    ],
+    [
+      "drydocs/tests/unit/test_theme_vocabulary.py",
+      "drydocs/drydocs_core/orchestration/controlm/description_tokens.py"
+    ],
+    [
+      "drydocs/tests/unit/test_theme_vocabulary.py",
+      "drydocs/drydocs_docmeta/connectors/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_theme_vocabulary.py",
+      "drydocs/drydocs_docmeta/manifest.py"
+    ],
+    [
       "drydocs/tests/unit/test_transcribe_doc_markup.py",
       "drydocs/drydocs/design_doc.py"
+    ],
+    [
+      "drydocs/tests/unit/test_ui_concepts.py",
+      "drydocs/drydocs_core/ui_concepts.py"
     ],
     [
       "drydocs/tests/unit/test_uncertain_boundary.py",
@@ -30924,6 +31645,11 @@
       "drydocs/agents/requirements.txt"
     ],
     [
+      "drydocs/agents",
+      "CONTAINS",
+      "drydocs/agents/serve.py"
+    ],
+    [
       "drydocs/agents/common",
       "CONTAINS",
       "drydocs/agents/common/__init__.py"
@@ -30997,6 +31723,11 @@
       "drydocs/agents/graph_qa",
       "CONTAINS",
       "drydocs/agents/graph_qa/control.py"
+    ],
+    [
+      "drydocs/agents/graph_qa",
+      "CONTAINS",
+      "drydocs/agents/graph_qa/declared_terms.py"
     ],
     [
       "drydocs/agents/graph_qa",
@@ -31476,6 +32207,11 @@
     [
       "drydocs/config/source-mappings",
       "CONTAINS",
+      "drydocs/config/source-mappings/pat-team-report.yaml"
+    ],
+    [
+      "drydocs/config/source-mappings",
+      "CONTAINS",
       "drydocs/config/source-mappings/psgmgr.yaml"
     ],
     [
@@ -31537,6 +32273,11 @@
       "drydocs/config/taxonomy",
       "CONTAINS",
       "drydocs/config/taxonomy/ui-components.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy",
+      "CONTAINS",
+      "drydocs/config/taxonomy/ui-concepts.yaml"
     ],
     [
       "drydocs/config/taxonomy",
@@ -35346,12 +36087,52 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/chain_inputs.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/cli_docs.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/cli_ingest.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/cli_plan.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/cli_schema.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/cli_variables.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/cli_verify.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/code_graph_freshness.py"
     ],
     [
       "drydocs/drydocs",
@@ -35427,6 +36208,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/ontology"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/pat_projection.py"
     ],
     [
       "drydocs/drydocs",
@@ -36586,6 +37372,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/notifications.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/ontology"
     ],
     [
@@ -36617,6 +37408,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/ui_concepts.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -36737,6 +37533,11 @@
       "drydocs/drydocs_core/ontology",
       "CONTAINS",
       "drydocs/drydocs_core/ontology/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_core/ontology",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/concept_scheme.py"
     ],
     [
       "drydocs/drydocs_core/ontology",
@@ -37986,12 +38787,22 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
+      "drydocs/knowledge/depgraph-snapshots/debt-metrics.jsonl"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots",
+      "CONTAINS",
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0340.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
       "drydocs/knowledge/depgraph-snapshots/filter_ignored.py"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots",
+      "CONTAINS",
+      "drydocs/knowledge/depgraph-snapshots/metrics_ledger.py"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -38182,6 +38993,11 @@
       "drydocs/knowledge/upgrade-plans/p0-benchmark",
       "CONTAINS",
       "drydocs/knowledge/upgrade-plans/p0-benchmark/persona_queries.json"
+    ],
+    [
+      "drydocs/knowledge/upgrade-plans/p0-benchmark",
+      "CONTAINS",
+      "drydocs/knowledge/upgrade-plans/p0-benchmark/verdicts.yaml"
     ],
     [
       "drydocs/libs",
@@ -38396,6 +39212,16 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/project_pat_team_report.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/render_benchmark_data.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/render_board.py"
     ],
     [
@@ -38457,6 +39283,11 @@
       "drydocs/tests",
       "CONTAINS",
       "drydocs/tests/conftest.py"
+    ],
+    [
+      "drydocs/tests",
+      "CONTAINS",
+      "drydocs/tests/env_drift.py"
     ],
     [
       "drydocs/tests",
@@ -38541,6 +39372,11 @@
     [
       "drydocs/tests/integration",
       "CONTAINS",
+      "drydocs/tests/integration/test_code_snapshot_retraction.py"
+    ],
+    [
+      "drydocs/tests/integration",
+      "CONTAINS",
       "drydocs/tests/integration/test_e2e_load.py"
     ],
     [
@@ -38581,6 +39417,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_agents_app_discovery.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_app_identity_guard.py"
     ],
     [
@@ -38606,6 +39447,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_benchmark_data.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_bmc_docs.py"
     ],
     [
@@ -38626,6 +39472,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_chain_inputs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_classification.py"
     ],
     [
@@ -38636,12 +39487,22 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_code_graph_freshness.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_code_graph_review_plan.py"
     ],
     [
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_code_snapshot_loader.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_code_snapshot_retraction.py"
     ],
     [
       "drydocs/tests/unit",
@@ -38782,6 +39643,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_enforcement_matrix.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_env_drift.py"
     ],
     [
       "drydocs/tests/unit",
@@ -38991,6 +39857,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_metrics_ledger.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_module_boundary.py"
     ],
     [
@@ -39001,12 +39872,22 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_no_render_parsing.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_no_shadow_definitions.py"
     ],
     [
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_node_status_envelope.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_notifications_carry_through.py"
     ],
     [
       "drydocs/tests/unit",
@@ -39022,6 +39903,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_pat_product_mapping.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_pat_projection.py"
     ],
     [
       "drydocs/tests/unit",
@@ -39082,6 +39968,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_publishing.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_query_spec_vocabulary.py"
     ],
     [
       "drydocs/tests/unit",
@@ -39246,6 +40137,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_source_labels.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_source_mapping_drift.py"
     ],
     [
@@ -39281,6 +40177,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_theme_vocabulary.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_tier2.py"
     ],
     [
@@ -39292,6 +40193,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_ui_components.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_ui_concepts.py"
     ],
     [
       "drydocs/tests/unit",
@@ -40163,13 +41069,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2289,
-    "edges": 1032,
+    "files": 2326,
+    "edges": 1129,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2570,
+    "rels": 2607,
     "directories": 282
   }
 }

@@ -190,7 +190,12 @@ try {
 # measured nothing).
 try {
   Push-Location $repo
+  # PS 5.1: a native command's stderr becomes an ErrorRecord under
+  # $ErrorActionPreference = "Stop" (the neo4j driver logs its notifications
+  # there), so relax it for the call and read stdout only.
+  $prevEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
   $fresh = & poetry run drydocs code-graph-freshness 2>$null
+  $ErrorActionPreference = $prevEap
   Pop-Location
   if ($LASTEXITCODE -eq 0 -and $fresh) {
     $line = (($fresh | Where-Object { "$_" -match "code graph:" }) -join " ") -replace "\s+", " "
@@ -492,10 +497,12 @@ Write-Host "wrote $(Split-Path $out -Leaf)  (commit $commit, branch $branch$prTx
 if ($Tree) {
   try {
     Push-Location $repo
+    $prevEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"  # native stderr, see above
     & poetry run python (Join-Path $here "metrics_ledger.py") $out 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -match "debt-metrics" } | ForEach-Object {
       $c = if ($_ -match "appended row") { "Green" } else { "Yellow" }
       Write-Host $_ -ForegroundColor $c
     }
+    $ErrorActionPreference = $prevEap
     Pop-Location
   } catch {
     Pop-Location -ErrorAction SilentlyContinue

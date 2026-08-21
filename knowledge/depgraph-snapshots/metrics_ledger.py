@@ -30,6 +30,7 @@ Usage (from snapshot.ps1, warn-only):
 from __future__ import annotations
 
 import json
+import logging
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
@@ -196,6 +197,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"debt-metrics: snapshot {snapshot} not found — no row written", file=sys.stderr)
         return 2
     sys.path.insert(0, str(REPO))
+    # expected UnknownLabelWarning (SchemaMeta absent from a content DB) — not a row failure
+    logging.getLogger("neo4j.notifications").setLevel(logging.ERROR)
     try:
         from drydocs_core.config import load_settings
         from drydocs_core.neo4j_client import Neo4jClient

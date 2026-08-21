@@ -27,6 +27,7 @@ The comparison is pure (:func:`compare`) so it is unit-testable over fixtures;
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -182,6 +183,10 @@ def check(
     """The I/O wrapper: probe the graph (any failure -> UNREACHABLE, named),
     read the newest snapshot, compare. Never raises, never writes."""
     name, captured = newest_snapshot(snapshot_dir)
+    # The probe says `NOT m:SchemaMeta`, and a content database that never held
+    # the meta-graph answers with an UnknownLabelWarning the driver logs at
+    # WARNING. Expected here; silence the logger for the probe only.
+    logging.getLogger("neo4j.notifications").setLevel(logging.ERROR)
     try:
         with client_factory() as cli:
             rows = cli.run(GRAPH_PROBE)
