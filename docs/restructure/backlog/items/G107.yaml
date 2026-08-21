@@ -1,0 +1,31 @@
+id: G107
+epic: component-topology
+title: Every component opens a LoaderRunLog per batch — G93's remediation run log generalized to lineage,
+  docmeta, deepdoc and the vendor scrape, which produce no run record at all today
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G104
+inputs:
+- drydocs_core/run_log.py
+- drydocs_remediation/
+- drydocs_lineage/
+- drydocs_docmeta/
+- drydocs_deepdoc/
+- scripts/external_vendor_scrape.py
+- docs/decisions/0014-runtime-substrate.md
+acceptance: |
+  The four run cadences that today leave no durable record each open a `LoaderRunLog` per batch, exactly as `drydocs_remediation` does after G93: `drydocs_lineage`, `drydocs_docmeta`, `drydocs_deepdoc`, and `scripts/external_vendor_scrape.py` (which prints to stdout only today). Per component: the run log opens at batch start and closes on both the success and the failure path, carries the same header/summary contract `run_log.py` already defines rather than a per-component variant, and names the batch with the ONE directory naming rule G105 establishes. A test per component drives one batch over fixtures and asserts a run-log file appeared, that it parses, and that an exception inside the batch still closes the log with a failure summary — the failure path is the half that matters, since a run log that only exists when nothing went wrong records the runs nobody needs.
+
+  What this item does NOT do: change any component's output, graph writes, or public interface. It adds a record of the run, nothing else. `poetry run pytest -q`, ruff clean, and `tests/unit/test_module_boundary.py` still green (the run log lives in core; components import core, never each other).
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-152 clause (5).
+
+  MODULE CHOICE, recorded because the entry asked for "per-component items" (plural) and this groom filed ONE: the change is a single mechanical pattern applied four times against one core contract, so four items would fragment one review across four pulls while multiplying the chance the four drift into four slightly different run-log shapes — which is the exact defect the item exists to remove. `module: drydocs-lineage` names the first component in the list; the acceptance enumerates all four so nothing is lost by the single filing. If whoever pulls this finds a component needs materially different treatment, split THAT one out as its own item rather than reshaping this acceptance.
+
+  G93 (drydocs-remediation) is the built precedent and is deliberately not re-done here.

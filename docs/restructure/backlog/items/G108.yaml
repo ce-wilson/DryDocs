@@ -1,0 +1,28 @@
+id: G108
+epic: component-topology
+title: 'drydocs_api logs nothing at all — an audit line for every Cypher-executing route, including
+  /raw-cypher and /specs/{id}/run, with the actor hashed the way :AgentRun already hashes it'
+type: task
+module: drydocs-api
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G104
+inputs:
+- drydocs_api/
+- agents/common/llm_ledger.py
+- docs/decisions/0014-runtime-substrate.md
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  Every `drydocs_api` route that executes Cypher writes one audit record per request — `/raw-cypher` and `/specs/{id}/run` at minimum, plus any sibling found by enumerating the routes rather than by memory (the enumeration is part of the deliverable: the item lists what it found). The component logs NOTHING today, so this is the first record of who asked the graph for what through the API.
+
+  Each record carries: timestamp, route, spec id where one applies, the outcome (rows returned or the error class), elapsed time, and an ACTOR identifier hashed by the same function `:AgentRun` already uses — never a raw actor value, so the record is publishable under the §3 sensitivity rules and cannot become the place a real identity leaks. The record does NOT contain result values; it is an access record, not a data copy. Where the Cypher text itself is recorded, that choice and its size bound are stated in the acceptance of whoever builds it — this item does not silently decide to persist query text.
+
+  The sink is the `RuntimeSettings` log directory via G105's dictConfig, on G105's naming rule; no second logging mechanism is introduced. Tests: one request per Cypher-executing route asserts exactly one audit record, that the actor field never equals the raw input, and that a route raising mid-query still emits a record with the error class. `poetry run pytest -q`, ruff clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-152 clause (6). Module drydocs-api; depends on G104 for the ratified shape and, in practice, on G105 for the sink — sequenced through G104 only, so it does not block on core landing first if the ADR ends up specifying the sink completely.
+
+  Deliberately scoped as an ACCESS record, not query persistence. Idea-152's closing line — that server-side persistence of executed Cypher for ask-search is a separate idea whose owning surface is unknown — is respected here: this item makes the request auditable without deciding where executed Cypher lives.

@@ -1,0 +1,32 @@
+id: R21
+epic: agentic-qa
+title: Neo4j warnings are discarded at three points, so a query built on retired vocabulary presents as
+  an empty answer — carry notifications through the runner into AgentRun and surface them on the admin path
+type: bug
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/
+- agents/common/agent_run_writer.py
+- agents/graph_qa/agent.py
+- web/src/
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  A Neo4j notification raised by a query the console ran is visible to an admin afterwards. Today it is dropped three times over — Ask renders only rows and errors, the API runner discards the driver's notifications, and `AgentRun` telemetry has no field to hold them — so the 2026-08-20 incident produced FOUR non-fatal warnings about retired vocabulary and presented as a clean empty result.
+
+  (1) The API runner stops discarding the driver's notification/summary payload and carries it alongside rows.
+  (2) `AgentRun` telemetry persists it (a warnings payload with, per notification, its code, title, position and severity), written by `agents/common/agent_run_writer.py` on the same run record that already counts the executed Cypher.
+  (3) The ADMIN review path displays it. The end-user Ask answer is NOT changed into an error: a non-fatal warning is not a failure, and turning it into one trades a silent defect for a noisy one. The user-facing surface may show at most a neutral "this answer has diagnostics" affordance; the diagnostics themselves live on the admin path.
+
+  The existing exposure boundary holds unchanged: the console shows router decision, generated Cypher, rows, timings and source — never model prompts or chain-of-thought. Notifications are Neo4j's own output about the query, so they sit on the safe side of that line; the acceptance says so explicitly because "surface more diagnostics" is exactly where that boundary erodes.
+
+  Tests: a run whose Cypher raises a known non-fatal notification (an unknown label is the cheap one) produces an `AgentRun` carrying it, and the admin surface renders it; a clean run carries an empty payload rather than a missing field. Where the test needs a live database it SKIPS naming the venue (J18). `poetry run pytest -q`, `npm run build` and oxlint clean for the admin surface.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-144's second half (see R20 for the first). Module drydocs-api because the runner is where the notifications are dropped first and every downstream fix depends on that one; the `agent_run_writer` and console edits ride along. Epic agentic-qa, phase 15.
+
+  Worth keeping in view for whoever pulls it: `agents/graph_qa/agent.py` swallows telemetry failures bare (same survey, Idea-152 finding (c)), so a telemetry write that fails while storing these warnings would itself be silent. G105 makes that swallow log at warning; the two items are independent but this one is less useful without it.

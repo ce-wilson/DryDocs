@@ -63,3 +63,18 @@ groom_log:
 - date: '2026-08-12'
   note: ── 2026-08-12 targeted groom (Idea-112 / Idea-113 / Idea-114) ──────────────
   attached_at: G92
+- date: '2026-08-21'
+  note: |-
+    ── 2026-08-21 groom (laptop) — Idea-152's runtime substrate, filed here for want of
+       its own epic ──────────────────────────────────────────────────────────────
+    G104-G109 are the six-item chain Idea-152 asked for in writing: the ADR (G104,
+    Proposed only — acceptance is the user's), then core settings + dictConfig (G105),
+    `drydocs prune-logs` (G106), per-component LoaderRunLog (G107), the API audit line
+    (G108) and the data-zone declaration (G109). No runtime-substrate epic exists and a
+    groom cannot mint one, so the chain sits in component-topology / phase 6 — the epic
+    that already owns cross-component structural rulings and already holds an ADR-drafting
+    item (G53). A dedicated epic is PROPOSED TO THE USER; taking it moves `epic:`, not ids.
+    G110 is unrelated: the residue of Idea-141's poetry-group review (verdict
+    do-not-recommend), namely MODULE_MAP contradicting the boundary test and four unpinned
+    agent-runtime dependencies.
+  attached_at: G104

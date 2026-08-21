@@ -1,0 +1,32 @@
+id: O64
+epic: web-console
+title: Ask loses the last completed question and answer on any navigation away and back — persist one
+  completed turn per persona in browser-local storage
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/src/routes/AskRoute.tsx
+- web/src/ask/
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  Navigating from Ask to Explorer and back restores the LAST COMPLETED turn — the question as asked and the answer as returned — instead of an empty panel. `AskRoute` keeps turns in component state today, so React unmounts the route and the turn is gone.
+
+  Scope, stated as three boundaries because each one is a way to get this wrong:
+  (1) **One completed turn per persona**, keyed by persona, not a growing history — this phase is restoring what the user just saw, not building a transcript feature.
+  (2) **Completed turns only.** An in-progress turn (request in flight) and a FAILED turn are never persisted: restoring a spinner that no request is behind, or re-presenting a stale error as if it were current, are both worse than the empty panel this fixes.
+  (3) **Browser-local storage for this phase**, and the existing TTL-bound explore-ref behavior stays explicit rather than being absorbed into the new store — if a persisted turn references an expired explore-ref, the turn still renders and the reference degrades visibly.
+
+  A test drives ask → navigate away → navigate back and asserts the completed turn is restored, that a failed turn is not, and that switching persona shows that persona's turn (or nothing) rather than the other's. `config/taxonomy/ui-components.yaml` and `ui-tests.yaml` rows updated per the standing console convention. `npm run build` and oxlint clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-143 (2026-08-20, prio proposed High), captured live in the console. Module drydocs-web / epic web-console / phase 12 by the O57 rule — file by the SURFACE delivered, not by where the data originates; the storage is browser-side, so nothing here touches the agents runtime or the API.
+
+  Filed p1 as proposed: this is a data-loss defect on the console's headline surface, and the workaround is retyping the question.
+
+  Idea-143 was captured ABOVE the `## Inbox` header (misfiled at capture, in the "How this feeds the backlog" section); grooming it to the audit trail corrects that as a side effect.

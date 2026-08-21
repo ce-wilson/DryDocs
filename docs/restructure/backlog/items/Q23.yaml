@@ -1,0 +1,36 @@
+id: Q23
+epic: docmeta
+title: A scrape run and the doc-source-registry row it fulfils are not joined — stamp the registry id
+  in the run manifest, and give the row captured_at + manifest the way bmc-docs-controlm-utilities has them
+type: task
+module: drydocs-docmeta
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/doc-source-registry.yaml
+- drydocs_docmeta/connectors/
+- scripts/external_vendor_scrape.py
+- config/doc-capture.yaml
+- docs/reviews/port-review-7c18ff4b-20260820.md
+acceptance: |
+  A VERBATIM trust claim on a `doc-source-registry` row traces to a RUN ID rather than to prose.
+
+  The gap, found at the 7c18ff4b port review: the `fcdo-frameworks` row was upgraded to VERBATIM on 2026-08-19 on the strength of a run keyed by a Confluence SPACE plus a free-text `--purpose` string — neither of which is a registry id — so the SME had to pick the space by hand because the tie-in to the row was not expressible. The join precedent already exists ONE ROW OVER: `bmc-docs-controlm-utilities` carries `captured_at`, a `manifest:` path to its `capture-manifest.json` whose capture id is stamped by `scripts/external_vendor_scrape.py`, and a `graph_locator` keyed by `corpus_id`.
+
+  (a) The scrape tool takes a `--registry-id` (or resolves `--purpose` to exactly one row and fails when it is ambiguous) and writes that id into the run manifest. An unresolvable or absent id is an error, not a warning — a run that cannot say which row it fulfils is the case this item exists to remove.
+  (b) The registry row gains `captured_at` and `manifest` at capture time, and `graph_locator` at load time, following the `bmc-docs-controlm-utilities` shape rather than a new one.
+  (c) A test asserts the round trip: a run against a fixture row produces a manifest naming that id, and the row's `manifest` path resolves to it.
+
+  PORT BOUNDARY, and it is why this item cannot just widen the schema: J51 ruled `config/doc-source-registry.yaml` PER-ENTRY with a FIELD split, and `captured_at` / `manifest` / `graph_locator` are COMPANY-OWNED facts that never cross at a port, while producer fields do. Whatever this item adds must stay inside that split — the producer defines the FIELD and the mechanism; it does not carry the company's VALUES. `tests/unit/test_port_manifest.py` and `test_port_reconcile_guards.py` stay green, and the J16 fall-through guard must see no new default.
+
+  `poetry run pytest -q`, ruff clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-148 (2026-08-20, prio proposed Med), captured at the 7c18ff4b port review. Note the entry's own numbering history: it was first captured as 147, collided with the ui-workstream branch's Idea-143..147, and was re-issued as 148 — a live instance of the concurrent-allocator hazard the IDEAS.md band rule was written for.
+
+  MODULE, checked rather than assumed: `MODULE_MAP.md` places the doc-source-registry ledger and the capture pipeline under `drydocs_docmeta/**`, sharing `config/doc-capture.yaml` with `scripts/external_vendor_scrape.py` "so one number governs both doors" — the same reasoning applies to the registry id, so both doors are in scope and the item is filed drydocs-docmeta / docmeta / phase 14 alongside Q12 and Q13.
+
+  Sibling of J51 (the doc-source-registry manifest row from the same review); this item is the mechanism half, J51 was the port-disposition half.

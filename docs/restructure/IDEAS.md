@@ -13,23 +13,6 @@ tombstone) with an id, owner agent, inputs, and an acceptance test.
 capture here (any surface)  ──groom──▶  backlog/items/<id>.yaml  ──▶  agent pulls it
 ```
 
-- **`Idea-143`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
-  Ask loses the last completed question and answer when navigating to Explorer and back because
-  `AskRoute` keeps turns only in component state. Persist the last completed turn per persona in
-  browser-local storage for this phase; do not persist in-progress or failed turns, and keep the
-  existing TTL-bound explore-ref behavior explicit.
-
-- **`Idea-144`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
-  Ask test question `how many folders and jobs does each tower support?` routes to
-  `explorer.folder-applications.v1`, gets 0 rows, then falls back to schema-grounded Cypher that
-  references stale graph vocabulary: `BELONGS_TO_APPLICATION`, `HAS_PORT`, `:Port`,
-  `:SchemaMeta`, and `active_state`. Neo4j emits four non-fatal warnings, so the answer presents
-  an empty result while Explorer can show synthesized data. Admins cannot currently see those
-  warnings: Ask renders only rows/errors, the API runner discards Neo4j notifications, and
-  `AgentRun` telemetry stores no warning payload. Fix the registered spec against the current
-  graph schema, add a live vocabulary/spec smoke check, and surface warning diagnostics to the
-  admin review path without exposing them as an end-user error.
-
 **Grooming ritual** (you, or an Opus `main` session, ~weekly): read this list top to bottom;
 for each idea either (a) promote it to a backlog item file (`backlog/items/<id>.yaml`), (b) merge it into an existing
 item, or (c) drop it. Strike through or delete what's been groomed so the inbox stays short.
@@ -110,158 +93,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-152`** · 2026-08-20 · `[idea]` · **open** · prio **High** —
-  **Log/config substrate: the log directory is env-var-only, two run-log families plus a
-  JSONL ledger share one directory under two naming rules with no rotation, and
-  `AppSettings.log_level` is wired to nothing.** Captured from a 2026-08-20 survey of this
-  repo beside a sister internal project's logging layer (mechanism only; no names or paths
-  carried). What the survey found here: (a) `drydocs_core/run_log.py` resolves
-  `DRYDOCS_LOGDIR` → `SPIDERP_LOGDIR` → `~/logs/DryDocs`; `adapters/sql_run_log.py` honors
-  only the legacy var; `agents/common/llm_ledger.py` writes a per-DAY `qa.graph_qa.<YYYYmmdd>
-  .jsonl` beside per-RUN `<kind>.<name>.<ts>.log` files; none rotate, cap, or sweep.
-  (b) `cli.py:715` is the sole `basicConfig` — level comes from `--verbose` only; stderr
-  only; `DRYDOCS_LOGDIR` never receives console output. (c) `drydocs_api` (incl.
-  `/raw-cypher`, `/specs/{id}/run`) logs nothing; `drydocs_remediation` (G93), `_lineage`,
-  `_docmeta`, `_deepdoc` have no logger; `scripts/external_vendor_scrape.py` prints only;
-  `agents/graph_qa/agent.py:70-77` swallows telemetry failures bare. (d) `.env.example`
-  documents neither `DRYDOCS_LOGDIR` nor `DRYDOCS_DATA_ROOT`. (e) Data-root drift: registry
-  `dpl/` vs code `dpl-registry/`; six code zones (`email-extracts`, `context-intake`,
-  `vendor-docs`, `remediation/*`, `cmdline-staging`, `catalog`) have no `source-registry`
-  row so `drydocs landing-zones --check` is blind to them; the Confluence capture lands
-  in-tree, against `landing_zones.py`'s tracked-only rule. **The pattern worth adopting
-  from the sister project**, as a sample: one factory module owning `get_logger(app)`;
-  per-key resolution *env var → config-file key → fallback arg → error* over a small
-  key file —
-  `LOG_ROOT=<base>/log_files`, `CONSOLE_LOG_DIR=<base>/log_files/console`,
-  `<INTEGRATION>_LOG_DIR=<base>/log_files/<integration>` (relative = repo-root-anchored,
-  env overrides); files `<app>/<stream>_<YYYYMMDD>_<HHMMSS>.log` under a per-app rotating
-  handler with a size quota, N-day retention, and a background sweeper. Its recorded
-  gotchas are the anti-checklist: level hardcoded with no env override; Linux-absolute
-  default that breaks on Windows; silent fallback to the local profile on a misconfigured
-  box; process-start timestamp in local time so all files share one stamp; sweeper
-  registry growing unbounded when `get_logger` is called with per-incident names.
-  **Proposed ADR 0014 "runtime substrate: logs, settings, data zones"** (next free number;
-  must reconcile with ADR 0009, which already makes git YAML the settings source of truth):
-  (1) one `RuntimeSettings` group (`DRYDOCS_` prefix, pydantic-settings like `config.py`)
-  carrying `log_dir`, `log_level`, `log_retention_days`, `data_root` — `.env`-readable,
-  env-overridable, defaults unchanged; `SPIDERP_*` kept one cycle as deprecated aliases,
-  then `DRYDOCS_*` only on both families (symmetry with the data root, which has no
-  legacy var). (2) stdlib `logging.config.dictConfig` from that group, no new runtime dep:
-  console + a JSON-lines file sink in `log_dir`, level from settings, `--verbose` still
-  wins; `run_log.py`'s header/summary contract unchanged. (3) ONE naming rule for the
-  directory — `<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}` — and the ledger moves to it
-  (or the exception is documented). (4) `drydocs prune-logs` mirroring `prune-snapshots`
-  (age + size, dry-run default) instead of a daemon sweeper. (5) every component opens a
-  `LoaderRunLog` per batch (G93 generalized to lineage/docmeta/deepdoc/scrape). (6) an API
-  request/audit line for every Cypher-executing route, actor hashed like `AgentRun`.
-  (7) the data-zone map gets a single declaration — `source-registry.yaml` rows for the six
-  undeclared zones, `dpl-registry` reconciled, `data_root.py` resolvers derived from the
-  rows — and `.env.example` gains both roots. Groom into: the ADR; a core item (1-3);
-  a load item (4); per-component items (5); an api item (6); a config item (7). The
-  ask-search logging request (executed Cypher never persisted server-side; only counted
-  on `:AgentRun`) is a separate idea once its owner surface is known.
-
-- **`Idea-151`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
-  **A bare one-key claim commit goes RED in CI: the pushed-claim protocol and the roadmap
-  stale-render guard contradict each other.** First hit 2026-08-20 (laptop), the first
-  post-shard claim: flipping `items/D10.yaml` to `in_progress` and pushing — exactly what
-  the Y2 claim ritual prescribes — failed `test_plan_roadmap.py::
-  test_committed_roadmap_page_matches_its_sources` on CI (run 32440366508), because
-  `roadmap.html` derives item statuses and the claim commit ships no regen. The close-out
-  commit went green, so the failure window is precisely the work interval the claim exists
-  to cover — every correctly-claimed item now spends its whole in-flight life with CI red
-  at the claim sha, which trains sessions to read red as noise (the exact habit Idea-111
-  fought). Either the claim ritual gains "run `render_board.py` in the claim commit" (cheap,
-  but no longer one-key) or the stale-render guards learn to tolerate status-only drift
-  (scoping question). Groom decides; don't leave both rules standing as written.
-
-- **`Idea-150`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
-  **`snapshot.ps1` cannot find the depgraph sibling when run from a git worktree, so the
-  session ritual's last step is unavailable to exactly the sessions CLAUDE.md tells to use
-  worktrees.** Line 172 resolves the instrument as `"$here\..\..\..\depgraph"`, three hops up
-  from `knowledge/depgraph-snapshots`. From the main checkout that lands on
-  `C:\coding\projects\depgraph` and is correct; from
-  `.claude/worktrees/<name>` the same three hops land on
-  `.claude/worktrees/depgraph`, which does not exist, and the script dies with
-  `Resolve-Path : Cannot find path`. Hit at the O57 session close 2026-08-20: everything
-  before it succeeded — all renders written, `ci: GREEN at HEAD c583b76` reported by the
-  script's own check — and only the JSON write was lost, so the session produced no drift
-  record. `tests/unit/test_probe_instrument.py:252` SKIPS for the same reason and with the
-  same wrong path in its message (`depgraph sibling checkout absent at
-  ...\worktrees\depgraph`), so the two agree with each other while both being wrong about
-  where the sibling is. The fix is to resolve the repo's MAIN working tree rather than count
-  directory hops — `git rev-parse --path-format=absolute --git-common-dir` gives the shared
-  `.git`, whose parent is the main checkout, and it returns the same answer from a worktree
-  and from the checkout itself. Worth doing in the same pass for the test's skip path.
-  Mechanism-only, no gate. Not fixed inside the O57 session deliberately: this is a shared
-  instrument, the ritual step that records repo structure, and it cannot be honestly verified
-  from a worktree without also exercising it from the main checkout.
-
-- **`Idea-149`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
-  **`ModuleIcon`'s switch has no `default` and no exhaustiveness check, so a new console
-  module renders in the nav as bare text with no error anywhere.** Hit at the O57 build:
-  `loadmap` was added to `ModuleId` and to `MODULES`, the page worked, the build and oxlint
-  were clean, and the Aside entry simply had no glyph — noticed only because a screenshot was
-  being read. The file ALREADY documents the hazard in a comment on the `software` case
-  ("this switch has no `default`, so a missing case returns undefined and the glyph silently
-  vanishes from both the aside and the Overview hub with no compiler error"), which makes this
-  a known trap that keeps being paid for rather than a discovery. The cheap fix is the standard
-  TS exhaustiveness guard — a `default` branch assigning the parameter to `never`, so the NEXT
-  missing case is a compile error at the point of omission instead of a silent gap on two
-  surfaces. Deliberately NOT done inside O57: that item's acceptance is the load-map surface,
-  and changing a shared component's return contract is its own change with its own blast
-  radius (12 modules + the Overview hub). Mechanism-only, no gate — nothing here touches edge
-  semantics.
-
-- **`Idea-148`** · 2026-08-20 · `[idea]` · **open** · prio? **Med** —
-  **A scrape run and the registry row it fulfils are not joined — `drydocs-scrape` should
-  stamp the `doc-source-registry` id in its run manifest, and the row should carry
-  `captured_at` + `manifest` the way `bmc-docs-controlm-utilities` already does.** Found at
-  the 7c18ff4b port review: the `fcdo-frameworks` row was upgraded to VERBATIM producer-side
-  on 2026-08-19 on the strength of a company run that was keyed by SPACE + a free-text
-  `--purpose` string, neither of which is a registry id — the SME chose the space by hand
-  because the tie-in to the row was not expressible. The join precedent EXISTS one row over:
-  `bmc-docs-controlm-utilities` carries `captured_at`, a `manifest:` path to its
-  `capture-manifest.json` (capture id stamped by `external_vendor_scrape.py`), and a
-  `graph_locator` by `corpus_id`. The fix is mechanism-only: (a) the scrape tool takes a
-  `--registry-id` (or resolves `--purpose` to one) and writes it into the run manifest;
-  (b) the registry row gains `captured_at` + `manifest` at capture and `graph_locator` at
-  load, so a VERBATIM claim traces to a run id instead of to prose ("the 2026-08-19 fetch").
-  Numbered 148 at the ui-workstream merge: that branch had already minted Idea-143..147, so the 147 this entry first carried collided and was re-issued here. Sibling of
-  the J51 doc-source-registry finding (same review): the fields (b) adds are COMPANY-owned
-  facts, which is why that file needs a per-entry row before they exist.
-
 - **`Idea-142`** · 2026-08-20 · `[bug]` · **closed → J51 DONE 2026-08-20 (six rows landed, same day it was groomed (2026-08-20, desktop, at the port review — the caa0406 report named five more paths; F4 status-direction ruled same day into the entry_rule + ADR 0013)** · prio? **High** —
-- **`Idea-145`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
-  Dark-mode UI contrast defect: the shared React controls on the left vertical rail and the Source
-  panel at the bottom right retain the same light-surface styling as light mode. The off-white
-  control box is stark against the dark page and does not provide an intentional dark-mode surface.
-  Audit the shared control/source styles and theme tokens; dark mode should use the page's dark
-  panel/background tokens while preserving readable text, borders, focus states, and source
-  affordances. Verify both light and dark screenshots after the fix.
-
-- **`Idea-146`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
-  Ask question `how many towers are there` returned `0` from generated Cypher
-  `MATCH (t:TOMRole) WHERE t.name CONTAINS 'Tower' OR t.name CONTAINS 'tower' RETURN count(DISTINCT t) AS tower_count`,
-  while `/explorer` defines Tower as a synthesized UI concept (`Tower / app drill-down graph · backs onto drydocs`)
-  backed by the in-repo `TOWERS` definitions. No registered QuerySpec matched, so the router correctly
-  escalated to Tier 1; the text2cypher model then selected the real `TOMRole` graph label as a proxy for
-  the UI term, but TOMRole is not the Explorer Tower definition. The answer therefore reports 0 towers
-  without explaining the semantic mismatch. The UI exposes the safe execution trace (router, generated
-  Cypher, rows, timings, source) but not model prompts or chain-of-thought. Add an explicit Tower
-  definition/source contract and a registered count spec or semantic mapping so this question cannot
-  silently cross from synthesized UI taxonomy to TOM ontology.
-
-- **`Idea-147`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
-  Ownership graph relationship labels are occluded by nodes in the left-to-right K4 qualified-
-  attribution layout. `/ownership` shows `EXAMPLE DATA · ILLUSTRATIVE — K4 qualified-attribution
-  shape`, but relationship names render behind nodes and are unreadable. Explorer's
-  `Tower / app drill-down graph · backs onto drydocs` and Lineage's `Source → target DAG · backs
-  onto drydocs` keep relationship names readable as overlays. Ownership should use the same
-  readable overlay treatment while preserving dark/light theme tokens, arrows, and the existing
-  left-to-right relationship direction.
-
-- **`Idea-141`** · 2026-08-20 · `[idea]` · **open — architect review DONE 2026-08-20, verdict: do-not-recommend as framed** · prio? **Low** —
+- **`Idea-141`** · 2026-08-20 · `[idea]` · **open — architect review DONE 2026-08-20, verdict: do-not-recommend as framed; the “worth doing regardless” residue groomed → G110 (2026-08-21); the four open questions stay the user’s** · prio? **Low** —
   **Should `agents/` stop carrying its own venv + `requirements.txt` and become an optional
   poetry group (`poetry install --with agents`), matching `[tool.poetry.group.api]` and
   `[tool.poetry.group.remediation]`?** Raised 2026-08-20 when the Ask spoke would not answer and
@@ -1497,6 +1330,175 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **FILED 2026-08-21 (laptop, groom of the open inbox)** — **Promoted 17, inboxed 0 new, merged 0, marked-in-place 1.** New items: **G104–G109**, the six-item runtime-substrate chain Idea-152 asked for in writing (G104 ADR 0014 DRAFTED-Proposed only — acceptance is the user’s and must reconcile with ADR 0009; G105 the `RuntimeSettings` group + `dictConfig`; G106 `drydocs prune-logs`; G107 per-component `LoaderRunLog`; G108 the API audit line; G109 the data-zone declaration) — filed under **component-topology / phase 6 for want of a runtime-substrate epic, which a groom cannot mint; a dedicated epic is PROPOSED TO THE USER** and taking it moves `epic:`, not ids. **G110** the Idea-141 residue (MODULE_MAP contradicts the boundary test; four agent-runtime dependencies unpinned). **O64–O67** the four console defects (Ask loses the last completed turn; dark mode never reaches the shared controls; /ownership labels render behind the nodes; `ModuleIcon` has no exhaustiveness guard). **R20–R22**, one Ask incident split into three separable defects — stale spec vocabulary, discarded Neo4j notifications, and the synthesized UI term *Tower* proxied onto `:TOMRole`; **module drydocs-api on all three, verified at the groom (the QuerySpec registry is `drydocs_api/query_specs.py`, not `agents/`)**, and R22 carries the gate boundary in its acceptance. **Q23** the scrape-run ↔ registry-row join, bounded by J51’s per-entry FIELD split. **U26** snapshot.ps1’s three-hop sibling resolution, which dies in every worktree — and its test’s skip path resolves it the same wrong way, so the two agree while both are wrong. **Y5** the claim-commit-vs-stale-render contradiction: Idea-151 asked the groom to decide and it did — **option (b), the guards tolerate status-only drift**, because option (a) puts generated files into every claim commit and recreates the shared-line conflict Y2’s sharding removed. **One marked in place, not moved:** Idea-141 — the poetry-group verdict and its four open questions stand; only the residue was groomed. **No note was parked as a new `[question]`:** every open entry was either actionable or already the user’s. **No plan change** — every item lands in an existing epic and phase, with the runtime-substrate epic proposed rather than created. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-104 (which MFT route-id shape is real), Idea-93 (E1’s status), Idea-74 (does DryDocs ingest the SNOW queue/group export, and which side), Idea-34 (the AIS acronym entry), Idea-33 (the unlocated typo), Idea-32 (the Oracle-connection scope), Idea-28 (the tier-1/tier-2 app-code enumeration — SME data entry), Idea-17 (two local relics, destructive), Idea-16 (the SNYK_TOKEN repo secret — no agent can set one), and Idea-141’s four packaging questions.
+
+- **`Idea-152`** · 2026-08-20 · `[idea]` · **groomed → G104–G109 (2026-08-21; the ADR is DRAFTED-only, acceptance is the user’s)** · prio **High** —
+  **Log/config substrate: the log directory is env-var-only, two run-log families plus a
+  JSONL ledger share one directory under two naming rules with no rotation, and
+  `AppSettings.log_level` is wired to nothing.** Captured from a 2026-08-20 survey of this
+  repo beside a sister internal project's logging layer (mechanism only; no names or paths
+  carried). What the survey found here: (a) `drydocs_core/run_log.py` resolves
+  `DRYDOCS_LOGDIR` → `SPIDERP_LOGDIR` → `~/logs/DryDocs`; `adapters/sql_run_log.py` honors
+  only the legacy var; `agents/common/llm_ledger.py` writes a per-DAY `qa.graph_qa.<YYYYmmdd>
+  .jsonl` beside per-RUN `<kind>.<name>.<ts>.log` files; none rotate, cap, or sweep.
+  (b) `cli.py:715` is the sole `basicConfig` — level comes from `--verbose` only; stderr
+  only; `DRYDOCS_LOGDIR` never receives console output. (c) `drydocs_api` (incl.
+  `/raw-cypher`, `/specs/{id}/run`) logs nothing; `drydocs_remediation` (G93), `_lineage`,
+  `_docmeta`, `_deepdoc` have no logger; `scripts/external_vendor_scrape.py` prints only;
+  `agents/graph_qa/agent.py:70-77` swallows telemetry failures bare. (d) `.env.example`
+  documents neither `DRYDOCS_LOGDIR` nor `DRYDOCS_DATA_ROOT`. (e) Data-root drift: registry
+  `dpl/` vs code `dpl-registry/`; six code zones (`email-extracts`, `context-intake`,
+  `vendor-docs`, `remediation/*`, `cmdline-staging`, `catalog`) have no `source-registry`
+  row so `drydocs landing-zones --check` is blind to them; the Confluence capture lands
+  in-tree, against `landing_zones.py`'s tracked-only rule. **The pattern worth adopting
+  from the sister project**, as a sample: one factory module owning `get_logger(app)`;
+  per-key resolution *env var → config-file key → fallback arg → error* over a small
+  key file —
+  `LOG_ROOT=<base>/log_files`, `CONSOLE_LOG_DIR=<base>/log_files/console`,
+  `<INTEGRATION>_LOG_DIR=<base>/log_files/<integration>` (relative = repo-root-anchored,
+  env overrides); files `<app>/<stream>_<YYYYMMDD>_<HHMMSS>.log` under a per-app rotating
+  handler with a size quota, N-day retention, and a background sweeper. Its recorded
+  gotchas are the anti-checklist: level hardcoded with no env override; Linux-absolute
+  default that breaks on Windows; silent fallback to the local profile on a misconfigured
+  box; process-start timestamp in local time so all files share one stamp; sweeper
+  registry growing unbounded when `get_logger` is called with per-incident names.
+  **Proposed ADR 0014 "runtime substrate: logs, settings, data zones"** (next free number;
+  must reconcile with ADR 0009, which already makes git YAML the settings source of truth):
+  (1) one `RuntimeSettings` group (`DRYDOCS_` prefix, pydantic-settings like `config.py`)
+  carrying `log_dir`, `log_level`, `log_retention_days`, `data_root` — `.env`-readable,
+  env-overridable, defaults unchanged; `SPIDERP_*` kept one cycle as deprecated aliases,
+  then `DRYDOCS_*` only on both families (symmetry with the data root, which has no
+  legacy var). (2) stdlib `logging.config.dictConfig` from that group, no new runtime dep:
+  console + a JSON-lines file sink in `log_dir`, level from settings, `--verbose` still
+  wins; `run_log.py`'s header/summary contract unchanged. (3) ONE naming rule for the
+  directory — `<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}` — and the ledger moves to it
+  (or the exception is documented). (4) `drydocs prune-logs` mirroring `prune-snapshots`
+  (age + size, dry-run default) instead of a daemon sweeper. (5) every component opens a
+  `LoaderRunLog` per batch (G93 generalized to lineage/docmeta/deepdoc/scrape). (6) an API
+  request/audit line for every Cypher-executing route, actor hashed like `AgentRun`.
+  (7) the data-zone map gets a single declaration — `source-registry.yaml` rows for the six
+  undeclared zones, `dpl-registry` reconciled, `data_root.py` resolvers derived from the
+  rows — and `.env.example` gains both roots. Groom into: the ADR; a core item (1-3);
+  a load item (4); per-component items (5); an api item (6); a config item (7). The
+  ask-search logging request (executed Cypher never persisted server-side; only counted
+  on `:AgentRun`) is a separate idea once its owner surface is known.
+
+- **`Idea-151`** · 2026-08-20 · `[bug]` · **groomed → Y5 (2026-08-21; RULED at the groom as option (b) — the stale-render guards tolerate status-only drift)** · prio? **Med** —
+  **A bare one-key claim commit goes RED in CI: the pushed-claim protocol and the roadmap
+  stale-render guard contradict each other.** First hit 2026-08-20 (laptop), the first
+  post-shard claim: flipping `items/D10.yaml` to `in_progress` and pushing — exactly what
+  the Y2 claim ritual prescribes — failed `test_plan_roadmap.py::
+  test_committed_roadmap_page_matches_its_sources` on CI (run 32440366508), because
+  `roadmap.html` derives item statuses and the claim commit ships no regen. The close-out
+  commit went green, so the failure window is precisely the work interval the claim exists
+  to cover — every correctly-claimed item now spends its whole in-flight life with CI red
+  at the claim sha, which trains sessions to read red as noise (the exact habit Idea-111
+  fought). Either the claim ritual gains "run `render_board.py` in the claim commit" (cheap,
+  but no longer one-key) or the stale-render guards learn to tolerate status-only drift
+  (scoping question). Groom decides; don't leave both rules standing as written.
+
+- **`Idea-150`** · 2026-08-20 · `[bug]` · **groomed → U26 (2026-08-21)** · prio? **Med** —
+  **`snapshot.ps1` cannot find the depgraph sibling when run from a git worktree, so the
+  session ritual's last step is unavailable to exactly the sessions CLAUDE.md tells to use
+  worktrees.** Line 172 resolves the instrument as `"$here\..\..\..\depgraph"`, three hops up
+  from `knowledge/depgraph-snapshots`. From the main checkout that lands on
+  `C:\coding\projects\depgraph` and is correct; from
+  `.claude/worktrees/<name>` the same three hops land on
+  `.claude/worktrees/depgraph`, which does not exist, and the script dies with
+  `Resolve-Path : Cannot find path`. Hit at the O57 session close 2026-08-20: everything
+  before it succeeded — all renders written, `ci: GREEN at HEAD c583b76` reported by the
+  script's own check — and only the JSON write was lost, so the session produced no drift
+  record. `tests/unit/test_probe_instrument.py:252` SKIPS for the same reason and with the
+  same wrong path in its message (`depgraph sibling checkout absent at
+  ...\worktrees\depgraph`), so the two agree with each other while both being wrong about
+  where the sibling is. The fix is to resolve the repo's MAIN working tree rather than count
+  directory hops — `git rev-parse --path-format=absolute --git-common-dir` gives the shared
+  `.git`, whose parent is the main checkout, and it returns the same answer from a worktree
+  and from the checkout itself. Worth doing in the same pass for the test's skip path.
+  Mechanism-only, no gate. Not fixed inside the O57 session deliberately: this is a shared
+  instrument, the ritual step that records repo structure, and it cannot be honestly verified
+  from a worktree without also exercising it from the main checkout.
+
+- **`Idea-149`** · 2026-08-20 · `[bug]` · **groomed → O67 (2026-08-21)** · prio? **Med** —
+  **`ModuleIcon`'s switch has no `default` and no exhaustiveness check, so a new console
+  module renders in the nav as bare text with no error anywhere.** Hit at the O57 build:
+  `loadmap` was added to `ModuleId` and to `MODULES`, the page worked, the build and oxlint
+  were clean, and the Aside entry simply had no glyph — noticed only because a screenshot was
+  being read. The file ALREADY documents the hazard in a comment on the `software` case
+  ("this switch has no `default`, so a missing case returns undefined and the glyph silently
+  vanishes from both the aside and the Overview hub with no compiler error"), which makes this
+  a known trap that keeps being paid for rather than a discovery. The cheap fix is the standard
+  TS exhaustiveness guard — a `default` branch assigning the parameter to `never`, so the NEXT
+  missing case is a compile error at the point of omission instead of a silent gap on two
+  surfaces. Deliberately NOT done inside O57: that item's acceptance is the load-map surface,
+  and changing a shared component's return contract is its own change with its own blast
+  radius (12 modules + the Overview hub). Mechanism-only, no gate — nothing here touches edge
+  semantics.
+
+- **`Idea-148`** · 2026-08-20 · `[idea]` · **groomed → Q23 (2026-08-21)** · prio? **Med** —
+  **A scrape run and the registry row it fulfils are not joined — `drydocs-scrape` should
+  stamp the `doc-source-registry` id in its run manifest, and the row should carry
+  `captured_at` + `manifest` the way `bmc-docs-controlm-utilities` already does.** Found at
+  the 7c18ff4b port review: the `fcdo-frameworks` row was upgraded to VERBATIM producer-side
+  on 2026-08-19 on the strength of a company run that was keyed by SPACE + a free-text
+  `--purpose` string, neither of which is a registry id — the SME chose the space by hand
+  because the tie-in to the row was not expressible. The join precedent EXISTS one row over:
+  `bmc-docs-controlm-utilities` carries `captured_at`, a `manifest:` path to its
+  `capture-manifest.json` (capture id stamped by `external_vendor_scrape.py`), and a
+  `graph_locator` by `corpus_id`. The fix is mechanism-only: (a) the scrape tool takes a
+  `--registry-id` (or resolves `--purpose` to one) and writes it into the run manifest;
+  (b) the registry row gains `captured_at` + `manifest` at capture and `graph_locator` at
+  load, so a VERBATIM claim traces to a run id instead of to prose ("the 2026-08-19 fetch").
+  Numbered 148 at the ui-workstream merge: that branch had already minted Idea-143..147, so the 147 this entry first carried collided and was re-issued here. Sibling of
+  the J51 doc-source-registry finding (same review): the fields (b) adds are COMPANY-owned
+  facts, which is why that file needs a per-entry row before they exist.
+
+- **`Idea-147`** · 2026-08-20 · `[bug]` · **groomed → O66 (2026-08-21)** · prio? **High** —
+  Ownership graph relationship labels are occluded by nodes in the left-to-right K4 qualified-
+  attribution layout. `/ownership` shows `EXAMPLE DATA · ILLUSTRATIVE — K4 qualified-attribution
+  shape`, but relationship names render behind nodes and are unreadable. Explorer's
+  `Tower / app drill-down graph · backs onto drydocs` and Lineage's `Source → target DAG · backs
+  onto drydocs` keep relationship names readable as overlays. Ownership should use the same
+  readable overlay treatment while preserving dark/light theme tokens, arrows, and the existing
+  left-to-right relationship direction.
+
+- **`Idea-146`** · 2026-08-20 · `[bug]` · **groomed → R22 (2026-08-21; the item may declare Tower’s source is NOT the graph, but any BINDING to graph vocabulary routes through the HITL gate)** · prio? **High** —
+  Ask question `how many towers are there` returned `0` from generated Cypher
+  `MATCH (t:TOMRole) WHERE t.name CONTAINS 'Tower' OR t.name CONTAINS 'tower' RETURN count(DISTINCT t) AS tower_count`,
+  while `/explorer` defines Tower as a synthesized UI concept (`Tower / app drill-down graph · backs onto drydocs`)
+  backed by the in-repo `TOWERS` definitions. No registered QuerySpec matched, so the router correctly
+  escalated to Tier 1; the text2cypher model then selected the real `TOMRole` graph label as a proxy for
+  the UI term, but TOMRole is not the Explorer Tower definition. The answer therefore reports 0 towers
+  without explaining the semantic mismatch. The UI exposes the safe execution trace (router, generated
+  Cypher, rows, timings, source) but not model prompts or chain-of-thought. Add an explicit Tower
+  definition/source contract and a registered count spec or semantic mapping so this question cannot
+  silently cross from synthesized UI taxonomy to TOM ontology.
+
+- **`Idea-145`** · 2026-08-20 · `[bug]` · **groomed → O65 (2026-08-21; filed p2 against this entry’s proposed High — presentation, not correctness)** · prio? **High** —
+  Dark-mode UI contrast defect: the shared React controls on the left vertical rail and the Source
+  panel at the bottom right retain the same light-surface styling as light mode. The off-white
+  control box is stark against the dark page and does not provide an intentional dark-mode surface.
+  Audit the shared control/source styles and theme tokens; dark mode should use the page's dark
+  panel/background tokens while preserving readable text, borders, focus states, and source
+  affordances. Verify both light and dark screenshots after the fix.
+
+- **`Idea-144`** · 2026-08-20 · `[bug]` · **groomed → R20 + R21 (2026-08-21; the spec/vocabulary half and the discarded-warnings half land in different code)** · prio? **High** —
+  Ask test question `how many folders and jobs does each tower support?` routes to
+  `explorer.folder-applications.v1`, gets 0 rows, then falls back to schema-grounded Cypher that
+  references stale graph vocabulary: `BELONGS_TO_APPLICATION`, `HAS_PORT`, `:Port`,
+  `:SchemaMeta`, and `active_state`. Neo4j emits four non-fatal warnings, so the answer presents
+  an empty result while Explorer can show synthesized data. Admins cannot currently see those
+  warnings: Ask renders only rows/errors, the API runner discards Neo4j notifications, and
+  `AgentRun` telemetry stores no warning payload. Fix the registered spec against the current
+  graph schema, add a live vocabulary/spec smoke check, and surface warning diagnostics to the
+  admin review path without exposing them as an end-user error.
+
+- **`Idea-143`** · 2026-08-20 · `[bug]` · **groomed → O64 (2026-08-21)** · prio? **High** —
+  Ask loses the last completed question and answer when navigating to Explorer and back because
+  `AskRoute` keeps turns only in component state. Persist the last completed turn per persona in
+  browser-local storage for this phase; do not persist in-progress or failed turns, and keep the
+  existing TTL-bound explore-ref behavior explicit.
 
 - **FILED 2026-08-19 (desktop, weekly groom of the whole `## Inbox`)** — **Promoted 10, inboxed 0 new, merged 3, closed 1, parked 1.** New items: **Q21** (the `docs_email_concerns` writer — the build the SIGNED `email-folder-assignment` gate authorized and did not build) and **Q22** (the SME assignment surface, the slice the gate named at §B2); **U24** (snapshot.ps1's RED warn prints `System.Object[]`) and **U25** (the debt-metrics ledger); **J49** (the non-render `write_text` sites); **G103** (the rua script-copy convention); **R15/R16/R17** (the gitnexus review's R1/R2/R4 — epistemic labeling, named agent verbs, read-time staleness); **N16** (rule what `source_label` means). **Three merges, deliberately riders rather than new items:** Idea-130 → **Q17** (jpmc-reports as the External-PUBLIC P4 end-to-end candidate — Q17 already owns that corpus's shape decision); Idea-137's union-report half → **N14** (gate §B3 named that report as the home for the unassigned email count, and N14 is still `todo`, so this is a rider and NOT a `depends_on` that would strand Q21); Idea-127's viewer half → **U22** (`viewer.html` already renders the commit; the missing AGE belongs with the detection). **One closed:** Idea-131 was consumed by **G98** the same day it was captured — the gate signed 19/19, `:Company` is registered, both `HAS_BUSINESS_SEGMENT*` edges are entered `status: planned`, and the §D3 endpoint guard the entry called "the reusable half" is built (`tests/unit/test_vocabulary_endpoints.py::test_every_declared_edge_endpoint_is_a_registered_label`); all four verified at this groom rather than taken from the close note. **One parked:** Idea-126 lands in `../depgraph`, not this repo. **Two marked in place, not moved:** Idea-132 (only the `source_label` question groomed out; the ServiceNow re-sourcing record stays standing because nothing is owed producer-side today) and Idea-93 (a third run of its standing stale-`inputs:` check — three refs, two of them false positives of the check; the E1 status question is still the user's). **Nine of the ten enter `next_ready`;** Q22 does not, because it depends on Q21 — the surface has no second write path. **No plan change:** every item lands in an existing epic and phase. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-104 (which MFT route-id shape is real), Idea-74 (does DryDocs ingest the SNOW queue/group export, and which side), Idea-34 (the AIS acronym entry), Idea-33 (the unlocated typo), Idea-32 (the Oracle-connection scope), Idea-28 (the tier-1/tier-2 app-code enumeration — SME data entry), Idea-17 and Idea-16 (both destructive or manual by nature), and E1's status from Idea-93.
 

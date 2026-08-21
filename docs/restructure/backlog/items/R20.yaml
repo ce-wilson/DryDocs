@@ -1,0 +1,34 @@
+id: R20
+epic: agentic-qa
+title: 'explorer.folder-applications.v1 returns 0 rows and the fallback Cypher names retired vocabulary
+  — re-ground the registered specs against the live schema and add a smoke check that fails when they drift'
+type: bug
+module: drydocs-api
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- tests/unit/test_query_specs.py
+- tests/unit/test_schema_meta_exclusion.py
+- drydocs_core/schema/
+- drydocs_core/ontology/relationship_vocabulary/
+acceptance: |
+  Two halves, and the second is the one that keeps this fixed.
+
+  (a) **The registered spec is re-grounded.** `explorer.folder-applications.v1` in `drydocs_api/query_specs.py` returns rows against the current schema instead of 0. Ask's test question `how many folders and jobs does each tower support?` routed to it, got nothing, and fell through to schema-grounded Cypher naming `BELONGS_TO_APPLICATION`, `HAS_PORT`, `:Port`, `:SchemaMeta` and `active_state` — vocabulary the graph has moved past, which Neo4j reported as four non-fatal warnings that nobody saw. Every registered spec is audited the same way, not just this one: the deliverable states how many specs were checked and which were stale. Where a spec's SUBJECT no longer exists in the graph, it is retired or marked unavailable rather than silently returning an empty result — a spec that answers "0" when it means "I no longer know how to ask this" is the actual defect.
+
+  (b) **A live vocabulary/spec smoke check.** A test that, against a populated database, asserts every label, relationship type and property named in a registered spec still exists in the live schema — and that SKIPS explicitly, naming the venue, when no database is reachable (per the J18 live-verification rule; the two machines hold independent graphs, so this can never be a silent pass). Drift then fails a check instead of surfacing as an empty answer months later.
+
+  The specs' vocabulary is taken FROM the schema and the relationship-vocabulary registry, never invented here: if the audit finds a spec that needs a term the registry does not carry, that term is not added in this item — it routes through the HITL gate like every other edge-meaning question, and the spec stays marked unavailable until the gate rules.
+
+  `poetry run pytest -q`, ruff clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-144 (2026-08-20, prio proposed High), split in two: R20 is the spec/vocabulary half, R21 the warning-visibility half. They are separable — either fix is worth having without the other — and they land in different code.
+
+  MODULE, verified rather than assumed: the QuerySpec registry is `drydocs_api/query_specs.py` (confirmed at this groom), so this is drydocs-api work filed under the agentic-qa epic and phase 15, the Q15 precedent for an api-module item under a non-api epic.
+
+  The router behaved CORRECTLY in the reported incident — no spec matched, so it escalated to Tier 1. What failed was the registered spec's grounding and the silence around the fallback. R22 covers the third thread from the same incident (the model proxying a UI term onto a graph label).

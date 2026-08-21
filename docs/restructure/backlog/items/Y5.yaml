@@ -1,0 +1,39 @@
+id: Y5
+epic: backlog-sharding
+title: 'The one-key claim commit goes RED in CI: the pushed-claim protocol and the roadmap stale-render
+  guard contradict each other — RULED at the groom as tolerate status-only drift, and this item applies it'
+type: bug
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_plan_roadmap.py
+- scripts/render_roadmap.py
+- scripts/render_board.py
+- drydocs/plan_roadmap.py
+- docs/restructure/backlog/README.md
+- CLAUDE.md
+acceptance: |
+  A correct one-key claim — flipping one `items/<id>.yaml` to `in_progress`, committing and pushing BEFORE starting work, exactly as the ADR 0013 claim ritual prescribes — no longer turns CI red.
+
+  It does today. First hit 2026-08-20 (laptop), the first post-shard claim: `items/D10.yaml` → `in_progress`, pushed, and `test_plan_roadmap.py::test_committed_roadmap_page_matches_its_sources` failed on CI run 32440366508 because `roadmap.html` derives item STATUSES and the claim commit ships no regen. The close-out commit went green, so the red window is precisely the work interval the claim exists to cover — every correctly-claimed item spends its whole in-flight life with CI red at the claim sha, which trains sessions to read red as noise. That is the exact habit Idea-111 was raised to break, and it cost 100+ consecutive ignored failures last time.
+
+  **THE RULING, made at the 2026-08-21 groom because Idea-151 asked the groom to decide: option (b) — the stale-render guards TOLERATE STATUS-ONLY DRIFT.** Option (a), regenerating renders inside the claim commit, was rejected on a discriminating ground rather than on convenience: it puts `board.html` and `roadmap.html` into every claim commit, so two machines claiming DIFFERENT items collide in generated files — which is the shared-line conflict ADR 0013's sharding was built to remove. Sharding made a claim a one-file edit; a guard must not put it back to three.
+
+  What the item delivers:
+  (1) The committed-render guards (`test_plan_roadmap.py::test_committed_roadmap_page_matches_its_sources` and its board/ideas siblings — enumerate them; do not fix one and leave the family inconsistent) compare the committed render against its sources with item `status` NORMALIZED OUT, so a status-only change does not fail them while any other drift still does.
+  (2) The tolerance is BOUNDED and proven: a test asserts that a title, module, phase, dependency or new-item change to the backlog still fails the guard. A guard relaxed without that test is a guard deleted.
+  (3) Rendered pages therefore may show a stale STATUS between claim and close. That is stated plainly in `docs/restructure/backlog/README.md` — the board is a render, the item file is the claim channel, and CLAUDE.md already says roll-ups are derived — so nobody reads the board as the authority on who holds what.
+  (4) The other rule is restated to MATCH rather than left standing as written: CLAUDE.md §0 and the backlog README say a claim is a one-key edit of one item file, committed and pushed, with no render step. Whichever of the two rules is not chosen must be amended in the same commit; the defect here is that both stood as written and contradicted.
+
+  `poetry run pytest -q` green, and a claim-shaped commit (one item file, status only) verified green in CI at its own sha.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-151 (2026-08-20, prio proposed Med), whose closing line — "Groom decides; don't leave both rules standing as written" — is the authority for ruling it here rather than parking it. The ruling and its reason are written into the acceptance so the next session inherits the argument, not just the verdict.
+
+  Epic backlog-sharding / module drydocs-plan / phase 8 by the Y2 precedent: Y2 built the shard, its claim mechanics and its render/validator wiring, and this is the defect that surfaced the first time that ritual ran.
+
+  Scope note for whoever pulls it: the fix is in the GUARDS, not in the renderers. `roadmap.html` and `board.html` keep deriving status and keep being regenerated at session close by `scripts/render_board.py`; only the staleness ASSERTION learns that status-only drift is expected mid-flight.

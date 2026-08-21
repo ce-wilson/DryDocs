@@ -50,3 +50,14 @@ groom_log:
 - date: '2026-08-12'
   note: ── 2026-08-12 remediation-fix-module groom (xml_io epic; plan reactive-finding-shannon) ──
   attached_at: G85
+- date: '2026-08-21'
+  note: |-
+    ── 2026-08-21 groom (laptop) — the four console defects captured 2026-08-20 ──
+    O64 Ask loses the last completed turn on navigation (Idea-143), O65 dark mode never
+    reaches the shared rail/Source controls (Idea-145, filed p2 against a proposed High —
+    presentation, not correctness), O66 /ownership renders relationship names behind the
+    nodes (Idea-147), O67 ModuleIcon's switch has no exhaustiveness guard (Idea-149, the
+    trap its own comment already documented). Ideas 143-147 were minted on the
+    feat/ui-workstream branch, which is why 147 collided once and Idea-148 carries the
+    re-issue note.
+  attached_at: O64

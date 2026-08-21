@@ -1,0 +1,26 @@
+id: O65
+epic: web-console
+title: Dark mode never reaches the shared controls — the left vertical rail and the bottom-right Source
+  panel keep their light-surface styling against the dark page
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  In dark mode the shared React controls on the left vertical rail and the Source panel at the bottom right render on the page's DARK panel and background tokens instead of the off-white light-mode surface they use today. The fix is at the token/shared-style level — audit the shared control and source styles and find where they resolve a light surface unconditionally — not a per-page override, because a per-page patch leaves the same defect on every surface that reuses those controls.
+
+  Preserved through the change and each checked explicitly: readable text contrast, borders, focus states (the keyboard ring must not vanish into a dark background — this is the one that gets lost), and the Source panel's affordances.
+
+  Verification is BOTH themes, screenshotted: light mode must be unchanged, since a dark-mode fix that quietly restyles light mode is a second defect. `npm run build` and oxlint clean; `ui-components.yaml` / `ui-tests.yaml` rows touched if the audit moves or renames a shared style.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-145 (2026-08-20, prio proposed High).
+
+  FILED p2 AGAINST A PROPOSED HIGH, stated per the R15 precedent: this is a presentation defect on a working surface — nothing is unreadable or unreachable, and no data is wrong — so it sits below the correctness defects groomed from the same batch (O64 loses user input, O66 makes a graph unreadable, R20/R21 return wrong answers). Promote it if the console is about to be demonstrated.

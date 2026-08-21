@@ -39,3 +39,12 @@ groom_log:
     --- halves of the business-layer location experiment that are not Z2's
     --- (C28 org structure, Q17 corpus reshape).
   attached_at: U18
+- date: '2026-08-21'
+  note: |-
+    ── 2026-08-21 groom (laptop) — Idea-150 ────────────────────────────────────
+    U26: snapshot.ps1 counts three directory hops to find the depgraph sibling, so the
+    ritual's last step dies in every git worktree — and test_probe_instrument.py's skip path
+    resolves it the same wrong way, so the two agree with each other while both are wrong.
+    Acceptance requires verification from BOTH venues (main checkout and worktree), since a
+    worktree-only check is what would have hidden it.
+  attached_at: U26

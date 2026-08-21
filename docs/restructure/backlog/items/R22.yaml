@@ -1,0 +1,38 @@
+id: R22
+epic: agentic-qa
+title: '"how many towers are there" answers 0 by silently proxying the synthesized UI term Tower onto
+  the :TOMRole graph label — give Tower a declared source contract that text2cypher cannot cross'
+type: bug
+module: drydocs-api
+phase: 15
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/src/data/towers.ts
+- drydocs_api/query_specs.py
+- agents/graph_qa/
+- config/taxonomy/
+- docs/RELATIONSHIP_GUIDE.md
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  Ask can no longer answer a question about **Tower** by quietly reaching for a different concept that happens to share a word.
+
+  What happened (2026-08-20): `how many towers are there` matched no registered spec, correctly escalated to Tier 1, and the text2cypher model chose the real graph label `:TOMRole` as a proxy for the UI term — `MATCH (t:TOMRole) WHERE t.name CONTAINS 'Tower' ...` — returning `0`. But `/explorer` defines Tower as a SYNTHESIZED UI concept backed by the in-repo `TOWERS` definitions (`web/src/data/towers.ts`), not by any graph label. The answer was not merely wrong; it crossed from UI taxonomy into TOM ontology without saying so.
+
+  Three things are owed:
+  (a) **A declared source contract for Tower** — Tower is written down as a UI-taxonomy concept whose authority is the in-repo definitions, with its source, its cardinality and its relationship (or absence of one) to `:TOMRole` stated in words. It lives where the console's other declared taxonomy lives under `config/taxonomy/`, so it is a fact a tool can read rather than a convention in a component.
+  (b) **A registered count spec** so the question resolves at Tier 0 against the declared source and returns the real number with its provenance ("from the Explorer Tower definitions, not from the graph").
+  (c) **A guard against the silent proxy** — schema grounding must not let a term with a declared non-graph source be answered by a graph label chosen for lexical similarity. Where the model cannot ground a term, the answer says the term is not a graph concept and names where it IS defined, rather than reporting a count of zero.
+
+  **VIA THE GATE — the hard boundary of this item.** Any BINDING between the UI Tower concept and graph vocabulary — a `:Tower` label, an edge from Tower to `:TOMRole` or to anything else, or a mapping asserting the two are the same subject — is an ontology decision and routes through the HITL gate (`docs/restructure/03-hitl-sme-flow.md`) with `status: planned` until confirmed. This item may declare that Tower's source is NOT the graph (that is a statement about a UI concept, and it is what unblocks (b) and (c)); it may not decide what Tower means in the ontology. If the SME rules Tower is a graph concept, that ruling supersedes (a) and the spec is rebuilt against it.
+
+  Tests: the question returns the declared count with its stated source; a question naming any declared non-graph term never produces Cypher against a lexically similar label; `poetry run pytest -q`, ruff clean, `npm run build` clean if the definitions move.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-146 (2026-08-20, prio proposed High). Third thread of the same incident as R20/R21 and deliberately separate: R20 is stale spec vocabulary, R21 is discarded warnings, and this one is a CATEGORY error — a synthesized UI term answered from the ontology. Fixing the first two would not have prevented it.
+
+  Model fable, unlike its two siblings, because the item sits on the taxonomy/ontology boundary: deciding that a term's authority is a UI definition rather than the graph is exactly the kind of call CLAUDE.md routes to the top tier and fences with the gate. Module drydocs-api (the spec registry, verified at this groom) with the definitions half in web/ and config/taxonomy/.
+
+  The console's existing exposure boundary is unchanged and is not part of the fix: it already shows router, generated Cypher, rows, timings and source, and never model prompts or chain-of-thought.

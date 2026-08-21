@@ -1,0 +1,25 @@
+id: O67
+epic: web-console
+title: ModuleIcon's switch has no default and no exhaustiveness check, so a new console module renders
+  in the nav as bare text with no compiler error and no runtime error
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: haiku
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/
+- config/taxonomy/ui-components.yaml
+acceptance: |
+  `ModuleIcon` gains the standard TypeScript exhaustiveness guard — a `default` branch that assigns the switch parameter to `never` — so the NEXT missing case is a compile error at the point of omission instead of a silent gap. The existing in-code comment on the `software` case, which already documents the hazard ("this switch has no `default`, so a missing case returns undefined and the glyph silently vanishes from both the aside and the Overview hub with no compiler error"), is updated to describe the guard rather than the trap.
+
+  Because the change alters a shared component's return contract, the blast radius is checked rather than assumed: every current `ModuleId` in `MODULES` renders its glyph on BOTH surfaces the comment names — the Aside and the Overview hub — verified after the change across all 12 modules. Any module found missing a glyph today (`loadmap` was, at the O57 build, which is how this was noticed) either gets one or is given an explicit, named fallback case; the guard must not be satisfied by wiring a silent placeholder into `default`, which would reintroduce the same defect through the fix.
+
+  `npm run build` fails if a `ModuleId` is added without a case — proven by adding a throwaway id locally, seeing the compile error, and reverting. oxlint clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-149 (2026-08-20, prio proposed Med). Deliberately NOT done inside O57: that item's acceptance was the load-map surface, and changing a shared component's return contract is its own change with its own blast radius (12 modules plus the Overview hub) — this item is that change.
+
+  Mechanism only; nothing here touches edge semantics or any gate. p2/haiku because the fix is one well-known TypeScript idiom and the acceptance names the verification exactly; the cost of leaving it is that a known trap keeps being paid for, which is why it is not p3.

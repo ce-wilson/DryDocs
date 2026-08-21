@@ -1,0 +1,30 @@
+id: G104
+epic: component-topology
+title: 'ADR 0014 DRAFTED (Proposed, not accepted): the runtime substrate — log directory, log level,
+  log retention and data root as one settings group, reconciled with ADR 0009'
+type: task
+module: docs
+phase: 6
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- docs/decisions/0009-configuration-substrate.md
+- docs/decisions/README.md
+- drydocs_core/config.py
+- drydocs_core/run_log.py
+- drydocs_core/adapters/sql_run_log.py
+- agents/common/llm_ledger.py
+- config/source-registry.yaml
+- .env.example
+- docs/restructure/IDEAS.md
+acceptance: |
+  A new `docs/decisions/0014-runtime-substrate.md` exists with status **Proposed** — never Accepted, because acceptance is the user's and is recorded in `docs/decisions/README.md` only after they rule. 0014 is the next free number as of this groom. The ADR decides, or explicitly defers with a named trigger, each of the seven clauses Idea-152 raised: (1) one `RuntimeSettings` group on the `DRYDOCS_` prefix (pydantic-settings, the shape `drydocs_core/config.py` already uses) carrying `log_dir`, `log_level`, `log_retention_days`, `data_root` — `.env`-readable, env-overridable, defaults unchanged, with `SPIDERP_*` kept one cycle as deprecated aliases and then dropped from BOTH log families; (2) stdlib `logging.config.dictConfig` driven from that group with NO new runtime dependency — console plus a JSON-lines file sink in `log_dir`, level from settings, `--verbose` still winning, and `run_log.py`'s existing header/summary contract untouched; (3) ONE naming rule for the shared directory, `<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}`, with the per-DAY `qa.graph_qa.<YYYYmmdd>.jsonl` ledger either moved onto it or its exception written down; (4) retention as a `drydocs prune-logs` verb mirroring `prune-snapshots` (age + size, dry-run default) rather than a background sweeper thread; (5) every component opening a `LoaderRunLog` per batch; (6) an API request/audit line for every Cypher-executing route, actor hashed the way `:AgentRun` already hashes it; (7) a single declaration of the data-zone map. THE HARD REQUIREMENT: the ADR states in its own text how it reconciles with **ADR 0009 (configuration substrate)**, which already makes git-tracked YAML the settings source of truth — an env-var-and-`.env` settings group is either an exception ADR 0009 permits (say where) or an amendment to it (say so, and say what in 0009 changes). It also records the sister project's own gotcha list as REJECTED alternatives, since Idea-152 captured it as an anti-checklist: level hardcoded with no env override; a Linux-absolute default that breaks on Windows; silent fallback to the local profile on a misconfigured box; one process-start timestamp shared by every file; and an unbounded sweeper registry when the logger factory is called with per-incident names. Named as OUT of scope: persisting executed Cypher server-side for ask-search — a separate idea whose owning surface is undecided. `docs/decisions/README.md` gains the 0014 row reading Proposed. No code changes in this item.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-152 (prio High, user-confirmed), which carries the 2026-08-20 survey and asked in writing to be groomed into "the ADR; a core item (1-3); a load item (4); per-component items (5); an api item (6); a config item (7)". G104 is the ADR; G105-G109 are those five, each `depends_on` this item so nothing implements an unratified decision.
+
+  EPIC AND PHASE CHOICE, recorded because it was a judgement call rather than an obvious fit: no runtime-substrate epic exists and a groom cannot mint one, so the chain is filed under component-topology / phase 6 — the epic that already owns cross-component structural rulings (ADR 0002's core-vs-component split) and that already holds an ADR-drafting item as precedent (G53, the ADR 0011 shelf plan). A dedicated epic is PROPOSED TO THE USER in the groom report; if they take it these six items change `epic:`, not their ids. Module `docs` follows Y1 and R1 — a decision document is docs work even when its subject is core. Model fable because the ADR decides a boundary (where settings may live at all) against a standing ADR.
+
+  Status stays Proposed on purpose: this item drafts the decision, it does not make it.

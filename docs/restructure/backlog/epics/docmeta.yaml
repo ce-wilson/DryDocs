@@ -26,3 +26,12 @@ groom_log:
     target class is in another database). Q8 is the ready-now bug; G32 is the
     decision everything else waits on.
   attached_at: Q7
+- date: '2026-08-21'
+  note: |-
+    ── 2026-08-21 groom (laptop) — Idea-148, the capture/registry join ──────────
+    Q23: a scrape run and the doc-source-registry row it fulfils are not joined, so the
+    fcdo-frameworks VERBATIM upgrade traces to prose rather than to a run id. The precedent
+    is one row over (bmc-docs-controlm-utilities carries captured_at + manifest +
+    graph_locator). Bounded by J51's per-entry FIELD split: the producer defines the field
+    and the mechanism, the company owns the values, and neither crosses at a port.
+  attached_at: Q23

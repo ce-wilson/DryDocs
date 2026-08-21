@@ -1,0 +1,30 @@
+id: O66
+epic: web-console
+title: '/ownership renders relationship names BEHIND the nodes so the K4 qualified-attribution shape
+  is unreadable — adopt the overlay treatment Explorer and Lineage already use'
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/src/
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  On `/ownership`, relationship names are readable. Today they render behind the nodes in the left-to-right layout, which means the page's entire subject — the K4 qualified-attribution SHAPE, the thing the banner `EXAMPLE DATA · ILLUSTRATIVE — K4 qualified-attribution shape` promises — cannot be read off it.
+
+  The fix reuses the treatment that already works one route over rather than inventing a third: Explorer's `Tower / app drill-down graph` and Lineage's `Source → target DAG` both keep relationship names legible as OVERLAYS. Ownership adopts the same overlay component/pattern, so the three graph surfaces stay consistent and one future change fixes all three.
+
+  Preserved: the existing left-to-right relationship DIRECTION (the qualified-attribution reading depends on it), arrowheads, and the dark/light theme tokens — verified in both themes.
+
+  The `EXAMPLE DATA · ILLUSTRATIVE` banner stays exactly as worded. This item changes only how the labels are drawn; it does not touch what the edges MEAN, which is K4's gate-confirmed attribution shape and not a console decision.
+
+  Screenshots in both themes showing every relationship name readable; `npm run build` and oxlint clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-147 (2026-08-20, prio proposed High). p1 as proposed: the defect makes the page's only content unreadable, so the surface is effectively down.
+
+  Explicitly a RENDERING fix with an ontology guardrail written into the acceptance — /ownership displays K4's qualified-attribution shape, and a "readability" pass is exactly the kind of change that quietly relabels or re-directs an edge. Nothing about edge meaning moves here; any such change routes through the HITL gate.

@@ -11,3 +11,15 @@ groom_log:
     QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts
     loop. O20 (UI zero graph writes) stands throughout the epic.
   attached_at: R1
+- date: '2026-08-21'
+  note: |-
+    ── 2026-08-21 groom (laptop) — one Ask incident, three separable defects ────
+    The 2026-08-20 session asked two questions and exposed three different failures, filed
+    as three items rather than one: R20 the registered spec returns 0 and the fallback names
+    retired vocabulary (Idea-144a); R21 Neo4j notifications are discarded at three points so
+    the answer presents clean (Idea-144b); R22 the synthesized UI term Tower is silently
+    proxied onto the :TOMRole label (Idea-146). R22 carries the gate boundary — it may
+    declare Tower's source is NOT the graph; any BINDING to graph vocabulary routes through
+    the HITL gate and stays planned. Module drydocs-api on all three, verified at the groom:
+    the QuerySpec registry is drydocs_api/query_specs.py, not agents/.
+  attached_at: R20

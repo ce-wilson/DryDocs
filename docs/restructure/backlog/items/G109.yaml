@@ -1,0 +1,37 @@
+id: G109
+epic: component-topology
+title: 'The data-zone map gets one declaration: six code zones have no source-registry row so landing-zones
+  --check is blind to them, registry dpl/ and code dpl-registry/ disagree, and .env.example names neither root'
+type: task
+module: config
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G104
+inputs:
+- config/source-registry.yaml
+- drydocs_core/data_root.py
+- drydocs_core/landing_zones.py
+- .env.example
+- docs/decisions/0014-runtime-substrate.md
+acceptance: |
+  The data zones under `DRYDOCS_DATA_ROOT` are declared in ONE place and the resolvers derive from that declaration instead of restating it.
+
+  (a) The six zones the 2026-08-20 survey found in code with no `source-registry` row — `email-extracts`, `context-intake`, `vendor-docs`, `remediation/*`, `cmdline-staging`, `catalog` — each get a row, or a recorded reason a zone legitimately has none. Today `drydocs landing-zones --check` is BLIND to all six, which is the defect: a check that silently covers half the zones reads as coverage.
+
+  (b) The `dpl/` (registry) vs `dpl-registry/` (code) drift is reconciled to one name, with the losing name kept as an alias for one cycle if anything on disk already uses it, and the choice recorded.
+
+  (c) `drydocs_core/data_root.py`'s resolvers are derived FROM the rows rather than hardcoded beside them, so a new zone cannot exist in code without existing in the registry. A test asserts the two agree: every zone the code can resolve has a row, every row resolves.
+
+  (d) `.env.example` documents `DRYDOCS_DATA_ROOT` and `DRYDOCS_LOGDIR`; it documents neither today.
+
+  (e) The Confluence capture that lands IN-TREE against `landing_zones.py`'s tracked-only rule is ruled one way and the ruling is written down: either it moves under the data root, or the rule gains a stated exception naming it. It is not left as an undocumented violation of a rule the same module enforces on everything else.
+
+  `poetry run pytest -q` including the classification guard (`tests/unit/test_classification.py` — every new registry row needs its `classification`, there is no unlabeled default), plus `drydocs landing-zones --check` reporting the full zone set. Ruff clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-152 clause (7) / finding (e). Module `config` because the deliverable is registry rows plus a derivation rule, not new component behavior; the `data_root.py` edit is the consequence of the declaration, not the point of the item.
+
+  Watch item for whoever pulls it: each new source-registry row must carry a `classification` per CLAUDE.md §3 — the six zones are operational metadata, so Internal is the likely answer, but it is a per-zone call and no default exists.

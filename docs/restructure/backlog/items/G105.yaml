@@ -1,0 +1,35 @@
+id: G105
+epic: component-topology
+title: One RuntimeSettings group plus dictConfig logging — the log directory stops being env-var-only,
+  AppSettings.log_level starts being wired to something, and the run-log directory gets one naming rule
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G104
+inputs:
+- drydocs_core/config.py
+- drydocs_core/run_log.py
+- drydocs_core/adapters/sql_run_log.py
+- agents/common/llm_ledger.py
+- drydocs/cli.py
+- .env.example
+- docs/decisions/0014-runtime-substrate.md
+acceptance: |
+  Clauses (1), (2) and (3) of ADR 0014 as ratified — no more, and nothing the ADR deferred.
+
+  (1) A `RuntimeSettings` group in `drydocs_core/config.py` (pydantic-settings, `DRYDOCS_` prefix, beside `Neo4jSettings`) carries `log_dir`, `log_level`, `log_retention_days`, `data_root`. Today's resolution order is PRESERVED as the default rather than replaced: `DRYDOCS_LOGDIR` wins, `SPIDERP_LOGDIR` still resolves for one deprecation cycle with a warning, `~/logs/DryDocs` stays the fallback. `drydocs_core/adapters/sql_run_log.py`, which honors ONLY the legacy variable today, resolves through the same group, so the two run-log families can no longer disagree about where the directory is.
+
+  (2) `drydocs/cli.py`'s single `basicConfig` — the only one in the tree, currently stderr-only with its level from `--verbose` alone — is replaced by `logging.config.dictConfig` built from the group: console plus a JSON-lines file sink under `log_dir`, level from `RuntimeSettings.log_level`, `--verbose` still overriding it. Stdlib only: a test asserts `pyproject.toml` gained no runtime dependency. `run_log.py`'s header/summary file contract is byte-identical before and after (a test writes one run log each way and diffs). The four components with no logger at all today — `drydocs_remediation`, `drydocs_lineage`, `drydocs_docmeta`, `drydocs_deepdoc` — get a module logger each, and `agents/graph_qa/agent.py`'s bare telemetry-failure swallow logs at warning instead of passing silently.
+
+  (3) One naming rule for the shared directory, `<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}`. The per-RUN `<kind>.<name>.<ts>.log` files already match it; `agents/common/llm_ledger.py`'s per-DAY `qa.graph_qa.<YYYYmmdd>.jsonl` either moves onto it or keeps an in-code comment citing the ADR-recorded exception and why a per-day append file earns one.
+
+  `.env.example` documents `DRYDOCS_LOGDIR`, `DRYDOCS_LOG_LEVEL`, `DRYDOCS_LOG_RETENTION_DAYS` and `DRYDOCS_DATA_ROOT`; it documents none of them today. "Defaults unchanged" is proven, not asserted: a test clears the environment and shows every path this touches resolves exactly where it resolved before. `poetry run pytest -q`, `python -c "import drydocs.cli"`, `drydocs --help`, `ruff check` and `ruff format --check` all green.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-152 clauses (1)(2)(3) — "a core item (1-3)" in that entry's own decomposition. `depends_on: [G104]` because ADR 0009 makes git-tracked YAML the settings source of truth, so an env-driven settings group has to be reconciled with it BEFORE it is built rather than after. Module drydocs-core by the ADR 0002-A placement test: pure config and typed-model work, no graph write, no run cadence.
+
+  The `SPIDERP_` alias deliberately survives one cycle instead of being deleted here. The data root already has no legacy variable, so the end state is symmetric either way, but a hard cut breaks any live shell still exporting the old name and that failure is silent.

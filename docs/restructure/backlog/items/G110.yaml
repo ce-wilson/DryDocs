@@ -1,0 +1,31 @@
+id: G110
+epic: component-topology
+title: 'agents/ residue after the poetry-group verdict: MODULE_MAP says agents/ is absent from the boundary
+  test while the test scans it, and the agent runtime pins none of its four non-ADK dependencies'
+type: chore
+module: drydocs-agents
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- MODULE_MAP.md
+- tests/unit/test_module_boundary.py
+- agents/requirements.txt
+- agents/README.md
+acceptance: |
+  Two independent corrections, both verified live at this groom (2026-08-21, laptop, at HEAD 28a5ccf0):
+
+  (a) `MODULE_MAP.md`'s `agents/` surface row states "not a Python package of this monorepo, so absent from the boundary test". `tests/unit/test_module_boundary.py` lists `REPO_ROOT / "agents"` in `PKG_ROOTS`, so the test DOES scan it. The row is corrected to say what is true — `agents/` is scanned by the boundary test and carries its own venv — and the correction says which of the two facts the old wording confused (own-venv is a packaging fact; in-scope-for-the-boundary-test is a different one). A doc row that contradicts the test it describes is worse than no row, because the test is the thing that actually gates commits.
+
+  (b) `agents/requirements.txt` pins its dependencies. Only `google-adk>=2,<3` is bounded today; `neo4j`, `python-dotenv`, `litellm` and `pyyaml` are BARE, so the agent runtime resolves whatever is current on the day someone builds the venv and no two machines are reproducible. The 2026-08-20 build measured what a bare resolve actually produces — `neo4j 6.2.0`, `litellm 1.97.0` under Python 3.14.6 — so the pins are recorded facts, not guesses. Pin at least `neo4j` and `litellm` (the two that carry known behavior: the driver major, and the provider adapter whose known-good version lives only in README prose today) with a comment naming where each number came from. Pinning happens IN `agents/requirements.txt` where the dependencies already live — this item does NOT create a poetry group.
+
+  No behavior change; the agents venv rebuilds clean from the pinned file.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-141's "worth doing regardless of the verdict" clause. The entry's main question — should `agents/` become `poetry install --with agents` instead of its own venv — was ARCHITECT-REVIEWED 2026-08-20 with the verdict do-not-recommend as framed, and is deliberately NOT groomed into an item: the reason to leave it alone is the cross-repo port (`poetry.lock` re-locks per side, which would oblige the company to resolve `google-adk` and `litellm` on its internal index at every port, a choice quarantined inside `agents/**` today), and the same-day measurement turned hazard (1) into a HARD CONFLICT — the agents venv resolves `click 8.4.2` against `pyproject.toml`'s `click = ">=8.0,<8.2"`, held down by `typer ^0.12`. That verdict stays in Idea-141 as the record; only this residue is owed.
+
+  Idea-141 stays OPEN in the inbox rather than moving to the audit trail, because its four open questions are the user's and would flip the verdict: does the company side install google-adk or SmartSDK and can it reach those distributions; is the agent runtime meant to stay on neo4j driver 6.x (if yes the group is impossible without loosening `neo4j = "^5.20"` repo-wide); and is "one machine holds the only agents venv" permanent.
+
+  p3 and haiku: both halves are small and fully specified. Epic component-topology because MODULE_MAP and the boundary test are ADR 0002's surfaces.

@@ -19,3 +19,14 @@ groom_log:
     surface. Cross-repo law from the idea entry: BOTH repos must move together at
     Y2 — the port carries the shard as a structure-breaking step, like S5's.
   attached_at: Y1
+- date: '2026-08-21'
+  note: |-
+    ── 2026-08-21 groom (laptop) — Idea-151, the first defect the claim ritual found ──
+    Y5: a bare one-key claim commit goes RED in CI because roadmap.html derives item statuses
+    and the claim ships no regen, so every correctly-claimed item is red for exactly its
+    in-flight life. Idea-151 asked the groom to decide, and it did: option (b), the
+    stale-render guards tolerate status-only drift. Option (a) — regen inside the claim
+    commit — was rejected because it puts generated files into every claim, recreating the
+    shared-line conflict Y2's sharding removed. The ruling and its reason are in the item's
+    acceptance.
+  attached_at: Y5

@@ -1,0 +1,34 @@
+id: U26
+epic: self-documentation
+title: snapshot.ps1 counts three directory hops to find the depgraph sibling, so the session ritual's
+  last step dies in every git worktree — resolve the main working tree instead
+type: bug
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- tests/unit/test_probe_instrument.py
+- knowledge/depgraph-snapshots/README.md
+acceptance: |
+  `knowledge/depgraph-snapshots/snapshot.ps1` writes its JSON when run from a git WORKTREE, not only from the main checkout.
+
+  The defect: the script resolves the instrument by counting hops — `(Resolve-Path "$here\..\..\..\depgraph")` (line 177 at this groom) — three levels up from `knowledge/depgraph-snapshots`. From the main checkout that lands on the real sibling and is correct; from `.claude/worktrees/<name>` the same three hops land on `.claude/worktrees/depgraph`, which does not exist, and the script dies with `Resolve-Path : Cannot find path`. That makes the ritual's last step unavailable to exactly the sessions CLAUDE.md tells to use worktrees.
+
+  The fix resolves the repo's MAIN working tree rather than counting directories: `git rev-parse --path-format=absolute --git-common-dir` returns the SHARED `.git`, whose parent is the main checkout, and it gives the same answer from a worktree and from the checkout itself. Hop-counting is removed, not patched with a second special case.
+
+  `tests/unit/test_probe_instrument.py` is fixed in the same pass: its skip path resolves the sibling the same wrong way and prints the same wrong location (`depgraph sibling checkout absent at ...\worktrees\depgraph`), so today the script and the test AGREE WITH EACH OTHER while both are wrong — which is why nobody caught it. After the fix the test skips only when the sibling is genuinely absent, and its message names the real path it looked in.
+
+  Verified from BOTH venues and both stated: one run from the main checkout and one from a worktree, each writing its `<project>-<date>.json`. That two-venue check is the acceptance, not a nicety — this is a shared instrument and it was deliberately not fixed inside the session that found it precisely because a worktree-only verification proves nothing.
+
+  Retention behavior (newest-only, U12) and the CI check are unchanged.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-150 (2026-08-20, prio proposed Med). Hit at the O57 session close: everything before the JSON write succeeded — all renders written, the script's own CI check reported GREEN at HEAD — and only the snapshot was lost, so that session produced no drift record.
+
+  Module graph-infra / epic self-documentation / phase 16 by the U15, U24 and U25 precedent (the snapshot instrument's own items live there). Mechanism only, no gate.
+
+  Line 177 is cited as of HEAD 28a5ccf0; the file moved during the 2026-08-20 CI-check fixes, so match on the `Resolve-Path` expression rather than the number.

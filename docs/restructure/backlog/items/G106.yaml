@@ -1,0 +1,24 @@
+id: G106
+epic: component-topology
+title: 'drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today — retention
+  as a verb mirroring prune-snapshots, not a background sweeper thread'
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G104
+inputs:
+- drydocs/cli.py
+- drydocs_core/run_log.py
+- agents/common/llm_ledger.py
+- docs/decisions/0014-runtime-substrate.md
+acceptance: |
+  A `drydocs prune-logs` verb in `drydocs/cli.py`, built as a deliberate mirror of the existing `prune-snapshots` so the two read the same at the prompt: DRY-RUN BY DEFAULT (it prints what it would delete and exits non-destructively unless an explicit apply flag is passed), bounded by both age (`--older-than-days`, defaulting to `RuntimeSettings.log_retention_days`) and total size (`--max-bytes`), and reporting a per-file table plus a total. It covers every file family that shares the log directory — the per-run `<kind>.<name>.<ts>.log` files from `run_log.py`, the SQL run logs, and `agents/common/llm_ledger.py`'s JSONL ledger — because the whole point of the finding is that three families share one directory under two naming rules and NONE of them rotate, cap or sweep. The ledger's retention is stated explicitly, whichever way it goes: an append-only audit ledger may legitimately be exempt, but then the exemption is in the code and in `--help`, not in the gap between them. A test drives the verb over a temp directory holding files of both naming shapes and asserts (a) dry-run deletes nothing, (b) the age bound and the size bound each select the expected set, (c) a file the retention policy exempts survives both. NO daemon and no background thread: ADR 0014 rejected the sister project's sweeper for a named reason (its registry grows unbounded when the logger factory is called with per-incident names) and a verb the session ritual can call has no such failure mode. `poetry run pytest -q`, `drydocs --help` showing the verb, ruff clean.
+notes: |
+  Groomed 2026-08-21 (laptop) from Idea-152 clause (4) — "a load item (4)" in that entry's decomposition. Module drydocs-load because `MODULE_MAP.md:74` places `drydocs/cli.py` there as the entrypoint, which is also where `prune-snapshots` already lives; filing it anywhere else would split two sibling verbs across two modules.
+
+  Depends on G104 only for the retention policy shape (age + size + which families are exempt); the verb itself is mechanical.
