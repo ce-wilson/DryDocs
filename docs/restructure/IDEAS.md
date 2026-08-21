@@ -4,12 +4,13 @@ Low-friction capture. Jot anything here from any surface — a "what if", a bug 
 a doc that needs writing, a future source to ingest. **No schema required.** Messy is fine.
 
 This is the **inbox**, not the backlog. Nothing here is committed to until it is *groomed*
-into [`backlog.yaml`](backlog.yaml) with an id, owner agent, inputs, and an acceptance test.
+into an item file under [`backlog/`](backlog/) (`items/<id>.yaml`; the old `backlog.yaml` is a
+tombstone) with an id, owner agent, inputs, and an acceptance test.
 
 ## How this feeds the backlog
 
 ```
-capture here (any surface)  ──groom──▶  backlog.yaml item  ──▶  agent pulls it
+capture here (any surface)  ──groom──▶  backlog/items/<id>.yaml  ──▶  agent pulls it
 ```
 
 - **`Idea-143`** · 2026-08-20 · `[bug]` · **open** · prio? **High** —
@@ -30,7 +31,7 @@ capture here (any surface)  ──groom──▶  backlog.yaml item  ──▶  
   admin review path without exposing them as an end-user error.
 
 **Grooming ritual** (you, or an Opus `main` session, ~weekly): read this list top to bottom;
-for each idea either (a) promote it to a `backlog.yaml` item, (b) merge it into an existing
+for each idea either (a) promote it to a backlog item file (`backlog/items/<id>.yaml`), (b) merge it into an existing
 item, or (c) drop it. Strike through or delete what's been groomed so the inbox stays short.
 
 ## Capture format (loose)
@@ -64,7 +65,7 @@ file already used (`2026-08-05 — [bug] **Title**`), just carrying identity and
 ### Allocator bands — which side minted this id (added 2026-08-18)
 
 **Producer allocates `1–9999`. Company allocates `10000+`.** Same rule in every series — here and
-in `backlog.yaml`'s letter series. The grammar does not change, so `Idea-10012` and `G10604` parse
+in the backlog's letter series (`backlog/items/<id>.yaml`). The grammar does not change, so `Idea-10012` and `G10604` parse
 with every existing regex and no historical id moves.
 
 **Read it by length:** *five digits or more → company; four or fewer → producer.* There is no
