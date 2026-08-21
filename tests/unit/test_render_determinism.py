@@ -240,3 +240,45 @@ def test_committed_surfaces_carry_no_cr_byte() -> None:
         "commit as LF either way, which is exactly why this goes unnoticed: the "
         "cost is a permanently-dirty stale-render check, not a wrong blob."
     )
+
+
+# J49 (2026-08-21): the fence is gone because every site behind it is ruled. The
+# Idea-121 sweep deliberately declared its writer list instead of sweeping the
+# tree, and ten non-render `write_text(` sites sat outside it; J49 gave each an
+# explicit newline="\n" with its reason (none produces a committed artifact — the
+# tracked internal/remediation/m0 transcripts and SDLC-Docs/extracted are
+# hand-authored INPUTS, not outputs). With the census at zero, a repo-wide static
+# rule is cheaper than the next per-site ruling: a writer that genuinely must not
+# pin LF states so in a `# newline:` comment and is listed here by path:line.
+WRITE_TEXT_NEWLINE_EXEMPT: frozenset[str] = frozenset()
+WRITE_TEXT_ROOTS = (
+    "drydocs",
+    "drydocs_core",
+    "drydocs_api",
+    "drydocs_deepdoc",
+    "drydocs_docmeta",
+    "drydocs_lineage",
+    "drydocs_remediation",
+    "drydocs_plan",
+    "drydocs_docgen",
+    "drydocs_port",
+    "scripts",
+)
+
+
+def test_every_write_text_in_the_tree_pins_newline() -> None:
+    offenders: list[str] = []
+    for root in WRITE_TEXT_ROOTS:
+        base = REPO / root
+        if not base.exists():
+            continue
+        for path in sorted(base.rglob("*.py"), key=lambda p: p.as_posix()):
+            rel = path.relative_to(REPO).as_posix()
+            for line in _write_text_calls_missing_newline(path.read_text(encoding="utf-8")):
+                if f"{rel}:{line}" not in WRITE_TEXT_NEWLINE_EXEMPT:
+                    offenders.append(f"{rel}:{line}")
+    assert not offenders, (
+        "write_text( without newline= (J49 rule — pass newline='\n', or exempt the "
+        "site by path:line in WRITE_TEXT_NEWLINE_EXEMPT with a `# newline:` reason):\n  "
+        + "\n  ".join(offenders)
+    )

@@ -2191,7 +2191,9 @@ def lineage_review(
         raise typer.Exit(2)
     graph = LineageGraph()
     coverage = ControlMInventoryExtractor().extract(source, graph)
-    out.write_text(to_html(graph, doc_id=doc_id or source.stem), encoding="utf-8")
+    # J49: LF on every platform — a review page diffed between machines must not
+    # differ by line endings. Not a committed surface (default path is untracked).
+    out.write_text(to_html(graph, doc_id=doc_id or source.stem), encoding="utf-8", newline="\n")
     st = graph.stats()
     console.print(
         f"[green]wrote {out}[/] — processes={st['processes']} "

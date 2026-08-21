@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/cli.py
@@ -25,3 +25,22 @@ acceptance: |
   THE CENSUS IS CORRECTED AT THE GROOM, and the correction is why this is not a re-run of the sweep: `write_text(` without a newline argument, across drydocs*/ and scripts/, returns TEN sites, not the eight Idea-121 fenced out -- drydocs/cli.py:2032 (the schema-graph html), drydocs/loaders/vendor_docs.py:188 and :227, drydocs/publishing/preview.py:12, drydocs/publishing/publisher.py:56, scripts/external_vendor_scrape.py:384, scripts/extract_office_text.py:105, plus THREE the original list never named: drydocs_docmeta/manifest.py:101, drydocs_remediation/changes.py:303 and drydocs_remediation/formats.py:207. (a) EACH SITE GETS ITS OWN CALL, recorded: pass newline="\n", or state in an inline comment why this writer must not. The sweep fenced these out deliberately -- they write non-render outputs and a blanket change is exactly what the fence refused. (b) THE RULING THAT MATTERS: for each site, does it produce a COMMITTED artifact? If it does, its writer joins the DECLARED tuple in tests/unit/test_render_determinism.py -- that list is declared and never swept (Idea-121's fence), so a committed surface whose writer is absent from the tuple is invisible to BOTH guards, the static one and the byte one. drydocs_docmeta/manifest.py and the two drydocs_remediation writers are the live candidates and must be ruled explicitly rather than passed over. (c) Both guards stay green, no committed surface holds a CR byte, and re-running every render still leaves a clean tree.
 notes: |
   Groomed 2026-08-19 from Idea-121's remaining half. The render half landed 2026-08-13 (d0b2a93 -- 25 dirtied files down to 0), and the guard that entry asked for now exists: tests/unit/test_render_determinism.py carries the static writer check and the CR byte check, built at the Idea-129 fix. What is left is exactly this per-site ruling. MODULE, choice recorded, and the spread is real: the ten sites sit in drydocs/ (5), scripts/ (2), drydocs_docmeta/ (1) and drydocs_remediation/ (2) -- no single MODULE_MAP component owns them. drydocs-load holds the plurality (cli.py plus loaders/vendor_docs.py) and is where the sweep starts; J48 is the precedent for filing a repo-wide sweep under one module rather than splitting it four ways. p3, NOT p2: the half that poisoned a committed provenance field -- meta.git.dirty reading true on every Windows snapshot -- is fixed, and what remains is legibility on outputs nobody diffs. Clause (b) is the escape hatch: if a site turns out to write a COMMITTED artifact, that site is a different priority and the close note should say so.
+  DONE 2026-08-21 (desktop). CENSUS CONFIRMED AT TEN by AST (write_text without a newline kwarg across
+  drydocs*/ and scripts/): cli.py lineage-review html, vendor_docs.py x2, publishing/preview.py,
+  publishing/publisher.py, docmeta/manifest.py, remediation/changes.py, remediation/formats.py,
+  external_vendor_scrape.py, extract_office_text.py. (a) EVERY site now passes newline="
+" with an
+  inline reason; none needed the "must not" branch. (b) THE RULING, site by site, none produces a
+  COMMITTED artifact: lineage-review.html defaults to an untracked cwd path; vendor_docs, the docmeta
+  manifest and the scrape manifest write under DATA_ROOT (and LF is part of the manifest's own
+  deterministic-bytes claim -- without it the diff-based freshness check reads a line ending as a
+  vendor edit); preview/publisher write caller-chosen paths; changes.py writes the fix-tracking
+  handoff to a caller target; formats.py dump() is used only in a tmp_path round-trip -- the two
+  tracked internal/remediation/m0/*-transcript.yaml carry a prose header dump() never writes, so they
+  are hand-authored INPUTS to load(); extract_office_text writes <src>/extracted/*.txt and the tracked
+  SDLC-Docs/extracted/*.md predate it (initial import) and are not its output. So the DECLARED tuple
+  in test_render_determinism.py gains no entry and nothing changes priority. (c) Both guards green;
+  AST census now reads ZERO, and that made a repo-wide static rule cheaper than the next per-site
+  ruling: test_every_write_text_in_the_tree_pins_newline sweeps the eleven roots with an explicit
+  path:line exemption set (empty) -- the fence Idea-121 refused is replaced by a rule, now that every
+  site behind it is ruled. Suite 2260 passed; re-rendering leaves a clean tree.

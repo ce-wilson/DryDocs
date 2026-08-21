@@ -204,9 +204,14 @@ class TranscriptDefinitionFormat(DefinitionFormat):
                 for j in definitions.jobs
             ],
         }
+        # J49: LF. The tracked transcripts under internal/remediation/m0/ are
+        # hand-authored INPUTS to load() (they carry a prose header this dump
+        # never writes), so this writer produces no committed surface; LF keeps
+        # a dumped round-trip byte-comparable across machines.
         target.write_text(
             yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
             encoding="utf-8",
+            newline="\n",
         )
         return target
 

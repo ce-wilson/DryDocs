@@ -185,7 +185,10 @@ def convert_capture(
             converted = html_to_markdown((pages_dir / page).read_bytes())
             role = derive_page_role(node["title"] if node["anchor"] is None else converted.title)
             md_name = f"{Path(page).stem}.md"
-            (md_dir / md_name).write_text(converted.markdown, encoding="utf-8")
+            # J49: LF — the converted markdown is what downstream chunking and digests
+            # read; a CRLF copy on Windows would hash differently from the same
+            # conversion on Linux. Under DATA_ROOT, never committed.
+            (md_dir / md_name).write_text(converted.markdown, encoding="utf-8", newline="\n")
             md_bytes += len(converted.markdown)
             roles[role] = roles.get(role, 0) + 1
             related_total += len(converted.related)
@@ -224,7 +227,9 @@ def convert_capture(
         "base_url": capture_manifest["base_url"],
         "documents": list(docs.values()),
     }
-    (base / "convert-manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (base / "convert-manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8", newline="\n"
+    )  # J49: LF, same reason as the markdown above
 
     return ConvertSummary(
         capture_id=capture_id,

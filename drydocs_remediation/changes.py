@@ -300,7 +300,12 @@ def fix_tracking_changeset(changeset: FixTrackingChangeset, target: Path) -> Pat
             for anchor in changeset.anchors
         ],
     }
+    # J49: LF — a handoff file travels to another machine (the fix-tracking
+    # loader's input); its bytes must not depend on where it was written.
+    # Caller-chosen target; no tracked file is produced by this writer.
     target.write_text(
-        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True), encoding="utf-8"
+        yaml.safe_dump(payload, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+        newline="\n",
     )
     return target

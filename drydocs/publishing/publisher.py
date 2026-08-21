@@ -53,5 +53,6 @@ class LocalPublisher:
         safe = "".join(c if c.isalnum() or c in "-_." else "_" for c in title) or "page"
         path = self.out_dir / (safe + ".html")
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(body, encoding="utf-8")
+        # J49: LF — the local "publish" stands in for Confluence, which stores LF.
+        path.write_text(body, encoding="utf-8", newline="\n")
         return PublishResult(title=title, location=path.as_uri(), published=True)

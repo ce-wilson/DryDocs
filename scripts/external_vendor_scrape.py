@@ -381,7 +381,9 @@ def capture(
         "failures": failures,
         "pages": records,
     }
-    (root / "capture-manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (root / "capture-manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8", newline="\n"
+    )  # J49: LF — same determinism reason as drydocs_docmeta.manifest
     return manifest
 
 

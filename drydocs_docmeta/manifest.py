@@ -203,9 +203,13 @@ class CaptureManifest:
         # sort_keys so two runs over identical content produce identical
         # files — a manifest that differs only by key order would make every
         # diff-based freshness check useless.
+        # J49: LF is part of the determinism claim above — without it the same
+        # manifest written on Windows and on Linux differs byte-for-byte, and the
+        # diff-based freshness check would read a line-ending as a vendor edit.
         path.write_text(
             json.dumps(asdict(self), indent=2, sort_keys=True),
             encoding="utf-8",
+            newline="\n",
         )
         return path
 
