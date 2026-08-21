@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-20T21:49:43",
-    "date": "20260820",
+    "captured_at": "2026-08-21T00:50:04",
+    "date": "20260821",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5c0308e6",
-      "full": "5c0308e6b75dbcc4633670011a01dfeb473a36e3",
+      "commit": "e955fce5",
+      "full": "e955fce5dab873ac0f252a74ebf85ef15178d8ca",
       "branch": "main",
-      "describe": "port-base-20260820-21-g5c0308e6",
-      "subject": "fix(snapshot): CI-check false GREEN, the actual boundary — PS 5.1 ConvertFrom-Json emits a JSON array as ONE wrapped item even in argument form (the prior fix missed), so enumerate the parsed object to unroll it. Verified live both ways: FAILURE at red HEAD 22b8ad7, GREEN at green c1cc811",
-      "dirty": true,
-      "untracked_present": true,
+      "describe": "port-base-20260820-24-ge955fce5",
+      "subject": "ci: single Python 3.12 + concurrency cancellation — Actions-minutes cost fix. The 3.11/3.12 matrix halves to the version both dev machines run (pyproject's ^3.11 floor deliberately untested, comment records it); a newer push to the same ref cancels the superseded in-flight run. No paths-ignore: docs pushes keep full guard coverage (Idea-111)",
+      "dirty": false,
+      "untracked_present": false,
       "pr": null
     },
     "depgraph": {
@@ -18737,10 +18737,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260820-2148.json",
-      "name": "drydocs-20260820-2148.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260820.json",
+      "name": "drydocs-20260820.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260820-2148.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260820.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -37349,7 +37349,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260820-2148.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260820.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
