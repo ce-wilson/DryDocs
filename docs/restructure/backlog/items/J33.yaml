@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - tests/unit/test_supplements.py
