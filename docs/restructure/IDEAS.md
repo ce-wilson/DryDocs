@@ -110,6 +110,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-151`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
+  **A bare one-key claim commit goes RED in CI: the pushed-claim protocol and the roadmap
+  stale-render guard contradict each other.** First hit 2026-08-20 (laptop), the first
+  post-shard claim: flipping `items/D10.yaml` to `in_progress` and pushing — exactly what
+  the Y2 claim ritual prescribes — failed `test_plan_roadmap.py::
+  test_committed_roadmap_page_matches_its_sources` on CI (run 32440366508), because
+  `roadmap.html` derives item statuses and the claim commit ships no regen. The close-out
+  commit went green, so the failure window is precisely the work interval the claim exists
+  to cover — every correctly-claimed item now spends its whole in-flight life with CI red
+  at the claim sha, which trains sessions to read red as noise (the exact habit Idea-111
+  fought). Either the claim ritual gains "run `render_board.py` in the claim commit" (cheap,
+  but no longer one-key) or the stale-render guards learn to tolerate status-only drift
+  (scoping question). Groom decides; don't leave both rules standing as written.
+
 - **`Idea-150`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
   **`snapshot.ps1` cannot find the depgraph sibling when run from a git worktree, so the
   session ritual's last step is unavailable to exactly the sessions CLAUDE.md tells to use
