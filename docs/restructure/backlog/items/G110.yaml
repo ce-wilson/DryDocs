@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - MODULE_MAP.md
@@ -29,3 +29,13 @@ notes: |
   Idea-141 stays OPEN in the inbox rather than moving to the audit trail, because its four open questions are the user's and would flip the verdict: does the company side install google-adk or SmartSDK and can it reach those distributions; is the agent runtime meant to stay on neo4j driver 6.x (if yes the group is impossible without loosening `neo4j = "^5.20"` repo-wide); and is "one machine holds the only agents venv" permanent.
 
   p3 and haiku: both halves are small and fully specified. Epic component-topology because MODULE_MAP and the boundary test are ADR 0002's surfaces.
+  DONE 2026-08-21 (desktop). (a) MODULE_MAP.md agents/ surface row corrected: agents/ IS scanned by
+  the boundary test (PKG_ROOTS lists REPO_ROOT / "agents" since 2026-07-25; the guard skips the
+  agents/.venv INTERPRETER, not the package) AND carries its own venv; the row says which two facts
+  the old wording ran together -- own-venv is a packaging fact, in-scope-for-the-guard is a different
+  one. (b) agents/requirements.txt pins neo4j>=6.2,<7, python-dotenv>=1.2,<2, litellm>=1.97,<2,
+  pyyaml>=6.0,<7 -- the 2026-08-20 bare-resolve measurements (neo4j 6.2.0, litellm 1.97.0) re-measured
+  today on the desktop agents/.venv (6.2.0 / 1.97.0 / 1.2.3 / 6.0.3), each with a comment naming the
+  source and the bump rule; google-adk>=2,<3 unchanged. `pip install --dry-run -r` against the
+  existing venv: every requirement already satisfied, so the pinned file rebuilds the same venv.
+  Pinned IN requirements.txt; no poetry group created; no behavior change.

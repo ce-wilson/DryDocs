@@ -2,7 +2,14 @@
 # python -m venv .venv && .venv\Scripts\pip install -r requirements.txt
 google-adk>=2,<3   # R10: ADK 2.0 idioms are the ruled build surface (ADR 0007 revisit
                    # check PASSED 2026-07-28); unpinned drifted under breaking changes
-neo4j
-python-dotenv
-litellm       # graph_qa provider adapter (R1 ruling: anthropic local / azure company)
-pyyaml        # graph_qa schema grounding reads relationship_vocabulary.yaml
+# G110 (2026-08-21): pinned to what a bare resolve actually produced on the
+# 2026-08-20 build (Python 3.14.6) and re-measured on the desktop agents/.venv
+# 2026-08-21 — recorded facts, not guesses. Bump on purpose, in this file, with
+# the reason; never by letting the day's resolver choose.
+neo4j>=6.2,<7          # driver major 6 (6.2.0 measured); the DryDocs poetry env is on 5.x — the
+                       # agents venv is a SEPARATE interpreter and may lead, but only by declaration
+python-dotenv>=1.2,<2  # 1.2.3 measured
+litellm>=1.97,<2       # 1.97.0 measured; graph_qa provider adapter (R1 ruling: anthropic local / azure
+                       # company). Windows: install wheels only (README install gotcha, 1.91.4 known-good
+                       # is a floor, not the pin)
+pyyaml>=6.0,<7         # 6.0.3 measured; graph_qa schema grounding reads relationship_vocabulary.yaml

@@ -16,10 +16,15 @@ The rule (CommonMark 4.5) is the whole fix: **an outer fence must be LONGER than
 any fence nested inside it**, because a closing fence must be at least as long as
 its opener — and a line carrying an info string can only ever open.
 
-Scope is `docs/**` — what this repo authors. `internal/` holds captured
-transcripts and `.claude/skills/**` holds vendored reference material; both have
-the same defect, and in both cases editing the file to satisfy a guard would edit
-somebody else's capture. They are inboxed instead.
+SCOPE (J44, 2026-08-21): EVERY tracked markdown file, with a named carve-out list.
+`docs/**` is what this repo authors and is held strictly. `internal/` holds
+captured transcripts and `.claude/skills/**` / `SDLC-Docs/extracted/` hold
+vendored or extracted material — the same defect lives in five of those files,
+and editing them to satisfy a guard would edit somebody else's capture. They are
+CARVED OUT BY NAME with the reason (CAPTURED_PATHS, the FOREIGN_PATHS /
+HISTORICAL_PATHS idiom of test_runbook_currency.py), and the list is shrink-only:
+a carved-out file that becomes clean must leave it. Anything new anywhere in the
+tree is guarded from its first commit.
 """
 
 from __future__ import annotations
@@ -78,6 +83,76 @@ def test_every_fence_under_docs_closes() -> None:
                 f"the OUTER fence must be longer than the inner one."
             )
     assert not problems, "\n".join(problems)
+
+
+#: J44 — tracked markdown the fence guard does NOT hold, each with its reason.
+#: These are captures and vendored material: the unclosed fence is the SOURCE's
+#: defect, faithfully transcribed, and correcting it here would edit someone
+#: else's document. Shrink-only: an entry that becomes clean fails below.
+CAPTURED_PATHS: dict[str, str] = {
+    "internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md": (
+        "VERBATIM capture of the company Confluence space (fcdo-frameworks corpus, trust "
+        "VERBATIM): the unclosed fence at line 5140 is the page's own"
+    ),
+    "internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md": (
+        "VERBATIM capture, same corpus: the fence at line 419 is the source's"
+    ),
+    ".claude/skills/data-context-extractor/references/domain-template.md": (
+        "vendored skill reference material — upstream's file, upstream's fence (line 142)"
+    ),
+    ".claude/skills/data-context-extractor/references/example-output.md": (
+        "vendored skill reference material — upstream's file, upstream's fence (line 112)"
+    ),
+    "SDLC-Docs/extracted/issue-driven-capture-loop.md": (
+        "text EXTRACTED from an office document at the initial import; the extraction "
+        "carries the document's fence as it found it (line 181)"
+    ),
+}
+
+
+def _tracked_markdown() -> list[Path]:
+    import subprocess
+
+    root = DOCS_ROOT.parent
+    out = subprocess.run(
+        ["git", "ls-files", "*.md"], cwd=root, capture_output=True, text=True, check=True
+    ).stdout
+    return [root / line for line in out.splitlines() if line.endswith(".md")]
+
+
+def test_every_fence_in_every_tracked_markdown_closes_or_is_carved_out_by_name() -> None:
+    """J44: the whole tree, default-deny, captures excused by name with a reason."""
+    root = DOCS_ROOT.parent
+    problems = []
+    still_dirty: set[str] = set()
+    found = _tracked_markdown()
+    assert len(found) > 200, f"expected the tracked markdown tree, found {len(found)} files"
+    for path in found:
+        rel = path.relative_to(root).as_posix()
+        result = unclosed_fence(path.read_text(encoding="utf-8", errors="replace"))
+        if not result:
+            continue
+        if rel in CAPTURED_PATHS:
+            still_dirty.add(rel)
+            continue
+        lineno, ticks = result
+        problems.append(
+            f"{rel}: fence of {ticks} backticks opened at line {lineno} never closes. "
+            "Fix it if this repo authored the file; if it is a capture, carve it out BY NAME "
+            "in CAPTURED_PATHS with the reason."
+        )
+    assert not problems, "\n".join(problems)
+    # shrink-only: a carve-out that no longer needs excusing must leave the list
+    stale = sorted(set(CAPTURED_PATHS) - still_dirty)
+    assert not stale, f"CAPTURED_PATHS entries are clean now — remove them: {stale}"
+
+
+def test_every_carve_out_carries_a_reason_and_exists() -> None:
+    root = DOCS_ROOT.parent
+    for rel, why in CAPTURED_PATHS.items():
+        assert why.strip(), rel
+        assert (root / rel).exists(), f"{rel} is carved out but no longer tracked"
+        assert not rel.startswith("docs/"), "docs/** is authored here and is never carved out"
 
 
 # ---- the parser itself, both directions --------------------------------------

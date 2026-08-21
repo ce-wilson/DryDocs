@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 gates: [business-application-identity]
 inputs:
@@ -17,3 +17,12 @@ acceptance: |
   The business-application-identity gate page's §D2 citation (seal_applications.cypher 124/147/170 + seal_contacts.cypher 53, now 152/175/198 + 55) gains a dated rider correcting the line numbers WITHOUT editing the signed text; the rule — a signed gate page is a historical record, drifted citations are corrected by rider, never in place — lands in docs/restructure/03-hitl-sme-flow.md where L19's doc-drift sweep will find it.
 notes: |
   Groomed 2026-08-07 from Idea-72. The rider default follows the step-83 precedent the entry names; if the SME prefers in-place correction for pure line numbers, the rule doc is the place to record that instead.
+  DONE 2026-08-21 (desktop). A dated D2-RIDER appended directly under the signed D2 confirmation on
+  config/gate-prompts/business-application-identity.yaml: the four attribution_id sites now sit at
+  seal_applications.cypher:152,175,198 + seal_contacts.cypher:55 (were 124,147,170 + 53; the files
+  grew above them at the S3 key flip and the K8 reshape; sites, literal roles and the 4-part shape
+  unchanged). The signed text is untouched. THE RULE lands in docs/restructure/03-hitl-sme-flow.md
+  (Audit trail): a signed gate page is a historical record -- drifted citations are corrected by a
+  dated `<id>-RIDER [what drifted, date (item)]` beside the entry, never in place -- with the three
+  precedents named (K7 G6-RIDER-RESOLVED, the step-83 port-prompt rider, this D2-RIDER) so L19's
+  doc-drift sweep applies it on every signed page.

@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/documentation/SKILL.md
@@ -16,3 +16,13 @@ acceptance: |
   The documentation skill gains a "White paper" document type alongside README, API, runbook, architecture and onboarding, with its section sequence stated (executive summary, problem, approach, architecture, governance, roadmap) and docs/whitepaper/drydocs-whitepaper.md named as the worked example that sequence was derived from; the skill's type list and its type-selection prose agree, so a future white paper is not re-derived from the architecture type by hand.
 notes: |
   Groomed 2026-08-07 (pm) from Idea-8. The whitepaper was written by deriving structure from the architecture type plus general white-paper convention — the derivation worked, it just was never written down. The optional half of the entry (an Epic L outline, whitepaper.outline.yaml, so the render pipeline validates it) is deliberately NOT in this item: outlines govern design docs, and the whitepaper is explicitly a non-governed outward-facing document where editorial treatment is allowed (CLAUDE.md, governed renders).
+  DONE 2026-08-21 (desktop). .claude/skills/documentation/SKILL.md gains a "White Paper" type beside
+  README / API / Runbook / Architecture / Onboarding, with the section sequence derived from
+  docs/whitepaper/drydocs-whitepaper.md (Rev 1, 2026-07-12) and that file named as the worked
+  example: executive summary, problem, approach, architecture, what it does on day one, governance
+  and trust model, operating model + roadmap, conclusion. A new "Choosing the type" paragraph makes
+  the type list and the selection prose agree (white paper = the reader decides rather than builds;
+  architecture doc = "how is it put together"); the skill description's trigger list names "white
+  paper"; the entry records that a white paper is NON-GOVERNED outward-facing (CLAUDE.md section 6:
+  editorial treatment allowed, unlike docs/design/* renders) and follows the U.S. business-English
+  guide.

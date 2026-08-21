@@ -59,6 +59,16 @@ Every gate run appends a short log (date, items confirmed/edited/rejected, your 
 rejections) to the mapping file's history or a sibling `config/gate-log.md`, so the evolution of
 the model is reviewable later.
 
+**Signed gate pages get riders, not edits (L25, 2026-08-21).** Once a gate page's confirmations
+are signed, the page is a historical record of what the SME saw and agreed to. When a citation on
+it drifts — a line number after a file grows, a path after a relocate, a count after a later
+finding — the correction is a **dated rider appended beside the signed entry** (`<id>-RIDER
+[what drifted, date (item)]: ...`), never an edit of the signed text. Precedents: the K7 §G
+`G6-RIDER-RESOLVED` entry on `seal-app-ref-edge-reshape`, the step-83 rider in the port prompt,
+and the `D2-RIDER` on `business-application-identity` that corrected
+`seal_applications.cypher:124,147,170 + seal_contacts.cypher:53` to `152,175,198 + 55`. L19's
+doc-drift sweep corrects citations this way on every signed page it touches.
+
 ## Gate-page format (STANDARD — all gate reviews follow this)
 
 Every gate review page is rendered by `drydocs/gate_pages.py` from a spec in
