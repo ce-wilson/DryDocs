@@ -11,7 +11,7 @@
       matrix_row: "Entity -> Entity = prov:wasDerivedFrom family (prov:hadPrimarySource is a sub-property)"
       neo4j_label: HAD_PRIMARY_SOURCE
       prov_maps_to: "prov:hadPrimarySource"
-      vocab_id: seal_had_primary_source
+      vocab_id: business_application_had_primary_source
     precedence_authority: lob-product-team    # SEAL/PAT precedence wired into the live chain at K4 clause 7 — see config/precedence.yaml
     standards_cited: ["PROV-O (prov:hadPrimarySource, sub-property of prov:wasDerivedFrom)"]
     capture: >
@@ -58,11 +58,11 @@
         pattern: "(Product|AreaProduct) -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> ProductRole"
         prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
         role_vocabulary: "ProductRole (skos:Concept) — EXACTLY the fixed 7 in scheme product_roles: area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead. Scheme FIXED (the tom_roles precedent — new roles require a new gate) and NO cto member: the families are independent (SME 2026-07-20; rename history as a skos:changeNote on tech_partner — formerly named 'CTO' in SEAL, whose CTO now denotes the product-level role). Scope: :Product / :AreaProduct only, never :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct. DISTINCT from :Role (org:Role, PAT hierarchy membership) and from :TOMRole — no shared concepts."
-      vocab_id: [catalog_cabinet_qualified_attribution, seal_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # HAS_AGENT hop REUSES seal_attribution_has_agent (duplicate-triple guard, C8 schema meta-graph); catalog_cabinet_attributed_to = the collapsed simple form, SME-decided 2026-07-20 (gate section C)
+      vocab_id: [catalog_cabinet_qualified_attribution, human_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # HAS_AGENT hop REUSES seal_attribution_has_agent (duplicate-triple guard, C8 schema meta-graph); catalog_cabinet_attributed_to = the collapsed simple form, SME-decided 2026-07-20 (gate section C)
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept, skos:inScheme)", "W3C ORG (org:reportsTo — cited for the deferred cross-family reporting edges, gate section D)"]
     capture: config/taxonomy/lob-product-team.yaml
-    vocab_id: [catalog_cabinet_qualified_attribution, seal_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # entry-level C7 field; mirrors ontology.qualified_form.vocab_id + the collapsed form
+    vocab_id: [catalog_cabinet_qualified_attribution, human_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # entry-level C7 field; mirrors ontology.qualified_form.vocab_id + the collapsed form
     status: confirmed
     proposed_at: 2026-07-19
     confirmed_by: chad.wilson   # SME, in-session chat gate — §F sign-off

@@ -314,11 +314,11 @@ MERGE (a)-[r:DELEGATES_TO]->(b)
 
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Port'})
 MERGE (a)-[r:HAS_PORT]->(b)
-  SET r.vocab_id = 'seal_has_port', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'active';
+  SET r.vocab_id = 'business_application_has_port', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Document'})
 MERGE (a)-[r:HAD_PRIMARY_SOURCE]->(b)
-  SET r.vocab_id = 'seal_had_primary_source', r.prov_maps_to = 'prov:hadPrimarySource', r.domain = 'business_application', r.status = 'active';
+  SET r.vocab_id = 'business_application_had_primary_source', r.prov_maps_to = 'prov:hadPrimarySource', r.domain = 'business_application', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'DistributionList'})
 MERGE (a)-[r:HAS_CONTACT_POINT]->(b)
@@ -326,7 +326,7 @@ MERGE (a)-[r:HAS_CONTACT_POINT]->(b)
 
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'BusinessApplication'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
-  SET r.vocab_id = 'seal_appuser_belongs_to_application', r.role = 'service_account', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+  SET r.vocab_id = 'business_application_appuser_belongs_to_application', r.role = 'service_account', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
 
 // ── domain: catalog ─────────────────────────────────────────────────────────
 
@@ -619,19 +619,19 @@ MERGE (a)-[r:WAS_ATTRIBUTED_TO]->(b)
 
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Attribution'})
 MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
-  SET r.vocab_id = 'seal_qualified_attribution', r.prov_maps_to = 'prov:qualifiedAttribution', r.domain = 'human', r.status = 'active';
+  SET r.vocab_id = 'human_qualified_attribution', r.prov_maps_to = 'prov:qualifiedAttribution', r.domain = 'human', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'Employee'})
 MERGE (a)-[r:HAS_AGENT]->(b)
-  SET r.vocab_id = 'seal_attribution_has_agent', r.prov_maps_to = 'prov:agent', r.domain = 'human', r.status = 'active';
+  SET r.vocab_id = 'human_attribution_has_agent', r.prov_maps_to = 'prov:agent', r.domain = 'human', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'TOMRole'})
 MERGE (a)-[r:HAD_ROLE]->(b)
-  SET r.vocab_id = 'seal_attribution_had_role', r.prov_maps_to = 'prov:hadRole', r.domain = 'human', r.status = 'active';
+  SET r.vocab_id = 'human_attribution_had_role', r.prov_maps_to = 'prov:hadRole', r.domain = 'human', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'Employee'})
 MERGE (a)-[r:OWNED_BY]->(b)
-  SET r.vocab_id = 'seal_appuser_owned_by', r.role = 'fid_owner', r.prov_maps_to = null, r.domain = 'human', r.status = 'planned';
+  SET r.vocab_id = 'human_appuser_owned_by', r.role = 'fid_owner', r.prov_maps_to = null, r.domain = 'human', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Product'}), (b:SchemaMeta {name: 'Attribution'})
 MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)

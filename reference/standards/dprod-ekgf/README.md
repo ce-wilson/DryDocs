@@ -9,4 +9,4 @@ Models data products and their **Ports**.
 - Treat Ports as the data-product interface boundary when reasoning about lineage between
   applications and the batch graph.
 
-See the SEAL block (`seal_has_port`) in `relationship_vocabulary.yaml`.
+See the business-application block (`business_application_has_port`, formerly `seal_has_port`) in `drydocs_core/ontology/relationship_vocabulary/`.

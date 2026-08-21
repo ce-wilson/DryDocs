@@ -77,5 +77,6 @@ active:
 # WIRED into the live `order:`/`active:` chain at K4 clause 7 (2026-07-15).
 # The linked mechanism is prov:hadPrimarySource on every extracted fact —
 # config/taxonomy-ontology-map.yaml#seal-doc-source-of-record (confirmed) and
-# relationship_vocabulary.yaml#seal_had_primary_source (active, edge-only).
+# relationship_vocabulary/#business_application_had_primary_source (active, edge-only;
+# id migrated from seal_had_primary_source at G101, 2026-08-21).
 # =============================================================================

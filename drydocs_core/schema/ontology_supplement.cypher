@@ -408,7 +408,7 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#sp
       n.domain = "Requirement",
       n.range  = "DocSection",
       n.notes  = "Requirement's specification is primary-sourced from this section's text "
-               + "(seal_had_primary_source reuse pattern). Gate B2.";
+               + "(business_application_had_primary_source reuse pattern). Gate B2.";
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#specifiedIn"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadPrimarySource"})
 MERGE (local)-[:MAPS_TO]->(prov);

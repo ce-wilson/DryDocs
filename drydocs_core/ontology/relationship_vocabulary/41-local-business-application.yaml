@@ -22,6 +22,45 @@
     supplement:   seal_ontology_supplement.cypher
     loader:       seal_applications.cypher
     domain:       business_application
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: business_application_has_port
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `business_application_has_port` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'seal_has_port'; loaders write
+      'business_application_has_port' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           business_application_has_port
+    neo4j_label:  HAS_PORT
+    inverse_label: "port of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Port
+    prov_maps_to: ~
+    note: >
+      Application exposes a port. Maps to dprod:hasPort pattern. Port kind is
+      stored as a node property — kinds: EventProcessing | BatchProcessing
+      (data ports) + Technology, the infrastructure attachment surface (kind
+      WIDENED by ruled amendment at gate server-location-ontology §C2,
+      2026-08-19: the SME directed the app->server link through a technology
+      port rather than a direct edge; this entry is REUSED for that hop per
+      the C8 identical-triple rule, and the port->server leg is
+      infra_port_runs_on_server in 51-local-infrastructure.yaml). The Z3
+      loader mints one Technology port per application. No PROV-O equivalent;
+      structural dprod relationship.
+      REPLACES seal_has_port at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       seal_applications.cypher
+    domain:       business_application
     status:       active
 
   - id:           seal_requires_scheduler
@@ -85,6 +124,43 @@
       the drydocs-docmeta component (the gate promoted docmeta from parked to a REQUIRED
       dependency of the provenance goal) — see knowledge/upgrade-plans/docmeta-component.md.
       Matrix row: Entity -> Entity = prov:wasDerivedFrom family.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       business_application
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: business_application_had_primary_source
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `business_application_had_primary_source` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'seal_had_primary_source'; loaders write
+      'business_application_had_primary_source' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           business_application_had_primary_source
+    neo4j_label:  HAD_PRIMARY_SOURCE
+    inverse_label: "primary source for"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Document
+    prov_maps_to: "prov:hadPrimarySource"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §D). Entity -> Entity, a sub-property of
+      prov:wasDerivedFrom: the BusinessApplication record (reclassed prov:Entity/
+      dprod:DataProduct at K4) was primarily sourced from a scraped SEAL/PAT Document.
+      Generalizes to any fact/entity extracted from a scraped page; BusinessApplication is
+      the concrete instance in scope. EDGE-ACTIVE ONLY: the Document node + loader wait on
+      the drydocs-docmeta component (the gate promoted docmeta from parked to a REQUIRED
+      dependency of the provenance goal) — see knowledge/upgrade-plans/docmeta-component.md.
+      Matrix row: Entity -> Entity = prov:wasDerivedFrom family.
+      REPLACES seal_had_primary_source at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       business_application
@@ -158,6 +234,49 @@
       only, never override a confirmed mapping — the G3 amendment).
       NOTHING LOADS: planned until the build item lands (N13
       flips-are-follow-ups).
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: business_application_appuser_belongs_to_application
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `business_application_appuser_belongs_to_application` below — same shape, same planned status.
+
+  - id:           business_application_appuser_belongs_to_application
+    neo4j_label:  BELONGS_TO_APPLICATION
+    inverse_label: "owns account"
+    role:         service_account
+    from_node:    AppUser
+    to_node:      BusinessApplication
+    prov_maps_to: ~
+    note: >
+      The directory's application (SEAL) assignment for a functional id — an
+      OWNERSHIP-RECORD fact, as of the extract (gate fid-identity-and-scope
+      §C1-§C3, SIGNED 2026-08-19). ASSERTS REGISTRATION, NEVER CONSUMPTION
+      (§G1): edge property assignment_kind: 'registration' rides on the data,
+      plus as_of (the EXTRACT date, never load date) and origin: 'declared'
+      (§B1). Same label as m3_belongs_to_application (ControlMFolder -> Port)
+      but a different triple — the C8 identical-triple rule; role
+      disambiguates. Target is :BusinessApplication, NOT the BatchProcessing
+      Port: ownership record, not batch wiring (§C2). N:1, graph-test only —
+      never a schema constraint (§C3, the TOM-roles lesson). NO TRANSITIVE
+      READ onto jobs (§G2): the registration and the folder attribution meet
+      ON THE JOB and nowhere else. Agent -> Entity, the family with no PROV
+      row (reg_uses_software's recorded reasoning). Feeds TierReconcilers.fid
+      from the SAME crosswalk (§C4) under the amended K2 scope (fill gaps
+      only, never override a confirmed mapping — the G3 amendment).
+      NOTHING LOADS: planned until the build item lands (N13
+      flips-are-follow-ups).
+      REPLACES seal_appuser_belongs_to_application at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ~
     loader:       ~
     domain:       business_application

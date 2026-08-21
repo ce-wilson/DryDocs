@@ -129,6 +129,41 @@
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       human
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: human_qualified_attribution
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `human_qualified_attribution` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'seal_qualified_attribution'; loaders write
+      'human_qualified_attribution' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           human_qualified_attribution
+    neo4j_label:  QUALIFIED_ATTRIBUTION
+    inverse_label: "attribution of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      Attribution
+    prov_maps_to: "prov:qualifiedAttribution"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). Reified/n-ary form of the TOM attribution
+      pattern (Attribution is a PROV Influence node, not itself Activity / Entity / Agent /
+      Collection, so no matrix row applies directly). Entry point to Attribution
+      -[:HAS_AGENT]-> Employee and Attribution -[:HAD_ROLE]-> TOMRole below. Type-checks
+      under the K4 :BusinessApplication reclass (prov:Entity). Multi-person roles load THIS
+      form; the simple collapsed edge (seal_app_attributed_to_employee) stays optional/derivable.
+      REPLACES seal_qualified_attribution at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       human
     status:       active
 
   - id:           seal_attribution_has_agent
@@ -147,6 +182,43 @@
       the Product Cabinet chain (catalog_cabinet_qualified_attribution, planned) — because
       the (Attribution, HAS_AGENT, Employee) triple is registered exactly once (the C8
       schema meta-graph refuses ambiguous duplicate triples).
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       human
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: human_attribution_has_agent
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `human_attribution_has_agent` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'seal_attribution_has_agent'; loaders write
+      'human_attribution_has_agent' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           human_attribution_has_agent
+    neo4j_label:  HAS_AGENT
+    inverse_label: "agent of"
+    role:         ~
+    from_node:    Attribution
+    to_node:      Employee
+    prov_maps_to: "prov:agent"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B). prov:agent inside the qualified-attribution
+      reification — names which Employee the Attribution is about. No independent matrix row
+      (Attribution is prov_type n/a, same family as seal_held_by's org:member inverse).
+      RESCOPED at the K5 sign-off (2026-07-20): serves BOTH attribution families as
+      family-agnostic infrastructure — the SEAL TOM chain (seal_qualified_attribution) and
+      the Product Cabinet chain (catalog_cabinet_qualified_attribution, planned) — because
+      the (Attribution, HAS_AGENT, Employee) triple is registered exactly once (the C8
+      schema meta-graph refuses ambiguous duplicate triples).
+      REPLACES seal_attribution_has_agent at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       human
@@ -169,6 +241,44 @@
       Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
       cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
+    supplement:   seal_ontology_supplement.cypher
+    loader:       ~
+    domain:       human
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: human_attribution_had_role
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `human_attribution_had_role` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'seal_attribution_had_role'; loaders write
+      'human_attribution_had_role' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           human_attribution_had_role
+    neo4j_label:  HAD_ROLE
+    inverse_label: "role in"
+    role:         ~
+    from_node:    Attribution
+    to_node:      TOMRole
+    prov_maps_to: "prov:hadRole"
+    note: >
+      ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
+      qualified-attribution reification — names which TOM role the Attribution grants. The
+      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
+      backup_information_owner | cto | technology_risk_controls |
+      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
+      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
+      TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
+      REPLACES seal_attribution_had_role at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   seal_ontology_supplement.cypher
     loader:       ~
     domain:       human
@@ -197,6 +307,47 @@
       delegation of action, so no prov:actedOnBehalfOf — null-PROV on the
       recorded local-meaning precedent. NOTHING LOADS: planned until the
       build item lands.
+    supplement:   ~
+    loader:       ~
+    domain:       human
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: human_appuser_owned_by
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G101 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `human_appuser_owned_by` below — same shape, same planned status.
+
+  - id:           human_appuser_owned_by
+    neo4j_label:  OWNED_BY
+    inverse_label: "owner of record for"
+    role:         fid_owner
+    from_node:    AppUser
+    to_node:      Employee
+    prov_maps_to: ~
+    note: >
+      The functional id's human OWNER-OF-RECORD — the manager the directory
+      names against the account, who RECERTIFIES ANNUALLY (gate
+      fid-identity-and-scope Q7, RULED 2026-08-19: owner-of-record, not mere
+      attestor). Accountability, NOT a contact point — explicitly not swept
+      into the email-dl-contact-point deferral. Ownership arrives natively
+      as-of (recertification cadence), so the edge carries as_of like its
+      §C1 sibling. THE TWO-HUMAN-OWNERS RULE FINALLY ATTACHES HERE: the SME
+      input (every FID carries at least two human owners) becomes a GRAPH
+      TEST against this edge — minimum cardinality is never a constraint
+      (the TOM-roles lesson); the census keeps accounts_below_owner_minimum
+      separate from accounts_with_no_owner_recorded so an unmeasurable
+      estate never reads as compliant. Agent -> Agent, but ownership is not
+      delegation of action, so no prov:actedOnBehalfOf — null-PROV on the
+      recorded local-meaning precedent. NOTHING LOADS: planned until the
+      build item lands.
+      REPLACES seal_appuser_owned_by at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ~
     loader:       ~
     domain:       human
