@@ -1804,6 +1804,12 @@
       "source": "snowflake-data-catalog"
     },
     {
+      "id": "catalog-business-term",
+      "status": "proposed",
+      "label": "IS_REPRESENTED_AS",
+      "source": "glossary"
+    },
+    {
       "id": "doc-supersedes-doc",
       "status": "proposed",
       "label": "SUPERSEDES",

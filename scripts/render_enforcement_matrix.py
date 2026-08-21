@@ -143,6 +143,14 @@ SURFACES: list[dict] = [
         "gate_ref": None,
     },
     {
+        "id": "glossary",
+        "title": "Business glossary (schema half)",
+        "file": "config/glossary/",
+        "consumers": [],  # G34 scaffold 2026-08-21: reservation only -- no loader reads it yet; content + consumer arrive with epic MM
+        "guard_tests": [],  # honest red flag until the content pass lands its shape test
+        "gate_ref": "G34 reservation (business-application-identity gate section F2, 2026-07-27); definitions half = internal/glossary/ (Internal)",
+    },
+    {
         "id": "crosswalks",
         "title": "Orchestrator crosswalks",
         "file": "config/crosswalks/",

@@ -101,6 +101,14 @@ MERGE (n:SchemaMeta:TOMRole {name: 'TOMRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:Theme {name: 'Theme'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:CatalogBusinessTerm {name: 'CatalogBusinessTerm'})
+  SET n.class = 'skos:Concept', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:CatalogValidValue {name: 'CatalogValidValue'})
+  SET n.class = 'skos:Concept', n.prov_type = 'n/a';
+MERGE (n:SchemaMeta:CatalogElement {name: 'CatalogElement'})
+  SET n.class = 'dd:CatalogElement', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:CatalogEncodingInstance {name: 'CatalogEncodingInstance'})
+  SET n.class = 'dd:CatalogEncodingInstance', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:ProductRole {name: 'ProductRole'})
   SET n.class = 'skos:Concept', n.prov_type = 'n/a';
 MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
@@ -417,6 +425,22 @@ MERGE (a)-[r:HAS_THEME]->(b)
 MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'Theme'})
 MERGE (a)-[r:HAS_THEME]->(b)
   SET r.vocab_id = 'catalog_has_theme', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'CatalogElement'}), (b:SchemaMeta {name: 'CatalogBusinessTerm'})
+MERGE (a)-[r:IS_REPRESENTED_AS]->(b)
+  SET r.vocab_id = 'catalog_is_represented_as', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'CatalogValidValue'}), (b:SchemaMeta {name: 'CatalogBusinessTerm'})
+MERGE (a)-[r:HAS_ALLOWED_VALUES]->(b)
+  SET r.vocab_id = 'catalog_has_allowed_values', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'CatalogBusinessTerm'}), (b:SchemaMeta {name: 'CatalogEncodingInstance'})
+MERGE (a)-[r:DEFINED_FOR]->(b)
+  SET r.vocab_id = 'catalog_defined_for', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'CatalogValidValue'}), (b:SchemaMeta {name: 'CatalogEncodingInstance'})
+MERGE (a)-[r:DEFINED_FOR]->(b)
+  SET r.vocab_id = 'catalog_defined_for', r.prov_maps_to = null, r.domain = 'catalog', r.status = 'planned';
 
 // ── domain: architecture ────────────────────────────────────────────────────
 

@@ -276,6 +276,41 @@ node_classifications:
       links so tagging at Product yields ProductLine and LOB free (§C). Never a
       DevTeam (org unit, not a subject).
 
+  # — Business glossary (G34, 2026-08-21; RESERVATION ONLY — no term defined, no loader) —
+  - label:      CatalogBusinessTerm
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      PLANNED (G34, 2026-08-21): a canonical business definition / acronym SENSE, keyed
+      term_id, in a skos:ConceptScheme per scope (area | business-domain | technical-domain
+      | industry). Shape from docs/patterns/data-catalog/enterprise-data-catalog-ontology.md
+      §Business Glossary; the SKOS binding (prefLabel / altLabel / definition / scopeNote /
+      does-NOT-mean as a skos:scopeNote) is the Idea-35 requirement MERGED into G34. The
+      glossary SCHEMA (this label, its key, its edges, config/glossary/schema.yaml) is
+      Internal-Public; the DEFINITIONS are Internal and live in internal/glossary/. First
+      content producer: drydocs_deepdoc (epic MM) — only acronyms that correlate to what is
+      being ingested; the company runs a dedicated acronym tool for everything else, and this
+      label never competes with it. Registered so a port cannot collide on the name.
+  - label:      CatalogValidValue
+    class:      "skos:Concept"
+    prov_type:  n/a
+    note: >
+      PLANNED (G34, 2026-08-21): an allowed enumeration value for a term, keyed value_id
+      (pattern §Business Glossary). Reservation only.
+  - label:      CatalogElement
+    class:      "dd:CatalogElement"
+    prov_type:  Entity
+    note: >
+      PLANNED (G34, 2026-08-21): a logical data element (field-level concept), keyed
+      element_id — the thing a business term is REPRESENTED AS. Reservation only; the
+      physical CatalogField / CatalogSchema half of the pattern is NOT reserved here.
+  - label:      CatalogEncodingInstance
+    class:      "dd:CatalogEncodingInstance"
+    prov_type:  Entity
+    note: >
+      PLANNED (G34, 2026-08-21): the code encoding a term's value set is DEFINED FOR,
+      keyed encoding_id (pattern §Business Glossary). Reservation only.
+
   # — Product Cabinet (K5 gate signed off 2026-07-20; supplement landed K6) —
   - label:      ProductRole
     class:      "skos:Concept"

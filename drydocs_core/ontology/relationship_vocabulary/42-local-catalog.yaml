@@ -401,3 +401,60 @@
     domain:       catalog
     loader:       ~
     status:       planned   # C34 2026-08-20; gate dcat-theme-subject-scheme drafted, unsigned
+
+  # ---- G34: business-glossary scaffold (2026-08-21) — RESERVATION ONLY ----
+  # Names and slots claimed so the internal port cannot collide (SME reason at
+  # gate business-application-identity §F2, 2026-07-27). No term is defined, no
+  # loader writes, no gate is run here; all three stay planned until the content
+  # pass (parked on the gate-log Q6 acronym ruling) opens its own gate.
+
+  - id:           catalog_is_represented_as
+    neo4j_label:  IS_REPRESENTED_AS
+    inverse_label: "represents"
+    role:         ~
+    from_node:    CatalogElement
+    to_node:      CatalogBusinessTerm
+    prov_maps_to: ~
+    skos_maps_to: "skos:exactMatch (the element's concept IS the term's sense)"
+    note: >
+      G34 reservation (2026-08-21). A logical data element is represented by exactly one
+      business-term SENSE; an acronym with several senses is several CatalogBusinessTerm
+      nodes in scoped schemes, never one node with a list. Shape from
+      docs/patterns/data-catalog/enterprise-data-catalog-ontology.md. Both ends Entities /
+      concepts — no PROV row (local structural link).
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_has_allowed_values
+    neo4j_label:  HAS_ALLOWED_VALUES
+    inverse_label: "allowed value of"
+    role:         ~
+    from_node:    CatalogValidValue
+    to_node:      CatalogBusinessTerm
+    prov_maps_to: ~
+    skos_maps_to: "skos:inScheme (a value is a narrower concept in the term's value scheme)"
+    note: >
+      G34 reservation (2026-08-21), direction as the pattern writes it (value -> term).
+      Reservation only.
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned
+
+  - id:           catalog_defined_for
+    neo4j_label:  DEFINED_FOR
+    inverse_label: "defines"
+    role:         ~
+    from_node:    "CatalogBusinessTerm | CatalogValidValue"
+    to_node:      CatalogEncodingInstance
+    prov_maps_to: ~
+    skos_maps_to: ~
+    note: >
+      G34 reservation (2026-08-21). A term or a valid value is defined for one code
+      encoding. Reservation only.
+    supplement:   ~
+    loader:       ~
+    domain:       catalog
+    status:       planned

@@ -230,3 +230,30 @@
       cascade picker returns a LIST, never a single application. The vocabulary
       entry stays status: planned until the product-scoped extract is onboarded
       here (C9 condition unchanged); K13 reconciled the semantics only.
+
+  # ---- G34: business-glossary scaffold (2026-08-21) — RESERVATION ONLY, proposed ----
+  - id: catalog-business-term
+    taxonomy:
+      source: glossary                      # NOT a source-registry row yet — the content pass registers it (Internal)
+      element: "A business term / acronym SENSE (CatalogBusinessTerm, term_id), its allowed values (CatalogValidValue), the logical element it is represented as (CatalogElement), and the encoding it is defined for (CatalogEncodingInstance)"
+    ontology:
+      from_node: CatalogElement             # dd:CatalogElement (prov:Entity)
+      to_node: CatalogBusinessTerm          # skos:Concept
+      prov_type_from: Entity
+      prov_type_to: n/a
+      matrix_row: "no PROV row — local structural link between an element and the concept it represents (SKOS binding instead)"
+      neo4j_label: IS_REPRESENTED_AS
+      prov_maps_to: ~
+      vocab_id: catalog_is_represented_as   # siblings: catalog_has_allowed_values, catalog_defined_for
+    precedence_authority: ~
+    standards_cited: ["SKOS (prefLabel / altLabel / definition / scopeNote; senses as concepts in scoped schemes)", "enterprise data-catalog pattern §Business Glossary"]
+    capture: >
+      waived — reservation only (G34 acceptance). The glossary SCHEMA is Internal-Public
+      (config/glossary/schema.yaml); term DEFINITIONS are Internal (internal/glossary/).
+    status: proposed
+    depends_on: ~
+    proposed_at: 2026-08-21
+    open_questions:
+      - "Gate-log Q6 (acronym question) decides whether config/taxonomy/software-registry.yaml#acronyms survives as a one-key section or migrates into scoped senses here; until it rules, #acronyms stays the durable home for the two expansions it holds."
+      - "Scope: the company runs a dedicated acronym tool. This glossary holds ONLY acronyms and terms that correlate to what DryDocs ingests (first producer: drydocs_deepdoc, epic MM), each with an evidence breadcrumb; it must never become a second general acronym catalogue."
+      - "Is the protective sentence (does-NOT-mean) a skos:scopeNote on the sense, or its own edge to the sense it is confused with?"

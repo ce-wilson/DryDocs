@@ -1,0 +1,5 @@
+# Internal — business-glossary DEFINITIONS. Shape: config/glossary/schema.yaml (drydocs.glossary.v1).
+# G34 scaffold 2026-08-21: intentionally empty. No term is defined by the scaffold.
+schema: drydocs.glossary.v1
+classification: Internal
+terms: []

@@ -1,0 +1,34 @@
+# Business glossary — SCHEMA (Internal-Public). G34 scaffold, 2026-08-21. No terms live here.
+# Definitions live in internal/glossary/terms.yaml (Internal) under this exact shape.
+schema: drydocs.glossary.v1
+classification: Internal-Public            # the shape; definitions are Internal
+scopes: [area, business-domain, technical-domain, industry]
+confidence_values: [candidate, likely, confirmed, corrected]
+skos:
+  sense: "skos:Concept"
+  scheme_per_scope: "skos:ConceptScheme"    # urn:drydocs:glossary:<scope>
+  labels: {preferred: "skos:prefLabel", alternate: "skos:altLabel"}
+  definition: "skos:definition"
+  does_not_mean: "skos:scopeNote"           # the protective sentence
+graph:
+  term_label: CatalogBusinessTerm
+  term_key: term_id                         # urn:drydocs:term:<scope>:<acronym>:<n>
+  value_label: CatalogValidValue
+  element_label: CatalogElement
+  encoding_label: CatalogEncodingInstance
+  edges: [IS_REPRESENTED_AS, HAS_ALLOWED_VALUES, DEFINED_FOR]
+  write_rule: "candidate senses are :Uncertain (ADR 0011) through drydocs_deepdoc/writer.py; confirmed = gate write"
+entry_shape:                                # one key, many senses
+  acronym: "<KEY>"
+  senses:
+    - term_id: "urn:drydocs:term:<scope>:<KEY>:1"
+      scope: technical-domain
+      pref_label: "<expansion>"
+      alt_labels: []
+      definition: "<one sentence>"
+      does_not_mean: []                     # ["<other expansion> — <where the misreading happened>"]
+      correlates_to: []                     # what DryDocs ingests that carries it: job-token | zone | launcher-flag | platform | feed | folder-token
+      evidence_ref: []                      # email:<id> | log:<job>/<run>/<lines> | jira:<key> | confluence:<page-id> | transcript:<file> | standard:<doc>
+      confidence: candidate
+      confirmed_by: ~
+      confirmed_on: ~
