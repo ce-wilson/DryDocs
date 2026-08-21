@@ -8,7 +8,7 @@ phase: 17
 agent: main
 model: sonnet
 priority: p1
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs_deepdoc/__init__.py
