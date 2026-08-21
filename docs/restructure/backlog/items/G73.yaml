@@ -11,6 +11,7 @@ priority: p2
 status: todo
 depends_on:
 - G70
+gates: [tom-roles-enumeration-and-cardinality]
 inputs:
 - config/gate-log.md
 - knowledge/upgrade-plans/servicenow-replica-evidence.md

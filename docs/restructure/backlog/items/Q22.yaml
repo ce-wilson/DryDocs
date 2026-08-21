@@ -11,6 +11,7 @@ priority: p2
 status: todo
 depends_on:
 - Q21
+gates: [email-folder-assignment]
 inputs:
 - web/src/routes/
 - drydocs/loaders/email_extracts.py

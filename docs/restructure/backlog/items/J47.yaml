@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -18,3 +18,14 @@ acceptance: |
   Two guards in tests/unit/test_port_manifest.py, each proven to FAIL on an injected defect before it is trusted (J26). (a) EXISTENCE: every non-glob row resolves to a path that exists and every glob row matches at least one path, unless the row is allow-listed with a reason -- the FOREIGN_PATHS / HISTORICAL_PATHS idiom test_runbook_currency.py::test_every_path_a_document_names_exists already uses, which this manifest needs because it legitimately names company-only paths (drydocs/docmeta/**, drydocs/scrapers/**) and globs that match nothing producer-side. (b) ORDERING, DERIVED rather than listed: any row whose path is a strict prefix-match of a LATER glob row is an ordering defect, replacing test_overrides_precede_their_broader_glob's hardcoded list of four overrides against config/**.
 notes: |
   Groomed 2026-08-11 from Idea-107 -- captured 2026-08-11 under the id Idea-86, which a 2026-08-07 [source] entry already held, and RENUMBERED at this groom (the older entry keeps the id; commit d05811a's message is the only surface carrying the short-lived spelling). That is the second two-session id collision in IDEAS.md after the duplicate Idea-101 J41 records. FOUND AT G75, not by a test: the row drydocs_core/controlm/** had pointed at a path that has not existed since the S2 / ADR 0008 relocate under orchestration/, so every module in the Control-M package was silently falling through to the generic drydocs_core/** evaluate-on-collision row instead of the canonical-producer row it was written for. Nothing failed, because test_port_manifest.py checks uniqueness, dispositions, notes and pins -- never existence. The ordering half was verified the same way: at G75 the order had to be fixed by hand. Sibling of J43, which adds a precondition key to the same file; separable because this is a producer-side unit-test guard while J43 changes the manifest vocabulary and the reconcile behaviour.
+  DONE 2026-08-21 (desktop). (a) EXISTENCE was already built on 2026-08-12 (928eca7f, the inverse of J16):
+  test_port_reconcile_guards::test_no_manifest_row_matches_nothing with the reasoned allow-list
+  `row_may_match_nothing` in PORT-MANIFEST.yaml (company-only modules, the J34 overlay slot, the
+  gitignored internal-local zone, the retired .print.html) -- re-verified today: 92 rows, 6 reasoned
+  zero-matches, 0 unexplained. (b) ORDERING, DERIVED: test_port_manifest::
+  test_no_row_is_shadowed_by_an_earlier_glob computes, for every row, whether an EARLIER glob row
+  already matches it (a literal row by itself; a glob row by a representative expansion) -- first
+  match wins, so such a row can never fire. Replaces the hand-typed list of four config/** overrides;
+  the no-drydocs/** assertion stays. J26 proof: test_shadow_detector_catches_a_misordered_override
+  fails on config/** before config/gate-log.md, passes on the right order, and catches a narrower glob
+  after a broader one. Current manifest: 0 shadowed rows.

@@ -11,6 +11,7 @@ priority: p1
 status: todo
 depends_on:
 - G35
+gates: [tom-roles-enumeration-and-cardinality]
 inputs:
 - config/gate-log.md
 - config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml

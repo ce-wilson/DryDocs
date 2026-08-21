@@ -10,6 +10,7 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
+gates: [pending-source-correction, email-folder-assignment]
 inputs:
 - drydocs/loaders/email_extracts.py
 - drydocs/loaders/cypher/email_extracts.cypher

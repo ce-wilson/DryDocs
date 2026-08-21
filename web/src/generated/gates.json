@@ -55,9 +55,7 @@
         "config/gate-prompts/controlm-q1q3-phase1.yaml"
       ],
       "log_ref": "config/gate-log.md:68",
-      "unblocks": [
-        "N1"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -68,14 +66,7 @@
         "config/gate-prompts/seal-tom-attribution-reshape.yaml"
       ],
       "log_ref": "config/gate-log.md:93",
-      "unblocks": [
-        "G101",
-        "J28",
-        "G35",
-        "K3",
-        "K21",
-        "K22"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -86,9 +77,7 @@
         "config/gate-prompts/bmc-docs-lexical-load.yaml"
       ],
       "log_ref": "config/gate-log.md:139",
-      "unblocks": [
-        "Q2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -99,11 +88,7 @@
         "config/gate-prompts/controlm-hosts-topology.yaml"
       ],
       "log_ref": "config/gate-log.md:160",
-      "unblocks": [
-        "P1",
-        "P3",
-        "P5"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -115,17 +100,7 @@
         "config/gate-prompts/seal-tom-attribution-reshape.yaml"
       ],
       "log_ref": "config/gate-log.md:195",
-      "unblocks": [
-        "G101",
-        "J28",
-        "G35",
-        "K2",
-        "K3",
-        "K17",
-        "K21",
-        "K22",
-        "S3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -137,12 +112,7 @@
         "config/gate-prompts/controlm-hosts-topology.yaml"
       ],
       "log_ref": "config/gate-log.md:239",
-      "unblocks": [
-        "F2",
-        "P1",
-        "P3",
-        "P5"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -154,12 +124,7 @@
         "config/gate-prompts/controlm-hosts-topology.yaml"
       ],
       "log_ref": "config/gate-log.md:266",
-      "unblocks": [
-        "F1",
-        "P1",
-        "P3",
-        "P5"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -170,10 +135,7 @@
         "config/gate-prompts/controlm-avg-run-supplement.yaml"
       ],
       "log_ref": "config/gate-log.md:293",
-      "unblocks": [
-        "P2",
-        "P4"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -195,11 +157,7 @@
         "config/gate-prompts/seal-attribution-match-policy.yaml"
       ],
       "log_ref": "config/gate-log.md:329",
-      "unblocks": [
-        "K2",
-        "K17",
-        "S3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -219,9 +177,7 @@
         "config/gate-prompts/software-usage-patterns.yaml"
       ],
       "log_ref": "config/gate-log.md:411",
-      "unblocks": [
-        "J28"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -232,9 +188,7 @@
         "config/gate-prompts/bmc-docs-lexical-load.yaml"
       ],
       "log_ref": "config/gate-log.md:461",
-      "unblocks": [
-        "Q2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -264,8 +218,6 @@
       ],
       "log_ref": "config/gate-log.md:574",
       "unblocks": [
-        "K5",
-        "K6",
         "K20"
       ]
     },
@@ -278,12 +230,7 @@
         "config/gate-prompts/doc-traceability-feedback.yaml"
       ],
       "log_ref": "config/gate-log.md:617",
-      "unblocks": [
-        "J25",
-        "L7",
-        "N8",
-        "O12"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -303,11 +250,7 @@
         "config/gate-prompts/ui-write-surface.yaml"
       ],
       "log_ref": "config/gate-log.md:701",
-      "unblocks": [
-        "O20",
-        "O24",
-        "O25"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -318,9 +261,7 @@
         "config/gate-prompts/platforms-taxonomy.yaml"
       ],
       "log_ref": "config/gate-log.md:741",
-      "unblocks": [
-        "C12"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -340,17 +281,7 @@
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
       ],
       "log_ref": "config/gate-log.md:804",
-      "unblocks": [
-        "C17",
-        "G55",
-        "J24",
-        "J28",
-        "J43",
-        "K7",
-        "K11",
-        "K15",
-        "S3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -364,23 +295,7 @@
       ],
       "log_ref": "config/gate-log.md:828",
       "unblocks": [
-        "C17",
-        "G34",
-        "G36",
-        "G55",
-        "J24",
-        "J28",
-        "J43",
-        "G35",
-        "K2",
-        "K7",
-        "K11",
-        "K15",
-        "K17",
-        "L25",
-        "S1",
-        "S3",
-        "S10"
+        "L25"
       ]
     },
     {
@@ -392,13 +307,7 @@
         "config/gate-prompts/self-documentation-code-graph.yaml"
       ],
       "log_ref": "config/gate-log.md:948",
-      "unblocks": [
-        "C19",
-        "G33",
-        "U10",
-        "U11",
-        "U23"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -418,11 +327,7 @@
         "config/gate-prompts/source-registry-v2.yaml"
       ],
       "log_ref": "config/gate-log.md:1044",
-      "unblocks": [
-        "J13",
-        "N7",
-        "N9"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -443,36 +348,7 @@
         "config/gate-prompts/source-registry-v2.yaml"
       ],
       "log_ref": "config/gate-log.md:1105",
-      "unblocks": [
-        "C19",
-        "F1",
-        "F2",
-        "G42",
-        "G44",
-        "J13",
-        "J17",
-        "J25",
-        "K2",
-        "K17",
-        "L7",
-        "N1",
-        "N5",
-        "N7",
-        "N8",
-        "N9",
-        "O12",
-        "P1",
-        "P2",
-        "P3",
-        "P4",
-        "P5",
-        "Q2",
-        "S3",
-        "G33",
-        "U10",
-        "U11",
-        "U23"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -483,17 +359,7 @@
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
       ],
       "log_ref": "config/gate-log.md:1136",
-      "unblocks": [
-        "C17",
-        "G55",
-        "J24",
-        "J28",
-        "J43",
-        "K7",
-        "K11",
-        "K15",
-        "S3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -523,20 +389,7 @@
         "config/gate-prompts/ui-write-surface.yaml"
       ],
       "log_ref": "config/gate-log.md:1251",
-      "unblocks": [
-        "C17",
-        "G55",
-        "J24",
-        "J28",
-        "J43",
-        "K7",
-        "K11",
-        "K15",
-        "O20",
-        "O24",
-        "O25",
-        "S3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -547,11 +400,7 @@
         "config/gate-prompts/audit-envelope-phase4.yaml"
       ],
       "log_ref": "config/gate-log.md:1355",
-      "unblocks": [
-        "G64",
-        "K21",
-        "M3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -563,12 +412,7 @@
         "config/gate-prompts/envelope-property-terms.yaml"
       ],
       "log_ref": "config/gate-log.md:1392",
-      "unblocks": [
-        "G64",
-        "K21",
-        "M3",
-        "M4"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -588,9 +432,7 @@
         "config/gate-prompts/fcdo-crosswalk.yaml"
       ],
       "log_ref": "config/gate-log.md:1432",
-      "unblocks": [
-        "W1"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -601,9 +443,7 @@
         "config/gate-prompts/fcdo-crosswalk.yaml"
       ],
       "log_ref": "config/gate-log.md:1454",
-      "unblocks": [
-        "W1"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -614,12 +454,7 @@
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
       "log_ref": "config/gate-log.md:1476",
-      "unblocks": [
-        "G70",
-        "G71",
-        "K21",
-        "O44"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -641,32 +476,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1586",
-      "unblocks": [
-        "C25",
-        "C33",
-        "G101",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J32",
-        "J43",
-        "K7",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
-        "K26",
-        "P1",
-        "P3",
-        "P5"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -677,20 +487,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1651",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -701,20 +498,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1731",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -725,20 +509,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1792",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -749,20 +520,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1863",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -773,20 +531,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1930",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -797,20 +542,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:1983",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -824,33 +556,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:2052",
-      "unblocks": [
-        "C25",
-        "C33",
-        "G101",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G64",
-        "G97",
-        "J24",
-        "J32",
-        "J43",
-        "K7",
-        "K16",
-        "K17",
-        "K19",
-        "K21",
-        "K24",
-        "K25",
-        "K26",
-        "M3",
-        "N1"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -862,22 +568,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:2155",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7",
-        "P2",
-        "P4"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -888,20 +579,7 @@
         "config/gate-prompts/rua-load-shapes.yaml"
       ],
       "log_ref": "config/gate-log.md:2215",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -914,34 +592,7 @@
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml"
       ],
       "log_ref": "config/gate-log.md:2297",
-      "unblocks": [
-        "C17",
-        "C25",
-        "C33",
-        "G101",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J28",
-        "J32",
-        "J43",
-        "K7",
-        "K11",
-        "K15",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
-        "K26",
-        "S3"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -956,21 +607,7 @@
       ],
       "log_ref": "config/gate-log.md:2405",
       "unblocks": [
-        "C25",
-        "C33",
-        "G101",
-        "G64",
-        "J28",
-        "J32",
-        "K16",
-        "K17",
-        "K19",
-        "K21",
-        "K24",
-        "K25",
-        "K26",
-        "M3",
-        "Z2"
+        "C33"
       ]
     },
     {
@@ -982,15 +619,7 @@
         "config/gate-prompts/email-dl-contact-point.yaml"
       ],
       "log_ref": "config/gate-log.md:2546",
-      "unblocks": [
-        "C29",
-        "C31",
-        "G44",
-        "G84",
-        "J24",
-        "J51",
-        "K17"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1001,12 +630,7 @@
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
       "log_ref": "config/gate-log.md:2574",
-      "unblocks": [
-        "G70",
-        "G71",
-        "K21",
-        "O44"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1017,12 +641,7 @@
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
       "log_ref": "config/gate-log.md:2644",
-      "unblocks": [
-        "G70",
-        "G71",
-        "K21",
-        "O44"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1036,21 +655,10 @@
       ],
       "log_ref": "config/gate-log.md:2743",
       "unblocks": [
-        "G34",
-        "G101",
-        "G36",
-        "J28",
-        "G35",
         "G70",
         "G71",
-        "K3",
-        "K21",
-        "K22",
-        "L25",
-        "O44",
-        "S1",
-        "S3",
-        "S10"
+        "G73",
+        "O44"
       ]
     },
     {
@@ -1062,12 +670,7 @@
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
       "log_ref": "config/gate-log.md:2815",
-      "unblocks": [
-        "G70",
-        "G71",
-        "K21",
-        "O44"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1078,12 +681,7 @@
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
       "log_ref": "config/gate-log.md:2877",
-      "unblocks": [
-        "G70",
-        "G71",
-        "K21",
-        "O44"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1094,12 +692,7 @@
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
       "log_ref": "config/gate-log.md:2905",
-      "unblocks": [
-        "G70",
-        "G71",
-        "K21",
-        "O44"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1110,11 +703,7 @@
         "config/gate-prompts/source-registry-v2.yaml"
       ],
       "log_ref": "config/gate-log.md:2940",
-      "unblocks": [
-        "J13",
-        "N7",
-        "N9"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1128,34 +717,7 @@
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
       "log_ref": "config/gate-log.md:2991",
-      "unblocks": [
-        "C25",
-        "C33",
-        "G87",
-        "G88",
-        "G89",
-        "G91",
-        "G101",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J28",
-        "J43",
-        "G35",
-        "G70",
-        "G73",
-        "K3",
-        "K7",
-        "K21",
-        "K22",
-        "Z2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1169,8 +731,6 @@
       ],
       "log_ref": "config/gate-log.md:3056",
       "unblocks": [
-        "M4",
-        "N1",
         "G90"
       ]
     },
@@ -1196,9 +756,7 @@
         "config/gate-prompts/corporate-backbone-vocabulary.yaml"
       ],
       "log_ref": "config/gate-log.md:3134",
-      "unblocks": [
-        "G98"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1211,28 +769,7 @@
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
       "log_ref": "config/gate-log.md:3180",
-      "unblocks": [
-        "C33",
-        "G87",
-        "G88",
-        "G89",
-        "G91",
-        "G101",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "G98",
-        "J24",
-        "J43",
-        "G70",
-        "G73",
-        "K7"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1246,36 +783,7 @@
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
       "log_ref": "config/gate-log.md:3256",
-      "unblocks": [
-        "C25",
-        "C33",
-        "G87",
-        "G88",
-        "G89",
-        "G91",
-        "G101",
-        "F1",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J32",
-        "J43",
-        "G70",
-        "G73",
-        "K7",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
-        "K26"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1286,15 +794,7 @@
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
       "log_ref": "config/gate-log.md:3328",
-      "unblocks": [
-        "G87",
-        "G88",
-        "G89",
-        "G91",
-        "G101",
-        "G70",
-        "G73"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1315,7 +815,6 @@
       ],
       "log_ref": "config/gate-log.md:3414",
       "unblocks": [
-        "N13",
         "N14",
         "N15",
         "Q21"
@@ -1330,12 +829,7 @@
         "config/gate-prompts/document-content-topology.yaml"
       ],
       "log_ref": "config/gate-log.md:3459",
-      "unblocks": [
-        "G32",
-        "G102",
-        "MM1",
-        "MM2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1346,12 +840,7 @@
         "config/gate-prompts/document-content-topology.yaml"
       ],
       "log_ref": "config/gate-log.md:3527",
-      "unblocks": [
-        "G32",
-        "G102",
-        "MM1",
-        "MM2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1373,10 +862,6 @@
       ],
       "log_ref": "config/gate-log.md:3581",
       "unblocks": [
-        "N13",
-        "N14",
-        "N15",
-        "Q10",
         "Q21",
         "Q22"
       ]
@@ -1390,9 +875,7 @@
         "config/gate-prompts/medallion-stage-vocabulary.yaml"
       ],
       "log_ref": "config/gate-log.md:3631",
-      "unblocks": [
-        "B5"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1404,21 +887,7 @@
         "config/gate-prompts/server-location-ontology.yaml"
       ],
       "log_ref": "config/gate-log.md:3675",
-      "unblocks": [
-        "C33",
-        "G22",
-        "G23",
-        "G45",
-        "G55",
-        "G56",
-        "G57",
-        "G58",
-        "G97",
-        "J24",
-        "J43",
-        "K7",
-        "Z2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "log-entry",
@@ -1430,14 +899,6 @@
       ],
       "log_ref": "config/gate-log.md:3771",
       "unblocks": [
-        "C25",
-        "G101",
-        "J32",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
         "K26"
       ]
     },
@@ -1451,14 +912,6 @@
       ],
       "log_ref": "config/gate-log.md:3830",
       "unblocks": [
-        "C25",
-        "G101",
-        "J32",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
         "K26"
       ]
     },
@@ -1472,14 +925,6 @@
       ],
       "log_ref": "config/gate-log.md:3862",
       "unblocks": [
-        "C25",
-        "G101",
-        "J32",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
         "K26"
       ]
     },
@@ -1493,14 +938,6 @@
       ],
       "log_ref": "config/gate-log.md:3894",
       "unblocks": [
-        "C25",
-        "G101",
-        "J32",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
         "K26"
       ]
     },
@@ -1516,19 +953,7 @@
       ],
       "log_ref": "config/gate-log.md:3914",
       "unblocks": [
-        "C25",
-        "C33",
-        "G101",
-        "J32",
-        "K2",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
-        "K26",
-        "S3",
-        "Z2"
+        "K26"
       ]
     },
     {
@@ -1542,17 +967,7 @@
       ],
       "log_ref": "config/gate-log.md:3965",
       "unblocks": [
-        "C25",
-        "G101",
-        "J32",
-        "K2",
-        "K16",
-        "K17",
-        "K19",
-        "K24",
-        "K25",
-        "K26",
-        "S3"
+        "K26"
       ]
     },
     {
@@ -1564,9 +979,7 @@
         "config/gate-prompts/bmc-docs-example.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "J24"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1578,9 +991,7 @@
       ],
       "log_ref": null,
       "unblocks": [
-        "K7",
-        "U10",
-        "U11"
+        "U10"
       ]
     },
     {
@@ -1592,9 +1003,7 @@
         "config/gate-prompts/controlm-definition-precedence.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "D10"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1605,10 +1014,7 @@
         "config/gate-prompts/dcat-theme-subject-scheme.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "C34",
-        "G77"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1620,9 +1026,7 @@
       ],
       "log_ref": null,
       "unblocks": [
-        "J50",
-        "K23",
-        "Q11"
+        "K23"
       ]
     },
     {
@@ -1660,11 +1064,7 @@
         "config/gate-prompts/etlprocess-kind-enum.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "G27",
-        "G95",
-        "W2"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1675,9 +1075,7 @@
         "config/gate-prompts/registry-wiring-readiness.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "N10"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1701,14 +1099,7 @@
         "config/gate-prompts/seal-tom-attribution-reshape.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "G101",
-        "J28",
-        "G35",
-        "K3",
-        "K21",
-        "K22"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1719,12 +1110,7 @@
         "config/gate-prompts/snowflake-data-catalog.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "G42",
-        "G44",
-        "J17",
-        "N5"
-      ]
+      "unblocks": []
     },
     {
       "kind": "prompt-only",
@@ -1735,9 +1121,7 @@
         "config/gate-prompts/software-usage-patterns.yaml"
       ],
       "log_ref": null,
-      "unblocks": [
-        "J28"
-      ]
+      "unblocks": []
     }
   ]
 }

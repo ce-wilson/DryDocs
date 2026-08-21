@@ -32,6 +32,7 @@ except ImportError:
 from drydocs_core import backlog_store
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[2]
 BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog"
 TOMBSTONE = REPO_ROOT / "docs" / "restructure" / "backlog.yaml"
 AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
@@ -59,6 +60,8 @@ REQUIRED_FIELDS = (
     "depends_on",
     "acceptance",
 )
+# J50: `gates:` is OPTIONAL — the declared gate edge (slugs this item waits on or
+# builds from), validated in test_declared_gates_are_lists_of_known_prompt_slugs.
 
 pytestmark = pytest.mark.skipif(not _YAML_AVAILABLE, reason="PyYAML not installed")
 
@@ -231,6 +234,32 @@ def test_producer_allocates_below_the_company_band() -> None:
         "Producer allocates 1-9999 in every series. If these arrived through a port, "
         "add them to PORTED_COMPANY_IDS rather than widening the band."
     )
+
+
+GATE_PROMPTS = REPO / "config" / "gate-prompts"
+
+
+def test_declared_gates_are_lists_of_known_prompt_slugs() -> None:
+    """J50: `gates:` is optional; when present it is a list of slugs that exist
+    as config/gate-prompts/<slug>.yaml. render_gates.py reads ONLY this field
+    for the unblocks edge, so a typo here is a silently missing edge — hence
+    the guard."""
+    doc = _load()
+    slugs = {p.stem for p in GATE_PROMPTS.glob("*.yaml")}
+    failures: list[str] = []
+    for item in doc.get("items", []):
+        gates = item.get("gates")
+        if gates is None:
+            continue
+        if not isinstance(gates, list) or not all(isinstance(g, str) for g in gates):
+            failures.append(f"[{item['id']}] gates must be a list of slug strings")
+            continue
+        for g in gates:
+            if g not in slugs:
+                failures.append(f"[{item['id']}] gates names unknown prompt slug '{g}'")
+        if len(set(gates)) != len(gates):
+            failures.append(f"[{item['id']}] gates repeats a slug")
+    assert not failures, "\n".join(failures)
 
 
 def test_dependencies_resolve_and_are_acyclic() -> None:

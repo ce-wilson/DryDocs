@@ -12,6 +12,7 @@ status: todo
 depends_on:
 - G22
 - G25
+gates: [dpl-pipeline-registry-contract]
 inputs:
 - config/gate-prompts/dpl-pipeline-registry-contract.yaml
 - config/gate-log.md

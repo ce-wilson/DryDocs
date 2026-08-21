@@ -13,6 +13,7 @@ depends_on:
 - N12
 - N13
 - O24
+gates: [pending-source-correction]
 inputs:
 - drydocs/loaders/seal_contacts.py
 - drydocs/loaders/base.py

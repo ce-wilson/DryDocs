@@ -10,6 +10,7 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
+gates: [document-supersession]
 inputs:
 - knowledge/upgrade-plans/servicenow-replica-evidence.md
 - config/source-registry.yaml

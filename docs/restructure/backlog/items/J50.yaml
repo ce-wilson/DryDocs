@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - scripts/render_gates.py
@@ -18,3 +18,24 @@ acceptance: |
   FOUND BY CAUSING IT (2026-08-19): writing K23's runbook-baseline note, which HANDS INFORMATION TO the document-supersession gate, made gates.json show that gate as UNBLOCKING K23 -- because render_gates.py's unblocks() serialises each backlog item to JSON and matches the gate slug ANYWHERE in it, so a prose citation becomes a dependency edge. In that instance the edge is defensible by luck (the runbook replacement really does want SUPERSEDES signed), which is what makes the pattern the defect rather than the instance. The SAME FILE already rules this distinction one edge over: J28 established "only an entry ABOUT the gate closes it -- a citation never does" and section_accounts_for() implements it for gate-log sections; backlog items got no equivalent. (a) CENSUS FIRST: classify every current unblocks edge as genuine (the item waits on the gate) or citation (the item merely mentions it), and record the split in the item's close note -- if it is one or two citations, a comment in render_gates.py plus this record MAY be ruled sufficient and the rest of this acceptance lapses, stated explicitly rather than silently. (b) Otherwise the edge becomes DECLARED rather than inferred: an item that genuinely waits on a gate says so in a field (e.g. gates: [document-supersession]) validated against config/gate-prompts/*.yaml slugs, unblocks() reads ONLY that field, and the K23 case is re-expressed as a declaration if it is ruled genuine. (c) A test pins the behaviour: an item whose PROSE cites a slug it does not declare produces NO edge. (d) gates.json regenerated; the stale-render check stays clean.
 notes: |
   Groomed 2026-08-19 (pre-port session) from Idea-139, captured minutes earlier in the same session. Sonnet: the acceptance is a written pass/fail. J-series because J28 IS this bug's precedent -- same renderer, same about-vs-citation distinction, opposite edge; phase and module follow it. The census-first clause is deliberate: the fix is allowed to be "a comment and a record" if the blast radius is one edge, and the item says so up front rather than discovering restraint later.
+  DONE 2026-08-21 (desktop). (a) CENSUS FIRST: 581 unblocks edges across 79 gates on the committed
+  gates.json; 165 of them reached NON-done items, and reading those: the blocked C33 was "unblocked" by
+  17 gates through prose (rua-load-shapes x11, fid-identity-and-scope, audit-envelope-phase4,
+  autosys-crosswalk, controlm-hosts-topology, controlm-avg-run-supplement, corporate-backbone-
+  vocabulary) while the gate it actually waits on, software-version-context, was absent; G56, G97,
+  J43, K16, K25 had the same 10-17 citation edges each. Far beyond "one or two citations", so (b)
+  applies. (b) DECLARED: an optional `gates: [slug, ...]` item field, validated in test_backlog
+  (list of existing config/gate-prompts slugs, no repeats); render_gates.unblocks() reads ONLY that
+  field, and a log-entry row hangs its edges off the gate the section is ABOUT (J28's accounted
+  slugs), never off a gate the section merely cites. Declared at the census (genuine = waits on the
+  gate, or builds what it ruled): C33 software-version-context; G62 rua-bundle-data-profile; G63
+  repo-manifest-data-profile; G64/G65 the two dpl registry contracts; G70/G71/G73/O44
+  tom-roles-enumeration-and-cardinality; G90 remediation-fix-tracking; K20 product-cabinet-attribution;
+  K23 document-supersession (the found instance, ruled genuine -- the runbook replacement wants
+  SUPERSEDES signed); K26 fid-identity-and-scope; L25 business-application-identity; N14/N15
+  pending-source-correction; Q21 pending-source-correction + email-folder-assignment; Q22
+  email-folder-assignment; U10 code-graph-package-layer. 581 -> 25 edges. (c) test_gates_json::
+  test_unblocks_edges_come_only_from_the_declared_gates_field: every edge's item declares a slug of
+  that row; K23 declares what it cites; C33 cites rua-load-shapes and is NOT an edge there.
+  (d) gates.json regenerated; the Y5 fingerprint guard correctly flagged the new field as non-status
+  drift and the roadmap was re-rendered. backlog/README.md documents the field.

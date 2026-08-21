@@ -113,12 +113,18 @@ def build_gates() -> dict:
     prompt_slugs = sorted(p.stem for p in PROMPTS.glob("*.yaml"))
 
     def unblocks(slug_or_words: list[str]) -> list[str]:
-        ids = []
-        for item in backlog_items:
-            text = json.dumps(item, ensure_ascii=False, default=str)
-            if any(w in text for w in slug_or_words):
-                ids.append(item["id"])
-        return ids
+        """J50 (2026-08-21): DECLARED, not inferred. An item that genuinely
+        waits on (or builds what was ruled at) a gate says so in its `gates:`
+        field, validated against config/gate-prompts/*.yaml slugs by
+        tests/unit/test_backlog.py. The previous mention scan serialised each
+        item to JSON and matched the slug ANYWHERE, so a prose citation became a
+        dependency edge — the census at J50 found 581 edges, the great majority
+        citations (a blocked item "unblocked" by seventeen unrelated gates
+        through its notes). Same rule the gate-log side already had at J28:
+        only an entry ABOUT the gate counts, a citation never does.
+        """
+        wanted = {w for w in slug_or_words if w in prompt_slugs}
+        return [item["id"] for item in backlog_items if wanted & set(item.get("gates") or [])]
 
     rows: list[dict] = []
     accounted_slugs: set[str] = set()
@@ -129,8 +135,12 @@ def build_gates() -> dict:
         slugs = [p for p in prompt_slugs if p in s["heading"] or p in s["body"]]
         cited_slugs.update(slugs)
         # J28: only an entry ABOUT the gate closes it -- a citation never does
-        accounted_slugs.update(p for p in slugs if section_accounts_for(p, s["heading"]))
-        search_terms = slugs if slugs else []
+        own = [p for p in slugs if section_accounts_for(p, s["heading"])]
+        accounted_slugs.update(own)
+        # J50: the unblocks edge hangs off the gate the section is ABOUT (J28's
+        # rule), never off a gate the section merely cites — a RECORD that
+        # mentions three other gates does not make their declared items its own.
+        search_terms = own
         rows.append(
             {
                 "kind": "log-entry",

@@ -12,6 +12,7 @@ priority: p2
 status: todo
 depends_on:
 - G35
+gates: [tom-roles-enumeration-and-cardinality]
 inputs:
 - web/src/routes/OwnershipRoute.tsx
 - web/src/ownership/OwnershipGraphPane.tsx

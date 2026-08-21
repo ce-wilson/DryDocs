@@ -12,6 +12,7 @@ status: todo
 depends_on:
 - G22
 - G24
+gates: [repo-manifest-data-profile]
 inputs:
 - config/gate-prompts/repo-manifest-data-profile.yaml
 - config/gate-log.md

@@ -10,6 +10,7 @@ model: sonnet
 priority: p3
 status: todo
 depends_on: []
+gates: [business-application-identity]
 inputs:
 - docs/restructure/03-hitl-sme-flow.md
 acceptance: |

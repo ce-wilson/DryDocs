@@ -96,25 +96,60 @@ def test_critical_rows_are_pinned(manifest: dict) -> None:
         ), f"{path}: expected {disposition}, manifest says {by_path.get(path)}"
 
 
-def test_overrides_precede_their_broader_glob(manifest: dict) -> None:
+def _is_glob(path: str) -> bool:
+    return any(c in path for c in "*?[")
+
+
+def _probe_for(path: str) -> str:
+    """A concrete path a row governs: itself for a literal row, a representative
+    expansion for a glob row (`**` -> two segments, `*` -> one token)."""
+    return path.replace("**", "zz/zz").replace("*", "zz")
+
+
+def shadowed_rows(rows: list[dict]) -> list[tuple[str, str]]:
+    """J47 (b): (row, earlier glob) pairs where an EARLIER glob row already
+    matches the row's path — first match wins, so the later, more specific row
+    can never fire. Derived from the rows themselves; no hardcoded override list."""
+    from tests.unit.test_port_reconcile_guards import glob_to_regex
+
+    paths = [r["path"] for r in rows]
+    out: list[tuple[str, str]] = []
+    for i, path in enumerate(paths):
+        probe = _probe_for(path)
+        for earlier in paths[:i]:
+            if _is_glob(earlier) and earlier != path and glob_to_regex(earlier).match(probe):
+                out.append((path, earlier))
+                break
+    return out
+
+
+def test_no_row_is_shadowed_by_an_earlier_glob(manifest: dict) -> None:
     """First match wins — a specific override (config/gate-log.md) must appear
-    BEFORE the broad glob that would otherwise swallow it (config/**)."""
+    BEFORE the broad glob that would otherwise swallow it (config/**). J47
+    (2026-08-21): DERIVED for every row rather than a hand-typed list of four
+    overrides against config/**, which is what let a fifth override drift
+    unchecked. Proven to fail on an injected defect below (J26)."""
     paths = [r["path"] for r in manifest["rows"]]
-
-    def idx(p: str) -> int:
-        return paths.index(p)
-
-    broad = "config/**"
-    for override in (
-        "config/gate-log.md",
-        "config/gate-prompts/**",
-        "config/review-labels.yaml",
-        "config/taxonomy-ontology-map/**",
-    ):
-        assert idx(override) < idx(broad), f"{override} must precede {broad} (first match wins)"
+    shadowed = shadowed_rows(manifest["rows"])
+    assert not shadowed, (
+        "rows that can never fire (an earlier glob already matches them):\n  "
+        + "\n  ".join(f"{row}  <- shadowed by earlier {glob}" for row, glob in shadowed)
+    )
     # same shape for the drydocs/ tree: the frozen adapter + review modules are
     # file-specific rows, and no broad drydocs/** row may exist at all
     assert "drydocs/**" not in paths, "no blanket drydocs/** row — keep dispositions explicit"
+
+
+def test_shadow_detector_catches_a_misordered_override() -> None:
+    """J26: the derived guard is watched to fail on the defect it replaces the
+    list for — the override AFTER its broad glob."""
+    bad = [{"path": "config/**"}, {"path": "config/gate-log.md"}, {"path": "docs/x.md"}]
+    assert shadowed_rows(bad) == [("config/gate-log.md", "config/**")]
+    good = [{"path": "config/gate-log.md"}, {"path": "config/**"}, {"path": "docs/x.md"}]
+    assert shadowed_rows(good) == []
+    # a later glob narrower than an earlier one is shadowed too
+    nested = [{"path": "docs/**"}, {"path": "docs/plan/*.html"}]
+    assert shadowed_rows(nested) == [("docs/plan/*.html", "docs/**")]
 
 
 def test_pyproject_row_pins_the_version_string_rule(manifest: dict) -> None:

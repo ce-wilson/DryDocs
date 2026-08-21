@@ -9,6 +9,7 @@ model: fable
 priority: p2
 status: todo
 depends_on: []
+gates: [remediation-fix-tracking]
 inputs:
 - drydocs_remediation/changes.py
 - config/gate-prompts/remediation-fix-tracking.yaml

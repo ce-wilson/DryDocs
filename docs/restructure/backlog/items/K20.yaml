@@ -10,6 +10,7 @@ model: fable
 priority: p1
 status: todo
 depends_on: []
+gates: [product-cabinet-attribution]
 inputs:
 - config/gate-prompts/product-cabinet-attribution.yaml
 - docs/Product/technology_roles_and_responsibilities.md

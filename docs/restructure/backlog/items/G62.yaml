@@ -12,6 +12,7 @@ status: in_progress
 depends_on:
 - G22
 - G23
+gates: [rua-bundle-data-profile]
 inputs:
 - config/gate-prompts/rua-bundle-data-profile.yaml
 - config/gate-log.md

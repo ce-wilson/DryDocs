@@ -10,6 +10,7 @@ model: fable
 priority: p2
 status: blocked
 depends_on: []
+gates: [software-version-context]
 inputs:
 - config/gate-prompts/software-version-context.yaml
 - config/gate-log.md

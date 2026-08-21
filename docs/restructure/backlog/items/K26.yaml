@@ -11,6 +11,7 @@ priority: p1
 status: todo
 depends_on:
 - K16
+gates: [fid-identity-and-scope]
 inputs:
 - config/gate-prompts/fid-identity-and-scope.yaml
 - config/gate-log.md

@@ -13,6 +13,7 @@ depends_on:
 - N12
 - N13
 - O24
+gates: [pending-source-correction]
 inputs:
 - drydocs_api/mappings.py
 - drydocs_core/mapping_store.py

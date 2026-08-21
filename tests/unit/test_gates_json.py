@@ -151,3 +151,45 @@ def test_the_duplicate_detector_sees_a_second_q6():
     ]
     assert _duplicate_question_ids(entries) == {"Q6": 2}
     assert _duplicate_question_ids(entries[:3]) == {}
+
+
+# --- J50: unblocks is DECLARED, never inferred from prose -------------------------
+
+
+def test_unblocks_edges_come_only_from_the_declared_gates_field():
+    """J50 (2026-08-21): an item whose PROSE cites a slug it does not declare
+    produces NO edge; an item that declares the slug does. The previous mention
+    scan turned every citation into a dependency (581 edges at the census, the
+    great majority citations); the J28 rule for log sections — only an entry
+    ABOUT the gate counts — now holds for backlog items too."""
+    import yaml
+
+    committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
+    items_dir = REPO / "docs" / "restructure" / "backlog" / "items"
+    declared: dict[str, set[str]] = {}
+    cites_without_declaring: dict[str, set[str]] = {}
+    slugs = {p.stem for p in (REPO / "config" / "gate-prompts").glob("*.yaml")}
+    for path in items_dir.glob("*.yaml"):
+        item = yaml.safe_load(path.read_text(encoding="utf-8"))
+        declared[item["id"]] = set(item.get("gates") or [])
+        text = json.dumps(item, ensure_ascii=False, default=str)
+        cites_without_declaring[item["id"]] = {
+            s for s in slugs if s in text and s not in declared[item["id"]]
+        }
+    for gate in committed["gates"]:
+        row_slugs = {p.split("/")[-1].removesuffix(".yaml") for p in gate["prompt_files"]}
+        for iid in gate.get("unblocks") or []:
+            assert (
+                declared.get(iid) & row_slugs
+            ), f"{iid} appears under {sorted(row_slugs)} without declaring it in gates:"
+    # the item the defect was found on: K23 cites AND declares document-supersession
+    assert "document-supersession" in declared["K23"]
+    # and a pure citation never becomes an edge: C33 cites rua-load-shapes (its notes
+    # name the no-symlink precedent) but declares only software-version-context
+    assert "rua-load-shapes" in cites_without_declaring["C33"]
+    for gate in committed["gates"]:
+        if (
+            "config/gate-prompts/rua-load-shapes.yaml" in gate["prompt_files"]
+            and "config/gate-prompts/software-version-context.yaml" not in gate["prompt_files"]
+        ):
+            assert "C33" not in (gate.get("unblocks") or [])

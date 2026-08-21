@@ -12,6 +12,7 @@ status: todo
 depends_on:
 - G22
 - G25
+gates: [dpl-dataset-registry-contract]
 inputs:
 - config/gate-prompts/dpl-dataset-registry-contract.yaml
 - config/gate-log.md

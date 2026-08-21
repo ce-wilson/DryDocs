@@ -11,6 +11,7 @@ priority: p2
 status: todo
 depends_on:
 - U9
+gates: [code-graph-package-layer]
 inputs:
 - config/gate-prompts/code-graph-package-layer.yaml
 - config/gate-prompts/self-documentation-code-graph.yaml
