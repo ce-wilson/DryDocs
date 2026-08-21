@@ -93,6 +93,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-154`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
+  **The Claude-in-Chrome extension browser is not trustworthy for console verification on the
+  laptop: it served a NON-laptop DryDocs root at localhost:5173 while claiming `isLocal: true`.**
+  Observed during the O64-O67 verification: the extension-connected tab at localhost:5173 served a
+  DryDocs checkout WITHOUT files that exist in this working tree (RelEdge.tsx absent, index.css
+  without the --xy vars, AskRoute WITH the wip persistence — a state no laptop checkout was in),
+  could not reach a fresh Vite on :5199 at all ("showing error page"), and cache-bypassed fetches
+  from inside the tab disagreed with curl against the same [::1]:5173 address — while netstat showed
+  exactly one listener (the laptop's own Vite) and `list_connected_browsers` reported one browser,
+  `isLocal: true`. Most consistent reading: the extension session was actually attached to the
+  desktop's Chrome (whose 5173 serves the ui-workstream worktree) with the locality flag wrong, but
+  the mechanism is unproven. Consequence for future sessions: do NOT trust extension-browser
+  verification of localhost dev servers on this machine — verify with a locally-launched headless
+  Chrome instead (the O64-O67 close used puppeteer-core in the session scratchpad against Vite
+  :5199, which behaved correctly throughout). Worth a quick check with both machines in hand: open
+  the extension picker with two browsers connected and see which Chrome the "Browser 1 /
+  isLocal: true" session really is.
+
 - **`Idea-153`** · 2026-08-21 · `[idea]` · **groomed → MM1–MM10** · prio **High** —
   **Deepdoc leaves the placeholder: the per-data-flow overview record, grounded in one
   production deep-dive.** A support thread (daily pre-processor failing on an API pull) was run to
