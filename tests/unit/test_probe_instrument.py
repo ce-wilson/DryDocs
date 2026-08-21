@@ -19,6 +19,28 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROBE_PATH = REPO_ROOT / "knowledge" / "depgraph-snapshots" / "probe_instrument.py"
+
+
+def _main_worktree() -> Path:
+    """The MAIN checkout — parent of the shared .git — from a worktree or the
+    checkout itself (U26). Falls back to this file's repo root when git is
+    unavailable, which is the pre-U26 behaviour and correct from the checkout."""
+    import subprocess
+
+    try:
+        out = subprocess.run(
+            ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return REPO_ROOT
+    return Path(out).parent if out else REPO_ROOT
+
+
 DEV_ENV = REPO_ROOT / "config" / "dev-environment.yaml"
 
 
@@ -247,9 +269,16 @@ def test_live_instrument_satisfies_the_capabilities_snapshot_requires():
             "the configured scanner is separately owned; its capability gap is an "
             "owed action there, not a failure here"
         )
-    dep_path = (REPO_ROOT / dep["repo"]).resolve()
+    # U26: the sibling sits beside the MAIN checkout. From a git worktree this
+    # file's parents[2] is the worktree, and resolving `../depgraph` from there
+    # named a path that never existed — the test skipped with the same wrong
+    # location snapshot.ps1 died on, so the two agreed while both were wrong.
+    dep_path = (_main_worktree() / dep["repo"]).resolve()
     if not (dep_path / "depgraph").is_dir():
-        pytest.skip(f"depgraph sibling checkout absent at {dep_path}")
+        pytest.skip(
+            f"depgraph sibling checkout absent at {dep_path} (resolved beside the main "
+            "working tree via git rev-parse --git-common-dir)"
+        )
     sys.path.insert(0, str(dep_path))
     try:
         for name in [m for m in sys.modules if m == "depgraph" or m.startswith("depgraph.")]:

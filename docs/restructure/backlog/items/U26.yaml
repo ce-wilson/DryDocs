@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -32,3 +32,15 @@ notes: |
   Module graph-infra / epic self-documentation / phase 16 by the U15, U24 and U25 precedent (the snapshot instrument's own items live there). Mechanism only, no gate.
 
   Line 177 is cited as of HEAD 28a5ccf0; the file moved during the 2026-08-20 CI-check fixes, so match on the `Resolve-Path` expression rather than the number.
+  DONE 2026-08-21 (desktop). snapshot.ps1 resolves the instrument beside the MAIN working tree:
+  `git rev-parse --path-format=absolute --git-common-dir` -> parent = main checkout -> ..\depgraph,
+  with a named failure when the sibling is absent (the path it looked in, and that a worktree needs
+  nothing of its own). Hop-counting removed, not patched. test_probe_instrument.py resolves the sibling
+  the same way (_main_worktree(), falling back to the file's repo root only when git is unavailable)
+  and its skip names the real path. VERIFIED FROM BOTH VENUES (desktop MSI): from a throwaway git
+  worktree .claude/worktrees/u26-check the patched script resolved the sibling and WROTE
+  drydocs-code-20260821.json (commit ff22f527, branch HEAD) where the old one died on Resolve-Path;
+  from the main checkout it wrote the same and printed `ci: GREEN at HEAD ff22f52`. Found on the way:
+  PS 5.1 reads the script as ANSI, so an em dash INSIDE a string literal decodes to bytes containing a
+  smart quote that PowerShell honours as a string delimiter (parser error at first run) -- string
+  literals kept ASCII, with a comment saying why. Worktree removed after the check.

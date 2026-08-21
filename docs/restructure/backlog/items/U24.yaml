@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -16,3 +16,11 @@ acceptance: |
   The warn line names the actual CI conclusion. Observed at the 2026-08-19 snapshot: `ci: System.Object[] AT HEAD e0ae9ba - main is RED...` -- the RED branch's format argument `$mine[0].conclusion.ToUpper()` stringified as an array, most likely PS 5.1 member enumeration on a nested result from `gh run list --json`. (a) FIX THE ACCESS: pin the array (`@($mine)[0]`) or select the property explicitly. (b) SWEEP THE WHOLE FUNCTION, not the one observed line: every `$mine[0]` property access shares the hazard -- the `.status` branch and the success test as well as the RED branch. Only RED was observed because RED is the branch that ran. (c) VERIFY BY RE-RUN, NOT BY READING: a snapshot run prints a warn line naming a real conclusion (or GREEN), and the close note quotes it with its venue (J18). (d) WARN-ONLY IS UNCHANGED: this reports, it never blocks the snapshot.
 notes: |
   Groomed 2026-08-19 from Idea-136. Cosmetic in effect and p3 accordingly, but the line exists so a human reads WHY main is red -- the check was added precisely because CI ran RED for 100+ consecutive runs with nobody looking (Idea-111), and a warn that names nothing is a warn nobody acts on. The RED itself at the time of the observation was the known billing block (jobs fail in 3-5s with no logs) and is NOT this item. Module graph-infra / phase 16 / epic self-documentation follows U7, U12 and U15 -- every snapshot.ps1 item in this backlog lands there. haiku: one PowerShell expression against a written pass/fail check, no decision.
+  DONE 2026-08-21 (desktop). (a)/(b) Get-CiVerdict pins ONE run object (`$first = @($mine)[0]`) and
+  reads `status` and `conclusion` as [string] scalars before any branch uses them; the no-run branch
+  pins `@($Runs)[0]` the same way. All three accesses swept, not only the RED line that was observed.
+  (c) VERIFIED BY RE-RUN, not by reading: `snapshot.ps1 -CodeOnly` on this desktop (MSI, main checkout)
+  printed `ci: GREEN at HEAD ff22f52`; the same run from a git worktree minutes earlier, while that
+  sha was still building, printed `ci: run for HEAD ff22f52 is in_progress - re-check before you close
+  the session` -- a real status, no System.Object[]. The RED branch shares the same scalar access and
+  was not exercised because main is green. (d) warn-only unchanged.

@@ -54,3 +54,6 @@ notes: |
   the same commit: "a claim ships NO render". The claim commit for THIS item (pushed before the fix)
   is the last red claim sha; the next one-key claim after this lands is the CI proof and is recorded
   on that item. Suite 2295 passed.
+  CI PROOF 2026-08-21: the first one-key claim after the fix -- ff22f527 `chore(U26,U24): claim --
+  in_progress`, one file, status only, no render -- is GREEN at its own sha (snapshot.ps1's verdict:
+  `ci: GREEN at HEAD ff22f52`).

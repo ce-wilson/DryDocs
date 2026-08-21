@@ -123,18 +123,26 @@ function Get-CiVerdict {
   }
   $mine = @($Runs | Where-Object { $_.headSha -eq $Head })
   if ($mine.Count -eq 0) {
+    $newest = @($Runs)[0]
     return @{ Color = "Yellow"; Text = ("ci: no run yet for HEAD {0} - newest on main is {1} ({2})" -f `
-      $short, @($Runs)[0].conclusion, @($Runs)[0].displayTitle) }
+      $short, [string]$newest.conclusion, [string]$newest.displayTitle) }
   }
-  if ($mine[0].status -ne "completed") {
+  # U24 (2026-08-21): the 2026-08-19 snapshot printed `ci: System.Object[] AT
+  # HEAD ...` - PS 5.1 member enumeration stringified a nested property as an
+  # array. Pin ONE run object and read each property as a scalar string; every
+  # branch below, not only the RED one that was observed, shares the hazard.
+  $first = @($mine)[0]
+  $status = [string]$first.status
+  $conclusion = [string]$first.conclusion
+  if ($status -ne "completed") {
     return @{ Color = "Yellow"; Text = ("ci: run for HEAD {0} is {1} - re-check before you close the session" -f `
-      $short, $mine[0].status) }
+      $short, $status) }
   }
-  if ($mine[0].conclusion -eq "success") {
+  if ($conclusion -eq "success") {
     return @{ Color = "Green"; Text = ("ci: GREEN at HEAD {0}" -f $short) }
   }
   return @{ Color = "Red"; Text = ("ci: {0} AT HEAD {1} - main is RED. Run 'gh run view --log-failed' before you stop." -f `
-    $mine[0].conclusion.ToUpper(), $short) }
+    $conclusion.ToUpper(), $short) }
 }
 
 # WARN-ONLY by design: this reports, it never blocks. A snapshot records repo
@@ -174,7 +182,27 @@ try {
   Write-Warning "ci check skipped: $($_.Exception.Message)"
 }
 
-$dep  = (Resolve-Path "$here\..\..\..\depgraph").Path
+# (PS 5.1 reads this file as ANSI: an em dash inside a STRING decodes to a byte
+# sequence containing a smart quote, which PowerShell honours as a string
+# delimiter - keep string literals to ASCII; comments are safe.)
+# U26 (2026-08-21): the instrument is a SIBLING OF THE MAIN CHECKOUT, so resolve
+# the main working tree rather than counting directory hops. Three hops up from
+# knowledge/depgraph-snapshots is right from the checkout and wrong from a git
+# worktree under .claude/worktrees/<name> (it lands on .claude/worktrees/depgraph,
+# which does not exist) — exactly the sessions CLAUDE.md sends to worktrees lost
+# the ritual's last step. `git rev-parse --git-common-dir` is the SHARED .git,
+# whose parent is the main checkout, and it answers the same from a worktree and
+# from the checkout itself.
+Push-Location $repo
+$gitCommon = (& git rev-parse --path-format=absolute --git-common-dir).Trim()
+Pop-Location
+if ([string]::IsNullOrWhiteSpace($gitCommon)) { throw "cannot resolve the main working tree (git rev-parse --git-common-dir returned nothing) - is $repo a git checkout?" }
+$mainTree = Split-Path -Parent $gitCommon
+$depCandidate = Join-Path $mainTree "..\depgraph"
+if (-not (Test-Path $depCandidate)) {
+  throw "depgraph sibling checkout absent at $((Join-Path (Split-Path -Parent $mainTree) 'depgraph')) - config/dev-environment.yaml pins `repo: ../depgraph` beside the MAIN checkout ($mainTree). Clone it there; a worktree needs nothing of its own."
+}
+$dep  = (Resolve-Path $depCandidate).Path
 
 # --- the configured instrument (config/dev-environment.yaml is the record) ----
 # Read the pin BEFORE the probe, so the refusal below and the currency warning
