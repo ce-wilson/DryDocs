@@ -4,7 +4,7 @@ Ported behavior from the company repo's JDBC path (``jdbc_oracle_adapter.py`` +
 ``SpiderpRunner.openTee()``): every statement the ``--use-oracle`` path runs is
 written to a self-contained, timestamped log OUTSIDE the repo, so the SME/HITL
 can verify exactly what was extracted. The producer's Oracle path is
-python-oracledb (no JDBC runner here — ``docs/port-prompt.md`` item 14), so the
+python-oracledb (no JDBC runner here — ``docs/port/port-prompt.md`` item 14), so the
 same log contract is implemented at the adapter seam:
 
     header (run metadata) -> handshake -> exact SQL (binds rendered for review)

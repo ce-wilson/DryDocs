@@ -192,7 +192,7 @@ The import direction is the architecture (this is also the C4 Level-3 view):
 (private, wired) across disjoint histories; applies are cherry-picks/checkouts driven by
 `PORT-MANIFEST.yaml` dispositions (clean-add / canonical-producer / canonical-company /
 union-append / per-entry / evaluate / never-port), with `git-readme.md` and
-`docs/port-prompt.md` as narrative. Back-flow is re-derived mechanism only, never values.
+`docs/port/port-prompt.md` as narrative. Back-flow is re-derived mechanism only, never values.
 
 <!-- anchor: classification-security -->
 ## Classification & security

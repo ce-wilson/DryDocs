@@ -12,7 +12,7 @@ status: done
 depends_on: []
 inputs:
 - config/source-registry.yaml
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   A gate prompt is drafted (G27/W1/U11 precedent — drafting decides nothing) proposing a separate wired/ready field on registry entries so semantic confirmation (gate-signed, transfers per Q6) and pipeline-wiring readiness stop sharing one flag; the prompt cites the a14a8028 fix session's Q1-B ruling and the cm_hosts standing divergence (semantically confirmed yet false company-side because their P3 host stage is unwired) as the motivating case; the registry schema changes ONLY when the gate signs.
 notes: |

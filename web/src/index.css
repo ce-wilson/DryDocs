@@ -93,7 +93,7 @@ body { min-height: 100svh; }
 .react-flow__controls-button svg { fill: currentColor; }
 .react-flow__attribution a { color: var(--faint); }
 
-/* Theme-pass additions (UI-WIP/drydocs-landing-dark.html parity) ---------- */
+/* Theme-pass additions (docs/design/ui-exploration/drydocs-landing-dark.html parity) ---------- */
 
 /* Card hover-lift (mockup `.tower:hover`): benefit/module cards share the same
    translateY + shadow lift via one class instead of repeating the rule per

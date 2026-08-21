@@ -3,14 +3,14 @@
 <!-- anchor: front-matter -->
 **Status:** DESCRIPTIVE — documents the built UI as of **Rev 1, 2026-07-18**, authored at
 commit `807e050` (branch `feat/mapping-store`; Epic O items O1–O7 done, plus the O13
-mapping-stewardship live demo). The O8–O12 site-plan rebuild (`UI-WIP/site-plan.md`) is the
+mapping-stewardship live demo). The O8–O12 site-plan rebuild (`docs/design/ui-exploration/site-plan.md`) is the
 PRESCRIPTIVE successor and is **not** this document. ·
 **Classification:** Internal-Public — mechanism only; every persona, tower, app, and row
 shown by the console is SYNTHESIZED; real SIDs/schemas live company-side. ·
 **Audience:** engineers working on `web/` (drydocs-web) or `drydocs_api/` (drydocs-api),
 and the SME reviewing the console's access-path and stewardship mechanics. ·
 **Companion:** `docs/decisions/0005-browser-neo4j-access-path.md` (the governing ADR);
-`docs/design/drydocs-project-tdd.md` (the platform frame); `UI-WIP/site-plan.md` (the
+`docs/design/drydocs-project-tdd.md` (the platform frame); `docs/design/ui-exploration/site-plan.md` (the
 successor design); `docs/design/drydocs-mapping-demo-runbook.md` (start the demo);
 `knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md` (the M0–M4 store plan).
 
@@ -44,7 +44,7 @@ materialization + changeset artifacts + the `/demo` page).
   endpoints read.
 
 **Out of scope** (delegated): the O8–O12 ReUI/Tailwind rebuild, QuerySpec export, and
-admin-config page (PRESCRIPTIVE — `UI-WIP/site-plan.md`); the ADK agent backend's
+admin-config page (PRESCRIPTIVE — `docs/design/ui-exploration/site-plan.md`); the ADK agent backend's
 internals; ingestion (`controlm-ingestion-tdd.md`); enterprise SSO/OIDC and real rosters
 (company-side twin per ADR 0005).
 
@@ -183,7 +183,7 @@ required**, the K2 shape `WAS_ASSOCIATED_WITH {role: seal_app_ref}` must be regi
 the vocabulary), stamps `authored_by` from the *session* persona, and returns a CSV in
 the committed template column order plus a `manifest.yaml` snippet. The server writes
 nothing. `static/mapping_demo.html` (served at `/demo`, same-origin, vanilla JS) is the
-grayscale live-data twin of `UI-WIP/wf-mapping-01.html`: persona login → domain strip →
+grayscale live-data twin of `docs/design/ui-exploration/wf-mapping-01.html`: persona login → domain strip →
 grid → draft tray → submitted changeset rendered back with a client-side CSV download.
 
 <!-- anchor: design-data-mapping -->
@@ -276,7 +276,7 @@ edge-shape follow-up gate remains open on the loader side.
 - **d3-force over NVL** (recorded on O6) — ISC, ~90 KB, layout-only, deterministic;
   revisit trigger: C4 zoom ladder or >200-node scenes.
 - **No router / single dark theme / hash views** — deliberate O2-era scope guards, now
-  explicitly superseded by `UI-WIP/site-plan.md` (O8: React Router, ReUI shell,
+  explicitly superseded by `docs/design/ui-exploration/site-plan.md` (O8: React Router, ReUI shell,
   system-default theming). This TDD stays DESCRIPTIVE of the built state.
 - **FastAPI as an optional dependency group** — keeps the default install and the unit
   suite framework-free; the pure-handler split is what made the offline suites possible.

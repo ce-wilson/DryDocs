@@ -1,6 +1,6 @@
 /* DryDocs design tokens — dark + light token sheets (O8 acceptance).
 
-   Dark is canonical (carried over verbatim from UI-WIP/drydocs-landing-dark.html,
+   Dark is canonical (carried over verbatim from docs/design/ui-exploration/drydocs-landing-dark.html,
    commit dd270b2) with one deliberate change: `--faint` is lightened from the
    mockup's #5C6B7E (design-review: 3.37:1 on --bg, WCAG AA fail) to ~#71809A
    per design-review.md rec #4 / site-plan.md §2. Light is derived second, same
@@ -56,7 +56,7 @@
   --status-fail: #bd1f43;
   --status-fail-soft: #971936;
 
-  /* Kept Orbit brand constants (UI-WIP/kept-orbit-philosophy.md): like --red,
+  /* Kept Orbit brand constants (docs/design/ui-exploration/kept-orbit-philosophy.md): like --red,
      the mark's stave colors are identity, not theme — same values both sheets. */
   --brand-navy: #1e3a5c;
   --brand-green: #2bb673;

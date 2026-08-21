@@ -1,6 +1,6 @@
 """Every fenced code block under docs/ must close.
 
-Found 2026-08-09 in `docs/port-prompt.md`, where it had been live since `84ed7e3`
+Found 2026-08-09 in `docs/port/port-prompt.md`, where it had been live since `84ed7e3`
 (2026-08-05) and through four ports. That file wraps the pasteable company prompt
 in one long ```` ```text ```` fence and nests a ```` ```powershell ```` example
 inside it. Both used THREE backticks, so the inner block's closing fence closed
@@ -68,7 +68,7 @@ def test_the_scan_actually_reaches_the_documents() -> None:
     """Guard the guard: an empty sweep passes everything and proves nothing."""
     found = _docs()
     assert len(found) > 20, f"expected the docs tree, found {len(found)} files"
-    assert (DOCS_ROOT / "port-prompt.md") in found
+    assert (DOCS_ROOT / "port" / "port-prompt.md") in found
 
 
 def test_every_fence_under_docs_closes() -> None:

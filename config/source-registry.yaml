@@ -733,7 +733,7 @@ datasets:
       T19 ruling 2026-07-31: named pat:product-catalog —
       industry-standard naming matching NEITHER legacy string (catalog-pat /
       pat-catalog), so neither repo's wrong value survives; recorded in the
-      docs/port-prompt.md divergence ledger for the company T19 gate.
+      docs/port/port-prompt.md divergence ledger for the company T19 gate.
 
   - id: "pat:people-report"
     system: pat

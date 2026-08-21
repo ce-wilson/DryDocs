@@ -40,7 +40,7 @@ concepts:
     source: web/src/data/towers.ts
     source_symbol: TOWERS
     source_kind: in-repo-definitions       # a TypeScript literal the console renders; no loader, no graph
-    authority: "the Explorer Tower definitions (web/src/data/towers.ts), verbatim port of the UI-WIP dark-landing mockup (commit dd270b2)"
+    authority: "the Explorer Tower definitions (web/src/data/towers.ts), verbatim port of the dark-landing mockup docs/design/ui-exploration/drydocs-landing-dark.html (commit dd270b2)"
     cardinality: 4
     members:
       - { key: home,   title: Home Lending }

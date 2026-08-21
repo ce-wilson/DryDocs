@@ -109,14 +109,14 @@ Sign-out is in the header. The mock-auth banner across the top is intentional.
 
 ## Running an SME feedback pass
 
-1. Open the wireframes for the session: `UI-WIP/wireframes/out/*.svg` (regenerate any
+1. Open the wireframes for the session: `docs/design/ui-exploration/wireframes/out/*.svg` (regenerate any
    time with the command below — no repo deps, no graph needed):
    ```powershell
-   python UI-WIP\wireframes\render_wireframes.py
+   python docs/design/ui-exploration\wireframes\render_wireframes.py
    ```
 2. Every wireframe element carries a **key** (`WF-LND-05`, `WF-LDS-02`, …). Give feedback
    against keys — "WF-LND-04 still too busy" — the way gate pages key confirmations.
-   `UI-WIP/wireframes/out/KEYS.md` resolves every key to its **label source, data
+   `docs/design/ui-exploration/wireframes/out/KEYS.md` resolves every key to its **label source, data
    source, React component, and graph/Cypher property**, so each comment re-attaches
    to exactly one buildable thing (the L5/L6 re-attachment idiom).
 3. Where feedback lands: UI look/behavior → `docs/restructure/IDEAS.md` inbox line citing

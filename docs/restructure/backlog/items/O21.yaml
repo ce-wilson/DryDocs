@@ -1,6 +1,6 @@
 id: O21
 epic: web-console
-title: 'Commit the UI-WIP design corpus: LFS the 19 MB .fig first, classify each file against the publish
+title: 'Commit the docs/design/ui-exploration design corpus: LFS the 19 MB .fig first, classify each file against the publish
   boundary'
 type: chore
 module: docs
@@ -11,12 +11,12 @@ priority: p3
 status: done
 depends_on: []
 inputs:
-- UI-WIP/
+- docs/design/ui-exploration/
 - PUBLISH-BOUNDARY.md
 - config/classification.yaml
 - .gitattributes
 acceptance: |
-  start-react-free-reference.fig (19 MB) is tracked via git-lfs BEFORE add; every untracked UI-WIP file is checked against PUBLISH-BOUNDARY.md and committed with a sensible classification (AI-generated mocks + design prose = internal-public ceiling; codeflow-ui-reference.png stays External with its citation; anything that turns out to show internal data — check dd-verify-top.png — moves to internal/ instead of committing here); layout-anatomy-checklist.md lands (closing the O8 "named input never committed" note); git status is clean for UI-WIP afterward.
+  start-react-free-reference.fig (19 MB) is tracked via git-lfs BEFORE add; every untracked docs/design/ui-exploration file is checked against PUBLISH-BOUNDARY.md and committed with a sensible classification (AI-generated mocks + design prose = internal-public ceiling; codeflow-ui-reference.png stays External with its citation; anything that turns out to show internal data — check dd-verify-top.png — moves to internal/ instead of committing here); layout-anatomy-checklist.md lands (closing the O8 "named input never committed" note); git status is clean for docs/design/ui-exploration afterward.
 notes: |
   site-plan.md §6 LFS follow-up, now actionable since the corpus feeds O15+ inputs. DONE 2026-07-21: all 17 files individually reviewed. 12 PNGs = AI mocks with explicitly illustrative/anonymized data (some carry AI-invented "Trusted by" real-company logo strips — reference material, never publish as marketing) + dd-verify-top.png = a screenshot of the already-committed controlm-ingestion-tdd render (PRARAG fixture name already public); 5 md files = clean design prose. All committed at the internal-public ceiling. DEVIATION from the acceptance letter: the .fig was NOT LFS-committed — it is the Keenthemes vendor template's own Figma source; committing would REDISTRIBUTE a third-party asset on a sometimes-published repo (license unverifiable offline), so it is gitignored with rationale (the vendor-PDF rule) per the original either/or in the UI-workstream memory note. Our own structure-only extraction (layout-anatomy-checklist.md) IS committed.
 annotations:

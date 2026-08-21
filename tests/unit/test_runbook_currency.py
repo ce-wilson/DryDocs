@@ -24,7 +24,7 @@ was the stale database enumeration. So this narrows the gap rather than closing
 it, which is why the runbooks also ship re-derive one-liners with the rule that
 the CODE wins on disagreement. A pointer cannot go stale; only a copy can.
 
-IT ALSO DOES NOT CHECK COMMIT SHAs, deliberately. ``docs/port-prompt.md`` cites
+IT ALSO DOES NOT CHECK COMMIT SHAs, deliberately. ``docs/port/port-prompt.md`` cites
 61 of them, and three legitimately do not resolve here: two are company-side (a
 port commit and a backup tag) and one is the ``depgraph`` SIBLING repo. A SHA
 guard would therefore need a foreign-ref exemption list that grows by two or
@@ -54,7 +54,7 @@ DESIGN_DIR = REPO_ROOT / "docs" / "design"
 #: check. Each needs a reason, and each must EXIST — a doc that gets renamed out
 #: from under this list would otherwise drop out of coverage silently.
 EXTRA_DOCS: dict[str, str] = {
-    "docs/port-prompt.md": (
+    "docs/port/port-prompt.md": (
         "the cross-repo port instructions — the highest-consequence document here, "
         "because a company-side session acts on it against a tree this repo cannot "
         "see, and (2026-08-05) cannot currently fetch this repo to check it either. "
@@ -70,7 +70,7 @@ HISTORICAL_PATHS: dict[str, str] = {
         "front-matter history — the demo runbook records where it was RELOCATED FROM "
         "at the L14 refit. A former path is a fact about the past, not a claim that it exists"
     ),
-    "docs/port-fix-a14a8028-company-prompt.md": (
+    "docs/company-prompts/port-fix-a14a8028-company-prompt.md": (
         "the port-prompt ledger cites the fix pack the a14a8028 fix session RAN "
         "(2026-08-06/07, session complete). The pack retired to internal-local/archive/"
         "company-prompts/ at the 2026-08-07 prompt retirement — the citation is a fact "

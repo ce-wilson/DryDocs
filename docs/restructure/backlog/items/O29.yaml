@@ -13,12 +13,12 @@ depends_on:
 - O18
 inputs:
 - web/src/
-- UI-WIP/two-track-ui-plan.md
+- docs/design/ui-exploration/two-track-ui-plan.md
 - internal/context-graph-analysis/ui-architecture-analysis.md
 acceptance: |
   A legend component (declared vs observed / trust-tier color key) renders on both the /lineage and /docs graph-pane canvases, reusing the existing tier vocabulary (VERBATIM/GROUNDED/SYNTHESIZED, the KIND_TOKEN palette) rather than inventing new colors; tokens read the theme CSS variables so it renders correctly in both dark and light mode; visible on the canvas itself, not only in the export manifest; suite + build + lint green.
 notes: |
-  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-5 (adopt of context-graph's declared/observed legend pattern, per internal/context-graph-analysis/ui-architecture-analysis.md). Sonnet- able — reuses existing tier vocab and canvases (O10/O18 both done), no new ontology or edge semantics.
+  Groomed 2026-07-23 from docs/design/ui-exploration/two-track-ui-plan.md T1-5 (adopt of context-graph's declared/observed legend pattern, per internal/context-graph-analysis/ui-architecture-analysis.md). Sonnet- able — reuses existing tier vocab and canvases (O10/O18 both done), no new ontology or edge semantics.
 annotations:
   status: 'closed 2026-08-07 (desktop, same session as the claim). BUILT: web/src/components/TrustLegend.tsx
     — the adopt of context-graph''s declared/observed legend pattern (ui-architecture-analysis.md "surface

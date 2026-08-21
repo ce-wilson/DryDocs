@@ -16,7 +16,7 @@ inputs:
 - drydocs/cli.py
 - drydocs/loaders/
 - config/source-registry.yaml
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 - PORT-MANIFEST.yaml
 acceptance: |
   The mechanical rename ADR 0012 authorises, executed as a SINGLE frozen change and ported as a SINGLE unit -- the SME's condition, and the right one: a wide rename landing in pieces leaves the two repos disagreeing about verb names for as long as the pieces take. Scope, in the layer order the ADR rules: CLI verbs (with deprecated aliases per the policy), LOADER_REGISTRY keys and loader class names, milestone-id verify commands, and -- only if the ADR rules them in the same unit -- source registry ids via the cross-repo path. Every derived surface regenerates and is proven current: load-map.json, load-map.html, ingest.sh, the startup runbook Appendix B (held by test_load_sequence_surfaces), the load runbook, and the skills that name verbs. MUST NOT overlap an in-flight port. The change freezes other producer work, lands, is ported, and only then does normal work resume.

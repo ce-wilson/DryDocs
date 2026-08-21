@@ -46,7 +46,7 @@ organization — where the page sits. It is **unrelated** to the `Ais*` ontology
 which is a **company-local** artifact of the company-side 2026-06-29 AIS gate, is
 **T12-SUPERSEDED** (2026-07-21), and which the producer repo never had at all: C12 took the
 direct route and registered `:SchedulerKind` into the software-registry model with no `Ais*`
-layer ever existing here (see `docs/port-ais-supplement-company-prompt.md`).
+layer ever existing here (see `docs/company-prompts/port-ais-supplement-company-prompt.md`).
 
 Saving a documentation URL neither revives that layer nor reopens its disposition. This is the
 same two-things-one-spelling trap J32 made a standing rule after `group` meant two different

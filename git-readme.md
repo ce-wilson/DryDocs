@@ -10,7 +10,7 @@
 
 > **Machine-readable dispositions: [`PORT-MANIFEST.yaml`](PORT-MANIFEST.yaml) is the
 > AUTHORITY** for how each path resolves on collision (first match wins; guarded by
-> `tests/unit/test_port_manifest.py`). This guide and `docs/port-prompt.md` are the
+> `tests/unit/test_port_manifest.py`). This guide and `docs/port/port-prompt.md` are the
 > narrative around it — when they disagree, the manifest wins and the prose is stale.
 
 This repo is the **producer** side. Work is built here on `main`, committed, and
@@ -83,7 +83,7 @@ What diverges, by stream:
   [`knowledge/upgrade-plans/docmeta-component.md`](knowledge/upgrade-plans/docmeta-component.md).
   **Its first increment has now shipped:** the **bmc-docs lexical loader** (P0) — the converted BMC
   docs corpus as a deterministic `Document`→`Chunk` graph, gate-accepted 13/13 and loaded live
-  producer-side (see the "Newer streams" bullet below + `docs/port-prompt.md` step 22). The rest is
+  producer-side (see the "Newer streams" bullet below + `docs/port/port-prompt.md` step 22). The rest is
   still a **mixed** stream: pipeline/registry/tests are clean-adds; the working Confluence connector
   wiring is **Canonical-COMPANY** (same rule as `drydocs-review`); and the company side must
   **supplement** vendor fetches blocked producer-side (documents.bmc.com 403), T4 connector
@@ -125,7 +125,7 @@ What diverges, by stream:
   is a back-flow reconciliation to resolve at the gate — do not blind-overwrite in either direction. Route
   via `ontology-mapper` + the HITL gate; log in `config/gate-log.md`.
 - **Newer streams (2026-07 — index only; the actionable per-path steps live in
-  [`docs/port-prompt.md`](docs/port-prompt.md)).** These shipped after the streams narrated above and are
+  [`docs/port/port-prompt.md`](docs/port/port-prompt.md)).** These shipped after the streams narrated above and are
   not all expanded into tables here; the port-prompt step number is the authority for each:
     - **Software registry** (plan-07 / ADR 0004) — `config/taxonomy/software-registry.yaml` + loader +
       supplement + `load-software-registry`/`apply-registry-supplement` CLI + vocab `reg_made_by`/
@@ -204,7 +204,7 @@ delete+add). Doc/code references to the old path were repointed in the same comm
   (your PORT-REPORT-bd7952f.md) — your main holds the complete pre-squash history. Every future
   port range is a cherry-pick of `c5a84c3..<producer-tip>`; `c5a84c3` itself is never ported (its
   tree equals `3ae9b08`'s). The step-by-step apply instructions for each range live in
-  `docs/port-prompt.md` — the first post-bundle range starts at its step 37, whose precondition is
+  `docs/port/port-prompt.md` — the first post-bundle range starts at its step 37, whose precondition is
   the `DD1`–`DD3` renumber above.
 
 **Post-push code-structure snapshot (drift comparison):** after each push, generate a
@@ -281,7 +281,7 @@ them the **opposite** way to everything else in this guide:
 If you have `git fetch`ed and see the producer touch these, drop the incoming side and
 keep `main`'s. This is the reverse of the Canonical-here rule — it protects your wired,
 internal-data originals from being clobbered by the public template. (Mirrored in the
-`reconcile-port` skill's divergence ledger and [`docs/port-prompt.md`](docs/port-prompt.md).)
+`reconcile-port` skill's divergence ledger and [`docs/port/port-prompt.md`](docs/port/port-prompt.md).)
 
 **Boundary guard note:** the producer will also add a `review` `COMPONENT_GROUP` to
 `tests/unit/test_module_boundary.py` + `MODULE_MAP.md`, and flip the guard to
@@ -394,7 +394,7 @@ For these paths, **do not hand-merge** — this repo is authoritative; replace
 | `drydocs/controlm/commands.py` | C | Shell parser + `LAUNCHER_REGISTRY` |
 | `drydocs/controlm/paths.py` | C | Path canonicalization + ref_role classification |
 | `drydocs/controlm/facts.py` | C | Fact / notification routing |
-| `docs/controlm-c3-normalization-status.md` | B (ext. C) | Status + operational runbook |
+| `docs/controlm/controlm-c3-normalization-status.md` | B (ext. C) | Status + operational runbook |
 | `tests/unit/test_variable_classifier.py` | A | |
 | `tests/unit/test_variable_resolver.py` | B | |
 | `tests/unit/test_variable_staging.py` | B (ext. C) | |
@@ -588,7 +588,7 @@ legitimate). All keys carry `DATA_CENTER` (TABLE_ID may collide across the 4 DCs
 > — the extracts filter `V.IS_CURRENT_VERSION = 'Y'` so superseded variable rows do not
 > leak. The old `CM_DEF_SETVAR` name and the DBA-verify TODO are retired.
 
-See `docs/controlm-c3-normalization-status.md` for the full status + operational runbook.
+See `docs/controlm/controlm-c3-normalization-status.md` for the full status + operational runbook.
 
 ---
 

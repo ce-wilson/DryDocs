@@ -197,19 +197,21 @@ def test_a_missing_relay_section_reports_nothing() -> None:
 
 # ---- cited-path resolution ---------------------------------------------------
 
-#: The Idea-110 document, reduced to the two lines that matter. `UI-WIP` is a real
+#: The Idea-110 document, reduced to the two lines that matter. `docs` is a real
 #: top-level directory and the mark was really deleted, so this is the live case.
+#: (The citations sat under `UI-WIP/` until S9 moved that workspace to
+#: `docs/design/ui-exploration/`; the first path segment is what this fixture turns on.)
 IDLE_DOC = """\
 # Claude Design UI starting prompt
 
-Approved / canonical: final mark `UI-WIP/drydocs-mark.svg` + `drydocs-mark-mini.svg`,
-brand sheet `UI-WIP/kept-orbit-brand-sheet.png`.
+Approved / canonical: final mark `docs/design/ui-exploration/drydocs-mark.svg` + `drydocs-mark-mini.svg`,
+brand sheet `docs/design/ui-exploration/kept-orbit-brand-sheet.png`.
 """
 
-ROOTS = frozenset({"UI-WIP", "docs", "drydocs", "drydocs_core", "scripts", "tests", "web"})
+ROOTS = frozenset({"docs", "drydocs", "drydocs_core", "scripts", "tests", "web"})
 
 #: Everything the idle doc names EXCEPT the deleted mark.
-PRESENT = {"UI-WIP/kept-orbit-brand-sheet.png"}
+PRESENT = {"docs/design/ui-exploration/kept-orbit-brand-sheet.png"}
 
 
 def _exists(rel: str) -> bool:
@@ -219,9 +221,16 @@ def _exists(rel: str) -> bool:
 def test_the_deleted_mark_is_reported_and_the_live_asset_is_not() -> None:
     """The exact 2026-08-12 failure: a merge validated text overlap, not the tree."""
     findings = unresolved_citations(
-        {"UI-WIP/claude-design-ui-prompt.md": IDLE_DOC}, repo_roots=ROOTS, exists=_exists
+        {"docs/design/ui-exploration/claude-design-ui-prompt.md": IDLE_DOC},
+        repo_roots=ROOTS,
+        exists=_exists,
     )
-    assert findings == [("UI-WIP/claude-design-ui-prompt.md", "UI-WIP/drydocs-mark.svg")]
+    assert findings == [
+        (
+            "docs/design/ui-exploration/claude-design-ui-prompt.md",
+            "docs/design/ui-exploration/drydocs-mark.svg",
+        )
+    ]
 
 
 def test_a_document_whose_every_citation_resolves_reports_nothing() -> None:
@@ -230,11 +239,11 @@ def test_a_document_whose_every_citation_resolves_reports_nothing() -> None:
     ``PRESENT`` covers the mark here, so the doc IS scanned and the scan comes back
     clean — distinguishable from a filter that silently dropped the document.
     """
-    everything = PRESENT | {"UI-WIP/drydocs-mark.svg"}
+    everything = PRESENT | {"docs/design/ui-exploration/drydocs-mark.svg"}
     assert cited_paths(IDLE_DOC, ROOTS) == everything, "the doc must actually be scanned"
     assert (
         unresolved_citations(
-            {"UI-WIP/claude-design-ui-prompt.md": IDLE_DOC},
+            {"docs/design/ui-exploration/claude-design-ui-prompt.md": IDLE_DOC},
             repo_roots=ROOTS,
             exists=lambda rel: rel in everything,
         )
@@ -283,8 +292,13 @@ def test_the_root_filter_does_not_swallow_a_real_stale_path() -> None:
 def test_a_document_that_declares_itself_a_record_is_exempt() -> None:
     """How Idea-110 was actually closed: annotated as a record, not edited."""
     record = "# Prompt — RECORD\n\n```yaml\nstatus: DATED RECORD\n```\n\n" + IDLE_DOC
-    assert is_record_document("UI-WIP/claude-design-ui-prompt.md", record)
-    assert unresolved_citations({"UI-WIP/x.md": record}, repo_roots=ROOTS, exists=_exists) == []
+    assert is_record_document("docs/design/ui-exploration/claude-design-ui-prompt.md", record)
+    assert (
+        unresolved_citations(
+            {"docs/design/ui-exploration/x.md": record}, repo_roots=ROOTS, exists=_exists
+        )
+        == []
+    )
 
 
 def test_the_marker_must_be_a_header_declaration_not_a_phrase_in_the_body() -> None:
@@ -308,10 +322,12 @@ def test_a_document_outside_every_record_prefix_is_still_checked() -> None:
 
 
 def test_the_documents_the_suite_already_resolves_are_not_reported_twice() -> None:
-    assert is_suite_guarded("docs/port-prompt.md")
+    assert is_suite_guarded("docs/port/port-prompt.md")
     assert is_suite_guarded("docs/design/drydocs-core-runbook.md")
     assert (
-        unresolved_citations({"docs/port-prompt.md": IDLE_DOC}, repo_roots=ROOTS, exists=_exists)
+        unresolved_citations(
+            {"docs/port/port-prompt.md": IDLE_DOC}, repo_roots=ROOTS, exists=_exists
+        )
         == []
     )
 
@@ -322,7 +338,7 @@ def test_a_new_design_doc_that_is_not_a_runbook_is_this_check_s_to_catch() -> No
     assert not is_suite_guarded("docs/design/drydocs-core-tdd.md")
     assert unresolved_citations(
         {"docs/design/drydocs-core-tdd.md": IDLE_DOC}, repo_roots=ROOTS, exists=_exists
-    ) == [("docs/design/drydocs-core-tdd.md", "UI-WIP/drydocs-mark.svg")]
+    ) == [("docs/design/drydocs-core-tdd.md", "docs/design/ui-exploration/drydocs-mark.svg")]
 
 
 # ---- tag naming --------------------------------------------------------------

@@ -17,7 +17,7 @@ inputs:
 - web/src/routes/AdminConfigRoute.tsx
 - drydocs_api/app.py
 - agents/graph_qa/providers.py
-- UI-WIP/sme-ui-launch-guide.md
+- docs/design/ui-exploration/sme-ui-launch-guide.md
 acceptance: |
   When an Ask request fails, the surface runs a STAGED self-diagnosis in place of the single red
   line it shows today, in this order:

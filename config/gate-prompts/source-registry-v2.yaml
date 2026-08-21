@@ -95,7 +95,7 @@ sections:
   - title: "C. Residual + consequences"
     confirmations:
       - "RESIDUAL (explicitly deferred with reason): the 18-row migration table is NOT block-confirmed — each row is confirmed individually at the N9 build (SME closed the session's HITL portion after the shape rulings). Previously signed rows transfer per Q6; everything else lands confirmed: false."
-      - "T19 naming note (recorded in the docs/port-prompt.md divergence ledger): the catalog feed's replacement dataset name is pat:product-catalog — industry-standard naming, matching NEITHER legacy string, so neither repo's wrong value survives; the PAT people report splits out as pat:people-report."
+      - "T19 naming note (recorded in the docs/port/port-prompt.md divergence ledger): the catalog feed's replacement dataset name is pat:product-catalog — industry-standard naming, matching NEITHER legacy string, so neither repo's wrong value survives; the PAT people report splits out as pat:people-report."
       - "Nothing changes shape before the N9 build lands: J21's hardening of the CURRENT registry remains the interim guarantee; the classification collapse (J23) already landed pre-gate as pure machinery removal."
   - title: "D. Sign-off"
     confirmations:

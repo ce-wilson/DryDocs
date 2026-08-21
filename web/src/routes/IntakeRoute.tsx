@@ -8,7 +8,7 @@ import ModuleToolbar from '../layout/ModuleToolbar'
 import IdChip from '../components/ui/IdChip'
 import IntakeStepper from '../components/IntakeStepper'
 
-// O47 — the Context Intake page, slice 3 of UI-WIP/sme-intake-page-plan.md.
+// O47 — the Context Intake page, slice 3 of docs/design/ui-exploration/sme-intake-page-plan.md.
 // Sections 1–3 are live against O45 (context-type artifact) and O46 (intake
 // store); sections 4–8 render as disabled placeholders naming their slice —
 // never silently absent. The area selector is a HINT channel by design (Q10:

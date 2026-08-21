@@ -12,8 +12,8 @@ status: done
 depends_on:
 - O8
 inputs:
-- UI-WIP/wf-mapping-01.md
-- UI-WIP/wf-mapping-01.html
+- docs/design/ui-exploration/wf-mapping-01.md
+- docs/design/ui-exploration/wf-mapping-01.html
 - config/manual-loads/
 - drydocs/loaders/manual_loads.py
 - config/gate-prompts/

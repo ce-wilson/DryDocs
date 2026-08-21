@@ -11,7 +11,7 @@ priority: p2
 status: done
 depends_on: []
 inputs:
-- UI-WIP/backstage-catalog-assessment.md
+- docs/design/ui-exploration/backstage-catalog-assessment.md
 - config/gate-prompts/
 - drydocs_lineage/writer.py
 - drydocs_core/ontology/relationship_vocabulary.yaml

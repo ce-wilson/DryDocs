@@ -12,7 +12,7 @@ status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   Producer PORT-MANIFEST.yaml stays canonical; company-only rows move to a separate company-side include whose rows the J16 guard (test_no_tracked_path_falls_through_silently) unions with the producer manifest; a test proves a producer-manifest-verbatim apply CANNOT drop a company include row; the grammar decision (include file vs marked section) is recorded in the manifest header; port-prompt.md documents the seam for the company session that re-adds the 89 dropped rows.
 notes: |

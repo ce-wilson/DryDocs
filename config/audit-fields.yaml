@@ -287,7 +287,7 @@ sources:
       (defined by the SYNTHETIC fixtures, adjust when a real sample validates it
       — the dpl_mac discipline)"), and the gate page's own provenance block
       records the same ("field contract ASSUMED until a real export validates").
-      REVISIT TRIGGER IS A NAMED TRACKER, not a hope: T13 (docs/port-prompt.md) —
+      REVISIT TRIGGER IS A NAMED TRACKER, not a hope: T13 (docs/port/port-prompt.md) —
       "DPL registry field contract validated vs a REAL per-SEAL export
       (pipeline_id.json/dataset_id.json)", status pending (producer belief, as of
       2026-08-01). A real Swagger export may well carry createdBy /

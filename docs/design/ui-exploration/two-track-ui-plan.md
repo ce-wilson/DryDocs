@@ -49,7 +49,7 @@ ships the seams; company fills them:
 ## Port discipline (what keeps this drift-free)
 
 - Producer → company: whole-branch cherry-pick of `feat/ui-underhood-theme` (web/ +
-  UI-WIP docs only; `internal/` never ports). Company does NOT restyle producer components —
+  docs/design/ui-exploration docs only; `internal/` never ports). Company does NOT restyle producer components —
   company-only surfaces live in company-only files/routes so the next port never collides.
 - Company → producer: mechanism-only reproduction (the drydocs-review back-flow rule);
   screenshots → reproduce generically, never copy files.

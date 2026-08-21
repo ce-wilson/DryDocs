@@ -213,7 +213,7 @@ sources:
       (Descriptive Metadata + its WIP CDAO twin, Data Quality, Data Contracts/
       DPROD, Taxonomy Framework v21) — the crosswalk's capture holes are closed.
       One page came back 0 bytes (the drafts/upcoming index) — QA'd company-side.
-      LOAD PATH: docs/fcdo-frameworks-load-company-prompt.md (the load is
+      LOAD PATH: docs/company-prompts/fcdo-frameworks-load-company-prompt.md (the load is
       company-side by guardrail 6 — the capture never leaves the company
       network); graph_locator fills when that load runs.
 

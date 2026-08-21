@@ -13,11 +13,11 @@ depends_on: []
 inputs:
 - web/src/underhood/benchmarkData.ts
 - knowledge/upgrade-plans/docmeta-p0-verdict.md
-- UI-WIP/two-track-ui-plan.md
+- docs/design/ui-exploration/two-track-ui-plan.md
 acceptance: |
   benchmarkData.ts is produced by a documented regeneration step (a script, or a recorded manual procedure in the file header/a sibling README) that reads a real evaluation-harness run rather than the hand-carried P0-verdict numbers; the /under-the-hood scoreboard renders unchanged in shape from the regenerated data; build + lint green.
 notes: |
-  Groomed 2026-07-23 from UI-WIP/two-track-ui-plan.md T1-8. No standalone "docmeta evaluation harness" backlog item exists yet (checked: R8 "Answer evaluation + cap tuning" evaluates the Q&A console's OWN runs, not a reusable docmeta benchmark harness — a different surface) — per the groom instruction the dependency is recorded here as prose rather than a fabricated id; depends_on is left [] and this item is in practice blocked on that harness existing until one is groomed and this item's depends_on is updated to point at it.
+  Groomed 2026-07-23 from docs/design/ui-exploration/two-track-ui-plan.md T1-8. No standalone "docmeta evaluation harness" backlog item exists yet (checked: R8 "Answer evaluation + cap tuning" evaluates the Q&A console's OWN runs, not a reusable docmeta benchmark harness — a different surface) — per the groom instruction the dependency is recorded here as prose rather than a fabricated id; depends_on is left [] and this item is in practice blocked on that harness existing until one is groomed and this item's depends_on is updated to point at it.
   DONE 2026-08-21 (desktop). REGENERATION STEP: scripts/render_benchmark_data.py reads the REAL
   harness run knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json (chars + latency per
   question per arm, the 2026-07-16 live run) plus a new machine-readable verdict ledger

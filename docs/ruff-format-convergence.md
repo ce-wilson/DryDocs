@@ -6,7 +6,7 @@ All six producer commits (stages 0–5) are on `main`; `poetry run ruff check .`
 **company-side instructions below are unchanged and now live** — they are the
 next action for this stream, and nothing producer-side is waiting on them.
 This doc remains the authority for the amended J10 scope; stage 0 added the
-numbered step to [`docs/port-prompt.md`](port-prompt.md) pointing here. Decision
+numbered step to [`docs/port/port-prompt.md`](port-prompt.md) pointing here. Decision
 session: 2026-07-19 (measurements below are live from that session, producer tip
 `83f97cb`); execution session 2026-08-01.
 

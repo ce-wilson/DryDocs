@@ -44,7 +44,7 @@ SqlRunLog                     drydocs_core/adapters/sql_run_log.py
 
 **No JDBC runner in this repo.** The company repo implements the same contract one level
 lower (`jdbc_oracle_adapter.py` → `run-sql.cmd` → `SpiderpRunner.openTee()`, where the
-`-- result (csv) --` framing is also a parse contract); see `docs/port-prompt.md` item 14.
+`-- result (csv) --` framing is also a parse contract); see `docs/port/port-prompt.md` item 14.
 Env-var names and log anatomy match across both repos so inspection snippets and runbooks
 work identically. Here the CSV block is log-only — rows flow through the cursor, not stdout.
 
@@ -137,6 +137,6 @@ Get-ChildItem $env:SPIDERP_LOGDIR -Filter *.log |
 - `drydocs_core/adapters/oracle_adapter.py` — the adapter (tee seam)
 - `drydocs_core/adapters/sql_run_log.py` — log writer + display renderer
 - `tests/unit/test_sql_run_log.py` — the pinned contract
-- `docs/controlm-staging-ingestion-flow.md` — ingest flow
-- `docs/port-prompt.md` item 14 — company JDBC path + the bind-renderer back-flow rule
+- `docs/controlm/controlm-staging-ingestion-flow.md` — ingest flow
+- `docs/port/port-prompt.md` item 14 — company JDBC path + the bind-renderer back-flow rule
 - `.claude/skills/run-drydocs/SKILL.md` — runbook + SQL-logging summary

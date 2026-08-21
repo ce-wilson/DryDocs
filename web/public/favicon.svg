@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="24 30 192 176">
   <!-- DryDocs — Kept Orbit mark, small-size (3-stave) variant.
-       Source geometry: UI-WIP/drydocs-mark-mini.svg (generated, exact ellipse
-       arcs); philosophy: UI-WIP/kept-orbit-philosophy.md. Favicons cannot read
+       Source geometry: docs/design/ui-exploration/drydocs-mark-mini.svg (generated, exact ellipse
+       arcs); philosophy: docs/design/ui-exploration/kept-orbit-philosophy.md. Favicons cannot read
        CSS tokens, so these are the brand constants (keel navy / community
        green / core red — palette after the community graph, a tribute). -->
   <defs>

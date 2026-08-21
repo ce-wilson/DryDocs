@@ -14,7 +14,7 @@ inputs:
 - drydocs/loaders/sql/
 - drydocs/loaders/cypher/controlm_jobs.cypher
 - docs/design/controlm-ingestion-tdd.md
-- docs/controlm-staging-ingestion-flow.md
+- docs/controlm/controlm-staging-ingestion-flow.md
 - .claude/skills/controlm-db/SKILL.md
 acceptance: |
   All psgmgr version filters compare IS_CURRENT_VERSION = 'Y': extracts (controlm_folders/jobs/conditions_in/conditions_out/variables/variables_scenarios + adhoc probes), staging DDL views, controlm_jobs.cypher .active derivation, models/controlm.py field description, controlm-db skill (SKILL.md, query-cookbook, schema-crosswalk, ingest), the TDD "two filters" section, and C3/status + port-guide docs; no IS_CURRENT_VERSION = '1' remains outside history/audit prose; test_controlm_cypher asserts 'Y'; staging-ingestion-flow preflight 0.3 marked RESOLVED = 'Y'; the CM_DEF_SETVAR_VW extracts carry a comment flagging the view's own domain for a one-line company preflight (SELECT DISTINCT IS_CURRENT_VERSION) before the production variables run; design-doc renders regenerated; full suite green.

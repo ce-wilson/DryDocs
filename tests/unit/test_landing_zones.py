@@ -6,7 +6,7 @@ can never be tracked (PUBLISH-BOUNDARY.md), so inside a working tree it always f
 in one of those two buckets -- meaning NO .gitignore arrangement protects a
 hand-carried extract from a port-time sweep. Which files survived a given sweep came
 down to whether they happened to be ignored and whether the sweep carried ``-x``.
-``docs/port-prompt.md`` has carried "NEVER git clean during a port" since the J22
+``docs/port/port-prompt.md`` has carried "NEVER git clean during a port" since the J22
 lesson and the extracts were deleted anyway, which is the whole argument for a
 checked declaration instead of another sentence in a runbook.
 

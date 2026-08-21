@@ -43,7 +43,7 @@ The in-chat SME session ruled **all** of D1–D4 and Q1–Q6 (transcription:
 - **T19 naming note** — the catalog feed's replacement name is
   **`pat:product-catalog`** (industry-standard naming; matches neither legacy string);
   the people report splits out as `pat:people-report`. Recorded in the
-  `docs/port-prompt.md` divergence ledger for the company T19 review.
+  `docs/port/port-prompt.md` divergence ledger for the company T19 review.
 - **RESIDUAL** — the migration table below is NOT block-confirmed: each row confirms
   individually at the **N9 build** (previously signed rows transfer per Q6; everything
   else lands `confirmed: false`).

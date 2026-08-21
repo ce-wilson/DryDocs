@@ -11,7 +11,7 @@ relates_to:
   - 0002-component-database-topology.md
   - drydocs/cli.py                             # CANONICAL_LOAD_SEQUENCE, LOADER_REGISTRY
   - config/source-registry.yaml                # registry v2 — COMPANY-CANONICAL
-  - docs/port-prompt.md                        # the deprecation policy crosses here
+  - docs/port/port-prompt.md                        # the deprecation policy crosses here
 executed_by: GN2          # nothing in this record renames anything by itself
 ```
 

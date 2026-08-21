@@ -325,6 +325,6 @@ def test_neo4j_spans_both_stacks() -> None:
 
 
 def test_web_console_stack_matches_the_locked_site_plan() -> None:
-    """The locked stack (UI-WIP/site-plan.md §1), pinned so a swap is deliberate."""
+    """The locked stack (docs/design/ui-exploration/site-plan.md §1), pinned so a swap is deliberate."""
     web = {p["id"] for p in _doc()["products"] if "web-console" in (p.get("stack") or [])}
     assert web == {"react", "reui", "react-flow", "tailwindcss", "neo4j"}

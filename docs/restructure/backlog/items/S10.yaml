@@ -17,7 +17,7 @@ inputs:
 - drydocs/loaders/software_registry.py
 - drydocs/loaders/base.py
 - graph-tests/business-application-identity.yaml
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   Every loader that MERGEs `:BusinessApplication {app_id}` — seal_applications.v1, manual_seal_attribution.v1, pat_product_mapping.v1, software_registry.v1 — refuses up front when the target database holds any `:BusinessApplication` with a null `app_id`, i.e. a node a pre-S3 loader created. The refusal follows the established idiom (`batch_port_orchestrator._assert_endpoint_registries_present`): it runs BEFORE `super()._load`, so a refused run writes nothing at all — not even the :JobRun — and the message names the remediation (backfill `app_id = seal_id` on the pre-cutover nodes, or rebuild, and count first) rather than only the symptom. The count excludes `:SchemaMeta` exemplars, which carry the real label with no key and would otherwise red every load (the `_count_real_nodes` precedent). Unit tests cover both directions per loader against a fake client — refuses on a dirty graph, proceeds on a clean one — plus one test asserting the refusal happens before any write. Full suite green.
 notes: |

@@ -16,7 +16,7 @@ inputs:
 - docs/whitepaper/
 - CLAUDE.md
 - .claude/skills/documentation
-- UI-WIP/site-plan.md
+- docs/design/ui-exploration/site-plan.md
 acceptance: |
   (a) The committed guide (docs/style/us-business-english.md, landed with this groom) is WIRED into the writing path: CLAUDE.md's working agreements point at it for outward-facing prose, and the documentation skill references it — so the next doc Claude writes follows it without being told. (b) The executive overview is rewritten per the guide: its 21 counted occurrences of spine/plane/crosswalk/guardrail/gate-confirmed drop to zero outside fenced-mechanism references; NOTE it is HTML-only today (no .md source) — decide and record whether the rewrite establishes an .md source or edits the HTML directly (it is a NON-GOVERNED editorial surface per CLAUDE.md §6, so direct edit is legal; the decision just has to be written down). (c) The idiom inventory runs across the OUTWARD-FACING set only — overview, whitepaper, website seed content — each hit rewritten or fence-noted. (d) THE FENCE HOLDS: no mechanism is renamed by this item — the HITL status value `confirmed`, port-prompt guardrail numbering, and any identifier in code/config/schema keep their names; the sweep OUTPUTS a candidate-rename list (term, where it lives, what a rename would touch) for the user to rule on separately if wanted. "Crosswalk(s)" is NOT a hit and NOT a candidate: SME-approved 2026-08-03 (matches company-internal service/lookup terminology) — the guide records the exception. Governed surfaces (docs/design/* renders, gate pages, board) are OUT of scope — their prose changes ride their own rev process, per the VERBATIM rule.
 notes: |

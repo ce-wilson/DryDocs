@@ -7,7 +7,7 @@ target**. Producer-side verification (2026-07-28) is below, plus the producer pr
 for the *real* defect that same session surfaced in its own note #2.
 
 **How to use it:** PASTE into the executing company session. Never commit it company-side
-(`docs/port-*.md` is `never-port` in the manifest). Retire it from the producer tree once
+(`docs/port/**` is `never-port` in the manifest). Retire it from the producer tree once
 the company confirms the actions are landed or declined.
 
 ---

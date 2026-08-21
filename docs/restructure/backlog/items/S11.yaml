@@ -24,7 +24,7 @@ inputs:
 - pyproject.toml
 - scripts/
 - PORT-MANIFEST.yaml
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 acceptance: |
   Three first-party packages exist and the seven modules no longer sit at drydocs/ root: drydocs_plan/ (plan_board, plan_roadmap), drydocs_docgen/ (doc_outline, design_doc, doc_pdf, plan_ideas — plan_ideas stays with docgen, the 2026-08-05 ruling stands) and drydocs_port/ (port_preflight). test_module_boundary.py classifies all three BY PACKAGE ROOT and the hand-maintained "plan" / "docgen" / "port" module-name tuples are DELETED, not re-pointed — that deletion is the acceptance signal that the physical tree now carries the classification the test was carrying by hand. pyproject packages updated; the five scripts/render_*.py wrappers, scripts/doc_to_pdf.py and the six unit test modules import the new paths; `drydocs --help` lists the same commands under the same names. Zero behaviour change is PROVEN, not asserted: docs/plan/board.html, ideas.html, roadmap.html and docs/design/*.html regenerate byte-identical from the moved code. MODULE_MAP.md's "Module (today)" table gains three package rows and drops the per-file drydocs/ rows they replace. Full suite green. Lands as ONE frozen unit and is ported as ONE unit (GN2's discipline — a wide move landing in pieces leaves the two repos disagreeing about import paths for as long as the pieces take).
 notes: |

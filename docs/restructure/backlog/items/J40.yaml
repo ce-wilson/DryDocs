@@ -12,11 +12,11 @@ status: todo
 depends_on: []
 inputs:
 - git-readme.md
-- docs/port-prompt.md
+- docs/port/port-prompt.md
 - PORT-MANIFEST.yaml
 - docs/decisions/0006-docmeta-component-and-doc-graph.md
 - drydocs_docmeta/
 acceptance: |
-  A recorded reconcile decision, written where the next port session reads it (docs/port-prompt.md and/or git-readme.md, with PORT-MANIFEST rows adjusted to match), covering all three divergences by name: (a) the ADR NUMBER COLLISION — the company carries docmeta at 0005 while the producer's 0005 is the browser-to-Neo4j access path and its docmeta ADR is 0006, so the decision states which number is canonical on each side and how a reader of either repo learns that; (b) the PACKAGE PATH — company drydocs/docmeta/ (drydocs.docmeta) vs producer top-level drydocs_docmeta/ — converged, or deliberately divergent WITH the reason recorded; (c) the two company-only files, prompts.py and pipeline.py, dispositioned as back-flow candidates or as company-only with a reason. Until that decision exists, docmeta paths are marked in the manifest so a verbatim apply cannot silently take them.
+  A recorded reconcile decision, written where the next port session reads it (docs/port/port-prompt.md and/or git-readme.md, with PORT-MANIFEST rows adjusted to match), covering all three divergences by name: (a) the ADR NUMBER COLLISION — the company carries docmeta at 0005 while the producer's 0005 is the browser-to-Neo4j access path and its docmeta ADR is 0006, so the decision states which number is canonical on each side and how a reader of either repo learns that; (b) the PACKAGE PATH — company drydocs/docmeta/ (drydocs.docmeta) vs producer top-level drydocs_docmeta/ — converged, or deliberately divergent WITH the reason recorded; (c) the two company-only files, prompts.py and pipeline.py, dispositioned as back-flow candidates or as company-only with a reason. Until that decision exists, docmeta paths are marked in the manifest so a verbatim apply cannot silently take them.
 notes: |
   Groomed 2026-08-09 from Idea-87. This is the class a port silently clobbers: a straight producer-to-company take would overwrite the package path, renumber-or-duplicate the ADR, and DROP two files that exist only on the company side. Same failure mode as Idea-79/J34 (the PORT-MANIFEST company-overlay seam, built 2026-08-07) but a different artifact — J34 gives this item the mechanism to express (b) and (c); what J34 cannot decide is which ADR number is canonical, and that is a user/SME call this item is the venue for, not a groom decision. Sequence it BEFORE the next docmeta-touching port, not after.

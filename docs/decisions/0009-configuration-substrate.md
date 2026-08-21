@@ -66,7 +66,7 @@ half should move too.
 1. **The HITL gate reviews diffs.** `docs/restructure/03-hitl-sme-flow.md` and every
    `config/gate-prompts/*.yaml` put a human SME in front of a change. A row-level DB delta is
    not something a domain expert signs off on in a gate session; a YAML hunk is.
-2. **The cross-repo port is a commit range.** `git-readme.md` and `docs/port-prompt.md` move
+2. **The cross-repo port is a commit range.** `git-readme.md` and `docs/port/port-prompt.md` move
    producer → company by applying commits onto a *disjoint* `main`. Database state cannot be
    cherry-picked.
 3. **Classification is enforced per file.** `tests/unit/test_classification.py` requires a
@@ -228,4 +228,4 @@ and it does not change any contract.
 4. [ ] Split `config/taxonomy-ontology-map.yaml` into `config/ontology-map/*.yaml` with a deterministic concatenating loader + a migration test proving parsed-output equivalence.
 5. [ ] Split `relationship_vocabulary.yaml` the same way; duplicate `id` across domains must fail the suite.
 6. [ ] Author JSON Schema for source-registry, ontology-map, relationship-vocabulary, crosswalk, and classification; wire into the existing tests; publish for the console and `agents/`.
-7. [ ] Port-sequence items 4–5 through `docs/port-prompt.md` — they are wide mechanical diffs and must not collide with an in-flight port.
+7. [ ] Port-sequence items 4–5 through `docs/port/port-prompt.md` — they are wide mechanical diffs and must not collide with an in-flight port.

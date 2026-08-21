@@ -12,7 +12,7 @@ status: done
 depends_on:
 - O9
 inputs:
-- UI-WIP/site-plan.md
+- docs/design/ui-exploration/site-plan.md
 - web/src/
 - config/gate-log.md
 - config/gate-prompts/

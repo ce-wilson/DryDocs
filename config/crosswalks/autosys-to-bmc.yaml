@@ -142,7 +142,7 @@ rows:
       AutoSys global variables are a box-/instance-scoped substitution mechanism.
       Control-M variables (SETVAR) use a different resolution model entirely
       (folder/job table-scoped — already the subject of the C3/C4 variable-
-      normalization stream, docs/controlm-staging-ingestion-flow.md). Do not collapse
+      normalization stream, docs/controlm/controlm-staging-ingestion-flow.md). Do not collapse
       these into one concept; any proposed variable-graph treatment routes through
       ontology-mapper, not this crosswalk.
 

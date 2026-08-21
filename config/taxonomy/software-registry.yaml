@@ -231,7 +231,7 @@ products:
     used_by_drydocs: true
     stack: [backend]
 
-  # --- Web-console stack (Epic O; UI-WIP/site-plan.md §1 "Stack (locked)") ---
+  # --- Web-console stack (Epic O; docs/design/ui-exploration/site-plan.md §1 "Stack (locked)") ---
   # INCLUSION RULE, so this does not become the dependency tree: a LOCKED STACK
   # DECISION goes here — something the site plan committed to and that a
   # replacement would be a real architectural change. Ordinary npm packages

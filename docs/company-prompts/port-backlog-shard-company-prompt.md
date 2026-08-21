@@ -97,7 +97,7 @@ the new rows: `backlog/items/*.yaml` **per-entry where the entry is the file**
 
 ## Also in this range (the rest is ordinary)
 
-Six ledger steps (docs/port-prompt.md 171-176); read them in order, they are short:
+Six ledger steps (docs/port/port-prompt.md 171-176); read them in order, they are short:
 
 - **171** — `constraints.cypher` is now per-entry by constraint name (your two
   snow-hpsm constraints stay); the `fcdo-frameworks` doc-source row reads VERBATIM

@@ -171,7 +171,7 @@ controlm-ingestion-tdd render.
 
 *What this prevents.* `PRARAG` appears in ~36 files across config, docs, loaders,
 the folder-name parser, five tests that assert on it literally, the bundled
-sample CSVs, the lineage fixtures, internal/, knowledge/, UI-WIP and the web demo
+sample CSVs, the lineage fixtures, internal/, knowledge/, docs/design/ui-exploration and the web demo
 data. A sweep would rewrite the sample corpus, break the tests that pin the
 parser's behaviour, and require a new synthetic prefix plus registry rows — all
 to remove a name nobody captured. That sweep was proposed on 2026-08-11 and

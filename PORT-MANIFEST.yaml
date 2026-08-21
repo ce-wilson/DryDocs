@@ -3,7 +3,7 @@
 # (producer ce-wilson/DryDocs → company <org>/DryDocs; disjoint histories)
 #
 # THE AUTHORITY for how each path resolves during a port. The narrative around
-# these rules lives in git-readme.md + docs/port-prompt.md + the reconcile-port
+# these rules lives in git-readme.md + docs/port/port-prompt.md + the reconcile-port
 # skill — those documents explain WHY; this file is WHAT, and it is what the
 # consumer-side reconcile run should read mechanically. Rows are id-free and
 # ordinal-free on purpose (the port-prompt step-number coupling is retired as
@@ -76,7 +76,7 @@ updated: 2026-08-20   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-produ
                       # without a full-suite run; the guard flagged it here).
                       # 2026-08-01: +docs/next-session-handoff.md and
                       # +docs/next-internal-session.md, both never-port. The SECOND
-                      # instance of the docs/port-*.md failure mode — producer-local
+                      # instance of the docs/port/** failure mode — producer-local
                       # session material falling to `docs/*.md` -> default clean-add.
                       # The internal-session checklist had been imported by two prior
                       # ports and was caught only because the copies had not yet
@@ -105,7 +105,7 @@ updated: 2026-08-20   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-produ
                       # rows below were the promised "path-column diff, not a prose rewrite".
                       # 2026-07-10, later: drydocs_remediation/** + internal/remediation/**
                       # rows added (G3 remediation component stream).
-                      # 2026-07-14 (step 31): web/** + UI-WIP/** canonical-producer,
+                      # 2026-07-14 (step 31): web/** + docs/design/ui-exploration/** canonical-producer,
                       # .github/** evaluate, config/manual-loads/manifest.yaml per-entry.
                       # 2026-07-15 (step 34): docs/design/controlm-ingestion-tdd.{md,html,
                       # print.html} canonical-company — consumer's TDD is finalized/ahead.
@@ -580,9 +580,12 @@ rows:
   - path: "web/**"
     disposition: canonical-producer
     note: "drydocs-web module (JS/TS, Epic O; step 31) — node_modules/dist gitignored; .env.example only, VITE_* values NEVER committed (Vite inlines them into the bundle)"
-  - path: "UI-WIP/**"
+  - path: "docs/design/ui-exploration/**"
     disposition: canonical-producer
-    note: "web-console design record (wireframes, nav flow, dark landing mock; step 31) — static reference material"
+    note: "web-console design record (wireframes, nav flow, dark landing mock; step 31) — static
+      reference material. Lived at repo-root `docs/design/ui-exploration/**` until S9 (2026-08-21) moved it here;
+      the row stays ABOVE the `docs/design/**` evaluate row on purpose, because this material is
+      producer-authored reference the consumer never finalizes."
   - path: "config/taxonomy/lob-product-team.yaml"
     disposition: per-entry
     entry_rule: >
@@ -727,13 +730,13 @@ rows:
   # rows and the never-port glob reasserts, so the deferral a future company
   # session most needs to read never reaches it. They come out when the crosswalk
   # ratifications are actually run, not before.
-  - path: "docs/gate-autosys-crosswalk-company-prompt.md"
+  - path: "docs/company-prompts/gate-autosys-crosswalk-company-prompt.md"
     disposition: clean-add
     note: "delivery pack drafted 2026-08-07 (F1 status/profile/ratification) — crosses once, then retires per the never-port row below"
-  - path: "docs/gate-airflow-crosswalk-company-prompt.md"
+  - path: "docs/company-prompts/gate-airflow-crosswalk-company-prompt.md"
     disposition: clean-add
     note: "delivery pack drafted 2026-08-07 (F2) — same lifecycle"
-  - path: "docs/gate-*-company-prompt.md"
+  - path: "docs/company-prompts/**"
     disposition: never-port
     note: "COMPANY-SESSION DELIVERY PACKS, one-way and ONE-TIME: drafted producer-side,
       they cross ONCE as explicit clean-adds (the five 2026-08-07 packs crossed with
@@ -747,7 +750,7 @@ rows:
       producer-side retirement DELETIONS never delete the company's live copy. A FUTURE
       prompt crosses by adding its specific file as a clean-add row ABOVE this one for
       the delivering port, then removing that row after the merge."
-  - path: "docs/port-*.md"
+  - path: "docs/port/**"
     disposition: never-port
     note: "PRODUCER-SIDE PORT CONTROL DOCS — the rolling port prompt, its step archive,
       and the per-stream hand-off packs (port-T12-*, port-step46-*). These direct the
@@ -755,7 +758,10 @@ rows:
       2026-07-27, which is why step 43 needed a prose 'do NOT re-add the T12 session
       materials' workaround — that instruction is now a manifest row. Hand-off packs are
       PASTED into the executing session, never committed company-side. The company's own
-      PORT-REPORT-<date>.md is a company artifact and is likewise not producer content."
+      PORT-REPORT-<date>.md is a company artifact and is likewise not producer content.
+      S9 (2026-08-21) moved these from the docs/port/** root glob into `docs/port/`, so
+      the row is a DIRECTORY now rather than a name pattern — a new port control doc is
+      covered by living in the directory instead of by remembering the prefix."
 
   # The same class as the row above, and the two files that PROVED the rule was needed:
   # both are producer-local session material that fell to `docs/*.md` -> default clean-add.
@@ -813,7 +819,7 @@ rows:
 # The inverse question nobody had asked: which tracked paths match NO row? 398
 # of 1415 did, and "deliberately default" was indistinguishable from "nobody
 # thought about it" — which is how knowledge/depgraph-snapshots/*.json and
-# docs/port-*.md each spent months instructing the consumer to port the
+# docs/port/** each spent months instructing the consumer to port the
 # producer's port INSTRUCTIONS as payload, found by accident, one at a time.
 #
 # Every entry below is BEHAVIOR-PRESERVING: it records why `default:` is the
@@ -832,7 +838,7 @@ default_ok:
       in the idea inbox): git-readme.md is deliberately uncovered. It is the WHY
       guide for the cross-repo model itself — the document that explains what a
       port IS — so both sides benefit from holding their own copy, and neither
-      side's is wrong. Note the contrast with docs/port-*.md (never-port): those
+      side's is wrong. Note the contrast with docs/port/** (never-port): those
       DIRECT a specific port and are not its payload; this one describes the
       model and is nobody's payload.
 
@@ -896,7 +902,22 @@ default_ok:
 
   # ---- docs -----------------------------------------------------------------
   - path: "docs/*.md"
-    reason: "loose repo-root docs (RELATIONSHIP_GUIDE, the Control-M flow/status notes). S9 will move most of these into subdirectory homes; revisit the pattern then"
+    reason: >
+      what is LEFT loose at the docs root after S9 (2026-08-21) grouped the rest:
+      RELATIONSHIP_GUIDE.md (a top-level index CLAUDE.md cites by that path),
+      oracle-sql-logging.md, ruff-format-convergence.md and
+      generic-snowflake-data-catalog-ingestion-plan.md. F13 named only the
+      `controlm-*` / `port-*` families, and those now have directory rows of their
+      own (`docs/port/**`, `docs/company-prompts/**`, `docs/controlm/**`). The
+      never-port session material (next-session-handoff, next-internal-session)
+      keeps its explicit rows ABOVE this entry. Evaluate-on-collision stays right
+      for the remainder.
+  - path: "docs/controlm/**"
+    reason: >
+      Control-M flow/status/plan notes, grouped here by S9 out of the docs root.
+      Producer-authored working notes about the shared ingestion model — the
+      consumer legitimately holds its own status for the same subject, so
+      evaluate-on-collision is right and a blanket take-producer would overwrite it.
   - path: "docs/decisions/**"
     reason: "ADRs — a decision record is append-only-ish history for the repo that made it; both sides may hold the same ADR number for different decisions, so never checkout"
   - path: "docs/reviews/**"

@@ -12,7 +12,7 @@ status: done
 depends_on: []
 inputs:
 - knowledge/standards/technology/description-field-metadata-plan.md
-- UI-WIP/backstage-catalog-assessment.md
+- docs/design/ui-exploration/backstage-catalog-assessment.md
 acceptance: |
   The description-field metadata plan's template phase includes a key-governance section modeled on annotation-naming governance: a reserved drydocs prefix for keys the template/graph owns; keys owned by external systems carry that system's prefix (the scim / jira / seal families); a bare unprefixed key is team-local and never load-bearing for ingestion; the plan's validation phase states it will enforce these rules. Doc-only — no loader or template build lands from this item.
 notes: |

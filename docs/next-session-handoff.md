@@ -3,7 +3,7 @@
 > **Rolling file — overwrite it, do not append.** One screen of "where things stand"
 > for picking the work up on the other machine. Durable state lives in
 > `docs/restructure/backlog/` (the claim channel — ONE FILE PER ITEM since today) and
-> `docs/port-prompt.md`; this is the narrative that git alone does not carry.
+> `docs/port/port-prompt.md`; this is the narrative that git alone does not carry.
 >
 > **Written 2026-08-20 (desktop, session close), producer head `11229bbd`; certified base
 > = tag `port-base-20260820` @ `213e1d12` (four ritual commits after it ride the next port).**
@@ -14,7 +14,7 @@
 **`7c18ff4b..port-base-20260820`** (25 commits, 544 paths, ledger steps 171-176).
 Anything committed after the tag rides the NEXT port — normal, not a discrepancy.
 
-**The hand prompt is `docs/port-backlog-shard-company-prompt.md`**, filled except
+**The hand prompt is `docs/company-prompts/port-backlog-shard-company-prompt.md`**, filled except
 for the company's own dates/branch names. It leads with the one thing that makes
 this port unlike every prior one: **step 175, the backlog shard**, applies by a
 ONE-TIME sequence — union the monolith under the old rule → run the PORTED
@@ -28,11 +28,11 @@ close-out, recorded in THEIR ledger, no ids carried here):** the 135-170 port is
 not-port-introduced section is in their PORT-REPORT; the stash was handled by-path
 (correctly — a wholesale pop would have clobbered tracked state). TWO items await
 the user's word to that session: (b) `port-prompt.md` "retire" — now DEFINED in
-`docs/port-7c18ff4b-followup-company-prompt.md`: archive their steps-43+ as a
+`docs/company-prompts/port-7c18ff4b-followup-company-prompt.md`: archive their steps-43+ as a
 `DATED RECORD` + replace the file with a POINTER to the producer ledger-at-tag,
 never `git rm` (97 refs / 32 files), never a fresh living ledger; (c) the seven
 deferred-gate DEFER records — authorized by the prompt, the session was
-conservative. Once (b) lands, paste `docs/port-backlog-shard-company-prompt.md`.
+conservative. Once (b) lands, paste `docs/company-prompts/port-backlog-shard-company-prompt.md`.
 Their `origin` is the producer remote but CANNOT push (user-confirmed); no action.
 
 **Standing rule from today (memory `hand-prompts-ask-nothing-back`):** producer-

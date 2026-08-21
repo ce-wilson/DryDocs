@@ -20,12 +20,12 @@ summary: >
   field cannot hold two dispositions. Clause D fences the scope.
 meta:
   Module: "config (the registry schema + drydocs_core/source_registry.py's gate) — no ontology or graph surface is touched"
-  Source: "config/source-registry.yaml (29 dataset rows, 20 true / 9 false) · config/schemas/source-registry.schema.json · drydocs_core/source_registry.py (require_confirmed) · docs/port-prompt.md (the a14a8028 fix session, decision 1)"
+  Source: "config/source-registry.yaml (29 dataset rows, 20 true / 9 false) · config/schemas/source-registry.schema.json · drydocs_core/source_registry.py (require_confirmed) · docs/port/port-prompt.md (the a14a8028 fix session, decision 1)"
   Precedent: "Q6 — signed-off gates TRANSFER across renames (config/gate-log.md, source-registry-v2) · the SOURCELESS_LOADERS idiom — an exemption without a written reason is the silent omission a guard exists to end · G27/W1/U11 — a drafted prompt decides nothing"
   Registry ref: "no row's `confirmed` value changes at this gate; the field's MEANING is what is on the table"
   Classification: "Internal-Public — mechanism only. The motivating divergence is described by its shape (a company loader tier not yet built); no company host names, SIDs or server addresses appear here"
   Vocabulary: "no relationship vocabulary is involved — this is a config-layer field, not an ontology edge"
-  Source of record: "backlog N10 · config/gate-log.md (transcription target) · docs/port-prompt.md divergence ledger"
+  Source of record: "backlog N10 · config/gate-log.md (transcription target) · docs/port/port-prompt.md divergence ledger"
 
 mapping:
   - n: 1

@@ -123,7 +123,7 @@ verified commit-by-commit by `port_preflight.py`. The base is tagged
 **`port-base-20260820`** at the roll commit (`python scripts/port_preflight.py
 --base 7c18ff4b --tag`). **THIS RANGE HAS ONE STEP WITH ITS OWN APPLY SEQUENCE —
 step 175, the backlog shard** — carried in full by
-`docs/port-backlog-shard-company-prompt.md`; everything else applies by the
+`docs/company-prompts/port-backlog-shard-company-prompt.md`; everything else applies by the
 manifest as usual. PRECONDITION on your side: the 135-170 port
 (`drydocs-port-20260820`) is `--no-ff` MERGED to your main with its follow-ups
 done before this range starts — a mid-apply range finishes on the monolith.
@@ -217,7 +217,7 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   run after M3), ui-write-surface (O20) — each opens with a STATUS question (an
   already-ratified answer stops the session), then an internal-dataset profile, then
   the producer rulings to finish per-item. Explicit clean-add manifest rows ride
-  above the `docs/gate-*-company-prompt.md` never-port glob; REMOVE those five rows
+  above the docs/company-prompts/** never-port glob; REMOVE those five rows
   after the delivering port merges.
 - **Producer head `a14a8028`** (2026-08-06), applied company-side as
   **PORT-REPORT-a14a8028** — range `5f79d145..a14a8028` = **107 commits, PRODUCER-VERIFIED
@@ -276,7 +276,7 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   Next-port base = `a14a8028`; 28 producer commits (G22 rulings, N8, O42, O45/O46
   intake slices) were already pending at review time.
   **FIX-SESSION CLOSE-OUT (company run, 2026-08-06; producer fix prompt
-  `docs/port-fix-a14a8028-company-prompt.md`):** branch `drydocs-port-20260806` at
+  `docs/company-prompts/port-fix-a14a8028-company-prompt.md`):** branch `drydocs-port-20260806` at
   **7 commits** (`rev-list pre-cewilson-port-20260806..HEAD` = 7), still **NOT merged**,
   backup tag intact. Suite **14 → 7 failed (1865 / 7 / 31)** — all 7 are documented
   deferrals, none silent: WP1.4 + the WP2 ×6. Per-package: `4283305` B3-proper
@@ -399,11 +399,11 @@ GUARDRAILS (durable — apply to every port):
    `default_ok:` with a reason; a path in NEITHER is an un-made decision, not a
    clean-add — stop, decide it, and send the row back (guarded by
    test_port_reconcile_guards.py::test_no_tracked_path_falls_through_silently).
-   TWO CITED DOCS ARE NOT IN YOUR TREE (both `docs/port-*.md` = never-port). Read them
+   TWO CITED DOCS ARE NOT IN YOUR TREE (both docs/port/** = never-port). Read them
    at the fetched producer ref, same idiom as above:
-   - `...:docs/port-prompt-archive-steps-1-42.md` — resolves every "archive step N"
+   - `...:docs/port/port-prompt-archive-steps-1-42.md` — resolves every "archive step N"
      citation, and holds the Done-means for T1–T10, which appear nowhere else.
-   - `...:docs/port-ais-supplement-company-prompt.md` — the T17 pack. NOT part of any
+   - `...:docs/company-prompts/port-ais-supplement-company-prompt.md` — the T17 pack. NOT part of any
      port (no payload; four actions on company-local code). Run it as its own session.
    A citation with no openable path is a DEFECT — send it back, do not work around it.
    READ AT PRODUCER **HEAD**, NOT AT THE REF YOU LAST FETCHED: `git fetch cewilson`
@@ -592,7 +592,7 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   `/workspace/`, local model/log ignores. J22's untracked-sweep guard requires the
   company working tree to be gitignored-clean, so these are load-bearing, not noise.
 - **NEVER `git clean` during a port.** The company tree carries ~25 untracked paths
-  including the `internal/**` data corpora and `UI-WIP/**`. `git reset --hard` leaves
+  including the `internal/**` data corpora and `docs/design/ui-exploration/**`. `git reset --hard` leaves
   untracked files alone; `git clean -fd` destroys them with NO reflog recovery.
   **This rule has been here since J22 and the extracts were deleted anyway**, so treat
   it as a reminder attached to a control, not as the control. The mechanics that make
@@ -1616,7 +1616,7 @@ regeneration, never-port outputs — and get no step.
     cite something.
 
 128. PORT-LOOP BOOKKEEPING (`06d4469`). The `ae21ee4` port is recorded MERGED
-    company-side with its branch removed — `docs/port-prompt.md` only. Nothing to
+    company-side with its branch removed — `docs/port/port-prompt.md` only. Nothing to
     apply; it is here because the ledger's ritual exemption is deliberately narrow
     (`chore(port): roll|ledger` only), so a substantive `chore(port):` such as
     retiring manifest rows still has to be told to you. This one is not substantive,
@@ -2250,7 +2250,7 @@ regeneration, never-port outputs — and get no step.
     fcdo-frameworks doc-source row goes VERBATIM on the 2026-08-19 company fetch
     (the four crosswalk capture holes closed), the "context"-never-in-an-id naming
     rule lands in config/taxonomy/context-types.yaml's header, and the LOAD is a
-    hand prompt (docs/fcdo-frameworks-load-company-prompt.md) — loads are always
+    hand prompt (docs/company-prompts/fcdo-frameworks-load-company-prompt.md) — loads are always
     yours; `963e93ca` the registry-embedding renders follow.)
     APPLY: constraints per-entry by name (your two stay); doc-source-registry now
     has its OWN per-entry row at step 175 — read that before taking this file.
@@ -2271,7 +2271,7 @@ regeneration, never-port outputs — and get no step.
 173. THE 7c18ff4b PORT REVIEW AND ITS TWO HAND PROMPTS [docs / review]
     (`5568be09` docs/reviews/port-review-7c18ff4b-20260820.md — range verified
     247/316 producer-side, five findings, verdict mergeable with conditions on the
-    follow-up; `195e5561` + `bc14b6c8` docs/port-7c18ff4b-followup-company-prompt.md
+    follow-up; `195e5561` + `bc14b6c8` docs/company-prompts/port-7c18ff4b-followup-company-prompt.md
     — the FID pair lands as ONE gate-log commit, the company-local fixes get a
     not-port-introduced section; REWRITTEN the same day so it asks for nothing
     back: records live in YOUR ledger, instance names nowhere (the standing rule
@@ -2302,8 +2302,9 @@ regeneration, never-port outputs — and get no step.
     files. Idea-142 closed by this step.
 
 175. Y2 — THE BACKLOG IS SHARDED; backlog.yaml IS A TOMBSTONE [drydocs-core / plan / guards]
-    [THE ONE STEP WITH ITS OWN APPLY SEQUENCE — read docs/port-backlog-shard-
-    company-prompt.md whole before touching the backlog]
+    [THE ONE STEP WITH ITS OWN APPLY SEQUENCE — read
+    docs/company-prompts/port-backlog-shard-company-prompt.md whole before
+    touching the backlog]
     (`8a6b592d` the build: docs/restructure/backlog/ — items/<id>.yaml x469,
     epics/<epic>.yaml x26 (54 header blocks as groom_log data), plan.yaml,
     modules.yaml; drydocs_core/backlog_store.py the ONE reader (assembles the

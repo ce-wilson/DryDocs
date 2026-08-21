@@ -9,7 +9,7 @@ User-supplied screenshots of **HL DataLens** (Home Lending SRE's runtime view ov
 same batch estate DryDocs models), captured 2026-07-28. Kept as **design-pattern shape
 references** for the console's runtime-monitor continuity work (`continuity.md` here,
 groom candidates DL-1…DL-9) — not decision evidence, and per the two-track back-flow
-rule (`UI-WIP/two-track-ui-plan.md`) patterns are **reproduced generically**, never
+rule (`docs/design/ui-exploration/two-track-ui-plan.md`) patterns are **reproduced generically**, never
 copied.
 
 | File | What it shows | Continuity item it feeds |
@@ -20,7 +20,7 @@ copied.
 | `HL-Datalens-ui-dataflow2.png` | Job Details: status filter tabs with count badges, per-job folder/name/timestamps table | DL-1 (tabular-nums), DL-3, DL-6 (identifier chips) |
 
 `continuity.md` — the groom-candidate write-up (DL-1…DL-9) — lives here rather than
-`UI-WIP/` because it names the company tool and quotes real identifier shapes
+`docs/design/ui-exploration/` because it names the company tool and quotes real identifier shapes
 (DL-9's home-ruling, applied at ingestion 2026-07-28). The root-`/*.png` gitignore rule
 kept the screenshots untracked while they sat at repo root; this folder is their
 classified, tracked home.

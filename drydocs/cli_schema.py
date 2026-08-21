@@ -56,7 +56,7 @@ def landing_zones_cmd(
     Read-only: it never creates a zone, because a doctor that repairs the tree it
     is inspecting reports health on damage it just hid. ``--check`` is the
     before/after call for a port -- an emptied zone is the signature of a
-    ``git clean``, and the reflog cannot recover it (see docs/port-prompt.md).
+    ``git clean``, and the reflog cannot recover it (see docs/port/port-prompt.md).
     """
     from drydocs_core.landing_zones import BASES, inventory, manual_zones
 

@@ -2,7 +2,7 @@
 # config/taxonomy/context-types.yaml — context-type vocabulary for SME intake.
 #
 # Created 2026-08-06 (backlog O45, slice 1 of the SME Context-Intake page plan,
-# UI-WIP/sme-intake-page-plan.md §2). This is the controlled list behind the
+# docs/design/ui-exploration/sme-intake-page-plan.md §2). This is the controlled list behind the
 # intake page's "context type" dropdown: what KIND of support situation the
 # uploaded evidence describes.
 #

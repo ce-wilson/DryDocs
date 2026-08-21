@@ -568,7 +568,7 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         )
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin
-    # of UI-WIP/wf-mapping-01.html until the O8 React shell exists.
+    # of docs/design/ui-exploration/wf-mapping-01.html until the O8 React shell exists.
     @app.get("/demo")
     def get_demo():
         from fastapi.responses import HTMLResponse

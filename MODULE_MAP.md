@@ -36,7 +36,7 @@ a boundary the guard enforces and the backlog files work against. A **directory*
   (this file, the backlog registry, `config/taxonomy/ui-components.yaml`). Renaming them to
   match would buy nothing and break ecosystem defaults.
 - The recurring confusion this rule answers: `web/` is the **real console**
-  (`drydocs-web`); `UI-WIP/` is a *docs workspace* (mockups, plans — module `docs`), not
+  (`drydocs-web`); `docs/design/ui-exploration/` is a *docs workspace* (mockups, plans — module `docs`), not
   code. S9 owns re-homing it under `docs/design/`.
 
 The backlog `modules:` comments cite this section rather than re-explaining it.

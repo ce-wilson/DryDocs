@@ -199,7 +199,7 @@ def test_items_have_valid_v2_fields() -> None:
 # "both sides run their own plan against OVERLAPPING ids" -- and it has already
 # cost a forced renumber: a concurrent push produced two different G70 and two
 # different G71, and the desktop pair moved to G75/G76 because config/gate-log.md
-# cited G73/G74 inside a SIGNED-OFF record (docs/port-prompt.md). Bands make
+# cited G73/G74 inside a SIGNED-OFF record (docs/port/port-prompt.md). Bands make
 # allocation need no coordination: producer 1-9999, company 10000+, readable by
 # LENGTH so there is no boundary to remember.
 

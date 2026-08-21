@@ -4,7 +4,7 @@
 // reserved column all read from this single source instead of being repeated
 // (and drifting) across component files.
 //
-// Zone rules encoded here (UI-WIP/wf-module-subpage-01.md, wf-landing-01.md):
+// Zone rules encoded here (docs/design/ui-exploration/wf-module-subpage-01.md, wf-landing-01.md):
 // - aside ≠ sidebar: the aside is global nav (left); the right sidebar is a
 //   per-page, per-node inspector. Never conflate the two.
 // - the collapsed aside keeps its grid column (collapsedWidthPx, not 0/none) —

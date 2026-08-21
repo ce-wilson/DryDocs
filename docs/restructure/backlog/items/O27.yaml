@@ -12,7 +12,7 @@ status: done
 depends_on: []
 inputs:
 - drydocs_api/query_specs.py
-- UI-WIP/backstage-catalog-assessment.md
+- docs/design/ui-exploration/backstage-catalog-assessment.md
 - web/src/
 acceptance: |
   A conventions section (drydocs_api/ docstring or a sibling doc, discoverable from query_specs.py) records three rules with rationale: (a) specs read gate-confirmed materialized edges and properties, never re-derive meaning from raw staged columns (precedence resolution lives in the loaders — the Backstage consume-the-relation-not-the-spec-field rule); (b) a canonical external ref grammar kind:namespace/name (namespace = data center where names collide across the 4 DCs) is defined for deep links and export manifests; (c) graph-internal element ids / uids never appear in URLs, manifests, or exports (documented as unstable). Existing registry specs are audited against (a) with violations fixed or flagged; a registry invariant or unit test enforces (c) where mechanical.

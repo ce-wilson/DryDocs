@@ -515,7 +515,7 @@ def test_before_text_missing_file_names_all_four(
 # The manifest answers "how does THIS path resolve"; nobody had asked the inverse,
 # "which paths match no row at all". Those take `default:` — clean-add if absent
 # consumer-side — silently, so a deliberate default reads exactly like an oversight.
-# It cost real incidents: knowledge/depgraph-snapshots/*.json and docs/port-*.md
+# It cost real incidents: knowledge/depgraph-snapshots/*.json and docs/port/**
 # were each instructing the consumer to commit the producer's port INSTRUCTIONS as
 # payload, found by accident one at a time, with a prose workaround standing in for
 # a missing row for a week. This is test_no_shadow_definitions (C18) applied to port

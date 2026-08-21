@@ -13,7 +13,7 @@ depends_on:
 - O38
 inputs:
 - web/src/
-- UI-WIP/two-track-ui-plan.md
+- docs/design/ui-exploration/two-track-ui-plan.md
 - internal/datalens-reference/continuity.md
 acceptance: |
   An optional config/env-driven "runtime view" URL-template slot renders an external-link affordance on entity surfaces (inspector + IdChips) when set and renders nothing when unset; the template is documented in .env.example; no company URL or hostname appears anywhere in the repo; build + lint green. Company-side binding is a DD-series item in the company tracker, never here (the two-track seam rule).

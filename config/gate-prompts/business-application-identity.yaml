@@ -122,7 +122,7 @@ meta:
   Ontology map: "NEW entry business-application-identity (proposed at this gate) — property-supplement shape, no edge; precedent job-runtime-stats-supplement (confirmed 2026-07-14)"
   Vocabulary: "NONE — no relationship_vocabulary.yaml term is created or changed. This is a node-property binding, not an edge"
   Related gates: "seal-app-ref-edge-reshape v2 (OPEN — also touches :BusinessApplication; run together or the second re-opens the first) · seal-attribution-match-policy (2026-07-14, NOT re-opened) · seal-tom-attribution-reshape (2026-07-10)"
-  Company impact: "seal_id almost certainly appears in company-side code the producer cannot see; port-sequenced through docs/port-prompt.md before any other wide structural port"
+  Company impact: "seal_id almost certainly appears in company-side code the producer cannot see; port-sequenced through docs/port/port-prompt.md before any other wide structural port"
 mapping:
   - n: 1
     element: "BusinessApplication identity VALUE"
@@ -224,7 +224,7 @@ sections:
       - "G1 [AMENDED 2026-07-27 — §D1(a) put :Port in phase 1, and 'the neutral pair' was a third id_authority leftover]: phases are additive and independently revertible — (1) loaders write BOTH properties from the same row value; a new constraint is added on app_id under a NEW name; and the :Port NODE KEY flips here too, because §D1 ruled (a) follows now. THE PORT STEP IS THE ONE WITH A TRAP: `CREATE CONSTRAINT <name> IF NOT EXISTS` matches on the NAME, so redefining `port_unique` under the same name SUCCEEDS AND DOES NOTHING, silently leaving the old (parent_seal_id, kind) definition live. It must be DROPped first or take a new name — same failure class as the session through-line 'succeeds loudly, does nothing' (G29 / G30 / Q8). (2) API + console read/emit app_id — SINGULAR, not 'the neutral pair'; §B0 withdrew the second element, same defect class as §D2's void option (b) and §E1's. (3) loader Cypher, graph-tests/ (one line, seal-attribution-coverage.yaml) and gate pages move to app_id; seal_id becomes a deprecated alias still written. Phase 2 is the one with a deadline (before more console routes land)."
       - "G2: module and file renames (seal_applications.py -> business_applications.py, seal_ontology_supplement.cypher -> ...) are phase 3+ and LOWEST value — cosmetic next to the property key, and they collide hard with the company port. Do them last, or not at all."
       - "G3: RETIRING seal_id is NOT decided here. It is a separate later gate, after the company side has ported and confirmed nothing reads it."
-      - "G4: port sequencing — this lands before any other wide structural port (docs/port-prompt.md), because the company side has seal_id in code the producer cannot see and every additional structural port compounds the conflict."
+      - "G4: port sequencing — this lands before any other wide structural port (docs/port/port-prompt.md), because the company side has seal_id in code the producer cannot see and every additional structural port compounds the conflict."
   - title: "H. Sign-off"
     confirmations:
       - "SME sign-off recorded here and transcribed to config/gate-log.md with per-item outcomes (A1-A4, B1-B3, C1-C4, D1-D2, E1-E3, F1-F2, G1-G4). On sign-off: the taxonomy-ontology-map entry business-application-identity flips proposed -> confirmed, backlog S3 unblocks, and gates.json is regenerated. Nothing is written to the graph at the gate itself."
