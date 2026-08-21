@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - config/gate-prompts/software-version-context.yaml
