@@ -95,6 +95,37 @@ def compute_row_checksum(
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+#: N16 (2026-08-21) — ``source_label`` RULED: option (a), WIDEN AND ENFORCE.
+#: WHAT IT IS FOR: the coarse provenance carrier a consumer reads off the run
+#: envelope (``(:JobRun).source``, set by every template from ``$source_label``)
+#: and off the load summary's ``source`` line — "what kind of thing did this
+#: run read", one word. It is deliberately coarser than N12's
+#: ``acquisition.format`` (csv/json/ascii/archive — how a MANUAL drop arrives)
+#: and names families that are not file formats at all (``pat``, ``snapshot``,
+#: ``registry``, ``vendor-docs``, ``taxonomy``); that is why (b), folding it into
+#: the format axis, was declined: the two ledgers describe different facts.
+#: ``agent`` was declared in the old comment and used by no loader: retired.
+#: NAME COLLISION, stated so neither meaning is imported into the other:
+#: ``source_label`` in drydocs_api/mappings.py and drydocs_core/mapping_store.py
+#: is the SOURCE NODE LABEL of a mapping ("ControlMFolder") — a different
+#: subject that happens to share the identifier.
+SOURCE_LABELS: frozenset[str] = frozenset(
+    {
+        "csv",  # a CSV adapter over a file (fixtures, projections, drops)
+        "oracle",  # a psgmgr / Oracle SQL extract
+        "human",  # a hand-authored mapping or ruling file (manual loads)
+        "pat",  # the PAT product catalogue / team report family
+        "snapshot",  # the depgraph code snapshot series
+        "registry",  # an in-repo registry (software registry)
+        "taxonomy",  # an in-repo taxonomy capture (batch-port orchestrators)
+        "markdown",  # a markdown corpus (design docs, doc traceability)
+        "json",  # a JSON corpus (email extracts)
+        "pdf",  # a PDF corpus (essential-graphrag)
+        "vendor-docs",  # the converted vendor documentation capture
+    }
+)
+
+
 @dataclass
 class LoadSummary:
     """Result of a single loader run."""
@@ -222,7 +253,11 @@ class BaseLoader:
     name: ClassVar[str] = "base"
     cypher_path: ClassVar[Path | None] = None
     row_model: ClassVar[type[BaseModel] | None] = None
-    source_label: ClassVar[str] = "csv"  # 'csv' | 'oracle' | 'agent' | 'human'
+    #: The provenance CARRIER stamped on the run envelope (``run.source``) and
+    #: read back by consumers — so it is a declared enum, not a comment (N16).
+    #: Must be one of :data:`SOURCE_LABELS`; tests/unit/test_source_labels.py
+    #: fails a loader that ships any other value.
+    source_label: ClassVar[str] = "csv"
 
     # ---- N3: the loader -> source join ----------------------------------
     # The config/source-registry.yaml id this loader draws from. Declared on

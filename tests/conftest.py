@@ -9,6 +9,20 @@ from __future__ import annotations
 
 import sys
 
+import pytest
+
+
+def pytest_sessionstart(session) -> None:
+    """S12 — fail the session ONCE, before any test, when the interpreter's
+    installed packages disagree with poetry.lock (tests/env_drift.py). Drift,
+    never path: a correctly provisioned Docker / tox / system-python run passes;
+    a wrong-version install in the right directory fails."""
+    from tests import env_drift
+
+    offenders, checked = env_drift.check()
+    if offenders:
+        raise pytest.UsageError(env_drift.report(offenders, checked))
+
 
 def pytest_sessionfinish(session, exitstatus) -> None:
     """Close the agents' shared Neo4j driver if anything in the run created it.
