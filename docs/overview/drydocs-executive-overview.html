@@ -1,3 +1,4 @@
+<meta charset="utf-8" />
 <title>DryDocs — Executive Overview</title>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -117,6 +118,12 @@
                           cited to Besta et al. 2025 [1] with the paper and repository
                           links directly beneath it; §06 loop redrawn with the findings
                           landing in the same database under the label.
+                          SELF-RENDERING (same day, second pass): the file had never carried
+                          a mermaid loader — it relied on the artifact host, so opened from disk
+                          it showed diagram SOURCE as text. A module script now loads mermaid from
+                          the CDN only when no host has rendered the diagrams; a <meta charset>
+                          leads the file so a bare open does not fall back to windows-1252. §02
+                          gains the same executive/full toggle as §04 ("Show every node").
                           LIGHT MODE ONLY for this revision — the dark token blocks are
                           removed so readability can be tested on one palette; the
                           mermaid blocks carry an explicit light init directive. Dark
@@ -340,8 +347,8 @@
   }
   .toggle input { width: 1rem; height: 1rem; accent-color: var(--teal); margin: 0; }
   .toggle span { color: var(--faint); font-size: 0.72rem; }
-  figure:has(#show-modules:not(:checked)) .view-full,
-  figure:has(#show-modules:checked) .view-exec {
+  figure:has(.toggle input:not(:checked)) .view-full,
+  figure:has(.toggle input:checked) .view-exec {
     height: 0; padding: 0; border-width: 0; overflow: hidden;
   }
 
@@ -552,11 +559,34 @@
     <h2>Five layers, one backbone</h2>
 
     <figure>
-      <div class="canvas">
+      <label class="toggle"><input type="checkbox" id="show-nodes" /> Show every node <span>— the five layers are the default; the node-level graph is one click away</span></label>
+      <div class="canvas view-exec">
+<pre class="mermaid">
+%%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
+flowchart TB
+  HUMAN["◆ PEOPLE &amp; TEAMS — who is accountable<br/>employees · dev teams · operating-model roles · escalation groups"]
+  BUSINESS["◆ BUSINESS &amp; PRODUCT — what it rolls up to<br/>segment → line of business → product line → product"]
+  APP["◆ APPLICATION — the pivot between business and technical<br/>business application (app_id + id_authority) · ports · software"]
+  ORCH["◆ ORCHESTRATION — THE BACKBONE: what actually ran<br/>application · folder · job · condition · server · observed run"]
+  DATA["◆ DATA &amp; DOCUMENTS — what it touches, what it cites<br/>files and datasets · documents → chunks · design docs → sections"]
+
+  ORCH ==>|WAS_ASSOCIATED_WITH| APP
+  BUSINESS -.->|planned| APP
+  APP -->|attributed roles| HUMAN
+  BUSINESS -->|dev teams| HUMAN
+  APP -->|primary source| DATA
+  ORCH -.->|file lineage| DATA
+
+  classDef backbone stroke-width:2.5px
+  class ORCH backbone
+</pre>
+      </div>
+      <div class="canvas view-full">
 <pre class="mermaid">
 %%{init: {"theme":"neutral","flowchart":{"curve":"basis"}}}%%
 flowchart TB
   subgraph HUMAN["◆ PEOPLE &amp; TEAMS — who is accountable"]
+    direction LR
     Employee[":Employee"]
     DevTeam[":DevTeam"]
     TOMRole[":TOMRole / :ProductRole"]
@@ -565,6 +595,7 @@ flowchart TB
   end
 
   subgraph BUSINESS["◆ BUSINESS &amp; PRODUCT — what it rolls up to"]
+    direction LR
     Segment[":BusinessSegment"]
     LOB[":CatalogLOB"]
     PLine[":ProductLine"]
@@ -572,12 +603,14 @@ flowchart TB
   end
 
   subgraph APP["◆ APPLICATION — the pivot between business and technical"]
+    direction LR
     BApp[":BusinessApplication<br/>app_id + id_authority"]
     Port[":Port — Batch / Event"]
     SwProduct[":SoftwareProduct → :Vendor"]
   end
 
   subgraph ORCH["◆ ORCHESTRATION — THE BACKBONE: what actually ran"]
+    direction LR
     CMApp[":ControlMApplication"]
     Folder[":ControlMFolder"]
     Job[":ControlMJob"]
@@ -587,6 +620,7 @@ flowchart TB
   end
 
   subgraph DATA["◆ DATA &amp; DOCUMENTS — what it touches, what it cites"]
+    direction LR
     FileRef[":File / :Dataset"]
     Doc[":Document → :Chunk"]
     DesignDoc[":DesignDoc → :DocSection"]
@@ -626,7 +660,8 @@ flowchart TB
       </div>
       <figcaption>
         <b>Solid</b> = active in the relationship vocabulary today. <b>Dashed</b> = registered
-        <code>planned</code> or gate-bound. <b>Thick</b> = the orchestration backbone.
+        <code>planned</code> or gate-bound. <b>Thick</b> = the orchestration backbone, and its
+        edge to the application layer is the load-bearing join of the whole graph.
       </figcaption>
     </figure>
 
@@ -1354,3 +1389,22 @@ flowchart TB
   </footer>
 
 </div>
+
+<!-- Self-rendering fallback (rev 10). The artifact host renders <pre class="mermaid">
+     itself and owns the mermaid instance. Opened from disk or any plain server there is no
+     host, so the page loaded as source text (seen 2026-08-21). This loads mermaid from the
+     CDN ONLY when no diagram has been rendered after a beat; under the host it does nothing. -->
+<script type="module">
+  const pending = () => [...document.querySelectorAll("pre.mermaid")].filter(p => !p.querySelector("svg") && !p.dataset.processed);
+  await new Promise(r => setTimeout(r, 800));
+  if (pending().length === 0) { /* host already rendered */ }
+  else {
+    try {
+      const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs");
+      mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "loose" });
+      await mermaid.run({ nodes: pending() });
+    } catch (e) {
+      console.warn("mermaid fallback did not load (offline, or the host blocks the CDN); diagram source is shown as text", e);
+    }
+  }
+</script>
