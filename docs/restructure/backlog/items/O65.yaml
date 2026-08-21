@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/
@@ -24,3 +24,5 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-145 (2026-08-20, prio proposed High).
 
   FILED p2 AGAINST A PROPOSED HIGH, stated per the R15 precedent: this is a presentation defect on a working surface — nothing is unreadable or unreachable, and no data is wrong — so it sits below the correctness defects groomed from the same batch (O64 loses user input, O66 makes a graph unreadable, R20/R21 return wrong answers). Promote it if the console is about to be demonstrated.
+
+  DELIVERED 2026-08-21 (laptop): root cause was CASCADE ORDER, not missing rules — index.css already themed the React Flow chrome, but @xyflow/react/dist/style.css imports later in the module graph, so its light defaults (#fefefe buttons, half-white attribution) won in BOTH themes and light mode masked it. Fix is token-level per the acceptance: the library's own --xy-* theming variables set on .react-flow (order-immune; every canvas themes at once, zero per-page overrides). Verified headless Chrome vs Vite :5199 — dark buttons #121e2e (--panel) / attribution transparent, light unchanged (white --panel), keyboard Tab reaches Fit View with the 2px --blue-br ring visible; both themes screenshot-checked. TC-SHELL-04 seeded. Commit 152042cf.

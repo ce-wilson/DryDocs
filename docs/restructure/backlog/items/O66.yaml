@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/
@@ -28,3 +28,5 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-147 (2026-08-20, prio proposed High). p1 as proposed: the defect makes the page's only content unreadable, so the surface is effectively down.
 
   Explicitly a RENDERING fix with an ontology guardrail written into the acceptance — /ownership displays K4's qualified-attribution shape, and a "readability" pass is exactly the kind of change that quietly relabels or re-directs an edge. Nothing about edge meaning moves here; any such change routes through the HITL gate.
+
+  DELIVERED 2026-08-21 (laptop): the wip's page-local EdgeLabelRenderer attempt still painted chips UNDER the nodes (the portal has no z-index of its own; observed live before the fix). components/RelEdge.tsx is now the ONE treatment — chip in the portal with explicit zIndex above the node layer, straight path for ownership's chain, bezier default matching explorer/lineage's prior curves — and all three canvases adopt it, so one future change fixes all three (explorer/lineage deliberately moved off the built-in SVG label per the one-component clause). All eight names readable in both themes; direction, arrowheads, and the EXAMPLE DATA banner untouched; edge meaning never moved. RelEdge registered UNBOUND (pin 71->72); TS-OWNERSHIP seeded (4/13->5/13). Commit 6eaf48ac.

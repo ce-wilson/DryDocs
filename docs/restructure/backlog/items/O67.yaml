@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: haiku
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/
@@ -23,3 +23,5 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-149 (2026-08-20, prio proposed Med). Deliberately NOT done inside O57: that item's acceptance was the load-map surface, and changing a shared component's return contract is its own change with its own blast radius (12 modules plus the Overview hub) — this item is that change.
 
   Mechanism only; nothing here touches edge semantics or any gate. p2/haiku because the fix is one well-known TypeScript idiom and the acceptance names the verification exactly; the cost of leaving it is that a known trap keeps being paid for, which is why it is not p3.
+
+  DELIVERED 2026-08-21 (laptop): default branch assigns the switch parameter to never — proven per the acceptance by adding a throwaway ModuleId, seeing TS2322 at ModuleIcon.tsx, reverting. No placeholder fallback (would reintroduce the silent gap); both hazard comments (software, loadmap) updated to describe the guard. Blast radius checked, not assumed: all 12 MODULES glyphs verified rendering on BOTH surfaces (aside nav + Overview hub spokes) in headless-Chrome screenshots; admin-config is the 13th ModuleId, deliberately absent from MODULES, and its case is covered by the same guard. Commit e8fa5ff1.

@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/routes/AskRoute.tsx
@@ -30,3 +30,5 @@ notes: |
   Filed p1 as proposed: this is a data-loss defect on the console's headline surface, and the workaround is retyping the question.
 
   Idea-143 was captured ABOVE the `## Inbox` header (misfiled at capture, in the "How this feeds the backlog" section); grooming it to the audit trail corrects that as a side effect.
+
+  DELIVERED 2026-08-21 (laptop): the ui-workstream wip had already written the storage mechanism (drydocs.ask.last-turn.v1.<personaId>, completed-only write site) — reviewed against the acceptance and two real gaps closed: restored-turn id collision with the session counter (restored turns normalize to id 0) and the in-place ?as= persona swap leaving the other persona's turn on screen (render-time re-derive; sign-out/sign-in remount already re-read). Verified via a headless-Chrome harness against Vite :5199 with the agent stack DOWN — 11/11 probes: restore on load AND across SPA nav, failed turn rendered-not-persisted and gone after nav, dead explore-ref degrades visibly (SpecGrid fallback) while the turn keeps rendering, persona isolation both directions. TS-ASK seeded (3 cases) with the stated caveat that the completed turn was storage-seeded, not produced by a live agent run. Commit 6abf2106.
