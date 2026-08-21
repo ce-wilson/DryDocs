@@ -159,7 +159,11 @@ try {
     Pop-Location
     $runs = @()
     if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
-      $runs = @($raw | ConvertFrom-Json)
+      # PS 5.1 trap (false GREEN, 2026-08-20): piping into ConvertFrom-Json
+      # returns the JSON array as ONE wrapped object, so the verdict's scalar
+      # tests become member-enumeration FILTERS - '-eq "success"' is truthy if
+      # ANY of the 10 runs succeeded, not if HEAD's did. Argument form unwraps.
+      $runs = @(ConvertFrom-Json ($raw -join "`n"))
     }
     $verdict = Get-CiVerdict -Runs $runs -Head $head
     Write-Host $verdict.Text -ForegroundColor $verdict.Color
