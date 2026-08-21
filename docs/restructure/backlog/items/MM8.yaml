@@ -12,6 +12,8 @@ status: todo
 depends_on:
 - MM2
 - MM7
+gates:
+- data-flow-overview
 inputs:
 - internal/remediation/standards-rules-registry.md
 - internal/remediation/governance/hlt-naming-standard.md

@@ -12,6 +12,8 @@ status: todo
 depends_on:
 - MM2
 - Q10
+gates:
+- data-flow-overview
 inputs:
 - docs/design/deepdoc-data-flow-overview.md
 - docs/restructure/backlog/items/Q10.yaml

@@ -327,3 +327,37 @@
     domain:       docs
     status:       planned
 
+  # ── Evidence breadcrumb of a derived record (MM2, 2026-08-21; gate data-flow-overview DRAFTED, unsigned) ──
+
+  - id:           docs_evidenced_by
+    neo4j_label:  EVIDENCED_BY
+    inverse_label: "evidence for"
+    role:         ~
+    from_node:    DataFlow
+    to_node:      "Document | Chunk"
+    prov_maps_to: "prov:wasDerivedFrom"
+    note: >
+      PLANNED (MM2). The breadcrumb from a deepdoc-derived record to whatever
+      it was read FROM. PROV reading fixed at the gate (§E confirmation 4):
+      the flow RECORD is an Entity derived from its evidence
+      (prov:wasDerivedFrom) even though the flow it describes is an Activity —
+      recorded so nobody later "corrects" the edge onto prov:used. Two
+      endpoint classes, one meaning, endpoint recorded on the edge (the
+      rua-load-shapes §B2 / docs_email_concerns convention). Emails already
+      ARE Documents (docs_email_concerns, Q10); a log excerpt becomes one when
+      MM3 stages it; an issue, a commit or a page when its MM5 connector
+      captures it. THE GRAMMAR IS OPEN at gate §E, pre-picking none: E1 a URN
+      list on the node (email:<extract-id> · log:<job>/<run>/<lines> ·
+      jira:<key> · commit:<sha> · confluence:<page-id> · transcript:<file>),
+      E2 this edge for every kind with ingestion first, or E3 both — the URN
+      as the breadcrumb identity AND the :Document business key, the edge
+      added when the corpus node exists. Whatever is ruled: one URN grammar
+      per source kind, transcript files cited by file name, and a fact with NO
+      breadcrumb is not written (the evidence-present guard lands with MM10,
+      guards first). Domain docs: the edge is about the corpus side, and
+      MM6/MM9 extend its from_node to the other derived-record labels the
+      method surfaces.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned

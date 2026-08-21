@@ -1,0 +1,394 @@
+# SME gate-prompt spec — the per-data-flow overview record (backlog MM2, epic
+# mind-map). DRAFTED 2026-08-21.
+#
+# This gate rules an IDENTITY and a VOCABULARY: what one "data flow" is in the
+# graph, what keys it, which of its fields are read from a source and which are
+# computed, and how a derived record points back at its evidence. It authorizes
+# NO graph write. Every label and edge it names is registered `status: planned`
+# in the relationship vocabulary (drydocs_core/ontology/relationship_vocabulary/
+# 10-node-classifications.yaml, 43-local-architecture.yaml, 45-local-docs.yaml)
+# and NONE flips past planned in MM2 — the builds are MM3 (log substrate), MM8
+# (remediation rule), MM9 (email binding) and MM10 (investigate v1), each of
+# which cites this gate in its `gates:` field.
+#
+# Why a gate and not a loader decision: three grains of "flow" already exist in
+# the repo and were never reconciled — the %%DATAFLOW variable (a fact, no
+# node), the designed-never-built :AppDataFlow (a URN, zero code), and the
+# runbook "data series" (a traversal, no persisted identity). O60/O62 (the
+# swimlane and file-name UI views) and the controlm-runbook-automation skill
+# will KEY on whatever is ruled here. The deciding evidence arrived on
+# 2026-08-20: the DPL launcher itself names the flow (`-dataflow <DATAFLOW>` on
+# the command line, `"DataFlow"` in the task-service request) and that name is
+# shared by every job of the flow across zones and across applications. Record:
+# docs/design/deepdoc-data-flow-overview.md (Rev 1) §2 and §7; verbatim capture
+# machine-local under internal-local/deepdoc/2026-08-20-session-1/transcripts/,
+# cited by file name.
+#
+# Sensitivity: Internal-Public. Every real value (application ids, job and
+# folder names, hosts, URLs, issue keys, people, distribution lists) is a role
+# placeholder: APP_ID-producer / APP_ID-consumer / APP_ID-downstream,
+# <JIRA-nnnn>, Auto, <job-preproc> … <job-trust>, <folder>, <DATAFLOW>,
+# <support-DL>.
+#
+# PRE-PICKING NONE. Where the drafter has a leaning it is labelled "drafter's
+# note" and the alternative is stated with equal weight. The SME rules.
+
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: data-flow-overview
+title: "SME Gate — the data-flow overview record: one identity for %%DATAFLOW, :AppDataFlow and the runbook data series"
+step: "MM2 — ontology proposal before MM3 (log-substrate extractor), MM8 (R13 second consequence), MM9 (email → flow binding), MM10 (investigate v1) write anything"
+summary: >
+  Rules six coupled things the design doc (docs/design/deepdoc-data-flow-overview.md
+  §2) proposes and deliberately leaves open: (a) the LABEL and KEY of the
+  per-flow record — a `:DataFlow` node keyed on the %%DATAFLOW value, or a fold
+  into the designed `:AppDataFlow` and its `dataflowUrn` — and whether that value
+  is unique firm-wide or only per application; (b) the `ingest_mode` enum and
+  the two rules that travel with it — it is NEVER derived from the job-name
+  token, and `unknown` is a recorded value, not a default; (c) every field of
+  the record badged SOURCE or DERIVED with its source object or rule named, so
+  nothing computed is ever mistaken for something read; (d) the five proposed
+  edges, each already registered `status: planned` with a PROV-O mapping or an
+  explicit "no PROV row" reason; (e) the evidence-breadcrumb grammar — one
+  `evidence_ref` URN per source kind, or prov:wasDerivedFrom to :Document/:Chunk
+  for every kind; and (f) the FileWatcher `load_bearing` field as an SME-ruled
+  value with `unruled` as the resting state.
+  The trigger is concrete. A support analyst spent one evening establishing
+  that a single daily flow is an API pull by the consuming application, that
+  its FileWatcher and TDQ steps watch files the flow itself wrote, that the
+  producer and the consumer are different applications, and that the job names
+  say none of this. Every one of those facts existed in some surface; none was
+  in one place. The record below is the one place. Confirming this gate writes
+  nothing to the graph; it fixes the identity the MM builds key on and seeds
+  the import from the feed-grain inventory workbook the estate already keeps.
+meta:
+  Module: "ontology (MM2) — consumers: drydocs-deepdoc (MM10), drydocs-lineage (MM3), drydocs-remediation (MM8), drydocs-docmeta (MM9)"
+  Source: "docs/design/deepdoc-data-flow-overview.md Rev 1 (2026-08-21) §2 record + §7 questions; docs/patterns/data-catalog/lineage-design-top3.md (:AppDataFlow, HAS_DATA_FLOW, ORCHESTRATES, dataflowUrn); knowledge/standards/technology/controlm-greenfield-job-standard.md ('sub-folder = DATAFLOW = DS_ID'); .claude/skills/controlm-runbook-automation/references/plan.md P4 (the data series); drydocs_api/query_specs.py runbooks.series.v1; drydocs_core/orchestration/controlm/variables.py FACT_REGISTRY DATAFLOW; ADR 0011 clause 1 (:Uncertain); gate document-content-topology §E (deepdoc = corpus consumer seeded from the grounded graph, SIGNED 2026-08-18)"
+  Registry ref: "relationship vocabulary — :DataFlow registered planned (10-node-classifications.yaml); arch_has_data_flow, arch_orchestrates, arch_fed_by, arch_lands_in (43-local-architecture.yaml) and docs_evidenced_by (45-local-docs.yaml) registered planned. No taxonomy-ontology-map row yet — the map entry follows the label ruling in (a)"
+  Classification: "Internal-Public — mechanism and vocabulary only; role placeholders throughout; the verbatim investigation record is machine-local and cited by transcript file name"
+  Import seed: "the estate's feed-grain inventory sheet (feed → folder → refined jobs → frequency → warehouse / DB / schema → work / target / view table → publish target). Its populated columns are the SOURCE seed for flow_id candidates, members, zone_chain and landing targets; its BLANK columns — 'Is Risk', SLA, business impacts, SOR contact — are exactly the SME fields of this record (business_purpose, open_questions, producer_contact) and stay SME-entered"
+  Precedence: "config/precedence.yaml — BMC baseline > internal standards > LOB→Product→Team. For owner_app the three readings (launcher -seal, task-service seal property, folder-name token) are ranked by that file, and a disagreement is RECORDED on the node, never silently resolved"
+  Blast radius: "MM3, MM8, MM9, MM10 (all `gates: [data-flow-overview]`); O60 swimlane data-flow view and O62 file-name → app + process (both key on the flow identity); the controlm-runbook-automation skill's P4 series extraction; the `:AppDataFlow` pattern doc, which this either adopts or retires"
+
+# The record's parts, one row per thing being ruled. Nothing here is written.
+mapping:
+  - n: 1
+    element: "the flow record — `:DataFlow {flow_id}`  [PLANNED label]"
+    target: "one node per <DATAFLOW> value, URN `urn:drydocs:dataflow:controlm:<DATAFLOW>`; class proposed prov:Activity (the lineage-design pattern's 'prov:Activity cluster'); every write carries :Uncertain + reliability + trust (ADR 0011 clause 1) until a gate promotes it"
+    edge: "IDENTITY TO RULE  [§A: label `:DataFlow` vs fold into `:AppDataFlow`; key uniqueness firm-wide vs per application]"
+  - n: 2
+    element: "`ingest_mode` ∈ api-pull | file-push | internal-generated | unknown"
+    target: "a DERIVED property of the flow record, computed from the pre-processor's RESOLVED command and the watcher's fed-from test — never from a job-name token"
+    edge: "ENUM TO RULE  [§B: the four values, or a richer set; `unknown` is a value]"
+  - n: 3
+    element: "(:BusinessApplication)-[:HAS_DATA_FLOW]->(:DataFlow)  [arch_has_data_flow, planned]"
+    target: "the owning (consumer-side) application; cited to lineage-design-top3 §'AppDataFlow'; PROV: the inverse of Activity → Agent = prov:wasAssociatedWith"
+    edge: "EDGE TO RULE  [§D: keep the pattern's direction with prov_maps_to ~, or invert to the matrix row WAS_ASSOCIATED_WITH {role: owner}]"
+  - n: 4
+    element: "(:DataFlow)-[:ORCHESTRATES]->(:ControlMJob)  [arch_orchestrates, planned]"
+    target: "flow membership — the jobs the series traversal reaches, filtered to the <DATAFLOW> value; cited to lineage-design-top3; composition, so dct:hasPart — no PROV row"
+    edge: "EDGE TO RULE  [§D]"
+  - n: 5
+    element: "(:DataFlow)-[:FED_BY {feed_name}]->(:BusinessApplication)  [arch_fed_by, planned]"
+    target: "the PRODUCER application — the single biggest unlock of the investigation, because producer and consumer were different applications and every surface keyed on the consumer; Activity → Agent = prov:wasAssociatedWith {role: producer}"
+    edge: "EDGE TO RULE  [§D — NEW term]"
+  - n: 6
+    element: "(:DataFlow)-[:LANDS_IN]->(:DataAsset)  [arch_lands_in, planned]"
+    target: "the snapshot / target table the flow publishes; Activity → Entity = prov:generated, the same row m3_writes_to / scheduler_writes_to already use at the process grain"
+    edge: "EDGE TO RULE  [§D — NEW term; or DERIVE it from the members' WRITES_TO and write nothing]"
+  - n: 7
+    element: "(:DataFlow)-[:EVIDENCED_BY]->(:Document | :Chunk)  [docs_evidenced_by, planned]"
+    target: "the breadcrumb to whatever the record was derived FROM — an email extract, a log excerpt, an issue, a commit, a page, a transcript file; prov:wasDerivedFrom when the record is read as an Entity"
+    edge: "GRAMMAR TO RULE  [§E: one URN per source kind on the node vs this edge to corpus nodes for every kind]"
+  - n: 8
+    element: "`watchers[].load_bearing` ∈ true | false | unruled; `tdq_self_asserted`"
+    target: "R13's second consequence (internal/remediation/standards-rules-registry.md R13): the DERIVED fed-from test PROPOSES; the SME RULES; `unruled` is the resting state the board shows"
+    edge: "FIELD TO RULE  [§F]"
+
+provenance:
+  - label: ":DataFlow  [PLANNED — registered at MM2, no loader, no taxonomy-ontology-map row until §A rules the label]"
+    source_object: "the %%DATAFLOW variable per sub-folder (FACT_REGISTRY, variables.py) ∪ the launcher -dataflow argument (shell.py contract) ∪ the task-service request DataFlow (Output-tab log, MM3) ∪ the feed-grain inventory sheet (import seed)"
+    key: "flow_id = urn:drydocs:dataflow:controlm:<DATAFLOW> — a business key, never an internal id (ADR 0002 D1 proxy-node rule). If §A rules per-application uniqueness the URN gains the APP_ID segment: urn:drydocs:dataflow:controlm:<APP_ID>:<DATAFLOW>"
+    loader: "none — MM10 writes the record as a deepdoc finding (:Uncertain); MM3 enriches the members; promotion is a gate write. This item writes nothing"
+    properties:
+      - name: "flow_id — the <DATAFLOW> value, recorded with WHICH of the three readings (variable / launcher / task-service) agreed"
+        origin: source
+        from: "%%DATAFLOW; CMDLINE -dataflow; Output-tab DataFlow"
+      - name: "owner_app → (:BusinessApplication {APP_ID}) via HAS_DATA_FLOW"
+        origin: source
+        from: "launcher -seal; task-service seal property; folder-name token — ranked by config/precedence.yaml, disagreement recorded"
+      - name: "producer_app (FED_BY), consumer_app (= owner_app)"
+        origin: derived
+        from: "producer from the upstream feed register / the API host's owning application; then SME-confirmed — the investigation shows these are DIFFERENT applications"
+      - name: "ingest_mode ∈ api-pull | file-push | internal-generated | unknown"
+        origin: derived
+        from: "the pre-processor's RESOLVED command (an HTTP client call = api-pull; an MFT/SFTP route id = file-push); a FileWatcher whose watched path a same-folder predecessor writes = internal-generated; else unknown. NEVER the name token (R13)"
+      - name: "zone_chain — ordered zone tokens along the series (e.g. ONPM → TRUST → RFND → PROV)"
+        origin: derived
+        from: "the existing runbooks.series.v1 traversal over INVOKES / WAS_INFORMED_BY, filtered to the flow"
+      - name: "members → (:ControlMJob) via ORCHESTRATES"
+        origin: derived
+        from: "the same traversal seeded from the flow's jobs"
+      - name: "pipeline_ids[], dataset_ids[]"
+        origin: source
+        from: "CMDLINE -pipeline / -dataset (G15 contract); the Output-tab log is authoritative when the command line carries only a %%variable (MM3)"
+      - name: "launcher_kinds[] (Identified '<KIND>' Job), compute_target, provenance_chain, landing_prefix"
+        origin: source
+        from: "the Output-tab log per <job, order-id, run> — the launcher's own assertions, read verbatim by the MM3 extractor; absent until MM3 lands and the field says so"
+      - name: "watchers[].load_bearing ∈ true | false | unruled"
+        origin: derived
+        from: "PROPOSED by the fed-from test (watched path == a same-folder predecessor's written path); RULED by the SME; `unruled` is the default and stays visible"
+      - name: "tdq_self_asserted"
+        origin: derived
+        from: "true when the token file and the data file share a writer"
+      - name: "sdlc_anchors {jira_project, jira_binding ∈ collaboration | seal-bound | none, bitbucket_projects[], confluence_spaces[]}"
+        origin: source
+        from: "the DevX project page (binding type); the PAT team report's Jira board column (internal/pat-evidence/); SME-entered and dated otherwise — MM6 rules the labels these become"
+      - name: "support_dls[], producer_contact"
+        origin: source
+        from: "email corpus headers (Q10) + the folder's escalation row"
+      - name: "business_purpose, open_questions[] (e.g. full vs delta)"
+        origin: derived
+        from: "SME free text, CITED to the issue / page that states it; a slot the graph cannot fill, kept visible rather than guessed"
+      - name: "evidence[] — email:<extract-id> · log:<job>/<run>/<lines> · jira:<key> · commit:<sha> · confluence:<page-id> · transcript:<file>"
+        origin: source
+        from: "whichever source the fact was read from; §E rules whether this is a URN list on the node or EVIDENCED_BY edges to corpus nodes"
+      - name: "reliability, trust, :Uncertain"
+        origin: derived
+        from: "ADR 0011 clause 1 — mandatory on every deepdoc write; promotion is a gate write, never a label strip"
+
+sections:
+  - id: A
+    title: "LABEL AND KEY — `:DataFlow` on the %%DATAFLOW value, or fold into `:AppDataFlow`'s dataflowUrn; unique firm-wide or per application"
+    body: >
+      Three grains exist and none is a node: the %%DATAFLOW variable is a fact
+      on a sub-folder (FACT_REGISTRY, variables.py; the greenfield standard's
+      "sub-folder = DATAFLOW = DS_ID"); :AppDataFlow is a designed label with a
+      DataHub-shaped URN (`urn:li:dataFlow:{controlm,<flowId>,<cluster>}`) and
+      zero code; the runbook "data series" is a traversal from each _FW along
+      WAS_INFORMED_BY (plan.md P4, runbooks.series.v1) with no persisted
+      identity. The investigation supplied the fact that picks the key: the
+      launcher names the flow — `-dataflow <DATAFLOW>` on the command line and
+      `"DataFlow": "<DATAFLOW>"` in the task-service request — and that name is
+      carried by every DPL job of the flow across zones, and across
+      APPLICATIONS: the ingestion job in APP_ID-consumer's folder and the
+      transform in APP_ID-downstream's folder carry related flow names.
+      TWO LABEL OPTIONS, equal weight. A1 `:DataFlow {flow_id}` — a new label
+      keyed directly on the <DATAFLOW> value, URN
+      `urn:drydocs:dataflow:controlm:<DATAFLOW>` in the repo's own grammar
+      (the DataAsset precedent, `urn:drydocs:dataasset:...`). Adopting it
+      RETIRES the :AppDataFlow pattern doc's label (the HAS_DATA_FLOW and
+      ORCHESTRATES terms survive either way). A2 fold into `:AppDataFlow` —
+      keep the designed label and its `dataflowUrn`, and make <DATAFLOW> the
+      `<flowId>` segment of the DataHub URN; gains catalog-team
+      interoperability at the cost of carrying `<cluster>` in the identity,
+      which the evidence shows is a RUNTIME fact (the submission response
+      names the cluster per run), not an identity fact.
+      TWO KEY OPTIONS, and this is the question the builds cannot proceed
+      without. K1 firm-wide unique — one node per <DATAFLOW> value, and a
+      second application carrying the same value is a data defect the record
+      surfaces. K2 per-application — the key is (APP_ID, <DATAFLOW>), URN
+      `urn:drydocs:dataflow:controlm:<APP_ID>:<DATAFLOW>`, and the
+      cross-application relationship the investigation saw (consumer flow →
+      downstream flow) is an EDGE between two flow nodes, not a shared
+      identity. Drafter's note: the evidence is one flow in one estate; it is
+      consistent with both. The honest answer may be "unknown until the
+      feed-grain inventory sheet is profiled for duplicate flow names across
+      applications" — in which case confirmation 4 below commissions that
+      count before any writer is built.
+    confirmations:
+      - "The flow's identity is the <DATAFLOW> value as the launcher names it (-dataflow / task-service DataFlow / %%DATAFLOW), NOT the folder, NOT the _FW job, and NOT a DataHub cluster segment. The three readings are recorded on the node with which ones agreed."
+      - "LABEL: one of A1 `:DataFlow` (new, repo URN grammar; :AppDataFlow retired from the pattern doc) or A2 `:AppDataFlow` (designed label kept, <DATAFLOW> becomes the flowId segment) is chosen, and the vocabulary entry is renamed or left accordingly. Neither is pre-picked."
+      - "KEY: one of K1 firm-wide unique or K2 per-application (APP_ID, <DATAFLOW>) is chosen, OR the ruling is explicitly deferred pending the duplicate-name count in confirmation 4. The URN grammar follows the choice."
+      - "Before any writer (MM10) or enricher (MM3) lands, the feed-grain inventory sheet is profiled for <DATAFLOW> values that recur under more than one application; the count is recorded on this gate's log entry. Zero is evidence for K1; non-zero is evidence for K2 or for a data defect — the SME says which."
+      - "Whatever label is ruled is a prov:Activity (the composite activity the members realize) unless the SME names a different class; the node classification entry records the ruling."
+
+  - id: B
+    title: "THE `ingest_mode` ENUM — never from the name token; `unknown` is a value"
+    body: >
+      The four proposed values: `api-pull` (the pre-processor's resolved
+      command is an HTTP client call against an external endpoint — the
+      investigated flow), `file-push` (an MFT/SFTP route delivers the file; the
+      _FW is genuinely waiting on an external writer), `internal-generated`
+      (the watched path is written by a predecessor in the same folder — the
+      watcher waits on the flow itself), `unknown` (none of the tests fired).
+      A richer set was raised in the design doc §7.2 — API pull, MFT push, SFTP
+      push, DB extract, internally generated — which splits `file-push` by
+      transport and adds a database-extract mode the evening did not see.
+      Drafter's note: the split by transport is cheap to add later and
+      expensive to remove; the DB-extract mode is real in the estate (the
+      Oracle staging legs) and would otherwise land as `unknown`.
+      TWO RULES travel with the enum whatever its values. R-TOKEN: the value is
+      NEVER derived from the job-name token. R13 already says the _FW token is
+      not evidence of a file arriving; the investigation is the proof (a
+      `_PREPROC` that is an API pull, a `_FW` watching its own output, a TDQ
+      comparing a self-written count). The name token may SEED a search; it
+      may never SET the field. R-UNKNOWN: `unknown` is a recorded value with a
+      reason (`no_resolved_command`, `no_predecessor_write`, `tests_disagree`),
+      not the absence of a value and not a default the writer falls into. A
+      flow whose mode is unknown is reported as such, counted, and left for the
+      SME — the same resting-state discipline as UNASSIGNED emails (gate
+      email-folder-assignment B3).
+      CARRIER. The design doc §4 proposes that the ruled value also becomes an
+      explicit fact the JOB carries — a description-metadata key
+      (`ingest.mode=api-pull`, under the C16 key-prefix governance) or a
+      folder variable — so the next analyst reads it instead of re-deriving
+      it from a log. That is a greenfield-standard change and goes to the
+      greenfield job standard as a planned entry; this gate rules only whether
+      the carrier is WANTED, not its spelling.
+    confirmations:
+      - "The enum is ONE of: the four values (api-pull | file-push | internal-generated | unknown) or the richer set (api-pull | mft-push | sftp-push | db-extract | internal-generated | unknown). Neither is pre-picked; the chosen set is written into the node-classification note and MM3/MM8 read it from there."
+      - "R-TOKEN: ingest_mode is never set from a job-name token. A writer that does so fails the MM8 guard; the token may only seed a search."
+      - "R-UNKNOWN: `unknown` is a value carrying a reason code, never a default; flows at `unknown` are counted and surfaced, never drained by a best-match sweep."
+      - "The derivation tests are named in the vocabulary note in this order: resolved command → watcher fed-from → else unknown. A disagreement between tests is `unknown` with reason `tests_disagree`, not the first test that fired."
+      - "A job-carried ingest-mode fact (description-metadata key or folder variable) is WANTED / NOT WANTED as a greenfield-standard addition. If wanted, its spelling is a planned entry in the greenfield job standard, ruled there, not here."
+
+  - id: C
+    title: "SOURCE VERSUS DERIVED — every field badged, its source object or rule named"
+    body: >
+      The provenance block above is the claim. Per field: SOURCE means read from
+      a named object (a variable, a command-line argument, a log line, a
+      workbook column, an email header) and the node records which; DERIVED
+      means computed by a named rule and the node records the rule and its
+      inputs. Three fields are SOURCE-then-SME (`producer_app`, `sdlc_anchors`,
+      `watchers[].load_bearing`) and two are SME-only (`business_purpose`,
+      `open_questions`): they are badged DERIVED here because a human ruling is
+      a derivation the graph cannot reproduce, and the `assigned_by` +
+      evidence-pointer requirement from gate email-folder-assignment A3 applies
+      to every one of them.
+      The Output-tab fields (`launcher_kinds`, `compute_target`,
+      `provenance_chain`, `landing_prefix`) are SOURCE but ABSENT until MM3
+      lands; the record says "not yet read" rather than carrying a null that
+      reads as "none". The workbook import seed is SOURCE for the columns it
+      fills and is NOT consulted for the blank ones — the blanks are the SME
+      fields, and copying a blank forward is how the workbook's own file-name
+      column came to be copy-filled across jobs that write different files.
+    confirmations:
+      - "Every field in the provenance block is badged SOURCE or DERIVED with a named source object or rule, and the SME finds none mislabelled. A field the SME re-badges is corrected in the vocabulary note before sign-off, not after."
+      - "The three SOURCE-then-SME fields and the two SME-only fields carry assigned_by + an evidence pointer on every write (the email-folder-assignment A3 rule, generalized)."
+      - "A SOURCE field whose source is not yet ingested (the Output-tab fields before MM3) is recorded as absent-with-reason, never as an empty value that reads as a fact."
+      - "The feed-grain inventory sheet seeds only the columns it populates; its blank columns are the SME fields and are never copy-filled from adjacent rows."
+
+  - id: D
+    title: "THE FIVE EDGES — registered planned, each with its PROV-O row or its stated reason for none"
+    body: >
+      Registered at MM2 (planned, loader ~, supplement ~):
+      arch_has_data_flow HAS_DATA_FLOW BusinessApplication → DataFlow (cited
+      to lineage-design-top3; the pattern's direction is Agent → Activity,
+      which is the INVERSE of the matrix row prov:wasAssociatedWith);
+      arch_orchestrates ORCHESTRATES DataFlow → ControlMJob (cited to
+      lineage-design-top3; composition — dct:hasPart — no PROV row, the same
+      reason catalog_has_product_line carries none); arch_fed_by FED_BY
+      {feed_name} DataFlow → BusinessApplication (NEW; Activity → Agent =
+      prov:wasAssociatedWith {role: producer}); arch_lands_in LANDS_IN DataFlow
+      → DataAsset (NEW; Activity → Entity = prov:generated, the row
+      m3_writes_to already uses at the process grain); docs_evidenced_by
+      EVIDENCED_BY DataFlow → Document | Chunk (NEW; prov:wasDerivedFrom,
+      reading the record as an Entity — §E).
+      TWO DIRECTION QUESTIONS the SME should look at squarely. D-OWN: keep
+      HAS_DATA_FLOW as the pattern wrote it (readable, Application-first, no
+      PROV row) or invert to the matrix's WAS_ASSOCIATED_WITH {role: owner}
+      (PROV-clean, and then FED_BY collapses into the SAME label with {role:
+      producer}, which is the house pattern for role-discriminated labels —
+      arch_owns_code, arch_owns_directory). D-LAND: LANDS_IN is DERIVABLE from
+      the members' existing WRITES_TO edges (the series' last process → its
+      DataAsset); writing it is a shortcut edge, and gate email-folder-assignment
+      C1 ruled that "traversal is legitimate reading, a shortcut edge is not"
+      for attribution. Whether that fence applies to a lineage roll-up is the
+      SME's call.
+    confirmations:
+      - "All five entries exist `status: planned` in the relationship vocabulary with the from/to labels, PROV-O mapping or stated no-PROV reason, and the lineage-design-top3 citation on HAS_DATA_FLOW and ORCHESTRATES. No entry flips past planned at this gate."
+      - "D-OWN: HAS_DATA_FLOW stays Application → DataFlow with prov_maps_to ~, OR is inverted onto WAS_ASSOCIATED_WITH {role: owner} with FED_BY folded in as {role: producer}. Neither is pre-picked; the ruled shape is what MM10 writes."
+      - "D-LAND: LANDS_IN is WRITTEN as a roll-up edge, OR is DERIVED at read time from the members' WRITES_TO and the entry is deprecated never-built with this gate as the reason."
+      - "FED_BY carries feed_name (the producer's register name for the feed) and as_of; a superseded producer is a retired edge with as_of, or a dated :Document the record cites — §E/Q6 rules which, and this confirmation only fixes that the edge carries the date."
+      - "ORCHESTRATES membership is the series traversal FILTERED to the flow's <DATAFLOW> value — a job reached by WAS_INFORMED_BY that carries a different flow value is a BOUNDARY of this flow and the start of another, never a member."
+
+  - id: E
+    title: "THE EVIDENCE BREADCRUMB — one URN per source kind, or prov:wasDerivedFrom to :Document/:Chunk for every kind"
+    body: >
+      Every fact the record carries was read from somewhere, and the deepdoc
+      charter (gate document-content-topology §E) is a retriever seeded from
+      the grounded graph that CITES its corpus. Two grammars, equal weight.
+      E1 URN LIST ON THE NODE — `evidence[]` holds one URN per source kind:
+      `email:<extract-id>`, `log:<job>/<run>/<line-range>`, `jira:<key>`,
+      `commit:<sha>`, `confluence:<page-id>`, `transcript:<file>`. Cheap, needs
+      no corpus node to exist, and a breadcrumb to a system DryDocs has not
+      ingested (an issue tracker, a code host) is still a breadcrumb. Cost: it
+      is a string, not an edge — nothing can traverse from the evidence back to
+      the findings it supports, and six grammars is six parsers.
+      E2 EDGES TO CORPUS NODES — every kind becomes a `:Document` (or `:Chunk`)
+      first, and the record carries EVIDENCED_BY (prov:wasDerivedFrom) to it.
+      Emails already ARE Documents (docs_email_concerns, Q10); a log excerpt
+      becomes one when MM3 stages it; an issue, a commit or a page becomes one
+      when its connector (MM5) captures it. Cost: a fact cannot be recorded
+      until its evidence is ingested, so the URN form is needed ANYWAY as the
+      interim — which suggests E3, BOTH: the URN is the breadcrumb's identity,
+      the edge is added when the corpus node exists, and the URN is the
+      Document's business key so the two never drift.
+      Drafter's note: E3 is the drafter's leaning because it is what the
+      :DataAsset proxy-node pattern already does for assets the loader has not
+      seen (ADR 0002 D1 — a business key the node survives a rebuild on). It
+      is stated here so the SME can reject it, not so it is assumed.
+    confirmations:
+      - "The breadcrumb grammar is ONE of E1 (URN list on the node), E2 (EVIDENCED_BY edges to :Document/:Chunk for every kind, ingestion first), or E3 (URN as the breadcrumb identity AND the Document business key; edge added when the corpus node exists). Neither is pre-picked."
+      - "Whatever is chosen, the six source kinds have ONE URN grammar each, written into the docs_evidenced_by note, and transcript files are cited by file name — never as an image or a screenshot."
+      - "A fact with NO breadcrumb is not written. Deepdoc's `:Uncertain` writer (ADR 0011 clause 1, tests/unit/test_uncertain_boundary.py) gains the evidence-present guard in the same build that writes the first record (MM10)."
+      - "The PROV reading is fixed: the flow RECORD is an Entity derived from its evidence (prov:wasDerivedFrom), even though the flow it describes is an Activity. The vocabulary note says so, so nobody later 'corrects' the edge onto prov:used."
+
+  - id: F
+    title: "THE WATCHER `load_bearing` FIELD — proposed by rule, ruled by the SME, `unruled` is the resting state"
+    body: >
+      R13 (standards-rules-registry) says: a _FW that depends on a _PREPROC
+      that calls an API is mis-tokened — retoken it. The investigation adds the
+      second consequence: such a watcher may be UNNECESSARY, and the TDQ step
+      beside it may be MASKING the absence of validation (the token count it
+      compares was written by the consumer's own pull). Two fields carry this:
+      `watchers[].load_bearing ∈ true | false | unruled` and
+      `tdq_self_asserted ∈ true | false`.
+      The DERIVED part is the fed-from test: a watcher is internally fed when
+      its watched path equals a path a same-folder predecessor writes. That
+      test PROPOSES `false`. It never SETS it — the SME rules per flow, with
+      the reason recorded, because the SME ruling of 2026-08-21 is explicit
+      that the watcher and the TDQ are SEPARATE questions: an API-pull flow
+      may drop the _FW and still need a real (source-sent) completeness check.
+      `unruled` is the default, and it is SHOWN — on the board, on the record
+      page, in the MM8 detector's output — so a flow nobody has looked at
+      never reads as one somebody cleared.
+      What this section does NOT rule: the greenfield transform (drop the
+      watcher, add a producer-side count) and the retoken target (`_DLMD` /
+      `_MON` for an API pull; `_PREPROC` reserved for file preparation). Those
+      are greenfield-standard entries and MM8's detector; this gate fixes only
+      the field, its values and who sets them.
+    confirmations:
+      - "`load_bearing` is SME-ruled: the fed-from test proposes, a human sets true or false with a recorded reason, and `unruled` is the default that is always displayed — never hidden, never inferred to false."
+      - "`tdq_self_asserted` is a separate DERIVED field (token file and data file share a writer) and is never collapsed into load_bearing — the watcher and the TDQ validation are two questions (SME ruling 2026-08-21)."
+      - "A `false` ruling PROPOSES a remediation (MM8) and never applies one; the two-tier fix model of drydocs_remediation holds."
+      - "The retoken target and the greenfield transform are OUT of this gate — they are planned entries in the greenfield job standard, ruled there."
+
+open_questions:
+  - "Q1 — Is <DATAFLOW> unique firm-wide or per application? One estate, one flow, one evening cannot answer it; the feed-grain inventory sheet can (§A confirmation 4). Until it is counted, K1 versus K2 is a guess either way."
+  - "Q2 — Richer ingest_mode set or the four values? The four cover the evening; the estate also has DB-extract legs (Oracle staging) that would land as `unknown` under the four. Adding a value later is cheap; removing one is not."
+  - "Q3 — Full versus delta: the slot no source filled. The snapshot table suggests full-by-design, the regulatory report suggests completeness, the API may offer no delta, and the full pull is what breaks the HTTP/2 stream. This is `open_questions[]` on the record by design — it is listed here so the SME sees the kind of slot the record keeps open rather than guesses."
+  - "Q4 — D-LAND: is a lineage roll-up edge (LANDS_IN) the same class of shortcut that email-folder-assignment C1 forbade for attribution, or is a derived-then-materialized lineage edge the normal case (the m3_writes_to precedent)? The answer decides whether LANDS_IN is built or deprecated never-built."
+  - "Q5 — E3's premise: is the evidence URN acceptable as the `:Document` business key for kinds DryDocs has NOT ingested (an issue key, a commit sha), or does a Document need captured text before it may exist? ADR 0006 defines :Document as a captured corpus member; a key-only proxy stretches that."
+  - "Q6 — Where does a SUPERSEDED producer live — a retired FED_BY with as_of, or a dated :Document the record cites with superseded_by? The evening found a stale legacy feed register naming a producer the current launcher does not; both shapes keep the history, only one is traversable."
+  - "Q7 — Security finding routing: a production bearer token was printed into job output by a `set -x` wrapper. Out of DryDocs' scope to fix and out of the graph by rule; which surface records the FINDING for the owning team without the value ever entering any tracked or loaded artifact?"
+
+risks:
+  - "Signing §A's label without §A's key is the worst available outcome: a writer would be built on an identity whose uniqueness is unknown, and the first duplicate <DATAFLOW> across two applications would either merge two flows into one node or fork the URN grammar mid-stream. The two rulings travel together or §A defers as a whole."
+  - "R-TOKEN is the rule most likely to erode quietly. The name token is RIGHT most of the time, and a writer that falls back to it on `unknown` will look accurate until the flow that matters — the one R13 exists for — is misfiled as file-push. MM8's guard has to fail on the fallback, not on the wrong answer."
+  - "`unruled` displayed everywhere is noisy by design. The temptation will be to hide it once it is the majority value; hiding it turns 'nobody looked' into 'nothing wrong', which is the exact misreading the TDQ step already produces on the investigated flow."
+  - "E2 without E1 blocks every fact on an ingestion that may never come (an issue tracker behind a connector with no item). E1 without E2 makes the record a dead end for retrieval — deepdoc's whole charter. The risk in E3 is two representations of one breadcrumb drifting; the business-key rule is what prevents it and it must be a guard, not a convention."
+  - "The feed-grain inventory sheet is an attractive import seed and a copy-filled one: its file-name column repeats across jobs that write different files, and its blanks are blank on every captured row. Seeding identity from it without the §A profiling step imports its defects as facts."
+  - "The :AppDataFlow pattern doc has been 'designed, zero code' for long enough that adopting OR retiring it will surprise someone. Either ruling edits the pattern doc in the same session; leaving it to describe a label the vocabulary retired recreates the ddcontext/dddocs drift this repo just cleaned up (gate document-content-topology R1)."
+  - "Every record is written :Uncertain and promotion is a gate write. If MM10 lands before the evidence-present guard (§E confirmation 3), the first records will carry no breadcrumb and the guard, added later, will have to either grandfather them or delete them — sequence the guard first, the ADR 0011 'guards first' precedent (G102)."
+
+status: drafted   # 2026-08-21 (MM2) — SME walk not yet scheduled; nothing flips past planned until it signs
+drafted: 2026-08-21
+unblocks:
+  - "MM3 — the Output-tab log extractor keys its enrichment on the flow identity §A rules"
+  - "MM8 — R13's second consequence needs ingest_mode (§B) and load_bearing (§F) as ruled fields before a detector proposes anything"
+  - "MM9 — email → flow binding needs the evidence grammar (§E) and the flow key (§A)"
+  - "MM10 — investigate() v1 writes the record; it cannot write an identity that is not ruled"
+  - "O60 / O62 — the swimlane and file-name UI views key on the flow identity"
+  - "the :AppDataFlow pattern doc — adopted or retired by §A, edited in the sign-off session"

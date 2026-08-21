@@ -598,3 +598,105 @@
     loader:       writer.write_rua
     domain:       architecture
     status:       active
+
+  # ── Data-flow overview record (MM2, 2026-08-21; gate data-flow-overview DRAFTED, unsigned) ──
+  # Four of the five edges of the :DataFlow record (10-node-classifications.yaml).
+  # The fifth, docs_evidenced_by, files under docs. ALL planned, loader ~,
+  # supplement ~: nothing is written until the gate signs, and §D of that gate
+  # holds two open direction questions (D-OWN, D-LAND) that may rename or
+  # retire entries here. Record: docs/design/deepdoc-data-flow-overview.md §2.
+
+  - id:           arch_has_data_flow
+    neo4j_label:  HAS_DATA_FLOW
+    inverse_label: "data flow of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      DataFlow
+    prov_maps_to: ~
+    note: >
+      PLANNED (MM2). The OWNING — consumer-side — application of a flow. Term
+      and direction cited to docs/patterns/data-catalog/lineage-design-top3.md
+      (":BusinessApplication -[:HAS_DATA_FLOW]-> :AppDataFlow"). Agent →
+      Activity is the INVERSE of the matrix row (Activity → Agent =
+      prov:wasAssociatedWith), hence prov_maps_to ~; gate §D D-OWN asks,
+      pre-picking neither, whether to keep the pattern's direction or invert
+      onto WAS_ASSOCIATED_WITH {role: owner} with arch_fed_by folded in as
+      {role: producer} — the role-discriminated house pattern
+      (arch_owns_code, arch_owns_directory). owner_app is read from the
+      launcher -seal argument, the task-service seal property and the
+      folder-name token, ranked by config/precedence.yaml; a disagreement is
+      recorded on the node, never silently resolved.
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_orchestrates
+    neo4j_label:  ORCHESTRATES
+    inverse_label: "orchestrated by"
+    role:         ~
+    from_node:    DataFlow
+    to_node:      ControlMJob
+    prov_maps_to: ~
+    note: >
+      PLANNED (MM2). Flow MEMBERSHIP — the jobs the runbook series traversal
+      (runbooks.series.v1 over INVOKES / WAS_INFORMED_BY) reaches, FILTERED to
+      the flow's <DATAFLOW> value: a job reached downstream that carries a
+      different flow value is the boundary of this flow and the start of
+      another, never a member (gate §D confirmation 5). Term cited to
+      docs/patterns/data-catalog/lineage-design-top3.md (":AppDataFlow
+      -[:ORCHESTRATES]-> :ControlMJob"). Composition, not derivation —
+      dct:hasPart — so no PROV row, the same reason catalog_has_product_line
+      carries none.
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_fed_by
+    neo4j_label:  FED_BY
+    inverse_label: "feeds"
+    role:         ~
+    from_node:    DataFlow
+    to_node:      BusinessApplication
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      PLANNED (MM2). The PRODUCER application of a flow — Activity → Agent =
+      prov:wasAssociatedWith {role: producer}. NEW term: the 2026-08-20
+      investigation's single biggest unlock was that producer and consumer
+      were DIFFERENT applications while every surface keyed on the consumer
+      (APP_ID-consumer owned the folder; APP_ID-producer owned the API and the
+      feed register). Edge properties: feed_name (the producer's register name
+      for the feed) and as_of; a superseded producer is a retired edge with
+      as_of OR a dated :Document the record cites with superseded_by — gate
+      §E / Q6 rules which. producer_app is DERIVED (upstream feed register, API
+      host's owning application) then SME-confirmed, with assigned_by + an
+      evidence pointer on every write (email-folder-assignment A3,
+      generalized). May fold into WAS_ASSOCIATED_WITH {role: producer} under
+      gate §D D-OWN.
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
+    status:       planned
+
+  - id:           arch_lands_in
+    neo4j_label:  LANDS_IN
+    inverse_label: "landing of"
+    role:         ~
+    from_node:    DataFlow
+    to_node:      DataAsset
+    prov_maps_to: "prov:generated"
+    note: >
+      PLANNED (MM2). The snapshot / target table a flow publishes — Activity →
+      Entity = prov:generated, the row m3_writes_to / scheduler_writes_to
+      already use at the process grain. NEW term, and the one most likely to
+      be RETIRED at the gate: it is DERIVABLE at read time from the members'
+      WRITES_TO edges (the series' last process → its DataAsset), so writing
+      it is a roll-up shortcut; gate §D D-LAND asks, pre-picking neither,
+      whether it is written or deprecated never-built with the gate as the
+      reason (email-folder-assignment C1 forbade shortcut edges for
+      ATTRIBUTION; whether that fence covers a lineage roll-up is open).
+    supplement:   ~
+    loader:       ~
+    domain:       architecture
+    status:       planned

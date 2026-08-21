@@ -172,6 +172,36 @@ node_classifications:
       DataSource / DataTarget pair as the to-node of m3_reads_from /
       m3_writes_to.
 
+  - label:      DataFlow
+    class:      "prov:Activity"
+    prov_type:  Activity
+    note: >
+      PLANNED (MM2, 2026-08-21; gate data-flow-overview DRAFTED, unsigned): the
+      per-data-flow overview record — one node per <DATAFLOW> value as the DPL
+      launcher names it (-dataflow on the command line, DataFlow in the
+      task-service request, %%DATAFLOW on the sub-folder), keyed
+      flow_id = urn:drydocs:dataflow:controlm:<DATAFLOW>. Reconciles three
+      grains that existed unreconciled: the %%DATAFLOW variable fact, the
+      designed-never-built :AppDataFlow (docs/patterns/data-catalog/
+      lineage-design-top3.md), and the runbook "data series" traversal
+      (runbooks.series.v1). Class prov:Activity = the composite activity its
+      member jobs realize (the pattern doc's "prov:Activity cluster"). EVERY
+      ruling is open at the gate and none is pre-picked: §A the LABEL (this
+      spelling vs folding into :AppDataFlow's dataflowUrn) and the KEY
+      (firm-wide unique vs per-application, URN gaining an <APP_ID> segment);
+      §B the ingest_mode enum (api-pull | file-push | internal-generated |
+      unknown, or a richer set) with two fixed rules — NEVER derived from the
+      job-name token (R13), and `unknown` is a recorded value with a reason,
+      never a default; §C every field badged SOURCE / DERIVED; §D the five
+      edges (arch_has_data_flow, arch_orchestrates, arch_fed_by, arch_lands_in,
+      docs_evidenced_by); §E the evidence-breadcrumb grammar; §F
+      watchers[].load_bearing as SME-ruled with `unruled` the resting state.
+      Written ONLY as a deepdoc finding under ADR 0011 clause 1 (:Uncertain +
+      reliability + trust, tests/unit/test_uncertain_boundary.py); promotion
+      is a gate write, never a label strip. No loader, no taxonomy-ontology-map
+      row until §A rules the label. Record: docs/design/
+      deepdoc-data-flow-overview.md §2.
+
   # — SEAL (active) —
   - label:      BusinessApplication
     class:      "prov:Entity"

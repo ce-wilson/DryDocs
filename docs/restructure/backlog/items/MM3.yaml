@@ -11,6 +11,8 @@ priority: p2
 status: todo
 depends_on:
 - MM1
+gates:
+- data-flow-overview
 inputs:
 - docs/design/deepdoc-data-flow-overview.md
 - drydocs_deepdoc/investigate.py

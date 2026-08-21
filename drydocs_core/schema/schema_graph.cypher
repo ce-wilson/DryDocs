@@ -85,6 +85,8 @@ MERGE (n:SchemaMeta:ControlMHostGroup {name: 'ControlMHostGroup'})
   SET n.class = 'dd:ControlMHostGroup', n.prov_type = 'Collection';
 MERGE (n:SchemaMeta:DataAsset {name: 'DataAsset'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
+MERGE (n:SchemaMeta:DataFlow {name: 'DataFlow'})
+  SET n.class = 'prov:Activity', n.prov_type = 'Activity';
 MERGE (n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})
   SET n.class = 'prov:Entity', n.dual_class = 'dprod:DataProduct', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Employee {name: 'Employee'})
@@ -458,6 +460,22 @@ MATCH (a:SchemaMeta {name: 'SourceOccurrence'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:OCCURRENCE_OF]->(b)
   SET r.vocab_id = 'arch_occurrence_of', r.prov_maps_to = 'prov:specializationOf', r.domain = 'architecture', r.status = 'active';
 
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'DataFlow'})
+MERGE (a)-[r:HAS_DATA_FLOW]->(b)
+  SET r.vocab_id = 'arch_has_data_flow', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'ControlMJob'})
+MERGE (a)-[r:ORCHESTRATES]->(b)
+  SET r.vocab_id = 'arch_orchestrates', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'BusinessApplication'})
+MERGE (a)-[r:FED_BY]->(b)
+  SET r.vocab_id = 'arch_fed_by', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'architecture', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'DataAsset'})
+MERGE (a)-[r:LANDS_IN]->(b)
+  SET r.vocab_id = 'arch_lands_in', r.prov_maps_to = 'prov:generated', r.domain = 'architecture', r.status = 'planned';
+
 // ── domain: registry ────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'SoftwareProduct'}), (b:SchemaMeta {name: 'Vendor'})
@@ -533,6 +551,14 @@ MERGE (a)-[r:CONCERNS]->(b)
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:CONCERNS]->(b)
   SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'Document'})
+MERGE (a)-[r:EVIDENCED_BY]->(b)
+  SET r.vocab_id = 'docs_evidenced_by', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'Chunk'})
+MERGE (a)-[r:EVIDENCED_BY]->(b)
+  SET r.vocab_id = 'docs_evidenced_by', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'docs', r.status = 'planned';
 
 // ── domain: all ─────────────────────────────────────────────────────────────
 
