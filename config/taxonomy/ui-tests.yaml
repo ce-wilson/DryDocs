@@ -87,6 +87,26 @@ suites:
         expect: "Radii come from tokens; `lg` is collapsed onto `md` (10px)."
         source: "O37 close note — App.css/index.css radii tokenized"
 
+      - id: TC-SHELL-04
+        description: React Flow chrome themes with the page — dark mode reaches the controls rail and the attribution
+        steps:
+          - Open any graph canvas (/ownership, /explorer, /lineage) in dark mode.
+          - Check the zoom rail at bottom-left and the attribution chip at bottom-right.
+          - Tab to a zoom-rail button and confirm the focus ring.
+          - Switch to light mode and re-check both.
+        expect: >
+          Rail buttons sit on the --panel/--panel2 tokens (dark #121e2e, light
+          white), the attribution background is transparent, and the keyboard
+          ring (2px --blue-br outline) is visible against the dark panel. The
+          theming rides the library's own --xy-* custom properties set on
+          .react-flow (index.css) — direct rules on the library's classes LOSE
+          the cascade to @xyflow/react/dist/style.css, which component modules
+          import later than index.css, so its light defaults (#fefefe buttons)
+          win in BOTH themes and light mode masks the defect. Any future
+          React Flow chrome styling goes through the variables, never direct
+          rules.
+        source: "O65 fix 2026-08-21 — laptop, headless Chrome vs Vite :5199: computed-style probes (btn bg #121e2e dark / white light, attribution transparent) + keyboard-Tab focus-ring probe + screenshots both themes"
+
   # ---------------------------------------------------------------------------
   - id: TS-LOADS
     module: loads
