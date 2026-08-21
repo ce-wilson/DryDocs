@@ -317,7 +317,8 @@
       "env_refs": [],
       "files": [
         "config/glossary/README.md",
-        "config/glossary/schema.yaml"
+        "config/glossary/schema.yaml",
+        "config/glossary/terms-public.yaml"
       ],
       "content": null,
       "extra_contents": {}
