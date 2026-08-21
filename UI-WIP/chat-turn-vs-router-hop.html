@@ -1,0 +1,606 @@
+<title>Chat Turn vs Router Hop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --ground:      #fcfcfd;
+    --surface:     #f1f3f6;
+    --surface-2:   #e7eaef;
+    --ink:         #14171c;
+    --ink-soft:    #4d5560;
+    --ink-faint:   #767f8b;
+    --rule:        #d5dae1;
+    --rule-soft:   #e5e9ee;
+    --accent:      #14615e;
+    --accent-soft: #d8ebe9;
+    --present:     #2c6f52;
+    --partial:     #8a5d16;
+    --absent:      #9d3f38;
+    --present-bg:  #dcece3;
+    --partial-bg:  #f3e7cf;
+    --absent-bg:   #f2dedc;
+
+    --f-sans:  "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --f-serif: "IBM Plex Serif", ui-serif, Georgia, "Times New Roman", serif;
+    --f-mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --measure: 68ch;
+    --wide: 1180px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+
+  .prose { max-width: var(--measure); }
+
+  /* ---------- masthead ---------- */
+  .masthead { display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--f-sans);
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .lede {
+    margin: 0;
+    max-width: var(--measure);
+    font-family: var(--f-serif);
+    font-size: 1.14rem;
+    line-height: 1.62;
+    color: var(--ink-soft);
+  }
+
+  .lede em { color: var(--ink); font-style: italic; }
+
+  /* ---------- sections ---------- */
+  section { display: flex; flex-direction: column; gap: 1.4rem; }
+
+  h2 {
+    margin: 0;
+    font-size: 1.32rem;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+
+  h2::before {
+    content: "";
+    flex: none;
+    width: 1.6rem;
+    height: 2px;
+    background: var(--accent);
+    transform: translateY(-0.32em);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  p { margin: 0; }
+  p + p { margin-top: 0.85rem; }
+
+  /* ---------- term chip ---------- */
+  code, .term {
+    font-family: var(--f-mono);
+    font-size: 0.855em;
+    font-weight: 500;
+  }
+
+  .term {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.13em 0.42em;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  code:not(.term) {
+    background: var(--surface);
+    color: var(--ink);
+    padding: 0.13em 0.4em;
+    border-radius: 3px;
+  }
+
+  /* ---------- diagram plate ----------
+     The page is light-only by choice, so the plate matches: mermaid paints its
+     own palette and sits on a fixed paper plate the way a printed figure does. */
+  .plate {
+    background: #f7f8fa;
+    border: 1px solid #dfe4ea;
+    border-radius: 4px;
+    overflow-x: auto;
+    padding: 1.75rem 1.5rem;
+  }
+
+  .plate pre.mermaid {
+    margin: 0;
+    background: none;
+    min-width: max-content;
+  }
+
+  .figcap {
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-faint);
+    display: flex;
+    gap: 0.55rem;
+    align-items: baseline;
+  }
+
+  .figcap b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---------- provenance banner ---------- */
+  .provenance {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .provenance > div {
+    background: var(--surface);
+    padding: 1.05rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .provenance .tag {
+    font-family: var(--f-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .provenance .tag.model { color: var(--partial); }
+  .provenance .tag.verified { color: var(--present); }
+
+  .provenance p { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.5; }
+
+  /* ---------- table ---------- */
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 860px;
+    font-size: 0.885rem;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: var(--surface-2);
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.73rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  thead th.mode { text-align: center; width: 8.5%; }
+  thead th.router { text-align: center; width: 11%; background: var(--accent-soft); color: var(--accent); }
+
+  tbody td {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface) 45%, transparent); }
+
+  td.what { color: var(--ink-soft); line-height: 1.45; }
+  td.mark { text-align: center; }
+  td.mark.routercol { background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+
+  .mk {
+    display: inline-block;
+    min-width: 1.55rem;
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.16em 0.44em;
+    border-radius: 3px;
+  }
+
+  .mk.y { background: var(--present-bg); color: var(--present); }
+  .mk.p { background: var(--partial-bg); color: var(--partial); }
+  .mk.n { background: var(--absent-bg);  color: var(--absent); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    align-items: center;
+  }
+
+  .legend span { display: inline-flex; align-items: center; gap: 0.42rem; }
+
+  /* ---------- payoff ---------- */
+  .payoff {
+    border-left: 2px solid var(--accent);
+    padding: 0.15rem 0 0.15rem 1.35rem;
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .payoff p { font-size: 1rem; }
+
+  ul { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: 0.55rem; }
+  li { color: var(--ink-soft); }
+  li strong { color: var(--ink); font-weight: 600; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 0;
+  }
+
+  .foot {
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    max-width: var(--measure);
+  }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 2.5rem 1.1rem 4rem; gap: 2.75rem; }
+    .plate { padding: 1.1rem 0.9rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Shared vocabulary · 2026-08-21</div>
+    <h1>Chat Turn vs Router Hop</h1>
+    <p class="lede">Two architectures we keep comparing without naming the parts. This gives every block a
+      <em>handle</em> — say <span class="term">TOOLDEF</span> or <span class="term">R-DEC</span> and we are
+      pointing at the same object. The short version of the difference: an editor chat turn can think, choose
+      from a menu of callable tools, and try again. The DryDocs router does none of those three.</p>
+  </header>
+
+  <div class="provenance">
+    <div>
+      <span class="tag model">Reference model</span>
+      <p>The editor-chat half is a generic model of how Agent / Ask / Plan modes generally work. It is not a
+        claim about any specific product's internals, which are not public.</p>
+    </div>
+    <div>
+      <span class="tag verified">Read from the code</span>
+      <p>The router half is verified against this repo: <code>agents/graph_qa/pipeline.py</code>,
+        <code>envelope.py</code>, <code>providers.py</code>, <code>control.py</code>.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <section>
+    <h2>The mode gate</h2>
+    <p class="prose">Mode is a <em>capability</em> decision made before the first inference call. It sets which
+      tools are offered, whether writes need approval, and whether the turn may iterate.</p>
+    <div class="plate">
+<pre class="mermaid">
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"IBM Plex Sans, sans-serif","fontSize":"13px","primaryColor":"#ffffff","primaryTextColor":"#14171c","primaryBorderColor":"#8f9aa6","lineColor":"#6b7683","secondaryColor":"#eef1f4","tertiaryColor":"#f7f8fa"}}}%%
+flowchart LR
+  MODE{"MODE<br/>which chat mode?"}
+  MODE -->|Ask| ASK["ASK<br/>TOOLDEF: read-only or none<br/>GATE: none<br/>LOOP: single pass<br/>FINAL: prose answer"]
+  MODE -->|Plan| PLAN["PLAN<br/>TOOLDEF: read-only<br/>GATE: none, nothing writes<br/>LOOP: over reads<br/>FINAL: plan awaiting approval"]
+  MODE -->|Agent| AGENT["AGENT<br/>TOOLDEF: read + write + execute<br/>GATE: on writes and commands<br/>LOOP: until done<br/>FINAL: summary of changes"]
+  PLAN -.->|on approval| AGENT
+  style ASK fill:#eef1f4,stroke:#8f9aa6
+  style PLAN fill:#eef1f4,stroke:#8f9aa6
+  style AGENT fill:#dcece3,stroke:#2c6f52
+</pre>
+    </div>
+    <div class="figcap"><b>Figure 1</b><span>Mode sets capability, not personality. Plan hands off to Agent; Ask never does.</span></div>
+  </section>
+
+  <section>
+    <h2>The editor chat turn</h2>
+    <p class="prose">One turn, mode-agnostic. Everything in <span class="term">ASSEMBLE</span> is rebuilt per
+      turn; the cycle <span class="term">INFER</span> → <span class="term">ACT</span> →
+      <span class="term">OBS</span> → <span class="term">INFER</span> is what makes a turn agentic.</p>
+    <div class="plate">
+<pre class="mermaid">
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"IBM Plex Sans, sans-serif","fontSize":"13px","primaryColor":"#ffffff","primaryTextColor":"#14171c","primaryBorderColor":"#8f9aa6","lineColor":"#6b7683","secondaryColor":"#eef1f4","tertiaryColor":"#f7f8fa"}}}%%
+flowchart TB
+  PROMPT["PROMPT<br/>the user turn"] --> ASSEMBLE
+  subgraph ASSEMBLE["ASSEMBLE — rebuilt every turn"]
+    direction LR
+    SYS["SYS<br/>system prompt<br/>mode persona and rules"]
+    HIST["HIST<br/>conversation history"]
+    CTXPACK["CTXPACK<br/>context assembly<br/>open file, selection,<br/>mentions, workspace retrieval"]
+    TOOLDEF["TOOLDEF<br/>tool schemas offered<br/>name, args, description"]
+  end
+  ASSEMBLE --> INFER["INFER<br/>model inference call"]
+  INFER --> THINK["THINK<br/>reasoning trace<br/>often surfaced to the reader"]
+  THINK --> EMIT{"EMIT<br/>text, or a tool call?"}
+  EMIT -->|text| FINAL
+  EMIT -->|tool call| GATE{"GATE<br/>approval required?"}
+  GATE -->|denied| OBS
+  GATE -->|allowed| ACT["ACT<br/>tool execution<br/>read, edit, run"]
+  ACT --> OBS["OBS<br/>tool result returned<br/>to the model"]
+  OBS --> LOOP{"LOOP<br/>goal met?"}
+  LOOP -->|no, try again| INFER
+  LOOP -->|yes| FINAL["FINAL<br/>final message"]
+  FINAL --> XCRIPT["XCRIPT<br/>persisted transcript<br/>prompts, replies, tool I/O"]
+  style THINK fill:#f3e7cf,stroke:#8a5d16
+  style LOOP fill:#dcece3,stroke:#2c6f52
+  style TOOLDEF fill:#dcece3,stroke:#2c6f52
+  style GATE fill:#dcece3,stroke:#2c6f52
+</pre>
+    </div>
+    <div class="figcap"><b>Figure 2</b><span>Highlighted blocks are the four the router has no equivalent for.</span></div>
+  </section>
+
+  <section>
+    <h2>The DryDocs router pipeline</h2>
+    <p class="prose">Same left-to-right job — question in, answer out — but the middle is a
+      <em>tiered classifier</em>, not an agent loop. <span class="term">R-DEC</span> is a single
+      classification with no second chance: pick a registered spec, or fall through to generation.</p>
+    <div class="plate">
+<pre class="mermaid">
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"IBM Plex Sans, sans-serif","fontSize":"13px","primaryColor":"#ffffff","primaryTextColor":"#14171c","primaryBorderColor":"#8f9aa6","lineColor":"#6b7683","secondaryColor":"#eef1f4","tertiaryColor":"#f7f8fa"}}}%%
+flowchart TB
+  QIN["Q-IN<br/>question, message part 0"] --> RSYS
+  CTRL["CTRL<br/>control part: api_token, api_url<br/>never reaches the model"] -.-> ENV
+  RCAT["R-CAT<br/>spec catalog<br/>registered QuerySpec ids"] --> RSYS
+  SESSMEM["SESS-MEM<br/>prior session events<br/>replayed as memory"] --> RSYS
+  RSYS["R-SYS<br/>ROUTER_SYSTEM<br/>reply with JSON only:<br/>spec_id and params"] --> RDEC
+  RDEC{"R-DEC<br/>did a spec match?"}
+  RDEC -->|spec_id| TSPEC["T0-SPEC<br/>Tier 0: registered QuerySpec<br/>reviewed, parameterized Cypher"]
+  RDEC -->|null, or an id<br/>that does not exist| TGEN["T1-GEN<br/>Tier 1: text2cypher<br/>schema + vocabulary prompt"]
+  TGEN --> TFIX["T1-FIX<br/>validate and repair<br/>fix_retries"]
+  TFIX --> EXEC
+  TSPEC --> EXEC["EXEC<br/>read-only execution<br/>row cap applied"]
+  EXEC --> SUFF{"SUFF<br/>rows sufficient<br/>to answer?"}
+  SUFF -->|no| TIER2["TIER2<br/>Tier 2: the only loop<br/>task graph + token budget"]
+  TIER2 --> ASYS
+  SUFF -->|yes| ASYS["A-SYS<br/>ANSWER_SYSTEM<br/>answer from rows only"]
+  ASYS --> AOUT["A-OUT<br/>answer text"]
+  AOUT --> ENV["ENV<br/>envelope: steps, sources, metrics<br/>question reduced to sha256 + length"]
+  ENV --> LEDGER["LEDGER<br/>R3 JSONL in DRYDOCS_LOGDIR<br/>the only sink with full question text"]
+  ENV --> SESS["SESS<br/>ADK session events<br/>steps and answer, not prompts"]
+  style RDEC fill:#f2dedc,stroke:#9d3f38
+  style TIER2 fill:#f3e7cf,stroke:#8a5d16
+  style TSPEC fill:#dcece3,stroke:#2c6f52
+</pre>
+    </div>
+    <div class="figcap"><b>Figure 3</b><span>R-DEC in red is the single irreversible choice. Tier 2 in amber is the only loop, and most runs never reach it.</span></div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Term by term</h2>
+    <p class="prose">The anchor table. Left column is the handle to use in a question; the right column is what
+      the router actually does with that concept, if anything.</p>
+
+    <div class="legend">
+      <span><span class="mk y">yes</span> present</span>
+      <span><span class="mk p">part</span> present but narrowed</span>
+      <span><span class="mk n">no</span> absent by construction</span>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>What it names</th>
+            <th class="mode">Ask</th>
+            <th class="mode">Plan</th>
+            <th class="mode">Agent</th>
+            <th class="router">graph_qa router</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="term">PROMPT</span></td>
+            <td class="what">The user's turn as typed.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk y">yes</span> <span class="term">Q-IN</span></td>
+          </tr>
+          <tr>
+            <td><span class="term">SYS</span></td>
+            <td class="what">System prompt setting role and rules.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk y">yes</span> three, one per hop</td>
+          </tr>
+          <tr>
+            <td><span class="term">CTXPACK</span></td>
+            <td class="what">Context assembled for this turn — files, selection, retrieval.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk p">part</span> graph schema + vocabulary, never files</td>
+          </tr>
+          <tr>
+            <td><span class="term">HIST</span></td>
+            <td class="what">Prior turns replayed as memory.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk y">yes</span> <span class="term">SESS-MEM</span></td>
+          </tr>
+          <tr>
+            <td><span class="term">TOOLDEF</span></td>
+            <td class="what">Callable tools offered to the model, with argument schemas.</td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk n">no</span> a catalog is a menu, not function-calling</td>
+          </tr>
+          <tr>
+            <td><span class="term">INFER</span></td>
+            <td class="what">One model inference call.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk y">yes</span> 2–3 per run</td>
+          </tr>
+          <tr>
+            <td><span class="term">THINK</span></td>
+            <td class="what">Reasoning produced before the answer.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk n">no</span> never requested, never returned</td>
+          </tr>
+          <tr>
+            <td><span class="term">EMIT</span></td>
+            <td class="what">What the model returns: prose, or a structured call.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk p">part</span> JSON only, two keys</td>
+          </tr>
+          <tr>
+            <td><span class="term">GATE</span></td>
+            <td class="what">Approval before a side effect.</td>
+            <td class="mark"><span class="mk n">no</span></td>
+            <td class="mark"><span class="mk n">no</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk n">no</span> read-only by construction</td>
+          </tr>
+          <tr>
+            <td><span class="term">ACT</span></td>
+            <td class="what">The tool actually running.</td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk p">part</span> <span class="term">EXEC</span>, one read query</td>
+          </tr>
+          <tr>
+            <td><span class="term">OBS</span></td>
+            <td class="what">Tool result handed back to the model.</td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk p">part</span> rows reach the answer hop only</td>
+          </tr>
+          <tr>
+            <td><span class="term">LOOP</span></td>
+            <td class="what">Iterate after seeing a result.</td>
+            <td class="mark"><span class="mk n">no</span></td>
+            <td class="mark"><span class="mk p">part</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk p">part</span> Tier 2 only, rarely reached</td>
+          </tr>
+          <tr>
+            <td><span class="term">FINAL</span></td>
+            <td class="what">The answer the reader sees.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk y">yes</span> <span class="term">A-OUT</span></td>
+          </tr>
+          <tr>
+            <td><span class="term">XCRIPT</span></td>
+            <td class="what">What is durably written down afterwards.</td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark"><span class="mk y">yes</span></td>
+            <td class="mark routercol"><span class="mk p">part</span> steps + answer; prompts and replies discarded</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Why the router misroutes, in these terms</h2>
+    <div class="payoff">
+      <p>Three blocks, absent together, explain what we saw in the <code>jdoe4821</code> session:</p>
+      <ul>
+        <li><strong>No <span class="term">THINK</span>.</strong> <span class="term">R-SYS</span> asks for JSON
+          with exactly two keys and no reason field, so no rationale is ever generated — there is nothing
+          suppressed to recover.</li>
+        <li><strong>No <span class="term">TOOLDEF</span>.</strong> <span class="term">R-CAT</span> is a list of
+          ids to pick from, not tools the model may call with arguments and then reconsider. One pick, then the
+          pipeline moves on.</li>
+        <li><strong>No <span class="term">LOOP</span> at Tier 0 or 1.</strong> A wrong route is terminal.
+          Zero rows is a valid outcome, so nothing triggers a retry against a different spec — the run proceeds
+          to <span class="term">A-SYS</span> and explains the emptiness instead of questioning it.</li>
+      </ul>
+      <p>An Agent-mode turn with the same wrong first guess recovers on the next pass, because
+        <span class="term">OBS</span> feeds back into <span class="term">INFER</span>. The router has no such
+        edge below Tier 2, which is why two of three runs reported "not ingested" for a document the corpus
+        held all along.</p>
+    </div>
+  </section>
+
+  <p class="foot">Terms are handles for this conversation, not identifiers in the codebase — except the
+    router-side ones drawn from real symbols (<code>ROUTER_SYSTEM</code>, <code>ANSWER_SYSTEM</code>,
+    <code>QuerySpec</code>, <code>fix_retries</code>, <code>StepRecord</code>). Backlog item R18 is where the
+    missing <span class="term">THINK</span> equivalent is tracked.</p>
+
+</div>
