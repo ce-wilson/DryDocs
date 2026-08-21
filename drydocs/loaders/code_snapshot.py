@@ -348,10 +348,47 @@ class CodeSnapshotAdapter:
             }
 
 
+#: The relationship types code_snapshot.cypher writes FROM a :CodeModule. The
+#: U21 retraction is bounded to exactly these, and to edges stamped
+#: ``source = 'depgraph-snapshot'`` — edges written by any other loader are
+#: never touched, whatever their type.
+SNAPSHOT_EDGE_TYPES: tuple[str, ...] = ("IMPORTS", "IS_ENCODED_IN", "HAS_MEDIA_TYPE")
+SNAPSHOT_EDGE_SOURCE = "depgraph-snapshot"
+
+
 class CodeSnapshotLoader(BaseLoader):
     """The G33 loader. Every snapshot is a FULL scan by construction, so the
     CLI passes ``full_extract=True`` and the D7 mark pass sweeps :CodeModule
-    nodes that left the source tree between snapshots."""
+    nodes that left the source tree between snapshots.
+
+    U21 — EDGES ARE RETRACTED, PER SOURCE, NEVER GLOBALLY. The node half of D7
+    marks modules that left the tree; nothing swept the EDGES, so the import
+    graph was append-only by construction: an import deleted from a file kept
+    its IMPORTS edge through every re-run (reproduced 2026-08-13, desktop,
+    neo4jtest, drydocs DB — ``loaders/seal_attribution.py -> loaders/base.py``
+    survived K8's removal and put base.py at fan-in 32 where the tree said 31;
+    A5 read a deleted test import as still tested). After the node pass, this
+    loader retracts, for every module THIS RUN TOUCHED (``m.last_run_id =
+    $run_id`` — the snapshot's own coverage, module by module), the outgoing
+    :data:`SNAPSHOT_EDGE_TYPES` edges it wrote earlier (``r.source =
+    'depgraph-snapshot'``) that this run did not re-assert (``r.last_run_id <>
+    $run_id``). A module the snapshot did not include keeps every edge; an edge
+    any other loader wrote is never a candidate. Same discipline as the D7 mark
+    pass: it runs only under ``full_extract`` and logs why when it does not.
+
+    DELETED, NOT MARKED — the ruling and its reason. Nodes are tombstoned
+    because review labels, SME notes and confirmations hang off them and a
+    retention window lets a re-appearing module reclaim its history. A snapshot
+    edge carries none of that: no curated state, fully re-derivable from the
+    next snapshot, and re-asserted by MERGE if the import comes back. Marking
+    would have forced the U13 rule onto every IMPORTS consumer (the tech-debt
+    skill's A1-A6, the review-plan seeds, m1-verify's fan-in) — a tombstoned
+    edge that one query forgets to filter is this same defect wearing a
+    property. Delete follows the repo's one edge-retraction precedent
+    (``stale_edge_cleanup.cypher``, D1: scope to the keys this run touched,
+    delete, re-assert). The count is reported in the load summary and on the
+    :JobRun as ``edges_retracted``, beside ``nodes_marked_removed``.
+    """
 
     name: ClassVar[str] = "code_snapshot.v1"
     source_id: ClassVar[str | None] = "repo:depgraph-snapshot"
@@ -359,6 +396,40 @@ class CodeSnapshotLoader(BaseLoader):
     row_model: ClassVar[type] = CodeModuleRow
     source_label: ClassVar[str] = "snapshot"
     sweep_label: ClassVar[str | None] = "CodeModule"
+
+    def _mark_removed(self, summary) -> None:  # — BaseLoader signature
+        super()._mark_removed(summary)
+        self._retract_stale_edges(summary)
+
+    def _retract_stale_edges(self, summary) -> None:
+        """U21 (a)-(c): per-source edge retraction, counted, never global."""
+        if not self.full_extract:
+            LOGGER.info(
+                "Loader %s: edge retraction skipped — the run did not declare "
+                "full_extract (a filtered extract must not retract)",
+                self.name,
+            )
+            return
+        types = "|".join(SNAPSHOT_EDGE_TYPES)
+        rows = self.client.run(
+            f"MATCH (m:CodeModule)-[r:{types}]->() "
+            "WHERE m.last_run_id = $run_id "
+            "  AND r.source = $edge_source "
+            "  AND (r.last_run_id IS NULL OR r.last_run_id <> $run_id) "
+            "WITH collect(r) AS stale "
+            "FOREACH (x IN stale | DELETE x) "
+            "RETURN size(stale) AS retracted",
+            run_id=self.run_id,
+            edge_source=SNAPSHOT_EDGE_SOURCE,
+        )
+        summary.edges_retracted = rows[0].get("retracted", 0) if rows else 0
+        LOGGER.info(
+            "Loader %s: edge retraction — %d %s edge(s) no longer asserted by the "
+            "snapshot for the modules it contained (scope=modules touched this run)",
+            self.name,
+            summary.edges_retracted,
+            "/".join(SNAPSHOT_EDGE_TYPES),
+        )
 
 
 class CodeTreeAdapter:

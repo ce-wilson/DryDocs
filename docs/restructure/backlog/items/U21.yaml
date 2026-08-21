@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/code_snapshot.py
@@ -21,3 +21,29 @@ acceptance: |
   After a `drydocs load-code-snapshot` run, the graph's IMPORTS edges EQUAL the loaded snapshot's IMPORTS edges for every module that snapshot CONTAINED. Today they do not, and the edge only ever grows. THE DEFECT, reproduced 2026-08-13 (desktop, neo4jtest, drydocs DB) against the graph freshly reloaded from that day's snapshot: `drydocs/loaders/seal_attribution.py` still carries an IMPORTS edge to `drydocs/loaders/base.py`; the file contains ZERO occurrences of the string "base" (K8 removed the import at 4df4df2) and the snapshot records no such edge. The edge SURVIVED a full re-run, so this is not staleness and a refresh does not fix it. Size at that reading: 985 live IMPORTS edges against 982 in the snapshot -- three ghosts, one of which put `loaders/base.py` at fan-in 32 where the tree says 31, i.e. it distorts the repo's most-cited change-risk metric. A5 is affected in the DANGEROUS direction: a module whose test import was DELETED keeps the ghost edge and still counts as tested, so test debt reads better than it is. THE FIX. (a) PER-SOURCE RETRACTION, NEVER A GLOBAL DELETE. For each module the loaded snapshot INCLUDED, the edges this loader wrote that the snapshot no longer asserts are retracted; edges touching a module the snapshot did NOT include are untouched, and edges written by any other loader are untouched. The scoping discipline already exists one file away -- base.py's D7 mark pass refuses to run without either `full_extract` or a scope property, logging why -- and this clause is that discipline applied to relationships. (b) DECIDE AND RECORD: marked or deleted. The node half MARKS (removed_from_source_at + removed_by_run_id) rather than deleting, which is what makes U13's "every query pack filters tombstones" rule necessary. Whichever this item picks, it states the reason, and if edges are marked then the read paths that consume IMPORTS (the tech-debt skill's A3/A5 queries, the review-plan seed queries) filter them the same way U13 made node queries filter -- a tombstoned edge that no query excludes is the same defect wearing a property. (c) THE COUNT IS REPORTED, never silent: edges retracted (and reactivated, if marked) appear in the load summary beside nodes_marked_removed, per the STG_PARSE_QUALITY house rule the node pass already follows. (d) GUARDS, both of them: loading snapshot A (edge present) then snapshot B (edge absent for a module B contains) leaves no live edge; and loading a snapshot that OMITS a module entirely leaves that module's edges alone. The first proves the sweep works, the second proves it cannot over-reach. (e) VERIFY ON THE REAL GRAPH at close, venue named per J18: live IMPORTS count equals the newest snapshot's, the seal_attribution -> base ghost is gone, and the A3 top fan-in is RE-MEASURED rather than re-typed.
 notes: |
   Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-118. SAME FAMILY AS U13, one grain down: the D7 sweep tombstones removed MODULES and nothing sweeps removed EDGES, so the import graph is append-only by construction. The repo holds exactly one edge-retraction precedent -- `drydocs/loaders/cypher/stale_edge_cleanup.cypher` (D1: delete condition edges for changed jobs before re-asserting them) -- and a grep of the tracked tree on 2026-08-13 finds NO live caller for it, so the pattern exists as a file rather than as a mechanism. Worth reading it anyway: it is the shape (scope to the keys this run touched, delete, re-assert) this item generalizes. MODULE drydocs-load: the change is in the loader and its Cypher, not in the depgraph instrument -- the snapshot is CORRECT, the load is what never subtracts. PAIRS WITH U22, found in the same session and from the same cross-check (the loaded graph vs the snapshot it was loaded from): U22 detects a load that never RAN, this fixes a load that runs and never RETRACTS. Neither substitutes for the other -- U22's freshness check would have reported this graph as current, because it was.
+  DONE 2026-08-21. (a) CodeSnapshotLoader._retract_stale_edges, run right after the D7 node mark
+  pass: MATCH (m:CodeModule)-[r:IMPORTS|IS_ENCODED_IN|HAS_MEDIA_TYPE]->() WHERE m.last_run_id = $run_id
+  (the snapshot's own coverage, module by module) AND r.source = 'depgraph-snapshot' (this loader's
+  edges only) AND r.last_run_id <> $run_id (not re-asserted this run) -> delete, count. A module the
+  snapshot omits keeps every edge; another loader's edge is never a candidate; like the mark pass it
+  refuses without full_extract and logs why. (b) RULING: DELETED, not marked, reason recorded in the
+  loader docstring + code_snapshot.cypher header + the tech-debt skill: a snapshot edge carries no
+  curated state, is fully re-derivable and comes back by MERGE on the next snapshot, while marking
+  would have pushed the U13 filter onto every IMPORTS consumer (A1-A6, review-plan seeds, m1-verify) --
+  a tombstoned edge one query forgets is this defect wearing a property. Follows the D1
+  stale_edge_cleanup precedent (scope to touched keys, delete, re-assert). (c) edges_retracted on
+  LoadSummary, as_dict, the O28 status envelope (drydocs.loader/edges-retracted, info) and the :JobRun
+  property, beside nodes_marked_removed. (d) tests/unit/test_code_snapshot_retraction.py (query shape,
+  ordering, full_extract refusal, template stamps) + tests/integration/test_code_snapshot_retraction.py
+  against a throwaway EE container, PASSED 2/2 (2026-08-21): A then B leaves no a->base edge while
+  c->base (c omitted from B) survives and c is node-tombstoned; reload A re-creates the edge; a
+  hand-curated IMPORTS edge between two touched modules survives a full re-load. (e) LIVE (desktop,
+  neo4jtest, drydocs DB, snapshot drydocs-20260821-0340.json): BEFORE the load the graph was STALE at
+  891 IMPORTS vs 1032 in the snapshot (U22's symptom, not this item's) and the seal_attribution->base
+  ghost was already absent -- the graph had been rebuilt since the 08-13 reading, so this run could
+  not re-kill it; what it proves instead is the equality clause: AFTER `drydocs load-code-snapshot`
+  (run 91d03d0e, nodes_marked_removed 4, edges_retracted 0) live IMPORTS = 1032 = snapshot, and the
+  per-edge set is IDENTICAL once the tree-mode `drydocs/` prefix is normalised (0 live-only, 0
+  snapshot-only). A3 top fan-in RE-MEASURED: loaders/base.py 34 (was 31 at the 08-09 reading on a
+  graph that could only grow; the new number is the snapshot's truth, not drift), repo_paths.py 30,
+  drydocs_lineage/model.py 26 -- record beside the old baselines, never folded in.

@@ -108,6 +108,10 @@ class LoadSummary:
     rows_changed: int = 0
     nodes_marked_removed: int = 0
     nodes_reactivated: int = 0
+    #: U21 — relationships this loader wrote earlier that the source no longer
+    #: asserts, retracted this run. Reported beside nodes_marked_removed (the
+    #: STG_PARSE_QUALITY house rule); 0 for loaders that do not retract.
+    edges_retracted: int = 0
     unresolved_parents: int = 0
     rejects: list[dict] = field(default_factory=list)
     status: str = "STARTED"
@@ -123,6 +127,7 @@ class LoadSummary:
             "rows_changed": self.rows_changed,
             "nodes_marked_removed": self.nodes_marked_removed,
             "nodes_reactivated": self.nodes_reactivated,
+            "edges_retracted": self.edges_retracted,
             "unresolved_parents": self.unresolved_parents,
             "status": self.status,
         }
@@ -175,6 +180,14 @@ def status_items_for(summary: LoadSummary) -> list[dict]:
                 "type": f"{STATUS_SOURCE}/removed-from-source",
                 "level": "warning",
                 "message": f"{summary.nodes_marked_removed} nodes no longer present in source",
+            }
+        )
+    if summary.edges_retracted:
+        items.append(
+            {
+                "type": f"{STATUS_SOURCE}/edges-retracted",
+                "level": "info",
+                "message": f"{summary.edges_retracted} relationships no longer asserted by source",
             }
         )
     if summary.unresolved_parents:
@@ -560,6 +573,7 @@ class BaseLoader:
                 run.rows_changed         = rows_changed,
                 run.nodes_marked_removed = $nodes_marked_removed,
                 run.nodes_reactivated    = $nodes_reactivated,
+                run.edges_retracted      = $edges_retracted,
                 run.status_items         = $status_items
             RETURN rows_changed
             """,
@@ -569,6 +583,7 @@ class BaseLoader:
             rows_rejected=summary.rows_rejected,
             nodes_marked_removed=summary.nodes_marked_removed,
             nodes_reactivated=summary.nodes_reactivated,
+            edges_retracted=summary.edges_retracted,
             # O28: the envelope rides as a list of JSON strings on the :JobRun.
             # A property, NOT a new node + relationship, and that is a deliberate
             # choice: a relationship type is an ontology decision that goes

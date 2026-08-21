@@ -24,6 +24,15 @@
 // :SoftwareProduct. Enforced as a GRAPH-TEST (m1-verify), not a constraint —
 // Neo4j cannot declare label mutual-exclusion.
 //
+// RETRACTION (U21, 2026-08-21) happens AFTER this template, in
+// CodeSnapshotLoader._retract_stale_edges: for every module this run touched
+// (m.last_run_id = $run_id), any IMPORTS / IS_ENCODED_IN / HAS_MEDIA_TYPE edge
+// with source = 'depgraph-snapshot' that this run did not re-stamp
+// (r.last_run_id <> $run_id) is DELETED and counted. That is why every edge
+// below carries source + last_run_id: they are the retraction's scope keys.
+// Modules the snapshot omits, and edges any other loader wrote, are never
+// candidates. Deleted rather than marked — the reason is in the loader docstring.
+//
 // Import targets are MERGEd as stubs so edge order within the batch cannot
 // matter; every target is also a node row of the same snapshot, which then
 // fills the stub in the same run.

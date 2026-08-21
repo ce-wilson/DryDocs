@@ -79,6 +79,13 @@ Four standing rules for every query and every conclusion:
   and `pyproject.toml` disagree.
 - **IMPORTS ≠ breaks-if-removed** (gate D2 caveat): an edge records that an
   import statement resolves, not that the dependency is load-bearing.
+- **IMPORTS edges are DELETED, not tombstoned, when a snapshot stops asserting them
+  (U21, 2026-08-21).** Only NODES carry `removed_from_source_at`; the A1–A6 queries need
+  no edge-level tombstone filter, and a live edge means the newest loaded snapshot asserts
+  it. Before U21 the import graph was append-only (a deleted import kept its edge through
+  every re-run and inflated fan-in / under-reported A5), so any fan-in baseline recorded
+  before that date was measured on a graph that could only grow. `edges_retracted` on the
+  :JobRun says how many the last load removed.
 
 | # | Query (run against database `drydocs`) | Debt category it measures |
 |---|---|---|
