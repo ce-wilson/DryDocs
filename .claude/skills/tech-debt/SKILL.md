@@ -96,6 +96,16 @@ Four standing rules for every query and every conclusion:
 | A5 | `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN $packages AND m.project <> 'tests' AND NOT EXISTS { MATCH (t:CodeModule {project:'tests'})-[:IMPORTS]->(m) WHERE NOT t:SchemaMeta } RETURN m.file_id` | **Test debt** — modules no test imports (direct-import proxy only; fixtures and subprocess-level coverage won't show). Baselines: **29** (seven roots, 2026-08-04) → **27** (seven roots, 2026-08-09 at `2d104ef`) → **29** (eight roots, same graph). **Read those three numbers, not the first and last** — the eight-root figure lands back on 29 by coincidence: the tree lost two untested modules while the eighth root contributed exactly two, so quoting 29 → 29 would report "no change" across two real movements in opposite directions. The eighth root's two are `drydocs_docmeta/connectors/filedrop.py` and `drydocs_docmeta/connectors/web.py`, and they belong in the untested list rather than being absent from it. Raw whole-repo `.py` reads 129 — vendored pollution, not test debt. |
 | A6 | `MATCH (a:CodeModule)-[:IMPORTS]->(b:CodeModule) WHERE NOT a:SchemaMeta AND NOT b:SchemaMeta AND a.removed_from_source_at IS NULL AND b.removed_from_source_at IS NULL AND a.project <> b.project RETURN a.project, b.project, count(*) ORDER BY count(*) DESC` | **Architecture debt** — cross-root coupling map; compare against MODULE_MAP.md's declared component boundaries. Unscoped on purpose: `IMPORTS` edges only exist between Python files, and post-U9 rows involving `agents/` or `scripts/` are first-party coupling worth seeing. |
 
+**Step 0 — is the graph current? (U22)** Before reading any number off the
+graph, run `poetry run drydocs code-graph-freshness`. It compares
+`max(:CodeModule.last_seen_at)` against the newest `knowledge/depgraph-snapshots/
+drydocs-*.json` `meta.captured_at` and prints ONE line naming the verdict
+(FRESH / STALE by N days / EMPTY / NO SNAPSHOT / DATABASE UNREACHABLE), the run
+id that last loaded and the snapshot it compared. Quote that line beside every
+A1–A6 number. It is warn-only and never refreshes anything: a STALE verdict
+means `drydocs load-code-snapshot` first — the 2026-08-13 reading of A3 = 28 was
+an eleven-day-old graph that looked current, and UNREACHABLE is never "fresh".
+
 How to run: no CLI query command exists yet — use a short scratchpad script
 with `Neo4jSettings` from `drydocs_core.config` (reads `.env`; raw
 `os.environ` lacks the password) and `Neo4jClient` as a context manager.

@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/code_snapshot.py
@@ -20,3 +20,24 @@ acceptance: |
   THE INCIDENT, 2026-08-13 (desktop, neo4jtest, drydocs DB): every :CodeModule carried `last_seen_at = 2026-08-02T23:06:42Z` from ONE run id -- loaded once on Aug 2, never refreshed, ELEVEN DAYS. The session read A3's top fan-in as 28, which is the Aug-2 value (the tech-debt skill's own baselines run 28 -> 29 on 08-04 -> 31 on 08-09), and it looked current. Same class as G78: not a failed read, a read that SUCCEEDED with the wrong data, sitting underneath every architecture and debt decision. `drydocs load-code-snapshot` repairs it in one command; nothing COMPARES the graph against the snapshot series. (a) THE COMPARISON EXISTS AS CODE, not as a habit: max(:CodeModule.last_seen_at) in the drydocs database against the newest `knowledge/depgraph-snapshots/drydocs-*.json` meta.captured_at, reporting the drift, the run id that last loaded, and WHICH snapshot it compared -- so "the graph is current" is falsifiable rather than assumed. (b) WARN, NOT FAIL -- ruled at this groom, and the reason is the argument CLAUDE.md already makes for snapshot.ps1's CI check: recording repo structure and passing a gate are unrelated jobs, and this check must never block a suite run or a snapshot on a machine with no database. It surfaces where the wrong number was actually consumed -- the tech-debt skill's read path -- and may ALSO ride the session ritual beside the CI check; the item states where it put it and why. (c) THE UNIT-TESTABLE HALF IS THE COMPARISON, not the freshness: a test drives it over fixtures -- fresh, stale, no snapshot on disk, empty graph, database unreachable -- and asserts each verdict, so the mechanism is guarded on a machine with no database. tests/unit/test_code_graph_review_plan.py is the offered home (it already fails when the typed package allow-list and pyproject.toml disagree, so the shape is there); a different home is fine with the reason written down. (d) DATABASE-UNREACHABLE IS A DISTINCT VERDICT, never "fresh". The failure this item exists to stop is a check that reports green because it could not look. OUT OF SCOPE, deliberately: auto-running the load. A stale graph is REPORTED, never silently refreshed -- a check that repairs what it measures can never be trusted to have measured anything. RIDER (2026-08-19 groom, from Idea-127 / R17): the depgraph HTML viewer shows the AGE too. knowledge/depgraph-snapshots/viewer.html already renders the snapshot's commit and branch from the meta header and says nothing about how OLD it is -- the same answer this comparison produces. The viewer displays this item's verdict rather than deriving a second one. R17 owns the ANSWER-side half in drydocs_api and consumes the same verdict.
 notes: |
   Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-117, which explicitly left the warn-vs-fail call to the groom. RULED WARN in clause (b); it is reversible at the item if the builder finds a fail-safe home, but the default must not be a red suite on a laptop with no container running. MODULE graph-infra rather than docs, chosen on SUBJECT and recorded here because both were plausible: the fact under test is the loaded graph's currency against the snapshot series (U15 / U19's family), not the review plan's prose (U13 / U20's). The likely code home straddles them -- a unit test file the docs items also touch -- which is exactly why the subject and not the file decided it. PRIORITY p2, not the entry's High: the condition is repaired by one existing command and was repaired the day it was found, so what is missing is DETECTION rather than capability. U21 is the p1 of the pair because it needs a fix nothing in the repo can do today. Idea-120 (a metrics JSONL beside each snapshot) is NOT this item -- groomed 2026-08-19 as U25 -- a trend ledger answers "is it getting better", this answers "is what I am reading current".
+  DONE 2026-08-21 (desktop). (a) drydocs/code_graph_freshness.py + the verb `drydocs code-graph-freshness`:
+  the graph probe (max :CodeModule.last_seen_at and its last_run_id) against the newest
+  knowledge/depgraph-snapshots/drydocs-*.json meta.captured_at, one line naming the verdict, the drift,
+  the run id and WHICH snapshot. Found while building it: snapshot.ps1 stamps captured_at as
+  (Get-Date).ToString("s") -- LOCAL time, no offset -- while last_seen_at is written with +00:00; a
+  naive captured_at is therefore read as local (reading it as UTC shifted today's snapshot five hours
+  earlier and would call a stale graph fresh inside that window; pinned by
+  test_naive_snapshot_time_is_local_not_utc). (b) WARN ONLY, exit 0 on every verdict, and it never
+  refreshes. WHERE IT LIVES: the tech-debt skill's read path (SKILL.md "Step 0" -- quote the line beside
+  every A1-A6 number; that is where the wrong 28 was consumed) AND the session ritual -- snapshot.ps1
+  prints it right after the CI verdict, skipping with a named reason when the CLI cannot run. (c)
+  tests/unit/test_code_graph_freshness.py (7) drives compare()/check() over fixtures: fresh, stale
+  (the 08-13 incident values -> "STALE by 10.x day(s)"), no snapshot, empty graph, unreachable, and
+  the naive-local rule; own file rather than test_code_graph_review_plan.py because that file guards a
+  document and this guards a mechanism. (d) UNREACHABLE is its own verdict with the exception named
+  and "freshness UNKNOWN, not fresh". LIVE (desktop MSI, neo4jtest / drydocs): `code graph: FRESH --
+  loaded 2026-08-21T09:19:10Z by run 91d03d0e... against drydocs-20260821-0340.json (captured
+  2026-08-21T08:40:24Z)` -- fresh because U21 ran the load today; before it the same graph was at
+  891 IMPORTS vs 1032, the symptom this check now names. RIDER: viewer.html shows each loaded
+  snapshot's captured_at and its age ("Nd old", writer-local clock) beside the commit, and says the
+  graph verdict is the CLI's -- it derives no second one. Out of scope, kept out: auto-running the load.

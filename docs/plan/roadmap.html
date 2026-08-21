@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<!-- sources-fingerprint: 8df7fce3ff7d6fe6a88a86ac8311ba176eb7bdc80106b18a398ff5d6d37c074d -->
+<!-- sources-fingerprint: 6bb1405a6664ed5140dcb4e67ef274681fd1f3c410cdc987a48d72cebfd30df5 -->
 <title>DryDocs — module roadmap</title>
 <style>:root{color-scheme:light}
 body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1a1a1a;
@@ -222,8 +222,7 @@ h2{font-size:1.1rem;margin:0}
 <tr><td><a class="idea-link" href="ideas.html">Idea-86</a></td><td><span class="est est-S">S</span></td><td>Register the internal MWAA docs as a corpus — parked on G32 ruling target_db.</td></tr>
 <tr><td><a class="idea-link" href="ideas.html">Idea-28</a></td><td><span class="est est-S">S</span></td><td>Tier-1/tier-2 app-code rows — SME data entry, not a backlog item.</td></tr>
 </tbody></table></section>
-<section class="module" id="module-graph-infra"><div class="module-head"><h2>graph-infra</h2><span class="stage stage-active">active</span><span class="counts">26 done &middot; 2 open</span></div><div class="progress"><div class="progress-bar" style="width:93%"></div></div><p class="prose"><strong>Built:</strong> The runtime estate works: the EE container with multi-database provisioning, the depgraph snapshot ritual plus viewer, code-graph and doc-traceability loads, CI with testcontainers e2e (Ryuk default settled at J36), and the MCP server wiring.</p><p class="prose"><strong>Remaining:</strong> G32 (in progress) is the keystone — the document/content database residency ruling that several parked corpus registrations wait on. Behind it: G49 MCP post-APOC verify, G50 rollback-container deletion, G53 the single-database contingency plan, U15 the dirty-flag split.</p><ul class="open-items">
-<li><a class="item-link" href="board.html#card-U22">U22</a> <span class="status-badge status-todo">todo</span> The code graph can go stale for weeks and nothing says so: compare the graph&#x27;s newest last_seen_at against the newest snapshot&#x27;s captured_at</li>
+<section class="module" id="module-graph-infra"><div class="module-head"><h2>graph-infra</h2><span class="stage stage-active">active</span><span class="counts">27 done &middot; 1 open</span></div><div class="progress"><div class="progress-bar" style="width:96%"></div></div><p class="prose"><strong>Built:</strong> The runtime estate works: the EE container with multi-database provisioning, the depgraph snapshot ritual plus viewer, code-graph and doc-traceability loads, CI with testcontainers e2e (Ryuk default settled at J36), and the MCP server wiring.</p><p class="prose"><strong>Remaining:</strong> G32 (in progress) is the keystone — the document/content database residency ruling that several parked corpus registrations wait on. Behind it: G49 MCP post-APOC verify, G50 rollback-container deletion, G53 the single-database contingency plan, U15 the dirty-flag split.</p><ul class="open-items">
 <li><a class="item-link" href="board.html#card-U25">U25</a> <span class="status-badge status-todo">todo</span> Debt metrics have no machine-readable history, so &#x27;is it getting better&#x27; is unanswerable: snapshot.ps1 appends one metrics row per run</li>
 </ul><table class="ideas"><thead><tr><th>Idea</th><th>Size</th><th>What / trigger</th></tr></thead><tbody>
 <tr><td><a class="idea-link" href="ideas.html">Idea-49</a></td><td><span class="est est-S">S</span></td><td>Recreate the desktop container or re-point — confirmed desktop-only; user ruling.</td></tr>

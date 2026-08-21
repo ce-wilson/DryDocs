@@ -89,6 +89,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         # landing zone, fail-by-name before any write). Load: it decides what the
         # chain verbs read.
         "drydocs.chain_inputs",
+        # drydocs.code_graph_freshness = U22: is the loaded code graph current vs the
+        # snapshot series? Reads the graph + a snapshot header, writes nothing; it is
+        # the load side's own "did my load land" question, so load.
+        "drydocs.code_graph_freshness",
         # drydocs.docs_coverage = the Q16 software->documentation coverage report.
         # Same bucket as docs_verify for the same recorded reason, and it IMPORTS
         # docs_verify (count_query/locator_of) so the two verbs can never disagree

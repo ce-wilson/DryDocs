@@ -223,10 +223,22 @@ function drawStats(){
   const s=document.getElementById('stats'), A=state.A, B=state.B;
   if(!A){ s.innerHTML='<span class="hint">No snapshot loaded.</span>'; return; }
   const ver = m => m && m.git && m.git.commit ? ` <span class="muted">@${m.git.commit}${m.git.branch?' ('+m.git.branch+')':''}${m.git.pr?' PR#'+m.git.pr:''}</span>` : '';
-  let html = `<div><b>A</b> ${A.name}${ver(A.meta)} <span class="muted">· ${A.stats.files} files / ${A.stats.dirs} dirs / ${A.stats.deps} imports</span></div>`;
+  // U22 rider: how OLD the snapshot is, beside what it is. meta.captured_at is
+  // the writer's local wall clock (snapshot.ps1 stamps Get-Date "s"), so the age
+  // is computed against the viewer's local clock. Whether the GRAPH was loaded
+  // from it is the `drydocs code-graph-freshness` verdict - this viewer shows
+  // the snapshot's age and does not derive a second freshness verdict.
+  const age = m => {
+    if(!m || !m.captured_at) return '';
+    const then = new Date(m.captured_at); if(isNaN(then)) return '';
+    const days = (Date.now() - then.getTime()) / 86400000;
+    const txt = days < 1 ? `${Math.round(days*24)}h old` : `${days.toFixed(1)}d old`;
+    return ` <span class="muted" title="meta.captured_at ${m.captured_at} (writer local time); graph freshness = drydocs code-graph-freshness">captured ${m.captured_at} · ${txt}</span>`;
+  };
+  let html = `<div><b>A</b> ${A.name}${ver(A.meta)}${age(A.meta)} <span class="muted">· ${A.stats.files} files / ${A.stats.dirs} dirs / ${A.stats.deps} imports</span></div>`;
   document.getElementById('legend').hidden = !B;
   if(B){
-    html += `<div><b>B</b> ${B.name}${ver(B.meta)} <span class="muted">· ${B.stats.files} files / ${B.stats.dirs} dirs / ${B.stats.deps} imports</span></div>`;
+    html += `<div><b>B</b> ${B.name}${ver(B.meta)}${age(B.meta)} <span class="muted">· ${B.stats.files} files / ${B.stats.dirs} dirs / ${B.stats.deps} imports</span></div>`;
     const add = cy.nodes('.add').length, del = cy.nodes('.del').length, same = cy.nodes('.same').length;
     html += `<div style="margin-top:6px"><span class="chip c-add">+${add} added</span><span class="chip c-del">−${del} removed</span><span class="chip c-same">${same} unchanged</span></div>`;
     const addD = cy.nodes('.add').filter('.dir').map(n=>n.data('rel'));

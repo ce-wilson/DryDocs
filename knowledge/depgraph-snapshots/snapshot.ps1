@@ -182,6 +182,28 @@ try {
   Write-Warning "ci check skipped: $($_.Exception.Message)"
 }
 
+# --- code-graph freshness (U22): warn-only, beside the CI check -------------
+# Is the graph this snapshot will be compared against still the graph anyone
+# has loaded? One line from `drydocs code-graph-freshness`; DATABASE
+# UNREACHABLE prints as its own verdict, never as fresh; nothing here blocks the
+# write or refreshes anything (a check that repairs what it measures has
+# measured nothing).
+try {
+  Push-Location $repo
+  $fresh = & poetry run drydocs code-graph-freshness 2>$null
+  Pop-Location
+  if ($LASTEXITCODE -eq 0 -and $fresh) {
+    $line = (($fresh | Where-Object { "$_" -match "code graph:" }) -join " ") -replace "\s+", " "
+    $color = if ($line -match "FRESH") { "Green" } else { "Yellow" }
+    Write-Host $line -ForegroundColor $color
+  } else {
+    Write-Host "code graph: freshness check skipped (drydocs CLI not runnable here)" -ForegroundColor DarkGray
+  }
+} catch {
+  Pop-Location -ErrorAction SilentlyContinue
+  Write-Warning "code-graph freshness check skipped: $($_.Exception.Message)"
+}
+
 # (PS 5.1 reads this file as ANSI: an em dash inside a STRING decodes to a byte
 # sequence containing a smart quote, which PowerShell honours as a string
 # delimiter - keep string literals to ASCII; comments are safe.)
