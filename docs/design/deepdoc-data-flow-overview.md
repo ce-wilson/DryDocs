@@ -210,6 +210,14 @@ consequence and a sharper test:
   true | false | unruled`. `false` proposes a greenfield transform (drop the watcher, keep a
   post-write checksum/row-count step on the producer side); `true` keeps it with the reason
   recorded; `unruled` is the default and the board shows it.
+- **Caveat (SME, 2026-08-21) — the watcher and the TDQ step are separate questions.** On an
+  API-pull flow the `_FW` may simply not be needed. The TDQ validation needs its own review: it is
+  either (a) not needed on this flow, or (b) **masking the fact that no validation happens** — the
+  token count it compares was written by the consumer's own pull, not sent by the source. A TDQ step
+  that passes against a self-produced token is not evidence of integrity; it reads as evidence. The
+  record therefore carries `tdq_self_asserted` beside `load_bearing`, and the gate rules both: keep,
+  drop, or replace with a source-sent count (the producer's register already lists structural /
+  completeness / timeliness methods per feed — that is where a real token count would come from).
 - **Greenfield token (SME-ruled):** R13's "retoken to match intent" now has a target — an API
   pull is `_DLMD` (download external data) or `_MON` (monitoring API), never `_PREPROC`; the
   `_PREPROC` token is reserved for file preparation. The token pair goes to the greenfield job
@@ -297,9 +305,10 @@ is not already there, cites the corpus, and leaves the human the slots only a hu
    downstream application's *related* flow names)?
 2. **`ingest_mode` enum** — the four values above, or a richer set (API pull, MFT push, SFTP push,
    DB extract, internally generated)?
-3. **Watcher ruling for this flow** — are the two internally fed watchers load-bearing? If not, is
-   the greenfield transform "drop + producer-side checksum" acceptable, or does the FileWatcher
-   remain the standard's required shape?
+3. **Watcher and TDQ ruling for this flow** — are the two internally fed watchers load-bearing? Is
+   the TDQ step needed at all, or is it masking the absence of a validation (it compares a token the
+   consumer's own pull wrote, not one the source sent)? If the watchers go, is "drop + source-sent or
+   producer-side count" the greenfield, or does the FileWatcher remain the standard's required shape?
 4. **Full vs delta** — the slot no source filled; the snapshot table suggests full-by-design, the
    regulatory report suggests completeness, the API may offer no delta. The full pull is also what
    breaks the HTTP/2 stream. Human design rationale required.
