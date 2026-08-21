@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-21T06:36:40",
+    "captured_at": "2026-08-21T09:19:01",
     "date": "20260821",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6efc1b2b",
-      "full": "6efc1b2b5c136229d0addfcadaf92f6ac673d45a",
+      "commit": "4176c125",
+      "full": "4176c12574fc06d0f242b3d6098c26757e487211",
       "branch": "main",
-      "describe": "port-base-20260820-107-g6efc1b2b",
-      "subject": "chore(R14): /list-apps lists only the real agent apps — agents/serve.py hands the API server ADK's own NestedAgentLoader (the adk-web loader: agent.py dirs only), so the shared common/ package stays where the apps import it and disappears from discovery; README states the app-vs-shared convention; guard added; proven on the installed ADK",
+      "describe": "port-base-20260820-110-g4176c125",
+      "subject": "feat(ontology): MM2 — gate prompt data-flow-overview drafted; :DataFlow + five edges registered planned",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6789,6 +6789,15 @@
       "name": "corporate-backbone-vocabulary.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/corporate-backbone-vocabulary.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/data-flow-overview.yaml",
+      "name": "data-flow-overview.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/data-flow-overview.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19286,10 +19295,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0340.json",
-      "name": "drydocs-20260821-0340.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "name": "drydocs-20260821.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821-0340.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31952,6 +31961,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/data-flow-overview.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/dcat-theme-subject-scheme.yaml"
     ],
     [
@@ -38792,7 +38806,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0340.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41069,13 +41083,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2326,
+    "files": 2327,
     "edges": 1129,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2607,
+    "rels": 2608,
     "directories": 282
   }
 }
