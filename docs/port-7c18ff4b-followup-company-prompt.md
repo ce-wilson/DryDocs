@@ -86,9 +86,5 @@ steps-43-NN.md` with a `status: DATED RECORD` header, and replace
 `reconcile-port` skill; your port history lives in `port-exec-state.md` and
 `PORT-REPORT-*.md`. References keep resolving; it never becomes a ledger again —
 that is what "never refresh" means. The same tombstone-pointer shape `backlog.yaml`
-took on the producer side today.
-
-**Also — before any other command on that machine:** if `origin` is the producer
-remote, disable its push URL (`git remote set-url --push origin DISABLED`). The
-"nothing pushes to the producer" guardrail should be physical, not procedural. **Record the close-out in `port-exec-state.md` as you have been** — that
+took on the producer side today. **Record the close-out in `port-exec-state.md` as you have been** — that
 ledger is the record, and it is yours. Nothing is reported back.
