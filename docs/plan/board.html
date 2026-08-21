@@ -439,7 +439,7 @@ RIBBON WEIGHT IS AN OPEN DESIGN QUESTION, flagged rather than assumed: in a Sank
 <div class="card ready" id="card-O62" data-id="O62" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o62 the ask report view: a file-name search resolves to the owning application and process, and the report shows code repos and dev teams for both processes so support can escalate" tabindex="0"><div class="card-head"><span class="card-id">O62</span><span class="card-title">The Ask report view: a file-name search resolves to the owning application and process, and the report shows code repos and dev teams for BOTH processes so support can escalate</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The Ask surface gains a REPORT rendering for the file-name search use case: a user searches a file name (or table) and the result renders as a structured report naming the business application and process associated with it -- and when the chain crosses processes (the captured example: a file-transfer process fed by an event-based application), the report shows the code repos and development teams for BOTH processes, because escalation is the point. The traversal binds via a reviewed read-only drydocs_api QuerySpec (shortest-path from an Application anchor filtered on a fileName property -- the captured example spans ~22 nodes across application / product / dev-team / scheduler folder+job / file-transfer route / pipeline / repo labels), never raw Cypher composed in the browser. The report carries the source -&gt; node-label legend table the captured example shows, so a reader can tell which source system asserted each row. Absence renders honestly: a leg the graph cannot supply renders as &quot;not found via &lt;spec&gt;&quot;, never as an empty section that reads as &quot;none exists&quot;. Committed fixtures are SYNTHESIZED twins of the captured example&#x27;s SHAPE -- no real SEAL ids, hosts, or repo URLs from the machine-local transcription. Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-17 (targeted groom -- the UI / UI-WIP inbox entries only) from Idea-123: the SME supplied a real captured example (screenshot + transcription machine-local at internal-local/ui-examples/, real SEAL ids/hosts/repo URLs -- never committed). This is the concrete output target for the Ask route: report form of the same job -&gt; pipeline -&gt; asset chain O60 draws as a swimlane diagram -- the pair is deliberate, one chain, two presentations. module drydocs-web with the QuerySpec half explicitly in scope the way other O-series frames bind specs; if the spec grows past a straightforward reviewed traversal, splitting a drydocs-api item out is the builder&#x27;s call to record. Whether this report also becomes an Ask-agent tool answer (the Idea-125 named-verbs direction) is NOT decided here -- this item renders the report; the agent-tool question stays in the inbox.
 </p></div></div>
-<div class="card ready" id="card-O63" data-id="O63" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o63 ask should diagnose its own failure instead of printing a bare &quot;failed to fetch&quot;: show the error verbatim, then ping the agent server red/green, then surface the next-stage error and a support hand-off" tabindex="0"><div class="card-head"><span class="card-id">O63</span><span class="card-title">Ask should diagnose its own failure instead of printing a bare &quot;Failed to fetch&quot;: show the error verbatim, then ping the agent server red/green, then surface the next-stage error and a support hand-off</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> When an Ask request fails, the surface runs a STAGED self-diagnosis in place of the single red
+<div class="card ready" id="card-O63" data-id="O63" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o63 service reachability, surfaced twice from one probe: ask diagnoses its own failure instead of printing a bare &quot;failed to fetch&quot;, and the admin page carries a service-status strip at the top" tabindex="0"><div class="card-head"><span class="card-id">O63</span><span class="card-title">Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare &quot;Failed to fetch&quot;, and the admin page carries a service-status strip at the top</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> When an Ask request fails, the surface runs a STAGED self-diagnosis in place of the single red
 line it shows today, in this order:
 
 (a) The originating error renders FIRST and VERBATIM — &quot;Failed to fetch&quot; stays &quot;Failed to fetch&quot;.
@@ -459,6 +459,21 @@ line it shows today, in this order:
 (e) The ladder ends with a `contact DryDocs support` hand-off once the checks stop being
     self-serviceable.
 
+(f) THE ADMIN PAGE CARRIES A SERVICE-STATUS STRIP AT THE TOP, driven by the SAME probe the
+    ladder uses — one implementation, two surfaces. It reports each service the console
+    depends on: drydocs-api (:8001), the graph behind it (reachable + which database), the
+    ADK agent server (:8000, green only when `graph_qa` is in `/list-apps`), and whether the
+    agent&#x27;s provider is configured. Ask&#x27;s ladder is the reactive view — it runs because
+    something already failed — and the strip is the standing one, answering &quot;is anything
+    missing?&quot; before a question is asked rather than after.
+
+    ON DEMAND AND TIMESTAMPED, NOT A LIVE MONITOR. DryDocs is deliberately not a real-time
+    system, and the strip must not imply otherwise: it checks when the page loads and when a
+    refresh control is pressed, shows `checked HH:MM` beside the verdict, and never polls on
+    a timer. A stale-but-dated verdict is honest; a green dot that silently stopped updating
+    is the failure this repo keeps refusing elsewhere. This is the same reason the console
+    renders committed artifacts rather than live-deriving them.
+
 THREE RULES THE LADDER MUST NOT BREAK:
 1. NEVER INVENT A GREEN. A probe that could not run renders &quot;not checked&quot;, never green and never
    0 — the O56 honesty rule, applied to liveness instead of counts.
@@ -472,7 +487,9 @@ THREE RULES THE LADDER MUST NOT BREAK:
 
 A test covers the ladder&#x27;s STATE MACHINE (error -&gt; checking -&gt; probe verdict -&gt; next error -&gt;
 hand-off) rather than its copy, and the ui-tests.yaml TS-ASK suite — declared but empty today —
-gains its first cases from whatever is actually watched working.
+gains its first cases from whatever is actually watched working. The strip is covered by the
+same probe&#x27;s tests plus a case asserting it renders &quot;not checked&quot; rather than a verdict before
+its first run.
 </p><p class="notes"><strong>Notes:</strong> Raised 2026-08-20 from a live failure in the ui-workstream session, and the sequence in the
 acceptance is the debugging path a human actually walked, turned into the page&#x27;s own behaviour.
 
@@ -489,9 +506,19 @@ cannot distinguish a service that was never started from a crashed one, a CORS r
 wrong VITE_ADK_URL. The console already knows which URL it dialled and can simply ask — which is
 what turns a dead end into a two-line answer.
 
+THE ADMIN STRIP (clause f) was added 2026-08-20 on the user&#x27;s direction, with the reason stated
+as a property of the project rather than a preference: &quot;the DryDocs project itself is not meant
+to be realtime intentionally&quot;, so the console needs service checks with status at the top of the
+admin page. That framing is what keeps the strip from drifting into a health dashboard — the
+requirement is an ANSWERABLE question (&quot;is anything missing right now?&quot;), not continuous
+monitoring, and the timestamp is what makes the difference visible to the reader. Scoped onto
+this item rather than a new one because it is the same probe: building it twice is how the two
+surfaces would end up disagreeing about what &quot;green&quot; means.
+
 DELIBERATELY NOT SPECIFIED: whether the ladder renders inline in the answer pane or in a
 collapsible diagnostics panel, and whether it re-runs on demand or once per failure. Both are page
-design and belong with the builder.
+design and belong with the builder. Same for the strip&#x27;s placement within
+AdminConfigRoute — &quot;at the top&quot; is the requirement, the exact chrome is not.
 
 ONE THING TO RULE WHEN BUILDING, not at the groom: `contact DryDocs support` is a placeholder
 string for the producer console, where &quot;support&quot; is the person reading the screen. If it should
