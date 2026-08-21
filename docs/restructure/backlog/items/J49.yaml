@@ -28,8 +28,7 @@ notes: |
   DONE 2026-08-21 (desktop). CENSUS CONFIRMED AT TEN by AST (write_text without a newline kwarg across
   drydocs*/ and scripts/): cli.py lineage-review html, vendor_docs.py x2, publishing/preview.py,
   publishing/publisher.py, docmeta/manifest.py, remediation/changes.py, remediation/formats.py,
-  external_vendor_scrape.py, extract_office_text.py. (a) EVERY site now passes newline="
-" with an
+  external_vendor_scrape.py, extract_office_text.py. (a) EVERY site now passes newline=LF with an
   inline reason; none needed the "must not" branch. (b) THE RULING, site by site, none produces a
   COMMITTED artifact: lineage-review.html defaults to an untracked cwd path; vendor_docs, the docmeta
   manifest and the scrape manifest write under DATA_ROOT (and LF is part of the manifest's own
