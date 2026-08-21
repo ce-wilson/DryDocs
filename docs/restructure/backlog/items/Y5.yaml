@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_plan_roadmap.py
@@ -37,3 +37,20 @@ notes: |
   Epic backlog-sharding / module drydocs-plan / phase 8 by the Y2 precedent: Y2 built the shard, its claim mechanics and its render/validator wiring, and this is the defect that surfaced the first time that ritual ran.
 
   Scope note for whoever pulls it: the fix is in the GUARDS, not in the renderers. `roadmap.html` and `board.html` keep deriving status and keep being regenerated at session close by `scripts/render_board.py`; only the staleness ASSERTION learns that status-only drift is expected mid-flight.
+  DONE 2026-08-21 (desktop). FAMILY ENUMERATED by experiment, not by reading: a status-only flip with
+  no render fails exactly ONE committed-render guard -- test_plan_roadmap::test_committed_roadmap_page_
+  matches_its_sources. board.html has no test guard (only the ritual's git diff), gates.json / load-map /
+  enforcement-matrix / ideas do not derive item status, so the family was already consistent and the
+  fix is one guard. (1) MECHANISM: render_roadmap embeds `<!-- sources-fingerprint: sha256 -->` --
+  sha256 over roadmap.yaml + the backlog with every item's `status` normalised out + the renderer's own
+  source bytes. The guard passes outright on an identical page, passes as STATUS-ONLY DRIFT when the
+  committed fingerprint equals the current one, and fails on anything else. (2) BOUNDED, proven by
+  test_status_only_drift_is_tolerated_and_nothing_else_is: todo->in_progress and ->done leave the
+  fingerprint unchanged; a title, module, phase, depends_on, new-item or roadmap edit changes it; and
+  by construction an edit to plan_roadmap.py itself changes it too (a renderer change without regen
+  still fails -- the old guard's other job is kept). Proven live on the tree: flipping C27's status
+  without rendering -> 11 passed; editing its title -> 1 failed. (3) backlog/README.md states the
+  stale-status consequence and why the board is not the authority. (4) CLAUDE.md pull rule amended in
+  the same commit: "a claim ships NO render". The claim commit for THIS item (pushed before the fix)
+  is the last red claim sha; the next one-key claim after this lands is the CI proof and is recorded
+  on that item. Suite 2295 passed.

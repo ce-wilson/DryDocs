@@ -27,7 +27,10 @@ inbox page.
 
 from __future__ import annotations
 
+import hashlib
 import html
+import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -249,15 +252,51 @@ h2{font-size:1.1rem;margin:0}
 """.strip()
 
 
+#: Y5 (2026-08-21): the one backlog field a render may lag behind. A claim is a
+#: one-key edit of one item file (ADR 0013) that ships NO render, so between
+#: claim and close the committed page shows a stale status BY DESIGN; the guard
+#: therefore compares a fingerprint of everything else.
+STATUS_ONLY_FIELDS = frozenset({"status"})
+_FINGERPRINT_RE = re.compile(r"<!-- sources-fingerprint: ([0-9a-f]{64}) -->")
+
+
+def sources_fingerprint(roadmap: dict[str, Any], backlog_doc: dict[str, Any]) -> str:
+    """sha256 over the page's inputs with item STATUS normalised out, plus the
+    renderer's own source — so a title / module / phase / dependency / new-item
+    change, or an edit to this renderer, changes the fingerprint, and a status
+    flip does not. Embedded in the page; the stale-render guard reads it back."""
+    items = [
+        {k: v for k, v in item.items() if k not in STATUS_ONLY_FIELDS}
+        for item in backlog_doc.get("items", [])
+    ]
+    rest = {k: v for k, v in backlog_doc.items() if k != "items"}
+    payload = json.dumps(
+        {"roadmap": roadmap, "backlog": rest, "items": items},
+        sort_keys=True,
+        default=str,
+        ensure_ascii=False,
+    )
+    renderer = Path(__file__).read_bytes()
+    return hashlib.sha256(payload.encode("utf-8") + b"\n--renderer--\n" + renderer).hexdigest()
+
+
+def committed_fingerprint(page_html: str) -> str | None:
+    """The fingerprint a rendered page carries, or None for a pre-Y5 render."""
+    m = _FINGERPRINT_RE.search(page_html)
+    return m.group(1) if m else None
+
+
 def render_roadmap(roadmap: dict[str, Any], backlog_doc: dict[str, Any]) -> str:
     """Render the roadmap page. Pure and deterministic — no clock, no host path."""
     check_coverage(roadmap, backlog_doc)
+    fingerprint = sources_fingerprint(roadmap, backlog_doc)
     backlog = backlog_from_dict(backlog_doc)
     sections = "\n".join(_render_module(e, backlog.items) for e in roadmap["modules"])
     stage_legend = "".join(f"<dt>{_esc(k)}</dt><dd>{_esc(v)}</dd>" for k, v in STAGES.items())
     est_legend = "".join(f"<dt>{_esc(k)}</dt><dd>{_esc(v)}</dd>" for k, v in ESTIMATES.items())
     return (
         '<!doctype html>\n<html><head><meta charset="utf-8">\n'
+        f"<!-- sources-fingerprint: {fingerprint} -->\n"
         "<title>DryDocs — module roadmap</title>\n"
         f"<style>{_CSS}</style>\n</head><body>\n"
         '<a class="backlink" href="board.html">&larr; Project board</a>'

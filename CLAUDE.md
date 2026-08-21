@@ -48,7 +48,8 @@ things share the word *port* — never conflate them:
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
   `docs/restructure/backlog/items/` whose every `depends_on` is `done` (the board's Ready-to-pull
   strip lists them); **commit and push** `status: in_progress` in that one item file
-  **before starting work**; do exactly that item, staying inside your layer; meet its
+  **before starting work** — a claim ships NO render (Y5: the roadmap guard tolerates
+  status-only drift, so the claim sha stays green; renders catch up at session close); do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL
   gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
   **Pushed, not merely committed — why:** the item file's `status` is the only claim channel between

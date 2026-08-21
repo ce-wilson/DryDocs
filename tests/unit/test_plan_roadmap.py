@@ -23,8 +23,10 @@ from drydocs.plan_roadmap import (
     ESTIMATES,
     STAGES,
     RoadmapError,
+    committed_fingerprint,
     load_roadmap,
     render_roadmap,
+    sources_fingerprint,
     write_roadmap,
 )
 from drydocs_core.backlog_store import load_backlog_document
@@ -163,12 +165,69 @@ def test_real_roadmap_cites_only_live_inbox_ideas() -> None:
 
 
 def test_committed_roadmap_page_matches_its_sources() -> None:
-    """The stale-render check from the CLAUDE.md session ritual, as a test."""
+    """The stale-render check from the CLAUDE.md session ritual, as a test.
+
+    Y5 (2026-08-21): TOLERATES STATUS-ONLY DRIFT. A claim is a one-key edit of
+    one item file, committed and pushed with no render (ADR 0013), so at a
+    claim sha the committed page lags by exactly one status — and that used to
+    turn CI red for the whole in-flight interval, which trains sessions to read
+    red as noise (Idea-111's failure mode). The page carries a fingerprint of
+    its sources with status normalised out (plus the renderer's own source);
+    an identical page passes outright, a page whose fingerprint still matches
+    passes as status-only drift, and anything else — title, module, phase,
+    dependency, new item, renderer edit — still fails.
+    """
     roadmap = load_roadmap(DEFAULT_ROADMAP_PATH)
     backlog_doc = load_backlog_document(DEFAULT_ROADMAP_BACKLOG_PATH)
     expected = render_roadmap(roadmap, backlog_doc)
     committed = DEFAULT_ROADMAP_OUT_PATH.read_text(encoding="utf-8")
-    assert committed == expected, (
-        "docs/plan/roadmap.html is stale — re-run `python scripts/render_board.py` "
-        "(it renders the roadmap too) and commit the refresh"
+    if committed == expected:
+        return
+    assert committed_fingerprint(committed) == sources_fingerprint(roadmap, backlog_doc), (
+        "docs/plan/roadmap.html is stale beyond a status-only change — re-run "
+        "`python scripts/render_board.py` (it renders the roadmap too) and commit the refresh"
     )
+
+
+def _claim(backlog_doc: dict, item_id: str, **changes) -> dict:
+    import copy
+
+    doc = copy.deepcopy(backlog_doc)
+    item = next(i for i in doc["items"] if i["id"] == item_id)
+    item.update(changes)
+    return doc
+
+
+def test_status_only_drift_is_tolerated_and_nothing_else_is() -> None:
+    """Y5 (2): the tolerance is BOUNDED. A guard relaxed without this test is a
+    guard deleted."""
+    import copy
+
+    roadmap = load_roadmap(DEFAULT_ROADMAP_PATH)
+    backlog_doc = load_backlog_document(DEFAULT_ROADMAP_BACKLOG_PATH)
+    base = sources_fingerprint(roadmap, backlog_doc)
+    first = next(i for i in backlog_doc["items"] if i["status"] == "todo")
+    # the claim shape: one item, status only
+    assert (
+        sources_fingerprint(roadmap, _claim(backlog_doc, first["id"], status="in_progress")) == base
+    )
+    assert sources_fingerprint(roadmap, _claim(backlog_doc, first["id"], status="done")) == base
+    # every other kind of drift changes the fingerprint
+    for change in (
+        {"title": first["title"] + " (edited)"},
+        {"module": "drydocs-core" if first.get("module") != "drydocs-core" else "drydocs-load"},
+        {"phase": (first.get("phase") or 0) + 1},
+        {"depends_on": [*(first.get("depends_on") or []), "Z9"]},
+    ):
+        assert (
+            sources_fingerprint(roadmap, _claim(backlog_doc, first["id"], **change)) != base
+        ), change
+    added = copy.deepcopy(backlog_doc)
+    added["items"].append({**first, "id": "Y5-NEW", "status": "todo"})
+    assert sources_fingerprint(roadmap, added) != base
+    edited_roadmap = copy.deepcopy(roadmap)
+    edited_roadmap["modules"][0]["built"] = "changed"
+    assert sources_fingerprint(edited_roadmap, backlog_doc) != base
+    # and the page carries the fingerprint the guard reads back
+    page = render_roadmap(roadmap, backlog_doc)
+    assert committed_fingerprint(page) == base
