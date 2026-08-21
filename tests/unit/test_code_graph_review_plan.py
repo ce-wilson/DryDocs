@@ -162,3 +162,23 @@ def test_the_reachability_check_is_ancestry_not_object_existence() -> None:
         "the plan no longer warns against `git cat-file -t` as the reachability test; "
         "that is the check that silently passes on this desktop and fails elsewhere"
     )
+
+
+# --- U20: per-root counts are derived, never hand-typed into the plan -------------
+
+
+def test_no_hand_typed_per_root_count_list_survives_in_the_plan() -> None:
+    """U20 (2026-08-21): Phase 3 unit 3 carried 'tests 85, drydocs 41, ...' — a
+    third hand-typed root list in one document, predating two of the eight
+    roots. The plan now says where the number is DERIVED (the graph query for
+    module counts, test_runbook_coverage.py for doc coverage) and carries no
+    such list; the mandate names the eight package roots, not six."""
+    text = PLAN.read_text(encoding="utf-8")
+    assert (
+        re.search(r"\btests \d+, drydocs \d+", text) is None
+    ), "a hand-typed per-root count list is back in the plan — derive it instead"
+    mandate = text[text.index("## Phase 1") : text.index("## Phase 2")]
+    assert "eight package roots" in mandate
+    assert "six scan roots" not in mandate
+    unit3 = text[text.index("3. **Coverage gaps by subsystem.**") :][:1400]
+    assert "test_runbook_coverage.py" in unit3 and "$packages" in unit3

@@ -48,8 +48,10 @@ findings never edit backlog.yaml directly.
 
 ## Phase 1 — Python architect (skills: `architecture`, `code-review`, `tech-debt`)
 
-**Mandate.** Structural health of the six scan roots, graph-first: query,
-rank, then read only the flagged files.
+**Mandate.** Structural health of the **eight package roots** (`pyproject.toml`
+`[tool.poetry] packages` + `tests` — the U18 scope, anchored by
+`tests/unit/test_code_graph_review_plan.py`), graph-first: query, rank, then
+read only the flagged files.
 
 Seed queries. Two standing filters ride EVERY query since U13/U14
 (2026-08-04); the canonical, fully-written forms live in the tech-debt
@@ -178,10 +180,21 @@ Units:
      passes them here and fails them on a fresh clone, and `rev-list --count`
      returns a number that means nothing across the disjoint pre-squash history.
      Verify the venue per J18 before trusting any citation check.
-3. **Coverage gaps by subsystem.** Six scan roots × DesignDoc coverage —
-   which root has the thinnest doc coverage relative to its module count
-   (baseline: tests 85, drydocs 41, drydocs_core 35, lineage 12,
-   remediation 7, deepdoc 3).
+3. **Coverage gaps by subsystem.** The eight package roots × doc coverage —
+   which root has the thinnest documentation relative to its module count.
+   **No per-root count lives in this prose (U20, 2026-08-21):** a third
+   hand-typed root list in one document was the argument for deriving, and
+   the previous baseline (six roots, 2026-07-27) predated both `drydocs_api`
+   and `drydocs_docmeta`. Derive both halves instead — module count per root
+   from the graph, `MATCH (m:CodeModule) WHERE NOT m:SchemaMeta AND
+   m.removed_from_source_at IS NULL AND m.extension = '.py' AND m.project IN
+   $packages RETURN m.project, count(m)` (quote the venue and the
+   `code-graph-freshness` line with it, U22); doc coverage per root from
+   `tests/unit/test_runbook_coverage.py`, whose per-module disposition
+   (RUNBOOK / PENDING / EXEMPT) is the only derived, guarded statement of which
+   root has a living document. The graph carries no DesignDoc→module edge —
+   `:Component.ref` is free text — so "coverage" is not a graph query today,
+   and this unit says so rather than faking one.
 4. **The §DEP sections of the SDLC docs** (`sdlc-*.md`) — regenerate their
    dependency claims FROM the graph instead of prose memory; any
    contradiction is a doc bug to log.
