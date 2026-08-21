@@ -62,19 +62,20 @@ def test_acceptance_edges_present() -> None:
     render. (seal_requires_scheduler left this set 2026-07-21 — deprecated
     at the C12 platforms-taxonomy gate; m3_seal_app_ref moved to the
     exclusion side at K8, 2026-08-04 — the job-grain edge deprecated when
-    m3_belongs_to_application activated, per the K7 sign-off;
+    scheduler_belongs_to_application activated, per the K7 sign-off;
     m3_runs_on_etl_host moved to the exclusion side at G55, 2026-08-07 —
     declined as redundant at rua-load-shapes §A2, the same move.)
     """
     out = render_schema_graph()
+    # ids repointed at G87 (2026-08-21): m3_/m7_ -> scheduler_ (add-new + deprecate-old)
     for vocab_id in (
-        "m3_belongs_to_application",
-        "m3_runs_on_agent_host",
-        "m3_runs_on_host_group",
-        "m3_invokes",
-        "m7_uses_artifact",
-        "m3_reads_from",
-        "m3_writes_to",
+        "scheduler_belongs_to_application",
+        "scheduler_runs_on_agent_host",
+        "scheduler_runs_on_host_group",
+        "scheduler_invokes",
+        "scheduler_uses_artifact",
+        "scheduler_reads_from",
+        "scheduler_writes_to",
         "docs_describes",
         "docs_chunk_part_of",
         "docs_first_chunk",

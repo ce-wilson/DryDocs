@@ -33,7 +33,7 @@ mappings:
       neo4j_label: CONTAINS_FOLDER
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
-    vocab_id: m3_contains_folder
+    vocab_id: scheduler_contains_folder
     status: applied                             # loader: controlm_folders.cypher (folder-pass header-row join)
     applied_on: 2026-07-07
     confirmed_by: SME
@@ -57,7 +57,7 @@ mappings:
       neo4j_label: SCHEDULED_ON
       prov_maps_to: ~                       # null on purpose: ControlMServer is not an Agent
     precedence_authority: bmc-baseline
-    vocab_id: m3_scheduled_on
+    vocab_id: scheduler_scheduled_on
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -75,7 +75,7 @@ mappings:
       neo4j_label: REQUIRES_IN_CONDITION   # domain alias mapping to prov:used
       prov_maps_to: "prov:used"
     precedence_authority: bmc-baseline
-    vocab_id: m3_requires_in_condition
+    vocab_id: scheduler_requires_in_condition
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -93,7 +93,7 @@ mappings:
       neo4j_label: EMITS_OUT_CONDITION     # domain alias mapping to prov:generated
       prov_maps_to: "prov:generated"
     precedence_authority: bmc-baseline
-    vocab_id: m3_emits_out_condition
+    vocab_id: scheduler_emits_out_condition
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -111,7 +111,7 @@ mappings:
       neo4j_label: WAS_INFORMED_BY         # replaces the retired DEPENDS_ON
       prov_maps_to: "prov:wasInformedBy"
     precedence_authority: bmc-baseline
-    vocab_id: m3_was_informed_by
+    vocab_id: scheduler_was_informed_by
     status: confirmed
     confirmed_by: SME
     confirmed_on: 2026-06-21
@@ -296,7 +296,7 @@ mappings:
       edge_properties: { role: host_group, derived: true }
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    vocab_id: m3_runs_on_host_group
+    vocab_id: scheduler_runs_on_host_group
     status: applied                             # P3 build 2026-07-27: derived pass runs_on_resolution.cypher (group wins; UNMATCHED = coverage)
     applied_on: 2026-07-27
     confirmed_by: SME
@@ -317,7 +317,7 @@ mappings:
       edge_properties: { participation_type: "VARCHAR2(1), domain probe pending" }
       prov_maps_to: "prov:hadMember"
     precedence_authority: bmc-baseline
-    vocab_id: m3_host_group_contains_host
+    vocab_id: scheduler_host_group_contains_host
     status: applied                             # P3 build 2026-07-27: loader controlm_hosts.cypher
     applied_on: 2026-07-27
     confirmed_by: SME
@@ -337,7 +337,7 @@ mappings:
       neo4j_label: DEFINED_ON
       prov_maps_to: ~
     precedence_authority: bmc-baseline
-    vocab_id: m3_host_group_defined_on
+    vocab_id: scheduler_host_group_defined_on
     status: confirmed                           # gate 2026-07-09; DC key rule = exact long-form name per knowledge/standards/technology/data-center-naming-convention.md; loader blocked on P3 value-domain verification + the 22-DC-vs-production scope call (gate-log residuals)
     confirmed_by: SME
     confirmed_on: 2026-07-09
@@ -401,7 +401,7 @@ mappings:
       edge_properties: { origin: "defined | matched-fallback | override | manual-pin", match_method: "defined | K2 fallback tier", tier: "seal-born | platform | dual-coded" }
       cardinality: "folder -> application is 1:1 (OWNER-NOT-USER: a folder belongs to whoever OWNS it, not whoever USES it). Enforced as a GRAPH-TEST, never a constraint — Neo4j cannot declare relationship cardinality (the TOM-roles precedent). Contrast reg_uses_software, ruled 1:N at the same gate (§G3): both are right, neither is declarable."
     precedence_authority: internal-standards   # the defined mapping is steward-authored company convention; SEAL identity itself stays with seal-pat-source-of-record
-    vocab_id: m3_belongs_to_application        # registered PLANNED at sign-off — no loader until the K7 build items land
+    vocab_id: scheduler_belongs_to_application        # registered PLANNED at sign-off — no loader until the K7 build items land
     source_evidence: "SME model 2026-07-22 (IDEAS.md top inbox item — grain correction + two-tier code model); tier 3 and the owner-not-user rule added by the SME in the K7 gate session 2026-08-03; read-only cardinality evidence live in explorer.controlm-app-codes.v1; supersession target = the active job-level m3_seal_app_ref (K2)"
     capture: config/taxonomy/controlm.yaml   # K12 (2026-08-04): the app-code grouping captured as the applications: section — pure classification (code -> member folders) from the sample jobs' application column, jobless folders name-DERIVED and flagged. Replaces the waiver, which recorded that :ControlMApplication arrived via the 2026-07-07 folder-pass extension and was never captured taxonomy-first. The DEFINED-mapping ROWS still have no machine feed — the steward store IS their source of record (§E2); the capture is of the classification, not the mapping.
     status: confirmed                          # gate seal-app-ref-edge-reshape SIGNED OFF 2026-08-03 (K7) — 24/24 confirmations

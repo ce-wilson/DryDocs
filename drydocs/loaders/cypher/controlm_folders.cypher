@@ -10,7 +10,7 @@
 //     -[:SCHEDULED_ON {since}]-> (:ControlMServer:Platform {name})
 //   (:ControlMApplication:Collection {name}) -[:CONTAINS_FOLDER]-> (folder)
 //     when the folder header row carries an APPLICATION value
-//     (gate controlm-q1q3-phase1; vocabulary m3_contains_folder)
+//     (gate controlm-q1q3-phase1; vocabulary scheduler_contains_folder)
 //
 // TWO fields become labels in this pass: DATA_CENTER -> :ControlMServer and
 // the header-row APPLICATION -> :ControlMApplication. Both grouping nodes
@@ -113,7 +113,7 @@ MERGE (app:ControlMApplication:Collection {name: row.application})
 SET app.last_seen_at = datetime($loaded_at),
     app.last_run_id  = $run_id
 
-// Application -> Folder containment (prov:hadMember; m3_contains_folder).
+// Application -> Folder containment (prov:hadMember; scheduler_contains_folder).
 MERGE (app)-[cf:CONTAINS_FOLDER]->(f)
   ON CREATE SET cf.first_seen_at = datetime($loaded_at),
                 cf.source        = 'psgmgr.CM_DEF_VJOB (folder header row)',

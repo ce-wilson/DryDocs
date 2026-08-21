@@ -38,7 +38,7 @@ MAPPING_ROLES = ("steward", "admin")
 # The one changeset shape the manual-loads mechanism supports — the K7 RULED
 # edge (gate seal-app-ref-edge-reshape §A1/§C1/§D1, 2026-08-03): folder-grain
 # attribution onto the application's BatchProcessing :Port, AUTHORED per app
-# code (§B1 — the loader fans out to folders via m3_contains_folder). The
+# code (§B1 — the loader fans out to folders via scheduler_contains_folder). The
 # job-grain K2 shape is retired for authoring (§A1: no per-job application
 # edge is authored going forward). K8 LANDED 2026-08-04: the loader chain
 # (manual_mappings SUPPORTED_SHAPE + folder_attribution.v1) enforces this

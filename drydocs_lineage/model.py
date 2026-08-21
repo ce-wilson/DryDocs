@@ -10,14 +10,14 @@ The depgraph prototype's *lineage layer*, reconciled to DryDocs identity and ont
   resolve unambiguously across the two registries.
 - **Ontology.** The typed rels are the ALREADY-REGISTERED gate-bound vocabulary
   entries (all ``status: planned`` — nothing here activates them):
-  ``INVOKES`` (m3_invokes, prov:used) · ``TRIGGERS`` (m3_triggers,
-  inverse-of prov:wasStartedBy) · ``READS_FROM`` (m3_reads_from, prov:used) ·
-  ``WRITES_TO`` (m3_writes_to, prov:generated). The prototype's bare ``READS`` /
+  ``INVOKES`` (scheduler_invokes, prov:used) · ``TRIGGERS`` (scheduler_triggers,
+  inverse-of prov:wasStartedBy) · ``READS_FROM`` (scheduler_reads_from, prov:used) ·
+  ``WRITES_TO`` (scheduler_writes_to, prov:generated). The prototype's bare ``READS`` /
   ``WRITES`` normalize to the registered labels on load (see ``REL_ALIASES``).
   Node classes: ``controlm_job`` processes ≙ :ControlMJob; invoked artifacts
-  normally ≙ the m3_invokes :Script target, EXCEPT Ab Initio / DPL invocations
+  normally ≙ the scheduler_invokes :Script target, EXCEPT Ab Initio / DPL invocations
   (``kind`` in ``{"abinitio", "dpl"}``) which ≙ :ETLProcess (G12; gate-log
-  2026-07-16 "cmdline-lineage-review" §b, resolving the m3_triggers business-key
+  2026-07-16 "cmdline-lineage-review" §b, resolving the scheduler_triggers business-key
   residual from 2026-07-15) — keyed on the SAME kind-scoped stable token
   ``process_id()``/the extractor's ``_stable_invocation_key`` already compute
   (Ab Initio pset/graph basename; DPL ``-pipeline`` GUID), with the full path /
@@ -45,11 +45,13 @@ REL_TYPES = {"INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO"}
 #: depgraph prototype spellings → registered labels
 REL_ALIASES = {"READS": "READS_FROM", "WRITES": "WRITES_TO"}
 #: label → relationship_vocabulary.yaml id (the ontology contract per edge)
+#: ids are the domain-derived scheme since G87 (2026-08-21, gate vocabulary-domains-and-id-policy
+#: §B3): m3_* -> scheduler_*; the old ids stay in the vocabulary as deprecated audit rows.
 VOCAB_IDS = {
-    "INVOKES": "m3_invokes",
-    "TRIGGERS": "m3_triggers",
-    "READS_FROM": "m3_reads_from",
-    "WRITES_TO": "m3_writes_to",
+    "INVOKES": "scheduler_invokes",
+    "TRIGGERS": "scheduler_triggers",
+    "READS_FROM": "scheduler_reads_from",
+    "WRITES_TO": "scheduler_writes_to",
 }
 
 

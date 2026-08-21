@@ -200,27 +200,27 @@ MERGE (n:SchemaMeta:Dataset {name: 'Dataset'});
 
 MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'ControlMServer'})
 MERGE (a)-[r:SCHEDULED_ON]->(b)
-  SET r.vocab_id = 'm3_scheduled_on', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_scheduled_on', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'ControlMJob'})
 MERGE (a)-[r:CONTAINS_JOB]->(b)
-  SET r.vocab_id = 'm3_contains_job', r.prov_maps_to = 'prov:hadMember', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_contains_job', r.prov_maps_to = 'prov:hadMember', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMApplication'}), (b:SchemaMeta {name: 'ControlMFolder'})
 MERGE (a)-[r:CONTAINS_FOLDER]->(b)
-  SET r.vocab_id = 'm3_contains_folder', r.prov_maps_to = 'prov:hadMember', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_contains_folder', r.prov_maps_to = 'prov:hadMember', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Condition'})
 MERGE (a)-[r:REQUIRES_IN_CONDITION]->(b)
-  SET r.vocab_id = 'm3_requires_in_condition', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_requires_in_condition', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Condition'})
 MERGE (a)-[r:EMITS_OUT_CONDITION]->(b)
-  SET r.vocab_id = 'm3_emits_out_condition', r.prov_maps_to = 'prov:generated', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_emits_out_condition', r.prov_maps_to = 'prov:generated', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'})
 MERGE (a)-[r:WAS_INFORMED_BY]->(a)
-  SET r.vocab_id = 'm3_was_informed_by', r.prov_maps_to = 'prov:wasInformedBy', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_was_informed_by', r.prov_maps_to = 'prov:wasInformedBy', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'File'})
 MERGE (a)-[r:USED]->(b)
@@ -228,23 +228,23 @@ MERGE (a)-[r:USED]->(b)
 
 MATCH (a:SchemaMeta {name: 'Deployment'}), (b:SchemaMeta {name: 'Developer'})
 MERGE (a)-[r:DEPLOYED_BY]->(b)
-  SET r.vocab_id = 'p2_deployed_by', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_deployed_by', r.prov_maps_to = 'prov:wasAssociatedWith', r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Deployment'}), (b:SchemaMeta {name: 'ControlMServer'})
 MERGE (a)-[r:DEPLOYED_TO]->(b)
-  SET r.vocab_id = 'p2_deployed_to', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_deployed_to', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Deployment'}), (b:SchemaMeta {name: 'ControlMFolder'})
 MERGE (a)-[r:DEPLOYS_FOLDER]->(b)
-  SET r.vocab_id = 'p2_deploys_folder', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_deploys_folder', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'Developer'})
 MERGE (a)-[r:AUTHORED_BY]->(b)
-  SET r.vocab_id = 'p2_authored_by', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_authored_by', r.prov_maps_to = 'prov:wasAttributedTo', r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMJobRun'}), (b:SchemaMeta {name: 'ControlMJob'})
 MERGE (a)-[r:INSTANCE_OF]->(b)
-  SET r.vocab_id = 'p2_instance_of', r.prov_maps_to = 'prov:wasInfluencedBy', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_instance_of', r.prov_maps_to = 'prov:wasInfluencedBy', r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMJobRun'}), (b:SchemaMeta {name: 'AppUser'})
 MERGE (a)-[r:EXECUTED_BY]->(b)
@@ -256,59 +256,59 @@ MERGE (a)-[r:RUNS_AS]->(b)
 
 MATCH (a:SchemaMeta {name: 'ControlMFolder'}), (b:SchemaMeta {name: 'Port'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
-  SET r.vocab_id = 'm3_belongs_to_application', r.role = 'seal_app_ref', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_belongs_to_application', r.role = 'seal_app_ref', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:INVOKES]->(b)
-  SET r.vocab_id = 'm3_invokes', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_invokes', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:INVOKES]->(b)
-  SET r.vocab_id = 'm3_invokes', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_invokes', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Script'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:TRIGGERS]->(b)
-  SET r.vocab_id = 'm3_triggers', r.prov_maps_to = 'prov:wasStartedBy', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_triggers', r.prov_maps_to = 'prov:wasStartedBy', r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:USES_ARTIFACT]->(b)
-  SET r.vocab_id = 'm7_uses_artifact', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_uses_artifact', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'm3_runs_on_agent_host', r.role = 'agent_host', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_runs_on_agent_host', r.role = 'agent_host', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ControlMHostGroup'})
 MERGE (a)-[r:RUNS_ON]->(b)
-  SET r.vocab_id = 'm3_runs_on_host_group', r.role = 'host_group', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_runs_on_host_group', r.role = 'host_group', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMHostGroup'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:CONTAINS_HOST]->(b)
-  SET r.vocab_id = 'm3_host_group_contains_host', r.prov_maps_to = 'prov:hadMember', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_host_group_contains_host', r.prov_maps_to = 'prov:hadMember', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMHostGroup'}), (b:SchemaMeta {name: 'ControlMServer'})
 MERGE (a)-[r:DEFINED_ON]->(b)
-  SET r.vocab_id = 'm3_host_group_defined_on', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_host_group_defined_on', r.prov_maps_to = null, r.domain = 'scheduler', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:READS_FROM]->(b)
-  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:READS_FROM]->(b)
-  SET r.vocab_id = 'm3_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_reads_from', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ETLProcess'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:WRITES_TO]->(b)
-  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'DataAsset'})
 MERGE (a)-[r:WRITES_TO]->(b)
-  SET r.vocab_id = 'm3_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'scheduler', r.status = 'active';
+  SET r.vocab_id = 'scheduler_writes_to', r.prov_maps_to = 'prov:generated', r.domain = 'scheduler', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:DELEGATES_TO]->(b)
-  SET r.vocab_id = 'm3_delegates_to', r.prov_maps_to = 'prov:actedOnBehalfOf', r.domain = 'scheduler', r.status = 'planned';
+  SET r.vocab_id = 'scheduler_delegates_to', r.prov_maps_to = 'prov:actedOnBehalfOf', r.domain = 'scheduler', r.status = 'planned';
 
 // ── domain: business_application ────────────────────────────────────────────
 
@@ -470,31 +470,31 @@ MERGE (a)-[r:CONTAINS_SERVICE]->(b)
 
 MATCH (a:SchemaMeta {name: 'Project'}), (b:SchemaMeta {name: 'CodeModule'})
 MERGE (a)-[r:HAS_MODULE]->(b)
-  SET r.vocab_id = 'u1_has_module', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_has_module', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CodeModule'})
 MERGE (a)-[r:IMPORTS]->(a)
-  SET r.vocab_id = 'u1_imports', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_imports', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CodeDirectory'}), (b:SchemaMeta {name: 'CodeModule'})
 MERGE (a)-[r:CONTAINS_ENTRY]->(b)
-  SET r.vocab_id = 'u2_contains_entry', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_contains_entry', r.prov_maps_to = 'prov:hadMember', r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'MediaType'})
 MERGE (a)-[r:HAS_MEDIA_TYPE]->(b)
-  SET r.vocab_id = 'u2_has_media_type', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_has_media_type', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CodeModule'}), (b:SchemaMeta {name: 'SwoClass'})
 MERGE (a)-[r:IS_ENCODED_IN]->(b)
-  SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Script'}), (b:SchemaMeta {name: 'SwoClass'})
 MERGE (a)-[r:IS_ENCODED_IN]->(b)
-  SET r.vocab_id = 'u1_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_is_encoded_in', r.prov_maps_to = null, r.domain = 'architecture', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'SourceOccurrence'}), (b:SchemaMeta {name: 'Script'})
 MERGE (a)-[r:OCCURRENCE_OF]->(b)
-  SET r.vocab_id = 'g22_occurrence_of', r.prov_maps_to = 'prov:specializationOf', r.domain = 'architecture', r.status = 'active';
+  SET r.vocab_id = 'arch_occurrence_of', r.prov_maps_to = 'prov:specializationOf', r.domain = 'architecture', r.status = 'active';
 
 // ── domain: registry ────────────────────────────────────────────────────────
 
@@ -574,56 +574,56 @@ MERGE (a)-[r:CONCERNS]->(b)
 
 // ── domain: all ─────────────────────────────────────────────────────────────
 
-// prov_was_generated_by: from_node "*" — representative exemplar edges;
+// all_was_generated_by: from_node "*" — representative exemplar edges;
 // in the real graph this edge exists on every node label.
 
 MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'JobRun'})
 MERGE (a)-[r:WAS_GENERATED_BY]->(b)
-  SET r.vocab_id = 'prov_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
+  SET r.vocab_id = 'all_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'JobRun'})
 MERGE (a)-[r:WAS_GENERATED_BY]->(b)
-  SET r.vocab_id = 'prov_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
+  SET r.vocab_id = 'all_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'CatalogLOB'}), (b:SchemaMeta {name: 'JobRun'})
 MERGE (a)-[r:WAS_GENERATED_BY]->(b)
-  SET r.vocab_id = 'prov_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
+  SET r.vocab_id = 'all_was_generated_by', r.prov_maps_to = 'prov:wasGeneratedBy', r.domain = 'all', r.status = 'active';
 
 // ── domain: context ─────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'Observation'}), (b:SchemaMeta {name: 'ControlMJob'})
 MERGE (a)-[r:OBSERVES]->(b)
-  SET r.vocab_id = 'sosa_observes', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:hasFeatureOfInterest', r.domain = 'context', r.status = 'planned';
+  SET r.vocab_id = 'context_observes', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:hasFeatureOfInterest', r.domain = 'context', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Observation'}), (b:SchemaMeta {name: 'Result'})
 MERGE (a)-[r:HAS_RESULT]->(b)
-  SET r.vocab_id = 'sosa_has_result', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:hasResult', r.domain = 'context', r.status = 'planned';
+  SET r.vocab_id = 'context_has_result', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:hasResult', r.domain = 'context', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Observation'}), (b:SchemaMeta {name: 'Sensor'})
 MERGE (a)-[r:MADE_BY_SENSOR]->(b)
-  SET r.vocab_id = 'sosa_made_by_sensor', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:madeBySensor', r.domain = 'context', r.status = 'planned';
+  SET r.vocab_id = 'context_made_by_sensor', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:madeBySensor', r.domain = 'context', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Observation'}), (b:SchemaMeta {name: 'ObservableProperty'})
 MERGE (a)-[r:OF_OBSERVABLE_PROPERTY]->(b)
-  SET r.vocab_id = 'sosa_observed_property', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:observedProperty', r.domain = 'context', r.status = 'planned';
+  SET r.vocab_id = 'context_observed_property', r.prov_maps_to = null, r.sosa_maps_to = 'sosa:observedProperty', r.domain = 'context', r.status = 'planned';
 
 // ── domain: quality ─────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'Metric'}), (b:SchemaMeta {name: 'Dimension'})
 MERGE (a)-[r:IN_DIMENSION]->(b)
-  SET r.vocab_id = 'c23_in_dimension', r.prov_maps_to = null, r.domain = 'quality', r.status = 'active';
+  SET r.vocab_id = 'quality_in_dimension', r.prov_maps_to = null, r.domain = 'quality', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'QualityMeasurement'}), (b:SchemaMeta {name: 'Metric'})
 MERGE (a)-[r:IS_MEASUREMENT_OF]->(b)
-  SET r.vocab_id = 'c23_is_measurement_of', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
+  SET r.vocab_id = 'quality_is_measurement_of', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'QualityMeasurement'}), (b:SchemaMeta {name: 'Dataset'})
 MERGE (a)-[r:COMPUTED_ON]->(b)
-  SET r.vocab_id = 'c23_computed_on', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
+  SET r.vocab_id = 'quality_computed_on', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'Dataset'}), (b:SchemaMeta {name: 'QualityMeasurement'})
 MERGE (a)-[r:HAS_QUALITY]->(b)
-  SET r.vocab_id = 'c23_has_quality', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
+  SET r.vocab_id = 'quality_has_quality', r.prov_maps_to = null, r.domain = 'quality', r.status = 'planned';
 
 // ── domain: corporate ───────────────────────────────────────────────────────
 

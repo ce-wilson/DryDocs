@@ -141,7 +141,7 @@ MERGE (n:OntologyTerm:SwoProperty {iri:"http://www.ebi.ac.uk/swo/SWO_0000150"}) 
 
 
 // ----- Media-type terms (file-format layer; SME ruling 2026-08-05) ----------
-//   Consumer: the code-snapshot loader's HAS_MEDIA_TYPE edge (u2_has_media_type)
+//   Consumer: the code-snapshot loader's HAS_MEDIA_TYPE edge (arch_has_media_type)
 //   — non-.py files in the all-files tree snapshot get a FORMAT binding the way
 //   .py gets a LANGUAGE binding (IS_ENCODED_IN). Two provenance tiers, split by
 //   `registered`:
@@ -242,8 +242,8 @@ MERGE (jpmc)-[r:HAS_BUSINESS_SEGMENT_HISTORICAL]->(s)
 // REVIVAL TRIGGER: the first measurement feed — expected to be the
 // temporal-runtime freshness observations (cm_avg_run / freshness_sla), whose
 // vocabulary notes already reference dqv:QualityMeasurement. When that feed
-// lands, groom the writer items and flip c23_is_measurement_of /
-// c23_computed_on / c23_has_quality from planned. All four DQV edges are
+// lands, groom the writer items and flip quality_is_measurement_of /
+// quality_computed_on / quality_has_quality from planned. All four DQV edges are
 // registered in relationship_vocabulary.yaml (c23_* ids); IN_DIMENSION below
 // is active — it is written right here at bootstrap.
 MERGE (d:Dimension {name:"Completeness"}) SET d.description = "Whether all required data is present.";

@@ -11,11 +11,11 @@
 //     the graph hangs off :Project — it is the "is this our own code?" anchor.
 //   * CodeModule (prov:Entity) — one source FILE, keyed on file_id
 //     (repo-relative path; §C1(a)/§C2). abs_path is DROPPED upstream (§H4).
-//   * HAS_MODULE = prov:hadMember (u1_has_module) — single root to ALL modules.
-//   * IMPORTS (u1_imports) — importer -> imported. §D2 accepted limit: cannot
+//   * HAS_MODULE = prov:hadMember (arch_has_module) — single root to ALL modules.
+//   * IMPORTS (arch_imports) — importer -> imported. §D2 accepted limit: cannot
 //     distinguish `import x` / `from x import y` / TYPE_CHECKING-only. Do NOT
 //     read an IMPORTS edge as "breaks if removed".
-//   * IS_ENCODED_IN (u1_is_encoded_in) — FIRST USE of the SWO layer: targets
+//   * IS_ENCODED_IN (arch_is_encoded_in) — FIRST USE of the SWO layer: targets
 //     the ALREADY-SEEDED SwoClass term (§E1(b)); row.language_iri is derived
 //     from node.extension by the adapter, null = no seeded term, edge skipped.
 //     MATCH-only on the term: run `drydocs bootstrap` (ontology.cypher) first.
@@ -63,7 +63,7 @@ SET m.project      = row.project,
     m.last_seen_at = datetime($loaded_at),
     m.last_run_id  = $run_id
 
-// Containment (u1_has_module, prov:hadMember).
+// Containment (arch_has_module, prov:hadMember).
 MERGE (p)-[hm:HAS_MODULE]->(m)
   ON CREATE SET hm.first_seen_at = datetime($loaded_at),
                 hm.source        = 'depgraph-snapshot',
@@ -71,7 +71,7 @@ MERGE (p)-[hm:HAS_MODULE]->(m)
 SET hm.last_seen_at = datetime($loaded_at),
     hm.last_run_id  = $run_id
 
-// SWO language binding (u1_is_encoded_in) — only when the adapter mapped the
+// SWO language binding (arch_is_encoded_in) — only when the adapter mapped the
 // extension to a seeded term. OPTIONAL MATCH + FOREACH because the term may
 // legitimately be absent per row (null iri), but a MAPPED term missing from
 // the graph means bootstrap has not run — m1-verify catches that as a count
@@ -87,7 +87,7 @@ FOREACH (l IN CASE WHEN lang IS NULL THEN [] ELSE [lang] END |
       enc.last_run_id  = $run_id
 )
 
-// Media-type binding (u2_has_media_type; SME ruling 2026-08-05) — same shape
+// Media-type binding (arch_has_media_type; SME ruling 2026-08-05) — same shape
 // as IS_ENCODED_IN: the adapter derives row.media_type_iri from the extension
 // (case-folded), null = no seeded term, edge skipped. Targets the seeded
 // :MediaType terms (ontology.cypher) — a mapped term missing from the graph
@@ -103,7 +103,7 @@ FOREACH (f IN CASE WHEN fmt IS NULL THEN [] ELSE [fmt] END |
       hmt.last_run_id  = $run_id
 )
 
-// Dependencies (u1_imports) — importer -> imported (§D1). Rows with no
+// Dependencies (arch_imports) — importer -> imported (§D1). Rows with no
 // imports are eliminated by the UNWIND here, which is safe: this is the last
 // clause chain and their node/containment writes above already happened.
 WITH row, m

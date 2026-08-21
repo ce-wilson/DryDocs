@@ -56,7 +56,7 @@ folder-to-application relation runs through a platform code, so there is no
 pending source fix to wait for and no corrected-in-source lifecycle (hence
 no `status` column). Rows still never write the graph directly; the K8
 loader is the only graph writer (§E3), fanning each code-level row out to
-its folders via `m3_contains_folder` (§B1) as
+its folders via `scheduler_contains_folder` (§B1) as
 `(:ControlMFolder)-[:BELONGS_TO_APPLICATION {role: seal_app_ref}]->(:Port)`.
 
 | column | required | meaning |

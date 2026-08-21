@@ -15,8 +15,8 @@ Pins, in ruling order:
 - **§D3:** only a qualified rua_fqdn resolves against ExecutionHost.nodeid;
   everything else is counted unresolvable, never prefix-matched.
 - **Refusals:** the same trust-boundary and gate-bound-vocabulary contracts as
-  write_curated, on the rua load's own labels (g22_occurrence_of /
-  u1_is_encoded_in) — checked against the REAL registry, where both are
+  write_curated, on the rua load's own labels (arch_occurrence_of /
+  arch_is_encoded_in) — checked against the REAL registry, where both are
   active since G23.
 - **Coverage:** the G20/G21/G24 counters ride the load report verbatim.
 
@@ -221,11 +221,11 @@ def test_plan_covers_the_ruled_node_set(tmp_path: Path) -> None:
     occ = next(c for c in cyphers if "MERGE (o:SourceOccurrence" in c)
     assert "MERGE (o:SourceOccurrence {occurrenceId: row.occurrence_id})" in occ
     assert "MERGE (o)-[r:OCCURRENCE_OF]->(s)" in occ
-    assert "r.vocab_id      = 'g22_occurrence_of'" in occ
+    assert "r.vocab_id      = 'arch_occurrence_of'" in occ
     assert "MATCH (s:Script {path: row.script_path})" in occ  # scripts are MERGEd first
     enc = next(c for c in cyphers if "IS_ENCODED_IN" in c)
     assert "OPTIONAL MATCH (lang:OntologyTerm:SwoClass {iri: row.language_iri})" in enc
-    assert "enc.vocab_id      = 'u1_is_encoded_in'" in enc
+    assert "enc.vocab_id      = 'arch_is_encoded_in'" in enc
 
     script_rows = next(p for c, p in plan.statements if "MERGE (s:Script" in c)["rows"]
     profile_row = next(r for r in script_rows if r["path"] == f"/home/{USER}/.profile")
@@ -371,20 +371,20 @@ def test_gate_bound_on_a_planned_registry(tmp_path: Path) -> None:
     exactly as for write_curated."""
     registry = tmp_path / "vocab.yaml"
     registry.write_text(
-        "  - id:           g22_occurrence_of\n"
+        "  - id:           arch_occurrence_of\n"
         "    status:       planned\n"
-        "  - id:           u1_is_encoded_in\n"
+        "  - id:           arch_is_encoded_in\n"
         "    status:       active\n",
         encoding="utf-8",
     )
     g = LineageGraph()
     RuaInventoryExtractor().extract(_write_bundle(tmp_path), g)
-    with pytest.raises(GateBoundVocabularyError, match="g22_occurrence_of"):
+    with pytest.raises(GateBoundVocabularyError, match="arch_occurrence_of"):
         write_rua(g, _FakeClient(), registry=registry)
 
 
 def test_live_load_executes_against_the_real_registry(tmp_path: Path) -> None:
-    """g22_occurrence_of and u1_is_encoded_in are both status: active in the
+    """arch_occurrence_of and arch_is_encoded_in are both status: active in the
     real registry since G23 — the live load proceeds and the report carries
     the write counts plus the passed-through extractor coverage."""
     g = LineageGraph()

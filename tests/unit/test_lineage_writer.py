@@ -11,9 +11,9 @@ Pins, in order of importance:
    database name that no longer exists and would not have caught a constant
    naming the real one. Same class of bug as the one it guards against.
 2. **Gate-bound vocabulary:** GATE STATE CHANGED AT G55 (rua-load-shapes §J,
-   SIGNED OFF 2026-08-07, 28/28): m3_invokes / m3_reads_from / m3_writes_to
+   SIGNED OFF 2026-08-07, 28/28): scheduler_invokes / scheduler_reads_from / scheduler_writes_to
    are ``status: active`` in the real registry, so a live load of those labels
-   proceeds; m3_triggers stays ``planned`` and still raises
+   proceeds; scheduler_triggers stays ``planned`` and still raises
    GateBoundVocabularyError — the gate check is per-label, and the terminus
    retires per-label as gates activate, never wholesale.
 3. **Curated-only + identity:** confirmed rels must exist in the graph;
@@ -78,13 +78,13 @@ class _FakeClient:
 
 
 ACTIVE_REGISTRY = """\
-  - id:           m3_invokes
+  - id:           scheduler_invokes
     status:       active
-  - id:           m3_triggers
+  - id:           scheduler_triggers
     status:       active
-  - id:           m3_reads_from
+  - id:           scheduler_reads_from
     status:       active
-  - id:           m3_writes_to
+  - id:           scheduler_writes_to
     status:       active
 """
 
@@ -141,7 +141,7 @@ def test_trust_boundary_refuses_other_databases() -> None:
 
 def test_live_load_executes_for_the_gate_activated_labels() -> None:
     """THE gate, INVERTED DELIBERATELY at G55 (gate rua-load-shapes §J, SIGNED
-    OFF 2026-08-07, 28/28): m3_invokes / m3_reads_from / m3_writes_to went
+    OFF 2026-08-07, 28/28): scheduler_invokes / scheduler_reads_from / scheduler_writes_to went
     planned → active, so the raises-check this test carried since the
     vocabulary was declared flips to the execution contract — updated
     deliberately, not silently, exactly as its old docstring promised. The
@@ -153,7 +153,7 @@ def test_live_load_executes_for_the_gate_activated_labels() -> None:
 
 
 def test_live_load_still_gate_bound_on_the_planned_label() -> None:
-    """m3_triggers was NOT among the six G22 activation candidates and stays
+    """scheduler_triggers was NOT among the six G22 activation candidates and stays
     status: planned — a plan carrying TRIGGERS still refuses against the real
     registry. The raises-check terminus retires per-label as gates activate,
     never wholesale."""
@@ -172,13 +172,20 @@ def test_live_load_still_gate_bound_on_the_planned_label() -> None:
         )
     )
     g.add_rel(sid, "TRIGGERS", did)
-    with pytest.raises(GateBoundVocabularyError, match="m3_triggers"):
+    with pytest.raises(GateBoundVocabularyError, match="scheduler_triggers"):
         write_curated(g, set(g.rels), client=_FakeClient())
 
 
 def test_real_registry_statuses_are_readable() -> None:
-    statuses = vocabulary_status({"m3_invokes", "m3_triggers", "m3_reads_from", "m3_writes_to"})
-    assert set(statuses) == {"m3_invokes", "m3_triggers", "m3_reads_from", "m3_writes_to"}
+    statuses = vocabulary_status(
+        {"scheduler_invokes", "scheduler_triggers", "scheduler_reads_from", "scheduler_writes_to"}
+    )
+    assert set(statuses) == {
+        "scheduler_invokes",
+        "scheduler_triggers",
+        "scheduler_reads_from",
+        "scheduler_writes_to",
+    }
     assert set(statuses.values()) <= {"planned", "active", "deprecated", "removed"}
 
 
@@ -233,7 +240,7 @@ def test_plan_mechanics_constraint_on_key_merge_unwind() -> None:
     # job endpoints are MATCHed on the NODE KEY — the M3 load owns those nodes
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in rel
     assert "MERGE (src:ControlMJob" not in rel
-    assert "r.vocab_id      = 'm3_invokes'" in rel
+    assert "r.vocab_id      = 'scheduler_invokes'" in rel
     assert "CYPHER 25" not in " ".join(cyphers)
     # the fixture's composite keys ride the rows
     rel_rows = next(
@@ -285,7 +292,7 @@ def test_abinitio_invocation_maps_to_etlprocess_not_script() -> None:
     )
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in rel
     assert "MATCH (dst:ETLProcess {token: row.dst_key})" in rel
-    assert "r.vocab_id      = 'm3_invokes'" in rel
+    assert "r.vocab_id      = 'scheduler_invokes'" in rel
 
 
 def test_triggers_targets_dpl_pipeline_as_etlprocess_with_properties() -> None:
@@ -335,14 +342,14 @@ def test_triggers_targets_dpl_pipeline_as_etlprocess_with_properties() -> None:
     trig = next(c for c, _ in plan.statements if "MERGE (src)-[r:TRIGGERS]->(dst)" in c)
     assert "MATCH (src:Script {path: row.src_key})" in trig
     assert "MATCH (dst:ETLProcess {token: row.dst_key})" in trig
-    assert "r.vocab_id      = 'm3_triggers'" in trig
+    assert "r.vocab_id      = 'scheduler_triggers'" in trig
 
 
 # --- 6. file-ops endpoint resolution (G13) ---------------------------------------------
 
 
 def test_file_ops_reads_from_script_resolves_to_owning_job() -> None:
-    """Gate-log 2026-07-15 EDIT: m3_reads_from's from_node is "ETLProcess |
+    """Gate-log 2026-07-15 EDIT: scheduler_reads_from's from_node is "ETLProcess |
     ControlMJob", never Script (a prov:Entity cannot carry prov:used). A
     script-level READS_FROM candidate must plan as the OWNING job reading the
     asset, resolved via the script's INVOKES edge — even though that INVOKES
@@ -380,7 +387,7 @@ def test_file_ops_reads_from_script_resolves_to_owning_job() -> None:
     rel = next(c for c in cyphers if "MERGE (src)-[r:READS_FROM]->(dst)" in c)
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in rel
     assert "MATCH (dst:DataAsset {assetId: row.dst_key})" in rel
-    assert "r.vocab_id      = 'm3_reads_from'" in rel
+    assert "r.vocab_id      = 'scheduler_reads_from'" in rel
 
     rows = next(p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c)["rows"]
     assert rows == [
@@ -418,7 +425,7 @@ def test_file_ops_etl_case_src_stays_etlprocess() -> None:
     write_rel = next(c for c in cyphers if "MERGE (src)-[r:WRITES_TO]->(dst)" in c)
     assert "MATCH (src:ETLProcess {token: row.src_key})" in write_rel
     assert "MATCH (dst:DataAsset {assetId: row.dst_key})" in write_rel
-    assert "r.vocab_id      = 'm3_writes_to'" in write_rel
+    assert "r.vocab_id      = 'scheduler_writes_to'" in write_rel
 
 
 def test_file_ops_script_invoked_by_multiple_jobs_fans_out() -> None:
@@ -523,7 +530,7 @@ def test_cmdline_file_op_feed_plans_job_to_asset_edges(tmp_path: Path) -> None:
     edges in plan_curated output. The extractor's file-ops feed arrives with
     the job itself as the Activity (the gate EDIT's file-ops case — no Script
     hop), so G13's resolution passes it straight through to the ControlMJob
-    MATCH shape; refusal semantics stay untouched (m3_reads_from/m3_writes_to
+    MATCH shape; refusal semantics stay untouched (scheduler_reads_from/scheduler_writes_to
     remain planned — this is plan material, not a write)."""
     csv_path = tmp_path / "jobs.csv"
     csv_path.write_text(
@@ -545,7 +552,7 @@ def test_cmdline_file_op_feed_plans_job_to_asset_edges(tmp_path: Path) -> None:
     reads = next(c for c in cyphers if "MERGE (src)-[r:READS_FROM]->(dst)" in c)
     assert "MATCH (src:ControlMJob {folder_id: row.src_folder_id, job_id: row.src_job_id})" in reads
     assert "MATCH (dst:DataAsset {assetId: row.dst_key})" in reads
-    assert "r.vocab_id      = 'm3_reads_from'" in reads
+    assert "r.vocab_id      = 'scheduler_reads_from'" in reads
     rows = next(p for c, p in plan.statements if "MERGE (src)-[r:READS_FROM]->(dst)" in c)["rows"]
     assert rows == [
         {
@@ -555,7 +562,7 @@ def test_cmdline_file_op_feed_plans_job_to_asset_edges(tmp_path: Path) -> None:
         }
     ]
     writes = next(c for c in cyphers if "MERGE (src)-[r:WRITES_TO]->(dst)" in c)
-    assert "r.vocab_id      = 'm3_writes_to'" in writes
+    assert "r.vocab_id      = 'scheduler_writes_to'" in writes
 
 
 def test_unresolved_file_op_candidates_mirrors_the_plan_drop() -> None:

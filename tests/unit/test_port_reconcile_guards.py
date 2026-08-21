@@ -104,8 +104,35 @@ def status_downgrades(
         if merged is None:
             violations.append(f"{k}: entry DROPPED by the merge (was {status!r})")
         elif merged.get(status_field) in downgrade_map.get(status, set()):
+            if gate_authorized_deprecation(merged, after_by, status_field=status_field):
+                continue
             violations.append(f"{k}: status downgraded {status!r} -> {merged.get(status_field)!r}")
     return violations
+
+
+def gate_authorized_deprecation(
+    merged: Mapping[str, Any],
+    after_by: Mapping[str, Mapping[str, Any]],
+    *,
+    status_field: str = "status",
+) -> bool:
+    """The PORT-MANIFEST vocabulary entry_rule's own exception, as code (G87, 2026-08-21):
+    ``active -> deprecated`` is NOT a downgrade when the merged entry is a gate-authorized
+    deprecation — ``deprecated_at`` + a ``deprecation_note`` (the gate cite). For an ID
+    MIGRATION (add-new + deprecate-old, gate vocabulary-domains-and-id-policy §B3) the entry
+    also names ``superseded_by``, and the successor must be present and not itself
+    deprecated/removed: the concept stays live under the new id, so nothing regressed.
+    Until G87 the rule lived only in the manifest prose, and every gate-ruled deprecation
+    the company ported had to be ratified by hand against a red guard."""
+    if merged.get(status_field) != "deprecated":
+        return False
+    if not (merged.get("deprecated_at") and merged.get("deprecation_note")):
+        return False
+    successor = merged.get("superseded_by")
+    if successor is None:
+        return True
+    live = after_by.get(successor)
+    return live is not None and live.get(status_field) not in {"deprecated", "removed"}
 
 
 def append_only_violation(before_text: str, after_text: str) -> str | None:
@@ -148,6 +175,40 @@ def test_vocab_active_downgrade_fails() -> None:
     ]
     violations = status_downgrades(_VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES)
     assert violations == ["m3_active_edge: status downgraded 'active' -> 'planned'"]
+
+
+def test_vocab_gate_authorized_deprecation_passes() -> None:
+    """G87: an id migration deprecates the old entry (deprecated_at + note +
+    superseded_by -> a live successor) — the manifest's exception, not a downgrade."""
+    after = [
+        {
+            "id": "m3_active_edge",
+            "status": "deprecated",
+            "deprecated_at": "2026-08-21",
+            "deprecation_note": "ID MIGRATION ONLY (G87)",
+            "superseded_by": "scheduler_active_edge",
+        },
+        {"id": "scheduler_active_edge", "status": "active"},
+        {"id": "m3_planned_edge", "status": "planned"},
+    ]
+    assert status_downgrades(_VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES) == []
+    # a bare status flip with no gate cite is still the clobber the rule exists for
+    after[0] = {"id": "m3_active_edge", "status": "deprecated"}
+    assert status_downgrades(_VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES) == [
+        "m3_active_edge: status downgraded 'active' -> 'deprecated'"
+    ]
+    # a successor that is itself deprecated does not carry the concept forward
+    after[0] = {
+        "id": "m3_active_edge",
+        "status": "deprecated",
+        "deprecated_at": "2026-08-21",
+        "deprecation_note": "x",
+        "superseded_by": "m3_planned_edge",
+    }
+    after[2] = {"id": "m3_planned_edge", "status": "deprecated"}
+    assert (
+        len(status_downgrades(_VOCAB_BEFORE, after, key="id", downgrade_map=VOCAB_DOWNGRADES)) == 1
+    )
 
 
 def test_vocab_upgrade_and_new_entries_pass() -> None:

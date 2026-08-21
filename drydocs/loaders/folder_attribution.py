@@ -8,7 +8,7 @@ Gate seal-app-ref-edge-reshape (SIGNED OFF 2026-08-03, config/gate-log.md):
        per-job application edge is authored.
 - §B1  ONE authoring mechanism: a steward-defined row per Control-M app code
        (drydocs_core.mapping_store, K9); this loader fans a code-level row
-       out over m3_contains_folder. A per-folder row (folder_id set) narrows
+       out over scheduler_contains_folder. A per-folder row (folder_id set) narrows
        to one folder — the tier-2 platform resolution path.
 - §B2  Tiers seal-born | platform | dual-coded ride the row; a code-level
        PLATFORM declaration row (empty app_id) attributes nothing itself —

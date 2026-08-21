@@ -20,6 +20,36 @@
     supplement:   sosa_experimental_supplement.cypher
     loader:       ~
     domain:       context
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: context_observes
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `context_observes` below — same shape, same planned status.
+
+  - id:           context_observes
+    neo4j_label:  OBSERVES
+    inverse_label: "observed by"
+    role:         ~
+    from_node:    Observation
+    to_node:      ControlMJob          # or ControlMFolder — both can act as sosa:FeatureOfInterest
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:hasFeatureOfInterest"
+    note: >
+      EXPERIMENTAL. Observation is about a feature of interest (the job/folder).
+      Open gate decision: is ControlMJobRun itself the Observation, or a separate
+      Observation node? See config/taxonomy-ontology-map.yaml `jobrun-observation`.
+      REPLACES sosa_observes at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
     status:       planned
 
   - id:           sosa_has_result
@@ -33,6 +63,35 @@
     note: >
       EXPERIMENTAL. Observation produced a result; the result carries resultTime
       (xsd:dateTime) and may carry a dqv:QualityMeasurement (freshness_sla etc.).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: context_has_result
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `context_has_result` below — same shape, same planned status.
+
+  - id:           context_has_result
+    neo4j_label:  HAS_RESULT
+    inverse_label: "result of"
+    role:         ~
+    from_node:    Observation
+    to_node:      Result
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:hasResult"
+    note: >
+      EXPERIMENTAL. Observation produced a result; the result carries resultTime
+      (xsd:dateTime) and may carry a dqv:QualityMeasurement (freshness_sla etc.).
+      REPLACES sosa_has_result at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   sosa_experimental_supplement.cypher
     loader:       ~
     domain:       context
@@ -52,6 +111,35 @@
     supplement:   sosa_experimental_supplement.cypher
     loader:       ~
     domain:       context
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: context_made_by_sensor
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `context_made_by_sensor` below — same shape, same planned status.
+
+  - id:           context_made_by_sensor
+    neo4j_label:  MADE_BY_SENSOR
+    inverse_label: "made"
+    role:         ~
+    from_node:    Observation
+    to_node:      Sensor
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:madeBySensor"
+    note: >
+      EXPERIMENTAL. Observation was made by a monitoring source (Control-M
+      history API / health probe).
+      REPLACES sosa_made_by_sensor at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
     status:       planned
 
   - id:           sosa_observed_property
@@ -65,6 +153,35 @@
     note: >
       EXPERIMENTAL. Observation targets an observable property (run-status,
       run-duration, exit-status, freshness).
+    supplement:   sosa_experimental_supplement.cypher
+    loader:       ~
+    domain:       context
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: context_observed_property
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `context_observed_property` below — same shape, same planned status.
+
+  - id:           context_observed_property
+    neo4j_label:  OF_OBSERVABLE_PROPERTY
+    inverse_label: "observed in"
+    role:         ~
+    from_node:    Observation
+    to_node:      ObservableProperty
+    prov_maps_to: ~
+    sosa_maps_to: "sosa:observedProperty"
+    note: >
+      EXPERIMENTAL. Observation targets an observable property (run-status,
+      run-duration, exit-status, freshness).
+      REPLACES sosa_observed_property at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   sosa_experimental_supplement.cypher
     loader:       ~
     domain:       context

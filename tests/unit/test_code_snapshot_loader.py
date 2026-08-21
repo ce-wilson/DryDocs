@@ -317,7 +317,7 @@ def test_ksh_binds_to_the_same_shell_term_as_sh() -> None:
     not a separate language.
 
     Stated as an equality rather than a literal IRI so the two can never drift
-    apart in a later edit. It matters because the signed m3_triggers note names
+    apart in a later edit. It matters because the signed scheduler_triggers note names
     the .ksh wrapper as the common case in this estate, so an unbound .ksh means
     the most frequent extension is the one that stays merely CLI-reported.
     """

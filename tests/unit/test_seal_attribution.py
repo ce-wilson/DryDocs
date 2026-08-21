@@ -248,7 +248,7 @@ def test_job_grain_vocab_entry_is_deprecated_with_no_loader() -> None:
     assert entry["status"] == "deprecated"
     assert entry["loader"] is None
     assert entry["supplement"] is None
-    assert "m3_belongs_to_application" in entry["note"]
+    assert "m3_belongs_to_application" in entry["note"]  # the K8-era note is history; G87 left it
 
 
 def test_retired_job_grain_writer_files_are_gone() -> None:

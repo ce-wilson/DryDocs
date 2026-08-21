@@ -30,8 +30,8 @@ Refusals (each is a contract, not a warning):
   load raises :class:`GateBoundVocabularyError` for any label not ``active``
   in ``relationship_vocabulary.yaml``. The gate cannot be reasoned around in
   code — it is a registry read, PER LABEL: gate rua-load-shapes (SIGNED OFF
-  2026-08-07, applied at G55) activated m3_invokes / m7_uses_artifact /
-  m3_reads_from / m3_writes_to, while m3_triggers stays planned and still
+  2026-08-07, applied at G55) activated scheduler_invokes / scheduler_uses_artifact /
+  scheduler_reads_from / scheduler_writes_to, while scheduler_triggers stays planned and still
   refuses.
 
 Node mechanics: ControlMJob endpoints are **MATCHed, never MERGEd** — the M3
@@ -46,7 +46,7 @@ properties, never identity; ``DataAsset.assetId`` — the D1 proxy URN,
 first (constraint-on-key rule).
 
 File-ops endpoint resolution (G13; gate-log 2026-07-15 "reads/writes shapes
-EDITED"): ``m3_reads_from`` / ``m3_writes_to`` from_node is ``ETLProcess |
+EDITED"): ``scheduler_reads_from`` / ``scheduler_writes_to`` from_node is ``ETLProcess |
 ControlMJob`` — never ``Script``, because :Script is a prov:Entity and cannot
 carry prov:used/generated. The ETL case (an ``_ETL_PROCESS_KINDS`` src) keeps
 its ETLProcess Activity as-is. The file-ops case (a plain wrapper script doing
@@ -349,7 +349,7 @@ def _resolve_file_ops(
         if _endpoint_class(graph, dst) != "asset":
             raise ValueError(
                 f"{rel_type} dst {dst!r} is not a DataAsset — the gate-log "
-                "2026-07-15 EDIT unifies m3_reads_from/m3_writes_to to_node "
+                "2026-07-15 EDIT unifies scheduler_reads_from/scheduler_writes_to to_node "
                 "on DataAsset for both the ETL and file-ops cases"
             )
         if _endpoint_class(graph, src) != "script":
@@ -542,7 +542,7 @@ def write_curated(
 #   planned and BUILD-BLOCKED on K17 — no :AppUser is minted or matched here.
 # - :SourceOccurrence per staged observation (§D2's reified grain), MERGEd on
 #   a deterministic occurrenceId (urn + origin + locator), each anchored
-#   (:SourceOccurrence)-[:OCCURRENCE_OF]->(:Script) — g22_occurrence_of, the
+#   (:SourceOccurrence)-[:OCCURRENCE_OF]->(:Script) — arch_occurrence_of, the
 #   transcribed §D2 prov:specializationOf binding. Server locator = host+path
 #   (host = the §D3-ruled rua_fqdn spelling, falling back to hostname/bundle
 #   for the ID only — resolution never uses the fallback); repo locator =
@@ -557,7 +557,7 @@ def write_curated(
 #   minted: a mapped term missing from the graph means bootstrap has not run).
 #
 # What does NOT load, because the gate held or declined it: NO :AppUser and no
-# m3_delegates_to (§A1 HELD behind K17); no arch_owns_directory edges (§C1
+# scheduler_delegates_to (§A1 HELD behind K17); no arch_owns_directory edges (§C1
 # planned, K17-blocked); no SOURCES edges (§C2 planned); no ExecutionHost is
 # minted (§D3 — rua mints no second host identity; the loader only RESOLVES
 # rua_fqdn against the deployed executionhost_nodeid key and counts the
@@ -607,7 +607,7 @@ SET o += row.props,
 MERGE (o)-[r:OCCURRENCE_OF]->(s)
   ON CREATE SET r.first_seen_at = datetime($written_at),
                 r.source        = 'drydocs-lineage',
-                r.vocab_id      = 'g22_occurrence_of'
+                r.vocab_id      = 'arch_occurrence_of'
 SET r.last_seen_at = datetime($written_at)
 RETURN count(r) AS written"""
 
@@ -619,7 +619,7 @@ FOREACH (l IN CASE WHEN lang IS NULL THEN [] ELSE [lang] END |
   MERGE (s)-[enc:IS_ENCODED_IN]->(l)
     ON CREATE SET enc.first_seen_at = datetime($written_at),
                   enc.source        = 'drydocs-lineage',
-                  enc.vocab_id      = 'u1_is_encoded_in'
+                  enc.vocab_id      = 'arch_is_encoded_in'
   SET enc.last_seen_at = datetime($written_at)
 )
 RETURN sum(CASE WHEN lang IS NULL THEN 0 ELSE 1 END) AS written"""
@@ -907,7 +907,8 @@ def plan_rua(
 
 #: rel label → vocabulary id for the rua load's own gate check (the curated
 #: CMD_LINE labels have theirs in model.VOCAB_IDS)
-RUA_VOCAB_IDS = {"OCCURRENCE_OF": "g22_occurrence_of", "IS_ENCODED_IN": "u1_is_encoded_in"}
+#: G87 (2026-08-21): g22_/u1_ -> arch_ under the domain-derived id scheme.
+RUA_VOCAB_IDS = {"OCCURRENCE_OF": "arch_occurrence_of", "IS_ENCODED_IN": "arch_is_encoded_in"}
 
 
 def write_rua(

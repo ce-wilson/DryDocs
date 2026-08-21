@@ -20,7 +20,7 @@
 // the CM_HOSTS-vs-CM_DEF_VTAB value-domain verification (probe P3) and the
 // 22-DC-vs-production scope call are still open gate-log residuals — and the
 // folder pass keys ControlMServer on the SHORT form today. The vocabulary
-// term m3_host_group_defined_on stays status: planned until those close.
+// term scheduler_host_group_defined_on stays status: planned until those close.
 //
 // The job wiring — RUNS_ON {role: host_group | agent_host} — is NOT this
 // pass either: it is the derived resolution pass (runs_on_resolution.cypher)
@@ -51,7 +51,7 @@ MERGE (h:ExecutionHost:Agent {nodeid: row.nodeid})
 SET h.last_seen_at = datetime($loaded_at),
     h.last_run_id  = $run_id
 
-// Group membership (prov:hadMember; m3_host_group_contains_host).
+// Group membership (prov:hadMember; scheduler_host_group_contains_host).
 MERGE (g)-[m:CONTAINS_HOST]->(h)
   ON CREATE SET m.first_seen_at = datetime($loaded_at),
                 m.source        = 'psgmgr.CM_HOSTS',

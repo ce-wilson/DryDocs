@@ -5,7 +5,7 @@
 // The containment layer of the code snapshot (SME ruling 2026-08-05, admitting
 // the tree the G33 gate deferred — ":Directory nodes and CONTAINS edges are a
 // gate decision"). Runs AFTER code_snapshot.cypher in load-code-snapshot.
-// Bindings (u2_contains_entry in the relationship vocabulary):
+// Bindings (arch_contains_entry in the relationship vocabulary):
 //   * CodeDirectory (prov:Collection) — one source-tree DIRECTORY, keyed on
 //     file_id (repo-relative path; shares the CodeModule key space — a path
 //     is a dir or a file, never both).

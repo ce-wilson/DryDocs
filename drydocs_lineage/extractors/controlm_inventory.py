@@ -6,7 +6,7 @@ Reads a CSV export of ``psgmgr.CM_DEF_VJOB`` (the projection in the load side's
 job/cmd/node_target/run_as/folder/application. It then parses each CMD_LINE — via the
 SHARED core parser, ``drydocs_core.orchestration.controlm.parse_command`` (the depgraph fork is
 gone; 0002-C §3/G8) — to find the *next lower dependency*, the script/executable the
-job launches, and links it with an ``INVOKES`` rel (m3_invokes, prov:used). Shared
+job launches, and links it with an ``INVOKES`` rel (scheduler_invokes, prov:used). Shared
 scripts invoked from multiple folders collapse to one child node with multiple
 INVOKES — exactly the lineage we want.
 

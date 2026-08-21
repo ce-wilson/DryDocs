@@ -12,7 +12,7 @@ Gate SIGNED OFF 2026-07-09 (config/gate-log.md). Deliberately NOT here:
 
 * DEFINED_ON (group → ControlMServer) — the DC key rule is signed but the
   value-domain verification (probe P3) and the 22-DC-vs-production scope
-  call are open gate-log residuals; ``m3_host_group_defined_on`` stays
+  call are open gate-log residuals; ``scheduler_host_group_defined_on`` stays
   ``status: planned``.
 * RUNS_ON — the NODE_ID resolution is the separate derived pass
   (:mod:`drydocs.loaders.runs_on_resolution`), run after jobs + hosts.

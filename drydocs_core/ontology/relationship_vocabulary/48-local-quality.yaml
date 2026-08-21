@@ -24,6 +24,42 @@
     supplement:   ~
     loader:       ontology.cypher
     domain:       quality
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: quality_in_dimension
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `quality_in_dimension` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'c23_in_dimension'; loaders write
+      'quality_in_dimension' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           quality_in_dimension
+    neo4j_label:  IN_DIMENSION
+    inverse_label: "groups"
+    role:         ~
+    from_node:    Metric
+    to_node:      Dimension
+    prov_maps_to: ~
+    note: >
+      dqv:inDimension. Catalog-internal reference edge: each seeded :Metric
+      (rowcount_match, freshness_sla, ...) belongs to one quality :Dimension
+      (Completeness, Accuracy, Consistency, Timeliness, Integrity). Written at
+      bootstrap by ontology.cypher's DQV-catalog section (TDQ baseline,
+      LoadPlanV2 §11.6); no loader touches it after that. Registered
+      retroactively at C23 — the edge shipped before the vocabulary discipline
+      existed.
+      REPLACES c23_in_dimension at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ~
+    loader:       ontology.cypher
+    domain:       quality
     status:       active
 
   - id:           c23_is_measurement_of
@@ -44,6 +80,39 @@
     supplement:   ~
     loader:       ~
     domain:       quality
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: quality_is_measurement_of
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `quality_is_measurement_of` below — same shape, same planned status.
+
+  - id:           quality_is_measurement_of
+    neo4j_label:  IS_MEASUREMENT_OF
+    inverse_label: "measured by"
+    role:         ~
+    from_node:    QualityMeasurement
+    to_node:      Metric
+    prov_maps_to: ~
+    note: >
+      dqv:isMeasurementOf. A concrete :QualityMeasurement points at the catalog
+      :Metric it instantiates (LoadPlanV2 §4.4). NO WRITER EXISTS — planned
+      until a measurement feed does; first candidate is the temporal-runtime
+      freshness observations (cm_avg_run), whose shipped vocabulary notes
+      already say a Result "may carry a dqv:QualityMeasurement (freshness_sla
+      etc.)". C23 ruling: DEFER, not build — writers with no data source would
+      have nothing to write.
+      REPLACES c23_is_measurement_of at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ~
+    loader:       ~
+    domain:       quality
     status:       planned
 
   - id:           c23_computed_on
@@ -57,6 +126,35 @@
       dqv:computedOn. The measurement names the :Dataset it was computed
       against (LoadPlanV2 §4.4). Planned with the same C23 trigger as
       c23_is_measurement_of.
+    supplement:   ~
+    loader:       ~
+    domain:       quality
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: quality_computed_on
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `quality_computed_on` below — same shape, same planned status.
+
+  - id:           quality_computed_on
+    neo4j_label:  COMPUTED_ON
+    inverse_label: "measured by"
+    role:         ~
+    from_node:    QualityMeasurement
+    to_node:      Dataset
+    prov_maps_to: ~
+    note: >
+      dqv:computedOn. The measurement names the :Dataset it was computed
+      against (LoadPlanV2 §4.4). Planned with the same C23 trigger as
+      c23_is_measurement_of.
+      REPLACES c23_computed_on at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ~
     loader:       ~
     domain:       quality
@@ -74,6 +172,36 @@
       (LoadPlanV2 §4.4: TDQ check produces measurements linked to the Dataset
       via HAS_QUALITY). Planned with the same C23 trigger as
       c23_is_measurement_of.
+    supplement:   ~
+    loader:       ~
+    domain:       quality
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: quality_has_quality
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `quality_has_quality` below — same shape, same planned status.
+
+  - id:           quality_has_quality
+    neo4j_label:  HAS_QUALITY
+    inverse_label: "quality of"
+    role:         ~
+    from_node:    Dataset
+    to_node:      QualityMeasurement
+    prov_maps_to: ~
+    note: >
+      dqv:hasQualityMeasurement. The dataset-side handle onto its measurements
+      (LoadPlanV2 §4.4: TDQ check produces measurements linked to the Dataset
+      via HAS_QUALITY). Planned with the same C23 trigger as
+      c23_is_measurement_of.
+      REPLACES c23_has_quality at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ~
     loader:       ~
     domain:       quality

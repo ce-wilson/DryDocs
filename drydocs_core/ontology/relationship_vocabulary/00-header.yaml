@@ -42,13 +42,21 @@
 #                 domain-derived prefix (scheduler_*, business_application_*,
 #                 human_*, catalog_*, arch_*, reg_*, docs_*/doc_*) — gate
 #                 vocabulary-domains-and-id-policy §B1, 2026-08-12. Status is
-#                 NEVER encoded in an id (§B2). Existing epoch-tag ids (m3_,
-#                 p2_, m7_, u1_/u2_, g22_, c23_, prov_, sosa_) stay valid;
-#                 their forced migration (add-new + deprecate-old) is a
-#                 groomed tech-debt item (§B3) — never rename an id in place,
-#                 it is the join key across the taxonomy-ontology-map, the
-#                 generated schema_graph.cypher, the SQLite mirror, and the
-#                 append-only gate log.
+#                 NEVER encoded in an id (§B2). The epoch-tag ids (m3_, p2_,
+#                 m7_, u1_/u2_, g22_, c23_, prov_, sosa_) were force-migrated
+#                 at G87 (2026-08-21, §B3) as add-new + deprecate-old pairs —
+#                 the prefix is mechanically the entry's `domain:` field
+#                 (architecture keeps its established arch_ spelling). The old
+#                 entries remain as deprecated audit rows carrying
+#                 deprecated_at + deprecation_note + superseded_by; never
+#                 rename an id in place — it is the join key across the
+#                 taxonomy-ontology-map, the generated schema_graph.cypher,
+#                 the SQLite mirror, and the append-only gate log.
+#   superseded_by the live replacement id when a deprecation is an ID
+#                 MIGRATION (or a concept re-homed on another entry). The port
+#                 guard reads it: active -> deprecated is not a downgrade when
+#                 deprecated_at + deprecation_note are present and the named
+#                 successor is itself live (test_port_reconcile_guards.py).
 #   neo4j_label   the Cypher relationship type
 #   inverse_label target-side display phrasing (SUPPORTS -> "supported by"),
 #                 read as "<target> <inverse_label> <source>". PRESENTATIONAL

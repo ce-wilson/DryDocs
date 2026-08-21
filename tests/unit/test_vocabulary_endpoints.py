@@ -75,8 +75,8 @@ KNOWN_UNREGISTERED_ENDPOINTS: dict[str, str] = {
     "Dimension": "DQV seed, C23-deferred",
     "OntologyTerm": "the META node the supplements declare terms as; docs_governed_by points at it",
     "SchedulerKind": "seal_requires_scheduler is deprecated (never built, retired at a gate)",
-    "SwoClass": "u1_is_encoded_in — software-ontology class, status planned",
-    "MediaType": "u2_has_media_type — dcat:mediaType, status planned",
+    "SwoClass": "arch_is_encoded_in — software-ontology class, status planned",
+    "MediaType": "arch_has_media_type — dcat:mediaType, status planned",
 }
 
 #: Wildcard from_node is a rendering convenience (WILDCARD_EXEMPLARS), not a label.

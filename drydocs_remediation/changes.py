@@ -54,7 +54,7 @@ def _citable_relationships() -> tuple[str, ...]:
     label of the scheduler domain, read from the registry itself. Derived, not
     hand-mirrored — the hand-kept tuple drifted (it predated the G22 flips and
     missed USES_ARTIFACT/READS_FROM/WRITES_TO/CONTAINS_HOST). Planned entries
-    (m3_triggers, ...) are absent because the filter says so, not by memory."""
+    (scheduler_triggers, ...) are absent because the filter says so, not by memory."""
     from drydocs_core.ontology.schema_graph import DEFAULT_VOCAB_PATH
     from drydocs_core.yaml_fragments import load_yaml_source
 

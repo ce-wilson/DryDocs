@@ -573,7 +573,9 @@ def test_manual_cypher_fans_out_per_app_code_and_stamps_manual_pin() -> None:
 
 def test_folder_vocab_entry_is_active_with_loader_and_supplement_recorded() -> None:
     vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
-    entry = next(r for r in vocab["local_relationships"] if r["id"] == "m3_belongs_to_application")
+    entry = next(
+        r for r in vocab["local_relationships"] if r["id"] == "scheduler_belongs_to_application"
+    )
     assert entry["status"] == "active"
     assert entry["loader"] == "folder_attribution.cypher"
     assert entry["supplement"] == "ontology_supplement.cypher"

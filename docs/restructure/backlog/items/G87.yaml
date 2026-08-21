@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: opus
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/ontology/relationship_vocabulary/00-header.yaml
@@ -17,3 +17,21 @@ inputs:
 - drydocs_lineage/writer.py
 acceptance: |
   Gate vocabulary-domains-and-id-policy §B3 (SIGNED 2026-08-12) ruled FORCED fall-off, not natural attrition: every epoch-tag id migrates to the domain-derived scheme (scheduler_*, business_application_*, ...) as ADD-NEW + DEPRECATE-OLD pairs -- never a rename in place, because ids are the join key across four ledgers. DONE MEANS: (a) each old entry is status deprecated with a note naming its replacement id; (b) the taxonomy-ontology-map vocab_id joins point at the new ids; (c) schema_graph.cypher regenerated; (d) the SQLite mirror rebuilds (content hash); (e) the hardcoded id table drydocs_lineage/model.py VOCAB_IDS and every test pin (test_yaml_fragments dispositions, test_schema_graph expected sets, lineage-writer vocab_id asserts) updated with a comment citing this item; (f) the port guard stays green (no id vanishes -- old entries remain as deprecated audit rows); (g) the append-only gate log keeps old spellings as history, untouched. Fold G88's relocation into the same pass where the same entries are touched.
+notes: |
+  DONE 2026-08-21. 37 of the 42 census ids migrated as add-new + deprecate-old pairs (110 -> 147
+  entries); the other 5 were ALREADY deprecated (m3_runs_on, m3_seal_app_ref, m3_runs_on_etl_host
+  retired at gates; m3_depends_on_file, m3_executed_by migrated at G91) and were left alone on
+  G101's own reasoning -- a replacement id for an entry nothing loads is an invented row. Prefix =
+  the entry's domain: field, mechanically: scheduler_ (22, incl. the p2_ deployment tier and
+  m7_uses_artifact), arch_ (6; the established abbreviation B1 names), all_was_generated_by,
+  context_* (sosa_ x4), quality_* (c23_ x4). Every old entry carries deprecated_at +
+  deprecation_note + superseded_by. (a)-(g) as accepted, plus two things the acceptance did not
+  name: (1) the PORT GUARD had the manifest's "EXCEPT gate-authorized deprecations" clause in prose
+  only -- test_port_reconcile_guards.py now implements it (active -> deprecated passes when
+  deprecated_at + deprecation_note are present and any superseded_by successor is live), otherwise
+  a company port of this commit would have shown 25 false downgrades; (2) graph DATA written before
+  this date still carries the old r.vocab_id -- drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+  re-stamps the 22 formerly-active ids, one-time, idempotent; run it per environment after
+  deploying. Prose that cites the old spellings as precedent (gate log, gate prompts, reviews,
+  history docs, map notes) is untouched by design. G88 was NOT folded in: its entries (the
+  people/org family in 41/42) are disjoint from this census, so it runs next as its own pass.

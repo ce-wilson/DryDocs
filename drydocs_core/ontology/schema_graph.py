@@ -39,11 +39,11 @@ Inclusion rule (the deterministic vocabulary→Cypher mapping, backlog C8)
   entries ... are excluded" — now enforced mechanically.)
 * Pipe-union endpoints (``from_node: "ETLProcess | ControlMJob"``) render one
   edge per alternative, in listed order.
-* The wildcard ``from_node: "*"`` (``prov_was_generated_by`` — BaseLoader writes
+* The wildcard ``from_node: "*"`` (``all_was_generated_by`` — BaseLoader writes
   it for every node label) renders as representative edges from the fixed
   :data:`WILDCARD_EXEMPLARS` so the visualization stays readable; in the real
   graph the edge exists on all nodes.
-* Self-referencing entries (``m3_was_informed_by``) render as a self-loop on a
+* Self-referencing entries (``scheduler_was_informed_by``) render as a self-loop on a
   single bound node.
 * Nodes: one exemplar per label referenced by a rendered relationship, in
   ``node_classifications`` order; ``class`` / ``dual_class`` / ``prov_type``

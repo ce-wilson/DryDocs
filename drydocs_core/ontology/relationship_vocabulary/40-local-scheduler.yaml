@@ -24,6 +24,41 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       controlm_folders.cypher
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_scheduled_on
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_scheduled_on` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_scheduled_on'; loaders write
+      'scheduler_scheduled_on' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_scheduled_on
+    neo4j_label:  SCHEDULED_ON
+    inverse_label: "schedules"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      Physical hosting — folder is scheduled on a specific Control-M server
+      (DATA_CENTER value). No PROV-O equivalent; infrastructure placement.
+      Edge carries since + last_seen_at for migration auditability.
+      RENAMED from RUNS_ON (see m3_runs_on, deprecated) so the RUNS_ON label
+      can be reused for execution-host placement with role properties.
+
+      REPLACES m3_scheduled_on at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_folders.cypher
+    domain:       scheduler
     status:       active
 
   - id:           m3_runs_on
@@ -59,6 +94,38 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       controlm_jobs.cypher
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_contains_job
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_contains_job` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_contains_job'; loaders write
+      'scheduler_contains_job' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_contains_job
+    neo4j_label:  CONTAINS_JOB
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      ControlMJob
+    prov_maps_to: "prov:hadMember"
+    note: >
+      ControlMFolder (prov:Collection) contains ControlMJob (prov:Activity).
+      Matrix row: Collection → any = HAD_MEMBER. CONTAINS_JOB is kept as
+      the label for query clarity; semantics are hadMember.
+      REPLACES m3_contains_job at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_jobs.cypher
+    domain:       scheduler
     status:       active
 
   - id:           m3_contains_folder
@@ -80,6 +147,43 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       controlm_folders.cypher
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_contains_folder
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_contains_folder` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_contains_folder'; loaders write
+      'scheduler_contains_folder' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_contains_folder
+    neo4j_label:  CONTAINS_FOLDER
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    ControlMApplication
+    to_node:      ControlMFolder
+    prov_maps_to: "prov:hadMember"
+    note: >
+      ControlMApplication (prov:Collection — the Control-M APPLICATION grouping from
+      the folder HEADER ROW in CM_DEF_VJOB (JOB_ID=1), deliberately NOT the business
+      :BusinessApplication / SEAL concept) contains ControlMFolder (prov:Collection). Matrix
+      row: Collection → any = HAD_MEMBER; symmetric with CONTAINS_JOB one level down.
+      SME gate 2026-07-07 (controlm-q1q3-phase1; config/gate-log.md). Loader landed
+      in the FOLDER pass, not jobs (load-order definition 2026-07-07): the folders
+      extract LEFT JOINs the header row so both field-derived grouping labels
+      (ControlMServer, ControlMApplication) exist before the jobs pass runs.
+      REPLACES m3_contains_folder at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_folders.cypher
+    domain:       scheduler
     status:       active
 
   - id:           m3_requires_in_condition
@@ -94,6 +198,39 @@ local_relationships:
       Matrix row: Activity → Entity = USED. REQUIRES_IN_CONDITION kept for
       domain clarity. Edge carries odate, and_or, parentheses, order_
       for boolean-expression reconstruction.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_conditions_in.cypher
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_requires_in_condition
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_requires_in_condition` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_requires_in_condition'; loaders write
+      'scheduler_requires_in_condition' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_requires_in_condition
+    neo4j_label:  REQUIRES_IN_CONDITION
+    inverse_label: "required by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Condition
+    prov_maps_to: "prov:used"
+    note: >
+      Job requires a named IN condition to be present before execution.
+      Matrix row: Activity → Entity = USED. REQUIRES_IN_CONDITION kept for
+      domain clarity. Edge carries odate, and_or, parentheses, order_
+      for boolean-expression reconstruction.
+      REPLACES m3_requires_in_condition at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       controlm_conditions_in.cypher
     domain:       scheduler
@@ -113,6 +250,38 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       controlm_conditions_out.cypher
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_emits_out_condition
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_emits_out_condition` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_emits_out_condition'; loaders write
+      'scheduler_emits_out_condition' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_emits_out_condition
+    neo4j_label:  EMITS_OUT_CONDITION
+    inverse_label: "emitted by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Condition
+    prov_maps_to: "prov:generated"
+    note: >
+      Job emits a named OUT condition on completion. SIGN='+' posts the
+      condition; SIGN='-' removes it. Matrix row: Activity → Entity =
+      GENERATED. EMITS_OUT_CONDITION kept for domain clarity.
+      REPLACES m3_emits_out_condition at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_conditions_out.cypher
+    domain:       scheduler
     status:       active
 
   - id:           m3_was_informed_by
@@ -129,6 +298,41 @@ local_relationships:
       derived=true. Replaces DEPENDS_ON. DIRECT pairs only since the
       phased-loader port (2026-07-23): transitive reach is a graph traversal,
       not a stored closure — the level/path properties are retired.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_dependencies_derived.cypher
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_was_informed_by
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_was_informed_by` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_was_informed_by'; loaders write
+      'scheduler_was_informed_by' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_was_informed_by
+    neo4j_label:  WAS_INFORMED_BY
+    inverse_label: "informed"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      ControlMJob
+    prov_maps_to: "prov:wasInformedBy"
+    note: >
+      Derived dependency edge. Successor job was informed by predecessor
+      via a shared OUT→IN condition pair. Direction: (successor)→(predecessor).
+      Matrix row: Activity → Activity = WAS_INFORMED_BY. Carries via_condition,
+      derived=true. Replaces DEPENDS_ON. DIRECT pairs only since the
+      phased-loader port (2026-07-23): transitive reach is a graph traversal,
+      not a stored closure — the level/path properties are retired.
+      REPLACES m3_was_informed_by at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       controlm_dependencies_derived.cypher
     domain:       scheduler
@@ -210,6 +414,34 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_deployed_by
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_deployed_by` below — same shape, same planned status.
+
+  - id:           scheduler_deployed_by
+    neo4j_label:  DEPLOYED_BY
+    inverse_label: "deployed"
+    role:         ~
+    from_node:    Deployment
+    to_node:      Developer
+    prov_maps_to: "prov:wasAssociatedWith"
+    note: >
+      Deployment activity associated with the developer who ran it.
+      Matrix row: Activity → Agent = WAS_ASSOCIATED_WITH. Feed: Change/CI-CD.
+      REPLACES p2_deployed_by at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       planned
 
   - id:           p2_deployed_to
@@ -228,6 +460,37 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_deployed_to
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_deployed_to` below — same shape, same planned status.
+
+  - id:           scheduler_deployed_to
+    neo4j_label:  DEPLOYED_TO
+    inverse_label: "deployment target of"
+    role:         ~
+    from_node:    Deployment
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      AUDIT CORRECTION: doc mapped this to prov:wasAssociatedWith, but
+      wasAssociatedWith requires an Agent target and ControlMServer is a
+      local platform class, not an Agent. Mapping set to null (local infra
+      placement, same family as SCHEDULED_ON). If a PROV mapping is required,
+      reclassify ControlMServer as prov:SoftwareAgent first. Feed: Change/CI-CD.
+      REPLACES p2_deployed_to at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       planned
 
   - id:           p2_deploys_folder
@@ -240,6 +503,34 @@ local_relationships:
     note: >
       Deployment ships a folder definition. Matrix row: Activity → Entity
       (Collection ⊑ Entity) = USED. Feed: Change/CI-CD.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_deploys_folder
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_deploys_folder` below — same shape, same planned status.
+
+  - id:           scheduler_deploys_folder
+    neo4j_label:  DEPLOYS_FOLDER
+    inverse_label: "deployed by"
+    role:         ~
+    from_node:    Deployment
+    to_node:      ControlMFolder
+    prov_maps_to: "prov:used"
+    note: >
+      Deployment ships a folder definition. Matrix row: Activity → Entity
+      (Collection ⊑ Entity) = USED. Feed: Change/CI-CD.
+      REPLACES p2_deploys_folder at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
@@ -258,6 +549,34 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_authored_by
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_authored_by` below — same shape, same planned status.
+
+  - id:           scheduler_authored_by
+    neo4j_label:  AUTHORED_BY
+    inverse_label: "authored"
+    role:         ~
+    from_node:    ControlMFolder
+    to_node:      Developer
+    prov_maps_to: "prov:wasAttributedTo"
+    note: >
+      Folder authorship. Matrix row: Entity → Agent = WAS_ATTRIBUTED_TO.
+      Feed: Folder XML / Git blame.
+      REPLACES p2_authored_by at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       planned
 
   - id:           p2_instance_of
@@ -272,6 +591,36 @@ local_relationships:
       generic prov:wasInfluencedBy (valid but weak); the tighter PROV pattern
       would treat ControlMJob as a prov:Plan via qualified association.
       Feed: Control-M history API.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_instance_of
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_instance_of` below — same shape, same planned status.
+
+  - id:           scheduler_instance_of
+    neo4j_label:  INSTANCE_OF
+    inverse_label: "has instance"
+    role:         ~
+    from_node:    ControlMJobRun
+    to_node:      ControlMJob
+    prov_maps_to: "prov:wasInfluencedBy"
+    note: >
+      Runtime execution is an instance of the job definition. Mapped to the
+      generic prov:wasInfluencedBy (valid but weak); the tighter PROV pattern
+      would treat ControlMJob as a prov:Plan via qualified association.
+      Feed: Control-M history API.
+      REPLACES p2_instance_of at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
@@ -449,6 +798,62 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       folder_attribution.cypher
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_belongs_to_application
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_belongs_to_application` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_belongs_to_application'; loaders write
+      'scheduler_belongs_to_application' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_belongs_to_application
+    neo4j_label:  BELONGS_TO_APPLICATION
+    inverse_label: "application for"
+    role:         seal_app_ref
+    from_node:    ControlMFolder
+    to_node:      Port
+    prov_maps_to: ~
+    note: >
+      FOLDER-grain application attribution — the K7 close-out ruling (gate
+      seal-app-ref-edge-reshape, SIGNED OFF 2026-08-03) that supersedes the
+      job-grain m3_seal_app_ref. Target is the application's BatchProcessing
+      :Port, NOT :BusinessApplication (§C1): the app node is already the hub
+      for SEAL record semantics — TOM roles, contacts, product links,
+      orchestrator edges — so hanging every folder off it concentrates batch
+      topology on the one node that can least afford it. The port is the
+      batch-facing side; the app node stays a record, not a junction.
+      prov_maps_to is deliberately null (§D1 option a): ControlMFolder
+      (Collection ⊑ Entity) → Port is an Entity→Entity governance/containment
+      fact with no natural PROV verb — the SCHEDULED_ON / reg_uses_software
+      precedent. ONE shape everywhere (§D2): loader edge, manual tier-5
+      writer, migration target. Folder→application is 1:1 by SME ruling
+      (OWNER-NOT-USER: a folder belongs to whoever OWNS it, not whoever USES
+      it — a platform team's all-tenants utility folder belongs to the
+      platform team), enforced as a GRAPH-TEST because Neo4j cannot declare
+      relationship cardinality — the TOM-roles precedent. Jobs INHERIT via
+      m3_contains_job; authoring is one steward-defined row per Control-M app
+      code, fanned out to folders via m3_contains_folder (§B1). Tier 2
+      (shared platform code) resolves per folder with :AreaProduct as a
+      ROUTING step, never an edge target — there is no direct mapping of
+      batch technical components to area product (SME 2026-08-03).
+      ACTIVATED at the K8 build (2026-08-04): loader
+      folder_attribution.cypher (app-code defined mapping + the demoted K2
+      fallback, origin-flagged per §B3); manual tier-5 pins via
+      manual_seal_attribution.cypher (rekeyed to this shape, §D2); the 1:1
+      graph-test lives in graph-tests/folder-attribution-coverage.yaml.
+      REPLACES m3_belongs_to_application at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       folder_attribution.cypher
+    domain:       scheduler
     status:       active
 
   - id:           m3_invokes
@@ -490,6 +895,66 @@ local_relationships:
       in the same breath (§A4) so the launcher/payload split is right from
       first load. Supplement block written at the flip; NO LOADER here —
       the curated load is G23.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_invokes
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_invokes` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_invokes'; loaders write
+      'scheduler_invokes' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_invokes
+    neo4j_label:  INVOKES
+    inverse_label: "invoked by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      "Script | ETLProcess"
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED 2026-07-15 (config/gate-log.md); planned = the flip +
+      supplement block land with the curated-load build (the K2
+      flips-are-follow-ups pattern — drydocs_lineage.writer keeps refusing
+      a live load until then). Job command line invokes a script/JAR
+      (CMDLINE / MEMNAME; Jar Path + Task Json Path). Matrix row:
+      Activity → Entity = USED. Produced today by
+      drydocs_lineage.extractors.controlm_inventory (job → invoked
+      artifact via the shared core parser); writer MATCHes ControlMJob on
+      the NODE KEY, MERGEs Script on path.
+      2026-07-16 SME session (gate-log cmdline-lineage-review): cardinality is
+      1..n per job (compound if/else commands carry multiple invocations, incl.
+      wrapper payloads); Script identity stays PATH-keyed — same-basename
+      multi-mount duplicates surface in lineage-review for SME merge, never
+      auto-merged. 2026-07-21 (gate-log cmdline-nfr-vetting): payload
+      invocations MIGRATE to the distinct m7_uses_artifact label at its
+      build — until then this entry keeps the 1..n fold; :Script gains
+      script_role {launcher, payload} at the same build (SME-3).
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A3, SIGNED OFF 28/28;
+      applied at G55): activates for reference facts — feeds verified
+      present at the ruling (controlm_inventory G14, the G39/G40 staging
+      seam, G16 SCRIPT_PATH facts). to_node widened to Script | ETLProcess
+      per §B2 (one edge meaning, two endpoint classes, the ENDPOINT
+      RECORDED PER EDGE — the m3_reads_from union-endpoint precedent; G12
+      already lands INVOKES on :ETLProcess for the abioncloud
+      wrapper-payload expansion). §B3 rides with it: the raw evidence
+      string (command line / variable form) is kept VERBATIM on the edge
+      or occurrence record — under B2 that string is how the
+      endpoint-class choice stays re-checkable. m7_uses_artifact activated
+      in the same breath (§A4) so the launcher/payload split is right from
+      first load. Supplement block written at the flip; NO LOADER here —
+      the curated load is G23.
+      REPLACES m3_invokes at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
@@ -538,6 +1003,64 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_triggers
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_triggers` below — same shape, same planned status.
+
+  - id:           scheduler_triggers
+    neo4j_label:  TRIGGERS
+    inverse_label: "triggered by"
+    role:         ~
+    from_node:    Script
+    to_node:      ETLProcess
+    prov_maps_to: "prov:wasStartedBy"
+    note: >
+      Gate CONFIRMED 2026-07-15 (config/gate-log.md) — shape validated by
+      the SME caveat: the common case is one .ksh wrapper script (the
+      INVOKES target) that launches the Informatica / Ab Initio / DPL
+      workload, passing the parameters those jobs need on CMD_LINE — so
+      TRIGGERS candidates are derivable from the already-ingested command
+      line, not only from an ETL metadata feed. (The other wrapper case is
+      pure unix file operations — move, gzip — with no ETLProcess; that
+      case is m3_reads_from / m3_writes_to with ControlMJob as the
+      Activity, never a TRIGGERS edge.) DIRECTION NOTE: prov:wasStartedBy
+      flows Activity → Entity (ETLProcess wasStartedBy Script); the graph
+      edge runs the INVERSE direction for query ergonomics. Treat TRIGGERS
+      as inverse-of wasStartedBy. Feed: CMD_LINE wrapper parameters
+      (primary); Informatica / Ab Initio / DPL metadata (enrichment).
+      2026-07-16 SME session (gate-log cmdline-lineage-review, run against 6
+      live captures): the business-key residual is RESOLVED — ETLProcess
+      identity = kind-scoped stable token (Ab Initio pset/graph BASENAME,
+      mount paths vary by env and stay properties; DPL -pipeline GUID with
+      dataflow + config JSON as properties), implemented extractor-side in
+      controlm_inventory._stable_invocation_key. ETLProcess KEEPS its label
+      and gains a kind property (etl|utility|notification — utility psets
+      exist, e.g. script-exec/send-email). DPL is NOT Ab Initio (own
+      invocation_type; java zilo framework originally, -py routes to
+      spark/pyspark). Remaining loader blocker: the ETLProcess endpoint
+      class in drydocs_lineage.writer (every non-job process still maps
+      to :Script).
+      2026-07-21 SME session (gate-log cmdline-nfr-vetting, SME-1): from-node
+      = the invoked wrapper/LAUNCHER Script re-CONFIRMED against the company
+      draft NFR's payload-sourced variant (REJECTED: the -pipeline GUID
+      literal rides the launcher's CMD_LINE — the surface the extractor
+      parses; payloads are often variable-held and unresolvable). Treat any
+      payload-sourced TRIGGERS in company data as a shape to reconcile at
+      their gate, not a producer emission.
+      REPLACES m3_triggers at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       planned
 
   - id:           m7_uses_artifact
@@ -578,6 +1101,62 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_uses_artifact
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_uses_artifact` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm7_uses_artifact'; loaders write
+      'scheduler_uses_artifact' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_uses_artifact
+    neo4j_label:  USES_ARTIFACT
+    inverse_label: "used as artifact by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      Script
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED 2026-07-21 (config/gate-log.md cmdline-nfr-vetting,
+      SME-2): job uses a PAYLOAD artifact (jar/wheel/pset/container-image
+      ref) — the Script the launcher dispatches, discriminated from the
+      launcher itself, which stays the m3_invokes target. Matrix row:
+      Activity → Entity = USED; distinct label (not single-label-with-role)
+      per the documented RUNS_ON-overload risk — the company v2
+      command-line/variables standard's tooling table already assumes this
+      edge (its m7_etl_artifact_supplement target). Adopted WITH the :Script
+      refinements (same gate, SME-3): script_role {launcher, payload} +
+      platform / artifact_uri / artifact_kind / platform_flags / script_path
+      properties (+ the 4 Informatica identifiers); Script identity stays
+      PATH-keyed. At this entry's build, payload invocations MIGRATE out of
+      the m3_invokes 1..n fold onto this label. Feed: canonical/aliased
+      artifact variables (FACT_REGISTRY migration — backlog G16) with the
+      aliases-suggest-values-decide contract; never the variable NAME alone
+      (2,384-var gap analysis: names lie).
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A4, SIGNED OFF 28/28;
+      applied at G55) — DELIBERATELY in the same breath as m3_invokes §A3:
+      activating A3 alone would land payloads in the INVOKES 1..n fold
+      first, forcing an in-graph migration; together, the launcher/payload
+      split is right from first load. Feed verified specific at the
+      ruling: FACT_REGISTRY ETL_ARTIFACT_URI / ETL_ARTIFACT_KIND /
+      ETL_ARTIFACT_SHA + ETL_PLATFORM / ETL_PLATFORM_FLAGS with alias
+      rollups under aliases-suggest-values-decide. Noted for §G2:
+      ETL_ARTIFACT_SHA is a CONTENT HASH on the variable, so a DPL-managed
+      artifact can be hash-BEARING even where the rua listing is
+      hash-absent. Supplement block written at the flip; loader is G23.
+      REPLACES m7_uses_artifact at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       active
 
   - id:           m3_runs_on_agent_host
@@ -597,6 +1176,44 @@ local_relationships:
       wins when both match (mirrors Control-M's own resolution) — see
       m3_runs_on_host_group and config/gate-prompts/controlm-hosts-topology.yaml.
       ACTIVE 2026-07-27 (P3): written by the derived resolution pass.
+    supplement:   ontology_supplement.cypher
+    loader:       runs_on_resolution.v1
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_runs_on_agent_host
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_runs_on_agent_host` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_runs_on_agent_host'; loaders write
+      'scheduler_runs_on_agent_host' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_runs_on_agent_host
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         agent_host
+    from_node:    ControlMJob
+    to_node:      ExecutionHost
+    prov_maps_to: ~
+    note: >
+      Job executes on a Control-M agent host (Control_M · Host, e.g.
+      PROCO-CDS-UTIL#). Infrastructure placement; no PROV mapping.
+      Same label as m3_runs_on_etl_host / m3_runs_on_host_group — role
+      property disambiguates. Feed UPDATED 2026-07-09: psgmgr CM_HOSTS +
+      the NODE_ID resolution pass — this role is the 1-hop HARD-CODED case
+      (job's NODE_ID matches a member NODEID, not a GRPNAME). Group match
+      wins when both match (mirrors Control-M's own resolution) — see
+      m3_runs_on_host_group and config/gate-prompts/controlm-hosts-topology.yaml.
+      ACTIVE 2026-07-27 (P3): written by the derived resolution pass.
+      REPLACES m3_runs_on_agent_host at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       runs_on_resolution.v1
     domain:       scheduler
@@ -664,6 +1281,49 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       runs_on_resolution.v1
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_runs_on_host_group
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_runs_on_host_group` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_runs_on_host_group'; loaders write
+      'scheduler_runs_on_host_group' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_runs_on_host_group
+    neo4j_label:  RUNS_ON
+    inverse_label: "runs"
+    role:         host_group
+    from_node:    ControlMJob
+    to_node:      ControlMHostGroup
+    prov_maps_to: ~
+    note: >
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); ACTIVE 2026-07-27 —
+      the P3 build (hosts loader + derived resolution pass, backlog P3).
+      Definition-time placement, the
+      2-HOP case: the job's NODE_ID names a host group (matches a
+      CM_HOSTS.GRPNAME) and Control-M load-balances the run across the
+      group's member hosts (reach hosts via CONTAINS_HOST). Derived
+      resolution pass that runs AFTER both the jobs pass and the hosts pass
+      (the WAS_INFORMED_BY derived-pass pattern); group match wins over a
+      direct host match, mirroring Control-M's own resolution. Same RUNS_ON
+      label as role=agent_host (the 1-hop hard-coded case) — role
+      disambiguates. Infrastructure placement; no PROV mapping (SCHEDULED_ON
+      precedent). Runtime rerun-affinity (a rerun sticks to the host of the
+      first attempt) is per-run state — phase-2 ControlMJobRun/SOSA, NOT this
+      definition edge.
+      REPLACES m3_runs_on_host_group at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       runs_on_resolution.v1
+    domain:       scheduler
     status:       active
 
   - id:           m3_host_group_contains_host
@@ -682,6 +1342,43 @@ local_relationships:
       HAD_MEMBER; domain label kept (CONTAINS_JOB / CONTAINS_FOLDER family).
       Edge carries participation_type (VARCHAR2(1) — value domain + BMC
       semantics pending probe P2a) and last_capture_date.
+    supplement:   ontology_supplement.cypher
+    loader:       controlm_hosts.v1
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_host_group_contains_host
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_host_group_contains_host` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_host_group_contains_host'; loaders write
+      'scheduler_host_group_contains_host' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_host_group_contains_host
+    neo4j_label:  CONTAINS_HOST
+    inverse_label: "contained in"
+    role:         ~
+    from_node:    ControlMHostGroup
+    to_node:      ExecutionHost
+    prov_maps_to: "prov:hadMember"
+    note: >
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md); ACTIVE 2026-07-27 —
+      the P3 build. Host-group membership from psgmgr
+      CM_HOSTS: one edge per (DATA_CENTER, GRPNAME, NODEID) row; each
+      distinct NODEID MERGEs one ExecutionHost (keyed on nodeid alone,
+      pending the multi-group probe P2c). Matrix row: Collection → any =
+      HAD_MEMBER; domain label kept (CONTAINS_JOB / CONTAINS_FOLDER family).
+      Edge carries participation_type (VARCHAR2(1) — value domain + BMC
+      semantics pending probe P2a) and last_capture_date.
+      REPLACES m3_host_group_contains_host at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       controlm_hosts.v1
     domain:       scheduler
@@ -704,6 +1401,41 @@ local_relationships:
       blocked on the gate-log residuals: P3 value-domain verification
       (adhoc/profile_cm_hosts.sql) + the 22-DC-vs-production scope call. Infrastructure placement; no
       PROV mapping (SCHEDULED_ON precedent).
+    supplement:   ~
+    loader:       ~
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_host_group_defined_on
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_host_group_defined_on` below — same shape, same planned status.
+
+  - id:           scheduler_host_group_defined_on
+    neo4j_label:  DEFINED_ON
+    inverse_label: "defines"
+    role:         ~
+    from_node:    ControlMHostGroup
+    to_node:      ControlMServer
+    prov_maps_to: ~
+    note: >
+      Gate CONFIRMED 2026-07-09 (config/gate-log.md). A host group is defined
+      per data center (CM_HOSTS.DATA_CENTER — 22 distinct incl.
+      non-production). DC key rule (SME, via knowledge/standards/technology/
+      data-center-naming-convention.md): long-form name is the NATIVE
+      DATA_CENTER value — exact match; segments (environment, instance,
+      default_time E<hhmm> EST) are candidate parsed properties. Loader
+      blocked on the gate-log residuals: P3 value-domain verification
+      (adhoc/profile_cm_hosts.sql) + the 22-DC-vs-production scope call. Infrastructure placement; no
+      PROV mapping (SCHEDULED_ON precedent).
+      REPLACES m3_host_group_defined_on at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ~
     loader:       ~
     domain:       scheduler
@@ -744,6 +1476,59 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_reads_from
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_reads_from` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_reads_from'; loaders write
+      'scheduler_reads_from' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_reads_from
+    neo4j_label:  READS_FROM
+    inverse_label: "read by"
+    role:         ~
+    from_node:    "ETLProcess | ControlMJob"
+    to_node:      DataAsset
+    prov_maps_to: "prov:used"
+    note: >
+      Gate CONFIRMED WITH EDIT 2026-07-15 (config/gate-log.md): endpoints
+      re-pointed from the pre-G9 shape (ETLProcess → DataSource) to the
+      two real cases — (1) ETL case: the ETLProcess reads a source dataset
+      (Source Zone + Source Glue Database; feed: Informatica / Ab Initio);
+      (2) file-ops case: the wrapper script is pure unix file operations
+      (move, gzip, …) and the type-correct Activity is the ControlMJob
+      itself (Script is prov:Entity and cannot carry prov:used) — the
+      writer must resolve the owning job via its INVOKES edge (follow-up,
+      IDEAS/backlog). To-node unified on DataAsset (the D1 proxy URN,
+      provisioning/02_proxy_constraints.cypher) — the edge direction
+      already encodes source-vs-target, so the DataSource label is retired
+      (see node_classifications). Matrix row: Activity → Entity = USED.
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A5, SIGNED OFF 28/28;
+      applied at G55) WITH THE RESTRICTION RESTATED — the SME changed the
+      page's own words: activates for STRUCTURED, LAUNCHER- OR
+      REGISTRY-GROUNDED evidence — dataset_flow AND parsed CMD_LINE
+      file-ops — but NOT script-body content grep. Both feeds verified at
+      the ruling: dpl_mac maps dataset_flow.json inputDatasets/
+      outputDatasets to candidates (GUID + version + zone);
+      controlm_inventory (G14) parses CMD_LINE MOVE/COPY/COMPRESS into the
+      same candidates with counters. Consequence accepted with the
+      activation: local_file DataAssets will be numerous and transient —
+      one per MOVE operand (§D1/§G1 answer the node-class question).
+      Supplement block written at the flip; loader is G23.
+      REPLACES m3_reads_from at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       active
 
   - id:           m3_writes_to
@@ -776,6 +1561,54 @@ local_relationships:
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_writes_to
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_writes_to` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'm3_writes_to'; loaders write
+      'scheduler_writes_to' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           scheduler_writes_to
+    neo4j_label:  WRITES_TO
+    inverse_label: "written by"
+    role:         ~
+    from_node:    "ETLProcess | ControlMJob"
+    to_node:      DataAsset
+    prov_maps_to: "prov:generated"
+    note: >
+      Gate CONFIRMED WITH EDIT 2026-07-15 (config/gate-log.md): endpoints
+      re-pointed from the pre-G9 shape (ETLProcess → DataTarget) to the
+      two real cases — (1) ETL case: the ETLProcess writes a target
+      dataset (Target Zone + Glue database / bucket / partition keys;
+      feed: Informatica / Ab Initio); (2) file-ops case: the wrapper
+      script is pure unix file operations (move, gzip, …) and the
+      type-correct Activity is the ControlMJob itself (Script is
+      prov:Entity and cannot carry prov:generated) — the writer must
+      resolve the owning job via its INVOKES edge (follow-up,
+      IDEAS/backlog). To-node unified on DataAsset (the D1 proxy URN,
+      provisioning/02_proxy_constraints.cypher) — the edge direction
+      already encodes source-vs-target, so the DataTarget label is retired
+      (see node_classifications). Matrix row: Activity → Entity =
+      GENERATED.
+      ACTIVATED 2026-08-07 (gate rua-load-shapes §A5, SIGNED OFF 28/28;
+      applied at G55) WITH THE RESTRICTION RESTATED — same ruling as
+      m3_reads_from: STRUCTURED, LAUNCHER- OR REGISTRY-GROUNDED evidence
+      (dataset_flow AND parsed CMD_LINE file-ops), NOT script-body content
+      grep. Supplement block written at the flip; loader is G23.
+      REPLACES m3_writes_to at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
     status:       active
 
   - id:           m3_delegates_to
@@ -800,6 +1633,46 @@ local_relationships:
       default — the silent split fid §A1 exists to prevent. The rua
       envelope corroborates PRESENCE; it authors no identity. Stays
       planned; re-tick after K17 signs.
+    supplement:   ontology_supplement.cypher
+    loader:       ~
+    domain:       scheduler
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: scheduler_delegates_to
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `scheduler_delegates_to` below — same shape, same planned status.
+
+  - id:           scheduler_delegates_to
+    neo4j_label:  DELEGATES_TO
+    inverse_label: "delegated to by"
+    role:         ~
+    from_node:    AppUser
+    to_node:      ExecutionHost
+    prov_maps_to: "prov:actedOnBehalfOf"
+    note: >
+      Service account delegated to a host per environment (EPV FID rows with
+      Use Case='AWS'/'DPL'/'CCMS' + Environment). prov:actedOnBehalfOf
+      requires Agent → Agent — this is why ExecutionHost is classified
+      prov:SoftwareAgent in node_classifications. Edge carries environment.
+      Feed: CMDB / IAM.
+      HELD 2026-08-07 (gate rua-load-shapes §A1, SIGNED OFF 28/28): may
+      NOT activate while its SUBJECT HAS NO AGREED KEY —
+      fid-identity-and-scope (K17, drafted, UNSIGNED) rules :AppUser keyed
+      on fid with fid_name a property and name→fid resolution an explicit
+      crosswalk step. ControlMJob.run_as carries the tenant NAME, not the
+      directory key; activating now would key :AppUser on the name by
+      default — the silent split fid §A1 exists to prevent. The rua
+      envelope corroborates PRESENCE; it authors no identity. Stays
+      planned; re-tick after K17 signs.
+      REPLACES m3_delegates_to at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, planned status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       ~
     domain:       scheduler

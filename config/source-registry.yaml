@@ -1074,7 +1074,7 @@ datasets:
       Since K8 (gate seal-app-ref-edge-reshape §B3) this feed is the demoted
       FALLBACK behind the app-code defined mapping
       (config/overrides/app-code-mappings.csv): it feeds the ACTIVE
-      m3_belongs_to_application folder edge with origin=matched-fallback.
+      scheduler_belongs_to_application folder edge with origin=matched-fallback.
       Mechanism-only here — no real SEAL/FID/app-name values. Extract:
       drydocs/loaders/sql/controlm_app_facts.sql (ORDER BY = tie-break
       contract).

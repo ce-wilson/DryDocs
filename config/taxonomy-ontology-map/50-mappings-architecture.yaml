@@ -41,7 +41,7 @@
       prov_type_to: Entity
       matrix_row: "Collection -> any = prov:hadMember"
     precedence_authority: internal-standards
-    vocab_id: u1_has_module
+    vocab_id: arch_has_module
     vocab_id_reason: >
       THREE edge terms registered at `status: planned` by this gate, not one:
       u1_has_module (Project -> CodeModule, the containment edge named here),

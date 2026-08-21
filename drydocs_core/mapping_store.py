@@ -251,7 +251,7 @@ CREATE VIEW v_source_corrections AS
 -- PERMANENT (no corrected-in-source lifecycle, hence no status column).
 -- Rows never write the graph directly; the loader (K8) stays the only
 -- graph writer (§E3). folder_id empty = code-level row, fanned out to
--- folders by the loader via m3_contains_folder (§B1); folder_id set = a
+-- folders by the loader via scheduler_contains_folder (§B1); folder_id set = a
 -- per-folder platform resolution (K7 §B2).
 CREATE TABLE app_code_mapping (
   line_no            INTEGER PRIMARY KEY,

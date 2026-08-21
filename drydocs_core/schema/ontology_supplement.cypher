@@ -244,7 +244,7 @@ MERGE (local)-[:MAPS_TO]->(prov);
 // --- CMD_LINE lineage verbs (gate rua-load-shapes §A3–§A5, SIGNED OFF 2026-08-07;
 //     blocks written at G55 — the flip; the curated load is G23) -------------------
 
-// INVOKES  —  ControlMJob → Script | ETLProcess  (prov:used; m3_invokes)
+// INVOKES  —  ControlMJob → Script | ETLProcess  (prov:used; scheduler_invokes)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#invokes"})
   SET n.label  = "INVOKES",
       n.domain = "ControlMJob",
@@ -261,14 +261,14 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// USES_ARTIFACT  —  ControlMJob → Script  (prov:used; m7_uses_artifact)
+// USES_ARTIFACT  —  ControlMJob → Script  (prov:used; scheduler_uses_artifact)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#usesArtifact"})
   SET n.label  = "USES_ARTIFACT",
       n.domain = "ControlMJob",
       n.range  = "Script",
       n.notes  = "Job uses a PAYLOAD artifact (jar/wheel/pset/container-image ref) — the "
                + "Script the launcher dispatches, discriminated from the launcher itself "
-               + "(the m3_invokes target). Distinct label per the documented "
+               + "(the scheduler_invokes target). Distinct label per the documented "
                + "RUNS_ON-overload risk (gate cmdline-nfr-vetting SME-2). Activated in "
                + "the same breath as INVOKES (rua-load-shapes §A4) so the "
                + "launcher/payload split is right from first load. Feed: FACT_REGISTRY "
@@ -277,7 +277,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// READS_FROM  —  ETLProcess | ControlMJob → DataAsset  (prov:used; m3_reads_from)
+// READS_FROM  —  ETLProcess | ControlMJob → DataAsset  (prov:used; scheduler_reads_from)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#readsFrom"})
   SET n.label  = "READS_FROM",
       n.domain = "ETLProcess | ControlMJob",
@@ -293,7 +293,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#used"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// WRITES_TO  —  ETLProcess | ControlMJob → DataAsset  (prov:generated; m3_writes_to)
+// WRITES_TO  —  ETLProcess | ControlMJob → DataAsset  (prov:generated; scheduler_writes_to)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#writesTo"})
   SET n.label  = "WRITES_TO",
       n.domain = "ETLProcess | ControlMJob",
@@ -323,7 +323,7 @@ MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Entity"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 
-// OCCURRENCE_OF  —  SourceOccurrence → Script  (prov:specializationOf; g22_occurrence_of)
+// OCCURRENCE_OF  —  SourceOccurrence → Script  (prov:specializationOf; arch_occurrence_of)
 // The §D2 anchor edge: an occurrence specializes the one path-keyed Script it
 // observes (the binding the SourceOccurrence class block above declares).
 // Registered at G23 (the loader build) — transcription of the signed ruling.
@@ -445,7 +445,7 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#fe
       n.domain = "FeedbackNote",
       n.range  = "Employee",
       n.notes  = "Note authored by the reviewing Employee — collapsed form (one author, no role "
-               + "scheme; p2_authored_by precedent). role=feedback_author discriminates on the "
+               + "scheme; scheduler_authored_by precedent). role=feedback_author discriminates on the "
                + "shared label. Gate C1.";
 MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#feedbackAuthoredBy"})
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasAttributedTo"})
@@ -480,7 +480,7 @@ MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Entity"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 
-// HAS_MODULE  —  Project → CodeModule  (prov:hadMember; u1_has_module)
+// HAS_MODULE  —  Project → CodeModule  (prov:hadMember; arch_has_module)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasModule"})
   SET n.label  = "HAS_MODULE",
       n.domain = "Project",
@@ -492,7 +492,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// IMPORTS  —  CodeModule → CodeModule  (prov:wasDerivedFrom; u1_imports)
+// IMPORTS  —  CodeModule → CodeModule  (prov:wasDerivedFrom; arch_imports)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#imports"})
   SET n.label  = "IMPORTS",
       n.domain = "CodeModule",
@@ -504,7 +504,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#wasDerivedFrom"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// IS_ENCODED_IN  —  CodeModule → SwoClass  (SWO_0000741; u1_is_encoded_in)
+// IS_ENCODED_IN  —  CodeModule → SwoClass  (SWO_0000741; arch_is_encoded_in)
 // FIRST USE of the SWO layer (seeded in ontology.cypher with zero consumers
 // until this gate). Precedent set at E1(b): bind to a seeded term that already
 // means the thing, derive the value from data the artifact carries, invent
@@ -538,7 +538,7 @@ MATCH (pc:OntologyTerm:ProvClass  {iri: "http://www.w3.org/ns/prov#Collection"})
 MERGE (lc)-[r:SUBCLASS_OF]->(pc)
   ON CREATE SET r.source = "drydocs.ontology_supplement";
 
-// CONTAINS_ENTRY  —  Project|CodeDirectory → CodeDirectory|CodeModule  (prov:hadMember; u2_contains_entry)
+// CONTAINS_ENTRY  —  Project|CodeDirectory → CodeDirectory|CodeModule  (prov:hadMember; arch_contains_entry)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#containsEntry"})
   SET n.label  = "CONTAINS_ENTRY",
       n.domain = "CodeDirectory",
@@ -554,7 +554,7 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (prov:OntologyTerm:ProvProperty       {iri: "http://www.w3.org/ns/prov#hadMember"})
 MERGE (local)-[:MAPS_TO]->(prov);
 
-// HAS_MEDIA_TYPE  —  CodeModule → MediaType  (dcat:mediaType; u2_has_media_type)
+// HAS_MEDIA_TYPE  —  CodeModule → MediaType  (dcat:mediaType; arch_has_media_type)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#hasMediaType"})
   SET n.label  = "HAS_MEDIA_TYPE",
       n.domain = "CodeModule",

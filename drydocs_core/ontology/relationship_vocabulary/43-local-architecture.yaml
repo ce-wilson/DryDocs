@@ -197,6 +197,40 @@
     supplement:   ontology_supplement.cypher
     loader:       code_snapshot.v1
     domain:       architecture
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: arch_has_module
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `arch_has_module` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'u1_has_module'; loaders write
+      'arch_has_module' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           arch_has_module
+    neo4j_label:  HAS_MODULE
+    inverse_label: "module of"
+    role:         ~
+    from_node:    Project
+    to_node:      CodeModule
+    prov_maps_to: "prov:hadMember"
+    sosa_maps_to: ~
+    note: >
+      The repository contains this source file. Runs from the SINGLE :Project root to
+      ALL modules (183 at the 2026-07-27 snapshot); "which of the six scan roots" is
+      answered by the CodeModule.project property, never by this edge (gate §B1(a)).
+      prov:hadMember follows the Collection -> any matrix row.
+      REPLACES u1_has_module at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
     status:       active
   - id:           u1_imports
     neo4j_label:  IMPORTS
@@ -217,6 +251,46 @@
       bare pairs for first-party .ts/.tsx/.js/.jsx imports, so front-end modules now
       carry this edge too — same meaning, same limits (an `import type` is
       indistinguishable from a value import, the TS analog of the §D2 caveat).
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: arch_imports
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `arch_imports` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'u1_imports'; loaders write
+      'arch_imports' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           arch_imports
+    neo4j_label:  IMPORTS
+    inverse_label: "imported by"
+    role:         ~
+    from_node:    CodeModule
+    to_node:      CodeModule
+    prov_maps_to: "prov:wasDerivedFrom"
+    sosa_maps_to: ~
+    note: >
+      Source-level import dependency, direction importer -> imported. KNOWN LIMIT,
+      ruled and ACCEPTED at gate §D2: the snapshot's edges are bare 2-element arrays,
+      so this CANNOT distinguish `import x` from `from x import y`, nor a
+      TYPE_CHECKING-only import from a runtime one. Do NOT read an IMPORTS edge as
+      "breaks if removed". Carries the M2 pull-provenance properties like every other
+      edge (§D3 — the no-properties divergence was rejected). WIDENED 2026-08-06
+      (O42): the instrument's ts-imports extractor (depgraph a56d2fc) emits the same
+      bare pairs for first-party .ts/.tsx/.js/.jsx imports, so front-end modules now
+      carry this edge too — same meaning, same limits (an `import type` is
+      indistinguishable from a value import, the TS analog of the §D2 caveat).
+      REPLACES u1_imports at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       code_snapshot.v1
     domain:       architecture
@@ -246,6 +320,49 @@
     supplement:   ontology_supplement.cypher
     loader:       code_tree.v1
     domain:       architecture
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: arch_contains_entry
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `arch_contains_entry` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'u2_contains_entry'; loaders write
+      'arch_contains_entry' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           arch_contains_entry
+    neo4j_label:  CONTAINS_ENTRY
+    inverse_label: "entry of"
+    role:         ~
+    from_node:    CodeDirectory
+    to_node:      CodeModule
+    prov_maps_to: "prov:hadMember"
+    sosa_maps_to: ~
+    note: >
+      Filesystem containment — parent directory holds this entry. SME RULING
+      2026-08-05 (direct in-session instruction): the G33 gate's deferred
+      ":Directory + CONTAINS" decision is ADMITTED; the all-files tree loads
+      whole. Polymorphic by design: parent is :Project at the repo root (the
+      root dir node maps onto the existing single :Project — B1(a) holds, no
+      duplicate root) and :CodeDirectory below; child is :CodeDirectory or
+      :CodeModule. ONE label for the whole tree so path traversal is a single
+      -[:CONTAINS_ENTRY*]-> pattern; the CONTAINS_JOB/CONTAINS_FOLDER
+      per-kind precedent was deliberately not followed (two child kinds would
+      force two labels and break traversal). Edges come from the snapshot's
+      v2 `rels` section — read from the tree, never guessed from path strings
+      (the 1800-rel section the loader previously warned it did not load).
+      prov:hadMember, Collection -> any matrix row.
+      REPLACES u2_contains_entry at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       code_tree.v1
+    domain:       architecture
     status:       active
   - id:           u2_has_media_type
     neo4j_label:  HAS_MEDIA_TYPE
@@ -271,6 +388,51 @@
       and are CLI-reported, never guessed. Maps to dcat:mediaType (non-PROV
       standard, hence prov_maps_to null). Format, not language: .py gets
       IS_ENCODED_IN, not this edge.
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: arch_has_media_type
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `arch_has_media_type` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'u2_has_media_type'; loaders write
+      'arch_has_media_type' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           arch_has_media_type
+    neo4j_label:  HAS_MEDIA_TYPE
+    inverse_label: "media type of"
+    role:         ~
+    from_node:    CodeModule
+    to_node:      MediaType
+    prov_maps_to: ~
+    sosa_maps_to: ~
+    note: >
+      File -> its serialization format, derived from node.extension exactly as
+      u1_is_encoded_in derives language (the E1(b) precedent: bind to a seeded
+      term, derive from data the artifact carries, invent nothing). SME RULING
+      2026-08-05: the non-.py majority of the tree snapshot (~1,140 files) gets
+      typed. Targets seeded :MediaType terms (ontology.cypher): IANA-registered
+      types carry the IANA registration page as iri (the DCAT convention;
+      each verified against iana.org at seeding — incl. application/toml
+      reg. 2024-10-21 and application/vnd.mermaid reg. 2023-09-18);
+      conventional unregistered types (TypeScript, PowerShell, Cypher,
+      Jupyter) carry drydocs.local/format# IRIs + registered:false — an
+      IANA-shaped iri for an unregistered type would fabricate a registration.
+      Extensions with neither binding ('', .example, .lock, .conf) stay unbound
+      and are CLI-reported, never guessed. Maps to dcat:mediaType (non-PROV
+      standard, hence prov_maps_to null). Format, not language: .py gets
+      IS_ENCODED_IN, not this edge.
+      REPLACES u2_has_media_type at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       code_snapshot.v1
     domain:       architecture
@@ -306,6 +468,55 @@
     supplement:   ontology_supplement.cypher
     loader:       code_snapshot.v1
     domain:       architecture
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: arch_is_encoded_in
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `arch_is_encoded_in` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'u1_is_encoded_in'; loaders write
+      'arch_is_encoded_in' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           arch_is_encoded_in
+    neo4j_label:  IS_ENCODED_IN
+    inverse_label: "encodes"
+    role:         ~
+    from_node:    "CodeModule | Script"
+    to_node:      SwoClass
+    prov_maps_to: ~
+    sosa_maps_to: ~
+    note: >
+      Binds a module to the programming language it is written in, targeting the
+      ALREADY-SEEDED SwoClass term (ontology.cypher:114, SWO_0000118 "Python").
+      Named for SWO_0000741 "is encoded in", the seeded SwoProperty it realises.
+      THE FIRST USE OF THE SWO LAYER IN THIS REPO — all 13 seeded terms had zero
+      consumers before this gate. Precedent it sets (§E1(b)): bind to a seeded term
+      that already means the thing, derive the value from data the artifact already
+      carries (node.extension), and invent nothing. Broader function-level binding
+      ("implements", "uses platform") was REJECTED — a dependency snapshot does not
+      know what a module implements. Value is .py-only today (§E2).
+      WIDENED 2026-08-07 (gate rua-load-shapes §C3, SIGNED OFF 28/28;
+      applied at G55): from_node = CodeModule | Script — the E1(b) adapter
+      pointed at the second software-artifact class. The .ksh ADDITION
+      rode the ruling: .ksh binds to the SAME Shell term as .sh
+      (SWO_0000124; SME — .ksh is a peer of .sh, not a separate language;
+      the signed m3_triggers note names the .ksh wrapper as the common
+      case in this estate), applied in code_snapshot.py at the session
+      with a same-iri test. The :Script edge loads at G23; the CodeModule
+      loader is unchanged. Boundary re-confirmed: run_as / J.OWNER is
+      Agent territory (PROV/ORG), never an SWO binding.
+      REPLACES u1_is_encoded_in at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
+    supplement:   ontology_supplement.cypher
+    loader:       code_snapshot.v1
+    domain:       architecture
     status:       active
 
   - id:           g22_occurrence_of
@@ -335,6 +546,54 @@
       (server-extract), repo+ref+commit+path (code-repo). Loaded ONLY by
       the G23 rua load (writer.plan_rua/write_rua), gate-checked like
       every other label it writes.
+    supplement:   ontology_supplement.cypher
+    loader:       writer.write_rua
+    domain:       architecture
+    status:       deprecated
+    deprecated_at: 2026-08-21
+    superseded_by: arch_occurrence_of
+    deprecation_note: >
+      ID MIGRATION ONLY — THE CONCEPT IS UNCHANGED. Gate vocabulary-domains-and-id-policy
+      §B3 (SIGNED 2026-08-12) ruled the epoch-tag ids FORCE-migrated onto the
+      domain-derived scheme; G87 applies it (2026-08-21). Add-new + deprecate-old, never
+      a rename in place: the id is the join key across the taxonomy-ontology-map, the
+      generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+      Live entry is `arch_occurrence_of` below — same shape, same active status.
+      DATA: edges already in a graph carry r.vocab_id = 'g22_occurrence_of'; loaders write
+      'arch_occurrence_of' from this date. drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher
+      re-stamps the old value (idempotent, one-time per environment).
+
+  - id:           arch_occurrence_of
+    neo4j_label:  OCCURRENCE_OF
+    inverse_label: "has occurrence"
+    role:         ~
+    from_node:    SourceOccurrence
+    to_node:      Script
+    prov_maps_to: "prov:specializationOf"
+    note: >
+      The anchor edge of the §D2 reified occurrence grain (gate
+      rua-load-shapes, SIGNED OFF 2026-08-07, 28/28): one observation of a
+      logical script IN one source, attached to the ONE path-keyed :Script
+      node (§D1) it specializes. REGISTERED AT G23, the loader build,
+      rather than G55: the MEANING was ruled and signed at §D2 — the
+      SourceOccurrence class note and its supplement block both declare
+      "the occurrence specializes the one logical Script node
+      (prov:specializationOf)", and §I1's fix-2 reads D2 as adding the
+      class AND its edge — but G55 applied only the entries the gate named
+      textually, so this entry transcribes the already-signed binding at
+      the moment the loader needs it. NOT a new meaning decided outside a
+      gate: the semantics, both endpoint classes, and the PROV term are
+      verbatim from the signed record; declining it would strand every
+      occurrence node the ruled grain requires. Occurrence identity =
+      deterministic occurrenceId (urn + origin + locator), so re-loads
+      MERGE idempotently; locator shapes per origin: host+path
+      (server-extract), repo+ref+commit+path (code-repo). Loaded ONLY by
+      the G23 rua load (writer.plan_rua/write_rua), gate-checked like
+      every other label it writes.
+      REPLACES g22_occurrence_of at G87 (2026-08-21) — forced id migration under gate
+      vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
+      now the entry's own `domain:` field. Same label, direction, active status
+      and semantics; history before 2026-08-21 is filed under the old id.
     supplement:   ontology_supplement.cypher
     loader:       writer.write_rua
     domain:       architecture

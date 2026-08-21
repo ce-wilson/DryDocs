@@ -108,12 +108,13 @@ def _vocab_entries() -> list[dict]:
 
 
 # Semantics seeded by the CORE schema (ontology.cypher), not a supplement:
-# prov_was_generated_by realises a pure PROV property whose ProvProperty term
-# is a core seed; c23_in_dimension is written at bootstrap by ontology.cypher
+# all_was_generated_by realises a pure PROV property whose ProvProperty term
+# is a core seed; quality_in_dimension is written at bootstrap by ontology.cypher
 # itself (loader: ontology.cypher — registered retroactively at C23, before
 # the vocabulary discipline existed). Nothing enters this set without the
 # same core-seeded justification in its entry note.
-CORE_SEEDED = {"prov_was_generated_by", "c23_in_dimension"}
+# ids repointed at G87 (2026-08-21): prov_ -> all_, c23_ -> quality_ (add-new + deprecate-old).
+CORE_SEEDED = {"all_was_generated_by", "quality_in_dimension"}
 
 
 def test_no_entry_is_active_without_a_supplement() -> None:
@@ -135,15 +136,15 @@ def test_g22_dispositions_are_terminal() -> None:
     entry left `planned` would silently read as still-a-candidate — the state
     the G55 acceptance names), and the held entry stays planned until K17."""
     status = {e["id"]: e.get("status") for e in _vocab_entries()}
-    assert status["m3_invokes"] == "active"  # §A3
-    assert status["m7_uses_artifact"] == "active"  # §A4
-    assert status["m3_reads_from"] == "active"  # §A5
-    assert status["m3_writes_to"] == "active"  # §A5
+    assert status["scheduler_invokes"] == "active"  # §A3
+    assert status["scheduler_uses_artifact"] == "active"  # §A4
+    assert status["scheduler_reads_from"] == "active"  # §A5
+    assert status["scheduler_writes_to"] == "active"  # §A5
     assert status["m3_runs_on_etl_host"] == "deprecated"  # §A2 declined
-    assert status["m3_delegates_to"] == "planned"  # §A1 held behind K17
+    assert status["scheduler_delegates_to"] == "planned"  # §A1 held behind K17
     assert status["arch_owns_directory"] == "planned"  # §C1 — build blocked on K17
     assert status["arch_sources"] == "planned"  # §C2
-    assert status["m3_triggers"] == "planned"  # not a G22 candidate — unchanged
+    assert status["scheduler_triggers"] == "planned"  # not a G22 candidate — unchanged
 
 
 def test_fragment_files_each_end_with_a_newline() -> None:
