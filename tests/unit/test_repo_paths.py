@@ -64,10 +64,11 @@ CONTENT_PATH_CONSTANTS: tuple[tuple[str, str], ...] = (
     # runtime READ default and stays package-internal. Same path, opposite call.
     ("drydocs.seal_samples", "DEFAULT_SAMPLES_DIR"),
     ("drydocs.port_preflight", "PORT_PROMPT_PATH"),
-    ("drydocs.cli", "DOC_REGISTRY_PATH"),
-    ("drydocs.cli", "SOFTWARE_REGISTRY_PATH"),
-    ("drydocs.cli", "PLATFORMS_PATH"),
-    ("drydocs.cli", "SOURCE_REGISTRY_PATH"),
+    # S8 (2026-08-21): the docs verbs and their content defaults moved out of the root
+    ("drydocs.cli_docs", "DOC_REGISTRY_PATH"),
+    ("drydocs.cli_docs", "SOFTWARE_REGISTRY_PATH"),
+    ("drydocs.cli_docs", "PLATFORMS_PATH"),
+    ("drydocs.cli_docs", "SOURCE_REGISTRY_PATH"),
     ("drydocs.loaders.bmc_docs", "DEFAULT_CORPUS_DIR"),
     ("drydocs.loaders.doc_traceability", "DEFAULT_DESIGN_DIR"),
     ("drydocs.loaders.essential_graphrag", "DEFAULT_PDF"),

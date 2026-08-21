@@ -136,7 +136,8 @@ def test_ingest_chain_order_is_enforced() -> None:
     assert [s[0] for s in drydocs_cli.CONTROLM_REL_STAGES] == ["controlm_dependencies_derived"]
     # The derived RUNS_ON resolution pass runs after ALL staged loads —
     # it reads the graph, not staging, so it sits after the stage loop.
-    cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
+    # S8: ingest-controlm lives in the ingest command module, not the root
+    cli_src = (ROOT / "drydocs" / "cli_ingest.py").read_text(encoding="utf-8")
     ingest = cli_src[cli_src.index("def ingest_controlm") :]
     assert ingest.index("runs_on_resolution") > ingest.index("for stage_name, cls,")
 
@@ -313,7 +314,7 @@ def test_hosts_sql_uses_its_own_scope_binds() -> None:
     # the folder-grained quartet does not apply at this grain (header comment
     # explains why — only code lines count here)
     assert ":folder_filter" not in code
-    cli_src = (ROOT / "drydocs" / "cli.py").read_text(encoding="utf-8")
+    cli_src = (ROOT / "drydocs" / "cli_ingest.py").read_text(encoding="utf-8")  # S8
     assert '"grpname_filter": None' in cli_src
 
 

@@ -72,6 +72,7 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 |---|---|---|
 | `drydocs/loaders/**` | `drydocs-load` (main) | `drydocs` ground truth |
 | `drydocs/cli.py` | `drydocs-load` (entrypoint) | — (orchestrates loaders) |
+| `drydocs/cli_schema.py`, `cli_ingest.py`, `cli_verify.py`, `cli_variables.py`, `cli_docs.py`, `cli_plan.py` | `drydocs-load` (per-domain command modules, S8 2026-08-21) — each holds one domain's Typer verbs and is merged FLAT onto the root, so `drydocs --help` is unchanged. They import shared state FROM the root and are NOT entrypoints: a verb that wires another component (resolve-cmdline-staging, lineage-review → `drydocs_lineage`; fid-census → `drydocs.fid_census`) stays in `cli.py`, the only `ENTRYPOINT_MODULES` exemption. `m1-verify`/`m3-verify` survive as deprecated aliases of `verify-reference`/`verify-controlm` | — (orchestrate loaders) |
 | `drydocs/snapshots/` | `drydocs-load` (tooling) | depgraph snapshot |
 | `drydocs/staging.py` | `drydocs-load` (staging bundle builder; ex `controlm/staging.py`) | — (builds loader input) |
 | `drydocs/cmdline_staging.py` | `drydocs-load` — G39/G40 TEMPORARY cmd-line job-detail staging store + parse (stand-in for the unbuilt psgmgr `CM_DEF_VJOB_DETAIL`; retire when a real table exists) | SQLite under `DRYDOCS_DATA_ROOT` (**no graph write**; G22 gates any load) |

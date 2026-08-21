@@ -92,8 +92,8 @@ poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itse
 poetry run drydocs load-essential-graphrag     # optional: ebook corpus (→ ddcontext)
 
 # 4. Verify invariants
-poetry run drydocs m1-verify
-poetry run drydocs m3-verify
+poetry run drydocs verify-reference   # m1-verify still works (deprecated alias, S8)
+poetry run drydocs verify-controlm    # m3-verify still works (deprecated alias, S8)
 ```
 
 The supplement order matters — `catalog_ontology_supplement.cypher` owns all canonical
@@ -141,7 +141,7 @@ for its options.
   `drydocs_lineage.writer`.
 
 **Verify & ops**
-- `m1-verify` / `m3-verify` — assert domain invariants on the populated graph.
+- `verify-reference` / `verify-controlm` — assert domain invariants on the populated graph (the milestone-named `m1-verify` / `m3-verify` remain as deprecated aliases, S8 2026-08-21).
 - `snapshot` / `prune-snapshots --years N` — (re)compute / prune entity snapshots.
 - `sweep-removed --days N [--label L] [--dry-run]` — hard-delete nodes soft-marked
   removed-from-source past the retention window (loads only ever MARK — D7).
@@ -240,7 +240,8 @@ DryDocs/
 │   │       └── controlm_dependencies_recursive.sql
 │   ├── schema/
 │   │   └── ontology_supplement.cypher               Control-M anchor terms live in the shared base supplement
-│   └── cli.py                                       registers ingest-controlm + m3-verify
+│   ├── cli.py                                       thin composition root (shared state, gates, the 3 cross-component verbs; S8)
+│   └── cli_{schema,ingest,verify,variables,docs,plan}.py   per-domain command modules, merged FLAT onto the root
 ├── drydocs/data/samples/
 │   ├── controlm_folders__sample.csv
 │   ├── controlm_jobs__sample.csv
@@ -264,7 +265,7 @@ poetry run drydocs ingest-controlm
 poetry run drydocs ingest-controlm --use-oracle --folder "CCB_AUTO_%"
 
 # Verify invariants.
-poetry run drydocs m3-verify
+poetry run drydocs verify-controlm
 ```
 
 Expected `m3-verify` output after the sample chain. **Reconciled 2026-07-18 (D6) to the

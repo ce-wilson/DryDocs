@@ -65,6 +65,17 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     "load": (
         "drydocs.loaders",
         "drydocs.cli",
+        # S8 (2026-08-21): cli.py is a thin composition root; the verbs live in
+        # per-domain modules that the root merges FLAT. They are classified load
+        # like the root but are NOT entrypoints — only drydocs.cli may wire other
+        # components, which is why resolve-cmdline-staging and lineage-review
+        # (drydocs_lineage) stayed in the root instead of moving out.
+        "drydocs.cli_schema",
+        "drydocs.cli_ingest",
+        "drydocs.cli_verify",
+        "drydocs.cli_variables",
+        "drydocs.cli_docs",
+        "drydocs.cli_plan",
         "drydocs.snapshots",
         "drydocs.staging",
         "drydocs.cmdline_staging",

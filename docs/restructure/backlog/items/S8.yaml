@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/cli.py
@@ -18,3 +18,25 @@ acceptance: |
   drydocs/cli.py is a thin root registering per-domain Typer sub-apps (schema / ingest / verify / variables / docs / plan), each in its own module; `drydocs --help` lists the same commands under the same names as before; the milestone-named verbs m1-verify / m3-verify gain verify-reference / verify-controlm aliases with the old names deprecated but still working; `python -c "import drydocs.cli"` clean; cli.py remains the composition root and remains exempt under ENTRYPOINT_MODULES (not a new exemption); full suite green.
 notes: |
   MERGE at the 2026-07-25 groom: the review's F6 (cli.py, 1,519 lines, 27 commands) and the long-parked IDEAS line "cli.py regroup: split the 937-line flat command list into domain subcommand groups — NOT milestone names" are the same work. The file has grown 582 lines since that note was written, which is the argument for doing it. Deliberately NOT dependent on S1 — no ADR ruling is needed to reorganize a CLI. Deprecation aliases were the original note's condition; keep them.
+  DONE 2026-08-21 (desktop). drydocs/cli.py 3184 -> 959 lines: the shared state (console, settings
+  client, source-registry gates, adapters, the load catalogue CANONICAL_LOAD_SEQUENCE / LOADER_REGISTRY /
+  COMMAND_LOADERS / REFRESH_REFERENCE_CHAIN, option factories, the callback) plus THREE verbs that wire
+  another component and therefore must stay in the only ENTRYPOINT_MODULES exemption:
+  resolve-cmdline-staging and lineage-review (drydocs_lineage) and fid-census (drydocs.fid_census,
+  review component). Six per-domain modules, each its own typer.Typer: cli_schema (check, landing-zones,
+  bootstrap, bootstrap-schema-graph, verify, reset, sweep-removed), cli_ingest (load, refresh-reference,
+  apply-supplements + the legacy per-supplement aliases, load-software-registry, load-batch-orchestrators,
+  load-code-snapshot, patch-window, load-server-inventory, load-folder-attribution, load-manual-mappings,
+  ingest-controlm), cli_verify (verify-reference, verify-controlm), cli_variables (export/parse-cmdline-
+  staging, analyze-variables, normalize-variables), cli_docs (load-bmc-docs, convert-vendor-docs,
+  load-vendor-docs, load-doc-traceability, load-essential-graphrag, load-email-extracts, docs-verify,
+  docs-coverage), cli_plan (snapshot, prune-snapshots). The root merges them FLAT
+  (app.registered_commands.extend) so `drydocs --help` lists the SAME 43 names as before -- diffed
+  before/after, the only additions are the two new aliases. m1-verify / m3-verify are registered
+  deprecated=True on the same callbacks as verify-reference / verify-controlm and still run.
+  `_client` is resolved THROUGH the root at call time in every submodule, so the tests that monkeypatch
+  drydocs.cli._client keep working unchanged; tests touched: test_controlm_cypher (reads ingest-controlm
+  text from cli_ingest), test_repo_paths (DOC_REGISTRY_PATH & co. now owned by cli_docs), and the six
+  modules classified `load` in test_module_boundary -- classification, not exemption; cli.py remains the
+  only ENTRYPOINT. pyproject per-file-ignore B008 extended to cli_*.py (Typer's convention). MODULE_MAP
+  + internal/repo-README updated. `python -c "import drydocs.cli"` clean; suite 2260 passed.

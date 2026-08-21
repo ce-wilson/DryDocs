@@ -143,6 +143,7 @@ ignore = [
 # Typer's API IS a call in the default: `def cmd(x: str = typer.Option(...))`.
 # B008 cannot be satisfied without abandoning the framework's calling convention.
 "drydocs/cli.py" = ["B008"]
+"drydocs/cli_*.py" = ["B008"]  # S8: the per-domain command modules carry the same Typer convention
 # RUF009 flags `span: Span = Span(0, 0)` on XmlNode. The rule exists to catch a
 # SHARED MUTABLE default, and `Span` is `@dataclass(frozen=True)` — an immutable
 # value object, so one shared instance is correct and a default_factory would
