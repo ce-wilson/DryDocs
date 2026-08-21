@@ -109,6 +109,28 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-150`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
+  **`snapshot.ps1` cannot find the depgraph sibling when run from a git worktree, so the
+  session ritual's last step is unavailable to exactly the sessions CLAUDE.md tells to use
+  worktrees.** Line 172 resolves the instrument as `"$here\..\..\..\depgraph"`, three hops up
+  from `knowledge/depgraph-snapshots`. From the main checkout that lands on
+  `C:\coding\projects\depgraph` and is correct; from
+  `.claude/worktrees/<name>` the same three hops land on
+  `.claude/worktrees/depgraph`, which does not exist, and the script dies with
+  `Resolve-Path : Cannot find path`. Hit at the O57 session close 2026-08-20: everything
+  before it succeeded — all renders written, `ci: GREEN at HEAD c583b76` reported by the
+  script's own check — and only the JSON write was lost, so the session produced no drift
+  record. `tests/unit/test_probe_instrument.py:252` SKIPS for the same reason and with the
+  same wrong path in its message (`depgraph sibling checkout absent at
+  ...\worktrees\depgraph`), so the two agree with each other while both being wrong about
+  where the sibling is. The fix is to resolve the repo's MAIN working tree rather than count
+  directory hops — `git rev-parse --path-format=absolute --git-common-dir` gives the shared
+  `.git`, whose parent is the main checkout, and it returns the same answer from a worktree
+  and from the checkout itself. Worth doing in the same pass for the test's skip path.
+  Mechanism-only, no gate. Not fixed inside the O57 session deliberately: this is a shared
+  instrument, the ritual step that records repo structure, and it cannot be honestly verified
+  from a worktree without also exercising it from the main checkout.
+
 - **`Idea-149`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
   **`ModuleIcon`'s switch has no `default` and no exhaustiveness check, so a new console
   module renders in the nav as bare text with no error anywhere.** Hit at the O57 build:
