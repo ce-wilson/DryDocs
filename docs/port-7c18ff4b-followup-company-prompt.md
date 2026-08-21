@@ -76,5 +76,19 @@ company-side; this prompt asks for nothing to be sent.
 Gate-log holds the FID pair in one commit and the board is regenerated; the
 PORT-REPORT carries the not-port-introduced section; `stash@{0}` is popped and
 the three HR files are back and still untracked; the stale `port-prompt.md` is
-retired. **Record the close-out in `port-exec-state.md` as you have been** — that
+retired — **defined (2026-08-20 evening, after your session rightly asked):** NOT
+`git rm` (it would orphan every reference), and NOT a reset to a fresh living
+ledger (that recreates the two-ledger divergence that made your step-43 copy
+stale). Archive your steps-43+ content to `docs/port-prompt-archive-company-
+steps-43-NN.md` with a `status: DATED RECORD` header, and replace
+`docs/port-prompt.md` with a short POINTER: the port authority is the producer's
+`docs/port-prompt.md` read at the certified tag + `PORT-MANIFEST.yaml` + the
+`reconcile-port` skill; your port history lives in `port-exec-state.md` and
+`PORT-REPORT-*.md`. References keep resolving; it never becomes a ledger again —
+that is what "never refresh" means. The same tombstone-pointer shape `backlog.yaml`
+took on the producer side today.
+
+**Also — before any other command on that machine:** if `origin` is the producer
+remote, disable its push URL (`git remote set-url --push origin DISABLED`). The
+"nothing pushes to the producer" guardrail should be physical, not procedural. **Record the close-out in `port-exec-state.md` as you have been** — that
 ledger is the record, and it is yours. Nothing is reported back.
