@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: opus
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs_core/ontology/relationship_vocabulary/00-header.yaml
