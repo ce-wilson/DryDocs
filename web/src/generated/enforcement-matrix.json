@@ -216,7 +216,7 @@
       ],
       "gate_ref": "taxonomy-importer layer (CLAUDE.md section 1)",
       "status": "gate-pending",
-      "pending_entries": 9,
+      "pending_entries": 10,
       "env_refs": [],
       "files": [
         "config/taxonomy/README.md",

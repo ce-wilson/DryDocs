@@ -584,3 +584,29 @@ invocation_patterns:
         Python script resolved as the invocation target, whether run
         directly or as an interpreter argument (python3 load_daily.py).
       status: proposed
+
+    # -- install-path rows (gate software-version-context §C1, SIGNED 2026-08-09;
+    #    authored by C33). A different FIELD from the rows above: these match an
+    #    INSTALL PATH from the adhoc fid-grain evidence (corpus adhoc-sme-email),
+    #    not a STG_INVOCATION launcher token, which is why no classifier_rule is
+    #    pinned -- commands.py never sees an install path. Same reviewable table
+    #    by the gate's ruling, so the two software-detection surfaces do not fork.
+    #    §C3: the version is DERIVED from the path, both forms stored
+    #    (version_raw verbatim `V4-3-2-2`, version normalized `4.3.2.2`), and a
+    #    missing 4th component is NEVER padded. §C4: a path matching no row loads
+    #    nothing. §C2: nothing here edits the product's curated versions: list.
+    - id: abinitio-install-path
+      product: abinitio
+      field: install_path
+      match_type: regex
+      pattern: '/abinitio-V(?P<major>\d+)-(?P<minor>\d+)-(?P<patch>\d+)(?:-(?P<build>\d+))?/?$'
+      example_matches:
+        - "<install-root>/abinitio-V4-3-2-2"     # version_raw V4-3-2-2 -> version 4.3.2.2
+        - "<install-root>/abinitio-V4-3-2"       # version_raw V4-3-2   -> version 4.3.2 (three components, as found)
+      note: >
+        Ab Initio Co>Operating System install directory as recorded in the
+        fid-grain evidence rows. The named groups are the §C3 version
+        components; the loader joins the present groups with "." and never
+        invents an absent one. Install-root is site-local and stays
+        company-side -- the row matches on the versioned leaf only.
+      status: proposed

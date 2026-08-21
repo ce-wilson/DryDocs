@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: blocked
 depends_on: []
 inputs:
 - config/gate-prompts/software-version-context.yaml
@@ -21,3 +21,16 @@ acceptance: |
   The gate signed the SHAPE and nothing else: reg_appuser_uses_software is registered status: planned, no loader exists, and the adhoc-sme-email corpus stays confirmed: false for that reason alone. This item builds exactly what sections A-E signed -- the loader itself (MERGE key per section Q3 below, edge properties per B3, as_of from the email's sent date), the :Document minted from the hand-recorded citation, the evidence: block's as_of filled in on the abinitio product row, registration in config/manual-loads/manifest.yaml per E4, and the C1 install-path pattern rows in the invocation_patterns shape. SECTION Q3 IS SETTLED BEFORE THE MERGE KEY IS WRITTEN, not after. The gate deferred it with the consequence stated: if the estate re-points installs by symlink, install_path is a poor key and identity moves to (fid, version), which is a RE-KEY rather than an edit. If Q3 cannot be answered, the item STOPS at that question and says so -- a guessed identity key is the failure the identity gate's D2/C3 exist to prevent. Two things this build must NOT do: write the section F application-level rollup (blocked on K17, and not behind a flag), and auto-append observed versions to the curated versions: list (C2). The vocabulary entry flips planned -> active only if its gate says so; nothing here signs anything.
 notes: |
   Groomed 2026-08-11 from Idea-98, the first of the follow-ups C25's close note carries. model fable because the deliverable lands a MERGE KEY -- the identity decision the gate deferred -- while the code around it is ordinary loader work. The observable close signal is the corpus flipping confirmed: false -> true on adhoc-sme-email, which is exactly why it must not flip on a guessed key.
+  STOPPED AT Q3, 2026-08-21 -- as the acceptance requires. The repo holds no answer to
+  Q3 (install_path stable, or re-pointed by symlink?): the only mentions are the gate's own
+  deferral and the rua-load-shapes D1 precedent, which forbids symlink RESOLUTION on capture
+  but says nothing about whether the estate re-points installs. The MERGE key is therefore
+  NOT written and no loader exists. Built before the stop, because it does not depend on Q3:
+  the §C1 install-path pattern row `abinitio-install-path` in
+  config/taxonomy/software-registry.yaml#invocation_patterns (field install_path, named
+  version groups, never-pad examples, status proposed). Still owed once Q3 is ruled: the
+  loader (key {source, install_path} if paths are stable; (fid, version) if symlinked), the
+  :Document citation (needs the email's sent date and digest -- company-side), the
+  evidence.as_of on the abinitio row, and the manifest.yaml registration. UNBLOCK = one SME
+  sentence answering Q3, logged as a RECORD in config/gate-log.md under the
+  software-version-context gate.
