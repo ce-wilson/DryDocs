@@ -20,20 +20,27 @@ on:
     branches: ["**"]
   pull_request:
 
+# A newer push to the same ref cancels the in-flight run for the older commit —
+# only the newest sha runs to completion (Actions-minutes decision, 2026-08-21).
+# The session ritual is unaffected: snapshot.ps1's CI check matches on HEAD's
+# sha, and HEAD's run is the one cancellation never touches.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   gates:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      # Single version by decision (2026-08-21, Actions-minutes cost): 3.12 is
+      # what both dev machines run. pyproject's ^3.11 floor is deliberately
+      # untested here — tightening it to ^3.12 would churn poetry.lock instead.
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Install Poetry
         run: pipx install poetry
@@ -42,8 +49,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pypoetry
-          key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-${{ runner.os }}-py${{ matrix.python-version }}-
+          key: poetry-${{ runner.os }}-py3.12-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-py3.12-
 
       - name: Install dependencies
         run: poetry install --no-interaction
