@@ -159,11 +159,12 @@ try {
     Pop-Location
     $runs = @()
     if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
-      # PS 5.1 trap (false GREEN, 2026-08-20): piping into ConvertFrom-Json
-      # returns the JSON array as ONE wrapped object, so the verdict's scalar
-      # tests become member-enumeration FILTERS - '-eq "success"' is truthy if
-      # ANY of the 10 runs succeeded, not if HEAD's did. Argument form unwraps.
-      $runs = @(ConvertFrom-Json ($raw -join "`n"))
+      # PS 5.1 trap (false GREEN, 2026-08-20): ConvertFrom-Json emits a JSON
+      # array as ONE PSObject-wrapped item (argument form included), so the
+      # verdict's scalar tests become member-enumeration FILTERS - '-eq
+      # "success"' is truthy if ANY of the 10 runs succeeded, not if HEAD's
+      # did. Enumerating the parsed object is what actually unrolls it here.
+      $runs = @((ConvertFrom-Json ($raw -join "`n")) | ForEach-Object { $_ })
     }
     $verdict = Get-CiVerdict -Runs $runs -Head $head
     Write-Host $verdict.Text -ForegroundColor $verdict.Color
