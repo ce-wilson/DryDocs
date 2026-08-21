@@ -677,12 +677,21 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             # 0002 D1/D2. Was `ddlineage` — a database nothing writes.
             database="drydocs",
             description=(
-                "Data-series chains: FileWatcher-triggered ETL processes and the "
-                "assets they land (curated post-gate; zero rows is the honest state "
-                "until the lineage live-load gate flips)."
+                "Data-series chains: the ETL process each job's command line "
+                "invokes and the assets it lands (curated lineage; zero rows is "
+                "the honest state until the live load runs)."
             ),
+            # G89 (2026-08-21, gate vocabulary-domains-and-id-policy §C3): this spec
+            # MATCHed [:TRIGGERS], a PLANNED edge no loader may write — and one whose
+            # registered shape is Script -> ETLProcess, not job -> ETLProcess, so the
+            # surface implied data that could not exist in either direction. Resolved
+            # onto INVOKES (scheduler_invokes, ACTIVE since G55): ControlMJob ->
+            # Script | ETLProcess is exactly the job-launches-process fact the runbook
+            # series needs. The TRIGGERS entry stays planned and untouched; when its
+            # build lands, the wrapper-script hop is a second, finer spec, not a
+            # rewrite of this one.
             cypher=(
-                "MATCH (j:ControlMJob)-[:TRIGGERS]->(e:ETLProcess) "
+                "MATCH (j:ControlMJob)-[:INVOKES]->(e:ETLProcess) "
                 "WHERE NOT j:SchemaMeta "
                 "OPTIONAL MATCH (e)-[:WRITES_TO]->(d:DataAsset) "
                 "RETURN j.job_name AS trigger_job, e.token AS process, e.kind AS kind, "
