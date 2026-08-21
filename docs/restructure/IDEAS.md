@@ -110,6 +110,57 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-152`** · 2026-08-20 · `[idea]` · **open** · prio **High** —
+  **Log/config substrate: the log directory is env-var-only, two run-log families plus a
+  JSONL ledger share one directory under two naming rules with no rotation, and
+  `AppSettings.log_level` is wired to nothing.** Captured from a 2026-08-20 survey of this
+  repo beside a sister internal project's logging layer (mechanism only; no names or paths
+  carried). What the survey found here: (a) `drydocs_core/run_log.py` resolves
+  `DRYDOCS_LOGDIR` → `SPIDERP_LOGDIR` → `~/logs/DryDocs`; `adapters/sql_run_log.py` honors
+  only the legacy var; `agents/common/llm_ledger.py` writes a per-DAY `qa.graph_qa.<YYYYmmdd>
+  .jsonl` beside per-RUN `<kind>.<name>.<ts>.log` files; none rotate, cap, or sweep.
+  (b) `cli.py:715` is the sole `basicConfig` — level comes from `--verbose` only; stderr
+  only; `DRYDOCS_LOGDIR` never receives console output. (c) `drydocs_api` (incl.
+  `/raw-cypher`, `/specs/{id}/run`) logs nothing; `drydocs_remediation` (G93), `_lineage`,
+  `_docmeta`, `_deepdoc` have no logger; `scripts/external_vendor_scrape.py` prints only;
+  `agents/graph_qa/agent.py:70-77` swallows telemetry failures bare. (d) `.env.example`
+  documents neither `DRYDOCS_LOGDIR` nor `DRYDOCS_DATA_ROOT`. (e) Data-root drift: registry
+  `dpl/` vs code `dpl-registry/`; six code zones (`email-extracts`, `context-intake`,
+  `vendor-docs`, `remediation/*`, `cmdline-staging`, `catalog`) have no `source-registry`
+  row so `drydocs landing-zones --check` is blind to them; the Confluence capture lands
+  in-tree, against `landing_zones.py`'s tracked-only rule. **The pattern worth adopting
+  from the sister project**, as a sample: one factory module owning `get_logger(app)`;
+  per-key resolution *env var → config-file key → fallback arg → error* over a small
+  key file —
+  `LOG_ROOT=<base>/log_files`, `CONSOLE_LOG_DIR=<base>/log_files/console`,
+  `<INTEGRATION>_LOG_DIR=<base>/log_files/<integration>` (relative = repo-root-anchored,
+  env overrides); files `<app>/<stream>_<YYYYMMDD>_<HHMMSS>.log` under a per-app rotating
+  handler with a size quota, N-day retention, and a background sweeper. Its recorded
+  gotchas are the anti-checklist: level hardcoded with no env override; Linux-absolute
+  default that breaks on Windows; silent fallback to the local profile on a misconfigured
+  box; process-start timestamp in local time so all files share one stamp; sweeper
+  registry growing unbounded when `get_logger` is called with per-incident names.
+  **Proposed ADR 0014 "runtime substrate: logs, settings, data zones"** (next free number;
+  must reconcile with ADR 0009, which already makes git YAML the settings source of truth):
+  (1) one `RuntimeSettings` group (`DRYDOCS_` prefix, pydantic-settings like `config.py`)
+  carrying `log_dir`, `log_level`, `log_retention_days`, `data_root` — `.env`-readable,
+  env-overridable, defaults unchanged; `SPIDERP_*` kept one cycle as deprecated aliases,
+  then `DRYDOCS_*` only on both families (symmetry with the data root, which has no
+  legacy var). (2) stdlib `logging.config.dictConfig` from that group, no new runtime dep:
+  console + a JSON-lines file sink in `log_dir`, level from settings, `--verbose` still
+  wins; `run_log.py`'s header/summary contract unchanged. (3) ONE naming rule for the
+  directory — `<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}` — and the ledger moves to it
+  (or the exception is documented). (4) `drydocs prune-logs` mirroring `prune-snapshots`
+  (age + size, dry-run default) instead of a daemon sweeper. (5) every component opens a
+  `LoaderRunLog` per batch (G93 generalized to lineage/docmeta/deepdoc/scrape). (6) an API
+  request/audit line for every Cypher-executing route, actor hashed like `AgentRun`.
+  (7) the data-zone map gets a single declaration — `source-registry.yaml` rows for the six
+  undeclared zones, `dpl-registry` reconciled, `data_root.py` resolvers derived from the
+  rows — and `.env.example` gains both roots. Groom into: the ADR; a core item (1-3);
+  a load item (4); per-component items (5); an api item (6); a config item (7). The
+  ask-search logging request (executed Cypher never persisted server-side; only counted
+  on `:AgentRun`) is a separate idea once its owner surface is known.
+
 - **`Idea-151`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
   **A bare one-key claim commit goes RED in CI: the pushed-claim protocol and the roadmap
   stale-render guard contradict each other.** First hit 2026-08-20 (laptop), the first
