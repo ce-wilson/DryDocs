@@ -25,6 +25,13 @@ interface Turn {
   running: boolean
 }
 
+// O64: ONE completed turn per persona survives navigation, in browser-local
+// storage for this phase. Completed turns only — the write site below runs
+// solely on a success envelope, and the read here refuses anything else — so
+// neither an in-flight spinner nor a stale error can be re-presented as
+// current. Explore-refs inside a restored turn keep their existing TTL
+// behavior: SpecGrid's fallback shows the expired-ref empty state, the turn
+// itself still renders.
 const LAST_TURN_PREFIX = 'drydocs.ask.last-turn.v1.'
 
 function lastTurnKey(personaId: string): string {
@@ -36,7 +43,12 @@ function loadLastTurn(personaId: string): Turn[] {
     const raw = localStorage.getItem(lastTurnKey(personaId))
     if (!raw) return []
     const turn = JSON.parse(raw) as Turn
-    return turn && typeof turn.question === 'string' && turn.envelope ? [{ ...turn, running: false }] : []
+    if (!turn || typeof turn.question !== 'string' || !turn.envelope) return []
+    // id 0 keeps the restored turn clear of the session counter (fresh asks
+    // start at id 1; a colliding id would make patch() update both turns and
+    // React see duplicate keys); error/running cleared — a persisted turn is
+    // completed by construction.
+    return [{ ...turn, id: 0, steps: Array.isArray(turn.steps) ? turn.steps : [], error: null, running: false }]
   } catch {
     return []
   }
@@ -82,6 +94,18 @@ export default function AskRoute({ persona }: { persona: Persona }) {
   const [question, setQuestion] = useState('')
   const [turns, setTurns] = useState<Turn[]>(() => loadLastTurn(persona.id))
   const nextId = useRef(1)
+  // O64: a `?as=` persona swap re-renders this same mounted route (sign-out
+  // remounts, the dev bypass does not), so a persona change re-derives the
+  // list from THAT persona's storage — the other persona's turn must never
+  // linger on screen. Render-time reset is the React "state from props"
+  // adjustment pattern; an in-flight ask from the old persona patches by id
+  // into a list that no longer holds it (a no-op) and still SAVES under the
+  // persona that asked, which onAsk captured at call time.
+  const shownPersona = useRef(persona.id)
+  if (shownPersona.current !== persona.id) {
+    shownPersona.current = persona.id
+    setTurns(loadLastTurn(persona.id))
+  }
   const running = turns.some((t) => t.running)
 
   async function onAsk() {
@@ -125,6 +149,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
           error: null,
           running: false,
         }
+        // O64: the ONLY persistence write — success envelopes, nothing else
         try {
           localStorage.setItem(lastTurnKey(persona.id), JSON.stringify(completed))
         } catch {}

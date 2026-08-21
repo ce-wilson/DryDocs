@@ -105,7 +105,10 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # every-module-has-a-suite rule below, and this one is not an empty one.
     # 4/13 -> 5/13 at O66 (2026-08-21): TS-OWNERSHIP seeded from the label-
     # readability fix's own in-browser verification (laptop, headless Chrome).
-    assert (len(seeded), len(suites)) == (5, 13), (
+    # 5/13 -> 6/13 at O64 (2026-08-21): TS-ASK seeded from the last-turn
+    # persistence verification — with its stated caveat that the completed
+    # turn was storage-seeded, not produced by a live agent run.
+    assert (len(seeded), len(suites)) == (6, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )

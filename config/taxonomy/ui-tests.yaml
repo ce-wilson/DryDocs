@@ -248,5 +248,56 @@ suites:
   - { id: TS-REMEDIATION, module: remediation, description: "Finding -> fix-batch flow.", cases: [] }
   - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }
   - { id: TS-GATES,       module: gates,       description: "Gate dependency graph + gate log.", cases: [] }
-  - { id: TS-ASK,         module: ask,         description: "Agent Q&A spoke: streamed steps, citations, metrics chip.", cases: [] }
   - { id: TS-UNDERHOOD,   module: underhood,   description: "Benchmark showcase surfaces.", cases: [] }
+
+  # ---------------------------------------------------------------------------
+  - id: TS-ASK
+    module: ask
+    description: >
+      Agent Q&A spoke: streamed steps, citations, metrics chip. Seeded at O64
+      (2026-08-21), the last-turn persistence fix. VERIFICATION CAVEAT, stated
+      because source rows must not overclaim: the completed turn in these runs
+      was SEEDED into browser-local storage (the agent stack was not run
+      end-to-end on the verifying machine); the write site was verified by
+      code-read plus the failed-ask negative case, which left storage
+      untouched. An end-to-end completed-ask run upgrades these sources when
+      the stack is next up.
+    cases:
+      - id: TC-ASK-01
+        description: The last completed turn survives navigating away and back
+        steps:
+          - Complete a turn on /ask (or seed drydocs.ask.last-turn.v1.<personaId>).
+          - Navigate to /explorer via the aside (SPA navigation, no reload).
+          - Navigate back to /ask the same way.
+        expect: >
+          The question as asked and the answer as returned render instead of
+          the empty panel — AskRoute unmounts on route change and previously
+          lost the turn (the reported data-loss defect). One completed turn
+          per persona, browser-local storage for this phase. A restored turn's
+          explore-ref still offers Open in Explorer, and a dead ref degrades
+          VISIBLY (SpecGrid's unavailable notice + empty state) while the turn
+          itself keeps rendering.
+        source: "O64 verification 2026-08-21 — laptop, headless-Chrome harness vs Vite :5199, agent stack down: restoredOnLoad / restoredAfterSpaNav / expiredRefDegradesVisibly all true, screenshots in the close"
+      - id: TC-ASK-02
+        description: In-progress and failed turns are never persisted
+        steps:
+          - With the agent stack down, ask any question and watch it fail.
+          - Inspect drydocs.ask.last-turn.v1.<personaId>; navigate away and back.
+        expect: >
+          The failure renders honestly in-session, storage still holds only
+          the prior COMPLETED turn, and after navigation the failed turn is
+          gone while the completed one is restored — a spinner no request is
+          behind and a stale error re-presented as current are both worse
+          than the empty panel.
+        source: "O64 verification 2026-08-21 — laptop, headless-Chrome harness vs Vite :5199: failedTurnShown / failedTurnNotPersisted / failedTurnGoneAfterNav / completedTurnBackAfterNav all true"
+      - id: TC-ASK-03
+        description: Switching persona shows that persona's turn, or nothing
+        steps:
+          - With a turn stored for one persona only, open /ask as the other persona.
+          - Switch back to the first.
+        expect: >
+          The second persona gets the empty ask panel (never the first's
+          turn); the first gets their own turn back. Storage is keyed per
+          persona; an in-place persona swap (?as=) re-derives the list on
+          render, and a sign-out/sign-in remount re-reads storage.
+        source: "O64 verification 2026-08-21 — laptop, headless-Chrome harness vs Vite :5199: otherPersonaSeesNothing / ownerPersonaSeesTheirTurn true, jdoe4821-empty screenshot in the close"
