@@ -51,12 +51,24 @@ def test_sql_run_log_shares_the_same_knob(tmp_path, monkeypatch):
 
 
 def test_naming_convention_and_collision_suffix(tmp_path, monkeypatch):
+    """J46: the clock is FROZEN across the two claims. Before, the test raced the
+    wall clock — it passed only when both calls landed inside one second, and
+    rode every full-suite run as an occasional -2-suffix failure. What is under
+    test is unchanged: the second claim of an existing name gets -2."""
+    from datetime import datetime
+
     monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path))
-    first = claim_log_path("load.controlm_jobs.v1")
+    frozen = datetime(2026, 8, 21, 4, 5, 6)
+    first = claim_log_path("load.controlm_jobs.v1", now=lambda: frozen)
     first.touch()
-    second = claim_log_path("load.controlm_jobs.v1")
+    second = claim_log_path("load.controlm_jobs.v1", now=lambda: frozen)
+    assert first.name == "load.controlm_jobs.v1.20260821-040506.log"
+    assert second.name == "load.controlm_jobs.v1.20260821-040506-2.log"
     assert re.fullmatch(r"load\.controlm_jobs\.v1\.\d{8}-\d{6}\.log", first.name)
-    assert re.fullmatch(r"load\.controlm_jobs\.v1\.\d{8}-\d{6}-2\.log", second.name)
+    # and a later second is a fresh name, not a suffix — proof the suffix is the
+    # collision logic and not an artefact of the frozen clock
+    later = claim_log_path("load.controlm_jobs.v1", now=lambda: datetime(2026, 8, 21, 4, 5, 7))
+    assert later.name == "load.controlm_jobs.v1.20260821-040507.log"
 
 
 # ---- header / meta ----------------------------------------------------------

@@ -37,7 +37,7 @@ import logging
 import os
 import sys
 import time
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -75,11 +75,16 @@ def caller_stamp() -> str:
     return "drydocs " + " ".join(sys.argv[1:])
 
 
-def claim_log_path(base_name: str) -> Path:
-    """Claim a log file under the shared naming convention, creating the dir."""
+def claim_log_path(base_name: str, *, now: Callable[[], datetime] = datetime.now) -> Path:
+    """Claim a log file under the shared naming convention, creating the dir.
+
+    ``now`` is injectable (J46): the collision suffix is decided by the second
+    stamp, so a test that wants a collision must hold the clock still rather
+    than hope two calls land inside the same wall-clock second.
+    """
     log_dir = resolve_log_dir()
     log_dir.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    stamp = now().strftime("%Y%m%d-%H%M%S")
     path = log_dir / f"{base_name}.{stamp}.log"
     seq = 1
     while path.exists():  # same base within one second (tests, retries)

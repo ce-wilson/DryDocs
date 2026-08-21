@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/gate-prompts/fid-identity-and-scope.yaml
@@ -20,3 +20,14 @@ acceptance: |
   REPRODUCED AT THE 2026-08-12 GROOM, no database and no company data (J18): a scan of every file in config/gate-prompts/ parsing the leading Qn of each open_questions entry reports exactly one collision in the whole tree -- fid-identity-and-scope.yaml, 9 questions, id Q6 used TWICE. One Q6 is the SME answer landed 2026-08-12 (CM_DEF_VJOB.OWNER holds the NAME, the join normalizes the directory side only); the other is an older, still-open question about whether the directory exposes an application-level roll-up. The gate this page belongs to is K17, which is the next thing walked on this thread, so the ambiguity is about to be written into a sign-off. (a) RENUMBER THE UNANSWERED ENTRY ONLY -- the roll-up question becomes the next free id (Q8; Q7 was raised the same day) and the ANSWERED Q6 keeps its number, because four other files already cite "Q6" by number for the answer and not for the roll-up question: config/source-mappings/psgmgr.yaml (the OWNER column note), config/source-registry.yaml (the psgmgr dataset note), docs/k16-fid-census-company-prompt.md, and backlog item K16's own "RUN Q6 FIRST" line. Verify each of those four still reads correctly after the edit; any citation found pointing at the roll-up question is re-pointed in the same commit. (b) A GUARD so this cannot recur silently: a test in tests/unit/test_gates_json.py (which already iterates config/gate-prompts/*.yaml) fails when any gate page reuses a question id inside open_questions, naming the file and the duplicated id. Guard added FIRST, watched to fail on the current tree, then the renumber turns it green -- the J26 shape. DECIDES NOTHING THE GATE OWNS: no question is answered, closed, or reworded, no edge semantics are touched, and no answer status changes. This is identifier hygiene on a page whose ids are quoted from four other files.
 notes: |
   Raised at the 2026-08-12 groom, not from the inbox -- found while re-checking the fid-identity-and-scope page after the same-day --run-as bind fix (887a0e7), which answered Q6 and raised Q7 in the same edit; the older Q6 was simply never renumbered when the new one was appended. Left DEPENDENCY-FREE rather than wired ahead of K17: the renumber touches only the entry nobody cites, so it is safe in either order, and blocking a p1 gate on a p2 identifier fix would cost more than the ambiguity. SEQUENCING PREFERENCE, not a dependency: land this BEFORE the K17 session, so the sign-off record cites an id that means one thing.
+  DONE 2026-08-21 (desktop). (a) The renumber had ALREADY LANDED on 2026-08-19 (b36ef388): the
+  unanswered roll-up question is Q8 ("renumbered 2026-08-19 -- this entry was a second Q6"), the
+  SME-answered OWNER question keeps Q6. The four citations re-read today all point at the answer:
+  psgmgr.yaml OWNER column note, source-registry.yaml psgmgr dataset note ("UPPER(CM_DEF_VJOB.OWNER)
+  -- the NAME on both sides"), docs/k16-fid-census-company-prompt.md ("gate section Q6" on the UPPER()
+  join), K16's "RUN Q6 FIRST ... whether CM_DEF_VJOB.OWNER holds the NAME". None pointed at the roll-up.
+  (b) GUARD, tests/unit/test_gates_json.py: test_no_gate_page_reuses_a_question_id iterates every
+  config/gate-prompts/*.yaml, parses the leading Qn of each open_questions entry and fails naming the
+  file and the duplicated id; the J26 proof is twofold -- a synthetic page with two Q6 fails the
+  detector, and the PRE-RENUMBER page read back from git (b36ef388^) yields ids
+  Q0..Q7 + Q6 -> {'Q6': 2}. Nothing the gate owns was decided.

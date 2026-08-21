@@ -101,3 +101,53 @@ def test_unsigned_but_cited_gates_render_open():
         "K7 signed this gate 2026-08-03 (heading-named entry) — an open row here "
         "means the classifier stopped honouring heading-named sign-offs"
     )
+
+
+# --- K24: question ids on a gate page are unique ------------------------------------
+
+
+def _question_ids(entries: list) -> list[str]:
+    """The leading Qn of each open_questions entry, in page order."""
+    ids = []
+    for entry in entries or []:
+        text = entry if isinstance(entry, str) else json.dumps(entry, ensure_ascii=False)
+        m = re.match(r"\s*(Q\d+)\b", text)
+        if m:
+            ids.append(m.group(1))
+    return ids
+
+
+def _duplicate_question_ids(entries: list) -> dict[str, int]:
+    ids = _question_ids(entries)
+    return {q: ids.count(q) for q in sorted(set(ids)) if ids.count(q) > 1}
+
+
+def test_no_gate_page_reuses_a_question_id():
+    """K24 (2026-08-21): fid-identity-and-scope.yaml carried TWO Q6 entries — the
+    SME-answered OWNER question and an older open roll-up question — while four
+    other files cite 'Q6' by number for the ANSWER. A reused id on a page whose
+    ids are quoted elsewhere is an ambiguity about to be written into a
+    sign-off. Identifier hygiene only: nothing a gate owns is decided here."""
+    import yaml
+
+    offenders = []
+    for path in sorted((REPO / "config" / "gate-prompts").glob("*.yaml")):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        dupes = _duplicate_question_ids(doc.get("open_questions") or [])
+        if dupes:
+            offenders.append(f"{path.name}: {dupes}")
+    assert not offenders, (
+        "gate page(s) reuse a question id inside open_questions:\n  " + "\n  ".join(offenders)
+    )
+
+
+def test_the_duplicate_detector_sees_a_second_q6():
+    """J26: the guard is watched to fail on the defect shape before it is trusted."""
+    entries = [
+        "Q5: fine",
+        "Q6 [ANSWERED]: the OWNER column holds the name",
+        "Q7: something else",
+        "Q6: is there an application-level roll-up?",
+    ]
+    assert _duplicate_question_ids(entries) == {"Q6": 2}
+    assert _duplicate_question_ids(entries[:3]) == {}
