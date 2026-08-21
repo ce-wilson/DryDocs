@@ -32,11 +32,21 @@ Cypher source of truth, no HTTP dependency.
 cd agents
 .venv\Scripts\Activate.ps1          # first time: python -m venv .venv; pip install -r requirements.txt
 Copy-Item .env.example .env          # fill NEO4J_PASSWORD (+ GOOGLE_API_KEY for the LLM apps)
-adk api_server --allow_origins http://localhost:5173
+.venv\Scripts\python serve.py --allow_origins http://localhost:5173
 ```
 
 Serves http://localhost:8000 — `GET /list-apps`, `POST /apps/{app}/users/{u}/sessions/{s}`,
 `POST /run`. Swagger at `/docs`. (`adk web` gives the ADK dev UI instead.)
+
+**Why `serve.py` and not `adk api_server` (R14, 2026-08-21).** `adk api_server` uses ADK's flat
+`AgentLoader`, whose `/list-apps` returns every non-hidden subdirectory — so the shared-tools
+package `common/` was listed as a fifth app. `serve.py` builds the identical FastAPI app but hands
+it ADK's own `NestedAgentLoader` (the loader `adk web` uses), which lists a directory only when it
+holds an `agent.py` or `root_agent.yaml`. Nothing moved: `common` stays importable as `common`.
+**Convention:** an APP is a directory with an `agent.py`; a SHARED package has none and is therefore
+never an app — put new shared tooling in `common/` (or another `agent.py`-less package), never in a
+directory with an `agent.py`. `tests/unit/test_agents_app_discovery.py` holds the app list to the
+four real apps.
 
 ## Memory-leak testing notes
 
