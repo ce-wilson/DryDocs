@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-21T09:19:01",
+    "captured_at": "2026-08-21T11:52:57",
     "date": "20260821",
-    "scan": "DryDocs",
+    "scan": "ui-workstream",
     "tree": true,
     "git": {
-      "commit": "4176c125",
-      "full": "4176c12574fc06d0f242b3d6098c26757e487211",
-      "branch": "main",
-      "describe": "port-base-20260820-110-g4176c125",
-      "subject": "feat(ontology): MM2 — gate prompt data-flow-overview drafted; :DataFlow + five edges registered planned",
+      "commit": "bc002e07",
+      "full": "bc002e07595d94cc37abe292893bccc686395450",
+      "branch": "HEAD",
+      "describe": "port-base-20260820-121-gbc002e07",
+      "subject": "Merge branch 'feat/s9-docs-hygiene' (S9 — repo-root docs hygiene, F10/F13)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -5552,6 +5552,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/.git",
+      "name": ".git",
+      "extension": "",
+      "rel_path": ".git",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/.git-blame-ignore-revs",
       "name": ".git-blame-ignore-revs",
       "extension": "",
@@ -5736,519 +5745,6 @@
       "name": "plan-incrementalContextLoop.prompt.md",
       "extension": ".md",
       "rel_path": "SDLC-Docs/extracted/plan-incrementalContextLoop.prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP",
-      "name": "UI-WIP",
-      "extension": "",
-      "rel_path": "UI-WIP",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Copilot_20260703_231747.png",
-      "name": "Copilot_20260703_231747.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Copilot_20260703_231747.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Copilot_20260703_231838.png",
-      "name": "Copilot_20260703_231838.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Copilot_20260703_231838.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/DryDocs_UI_Development_Specs.md",
-      "name": "DryDocs_UI_Development_Specs.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/DryDocs_UI_Development_Specs.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini-generated-subpage-2.png",
-      "name": "Gemini-generated-subpage-2.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini-generated-subpage-2.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini-generated-subpage-3.png",
-      "name": "Gemini-generated-subpage-3.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini-generated-subpage-3.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini-generated-subpage.png",
-      "name": "Gemini-generated-subpage.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini-generated-subpage.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini_Generated_Image_oob4hpoob4hpoob4.png",
-      "name": "Gemini_Generated_Image_oob4hpoob4hpoob4.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini_Generated_Image_oob4hpoob4hpoob4.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini_Generated_Landing-1.png",
-      "name": "Gemini_Generated_Landing-1.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini_Generated_Landing-1.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini_Generated_Landing-Favorite.png",
-      "name": "Gemini_Generated_Landing-Favorite.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini_Generated_Landing-Favorite.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/Gemini_Generated_Landing-different.png",
-      "name": "Gemini_Generated_Landing-different.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/Gemini_Generated_Landing-different.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/WEBSITE-IDEAS.MD",
-      "name": "WEBSITE-IDEAS.MD",
-      "extension": ".MD",
-      "rel_path": "UI-WIP/WEBSITE-IDEAS.MD",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/backstage-catalog-assessment.md",
-      "name": "backstage-catalog-assessment.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/backstage-catalog-assessment.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/backstage-deepdive-plan.md",
-      "name": "backstage-deepdive-plan.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/backstage-deepdive-plan.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/claude-design-ui-prompt.md",
-      "name": "claude-design-ui-prompt.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/claude-design-ui-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/codeflow-ui-reference.png",
-      "name": "codeflow-ui-reference.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/codeflow-ui-reference.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/dd-verify-top.png",
-      "name": "dd-verify-top.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/dd-verify-top.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/design-review.md",
-      "name": "design-review.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/design-review.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/drydocs-console-mockup.html",
-      "name": "drydocs-console-mockup.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/drydocs-console-mockup.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/drydocs-landing-dark.html",
-      "name": "drydocs-landing-dark.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/drydocs-landing-dark.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/drydocs-wireframe-print.pdf",
-      "name": "drydocs-wireframe-print.pdf",
-      "extension": ".pdf",
-      "rel_path": "UI-WIP/drydocs-wireframe-print.pdf",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/gemini-wire-frame.md",
-      "name": "gemini-wire-frame.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/gemini-wire-frame.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/icons.md",
-      "name": "icons.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/icons.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/kept-orbit-brand-sheet.png",
-      "name": "kept-orbit-brand-sheet.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/kept-orbit-brand-sheet.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/kept-orbit-philosophy.md",
-      "name": "kept-orbit-philosophy.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/kept-orbit-philosophy.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/layout-anatomy-checklist.md",
-      "name": "layout-anatomy-checklist.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/layout-anatomy-checklist.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/logo-5.png",
-      "name": "logo-5.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/logo-5.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/logo-8.png",
-      "name": "logo-8.png",
-      "extension": ".png",
-      "rel_path": "UI-WIP/logo-8.png",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/neo4j-community-logo.webp",
-      "name": "neo4j-community-logo.webp",
-      "extension": ".webp",
-      "rel_path": "UI-WIP/neo4j-community-logo.webp",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/site-plan.md",
-      "name": "site-plan.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/site-plan.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/sme-agent-test-runbook.md",
-      "name": "sme-agent-test-runbook.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/sme-agent-test-runbook.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/sme-intake-page-plan.md",
-      "name": "sme-intake-page-plan.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/sme-intake-page-plan.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/sme-ui-launch-guide.md",
-      "name": "sme-ui-launch-guide.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/sme-ui-launch-guide.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/two-track-ui-plan.md",
-      "name": "two-track-ui-plan.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/two-track-ui-plan.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/ui-conventions.md",
-      "name": "ui-conventions.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/ui-conventions.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/ui-nav-flow.mermaid",
-      "name": "ui-nav-flow.mermaid",
-      "extension": ".mermaid",
-      "rel_path": "UI-WIP/ui-nav-flow.mermaid",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-admin-config-01.html",
-      "name": "wf-admin-config-01.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/wf-admin-config-01.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-admin-config-01.md",
-      "name": "wf-admin-config-01.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wf-admin-config-01.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-console-01.html",
-      "name": "wf-console-01.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/wf-console-01.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-console-01.pdf",
-      "name": "wf-console-01.pdf",
-      "extension": ".pdf",
-      "rel_path": "UI-WIP/wf-console-01.pdf",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-landing-01.html",
-      "name": "wf-landing-01.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/wf-landing-01.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-landing-01.md",
-      "name": "wf-landing-01.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wf-landing-01.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-mapping-01.html",
-      "name": "wf-mapping-01.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/wf-mapping-01.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-mapping-01.md",
-      "name": "wf-mapping-01.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wf-mapping-01.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-module-subpage-01.md",
-      "name": "wf-module-subpage-01.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wf-module-subpage-01.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-runbook-path-01.html",
-      "name": "wf-runbook-path-01.html",
-      "extension": ".html",
-      "rel_path": "UI-WIP/wf-runbook-path-01.html",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wf-runbook-path-01.md",
-      "name": "wf-runbook-path-01.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wf-runbook-path-01.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframe-guide.md",
-      "name": "wireframe-guide.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wireframe-guide.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes",
-      "name": "wireframes",
-      "extension": "",
-      "rel_path": "UI-WIP/wireframes",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/out",
-      "name": "out",
-      "extension": "",
-      "rel_path": "UI-WIP/wireframes/out",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/out/KEYS.md",
-      "name": "KEYS.md",
-      "extension": ".md",
-      "rel_path": "UI-WIP/wireframes/out/KEYS.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/out/dataflow.svg",
-      "name": "dataflow.svg",
-      "extension": ".svg",
-      "rel_path": "UI-WIP/wireframes/out/dataflow.svg",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/out/landing.svg",
-      "name": "landing.svg",
-      "extension": ".svg",
-      "rel_path": "UI-WIP/wireframes/out/landing.svg",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/out/loads.svg",
-      "name": "loads.svg",
-      "extension": ".svg",
-      "rel_path": "UI-WIP/wireframes/out/loads.svg",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/out/underhood.svg",
-      "name": "underhood.svg",
-      "extension": ".svg",
-      "rel_path": "UI-WIP/wireframes/out/underhood.svg",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/render_wireframes.py",
-      "name": "render_wireframes.py",
-      "extension": ".py",
-      "rel_path": "UI-WIP/wireframes/render_wireframes.py",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/UI-WIP/wireframes/wireframes.json",
-      "name": "wireframes.json",
-      "extension": ".json",
-      "rel_path": "UI-WIP/wireframes/wireframes.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -7667,28 +7163,118 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/controlm-c3-normalization-status.md",
+      "file_id": "drydocs/docs/company-prompts",
+      "name": "company-prompts",
+      "extension": "",
+      "rel_path": "docs/company-prompts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/fcdo-frameworks-load-company-prompt.md",
+      "name": "fcdo-frameworks-load-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/fcdo-frameworks-load-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/gate-airflow-crosswalk-company-prompt.md",
+      "name": "gate-airflow-crosswalk-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/gate-airflow-crosswalk-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/gate-autosys-crosswalk-company-prompt.md",
+      "name": "gate-autosys-crosswalk-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/gate-autosys-crosswalk-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/k16-fid-census-company-prompt.md",
+      "name": "k16-fid-census-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/k16-fid-census-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/port-7c18ff4b-followup-company-prompt.md",
+      "name": "port-7c18ff4b-followup-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/port-7c18ff4b-followup-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/port-ais-supplement-company-prompt.md",
+      "name": "port-ais-supplement-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/port-ais-supplement-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/port-backlog-shard-company-prompt.md",
+      "name": "port-backlog-shard-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/port-backlog-shard-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/port-xml-test-company-prompt.md",
+      "name": "port-xml-test-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/port-xml-test-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "docs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/controlm/controlm-c3-normalization-status.md",
       "name": "controlm-c3-normalization-status.md",
       "extension": ".md",
-      "rel_path": "docs/controlm-c3-normalization-status.md",
+      "rel_path": "docs/controlm/controlm-c3-normalization-status.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/controlm-job-type-tables-plan.md",
+      "file_id": "drydocs/docs/controlm/controlm-job-type-tables-plan.md",
       "name": "controlm-job-type-tables-plan.md",
       "extension": ".md",
-      "rel_path": "docs/controlm-job-type-tables-plan.md",
+      "rel_path": "docs/controlm/controlm-job-type-tables-plan.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/controlm-staging-ingestion-flow.md",
+      "file_id": "drydocs/docs/controlm/controlm-staging-ingestion-flow.md",
       "name": "controlm-staging-ingestion-flow.md",
       "extension": ".md",
-      "rel_path": "docs/controlm-staging-ingestion-flow.md",
+      "rel_path": "docs/controlm/controlm-staging-ingestion-flow.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8297,28 +7883,523 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/fcdo-frameworks-load-company-prompt.md",
-      "name": "fcdo-frameworks-load-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/fcdo-frameworks-load-company-prompt.md",
+      "file_id": "drydocs/docs/design/ui-exploration",
+      "name": "ui-exploration",
+      "extension": "",
+      "rel_path": "docs/design/ui-exploration",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Copilot_20260703_231747.png",
+      "name": "Copilot_20260703_231747.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Copilot_20260703_231747.png",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/gate-airflow-crosswalk-company-prompt.md",
-      "name": "gate-airflow-crosswalk-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/gate-airflow-crosswalk-company-prompt.md",
+      "file_id": "drydocs/docs/design/ui-exploration/Copilot_20260703_231838.png",
+      "name": "Copilot_20260703_231838.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Copilot_20260703_231838.png",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/gate-autosys-crosswalk-company-prompt.md",
-      "name": "gate-autosys-crosswalk-company-prompt.md",
+      "file_id": "drydocs/docs/design/ui-exploration/DryDocs_UI_Development_Specs.md",
+      "name": "DryDocs_UI_Development_Specs.md",
       "extension": ".md",
-      "rel_path": "docs/gate-autosys-crosswalk-company-prompt.md",
+      "rel_path": "docs/design/ui-exploration/DryDocs_UI_Development_Specs.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini-generated-subpage-2.png",
+      "name": "Gemini-generated-subpage-2.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini-generated-subpage-2.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini-generated-subpage-3.png",
+      "name": "Gemini-generated-subpage-3.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini-generated-subpage-3.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini-generated-subpage.png",
+      "name": "Gemini-generated-subpage.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini-generated-subpage.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini_Generated_Image_oob4hpoob4hpoob4.png",
+      "name": "Gemini_Generated_Image_oob4hpoob4hpoob4.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini_Generated_Image_oob4hpoob4hpoob4.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini_Generated_Landing-1.png",
+      "name": "Gemini_Generated_Landing-1.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini_Generated_Landing-1.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini_Generated_Landing-Favorite.png",
+      "name": "Gemini_Generated_Landing-Favorite.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini_Generated_Landing-Favorite.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/Gemini_Generated_Landing-different.png",
+      "name": "Gemini_Generated_Landing-different.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/Gemini_Generated_Landing-different.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/WEBSITE-IDEAS.MD",
+      "name": "WEBSITE-IDEAS.MD",
+      "extension": ".MD",
+      "rel_path": "docs/design/ui-exploration/WEBSITE-IDEAS.MD",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/backstage-catalog-assessment.md",
+      "name": "backstage-catalog-assessment.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/backstage-catalog-assessment.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/backstage-deepdive-plan.md",
+      "name": "backstage-deepdive-plan.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/backstage-deepdive-plan.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/chat-turn-vs-router-hop.html",
+      "name": "chat-turn-vs-router-hop.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/chat-turn-vs-router-hop.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/claude-design-ui-prompt.md",
+      "name": "claude-design-ui-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/claude-design-ui-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/codeflow-ui-reference.png",
+      "name": "codeflow-ui-reference.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/codeflow-ui-reference.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/dd-verify-top.png",
+      "name": "dd-verify-top.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/dd-verify-top.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/design-review.md",
+      "name": "design-review.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/design-review.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/drydocs-console-mockup.html",
+      "name": "drydocs-console-mockup.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/drydocs-console-mockup.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/drydocs-landing-dark.html",
+      "name": "drydocs-landing-dark.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/drydocs-landing-dark.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/drydocs-wireframe-print.pdf",
+      "name": "drydocs-wireframe-print.pdf",
+      "extension": ".pdf",
+      "rel_path": "docs/design/ui-exploration/drydocs-wireframe-print.pdf",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/gemini-wire-frame.md",
+      "name": "gemini-wire-frame.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/gemini-wire-frame.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/icons.md",
+      "name": "icons.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/icons.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/kept-orbit-brand-sheet.png",
+      "name": "kept-orbit-brand-sheet.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/kept-orbit-brand-sheet.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/kept-orbit-philosophy.md",
+      "name": "kept-orbit-philosophy.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/kept-orbit-philosophy.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/layout-anatomy-checklist.md",
+      "name": "layout-anatomy-checklist.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/layout-anatomy-checklist.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/logo-5.png",
+      "name": "logo-5.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/logo-5.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/logo-8.png",
+      "name": "logo-8.png",
+      "extension": ".png",
+      "rel_path": "docs/design/ui-exploration/logo-8.png",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/neo4j-community-logo.webp",
+      "name": "neo4j-community-logo.webp",
+      "extension": ".webp",
+      "rel_path": "docs/design/ui-exploration/neo4j-community-logo.webp",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/site-plan.md",
+      "name": "site-plan.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/site-plan.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/sme-agent-test-runbook.md",
+      "name": "sme-agent-test-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/sme-agent-test-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/sme-intake-page-plan.md",
+      "name": "sme-intake-page-plan.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/sme-intake-page-plan.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/sme-ui-launch-guide.md",
+      "name": "sme-ui-launch-guide.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/sme-ui-launch-guide.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/two-track-ui-plan.md",
+      "name": "two-track-ui-plan.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/two-track-ui-plan.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/ui-conventions.md",
+      "name": "ui-conventions.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/ui-conventions.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/ui-nav-flow.mermaid",
+      "name": "ui-nav-flow.mermaid",
+      "extension": ".mermaid",
+      "rel_path": "docs/design/ui-exploration/ui-nav-flow.mermaid",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-admin-config-01.html",
+      "name": "wf-admin-config-01.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/wf-admin-config-01.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-admin-config-01.md",
+      "name": "wf-admin-config-01.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wf-admin-config-01.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-console-01.html",
+      "name": "wf-console-01.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/wf-console-01.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-console-01.pdf",
+      "name": "wf-console-01.pdf",
+      "extension": ".pdf",
+      "rel_path": "docs/design/ui-exploration/wf-console-01.pdf",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-landing-01.html",
+      "name": "wf-landing-01.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/wf-landing-01.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-landing-01.md",
+      "name": "wf-landing-01.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wf-landing-01.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-mapping-01.html",
+      "name": "wf-mapping-01.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/wf-mapping-01.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-mapping-01.md",
+      "name": "wf-mapping-01.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wf-mapping-01.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-module-subpage-01.md",
+      "name": "wf-module-subpage-01.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wf-module-subpage-01.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-runbook-path-01.html",
+      "name": "wf-runbook-path-01.html",
+      "extension": ".html",
+      "rel_path": "docs/design/ui-exploration/wf-runbook-path-01.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wf-runbook-path-01.md",
+      "name": "wf-runbook-path-01.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wf-runbook-path-01.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframe-guide.md",
+      "name": "wireframe-guide.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wireframe-guide.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes",
+      "name": "wireframes",
+      "extension": "",
+      "rel_path": "docs/design/ui-exploration/wireframes",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/out",
+      "name": "out",
+      "extension": "",
+      "rel_path": "docs/design/ui-exploration/wireframes/out",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/out/KEYS.md",
+      "name": "KEYS.md",
+      "extension": ".md",
+      "rel_path": "docs/design/ui-exploration/wireframes/out/KEYS.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/out/dataflow.svg",
+      "name": "dataflow.svg",
+      "extension": ".svg",
+      "rel_path": "docs/design/ui-exploration/wireframes/out/dataflow.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/out/landing.svg",
+      "name": "landing.svg",
+      "extension": ".svg",
+      "rel_path": "docs/design/ui-exploration/wireframes/out/landing.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/out/loads.svg",
+      "name": "loads.svg",
+      "extension": ".svg",
+      "rel_path": "docs/design/ui-exploration/wireframes/out/loads.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/out/underhood.svg",
+      "name": "underhood.svg",
+      "extension": ".svg",
+      "rel_path": "docs/design/ui-exploration/wireframes/out/underhood.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/render_wireframes.py",
+      "name": "render_wireframes.py",
+      "extension": ".py",
+      "rel_path": "docs/design/ui-exploration/wireframes/render_wireframes.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/ui-exploration/wireframes/wireframes.json",
+      "name": "wireframes.json",
+      "extension": ".json",
+      "rel_path": "docs/design/ui-exploration/wireframes/wireframes.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8400,15 +8481,6 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/k16-fid-census-company-prompt.md",
-      "name": "k16-fid-census-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/k16-fid-census-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8612,55 +8684,28 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/port-7c18ff4b-followup-company-prompt.md",
-      "name": "port-7c18ff4b-followup-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/port-7c18ff4b-followup-company-prompt.md",
+      "file_id": "drydocs/docs/port",
+      "name": "port",
+      "extension": "",
+      "rel_path": "docs/port",
       "project": "drydocs",
       "circular": false,
-      "kind": "file"
+      "kind": "dir"
     },
     {
-      "file_id": "drydocs/docs/port-ais-supplement-company-prompt.md",
-      "name": "port-ais-supplement-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/port-ais-supplement-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/port-backlog-shard-company-prompt.md",
-      "name": "port-backlog-shard-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/port-backlog-shard-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/port-prompt-archive-steps-1-42.md",
+      "file_id": "drydocs/docs/port/port-prompt-archive-steps-1-42.md",
       "name": "port-prompt-archive-steps-1-42.md",
       "extension": ".md",
-      "rel_path": "docs/port-prompt-archive-steps-1-42.md",
+      "rel_path": "docs/port/port-prompt-archive-steps-1-42.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/port-prompt.md",
+      "file_id": "drydocs/docs/port/port-prompt.md",
       "name": "port-prompt.md",
       "extension": ".md",
-      "rel_path": "docs/port-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/port-xml-test-company-prompt.md",
-      "name": "port-xml-test-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/port-xml-test-company-prompt.md",
+      "rel_path": "docs/port/port-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15074,15 +15119,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -15171,15 +15207,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -16233,24 +16260,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/pat_projection.py",
@@ -19295,10 +19304,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
-      "name": "drydocs-20260821.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0918.json",
+      "name": "drydocs-20260821-0918.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821-0918.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28056,6 +28065,11 @@
     [
       "drydocs",
       "CONTAINS",
+      "drydocs/.git"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
       "drydocs/.git-blame-ignore-revs"
     ],
     [
@@ -28112,11 +28126,6 @@
       "drydocs",
       "CONTAINS",
       "drydocs/SDLC-Docs"
-    ],
-    [
-      "drydocs",
-      "CONTAINS",
-      "drydocs/UI-WIP"
     ],
     [
       "drydocs",
@@ -31334,286 +31343,6 @@
       "drydocs/SDLC-Docs/extracted/plan-incrementalContextLoop.prompt.md"
     ],
     [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Copilot_20260703_231747.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Copilot_20260703_231838.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/DryDocs_UI_Development_Specs.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini-generated-subpage-2.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini-generated-subpage-3.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini-generated-subpage.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini_Generated_Image_oob4hpoob4hpoob4.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini_Generated_Landing-1.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini_Generated_Landing-Favorite.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/Gemini_Generated_Landing-different.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/WEBSITE-IDEAS.MD"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/backstage-catalog-assessment.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/backstage-deepdive-plan.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/claude-design-ui-prompt.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/codeflow-ui-reference.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/dd-verify-top.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/design-review.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/drydocs-console-mockup.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/drydocs-landing-dark.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/drydocs-wireframe-print.pdf"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/gemini-wire-frame.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/icons.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/kept-orbit-brand-sheet.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/kept-orbit-philosophy.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/layout-anatomy-checklist.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/logo-5.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/logo-8.png"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/neo4j-community-logo.webp"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/site-plan.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/sme-agent-test-runbook.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/sme-intake-page-plan.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/sme-ui-launch-guide.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/two-track-ui-plan.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/ui-conventions.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/ui-nav-flow.mermaid"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-admin-config-01.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-admin-config-01.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-console-01.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-console-01.pdf"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-landing-01.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-landing-01.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-mapping-01.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-mapping-01.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-module-subpage-01.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-runbook-path-01.html"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wf-runbook-path-01.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframe-guide.md"
-    ],
-    [
-      "drydocs/UI-WIP",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/out"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/render_wireframes.py"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/wireframes.json"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes/out",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/out/KEYS.md"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes/out",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/out/dataflow.svg"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes/out",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/out/landing.svg"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes/out",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/out/loads.svg"
-    ],
-    [
-      "drydocs/UI-WIP/wireframes/out",
-      "CONTAINS",
-      "drydocs/UI-WIP/wireframes/out/underhood.svg"
-    ],
-    [
       "drydocs/agents",
       "CONTAINS",
       "drydocs/agents/.env.example"
@@ -32346,17 +32075,12 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/controlm-c3-normalization-status.md"
+      "drydocs/docs/company-prompts"
     ],
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/controlm-job-type-tables-plan.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/controlm-staging-ingestion-flow.md"
+      "drydocs/docs/controlm"
     ],
     [
       "drydocs/docs",
@@ -32371,32 +32095,12 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/fcdo-frameworks-load-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-airflow-crosswalk-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/gate-autosys-crosswalk-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
       "drydocs/docs/generic-snowflake-data-catalog-ingestion-plan.md"
     ],
     [
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/history"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/k16-fid-census-company-prompt.md"
     ],
     [
       "drydocs/docs",
@@ -32431,32 +32135,7 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/port-7c18ff4b-followup-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/port-ais-supplement-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/port-backlog-shard-company-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/port-prompt-archive-steps-1-42.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/port-prompt.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/port-xml-test-company-prompt.md"
+      "drydocs/docs/port"
     ],
     [
       "drydocs/docs",
@@ -32517,6 +32196,61 @@
       "drydocs/docs/Product/seal",
       "CONTAINS",
       "drydocs/docs/Product/seal/seal-application-hierarchy.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/fcdo-frameworks-load-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/gate-airflow-crosswalk-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/gate-autosys-crosswalk-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/k16-fid-census-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/port-7c18ff4b-followup-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/port-ais-supplement-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/port-backlog-shard-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/port-xml-test-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/controlm",
+      "CONTAINS",
+      "drydocs/docs/controlm/controlm-c3-normalization-status.md"
+    ],
+    [
+      "drydocs/docs/controlm",
+      "CONTAINS",
+      "drydocs/docs/controlm/controlm-job-type-tables-plan.md"
+    ],
+    [
+      "drydocs/docs/controlm",
+      "CONTAINS",
+      "drydocs/docs/controlm/controlm-staging-ingestion-flow.md"
     ],
     [
       "drydocs/docs/decisions",
@@ -32799,6 +32533,11 @@
       "drydocs/docs/design/templates"
     ],
     [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration"
+    ],
+    [
       "drydocs/docs/design/feedback",
       "CONTAINS",
       "drydocs/docs/design/feedback/README.md"
@@ -32842,6 +32581,291 @@
       "drydocs/docs/design/templates",
       "CONTAINS",
       "drydocs/docs/design/templates/tdd.outline.yaml"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Copilot_20260703_231747.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Copilot_20260703_231838.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/DryDocs_UI_Development_Specs.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini-generated-subpage-2.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini-generated-subpage-3.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini-generated-subpage.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini_Generated_Image_oob4hpoob4hpoob4.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini_Generated_Landing-1.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini_Generated_Landing-Favorite.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/Gemini_Generated_Landing-different.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/WEBSITE-IDEAS.MD"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/backstage-catalog-assessment.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/backstage-deepdive-plan.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/chat-turn-vs-router-hop.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/claude-design-ui-prompt.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/codeflow-ui-reference.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/dd-verify-top.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/design-review.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/drydocs-console-mockup.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/drydocs-landing-dark.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/drydocs-wireframe-print.pdf"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/gemini-wire-frame.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/icons.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/kept-orbit-brand-sheet.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/kept-orbit-philosophy.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/layout-anatomy-checklist.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/logo-5.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/logo-8.png"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/neo4j-community-logo.webp"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/site-plan.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/sme-agent-test-runbook.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/sme-intake-page-plan.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/sme-ui-launch-guide.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/two-track-ui-plan.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/ui-conventions.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/ui-nav-flow.mermaid"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-admin-config-01.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-admin-config-01.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-console-01.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-console-01.pdf"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-landing-01.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-landing-01.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-mapping-01.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-mapping-01.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-module-subpage-01.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-runbook-path-01.html"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wf-runbook-path-01.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframe-guide.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/out"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/render_wireframes.py"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/wireframes.json"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes/out",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/out/KEYS.md"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes/out",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/out/dataflow.svg"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes/out",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/out/landing.svg"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes/out",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/out/loads.svg"
+    ],
+    [
+      "drydocs/docs/design/ui-exploration/wireframes/out",
+      "CONTAINS",
+      "drydocs/docs/design/ui-exploration/wireframes/out/underhood.svg"
     ],
     [
       "drydocs/docs/history",
@@ -32957,6 +32981,16 @@
       "drydocs/docs/plan",
       "CONTAINS",
       "drydocs/docs/plan/roadmap.html"
+    ],
+    [
+      "drydocs/docs/port",
+      "CONTAINS",
+      "drydocs/docs/port/port-prompt-archive-steps-1-42.md"
+    ],
+    [
+      "drydocs/docs/port",
+      "CONTAINS",
+      "drydocs/docs/port/port-prompt.md"
     ],
     [
       "drydocs/docs/restructure",
@@ -36096,11 +36130,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -36147,11 +36176,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/code_graph_freshness.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -36212,16 +36236,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -38806,7 +38820,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0918.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41083,13 +41097,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2327,
+    "files": 2329,
     "edges": 1129,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2608,
-    "directories": 282
+    "rels": 2609,
+    "directories": 281
   }
 }
