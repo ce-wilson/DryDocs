@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-21T03:33:37",
+    "captured_at": "2026-08-21T03:40:24",
     "date": "20260821",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "d6f40b1b",
-      "full": "d6f40b1b507f57a483e2dd8f40daa16f76c1c700",
+      "commit": "9ba88772",
+      "full": "9ba88772807df95b1026c9eba4f89753a3ddfaa7",
       "branch": "main",
-      "describe": "port-base-20260820-47-gd6f40b1b",
-      "subject": "docs(ideas): Idea-154 ΓÇö the extension-connected Chrome served a non-laptop DryDocs root at localhost:5173 (isLocal flag wrong?); ideas/board re-rendered",
+      "describe": "port-base-20260820-53-g9ba88772",
+      "subject": "fix(G89): runbooks.series.v1 matched the planned TRIGGERS edge (and the wrong from_node) — repointed onto the active INVOKES edge (scheduler_invokes); TRIGGERS entry untouched",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": true,
+      "untracked_present": false,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -15029,6 +15029,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/cli.py",
       "name": "cli.py",
       "extension": ".py",
@@ -15045,6 +15054,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -15641,6 +15659,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher",
+      "name": "migrate_vocab_ids_g101.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher",
       "name": "migrate_vocab_ids_g87.cypher",
       "extension": ".cypher",
@@ -16089,6 +16116,24 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/plan_board.py",
@@ -16914,6 +16959,15 @@
       "name": "51-local-infrastructure.yaml",
       "extension": ".yaml",
       "rel_path": "drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml",
+      "name": "52-local-human.yaml",
+      "extension": ".yaml",
+      "rel_path": "drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19079,10 +19133,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0146.json",
-      "name": "drydocs-20260821-0146.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "name": "drydocs-20260821.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821-0146.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -35287,12 +35341,22 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/cmdline_staging.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -35353,6 +35417,16 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -36152,6 +36226,11 @@
     [
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
       "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g87.cypher"
     ],
     [
@@ -36758,6 +36837,11 @@
       "drydocs/drydocs_core/ontology/relationship_vocabulary",
       "CONTAINS",
       "drydocs/drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml"
+    ],
+    [
+      "drydocs/drydocs_core/ontology/relationship_vocabulary",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml"
     ],
     [
       "drydocs/drydocs_core/orchestration",
@@ -37902,7 +37986,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0146.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40079,13 +40163,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2287,
+    "files": 2289,
     "edges": 1032,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2564,
-    "directories": 278
+    "rels": 2570,
+    "directories": 282
   }
 }
