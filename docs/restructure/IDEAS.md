@@ -109,6 +109,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-149`** · 2026-08-20 · `[bug]` · **open** · prio? **Med** —
+  **`ModuleIcon`'s switch has no `default` and no exhaustiveness check, so a new console
+  module renders in the nav as bare text with no error anywhere.** Hit at the O57 build:
+  `loadmap` was added to `ModuleId` and to `MODULES`, the page worked, the build and oxlint
+  were clean, and the Aside entry simply had no glyph — noticed only because a screenshot was
+  being read. The file ALREADY documents the hazard in a comment on the `software` case
+  ("this switch has no `default`, so a missing case returns undefined and the glyph silently
+  vanishes from both the aside and the Overview hub with no compiler error"), which makes this
+  a known trap that keeps being paid for rather than a discovery. The cheap fix is the standard
+  TS exhaustiveness guard — a `default` branch assigning the parameter to `never`, so the NEXT
+  missing case is a compile error at the point of omission instead of a silent gap on two
+  surfaces. Deliberately NOT done inside O57: that item's acceptance is the load-map surface,
+  and changing a shared component's return contract is its own change with its own blast
+  radius (12 modules + the Overview hub). Mechanism-only, no gate — nothing here touches edge
+  semantics.
+
 - **`Idea-148`** · 2026-08-20 · `[idea]` · **open** · prio? **Med** —
   **A scrape run and the registry row it fulfils are not joined — `drydocs-scrape` should
   stamp the `doc-source-registry` id in its run manifest, and the row should carry

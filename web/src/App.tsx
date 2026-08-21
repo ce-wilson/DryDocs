@@ -21,6 +21,7 @@ import RemediationRoute from './routes/RemediationRoute'
 import DocsRoute from './routes/DocsRoute'
 import SoftwareRoute from './routes/SoftwareRoute'
 import GatesRoute from './routes/GatesRoute'
+import LoadMapRoute from './routes/LoadMapRoute'
 import UnderTheHoodRoute from './routes/UnderTheHoodRoute'
 import './App.css'
 
@@ -95,6 +96,14 @@ export default function App() {
         />
         <Route path="loads" element={<LoadsRoute persona={persona} />} />
         <Route path="loads/run/:runId" element={<LoadsRoute persona={persona} />} />
+        {/* O57: SME designation from the module registry — same gate as
+            /software and /gates, for the same reason (governance state). */}
+        <Route
+          path="load-map"
+          element={
+            persona.role === 'steward' || persona.role === 'admin' ? <LoadMapRoute /> : <Navigate to="/" replace />
+          }
+        />
         <Route
           path="under-the-hood"
           element={persona.role === 'steward' || persona.role === 'admin' ? <UnderTheHoodRoute /> : <Navigate to="/" replace />}

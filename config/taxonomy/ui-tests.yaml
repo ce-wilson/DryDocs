@@ -142,6 +142,56 @@ suites:
           the network tab and be wrong on screen.
         source: "Q16 build 2026-08-07 - verified against the Vite dev server (curl, both paths)"
 
+  # ---------------------------------------------------------------------------
+  - id: TS-LOADMAP
+    module: loadmap
+    description: >
+      The /load-map console lens on the generated load-map.json (O57): the
+      registry sources, systems, canonical sequence, retired ids, and BOTH
+      declared defect lists. Seeded from in-browser observation at the build
+      itself rather than from a commit message, which is the whole point of
+      this ledger.
+    cases:
+      - id: TC-LOADMAP-01
+        description: Every collection in the JSON reaches the page, and the counts match it
+        steps:
+          - Open /load-map as a steward or admin persona.
+          - Read the six stat tiles.
+          - Compare each against web/src/generated/load-map.json.
+        expect: >
+          The tiles report sources / systems / sequence steps / retired ids /
+          ad-hoc commands / declared defects, and every number equals the length
+          of its array in the committed JSON (observed 30 / 16 / 19 / 17 / 2 / 4).
+          The numbers are NOT hard-coded anywhere - tests/unit/test_load_map_console.py
+          recomputes them from the JSON, so a regenerated file moves the page
+          and the guard together.
+        source: "O57 build 2026-08-20 - desktop, Vite dev server, ?as=asmith7734, screenshot in the close"
+
+      - id: TC-LOADMAP-02
+        description: The two defect lists render as defects instead of being dropped
+        steps:
+          - Open /load-map and select the Defects tab.
+        expect: >
+          Both generator-computed lists appear with their WRITTEN REASONS in
+          full - "Loaders with no registry source" (observed 1: manual_seal_attribution.v1)
+          and "Map entries whose source is unregistered" (observed 3, incl.
+          dl-contact-point carrying the N8 no-feed-by-design exemption). The
+          reason text is rendered, not truncated: an exemption that cannot be
+          read cannot be argued with.
+        source: "O57 build 2026-08-20 - desktop, Vite dev server, Defects tab screenshot in the close"
+
+      - id: TC-LOADMAP-03
+        description: The page and /software partition the file with no overlap and no gap
+        steps:
+          - Note the source count on /load-map.
+          - Note the corpus count on /software's Corpora tab.
+          - Add them and compare with the length of `sources` in load-map.json.
+        expect: >
+          The two sum to the full array (observed 30 + 8 = 38). Both filter on
+          the same `home` key in opposite directions, so no row can appear on
+          both pages or on neither.
+        source: "O57 build 2026-08-20 - desktop, counts read off both pages; the sum is pinned Python-side"
+
   # --- declared, not yet seeded ----------------------------------------------
   # Present so the coverage gap is a number, not an absence. Seed each from
   # verified behaviour when that module is next worked on — never by inventing
