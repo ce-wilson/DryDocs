@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_runbook_currency.py
@@ -18,3 +18,16 @@ acceptance: |
   Every guard that shells out to a DryDocs command and parses its RENDERED output is enumerated, and each one is either converted to read the importable object (the N6 fix: app.registered_commands instead of parsing `drydocs --help`) or carries a written reason why the render itself is the thing under test; the rule — never parse a render when the object is importable — lands in the repo's working agreements where the next test author will read it.
 notes: |
   Groomed 2026-08-07 (pm) from Idea-54. The motivating guard failed twice at once on the laptop, having never actually executed there: text=True decodes cp1252 and cannot decode Typer's rich box character, so stdout came back None, AND the table rows start with U+2502 rather than '|', so the pattern would have matched nothing anyway — which makes every documented verb look unregistered. A guard that passes by accident on one machine and cannot run on the other is the class. J33 is its sibling on the assertion side (plain substrings vs ANSI-colored output).
+  DONE 2026-08-21 (desktop). ENUMERATED every test that shells out or invokes the CLI (12 files):
+  (1) CliRunner invocations asserting on result.output -- test_supplements (6 apply-supplements
+  cases), test_bootstrap_guard (5 bootstrap), test_source_registry (2 gate cases), test_chain_inputs
+  (2 refresh-reference): the verb's exit code + message IS the contract under test, so the render is
+  legitimately the subject; they strip ANSI (e87800f9) and ride the J33 non-terminal console.
+  (2) git plumbing -- ls-files / rev-parse / worktree add in test_file_encoding, test_publish_
+  boundary_values, test_port_reconcile_guards, test_probe_instrument, test_mapping_api, test_repo_paths:
+  machine-readable by design, not a render. (3) subprocess runs of python scripts -- render_board.py
+  and a probe inside a throwaway worktree (test_repo_paths), a standalone validator (test_config_
+  schemas): the PROCESS BOUNDARY is the subject. NONE parses `--help` or any human-facing listing
+  any more -- the N6 class is gone. THE RULE lands in CLAUDE.md section 6 ("Never parse a render when
+  the object is importable") and tests/unit/test_no_render_parsing.py keeps the N6 class from
+  returning (fails any test that invokes `--help` through CliRunner or subprocess).

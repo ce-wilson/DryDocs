@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/port-prompt.md
@@ -18,3 +18,14 @@ acceptance: |
   docs/port-prompt.md's STANDING RELAYS section (J38) gains the C25 relay as a numbered entry beside R1-R4: the producer is canonical for the `dpl` and `snowflake` product rows, the `in-house` vendor (no publisher_url, guard narrowed to third-party vendors) and the acronym DPL = "Data Pipeline Library". It is written as a VALUE TRANSPLANT ACROSS FILES, never a same-file overwrite -- the standing R1 AIS lesson, which applies identically because the company's home for these is a different file. The entry states the deliberate producer-first divergence with a waiting consumer: the SME began the same expansion company-side on 2026-08-07 and STOPPED so the two copies would match. Every existing relay is RE-VERIFIED at the same touch per the section's own rule, and the other post-port items ride along -- the staged clean-add rows, the ledger roll, and striking R4 if the J34 overlay migration has landed. Nothing is relayed from memory; a stale relay is worse than none.
 notes: |
   Groomed 2026-08-11 from Idea-99. Deliberately NOT written into docs/port-prompt.md when it arose: a port was in flight against a fetched head and that file is a hand-merge surface, so a relay added mid-port lands in someone's conflict resolution instead of their checklist. FIRST ACTION IS THEREFORE A CHECK -- confirm the port has merged; if it has not, the item waits rather than repeating the mistake it exists to avoid.
+  DONE 2026-08-21 (desktop) -- ALREADY DELIVERED, verified rather than re-written. docs/port-prompt.md
+  STANDING RELAYS carries the C25 relay as RELAY-5 (added 2026-08-09): the `dpl` and `snowflake`
+  product rows, the `in-house` vendor without publisher_url with the guard narrowed to third-party
+  vendors, `DPL: "Data Pipeline Library"`, written as a VALUE TRANSPLANT ACROSS FILES (rider (a)
+  cites RELAY-1), with the producer-first divergence and its waiting consumer stated, plus the
+  versions: [] and publish-boundary riders. It was then CORRECTED by the company at PORT-REPORT-6f03264
+  (2026-08-09 pm): the "you were mid-flight" half had no basis -- the SME's 08-07 work never reached a
+  pushed branch -- so the relay now carries `[SME-REPORTED]` and the J41 basis-tag rule exists because
+  of it. Re-verified today from the producer tree: software-registry.yaml still holds acronyms DPL
+  (l.67), vendor in-house (l.126), products snowflake (l.365) and dpl/in-house (l.391). RELAY-4 (the
+  J34 overlay migration) is already struck. No relay rewritten from memory.

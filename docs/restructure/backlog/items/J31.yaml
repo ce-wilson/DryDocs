@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - CLAUDE.md
@@ -17,3 +17,11 @@ acceptance: |
   CLAUDE.md §0's pull rule gains a work-visibility clause carrying a MECHANISM rather than an intention, answering three things: (1) WHEN an in-flight session pushes work — a named trigger (first substantive edit, or the end of any session that did not close its item), not "when convenient"; (2) WHERE it goes — the `wip/<id>-<machine>` branch shape the K9 recovery already used, so the convention is discovered rather than invented; (3) WHAT a session must check before RELEASING someone else's claim back to todo — at minimum `git branch -r --list "wip/<id>-*"` — so a claim with work behind it cannot be declared dead. The clause cites both occurrences as its evidence and states plainly what it does NOT fix: a session that dies before its first push stays invisible, and no convention changes that.
 notes: |
   Groomed 2026-08-04 (weekly groom) from the wip/k9-laptop inbox line, promoted SEPARATELY from the branch cleanup (J30) because the branch is a one-off and this is the rule. It EXTENDS a discipline the repo already ruled — J19 codified the pushed-claim rule after the 2026-07-28 C19 collision — rather than proposing a new direction, which is why it grooms as a chore instead of routing to the HITL gate. The exact wording stays the user's to confirm at build; what this groom fixes is that the gap now has an owner and an id. The cost is measured, not hypothetical: the laptop built a full K9 implementation and never pushed it, the desktop released the claim as dead (claim commit 3608ae5 was the tip and nothing followed) and rebuilt it, and main now carries 17d9e08 while bfb2f0b sits on a branch nobody planned. One push of a wip branch would have prevented the whole rebuild.
+  DONE 2026-08-21 (desktop). CLAUDE.md section 0, directly under the pushed-claim rule, gains the
+  work-visibility clause as a MECHANISM: (1) WHEN -- push at the first substantive edit and at the end
+  of any session that did not close its item; (2) WHERE -- `wip/<id>-<machine>` (the K9 recovery's
+  `wip/k9-laptop` shape, discovered not invented), never main; (3) BEFORE RELEASING another session's
+  claim -- `git branch -r --list "wip/<id>-*"`, so a claim with work behind it cannot be declared dead.
+  Both occurrences cited (K9: built on the laptop, never pushed, desktop rebuilt -- 3608ae5 / 17d9e08
+  / bfb2f0b; and the C19 double-build), and the limit stated plainly: a session that dies before its
+  first push stays invisible. Exact wording is the user's to confirm; the clause is now in the file.

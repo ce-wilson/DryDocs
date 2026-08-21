@@ -56,6 +56,16 @@ things share the word *port* — never conflate them:
   concurrent sessions on the two machines, and git is the only sync layer, so a local-only claim is
   invisible to the other machine. This is not hypothetical: on **2026-07-28 two sessions independently
   built C19 about ten minutes apart.** Same at the close — push `done`, don't sit on it.
+  **Work visibility (J31) — the claim is visible, the WORK is not, until it is pushed.** Mechanism,
+  not intention: (1) WHEN — push your in-flight work at the **first substantive edit** and again at
+  the **end of any session that did not close its item**; (2) WHERE — a branch named
+  **`wip/<id>-<machine>`** (the shape the K9 recovery used, `wip/k9-laptop`), never `main`;
+  (3) BEFORE RELEASING someone else's `in_progress` claim back to `todo`, run
+  **`git branch -r --list "wip/<id>-*"`** — a claim with a wip branch behind it is not dead, it is
+  someone's unmerged work. Evidence, twice: K9 was fully built on the laptop and never pushed, so
+  the desktop read claim commit `3608ae5` as a dead tip and rebuilt it (`17d9e08` on main,
+  `bfb2f0b` stranded on a branch); and the C19 double-build above. What this does NOT fix: a session
+  that dies before its first push stays invisible, and no convention changes that.
 
 **Session ritual (keeps every platform aligned):**
 1. **Start:** `git pull` → read this file → open the board's Ready-to-pull strip (or run
@@ -237,6 +247,12 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
 - **Taxonomy imports are reversible; ontology edges are not casual.** New relationship types
   go through `docs/RELATIONSHIP_GUIDE.md` + the relationship-vocabulary registry (`drydocs_core/ontology/relationship_vocabulary/`, per-domain fragments; S5) +
   the HITL gate. Set `status: planned` first.
+- **Never parse a render when the object is importable (J37).** A guard that enumerates commands,
+  loaders, specs or options reads the importable object (`app.registered_commands`, `LOADER_REGISTRY`,
+  `QUERY_SPECS`) — never `drydocs --help` or any other human-facing render, which reflows, colours and
+  wraps (J33). A test may assert against CLI output only when that output IS the contract under test
+  (exit code + message), and it strips ANSI / relies on the unit conftest's non-terminal console.
+  Guarded by `tests/unit/test_no_render_parsing.py`.
 - **Tests gate every change:** `poetry run pytest -q`, `python -c "import drydocs.cli"`,
   `drydocs --help`.
 - **Secrets discipline:** architecture-level only. No real data values in commits.
