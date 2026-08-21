@@ -1,0 +1,59 @@
+# =============================================================================
+# config/taxonomy/ui-concepts.yaml — DECLARED UI-taxonomy concepts whose source
+# is NOT the graph (R22, 2026-08-21).
+#
+# WHY THIS FILE EXISTS. On 2026-08-20 the question "how many towers are there"
+# matched no registered spec, escalated to schema-grounded text2cypher, and the
+# model chose the real graph label :TOMRole as a proxy for the console term
+# Tower — `MATCH (t:TOMRole) WHERE t.name CONTAINS 'Tower'` — returning 0. The
+# answer was not merely wrong; it crossed from UI taxonomy into the TOM ontology
+# without saying so. Tower is a SYNTHESIZED console concept backed by in-repo
+# definitions (web/src/data/towers.ts, the /explorer landing), not by any label.
+#
+# WHAT A ROW DECLARES: a term the console uses, the in-repo SOURCE that defines
+# it, its cardinality and members, and its relationship to the graph — stated in
+# words. A term listed here is answered FROM this declaration at Tier 0 with its
+# provenance ("from the Explorer Tower definitions, not from the graph"), and
+# schema grounding is forbidden from proxying it onto a graph label chosen for
+# lexical similarity (agents/graph_qa/pipeline.py, declared-term step).
+#
+# THE HARD BOUNDARY. This file may say that a term's source is NOT the graph —
+# that is a statement about a UI concept. It may NOT decide what the term means
+# in the ontology. Any BINDING between a UI concept and graph vocabulary (a
+# :Tower label, an edge Tower -> :TOMRole or anything else, a mapping asserting
+# the two are one subject) is an ontology decision: it routes through the HITL
+# gate (docs/restructure/03-hitl-sme-flow.md) as `status: planned` and, if
+# confirmed, supersedes the row here (graph_binding changes and the answer path
+# is rebuilt against the graph).
+#
+# Guarded by tests/unit/test_ui_concepts.py: cardinality + members agree with
+# the TypeScript source in both directions; every row names a source that
+# exists; graph_binding is the closed enum below.
+# =============================================================================
+schema: drydocs.ui-concepts.v1
+classification: Internal-Public          # synthesized console vocabulary; no real data
+updated: 2026-08-21
+
+concepts:
+  - term: Tower
+    aliases: [towers, CTO tower, CTO towers]
+    source: web/src/data/towers.ts
+    source_symbol: TOWERS
+    source_kind: in-repo-definitions       # a TypeScript literal the console renders; no loader, no graph
+    authority: "the Explorer Tower definitions (web/src/data/towers.ts), verbatim port of the UI-WIP dark-landing mockup (commit dd270b2)"
+    cardinality: 4
+    members:
+      - { key: home,   title: Home Lending }
+      - { key: auto,   title: Auto }
+      - { key: cards,  title: Credit Cards }
+      - { key: shared, title: Shared Services }
+    graph_binding: none                    # none | planned | confirmed — anything but `none` comes from the gate log
+    relationship_to_graph: >
+      No graph label backs Tower and no edge reaches it. :TOMRole is the SEAL Technical
+      Operating Model ROLE vocabulary (application_owner, cto, operate_manager, ... — K4,
+      2026-07-15): a different concept that happens to share the word "CTO" with the
+      console's "CTO towers". Tower is not a :TOMRole, not a :CatalogLOB, not a
+      :ProductLine; the four towers are an illustrative landing-page grouping. Whether
+      Tower should ever be a graph concept — and if so what it maps to — is the HITL
+      gate's question, not this file's; until a gate rules, a question about towers is
+      answered from these definitions and the answer says so.

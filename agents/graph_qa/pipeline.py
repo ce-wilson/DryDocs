@@ -24,6 +24,7 @@ from collections.abc import Callable
 from common import specs_catalog
 from common.specs_catalog import ensure_read_only
 
+from graph_qa.declared_terms import answer_declared
 from graph_qa.envelope import (
     Envelope,
     Metrics,
@@ -372,6 +373,26 @@ class GraphQaPipeline:
         if user_id:  # R3 reserved slot: hash + length only, never the identity
             envelope.user_id_sha256 = sha256_text(user_id)
             envelope.user_id_chars = len(user_id)
+
+        # R22: a term with a DECLARED non-graph source (config/taxonomy/
+        # ui-concepts.yaml — Tower first) is answered from its declaration at
+        # Tier 0, with provenance, before the router or text2cypher can reach
+        # for a graph label that merely shares a word. No Cypher, no LLM.
+        if answer_declared(
+            envelope,
+            question,
+            timings,
+            clock=self.clock,
+            push=lambda step: self._push_step(envelope, step),
+        ):
+            envelope.metrics.iterations = 1
+            envelope.metrics.budget["tokens_limit"] = self.token_budget
+            envelope.metrics.budget["tokens_used"] = envelope.metrics.tokens.total
+            envelope.metrics.response_ms = {
+                "total": int((self.clock() - total_started) * 1000),
+                **timings,
+            }
+            return envelope
 
         spec_id, params = self._route(envelope, question, timings)
         result = self._run_spec(envelope, spec_id, params, timings) if spec_id else None

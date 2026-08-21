@@ -29,7 +29,7 @@ def est_tokens(text: str) -> int:
 @dataclass
 class StepRecord:
     i: int
-    kind: str  # 'router' | 'spec' | 'text2cypher' | 'answer' | 'tier2'
+    kind: str  # 'declared' | 'router' | 'spec' | 'text2cypher' | 'answer' | 'tier2'
     ms: int = 0
     spec_id: str | None = None
     cypher: str | None = None
@@ -88,7 +88,7 @@ class Metrics:
 class Envelope:
     run_id: str
     session_id: str
-    tier: str  # 'spec' | 'text2cypher' | 'tier2' | 'unanswered'
+    tier: str  # 'declared' | 'spec' | 'text2cypher' | 'tier2' | 'unanswered'
     question_sha256: str
     question_chars: int
     answer: str

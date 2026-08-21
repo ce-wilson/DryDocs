@@ -218,7 +218,7 @@
       ],
       "gate_ref": "taxonomy-importer layer (CLAUDE.md section 1)",
       "status": "gate-pending",
-      "pending_entries": 10,
+      "pending_entries": 11,
       "env_refs": [],
       "files": [
         "config/taxonomy/README.md",
@@ -232,6 +232,7 @@
         "config/taxonomy/server-location.yaml",
         "config/taxonomy/software-registry.yaml",
         "config/taxonomy/ui-components.yaml",
+        "config/taxonomy/ui-concepts.yaml",
         "config/taxonomy/ui-tests.yaml"
       ],
       "content": null,

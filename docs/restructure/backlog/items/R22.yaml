@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/data/towers.ts
@@ -36,3 +36,25 @@ notes: |
   Model fable, unlike its two siblings, because the item sits on the taxonomy/ontology boundary: deciding that a term's authority is a UI definition rather than the graph is exactly the kind of call CLAUDE.md routes to the top tier and fences with the gate. Module drydocs-api (the spec registry, verified at this groom) with the definitions half in web/ and config/taxonomy/.
 
   The console's existing exposure boundary is unchanged and is not part of the fix: it already shows router, generated Cypher, rows, timings and source, and never model prompts or chain-of-thought.
+  DONE 2026-08-21 (desktop). (a) config/taxonomy/ui-concepts.yaml (drydocs.ui-concepts.v1): Tower
+  declared as a UI-taxonomy concept -- source web/src/data/towers.ts#TOWERS (in-repo definitions,
+  verbatim port of the dark-landing mockup), cardinality 4, members home/auto/cards/shared with
+  titles, graph_binding: none, and its relationship to :TOMRole stated in words (a ROLE vocabulary
+  that shares the word "CTO"; Tower is not a TOMRole, CatalogLOB or ProductLine). The header writes
+  the hard boundary: the file may say the source is NOT the graph; any binding (a :Tower label, an
+  edge, a sameness mapping) is an ontology decision for the HITL gate, status: planned, and a
+  confirmed binding supersedes the row (graph_binding != none hands the term back to the graph
+  path). Reader: drydocs_core/ui_concepts.py. (b) NOT a Cypher spec -- a spec is Cypher and the
+  declared source is not the graph -- but the same Tier-0 outcome: agents/graph_qa/declared_terms.py
+  answers a question naming a declared term BEFORE the router, deterministically, with provenance
+  ("from the Explorer Tower definitions ... not from the graph"), tier `declared`, StepRecord kind
+  `declared` with cypher None and rows = cardinality, SourceRecord config/taxonomy/ui-concepts.yaml#Tower,
+  zero LLM calls, zero reads. (c) THE GUARD: the short-circuit means text2cypher is never reached for
+  such a term; as the second line, build_schema_prompt appends a "NOT graph concepts" section naming
+  each declared term, its source and the refused proxy, instructing an empty cypher. TESTS
+  tests/unit/test_ui_concepts.py (7): declaration == towers.ts in both directions (keys, titles,
+  count, source exists); count question -> "There are 4 towers: Home Lending, Auto, Credit Cards,
+  Shared Services ... not from the graph"; whole-word + alias matching (watchtower does not match);
+  the pipeline answers with NO read and NO LLM call and the only step is `declared`; the schema
+  prompt carries the section; a planned/confirmed binding returns the term to the graph path.
+  npm build not needed: no web file changed (towers.ts is read, not moved). Suite green.

@@ -17,9 +17,16 @@ context cost per call.
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import yaml
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from drydocs_core.ui_concepts import not_graph_concept_lines  # noqa: E402
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 # S5 split the monolith into per-domain fragments; the directory is the source
@@ -118,4 +125,15 @@ def build_schema_prompt(
         "## Example queries (registered specs — follow this idiom)",
         *_clip(example_lines, SECTION_BUDGETS["examples"]),
     ]
+    declared = not_graph_concept_lines()
+    if declared:
+        # R22: terms with a DECLARED non-graph source. The pipeline answers them
+        # before text2cypher ever runs; this section is the second line — if
+        # the model is reached, it must not proxy such a term onto a label.
+        parts += [
+            "",
+            "## NOT graph concepts (declared UI taxonomy — config/taxonomy/ui-concepts.yaml)",
+            *declared,
+            'If the question is about one of these, return {"cypher": ""} and say it is not a graph concept.',
+        ]
     return "\n".join(parts)[:max_chars]
