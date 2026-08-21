@@ -1558,6 +1558,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "controlm-definition-precedence (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/controlm-definition-precedence.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "D10"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "dcat-theme-subject-scheme (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

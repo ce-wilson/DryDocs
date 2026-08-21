@@ -349,6 +349,7 @@
         "config/gate-prompts/business-application-identity.yaml",
         "config/gate-prompts/code-graph-package-layer.yaml",
         "config/gate-prompts/controlm-avg-run-supplement.yaml",
+        "config/gate-prompts/controlm-definition-precedence.yaml",
         "config/gate-prompts/controlm-hosts-topology.yaml",
         "config/gate-prompts/controlm-q1q3-phase1.yaml",
         "config/gate-prompts/corporate-backbone-vocabulary.yaml",

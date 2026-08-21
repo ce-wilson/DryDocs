@@ -8,7 +8,7 @@ phase: 3
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/precedence.yaml
@@ -17,4 +17,5 @@ inputs:
 acceptance: |
   A gate prompt is drafted (drafting decides nothing; config/precedence.yaml is unchanged until sign-off) that puts ONE question to the SME per object class — which source wins when the XML export and the Oracle replica disagree — with a candidate answer stated for them to accept or reject ("the XML export is the definition source of record; the replica remains the runtime/stats feed") rather than an open essay question. The prompt names the two riders the ruling must carry: a named OWNER and a SUNSET for the dual-definition path (the dual-ingestion rule of thumb), and the consequence for T16 — if XML becomes the standing feed, the CM_DEF_VJOB_DETAIL retirement note gains a second path.
 notes: |
+  DELIVERED 2026-08-20 (laptop): config/gate-prompts/controlm-definition-precedence.yaml drafted, UNSIGNED — one question per object class (A1 jobs / A2 folders / A3 variables / A4 single-source classes stay rowless), each with the Idea-43 candidate stated for accept/reject; A5 forces the 2026-08-11 'database primary, XML secondary' remediation direction to be reconciled with the candidate rather than surviving sign-off unnamed. Riders B1-B3 (named owner, sunset, manual-drop cadence); consequences C1-C4 carry the precedence.yaml entry, the registry confirmed-flip, and the T16 second path (recorded at the NEXT ledger roll — the page never edits the port ledger, apply in flight). Evidence rows: the G48 cmd_line_mismatch counter and the G47 ASSUMED-contract caveat. precedence.yaml and the registry are UNCHANGED, per the acceptance — drafting decides nothing; gates.json row renders open.
   Groomed 2026-08-07 (pm) from Idea-43, which says plainly that this is HITL and never a groom's call — so the ITEM is the prompt, not the ruling. Guardrail 3 of the XML-fed cmd-line resolution work (G46/G47/G48): those builds fill a nullable derived column and decide no source-of-truth question, so they are NOT blocked on this. Epic D and module config because precedence.yaml is the artifact; sibling of D9, which asks the adjacent question about two INTERNAL tiers.

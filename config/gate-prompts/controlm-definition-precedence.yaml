@@ -1,0 +1,84 @@
+# SME gate-prompt spec — Control-M definition precedence: deftable XML export vs
+# psgmgr replica (backlog id: D10). DRAFTED 2026-08-20, UNSIGNED. Guardrail 3 of
+# the XML-fed cmd-line resolution stream (G46/G47/G48): those builds fill a
+# nullable derived column and decide NO source-of-truth question — this page is
+# where that question is put to the SME, one question per object class, each
+# with a candidate answer to accept or reject. DRAFTING DECIDES NOTHING:
+# config/precedence.yaml is unchanged until sign-off, and the registry row
+# controlm:deftable-xml-export stays confirmed: false until this ruling admits
+# it (nothing writes the graph before that flip). Mechanism-only: source ids
+# use the registry's [db] grammar; no real SIDs, servers, or data values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: controlm-definition-precedence
+title: "SME Gate — Control-M definition precedence: when the deftable XML export and the psgmgr replica disagree about an object, which one is the definition source of record?"
+step: "Follows controlm-q1q3-phase1 (signed 2026-07-07 — the five psgmgr extracts are confirmed and loading) and the G46/G47/G48 cmd-line resolution build (closed 2026-07-29, ruling deliberately NOT made there). Blocks: the confirmed: false on registry row controlm:deftable-xml-export, and the D9 sibling ruling stays separate (two INTERNAL tiers — a different axis of the same precedence file)."
+summary: >
+  Two feeds now describe the same Control-M definitions: the psgmgr CM_ replica
+  (per-table rows, confirmed and loading since controlm-q1q3-phase1) and the
+  deftable XML export (G47 extractor, staged only). Where they disagree about
+  an object, ONE of them must be the definition source of record — per object
+  class, ruled here, never improvised in a loader. The candidate answer put to
+  the SME is Idea-43's: "the XML export is the definition source of record; the
+  replica remains the runtime/stats feed." The visible counter-evidence is
+  surfaced, not resolved: the SME's 2026-08-11 remediation direction reads the
+  estate "database primary, XML secondary" — compatible if that names coverage
+  and cadence while this page names conflict-wins, but only the SME says so.
+  The ruling must carry two riders (the dual-ingestion rule of thumb): a named
+  OWNER and a SUNSET for the dual-definition path. Drafting decides nothing;
+  sign-off transcribes to config/gate-log.md and only then does
+  config/precedence.yaml change.
+meta:
+  Module: "config (precedence.yaml is the artifact; loaders change nothing here)"
+  Source: "controlm@[db].psgmgr.cm_def_vtab / cm_def_vjob / cm_def_setvar_vw (confirmed: true) vs controlm:deftable-xml-export (confirmed: false, blocked on THIS ruling)"
+  Evidence: "G48 resolve-cmdline-staging counts cmd_line_mismatch per job — store-verbatim vs XML CMDLINE, counted on disagreement, never substituted: the measured disagreement feed this ruling consumes. Caveat named, not hidden: the G47 XML element contract is ASSUMED from SYNTHETIC fixtures until a real export is walked."
+  Registry ref: "config/source-registry.yaml — the XML row's confirmed flip is a §D consequence of sign-off, never a drafting side effect"
+  Classification: "Internal-Public (mechanism only; the [db] grammar stands in for real SIDs)"
+  Source of record: "config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "Job definition disagreement (cm_def_vjob vs XML job element; cmd_line is the measured case)"
+    target: "per-class definition-SoR record in config/precedence.yaml — loser becomes alias/cross-check, never silent override"
+    edge: "precedence ruling  [clause A1]"
+  - n: 2
+    element: "Folder definition disagreement (cm_def_vtab vs XML folder element)"
+    target: "same record, folder class"
+    edge: "precedence ruling  [clause A2]"
+  - n: 3
+    element: "Variable definition disagreement (cm_def_setvar_vw vs XML ordered variables)"
+    target: "same record, variable class — the XML is the only feed carrying declaration ORDER"
+    edge: "precedence ruling  [clause A3]"
+  - n: 4
+    element: "The dual-definition path itself (two feeds describing the same objects)"
+    target: "a named OWNER and a SUNSET riding the ruling — the dual-ingestion rule of thumb"
+    edge: "riders  [clauses B1-B3]"
+
+provenance:
+  - label: "What already loads vs what is staged (the asymmetry this page rules on)"
+    source_object: "psgmgr CM_ per-table rows (graph loaders, confirmed) + deftable XML export (G47 staging extractor, no loader)"
+    key: "the XML row's registry note: 'the environment's real config SoR (XML-not-JSON): definitions + ordered folder/job variables in one self-consistent snapshot' — a SoR claim this gate either ratifies or rejects"
+    loader: "~ (no loader gains or loses a source until the ruling is transcribed)"
+    properties:
+      - {name: cmd_line_mismatch, origin: derived, from: "G48 resolve-cmdline-staging quality table", note: "per-job disagreement counter — measured precedence evidence, never a substitution"}
+      - {name: acquisition_mode, origin: source, from: "registry acquisition blocks", note: "the replica is a standing feed; the XML arrives by MANUAL drop — a SoR that arrives manually needs the B3 cadence or the ruling inverts in practice"}
+
+sections:
+  - title: "A. Per-class rulings — one question per object class, candidate stated for accept/reject"
+    confirmations:
+      - "A1 [jobs]: when cm_def_vjob and the XML job element disagree about a job definition (cmd_line is the live, counted case), the XML export wins as definition source of record; the replica remains the runtime/stats feed and its value is recorded as alias/cross-check, never silently dropped. [accept / amend / reject]"
+      - "A2 [folders]: same ruling for folder definitions (cm_def_vtab vs the XML folder element) — one self-consistent snapshot should win or lose as a unit with A1, and splitting the winner across classes is itself a ruling to make knowingly. [accept / amend / reject]"
+      - "A3 [variables]: same ruling for variable definitions (cm_def_setvar_vw vs the XML's ordered folder/job variables), noting the asymmetry: only the XML carries declaration ORDER, so a replica win here still leaves order XML-sourced or unmodeled — say which. G39's deferred variables pull re-enters through whichever feed wins. [accept / amend / reject]"
+      - "A4 [single-source classes]: conditions/dependencies (cm_def_lnki_p_vw / cm_def_lnko_p_vw), hosts, runtime stats, and history have ONE feed today — no disagreement is expressible and no precedence row is minted for them. If the XML extractor later grows condition coverage, that class re-enters at this gate rather than inheriting A1's answer. [accept / amend / reject]"
+      - "A5 [the counter-evidence]: the 2026-08-11 remediation direction 'database primary, XML secondary' and this page's candidate are reconciled explicitly — either (i) they answer different questions (read-coverage vs conflict-wins) and both stand, or (ii) the direction inverts the candidate and A1-A3 are re-ruled accordingly. One of the two readings is chosen; the tension does not survive sign-off unnamed. [reading i / reading ii]"
+  - title: "B. Riders — the dual-ingestion rule of thumb (a dual-definition path with no owner and no sunset becomes permanent drift)"
+    confirmations:
+      - "B1 [owner]: the dual-definition path has a NAMED owner — recorded by name company-side / in internal/ (rosters are Internal), carried here by role. [named / deferred]"
+      - "B2 [sunset]: the path has a SUNSET — a date or condition on which one feed stops being read for definitions (candidate: the losing feed demotes to cross-check when the winner's contract is verified against a real export, per the Evidence caveat). [ruled / deferred]"
+      - "B3 [cadence]: the XML's manual-drop acquisition gets a refresh cadence commensurate with being a definition SoR, or the ruling records that a stale-but-authoritative snapshot is acceptable and why. [ruled / deferred]"
+  - title: "C. Consequences the sign-off carries (transcribed, then applied — never the other way around)"
+    confirmations:
+      - "C1: config/precedence.yaml gains the ruled per-class record with conflict_policy semantics intact (winner recorded, loser aliased, require_sme_confirmation stays true); the file changes AFTER transcription to config/gate-log.md, in the same change, citing this gate. [confirm]"
+      - "C2: registry row controlm:deftable-xml-export flips confirmed only as this ruling admits it, and its authority: SOR claim is amended to match the ruling if the candidate is rejected. [confirm / amend]"
+      - "C3 [T16 second path]: if the XML becomes the standing definition feed, the CM_DEF_VJOB_DETAIL retirement note (RETIREMENT_NOTE in drydocs/cmdline_staging.py; port tracker row T16 / step 49g) gains its second retirement path — the staging stand-in dies EITHER when a real job-detail table exists OR when the XML feed supersedes the need. Ruled here, recorded there by whoever next rolls the ledger — this page never edits the port ledger. [confirm / amend]"
+      - "C4: safe to transcribe this ruling into config/gate-log.md; gates.json and the enforcement surfaces regenerate from the record. [confirm]"
