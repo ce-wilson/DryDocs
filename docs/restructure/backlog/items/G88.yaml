@@ -7,7 +7,7 @@ phase: 2
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on:
 - G87
 inputs:
@@ -15,3 +15,17 @@ inputs:
 - drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml
 acceptance: |
   Gate vocabulary-domains-and-id-policy §A3 (SIGNED 2026-08-12) registered the human domain with NO entries moved. This item does the move: the people/org entries (the attribution/membership family in business_application and catalog) relocate to a human fragment (e.g. 49-local-human.yaml) with domain: human. Depends on G87 BY DESIGN: ids change there, so relocating in the same pass avoids touching the same entries twice; if G87 is descoped this item may run alone with ids unchanged (domain + fragment move only). schema_graph.cypher regenerates; the fragment sort order stays stable.
+notes: |
+  DONE 2026-08-21, run as its own pass after G87 (its entries are disjoint from G87's
+  epoch-tag census, so there was no double-touch to avoid by folding). 14 entries moved to
+  drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml (49 was taken by
+  corporate): 8 from business_application (seal_has_membership / seal_of_role / seal_held_by
+  [deprecated rows travel with their family, as §A1/§A2 did], seal_app_attributed_to_employee,
+  seal_qualified_attribution, seal_attribution_has_agent, seal_attribution_had_role,
+  seal_appuser_owned_by) and 6 from catalog (the Product Cabinet trio, catalog_dev_team_has_membership
+  [deprecated], the DevTeam staffing pair). THE RULE, written into the fragment header so the next
+  entry does not guess: from_node or to_node in Employee | Membership | Role | TOMRole | ProductRole
+  | Attribution. DevTeam-as-org-unit catalog edges (has_dev_team, supports*, has_jira_board) stay in
+  catalog -- product-catalog hierarchy, not people. Partition move only: ids unchanged (G101 migrates
+  the seal_ ones; the attribution trio now lands as human_* there), labels/statuses/loaders untouched;
+  schema_graph.cypher regenerated (r.domain changes only); sorted fragment order stable.

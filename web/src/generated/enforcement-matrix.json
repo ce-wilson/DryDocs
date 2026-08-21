@@ -198,7 +198,8 @@
         "drydocs_core/ontology/relationship_vocabulary/48-local-quality.yaml",
         "drydocs_core/ontology/relationship_vocabulary/49-local-corporate.yaml",
         "drydocs_core/ontology/relationship_vocabulary/50-local-itsm.yaml",
-        "drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml"
+        "drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml",
+        "drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml"
       ],
       "content": null,
       "extra_contents": {}
