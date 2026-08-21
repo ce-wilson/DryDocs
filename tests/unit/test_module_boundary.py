@@ -85,6 +85,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         # files REFRESH_REFERENCE_CHAIN reads (G82). Load, same bucket and same
         # reason as seal_samples: loader INPUT, output filenames are the chain's.
         "drydocs.pat_projection",
+        # drydocs.chain_inputs = the G78 chain-input resolver (fixture dir or declared
+        # landing zone, fail-by-name before any write). Load: it decides what the
+        # chain verbs read.
+        "drydocs.chain_inputs",
         # drydocs.docs_coverage = the Q16 software->documentation coverage report.
         # Same bucket as docs_verify for the same recorded reason, and it IMPORTS
         # docs_verify (count_query/locator_of) so the two verbs can never disagree

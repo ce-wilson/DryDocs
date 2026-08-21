@@ -80,7 +80,8 @@ poetry run drydocs bootstrap-schema-graph      # schema meta-graph → ddschema 
 poetry run drydocs apply-supplements           # base → seal → catalog → registry, verified
 
 # 3. Load sample data
-poetry run drydocs refresh-reference           # catalog + SEAL + dev teams (M1 chain)
+poetry run drydocs refresh-reference --samples-dir drydocs/data/samples   # FIXTURE run (M1 chain; SEAL fixtures via scripts/build_seal_samples.py first)
+poetry run drydocs refresh-reference --source pat:people-report             # REAL run: reads <step>.csv from the source's declared landing zone (G78: no default)
 poetry run drydocs ingest-controlm             # Control-M folders → jobs → conditions → deps
 
 # 3b. Demonstrable content — the document corpora. A FRESH OR REBUILT container
@@ -126,7 +127,7 @@ for its options.
 - `reset --yes` — **destructive**: `DETACH DELETE` every node + relationship.
 
 **Ingest**
-- `refresh-reference` — weekly catalog + SEAL + dev-teams chain (+ snapshots).
+- `refresh-reference` — weekly catalog + SEAL + dev-teams chain (+ snapshots). Explicit input or exit 2 (G78): `--samples-dir` for fixtures, `--source <id>` (repeatable) for landing zones; a missing required file fails the chain by name before any write; the closing table lists the path each step read.
 - `ingest-controlm` — Control-M chain (folders → jobs → conditions in/out → derived deps). `--skip-part2` stops after folders+jobs.
 - `load <name> --csv FILE | --sql STMT` — run a single registered loader.
 

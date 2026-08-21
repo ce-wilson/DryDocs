@@ -19,6 +19,14 @@ import typer
 from rich.table import Table
 
 from drydocs import cli as _root  # the composition root; call-time lookups only
+from drydocs.chain_inputs import (
+    ChainModeError,
+    ChainStep,
+    MissingChainInputError,
+    StepResult,
+    resolve_chain_inputs,
+    summary_lines,
+)
 from drydocs.cli import (
     CONTROLM_NODE_STAGES,
     CONTROLM_PART2_STAGES,
@@ -37,6 +45,7 @@ from drydocs.cli import (
     _row_cap_opt,
     _run_as_opt,
     _scope_binds,
+    _source_registry,
     console,
 )
 from drydocs_core.neo4j_client import Neo4jClient
@@ -138,33 +147,70 @@ def load(
 
 @app.command(name="refresh-reference")
 def refresh_reference(
-    samples_dir: Path = typer.Option(
-        DEFAULT_SAMPLES_DIR,
+    samples_dir: Path | None = typer.Option(
+        None,
         "--samples-dir",
-        help="Directory holding the *__sample.csv fixtures. Defaults to the bundled package samples.",
+        help=(
+            "FIXTURE run: directory holding the bundled *__sample.csv fixtures. No default "
+            "(G78) — a default loaded fixtures into a real graph and reported success."
+        ),
+    ),
+    source: list[str] = typer.Option(
+        [],
+        "--source",
+        help=(
+            "REAL run: a source-registry dataset id (repeatable). Each selected step reads "
+            "<step>.csv from the source's declared landing zone (acquisition.drop_dir under "
+            "DRYDOCS_DATA_ROOT); steps bound to an unselected source are reported NOT SELECTED."
+        ),
     ),
     snapshot: bool = typer.Option(True),
 ) -> None:
-    """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence."""
+    """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence.
+
+    Explicit input or exit 2 — the single-loader `load --csv` contract, copied up
+    (G78): every step's file is resolved BEFORE the first write, a missing
+    required file fails the whole chain by name, and the closing table says
+    which path each step read and how many rows it loaded.
+    """
     # Confirmed-gate (D3): every feed the chain touches must be SME-confirmed
     # before any write — derived from the chain's own source_id declarations
     # (overlay-aware per D2).
     for cls in {cls for _, cls, _ in REFRESH_REFERENCE_CHAIN}:
         _gate_loader(cls)
+    steps = [ChainStep(nm, cls, fixture) for nm, cls, fixture in REFRESH_REFERENCE_CHAIN]
+    try:
+        plan = resolve_chain_inputs(
+            steps, samples_dir=samples_dir, sources=source, registry=_source_registry()
+        )
+    except (ChainModeError, MissingChainInputError) as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    mode = "FIXTURE" if samples_dir is not None else "SOURCE"
+    console.print(f"[cyan]refresh-reference — {mode} run; {len(plan.inputs)} step(s) resolved[/]")
+    results: list[StepResult] = []
     with _client() as cli:
         bs = refresh_business_segments(cli)
         console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
-        for nm, cls, sample_csv in REFRESH_REFERENCE_CHAIN:
-            sample = samples_dir / sample_csv
-            if not sample.exists():
-                console.print(f"[yellow]No sample for {nm}; skipping.[/]")
-                continue
-            console.print(f"[cyan]>> {nm}[/]")
-            summary = cls(cli, _csv_adapter(sample)).load()
+        for item in plan.inputs:
+            console.print(f"[cyan]>> {item.step.name}[/]  {item.path}")
+            summary = item.step.loader(cli, _csv_adapter(item.path)).load()
             console.print(f"   rows={summary.rows_processed} rejected={summary.rows_rejected}")
+            results.append(
+                StepResult(
+                    step=item.step.name,
+                    mode=item.mode,
+                    path=str(item.path),
+                    rows=summary.rows_processed,
+                    rejected=summary.rows_rejected,
+                    source_id=item.source_id,
+                )
+            )
         if snapshot:
             console.print("[cyan]>> snapshots[/]")
             console.print(SnapshotWriter(cli).write_all())
+    for line in summary_lines(results, plan.skipped):
+        console.print(line)
 
 
 _TERM_TOTAL = "MATCH (n:OntologyTerm) RETURN count(n) AS n"
@@ -858,6 +904,24 @@ def ingest_controlm(
         )
         return
 
+    if not use_oracle:
+        # G78 (a): every stage's fixture is resolved BEFORE the first write and a
+        # missing one fails the chain BY NAME — never "skipping". The bundled
+        # default stays for this verb because sample mode IS its documented mode
+        # (the e2e chain and the runbooks run it) and the real run is
+        # --use-oracle, not a different directory; the banner makes the mode
+        # unmistakable in the log.
+        console.print(f"[yellow]FIXTURE RUN[/]: reading controlm_*__sample.csv from {samples_dir}")
+        try:
+            resolve_chain_inputs(
+                [ChainStep(nm, cls, csv) for nm, cls, csv, _ in stages],
+                samples_dir=samples_dir,
+                sources=[],
+                registry=_source_registry(),
+            )
+        except MissingChainInputError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from exc
     with _client() as cli:
         for stage_name, cls, sample_csv, sql_file in stages:
             if use_oracle:

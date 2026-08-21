@@ -142,6 +142,16 @@ stay skipped — confirm with the operator if a new one appears.
     (or has a live loader for it), that specific entry is a back-flow COLLISION — keep
     the company's active version; do NOT downgrade it to the producer's `planned` state.**
     Reconcile per-entry, not by taking the whole file blindly.
+- **Fixture file naming — DOUBLE vs SINGLE underscore (G78, SME-confirmed 2026-08-11).**
+  Producer fixtures are `<loader>__sample.csv` (two underscores: `catalog_lobs__sample.csv`);
+  company fixtures are `<loader>_sample.csv` (one). The same file therefore cannot serve
+  both sides, and before G78 a file copied across was SILENTLY SKIPPED ("No sample for …,
+  skipping") rather than rejected. Since G78 (2026-08-21) the producer chain verbs FAIL BY
+  NAME on a missing fixture and `refresh-reference` has no fixture default at all
+  (`--samples-dir` for fixtures, `--source <id>` for landing zones) — so a company port
+  that keeps its single-underscore fixtures must either rename them or carry its own
+  `REFRESH_REFERENCE_CHAIN` fixture names; do not "fix" the divergence by loosening the
+  resolver back to a skip.
 - **PAT catalog ontology — company is AHEAD and the producer has ADOPTED NOTHING (C26,
   2026-08-21; adoption = C27, gated on the COMPANY catalog gate's own sign-off).** The
   company gate page `internal/org/catalog/_catalog_gate_page.html` (dated 2026-06-25, "SME
