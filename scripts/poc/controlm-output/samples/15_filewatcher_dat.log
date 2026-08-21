@@ -1,0 +1,10 @@
+PJOB0015_FLOW_ALPHA_DAT_ONPM_FW
+
+00001 2026/08/20 15:35 - 2026/08/20 15:37 Size: 515 Status: 0
+
++ ctmfw /data/tenant_a/dropbox/AREA/flow_alpha_20260820.csv CREATE 0B 60 20 6 120 N NOW 0 NO_MIN\
+_AGE NO_MAX_AGE
+0820 19:35:47 : File '/data/tenant_a/dropbox/AREA/flow_alpha_20260820.csv' exists, it's current \
+size is 5762736988 bytes . id=1.
+0820 19:37:47 : File transfer was completed. The size of file '/data/tenant_a/dropbox/AREA/flow_alpha\
+_20260820.csv' is 5762736988 bytes. id=1. Modified 20/08/2026 19:35

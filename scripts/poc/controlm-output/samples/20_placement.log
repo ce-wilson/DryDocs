@@ -1,0 +1,31 @@
+PJOB0020_FLOW_ALPHA_AWS_PLCT
+
+00001 2026/08/20 15:37 - 2026/08/20 15:41 Size: 6745 Status: 0
+
++ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -dataset b453b0b1-0000-362d-845d-000000000002 -version 1.0.4-met\
+afix -pipeline d1cfdc57-0000-4ea7-be62-000000000001 -bd 20260820 -od 20260819 -datFile /data/tenant_a/dropbox/AREA\
+/flow_alpha_20260820.csv -fid A000001 -timeout 3 -sleep 1 -p -tokFile /data/tenant_a/dropbox/AREA/flow_alpha_20260820.tok -conf /apps/tenants/tenant_a/cfg/12345-epv-conf.json
+Deployment path /apps/tenants/dpl_utils/dt-accelerators
+Using active install in slot A.
+
+2026-08-20 19:37:50,626 [INFO] dt-launcher: dt-launcher-py started on host-a.example with pid 632742
+2026-08-20 19:37:50,630 [INFO] CommandLineParser: Validating command line argumnets....
+2026-08-20 19:37:50,630 [INFO] CommandLineParser: Identified 'PLACEMENT' Job
+2026-08-20 19:37:50,638 [INFO] CommandLineParser: All arguments validated sucessfully.
+2026-08-20 19:37:50,640 [INFO] PlacementService: DPL Placement URL https://placement.example/shared-functions/provision-data/v1/datasets/b453b0b1-0000-362d-845d-000000000002/place?businessDate=20260820&orderDate=20260819&datasetVersion=1.0.4-metafix&pipelineId=d1cfdc57-0000-4ea7-be62-000000000001
+2026-08-20 19:37:50,656 [INFO] IdaHelper: Getting credentials for domain\A000001
+2026-08-20 19:37:50,934 [INFO] IdaHelper: Sucessfully authenticated with IDAnywhere.
+2026-08-20 19:39:28,074 [INFO] PlacementService: Got placement response: {'provenanceGuid': '9878a0ce-0000-4a31-8391-000000000003',\
+ 'datasetVersion': '1.0.4-metafix', 'placementOriginator': 'A000001', 'pipelineId': 'd1cfdc57-0000-4ea7-be62-000000000001', 'businessDate': '20260820', 'orderDate': '20260819', 'rowCount': 20}
+2026-08-20 19:39:28,074 [INFO] PlacementService:
+ProvenanceID=9878a0ce-0000-4a31-8391-000000000003
+2026-08-20 19:39:28,442 [INFO] PlacementService: Got status for: ['MERCURY_S3', 'AWS_S3']
+2026-08-20 19:39:28,443 [INFO] PlacementService: ============= Checking MERCURY_S3 Status =================
+2026-08-20 19:39:28,443 [INFO] PlacementService: [{'status': 'COMPLETED', 'targetLocation': 'token_flow_alpha_20260820.tok', 'provenanceGUID': '9878a0ce-0000-4a31-8391-000000000003'}, {'status': 'COMPLETED', 'targetLocation': 'flow_alpha_20260820.csv', 'provenanceGUID': '9878a0ce-0000-4a31-8391-000000000003'}]
+2026-08-20 19:39:28,443 [INFO] PlacementService: ============= Checking AWS_S3 Status =================
+2026-08-20 19:39:28,443 [INFO] PlacementService: [{'status': 'PENDING', 'targetLocation': '', 'provenanceGUID': '9878a0ce-0000-4a31-8391-000000000003'}]
+2026-08-20 19:39:28,443 [INFO] PlacementService: Placement is not complete, re-checking status in 1 minute(s)
+2026-08-20 19:40:28,674 [INFO] PlacementService: ============= Checking AWS_S3 Status =================
+2026-08-20 19:40:28,674 [INFO] PlacementService: [{'status': 'COMPLETED', 'targetLocation': '12345/raw/flow_alpha\
+/9878a0ce-0000-4a31-8391-000000000003/token_flow_alpha_20260820.tok', 'provenanceGUID': '9878a0ce-0000-4a31-8391-000000000003'}, {'status': 'COMPLETED', 'targetLocation': '12345/raw/flow_alpha/9878a0ce-0000-4a31-8391-000000000003/flow_alpha_20260820.csv', 'provenanceGUID': '9878a0ce-0000-4a31-8391-000000000003'}]
+2026-08-20 19:40:28,675 [INFO] PlacementService: Placement for provenance id 9878a0ce-0000-4a31-8391-000000000003 is complete!

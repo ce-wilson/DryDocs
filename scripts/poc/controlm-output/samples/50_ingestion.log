@@ -1,0 +1,25 @@
+PJOB0050_FLOW_ALPHA_AWS_TRUST
+
+00001 2026/08/20 15:41 - 2026/08/20 16:02 Size: 12505 Status: 0
+
++ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline d1cfdc57-0000-4ea7-be62-000000000001 -appName appa -\
+alias aws-eks -seal 12345 -dataflow FLOW_ALPHA -img img-12345-aws-PC -bd 20260820 -od 20260819 -fid A000001 -proId 9878a0ce-0000-4a31-8391-000000000003 -timeout 3 -sleep 1 -i -conf /apps/tenants/tenant_a/cfg/12345-epv-conf.json -compute /apps/tenants/tenant_a/cfg/compute_ing_medium.json
+Deployment path /apps/tenants/dpl_utils/dt-accelerators
+Using active install in slot A.
+
+2026-08-20 19:41:32,108 [INFO] dt-launcher: dt-launcher-py started on host-b.example with pid 1651770
+2026-08-20 19:41:32,119 [INFO] CommandLineParser: Identified 'INGESTION' Job
+2026-08-20 19:41:32,161 [INFO] dt-launcher: ===============Running JAVA Ingestion====================
+2026-08-20 19:41:32,161 [INFO] UserConfiguration: Image img-12345-aws-PC mapped to registry.example/container-release/appa/img-12345@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+2026-08-20 19:41:32,169 [INFO] TaskService: Task service request: {
+    "businessDate": "20260820",
+    "ODate": "20260819",
+    "DataFlow": "FLOW_ALPHA",
+    "ComputeParams": {
+        "spark.executor.cores": "6",
+        "spark.executor.memory": "32g",
+        "spark.kubernetes.seal": 12345,
+        "spark.kubernetes.container.image": "registry.example/container-release/appa/img-12345@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "spark.kubernetes.appname": "appa",
+        "spark.namespace.alias": "aws-eks"
+[cut]

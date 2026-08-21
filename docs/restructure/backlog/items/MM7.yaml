@@ -23,3 +23,16 @@ acceptance: |-
   drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per <job, order-id, run>, and joins onto already-staged DPL processes on the pipeline GUID (falling back to <job, run> when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted). It sets PROPERTIES only — launcher_kind (from the `Identified '<KIND>' Job` line), compute_target, provenance_guid (placement response) and the -proId it is threaded to, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a provenance chain across two jobs, a transform that logs no provenance id, and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py's stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.
 notes: |-
   Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
+
+  POC 2026-08-21 (user direction: a proof of concept frames the implementation before the
+  extractor is written) - scripts/poc/controlm-output/: one PowerShell parser per job shape
+  (PREPROC api-pull wrapper, FILEWATCHER ctmfw, and the four dt-launcher kinds PLACEMENT /
+  INGESTION / TRANSFORM / PROVISION), a dispatcher keyed ONLY on the launcher's own
+  Identified-kind line, and Join-Hops.ps1 that derives the record's DERIVED fields across
+  hops (watcher internally fed, preproc files to placement args, provenanceGuid to -proId,
+  flow identity by dataflow, ingest mode). Seven synthetic sample logs reproduce the captured
+  shapes including the cut task-service JSON, the transform with no provenance id, and a
+  printed bearer token (redacted and counted). Real logs live under
+  internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
+  item's deliverable; the PoC fixed its field list and skip-reason set.
+

@@ -1,0 +1,20 @@
+PJOB0008_FLOW_ALPHA_ONPM_PREPROC
+
+00009 2026/08/20 15:17 - 2026/08/20 15:35 Size: 72735 Status: 0
+
+++ cat /apps/tenants/tenant_a/scripts/flow_alpha_fields.txt
++ /apps/tenants/tenant_a/scripts/flow_alpha_api_curl_fetch.ksh -t party_data -u 20260820 -e PROD -i a_svc_acct -z 'https://api.producer.example/api/party-data/v2?data.format=csv&data.fields=f1,f2,f3&sourceApplication=PC' -d /data/tenant_a/dropbox/AREA -s /apps/tenants/tenant_a/scripts
+INFO: Current date                      : 2026-08-20 07:17:51 PM
+INFO: The output file creation date is  : 20260820
+INFO: The output data file name is      : flow_alpha_original_20260820.csv
+INFO: The output tok file name is       : flow_alpha_20260820.tok
+INFO: The output data without trailer  file name is     : flow_alpha_20260820.csv
+INFO: The API name is                   : party_data
+INFO: Bearer token generation step      : Starting
+
+INFO:Password retrieve step             : Completed
+INFO:Status Code from token api: 200
+INFO:Access Token receive step: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzYW1wbGUtbm90LXJlYWwifQ.c2lnbmF0dXJlLXNhbXBsZS1ub3QtcmVhbA
+INFO: API data pull step                : Starting
+curl: (92) HTTP/2 stream 0 was not closed cleanly: INTERNAL_ERROR
+ERROR: API data pull step failed

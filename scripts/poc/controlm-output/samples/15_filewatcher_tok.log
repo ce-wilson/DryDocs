@@ -1,0 +1,7 @@
+PJOB0015_FLOW_ALPHA_TOK_ONPM_FW
+
+00001 2026/08/20 15:35 - 2026/08/20 15:36 Size: 480 Status: 0
+
++ ctmfw /data/tenant_a/dropbox/AREA/flow_alpha_20260820.tok CREATE 0B 60 20 6 120 N NOW 0 NO_MIN_AGE NO_MAX_AGE
+0820 19:35:47 : File '/data/tenant_a/dropbox/AREA/flow_alpha_20260820.tok' exists, it's current size is 42 bytes . id=1.
+0820 19:36:47 : File transfer was completed. The size of file '/data/tenant_a/dropbox/AREA/flow_alpha_20260820.tok' is 42 bytes. id=1. Modified 20/08/2026 19:35

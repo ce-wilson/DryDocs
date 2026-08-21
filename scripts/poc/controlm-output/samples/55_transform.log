@@ -1,0 +1,27 @@
+PJOB0055_AUTO_FLOW_ALPHA_INTM_AWS_RFND
+
+00001 2026/08/20 16:06 - 2026/08/20 16:08 Size: 6110 Status: 0
+
++ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline e3f0ab01-0000-4cfb-a31a-000000000004 -appName test -alias test -seal 67890 -dataflow FLOW_ALPHA_INTM -img img-67890-aws-PC -bd 20260820 -od 20260819 -fid A000002 -timeout 5 -sleep 1 -i -conf /apps/tenants/tenant_a/cfg/67890-epv-conf.json -compute /apps/tenants/tenant_a/cfg/compute_xxlarge.json
+Deployment path /apps/tenants/dpl_utils/dt-accelerators
+Using active install in slot A.
+2026-08-20 20:06:52,334 [INFO] dt-launcher: dt-launcher-py started on host-c.example with pid 2295915
+2026-08-20 20:06:52,348 [INFO] CommandLineParser: Identified 'TRANSFORM' Job
+2026-08-20 20:06:52,391 [WARNING] dt-launcher: No provenanceId is provided!
+2026-08-20 20:06:52,391 [INFO] dt-launcher: ===============Running JAVA Transformation====================
+2026-08-20 20:06:52,391 [INFO] UserConfiguration: Image img-67890-aws-PC mapped to registry.example/container-release/appb/img-67890@sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+2026-08-20 19:41:32,169 [INFO] TaskService: Task service request: {
+    "businessDate": "20260820",
+    "ODate": "20260819",
+    "DataFlow": "FLOW_ALPHA_INTM",
+    "ComputeParams": {
+        "spark.executor.cores": "6",
+        "spark.executor.memory": "32g",
+        "spark.kubernetes.seal": 67890,
+        "spark.kubernetes.container.image": "registry.example/container-release/test/img-67890@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "spark.kubernetes.appname": "test",
+        "spark.namespace.alias": "test"
+    }
+}
+2026-08-20 20:07:00,000 [INFO] TaskService: Submitting job to: https://task.example/shared-functions/provision-data/v2/clusters/launch/pipelineId=e3f0ab01-0000-4cfb-a31a-000000000004
+2026-08-20 20:07:10,000 [INFO] TaskService: Submission response: {'pipelineID': 'e3f0ab01-0000-4cfb-a31a-000000000004', 'jobID': '86030208913936001', 'httpStatus': 'CREATED', 'cluster': 'mt-p01.region-c01'}

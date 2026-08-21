@@ -1,0 +1,28 @@
+PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG
+
+00001 2026/08/20 16:10 - 2026/08/20 16:13 Size: 5358 Status: 0
+
++ /apps/tenants/dpl_utils/dt-accelerators/dt-launcher.sh -env prod -pipeline 14a83971-0000-468e-8cb4-000000000005 -appName appb\
+ -seal 67890 -dataflow FLOW_BETA_DLY -img img-67890-aws-PC -bd 20260819 -od 20260819 -fid A000002 -timeout 3 -slee\
+p 1 -t -compute /apps/tenants/tenant_a/cfg/compute_67890_GKP_PROD.json -conf /apps/tenants/tenant_a/cfg/67890-epv-conf.json
+Deployment path /apps/tenants/dpl_utils/dt-accelerators
+Using active install in slot A.
+2026-08-20 20:11:02,692 [INFO] dt-launcher: dt-launcher-py started on host-d.example with pid 1582838
+2026-08-20 20:11:02,697 [INFO] CommandLineParser: Identified 'PROVISION' Job. Provision jobs execute on GKP not EKS!
+2026-08-20 20:11:02,709 [INFO] UserConfiguration: Image img-67890-aws-PC mapped to registry.example/container-release/appb/img-67890@sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+2026-08-20 19:41:32,169 [INFO] TaskService: Task service request: {
+    "businessDate": "20260820",
+    "ODate": "20260819",
+    "DataFlow": "FLOW_BETA_DLY",
+    "ComputeParams": {
+        "spark.executor.cores": "6",
+        "spark.executor.memory": "32g",
+        "spark.gkp.sophia.fid": "h000001",
+        "spark.kubernetes.seal": 67890,
+        "spark.kubernetes.container.image": "registry.example/container-release/appb/img-67890@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "spark.kubernetes.appname": "appb",
+        "spark.namespace.alias": "gkp-ns"
+    }
+}
+2026-08-20 20:11:02,988 [INFO] TaskService: Submitting job to: https://task.example/shared-functions/provision-data/v2/clusters/launch/pipelineId=14a83971-0000-468e-8cb4-000000000005
+2026-08-20 20:11:16,644 [INFO] TaskService: Submission response: {'pipelineID': '14a83971-0000-468e-8cb4-000000000005', 'jobID': '86030208913936523', 'oDate': '20260819', 'businessDate': '20260819', 'userId': 'A000002', 'httpStatus': 'CREATED', 'cluster': 'mt-p13.region-c02'}
