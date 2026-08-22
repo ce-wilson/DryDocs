@@ -172,6 +172,17 @@ The G15/G16 launcher contract reads the **command line**; the Output tab shows t
 | nothing | the response: `provenanceGuid` (run-scoped, see the field table), `rowCount`, then a poll of two landing targets until `COMPLETED`, with the landing keys |
 | nothing | a production bearer token printed into the job output by the pre-processor wrapper (`set -x` on) — a finding for the owning team, recorded here as a mechanism risk, not a value |
 
+**Where the job identity comes from — the file name, not the log.** The modern launcher wrapper
+writes no job name or run metadata into the Output body; a first run against real logs showed the
+job blank on all eleven. These are standard Control-M sysout files, and the identity — job name,
+order id, date, run stamp — is carried by the **file name**. Identity is therefore the one part of
+the record whose source is the file rather than its contents, with three consequences: the
+extractor's input is a *named file*, never a detached text blob, because the name carries the
+`<job, order-id, run>` key it joins on; the reader is a tolerant scan with a site-pinnable override,
+because sysout naming varies by site; and the name's date field is recorded as `run_date` and is
+**not** merged into the launcher's `-od` `order_date`, because on real logs the two differ and which
+one the name carries is an open question for the estate.
+
 **Proposed extractor** — `drydocs_lineage/extractors/controlm_output.py`, the same shape as
 `dpl_mac.py`: it never creates the seed; it joins onto `:ETLProcess` rows another extractor already
 staged **on the pipeline GUID** (falling back to `<job, run>` when the command line carried only a

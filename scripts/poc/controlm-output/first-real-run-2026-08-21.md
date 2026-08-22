@@ -127,9 +127,30 @@ and reading the landing prefix that carries it. Both are run-level facts, not li
 | Gap | Evidence | Next step |
 |---|---|---|
 | **No PLACEMENT log collected** | JOIN 2 `(no PLACEMENT hop)`, `prov_guid` empty on every row, yet ingestion consumed a `-proId` | collect the placement job's Output tab for this neighbourhood; it is the only hop that *mints* provenance |
-| **`job` column empty on every row** | header-block job name never reaches the record, though the bundled samples populate it | parser gap, not a log gap — `Set-HeaderFields` matches a header shape these logs do not use; capture one real header block and widen the pattern |
+| ~~**`job` column empty on every row**~~ **RESOLVED — the identity is not in the body** | blank on all eleven | **Known behaviour of the modern launcher wrapper: it writes no job name or run metadata into the Output body.** These are standard Control-M sysouts and the identity — job name, order id, date, run stamp — is in the **file name**. Widening the header pattern would have been the wrong fix. Identity now reads from the name (`Get-IdentityFromFileName`), with the body header as fallback and cross-check |
 | **One log matches no kind rule** | `kind_unknown` | characterize its shape; it is the eleventh log and a whole job class may be unrepresented |
 | **Ingest mode derived for one hop only** | JOIN 5 shows a single mode | mode is per-flow, and only the PREPROC hop carries the evidence; flows without a PREPROC log resolve to `unknown` with a reason, as designed |
+
+## Where identity actually lives
+
+The blank `job` column looked like a parser defect and was not one. The **modern launcher wrapper
+does not write the job name or run metadata into the Output body at all** — no pattern widening
+would have recovered it. These are standard Control-M sysout files, and the identity is carried by
+the **file name**: job name, order id, a date, and a run stamp.
+
+That makes identity the one part of the record with a different source from every other field. Every
+other fact is read from the body; identity is read from the name, and a log detached from its
+file name has no identity at all. Three consequences for MM7:
+
+1. **The extractor's input is a named file, not a text blob.** An acquisition path that hands over
+   Output text without its file name loses `<job, order-id, run>` — which is exactly the key the
+   extractor joins on. Idea-133's `mode` / `via` declaration has to preserve the name.
+2. **Sysout naming varies by site, so the reader is a tolerant scan with an override**, not a fixed
+   format, and it prints what it derived so a wrong parse is visible rather than silent.
+3. **The name's date field is not the launcher's `-od`.** On the samples they differ
+   (`run_date` 20260820 from the name, `order_date` 20260819 from `-od`). The reader records the
+   name's value as `run_date` and claims nothing about which is the order date — an open question
+   for the estate, not something to resolve by merging the two fields.
 
 ## Two findings that belong to the estate, not to the parser
 

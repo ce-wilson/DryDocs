@@ -178,6 +178,10 @@ function New-Result {
         source_file       = $SourceFile
         launcher_kind     = $Kind
         job_name          = $null
+        order_id          = $null      # from the FILE NAME - the modern wrapper omits it from the body
+        run_date          = $null      # from the FILE NAME; NOT assumed to be the launcher's -od
+        run_stamp         = $null      # from the FILE NAME
+        identity_source   = $null      # filename | header | filename+header | none
         run_number        = $null
         run_window        = $null
         exit_status       = $null
@@ -217,12 +221,118 @@ function New-Result {
     }
 }
 
+# --- identity from the FILE NAME -------------------------------------------------------------
+#
+# WHY THIS EXISTS (estate fact, 2026-08-21). The modern launcher wrapper does NOT write the job
+# name, order id or run metadata into the Output body - the first real-log run showed a blank
+# job column on all eleven logs. That is not a parser gap in the body reader and widening the
+# header pattern would not fix it: this is a standard Control-M sysout, and the identity is in
+# the FILE NAME (job name, order id, order date, run stamp). So identity is read from the name,
+# and the body header - which older logs still carry - is a fallback and a cross-check.
+#
+# The default reader is a tolerant scan, not a fixed format, because sysout naming varies by
+# site. Pass -NamePattern (a regex with named groups job/order/odate/stamp) via
+# Set-CtmNamePattern to pin it for an estate. Whatever it derives is PRINTED, so a wrong parse
+# is visible rather than silent - the same rule the joins follow.
+
+$script:CtmNamePattern = $null
+
+function Set-CtmNamePattern {
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Pattern)
+    if ([string]::IsNullOrWhiteSpace($Pattern)) { $script:CtmNamePattern = $null }
+    else { $script:CtmNamePattern = $Pattern }
+}
+
+function Test-JobNameShape {
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Value)
+    return ($Value -match '^[A-Za-z][A-Za-z0-9]{2,}[0-9_][A-Za-z0-9_]+$')
+}
+
+function Get-IdentityFromFileName {
+    param([Parameter(Mandatory)][string]$Path)
+    $base = [System.IO.Path]::GetFileNameWithoutExtension($Path)
+    # run_date is deliberately NOT called order_date: the launcher's own -od argument is a
+    # different field and the two disagree on real logs. Which one the name carries is an open
+    # question for the estate, so the reader records what it saw and claims nothing.
+    $out = [ordered]@{ job_name = $null; order_id = $null; run_date = $null; run_stamp = $null; pattern = 'none' }
+
+    if ($null -ne $script:CtmNamePattern) {
+        if ($base -match $script:CtmNamePattern) {
+            if ($Matches.Contains('job'))   { $out.job_name   = $Matches['job'] }
+            if ($Matches.Contains('order')) { $out.order_id   = $Matches['order'] }
+            if ($Matches.Contains('odate')) { $out.run_date = $Matches['odate'] }
+            if ($Matches.Contains('stamp')) { $out.run_stamp  = $Matches['stamp'] }
+            $out.pattern = 'override'
+        }
+        return $out
+    }
+
+    # Default scan. Sysout names put the job name first and the numeric fields after it, most
+    # commonly dot-separated - job names themselves are full of underscores, so '.' is the field
+    # separator and '_' is not.
+    $parts = @($base -split '\.')
+    if ($parts.Count -ge 2 -and (Test-JobNameShape -Value $parts[0])) {
+        $out.job_name = $parts[0]
+        $out.pattern = 'dotted'
+        foreach ($seg in $parts[1..($parts.Count - 1)]) {
+            if ($seg -match '^20\d{6}$' -and $null -eq $out.run_date) { $out.run_date = $seg; continue }
+            if ($seg -match '^\d{9,17}$' -and $null -eq $out.run_stamp) { $out.run_stamp = $seg; continue }
+            if ($seg -match '^\d{6}$'    -and $null -eq $out.run_stamp) { $out.run_stamp = $seg; continue }
+            if ($seg -match '^[0-9A-Za-z]{3,10}$' -and $null -eq $out.order_id) { $out.order_id = $seg; continue }
+        }
+        return $out
+    }
+
+    # No dot fields: anchor on a delimited YYYYMMDD and take what precedes it as the job name.
+    if ($base -match '^(?<job>.+?)[._-](?<odate>20\d{6})(?:[._-](?<rest>.*))?$' -and (Test-JobNameShape -Value $Matches['job'])) {
+        $out.job_name = $Matches['job']
+        $out.run_date = $Matches['odate']
+        $out.pattern    = 'date-anchored'
+        if ($Matches.Contains('rest') -and -not [string]::IsNullOrWhiteSpace($Matches['rest'])) {
+            foreach ($seg in @($Matches['rest'] -split '[._-]')) {
+                if ($seg -match '^\d{6,17}$' -and $null -eq $out.run_stamp) { $out.run_stamp = $seg; continue }
+                if ($seg -match '^[0-9A-Za-z]{3,10}$' -and $null -eq $out.order_id) { $out.order_id = $seg }
+            }
+        }
+        return $out
+    }
+
+    # A bare job name with no fields at all still gives identity.
+    if (Test-JobNameShape -Value $base) { $out.job_name = $base; $out.pattern = 'name-only' }
+    return $out
+}
+
+function Set-IdentityFromFileName {
+    param([Parameter(Mandatory)]$Result)
+    $id = Get-IdentityFromFileName -Path $Result.source_file
+    if ($null -eq $id.job_name) { $Result.skip_reasons += 'identity_not_in_filename'; return }
+    $Result.job_name   = $id.job_name
+    $Result.order_id   = $id.order_id
+    $Result.run_stamp  = $id.run_stamp
+    $Result.run_date   = $id.run_date
+    $Result.identity_source = 'filename'
+    if ($null -eq $id.order_id) { $Result.skip_reasons += 'no_order_id_in_filename' }
+}
+
 function Set-HeaderFields {
     # "JOBNAME" / "00001 2026/08/20 15:37 - 2026/08/20 15:41 Size: 6745 Status: 0" header
     # lines, when the log was copied with the panel header. Optional.
+    # Identity comes from the FILE NAME first (see Get-IdentityFromFileName). Older logs also
+    # carry a bare job-name line here; it is a fallback when the name gave nothing, and a
+    # cross-check when both are present.
     param([Parameter(Mandatory)]$Result, [Parameter(Mandatory)][AllowEmptyString()][string[]]$Lines)
+    Set-IdentityFromFileName -Result $Result
     foreach ($l in $Lines) {
-        if ($null -eq $Result.job_name -and $l -match '^([A-Z][A-Z0-9]{2,}[0-9_][A-Z0-9_]+)\s*$') { $Result.job_name = $Matches[1] }
+        if ($l -match '^([A-Z][A-Z0-9]{2,}[0-9_][A-Z0-9_]+)\s*$') {
+            if ($null -eq $Result.job_name) {
+                $Result.job_name = $Matches[1]
+                $Result.identity_source = 'header'
+            } elseif ($Result.job_name -ne $Matches[1]) {
+                $Result.skip_reasons += "identity_mismatch:filename=$($Result.job_name);header=$($Matches[1])"
+            } elseif ($Result.identity_source -eq 'filename') {
+                $Result.identity_source = 'filename+header'
+            }
+        }
         if ($l -match '^(\d{5})\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})\s*-\s*(\d{4}/\d{2}/\d{2} \d{2}:\d{2}).*Status:\s*(\d+)') {
             $Result.run_number = $Matches[1]
             $Result.run_window = "$($Matches[2]) - $($Matches[3])"

@@ -27,6 +27,15 @@ the scripts carry no host names, application ids, or people; the bundled samples
 Real logs go under `internal-local/controlm-output-logs/` (git-ignored). Copy the Output tab text
 into a `.log`/`.txt` file; the panel's soft-wrap marker (trailing `\`) is handled.
 
+**Keep the sysout file name.** The modern launcher wrapper writes no job name or run metadata into
+the Output body — identity (job name, order id, date, run stamp) is in the **file name**, and a log
+saved under an arbitrary name has no identity at all. The reader (`Get-IdentityFromFileName`) is a
+tolerant scan because sysout naming varies by site; to pin an estate's format call
+`Set-CtmNamePattern` with a regex using the named groups `job`, `order`, `odate`, `stamp` before
+parsing. The bundled sample names show a representative shape, not a confirmed site convention.
+The name's date is recorded as `run_date` and is deliberately NOT merged into `order_date` (the
+launcher's `-od`) — on real logs the two differ.
+
 ## The job shapes and what each contributes
 
 | Script | Detected by | Fields this hop owns |
