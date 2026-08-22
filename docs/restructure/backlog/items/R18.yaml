@@ -21,3 +21,60 @@ acceptance: |
   (a) An explicit opt-in `--debug` / `--verbose` runtime option (or the equivalent documented service setting for the ADK server) enables an append-only diagnostic trace for one Ask run, correlated on every record by the existing `run_id` and `session_id`. (b) The trace captures the observable decision path: normalized question, router outcome and candidate/spec rationale, schema/vocabulary inputs selected for text2cypher, generated Cypher, validation/fix attempts and errors, executed row counts, answer inputs, and final envelope status/timing. It must not capture hidden chain-of-thought or provider secrets. (c) Default behavior remains the current minimal telemetry contract; debug is off unless explicitly enabled, and sensitive question/answer content follows the existing local-log classification and retention rules. (d) An admin can retrieve or download the trace by run_id/session_id and distinguish one question from concurrent sessions; the Ask UI links the visible run id to the trace when debug is enabled. Unit tests cover correlation, disabled-by-default behavior, redaction, and a full router -> query -> answer trace.
 notes: |
   Follow-on to R3, which is DONE and already writes per-call JSONL plus the :AgentRun summary, and R5, which exposes the safe per-step Cypher in the Ask UI. This item fills the current gap between those surfaces and the richer diagnostic evidence needed to explain routing and generated-query decisions. "Thinking" means an auditable decision trace, not unrestricted model chain-of-thought.
+  VERIFIED 2026-08-21 (desktop, live Ask session `ask-jdoe4821-wjtacr8x`, three runs,
+  `qa.graph_qa.20260821.jsonl` + `agents/graph_qa/.adk/session.db`) — the gap this item
+  names is REAL and is larger than a logging change. Read at the code, not inferred.
+
+  WHAT EACH HOP KEEPS TODAY, transcribed as observed:
+  - router — kept: `spec_id` and `ms` on the StepRecord, nothing else. Dropped: the prompt,
+    and the ENTIRE raw reply. In `_route()` (agents/graph_qa/pipeline.py, the `raw = self._llm(...)`
+    call) the reply is a local, handed to `_extract_json`, reduced to `spec_id` + `params`,
+    and lost when the function returns. `StepRecord` (agents/graph_qa/envelope.py) has no
+    field that could hold it.
+  - text2cypher — kept: the generated `cypher` string, plus `database`, `rows`, `truncated`,
+    `fix_retries`, `error`. Dropped: the schema/vocabulary prompt built by `build_schema_prompt`,
+    and any prose the model wrapped around the JSON. The kept Cypher is the ONE genuinely
+    diagnostic intermediate that exists today.
+  - answer — kept: `ms` on the step; the output text lands in `envelope.answer`. Dropped: the
+    system prompt and the rows JSON it reasoned over.
+
+  WHY, and this is the part that changes the build: there are TWO independent causes, and
+  neither is fixed by writing more log lines.
+  1. No rationale is ever GENERATED. `ROUTER_SYSTEM` closes with a JSON-only instruction whose
+     object has exactly two keys, `spec_id` and `params` — there is no `reason` field, so the
+     model is never asked to explain the choice. The telemetry confirms nothing was emitted and
+     suppressed: router completion tokens were 17, 17 and 30 across the three runs, which is the
+     size of those JSON literals alone. Clause (b) asks for "router outcome and candidate/spec
+     rationale"; the outcome half is already recorded, the rationale half requires a CONTRACT
+     CHANGE to the router prompt plus a `StepRecord` field, not a capture change.
+  2. Nothing below the pipeline could carry it either. `LiteLlmProvider.complete`
+     (agents/graph_qa/providers.py) reads only `response.choices[0].message.content`, passes no
+     thinking parameter, and runs at temperature 0 — so a provider-side reasoning block would be
+     discarded before the pipeline ever saw it. This is consistent with the notes above: the item
+     wants an auditable decision trace, and clause (b) fences off hidden chain-of-thought.
+
+  SINK BOUNDARY, pinning clause (c) to a specific place: full prompt and reply text belongs in
+  the DRYDOCS_LOGDIR ledger that R3 already owns, NOT in the envelope. `Envelope` deliberately
+  reduces question text and caller identity to sha256-plus-length so neither is persisted in a
+  payload or in-graph, while R3's run line is already the sanctioned home for full question text.
+  A trace that widened the envelope would cross a boundary this repo drew on purpose.
+
+  WHAT THE THREE RUNS SHOWED, as the worked example a builder can test against: same session,
+  same user, one subject — BMC Control-M OS job parameters. Run 1 routed to text2cypher and
+  generated `(d:Document)-[:HAS_CHUNK]->(c:Chunk)` filtered on `d.name`; the corpus edge is
+  `(:Chunk)-[:PART_OF]->(:Document)` and `Document` carries `doc_id`/`title`/`source_page`, so
+  two independent defects each produced 0 rows. Run 2 routed to text2cypher and read the same
+  words as an OPERATIONAL question, generating a valid `ControlMFolder`/`ControlMJob` traversal
+  on `task_type` — 0 rows, right schema, wrong domain. Run 3 named a graph property in the
+  question, routed to spec `docs.documents.v1`, and found the document — `controlm-os-job-parameters`,
+  16 chunks, GROUNDED/External. So the corpus held the answer the whole time and two of three
+  runs told the user it was not ingested. Today a reviewer can reconstruct WHAT ran from the kept
+  Cypher but nothing says WHY the router read the same subject three different ways, which is
+  precisely the evidence this item exists to produce.
+
+  TIES: O62 is the search-side sibling — run 3 is a real user performing its file-name search
+  use case, and it is worth noting there that `docs.documents.v1` applies no search filter at all
+  (it lists every Document and the answer LLM picked the match out of 27 rows by title
+  similarity), so the retrieval was approximate even though the answer was right. R13 concerns
+  growth of the same `.adk/session.db` this evidence was read from, and Idea-151 records a
+  cleartext credential in that same store.

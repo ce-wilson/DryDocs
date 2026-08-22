@@ -424,6 +424,23 @@ RIBBON WEIGHT IS AN OPEN DESIGN QUESTION, flagged rather than assumed: in a Sank
 </p></div></div>
 <div class="card ready" id="card-O62" data-id="O62" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o62 the ask report view: a file-name search resolves to the owning application and process, and the report shows code repos and dev teams for both processes so support can escalate" tabindex="0"><div class="card-head"><span class="card-id">O62</span><span class="card-title">The Ask report view: a file-name search resolves to the owning application and process, and the report shows code repos and dev teams for BOTH processes so support can escalate</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The Ask surface gains a REPORT rendering for the file-name search use case: a user searches a file name (or table) and the result renders as a structured report naming the business application and process associated with it -- and when the chain crosses processes (the captured example: a file-transfer process fed by an event-based application), the report shows the code repos and development teams for BOTH processes, because escalation is the point. The traversal binds via a reviewed read-only drydocs_api QuerySpec (shortest-path from an Application anchor filtered on a fileName property -- the captured example spans ~22 nodes across application / product / dev-team / scheduler folder+job / file-transfer route / pipeline / repo labels), never raw Cypher composed in the browser. The report carries the source -&gt; node-label legend table the captured example shows, so a reader can tell which source system asserted each row. Absence renders honestly: a leg the graph cannot supply renders as &quot;not found via &lt;spec&gt;&quot;, never as an empty section that reads as &quot;none exists&quot;. Committed fixtures are SYNTHESIZED twins of the captured example&#x27;s SHAPE -- no real SEAL ids, hosts, or repo URLs from the machine-local transcription. Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-17 (targeted groom -- the UI / docs/design/ui-exploration inbox entries only) from Idea-123: the SME supplied a real captured example (screenshot + transcription machine-local at internal-local/ui-examples/, real SEAL ids/hosts/repo URLs -- never committed). This is the concrete output target for the Ask route: report form of the same job -&gt; pipeline -&gt; asset chain O60 draws as a swimlane diagram -- the pair is deliberate, one chain, two presentations. module drydocs-web with the QuerySpec half explicitly in scope the way other O-series frames bind specs; if the spec grows past a straightforward reviewed traversal, splitting a drydocs-api item out is the builder&#x27;s call to record. Whether this report also becomes an Ask-agent tool answer (the Idea-125 named-verbs direction) is NOT decided here -- this item renders the report; the agent-tool question stays in the inbox.
+OBSERVED 2026-08-21 (desktop, live Ask session `ask-jdoe4821-wjtacr8x`) — a real user ran this
+item&#x27;s use case against the current surface, so the shape is no longer only the SME&#x27;s captured
+example. The user asked for a file name, `OS_Job_parameters.htm`, and the answer was correct:
+document `controlm-os-job-parameters`, 16 chunks, GROUNDED/External. HOW it was correct is the
+finding worth pinning to this item: the router chose registered spec `docs.documents.v1`, whose
+Cypher applies NO search filter — it lists every `:Document` with a chunk count — and the answer
+LLM picked the match out of 27 rows by title similarity. So the retrieval was a full-corpus scan
+narrowed by the model, not a search, and `d.source_page` was never read even though the user
+named that property. That works at 27 documents and degrades as the corpus grows, which is a
+direct argument for this item&#x27;s clause that the traversal binds via a REVIEWED read-only spec:
+the spec has to do the filtering, or the honest-absence clause cannot mean anything either
+(a full listing can never render &quot;not found via &lt;spec&gt;&quot;). No spec in `drydocs_api/query_specs.py`
+currently accepts a search term — `docs.chunks.v1` returns headings without text and takes no
+filter — so a term-accepting doc/file-name spec is a real prerequisite, not an assumed one.
+Two sibling runs in the same session missed entirely, both answering &quot;not ingested&quot; while the
+corpus held the document; that evidence and the per-hop reasoning are recorded on R18, the
+trace item, rather than duplicated here.
 </p></div></div>
 <div class="card ready" id="card-O63" data-id="O63" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o63 service reachability, surfaced twice from one probe: ask diagnoses its own failure instead of printing a bare &quot;failed to fetch&quot;, and the admin page carries a service-status strip at the top" tabindex="0"><div class="card-head"><span class="card-id">O63</span><span class="card-title">Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare &quot;Failed to fetch&quot;, and the admin page carries a service-status strip at the top</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> When an Ask request fails, the surface runs a STAGED self-diagnosis in place of the single red
 line it shows today, in this order:
@@ -582,6 +599,63 @@ Sibling of J51 (the doc-source-registry manifest row from the same review); this
 </p></div></div>
 <div class="card ready" id="card-R18" data-id="R18" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="requirement" data-status="todo" data-search="r18 ask debug trace: opt-in verbose decision log correlated to run_id and session_id" tabindex="0"><div class="card-head"><span class="card-id">R18</span><span class="card-title">Ask debug trace: opt-in verbose decision log correlated to run_id and session_id</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-R3" data-target="card-R3">R3</a> <a class="dep-link" href="#card-R5" data-target="card-R5">R5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) An explicit opt-in `--debug` / `--verbose` runtime option (or the equivalent documented service setting for the ADK server) enables an append-only diagnostic trace for one Ask run, correlated on every record by the existing `run_id` and `session_id`. (b) The trace captures the observable decision path: normalized question, router outcome and candidate/spec rationale, schema/vocabulary inputs selected for text2cypher, generated Cypher, validation/fix attempts and errors, executed row counts, answer inputs, and final envelope status/timing. It must not capture hidden chain-of-thought or provider secrets. (c) Default behavior remains the current minimal telemetry contract; debug is off unless explicitly enabled, and sensitive question/answer content follows the existing local-log classification and retention rules. (d) An admin can retrieve or download the trace by run_id/session_id and distinguish one question from concurrent sessions; the Ask UI links the visible run id to the trace when debug is enabled. Unit tests cover correlation, disabled-by-default behavior, redaction, and a full router -&gt; query -&gt; answer trace.
 </p><p class="notes"><strong>Notes:</strong> Follow-on to R3, which is DONE and already writes per-call JSONL plus the :AgentRun summary, and R5, which exposes the safe per-step Cypher in the Ask UI. This item fills the current gap between those surfaces and the richer diagnostic evidence needed to explain routing and generated-query decisions. &quot;Thinking&quot; means an auditable decision trace, not unrestricted model chain-of-thought.
+VERIFIED 2026-08-21 (desktop, live Ask session `ask-jdoe4821-wjtacr8x`, three runs,
+`qa.graph_qa.20260821.jsonl` + `agents/graph_qa/.adk/session.db`) — the gap this item
+names is REAL and is larger than a logging change. Read at the code, not inferred.
+
+WHAT EACH HOP KEEPS TODAY, transcribed as observed:
+- router — kept: `spec_id` and `ms` on the StepRecord, nothing else. Dropped: the prompt,
+  and the ENTIRE raw reply. In `_route()` (agents/graph_qa/pipeline.py, the `raw = self._llm(...)`
+  call) the reply is a local, handed to `_extract_json`, reduced to `spec_id` + `params`,
+  and lost when the function returns. `StepRecord` (agents/graph_qa/envelope.py) has no
+  field that could hold it.
+- text2cypher — kept: the generated `cypher` string, plus `database`, `rows`, `truncated`,
+  `fix_retries`, `error`. Dropped: the schema/vocabulary prompt built by `build_schema_prompt`,
+  and any prose the model wrapped around the JSON. The kept Cypher is the ONE genuinely
+  diagnostic intermediate that exists today.
+- answer — kept: `ms` on the step; the output text lands in `envelope.answer`. Dropped: the
+  system prompt and the rows JSON it reasoned over.
+
+WHY, and this is the part that changes the build: there are TWO independent causes, and
+neither is fixed by writing more log lines.
+1. No rationale is ever GENERATED. `ROUTER_SYSTEM` closes with a JSON-only instruction whose
+   object has exactly two keys, `spec_id` and `params` — there is no `reason` field, so the
+   model is never asked to explain the choice. The telemetry confirms nothing was emitted and
+   suppressed: router completion tokens were 17, 17 and 30 across the three runs, which is the
+   size of those JSON literals alone. Clause (b) asks for &quot;router outcome and candidate/spec
+   rationale&quot;; the outcome half is already recorded, the rationale half requires a CONTRACT
+   CHANGE to the router prompt plus a `StepRecord` field, not a capture change.
+2. Nothing below the pipeline could carry it either. `LiteLlmProvider.complete`
+   (agents/graph_qa/providers.py) reads only `response.choices[0].message.content`, passes no
+   thinking parameter, and runs at temperature 0 — so a provider-side reasoning block would be
+   discarded before the pipeline ever saw it. This is consistent with the notes above: the item
+   wants an auditable decision trace, and clause (b) fences off hidden chain-of-thought.
+
+SINK BOUNDARY, pinning clause (c) to a specific place: full prompt and reply text belongs in
+the DRYDOCS_LOGDIR ledger that R3 already owns, NOT in the envelope. `Envelope` deliberately
+reduces question text and caller identity to sha256-plus-length so neither is persisted in a
+payload or in-graph, while R3&#x27;s run line is already the sanctioned home for full question text.
+A trace that widened the envelope would cross a boundary this repo drew on purpose.
+
+WHAT THE THREE RUNS SHOWED, as the worked example a builder can test against: same session,
+same user, one subject — BMC Control-M OS job parameters. Run 1 routed to text2cypher and
+generated `(d:Document)-[:HAS_CHUNK]-&gt;(c:Chunk)` filtered on `d.name`; the corpus edge is
+`(:Chunk)-[:PART_OF]-&gt;(:Document)` and `Document` carries `doc_id`/`title`/`source_page`, so
+two independent defects each produced 0 rows. Run 2 routed to text2cypher and read the same
+words as an OPERATIONAL question, generating a valid `ControlMFolder`/`ControlMJob` traversal
+on `task_type` — 0 rows, right schema, wrong domain. Run 3 named a graph property in the
+question, routed to spec `docs.documents.v1`, and found the document — `controlm-os-job-parameters`,
+16 chunks, GROUNDED/External. So the corpus held the answer the whole time and two of three
+runs told the user it was not ingested. Today a reviewer can reconstruct WHAT ran from the kept
+Cypher but nothing says WHY the router read the same subject three different ways, which is
+precisely the evidence this item exists to produce.
+
+TIES: O62 is the search-side sibling — run 3 is a real user performing its file-name search
+use case, and it is worth noting there that `docs.documents.v1` applies no search filter at all
+(it lists every Document and the answer LLM picked the match out of 27 rows by title
+similarity), so the retrieval was approximate even though the answer was right. R13 concerns
+growth of the same `.adk/session.db` this evidence was read from, and Idea-151 records a
+cleartext credential in that same store.
 </p></div></div>
 <div class="card ready" id="card-R19" data-id="R19" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="requirement" data-status="todo" data-search="r19 ask clarification loop for unresolved acronyms and graph-label intent" tabindex="0"><div class="card-head"><span class="card-id">R19</span><span class="card-title">Ask clarification loop for unresolved acronyms and graph-label intent</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-R2" data-target="card-R2">R2</a> <a class="dep-link" href="#card-R5" data-target="card-R5">R5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) When the initial question contains an acronym, label, or domain term that does not resolve to a registered QuerySpec, active vocabulary row, live label/property, or approved acronym sense, the agent does not silently choose a near match; it returns a structured clarification request with the unresolved term, the detected candidate senses/labels, and one or more concise choices. (b) The Ask UI renders the clarification as an actionable question, preserves the pending question/session, and submits the user&#x27;s selection or free-text clarification as the next turn. A confirmed clarification is visible in the trace and is used for the subsequent router/text2cypher decision. (c) If the user declines or no clarification is possible, the answer states the ambiguity and does not present a zero-row near-match as a definitive answer. Existing clear questions remain single-pass and unchanged. (d) Tests cover unknown acronym, ambiguous label with multiple candidates, user selection, cancellation, session persistence, and the no-clarification regression path.
 </p><p class="notes"><strong>Notes:</strong> Requested as a companion to R18 after the Tower/TOMRole mismatch: the Explorer&#x27;s synthesized Tower concept was silently mapped to the real TOMRole label. This is a disambiguation contract, not permission for the agent to invent ontology or relationship meanings; unresolved meaning still routes to the SME/HITL path.

@@ -93,6 +93,49 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-156`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
+  **The snapshot CI check can never see a branch, and the verdict still has no tests.** Filed on
+  `feat/ui-workstream` as its Idea-152 and re-filed here at 156 because both 151 and 152 were
+  taken on `main` by unrelated entries while the branch sat unmerged. **Half of the original
+  report is already fixed and is recorded here only so the fix is not re-done:** the report's
+  defect (1), `Get-CiVerdict` never enumerating the runs array so `$mine[0]` was the whole
+  ten-run array and `conclusion -eq "success"` was true if ANY recent run passed, was fixed on
+  `main` by `22b8ad7` and then properly by `5c0308e` (`knowledge/depgraph-snapshots/snapshot.ps1`
+  now assigns the parse and unrolls it explicitly, with the PS 5.1 trap written down at the
+  line). **What is still open is defect (2):** the caller runs
+  `gh run list --branch main --limit 10` and matches the LOCAL HEAD against it, so from any
+  branch — which is what CLAUDE.md instructs for worktree, epic-slice and agent work — HEAD can
+  never appear until merge and the check degrades to the yellow no-run-yet path permanently. The
+  branch this was filed from is the worked example: CI was green on `feat/ui-workstream` and
+  invisible to a query pinned to `main`. Fix: pass the current branch via
+  `git rev-parse --abbrev-ref HEAD` instead of the literal `main`. **Also still open, and the
+  reason the first defect shipped at all:** the verdict is a pure function of (runs, head) by its
+  own design note and has NO tests — add fixtures for green-at-head,
+  failed-at-head-with-older-success, in-progress, no-run-yet and empty. The empty case is the one
+  that would have caught it. Sibling of [[Idea-150]] in the same script: that one loses the JSON
+  write from a worktree, this one mis-reports the step before it. Mechanism-only, no gate.
+
+- **`Idea-155`** · 2026-08-21 · `[bug]` · **open** · prio? **High** —
+  The Ask control token is persisted in cleartext in the ADK session store. `web/src/ask/askApi.ts`
+  sends the drydocs-api session token as an in-band message part
+  (`{"drydocs_control": {"api_token": ..., "api_url": ...}}`, the R5 handshake in
+  `agents/graph_qa/control.py`), and ADK writes every message part verbatim into
+  `agents/graph_qa/.adk/session.db`, so the raw bearer token lands on disk in the `events` table
+  once per turn. Observed 2026-08-21 on this desktop in session `ask-jdoe4821-wjtacr8x` — the same
+  token appears in all three user events. Two things make it worse than a stray log line: the token
+  has no expiry (`InMemorySessionStore.issue` mints `secrets.token_urlsafe(24)` and only `revoke`
+  or an API restart ends it), so a copy taken from the file is replayable for the life of the API
+  process; and the store is never pruned, so tokens accumulate. It also contradicts the envelope's
+  own privacy stance one row over — `Envelope` deliberately reduces question text and caller
+  identity to sha256 plus length so neither is persisted, while the credential beside them is
+  written raw. `control.py` states that control parts never reach the LLM, which holds, but says
+  nothing about persistence; that is the gap. Not a commit-boundary leak: `.adk/` is gitignored
+  (`.gitignore:25`), so nothing reached the repo. Fix direction — strip the control part from the
+  event before ADK persists it, or redact the value on write and keep the token only in process
+  memory for the turn; add a regression test asserting no `api_token` value appears in
+  `session.db` after a run, and purge the existing file since its tokens are live until the API
+  restarts.
+
 - **`Idea-154`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
   **The Claude-in-Chrome extension browser is not trustworthy for console verification on the
   laptop: it served a NON-laptop DryDocs root at localhost:5173 while claiming `isLocal: true`.**

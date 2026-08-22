@@ -20,3 +20,20 @@ acceptance: |
   The Ask surface gains a REPORT rendering for the file-name search use case: a user searches a file name (or table) and the result renders as a structured report naming the business application and process associated with it -- and when the chain crosses processes (the captured example: a file-transfer process fed by an event-based application), the report shows the code repos and development teams for BOTH processes, because escalation is the point. The traversal binds via a reviewed read-only drydocs_api QuerySpec (shortest-path from an Application anchor filtered on a fileName property -- the captured example spans ~22 nodes across application / product / dev-team / scheduler folder+job / file-transfer route / pipeline / repo labels), never raw Cypher composed in the browser. The report carries the source -> node-label legend table the captured example shows, so a reader can tell which source system asserted each row. Absence renders honestly: a leg the graph cannot supply renders as "not found via <spec>", never as an empty section that reads as "none exists". Committed fixtures are SYNTHESIZED twins of the captured example's SHAPE -- no real SEAL ids, hosts, or repo URLs from the machine-local transcription. Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
 notes: |
   Groomed 2026-08-17 (targeted groom -- the UI / docs/design/ui-exploration inbox entries only) from Idea-123: the SME supplied a real captured example (screenshot + transcription machine-local at internal-local/ui-examples/, real SEAL ids/hosts/repo URLs -- never committed). This is the concrete output target for the Ask route: report form of the same job -> pipeline -> asset chain O60 draws as a swimlane diagram -- the pair is deliberate, one chain, two presentations. module drydocs-web with the QuerySpec half explicitly in scope the way other O-series frames bind specs; if the spec grows past a straightforward reviewed traversal, splitting a drydocs-api item out is the builder's call to record. Whether this report also becomes an Ask-agent tool answer (the Idea-125 named-verbs direction) is NOT decided here -- this item renders the report; the agent-tool question stays in the inbox.
+  OBSERVED 2026-08-21 (desktop, live Ask session `ask-jdoe4821-wjtacr8x`) — a real user ran this
+  item's use case against the current surface, so the shape is no longer only the SME's captured
+  example. The user asked for a file name, `OS_Job_parameters.htm`, and the answer was correct:
+  document `controlm-os-job-parameters`, 16 chunks, GROUNDED/External. HOW it was correct is the
+  finding worth pinning to this item: the router chose registered spec `docs.documents.v1`, whose
+  Cypher applies NO search filter — it lists every `:Document` with a chunk count — and the answer
+  LLM picked the match out of 27 rows by title similarity. So the retrieval was a full-corpus scan
+  narrowed by the model, not a search, and `d.source_page` was never read even though the user
+  named that property. That works at 27 documents and degrades as the corpus grows, which is a
+  direct argument for this item's clause that the traversal binds via a REVIEWED read-only spec:
+  the spec has to do the filtering, or the honest-absence clause cannot mean anything either
+  (a full listing can never render "not found via <spec>"). No spec in `drydocs_api/query_specs.py`
+  currently accepts a search term — `docs.chunks.v1` returns headings without text and takes no
+  filter — so a term-accepting doc/file-name spec is a real prerequisite, not an assumed one.
+  Two sibling runs in the same session missed entirely, both answering "not ingested" while the
+  corpus held the document; that evidence and the per-hop reasoning are recorded on R18, the
+  trace item, rather than duplicated here.
