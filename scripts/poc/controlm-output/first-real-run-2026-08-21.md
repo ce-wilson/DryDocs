@@ -44,6 +44,10 @@ watcher              /data/<tenant>/dropbox/<FEED>/flow_alpha_data_20260820.csv
 transform            CHAIN BREAKS: No provenanceId is provided!      [x6]
 provision            -proId    (GKP; submission <submission-job-id> on <gkp-cluster>)
 
+  [the "CHAIN BREAKS" wording above is what the tool printed on the day and is
+   transcribed as printed; it was WRONG and the tool no longer says it -- see
+   "The correction that changes what JOIN 3 means" below]
+
 == JOIN 4: flow identity across hops (%%DATAFLOW as the launcher names it) ==
   FLOW_BETA_SNPST            2 hop(s): TRANSFORM+TRANSFORM   app_id(s): <APP_ID-derive>
   FLOW_BETA_SNPST_DLY        2 hop(s): TRANSFORM+PROVISION   app_id(s): <APP_ID-derive>
@@ -75,11 +79,11 @@ with a count here; the transcription carries them one per line as printed.
 2. **R13's second consequence fires on real data, not just the samples.** The watcher waits on a file
    the same flow's pre-processor wrote, and that pre-processor's derived mode is `api-pull`. The
    name token could not have told anyone this; the resolved command did.
-3. **The provenance chain breaks at every transform — six of six.** On the synthetic samples this
-   fired once and read as a sample artifact. Six of six on real logs makes it the transform hop's
-   *normal state*: `provenanceGuid` is produced at placement and consumed at ingestion, and then the
-   thread is dropped. Any lineage design that assumes the GUID survives into transform is wrong about
-   this estate. This is the single most consequential correction the run makes to MM7's design.
+3. **No hop outside placement→ingestion carries the handoff token — six transforms of six.** The
+   run made this look like a defect; it is not one. See the correction section below: the guid's
+   scope *is* those two jobs, so six-of-six is the token working as designed. What the run does
+   establish is the **frequency**: nothing downstream carries it, so nothing downstream can be
+   correlated by it.
 4. **Compute target is not uniform and not inferable.** EKS on four hops, GKP on the provision hop
    (from the launcher's own assertion), and on three hops the namespace alias resolves to the literal
    string `test`, so `compute_target` reports `alias:test` rather than guessing. The
@@ -92,6 +96,31 @@ with a count here; the transcription carries them one per line as printed.
 6. **The pipeline GUID is per flow name, not per job.** Eight distinct GUIDs across eight launcher
    hops, and where one flow name has two hops (`FLOW_BETA_SNPST`) the GUIDs differ. Identity for the
    flow record cannot be the pipeline GUID.
+
+## The correction that changes what JOIN 3 means
+
+**SME ruling, 2026-08-21.** `provenanceGuid` is **not provenance**. The placement service mints it
+**at job run**, and it is used **only between the two jobs that JOIN 3 names** — placement produces
+it, the ingestion consuming that placement carries it as `-proId`. It is a run-scoped handoff token.
+**It cannot be used to validate Control-M lineage.**
+
+The PoC's original wording got this backwards. It printed `CHAIN BREAKS` at each transform, which
+asserts that a chain was supposed to continue and did not. There is no chain to break: a transform
+has no handoff to receive. Three things follow, and they are binding on MM7:
+
+1. **Absence downstream is expected, not a defect.** A hop that logs `No provenanceId is provided!`
+   is behaving correctly. The extractor still records the absence — it is worth counting — but as an
+   expected-absent observation, never as a lineage break or a remediation signal.
+2. **The guid must never key an edge, identify a flow, or join hops beyond the pair.** Flow identity
+   is the `%%DATAFLOW` name plus the application id (finding 5 below). Using a run-scoped token as a
+   graph key would manufacture false lineage that looks authoritative because of what it is called.
+3. **The word is a trap in this repo specifically.** DryDocs grounds its edges in PROV-O, where
+   *provenance* means derivation history. The vendor's field name collides with that and means
+   something much narrower. Anywhere the term crosses from a log into our model it needs the scope
+   stated with it.
+
+What the token **is** good for: correlating one placement run to the ingestion run that consumed it,
+and reading the landing prefix that carries it. Both are run-level facts, not lineage.
 
 ## What the run exposes as gaps
 
@@ -119,8 +148,9 @@ with a count here; the transcription carries them one per line as printed.
 The PoC was written to frame the field list. It did, and the run amends it:
 
 - `compute_target` needs three states, not two — resolved, alias-unresolved, absent.
-- `provenance_guid` / `pro_id_in` need a **chain-status** derived field, because "broken" is the
-  common case and a null on its own does not say whether the hop should have carried one.
+- `provenance_guid` / `pro_id_in` are a **placement→ingestion pair correlation**, scoped and
+  labelled as such. No chain-status field, no lineage role, no edge. The field's docstring carries
+  the scope so the next reader does not re-infer a chain from the name.
 - The findings set (`bearer_token_printed_to_output`, `appname=test`, `namespace.alias=test`) is
   separate from the skip-reason set: a *skip* is something the extractor could not do, a *finding* is
   something the extractor did and the estate should look at. `OutputCoverage` should count them

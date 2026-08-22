@@ -8,10 +8,17 @@
 #
 #   PREPROC  --data_files-->  FILEWATCHER.watched_path        => internally fed?  (R13 second consequence)
 #   PREPROC  --data_files-->  PLACEMENT.data_files (-datFile / -tokFile)
-#   PLACEMENT.provenance_guid --> INGESTION.pro_id_in          => the provenance chain
+#   PLACEMENT.provenance_guid --> INGESTION.pro_id_in          => the placement handoff (SCOPE: those two jobs)
 #   INGESTION/TRANSFORM/PROVISION.dataflow                     => one flow, or siblings
-#   TRANSFORM.provenance_warning                               => chain breaks here
 #   every hop.pipeline_id                                      => the CMDLINE lineage join key
+#
+# WHAT provenanceGuid IS NOT (SME ruling 2026-08-21). The placement service mints it AT JOB RUN
+# and it is used ONLY between the two jobs named above: placement produces it, the ingestion that
+# consumes that placement carries it as -proId. It is a run-scoped handoff token, NOT provenance in
+# the PROV-O sense this repo uses that word for, and it CANNOT validate or reconstruct Control-M
+# lineage. Two consequences for anything built on this PoC: a downstream hop that logs no
+# provenance id is the token behaving as designed, not a defect; and the guid must never key an
+# edge or serve as a flow identity (that is %%DATAFLOW plus the application id).
 param(
     [Parameter(Mandatory)][string]$JsonDir
 )
@@ -84,7 +91,8 @@ foreach ($pl in $plc) {
 }
 if ($plc.Count -eq 0) { "  (no PLACEMENT hop)" }
 
-Write-Host "`n== JOIN 3: provenance chain (placement provenanceGuid -> ingestion -proId) ==" -ForegroundColor Cyan
+Write-Host "`n== JOIN 3: placement handoff (placement provenanceGuid -> ingestion -proId; those two jobs ONLY) ==" -ForegroundColor Cyan
+Write-Host "   run-scoped token, minted at job run - not PROV-O provenance, not a lineage key" -ForegroundColor DarkGray
 foreach ($pl in $plc) {
     $g = Val $pl 'provenance_guid'
     Show "placement produced" $g
@@ -98,7 +106,7 @@ foreach ($pl in $plc) {
 }
 foreach ($t in $trf) {
     $w = Val $t 'provenance_warning'
-    if ($null -ne $w) { Show "transform $(Val $t 'job_name')" "CHAIN BREAKS: $w" }
+    if ($null -ne $w) { Show "transform $(Val $t 'job_name')" "no handoff token (expected - out of scope): $w" }
     else { Show "transform $(Val $t 'job_name')" "-proId $(Val $t 'pro_id_in')" }
 }
 foreach ($p in $prv) { Show "provision $(Val $p 'job_name')" "-proId $(Val $p 'pro_id_in')  (GKP; submission $(Val $p 'submission_job_id') on $(Val $p 'submission_cluster'))" }

@@ -132,9 +132,9 @@ provenance:
       - name: "pipeline_ids[], dataset_ids[]"
         origin: source
         from: "CMDLINE -pipeline / -dataset (G15 contract); the Output-tab log is authoritative when the command line carries only a %%variable (MM3)"
-      - name: "launcher_kinds[] (Identified '<KIND>' Job), compute_target, provenance_chain, landing_prefix"
+      - name: "launcher_kinds[] (Identified '<KIND>' Job), compute_target, placement_handoff, landing_prefix"
         origin: source
-        from: "the Output-tab log per <job, order-id, run> — the launcher's own assertions, read verbatim by the MM3 extractor; absent until MM3 lands and the field says so"
+        from: "the Output-tab log per <job, order-id, run> — the launcher's own assertions, read verbatim by the MM3 extractor; absent until MM3 lands and the field says so. placement_handoff is the placement response provenanceGuid paired with the -proId of the ingestion consuming it, and its scope is exactly those two jobs (SME ruling 2026-08-21) — a run-scoped correlation token, not PROV-O provenance and not a lineage validator"
       - name: "watchers[].load_bearing ∈ true | false | unruled"
         origin: derived
         from: "PROPOSED by the fed-from test (watched path == a same-folder predecessor's written path); RULED by the SME; `unruled` is the default and stays visible"
@@ -257,7 +257,7 @@ sections:
       evidence-pointer requirement from gate email-folder-assignment A3 applies
       to every one of them.
       The Output-tab fields (`launcher_kinds`, `compute_target`,
-      `provenance_chain`, `landing_prefix`) are SOURCE but ABSENT until MM3
+      `placement_handoff`, `landing_prefix`) are SOURCE but ABSENT until MM3
       lands; the record says "not yet read" rather than carrying a null that
       reads as "none". The workbook import seed is SOURCE for the columns it
       fills and is NOT consulted for the blank ones — the blanks are the SME
@@ -268,6 +268,7 @@ sections:
       - "The three SOURCE-then-SME fields and the two SME-only fields carry assigned_by + an evidence pointer on every write (the email-folder-assignment A3 rule, generalized)."
       - "A SOURCE field whose source is not yet ingested (the Output-tab fields before MM3) is recorded as absent-with-reason, never as an empty value that reads as a fact."
       - "The feed-grain inventory sheet seeds only the columns it populates; its blank columns are the SME fields and are never copy-filled from adjacent rows."
+      - "placement_handoff is a run-scoped correlation between the placement job and the ingestion job that consumes it, and NOTHING more: the SME confirms it may never key an edge, identify a flow, or be presented as evidence that a lineage path is real. The field name says handoff, not provenance, because the vendor's own field name collides with the PROV-O sense this repo reserves the word for. A hop that logs no id is recorded expected-absent, never as a break or a remediation signal. (SME ruling 2026-08-21; a first real-log run showed six transforms of six carrying none, which is the token working as designed.)"
 
   - id: D
     title: "THE FIVE EDGES — registered planned, each with its PROV-O row or its stated reason for none"

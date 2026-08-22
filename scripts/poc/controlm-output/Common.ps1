@@ -200,7 +200,7 @@ function New-Result {
         image_digest      = $null
         pro_id_in         = $null      # -proId the job was GIVEN (consumer side of the chain)
         provenance_guid   = $null      # provenanceGuid the job PRODUCED (placement response)
-        provenance_warning = $null     # "No provenanceId is provided!" - chain breaks here
+        provenance_warning = $null     # "No provenanceId is provided!" - EXPECTED off the placement->ingestion pair
         landing_targets   = $null
         landing_prefix    = $null
         data_files        = $null      # dat / tok / original file names the job names

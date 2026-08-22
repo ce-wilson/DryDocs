@@ -35,7 +35,7 @@ into a `.log`/`.txt` file; the panel's soft-wrap marker (trailing `\`) is handle
 | `Parse-FileWatcher.ps1` | `+ ctmfw …` | watched path, result (`transfer_completed` / exists / none), size, token-vs-data role |
 | `Parse-Placement.ps1` | `Identified 'PLACEMENT' Job` | **produces the `provenanceGuid`**, dat/tok file args, landing targets (`MERCURY_S3`, `AWS_S3`), landing prefix `<APP_ID>/raw/<flow>/<guid>/` |
 | `Parse-Ingestion.ps1` | `Identified 'INGESTION' Job` | **consumes `-proId`**, `-dataflow` vs task-request `DataFlow` (agreement checked), `-seal` vs `spark.kubernetes.seal`, image digest, compute target from the namespace alias, `task_request_closed` |
-| `Parse-Transform.ps1` | `Identified 'TRANSFORM' Job` | same as ingestion plus `provenance_warning` (*No provenanceId is provided!* — the chain breaks here) and the `appname=test` finding |
+| `Parse-Transform.ps1` | `Identified 'TRANSFORM' Job` | same as ingestion plus `provenance_warning` (*No provenanceId is provided!* — expected: the handoff token is scoped to placement→ingestion) and the `appname=test` finding |
 | `Parse-Provision.ps1` | `Identified 'PROVISION' Job. Provision jobs execute on GKP not EKS!` | compute target **GKP** from the launcher's own line, v2 submission URL, response `jobID` / `httpStatus` / `cluster`, GKP credential key |
 
 Every parser emits the same record (`Common.ps1 → New-Result`). A field a log does not carry is
@@ -50,8 +50,11 @@ MM7's `OutputCoverage` dataclass will carry.
    *internally fed* → `load_bearing=false` **proposed** (R13's second consequence; the SME rules,
    `unruled` until then).
 2. **Pre-processor files → placement `-datFile`/`-tokFile`.**
-3. **Provenance chain:** `PLACEMENT.provenance_guid == INGESTION.pro_id_in` → MATCH/MISMATCH;
-   a TRANSFORM with the warning is reported as the break.
+3. **Placement handoff:** `PLACEMENT.provenance_guid == INGESTION.pro_id_in` → MATCH/MISMATCH.
+   **Scope is those two jobs only** (SME ruling 2026-08-21): the placement service mints the guid at
+   job run and nothing downstream carries it. It is a run-scoped correlation token, not PROV-O
+   provenance, and it cannot validate Control-M lineage or key an edge. A TRANSFORM logging no
+   provenance id is reported as expected-absent, not as a break.
 4. **Flow identity across hops** by `dataflow`, with the app ids seen — sibling flow names under
    different app ids are the producer/consumer split the gate's §A key ruling decides.
 5. **Ingest mode**, derived; `unknown` printed as a value when no PREPROC log was supplied.

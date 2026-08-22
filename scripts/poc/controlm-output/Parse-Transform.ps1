@@ -3,7 +3,9 @@
 # Same launcher and argument shape as INGESTION, two differences that matter to the chain:
 #   * it usually carries NO -proId, and the launcher says so:
 #       [WARNING] dt-launcher: No provenanceId is provided!
-#     -> provenance_warning is set; the provenance chain BREAKS here and the record says so.
+#     -> provenance_warning is set. This is NOT a defect: the placement handoff token is scoped to
+#        placement->ingestion only (SME ruling 2026-08-21), so a transform never carries one. The
+#        record notes it because the absence is worth counting, not because something broke.
 #   * the task-service request names the flow the transform WRITES (its own -dataflow), which
 #     is typically a sibling of the ingestion flow (e.g. <X>_PARTY_DATA -> <X>_PARTY_INTM).
 #
