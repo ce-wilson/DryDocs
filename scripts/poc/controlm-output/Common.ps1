@@ -267,13 +267,20 @@ function Get-IdentityFromFileName {
         return $out
     }
 
-    # Default scan. Sysout names put the job name first and the numeric fields after it, most
-    # commonly dot-separated - job names themselves are full of underscores, so '.' is the field
+    # Default scan. THE JOB NAME IS THE LEADING FIELD - confirmed for this estate 2026-08-21;
+    # the field order after it is not yet confirmed, so the trailing segments are classified by
+    # SHAPE rather than by position. Job names are full of underscores, so '.' is the field
     # separator and '_' is not.
+    #
+    # Position is the evidence here, not the name's appearance: a leading field is taken as the
+    # job name even when it does not look like one, because rejecting it on a shape guess would
+    # throw away the identity of exactly the jobs whose naming is non-standard - the ones most
+    # worth seeing. An unusual shape is recorded, never a reason to drop the value.
     $parts = @($base -split '\.')
-    if ($parts.Count -ge 2 -and (Test-JobNameShape -Value $parts[0])) {
+    if ($parts.Count -ge 2) {
         $out.job_name = $parts[0]
         $out.pattern = 'dotted'
+        if (-not (Test-JobNameShape -Value $parts[0])) { $out.pattern = 'dotted:unusual-name-shape' }
         foreach ($seg in $parts[1..($parts.Count - 1)]) {
             if ($seg -match '^20\d{6}$' -and $null -eq $out.run_date) { $out.run_date = $seg; continue }
             if ($seg -match '^\d{9,17}$' -and $null -eq $out.run_stamp) { $out.run_stamp = $seg; continue }
@@ -284,10 +291,11 @@ function Get-IdentityFromFileName {
     }
 
     # No dot fields: anchor on a delimited YYYYMMDD and take what precedes it as the job name.
-    if ($base -match '^(?<job>.+?)[._-](?<odate>20\d{6})(?:[._-](?<rest>.*))?$' -and (Test-JobNameShape -Value $Matches['job'])) {
+    if ($base -match '^(?<job>.+?)[._-](?<odate>20\d{6})(?:[._-](?<rest>.*))?$') {
         $out.job_name = $Matches['job']
         $out.run_date = $Matches['odate']
-        $out.pattern    = 'date-anchored'
+        $out.pattern  = 'date-anchored'
+        if (-not (Test-JobNameShape -Value $out.job_name)) { $out.pattern = 'date-anchored:unusual-name-shape' }
         if ($Matches.Contains('rest') -and -not [string]::IsNullOrWhiteSpace($Matches['rest'])) {
             foreach ($seg in @($Matches['rest'] -split '[._-]')) {
                 if ($seg -match '^\d{6,17}$' -and $null -eq $out.run_stamp) { $out.run_stamp = $seg; continue }
@@ -306,6 +314,7 @@ function Set-IdentityFromFileName {
     param([Parameter(Mandatory)]$Result)
     $id = Get-IdentityFromFileName -Path $Result.source_file
     if ($null -eq $id.job_name) { $Result.skip_reasons += 'identity_not_in_filename'; return }
+    if ($id.pattern -like '*unusual-name-shape*') { $Result.skip_reasons += "finding:leading_field_not_job_shaped:$($id.job_name)" }
     $Result.job_name   = $id.job_name
     $Result.order_id   = $id.order_id
     $Result.run_stamp  = $id.run_stamp

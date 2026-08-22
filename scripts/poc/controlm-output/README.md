@@ -29,10 +29,14 @@ into a `.log`/`.txt` file; the panel's soft-wrap marker (trailing `\`) is handle
 
 **Keep the sysout file name.** The modern launcher wrapper writes no job name or run metadata into
 the Output body — identity (job name, order id, date, run stamp) is in the **file name**, and a log
-saved under an arbitrary name has no identity at all. The reader (`Get-IdentityFromFileName`) is a
-tolerant scan because sysout naming varies by site; to pin an estate's format call
-`Set-CtmNamePattern` with a regex using the named groups `job`, `order`, `odate`, `stamp` before
-parsing. The bundled sample names show a representative shape, not a confirmed site convention.
+saved under an arbitrary name has no identity at all. **The job name is the leading field**
+(confirmed for this estate 2026-08-21); the order of the fields after it is not yet confirmed, so
+`Get-IdentityFromFileName` takes the leading field by *position* and classifies the rest by *shape*.
+A leading field is accepted as the job name even when it does not look like one — flagged
+`finding:leading_field_not_job_shaped`, never dropped, because rejecting on appearance would lose
+the identity of exactly the non-standard jobs most worth seeing. To pin an estate's format outright,
+call `Set-CtmNamePattern` with a regex using the named groups `job`, `order`, `odate`, `stamp`
+before parsing. The bundled sample names show a representative shape, not a confirmed site convention.
 The name's date is recorded as `run_date` and is deliberately NOT merged into `order_date` (the
 launcher's `-od`) — on real logs the two differ.
 
