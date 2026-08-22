@@ -137,6 +137,14 @@ docs/design/feedback/scans/*
 /*.jpg
 /*.jpeg
 
+# Figma design documents (2026-08-22). `.fig` is Figma's native binary save format
+# (magic bytes `fig-kiwi`); nothing in the build or the docs pipeline reads one, git cannot
+# delta-compress it, and a committed copy is permanent. The one that prompted this rule was
+# an ~18 MB third-party UI kit sitting untracked in two places after S9's move, which also
+# makes it somebody else's asset with its own license — the wrong shape for a repo with a
+# publish boundary. Design references live machine-local in internal-local/ui-examples/.
+*.fig
+
 # OS
 .DS_Store
 Thumbs.db
