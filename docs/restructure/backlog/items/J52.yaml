@@ -1,0 +1,29 @@
+id: J52
+epic: release-infrastructure
+title: Verification evidence about a local dev server counts only when the session launched the browser
+  itself — record the rule and the recipe in the verify skill
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/verify/SKILL.md
+- web/README.md
+acceptance: |
+  (a) THE RULE: `.claude/skills/verify/SKILL.md` gains a short entry in its existing gotchas/discipline section — a claim about what a LOCAL DEV SERVER (Vite, drydocs-api, the ADK server) rendered or returned is evidence only when the browser making the request was launched by the session making the claim. A browser the session merely ATTACHED to is not a known venue, and "verified" without a known venue is the J18 defect in browser form.
+
+  (b) THE RECIPE IS THERE, NOT JUST THE PROHIBITION: the skill already documents headless Edge for rendered HTML files; it gains the dev-server case — a session-launched headless browser driven from the session scratchpad (the 2026-08-21 close used puppeteer-core against a Vite dev server on an alternate port and behaved correctly throughout), carrying the same "launch from PowerShell/`subprocess`, NOT Git Bash" caveat the skill already states.
+
+  (c) THE OBSERVATION IS CITED AS AN OBSERVATION: on 2026-08-21 an extension-connected tab at `localhost:5173` served a DryDocs checkout that did not match the working tree while reporting `isLocal: true`, and cache-bypassed fetches from inside that tab disagreed with `curl` against the same address. The reading that the session was attached to another machine's Chrome is UNPROVEN by the entry's own admission and MUST NOT be written into a tracked, ported file as a mechanism — the rule stands on the venue argument, which holds either way.
+
+  (d) NO MECHANISM CHANGE AND NO CODE: one rule and one recipe in an existing skill. Nothing in `web/` changes; `web/README.md` is an input only because it is where the `?as=<persona>` headless sign-in is already documented, and a one-line cross-reference belongs there if the recipe needs it.
+notes: |
+  Groomed 2026-08-22 (laptop) from Idea-154's CONSEQUENCE half. The entry itself STAYS OPEN in the inbox, marked in place: its other half — open the extension picker with two browsers connected and see which Chrome the "Browser 1 / isLocal: true" session really is — needs both machines in hand and is the user's step, not an agent's, and it is the only thing that would turn the reading into a mechanism.
+
+  Module `docs` / phase 8 / epic release-infrastructure recorded as a CHOICE, not a finding: the verify skill is cross-cutting session tooling — it covers the design-doc renderer, the board and gate renders and the CLI as well as the console — so it lands with the session-ritual infrastructure rather than in Epic O's web-console work. The edit is identical either way; only the shelf differs.
+
+  p3 and haiku: one written paragraph plus a recipe already executed once, against an acceptance that names exactly what may and may not be asserted.

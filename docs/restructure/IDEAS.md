@@ -93,63 +93,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-157`** · 2026-08-22 · `[bug]` · **open** · prio? **Med** —
-  **The 28 live Documents carry NO corpus_id — G32 §A's blast-radius story leans on a property
-  the pre-fold loads never wrote.** Found at the Q14 evidence pass (laptop, `neo4jtest`,
-  `drydocs` DB — J18): `MATCH (d:Document) RETURN d.corpus_id, count(*)` → all 28 rows
-  (27 bmc-docs + 1 essential-graphrag) group under `corpus_id: null`. G32 §A ruled that
-  load-separation and blast-radius in the one database "are satisfied by corpus_id scoping",
-  and `docs-verify`'s graph_locator matches on `corpus_id` — but only the Q13 vendor-docs
-  loader stamps it; `bmc_docs.cypher`'s R3 reload evidently does not (or the laptop's reload
-  predates the stamp). Either the bmc-docs/essential-graphrag loaders gain the corpus_id
-  stamp + a backfill, or the fold's scoping claim is narrower than the gate-log reads.
-  Not chased inside Q14 (drydocs-load layer, not ontology). Sibling context: [[Idea-154]]'s
-  venue discipline is why the machine is named.
-
-- **`Idea-156`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
-  **The snapshot CI check can never see a branch, and the verdict still has no tests.** Filed on
-  `feat/ui-workstream` as its Idea-152 and re-filed here at 156 because both 151 and 152 were
-  taken on `main` by unrelated entries while the branch sat unmerged. **Half of the original
-  report is already fixed and is recorded here only so the fix is not re-done:** the report's
-  defect (1), `Get-CiVerdict` never enumerating the runs array so `$mine[0]` was the whole
-  ten-run array and `conclusion -eq "success"` was true if ANY recent run passed, was fixed on
-  `main` by `22b8ad7` and then properly by `5c0308e` (`knowledge/depgraph-snapshots/snapshot.ps1`
-  now assigns the parse and unrolls it explicitly, with the PS 5.1 trap written down at the
-  line). **What is still open is defect (2):** the caller runs
-  `gh run list --branch main --limit 10` and matches the LOCAL HEAD against it, so from any
-  branch — which is what CLAUDE.md instructs for worktree, epic-slice and agent work — HEAD can
-  never appear until merge and the check degrades to the yellow no-run-yet path permanently. The
-  branch this was filed from is the worked example: CI was green on `feat/ui-workstream` and
-  invisible to a query pinned to `main`. Fix: pass the current branch via
-  `git rev-parse --abbrev-ref HEAD` instead of the literal `main`. **Also still open, and the
-  reason the first defect shipped at all:** the verdict is a pure function of (runs, head) by its
-  own design note and has NO tests — add fixtures for green-at-head,
-  failed-at-head-with-older-success, in-progress, no-run-yet and empty. The empty case is the one
-  that would have caught it. Sibling of [[Idea-150]] in the same script: that one loses the JSON
-  write from a worktree, this one mis-reports the step before it. Mechanism-only, no gate.
-
-- **`Idea-155`** · 2026-08-21 · `[bug]` · **open** · prio? **High** —
-  The Ask control token is persisted in cleartext in the ADK session store. `web/src/ask/askApi.ts`
-  sends the drydocs-api session token as an in-band message part
-  (`{"drydocs_control": {"api_token": ..., "api_url": ...}}`, the R5 handshake in
-  `agents/graph_qa/control.py`), and ADK writes every message part verbatim into
-  `agents/graph_qa/.adk/session.db`, so the raw bearer token lands on disk in the `events` table
-  once per turn. Observed 2026-08-21 on this desktop in session `ask-jdoe4821-wjtacr8x` — the same
-  token appears in all three user events. Two things make it worse than a stray log line: the token
-  has no expiry (`InMemorySessionStore.issue` mints `secrets.token_urlsafe(24)` and only `revoke`
-  or an API restart ends it), so a copy taken from the file is replayable for the life of the API
-  process; and the store is never pruned, so tokens accumulate. It also contradicts the envelope's
-  own privacy stance one row over — `Envelope` deliberately reduces question text and caller
-  identity to sha256 plus length so neither is persisted, while the credential beside them is
-  written raw. `control.py` states that control parts never reach the LLM, which holds, but says
-  nothing about persistence; that is the gap. Not a commit-boundary leak: `.adk/` is gitignored
-  (`.gitignore:25`), so nothing reached the repo. Fix direction — strip the control part from the
-  event before ADK persists it, or redact the value on write and keep the token only in process
-  memory for the turn; add a regression test asserting no `api_token` value appears in
-  `session.db` after a run, and purge the existing file since its tokens are live until the API
-  restarts.
-
-- **`Idea-154`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-154`** · 2026-08-21 · `[bug]` · **open — partially groomed → J52 (2026-08-22, the consequence half: the verify skill gains the session-launched-browser rule + recipe); the two-browser diagnostic that would prove the mechanism needs both machines in hand and stays the user's step** · prio? **Med** —
   **The Claude-in-Chrome extension browser is not trustworthy for console verification on the
   laptop: it served a NON-laptop DryDocs root at localhost:5173 while claiming `isLocal: true`.**
   Observed during the O64-O67 verification: the extension-connected tab at localhost:5173 served a
@@ -166,6 +110,14 @@ question a 1,000-line file with the trail at the bottom could not answer.
   :5199, which behaved correctly throughout). Worth a quick check with both machines in hand: open
   the extension picker with two browsers connected and see which Chrome the "Browser 1 /
   isLocal: true" session really is.
+  **GROOMED IN PART 2026-08-22 — what left, and what did not.** The consequence half is now an item:
+  `J52` puts the positive discipline into `.claude/skills/verify/SKILL.md` — verification evidence about a
+  LOCAL DEV SERVER counts only when the session launched the browser itself, which is J18's venue rule in
+  browser form — together with the session-launched headless recipe. Its acceptance FORBIDS writing the
+  desktop-Chrome-attachment reading into that tracked, ported file: it is unproven by this entry's own
+  admission, and the rule stands on the venue argument either way. What stays here is the diagnostic that
+  would settle the mechanism (two browsers connected, read which Chrome the `isLocal: true` session really
+  is) — it needs both machines in hand, so no agent can run it.
 
 - **`Idea-153`** · 2026-08-21 · `[idea]` · **groomed → MM1–MM10** · prio **High** —
   **Deepdoc leaves the placeholder: the per-data-flow overview record, grounded in one
@@ -642,6 +594,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `NULL` in the standard) are DIFFERENT SUBJECTS that a naive key mapping would merge.
   **CHECKED AT THE 2026-08-11 GROOM — still open, and now half-answered.** C30 (done, 2026-08-11) retires the INBOUND/OUTBOUND route pair ON WATCHERS, because a watcher is inherently inbound, and drops `PDN_SNOW_QUEUE` from the job token set — so the directional-pair half and the two-queues half both narrow. What C30 did NOT rule, and what still needs the SME, is the one this entry was raised for: whether the real route id is the numeric `372399` or the `MFTS_RT_*` string, which decides both what C16's single `mfts.routeId` prefix target points at and what a `dprod:DataProductPort` is keyed on. NOT groomed into an item, deliberately: the two readings lead to different prefix governance and a different port key, and a groom cannot pick between them.
   **RE-CHECKED AT THE 2026-08-12 GROOM — still the SME's, and now explicitly PROTECTED in an item rather than only in this file.** G83 applies C30's ruling to the parse contract, which means it touches exactly the two entries that carry this question. Its acceptance therefore says in writing that marking the route pair retired is NOT an answer to which route-id shape is real, and that whichever entry survives must keep the note recording the two unreconciled forms — so the evidence cannot be tidied away with the tokens. The question itself is unchanged and unowned.
+  **RE-CHECKED AT THE 2026-08-22 GROOM — unchanged and still the SME's.** No new evidence since the
+  2026-08-12 re-check: G83 still carries the protection clause, and nothing in the interim touched which
+  route-id shape is real. Not groomed, deliberately — the two readings lead to different C16 prefix
+  governance and a different `dprod:DataProductPort` key, and a groom cannot pick between them.
 
 - **`Idea-93`** · 2026-08-08 · `[chore]` · **groomed → executed IN PLACE at the 2026-08-09 groom (14 stale `inputs:` fixed in backlog.yaml) + merged → L19 (the design-doc half); the E1 status question STAYS OPEN — user call** · prio? **High** —
   **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,
@@ -711,27 +667,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   what remained was a one-line `.filter(...)` making the pick-list agree with the
   aside — minting an item to close it the same minute is ceremony, not audit. The
   groom was right to flag the disagreement; the ruling is what dissolved it.
-
-- **`Idea-86`** · 2026-08-07 · `[source]` · **parked → G32 rules `target_db`** · prio? **Med** —
-  **Register the internal MWAA documentation as a doc corpus — blocked on `target_db`,
-  which G32 owns.** The internal MWAA implementation-docs locator saved this session
-  (`internal/airflow-reference/mwaa-internal-docs.md`, hung off the `airflow` system
-  row's `locator.internal_docs` in `config/source-registry.yaml`, id
-  `airflow:internal-implementation-docs`) has NO entry in
-  `config/doc-source-registry.yaml`, so `drydocs docs-coverage` reports Airflow as
-  `no-corpus` — a true statement, and the exact row the Q16 report exists to print.
-  Registering one requires `target_db`, and `tests/unit/test_doc_registry.py` admits
-  only `{dddocs, ddcontext}` with no "pending" value — a field G32 is actively
-  deciding. **User ruling 2026-08-07: WAIT for G32** rather than declare a value that
-  the ruling may reverse. When it unparks, the entry is tier **T2** (internal
-  platform), connector **web**, curation **sme-confirm** (fixed per tier), and
-  classification **Internal**.
-  TRIGGER RE-CHECKED 2026-08-12 (groom) — **NOT fired.** G32 is still `in_progress` (a drafted,
-  unsigned gate awaiting the SME), so `target_db` has no ruled value and the user's WAIT ruling
-  stands. Worth noting for whoever schedules that gate: the residency question now has a THIRD
-  waiting consumer — C34 §(b1) blocks its cross-corpus half on the same constraint (a Neo4j
-  relationship cannot span databases), alongside this entry and `Idea-88`. Three parked items on
-  one unsigned gate is the argument for scheduling it, not for pre-empting it.
 
 - **`Idea-74`** · 2026-08-05 · `[source]` · **open — user decision, blocks O44 column 3** · prio? **Med** —
   **Does DryDocs ingest the ServiceNow queue/assignment-group export, and
@@ -1121,6 +1056,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
   runbooks / Jira sign-offs / email threads (brownfield bootstrap, rejected as end
   state). C2 keyed convention must SHARE the description-metadata plan's template
   phase (two 4000-char conventions must not fork).
+  TRIGGER RE-CHECKED 2026-08-22 (groom) — **NOT fired.** `config/gate-log.md` carries a 2026-08-12 `RECORD:`
+  for §G5 (the downstream consumer contact attaches to a `:Port`, not to job/folder) — a logged SME direction,
+  NOT a sign-off. The gate itself is still unsigned, so the entry's own disposition stands: tracked at the gate,
+  build items groomed on sign-off, nothing parked here.
 
 - **`Idea-28`** · 2026-07-22 · `[source]` · **open — SME data entry, not a backlog item** · prio? **High** —
   **Tier-1/tier-2 app-code rows: the SME still owes the enumeration.**
@@ -1145,6 +1084,9 @@ question a 1,000-line file with the trail at the bottom could not answer.
   in the console shell; it re-scopes nothing, so there is still no item that would decide node
   identity, which is the only thing this entry constrains. Attaching the constraint to O2 now
   would file it against a done item where no one implementing the real re-scope will read it.
+  TRIGGER RE-CHECKED 2026-08-22 (groom) — **NOT fired, unchanged from 2026-08-12.** `O2` (done) is still the
+  only env-toggle item and it is still cosmetic: it re-scopes no data, so no item yet decides node identity,
+  which is the only thing this entry constrains.
 
 - **`Idea-25`** · 2026-07-22 · `[idea]` · **parked → a producer extractor starts consuming a temporal field** · prio? **Low** —
   **Control-M compact-timestamp normalization (mechanism, from the
@@ -1420,6 +1362,85 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **FILED 2026-08-22 (laptop, groom of the open inbox)** — **Promoted 5, inboxed 0 new, merged 0, marked-in-place 1.** New items: **Q26** — G32 §A rests blast-radius on `corpus_id` scoping and the loaded graph has none (all 28 live `:Document` rows group under null, because only the Q13 loader stamps it); the item makes the SIGNED claim true as written (stamp + reload, per machine) and says in writing that narrowing the claim instead would be an ESCALATION to the gate, never an item's decision. **Q27** — Idea-86 **UNPARKED: its named trigger fired.** The entry waited on "G32 rules `target_db`"; the gate signed 32/32 on 2026-08-18 and G102 applied the fold, so `target_db` has exactly one legal value and the internal MWAA docs can register (registration only — `confirmed: false`, no loader may write). **U27** — snapshot.ps1's CI check asks `gh run list --branch main` and matches LOCAL HEAD against it, so from any branch HEAD can never appear and the verdict degrades to no-run-yet permanently; five fixtures for a verdict function its own design note calls pure and which has no tests. **R23** — the R5 in-band handshake writes the drydocs-api session token into `agents/graph_qa/.adk/session.db` in cleartext once per turn, no expiry, never pruned (p1; `.adk/` is gitignored, so no commit-boundary leak). **J52** — Idea-154's consequence half: verification evidence about a local dev server counts only when the session launched the browser itself. **One marked in place, not moved:** Idea-154 — the two-browser diagnostic needs both machines in hand and stays the user's step. **Trigger sweep:** all parked entries re-read; ONE had fired (Idea-86 → Q27). Idea-29 (gate `email-dl-contact-point` — a 2026-08-12 `RECORD:` is not a sign-off) and Idea-27 (still only the cosmetic O2 toggle) re-checked and NOT fired, noted on the entries; the rest wait on external triggers (SME scheduling, company network, sibling-repo work). **No note was parked as a new `[question]`** — every open entry was either actionable or already the user's. **No plan change**: every item lands in an existing epic and phase. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-104 (which MFT route-id shape is real — re-checked, still unowned), Idea-93 (E1's status), Idea-74, Idea-34, Idea-33, Idea-32, Idea-28, Idea-17, Idea-16, Idea-141's four packaging questions, and Idea-154's two-browser check. **One citation corrected outside the inbox:** R18's notes cited "Idea-151" for the cleartext credential, which is the BRANCH-side number — repointed at R23/Idea-155. **And one stale roadmap row exposed:** retiring Idea-86's `roadmap.yaml` estimate turned `test_real_roadmap_cites_only_live_inbox_ideas` red on **Idea-88** as well — that row should have been retired on 2026-08-13 when the entry became Q18, and survived nine days only because the guard matches a SUBSTRING and Idea-86's body happened to cite `` `Idea-88` ``. Both rows are retired in this commit.
+
+- **`Idea-157`** · 2026-08-22 · `[bug]` · **groomed → Q26 (2026-08-22)** · prio? **Med** —
+  **The 28 live Documents carry NO corpus_id — G32 §A's blast-radius story leans on a property
+  the pre-fold loads never wrote.** Found at the Q14 evidence pass (laptop, `neo4jtest`,
+  `drydocs` DB — J18): `MATCH (d:Document) RETURN d.corpus_id, count(*)` → all 28 rows
+  (27 bmc-docs + 1 essential-graphrag) group under `corpus_id: null`. G32 §A ruled that
+  load-separation and blast-radius in the one database "are satisfied by corpus_id scoping",
+  and `docs-verify`'s graph_locator matches on `corpus_id` — but only the Q13 vendor-docs
+  loader stamps it; `bmc_docs.cypher`'s R3 reload evidently does not (or the laptop's reload
+  predates the stamp). Either the bmc-docs/essential-graphrag loaders gain the corpus_id
+  stamp + a backfill, or the fold's scoping claim is narrower than the gate-log reads.
+  Not chased inside Q14 (drydocs-load layer, not ontology). Sibling context: [[Idea-154]]'s
+  venue discipline is why the machine is named.
+
+- **`Idea-156`** · 2026-08-21 · `[bug]` · **groomed → U27 (2026-08-22)** · prio? **Med** —
+  **The snapshot CI check can never see a branch, and the verdict still has no tests.** Filed on
+  `feat/ui-workstream` as its Idea-152 and re-filed here at 156 because both 151 and 152 were
+  taken on `main` by unrelated entries while the branch sat unmerged. **Half of the original
+  report is already fixed and is recorded here only so the fix is not re-done:** the report's
+  defect (1), `Get-CiVerdict` never enumerating the runs array so `$mine[0]` was the whole
+  ten-run array and `conclusion -eq "success"` was true if ANY recent run passed, was fixed on
+  `main` by `22b8ad7` and then properly by `5c0308e` (`knowledge/depgraph-snapshots/snapshot.ps1`
+  now assigns the parse and unrolls it explicitly, with the PS 5.1 trap written down at the
+  line). **What is still open is defect (2):** the caller runs
+  `gh run list --branch main --limit 10` and matches the LOCAL HEAD against it, so from any
+  branch — which is what CLAUDE.md instructs for worktree, epic-slice and agent work — HEAD can
+  never appear until merge and the check degrades to the yellow no-run-yet path permanently. The
+  branch this was filed from is the worked example: CI was green on `feat/ui-workstream` and
+  invisible to a query pinned to `main`. Fix: pass the current branch via
+  `git rev-parse --abbrev-ref HEAD` instead of the literal `main`. **Also still open, and the
+  reason the first defect shipped at all:** the verdict is a pure function of (runs, head) by its
+  own design note and has NO tests — add fixtures for green-at-head,
+  failed-at-head-with-older-success, in-progress, no-run-yet and empty. The empty case is the one
+  that would have caught it. Sibling of [[Idea-150]] in the same script: that one loses the JSON
+  write from a worktree, this one mis-reports the step before it. Mechanism-only, no gate.
+
+- **`Idea-155`** · 2026-08-21 · `[bug]` · **groomed → R23 (2026-08-22)** · prio? **High** —
+  The Ask control token is persisted in cleartext in the ADK session store. `web/src/ask/askApi.ts`
+  sends the drydocs-api session token as an in-band message part
+  (`{"drydocs_control": {"api_token": ..., "api_url": ...}}`, the R5 handshake in
+  `agents/graph_qa/control.py`), and ADK writes every message part verbatim into
+  `agents/graph_qa/.adk/session.db`, so the raw bearer token lands on disk in the `events` table
+  once per turn. Observed 2026-08-21 on this desktop in session `ask-jdoe4821-wjtacr8x` — the same
+  token appears in all three user events. Two things make it worse than a stray log line: the token
+  has no expiry (`InMemorySessionStore.issue` mints `secrets.token_urlsafe(24)` and only `revoke`
+  or an API restart ends it), so a copy taken from the file is replayable for the life of the API
+  process; and the store is never pruned, so tokens accumulate. It also contradicts the envelope's
+  own privacy stance one row over — `Envelope` deliberately reduces question text and caller
+  identity to sha256 plus length so neither is persisted, while the credential beside them is
+  written raw. `control.py` states that control parts never reach the LLM, which holds, but says
+  nothing about persistence; that is the gap. Not a commit-boundary leak: `.adk/` is gitignored
+  (`.gitignore:25`), so nothing reached the repo. Fix direction — strip the control part from the
+  event before ADK persists it, or redact the value on write and keep the token only in process
+  memory for the turn; add a regression test asserting no `api_token` value appears in
+  `session.db` after a run, and purge the existing file since its tokens are live until the API
+  restarts.
+
+- **`Idea-86`** · 2026-08-07 · `[source]` · **groomed → Q27 (2026-08-22, UNPARKED — the named trigger fired: G32 signed 2026-08-18, G102 applied)** · prio? **Med** —
+  **Register the internal MWAA documentation as a doc corpus — blocked on `target_db`,
+  which G32 owns.** The internal MWAA implementation-docs locator saved this session
+  (`internal/airflow-reference/mwaa-internal-docs.md`, hung off the `airflow` system
+  row's `locator.internal_docs` in `config/source-registry.yaml`, id
+  `airflow:internal-implementation-docs`) has NO entry in
+  `config/doc-source-registry.yaml`, so `drydocs docs-coverage` reports Airflow as
+  `no-corpus` — a true statement, and the exact row the Q16 report exists to print.
+  Registering one requires `target_db`, and `tests/unit/test_doc_registry.py` admits
+  only `{dddocs, ddcontext}` with no "pending" value — a field G32 is actively
+  deciding. **User ruling 2026-08-07: WAIT for G32** rather than declare a value that
+  the ruling may reverse. When it unparks, the entry is tier **T2** (internal
+  platform), connector **web**, curation **sme-confirm** (fixed per tier), and
+  classification **Internal**.
+  TRIGGER RE-CHECKED 2026-08-12 (groom) — **NOT fired.** G32 is still `in_progress` (a drafted,
+  unsigned gate awaiting the SME), so `target_db` has no ruled value and the user's WAIT ruling
+  stands. Worth noting for whoever schedules that gate: the residency question now has a THIRD
+  waiting consumer — C34 §(b1) blocks its cross-corpus half on the same constraint (a Neo4j
+  relationship cannot span databases), alongside this entry and `Idea-88`. Three parked items on
+  one unsigned gate is the argument for scheduling it, not for pre-empting it.
 
 - **FILED 2026-08-21 (laptop, groom of the open inbox)** — **Promoted 17, inboxed 0 new, merged 0, marked-in-place 1.** New items: **G104–G109**, the six-item runtime-substrate chain Idea-152 asked for in writing (G104 ADR 0014 DRAFTED-Proposed only — acceptance is the user’s and must reconcile with ADR 0009; G105 the `RuntimeSettings` group + `dictConfig`; G106 `drydocs prune-logs`; G107 per-component `LoaderRunLog`; G108 the API audit line; G109 the data-zone declaration) — filed under **component-topology / phase 6 for want of a runtime-substrate epic, which a groom cannot mint; a dedicated epic is PROPOSED TO THE USER** and taking it moves `epic:`, not ids. **G110** the Idea-141 residue (MODULE_MAP contradicts the boundary test; four agent-runtime dependencies unpinned). **O64–O67** the four console defects (Ask loses the last completed turn; dark mode never reaches the shared controls; /ownership labels render behind the nodes; `ModuleIcon` has no exhaustiveness guard). **R20–R22**, one Ask incident split into three separable defects — stale spec vocabulary, discarded Neo4j notifications, and the synthesized UI term *Tower* proxied onto `:TOMRole`; **module drydocs-api on all three, verified at the groom (the QuerySpec registry is `drydocs_api/query_specs.py`, not `agents/`)**, and R22 carries the gate boundary in its acceptance. **Q23** the scrape-run ↔ registry-row join, bounded by J51’s per-entry FIELD split. **U26** snapshot.ps1’s three-hop sibling resolution, which dies in every worktree — and its test’s skip path resolves it the same wrong way, so the two agree while both are wrong. **Y5** the claim-commit-vs-stale-render contradiction: Idea-151 asked the groom to decide and it did — **option (b), the guards tolerate status-only drift**, because option (a) puts generated files into every claim commit and recreates the shared-line conflict Y2’s sharding removed. **One marked in place, not moved:** Idea-141 — the poetry-group verdict and its four open questions stand; only the residue was groomed. **No note was parked as a new `[question]`:** every open entry was either actionable or already the user’s. **No plan change** — every item lands in an existing epic and phase, with the runtime-substrate epic proposed rather than created. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-104 (which MFT route-id shape is real), Idea-93 (E1’s status), Idea-74 (does DryDocs ingest the SNOW queue/group export, and which side), Idea-34 (the AIS acronym entry), Idea-33 (the unlocated typo), Idea-32 (the Oracle-connection scope), Idea-28 (the tier-1/tier-2 app-code enumeration — SME data entry), Idea-17 (two local relics, destructive), Idea-16 (the SNYK_TOKEN repo secret — no agent can set one), and Idea-141’s four packaging questions.
 

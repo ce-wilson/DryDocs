@@ -23,3 +23,14 @@ groom_log:
     the HITL gate and stays planned. Module drydocs-api on all three, verified at the groom:
     the QuerySpec registry is drydocs_api/query_specs.py, not agents/.
   attached_at: R20
+- date: '2026-08-22'
+  note: |-
+    ── 2026-08-22 groom (laptop) — Idea-155, the credential at rest ─────────────
+    R23: the R5 in-band control handshake sends the drydocs-api session token as a message
+    part, and ADK persists every part verbatim, so the raw bearer token lands in
+    agents/graph_qa/.adk/session.db once per turn — observed live, no expiry on the token
+    and no pruning of the store. p1 above its two siblings that read the same store (R13
+    growth, R18 evidence) because it is a live credential at rest, and because the Envelope
+    one row over already reduces question text and caller identity to sha256. Not a
+    commit-boundary leak: .adk/ is gitignored. Mechanism only, no gate.
+  attached_at: R23

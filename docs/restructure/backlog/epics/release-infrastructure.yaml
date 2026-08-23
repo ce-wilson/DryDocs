@@ -69,3 +69,15 @@ groom_log:
     inbox for a user/SME ruling: Idea-104 (MFT route-id shape) and Idea-105
     (the DESCRIPTION field's two claimants).
   attached_at: J42
+- date: '2026-08-22'
+  note: |-
+    ── 2026-08-22 groom (laptop) — Idea-154's consequence half ──────────────────
+    J52: verification evidence about a LOCAL DEV SERVER counts only when the session
+    launched the browser itself — an attached/extension-controlled browser is not a known
+    venue, which is the J18 rule in browser form. The rule and the session-launched headless
+    recipe land in .claude/skills/verify/SKILL.md. The acceptance forbids asserting the
+    unproven mechanism (that the extension session was attached to the other machine's
+    Chrome) in a tracked, ported file; the two-browser diagnostic that would settle it needs
+    both machines in hand and stays the user's step in the inbox. Epic/module recorded as a
+    choice: the verify skill is cross-cutting session tooling, not an Epic O console feature.
+  attached_at: J52

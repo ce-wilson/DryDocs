@@ -1,0 +1,40 @@
+id: Q26
+epic: docmeta
+title: 'The fold''s blast-radius scoping is not true of the loaded graph: bmc-docs and essential-graphrag
+  write no corpus_id, so all 28 live :Document rows group under null'
+type: bug
+module: drydocs-load
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/cypher/bmc_docs.cypher
+- drydocs/loaders/cypher/essential_graphrag.cypher
+- drydocs/docs_coverage.py
+- drydocs/docs_verify.py
+- config/doc-source-registry.yaml
+acceptance: |
+  G32 §A ruled that "load-separation and blast-radius are satisfied by corpus_id scoping". The loaded graph does not carry the property that claim rests on. This item makes the signed claim true as written.
+
+  (a) THE MEASUREMENT, reproducible before and after: `MATCH (d:Document) RETURN coalesce(d.corpus_id, '(none)') AS corpus, count(*) ORDER BY corpus` returns NO rows in the `(none)` bucket on a machine whose corpora are loaded. The close note carries the venue (J18) and the before/after counts. The reading this item was raised on: 2026-08-21, laptop, `neo4jtest`, `drydocs` DB — all 28 rows (27 bmc-docs + 1 essential-graphrag) grouped under `corpus_id: null`.
+
+  (b) BOTH LOADERS STAMP IT: `bmc_docs.cypher` and `essential_graphrag.cypher` write `corpus_id` on every `:Document` and `:Chunk` they MERGE, equal to that corpus's `id` in `config/doc-source-registry.yaml` (`bmc-docs`, `neo4j-docs-essential-graphrag`) — read from the registry row, not a literal invented at the loader — and the write is idempotent (a re-run changes no other property, and `rows_changed` is ZERO on the second run).
+
+  (c) EXISTING LOADS ARE MADE TO MATCH, per machine and J18-tagged: state which of reload-or-backfill each machine takes, and do it. G102's R3 clause already ran a full bmc-docs delete+reload once per machine, so a reload IS the sanctioned vehicle and no new mechanism is needed — but it must actually be re-run AFTER (b) lands, because a stamp that exists in the loader and not in the graph is the exact shape of the defect being fixed.
+
+  (d) THE REGISTRY SAYS WHAT IS TRUE: `bmc-docs`'s `graph_locator` either moves to `match: corpus_id` / `value: bmc-docs`, or keeps `match: path_prefix` with the reason for keeping it written on the row. Its comment today reads "pre-dates corpus_id"; once (b) lands that sentence is false, so one of the two must change. `docs_verify.py`'s header prose ("only the Q13 vendor-docs loader writes corpus_id") is corrected in the same pass.
+
+  (e) THE SENTINEL FOLLOWS THE FACTS: `docs_coverage.EDGE_CORPUS_UNKNOWN` is documented as "A REAL, EXPECTED state" because `bmc_docs.cypher` writes no corpus. If (b)+(c) make that unreachable for the loaded corpora, the comment says so and names what could still produce the bucket. The constant is NOT deleted on the strength of one machine's counts — the other machine's graph is independent.
+
+  (f) NO ONTOLOGY CHANGE AND NO GATE: `corpus_id` is a provenance PROPERTY on labels that already exist — no new edge, no vocabulary entry, nothing flipped from planned to active. This item does not reinterpret a signed ruling; it makes it hold. If (b) turns out to be wrong for bmc-docs (the corpus is genuinely path-identified and the gate's scoping claim is narrower than it reads), that is an ESCALATION to the gate, not a decision this item takes.
+notes: |
+  Groomed 2026-08-22 (laptop) from Idea-157, found at the Q14 evidence pass and deliberately not chased there (drydocs-load layer, not ontology).
+
+  WHY IT IS NOT ALREADY HANDLED, since two surfaces look like they handle it: the registry gives bmc-docs `match: path_prefix` and `docs_coverage.py` carries an explicit `(no corpus_id)` sentinel — so `docs-verify` and `docs-coverage` both work today. What does NOT work is the governance claim above them: G32 §A named corpus_id scoping as the mechanism that replaced the three-database wall, and 28 of 28 live Documents carry no corpus. The verifier having a workaround is not the same as the scoping being real.
+
+  TIMING, and why the natural vehicle already fired: G102 (done) ran R3's delete + reload live on the laptop (27 -> 0 -> 27 DESCRIBES, 374 chunks) AFTER the fold — and the reloaded documents still carry no corpus_id, because the loader does not stamp one. A future reload is the second chance, which is why clause (c) makes re-running it explicit rather than assuming it.
+
+  Module drydocs-load: both cypher files live in `drydocs/loaders/`. Epic docmeta / phase 14 by the Q7/Q13/Q24 precedent. p2 and sonnet: the change is small and the acceptance is written, but it touches two loaders plus a per-machine graph action.

@@ -1,0 +1,36 @@
+id: R23
+epic: agentic-qa
+title: 'The Ask control token is persisted in cleartext: the R5 in-band handshake writes the drydocs-api
+  session token into agents/graph_qa/.adk/session.db once per turn'
+type: bug
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- agents/graph_qa/control.py
+- agents/graph_qa/agent.py
+- web/src/ask/askApi.ts
+- drydocs_api/sessions.py
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  (a) THE VALUE STOPS REACHING DISK: after an Ask run, the `api_token` VALUE appears nowhere in `agents/graph_qa/.adk/session.db`. Either the control part is stripped from the event before ADK persists it, or the value is redacted on write and the live token is held only in process memory for the turn. Observed 2026-08-21 (desktop, session `ask-jdoe4821-wjtacr8x`): the raw bearer token appears verbatim in all three user events in the `events` table, because `askApi.ts` sends it as an in-band message part and ADK writes every part as given.
+
+  (b) A REGRESSION TEST ASSERTS IT — a run (real ADK, or the stubbed runtime the handshake was designed to allow) leaves no `api_token` value in the store. This is the clause that keeps it fixed. `control.py`'s own docstring says the in-band shape was chosen so it is "testable without an ADK runtime", so the test costs little.
+
+  (c) THE HANDSHAKE STILL WORKS — R5's observable behavior is unchanged: the agent still registers each executed Cypher as an ephemeral spec owned by the ASKING session, Open-in-Explorer and Export still work for that user, and a foreign session still 404s.
+
+  (d) THE STORES ALREADY ON DISK ARE PURGED, per machine and J18-tagged. The tokens sitting there stay REPLAYABLE for the life of the API process — `InMemorySessionStore.issue` (drydocs_api/sessions.py) mints `secrets.token_urlsafe(24)` with no expiry, and only `revoke` or a restart ends one — and nothing prunes the store, so they accumulate. The close note names each machine whose `.adk/session.db` was purged. This is disk hygiene, NOT history rewriting: `.adk/` is gitignored (`.gitignore`, the "ADK local runtime state" block), so nothing reached the repo.
+
+  (e) THE CHANNEL SAYS WHAT IT PROMISES: `control.py` states that control parts never reach the LLM — which holds — and says nothing about persistence. That silence is how this shipped. The fixed file states the persistence property beside the LLM one.
+
+  No ontology change and no gate: this is a credential-handling defect in an existing mechanism.
+notes: |
+  Groomed 2026-08-22 (laptop) from Idea-155, which was filed branch-side on `feat/ui-workstream` as that branch's Idea-151 and re-filed at 155 on main (151 there is the unrelated stale-render entry, groomed to Y5 — R18's notes cite the branch number and are corrected to point here in the same commit as this item).
+
+  p1, above the two siblings that read the same store, because it is a live credential at rest with no expiry: a copy taken from the file replays for the life of the API process. Two things make it worse than a stray log line — the accumulation, and the contradiction one row over. `Envelope` deliberately reduces question text and caller identity to sha256-plus-length so neither is persisted, while the credential beside them is written raw; the repo already decided how it feels about persisting sensitive fields on this path.
+
+  SIBLINGS in the same store, deliberately NOT merged: R13 (p3) asks whether ADK 2.x offers a partial/non-persisted event mode — its mechanism might incidentally satisfy (a), but this item must not wait on that question; R18 read its evidence out of this same `session.db`. Module drydocs-agents because the fix belongs on the agent side of the handshake (strip or redact before ADK persists), even though the token is minted in drydocs_api and sent by web.

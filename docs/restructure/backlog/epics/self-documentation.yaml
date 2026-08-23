@@ -48,3 +48,15 @@ groom_log:
     Acceptance requires verification from BOTH venues (main checkout and worktree), since a
     worktree-only check is what would have hidden it.
   attached_at: U26
+- date: '2026-08-22'
+  note: |-
+    ── 2026-08-22 groom (laptop) — Idea-156 ────────────────────────────────────
+    U27: the same script's CI check asks `gh run list --branch main` and matches LOCAL HEAD
+    against the answer, so from any branch HEAD can never appear and the verdict degrades to
+    the yellow no-run-yet path permanently — the branch it was filed from is the worked
+    example (green on feat/ui-workstream, invisible to the check). The verdict is a pure
+    function of (runs, head) by its own design note and still has no tests; five named
+    fixtures are the second half, skipping cleanly where no PowerShell exists because this
+    repo has no Pester. The array-unrolling half of the original report was already fixed at
+    5c0308e / U24 and is recorded in the item so it is not re-done.
+  attached_at: U27

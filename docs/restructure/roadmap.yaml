@@ -333,15 +333,13 @@ modules:
       export (Epic Z: per-application download, prod + DR, geography fields —
       whose data-center field is NOT the Control-M field of that name).
     ideas:
-      - id: Idea-88
-        estimate: M
-        note: describes_product field on doc-source-registry entries so the one
-          loaded software-docs edge is reproducible from the ledger — parked on
-          G32, then Q14.
-      - id: Idea-86
-        estimate: S
-        note: Register the internal MWAA docs as a corpus — parked on G32 ruling
-          target_db.
+      # Idea-88 (describes_product on doc-source-registry rows) retired here at the
+      # 2026-08-22 groom: it became Q18 on 2026-08-13 and the estimate belongs to that
+      # item now. It survived nine days only because the inbox-citation guard matches a
+      # SUBSTRING, and Idea-86's body cited `Idea-88` — moving Idea-86 to the audit trail
+      # in this groom is what exposed it.
+      # Idea-86 (register the internal MWAA docs as a corpus) retired the same day: its
+      # parked trigger fired (G32 signed 2026-08-18, G102 applied) and it became Q27.
       - id: Idea-28
         estimate: S
         note: Tier-1/tier-2 app-code rows — SME data entry, not a backlog item.

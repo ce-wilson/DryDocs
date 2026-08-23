@@ -35,3 +35,15 @@ groom_log:
     graph_locator). Bounded by J51's per-entry FIELD split: the producer defines the field
     and the mechanism, the company owns the values, and neither crosses at a port.
   attached_at: Q23
+- date: '2026-08-22'
+  note: |-
+    ── 2026-08-22 groom (laptop) — Idea-157 and the unparked Idea-86 ────────────
+    Q26: G32 §A rests blast-radius on corpus_id scoping and the loaded graph carries no
+    corpus_id — all 28 live :Document rows group under null, because only the Q13 loader
+    stamps it. The item makes the SIGNED claim true as written (stamp + reload) and says in
+    writing that narrowing the claim instead would be an escalation to the gate, not a
+    decision an item takes. Q27: Idea-86 UNPARKED — its named trigger ("G32 rules
+    target_db") fired at the 2026-08-18 sign-off and the G102 apply, so the internal MWAA
+    docs can register with the one legal target_db. Registration only: confirmed stays
+    false and no loader may write from the row.
+  attached_at: Q26
