@@ -1,0 +1,33 @@
+id: S13
+epic: structure-remediation
+title: 'None of the six S8 command modules can be imported first: `import drydocs.cli_docs` in a fresh
+  interpreter raises AttributeError, and the full suite hides it'
+type: bug
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/cli.py
+- drydocs/cli_docs.py
+- drydocs/cli_schema.py
+- drydocs/cli_ingest.py
+- drydocs/cli_verify.py
+- drydocs/cli_variables.py
+- drydocs/cli_plan.py
+- tests/unit/test_repo_paths.py
+- MODULE_MAP.md
+- CLAUDE.md
+acceptance: |
+  MEASURED, REPRODUCIBLE FROM THE REPO (2026-08-23, no live services, no machine-specific state -- run it in any checkout): six fresh interpreters, six failures.
+  `python -c "import drydocs.cli_schema"` -- and the same for `cli_ingest`, `cli_verify`, `cli_variables`, `cli_docs`, `cli_plan` -- each raises `AttributeError: partially initialized module 'drydocs.<name>' has no attribute 'app' (most likely due to a circular import)` at `drydocs/cli.py:955`. Only `import drydocs.cli` succeeds, which is the ONE import CLAUDE.md's smoke test names, which is why the S8 split shipped this on 2026-08-21 and nothing went red.
+  THE CYCLE, read at the code rather than inferred: each command module opens with `from drydocs import cli as _root` (and a `from drydocs.cli import ...` for shared state) BEFORE it executes its own `app = typer.Typer(...)`. So importing a command module first runs the ROOT's module body to completion, and the root's last statements are `COMMAND_MODULES = (cli_schema, cli_ingest, cli_verify, cli_variables, cli_docs, cli_plan)` followed by `_sub.app.registered_commands` -- reaching back into the very module that is still mid-import and has no `app` yet. Import the root first and the same code runs in an order where every `app` exists, so the cycle is invisible.
+  (a) ALL SIX import cleanly as the first import of a fresh interpreter. (b) A GUARD THAT CAN ACTUALLY SEE IT: the check must run each import in its OWN SUBPROCESS. An in-process guard proves nothing here -- whichever module the test session touched first primes `sys.modules` and the failure vanishes, which is precisely the mechanism that hid this. Proven to FAIL on the current code before the fix lands (J26). (c) THE STANDING SYMPTOM THIS EXPLAINS, and the acceptance's cheapest witness: `pytest tests/unit/test_repo_paths.py` run ALONE is 4 failed / 45 passed today, while the same tests inside the full suite are green (2328 passed, 9 skipped at commit 81f1eb08) -- a targeted run gives a FALSE RED that costs a session its afternoon. After the fix, that module passes standalone and in the suite. (d) THE S8 CONTRACT SURVIVES, all three clauses `drydocs/cli_docs.py`'s own header states: the root remains the composition root and the only module that may wire other components; the sub-apps still merge FLAT, so `drydocs --help` lists exactly the same verb names (diff the help output before and after); and `_client` still resolves THROUGH the root at call time, so tests that monkeypatch `drydocs.cli._client` keep working. (e) The `python -c "import drydocs.cli"` line in CLAUDE.md's working agreements widens to cover the command modules, or the new guard is named there -- a smoke test that checks one of seven entry points is how this class returns.
+  CANDIDATE SHAPES, none mandated -- the acceptance is the behavior, not the design: move the root's merge loop out of the module body into the function that builds/runs the app; or have each command module import the root lazily inside its functions instead of at module scope; or hoist the shared state (`console`, `_REPO_ROOT`, `_gate_loader`, the chain constants) into a third module both sides import, which is the ADR 0002-A shape and the only option that removes the cycle rather than reordering it.
+notes: |
+  Found 2026-08-23 (laptop) during a groom, while checking which Ready-to-pull items were safely dispatchable -- not from the inbox. The trail: running `tests/unit/test_repo_paths.py` in a partial selection produced four failures that the full suite does not produce, which looked like an order-dependent test until the six-interpreter probe showed the import itself is broken and the test was reporting it faithfully.
+  WHY IT IS p2 AND NOT p1: the shipped CLI is unaffected -- `drydocs --help` and every verb work, because the real entry point imports the root first, and `drydocs_core` is untouched. What is broken is every OTHER way in: a targeted pytest run, an editor's test runner, an agent importing one command module to read its verbs, and any future consumer that does `from drydocs.cli_docs import ...`. Cheap to fix, and it decays badly -- each further split adds another module that only works if something else imported first.
+  RELATION TO S8 (done, 2026-08-21): this is S8's residue, not a reversal of it. The split was right and the module boundary it drew is the one MODULE_MAP.md line 77 records; the defect is purely that the composition root reaches back into its parts at import time. Same family as the standing repo theme in J26/G80/J47 -- a thing is declared, and the check that would notice it is missing or looks in a place where it cannot fail.

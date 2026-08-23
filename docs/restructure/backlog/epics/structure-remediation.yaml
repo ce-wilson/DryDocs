@@ -25,3 +25,19 @@ groom_log:
           are two different mechanisms, not duplication; scored lowest, recorded only
       F11 depgraph-snapshot retention — a user call about audit history, re-inboxed
   attached_at: S1
+- date: '2026-08-23'
+  note: |-
+    ── 2026-08-23 groom (laptop) — S13, S8's import-order residue ──────────────
+    Not from the inbox: found while checking which Ready-to-pull items were safely
+    dispatchable. All SIX per-domain command modules S8 split out on 2026-08-21 fail to
+    import as the FIRST import of a fresh interpreter — each opens with `from drydocs
+    import cli as _root`, so the root's body runs to its closing merge loop and reaches
+    back for an `app` the still-importing module has not defined yet. `import drydocs.cli`
+    works, and that is the ONE import CLAUDE.md's smoke test names, so nothing went red.
+    The visible symptom is a FALSE RED: `pytest tests/unit/test_repo_paths.py` alone is
+    4 failed / 45 passed while the full suite is green at 2328. p2, because the shipped
+    CLI is unaffected — every other way in is not. The item requires the guard to run each
+    import in its own SUBPROCESS, since an in-process check cannot fail once sys.modules
+    is primed, which is the mechanism that hid it. S8 itself is not reversed: the module
+    boundary stands, only the root's import-time reach-back is wrong.
+  attached_at: S13

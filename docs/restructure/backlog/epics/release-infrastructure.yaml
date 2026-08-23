@@ -81,3 +81,18 @@ groom_log:
     both machines in hand and stays the user's step in the inbox. Epic/module recorded as a
     choice: the verify skill is cross-cutting session tooling, not an Epic O console feature.
   attached_at: J52
+- date: '2026-08-23'
+  note: |-
+    ── 2026-08-23 groom (laptop) — no notes to groom; ONE merge here ───────────
+    The inbox held nothing ungroomed (the earlier fork of this same session swept it at
+    81f1eb08), so this run promoted nothing into epic J (its one promotion, S13, is a
+    structure-remediation item). The finding came from checking which Ready-to-pull items
+    were safely dispatchable: J42 — the port-time backlog-union guard, p1 and in
+    the ready strip — still aimed at docs/restructure/backlog.yaml and its items[] key, which
+    Y2 turned into a TOMBSTONE on 2026-08-20. Read literally it would have diffed two empty
+    sets and PASSED. Repointed at the sharded grain (the entry IS the file, ADR 0013 Clause 6),
+    with the empty/absent-directory case and the filename-vs-inner-id mismatch now required to
+    FAIL, and the never-regress-a-status half fenced out to J16 where the manifest already puts
+    it. A sweep of every other citation of the tombstone across the item files found them all
+    in DONE items, where naming the old path is correct history — J42 was the only live one.
+  attached_at: J42
