@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-21T11:52:57",
-    "date": "20260821",
-    "scan": "ui-workstream",
+    "captured_at": "2026-08-22T19:29:07",
+    "date": "20260822",
+    "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "bc002e07",
-      "full": "bc002e07595d94cc37abe292893bccc686395450",
-      "branch": "HEAD",
-      "describe": "port-base-20260820-121-gbc002e07",
-      "subject": "Merge branch 'feat/s9-docs-hygiene' (S9 — repo-root docs hygiene, F10/F13)",
+      "commit": "5a0383e7",
+      "full": "5a0383e7dbb5e3c7f54eaa6feec62bfb95dde0c0",
+      "branch": "main",
+      "describe": "port-base-20260820-132-g5a0383e7",
+      "subject": "feat(Q14): vendor-docs entity-spine gate prompt DRAFTED — 5 sections / 20 confirmations, decides nothing",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -5552,15 +5552,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/.git",
-      "name": ".git",
-      "extension": "",
-      "rel_path": ".git",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/.git-blame-ignore-revs",
       "name": ".git-blame-ignore-revs",
       "extension": "",
@@ -6591,6 +6582,15 @@
       "name": "ui-write-surface.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/ui-write-surface.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/vendor-docs-entity-spine.yaml",
+      "name": "vendor-docs-entity-spine.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/vendor-docs-entity-spine.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19304,10 +19304,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0918.json",
-      "name": "drydocs-20260821-0918.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "name": "drydocs-20260821.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821-0918.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20154,6 +20154,195 @@
       "name": "mapping_analytics.py",
       "extension": ".py",
       "rel_path": "scripts/mapping_analytics.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc",
+      "name": "poc",
+      "extension": "",
+      "rel_path": "scripts/poc",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output",
+      "name": "controlm-output",
+      "extension": "",
+      "rel_path": "scripts/poc/controlm-output",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Common.ps1",
+      "name": "Common.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Common.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Join-Hops.ps1",
+      "name": "Join-Hops.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Join-Hops.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-ControlMOutput.ps1",
+      "name": "Parse-ControlMOutput.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-ControlMOutput.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-FileWatcher.ps1",
+      "name": "Parse-FileWatcher.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-FileWatcher.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-Ingestion.ps1",
+      "name": "Parse-Ingestion.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-Ingestion.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-Placement.ps1",
+      "name": "Parse-Placement.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-Placement.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-Preproc.ps1",
+      "name": "Parse-Preproc.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-Preproc.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-Provision.ps1",
+      "name": "Parse-Provision.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-Provision.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/Parse-Transform.ps1",
+      "name": "Parse-Transform.ps1",
+      "extension": ".ps1",
+      "rel_path": "scripts/poc/controlm-output/Parse-Transform.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "scripts/poc/controlm-output/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/first-real-run-2026-08-21.md",
+      "name": "first-real-run-2026-08-21.md",
+      "extension": ".md",
+      "rel_path": "scripts/poc/controlm-output/first-real-run-2026-08-21.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples",
+      "name": "samples",
+      "extension": "",
+      "rel_path": "scripts/poc/controlm-output/samples",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB0008_FLOW_ALPHA_ONPM_PREPROC.0a1b2.20260820.20260820151712.log",
+      "name": "PJOB0008_FLOW_ALPHA_ONPM_PREPROC.0a1b2.20260820.20260820151712.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB0008_FLOW_ALPHA_ONPM_PREPROC.0a1b2.20260820.20260820151712.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB0015_FLOW_ALPHA_DAT_ONPM_FW.0a1b3.20260820.20260820153730.log",
+      "name": "PJOB0015_FLOW_ALPHA_DAT_ONPM_FW.0a1b3.20260820.20260820153730.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB0015_FLOW_ALPHA_DAT_ONPM_FW.0a1b3.20260820.20260820153730.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB0015_FLOW_ALPHA_TOK_ONPM_FW.0a1b4.20260820.20260820153733.log",
+      "name": "PJOB0015_FLOW_ALPHA_TOK_ONPM_FW.0a1b4.20260820.20260820153733.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB0015_FLOW_ALPHA_TOK_ONPM_FW.0a1b4.20260820.20260820153733.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB0020_FLOW_ALPHA_AWS_PLCT.0a1b5.20260820.20260820153750.log",
+      "name": "PJOB0020_FLOW_ALPHA_AWS_PLCT.0a1b5.20260820.20260820153750.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB0020_FLOW_ALPHA_AWS_PLCT.0a1b5.20260820.20260820153750.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB0050_FLOW_ALPHA_AWS_TRUST.0a1b6.20260820.20260820154102.log",
+      "name": "PJOB0050_FLOW_ALPHA_AWS_TRUST.0a1b6.20260820.20260820154102.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB0050_FLOW_ALPHA_AWS_TRUST.0a1b6.20260820.20260820154102.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB0055_AUTO_FLOW_ALPHA_INTM_AWS_RFND.0a1b7.20260820.20260820160510.log",
+      "name": "PJOB0055_AUTO_FLOW_ALPHA_INTM_AWS_RFND.0a1b7.20260820.20260820160510.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB0055_AUTO_FLOW_ALPHA_INTM_AWS_RFND.0a1b7.20260820.20260820160510.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/poc/controlm-output/samples/PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG.0a1b8.20260820.20260820201055.log",
+      "name": "PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG.0a1b8.20260820.20260820201055.log",
+      "extension": ".log",
+      "rel_path": "scripts/poc/controlm-output/samples/PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG.0a1b8.20260820.20260820201055.log",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28065,11 +28254,6 @@
     [
       "drydocs",
       "CONTAINS",
-      "drydocs/.git"
-    ],
-    [
-      "drydocs",
-      "CONTAINS",
       "drydocs/.git-blame-ignore-revs"
     ],
     [
@@ -31856,6 +32040,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/ui-write-surface.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/vendor-docs-entity-spine.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -38820,7 +39009,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821-0918.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -39235,6 +39424,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/poc"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/port_preflight.py"
     ],
     [
@@ -39306,6 +39500,106 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/shard_backlog.py"
+    ],
+    [
+      "drydocs/scripts/poc",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Common.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Join-Hops.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-ControlMOutput.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-FileWatcher.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-Ingestion.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-Placement.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-Preproc.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-Provision.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/Parse-Transform.ps1"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/README.md"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/first-real-run-2026-08-21.md"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB0008_FLOW_ALPHA_ONPM_PREPROC.0a1b2.20260820.20260820151712.log"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB0015_FLOW_ALPHA_DAT_ONPM_FW.0a1b3.20260820.20260820153730.log"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB0015_FLOW_ALPHA_TOK_ONPM_FW.0a1b4.20260820.20260820153733.log"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB0020_FLOW_ALPHA_AWS_PLCT.0a1b5.20260820.20260820153750.log"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB0050_FLOW_ALPHA_AWS_TRUST.0a1b6.20260820.20260820154102.log"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB0055_AUTO_FLOW_ALPHA_INTM_AWS_RFND.0a1b7.20260820.20260820160510.log"
+    ],
+    [
+      "drydocs/scripts/poc/controlm-output/samples",
+      "CONTAINS",
+      "drydocs/scripts/poc/controlm-output/samples/PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG.0a1b8.20260820.20260820201055.log"
     ],
     [
       "drydocs/tests",
@@ -41097,13 +41391,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2329,
+    "files": 2347,
     "edges": 1129,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2609,
-    "directories": 281
+    "rels": 2630,
+    "directories": 284
   }
 }
