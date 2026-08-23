@@ -64,7 +64,10 @@ export const MODULES: readonly ModuleDef[] = [
     // APPLICATION-code mapping-pattern view (dedicated code vs shared
     // platform code) — the SME mapping surface needed soonest. Site-plan §3
     // listed four tabs; these are the reviewed additions.
-    tabs: ['Applications', 'Folders', 'App codes', 'Jobs', 'Conditions', 'Servers'],
+    // Locations (Z5, 2026-08-22): the reusable map module's first consumer.
+    // It sits beside Servers deliberately — same estate, one tab answering
+    // "what do we have" and the next answering "where is it".
+    tabs: ['Applications', 'Folders', 'App codes', 'Jobs', 'Conditions', 'Servers', 'Locations'],
     phase: 1,
     retrieval: 'agent', // graph-nav Q&A over the drydocs graph (Epic R router target)
     agent: 'graph-qa (ADK)',

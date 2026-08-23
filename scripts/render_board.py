@@ -56,6 +56,7 @@ def main() -> None:
         import render_context_types
         import render_enforcement_matrix
         import render_gates
+        import render_gazetteer
         import render_ideas
         import render_load_map
         import render_remediation_diff
@@ -67,6 +68,14 @@ def main() -> None:
         render_load_map.main()
         render_software_registry.main()
         render_context_types.main()
+        # The Z5 map assets (2026-08-22): the gazetteer artifact rides here for
+        # the same J20 reason as the others -- it is generated from a config
+        # taxonomy the console reads, so an edit without a re-render leaves a
+        # committed artifact describing places the yaml no longer lists. The
+        # world-map render does NOT ride here: its input is a vendored dataset
+        # that changes only when someone deliberately moves editions, so
+        # re-running it every board render would be work with no trigger.
+        render_gazetteer.main()
         # The remediation fix-diff frame (2026-08-12) rides here too: its
         # content is computed by the real xml_io splice + self-check pipeline,
         # so any change to that mechanism must re-render the committed frame

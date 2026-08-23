@@ -7,6 +7,7 @@ import ModuleTemplate from '../ModuleTemplate'
 import ExplorerGraphPane from '../../explorer/ExplorerGraphPane'
 import DataFrame from '../../explorer/DataFrame'
 import SpecGrid from '../../explorer/SpecGrid'
+import LocationMap, { type MapDimension } from '../../components/map/LocationMap'
 import NodeInspector from '../../explorer/NodeInspector'
 import {
   APP_CODES_FRAME,
@@ -26,6 +27,38 @@ import type { TowerKey } from '../../data/towers'
 // content is the SYNTHESIZED tower set; the live O6 dependency view stays at
 // /explorer/live, tower drill-downs at /explorer/tower/:key.
 const explorerModule = MODULES.find((m) => m.id === 'explorer')!
+
+// Z5: the relationship dimensions the Locations tab offers. This list is the
+// dropdown — LocationMap knows nothing about servers, jobs or teams, so adding
+// the next located label is one QuerySpec plus one entry here, with no change to
+// the component. Each `note` states what the dimension actually CLAIMS, because
+// "jobs at a location" and "a team's work reaches a location" are different
+// assertions and a map flattens that distinction unless the page says otherwise.
+const LOCATION_DIMENSIONS: readonly MapDimension[] = [
+  {
+    specId: 'map.server-locations.v1',
+    label: 'Servers',
+    kind: 'server',
+    note: 'Inventory servers at the data center they are placed in (the direct LOCATED_IN edge).',
+  },
+  {
+    specId: 'map.job-locations.v1',
+    label: 'Jobs',
+    kind: 'job',
+    note:
+      'Jobs at the location of the host they run on. There is no job\u2192server edge by design ' +
+      '(gate SS C3) \u2014 this is the traversal, so a job whose host never resolved is counted as ' +
+      'unplaceable rather than shown somewhere convenient.',
+  },
+  {
+    specId: 'map.team-locations.v1',
+    label: 'Teams',
+    kind: 'team',
+    note:
+      'Where a team\u2019s applications RUN \u2014 a reach claim, never a residence claim. DryDocs ' +
+      'holds no person-location data.',
+  },
+]
 
 export default function ExplorerRoute({ persona }: { persona: Persona }) {
   const [tower, setTower] = useState<TowerKey>('home')
@@ -111,6 +144,9 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
             specId="explorer.servers.v1"
             fallback={<DataFrame cols={SERVERS_FRAME.cols} rows={SERVERS_FRAME.rows} {...frameProps} />}
           />
+        ),
+        Locations: (
+          <LocationMap access={access} dimensions={LOCATION_DIMENSIONS} placeNoun="data centers" />
         ),
       }}
     />

@@ -285,10 +285,16 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     relationship-label edge renders on the ownership, explorer, AND lineage
     canvases (the one-treatment rule that item lands), so binding it to any
     one module would misstate it. Same rule as TrustLegend.
+    72 -> 74 at Z5 (2026-08-22): LocationMap + MapGlyphs, both deliberately
+    UNBOUND. The Z5 directive is "module first, pages second" — the map takes
+    its relationship dimensions as props and the Explorer Locations tab is only
+    its FIRST consumer (Z6's runtime map is the next), so binding it to
+    `explorer` would encode the first caller as the owner. Same rule as RelEdge
+    and TrustLegend, and the reason bound stays at 31 while the total moves two.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         31,
-        72,
+        74,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

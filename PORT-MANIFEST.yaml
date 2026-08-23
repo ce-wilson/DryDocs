@@ -950,6 +950,19 @@ default_ok:
       mirror (PUBLISH-BOUNDARY.md is what enforces that, not this manifest).
   - path: "external/ServiceNow/**"
     reason: "vendor reference stub; the populated vendor trees under external/orchestration/** have their own canonical-producer row"
+  - path: "external/geo/**"
+    reason: >
+      Z5 (2026-08-22): the vendored Natural Earth / world-atlas country TopoJSON
+      that scripts/render_world_map.py projects into the committed map asset.
+      Evaluate-on-collision is right and take-producer would be no better: the
+      file is a byte-identical redistribution of a published npm package at a
+      pinned edition, so if both sides hold it they hold the SAME bytes, and if
+      they diverge somebody deliberately moved editions and that is a decision to
+      look at rather than overwrite. Unlike the vendor PDFs under
+      external/orchestration/**, this one is COMMITTED rather than gitignored —
+      Natural Earth is public domain and world-atlas is ISC, so a
+      private-but-sometimes-published repo may carry it (see that directory's
+      SOURCE-MANIFEST.md).
 
 # =============================================================================
 # row_may_match_nothing — rows that match NO path on this side, ON PURPOSE

@@ -1,0 +1,153 @@
+# =============================================================================
+# config/taxonomy/location-gazetteer.yaml — place names -> coordinates (Z5)
+#
+# WHY THIS FILE EXISTS. The Z2 signed contract gives a located node city, state
+# and country as TEXT and nothing else (`:DataCenter {name, city, state, country,
+# location_grain}` — drydocs/loaders/cypher/server_inventory.cypher). Text cannot
+# be drawn on a map. Something has to turn "Sampleville, SV, SYN" into a point,
+# and that something is either an ontology change (put lat/long on :DataCenter —
+# a gate, and a different item) or a lookup table. This is the lookup table.
+#
+# PURE CLASSIFICATION (layer 1). Nothing here is loaded to the graph, nothing here
+# implies an edge, and no entry asserts that anything of ours IS at these places.
+# It says only "this place name means this point on the globe" — public geography,
+# true regardless of who occupies a site. WHERE a located node actually sits comes
+# from its source, always; this file only resolves the name that source supplied.
+# Adding a row is a config edit, never a HITL gate.
+#
+# CLASSIFICATION: External. City coordinates are public-domain geographic fact.
+# The rule that keeps it that way: a row is a PLACE, never an occupancy claim —
+# no row may name a company, a building tenant, a SEAL, or a hostname. A gazetteer
+# that started recording who sits where would be Internal data wearing a taxonomy
+# file's clothes, and would have to move to internal/.
+#
+# UNRESOLVED IS A FIRST-CLASS OUTCOME, NOT A FAILURE. The map counts what it
+# could not place and shows the number (LocationMap's "unplaceable" figure). This
+# is the Z3 discipline applied one layer up: that loader records match_tier /
+# UNMATCHED rather than dropping unjoined hosts, "so coverage gaps are visible
+# instead of dropped" (Z3 acceptance). A gazetteer miss is a coverage gap. It must
+# never be silently omitted from a map, because a map with a missing dot reads as
+# "nothing there" rather than "we could not place it".
+#
+# COUNTRY IDS ARE ISO 3166-1 NUMERIC, matching web/src/generated/world-map.ts
+# (Natural Earth's own key). Numeric rather than alpha-2/3 because that is what the
+# map data carries; the alias lists below are where messy real-world spellings get
+# reconciled, deliberately, since spelling variance is a data problem and not a
+# map problem.
+#
+# Guard: tests/unit/test_location_gazetteer.py (schema pin, id uniqueness,
+# coordinate ranges, alias collisions, every country_id present in the map).
+# =============================================================================
+
+taxonomy: location-gazetteer
+domain: geography
+taxonomy_path_root: geography/gazetteer
+classification: External
+classification_only: true
+captured: 2026-08-22 # backlog Z5
+
+# ---------------------------------------------------------------------------
+# COUNTRIES — the world-map join. `aliases` are the spellings a SOURCE might
+# use; matching is case-insensitive and whitespace-trimmed by the consumer.
+# ---------------------------------------------------------------------------
+countries:
+  - id: "840"
+    name: United States
+    aliases: [US, USA, "U.S.", "U.S.A.", "United States of America", USES]
+  - id: "826"
+    name: United Kingdom
+    aliases: [UK, GB, GBR, "Great Britain", "United Kingdom of Great Britain and Northern Ireland"]
+  - id: "124"
+    name: Canada
+    aliases: [CA, CAN]
+  - id: "356"
+    name: India
+    aliases: [IN, IND]
+  - id: "036"
+    name: Australia
+    aliases: [AU, AUS]
+  - id: "702"
+    name: Singapore
+    aliases: [SG, SGP]
+    # DECLARED: Natural Earth at 1:110m does not draw Singapore — a city-state
+    # that small falls below the source's resolution, so no outline exists to
+    # tint or drill into. Cities here still PLOT correctly (a point needs only
+    # its own coordinate) and land just off the Malay peninsula where they
+    # belong; what is missing is the country shape, not the position. Declared
+    # rather than deleted, because dropping the row would make Singapore data
+    # silently unplaceable instead of visibly drawn. Guarded by
+    # test_location_gazetteer.py — an UNDECLARED shapeless country fails.
+    no_shape_at_source_resolution: true
+  - id: "276"
+    name: Germany
+    aliases: [DE, DEU, GER]
+  - id: "392"
+    name: Japan
+    aliases: [JP, JPN]
+  - id: "756"
+    name: Switzerland
+    aliases: [CH, CHE]
+  - id: "372"
+    name: Ireland
+    aliases: [IE, IRL]
+  - id: "076"
+    name: Brazil
+    aliases: [BR, BRA]
+
+# ---------------------------------------------------------------------------
+# CITIES — the drill-down points. `lat`/`lon` in decimal degrees, WGS84,
+# rounded to 4 dp (~11 m: far finer than a city-grain claim deserves, and the
+# rounding is the point — these are CITY centres, never building addresses).
+#
+# The seed set is the union of two public sources already in play, and nothing
+# else: the cities named in the 2026-08-08 business-layer location experiment
+# (internal/context-graph-analysis/business-layer-location-experiment.md §5,
+# from public annual-report / investor-relations material — the `jpmc-reports`
+# corpus, registered External) and the public corporate-office city list the SME
+# supplied at the Z5 build. Both are "this company has a presence in this city"
+# claims from public sources; only the CITY survives into this file, because a
+# place name is all a gazetteer is entitled to hold.
+#
+# GRAIN, per the Idea-90 finding the Z2 gate adopted: real location data arrives
+# at mixed grain, so a row declares what it IS. `grain: city` means the point is
+# a city centre and must not be read as a street address. There are deliberately
+# no `grain: address` rows here — a street address is Internal by
+# PUBLISH-BOUNDARY.md and belongs in internal/, never in a publishable config.
+# ---------------------------------------------------------------------------
+cities:
+  # ---- United States ------------------------------------------------------
+  - { id: us-new-york,      name: New York,      state: NY, country_id: "840", lat:  40.7128, lon:  -74.0060, grain: city }
+  - { id: us-san-francisco, name: San Francisco, state: CA, country_id: "840", lat:  37.7749, lon: -122.4194, grain: city }
+  - { id: us-wilmington-de, name: Wilmington,    state: DE, country_id: "840", lat:  39.7459, lon:  -75.5466, grain: city }
+  - { id: us-tampa,         name: Tampa,         state: FL, country_id: "840", lat:  27.9506, lon:  -82.4572, grain: city }
+  - { id: us-chicago,       name: Chicago,       state: IL, country_id: "840", lat:  41.8781, lon:  -87.6298, grain: city }
+  - { id: us-westerville,   name: Westerville,   state: OH, country_id: "840", lat:  40.1262, lon:  -82.9291, grain: city }
+  - { id: us-columbus,      name: Columbus,      state: OH, country_id: "840", lat:  39.9612, lon:  -82.9988, grain: city }
+  - { id: us-philadelphia,  name: Philadelphia,  state: PA, country_id: "840", lat:  39.9526, lon:  -75.1652, grain: city }
+  - { id: us-dallas,        name: Dallas,        state: TX, country_id: "840", lat:  32.7767, lon:  -96.7970, grain: city }
+  - { id: us-plano,         name: Plano,         state: TX, country_id: "840", lat:  33.0198, lon:  -96.6989, grain: city }
+  - { id: us-houston,       name: Houston,       state: TX, country_id: "840", lat:  29.7604, lon:  -95.3698, grain: city }
+  # ---- United Kingdom -----------------------------------------------------
+  - { id: uk-london,        name: London,        state: ~,  country_id: "826", lat:  51.5072, lon:   -0.1276, grain: city }
+  - { id: uk-glasgow,       name: Glasgow,       state: ~,  country_id: "826", lat:  55.8642, lon:   -4.2518, grain: city }
+  - { id: uk-edinburgh,     name: Edinburgh,     state: ~,  country_id: "826", lat:  55.9533, lon:   -3.1883, grain: city }
+  - { id: uk-bournemouth,   name: Bournemouth,   state: ~,  country_id: "826", lat:  50.7192, lon:   -1.8808, grain: city }
+
+# ---------------------------------------------------------------------------
+# SYNTHETIC — the fixture's own geography, kept apart from real places on
+# purpose. tests/fixtures/server_inventory/synthetic-server-export.csv invents
+# country "SYN" / city "Sampleville" precisely so no test can be mistaken for
+# real estate data; the map has to place them or the e2e demo shows an empty
+# world. They resolve to a point in the open Atlantic that is deliberately
+# nobody's territory, and `synthetic: true` lets a surface label them as such.
+#
+# These carry NO country_id: "SYN" is not an ISO code and must never resolve
+# onto a real country's shape. A synthetic city is placed by raw coordinate and
+# is expected to sit off-shape — that is correct, not a defect.
+# ---------------------------------------------------------------------------
+synthetic:
+  countries:
+    - { id: SYN, name: Synthetica, aliases: [SYN] }
+  cities:
+    - { id: syn-sampleville, name: Sampleville, state: SV, country_alias: SYN, lat: 14.0, lon: -34.0, grain: city }
+    - { id: syn-otherton,    name: Otherton,    state: OT, country_alias: SYN, lat: 11.5, lon: -30.5, grain: city }

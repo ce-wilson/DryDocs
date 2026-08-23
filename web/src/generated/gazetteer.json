@@ -1,0 +1,352 @@
+{
+  "taxonomy": "location-gazetteer",
+  "classification": "External",
+  "captured": "2026-08-22",
+  "map": {
+    "width": 1000.0,
+    "height": 500.0,
+    "projection": "equirectangular"
+  },
+  "countries": [
+    {
+      "id": "840",
+      "name": "United States",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "826",
+      "name": "United Kingdom",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "124",
+      "name": "Canada",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "356",
+      "name": "India",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "036",
+      "name": "Australia",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "702",
+      "name": "Singapore",
+      "synthetic": false,
+      "no_shape": true
+    },
+    {
+      "id": "276",
+      "name": "Germany",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "392",
+      "name": "Japan",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "756",
+      "name": "Switzerland",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "372",
+      "name": "Ireland",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "076",
+      "name": "Brazil",
+      "synthetic": false,
+      "no_shape": false
+    },
+    {
+      "id": "SYN",
+      "name": "Synthetica",
+      "synthetic": true,
+      "no_shape": true
+    }
+  ],
+  "country_lookup": {
+    "au": "036",
+    "aus": "036",
+    "australia": "036",
+    "br": "076",
+    "bra": "076",
+    "brazil": "076",
+    "ca": "124",
+    "can": "124",
+    "canada": "124",
+    "ch": "756",
+    "che": "756",
+    "de": "276",
+    "deu": "276",
+    "gb": "826",
+    "gbr": "826",
+    "ger": "276",
+    "germany": "276",
+    "great britain": "826",
+    "ie": "372",
+    "in": "356",
+    "ind": "356",
+    "india": "356",
+    "ireland": "372",
+    "irl": "372",
+    "japan": "392",
+    "jp": "392",
+    "jpn": "392",
+    "sg": "702",
+    "sgp": "702",
+    "singapore": "702",
+    "switzerland": "756",
+    "syn": "SYN",
+    "synthetica": "SYN",
+    "u.s.": "840",
+    "u.s.a.": "840",
+    "uk": "826",
+    "united kingdom": "826",
+    "united kingdom of great britain and northern ireland": "826",
+    "united states": "840",
+    "united states of america": "840",
+    "us": "840",
+    "usa": "840",
+    "uses": "840"
+  },
+  "cities": [
+    {
+      "id": "syn-otherton",
+      "name": "Otherton",
+      "state": "OT",
+      "country_id": null,
+      "country_alias": "SYN",
+      "lat": 11.5,
+      "lon": -30.5,
+      "x": 415.28,
+      "y": 218.06,
+      "grain": "city",
+      "synthetic": true
+    },
+    {
+      "id": "syn-sampleville",
+      "name": "Sampleville",
+      "state": "SV",
+      "country_id": null,
+      "country_alias": "SYN",
+      "lat": 14.0,
+      "lon": -34.0,
+      "x": 405.56,
+      "y": 211.11,
+      "grain": "city",
+      "synthetic": true
+    },
+    {
+      "id": "uk-bournemouth",
+      "name": "Bournemouth",
+      "state": null,
+      "country_id": "826",
+      "country_alias": null,
+      "lat": 50.7192,
+      "lon": -1.8808,
+      "x": 494.78,
+      "y": 109.11,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "uk-edinburgh",
+      "name": "Edinburgh",
+      "state": null,
+      "country_id": "826",
+      "country_alias": null,
+      "lat": 55.9533,
+      "lon": -3.1883,
+      "x": 491.14,
+      "y": 94.57,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "uk-glasgow",
+      "name": "Glasgow",
+      "state": null,
+      "country_id": "826",
+      "country_alias": null,
+      "lat": 55.8642,
+      "lon": -4.2518,
+      "x": 488.19,
+      "y": 94.82,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "uk-london",
+      "name": "London",
+      "state": null,
+      "country_id": "826",
+      "country_alias": null,
+      "lat": 51.5072,
+      "lon": -0.1276,
+      "x": 499.65,
+      "y": 106.92,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-chicago",
+      "name": "Chicago",
+      "state": "IL",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 41.8781,
+      "lon": -87.6298,
+      "x": 256.58,
+      "y": 133.67,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-columbus",
+      "name": "Columbus",
+      "state": "OH",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 39.9612,
+      "lon": -82.9988,
+      "x": 269.45,
+      "y": 139.0,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-dallas",
+      "name": "Dallas",
+      "state": "TX",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 32.7767,
+      "lon": -96.797,
+      "x": 231.12,
+      "y": 158.95,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-houston",
+      "name": "Houston",
+      "state": "TX",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 29.7604,
+      "lon": -95.3698,
+      "x": 235.08,
+      "y": 167.33,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-new-york",
+      "name": "New York",
+      "state": "NY",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 40.7128,
+      "lon": -74.006,
+      "x": 294.43,
+      "y": 136.91,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-philadelphia",
+      "name": "Philadelphia",
+      "state": "PA",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 39.9526,
+      "lon": -75.1652,
+      "x": 291.21,
+      "y": 139.02,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-plano",
+      "name": "Plano",
+      "state": "TX",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 33.0198,
+      "lon": -96.6989,
+      "x": 231.39,
+      "y": 158.28,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-san-francisco",
+      "name": "San Francisco",
+      "state": "CA",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 37.7749,
+      "lon": -122.4194,
+      "x": 159.95,
+      "y": 145.07,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-tampa",
+      "name": "Tampa",
+      "state": "FL",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 27.9506,
+      "lon": -82.4572,
+      "x": 270.95,
+      "y": 172.36,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-westerville",
+      "name": "Westerville",
+      "state": "OH",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 40.1262,
+      "lon": -82.9291,
+      "x": 269.64,
+      "y": 138.54,
+      "grain": "city",
+      "synthetic": false
+    },
+    {
+      "id": "us-wilmington-de",
+      "name": "Wilmington",
+      "state": "DE",
+      "country_id": "840",
+      "country_alias": null,
+      "lat": 39.7459,
+      "lon": -75.5466,
+      "x": 290.15,
+      "y": 139.59,
+      "grain": "city",
+      "synthetic": false
+    }
+  ]
+}

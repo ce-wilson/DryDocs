@@ -980,6 +980,129 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=(ParamSpec("app_id", "string"), *_LIMIT),
         ),
+        # ---- Z5: the located-node map, one spec per relationship dimension ----
+        # WHY THREE SPECS AND NOT ONE PARAMETERIZED SPEC. A Cypher label cannot be a
+        # query parameter, and building one by string interpolation from a browser
+        # prop is label injection wearing a feature's clothes. So the REGISTRY holds
+        # one reviewed traversal per dimension and the COMPONENT stays generic — it
+        # takes a spec id plus display props (Z5: "the component takes label +
+        # relationship as props so the next located label reuses it unchanged").
+        # Adding the next located label is a spec here, not a component change.
+        #
+        # All three return the SAME column shape on purpose. That is what lets the
+        # map consume any of them without knowing which it got, and what makes the
+        # dropdown a data choice rather than a rendering branch.
+        QuerySpec(
+            id="map.server-locations.v1",
+            database="drydocs",
+            description=(
+                "Z5 map, base dimension: every inventory :Server placed at its "
+                "physical :DataCenter (the direct LOCATED_IN edge the Z3 loader "
+                "writes). origin_kind 'server' drives the rack/building icon. "
+                "location_grain travels with every row per the Idea-90 finding the "
+                "Z2 gate adopted — a consumer must be able to tell a building-grain "
+                "placement from a city-grain one rather than drawing both as a pin."
+            ),
+            cypher=(
+                "MATCH (s:Server)-[:LOCATED_IN]->(dc:DataCenter) "
+                "WHERE NOT s:SchemaMeta AND NOT dc:SchemaMeta "
+                "RETURN s.name AS origin, 'server' AS origin_kind, "
+                "dc.name AS data_center, dc.city AS city, dc.state AS state, "
+                "dc.country AS country, dc.location_grain AS location_grain "
+                "ORDER BY origin LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("origin", "string", "Server"),
+                ColumnDef("origin_kind", "string", "Kind"),
+                ColumnDef("data_center", "string", "Data center"),
+                ColumnDef("city", "string", "City"),
+                ColumnDef("state", "string", "State"),
+                ColumnDef("country", "string", "Country"),
+                ColumnDef("location_grain", "string", "Declared grain"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="map.job-locations.v1",
+            database="drydocs",
+            description=(
+                "Z5 map, job dimension: Control-M jobs placed at the physical location "
+                "of the host they run on. Per gate SS C3 there is NO job->Server edge — "
+                "location is a TRAVERSAL (job -> RUNS_ON host/group -> RESOLVES_TO_SERVER "
+                "-> LOCATED_IN), and this spec IS that traversal rather than the shortcut "
+                "edge somebody would otherwise be tempted to materialize. Jobs whose host "
+                "never resolved are absent here BY CONSTRUCTION; the unplaceable count the "
+                "map shows is what keeps that gap visible instead of silently empty."
+            ),
+            cypher=(
+                "MATCH (j:ControlMJob)-[:RUNS_ON]->(t) "
+                "WHERE NOT j:SchemaMeta AND NOT t:SchemaMeta "
+                "OPTIONAL MATCH (t)-[:CONTAINS_HOST]->(m:ExecutionHost) WHERE NOT m:SchemaMeta "
+                "WITH j, CASE WHEN t:ExecutionHost THEN t ELSE m END AS h "
+                "WHERE h IS NOT NULL "
+                "MATCH (h)-[:RESOLVES_TO_SERVER]->(s:Server)-[:LOCATED_IN]->(dc:DataCenter) "
+                "WHERE NOT s:SchemaMeta AND NOT dc:SchemaMeta "
+                "RETURN DISTINCT j.job_name AS origin, 'job' AS origin_kind, "
+                "dc.name AS data_center, dc.city AS city, dc.state AS state, "
+                "dc.country AS country, dc.location_grain AS location_grain "
+                "ORDER BY origin LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("origin", "string", "Job"),
+                ColumnDef("origin_kind", "string", "Kind"),
+                ColumnDef("data_center", "string", "Data center"),
+                ColumnDef("city", "string", "City"),
+                ColumnDef("state", "string", "State"),
+                ColumnDef("country", "string", "Country"),
+                ColumnDef("location_grain", "string", "Declared grain"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="map.team-locations.v1",
+            database="drydocs",
+            description=(
+                "Z5 map, person/team dimension: dev teams placed at the locations their "
+                "work actually runs in, via the attribution chain the C3 gate signed "
+                "(team <-WAS_ATTRIBUTED_TO{developed_by}- app -> port <- folder -> jobs -> "
+                "host -> server -> data center). This is a REACH claim, never a residence "
+                "claim: it says 'this team's applications run in this place', not 'this "
+                "team sits there'. DryDocs holds no person-location data and this spec "
+                "must not be read as if it did. Team rosters are confidential material, so "
+                "Internal handling (J23) like every other ownership read."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication)-[:WAS_ATTRIBUTED_TO {role: 'developed_by'}]->"
+                "(dt:DevTeam) "
+                "WHERE NOT a:SchemaMeta AND NOT dt:SchemaMeta "
+                "MATCH (a)-[:HAS_PORT]->(bp:Port)<-[:BELONGS_TO_APPLICATION]-(f:ControlMFolder) "
+                "WHERE NOT bp:SchemaMeta AND NOT f:SchemaMeta "
+                "MATCH (f)-[:CONTAINS_JOB]->(j:ControlMJob)-[:RUNS_ON]->(t) "
+                "WHERE NOT j:SchemaMeta AND NOT t:SchemaMeta "
+                "OPTIONAL MATCH (t)-[:CONTAINS_HOST]->(m:ExecutionHost) WHERE NOT m:SchemaMeta "
+                "WITH dt, CASE WHEN t:ExecutionHost THEN t ELSE m END AS h "
+                "WHERE h IS NOT NULL "
+                "MATCH (h)-[:RESOLVES_TO_SERVER]->(s:Server)-[:LOCATED_IN]->(dc:DataCenter) "
+                "WHERE NOT s:SchemaMeta AND NOT dc:SchemaMeta "
+                "RETURN DISTINCT dt.name AS origin, 'team' AS origin_kind, "
+                "dc.name AS data_center, dc.city AS city, dc.state AS state, "
+                "dc.country AS country, dc.location_grain AS location_grain "
+                "ORDER BY origin LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("origin", "string", "Team"),
+                ColumnDef("origin_kind", "string", "Kind"),
+                ColumnDef("data_center", "string", "Data center"),
+                ColumnDef("city", "string", "City"),
+                ColumnDef("state", "string", "State"),
+                ColumnDef("country", "string", "Country"),
+                ColumnDef("location_grain", "string", "Declared grain"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         QuerySpec(
             id="console.agent-runs.v1",
             database="drydocs",  # G102 fold (2026-08-18): the R1 ruling's substance ("never in ground truth") survives as :Uncertain on the write; uncertain=True below is the watermark trigger

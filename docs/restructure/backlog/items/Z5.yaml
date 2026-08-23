@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - Z3
 inputs:
@@ -19,3 +19,53 @@ acceptance: |
   A self-contained console map component, insertable into any page: given a node label that carries location (the Z2 contract), it renders a world map and a drill-down country map, and a selection dropdown shows the relationship from a job or person/team (person/team icon) to the city, with a building icon for a data center or office location. Map assets are embedded (SVG), no external tile or font fetch — the console must work offline, same rule as every committed render surface. Data arrives through a read-only QuerySpec (O33 guard); the component takes label + relationship as props so the next located label reuses it unchanged.
 notes: |
   User directive 2026-08-08. Explicitly designed as a module first, pages second — the directive names reuse as the point. First consumers: the application server-location view (via Z3/Z4 data) and the Z6 runtime map.
+  DONE 2026-08-22 on feat/ui-workstream. Shipped as FOUR layers so the reuse the
+  directive asks for is structural rather than promised: a vendored public-domain map
+  source, a generated asset, a gazetteer, and a component that knows none of them.
+  THE GAP THE ITEM DID NOT NAME: Z2 signed city/state/country as TEXT and Z3 loads
+  exactly that -- :DataCenter carries no coordinates -- so nothing in the graph could
+  be placed on a map at all. Ruled with the user rather than assumed: a committed
+  gazetteer (config/taxonomy/location-gazetteer.yaml, External, pure classification,
+  no ontology change and so no gate) resolves place NAMES to points, seeded from the
+  Idea-90 experiment's public cities plus the SME's public office-city list. A row is
+  a PLACE, never an occupancy claim -- the guard fails on any field naming a tenant,
+  seal, hostname or address, which is what keeps the file publishable.
+  MAP ASSET: Natural Earth 1:110m via world-atlas 2.0.2 (ISC over public-domain data)
+  vendored at external/geo/world-atlas/ with a SOURCE-MANIFEST, projected by
+  scripts/render_world_map.py into committed SVG paths. ZERO runtime dependencies --
+  no d3-geo, no topojson -- because the console must work offline anyway, so decoding
+  in the browser would buy nothing and cost three deps. Equirectangular specifically
+  so the browser reproduces the projection in two lines and a guard can assert the two
+  languages agree; a point drawn under a different projection lands off its own shape
+  and nothing downstream can detect that. Drill-down is the same path data under a
+  per-country viewBox, so world and country maps cannot disagree.
+  THREE FINDINGS THE ACCEPTANCE COULD NOT HAVE ANTICIPATED, all found by measuring or
+  looking rather than by assuming. (1) An area-weighted centroid put France in the Bay
+  of Biscay and the US in Montana -- overseas territories drag the mean off the
+  mainland; fixed to largest-ring. (2) Russia and Fiji straddle 180 degrees, so a
+  2-degree step on the globe became a 998-unit leap across the canvas: both drew a
+  streak the full width of the world AND took a world-sized bbox, which would have
+  made drill-down a silent no-op. Found by RENDERING IT AND LOOKING, not by any test;
+  now split at the antimeridian and guarded three ways. (3) Natural Earth at 1:110m
+  does not draw Singapore -- too small a city-state -- so the country is declared
+  no_shape_at_source_resolution and an UNDECLARED shapeless country now fails.
+  COMPONENT: LocationMap takes dimensions as props and knows nothing of Server, Job or
+  DevTeam. One QuerySpec per dimension rather than a label prop, because a Cypher label
+  cannot be a parameter and interpolating one from a browser prop is injection; all
+  three specs return one shared column shape, which is what makes the dropdown a data
+  choice instead of a rendering branch. map.team-locations.v1 is deliberately a REACH
+  claim (where a team's applications run), never residence -- DryDocs holds no
+  person-location data. Unplaceable rows are counted, listed with a reason, and shown
+  even at zero: the Z3 UNMATCHED discipline one layer up, because a map with a missing
+  dot reads as "nothing there".
+  First consumer is the Explorer Locations tab (registry tabs edit + one JSX line),
+  which is the reuse claim demonstrated rather than asserted; Z6's runtime map is next
+  and needs no change here. Both components are UNBOUND in the ui-components ledger for
+  that reason.
+  Verified: suite 2346/10, ruff + oxlint clean, web build green (bundle +157 KB, +57 KB
+  gzipped -- the world geometry, the price of working offline). Geometry verified by
+  RENDERING it in Chrome and inspecting: 15 real cities land correctly, the two
+  synthetic fixture cities sit in open ocean that is nobody's territory, and the US
+  drill-down frames the contiguous states with Plano/Dallas adjacent and
+  Westerville/Columbus in Ohio. Neo4j NOT required for any of it -- no live-graph claim
+  is made here; the specs are registered and guarded, not yet run against a loaded DB.

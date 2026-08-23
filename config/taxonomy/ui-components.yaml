@@ -121,7 +121,7 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (16) ---
+  # --- component (17) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
@@ -131,6 +131,13 @@ components:
   - { id: MiniDag,                 area: component,    path: components/MiniDag.tsx }
   - { id: ModuleIcon,              area: component,    path: components/ModuleIcon.tsx }
   - { id: MyApps,                  area: component,    path: components/MyApps.tsx }
+  # Z5: the reusable location map. UNBOUND to any module on purpose — the Z5
+  # directive is "module first, pages second", so it takes its relationship
+  # dimensions as props and the Explorer Locations tab is only its first
+  # consumer (Z6's runtime map is the next). MapGlyphs is its icon set, kept
+  # beside it rather than in components/icons/ because the three glyphs mean
+  # nothing outside a map legend.
+  - { id: LocationMap,             area: component,    path: components/map/LocationMap.tsx }
   # O66: the one relationship-label edge for every graph canvas (ownership +
   # explorer + lineage adopt it) — deliberately UNBOUND, same rule as TrustLegend
   - { id: RelEdge,                 area: component,    path: components/RelEdge.tsx }
@@ -141,7 +148,8 @@ components:
   - { id: TowerIcon,               area: component,    path: components/TowerIcon.tsx }
   - { id: TrustLegend,             area: component,    path: components/TrustLegend.tsx }
 
-  # --- icon (1) ---
+  # --- icon (2) ---
+  - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
   # --- ask (1) ---
