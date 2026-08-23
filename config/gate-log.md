@@ -4056,3 +4056,26 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   planned past Q25 — its flip rides the future parser work per §D2(iii).
   Map entry vendor-docs-entity-spine: proposed -> confirmed (summary 9->8
   proposed, 25->26 confirmed).
+
+
+## 2026-08-22 — RECORD: gate vendor-docs-entity-core — RENAMED from vendor-docs-entity-spine, the same day's SIGNED OFF 21/21 TRANSFERS (user ruling; Q6 precedent)
+
+- **What this records.** Minutes after signing the gate above, the SME ruled the
+  id itself: "spine" is on the US-business-English banned list
+  (docs/style/us-business-english.md; CLAUDE.md §6 — "backbone"/"core", never
+  "spine"), so `vendor-docs-entity-spine` becomes **`vendor-docs-entity-core`**.
+  A signed-off gate TRANSFERS across a rename — the Q6 / source-registry-v2
+  precedent — so the 21/21 sign-off, its one §A2 clarification, and every ruling
+  stand unchanged under the new id. This entry's heading carries the new slug so
+  the gates surface accounts for the renamed prompt file; the SIGNED OFF entry
+  above is the ruling record and is not edited (L25 riders-not-edits).
+- **Scope of the rename — pointers, never the signed record.** The prompt file
+  (`git mv`), its `id:` and `title:`, the taxonomy-ontology-map entry id +
+  `gate_spec:` path, the map header/summary comments, the vocabulary-note gate
+  references (7 entries + banners), Q14's close-note annotation, Q24/Q25 (unsigned
+  items — their prose de-spines too), and NODE_QUICK_REFERENCE. The signed
+  confirmations' body prose retains "spine" as the SME saw it; the mechanism-name
+  boundary (CLAUDE.md §6: a style pass never renames identifiers) is not crossed
+  because this IS the identifier's owner renaming it, not a style pass.
+- **History.** Everything before this entry is filed under the old id; the yaml's
+  header note points here.

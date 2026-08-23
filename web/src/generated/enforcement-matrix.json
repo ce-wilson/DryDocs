@@ -409,7 +409,7 @@
         "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml",
         "config/gate-prompts/ui-write-surface.yaml",
-        "config/gate-prompts/vendor-docs-entity-spine.yaml",
+        "config/gate-prompts/vendor-docs-entity-core.yaml",
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml",
         "config/gate-log.md"
       ],

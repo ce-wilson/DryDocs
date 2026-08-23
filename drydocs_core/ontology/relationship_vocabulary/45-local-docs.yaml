@@ -362,7 +362,7 @@
     domain:       docs
     status:       planned
 
-  # ── Vendor-docs entity spine (Q14, 2026-08-22; gate vendor-docs-entity-spine SIGNED OFF 2026-08-22, 21/21) ──
+  # ── Vendor-docs entity core (Q14, 2026-08-22; gate vendor-docs-entity-core SIGNED OFF 2026-08-22, 21/21) ──
   # The bmc-docs-controlm-utilities corpus (1016 VERBATIM pages, never loaded —
   # confirmed: false until the gate's §E signs). Five entries, all planned:
   # the aboutness triple (§B), the product bridge (§A3), the vendor cross-link
@@ -376,7 +376,7 @@
     to_node:      ControlMUtility
     prov_maps_to: ~
     note: >
-      PLANNED (gate vendor-docs-entity-spine §B, drafted 2026-08-22 at Q14 —
+      PLANNED (gate vendor-docs-entity-core §B, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A vendor page is ABOUT the utility its title
       names (exportdefjob, ctmorder, the emdef family). REUSES the ACTIVE
       DESCRIBES label as a NEW TRIPLE beside Document -> SoftwareProduct —
@@ -402,7 +402,7 @@
     to_node:      SoftwareProduct
     prov_maps_to: ~
     note: >
-      PLANNED (gate vendor-docs-entity-spine §A3, drafted 2026-08-22 at Q14 —
+      PLANNED (gate vendor-docs-entity-core §A3, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The bridge that keeps a utility inside the
       software family without making it a product: ControlMUtility ->
       SoftwareProduct {product_id: controlm}. dcterms:isPartOf family,
@@ -426,7 +426,7 @@
     to_node:      Document
     prov_maps_to: ~
     note: >
-      PLANNED (gate vendor-docs-entity-spine §C, drafted 2026-08-22 at Q14 —
+      PLANNED (gate vendor-docs-entity-core §C, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The vendor's own in-page cross-link between
       two topics, carried as an assertion: the corpus is VERBATIM throughout,
       so the link is the vendor's words as much as the sentence around it, and
@@ -456,7 +456,7 @@
     to_node:      DocSection
     prov_maps_to: ~
     note: >
-      PLANNED (gate vendor-docs-entity-spine §E3, drafted 2026-08-22 at Q14 —
+      PLANNED (gate vendor-docs-entity-core §E3, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A Document's placement in the publisher's own
       toc.json tree — pure transcription of vendor structure, layer-1
       taxonomy, no meaning asserted. Structural containment, no PROV row,
@@ -481,7 +481,7 @@
     to_node:      DocSection
     prov_maps_to: ~
     note: >
-      PLANNED (gate vendor-docs-entity-spine §E3, drafted 2026-08-22 at Q14 —
+      PLANNED (gate vendor-docs-entity-core §E3, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The publisher's TOC hierarchy: a section's
       parent section, transcribed from toc.json — layer-1 taxonomy, no meaning
       asserted. Structural hierarchy, no PROV row, dcterms:isPartOf family

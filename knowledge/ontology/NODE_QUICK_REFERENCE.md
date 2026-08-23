@@ -100,7 +100,7 @@ role scheme (K5 gate + K6 supplement; scope :Product / :AreaProduct only).
 | Document | Entity | Entity | prov:Entity⁹ |
 | Chunk | Entity | Entity | prov:Entity |
 
-## Vendor-docs entity spine (CONFIRMED — gate `vendor-docs-entity-spine` SIGNED OFF 2026-08-22, 21/21; vocab stays planned until the Q24/Q25 builds)
+## Vendor-docs entity core (CONFIRMED — gate `vendor-docs-entity-core` SIGNED OFF 2026-08-22, 21/21; vocab stays planned until the Q24/Q25 builds)
 
 | Node label | Source type | Target type | PROV-O / W3C type |
 |:---|:---|:---|:---|

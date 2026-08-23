@@ -976,10 +976,21 @@
       "title": "GATE: vendor-docs-entity-spine — SIGNED OFF 21/21 (Q14)",
       "status": "signed-off",
       "prompt_files": [
-        "config/gate-prompts/email-folder-assignment.yaml",
-        "config/gate-prompts/vendor-docs-entity-spine.yaml"
+        "config/gate-prompts/email-folder-assignment.yaml"
       ],
       "log_ref": "config/gate-log.md:3986",
+      "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-22",
+      "title": "RECORD: gate vendor-docs-entity-core — RENAMED from vendor-docs-entity-spine, the same day's SIGNED OFF 21/21 TRANSFERS (user ruling; Q6 precedent)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/source-registry-v2.yaml",
+        "config/gate-prompts/vendor-docs-entity-core.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4061",
       "unblocks": []
     },
     {

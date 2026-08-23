@@ -1434,7 +1434,7 @@
       "taxonomy_captures": [],
       "ontology_mappings": [
         {
-          "id": "vendor-docs-entity-spine",
+          "id": "vendor-docs-entity-core",
           "status": "confirmed",
           "label": null
         }

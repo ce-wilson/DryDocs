@@ -229,7 +229,7 @@
   # 9.0.20; confirmed: false, NEVER loaded on either machine). One entry per gate,
   # edge_shapes per term — the L7 doc-traceability-feedback shape.
 
-  - id: vendor-docs-entity-spine
+  - id: vendor-docs-entity-core
     taxonomy:
       source: "bmc-docs-controlm-utilities"
       element: "Vendor page titles ARE exact utility names (exportdefjob, ctmorder, the emdef family: defjob/exportdefjob/updatedef/copydefjob/deldefjob/duplicatedefjob, each with rules/parameters/examples) — a name-addressable entity spine the publisher ships in toc.json, modeled as first-class nodes + aboutness/navigation/estate-join edges (backlog Q14; plan knowledge/upgrade-plans/vendor-docs-agent-navigation.md §3)"
@@ -265,7 +265,7 @@
     proposed_at: 2026-08-22
     confirmed_by: chad.wilson
     confirmed_on: 2026-08-22   # gate session same day as the draft, all 21 confirmations (A1-A4, B1-B3, C1-C4, D1-D4, E1-E6) — transcribed in config/gate-log.md
-    gate_spec: config/gate-prompts/vendor-docs-entity-spine.yaml
+    gate_spec: config/gate-prompts/vendor-docs-entity-core.yaml
     capture: >
       waived — the classification source is the OUT-OF-REPO capture
       (DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/, desktop

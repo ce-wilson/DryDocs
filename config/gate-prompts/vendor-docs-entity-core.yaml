@@ -1,4 +1,12 @@
-# SME gate-prompt spec — the vendor-docs entity spine (backlog Q14). GATE-BOUND
+# RENAMED 2026-08-22 (user ruling, same day as the sign-off): vendor-docs-entity-spine
+# -> vendor-docs-entity-core — "spine" is on the US-business-English banned list
+# (docs/style/us-business-english.md; CLAUDE.md §6: "backbone"/"core", never "spine").
+# ID, TITLE AND FILENAME ONLY: the signed confirmations below are the historical
+# record of what the SME saw and are NOT edited (L25 riders-not-edits); body prose
+# retains "spine" as signed. The 21/21 sign-off TRANSFERS across the rename (the
+# Q6 precedent) — see the gate-log RECORD entry of the same date. History before
+# the rename is filed under the old id.
+# SME gate-prompt spec — the vendor-docs entity core (backlog Q14). GATE-BOUND
 # AND DECIDES NOTHING: drafting a prompt is not an ontology change (the
 # G27/W1/U11/N10 precedent). Every term this page proposes sits at
 # `status: planned` in the relationship vocabulary and `status: proposed` in the
@@ -8,8 +16,8 @@
 # why that is this gate's own subject rather than a missing prerequisite.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-id: vendor-docs-entity-spine
-title: "SME Gate — the vendor-docs entity spine: is a documented utility a first-class node, and which edge carries it?"
+id: vendor-docs-entity-core
+title: "SME Gate — the vendor-docs entity core: is a documented utility a first-class node, and which edge carries it?"
 step: "The bmc-docs-controlm-utilities capture (1016 verbatim BMC pages, 1017 TOC nodes, 9.0.20) is registered confirmed: false and has never loaded on either machine. The Q13 pipeline that would load its layer-1 spine is built and offline-tested (60 tests) but refuses to run until an SME signs the doc-graph shape — the refusal G32's Q6 clause left standing on purpose ('the fold made the write legal, not ruled'). This page is that ruling. Sections A–D put the four layer-2/3 questions from knowledge/upgrade-plans/vendor-docs-agent-navigation.md §3; section E is the enabling layer-1 confirmation without which the gate's own subject can never load. Nothing changes before this page signs."
 summary: >
   The corpus's page titles are exact utility names (exportdefjob, ctmorder, the

@@ -1678,7 +1678,7 @@ local_relationships:
     domain:       scheduler
     status:       planned
 
-  # ── Vendor-docs entity spine, layer 3 (Q14, 2026-08-22; gate vendor-docs-entity-spine SIGNED OFF 2026-08-22, 21/21) ──
+  # ── Vendor-docs entity spine, layer 3 (Q14, 2026-08-22; gate vendor-docs-entity-core SIGNED OFF 2026-08-22, 21/21) ──
 
   - id:           scheduler_invokes_utility
     neo4j_label:  INVOKES
@@ -1688,7 +1688,7 @@ local_relationships:
     to_node:      ControlMUtility
     prov_maps_to: "prov:used"
     note: >
-      PLANNED (gate vendor-docs-entity-spine §D, drafted 2026-08-22 at Q14 —
+      PLANNED (gate vendor-docs-entity-core §D, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The layer-3 estate join: a job whose CMD_LINE
       invokes a Control-M utility (ctmorder, exportdefjob) reaches the page
       documenting it via the utility node. NEW TRIPLE of the INVOKES label

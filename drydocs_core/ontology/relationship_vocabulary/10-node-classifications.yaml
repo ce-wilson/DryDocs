@@ -145,10 +145,10 @@ node_classifications:
     class:      "dd:ControlMUtility"
     prov_type:  Entity
     note: >
-      CONFIRMED (gate vendor-docs-entity-spine §A, drafted 2026-08-22 at Q14 —
+      CONFIRMED (gate vendor-docs-entity-core §A, drafted 2026-08-22 at Q14 —
       SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A Control-M command-line utility the vendor
       documents by exact name (exportdefjob, ctmorder, the emdef family) —
-      the name-addressable entry point of the vendor-docs entity spine, minted
+      the name-addressable entry point of the vendor-docs entity core, minted
       deterministically from the bmc-docs-controlm-utilities page titles,
       never by an LLM. prov:Entity: jobs USE it (scheduler_invokes_utility,
       Activity -> Entity = prov:used); documents DESCRIBE it
@@ -614,7 +614,7 @@ node_classifications:
       from :Chunk (ingested/H2-chunked) per the managed-vs-ingested boundary. DocSection
       is the shared target of both traceability (Requirement -[:SPECIFIED_IN]->) and
       review feedback (FeedbackNote -[:ANNOTATES]->).
-      SECOND USE (gate vendor-docs-entity-spine §E2, drafted 2026-08-22 at
+      SECOND USE (gate vendor-docs-entity-core §E2, drafted 2026-08-22 at
       Q14, SIGNED OFF 2026-08-22): the vendor-docs TOC tree — Q13's loader writes
       :DocSection nodes from the publisher's toc.json (capture-scoped
       section_id, docs_in_section / docs_subsection_of, both planned). Same
