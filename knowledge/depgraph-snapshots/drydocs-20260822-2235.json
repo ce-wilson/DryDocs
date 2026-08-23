@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-22T21:57:09",
+    "captured_at": "2026-08-22T22:35:39",
     "date": "20260822",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "cbb38458",
-      "full": "cbb384585f9414d8afea309a4054194bb972b517",
+      "commit": "5e28e11b",
+      "full": "5e28e11b4b2680f77710527d63d2c62ff24825fc",
       "branch": "main",
-      "describe": "port-base-20260820-137-gcbb38458",
-      "subject": "chore(gate): vendor-docs-entity-spine RENAMED vendor-docs-entity-core — user ruling, sign-off transfers (Q6)",
-      "dirty": false,
+      "describe": "port-base-20260820-139-g5e28e11b",
+      "subject": "docs(style): sweep \"spine\" from IDEAS.md prose — 8 swaps to \"backbone\", 2 deliberate survivors",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -19322,10 +19322,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260822-2034.json",
-      "name": "drydocs-20260822-2034.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260822.json",
+      "name": "drydocs-20260822.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260822-2034.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260822.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39037,7 +39037,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260822-2034.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260822.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
