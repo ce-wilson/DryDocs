@@ -971,6 +971,18 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-22",
+      "title": "GATE: vendor-docs-entity-spine — SIGNED OFF 21/21 (Q14)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/email-folder-assignment.yaml",
+        "config/gate-prompts/vendor-docs-entity-spine.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3986",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1135,17 +1147,6 @@
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/software-usage-patterns.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": []
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "vendor-docs-entity-spine (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/vendor-docs-entity-spine.yaml"
       ],
       "log_ref": null,
       "unblocks": []

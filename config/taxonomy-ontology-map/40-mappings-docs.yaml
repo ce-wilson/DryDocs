@@ -261,24 +261,38 @@
       node_classifications_added: [ControlMUtility]
     precedence_authority: bmc-baseline
     vocab_id: docs_describes_utility   # primary; all six in edge_shapes
-    status: proposed
+    status: confirmed
     proposed_at: 2026-08-22
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-08-22   # gate session same day as the draft, all 21 confirmations (A1-A4, B1-B3, C1-C4, D1-D4, E1-E6) — transcribed in config/gate-log.md
     gate_spec: config/gate-prompts/vendor-docs-entity-spine.yaml
+    capture: >
+      waived — the classification source is the OUT-OF-REPO capture
+      (DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/, desktop
+      data root: the verbatim vendor payload never enters the repo per the
+      publish boundary) plus its doc-source-registry row
+      (config/doc-source-registry.yaml, counts transcribed at capture); no
+      config/taxonomy/ import exists for the vendor TOC — the entity spine is
+      minted FROM the loaded corpus at Q25, not from a taxonomy capture file.
+      The taxonomy-first gap this field records rather than hides (the
+      email-concerns-subject precedent).
     note: >
-      DRAFTED, DECIDES NOTHING (the G27/W1/U11/N10 precedent) — every vocab entry
-      status: planned, the registry row stays confirmed: false, no loader writes.
-      TWO ACCEPTANCE PREMISES OVERTAKEN, recorded not re-done (the Q9 idiom):
-      (1) Q14's acceptance asks for evidence from the LOADED layer-1 spine, but
-      the spine cannot load until this gate's own §E signs (the registry's
-      doc-graph gate — G32 Q6 names it unsigned; no other item owns it) —
-      evidence is capture-grain (registry-transcribed counts/titles) plus the
-      live sibling corpus, venue-tagged (laptop, neo4jtest, drydocs DB,
-      2026-08-22, J18: 27 DESCRIBES -> controlm, zero utilities-spine nodes,
-      17/17 sample jobs with cmd_line and zero utility invocations).
-      (2) the layer-3 join was to be recorded BLOCKED on G32; G32 SIGNED
-      2026-08-18 and the G102 fold executed — 'the fold made the write legal,
-      not ruled', and §D rules it. Sign-off is a separate SME session; §E4:
-      signing authorizes the confirmed flip, the flip itself is a groomed
-      follow-up (flips-are-follow-ups), first load on the machine holding the
-      capture (desktop data root).
+      CONFIRMED MAPPING, NOT YET WRITTEN: every vocab entry stays status: planned
+      until its build lands (flips-are-follow-ups — Q24 flips the registry row +
+      runs the first layer-1 load on the DESKTOP, which holds the capture; Q25
+      builds the entity spine and flips its entries active with supplements;
+      scheduler_invokes_utility waits past Q25 on the CMD_LINE parser work,
+      §D2(iii)). THE SESSION'S ONE CLARIFICATION (§A2): the SME's condition —
+      family placement, never a SoftwareProduct peer — is exactly what the draft
+      does; the "sibling" scenario was the REJECTED alternative (each utility as
+      a registry product row beside controlm/neo4j). C3 RULED ADOPTION: the
+      rdfs:seeAlso mapping is adopted on docs_see_also (rdfs is a declared
+      namespace — the ANNOTATES local-pending pattern deliberately not followed).
+      TWO ACCEPTANCE PREMISES had been OVERTAKEN and were confirmed as recorded
+      (the Q9 idiom): the LOADED-spine evidence premise (unmeetable — §E1 ruled
+      THIS page is the corpus's doc-graph gate; evidence was capture-grain plus
+      the live sibling corpus, venue-tagged laptop/neo4jtest/drydocs 2026-08-22
+      J18) and the layer-3 BLOCKED-on-G32 premise (G32 signed 2026-08-18, G102
+      fold executed; §D ruled the real chain). E5 fence: Q15/Q18/loader code/
+      bmc-docs corpus untouched by this gate.
 

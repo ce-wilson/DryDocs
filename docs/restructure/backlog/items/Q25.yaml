@@ -1,0 +1,23 @@
+id: Q25
+epic: docmeta
+title: 'Build the vendor-docs entity spine the gate ruled: mint ControlMUtility nodes, DESCRIBES title-match,
+  SEE_ALSO cross-links, PART_OF product bridge — flipping their vocabulary entries active'
+type: task
+module: drydocs-load
+phase: 14
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- Q24
+inputs:
+- config/gate-log.md
+- config/gate-prompts/vendor-docs-entity-spine.yaml
+- drydocs_core/ontology/relationship_vocabulary/
+- config/taxonomy-ontology-map/40-mappings-docs.yaml
+- drydocs/loaders/
+acceptance: |
+  The layer-2 build of gate vendor-docs-entity-spine (SIGNED OFF 2026-08-22, 21/21): (1) :ControlMUtility nodes minted deterministically from the loaded corpus's page titles (§A4: name-keyed with a uniqueness constraint, family/kind by explicit rule, unclassified counts REPORTED, never defaulted — no LLM anywhere); (2) the three ruled edges load: DESCRIBES by title-match (§B3, unmatched count reported), SEE_ALSO from parsed in-page hrefs with the REQUIRED basis properties (§C2: source href + anchor on every edge — no anonymous assertions), PART_OF to SoftwareProduct {controlm} (§A3); (3) the four vocabulary entries (docs_describes_utility, docs_see_also, docs_utility_part_of + the ControlMUtility LocalClass block per the 10-header rule) flip planned -> active WITH supplement blocks in the same commit (G55 invariant), and the map entry's applied transition is recorded (summary confirmed -> applied per the house counting); (4) scheduler_invokes_utility is NOT flipped and NOT loaded — it stays planned until the CMD_LINE parser work (§D2(iii)) — and the close note says so explicitly so the partial flip is never read as an oversight; (5) suite green, and a graph-test pins the SEE_ALSO basis-required rule (an edge without href+anchor is a defect, the O24 discipline made mechanical).
+notes: |
+  Minted 2026-08-22 at the vendor-docs-entity-spine sign-off (gate-log terminus). Depends on Q24: the spine must exist before edges can hang off it, and DESCRIBES title-match needs loaded Documents. Fable per the matrix — the build makes derivation-rule decisions (title normalization, family grouping) that must stay inside the gate's rulings. The §C3 adoption means the supplement's SEE_ALSO term carries rdfs:seeAlso as its standards mapping. Venue: runs wherever Q24 loaded (desktop first); the loaders are venue-neutral.

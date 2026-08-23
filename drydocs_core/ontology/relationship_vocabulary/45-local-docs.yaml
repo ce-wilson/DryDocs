@@ -362,7 +362,7 @@
     domain:       docs
     status:       planned
 
-  # ── Vendor-docs entity spine (Q14, 2026-08-22; gate vendor-docs-entity-spine DRAFTED, unsigned) ──
+  # ── Vendor-docs entity spine (Q14, 2026-08-22; gate vendor-docs-entity-spine SIGNED OFF 2026-08-22, 21/21) ──
   # The bmc-docs-controlm-utilities corpus (1016 VERBATIM pages, never loaded —
   # confirmed: false until the gate's §E signs). Five entries, all planned:
   # the aboutness triple (§B), the product bridge (§A3), the vendor cross-link
@@ -377,7 +377,7 @@
     prov_maps_to: ~
     note: >
       PLANNED (gate vendor-docs-entity-spine §B, drafted 2026-08-22 at Q14 —
-      unsigned; nothing loads). A vendor page is ABOUT the utility its title
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A vendor page is ABOUT the utility its title
       names (exportdefjob, ctmorder, the emdef family). REUSES the ACTIVE
       DESCRIBES label as a NEW TRIPLE beside Document -> SoftwareProduct —
       the C8 same-label-new-triple discipline (doc_section_part_of precedent);
@@ -403,7 +403,7 @@
     prov_maps_to: ~
     note: >
       PLANNED (gate vendor-docs-entity-spine §A3, drafted 2026-08-22 at Q14 —
-      unsigned; nothing loads). The bridge that keeps a utility inside the
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The bridge that keeps a utility inside the
       software family without making it a product: ControlMUtility ->
       SoftwareProduct {product_id: controlm}. dcterms:isPartOf family,
       structural not derivation — no PROV row. THIRD triple of the PART_OF
@@ -427,7 +427,7 @@
     prov_maps_to: ~
     note: >
       PLANNED (gate vendor-docs-entity-spine §C, drafted 2026-08-22 at Q14 —
-      unsigned; nothing loads). The vendor's own in-page cross-link between
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The vendor's own in-page cross-link between
       two topics, carried as an assertion: the corpus is VERBATIM throughout,
       so the link is the vendor's words as much as the sentence around it, and
       it is the only lateral-navigation signal the corpus ships beyond the TOC
@@ -436,11 +436,13 @@
       email-folder-assignment §A3 discipline — no anonymous assertions): the
       source href and the anchor it was parsed from. On the G32 §F axes:
       vendor-asserted origin, never :Uncertain (parsing a literal href is
-      mechanical). Standards analog rdfs:seeAlso — rdfs IS declared in
-      namespaces.py (unlike the ANNOTATES/oa:hasTarget case); §C3 asks the
-      gate whether to adopt the mapping or keep the label local. If the SME
-      rules cross-links presentation, this entry retires (rejected in the
-      map, never loaded) — the §C4 decline path, priced at the gate.
+      mechanical). Standards mapping ADOPTED AT THE GATE (§C3, 2026-08-22):
+      rdfs:seeAlso — the rdfs namespace is declared in namespaces.py, so the
+      ANNOTATES local-pending pattern was deliberately not followed (its
+      blocker, an undeclared namespace, does not exist here). §C1 ruled
+      cross-links ARE assertions we carry (the §C4 decline path was priced
+      and declined); SEE_ALSO keeps the domain label with rdfs:seeAlso as
+      its recorded standards term.
     supplement:   ~
     loader:       ~
     domain:       docs
@@ -455,7 +457,7 @@
     prov_maps_to: ~
     note: >
       PLANNED (gate vendor-docs-entity-spine §E3, drafted 2026-08-22 at Q14 —
-      unsigned; nothing loads). A Document's placement in the publisher's own
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A Document's placement in the publisher's own
       toc.json tree — pure transcription of vendor structure, layer-1
       taxonomy, no meaning asserted. Structural containment, no PROV row,
       dcterms:isPartOf family analog (the docs_chunk_part_of reasoning).
@@ -480,7 +482,7 @@
     prov_maps_to: ~
     note: >
       PLANNED (gate vendor-docs-entity-spine §E3, drafted 2026-08-22 at Q14 —
-      unsigned; nothing loads). The publisher's TOC hierarchy: a section's
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). The publisher's TOC hierarchy: a section's
       parent section, transcribed from toc.json — layer-1 taxonomy, no meaning
       asserted. Structural hierarchy, no PROV row, dcterms:isPartOf family
       analog. Same loader-without-vocabulary gap as docs_in_section (§E3):

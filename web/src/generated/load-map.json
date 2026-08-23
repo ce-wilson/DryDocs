@@ -1435,7 +1435,7 @@
       "ontology_mappings": [
         {
           "id": "vendor-docs-entity-spine",
-          "status": "proposed",
+          "status": "confirmed",
           "label": null
         }
       ],

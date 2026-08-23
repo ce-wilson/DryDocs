@@ -3981,3 +3981,78 @@ never edit the prompt).
   vocabulary are untouched; `match_method: 'fid'` keeps its meaning; the
   signed gate's yaml is not edited (N13) — this entry is the amendment
   record, on the G35-amendment precedent.
+
+
+## 2026-08-22 — GATE: vendor-docs-entity-spine — SIGNED OFF 21/21 (Q14)
+
+The SME session for the gate Q14 drafted the same day — all 21 confirmations,
+one clarification exchange recorded (§A2), no held clauses, no edits to the
+drafted proposals. Venue for the live evidence: laptop, `neo4jtest`, `drydocs`
+DB, 2026-08-22 (J18). Signing moves NO data and writes NO graph; every
+activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
+
+- **§A — ControlMUtility IS a first-class node (A1), a NEW dd:ControlMUtility
+  class (A2).** A2 carried the session's one clarification: the SME's condition
+  — "I agree if it contains ControlMJob, ControlMFolder and is not a sibling" —
+  was confirmed to mean FAMILY PLACEMENT: ControlMUtility files IN the
+  Control-M class family (the 10-node-classifications group holding
+  ControlMJob/ControlMFolder/ControlMServer) and is NEVER a SoftwareProduct
+  row; the rejected alternative would have put each utility beside controlm/
+  neo4j/oracle-db as a peer product ("sibling"), and the SME's own reading was
+  that the corpus documents Control-M's parts, so peerhood never made sense.
+  Restated and confirmed as drafted. A3: the docs_utility_part_of bridge
+  (PART_OF -> SoftwareProduct {controlm}, third triple of the label, C8)
+  confirmed with direction. A4: name-keyed identity + deterministic
+  family/kind derivation with unclassified counts reported, confirmed.
+- **§B — REUSE DESCRIBES (B1), bare edge (B2), title-match basis (B3).** The
+  aboutness label is not duplicated: docs_describes_utility is a new triple
+  beside the ACTIVE Document -> SoftwareProduct entry; a DOCUMENTS mint was
+  offered and declined. No version properties ride the edge — the caveat is
+  node-grain per the Q13 close. Derivation is deterministic title-match,
+  unmatched count reported, never defaulted (the email-folder-assignment
+  structured-signal bar; here the structured signal IS the title).
+- **§C — vendor cross-links ARE assertions we carry (C1), basis REQUIRED
+  (C2), rdfs:seeAlso ADOPTED (C3).** docs_see_also carries href + anchor
+  evidence on every edge (O24 / email-folder-assignment §A3 — no anonymous
+  assertions); vendor-asserted origin, never :Uncertain. C3 is a real ruling,
+  not a note: the rdfs namespace is declared in namespaces.py, so the mapping
+  is ADOPTED on the entry rather than parked as a candidate (the ANNOTATES
+  local-pending pattern explicitly NOT followed here, because its blocker —
+  an undeclared namespace — does not exist). C4 acknowledged (the decline
+  path was priced; the choice was made knowingly).
+- **§D — the overtaken premise RECORDED (D1), the real chain ruled (D2), NEW
+  TRIPLE over widening (D3), no-demo registration accepted (D4).** Q14's
+  acceptance required the layer-3 join "recorded as BLOCKED on G32"; G32
+  signed 2026-08-18 and the G102 fold executed, so the record here is the
+  dissolution (the Q9 overtaken-not-re-done idiom), and what now gates the
+  join is: §A/§B (this page), the §E load, and the CMD_LINE -> utility
+  parser work (G14 feed pattern under the G32 §E graph-seeded charter).
+  scheduler_invokes_utility stays a separate planned triple — the ACTIVE
+  scheduler_invokes is untouched (PATH-keyed Script vs NAME-keyed utility;
+  no blast radius on the shipped extractor). The sample estate carries zero
+  utility invocations (17/17 jobs with cmd_line, none matching) — registered
+  with no demo, stated plainly.
+- **§E — THIS page is the corpus's doc-graph gate (E1), the Q13 shape
+  confirmed (E2), the two unregistered loader edges registered (E3), the
+  flip authorized-not-performed (E4), scope fenced (E5).** E1 resolves the
+  chicken-and-egg Q14's close named: the acceptance's LOADED-spine evidence
+  premise was unmeetable because the load waited on this very page; G32's Q6
+  clause left the doc-graph gate unsigned and no other backlog item owned
+  it. E2 confirms the layer-1 shape exactly as Q13 shipped it (capture-scoped
+  doc_id; :DocSection reused from the design-doc family, second use recorded
+  on its classification). E3 closes the loader-without-vocabulary gap found
+  at the draft: docs_in_section / docs_subsection_of registered planned.
+  E4: signing AUTHORIZES bmc-docs-controlm-utilities -> confirmed: true; the
+  flip and the first live load are Q24 (the machine holding the capture is
+  the desktop — the load is venue-bound, J18). E5: Q15 QuerySpecs, Q18
+  describes_product, all loader code, and the bmc-docs corpus are out of
+  scope.
+- **Terminus.** Signing changes vocabulary NOTES and the map entry status
+  only. All seven entries STAY `planned` — they flip active WITH their build
+  (K2/G55 flips-are-follow-ups): Q24 (registry confirmed flip + first live
+  layer-1 load, desktop) and Q25 (the entity-spine build: utility minting +
+  DESCRIBES title-match + SEE_ALSO parse + PART_OF bridge, flipping those
+  entries active with supplement blocks). scheduler_invokes_utility stays
+  planned past Q25 — its flip rides the future parser work per §D2(iii).
+  Map entry vendor-docs-entity-spine: proposed -> confirmed (summary 9->8
+  proposed, 25->26 confirmed).

@@ -145,8 +145,8 @@ node_classifications:
     class:      "dd:ControlMUtility"
     prov_type:  Entity
     note: >
-      PROPOSED (gate vendor-docs-entity-spine §A, drafted 2026-08-22 at Q14 —
-      unsigned; nothing loads). A Control-M command-line utility the vendor
+      CONFIRMED (gate vendor-docs-entity-spine §A, drafted 2026-08-22 at Q14 —
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A Control-M command-line utility the vendor
       documents by exact name (exportdefjob, ctmorder, the emdef family) —
       the name-addressable entry point of the vendor-docs entity spine, minted
       deterministically from the bmc-docs-controlm-utilities page titles,
@@ -615,11 +615,11 @@ node_classifications:
       is the shared target of both traceability (Requirement -[:SPECIFIED_IN]->) and
       review feedback (FeedbackNote -[:ANNOTATES]->).
       SECOND USE (gate vendor-docs-entity-spine §E2, drafted 2026-08-22 at
-      Q14, unsigned): the vendor-docs TOC tree — Q13's loader writes
+      Q14, SIGNED OFF 2026-08-22): the vendor-docs TOC tree — Q13's loader writes
       :DocSection nodes from the publisher's toc.json (capture-scoped
       section_id, docs_in_section / docs_subsection_of, both planned). Same
       single-classification discipline as :Document's dedupe (2026-07-09):
-      one label, the second use recorded here, gate-bound until §E signs.
+      one label, the second use recorded here; §E2 signed 2026-08-22 — loads at Q24.
 
   - label:      Requirement
     class:      "dd:Requirement"
