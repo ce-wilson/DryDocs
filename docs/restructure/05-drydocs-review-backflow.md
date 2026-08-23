@@ -32,7 +32,7 @@ goal (any DryDocs adopter needs an SME review loop).
 |---|---|---|
 | `graph_review.py` | Renders live-graph rows → self-contained SME review HTML (one section per DATA label, provenance header, snake_case node cards, `hidden_props` stripped). **No Neo4j in the module** (CLI hands it rows) → offline unit-testable. | reads graph via CLI → writes HTML |
 | `graph_verify.py` | Data-driven Cypher acceptance runner: loads YAML `TC-*` suites, runs each against the live graph, asserts `equals`/`empty`/`nonempty`, non-zero exit on failure. Loader + evaluate are pure/offline. | reads graph via CLI |
-| `review_labels.py` | Typed accessor over `review-labels.yaml` — the shared spine mapping each ingestion *source* → the DATA labels it populates, in chain order + SME provenance. Consumed by both above. Pure config, no graph. | reads config |
+| `review_labels.py` | Typed accessor over `review-labels.yaml` — the shared backbone mapping each ingestion *source* → the DATA labels it populates, in chain order + SME provenance. Consumed by both above. Pure config, no graph. | reads config |
 | `sme_notes.py` | Harvester for owner-attributed `SME[SID]` inline notes across the repo (Python/YAML `#`, Cypher `//`), typed sub-tags routing to `$FR/$UC/$OQ/$NOTES`. Read-only; structured SME feedback back to the agent. | reads repo files |
 | `drydocs/publishing/` | Confluence publish pipeline: authors XHTML fragments under `pages/`, assembles via template (`assembler`), validates XML + macro allow-list (`validator`), previews locally (`preview`), pushes via a Confluence-client wrapper. | reads docs/site → writes Confluence |
 
@@ -97,7 +97,7 @@ unguarded. Today the only unclassified `.py` under the scanned roots is
 
 ## Sequencing (by sanitization-risk + testability)
 
-1. `graph_verify` + `review_labels` — the offline spine (loader + evaluate pure).
+1. `graph_verify` + `review_labels` — the offline backbone (loader + evaluate pure).
 2. `graph_review` — pure HTML renderer, offline-testable.
 3. `sme_notes` — generic harvester, strip real SIDs.
 4. HITL prompt-page **generator** — renderer over the three inputs above; own thread.
@@ -126,7 +126,7 @@ company reads) and [`docs/port/port-prompt.md`](../port-prompt.md), and in the
 
 Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
 
-- **H1 — done (2026-07-01).** The offline spine: [`drydocs/review_labels.py`](../../drydocs/review_labels.py)
+- **H1 — done (2026-07-01).** The offline backbone: [`drydocs/review_labels.py`](../../drydocs/review_labels.py)
   (typed accessor over [`config/review-labels.yaml`](../../config/review-labels.yaml)) +
   [`drydocs/graph_verify.py`](../../drydocs/graph_verify.py) (pure `load`/`evaluate`; `run_*`
   takes a duck-typed `GraphRunner`, so the module never imports Neo4j and is fully offline).
@@ -134,7 +134,7 @@ Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
   (named `vendor-bmc-smoke.yaml` until the ADR 0004 rename).
   27 unit tests; both YAML seeds `classification: Internal-Public`.
 - **H2 — done (2026-07-01).** [`drydocs/graph_review.py`](../../drydocs/graph_review.py): pure
-  `render_review({label: [props]})` → self-contained HTML, `hidden_props` + `_`-keys stripped, review-spine
+  `render_review({label: [props]})` → self-contained HTML, `hidden_props` + `_`-keys stripped, review-backbone
   provenance on each section header. 6 unit tests.
 - **H3 — done (2026-07-01).** [`drydocs/sme_notes.py`](../../drydocs/sme_notes.py): `SME[sid] $FR/$UC/$OQ/$NOTES`
   harvester (read-only `harvest_tree`/`route`, excludes `data/`). 5 unit tests, synthetic SIDs.
@@ -157,7 +157,7 @@ What remains is HITL/company-gated or an architecture decision (below).
 Everything below either needs the **HITL SME gate** or an **architecture decision**, so
 per scope it is documented here rather than built:
 
-1. **Real internal review spine (HITL-gated).** The committed `review-labels.yaml` is the
+1. **Real internal review backbone (HITL-gated).** The committed `review-labels.yaml` is the
    bmc-docs generic seed. The real internal source→label chains (SEAL / PAT sources) are
    `Internal`/`Internal-Confidential`, live in a gitignored twin, and must be confirmed
    through the gate ([`03-hitl-sme-flow.md`](03-hitl-sme-flow.md), logged to

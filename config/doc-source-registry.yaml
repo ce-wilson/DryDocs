@@ -47,7 +47,7 @@
 #                    corpus id. Declaring it here keeps the check registry-driven
 #                    instead of teaching the verifier three loader shapes.
 #                    `match: none` = deliberately NOT on the Document->Chunk
-#                    lexical spine; docs-verify reports `unshaped`, never
+#                    lexical backbone; docs-verify reports `unshaped`, never
 #                    `missing`, so "never loaded this way" is not read as a defect.
 #
 # Freshness is gate-preserving (ADR 0006 §4): a sha256 change on refetch
@@ -280,7 +280,7 @@ sources:
       one :Document carrying doc_id / subject / sent_at / custodian /
       source_digest / corpus_id, with NO body text and NO :Chunk chain. The
       body carries named individuals and internal addresses, and there is no
-      email connector to refetch it reproducibly; the Document→Chunk spine
+      email connector to refetch it reproducibly; the Document→Chunk backbone
       stays available without rework if one is ever built. Raw messages and
       attachments live company-side under internal/, never in this repo.
       TRUST IS SPLIT, and the split is the point: the DOCUMENT is VERBATIM;
@@ -301,7 +301,7 @@ sources:
       ADD rather than discover the question at build time. They are currently
       registered as two because four properties differ, not because nobody
       looked: (1) SHAPE — this one is citation-only, Q10's loads the ACTIVE
-      lexical Document->Chunk spine; (2) CADENCE — one-off SME evidence with no
+      lexical Document->Chunk backbone; (2) CADENCE — one-off SME evidence with no
       pipeline, vs a recurring operational feed with an extraction step;
       (3) RETENTION — Q10's file-server extracts become the ONLY copy after the
       6-18 month Outlook purge, so that corpus carries a backup obligation this
@@ -366,13 +366,13 @@ sources:
     graph_locator:                      # :DataAsset slices, NOT Document->Chunk — see notes; reshaping is P4+
       match: none
       value: ~
-    confirmed: false                    # no active loader binds here; reshaping onto the lexical spine is a P4+ decision — a future loader gates on this flag (N9)
+    confirmed: false                    # no active loader binds here; reshaping onto the lexical backbone is a P4+ decision — a future loader gates on this flag (N9)
     notes: >
       The FIRST ddcontext doc ingestion (pre-dates the docmeta plan): JPMC
       annual-report sections as :DataAsset slices seeding the effective-dated
       BusinessSegment context — NOT the lexical Document→Chunk shape. Backfilled
       here (Q5) so every live corpus traces to a registry entry; reshaping it
-      onto the lexical spine is a P4+ decision. The script still carries the
+      onto the lexical backbone is a P4+ decision. The script still carries the
       pre-restructure repo path for its PDFs — update on next run.
 
 # ---------------------------------------------------------------------------

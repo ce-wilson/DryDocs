@@ -446,7 +446,7 @@ node_classifications:
       A ServiceNow assignment group — the ITSM support unit technicians belong to.
       Same class as :DevTeam: both are organizational units that hold people in
       roles, and modelling them alike is what lets one :Employee carry PAT, SEAL
-      and ITSM roles off one spine. Registered at G100 (2026-08-18) with the
+      and ITSM roles off one backbone. Registered at G100 (2026-08-18) with the
       staffing edges, never an edge whose node class is unclassified (the
       ControlMApplication lesson, 2026-07-09).
       SOURCED OOTB: ServiceNow ships the group in sys_user_group, its membership in
@@ -764,7 +764,7 @@ node_classifications:
     note: >
       RULED at gate server-location-ontology §A1 (SIGNED 2026-08-19): a PHYSICAL/VIRTUAL server from
       the infrastructure site's per-application export (infra:server-export) —
-      the INVENTORY spine. Deliberately distinct from THREE near-neighbors, and
+      the INVENTORY backbone. Deliberately distinct from THREE near-neighbors, and
       the distinctions are the point: (1) ExecutionHost is Control-M's VIEW of
       a host (prov:SoftwareAgent, keyed on nodeid; may be an LB alias) — the
       two join ONLY via infra_resolves_to_server's evidence-carrying edge,

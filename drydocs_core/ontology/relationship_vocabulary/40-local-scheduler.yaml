@@ -1678,7 +1678,7 @@ local_relationships:
     domain:       scheduler
     status:       planned
 
-  # ── Vendor-docs entity spine, layer 3 (Q14, 2026-08-22; gate vendor-docs-entity-core SIGNED OFF 2026-08-22, 21/21) ──
+  # ── Vendor-docs entity core, layer 3 (Q14, 2026-08-22; gate vendor-docs-entity-core SIGNED OFF 2026-08-22, 21/21) ──
 
   - id:           scheduler_invokes_utility
     neo4j_label:  INVOKES

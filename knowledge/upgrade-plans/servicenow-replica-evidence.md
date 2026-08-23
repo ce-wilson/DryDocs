@@ -31,7 +31,7 @@ returned.
 
 ## 1. The working query, as mechanism
 
-### 1.1 The join spine
+### 1.1 The join backbone
 
 Nine table references, all `LEFT JOIN`, anchored on the TOM assignment row. Aliases are the SME's.
 

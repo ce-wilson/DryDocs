@@ -21,7 +21,7 @@ via the guided gate (`docs/restructure/03-hitl-sme-flow.md`).
 | `manual-loads/` | SME-authored CSV mappings — the tier-5 manual final option (manifest-gated). |
 | `overrides/` | User override lists (the M2 origin-flagged store): committed CSVs materialized into the mapping store with origin flags. |
 | [`audit-fields.yaml`](audit-fields.yaml) | Per-source HITL-gated audit envelope definitions (doc 06). |
-| [`review-labels.yaml`](review-labels.yaml) | Source → DATA-label review spine consumed by `drydocs-review`. |
+| [`review-labels.yaml`](review-labels.yaml) | Source → DATA-label review backbone consumed by `drydocs-review`. |
 | [`doc-source-registry.yaml`](doc-source-registry.yaml) | Registry of ingested documentation sources (doc-ingestion track). |
 | [`dev-environment.yaml`](dev-environment.yaml) | Single source of truth for local dev/test Neo4j container/DB names + ports (drift-guarded). |
 

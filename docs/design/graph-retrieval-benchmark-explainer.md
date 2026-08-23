@@ -194,7 +194,7 @@ on anyone's judgment.
 The verdict — **BUILD** — translates into a component design with clear roles rather
 than a single retriever:
 
-1. **The lexical graph is the spine.** Document→Chunk with governed trust tiers, proven
+1. **The lexical graph is the backbone.** Document→Chunk with governed trust tiers, proven
    twice now (the Control-M corpus and the GraphRAG book load).
 2. **Full-text search stays as standing infrastructure** — keyless, ~10 ms, covers most
    exact-term lookups — as the keyword half of a future hybrid, never the sole retriever.

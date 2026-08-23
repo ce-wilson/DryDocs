@@ -109,7 +109,7 @@ role scheme (K5 gate + K6 supplement; scope :Product / :AreaProduct only).
 (:DocSection is REUSED for the vendor TOC tree — second use recorded on its
 classification, gate §E2; not a new label.)
 
-## Doc graph — traceability spine (ACTIVE, gate `doc-traceability-feedback` signed off 2026-07-20; L7 / ADR 0006)
+## Doc graph — traceability backbone (ACTIVE, gate `doc-traceability-feedback` signed off 2026-07-20; L7 / ADR 0006)
 
 | Node label | Source type | Target type | PROV-O / W3C type |
 |:---|:---|:---|:---|

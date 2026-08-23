@@ -146,7 +146,7 @@ software-KG / context-KG split being asked for.
 `drydocs-deepdoc` per ADR 0002 C3) — handles both external and internal sources.** The
 external/internal difference is *data on the source record* (classification, connector,
 curation requirements), not a difference in pipeline shape. Splitting into two modules would
-duplicate the fetch→clean→hash→chunk→stamp→load spine and put the publish boundary in code
+duplicate the fetch→clean→hash→chunk→stamp→load backbone and put the publish boundary in code
 instead of config, violating the repo's own rule that precedence/gating live in `config/`.
 
 The pipeline, per source:

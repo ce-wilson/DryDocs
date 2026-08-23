@@ -345,7 +345,7 @@ export default function SoftwareRoute({ persona }: { persona: Persona }) {
                 </td>
                 <td className="border-b border-edge-soft px-2.5 py-1.5 text-[10px] text-faint">
                   {c.graph_locator?.match === 'none'
-                    ? 'not on the lexical spine — by ruling'
+                    ? 'not on the lexical backbone — by ruling'
                     : (c.graph_locator?.match ?? '—')}
                 </td>
               </tr>

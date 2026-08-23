@@ -152,7 +152,7 @@ def test_db_absent_still_says_where_the_corpus_actually_is() -> None:
     assert "meanwhile present in ['drydocs'] (26 docs)" in rows[0].detail
 
 
-def test_corpus_off_the_lexical_spine_is_unshaped_not_missing() -> None:
+def test_corpus_off_the_lexical_backbone_is_unshaped_not_missing() -> None:
     """jpmc-reports loaded as :DataAsset slices — its documents are not missing,
     they were never documents."""
     rows = verify(

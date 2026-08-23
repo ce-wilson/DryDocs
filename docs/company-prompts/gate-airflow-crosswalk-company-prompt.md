@@ -89,7 +89,7 @@ that rules company-only rows cannot be a ported artifact.
 
 Only your side can see the estate. Real values stay Internal; counts and shapes come
 back here. NOTE the DPL context your side already traced (2026-07-21): the AWS Glue
-leg sits BEHIND the launcher spine — this profile is about ORCHESTRATOR-level
+leg sits BEHIND the launcher backbone — this profile is about ORCHESTRATOR-level
 Airflow/MWAA use, not the Glue jobs the DPL pipelines wrap:
 1. **Estate census:** MWAA environments / self-managed Airflow instances in scope —
    DAG repo availability, DAG counts, schedule coverage.

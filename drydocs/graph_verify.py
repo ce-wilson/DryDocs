@@ -149,9 +149,9 @@ def evaluate(
 
 
 def unknown_targets(suite: Suite, review_labels: Any) -> list[str]:
-    """Labels a suite targets that the review spine doesn't know about.
+    """Labels a suite targets that the review backbone doesn't know about.
 
-    Optional cross-check that ties graph-verify to the ``review_labels`` spine (both
+    Optional cross-check that ties graph-verify to the ``review_labels`` backbone (both
     in the ``drydocs-review`` component). ``review_labels`` is a
     :class:`drydocs.review_labels.ReviewLabels`; passed in to keep this pure.
     """

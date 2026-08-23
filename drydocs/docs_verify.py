@@ -23,7 +23,7 @@ and reporting either as `missing` would be a false diagnosis:
   has never created. That is not a load failure; it is the open topology
   question G32 exists to rule on.
 * ``unshaped`` — the corpus is registered and real but was never put on the
-  lexical Document->Chunk spine (``jpmc-reports`` loaded as :DataAsset slices,
+  lexical Document->Chunk backbone (``jpmc-reports`` loaded as :DataAsset slices,
   pre-dating the docmeta plan). Its documents are not missing; they were never
   documents.
 
@@ -59,7 +59,7 @@ FAILING = frozenset({WRONG_DB, WRONG_REALM})
 MATCH_CORPUS_ID = "corpus_id"  # (:Document {corpus_id: value})  — Q13 loaders
 MATCH_DOC_ID = "doc_id"  # (:Document {doc_id: value})     — single-doc corpora
 MATCH_PATH_PREFIX = "path_prefix"  # d.path STARTS WITH value        — file-tree corpora
-MATCH_NONE = "none"  # not on the lexical spine at all
+MATCH_NONE = "none"  # not on the lexical backbone at all
 
 LOCATOR_KINDS = frozenset({MATCH_CORPUS_ID, MATCH_DOC_ID, MATCH_PATH_PREFIX, MATCH_NONE})
 
@@ -91,7 +91,7 @@ class CorpusRow:
 def locator_of(source: dict) -> tuple[str, str | None, bool]:
     """Return ``(kind, value, declared)`` for an entry.
 
-    ``declared`` separates "this corpus is deliberately not on the lexical spine"
+    ``declared`` separates "this corpus is deliberately not on the lexical backbone"
     (``match: none``, a ruling someone made) from "nobody said" (no
     ``graph_locator`` at all). Both end up ``unshaped``, but only one of them is
     an answer, and the detail line must not claim the entry said nothing when it
@@ -182,7 +182,7 @@ def verify(
                     target_db=target,
                     status=UNSHAPED,
                     detail=(
-                        "declared not on the :Document spine (match: none)"
+                        "declared not on the :Document backbone (match: none)"
                         if declared
                         else "no graph_locator declared — nobody has ruled how to find this corpus"
                     ),

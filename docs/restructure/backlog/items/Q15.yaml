@@ -1,6 +1,6 @@
 id: Q15
 epic: docmeta
-title: 'Agent navigation QuerySpecs over the doc spine: name-addressable lookup, section browse, role
+title: 'Agent navigation QuerySpecs over the doc backbone: name-addressable lookup, section browse, role
   siblings, search as FALLBACK'
 type: task
 module: drydocs-api

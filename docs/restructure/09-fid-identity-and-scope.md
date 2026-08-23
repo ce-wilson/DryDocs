@@ -243,7 +243,7 @@ surface over the directory proper:
 |---|---|---|
 | Who owns/manages this run-as account? | A (HR) | `run_as` name -> A.name -> A.manager (owner's standard id) — at (account id, owner) grain |
 | Which application is this FID assigned to? | B (id-owner) | `run_as` name -> B.name -> the search's application id; B is the K2 tier-2 candidate |
-| Identity spine | B's ids | the FID/record id keys the `:AppUser` node (the doc's standing rule); A's employee-id is a per-row key of the HR carrier, not the identity |
+| Identity core | B's ids | the FID/record id keys the `:AppUser` node (the doc's standing rule); A's employee-id is a per-row key of the HR carrier, not the identity |
 | Census (a) | B | by-application total (over-broad; §D filters rule what counts) |
 | Census owner-side counts | A | owner fan-out, name collisions, LOB/cost-center distribution |
 

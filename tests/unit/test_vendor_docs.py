@@ -459,7 +459,7 @@ def test_loader_wiring():
     assert VendorDocsLoader.source_label == "vendor-docs"
 
 
-def test_cypher_writes_the_spine():
+def test_cypher_writes_the_backbone():
     cypher = CYPHER.read_text(encoding="utf-8")
     for token in (
         ":Document",

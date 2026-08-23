@@ -668,7 +668,7 @@ def test_coverage_suite_pins_the_orchestrator_agreement() -> None:
 
 def test_cascade_specs_are_registered_with_the_ruled_semantics() -> None:
     """The four cascade specs carry the gate's rulings in their Cypher:
-    unmapped-only folders (§G7), the catalog spine over HAS_APPLICATION
+    unmapped-only folders (§G7), the catalog backbone over HAS_APPLICATION
     (§G6 — the list picker's traversal), the orchestrator role filter (C12),
     and the per-app edge disclosure (source + origin, §G2/§G3)."""
     from drydocs_api.query_specs import QUERY_SPECS

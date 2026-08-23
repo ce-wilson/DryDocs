@@ -22,7 +22,7 @@
 # the sensitivity/publish boundary, the graph, the HITL gate):
 #   • enterprise/IDA  "Technical Design Doc Template.doc" — kept: Purpose/Scope,
 #       Definitions, System Overview (→ Design summary), Component Description
-#       (→ Detailed design), §6 SOFTWARE REQUIREMENTS TRACEABILITY MATRIX (the spine).
+#       (→ Detailed design), §6 SOFTWARE REQUIREMENTS TRACEABILITY MATRIX (the backbone).
 #   • agile/story     "Technical Design.docx" — kept: Design Summary, Component Changes
 #       (→ Detailed design), Configuration (→ folded into Detailed design), QA / Unit /
 #       SIT-UAT (→ QA & tests), Discussions.
@@ -47,7 +47,7 @@ classification: Internal-Public          # this template carries no real data
 updated: 2026-07-08
 
 source_templates:
-  - "SDLC-Docs/Technical Design Doc Template.doc  (enterprise/IDA — traceability-matrix spine)"
+  - "SDLC-Docs/Technical Design Doc Template.doc  (enterprise/IDA — traceability-matrix backbone)"
   - "SDLC-Docs/Technical Design.docx  (agile/story — component changes + tests)"
 
 # ── The outline. `anchor` is stable + authored; heading is the rendered text; ────
@@ -132,7 +132,7 @@ sections:
     heading: "Requirements traceability matrix"
     required: true
     guidance: >
-      THE SPINE (enterprise §6). One row per requirement/capability; columns:
+      THE BACKBONE (enterprise §6). One row per requirement/capability; columns:
       requirement | design-section anchor | component/module | test/verify | status.
       This is what makes a scanned pen note or a save-button comment land at "a trackable
       place within the requirements". See the traceability contract below for how strict

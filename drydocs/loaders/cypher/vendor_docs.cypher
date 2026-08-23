@@ -44,7 +44,7 @@
 //   (doc)-[:FIRST_CHUNK]->(chunk seq 0)
 //   (prev chunk)-[:NEXT_CHUNK]->(this chunk)   — order computed in Python
 //   (:DocSection {section_id, title, corpus_id, capture_id, doc_version,
-//     version_verified})                          the TOC spine
+//     version_verified})                          the TOC backbone
 //   (doc)-[:IN_SECTION]->(:DocSection)
 //   (:DocSection)-[:SUBSECTION_OF]->(:DocSection)
 //
@@ -107,7 +107,7 @@ FOREACH (_ IN CASE WHEN row.prev_chunk_id IS NULL THEN [] ELSE [1] END |
   MERGE (prev)-[:NEXT_CHUNK]->(chunk)
 )
 
-// --- TOC spine ---------------------------------------------------------------
+// --- TOC backbone ---------------------------------------------------------------
 // The publisher's own hierarchy, transcribed. Section identity is the joined
 // ancestry path scoped by CAPTURE, so neither two corpora sharing a book name
 // nor two versions of one book collide, and a re-run is idempotent.

@@ -1,11 +1,11 @@
-"""Typed accessor over ``config/review-labels.yaml`` — the shared *review spine*.
+"""Typed accessor over ``config/review-labels.yaml`` — the shared *review backbone*.
 
 Maps each ingestion SOURCE to the DATA node labels it populates, in chain order,
 with SME provenance. Consumed by the ``drydocs-review`` component: ``graph_review``
 renders one section per label; ``graph_verify`` validates a suite's declared targets
-against the spine.
+against the backbone.
 
-Pure config layer — **no Neo4j, no graph writes**. The committed spine is seeded from
+Pure config layer — **no Neo4j, no graph writes**. The committed backbone is seeded from
 the vendor-BMC baseline (``classification: Internal-Public``). Real internal
 source->label chains live in a gitignored twin and pass the HITL gate before driving
 any load.
@@ -47,7 +47,7 @@ class SourceLabels:
 
 
 class ReviewLabels:
-    """Read-only view over the review spine."""
+    """Read-only view over the review backbone."""
 
     def __init__(self, sources: dict[str, SourceLabels], classification: str | None = None) -> None:
         self._sources = sources

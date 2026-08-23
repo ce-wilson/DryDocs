@@ -11,7 +11,7 @@ collides with the original's separately-constrained ``seal_id``.
 
 WHY A GUARD AND NOT A COMMENT. That paragraph existed in the gate, in
 ``seal_applications.cypher``, and in this repo's graph-tests — and it still
-happened. A company run of ``drydocs load seal_applications`` against a graph that
+happened. A run of ``drydocs load seal_applications`` against a graph that
 had taken the S3 code but not the S3 re-key died on
 ``Neo.ClientError.Schema.ConstraintValidationFailed`` MID-LOAD. Mid-load is the
 part that matters: batches commit per flush, so the crash leaves a partially

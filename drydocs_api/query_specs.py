@@ -372,7 +372,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             id="mappings.catalog-cascade.v1",
             database="drydocs",
             description=(
-                "The cascade's catalog spine: ProductLine -> HAS_PRODUCT -> Product "
+                "The cascade's catalog backbone: ProductLine -> HAS_PRODUCT -> Product "
                 "-> HAS_APPLICATION -> BusinessApplication, flat rows the picker "
                 "groups client-side. §G6 rules the COMPANY reading of "
                 "HAS_APPLICATION (a structural support link, 1:many by design — the "

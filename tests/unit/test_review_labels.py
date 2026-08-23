@@ -1,4 +1,4 @@
-"""Unit tests for the review spine (drydocs/review_labels.py) — pure, no Neo4j."""
+"""Unit tests for the review backbone (drydocs/review_labels.py) — pure, no Neo4j."""
 
 from __future__ import annotations
 
@@ -58,13 +58,13 @@ def test_malformed_docs_raise(bad: dict) -> None:
         ReviewLabels.from_dict(bad)
 
 
-def test_committed_spine_loads_and_is_publishable() -> None:
+def test_committed_backbone_loads_and_is_publishable() -> None:
     """The real config/review-labels.yaml parses and is committed at a publishable tier."""
     rl = ReviewLabels.load()
-    assert rl.sources(), "committed spine should declare sources"
+    assert rl.sources(), "committed backbone should declare sources"
     assert rl.classification in {
         "External",
         "Internal-Public",
-    }, "committed review spine must stay within the public-producer ceiling"
+    }, "committed review backbone must stay within the public-producer ceiling"
     # grounded in real schema labels
     assert "ControlMJob" in rl.all_labels()

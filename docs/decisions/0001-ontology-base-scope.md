@@ -1,4 +1,4 @@
-# ADR 0001 — Ontology base scope: freeze the PROV spine, demote the rest
+# ADR 0001 — Ontology base scope: freeze the PROV backbone, demote the rest
 
 ```yaml
 status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED
@@ -28,16 +28,16 @@ node **identity is always a business key**, never a URL.
 A second model reviewed an expanded standards set — adding **CSVW
 (tabular-metadata), LDP, LDN** and leaning harder on **OBI/IAO** for provenance and
 epistemology. That review reasoned in RDF triples and was unaware of what we had
-already built (PROV spine, DataHub `Schema→Field→Element` column model). This ADR
+already built (PROV backbone, DataHub `Schema→Field→Element` column model). This ADR
 records the decision on what actually enters the graph.
 
 ## Decision
 
-**Seed only the spine. Cite everything else; keep it out of the graph.**
+**Seed only the backbone. Cite everything else; keep it out of the graph.**
 
 | Standard | Disposition | Rule |
 |---|---|---|
-| PROV-O | **Core — spine, frozen** | Canonical provenance: `Entity` / `Activity` / `Agent` + relations. |
+| PROV-O | **Core — backbone, frozen** | Canonical provenance: `Entity` / `Activity` / `Agent` + relations. |
 | DCAT v3, DPROD, DQV, W3C ORG | **Core, frozen** | Already seeded and load-bearing. |
 | OpenLineage + DataHub URN | **Core (identity + lineage)** | Per `docs/patterns/data-catalog/ontology-standard.md`. |
 | SWO (SDLC subset) | **Core but scoped** | Language/script/platform classification only. Agents are `prov:SoftwareAgent`, not SWO. |
@@ -46,7 +46,7 @@ records the decision on what actually enters the graph.
 | CSVW | **Cite, do not seed** | Column granularity already covered by DataHub `Schema→Field→Element`. Only borrow ≤4 dialect *property names* (`csvw:delimiter`, `csvw:null`, `csvw:quoteChar`, `csvw:header`) on the file/`:Distribution` node **if** raw delimited-file dialect must be captured. No CSVW class hierarchy. |
 | LDP / LDN | **Reject** | Active HTTP protocols (`POST`, inbox). Zero queryable value in an API-less, pull/batch system. Documentation footnote only. |
 
-**Governing principle:** *Spine standards are seeded into the graph; everything
+**Governing principle:** *Backbone standards are seeded into the graph; everything
 else is cited in `reference/standards/` and stays out of it.*
 
 ### Two LPG rules this ADR codifies (into `docs/RELATIONSHIP_GUIDE.md`)
@@ -62,7 +62,7 @@ else is cited in `reference/standards/` and stays out of it.*
 
 **Positive**
 - Base is finalized mostly by *removing* proposed additions — KISS preserved.
-- The PROV spine stays the unambiguous backbone; no OBI/IAO/PROV collision.
+- The PROV backbone stays the unambiguous backbone; no OBI/IAO/PROV collision.
 - Net new graph content: at most four optional dialect properties.
 - Reduced HITL-gate burden — fewer seeded terms to govern.
 - Staleness is already handled by DQV `freshness_sla` / `arrival_latency`; make it

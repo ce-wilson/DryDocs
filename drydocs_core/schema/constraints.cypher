@@ -140,7 +140,7 @@ CREATE CONSTRAINT controlmjob_key     IF NOT EXISTS FOR (j:ControlMJob)         
 DROP CONSTRAINT condition_key IF EXISTS;
 CREATE CONSTRAINT condition_key       IF NOT EXISTS FOR (c:Condition)           REQUIRE (c.folder_id, c.name) IS NODE KEY;
 
-// The D1 business-key spine (G31, 2026-08-18). Moved here from
+// The D1 business-key backbone (G31, 2026-08-18). Moved here from
 // provisioning/02_proxy_constraints.cypher when the G102 fold retired that
 // file's charter (cross-database joins need matching keys in BOTH databases;
 // there is one database now). The DISCIPLINE it carried survives intact:
@@ -197,7 +197,7 @@ CREATE CONSTRAINT codemodule_file_id  IF NOT EXISTS FOR (m:CodeModule)          
 // 2026-08-05, admitting the containment tree the G33 gate deferred).
 CREATE CONSTRAINT codedirectory_file_id IF NOT EXISTS FOR (d:CodeDirectory)     REQUIRE d.file_id IS UNIQUE;
 // --- Infrastructure / server location (Z3; gate server-location-ontology
-// SIGNED OFF 12/12, 2026-08-19). :Server is the INVENTORY spine (§A1), keyed
+// SIGNED OFF 12/12, 2026-08-19). :Server is the INVENTORY backbone (§A1), keyed
 // on name — the Z2 join key; deliberately NOT ExecutionHost's nodeid key
 // (identity joins are the RESOLVES_TO_SERVER evidence edge, never a shared
 // key). :DataCenter is the PHYSICAL building (§B1) — never the Control-M

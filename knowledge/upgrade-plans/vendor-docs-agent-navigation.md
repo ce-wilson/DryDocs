@@ -1,6 +1,6 @@
 # Loading the vendor-docs capture for AGENT navigation
 
-**Status:** plan, not a decision. The layer-1 spine is buildable now; every
+**Status:** plan, not a decision. The layer-1 backbone is buildable now; every
 meaning edge in layer 2/3 is gate-bound and stays `status: planned` until an SME
 signs it (CLAUDE.md §6 — ontology edges are not casual).
 **Written:** 2026-07-31, at the `bmc-controlm-utilities` capture.
@@ -25,7 +25,7 @@ exists. This capture is different in two ways that change the modelling:
 
 The last two are the opportunity. We are not guessing at structure: BMC ships
 the breadcrumb (`Utilities > emdef utility for jobs > defjob > defjob XML file
-rules`) and the page titles are exact utility names. That is a navigable spine
+rules`) and the page titles are exact utility names. That is a navigable backbone
 handed to us for free, and the current lexical shape throws it away.
 
 ---
@@ -66,7 +66,7 @@ conversation is the cautionary tale: **the capture is 9.0.20, the estate is
 
 Deliberately mapped onto CLAUDE.md §1 so the gate boundary is obvious.
 
-### Layer 1 — the document spine (TAXONOMY: pure classification, loadable now)
+### Layer 1 — the document backbone (TAXONOMY: pure classification, loadable now)
 
 Nothing here asserts meaning; it transcribes the publisher's own structure.
 
@@ -88,7 +88,7 @@ Nothing here asserts meaning; it transcribes the publisher's own structure.
 tier classifier, and it must report how many pages it could NOT classify rather
 than defaulting them silently.
 
-### Layer 2 — the entity spine (ONTOLOGY: gate-bound)
+### Layer 2 — the entity core (ONTOLOGY: gate-bound)
 
 ```
 (:ControlMUtility {name, family, kind})   # exportdefjob, ctmorder, defjob…

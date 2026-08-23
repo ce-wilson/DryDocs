@@ -14,7 +14,7 @@ SEC-filed annual report + a public GlobalData profile page).
 - The corpus **exists in the registry**: `config/doc-source-registry.yaml` id `jpmc-reports`
   (classification External, `target_db: ddcontext`, captured 2026-06-30, trust VERBATIM).
   It was the FIRST ddcontext doc ingestion — annual-report sections as `:DataAsset` slices
-  seeding effective-dated BusinessSegment context — **not** the lexical Document→Chunk spine,
+  seeding effective-dated BusinessSegment context — **not** the lexical Document→Chunk backbone,
   and `confirmed: false` (no active loader binds; reshaping is a P4+ decision).
 - **Live check (desktop, `neo4jtest`, `ddcontext` — J18 venue): the database is EMPTY.**
   Zero nodes, zero relationships. The June ingestion either ran against the retired
@@ -24,7 +24,7 @@ SEC-filed annual report + a public GlobalData profile page).
   the registry's `captured_at: 2026-06-30`. The registry entry describes a 2024-edition run.
 - **Conclusion:** a true GraphRAG search (vector retrieval over chunks) is not possible today
   for two independent reasons — nothing is loaded in this venue, and even the registered
-  shape is `:DataAsset` slices, not the retrievable lexical spine. So the concept test below
+  shape is `:DataAsset` slices, not the retrievable lexical backbone. So the concept test below
   is the experiment the directive anticipated: apply the ontology by hand to what the report
   says, and see whether the business layer stands on its own.
 
@@ -107,7 +107,7 @@ a world map today, with `org:OrganizationalUnit` and person/team relationships a
 dropdown dimension.
 
 **Queued (inbox capture, next groom):**
-1. The jpmc-reports corpus needs a decision: reshape onto the lexical Document→Chunk spine
+1. The jpmc-reports corpus needs a decision: reshape onto the lexical Document→Chunk backbone
    (making real GraphRAG possible) or keep the `:DataAsset`-slice shape — the registry's
    named P4+ decision, now with a concrete consumer (this experiment) asking for it. The
    2025/2026 editions sitting at the repo root are newer than `captured_at` and should ride

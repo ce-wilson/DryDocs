@@ -3,7 +3,7 @@
 
 What is pinned here, and to which ruling:
 
-* §A1 — the loader writes :Server (the inventory spine) and the identity join
+* §A1 — the loader writes :Server (the inventory backbone) and the identity join
   is an EDGE pass, never a merge: the resolution cypher must not contain a
   single MERGE on a node.
 * §A3 — designation is validated to the ruled enum (PROD | DR) at the model.

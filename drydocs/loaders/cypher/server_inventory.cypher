@@ -5,7 +5,7 @@
 // Gate: server-location-ontology SIGNED OFF 12/12, 2026-08-19
 // (config/gate-log.md; spec config/gate-prompts/server-location-ontology.yaml).
 // Bindings:
-//   * Server (dd:Server) — the INVENTORY spine (§A1), keyed on name.
+//   * Server (dd:Server) — the INVENTORY backbone (§A1), keyed on name.
 //     Deliberately NOT ExecutionHost (Control-M's view — often an LB alias),
 //     NOT ControlMServer (a scheduler instance), NOT ControlMHostGroup (an
 //     LB set). The ExecutionHost join is the SEPARATE derived resolution pass

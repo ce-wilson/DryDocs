@@ -546,7 +546,7 @@ def _detail(row: ProductCoverageRow) -> str:
     if row.coverage == UNGATED:
         return "corpus registered but confirmed: false — no loader may write from it"
     if row.coverage == NO_LOCATOR:
-        return "graph_locator match: none — not on the lexical spine, by ruling"
+        return "graph_locator match: none — not on the lexical backbone, by ruling"
     if row.coverage == NOT_PROBED:
         return "declaration clean; graph not probed"
     if DIVERGENCE_EDGES_UNDECLARED in row.divergence:

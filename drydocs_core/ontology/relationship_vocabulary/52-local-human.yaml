@@ -9,7 +9,7 @@
   # prov:agent / prov:hadRole). Edges that merely name an ORG UNIT as a catalog
   # node (Product -> DevTeam, DevTeam -> Product SUPPORTS, DevTeam -> JiraBoard)
   # are the product-catalog hierarchy and stay in `catalog`; the :Employee
-  # node spine itself is G74's.
+  # node backbone itself is G74's.
   #
   # PARTITION MOVE ONLY: ids, labels, directions, statuses, notes, loaders and
   # supplements are exactly as they were in 41-local-business-application.yaml

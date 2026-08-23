@@ -54,7 +54,7 @@ groom_log:
     Removal is cheap BY THE ADR'S OWN ACCOUNTING: "ddlineage is empty, so choosing
     it later costs a design, not a data migration" — and recreating it later costs
     one CREATE DATABASE line, while the design question (a :ControlMJob proxy-node
-    spine) was never answered and stays owned by the named revisit trigger.
+    backbone) was never answered and stays owned by the named revisit trigger.
     Sequencing: X1 (decision record) → X2 (repo sweep) → X3/X4 (live drops, one
     per machine — the G50/G52 venue-pinned precedent; the two machines hold
     independent graphs, so one item cannot close both).

@@ -122,7 +122,7 @@ def test_every_corpus_declares_how_to_find_itself() -> None:
     the graph is not — only the Q13 loader writes `corpus_id`.
 
     `match: none` is a legitimate answer (the corpus is deliberately not on the
-    Document->Chunk spine), but it has to be SAID. An entry that declares nothing
+    Document->Chunk backbone), but it has to be SAID. An entry that declares nothing
     is indistinguishable from one nobody thought about, and docs-verify would
     have to guess which — so the guard is on the declaration, not on the value.
     """

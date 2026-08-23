@@ -671,7 +671,7 @@ def load_server_inventory(
     """Z3: load the infra server export + the tiered ExecutionHost join.
 
     Gate server-location-ontology (SIGNED OFF 12/12, 2026-08-19): :Server is
-    the inventory spine (§A1), :DataCenter carries geography + the Idea-90
+    the inventory backbone (§A1), :DataCenter carries geography + the Idea-90
     location_grain declaration (§B1/§B2), and the §C2 technology-port leg —
     (:BusinessApplication)-[:HAS_PORT]->(:Port {kind:'Technology'})-
     [:RUNS_ON {role:'technology_port'}]->(:Server) — is MATCH-only on the

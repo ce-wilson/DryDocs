@@ -52,7 +52,7 @@
 | File | Created | Updated | Status | Purpose |
 |---|---|---|---|---|
 | docs/decisions/README.md | 2026-07-02 | 2026-07-14 | living | ADR index & conventions |
-| 0001-ontology-base-scope.md | 2026-06-22 | 2026-06-22 | record | Freeze the PROV spine, demote the rest |
+| 0001-ontology-base-scope.md | 2026-06-22 | 2026-06-22 | record | Freeze the PROV backbone, demote the rest |
 | 0002-component-database-topology.md | 2026-06-26 | 2026-07-11 | record | Modular components over isolated graphs |
 | 0002-a-drydocs-core-extraction-plan.md | 2026-06-26 | 2026-07-10 | record | drydocs-core thin-extraction plan |
 | 0002-a-1-phase-b-thin-relocate.md | 2026-07-10 | 2026-07-10 | record | Phase B physical relocate amendment |
@@ -80,7 +80,7 @@
 | feedback/README.md | 2026-07-08 | 2026-07-20 | living | HITL annotation flow for design docs (Epic L) |
 | feedback/scans/README.md | 2026-07-08 | 2026-07-08 | living | Raw paper-HITL scan drop conventions (L6) |
 
-## docs/restructure/ (the plan spine)
+## docs/restructure/ (the plan backbone)
 
 | File | Created | Updated | Status | Purpose |
 |---|---|---|---|---|

@@ -2,7 +2,7 @@
 server-location-ontology §C1, SIGNED OFF 12/12, 2026-08-19).
 
 Joins Control-M's view of a host (:ExecutionHost, keyed on nodeid — often a
-load-balancer alias) to the inventory spine (:Server, from
+load-balancer alias) to the inventory backbone (:Server, from
 :class:`~drydocs.loaders.server_inventory.ServerInventoryLoader`) under the
 signed match tiers, K2-style — declared tiers, recorded evidence, nothing
 silent:

@@ -1,4 +1,4 @@
-"""G31 — the D1 business-key spine, guarded within the one database.
+"""G31 — the D1 business-key backbone, guarded within the one database.
 
 The item's original acceptance was written against the pre-G32 multi-database
 future: proxy keys mirrored into every database so the composite could join
@@ -72,7 +72,7 @@ def _constrained_pairs() -> set[tuple[str, str]]:
 
 def _join_targets() -> dict[tuple[str, str], list[str]]:
     """(label, prop) pairs each loader MATCHes without MERGEing that label —
-    the cross-loader joins the spine exists for."""
+    the cross-loader joins the backbone exists for."""
     targets: dict[tuple[str, str], list[str]] = {}
     for path in sorted(CYPHER_DIR.glob("*.cypher"), key=lambda p: p.as_posix()):
         text = path.read_text(encoding="utf-8")
@@ -100,7 +100,7 @@ def test_every_loader_join_target_has_a_constrained_business_key() -> None:
     )
 
 
-def test_the_d1_spine_keys_are_home_in_constraints() -> None:
+def test_the_d1_backbone_keys_are_home_in_constraints() -> None:
     """The two keys the retired proxy file carried, plus the four the G31
     measurement found missing (they arrived between the measurement and the
     fold): all six live in the committed schema, one home."""
@@ -114,7 +114,7 @@ def test_the_d1_spine_keys_are_home_in_constraints() -> None:
         ("Document", "doc_id"),
         ("ControlMFolder", "folder_id"),
     ]:
-        assert pair in constrained, f"D1 spine key missing from the schema: {pair}"
+        assert pair in constrained, f"D1 backbone key missing from the schema: {pair}"
 
 
 def test_the_proxy_file_stays_a_tombstone() -> None:

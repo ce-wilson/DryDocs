@@ -16,7 +16,7 @@
 # classification declared there.
 #
 # NO TRACEABILITY BLOCK (decision, 2026-07-20 — L8): the requirements traceability
-# matrix is the TDD's spine; a runbook has procedures, not requirements. The verify
+# matrix is the TDD's backbone; a runbook has procedures, not requirements. The verify
 # section IS the runbook's proof surface — each procedure states its check inline.
 # If a runbook ever needs requirement-level tracking, add the `traceability:` block
 # here (the validator already supports it) rather than inventing a per-doc format.

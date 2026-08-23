@@ -125,7 +125,7 @@ a person leaving the firm rewrites ownership by process.
 
 ## 7. Consequences DryDocs must respect (mechanism, not policy)
 
-1. **The FID is the identity spine; accounts are its instances.** Ownership questions
+1. **The FID is the identity core; accounts are its instances.** Ownership questions
    join to the FID; execution questions join to the account (`run_as`).
 2. **Name ≠ id.** The rest of our data joins on the *name* a job runs as; the
    directory is keyed on the *id* — and one name can be registered many times to

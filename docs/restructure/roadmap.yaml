@@ -207,7 +207,7 @@ modules:
       endpoints, and the ownership/attribution query family — the contract both
       the console and the agent tier consume.
     remaining: >
-      Six open items: Q15 doc-spine navigation QuerySpecs, G38 federated-read
+      Six open items: Q15 doc-backbone navigation QuerySpecs, G38 federated-read
       proof (ddall), O48 review-for-ontology extraction, O49 related-nodes panel,
       O52 the always-null holder_sid fix, and R9 the agent query command.
     ideas: []
@@ -227,7 +227,7 @@ modules:
   - module: drydocs-docmeta
     stage: early
     built: >
-      Document-corpus ingestion core (ADR 0006) with the doc spine and
+      Document-corpus ingestion core (ADR 0006) with the doc backbone and
       traceability loads. The company side is AHEAD of the producer here — their
       package layout diverged and they carry prompts.py and pipeline.py, which do
       not exist in this tree.
