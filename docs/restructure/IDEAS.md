@@ -1200,7 +1200,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 - **`Idea-20`** · 2026-07-21 · `[source]` · **groomed → G60 (2026-08-07 pm) — clause (c) ONLY; clauses (a) and (d) re-read 2026-08-12 as PARKED, not open: (a) parked → a real CMD_LINE sample containing the `ingestion-launcher` jar, (d) parked → layer-4 context-graph work starts** · prio? **Med** —
   **DPL ingestion leg + AWS zone model traced** (company ingestion
-  template; mechanism-only — values stay company-side). Upstream of the launcher spine:
+  template; mechanism-only — values stay company-side). Upstream of the launcher backbone:
   FM drop of a `.dat` + `.tok` landing pair → Control-M file-watcher condition grammar
   (`TOK-IN-COND…` / `FW_DAT#DAT-IN-COND…`, FW-OK-on-FAIL) → a **separate
   `ingestion-launcher` jar** publishes to S3 RAW via HTTP-PUT publish API (dataset
@@ -1415,7 +1415,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   TDD (L1) and Runbook (L8). Parked, not promoted: the BRD is a work-in-progress upstream and
   the user flagged it as "definitely a later phase", so there is no stable outline to write an
   acceptance test against yet. When the BRD shape settles, promote as `docs/design/templates/
-  brd.outline.yaml` (reuse the `drydocs.doc-outline.v1` schema + traceability spine) into Epic L.
+  brd.outline.yaml` (reuse the `drydocs.doc-outline.v1` schema + traceability backbone) into Epic L.
   Seed from the corpus: `SDLC-Docs/BRD - Table of Contents.docx`, `business requirements document
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
@@ -2313,7 +2313,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (company-side) populates `seal_id` on every row, including the platform codes, so a straight
   CSV→authored-rows conversion can NEVER produce a platform declaration. Confirmed real by the user
   2026-08-05: `AOC` (registered to the CCB Cloud Data Processing Platform SEAL, the datalake seal for
-  Ab Initio) and `DCL` (the DPL launcher spine, registered to a consumer app) are both shared platform
+  Ab Initio) and `DCL` (the DPL launcher backbone, registered to a consumer app) are both shared platform
   codes whose folders serve many consuming applications. K7 ALREADY RULED THIS — tier 2, "e.g. the DPL
   launcher spine", folders SURFACE for steward completion, never auto-picked
   ([`k7-folder-mapping-decisions.md:14`](k7-folder-mapping-decisions.md)) — so the 1:1 graph-test does
@@ -2639,7 +2639,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   canonical-company and did not take the producer edits, so RELAY-7 carries this across.
 
 
-- **`Idea-73`** · 2026-08-05 · `[source]` · **merged → G74 (2026-08-12) — the item that owns the :Employee spine now carries the source question, the O44 column-1 consumer and the company-side reading** · prio? **High** —
+- **`Idea-73`** · 2026-08-05 · `[source]` · **merged → G74 (2026-08-12) — the item that owns the :Employee backbone now carries the source question, the O44 column-1 consumer and the company-side reading** · prio? **High** —
   **Where does the employee hierarchy come from, and does it live producer-side at
   all?** Established while drafting G35: `:Employee` is a node class (`prov:Agent`)
   with **no Employee-to-Employee edge anywhere** in the relationship vocabulary —
@@ -2648,7 +2648,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   person is in the role, create the relationship to the employee hierarchy in a
   later pass") and O44's first column, whose manager filter is its whole point.
   The 2026-07-23 producer-session HR-hierarchy direction — single `:Employee`
-  spine, two-scope HR supplement, two-pass loader, `REPORTS_TO` current-state
+  backbone, two-scope HR supplement, two-pass loader, `REPORTS_TO` current-state
   sweep — was written for the **company** `hr-emp-hierarchy` gate, which is
   probably why nothing landed here. Decide whether the producer repo gets a
   hierarchy at all (with what source — `pat:people-report` carries teams, not
@@ -2912,14 +2912,14 @@ question a 1,000-line file with the trail at the bottom could not answer.
   search verdict: the `jpmc-reports` corpus is registered (External, `target_db:
   ddcontext`, `:DataAsset`-slice shape, `confirmed: false`) but `ddcontext` is EMPTY on
   the desktop (`neo4jtest`, probed 2026-08-08) and the registered shape is not the
-  lexical spine, so no vector retrieval is possible either way. The hand-applied ORG +
+  lexical backbone, so no vector retrieval is possible either way. The hand-applied ORG +
   location pass over the public sources produced a coherent business layer regardless:
   org units = the LOB layer verbatim ("managed on an LOB basis"), an effective-dated
   `org:ChangeEvent` (the 2Q2024 segment merge), sites at MIXED grain (street → city →
   country), and a hard epistemic line between an enumerable `org:Site` and an aggregate
   presence claim ("177 locations") that must never be exploded into fake site nodes.
   Queued: (1) the corpus's named P4+ reshape decision now has a real consumer — lexical
-  spine vs slice shape, and the newer 2025/2026 editions at the repo root should ride the
+  backbone vs slice shape, and the newer 2025/2026 editions at the repo root should ride the
   re-ingest; (2) the §3 ORG mappings are gate material (`status: planned` proposals) —
   grain + claim-vs-site findings feed Z2, the org-structure shapes want a business-layer
   gate or E-epic item; (3) any re-ingest gates on the desktop ddcontext provisioning
@@ -3712,7 +3712,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     **Q8** the DESCRIBES silent-drop bug; **Q9** re-file Essential GraphRAG as Neo4j vendor
     docs; **Q10** the failure/activity email corpus; **Q11** document supersession/currency.
   - **Epic G (component-topology):** **G32** the document/content topology ruling +
-    ddcontext charter (the decision everything waits on); **G31** the proxy-spine extension
+    ddcontext charter (the decision everything waits on); **G31** the proxy-node backbone extension
     (prerequisite for every corpus move).
   - **New phase 16 + Epic U — `self-documentation`:** **G33** the code snapshot under a
     Project root. Groomed into phase 6 with the marginal fit flagged, then **re-phased the
@@ -4030,7 +4030,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   variables-simulation views) → **merged into G15** (acceptance upgraded from
   placeholders to observed grammar: single-dash `-pipeline` GUID as the only literal,
   variable-held launcher fallback, -i/-t/-py mode flags, -seal/-fid/-img/-conf/-compute
-  property set; one dt-launcher.sh spine across ingest/transform/provision). Remainder
+  property set; one dt-launcher.sh backbone across ingest/transform/provision). Remainder
   re-inboxed on the ingestion-leg line: template ingestion-launcher jar unobserved,
   Pre/Post-exec file-op surface, zone/glue DataAsset shapes, cross-job %%\\JOB\VAR.
 
