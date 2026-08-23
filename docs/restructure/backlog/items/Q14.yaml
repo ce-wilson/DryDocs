@@ -8,7 +8,7 @@ phase: 14
 agent: ontology-mapper
 model: fable
 priority: p2
-status: todo
+status: in_progress
 depends_on:
 - Q13
 inputs:
