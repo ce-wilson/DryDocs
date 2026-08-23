@@ -1677,3 +1677,39 @@ local_relationships:
     loader:       ~
     domain:       scheduler
     status:       planned
+
+  # ── Vendor-docs entity spine, layer 3 (Q14, 2026-08-22; gate vendor-docs-entity-spine DRAFTED, unsigned) ──
+
+  - id:           scheduler_invokes_utility
+    neo4j_label:  INVOKES
+    inverse_label: "invoked by"
+    role:         ~
+    from_node:    ControlMJob
+    to_node:      ControlMUtility
+    prov_maps_to: "prov:used"
+    note: >
+      PLANNED (gate vendor-docs-entity-spine §D, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). The layer-3 estate join: a job whose CMD_LINE
+      invokes a Control-M utility (ctmorder, exportdefjob) reaches the page
+      documenting it via the utility node. NEW TRIPLE of the INVOKES label
+      beside the ACTIVE scheduler_invokes (Script | ETLProcess) — deliberately
+      NOT a widening of that entry: the targets have different identity rules
+      (Script is PATH-keyed, a utility is NAME-keyed) and widening an active
+      entry is a gate edit with blast radius across a shipped extractor; the
+      gate §D3 offers the widening as the alternative. Matrix row: Activity ->
+      Entity = prov:used, the row scheduler_invokes already rides. HISTORY OF
+      THE BLOCK, recorded per the Q9 overtaken-not-re-done idiom: the plan
+      registered layer 3 as BLOCKED on G32 (a relationship cannot span Neo4j
+      databases — Q8; ADR 0006's dddocs re-target). G32 SIGNED 2026-08-18
+      (one database, dddocs retired at R1, executed by the G102 fold) — 'the
+      fold made the write legal, not ruled' (G32 Q6). What gates the join now
+      (§D2): the gate's own §A/§B rulings, the §E layer-1 load, and the
+      CMD_LINE -> utility derivation (the G14 file-ops feed pattern under the
+      G32 §E charter — no relationship unless its subject already exists in
+      the grounded graph). Sample-estate honesty (§D4): 17/17 bundled jobs
+      carry cmd_line, ZERO invoke a known utility — the join pays on the
+      company estate; no demo is promised.
+    supplement:   ~
+    loader:       ~
+    domain:       scheduler
+    status:       planned

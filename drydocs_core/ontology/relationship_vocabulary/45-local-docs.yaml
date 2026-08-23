@@ -361,3 +361,135 @@
     loader:       ~
     domain:       docs
     status:       planned
+
+  # ── Vendor-docs entity spine (Q14, 2026-08-22; gate vendor-docs-entity-spine DRAFTED, unsigned) ──
+  # The bmc-docs-controlm-utilities corpus (1016 VERBATIM pages, never loaded —
+  # confirmed: false until the gate's §E signs). Five entries, all planned:
+  # the aboutness triple (§B), the product bridge (§A3), the vendor cross-link
+  # (§C), and the two Q13-loader TOC edges the vocabulary never registered (§E3).
+
+  - id:           docs_describes_utility
+    neo4j_label:  DESCRIBES
+    inverse_label: "described by"
+    role:         ~
+    from_node:    Document
+    to_node:      ControlMUtility
+    prov_maps_to: ~
+    note: >
+      PLANNED (gate vendor-docs-entity-spine §B, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). A vendor page is ABOUT the utility its title
+      names (exportdefjob, ctmorder, the emdef family). REUSES the ACTIVE
+      DESCRIBES label as a NEW TRIPLE beside Document -> SoftwareProduct —
+      the C8 same-label-new-triple discipline (doc_section_part_of precedent);
+      same aboutness meaning (dcterms:subject / foaf:primaryTopic, deliberately
+      NOT wasDerivedFrom, no PROV row), new endpoint pair, separate entry. A
+      new DOCUMENTS label was laid out at the gate for explicit rejection (two
+      labels, one meaning, split queries). EDGE STAYS BARE (§B2): the version
+      caveat is node-grain (doc_version / version_verified on Document, Chunk
+      AND DocSection per the Q13 close) — unlike the product-targeted triple's
+      target_version. Derivation basis (§B3): deterministic title-match to the
+      utility node, unmatched count reported, never defaulted — no LLM.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_utility_part_of
+    neo4j_label:  PART_OF
+    inverse_label: "has part"
+    role:         ~
+    from_node:    ControlMUtility
+    to_node:      SoftwareProduct
+    prov_maps_to: ~
+    note: >
+      PLANNED (gate vendor-docs-entity-spine §A3, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). The bridge that keeps a utility inside the
+      software family without making it a product: ControlMUtility ->
+      SoftwareProduct {product_id: controlm}. dcterms:isPartOf family,
+      structural not derivation — no PROV row. THIRD triple of the PART_OF
+      label (after Chunk -> Document and DocSection -> DesignDoc): same label,
+      new entry per endpoint pair (C8). The alternative — utilities AS
+      SoftwareProduct rows — was laid out at the gate §A2 for explicit
+      rejection: the registry classifies what a vendor SHIPS as a governed,
+      hand-curated, seal_id-bearing product row; ~100+ corpus-derived utility
+      instances would invert that grain.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_see_also
+    neo4j_label:  SEE_ALSO
+    inverse_label: "see also"
+    role:         ~
+    from_node:    Document
+    to_node:      Document
+    prov_maps_to: ~
+    note: >
+      PLANNED (gate vendor-docs-entity-spine §C, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). The vendor's own in-page cross-link between
+      two topics, carried as an assertion: the corpus is VERBATIM throughout,
+      so the link is the vendor's words as much as the sentence around it, and
+      it is the only lateral-navigation signal the corpus ships beyond the TOC
+      (the plan's 'no lateral movement' failure). Entity -> Entity reference,
+      not derivation — no PROV row. BASIS REQUIRED on every edge (the O24 /
+      email-folder-assignment §A3 discipline — no anonymous assertions): the
+      source href and the anchor it was parsed from. On the G32 §F axes:
+      vendor-asserted origin, never :Uncertain (parsing a literal href is
+      mechanical). Standards analog rdfs:seeAlso — rdfs IS declared in
+      namespaces.py (unlike the ANNOTATES/oa:hasTarget case); §C3 asks the
+      gate whether to adopt the mapping or keep the label local. If the SME
+      rules cross-links presentation, this entry retires (rejected in the
+      map, never loaded) — the §C4 decline path, priced at the gate.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_in_section
+    neo4j_label:  IN_SECTION
+    inverse_label: "contains page"
+    role:         ~
+    from_node:    Document
+    to_node:      DocSection
+    prov_maps_to: ~
+    note: >
+      PLANNED (gate vendor-docs-entity-spine §E3, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). A Document's placement in the publisher's own
+      toc.json tree — pure transcription of vendor structure, layer-1
+      taxonomy, no meaning asserted. Structural containment, no PROV row,
+      dcterms:isPartOf family analog (the docs_chunk_part_of reasoning).
+      REGISTERED AT THE DRAFT to close a loader-without-vocabulary gap found
+      there: Q13's vendor-docs cypher ships this edge, while its structural
+      siblings (PART_OF, FIRST_CHUNK, NEXT_CHUNK) were all registered at the
+      bmc-docs-lexical-load gate — this one never was. The :DocSection label
+      is REUSED from the design-doc traceability family (single-classification
+      discipline, the :Document dedupe precedent); the vendor-TOC use is
+      recorded on its node classification.
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned
+
+  - id:           docs_subsection_of
+    neo4j_label:  SUBSECTION_OF
+    inverse_label: "has subsection"
+    role:         ~
+    from_node:    DocSection
+    to_node:      DocSection
+    prov_maps_to: ~
+    note: >
+      PLANNED (gate vendor-docs-entity-spine §E3, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). The publisher's TOC hierarchy: a section's
+      parent section, transcribed from toc.json — layer-1 taxonomy, no meaning
+      asserted. Structural hierarchy, no PROV row, dcterms:isPartOf family
+      analog. Same loader-without-vocabulary gap as docs_in_section (§E3):
+      shipped by Q13's cypher, never registered until this draft. One TOC
+      node (89881.htm#o90021) addresses a SECTION of another page by fragment
+      — a real navigation node, not a second document; the loader carries
+      page + anchor per row so the hierarchy is faithful without minting a
+      phantom :Document (the capture-manifest contract).
+    supplement:   ~
+    loader:       ~
+    domain:       docs
+    status:       planned

@@ -100,6 +100,15 @@ role scheme (K5 gate + K6 supplement; scope :Product / :AreaProduct only).
 | Document | Entity | Entity | prov:Entity⁹ |
 | Chunk | Entity | Entity | prov:Entity |
 
+## Vendor-docs entity spine (PROPOSED, gate `vendor-docs-entity-spine` drafted 2026-08-22 at Q14 — unsigned; nothing loads)
+
+| Node label | Source type | Target type | PROV-O / W3C type |
+|:---|:---|:---|:---|
+| ControlMUtility | Entity | Entity | dd:ControlMUtility (name-keyed; minted from bmc-docs-controlm-utilities page titles, deterministic — gate §A) |
+
+(:DocSection is REUSED for the vendor TOC tree — second use recorded on its
+classification, gate §E2; not a new label.)
+
 ## Doc graph — traceability spine (ACTIVE, gate `doc-traceability-feedback` signed off 2026-07-20; L7 / ADR 0006)
 
 | Node label | Source type | Target type | PROV-O / W3C type |

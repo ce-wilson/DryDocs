@@ -1432,7 +1432,13 @@
       },
       "taxonomy_path": "technology/orchestration/control-m",
       "taxonomy_captures": [],
-      "ontology_mappings": [],
+      "ontology_mappings": [
+        {
+          "id": "vendor-docs-entity-spine",
+          "status": "proposed",
+          "label": null
+        }
+      ],
       "loaders": [
         {
           "name": "vendor_docs.v1",

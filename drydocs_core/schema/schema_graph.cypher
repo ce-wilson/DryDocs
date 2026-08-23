@@ -83,6 +83,8 @@ MERGE (n:SchemaMeta:ExecutionHost {name: 'ExecutionHost'})
   SET n.class = 'prov:SoftwareAgent', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:ControlMHostGroup {name: 'ControlMHostGroup'})
   SET n.class = 'dd:ControlMHostGroup', n.prov_type = 'Collection';
+MERGE (n:SchemaMeta:ControlMUtility {name: 'ControlMUtility'})
+  SET n.class = 'dd:ControlMUtility', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DataAsset {name: 'DataAsset'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DataFlow {name: 'DataFlow'})
@@ -313,6 +315,10 @@ MERGE (a)-[r:WRITES_TO]->(b)
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:DELEGATES_TO]->(b)
   SET r.vocab_id = 'scheduler_delegates_to', r.prov_maps_to = 'prov:actedOnBehalfOf', r.domain = 'scheduler', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ControlMUtility'})
+MERGE (a)-[r:INVOKES]->(b)
+  SET r.vocab_id = 'scheduler_invokes_utility', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'planned';
 
 // ── domain: business_application ────────────────────────────────────────────
 
@@ -559,6 +565,26 @@ MERGE (a)-[r:EVIDENCED_BY]->(b)
 MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'Chunk'})
 MERGE (a)-[r:EVIDENCED_BY]->(b)
   SET r.vocab_id = 'docs_evidenced_by', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ControlMUtility'})
+MERGE (a)-[r:DESCRIBES]->(b)
+  SET r.vocab_id = 'docs_describes_utility', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ControlMUtility'}), (b:SchemaMeta {name: 'SoftwareProduct'})
+MERGE (a)-[r:PART_OF]->(b)
+  SET r.vocab_id = 'docs_utility_part_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'})
+MERGE (a)-[r:SEE_ALSO]->(a)
+  SET r.vocab_id = 'docs_see_also', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'DocSection'})
+MERGE (a)-[r:IN_SECTION]->(b)
+  SET r.vocab_id = 'docs_in_section', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DocSection'})
+MERGE (a)-[r:SUBSECTION_OF]->(a)
+  SET r.vocab_id = 'docs_subsection_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
 
 // ── domain: all ─────────────────────────────────────────────────────────────
 

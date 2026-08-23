@@ -1138,6 +1138,17 @@
       ],
       "log_ref": null,
       "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "vendor-docs-entity-spine (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/vendor-docs-entity-spine.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     }
   ]
 }

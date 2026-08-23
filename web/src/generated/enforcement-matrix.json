@@ -152,7 +152,7 @@
       ],
       "gate_ref": "HITL gate (docs/restructure/03-hitl-sme-flow.md)",
       "status": "gate-pending",
-      "pending_entries": 22,
+      "pending_entries": 24,
       "env_refs": [],
       "files": [
         "config/taxonomy-ontology-map/00-header.yaml",
@@ -181,7 +181,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 50,
+      "pending_entries": 56,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
@@ -360,7 +360,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 116,
+      "pending_entries": 120,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -409,6 +409,7 @@
         "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml",
         "config/gate-prompts/ui-write-surface.yaml",
+        "config/gate-prompts/vendor-docs-entity-spine.yaml",
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml",
         "config/gate-log.md"
       ],

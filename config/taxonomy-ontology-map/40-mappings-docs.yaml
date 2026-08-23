@@ -224,3 +224,61 @@
       purge is project/process-scoped, so an unassigned email is unpurgeable by scope and
       is surfaced by the report, never deleted by a default.
 
+  # ---- Q14: vendor-docs entity spine (2026-08-22 — gate DRAFTED, unsigned) ----
+  # The bmc-docs-controlm-utilities capture (1016 VERBATIM pages, 1017 TOC nodes,
+  # 9.0.20; confirmed: false, NEVER loaded on either machine). One entry per gate,
+  # edge_shapes per term — the L7 doc-traceability-feedback shape.
+
+  - id: vendor-docs-entity-spine
+    taxonomy:
+      source: "bmc-docs-controlm-utilities"
+      element: "Vendor page titles ARE exact utility names (exportdefjob, ctmorder, the emdef family: defjob/exportdefjob/updatedef/copydefjob/deldefjob/duplicatedefjob, each with rules/parameters/examples) — a name-addressable entity spine the publisher ships in toc.json, modeled as first-class nodes + aboutness/navigation/estate-join edges (backlog Q14; plan knowledge/upgrade-plans/vendor-docs-agent-navigation.md §3)"
+    ontology:
+      from_node: ControlMUtility            # dd:ControlMUtility (NEW class, proposed — gate §A; prov:Entity)
+      to_node: "SoftwareProduct | Document | DocSection | ControlMJob"
+      prov_type_from: Entity
+      prov_type_to: "Entity (SoftwareProduct/Document/DocSection) | Activity (ControlMJob)"
+      matrix_row: "several — one row per edge; see edge_shapes"
+      edge_shapes:
+        - edge: "Document -[:DESCRIBES]-> ControlMUtility"
+          matrix_row: "Entity -> Entity aboutness, no PROV row — REUSED label, new triple beside the ACTIVE Document -> SoftwareProduct (C8 discipline; gate §B)"
+          vocab_id: docs_describes_utility
+        - edge: "ControlMUtility -[:PART_OF]-> SoftwareProduct"
+          matrix_row: "structural containment, no PROV row (dcterms:isPartOf family) — THIRD triple of PART_OF (gate §A3)"
+          vocab_id: docs_utility_part_of
+        - edge: "Document -[:SEE_ALSO]-> Document"
+          matrix_row: "Entity -> Entity reference, no PROV row (rdfs:seeAlso analog, namespace declared) — vendor-asserted, basis REQUIRED (gate §C)"
+          vocab_id: docs_see_also
+        - edge: "Document -[:IN_SECTION]-> DocSection"
+          matrix_row: "structural containment, no PROV row — layer-1 TOC transcription; loader-without-vocabulary gap closed at the draft (gate §E3)"
+          vocab_id: docs_in_section
+        - edge: "DocSection -[:SUBSECTION_OF]-> DocSection"
+          matrix_row: "structural hierarchy, no PROV row — layer-1 TOC transcription; same §E3 gap"
+          vocab_id: docs_subsection_of
+        - edge: "ControlMJob -[:INVOKES]-> ControlMUtility"
+          matrix_row: "Activity -> Entity = prov:used — new triple beside the ACTIVE scheduler_invokes (Script | ETLProcess); the layer-3 estate join, formerly BLOCKED on G32, made legal-not-ruled by the fold (gate §D)"
+          vocab_id: scheduler_invokes_utility
+      node_classifications_added: [ControlMUtility]
+    precedence_authority: bmc-baseline
+    vocab_id: docs_describes_utility   # primary; all six in edge_shapes
+    status: proposed
+    proposed_at: 2026-08-22
+    gate_spec: config/gate-prompts/vendor-docs-entity-spine.yaml
+    note: >
+      DRAFTED, DECIDES NOTHING (the G27/W1/U11/N10 precedent) — every vocab entry
+      status: planned, the registry row stays confirmed: false, no loader writes.
+      TWO ACCEPTANCE PREMISES OVERTAKEN, recorded not re-done (the Q9 idiom):
+      (1) Q14's acceptance asks for evidence from the LOADED layer-1 spine, but
+      the spine cannot load until this gate's own §E signs (the registry's
+      doc-graph gate — G32 Q6 names it unsigned; no other item owns it) —
+      evidence is capture-grain (registry-transcribed counts/titles) plus the
+      live sibling corpus, venue-tagged (laptop, neo4jtest, drydocs DB,
+      2026-08-22, J18: 27 DESCRIBES -> controlm, zero utilities-spine nodes,
+      17/17 sample jobs with cmd_line and zero utility invocations).
+      (2) the layer-3 join was to be recorded BLOCKED on G32; G32 SIGNED
+      2026-08-18 and the G102 fold executed — 'the fold made the write legal,
+      not ruled', and §D rules it. Sign-off is a separate SME session; §E4:
+      signing authorizes the confirmed flip, the flip itself is a groomed
+      follow-up (flips-are-follow-ups), first load on the machine holding the
+      capture (desktop data root).
+

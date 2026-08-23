@@ -141,6 +141,26 @@ node_classifications:
       (ControlMJob.group_name) is the application-group concept — a different
       thing entirely; "host group" is the 9.0.x vendor term.
 
+  - label:      ControlMUtility
+    class:      "dd:ControlMUtility"
+    prov_type:  Entity
+    note: >
+      PROPOSED (gate vendor-docs-entity-spine §A, drafted 2026-08-22 at Q14 —
+      unsigned; nothing loads). A Control-M command-line utility the vendor
+      documents by exact name (exportdefjob, ctmorder, the emdef family) —
+      the name-addressable entry point of the vendor-docs entity spine, minted
+      deterministically from the bmc-docs-controlm-utilities page titles,
+      never by an LLM. prov:Entity: jobs USE it (scheduler_invokes_utility,
+      Activity -> Entity = prov:used); documents DESCRIBE it
+      (docs_describes_utility). Uniqueness key: name (the vendor-canonical
+      string); carries family + kind where the title rule derives them,
+      unclassified counts reported. Vendor-prefixed label per ADR 0003/0008
+      (the ControlMJob/ControlMFolder/ControlMServer family). Deliberately NOT
+      a :SoftwareProduct row — the registry classifies what a vendor SHIPS as
+      a governed, hand-curated product entry; the gate §A2 lays that
+      alternative out for explicit rejection. Bridge to the product:
+      docs_utility_part_of (PART_OF -> SoftwareProduct {controlm}).
+
   - label:      DataSource
     class:      "dcat:Dataset"
     prov_type:  Entity
@@ -594,6 +614,12 @@ node_classifications:
       from :Chunk (ingested/H2-chunked) per the managed-vs-ingested boundary. DocSection
       is the shared target of both traceability (Requirement -[:SPECIFIED_IN]->) and
       review feedback (FeedbackNote -[:ANNOTATES]->).
+      SECOND USE (gate vendor-docs-entity-spine §E2, drafted 2026-08-22 at
+      Q14, unsigned): the vendor-docs TOC tree — Q13's loader writes
+      :DocSection nodes from the publisher's toc.json (capture-scoped
+      section_id, docs_in_section / docs_subsection_of, both planned). Same
+      single-classification discipline as :Document's dedupe (2026-07-09):
+      one label, the second use recorded here, gate-bound until §E signs.
 
   - label:      Requirement
     class:      "dd:Requirement"

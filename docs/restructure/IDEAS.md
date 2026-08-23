@@ -93,6 +93,19 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-157`** · 2026-08-22 · `[bug]` · **open** · prio? **Med** —
+  **The 28 live Documents carry NO corpus_id — G32 §A's blast-radius story leans on a property
+  the pre-fold loads never wrote.** Found at the Q14 evidence pass (laptop, `neo4jtest`,
+  `drydocs` DB — J18): `MATCH (d:Document) RETURN d.corpus_id, count(*)` → all 28 rows
+  (27 bmc-docs + 1 essential-graphrag) group under `corpus_id: null`. G32 §A ruled that
+  load-separation and blast-radius in the one database "are satisfied by corpus_id scoping",
+  and `docs-verify`'s graph_locator matches on `corpus_id` — but only the Q13 vendor-docs
+  loader stamps it; `bmc_docs.cypher`'s R3 reload evidently does not (or the laptop's reload
+  predates the stamp). Either the bmc-docs/essential-graphrag loaders gain the corpus_id
+  stamp + a backfill, or the fold's scoping claim is narrower than the gate-log reads.
+  Not chased inside Q14 (drydocs-load layer, not ontology). Sibling context: [[Idea-154]]'s
+  venue discipline is why the machine is named.
+
 - **`Idea-156`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
   **The snapshot CI check can never see a branch, and the verdict still has no tests.** Filed on
   `feat/ui-workstream` as its Idea-152 and re-filed here at 156 because both 151 and 152 were
