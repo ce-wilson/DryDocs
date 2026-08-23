@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-22T22:35:39",
+    "captured_at": "2026-08-22T23:00:27",
     "date": "20260822",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5e28e11b",
-      "full": "5e28e11b4b2680f77710527d63d2c62ff24825fc",
+      "commit": "72a60da3",
+      "full": "72a60da3029338dc5bff06f129853eaf694e142a",
       "branch": "main",
-      "describe": "port-base-20260820-139-g5e28e11b",
-      "subject": "docs(style): sweep \"spine\" from IDEAS.md prose — 8 swaps to \"backbone\", 2 deliberate survivors",
-      "dirty": true,
+      "describe": "port-base-20260820-142-g72a60da3",
+      "subject": "style(review): ruff-format graph_review.py — the backbone swap pushed one comment over the line limit (CI ruff-format gate)",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -19322,10 +19322,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260822.json",
-      "name": "drydocs-20260822.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260822-2235.json",
+      "name": "drydocs-20260822-2235.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260822.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260822-2235.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20834,10 +20834,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/tests/unit/test_business_key_spine.py",
-      "name": "test_business_key_spine.py",
+      "file_id": "drydocs/tests/unit/test_business_key_backbone.py",
+      "name": "test_business_key_backbone.py",
       "extension": ".py",
-      "rel_path": "tests/unit/test_business_key_spine.py",
+      "rel_path": "tests/unit/test_business_key_backbone.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39037,7 +39037,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260822.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260822-2235.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -39812,7 +39812,7 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
-      "drydocs/tests/unit/test_business_key_spine.py"
+      "drydocs/tests/unit/test_business_key_backbone.py"
     ],
     [
       "drydocs/tests/unit",
