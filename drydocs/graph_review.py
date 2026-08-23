@@ -46,7 +46,9 @@ def _ordered_labels(rows_by_label: Mapping[str, Any], review_labels: Any | None)
     if review_labels is None:
         return list(rows_by_label)
     backbone = [lbl for lbl in review_labels.all_labels() if lbl in rows_by_label]
-    extra = [lbl for lbl in rows_by_label if lbl not in backbone]  # present in rows, not in backbone
+    extra = [
+        lbl for lbl in rows_by_label if lbl not in backbone
+    ]  # present in rows, not in backbone
     return backbone + extra
 
 
