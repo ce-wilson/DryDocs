@@ -93,6 +93,32 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-158`** · 2026-08-23 · `[bug]` · **open** · prio? **Med** —
+  **`snapshot.ps1`'s board refresh half-failed and reported a traceback with no traceback in it.**
+  At this session's close the ritual printed
+  `WARNING: board refresh skipped: Traceback (most recent call last):` and nothing more, after
+  writing only three of `render_board.py`'s nine outputs (board.html, gates.json,
+  enforcement-matrix.json — then stopping before load-map, software-registry, context-types,
+  remediation-diff, ideas.html and roadmap.html). Run directly in the same tree seconds later the
+  same script completed all nine. **Two separable defects.**
+  **(1) The message is useless by construction.** The catch block
+  (`knowledge/depgraph-snapshots/snapshot.ps1:97`) prints `$_.Exception.Message`, which for a
+  failing NATIVE command is the first line of stderr — and the first line of a Python failure is
+  always the literal `Traceback (most recent call last):`. So the warning can never name a cause:
+  it reports the banner and discards the exception. Capture the command's full stderr and print
+  the LAST line (the exception type and message) or the whole block.
+  **(2) The refresh is "best-effort" and a PARTIAL run is indistinguishable from a skipped one.**
+  The step is wrapped so it never blocks the snapshot, which is right, but a half-written render
+  set is worse than none: the surfaces it did write are current and the six it did not are stale,
+  and the stale-render `git diff --quiet` check in the ritual runs against whatever it produced.
+  Nothing says which outputs landed. This is the Idea-111 shape again — an instrument whose
+  failure mode is silence, inside the ritual step added to stop exactly that.
+  **Root cause on this machine, for the reproduction:** the Claude Code shell pre-sets
+  `VIRTUAL_ENV` to `agents\.venv`, and `poetry run` inside the script inherits it, so the import
+  resolves against the wrong environment partway through. A user's own terminal is unaffected,
+  which is why this has never been seen interactively — and is a second reason the message needs
+  to name the cause rather than the banner. Mechanism-only, no gate.
+
 - **`Idea-154`** · 2026-08-21 · `[bug]` · **open — partially groomed → J52 (2026-08-22, the consequence half: the verify skill gains the session-launched-browser rule + recipe); the two-browser diagnostic that would prove the mechanism needs both machines in hand and stays the user's step** · prio? **Med** —
   **The Claude-in-Chrome extension browser is not trustworthy for console verification on the
   laptop: it served a NON-laptop DryDocs root at localhost:5173 while claiming `isLocal: true`.**
