@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/cli.py
@@ -19,3 +19,18 @@ acceptance: |
   G59 built exactly this guard for SUPPLEMENTS -- unchained_supplement_files() fails when a supplement exists on disk but is absent from the chain. There is NO equivalent for LOADERS, which is why pat_team_roles and area_products sit in LOADER_REGISTRY, reachable by name, belonging to no sequence, with nothing turning red. (a) A guard fails when a loader is registered but appears in no chain and no profile, NAMING the loader rather than reporting a count -- the G59 shape. A deliberate exclusion stays expressible and carries a WRITTEN REASON, the SCHEDULED_INGEST_EXCLUSIONS idiom. (b) The same two facts become defect classes in web/src/generated/load-map.json, beside the sourceless_loaders and map_entries_without_registry_source lists it already carries: unchained loaders, and steps whose declared input is absent (G78's other half). O57 already renders that JSON's defect lists rather than dropping them, so this is what makes the console page an honest inventory instead of a tidy one. (c) Portable: the guard must hold in a consumer repo whose chains legitimately differ -- the company chain carries sub_lobs where the producer carries pat_product_mapping, so a guard that hardcodes producer membership fails there for being right.
 notes: |
   Raised 2026-08-11 (desktop). Dependency-free deliberately: the guard is worth having BEFORE G79 moves loaders between chains, because that is exactly when one goes missing. Same family as G59 and as J47 (no guard asserts a PORT-MANIFEST path exists) -- three instances now of "a thing is declared, nothing checks it is reachable".
+  DONE 2026-08-23 (laptop). (a) cli.unchained_loaders() + UNCHAINED_LOADER_EXCLUSIONS (the G59
+  shape, computed in the module so a consumer repo guards its OWN chains): a LOADER_REGISTRY loader
+  in no COMMAND_LOADERS chain fails tests/unit/test_load_map_declarations.py BY NAME unless excused
+  in writing. area_products and pat_team_roles are the two written exclusions, both parked on
+  G79 (b) per that item's own clause; the hygiene test makes an exclusion that becomes chained
+  CONTRADICTORY, so G79 must delete them when it wires the orphans. (b) load-map.json (+ the N5 HTML
+  and the O57 console defects tab, DEFECT_COUNT included) gains unchained_loaders (reason-or-null)
+  and steps_with_uncommitted_inputs — the G78 other half at the map grain: chain-declared files that
+  are not repo content. The generated SEAL fixtures are declared PRESENCE-INDEPENDENT
+  (cli.GENERATED_SAMPLE_FILES, keys derived from drydocs.seal_samples) so the committed render
+  cannot flap between a machine that has built them and one that has not; paths are repo-relative
+  for the same reason. (c) The firing test uses a synthetic orphan injected into the registry, never
+  a pinned producer membership. The pre-existing console guard
+  (tests/unit/test_load_map_console.py) caught the two new JSON keys exactly as designed and now
+  routes them. Suite 2332 passed; web tsc build green.
