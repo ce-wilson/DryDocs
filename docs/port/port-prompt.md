@@ -23,6 +23,13 @@ repair). Company-side at completion:
    `docs/restructure/backlog.yaml` carries no `items` key, so a check aimed there
    would compare two empty sets and pass for being wrong. UNION half only; status
    regression stays with the J16 reconcile guard.
+   **BASIS — this sub-step applies only to a range that CONTAINS the script.**
+   `scripts/port_backlog_union.py` lands at `35e6d103`, which is AFTER
+   `port-base-20260820`: a session applying `7c18ff4b..port-base-20260820` does not
+   have it and must not be held up looking for it. For that one port the shard
+   sequence's own **`PROOF OK`** (hand-prompt step 3) is the item-integrity check —
+   quote that line in the PORT-REPORT where the union block would go. Hand-carrying
+   the script is not a substitute: the backlog tree is each side's own output.
 2. Update **Last completed port** here with the FOUR REQUIRED FIELDS — none may be
    omitted or deferred: (a) the applied RANGE (`<base>..<head>`, with `rev-list
    --count`); (b) the PORT COMMIT(s) on the port branch; (c) the BACKUP TAG and the
@@ -35,8 +42,11 @@ Producer-side at the next session: verify the roll against `git log
 <last-ported-head>..HEAD` COMMIT-BY-COMMIT (the roll-procedure rule below), never by
 eyeballing back from the newest entry.
 
-**RELAY — G81 (2026-08-24): two things change for the company on the next port,
-and one of them is about the machine that had the incident.**
+**RELAY — G81 (2026-08-24) [VERIFIED-PRODUCER]. BASIS: this rides the range AFTER
+`port-base-20260820` — G81 lands at `fcf973b5`, so it is NOT in the
+`7c18ff4b..port-base-20260820` port the backlog-shard hand prompt carries. Do not go
+looking for either change in that range. Two things change for the company when the
+range after it ports, and one of them is about the machine that had the incident.**
 
 1. **`DRYDOCS_DATA_ROOT` is now MANDATORY — there is no `~/data/DryDocs` default.**
    The first data-path command after the port (`landing-zones`, a `--source` chain
