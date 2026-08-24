@@ -58,7 +58,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # Classified load, not review: the item chose drydocs-load because the verb sits
     # beside m1-verify/m3-verify and must work BEFORE the docmeta component exists
     # (Q6). RE-HOME it to docmeta if that component takes over corpus state.
-    # drydocs.seal_samples = generates the two SEAL fixtures REFRESH_REFERENCE_CHAIN
+    # drydocs.seal_samples = generates the two SEAL fixtures the business-application chain
     # declares (drydocs/data/ is gitignored, so they are built per machine, never
     # committed). Load, same bucket as staging: it produces loader INPUT and its
     # output filenames are the chain's own constants.
@@ -82,7 +82,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.docs_verify",
         "drydocs.seal_samples",
         # drydocs.pat_projection = projects the raw PAT team report into the two
-        # files REFRESH_REFERENCE_CHAIN reads (G82). Load, same bucket and same
+        # files the team chain reads (G82). Load, same bucket and same
         # reason as seal_samples: loader INPUT, output filenames are the chain's.
         "drydocs.pat_projection",
         # drydocs.chain_inputs = the G78 chain-input resolver (fixture dir or declared

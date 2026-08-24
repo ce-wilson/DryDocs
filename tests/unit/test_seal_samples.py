@@ -143,11 +143,12 @@ def test_a_capture_outside_the_reserved_block_is_refused(tmp_path: Path) -> None
 
 
 def test_write_samples_emits_both_files_with_the_declared_headers(tmp_path: Path) -> None:
-    """The chain names both filenames (``REFRESH_REFERENCE_CHAIN``); a rename here
-    would silently reinstate the skip the generator exists to end."""
-    from drydocs.cli import REFRESH_REFERENCE_CHAIN
+    """A subject chain names both filenames (``cli.CHAINS``, the business-application
+    chain since the G79 split); a rename here would silently reinstate the skip the
+    generator exists to end."""
+    from drydocs.cli import chain_steps
 
-    declared = {sample for _, _, sample in REFRESH_REFERENCE_CHAIN}
+    declared = {sample for _, _, sample in chain_steps()}
     written = write_samples(out_dir=tmp_path)
     for path, header in zip(written, (APPLICATION_HEADER, CONTACT_HEADER), strict=True):
         assert path.name in declared, f"{path.name} is not declared in the refresh chain"

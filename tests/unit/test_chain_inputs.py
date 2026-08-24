@@ -40,7 +40,7 @@ runner = CliRunner()
 
 
 def _chain() -> list[ChainStep]:
-    return [ChainStep(nm, cls, fixture) for nm, cls, fixture in cli_mod.REFRESH_REFERENCE_CHAIN]
+    return [ChainStep(nm, cls, fixture) for nm, cls, fixture in cli_mod.chain_steps()]
 
 
 # -- (b) no default, two explicit modes ----------------------------------------
@@ -71,7 +71,7 @@ def test_unknown_source_is_refused_and_the_declared_zones_are_named() -> None:
 def test_missing_fixture_fails_naming_file_and_directory(tmp_path: Path) -> None:
     """A fixture directory with everything EXCEPT the two generated SEAL files —
     exactly the producer-side state the item reproduced."""
-    for _, _, fixture in cli_mod.REFRESH_REFERENCE_CHAIN:
+    for _, _, fixture in cli_mod.chain_steps():
         if not fixture.startswith("seal_"):
             (tmp_path / fixture).write_text("h\n", encoding="utf-8")
     with pytest.raises(MissingChainInputError) as info:
@@ -125,11 +125,15 @@ def test_source_mode_reads_the_declared_zone_and_reports_unselected_steps(
     zone = tmp_path / "pat"  # pat:people-report's declared drop_dir
     zone.mkdir()
     (zone / "pat_product_mapping.csv").write_text("h\n", encoding="utf-8")
+    # pat_team_roles binds to the SAME source and joined a chain at G79, so
+    # selecting people-report now selects both of its steps — the wiring is
+    # visible here rather than only in the registry.
+    (zone / "pat_team_roles.csv").write_text("h\n", encoding="utf-8")
     plan = resolve_chain_inputs(
         _chain(), samples_dir=None, sources=["pat:people-report"], registry=REGISTRY
     )
     loaded = {i.step.name: i for i in plan.inputs}
-    assert set(loaded) == {"pat_product_mapping"}
+    assert set(loaded) == {"pat_product_mapping", "pat_team_roles"}
     assert loaded["pat_product_mapping"].mode == SOURCE
     assert loaded["pat_product_mapping"].source_id == "pat:people-report"
     assert loaded["pat_product_mapping"].path == zone / "pat_product_mapping.csv"
@@ -189,4 +193,4 @@ def test_business_segments_is_the_one_step_with_no_file_and_says_so() -> None:
     the chain's only input-less step, which is why it runs before the resolved
     plan rather than being a ChainStep. Imported here so the rider holds."""
     assert callable(business_segments.refresh_business_segments)
-    assert all(nm != "business_segments" for nm, _, _ in cli_mod.REFRESH_REFERENCE_CHAIN)
+    assert all(nm != "business_segments" for nm, _, _ in cli_mod.chain_steps())

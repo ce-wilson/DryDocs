@@ -41,10 +41,14 @@
 >
 > The ruling: the script's shorter list is **deliberate**. A scheduled Control-M ingest is
 > not a full refresh, and the four steps it skips each have a reason now recorded in code
-> (`cli.SCHEDULED_INGEST_EXCLUSIONS`) — `refresh-reference` is a weekly chain on a
-> different cadence, `load-software-registry` and `load-bmc-docs` are repo-triggered
-> corpora that change when the repo does rather than when the estate does, and
-> `docs-verify` would fail that path by design, since it loads no doc corpora.
+> (`cli.SCHEDULED_INGEST_EXCLUSIONS`) or, since G79, DERIVED from the source's own
+> declared `cadence` — the three reference commands (`refresh-catalog`,
+> `refresh-applications`, `refresh-teams`) are `cadence: weekly` feeds on a different
+> rhythm from the batch estate, `load-software-registry` and `load-bmc-docs` are
+> repo-triggered corpora that change when the repo does rather than when the estate
+> does, and `docs-verify` would fail that path by design, since it loads no doc
+> corpora. The cadence-derived omissions need no prose entry: the registry field is
+> the reason, and it is one a reader can check.
 >
 > Appendix B's omission was **not** deliberate: `docs-verify` is a standing step and a cold
 > start is exactly when the doc corpora get loaded, so it is now the last line of the
@@ -264,7 +268,9 @@ samples; the Oracle variant is the same chain with scope binds.
 
 1. **Reference data (M1 chain):**
    ```powershell
-   poetry run drydocs refresh-reference           # catalog + SEAL + dev teams (+ snapshots)
+   poetry run drydocs refresh-catalog             # LOBs -> product lines -> products (+ snapshots)
+   poetry run drydocs refresh-applications        # SEAL applications + contacts (+ snapshots)
+   poetry run drydocs refresh-teams               # dev teams, team roles, team<->app alignment
    ```
 2. **Control-M (M3 chain):**
    ```powershell
@@ -410,7 +416,9 @@ poetry run drydocs check
 poetry run drydocs bootstrap
 poetry run drydocs bootstrap-schema-graph
 poetry run drydocs apply-supplements
-poetry run drydocs refresh-reference
+poetry run drydocs refresh-catalog
+poetry run drydocs refresh-applications
+poetry run drydocs refresh-teams
 poetry run drydocs ingest-controlm
 poetry run drydocs load-software-registry
 poetry run drydocs load-bmc-docs

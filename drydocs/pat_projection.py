@@ -12,7 +12,7 @@ real file can reach it, so "built and tested" and "never run" were both true at
 once. ``locator.mapping: ~`` on ``pat:people-report`` was the fingerprint.
 
 WHAT THIS DOES. One raw CSV in, two CSVs out, named exactly as
-``REFRESH_REFERENCE_CHAIN`` expects (``dev_teams__sample.csv`` and
+the team chain expects (``dev_teams__sample.csv`` and
 ``pat_product_mapping__sample.csv``) so the existing command runs them unchanged::
 
     poetry run python scripts/project_pat_team_report.py <raw.csv> --out-dir <dir>
@@ -58,7 +58,8 @@ from pathlib import Path
 
 import yaml
 
-#: The two files REFRESH_REFERENCE_CHAIN reads, by name — keep in lock-step with
+#: The two files the TEAM chain reads (cli.CHAINS['refresh-teams'] since the G79
+#: split), by name — keep in lock-step with
 #: drydocs/cli.py. The ``__sample`` suffix is the chain's naming convention, not
 #: a claim that the content is synthetic: ``--samples-dir`` is simply "the
 #: directory the chain reads", and the projection writes there.

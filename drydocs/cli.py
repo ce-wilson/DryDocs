@@ -231,22 +231,87 @@ SOURCELESS_LOADERS: dict[type, str] = {
     ),
 }
 
-# The M1 reference-refresh chain (weekly cadence): (cli name, loader class,
-# bundled sample filename). Order matters — hierarchy parents before children,
-# SEAL apps before contacts, mapping last.
-REFRESH_REFERENCE_CHAIN: tuple[tuple[str, type, str], ...] = (
+# ---- G79: the reference chains, ONE SUBJECT EACH -----------------------------
+# Until 2026-08-23 these seven loaders were a single `refresh-reference` tuple
+# spanning THREE unrelated sources with three different refresh rhythms. That
+# bundle had no organising principle, which is precisely why a loader could fall
+# out of it and nothing noticed (G78's dropped dev_teams; G80's two orphans).
+# Each command now covers ONE SUBJECT, and the subject — not the chain's
+# accidental order — is what decides membership. Two subjects may legitimately
+# draw on one source system (dev teams and the product catalog both come from
+# PAT); what must not happen is the reverse, one command spanning three sources,
+# because then nothing can say whether the command is complete.
+#
+# Shape is unchanged: (cli name, loader class, bundled sample filename).
+
+# Subject: the product catalog hierarchy (LOB -> product line -> product).
+# Order matters — hierarchy parents before children.
+CATALOG_CHAIN: tuple[tuple[str, type, str], ...] = (
     ("catalog_lobs", CatalogLOBsLoader, "catalog_lobs__sample.csv"),
     ("product_lines", ProductLinesLoader, "product_lines__sample.csv"),
     ("products", ProductsLoader, "products__sample.csv"),
+)
+
+# Subject: business applications and the people attributed to them.
+# SEAL apps before contacts — a contact MATCHes the application it hangs off.
+BUSINESS_APPLICATION_CHAIN: tuple[tuple[str, type, str], ...] = (
     (
         "seal_applications",
         seal_apps_mod.SealApplicationsLoader,
         "seal_application_data__sample.csv",
     ),
     ("seal_contacts", seal_contacts_mod.SealContactsLoader, "seal_contact_data__sample.csv"),
+)
+
+# Subject: the delivery organisation — teams, the people in them, and the
+# team<->application alignment. pat_product_mapping sits HERE and not with the
+# catalog: its subject is which team is aligned to which application, which is an
+# org fact that happens to cite product ids. Mapping stays last, as it always was.
+# pat_team_roles JOINS THE CHAIN HERE (G79 (b)) — gate-confirmed at C9 on
+# 2026-07-18, carrying a loader class and cypher, and yet reachable only as
+# `drydocs load pat_team_roles`, so no operator path had ever run it.
+TEAM_CHAIN: tuple[tuple[str, type, str], ...] = (
     ("dev_teams", DevTeamsLoader, "dev_teams__sample.csv"),
+    ("pat_team_roles", PatTeamRolesLoader, "pat_team_roles__sample.csv"),
     ("pat_product_mapping", PatProductMappingLoader, "pat_product_mapping__sample.csv"),
 )
+
+#: command -> the ordered chain it runs. THE registry: every enumeration of "the
+#: sequenced CSV chains" derives from this one mapping — COMMAND_LOADERS below,
+#: the load-map render's declared-input walk, and the guards that check chain
+#: bindings and bundled fixtures. Splitting a chain again is an edit HERE and
+#: nowhere else, which is the property the single-tuple version did not have.
+CHAINS: dict[str, tuple[tuple[str, type, str], ...]] = {
+    "refresh-catalog": CATALOG_CHAIN,
+    "refresh-applications": BUSINESS_APPLICATION_CHAIN,
+    "refresh-teams": TEAM_CHAIN,
+}
+
+
+def chain_steps() -> tuple[tuple[str, type, str], ...]:
+    """Every (name, loader, fixture) triple of every subject chain, in order."""
+    return tuple(step for chain in CHAINS.values() for step in chain)
+
+
+# ---- G79 (e): the one load-order invariant the split must not lose -----------
+#: Loaders that can MINT a :BusinessApplication. seal_applications must run
+#: BEFORE any of them, because SEAL is the authority for application identity and
+#: anything else reaching an application node first would decide that identity by
+#: accident of order. The producer satisfied this only as a POSITION IN A TUPLE,
+#: which is exactly the kind of accident a split loses; now it is a DECLARATION
+#: with a guard (tests/unit/test_load_map_declarations.py), so the next reorder
+#: fails loudly instead of silently.
+#:
+#: Producer-side this is currently satisfied twice over: pat_product_mapping's
+#: cypher MERGEs on the SAME neutral app_id key seal_applications uses, so there
+#: is no stub and no second node. The COMPANY is not so lucky — its
+#: pat_app_links.cypher still MERGEs on the pre-S3 seal_id with is_stub=true and
+#: collides on the subsequent SET (SME hit it live 2026-08-11, RELAY-8) — which
+#: is why the invariant is written down here rather than left to hold by luck.
+BUSINESS_APPLICATION_MINTERS: frozenset[type] = frozenset({PatProductMappingLoader})
+
+#: The loader that is the AUTHORITY for application identity.
+APPLICATION_IDENTITY_LOADER: type = seal_apps_mod.SealApplicationsLoader
 
 # The M3 ingest-controlm stages: (cli name, loader class, sample csv, sql file).
 # Order is enforced — jobs MATCH their parent folder; conditions MATCH their
@@ -300,7 +365,11 @@ DOC_TRACEABILITY_CHAIN: tuple[tuple[type, type, str], ...] = (
 # (2) Command -> the loaders it runs, in order. Derived from the chain
 # constants above wherever a chain exists, so declaration == behavior.
 COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
-    "refresh-reference": tuple(cls for _, cls, _ in REFRESH_REFERENCE_CHAIN),
+    **{cmd: tuple(cls for _, cls, _ in chain) for cmd, chain in CHAINS.items()},
+    # The deprecated alias runs the union of all three, in sequence order (S8's
+    # m1-verify -> verify-reference precedent: an alias is a real command that
+    # delegates, never a second implementation).
+    "refresh-reference": tuple(cls for _, cls, _ in chain_steps()),
     "ingest-controlm": tuple(
         cls for _, cls, *_ in CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
     ),
@@ -320,7 +389,12 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
 # Loader-running commands that are OPERATOR-DRIVEN, not sequence members:
 # `load` runs any single LOADER_REGISTRY loader ad hoc; manual mappings load
 # when an SME authors one (manifest-gated), not on a refresh cadence.
-AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
+# `refresh-reference` joins them at G79: it is now a DEPRECATED ALIAS that
+# delegates to the three subject commands, so it runs loaders but is not itself a
+# sequence member — the three steps it delegates to are. Declaring it here is what
+# keeps "every loader-running command is placed" true without putting a fourth,
+# redundant step in the canonical sequence.
+AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings", "refresh-reference"})
 
 # ---- G80: no loader is silently outside every chain -------------------------
 # A LOADER_REGISTRY loader that no COMMAND_LOADERS command runs is reachable
@@ -334,16 +408,14 @@ AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
 # the omission is a decision on record rather than silence.
 UNCHAINED_LOADER_EXCLUSIONS: dict[str, str] = {
     "area_products": (
-        "nothing to chain yet: the bundled extract records area_products: 0 "
-        "against the standing area-product-missing open question "
-        "(config/taxonomy/lob-product-team.yaml) — G79 (b) wires or retires it "
-        "when the refresh chain splits by subject"
-    ),
-    "pat_team_roles": (
-        "gate-confirmed (C9, 2026-07-18) with loader class and cypher, but no "
-        "operator path has ever run it and no cadence was ever ruled — G79 (b) "
-        "owns wiring it into the organisation-tier subject command; recorded "
-        "here so the gap is a decision on record, not drift"
+        "there is nothing to load: the catalog capture records `area_products: 0` "
+        "against the standing `area-product-missing` open question "
+        "(config/taxonomy/lob-product-team.yaml), so this is a real source grain "
+        "we do not yet receive rows for. Wiring an empty step into refresh-catalog "
+        "would make every run report a step that loads nothing, which reads as a "
+        "broken load rather than an absent feed. G79 (b) considered it and left it "
+        "out on that basis; revisit when the open question closes and the extract "
+        "carries area-product rows"
     ),
 }
 
@@ -411,12 +483,102 @@ class LoadStep(NamedTuple):
     A NamedTuple, not a bare 3-tuple, because N6 widened it: unpacking sites
     that assumed ``for command, mode, note in ...`` now fail loudly at import
     rather than silently binding ``note`` to a set of profile names.
+
+    ``profiles`` is either a declared set or :data:`DERIVED` (G79 (c)). DERIVED
+    means the answer is computed from the CADENCE of the sources this step's
+    loaders read — there is no literal to maintain and therefore none to drift.
+    Resolve it with :func:`step_profiles`, never by reading the field.
     """
 
     command: str
     mode: str
-    profiles: frozenset[str]
+    profiles: frozenset[str] | None
     note: str
+
+
+#: Sentinel for :attr:`LoadStep.profiles`: this step's operator surfaces are
+#: DERIVED from its sources' declared cadence, not written down here. G79 (c) —
+#: "the source dictates how often it refreshes" is now true in code rather than
+#: true in a comment.
+DERIVED: None = None
+
+#: cadence (config/source-registry.yaml) -> the operator surfaces that run it.
+#: THE mapping, and the only place a rhythm becomes a surface. Adding a cadence
+#: value means adding a row here, which is the point: an unmapped cadence fails
+#: loudly rather than quietly running nowhere.
+CADENCE_PROFILES: dict[str, frozenset[str]] = {
+    # A slow reference feed. Not on the batch path: re-loading the catalog and
+    # SEAL feeds every ingest would re-read unchanged sources many times a week.
+    "weekly": frozenset({"cold-start"}),
+    # Moves with the Control-M estate, so every scheduled ingest wants it.
+    "batch": frozenset({"cold-start", "scheduled-ingest"}),
+    # Changes when the REPO changes, never when a data source does — so it rides
+    # a rebuild (cold start), not the batch schedule.
+    "repo-change": frozenset({"cold-start"}),
+}
+
+
+class CadenceDerivationError(RuntimeError):
+    """A DERIVED step whose cadence cannot be resolved — never a silent empty set."""
+
+
+def step_sources(command: str) -> tuple[str, ...]:
+    """The source-registry ids this command's loaders declare, sorted."""
+    return tuple(
+        sorted({cls.source_id for cls in COMMAND_LOADERS.get(command, ()) if cls.source_id})
+    )
+
+
+def step_profiles(step: LoadStep, registry: SourceRegistry | None = None) -> frozenset[str]:
+    """The operator surfaces that run *step* — declared, or derived from cadence.
+
+    A DERIVED step reads every source its loaders declare and maps the common
+    cadence through :data:`CADENCE_PROFILES`. THE DIVERGENCE RULE, and it is
+    deliberately strict: if a command's sources disagree about cadence there is
+    no honest answer, so this RAISES rather than picking one. That is a ruling
+    the SME owes, surfaced the moment it first matters — which is exactly what
+    the old hand-assigned tuple could never do, because a tuple is equally happy
+    describing a command whose sources agree and one whose sources do not.
+    """
+    if step.profiles is not None:
+        return step.profiles
+    reg = registry if registry is not None else _source_registry()
+    sources = step_sources(step.command)
+    if not sources:
+        raise CadenceDerivationError(
+            f"step {step.command!r} is DERIVED but runs no source-declaring loader — "
+            "a step with no source has no cadence to read; declare its profiles."
+        )
+    cadences = {}
+    for sid in sources:
+        try:
+            cadences[sid] = reg.get(sid).cadence
+        except Exception as exc:  # unknown id is a registry defect, not a profile answer
+            raise CadenceDerivationError(f"step {step.command!r}: source {sid!r}: {exc}") from exc
+    missing = sorted(sid for sid, cad in cadences.items() if not cad)
+    if missing:
+        raise CadenceDerivationError(
+            f"step {step.command!r} is DERIVED but source(s) {missing} declare no "
+            "cadence — add `cadence:` to the registry row, or declare the step's "
+            "profiles explicitly."
+        )
+    distinct = set(cadences.values())
+    if len(distinct) > 1:
+        detail = ", ".join(f"{sid}={cad}" for sid, cad in sorted(cadences.items()))
+        raise CadenceDerivationError(
+            f"step {step.command!r} spans sources with DIFFERENT cadences ({detail}). "
+            "A command covering one subject may read several sources, but they must "
+            "share a rhythm — otherwise which surface runs it has no honest answer. "
+            "Split the command, or rule the cadences into agreement (G79 (c))."
+        )
+    cadence = distinct.pop()
+    try:
+        return CADENCE_PROFILES[cadence]
+    except KeyError as exc:
+        raise CadenceDerivationError(
+            f"step {step.command!r}: cadence {cadence!r} is not in CADENCE_PROFILES — "
+            f"declared values: {sorted(CADENCE_PROFILES)}"
+        ) from exc
 
 
 #: The operator surfaces that RUN a filtered view of the sequence. Adding one
@@ -440,14 +602,14 @@ LOAD_PROFILES: dict[str, str] = {
 #: steps from ingest.sh was indistinguishable from someone forgetting them.
 #: (`optional`/`gated` steps need no entry — not running them is what those
 #: modes already mean.) Guarded by tests/unit/test_load_sequence_surfaces.py.
+#:
+#: SHRANK AT G79, and the reason matters: a step whose profiles are DERIVED owes
+#: nothing here, because its source's declared `cadence` IS the written reason —
+#: and a better one, since a reader can check it against the registry instead of
+#: taking a sentence on trust. The old `refresh-reference` entry said in prose
+#: exactly what `cadence: weekly` now says in data. What is left are the
+#: omissions cadence cannot explain, which are the SEMANTIC ones.
 SCHEDULED_INGEST_EXCLUSIONS: dict[str, str] = {
-    "refresh-reference": (
-        "different cadence, declared on the command itself: the M1 reference "
-        "chain is WEEKLY (REFRESH_REFERENCE_CHAIN's own comment, and the "
-        "command's help text) while Control-M ingestion runs on the batch "
-        "schedule. Running it every ingest would re-load the catalog/SEAL feeds "
-        "many times a week for no source change"
-    ),
     "load-software-registry": (
         "repo-triggered, not estate-triggered: the registry is loaded from "
         "config/taxonomy/software-registry.yaml, so it changes when the REPO "
@@ -490,7 +652,28 @@ CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
         "15 steps while both real paths ran 16",
     ),
     LoadStep("apply-supplements", "standing", _ALL, "the ONE verified supplement chain (G29)"),
-    LoadStep("refresh-reference", "standing", _COLD, "catalog + SEAL + dev teams (M1)"),
+    LoadStep(
+        "refresh-catalog",
+        "standing",
+        DERIVED,
+        "product catalog hierarchy: LOB -> product line -> product (G79 split)",
+    ),
+    LoadStep(
+        "refresh-applications",
+        "standing",
+        DERIVED,
+        "business applications + their contacts (SEAL). Sits BEFORE refresh-teams "
+        "because SEAL is the authority for application identity and refresh-teams "
+        "carries a :BusinessApplication minter — the G79 (e) invariant, declared in "
+        "BUSINESS_APPLICATION_MINTERS and guarded, not left to tuple order",
+    ),
+    LoadStep(
+        "refresh-teams",
+        "standing",
+        DERIVED,
+        "the delivery organisation: dev teams, team roles (wired at G79 (b) after "
+        "never having run) and the team<->application alignment",
+    ),
     LoadStep(
         "ingest-controlm", "standing", _ALL, "folders -> jobs -> conditions -> derived deps (M3)"
     ),
@@ -571,7 +754,7 @@ def load_profile(name: str) -> tuple[LoadStep, ...]:
     """
     if name not in LOAD_PROFILES:
         raise KeyError(f"unknown load profile {name!r} — declared: {sorted(LOAD_PROFILES)}")
-    return tuple(step for step in CANONICAL_LOAD_SEQUENCE if name in step.profiles)
+    return tuple(step for step in CANONICAL_LOAD_SEQUENCE if name in step_profiles(step))
 
 
 # --- helpers -----------------------------------------------------------------

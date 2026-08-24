@@ -93,6 +93,26 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-159`** · 2026-08-23 · `[bug]` · **open** · prio? **Low** —
+  **Four tests pass in the full suite and FAIL when their file runs alone**, which
+  means the suite's green does not mean what a reader assumes it means.
+  `pytest -q tests/unit/test_repo_paths.py` alone gives 4 failures, all
+  `AttributeError: partially initialized module 'drydocs.cli_docs' has no attribute
+  'app' (most likely due to a circular import)` — the parametrized
+  `test_content_defaults_live_under_the_resolved_root[drydocs.cli_docs-*]` cases.
+  In the full suite something imports `drydocs.cli` first and the cycle resolves, so
+  the failure is invisible. **Verified PRE-EXISTING at `origin/main`, not introduced
+  by G79** — found while checking whether the G79 split had broken it, and confirmed
+  by running the same file alone on main (same 4 failures). Why it is worth fixing
+  rather than tolerating: a developer narrowing to one file to iterate gets four red
+  tests that have nothing to do with their change, which trains people to ignore red;
+  and the cycle it exposes is real (`cli_docs` <-> the composition root), so the
+  import graph is telling the truth about a coupling the boundary test permits by
+  the `ENTRYPOINT_MODULES` exemption. Likely fix is an import-order-independent
+  accessor in the test rather than loosening the module boundary. Whoever takes it
+  should check the other `cli_*` domain modules (S8 split them out) for the same
+  shape rather than fixing only the two that happen to be parametrized here.
+
 - **`Idea-158`** · 2026-08-23 · `[bug]` · **open** · prio? **Med** —
   **`snapshot.ps1`'s board refresh half-failed and reported a traceback with no traceback in it.**
   At this session's close the ritual printed

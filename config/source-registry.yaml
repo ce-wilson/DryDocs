@@ -348,6 +348,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [folders]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -369,6 +370,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [jobs]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -392,6 +394,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [conditions, dependencies]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -414,6 +417,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [conditions]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -455,6 +459,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [hosts]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -685,6 +690,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [applications, ports, memberships, roles, employees]
     adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    cadence: weekly                 # G79: how OFTEN it refreshes -- business applications are not created daily (SME cadence argument, G79) -- the operational estate can be, and that is a different source
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
@@ -712,6 +718,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams]
     adapter: csv
+    cadence: weekly                 # G79: how OFTEN it refreshes -- the M1 reference rhythm the chain's own comment and the command help have always stated -- the catalog hierarchy is not re-cut daily
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
@@ -745,6 +752,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [team_applications]
     adapter: csv
+    cadence: weekly                 # G79: how OFTEN it refreshes -- same reference rhythm as its sibling catalog feed: the team report is re-issued on a slow cycle, not with the batch estate
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
@@ -807,6 +815,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [vendors, software_products]
     adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
+    cadence: repo-change                 # G79: how OFTEN it refreshes -- read from config/taxonomy/software-registry.yaml, so it changes when the REPO changes and not when any data source does
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii

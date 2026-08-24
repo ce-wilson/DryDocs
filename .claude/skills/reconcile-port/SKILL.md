@@ -165,7 +165,8 @@ stay skipped — confirm with the operator if a new one appears.
   NAME on a missing fixture and `refresh-reference` has no fixture default at all
   (`--samples-dir` for fixtures, `--source <id>` for landing zones) — so a company port
   that keeps its single-underscore fixtures must either rename them or carry its own
-  `REFRESH_REFERENCE_CHAIN` fixture names; do not "fix" the divergence by loosening the
+  the subject chains' fixture names (`cli.CHAINS`; one `REFRESH_REFERENCE_CHAIN` tuple
+  before the G79 split); do not "fix" the divergence by loosening the
   resolver back to a skip.
 - **PAT catalog ontology — company is AHEAD and the producer has ADOPTED NOTHING (C26,
   2026-08-21; adoption = C27, gated on the COMPANY catalog gate's own sign-off).** The

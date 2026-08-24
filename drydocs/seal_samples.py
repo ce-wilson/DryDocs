@@ -7,7 +7,8 @@ module exists to respect it rather than route around it: the SEAL samples are
 **generated on the machine that needs them** and never committed, so the boundary
 holds and the fixtures still exist.
 
-The gap this closes. ``REFRESH_REFERENCE_CHAIN`` has always declared
+The gap this closes. The business-application chain (``cli.CHAINS``; before the
+G79 split, ``REFRESH_REFERENCE_CHAIN``) has always declared
 ``seal_application_data__sample.csv`` and ``seal_contact_data__sample.csv``, and both
 were deleted at ``9d59f53`` (2026-07-19) for carrying real ``seal_id`` values and never
 replaced. So ``drydocs refresh-reference`` printed two yellow skips, exited 0, and wrote

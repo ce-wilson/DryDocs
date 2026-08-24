@@ -110,6 +110,20 @@ class Source:
         return self.data.get("crosswalk")
 
     @property
+    def cadence(self) -> str | None:
+        """G79 — how OFTEN this source refreshes: ``weekly`` | ``batch`` |
+        ``repo-change``, or ``None`` where none is declared.
+
+        A property of the SOURCE, not of the command that reads it, which is
+        what lets ``cli.load_profile()`` derive a standing step's operator
+        surfaces instead of reading a hand-maintained tuple. ``None`` is a real
+        answer, not a gap: doc-ledger rows carry no cadence (N12 fenced that
+        ledger out), and a step whose sources have none keeps its DECLARED
+        profiles rather than being given a made-up rhythm.
+        """
+        return self.data.get("cadence")
+
+    @property
     def urn(self) -> str | None:
         """D3 — derived, never hand-maintained: lowercase
         ``urn:drydocs:dataset:({carrier-or-origin},{artifact},prod)``.
