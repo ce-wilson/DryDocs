@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/decisions/0009-configuration-substrate.md
@@ -28,3 +28,31 @@ notes: |
   EPIC AND PHASE CHOICE, recorded because it was a judgement call rather than an obvious fit: no runtime-substrate epic exists and a groom cannot mint one, so the chain is filed under component-topology / phase 6 — the epic that already owns cross-component structural rulings (ADR 0002's core-vs-component split) and that already holds an ADR-drafting item as precedent (G53, the ADR 0011 shelf plan). A dedicated epic is PROPOSED TO THE USER in the groom report; if they take it these six items change `epic:`, not their ids. Module `docs` follows Y1 and R1 — a decision document is docs work even when its subject is core. Model fable because the ADR decides a boundary (where settings may live at all) against a standing ADR.
 
   Status stays Proposed on purpose: this item drafts the decision, it does not make it.
+  DONE 2026-08-24 (desktop). docs/decisions/0014-runtime-substrate.md written, status PROPOSED,
+  and the README row reads Proposed -- the ruling is the user's and this item does not make it.
+  All seven clauses decided or deferred with a named trigger; two are deferrals (clause 5's API
+  scope, trigger = clause 6's audit-line design; clause 6's Cypher text, trigger = the ask-search
+  owner), and clause 3 ships a deliberate exception rather than a clean rule.
+  THE 0009 RECONCILIATION, which was the hard requirement, lands as an EXCEPTION 0009 ALREADY
+  PERMITS rather than an amendment: rule 1 scopes git-text source-of-truth to "anything an SME
+  gates, a port carries, or a classification test guards", and the runtime substrate fails all
+  three named tests -- with PORT-MANIFEST marking the sibling dev-environment.yaml
+  canonical-company precisely so local paths never cross, which is the same argument one file
+  over. The ADR draws an explicit anti-drift line (per-machine operational facts only) and names
+  the one place the ruling could go the other way, so a broader reading of rule 1 turns this into
+  an amendment instead of being quietly assumed.
+  THE SURVEY WAS RE-VERIFIED, NOT TRUSTED, and that earned its keep: Idea-152 is four days old
+  and G81 landed inside the gap. TWO of its findings are stale and the ADR records both rather
+  than arguing from them -- sql_run_log.py does NOT honor only the legacy var (it imports
+  claim_log_path from run_log, so both families already share the resolver and differ only in
+  file naming), and .env.example now documents DRYDOCS_DATA_ROOT (G81, 2026-08-23), leaving only
+  DRYDOCS_LOGDIR undocumented. The other findings hold and are cited to line. Clause 7 is
+  likewise mostly executed already: G81 built config/data-zones.yaml and the guards, so G109 is
+  the remainder -- and the ADR fences it against creating a THIRD declaration by ruling that the
+  zone map keeps mode and the registry gains rows.
+  ONE CORRECTION MADE IN DRAFTING: the closing consequence first called agents/graph_qa's bare
+  telemetry swallow a defect. It is not -- it is deliberate and documented ("telemetry never
+  turns a good answer into an error"). Rewritten to the accurate and more useful point: the
+  swallow is right, and with no logging backbone behind it a permanently broken ledger still
+  reports nothing, which is what clause 2 fixes without touching the swallow.
+  SCOPE HELD: no code changed. Suite 2382 passed, ruff + format clean.
