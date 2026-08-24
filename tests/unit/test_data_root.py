@@ -8,6 +8,7 @@ the publish-boundary safety net — the repo tree NEVER contains a rua bundle
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 
 from drydocs_core import data_root as dr
@@ -80,9 +81,15 @@ def test_create_on_demand_only(tmp_path, monkeypatch):
     monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path / "root"))
     path = rua_incoming_dir()
     assert not path.exists()  # resolving never creates
-    created = rua_incoming_dir(create=True)
-    assert created.is_dir()
-    assert source_dir("dpl", "swagger", create=True).is_dir()
+    # G81 (e): rua_incoming_dir is a READ zone (hand-carried bundles) and no
+    # longer takes `create` at all — any path a create-capable helper may build
+    # is write-mode BY CONSTRUCTION, so the converse is enforced in the
+    # signature rather than left to discipline.
+    assert "create" not in inspect.signature(rua_incoming_dir).parameters
+    created = rua_extracted_dir("bundle-1", create=True)
+    assert created.is_dir()  # the WRITE half still creates on demand
+    # A WRITE zone creates; the read-zone refusal is proved in test_data_zones.py.
+    assert source_dir("cmdline-staging", "work", create=True).is_dir()
 
 
 # ---- publish-boundary safety net (the root-image-rule spirit) ---------------

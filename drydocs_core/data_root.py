@@ -43,6 +43,10 @@ DEFAULT_DATA_ROOT = Path.home() / "data" / "DryDocs"
 DATA_ROOT_ENV = "DRYDOCS_DATA_ROOT"
 
 
+class ReadZoneWriteError(RuntimeError):
+    """A write was aimed at a declared READ zone — the G81 incident's shape."""
+
+
 def resolve_data_root() -> Path:
     """The configurable data root: DRYDOCS_DATA_ROOT > ``~/data/DryDocs``."""
     raw = os.environ.get(DATA_ROOT_ENV, "").strip()
@@ -50,16 +54,54 @@ def resolve_data_root() -> Path:
 
 
 def source_dir(*parts: str, create: bool = False) -> Path:
-    """A per-source subfolder under the data root (``source_dir('rua', 'incoming')``)."""
+    """A subfolder under the data root (``source_dir('rua', 'incoming')``).
+
+    THE GENERAL HELPER, AND THE ONE THAT MADE THE INCIDENT POSSIBLE (G81): it
+    takes arbitrary parts, so it can name any path under the root — including,
+    with no parts at all, the ROOT ITSELF, which contains every declared drop
+    zone. Prefer a named helper; this exists for the zones that have not earned
+    one yet, and every such call site is now a declared zone in
+    ``config/data-zones.yaml``.
+
+    ``create=True`` REFUSES when the target is inside a declared read zone.
+    That check lives here rather than only in the test because the test compares
+    DECLARATIONS while this compares the path actually being made — and the
+    incident's shape is a real mkdir/write landing somewhere a human drops
+    source files.
+    """
     path = resolve_data_root().joinpath(*parts)
     if create:
+        _refuse_write_into_read_zone(path, action="create")
         path.mkdir(parents=True, exist_ok=True)
     return path
 
 
-def rua_incoming_dir(*, create: bool = False) -> Path:
-    """Landing zone for collected ``rua_*.tar.gz`` bundles."""
-    return source_dir("rua", "incoming", create=create)
+def _refuse_write_into_read_zone(target: Path, *, action: str) -> None:
+    """Raise when ``target`` sits inside a declared READ zone (G81 (c), runtime).
+
+    Imported lazily: :mod:`drydocs_core.data_zones` reads this module, so a
+    module-level import would be a cycle. A declaration that cannot be read is
+    NOT treated as permission — the error propagates, because "we could not
+    check" must never resolve to "go ahead" in the one guard standing between a
+    write and somebody's source data.
+    """
+    from drydocs_core.data_zones import read_zone_containing
+
+    zone = read_zone_containing(target)
+    if zone is not None:
+        raise ReadZoneWriteError(
+            f"refusing to {action} {target}: it is inside the READ zone "
+            f"{zone.id!r} ({zone.path}). Source data a human dropped there is "
+            "never the system's to write — that is the 2026-08-11 overwrite in "
+            "one sentence. Write to a `write`-mode zone in config/data-zones.yaml, "
+            "or change the zone's mode there if this really is ours to rebuild."
+        )
+
+
+def rua_incoming_dir() -> Path:
+    """Landing zone for collected ``rua_*.tar.gz`` bundles. READ zone (G81): a
+    hand-carried bundle is source data, so this helper cannot create."""
+    return source_dir("rua", "incoming")
 
 
 def rua_extracted_dir(bundle_name: str | None = None, *, create: bool = False) -> Path:
@@ -68,17 +110,22 @@ def rua_extracted_dir(bundle_name: str | None = None, *, create: bool = False) -
     return source_dir(*parts, create=create)
 
 
-def dpl_registry_dir(seal: str | None = None, *, create: bool = False) -> Path:
-    """Landing zone for per-SEAL DPL registry Swagger exports (G25)."""
+def dpl_registry_dir(seal: str | None = None) -> Path:
+    """Landing zone for per-SEAL DPL registry Swagger exports (G25). READ zone.
+
+    NOTE the path: ``dpl-registry/``. The source registry declared ``dpl/`` from
+    N12 until G81 corrected it — the two had NEVER agreed, so an operator who
+    followed the registry had files nothing read (reconstruction §3b)."""
     parts = ("dpl-registry",) + ((seal,) if seal else ())
-    return source_dir(*parts, create=create)
+    return source_dir(*parts)
 
 
-def catalog_dir(sub: str | None = None, *, create: bool = False) -> Path:
+def catalog_dir(sub: str | None = None) -> Path:
     """Landing zone for Snowflake data-catalog view exports (G42);
-    ``catalog_dir("screenshots")`` is the evidence-capture area."""
+    ``catalog_dir("screenshots")`` is the evidence-capture area. READ zone (G81):
+    hand-pulled exports and SME evidence are never the system's to write."""
     parts = ("catalog",) + ((sub,) if sub else ())
-    return source_dir(*parts, create=create)
+    return source_dir(*parts)
 
 
 def vendor_docs_dir(vendor_tree: str | None = None, *, create: bool = False) -> Path:
@@ -114,23 +161,23 @@ def context_intake_dir(*, create: bool = False) -> Path:
     return source_dir("context-intake", create=create)
 
 
-def email_extracts_dir(*, create: bool = False) -> Path:
+def email_extracts_dir() -> Path:
     """DRYDOCS_DATA_ROOT/email-extracts/ — the Q10 landing zone: Copilot JSON
     extracts beside their original .msg files. Machine-local; the repo carries
     only synthetic samples (drydocs/data/samples/email-extracts/)."""
-    return source_dir("email-extracts", create=create)
+    return source_dir("email-extracts")
 
 
-def controlm_xml_dir(*, create: bool = False) -> Path:
+def controlm_xml_dir() -> Path:
     """Landing zone for Control-M XML definition exports (G47 — the
     9.0.21.300 config SoR; real folder/job/variable values are Internal).
     No filename-fingerprint tree sweep exists for these: exports are
     arbitrarily-named generic ``.xml``, so the guard is this landing-zone
     convention itself plus the classification on the source entry."""
-    return source_dir("controlm-xml", create=create)
+    return source_dir("controlm-xml")
 
 
-def remediation_incoming_dir(*, create: bool = False) -> Path:
+def remediation_incoming_dir() -> Path:
     """Landing zone for folder ``.xml`` exports awaiting a remediation pass.
 
     Deliberately separate from :func:`controlm_xml_dir` (the INGESTION landing
@@ -138,7 +185,7 @@ def remediation_incoming_dir(*, create: bool = False) -> Path:
     fix package, not the graph load — mixing them would make "which exports are
     loaded?" unanswerable from the tree. Real definitions are Internal; nothing
     here is ever committed."""
-    return source_dir("remediation", "incoming", create=create)
+    return source_dir("remediation", "incoming")
 
 
 def remediation_outgoing_dir(*, create: bool = False) -> Path:
@@ -152,3 +199,15 @@ def remediation_recommendations_dir(*, create: bool = False) -> Path:
     """Output zone for remediation recommendation documents (change docs,
     equivalence reports, fix-tracking change-sets awaiting the loader)."""
     return source_dir("remediation", "recommendations", create=create)
+
+
+def cmdline_staging_dir(*, create: bool = False) -> Path:
+    """G39 job-detail staging store (SQLite). WRITE zone — the system rebuilds it."""
+    return source_dir("cmdline-staging", create=create)
+
+
+def controlm_api_config_dir() -> Path:
+    """Holds ``controlm_api.cfg`` (G96), AUTHORED BY AN OPERATOR. READ zone:
+    overwriting somebody's endpoint/credential config is the same class as
+    overwriting their extract."""
+    return source_dir("controlm-api")
