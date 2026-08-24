@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-23T21:56:07",
+    "captured_at": "2026-08-23T22:49:12",
     "date": "20260823",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "1a4460e4",
-      "full": "1a4460e4a1e925f1940d0ecba8402669ee18080a",
+      "commit": "de5506d3",
+      "full": "de5506d306dd9cdc2bd8926bbd867cdeeb151b5b",
       "branch": "main",
-      "describe": "port-base-20260820-154-g1a4460e4",
-      "subject": "fix(port): J42 — the union block is pure ASCII, guarded",
+      "describe": "port-base-20260820-161-gde5506d3",
+      "subject": "Merge branch 'feat/g79-source-split' — G79: refresh-reference splits by source",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -15407,6 +15407,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/data/samples/pat_team_roles__sample.csv",
+      "name": "pat_team_roles__sample.csv",
+      "extension": ".csv",
+      "rel_path": "drydocs/data/samples/pat_team_roles__sample.csv",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/data/samples/product_lines__sample.csv",
       "name": "product_lines__sample.csv",
       "extension": ".csv",
@@ -19385,10 +19394,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823-2149.json",
-      "name": "drydocs-20260823-2149.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json",
+      "name": "drydocs-20260823.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823-2149.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -37094,6 +37103,11 @@
     [
       "drydocs/drydocs/data/samples",
       "CONTAINS",
+      "drydocs/drydocs/data/samples/pat_team_roles__sample.csv"
+    ],
+    [
+      "drydocs/drydocs/data/samples",
+      "CONTAINS",
       "drydocs/drydocs/data/samples/product_lines__sample.csv"
     ],
     [
@@ -39169,7 +39183,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823-2149.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41561,13 +41575,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2358,
+    "files": 2359,
     "edges": 1133,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2641,
+    "rels": 2642,
     "directories": 284
   }
 }
