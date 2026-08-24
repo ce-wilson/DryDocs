@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p0
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs_core/data_root.py
