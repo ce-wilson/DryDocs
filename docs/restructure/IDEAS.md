@@ -93,6 +93,40 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-168`** · 2026-08-24 · `[chore]` · **parked → next internal session** · prio? **Med** —
+  **The Control-M profiling numbers are company-estate figures, and every threshold derived
+  from them needs re-tuning on the internal side.** Two different things are called
+  "profiling" here and both statements about them are true at once. (1) The **cardinality
+  volumetrics already given ARE captured**: CM_HOSTS 2026-07-09 (22 distinct DATA_CENTERs /
+  5,396 GRPNAMEs / 8,161 NODEIDs) in `drydocs/loaders/sql/adhoc/profile_cm_hosts.sql`,
+  `drydocs/loaders/sql/controlm_hosts.sql`, the `controlm-hosts-topology` gate spec and the
+  CM_HOSTS `profile.via:` string; CM_AVG_RUN 2026-07-22 (169,639 rows / 14 DCs / 12,639
+  folders / 779 node groups / 26 columns) in `profile_cm_avg_run.sql` and the
+  `controlm-avg-run-supplement` gate spec. (2) The ledger's `census:` field means the
+  **column inventory** (types, nullability, `column_count`), which has only ever run for
+  CM_AVG_RUN — **6 of the 7 objects in `config/source-mappings/psgmgr.yaml` still read
+  `census: pending`**, so a tool reading the ledger correctly reports them unprofiled.
+  Volumetrics are not a census and neither backfills the other: stamping the counts into
+  `profiled_on`/`census` would falsify `census_failures()`, where a *recorded* census must
+  balance explicit rows against the frozen sweep `count:`.
+  **WHERE it runs — internal only, by design.** Backlog P1 carries the rule in its own record
+  ("User-run on the internal network (no producer-side psgmgr access); agent transcribes" /
+  "Producer never runs these probes (internal-only by design); status mirrors the company
+  SoR"). The producer side has no psgmgr, transcribes conclusions only, and consumes none of
+  the numbers mechanically — `census: pending` means there is nothing to reconcile, so no
+  producer-side ingest, guard or suite is waiting on this. doc 08 Phase 2 (the real column
+  census, via the controlm-db skill against the live views) is an internal-session job for the
+  same reason.
+  **WHAT needs tuning internally:** every number calibrated against the company estate rather
+  than derived — the avg-run supplement's ≈30% join-coverage expectation (145,454/169,639
+  stats→jobs, 144,827/489,096 jobs→stats), the grain-dedupe discriminator (dups 2–49,
+  STAT_PERIOD the leading candidate), the run-time sanity cap (outliers to ~2.65 y), and P1's
+  own performance flag (scoped smoke test before the estate-wide join). They ride with the
+  probes still owed: `docs/next-internal-session.md` item 1 — the CM_HOSTS **definition-side**
+  probes P1–P5 and the **DC scope call** (three datapoints: 22 DCs in CM_HOSTS, 14 in
+  CM_AVG_RUN, 4 production) are open even though backlog P1 reads `done`, because only the
+  avg-run set actually ran.
+
 - **`Idea-166`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
   **The load runbook's `--csv` example points at a path that exists nowhere in this repo.**
   `docs/design/drydocs-load-runbook.md` step 3 reads
