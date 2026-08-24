@@ -137,17 +137,28 @@ Index: [`reference/REGISTRY.yaml`](reference/REGISTRY.yaml)
 | **Academic research** | papers backing modeling choices | [`reference/research/`](reference/research/README.md) |
 
 > **Trimming `neo4j-skills` — delete the directory AND prune the manifest, or the whole plugin dies.**
-> The plugin ships 29 skills (~8k always-on tokens); we run 9 (~3k). Trimming takes **two** steps, both
+> The plugin ships 29 skills (~9.6k always-on tokens); we run 10 (~3.3k — measured with
+> `claude plugin details neo4j-skills`, which prints the projected always-on cost). Trimming takes **two** steps, both
 > required, in the plugin cache (`~/.claude/plugins/cache/neo4j-skills-marketplace/neo4j-skills/<ver>/`):
 > **(1)** delete the unwanted `neo4j-*-skill/` directories, **(2)** remove their entries from that
-> directory's `.claude-plugin/plugin.json` `skills` array. Step 1 without step 2 makes Claude Code fail
-> the *entire* plugin on the missing paths — every skill vanishes with no error at the prompt. That is
-> exactly what happened: the `aura-*` deletion (Aura ruled out for the Docker EE container, 2026-07-06)
-> silently took **all** Neo4j reference offline until 2026-07-31, while this table still routed work to it.
+> directory's `.claude-plugin/plugin.json` `skills` array. Step 1 without step 2 leaves the manifest
+> pointing at paths that no longer exist. On Claude Code 1.x that made the *entire* plugin fail on the
+> missing paths — every skill vanished with no error at the prompt, which is exactly what happened: the
+> `aura-*` deletion (Aura ruled out for the Docker EE container, 2026-07-06) silently took **all** Neo4j
+> reference offline until 2026-07-31, while this table still routed work to it. On **2.1.241 that symptom
+> did not reproduce** — the three dangling `aura-*` entries sat in the manifest and the plugin still loaded
+> its remaining skills — so treat step 2 as required for correctness, not as a guaranteed tripwire.
 > `skillOverrides` is **not** an alternative — it gates filesystem skills (`.claude/skills/`) only, never
 > plugin skills; verified inert in both project and local scope. Any `claude plugin install`/`update`
 > re-fetches all 29 and reverts both steps — redo them, then confirm with `claude plugin details neo4j-skills`
-> (expect `Skills (9)` and `✔ enabled` in `claude plugin list`).
+> (expect `Skills (10)` and `✔ enabled` in `claude plugin list`). This HAS recurred: a re-fetch put all 29
+> back and the trim was re-applied 2026-08-23.
+>
+> The 10 we run: cypher, modeling, import, document-import, graphrag, vector-index, gds, driver-python,
+> query-tuning, security. (`document-import` joined the set 2026-08-23 — it was in active use.) Note that
+> five of the vendor's skills — `cli-tools`, `driver-javascript`, `mcp`, `migration`, `spring-data` — ship
+> with malformed YAML frontmatter (an unquoted multi-line `description` containing `: `) and never load at
+> all; they are outside the keep set, so this costs us nothing.
 
 ### Tier 2 — Orchestration *vendors* (you ingest FROM these — one level lower)
 Index: [`external/orchestration/README.md`](external/orchestration/README.md)
