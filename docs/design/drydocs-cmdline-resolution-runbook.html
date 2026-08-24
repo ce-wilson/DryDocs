@@ -107,38 +107,38 @@ job_detail ──③parse (G26/G15/G16)──▶ job_detail_parsed + parse_quali
 <h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
 <p>Bring the store from NOTHING to POPULATED — the export is the chain&#x27;s step ①:</p>
 <ol><li><strong>Export</strong> — one row per loaded job, command text verbatim:</li></ol>
-<pre class="powershell"><code>   drydocs export-cmdline-staging
-   # jobs=240137 with_cmd_line=182254 active=175003 | task_type: Job=…, Watcher=…</code></pre>
+<pre class="powershell"><code>drydocs export-cmdline-staging
+# jobs=240137 with_cmd_line=182254 active=175003 | task_type: Job=…, Watcher=…</code></pre>
 <p>Writes <code>&lt;DRYDOCS_DATA_ROOT&gt;/cmdline-staging/job_detail.db</code> (schema <code>drydocs.cmdline-staging.v3</code>). The store is REBUILT from scratch on every run — it is derived plumbing (same graph → same rows, no wall-clock values), and it is a TEMPORARY stand-in: the retirement note in its <code>meta</code> table says it dies the day a real <code>CM_DEF_VJOB_DETAIL</code>-style table exists.</p>
 <p>The only graph access in the whole chain happens here, and it is a read-only <code>MATCH</code>:</p>
-<pre class="cypher"><code>   MATCH (j:ControlMJob)
-   RETURN j.folder_id, j.job_id, j.job_name, j.parent_table AS folder_name,
-          j.instance_name AS data_center, j.task_type, j.active, j.cmd_line
-   ORDER BY j.folder_id, j.job_id</code></pre>
+<pre class="cypher"><code>MATCH (j:ControlMJob)
+RETURN j.folder_id, j.job_id, j.job_name, j.parent_table AS folder_name,
+       j.instance_name AS data_center, j.task_type, j.active, j.cmd_line
+ORDER BY j.folder_id, j.job_id</code></pre>
 <p>Success looks like: the summary line prints with a per-task-type census and the <code>.db</code> file exists at the path above.</p>
 <h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
 <p>The recurring chain on a populated store. <strong>Order matters twice</strong>: ② must run before ③ (the parse prefers resolved text), and re-running ① wipes ②+③&#x27;s output by design (resolution re-runs after every export).</p>
 <ol><li><strong>Resolve</strong> (G48) — XML variables through the one shared resolver:</li></ol>
-<pre class="powershell"><code>   drydocs resolve-cmdline-staging          # default XML source: &lt;root&gt;/controlm-xml/
-   drydocs resolve-cmdline-staging --xml-source C:\path\to\export.xml   # override</code></pre>
+<pre class="powershell"><code>drydocs resolve-cmdline-staging          # default XML source: &lt;root&gt;/controlm-xml/
+drydocs resolve-cmdline-staging --xml-source C:\path\to\export.xml   # override</code></pre>
 <p>What happens, precisely:</p>
 <ul><li>the G47 extractor stages the export taxonomy-first — folders, jobs, and variables with <strong>document-order ordinals</strong> (the resolver&#x27;s sequential-assignment contract);</li><li>each store row joins an XML job on <code>(data_center, folder_name, job_name)</code> (a counted <code>dc_fallback</code> to <code>(folder_name, job_name)</code> exists for rows whose <code>data_center</code> is NULL);</li><li>the <strong>store&#x27;s verbatim</strong> <code>cmd_line</code> is resolved via <code>resolve_command_line(extract.scope_layers(xml_job), cmd_line)</code> — the XML supplies ONLY the bindings. The XML job&#x27;s own <code>CMDLINE</code> is compared and a disagreement is COUNTED (<code>cmd_line_mismatch</code> — measured evidence for the open precedence question), never substituted;</li><li><code>cmd_line_resolved</code> is populated only when resolution changed the text; <code>cmd_line</code> is never touched. Per-job provenance lands in <code>resolution_quality</code>: verdict, source, match route, substituted names with the winning scope, unresolved residue, <code>{ODATE}</code>-class canonical tokens.</li></ul>
-<pre class="text"><code>   resolution: resolved=2 residue=1 nothing=2 no_match=1 ambiguous=1 no_cmd_line=1
-   (of 8 jobs, 7 xml jobs) | substitutions=3 dc_fallback=1 no_folder_name=0 cmd_line_mismatch=1</code></pre>
+<pre class="text"><code>resolution: resolved=2 residue=1 nothing=2 no_match=1 ambiguous=1 no_cmd_line=1
+(of 8 jobs, 7 xml jobs) | substitutions=3 dc_fallback=1 no_folder_name=0 cmd_line_mismatch=1</code></pre>
 <p>Every job lands in exactly one verdict — the buckets always sum to the job count.</p>
 <ol><li><strong>Parse</strong> (G40) — resolved-when-present into structured columns:</li></ol>
-<pre class="powershell"><code>   drydocs parse-cmdline-staging
-   # coverage: parsed=… partial=… unparsed=… no_cmd_line=… (…; N from resolved cmd lines)</code></pre>
+<pre class="powershell"><code>drydocs parse-cmdline-staging
+# coverage: parsed=… partial=… unparsed=… no_cmd_line=… (…; N from resolved cmd lines)</code></pre>
 <p><code>parse_command</code> (G26 launcher registry, G15 DPL arg contract, G16 values-decide) fills <code>job_detail_parsed</code> (launcher, launch_mode, script_path, config_path, artifact_kind, pipeline_guid, props/args JSON); <code>parse_quality.parsed_from</code> records <code>resolved</code> or <code>raw</code> per job. Resolution exists to raise this step&#x27;s coverage: a <code>%%VAR</code>-launcher job that was <code>unparsed</code> raw becomes <code>parsed</code> from its resolved text.</p>
 <p>A worked example, one row through all three steps (synthetic):</p>
 <table><thead><tr><th>stage</th><th>value</th></tr></thead><tbody><tr><td>① <code>cmd_line</code> (verbatim, forever)</td><td><code>%%PY_LAUNCH --pipeline-id &lt;guid&gt; --aws</code></td></tr><tr><td>② <code>cmd_line_resolved</code></td><td><code>/apps/py/py-launcher.sh --pipeline-id &lt;guid&gt; --aws</code></td></tr><tr><td>② <code>resolution_quality</code></td><td><code>verdict=resolved · substituted=[[&quot;PY_LAUNCH&quot;,&quot;FOLDER&quot;]]</code></td></tr><tr><td>③ <code>job_detail_parsed</code></td><td><code>launcher=/apps/py/py-launcher.sh · pipeline_guid=&lt;guid&gt;</code></td></tr><tr><td>③ <code>parse_quality</code></td><td><code>verdict=parsed · parsed_from=resolved</code></td></tr></tbody></table>
 <h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
 <ul><li><strong>Summary lines</strong> print on every verb (the never-silent rule). The resolve buckets must sum to the job count; if <code>no_xml_match</code> dominates, see Troubleshooting before trusting anything downstream.</li><li><strong>Spot-check the store</strong> (sqlite3, or any client):</li></ul>
-<pre class="sql"><code>  SELECT value FROM meta WHERE key=&#x27;schema_version&#x27;;   -- drydocs.cmdline-staging.v3
-  SELECT verdict, count(*) FROM resolution_quality GROUP BY verdict;
-  SELECT parsed_from, count(*) FROM parse_quality GROUP BY parsed_from;
-  SELECT cmd_line, cmd_line_resolved FROM job_detail
-   WHERE cmd_line_resolved IS NOT NULL LIMIT 5;        -- verbatim ALWAYS beside derived</code></pre>
+<pre class="sql"><code>SELECT value FROM meta WHERE key=&#x27;schema_version&#x27;;   -- drydocs.cmdline-staging.v3
+SELECT verdict, count(*) FROM resolution_quality GROUP BY verdict;
+SELECT parsed_from, count(*) FROM parse_quality GROUP BY parsed_from;
+SELECT cmd_line, cmd_line_resolved FROM job_detail
+ WHERE cmd_line_resolved IS NOT NULL LIMIT 5;        -- verbatim ALWAYS beside derived</code></pre>
 <ul><li><strong>Determinism:</strong> re-running ② or ③ without a new export produces identical counts (both clear their own output first).</li><li><strong>The unit contract:</strong> <code>poetry run pytest tests/unit/test_cmdline_staging.py tests/unit/test_lineage_controlm_xml.py tests/unit/test_variable_resolver.py -q</code> — green means the chain&#x27;s semantics (verbatim-beside-derived, verdict exhaustiveness, one-resolver handoff) still hold.</li></ul>
 <h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
 <p>The store is derived and rebuildable — rollback is re-derivation, never surgery:</p>

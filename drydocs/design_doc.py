@@ -88,11 +88,21 @@ def _is_table_sep(line: str) -> bool:
 
 
 def _parse_fence(lines: list[str], start: int) -> tuple[str, int]:
-    lang = lines[start].strip()[3:].strip()
+    """The fenced block at *start*, dedented to the fence's own column.
+
+    The dedent matters for a fence inside a list item, where CommonMark puts the
+    opening ``` at the item's content column (3 spaces under ``1. ``) and does NOT
+    count that indentation as part of the code. A top-level fence has pad 0, so
+    this is a no-op there.
+    """
+    opener = lines[start]
+    pad = len(opener) - len(opener.lstrip())
+    lang = opener.strip()[3:].strip()
     body: list[str] = []
     i = start + 1
     while i < len(lines) and not lines[i].strip().startswith("```"):
-        body.append(lines[i])
+        line = lines[i]
+        body.append(line[pad:] if not line[:pad].strip() else line.lstrip())
         i += 1
     i += 1  # consume the closing ```
     code = html.escape("\n".join(body))
@@ -119,26 +129,51 @@ def _parse_table(lines: list[str], start: int) -> tuple[str, int]:
     return "".join(out), i
 
 
-def _build_nested(items: list[tuple[int, bool, str]]) -> str:
-    """Flat (indent, ordered, text) items -> nested <ul>/<ol> HTML."""
+def _render_segments(segments: list[tuple[str, str]]) -> str:
+    """One list item's content, in source order.
+
+    Segments are ("text", raw) or ("html", block). Consecutive text joins with a
+    space and goes through :func:`_inline`, exactly as before; an ("html", …) block
+    is emitted verbatim WHERE IT APPEARS, which is the whole point — a fence that
+    renders after the prose that followed it in the source is not a code block, it
+    is a reordering.
+    """
+    out: list[str] = []
+    buf: list[str] = []
+    for kind, value in segments:
+        if kind == "text":
+            buf.append(value)
+            continue
+        if buf:
+            out.append(_inline(" ".join(buf)))
+            buf = []
+        out.append(value)
+    if buf:
+        out.append(_inline(" ".join(buf)))
+    return "".join(out)
+
+
+def _build_nested(items: list[tuple[int, bool, list[tuple[str, str]]]]) -> str:
+    """Flat (indent, ordered, segments) items -> nested <ul>/<ol> HTML."""
     out: list[str] = []
     stack: list[tuple[int, str]] = []  # (indent, tag)
-    for indent, ordered, text in items:
+    for indent, ordered, segments in items:
         tag = "ol" if ordered else "ul"
+        content = _render_segments(segments)
         if stack and indent > stack[-1][0]:
             out.append(f"<{tag}>")
             stack.append((indent, tag))
-            out.append(f"<li>{_inline(text)}")
+            out.append(f"<li>{content}")
         else:
             while stack and stack[-1][0] > indent:
                 _, t = stack.pop()
                 out.append(f"</li></{t}>")
             if stack and stack[-1][0] == indent:
-                out.append(f"</li><li>{_inline(text)}")
+                out.append(f"</li><li>{content}")
             else:
                 out.append(f"<{tag}>")
                 stack.append((indent, tag))
-                out.append(f"<li>{_inline(text)}")
+                out.append(f"<li>{content}")
     while stack:
         _, t = stack.pop()
         out.append(f"</li></{t}>")
@@ -146,19 +181,29 @@ def _build_nested(items: list[tuple[int, bool, str]]) -> str:
 
 
 def _parse_list(lines: list[str], start: int) -> tuple[str, int]:
-    items: list[tuple[int, bool, str]] = []
+    items: list[tuple[int, bool, list[tuple[str, str]]]] = []
     i = start
     while i < len(lines):
         m = _LIST_ITEM.match(lines[i])
         if m:
-            items.append((len(m.group(1)), m.group(2).endswith("."), m.group(3)))
+            items.append((len(m.group(1)), m.group(2).endswith("."), [("text", m.group(3))]))
             i += 1
-        elif lines[i].strip() and items and (len(lines[i]) - len(lines[i].lstrip())) > items[-1][0]:
-            # indented continuation of the current item
-            items[-1] = (items[-1][0], items[-1][1], items[-1][2] + " " + lines[i].strip())
+            continue
+        line = lines[i]
+        indent = len(line) - len(line.lstrip())
+        if line.strip() and items and indent > items[-1][0]:
+            if line.strip().startswith("```"):
+                # A FENCE IS A BLOCK, not prose. Folding it into the item text (what
+                # this branch did for everything) ran every command in every operator
+                # runbook onto one line and turned the fence markers into inline code
+                # spans — "powershell docker start neo4jtest docker port neo4jtest".
+                block, i = _parse_fence(lines, i)
+                items[-1][2].append(("html", block))
+                continue
+            items[-1][2].append(("text", line.strip()))
             i += 1
-        else:
-            break
+            continue
+        break
     return _build_nested(items), i
 
 

@@ -1,0 +1,57 @@
+# design-doc feedback — paste into docs/design/feedback/drydocs-startup-refresh-runbook-rev<N>.yaml
+doc: drydocs-startup-refresh-runbook
+author: chad.wilson          # optional review-outcome field (README §L7) — the SME reviewer
+notes:
+  # The first two notes are CARRIED FORWARD from rev1 and were already applied at Rev 2
+  # (2026-07-20). They are kept here rather than dropped so this file is the whole of what
+  # the reviewer sent, and so a reader does not chase two of four notes that are already done.
+  - anchor: front-matter
+    status: applied          # applied in Rev 2 (2026-07-20); re-verified at Rev 11 — the render
+                             # emits four separate <li>, one per bullet. No change needed.
+    note: |
+      For each bullet point, start on a new line. i.e. Classification, Classification, Companion
+  - anchor: purpose-scope
+    status: applied          # applied in Rev 2 (2026-07-20); re-verified at Rev 11 — the
+                             # out-of-scope line no longer carries the Track-2 clause.
+    note: |
+      Remove: "Company-side production ingest (Track-2 — the port-prompt and the company Control-M ingestion TDD own that)"  Out of scope: UI or web console (Epic O)  and multi-DB provisioning topology beyond a first-time pointer.
+  - anchor: startup
+    status: applied          # applied in Rev 12 (2026-08-24) — all four sub-items
+    note: |
+      remove 'Schema backbone,' change to 'Schema core,'  each update so each powershell and poetry run steps shown in code blocks on unique lines and do not run together.      remove agent note "Do not hand-run the per-file verbs to "save a step": that is exactly how registry` went missing from this runbook for months."     Move: "1. First-time only - multi-DB" to the end of Prerequisites.
+    resolution: |
+      Four sub-items, three of them prose and one of them not.
+
+      (1) "Schema backbone," -> "Schema core," — done. Both words are on the approved
+          list in CLAUDE.md sect. 6; this is the reviewer's pick between them.
+
+      (2) "each powershell and poetry run steps shown in code blocks on unique lines and
+          do not run together" — THIS WAS A RENDERER DEFECT, NOT PROSE, and it was
+          repo-wide. `render_body`'s list parser joined every indented continuation line
+          of a list item with a single space, fenced blocks included, so a fence inside
+          `1. ...` collapsed and `_inline` then turned its backticks into inline <code>
+          spans. Startup step 1 rendered as the literal run-together string
+          "powershell docker start neo4jtest docker port neo4jtest". Measured before
+          fixing: THREE runbooks rendered ZERO <pre> blocks
+          (drydocs-startup-refresh-runbook, drydocs-core-runbook, drydocs-load-runbook)
+          because all of their fences sit inside numbered steps. The source markdown was
+          correct CommonMark throughout — a fence indented to the item's content column
+          (3 spaces under "1. ") belongs to that item — so the fix is in
+          drydocs/design_doc.py, not in any doc: a fence in a list continuation is now
+          parsed as a BLOCK and emitted in source order, and _parse_fence dedents to the
+          fence's own column so the code carries no leading indent.
+
+      (3) the "Do not hand-run the per-file verbs" note — removed. The ruling it defends
+          (the order lives in SUPPLEMENTS, not in a runbook list) is already stated in
+          the sentence immediately before it, so the scolding added tone and no content.
+
+      (4) Move provisioning to the end of Prerequisites — done, and it is the better
+          shape for a reason worth recording: provisioning is a PRECONDITION of every
+          startup step rather than one of them (nothing in Startup creates a database),
+          and moving it there is also what makes the scope note's "multi-DB provisioning
+          topology beyond a first-time pointer" true rather than aspirational — the
+          detail belongs to drydocs_core/schema/provisioning/README.md and now stays
+          there. Note the item text quoted, "1. First-time only - multi-DB", is Rev 10's
+          wording; Rev 11 had already renamed and re-ordered that step while this review
+          was in hand, so the move lands on the renamed step. Startup renumbers 1-2-3 and
+          the two rollback cross-references were re-pointed with it.

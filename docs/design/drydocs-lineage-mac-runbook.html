@@ -110,30 +110,30 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
 <p>The recurring procedure on a READY setup. Steps 1–4 are pure candidate-side (no graph, rerun freely); step 5 is the gated write.</p>
 <ol><li><strong>Extract candidates</strong> — both extractors feed ONE <code>LineageGraph</code>:</li></ol>
-<pre class="powershell"><code>   poetry run python -c @&quot;
-   from drydocs_lineage.extractors import ControlMInventoryExtractor, DplMacExtractor
-   from drydocs_lineage.model import LineageGraph
-   g = LineageGraph()
-   inv = ControlMInventoryExtractor().extract(r&#x27;tests/fixtures/lineage/jobs.csv&#x27;, g)
-   print(&#x27;inventory |&#x27;, inv.summary())
-   mac = DplMacExtractor().extract(r&#x27;&lt;mac-root&gt;&#x27;, g)   # skip these 2 lines if no MAC
-   print(&#x27;mac       |&#x27;, mac.summary())
-   print(&#x27;graph     |&#x27;, g.stats())
-   &quot;@</code></pre>
+<pre class="powershell"><code>poetry run python -c @&quot;
+from drydocs_lineage.extractors import ControlMInventoryExtractor, DplMacExtractor
+from drydocs_lineage.model import LineageGraph
+g = LineageGraph()
+inv = ControlMInventoryExtractor().extract(r&#x27;tests/fixtures/lineage/jobs.csv&#x27;, g)
+print(&#x27;inventory |&#x27;, inv.summary())
+mac = DplMacExtractor().extract(r&#x27;&lt;mac-root&gt;&#x27;, g)   # skip these 2 lines if no MAC
+print(&#x27;mac       |&#x27;, mac.summary())
+print(&#x27;graph     |&#x27;, g.stats())
+&quot;@</code></pre>
 <p><code>&lt;mac-root&gt;</code> may be the hand-staged root, the clone root (or its <code>promotion/pipelines/</code> dir), or a SINGLE <code>name#guid</code> pipeline folder — the per-folder scope for one-pipeline reruns.</p>
 <p><em>Success:</em> both <code>summary()</code> lines print, and every skip shows up as a COUNT (<code>unresolved=</code>, <code>unmatched=</code>, <code>riders=</code>…) — the house rule is counted-never- silent, so a zero-warning run and a warning-heavy run are both &quot;working&quot;; what matters is that the numbers reconcile with what you fed in. The MAC join is by <code>--pipeline-id</code> GUID (both launcher spellings) onto the <code>proc#dpl:{GUID}</code> identity the inventory pass created; <code>matched</code> + <code>unmatched</code> should equal <code>sets_read - sets_no_guid - sets_invalid</code>. On a clone, <code>clone: pipes=</code> should equal sets consumed plus <code>missing_sets=</code> (the still-to-fetch list).</p>
 <ol><li><strong>Render the SME review page</strong> (no Neo4j):</li></ol>
-<pre class="powershell"><code>   poetry run drydocs lineage-review &lt;jobs.csv&gt; -o lineage-review.html</code></pre>
+<pre class="powershell"><code>poetry run drydocs lineage-review &lt;jobs.csv&gt; -o lineage-review.html</code></pre>
 <p><em>Success:</em> the HTML opens; same-basename multi-mount Script duplicates and <code>kind UNKNOWN</code> invocations are flagged for the SME — they are NEVER auto-merged/auto-typed.</p>
 <ol><li><strong>Curate.</strong> The SME confirms a subset of candidate rels (today: assemble the confirmed <code>(src, TYPE, dst)</code> set from the review pass — <code>curation.curate</code> is a stub by design). Anything ambiguous goes to the HITL gate, not a guess.</li></ol>
 <ol><li><strong>Plan the write</strong> — pure function, produces the EXACT batches for review:</li></ol>
-<pre class="python"><code>   from drydocs_lineage.writer import plan_curated
-   plan = plan_curated(g, confirmed)
-   print(plan.scripts, plan.etl_processes, plan.assets, plan.rels)</code></pre>
+<pre class="python"><code>from drydocs_lineage.writer import plan_curated
+plan = plan_curated(g, confirmed)
+print(plan.scripts, plan.etl_processes, plan.assets, plan.rels)</code></pre>
 <p><em>Success:</em> no <code>ValueError</code> (a raise means the confirmed set drifted from the graph, or a job lacks its <code>folder_id.job_id</code> NODE-KEY composite — fix the input, don&#x27;t hand-edit the plan). ETLProcess rows take their <code>kind</code> from the MAC-derived <code>mac_kind</code> where present; rider-path nodes (e.g. <code>subType=provisioning</code>) keep the default <code>&#x27;etl&#x27;</code> <strong>on purpose</strong> until the enum gate ruling.</p>
 <ol><li><strong>Load — currently REFUSES, and that is the contract:</strong></li></ol>
-<pre class="python"><code>   from drydocs_lineage.writer import write_curated
-   write_curated(g, confirmed, client)   # raises GateBoundVocabularyError today</code></pre>
+<pre class="python"><code>from drydocs_lineage.writer import write_curated
+write_curated(g, confirmed, client)   # raises GateBoundVocabularyError today</code></pre>
 <p>The four <code>m3_*</code> registry entries are <code>status: planned</code>; <code>write_curated</code> reads the registry and refuses a live load until they are <code>active</code> (D2: curated-only writes). <strong>The unlock is a HITL gate session, not a code edit:</strong> the lineage live-load gate flips the entries active WITH their <code>ontology_supplement.cypher</code> blocks (the K2 flips-are-follow-ups pattern; <code>test_schema.py</code> enforces block-per-active-edge). After the flip, rerun this step — MERGE semantics make it idempotent.</p>
 <h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
 <ul><li><strong>Candidate side (every run):</strong> <code>poetry run pytest tests/unit/test_lineage_inventory.py tests/unit/test_lineage_mac.py tests/unit/test_lineage_writer.py -q</code> → all green (fully synthetic, no network). Coverage numbers from step 1 reconcile: MAC <code>matched + unmatched = sets_read - sets_no_guid - sets_invalid</code>; inventory <code>jobs_added + skipped_* = rows_read</code>.</li><li><strong>Plan side:</strong> <code>plan.rels == len(confirmed)</code>; every statement in <code>plan.statements</code> is a MERGE/MATCH batch you can eyeball — nothing is hidden.</li><li><strong>Post-flip load (once the gate opens):</strong> rerun step 5, then in the graph: node counts match <code>plan.scripts / .etl_processes / .assets</code>; every written rel carries <code>vocab_id</code> + <code>source=&#x27;drydocs-lineage&#x27;</code>; ETLProcess <code>kind</code> is MAC-derived where a MAC set covered the pipeline and <code>&#x27;etl&#x27;</code> elsewhere.</li><li><strong>Full suite before any commit that touched this component:</strong> <code>poetry run pytest -q</code> green + <code>python -c &quot;import drydocs.cli&quot;</code> + <code>drydocs --help</code> (the CLAUDE.md §6 gates).</li></ul>

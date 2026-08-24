@@ -1,8 +1,18 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 11, 2026-08-24**
-  (CATCH-UP TO THE G102 FOLD, 2026-08-18 — this doc had been Rev 10 / 2026-08-04, so it
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 12, 2026-08-24**
+  (SME feedback applied — `docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml`:
+  provisioning moves OUT of Startup to the end of Prerequisites, where it belongs — it is
+  a precondition of every startup step rather than one of them, and putting it there also
+  makes the scope note's "first-time pointer" true instead of aspirational; "Schema
+  backbone" reads "Schema core"; and the per-file-verb scolding is dropped, since the
+  ruling it protects is already stated one sentence earlier. The feedback's fourth note —
+  commands running together — was NOT a prose defect: `render_body` folded a fenced block
+  inside a list item into the item's text, so every operator runbook rendered its commands
+  on one line. Fixed in `drydocs/design_doc.py`, which is why this Rev changes more `.html`
+  than `.md`; on top of
+  Rev 11, 2026-08-24 (CATCH-UP TO THE G102 FOLD, 2026-08-18 — this doc had been Rev 10 / 2026-08-04, so it
   spent two weeks telling readers to provision a four-database topology two of whose
   names were retired. Three defects fixed: the topology enumerations drop to
   **`drydocs` + `ddschema`**; `load-essential-graphrag` no longer documents a
@@ -202,6 +212,26 @@ beyond a first-time pointer (G1's `provision.ps1` README owns it).
 4. **Reference docs at hand:** `internal/repo-README.md` §Quick start (the canonical
    command chain this runbook operationalizes) and
    `internal/helpmeloginlocalneo4j.md` (if login misbehaves).
+5. **The topology provisioned — `drydocs` + `ddschema`.** A PREREQUISITE and not a
+   startup step, because nothing in Startup creates a database: every verb there opens a
+   session against one that must already exist, and `drydocs check` raises
+   `Neo.ClientError.Database.DatabaseNotFound` where `drydocs` is absent. Needed on a
+   DBMS never provisioned, and again after anything that destroys databases — a deleted
+   `neo4j-testdata` volume, a hand `DROP DATABASE`. Skip it where `SHOW DATABASES`
+   already lists both.
+   ```powershell
+   .\drydocs_core\schema\provisioning\provision.ps1
+   ```
+   *Success:* `OK  topology provisioned (drydocs, ddschema …)`, and `SHOW DATABASES`
+   lists `drydocs` and `ddschema` `online`. The procedure and its caveats belong to
+   `drydocs_core/schema/provisioning/README.md` — this is the first-time pointer the
+   scope note above reserves, not a second copy of it. The two caveats that cost a
+   session if unknown: `CREATE DATABASE … IF NOT EXISTS` is a no-op on a name that
+   exists, so a green re-run proves nothing about a NEWLY ADDED one; and provisioning
+   **never drops**, so a container older than a retirement still carries the dead name
+   after a green run (`ddlineage` 2026-08-04; `ddcontext` and the `ddall` composite
+   2026-08-18, at the G32/G102 fold). Dropping those is manual and per-machine; they are
+   inert meanwhile.
 
 <!-- anchor: startup -->
 ## Startup
@@ -216,41 +246,15 @@ check; go to Troubleshooting.
    ```
    *Success:* `docker ps` shows the container up; `docker logs` ends with
    `INFO  Started.`; the port mapping matches what `.env`'s `NEO4J_URI` expects.
-2. **Provision the topology — `drydocs` + `ddschema`.** Required on a DBMS that has
-   never been provisioned, and again after anything that destroys databases (a deleted
-   `neo4j-testdata` volume, a hand `DROP DATABASE`). Skip it on a container that already
-   shows both names in `SHOW DATABASES`.
-   ```powershell
-   .\drydocs_core\schema\provisioning\provision.ps1
-   ```
-   *Success:* `OK  topology provisioned (drydocs, ddschema …)`, and
-   `SHOW DATABASES` lists `drydocs` and `ddschema` `online`.
-
-   **This step is FIRST for a reason, and it used to be fourth.** Nothing else creates a
-   database — every verb below opens a session against one that must already exist, and
-   `drydocs check` raises `Neo.ClientError.Database.DatabaseNotFound` where `drydocs` is
-   absent. The script runs `01_databases.cypher` against the **`system`** database via
-   `cypher-shell` (host PATH if present, else `docker cp` + `docker exec`); it is
-   idempotent (`IF NOT EXISTS`) and is wired to no startup hook, by design —
-   provisioning is a deliberate act, not something a command does to you.
-
-   Two asymmetries worth knowing before you trust a green run. `CREATE DATABASE … IF NOT
-   EXISTS` is a no-op where the name already exists, so re-running proves nothing about a
-   NEWLY ADDED name — confirm with `SHOW DATABASES` rather than inferring it. And
-   provisioning **never drops anything**, so a container predating a RETIREMENT still
-   carries the dead name after a green run: `ddlineage` (retired 2026-08-04, ADR 0002 X1)
-   and `ddcontext` + the `ddall` composite (retired 2026-08-18 at the G32/G102 fold).
-   Dropping those is manual, per machine — alias out of any composite, zero-node probe,
-   then `DROP DATABASE <name>`. They are inert meanwhile: nothing reads or writes them.
-3. **Connectivity + APOC:**
+2. **Connectivity + APOC:**
    ```powershell
    poetry run drydocs check
    ```
    *Success:* exit 0 — server version and APOC reported.
-4. **Schema backbone, then the supplement chain:**
+3. **Schema core, then the supplement chain:**
    ```powershell
    poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher
-   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (step 2 provisioned it)
+   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (Prerequisite 5 made it)
    poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry
    ```
    One command, not four. The order is load-bearing — `catalog` reuses the
@@ -258,8 +262,7 @@ check; go to Troubleshooting.
    the canonical `:Role` seeds the SEAL/PAT loaders MATCH at runtime (since K6 also the
    `product_roles` ProductRole scheme) — so the order lives in ONE place,
    `drydocs_core.schema.supplements.SUPPLEMENTS`, rather than in whatever sequence a
-   runbook happened to list (G29). Do not hand-run the per-file verbs to "save a step":
-   that is exactly how `registry` went missing from this runbook for months.
+   runbook happened to list (G29).
 
    *Success:* exit 0, and the printed table shows every supplement with
    `Verified == Declared terms` and `OK = yes`. The command FAILS if a supplement
@@ -368,12 +371,12 @@ Known-good is cheap here because every loader MERGEs idempotently.
    host ports (re-check `docker port`, update `.env` — that is exactly what the
    2026-07-23 recreation did, Appendix A); deleting the *volume* loses the graph — and it
    takes the DATABASES with it, not just their contents, so the recovery starts at
-   Startup step **2** (provisioning), not at the schema step. Then run it through,
+   **Prerequisite 5** (provisioning), not at any Startup step. Then run it through,
    including Refresh step 3 (the document corpora live only in the DB).
 4. **Destructive last resort:** `poetry run drydocs reset --yes` DETACH-DELETEs every
    node and relationship in the default DB. Blast radius: the whole graph, including
    gate-accepted corpora loads. The DATABASES survive (it deletes contents, not names),
-   so recovery is Startup step 4 + the full Refresh section — no re-provisioning.
+   so recovery is Startup step 3 + the full Refresh section — no re-provisioning.
 
 <!-- anchor: troubleshooting -->
 ## Troubleshooting
