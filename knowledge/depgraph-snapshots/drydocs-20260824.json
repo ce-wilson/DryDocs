@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T08:23:29",
+    "captured_at": "2026-08-24T11:57:34",
     "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "fcf973b5",
-      "full": "fcf973b5038578bc5d14add700bce25b882c060a",
+      "commit": "a25041e7",
+      "full": "a25041e7b2832481287bba13625945a69fc420de",
       "branch": "main",
-      "describe": "port-base-20260820-172-gfcf973b5",
-      "subject": "test(core): G81 follow-through — guard declared-equals-resolved; relay the two company consequences",
+      "describe": "port-base-20260820-177-ga25041e7",
+      "subject": "docs(ideas): capture the wave-2 blocker list and the DD-band occupation",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7217,6 +7217,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/company-prompts/port-213e1d12-followup-company-prompt.md",
+      "name": "port-213e1d12-followup-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/port-213e1d12-followup-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/company-prompts/port-7c18ff4b-followup-company-prompt.md",
       "name": "port-7c18ff4b-followup-company-prompt.md",
       "extension": ".md",
@@ -14327,15 +14336,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/reviews/port-review-7c18ff4b-20260820.md",
-      "name": "port-review-7c18ff4b-20260820.md",
-      "extension": ".md",
-      "rel_path": "docs/reviews/port-review-7c18ff4b-20260820.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/reviews/schema-matrix-2026-08-17.md",
       "name": "schema-matrix-2026-08-17.md",
       "extension": ".md",
@@ -19421,10 +19421,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
-      "name": "drydocs-20260824.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-0823.json",
+      "name": "drydocs-20260824-0823.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824-0823.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -32618,6 +32618,11 @@
     [
       "drydocs/docs/company-prompts",
       "CONTAINS",
+      "drydocs/docs/company-prompts/port-213e1d12-followup-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
       "drydocs/docs/company-prompts/port-7c18ff4b-followup-company-prompt.md"
     ],
     [
@@ -36278,11 +36283,6 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
-      "drydocs/docs/reviews/port-review-7c18ff4b-20260820.md"
-    ],
-    [
-      "drydocs/docs/reviews",
-      "CONTAINS",
       "drydocs/docs/reviews/schema-matrix-2026-08-17.md"
     ],
     [
@@ -39278,7 +39278,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-0823.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
