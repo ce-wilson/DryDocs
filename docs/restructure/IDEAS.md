@@ -93,6 +93,48 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-169`** · 2026-08-24 · `[task]` · **open** · prio? **High** —
+  **The Control-M extracts have no data-center dimension, and the estate is too big to pull
+  in one go — they need to run individually, per DC, in stages.** *(User direction
+  2026-08-24.)* **MEASURED, not recalled:** neither `controlm_folders.sql` nor
+  `controlm_jobs.sql` filters on `DATA_CENTER`. The scope binds are `:folder_filter`,
+  `:run_as` (jobs only), `:developer_sid` and `:row_cap` — built by `_scope_binds()`
+  (`drydocs/cli.py`) and exposed as `--folder` / `--run-as` / `--developer-sid` /
+  `--row-cap`. The siblings are the same: variables share those four,
+  `controlm_hosts.sql` has `:grpname_filter` + `:row_cap`, `controlm_avg_run.sql` has
+  `:folder_filter` + `:row_cap`. So a run today pulls **every** DC present in
+  actively-scheduled folders, and `controlm_folders.cypher` mints one `:ControlMServer`
+  per distinct `DATA_CENTER` — non-production included. `--folder` is the only lever and
+  it filters the wrong axis.
+  **THE SCOPE:** three production data centers, run one at a time — `T012-E0700-IB`,
+  `T014-E0700-ANY`, `T032-E0700-DMA` in the publishable spelling (the J13 environment-letter
+  swap; real values live in `internal/standards/technology/data-center-inventory.md`).
+  **WHY STAGING IS NOT OPTIONAL, with the numbers the 2026-08-24 census produced:** raw
+  object sizes are CM_DEF_VJOB 1,089,358 rows · CM_DEF_LNKI_P_VW 1,293,560 ·
+  CM_DEF_LNKO_P_VW 1,318,968 · CM_DEF_SETVAR_VW **4,716,529** · CM_DEF_VTAB 76,364. The
+  extract scope (`IS_CURRENT_VERSION = 'Y'` + `USER_DAILY IS NOT NULL`) already cuts jobs to
+  ~240,600 across four DCs, and the per-DC split (internal twin, capture 2026-06) runs
+  2,230–7,914 folders and 42,688–85,202 jobs per DC — so **per-DC is a fraction of the
+  estate, and variables is the object that actually forces staging**, not jobs.
+  **THE DBA ASK IS ALREADY WRITTEN, AND IT IS ALREADY DC-SHAPED:**
+  `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` is a DBA implementation script —
+  Section 0 pre-flight (is `TABLE_ID` unique across DCs? the design assumes the composite
+  key defensively), Section 1 base read views, `stg_run.data_centers` ("comma list processed
+  this run"), every staging table carrying `(run_id, data_center, folder_id, job_id)` with a
+  `(data_center, folder_id, job_id)` index, Section 6 grants, full-refresh load pattern,
+  sizing < 3M rows / < 2 GB with no partitioning needed. **"Dictate what we need" = hand
+  them that file.** What it does NOT yet carry is a per-DC RUN RECIPE (one run per DC vs one
+  run listing three), and `stg_run.data_centers` is a comma list, so either shape is
+  expressible — the choice needs writing down before the first load.
+  **NOT BUILT, deliberately:** no `:data_center` bind was added. The mechanism is cheap and
+  changes no projection (one NULL-tolerant bind per extract + `_scope_binds()` +
+  `--data-center`; the ledger and the SQL drift guard are untouched because the column set
+  does not move), but **which** DCs load is the SME's scope call, and the 22-vs-4 residual
+  under gate `controlm-hosts-topology` is still open.
+  **ONE QUESTION FOR THE USER, not for an agent:** the three named DCs are three of the
+  **four** known production DCs — `T021-E0800-ANY`, the largest by folder count, is absent.
+  Deliberate scope cut, or an omission?
+
 - **`Idea-168`** · 2026-08-24 · `[chore]` · **parked → next internal session** · prio? **Med** —
   **The Control-M profiling numbers are company-estate figures, and every threshold derived
   from them needs re-tuning on the internal side.** Two different things are called
@@ -126,6 +168,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
   probes P1–P5 and the **DC scope call** (three datapoints: 22 DCs in CM_HOSTS, 14 in
   CM_AVG_RUN, 4 production) are open even though backlog P1 reads `done`, because only the
   avg-run set actually ran.
+  **KEPT-UPDATED 2026-08-24 — the census half LANDED, the tuning half did not.** An internal
+  session ran the doc 08 Phase 2 catalog census read-only against live psgmgr (column
+  inventory + row counts, no data values) and the conclusions are transcribed into
+  `config/source-mappings/psgmgr.yaml`: **7/7 objects now read `census: complete`** (was 1/7),
+  every sweep carries its frozen `count:`, `census_failures()` is empty, and **CM_DEF_VJOB's
+  `kind` was wrong — recorded `view`, it is a TABLE** (corrected in the same pass; no other
+  file asserted the wrong kind). Column counts / rows: VTAB 26 / 76,364 · VJOB 121 /
+  1,089,358 · LNKI 12 / 1,293,560 · LNKO 10 / 1,318,968 · SETVAR 11 / 4,716,529 · CM_HOSTS 5 /
+  13,745 · AVG_RUN 26 (2026-07-22). STILL OPEN, and why this entry stays parked: per-column
+  DATA profiling (null rates, distinct counts, value domains) is a separate heavier pass; the
+  CM_HOSTS **definition-side** probes P1–P5 still have not run — a catalog census is not those,
+  and the remaining probes return real host/group names, which is why the census used a
+  catalog-only path; and the DC scope call is still the SME's. The per-DC extraction
+  requirement those row counts drive is [[Idea-169]].
 
 - **`Idea-166`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
   **The load runbook's `--csv` example points at a path that exists nowhere in this repo.**
