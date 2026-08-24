@@ -93,6 +93,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-163`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
+  **`v0.3.0` — the first tagged release — exists only as a local tag on the desktop, and it
+  points into orphaned history.** `git ls-remote --tags origin` returns only the six
+  `port-base-*` tags, so the annotated tag was never pushed and is absent from
+  `ce-wilson/DryDocs` and from the laptop. Its target `8645f81e` (2026-07-09) is NOT reachable
+  from `main`: the 2026-07-20 squash re-rooted `main` at `c5a84c37`, leaving the tag pointing
+  inside the pre-squash history held by `archive/old-history-2026-07-20`. Both of those refs are
+  desktop-local, so losing this machine's `.git` takes the repo's only record of the release with
+  it. VERSIONING.md's own ritual step 5 says to push the branch AND the tag
+  (`git push origin main --follow-tags`); that never completed for `v0.3.0`. **Not a port
+  defect** — `git-readme.md` step 24 rules that the annotated tag does not cherry-pick and that
+  the company keeps its own version string, so the company repo correctly has no `v0.3.0`; the
+  gap is producer-side only. **Three decisions ride on this, none automatic:** (1) push the tag
+  as-is, which publishes a ref into history unreachable from `main`, or re-cut it against a
+  post-squash commit, which changes what the first release points at; (2) `pyproject.toml` still
+  reads `0.3.0` while CHANGELOG `[Unreleased]` has accumulated everything since 2026-07-09 —
+  whether that has earned a `v0.4.0` is a release call; (3) VERSIONING.md is itself stale, citing
+  `drydocs.backlog.v2` and `docs/restructure/backlog.yaml` when the schema is v3 (ADR 0013) and
+  that file is a tombstone — either L19 doc-drift or folded in here. Surfaced while verifying a
+  company-side port-close review, which correctly flagged the tag's absence on their main.
+
 - **`Idea-162`** · 2026-08-24 · `[chore]` · **open** · prio? **Low** —
   **The company occupies `DD1`–`DD10` in the PRODUCER band, in a letter series this repo
   cannot see.** `DD1`–`DD9` predate the 2026-08-18 allocator partition and are
