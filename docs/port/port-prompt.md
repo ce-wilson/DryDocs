@@ -1108,6 +1108,16 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   producer change. Note the company runbook's step 8 currently sequences the PAT block
   BEFORE the SEAL block, which is what produced the failure.
   Rides T23, which already carries the S3 re-key and its all-8-sites-in-one-apply rule.
+  **UPDATE 2026-08-23 (G79) — the rule is now DECLARED, not a position in a tuple.**
+  The statement above was true and is now enforced. `REFRESH_REFERENCE_CHAIN` no longer
+  exists: it split into `refresh-catalog` / `refresh-applications` / `refresh-teams`
+  (`cli.CHAINS`), and the ordering rule rides that split as
+  `cli.BUSINESS_APPLICATION_MINTERS` + `cli.APPLICATION_IDENTITY_LOADER` with a guard
+  asserting the identity loader's command precedes every minter's in
+  `CANONICAL_LOAD_SEQUENCE`. So the invariant survives a reorder instead of depending on
+  one, which is exactly what a split threatened. **Nothing changes for the company
+  side:** the fix is still company-owned, and producer still has neither the wrong order
+  nor the collision — it is simply no longer luck that it does not.
   **CORRECTION TO A COMPANY-SIDE MEMORY NOTE, 2026-08-11 — please strike it.** A
   company session recorded `load-order-seal-before-pat.md` saying the fix "is
   producer-owned — the canonical `CANONICAL_LOAD_SEQUENCE` will be corrected upstream
