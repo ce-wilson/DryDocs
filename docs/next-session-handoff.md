@@ -2,88 +2,89 @@
 
 > **Rolling file — overwrite it, do not append.** One screen of "where things stand"
 > for picking the work up on the other machine. Durable state lives in
-> `docs/restructure/backlog/` (the claim channel — ONE FILE PER ITEM since today) and
+> `docs/restructure/backlog/` (the claim channel — one file per item) and
 > `docs/port/port-prompt.md`; this is the narrative that git alone does not carry.
 >
-> **Written 2026-08-20 (desktop, session close), producer head `11229bbd`; certified base
-> = tag `port-base-20260820` @ `213e1d12` (four ritual commits after it ride the next port).**
+> **Written 2026-08-24 (laptop `NewThinkpad`, session close), producer head `1cbacd7a`;
+> certified base = tag `port-base-20260824` @ `68b53716` (commits after it ride the
+> next port — normal, not a discrepancy).**
 
-## 1. A CERTIFIED BASE IS WAITING — the lull port is ready on our side
+## 1. WAVE 2 IS CERTIFIED AND WAITING
 
-**`port-base-20260820` @ `213e1d12`**, preflight 7/7 green, range
-**`7c18ff4b..port-base-20260820`** (25 commits, 544 paths, ledger steps 171-176).
-Anything committed after the tag rides the NEXT port — normal, not a discrepancy.
+**`port-base-20260824` @ `68b53716`**, preflight **7/7**, range
+**`213e1d12..port-base-20260824`** — **182 commits**, ledger steps **178-213**.
+Suite 2382 passed / 9 skipped (laptop `NewThinkpad`, samples-dir present,
+`RECONCILE_BEFORE_DIR` unset — J18). CI green at the tagged commit.
 
-**The hand prompt is `docs/company-prompts/port-backlog-shard-company-prompt.md`**, filled except
-for the company's own dates/branch names. It leads with the one thing that makes
-this port unlike every prior one: **step 175, the backlog shard**, applies by a
-ONE-TIME sequence — union the monolith under the old rule → run the PORTED
-`scripts/shard_backlog.py` on the union → the proof must print `PROOF OK` →
-`--tombstone`. The tree is each side's own output; never copied. Everything else
-in the range applies by the manifest as usual.
+**No hand prompt has been written for this range, deliberately.** Unlike the
+`port-base-20260820` port, nothing here needs its own apply sequence — everything
+applies by the manifest. What it DOES need is that the reader opens five steps first,
+because they change behaviour or delete something the other side may hold:
 
-**Company-side precondition — MOSTLY MET as of this evening (per their session's
-close-out, recorded in THEIR ledger, no ids carried here):** the 135-170 port is
-`--no-ff` merged to their main; the FID pair landed as ONE gate-log commit; the
-not-port-introduced section is in their PORT-REPORT; the stash was handled by-path
-(correctly — a wholesale pop would have clobbered tracked state). TWO items await
-the user's word to that session: (b) `port-prompt.md` "retire" — now DEFINED in
-`docs/company-prompts/port-7c18ff4b-followup-company-prompt.md`: archive their steps-43+ as a
-`DATED RECORD` + replace the file with a POINTER to the producer ledger-at-tag,
-never `git rm` (97 refs / 32 files), never a fresh living ledger; (c) the seven
-deferred-gate DEFER records — authorized by the prompt, the session was
-conservative. Once (b) lands, paste `docs/company-prompts/port-backlog-shard-company-prompt.md`.
-Their `origin` is the producer remote but CANNOT push (user-confirmed); no action.
+| step | why it needs reading before the apply is planned |
+|------|--------------------------------------------------|
+| **195** | S8 splits `cli.py` (3184 lines) into a composition root + six domain modules. `drydocs/cli.py` is `evaluate` — biggest hand-merge in the range. |
+| **209** | G79 removes `refresh-reference` **by name**; three subject commands replace it. Any runbook or schedule calling it breaks. |
+| **210** | G81 makes `DRYDOCS_DATA_ROOT` **mandatory** — the first data-path command after the port exits 2 until it is exported. Also RELAY-12. |
+| **188** | G87/G88/G101 migrate live vocabulary ids and ship two `.cypher` migrations that must run against the consumer's own graph. |
+| **212** | the range **deletes** `docs/reviews/port-review-7c18ff4b-20260820.md` from the producer tree — an untracking (`103f240c`), not a retraction. |
 
-**Standing rule from today (memory `hand-prompts-ask-nothing-back`):** producer-
-facing text never asks for anything back — no SHAs, no replies, no instance names.
-Records live in THEIR ledger. The user will clean `port-prompt.md`'s older wording.
+**Also new this range and relevant AT the close:** step 208 — `scripts/port_backlog_union.py`
+lands at `35e6d103`, which is INSIDE this range, so unlike the last port the company
+now has it. Run it at close and paste the block into the PORT-REPORT.
 
-## 2. What landed today (all pushed, CI green at every step checked)
+## 2. TWO CLOSE-OUT GAPS, BOTH THE USER'S CALL
 
-- **The backlog is sharded (Y1 + Y2, ADR 0013).** `backlog.yaml` is an 11-line
-  tombstone; items live in `docs/restructure/backlog/items/<id>.yaml`. Roll-ups are
-  DERIVED (the board's "Ready to pull" strip = `next_ready`); nothing stores them
-  and `test_backlog.py` fails if anything does. **A claim is a one-key edit of one
-  item file, committed and pushed before work** — four claims/closes today were
-  exactly that. Reader: `drydocs_core.backlog_store`. Groom skill, validator,
-  CLAUDE.md §0, and the reconcile-port before-snapshot (now
-  `backlog_store.dump_document()`) are re-pointed.
-- **F4 ruled:** at a port, backlog `status` is PER-REPO — the consumer's stands,
-  the producer's folds into notes (ADR 0013 Clause 4 + the manifest entry_rule).
-  Intra-repo (two machines) keeps "never regress / keep the further-along".
-- **J51 done:** six PER-ENTRY manifest rows for the paths the company legitimately
-  extends (description_tokens, detect, test_runbook_currency, email-dl-contact-
-  point, ui-components, doc-source-registry with a field split). Idea-142 closed.
-- **C34 done:** `lob-product-team.yaml` declared a skos:ConceptScheme (layer 1);
-  gate `dcat-theme-subject-scheme` DRAFTED unsigned (residency recorded as
-  answered-by-fold; IS-vs-HAS, depth, detector-cap, pending-vs-out-of-scope posed);
-  `catalog_has_theme` + `:Theme` registered PLANNED.
-- Port review of 7c18ff4b (five findings) + two hand prompts; Idea-148 (scrape run
-  <-> registry row join) inboxed.
-- **Standing rule, saved as memory `hand-prompts-ask-nothing-back`:** producer-facing
-  text never asks for SHAs/replies/instance names back; records live in THEIR ledger.
-  Applied: both prompts and this file carry zero company commit ids (grep-verified).
-- Email storage question answered from the registry (no change): `adhoc-sme-email`
-  = raw under company `internal/`, CITATION-ONLY :Document, no body; `ops-email-
-  extracts` = `DRYDOCS_DATA_ROOT/email-extracts/`. Unfixed: a subpath/filename
-  convention for ad-hoc emails — not inboxed, the user did not ask for one.
+1. **The `port-base-20260820` port is REPORTED COMPLETE (user, 2026-08-24) but its four
+   J35 fields have not reached this file.** The roll note records it as
+   **USER-REPORTED**, not as the J35 record, and nothing was filled in from this side —
+   no producer figure may stand in for a company acceptance number. If the company
+   PORT-REPORT is available, the paragraph can be upgraded now instead of at the next
+   port: applied RANGE + `rev-list --count`, PORT COMMIT(s), BACKUP TAG + its proof,
+   ACCEPTANCE NUMBERS.
+2. **The `caa0406` close-out is still unrecorded** — three fields, plus RELAY-7 owed
+   company-side. Unchanged from the last two handoffs; the block above the
+   "Last CONFIRMED-COMPLETE port" section in `port-prompt.md` says what rides on it.
 
-## 3. Machine state (desktop)
+## 3. What landed today (all pushed; CI green at HEAD)
 
-- **`VIRTUAL_ENV` leak:** Claude Code's shell here pre-sets it to `agents\.venv`;
-  prefix `unset VIRTUAL_ENV;` or `poetry run` silently uses the wrong venv. User
-  terminals are NOT affected (memory `desktop-virtualenv-leak`). The handoff's
-  earlier "repaired venv / S12" worry was this.
-- **Worktree `ui-workstream`** (`feat/ui-workstream`) is MERGED and fast-forwarded
-  to `213e1d12`, 0 ahead, clean, with its own `.venv`. The user has not worked it
-  since; nothing pending there. Do not clean worktrees.
-- The FID/port screenshots under the data root and the five `port-*.png` in the
-  repo root are gitignored and carry SIDs/handles — never into a tracked surface.
+- **`3f1cac70`** — the three cited paths that resolved nowhere, and **RELAY-12**. The
+  G81 relay had been sitting OUTSIDE the numbered section while `relays_missing_basis()`
+  parses only between `STANDING RELAYS` and `OWED COMPANY-SIDE:`, so check 5 was passing
+  GREEN on a relay it structurally never inspected. Nothing was wrong with the relay —
+  what was wrong is that the green meant nothing about it.
+- **`9e621887`** — the roll: steps 178-213 plus the coverage footnote.
+- **`3b4d8e76` + `68b53716`** — the CI failure and its repair (see §4), the tag point.
+- **`1cbacd7a`** — the roll note's range count and tag location corrected, and the
+  ACCEPTANCE GATE's stale full-suite reference refreshed.
+- **`d222290e`** — Idea-161 closed into the audit trail.
 
-## 4. Open claims
+## 4. THE ONE THING WORTH CARRYING TO THE OTHER MACHINE
 
-None under this session's name. Laptop claims per the board (`docs/plan/board.html`).
-Next producer-side candidates: E1 / K16 / L19 / G62 stay `in_progress` from earlier
-sessions; the board's Ready-to-pull strip lists 100+ dependency-ready items, p1s
-first: D10, G68, G70.
+**A guard can pass locally and fail in a fresh clone because of an UNTRACKED file that
+is still on disk.** The roll went RED on CI while the same suite passed here: step 212
+cites `docs/reviews/port-review-7c18ff4b-20260820.md`, which `103f240c` untracked but
+which this laptop still holds. `test_runbook_currency.py` asks the **filesystem**, not
+git. Any machine that ever held the file gets the same false pass; only a new checkout
+sees the truth.
+
+Fixed as a `HISTORICAL_PATHS` entry whose reason carries the trap, and **verified by
+moving the file aside and re-running** — not by trusting the local green. This is the
+Idea-111 class (an instrument whose failure mode is silence) and it is the reason the
+session ritual's CI check is a numbered step rather than a habit.
+
+## 5. Open and unchanged
+
+- **Idea-162** — the company occupies `DD1`–`DD10` in the PRODUCER band. Capture-only;
+  nothing to do until a producer `DD` series is proposed, which is the only way that
+  decision would get made by accident.
+- **Idea-160** — a SOURCE-mode `refresh-teams` needs `pat_team_roles.csv`, which nothing
+  emits. Fails loud by name (G78), so it is a task, not a bug — but the first company-side
+  real run meets it, and step 191 says so.
+- **Idea-158** — `snapshot.ps1`'s board refresh can half-fail and report a traceback with
+  no traceback in it. Root cause on this machine is `VIRTUAL_ENV` pre-set to `agents\.venv`
+  in the agent shell, inherited by `poetry run`. Confirm all nine renders landed rather
+  than trusting the warning line.
+- **Idea-159 / S13** — four tests pass in the full suite and fail when their file runs
+  alone (the `cli_*` circular import the S8 split exposed).
+- Five items sit `in_progress` (E1, G62, K16, L19, MM7) and were NOT touched.
