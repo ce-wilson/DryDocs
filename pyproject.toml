@@ -65,7 +65,7 @@ optional = true
 lxml = ">=5.3"
 
 [tool.poetry.scripts]
-drydocs = "drydocs.cli:app"
+drydocs = "drydocs.cli:run"   # run() renders operator-config errors (G81) as exit 2, not a traceback
 
 [build-system]
 requires = ["poetry-core"]

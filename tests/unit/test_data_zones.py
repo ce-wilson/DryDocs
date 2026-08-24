@@ -284,3 +284,23 @@ def test_read_zone_containing_finds_the_zone(monkeypatch, tmp_path: Path) -> Non
     hit = dz.read_zone_containing(tmp_path / "remediation" / "incoming" / "x" / "y.xml")
     assert hit is not None and hit.id == "remediation-incoming"
     assert dz.read_zone_containing(tmp_path / "rua" / "extracted" / "b") is None
+
+
+def test_the_console_script_renders_config_errors_not_tracebacks() -> None:
+    """G81's errors are OPERATOR CONFIGURATION errors, and the command most
+    likely to meet one is `landing-zones` — whose whole reason for existing is
+    that "my extracts are gone" should be a one-command answer. A stack trace
+    there defeats the command at the moment it matters, so pyproject points at
+    run(), which renders the message and exits 2 (the repo's operator-error
+    code). Guarded because an entry-point revert is silent and untested."""
+    import tomllib
+
+    from drydocs import cli
+
+    assert hasattr(cli, "run"), "drydocs.cli.run() is the console-script entry point"
+    pyproject = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
+    entry = pyproject["tool"]["poetry"]["scripts"]["drydocs"]
+    assert entry.startswith("drydocs.cli:run"), (
+        f"the console script points at {entry!r}, not drydocs.cli:run — an "
+        "unset DRYDOCS_DATA_ROOT would render as a traceback again."
+    )
