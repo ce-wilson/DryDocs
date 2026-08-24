@@ -1,8 +1,19 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 10, 2026-08-04**
-  (Appendix B is now a PROFILE of the one declared load sequence, not a copy of it —
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 11, 2026-08-24**
+  (CATCH-UP TO THE G102 FOLD, 2026-08-18 — this doc had been Rev 10 / 2026-08-04, so it
+  spent two weeks telling readers to provision a four-database topology two of whose
+  names were retired. Three defects fixed: the topology enumerations drop to
+  **`drydocs` + `ddschema`**; `load-essential-graphrag` no longer documents a
+  `-> ddcontext` target the CLI stopped carrying at `4763e63e`; and **provisioning moves
+  from step 4 to step 2**, because it CREATES the databases every later step connects to —
+  `drydocs check` raises `DatabaseNotFound` on a DBMS where `drydocs` is absent, so the
+  old order could not be followed on the fresh container it was written for. Why it
+  drifted is worth one line: Appendix B stayed correct throughout because
+  `tests/unit/test_load_sequence_surfaces.py` guards it, and nothing guards Appendix A or
+  the Startup list; on top of
+  Rev 10, 2026-08-04, where Appendix B became a PROFILE of the one declared load sequence, not a copy of it —
   it gains the standing `docs-verify` step it had been missing and a guard now fails
   if it drifts again (N6); on top of
   Rev 9, same day, where `ddlineage` retired — ADR 0002 X1 amendment: the topology enumerations drop to four
@@ -205,15 +216,41 @@ check; go to Troubleshooting.
    ```
    *Success:* `docker ps` shows the container up; `docker logs` ends with
    `INFO  Started.`; the port mapping matches what `.env`'s `NEO4J_URI` expects.
-2. **Connectivity + APOC:**
+2. **Provision the topology — `drydocs` + `ddschema`.** Required on a DBMS that has
+   never been provisioned, and again after anything that destroys databases (a deleted
+   `neo4j-testdata` volume, a hand `DROP DATABASE`). Skip it on a container that already
+   shows both names in `SHOW DATABASES`.
+   ```powershell
+   .\drydocs_core\schema\provisioning\provision.ps1
+   ```
+   *Success:* `OK  topology provisioned (drydocs, ddschema …)`, and
+   `SHOW DATABASES` lists `drydocs` and `ddschema` `online`.
+
+   **This step is FIRST for a reason, and it used to be fourth.** Nothing else creates a
+   database — every verb below opens a session against one that must already exist, and
+   `drydocs check` raises `Neo.ClientError.Database.DatabaseNotFound` where `drydocs` is
+   absent. The script runs `01_databases.cypher` against the **`system`** database via
+   `cypher-shell` (host PATH if present, else `docker cp` + `docker exec`); it is
+   idempotent (`IF NOT EXISTS`) and is wired to no startup hook, by design —
+   provisioning is a deliberate act, not something a command does to you.
+
+   Two asymmetries worth knowing before you trust a green run. `CREATE DATABASE … IF NOT
+   EXISTS` is a no-op where the name already exists, so re-running proves nothing about a
+   NEWLY ADDED name — confirm with `SHOW DATABASES` rather than inferring it. And
+   provisioning **never drops anything**, so a container predating a RETIREMENT still
+   carries the dead name after a green run: `ddlineage` (retired 2026-08-04, ADR 0002 X1)
+   and `ddcontext` + the `ddall` composite (retired 2026-08-18 at the G32/G102 fold).
+   Dropping those is manual, per machine — alias out of any composite, zero-node probe,
+   then `DROP DATABASE <name>`. They are inert meanwhile: nothing reads or writes them.
+3. **Connectivity + APOC:**
    ```powershell
    poetry run drydocs check
    ```
    *Success:* exit 0 — server version and APOC reported.
-3. **Schema backbone, then the supplement chain:**
+4. **Schema backbone, then the supplement chain:**
    ```powershell
    poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher
-   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (G51 provisions it)
+   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (step 2 provisioned it)
    poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry
    ```
    One command, not four. The order is load-bearing — `catalog` reuses the
@@ -233,21 +270,6 @@ check; go to Troubleshooting.
    *Opt-in:* `--with-sosa` appends the EXPERIMENTAL SOSA/SSN supplement. It is not a
    declared company standard and is never in the default chain — leave it off unless
    you are deliberately working layer-4.
-4. **First-time only — multi-DB topology** (drydocs + ddcontext + ddschema
-   + the ddall composite): run the G1 provisioning per
-   `drydocs_core/schema/provisioning/README.md` (`provision.ps1`). Skip on an
-   already-provisioned container.
-
-   Note the ordering trap on an EXISTING container: `CREATE DATABASE … IF NOT EXISTS`
-   is a no-op where the database already exists, so re-running provisioning proves
-   nothing about a newly added name. `ddschema` was created by hand during C21 and only
-   provisioned by DDL at G51 — on any machine that predates G51, confirm with
-   `SHOW DATABASES` rather than inferring it from a successful `provision.ps1` run.
-   The same asymmetry runs the other way for a RETIRED name: provisioning never drops
-   anything, so a container that predates the 2026-08-04 `ddlineage` retirement (ADR
-   0002 X1) still carries it after a green `provision.ps1` — dropping it is the manual
-   Epic X step (alias out of `ddall`, zero-node probe, then `DROP DATABASE ddlineage`).
-
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
 
@@ -284,7 +306,7 @@ samples; the Oracle variant is the same chain with scope binds.
    poetry run drydocs load-software-registry
    poetry run drydocs load-bmc-docs
    poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itself
-   poetry run drydocs load-essential-graphrag     # optional (-> ddcontext)
+   poetry run drydocs load-essential-graphrag     # optional (-> drydocs)
    ```
    `load-doc-traceability` is the L7 self-documentation chain: `docs/design/*.md` →
    `:DesignDoc`/`:DocSection`, the traceability-matrix rows → `:Requirement`/
@@ -344,12 +366,14 @@ Known-good is cheap here because every loader MERGEs idempotently.
 3. **Container-level:** `docker stop` is always safe — graph data lives in the named
    volume `neo4j-testdata` and survives restarts. Recreating the *container* can remap
    host ports (re-check `docker port`, update `.env` — that is exactly what the
-   2026-07-23 recreation did, Appendix A); deleting the *volume* loses the graph — the
-   recovery is this runbook from Startup step 3, including Refresh step 3 (the document
-   corpora live only in the DB).
+   2026-07-23 recreation did, Appendix A); deleting the *volume* loses the graph — and it
+   takes the DATABASES with it, not just their contents, so the recovery starts at
+   Startup step **2** (provisioning), not at the schema step. Then run it through,
+   including Refresh step 3 (the document corpora live only in the DB).
 4. **Destructive last resort:** `poetry run drydocs reset --yes` DETACH-DELETEs every
    node and relationship in the default DB. Blast radius: the whole graph, including
-   gate-accepted corpora loads. Recovery: Startup steps 3–4 + the full Refresh section.
+   gate-accepted corpora loads. The DATABASES survive (it deletes contents, not names),
+   so recovery is Startup step 4 + the full Refresh section — no re-provisioning.
 
 <!-- anchor: troubleshooting -->
 ## Troubleshooting
@@ -383,8 +407,12 @@ don't duplicate it here.
 <!-- anchor: appendices -->
 ## Appendices
 
-**A. Current local environment** — a render of `config/dev-environment.yaml` (2026-08-03).
-Change it *there* first, then here; verify against `docker port`, never assume:
+**A. Current local environment** — a render of `config/dev-environment.yaml`
+(re-read 2026-08-24, post-fold). Change it *there* first, then here; verify against
+`docker port`, never assume. **This table is PER-MACHINE**: `dev-environment.yaml` is
+`canonical-company` in `PORT-MANIFEST.yaml`, so container names, ports and paths are
+local facts that must never be copied across the repo boundary — only the DATABASE row
+is a shared fact, because the topology is ruled rather than local.
 
 | Item | Value |
 |---|---|
@@ -394,7 +422,7 @@ Change it *there* first, then here; verify against `docker port`, never assume:
 | Plugins | `apoc` (174 procs) + `gds` (471 procs), both 2026.05.0. Needs `apoc.*,gds.*` in BOTH `dbms.security.procedures.unrestricted` and `..._allowlist`. NOT `NEO4J_PLUGINS` — see Rev 4 |
 | HTTP / Browser | container 7474 → host **7474** (`http://localhost:7474/browser/`) |
 | Bolt | container 7687 → host **7687** (`bolt://localhost:7687`) |
-| Databases | `drydocs`, `ddcontext` + composite `ddall` (G1/G7), and `ddschema` for the schema meta-graph (G51) — deliberately NOT a `ddall` constituent, since it describes the schema rather than the estate. (`ddlineage` retired 2026-08-04, ADR 0002 X1 — a container provisioned earlier still shows it until the Epic X drop) |
+| Databases | `drydocs` (ground truth AND the document corpora) and `ddschema` (the schema meta-graph) — the folded set, `01_databases.cypher`. RETIRED names a container provisioned earlier still shows until it is dropped by hand: `ddlineage` (2026-08-04, ADR 0002 X1), and `ddcontext` + the composite `ddall` (2026-08-18, gate `document-content-topology` / G102). `ddschema` was never a `ddall` constituent — it describes the schema, not the estate. |
 | Credentials | `.env` only (`NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD`) |
 
 **No rollback copy exists on the laptop.** The retired `neo4j-drydocs-ee` (7476/7689) container

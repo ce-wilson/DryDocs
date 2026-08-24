@@ -87,7 +87,7 @@ is wired or the model is unpriced. R3 also adds the reserved caller-identity
 slot `user_id_sha256`/`user_id_chars` (hash + length only, mirroring the
 question-text rule) and two sinks beside the envelope: a per-LLM-call JSONL
 ledger in DRYDOCS_LOGDIR (the ONLY home of full question text) and one
-`:AgentRun` node per question in `ddcontext` via
+`:AgentRun` node per question in `drydocs` (the G102 fold, 2026-08-18) via
 `common/agent_run_writer.py` (surfaced by the `console.agent-runs.v1` spec).
 `fetched_at`/`stale` are declared now and filled by R7. `chunks` stays 0
 until doc-corpus retrieval (R7) wires in.

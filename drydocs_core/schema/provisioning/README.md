@@ -13,7 +13,8 @@ on a **Neo4j Enterprise** DBMS. Authoring + structure only — **no data load** 
 > "provisioned but not live" disposition). Curated lineage writes land in `drydocs` per
 > ADR 0002 D1/D2; nothing ever wrote or read `ddlineage`, and empty-but-provisioned is
 > the gap the G28/G30 drift classes grew in. On a host that still carries it, drop it
-> per the Epic X items (alias out of `ddall` first, behind a zero-node emptiness probe).
+> per the Epic X items, behind a zero-node emptiness probe. (Those items also said
+> "alias out of `ddall` first" — no longer a step, since `ddall` retired 2026-08-18.)
 
 | `02_proxy_constraints.cypher` | — (RETIRED at G31/G102, 2026-08-18) | tombstone — the cross-db charter died with the fold; both keys live in `constraints.cypher` (`drydocs bootstrap`) |
 | `smoke_drydocs_all.cypher` | — (RETIRED with `ddall`; file DELETED at the G38 close, 2026-08-19 — recover via git history) | the federated smoke had nothing left to federate |
@@ -113,7 +114,14 @@ covered path.
 
 ## Why these keys (no identity invented)
 
-The composite joins `ddcontext` → `drydocs` by **business key** (proxy-node
+> **RETIRED MECHANISM, KEPT FOR ITS REASONING (G102, 2026-08-18).** There is no
+> composite and no cross-database join any more — `ddcontext` folded into `drydocs`
+> and `ddall` retired with it. This section is kept because the KEYS it chose did not
+> retire: they are the ones `constraints.cypher` still enforces, and the argument for
+> choosing a business key over an internal id is the same argument whether or not two
+> databases are involved. Read the mechanism below in the past tense.
+
+The composite joined `ddcontext` → `drydocs` by **business key** (proxy-node
 pattern), never internal node id — so context records survive every `drydocs`
 rebuild and re-link automatically. Keys are the **existing canonical** ones
 (ADR 0001: "identity is always a business key"): `DataAsset.assetId` (the URN) and
@@ -127,16 +135,26 @@ gate — out of scope for G1.
   The live production deploy is tracked separately as **G7** (blocked on a multi-DB-capable
   target — procurement/ops gate, not code). G1 is authored + validated on a **local**
   Enterprise instance.
-- **`drydocs` is ephemeral today** (created/tested/destroyed). `ddcontext` is writable
-  now (isolated). **Promotion** `ddcontext → drydocs` stays **paused** until core
-  stabilizes (ADR 0002 rollout state; promotion path = Epic G5).
+- **`drydocs` is the one content database** since the G32/G102 fold (2026-08-18). The
+  `ddcontext → drydocs` promotion path this section used to describe is GONE with its
+  source: uncertain content lives in `drydocs` behind the `:Uncertain` LABEL, so there
+  is nothing to promote and no paused rollout state. Keying trust on which database a
+  row sat in was the root cause the gate's §B named.
 
 ## Validation status
 
 **Live-validated 2026-07-07** against a local Docker Enterprise instance
 (`neo4j:5.26-enterprise-ubi10`): 01 → 02 (×3) → smoke all succeeded; smoke returned
-`0 / 0 / 0` on the fresh topology and `SHOW DATABASES` shows all four DryDocs
+`0 / 0 / 0` on the fresh topology and `SHOW DATABASES` showed all four DryDocs
 databases online. This closes G1's acceptance.
+
+**That count is a fact about 2026-07-07, not about now.** The topology has been cut
+twice since: `ddlineage` retired 2026-08-04 (ADR 0002 X1) and `ddcontext` + the `ddall`
+composite retired 2026-08-18 (gate `document-content-topology` / G102). A green run of
+this script today provisions **`drydocs` and `ddschema`** — read `01_databases.cypher`
+for the live set, and `tests/unit/test_database_names.py` for the assertion that pins
+it. Provisioning never DROPS, so a container older than either retirement still shows
+the dead names after a green run; dropping them is manual and per-machine.
 
 Note: nothing runs this at container startup — provisioning is a deliberate one-time
 step after the DBMS is up (re-runnable safely thanks to `IF NOT EXISTS`).

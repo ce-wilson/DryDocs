@@ -51,8 +51,13 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 10
-    )  # Rev 10, 2026-08-04 (N6: Appendix B becomes the `cold-start` PROFILE of
+        header["rev"] == 11
+    )  # Rev 11, 2026-08-24: the G102 catch-up. The doc had told readers for two weeks to
+    # provision a four-database topology two of whose names retired at the 2026-08-18 fold,
+    # and it ordered provisioning FOURTH — after the verbs that connect to the databases it
+    # creates, so `drydocs check` raises DatabaseNotFound and the sequence could not be
+    # followed on the fresh container it was written for. Provisioning is now step 2.
+    # Rev 10, 2026-08-04 (N6: Appendix B becomes the `cold-start` PROFILE of
     # cli.CANONICAL_LOAD_SEQUENCE rather than a second sequence — it gains the standing
     # docs-verify step it was missing, and test_load_sequence_surfaces.py now fails on
     # any drift between the block and the declaration). Rev 9 same day was X2: ddlineage

@@ -421,7 +421,7 @@ core and *never each other*.
 | `drydocs-docgen` | doc outlines, design-doc renderer, PDF | `docs/design/*.html` |
 | `drydocs_remediation` | defect → fix package → ticket | **Jira only — never the graph** |
 | `drydocs_lineage` | command-line-derived lineage, SME curation | gate-bound writer |
-| `drydocs_deepdoc` | on-failure deep investigation | the `ddcontext` DB only |
+| `drydocs_deepdoc` | on-failure deep investigation | `drydocs`, behind the `:Uncertain` label |
 
 The boundary is not a diagram — it is a test. An AST-based guard walks every module's
 imports and fails the build if core imports a component, if components entangle, or —
@@ -429,20 +429,34 @@ the default-deny clause — if any module exists that is not classified into exa
 bucket. Unclassified code is a build failure, not a shrug.
 
 <!-- anchor: architecture-databases -->
-### Four databases, and why trust is a transaction domain
+### Two databases, and why trust is a LABEL rather than a location
 
-DryDocs runs Neo4j Enterprise with a deliberate multi-database topology (ADR 0002):
+DryDocs runs Neo4j Enterprise. The topology was four databases until the
+`document-content-topology` gate (signed 32/32, 2026-08-18) folded the CONTENT axis to
+one, applied at G102:
 
-| Database | Holds | Trust tier |
+| Database | Holds | Trust |
 |---|---|---|
-| `drydocs` | ground truth: Control-M, SEAL, catalog — including curated lineage (ADR 0002 D1/D2) | VERBATIM / GROUNDED |
-| `ddcontext` | uncertain, exploratory, AI-inferred material | SYNTHESIZED |
-| `ddschema` | the schema meta-graph (G51) — describes the schema, not the estate; not a `ddall` constituent | descriptive |
-| `ddall` | a *composite* database aliasing the two estate databases | read-only view |
+| `drydocs` | ground truth (Control-M, SEAL, catalog, curated lineage) AND the document corpora AND uncertain material | VERBATIM / GROUNDED carried plainly; SYNTHESIZED carried by the `:Uncertain` LABEL |
+| `ddschema` | the schema meta-graph (G51) — describes the schema, not the estate | descriptive |
 
-(A fifth name, `ddlineage`, was provisioned from G1 until 2026-08-04 — retired by the
-ADR 0002 X1 amendment after nothing ever wrote or read it; curated lineage lands in
-`drydocs`.)
+**Why the fold, and why it is not a retreat.** ADR 0011 held a single-database plan on
+the shelf against Enterprise becoming unavailable. Enterprise did not become
+unavailable — the SME ruled the fold on RETRIEVAL grounds, so the ADR's status reads
+`EXECUTED-BY-CHOICE`. The substantive change is that **trust stopped being a storage
+location and became a property of the row**: keying it on which database a node sat in
+was the root cause the gate's §B named, because a query that crosses databases to
+answer one question cannot rank what it finds. Ground-truth query specs exclude
+`:Uncertain` explicitly (30 sites across all 28 specs), a writer allow-list of two is
+enforced, and an audit spec asserts nothing uncertain is reachable from a ground-truth
+path — the three ADR 0011 clause-1 guards, landed BEFORE the fold rather than after.
+
+(Two names retired along the way and a container older than either still shows them
+until they are dropped by hand: `ddlineage`, provisioned from G1 until 2026-08-04 and
+never written or read; and `ddcontext` plus the composite `ddall` at the fold — a
+composite over one database federates nothing. A third, `dddocs`, was rejected before
+it was ever provisioned: a proposed database whose contents belong in the original
+fails the naming rule.)
 
 The point of `ddcontext` is architectural honesty: uncertain data lives in its own
 transaction domain, so it is *physically impossible* to write it into ground truth by
