@@ -23,8 +23,8 @@ on `:DataAsset` and `:ControlMJob`.
 | Document type | Classification | Trust | Target DB | Sanitize? |
 |---|---|---|---|---|
 | Public annual reports, 10-K SEC filings | External | VERBATIM / GROUNDED | `drydocs` | No — public domain; cite `source_url` |
-| Internal slide decks, design docs, org charts | Internal-Public | SYNTHESIZED | `ddcontext` | Yes — omit internal names before committing |
-| Confidential internal documents (rosters, SIDs, SEAL ids, schema object names) | Internal | SYNTHESIZED | `ddcontext` | Never commit even sanitized — flag the confidential handling in a note on the entry (J23) |
+| Internal slide decks, design docs, org charts | Internal-Public | SYNTHESIZED | `drydocs` + `:Uncertain` | Yes — omit internal names before committing |
+| Confidential internal documents (rosters, SIDs, SEAL ids, schema object names) | Internal | SYNTHESIZED | `drydocs` + `:Uncertain` | Never commit even sanitized — flag the confidential handling in a note on the entry (J23) |
 
 > **External documents** (annual reports, SEC filings, public vendor docs) are in the
 > public domain. They carry `classification: External`, require no sanitization, and
@@ -32,8 +32,12 @@ on `:DataAsset` and `:ControlMJob`.
 > for direct quotes or `trust: GROUNDED` for derived/calculated facts. Always add
 > `source_url` pointing to the public source.
 >
-> **Internal documents** carry `trust: SYNTHESIZED` and always target `ddcontext`.
-> Promotion to `drydocs` requires HITL gate confirmation.
+> **Internal documents** carry `trust: SYNTHESIZED` and are always written with the
+> `:Uncertain` LABEL. Since the G32/G102 fold (2026-08-18) there is one content
+> database: separation is the label, not the location — keying trust on where a row
+> was stored is the root cause the gate's §B named, because a query that has to cross
+> databases cannot rank what it finds. Clearing the label requires HITL gate
+> confirmation; the row does not move.
 
 ---
 
@@ -51,7 +55,7 @@ urn:drydocs:dataasset:s3:<bucket-name>/<prefix>:<filename-pattern>
 urn:drydocs:dataasset:teradata:<database>:<TABLE_NAME>
 urn:drydocs:dataasset:sqlserver:<database>.<schema>:<TABLE_NAME>
 urn:drydocs:dataasset:linux:<host-path>:<filename-pattern>
-urn:drydocs:dataasset:document:<org-namespace>:<document-name>   ← Mode C / ddcontext only
+urn:drydocs:dataasset:document:<org-namespace>:<document-name>   ← Mode C / :Uncertain only
 ```
 
 ---

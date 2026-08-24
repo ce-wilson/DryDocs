@@ -46,7 +46,7 @@ scope for the extractor skill.
   format             STRING          -- TABLE | FILE | VIEW | STREAM | PDF | METRICS
   isExternalFeed     BOOLEAN         -- true = data originates outside the org's own jobs
   isSourceOfRecord   BOOLEAN         -- true = business-authoritative copy of this dataset
-  trust              STRING          -- VERBATIM | GROUNDED | SYNTHESIZED (required for ddcontext)
+  trust              STRING          -- VERBATIM | GROUNDED | SYNTHESIZED (required on :Uncertain rows)
   reliability        FLOAT           -- 0.0–1.0 (required when trust = SYNTHESIZED)
 }
 ```
@@ -78,7 +78,7 @@ every traversal query through it.
   code              STRING  UNIQUE  -- CCB | CIB | AWM | Corp | CB
   name              STRING          -- full segment name
   retired           BOOLEAN         -- true = pre-reorg segment no longer active
-  -- Metric properties (SYNTHESIZED — ddcontext only, never drydocs directly)
+  -- Metric properties (SYNTHESIZED — the node carries :Uncertain, never bare)
   roe_{year}        FLOAT           -- return on equity for a given year
   metric_year       INTEGER         -- year the metrics apply to
   metric_source     STRING          -- source doc + page reference

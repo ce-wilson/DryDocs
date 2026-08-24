@@ -262,4 +262,4 @@ BusinessSegment → (LOB→Product→App→Flow→Job) -[:EMITS_OUT_CONDITION]->
   not just the developer — these drive business-critical lineage queries
 - **Segment metrics from public documents** (annual reports, 10-K SEC filings): `classification: External`,
   `trust: VERBATIM/GROUNDED`, set `source_url`, load directly to `drydocs` — no sanitization, no staging
-- **Segment metrics from internal documents**: `trust: SYNTHESIZED`, target `ddcontext`, promote via HITL gate
+- **Segment metrics from internal documents**: `trust: SYNTHESIZED`, written to `drydocs` labelled `:Uncertain`, label cleared via HITL gate

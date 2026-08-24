@@ -93,24 +93,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-165`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
-  **A SKILL still routes agents into two databases that do not exist**, which is worse
-  than the stale prose swept at `703c2019` because a skill is executable guidance rather
-  than description. `.claude/skills/data-context-extractor/` carries **18 sites** across
-  five files instructing an agent to give document DataAssets `trust: SYNTHESIZED` and
-  **target `ddcontext`** (`SKILL.md` x8 — including the `description:` frontmatter that
-  decides when the skill is invoked at all — `references/platforms.md` x4,
-  `cypher-patterns.md` x3, `nodes.md` x2, `use-cases.md` x1). `cypher-patterns.md` goes
-  further and emits `CALL { USE ddall.ddcontext ... }` — a cross-database query against a
-  composite retired 2026-08-18 for federating one database. Both names died at the G32/G102
-  fold. **Why this was left out of the sweep rather than fixed with it:** the sweep replaced
-  descriptions of where content LIVES, which is mechanical. This skill encodes a RULING about
-  where SYNTHESIZED content goes, and the fold's answer — one database, `:Uncertain` as the
-  LABEL, trust as a property of the row rather than of the storage location — is the gate's
-  §B, so re-pointing it is a decision to make deliberately and not inside a prose pass.
-  `.claude/**` is canonical-producer, so it ports as-is. Whoever takes it should re-point
-  the two `USE ddall.ddcontext` blocks first: those are not just wrong, they cannot run.
-
 - **`Idea-164`** · 2026-08-24 · `[task]` · **open** · prio? **Med** —
   **The superseded-database guard does not scan the two packages where the stale names
   actually were.** `tests/unit/test_database_names.py` has scanned six packages since G28
@@ -1509,6 +1491,35 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **`Idea-165`** · 2026-08-24 · `[bug]` · **done (2026-08-24)** · prio? **Med** —
+  **A SKILL still routes agents into two databases that do not exist**, which is worse
+  than the stale prose swept at `703c2019` because a skill is executable guidance rather
+  than description. `.claude/skills/data-context-extractor/` carries **18 sites** across
+  five files instructing an agent to give document DataAssets `trust: SYNTHESIZED` and
+  **target `ddcontext`** (`SKILL.md` x8 — including the `description:` frontmatter that
+  decides when the skill is invoked at all — `references/platforms.md` x4,
+  `cypher-patterns.md` x3, `nodes.md` x2, `use-cases.md` x1). `cypher-patterns.md` goes
+  further and emits `CALL { USE ddall.ddcontext ... }` — a cross-database query against a
+  composite retired 2026-08-18 for federating one database. Both names died at the G32/G102
+  fold. **Why this was left out of the sweep rather than fixed with it:** the sweep replaced
+  descriptions of where content LIVES, which is mechanical. This skill encodes a RULING about
+  where SYNTHESIZED content goes, and the fold's answer — one database, `:Uncertain` as the
+  LABEL, trust as a property of the row rather than of the storage location — is the gate's
+  §B, so re-pointing it is a decision to make deliberately and not inside a prose pass.
+  `.claude/**` is canonical-producer, so it ports as-is. Whoever takes it should re-point
+  the two `USE ddall.ddcontext` blocks first: those are not just wrong, they cannot run.
+  **DONE 2026-08-24.** All 18 sites re-pointed, and the substitution is the fold's own
+  ruling rather than a rename: SYNTHESIZED content is written to `drydocs` carrying the
+  **`:Uncertain` LABEL**, so separation is the label and not the location. The trust axis
+  itself (VERBATIM / GROUNDED / SYNTHESIZED) did not move and is untouched. The
+  `CALL { USE ddall.ddcontext ... }` subquery became an ordinary
+  `MATCH (seg:BusinessSegment&Uncertain)` — worth keeping because it is the clearest
+  statement of what the fold bought: the federated hop was not replaced, it stopped being
+  needed. The gate's §B reason now sits in `references/platforms.md` where an agent reading
+  the skill meets it — keying trust on where a row was stored is the root cause, because a
+  query that has to cross databases cannot rank what it finds. Two mentions of the dead
+  names survive on purpose, both inside a comment that says they retired.
 
 - **`Idea-161`** · 2026-08-24 · `[task]` · **done (2026-08-24, laptop `NewThinkpad`)** · prio? **Med** —
   **The wave-2 base is CERTIFIED: `port-base-20260824` @ `68b53716`, preflight 7/7.**

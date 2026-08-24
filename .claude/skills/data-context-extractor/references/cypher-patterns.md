@@ -251,14 +251,16 @@ RETURN seg.code AS segment,
        count(DISTINCT j) AS jobsUsingAsset
 ORDER BY a.platform, type(r), a.name;
 
--- Segment metrics from ddcontext (SYNTHESIZED — verify before promoting)
--- USE ddall.ddcontext for cross-DB lookup
-CALL { USE ddall.ddcontext
-  MATCH (seg:BusinessSegment)
-  WHERE seg.trust = 'SYNTHESIZED' AND seg.metric_year IS NOT NULL
-  RETURN seg.code, seg.name, seg.roe_2024, seg.metric_year, seg.metric_source, seg.reliability
-}
-RETURN code, name, roe_2024, metric_year, metric_source, reliability
+-- Segment metrics carried as SYNTHESIZED (verify before clearing :Uncertain).
+-- NO cross-database hop: this used to open `CALL { USE ddall.ddcontext ... }`, and
+-- both that composite and ddcontext retired at the G32/G102 fold (2026-08-18). One
+-- content database, and the :Uncertain LABEL is the separation — which is also why
+-- this reads as an ordinary MATCH now rather than a federated subquery.
+MATCH (seg:BusinessSegment&Uncertain)
+WHERE seg.trust = 'SYNTHESIZED' AND seg.metric_year IS NOT NULL
+RETURN seg.code AS code, seg.name AS name, seg.roe_2024 AS roe_2024,
+       seg.metric_year AS metric_year, seg.metric_source AS metric_source,
+       seg.reliability AS reliability
 ORDER BY code;
 ```
 
