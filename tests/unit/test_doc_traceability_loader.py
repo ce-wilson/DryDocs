@@ -51,8 +51,17 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 12
-    )  # Rev 12, 2026-08-24: the rev11 SME feedback — provisioning moves out of Startup to the
+        header["rev"] == 13
+    )  # Rev 13, 2026-08-24: PRESENTATION ONLY. Appendix B's fifteen bare command lines gain
+    # a numbered `#` comment per step and blank-line phase grouping, and the four remaining
+    # bare commands elsewhere pick up the aligned trailing comment the doc's other
+    # multi-command blocks already had. THE RULE: a fenced block with two or more commands
+    # annotates every line; a single-command block does not, its step title already being
+    # the description. No command, order or success check changed. Appendix B stays
+    # guard-clean because test_load_sequence_surfaces extracts verbs with
+    # `poetry run drydocs (<verb>)` and never sees a comment — which is also why a
+    # superseded step must never be left commented-out there: the regex would match it.
+    # Rev 12, 2026-08-24: the rev11 SME feedback — provisioning moves out of Startup to the
     # end of Prerequisites (it is a precondition of every startup step, not one of them),
     # "Schema backbone" -> "Schema core", the per-file-verb scolding dropped. The same
     # feedback's "commands run together" note was a RENDERER defect, not prose: render_body

@@ -4,7 +4,13 @@
 - **Module:** drydocs-load — this runbook IS the module runbook for drydocs-load
   (V1 coverage rule; V3 ruled AUTHOR-DISTINCT, see Purpose & scope for the overlap ruling
   against the system-level startup/refresh runbook).
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-24**
+  (PRESENTATION ONLY — the three fenced blocks that carry two commands now annotate each
+  line with an aligned trailing `#`, matching the startup-refresh runbook's Rev 13 rule: a
+  block with two or more commands annotates every line, a single-command block does not,
+  because its numbered step title is already the description. No command, flag or success
+  check changed; on top of
+  Rev 2, 2026-08-04
   (N6 landed: the two operator surfaces are now PROFILES of the declaration rather than
   hand-maintained copies, so the "until N6 lands they can disagree" framing below is
   replaced by what the profiles are; the re-derive one-liner is also fixed — N6 widened
@@ -97,8 +103,8 @@ This module has no service. "Startup" is running a single loader deliberately.
 3. **Run ONE loader** — most take `--csv` for a specific file, and the Control-M chain
    takes `--use-oracle` and scoping flags:
    ```powershell
-   poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv
-   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"
+   poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv   # a CSV loader: one file, one verb
+   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"              # the Control-M chain, Oracle-scoped
    ```
    Success: the run envelope printed at close, with `'status': 'OK'`.
 
@@ -136,7 +142,7 @@ do to ONE loader between chain runs.
   nodes. Check `nodes_marked_removed` against what you expect BEFORE sweeping.
 - **Snapshots** recompute without re-loading source:
   ```powershell
-  poetry run drydocs snapshot
+  poetry run drydocs snapshot               # recompute rollups from the graph as it stands
   poetry run drydocs prune-snapshots        # deletes older than N years, keeps the newest
   ```
 - **Doc corpora** reconcile declared-vs-loaded, and exit non-zero on the wrong database —
@@ -153,8 +159,8 @@ do to ONE loader between chain runs.
 
 **2. The invariants hold:**
 ```powershell
-poetry run drydocs m1-verify
-poetry run drydocs m3-verify
+poetry run drydocs m1-verify              # reference / catalog / SEAL layer
+poetry run drydocs m3-verify              # the Control-M chain
 ```
 M1 covers the reference/catalog/SEAL layer, M3 the Control-M chain. These are assertions
 about the populated graph, so they are the real proof a load worked — the envelope only

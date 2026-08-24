@@ -1,8 +1,22 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 12, 2026-08-24**
-  (SME feedback applied — `docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml`:
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 13, 2026-08-24**
+  (PRESENTATION ONLY — no command, no order and no success check changed. Appendix B was
+  fifteen bare command lines: correct, guarded, and unreadable without scrolling back to
+  the sections that explain each one. It now carries a numbered `#` comment per step and a
+  blank line between phases, so the whole cold start reads in one screenful — the shape the
+  internal Confluence "Poetry Sequence" page uses, which is the format the reviewer finds
+  easier to follow. The four commands elsewhere that were still bare —
+  `load-software-registry`, `load-bmc-docs`, `m1-verify`, `m3-verify` — pick up the aligned
+  trailing comment every other multi-command block in this doc already had. THE RULE, so
+  the next edit does not have to re-derive it: a fenced block with two or more commands
+  annotates every line; a single-command block does not, because its numbered step title
+  is already the description. Appendix B stays guard-clean — `test_load_sequence_surfaces`
+  extracts verbs with `poetry run drydocs (<verb>)`, so comments are invisible to it,
+  which also means a superseded step must NEVER be left commented-out in that block: the
+  regex would match it and inject a phantom verb; on top of
+  Rev 12, 2026-08-24 (SME feedback applied — `docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml`:
   provisioning moves OUT of Startup to the end of Prerequisites, where it belongs — it is
   a precondition of every startup step rather than one of them, and putting it there also
   makes the scope note's "first-time pointer" true instead of aspirational; "Schema
@@ -11,7 +25,7 @@
   commands running together — was NOT a prose defect: `render_body` folded a fenced block
   inside a list item into the item's text, so every operator runbook rendered its commands
   on one line. Fixed in `drydocs/design_doc.py`, which is why this Rev changes more `.html`
-  than `.md`; on top of
+  than `.md`); on top of
   Rev 11, 2026-08-24 (CATCH-UP TO THE G102 FOLD, 2026-08-18 — this doc had been Rev 10 / 2026-08-04, so it
   spent two weeks telling readers to provision a four-database topology two of whose
   names were retired. Three defects fixed: the topology enumerations drop to
@@ -306,8 +320,8 @@ samples; the Oracle variant is the same chain with scope binds.
 3. **Demonstrable content — after ANY container rebuild** (a fresh container has none
    of these corpora; the loaders are idempotent, re-running on a live container is safe):
    ```powershell
-   poetry run drydocs load-software-registry
-   poetry run drydocs load-bmc-docs
+   poetry run drydocs load-software-registry      # vendor / product registry (plan 07)
+   poetry run drydocs load-bmc-docs               # BMC corpus -> Document/Chunk lexical graph
    poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itself
    poetry run drydocs load-essential-graphrag     # optional (-> drydocs)
    ```
@@ -337,8 +351,8 @@ samples; the Oracle variant is the same chain with scope binds.
 
 1. **Graph invariants:**
    ```powershell
-   poetry run drydocs m1-verify
-   poetry run drydocs m3-verify
+   poetry run drydocs m1-verify                   # reference / catalog / SEAL layer
+   poetry run drydocs m3-verify                   # the Control-M chain
    ```
    *Success:* both exit 0, every invariant `yes` — including "active folders contain at
    least one job" (`empty=0` since D6). The canonical expected `m3-verify` output for the
@@ -442,18 +456,37 @@ compares this block against the declaration and fails on any difference, so a st
 or removed here alone breaks the suite (N6, Rev 10):
 
 ```powershell
+# 1. Container up -- confirm the host port mapping before anything talks to it
 docker start neo4jtest
+
+# 2. Sanity check -- Neo4j reachable, APOC present
 poetry run drydocs check
+
+# 3. Schema core -- constraints.cypher + ontology.cypher
 poetry run drydocs bootstrap
+
+# 3b. Schema meta-graph -> ddschema (the database itself comes from Prerequisites, not here)
 poetry run drydocs bootstrap-schema-graph
+
+# 4. The ONE verified supplement chain: base -> seal -> catalog -> registry (G29)
 poetry run drydocs apply-supplements
+
+# 5. Reference load, by SOURCE (G79 split). Order is load-bearing: the catalog
+#    skeleton creates no :BusinessApplication, SEAL is authoritative for it, and
+#    refresh-teams carries a minter -- so applications precede teams.
 poetry run drydocs refresh-catalog
 poetry run drydocs refresh-applications
 poetry run drydocs refresh-teams
+
+# 6. Control-M -- folders -> jobs -> conditions -> derived deps (M3)
 poetry run drydocs ingest-controlm
+
+# 7. Registries and corpora
 poetry run drydocs load-software-registry
 poetry run drydocs load-bmc-docs
 poetry run drydocs load-doc-traceability
+
+# 8. Verify
 poetry run drydocs m1-verify
 poetry run drydocs m3-verify
 poetry run drydocs docs-verify
