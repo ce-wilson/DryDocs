@@ -496,9 +496,28 @@ rows:
       the fact at best; a per-entry union prevents it. Same class as the
       registry wired-field problem (registry-wiring-readiness gate prompt): one
       disposition cannot carry two sides' facts.
+  - path: "drydocs_core/schema/provisioning/01_databases.cypher"
+    disposition: canonical-producer   # UNCHANGED from the schema/** default; the row exists for the note
+    note: >
+      THE TOPOLOGY IS A CROSS-DISPOSITION ATOM — read this before resolving any one of
+      its files. This DDL, `config/dev-environment.yaml` (canonical-COMPANY, row above)
+      and `tests/unit/test_database_names.py` + `tests/unit/test_dev_environment.py`
+      (per-entry / evaluate) are ONE change under THREE dispositions, held together by
+      two exact-equality guards that read the DDL by parsing it.
+      TAKE THEM IN ONE COMMIT. Taking exactly one fails loudly and the message names
+      only the file in front of you: `test_databases_match_provisioning_script` reports
+      the two databases and says nothing about the config file you also had to fold, so
+      the cheapest-looking exit is to revert the DDL — which is a canonical-producer file
+      going backwards, and reads to the producer as a dropped file.
+      MEASURED, not theorised (2026-08-24): a company copy of this DDL was found still
+      carrying `CREATE DATABASE ddcontext` and the `ddall` composite after the range
+      containing the fold (`988bf0d6`, in `port-base-20260819`) was reported merged.
+      RELAY-13 carries the diagnostic and the resolution. The disposition is NOT changed
+      here and should not be — it was already right, and the apply still did not land it;
+      what was missing is this paragraph, not different mechanism.
   - path: "drydocs_core/schema/**"
     disposition: canonical-producer
-    note: "supplements + the schema meta-graph; constraints.cypher carved out per-entry ABOVE (first match wins) after the 2026-08-20 drop"
+    note: "supplements + the schema meta-graph; constraints.cypher carved out per-entry ABOVE (first match wins) after the 2026-08-20 drop, and 01_databases.cypher likewise for its cross-disposition note"
   - path: "tests/unit/test_variable_*.py"
     disposition: canonical-producer
     note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"
@@ -550,6 +569,37 @@ rows:
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"
+  - path: "tests/unit/test_database_names.py"
+    disposition: per-entry
+    entry_rule: >
+      The TOPOLOGY assertions are producer-canonical — the provisioned set and
+      SUPERSEDED_NAMES are a signed gate's ruling (document-content-topology,
+      32/32, 2026-08-18), not a per-side preference, and they move with
+      `drydocs_core/schema/provisioning/01_databases.cypher` ALWAYS. SCANNED_PACKAGES
+      is the opposite: it is an extensible list of the packages each side scans, and
+      a company-only package is never dropped by a port. Same split, same reason, as
+      `tests/unit/test_module_boundary.py` two rows above — which was canonical-producer
+      until a wholesale take dropped the company's extended groups.
+    note: >
+      MOVES WITH `drydocs_core/schema/provisioning/01_databases.cypher`, ALWAYS.
+      This guard DERIVES the provisioned set by parsing that cypher file and
+      compares it against a hard-coded expectation, so the two encode ONE
+      topology ruling and neither is meaningful alone. Without this row the pair
+      split across dispositions - the cypher `canonical-producer` under
+      `drydocs_core/schema/**`, the guard falling to the `tests/**` default_ok
+      whose reason is "consumer expectations legitimately diverge". That reason
+      is right about test_schema.py's constraint count and WRONG here: the
+      topology is ruled by a signed gate (document-content-topology, 32/32,
+      2026-08-18), not chosen per side.
+      WHY THIS ROW EXISTS, measured not theorised (2026-08-24): taking exactly
+      one of the pair fails LOUDLY, which is fine - a folded cypher against a
+      pre-fold guard is red, and so is the reverse. Taking NEITHER is green and
+      wrong, and that is the case that happened: a company copy of the cypher was
+      found still carrying `CREATE DATABASE ddcontext` and the `ddall` composite
+      after the range containing the fold (`988bf0d6`, in `port-base-20260819`)
+      was reported merged. A green suite described a topology two names too wide.
+      This row cannot force the take - nothing in a manifest can - but it puts
+      the coupling where a port session resolving either file will read it.
   - path: "tests/unit/test_port_manifest.py"
     disposition: canonical-producer
   - path: "PORT-MANIFEST.yaml"

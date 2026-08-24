@@ -1375,6 +1375,65 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   for the incident — is producer-machine-local (`docs/reviews/**` is gitignored as of
   `103f240c`); ask for it if you want the reasoning rather than the outcome.
 
+- **RELAY-13 — YOUR `01_databases.cypher` MAY STILL PROVISION `ddcontext` AND THE `ddall`
+  COMPOSITE, AND THE FOLD OWES YOU A PER-MACHINE SEQUENCE NOBODY TRACKED**
+  `[VERIFIED-PRODUCER]` for everything about the producer tree below; the ONE claim about
+  yours is tagged separately (raised 2026-08-24). The G32/G102 fold rode the
+  `caa0406..port-base-20260819` range — `988bf0d6` is the fold commit — so this is not new
+  payload. It is what that range owed you and may not have delivered.
+  **(1) DIAGNOSE — two commands, and the failure text already tells you which case you are
+  in.** `poetry run pytest tests/unit/test_database_names.py tests/unit/test_dev_environment.py -q`
+  and `poetry run drydocs docs-verify`.
+  **(a)** suite GREEN and your cypher still says `CREATE DATABASE ddcontext` → nothing of the
+  fold landed. **(b)** `test_provisioning_creates_the_expected_topology` fails with a 4-name
+  expectation against a 2-name actual → you have the cypher, not the guard. **(c)** that test
+  fails the other way AND `test_superseded_names_are_really_superseded` reports *"provisioning
+  creates ['ddall', 'ddcontext'], which this test calls superseded"* → you have the guard, not
+  the cypher; that second failure is the discriminator, and it fires in no other case.
+  **(d)** suite green, but `SHOW DATABASES` still lists the retired names → your repo is right
+  and only the graph work in (4) is owed.
+  **THE ONE THING WE CANNOT SEE** `[SME-REPORTED]`: the SME reports a copy still carrying
+  `CREATE DATABASE ddcontext` and `CREATE COMPOSITE DATABASE ddall`. **If yours is already
+  folded, this relay costs you two commands — say so and it is struck.** Never read it as a
+  statement that your tree is broken; RELAY-5 is why that sentence is written this way.
+  **(2) WHY A CORRECT APPLY MAY HAVE PRODUCED THIS, so nobody goes looking for a mistake.**
+  `988bf0d6` changed THREE files under THREE dispositions:
+  `drydocs_core/schema/provisioning/01_databases.cypher` is canonical-producer and crosses
+  wholesale; `config/dev-environment.yaml` is **canonical-company** and must never cross;
+  `tests/unit/test_database_names.py` falls to the `tests/**` evaluate default. Take the
+  cypher, correctly decline the config, and your suite goes RED on
+  `test_databases_match_provisioning_script` — whose message names the two databases and says
+  nothing about the config file you also had to fold. The cheapest exit from that red is to put
+  the cypher back, and ledger step 158 licensed it by calling provisioning DDL "your graph". So:
+  **the fix is one commit containing the folded cypher, both guard tests, AND your own edit to
+  your `config/dev-environment.yaml` keys.** Any one of them alone is red.
+  **(3) TAKING THE FOLDED FILE IS SAFE EVEN IF YOUR GRAPH HAS NOT FOLDED — and that is the
+  sentence that unblocks this.** `CREATE DATABASE … IF NOT EXISTS` never drops, so an existing
+  container keeps `ddcontext` and `ddall` online and inert; nothing reading them stops working.
+  The only real difference is a FRESH container, which would not get `ddcontext` — and that
+  fails LOUDLY at session open with `DatabaseNotFound`, naming the database, rather than
+  stranding data. Your Tier-A discretion is over what you DROP from a live DBMS, never over
+  what the repo's provisioning DDL says. Before you decide, run
+  `git grep -n "ddcontext\|ddall"` over your own loaders: if a company-only writer still
+  targets one, the ruling is yours — and then keeping it is a divergence recorded in BOTH files,
+  not a silent revert of one.
+  **(4) THE PER-MACHINE SEQUENCE, previously recorded only on a done item and therefore
+  invisible.** Once the repo half is right, each of your machines still owes: the R3
+  delete-and-reload of the DESCRIBES edges, the ebook-corpus reload, and the drop of the two
+  retired databases. **Sequence the delete and the reload in ONE session** — the gate's own risk
+  entry says so, because the window between them is a graph with a capability the gate removed.
+  Producer figures, quoted as OUR venue and NOT as a count to expect (J18, laptop `neo4jtest`
+  `drydocs`): 27 edges → 0 → 27, 374 chunks, `:Uncertain` 0.
+  **(5) THE TRAP WE HIT, so you do not.** `drydocs load-essential-graphrag` carried its own
+  `--database` default of `ddcontext` that the fold sweep missed, and it STRANDED the book
+  corpus in the retired database. It was caught only because `docs-verify` deliberately sweeps
+  the retired name one last time (`drydocs/cli_docs.py`, self-retiring via a `SHOW DATABASES`
+  intersection, so it silently stops once you drop the database). Fixed producer-side; the
+  default is now `drydocs` and the fix rides the port. **This is why (1) runs `docs-verify` and
+  not only pytest** — the suite cannot see a stranded corpus.
+  **WHAT TO SEND BACK:** the case letter from (1) and the actual command OUTPUT, not the
+  verdict (RELAY-3(b)). If you are in case (d) or already folded, that discharges this relay.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
