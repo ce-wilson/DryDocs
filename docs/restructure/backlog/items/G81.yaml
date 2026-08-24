@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p0
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/data_root.py
@@ -20,3 +20,60 @@ acceptance: |
   INCIDENT, 2026-08-11: the SME's internal folder holding extracted CSV source data was OVERWRITTEN. Recovery is from a backup, so the data is not lost, but the class is live and it fires again the moment the backup is restored to the same place. This is the most severe defect class the repo has produced — every other failure this week was a wrong READ; this one destroyed a source. (a) RECONSTRUCT FIRST, do not guess. Establish what wrote over what, from the code, and record it. The write-capable surface to walk: drydocs_core/data_root.py declares ten-plus path helpers IN PYTHON, several taking create=True so they mkdir, and rua_extracted_dir() names an "extracted" area that a re-run may legitimately rebuild. Reconstruction is part of the deliverable, not a preamble to it — a guard written against a guessed mechanism guards the wrong thing. (b) DECLARE EVERY PATH IN CONFIGURATION, not in code, each carrying a MODE: read (source data the system may NEVER write), write (outputs it owns and may rebuild), scratch (disposable). Three families the SME named, all currently scattered: LOGS (DRYDOCS_LOGDIR, env-only), LOADER INPUT DATA (per source), and REMEDIATION OUTPUT (the greenfield artifact and Jira handoff). Moving the declaration out of Python is the point: today a path is whatever a helper returns, so no reader can enumerate what the system touches, which is why an overlap was invisible until it destroyed something. (c) THE INVARIANT THAT WOULD HAVE PREVENTED IT: no write-mode path may EQUAL OR CONTAIN a read-mode path. Guarded, with the failure naming both paths. This is the whole defect in one sentence and it is mechanically checkable. (d) NO SILENT DEFAULT ROOT. resolve_data_root() falls back to ~/data/DryDocs whenever DRYDOCS_DATA_ROOT is unset or empty, so a missing environment variable silently relocates every read and write to a plausible-looking wrong place — the SAME defect family as G78's fixture-directory default, one layer down. An unset root must FAIL, naming the variable. (e) Any path a create=True helper may build is write-mode BY CONSTRUCTION. A read-mode path must be reachable through a helper that cannot create, cannot clean and cannot write. Ties to ADR 0012: a source declaring acquisition file-drop needs a declared location, and that location is read-mode by definition — so (b) supplies what the ADR's acquisition axis assumes exists.
 notes: |
   Raised 2026-08-11 (desktop) from an SME incident report. p0 on IRREVERSIBILITY, which is the axis that separates it from G78: a wrong load is re-runnable, a destroyed source directory is recoverable only as far as the last backup, and if that backup had been stale or absent the loss would be permanent. G78 is louder; this one is worse. SME DIRECTION ON SEQUENCING: the layout must be planned with the ARCHITECT PERSONA, and it must be planned WITH the loader restructure rather than after it — G79 moves loaders between chains and ADR 0012 puts acquisition on the source entry, so both touch exactly the paths this item declares. Doing the declaration afterwards means declaring a layout that was just rearranged. The persona review is docs/reviews/persona-python-architect — a layout question, not a graph-modelling one, so the Python architect rather than the Neo4j architect. SCOPE FENCE: this declares paths and guards the overlap. It does not relocate anyone's data — a config change that silently moved a root would be the same class of defect the item exists to close.
+  DONE 2026-08-24 (laptop), branch feat/g81-path-zones, merged --no-ff. (a) RECONSTRUCTION IS THE
+  DELIVERABLE: docs/reviews/g81-data-path-reconstruction.md walks the write-capable surface from the
+  code and MEASURES four live overlaps rather than theorising one -- controlm_xml_dir() resolving
+  EXACTLY to a declared drop zone; rua/extracted/ and rua/incoming/ nested inside the declared `rua/`
+  read zone; and source_dir(), a public arbitrary-parts create-capable helper whose no-argument form
+  is the ROOT, which contains every drop zone. It ranks candidate mechanisms for the incident and
+  deliberately does NOT claim which fired: the machines hold independent data roots and this session
+  cannot see the SME's. The guard forbids the CLASS, so it never depended on identifying the instance.
+  THE ACCEPTANCE'S INVARIANT WAS WIDENED ON THE EVIDENCE, and this is the one place the item's own
+  words were changed: clause (c) says "no write path may EQUAL OR CONTAIN a read path", but TWO of
+  the four findings were read-CONTAINS-write and are invisible in that direction. The guard checks
+  equality and BOTH containment directions.
+  (b) config/data-zones.yaml declares every system-owned zone with a mode (read/write/scratch).
+  Dataset read zones are NOT duplicated -- they are already source-registry acquisition.drop_dir rows
+  (N12), and data_zones.overlaps() JOINS the two files rather than restating one in the other (26
+  zones checked). data_root.py keeps its helper API so no call site moved, but the helpers are now
+  readers of the declaration. All THREE families the SME named are enumerable: LOGS (zone run-logs),
+  LOADER INPUT DATA (registry drop rows, per source), REMEDIATION OUTPUT (remediation-outgoing +
+  -recommendations). Nuance recorded rather than papered over: the "greenfield artifact / Jira
+  handoff" is a caller-supplied Path in drydocs_remediation/jira.py with NO production caller, read
+  not written -- no path of its own to declare, and inventing a zone would be declaring a layout that
+  does not exist. TWO ZONES NOBODY HAD DECLARED surfaced while walking call sites (cmdline-staging,
+  controlm-api operator config) -- the clearest evidence the file earns its place, since neither was
+  hidden, merely unenumerable.
+  (c) Guarded, names BOTH paths, and PROVEN TO FAIL on each injected shape -- equal, inside,
+  contains, and scratch-counts-as-write (J26). Two DECLARATION CORRECTIONS bring the real tree to
+  zero violations and neither moves a byte (the scope fence): `rua/` narrows to `rua/incoming/`,
+  which is what data_root.py's docstring has said since G19, and the two dpl rows move to
+  `dpl-registry/`. Those had NEVER agreed with the code since N12, so an operator who followed the
+  registry had files nothing read -- a second defect class found by the reconstruction.
+  (d) resolve_data_root() RAISES when DRYDOCS_DATA_ROOT is unset or empty; there is no default.
+  DEFAULT_DATA_ROOT survives as the CONVENTIONAL location the error suggests. The unit conftest gives
+  the suite a hermetic tmp root -- sharper than the log fixture's reason: a test resolving the
+  developer's REAL data root could create directories in it. Documented where an operator looks
+  (config/dev-environment.yaml `data:` block, .env.example). Verified live: with the variable unset,
+  `drydocs landing-zones` prints the message and exits 2, and `drydocs --help` still works (nothing
+  resolves the root at import time).
+  (e) Read-zone helpers lost `create` ENTIRELY -- enforced in the signature, not by discipline -- and
+  source_dir(create=True) refuses a target inside any read zone.
+  THE RUNTIME LEG, which the static invariant structurally cannot cover: rua _unpack's `unpack_dir`
+  is caller-supplied, so no comparison of DECLARATIONS can see it -- an operator naming their own
+  extract folder gets it overwritten file by file, since extractall overwrites with no warning and no
+  diff. Refused now on both branches, with a test proving an existing file SURVIVES the refusal. The
+  two archive protections are different guarantees and both are needed: filter="data" polices what is
+  INSIDE the tarball, the refusal polices WHERE it lands.
+  A UX defect found by live-testing my own change and fixed rather than left: the mandatory root
+  presented as a Python TRACEBACK from `drydocs landing-zones` -- the command whose entire purpose is
+  that "my extracts are gone" is a one-command answer, met by an operator already worried about their
+  data. The console script now points at drydocs.cli:run(), which renders both G81 errors as exit 2
+  (the G78 operator-error code); guarded, because an entry-point revert is silent.
+  SME SEQUENCING HONOURED: planned WITH the loader restructure (G79 landed the same session), not
+  after it. On the ARCHITECT PERSONA direction -- docs/reviews/persona-python-architect-2026-08.md is
+  a CODE-GRAPH review (layering, fan-in, orphans) and rules on no filesystem question, so it neither
+  supported nor contradicted the layout; per the direction the layout plan was therefore WRITTEN DOWN
+  as the record's section 5 rather than left implicit in the diff. SCOPE FENCE HELD: no data was
+  relocated, and DRYDOCS_LOGDIR kept its default -- (d) names the DATA root, and a relocated log is
+  annoying where a relocated data root is destructive. Suite 2381 passed.

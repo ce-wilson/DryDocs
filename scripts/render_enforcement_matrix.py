@@ -187,6 +187,19 @@ SURFACES: list[dict] = [
         "gate_ref": None,
     },
     {
+        "id": "data-zones",
+        "title": "Data zones (path modes + the non-overlap invariant)",
+        "file": "config/data-zones.yaml",
+        "consumers": [
+            "drydocs_core/data_zones.py",
+            "drydocs_core/data_root.py",
+            # the READ half of the invariant: acquisition.drop_dir rows
+            "config/source-registry.yaml",
+        ],
+        "guard_tests": ["test_data_zones.py"],
+        "gate_ref": None,
+    },
+    {
         "id": "dev-environment",
         "title": "Dev/test environment names",
         "file": "config/dev-environment.yaml",

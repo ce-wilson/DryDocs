@@ -75,6 +75,7 @@ from rich.table import Table
 import drydocs_core
 from drydocs_core.adapters import CsvAdapter, OracleAdapter
 from drydocs_core.config import load_settings
+from drydocs_core.data_root import DataRootNotSetError, ReadZoneWriteError
 from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.repo_paths import repo_root
 from drydocs_core.run_log import LoaderRunLog
@@ -904,6 +905,30 @@ def _row_cap_opt():
     return typer.Option(None, "--row-cap", help=f"Unordered ROWNUM sample cap. {_SCOPE_HELP}")
 
 
+# --- entry point -------------------------------------------------------------
+
+
+def run() -> None:
+    """Console-script entry point (``pyproject.toml`` -> ``drydocs``).
+
+    Exists to turn an OPERATOR CONFIGURATION error into a message and exit 2
+    rather than a Python traceback. G81 made ``DRYDOCS_DATA_ROOT`` mandatory,
+    and the command most likely to meet that error is ``landing-zones`` — whose
+    entire reason for existing is that "my extracts are gone" should be a
+    one-command answer. Handing that operator a stack trace would defeat the
+    command at exactly the moment it matters. Exit 2 is the repo's
+    operator-error code (the G78 ``load``/chain contract).
+    """
+    try:
+        app()
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise SystemExit(2) from exc
+    except ReadZoneWriteError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise SystemExit(2) from exc
+
+
 # --- callback ---------------------------------------------------------------
 
 
@@ -1214,4 +1239,4 @@ for _sub in COMMAND_MODULES:
 
 
 if __name__ == "__main__":
-    app()
+    run()

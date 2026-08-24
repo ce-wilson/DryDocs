@@ -8,7 +8,10 @@ the publish-boundary safety net — the repo tree NEVER contains a rua bundle
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
+
+import pytest
 
 from drydocs_core import data_root as dr
 from drydocs_core.data_root import (
@@ -30,9 +33,27 @@ REPO = Path(__file__).resolve().parents[2]
 # ---- resolution -------------------------------------------------------------
 
 
-def test_default_and_env_override(tmp_path, monkeypatch):
+def test_an_unset_root_fails_naming_the_variable(tmp_path, monkeypatch):
+    """G81 (d): THERE IS NO DEFAULT. An unset variable used to relocate every
+    read and write to ~/data/DryDocs — a plausible-looking place a person might
+    also pick by hand — so the same command in two shells targeted two different
+    trees and a write meant for one could land on the other. Same family as
+    G78's fixture default, one layer down and worse: G78 loaded the wrong data,
+    this destroys the right data."""
     monkeypatch.delenv(dr.DATA_ROOT_ENV, raising=False)
-    assert resolve_data_root() == dr.DEFAULT_DATA_ROOT
+    with pytest.raises(dr.DataRootNotSetError) as info:
+        resolve_data_root()
+    assert dr.DATA_ROOT_ENV in str(info.value), "the failure must NAME the variable"
+
+    monkeypatch.setenv(dr.DATA_ROOT_ENV, "   ")
+    with pytest.raises(dr.DataRootNotSetError):
+        resolve_data_root()  # whitespace-only is unset, not a path
+
+
+def test_the_conventional_location_is_still_documented(tmp_path, monkeypatch):
+    """DEFAULT_DATA_ROOT survives as the location an operator SHOULD usually
+    pick — and the error message suggests it — but nothing resolves to it
+    implicitly."""
     assert dr.DEFAULT_DATA_ROOT == Path.home() / "data" / "DryDocs"
     monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path / "elsewhere"))
     assert resolve_data_root() == tmp_path / "elsewhere"
@@ -80,9 +101,15 @@ def test_create_on_demand_only(tmp_path, monkeypatch):
     monkeypatch.setenv(dr.DATA_ROOT_ENV, str(tmp_path / "root"))
     path = rua_incoming_dir()
     assert not path.exists()  # resolving never creates
-    created = rua_incoming_dir(create=True)
-    assert created.is_dir()
-    assert source_dir("dpl", "swagger", create=True).is_dir()
+    # G81 (e): rua_incoming_dir is a READ zone (hand-carried bundles) and no
+    # longer takes `create` at all — any path a create-capable helper may build
+    # is write-mode BY CONSTRUCTION, so the converse is enforced in the
+    # signature rather than left to discipline.
+    assert "create" not in inspect.signature(rua_incoming_dir).parameters
+    created = rua_extracted_dir("bundle-1", create=True)
+    assert created.is_dir()  # the WRITE half still creates on demand
+    # A WRITE zone creates; the read-zone refusal is proved in test_data_zones.py.
+    assert source_dir("cmdline-staging", "work", create=True).is_dir()
 
 
 # ---- publish-boundary safety net (the root-image-rule spirit) ---------------

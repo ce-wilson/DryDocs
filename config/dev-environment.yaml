@@ -68,6 +68,29 @@ services:
   adk_api: 8000           # agents ADK server (VITE_ADK_URL)
   drydocs_api: 8001       # thin read API, ADR 0005 (VITE_API_URL)
 
+data:
+  # WHERE SOURCE PAYLOADS AND OUTPUTS LIVE. Every drop zone and every output the
+  # system writes is rooted here, which is why G81 (2026-08-23) made it MANDATORY:
+  # `resolve_data_root()` RAISES when DRYDOCS_DATA_ROOT is unset or empty rather
+  # than falling back. The old fallback (~/data/DryDocs) meant the same command in
+  # two shells targeted two different trees, so a write meant for one could land on
+  # the other and report success either way — the mechanism behind the 2026-08-11
+  # overwrite of an SME source folder (docs/reviews/g81-data-path-reconstruction.md).
+  #
+  # The value is PER MACHINE and never committed: it is a real local path, and this
+  # file carries names and ports only. Set it in your shell profile.
+  root_env: DRYDOCS_DATA_ROOT
+  conventional_location: "~/data/DryDocs"   # what to point it at, not a default
+  # What lives under it, with each zone's MODE, is config/data-zones.yaml (write /
+  # scratch) plus config/source-registry.yaml `acquisition.drop_dir` (read). The
+  # invariant across both: no write path may equal, contain or be contained by a
+  # read path (tests/unit/test_data_zones.py).
+  zones_declaration: config/data-zones.yaml
+  # Run logs keep their default ON PURPOSE (G81 scope fence): a relocated log is
+  # annoying, a relocated data root is destructive.
+  log_env: DRYDOCS_LOGDIR
+  log_default: "~/logs/DryDocs"
+
 depgraph:
   # The code-graph INSTRUMENT (U7). knowledge/depgraph-snapshots/snapshot.ps1
   # shells out to this sibling checkout, so the revision here decides what a

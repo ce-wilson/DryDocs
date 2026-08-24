@@ -897,7 +897,9 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: archive
-      drop_dir: rua/
+      drop_dir: rua/incoming/   # G81: was the over-broad `rua/`, which CONTAINED the
+                               # rua/extracted/ write zone (an unpack overwrites there).
+                               # Narrowed to what data_root.py's docstring has said since G19.
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # rua_*.tar.gz — `archive` added to the enum for exactly this row; the tsv/text lives INSIDE the envelope
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — clauses a–g all ruled. Authority to load, NOT a loader: the curated build is G23 and adapter stays ~
@@ -922,7 +924,9 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: dpl/
+      drop_dir: dpl-registry/  # G81: was `dpl/`, which NEVER matched dpl_registry_dir()'s
+                               # `dpl-registry/` — so a drop that followed the registry was
+                               # never read. Corrected to the path the G25 flow actually uses.
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # manual TODAY: hand-exported Swagger json per SEAL. Flips automated/api when a pull is built — the N13 flip, recorded not ruled
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §G ruled clause (f) GUID-vs-URN, §H ruled clause (g) three-signal usage. Field contract still ASSUMED (T13): the envelope entry is a ruled stub
@@ -947,7 +951,9 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: dpl/
+      drop_dir: dpl-registry/  # G81: was `dpl/`, which NEVER matched dpl_registry_dir()'s
+                               # `dpl-registry/` — so a drop that followed the registry was
+                               # never read. Corrected to the path the G25 flow actually uses.
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # manual TODAY — same as its sibling; flips automated/api with the N13 flip
     confirmed: true                     # same activation condition as dpl:pipeline-registry — gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28)
