@@ -6,8 +6,22 @@ confidential (Internal, J23) source payloads get a real home OUTSIDE the project
 tree, and the repo carries only the pointer. ``internal-local/`` remains the
 in-tree hand-carry WORKING area (pointers, notes) — never the payload store.
 
-    DRYDOCS_DATA_ROOT   data directory for all out-of-repo source payloads;
-                        default ``~/data/DryDocs``. Created on demand.
+    DRYDOCS_DATA_ROOT   data directory for all out-of-repo source payloads.
+                        MANDATORY since G81 (2026-08-23): unset or empty RAISES
+                        :class:`DataRootNotSetError`. There is deliberately no
+                        default — the old ``~/data/DryDocs`` fallback silently
+                        relocated every read and write when the variable was
+                        missing, which is how a write lands on somebody's source
+                        data. ``~/data/DryDocs`` remains the CONVENTIONAL place
+                        to point it, and nothing resolves to it implicitly.
+
+EVERY PATH HERE IS A DECLARED ZONE WITH A MODE (G81). ``config/data-zones.yaml``
+declares the system-owned zones (write/scratch) and the read zones that are not
+dataset drops; dataset drops stay in ``config/source-registry.yaml``
+(``acquisition.drop_dir``, N12). :mod:`drydocs_core.data_zones` joins the two and
+enforces the invariant: no write path may equal, contain or be contained by a
+read path. A READ-zone helper below takes no ``create`` argument at all — any
+path a create-capable helper may build is write-mode by construction.
 
 Per-source subfolders hang off the root — the rua landing zone (user call
 2026-07-21: bundle output is unstructured and can be big, so it lives beside
@@ -47,10 +61,38 @@ class ReadZoneWriteError(RuntimeError):
     """A write was aimed at a declared READ zone — the G81 incident's shape."""
 
 
+class DataRootNotSetError(RuntimeError):
+    """``DRYDOCS_DATA_ROOT`` is unset or empty — G81 (d): never a silent default."""
+
+
 def resolve_data_root() -> Path:
-    """The configurable data root: DRYDOCS_DATA_ROOT > ``~/data/DryDocs``."""
+    """The data root, from ``DRYDOCS_DATA_ROOT``. UNSET IS AN ERROR (G81 (d)).
+
+    THERE IS NO DEFAULT ANY MORE, and the reason is the whole item: until
+    2026-08-23 an unset variable silently relocated every read and every write to
+    ``~/data/DryDocs`` — a plausible-looking place a person might also pick by
+    hand. So the same command in two shells could target two different trees, and
+    a write meant for one landed in the other, with success reported either way.
+    Same family as G78's fixture-directory default, one layer down and with worse
+    consequences: G78 loaded the wrong data, this could destroy the right data.
+
+    :data:`DEFAULT_DATA_ROOT` is KEPT as the documented conventional location —
+    it is what an operator should usually point the variable at, and what the
+    error message suggests — but nothing resolves to it implicitly.
+    """
     raw = os.environ.get(DATA_ROOT_ENV, "").strip()
-    return Path(raw) if raw else DEFAULT_DATA_ROOT
+    if not raw:
+        raise DataRootNotSetError(
+            f"{DATA_ROOT_ENV} is not set. Every source drop and every output the "
+            "system writes is rooted there, so there is deliberately NO default: "
+            "an unset variable used to relocate all of them silently to "
+            f"{DEFAULT_DATA_ROOT}, which is how a write can land on somebody's "
+            "source data (G81). Set it to your data root — the conventional "
+            f"location is {DEFAULT_DATA_ROOT}. Set it in your shell profile "
+            f"(PowerShell: $env:{DATA_ROOT_ENV}; bash: export {DATA_ROOT_ENV}=...). "
+            "config/dev-environment.yaml records it for this repo."
+        )
+    return Path(raw)
 
 
 def source_dir(*parts: str, create: bool = False) -> Path:
@@ -71,12 +113,12 @@ def source_dir(*parts: str, create: bool = False) -> Path:
     """
     path = resolve_data_root().joinpath(*parts)
     if create:
-        _refuse_write_into_read_zone(path, action="create")
+        refuse_write_into_read_zone(path, action="create")
         path.mkdir(parents=True, exist_ok=True)
     return path
 
 
-def _refuse_write_into_read_zone(target: Path, *, action: str) -> None:
+def refuse_write_into_read_zone(target: Path, *, action: str) -> None:
     """Raise when ``target`` sits inside a declared READ zone (G81 (c), runtime).
 
     Imported lazily: :mod:`drydocs_core.data_zones` reads this module, so a

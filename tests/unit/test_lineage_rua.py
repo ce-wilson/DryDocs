@@ -380,3 +380,35 @@ def test_derived_copy_path_is_readable_from_the_extractor_side(tmp_path: Path) -
     assert target.is_file(), f"derived copy path {target} is not a file"
     assert target.read_text(encoding="utf-8")
     assert coverage.script_copies_present >= 1
+
+
+def test_unpacking_into_a_read_zone_is_refused(tmp_path, monkeypatch) -> None:
+    """G81, THE RUNTIME LEG. `unpack_dir` is caller-supplied, so no comparison of
+    DECLARED zones can catch it — an operator naming their own extract folder
+    gets it overwritten file by file, because extractall overwrites with no
+    warning and no diff. That is the 2026-08-11 incident's shape, so the refusal
+    lives at the write site as well as in the declaration check."""
+    import tarfile
+
+    from drydocs_core.data_root import ReadZoneWriteError
+
+    monkeypatch.setenv("DRYDOCS_DATA_ROOT", str(tmp_path))
+    tarball = tmp_path / "rua_host_20260823.tar.gz"
+    payload = tmp_path / "payload"
+    payload.mkdir()
+    (payload / "meta.txt").write_text("host=h\n", encoding="utf-8")
+    with tarfile.open(tarball, "w:gz") as tf:
+        tf.add(payload, arcname="rua_host_20260823")
+
+    # remediation/incoming is a declared READ zone — a hand-drop area.
+    victim = tmp_path / "remediation" / "incoming"
+    victim.mkdir(parents=True)
+    (victim / "precious.xml").write_text("<original/>", encoding="utf-8")
+
+    with pytest.raises(ReadZoneWriteError) as info:
+        RuaInventoryExtractor().extract(tarball, LineageGraph(), unpack_dir=victim)
+
+    assert "remediation-incoming" in str(info.value)
+    assert (victim / "precious.xml").read_text(
+        encoding="utf-8"
+    ) == "<original/>", "the existing file was touched despite the refusal"

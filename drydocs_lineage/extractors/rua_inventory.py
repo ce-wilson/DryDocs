@@ -52,7 +52,7 @@ import tarfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from drydocs_core.data_root import rua_extracted_dir
+from drydocs_core.data_root import refuse_write_into_read_zone, rua_extracted_dir
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
@@ -226,10 +226,21 @@ class RuaInventoryExtractor:
                 name = name[: -len(suffix)]
                 break
         dest = Path(unpack_dir) if unpack_dir else rua_extracted_dir(name, create=True)
+        # G81 — THE WRITE SITE, and the one the static invariant cannot see.
+        # `unpack_dir` is a caller-supplied path, so no comparison of DECLARED
+        # zones can catch it: an operator naming their own extract folder here
+        # gets it overwritten file by file. `extractall` overwrites with no
+        # warning and no diff, which is what makes this the incident's shape
+        # rather than merely a mess. The check runs for BOTH branches — the
+        # default zone benefits too, since a future declaration change could
+        # move it under a drop zone without anyone re-reading this function.
+        refuse_write_into_read_zone(dest, action="unpack into")
         dest.mkdir(parents=True, exist_ok=True)
         with tarfile.open(tarball) as tf:
             # filter="data": strips absolute paths / traversal / specials — a
-            # carried-back tarball is data, never something to trust blindly
+            # carried-back tarball is data, never something to trust blindly.
+            # NOTE the two are different guarantees: filter= polices what is
+            # INSIDE the archive, the refusal above polices WHERE it lands.
             tf.extractall(dest, filter="data")
         return dest
 
