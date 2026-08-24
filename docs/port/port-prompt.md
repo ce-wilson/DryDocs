@@ -2961,6 +2961,13 @@ company prompt, so citing them at a step would restate the file inside itself:
 physical), `4a42b659` `c733ae29` (the wave-1 handoff and the
 `port-213e1d12-followup-company-prompt.md` hand prompt, both
 `docs/company-prompts/**`, which is `never-port`).
+ADDENDUM (same day, after the roll): `3b4d8e76` — step 212's citation of
+`docs/reviews/port-review-7c18ff4b-20260820.md` resolved on this laptop, where the
+untracked file still sits on disk, and NOT in a fresh clone; CI caught it at the roll
+commit. The path is now a `HISTORICAL_PATHS` entry in
+`tests/unit/test_runbook_currency.py` with its reason. Cited here rather than given a
+step because it repairs this file's own coverage, and the terminating write is the
+`chore(port): ledger` commit that adds this line.
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
