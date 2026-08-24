@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -25,3 +25,26 @@ notes: |
   Groomed 2026-08-11 from Idea-96. PORT-MANIFEST.yaml states the union rule unconditionally for docs/restructure/backlog.yaml ("Union the items; NEVER regress a status ... or drop an entry"), and tests/unit/test_backlog.py enforces plenty about the file -- schema, roll-up arithmetic, next_ready, unknown depends_on -- but every one of those checks looks at ONE copy in isolation. The union is a claim about TWO copies and nothing compares them, so a port that quietly under-delivers items leaves both sides internally consistent and green. Textbook J26: a rule written in prose and enforced by nobody. The near miss that makes it worse -- the dependency guard would have caught it only if a surviving item happened to depend on a missing one, so whether the gap is visible at all is luck rather than design. Mechanism only; the numbers and ids from the occurrence stay in the port report, not here.
 
   REPOINTED AT THE SHARDED GRAIN, 2026-08-23 groom (laptop) -- a correction, not a scope change. This item was written 2026-08-11, nine days before Y2 sharded the backlog, and its acceptance still sent the builder at docs/restructure/backlog.yaml and its items[] key. That file is now a TOMBSTONE, so the check as written would have read two empty sets and PASSED -- an item whose own argument is "a rule written in prose and enforced by nobody" would have shipped a guard that is green for being wrong. Found while verifying which ready items were safely dispatchable, and it was the ONLY open item still pointing at the tombstone (every other citation of that path is in a done item, where it is correct history). The rule itself did not move: PORT-MANIFEST.yaml's row for docs/restructure/backlog/items/*.yaml carries the same promise at file grain ("Never drop a file; never regress a status", F4 ruling 2026-08-20), which is why the repoint is mechanical and needed no ruling. Two things were tightened while repointing, both to keep the guard from passing vacuously again: the empty/absent-directory case must FAIL rather than read as agreement, and the filename-vs-inner-id disagreement is now in scope (the filename IS the id under Clause 6, so a mismatch means the set being diffed is not the set that exists). The status-regression half was fenced OUT explicitly because J16 already owns it -- previously that division was only implicit in the manifest's note.
+  DONE 2026-08-23 (laptop). New drydocs/port_backlog_union.py (the `port` component group, beside
+  port_preflight.py) + scripts/port_backlog_union.py. THE ID SET IS THE DIRECTORY LISTING, read on
+  BOTH sides by the SAME reader -- drydocs_core.backlog_store.load_items -- so the vacuous-green
+  cases fail LOUD rather than reading as agreement: a FILE path is refused before anything is read
+  (the tombstone would compare two empty sets and pass for being wrong), and an absent items dir, an
+  empty one, and a filename whose stem disagrees with the inner id are all errors the store already
+  raises and this re-raises as BacklogUnionError naming the side. Producer side = the RECORDED PORT
+  BASE materialized from a git ref with `git archive` into a temp dir (never HEAD -- commits past
+  the tag ride the next port); consumer side = the POST-APPLY WORKING TREE, which is the only side
+  that answers "did THIS port under-deliver". UNION_EXCLUSIONS carries ids deliberately not carried
+  across, and compare() judges each against the real trees: an allowance for an id the producer never
+  had is STALE and one for an id the consumer HAS never described a drop -- both fail rather than
+  excuse. The report states accepted differences even when the gap is empty ("accepted differences:
+  none declared"), so a ruled omission and no omission read differently. PROVEN TO FAIL, three ways:
+  the unit test deletes one item FILE from a consumer copy and asserts the id is named (J26), and
+  live on this repo -- HEAD vs an 08-21 tree named all 8 items added since (exit 1), HEAD vs the
+  working tree passed 505/505 (exit 0), and an unknown ref exited 2 with git's own error rather than
+  an empty set. Wired where a session will meet it: step 5 of .claude/skills/reconcile-port/SKILL.md,
+  a row in that skill's port-report template, and step 1 of the port-prompt's mandatory J35 closing
+  sequence. SCOPE FENCE HELD: no status is compared anywhere and nothing touches
+  RECONCILE_BEFORE_DIR -- the never-regress-a-status half stays the J16 guard's.
+  tests/unit/test_port_backlog_union.py (16). MODULE_MAP row + the boundary group registered in the
+  same commit (default-deny). Suite 2348 passed.

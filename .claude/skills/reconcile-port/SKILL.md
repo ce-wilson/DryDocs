@@ -51,7 +51,22 @@ the accumulated lessons from prior ports. Read both.
      avoids re-deriving the skip guards — see ledger note).
    - **Collisions** → hand-merge per the ledger below.
 4. **Validate Track-1** (the contract — needs no data file).
-5. **Don't push.** Write a port report (template below) and stop.
+5. **CHECK THE BACKLOG UNION (J42).** The manifest's row for
+   `docs/restructure/backlog/items/*.yaml` promises *"never drop a file"*, and until
+   J42 nothing compared the two id sets — every backlog guard reads ONE copy, so a
+   port that quietly under-delivered items left both sides internally consistent and
+   green. Run it AFTER the apply, from this repo, naming the same port-base tag you
+   ported from:
+   `poetry run python scripts/port_backlog_union.py --producer-ref port-base-YYYYMMDD`
+   Exit 0 = the union holds (any ruled omissions print WITH their reasons). Exit 1 =
+   the port dropped items and the run names every id — restore each file from the
+   base, or record it in `drydocs.port_backlog_union.UNION_EXCLUSIONS` with the
+   reason it stays behind. Exit 2 = a side could not be read, which is a FAILURE and
+   never "no difference": the tombstone `docs/restructure/backlog.yaml` has no
+   `items` key, so a check aimed there would compare two empty sets and pass for
+   being wrong. Paste the printed block into the port report. This covers the UNION
+   half only — the status-regression half is the J16 before/after guard above.
+6. **Don't push.** Write a port report (template below) and stop.
 
 ## Encoding trap (company send-back, PORT-REPORT-ae21ee4, 2026-08-10)
 
@@ -303,6 +318,7 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
+- Backlog union (J42): <paste the scripts/port_backlog_union.py block — producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>

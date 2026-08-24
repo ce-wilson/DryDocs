@@ -136,7 +136,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # nothing else" note was protecting still holds: the guards run without a
     # repository, and now the checks run against the CALLER's checkout rather than
     # certifying the main tree from inside a worktree.
-    "port": ("drydocs.port_preflight",),
+    "port": ("drydocs.port_preflight", "drydocs.port_backlog_union"),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.
     #

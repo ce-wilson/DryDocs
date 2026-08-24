@@ -12,7 +12,17 @@ consecutive rolls discovered unrecorded ports after the fact (PORT-REPORT-f71967
 PORT-REPORT-6713c142, PORT-REPORT-5f79d145 — the last two left NO producer-verifiable
 range, port commit, backup tag or acceptance numbers, an absence no later roll can
 repair). Company-side at completion:
-1. Write the PORT-REPORT (guardrail 8) with every producer-tree citation SHA-stamped.
+1. Write the PORT-REPORT (guardrail 8) with every producer-tree citation SHA-stamped,
+   and INCLUDE THE BACKLOG UNION BLOCK (J42): `poetry run python
+   scripts/port_backlog_union.py --producer-ref port-base-YYYYMMDD`, run company-side
+   after the apply, diffs the producer base's backlog item-id set against the applied
+   tree and FAILS naming every dropped id. The manifest has promised "never drop a
+   file" for `docs/restructure/backlog/items/*.yaml` all along while every backlog
+   guard read only ONE copy, so an under-delivering port left both sides green.
+   Exit 2 (a side unreadable) is a FAILURE, never "no difference" — the tombstone
+   `docs/restructure/backlog.yaml` carries no `items` key, so a check aimed there
+   would compare two empty sets and pass for being wrong. UNION half only; status
+   regression stays with the J16 reconcile guard.
 2. Update **Last completed port** here with the FOUR REQUIRED FIELDS — none may be
    omitted or deferred: (a) the applied RANGE (`<base>..<head>`, with `rev-list
    --count`); (b) the PORT COMMIT(s) on the port branch; (c) the BACKUP TAG and the
