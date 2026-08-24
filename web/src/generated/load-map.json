@@ -1831,5 +1831,35 @@
       "label": "SUPERSEDES",
       "source": "any multi-version corpus (the internal process pages are the named case)"
     }
+  ],
+  "unchained_loaders": [
+    {
+      "name": "area_products",
+      "class": "AreaProductsLoader",
+      "loader": "area_products.v1",
+      "reason": "nothing to chain yet: the bundled extract records area_products: 0 against the standing area-product-missing open question (config/taxonomy/lob-product-team.yaml) — G79 (b) wires or retires it when the refresh chain splits by subject"
+    },
+    {
+      "name": "pat_team_roles",
+      "class": "PatTeamRolesLoader",
+      "loader": "pat_team_roles.v1",
+      "reason": "gate-confirmed (C9, 2026-07-18) with loader class and cypher, but no operator path has ever run it and no cadence was ever ruled — G79 (b) owns wiring it into the organisation-tier subject command; recorded here so the gap is a decision on record, not drift"
+    }
+  ],
+  "steps_with_uncommitted_inputs": [
+    {
+      "command": "refresh-reference",
+      "step": "seal_applications",
+      "file": "seal_application_data__sample.csv",
+      "searched": "drydocs/data/samples",
+      "exemption": "generated per machine from the capture by scripts/build_seal_samples.py — run it after checkout; the fixture derives from internal SEAL data shapes and is deliberately not committed"
+    },
+    {
+      "command": "refresh-reference",
+      "step": "seal_contacts",
+      "file": "seal_contact_data__sample.csv",
+      "searched": "drydocs/data/samples",
+      "exemption": "generated per machine from the capture by scripts/build_seal_samples.py — run it after checkout; the fixture derives from internal SEAL data shapes and is deliberately not committed"
+    }
   ]
 }

@@ -81,6 +81,7 @@ from drydocs_core.source_registry import (
     UnknownSourceError,
 )
 
+from . import seal_samples as seal_samples_mod
 from .loaders import seal_applications as seal_apps_mod
 from .loaders import seal_contacts as seal_contacts_mod
 from .loaders.batch_port_orchestrator import (
@@ -320,6 +321,76 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
 # `load` runs any single LOADER_REGISTRY loader ad hoc; manual mappings load
 # when an SME authors one (manifest-gated), not on a refresh cadence.
 AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
+
+# ---- G80: no loader is silently outside every chain -------------------------
+# A LOADER_REGISTRY loader that no COMMAND_LOADERS command runs is reachable
+# ONLY as `drydocs load <name>` — registered, green, and never executed by any
+# operator path. That is the G59 unchained-supplement class one registry over,
+# and it is how area_products and pat_team_roles sat runnable-by-name for weeks
+# with nothing turning red. A loader deliberately outside every chain needs its
+# reason here (the SCHEDULED_INGEST_EXCLUSIONS idiom): cli name -> why.
+# tests/unit/test_load_map_declarations.py fails naming any loader that is
+# neither chained nor excused, and the load-map render publishes this dict so
+# the omission is a decision on record rather than silence.
+UNCHAINED_LOADER_EXCLUSIONS: dict[str, str] = {
+    "area_products": (
+        "nothing to chain yet: the bundled extract records area_products: 0 "
+        "against the standing area-product-missing open question "
+        "(config/taxonomy/lob-product-team.yaml) — G79 (b) wires or retires it "
+        "when the refresh chain splits by subject"
+    ),
+    "pat_team_roles": (
+        "gate-confirmed (C9, 2026-07-18) with loader class and cypher, but no "
+        "operator path has ever run it and no cadence was ever ruled — G79 (b) "
+        "owns wiring it into the organisation-tier subject command; recorded "
+        "here so the gap is a decision on record, not drift"
+    ),
+}
+
+
+def unchained_registry_loaders() -> tuple[tuple[str, type], ...]:
+    """Every LOADER_REGISTRY ``(name, class)`` no COMMAND_LOADERS command runs.
+
+    Excused or not — the guard subtracts :data:`UNCHAINED_LOADER_EXCLUSIONS`,
+    the load-map render joins the exclusions on as reason-or-null. ONE
+    predicate for both so the suite and the surface cannot drift apart.
+    """
+    chained = {cls for classes in COMMAND_LOADERS.values() for cls in classes}
+    return tuple((name, cls) for name, cls in sorted(LOADER_REGISTRY.items()) if cls not in chained)
+
+
+def unchained_loaders() -> tuple[str, ...]:
+    """Registry loaders in NO command's chain with NO written reason.
+
+    Computed here, not in the test, so a consumer repo whose chains
+    legitimately differ (the company chain carries sub_lobs where the producer
+    carries pat_product_mapping) gets the same protection from its OWN
+    registry, chains and exclusions — the test stays repo-agnostic (G59 shape).
+    """
+    return tuple(
+        name
+        for name, _cls in unchained_registry_loaders()
+        if name not in UNCHAINED_LOADER_EXCLUSIONS
+    )
+
+
+#: Chain-declared sample files that are GENERATED PER MACHINE and never
+#: committed (G78's SEAL fixtures): filename -> how to build one. The load-map
+#: render lists these as written-down absences, PRESENCE-INDEPENDENT — probing
+#: the filesystem would make the committed render flap between a machine that
+#: has generated them and one that has not.
+GENERATED_SAMPLE_FILES: dict[str, str] = {
+    seal_samples_mod.APPLICATION_SAMPLE: (
+        "generated per machine from the capture by scripts/build_seal_samples.py "
+        "— run it after checkout; the fixture derives from internal SEAL data "
+        "shapes and is deliberately not committed"
+    ),
+    seal_samples_mod.CONTACT_SAMPLE: (
+        "generated per machine from the capture by scripts/build_seal_samples.py "
+        "— run it after checkout; the fixture derives from internal SEAL data "
+        "shapes and is deliberately not committed"
+    ),
+}
 
 # (3) THE canonical ordered load sequence — declared once; ingest.sh and the
 # startup/refresh runbook derive from it (N6 retires their independent copies).

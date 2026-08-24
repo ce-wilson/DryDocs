@@ -172,6 +172,69 @@ def test_every_concrete_loader_is_reachable_or_ad_hoc():
     )
 
 
+# ---- G80: registry membership alone is not reachability ----------------------
+
+
+def test_no_registry_loader_is_silently_unchained():
+    """G80: the test above accepts bare LOADER_REGISTRY membership, which is
+    exactly how area_products and pat_team_roles sat runnable-by-name while no
+    operator path ever ran them. A registry loader in NO command's chain fails
+    BY NAME unless cli.UNCHAINED_LOADER_EXCLUSIONS carries its written reason
+    (the G59 unchained-supplement guard, one registry over)."""
+    missing = cli.unchained_loaders()
+    assert not missing, (
+        f"LOADER_REGISTRY loader(s) no declared command runs and no written "
+        f"reason excuses: {list(missing)} — wire each into a COMMAND_LOADERS "
+        "chain or add it to UNCHAINED_LOADER_EXCLUSIONS with a written reason."
+    )
+
+
+def test_unchained_exclusions_are_real_unchained_and_carry_reasons():
+    """Exclusion hygiene (the SCHEDULED_INGEST_EXCLUSIONS idiom): every entry
+    names a registry loader (else stale), one that is NOT in any chain (else
+    contradictory — this is what forces G79 to delete the exclusion when it
+    wires the orphan), and carries a sentence, not a token."""
+    chained = {cls for classes in cli.COMMAND_LOADERS.values() for cls in classes}
+    for name, reason in cli.UNCHAINED_LOADER_EXCLUSIONS.items():
+        assert name in cli.LOADER_REGISTRY, f"stale exclusion: {name!r} not in LOADER_REGISTRY"
+        assert cli.LOADER_REGISTRY[name] not in chained, (
+            f"{name!r} is excluded AND chained — contradictory; delete the " "exclusion"
+        )
+        assert len(reason.split()) >= 5, f"{name!r}: the reason must be a sentence, not a token"
+
+
+def test_unchained_detection_names_the_loader(monkeypatch):
+    """The guard actually fires: a registry entry no chain runs is reported by
+    NAME, not swallowed into a count — repo-agnostic (a synthetic orphan, not a
+    pinned producer membership, so the consumer repo's differing chains pass)."""
+
+    class _OrphanProbeLoader:
+        pass
+
+    monkeypatch.setitem(cli.LOADER_REGISTRY, "orphan_probe", _OrphanProbeLoader)
+    assert "orphan_probe" in cli.unchained_loaders()
+    # and the excused set stays out of the failure list
+    for name in cli.UNCHAINED_LOADER_EXCLUSIONS:
+        assert name not in cli.unchained_loaders()
+
+
+def test_generated_sample_declarations_are_real_and_carry_reasons():
+    """GENERATED_SAMPLE_FILES hygiene: every entry names a file some chain
+    actually declares (else stale), and says how to build it."""
+    declared = {sample for _nm, _cls, sample in cli.REFRESH_REFERENCE_CHAIN}
+    declared |= {
+        sample
+        for _nm, _cls, sample, _sql in (
+            cli.CONTROLM_NODE_STAGES + cli.CONTROLM_PART2_STAGES + cli.CONTROLM_REL_STAGES
+        )
+    }
+    for filename, reason in cli.GENERATED_SAMPLE_FILES.items():
+        assert (
+            filename in declared
+        ), f"stale GENERATED_SAMPLE_FILES entry: {filename!r} is declared by no chain"
+        assert len(reason.split()) >= 5, f"{filename!r}: say how to build it, not a token"
+
+
 # ---- (3) the canonical sequence ---------------------------------------------
 
 

@@ -13,7 +13,9 @@ import {
   SEQUENCE,
   SOURCELESS_LOADERS,
   SOURCES,
+  STEPS_WITH_UNCOMMITTED_INPUTS,
   SYSTEMS,
+  UNCHAINED_LOADERS,
   ledgerPath,
   ledgerState,
   pipelineReach,
@@ -255,15 +257,15 @@ export default function LoadMapRoute() {
   const defectsTab = (
     <div className="flex h-full min-h-0 flex-col gap-2">
       <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
-        <b>These are the known-broken rows, shown on purpose.</b> The generator already computes both lists; a page
-        that quietly dropped them would read as “all clear” while the defects sat in the JSON unread. A written
+        <b>These are the known-broken rows, shown on purpose.</b> The generator already computes all four lists; a
+        page that quietly dropped them would read as “all clear” while the defects sat in the JSON unread. A written
         exemption is not the same as a defect — where one exists it is printed in full, so the reason can be argued
         with.
       </p>
       {DEFECT_COUNT === 0 ? (
         <EmptyState
           title="No declared defects"
-          hint="Both generator-computed lists are empty in the committed load-map.json."
+          hint="All four generator-computed lists are empty in the committed load-map.json."
         />
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
@@ -294,6 +296,40 @@ export default function LoadMapRoute() {
                   <td className={`${TD} font-mono text-[10px] text-muted`}>{e.label}</td>
                   <td className={`${TD} font-mono text-[10px] text-muted`}>{e.source}</td>
                   <td className={`${TD} text-muted`}>{e.exemption}</td>
+                </tr>
+              ))}
+            </Table>
+          </div>
+          <div>
+            <p className="mb-1 text-[11px] font-semibold text-muted">
+              Loaders in no chain — reachable only ad hoc ({UNCHAINED_LOADERS.length})
+            </p>
+            <Table headers={['CLI name', 'Class', 'Stated reason']}>
+              {UNCHAINED_LOADERS.map((l, i) => (
+                <tr key={l.name} className={i % 2 ? 'bg-bg-2/40' : ''}>
+                  <td className={`${TD} font-mono text-[10px] text-text`}>{l.name}</td>
+                  <td className={`${TD} font-mono text-[10px] text-muted`}>{l.class}</td>
+                  <td className={`${TD} text-muted`}>
+                    {l.reason ?? <b>SILENT — no written reason; the suite fails on this row</b>}
+                  </td>
+                </tr>
+              ))}
+            </Table>
+          </div>
+          <div>
+            <p className="mb-1 text-[11px] font-semibold text-muted">
+              Chain inputs not committed with the repo ({STEPS_WITH_UNCOMMITTED_INPUTS.length})
+            </p>
+            <Table headers={['Command', 'Step', 'File', 'Searched', 'Why']}>
+              {STEPS_WITH_UNCOMMITTED_INPUTS.map((s, i) => (
+                <tr key={`${s.step}-${s.file}`} className={i % 2 ? 'bg-bg-2/40' : ''}>
+                  <td className={`${TD} font-mono text-[10px] text-text`}>{s.command}</td>
+                  <td className={`${TD} font-mono text-[10px] text-muted`}>{s.step}</td>
+                  <td className={`${TD} font-mono text-[10px] text-muted`}>{s.file}</td>
+                  <td className={`${TD} font-mono text-[10px] text-muted`}>{s.searched}</td>
+                  <td className={`${TD} text-muted`}>
+                    {s.exemption ?? <b>MISSING — a real run fails at preflight (G78)</b>}
+                  </td>
                 </tr>
               ))}
             </Table>

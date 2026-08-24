@@ -8,7 +8,8 @@
 // JSON's console consumer was never scoped. /software (O56) is the only web/
 // code that imports it at all, and it deliberately keeps the 8 `doc-registry`
 // rows. Everything else in the file — the 30 registry sources, the systems,
-// the retired ids, the load sequence, and BOTH defect lists — had no reader.
+// the retired ids, the load sequence, and ALL FOUR defect lists (two at O57,
+// two more at G80) — had no reader.
 //
 // READS THE COMMITTED JSON ONLY. It never re-derives from config/, which is
 // what makes it structurally incapable of disagreeing with
@@ -97,6 +98,31 @@ export interface MapEntryWithoutSource {
   exemption: string
 }
 
+/**
+ * A LOADER_REGISTRY loader no declared command runs — reachable only ad hoc
+ * via `drydocs load <name>` (G80). `reason` null means the suite is failing:
+ * unexcused silence is exactly what cli.unchained_loaders() turns red on.
+ */
+export interface UnchainedLoader {
+  name: string
+  class: string
+  loader: string
+  reason: string | null
+}
+
+/**
+ * A chain step whose declared bundled input is not committed with the repo
+ * (G80, G78's other half). An `exemption` is a per-machine build on record
+ * (the generated SEAL fixtures); null means a real run would fail at preflight.
+ */
+export interface StepWithUncommittedInput {
+  command: string
+  step: string
+  file: string
+  searched: string
+  exemption: string | null
+}
+
 const data = loadMapData as unknown as {
   note: string
   sequence: SequenceStep[]
@@ -106,6 +132,8 @@ const data = loadMapData as unknown as {
   retired: RetiredId[]
   sourceless_loaders: SourcelessLoader[]
   map_entries_without_registry_source: MapEntryWithoutSource[]
+  unchained_loaders: UnchainedLoader[]
+  steps_with_uncommitted_inputs: StepWithUncommittedInput[]
 }
 
 export const GENERATOR_NOTE = data.note
@@ -132,9 +160,15 @@ export const SEQUENCE: SequenceStep[] = data.sequence
 export const AD_HOC_COMMANDS: string[] = data.ad_hoc_commands
 export const SOURCELESS_LOADERS: SourcelessLoader[] = data.sourceless_loaders
 export const MAP_ENTRIES_WITHOUT_SOURCE: MapEntryWithoutSource[] = data.map_entries_without_registry_source
+export const UNCHAINED_LOADERS: UnchainedLoader[] = data.unchained_loaders
+export const STEPS_WITH_UNCOMMITTED_INPUTS: StepWithUncommittedInput[] = data.steps_with_uncommitted_inputs
 
-/** Both declared defect lists, totalled for the page's defect count. */
-export const DEFECT_COUNT = SOURCELESS_LOADERS.length + MAP_ENTRIES_WITHOUT_SOURCE.length
+/** All four declared defect lists, totalled for the page's defect count. */
+export const DEFECT_COUNT =
+  SOURCELESS_LOADERS.length +
+  MAP_ENTRIES_WITHOUT_SOURCE.length +
+  UNCHAINED_LOADERS.length +
+  STEPS_WITH_UNCOMMITTED_INPUTS.length
 
 /** Source kinds present, in descending frequency — drives the kind filter. */
 export const KINDS: string[] = Array.from(
