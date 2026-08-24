@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-23T17:11:24",
+    "captured_at": "2026-08-23T21:49:07",
     "date": "20260823",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "854b1f87",
-      "full": "854b1f87835199332495d719dd5c7e53c2d37dd4",
+      "commit": "35e6d103",
+      "full": "35e6d10310151f39f6855b70f132a2ee3df17a4d",
       "branch": "main",
-      "describe": "port-base-20260820-145-g854b1f87",
-      "subject": "chore(backlog): groom -- 1 promoted, 0 inboxed, 1 merged",
+      "describe": "port-base-20260820-152-g35e6d103",
+      "subject": "feat(port): J42 — diff the two repos' backlog item-id sets and fail the port report on a gap",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -15191,15 +15191,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -15288,15 +15279,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -16352,24 +16334,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/pat_projection.py",
       "name": "pat_projection.py",
       "extension": ".py",
@@ -16401,6 +16365,15 @@
       "name": "plan_roadmap.py",
       "extension": ".py",
       "rel_path": "drydocs/plan_roadmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port_backlog_union.py",
+      "name": "port_backlog_union.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port_backlog_union.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19412,10 +19385,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260822.json",
-      "name": "drydocs-20260822.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json",
+      "name": "drydocs-20260823.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260822.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20451,6 +20424,15 @@
       "name": "PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG.0a1b8.20260820.20260820201055.log",
       "extension": ".log",
       "rel_path": "scripts/poc/controlm-output/samples/PJOB095_AUTO_FLOW_BETA_DLY_GKP_TDSTG.0a1b8.20260820.20260820201055.log",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/port_backlog_union.py",
+      "name": "port_backlog_union.py",
+      "extension": ".py",
+      "rel_path": "scripts/port_backlog_union.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21765,6 +21747,15 @@
       "name": "test_plan_roadmap.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_plan_roadmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_port_backlog_union.py",
+      "name": "test_port_backlog_union.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_backlog_union.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24796,6 +24787,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs/port_backlog_union.py",
+      "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
       "drydocs/drydocs/port_preflight.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -25638,6 +25633,14 @@
     [
       "drydocs/scripts/mapping_analytics.py",
       "drydocs/drydocs_core/mapping_store.py"
+    ],
+    [
+      "drydocs/scripts/port_backlog_union.py",
+      "drydocs/drydocs/port_backlog_union.py"
+    ],
+    [
+      "drydocs/scripts/port_backlog_union.py",
+      "drydocs/drydocs/port_preflight.py"
     ],
     [
       "drydocs/scripts/port_preflight.py",
@@ -26726,6 +26729,10 @@
     [
       "drydocs/tests/unit/test_plan_roadmap.py",
       "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_backlog_union.py",
+      "drydocs/drydocs/port_backlog_union.py"
     ],
     [
       "drydocs/tests/unit/test_port_manifest.py",
@@ -36467,11 +36474,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -36518,11 +36520,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/code_graph_freshness.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -36587,16 +36584,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/pat_projection.py"
     ],
     [
@@ -36613,6 +36600,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/plan_roadmap.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/port_backlog_union.py"
     ],
     [
       "drydocs/drydocs",
@@ -39177,7 +39169,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260822.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -39593,6 +39585,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/poc"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/port_backlog_union.py"
     ],
     [
       "drydocs/scripts",
@@ -40418,6 +40415,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_plan_roadmap.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_port_backlog_union.py"
     ],
     [
       "drydocs/tests/unit",
@@ -41559,13 +41561,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2355,
-    "edges": 1129,
+    "files": 2358,
+    "edges": 1133,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2642,
-    "directories": 288
+    "rels": 2641,
+    "directories": 284
   }
 }
