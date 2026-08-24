@@ -133,12 +133,26 @@ and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
 **LEDGER ROLLED AND CERTIFIED 2026-08-24 (laptop, post-reboot) — THIS ROLL REPLACES
-THE 2026-08-20 ONE.** Steps **178-213** cover the **179-commit delta
-`port-base-20260820..main`**, verified commit-by-commit by `port_preflight.py`: 136
-commits cited across the 36 steps and the coverage footnote, 42 exempt by subject
-under the standing ritual rule, and the roll write itself terminating via the
-script's `chore(port): roll` exemption. The base is tagged **`port-base-20260824`**
-at the roll commit (`python scripts/port_preflight.py --base 213e1d12 --tag`).
+THE 2026-08-20 ONE.** Steps **178-213** cover the **182-commit delta
+`213e1d12..port-base-20260824`**, verified commit-by-commit by `port_preflight.py`:
+138 commits cited across the 36 steps and the coverage footnote, 44 exempt by subject
+under the standing ritual rule. **CERTIFIED 7/7 at `68b53716`** (tree clean, relay
+basis tags, ledger coverage 182/182 cited-or-ritual, cited paths resolve, renders
+current, suite **2382 passed / 9 skipped**, tag pushed) — venue **laptop
+`NewThinkpad`**, samples-dir present, `RECONCILE_BEFORE_DIR` unset (J18). CI green at
+the tagged commit.
+
+**THE TAG IS NOT AT THE ROLL COMMIT, AND THE COUNT IS 182 RATHER THAN THE 179 THIS
+PARAGRAPH FIRST CLAIMED — read this before you reconcile the numbers.** The roll wrote
+at `9e621887`; CI then failed it on ONE citation, `docs/reviews/port-review-7c18ff4b-20260820.md`,
+which `103f240c` untracked but which was still present on the producer laptop's disk,
+so the currency guard (which asks the filesystem, not git) passed locally and failed in
+a fresh clone. The repair `3b4d8e76` and its coverage addendum `68b53716` follow, and
+the tag sits at the addendum. So `git rev-list --count 213e1d12..port-base-20260824`
+returns **182**, `git rev-parse port-base-20260824` returns **`68b53716`**, and both
+are correct. The first-written 179/roll-commit figures were measured before those three
+commits existed; they are corrected here rather than left for you to disprove, because
+this repo has already spent one follow-up condition on a 478-vs-479 mismatch.
 
 **PRECONDITION — the `7c18ff4b..port-base-20260820` port must be MERGED and closed
 out before this range starts.** That range carried step 175, the backlog shard, which
@@ -2979,8 +2993,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
 - Full `pytest tests/unit/` — ZERO failures is the contract;
-  producer reference at the 158-170 extension (`a4e65d26`, desktop, 2026-08-19):
-  **2224 passed / 5 skipped / 13 deselected** with the production CSV present and
+  producer reference at the CERTIFIED BASE (`port-base-20260824` @ `68b53716`,
+  laptop `NewThinkpad`, 2026-08-24): **2382 passed / 9 skipped** with the production
+  CSV present and `RECONCILE_BEFORE_DIR` unset. (The prior reference, two rolls back,
+  was `a4e65d26` desktop 2026-08-19 at 2224 / 5 / 13 deselected — kept here only so the
+  chain is readable; a producer figure is never your acceptance number.) With
   no RECONCILE_BEFORE_DIR — your figure lands ABOVE your own e60822fc baseline,
   never compared against ours; skips are
   environment/fixture-absence by design (production CSVs, XML fixtures, fastapi
