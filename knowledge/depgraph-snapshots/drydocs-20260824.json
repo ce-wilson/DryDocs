@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-23T22:59:01",
-    "date": "20260823",
+    "captured_at": "2026-08-24T08:12:58",
+    "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "118e2cbf",
-      "full": "118e2cbf312f24423e5c35a36041849a64949040",
+      "commit": "ebea0e34",
+      "full": "ebea0e34b0917296fc07fca7106cbbcf953a73ef",
       "branch": "main",
-      "describe": "port-base-20260820-163-g118e2cbf",
-      "subject": "docs(load): G79 follow-through — the module docstrings name the three commands; Idea-160",
+      "describe": "port-base-20260820-170-gebea0e34",
+      "subject": "Merge branch 'feat/g81-path-zones' — G81: declared path zones and the non-overlap invariant",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6123,6 +6123,15 @@
       "name": "fcdo-vocabulary.yaml",
       "extension": ".yaml",
       "rel_path": "config/crosswalks/fcdo-vocabulary.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/data-zones.yaml",
+      "name": "data-zones.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/data-zones.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13805,6 +13814,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/g81-data-path-reconstruction.md",
+      "name": "g81-data-path-reconstruction.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/g81-data-path-reconstruction.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/gitnexus-depgraph-comparison.md",
       "name": "gitnexus-depgraph-comparison.md",
       "extension": ".md",
@@ -16843,7 +16861,16 @@
       "extension": ".py",
       "rel_path": "drydocs_core/data_root.py",
       "project": "drydocs",
-      "circular": false,
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/data_zones.py",
+      "name": "data_zones.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/data_zones.py",
+      "project": "drydocs",
+      "circular": true,
       "kind": "file"
     },
     {
@@ -16888,7 +16915,7 @@
       "extension": ".py",
       "rel_path": "drydocs_core/landing_zones.py",
       "project": "drydocs",
-      "circular": false,
+      "circular": true,
       "kind": "file"
     },
     {
@@ -19394,10 +19421,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823-2249.json",
-      "name": "drydocs-20260823-2249.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json",
+      "name": "drydocs-20260823.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823-2249.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21090,6 +21117,15 @@
       "name": "test_data_root.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_data_root.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_data_zones.py",
+      "name": "test_data_zones.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_data_zones.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25088,6 +25124,22 @@
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
+      "drydocs/drydocs_core/data_root.py",
+      "drydocs/drydocs_core/data_zones.py"
+    ],
+    [
+      "drydocs/drydocs_core/data_zones.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs_core/data_zones.py",
+      "drydocs/drydocs_core/landing_zones.py"
+    ],
+    [
+      "drydocs/drydocs_core/data_zones.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs_core/landing_zones.py",
       "drydocs/drydocs_core/data_root.py"
     ],
@@ -25801,6 +25853,10 @@
     ],
     [
       "drydocs/tests/unit/conftest.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/tests/unit/conftest.py",
       "drydocs/drydocs_core/run_log.py"
     ],
     [
@@ -26054,6 +26110,26 @@
     [
       "drydocs/tests/unit/test_data_root.py",
       "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs_core/data_zones.py"
     ],
     [
       "drydocs/tests/unit/test_database_names.py",
@@ -26490,6 +26566,10 @@
     [
       "drydocs/tests/unit/test_lineage_review.py",
       "drydocs/drydocs_lineage/review.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_rua.py",
+      "drydocs/drydocs_core/data_root.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_rua.py",
@@ -31838,6 +31918,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/data-zones.yaml"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/dev-environment.yaml"
     ],
     [
@@ -36128,6 +36213,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/g81-data-path-reconstruction.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/gitnexus-depgraph-comparison.md"
     ],
     [
@@ -37728,6 +37818,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/data_zones.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/doc_anchors.py"
     ],
     [
@@ -39183,7 +39278,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823-2249.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40059,6 +40154,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_data_root.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_data_zones.py"
     ],
     [
       "drydocs/tests/unit",
@@ -41575,13 +41675,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2359,
-    "edges": 1133,
-    "circular_files": 0,
+    "files": 2363,
+    "edges": 1144,
+    "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2642,
+    "rels": 2646,
     "directories": 284
   }
 }
