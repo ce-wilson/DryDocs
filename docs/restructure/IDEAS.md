@@ -93,6 +93,45 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-162`** · 2026-08-24 · `[chore]` · **open** · prio? **Low** —
+  **The company occupies `DD1`–`DD10` in the PRODUCER band, in a letter series this repo
+  cannot see.** `DD1`–`DD9` predate the 2026-08-18 allocator partition and are
+  grandfathered by the forward-only clause; `DD10` was minted 2026-08-24 — groomed from
+  their correctly-banded `Idea-10000` — and landed at numeric 10, inside `1–9999`. Ports
+  are one-way, so none of those ids ever reaches this tree and the only producer-side
+  record of them is machine-local. **The hazard is ours, not theirs:** if this repo ever
+  opens a `DD` series — `drydocs_deepdoc` is producer code and `DD` is the obvious slug —
+  then `DD1` is a perfectly LEGAL producer-band mint that collides at the company's next
+  `union-append`, which is the G70/G71 shape that already forced one renumber (and could
+  not be settled by renaming, because `config/gate-log.md` cited the ids inside a
+  SIGNED-OFF record). Renumbering their `DD10` does not close this — `DD1`–`DD9` stay.
+  **Disposition when it arises:** open any producer `DD` series at a number no company id
+  can reach, or pick another prefix. Nothing to do until such a series is proposed;
+  captured so that decision is not made by accident, which is the only way it would be.
+
+- **`Idea-161`** · 2026-08-24 · `[task]` · **open** · prio? **Med** —
+  **The wave-2 port base has three named blockers and none of them needs a particular
+  machine.** `python scripts/port_preflight.py --base 213e1d12` (laptop `NewThinkpad`,
+  2026-08-24) returns NOT CERTIFIED on three of seven; the other four already pass —
+  tree clean, relay basis tags, renders current, suite green (2382 passed / 9 skipped).
+  **(1) Ledger coverage** — roughly 45 UNCITED commits; the ledger stops at step 177
+  (`2adcd98a`, the S9 path move), so the roll writes 178 onward. This is the bulk of the
+  work. **(2) Cited paths resolve** — three, and the one that looks machine-local is not
+  fixable by changing machine: `scripts/poc/controlm-output/first-real-run-2026-08-21.md`
+  cites an `internal-local/controlm-output-logs/...` transcript that its own commit
+  message places on the **company working copy**, so it resolves on no producer machine,
+  ever — which is exactly what a `status: DATED RECORD` line in the first 30 lines is
+  for (the Idea-110 convention: annotate the record rather than edit it). The other two,
+  `docs/design/deepdoc-data-flow-overview.md` and `scripts/poc/controlm-output/README.md`,
+  both cite `drydocs_lineage/extractors/controlm_output.py`, which exists nowhere; neither
+  is a record, so the fix is to reword the citation as planned or write the module — a
+  README sending a reader to a file that is not there is the precise defect the guard
+  exists to catch. **(3) Certified base tag** — the `--tag` run, last. **Also in the
+  roll:** the G81 relay block sits OUTSIDE the numbered `STANDING RELAYS` section, and
+  `relays_missing_basis()` parses only between `STANDING RELAYS` and `OWED COMPANY-SIDE:`,
+  so the relay-basis check passes on a relay it structurally never inspected — renumber it
+  into the section. **Routing:** either machine; git carries everything this needs.
+
 - **`Idea-160`** · 2026-08-23 · `[task]` · **open** · prio? **Med** —
   **A SOURCE-mode `refresh-teams` now needs an input file nothing produces.** G79 wired
   `pat_team_roles` into the team chain (it was gate-confirmed at C9 and had never run),
