@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-23T22:49:12",
+    "captured_at": "2026-08-23T22:59:01",
     "date": "20260823",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "de5506d3",
-      "full": "de5506d306dd9cdc2bd8926bbd867cdeeb151b5b",
+      "commit": "118e2cbf",
+      "full": "118e2cbf312f24423e5c35a36041849a64949040",
       "branch": "main",
-      "describe": "port-base-20260820-161-gde5506d3",
-      "subject": "Merge branch 'feat/g79-source-split' — G79: refresh-reference splits by source",
+      "describe": "port-base-20260820-163-g118e2cbf",
+      "subject": "docs(load): G79 follow-through — the module docstrings name the three commands; Idea-160",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19394,10 +19394,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json",
-      "name": "drydocs-20260823.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823-2249.json",
+      "name": "drydocs-20260823-2249.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823-2249.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39183,7 +39183,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823-2249.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
