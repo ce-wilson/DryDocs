@@ -93,6 +93,43 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-166`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
+  **The load runbook's `--csv` example points at a path that exists nowhere in this repo.**
+  `docs/design/drydocs-load-runbook.md` step 3 reads
+  `poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv`, but
+  `internal/org/` holds exactly one file here (`product-overview.md`, from `36ae3828`) and
+  `internal/org/catalog/` has never existed producer-side. Every other producer mention of
+  that directory is a reference to the COMPANY's copy, not ours — `C26`'s divergence
+  ledger, `reconcile-port/SKILL.md`, `30-mappings-catalog.yaml`, and the 2026-07-27 inbox
+  line — all citing their 2026-06-25 catalog gate page. So the runbook teaches a
+  company-shaped path as if it were a local one, in a doc classified Internal-Public on the
+  grounds that it carries bundled sample data only. **Found the honest way:** a company
+  session hit the same line, could not find the file, and spent a session tracing why its
+  catalog folder kept reverting — the answer had nothing to do with the runbook, but the
+  runbook is where the hunt started. **Disposition, not decided:** either repoint the
+  example at a bundled sample under `drydocs/data/samples/` so a reader can actually run
+  it, or mark it explicitly as a company-side illustration. Do NOT invent an
+  `internal/org/catalog/` here to make the line true — real data never lands in this repo,
+  which is the whole asymmetry. Note the line was touched at load-runbook Rev 3 (annotation
+  only); the path was not examined then.
+
+- **`Idea-167`** · 2026-08-24 · `[question]` · **open** · prio? **Low** —
+  **The company's `catalog` supplement declares two more terms than ours, and the gap is
+  theirs, not producer staleness.** A company `apply-supplements` run reports
+  base 47 / seal 15 / **catalog 24** / registry 4 / infrastructure 6; producer declares
+  base 47 / seal 15 / **catalog 22** / registry 4 / infrastructure 6 — four of five match
+  exactly, and `sosa` is correctly absent on both (opt-in). Producer has never held 24:
+  `catalog_ontology_supplement.cypher` went 18 -> 22 at K6 (Product Cabinet, the ProductRole
+  scheme) and has been 22 at every commit touching it since. Ports run one way, so the two
+  extra terms are company-local catalog modelling. **Why it is worth a look rather than a
+  shrug:** the whole point of G29's declared chain is that a term nobody declared is a
+  loader MATCHing nothing — two undeclared-here terms are the mirror case, a real modelling
+  addition that only one side has. **Ask:** name the two IRIs. If they are a genuine
+  addition they are a `drydocs-review` BACK-FLOW candidate, alongside the two company-local
+  supplements already tracked at `Idea-52` -> `G59`. If they are leftovers from a
+  superseded shape, they want retiring on their side. Producer does nothing until the two
+  ids are known — this is a question, not a defect.
+
 - **`Idea-164`** · 2026-08-24 · `[task]` · **open** · prio? **Med** —
   **The superseded-database guard does not scan the two packages where the stale names
   actually were.** `tests/unit/test_database_names.py` has scanned six packages since G28
