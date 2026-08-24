@@ -132,18 +132,39 @@ local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-of
 and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
-**LEDGER ROLLED AND CERTIFIED 2026-08-20 (desktop, post-reboot).** Steps **171-176**
-cover the **24-commit delta `7c18ff4b..main`** (18 cited across the six steps, 6
-ritual under the standing exemption: `0fdfe7a2` the 20260819 roll, `963e93ca` a
-render follow, `16f370d0` the handoff roll, `b0c823da` `4040c47e` `4dac320c` claims),
-verified commit-by-commit by `port_preflight.py`. The base is tagged
-**`port-base-20260820`** at the roll commit (`python scripts/port_preflight.py
---base 7c18ff4b --tag`). **THIS RANGE HAS ONE STEP WITH ITS OWN APPLY SEQUENCE —
-step 175, the backlog shard** — carried in full by
-`docs/company-prompts/port-backlog-shard-company-prompt.md`; everything else applies by the
-manifest as usual. PRECONDITION on your side: the 135-170 port
-(`drydocs-port-20260820`) is `--no-ff` MERGED to your main with its follow-ups
-done before this range starts — a mid-apply range finishes on the monolith.
+**LEDGER ROLLED AND CERTIFIED 2026-08-24 (laptop, post-reboot) — THIS ROLL REPLACES
+THE 2026-08-20 ONE.** Steps **178-213** cover the **179-commit delta
+`port-base-20260820..main`**, verified commit-by-commit by `port_preflight.py`: 136
+commits cited across the 36 steps and the coverage footnote, 42 exempt by subject
+under the standing ritual rule, and the roll write itself terminating via the
+script's `chore(port): roll` exemption. The base is tagged **`port-base-20260824`**
+at the roll commit (`python scripts/port_preflight.py --base 213e1d12 --tag`).
+
+**PRECONDITION — the `7c18ff4b..port-base-20260820` port must be MERGED and closed
+out before this range starts.** That range carried step 175, the backlog shard, which
+has its own apply sequence; a mid-apply range finishes on the monolith and this one
+begins after it. Steps 171-176 stay live below for exactly that reason.
+
+**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (179 commits,
+four days) and three steps change BEHAVIOUR rather than content: **195** splits
+`cli.py` into six modules and is the biggest hand-merge here, **209** removes the
+`refresh-reference` command by name, and **210** makes `DRYDOCS_DATA_ROOT` mandatory
+so the first data-path command after the port exits 2 until it is exported. **188**
+migrates vocabulary ids you may hold and ships two `.cypher` migrations that must run
+against your graph. **212** deletes a file from the producer tree that you may have
+taken at the last port — an untracking, not a retraction. Read those five before you
+plan the apply; the rest applies by the manifest as usual.
+
+**COMPANY CLOSE-OUT OF THE `port-base-20260820` PORT: REPORTED COMPLETE, FIELDS NOT
+YET RECEIVED (2026-08-24, USER-REPORTED).** The user states the internal port is
+complete. That is a dated report, not the J35 record: the four required fields —
+applied RANGE with its `rev-list --count`, the PORT COMMIT(s), the BACKUP TAG with
+its `rev-list --count <tag>..HEAD` proof, and the ACCEPTANCE NUMBERS — have not
+reached this file. Per the standing rule, no producer-side figure may stand in for a
+company acceptance number, so nothing is filled in from this side. **First action at
+the next port: fill them from the company PORT-REPORT.** The `caa0406` block below
+records what an unfilled close-out costs, and it is the reason this paragraph exists
+rather than a checkmark.
 
 > **THE `caa0406` PORT'S CLOSE-OUT IS UNRECORDED — ask before assuming it landed.**
 > `ae21ee4` got an explicit `06d4469` "MERGED company-side, branch removed" commit.
@@ -2466,6 +2487,422 @@ regeneration, never-port outputs — and get no step.
     - Your `docs/controlm-*.md`, if you hold your own, are governed by the re-scoped
       `docs/*.md` `default_ok` entry until you move them; nothing forces you to.
 
+178. THE WEB CONSOLE — O57 /load-map, O64–O67, O55, O31 [web — canonical-producer,
+    read K7–K15 first] (`72e75735` O57: a NEW nav module `loadmap` at /load-map,
+    steward+admin access, reading the committed `load-map.json` and never re-deriving
+    from the registries — the 30 sources, 16 systems, 19 sequence steps and BOTH declared
+    defect lists N4 generated had no console reader at all. `6abf2106` O64 Ask keeps the
+    last completed turn per persona across navigation; `152042cf` O65 dark mode reaches
+    the React Flow chrome through the library's own `--xy-*` variables (cascade order,
+    not missing rules); `6eaf48ac` O66 ONE shared `RelEdge` overlay for all three graph
+    canvases; `e8fa5ff1` O67 `ModuleIcon` exhaustiveness — a `ModuleId` without a glyph
+    case is now a `tsc` error; `b8962913` O55 npm audit clean, lockfile only; `154c5fa8`
+    O31 `benchmarkData.ts` is RENDERED from the P0 harness run plus a verdict ledger,
+    not hand-carried — the old scoreboard disagreed with its own rows.)
+    APPLY: take by NAME, never `git checkout -- web/src` — the K7–K15 folder-attribution
+    hold is still live and a wholesale checkout re-adopts the held UI. O31's `.ts` is
+    DERIVED: take `scripts/render_benchmark_data.py` + `verdicts.yaml` and re-render it.
+
+179. THE SME LAUNCH GUIDE NAMED THREE SERVICES AND THE STACK HAS FOUR
+    [docs/design/ui-exploration — canonical-producer] (`90e79687`: live mode ran green on
+    Neo4j + drydocs-api + Vite and `/ask` still failed, because `/ask` is the ONE view
+    that does not go through drydocs-api — it talks to the `graph_qa` ADK agent on :8000,
+    absent from the guide entirely. Two properties recorded because each costs a debugging
+    session once: that server runs in its OWN venv, not the poetry env, and reads its OWN
+    `agents/.env`, not the repo-root one — both gitignored, so a fresh clone or a new
+    worktree has neither. `847ce8a7` + `8b38109f` add the chat-turn vs router-hop
+    vocabulary page and fix its mermaid figures ignoring the page theme.)
+    CAUTION: all three landed at the PRE-S9 `UI-WIP/` path and moved with step 177. Read
+    177 before resolving them, or you will re-create a directory both sides just retired.
+
+180. THE EXECUTIVE OVERVIEW, REV 10 [docs/overview — `default_ok`, audience differs]
+    (`54f2d6df` first content refresh since rev 6: the ONE-DATABASE topology
+    (`document-content-topology` signed 2026-08-18, ADR 0011 executed by choice —
+    ddcontext/dddocs/ddall retired, ddschema stays separate), deepdoc re-chartered per
+    G32 §E / MM1, ADRs 0008/0009/0010 accepted and built, new §03 agent decision tree.
+    `ba8912a2` the executive module flow by default, full map behind a checkbox.
+    `bb28f5d6` the page renders its own diagrams when opened from disk — it had NEVER
+    carried a mermaid loader in any revision and relied on the artifact host, so a
+    `file://` open showed diagram source.)
+    APPLY: nothing. `default_ok` on purpose — outward-facing, and your audience is not
+    ours. The mermaid-loader technique is worth lifting if your own HTML docs open from disk.
+
+181. D10 — THE XML-vs-REPLICA PRECEDENCE GATE, DRAFTED AND UNSIGNED [gate-prompts]
+    (`0baa7973`: `controlm-definition-precedence`, one question per object class with the
+    Idea-43 candidate STATED rather than pre-picked, owner + sunset riders on every
+    clause, the T16 second path carried. Registers nothing, decides nothing.)
+    APPLY: `config/gate-prompts/**` is YOURS. Take it as a starting point if you like, but
+    the ruling is your SME's — this side has not run it either.
+
+182. Q14 — vendor-docs-entity-core: DRAFTED, SIGNED 21/21, THEN RENAMED [gate / ontology]
+    (`5a0383e7` the draft — 5 sections / 20 confirmations, §E added as the corpus's own
+    doc-graph gate with its chicken-and-egg stated in the prompt itself; `b8d70a78` the
+    standard E6 safe-to-transcribe closing confirmation; `d316bf96` SIGNED OFF 21/21 the
+    same day — `ControlMUtility` confirmed as a new Control-M-family class with the
+    `PART_OF` product bridge, `DESCRIBES` reused as a new triple, vendor cross-links as
+    `SEE_ALSO` with `rdfs:seeAlso` ADOPTED, and the real layer-3 chain ruled a new
+    `INVOKES` triple with the active `scheduler_invokes` untouched; `cbb38458` RENAMED
+    entity-spine → entity-core on the user's style ruling, sign-off transfers.)
+    CAUTION ON THE RENAME: the SIGNED OFF `gate-log.md` entry was NOT edited (L25
+    riders-not-edits) — a `RECORD:` entry carries the new slug with transfer wording. Take
+    the entity-CORE spelling; the signed confirmations' body prose still reads "spine"
+    deliberately, because that is what the SME saw.
+
+183. MM2 — THE data-flow-overview GATE PROMPT, DRAFTED [ontology / gate-prompts]
+    (`4176c125`: the per-data-flow overview record keyed on the `%%DATAFLOW` value the
+    launcher itself names, reconciling three grains that existed unreconciled — the
+    `%%DATAFLOW` variable fact, the designed-never-built `:AppDataFlow`, and the runbook
+    data-series traversal. 27 confirmations in six sections, nothing pre-picked;
+    `:DataFlow` plus five edges registered PLANNED, no loader touched.)
+    APPLY: vocabulary fragments per-entry as always — five PLANNED entries, nothing
+    active. Read it before MM7/MM8 land; it is where the grain question gets settled.
+
+184. EPIC MM — deepdoc LEAVES THE PLACEHOLDER [drydocs-deepdoc / docs]
+    (`cf58e4d8` mints MM1–MM10 and adds `docs/design/deepdoc-data-flow-overview.md`,
+    synthesized MECHANISM-ONLY from one production support deep-dive whose verbatim
+    transcript is machine-local and never committed; every field badged SOURCE/DERIVED,
+    every label and edge `status: planned`. It establishes the Control-M Output tab as
+    ITERATION 2 of the launcher contract — it asserts the job KIND, the provenance-GUID
+    chain, the landing prefix and the compute target that CMDLINE cannot; no sysout
+    ingestion existed anywhere before. `ff640638` and `f9e9d037` are same-day SME rulings
+    on it. `42b57e98` MM1 restates the deepdoc charter where the package docstring,
+    MODULE_MAP row, boundary-group comment and roadmap still carried the old one.)
+    APPLY: `docs/design/**` evaluates. The `.md` is the source and the `.html` beside it
+    is a deterministic render (Epic L) — never hand-merge the HTML, re-render it.
+
+185. MM7 — THE OUTPUT-TAB PoC, AND THE SME RULING THAT REVERSED ITS HEADLINE
+    [scripts/poc — `default_ok`; THE RULING IS THE PART THAT MATTERS] (`e124b3ee` the
+    PowerShell parsers, one per job shape plus a cross-hop joiner, dispatching ONLY on the
+    launcher's own "Identified <KIND> Job" line and never the job name — the R13 trap;
+    `293a6439` the sanitized record of the first real run, eleven logs parsed, zero errors;
+    `8adfa688` THE RULING — `provenanceGuid` is a run-scoped placement→ingestion handoff,
+    a correlation token. It is NOT provenance in the PROV-O sense this repo reserves the
+    word for, and it cannot validate or reconstruct Control-M lineage. The PoC asserted
+    the opposite, printing "CHAIN BREAKS" at six of six transforms, and the first real-log
+    run was read as six defects. There is no chain to break. `18f0e26c` job identity comes
+    from the sysout FILE NAME — the modern wrapper writes none into the body; `075aeea3`
+    takes the leading filename field by POSITION, not by how it looks. `3f1cac70` rewords
+    two citations that named an extractor module MM7 has not written.)
+    APPLY: throwaway-grade, not a component, writes no graph — take it only for the log
+    patterns. Take the RULING regardless: any lineage design that assumes the GUID
+    survives past ingestion is wrong, and that is a design fact, not a parser fact.
+
+186. G34 — THE BUSINESS-GLOSSARY SCAFFOLD, RESERVATION ONLY [ontology / config]
+    (`523b538b` reserves the names and the slot so the internal port cannot collide (SME
+    reason at `business-application-identity` §F2) and STOPS — no term defined, no loader
+    reading it, no gate run. `CatalogBusinessTerm` (skos:Concept, one node per SENSE),
+    `CatalogValidValue`, `CatalogElement`, `CatalogEncodingInstance` planned; three edges
+    planned in `42-local-catalog.yaml`; the classification split written down with both
+    homes created — `config/glossary/` (Internal-Public, ports) and `internal/glossary/`
+    (Internal, empty by design). `7ab95016` adds the first public sense: DRY.)
+    CAUTION: the SME records that YOUR side runs a dedicated acronym tool. This is the
+    slot, not a competitor — do not populate it before that question reaches your SME.
+
+187. C33 — STOPPED AT Q3, STATUS `blocked` [config / taxonomy] (`31dda9a4`: §C1 gains the
+    install-path pattern row `abinitio-install-path`, and the item then STOPS — symlink
+    stability is unruled, so per its own acceptance the loader and the MERGE key were
+    deliberately NOT written.)
+    APPLY: nothing to run. Worth one read as the shape of an item that stops honestly
+    instead of guessing past its own gate.
+
+188. THE VOCABULARY IDS MIGRATE ONTO THE DOMAIN-DERIVED SCHEME — G87, G88, G101, G89
+    [ontology — per-entry, AND THIS ONE CHANGES IDS YOU MAY HOLD] (`453d9c0b` G87
+    force-migrates the 37 live epoch-tag ids: add-new + deprecate-old with `superseded_by`
+    on every old row, map joins / lineage `VOCAB_IDS` / test pins repointed, and
+    `migrate_vocab_ids_g87.cypher` re-stamps old `r.vocab_id` in the graph; `51a02e24` G88
+    relocates the people/org family (ORG membership + PROV qualified attribution, 14
+    entries) into domain `human` as new fragment `52-local-human.yaml` — a partition move
+    only; `8dc9a804` G101 migrates the `seal_*` ids the same way, 5 per the census plus 2
+    post-gate appuser entries as a named widening; `9ba88772` G89 repoints
+    `runbooks.series.v1` off the PLANNED `TRIGGERS` edge onto the active `INVOKES`
+    (`scheduler_invokes`) — it had also had the wrong `from_node`.)
+    APPLY — IN THIS ORDER: fragments per-entry as always, but the OLD rows are kept with
+    `superseded_by`, never deleted, so a union gives you both and that is correct. Run the
+    two `migrate_vocab_ids_*.cypher` against YOUR graph or your stored `r.vocab_id` values
+    keep pointing at deprecated ids. The port guard implements the manifest's
+    gate-authorized-deprecation exception — this is the case it was written for.
+
+189. C26 — THE COMPANY-CATALOG DIVERGENCE, WRITTEN WHERE A PORT READS IT [ontology /
+    reconcile ledger] (`707cea34`: 5 differences plus a joint label/key ruling and 2 relay
+    items land in the reconcile-port ledger; `catalog_has_sub_lob`,
+    `catalog_sub_lob_has_product_line` and `CatalogSubLOB` reserved PLANNED and the two
+    company map ids `proposed` — NOTHING adopted; LOB002 AWMCIB split into AWM + CIB @1.0
+    as taxonomy capture.)
+    APPLY: read the ledger entries first — they describe YOUR catalog, from producer
+    observation, and the point of writing them here is that you can correct them. Nothing
+    in this step is active; the adoption is a gate on your side.
+
+190. G77 — ONE THEME VOCABULARY, TWO CORPORA [drydocs-docmeta / taxonomy]
+    (`a13f4561`: `concept_scheme.py` reads the `lob-product-team` skos:ConceptScheme
+    (IRI = scheme#notation; labels never resolve), a folder-scope THEME token is added for
+    `JobType.FOLDER` (optional — findings, never raises), and the docmeta `PageRecord`
+    gains `themes` / `theme_status` reporting classified / unclassified / out_of_scope
+    APART rather than collapsed. Zero graph writes.)
+    APPLY: `config/taxonomy/lob-product-team.yaml` is per-entry (step 176 + `b9dd1191`);
+    the `concept_scheme` block is MECHANISM and crosses whole, your LOB rows stay.
+
+191. G82 — THE MISSING PAT TEAM-REPORT PROJECTION [drydocs / config]
+    (`adb8d301`: `drydocs/pat_projection.py` + `scripts/project_pat_team_report.py` write
+    the two files `REFRESH_REFERENCE_CHAIN` reads. It REFUSES to guess a key header —
+    `--header-map` pins the spellings at the first real run rather than guessing, and
+    `Relationship Type` is taken, never the `Team Type Name` decoy. `pat-team-report.yaml`
+    is authored from what it actually reads and `pat:people-report`'s `locator.mapping` is
+    no longer null. `2c995f34` skip-guards the gitignored-fixture read.)
+    CAUTION: the REAL-DATA run is yours — this side has no PAT export. And see step 209:
+    G79 wired a third file, `pat_team_roles.csv`, that this projection does NOT emit
+    (producer Idea-160). Your first SOURCE-mode `refresh-teams` will stop on it by name.
+
+192. U21 — IMPORTS EDGES ARE RETRACTED PER SOURCE [drydocs/loaders]
+    (`6c7e1514`: after the D7 node pass the code-snapshot loader DELETES its own
+    IMPORTS / IS_ENCODED_IN / HAS_MEDIA_TYPE edges that this run did not re-assert, scoped
+    to modules the snapshot contained — omitted modules and other loaders' edges untouched.
+    Deleted, not marked, with the reason recorded; `edges_retracted` is reported in the
+    summary, the envelope and on `:JobRun`. Unit + testcontainers guards.)
+    APPLY: take it. Live-verified producer-side on `neo4jtest` (J18) — 1032 edges = the
+    snapshot; re-verify against your own graph, since the two are independent.
+
+193. J33 — THE THREE rich-ANSI FAILURES WERE `FORCE_COLOR` [tests]
+    (`3045a22b`: `FORCE_COLOR=3` in one machine's environment made three tests fail on
+    colour rather than behaviour. The unit conftest now clears it — and `TERM=dumb` — at
+    IMPORT, before `drydocs.cli` builds its Console. Whole suite green under
+    `FORCE_COLOR=3`; no assertion was loosened to get there.)
+    APPLY: take the conftest change. If you have ever seen an unexplained rich-output
+    failure on one machine and not another, this is very likely it.
+
+194. J49 — THE TEN NON-RENDER `write_text` SITES ARE RULED [tests / scripts]
+    (`aea3d584`: explicit `newline="\n"` at every one, each with its reason. None produces
+    a committed artifact — the m0 transcripts and `SDLC-Docs/extracted` are hand-authored
+    INPUTS — so the DECLARED tuple gains nothing; the census is now zero, which is what
+    lets a repo-wide static rule replace the per-site fence.)
+    APPLY: mechanical. Take it with the guard, or the census reopens on your next write site.
+
+195. S8 — `cli.py` SPLITS INTO A COMPOSITION ROOT + SIX DOMAIN MODULES
+    [drydocs — `evaluate`, AND THIS IS THE BIGGEST HAND-MERGE IN THE RANGE]
+    (`f5e7229d`: 3184 lines become a thin root plus `cli_schema` / `cli_ingest` /
+    `cli_verify` / `cli_variables` / `cli_docs` / `cli_plan`, merged flat — the SAME 43
+    verbs under the SAME names, so the CLI contract does not move. `verify-reference` and
+    `verify-controlm` are added with `m1-verify` / `m3-verify` kept as deprecated aliases.
+    The three cross-component verbs stay in the root: no new boundary exemption.)
+    APPLY — READ BEFORE YOU START: `drydocs/cli.py` is `evaluate` and the collision ledger
+    rule is "keep consumer verbs, add producer verbs". That rule still holds, but the
+    producer verbs now live in SIX files, so the merge is: take the six new modules whole,
+    then reduce YOUR `cli.py` to the composition root plus your own verbs. Do not try to
+    reconcile a 3184-line file against a 400-line one line-by-line.
+
+196. G78 — A CHAIN STEP THAT CANNOT FIND ITS INPUT FAILS BY NAME, BEFORE ANY WRITE
+    [drydocs / drydocs-core] (`9463beee`: `refresh-reference` no longer has a fixture
+    default — you pass `--samples-dir` (fixtures) or `--source <id>` (the declared landing
+    zone), with a per-step path table printed at close. `ingest-controlm` preflights and
+    prints a FIXTURE RUN banner. Five previously untested loaders gain a direct test import.
+    The fixture-naming divergence between the two sides is recorded in the port ledger.)
+    APPLY: this is a BEHAVIOUR change to how a run is invoked — any script or runbook of
+    yours that called `refresh-reference` bare now fails loudly by name, which is the point.
+    Update your callers in the same commit you take it.
+
+197. R20, R21, R22 — THE QUERY SPECS, THE NOTIFICATIONS, THE TOWER CONTRACT [drydocs-api /
+    drydocs-core] (`06f9a76b` R20 audits all 32 query specs against the vocabulary AND the
+    live schema: `ownership.teams.v1` was asking a NEVER-REGISTERED `DEVELOPS` edge (now
+    `WAS_ATTRIBUTED_TO {role:'developed_by'}`), catalog-cascade's planned `HAS_APPLICATION`
+    leg is written down via `QuerySpec.planned_terms`, and folder-applications was found
+    CURRENT — the 08-20 zero was a load gap, not a spec defect. `d0069191` R21 carries Neo4j
+    notifications instead of discarding them — one core shape, both runners, `StepRecord`,
+    `:AgentRun` warnings, exposed on the admin path. `4519d585` R22 gives Tower a declared
+    source contract text2cypher cannot cross: `config/taxonomy/ui-concepts.yaml` with
+    `graph_binding: none`, plus a Tier-0 declared-term step that answers with provenance
+    BEFORE the router — no Cypher, no LLM — drift-guarded against the TypeScript.)
+    APPLY: R20's `DEVELOPS` fix is the one to check against your own specs — an unregistered
+    edge type in a spec returns zero rows and reads as missing data, not as a bug.
+
+198. Y5 — THE ROADMAP STALE-RENDER GUARD TOLERATES STATUS-ONLY DRIFT [plan / guards]
+    (`f7744112`: a sources fingerprint — status normalised out, renderer bytes included —
+    is embedded in `roadmap.html` and compared only when the page differs, so a
+    claim commit that flips one `status:` no longer has to ship a render. Bounded by a test
+    proving title / module / phase / dependency / new-item / renderer changes still FAIL.
+    CLAUDE.md's pull rule and the backlog README now agree that a claim ships no render.)
+    APPLY: take it with the guard. This is what makes the one-file claim flip cheap, which
+    matters more on your side than ours if two sessions ever run at once.
+
+199. THE SNAPSHOT RITUAL'S OWN INSTRUMENTS [knowledge/depgraph-snapshots — producer ritual,
+    but the LESSON ports] (`22b8ad72` then `5c0308e6`: the CI check printed GREEN at a RED
+    HEAD. PS 5.1's `ConvertFrom-Json` emits a JSON array as ONE WRAPPED ITEM — in pipeline
+    AND in argument form, which the first fix missed — so the verdict's scalar tests became
+    member-enumeration filters that passed if ANY recent run had. Caught live at a
+    billing-blocked failure. `4bd82a47` U26/U24: the script resolves the depgraph sibling
+    beside the MAIN working tree via git-common-dir, so it runs from a worktree.
+    `cd48241c` U22: `drydocs code-graph-freshness` compares `max(:CodeModule.last_seen_at)`
+    to the newest snapshot's `captured_at` with fresh/stale/empty/no-snapshot/unreachable
+    verdicts — warn-only, never refreshing. `24bfbf9d` U25/G103: `debt-metrics.jsonl`, one
+    append-only LF row per snapshot run, `merge=union`, exempt from U12 retention, and no
+    row is written without a database.)
+    APPLY: the `.ps1` is producer ritual and need not cross. The PS 5.1 finding should:
+    any PowerShell of yours that reads `gh ... --json` and tests a scalar has this bug.
+
+200. K24/J46 AND J47/J50 — GATE-PAGE IDS, RUN-LOG FLAKE, DECLARED UNBLOCKS, MANIFEST ORDER
+    [guards / plan] (`2e8b5c3d`: a guard against REUSED question ids on gate pages, proven
+    on the pre-renumber FID page pulled from history, plus the run-log collision test
+    de-flaked by injecting the clock into `claim_log_path`. `0a72aed4`: `gates.json`
+    unblocks edges are now DECLARED — item gates via a validated-slug field, sections
+    hanging edges off the gate they are ABOUT — which takes 581 citation-inflated edges
+    down to 25 genuine ones; and the PORT-MANIFEST ordering guard is DERIVED for every row
+    (earlier-glob shadowing) instead of read from a hand-typed list.)
+    APPLY: the manifest ordering guard is the one with teeth for you — it is what catches a
+    new row added above an existing one and silently shadowing it.
+
+201. U20 — THE CODE-GRAPH REVIEW PLAN NAMES WHERE ITS NUMBERS COME FROM [docs/reviews]
+    (`f56cf601`: the plan is restated on the eight package roots, and the hand-typed
+    per-root count list is replaced by where each number is DERIVED — a graph query for
+    modules, the runbook-coverage test for docs — with a guard keeping the hand-typed form
+    out. Re-measured counts live on the item, not in the prose.)
+    APPLY: nothing. `docs/reviews/**` is a dated record on this side.
+
+202. N16/S12 — `source_label` BECOMES A DECLARED ENUM; THE ENVIRONMENT-DRIFT GUARD
+    [drydocs-core / tests] (`1afd7c97`: the widen-and-enforce ruling — `SOURCE_LABELS` is
+    now declared and enforced, the retired agent value is out, and the mappings'
+    `source_label` collision is stated rather than left implicit. Separately, a drift guard
+    fails the session ONCE when installed packages disagree with `poetry.lock` — drift,
+    never path, proven negative via `DRYDOCS_LOCK_PATH`.)
+    CAUTION: this closes the standing tail carried at RELAY-11(7) — `source_label:
+    'snowflake'` was a 13th value outside the declared enum that 12 of 28 producer loaders
+    already sat outside, unenforced. If your loaders carry labels of your own, widen the
+    enum in the same commit you take it or the guard fails on YOUR data, correctly.
+
+203. J37/J31/J45 — NEVER PARSE A RENDER, AND WORK VISIBILITY [working agreements / guards]
+    (`d91ac809`: the never-parse-a-render rule enters CLAUDE.md §6 with a sweep guard
+    (`test_no_render_parsing.py`); census confirms no test parses `--help` any more. The
+    work-visibility clause — `wip/<id>-<machine>`, push at the first substantive edit,
+    check `git branch -r --list` before releasing someone else's claim — enters the pull
+    rule. J45 verified as ALREADY DELIVERED at RELAY-5, not re-done.)
+    APPLY: CLAUDE.md is canonical-producer; take it. The wip-branch clause is written for
+    two machines on one repo and applies to you the same way it applies here.
+
+204. L25/L26/J44/G110 — DATED RIDERS, THE WHITE PAPER TYPE, THE FENCE GUARD, agents/
+    [docs / skills / guards] (`f748abbd`: citations on SIGNED pages get DATED RIDERS rather
+    than edits — the D2-RIDER precedent plus the rule itself in the HITL flow doc; the
+    documentation skill gains the White Paper type; the markdown fence guard widens to
+    EVERY tracked markdown with five named, reasoned, shrink-only carve-outs; the `agents/`
+    MODULE_MAP row is corrected and `requirements.txt` pinned to measured versions.)
+    APPLY: the riders-not-edits rule is the one to adopt first — it is what step 182 relies
+    on, and it is the difference between an audit trail and a rewritten one.
+
+205. R14 — `/list-apps` LISTS ONLY THE REAL AGENT APPS [agents] (`6efc1b2b`: `agents/serve.py`
+    hands the API server ADK's own `NestedAgentLoader` — the adk-web loader, `agent.py`
+    directories only — so the shared `common/` package stays where the apps import it and
+    disappears from discovery. The README states the app-vs-shared convention; a guard
+    holds it; proven against the installed ADK.)
+    APPLY: only if you run the agent stack. Cosmetic until you do, then immediately not.
+
+206. THE "spine" → "backbone" SWEEP [style — repo-wide, mechanical] (`a56da422`: 82 files,
+    163 swaps, pure 1:1 — insertions equal deletions. One file rename rides along
+    (`test_business_key_spine.py` → `test_business_key_backbone.py` plus its one cypher
+    pointer) and six test FUNCTION names, because underscore identifiers sit outside `\b`.
+    Code changes are comments, docstrings, messages and local names only; repo-internal
+    string contracts moved on BOTH sides together, and no graph data value carries the word
+    — verified before sweeping. `5e28e11b` does IDEAS.md prose, 8 swaps and 2 deliberate
+    survivors. `72a60da3` is the ruff-format follow: one swapped comment went over the line
+    limit and the CI format gate is blocking.)
+    CAUTION: this touches 82 files and will collide with anything you have edited in them.
+    It carries no meaning — resolve every conflict in favour of YOUR content and just apply
+    the word swap on top. `vendor-docs-entity-core` (step 182) is the one place the swap is
+    an identifier rather than prose.
+
+207. G80 — THE UNCHAINED-LOADER GUARD, AND TWO NEW LOAD-MAP DEFECT CLASSES [drydocs / web]
+    (`0d53e4db`: `cli.unchained_loaders()` fails the suite BY NAME for any `LOADER_REGISTRY`
+    loader that no `COMMAND_LOADERS` command runs, with `UNCHAINED_LOADER_EXCLUSIONS`
+    carrying the written reasons. `load-map.json`, the N5 HTML and the O57 defects tab gain
+    `unchained_loaders` and `steps_with_uncommitted_inputs` beside the two existing lists;
+    the generated SEAL fixtures are declared presence-independent so the committed render
+    cannot flap between machines. `f2fbee59` routes the new lists through the O57 console
+    guard — every collection must have a reader — and closes the item.)
+    APPLY: expect this guard to FAIL on your tree first time and treat that as the finding.
+    A loader nothing runs is exactly what it is for.
+
+208. J42 — DIFF THE TWO REPOS' BACKLOG ITEM-ID SETS, AND FAIL THE PORT REPORT ON A GAP
+    [drydocs / port — THIS IS NOW A CLOSING-SEQUENCE STEP] (`35e6d103`:
+    `drydocs/port_backlog_union.py` + `scripts/port_backlog_union.py`. The manifest has
+    promised "never drop a file" for `backlog/items/*.yaml` all along while every backlog
+    guard read ONE copy, so an under-delivering port left both sides internally consistent
+    and green. The id set is the DIRECTORY LISTING (ADR 0013 Clause 6), read on both sides
+    by `backlog_store.load_items`, so the vacuous-green cases fail loud: a file path (the
+    tombstone) is refused outright, and absent/empty dirs and filename-vs-inner-id
+    mismatches are errors rather than agreement. `1a4460e4`: the pasted block is pure ASCII
+    and guarded — PS 5.1 mojibakes non-ASCII console output, which the first live run
+    reproduced, and a corrupted paste is a silently wrong port report.)
+    APPLY: run it at THIS port's close and paste the block into your PORT-REPORT. The
+    script rides IN this range, so unlike the `port-base-20260820` port you now have it.
+
+209. G79 — `refresh-reference` SPLITS INTO THREE SUBJECT COMMANDS [drydocs / config —
+    BEHAVIOUR CHANGE] (`680b9e90` (c) part 1: `cadence: weekly | batch | repo-change` sits
+    on the SOURCE row beside `acquisition` — acquisition is HOW data arrives, cadence is HOW
+    OFTEN; nine rows carry it, derived from the sequence rather than hand-listed.
+    `3f97b3cc` (a)(b)(c)(e): one command per SUBJECT replacing a seven-loader tuple that
+    spanned three sources with three rhythms and so had no organising principle — which is
+    why a loader could fall out of it and nothing noticed. `refresh-catalog` (LOB → product
+    line → product), `refresh-applications` (SEAL apps + contacts), `refresh-teams` (dev
+    teams, team roles, team↔app alignment); `business_segments` re-homed to refresh-catalog
+    as the precondition of the reconciliation it feeds. `93aa8060` makes the invariant and
+    the cadence derivation falsifiable rather than asserted. `118e2cbf` the docstrings, plus
+    Idea-160.)
+    CAUTION: `refresh-reference` IS GONE by that name. Update your runbooks and any
+    scheduled invocation in the same commit. And see step 191 — a SOURCE-mode
+    `refresh-teams` resolves `pat_team_roles.csv`, which nothing yet emits; G78 fails by
+    name before any write, so you will get a clear message, not a partial load.
+
+210. G81 — DECLARED PATH ZONES, AND `DRYDOCS_DATA_ROOT` BECOMES MANDATORY [drydocs-core /
+    cli — SEE RELAY-12] (`701e1d22` (a)(b)(c)(e): a reconstruction of the write-capable
+    surface measured FOUR live overlaps — `controlm_xml_dir()` aimed exactly at a declared
+    drop zone, `rua/extracted/` and `rua/incoming/` sitting inside the declared `rua/` read
+    zone, and `source_dir()`, an arbitrary-parts create-capable helper whose no-argument
+    form is the root itself. Declared zones with modes plus a non-overlap invariant now
+    forbid the class. `52996cee` (d): `resolve_data_root()` RAISES when `DRYDOCS_DATA_ROOT`
+    is unset — the old `~/data/DryDocs` fallback meant the same command in two shells
+    targeted two different trees and reported success either way. `DEFAULT_DATA_ROOT`
+    survives only as the location the error message suggests. `96404367`: the console script
+    points at `drydocs.cli:run()` so this renders as a message and exit 2, not a traceback —
+    `landing-zones` exists so "my extracts are gone" is a one-command answer, and a stack
+    trace defeats it at the moment it matters. `fcf973b5`: the "declared-equals-resolved"
+    guard the reconstruction CLAIMED did not exist for the YAML half — the check matched by
+    NAME, so renaming a zone's path and leaving the code alone fired nothing while both
+    guard layers keyed on the declaration. Now a test, proven to fire on injected drift.)
+    APPLY: export `DRYDOCS_DATA_ROOT` before the first data-path command after this port, or
+    it exits 2 by design. `drydocs --help` and the unit suite are unaffected. An existing
+    install keeps the old console-script shim until `poetry install` — that costs error
+    RENDERING only, never behaviour. RELAY-12 carries this and the `dpl-registry/`
+    `drop_dir` correction; action it there.
+
+211. CI — SINGLE PYTHON 3.12 AND CONCURRENCY CANCELLATION [.github — `evaluate`]
+    (`e955fce5`: an Actions-minutes cost fix. The 3.11/3.12 matrix halves to the version
+    both dev machines run — `pyproject`'s `^3.11` floor is now deliberately untested and a
+    comment records that — and a newer push to the same ref cancels the superseded in-flight
+    run. Deliberately NO `paths-ignore`: docs pushes keep full guard coverage, per Idea-111,
+    because the guards that catch stale docs live in the same suite.)
+    APPLY: `.github/**` is `evaluate` — keep your workflows and adapt. The `paths-ignore`
+    reasoning is the transferable part; the runner economics are not ours to judge.
+
+212. TWO `.gitignore` RULINGS, ONE OF WHICH CHANGES WHAT A PORT DELIVERS [repo hygiene]
+    (`103f240c`: `docs/reviews/port-review-*` now stays MACHINE-LOCAL. A producer review of
+    a COMPANY port transcribes another side's session — acceptance numbers, branch and tag
+    names, item counts, the verified-vs-claimed split the format exists for — and
+    `docs/reviews/**` is `default_ok`, so a tracked review PORTS BACK to the repo it is
+    about. Both halves in one commit, because `.gitignore` alone never untracks:
+    `git rm --cached docs/reviews/port-review-7c18ff4b-20260820.md`, which was already
+    tracked and had already crossed at the 20260820 port. `3298c8ce`: `.fig` (Figma's binary
+    save format) is ignored — nothing reads one, git cannot delta-compress it, and a
+    committed copy is permanent.)
+    APPLY — READ THIS BEFORE YOU DIFF: this range DELETES
+    `docs/reviews/port-review-7c18ff4b-20260820.md` from the producer tree. That is a
+    producer-side UNTRACKING, not a retraction of the review. If you took the file at the
+    20260820 port, keep your copy; nothing about its content changed.
+
+213. RIDER ON STEP 176 — `lob-product-team.yaml` GETS ITS PER-ENTRY ROW [PORT-MANIFEST]
+    (`b9dd1191`: step 176 told you the file was per-entry while the manifest still let it
+    fall to `config/**` wholesale — J51 path (7), found by the company session at the
+    lull-port apply. The row now exists, above the `config/**` default, with the entry rule
+    spelled out: your REAL LOB rows are estate data and stay, the producer's are the
+    synthetic publishable sample and never overwrite them, and the producer-owned MECHANISM
+    blocks — the header, `concept_scheme`, `open_questions` by id — cross whole.)
+    APPLY: `PORT-MANIFEST.yaml` is canonical-producer; you take it wholesale and this row
+    comes with it. This is a producer defect your side found and it is fixed — thank you.
+
 LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
 this range, cited here because the coverage check reads ONLY this section:
 `30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim/close/next_ready
@@ -2482,6 +2919,48 @@ branch's merge-from-main; content at steps 169 and 160 respectively);
 `74491c32` `4b7b0f9a` `c264fc33` (the PR #3/#4/#5 merges — content at
 step 169's README/venv note, S12 drift guard, and G101 respectively).
 
+LEDGER COVERAGE FOOTNOTE (2026-08-24) — ritual and self-referential commits in the
+`port-base-20260820..HEAD` range, cited here because the coverage check reads ONLY
+this section. 42 more were exempt by SUBJECT and needed no citation; these are the
+ones whose subject line does not match a ritual pattern, grouped by why.
+BACKLOG CLAIMS that did not use the `chore(backlog): claim` subject — the flip is
+one `status:` key and carries no apply content: `bdca9927` `af676699` `f7964d61`
+`46ae572f` `eafba5a7` `a25dc9b2` `d4915e66` `0a544396` `37e342b0` `e235b592`
+`bba047a6` `dd1defd3` `f6b45701` `9e0c05cb` `ff22f527` `55c1f958` `6a94c19e`
+`66106a08` `c93aaf4f` `a0dc400d` `70e75a86` `83123f36` `febccf44` `4f3ead03`
+`b1f94511` `3cbf49c5` `65f8c836`. (Worth one line rather than a silent exemption:
+the ritual patterns match `chore(backlog): claim`, and a session that writes
+`chore(G77): claim` instead gets no exemption and lands in the UNCITED list. That
+is the guard being narrow on purpose — matching `chore(*): claim` at large would
+let a substantive commit hide behind the word — so the cost is this list, not a
+loosened rule.)
+BACKLOG CLOSE NOTES AND ITEM EDITS, same reasoning, status and notes only:
+`12d39779` (O64–O67 done) `5857709e` (G79 done + Idea-159) `db2d96b8` (G81 done)
+`74c3b985` `6cff472a` (O63 raised, then widened) `aaf5711d` (the ui-workstream
+findings landed on main — R18 evidence, O62, two ideas renumbered past a collision).
+BACKLOG YAML REPAIRS — the same defect twice, a raw newline inside a block scalar
+breaking the item parse and the board render with it: `1b01c893` (J49's note)
+`9a12569f` (U25's note).
+IDEA CAPTURES — `docs/restructure/IDEAS.md` is `union-append`; an inbox entry is
+not apply content: `6e68bdb1` (Idea-150) `c1cc8119` (the header still routed
+grooming at the `backlog.yaml` tombstone) `7a48897c` (Idea-151) `46ac411d`
+(Idea-152) `d6f40b1b` (Idea-154) `a25041e7` (Idea-161/162, the wave-2 blocker list
+and the DD-band occupation).
+DEPGRAPH SNAPSHOTS written with a `chore(snapshot):` subject instead of
+`chore(depgraph): snapshot`: `61ab0f7c` `eb254002`.
+HANDOFF ROLLS — `docs/next-session-handoff.md`, producer session state, never-port:
+`b06cbb5d` `f46b9cec`.
+MERGE COMMITS, content cited at the steps named: `b07d3a3b` `c583b761` (the
+ui-workstream branch — content at steps 178/179), `fab69606` `bc002e07` (the S9 docs
+hygiene branch — content at step 177), `de5506d3` (G79 — step 209), `ebea0e34`
+(G81 — step 210).
+SELF-DOCUMENTING — their payload IS text in this file or in a `never-port`
+company prompt, so citing them at a step would restate the file inside itself:
+`2adcd98a` (wrote step 177), `c78ab18f` `11229bbd` (defined "retire" for your
+`port-prompt.md`, then dropped a push-URL note that was wrong — the guardrail is
+physical), `4a42b659` `c733ae29` (the wave-1 handoff and the
+`port-213e1d12-followup-company-prompt.md` hand prompt, both
+`docs/company-prompts/**`, which is `never-port`).
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
