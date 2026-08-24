@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T14:59:39",
+    "captured_at": "2026-08-24T18:02:39",
     "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "ee1d905d",
-      "full": "ee1d905d1d3cbaea160acfd6b6aca8cecb9b3b71",
+      "commit": "865fde12",
+      "full": "865fde12834659e52353f9ca7ba3724ac37405a4",
       "branch": "main",
-      "describe": "port-base-20260824-4-gee1d905d",
-      "subject": "docs(ideas): Idea-163 -- the v0.3.0 tag is desktop-local and points into orphaned history",
+      "describe": "port-base-20260824-18-g865fde12",
+      "subject": "docs(ideas): Idea-169 — the extracts must run per data center, and the DBA ask is already written",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7460,6 +7460,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0014-runtime-substrate.md",
+      "name": "0014-runtime-substrate.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0014-runtime-substrate.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/README.md",
       "name": "README.md",
       "extension": ".md",
@@ -7788,6 +7797,15 @@
       "name": "drydocs-startup-refresh-runbook-rev1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml",
+      "name": "drydocs-startup-refresh-runbook-rev11.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19421,10 +19439,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
-      "name": "drydocs-20260824.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-1459.json",
+      "name": "drydocs-20260824-1459.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824-1459.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -32743,6 +32761,11 @@
     [
       "drydocs/docs/decisions",
       "CONTAINS",
+      "drydocs/docs/decisions/0014-runtime-substrate.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
       "drydocs/docs/decisions/README.md"
     ],
     [
@@ -32949,6 +32972,11 @@
       "drydocs/docs/design/feedback",
       "CONTAINS",
       "drydocs/docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml"
+    ],
+    [
+      "drydocs/docs/design/feedback",
+      "CONTAINS",
+      "drydocs/docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml"
     ],
     [
       "drydocs/docs/design/feedback",
@@ -39278,7 +39306,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-1459.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41675,13 +41703,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2363,
+    "files": 2365,
     "edges": 1144,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2646,
+    "rels": 2648,
     "directories": 284
   }
 }
