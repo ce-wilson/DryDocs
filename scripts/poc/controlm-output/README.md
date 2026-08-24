@@ -3,8 +3,9 @@
 **What this is.** Throwaway-grade PowerShell that reads one Control-M job *Output* log and pulls
 out the metadata each hop of a DPL data flow contributes — the second iteration of the
 command-line lineage (`G15/G16` read the command line; this reads what the launcher *did* with
-it). It exists to make the log patterns visible and debuggable before the real extractor
-(`drydocs_lineage/extractors/controlm_output.py`, backlog **MM7**) is written. One script per
+it). It exists to make the log patterns visible and debuggable before the real extractor — a
+`controlm_output` module alongside the other lineage extractors, **planned under backlog
+MM7 and not yet written** — exists. One script per
 job shape, on purpose: each file's header lists the exact lines it matches.
 
 **What it is not.** Not a component, not imported by anything, writes no graph. Mechanism only:

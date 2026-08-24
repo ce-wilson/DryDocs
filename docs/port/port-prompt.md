@@ -42,31 +42,6 @@ Producer-side at the next session: verify the roll against `git log
 <last-ported-head>..HEAD` COMMIT-BY-COMMIT (the roll-procedure rule below), never by
 eyeballing back from the newest entry.
 
-**RELAY — G81 (2026-08-24) [VERIFIED-PRODUCER]. BASIS: this rides the range AFTER
-`port-base-20260820` — G81 lands at `fcf973b5`, so it is NOT in the
-`7c18ff4b..port-base-20260820` port the backlog-shard hand prompt carries. Do not go
-looking for either change in that range. Two things change for the company when the
-range after it ports, and one of them is about the machine that had the incident.**
-
-1. **`DRYDOCS_DATA_ROOT` is now MANDATORY — there is no `~/data/DryDocs` default.**
-   The first data-path command after the port (`landing-zones`, a `--source` chain
-   run, anything resolving a zone) exits 2 with a message naming the variable until
-   it is exported. `drydocs --help` and the unit suite are unaffected. This is
-   deliberate: the old silent fallback meant the same command in two shells targeted
-   two different trees, which is a candidate mechanism for the 2026-08-11 overwrite.
-   Note the console script moved to `drydocs.cli:run` so these render as exit 2
-   rather than a traceback — an existing install keeps the old shim until
-   `poetry install`, which costs only error *rendering*, not behaviour.
-2. **The `dpl:*` rows' `drop_dir` was corrected from `dpl/` to `dpl-registry/`.**
-   The registry and `dpl_registry_dir()` had NEVER agreed, since N12. If anyone
-   there followed the registry, **their Swagger exports are sitting in `dpl/` where
-   nothing reads them** — worth a look before the corrected row makes `dpl-registry/`
-   the only place anything checks. Producer took the code's path because that is
-   what the G25 flow actually reads; no data was moved on either side.
-
-Full diagnosis, including the four measured overlaps and the ranked candidate
-mechanisms for the incident: `docs/reviews/g81-data-path-reconstruction.md`.
-
 **OPENING SEQUENCE (J41, 2026-08-09 — MANDATORY, producer-side, before any company
 session starts).** J35 above is the CLOSING half. For nine months there was no opening
 half, so every port began on a base nobody had certified. That cost a full cycle on
@@ -1339,6 +1314,31 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   meaning (producer Idea-132 carries it). And the wider extract re-sourcing
   (hand-pulled CSV/YAML → SQL over the replica) is Idea-132's subject; the producer's
   G100 technician-group lookup builds against the SOURCED feed for the same reason.
+
+- **RELAY-12 — `DRYDOCS_DATA_ROOT` IS NOW MANDATORY, and one `drop_dir` was wrong
+  since N12** `[VERIFIED-PRODUCER]` (raised 2026-08-24). **BASIS:** both changes ride
+  the range AFTER `port-base-20260820` — G81 lands at `fcf973b5` — so they are NOT in
+  the `7c18ff4b..port-base-20260820` port the backlog-shard hand prompt carries. Do
+  not go looking for either in that range. Two things change for you when the range
+  after it ports, and one of them is about the machine that had the incident.
+  **(a) `DRYDOCS_DATA_ROOT` is MANDATORY — there is no `~/data/DryDocs` default.** The
+  first data-path command after the port (`landing-zones`, a `--source` chain run,
+  anything resolving a zone) exits 2 with a message naming the variable until it is
+  exported. `drydocs --help` and the unit suite are unaffected. This is deliberate:
+  the old silent fallback meant the same command in two shells targeted two different
+  trees, which is a candidate mechanism for the 2026-08-11 overwrite. The console
+  script moved to `drydocs.cli:run` so these render as exit 2 rather than a
+  traceback — an existing install keeps the old shim until `poetry install`, which
+  costs only error *rendering*, not behaviour.
+  **(b) The `dpl:*` rows' `drop_dir` was corrected from `dpl/` to `dpl-registry/`.**
+  The registry and `dpl_registry_dir()` had NEVER agreed, since N12. If anyone there
+  followed the registry, **their Swagger exports are sitting in `dpl/` where nothing
+  reads them** — worth a look before the corrected row makes `dpl-registry/` the only
+  place anything checks. Producer took the code's path because that is what the G25
+  flow actually reads; no data was moved on either side.
+  **Full diagnosis** — the four measured overlaps and the ranked candidate mechanisms
+  for the incident — is producer-machine-local (`docs/reviews/**` is gitignored as of
+  `103f240c`); ask for it if you want the reasoning rather than the outcome.
 
 OWED COMPANY-SIDE:
 
