@@ -680,3 +680,71 @@ def test_drop_dir_stays_inside_the_landing_zone_convention() -> None:
         "drop_dir values that look like real machine paths (real paths live in the "
         "internal twin only):\n  " + "\n  ".join(bad)
     )
+
+
+# ---- G79: cadence (2026-08-23) ----------------------------------------------
+# HOW OFTEN a source refreshes, so cli.load_profile() can DERIVE which operator
+# surface runs a standing loader-backed step instead of reading a hand-kept
+# tuple. Required only where a standing sequenced loader draws on the row --
+# DERIVED from the sequence, never hand-listed here, so wiring a new chain makes
+# this fail until its source declares a rhythm.
+
+CADENCES = ("weekly", "batch", "repo-change")
+
+
+def _sources_of_standing_loader_steps() -> set[str]:
+    from drydocs import cli
+
+    needed: set[str] = set()
+    for step in cli.CANONICAL_LOAD_SEQUENCE:
+        if step.mode != "standing":
+            continue
+        for cls in cli.COMMAND_LOADERS.get(step.command, ()):
+            if cls.source_id is not None:
+                needed.add(cls.source_id)
+    return needed
+
+
+def test_declared_cadences_are_from_the_vocabulary() -> None:
+    bad = [
+        f"{r['id']}: {r['cadence']!r}"
+        for r in _real_dataset_rows()
+        if "cadence" in r and r["cadence"] not in CADENCES
+    ]
+    assert not bad, f"cadence must be one of {CADENCES}: {bad}"
+
+
+def test_every_source_a_standing_chain_reads_declares_a_cadence() -> None:
+    """The profile derivation is only honest if the rows it reads carry the
+    field. A source with no cadence is not a silent default -- the step keeps
+    its DECLARED profiles and this test names the row so that choice is made
+    deliberately."""
+    rows = {r["id"]: r for r in _real_dataset_rows()}
+    missing = sorted(
+        sid
+        for sid in _sources_of_standing_loader_steps()
+        if sid in rows and not rows[sid].get("cadence")
+    )
+    assert not missing, (
+        f"dataset row(s) a STANDING sequenced loader reads with no cadence: {missing} "
+        "-- declare weekly|batch|repo-change so load_profile() can derive the step's "
+        "operator surfaces (G79 (c))."
+    )
+
+
+def test_cadence_is_a_dataset_field_not_a_doc_ledger_one() -> None:
+    """N12 fenced the doc ledger out of the acquisition work and cadence keeps
+    that fence: load-bmc-docs' corpus lives there, so its step keeps declared
+    profiles rather than being handed a rhythm the ledger cannot state."""
+    import yaml
+
+    doc = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "config" / "doc-source-registry.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stray = [e["id"] for e in doc["sources"] if "cadence" in e]
+    assert not stray, (
+        f"doc-registry rows carrying cadence: {stray} -- the field is a DATASET-row "
+        "field (N12's fence); extending it to the doc ledger is a separate call."
+    )
