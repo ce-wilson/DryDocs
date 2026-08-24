@@ -109,29 +109,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   can reach, or pick another prefix. Nothing to do until such a series is proposed;
   captured so that decision is not made by accident, which is the only way it would be.
 
-- **`Idea-161`** · 2026-08-24 · `[task]` · **open** · prio? **Med** —
-  **The wave-2 port base has three named blockers and none of them needs a particular
-  machine.** `python scripts/port_preflight.py --base 213e1d12` (laptop `NewThinkpad`,
-  2026-08-24) returns NOT CERTIFIED on three of seven; the other four already pass —
-  tree clean, relay basis tags, renders current, suite green (2382 passed / 9 skipped).
-  **(1) Ledger coverage** — roughly 45 UNCITED commits; the ledger stops at step 177
-  (`2adcd98a`, the S9 path move), so the roll writes 178 onward. This is the bulk of the
-  work. **(2) Cited paths resolve** — three, and the one that looks machine-local is not
-  fixable by changing machine: `scripts/poc/controlm-output/first-real-run-2026-08-21.md`
-  cites an `internal-local/controlm-output-logs/...` transcript that its own commit
-  message places on the **company working copy**, so it resolves on no producer machine,
-  ever — which is exactly what a `status: DATED RECORD` line in the first 30 lines is
-  for (the Idea-110 convention: annotate the record rather than edit it). The other two,
-  `docs/design/deepdoc-data-flow-overview.md` and `scripts/poc/controlm-output/README.md`,
-  both cite `drydocs_lineage/extractors/controlm_output.py`, which exists nowhere; neither
-  is a record, so the fix is to reword the citation as planned or write the module — a
-  README sending a reader to a file that is not there is the precise defect the guard
-  exists to catch. **(3) Certified base tag** — the `--tag` run, last. **Also in the
-  roll:** the G81 relay block sits OUTSIDE the numbered `STANDING RELAYS` section, and
-  `relays_missing_basis()` parses only between `STANDING RELAYS` and `OWED COMPANY-SIDE:`,
-  so the relay-basis check passes on a relay it structurally never inspected — renumber it
-  into the section. **Routing:** either machine; git carries everything this needs.
-
 - **`Idea-160`** · 2026-08-23 · `[task]` · **open** · prio? **Med** —
   **A SOURCE-mode `refresh-teams` now needs an input file nothing produces.** G79 wired
   `pat_team_roles` into the team chain (it was gate-confirmed at C9 and had never run),
@@ -1468,6 +1445,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **`Idea-161`** · 2026-08-24 · `[task]` · **done (2026-08-24, laptop `NewThinkpad`)** · prio? **Med** —
+  **The wave-2 base is CERTIFIED: `port-base-20260824` @ `68b53716`, preflight 7/7.**
+  All three named blockers cleared plus the relay defect. **(1) Ledger coverage** —
+  the estimate in the original entry was wrong and the correction is the useful part:
+  **136 uncited commits, not ~45**, across a 179-commit range. The gap is not a
+  miscount, it is a rule: `is_ritual()` matches the subject `chore(backlog): claim`
+  and NOT `chore(<item-id>): claim`, so 27 claim commits in this range read as
+  substantive to the checker. Deliberate narrowness — matching `chore(*): claim` at
+  large would let real work hide behind the word — so the cost is a footnote list,
+  now written down in the footnote itself rather than left for the next roll to
+  rediscover. Steps **178-213** were written, 36 of them; five are called out in the
+  roll note as behaviour-changing or delete-something-you-hold (195 the cli split,
+  209 `refresh-reference` gone by name, 210 the mandatory data root, 188 the
+  vocabulary-id migrations, 212 the untracked review). **(2) Cited paths** — the
+  `internal-local/` transcript took the `status: DATED RECORD` treatment exactly as
+  the entry predicted; the two `drydocs_lineage/extractors/controlm_output.py`
+  citations were reworded to name the planned module without claiming a file (MM7
+  writes it; writing it here would have been scope). **(3) The relay defect** — the
+  G81 block became **RELAY-12** inside the parsed section; verified the parser now
+  enumerates 1-12. **(4) The tag.**
+  **ONE THING THIS ENTRY DID NOT PREDICT, and it is the reason the ritual has a CI
+  step:** the roll went RED on CI while the same suite passed locally. Step 212 cites
+  `docs/reviews/port-review-7c18ff4b-20260820.md`, which `103f240c` untracked but
+  which is still **present on this laptop's disk** — the currency guard asks the
+  filesystem, not git, so it resolved here and nowhere else. Any machine that ever
+  held the file gets the same false pass. Fixed as a `HISTORICAL_PATHS` entry
+  (`3b4d8e76`) whose reason carries the trap, and **verified by moving the file aside
+  and re-running**, not by trusting the local green. Related: [[Idea-111]] is the same
+  class — an instrument whose failure mode is silence.
 
 - **FILED 2026-08-23 (laptop, dispatched groom — the run that followed 2026-08-22's)** — **Promoted 1, inboxed 0, merged 1. The inbox was empty of ungroomed notes** — the earlier fork of this same session had swept it hours before (commit `81f1eb08`, the FILED entry below), and `feat/ui-workstream` was checked too: its only inbox difference is that it sits BEHIND `main`, so no branch-side note is owed. **No new `[question]` was parked**, and no inbox entry was re-annotated: the open ones are the same user/SME calls the run below already named, and a second "re-checked" line a day later is noise, not an audit trail. **Both durable changes came from checking which Ready-to-pull items were safely dispatchable, which is where a groom with no notes earns its keep.** **PROMOTED — S13:** all SIX per-domain command modules the S8 split created on 2026-08-21 (`cli_schema`, `cli_ingest`, `cli_verify`, `cli_variables`, `cli_docs`, `cli_plan`) **fail to import as the first import of a fresh interpreter** — `python -c "import drydocs.cli_docs"` raises `AttributeError: partially initialized module ... has no attribute 'app'` at `drydocs/cli.py:955`. Each module opens with `from drydocs import cli as _root`, so the root's body runs to its closing merge loop and reaches back for an `app` the still-importing module has not defined yet. `import drydocs.cli` succeeds — and that is the ONE import CLAUDE.md's smoke test names, so nothing ever went red. The visible symptom is a **false red**: `pytest tests/unit/test_repo_paths.py` alone is 4 failed / 45 passed while the same tests inside the full suite pass (2328 passed, 9 skipped). p2 — the shipped CLI is unaffected because the real entry point imports the root first; every other way in is not. The item requires the guard to run each import **in its own subprocess**, since an in-process check cannot fail once `sys.modules` is primed — the very mechanism that hid it. Reproducible from the repo in any checkout, so no venue pin is owed (J18). **MERGED — J42** — the port-time backlog-union guard, p1 and sitting in the Ready-to-pull strip — was written 2026-08-11, nine days before **Y2** sharded the backlog, and its acceptance still aimed at `docs/restructure/backlog.yaml` and its `items[]` key. That file is a **TOMBSTONE**, so the guard as specified would have read two empty id sets, reported "no difference" and **passed for being wrong** — the exact J26 failure the item exists to close, reproduced inside the item itself. Repointed at the sharded grain (the entry IS the file, ADR 0013 Clause 6, so the id set is the directory listing or `backlog_store.load_backlog_document()`), with two tightenings so it cannot go vacuously green again: an **absent or empty items directory must FAIL** rather than read as agreement, and a **filename-vs-inner-id mismatch** is now in scope. The never-regress-a-status half was fenced out to **J16**, which already owns it. Scope unchanged otherwise, and no ruling was needed — `PORT-MANIFEST.yaml` already carries the same promise at file grain ("Never drop a file; never regress a status", F4 ruling 2026-08-20). **A sweep of every other citation of the tombstone** across the 504 item files found them all inside **done** items, where naming the old path is correct history; J42 was the only live one. A parallel check of every open item's `inputs:` for paths that do not exist returned only legitimate forward references (G105-G109 → the ADR G104 will write) and machine-local `internal-local/` transcripts.
 
