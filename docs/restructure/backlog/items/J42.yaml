@@ -48,3 +48,4 @@ notes: |
   RECONCILE_BEFORE_DIR -- the never-regress-a-status half stays the J16 guard's.
   tests/unit/test_port_backlog_union.py (16). MODULE_MAP row + the boundary group registered in the
   same commit (default-deny). Suite 2348 passed.
+  FOLLOW-UP, same session: render() now emits pure ASCII and a test holds it there. The skill tells a company session to PASTE the block into the port report, and PS 5.1 mojibakes non-ASCII console output -- the PORT-REPORT-ae21ee4 trap documented two sections above the new step, which the first live run reproduced. A corrupted paste is a silently wrong port report, which is the same class this item exists to close.

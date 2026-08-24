@@ -239,3 +239,18 @@ def test_this_repos_backlog_reads_as_a_non_empty_id_set() -> None:
 
     assert len(ids) > 50, "the producer backlog should be large — an empty read is the J26 trap"
     assert len(set(ids)) == len(ids), "duplicate id from the directory listing"
+
+
+def test_the_rendered_block_is_pure_ascii(tmp_path: Path) -> None:
+    """The skill tells a company session to PASTE this block into the port report,
+    and PowerShell 5.1 mojibakes non-ASCII in console output — the documented
+    PORT-REPORT-ae21ee4 trap, two sections above the step that runs this check. A
+    corrupted paste is a silently wrong port report, so the block stays ASCII."""
+    producer = _tree(tmp_path / "producer", ["A1", "A2", "A3"])
+    consumer = _tree(tmp_path / "consumer", ["A1"])
+
+    rendered = compare(
+        producer, consumer, exclusions={"A3": "a written reason of adequate length here"}
+    ).render()
+
+    rendered.encode("ascii")  # raises UnicodeEncodeError if a smart dash creeps back in

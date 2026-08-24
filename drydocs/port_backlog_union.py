@@ -99,23 +99,23 @@ class UnionReport:
         """The port-report block. States the accepted differences even when the
         gap is empty — a ruled omission must never read the same as no omission."""
         lines = [
-            "BACKLOG UNION CHECK (J42) — producer base vs the applied consumer tree",
+            "BACKLOG UNION CHECK (J42) -- producer base vs the applied consumer tree",
             f"  producer items: {len(self.producer_ids)}",
             f"  consumer items: {len(self.consumer_ids)}",
         ]
         if self.missing:
-            lines.append(f"  MISSING FROM THE CONSUMER ({len(self.missing)}) — the port dropped:")
+            lines.append(f"  MISSING FROM THE CONSUMER ({len(self.missing)}) -- the port dropped:")
             lines.extend(f"    - {item_id}" for item_id in self.missing)
         else:
             lines.append("  missing from the consumer: none")
         if self.accepted:
-            lines.append(f"  accepted differences ({len(self.accepted)}) — ruled, not dropped:")
+            lines.append(f"  accepted differences ({len(self.accepted)}) -- ruled, not dropped:")
             lines.extend(f"    - {item_id}: {reason}" for item_id, reason in self.accepted)
         else:
             lines.append("  accepted differences: none declared")
         if self.consumer_only:
             lines.append(
-                f"  consumer-only ({len(self.consumer_only)}) — the company's own work, "
+                f"  consumer-only ({len(self.consumer_only)}) -- the company's own work, "
                 "not a gap: " + ", ".join(self.consumer_only)
             )
         if self.stale_exclusions:
