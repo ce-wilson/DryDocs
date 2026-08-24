@@ -58,9 +58,11 @@ time**, over these three:
 | `P032-E0700-DMA` | 4,441 | 85,202 |
 
 **`P021-E0800-ANY` is NOT in that list** — and it is the largest of the four by folder
-count (7,914 folders / 59,712 jobs). Whether that is a deliberate scope cut or an
-omission is the user's call, not an inference to make here; it is raised as the open
-question on `Idea-169`.
+count (7,914 folders / 59,712 jobs). **RULED 2026-08-24 (user): a deliberate scope cut,
+not an omission.** The graph and the UI get exercised against the three-DC load before
+more is ingested — test first, widen after. So this table is a FIRST CUT with a named
+reason to revisit, not the final extraction scope, and `P021-E0800-ANY` re-enters when
+that testing says the shape holds.
 
 This is an EXTRACTION-SCOPE direction, not the DC scope call. The
 `controlm-hosts-topology` residual ("load all 22 data centers or production-only") is

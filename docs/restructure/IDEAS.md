@@ -93,6 +93,43 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-170`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
+  **The one-sided allocator partition bit: a company inbox capture landed with NO id at
+  all, and its number was minted only after the user asked where it was.** Port step 160
+  predicted this in as many words — *"Until that lands the partition is one-sided and the
+  next Idea-59-class collision is a matter of time"* — and its company half
+  (`n >= 10000` mirror assertion + a committed grandfather constant) is still unexecuted.
+  This is the first recorded instance of it actually costing something.
+  **WHAT THIS SIDE ACTUALLY HAS — checked, because the company session reported the
+  opposite:** `tests/unit/test_plan_ideas.py` exists here with 12 tests, four of them
+  load-bearing for exactly this failure. `test_every_inbox_entry_carries_the_header`
+  matches ``- **`Idea-<n>`** ·`` per entry, so an unheadered capture fails immediately —
+  it is precisely the guard the missing number would have tripped, and its docstring says
+  why it exists ("the entry simply does not appear in the scan, which reads as 'nothing to
+  review here' rather than as a formatting slip"). `test_idea_ids_are_unique` scans the
+  WHOLE file, not just the inbox, *because* union-append is when a duplicate arrives.
+  `test_producer_allocates_below_the_company_band` pins `PRODUCER_BAND_CEILING = 9999`
+  with a deliberately hand-maintained `PORTED_COMPANY_IDS`. And
+  `test_the_bands_are_documented_where_a_capturer_will_read_them` requires `IDEAS.md`
+  itself to contain `9999`, `10000+` and `union-append` — the **Allocator bands** section
+  has been in this file since 2026-08-18.
+  **THE CLAIM TO CORRECT, or it gets re-derived next port:** the company session reported
+  (a) "no allocator-bands documentation section in IDEAS.md — the rule lives only in
+  `test_backlog.py`'s comments" and (b) "no idea-side band guard: `test_plan_ideas.py` is
+  absent **on both sides**, recorded in the port ledger." (a) is true company-side only.
+  (b)'s "both sides" half is wrong, and so is its reading of the ledger:
+  `PORT-MANIFEST.yaml`'s `test_plan_ideas.py` row is `disposition: per-entry` and reads
+  **"The render/header guards are producer-canonical and port whole. The ALLOCATOR-BAND
+  block does NOT"** — the ledger tells the company to TAKE the file and invert one block,
+  not that the file is absent by design.
+  **THE CHEAP HALF IS AVAILABLE TODAY, independently of the band work:** the header and
+  uniqueness guards carry no band assumption whatsoever, so porting just those two ends the
+  "capture with no id" failure mode outright. Only `PRODUCER_BAND_CEILING` /
+  `PORTED_COMPANY_IDS` need the mirror treatment described in port step 160.
+  **Producer-side action: none** — all four guards are green here, and the id this entry
+  carries was minted by them. Captured so the next port relays a finding instead of
+  rebuilding it.
+
 - **`Idea-169`** · 2026-08-24 · `[task]` · **open** · prio? **High** —
   **The Control-M extracts have no data-center dimension, and the estate is too big to pull
   in one go — they need to run individually, per DC, in stages.** *(User direction
@@ -131,9 +168,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `--data-center`; the ledger and the SQL drift guard are untouched because the column set
   does not move), but **which** DCs load is the SME's scope call, and the 22-vs-4 residual
   under gate `controlm-hosts-topology` is still open.
-  **ONE QUESTION FOR THE USER, not for an agent:** the three named DCs are three of the
-  **four** known production DCs — `T021-E0800-ANY`, the largest by folder count, is absent.
-  Deliberate scope cut, or an omission?
+  **THE FOURTH DC — ANSWERED 2026-08-24 (user):** `T021-E0800-ANY`, the largest by folder
+  count, is a **deliberate scope cut, not an omission** — the graph and the UI get exercised
+  against the three-DC load before more is ingested. So the order is test-then-widen, and the
+  three DCs are a first cut rather than the final estate; nothing here rules the DC scope
+  call (`controlm-hosts-topology`), which stays the SME's.
 
 - **`Idea-168`** · 2026-08-24 · `[chore]` · **parked → next internal session** · prio? **Med** —
   **The Control-M profiling numbers are company-estate figures, and every threshold derived
@@ -281,6 +320,14 @@ question a 1,000-line file with the trail at the bottom could not answer.
   **Disposition when it arises:** open any producer `DD` series at a number no company id
   can reach, or pick another prefix. Nothing to do until such a series is proposed;
   captured so that decision is not made by accident, which is the only way it would be.
+  **KEPT-UPDATED 2026-08-24:** a company session now describes their `Idea-10000` as "the one
+  that groomed into **DD10001**", while this entry recorded that mint as **DD10** — numeric 10,
+  inside the producer band — on the same day. Either the out-of-band id was renumbered after
+  this was written, or the two numbers are being used interchangeably in conversation.
+  **Unresolved from here:** ports are one-way, so this side cannot read their letter series.
+  What does not change either way is the hazard above — `DD1`–`DD9` stay in the producer band
+  regardless, so renumbering `DD10` would not close this entry. See [[Idea-170]] for the
+  guard half of the same partition.
 
 - **`Idea-160`** · 2026-08-23 · `[task]` · **open** · prio? **Med** —
   **A SOURCE-mode `refresh-teams` now needs an input file nothing produces.** G79 wired
