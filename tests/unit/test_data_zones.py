@@ -304,3 +304,44 @@ def test_the_console_script_renders_config_errors_not_tracebacks() -> None:
         f"the console script points at {entry!r}, not drydocs.cli:run — an "
         "unset DRYDOCS_DATA_ROOT would render as a traceback again."
     )
+
+
+def test_each_zone_path_equals_what_its_helper_actually_resolves(monkeypatch, tmp_path) -> None:
+    """THE DECLARED-EQUALS-RESOLVED GUARD, and it is the one that makes the dpl
+    class impossible rather than merely fixed.
+
+    `dpl:pipeline-registry` said `dpl/` while dpl_registry_dir() returned
+    `dpl-registry/`, and the two had never agreed since N12 — an operator who
+    followed the registry had files nothing read. That was caught by hand here;
+    nothing would have caught it happening again INSIDE config/data-zones.yaml,
+    and the consequence is worse than a stranded drop: both guard layers key on
+    the DECLARATION, so a zone whose YAML path drifts from its helper leaves the
+    static invariant checking a fiction while `read_zone_containing()` protects
+    the declared directory as writes land in the real one. Drift here disarms the
+    whole mechanism silently, which is exactly the class G81 exists to end.
+
+    Matching by NAME is not enough — that only proves the helper is mentioned.
+    """
+    from drydocs_core import data_root
+
+    monkeypatch.setenv(data_root.DATA_ROOT_ENV, str(tmp_path))
+    mismatches = []
+    for zone in dz.load_zones():
+        if not zone.helper:
+            continue  # `helper: ~` — owned elsewhere (run_log owns the log dir)
+        fn = getattr(data_root, zone.helper, None)
+        if fn is None:
+            continue  # named by test_declared_helpers_exist
+        resolved = fn()
+        declared = dz._resolve(zone.base, zone.path_spec)
+        if resolved.resolve() != declared.resolve():
+            mismatches.append(
+                f"{zone.id}: declares {declared} but {zone.helper}() returns {resolved}"
+            )
+    assert not mismatches, (
+        "zone declaration(s) disagreeing with the helper that implements them:\n  "
+        + "\n  ".join(mismatches)
+        + "\nThe declaration is what both the invariant and the runtime refusal "
+        "read, so a drift here protects the wrong directory while writes land in "
+        "the real one."
+    )
