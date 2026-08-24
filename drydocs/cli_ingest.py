@@ -1,4 +1,4 @@
-"""Load / ingest commands: load, refresh-reference, apply-supplements (+ legacy per-supplement aliases), load-software-registry, load-batch-orchestrators, load-code-snapshot, patch-window, load-server-inventory, load-folder-attribution, load-manual-mappings, ingest-controlm.
+"""Load / ingest commands: load, refresh-catalog, refresh-applications, refresh-teams (+ the deprecated refresh-reference alias that runs all three), apply-supplements (+ legacy per-supplement aliases), load-software-registry, load-batch-orchestrators, load-code-snapshot, patch-window, load-server-inventory, load-folder-attribution, load-manual-mappings, ingest-controlm.
 
 S8 (2026-08-21): split out of drydocs/cli.py. The root stays the composition
 root and the only module that may wire other components; this module holds

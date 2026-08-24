@@ -93,6 +93,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-160`** · 2026-08-23 · `[task]` · **open** · prio? **Med** —
+  **A SOURCE-mode `refresh-teams` now needs an input file nothing produces.** G79 wired
+  `pat_team_roles` into the team chain (it was gate-confirmed at C9 and had never run),
+  and it binds to `pat:people-report` — so a REAL run,
+  `drydocs refresh-teams --source pat:people-report`, resolves THREE files from that
+  source's landing zone: `dev_teams.csv`, `pat_product_mapping.csv` and now
+  `pat_team_roles.csv`. `scripts/project_pat_team_report.py` (G82) emits only the first
+  two, so the third has no documented way to exist. **Not silent** — G78's resolver
+  fails before the first write, naming the file and the directory searched, which is
+  the whole reason this is a task and not a bug. But the first company-side real run
+  will stop there with no instruction on what to do next, which is a poor place to
+  learn it. Two candidate dispositions, and the item should pick ONE with a reason:
+  extend `pat_projection.py` to emit `pat_team_roles.csv` from the same PAT team report
+  (its ledger, `config/source-mappings/pat-team-report.yaml`, would need the role
+  columns pinned — G82's `--header-map` discipline, spellings fixed at the first real
+  run, never guessed), or declare the file a hand-drop and say so where the operator
+  will look. Scope note: this is G82-adjacent (the projection's coverage), deliberately
+  NOT G79 — the split's job was to wire the loader and it did, fixture mode included
+  (verified live: 6 rows, 0 rejected). FIXTURE mode is unaffected; the bundled
+  `pat_team_roles__sample.csv` ships with the package.
+
 - **`Idea-159`** · 2026-08-23 · `[bug]` · **open** · prio? **Low** —
   **Four tests pass in the full suite and FAIL when their file runs alone**, which
   means the suite's green does not mean what a reader assumes it means.

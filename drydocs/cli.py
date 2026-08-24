@@ -20,7 +20,11 @@ still work — since G29 they are thin aliases that delegate into the same
 chain runner, so they too verify and write a run log.
 
 Ingest commands:
-  drydocs refresh-reference       — catalog + SEAL weekly refresh chain
+  drydocs refresh-catalog         — LOB -> product line -> product (weekly)
+  drydocs refresh-applications    — SEAL applications + contacts (weekly)
+  drydocs refresh-teams           — dev teams, team roles, team<->app alignment
+  drydocs refresh-reference       — DEPRECATED alias: runs the three above in
+                                    order (G79 split them by subject)
   drydocs ingest-controlm         — Control-M chain (folders → jobs → conditions → deps)
   drydocs load <name> --csv       — single loader against a CSV file
   drydocs load-software-registry  — third-party software registry from
