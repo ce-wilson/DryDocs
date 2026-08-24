@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T08:12:58",
+    "captured_at": "2026-08-24T08:23:29",
     "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "ebea0e34",
-      "full": "ebea0e34b0917296fc07fca7106cbbcf953a73ef",
+      "commit": "fcf973b5",
+      "full": "fcf973b5038578bc5d14add700bce25b882c060a",
       "branch": "main",
-      "describe": "port-base-20260820-170-gebea0e34",
-      "subject": "Merge branch 'feat/g81-path-zones' — G81: declared path zones and the non-overlap invariant",
+      "describe": "port-base-20260820-172-gfcf973b5",
+      "subject": "test(core): G81 follow-through — guard declared-equals-resolved; relay the two company consequences",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19421,10 +19421,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json",
-      "name": "drydocs-20260823.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "name": "drydocs-20260824.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260823.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39278,7 +39278,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260823.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
