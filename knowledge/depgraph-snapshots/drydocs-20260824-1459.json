@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T11:57:34",
+    "captured_at": "2026-08-24T14:59:39",
     "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a25041e7",
-      "full": "a25041e7b2832481287bba13625945a69fc420de",
+      "commit": "ee1d905d",
+      "full": "ee1d905d1d3cbaea160acfd6b6aca8cecb9b3b71",
       "branch": "main",
-      "describe": "port-base-20260820-177-ga25041e7",
-      "subject": "docs(ideas): capture the wave-2 blocker list and the DD-band occupation",
+      "describe": "port-base-20260824-4-gee1d905d",
+      "subject": "docs(ideas): Idea-163 -- the v0.3.0 tag is desktop-local and points into orphaned history",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19421,10 +19421,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-0823.json",
-      "name": "drydocs-20260824-0823.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "name": "drydocs-20260824.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824-0823.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39278,7 +39278,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-0823.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
