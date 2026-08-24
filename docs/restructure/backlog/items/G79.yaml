@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - G78
 inputs:
@@ -20,3 +20,62 @@ acceptance: |
   refresh-reference bundles SEVEN loaders across THREE unrelated sources with different natural refresh cadences. That bundle has no organising principle, which is why a loader can fall out of it and nothing notices. Split it so each command covers ONE source. (a) The split, by subject rather than by chain accident: the product catalog tier (catalog LOBs, product lines, products), the organisation tier (dev teams, team roles), and the business-application tier (applications, contacts). These are SEPARATE COMMANDS even where two share a source system, because the SME's cadence argument is per subject: business applications are not created daily, the operational estate can be. (b) WIRE THE TWO ORPHANS. pat_team_roles is gate-confirmed (C9, 2026-07-18), has a loader class and cypher, is reachable as `drydocs load pat_team_roles` -- and belongs to NO chain and NO profile, so no operator path has ever run it. area_products is in the same state. Either wire each into its subject command or record a written reason it is excluded; the one thing not allowed is the current silence. area_products has a plausible reason ready to be written down (lob-product-team.yaml records area_products: 0 with the standing area-product-missing open question); pat_team_roles has none that this item could find. (c) Cadence moves OFF the hand-assigned profile tuples and ONTO the source registry entry, so load_profile() DERIVES its steps by filtering on cadence instead of reading a literal maintained by hand. This is what makes "the source dictates how often it refreshes" true in code rather than true in a comment. (d) Acquisition mode joins it on the registry entry (file-drop | db-pull | api-pull | repo | scrape), so the anticipated CSV-to-database move for business-application data is a registry edit plus an adapter swap, with the loader, the command name, the sequence position and the cadence all unchanged. (e) PRESERVE ONE LOAD-ORDER INVARIANT ACROSS THE SPLIT, and state it where the split happens: seal_applications loads BEFORE any loader that can mint a :BusinessApplication. Producer satisfies it today by accident of chain order rather than by declaration, and the split is exactly when an accident gets lost. Producer is additionally safe because pat_product_mapping.cypher MERGEs on the SAME neutral app_id key seal_applications uses -- so no stub, no second node, no ordering dependency. The company is NOT safe: pat_app_links.cypher still MERGEs on the pre-S3 seal_id with is_stub=true, mints a null-app_id node the uniqueness constraint cannot match, and the subsequent SET collides (SME hit it live 2026-08-11; RELAY-8, a T23 residue). Once commands are keyed to sources, the constraint is expressible as a declared dependency rather than a position in a tuple -- state it that way, so the next reorder cannot silently break it. NAMING IS DELIBERATELY OUT OF SCOPE -- this item splits and wires using CURRENT names. Renaming is GN1/GN2 and is frozen-and-ported as one unit; doing both at once makes an already wide port surface unreviewable.
 notes: |
   Raised 2026-08-11 (desktop) on SME direction. Depends on G78 because splitting a chain that silently skips its inputs just gives you more places to skip silently. The SME asked whether product and org structure can be separate commands while sharing sources -- yes, and that is the point: the COMMAND is keyed to the subject, the SOURCE is a property of the data, and two subjects may legitimately draw on one source system. What must not happen is the reverse, which is what exists now: one command spanning three sources, so nothing can say whether the command is complete. RIDER NOTE 2026-08-13 (targeted groom, from Idea-119): two of the five loaders named in G78 clause (d) are ones THIS split re-homes -- seal_contacts (a REFRESH_REFERENCE_CHAIN member) and business_segments (refreshed inside the same command, ahead of the chain tuple). If G78's coverage clause has not closed by the time this runs, the tests move WITH the loaders into their new subject command rather than being left pointing at a command that no longer exists.
+  DONE 2026-08-23 (laptop), on branch feat/g79-source-split, merged --no-ff. (a) THE SPLIT: three
+  subject commands replace the seven-loader bundle -- refresh-catalog (LOB -> product line ->
+  product), refresh-applications (SEAL apps + contacts), refresh-teams (dev teams, team roles,
+  team<->app alignment). pat_product_mapping was not named by any tier in the acceptance; it went to
+  TEAMS because its subject is which team is aligned to which application, an org fact that merely
+  cites product ids, and it stays last as it always was. business_segments re-homed to
+  refresh-catalog: it is a read-only COUNT, not a loader, and catalog_lobs reconciles LOBs to those
+  corporate segments, so it is that reconciliation's precondition. ONE runner behind all three --
+  the G78 contract is identical; only the subject differs. New cli.CHAINS is the single registry
+  every enumeration derives from (COMMAND_LOADERS, the load-map render's declared-input walk, the
+  chain-binding and bundled-fixture guards), so the NEXT split is one edit rather than four.
+  (b) pat_team_roles IS WIRED and, for the first time in its existence, HAS RUN: verified live on
+  the LAPTOP, bolt://localhost:7687 db=drydocs -- `refresh-teams --samples-dir drydocs/data/samples`
+  loaded 6 rows, 0 rejected, and the graph now holds the full G91 shape (DevTeam
+  -[:QUALIFIED_ATTRIBUTION]-> Attribution -[:HAD_ROLE]-> Role, -[:HAS_AGENT]-> Employee) for all six.
+  Wiring it needed a bundled fixture, which did not exist -- added, six synthetic rows using team ids
+  from the dev_teams sample and role ids from the seeded PAT role vocabulary (force-added; drydocs/data/
+  is gitignored and the other 13 samples are tracked the same way). area_products stays OUT with its
+  reason rewritten to stand on the standing `area_products: 0` open question rather than on "G79 will
+  decide", which is now false. G80's hygiene guard did exactly its job here -- excluded-AND-chained is
+  contradictory -- so wiring the orphan FORCED its stale excuse to be deleted.
+  (c) load_profile() DERIVES. LoadStep.profiles is a declared set OR the DERIVED sentinel;
+  step_profiles() resolves DERIVED by reading the CADENCE of the command's sources through
+  CADENCE_PROFILES. `cadence: weekly|batch|repo-change` is a new dataset-row field on the nine rows a
+  standing sequenced loader reads (derived from the sequence, never hand-listed, so a new chain fails
+  the guard until its source declares a rhythm); values are RECORDED, not invented -- each is the
+  rhythm the chain comments and command help already stated. THE DIVERGENCE RULE: a command whose
+  sources disagree about cadence RAISES rather than picking one, surfacing a ruling the SME owes at
+  the moment it first matters -- something a hand-assigned tuple structurally could not do. Proven by
+  the contract test: flipping a cadence in a FIXTURE registry moves refresh-catalog between operator
+  surfaces with zero edit to the package. SCHEDULED_INGEST_EXCLUSIONS shrank by one: a cadence-derived
+  omission needs no prose entry, because the registry field is the reason and a reader can check it.
+  (d) SATISFIED BY N12, NOT REBUILT -- a correction, not a scope change. This clause was written
+  2026-08-11 and asked for `file-drop|db-pull|api-pull|repo|scrape` on the registry entry; N12 landed
+  the same mechanism SME-directed on 2026-08-18 as `acquisition.mode: manual|automated (via api|db)`,
+  guarded, with an explicit framing clause. The clause's PURPOSE -- the CSV-to-database move being a
+  registry edit plus an adapter swap with loader, command name, sequence position and cadence all
+  unchanged -- is exactly N12's mode flip, and that is now true. Re-vocabularying a five-day-old
+  SME-directed field would itself be a rename needing a ruling, so it was not done.
+  (e) The invariant is a DECLARATION with a guard: BUSINESS_APPLICATION_MINTERS +
+  APPLICATION_IDENTITY_LOADER, and a test asserting the identity loader's command precedes every
+  minter's in CANONICAL_LOAD_SEQUENCE (plus hygiene so a stale minter cannot let it pass vacuously).
+  refresh-applications is sequenced before refresh-teams for that reason, stated at the step. The
+  port-prompt's RELAY-8 note got an UPDATE rather than a rewrite: what it verified was true and is now
+  ENFORCED, so producer no longer satisfies the rule by luck.
+  refresh-reference survives as a DEPRECATED ALIAS that delegates to the three (the S8
+  m1-verify -> verify-reference precedent) and is declared AD_HOC, not a fourth sequence step -- the
+  company's scripts and operator muscle memory name it, and a removed verb fails like a broken install.
+  NAMING stayed out of scope as directed (GN1/GN2). Surfaces regenerated; the runbook's Appendix B
+  names the three commands. Suite 2357 passed.
+  ONE THING FOUND AND NOT FIXED, deliberately: the live run's third step, pat_product_mapping, was
+  REFUSED by the pre-cutover guard -- this laptop's drydocs DB holds 4 :BusinessApplication nodes with
+  a null app_id from before the seal_id -> app_id cutover. That is stale LOCAL GRAPH state on one
+  machine, not a repo defect, and the guard refusing is the guard working (it is the same class the
+  RELAY-8 note describes). Repairing it is a graph decision under the wipe-and-rebuild doctrine, not
+  this item's business. Idea-159 captured separately: four tests in test_repo_paths.py pass in the
+  full suite and fail when that file runs alone (a cli_docs circular import), verified PRE-EXISTING at
+  origin/main while checking whether this split had caused it.
+
