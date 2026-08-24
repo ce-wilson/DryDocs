@@ -93,6 +93,49 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-165`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
+  **A SKILL still routes agents into two databases that do not exist**, which is worse
+  than the stale prose swept at `703c2019` because a skill is executable guidance rather
+  than description. `.claude/skills/data-context-extractor/` carries **18 sites** across
+  five files instructing an agent to give document DataAssets `trust: SYNTHESIZED` and
+  **target `ddcontext`** (`SKILL.md` x8 — including the `description:` frontmatter that
+  decides when the skill is invoked at all — `references/platforms.md` x4,
+  `cypher-patterns.md` x3, `nodes.md` x2, `use-cases.md` x1). `cypher-patterns.md` goes
+  further and emits `CALL { USE ddall.ddcontext ... }` — a cross-database query against a
+  composite retired 2026-08-18 for federating one database. Both names died at the G32/G102
+  fold. **Why this was left out of the sweep rather than fixed with it:** the sweep replaced
+  descriptions of where content LIVES, which is mechanical. This skill encodes a RULING about
+  where SYNTHESIZED content goes, and the fold's answer — one database, `:Uncertain` as the
+  LABEL, trust as a property of the row rather than of the storage location — is the gate's
+  §B, so re-pointing it is a decision to make deliberately and not inside a prose pass.
+  `.claude/**` is canonical-producer, so it ports as-is. Whoever takes it should re-point
+  the two `USE ddall.ddcontext` blocks first: those are not just wrong, they cannot run.
+
+- **`Idea-164`** · 2026-08-24 · `[task]` · **open** · prio? **Med** —
+  **The superseded-database guard does not scan the two packages where the stale names
+  actually were.** `tests/unit/test_database_names.py` has scanned six packages since G28
+  (`SCANNED_PACKAGES`), and `agents/` and `drydocs_docmeta/` are not among them — which is
+  precisely where the 2026-08-24 sweep found live-code docstrings naming `ddcontext` and
+  `dddocs`, including one (`agents/common/agent_run_writer.py`) whose module docstring said
+  *"targeting the ruled database — `ddcontext`, NEVER `drydocs`"* twenty lines above a
+  constant reading `drydocs`. The guard could not see either. Separately `SUPERSEDED_NAMES`
+  carries `drydocs_docs` (the docmeta plan's WORKING name) but not **`dddocs`**, the real one
+  that ADR 0006 §1 rejected — so the one name the fold's §C found declared-but-never-provisioned
+  is the one the guard does not blocklist. **Measured before proposing:** running the guard's
+  own line-scan logic over `agents/`, `drydocs_docmeta/`, `scripts/`, `libs/` and `web/` with
+  `dddocs` added returns exactly **four** hits, all four real, no false positives — so the
+  widening is a two-element tuple edit plus one frozenset entry, not a new instrument.
+  **The general form is the part worth keeping:** at the fold, every GUARDED surface followed
+  and nine unguarded ones did not, and the same runbook proves it both ways — Appendix B stayed
+  correct because `test_load_sequence_surfaces.py` derives it, Appendix A drifted because its
+  only stated source is a sentence. A third clause could extend the same scan to a small
+  DECLARED list of operator docs (the `EXTRA_DOCS` idiom in `test_runbook_currency.py`), which
+  would have caught all five doc sites. Deliberately scoped OUT of the sweep commit on the
+  user's call — raised here so the choice is visible rather than lost. Whoever takes it should
+  write the widening RED first and confirm it names the sites before any fix: a guard that is
+  green the moment it is written has proven nothing, which is the same rule N11 already applies
+  to an empty census.
+
 - **`Idea-163`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
   **`v0.3.0` — the first tagged release — exists only as a local tag on the desktop, and it
   points into orphaned history.** `git ls-remote --tags origin` returns only the six
