@@ -185,3 +185,59 @@ machine, and does not touch `DRYDOCS_LOGDIR`'s default. Clause (d) names the
 **data** root: a relocated log is annoying, a relocated data root is destructive.
 Logs are *declared* under (b) so they can be enumerated, but their resolution
 semantics are unchanged.
+
+---
+
+## 7. Outcome — what was built, 2026-08-23/24 (laptop)
+
+Written after the fix, against the same tree, so this file records both the
+diagnosis and what it produced rather than leaving the second half to a commit
+message.
+
+**The four findings are closed and the invariant reports zero**, joined across
+`config/data-zones.yaml` (12 system-owned zones) and the registry's 14
+`acquisition.drop_dir` rows — 26 zones checked in both directions.
+
+The **two declaration corrections** in §5 were applied exactly as described, and
+neither moved a byte of anyone's data:
+
+- `exec-hosts:rua-bundle` `rua/` → `rua/incoming/`, which makes `rua/extracted/`
+  a sibling rather than a nested write;
+- the two `dpl:*` rows `dpl/` → `dpl-registry/`, ending a disagreement that had
+  stood since N12.
+
+**The three families the SME named are all enumerable now**, which was the point
+of moving the declaration out of Python:
+
+| Family | Where it is declared |
+|---|---|
+| LOGS | `data-zones.yaml` zone `run-logs` (`DRYDOCS_LOGDIR`, default kept — §6) |
+| LOADER INPUT DATA | `source-registry.yaml` `acquisition.drop_dir`, per source (read) |
+| REMEDIATION OUTPUT | `data-zones.yaml` zones `remediation-outgoing`, `remediation-recommendations` |
+
+One nuance on the third, recorded rather than papered over: the acceptance names
+"the greenfield artifact and Jira handoff". `drydocs_remediation/jira.py` carries
+`greenfield_artifact` as a **caller-supplied `Path` with no production caller
+yet** — it is read (attached to an issue), never written, so it is not a
+destructive vector and has no path of its own to declare. Inventing a zone for it
+would be declaring a layout that does not exist. When a caller appears, its
+output belongs in `remediation-outgoing`.
+
+**Two zones nobody had declared** surfaced while walking the call sites —
+`cmdline-staging/` (write) and `controlm-api/` (read, holding an operator-authored
+credentials config). Neither was hidden; both were simply `source_dir(...)` calls
+that no reader could enumerate. That is the audit the Python-side declaration made
+impossible, and finding them is the clearest evidence the file earns its place.
+
+**What the guard cannot see, and what covers it.** The static invariant compares
+DECLARATIONS. A path handed in at call time is invisible to it — `_unpack`'s
+`unpack_dir` is the live example, and it is how the incident could happen with
+every declaration correct. So the refusal also runs at the write site
+(`refuse_write_into_read_zone`), on both the supplied and default branches, and
+the test proves an existing file survives it. The two archive protections are
+different guarantees and both are needed: `filter="data"` polices what is INSIDE
+the tarball, the refusal polices WHERE it lands.
+
+**Deliberately not done:** no data was relocated (the scope fence), and
+`DRYDOCS_LOGDIR` kept its default — clause (d) names the DATA root, and a
+relocated log is annoying where a relocated data root is destructive.
