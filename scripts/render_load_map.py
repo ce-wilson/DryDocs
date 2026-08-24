@@ -228,7 +228,11 @@ def build_load_map() -> dict:
             "mode": step.mode,
             # N6: which operator surfaces run this step. Sorted so the render is
             # deterministic — the declaration holds an unordered frozenset.
-            "profiles": sorted(step.profiles),
+            # G79: DERIVED steps carry no literal — resolve through the same
+            # function load_profile() uses, so the published surface cannot
+            # disagree with what the operator paths actually run.
+            "profiles": sorted(cli.step_profiles(step)),
+            "profiles_derived": step.profiles is None,
             "note": step.note,
             "loaders": [cls.name for cls in cli.COMMAND_LOADERS.get(step.command, ())],
         }
@@ -270,8 +274,9 @@ def build_load_map() -> dict:
     # exemption null. Paths are repo-relative on purpose (committed==fresh
     # must hold on every machine).
     declared_inputs: list[tuple[str, str, str, Path, str]] = [
-        ("refresh-reference", nm, sample, cli.DEFAULT_SAMPLES_DIR, "drydocs/data/samples")
-        for nm, _cls, sample in cli.REFRESH_REFERENCE_CHAIN
+        (command, nm, sample, cli.DEFAULT_SAMPLES_DIR, "drydocs/data/samples")
+        for command, chain in cli.CHAINS.items()
+        for nm, _cls, sample in chain
     ]
     for nm, _cls, sample, sql in (
         cli.CONTROLM_NODE_STAGES + cli.CONTROLM_PART2_STAGES + cli.CONTROLM_REL_STAGES

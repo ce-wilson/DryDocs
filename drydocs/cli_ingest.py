@@ -12,6 +12,7 @@ monkeypatch ``drydocs.cli._client`` keep working.
 from __future__ import annotations
 
 import uuid
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
 
@@ -28,6 +29,7 @@ from drydocs.chain_inputs import (
     summary_lines,
 )
 from drydocs.cli import (
+    CHAINS,
     CONTROLM_NODE_STAGES,
     CONTROLM_PART2_STAGES,
     CONTROLM_REL_STAGES,
@@ -35,7 +37,6 @@ from drydocs.cli import (
     LOADER_REGISTRY,
     LOADER_SOURCE,
     LOGGER,
-    REFRESH_REFERENCE_CHAIN,
     SQL_DIR,
     _csv_adapter,
     _developer_sid_opt,
@@ -145,53 +146,55 @@ def load(
 # --- M1 commands -------------------------------------------------------------
 
 
-@app.command(name="refresh-reference")
-def refresh_reference(
-    samples_dir: Path | None = typer.Option(
-        None,
-        "--samples-dir",
-        help=(
-            "FIXTURE run: directory holding the bundled *__sample.csv fixtures. No default "
-            "(G78) — a default loaded fixtures into a real graph and reported success."
-        ),
-    ),
-    source: list[str] = typer.Option(
-        [],
-        "--source",
-        help=(
-            "REAL run: a source-registry dataset id (repeatable). Each selected step reads "
-            "<step>.csv from the source's declared landing zone (acquisition.drop_dir under "
-            "DRYDOCS_DATA_ROOT); steps bound to an unselected source are reported NOT SELECTED."
-        ),
-    ),
-    snapshot: bool = typer.Option(True),
-) -> None:
-    """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence.
+# ---- G79: one command per SUBJECT -------------------------------------------
+# These three replace the single `refresh-reference`, which bundled seven loaders
+# across three sources with three rhythms. They share ONE runner because the
+# contract is identical (G78: explicit input or exit 2, resolve every step before
+# the first write, closing table) — what differs is the subject, which is exactly
+# what the chain constant now names.
 
-    Explicit input or exit 2 — the single-loader `load --csv` contract, copied up
-    (G78): every step's file is resolved BEFORE the first write, a missing
-    required file fails the whole chain by name, and the closing table says
-    which path each step read and how many rows it loaded.
-    """
+_SAMPLES_HELP = (
+    "FIXTURE run: directory holding the bundled *__sample.csv fixtures. No default "
+    "(G78) — a default loaded fixtures into a real graph and reported success."
+)
+_SOURCE_HELP = (
+    "REAL run: a source-registry dataset id (repeatable). Each selected step reads "
+    "<step>.csv from the source's declared landing zone (acquisition.drop_dir under "
+    "DRYDOCS_DATA_ROOT); steps bound to an unselected source are reported NOT SELECTED."
+)
+
+
+def _run_reference_chain(
+    command: str,
+    *,
+    samples_dir: Path | None,
+    sources: list[str],
+    snapshot: bool,
+    snapshot_families: tuple[str, ...],
+    preamble: Callable[[Neo4jClient], None] | None = None,
+) -> None:
+    """Run ONE subject chain end to end. `snapshot_families` names the snapshot
+    writers this SUBJECT owns — never write_all(), which spans two subjects and
+    would have each command claiming the others' entities."""
+    chain = CHAINS[command]
     # Confirmed-gate (D3): every feed the chain touches must be SME-confirmed
-    # before any write — derived from the chain's own source_id declarations
-    # (overlay-aware per D2).
-    for cls in {cls for _, cls, _ in REFRESH_REFERENCE_CHAIN}:
+    # before any write — derived from the chain's own source_id declarations.
+    for cls in {cls for _, cls, _ in chain}:
         _gate_loader(cls)
-    steps = [ChainStep(nm, cls, fixture) for nm, cls, fixture in REFRESH_REFERENCE_CHAIN]
+    steps = [ChainStep(nm, cls, fixture) for nm, cls, fixture in chain]
     try:
         plan = resolve_chain_inputs(
-            steps, samples_dir=samples_dir, sources=source, registry=_source_registry()
+            steps, samples_dir=samples_dir, sources=sources, registry=_source_registry()
         )
     except (ChainModeError, MissingChainInputError) as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
     mode = "FIXTURE" if samples_dir is not None else "SOURCE"
-    console.print(f"[cyan]refresh-reference — {mode} run; {len(plan.inputs)} step(s) resolved[/]")
+    console.print(f"[cyan]{command} — {mode} run; {len(plan.inputs)} step(s) resolved[/]")
     results: list[StepResult] = []
     with _client() as cli:
-        bs = refresh_business_segments(cli)
-        console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
+        if preamble is not None:
+            preamble(cli)
         for item in plan.inputs:
             console.print(f"[cyan]>> {item.step.name}[/]  {item.path}")
             summary = item.step.loader(cli, _csv_adapter(item.path)).load()
@@ -206,11 +209,109 @@ def refresh_reference(
                     source_id=item.source_id,
                 )
             )
-        if snapshot:
+        if snapshot and snapshot_families:
             console.print("[cyan]>> snapshots[/]")
-            console.print(SnapshotWriter(cli).write_all())
+            writer = SnapshotWriter(cli)
+            console.print(
+                {fam: getattr(writer, f"write_{fam}_snapshots")() for fam in snapshot_families}
+            )
     for line in summary_lines(results, plan.skipped):
         console.print(line)
+
+
+def _segments_preamble(cli: Neo4jClient) -> None:
+    """business_segments RE-HOMED here (G79). It is a read-only COUNT, not a
+    loader — it verifies the bootstrap-seeded corporate backbone is still there.
+    It belongs to the CATALOG subject because catalog_lobs reconciles LOBs to
+    those corporate BusinessSegments, so the count is that reconciliation's
+    precondition rather than a step of its own."""
+    bs = refresh_business_segments(cli)
+    console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
+
+
+@app.command(name="refresh-catalog")
+def refresh_catalog(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """Product catalog hierarchy: LOBs -> product lines -> products.
+
+    Explicit input or exit 2 — the single-loader `load --csv` contract (G78).
+    """
+    _run_reference_chain(
+        "refresh-catalog",
+        samples_dir=samples_dir,
+        sources=source,
+        snapshot=snapshot,
+        snapshot_families=("product", "lob"),
+        preamble=_segments_preamble,
+    )
+
+
+@app.command(name="refresh-applications")
+def refresh_applications(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """Business applications and their contacts (SEAL).
+
+    Runs BEFORE refresh-teams: SEAL is the authority for application identity,
+    and refresh-teams carries a :BusinessApplication minter (G79 (e)).
+    """
+    _run_reference_chain(
+        "refresh-applications",
+        samples_dir=samples_dir,
+        sources=source,
+        snapshot=snapshot,
+        snapshot_families=("application",),
+    )
+
+
+@app.command(name="refresh-teams")
+def refresh_teams(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """The delivery organisation: dev teams, their roles, and team<->app alignment.
+
+    No snapshot family: the temporal snapshot writers cover applications,
+    products and LOBs — there is no team snapshot to write, and inventing one
+    here would be a load this subject was never asked for.
+    """
+    _run_reference_chain(
+        "refresh-teams",
+        samples_dir=samples_dir,
+        sources=source,
+        snapshot=snapshot,
+        snapshot_families=(),
+    )
+
+
+@app.command(name="refresh-reference")
+def refresh_reference(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """[dim](deprecated)[/] Runs refresh-catalog, refresh-applications and
+    refresh-teams in sequence — the three subjects this command used to bundle.
+
+    DEPRECATED, NOT DELETED (the S8 `m1-verify` -> `verify-reference`
+    precedent): operator muscle memory, runbooks and the company's own scripts
+    name this verb, and a removed command fails in a way that reads like a
+    broken install. It DELEGATES — there is no second implementation to drift.
+    """
+    console.print(
+        "[yellow]refresh-reference is deprecated (G79): it bundled three subjects "
+        "with three refresh rhythms. Running refresh-catalog, refresh-applications "
+        "and refresh-teams in order.[/]"
+    )
+    refresh_catalog(samples_dir=samples_dir, source=source, snapshot=snapshot)
+    refresh_applications(samples_dir=samples_dir, source=source, snapshot=snapshot)
+    refresh_teams(samples_dir=samples_dir, source=source, snapshot=snapshot)
 
 
 _TERM_TOTAL = "MATCH (n:OntologyTerm) RETURN count(n) AS n"

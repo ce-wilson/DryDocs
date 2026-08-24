@@ -8,6 +8,7 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "Neo4j + APOC reachable",
       "loaders": []
     },
@@ -18,6 +19,7 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "constraints + ontology seed",
       "loaders": []
     },
@@ -28,6 +30,7 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "schema meta-graph rendered + applied to ddschema (C21/G51). Targets a DIFFERENT database, so it is chain-independent of everything below and could sit anywhere — it sits here because a wiped DBMS is exactly when the meta-graph gets forgotten. ADDED 2026-08-04: it was already in both operator surfaces (scripts/ingest.sh step 3/6 and the startup runbook's Appendix B) and missing ONLY here, so the generated load-map published 15 steps while both real paths ran 16",
       "loaders": []
     },
@@ -38,23 +41,48 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "the ONE verified supplement chain (G29)",
       "loaders": []
     },
     {
-      "command": "refresh-reference",
+      "command": "refresh-catalog",
       "mode": "standing",
       "profiles": [
         "cold-start"
       ],
-      "note": "catalog + SEAL + dev teams (M1)",
+      "profiles_derived": true,
+      "note": "product catalog hierarchy: LOB -> product line -> product (G79 split)",
       "loaders": [
         "catalog_lobs.v1",
         "product_lines.v1",
-        "products.v1",
+        "products.v1"
+      ]
+    },
+    {
+      "command": "refresh-applications",
+      "mode": "standing",
+      "profiles": [
+        "cold-start"
+      ],
+      "profiles_derived": true,
+      "note": "business applications + their contacts (SEAL). Sits BEFORE refresh-teams because SEAL is the authority for application identity and refresh-teams carries a :BusinessApplication minter — the G79 (e) invariant, declared in BUSINESS_APPLICATION_MINTERS and guarded, not left to tuple order",
+      "loaders": [
         "seal_applications.v1",
-        "seal_contacts.v1",
+        "seal_contacts.v1"
+      ]
+    },
+    {
+      "command": "refresh-teams",
+      "mode": "standing",
+      "profiles": [
+        "cold-start"
+      ],
+      "profiles_derived": true,
+      "note": "the delivery organisation: dev teams, team roles (wired at G79 (b) after never having run) and the team<->application alignment",
+      "loaders": [
         "dev_teams.v1",
+        "pat_team_roles.v1",
         "pat_product_mapping.v1"
       ]
     },
@@ -65,6 +93,7 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "folders -> jobs -> conditions -> derived deps (M3)",
       "loaders": [
         "controlm_folders.v1",
@@ -81,6 +110,7 @@
       "profiles": [
         "cold-start"
       ],
+      "profiles_derived": false,
       "note": "vendor/product registry (plan 07)",
       "loaders": [
         "software_registry.v1"
@@ -90,6 +120,7 @@
       "command": "load-batch-orchestrators",
       "mode": "optional",
       "profiles": [],
+      "profiles_derived": false,
       "note": "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the SEAL chain and the software registry already loaded",
       "loaders": [
         "batch_port_orchestrator.v1"
@@ -101,6 +132,7 @@
       "profiles": [
         "cold-start"
       ],
+      "profiles_derived": false,
       "note": "BMC corpus lexical graph",
       "loaders": [
         "bmc_docs.v1"
@@ -110,6 +142,7 @@
       "command": "load-vendor-docs",
       "mode": "optional",
       "profiles": [],
+      "profiles_derived": false,
       "note": "Q13 captured vendor documentation (verbatim, out-of-repo capture -> convert -> load); taxonomy only, gated until its corpus is confirmed",
       "loaders": [
         "vendor_docs.v1"
@@ -119,6 +152,7 @@
       "command": "load-essential-graphrag",
       "mode": "optional",
       "profiles": [],
+      "profiles_derived": false,
       "note": "Q2 book corpus -> drydocs (G102 fold)",
       "loaders": [
         "essential_graphrag.v1"
@@ -128,6 +162,7 @@
       "command": "load-email-extracts",
       "mode": "optional",
       "profiles": [],
+      "profiles_derived": false,
       "note": "Q10 failure/activity email extracts -> lexical graph (assignment edge gated)",
       "loaders": [
         "email_extracts.v1"
@@ -139,6 +174,7 @@
       "profiles": [
         "cold-start"
       ],
+      "profiles_derived": false,
       "note": "L7 self-documentation (design docs + feedback). The one `optional` step a profile runs: a cold start is exactly when the doc graph is empty, and it stayed missing from the runbook until Rev 5 for want of saying so",
       "loaders": [
         "doc_sections.v1",
@@ -150,6 +186,7 @@
       "command": "load-code-snapshot",
       "mode": "optional",
       "profiles": [],
+      "profiles_derived": false,
       "note": "G33 self-documentation; ritual-driven (newest committed snapshot)",
       "loaders": [
         "code_snapshot.v1",
@@ -160,6 +197,7 @@
       "command": "load-folder-attribution",
       "mode": "gated",
       "profiles": [],
+      "profiles_derived": false,
       "note": "K8 folder-grain attribution: the app-code defined mapping (config/overrides/app-code-mappings.csv) + the stg_app_fact fallback feed need ingest-controlm + refresh-reference first (gate §E preconditions)",
       "loaders": [
         "folder_attribution.v1"
@@ -169,6 +207,7 @@
       "command": "load-server-inventory",
       "mode": "optional",
       "profiles": [],
+      "profiles_derived": false,
       "note": "Z3 server inventory: per-application infra exports (the internal/server-inventory/ landing zone) -> :Server/:DataCenter + the tiered ExecutionHost join; the app port leg is MATCH-only, so refresh-reference (SEAL) and ingest-controlm (hosts) first make it complete rather than valid",
       "loaders": [
         "server_inventory.v1"
@@ -181,6 +220,7 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "M1 invariants",
       "loaders": []
     },
@@ -191,6 +231,7 @@
         "cold-start",
         "scheduled-ingest"
       ],
+      "profiles_derived": false,
       "note": "M3 invariants",
       "loaders": []
     },
@@ -200,13 +241,15 @@
       "profiles": [
         "cold-start"
       ],
+      "profiles_derived": false,
       "note": "doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)",
       "loaders": []
     }
   ],
   "ad_hoc_commands": [
     "load",
-    "load-manual-mappings"
+    "load-manual-mappings",
+    "refresh-reference"
   ],
   "systems": [
     {
@@ -794,6 +837,7 @@
           "cli_name": "seal_applications",
           "source_label": "csv",
           "commands": [
+            "refresh-applications",
             "refresh-reference"
           ]
         },
@@ -803,6 +847,7 @@
           "cli_name": "seal_contacts",
           "source_label": "csv",
           "commands": [
+            "refresh-applications",
             "refresh-reference"
           ]
         }
@@ -881,6 +926,7 @@
           "cli_name": "catalog_lobs",
           "source_label": "oracle",
           "commands": [
+            "refresh-catalog",
             "refresh-reference"
           ]
         },
@@ -890,7 +936,8 @@
           "cli_name": "dev_teams",
           "source_label": "oracle",
           "commands": [
-            "refresh-reference"
+            "refresh-reference",
+            "refresh-teams"
           ]
         },
         {
@@ -899,6 +946,7 @@
           "cli_name": "product_lines",
           "source_label": "oracle",
           "commands": [
+            "refresh-catalog",
             "refresh-reference"
           ]
         },
@@ -908,6 +956,7 @@
           "cli_name": "products",
           "source_label": "oracle",
           "commands": [
+            "refresh-catalog",
             "refresh-reference"
           ]
         }
@@ -949,7 +998,8 @@
           "cli_name": "pat_product_mapping",
           "source_label": "pat",
           "commands": [
-            "refresh-reference"
+            "refresh-reference",
+            "refresh-teams"
           ]
         },
         {
@@ -957,7 +1007,10 @@
           "class": "PatTeamRolesLoader",
           "cli_name": "pat_team_roles",
           "source_label": "pat",
-          "commands": []
+          "commands": [
+            "refresh-reference",
+            "refresh-teams"
+          ]
         }
       ]
     },
@@ -1837,25 +1890,19 @@
       "name": "area_products",
       "class": "AreaProductsLoader",
       "loader": "area_products.v1",
-      "reason": "nothing to chain yet: the bundled extract records area_products: 0 against the standing area-product-missing open question (config/taxonomy/lob-product-team.yaml) — G79 (b) wires or retires it when the refresh chain splits by subject"
-    },
-    {
-      "name": "pat_team_roles",
-      "class": "PatTeamRolesLoader",
-      "loader": "pat_team_roles.v1",
-      "reason": "gate-confirmed (C9, 2026-07-18) with loader class and cypher, but no operator path has ever run it and no cadence was ever ruled — G79 (b) owns wiring it into the organisation-tier subject command; recorded here so the gap is a decision on record, not drift"
+      "reason": "there is nothing to load: the catalog capture records `area_products: 0` against the standing `area-product-missing` open question (config/taxonomy/lob-product-team.yaml), so this is a real source grain we do not yet receive rows for. Wiring an empty step into refresh-catalog would make every run report a step that loads nothing, which reads as a broken load rather than an absent feed. G79 (b) considered it and left it out on that basis; revisit when the open question closes and the extract carries area-product rows"
     }
   ],
   "steps_with_uncommitted_inputs": [
     {
-      "command": "refresh-reference",
+      "command": "refresh-applications",
       "step": "seal_applications",
       "file": "seal_application_data__sample.csv",
       "searched": "drydocs/data/samples",
       "exemption": "generated per machine from the capture by scripts/build_seal_samples.py — run it after checkout; the fixture derives from internal SEAL data shapes and is deliberately not committed"
     },
     {
-      "command": "refresh-reference",
+      "command": "refresh-applications",
       "step": "seal_contacts",
       "file": "seal_contact_data__sample.csv",
       "searched": "drydocs/data/samples",

@@ -1,0 +1,7 @@
+team_id,employee_sid,role_id,valid_from,valid_to
+T0042,K100001,tech_partner,2026-01-01,
+T0042,K100002,principal_engineer,2026-01-01,
+T0099,K100003,tech_partner,2026-01-01,
+T0100,K100004,area_tech_partner,2026-01-01,
+T0117,K100005,head_of_technology,2026-01-01,
+T0250,K100006,tech_partner,2026-01-01,

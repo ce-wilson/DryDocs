@@ -144,7 +144,7 @@ def test_chain_constants_agree_with_the_loader_registry():
     """The (cli name, class) pairs in the chain constants must be the SAME
     binding LOADER_REGISTRY carries — a renamed key or swapped class here
     would run one loader while reporting another."""
-    pairs = [(nm, cls) for nm, cls, _ in cli.REFRESH_REFERENCE_CHAIN]
+    pairs = [(nm, cls) for nm, cls, _ in cli.chain_steps()]
     pairs += [
         (nm, cls)
         for nm, cls, *_ in (
@@ -221,7 +221,7 @@ def test_unchained_detection_names_the_loader(monkeypatch):
 def test_generated_sample_declarations_are_real_and_carry_reasons():
     """GENERATED_SAMPLE_FILES hygiene: every entry names a file some chain
     actually declares (else stale), and says how to build it."""
-    declared = {sample for _nm, _cls, sample in cli.REFRESH_REFERENCE_CHAIN}
+    declared = {sample for _nm, _cls, sample in cli.chain_steps()}
     declared |= {
         sample
         for _nm, _cls, sample, _sql in (

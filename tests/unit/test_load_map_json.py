@@ -107,8 +107,20 @@ def test_sequence_mirrors_the_declaration():
         (s["command"], s["mode"], frozenset(s["profiles"]), s["note"])
         for s in committed["sequence"]
     ]
-    declared = [(s.command, s.mode, s.profiles, s.note) for s in cli.CANONICAL_LOAD_SEQUENCE]
+    # G79: a DERIVED step has no literal to mirror, so the render is compared
+    # against the RESOLVED answer — the same function the operator paths call.
+    # Comparing against `step.profiles` would compare the render to None.
+    declared = [
+        (s.command, s.mode, cli.step_profiles(s), s.note) for s in cli.CANONICAL_LOAD_SEQUENCE
+    ]
     assert rendered == declared, "load-map.json sequence drifted from cli.CANONICAL_LOAD_SEQUENCE"
+
+    # ...and the render says WHICH steps were derived, so a reader can tell a
+    # declared surface membership from a computed one.
+    derived = {s["command"] for s in committed["sequence"] if s["profiles_derived"]}
+    assert derived == {
+        s.command for s in cli.CANONICAL_LOAD_SEQUENCE if s.profiles is None
+    }, "load-map.json disagrees with the declaration about which steps derive their profiles"
 
 
 def test_doc_corpus_rows_carry_the_doc_governance_fields():
