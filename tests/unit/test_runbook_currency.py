@@ -76,6 +76,17 @@ HISTORICAL_PATHS: dict[str, str] = {
         "company-prompts/ at the 2026-08-07 prompt retirement — the citation is a fact "
         "about a completed session, and the full text is one `git show ced0088` away"
     ),
+    "docs/reviews/port-review-7c18ff4b-20260820.md": (
+        "UNTRACKED producer-side at 103f240c — a producer review of a COMPANY port ports "
+        "BACK to the repo it is about, so `docs/reviews/port-review-*` is now gitignored "
+        "and the file was `git rm --cached`ed. Step 212 names it to tell that side the "
+        "range DELETES a file they may hold, which a diff cannot distinguish from a "
+        "retraction. The path is a fact about a completed untracking; the text is one "
+        "`git show 103f240c^:docs/reviews/port-review-7c18ff4b-20260820.md` away. "
+        "NOTE FOR THE NEXT SESSION ON A MACHINE THAT STILL HAS IT: untracked-but-present "
+        "makes this guard pass LOCALLY and fail on a fresh clone — this entry was added "
+        "from the CI failure, not from a local run"
+    ),
 }
 
 #: Paths in ANOTHER repo. Kept separate from HISTORICAL_PATHS on purpose: "this
