@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T22:42:55",
-    "date": "20260824",
+    "captured_at": "2026-08-25T03:48:41",
+    "date": "20260825",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "dd71116e",
-      "full": "dd71116ed0bb22c96065e6d41ac5ff43e0fa0642",
+      "commit": "26b0ce79",
+      "full": "26b0ce795a15159f8832cfa19e15d24ee5d6e573",
       "branch": "main",
-      "describe": "port-base-20260824c",
-      "subject": "chore(port): ledger — the range count measured AT the tag, not before it",
+      "describe": "port-base-20260824c-7-g26b0ce79",
+      "subject": "docs(handoff): R23's desktop half — the purge only that machine can do",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -5835,6 +5835,15 @@
       "name": "neo4j_tool.py",
       "extension": ".py",
       "rel_path": "agents/common/neo4j_tool.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/agents/common/session_redaction.py",
+      "name": "session_redaction.py",
+      "extension": ".py",
+      "rel_path": "agents/common/session_redaction.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19439,10 +19448,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-2235.json",
-      "name": "drydocs-20260824-2235.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "name": "drydocs-20260824.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824-2235.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22157,6 +22166,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_session_redaction.py",
+      "name": "test_session_redaction.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_session_redaction.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_skip_guard_policy.py",
       "name": "test_skip_guard_policy.py",
       "extension": ".py",
@@ -24080,6 +24098,14 @@
     [
       "drydocs/agents/graph_query/agent.py",
       "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
+      "drydocs/agents/serve.py",
+      "drydocs/agents/common/session_redaction.py"
+    ],
+    [
+      "drydocs/agents/serve.py",
+      "drydocs/agents/graph_qa/control.py"
     ],
     [
       "drydocs/drydocs/chain_inputs.py",
@@ -31834,6 +31860,11 @@
     [
       "drydocs/agents/common",
       "CONTAINS",
+      "drydocs/agents/common/session_redaction.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
       "drydocs/agents/common/specs_catalog.py"
     ],
     [
@@ -39314,7 +39345,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-2235.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40759,6 +40790,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_session_redaction.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_skip_guard_policy.py"
     ],
     [
@@ -41711,13 +41747,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2365,
-    "edges": 1146,
+    "files": 2367,
+    "edges": 1148,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2648,
+    "rels": 2650,
     "directories": 284
   }
 }
