@@ -1,8 +1,8 @@
 # ADR 0014 — Runtime substrate: logs, settings and data zones are one per-machine settings group
 
 ```yaml
-status: PROPOSED          # NEVER Accepted by the drafting session — acceptance is the user's,
-                          # and is recorded in docs/decisions/README.md only after they rule
+status: ACCEPTED          # ruled 2026-08-25 by chad.wilson, WITH AMENDMENTS — see "What the ruling changed"
+accepted: 2026-08-25      # drafted PROPOSED at G104; the drafting session never accepts its own ADR
 date: 2026-08-24
 authored_by: G104 (desktop)
 deciders: [chad.wilson]
@@ -17,11 +17,52 @@ relates_to:
   - drydocs_core/data_root.py                  # DRYDOCS_DATA_ROOT, mandatory since G81
   - config/data-zones.yaml                     # G81's declared zones
   - .env.example
-executed_by: G105 (1-3), G106 (4), G107 (5), G108 (6), G109 (7)
+executed_by: G105 (1-3), G106 (4), G107 (5), G108 (6), G109 (7 — DONE 2026-08-24)
 ```
 
-> **Nothing in this record changes code.** It drafts the decision; G105–G109 implement it,
-> and each of them `depends_on` this ADR so that nothing implements an unratified ruling.
+> **Nothing in this record changes code.** G105–G108 implement it and each `depends_on` this
+> ADR, so nothing implemented an unratified ruling. Clause 7 was already executed by G109,
+> which ran before the ruling because its remaining work did not depend on any clause here.
+
+## What the ruling changed
+
+Ruled 2026-08-25. **Accepted with four amendments**, all recorded here rather than left in
+the chat that produced them.
+
+| Clause | Ruling |
+|---|---|
+| 1 | **AMENDED** — the settings group is per-KIND, not one global set. See clause 1 |
+| 3 | **AMENDED** — the naming rule DERIVES from the declaration; the ledger exception is withdrawn |
+| 4 | **AMENDED** — `prune-logs` reads retention from the declaration, not from flags or literals |
+| 5 | **DEFERRAL RESOLVED** — `drydocs_api` is out of scope; it has no batches |
+| 6 | **WIDENED** — the audit line covers routes that WRITE, not only routes that execute Cypher |
+| 7 | **CORRECTED** — the clause's forward list was overtaken by G109 before the ruling |
+| 2 | as drafted |
+
+### The governing principle, in the SME's words
+
+> *"The goal is to have everything configurable, not hardcode."*
+
+This is broader than the ADR 0009 question it was given in answer to, and it is the reason
+three of the four amendments exist, so it belongs at the top rather than inside one clause.
+
+**It does not mean "everything lives in the environment."** A declaration in committed YAML
+is equally configurable, and is where a value with domain meaning belongs. What the
+principle forbids is a value buried in a Python literal — which is exactly what this ADR's
+own survey found three times over: `run_log.py:147` hardcodes the `load.` prefix,
+`llm_ledger.py` hardcodes `qa.graph_qa`, and `AppSettings.log_level` is declared and read by
+nobody.
+
+So the rule has two halves that do not compete:
+
+1. **Nothing is hardcoded.** Every runtime value is declared somewhere a reader can find it.
+2. **Where the declaration lives** is decided by what kind of value it is — a per-machine
+   operational fact goes to the environment and `.env` (gitignored, `!.env.example`
+   re-included as the template); a domain fact goes to committed YAML under ADR 0009.
+
+Half 2 is the anti-drift line this ADR already drew. Half 1 is the SME's addition, and it is
+what turns clauses 1, 3 and 4 from "configure the log directory" into "stop hardcoding the
+things around it".
 
 ## Context
 
@@ -104,10 +145,38 @@ buried.
 
 Seven clauses. Each is decided or explicitly deferred with a named trigger.
 
-### 1. One `RuntimeSettings` group — DECIDED
+### 1. One `RuntimeSettings` group, declared PER KIND — DECIDED, AMENDED AT RULING
 
-A fourth pydantic-settings group in `drydocs_core/config.py`, `DRYDOCS_` prefix, matching
-the three that exist:
+**Amendment (2026-08-25).** As drafted this clause gave ONE `log_dir` / `log_level` /
+`log_retention_days` for everything. Ruled per-KIND instead, declared in
+`config/log-kinds.yaml` (schema `drydocs.log-kinds.v1`) on the `config/data-zones.yaml`
+idiom: declare in YAML, resolvers derive, a guard asserts they agree.
+
+**What forced it** is the governing principle above, not a volume problem — four kinds and
+86 files is no pressure at all. `kind` is currently a filename convention rather than a
+code concept: three sites mint it and none agree (`run_log.py:147` hardcodes `load.`,
+`llm_ledger.py` hardcodes `qa.graph_qa`, `sql_run_log` takes a caller-supplied `base_name`
+with no prefix enforcement, so that family can write any kind it likes). Nothing can be
+configured per kind while no declaration says what the kinds ARE.
+
+The declaration carries one `root` block (base / path / `env`), a `defaults` block (level,
+`retention_days`, `rotation`, `format`, `dir`), then one entry per kind naming its `writer`
+and overriding only what differs — `load` inherits everything; `qa` takes `rotation:
+per-day`, `format: jsonl` and a longer retention; `sql` is declared so the family that
+accepts any `base_name` becomes checkable; `api` is declared `status: planned` for clause 6
+so the kind exists before its writer does. An optional per-kind `dir` and a
+`DRYDOCS_LOGDIR_<KIND>` override generalize the `<INTEGRATION>_LOG_DIR` pattern Idea-152
+captured from the sister project.
+
+**A defect this fixes by construction.** `config/data-zones.yaml`'s `run-logs` zone declares
+`env: DRYDOCS_LOGDIR` and `data_zones._resolve()` ignores the field, handling only
+`base: home` and `base: data_root`. With the variable set, the zone resolves to the untouched
+default while every real log lands elsewhere — and G81's declared-equals-resolved guard
+misses it, because that guard only walks zones carrying a `helper` and `run-logs` has none.
+A single `root` block is one place that resolves the variable, so the class cannot recur.
+**The guard gap is separate and must be closed regardless of this clause** (Idea-171).
+
+The fields below are now the per-kind `defaults`, not a global set:
 
 | Field | Default | Today |
 |---|---|---|
@@ -141,22 +210,47 @@ beside it rather than replacing it.
 from it: **no module calls `basicConfig`.** A library that configures the root logger steals
 it from its caller.
 
-### 3. One naming rule — DECIDED, with the ledger exception WRITTEN DOWN rather than moved
+### 3. The naming rule DERIVES from the declaration — DECIDED, AMENDED AT RULING
 
-`<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}` for the shared directory.
+**Amendment (2026-08-25). The clause as drafted was wrong, and it was wrong because it was
+written without counting.** It asserted `<kind>.<name>.<YYYYmmdd-HHMMSS>.{log|jsonl}` and
+called the ledger the one exception to it. Measured against the real directory (desktop,
+`C:\coding\projects\logs\DryDocs`, J18): **the rule matches 5 of 86 files.** The other
+79 read `load.<name>.v1.<ts>.log`, and the `v1` sits INSIDE `loader_name` rather than as a
+fourth field — so the rule was not off by one segment, it described the wrong shape, and
+the ledger was never "the one exception". 92% of the directory departed from it.
 
-`agents/common/llm_ledger.py`'s `qa.graph_qa.<YYYYmmdd>.jsonl` **keeps its per-DAY stamp**,
-and the exception is recorded here instead of being normalized away. It is an append-only
-ledger, not a run artifact: per-run files would shard one queryable history into hundreds of
-fragments, and the whole value of a ledger is that it is one file you can read end to end.
-The rule it must obey is the one that matters — it lives in `log_dir` and is swept by the
-same retention verb.
+**The rule is therefore derived rather than asserted:**
 
-*This is the clause most likely to be over-ruled, and the counter-argument is that one
-exception in a naming rule is how naming rules die. Stated so the user can take the other
-side knowingly.*
+```
+<kind>.<name>.<stamp>.<ext>
+```
 
-### 4. `drydocs prune-logs` — DECIDED
+where `<stamp>` granularity comes from the kind's `rotation` (`per-run` -> `YYYYmmdd-HHMMSS`,
+`per-day` -> `YYYYmmdd`) and `<ext>` from its `format`. `<name>` stays free-form, which is
+what makes the 79 `.v1` files conforming.
+
+**The ledger exception is WITHDRAWN — not overruled, dissolved.** Under a derived grammar
+`qa.graph_qa.20260820.jsonl` is conforming: `kind=qa`, `name=graph_qa`, `stamp=20260820`,
+`ext=jsonl`. The per-day rotation is a declared property of that kind, not a departure from
+a rule. The drafted clause flagged itself with "one exception in a naming rule is how naming
+rules die"; the amendment removes the exception rather than defending it, which is the same
+concern answered properly.
+
+The ledger keeps its per-day file on its own merits, now recorded as the reason for
+`rotation: per-day` rather than as an excuse: it is append-only, and its `run` line is the
+ONLY place the full question text lands (`:AgentRun` carries sha256 + length), so its value
+is that one file reads end to end. Measured: 2 day-files, 54 entries, 18.9 KB, 14 run ids —
+per-run sharding would give 14 files, not the "hundreds of fragments" the draft claimed.
+
+### 4. `drydocs prune-logs`, reading retention FROM the declaration — DECIDED, AMENDED AT RULING
+
+**Amendment (2026-08-25).** The verb takes its retention from `config/log-kinds.yaml`, not
+from hardcoded values and not from flags alone. `prune-logs` with no arguments does the
+declared thing; flags remain one-off overrides. That is the governing principle applied to
+this clause — a 90-day window living in a function default is exactly the hardcoded value
+the principle forbids, and it is why the ledger can carry its own longer retention without
+anyone having to remember to pass it.
 
 A verb mirroring `prune-snapshots`: age plus size, **dry-run by default**. Not a background
 sweeper thread. The sister project's unbounded sweeper registry is in the rejected list
@@ -169,15 +263,26 @@ acts on its own.
 Every component opens one per batch — G93's remediation case generalized to `_lineage`,
 `_docmeta`, `_deepdoc` and `scripts/external_vendor_scrape.py`.
 
-**Deferred:** whether `drydocs_api` counts as a component for this clause, since it serves
-requests rather than running batches. Trigger: clause 6's audit line is designed — if that
-line already carries what a run log would, the API needs no second surface.
+**DEFERRAL RESOLVED AT RULING (2026-08-25): `drydocs_api` is OUT of scope, and it was a
+category error rather than a scoping question.** The draft deferred "whether it counts as a
+component", pending clause 6's design. The SME's observation settled it faster: it is the
+web console's backend — `web/**` is the UI proper (72 `.tsx` files) and
+`web/src/lib/graphApi.ts` launches this module via uvicorn — a thin read-only API over the
+graph (ADR 0005, O5). It has no batches at all, so a `LoaderRunLog` there has nothing to
+open one per. Clause 6 is its surface, which is what the deferral was pointing at anyway.
 
-### 6. API request/audit line — DECIDED, one detail deferred
+### 6. API request/audit line — DECIDED, WIDENED AT RULING, one detail deferred
 
-Every Cypher-executing route in `drydocs_api` emits one audit line, actor hashed the way
-`:AgentRun` already hashes it. `/raw-cypher` and `/specs/{id}/run` are the routes that make
-this non-optional.
+Every route in `drydocs_api` that **executes Cypher OR writes** emits one audit line, actor
+hashed the way `:AgentRun` already hashes it. `/raw-cypher` and `/specs/{id}/run` are the
+routes that make this non-optional.
+
+**Widened at ruling (2026-08-25), found while resolving clause 5.** The draft said
+"Cypher-executing" only. `intake.py` (O46) writes — multipart upload to the data root. It
+touches no graph and no tracked file (guarded by `test_no_endpoint_writes_a_tracked_file`),
+so it is not a Cypher route and the drafted wording excluded it. That would have left the
+one API surface that touches the filesystem as the one with no audit trail, which inverts
+the point of the clause.
 
 **Deferred:** whether the line carries the Cypher text itself. Trigger: the ask-search
 question below, which owns it.
@@ -185,17 +290,27 @@ question below, which owns it.
 ### 7. One data-zone declaration — DECIDED, mostly executed by G81 already
 
 `config/data-zones.yaml` is the single declaration and `data_root.py`'s resolvers derive
-from it. G81 built the declaration and the guards; what remains is G109's list — the six
-zones needing a `source-registry` row or a recorded reason, the `dpl/` vs `dpl-registry/`
-reconciliation, resolvers derived rather than restated, `.env.example` gaining
-`DRYDOCS_LOGDIR` (the data root is already there), and the in-tree Confluence capture ruled
-one way against `landing_zones.py`'s tracked-only rule.
+from it. **That decision is unchanged and G109 upheld it. The clause's forward-looking list
+was overtaken before the ruling and is corrected here** — G109 ran on 2026-08-24 because none
+of its remaining work depended on a clause in this ADR.
 
-**One thing this clause must not do:** create a *third* place a zone is declared.
-`config/data-zones.yaml` and `config/source-registry.yaml` already both describe zones, for
-different reasons — the first says what mode a path has, the second says what source lands
-there. G109 gives the six zones registry rows and keeps the zone map the authority on mode;
-it does not merge the two files.
+What G109 actually did, which is not what this clause predicted: it did **not** give the six
+zones `source-registry` rows. Two of them were already satisfied by G81 (the `dpl/` vs
+`dpl-registry/` reconciliation, and resolvers deriving with a guard in both directions). For
+the rest it took the acceptance's own "recorded reason a zone legitimately has none" branch,
+because a write zone has no provenance, trust axis or acquisition mode — its registry row
+would be a field set of nulls asserting a source that does not exist — and because
+`data-zones.yaml`'s header already rules that a zone duplicating a registry row FAILS the
+guard. What it fixed instead was the READ SURFACE: `drydocs landing-zones` reported only the
+registry, so every zone in the other declaration was invisible to the one command that
+answers "are my extracts still there". It now reports both (26 zones, was 15) with a
+mode-aware `--check`. It also ruled the in-tree Confluence capture OUT of the tree and added
+`DRYDOCS_LOGDIR` to `.env.example`.
+
+**One thing this clause must not do, and G109 honoured it:** create a *third* place a zone is
+declared. `config/data-zones.yaml` and `config/source-registry.yaml` already both describe
+zones, for different reasons — the first says what mode a path has, the second says what
+source lands there. The zone map stays the authority on mode; the two files are not merged.
 
 ## Rejected alternatives
 

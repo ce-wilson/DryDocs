@@ -93,7 +93,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-171`** · 2026-08-24 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-171`** · 2026-08-24 · `[idea]` · **open — clauses 1/3/4 were RULED into ADR 0014 (2026-08-25); the `data_zones._resolve()` env-field gap is the un-consumed residue and needs its own item** · prio? **Med** —
   **Logging is configurable globally or not at all; it needs to be configurable BY KIND, and
   `kind` is not yet a thing the code knows about.** User direction, 2026-08-24, taken while
   reviewing ADR 0014 clause 3. MEASURED FIRST (desktop, `C:\coding\projects\logs\DryDocs`,
@@ -147,6 +147,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
   ruled ON the ADR rather than after it — G105 implements clause 1 and would otherwise build
   the global shape first and have it widened immediately. Clause 3 is superseded by the
   derived grammar above. Not started; no code written.
+  **OUTCOME 2026-08-25:** ruled into ADR 0014 as amendments to clauses 1 (per-kind
+  declaration), 3 (derived grammar, ledger exception withdrawn) and 4 (retention read from
+  the declaration), with G105's acceptance given a rider so it builds the amended shape.
+  **WHAT STAYS OPEN, and it is not covered by any of those:** `data_zones._resolve()`
+  ignores a zone's `env:` field, and G81's declared-equals-resolved guard only walks zones
+  carrying a `helper`, so `run-logs` (helper null) is unguarded and resolves to the wrong
+  directory whenever DRYDOCS_LOGDIR is set. The ADR's clause 1 fixes the class by giving
+  the log root ONE resolution site, but that is a forward fix: the guard gap and the
+  currently-wrong zone need closing on their own, and `drydocs landing-zones` reports that
+  zone confidently and wrongly until they are. Groom as a separate item.
 
 - **`Idea-170`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
   **The one-sided allocator partition bit: a company inbox capture landed with NO id at
