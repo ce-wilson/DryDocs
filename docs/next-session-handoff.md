@@ -95,7 +95,20 @@ sat OUTSIDE the parsed section and check 5 passed green on something it structur
 never inspected. Here the obligation sits outside the *read* section. **Test: if a
 capture ends with "they need to…", it is a relay, not an idea.**
 
-## 5. Open and unchanged
+## 5. OWED ON THE DESKTOP — one action, and only that machine can do it
+
+**R23 clause (d): purge `agents/graph_qa/.adk/session.db` on the DESKTOP.** The fix
+landed 2026-08-25 (laptop) and no new turn can write a token, but the stores already on
+disk are unaffected by it. The 2026-08-21 observation was made on the desktop —
+session `ask-jdoe4821-wjtacr8x`, the raw bearer token verbatim in all three user events
+— and those tokens stay REPLAYABLE for the life of the API process, because
+`InMemorySessionStore.issue` mints with no expiry and only `revoke` or a restart ends
+one. **The laptop was checked and is clean** (4 events, zero `api_token` mentions, file
+dated 2026-07-23, i.e. it predates R5), so this is one machine's action, not both.
+Disk hygiene only, not history rewriting: `.adk/` is gitignored, so nothing reached the
+repo. Record the purge in R23's close note with the machine named (J18).
+
+## 6. Open and unchanged
 
 - **Idea-162** — the company occupies `DD1`–`DD10` in the PRODUCER band. Capture-only.
   A 2026-08-24 report describes that series as `DD10001`, which would put it in the
