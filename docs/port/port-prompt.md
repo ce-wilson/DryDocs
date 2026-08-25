@@ -140,9 +140,12 @@ relay, the alias sanitization + Scan D, and the C27 CatalogSubLOB ruling). Certi
 figures are stated AT THE TAG by `port_preflight.py` — venue (J18): desktop. **Two steps
 in this extension need reading before the apply is planned: 226 (Scan D fails on your
 alias ids until your `[db]` revert — sequencing is yours, make it deliberate) and 223
-(the legacy log env var's deprecation drop trigger is THIS port).** The hand prompt for
-the range is `docs/company-prompts/catalog-sublob-and-db-alias-company-prompt.md`; steps
-221-227 carry per-step APPLY notes as usual. If your apply is already in flight against
+(the legacy log env var's deprecation drop trigger is THIS port).** The range's hand prompt (`catalog-sublob-and-db-alias-company-prompt.md`, under
+docs/company-prompts/ AT THE TAG) was DELIVERED BY HAND and executed company-side
+2026-08-25 (the Option 1 relabel ran the same day), then retired producer-side per the
+manifest's delivery-pack rule -- the deletion rides the NEXT range; your copy arrives
+with THIS apply and is yours to retire at close-out. Steps 221-227 carry per-step APPLY
+notes as usual, and step 226's Scan D sequencing instruction stands on its own below. If your apply is already in flight against
 `port-base-20260824c`, finish it and take `port-base-20260824c..port-base-20260825` as
 the next range — do not re-target mid-apply.
 
@@ -3247,8 +3250,9 @@ regeneration, never-port outputs — and get no step.
     NEW Scan D in `tests/unit/test_publish_boundary_values.py`: sha256-pinned (the
     guard never writes the token), trailing-underscore allowance for the deprecated
     env prefix, proven to fire on injected drift.
-    APPLY — **READ `docs/company-prompts/catalog-sublob-and-db-alias-company-prompt.md`
-    §3 BEFORE taking `tests/**` from this range.** Scan D fails on your ten alias ids
+    APPLY — **READ the range's hand prompt §3 (delivered by hand 2026-08-25;
+    `catalog-sublob-and-db-alias-company-prompt.md`, in the range at the tag and on
+    your side already) BEFORE taking `tests/**` from this range.** Scan D fails on your ten alias ids
     until your `[db]` revert lands; tests/** is evaluate-on-collision, so taking it
     red or after the revert is YOUR sequencing call — just make it deliberately.
 

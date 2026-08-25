@@ -12,8 +12,10 @@
 > with amendments, G105 log-kinds, G107 batch run logs, R23 CLOSED — the desktop store
 > was purged 2026-08-25 and §5 below is DONE — the escalation-census relay, the alias
 > sanitization + Scan D, and the C27 CatalogSubLOB ruling). Read steps 226 and 223
-> before planning the apply; the range's hand prompt is
-> `docs/company-prompts/catalog-sublob-and-db-alias-company-prompt.md`. The rest of this
+> before planning the apply; the range's hand prompt
+> (`catalog-sublob-and-db-alias-company-prompt.md`) was delivered by hand and executed
+> company-side 2026-08-25, then retired to internal-local/archive/ per the delivery-pack
+> rule -- still IN the range at the tag, so the apply carries their copy. The rest of this
 > file is the 2026-08-24 narrative and still reads correctly against the longer range.
 
 ## 1. WAVE 2 IS CERTIFIED AND WAITING — AND IT GREW
