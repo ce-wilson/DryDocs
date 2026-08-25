@@ -130,6 +130,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
   transcription slip, but the producer row cannot adopt it and the guards would
   refuse it. The value is not repeated here, which is the rule doing its job: an
   id-shaped string is exactly where a database name stops looking like one.
+  **KEPT-UPDATED 2026-08-25 (user correction, and it found a real gap).** The value is
+  the DATABASE NAME, not an instance SID — the assistant's first framing was wrong. The
+  correction is not the useful part; the gap it exposed is. **Ten shipped ids write
+  `[db]` and nothing recorded what `[db]` IS**, in this repo or the internal twin, from
+  the N9 build on 2026-07-31 until now. A redaction whose real value lives only in a
+  shell profile is not a boundary control, it is a gap shaped like one — and the
+  precedent for closing it already existed:
+  `internal/standards/technology/data-center-inventory.md` is exactly the same artifact
+  for the `P`->`T` swap. Written as
+  `internal/standards/technology/database-inventory.md`, with the grammar, the ten ids
+  it keys, and the two `catalog@[db].[schema].*` rows marked UNRESOLVED rather than
+  redacted (their gate prompt is undrafted, so nobody has hidden anything — nobody
+  knows yet).
+  **AND ONE OPEN RULING IT SURFACED, left for the SME:** the same token is PUBLISHED as
+  an env-var prefix (`SPIDERP_LOGDIR` in `.env.example`, ADR 0014, the `run-drydocs`
+  skill) and named directly in the `reconcile-port` skill's tnsnames caution, while the
+  id grammar redacts it. Either the redaction does less than it looks like, or those
+  four sites want the J13 class-2 treatment. Not swept: ADR 0014 already deprecates
+  `SPIDERP_*` for one cycle so the env prefix has a scheduled death, and the skill
+  mention is a connection mechanism that loses its point if generalized. Same shape as
+  the four J13 classes — the assistant proposes, the SME rules.
 
 - **`Idea-172`** · 2026-08-25 · `[idea]` · **open — groom into EPIC O (SME placement); the UI-display half is a TOP-OF-LIST review, not a build** · prio? **High** —
   **The console admin page should surface the log estate: directory, path, size and capacity per
