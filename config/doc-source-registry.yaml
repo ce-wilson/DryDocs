@@ -190,6 +190,12 @@ sources:
     classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the capture (J23 collapse)
     source: "the 2026-08-19 live Confluence fetch (company-side capture, J18: drydocs-scrape on the company checkout — consolidated HTML + manifest run-20260819T215955Z under internal/knowledge/data/<space>/); supersedes the 2026-07-30 screenshot transcriptions in internal/fcdo-reference/*.md, which remain the provenance trail"
     connector: confluence                 # company-network only; scrape supersedes the transcripts
+    landing_zone: confluence-capture      # G109 (e): the capture lands in the DECLARED read zone under
+                                          # DRYDOCS_DATA_ROOT, never in-tree. The 2026-08-19 capture path
+                                          # recorded in `source:` above is left as written -- it is what
+                                          # happened, and falsifying a provenance record to match a later
+                                          # ruling is the one thing a VERBATIM row may not do. The ruling
+                                          # applies to where the NEXT capture lands; see config/data-zones.yaml.
     manifest: ~                           # provenance + gap ledger lives in internal/fcdo-reference/README.md
     trust_default: VERBATIM               # upgraded 2026-08-19 per this row's own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0 failed). Was GROUNDED while the capture was screenshot transcription
     tier: T4

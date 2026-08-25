@@ -345,3 +345,80 @@ def test_each_zone_path_equals_what_its_helper_actually_resolves(monkeypatch, tm
         "read, so a drift here protects the wrong directory while writes land in "
         "the real one."
     )
+
+
+def test_landing_zones_reports_both_declarations_not_just_the_registry(
+    monkeypatch, tmp_path
+) -> None:
+    """G109 (a): the read surface must cover BOTH declarations.
+
+    `drydocs landing-zones` read only `config/source-registry.yaml`'s manual rows,
+    so every zone `config/data-zones.yaml` declares — including read zones holding
+    real source data — was invisible to the one command whose purpose is that "my
+    extracts are gone" is a one-command answer. A check that silently covers half
+    the zones reads as coverage, and that is the defect rather than the count.
+
+    Asserted against the JSON surface because that IS the contract here (J37: a
+    guard may read CLI output when the output is the contract, and JSON is machine
+    output rather than a render that reflows).
+    """
+    import json
+
+    from typer.testing import CliRunner
+
+    from drydocs import cli
+    from drydocs_core import data_zones as dz
+    from drydocs_core import landing_zones as lz
+
+    monkeypatch.setenv("DRYDOCS_DATA_ROOT", str(tmp_path))
+    result = CliRunner().invoke(cli.app, ["landing-zones", "--json"])
+    assert result.exit_code == 0, result.output
+
+    payload = json.loads(result.stdout)
+    assert set(payload) == {"manual_zones", "declared_zones"}, (
+        "the JSON surface must stay ONE document with both halves — two printed "
+        "arrays do not parse, which would break the machine-readable contract"
+    )
+
+    reported = {row["zone_id"] for row in payload["declared_zones"]}
+    expected = {zone.id for zone in dz.load_zones()}
+    assert (
+        reported == expected
+    ), f"declared zones missing from the read surface: {sorted(expected - reported)}"
+
+    manual = {row["source_id"] for row in payload["manual_zones"]}
+    assert manual == {
+        z.source_id for z in lz.manual_zones()
+    }, "widening the command must not drop the registry half it already covered"
+    assert reported, "no declared zones reported at all — the join is dead"
+
+
+def test_check_fails_on_an_empty_read_zone_but_not_an_empty_write_zone(
+    monkeypatch, tmp_path
+) -> None:
+    """G109 (a): mode decides what EMPTY means, which is why --check is mode-aware.
+
+    An empty READ zone is the signature this command exists to surface — source
+    data that was there and is not. An empty WRITE zone is an output directory the
+    system rebuilds on demand, so failing on it would train the operator to ignore
+    the exit code, which costs more than the check is worth.
+    """
+    from typer.testing import CliRunner
+
+    from drydocs import cli
+    from drydocs_core import data_zones as dz
+
+    monkeypatch.setenv("DRYDOCS_DATA_ROOT", str(tmp_path))
+    zones = dz.load_zones()
+    write_zone = next(z for z in zones if z.mode == dz.WRITE and z.base == dz.BASE_DATA_ROOT)
+    read_zone = next(z for z in zones if z.mode == dz.READ and z.base == dz.BASE_DATA_ROOT)
+
+    write_zone.path.mkdir(parents=True, exist_ok=True)
+    assert (
+        CliRunner().invoke(cli.app, ["landing-zones", "--check"]).exit_code == 0
+    ), "an empty WRITE zone must not fail --check"
+
+    read_zone.path.mkdir(parents=True, exist_ok=True)
+    assert (
+        CliRunner().invoke(cli.app, ["landing-zones", "--check"]).exit_code == 1
+    ), "an empty READ zone must fail --check — it is the missing-source signature"

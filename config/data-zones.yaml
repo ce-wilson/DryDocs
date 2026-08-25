@@ -20,6 +20,20 @@
 # read-mode path. Both directions — the acceptance named only one, and two of the
 # four live findings ran the other way (see the reconstruction §3).
 #
+# WHY A WRITE ZONE HAS NO SOURCE-REGISTRY ROW (G109 (a), recorded rather than
+# fixed). The registry declares SOURCES — where data ARRIVES from and drops in.
+# A write or scratch zone is an output the system owns; it has no provenance, no
+# trust axis and no acquisition mode, so a registry row for one would be a field
+# set of nulls asserting a source that does not exist. That is the "recorded
+# reason a zone legitimately has none" branch, and it covers rua-extracted,
+# remediation-outgoing, remediation-recommendations, vendor-docs, context-intake,
+# cmdline-staging and run-logs. What G109 fixed instead was the READ SURFACE:
+# `drydocs landing-zones` used to read only the registry, so every zone in this
+# file was invisible to the one command that answers "are my extracts still
+# there". It now reports both declarations and --check covers the read zones of
+# each. Mode decides what EMPTY means — an empty read zone is missing source
+# data, an empty write zone is a directory the system rebuilds.
+#
 # READ ZONES ARE NOT DECLARED HERE when they are dataset drops. Those already
 # live in config/source-registry.yaml as `acquisition.drop_dir` (N12), resolved
 # by drydocs_core/landing_zones.py; duplicating them would create exactly the
@@ -176,3 +190,29 @@ zones:
       the DATA root, and a relocated log is annoying where a relocated data root
       is destructive. A log may hold real source values (job names, rejected
       rows), which is why it is outside the repo either way.
+
+  # ---- verbatim doc captures (G109 (e)) -------------------------------------
+  - id: confluence-capture
+    mode: read
+    base: data_root
+    path: confluence-capture/
+    helper: ~   # arrives with the loader that reads it; declaring the zone does not need one
+    note: >
+      RULED AT G109 (e), which required this to be settled one way rather than
+      left as an undocumented violation. The fcdo-frameworks capture
+      (config/doc-source-registry.yaml, VERBATIM, Internal) has been landing
+      IN-TREE under internal/knowledge/data/<space>/. That is the most deletable
+      state a payload can be in: untracked AND not gitignored, which `git clean
+      -fd` removes without even needing -x. THE RULING IS "IT MOVES", not "the
+      rule gains an exception", and the reason it cannot be an exception is that
+      it could never expire — landing_zones.py permits an in-tree zone only when
+      its contents are TRACKED, and PUBLISH-BOUNDARY.md forbids ever tracking a
+      verbatim capture carrying real employee names and internal URLs. An
+      exception here would be permanent by construction. Every sibling verbatim
+      capture already lands out of tree for the same reason: vendor-docs/ exists
+      precisely as "the external/ServiceNow/extracted/ .gitignore precedent
+      generalized to a real out-of-repo home". Read-mode: the capture is the
+      scrape's output and DryDocs' input, so nothing here may write it.
+      COMPANY-SIDE NOTE, since that is where the scrape runs: producer has no
+      internal/knowledge/ directory at all, so this ruling costs nothing to adopt
+      here and is a real relocation only on the checkout that holds the capture.

@@ -85,6 +85,58 @@ class DataZone:
     def creatable(self) -> bool:
         return self.mode in CREATABLE_MODES
 
+    @property
+    def inside_repo(self) -> bool:
+        """True when the resolved zone sits under the repo working tree.
+
+        The same property ``landing_zones.LandingZone`` exposes, and for the same
+        reason: a ``data_root`` zone is safe because it is OUTSIDE the tree, and
+        ``DRYDOCS_DATA_ROOT`` is env-settable, so someone will eventually point it
+        at the checkout. Asserted on the RESOLVED path, never inferred from
+        ``base``.
+        """
+        try:
+            self.path.resolve().relative_to(_REPO_ROOT)
+        except (ValueError, OSError):
+            return False
+        return True
+
+
+@dataclass(frozen=True)
+class ZoneState:
+    """What is actually in a declared zone right now. Read-only, never creates."""
+
+    zone: DataZone
+    exists: bool
+    file_count: int
+
+    @property
+    def empty(self) -> bool:
+        return self.exists and self.file_count == 0
+
+
+def inventory(zones: tuple[DataZone, ...] | None = None) -> tuple[ZoneState, ...]:
+    """Present-or-absent plus a file count per declared zone.
+
+    The read surface G109 gives ``drydocs landing-zones``. Mirrors
+    ``landing_zones.inventory`` deliberately rather than sharing an
+    implementation: the two declarations stay separate files on purpose (see this
+    module's docstring), and a shared walker would be the seam through which they
+    quietly become one. Never creates a directory — a doctor that repairs the
+    tree it is inspecting reports health on damage it just hid.
+    """
+    import os
+
+    out: list[ZoneState] = []
+    for zone in zones if zones is not None else all_zones():
+        exists = zone.path.is_dir()
+        count = 0
+        if exists:
+            for _, _, files in os.walk(zone.path):
+                count += len(files)
+        out.append(ZoneState(zone=zone, exists=exists, file_count=count))
+    return tuple(out)
+
 
 def _resolve(base: str, spec: str) -> Path:
     if base == BASE_HOME:
