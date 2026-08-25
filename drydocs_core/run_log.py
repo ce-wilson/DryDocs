@@ -37,10 +37,14 @@ import logging
 import os
 import sys
 import time
-from collections.abc import Callable, Mapping
+import uuid
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+LOGGER = logging.getLogger(__name__)
 
 DEFAULT_LOGDIR = Path.home() / "logs" / "DryDocs"
 LOGDIR_ENV = "DRYDOCS_LOGDIR"
@@ -220,3 +224,61 @@ class LoaderRunLog:
             self._fh.write(text)
         except OSError:
             pass
+
+
+@contextmanager
+def batch_run_log(
+    name: str,
+    *,
+    run_id: str | None = None,
+    source: str = "",
+    target: str = "",
+    meta: Mapping[str, Any] | None = None,
+) -> Iterator[dict[str, Any]]:
+    """Open a :class:`LoaderRunLog` for one COMPONENT batch and close it on both paths.
+
+    G107. ``drydocs/loaders/base.py`` has always done this correctly — open,
+    capture the exception, re-raise, close in ``finally`` — but it did it inline,
+    so the four components that run their own cadences had no way to get the same
+    behaviour without copying the block. Copying it four times is precisely the
+    drift G107 exists to prevent: four components, four almost-identical shapes,
+    and no single place to fix the one that is subtly wrong. This is that block,
+    once.
+
+    Yields a mutable ``summary`` dict. Fill it during the batch; whatever it holds
+    at exit becomes the log's summary block. The batch's OWN return value is
+    untouched — this records a run, it does not wrap one.
+
+    ``OSError`` while claiming the file is swallowed and the batch runs WITHOUT a
+    log, matching ``base.py._open_run_log``: a run log is an audit trail and must
+    never be the reason a batch fails. An exception inside the batch is recorded
+    and re-raised unchanged.
+
+        with batch_run_log("lineage.curated", target="drydocs") as summary:
+            written = do_the_work()
+            summary["rels written"] = written
+    """
+    log = LoaderRunLog(
+        name,
+        run_id or str(uuid.uuid4()),
+        source=source,
+        target=target,
+        meta=meta,
+    )
+    summary: dict[str, Any] = {}
+    try:
+        path = log.open()
+    except OSError as exc:  # — unwritable log dir: record nothing, run anyway
+        LOGGER.warning("%s: run log unavailable (%s) — continuing without", name, exc)
+        yield summary
+        return
+    log.attach()
+    LOGGER.info("[run-log] %s", path)
+    error: BaseException | None = None
+    try:
+        yield summary
+    except BaseException as exc:
+        error = exc
+        raise
+    finally:
+        log.close(summary, error=error)

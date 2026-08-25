@@ -65,6 +65,7 @@ if str(REPO_ROOT) not in sys.path:  # allow `python scripts/...` without PYTHONP
     sys.path.insert(0, str(REPO_ROOT))
 
 from drydocs_core.data_root import vendor_docs_dir  # noqa: E402
+from drydocs_core.run_log import batch_run_log  # noqa: E402
 from drydocs_docmeta.policy import CapturePolicy, TooManyPagesError  # noqa: E402
 
 #: The ceiling, the politeness delay, the user agent and the scheme allow-list
@@ -301,7 +302,7 @@ def enforce_ceiling(page_count: int, max_pages: int) -> None:
 # --------------------------------------------------------------------------- #
 # capture
 # --------------------------------------------------------------------------- #
-def capture(
+def _capture(
     tree: VendorTree,
     entries: list[TocEntry],
     *,
@@ -458,3 +459,42 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
+
+
+def capture(
+    tree: VendorTree,
+    entries: list[TocEntry],
+    *,
+    delay: float,
+    refresh: bool = False,
+    fetcher=fetch,
+    out_root: Path | None = None,
+) -> dict:
+    """One scrape batch, wrapped in a run log (G107).
+
+    Delegates to :func:`_capture` unchanged. This script printed to stdout only,
+    so a scrape that ran overnight left nothing behind once the terminal closed —
+    the run log is the durable half.
+    """
+    with batch_run_log(
+        f"scrape.{tree.id}",
+        source=tree.id,
+        target=str(out_root or ""),
+        meta={"pages planned": len(entries), "refresh": refresh},
+    ) as summary:
+        result = _capture(
+            tree, entries, delay=delay, refresh=refresh, fetcher=fetcher, out_root=out_root
+        )
+        # The manifest's OWN key names, read from _capture rather than guessed --
+        # a summary that invents field names records nothing anyone can join on.
+        for key in (
+            "toc_nodes_requested",
+            "toc_nodes_recorded",
+            "documents",
+            "documents_fetched_this_run",
+            "documents_skipped_existing",
+            "failed",
+        ):
+            if key in result:
+                summary[key] = result[key]
+        return result

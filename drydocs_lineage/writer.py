@@ -73,6 +73,7 @@ from typing import Any
 import drydocs_core.ontology as _core_ontology
 from drydocs_core import yaml_fragments
 from drydocs_core.ontology.swo_adapter import EXTENSION_LANGUAGE_IRI
+from drydocs_core.run_log import batch_run_log
 
 from .model import VOCAB_IDS, LineageGraph
 
@@ -471,7 +472,7 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
 # --- the live load ---------------------------------------------------------------
 
 
-def write_curated(
+def _write_curated(
     graph: LineageGraph,
     confirmed: set[tuple[str, str, str]],
     client: Any = None,
@@ -911,7 +912,7 @@ def plan_rua(
 RUA_VOCAB_IDS = {"OCCURRENCE_OF": "arch_occurrence_of", "IS_ENCODED_IN": "arch_is_encoded_in"}
 
 
-def write_rua(
+def _write_rua(
     graph: LineageGraph,
     client: Any = None,
     *,
@@ -979,3 +980,54 @@ def write_rua(
         hosts_unresolved=tuple(sorted(hosts_unresolved)),
         coverage=dict(coverage or {}),
     )
+
+
+def write_curated(
+    graph: LineageGraph,
+    confirmed: set[tuple[str, str, str]],
+    client: Any = None,
+    *,
+    registry: Path | None = None,
+) -> int:
+    """Curated ground-truth write, wrapped in a run log (G107).
+
+    Delegates to :func:`_write_curated` unchanged — this adds a record of the
+    run, not behaviour. The empty-``confirmed`` guard runs BEFORE the log opens
+    deliberately: nothing was asked for, so there is no batch to record, and a
+    log per no-op call would bury the real runs.
+    """
+    if not confirmed:
+        return 0
+    with batch_run_log(
+        "lineage.curated",
+        target=DATABASE,
+        meta={"confirmed rels": len(confirmed)},
+    ) as summary:
+        written = _write_curated(graph, confirmed, client, registry=registry)
+        summary["rels written"] = written
+        summary["confirmed rels"] = len(confirmed)
+        return written
+
+
+def write_rua(
+    graph: LineageGraph,
+    client: Any = None,
+    *,
+    bundle_dir: str | Path | None = None,
+    registry: Path | None = None,
+    coverage: dict[str, Any] | None = None,
+) -> RuaLoadReport:
+    """The live rua load, wrapped in a run log (G107).
+
+    Delegates to :func:`_write_rua` unchanged.
+    """
+    with batch_run_log(
+        "lineage.rua",
+        target=DATABASE,
+        source=str(bundle_dir or ""),
+    ) as summary:
+        report = _write_rua(
+            graph, client, bundle_dir=bundle_dir, registry=registry, coverage=coverage
+        )
+        summary["report"] = report
+        return report

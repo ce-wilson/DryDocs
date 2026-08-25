@@ -24,6 +24,8 @@ import urllib.error
 import urllib.request
 from collections.abc import Callable
 
+from drydocs_core.run_log import batch_run_log
+
 from ..policy import CapturePolicy
 from .base import FetchSource, RawPage, SourceUnavailableError
 
@@ -57,7 +59,7 @@ class WebConnector:
         self._transport = transport or urllib_transport
         self._sleep = sleep
 
-    def fetch(self, source: FetchSource) -> list[RawPage]:
+    def _fetch(self, source: FetchSource) -> list[RawPage]:
         # 1. Refuse before touching the network. The location list is already
         #    resolved (from the publisher's manifest), so this is exact.
         self.policy.enforce_ceiling(len(source.locations), max_pages=source.max_pages)
@@ -75,6 +77,23 @@ class WebConnector:
                 self._sleep(self.policy.delay_seconds)
             pages.append(self._fetch_one(location, headers))
         return pages
+
+    def fetch(self, source: FetchSource) -> list[RawPage]:
+        """One acquisition batch, wrapped in a run log (G107).
+
+        Delegates to :meth:`_fetch` unchanged — this records that the batch ran
+        and what it acquired; it does not change what is fetched. Keeps the
+        public name so the ``Connector`` protocol is still satisfied.
+        """
+        with batch_run_log(
+            "docmeta.web",
+            source=source.id,
+            meta={"connector": "WebConnector"},
+        ) as summary:
+            pages = self._fetch(source)
+            summary["pages fetched"] = len(pages)
+            summary["bytes fetched"] = sum(len(page.body) for page in pages)
+            return pages
 
     def _fetch_one(self, location: str, headers: dict[str, str]) -> RawPage:
         last: Exception | None = None
