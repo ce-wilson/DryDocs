@@ -271,3 +271,76 @@ def test_data_center_names_are_not_production() -> None:
         "value moves) and keep the real value in the internal/ twin:\n"
         + "\n".join(sorted(set(violations)))
     )
+
+
+# ---- Scan D: redacted infrastructure names (SME ruling 2026-08-25) ----------
+
+#: sha256 of every token the publish boundary redacts by NAME rather than by
+#: shape. HASHED, never written literally, for the reason this module's docstring
+#: gives: a guard that embeds the value it protects leaks it in the act of
+#: guarding. Both cases are pinned because a lowercase spelling publishes the
+#: token just as effectively as an uppercase one.
+#:
+#: Entry 1 is the Oracle database alias behind `[db]` in every `*@[db].psgmgr.*`
+#: id. The signed grammar (gate `source-registry-v2` 2026-07-31; `gate-log.md`
+#: :1075 and :2971) redacts the DATABASE and keeps the schema. The SME ruled
+#: 2026-08-25 that it is an ALIAS rather than a SID and is still not published.
+#: The real value lives in `internal/standards/technology/database-inventory.md`,
+#: which is outside the publish boundary and is the designed home for the
+#: placeholder -> value key.
+REDACTED_NAME_HASHES = {
+    "acf450137af266f39ded914223648645fb3a4144bbe4c5f73e2789ee62d7cb68",
+    "5b511eb811e26bfa455d1ffc224b397f18cfd27908be74a549c1eeae35f12141",
+}
+
+#: The ONE published form that is allowed, and why. The token also serves as a
+#: deprecated env-var PREFIX (`<alias>_LOGDIR`, `_CALLER`, `_DSN`), kept so a live
+#: shell or scheduled job exporting the old name keeps working; renaming it
+#: defeats the only reason it exists and the failure is silent. ADR 0014 clause 1
+#: (accepted 2026-08-25) rules the prefix DROPPED at the next port after
+#: acceptance, so THIS ALLOWANCE IS TEMPORARY -- when that lands, delete this
+#: constant and the guard tightens to "no published form at all".
+_ENV_PREFIX_MARKER = "_"
+
+_TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9]{4,15}")
+
+
+def test_redacted_infrastructure_names_are_not_published() -> None:
+    """A name the boundary redacts must not appear in the publishable tree.
+
+    The J15 lesson one level over: those sweeps grepped the FIELD name while real
+    values survived as VALUES. This is the mirror case -- the id grammar redacted
+    the database in every id, and the same token then sat in prose in a skill, in
+    `PORT-MANIFEST.yaml` and in a port archive, doing a different job. Three
+    tracked files published exactly what twenty-eight ids were careful to remove.
+    """
+    import hashlib
+
+    offenders: list[str] = []
+    # _tracked_files() already drops internal/ and binaries -- the publishable
+    # tree by the same definition the other three scans use, not a second one.
+    for rel in _tracked_files():
+        body = _read(rel)
+        for match in _TOKEN.finditer(body):
+            token = match.group(0)
+            if hashlib.sha256(token.encode()).hexdigest() not in REDACTED_NAME_HASHES:
+                continue
+            if body[match.end() : match.end() + 1] == _ENV_PREFIX_MARKER:
+                # `<token>_...` is the env-var PREFIX, the temporary allowance
+                # above. A trailing underscore is the whole distinction the SME
+                # ruling draws: the bare token is the published NAME, the
+                # prefixed form is a compatibility mechanism with a scheduled
+                # end. Enumerating suffixes instead (_LOGDIR, _CALLER) was the
+                # first cut and missed _DSN and the bare `<token>_` references
+                # in prose -- an allowlist of spellings rots the moment someone
+                # writes a fourth one.
+                continue
+            line = body[: match.start()].count(chr(10)) + 1
+            offenders.append(f"{rel}:{line}")
+
+    assert not offenders, (
+        "a redacted infrastructure name is published in: "
+        + ", ".join(sorted(set(offenders)))
+        + ". The value belongs in internal/ (outside the boundary), never in a "
+        "tracked publishable file. This guard names the FILE, never the value."
+    )

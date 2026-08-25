@@ -321,7 +321,7 @@ rows:
   - path: "docs/design/controlm-ingestion-tdd.md"
     disposition: canonical-company
     note: >
-      the consumer's TDD is FINALIZED (2026-07-15) and ahead — carries the SPIDERP §7f
+      the consumer's TDD is FINALIZED (2026-07-15) and ahead — carries the psgmgr §7f
       audit chain + live-verified content; the producer copy is the mirror. Producer-side
       corrections that originated FROM the finalized doc (e.g. the D4 IS_CURRENT_VERSION
       'Y' fix, step 34) are already present consumer-side by construction.

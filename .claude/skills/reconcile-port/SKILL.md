@@ -293,8 +293,8 @@ present. For a fresh `psgmgr` pull:
   alias). In that config a plain `--use-oracle` run uses OCI and WILL hit the
   real Kerberos SPN errors (ORA-12514 / ORA-12638) — that is a DBA / SPN /
   tnsnames issue, NOT a code toggle. Thin mode is only an option if you can set
-  `ORACLE_KERBEROS=False` AND supply a real `host:port/service` DSN (a TNS alias
-  like `SPIDERP` resolves only via tnsnames and won't work thin).
+  `ORACLE_KERBEROS=False` AND supply a real `host:port/service` DSN (a bare TNS
+  alias resolves only via tnsnames and won't work thin).
 - Scope binds are **connection-mode agnostic** (NULL-tolerant SQL predicates —
   they work the same under thick/Kerberos once the SQL is ported): `--folder`
   (SCHED_TABLE LIKE), `--run-as` (tenant FID = `OWNER`), `--developer-sid`

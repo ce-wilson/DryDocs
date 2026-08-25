@@ -51,9 +51,24 @@ see the row's own notes).
 **The same token is published as an environment-variable prefix while being redacted as a
 database name.** `SPIDERP_LOGDIR` appears in tracked, publishable files — `.env.example`,
 [`docs/decisions/0014-runtime-substrate.md`](../../../docs/decisions/0014-runtime-substrate.md),
-the `run-drydocs` skill — as the deprecated alias for `DRYDOCS_LOGDIR`, and the `reconcile-port`
-skill names `SPIDERP` directly in its tnsnames caution. So the value the id grammar removes is
-sitting in four other tracked files under a different job.
+the `run-drydocs` skill — as the deprecated alias for `DRYDOCS_LOGDIR`. So the value the id
+grammar removes is sitting in other tracked files under a different job.
+
+**SME RULING, 2026-08-25: it is an ALIAS NAME, not a SID — and it is still not to be published.**
+Sanitize it. Acted on the same day for the two PROSE mentions, which had no mechanism cost:
+the `reconcile-port` skill's tnsnames caution now reads "a bare TNS alias" and names none, and
+both `PORT-MANIFEST.yaml` and the steps-1-42 port archive now say `psgmgr §7f` — the SCHEMA,
+which the signed grammar explicitly keeps (`gate-log.md:2971`: "the DATABASE redacted to `[db]`
+and the schema kept").
+
+**What the ruling does NOT resolve by itself, because it has an operational cost:** the
+`SPIDERP_LOGDIR` / `SPIDERP_CALLER` env-var PREFIX. Renaming it defeats the only reason it
+exists — backward compatibility for a live shell or scheduled job still exporting the old name,
+and that failure is silent. ADR 0014 clause 1 (accepted 2026-08-25) already rules the prefix
+DROPPED, with its trigger named as the next port after acceptance. So the ruling and the
+deprecation converge on the same end state; the open question is only whether the drop is
+accelerated to now or left to its trigger. Either way the prefix stops publishing the token —
+this is a timing call, not a second ruling.
 
 Either the redaction is doing less than it appears to, or the env prefix and the skill mention
 should be swept the way the data-center codes were at J13 class 2. **This is the SME's ruling,
