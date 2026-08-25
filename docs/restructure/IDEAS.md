@@ -93,6 +93,44 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-173`** · 2026-08-25 · `[bug]` · **open** · prio? **High** —
+  **A company session recorded a census on `config/source-registry.yaml`, which is
+  `canonical-producer` — so the next port deletes it.** Not hypothetical and not a
+  criticism of that session: it asked the right question, got the right answer for
+  where a loaderless object's census belongs, wrote it in the right FILE, and the
+  file is one the port overwrites wholesale. `PORT-MANIFEST.yaml` has NO row for
+  `source-registry.yaml` (only `doc-source-registry.yaml` has its own), so it falls
+  to the `config/**` default, which is `canonical-producer`. The census landed
+  producer-side in this same commit so the port carries it TO them, which is the
+  direction that survives.
+  **N10 ALREADY NAMED THIS EXACT FAILURE and it has now happened twice.** Its gate
+  prompt (`registry-wiring-readiness`, drafted 2026-08-19) argues from the port
+  asymmetry: *"the company's cm_hosts wiring hold is OVERWRITTEN by the producer's
+  `confirmed: true` at every port and survives only because a human pinned it and
+  armed a re-arm trigger."* That was one field on one row; this is a whole census
+  paragraph. **The generalization worth capturing: a canonical-producer file has no
+  company-writable surface at all, so "where does a company-side FACT about a
+  company-side system live?" has no answer today** — and the answer keeps being
+  discovered per-file, at the cost of the work already written.
+  **THE SECOND HALF — the census-only ledger class.** `test_source_mapping_drift.py`
+  requires every `psgmgr.yaml` object to be exercised by at least one loader SQL, so
+  a registered-not-loaded object cannot go in the column ledger. That guard is RIGHT
+  and must not be loosened for this. But it leaves column inventory for a loaderless
+  object with nowhere structured to live — it went into a `notes:` prose block, which
+  no `census_failures()` can reconcile and no drift check can read. If the ledger
+  should ever hold it, that is a deliberate schema change (an object class the drift
+  guard SKIPS *because* it is registered-not-loaded, with the skip stated rather than
+  implied), not a quiet guard edit. Capture-only until something actually needs to
+  query a loaderless census.
+  **Third, smaller, and the reason to check the id at the next port:** the company's
+  row substitutes the REAL DATABASE NAME into the `{db}` slot of the id. The
+  producer's is `seal@[db].psgmgr.cm_escalation_db`, and that placeholder is the
+  SIGNED N9 grammar (J13 class 3: redact the db, publish schema.table), pinned in
+  `tests/unit/test_source_registry.py`. Either that is a local divergence or a
+  transcription slip, but the producer row cannot adopt it and the guards would
+  refuse it. The value is not repeated here, which is the rule doing its job: an
+  id-shaped string is exactly where a database name stops looking like one.
+
 - **`Idea-172`** · 2026-08-25 · `[idea]` · **open — groom into EPIC O (SME placement); the UI-display half is a TOP-OF-LIST review, not a build** · prio? **High** —
   **The console admin page should surface the log estate: directory, path, size and capacity per
   kind.** SME direction, 2026-08-25, given alongside the ADR 0014 retention rulings. Epic O already

@@ -210,7 +210,7 @@ objects:
   - name: CM_DEF_LNKI_P_VW
     kind: view
     profile:
-      profiled_on: ~
+      profiled_on: 2026-08-24
       via: >
         Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
         internal session 2026-08-24 — conclusions transcribed producer-side,
@@ -261,7 +261,7 @@ objects:
   - name: CM_DEF_LNKO_P_VW
     kind: view
     profile:
-      profiled_on: ~
+      profiled_on: 2026-08-24
       via: >
         Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
         internal session 2026-08-24 — conclusions transcribed producer-side,
@@ -310,7 +310,7 @@ objects:
   - name: CM_DEF_SETVAR_VW
     kind: view
     profile:
-      profiled_on: ~
+      profiled_on: 2026-08-24
       via: >
         Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
         internal session 2026-08-24 — conclusions transcribed producer-side,

@@ -597,6 +597,30 @@ datasets:
       feeds_taxonomy: []), so no graph data is affected by the discrepancy — the
       claim is what was wrong, and it is corrected here rather than left to be
       read as licence.
+      CENSUS RECORDED 2026-08-25 (relayed): read-only catalog census
+      (ALL_TAB_COLUMNS + row count) run against live psgmgr in an internal
+      session 2026-08-24 — conclusions transcribed producer-side, NO data values
+      read, and the database name stays out of the id per the signed N9 grammar
+      (J13 class 3: redact the db, publish schema.table). Real TABLE, 30
+      columns, 934,402 rows at census time. SHAPE: `EJOBNAME` VARCHAR2(64) NOT
+      NULL is the join key and it is JOB grain — which is the whole reason the
+      2026-08-17 correction above exists. Routing is three triads per dimension
+      (`E<dim>FAILED` / `E<dim>LS` / `E<dim>LR`) across WORKGROUP, SYSTEM,
+      COMPONENT (= SEAL), ITEM, MODULE, SEVERITY and PAGEOUT;
+      `ESPECIALINSTRUCTIONS` VARCHAR2(4000) is the field the
+      `email-dl-contact-point` gate names as a candidate authoritative source
+      for job→DL notification wiring, and that gate is NOT signed — its only
+      gate-log entry is a 2026-08-12 RECORD. Remaining columns: ELOB,
+      EAPPLICATION VARCHAR2(72), ENV NOT NULL, EUSER, EUPDATETIME, SCHEDULER
+      NOT NULL, CAPTURE_DATE.
+      WHY THE CENSUS LIVES HERE AND NOT IN THE COLUMN LEDGER, because the
+      question will be asked again: `config/source-mappings/psgmgr.yaml` is the
+      doc-08 disposition ledger and `tests/unit/test_source_mapping_drift.py`
+      requires EVERY ledger object to be exercised by at least one loader SQL.
+      This table has no loader by design (`confirmed: false`, `adapter: ~`), so
+      adding it there would break that guard — correctly. A census is a FACT and
+      records here; a column-disposition ledger is a set of DECISIONS about
+      where each column lands, and those are gate work, not transcription.
 
   # ---- Control-M born-here export --------------------------------------------
   - id: "controlm:deftable-xml-export"
