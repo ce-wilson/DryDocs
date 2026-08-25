@@ -5,9 +5,16 @@
 > `docs/restructure/backlog/` (the claim channel — one file per item) and
 > `docs/port/port-prompt.md`; this is the narrative that git alone does not carry.
 >
-> **Written 2026-08-24 (laptop `NewThinkpad`, second session of the day, at the roll
-> commit itself), certified base = tag `port-base-20260824c`.** Two earlier tags carry
-> the same day's date and are superseded, not withdrawn — see §1.
+> **Updated 2026-08-25 (desktop, at the 20260825 certification): certified base is now
+> tag `port-base-20260825` — 230 commits, `213e1d12..port-base-20260825`, preflight 7/7,
+> suite 2431/11 (desktop MSI), steps 178-227.** The 2026-08-24 series below is superseded
+> by extension, not withdrawn: this tag is `...824c` plus steps 221-227 (ADR 0014 ruled
+> with amendments, G105 log-kinds, G107 batch run logs, R23 CLOSED — the desktop store
+> was purged 2026-08-25 and §5 below is DONE — the escalation-census relay, the alias
+> sanitization + Scan D, and the C27 CatalogSubLOB ruling). Read steps 226 and 223
+> before planning the apply; the range's hand prompt is
+> `docs/company-prompts/catalog-sublob-and-db-alias-company-prompt.md`. The rest of this
+> file is the 2026-08-24 narrative and still reads correctly against the longer range.
 
 ## 1. WAVE 2 IS CERTIFIED AND WAITING — AND IT GREW
 
