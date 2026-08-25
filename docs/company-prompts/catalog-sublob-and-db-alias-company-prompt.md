@@ -114,11 +114,11 @@ Worth noting the guard's allowance is the **trailing underscore**: `<alias>_LOGD
 
 ---
 
-## 4. The Sub-LoB label — the one genuinely open catalog question
+## 4. The Sub-LoB label — RULED, and two corrections to your C27 review
 
 Your C27 review was accurate on four of five points and found the gate reversal
-(`gate-log.md:1678`, 2026-08-06) that the producer had only inferred. Two corrections, and the
-second is the reason this section exists.
+(`gate-log.md:1678`, 2026-08-06) that the producer had only inferred. Two corrections below;
+the second was the last genuinely open catalog question and is now ruled.
 
 ### Correction A — the reserved map ids are the wrong names
 
@@ -128,10 +128,17 @@ C26 reserved `sub-lob-org-unit` and `catalog-lob-reconciles-segment` (producer
 
 The reservation's stated purpose was that *"a port collides on a deliberate placeholder
 instead of silently adding a duplicate concept."* It cannot do that — it reserved names nobody
-uses. The producer will retire the two dead placeholders and reserve your two real ids
-instead. Nothing for you to do; recorded so the next port's ledger explains the change.
+uses.
 
-### Correction B — the label question is NOT settled, only settled for LOB
+**Done producer-side 2026-08-25:** both are now `rejected` with `superseded_by`
+(`sub-lob-org-unit` → `lob-has-sub-lob`, `catalog-lob-reconciles-segment` →
+`lob-reconciles-to-segment`) — the audit-kept lifecycle, not a delete. Your two real ids are
+recorded as **names the producer must not mint** rather than as producer map rows, because the
+producer models no Sub-LoB grain and a row for a concept it does not hold would be a second
+fiction beside the one being retired. Nothing for you to do; recorded so the next port's
+diff explains itself.
+
+### Correction B — the label was settled only for LOB, and Sub-LoB went the other way
 
 You report Sub-LoB as "BUILT and ACTIVE company-side" and treat that as closing it. The
 **grain** is settled. The **label** is not, and your build has already answered it the way the
@@ -159,19 +166,36 @@ planned. The merge keeps yours. No duplicate, no `FragmentSourceError`.
 the producer holds `CatalogSubLOB` planned, indefinitely — two labels for one concept, which
 is precisely what the LOB reversal was run to end.
 
-### Three ways out, and the producer's position
+### RULED 2026-08-25 (SME): `CatalogSubLOB` — Option 1
 
-1. **Company relabels `SubLOB` → `CatalogSubLOB`**, keeps the vocab id, producer flips its
-   planned entry active. One shape both sides. Costs you a relabel of a build you just did.
-   **This is the producer's recommendation**, on the LOB precedent alone.
-2. **Company renames its vocab id** to something company-scoped and keeps `SubLOB`. Removes
-   any id ambiguity but freezes the two-label divergence permanently.
-3. **Producer adopts `SubLOB`**, retiring its `CatalogSubLOB` reservation. Consistent within
-   Sub-LoB, inconsistent with the LOB ruling made six weeks earlier.
+**The company relabels `:SubLOB` → `:CatalogSubLOB`. The shared vocab id
+`catalog_has_sub_lob` is unchanged; only the target label moves.** Recorded producer-side at
+`config/gate-log.md`, heading *"2026-08-25 — RULING: catalog Sub-LoB label"*.
 
-The producer is not choosing for you and there is no gate blocking your side. What matters is
-that **the choice is made deliberately and recorded in your ledger**, rather than left as the
-default that (2) becomes by inaction.
+The two alternatives were considered and are recorded there as rejected: renaming your vocab
+id to something company-scoped removes the id ambiguity but freezes the two-label divergence
+permanently, and having the producer adopt `:SubLOB` would reverse the LOB ruling one level
+down. The LOB precedent is the reason — **your own gate reversal of 2026-08-06** adopted the
+producer model at that level, and the hierarchy should not disagree with itself between LOB
+and Sub-LoB.
+
+**What this costs you: a relabel of a build you just finished** — `sub_lobs.cypher`, the
+`SubLOB` node class in `15-node-classifications-company.yaml`, the `to_node` on
+`catalog_has_sub_lob` in `49-local-company.yaml`, and `product_lines.cypher`'s widened
+`HAS_PRODUCT_LINE` anchor. The keying is untouched: you keyed on the native PAT Sub-LoB ID
+from the People Report, and that stays.
+
+**What it does NOT cost you: any urgency.** The earlier producer note claiming the guard goes
+red on the next port was wrong (see above) — the per-entry rule keeps your active entry either
+way. Sequence the relabel with your own work; nothing is blocked and nothing breaks while it
+is outstanding.
+
+**The producer side of Option 1 is deliberately NOT "flip the planned entry active."** Its
+`catalog_has_sub_lob` and `catalog_sub_lob_has_product_line` stay `planned`: the producer
+models no Sub-LoB grain, captures no Sub-LoB column, and has no loader — and an active entry
+with no loader is a claim this repo does not allow. The ruling authorizes; the flip is a
+follow-up that arrives with a build. So do not expect an active producer entry in the next
+port, and do not read its absence as the ruling being unsettled.
 
 ---
 
@@ -182,10 +206,11 @@ overtaken, as you said. Your conclusion to re-scope rather than relitigate is ri
 *"relitigating the settled three is exactly what the C26/C27 notes warn against"* is a fair
 reading of them.
 
-The producer is re-scoping C27 to **the Sub-LoB label ruling plus the map-id reservation
-cleanup** — not down to the `app_id` alignment. `app_id` stays where it already lives on your
-side (T1, Tier-B HELD, rebuild-not-migrate); pulling it into a catalog gate would give it a
-second owner. The three settled items are cited as settled, with the reversal as their
-authority.
+**C27 is CLOSED producer-side (2026-08-25)**, re-scoped exactly as you suggested and then
+finished: the Sub-LoB label ruling (§4) plus the map-id reservation cleanup (Correction A).
+Not scoped down to `app_id` — that stays where it already lives on your side (T1, Tier-B HELD,
+rebuild-not-migrate), because pulling it into a catalog ruling would give it a second owner.
+The three items your review found already settled are cited as settled, with your 2026-08-06
+reversal as their authority, and are not relitigated.
 
 Nothing in this section needs anything from you.

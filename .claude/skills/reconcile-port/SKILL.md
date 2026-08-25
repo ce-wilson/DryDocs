@@ -180,13 +180,24 @@ stay skipped — confirm with the operator if a new one appears.
      and the flattening is INVISIBLE: a sub-LoB id in `parent_lob_id` MERGEs a phantom LOB.
   2. **Range** — company widens `HAS_PRODUCT_LINE` to `(:SubLOB|:LOB) → ProductLine`; producer
      `catalog_has_product_line` is `CatalogLOB → ProductLine` only.
-  3. **Label** — company writes `:LOB {lob_id, name}`; producer writes `:CatalogLOB {lob_id,
-     code, name}` (`catalog_lobs.cypher`). Same thing, two labels — the fallback branch in
-     (1) and our loader cannot both be right.
-  4. **Map ids** — company page expects `sub-lob-org-unit` and `catalog-lob-reconciles-segment`;
-     producer has `lob-has-product-line` and `lob-reconciles-to-segment` (confirmed 2026-06-21).
-     Both company ids are now RESERVED `proposed` in `30-mappings-catalog.yaml` so a port
-     collides on a deliberate placeholder instead of silently adding a duplicate concept.
+  3. **Label — SETTLED, both levels, and NOT by C27.** LOB: the company's own **GATE
+     REVERSAL of 2026-08-06** (their `gate-log.md:1678`, port `drydocs-port-20260806`,
+     producer head `a14a8028`) retired the 2026-06-25 gate and adopted the full producer
+     model — `:LOB` -> `:CatalogLOB`, `code` reinstated, TC-CAT-003 retired. Both sides now
+     `MERGE (l:CatalogLOB {lob_id: ...})`. Sub-LoB: **RULED 2026-08-25 (SME, Option 1) —
+     `CatalogSubLOB`**; the company relabels its active `:SubLOB` build, the producer's
+     reserved label stands, the shared vocab id `catalog_has_sub_lob` is unchanged. Do NOT
+     re-open either as a divergence to preserve.
+  4. **Map ids — the C26 reservation named the WRONG ids and is retired.** It reserved
+     `sub-lob-org-unit` + `catalog-lob-reconciles-segment` off the 2026-06-25 page; the company
+     actually built `lob-has-sub-lob` + `sub-lob-has-product-line` and KEPT the producer's
+     `lob-reconciles-to-segment`. Both reservations moved to `rejected` with `superseded_by`
+     at the C27 ruling (2026-08-25) — a placeholder guarding a name nobody mints guards
+     nothing. The producer keeps `lob-has-product-line` / `lob-reconciles-to-segment`
+     (confirmed 2026-06-21); the company's two live in their own company-only fragment and
+     never arrive here. **The real reservation is a rule, not a row: the producer must not
+     mint `lob-has-sub-lob` or `sub-lob-has-product-line` for anything else** — the per-entry
+     merge is id-keyed, so that would land as one id with two meanings.
   5. **Capture grain** — company ingests the 5-field `pat_lob_sublob_productline.csv` (164
      rows, with a Sub-LoB Name column); producer `config/taxonomy/lob-product-team.yaml`
      has no Sub-LoB column at all.

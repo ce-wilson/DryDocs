@@ -49,9 +49,13 @@
       PLANNED (C26, 2026-08-21) — reservation only. LOB contains sub-LoBs; at source
       "only CIB and AWM have them". The company gate page introduces it as
       (:LOB)-[:HAS_SUB_LOB]->(:SubLOB); the producer registers the NAME under its own
-      label convention and adopts nothing. TRIGGER: the C27 gate's joint label + key
-      ruling. Until then the producer chain stays CatalogLOB -> ProductLine and the
-      flattening is recorded as a known divergence, not a bug.
+      label convention and adopts nothing. TRIGGER FIRED 2026-08-25 — the C27 label
+      ruling (gate-log, Option 1) settles CatalogSubLOB: the company relabels and this
+      to_node stands. STATUS DELIBERATELY STAYS planned: the ruling AUTHORIZES, it does
+      not perform (flips-are-follow-ups). The producer models no Sub-LoB grain, captures
+      no Sub-LoB column and has no loader, and an active entry with no loader is the
+      claim this repo does not allow. The producer chain stays CatalogLOB -> ProductLine
+      and the flattening remains a known, recorded divergence.
     supplement:   ~
     loader:       ~
     domain:       catalog

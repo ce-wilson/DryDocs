@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - C26
 inputs:
@@ -22,3 +22,58 @@ acceptance: |
   A gate prompt is drafted and RUN, and its outcome transcribed to config/gate-log.md under a slug-named heading. It rules, in one session because they interact: (a) whether `:SubLOB` + `HAS_SUB_LOB` enter the producer ontology and with what range widening on HAS_PRODUCT_LINE; (b) the label ruling `:LOB` vs `:CatalogLOB` — the two sides write DIFFERENT labels for the same thing, so the company's `:LOB {lob_id}` fallback branch and our `catalog_lobs.cypher` cannot both be right; (c) the map-id reconciliation; and (d) how the S3 `app_id` key lands on shapes authored before the rename. Confirmed entries flip from `planned` to `confirmed` with their loader builds groomed as follow-ups; anything deferred is recorded with the consequence stated. The C22/C24 coalesce and orphan-flag conventions are applied to any loader this touches, not re-litigated.
 notes: |
   TRIGGER, and it is external: the COMPANY gate's own sign-off. Producer sign-off is not company sign-off (the standing rule — their tracker is T1-T8/DD*), and adopting a shape from an UNSIGNED company gate page would import a proposal as if it were a ruling. So this item stays `todo` and simply does not become ready until C26 is done AND the trigger fires; do not "unblock" it by relaxing the dependency. WHY THE FLATTENING IS URGENT ENOUGH TO GATE RATHER THAN SHRUG AT: our chain runs BusinessSegment → CatalogLOB → ProductLine → Product → AreaProduct while the source runs LoB → Sub-LoB → Product Line → …, so we silently flatten one level — and the flattening is INVISIBLE rather than merely absent, because `parent_lob_id` on a product line will carry whatever the extract puts there. A sub-LoB id landing in a `:CatalogLOB`-keyed field MERGEs a phantom LOB that looks exactly like a real one. Corroborated three ways (SME statement 2026-08-01, the FCDO capture's "5-level hierarchy … native IDs at each level", and the company's own gate page).
+  DONE 2026-08-25 (desktop). CLOSED BY RULING, NOT BY A GATE SESSION — three of the four
+  questions the acceptance bound together were already settled OUTSIDE this item, and binding
+  them was the premise that expired.
+
+  THE EXTERNAL TRIGGER FIRED IN THE OPPOSITE DIRECTION FROM THE ONE THE NOTES EXPECTED. The
+  notes say this item waits on "the COMPANY gate's own sign-off" and warn against relaxing the
+  dependency. That gate was not signed -- it was REVERSED. The company's own gate-log records a
+  2026-08-06 GATE REVERSAL (port drydocs-port-20260806, producer head a14a8028) retiring the
+  2026-06-25 page and adopting the FULL PRODUCER catalog model: :LOB -> :CatalogLOB, `code`
+  reinstated, TC-CAT-003 retired. Producer-side the same event is recorded at
+  docs/port/port-prompt.md:339. So the dependency was never relaxed; the thing it waited for
+  happened and resolved three questions in the producer's favour.
+  (b) LABEL, LOB half: settled by that reversal. Both sides now MERGE (l:CatalogLOB {lob_id}).
+  (a) SUB-LOB GRAIN: settled by a company build -- vocab active, node class, sub_lobs.cypher,
+      product_lines.cypher widened, keyed on the native PAT Sub-LoB ID.
+  (c) MAP IDS: settled by the company ADDING company-only rows rather than renaming producer
+      ones; the producer keeps lob-has-product-line / lob-reconciles-to-segment.
+  (d) S3 app_id: NOT closed here and deliberately not pulled in. It is Tier-B HELD company-side
+      under their tracker T1, rebuild-not-migrate; a catalog ruling would give it a second owner.
+
+  WHAT THIS ITEM ACTUALLY RULED — the one question the reversal did NOT reach. The label
+  question repeated one level down and nobody noticed while everyone looked at LOB: the company
+  built :SubLOB, the producer reserved CatalogSubLOB, same shared vocab id catalog_has_sub_lob,
+  different to_node. SME RULED Option 1: CatalogSubLOB. The company relabels, the producer's
+  reserved label stands, the vocab id is unchanged. Recorded in config/gate-log.md under
+  "2026-08-25 — RULING: catalog Sub-LoB label", with the two rejected alternatives and why the
+  LOB precedent decides it.
+
+  A PRODUCER CLAIM CORRECTED IN THE COURSE OF RULING IT. An earlier producer note said the
+  divergence made a guard "go red on the next port either way". False, and the urgency was the
+  wrong reason to act: relationship_vocabulary/** is per-entry and its rule is explicit --
+  never downgrade an ACTIVE consumer entry to the producer's planned. The company entry is
+  active with a loader behind it, so the merge keeps it; no duplicate, no FragmentSourceError.
+  The substance stood (two labels, one concept) but it was a divergence with no expiry rather
+  than a deadline, and the ruling is recorded on that footing.
+
+  THE C26 RESERVATIONS ARE RETIRED FOR NAMING THE WRONG IDS. C26 reserved sub-lob-org-unit and
+  catalog-lob-reconciles-segment off the 2026-06-25 page; the company built lob-has-sub-lob and
+  sub-lob-has-product-line and KEPT lob-reconciles-to-segment. A placeholder guarding a name
+  nobody mints guards nothing, so the stated purpose was never served. Both moved to `rejected`
+  with superseded_by (the C12 requires-scheduler lifecycle, audit-kept not deleted); the summary
+  recount is proposed 8->6, rejected 1->3. The real company ids are recorded as NAMES THE
+  PRODUCER MUST NOT MINT rather than as producer map rows -- a row for a concept the producer
+  does not model would be a second fiction beside the one being retired.
+
+  FLIPS ARE FOLLOW-UPS: the ruling AUTHORIZES and performs nothing. catalog_has_sub_lob and
+  catalog_sub_lob_has_product_line stay `planned`. The producer models no Sub-LoB grain,
+  captures no Sub-LoB column and has no loader, and an active entry with no loader is the claim
+  this repo does not allow. No follow-up item is minted because there is no producer work until
+  a Sub-LoB capture exists; the condition is recorded on the vocabulary entry instead.
+
+  ALSO UPDATED: the reconcile-port divergence ledger (items 3 and 4 rewritten -- label settled
+  at BOTH levels, map-id reservation retired with the must-not-mint rule), and the company hand
+  prompt, which now states the ruling instead of offering three options.
+  Suite green; ruff clean.

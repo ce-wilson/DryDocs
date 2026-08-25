@@ -903,12 +903,12 @@
         },
         {
           "id": "sub-lob-org-unit",
-          "status": "proposed",
+          "status": "rejected",
           "label": "HAS_SUB_LOB"
         },
         {
           "id": "catalog-lob-reconciles-segment",
-          "status": "proposed",
+          "status": "rejected",
           "label": "RECONCILES_TO"
         }
       ],

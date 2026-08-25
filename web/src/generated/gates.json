@@ -994,6 +994,15 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-25",
+      "title": "RULING: catalog Sub-LoB label — `CatalogSubLOB` (C27 item (b); SME, Option 1)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:4082",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

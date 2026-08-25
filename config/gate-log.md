@@ -4079,3 +4079,41 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   because this IS the identifier's owner renaming it, not a style pass.
 - **History.** Everything before this entry is filed under the old id; the yaml's
   header note points here.
+## 2026-08-25 — RULING: catalog Sub-LoB label — `CatalogSubLOB` (C27 item (b); SME, Option 1)
+
+- **What this rules.** The company built the Sub-LoB grain as node label `:SubLOB`; the
+  producer reserved `CatalogSubLOB` at C26. Two labels for one concept — divergence #3 of the
+  C26 ledger repeating one level below the LOB question. **RULED: `CatalogSubLOB`, Option 1 —
+  the company relabels, the producer's reserved label stands, one shape both sides.** The
+  vocabulary id `catalog_has_sub_lob` is unchanged and shared; only the target label moves.
+- **Why Option 1 and not the other two.** The LOB precedent is six weeks old and went the same
+  way: the company's own **GATE REVERSAL of 2026-08-06** (`gate-log.md:1678`, port
+  `drydocs-port-20260806`, producer head `a14a8028`) retired the 2026-06-25 "Option A" gate and
+  adopted the full producer catalog model — `:LOB` → `:CatalogLOB`, `code` reinstated. Ruling
+  Sub-LoB the other way would leave the hierarchy inconsistent with itself one level down.
+  Option 2 (company renames its vocab id, keeps `:SubLOB`) removes the id ambiguity but freezes
+  the two-label divergence permanently; Option 3 (producer adopts `:SubLOB`) reverses the LOB
+  ruling for one level only.
+- **NOT a port break, and an earlier producer note that said so was wrong.**
+  `drydocs_core/ontology/relationship_vocabulary/**` is `per-entry`, and its entry rule is
+  explicit: *"NEVER downgrade a consumer entry whose status is active (or a node class a live
+  loader depends on) to the producer's planned/deprecated."* The company entry is `active` with
+  `sub_lobs.cypher` behind it; the producer's is `planned`. The merge keeps the company's — no
+  duplicate id, no `FragmentSourceError`. What the divergence actually was is a mismatch with
+  no expiry, which is why it needed a ruling rather than a deadline.
+- **FLIPS ARE FOLLOW-UPS.** This authorizes; it performs nothing. The producer's
+  `catalog_has_sub_lob` and `catalog_sub_lob_has_product_line` stay `planned` — the producer
+  models no Sub-LoB grain and has no loader, and an `active` entry with no loader is the claim
+  this repo does not allow. The build is groomed separately.
+- **Three of C27's four questions were already settled outside it,** which is why this entry is
+  a ruling rather than a gate session: (b) the LOB label by the 2026-08-06 reversal; (a) the
+  Sub-LoB grain by the company build; (c) the map ids by the company adding company-only rows
+  rather than renaming producer ones. (d) the S3 `app_id` cutover is NOT closed here — it is
+  Tier-B HELD company-side under their own tracker T1, rebuild-not-migrate, and pulling it into
+  a catalog ruling would give it a second owner.
+- **Map-id correction made with this ruling.** C26's two reservations named ids nobody uses:
+  it reserved `sub-lob-org-unit` and `catalog-lob-reconciles-segment` while the company built
+  `lob-has-sub-lob` and `sub-lob-has-product-line` and KEPT the producer's
+  `lob-reconciles-to-segment`. A placeholder that guards a name nobody mints guards nothing, so
+  both are moved to `rejected` (superseded, kept for audit — the C12 `requires-scheduler`
+  lifecycle) with the real company ids recorded as the names the producer must not mint.
