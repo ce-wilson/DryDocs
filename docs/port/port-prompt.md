@@ -2644,7 +2644,7 @@ regeneration, never-port outputs — and get no step.
         160) with the reason "producer-shaped directory; this side keeps the flat
         docs-root layout". Correct, and cheaper, but the two trees stay divergent.
     Option (a) is the better fit if you are already acting on the
-    `docs/company-prompts/port-7c18ff4b-followup-company-prompt.md` instruction to retire your `port-prompt.md` to a
+    `port-7c18ff4b-followup-company-prompt.md` (retired producer-side 2026-08-25 after the port closed; your copy is the live one) instruction to retire your `port-prompt.md` to a
     pointer — do the retirement and the move in one commit rather than twice.
 
     WHAT DOES NOT MOVE, and is worth knowing before you go looking:
@@ -3236,7 +3236,7 @@ regeneration, never-port outputs — and get no step.
     so it survives ports instead of being overwritten with your local copy; the
     `[db]` placeholder finally has a machine-local key (`internal/standards/
     technology/database-inventory.md`, does NOT cross). The hand prompt
-    (`docs/company-prompts/escalation-census-company-prompt.md`) told your side the
+    (`escalation-census-company-prompt.md`, delivered by hand and executed 2026-08-25, then retired producer-side) told your side the
     census note there is temporary.
     APPLY — expect your census note on the old row to be superseded by this file
     arriving; your ledger already records that expectation.
