@@ -93,6 +93,61 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-171`** · 2026-08-24 · `[idea]` · **open** · prio? **Med** —
+  **Logging is configurable globally or not at all; it needs to be configurable BY KIND, and
+  `kind` is not yet a thing the code knows about.** User direction, 2026-08-24, taken while
+  reviewing ADR 0014 clause 3. MEASURED FIRST (desktop, `C:\coding\projects\logs\DryDocs`,
+  J18): 86 files / 396 KB in one flat directory — 84 loader run logs plus a 2-file graph-QA
+  ledger (54 entries, 18.9 KB, 40 `llm_call` + 14 `run` lines over 14 run ids). One directory,
+  one level, no retention, and the level field is read by nothing.
+  **WHY IT CANNOT BE CONFIGURED TODAY:** `kind` is a filename convention, not a code concept.
+  Three independent sites mint it and none of them agree to anything —
+  `run_log.py:147` hardcodes the literal `load.` prefix, `llm_ledger.py` hardcodes
+  `qa.graph_qa`, and `sql_run_log` accepts a caller-supplied `base_name` with no prefix
+  enforcement at all, so that family can currently write any kind it likes. Nothing can be
+  configured per kind while no declaration says what the kinds ARE.
+  **TWO FINDINGS THAT CAME OUT OF THE SAME MEASUREMENT, both worth carrying into the build.**
+  (1) ADR 0014 clause 3's naming rule `<kind>.<name>.<YYYYmmdd-HHMMSS>` matches **5 of 86
+  files**. The other 79 read `load.<name>.v1.<ts>.log` — and the `v1` is INSIDE `loader_name`,
+  not a fourth field, so the rule is not wrong by one segment, it is describing the wrong
+  shape. The ledger is therefore not "the one exception" the clause calls it; the clause was
+  drafted without counting.
+  (2) The `run-logs` zone in `config/data-zones.yaml` declares `env: DRYDOCS_LOGDIR` and
+  `data_zones._resolve()` ignores the field entirely, handling only `base: home` and
+  `base: data_root`. With the variable set, the zone resolves to the untouched default
+  (`~/logs/DryDocs`, 11 stale files) while every real log lands elsewhere — and G81's
+  declared-equals-resolved guard misses it because that guard only walks zones with a
+  `helper`, which `run-logs` has as null. G109 made this WORSE by widening
+  `drydocs landing-zones` to report the zone: it was invisible before and is now reported
+  confidently and wrongly, which is the exact failure that command exists to prevent. The
+  root-resolution half of this proposal fixes it by construction, and the guard gap needs
+  closing whether or not the rest lands.
+  **PROPOSED SHAPE — `config/log-kinds.yaml`, schema `drydocs.log-kinds.v1`,** following the
+  `config/data-zones.yaml` idiom this repo already uses (declare in YAML, resolvers derive,
+  a guard asserts they agree). One `root` block carrying base/path/env — one place resolves
+  the variable, so finding (2) cannot recur. A `defaults` block (level, retention_days,
+  rotation `per-run|per-day`, format `log|jsonl`, dir). Then one entry per kind naming its
+  `writer`, overriding only what differs: `load` inherits everything; `qa` takes
+  `rotation: per-day`, `format: jsonl` and a longer retention, because it is an append-only
+  ledger whose `run` line is the ONLY place full question text lands (`:AgentRun` carries
+  sha256 + length), so its value is that one file reads end to end; `sql` is declared so the
+  family that accepts any `base_name` becomes checkable; `api` is declared
+  `status: planned` for ADR 0014 clause 6, so the kind exists before its writer does.
+  Optional per-kind `dir:` and a `DRYDOCS_LOGDIR_<KIND>` override generalize the sister
+  project's `<INTEGRATION>_LOG_DIR` pattern that Idea-152 captured.
+  **THE GRAMMAR THEN DERIVES INSTEAD OF BEING ASSERTED:** `<kind>.<name>.<stamp>.<ext>`,
+  where stamp granularity comes from `rotation` and `ext` from `format`. Under that,
+  `qa.graph_qa.20260820.jsonl` is CONFORMING rather than excepted — which dissolves ADR 0014
+  clause 3's self-flagged weakness ("one exception in a naming rule is how naming rules die")
+  without needing the exception at all. `<name>` stays free-form, which is what makes the 79
+  `.v1` files conforming too.
+  **Relationship to the ADR chain, so this is not groomed as a duplicate:** ADR 0014 clause 1
+  gives ONE `RuntimeSettings` group with a single `log_dir`/`log_level`/`log_retention_days`.
+  This is that clause widened from one global set to a per-kind declaration, and it should be
+  ruled ON the ADR rather than after it — G105 implements clause 1 and would otherwise build
+  the global shape first and have it widened immediately. Clause 3 is superseded by the
+  derived grammar above. Not started; no code written.
+
 - **`Idea-170`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
   **The one-sided allocator partition bit: a company inbox capture landed with NO id at
   all, and its number was minted only after the user asked where it was.** Port step 160
