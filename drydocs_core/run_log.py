@@ -62,12 +62,28 @@ CAPTURE_NAMESPACES = ("drydocs", "drydocs_core")
 
 
 def resolve_log_dir() -> Path:
-    """The configurable log path: DRYDOCS_LOGDIR > SPIDERP_LOGDIR > default."""
-    for env in (LOGDIR_ENV, LEGACY_LOGDIR_ENV):
-        raw = os.environ.get(env, "").strip()
-        if raw:
-            return Path(raw)
-    return DEFAULT_LOGDIR
+    """The configurable log path: DRYDOCS_LOGDIR > SPIDERP_LOGDIR > default.
+
+    G105: the ORDER is unchanged and is now resolved in ONE place —
+    :func:`drydocs_core.log_kinds.resolve_root`, reading ``config/log-kinds.yaml``
+    — so the log root has a declaration like every other configured path instead
+    of living in three module constants. The legacy variable now emits a
+    DeprecationWarning when it is the one that resolved; it still resolves.
+
+    Falls back to the module constants if the declaration cannot be read. That is
+    deliberate and narrow: a run log must never be the reason a load fails, and
+    this function is called from inside ``open()``.
+    """
+    try:
+        from drydocs_core.log_kinds import resolve_root
+
+        return resolve_root(default=DEFAULT_LOGDIR)
+    except Exception:  # — a broken declaration must not take the loaders with it
+        for env in (LOGDIR_ENV, LEGACY_LOGDIR_ENV):
+            raw = os.environ.get(env, "").strip()
+            if raw:
+                return Path(raw)
+        return DEFAULT_LOGDIR
 
 
 def caller_stamp() -> str:
@@ -88,12 +104,29 @@ def claim_log_path(base_name: str, *, now: Callable[[], datetime] = datetime.now
     """
     log_dir = resolve_log_dir()
     log_dir.mkdir(parents=True, exist_ok=True)
-    stamp = now().strftime("%Y%m%d-%H%M%S")
-    path = log_dir / f"{base_name}.{stamp}.log"
+
+    # G105: the stamp granularity and the extension are DERIVED from the declared
+    # kind — ``base_name`` is ``<kind>.<name>``, and the kind is what says whether
+    # this rotates per run or per day and whether it is .log or .jsonl. Every
+    # caller funnels through here, which is what makes `kind` a real thing rather
+    # than a prefix three sites happened to agree on for `load` and not for `sql`.
+    kind_id, _, name = base_name.partition(".")
+    try:
+        from drydocs_core.log_kinds import kind as declared_kind
+        from drydocs_core.log_kinds import stamp_for
+
+        spec = declared_kind(kind_id)
+        stamp = stamp_for(spec.rotation, now())
+        suffix = spec.format
+    except Exception:  # — an unreadable declaration falls back to the old shape
+        stamp = now().strftime("%Y%m%d-%H%M%S")
+        suffix = "log"
+
+    path = log_dir / f"{base_name}.{stamp}.{suffix}"
     seq = 1
-    while path.exists():  # same base within one second (tests, retries)
+    while path.exists():  # same base within one stamp (tests, retries, per-day)
         seq += 1
-        path = log_dir / f"{base_name}.{stamp}-{seq}.log"
+        path = log_dir / f"{base_name}.{stamp}-{seq}.{suffix}"
     return path
 
 

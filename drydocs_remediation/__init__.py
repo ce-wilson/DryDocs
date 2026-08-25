@@ -45,3 +45,8 @@ __all__ = [
     "transform",
     "xml_bridge",
 ]
+
+import logging
+
+#: G105/ADR 0014 clause 2 — a module logger per component.
+LOGGER = logging.getLogger(__name__)

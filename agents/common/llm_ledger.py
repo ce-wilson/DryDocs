@@ -80,8 +80,18 @@ class LlmLedger:
 
     def path(self) -> Path:
         log_dir = self._log_dir or resolve_log_dir()
-        stamp = datetime.now().strftime("%Y%m%d")
-        return log_dir / f"{LEDGER_BASENAME}.{stamp}.jsonl"
+        # G105: DERIVED from config/log-kinds.yaml rather than formatted here.
+        # The `qa` kind declares rotation: per-day and format: jsonl, so this file
+        # is CONFORMING under the one naming rule rather than the exception ADR
+        # 0014 clause 3 originally called it. Falls back to the literal shape if
+        # the declaration cannot be read -- telemetry never breaks an answer.
+        try:
+            from drydocs_core.log_kinds import log_filename
+
+            return log_dir / log_filename("qa", "graph_qa")
+        except Exception:
+            stamp = datetime.now().strftime("%Y%m%d")
+            return log_dir / f"{LEDGER_BASENAME}.{stamp}.jsonl"
 
     def _append(self, record: dict) -> None:
         try:

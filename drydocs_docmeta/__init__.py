@@ -23,4 +23,12 @@ gate. Nothing here invents a relationship type.
 
 from __future__ import annotations
 
+import logging
+
+#: G105/ADR 0014 clause 2 — a module logger per component. The components had
+#: NONE, so anything they wanted to say had nowhere to go; the CLI's dictConfig
+#: is what gives this a console and a file sink. A component never calls
+#: basicConfig: configuring the root logger steals it from the caller.
+LOGGER = logging.getLogger(__name__)
+
 __all__ = ["__doc__"]

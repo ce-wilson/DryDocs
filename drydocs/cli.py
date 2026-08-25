@@ -932,13 +932,73 @@ def run() -> None:
 # --- callback ---------------------------------------------------------------
 
 
+def configure_logging(*, verbose: bool = False) -> None:
+    """The ONE logging configuration call — ADR 0014 clause 2 (G105).
+
+    Replaces the single ``basicConfig`` this CLI carried, which was stderr-only
+    and took its level from ``--verbose`` alone, so ``AppSettings.log_level``
+    existed and was read by nobody.
+
+    Stdlib ``dictConfig``, no new runtime dependency. Console plus a file sink
+    under the resolved log root; the level comes from ``RuntimeSettings``, and
+    ``--verbose`` still WINS over it — a flag the operator typed outranks a
+    declared default.
+
+    THE RULE THAT FOLLOWS FROM THIS BEING THE ONLY CALL: no module calls
+    ``basicConfig``. A library that configures the root logger steals it from its
+    caller, which is why the four components get module loggers instead.
+
+    Never raises. Logging that refuses to start must not stop the command the
+    operator actually asked for — the same reasoning that makes a run log
+    best-effort after open.
+    """
+    import logging.config
+
+    level = "DEBUG" if verbose else "INFO"
+    handlers: dict[str, dict[str, object]] = {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": level,
+            "formatter": "plain",
+            "stream": "ext://sys.stderr",
+        }
+    }
+    try:
+        from drydocs_core.config import RuntimeSettings
+        from drydocs_core.log_kinds import log_filename
+        from drydocs_core.run_log import resolve_log_dir
+
+        if not verbose:
+            level = RuntimeSettings().log_level.upper()
+            handlers["console"]["level"] = level
+        log_dir = resolve_log_dir()
+        log_dir.mkdir(parents=True, exist_ok=True)
+        handlers["file"] = {
+            "class": "logging.FileHandler",
+            "level": level,
+            "formatter": "plain",
+            "filename": str(log_dir / log_filename("cli", "console")),
+            "encoding": "utf-8",
+            "delay": True,  # no file until something is actually logged
+        }
+    except Exception:  # — an unconfigurable sink never costs the operator the console
+        pass
+
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {"plain": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}},
+            "handlers": handlers,
+            "root": {"level": level, "handlers": sorted(handlers)},
+        }
+    )
+
+
 @app.callback()
 def main(verbose: bool = typer.Option(False, "--verbose", "-v")) -> None:
     """DryDocs — production support inventory + data product KG."""
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format="%(asctime)s %(name)s %(levelname)s %(message)s",
-    )
+    configure_logging(verbose=verbose)
 
 
 # --- M0 commands -------------------------------------------------------------

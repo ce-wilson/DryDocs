@@ -1,0 +1,130 @@
+# =============================================================================
+# config/log-kinds.yaml — every log KIND the system writes, declared with its
+# directory, level, retention, rotation and format
+# =============================================================================
+# G105, ADR 0014 clause 1 AS AMENDED AT THE 2026-08-25 RULING. The clause as
+# drafted gave ONE global log_dir / log_level / log_retention_days; the SME ruled
+# it per-KIND on a broader principle — "the goal is to have everything
+# configurable, not hardcode."
+#
+# WHY THIS FILE HAD TO EXIST BEFORE ANYTHING COULD BE CONFIGURED PER KIND.
+# `kind` was a filename convention, not a code concept. Three sites minted it and
+# none agreed:
+#   drydocs_core/run_log.py      hardcoded the literal `load.` prefix
+#   agents/common/llm_ledger.py  hardcoded `qa.graph_qa`
+#   adapters/sql_run_log.py      took a caller-supplied base_name with NO prefix
+#                                enforcement, so it wrote `oracle.<ts>.log` and
+#                                could have written any kind it liked
+# Nothing can be configured per kind while no declaration says what the kinds ARE.
+#
+# THE NAMING RULE IS DERIVED FROM THIS FILE, NOT ASSERTED BESIDE IT (clause 3 as
+# amended). The rule is:
+#
+#     <kind>.<name>.<stamp>.<ext>
+#
+# where <stamp> granularity comes from the kind's `rotation` (per-run ->
+# YYYYmmdd-HHMMSS, per-day -> YYYYmmdd) and <ext> from its `format`. <name> stays
+# FREE-FORM, which is what makes `load.code_snapshot.v1.<ts>.log` conforming — the
+# version sits inside <name>, and the drafted rule that spelled the stamp out
+# matched only 5 of 86 real files because it did not know that.
+#
+# The per-day `qa.graph_qa.<YYYYmmdd>.jsonl` ledger is CONFORMING under this rule,
+# not excepted: kind=qa, name=graph_qa, stamp=20260820, ext=jsonl. The drafted
+# clause called it "the one exception" and flagged itself with "one exception in a
+# naming rule is how naming rules die"; deriving the rule removes the exception
+# instead of defending it.
+#
+# ROOT, AND WHY IT IS ONE BLOCK. Every kind hangs off one root, resolved in ONE
+# place. config/data-zones.yaml's `run-logs` zone declares `env: DRYDOCS_LOGDIR`
+# and data_zones._resolve() ignores the field, so with the variable set that zone
+# resolves to the untouched default while every real log lands elsewhere. A single
+# root block is the shape in which that class cannot recur. (The zone-resolver bug
+# and the guard gap behind it are Idea-171's residue and are NOT fixed here.)
+schema: drydocs.log-kinds.v1
+
+root:
+  base: home # under the user's home directory, the run-log idiom since G19
+  path: logs/DryDocs/
+  env: DRYDOCS_LOGDIR
+  legacy_env: SPIDERP_LOGDIR # honored ONE more cycle, with a deprecation warning
+  note: >
+    SCOPE FENCE, carried from G81 (d): unlike DRYDOCS_DATA_ROOT this keeps its
+    default and is NOT mandatory. G81 named the DATA root deliberately — a
+    relocated log is annoying where a relocated data root is destructive. The
+    legacy variable's removal trigger is the next port after ADR 0014 was
+    accepted; "one cycle" with no event attached is how a deprecation becomes
+    permanent.
+
+defaults:
+  level: INFO
+  retention_days: 90
+  rotation: per-run # per-run -> <YYYYmmdd-HHMMSS> | per-day -> <YYYYmmdd>
+  format: log # log | jsonl
+  dir: ~ # null = the root itself; a kind may name a subdirectory
+
+kinds:
+  - id: load
+    writer: drydocs_core.run_log.LoaderRunLog
+    note: >
+      84 of the 86 files in the directory today. `name` is the loader id and
+      already carries its own version segment (code_snapshot.v1) — which is why
+      <name> is free-form in the derived rule rather than a bare identifier.
+
+  - id: sql
+    writer: drydocs_core.adapters.sql_run_log.SqlRunLog
+    note: >
+      The family that could write ANY kind: SqlRunLog(self.name) from
+      oracle_adapter, so it wrote `oracle.<ts>.log` with no kind segment at all.
+      Declaring it is what makes that checkable. It shares run_log's directory
+      resolver already (it imports claim_log_path) — the two families never
+      disagreed about WHERE, only about the filename.
+
+  - id: cli
+    writer: drydocs.cli.configure_logging
+    rotation: per-day
+    note: >
+      The dictConfig FILE SINK — the general console stream teed to disk, not a
+      run artifact, which is why it rotates per day like the ledger rather than
+      per invocation. Declared because the sink was first written as
+      `drydocs.cli.log`, a name that quietly did not conform to the very rule
+      this file derives: `drydocs` is not a kind. A sink exempt from the naming
+      rule it ships alongside is how the rule stops meaning anything.
+
+  - id: qa
+    writer: agents.common.llm_ledger
+    rotation: per-day
+    format: jsonl
+    note: >
+      Append-only ledger, not a run artifact — per-run files would shard one
+      queryable history, and its `run` line is the ONLY place the full question
+      text lands (:AgentRun carries sha256 + length). Retention is the shared 90
+      days by SME ruling rather than an exemption: 90 days of question text is
+      what makes the ledger useful for search metrics, where an unbounded ledger
+      is an audit relic. The consequence is deliberate and stated — sweeping it
+      destroys the only record that turns a hash back into words.
+
+  - id: api
+    status: planned # ADR 0014 clause 6; the writer does not exist yet (G108)
+    rotation: per-day
+    format: jsonl
+    note: >
+      One audit line per drydocs_api route that executes Cypher OR WRITES —
+      widened from Cypher-only at the ruling, because intake.py writes to the data
+      root and would otherwise be the one filesystem-touching surface with no
+      trail. Lean by design: no Cypher text. 90 days because the purpose is a
+      metrics window on what is searched. Declared now so the kind exists before
+      its writer does.
+
+  - id: api-debug
+    status: planned # G108
+    retention_days: 7
+    format: jsonl
+    note: >
+      The trace/debug tier, ruled a SEPARATE KIND rather than `api` at DEBUG
+      level so a 90-day metrics record is never buried in debug noise and debug
+      can be deleted aggressively without touching the audit. It DOES carry
+      Cypher text and request detail. Verbose is settings-level here, not
+      per-request: an HTTP request has no --verbose, and a per-request header
+      would let an untrusted caller enable verbose capture of their own traffic.
+      HELD FOR SME REVIEW: whether this text is ever DISPLAYED in the console.
+      Capturing it is ruled; surfacing it is not.

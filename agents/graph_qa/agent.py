@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from collections.abc import AsyncGenerator
 from dataclasses import asdict
 from datetime import datetime
@@ -34,6 +35,8 @@ from graph_qa.control import split_question_and_control
 from graph_qa.envelope import sha256_text
 from graph_qa.pipeline import GraphQaPipeline
 from graph_qa.providers import LiteLlmProvider, ProviderConfigError, provider_from_env
+
+_LOGGER = logging.getLogger(__name__)
 
 _provider: LiteLlmProvider | None = None
 _ledger = LlmLedger()  # R3 sink 1: per-LLM-call JSONL in DRYDOCS_LOGDIR
@@ -67,14 +70,18 @@ def _record_run(envelope, question: str, user_id: str) -> None:
     """R3 sinks after the answer: run line in the local ledger (full question
     text lives ONLY there) + the :AgentRun node via the dedicated writer.
     Both best-effort — telemetry never turns a good answer into an error."""
+    # G105/ADR 0014 clause 2: still BEST-EFFORT -- telemetry never turns a good
+    # answer into an error, and that judgement was always right. What was wrong is
+    # that a permanently broken sink reported nothing at all, so the swallow now
+    # says so once per failure instead of passing silently.
     try:
         _ledger.run(envelope, question)
     except Exception:
-        pass
+        _LOGGER.warning("graph_qa: ledger write failed; the answer stands", exc_info=True)
     try:
         write_agent_run(envelope, user_id=user_id)
     except Exception:
-        pass
+        _LOGGER.warning("graph_qa: :AgentRun write failed; the answer stands", exc_info=True)
 
 
 def _memory_size(ctx: InvocationContext) -> tuple[int, int]:

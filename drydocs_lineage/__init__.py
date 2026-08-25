@@ -37,7 +37,15 @@ records anchored OCCURRENCE_OF, directory DataAssets, §C3 IS_ENCODED_IN).
 STILL A STUB: ``curation.curate`` (phased cadence — trigger wiring is later work).
 """
 
+import logging
+
 from . import curation, extractors, model, review, writer
+
+#: G105/ADR 0014 clause 2 — a module logger per component. These components
+#: had NONE, so anything they wanted to say had nowhere to go. A component
+#: never calls basicConfig: configuring the root logger steals it from the
+#: caller, which is why drydocs.cli owns the one dictConfig call.
+LOGGER = logging.getLogger(__name__)
 
 #: The write target — ground truth. Defined AT the write boundary (writer.py);
 #: the trust axis IS the DB boundary (ADR 0002 D1).
