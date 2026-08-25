@@ -11,7 +11,14 @@ the bounded graph-of-thoughts loop.
 the `drydocs_control` JSON (`control.py`) carrying the console session's
 drydocs-api token + url — the R4 owner-token handshake that lets the agent
 register ephemeral specs the ASKING session can run/export. Control parts
-never reach the LLM.
+never reach the LLM — **and since R23 the token never reaches the session
+store either.** ADK persists every part of the user message as given, so the
+launcher (`serve.py`) wraps the session service and writes a redacted copy:
+`api_token` is stored as a fixed placeholder, `api_url` is kept, and the live
+value exists only in the turn's in-memory `user_content`. The stored event
+still shows a handshake happened; a resumed invocation, which recovers its
+content from stored history, degrades to "no control" exactly as a malformed
+part does.
 
 ## The tiers
 

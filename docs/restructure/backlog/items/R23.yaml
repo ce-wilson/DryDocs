@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - agents/graph_qa/control.py
@@ -32,5 +32,50 @@ notes: |
   Groomed 2026-08-22 (laptop) from Idea-155, which was filed branch-side on `feat/ui-workstream` as that branch's Idea-151 and re-filed at 155 on main (151 there is the unrelated stale-render entry, groomed to Y5 — R18's notes cite the branch number and are corrected to point here in the same commit as this item).
 
   p1, above the two siblings that read the same store, because it is a live credential at rest with no expiry: a copy taken from the file replays for the life of the API process. Two things make it worse than a stray log line — the accumulation, and the contradiction one row over. `Envelope` deliberately reduces question text and caller identity to sha256-plus-length so neither is persisted, while the credential beside them is written raw; the repo already decided how it feels about persisting sensitive fields on this path.
+
+  DONE 2026-08-25 (laptop `NewThinkpad`). Fixed at the ONE choke point every session
+  service persists through -- `append_event` -- rather than at any single backend, so
+  local SQLite, a database URI and the in-memory service are covered identically.
+  `graph_qa/control.py` gains the pure rule (`redact_control_text`, `SECRET_CONTROL_FIELDS`,
+  `REDACTED_VALUE`), `common/session_redaction.py` the duck-typed `RedactingSessionService`,
+  and `serve.py` installs it by replacing the one ADK function `fast_api` calls to build
+  the service -- verified patched and idempotent in the agents venv (google-adk 2.3.0).
+
+  THE THING THAT MADE THIS SUBTLE, and the reason clause (c) has its own test: upstream,
+  the persisted event's `content` IS the object the agent reads as `ctx.user_content`
+  (`Runner._append_user_event` passes it straight through). Redacting in place would have
+  taken the token away from the very turn that needs it and Open-in-Explorer would have
+  quietly stopped working. So nothing is mutated: an event with nothing secret is returned
+  BY IDENTITY, and one with a token is replaced by a deep copy that is written instead.
+
+  (a) VALUE STOPS REACHING DISK -- the field survives, the value does not. A deletion was
+  rejected: the R5 trail is read for "did this turn carry control", which a deletion
+  silently answers no. `api_url` is deliberately NOT in the secret set -- it is
+  configuration, and redacting it would cost readability for no security gain.
+  (b) `tests/unit/test_session_redaction.py` -- 14 passed / 1 skipped. J26 PROOF: driving
+  the same fixtures through the wrapper with a no-op redactor (the pre-R23 behaviour) puts
+  the token in the store; with the real rule it does not. Same fixtures, opposite verdicts.
+  It uses a STUB store on purpose -- `agents/` has its own venv and this repo's interpreter
+  has no google-adk, so a guard needing a real runtime could not run in CI at all, and the
+  defect is "what got written", not "which database wrote it". The one thing a stub cannot
+  prove -- that ADK still calls the seam `serve.py` patches -- is its own test, which SKIPS
+  where ADK is absent (U26 precedent) instead of passing for being unable to look.
+  (c) HANDSHAKE UNCHANGED: `askApi.ts` and `split_question_and_control` are untouched, the
+  wire shape is the same, and a test asserts the live event still parses to the real token.
+  (d) STORES ON DISK, per machine (J18). LAPTOP `NewThinkpad`: `agents/graph_qa/.adk/session.db`
+  inspected -- 4 events, ZERO mentions of `api_token`, file dated 2026-07-23, i.e. it predates
+  R5. Nothing to purge here, and that is recorded rather than reported as a purge that
+  happened. DESKTOP: STILL OWED -- the 2026-08-21 observation was made there and this session
+  cannot reach that filesystem. Carried in the handoff so the next desktop session does it.
+  (e) `control.py`'s docstring now states the persistence property beside the LLM one, with
+  the two consequences spelled out rather than left to be discovered: the SSE echo carries
+  the redacted text, and a RESUMED invocation degrades to "no control" exactly as a
+  malformed part does. `graph_qa/README.md` says the same in one paragraph.
+
+  ADR 0007 needed no edit -- it makes no claim about credential persistence, which is
+  precisely the silence that let this ship.
+
+  Suite 2399 passed / 10 skipped; ruff check + format clean; `import drydocs.cli` and
+  `drydocs --help` pass.
 
   SIBLINGS in the same store, deliberately NOT merged: R13 (p3) asks whether ADK 2.x offers a partial/non-persisted event mode — its mechanism might incidentally satisfy (a), but this item must not wait on that question; R18 read its evidence out of this same `session.db`. Module drydocs-agents because the fix belongs on the agent side of the handshake (strip or redact before ADK persists), even though the token is minted in drydocs_api and sent by web.
