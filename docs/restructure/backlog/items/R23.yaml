@@ -79,3 +79,10 @@ notes: |
   `drydocs --help` pass.
 
   SIBLINGS in the same store, deliberately NOT merged: R13 (p3) asks whether ADK 2.x offers a partial/non-persisted event mode — its mechanism might incidentally satisfy (a), but this item must not wait on that question; R18 read its evidence out of this same `session.db`. Module drydocs-agents because the fix belongs on the agent side of the handshake (strip or redact before ADK persists), even though the token is minted in drydocs_api and sent by web.
+  CLAUSE (d) EXECUTED 2026-08-25 (DESKTOP -- J18, the machine named because an untagged
+  'purged' reads as both). agents/graph_qa/.adk/session.db deleted after confirming the
+  exposure was real and still present: 12 sessions / 59 events, 10 events carrying
+  api_token -- the 2026-08-21 observation, unchanged. Disk hygiene only: .adk/ is
+  gitignored, nothing ever reached the repo. The laptop was checked at the fix and is
+  clean (4 events, zero api_token, file predates R5), so this closes the last open half
+  of R23 on the only machine that had one.
