@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T22:35:55",
+    "captured_at": "2026-08-24T22:42:55",
     "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "68b1c03b",
-      "full": "68b1c03bcbe97b7c48b29c9e0ce8377ab7a0810d",
+      "commit": "dd71116e",
+      "full": "dd71116ed0bb22c96065e6d41ac5ff43e0fa0642",
       "branch": "main",
-      "describe": "port-base-20260824b",
-      "subject": "chore(port): roll the ledger to the second 2026-08-24 base — steps 214-220, RELAY-14/15",
+      "describe": "port-base-20260824c",
+      "subject": "chore(port): ledger — the range count measured AT the tag, not before it",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19439,10 +19439,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
-      "name": "drydocs-20260824.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-2235.json",
+      "name": "drydocs-20260824-2235.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824-2235.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39314,7 +39314,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-2235.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
