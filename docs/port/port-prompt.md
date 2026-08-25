@@ -133,9 +133,9 @@ and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
 **LEDGER ROLLED AND RE-CERTIFIED 2026-08-24 — THIS ROLL REPLACES THE 2026-08-20 ONE AND
-BOTH EARLIER 2026-08-24 ONES.** Steps **178-220** cover the **206-commit delta
+BOTH EARLIER 2026-08-24 ONES.** Steps **178-220** cover the **208-commit delta
 `213e1d12..port-base-20260824c`**, verified commit-by-commit by `port_preflight.py`.
-**CERTIFIED 7/7** (tree clean, relay basis tags, ledger coverage 206/206
+**CERTIFIED 7/7** (tree clean, relay basis tags, ledger coverage 208/208
 cited-or-ritual, cited paths resolve, renders current, suite **2385 passed /
 9 skipped**, tag pushed). **Venue (J18): laptop `NewThinkpad`**, and the skip
 composition is stated rather than summarised — 6 reconcile guards with
@@ -152,7 +152,7 @@ beyond taking the longest.
   moved 22 commits past the morning tag while the range sat unapplied, so rather than
   leave those to an immediate third wave they were ledgered as steps 214-220 plus a
   second coverage footnote.
-- **`port-base-20260824c`** (206 commits, same steps) — a ledger ACCURACY repair, no new
+- **`port-base-20260824c`** (208 commits, same steps) — a ledger ACCURACY repair, no new
   payload: step 219 as first written described a `data_root.py` resolver derivation that
   G109 does not contain (G81 had already done that, and G109 records it as overtaken),
   and step 216 named the driver script instead of the module that holds the fix. Both
@@ -182,7 +182,7 @@ out before this range starts.** That range carried step 175, the backlog shard, 
 has its own apply sequence; a mid-apply range finishes on the monolith and this one
 begins after it. Steps 171-176 stay live below for exactly that reason.
 
-**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (206 commits,
+**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (208 commits,
 five days) and three steps change BEHAVIOUR rather than content: **195** splits
 `cli.py` into six modules and is the biggest hand-merge here, **209** removes the
 `refresh-reference` command by name, and **210** makes `DRYDOCS_DATA_ROOT` mandatory

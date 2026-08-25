@@ -12,7 +12,7 @@
 ## 1. WAVE 2 IS CERTIFIED AND WAITING — AND IT GREW
 
 **`port-base-20260824c`**, preflight **7/7**, range
-**`213e1d12..port-base-20260824c`** — **206 commits**, ledger steps **178-220**.
+**`213e1d12..port-base-20260824c`** — **208 commits**, ledger steps **178-220**.
 Suite **2385 passed / 9 skipped** (laptop `NewThinkpad`; 6 skips are reconcile guards
 with `RECONCILE_BEFORE_DIR` unset, 3 are the production sample CSV being absent — J18).
 
