@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-24T18:02:39",
+    "captured_at": "2026-08-24T22:35:55",
     "date": "20260824",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "865fde12",
-      "full": "865fde12834659e52353f9ca7ba3724ac37405a4",
+      "commit": "68b1c03b",
+      "full": "68b1c03bcbe97b7c48b29c9e0ce8377ab7a0810d",
       "branch": "main",
-      "describe": "port-base-20260824-18-g865fde12",
-      "subject": "docs(ideas): Idea-169 — the extracts must run per data center, and the DBA ask is already written",
+      "describe": "port-base-20260824b",
+      "subject": "chore(port): roll the ledger to the second 2026-08-24 base — steps 214-220, RELAY-14/15",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19439,10 +19439,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-1459.json",
-      "name": "drydocs-20260824-1459.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "name": "drydocs-20260824.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824-1459.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24383,6 +24383,10 @@
     ],
     [
       "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/data_zones.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
       "drydocs/drydocs_core/landing_zones.py"
     ],
     [
@@ -26148,6 +26152,10 @@
     [
       "drydocs/tests/unit/test_data_zones.py",
       "drydocs/drydocs_core/data_zones.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs_core/landing_zones.py"
     ],
     [
       "drydocs/tests/unit/test_database_names.py",
@@ -39306,7 +39314,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824-1459.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41704,7 +41712,7 @@
       "drydocs"
     ],
     "files": 2365,
-    "edges": 1144,
+    "edges": 1146,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
