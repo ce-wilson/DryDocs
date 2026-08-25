@@ -17,6 +17,41 @@ inputs:
 - docs/decisions/0014-runtime-substrate.md
 - docs/decisions/0007-agentic-qa-architecture.md
 acceptance: |
+  SME RULINGS FOLDED IN 2026-08-25 — the clause-6 deferral is CLOSED and this item now builds TWO
+  kinds, not one. Read these before the original acceptance below, which predates them.
+
+  (A) TWO KINDS, not one surface at two levels. `api` is the AUDIT record: lean, 90-day retention,
+  and it does NOT carry Cypher text. `api-debug` is a separate declared kind in
+  config/log-kinds.yaml: verbose, short retention, per-run rotation, and it DOES carry Cypher text
+  and request detail. Ruled as a split rather than one kind at DEBUG level so a 90-day metrics
+  record is never buried in debug noise and debug can be deleted aggressively without touching the
+  audit. This closes ADR 0014 clause 6's deferred question ("does the line carry the Cypher text")
+  by answering it per kind instead of once.
+
+  (B) 90-DAY RETENTION ON THE AUDIT KIND, and the reason is a metrics window, not an audit relic:
+  the SME's purpose is meaningful figures on WHAT IS SEARCHED. Declared in config/log-kinds.yaml
+  per G105, never as a literal here.
+
+  (C) VERBOSE IS SETTINGS-LEVEL, NOT PER REQUEST. There is no `--verbose` on an HTTP request, and a
+  per-request header would let an untrusted caller turn on verbose capture of their own traffic.
+  The `api-debug` kind's level comes from its declaration, so it is configured rather than asked
+  for -- the everything-configurable principle applied to a surface that has no CLI flag.
+
+  (D) A CORRELATION ID IS REQUIRED, and it is the field this item would otherwise have shipped
+  without. The QA ledger holds the QUESTION TEXT and the API audit holds the ROUTE AND OUTCOME, and
+  today nothing joins them: the ledger carries `run_id` and the drafted audit fields carry no
+  equivalent. Without it "what is searched" cannot be answered -- half the metric is in each file.
+  This is not hypothetical wiring: agents/graph_qa/agent.py:60 calls ephemeral_client, which POSTs
+  to {api_url}/specs/ephemeral, so one console question really does produce ledger lines AND an API
+  call. Carry the agent `run_id` where the control part supplies one, else the hashed session token
+  that control.py already passes. Adding it later is a migration; adding it now is a field.
+
+  (E) THE ONE THING HELD FOR SME REVIEW: whether debug-tier Cypher text is ever DISPLAYED IN THE
+  UI. Capturing it is ruled; surfacing it is not, and the SME asked for that specific question to
+  go to the TOP of the review list. So this item may write it and must not surface it, and any UI
+  work that would display it is blocked on that review rather than on this item.
+
+
   Every `drydocs_api` route that executes Cypher writes one audit record per request — `/raw-cypher` and `/specs/{id}/run` at minimum, plus any sibling found by enumerating the routes rather than by memory (the enumeration is part of the deliverable: the item lists what it found). The component logs NOTHING today, so this is the first record of who asked the graph for what through the API.
 
   Each record carries: timestamp, route, spec id where one applies, the outcome (rows returned or the error class), elapsed time, and an ACTOR identifier hashed by the same function `:AgentRun` already uses — never a raw actor value, so the record is publishable under the §3 sensitivity rules and cannot become the place a real identity leaks. The record does NOT contain result values; it is an access record, not a data copy. Where the Cypher text itself is recorded, that choice and its size bound are stated in the acceptance of whoever builds it — this item does not silently decide to persist query text.

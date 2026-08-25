@@ -93,6 +93,37 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-172`** · 2026-08-25 · `[idea]` · **open — groom into EPIC O (SME placement); the UI-display half is a TOP-OF-LIST review, not a build** · prio? **High** —
+  **The console admin page should surface the log estate: directory, path, size and capacity per
+  kind.** SME direction, 2026-08-25, given alongside the ADR 0014 retention rulings. Epic O already
+  owns the console and an admin config-traceability lens, and the SME placed this there rather than
+  in a new epic — so this is a PANEL on that surface, not a new one.
+  **THE DATA ALREADY EXISTS, which is why this is small.** G109 shipped
+  `drydocs_core.data_zones.inventory()`, which returns present/absent plus a file count per declared
+  zone, and `drydocs landing-zones --json` already emits both halves as one document
+  (`manual_zones` + `declared_zones`) with `path`, `mode`, `base`, `inside_repo`, `exists`,
+  `file_count`, `empty`. The panel needs a read endpoint over that, not new collection. Capacity is
+  the one genuinely missing field — `inventory()` counts files, it does not sum bytes — so a
+  `total_bytes` per zone is the one core addition, and it belongs beside the count rather than in
+  the API.
+  **WHY IT IS WORTH BUILDING RATHER THAN JUST RUNNING THE CLI:** the whole reason
+  `drydocs landing-zones` exists is that "my extracts are gone" should be a one-command answer, and
+  the person most likely to ask it is the SME on a machine where the CLI is not the habitual
+  surface. Post-G105 the panel also answers the retention question the same way — 90 days declared
+  against N days actually on disk.
+  **ONE THING IT MUST NOT DO WITHOUT A RULING, and the SME asked for this to go to the top of the
+  review list: display debug-tier Cypher text.** ADR 0014 clause 6 as ruled splits `api` (lean,
+  90-day, no Cypher) from `api-debug` (verbose, short, carries Cypher and request detail).
+  CAPTURING that text is ruled; SURFACING it in the console is NOT, and the two are different risks
+  — a short-lived file on an operator's disk versus a rendered page. So this panel may report the
+  debug kind's SIZE and RETENTION like any other kind, and must not render its contents until that
+  review happens. Anything that would display it is blocked on the review, not on this item.
+  **Also worth carrying in:** the panel is the natural place to show the `data_zones._resolve()`
+  defect while it is live (Idea-171's residue) — the `run-logs` zone resolves to the default
+  whenever `DRYDOCS_LOGDIR` is set, so a panel built today would confidently show the wrong
+  directory for exactly the kind the SME most wants to see. Fix that first or the panel ships a
+  known-wrong row.
+
 - **`Idea-171`** · 2026-08-24 · `[idea]` · **open — clauses 1/3/4 were RULED into ADR 0014 (2026-08-25); the `data_zones._resolve()` env-field gap is the un-consumed residue and needs its own item** · prio? **Med** —
   **Logging is configurable globally or not at all; it needs to be configurable BY KIND, and
   `kind` is not yet a thing the code knows about.** User direction, 2026-08-24, taken while

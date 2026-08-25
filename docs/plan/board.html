@@ -244,7 +244,29 @@ RIDER ADDED AT THE 2026-08-25 RULING, because this item&#x27;s clause-by-clause 
 
 The `SPIDERP_` alias deliberately survives one cycle instead of being deleted here. The data root already has no legacy variable, so the end state is symmetric either way, but a hard cut breaks any live shell still exporting the old name and that failure is silent.
 </p></div></div>
-<div class="card ready" id="card-G106" data-id="G106" data-module="drydocs-load" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g106 drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today — retention as a verb mirroring prune-snapshots, not a background sweeper thread" tabindex="0"><div class="card-head"><span class="card-id">G106</span><span class="card-title">drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today — retention as a verb mirroring prune-snapshots, not a background sweeper thread</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G104" data-target="card-G104">G104</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A `drydocs prune-logs` verb in `drydocs/cli.py`, built as a deliberate mirror of the existing `prune-snapshots` so the two read the same at the prompt: DRY-RUN BY DEFAULT (it prints what it would delete and exits non-destructively unless an explicit apply flag is passed), bounded by both age (`--older-than-days`, defaulting to `RuntimeSettings.log_retention_days`) and total size (`--max-bytes`), and reporting a per-file table plus a total. It covers every file family that shares the log directory — the per-run `&lt;kind&gt;.&lt;name&gt;.&lt;ts&gt;.log` files from `run_log.py`, the SQL run logs, and `agents/common/llm_ledger.py`&#x27;s JSONL ledger — because the whole point of the finding is that three families share one directory under two naming rules and NONE of them rotate, cap or sweep. The ledger&#x27;s retention is stated explicitly, whichever way it goes: an append-only audit ledger may legitimately be exempt, but then the exemption is in the code and in `--help`, not in the gap between them. A test drives the verb over a temp directory holding files of both naming shapes and asserts (a) dry-run deletes nothing, (b) the age bound and the size bound each select the expected set, (c) a file the retention policy exempts survives both. NO daemon and no background thread: ADR 0014 rejected the sister project&#x27;s sweeper for a named reason (its registry grows unbounded when the logger factory is called with per-incident names) and a verb the session ritual can call has no such failure mode. `poetry run pytest -q`, `drydocs --help` showing the verb, ruff clean.
+<div class="card ready" id="card-G106" data-id="G106" data-module="drydocs-load" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g106 drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today — retention as a verb mirroring prune-snapshots, not a background sweeper thread" tabindex="0"><div class="card-head"><span class="card-id">G106</span><span class="card-title">drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today — retention as a verb mirroring prune-snapshots, not a background sweeper thread</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G104" data-target="card-G104">G104</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> SME RULINGS FOLDED IN 2026-08-25 — read before the original acceptance below.
+
+(A) THE QA LEDGER IS NOT EXEMPT. It gets 90-day retention like everything else. The acceptance
+below puts the exemption question in the open (&quot;an append-only audit ledger may legitimately be
+exempt, but then the exemption is in the code and in --help&quot;); it is answered NOT-EXEMPT. The
+reason is the same one that sets the API audit window: 90 days of question text is what makes the
+ledger useful for search metrics, where an unbounded ledger is just an audit relic. Note the
+consequence honestly in --help -- the `run` line is the ONLY place full question text lands
+(:AgentRun carries sha256 + length), so sweeping it destroys the only record that turns a hash
+back into words. That is a deliberate 90-day horizon, not an oversight.
+
+(B) EVERY WINDOW COMES FROM THE DECLARATION, never from a literal or a flag default in this file.
+ADR 0014 clause 4 as amended: `prune-logs` with no arguments does the declared thing and flags are
+one-off overrides. Retention is per kind in config/log-kinds.yaml (G105), so `api` 90, `qa` 90,
+`api-debug` short, `load` its own -- this verb reads them rather than knowing them.
+
+(C) STILL OPEN, and it must not be silently defaulted: `--max-bytes` has no ruled number. The age
+bound is settled; the size cap is not. Either the SME sets it or this item ships age-only with the
+size bound recorded as deferred and its trigger named. Do not invent a cap -- a size sweep that
+nobody chose is how a retention verb deletes something someone wanted.
+
+
+A `drydocs prune-logs` verb in `drydocs/cli.py`, built as a deliberate mirror of the existing `prune-snapshots` so the two read the same at the prompt: DRY-RUN BY DEFAULT (it prints what it would delete and exits non-destructively unless an explicit apply flag is passed), bounded by both age (`--older-than-days`, defaulting to `RuntimeSettings.log_retention_days`) and total size (`--max-bytes`), and reporting a per-file table plus a total. It covers every file family that shares the log directory — the per-run `&lt;kind&gt;.&lt;name&gt;.&lt;ts&gt;.log` files from `run_log.py`, the SQL run logs, and `agents/common/llm_ledger.py`&#x27;s JSONL ledger — because the whole point of the finding is that three families share one directory under two naming rules and NONE of them rotate, cap or sweep. The ledger&#x27;s retention is stated explicitly, whichever way it goes: an append-only audit ledger may legitimately be exempt, but then the exemption is in the code and in `--help`, not in the gap between them. A test drives the verb over a temp directory holding files of both naming shapes and asserts (a) dry-run deletes nothing, (b) the age bound and the size bound each select the expected set, (c) a file the retention policy exempts survives both. NO daemon and no background thread: ADR 0014 rejected the sister project&#x27;s sweeper for a named reason (its registry grows unbounded when the logger factory is called with per-incident names) and a verb the session ritual can call has no such failure mode. `poetry run pytest -q`, `drydocs --help` showing the verb, ruff clean.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-21 (laptop) from Idea-152 clause (4) — &quot;a load item (4)&quot; in that entry&#x27;s decomposition. Module drydocs-load because `MODULE_MAP.md:74` places `drydocs/cli.py` there as the entrypoint, which is also where `prune-snapshots` already lives; filing it anywhere else would split two sibling verbs across two modules.
 
 Depends on G104 only for the retention policy shape (age + size + which families are exempt); the verb itself is mechanical.
@@ -258,7 +280,42 @@ MODULE CHOICE, recorded because the entry asked for &quot;per-component items&qu
 
 G93 (drydocs-remediation) is the built precedent and is deliberately not re-done here.
 </p></div></div>
-<div class="card ready" id="card-G108" data-id="G108" data-module="drydocs-api" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g108 drydocs_api logs nothing at all — an audit line for every cypher-executing route, including /raw-cypher and /specs/{id}/run, with the actor hashed the way :agentrun already hashes it" tabindex="0"><div class="card-head"><span class="card-id">G108</span><span class="card-title">drydocs_api logs nothing at all — an audit line for every Cypher-executing route, including /raw-cypher and /specs/{id}/run, with the actor hashed the way :AgentRun already hashes it</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G104" data-target="card-G104">G104</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every `drydocs_api` route that executes Cypher writes one audit record per request — `/raw-cypher` and `/specs/{id}/run` at minimum, plus any sibling found by enumerating the routes rather than by memory (the enumeration is part of the deliverable: the item lists what it found). The component logs NOTHING today, so this is the first record of who asked the graph for what through the API.
+<div class="card ready" id="card-G108" data-id="G108" data-module="drydocs-api" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g108 drydocs_api logs nothing at all — an audit line for every cypher-executing route, including /raw-cypher and /specs/{id}/run, with the actor hashed the way :agentrun already hashes it" tabindex="0"><div class="card-head"><span class="card-id">G108</span><span class="card-title">drydocs_api logs nothing at all — an audit line for every Cypher-executing route, including /raw-cypher and /specs/{id}/run, with the actor hashed the way :AgentRun already hashes it</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G104" data-target="card-G104">G104</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> SME RULINGS FOLDED IN 2026-08-25 — the clause-6 deferral is CLOSED and this item now builds TWO
+kinds, not one. Read these before the original acceptance below, which predates them.
+
+(A) TWO KINDS, not one surface at two levels. `api` is the AUDIT record: lean, 90-day retention,
+and it does NOT carry Cypher text. `api-debug` is a separate declared kind in
+config/log-kinds.yaml: verbose, short retention, per-run rotation, and it DOES carry Cypher text
+and request detail. Ruled as a split rather than one kind at DEBUG level so a 90-day metrics
+record is never buried in debug noise and debug can be deleted aggressively without touching the
+audit. This closes ADR 0014 clause 6&#x27;s deferred question (&quot;does the line carry the Cypher text&quot;)
+by answering it per kind instead of once.
+
+(B) 90-DAY RETENTION ON THE AUDIT KIND, and the reason is a metrics window, not an audit relic:
+the SME&#x27;s purpose is meaningful figures on WHAT IS SEARCHED. Declared in config/log-kinds.yaml
+per G105, never as a literal here.
+
+(C) VERBOSE IS SETTINGS-LEVEL, NOT PER REQUEST. There is no `--verbose` on an HTTP request, and a
+per-request header would let an untrusted caller turn on verbose capture of their own traffic.
+The `api-debug` kind&#x27;s level comes from its declaration, so it is configured rather than asked
+for -- the everything-configurable principle applied to a surface that has no CLI flag.
+
+(D) A CORRELATION ID IS REQUIRED, and it is the field this item would otherwise have shipped
+without. The QA ledger holds the QUESTION TEXT and the API audit holds the ROUTE AND OUTCOME, and
+today nothing joins them: the ledger carries `run_id` and the drafted audit fields carry no
+equivalent. Without it &quot;what is searched&quot; cannot be answered -- half the metric is in each file.
+This is not hypothetical wiring: agents/graph_qa/agent.py:60 calls ephemeral_client, which POSTs
+to {api_url}/specs/ephemeral, so one console question really does produce ledger lines AND an API
+call. Carry the agent `run_id` where the control part supplies one, else the hashed session token
+that control.py already passes. Adding it later is a migration; adding it now is a field.
+
+(E) THE ONE THING HELD FOR SME REVIEW: whether debug-tier Cypher text is ever DISPLAYED IN THE
+UI. Capturing it is ruled; surfacing it is not, and the SME asked for that specific question to
+go to the TOP of the review list. So this item may write it and must not surface it, and any UI
+work that would display it is blocked on that review rather than on this item.
+
+
+Every `drydocs_api` route that executes Cypher writes one audit record per request — `/raw-cypher` and `/specs/{id}/run` at minimum, plus any sibling found by enumerating the routes rather than by memory (the enumeration is part of the deliverable: the item lists what it found). The component logs NOTHING today, so this is the first record of who asked the graph for what through the API.
 
 Each record carries: timestamp, route, spec id where one applies, the outcome (rows returned or the error class), elapsed time, and an ACTOR identifier hashed by the same function `:AgentRun` already uses — never a raw actor value, so the record is publishable under the §3 sensitivity rules and cannot become the place a real identity leaks. The record does NOT contain result values; it is an access record, not a data copy. Where the Cypher text itself is recorded, that choice and its size bound are stated in the acceptance of whoever builds it — this item does not silently decide to persist query text.
 
