@@ -132,35 +132,47 @@ local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-of
 and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
-**LEDGER ROLLED AND CERTIFIED 2026-08-24 (laptop, post-reboot) — THIS ROLL REPLACES
-THE 2026-08-20 ONE.** Steps **178-213** cover the **182-commit delta
-`213e1d12..port-base-20260824`**, verified commit-by-commit by `port_preflight.py`:
-138 commits cited across the 36 steps and the coverage footnote, 44 exempt by subject
-under the standing ritual rule. **CERTIFIED 7/7 at `68b53716`** (tree clean, relay
-basis tags, ledger coverage 182/182 cited-or-ritual, cited paths resolve, renders
-current, suite **2382 passed / 9 skipped**, tag pushed) — venue **laptop
-`NewThinkpad`**, samples-dir present, `RECONCILE_BEFORE_DIR` unset (J18). CI green at
-the tagged commit.
+**LEDGER ROLLED AND RE-CERTIFIED 2026-08-24, SECOND BASE — THIS ROLL REPLACES BOTH THE
+2026-08-20 ONE AND THE FIRST 2026-08-24 ONE.** Steps **178-220** cover the
+**205-commit delta `213e1d12..port-base-20260824b`**, verified commit-by-commit by
+`port_preflight.py`. **CERTIFIED 7/7** (tree clean, relay basis tags, ledger coverage
+205/205 cited-or-ritual, cited paths resolve, renders current, suite **2385 passed /
+9 skipped**, tag pushed). **Venue (J18): laptop `NewThinkpad`**, and the skip
+composition is stated rather than summarised — 6 reconcile guards with
+`RECONCILE_BEFORE_DIR` unset, 3 with the production sample CSV ABSENT (gitignored, so
+absent in any fresh clone). Your figure is not comparable to this one and never was.
 
-**THE TAG IS NOT AT THE ROLL COMMIT, AND THE COUNT IS 182 RATHER THAN THE 179 THIS
-PARAGRAPH FIRST CLAIMED — read this before you reconcile the numbers.** The roll wrote
-at `9e621887`; CI then failed it on ONE citation, `docs/reviews/port-review-7c18ff4b-20260820.md`,
-which `103f240c` untracked but which was still present on the producer laptop's disk,
-so the currency guard (which asks the filesystem, not git) passed locally and failed in
-a fresh clone. The repair `3b4d8e76` and its coverage addendum `68b53716` follow, and
-the tag sits at the addendum. So `git rev-list --count 213e1d12..port-base-20260824`
-returns **182**, `git rev-parse port-base-20260824` returns **`68b53716`**, and both
-are correct. The first-written 179/roll-commit figures were measured before those three
-commits existed; they are corrected here rather than left for you to disprove, because
-this repo has already spent one follow-up condition on a 478-vs-479 mismatch.
+**WHY THERE ARE TWO TAGS FOR ONE DAY, AND WHICH ONE TO PORT.** `port-base-20260824`
+(`68b53716`, 182 commits, steps 178-213) certified cleanly that morning and is NOT
+withdrawn — it was overtaken. Producer HEAD moved 22 commits past it while the range sat
+unapplied, so rather than leave those to an immediate third wave they are ledgered here
+as steps **214-220** plus a second coverage footnote, and the base is re-certified at
+**`port-base-20260824b`**. **Port `213e1d12..port-base-20260824b`** — same base, longer
+range, one apply. The earlier tag stays in place so a session that already planned
+against it can see exactly what it grew by
+(`git log port-base-20260824..port-base-20260824b`). If your apply is already IN FLIGHT
+against `68b53716`, finish it and take 214-220 as the next range; do not re-target
+mid-apply. Nothing in 214-220 changes the five behaviour-changing reads below.
+
+**A COUNT MEASURED BEFORE THE ROLL COMMIT IS WRONG BY THE ROLL COMMIT — the first
+2026-08-24 roll learned this the expensive way, and the lesson is kept rather than the
+arithmetic.** That roll wrote 179; CI then failed it on ONE citation,
+`docs/reviews/port-review-7c18ff4b-20260820.md`, which `103f240c` untracked but which
+was still on the producer laptop's disk — so the currency guard, which asks the
+FILESYSTEM rather than git, passed locally and failed in a fresh clone. The repair and
+its coverage addendum put the real figure at 182, at a tag two commits past the roll
+commit. Both numbers were honestly measured; only one was measured last. So the figures
+above are measured AT THE TAG, and
+`git rev-list --count 213e1d12..port-base-20260824b` is the check that settles it. This
+repo has already spent one follow-up condition on a 478-vs-479 mismatch.
 
 **PRECONDITION — the `7c18ff4b..port-base-20260820` port must be MERGED and closed
 out before this range starts.** That range carried step 175, the backlog shard, which
 has its own apply sequence; a mid-apply range finishes on the monolith and this one
 begins after it. Steps 171-176 stay live below for exactly that reason.
 
-**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (179 commits,
-four days) and three steps change BEHAVIOUR rather than content: **195** splits
+**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (205 commits,
+five days) and three steps change BEHAVIOUR rather than content: **195** splits
 `cli.py` into six modules and is the biggest hand-merge here, **209** removes the
 `refresh-reference` command by name, and **210** makes `DRYDOCS_DATA_ROOT` mandatory
 so the first data-path command after the port exits 2 until it is exported. **188**
@@ -1433,6 +1445,67 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   not only pytest** — the suite cannot see a stranded corpus.
   **WHAT TO SEND BACK:** the case letter from (1) and the actual command OUTPUT, not the
   verdict (RELAY-3(b)). If you are in case (d) or already folded, that discharges this relay.
+
+- **RELAY-14 — THE ID-SPACE PARTITION IS STILL ONE-SIDED, AND IT HAS NOW COST A
+  CAPTURE** `[SME-REPORTED]` for the company-side observation; `[VERIFIED-PRODUCER]`
+  for every producer-tree fact below (raised 2026-08-24). Step 160 asked for the mirror
+  assertion and said "until that lands the partition is one-sided and the next
+  Idea-59-class collision is a matter of time". **On 2026-08-24 a company session
+  captured an inbox entry with NO id at all** — it did not allocate in the 10000+ band,
+  and nothing stopped it.
+  **THE CHEAP HALF NEEDS NO DECISION ABOUT BANDS.** Two of the four guards in
+  `tests/unit/test_plan_ideas.py` carry no band assumption and port as-is:
+  `test_every_inbox_entry_carries_the_header` (every entry must match the `Idea-<n>`
+  header, so an unheadered capture fails loudly instead of reading as "nothing to review
+  here") and `test_idea_ids_are_unique` (whole file, not just the inbox, because
+  union-append is exactly when a duplicate arrives). Those two make the failure that
+  just happened impossible, today. **The band half is still yours:** write `n >= 10000`
+  and grandfather your existing low ids as a committed constant.
+  **TWO CLAIMS FROM THAT SESSION ARE WRONG FOR THE PRODUCER TREE — corrected here so
+  they are not carried forward.** (a) "No allocator-bands section in `IDEAS.md`" is true
+  of yours, not of ours: the section has been in producer `IDEAS.md` since 2026-08-18.
+  (b) "`test_plan_ideas.py` is absent on both sides, recorded in the port ledger" — the
+  file exists producer-side with 12 tests, and `PORT-MANIFEST.yaml` marks it
+  `disposition: per-entry`, reading *"The render/header guards are producer-canonical
+  and port whole. The ALLOCATOR-BAND block does NOT"*. The ledger says take the file and
+  invert one block; it never says the file is absent.
+  **WHAT TO SEND BACK:** whether the two band-free guards landed, and the constant you
+  grandfathered. Producer-side action: none — all four guards are green here.
+
+- **RELAY-15 — CONTROL-M EXTRACTION IS INTERNAL-ONLY WORK, THE EXTRACTS HAVE NO
+  DATA-CENTER DIMENSION, AND THE DBA ASK IS ALREADY WRITTEN** `[VERIFIED-PRODUCER]` for
+  the code facts; `[SME-REPORTED]` for the estate volumetrics (raised 2026-08-24;
+  producer Idea-168 + Idea-169).
+  **(1) PROFILING IS YOURS BY DESIGN, and its numbers need tuning where the data is.**
+  The producer has no psgmgr access, so nothing here is blocked producer-side — but four
+  expectations baked into the profile prose are producer GUESSES only an internal run
+  can correct: the ~30% join-coverage expectation, the grain-dedupe discriminator, the
+  run-time sanity cap, and the estate-wide-join performance flag. Two different things
+  are called "profiling" and only one is done: the doc-08 COLUMN CENSUS is complete 7/7
+  (step 220); per-column DATA profiling — null rates, distinct counts, value domains —
+  and the CM_HOSTS definition-side probes are not.
+  **(2) NEITHER EXTRACT FILTERS BY DATA CENTER.**
+  `drydocs/loaders/sql/controlm_folders.sql` and `drydocs/loaders/sql/controlm_jobs.sql`
+  bind exactly `:folder_filter`, `:run_as`, `:developer_sid`, `:row_cap` —
+  `_scope_binds()` builds that set and no other. There is no `:data_center` bind and one
+  was deliberately NOT built: WHICH data centers load is an SME scope call, not a
+  producer default. `--folder` filters `SCHED_TABLE`, a different axis; do not reach for
+  it as a stand-in.
+  **(3) DO NOT RE-SPECIFY THE STAGING SCHEMA TO YOUR DBAs — it exists.**
+  `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` is already a DBA implementation
+  script and already data-center-shaped: a pre-flight asking whether `TABLE_ID` is
+  unique ACROSS data centers, `stg_run.data_centers` as the comma list processed per
+  run, every staging table keyed `(run_id, data_center, folder_id, job_id)`, grants, and
+  a full-refresh load pattern sized under 3M rows / 2 GB with no partitioning needed.
+  What is missing is a per-DC RUN RECIPE, not a schema. **What forces staging is the
+  VARIABLES extract, not jobs** — the census puts `CM_DEF_SETVAR_VW` near 4.7M rows
+  against roughly 1.1M raw job rows.
+  **(4) SCOPE IS A FIRST CUT WITH A NAMED REASON TO REVISIT.** Three data centers are in
+  scope; a fourth — the largest by folder count — is a DELIBERATE CUT (SME, 2026-08-24),
+  because the graph and the UI get exercised against the three-DC load before more is
+  ingested. Real data-center identifiers are Internal and live only in
+  `internal/standards/technology/data-center-inventory.md`; this file is publishable, so
+  it names none.
 
 OWED COMPANY-SIDE:
 
@@ -2976,6 +3049,84 @@ regeneration, never-port outputs — and get no step.
     APPLY: `PORT-MANIFEST.yaml` is canonical-producer; you take it wholesale and this row
     comes with it. This is a producer defect your side found and it is fixed — thank you.
 
+214. THE `neo4j-skills` TRIM NOTE IS CORRECTED — 10 SKILLS, A MEASURED COST, AND A
+    VERSION-SCOPED SYMPTOM [`CLAUDE.md` — canonical-producer] (`ba9540c7`). The routing
+    table claimed 9 skills and an unmeasured token cost. `claude plugin details
+    neo4j-skills` prints the projected always-on figure, so the note now quotes it (29
+    shipped, 10 run) and lists `document-import` in the keep set, where it was already
+    in use. The load-bearing correction is the SYMPTOM: on Claude Code 1.x a pruned
+    directory left in the manifest killed the WHOLE plugin silently; on 2.1.241 that did
+    not reproduce. Step 2 of the trim is required for CORRECTNESS, not as a guaranteed
+    tripwire.
+    APPLY: `CLAUDE.md` is canonical-producer and crosses wholesale. Keep the two-step
+    trim procedure and the "any install/update reverts it" caution; the skill list
+    itself is a producer venue fact.
+
+215. THE G102 FOLD REACHED THE CODE AND NOT THE PROSE [docs / skills — read with
+    RELAY-13] (`703c2019` the topology prose, `034a476d` Idea-165). Two retired database
+    names survived the fold in the places an AGENT reads rather than a test: the topology
+    documentation, and the `data-context-extractor` skill, which was still routing agents
+    at both dead databases. Both fixed; the two mentions that remain sit inside a comment
+    saying they retired.
+    APPLY: RELAY-13 carries the company-side half of this fold and is the read that
+    matters. These two are the producer's prose tail — they change no behaviour.
+
+216. DESIGN-DOC RENDERER — A FENCED CODE BLOCK INSIDE A LIST ITEM IS A BLOCK, NOT PROSE
+    [renderer] (`eb55853e`). `scripts/render_design_doc.py` treated a fence nested in a
+    list item as prose and reflowed it. Renders are deterministic and the HITL loop keys
+    feedback anchors on them, so a reflowed block silently breaks re-attachment — the
+    same class as the "governed renders publish VERBATIM" rule, arriving from the
+    renderer side instead of the sharing side.
+    APPLY: take it with the renderer, then re-render your design docs and expect a diff
+    on any doc holding a fence inside a list. A diff there is the fix landing, not drift.
+
+217. RUNBOOK MULTI-COMMAND BLOCKS GET ANNOTATED [docs/design — evaluate] (`c0b36116`;
+    startup-refresh Rev 13, load Rev 3). A block of several commands under one heading
+    reads as a single action; each command now says what it does and when it may be
+    skipped. `tests/unit/test_doc_traceability_loader.py` moves with it.
+    APPLY: `docs/design/**` is evaluate-on-collision and your runbooks name your venues.
+    Take the annotation discipline; the command list is ours.
+
+218. G104 — ADR 0014, THE RUNTIME SUBSTRATE [ADR — PROPOSED, not accepted] (`566b5fbd`).
+    Log directory, log level and the data root get ONE decision record instead of three
+    conventions discovered separately. Status is **Proposed**: it writes down the
+    decision the tree is already living by so it can be argued with, not a ratified rule.
+    The 0009 reconciliation is an exception 0009 already permits — read that clause
+    before treating this as a conflict between two ADRs.
+    APPLY: `docs/decisions/**` is `default_ok` — take or skip freely, never checkout;
+    both sides may hold the same ADR number for different decisions.
+
+219. G109 — THE DATA-ZONE MAP GETS ONE DECLARATION [config / drydocs-core]
+    (`f0f02fac` claim, `240accc9` the build). `drydocs landing-zones --check` was BLIND
+    to six code zones that had no `source-registry` row — a check silently covering half
+    the zones reads as coverage. Every zone now has a row or a recorded reason;
+    `drydocs_core/data_root.py` DERIVES its resolvers from those rows, so a zone cannot
+    exist in code without existing in the registry; the `dpl/` (registry) vs
+    `dpl-registry/` (code) drift is reconciled; `.env.example` documents both
+    `DRYDOCS_DATA_ROOT` and `DRYDOCS_LOGDIR`; and the in-tree Confluence capture is RULED
+    rather than left an undocumented violation of a rule the same module enforces on
+    everything else. Two of the five clauses were already satisfied by G81 and are
+    recorded as OVERTAKEN, not re-done.
+    APPLY: reads with RELAY-12 (G81 made the data root mandatory). Every new registry row
+    needs its `classification` — there is no unlabeled default (CLAUDE.md §3), and the
+    six zones are operational metadata, so the answer is per-zone rather than a default.
+
+220. DOC 08 PHASE 2 — psgmgr CENSUSED 7/7, AND `CM_DEF_VJOB` IS A TABLE
+    [config / TEST-PINNED] (`a8188d3a`). The column ledger stood 1/7 censused since
+    2026-07-22; an internal session ran the read-only catalog census on the other six and
+    the results are transcribed here. Every object now carries `census: complete`, a real
+    `column_count`, a `profiled_on`, and a frozen `count:` on its `default_disposition`,
+    so `census_failures()` reconciles explicit rows + swept count == `column_count`
+    across all seven. `tests/unit/test_source_mappings.py` no longer pins the censused
+    set to one name: a NEW object arrives `pending` and fails there until its census
+    lands. ONE MODEL CORRECTION — `CM_DEF_VJOB` is `kind: table`, not `view`; the family
+    name misleads exactly the way `CM_DEF_VTAB` does.
+    APPLY — EXPECT A CONFLICT AND MERGE THE WORDING, NOT THE NUMBERS: your side edited
+    the same ledger blocks the same day and the counts agree; only the prose differs. And
+    keep the two classes apart — a census is COLUMN INVENTORY. Row and distinct counts
+    are a different class and must never be written into `census` / `column_count`, or
+    `census_failures()` starts passing on a reconciliation it never performed.
+
 LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
 this range, cited here because the coverage check reads ONLY this section:
 `30e2b9bb` `e0ae9bab` `3643c36f` (the Q9/Q10/Q11 batch-claim/close/next_ready
@@ -3041,6 +3192,23 @@ commit. The path is now a `HISTORICAL_PATHS` entry in
 `tests/unit/test_runbook_currency.py` with its reason. Cited here rather than given a
 step because it repairs this file's own coverage, and the terminating write is the
 `chore(port): ledger` commit that adds this line.
+LEDGER COVERAGE FOOTNOTE (2026-08-24, SECOND ROLL) — the `68b53716..HEAD` extension,
+cited here because the coverage check reads ONLY this section.
+IDEA CAPTURES — `docs/restructure/IDEAS.md` is `union-append` and an inbox entry is not
+apply content. The three carrying a COMPANY action were PROMOTED TO RELAYS rather than
+left in the inbox, which your repo never reads (RELAY-14 from Idea-170; RELAY-15 from
+Idea-168 + Idea-169): `d222290e` (Idea-161 closed — the first wave-2 certification),
+`ee1d905d` (Idea-163, a desktop-local `v0.3.0` tag pointing into orphaned history),
+`870c9799` (the two findings the topology sweep deliberately left open), `21cc11c3`
+(Idea-166 + Idea-167), `8570bbc2` (Idea-168), `865fde12` (Idea-169), `264748b8`
+(Idea-170).
+SELF-DOCUMENTING — `1598c3e4` WROTE RELAY-13; its payload IS the relay text in the
+STANDING RELAYS section above, so a step would restate the file inside itself.
+HANDOFF ROLL — `e8dc2c3c`, `docs/next-session-handoff.md`: producer session state,
+never-port.
+DEPGRAPH SNAPSHOT written `chore(snapshot):` instead of `chore(depgraph): snapshot` —
+the third instance of the same subject-line variant, listed rather than fixed by
+loosening the pattern: `28c1181a`.
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
@@ -3052,9 +3220,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
 - Full `pytest tests/unit/` — ZERO failures is the contract;
-  producer reference at the CERTIFIED BASE (`port-base-20260824` @ `68b53716`,
-  laptop `NewThinkpad`, 2026-08-24): **2382 passed / 9 skipped** with the production
-  CSV present and `RECONCILE_BEFORE_DIR` unset. (The prior reference, two rolls back,
+  producer reference at the CERTIFIED BASE (`port-base-20260824b`,
+  laptop `NewThinkpad`, 2026-08-24): **2385 passed / 9 skipped**, with the production
+  sample CSV ABSENT (3 of the skips) and `RECONCILE_BEFORE_DIR` unset (6). (The same-day first base
+  `port-base-20260824` @ `68b53716` measured 2382 / 9 at the same venue; the delta is
+  the guards that rode steps 214-220.) (The prior reference, two rolls back,
   was `a4e65d26` desktop 2026-08-19 at 2224 / 5 / 13 deselected — kept here only so the
   chain is readable; a producer figure is never your acceptance number.) With
   no RECONCILE_BEFORE_DIR — your figure lands ABOVE your own e60822fc baseline,
