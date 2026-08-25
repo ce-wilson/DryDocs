@@ -132,6 +132,20 @@ local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-of
 and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
+**LEDGER ROLLED 2026-08-25 — THIS ROLL EXTENDS THE 2026-08-24 SERIES; PORT THE LONGEST
+RANGE, `213e1d12..port-base-20260825`.** Steps **221-227** cover the extension
+`dd71116e..HEAD` (ADR 0014 accepted with amendments, G105 log-kinds + dictConfig, G107
+batch run logs, R23 with both machines' stores accounted for, the escalation-census
+relay, the alias sanitization + Scan D, and the C27 CatalogSubLOB ruling). Certification
+figures are stated AT THE TAG by `port_preflight.py` — venue (J18): desktop. **Two steps
+in this extension need reading before the apply is planned: 226 (Scan D fails on your
+alias ids until your `[db]` revert — sequencing is yours, make it deliberate) and 223
+(the legacy log env var's deprecation drop trigger is THIS port).** The hand prompt for
+the range is `docs/company-prompts/catalog-sublob-and-db-alias-company-prompt.md`; steps
+221-227 carry per-step APPLY notes as usual. If your apply is already in flight against
+`port-base-20260824c`, finish it and take `port-base-20260824c..port-base-20260825` as
+the next range — do not re-target mid-apply.
+
 **LEDGER ROLLED AND RE-CERTIFIED 2026-08-24 — THIS ROLL REPLACES THE 2026-08-20 ONE AND
 BOTH EARLIER 2026-08-24 ONES.** Steps **178-220** cover the **208-commit delta
 `213e1d12..port-base-20260824c`**, verified commit-by-commit by `port_preflight.py`.
@@ -3152,6 +3166,113 @@ regeneration, never-port outputs — and get no step.
     keep the two classes apart — a census is COLUMN INVENTORY. Row and distinct counts
     are a different class and must never be written into `census` / `column_count`, or
     `census_failures()` starts passing on a reconciliation it never performed.
+
+221. ADR 0014 RULED — RUNTIME SUBSTRATE ACCEPTED WITH FOUR AMENDMENTS, AND "EVERYTHING
+    CONFIGURABLE, NOT HARDCODE" IS THE RECORDED PRINCIPLE [docs / decisions]
+    (`6abc1359` the Idea-171 capture, `413b9186` the acceptance, `ecf8ab17` the
+    G106/G108 rulings folded + Idea-172). The ADR drafted at step 218 is ACCEPTED
+    2026-08-25 as an EXCEPTION ADR 0009 already permits (rule 1's own scope clause —
+    no SME gates a log directory, no port carries one, no classification test guards
+    one). Amendments: clause 1 per-KIND in `config/log-kinds.yaml`; clause 3 the naming
+    rule DERIVES (the drafted rule matched 5 of 86 real files); clause 4 `prune-logs`
+    reads retention from the declaration; clauses 5/6 — `drydocs_api` is OUT of clause
+    5 (it has no batches) and the audit line WIDENS to routes that write. G106/G108
+    carry the retention rulings as acceptance riders: `api` audit 90 days no Cypher
+    text, `api-debug` a SEPARATE kind (verbose, short, carries Cypher), verbose is
+    settings-level, and a CORRELATION id is required (the QA ledger holds question
+    text, the audit holds route+outcome, nothing joined them).
+    APPLY — record-only for you: your gates are your own, but the README row and the
+    ADR's "What the ruling changed" section are the authority the G105/G107 code
+    steps below build against.
+
+222. G107 — ONE SHARED BATCH RUN LOG, WIRED INTO THE THREE COMPONENTS THAT HAVE
+    BATCHES [drydocs-core / components] (`26ade9f4`). `batch_run_log()` context
+    manager in `drydocs_core/run_log.py` — open, capture, re-raise, close in finally,
+    an unwritable log dir swallowed (a run log is never the reason a batch fails).
+    Wired by rename-plus-wrapper: lineage `write_curated`/`write_rua`, docmeta's two
+    connectors (fetch stays the PUBLIC name — the Connector protocol is guarded), the
+    vendor scrape's `capture`. THE CITED PRECEDENT DID NOT EXIST — G93 is still todo,
+    so remediation logs nothing; G93 gained a rider to use this helper. DEEPDOC IS
+    REFUSED, NOT SKIPPED: it is a scaffold until MM10 and both entry points raise on
+    line one. 12 new guards, both paths per component.
+    APPLY — your `drydocs_remediation` is the live one: when you take G93, use
+    `batch_run_log`, never a hand-rolled block.
+
+223. G105 — LOG KINDS ARE DECLARED, THE NAMING RULE DERIVES FROM THEM, dictConfig
+    REPLACES basicConfig [drydocs-core / config] (`3ec2c436`). NEW
+    `config/log-kinds.yaml` (schema drydocs.log-kinds.v1) + reader
+    `drydocs_core/log_kinds.py` on the data-zones idiom. Six kinds: load/sql/cli/qa
+    active, api/api-debug `planned` for G108. `claim_log_path` parses `<kind>.<name>`
+    and REFUSES an undeclared kind; the SQL family gains the `sql.` segment it never
+    had (it wrote `oracle.<ts>.log`); the per-day `qa` ledger is CONFORMING, not
+    excepted. `RuntimeSettings` joins config.py; `cli.py`'s one `basicConfig` becomes
+    `configure_logging()` (stdlib dictConfig, `--verbose` still wins); four components
+    gain module loggers; graph_qa's telemetry swallow now WARNS (the swallow itself is
+    unchanged and right). The legacy log env var resolves one more cycle WITH a
+    DeprecationWarning — **the drop trigger is THIS port landing on your side.**
+    APPLY — read `config/log-kinds.yaml` + `.env.example` first; your two company-only
+    supplements precedent applies if you carry company-only log kinds: add them to
+    YOUR declaration before adopting the refusal path.
+
+224. R23 — THE ASK CONTROL TOKEN STOPS REACHING THE SESSION STORE, AND BOTH MACHINES'
+    STORES ARE ACCOUNTED FOR [agents] (`bd0cd2dd` the fix, `26b0ce79` the handoff,
+    `7e478283` the desktop purge record). The R5 control part carried the browser's
+    api_token into ADK session events verbatim; the fix redacts it before the store
+    (`agents/common/session_redaction.py` + guards). Producer stores: laptop checked
+    clean at the fix; desktop confirmed 10 token-bearing events and PURGED 2026-08-25
+    (J18 — machine named because an untagged "purged" reads as both). `.adk/` is
+    gitignored; nothing ever reached either repo.
+    APPLY — code applies by manifest. YOUR action: check your own `.adk/session.db`
+    for `api_token` in events and purge if present; the tokens are replayable for the
+    life of the API process.
+
+225. DOC 08 PHASE 2 RELAY — THE CM_ESCALATION_DB CENSUS LANDS ON THE SIDE THE PORT
+    CARRIES FROM [config / registry] (`6ea0b3d7` the census, `ede62d44` the internal
+    `[db]` key, `0786cd41` the hand prompt). The escalation-table census (7/7 columns)
+    is transcribed onto the PRODUCER's registry row — the canonical-producer side —
+    so it survives ports instead of being overwritten with your local copy; the
+    `[db]` placeholder finally has a machine-local key (`internal/standards/
+    technology/database-inventory.md`, does NOT cross). The hand prompt
+    (`docs/company-prompts/escalation-census-company-prompt.md`) told your side the
+    census note there is temporary.
+    APPLY — expect your census note on the old row to be superseded by this file
+    arriving; your ledger already records that expectation.
+
+226. THE REDACTED DATABASE ALIAS STOPS BEING PUBLISHED, AND SCAN D GUARDS IT
+    [boundary / tests] (`f22da676` the sanitization + guard, `92115bf3` the hand
+    prompt). SME ruling 2026-08-25: the token is an ALIAS, not a SID, and is still
+    not published. Three producer prose leaks sanitized (the reconcile-port skill's
+    tnsnames caution now names NO alias; PORT-MANIFEST + the steps-1-42 archive now
+    say `psgmgr §7f` — the SCHEMA, which the signed grammar KEEPS, gate-log:2971).
+    NEW Scan D in `tests/unit/test_publish_boundary_values.py`: sha256-pinned (the
+    guard never writes the token), trailing-underscore allowance for the deprecated
+    env prefix, proven to fire on injected drift.
+    APPLY — **READ `docs/company-prompts/catalog-sublob-and-db-alias-company-prompt.md`
+    §3 BEFORE taking `tests/**` from this range.** Scan D fails on your ten alias ids
+    until your `[db]` revert lands; tests/** is evaluate-on-collision, so taking it
+    red or after the revert is YOUR sequencing call — just make it deliberately.
+
+227. C27 — THE SUB-LOB LABEL IS `CatalogSubLOB` (SME, OPTION 1), AND THE C26
+    RESERVATIONS RETIRE [ontology / map] (`32f8f7b0`). The one catalog question your
+    2026-08-06 gate reversal did not reach: the same label split one level down.
+    RULED CatalogSubLOB; your side has ALREADY EXECUTED the relabel (Option 1 run
+    2026-08-25, suite 2420 green — this step is the producer record catching up, not
+    an instruction). Producer vocab entries STAY `planned` (no producer Sub-LoB grain,
+    no capture, no loader — flips are follow-ups); the C26 map-id reservations move to
+    `rejected` with `superseded_by` for naming ids nobody mints (you built
+    `lob-has-sub-lob`/`sub-lob-has-product-line` and KEPT `lob-reconciles-to-segment`);
+    your two real ids are recorded as names the producer must not mint. The
+    reconcile-port divergence ledger items 3/4 are rewritten — label settled BOTH
+    levels, do not re-open either as a divergence to preserve.
+    APPLY — the map fragment merge is per-entry; your active entries survive by rule.
+    Your two deliberate leftovers (review-labels spine, TDD prose) are yours to
+    schedule and are recorded as such.
+
+LEDGER COVERAGE FOOTNOTE (2026-08-25 ROLL) — ritual commits in the
+`dd71116e..HEAD` extension, cited because the coverage check reads ONLY this
+section: `735c0ef3` `1ebc0088` (depgraph snapshots), `65fdcdcc` `e232d684`
+`def4727f` `1b5a27a2` (claim flips for C27/G105/G107/R23 — the work is steps
+221-227), plus the roll commit itself under the narrow roll exemption.
 
 LEDGER COVERAGE FOOTNOTE (2026-08-19) — ritual and self-referential commits in
 this range, cited here because the coverage check reads ONLY this section:

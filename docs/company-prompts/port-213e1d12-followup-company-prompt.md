@@ -136,7 +136,8 @@ transcribes your session, and `docs/reviews/**` is `default_ok`, so a tracked co
 ports back to the repo it is about. They are machine-local from now on.
 
 The practical effect for you: **the next range will hand you a deletion of
-`docs/reviews/port-review-7c18ff4b-20260820.md`.** That is a producer-side
+`port-review-7c18ff4b-20260820.md` (under the producer's docs/reviews/, already
+untracked there — which is why citing its full path would dangle).** That is a producer-side
 untracking, not a retraction — its findings stand and several of them are already in
 your ledger. Keep your copy; take the deletion or don't, either is fine, and neither
 is a discrepancy to chase.
