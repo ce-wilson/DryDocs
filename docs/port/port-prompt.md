@@ -132,27 +132,38 @@ local-run-evidence-only is RESOLVED — `main` is green at HEAD (the K17 sign-of
 and both commits after it all passed). Earlier acceptance claims in this range
 remain local-run statements as written; from here CI corroborates.
 
-**LEDGER ROLLED AND RE-CERTIFIED 2026-08-24, SECOND BASE — THIS ROLL REPLACES BOTH THE
-2026-08-20 ONE AND THE FIRST 2026-08-24 ONE.** Steps **178-220** cover the
-**205-commit delta `213e1d12..port-base-20260824b`**, verified commit-by-commit by
-`port_preflight.py`. **CERTIFIED 7/7** (tree clean, relay basis tags, ledger coverage
-205/205 cited-or-ritual, cited paths resolve, renders current, suite **2385 passed /
+**LEDGER ROLLED AND RE-CERTIFIED 2026-08-24 — THIS ROLL REPLACES THE 2026-08-20 ONE AND
+BOTH EARLIER 2026-08-24 ONES.** Steps **178-220** cover the **206-commit delta
+`213e1d12..port-base-20260824c`**, verified commit-by-commit by `port_preflight.py`.
+**CERTIFIED 7/7** (tree clean, relay basis tags, ledger coverage 206/206
+cited-or-ritual, cited paths resolve, renders current, suite **2385 passed /
 9 skipped**, tag pushed). **Venue (J18): laptop `NewThinkpad`**, and the skip
 composition is stated rather than summarised — 6 reconcile guards with
 `RECONCILE_BEFORE_DIR` unset, 3 with the production sample CSV ABSENT (gitignored, so
 absent in any fresh clone). Your figure is not comparable to this one and never was.
 
-**WHY THERE ARE TWO TAGS FOR ONE DAY, AND WHICH ONE TO PORT.** `port-base-20260824`
-(`68b53716`, 182 commits, steps 178-213) certified cleanly that morning and is NOT
-withdrawn — it was overtaken. Producer HEAD moved 22 commits past it while the range sat
-unapplied, so rather than leave those to an immediate third wave they are ledgered here
-as steps **214-220** plus a second coverage footnote, and the base is re-certified at
-**`port-base-20260824b`**. **Port `213e1d12..port-base-20260824b`** — same base, longer
-range, one apply. The earlier tag stays in place so a session that already planned
-against it can see exactly what it grew by
-(`git log port-base-20260824..port-base-20260824b`). If your apply is already IN FLIGHT
-against `68b53716`, finish it and take 214-220 as the next range; do not re-target
-mid-apply. Nothing in 214-220 changes the five behaviour-changing reads below.
+**WHY THERE ARE THREE TAGS FOR ONE DAY, AND WHICH ONE TO PORT. Port
+`213e1d12..port-base-20260824c`.** All three certified 7/7 against the same base; each
+later one is the earlier one plus commits, so there is nothing to choose between them
+beyond taking the longest.
+- **`port-base-20260824`** (`68b53716`, 182 commits, steps 178-213) — the morning base.
+  Certified cleanly, never applied, overtaken.
+- **`port-base-20260824b`** (`68b1c03b`, 205 commits, steps 178-220) — producer HEAD had
+  moved 22 commits past the morning tag while the range sat unapplied, so rather than
+  leave those to an immediate third wave they were ledgered as steps 214-220 plus a
+  second coverage footnote.
+- **`port-base-20260824c`** (206 commits, same steps) — a ledger ACCURACY repair, no new
+  payload: step 219 as first written described a `data_root.py` resolver derivation that
+  G109 does not contain (G81 had already done that, and G109 records it as overtaken),
+  and step 216 named the driver script instead of the module that holds the fix. Both
+  now match the commits. Superseding a certified tag for a wrong STEP is the cheaper
+  half of the J41 bargain — the alternative is a company session planning an apply
+  around a change it will not find.
+
+None of 214-220 changes behaviour, so the five "read this first" steps below are
+unchanged. **If your apply is already IN FLIGHT against an earlier tag, finish it and
+take the remainder as the next range; do not re-target mid-apply.**
+`git log port-base-20260824..port-base-20260824c` shows exactly what grew.
 
 **A COUNT MEASURED BEFORE THE ROLL COMMIT IS WRONG BY THE ROLL COMMIT — the first
 2026-08-24 roll learned this the expensive way, and the lesson is kept rather than the
@@ -163,7 +174,7 @@ FILESYSTEM rather than git, passed locally and failed in a fresh clone. The repa
 its coverage addendum put the real figure at 182, at a tag two commits past the roll
 commit. Both numbers were honestly measured; only one was measured last. So the figures
 above are measured AT THE TAG, and
-`git rev-list --count 213e1d12..port-base-20260824b` is the check that settles it. This
+`git rev-list --count 213e1d12..port-base-20260824c` is the check that settles it. This
 repo has already spent one follow-up condition on a 478-vs-479 mismatch.
 
 **PRECONDITION — the `7c18ff4b..port-base-20260820` port must be MERGED and closed
@@ -171,7 +182,7 @@ out before this range starts.** That range carried step 175, the backlog shard, 
 has its own apply sequence; a mid-apply range finishes on the monolith and this one
 begins after it. Steps 171-176 stay live below for exactly that reason.
 
-**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (205 commits,
+**WHAT IS DIFFERENT ABOUT THIS RANGE, in one paragraph.** It is large (206 commits,
 five days) and three steps change BEHAVIOUR rather than content: **195** splits
 `cli.py` into six modules and is the biggest hand-merge here, **209** removes the
 `refresh-reference` command by name, and **210** makes `DRYDOCS_DATA_ROOT` mandatory
@@ -3072,8 +3083,9 @@ regeneration, never-port outputs — and get no step.
     matters. These two are the producer's prose tail — they change no behaviour.
 
 216. DESIGN-DOC RENDERER — A FENCED CODE BLOCK INSIDE A LIST ITEM IS A BLOCK, NOT PROSE
-    [renderer] (`eb55853e`). `scripts/render_design_doc.py` treated a fence nested in a
-    list item as prose and reflowed it. Renders are deterministic and the HITL loop keys
+    [renderer] (`eb55853e`). `drydocs/design_doc.py` — the module, not the thin
+    `scripts/render_design_doc.py` driver — treated a fence nested in a list item as
+    prose and reflowed it; `tests/unit/test_doc_traceability_loader.py` pins it. Renders are deterministic and the HITL loop keys
     feedback anchors on them, so a reflowed block silently breaks re-attachment — the
     same class as the "governed renders publish VERBATIM" rule, arriving from the
     renderer side instead of the sharing side.
@@ -3096,20 +3108,34 @@ regeneration, never-port outputs — and get no step.
     APPLY: `docs/decisions/**` is `default_ok` — take or skip freely, never checkout;
     both sides may hold the same ADR number for different decisions.
 
-219. G109 — THE DATA-ZONE MAP GETS ONE DECLARATION [config / drydocs-core]
-    (`f0f02fac` claim, `240accc9` the build). `drydocs landing-zones --check` was BLIND
-    to six code zones that had no `source-registry` row — a check silently covering half
-    the zones reads as coverage. Every zone now has a row or a recorded reason;
-    `drydocs_core/data_root.py` DERIVES its resolvers from those rows, so a zone cannot
-    exist in code without existing in the registry; the `dpl/` (registry) vs
-    `dpl-registry/` (code) drift is reconciled; `.env.example` documents both
-    `DRYDOCS_DATA_ROOT` and `DRYDOCS_LOGDIR`; and the in-tree Confluence capture is RULED
-    rather than left an undocumented violation of a rule the same module enforces on
-    everything else. Two of the five clauses were already satisfied by G81 and are
-    recorded as OVERTAKEN, not re-done.
-    APPLY: reads with RELAY-12 (G81 made the data root mandatory). Every new registry row
-    needs its `classification` — there is no unlabeled default (CLAUDE.md §3), and the
-    six zones are operational metadata, so the answer is per-zone rather than a default.
+219. G109 — `landing-zones` STOPS COVERING HALF THE ZONES, AND THE CONFLUENCE CAPTURE
+    IS RULED OUT OF THE TREE [config / drydocs-core] (`f0f02fac` claim, `240accc9` the
+    build). **The premise moved between grooming and build, and the sharper defect is
+    what shipped — read this before you look for a registry change that is not there.**
+    The item said six zones had no `source-registry` row, so `drydocs landing-zones
+    --check` was blind to them. Post-G81 all six DO have a declaration — in
+    `config/data-zones.yaml` — and the command was STILL blind, because it read only the
+    registry. Duplicating them into the registry would have been wrong twice over:
+    `data-zones.yaml`'s own header FAILS a zone that duplicates a registry row, and a
+    WRITE zone has no provenance, trust axis or acquisition mode, so its row would be
+    nulls asserting a source that does not exist. The READ SURFACE is what changed:
+    `landing-zones` now reports both declarations (26 zones, was 15) and `--check` is
+    MODE-AWARE — an empty read zone fails, an empty write zone does not, because failing
+    on an output directory the system rebuilds trains the operator to ignore the exit
+    code. `.env.example` gains `DRYDOCS_LOGDIR` (G81 had already added the data root),
+    and two of the five clauses were already satisfied by G81 — recorded as OVERTAKEN,
+    acceptance text untouched, not re-done.
+    **RULED (clause e): the `fcdo-frameworks` Confluence capture MOVES; it gets no
+    exception.** It had landed in-tree untracked AND not gitignored — the one category
+    `git clean -fd` removes without `-x`. An in-tree zone is permitted only when TRACKED,
+    and PUBLISH-BOUNDARY forbids ever tracking a verbatim capture carrying real names and
+    internal URLs, so an exception could never expire where a ruling can.
+    APPLY: reads with RELAY-12 (G81 made the data root mandatory). Nothing here REFUSES
+    anything new — the command sees more, it rejects no more — so a company-only zone
+    keeps working; it simply stays invisible to `--check` until it has a
+    `config/data-zones.yaml` declaration. One deliberate non-change worth keeping: the
+    doc-source row's historical `source:` path is left as written, because falsifying a
+    provenance record to match a later ruling is the one thing a VERBATIM row may not do.
 
 220. DOC 08 PHASE 2 — psgmgr CENSUSED 7/7, AND `CM_DEF_VJOB` IS A TABLE
     [config / TEST-PINNED] (`a8188d3a`). The column ledger stood 1/7 censused since
@@ -3220,7 +3246,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
 - Full `pytest tests/unit/` — ZERO failures is the contract;
-  producer reference at the CERTIFIED BASE (`port-base-20260824b`,
+  producer reference at the CERTIFIED BASE (`port-base-20260824c`,
   laptop `NewThinkpad`, 2026-08-24): **2385 passed / 9 skipped**, with the production
   sample CSV ABSENT (3 of the skips) and `RECONCILE_BEFORE_DIR` unset (6). (The same-day first base
   `port-base-20260824` @ `68b53716` measured 2382 / 9 at the same venue; the delta is

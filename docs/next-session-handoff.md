@@ -6,22 +6,25 @@
 > `docs/port/port-prompt.md`; this is the narrative that git alone does not carry.
 >
 > **Written 2026-08-24 (laptop `NewThinkpad`, second session of the day, at the roll
-> commit itself), certified base = tag `port-base-20260824b`.** The morning tag
-> `port-base-20260824` @ `68b53716` is superseded, not withdrawn — see §1.
+> commit itself), certified base = tag `port-base-20260824c`.** Two earlier tags carry
+> the same day's date and are superseded, not withdrawn — see §1.
 
 ## 1. WAVE 2 IS CERTIFIED AND WAITING — AND IT GREW
 
-**`port-base-20260824b`**, preflight **7/7**, range
-**`213e1d12..port-base-20260824b`** — **205 commits**, ledger steps **178-220**.
+**`port-base-20260824c`**, preflight **7/7**, range
+**`213e1d12..port-base-20260824c`** — **206 commits**, ledger steps **178-220**.
 Suite **2385 passed / 9 skipped** (laptop `NewThinkpad`; 6 skips are reconcile guards
 with `RECONCILE_BEFORE_DIR` unset, 3 are the production sample CSV being absent — J18).
 
-**Why a second tag on the same day.** The morning base `68b53716` certified cleanly at
-182 commits / steps 178-213 and is still there. Producer HEAD then moved 22 commits past
-it while nobody was applying it, so instead of leaving those to an immediate third wave
-they are ledgered as **steps 214-220** with a second coverage footnote, and the base is
-re-certified. **Port the longer range in one apply.** If an apply is already in flight
-against `68b53716`, finish it and take 214-220 next — do not re-target mid-apply.
+**Why three tags carry the same date.** All three certified 7/7 against the same base
+and each is the previous one plus commits, so take the longest. `port-base-20260824`
+(`68b53716`, 182 commits) was the morning base; HEAD then moved 22 commits past it while
+nobody applied it, so those were ledgered as **steps 214-220** and re-certified as
+`...824b` (`68b1c03b`, 205); `...824c` is a ledger ACCURACY repair on top with no new
+payload — step 219 had described a resolver change G109 does not contain and step 216
+named the driver instead of the module. **Port the longest range in one apply.** If an
+apply is already in flight against an earlier tag, finish it and take the remainder
+next — do not re-target mid-apply.
 
 **No hand prompt for this range, deliberately** — everything applies by the manifest.
 What it needs is that the reader opens five steps first, because they change behaviour
@@ -59,9 +62,10 @@ the PORT-REPORT.
 - **Steps 214-220** — the `neo4j-skills` trim-note correction (214), the G102 fold's
   prose tail incl. the `data-context-extractor` skill that was still routing agents at
   two dead databases (215), the design-doc renderer's nested-fence fix (216), runbook
-  block annotation (217), ADR 0014 / G104 (218), G109's single data-zone declaration
-  (219), and doc 08 Phase 2 — psgmgr censused 7/7 with `CM_DEF_VJOB` corrected to a
-  TABLE (220).
+  block annotation (217), ADR 0014 / G104 (218), G109 making `landing-zones --check`
+  see both zone declarations instead of half of them and ruling the Confluence capture
+  out of the tree (219), and doc 08 Phase 2 — psgmgr censused 7/7 with `CM_DEF_VJOB`
+  corrected to a TABLE (220).
 - **RELAY-14 — the id-space partition is still one-sided, and it has now cost a
   capture.** A company session captured an inbox entry with **no id at all**. Step 160
   predicted exactly this. The relay separates the two halves: the header and uniqueness
