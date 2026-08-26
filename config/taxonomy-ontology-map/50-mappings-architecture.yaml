@@ -15,7 +15,7 @@
     precedence_authority: internal-standards   # naming normalized by knowledge/standards
     status: proposed                       # <-- SME must confirm before load
     notes: >
-      FCDO alignment registered PLANNED (W2 2026-08-05; ALIGNMENT-PLAN Phase
+      CDO alignment registered PLANNED (W2 2026-08-05; ALIGNMENT-PLAN Phase
       2.3): when Table -> DataAsset is confirmed at this gate, column facts
       use the SHACL ColumnShape property names — precision, scale, length,
       isNullable — and any future Oracle<->Snowflake datatype crosswalk

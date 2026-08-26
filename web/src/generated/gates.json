@@ -426,10 +426,10 @@
     {
       "kind": "log-entry",
       "date": "2026-08-05",
-      "title": "GATE: fcdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)",
+      "title": "GATE: cdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)",
       "status": "signed-off",
       "prompt_files": [
-        "config/gate-prompts/fcdo-crosswalk.yaml"
+        "config/gate-prompts/cdo-crosswalk.yaml"
       ],
       "log_ref": "config/gate-log.md:1432",
       "unblocks": []
@@ -437,10 +437,10 @@
     {
       "kind": "log-entry",
       "date": "2026-08-05",
-      "title": "RECORD: `fcdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the fcdo-crosswalk sign-off)",
+      "title": "RECORD: `cdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the cdo-crosswalk sign-off)",
       "status": "recorded",
       "prompt_files": [
-        "config/gate-prompts/fcdo-crosswalk.yaml"
+        "config/gate-prompts/cdo-crosswalk.yaml"
       ],
       "log_ref": "config/gate-log.md:1454",
       "unblocks": []
@@ -1026,6 +1026,17 @@
       "unblocks": [
         "K20"
       ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-26",
+      "title": "RECORD: org-acronym sanitization — the `cdo-*` rename (user direction, in-chat)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/cdo-crosswalk.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4175",
+      "unblocks": []
     },
     {
       "kind": "prompt-only",

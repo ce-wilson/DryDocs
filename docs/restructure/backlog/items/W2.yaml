@@ -1,6 +1,6 @@
 id: W2
-epic: fcdo-alignment
-title: 'FCDO property/enum alignment registered as planned on the planned items: Run properties + run-event
+epic: cdo-alignment
+title: 'CDO property/enum alignment registered as planned on the planned items: Run properties + run-event
   enum, SKOS-required attrs on enum gates, ColumnShape property names'
 type: task
 module: ontology
@@ -11,11 +11,11 @@ priority: p2
 status: done
 depends_on: []
 inputs:
-- internal/fcdo-reference/ALIGNMENT-PLAN.md
+- internal/cdo-reference/ALIGNMENT-PLAN.md
 - drydocs_core/ontology/relationship_vocabulary.yaml
 - config/gate-prompts/
 - drydocs_core/schema/
 acceptance: |
-  The FCDO-aligned names are REGISTERED as planned/proposed on their three landing spots, each activating only at its host gate/build — never from this item: (1) the planned ControlMJobRun material carries the required Run property semantics (run UUID, nominalTime scheduled time, parent run/job link, errorMessage) and START/COMPLETE/FAIL/ABORT as the run-event value set, with wiring the three seeded :OlClass nodes (OL Run/Job/Dataset) via MAPS_TO listed as part of that build; (2) the open G27 etlprocess-kind-enum prompt (and the enum-gate idiom it sets) states the SKOS-required concept attributes (prefLabel, definition, identifier, created/creator) with the tom_roles/product_roles backfill named; (3) the oracle-schema-asset gate material names the ColumnShape property names (precision, scale, length, isNullable) for column facts. All entries status planned; vocabulary/schema tests green.
+  The CDO-aligned names are REGISTERED as planned/proposed on their three landing spots, each activating only at its host gate/build — never from this item: (1) the planned ControlMJobRun material carries the required Run property semantics (run UUID, nominalTime scheduled time, parent run/job link, errorMessage) and START/COMPLETE/FAIL/ABORT as the run-event value set, with wiring the three seeded :OlClass nodes (OL Run/Job/Dataset) via MAPS_TO listed as part of that build; (2) the open G27 etlprocess-kind-enum prompt (and the enum-gate idiom it sets) states the SKOS-required concept attributes (prefLabel, definition, identifier, created/creator) with the tom_roles/product_roles backfill named; (3) the oracle-schema-asset gate material names the ColumnShape property names (precision, scale, length, isNullable) for column facts. All entries status planned; vocabulary/schema tests green.
 notes: |
   Groomed 2026-07-31 — ALIGNMENT-PLAN Phase 2 (planned-items-only rule). Registration is startable now; each activation rides its host gate/build (prose dependency per the O31 precedent, not depends_on ids). SCOPE NOTE (user ruling 2026-07-31): the Run property semantics in (1) — run UUID, nominalTime, parent link, errorMessage, START/COMPLETE/FAIL/ABORT — would apply IF DryDocs becomes event-based / near-real-time monitoring, WHICH IT IS NOT. Our run data is batch history (CM_HIST / cm_avg_run supplements), not a live OpenLineage event stream — so item (1) stays a registered-planned naming alignment only, adopted so that IF an event-based mode ever arrives the names are already conformant; it is not a mandate to build run-event ingestion, and no gate should treat it as one. DONE 2026-08-05 (desktop, 46a2b8c): (1) landed on the ControlMJobRun note in relationship_vocabulary/10-node-classifications.yaml (Run semantics + event value set + :OlClass MAPS_TO wiring listed as part of that build, scope ruling restated); (2) landed as C3 on the G27 prompt (SKOS attrs stated as the enum-gate idiom; tom_roles/ product_roles named as backfill targets, follow-up rides the ruled option's build); (3) landed as a notes: block on the oracle-schema-asset map entry (ColumnShape names + maps-to-type pattern). Registrations only — every activation rides its host gate/build. Suite 1588 green.

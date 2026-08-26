@@ -1,3 +1,13 @@
+> **RENAMED 2026-08-26 (org-acronym sanitization, user direction):** this directory was
+> `internal/fcdo-reference/`; the doc corpus id was `fcdo-frameworks` (now `cdo-frameworks`);
+> the gate and crosswalk were `fcdo-crosswalk` / `fcdo-vocabulary.yaml` (now `cdo-*`); the
+> Epic W id was `fcdo-alignment` (now `cdo-alignment`); the company prompt was
+> `fcdo-frameworks-load-company-prompt.md`; prose used "FCDO". Every publishable surface now
+> uses the neutral `cdo-*` / "chief data office (CDO)" forms. This note is the ONE place the
+> mapping is written — this file is Internal and never publishes. The retired strings may
+> never re-mint with a different meaning. Content below is unchanged: the transcripts are
+> verbatim captures, and FCDO inside them names the real org.
+
 # internal/fcdo-reference — FCDO Data Publishing Frameworks capture
 
 **Classification: Internal** (confidential handling — J23 collapse 2026-07-31) — contains real employee names, internal

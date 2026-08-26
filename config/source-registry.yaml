@@ -19,9 +19,9 @@
 #                is not established public vocabulary — psgmgr is)
 #                {system}:{artifact}             born-here datasets
 #   Derived stores keep the @ grammar + `derived: true`; `authority` is
-#   omitted there (Q3 — not SOR/ADS; FCDO SOC = upstream capture, doesn't fit).
+#   omitted there (Q3 — not SOR/ADS; CDO SOC = upstream capture, doesn't fit).
 #
-# AUTHORITY (FCDO vocabulary as a FIELD): SOR = originating source for this
+# AUTHORITY (CDO vocabulary as a FIELD): SOR = originating source for this
 # set of data; ADS = approved copy/redistribution carrier. Attaches to the
 # DATASET, never the system (their own definition is per-data-subset).
 #
@@ -1096,7 +1096,7 @@ datasets:
     artifact_kind: table
     taxonomy_category: Software / Apps
     asset_type: dcat:Dataset
-    derived: true                       # Q3 ruling: derived store — @ grammar for visibility, authority omitted (not SOR/ADS; FCDO SOC checked, doesn't fit)
+    derived: true                       # Q3 ruling: derived store — @ grammar for visibility, authority omitted (not SOR/ADS; CDO SOC checked, doesn't fit)
     feeds_taxonomy: [applications]      # semantic facts attribute a ControlMJob to an Application (SEAL)
     adapter: oracle
     acquisition:                        # N12 (2026-08-18): how the data arrives
@@ -1198,7 +1198,9 @@ retired:
     replaced_by: ["repo:design-docs"]
     reason: "born-here grammar (pipeline-side only per Q5)"
   # NOTE — bmc-docs / neo4j-docs-essential-graphrag (formerly essential-graphrag,
-# renamed 2026-08-18 in its one home) / fcdo-frameworks are NOT retired:
+# renamed 2026-08-18 in its one home) / cdo-frameworks (renamed 2026-08-26
+# in its one home — org-acronym sanitization; mapping in
+# internal/cdo-reference/README.md) are NOT retired here:
   # those ids stay LIVE in their one home (config/doc-source-registry.yaml);
   # only the pipeline twin rows dropped. The runtime registry unions the doc
   # ledger, so loaders bound to them still resolve and gate.

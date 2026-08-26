@@ -1,40 +1,40 @@
-# SME gate-prompt spec — FCDO vocabulary crosswalk (backlog W1).
+# SME gate-prompt spec — CDO vocabulary crosswalk (backlog W1).
 # SIGNED OFF 2026-08-05 (gate-log; 13 confirmations ACCEPTED IN FULL, chad.wilson,
 # in-chat) — rows 1-4, 6-8 + file status flipped confirmed; row 5 stays
 # blocked-on-recapture (signed NEITHER WAY — Descriptive Metadata Framework
-# recapture required first). SME remark on §A: fcdo-frameworks corpus activation
+# recapture required first). SME remark on §A: cdo-frameworks corpus activation
 # is under consideration, a separate registry decision this gate did not make.
-# Reviews config/crosswalks/fcdo-vocabulary.yaml row-by-row. Confirming this
-# gate did NOT activate the fcdo-frameworks corpus, change any ontology term,
+# Reviews config/crosswalks/cdo-vocabulary.yaml row-by-row. Confirming this
+# gate did NOT activate the cdo-frameworks corpus, change any ontology term,
 # or authorize a graph write.
 # Mechanism-only: standard CURIEs (prov:, dcat:, skos:, adms:, rdfs:, public
 # OpenLineage spec); no internal URLs/org names. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-id: fcdo-crosswalk
-title: "SME Gate — FCDO vocabulary crosswalk (DryDocs terms to the firmwide framework terms)"
-step: "ALIGNMENT-PLAN Phase 1 (internal/fcdo-reference/ALIGNMENT-PLAN.md) — crosswalk confirmation, before any Phase-2 activation"
+id: cdo-crosswalk
+title: "SME Gate — CDO vocabulary crosswalk (DryDocs terms to the firmwide framework terms)"
+step: "ALIGNMENT-PLAN Phase 1 (internal/cdo-reference/ALIGNMENT-PLAN.md) — crosswalk confirmation, before any Phase-2 activation"
 summary: >
   Confirms the DryDocs <-> firmwide-framework vocabulary crosswalk in
-  config/crosswalks/fcdo-vocabulary.yaml: eight rows mapping our ontology terms
+  config/crosswalks/cdo-vocabulary.yaml: eight rows mapping our ontology terms
   onto the standard vocabularies the frameworks require (PROV-O, DCAT, SKOS,
   ADMS, RDFS, OpenLineage). The verdict being ratified is the ALIGNMENT-PLAN's:
   DryDocs is already structurally aligned — every row maps an EXISTING DryDocs
   term to a standard term; none renames, reshapes, or adds anything. One row
   (5, the metadata envelope) sits in a known capture hole and is
   blocked-on-recapture — it stays open regardless of this session's other
-  outcomes until the fcdo-frameworks scrape recaptures its framework.
-  Confirming this gate does NOT activate the fcdo-frameworks corpus
+  outcomes until the cdo-frameworks scrape recaptures its framework.
+  Confirming this gate does NOT activate the cdo-frameworks corpus
   (config/doc-source-registry.yaml keeps confirmed: false until its own
   flip) and authorizes no graph write.
 meta:
   Module: "drydocs-core"
-  Source: "internal/fcdo-reference/ ALIGNMENT-PLAN.md + framework transcripts (2026-07-30 screenshot capture; recapture path = the registered fcdo-frameworks Confluence scrape)"
-  Registry ref: "fcdo-frameworks — NOT confirmed (config/doc-source-registry.yaml, T4, connector confluence, refresh on-demand); this gate is the 'crosswalk gate not yet drafted' its confirmed: false comment names"
+  Source: "internal/cdo-reference/ ALIGNMENT-PLAN.md + framework transcripts (2026-07-30 screenshot capture; recapture path = the registered cdo-frameworks Confluence scrape)"
+  Registry ref: "cdo-frameworks — NOT confirmed (config/doc-source-registry.yaml, T4, connector confluence, refresh on-demand); this gate is the 'crosswalk gate not yet drafted' its confirmed: false comment names"
   Classification: "Internal-Public (this page and the crosswalk file: standard CURIEs only, mechanism-only) — the evidence corpus itself is Internal (confidential handling) and stays in internal/"
   Precedence: "Alignment is one-way — DryDocs terms map TO the framework terms; no framework term redefines a DryDocs term, and the frameworks have no vocabulary for scheduling/conditions/folders/run-state escalation/sensitivity classification, so those local terms stay as-is"
-  Crosswalk file: "config/crosswalks/fcdo-vocabulary.yaml (8 rows: 7 proposed, 1 blocked-on-recapture)"
-  Source of record: "internal/fcdo-reference/ALIGNMENT-PLAN.md (plan + skip list + evidence caveats)"
+  Crosswalk file: "config/crosswalks/cdo-vocabulary.yaml (8 rows: 7 proposed, 1 blocked-on-recapture)"
+  Source of record: "internal/cdo-reference/ALIGNMENT-PLAN.md (plan + skip list + evidence caveats)"
 mapping:
   - n: 1
     element: "ControlMJob (dd:ControlMJob)"
@@ -69,19 +69,19 @@ mapping:
     target: "skos:closeMatch + firm-namespace mappingConfidence"
     edge: "(CatalogLOB)-[:RECONCILES_TO {confidence}]->(BusinessSegment)  [PROPOSED — approximate; property-name note, carrier differs]"
 provenance:
-  - label: "Crosswalk rows (config/crosswalks/fcdo-vocabulary.yaml)"
-    source_object: "internal/fcdo-reference/ALIGNMENT-PLAN.md Phase-1 table"
+  - label: "Crosswalk rows (config/crosswalks/cdo-vocabulary.yaml)"
+    source_object: "internal/cdo-reference/ALIGNMENT-PLAN.md Phase-1 table"
     key: "row n"
     loader: "n/a — crosswalk sign-off only; no loader reads this file (the orchestrator runtime deliberately skips its schema)"
     properties:
       - {name: drydocs, origin: source, from: "drydocs_core/ontology/relationship_vocabulary/ term ids and classings", note: "existing-term carryover — no new terms minted"}
-      - {name: fcdo, origin: source, from: "framework transcripts (2026-07-30 capture)", note: "standard-CURIE rendering of the framework term; internal names stay in internal/"}
+      - {name: cdo, origin: source, from: "framework transcripts (2026-07-30 capture)", note: "standard-CURIE rendering of the framework term; internal names stay in internal/"}
       - {name: fidelity, origin: derived, from: "ALIGNMENT-PLAN verdict per row", note: "exact where classing is identical; approximate where grain, carrier, or documentation-only scope differs"}
       - {name: status, origin: derived, from: "evidence-caveat check against the four named capture holes", note: "blocked-on-recapture when the row's framework evidence is a capture hole (row 5)"}
 sections:
   - title: "A. Scope confirmation"
     confirmations:
-      - "This gate reviews config/crosswalks/fcdo-vocabulary.yaml only — it does not activate the fcdo-frameworks corpus (its confirmed: false stands until its own registry flip), does not change any ontology term or status value, and authorizes no graph write."
+      - "This gate reviews config/crosswalks/cdo-vocabulary.yaml only — it does not activate the cdo-frameworks corpus (its confirmed: false stands until its own registry flip), does not change any ontology term or status value, and authorizes no graph write."
       - "The committed crosswalk and this page are mechanism-only: standard CURIEs (prov:, dcat:, skos:, adms:, rdfs:, the public OpenLineage spec) with no internal URLs, org names, or firm-namespace CURIE prefixes — the evidence corpus stays in internal/."
       - "Every row maps an EXISTING DryDocs term to a standard term; no row renames a mechanism, reshapes an edge, or adds a new node/edge type — the ALIGNMENT-PLAN's verdict (already structurally aligned) is what is being ratified."
       - "The frameworks have no vocabulary for scheduling, conditions, folders, run-state escalation, or sensitivity classification — those local terms have nothing to conform to and stay as-is; the ALIGNMENT-PLAN skip list is binding on this gate."
@@ -94,9 +94,9 @@ sections:
       - "Row 8's carrier difference is accepted: RECONCILES_TO {confidence} carries skos:closeMatch + mapping-confidence semantics on an edge property rather than an RDF mapping resource — semantics align, carrier differs, nothing is rebuilt."
   - title: "C. Blocked-on-recapture"
     confirmations:
-      - "Row 5 (loader envelope <-> metadata envelope) is BLOCKED: its framework (Descriptive Metadata) is a known capture hole, and the row stays open — signed neither way in this session — unless the registered fcdo-frameworks scrape has recaptured that framework and the recaptured evidence is on the table."
+      - "Row 5 (loader envelope <-> metadata envelope) is BLOCKED: its framework (Descriptive Metadata) is a known capture hole, and the row stays open — signed neither way in this session — unless the registered cdo-frameworks scrape has recaptured that framework and the recaptured evidence is on the table."
       - "The other three capture holes (Data Quality, Data Contracts/DPROD, Taxonomy normative property tables) block no current row, and it is confirmed that absence from the transcript is not treated as absence from the standard anywhere in this crosswalk."
   - title: "D. Sign-off"
     confirmations:
-      - "All 8 rows in config/crosswalks/fcdo-vocabulary.yaml were reviewed and are correct as proposed (rows 1-4, 6-8) or blocked-on-recapture (row 5)."
-      - "Safe to transcribe into config/gate-log.md and flip the reviewed rows (and the file status) proposed -> confirmed — excluding any row still blocked-on-recapture; the fcdo-frameworks corpus activation remains a separate, later decision."
+      - "All 8 rows in config/crosswalks/cdo-vocabulary.yaml were reviewed and are correct as proposed (rows 1-4, 6-8) or blocked-on-recapture (row 5)."
+      - "Safe to transcribe into config/gate-log.md and flip the reviewed rows (and the file status) proposed -> confirmed — excluding any row still blocked-on-recapture; the cdo-frameworks corpus activation remains a separate, later decision."

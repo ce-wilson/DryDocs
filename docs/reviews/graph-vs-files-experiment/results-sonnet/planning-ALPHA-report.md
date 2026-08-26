@@ -329,8 +329,8 @@ sweep (or a human) would think to check first (e.g. `PUBLISH-BOUNDARY.md`).
 
 **Code-context sizing — navigation shown:**
 - Task input named `tests/unit/test_markdown_fences.py` and (indirectly, by description)
-  `SDLC-Docs/extracted/issue-driven-capture-loop.md`, `internal/fcdo-reference/
-  CONFLUENCE-TRANSCRIPT.md`, `internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md`, and
+  `SDLC-Docs/extracted/issue-driven-capture-loop.md`, `internal/cdo-reference/
+  CONFLUENCE-TRANSCRIPT.md`, `internal/cdo-reference/TRANSCRIPT-1-ONTOLOGY.md`, and
   `.claude/skills/data-context-extractor/references/`. I did not query the graph for the last
   three (transcripts/vendored material) since the idea and the guard's own docstring both
   already dispose of them (leave unguarded); querying would not change the disposition.

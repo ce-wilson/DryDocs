@@ -90,11 +90,11 @@ def test_every_fence_under_docs_closes() -> None:
 #: defect, faithfully transcribed, and correcting it here would edit someone
 #: else's document. Shrink-only: an entry that becomes clean fails below.
 CAPTURED_PATHS: dict[str, str] = {
-    "internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md": (
-        "VERBATIM capture of the company Confluence space (fcdo-frameworks corpus, trust "
+    "internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md": (
+        "VERBATIM capture of the company Confluence space (cdo-frameworks corpus, trust "
         "VERBATIM): the unclosed fence at line 5140 is the page's own"
     ),
-    "internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md": (
+    "internal/cdo-reference/TRANSCRIPT-1-ONTOLOGY.md": (
         "VERBATIM capture, same corpus: the fence at line 419 is the source's"
     ),
     ".claude/skills/data-context-extractor/references/domain-template.md": (

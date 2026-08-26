@@ -1075,7 +1075,7 @@ build** with its three premise errors corrected.
     committed producer ids carry [db].[schema] placeholders.
   - **Q2 — URN env segment: always prod** (promotion-clone/lag not modeled).
   - **Q3 — derived stores:** @ grammar + derived: true; authority OMITTED —
-    not SOR/ADS, and FCDO SOC was checked (§H vocabulary: System of Capture =
+    not SOR/ADS, and CDO SOC was checked (§H vocabulary: System of Capture =
     upstream ingestion feeding an SOR) and does not fit downstream transforms.
   - **Q4 — snow registers NOW as a SaaS system;** first dataset =
     snow:cmdb-ci-classes (the sampled CMDB class export), doubling as the
@@ -1125,7 +1125,7 @@ list in `config/source-registry.yaml` refuses every old id from here on.
 | `snowflake-data-catalog` | `catalog@[db].[schema].datasets_v` + `distributions_v` | (unconfirmed — gate prompt not drafted) |
 | `code-repo` | `bitbucket:repo-objects-manifest` | (unconfirmed — G22) |
 | `oracle-schemas` / `snowflake` | `oracle:schema-inventory` / `snowflake:schema-inventory` | (unconfirmed placeholders) |
-| `bmc-docs` / `essential-graphrag` / `fcdo-frameworks` | NOT renamed — pipeline twins dropped; ids stay live in `config/doc-source-registry.yaml` (one home), which now carries their `confirmed:` state | bmc-docs-lexical-load 2026-07-08 (covers essential-graphrag per the Q2 groom) |
+| `bmc-docs` / `essential-graphrag` / `cdo-frameworks` | NOT renamed — pipeline twins dropped; ids stay live in `config/doc-source-registry.yaml` (one home), which now carries their `confirmed:` state | bmc-docs-lexical-load 2026-07-08 (covers essential-graphrag per the Q2 groom) |
 
 **Per-row residual executed:** every row above was confirmed individually at the N9 build
 (the N7 residual). New rows registered: `seal@[db].psgmgr.cm_escalation_db` (the gate's worked
@@ -1157,7 +1157,7 @@ The id exists at every grain — the team report just does not project it.
   is what makes the ruling executable: while it is required, the name-only team
   report cannot load product lines at all, so a name cannot become the de-facto
   key by accident. Corroborated independently of the SME by
-  `internal/fcdo-reference` (the PAT-catalog artifact described as a 5-level
+  `internal/cdo-reference` (the PAT-catalog artifact described as a 5-level
   hierarchy with "native IDs at each level") and by the company's own 5-field
   `pat_lob_sublob_productline.csv` — an extract already at that grain.
 - **§b — RECORDED: `area_product_id` is the SUPPORTING area product.**
@@ -1429,31 +1429,31 @@ rename of the frozen names.
   emptiness probes; a non-empty probe stops as a defect report).
 
 
-## 2026-08-05 — GATE: fcdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)
+## 2026-08-05 — GATE: cdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)
 
-**Spec:** `config/gate-prompts/fcdo-crosswalk.yaml` · **SME:** chad.wilson, in-chat
+**Spec:** `config/gate-prompts/cdo-crosswalk.yaml` · **SME:** chad.wilson, in-chat
 (section walkthrough; page rendered to `internal-local/gate-pages/`). The DryDocs ↔
-firmwide-framework vocabulary crosswalk (`config/crosswalks/fcdo-vocabulary.yaml`,
+firmwide-framework vocabulary crosswalk (`config/crosswalks/cdo-vocabulary.yaml`,
 8 rows). Ratifies the ALIGNMENT-PLAN verdict: already structurally aligned — every
 row maps an EXISTING DryDocs term to a standard term; nothing renamed, reshaped,
 or added.
 
 | Item | Ruling |
 |---|---|
-| A1–A4 scope | **CONFIRMED** — review-only; mechanism-only surfaces (standard CURIEs, no internal names); nothing new minted; the ALIGNMENT-PLAN skip list is binding. **SME remark on A:** activation of the `fcdo-frameworks` corpus is UNDER CONSIDERATION now that alignment is verified — it remains a separate registry decision, NOT flipped by this gate. |
+| A1–A4 scope | **CONFIRMED** — review-only; mechanism-only surfaces (standard CURIEs, no internal names); nothing new minted; the ALIGNMENT-PLAN skip list is binding. **SME remark on A:** activation of the `cdo-frameworks` corpus is UNDER CONSIDERATION now that alignment is verified — it remains a separate registry decision, NOT flipped by this gate. |
 | B1 rows 1/2/3/7 exact | **CONFIRMED** — ControlMJob↔OL Job, JobRun/ControlMJobRun↔OL Run, DataAsset↔Dataset, SUBCLASS_OF/MAPS_TO↔rdfs bridging. |
 | B2 row 2 scope note | **CONFIRMED** — the 2026-07-31 batch-history ruling restated; name conformance only, no run-event-ingestion mandate. |
 | B3 row 4 grain split | **CONFIRMED** — their grain is the Run, ours the definition (ETLProcess \| ControlMJob); both grains recorded; any future run-grain lineage lands on ControlMJobRun without displacing the definition-grain edges. |
 | B4 row 6 documentation-only | **CONFIRMED** — the adms:status reading is a translation aid; the proposed→confirmed→applied HITL machinery changes in no way. |
 | B5 row 8 carrier difference | **CONFIRMED** — RECONCILES_TO {confidence} carries skos:closeMatch + mapping-confidence semantics on an edge property rather than an RDF mapping resource. |
-| C1 row 5 blocked | **CONFIRMED** — stays OPEN, signed neither way, until the registered `fcdo-frameworks` scrape recaptures the Descriptive Metadata Framework. |
+| C1 row 5 blocked | **CONFIRMED** — stays OPEN, signed neither way, until the registered `cdo-frameworks` scrape recaptures the Descriptive Metadata Framework. |
 | C2 absence ≠ absence | **CONFIRMED** — transcript absence is never treated as absence from their standard. |
 | D1–D2 sign-off | **CONFIRMED** — rows 1–4, 6–8 and the file status flip proposed → confirmed; row 5 stays `blocked-on-recapture`; the guard test moves to the post-gate state in the same commit (F1/F2 precedent); corpus activation stays a separate, later decision. |
 
 
-## 2026-08-05 — RECORD: `fcdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the fcdo-crosswalk sign-off)
+## 2026-08-05 — RECORD: `cdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the cdo-crosswalk sign-off)
 
-- **What this records:** the in-chat user ruling activating the `fcdo-frameworks`
+- **What this records:** the in-chat user ruling activating the `cdo-frameworks`
   doc corpus — `config/doc-source-registry.yaml` `confirmed: false → true`. A record
   on the G51/X1 idiom (direction, not a gate session): no ontology edge, no
   vocabulary status change, no graph write. The stated rationale: "settle our
@@ -1464,7 +1464,7 @@ or added.
   `blocked-on-recapture` regardless — that is crosswalk-side state, untouched here;
   if anything, activation is the path that PRODUCES the recapture evidence
   (Descriptive Metadata is the first-priority recapture target in the entry's notes).
-- **What activation does and does not do:** `require_confirmed("fcdo-frameworks")`
+- **What activation does and does not do:** `require_confirmed("cdo-frameworks")`
   now passes, so the docmeta pipeline may ingest the corpus when the Confluence
   connector runs — which is company-network-side only; nothing can be scraped from
   the producer machine. T4 `sme-confirm` curation still applies per ingested page,
@@ -1484,7 +1484,7 @@ or added.
   SME asked, a day later, whether it had been confirmed. That is the
   "did the gate land?" failure mode arriving on schedule: **a CONFIRMED CLAUSE
   inside an UNSIGNED gate has no home in a log organised by sign-off.** Recorded on
-  the G51/X1/`fcdo-frameworks` RECORD idiom — direction, not a gate session.
+  the G51/X1/`cdo-frameworks` RECORD idiom — direction, not a gate session.
 - **What was confirmed (2026-08-05, in-chat):** *"three separate role classes, not
   one concept with a level."* Restated 2026-08-06 with the cardinality attached:
   *"L1 Operate Manager, L2 Operate Manager, Operate Manager are 3 separate roles
@@ -3659,8 +3659,8 @@ six confirmations (A1-A3, B1-B2, C1), no held clauses.
   are captured with stage: ~ until evidence lands, per the
   keep-imports-faithful rule; their mapping is a capture UPDATE when a real
   artifact arrives, not a re-gate.
-- **§B2 — FCDO IS CONTEXT, NOT ESTATE TRUTH:** the Raw / Conformed-Silver /
-  Consumable-Gold mesh framing (internal/fcdo-reference/) is a third, external
+- **§B2 — CDO IS CONTEXT, NOT ESTATE TRUTH:** the Raw / Conformed-Silver /
+  Consumable-Gold mesh framing (internal/cdo-reference/) is a third, external
   vocabulary — crosswalk context only; nothing from it enters the stage set.
 - **§C1 — THE FENCE: NO EDGE, NOT EVEN PLANNED.** This capture declares no
   dataset/job stage-attribution edge anywhere. When a consumer actually needs
@@ -4171,3 +4171,21 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   and area_product_owner's scope are named untouched.
 - **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
   DRAFTED stubs as non-authority; no vocabulary status may cite this heading.
+
+## 2026-08-26 — RECORD: org-acronym sanitization — the `cdo-*` rename (user direction, in-chat)
+
+- **What this records:** a four-letter internal org acronym was retired from every
+  publishable surface (user direction 2026-08-26, this session). The gate formerly named
+  for it is now `cdo-crosswalk` (spec `config/gate-prompts/cdo-crosswalk.yaml`); the
+  vocabulary crosswalk is `config/crosswalks/cdo-vocabulary.yaml`; the doc corpus id is
+  `cdo-frameworks`; the Epic W id is `cdo-alignment`; the reference capture moved to
+  `internal/cdo-reference/`. Prior entries in this log were swept IN PLACE — read `cdo-*`
+  (or "CDO") in any pre-2026-08-26 entry as the renamed id, signed under its former name.
+- **The old↔new mapping** is recorded once, in `internal/cdo-reference/README.md`
+  (Internal — the old string may not appear in this publishable file). The retired
+  strings can never re-mint with a different meaning (doc-source-registry `retired:`
+  carries the placeholder entry).
+- **What this does NOT do:** no ruling is reopened. The 2026-08-05 crosswalk sign-off
+  (13/13, row 5 blocked-on-recapture) stands unchanged under the new name. CDO on these
+  surfaces is the industry C-suite sense (chief data office/officer) — the sense
+  collisions are recorded in `config/glossary/terms-public.yaml` (fifth pass).

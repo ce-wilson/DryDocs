@@ -199,7 +199,7 @@ zones:
     helper: ~   # arrives with the loader that reads it; declaring the zone does not need one
     note: >
       RULED AT G109 (e), which required this to be settled one way rather than
-      left as an undocumented violation. The fcdo-frameworks capture
+      left as an undocumented violation. The cdo-frameworks capture
       (config/doc-source-registry.yaml, VERBATIM, Internal) has been landing
       IN-TREE under internal/knowledge/data/<space>/. That is the most deletable
       state a payload can be in: untracked AND not gitignored, which `git clean

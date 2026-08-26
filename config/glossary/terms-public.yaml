@@ -28,6 +28,24 @@
 # definition, CROs skipped as a plural variant of the existing CRO. Card-context terms surveyed and
 # deliberately NOT added: ACH/RTP/ATM (payments rails, not card lending), CAGR (chart metric), SAR
 # (Hong Kong Special Administrative Region in this report, not suspicious-activity-report).
+#
+# FOURTH PASS 2026-08-26 (review of the three passes above): the third pass caught entries the
+# line-start anchor MISSED; this pass repairs the mirror defect it left behind — six entries whose
+# pref_label/definition swallowed the FOLLOWING glossary entry after the same PDF text-join (CCO ate
+# CCP, FDIC ate FDM, PCAOB ate PCD, PD ate the Pillar-1 phrase entry, VA ate VaR, OPEB ate a page
+# header). All six truncated to their own expansion. The two swallowed entries that had no key of
+# their own are added: CCP and PCD — the source PDF was no longer on this machine, so their
+# definitions carry only the verbatim fragment the bleed preserved, marked as such; re-extract on a
+# machine that still holds the PDF to complete them.
+#
+# FIFTH PASS 2026-08-26 (user direction: add the C-suite acronyms related to data or information
+# owners and the technical CTO; source: business.com "C-Suite Job Titles", a PUBLIC business-press
+# article): CDO lands with BOTH senses the article defines (Chief Data Officer, Chief Digital
+# Officer); CIO gains the information-officer sense beside the report glossary's investment-office
+# sense, cross-noted both ways in does_not_mean; CTO added. Surveyed and deliberately NOT added:
+# CISO (security, not ownership), CAIO (AI policy), and the rest of the article's C-suite table —
+# outside the ask. The CDO entry also backs the cdo-* config ids the same-day sanitization pass
+# introduces (its does_not_mean carries the collateralized-debt-obligation collision).
 schema: drydocs.glossary.v1
 classification: Internal-Public
 terms:
@@ -261,15 +279,66 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:CCO:1
     scope: industry
-    pref_label: Chief Compliance Officer CCP “Central counterparty” is a clearing house that interposes
+    pref_label: Chief Compliance Officer
     alt_labels: []
-    definition: Chief Compliance Officer CCP “Central counterparty” is a clearing house that interposes.
-      Expansion per the source glossary; see evidence_ref for the full entry.
+    definition: Chief Compliance Officer. Expansion per the source glossary; see evidence_ref for the full
+      entry.
     does_not_mean: []
     correlates_to: []
     evidence_ref:
     - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
       PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CCP
+  senses:
+  - term_id: urn:drydocs:term:industry:CCP:1
+    scope: industry
+    pref_label: Central counterparty
+    alt_labels: []
+    definition: Central counterparty. The recovered fragment of the source entry reads "a clearing house
+      that interposes" (see the fourth-pass note above); full definition per the source glossary — see
+      evidence_ref.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CDO
+  senses:
+  - term_id: urn:drydocs:term:industry:CDO:1
+    scope: industry
+    pref_label: Chief Data Officer
+    alt_labels: []
+    definition: Oversees data-related business functions, including data management, data quality, data
+      strategy, data analytics and business intelligence — the executive data-owner role.
+    does_not_mean:
+    - Collateralized debt obligation — the structured-finance instrument, the default reading in many
+      bank-domain sources (the JPMC 2025 glossary defines CDS but not CDO). This repo's cdo-* config
+      ids take the chief-data-office sense (2026-08-26 sanitization ruling).
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+  - term_id: urn:drydocs:term:industry:CDO:2
+    scope: industry
+    pref_label: Chief Digital Officer
+    alt_labels: []
+    definition: Leads an organization's digital transformation efforts, overseeing the adoption of new
+      technologies and digital practices. The same source defines both CDO senses; sense :1 is the one
+      this repo's config ids mean.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
@@ -393,11 +462,29 @@ terms:
     alt_labels: []
     definition: Chief Investment Office. Expansion per the source glossary; see evidence_ref for the full
       entry.
-    does_not_mean: []
+    does_not_mean:
+    - Chief Information Officer — the industry C-suite technology role (sense :2 of this key); the two
+      senses collide wherever bank sources meet technology prose (flagged at the 2026-08-26 fifth pass).
     correlates_to: []
     evidence_ref:
     - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
       PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+  - term_id: urn:drydocs:term:industry:CIO:2
+    scope: industry
+    pref_label: Chief Information Officer
+    alt_labels: []
+    definition: Leads the organization in information technology (IT); owns corporate IT applications,
+      platforms and infrastructure — the executive information-owner role.
+    does_not_mean:
+    - Chief Investment Office — the JPMC annual-report glossary sense (sense :1 of this key); bank
+      filings default to the investment-office reading.
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
@@ -493,6 +580,22 @@ terms:
     evidence_ref:
     - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
       PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CTO
+  senses:
+  - term_id: urn:drydocs:term:industry:CTO:1
+    scope: industry
+    pref_label: Chief Technology Officer
+    alt_labels: []
+    definition: Focuses on how a company builds and uses technology and helps identify and solve
+      technology challenges — the technical executive role.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
@@ -674,11 +777,10 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:FDIC:1
     scope: industry
-    pref_label: Federal Deposit Insurance Corporation FDM "Financial difficulty modification" applies
-      to
+    pref_label: Federal Deposit Insurance Corporation
     alt_labels: []
-    definition: Federal Deposit Insurance Corporation FDM "Financial difficulty modification" applies
-      to. Expansion per the source glossary; see evidence_ref for the full entry.
+    definition: Federal Deposit Insurance Corporation. Expansion per the source glossary; see evidence_ref for the full
+      entry.
     does_not_mean: []
     correlates_to: []
     evidence_ref:
@@ -1385,11 +1487,10 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:OPEB:1
     scope: industry
-    pref_label: Other postretirement employee benefit Glossary of Terms and Acronyms 324 JPMorgan Chase
-      &
+    pref_label: Other postretirement employee benefit
     alt_labels: []
-    definition: Other postretirement employee benefit Glossary of Terms and Acronyms 324 JPMorgan Chase
-      &. Expansion per the source glossary; see evidence_ref for the full entry.
+    definition: Other postretirement employee benefit. Expansion per the source glossary; see evidence_ref for the full
+      entry.
     does_not_mean: []
     correlates_to: []
     evidence_ref:
@@ -1402,10 +1503,26 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:PCAOB:1
     scope: industry
-    pref_label: Public Company Accounting Oversight Board PCD “Purchased credit deteriorated” assets
+    pref_label: Public Company Accounting Oversight Board
     alt_labels: []
-    definition: Public Company Accounting Oversight Board PCD “Purchased credit deteriorated” assets.
-      Expansion per the source glossary; see evidence_ref for the full entry.
+    definition: Public Company Accounting Oversight Board. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: PCD
+  senses:
+  - term_id: urn:drydocs:term:industry:PCD:1
+    scope: industry
+    pref_label: Purchased credit deteriorated
+    alt_labels: []
+    definition: Purchased credit deteriorated assets ("assets" is the recovered start of the source entry;
+      see the fourth-pass note above). Full definition per the source glossary — see evidence_ref.
     does_not_mean: []
     correlates_to: []
     evidence_ref:
@@ -1418,10 +1535,10 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:PD:1
     scope: industry
-    pref_label: 'Probability of default Pillar 1: The Basel framework consists of a three “Pillar” approach'
+    pref_label: Probability of default
     alt_labels: []
-    definition: 'Probability of default Pillar 1: The Basel framework consists of a three “Pillar” approach.
-      Expansion per the source glossary; see evidence_ref for the full entry.'
+    definition: Probability of default. Expansion per the source glossary; see evidence_ref for the full
+      entry.
     does_not_mean: []
     correlates_to: []
     evidence_ref:
@@ -1735,10 +1852,10 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:VA:1
     scope: industry
-    pref_label: U.S. Department of Veterans Affairs VaR “Value-at-risk” is a measure of the dollar amount
+    pref_label: U.S. Department of Veterans Affairs
     alt_labels: []
-    definition: U.S. Department of Veterans Affairs VaR “Value-at-risk” is a measure of the dollar amount
-      of potential loss from adverse market moves in an ordinary market environment.
+    definition: U.S. Department of Veterans Affairs. Expansion per the source glossary; see evidence_ref for the full
+      entry.
     does_not_mean: []
     correlates_to: []
     evidence_ref:

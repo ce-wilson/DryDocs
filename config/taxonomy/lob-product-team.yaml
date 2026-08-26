@@ -94,7 +94,7 @@ open_questions:
 # (config/gate-prompts/dcat-theme-subject-scheme.yaml). SKOS is already precedent
 # in this file (RECONCILES_TO is skos:closeMatch, open question business-segment)
 # and in the vocabulary (10-node-classifications.yaml: skos:Concept classes).
-# Standard cited VERBATIM: the firm's Taxonomy Framework in the fcdo-frameworks
+# Standard cited VERBATIM: the firm's Taxonomy Framework in the cdo-frameworks
 # corpus (config/doc-source-registry.yaml, trust VERBATIM since 2026-08-19) — cite
 # the registry row, never the page.
 # -----------------------------------------------------------------------------
@@ -112,4 +112,4 @@ concept_scheme:
   not_concepts: [dev_teams]                      # org:OrganizationalUnit, never a subject
   broader_is: "the parent_* link, read as skos:broader; transitive closure gives LOB from Product for free (§C annotation depth)"
   in_scheme_of: "dcat:theme targets (gate-bound: the edge is the gate's, this declaration is not)"
-  standard: fcdo-frameworks                      # doc-source-registry id; Taxonomy Framework, VERBATIM
+  standard: cdo-frameworks                      # doc-source-registry id; Taxonomy Framework, VERBATIM

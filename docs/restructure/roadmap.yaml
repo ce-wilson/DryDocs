@@ -240,7 +240,7 @@ modules:
     ideas:
       - id: Idea-44
         estimate: S
-        note: fcdo-frameworks live Confluence scrape — company-side, parked on
+        note: cdo-frameworks live Confluence scrape — company-side, parked on
           company network access.
 
   - module: reference
@@ -278,7 +278,7 @@ modules:
       The meaning layer is the project's center of gravity: 33 closed items
       spanning the supplement files, the relationship-vocabulary registry, and
       this quarter's signed gates (match policy, SEAL edge reshape, audit
-      envelope, envelope terms, registry redesign, FCDO crosswalk).
+      envelope, envelope terms, registry redesign, CDO crosswalk).
     remaining: >
       Sixteen open items, and the bottleneck is deliberate: most are SME-bound
       HITL gates, not code — E1 SOSA and G35 TOM roles in progress; K17 FID

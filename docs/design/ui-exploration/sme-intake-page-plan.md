@@ -14,7 +14,7 @@
    the list will grow as we refine it.
 3. **Upload** — drag-and-drop for `.msg`, `.json`, `.txt` (TBD): the email, and when
    the Copilot prompt was used, the corresponding `.json` extract.
-4. **Review for ontology** — a button, similar to the FCDO tool's review pass.
+4. **Review for ontology** — a button, similar to the CDO tool's review pass.
 5. **Related nodes** — a Cypher query that finds related nodes in the structured data.
 6. **Agent first-pass correlation** — for SME review, accept or modify.
 7. **Confirmation** — sends the package to admin review for acceptance and graph load.
@@ -118,10 +118,10 @@ whole prior conversation as a quoted tail. Rule:
   belongs to the Q10 build, not this page). The page writes intake records, not
   registry entries.
 
-### 4. "Review for ontology" (the FCDO-style pass)
+### 4. "Review for ontology" (the CDO-style pass)
 
 One button. The backend runs an extraction pass over the uploaded evidence and
-returns a **proposed-bindings panel**, the same interaction the FCDO tool's
+returns a **proposed-bindings panel**, the same interaction the CDO tool's
 review gives content owners — machine proposes, human disposes:
 
 - **Recognized entities**: Control-M folder/job names, dataset/table identifiers,
@@ -354,5 +354,5 @@ of truth for tests and demos, the bundled-samples precedent.
   the weaker signal? (Recommended: hint only; extraction + SME beat it.)
 - Retention surfacing: should the page show Q10's retention note ("file server
   becomes system of record after Outlook purge") per intake, or per corpus?
-- Is the FCDO-style review panel worth generalizing into a shared component with
+- Is the CDO-style review panel worth generalizing into a shared component with
   the gate pages now, or after the first build proves the shape?
