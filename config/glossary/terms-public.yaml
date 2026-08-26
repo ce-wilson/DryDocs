@@ -19,6 +19,15 @@
 # is card lending, outside the home-and-auto ask -- noted here so the exclusion reads as a decision.
 # Fannie Mae / Ginnie Mae ARE in the report glossaries but as PHRASE keys, not acronyms (no FNMA/
 # GNMA entries exist), so they stay out of an acronym-keyed list.
+#
+# THIRD PASS 2026-08-25 (user direction: the CCB Credit Cards space + add GPCC): GPCC lands with its
+# 2024 footnote definition (excludes private label and Commercial Card). The card sweep also exposed
+# an EXTRACTION MISS in the first pass: six glossary entries sit mid-line after PDF text-join and the
+# line-start anchor never saw them -- FDM (the SUCCESSOR to TDR, which pairs with the TDR entry
+# above), GAAP, LTD, VaR, GSE(s) and CROs. Four added, GSE's sense upgraded to the glossary's own
+# definition, CROs skipped as a plural variant of the existing CRO. Card-context terms surveyed and
+# deliberately NOT added: ACH/RTP/ATM (payments rails, not card lending), CAGR (chart metric), SAR
+# (Hong Kong Special Administrative Region in this report, not suspicious-activity-report).
 schema: drydocs.glossary.v1
 classification: Internal-Public
 terms:
@@ -1824,16 +1833,17 @@ terms:
   senses:
   - term_id: urn:drydocs:term:industry:GSE:1
     scope: industry
-    pref_label: Government-sponsored enterprises
+    pref_label: U.S. government-sponsored enterprises
     alt_labels: []
-    definition: Government-sponsored enterprises (Fannie Mae, Freddie Mac and similar) -- the agencies
-      that purchase or guarantee conforming residential mortgages; ~40 uses in each report year.
+    definition: 'Quasi-governmental, privately-held entities established or chartered by the U.S. government
+      to serve public purposes specified by Congress, improving the flow of credit to specific sectors
+      (Fannie Mae, Freddie Mac). UPGRADED from the earlier prose-cited sense: the 2025 glossary defines
+      GSE(s) formally under the quoted-key form the first extraction missed.'
     does_not_mean: []
     correlates_to:
     - home-lending
     evidence_ref:
-    - standard:JPMorgan Chase 2024 Annual Report - expansion in prose ('government-sponsored enterprises');
-      heavy use both years
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms - the GSE(s) entry
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
@@ -1852,6 +1862,87 @@ terms:
     evidence_ref:
     - standard:JPMorgan Chase 2024 Annual Report and standard:JPMorgan Chase 2025 Annual Report - used
       unexpanded in the credit-quality disclosures
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GPCC
+  senses:
+  - term_id: urn:drydocs:term:industry:GPCC:1
+    scope: industry
+    pref_label: General purpose credit card
+    alt_labels: []
+    definition: 'General purpose credit card. Per the 2024 report footnote: GPCC spend excludes private
+      label and Commercial Card -- the category boundary matters when reading card sales-volume figures.'
+    does_not_mean: []
+    correlates_to:
+    - card-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - inline definition, CCB card-spend footnote
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FDM
+  senses:
+  - term_id: urn:drydocs:term:industry:FDM:1
+    scope: industry
+    pref_label: Financial difficulty modification
+    alt_labels: []
+    definition: 'Financial difficulty modification -- THE SUCCESSOR TO TDR. Applies to loan modifications
+      effective January 1, 2023 (principal forgiveness, interest rate reduction, other-than-insignificant
+      payment delay, term extension, or combinations). Read with this file''s TDR entry: TDR = pre-2023
+      modifications, FDM = 2023 onward. Card-loan FDMs are the stated exception to the nonaccrual-placement
+      norm.'
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    - card-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    - standard:JPMorgan Chase 2024 Annual Report - same entry
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GAAP
+  senses:
+  - term_id: urn:drydocs:term:industry:GAAP:1
+    scope: industry
+    pref_label: Accounting principles generally accepted in the U.S.
+    alt_labels: []
+    definition: Accounting principles generally accepted in the United States of America.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LTD
+  senses:
+  - term_id: urn:drydocs:term:industry:LTD:1
+    scope: industry
+    pref_label: Long-term debt
+    alt_labels: []
+    definition: Long-term debt satisfying certain eligibility criteria (the report's capital/TLAC usage).
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: VaR
+  senses:
+  - term_id: urn:drydocs:term:industry:VaR:1
+    scope: industry
+    pref_label: Value-at-risk
+    alt_labels: []
+    definition: A measure of the dollar amount of potential loss from adverse market moves in an ordinary
+      market environment. The glossary separately defines Regulatory VaR (daily aggregated VaR under regulatory
+      rules).
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
