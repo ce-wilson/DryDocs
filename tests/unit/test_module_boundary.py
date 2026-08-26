@@ -120,6 +120,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.gate_pages",
         "drydocs.publishing",
         "drydocs.fid_census",
+        # drydocs.run_as_detect = K25, fid_census's sibling: the cross-application
+        # run_as detection the K17 gate's §G numbers come from. Same reasoning,
+        # same stdlib-only porting discipline.
+        "drydocs.run_as_detect",
     ),
     # drydocs-plan — backlog.yaml -> HTML project board renderer (Epic I).
     # plan_roadmap belongs HERE (unlike plan_ideas, below): it renders no

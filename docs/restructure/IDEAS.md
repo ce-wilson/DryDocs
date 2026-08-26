@@ -5191,3 +5191,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
     (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
     (c396d75, ede0b94).
 
+
+- **Idea-177 (2026-08-26, desktop):** `drydocs/fid_census.py`'s module docstring still opens with
+  "Gate ``fid-identity-and-scope`` is DRAFTED AND UNSIGNED" — the gate SIGNED 33/33 on 2026-08-19
+  (recorded in the K16 company prompt's rider and the gate log). The docstring's *reasoning* (the
+  census runs before the gate) is now history, same as the prompt's rider says of itself. One-line
+  docstring correction; noticed during K25 (its sibling module cites the signed state) and left
+  out of that commit because it is K16's surface, not K25's.
