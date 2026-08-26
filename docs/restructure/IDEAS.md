@@ -116,17 +116,26 @@ question a 1,000-line file with the trail at the bottom could not answer.
     a tray, and that becomes an artifact a loader applies after review. Same mechanism as the
     /mappings changeset and the acronym add path backlog O68 describes. Worth checking whether one
     drafting mechanism can serve all three rather than growing a third.
-  - **"LABEL NODE" NEEDS DISAMBIGUATING BEFORE ANY BUILD, because the two readings have very
-    different costs.** A *tag node* (a node that exists to group things, attached by an edge) is
-    data, and rides the normal proposal path. A new *node label* is an ONTOLOGY decision — new
-    labels and edge types go through `docs/RELATIONSHIP_GUIDE.md`, the relationship-vocabulary
-    registry and the HITL gate, and are explicitly never invented during import. A UI affordance
-    that mints labels by checkbox is the second thing, and would be minting ontology from a grid.
+  - **"LABEL NODE" NEEDS DISAMBIGUATING BEFORE ANY BUILD.** A *tag node* is a node that exists to
+    group things, attached by an edge; a new *node label* is a schema-level addition. **KEPT-UPDATED
+    2026-08-26 (user ruling): EITHER reading needs an ONTOLOGY REVIEW — the tag/label distinction
+    does not buy a cheap path, and this entry originally said it did.** The correction matters
+    because the earlier framing (a tag node "is data, and rides the normal proposal path") is
+    exactly the sentence that would license someone to build it without a gate. It does not hold: a
+    tag node still has to answer *what label does this node carry* and *what edge attaches it to
+    anything*, and a new relationship type goes through `docs/RELATIONSHIP_GUIDE.md`, the
+    relationship-vocabulary registry (`drydocs_core/ontology/relationship_vocabulary/`) and the HITL
+    gate — never invented during import (CLAUDE.md §6). So there is no "just data" branch here;
+    both readings mint ontology, one at the instance grain and one at the schema grain, and both go
+    through review with `status: planned` set first.
   - **FILED Low, and the reason is readiness rather than merit:** nothing depends on it, and it
     cannot be built at all without at least one ruling — possibly two. It should not sit in the
     ready-to-pull strip competing with work that has no such precondition. The honest first step is
-    not a build item but a gate question: *may a console surface DRAFT a context-graph node
-    proposal, and does the uncertain writer list extend to whatever applies it?*
+    not a build item but a gate question, and it is now THREE clauses in a deliberate order:
+    *(a) what label and what attaching edge would this mint, and does the ontology admit them?*
+    then *(b) may a console surface DRAFT a context-graph node proposal?* then *(c) does the
+    uncertain writer list extend to whatever applies it?* (a) comes first because if the ontology
+    does not admit the label and the edge, there is nothing for (b) and (c) to be about.
 
   Mechanism-only; no real column values or company data land in a tracked file.
 
