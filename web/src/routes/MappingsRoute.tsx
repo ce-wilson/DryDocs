@@ -14,6 +14,7 @@ import { DEMO_OVERRIDE_GRID, type OverrideGridRow } from '../data/mappingsDemo'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 import AppCodeCascadePane from './AppCodeCascadePane'
+import DomainGridTable from './DomainGridTable'
 
 // /mappings — the O13 manual-mapping stewardship screen (wf-mapping-01).
 // Steward + admin only (server-enforced too — /mappings/* returns 403 below
@@ -206,13 +207,13 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
               <p className="shrink-0 text-[11px] text-muted">
                 {activeDef?.title} — read-only view of the committed source ({activeDef?.source}), served from the
                 mapping-store materialization.
-                {domainGrid && (
-                  <span className="ml-1 font-mono text-[10px] text-faint">
-                    {domainGrid.rows.length} rows
-                  </span>
-                )}
               </p>
-              <DomainGridTable grid={domainGrid} apiDown={apiDown} />
+              <DomainGridTable
+                grid={domainGrid}
+                apiDown={apiDown}
+                domainId={activeDomain}
+                source={activeDef?.source}
+              />
             </>
           )}
 
@@ -226,45 +227,6 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
 
       </div>
 
-    </div>
-  )
-}
-
-function DomainGridTable({ grid, apiDown }: { grid: MappingGrid | null; apiDown: string | null }) {
-  if (!grid) {
-    return (
-      <p className="px-1 py-2 text-[11px] text-faint">
-        {apiDown ? 'Needs drydocs-api (mapping.db read).' : 'Loading mapping.db grid…'}
-      </p>
-    )
-  }
-  if (grid.rows.length === 0) {
-    return <p className="px-1 py-2 text-[11px] text-faint">No committed entries yet.</p>
-  }
-  return (
-    <div className="mt-1.5 min-h-0 flex-1 overflow-auto rounded-md border border-edge">
-      <table className="w-full border-collapse text-left text-[11px]">
-        <thead className="sticky top-0 bg-panel-2">
-          <tr>
-            {grid.keys.map((k) => (
-              <th key={k} className="border-b border-edge px-2 py-1 font-semibold text-muted">
-                {k}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {grid.rows.map((r, i) => (
-            <tr key={i} className={i % 2 ? 'bg-bg-2/40' : ''}>
-              {grid.keys.map((k) => (
-                <td key={k} className="border-b border-edge-soft px-2 py-1 text-text">
-                  {String(r[k] ?? '')}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   )
 }

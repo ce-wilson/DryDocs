@@ -88,13 +88,14 @@ components:
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
 
-  # --- route (22) ---
+  # --- route (23) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
   - { id: AssetPathRoute,          area: route,        path: routes/AssetPathRoute.tsx }
   - { id: ConsoleRoute,            area: route,        path: routes/ConsoleRoute.tsx }
   - { id: DocsRoute,               area: route,        path: routes/DocsRoute.tsx,                        module: docs,       module_evidence: route-name }
+  - { id: DomainGridTable,        area: route,        path: routes/DomainGridTable.tsx }
   - { id: SoftwareRoute,           area: route,        path: routes/SoftwareRoute.tsx,                    module: software,   module_evidence: route-name }
   - { id: GatesRoute,              area: route,        path: routes/GatesRoute.tsx,                       module: gates,      module_evidence: route-name }
   - { id: IntakeRoute,             area: route,        path: routes/IntakeRoute.tsx }

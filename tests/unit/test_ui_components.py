@@ -291,10 +291,15 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     its FIRST consumer (Z6's runtime map is the next), so binding it to
     `explorer` would encode the first caller as the owner. Same rule as RelEdge
     and TrustLegend, and the reason bound stays at 31 while the total moves two.
+    74 -> 75 at the /mappings grid-controls build (2026-08-26): DomainGridTable
+    rides UNBOUND like its parent MappingsRoute and its sibling
+    AppCodeCascadePane — 'mappings' is not a registry module, so a binding
+    would invent one. Extracted from the route when it grew filter / sort /
+    column-width / CSV controls, the same reason AppCodeCascadePane was.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         31,
-        74,
+        75,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
