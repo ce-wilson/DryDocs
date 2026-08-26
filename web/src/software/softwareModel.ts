@@ -30,6 +30,10 @@ export interface VendorIconDef {
   verified: boolean
   asset: string
   source: string
+  // OPTIONAL on-dark variant — present only for marks that ship an official
+  // pair (React today). Null means the single `asset` reads on both grounds.
+  asset_dark?: string | null
+  source_dark?: string | null
 }
 
 export interface Vendor {

@@ -110,6 +110,11 @@ vendors:
   - id: meta
     name: Meta
     publisher_url: https://react.dev/
+    icon: react                   # React's mark, not Meta's — the manifest icon carries
+                                  # vendor: meta, the same product-icon-owned-by-a-brand
+                                  # shape as jira -> atlassian. Meta is in this registry
+                                  # only as React's publisher, so React's logo is the
+                                  # recognisable thing to draw.
   - id: reui
     name: ReUI
     publisher_url: https://reui.io/

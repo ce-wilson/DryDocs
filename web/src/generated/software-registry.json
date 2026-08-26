@@ -25,7 +25,9 @@
         "hex": "#4581C3",
         "verified": true,
         "asset": "vendor-icons/neo4j.svg",
-        "source": "vendors/packaged/neo4j.svg"
+        "source": "vendors/packaged/neo4j.svg",
+        "asset_dark": null,
+        "source_dark": null
       }
     },
     {
@@ -41,7 +43,9 @@
         "hex": "#FE5000",
         "verified": true,
         "asset": "vendor-icons/bmc.svg",
-        "source": "vendors/packaged/bmc.svg"
+        "source": "vendors/packaged/bmc.svg",
+        "asset_dark": null,
+        "source_dark": null
       }
     },
     {
@@ -57,7 +61,9 @@
         "hex": "#C74634",
         "verified": false,
         "asset": "vendor-icons/oracle.svg",
-        "source": "vendors/external/oracle.svg"
+        "source": "vendors/external/oracle.svg",
+        "asset_dark": null,
+        "source_dark": null
       }
     },
     {
@@ -79,7 +85,9 @@
         "hex": "#E31A2E",
         "verified": true,
         "asset": "vendor-icons/ab-initio.png",
-        "source": "vendors/external/ab-initio/block.png"
+        "source": "vendors/external/ab-initio/block.png",
+        "asset_dark": null,
+        "source_dark": null
       }
     },
     {
@@ -95,7 +103,9 @@
         "hex": "#FF4D00",
         "verified": false,
         "asset": "vendor-icons/informatica.svg",
-        "source": "vendors/external/informatica.svg"
+        "source": "vendors/external/informatica.svg",
+        "asset_dark": null,
+        "source_dark": null
       }
     },
     {
@@ -114,7 +124,19 @@
       "id": "meta",
       "name": "Meta",
       "publisher_url": "https://react.dev/",
-      "icon": null
+      "icon": {
+        "id": "react",
+        "label": "React",
+        "kind": "software",
+        "vendor": "meta",
+        "category": "devtrack",
+        "hex": "#087EA4",
+        "verified": true,
+        "asset": "vendor-icons/react.svg",
+        "source": "vendors/external/react/logo-on-light.svg",
+        "asset_dark": "vendor-icons/react-dark.svg",
+        "source_dark": "vendors/external/react/logo-on-dark.svg"
+      }
     },
     {
       "id": "reui",
@@ -147,7 +169,9 @@
         "hex": "#29B5E8",
         "verified": true,
         "asset": "vendor-icons/snowflake.svg",
-        "source": "vendors/packaged/snowflake.svg"
+        "source": "vendors/packaged/snowflake.svg",
+        "asset_dark": null,
+        "source_dark": null
       }
     },
     {
@@ -161,7 +185,6 @@
     "psf",
     "apache",
     "broadcom",
-    "meta",
     "reui",
     "xyflow",
     "tailwind-labs",

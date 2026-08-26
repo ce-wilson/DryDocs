@@ -1,7 +1,8 @@
 import type { Vendor } from './softwareModel'
 
 // Renders a vendor's manifest icon, or a labelled initial when it has none.
-// 7 of 12 vendors have no icon — reported, never silent, never an error.
+// Vendors without an icon are reported in vendors_without_icons — never silent,
+// never an error (the link is soft by design; see software-registry.yaml).
 //
 // THE GOTCHA: render_software_registry.py writes `asset` WITHOUT a leading
 // slash ("vendor-icons/neo4j.svg"). A relative src on the /software route
@@ -33,13 +34,30 @@ export default function VendorIcon({ vendor, size = 18 }: { vendor?: Vendor; siz
     )
   }
 
-  return (
+  const img = (asset: string, cls?: string) => (
     <img
-      src={`/${vendor.icon.asset}`}
+      src={`/${asset}`}
       alt=""
       aria-hidden="true"
       title={vendor.name}
+      className={cls}
       style={{ ...box, objectFit: 'contain' }}
     />
+  )
+
+  // Most marks carry their own colour and read on either ground, so they render
+  // as one <img>. A few ship an OFFICIAL on-light/on-dark pair (React's
+  // #087EA4 / #58C4DC) — for those, render both and let the theme decide.
+  // The `dark:` variant rather than the theme hook on purpose: tokens.css opts
+  // Tailwind into the CLASS-based dark variant, and that class is stamped by
+  // the pre-paint boot script in index.html — so the right mark is correct on
+  // the very first frame with no post-hydration swap, and System mode keeps
+  // working without this component subscribing to anything.
+  if (!vendor.icon.asset_dark) return img(vendor.icon.asset)
+  return (
+    <>
+      {img(vendor.icon.asset, 'dark:hidden')}
+      {img(vendor.icon.asset_dark, 'hidden dark:inline')}
+    </>
   )
 }

@@ -146,6 +146,17 @@
       "kind": "software",
       "vendor": "atlassian"
     },
+    "react": {
+      "label": "React",
+      "category": "devtrack",
+      "hex": "#087EA4",
+      "verified": true,
+      "svg": "vendors/external/react/logo-on-light.svg",
+      "svg_dark": "vendors/external/react/logo-on-dark.svg",
+      "provenance": "self-supplied (react.dev brand assets; the official #087EA4 / #58C4DC pair)",
+      "kind": "software",
+      "vendor": "meta"
+    },
     "experian": {
       "label": "Experian",
       "category": "lending",

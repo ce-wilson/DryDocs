@@ -38,6 +38,15 @@ def _display_asset(icon: dict) -> str:
     return icon["svg"]
 
 
+def _dark_asset(icon: dict) -> str | None:
+    """OPTIONAL on-dark variant (``svg_dark``). Only a handful of marks need
+    one — most brand svgs carry their own colour and read on either ground.
+    React ships an official pair (#087EA4 on light, #58C4DC on dark), so the
+    console swaps by theme instead of washing one out. Absent for every other
+    icon, and absent means the single ``svg`` is used on both grounds."""
+    return icon.get("svg_dark")
+
+
 def build_software_registry_view() -> dict:
     registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
@@ -74,6 +83,10 @@ def build_software_registry_view() -> dict:
                 # served same-origin by the Vite app (web/public/)
                 "asset": f"vendor-icons/{icon_id}{Path(source).suffix}",
                 "source": source,  # repo path inside drydocs-icons/ (provenance)
+                "asset_dark": (
+                    f"vendor-icons/{icon_id}-dark{Path(dark).suffix}" if (dark := _dark_asset(icon)) else None
+                ),
+                "source_dark": dark,
             }
         vendors.append(row)
 
@@ -125,11 +138,15 @@ def copy_assets(view: dict) -> list[str]:
     for v in view["vendors"]:
         if not v["icon"]:
             continue
-        src = ICONS_ROOT / v["icon"]["source"]
-        dst = REPO / "web" / "public" / v["icon"]["asset"]
-        if not dst.exists() or dst.read_bytes() != src.read_bytes():
-            shutil.copyfile(src, dst)
-        copied.append(v["icon"]["asset"])
+        pairs = [(v["icon"]["source"], v["icon"]["asset"])]
+        if v["icon"].get("source_dark"):
+            pairs.append((v["icon"]["source_dark"], v["icon"]["asset_dark"]))
+        for source, asset in pairs:
+            src = ICONS_ROOT / source
+            dst = REPO / "web" / "public" / asset
+            if not dst.exists() or dst.read_bytes() != src.read_bytes():
+                shutil.copyfile(src, dst)
+            copied.append(asset)
     return copied
 
 

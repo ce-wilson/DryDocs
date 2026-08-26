@@ -8,6 +8,7 @@ reads from it, so an icon or colour changes in exactly one place.
     vendors/external/   self-supplied / trademark-sensitive / cached — committed
     png/                raster exports
     manifest.json       id -> label, category, svg/raster path, brand hex, provenance, verified
+                        (+ optional svg_dark: the ON-DARK variant, see below)
     SOURCE.md           this file
 
 ## Colour + source status
@@ -39,6 +40,21 @@ reach that site) and/or supply an official asset; the sheet marks these with "?"
 | Oracle (GOS) | Simple Icons — cached | #C74634 | **confirm colour** (approx) |
 | Salesforce | Simple Icons — cached | #00A1E0 | **confirm colour** (approx) |
 | Experian | **none available** | #632678 | **upload official logo** — placeholder shown |
+| React | self-supplied (react.dev brand assets) | #087EA4 / #58C4DC | verified — the official on-light / on-dark pair |
+
+## On-dark variants (`svg_dark`)
+
+Most marks carry their own colour and read on either ground, so they have ONE
+`svg`. A few brands publish a PAIR — React ships #087EA4 for light backgrounds
+and #58C4DC for dark ones — and washing one of them out is visible. For those,
+`svg` stays the on-LIGHT asset (what every non-console consumer draws: the HTML
+sheet, Confluence, PowerPoint, C4 diagrams) and `svg_dark` carries the on-dark
+override, which only the web console uses, swapping by its `dark` theme class.
+
+Filenames say which BACKGROUND the asset is for — `logo-on-light.svg`,
+`logo-on-dark.svg` — not what colour it is. A file called `react_logo_dark.svg`
+is ambiguous in exactly the way that gets a pair wired backwards, so the
+registry renames on the way in.
 
 ## Generic (non-brand) icons
 
