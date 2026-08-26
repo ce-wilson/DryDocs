@@ -1,0 +1,92 @@
+id: O68
+epic: web-console
+title: Acronyms need a real surface — today they are a run-on footnote with no way to add one; give
+  them a readable list and an add affordance on the artifact path
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/routes/SoftwareRoute.tsx
+- web/src/software/softwareModel.ts
+- config/taxonomy/software-registry.yaml
+- scripts/render_software_registry.py
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  (a) DISPLAY — acronyms render as a readable list, one row per term (term, expansion), instead of
+  being concatenated with a middle dot onto the end of a footnote. The recommended home is a tab on
+  /software, because that page already loads the data and the registry is where acronyms live;
+  exact placement is the builder's, but it must be reachable without hunting and must not be a
+  footnote on a tab about something else.
+
+  (b) THE LAYOUT TEST IS THE SNOW ENTRY, not the short ones. Its expansion is a full sentence
+  carrying a warning (ServiceNow, the ITSM/CMDB platform, explicitly NOT Snowflake), and that
+  warning is the entire reason the entry exists. It must render in full — not truncated, not
+  ellipsised behind a tooltip. AIS and DPL are two words each and will look fine under any layout,
+  so a design validated only against them proves nothing.
+
+  (c) ADD — the same view carries an affordance to add an acronym, and it produces a CHANGE
+  ARTIFACT rather than writing anything. This is settled doctrine, not a fresh design question:
+  the ui-write-surface gate (O20, SIGNED OFF 2026-07-21, config/gate-log.md) ruled M3 direct write
+  REFUSED STANDING, C4 admin edits NEVER, and C3 server-side git DEFERRED — so M1 (artifact-only)
+  or M2 (an origin-flagged non-graph draft store) is the path, and the committed YAML stays
+  authored through git. Reuse the shape /mappings already uses rather than inventing a second: draft
+  into a per-user tray, submit produces a downloadable snippet plus rationale, and it travels git
+  to review to merge. A rationale is REQUIRED on the draft, as it is on every other drafting
+  surface here.
+
+  (d) PROVENANCE — the acceptance forces a decision rather than letting it be lost by default.
+  Each committed acronym today carries its why/when/who in a YAML COMMENT beside it (AIS cites the
+  capability-area corroboration; DPL and SNOW are both dated 2026-08-09 and named as SME-supplied,
+  SNOW marked IMPORTANT). A UI cannot read comments. Either the add flow captures that into
+  structured fields — in which case the schema grows and the three existing entries are migrated in
+  the same change — or the display states plainly that provenance is comment-only and not shown.
+  What is NOT acceptable is a surface that presents three fully-sourced entries and a new one with
+  no source, indistinguishable from each other.
+
+  (e) A GUARD — nothing tests the acronyms block today, in either
+  tests/unit/test_software_registry.py or test_software_registry_json.py. Whatever shape (c) and (d)
+  settle on gets one, including the case that decides (d): an entry missing whatever provenance the
+  ruling requires.
+
+  Registered in ui-components.yaml and ui-tests.yaml with coverage pins; both themes; npm run build
+  and oxlint clean.
+notes: |
+  Raised 2026-08-26 by the user during the ui-workstream session, alongside the /mappings grid-control
+  work — the same complaint in a different place: data that exists in the repo but has no surface a
+  person can actually read or extend.
+
+  WHAT IS THERE TODAY, because it is the whole argument for clause (a): SoftwareRoute.tsx joins the
+  acronym map into a single string with a middle-dot separator and appends it to a 10px footnote that
+  already carries two other sentences (the Snowflake-absent-by-construction note and the self
+  application id). Three entries and it is already a run-on; the SNOW gloss alone is a sentence, so
+  the line reads as prose rather than a glossary. The data is fine — it is the presentation that has
+  no room to grow, and it gets worse with every acronym added.
+
+  ADD IS A WRITE SURFACE, which is why clause (c) cites the ruling instead of leaving it open. The
+  O20 gate settled the mechanism tiers console-wide and a builder who does not know that will reach
+  for the obvious thing, which is editing the YAML server-side. Worth noting the boundary precisely:
+  acronyms live in a committed config file, NOT the graph, so the refused M3 tier is about graph
+  writes and does not literally name this case. The reason the artifact path still applies is C4
+  (admin edits, confirmed NEVER) and C3 (server-side git, DEFERRED) — the committed tree is authored
+  through git, and a console that edits config files directly reopens a question the gate closed.
+
+  FOUND WHILE SCOPING, both recorded so they are not rediscovered: the acronyms block has NO test of
+  any kind, and the per-entry provenance lives only in comments. The second is the interesting one —
+  it is a real instance of the pattern this repo keeps naming elsewhere, where the thing that makes a
+  fact trustworthy is present for a human reader and invisible to every tool.
+
+  DELIBERATELY NOT SPECIFIED: whether the surface is a new /software tab or its own route; whether
+  the add affordance is inline in the list or a dialog; and whether provenance becomes structured
+  fields or stays comment-only. The first two are page design and belong with the builder. The third
+  is a genuine fork with a schema consequence, and clause (d) requires it be DECIDED and stated
+  rather than defaulted into.
+
+  NOT gate-bound in itself: a glossary is not edge semantics, not the ontology, and not a graph
+  write. If clause (d) lands on structured provenance fields, that is a config-schema change and
+  rides the normal review, not the HITL gate.
