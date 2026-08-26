@@ -42,12 +42,18 @@ import AppCodeCascadePane from './AppCodeCascadePane'
 // renders with a visible notice when the api is down — never silently.
 const FALLBACK_DOMAINS: MappingDomain[] = [
   { id: 'ontology-map', title: 'Taxonomy ↔ Ontology map (the loading quintuple)', kind: 'quintuple', source: 'config/taxonomy-ontology-map.yaml', tier: null, available: true },
-  { id: 'job-application', title: 'Job → Application (RETIRED at K15 — folder grain supersedes)', kind: 'manual', source: '(retired 2026-08-05 — author at app-code-mapping; jobs inherit their folder)', tier: 5, available: false },
+  { id: 'seal-contact-override', title: 'Application Contacts (operate-manager override list — L1/L2)', kind: 'override', source: 'config/overrides/seal-contact-overrides.csv', tier: null, available: true },
+  { id: 'app-code-mapping', title: 'Application ← App code (the K7 defined-mapping store)', kind: 'defined', source: 'config/overrides/app-code-mappings.csv', tier: null, available: true },
   { id: 'fid-seal', title: 'FID → app_id (tier 2)', kind: 'manual', source: '(K6/T2 — reconciler table not built yet)', tier: 2, available: false },
   { id: 'alias-seal', title: 'ALIAS → app_id (tier 4)', kind: 'manual', source: '(T3 — reconciler table not built yet)', tier: 4, available: false },
-  { id: 'seal-contact-override', title: 'SEAL contacts — operate-manager override list (L1/L2)', kind: 'override', source: 'config/overrides/seal-contact-overrides.csv', tier: null, available: true },
-  { id: 'app-code-mapping', title: 'App code → Application (the K7 defined-mapping store)', kind: 'defined', source: 'config/overrides/app-code-mappings.csv', tier: null, available: true },
+  { id: 'job-application', title: 'Job → Application (RETIRED at K15 — folder grain supersedes)', kind: 'manual', source: '(retired 2026-08-05 — author at app-code-mapping; jobs inherit their folder)', tier: 5, available: false },
 ]
+
+// Domains the strip does NOT render (user direction, 2026-08-26). The row stays in
+// the registry above and server-side so /mappings/domains keeps recording the
+// retirement, but a permanently disabled tab is chrome, not information: K15 retired
+// job-grain authoring and app-code-mapping is where it moved to.
+const HIDDEN_FROM_STRIP = new Set(['job-application'])
 
 function download(filename: string, content: string, type = 'text/plain') {
   const url = URL.createObjectURL(new Blob([content], { type }))
@@ -158,31 +164,31 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
 
       {/* Domain strip — registry-driven (wf-mapping-01 annotation 1) */}
       <div className="flex flex-wrap items-center gap-1.5 px-4 pt-3" role="tablist" aria-label="Mapping domains">
-        {domains.map((d) => (
-          <button
-            key={d.id}
-            type="button"
-            role="tab"
-            aria-selected={d.id === activeDomain}
-            disabled={!d.available}
-            onClick={() => setActiveDomain(d.id)}
-            title={d.source}
-            className={
-              'rounded-md border px-2.5 py-1 text-xs font-medium ' +
-              (d.id === activeDomain
-                ? 'border-brand bg-panel-2 text-text'
-                : d.available
-                  ? 'border-edge bg-bg-2 text-muted hover:text-text'
-                  : 'cursor-not-allowed border-edge-soft text-faint')
-            }
-          >
-            {d.title.split(' (')[0]}
-            {d.tier !== null && <span className="ml-1 font-mono text-[10px]">t{d.tier}</span>}
-            {!d.available && (
-              <span className="ml-1 text-[10px]">{d.id === 'job-application' ? '(retired)' : '(not built)'}</span>
-            )}
-          </button>
-        ))}
+        {domains
+          .filter((d) => !HIDDEN_FROM_STRIP.has(d.id))
+          .map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              role="tab"
+              aria-selected={d.id === activeDomain}
+              disabled={!d.available}
+              onClick={() => setActiveDomain(d.id)}
+              title={d.source}
+              className={
+                'rounded-md border px-2.5 py-1 text-xs font-medium ' +
+                (d.id === activeDomain
+                  ? 'border-brand bg-panel-2 text-text'
+                  : d.available
+                    ? 'border-edge bg-bg-2 text-muted hover:text-text'
+                    : 'cursor-not-allowed border-edge-soft text-faint')
+              }
+            >
+              {d.title.split(' (')[0]}
+              {d.tier !== null && <span className="ml-1 font-mono text-[10px]">t{d.tier}</span>}
+              {!d.available && <span className="ml-1 text-[10px]">(not built)</span>}
+            </button>
+          ))}
       </div>
 
       <div className="flex min-h-0 flex-1 gap-3 p-4">

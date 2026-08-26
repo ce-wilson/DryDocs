@@ -62,23 +62,32 @@ DOMAINS: tuple[dict, ...] = (
         "tier": None,
         "available": True,
     },
+    # O24 — the ui-write-surface gate's M2 origin-flagged store (SME-3,
+    # 2026-07-21): SEAL says one thing, the support team knows another, and
+    # only the application owner (AO privilege) can fix SEAL. Overrides are
+    # kept SIDE BY SIDE with the source value (origin flag on every row),
+    # never write the graph, and feed the source-corrections report.
     {
-        # RETIRED at K15 (2026-08-05). K7 §A1 ruled attribution FOLDER-grain and K8
-        # retired the job-grain edge, so this domain's coverage grid read a
-        # relationship that no longer exists — it reported every row unresolved and
-        # drafted a changeset the server refuses. Retired rather than re-bound: a
-        # folder and its jobs carry the SAME app code, so a job-grain grid is N times rows
-        # carrying ONE folder-level fact, and a grid that looks per-job invites being
-        # read as per-job truth. Authoring lives at `app-code-mapping` (one row per app
-        # code); "which application owns this job" stays a one-hop traversal.
-        # The row STAYS in the registry, unavailable — a silently vanished domain reads
-        # as a bug to anyone who bookmarked ?domain=job-application.
-        "id": "job-application",
-        "title": "Job → Application (RETIRED at K15 — folder grain supersedes)",
-        "kind": "manual",
-        "source": "(retired 2026-08-05 — author at app-code-mapping; jobs inherit their folder)",
-        "tier": 5,
-        "available": False,
+        "id": "seal-contact-override",
+        "title": "Application Contacts (operate-manager override list — L1/L2)",
+        "kind": "override",
+        "source": "config/overrides/seal-contact-overrides.csv",
+        "tier": None,
+        "available": True,
+    },
+    # K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape
+    # §E1/§E2, 2026-08-03): the steward-defined app-code → application
+    # domain, O24 mechanics verbatim (committed CSV → mapping.db → this
+    # console). Unlike the contact overrides it IS a graph-loadable source
+    # of record (no machine feed exists to defer to), and override rows may
+    # be PERMANENT — no corrected-in-source lifecycle in this domain.
+    {
+        "id": "app-code-mapping",
+        "title": "Application ← App code (the K7 defined-mapping store)",
+        "kind": "defined",
+        "source": "config/overrides/app-code-mappings.csv",
+        "tier": None,
+        "available": True,
     },
     {
         "id": "fid-seal",
@@ -96,32 +105,30 @@ DOMAINS: tuple[dict, ...] = (
         "tier": 4,
         "available": False,
     },
-    # O24 — the ui-write-surface gate's M2 origin-flagged store (SME-3,
-    # 2026-07-21): SEAL says one thing, the support team knows another, and
-    # only the application owner (AO privilege) can fix SEAL. Overrides are
-    # kept SIDE BY SIDE with the source value (origin flag on every row),
-    # never write the graph, and feed the source-corrections report.
+    # RETIRED at K15 (2026-08-05). K7 §A1 ruled attribution FOLDER-grain and K8
+    # retired the job-grain edge, so this domain's coverage grid read a
+    # relationship that no longer exists — it reported every row unresolved and
+    # drafted a changeset the server refuses. Retired rather than re-bound: a
+    # folder and its jobs carry the SAME app code, so a job-grain grid is N times rows
+    # carrying ONE folder-level fact, and a grid that looks per-job invites being
+    # read as per-job truth. Authoring lives at `app-code-mapping` (one row per app
+    # code); "which application owns this job" stays a one-hop traversal.
+    #
+    # NO LONGER SURFACED AS A TAB (user direction, 2026-08-26). The row stays in the
+    # registry so /mappings/domains keeps recording the retirement for any API
+    # consumer, and it sorts LAST. What this replaces is a claim that had already
+    # stopped being true: the row used to say it stayed visible so a bookmarked
+    # ?domain=job-application would not read as a silently vanished domain — but the
+    # console's deep-link initializer requires `available`, so that link has always
+    # fallen back to app-code-mapping without ever opening this domain. The tab it
+    # actually produced was a permanently disabled button, which is what was removed.
     {
-        "id": "seal-contact-override",
-        "title": "SEAL contacts — operate-manager override list (L1/L2)",
-        "kind": "override",
-        "source": "config/overrides/seal-contact-overrides.csv",
-        "tier": None,
-        "available": True,
-    },
-    # K9 — the K7 defined-mapping store (gate seal-app-ref-edge-reshape
-    # §E1/§E2, 2026-08-03): the steward-defined app-code → application
-    # domain, O24 mechanics verbatim (committed CSV → mapping.db → this
-    # console). Unlike the contact overrides it IS a graph-loadable source
-    # of record (no machine feed exists to defer to), and override rows may
-    # be PERMANENT — no corrected-in-source lifecycle in this domain.
-    {
-        "id": "app-code-mapping",
-        "title": "App code → Application (the K7 defined-mapping store)",
-        "kind": "defined",
-        "source": "config/overrides/app-code-mappings.csv",
-        "tier": None,
-        "available": True,
+        "id": "job-application",
+        "title": "Job → Application (RETIRED at K15 — folder grain supersedes)",
+        "kind": "manual",
+        "source": "(retired 2026-08-05 — author at app-code-mapping; jobs inherit their folder)",
+        "tier": 5,
+        "available": False,
     },
 )
 
