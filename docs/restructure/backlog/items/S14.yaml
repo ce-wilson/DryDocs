@@ -1,0 +1,58 @@
+id: S14
+epic: structure-remediation
+title: 'Relocate docs/Product/ to knowledge/org/: captured org/product source material gets a proper
+  home, the seal/ name-directory dissolves'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: [K20]
+gates: []
+inputs:
+- docs/Product/product-overview.md
+- docs/Product/Technology_Team_Types.md
+- docs/Product/technology_roles_and_responsibilities.md
+- docs/Product/quad-mermaid.js
+- docs/Product/seal/seal-application-hierarchy.md
+- PORT-MANIFEST.yaml
+- git-readme.md
+- knowledge/upgrade-plans/docmeta-component.md
+acceptance: |
+  docs/Product/ no longer exists. Its five files live at knowledge/org/ with kebab-case
+  names: product-overview.md, technology-team-types.md,
+  technology-roles-and-responsibilities.md, org-quad-chart.mmd (the "quad-mermaid.js"
+  file is a Mermaid org diagram, not JavaScript — the extension is corrected at the
+  move), seal-application-hierarchy.md (the seal/ subdirectory dissolves; the file has
+  zero code references, verified 2026-08-26). Living references updated in the SAME
+  commit: (1) PORT-MANIFEST.yaml default_ok "docs/Product/**" becomes
+  "knowledge/org/**" scoped to these files (knowledge/** already has a default_ok
+  entry — fold in or narrow, keep the reason's "consumer has the authoritative
+  originals internally" sentence); (2) git-readme.md directory table row; (3) both
+  knowledge/upgrade-plans/docmeta-component.md T3 source paths; (4) the K5-amendment
+  gate prompt drafted by K20 — IF still unsigned, repoint its
+  technology_roles_and_responsibilities.md citation; if already SIGNED, leave the
+  prompt and gate-log untouched (L25: signed records keep their as-of paths) and note
+  the move in this item's done-note instead. Dated records stay as-is: doc-inventory
+  rows, port-prompt ledger steps and archives, IDEAS.md Idea-75 text, J14/K20 done
+  inputs, the catalog_ontology_supplement.cypher J14 history comment. Full unit suite
+  green (the port-manifest and reconcile guards check manifest paths against the
+  tree); board re-rendered; internal/org/product-overview.md verbatim-twin header
+  repointed to the new residue path if it names the old one.
+notes: |
+  Minted 2026-08-26 from the SME's in-session call: docs/Product is tech debt — out of
+  place, and "seal" is a proper noun as a directory name. Target knowledge/org/ follows
+  the J14 pattern (sanitized public captures live under knowledge/; verbatim twins
+  under internal/ — product-overview.md's verbatim capture is already at
+  internal/org/product-overview.md). depends_on K20 is deliberate sequencing, not a
+  data dependency: K20's gate-prompt draft cites
+  docs/Product/technology_roles_and_responsibilities.md as evidence, so the move runs
+  after K20 completes to avoid churning an item mid-draft — K20 itself moves nothing
+  (rider recorded in K20's notes). Reference census as of 2026-08-26: zero code
+  references to any docs/Product file (py/cypher/sql/js/ps1 trees swept); living prose
+  references are exactly the four in acceptance; everything else is dated or generated
+  (depgraph snapshots regenerate). SEAL as a TERM stays — the ruled boundary is that
+  SEAL ids/values are Internal, not the system name; this item only dissolves the
+  directory.
