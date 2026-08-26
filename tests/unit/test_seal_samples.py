@@ -16,7 +16,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
 
 from drydocs.seal_samples import (
     APPLICATION_HEADER,
@@ -30,10 +29,12 @@ from drydocs.seal_samples import (
 )
 from drydocs_core.models.seal import SealApplicationRow, SealContactRow
 
-#: Role classes the SME's 2026-08-06 list names that the code cannot admit today —
-#: G35 §A3/§A1d. Pinned as an EXPECTATION, not an accident: when the gate rules how an
-#: unknown name is handled, this set is the thing that must change with it.
-UNADMISSIBLE_TODAY = {
+#: Role classes the pre-G70 enum gate REFUSED outright (G35 §A3/§A1d). The old pin
+#: said "when the gate rules how an unknown name is handled, this set is the thing
+#: that must change with it" — it was ruled (admit flagged, signed 2026-08-11) and
+#: applied at G70, so these now ADMIT with their own declared concepts, and the set
+#: survives as the assertion that they KEEP admitting.
+FORMERLY_UNADMISSIBLE = {
     "Deployment Owner",
     "Deployment Information Owner",
     "Application Module Owner",
@@ -63,22 +64,22 @@ def test_every_application_row_carries_all_three_inline_contacts(rows) -> None:
             assert row.get(name_column), f"{row['app_id']} has no {name_column}"
 
 
-def test_contact_rows_split_exactly_as_the_code_admits_them(rows) -> None:
-    """The sample deliberately carries names the loader REFUSES, so §A3 reproduces on
-    demand. This pins which ones — a new refusal is a finding, not noise."""
+def test_every_contact_row_now_admits_including_the_four_the_old_gate_refused(rows) -> None:
+    """Pre-G70 this test pinned the REFUSAL of four classes (§A3 reproduced on
+    demand). The gate ruled admit-flagged and G70 applied it, so the sample's
+    whole surface now loads — and the four formerly-refused names resolve to
+    their own DECLARED concepts rather than arriving flagged."""
     _, contact_rows = rows
-    refused, accepted = [], []
-    for row in contact_rows:
-        try:
-            SealContactRow.model_validate(row)
-        except ValidationError:
-            refused.append(row["role_name"])
-        else:
-            accepted.append(row["role_name"])
-
-    assert set(refused) == UNADMISSIBLE_TODAY
-    assert accepted, "every contact row was refused — the sample is not exercising the loader"
-    assert not (set(accepted) & UNADMISSIBLE_TODAY)
+    validated = [SealContactRow.model_validate(row) for row in contact_rows]
+    assert validated, "the sample produced no contact rows"
+    formerly_refused = [r for r in validated if r.role_name in FORMERLY_UNADMISSIBLE]
+    assert {
+        r.role_name for r in formerly_refused
+    } == FORMERLY_UNADMISSIBLE, "the sample stopped exercising the §A1d classes"
+    assert all(r.tom_role_id is not None for r in validated), (
+        "a sample role arrived UNDECLARED — the bundled sample carries only "
+        "declared classes, so a None here means the vocabulary lost one"
+    )
 
 
 def test_no_two_contact_rows_collide_on_attribution_id(rows) -> None:
@@ -89,10 +90,9 @@ def test_no_two_contact_rows_collide_on_attribution_id(rows) -> None:
     """
     _, contact_rows = rows
     keys = [
-        f"{row['app_id']}|SEAL|{SealContactRow.model_validate(row).role_name.value}|"
+        f"{row['app_id']}|SEAL|{SealContactRow.model_validate(row).role_name}|"
         f"{row['employee_sid']}"
         for row in contact_rows
-        if row["role_name"] not in UNADMISSIBLE_TODAY
     ]
     duplicates = {key for key in keys if keys.count(key) > 1}
     assert not duplicates, f"attribution_id collision — a holding would be lost: {duplicates}"

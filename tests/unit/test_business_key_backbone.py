@@ -51,6 +51,14 @@ EXEMPT: dict[tuple[str, str], str] = {
         "the guard's first run, G31 2026-08-18; indexing it is a perf question, not "
         "an identity one."
     ),
+    ("Attribution", "role_source_name"): (
+        "migrate_tom_role_split_g70.cypher — a one-shot migration selecting a "
+        "POPULATION by role class (every L1/L2/bare-OM/Risk-Manager/CBT "
+        "Attribution), not an identity join: one-to-many by design, zero rows "
+        "means 'already migrated' (it is idempotent), so the Q8 silent-miss "
+        "class does not apply. The loaders never join on this property — its "
+        "identity key stays attribution_id, which IS constrained."
+    ),
 }
 
 

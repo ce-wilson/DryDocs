@@ -297,9 +297,8 @@ node_classifications:
     prov_type:  n/a
     note: >
       ACTIVE (K4, 2026-07-15): SEAL Technical Operating Model role vocabulary — skos:Concept
-      in scheme tom_roles (SkosConceptScheme), the gate §B REVISED fixed 7: application_owner,
-      primary_information_owner, backup_information_owner, cto, technology_risk_controls,
-      design_authority, operate_manager (L1/L2 = Attribution property). cto is NOT shared
+      in scheme tom_roles (SkosConceptScheme). Since G70 (2026-08-11 gate, applied 2026-08-26)
+      the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). cto is NOT shared
       with the K5 ProductRole scheme — the K5 gate (signed off 2026-07-20) decided the two
       families are INDEPENDENT, superseding the 2026-07-10 §B "CTO in both families" record
       (rename history in the gate log: the area-product Tech Partner was formerly named
@@ -369,8 +368,10 @@ node_classifications:
       ACTIVE (K6, 2026-07-20; gate product-cabinet-attribution signed off same day) —
       Product Cabinet role vocabulary, skos:Concept in scheme product_roles; EXACTLY the
       fixed 7 (area_product_owner, product_owner, product_architect, tech_partner,
-      data_owner, data_certifier, analytics_lead), scheme FIXED (the tom_roles precedent —
-      new roles require a new gate). NO cto member: the two role families are INDEPENDENT
+      data_owner, data_certifier, analytics_lead), scheme FIXED on its OWN ruling —
+      new roles require a new gate. (This row once cited "the tom_roles precedent"; tom_roles
+      moved to a DECLARED vocabulary at G70, which does not reopen K5 — product_roles stays
+      fixed because ITS gate ruled it so.) NO cto member: the two role families are INDEPENDENT
       (SME 2026-07-20 — the shared-cto concept from the 2026-07-10 gate §B record is
       dropped for now; SEAL's cto stays a TOM role attributed to :BusinessApplication).
       Rename history, carried as a skos:changeNote on the tech_partner concept: in PAT the

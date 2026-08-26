@@ -234,11 +234,9 @@
     note: >
       ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
       qualified-attribution reification — names which TOM role the Attribution grants. The
-      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
-      backup_information_owner | cto | technology_risk_controls |
-      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
-      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
-      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      scheme (tom_roles) is the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority arrived
+      with the 2026-07-10 revision.
       cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
     supplement:   seal_ontology_supplement.cypher
@@ -268,11 +266,9 @@
     note: >
       ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
       qualified-attribution reification — names which TOM role the Attribution grants. The
-      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
-      backup_information_owner | cto | technology_risk_controls |
-      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
-      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
-      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      scheme (tom_roles) is the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority arrived
+      with the 2026-07-10 revision.
       cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
       REPLACES seal_attribution_had_role at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate

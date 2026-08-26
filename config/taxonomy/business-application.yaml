@@ -106,7 +106,8 @@ nodes:
   # Membership ▸ Role ▸ Employee (n-ary). Keyed (sealid, role, sid). Employees referenced by
   # SID only — real names/emails are confidential (synthetic in the sample) -> internal/.
   #
-  # REBUILT 2026-08-06 from the SME's role list (13 classes; see the `roles:` register).
+  # REBUILT 2026-08-06 from the SME's role list (13 classes; the register that was
+  # derived from it here was deleted at G70 — see tom-role-vocabulary.yaml).
   # SIDs are now PERSON-scoped rather than app-scoped: the earlier K/L/M-per-application
   # pattern implied 15 different people and made every cross-application question
   # unaskable. The four role/SID pairs the SME set on 70001 are preserved exactly.
@@ -164,70 +165,32 @@ nodes:
         - { role: Design Authority, sid: K234567 }
         - { role: L2 Operate Manager, sid: K456789 }
 
-  # Role — distinct role types observed (org:Role). DERIVED: the union of the role names
-  # in `memberships` above, nothing more. It is an OBSERVATION of the sample, not a
-  # vocabulary declaration — the vocabulary question is open at gate G35
-  # (config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml), whose §A1 cites this
-  # list as one of four divergent role lists and whose §H4 requires it to be reconciled to
-  # whatever §A rules. Nothing reads it (G35 §A8). Listed in the SME's own order rather
-  # than sorted, because that order groups the classes and the grouping is information.
+  # THE ROLE REGISTER THAT STOOD HERE WAS DELETED AT G70 — not moved, not
+  # reinterpreted (gate tom-roles-enumeration-and-cardinality §F3: a new
+  # declared file won, and "leaving both is the one outcome to refuse"). It
+  # was §A8's fourth divergent role list, read by no code, and §A1b measured
+  # it drifting twice inside a single gate with the full suite green. The
+  # DECLARED vocabulary — both registers, scope/type/required/active, the
+  # retirement state — is config/taxonomy/tom-role-vocabulary.yaml, read by
+  # drydocs_core.ontology.tom_role_vocabulary and drift-guarded by
+  # tests/unit/test_tom_role_vocabulary.py.
   #
-  # 2026-08-06: REPLACED WHOLESALE from the 13-class list the SME supplied in chat. This
-  # supersedes the same day's earlier 70001 re-point (which had produced an 8-name union),
-  # and it is a TAXONOMY capture — reversible by construction, and it rules nothing. The
-  # same list is recorded in G35 as `sme_direction` for the walk to rule on; until §A is
-  # signed, the scheme still holds its 7 concepts and the loaders their 4-branch crosswalk.
-  #
-  # THREE THINGS THIS LIST CHANGES, all of them questions for the gate rather than answers:
-  #   FOUR CLASSES ARE NEW to the repo entirely — Deployment Owner, Deployment Information
-  #   Owner, Application Module Owner, Site Reliability Engineer. None appears in the signed
-  #   scheme, the SealRole enum, the loader crosswalk or any prior capture.
-  #   ONE NAME IS GONE — Risk Manager. It is still live in the SealRole enum and still
-  #   flagged unmapped by the loader, so its absence here is a capture change, NOT a
-  #   retirement. Chief Business Technologist was also absent from the list and was
-  #   RESTORED the same day by a separate SME ruling (below).
-  #   THE PARENTHETICALS ARE ABBREVIATIONS, not part of the name: the SME wrote every
-  #   acronym in "Name (ABBREV)" form and left it off the four classes that have none, so
-  #   they are recorded in `abbrev` and the earlier "Chief Technology Officer(CTO)" literal
-  #   is read as the same convention rather than as a source string. See G35 §A3b.
-  # 2026-08-06, SECOND RULING THE SAME DAY — Chief Business Technologist (CBT) is RESTORED
-  # as an OPTIONAL role class: "add optional role: Chief Business Technologist (CBT) but do
-  # not create a cypher relationship mapping for it, in case it appears". Both halves already
-  # hold in code and NEITHER needed a change: CBT is admissible (SealRole line 109, aliases
-  # 148-149) and no Cypher crosswalk branch exists for it, so a CBT row loads and arrives
-  # flagged unmapped_role=true. That is the K4 policy used ON PURPOSE rather than as a gap —
-  # a name the source may emit is recorded rather than refused, and no concept is minted for
-  # it (seal_contacts.cypher:75, "never mint concepts here"). It also DISPOSES of G35's G10:
-  # CBT is a role class in its own right, not an alias of Chief Technology Officer, which is
-  # why 70001 now carries BOTH, held by different people.
-  #
-  # NOTE what is deliberately NOT recorded here: a `required` / `optional` field. G35 §B3
-  # rules that required-ness becomes an attribute of the TOMRole CONCEPT, and adding it to
-  # this capture would create a fifth divergent surface for the exact fact the gate is trying
-  # to give one home. The optional ruling lives in the gate and the gate log; this file
-  # records only that the class was observed.
-  roles:
-    - { role: Application Owner, abbrev: AO }
-    - { role: Primary Information Owner, abbrev: PIO }
-    - { role: Backup Information Owner, abbrev: BIO }
-    - { role: Chief Technology Officer, abbrev: CTO }
-    - { role: Chief Business Technologist, abbrev: CBT }
-    - { role: Design Authority, abbrev: DA }
-    - { role: Deployment Owner }
-    - { role: Deployment Information Owner }
-    - { role: Application Module Owner }
-    - { role: L1 Operate Manager }
-    - { role: L2 Operate Manager }
-    - { role: Operate Manager }
-    - { role: Site Reliability Engineer, abbrev: SRE }
-    - { role: Backup Application Owner, abbrev: BAO }
+  # The MEMBERSHIPS above deliberately REMAIN: they are the synthetic SAMPLE
+  # the G35 gate walk was built on (the three deliberately different
+  # application shapes), not a vocabulary declaration — the deleted list was
+  # DERIVED from them, which is why deleting the list alone would not have
+  # survived a regeneration (§H4). The guard that replaces the derivation:
+  # every membership role name must canonicalize into the declared
+  # vocabulary, so this file can never quietly grow a fifteenth name the
+  # register does not carry.
 
 counts:
   business_applications: 3
   ports_per_app: 2          # EventProcessing + BatchProcessing
   memberships: 32           # 14 (70001 full) + 12 (70002 wide) + 6 (70003 minimal)
-  distinct_roles: 14        # the SME's 13-class list of 2026-08-06 + Chief Business Technologist,
-                            # restored the same day as an optional class; every class appears on 70001
+  distinct_roles: 14        # distinct role names observed in the memberships sample (the SME's
+                            # 13-class list + CBT); every one canonicalizes into the DECLARED
+                            # vocabulary (tom-role-vocabulary.yaml) — guarded, see the note above
   distinct_employees: 7     # by SID. WAS 15, and the drop is the POINT: SIDs are now
                             # person-scoped, so the same seven people recur across roles and
                             # across applications. 31 memberships over 7 people is what makes

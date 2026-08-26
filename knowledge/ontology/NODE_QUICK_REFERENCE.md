@@ -178,9 +178,13 @@ their notes.
 
 ¹⁰ Two INDEPENDENT skos:ConceptScheme role vocabularies — do not conflate with each
 other or with `:Role` (org:Role, PAT hierarchy only). **TOMRole** (scheme `tom_roles`,
-ACTIVE at K4, the gate-REVISED fixed 7): application_owner, primary_information_owner,
-backup_information_owner, cto, technology_risk_controls, design_authority,
-operate_manager (L1/L2 lives on the Attribution node). **ProductRole** (scheme
+ACTIVE at K4; since G70 DECLARED in `config/taxonomy/tom-role-vocabulary.yaml` — 16
+classes: 7 required per the signed §G register (application_owner,
+primary_information_owner, backup_information_owner, cto, technology_risk_controls,
+design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager
+split (operate_manager_l1 / operate_manager_l2 / operate_manager — the level property
+retired) and both SRE rows (derived); required/scope/active ride the concept,
+cardinality one-or-more recorded once on the scheme). **ProductRole** (scheme
 `product_roles`, ACTIVE at K6 2026-07-20, fixed 7): area_product_owner, product_owner,
 product_architect, tech_partner, data_owner, data_certifier, analytics_lead — no shared
 `cto` concept (K5 ruling supersedes the 2026-07-10 §B record); area_product_owner and

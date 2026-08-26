@@ -232,6 +232,7 @@
         "config/taxonomy/platforms.yaml",
         "config/taxonomy/server-location.yaml",
         "config/taxonomy/software-registry.yaml",
+        "config/taxonomy/tom-role-vocabulary.yaml",
         "config/taxonomy/ui-components.yaml",
         "config/taxonomy/ui-concepts.yaml",
         "config/taxonomy/ui-tests.yaml"
