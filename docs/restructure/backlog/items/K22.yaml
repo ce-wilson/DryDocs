@@ -8,7 +8,7 @@ phase: 9
 agent: ontology-mapper
 model: fable
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - knowledge/upgrade-plans/servicenow-replica-evidence.md
