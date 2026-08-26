@@ -93,6 +93,44 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-159`** · 2026-08-26 · `[idea]` · **open** · prio? **Med** —
+  **Deepdoc meets acronyms all over the corpus and has nowhere to put them — expand that capture
+  into an acronym LOADER that feeds the surface backlog O68 specifies.** Raised by the user
+  2026-08-26, right after O68 was filed: O68 gives acronyms a readable surface and a MANUAL add
+  path, and this is the automated feeder for it. The investigation the deepdoc design doc records
+  is exactly the situation that produces acronyms — one evening crossing email, the Control-M
+  client, Jira, Bitbucket and Confluence, every one of them dense with internal shorthand — and the
+  analyst's mind map is where those meanings currently get written down and then lost with the
+  session. **Checked before filing, and it is the sharp end of this entry: `acronym` appears
+  NOWHERE in `docs/design/deepdoc-data-flow-overview.md` or `drydocs_deepdoc/`.** The capture is
+  informal today; there is no field, no slot and no output that holds one. **MM3 is the natural
+  seam** — it builds the mind-map state file (`drydocs.deepdoc.mindmap.v1`) AND the shared entity/ID
+  extractor in `drydocs_core`, and that extractor's enumerated token classes (application-id tokens,
+  issue keys, folder-name positional tokens via the PRAOCG decode, table names, distribution-list
+  names, GUIDs) do NOT include acronyms. So the concrete ask splits in two: add acronyms as an
+  extracted class, then give the result somewhere to land.
+  - **THE FORK TO DECIDE, not to default:** where does a loaded acronym go? Today the durable home
+    is `config/taxonomy/software-registry.yaml` — a CONFIG glossary, not the graph — so "loader" in
+    the repo's usual sense (the only graph writers) may be the wrong word for it. Either it lands as
+    graph nodes and becomes a real loader with a `LOADER_REGISTRY` row, or it proposes into the
+    registry and rides the change-artifact path O68 clause (c) already describes. Both are
+    defensible; picking silently is not.
+  - **TRUST IS NOT OPTIONAL HERE.** Deepdoc output is corpus-derived, so a harvested acronym is
+    SYNTHESIZED and carries the `:Uncertain` discipline (ADR 0006 corpus-consumer ruling, ADR 0011,
+    `tests/unit/test_uncertain_boundary.py`). It must never become indistinguishable from the three
+    SME-supplied entries committed today. That is the SAME fork O68 clause (d) already forces about
+    provenance, reached from the other direction — whichever item lands first should settle it for
+    both, because two surfaces disagreeing about what makes an acronym trustworthy is worse than
+    either gap.
+  - **An acronym also has a shape the other extracted classes do not:** it needs the SENTENCE it was
+    found in, not just the token. `SNOW` is only useful because someone wrote down that it means
+    ServiceNow and explicitly NOT Snowflake, and that distinction lives in prose, not in the token.
+    Expect the candidate record to carry the surrounding evidence span, which the extractor's typed
+    matches-with-spans design already supports.
+
+  Sibling of backlog O68 (the surface and the manual add), and depends on MM3 for the extractor.
+  Mechanism-only; no real acronym values from any company corpus land in a tracked file.
+
 - **`Idea-158`** · 2026-08-26 · `[bug]` · **open** · prio? **Med** —
   **`MiniDag` never adopted the O66 `RelEdge` overlay, so relationship names still render BEHIND
   the nodes on FIVE routes.** O66's acceptance says the fix is one component so that "one future
