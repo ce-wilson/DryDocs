@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-25T22:28:39",
-    "date": "20260825",
+    "captured_at": "2026-08-26T00:02:25",
+    "date": "20260826",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "30c7fb7e",
-      "full": "30c7fb7e6ab5dc1c62cb714842236b2a8e78139f",
+      "commit": "49202a88",
+      "full": "49202a88d74496b65f729857e8f6aecc9fc91a7b",
       "branch": "main",
-      "describe": "port-base-20260825-21-g30c7fb7e",
-      "subject": "feat(lineage): G92 — resolve the job's scope chain before the file-op parse",
+      "describe": "port-base-20260825-27-g49202a88",
+      "subject": "feat(remediation): G69 — R41-R44 registered and detected in the same change",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6600,6 +6600,15 @@
       "name": "source-registry-v2.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/source-registry-v2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/standard-identity-and-carrier.yaml",
+      "name": "standard-identity-and-carrier.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/standard-identity-and-carrier.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18134,6 +18143,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_remediation/profile.py",
+      "name": "profile.py",
+      "extension": ".py",
+      "rel_path": "drydocs_remediation/profile.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_remediation/transform.py",
       "name": "transform.py",
       "extension": ".py",
@@ -19475,10 +19493,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json",
-      "name": "drydocs-20260825.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2228.json",
+      "name": "drydocs-20260825-2228.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825-2228.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22049,6 +22067,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_remediation_profile.py",
+      "name": "test_remediation_profile.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_profile.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_remediation_scaffold.py",
       "name": "test_remediation_scaffold.py",
       "extension": ".py",
@@ -24301,6 +24328,14 @@
       "drydocs/drydocs_lineage/review.py"
     ],
     [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_remediation/profile.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_remediation/xml_bridge.py"
+    ],
+    [
       "drydocs/drydocs/cli_docs.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -25765,6 +25800,22 @@
       "drydocs/drydocs_remediation/equivalence.py"
     ],
     [
+      "drydocs/drydocs_remediation/profile.py",
+      "drydocs/drydocs_core/orchestration/controlm/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/profile.py",
+      "drydocs/drydocs_core/orchestration/controlm/variables.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/profile.py",
+      "drydocs/drydocs_remediation/detect.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/profile.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
       "drydocs/drydocs_remediation/transform.py",
       "drydocs/drydocs_remediation/formats.py"
     ],
@@ -27154,6 +27205,10 @@
     ],
     [
       "drydocs/tests/unit/test_remediation_conformance.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_conformance.py",
       "drydocs/drydocs_remediation/xml_bridge.py"
     ],
     [
@@ -27199,6 +27254,18 @@
     [
       "drydocs/tests/unit/test_remediation_m0.py",
       "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_profile.py",
+      "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_profile.py",
+      "drydocs/drydocs_remediation/profile.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_profile.py",
+      "drydocs/drydocs_remediation/xml_bridge.py"
     ],
     [
       "drydocs/tests/unit/test_remediation_scaffold.py",
@@ -32452,6 +32519,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/source-registry-v2.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/standard-identity-and-carrier.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -38751,6 +38823,11 @@
     [
       "drydocs/drydocs_remediation",
       "CONTAINS",
+      "drydocs/drydocs_remediation/profile.py"
+    ],
+    [
+      "drydocs/drydocs_remediation",
+      "CONTAINS",
       "drydocs/drydocs_remediation/transform.py"
     ],
     [
@@ -39501,7 +39578,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2228.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40866,6 +40943,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_remediation_profile.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_remediation_scaffold.py"
     ],
     [
@@ -41913,13 +41995,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2372,
-    "edges": 1172,
+    "files": 2375,
+    "edges": 1182,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2655,
+    "rels": 2658,
     "directories": 284
   }
 }
