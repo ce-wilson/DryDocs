@@ -4117,3 +4117,33 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   `lob-reconciles-to-segment`. A placeholder that guards a name nobody mints guards nothing, so
   both are moved to `rejected` (superseded, kept for audit — the C12 `requires-scheduler`
   lifecycle) with the real company ids recorded as the names the producer must not mint.
+## 2026-08-25 — RECORD: gate `standard-identity-and-carrier` DRAFTED, unsigned (G95)
+
+- **What this records.** The G95 prompt is drafted (5 sections, 17 confirmations) and
+  NOTHING is decided: no config family exists, TOKEN_REGISTRY is untouched, and its every
+  entry stays `proposed` exactly as its own header says. This stub exists because the G95
+  acceptance names it as part of the deliverable — the gates surface should show the gate
+  as awaiting-SME rather than the question living only in a YAML file nobody re-reads.
+- **The four questions on the page.** (A) whether a validation standard gets a stable id
+  (proposed `<domain>.<subject>.v<N>`, opaque to selection), with the CONTRACT CHANGE said
+  plainly — an id outside TOKEN_REGISTRY turns the registry-vs-standard agreement test from
+  a two-way guard (code == document) into a three-way one (code == document == carrier),
+  both directions. (B) the carrier, three candidates priced and none pre-picked: versioned
+  YAML on the launcher-registry/G26 precedent; SQLite-as-primary, which collides with ADR
+  0009 rule 1 and ADR 0014's domain-fact line and is PRICED rather than forbidden; and
+  0009's own hybrid (YAML truth + mapping.db derived read model + rule-5 draft flow), which
+  is the shape the floated "config table" can have without breaching anything. The port
+  disposition of BY-TEAM rows is part of the ruling (the 2026-08-25 alias lesson: company
+  values in a canonical-producer file are overwritten wholesale). (C) the §7.5/G84 fence
+  ratified explicitly — the DD digit is a grammar version and selects nothing, ruled NOW
+  because a per-team registry is exactly the pressure that would break it. (D) divergence
+  policy: ADD is the C16 case and stays free; RELAXING a company-required token is put as
+  forbidden vs permitted-with-ratification, with recorded-only recommended against in the
+  page's own text.
+- **Registered: nothing, deliberately.** Identity and carrier are config-layer; no
+  vocabulary term, node class, property term or map row is proposed. §E1 makes the
+  absence a decision on the record; a future :Standard graph presence would be its own
+  ontology gate.
+- **Related:** G94 (the selector — builds regardless, may not invent the carrier), G84
+  (adoption measurement + the fence's origin), the etlprocess-kind-enum rider (where
+  engine names must agree if per-engine standards get ids).

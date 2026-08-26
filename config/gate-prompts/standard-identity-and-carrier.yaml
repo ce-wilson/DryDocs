@@ -1,0 +1,121 @@
+# SME gate-prompt spec — standard IDENTITY and its carrier (backlog G95).
+# GATE-BOUND AND DECIDES NOTHING: drafting a prompt is not a contract change
+# (the G27/W1/N10/G61 precedent). Nothing is written to the graph, no config
+# family is created, and TOKEN_REGISTRY is not touched until the SME signs.
+#
+# WHAT THIS PAGE PROPOSES, STATED UP FRONT BECAUSE IT IS UNUSUAL: no vocabulary
+# term, no node class, no property term — identity and carrier are CONFIG-layer
+# questions about a registry/profile store, not ontology bindings. There is
+# therefore nothing to register `planned`; the pre-gate record is this file
+# plus its gate-log stub, and saying so explicitly beats a map row minted into
+# the wrong layer to satisfy the letter of a rule (the stretching-a-wrong-label
+# failure CLAUDE.md §1 names).
+#
+# THE USER DIRECTION THIS PUTS TO THE GATE (2026-08-12, Idea-114 clause 2):
+# a config table (SQLite was floated) keyed by a standard id, holding a
+# validation profile BY TEAM, platform/product hierarchy later. The direction
+# is honored by being ASKED WITH ITS COSTS VISIBLE, not by being pre-adopted —
+# two ADRs accepted since the direction was given (0009's rule 1 standing;
+# 0014's per-machine-vs-domain line, 2026-08-25) bear directly on the carrier
+# and are laid out in §B.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: standard-identity-and-carrier
+title: "SME Gate — standard identity and its carrier: a stable id for a validation standard, where per-team profiles live, and the fence that keeps the DD digit out of it"
+step: "G84 built adoption measurement and G94 will build the selector (TASKTYPE + JOB_ROLE + launcher classification -> a standard identity plus its token set) — but 'a standard identity' does not exist yet: today the per-job-type sets are code-as-data in TOKEN_REGISTRY, whose own docstring calls itself the single source both the parser and the published register read from. Giving a standard an id outside that module is a CONTRACT CHANGE, and storing per-team profiles is a governance surface. Four questions, evidence attached, nothing pre-picked."
+summary: >
+  Section A rules identity: whether a standard gets a stable id at all, its
+  shape, and — said plainly — that an id outside TOKEN_REGISTRY changes what
+  the registry-vs-standard agreement test guards, from a two-way code-vs-
+  document check into a three-way one. Section B lays the carriers side by
+  side without pre-picking: versioned YAML under config/ on the
+  launcher-registry precedent, SQLite as primary (which collides with ADR
+  0009 rule 1 and must be ruled as an exception or rejected on it), and
+  0009's own hybrid — YAML source of truth with mapping.db as the derived
+  read model, which is the shape the floated 'config table' can have without
+  breaching anything. The port cost is stated from this week's live lesson:
+  real team data in a canonical-producer file evaporates at the next port.
+  Section C ratifies the §7.5/G84 fence explicitly — the DD digit is a
+  grammar version and must never select a standard — because a per-team
+  registry is exactly the pressure that would break it. Section D rules the
+  divergence policy: adding a team-local token is the C16 case the parser
+  already preserves; RELAXING a company-required token is a governance
+  decision, and the page asks whether it is permitted at all and who
+  ratifies it. Section E fences scope.
+
+meta:
+  Module: "config — the artifact under discussion is a registry/profile store, and config/ is the declared home for registries and crosswalks (launcher-registry.yaml is the closest existing shape). The prompt DESCRIBES a contract change to drydocs_core/orchestration/controlm/description_tokens.py; it does not make one"
+  Source: "drydocs_core/orchestration/controlm/description_tokens.py (TOKEN_REGISTRY docstring + the §7.5 sentinel contract + the C16 unknown-keys rule) · knowledge/standards/technology/controlm-guidelines-and-standards.md §7.5 · user direction 2026-08-12 (Idea-114 clause 2, transcribed in IDEAS.md) · config/launcher-registry.yaml (the G26 precedent header) · ADR 0009 rules 1/2/5 · ADR 0014's per-machine-vs-domain line (accepted 2026-08-25)"
+  Precedent: "G27/W1/N10/G61 — a drafted prompt decides nothing · G26 launcher-registry — code-as-data moved to schema-pinned, test-guarded config, 'adding a rule is a config edit plus a test run' · ADR 0009 rule 5 — propose in the DB, land in git · the alias episode (2026-08-25) — company-local values in a canonical-producer config file are overwritten wholesale at port · G84(c)/§7.5 — the DD digit is a grammar VERSION · C16 — a bare team-local key is legal, preserved verbatim, never load-bearing · G16 — aliases suggest, values decide"
+  Registry ref: "no source-registry or doc-source-registry flag moves; the standards themselves are knowledge/standards/ documents and the estate evidence arrives through surfaces already registered"
+  Classification: "Internal-Public — mechanism only: token KEYS and job-type names appear; no real folder names, job names, team names, hosts or SIDs"
+  Vocabulary: "NOTHING registered, deliberately — no vocabulary term, node class or property term is proposed (identity and carrier are config-layer). The pre-gate record is this file + the gate-log stub; §E1 makes that an explicit clause so the absence reads as a decision, not an omission"
+
+provenance:
+  - label: "The contract as it stands — source-grain evidence"
+    source_object: "drydocs_core/orchestration/controlm/description_tokens.py"
+    key: "TOKEN_REGISTRY (token spelling -> TokenSpec), required_tokens(JobType) — the ONLY selection dimension today"
+    loader: "NONE — the registry is a parse contract, not a load; its own header says every entry is proposed with no vocabulary binding and no loader"
+    properties:
+      - name: single_source_claim
+        origin: source
+        from: "the TOKEN_REGISTRY docstring: 'the single source both the parser and the published register read from, so code and document cannot drift (guarded by the registry-vs-standard agreement test)'"
+        note: "§A's whole subject. An id outside this module is a contract change to exactly this sentence, and the prompt says so plainly rather than discovering it at build time."
+      - name: dd_sentinel
+        origin: source
+        from: "GRAMMAR_SENTINEL = 'DD1|' and the versioned _SENTINEL regex: 'the digit is a grammar VERSION, never a template id (§7.5)'"
+        note: "§C ratifies this fence explicitly. G94's guardrail-as-test (same job under DD1| and DD2| selects the SAME standard) is the enforcement; this page is the ruling it enforces."
+      - name: c16_team_local
+        origin: source
+        from: "parse rule 5: unknown keys within a structured block are RETURNED, never dropped — 'the C16 key-prefix governance makes a bare key a legal team-local annotation: preserved verbatim, never load-bearing'"
+        note: "§D's ADD half already has a home. The prompt's open half is RELAX, which no rule covers."
+  - label: "The carrier landscape — derived comparison (assembled for this page, decided by nobody yet)"
+    source_object: "config/launcher-registry.yaml (G26) · ADR 0009 · ADR 0014 · PORT-MANIFEST.yaml config/** disposition"
+    key: "carrier candidate"
+    loader: "NONE"
+    properties:
+      - name: yaml_precedent
+        origin: derived
+        from: "launcher-registry.yaml's own header: moved OUT of commands.py so 'adding a wrapper rule is a config edit plus a test run, no Python change' — schema-pinned, ordered, guarded by test_launcher_registry.py"
+        note: "The closest existing shape to what §B proposes as candidate 1. Its whole history is the same move this gate considers: code-as-data promoted to config."
+      - name: adr_collision
+        origin: derived
+        from: "ADR 0009 rule 1 ('source of truth is git text, permanently — this is not a stepping stone to a database') set against the floated SQLite table; ADR 0014's line (a value an SME would want to see change is a DOMAIN fact and goes to git text)"
+        note: "A validation profile is exactly a value an SME rules on, so SQLite-as-PRIMARY needs 0009 re-opened; SQLite as the DERIVED read model (0009 rule 2, mapping.db) needs nothing. §B lays this out; the gate rules it."
+      - name: port_cost
+        origin: derived
+        from: "config/** is canonical-producer; the 2026-08-25 alias episode proved company-local values in such a file are overwritten wholesale at the next port"
+        note: "A BY-TEAM profile is company data by definition. Whichever carrier wins, the PORT DISPOSITION of the team rows is part of the ruling, not an afterthought — per-entry, a company overlay (the J34 seam), or a canonical-company sibling file."
+
+sections:
+  - title: "A. Identity — does a standard get a stable id, and what does that do to the contract"
+    confirmations:
+      - "A1. DOES A STANDARD GET AN ID AT ALL? Today 'the FileWatcher standard' has no name a row can reference — required_tokens(JobType) IS the standard, anonymously. G94's selector must return 'a STANDARD IDENTITY plus the token set that identity requires', so something must be referenceable. The alternative to minting ids — the selector returns only token sets and identity stays implicit in code — is laid out for explicit rejection: it makes per-team profiles unaddressable (a profile must say WHICH standard it profiles) and adoption reporting unattributable. Confirm that standards get stable ids."
+      - "A2. THE SHAPE: proposed `<domain>.<subject>.v<N>` (controlm.filewatcher.v1, controlm.engine-dpl.v1, controlm.generic.v1) — dot-separated like the registry's dataset grammar, versioned like the supplements, with v-bumps for CONTENT changes to a standard (a required token added or removed) and NOT for grammar-version changes (that is the DD digit's job and §C's fence). The id is OPAQUE to selection: G94 selects on TASKTYPE + JOB_ROLE + launcher classification and RETURNS an id, never parses one. Rule the shape, or amend it — what must survive any amendment is versioning-by-content and opacity-to-selection."
+      - "A3. THE CONTRACT CHANGE, SAID PLAINLY (the acceptance requires this): TOKEN_REGISTRY's docstring claims it is 'the single source both the parser and the published register read from, so code and document cannot drift', guarded by the registry-vs-standard agreement test. An id living OUTSIDE that module means the agreement test stops guarding a two-way fact (code == document) and must start guarding a THREE-way one (code == document == carrier): every standard id the carrier names must resolve to a token set derivable from TOKEN_REGISTRY, and every TOKEN_REGISTRY job-type set must be reachable from some standard id — both directions, the D3 endpoint-guard lesson. Confirm that the agreement test's new obligation is part of this ruling, so the build inherits it as a requirement rather than discovering it."
+      - "A4. WHAT AN ID IS NOT: not a graph node (no :Standard label is proposed — if the graph ever needs one, that is an ontology gate with its own page), not a selector input (§C), and not a team property (a team HOLDS a profile AGAINST a standard id; the id itself is company-level). Confirm the three negatives so the id cannot scope-creep at build time."
+
+  - title: "B. The carrier — laid side by side, costs at review time and at port time, nothing pre-picked"
+    confirmations:
+      - "B1. CANDIDATE 1 — VERSIONED YAML UNDER config/ (the launcher-registry precedent): schema-pinned (drydocs.standards-registry.v1), test-guarded, teams add profile rows without a code change — the exact move G26 already made once, whose header says adding a rule became 'a config edit plus a test run'. Review cost: a profile change is a YAML diff a gate session can read (ADR 0009's own argument — 'a row-level DB delta is not something a domain expert signs off on; a YAML hunk is'). Port cost: see B4, which is REAL and stated. Rule for or against."
+      - "B2. CANDIDATE 2 — SQLITE AS PRIMARY (the floated table): real constraints, concurrent edits, natural UI backing. STATED COLLISION, not implied: ADR 0009 rule 1 says git text is the source of truth PERMANENTLY and 'this is not a stepping stone to a database'; ADR 0014's accepted line says a value an SME would want to see change is a domain fact and lives git-side — and a validation profile is precisely such a value. Choosing this candidate therefore means re-opening a rule 0009 states as permanent, through 0009's own amendment path, with the four load-bearing mechanisms it protects (gate diffs, port ranges, per-file classification, deterministic renders) each answered. The page does not forbid it; it prices it. Rule for or against."
+      - "B3. CANDIDATE 3 — 0009'S OWN HYBRID: YAML under config/ as source of truth, materialized into var/mapping.db as a DERIVED read model (rule 2's existing pattern), with any future UI editing through the draft table and landing as a YAML diff (rule 5: propose in the DB, land in git). This is the shape the floated 'config table' can have WITHOUT breaching anything — the SME gets the table, the gate keeps its diff, the port keeps its range. Rule whether this is the intended reading of the 2026-08-12 direction."
+      - "B4. THE PORT DISPOSITION IS PART OF THE RULING, NOT AN AFTERTHOUGHT — this week's live lesson (the alias episode): config/** is canonical-producer, and company-local values in such a file are overwritten WHOLESALE at the next port. A BY-TEAM profile is company data by definition. So whichever carrier wins, the ruling names where team rows live: split files (producer ships the standards + a generic profile as canonical-producer; team profiles in a canonical-company sibling the port never touches — the dev-environment.yaml pattern), a per-entry disposition with an id-keyed merge rule, or the J34 overlay seam. Rule the disposition WITH the carrier."
+      - "B5. THE HIERARCHY IS DECLARED FUTURE, NOT BUILT: the direction names 'a platform/product hierarchy later'. The ruling here fixes only the KEY GRAIN a profile binds to (proposed: team, the direction's own word, with the standard id as the other half of the key), and requires the carrier schema to version so a later platform/product level is an additive schema bump, not a re-key. Confirm the grain and the additive-evolution requirement."
+
+  - title: "C. The fence — the DD digit must not select a standard, ratified because this registry is the pressure that would break it"
+    confirmations:
+      - "C1. RATIFY §7.5/G84 EXPLICITLY: the DD digit is a grammar VERSION — DD1 and a future DD2 are read side by side through a migration — and it MUST NOT select a template or a standard. Selection rides TASKTYPE + the registered JOB_ROLE token + the launcher classification (G94's tree), and a standard id therefore needs its OWN carrier, which is this page's whole subject. The fence is already code (the _SENTINEL regex comment) and will be a test (G94(b): the same job under DD1| and DD2| selects the SAME standard). This clause makes it a RULING, so the test enforces something signed rather than something assumed."
+      - "C2. WHY RATIFICATION IS NEEDED NOW rather than left implicit: a per-team registry is exactly the pressure that would break the fence — the first team that wants 'our jobs are DD2 and DD2 means our template' has a carrier to write it in. The fence's meaning after this page: a team profile may KEY on (team, standard id) and NOTHING else; grammar version appears nowhere in any profile key or selector input. Confirm, and confirm that a carrier schema which even PERMITS a grammar-version column fails review."
+
+  - title: "D. Divergence policy — what a team profile may change"
+    confirmations:
+      - "D1. ADDING IS ALREADY LEGAL AND STAYS SO: a team-local token is the C16 case — the parser preserves an unknown key within a structured block verbatim, never load-bearing, never dropped (parse rule 5). A team profile listing its OWN additional tokens changes nothing about that contract; it merely declares what the team expects of itself. Confirm that ADD requires no ratification beyond the profile row existing."
+      - "D2. RELAXING IS THE GOVERNANCE QUESTION, asked rather than assumed: may a team profile mark a COMPANY-REQUIRED token as not-required-for-us? Three positions laid out — (1) FORBIDDEN: profiles may only add; a company-required token is required everywhere, and a team that cannot comply carries a FINDING, not an exemption (the G16 'report and carry on' discipline); (2) PERMITTED WITH RATIFICATION: a relaxation is itself a gate-logged ruling, per team per token, with the gate-log entry id carried IN the profile row (no anonymous exemptions — the O24/A3 rule applied to governance); (3) PERMITTED RECORDED-ONLY: the row says so and nobody signs. The page recommends AGAINST (3) in its own text — an unratified exemption is how a company standard stops being one — and asks the SME to rule between (1) and (2)."
+      - "D3. WHOEVER RATIFIES, THE RECORD IS APPEND-ONLY: a relaxation later withdrawn is a new row superseding the old (the status-never-regresses discipline), never an edit — so 'was this ever exempt, and when' stays answerable. Confirm the append-only rule for profile history regardless of the D2 outcome."
+
+  - title: "E. Scope fence"
+    confirmations:
+      - "E1. NOTHING IS REGISTERED, AND THAT IS A DECISION: no vocabulary term, node class, property term or map row rides this page — identity and carrier are config-layer. The pre-gate record is this file plus its gate-log stub. If the gate rules that standards ALSO warrant graph presence (:Standard nodes, VALIDATES_AGAINST edges), that is a NEW ontology gate with its own page — named here so the omission cannot read as forgotten."
+      - "E2. G94 BUILDS REGARDLESS: the selector (selection separated from validation) does not depend on this page — it can return interim identities derived from its own branches until the carrier exists. What G94 may NOT do is invent the carrier; storage is explicitly out of its scope and inside this page's."
+      - "E3. FLIPS ARE FOLLOW-UPS: signing authorizes. The carrier file/schema, the agreement test's three-way extension (§A3), and any migration are groomed build items after sign-off; TOKEN_REGISTRY is untouched until then, and its every entry stays proposed exactly as its header says today."

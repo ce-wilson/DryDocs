@@ -1003,6 +1003,18 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-25",
+      "title": "RECORD: gate `standard-identity-and-carrier` DRAFTED, unsigned (G95)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/etlprocess-kind-enum.yaml",
+        "config/gate-prompts/standard-identity-and-carrier.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4120",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1117,7 +1129,7 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "etlprocess-kind-enum (gate page rendered — session not yet run)",
+      "title": "etlprocess-kind-enum (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/etlprocess-kind-enum.yaml"
