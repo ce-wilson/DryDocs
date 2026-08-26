@@ -98,10 +98,13 @@ def test_folder_sql_joins_header_row_for_application() -> None:
     """APPLICATION comes from the folder header row (JOB_ID=1, SMART Table) —
     CM_DEF_VTAB has no APPLICATION column. LEFT JOIN so header-less folders load."""
     text = (SQL_DIR / "controlm_folders.sql").read_text(encoding="utf-8")
-    assert "LEFT JOIN psgmgr.CM_DEF_VJOB H" in text
-    assert "H.JOB_ID   = 1" in text or "H.JOB_ID = 1" in text
-    assert "H.APPLICATION" in text
-    assert "H.IS_CURRENT_VERSION = 'Y'" in text  # string literal, VARCHAR2(1); domain 'Y' (D4)
+    # J39 (2026-08-26): alias H -> J, back-flowed from the company copy so the two
+    # sides stop carrying a permanent cosmetic diff. The guard pins the JOIN, and
+    # the alias letter only because the assertions must name it.
+    assert "LEFT JOIN psgmgr.CM_DEF_VJOB J" in text
+    assert "J.JOB_ID   = 1" in text or "J.JOB_ID = 1" in text
+    assert "J.APPLICATION" in text
+    assert "J.IS_CURRENT_VERSION = 'Y'" in text  # string literal, VARCHAR2(1); domain 'Y' (D4)
 
 
 def test_ingest_chain_order_is_enforced() -> None:

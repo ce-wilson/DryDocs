@@ -27,6 +27,11 @@ VALID_DISPOSITIONS = {
     "per-entry",
     "evaluate",
     "never-port",
+    # J43 (2026-08-26): a DETERMINISTIC RENDER — take neither side's copy,
+    # REGENERATE from the reconciled tree. Added for the whole derived family at
+    # once (board/roadmap/ideas/load-map + the design-doc renders); the roadmap
+    # row had inboxed exactly this naming gap after the company's send-back.
+    "derived",
 }
 
 
@@ -71,7 +76,9 @@ def test_protective_rows_carry_a_note(manifest: dict) -> None:
     missing = [
         r["path"]
         for r in manifest["rows"]
-        if r["disposition"] in ("canonical-company", "never-port") and not r.get("note")
+        # J43: `derived` joins the note-required set — a derived row's note must
+        # name what regenerates it, or "regenerate" is an instruction with no verb.
+        if r["disposition"] in ("canonical-company", "never-port", "derived") and not r.get("note")
     ]
     assert not missing, f"protective rows without a note: {missing}"
 

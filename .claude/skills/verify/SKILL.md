@@ -41,6 +41,26 @@ at runtime — file inspection alone misses it).
   (stdout is cp1252).
 - Brave hangs headless on this box (2×180s, L4 finding) — Edge/Chrome only.
 
+### Local dev servers — the venue rule (J52, 2026-08-25)
+
+- **A claim about what a LOCAL DEV SERVER (Vite, drydocs-api, the ADK server)
+  rendered or returned is evidence ONLY when the browser making the request was
+  launched by the session making the claim.** A browser the session merely
+  ATTACHED to (the Chrome extension, a pre-existing tab) is not a known venue,
+  and "verified" without a known venue is the J18 defect in browser form.
+- **The recipe, not just the prohibition:** drive a session-launched headless
+  browser from the session scratchpad — the 2026-08-21 close used
+  puppeteer-core against a Vite dev server on an alternate port and behaved
+  correctly throughout. The same launch caveat above applies: PowerShell/
+  `subprocess`, never Git Bash.
+- **The observation this rule comes from, cited as an observation:** on
+  2026-08-21 an extension-connected tab at `localhost:5173` served a DryDocs
+  checkout that did not match the working tree while reporting `isLocal: true`,
+  and cache-bypassed fetches from inside that tab disagreed with `curl` against
+  the same address. WHY that happened is unproven and deliberately not asserted
+  here — the rule stands on the venue argument alone: if you did not launch the
+  browser, you do not know what it is pointed at.
+
 ## CLI / pipeline changes
 
 Use the `run-drydocs` skill (ingest chain, m3-verify, model-layer checks without Neo4j).

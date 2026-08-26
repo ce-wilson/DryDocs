@@ -48,7 +48,7 @@ REGISTRY = REPO_ROOT / "config" / "source-registry.yaml"
 # CM_DEF_VJOB folder HEADER ROW join (gate controlm-q1q3-phase1 §Q3); the ledger
 # carries APPLICATION under CM_DEF_VJOB for that reason.
 SQL_OBJECT_ALIASES: dict[str, dict[str, str]] = {
-    "controlm_folders.sql": {"T": "CM_DEF_VTAB", "H": "CM_DEF_VJOB"},
+    "controlm_folders.sql": {"T": "CM_DEF_VTAB", "J": "CM_DEF_VJOB"},  # J39: alias J, matching the company copy
     "controlm_jobs.sql": {"J": "CM_DEF_VJOB"},
     "controlm_conditions_in.sql": {"L": "CM_DEF_LNKI_P_VW"},
     "controlm_conditions_out.sql": {"L": "CM_DEF_LNKO_P_VW"},

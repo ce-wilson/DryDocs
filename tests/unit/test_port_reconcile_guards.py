@@ -135,6 +135,75 @@ def gate_authorized_deprecation(
     return live is not None and live.get(status_field) not in {"deprecated", "removed"}
 
 
+#: J43: statuses that mean "the graph may now carry this meaning". An entry
+#: REACHING one of these through a reconcile is an ACTIVATION, and on a
+#: gate-bound file (the manifest rows carrying `gate_bound:`) an activation is
+#: legal only when a gate signed ON THE RECEIVING SIDE authorizes it — status
+#: and id-set parity is not field-and-gate parity, which is the rule the
+#: manifest now states in those words.
+ACTIVE_STATUSES = {"active", "confirmed", "applied"}
+
+#: Headings in config/gate-log.md that constitute signing authority: a GATE
+#: sign-off, or a RULING/AMENDMENT heading (the C27 CatalogSubLOB precedent —
+#: an SME ruling recorded outside a numbered gate session is still authority).
+_SIGNED_HEADING = re.compile(r"(?m)^## .*(?:GATE: \S+ .*SIGNED OFF|RULING:|AMENDMENT)")
+
+
+def signed_authority_text(gate_log_text: str) -> str:
+    """The concatenated text of every signing-authority section of a gate log.
+
+    Sections are sliced heading-to-heading so a gate id mentioned only inside a
+    DRAFTED/unsigned stub (the G95 shape) is NOT authority — the whole point is
+    that a stub records a question and signs nothing.
+    """
+    headings = list(re.finditer(r"(?m)^## ", gate_log_text))
+    out: list[str] = []
+    for i, m in enumerate(headings):
+        end = headings[i + 1].start() if i + 1 < len(headings) else len(gate_log_text)
+        section = gate_log_text[m.start() : end]
+        first_line = section.splitlines()[0]
+        if _SIGNED_HEADING.match(first_line):
+            out.append(section)
+    return chr(10).join(out)
+
+
+def unsigned_activations(
+    before: Iterable[Mapping[str, Any]],
+    after: Iterable[Mapping[str, Any]],
+    gate_log_text: str,
+    *,
+    key: str,
+    status_field: str = "status",
+) -> list[str]:
+    """J43(a): activations the receiving side's gate log does not authorize.
+
+    An entry whose status becomes ACTIVE_STATUSES across the reconcile (or that
+    ARRIVES new already-active) must be traceable to signing authority in the
+    RECEIVING side's gate log: its id appears somewhere inside a signed
+    section. An activation citing nothing fails too — an unattributed
+    activation is the defect, not a lesser case of it. Producer-side this runs
+    against the producer's own gate log (self-consistency); the live reconcile
+    test runs it against the consumer's.
+    """
+    before_status = {e[key]: e.get(status_field) for e in before}
+    authority = signed_authority_text(gate_log_text)
+    violations: list[str] = []
+    for entry in after:
+        k = entry[key]
+        now = entry.get(status_field)
+        was = before_status.get(k)
+        if now not in ACTIVE_STATUSES or was in ACTIVE_STATUSES:
+            continue  # not an activation crossing the line
+        if k in authority:
+            continue
+        violations.append(
+            f"{k}: activated ({was!r} -> {now!r}) with no signing authority on the "
+            "receiving side's gate log — a gate-bound file activates by signed gate, "
+            "never by arrival"
+        )
+    return violations
+
+
 def append_only_violation(before_text: str, after_text: str) -> str | None:
     """None if ``before_text`` is a byte prefix of ``after_text``; else a message."""
     if after_text.startswith(before_text):
@@ -269,6 +338,58 @@ def test_backlog_dropped_item_fails() -> None:
     assert violations == ["COMPANY-ONLY: entry DROPPED by the merge (was 'todo')"]
 
 
+# --- J43 (2026-08-26): gate-bound activation — fixture tests, proven to fail ---
+
+_SIGNED_LOG = (
+    "## 2026-08-01 — GATE: g-one — SIGNED OFF 5/5 (X1)"
+    + chr(10)
+    + "- confirms entry `alpha` and blesses its activation."
+    + chr(10)
+)
+_STUB_LOG = (
+    "## 2026-08-01 — RECORD: gate g-one DRAFTED, unsigned (X1)"
+    + chr(10)
+    + "- mentions entry `alpha` inside a stub that signs nothing."
+    + chr(10)
+)
+
+
+def test_gate_bound_activation_passes_with_signing_authority() -> None:
+    before = [{"id": "alpha", "status": "planned"}]
+    after = [{"id": "alpha", "status": "active"}]
+    assert unsigned_activations(before, after, _SIGNED_LOG, key="id") == []
+
+
+def test_gate_bound_activation_fails_on_a_stub_heading() -> None:
+    """J26: proven to FAIL before it is trusted — a DRAFTED/unsigned stub that
+    mentions the entry is exactly the near-miss the section-slicing must reject."""
+    before = [{"id": "alpha", "status": "planned"}]
+    after = [{"id": "alpha", "status": "active"}]
+    violations = unsigned_activations(before, after, _STUB_LOG, key="id")
+    assert len(violations) == 1 and "alpha" in violations[0]
+
+
+def test_gate_bound_activation_fails_when_nothing_cites_it() -> None:
+    before = [{"id": "beta", "status": "proposed"}]
+    after = [{"id": "beta", "status": "confirmed"}]
+    violations = unsigned_activations(before, after, _SIGNED_LOG, key="id")
+    assert len(violations) == 1, "an unattributed activation is the defect, not a lesser case"
+
+
+def test_gate_bound_new_arrival_already_active_needs_authority_too() -> None:
+    """An entry that ARRIVES active (absent from before) is still an activation —
+    the port bringing a producer-active entry does not exempt it from the
+    receiving side's gate log."""
+    after = [{"id": "gamma", "status": "active"}]
+    assert len(unsigned_activations([], after, _SIGNED_LOG, key="id")) == 1
+
+
+def test_gate_bound_ignores_entries_already_active() -> None:
+    before = [{"id": "alpha", "status": "active"}]
+    after = [{"id": "alpha", "status": "active"}]
+    assert unsigned_activations(before, after, _STUB_LOG, key="id") == []
+
+
 def test_gate_log_append_only_mechanics() -> None:
     before = "# HITL gate log\n\n## 2026-06-21 - C1\n- Confirmed: 4\n"
     appended = before + "\n## 2026-07-11 - new gate\n- Confirmed: 1\n"
@@ -394,6 +515,20 @@ def test_reconcile_backlog_no_regression_live() -> None:
         downgrade_map=BACKLOG_DOWNGRADES,
     )
     assert not violations, "\n".join(violations)
+
+
+@_needs_before
+def test_reconcile_vocab_gate_bound_activations_live() -> None:
+    """J43(a) live half: every entry the reconcile ACTIVATES must trace to signing
+    authority in the RECEIVING side's gate log. Runs beside the no-downgrade
+    check, off the same snapshot."""
+    before = yaml.safe_load(before_text("relationship_vocabulary.yaml"))
+    after = yaml_fragments.load_yaml_source(VOCAB_FILE)
+    gate_log = GATE_LOG.read_text(encoding="utf-8")
+    violations = unsigned_activations(
+        vocab_entries(before), vocab_entries(after), gate_log, key="id"
+    )
+    assert not violations, chr(10).join(violations)
 
 
 @_needs_before

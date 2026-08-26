@@ -739,6 +739,28 @@ STANDING DIVERGENCES LEDGER (expected collisions — resolve as stated, do NOT "
   exist producer-side at all; `tests/unit/test_employee_roster.py` and a `test_snow_supp*`
   are likewise absent. (`drydocs/publishing/validator.py` exists both sides and diverges
   in content — sanctioned, `drydocs/**` is evaluate-on-collision.) See T21.
+- **DOCMETA DIVERGENCE — RECONCILE DECISION RECORDED (J40, 2026-08-26), three parts,
+  all standing until the company's docmeta ADOPTION PASS (the e1ce510b port deferred the
+  docs-verify/docmeta cluster as a coherent whole, so that pass is the named trigger).**
+  (a) THE ADR NUMBER COLLISION IS PERMANENT AND HARMLESS ONCE NAMED: the company carries
+  its docmeta ADR at **0005** while the producer's 0005 is the browser-to-Neo4j access
+  path and its docmeta ADR is **0006**. RULED: each side's numbering is canonical IN ITS
+  OWN REPO and nothing is ever renumbered (ids are join keys — the G87 rule); a reader of
+  either repo learns the mapping HERE and from the docs/decisions/** manifest row, which
+  now says it. Cross-repo ADR citations must therefore cite by TITLE + side, never by
+  bare number.
+  (b) THE PACKAGE PATH IS DELIBERATELY DIVERGENT, WITH A CONVERGENCE TARGET: company
+  `drydocs/docmeta/` (drydocs.docmeta) vs producer top-level `drydocs_docmeta/`. The
+  producer layout is the convergence target because the module-boundary guard
+  (tests/unit/test_module_boundary.py) enforces components as top-level packages —
+  `drydocs.docmeta` nests a component inside the CLI package, which ADR 0002-A's
+  invariant forbids — and the producer package was AUTHORED against the described shape,
+  never copied (T21, discharged 2026-08-04). Convergence happens AT the docmeta adoption
+  pass, not before: a rename mid-divergence would collide with the deferred cluster.
+  (c) `prompts.py` AND `pipeline.py` ARE BACK-FLOW CANDIDATES, not company-only-forever:
+  both are company capability the producer's Q6 authoring deliberately did not include.
+  They join the drydocs-review back-flow set (mechanism-only reproduction; no company
+  values), and until that lands they are protected by the canonical-company rows below.
 - **`PORT-MANIFEST.yaml` = canonical-producer, and the company-only rows now have
   a home a verbatim take cannot touch (J34, 2026-08-09).** The manifest declares an
   `overlay:` seam: side-local rows live in `PORT-MANIFEST.company.yaml` (company-tracked,

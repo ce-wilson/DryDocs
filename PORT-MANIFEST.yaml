@@ -25,6 +25,14 @@
 #                      drop either side's entries
 #   per-entry          collision resolves INSIDE the file, entry by entry — the
 #                      entry_rule is mandatory and path-level checkout is FORBIDDEN
+#   derived            the file is a DETERMINISTIC RENDER: take NEITHER side's copy —
+#                      REGENERATE it from the reconciled tree (guardrail 5), then commit
+#                      the refresh. Keeping a stale consumer render is as wrong as taking
+#                      the producer's. (J43, 2026-08-26 — decided across ALL derived rows
+#                      at once; splitting one row from the board.html precedent is refused.
+#                      Settles the naming question the roadmap.html row had inboxed: these
+#                      rows carried canonical-company, which was a poor fit for a render
+#                      with no authored consumer content to be canonical about.)
 #   evaluate           collision: hand-merge per the reconcile-port collision ledger
 #   never-port         must not cross the boundary in either direction (values,
 #                      credentials, gitignored data)
@@ -134,6 +142,14 @@ rows:
   # ---- per-entry files (checkout of the whole file is FORBIDDEN) ------------
   - path: "drydocs_core/ontology/relationship_vocabulary/**"
     disposition: per-entry
+    gate_bound: config/gate-log.md   # J43: entries here ACTIVATE only by signed gate.
+                                     # "identical to base" and "per-entry equivalent" are
+                                     # BOTH insufficient tests for a gate-bound file,
+                                     # because status and id-set parity is not
+                                     # field-and-gate parity. The reconcile-time check
+                                     # (test_port_reconcile_guards: unsigned_activations)
+                                     # refuses to activate an entry whose cited gate is
+                                     # unsigned ON THE RECEIVING SIDE'S gate-log.
     entry_rule: >
       S5 (2026-08-04): the registry is a fragment DIRECTORY — per-domain files
       merged in sorted-filename order by drydocs_core/yaml_fragments.py; apply
@@ -150,6 +166,10 @@ rows:
     note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py"
   - path: "config/taxonomy-ontology-map/**"
     disposition: per-entry
+    gate_bound: config/gate-log.md   # J43: same rule as the vocabulary row above —
+                                     # confirmed/applied entries exist only by signed
+                                     # gate, and the receiving side's gate-log is the
+                                     # authority the reconcile check reads.
     entry_rule: >
       S5 (2026-08-04): fragment DIRECTORY, same shape and rule as the
       relationship_vocabulary row above — apply the split, merge per entry.
@@ -326,16 +346,16 @@ rows:
       corrections that originated FROM the finalized doc (e.g. the D4 IS_CURRENT_VERSION
       'Y' fix, step 34) are already present consumer-side by construction.
   - path: "docs/design/controlm-ingestion-tdd.html"
-    disposition: canonical-company
+    disposition: derived
     note: "render of the above — regenerate consumer-side, never take the producer render"
   - path: "docs/design/controlm-ingestion-tdd.print.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       RETIRED producer-side (L13, 2026-07-18): the render series collapsed to the single
       .html (screen + @media print). At the next port, DELETE the consumer-side twin and
       regenerate the single .html consumer-side — never take a producer render.
   - path: "docs/plan/load-map.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — the N5 human load-map surface, a deterministic render of the
       consumer's OWN source registry + N3 loader declarations + ledgers + map
@@ -345,7 +365,7 @@ rows:
       (Row added 2026-07-29 when the J16 coverage guard caught the new file —
       the .json twin rides web/** and regenerates under guardrail 5.)
   - path: "docs/plan/ideas.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — the idea-inbox read view, a deterministic render of the
       consumer's OWN docs/restructure/IDEAS.md (scripts/render_ideas.py, rides
@@ -357,7 +377,7 @@ rows:
       tree. (Row added 2026-08-05 with the page; the J16 coverage guard caught
       the new file in the same run that created it, which is the guard working.)
   - path: "docs/plan/roadmap.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — the module-roadmap page (scripts/render_roadmap.py, rides the
       default board render): counts and open-item links are read live from the
@@ -368,21 +388,30 @@ rows:
       because keeping a stale consumer render is as wrong as taking the
       producer's. (Row added 2026-08-09 — the J16 guard caught the pair one
       session after the page shipped.)
-      NAMING QUESTION, raised by the company's send-back and deliberately NOT
-      decided here: `canonical-company` is a poor fit for a DERIVED render,
-      which has no authored consumer content to be canonical about — it is
-      regenerated, not kept. board.html and the design-doc renders carry the
-      same label for the same reason, so splitting this one row would create an
-      inconsistency worse than the imprecision. Whether the vocabulary needs a
-      `derived` disposition is inboxed rather than settled unilaterally.
+      NAMING QUESTION SETTLED at J43 (2026-08-26): the vocabulary gained the
+      `derived` disposition and every derived-render row flipped to it in one
+      change — the company's send-back was right that canonical-company was a
+      poor fit, and the fix landed across the whole family, never one row.
   - path: "docs/plan/board.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — a deterministic render of docs/restructure/backlog.yaml
       (scripts/render_board.py). Keep the consumer's copy through the port, then
       REGENERATE it from the merged backlog; taking the producer's render ships
       the producer's plan as the consumer's board. Same rule as the design-doc
       renders. Had no row until 2026-07-28 (J16).
+  - path: "drydocs/docmeta/**"
+    disposition: canonical-company
+    note: "J40 (2026-08-26): the COMPANY's docmeta package path — does not exist producer-side
+      (producer authored drydocs_docmeta/ top-level, T21). Deliberately divergent until the
+      company's docmeta ADOPTION PASS converges onto the producer layout (the module-boundary
+      invariant makes top-level the only legal component shape); until then no producer take,
+      no deletion sweep, may touch it. prompts.py + pipeline.py inside it are back-flow
+      candidates. Full decision: docs/port/port-prompt.md, the J40 divergence entry."
+  - path: "drydocs/scrapers/**"
+    disposition: canonical-company
+    note: "J40: company-only acquisition framework sibling of drydocs/docmeta/** — same
+      protection, same decision entry, same adoption-pass trigger."
   - path: "drydocs_core/adapters/oracle_adapter.py"
     disposition: canonical-company
     note: >
@@ -976,7 +1005,7 @@ default_ok:
       consumer legitimately holds its own status for the same subject, so
       evaluate-on-collision is right and a blanket take-producer would overwrite it.
   - path: "docs/decisions/**"
-    reason: "ADRs — a decision record is append-only-ish history for the repo that made it; both sides may hold the same ADR number for different decisions, so never checkout"
+    reason: "ADRs — a decision record is append-only-ish history for the repo that made it; both sides may hold the same ADR number for different decisions, so never checkout. J40 (2026-08-26) names the LIVE instance: company docmeta ADR = 0005 while producer 0005 = browser access and producer docmeta = 0006 — each numbering canonical on its own side, nothing renumbered (G87: ids are join keys), cross-repo citations by TITLE + side, never bare number. Full decision: the J40 entry in docs/port/port-prompt.md"
   - path: "docs/reviews/**"
     reason: "point-in-time review records (tech-debt, code-graph plans) — historical artifacts of the side that ran the review"
   - path: "docs/patterns/**"
@@ -1044,6 +1073,15 @@ default_ok:
 # =============================================================================
 row_may_match_nothing:
   # ---- side-local by construction ------------------------------------------
+  - path: "drydocs/docmeta/**"
+    reason: >
+      J40: a COMPANY-ONLY package path, protected by its canonical-company row so a
+      deletion sweep or verbatim take can never silently remove it — producer-side the
+      glob matches nothing by construction, which is the row doing its job.
+  - path: "drydocs/scrapers/**"
+    reason: >
+      J40: same as drydocs/docmeta/** — company-only capability, row exists to protect,
+      matches nothing producer-side by construction.
   - path: "docs/next-internal-session.md"
     reason: >
       RETIRED 2026-08-25 — the file is deleted producer-side (audit + the Idea-174

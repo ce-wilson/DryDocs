@@ -33,7 +33,7 @@ SELECT
     T.TABLE_ID       AS folder_id,
     T.SCHED_TABLE    AS sched_table,        -- folder name
     T.DATA_CENTER    AS data_center,        -- Control-M server (P12/P14/P32/P33)
-    H.APPLICATION    AS application,        -- folder header row -> :ControlMApplication
+    J.APPLICATION    AS application,        -- folder header row -> :ControlMApplication
     T.USER_DAILY     AS user_daily,
     T.TABLE_STATUS   AS table_status,
     T.TABLE_TYPE     AS table_type,
@@ -42,10 +42,13 @@ SELECT
     T.LAST_UPDATED_USER AS last_updated_user,
     T.CAPTURE_DATE   AS capture_date
 FROM   psgmgr.CM_DEF_VTAB T
-LEFT JOIN psgmgr.CM_DEF_VJOB H
-       ON  H.TABLE_ID = T.TABLE_ID
-       AND H.JOB_ID   = 1                   -- folder header row (SMART Table)
-       AND H.IS_CURRENT_VERSION = 'Y'       -- VARCHAR2(1): string literal; domain 'Y' (company TDD, 2026-07-15)
+-- ALIAS NOTE (J39, 2026-08-26): the header-row join is aliased J (job table),
+-- matching the company's copy — back-flowed mechanism-only so the two sides'
+-- file stops carrying a permanent cosmetic diff. Was H.
+LEFT JOIN psgmgr.CM_DEF_VJOB J
+       ON  J.TABLE_ID = T.TABLE_ID
+       AND J.JOB_ID   = 1                   -- folder header row (SMART Table)
+       AND J.IS_CURRENT_VERSION = 'Y'       -- VARCHAR2(1): string literal; domain 'Y' (company TDD, 2026-07-15)
 WHERE  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
   AND  (:folder_filter IS NULL OR T.SCHED_TABLE       LIKE :folder_filter)

@@ -168,6 +168,39 @@ stay skipped — confirm with the operator if a new one appears.
   the subject chains' fixture names (`cli.CHAINS`; one `REFRESH_REFERENCE_CHAIN` tuple
   before the G79 split); do not "fix" the divergence by loosening the
   resolver back to a skip.
+- **The six un-back-flowed company advances — ALL SIX DISPOSITIONED (J39, 2026-08-26).**
+  One reproduced, five ledgered with reason + trigger; none left undecided, nothing
+  touching edge meaning adopted outside a gate:
+  1. **controlm_folders.sql `J` table alias — REPRODUCED** (mechanism-only, the alias
+     rename H→J with a provenance comment in the file). The one advance whose whole
+     content was visible from the diff shape; the standing cosmetic divergence ends.
+  2. **snow-support schema pair (`hpsm_queue_key`/`sn_group_name`) + `snow-snowflake-itsm`
+     stub — LEDGERED, partially superseded.** G100 (2026-08-18) already brought
+     :ServiceNowGroup producer-side with the sys_user_group sourcing note; the constraint
+     pair and the source stub are the ITSM LOADER's to carry. TRIGGER: the snow loader
+     build after gate `snow-cmdb-ci-classes` (Q4) signs — adopting constraints for a
+     loader that does not exist is dead DDL.
+  3. **drydocs_remediation DPL watch-drift rule + tests — LEDGERED.** The rule's CONTENT
+     has never been seen producer-side (only its existence, via the J51 DPL-* id list);
+     reproducing a detector from its name manufactures semantics. TRIGGER: the
+     screenshot/describe channel or the drydocs-review back-flow epic delivering the rule
+     body; it then lands as an R-rule through detect.py's registry like R41-R44 did.
+  4. **graph_verify Assertion refactor — LEDGERED.** graph_verify.py itself is
+     company-only; the producer cannot refactor what it does not hold. TRIGGER: the
+     drydocs-review back-flow epic, which reproduces the whole toolkit — the refactor
+     rides in with it, never separately.
+  5. **docgen deviations vs the finalized company TDD — OVERTAKEN, closed.** Two things
+     ended it: the renderer converged through the L-epic fixes (the 2026-08-24
+     nested-fence fix regenerated every runbook render), and J43 (2026-08-26) ruled the
+     TDD renders `derived` — regenerated from the reconciled tree with the CURRENT
+     renderer, so a deviation list against a frozen render is a category that no longer
+     exists. Residue, if their regeneration ever shows semantic loss: that is a renderer
+     BUG filed as one, not a deviation to catalog.
+  6. **CONFLUENCE_BASE_URL config seam — LEDGERED.** The mechanism (base-URL as config,
+     value company-side) is right, but the producer has no confluence connector — the
+     doc-source-registry's fcdo row says 'when the confluence connector runs' in its own
+     words. A config seam with no consumer is dead config. TRIGGER: the confluence
+     connector build in drydocs_docmeta/connectors/; the seam ships WITH it.
 - **PAT catalog ontology — company is AHEAD and the producer has ADOPTED NOTHING (C26,
   2026-08-21; adoption = C27, gated on the COMPANY catalog gate's own sign-off).** The
   company gate page `internal/org/catalog/_catalog_gate_page.html` (dated 2026-06-25, "SME

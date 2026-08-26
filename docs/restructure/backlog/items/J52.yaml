@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/verify/SKILL.md
@@ -27,3 +27,13 @@ notes: |
   Module `docs` / phase 8 / epic release-infrastructure recorded as a CHOICE, not a finding: the verify skill is cross-cutting session tooling — it covers the design-doc renderer, the board and gate renders and the CLI as well as the console — so it lands with the session-ritual infrastructure rather than in Epic O's web-console work. The edit is identical either way; only the shelf differs.
 
   p3 and haiku: one written paragraph plus a recipe already executed once, against an acceptance that names exactly what may and may not be asserted.
+  DONE 2026-08-26 (desktop). The verify skill gained its own "Local dev servers — the venue
+  rule" section: (a) the rule verbatim from the acceptance -- dev-server evidence counts only
+  from a browser THIS session launched; an attached browser is not a known venue, and
+  "verified" without a venue is the J18 defect in browser form. (b) the recipe beside the
+  prohibition: session-launched headless browser from the scratchpad (the 2026-08-21
+  puppeteer-core-vs-Vite close as the worked example), carrying the existing
+  PowerShell-not-Git-Bash launch caveat. (c) the 2026-08-21 observation cited AS an
+  observation -- the mismatched localhost:5173 tab, isLocal: true, fetch-vs-curl disagreement
+  -- with the attached-to-another-machine reading explicitly NOT asserted as mechanism, per
+  the acceptance's own instruction. Skill-file edit only; no code.
