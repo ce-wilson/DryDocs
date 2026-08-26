@@ -50,8 +50,8 @@ groom_log:
   attached_at: G45
 - date: '2026-07-31'
   note: |-
-    ── Epic W — FCDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
-    Groomed 2026-07-31 from the FCDO capture (internal/fcdo-reference/, 8abc05f)
+    ── Epic W — CDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
+    Groomed 2026-07-31 from the CDO capture (internal/cdo-reference/, 8abc05f)
     and its ALIGNMENT-PLAN.md: align producer ontology to the internal governance
     group's firmwide frameworks ON PLANNED ITEMS ONLY (user rule: don't add what
     we won't use). Every confirmation routes through the SME gate; the plan's

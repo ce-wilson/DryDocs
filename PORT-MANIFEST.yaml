@@ -701,13 +701,13 @@ rows:
       captured_at, manifest, source (the where — a space or data-root path is
       estate data), and the inline comment on confirmed. `confirmed` itself is
       PER-REPO (the F4 rule one file over — the company ratifies its own
-      activations; the 2026-08-19 company ratification of fcdo-frameworks stands
+      activations; the 2026-08-19 company ratification of cdo-frameworks stands
       beside the producer's 2026-08-05 ruling, both true). Company-only ids are
       kept; producer-only ids are clean-adds. Precedent: source-registry v2's
       company-canonical ids + the D2 overlay seam.
     note: >
       J51 (2026-08-20), found at the 7c18ff4b review: the producer row for
-      fcdo-frameworks reads VERBATIM while the company row — where the run
+      cdo-frameworks reads VERBATIM while the company row — where the run
       happened — still read GROUNDED / "no connector has run" with its own
       ratification citation; config/** would have overwritten the citation and,
       after their load, graph_locator, at every port. Idea-148 (the run <-> row
@@ -823,7 +823,7 @@ rows:
       THREE were retired and TWO deliberately retained above -- see that block). After
       the delivering port merges, the
       COMPANY copy is the live one — their pending sessions (rua-load-shapes
-      ratification, source-registry-v2 review, fcdo-crosswalk, cmdline-nfr-vetting)
+      ratification, source-registry-v2 review, cdo-crosswalk, cmdline-nfr-vetting)
       read it, and they retire it at their own close-out. Producer originals retire to
       internal-local/archive/ once delivery is confirmed; this row exists so the
       producer-side retirement DELETIONS never delete the company's live copy. A FUTURE

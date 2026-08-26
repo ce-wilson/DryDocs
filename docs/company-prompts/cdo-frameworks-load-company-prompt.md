@@ -1,4 +1,4 @@
-# Company-side prompt — load the `fcdo-frameworks` capture into the graph
+# Company-side prompt — load the `cdo-frameworks` capture into the graph
 
 > Producer-drafted 2026-08-20 for the company-side assistant. Paste or read whole.
 > The capture this loads EXISTS ONLY ON YOUR SIDE (the 2026-08-19 live Confluence
@@ -10,9 +10,9 @@
 
 ## What this is
 
-The `fcdo-frameworks` corpus (`config/doc-source-registry.yaml`) — the firmwide
+The `cdo-frameworks` corpus (`config/doc-source-registry.yaml`) — the firmwide
 data-publishing frameworks the ontology mapping was built from — is registered,
-**activated** (`confirmed: true`, user ruling 2026-08-05 at the fcdo-crosswalk
+**activated** (`confirmed: true`, user ruling 2026-08-05 at the cdo-crosswalk
 sign-off), and as of 2026-08-19 **captured VERBATIM**: your `drydocs-scrape` run
 fetched ~50 pages, 0 failed, closing the four capture holes the row named
 (Descriptive Metadata + WIP CDAO twin, Data Quality, Data Contracts/DPROD, the
@@ -27,7 +27,7 @@ and reaches you at the next port; nothing in it needs your edit.
    is fine; an empty capture nobody looked at is a hole with a checkmark.
 
 2. **Load via the docmeta pipeline** — the Q10/Q9 lexical shape: one
-   `:Document` per page, `:Chunk` via `PART_OF`, corpus id `fcdo-frameworks`
+   `:Document` per page, `:Chunk` via `PART_OF`, corpus id `cdo-frameworks`
    per the corpus-id grammar, into YOUR `drydocs` database (the row's
    `target_db` — the G102 fold applies to you only if/when your own fold gate
    ratifies; until then load to wherever your content realm lives and say so).

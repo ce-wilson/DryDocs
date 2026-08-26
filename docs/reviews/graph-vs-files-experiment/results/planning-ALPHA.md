@@ -359,13 +359,13 @@ The SME confirmed the cardinality ("one application, multiple deployments is cor
 
 **Justification:**
 
-The test `test_markdown_fences.py` guards only `docs/**`, deliberately leaving `internal/fcdo-reference/` (CONFLUENCE-TRANSCRIPT*.md), `.claude/skills/data-context-extractor/references/` (vendored skill material), and `SDLC-Docs/extracted/issue-driven-capture-loop.md` unguarded. The issue: editing captured transcripts or vendored material to satisfy a guard means editing somebody else's capture — a provenance decision, not a formatting one. The question: (a) widen the guard with an explicit capture carve-out, or (b) leave captures unguarded and document the boundary explicitly where it lives (in PORT-MANIFEST.yaml's or the guard's comments)? A third option: auto-fix the SDLC one (trailing orphan, probably safe) separately from the policy decision.
+The test `test_markdown_fences.py` guards only `docs/**`, deliberately leaving `internal/cdo-reference/` (CONFLUENCE-TRANSCRIPT*.md), `.claude/skills/data-context-extractor/references/` (vendored skill material), and `SDLC-Docs/extracted/issue-driven-capture-loop.md` unguarded. The issue: editing captured transcripts or vendored material to satisfy a guard means editing somebody else's capture — a provenance decision, not a formatting one. The question: (a) widen the guard with an explicit capture carve-out, or (b) leave captures unguarded and document the boundary explicitly where it lives (in PORT-MANIFEST.yaml's or the guard's comments)? A third option: auto-fix the SDLC one (trailing orphan, probably safe) separately from the policy decision.
 
 **Code Navigation:**
 
 - **Finding the test:** Glob `tests/unit/test_markdown_fences.py` → matches directly
 - **Understanding the scope:** Read full test file (lines 1–80) to see what's guarded and why
-- **Finding the unclosed fences:** Idea-103 text (lines 65–78 of IDEAS.md) lists them: internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md (opens 5140 of 5355), CONFLUENCE-TRANSCRIPT-1-ONTOLOGY.md (419 of 568), .claude/skills/data-context-extractor/references/, SDLC-Docs/extracted/issue-driven-capture-loop.md (181 of 181 trailing)
+- **Finding the unclosed fences:** Idea-103 text (lines 65–78 of IDEAS.md) lists them: internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md (opens 5140 of 5355), CONFLUENCE-TRANSCRIPT-1-ONTOLOGY.md (419 of 568), .claude/skills/data-context-extractor/references/, SDLC-Docs/extracted/issue-driven-capture-loop.md (181 of 181 trailing)
 - **Understanding provenance:** The test's docstring (lines 1–23) explains why captures are exempted
 - **Finding documentation location:** Grep for guard scope decisions in existing comments → PORT-MANIFEST.yaml has guard decisions documented
 
@@ -383,7 +383,7 @@ The test `test_markdown_fences.py` guards only `docs/**`, deliberately leaving `
   priority: p3
   status: todo
   depends_on: []
-  inputs: [tests/unit/test_markdown_fences.py, internal/fcdo-reference/, .claude/skills/data-context-extractor/references/]
+  inputs: [tests/unit/test_markdown_fences.py, internal/cdo-reference/, .claude/skills/data-context-extractor/references/]
   acceptance: >
     One of two outcomes, recorded in test_markdown_fences.py docstring and 
     PORT-MANIFEST.yaml PUBLISH-BOUNDARY section: (a) guard widened with explicit 

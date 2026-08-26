@@ -922,8 +922,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   is the surface whose counts disagree with SEAL's, and neither is ingested today.
 
 - **`Idea-70`** · 2026-08-05 · `[decision]` · **closed — RULED same day, no item** · prio? **Med** —
-  **`fcdo-frameworks` corpus activation — SME "under consideration" at the
-  fcdo-crosswalk sign-off (gate-log 2026-08-05).** RULED in-chat the same
+  **`cdo-frameworks` corpus activation — SME "under consideration" at the
+  cdo-crosswalk sign-off (gate-log 2026-08-05).** RULED in-chat the same
   session ("flip to activate. I want to settle our ontology with what they
   published"): (a) `confirmed: true` flipped in
   `config/doc-source-registry.yaml` with a gate-log RECORD entry; (b) the
@@ -1048,9 +1048,9 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the thing worth an item.
 
 - **`Idea-44`** · 2026-07-31 · `[source]` · **parked → company network access** · prio? **Med** —
-  **fcdo-frameworks live Confluence scrape (company-side).**
+  **cdo-frameworks live Confluence scrape (company-side).**
   Registered on-demand in `config/doc-source-registry.yaml` (connector: confluence, T4,
-  ddcontext); page-ID target list in `internal/fcdo-reference/README.md`. Priority
+  ddcontext); page-ID target list in `internal/cdo-reference/README.md`. Priority
   recapture: Descriptive Metadata, Data Quality, Data Contracts (DPROD), Taxonomy
   Framework property tables — the capture holes that block crosswalk sign-off. Needs the
   docmeta confluence connector (or an interim company-side capture) — company network only.
@@ -2149,7 +2149,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   **A scrape run and the registry row it fulfils are not joined — `drydocs-scrape` should
   stamp the `doc-source-registry` id in its run manifest, and the row should carry
   `captured_at` + `manifest` the way `bmc-docs-controlm-utilities` already does.** Found at
-  the 7c18ff4b port review: the `fcdo-frameworks` row was upgraded to VERBATIM producer-side
+  the 7c18ff4b port review: the `cdo-frameworks` row was upgraded to VERBATIM producer-side
   on 2026-08-19 on the strength of a company run that was keyed by SPACE + a free-text
   `--purpose` string, neither of which is a registry id — the SME chose the space by hand
   because the tie-in to the row was not expressible. The join precedent EXISTS one row over:
@@ -2738,7 +2738,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   same thing. Original note follows. The catalog hierarchy runs
   `BusinessSegment → CatalogLOB → ProductLine → Product → AreaProduct`; the source runs
   `LoB → Sub-LoB → Product Line → …`, so our chain silently flattens one level. Corroborated
-  three ways: the SME statement (2026-08-01), the FCDO capture's "5-level hierarchy … native
+  three ways: the SME statement (2026-08-01), the CDO capture's "5-level hierarchy … native
   IDs at each level", and the company's own catalog gate page which already introduces
   `:SubLOB` + `HAS_SUB_LOB` ("only CIB and AWM have them") and widens `HAS_PRODUCT_LINE` to
   `(:SubLOB|:LOB)`. NOT built at C17 on purpose — a new node label + relationship is an
@@ -3432,7 +3432,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (`84ed7e3`, live five days and four ports) scanned all 507 tracked `.md` files and
   found six. One was ours and is fixed (`docs/decisions/0002` carried an orphan trailing
   fence). `tests/unit/test_markdown_fences.py` now guards `docs/**`. The rest were left
-  DELIBERATELY, and the reason is the interesting part: `internal/fcdo-reference/`
+  DELIBERATELY, and the reason is the interesting part: `internal/cdo-reference/`
   CONFLUENCE-TRANSCRIPT.md (opens 5140 of 5355) and TRANSCRIPT-1-ONTOLOGY.md (419 of
   568) are CAPTURED transcripts, and `.claude/skills/data-context-extractor/references/`
   is vendored skill material — editing either to satisfy a guard means editing somebody
@@ -3844,7 +3844,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (job-failure, missed-data-load, missed-file, data-issue — growing, taxonomy
   layer so growth is not a gate) → drag-drop upload for .msg + Copilot .json
   pairs (.txt TBD; data-root staging, Internal stamp, sha256, never the repo) →
-  FCDO-style "review for ontology" pass (proposed bindings, SME confirms) →
+  CDO-style "review for ontology" pass (proposed bindings, SME confirms) →
   read-only related-nodes QuerySpec over the structured graph → ADK agent
   first-pass correlation (accept / modify / stay-unassigned) → confirm into the
   O24 origin-flagged store (`origin: sme-intake`) and an ADMIN review queue.
@@ -4146,8 +4146,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - 2026-07-31 — [idea] registry-plan directive captured → **MERGED into N7** same day
   (`2d6f705`: inputs + notes point at `internal/registry-redesign/REGISTRY-PLAN.md`;
   samples re-homed, J22 guard failure cleared). No new item.
-- 2026-07-31 — [idea] FCDO ontology crosswalk Phases 1–3 → new **Epic W**
-  (fcdo-alignment, phase 2): **W1** crosswalk + gate spec (mechanism-only rows,
+- 2026-07-31 — [idea] CDO ontology crosswalk Phases 1–3 → new **Epic W**
+  (cdo-alignment, phase 2): **W1** crosswalk + gate spec (mechanism-only rows,
   capture-hole rows blocked-on-recapture), **W2** planned property/enum registration
   (Run props + event enum, SKOS attrs on enum gates incl. G27, ColumnShape names),
   **W3** ontology-builder as optional add-source-object aid. Skip list binding; the

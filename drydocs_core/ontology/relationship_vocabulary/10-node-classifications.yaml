@@ -54,8 +54,8 @@ node_classifications:
     prov_type:  Activity
     note: >
       One actual execution of a ControlMJob, from the Control-M history API.
-      FCDO alignment registered PLANNED (W2 2026-08-05; crosswalk
-      config/crosswalks/fcdo-vocabulary.yaml row 2): when this label builds,
+      CDO alignment registered PLANNED (W2 2026-08-05; crosswalk
+      config/crosswalks/cdo-vocabulary.yaml row 2): when this label builds,
       its properties adopt the OpenLineage-as-PROV Run semantics — run UUID,
       nominalTime (the scheduled time), parent run/job link, errorMessage —
       with START/COMPLETE/FAIL/ABORT as the run-event value set; the same
@@ -418,7 +418,7 @@ node_classifications:
     note: >
       PLANNED (C26, 2026-08-21): the Sub-LoB tier between a line of business and its
       product lines — a real, id-keyed grain at source (SME 2026-08-01: LoB, Sub-LoB,
-      Product Line, Product and Area Product EACH carry a numeric id; FCDO capture
+      Product Line, Product and Area Product EACH carry a numeric id; CDO capture
       "5-level hierarchy, native IDs at each level") that the producer does not model.
       The COMPANY already builds it as `:SubLOB {sub_lob_id}` ("only CIB and AWM have
       them"); the label is reserved here under the producer's Catalog* convention so

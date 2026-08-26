@@ -447,7 +447,7 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   exec-aware provision.ps1. 88 V-series module runbooks + coverage test. 89 runbook
   currency guard. 90 N6 one load sequence, two profiles. 91 K15 job-grain pane
   retired. 92 three gate prompts drafted [UNRULED]. 93 S10 pre-cutover refusal guard.
-  94 C24 sparse-refresh blanking fix. 95 W1–W3 + fcdo-crosswalk gate SIGNED 13/13.
+  94 C24 sparse-refresh blanking fix. 95 W1–W3 + cdo-crosswalk gate SIGNED 13/13.
   96 K18 `tier`→`row_kind` [FORMAT-BREAKING; T23 family]. 97 K19 mapping-age suspects.
   98 J32 field-meaning rule. 99 code-graph containment tree + media types
   (EXPECTED_CONSTRAINTS 52→53). 100 SFS = target DB platform [RECORD-CORRECTION].
@@ -2545,10 +2545,10 @@ regeneration, never-port outputs — and get no step.
     (`25556622` constraints.cypher re-dispositioned PER-ENTRY — the wholesale take at
     the 135-170 apply dropped two live company constraints (hpsm_queue_key,
     sn_group_name); the row now unions by constraint name. `bdb5886a` the
-    fcdo-frameworks doc-source row goes VERBATIM on the 2026-08-19 company fetch
+    cdo-frameworks doc-source row goes VERBATIM on the 2026-08-19 company fetch
     (the four crosswalk capture holes closed), the "context"-never-in-an-id naming
     rule lands in config/taxonomy/context-types.yaml's header, and the LOAD is a
-    hand prompt (docs/company-prompts/fcdo-frameworks-load-company-prompt.md) — loads are always
+    hand prompt (docs/company-prompts/cdo-frameworks-load-company-prompt.md) — loads are always
     yours; `963e93ca` the registry-embedding renders follow.)
     APPLY: constraints per-entry by name (your two stay); doc-source-registry now
     has its OWN per-entry row at step 175 — read that before taking this file.
@@ -2644,7 +2644,7 @@ regeneration, never-port outputs — and get no step.
     [ontology / taxonomy] (`6e912c1d`: (a) config/taxonomy/lob-product-team.yaml
     gains `concept_scheme` — skos:ConceptScheme urn:drydocs:scheme:lob-product-team,
     top concepts = lobs, parent_* read as skos:broader, DevTeam excluded, the
-    Taxonomy Framework cited by its fcdo-frameworks registry row — layer 1, no
+    Taxonomy Framework cited by its cdo-frameworks registry row — layer 1, no
     gate, no edge; (b) config/gate-prompts/dcat-theme-subject-scheme.yaml DRAFTED,
     unsigned — §A records residency as ANSWERED BY THE G102 FOLD, §B IS-vs-HAS a
     concept (:Theme as its own label recommended, the TOMRole/ProductRole
@@ -3193,7 +3193,7 @@ regeneration, never-port outputs — and get no step.
     code. `.env.example` gains `DRYDOCS_LOGDIR` (G81 had already added the data root),
     and two of the five clauses were already satisfied by G81 — recorded as OVERTAKEN,
     acceptance text untouched, not re-done.
-    **RULED (clause e): the `fcdo-frameworks` Confluence capture MOVES; it gets no
+    **RULED (clause e): the `cdo-frameworks` Confluence capture MOVES; it gets no
     exception.** It had landed in-tree untracked AND not gitignored — the one category
     `git clean -fd` removes without `-x`. An in-tree zone is permitted only when TRACKED,
     and PUBLISH-BOUNDARY forbids ever tracking a verbatim capture carrying real names and

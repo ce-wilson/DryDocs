@@ -23,7 +23,7 @@ notes: |
   DONE 2026-08-21 on branch feat/s9-docs-hygiene (c3cd5521 the move + sweep, then the
   port step). Four homes, not two: UI-WIP/ -> docs/design/ui-exploration/, docs/port/
   (prompt + steps-1-42 archive), docs/company-prompts/ (all eight *-company-prompt.md,
-  including the four gate/fcdo/k16 files F13 did not name but which are the same kind),
+  including the four gate/cdo/k16 files F13 did not name but which are the same kind),
   docs/controlm/. 169 files carried the rename, not the 31 the review estimated.
   Left loose at the docs root on purpose: RELATIONSHIP_GUIDE.md (CLAUDE.md cites it by
   that path), oracle-sql-logging.md, ruff-format-convergence.md, the snowflake plan, and

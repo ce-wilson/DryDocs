@@ -198,7 +198,7 @@ stay skipped — confirm with the operator if a new one appears.
      BUG filed as one, not a deviation to catalog.
   6. **CONFLUENCE_BASE_URL config seam — LEDGERED.** The mechanism (base-URL as config,
      value company-side) is right, but the producer has no confluence connector — the
-     doc-source-registry's fcdo row says 'when the confluence connector runs' in its own
+     doc-source-registry's cdo row says 'when the confluence connector runs' in its own
      words. A config seam with no consumer is dead config. TRIGGER: the confluence
      connector build in drydocs_docmeta/connectors/; the seam ships WITH it.
 - **PAT catalog ontology — company is AHEAD and the producer has ADOPTED NOTHING (C26,

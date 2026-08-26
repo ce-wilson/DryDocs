@@ -15,7 +15,7 @@ classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: source-registry-v2
 title: "SME Gate — source-registry schema v2: SYSTEM/DATASET two-level identity, qualified replica ids (origin@db.schema.table), per-side loader overlay, URN handle, reconcile guard"
-step: "Decision gate for the registry redesign (N7) — decides FROM internal/registry-redesign/REGISTRY-PLAN.md (the 2026-07-31 plan of record: three distinctions, id grammar, FCDO authority field, migration sketch) bundling the four coupled decisions the backlog acceptance names as ONE design"
+step: "Decision gate for the registry redesign (N7) — decides FROM internal/registry-redesign/REGISTRY-PLAN.md (the 2026-07-31 plan of record: three distinctions, id grammar, CDO authority field, migration sketch) bundling the four coupled decisions the backlog acceptance names as ONE design"
 summary: >
   The flat source-registry id conflated three different things — software we
   use/trace (its own taxonomy ledger, not a source), ingested data sources,
@@ -23,7 +23,7 @@ summary: >
   vs pat-catalog same-string collision (tracker T19) happened and why
   feeds_taxonomy lists kept widening instead of splitting. v2 splits SYSTEM
   rows (connection, locator, classification, SDLC link) from DATASET rows
-  (gate, crosswalk, feeds_taxonomy, FCDO authority — each with its OWN
+  (gate, crosswalk, feeds_taxonomy, CDO authority — each with its OWN
   confirmed state); loaders bind to the dataset. Replica/derived dataset ids
   carry the origin AND the actual qualified carrier locator:
   {origin}@{db}.{schema}.{table} (SME amendment: the qualified path REPLACES
@@ -37,7 +37,7 @@ meta:
   Source: "internal/registry-redesign/REGISTRY-PLAN.md (plan of record 2026-07-31) + samples/ (SNOW CMDB classes, DataHub URN convention, target-column worksheet)"
   Registry ref: "all 18 current source-registry entries migrate per the plan's sketch table — rows land at the N9 build, individually confirmed there (the deferred residual)"
   Classification: "Internal-Public (grammar + mechanism); real SEAL ids / db / schema / connection values stay internal/ — committed rows carry placeholders"
-  Standards: "FCDO Data Authority vocabulary adopted as a FIELD (authority: SOR|ADS, transcript §H — SOR is per-data-subset, the two-level argument; replica carrier = ADS); JDI id principles (§A) shape the grammar; SOC checked and NOT used for derived stores (SOC = upstream System of Capture, does not fit)"
+  Standards: "CDO Data Authority vocabulary adopted as a FIELD (authority: SOR|ADS, transcript §H — SOR is per-data-subset, the two-level argument; replica carrier = ADS); JDI id principles (§A) shape the grammar; SOC checked and NOT used for derived stores (SOC = upstream System of Capture, does not fit)"
   Source of record: "backlog N7 · config/gate-log.md (transcribed 2026-07-31) · docs/restructure/03-hitl-sme-flow.md"
 
 mapping:
@@ -51,7 +51,7 @@ mapping:
     edge: "loader binding moves to dataset  [RULED 2026-07-31 — D1]"
   - n: 3
     element: "Replica/derived dataset id"
-    target: "{origin}@{db}.{schema}.{table} — all dots after @; the qualified segment is the ACTUAL carrier locator, replacing the informal system nickname (SME amendment to Q1, issued in-chat with the worked example controlm@[db].[schema].cm_def_vjob); lowercase; real db/schema values internal-twin only, committed ids carry [db].[schema] placeholders. Born-here datasets: {system}:{artifact} (e.g. pat:product-catalog). derived: true flags transformation stores (authority omitted there — not SOR/ADS, and FCDO SOC is upstream capture, checked §H)"
+    target: "{origin}@{db}.{schema}.{table} — all dots after @; the qualified segment is the ACTUAL carrier locator, replacing the informal system nickname (SME amendment to Q1, issued in-chat with the worked example controlm@[db].[schema].cm_def_vjob); lowercase; real db/schema values internal-twin only, committed ids carry [db].[schema] placeholders. Born-here datasets: {system}:{artifact} (e.g. pat:product-catalog). derived: true flags transformation stores (authority omitted there — not SOR/ADS, and CDO SOC is upstream capture, checked §H)"
     edge: "id grammar  [RULED 2026-07-31 — Q1 amended + Q3]"
   - n: 4
     element: "Per-side loader→source_id overlay"
@@ -73,7 +73,7 @@ provenance:
     loader: "~ (no loader — design input; samples are header-only/redacted captures)"
     properties:
       - {name: three_distinctions, origin: source, from: "user directive 2026-07-30/31 (chat)", note: "software-we-use ≠ ingested sources ≠ replica datasets; documents keep their own ledger"}
-      - {name: fcdo_authority_field, origin: source, from: "internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md §H (jpmv:designation ADS/SOC/SOR; SOR defined per data subset)", note: "adopted as a registry FIELD only — no Data Authority graph classes (ALIGNMENT-PLAN skip list refined, not violated)"}
+      - {name: cdo_authority_field, origin: source, from: "internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md §H (jpmv:designation ADS/SOC/SOR; SOR defined per data subset)", note: "adopted as a registry FIELD only — no Data Authority graph classes (ALIGNMENT-PLAN skip list refined, not violated)"}
       - {name: urn_convention, origin: source, from: "samples/DataHubExample.csv", note: "tuple shape + the lowercase PROD-vs-prod duplicate warning"}
       - {name: in_chat_rulings, origin: source, from: "SME in-chat session 2026-07-31 (chad.wilson)", note: "D1 adopt + seal_id placeholder; D2 overlay adopt; D3 URN adopt; D4 refusal+replaces adopt; Q1 @ grammar amended to origin@db.schema.table (qualified locator replaces the nickname, lowercase); Q2 env always prod; Q3 derived flag, authority omitted; Q4 snow registered NOW as a SaaS system; Q5 design-docs pipeline-side only; Q6 signed-off gates TRANSFER across renames (one gate-log amendment; D4 catches meaning changes). T19 naming note: the catalog feed's replacement name = pat:product-catalog (industry-standard naming), recorded in the divergence ledger"}
 
@@ -88,7 +88,7 @@ sections:
     confirmations:
       - "Q1 [RULED — @ grammar, amended]: replica/derived ids = {origin}@{db}.{schema}.{table}, all dots after @, the qualified segment being the ACTUAL carrier locator (replaces the informal nickname; worked example controlm@[db].[schema].cm_def_vjob); born-here datasets = {system}:{artifact}; lowercase throughout; real db/schema values internal-twin only."
       - "Q2 [RULED]: URN env segment always prod — promotion-clone/lag cases not modeled."
-      - "Q3 [RULED]: derived stores keep the @ grammar for visibility + derived: true; authority OMITTED (not SOR/ADS; FCDO SOC = upstream System of Capture, checked against §H and does not fit)."
+      - "Q3 [RULED]: derived stores keep the @ grammar for visibility + derived: true; authority OMITTED (not SOR/ADS; CDO SOC = upstream System of Capture, checked against §H and does not fit)."
       - "Q4 [RULED]: snow (ServiceNow) registers as a system NOW, typed SaaS; first dataset = snow:cmdb-ci-classes (the sampled class export), doubling as the crosswalk source for every system row's cmdb_ci field."
       - "Q5 [RULED]: design-docs is pipeline-side only — it feeds graph classes beyond Document/Chunk; the doc-registry twin drops (one home per source)."
       - "Q6 [RULED]: existing signed-off gates TRANSFER to renamed dataset rows as-is (rename = identity refactoring, not meaning change); ONE gate-log amendment entry maps every old→new id at the build; re-gating is reserved for actual meaning changes, which D4 catches."

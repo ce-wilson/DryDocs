@@ -270,7 +270,7 @@ def test_the_runtime_ladder_matches_the_ledger_guard():
 def test_t1_needs_no_sme_and_the_rest_do():
     entries = registry.load_doc_sources()
     assert not entries["bmc-docs"].needs_sme_confirmation  # T1 vendor
-    assert entries["fcdo-frameworks"].needs_sme_confirmation  # T4
+    assert entries["cdo-frameworks"].needs_sme_confirmation  # T4
 
 
 def test_unknown_source_names_the_ledger():

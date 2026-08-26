@@ -366,8 +366,8 @@ somewhere K21's dependents will see it (their notes or inputs).
 J41's sweep found six unclosed markdown fences in 507 tracked `.md` files. One was ours
 (fixed). Now `tests/unit/test_markdown_fences.py` guards `docs/**` — but five remain
 DELIBERATELY, outside the guard, in files we do not author:
-- `internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md` (5140 of 5355 fences) — captured transcript
-- `internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md` (419 of 568) — captured transcript
+- `internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md` (5140 of 5355 fences) — captured transcript
+- `internal/cdo-reference/TRANSCRIPT-1-ONTOLOGY.md` (419 of 568) — captured transcript
 - `.claude/skills/data-context-extractor/references/` — vendored skill material
 - `SDLC-Docs/extracted/issue-driven-capture-loop.md` (181 of 181) — trailing orphan, possibly safe
 
@@ -380,7 +380,7 @@ is already done as part of J41. The decision is:
 
 - **(A)** Promote → `J45`: "Widen test_markdown_fences to carve out CAPTURE corpus files"
   - Inputs: test_markdown_fences.py, docs/restructure/IDEAS.md
-  - Acceptance: Guard scans all `docs/**` md files; SKIPS `internal/fcdo-reference/TRANSCRIPT*.md`
+  - Acceptance: Guard scans all `docs/**` md files; SKIPS `internal/cdo-reference/TRANSCRIPT*.md`
     with comment explaining CAPTURED-CORPUS exception; guard still catches `docs/decisions/*`
 
 - **(B)** Document in PUBLISH-BOUNDARY.md that CAPTURE files are intentionally exempt

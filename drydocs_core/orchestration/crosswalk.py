@@ -41,7 +41,7 @@ DEFAULT_CROSSWALK_DIR = _REPO_ROOT / "config" / "crosswalks"
 SCHEMA_ID = "drydocs.crosswalk.v1"
 
 #: Sibling crosswalk kinds that share ``config/crosswalks/`` but are NOT
-#: orchestrator crosswalks — e.g. the FCDO vocabulary crosswalk (backlog W1),
+#: orchestrator crosswalks — e.g. the CDO vocabulary crosswalk (backlog W1),
 #: which maps ontology terms to standard vocabularies and has its own guards.
 #: The directory scan skips these deliberately; any OTHER schema id still
 #: fails loudly, so a typo'd orchestrator crosswalk cannot vanish silently.

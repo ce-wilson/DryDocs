@@ -17,7 +17,7 @@
 #       the ARTIFACT (the book/guide), never the adapter or capture version:
 #       bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag.
 #   NON-VENDOR corpora (SME/internal/public-filing classes) keep class-based
-#   ids (adhoc-sme-email, jpmc-reports, fcdo-frameworks, seal-pat-scrape) —
+#   ids (adhoc-sme-email, jpmc-reports, cdo-frameworks, seal-pat-scrape) —
 #   deliberately OUT of the vendor grammar, recorded so it does not creep.
 #   RENAMES are add-new + retire-old: the renamed row carries `replaces:`, the
 #   old string enters `retired:` below and can NEVER re-mint with a different
@@ -186,9 +186,9 @@ sources:
       constant matches the graph, not this id.
 
   # ---- Queued corpora (registered, not yet ingested) ------------------------
-  - id: fcdo-frameworks
+  - id: cdo-frameworks                  # renamed 2026-08-26 (org-acronym sanitization); mapping in internal/cdo-reference/README.md
     classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the capture (J23 collapse)
-    source: "the 2026-08-19 live Confluence fetch (company-side capture, J18: drydocs-scrape on the company checkout — consolidated HTML + manifest run-20260819T215955Z under internal/knowledge/data/<space>/); supersedes the 2026-07-30 screenshot transcriptions in internal/fcdo-reference/*.md, which remain the provenance trail"
+    source: "the 2026-08-19 live Confluence fetch (company-side capture, J18: drydocs-scrape on the company checkout — consolidated HTML + manifest run-20260819T215955Z under internal/knowledge/data/<space>/); supersedes the 2026-07-30 screenshot transcriptions in internal/cdo-reference/*.md, which remain the provenance trail"
     connector: confluence                 # company-network only; scrape supersedes the transcripts
     landing_zone: confluence-capture      # G109 (e): the capture lands in the DECLARED read zone under
                                           # DRYDOCS_DATA_ROOT, never in-tree. The 2026-08-19 capture path
@@ -196,7 +196,7 @@ sources:
                                           # happened, and falsifying a provenance record to match a later
                                           # ruling is the one thing a VERBATIM row may not do. The ruling
                                           # applies to where the NEXT capture lands; see config/data-zones.yaml.
-    manifest: ~                           # provenance + gap ledger lives in internal/fcdo-reference/README.md
+    manifest: ~                           # provenance + gap ledger lives in internal/cdo-reference/README.md (dir renamed 2026-08-26; its top note records the mapping)
     trust_default: VERBATIM               # upgraded 2026-08-19 per this row's own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0 failed). Was GROUNDED while the capture was screenshot transcription
     tier: T4
     curation: sme-confirm                 # T4 ladder post-J23 (+confidential rider retired with the tier)
@@ -206,12 +206,12 @@ sources:
     graph_locator:                      # no connector has run — nothing to locate until the confluence fetch exists
       match: none
       value: ~
-    confirmed: true                     # ACTIVATED by user ruling in-chat 2026-08-05 (gate-log RECORD): the fcdo-crosswalk gate it waited on signed the same day 13/13; activation proceeds independently of the row-5 recapture ("settle our ontology with what they published"). The scrape itself stays company-network-side; T4 sme-confirm curation still applies to every ingested page.
+    confirmed: true                     # ACTIVATED by user ruling in-chat 2026-08-05 (gate-log RECORD): the cdo-crosswalk gate it waited on signed the same day 13/13; activation proceeds independently of the row-5 recapture ("settle our ontology with what they published"). The scrape itself stays company-network-side; T4 sme-confirm curation still applies to every ingested page.
     notes: >
-      The FCDO firmwide data-publishing frameworks corpus (ontology/taxonomy/
+      The chief-data-office (CDO) data-publishing frameworks corpus (ontology/taxonomy/
       provenance/ETL standards from the internal governance group). Purpose:
-      reference for the FCDO ontology crosswalk
-      (internal/fcdo-reference/ALIGNMENT-PLAN.md). Priority recapture targets
+      reference for the CDO ontology crosswalk
+      (internal/cdo-reference/ALIGNMENT-PLAN.md). Priority recapture targets
       when the confluence connector runs: Descriptive Metadata, Data Quality,
       Data Contracts (DPROD) frameworks + the Taxonomy Framework property
       tables — the known capture holes that block crosswalk sign-off.
@@ -219,7 +219,7 @@ sources:
       (Descriptive Metadata + its WIP CDAO twin, Data Quality, Data Contracts/
       DPROD, Taxonomy Framework v21) — the crosswalk's capture holes are closed.
       One page came back 0 bytes (the drafts/upcoming index) — QA'd company-side.
-      LOAD PATH: docs/company-prompts/fcdo-frameworks-load-company-prompt.md (the load is
+      LOAD PATH: docs/company-prompts/cdo-frameworks-load-company-prompt.md (the load is
       company-side by guardrail 6 — the capture never leaves the company
       network); graph_locator fills when that load runs.
 
@@ -392,3 +392,6 @@ retired:
   - id: essential-graphrag
     replaced_by: ["neo4j-docs-essential-graphrag"]
     reason: "id-grammar rename; RETIRED AS A REGISTRY ID ONLY — the string stays LIVE in the graph as the Document's doc_id business key and in the loader's DOC_ID constant"
+  - id: "(sanitized-2026-08-26)"
+    replaced_by: ["cdo-frameworks"]
+    reason: "org-acronym sanitization (user direction 2026-08-26): the retired string contains an internal org acronym and may not appear in this publishable file; the old<->new mapping is recorded once, in internal/cdo-reference/README.md. Never-re-mint applies to the recorded string."

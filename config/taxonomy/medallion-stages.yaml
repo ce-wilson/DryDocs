@@ -29,8 +29,8 @@
 # so the other two rows carry stage: ~ until evidence lands — captured
 # faithfully, never improved (the taxonomy import rule).
 #
-# FCDO's Raw / Conformed-Silver / Consumable-Gold framing
-# (internal/fcdo-reference/) is a THIRD, external vocabulary — crosswalk
+# CDO's Raw / Conformed-Silver / Consumable-Gold framing
+# (internal/cdo-reference/) is a THIRD, external vocabulary — crosswalk
 # context only, deliberately NOT rows here (ruling B2).
 #
 # SOURCE BOUNDARY: mechanism only. Sites, URLs, bucket names, GUIDs and every

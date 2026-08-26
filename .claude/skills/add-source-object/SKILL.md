@@ -88,12 +88,12 @@ Never invent an edge inside a loader. For each new concept:
      `capture: waived — <reason>` (the platforms.yaml retrofit is the
      precedent for what a silent skip costs — never omit the field).
 
-### Optional aid — `fcdo-ontology-builder` (flat/denormalized sources)
+### Optional aid — `ontology-builder` (flat/denormalized sources)
 
 For a flat or denormalized source (a wide export, a catalog CSV), the
-firmwide `fcdo-ontology-builder` agent skill can accelerate this step.
+firmwide `ontology-builder` agent skill can accelerate this step.
 Optional and company-side only (the tool belongs to the internal governance
-group; adoption plan = `internal/fcdo-reference/ALIGNMENT-PLAN.md` Phase 3):
+group; adoption plan = `internal/cdo-reference/ALIGNMENT-PLAN.md` Phase 3):
 
 - Feed it **header-only or redacted extracts ONLY** — never real data values.
 - Reuse from its output: the SKOS enum extraction (candidate concept schemes

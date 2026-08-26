@@ -74,7 +74,7 @@ notes: |
   2026-08-23, so "documents neither" was half-stale at drafting. The block records that the log
   dir is OPTIONAL where the data root is mandatory -- the G81 (d) scope fence.
 
-  (e) RULED: THE CAPTURE MOVES, it does not get an exception. The fcdo-frameworks Confluence
+  (e) RULED: THE CAPTURE MOVES, it does not get an exception. The cdo-frameworks Confluence
   capture had been landing in-tree under internal/knowledge/data/<space>/ -- untracked AND not
   gitignored, the one category git clean -fd removes without needing -x. An exception could
   never expire: landing_zones.py permits an in-tree zone only when its contents are TRACKED,

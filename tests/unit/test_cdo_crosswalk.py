@@ -1,8 +1,8 @@
-"""W1 — the FCDO vocabulary crosswalk (config/crosswalks/fcdo-vocabulary.yaml).
+"""W1 — the CDO vocabulary crosswalk (config/crosswalks/cdo-vocabulary.yaml).
 
 A VOCABULARY crosswalk, not an orchestrator one: it maps DryDocs ontology
 terms onto the standard vocabularies the firmwide frameworks require. These
-guards pin the POST-GATE state (gate fcdo-crosswalk SIGNED OFF 2026-08-05,
+guards pin the POST-GATE state (gate cdo-crosswalk SIGNED OFF 2026-08-05,
 13/13 — the F1/F2 flip-with-the-test precedent):
 
 - the signed outcome holds exactly: file ``confirmed``, rows 1-4 and 6-8
@@ -28,8 +28,8 @@ from drydocs_core.orchestration.crosswalk import (
 )
 
 REPO = Path(__file__).resolve().parent.parent.parent
-CROSSWALK = REPO / "config" / "crosswalks" / "fcdo-vocabulary.yaml"
-GATE_PROMPT = REPO / "config" / "gate-prompts" / "fcdo-crosswalk.yaml"
+CROSSWALK = REPO / "config" / "crosswalks" / "cdo-vocabulary.yaml"
+GATE_PROMPT = REPO / "config" / "gate-prompts" / "cdo-crosswalk.yaml"
 
 VOCAB_SCHEMA_ID = "drydocs.vocab-crosswalk.v1"
 ROW_STATUSES = {"confirmed", "blocked-on-recapture"}
@@ -46,12 +46,12 @@ def test_file_exists_and_declares_the_sibling_schema() -> None:
         "the orchestrator runtime does not recognize the vocabulary schema — "
         "load_crosswalks() would raise on this file"
     )
-    assert doc["gate_spec"] == "config/gate-prompts/fcdo-crosswalk.yaml"
+    assert doc["gate_spec"] == "config/gate-prompts/cdo-crosswalk.yaml"
     assert (REPO / doc["gate_spec"]).is_file()
 
 
 def test_statuses_match_the_signed_gate_outcome() -> None:
-    """Gate fcdo-crosswalk, 2026-08-05: rows 1-4/6-8 confirmed, row 5 blocked.
+    """Gate cdo-crosswalk, 2026-08-05: rows 1-4/6-8 confirmed, row 5 blocked.
     Any other value means someone flipped a status outside a gate session."""
     doc = _doc()
     assert doc["status"] == "confirmed", "file status was signed 2026-08-05 (gate-log)"

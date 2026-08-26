@@ -352,10 +352,10 @@ def test_doc_ledger_union_gates_doc_corpora() -> None:
     assert bmc.urn is None  # doc corpora keep docmeta identity
     reg.require_confirmed("neo4j-docs-essential-graphrag")
     # ACTIVATED 2026-08-05 (user ruling in-chat, gate-log RECORD): the covering
-    # crosswalk gate (fcdo-crosswalk) signed the same day; before that, this
+    # crosswalk gate (cdo-crosswalk) signed the same day; before that, this
     # line pinned the UnconfirmedSourceError refusal.
-    fcdo = reg.require_confirmed("fcdo-frameworks")
-    assert fcdo.home == "doc-registry"
+    cdo = reg.require_confirmed("cdo-frameworks")
+    assert cdo.home == "doc-registry"
 
 
 def test_temp_registry_does_not_union_shipped_ledgers(tmp_path: Path) -> None:

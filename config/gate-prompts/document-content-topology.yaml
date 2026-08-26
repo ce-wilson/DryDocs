@@ -92,7 +92,7 @@ mapping:
     edge: "SCOPE WIDENED  [R1 — no new database; the corpora that declared `dddocs` resolve here, which is where bmc-docs already physically sits]"
   - n: 2
     element: "ddcontext — the EXTENSION: reference/experiment/SME content + derived findings"
-    target: "neo4j-docs-essential-graphrag, fcdo-frameworks, adhoc-sme-email, jpmc-reports — plus the derived findings (drydocs-deepdoc output) it was originally chartered for"
+    target: "neo4j-docs-essential-graphrag, cdo-frameworks, adhoc-sme-email, jpmc-reports — plus the derived findings (drydocs-deepdoc output) it was originally chartered for"
     edge: "CHARTER RESTATED  [PROPOSED — §B: it holds a permanent MIX of captured content and derived findings, so a watermark keyed on database name can never be true for it]"
   - n: 3
     element: "dddocs — RETIRED"
@@ -109,7 +109,7 @@ mapping:
 
 provenance:
   - label: ":Document / :Chunk  [EXISTING node classes — the lexical graph ADR 0006 defines]"
-    source_object: "captured corpora declared in config/doc-source-registry.yaml (7 today: bmc-docs, bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag, fcdo-frameworks, seal-pat-scrape, adhoc-sme-email, jpmc-reports)"
+    source_object: "captured corpora declared in config/doc-source-registry.yaml (7 today: bmc-docs, bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag, cdo-frameworks, seal-pat-scrape, adhoc-sme-email, jpmc-reports)"
     key: "doc id / chunk id from the capture manifest — a business key, so a corpus survives a rebuild and re-links (ADR 0002 D1 proxy-node pattern)"
     loader: "drydocs load-bmc-docs, load-vendor-docs, load-essential-graphrag (CANONICAL_LOAD_SEQUENCE steps — verbs are the ADR 0012 public contract and did NOT rename with the corpus ids)"
     properties:
@@ -229,7 +229,7 @@ sections:
       `exports.WATERMARK_VALUE` is the string "SYNTHESIZED — unverified", stamped
       onto every exported row of a watermarked spec.
       Measured against the registry, ddcontext holds four corpora and NOT ONE of
-      them is synthesized: neo4j-docs-essential-graphrag GROUNDED, fcdo-frameworks GROUNDED
+      them is synthesized: neo4j-docs-essential-graphrag GROUNDED, cdo-frameworks GROUNDED
       (activated by SME ruling 2026-08-05), adhoc-sme-email VERBATIM,
       jpmc-reports VERBATIM. So an export of an SME email captured word for word
       is stamped as machine-synthesized and unverified. That is a false
@@ -288,7 +288,7 @@ sections:
       to `drydocs` — bmc-docs (GROUNDED, T1), bmc-docs-controlm-utilities (VERBATIM,
       T1), seal-pat-scrape (VERBATIM, T2, stub);
       unchanged in `ddcontext` — neo4j-docs-essential-graphrag (GROUNDED, T1),
-      fcdo-frameworks (GROUNDED, T4), adhoc-sme-email (VERBATIM, T4),
+      cdo-frameworks (GROUNDED, T4), adhoc-sme-email (VERBATIM, T4),
       jpmc-reports (VERBATIM, T1).
       THE TWO BMC SETS, per R2's caveat, because "reload from source" means a
       different amount of work for each and the difference is not visible from
@@ -476,7 +476,7 @@ sections:
 open_questions:
   - "Q1 — does anything besides deepdoc ever write ddcontext? Under R1 the answer matters less than it did: ddcontext is no longer an empty database waiting for a loader, it holds four corpora today. The question narrows to whether derived findings need their own label discipline to stay distinguishable from captured content now that they share a database — which is the mixed-database consequence §B is accepting."
   - "Q3 — does the analytical projection (§D) subsume the vector-search cost, or is a cross-corpus vector index needed on the live path? The answer changes whether the projection is a batch convenience or a serving component, which is a much larger commitment. R1 did not touch this."
-  - "Q4 — fcdo-frameworks was activated by SME ruling on 2026-08-05 and lands in ddcontext, whose watermark misdescribes it. Under R1 it STAYS there, so the clock the draft started has not stopped: it is now §B-NOW that has to land, not a data move. A week has passed since the draft."
+  - "Q4 — cdo-frameworks was activated by SME ruling on 2026-08-05 and lands in ddcontext, whose watermark misdescribes it. Under R1 it STAYS there, so the clock the draft started has not stopped: it is now §B-NOW that has to land, not a data move. A week has passed since the draft."
   - "Q6 (NEW, created by R1) — does bmc_docs.cypher's DESCRIBES write stay as it is? It was never withdrawn; only vendor_docs.cypher refuses the edge. R1 makes the write unambiguously legal, so the question is whether the OTHER corpus should now get it too, or whether vendor_docs.cypher's refusal was about corpus shape rather than residency."
   - "Q7 (NEW, created by R1) — Q16 clause (b), the product->documentation pointer reaching the graph, closed as an explicit partial on 2026-08-07 with no successor item and is traceable only by prose. R1 makes it CHEAPER, not harder: the corpora and the products now share a database, so DESCRIBES may already be the whole answer (Q16's own 'cheapest possible answer, check FIRST'). Either mint the successor item at sign-off or record the decline — do not leave it in prose."
   - "Q8 (NEW, superseding the draft's Q5) — the naming logic R1 states ('drydocs is the original, dd* are extensions') is worth recording as a RULE in the ADR amendment, not just as this one rejection. It is the test the next proposed database has to pass."
