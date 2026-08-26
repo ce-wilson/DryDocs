@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-25T21:32:50",
+    "captured_at": "2026-08-25T22:10:49",
     "date": "20260825",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6fd395fb",
-      "full": "6fd395fb87149022e33a270728a800562b44444c",
+      "commit": "949b3b71",
+      "full": "949b3b71a2fa4a041ca15782ac75afc709822e13",
       "branch": "main",
-      "describe": "port-base-20260825-12-g6fd395fb",
-      "subject": "feat(lineage): G56 — collector captures the mount table, so shared-vs-local storage is DERIVED",
+      "describe": "port-base-20260825-15-g949b3b71",
+      "subject": "feat(lineage): G97 — launcher and payload stop sharing the INVOKES fold",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -15911,6 +15911,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/migrate_payload_invokes_to_uses_artifact_g97.cypher",
+      "name": "migrate_payload_invokes_to_uses_artifact_g97.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/migrate_payload_invokes_to_uses_artifact_g97.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/migrate_runs_on_to_scheduled_on.cypher",
       "name": "migrate_runs_on_to_scheduled_on.cypher",
       "extension": ".cypher",
@@ -19457,10 +19466,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json",
-      "name": "drydocs-20260825.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2132.json",
+      "name": "drydocs-20260825-2132.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825-2132.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26689,6 +26698,10 @@
     [
       "drydocs/tests/unit/test_lineage_inventory.py",
       "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_inventory.py",
+      "drydocs/drydocs_lineage/writer.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_mac.py",
@@ -37661,6 +37674,11 @@
     [
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/migrate_payload_invokes_to_uses_artifact_g97.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
       "drydocs/drydocs/loaders/cypher/migrate_runs_on_to_scheduled_on.cypher"
     ],
     [
@@ -39461,7 +39479,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2132.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41873,13 +41891,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2370,
-    "edges": 1169,
+    "files": 2371,
+    "edges": 1170,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2653,
+    "rels": 2654,
     "directories": 284
   }
 }
