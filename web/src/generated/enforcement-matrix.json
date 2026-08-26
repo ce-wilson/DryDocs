@@ -152,7 +152,7 @@
       ],
       "gate_ref": "HITL gate (docs/restructure/03-hitl-sme-flow.md)",
       "status": "gate-pending",
-      "pending_entries": 24,
+      "pending_entries": 26,
       "env_refs": [],
       "files": [
         "config/taxonomy-ontology-map/00-header.yaml",
@@ -361,7 +361,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 122,
+      "pending_entries": 123,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -399,6 +399,7 @@
         "config/gate-prompts/repo-manifest-data-profile.yaml",
         "config/gate-prompts/rua-bundle-data-profile.yaml",
         "config/gate-prompts/rua-load-shapes.yaml",
+        "config/gate-prompts/script-provenance-gaps.yaml",
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml",
         "config/gate-prompts/seal-attribution-match-policy.yaml",
         "config/gate-prompts/seal-tom-attribution-reshape.yaml",

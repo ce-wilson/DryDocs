@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: fable
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - internal/remediation/governance/nfr-consistency-and-greenfield.md
@@ -18,3 +18,46 @@ acceptance: |
   A gate prompt is drafted — drafting decides nothing (the G27 / W1 / N10 precedent), and nothing is written to the graph until sign-off — covering the two provenance gap classes the live FW-really-API case surfaced: (a) a flag for a payload script DEPLOYED on the execution host but ABSENT from source control, where a code search finds only the XML variable reference: what it is called, what it attaches to, and what a consumer may conclude from it; (b) Script identity for non-DPL jobs, which have no pipeline-id key at all: whether the PATH is the identity fallback, and whether the GUID-vs-path boundary is the kind discriminator. Every vocabulary or property term the prompt proposes is registered `planned` and stays planned until the gate signs.
 notes: |
   Groomed 2026-08-07 (pm) from Idea-21. The anti-pattern itself is already codified (_FW-really-API plus design principle 8 — intent from resolved flow, flag the name-token disagreement); what is NOT settled is either gap class, and both are keying/meaning decisions, so they route through the gate rather than through a build. Checked at the groom: nothing under drydocs_lineage/ or config/ carries an in-source-control flag today, so the prompt starts from a clean sheet.
+  DONE 2026-08-25 (desktop). Drafted config/gate-prompts/script-provenance-gaps.yaml -- ONE
+  page, both gap classes as its two ruling sections (3 sections, 13 confirmations, format
+  guard green, loads via gate_pages). Drafts only; the sign-off is a separate SME session.
+
+  TIMING TURNED OUT TO MATTER: both of the laptop's same-evening closes feed this draft.
+  G97 (the m7 payload build) made gap (b)'s GUID-vs-path boundary OPERATIONAL -- GUID-keyed
+  DPL targets stay :ETLProcess on INVOKES, path-shaped payloads land :Script on
+  USES_ARTIFACT -- so §B2 asks the SME to RATIFY a boundary the build is already running
+  on, with G97's bucket counts as the named re-verification if re-drawn. And G56's mount
+  capture is what makes path identity DECIDABLE: §B3's proposed key is (storage_scope,
+  normalized_path), collapsing to path alone on shared mounts, with the path-only
+  alternative laid out for explicit rejection (wrong on local storage, where two hosts'
+  identical paths are different files).
+
+  GAP (a) -- the flag: §A proposes TRI-STATE scm_status (tracked | deployed-only | unknown,
+  default unknown), attached to :Script (not the job, not the edge -- the artifact is the
+  absent thing), carried with scm_checked_at + scm_search_scope (O24/A3 no anonymous
+  assertions; K17 as-of -- an SCM absence is true as of the search and within its scope).
+  §A4 states the may/may-not-conclude lists ON the term; §A5 argues deliberately that this
+  is NOT :Uncertain -- a grounded negative observation with its basis on the node is not an
+  unestablished finding, and blurring the two teaches consumers to discount the one flag
+  §A4 wants acted on.
+
+  GAP (b) -- identity: §B1 names the uncomfortable current truth -- :Script has NO
+  uniqueness constraint and a GUID-less script has NO key at all, so two loads can mint two
+  nodes for one script -- and proposes amending the lineage model's standing note from
+  'path is never identity' to 'never identity WHERE A GUID EXISTS'. §B4 keeps content hash
+  a property (drift, version), never the key. §B5 states the sign-off blast radius
+  honestly: a constraints.cypher addition, an EXPECTED_CONSTRAINTS bump, and the S3
+  null-ignoring-uniqueness backfill hazard, with the migration a groomed follow-up.
+
+  REGISTRATION SHAPE, and why it differs from C28's: no new edge and no new node class
+  exist to reserve -- both gaps are property/identity questions on the existing :Script.
+  The acceptance's 'registered planned' lands as TWO map rows proposed in
+  50-mappings-architecture.yaml (script-scm-status, script-identity-binding; summary
+  9->11); the §0b property-term bindings CANNOT precede the gate -- the
+  envelope-property-terms (M4) rule is that decided_by names a SIGNED gate -- so §C3 makes
+  their at-sign-off registration an explicit clause instead of a silent omission.
+
+  Scope fence: the _FW-really-API anti-pattern + design principle 8 stand as signed at
+  cmdline-nfr-vetting and are not re-ruled; the description-field metadata plan stays the
+  declared-provenance carrier (authoring policy vs observed-estate modelling, kept apart).
+  Suite 2453 passed / 8 skipped; ruff clean.

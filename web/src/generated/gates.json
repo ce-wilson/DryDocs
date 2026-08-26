@@ -1152,6 +1152,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "script-provenance-gaps (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/script-provenance-gaps.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "seal-tom-attribution-reshape (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [

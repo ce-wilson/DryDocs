@@ -1885,6 +1885,18 @@
       "source": "any multi-version corpus (the internal process pages are the named case)"
     },
     {
+      "id": "script-scm-status",
+      "status": "proposed",
+      "label": null,
+      "source": "cmdline-nfr-vetting live case (2026-07-21)"
+    },
+    {
+      "id": "script-identity-binding",
+      "status": "proposed",
+      "label": null,
+      "source": "CMDLINE resolution chain (resolved command lines) + G56 mount capture (storage scope derived) + G97 payload build (the boundary as built)"
+    },
+    {
       "id": "company-has-sub-organization",
       "status": "proposed",
       "label": "HAS_SUB_ORGANIZATION",

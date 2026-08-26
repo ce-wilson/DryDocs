@@ -89,3 +89,60 @@
       build the ~250-term SWO SDLC subset (which §A4 scoped out, and which cannot be
       loaded today because ontology.cypher:109 points at a file that does not exist)
       would revisit §E's binding depth.
+
+  # ── G61 reservations (2026-08-25) — gate script-provenance-gaps ─────────────
+  # Both are PROPERTY/IDENTITY questions on the existing :Script — no new edge,
+  # no new node class. The property-term bindings land in the vocabulary's
+  # section 0b AT SIGN-OFF (the envelope-property-terms/M4 rule: decided_by
+  # names a signed gate), so these two rows are the whole pre-gate registration.
+
+  - id: script-scm-status
+    taxonomy:
+      source: "cmdline-nfr-vetting live case (2026-07-21)"
+      element: "A payload script DEPLOYED on the execution host but ABSENT from source control — the code search finds only the XML variable reference that names it"
+    ontology:
+      from_node: Script
+      to_node: Script                       # property binding, no edge — the S3 business-application-identity shape
+      matrix_row: "provenance property (tri-state; no PROV row — negative evidence is not a derivation)"
+      neo4j_label: ~
+      prov_maps_to: ~
+      vocab_id: ~                           # §0b property-term binding lands at sign-off (M4 rule), decided_by: script-provenance-gaps
+    precedence_authority: bmc-baseline
+    capture: >
+      waived — property proposal only. Proposed shape: scm_status
+      (tracked | deployed-only | unknown, default unknown) + scm_checked_at +
+      scm_search_scope, the basis-required companions (O24/A3: no anonymous
+      assertions; K17: an absence is true as of the search that established it).
+    status: proposed
+    depends_on: ~
+    proposed_at: 2026-08-25
+    open_questions:
+      - "§A1: tri-state scm_status vs a bare boolean flag written only on bad cases — the boolean collapses 'checked and absent' into 'never checked', and absence-of-flag becomes ambiguous the same way one level up."
+      - "§A4: the may/may-not-conclude lists ride the term itself; deployed-only is NEVER a deletion candidate on this evidence alone."
+      - "§A5: NOT :Uncertain — a grounded negative observation with its scope and date on the node is not an unestablished finding."
+
+  - id: script-identity-binding
+    taxonomy:
+      source: "CMDLINE resolution chain (resolved command lines) + G56 mount capture (storage scope derived) + G97 payload build (the boundary as built)"
+      element: "Script identity for non-DPL jobs: no pipeline-id key exists, :Script carries no uniqueness constraint, so two loads can mint two nodes for one script"
+    ontology:
+      from_node: Script
+      to_node: Script                       # identity/property binding, no edge
+      matrix_row: "identity binding (no PROV row — keying is not derivation)"
+      neo4j_label: ~
+      prov_maps_to: ~
+      vocab_id: ~
+    precedence_authority: bmc-baseline
+    capture: >
+      waived — identity proposal only. Proposed key: (storage_scope,
+      normalized_path), collapsing to path alone on shared mounts (G56);
+      content hash a property for drift, never the key (§B4). Amends the
+      lineage model's standing 'path is never identity' note to 'never
+      identity WHERE A GUID EXISTS' — GUID-keyed targets stay :ETLProcess
+      (the G97 boundary, ratified at §B2 or re-drawn there).
+    status: proposed
+    depends_on: ~
+    proposed_at: 2026-08-25
+    open_questions:
+      - "§B1: if path-as-fallback is DECLINED, what else keys a GUID-less script? 'Nothing' is the current answer and cannot survive a second load."
+      - "§B5: the constraint consequence — constraints.cypher addition, EXPECTED_CONSTRAINTS bump, and the S3 null-ignoring-uniqueness backfill hazard for Scripts already minted unkeyed; migration is a groomed follow-up, never performed at sign-off."
