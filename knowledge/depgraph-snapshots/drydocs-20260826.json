@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-26T02:54:27",
+    "captured_at": "2026-08-26T13:18:35",
     "date": "20260826",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "16c5ec2d",
-      "full": "16c5ec2dcab6d41647ce81fa4d9b4c9e291e6247",
+      "commit": "9256fc49",
+      "full": "9256fc49cbb9a65e12999740889a523df57d1cb5",
       "branch": "main",
-      "describe": "port-base-20260825-37-g16c5ec2d",
-      "subject": "feat(review): K25 — the cross-application run_as detector, class-first and per-job",
+      "describe": "port-base-20260826-5-g9256fc49",
+      "subject": "Merge fix/acronym-listings-and-boundary-sweep: glossary fourth+fifth passes and the cdo-* boundary sweep",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6128,10 +6128,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/config/crosswalks/fcdo-vocabulary.yaml",
-      "name": "fcdo-vocabulary.yaml",
+      "file_id": "drydocs/config/crosswalks/cdo-vocabulary.yaml",
+      "name": "cdo-vocabulary.yaml",
       "extension": ".yaml",
-      "rel_path": "config/crosswalks/fcdo-vocabulary.yaml",
+      "rel_path": "config/crosswalks/cdo-vocabulary.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -6249,6 +6249,15 @@
       "name": "business-layer-org-structure.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/business-layer-org-structure.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/cdo-crosswalk.yaml",
+      "name": "cdo-crosswalk.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/cdo-crosswalk.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -6402,15 +6411,6 @@
       "name": "etlprocess-kind-enum.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/etlprocess-kind-enum.yaml",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/config/gate-prompts/fcdo-crosswalk.yaml",
-      "name": "fcdo-crosswalk.yaml",
-      "extension": ".yaml",
-      "rel_path": "config/gate-prompts/fcdo-crosswalk.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -6609,6 +6609,15 @@
       "name": "standard-identity-and-carrier.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/standard-identity-and-carrier.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/tech-partner-attach-level.yaml",
+      "name": "tech-partner-attach-level.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/tech-partner-attach-level.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -7199,15 +7208,6 @@
       "kind": "dir"
     },
     {
-      "file_id": "drydocs/docs/Product/seal/image-2.md",
-      "name": "image-2.md",
-      "extension": ".md",
-      "rel_path": "docs/Product/seal/image-2.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/Product/seal/seal-application-hierarchy.md",
       "name": "seal-application-hierarchy.md",
       "extension": ".md",
@@ -7244,10 +7244,10 @@
       "kind": "dir"
     },
     {
-      "file_id": "drydocs/docs/company-prompts/fcdo-frameworks-load-company-prompt.md",
-      "name": "fcdo-frameworks-load-company-prompt.md",
+      "file_id": "drydocs/docs/company-prompts/cdo-frameworks-load-company-prompt.md",
+      "name": "cdo-frameworks-load-company-prompt.md",
       "extension": ".md",
-      "rel_path": "docs/company-prompts/fcdo-frameworks-load-company-prompt.md",
+      "rel_path": "docs/company-prompts/cdo-frameworks-load-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8954,6 +8954,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/epics/cdo-alignment.yaml",
+      "name": "cdo-alignment.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/epics/cdo-alignment.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/epics/component-topology.yaml",
       "name": "component-topology.yaml",
       "extension": ".yaml",
@@ -9012,15 +9021,6 @@
       "name": "drydocs-review-backflow.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/epics/drydocs-review-backflow.yaml",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/restructure/backlog/epics/fcdo-alignment.yaml",
-      "name": "fcdo-alignment.yaml",
-      "extension": ".yaml",
-      "rel_path": "docs/restructure/backlog/epics/fcdo-alignment.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9822,6 +9822,51 @@
       "name": "G110.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/G110.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G111.yaml",
+      "name": "G111.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G111.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G112.yaml",
+      "name": "G112.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G112.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G113.yaml",
+      "name": "G113.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G113.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G114.yaml",
+      "name": "G114.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G114.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G115.yaml",
+      "name": "G115.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G115.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11231,6 +11276,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/J53.yaml",
+      "name": "J53.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J53.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J54.yaml",
+      "name": "J54.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J54.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/J6.yaml",
       "name": "J6.yaml",
       "extension": ".yaml",
@@ -11433,6 +11496,15 @@
       "name": "K26.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/K26.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/K27.yaml",
+      "name": "K27.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/K27.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11676,6 +11748,15 @@
       "name": "L28.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/L28.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/L29.yaml",
+      "name": "L29.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/L29.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11937,6 +12018,15 @@
       "name": "N16.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/N16.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/N17.yaml",
+      "name": "N17.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/N17.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12590,6 +12680,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/O68.yaml",
+      "name": "O68.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O68.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/O7.yaml",
       "name": "O7.yaml",
       "extension": ".yaml",
@@ -12657,6 +12756,15 @@
       "name": "P5.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/P5.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/P6.yaml",
+      "name": "P6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/P6.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13152,6 +13260,24 @@
       "name": "S13.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/S13.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/S14.yaml",
+      "name": "S14.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/S14.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/S15.yaml",
+      "name": "S15.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/S15.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18710,6 +18836,78 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/cdo-reference",
+      "name": "cdo-reference",
+      "extension": "",
+      "rel_path": "internal/cdo-reference",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/ALIGNMENT-PLAN.md",
+      "name": "ALIGNMENT-PLAN.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/ALIGNMENT-PLAN.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md",
+      "name": "CONFLUENCE-TRANSCRIPT.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/TRANSCRIPT-1-ONTOLOGY.md",
+      "name": "TRANSCRIPT-1-ONTOLOGY.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/TRANSCRIPT-1-ONTOLOGY.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/TRANSCRIPT-2-TAXONOMY.md",
+      "name": "TRANSCRIPT-2-TAXONOMY.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/TRANSCRIPT-2-TAXONOMY.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/TRANSCRIPT-3-THOUGHTS-VOCAB.md",
+      "name": "TRANSCRIPT-3-THOUGHTS-VOCAB.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/TRANSCRIPT-3-THOUGHTS-VOCAB.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/cdo-reference/TRANSCRIPT-4-MISC.md",
+      "name": "TRANSCRIPT-4-MISC.md",
+      "extension": ".md",
+      "rel_path": "internal/cdo-reference/TRANSCRIPT-4-MISC.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/context-graph-analysis",
       "name": "context-graph-analysis",
       "extension": "",
@@ -18912,78 +19110,6 @@
       "name": "README.md",
       "extension": ".md",
       "rel_path": "internal/dsi-reference/README.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference",
-      "name": "fcdo-reference",
-      "extension": "",
-      "rel_path": "internal/fcdo-reference",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/ALIGNMENT-PLAN.md",
-      "name": "ALIGNMENT-PLAN.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/ALIGNMENT-PLAN.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md",
-      "name": "CONFLUENCE-TRANSCRIPT.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/README.md",
-      "name": "README.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/README.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md",
-      "name": "TRANSCRIPT-1-ONTOLOGY.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/TRANSCRIPT-2-TAXONOMY.md",
-      "name": "TRANSCRIPT-2-TAXONOMY.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/TRANSCRIPT-2-TAXONOMY.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/TRANSCRIPT-3-THOUGHTS-VOCAB.md",
-      "name": "TRANSCRIPT-3-THOUGHTS-VOCAB.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/TRANSCRIPT-3-THOUGHTS-VOCAB.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/internal/fcdo-reference/TRANSCRIPT-4-MISC.md",
-      "name": "TRANSCRIPT-4-MISC.md",
-      "extension": ".md",
-      "rel_path": "internal/fcdo-reference/TRANSCRIPT-4-MISC.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19547,10 +19673,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260826.json",
-      "name": "drydocs-20260826.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260826-0254.json",
+      "name": "drydocs-20260826-0254.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260826.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260826-0254.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21095,6 +21221,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_cdo_crosswalk.py",
+      "name": "test_cdo_crosswalk.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_cdo_crosswalk.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_chain_inputs.py",
       "name": "test_chain_inputs.py",
       "extension": ".py",
@@ -21459,15 +21594,6 @@
       "name": "test_external_vendor_scrape.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_external_vendor_scrape.py",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/tests/unit/test_fcdo_crosswalk.py",
-      "name": "test_fcdo_crosswalk.py",
-      "extension": ".py",
-      "rel_path": "tests/unit/test_fcdo_crosswalk.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26253,6 +26379,14 @@
       "drydocs/drydocs_core/cypher_split.py"
     ],
     [
+      "drydocs/tests/unit/test_cdo_crosswalk.py",
+      "drydocs/drydocs/gate_pages.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cdo_crosswalk.py",
+      "drydocs/drydocs_core/orchestration/crosswalk.py"
+    ],
+    [
       "drydocs/tests/unit/test_chain_inputs.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -26647,14 +26781,6 @@
     [
       "drydocs/tests/unit/test_external_vendor_scrape.py",
       "drydocs/scripts/external_vendor_scrape.py"
-    ],
-    [
-      "drydocs/tests/unit/test_fcdo_crosswalk.py",
-      "drydocs/drydocs/gate_pages.py"
-    ],
-    [
-      "drydocs/tests/unit/test_fcdo_crosswalk.py",
-      "drydocs/drydocs_core/orchestration/crosswalk.py"
     ],
     [
       "drydocs/tests/unit/test_fid_census.py",
@@ -32417,7 +32543,7 @@
     [
       "drydocs/config/crosswalks",
       "CONTAINS",
-      "drydocs/config/crosswalks/fcdo-vocabulary.yaml"
+      "drydocs/config/crosswalks/cdo-vocabulary.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -32453,6 +32579,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/business-layer-org-structure.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/cdo-crosswalk.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -32538,11 +32669,6 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/etlprocess-kind-enum.yaml"
-    ],
-    [
-      "drydocs/config/gate-prompts",
-      "CONTAINS",
-      "drydocs/config/gate-prompts/fcdo-crosswalk.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -32653,6 +32779,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/standard-identity-and-carrier.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/tech-partner-attach-level.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -33007,17 +33138,12 @@
     [
       "drydocs/docs/Product/seal",
       "CONTAINS",
-      "drydocs/docs/Product/seal/image-2.md"
-    ],
-    [
-      "drydocs/docs/Product/seal",
-      "CONTAINS",
       "drydocs/docs/Product/seal/seal-application-hierarchy.md"
     ],
     [
       "drydocs/docs/company-prompts",
       "CONTAINS",
-      "drydocs/docs/company-prompts/fcdo-frameworks-load-company-prompt.md"
+      "drydocs/docs/company-prompts/cdo-frameworks-load-company-prompt.md"
     ],
     [
       "drydocs/docs/company-prompts",
@@ -33932,6 +34058,11 @@
     [
       "drydocs/docs/restructure/backlog/epics",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/epics/cdo-alignment.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/epics",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/epics/component-topology.yaml"
     ],
     [
@@ -33963,11 +34094,6 @@
       "drydocs/docs/restructure/backlog/epics",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/epics/drydocs-review-backflow.yaml"
-    ],
-    [
-      "drydocs/docs/restructure/backlog/epics",
-      "CONTAINS",
-      "drydocs/docs/restructure/backlog/epics/fcdo-alignment.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/epics",
@@ -34408,6 +34534,31 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/G110.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G111.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G112.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G113.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G114.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G115.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -35192,6 +35343,16 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J53.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J54.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/J6.yaml"
     ],
     [
@@ -35303,6 +35464,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/K26.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/K27.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -35438,6 +35604,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/L28.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/L29.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -35583,6 +35754,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/N16.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/N17.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -35947,6 +36123,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O68.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/O7.yaml"
     ],
     [
@@ -35983,6 +36164,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/P5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/P6.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -36258,6 +36444,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/S13.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/S14.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/S15.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -39237,6 +39433,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/cdo-reference"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/context-graph-analysis"
     ],
     [
@@ -39253,11 +39454,6 @@
       "drydocs/internal",
       "CONTAINS",
       "drydocs/internal/dsi-reference"
-    ],
-    [
-      "drydocs/internal",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference"
     ],
     [
       "drydocs/internal",
@@ -39313,6 +39509,41 @@
       "drydocs/internal/airflow-reference",
       "CONTAINS",
       "drydocs/internal/airflow-reference/mwaa-internal-docs.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/ALIGNMENT-PLAN.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/CONFLUENCE-TRANSCRIPT.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/README.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/TRANSCRIPT-1-ONTOLOGY.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/TRANSCRIPT-2-TAXONOMY.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/TRANSCRIPT-3-THOUGHTS-VOCAB.md"
+    ],
+    [
+      "drydocs/internal/cdo-reference",
+      "CONTAINS",
+      "drydocs/internal/cdo-reference/TRANSCRIPT-4-MISC.md"
     ],
     [
       "drydocs/internal/context-graph-analysis",
@@ -39408,41 +39639,6 @@
       "drydocs/internal/dsi-reference",
       "CONTAINS",
       "drydocs/internal/dsi-reference/README.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/ALIGNMENT-PLAN.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/CONFLUENCE-TRANSCRIPT.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/README.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/TRANSCRIPT-1-ONTOLOGY.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/TRANSCRIPT-2-TAXONOMY.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/TRANSCRIPT-3-THOUGHTS-VOCAB.md"
-    ],
-    [
-      "drydocs/internal/fcdo-reference",
-      "CONTAINS",
-      "drydocs/internal/fcdo-reference/TRANSCRIPT-4-MISC.md"
     ],
     [
       "drydocs/internal/glossary",
@@ -39737,7 +39933,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260826.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260826-0254.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40532,6 +40728,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_cdo_crosswalk.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_chain_inputs.py"
     ],
     [
@@ -40733,11 +40934,6 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_external_vendor_scrape.py"
-    ],
-    [
-      "drydocs/tests/unit",
-      "CONTAINS",
-      "drydocs/tests/unit/test_fcdo_crosswalk.py"
     ],
     [
       "drydocs/tests/unit",
@@ -42169,13 +42365,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2384,
+    "files": 2398,
     "edges": 1194,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2667,
+    "rels": 2681,
     "directories": 284
   }
 }
