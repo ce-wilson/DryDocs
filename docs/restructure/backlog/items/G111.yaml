@@ -1,0 +1,31 @@
+id: G111
+epic: component-topology
+title: 'A declared zone whose env variable is set resolves to the untouched default: data_zones._resolve()
+  ignores the env field, and the G81 declared-equals-resolved guard only walks zones that carry a helper'
+type: bug
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/data_zones.py
+- config/data-zones.yaml
+- tests/unit/test_data_zones.py
+- drydocs_core/log_kinds.py
+acceptance: |
+  (a) THE RESOLUTION. `data_zones._resolve()` handles `base: home` and `base: data_root` and nothing else, so the `env:` field a zone declares is read by no code at all. `config/data-zones.yaml`'s `run-logs` zone declares `env: DRYDOCS_LOGDIR`; with that variable set (this desktop sets it, per the local data/log roots), the zone resolves to the default under the home directory while every real log lands elsewhere. After this item, a zone declaring `env:` resolves through that variable when it is set and non-empty, and falls back to `base` + `path` when it is not — the same order `drydocs_core.log_kinds.resolve_root()` already implements for the log root, reused rather than re-derived so the two cannot drift.
+
+  (b) THE GUARD. `tests/unit/test_data_zones.py`'s declared-equals-resolved check walks only zones carrying a `helper`, and `run-logs` has `helper: ~`. A helper-less zone is therefore unguarded, which is why (a) survived G81 and G109. The guard is widened to assert every zone resolves to what the declaration says, helper or not, and the widening is written RED FIRST against the current code with `DRYDOCS_LOGDIR` set — a guard that is green the moment it is written has proven nothing.
+
+  (c) THE READ SURFACE. `drydocs landing-zones` (widened by G109 to report declared zones) shows the `run-logs` row resolving to the same directory `drydocs_core.run_log` actually writes to, verified on a machine where `DRYDOCS_LOGDIR` is set and named in the close note per J18. This is the point of the item: the command exists so "where did my logs go" is a one-command answer, and today it answers confidently and wrongly.
+
+  (d) THE DOCSTRING THAT PREDICTED THIS. `log_kinds.resolve_root()` carries a paragraph naming this exact defect as live next door; it is rewritten to describe the fixed state rather than left asserting something untrue.
+notes: |
+  Groomed 2026-08-26 from Idea-171's residue. Clauses 1, 3 and 4 of that entry were RULED into ADR 0014 on 2026-08-25 and built by G105 (one log root, per-kind declaration, derived grammar, retention read from the declaration); this is the part the ADR does not close. ADR 0014 clause 1 gives the LOG root one resolution site, which is a forward fix for one zone — the bug here is general to any zone declaring `env:`, and the guard gap is general to any helper-less zone.
+
+  Module `drydocs-core` and epic component-topology recorded as a choice: `config/data-zones.yaml` is the declaration but the defect is entirely in the resolver and its guard, which are core. Filing it under `config` would put the item on the shelf where nothing needs to change.
+
+  Mechanism only. No edge semantics, no gate. p2 rather than p1 because nothing loses data — a log lands in the right place today; only the description of where it landed is wrong.

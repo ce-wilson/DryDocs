@@ -1,0 +1,35 @@
+id: G115
+epic: component-topology
+title: The Control-M extracts have no data-center dimension, so a run pulls every data center at once
+  — add the scope bind and write down the per-data-center run recipe
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/sql/controlm_folders.sql
+- drydocs/loaders/sql/controlm_jobs.sql
+- drydocs/loaders/sql/controlm_hosts.sql
+- drydocs/loaders/sql/controlm_avg_run.sql
+- drydocs/loaders/sql/ddl/controlm_staging_ddl.sql
+- drydocs/cli.py
+acceptance: |
+  (a) THE BIND. Neither the folders nor the jobs extract filters on the data center; the scope binds are the folder filter, run-as (jobs only), developer SID and row cap, built by the CLI scope-bind helper and exposed as four options. A data-center bind joins them across the Control-M extract family (folders, jobs, variables, hosts, avg-run), optional and absent-means-all so no existing invocation changes behaviour, with the option name and the bind name matching the existing idiom rather than inventing a new one.
+
+  (b) THE RECIPE IS DECIDED AND WRITTEN DOWN. The DBA staging script already carries a data-center column on every staging table, a composite index, and a run row whose data-centers field is a comma list — so both shapes are expressible: one run per data center, or one run naming several. The item CHOOSES one, states the reason, and records it where an operator will read it (the load runbook), because leaving it expressible-but-undecided is how the first real load invents a third shape.
+
+  (c) THE PRODUCTION SCOPE IS NAMED IN THE PUBLISHABLE SPELLING. Three production data centers, run one at a time; the publishable spellings carry the J13 environment-letter swap and the real values stay in the internal data-center inventory. No real value enters this repo.
+
+  (d) FIXTURES AND GUARDS. The bundled samples exercise the new bind in both states (set and absent); the SQL-parse drift guard still passes with the added predicate; `drydocs --help` is not parsed by any test added here (J37 — assert against the registered command objects).
+
+  (e) THE PRECONDITION IS STATED, NOT SILENTLY ASSUMED. Building the bind is safe today, but the FIRST multi-data-center LOAD is blocked on P6 (the identity-collision probe): graph identity for a folder is the folder id plus job id with no data-center component, so a table id reused across data centers would merge two different folders into one node. The acceptance is met only if that precondition is written into the runbook section this item touches, naming P6.
+notes: |
+  Groomed 2026-08-26 from Idea-169 (user direction 2026-08-24). Measured rather than recalled in the entry: the raw object row counts run from 76 thousand to 4.7 million, the current extract scope already cuts jobs to roughly 240 thousand across four data centers, and the per-data-center split runs a few thousand folders and tens of thousands of jobs each — so per-data-center is a fraction of the estate and the variables object is what actually forces staging, not jobs.
+
+  Module `drydocs-load` and epic component-topology recorded as a choice with alternatives considered: runtime-topology (Epic P) owns the CM_HOSTS and CM_AVG_RUN supplements rather than extraction scope, and source-column-mappings (Epic N) owns the column ledgers rather than the pull. The work is in the loader SQL and the CLI, so it lands with the component that holds them.
+
+  p1 because it gates the first real estate-scale load and the user has already given the direction. opus rather than sonnet because clause (b) is a decision with an operational consequence, not a transcription.

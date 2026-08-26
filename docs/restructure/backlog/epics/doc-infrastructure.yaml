@@ -2,4 +2,10 @@ id: doc-infrastructure
 letter: L
 title: doc infrastructure
 order: 11
-groom_log: []
+groom_log:
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Idea-166. The load runbook's CSV example names a directory that
+    has never existed producer-side, so the step teaches a company-shaped path as a local one.
+    The forbidden fix is stated in the acceptance: do not create the directory here.
+  attached_at: L29

@@ -1,0 +1,36 @@
+id: O68
+epic: web-console
+title: 'The admin page should show the log estate: directory, path, size and capacity per kind — and
+  must not render debug-tier Cypher until that display is reviewed'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G111
+inputs:
+- web/src/
+- drydocs_core/data_zones.py
+- drydocs_core/log_kinds.py
+- config/log-kinds.yaml
+acceptance: |
+  (a) THE PANEL. The admin configuration page (O12) gains a log-estate panel: per declared kind and per declared zone, the directory, the resolved path, the file count, the total size, and the declared retention. It is a PANEL on that existing surface, not a new page — the SME placed it there rather than in a new epic.
+
+  (b) THE DATA MOSTLY EXISTS, SO MOST OF THIS IS WIRING. G109 shipped a zone inventory returning present/absent plus a file count per declared zone, and the landing-zones command already emits manual and declared zones as one document with path, mode, base, in-repo, exists, file count and empty. The panel needs a read endpoint over that, not new collection. The ONE genuinely missing field is capacity — the inventory counts files and does not sum bytes — so a total-bytes value is added beside the count in CORE, not computed in the API and not in the browser.
+
+  (c) THE DEBUG TIER IS REPORTED, NEVER RENDERED. ADR 0014 clause 6 as ruled splits the lean, longer-retention API log from a verbose short-retention debug log that carries Cypher text and request detail. CAPTURING that text is ruled; SURFACING it in a console is NOT, and they are different risks — a short-lived file on an operator's disk versus a rendered page. This panel may report the debug kind's SIZE and RETENTION like any other kind and MUST NOT render its contents. Anything that would display it is blocked on the SME review, which is a separate ruling and not this item's to make.
+
+  (d) IT DOES NOT SHIP A KNOWN-WRONG ROW. G111 is a hard dependency, not a courtesy: today the run-logs zone resolves to the default whenever the log-directory variable is set, so a panel built before that fix would confidently show the wrong directory for exactly the kind the SME most wants to see.
+
+  (e) WHY A PANEL AND NOT JUST THE CLI, stated in the panel's own copy or its PR note: the command exists so "my extracts are gone" is a one-command answer, and the person most likely to ask is on a machine where the CLI is not the habitual surface. Post-retention it answers the same question for logs — days declared against days actually on disk.
+notes: |
+  Groomed 2026-08-26 from Idea-172 (SME direction 2026-08-25, given alongside the ADR 0014 retention rulings). Epic O and the admin page are the SME's own placement.
+
+  Module `drydocs-web` recorded as a choice: the item spans three modules — the total-bytes field is core, the read endpoint is api, the panel is web — and it is filed against the surface the SME asked for. Whoever takes it should keep the core slice in core (clause b) rather than letting a byte sum drift into the API layer, which is the seam the module boundary exists to protect.
+
+  The Cypher-display question in clause (c) is an SME review, parked as a question in the inbox at this groom and named in the groom report; the item is complete without it and stays blocked on it for that one behaviour only.
+
+  p2/sonnet: the data exists, the acceptance names the one new field, and the single hard rule (no debug content) is stated in the negative so it is testable.

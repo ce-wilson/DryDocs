@@ -1,0 +1,30 @@
+id: S15
+epic: structure-remediation
+title: Four tests pass in the full suite and fail when their file runs alone — a circular import between
+  a CLI domain module and the composition root, hidden by import order
+type: bug
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_repo_paths.py
+- drydocs/cli_docs.py
+- drydocs/cli.py
+acceptance: |
+  (a) THE FILE PASSES ALONE. Running `tests/unit/test_repo_paths.py` on its own currently gives four failures, all a partially-initialized-module error on a CLI domain module, from the parametrized content-defaults cases. In the full suite something imports the composition root first and the cycle resolves, so the failure is invisible. After this item the file passes both alone and in the suite, and the close note shows both runs.
+
+  (b) THE FIX DOES NOT LOOSEN THE BOUNDARY. The likely fix is an import-order-independent accessor in the TEST rather than a change to the module graph; if the fix instead touches the boundary test's entrypoint exemption, that is a different decision and needs saying out loud with a reason, not slipping in under a test fix.
+
+  (c) THE SIBLINGS ARE CHECKED. The S8 split produced several CLI domain modules, not just the one that happens to be parametrized here. Whoever takes it checks the others for the same shape and states the result — fixing only the two parametrized ones leaves the same trap for the next module someone adds to the list.
+
+  (d) THE CYCLE IS NAMED EVEN IF IT IS NOT DISSOLVED. The import graph is telling the truth about a real coupling between the domain module and the composition root. If the item does not remove that coupling, it records it where the next reader meets it, so a future reader does not re-derive the diagnosis from four confusing failures.
+notes: |
+  Groomed 2026-08-26 from Idea-159. Verified PRE-EXISTING at origin/main and still live: reproduced at this groom on the desktop (2026-08-26) — 4 failed, 45 passed running that file alone, the same four parametrized cases the entry names. Not introduced by G79.
+
+  Why it is worth fixing rather than tolerating: a developer narrowing to one file to iterate gets four red tests that have nothing to do with their change, which trains people to ignore red.
+
+  Epic structure-remediation and module `drydocs-load` follow S8, which performed the CLI split that produced this shape. p2/sonnet.

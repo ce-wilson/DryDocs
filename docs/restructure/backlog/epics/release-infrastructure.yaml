@@ -96,3 +96,12 @@ groom_log:
     it. A sweep of every other citation of the tombstone across the item files found them all
     in DONE items, where naming the old path is correct history — J42 was the only live one.
   attached_at: J42
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Ideas 158 and 163. J53 the snapshot script's board refresh, whose
+    catch block can never name a cause (it prints the first stderr line, which for Python is
+    always the traceback banner) and whose partial run is indistinguishable from a skipped one
+    — the Idea-111 shape inside the ritual step added to prevent it. J54 the VERSIONING.md
+    currency fix only; the v0.3.0 tag disposition and whether a v0.4.0 is owed stay user
+    decisions and are parked as an inbox question.
+  attached_at: J53

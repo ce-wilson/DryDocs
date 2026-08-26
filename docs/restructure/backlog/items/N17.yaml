@@ -1,0 +1,31 @@
+id: N17
+epic: source-column-mappings
+title: The derived join key ripple sweep is now desk work — say which psgmgr objects carry it, and record
+  the answer in the column ledger rather than a new document
+type: chore
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/source-mappings/psgmgr.yaml
+- config/source-registry.yaml
+acceptance: |
+  (a) THE ANSWER READS OFF THE LEDGER, NOT A LOGIN. When this parked on 2026-07-14 it needed live queries. Doc 08 Phase 2 (2026-08-25) has since censused all seven psgmgr objects with complete column inventories, so the question — which other CM_ objects carry the derived folder-id-plus-job-id key, as join-upgrade candidates over the weaker scheduling-table and member-name joins — is answerable from `config/source-mappings/psgmgr.yaml` alone. No internal session, no live probe.
+
+  (b) THE KNOWN NEGATIVE IS CARRIED FORWARD, NOT RE-DISCOVERED. CM_AVG_RUN carries no such key; the 2026-07-22 relay proved it. The outcome must state that explicitly rather than leaving a reader to wonder whether it was checked.
+
+  (c) IT LANDS IN THE LEDGER. The result is recorded in the existing column-ledger fields for each object, not in a new document. A new doc for one fact is how doc 08 grew the drift the ledger was built to kill.
+
+  (d) A CANDIDATE IS A CANDIDATE. Naming an object as a join-upgrade candidate does NOT change any loader SQL and must not — an actual join change is a separate item against the loader, with its own coverage evidence.
+notes: |
+  Groomed 2026-08-26 from Idea-174 clause 2, which explicitly re-reads this as desk work now that the census landed. The entry's own disposition line ("fold the outcome into the column ledger rather than a new doc") is clause (c).
+
+  Module `config` and epic source-column-mappings because the ledger is the artifact; phase 11 with the rest of doc 08.
+
+  Deliberately NOT merged into G115: that item is the extraction bind, this is a ledger fact, and they share nothing but the source system.
+
+  p2/sonnet: the acceptance is a reading task against a file that is already complete.

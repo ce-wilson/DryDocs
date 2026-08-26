@@ -93,86 +93,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-176`** · 2026-08-25 · `[idea]` · **open — deliberately left out of G92, which scoped itself to file-op operands** · prio? **Med** —
-  **G92 put a resolved scope chain in the Control-M extractor, and exactly one
-  consumer uses it.** The chain is now built once per run (`_build_scope_chains`) and
-  `_resolve_shell` runs shell text through the one core resolver before the file-op
-  parse. Two other places in the SAME extractor still read RAW values and would be
-  strictly better with it:
-  **(1) THE G97 ARTIFACT PASS.** `_artifact_pass` skips any `ETL_ARTIFACT_URI` whose
-  value still holds a `%%ref` and counts it as `artifact_values_unresolved`. Many of
-  those are resolvable right now — the chain is already in hand two methods away. This
-  was NOT folded into G92 because G92's acceptance is explicit about file-op operands
-  and its counters are file-op counters; widening it would have silently changed G97's
-  tested numbers in the same commit that established them.
-  **(2) INVOCATION TARGETS.** The CMD_LINE pass deliberately still parses the VERBATIM
-  command for invocations (G92 resolves only the file-op half). That was the right call
-  and should stay a decision rather than drift: invocation identity is already
-  env-stabilised by `_stable_invocation_key` (DPL pipeline GUID, Ab Initio basename),
-  and re-keying it on resolved text would move a signed ruling (cmdline-lineage-review
-  2026-07-16). If this is ever revisited it is a GATE question, not a build.
-  **WHAT IS ALREADY TRUE AND NEEDS NOTHING:** the resolve counters
-  (`resolve_resolved` / `residue` / `unresolved` / `nothing_to_substitute` /
-  `no_scope_chain`) ride the existing `ExtractCoverage` summary line, so the yield of
-  any widening is measurable in the place the other counters already land.
-
-- **`Idea-175`** · 2026-08-25 · `[idea]` · **open — the consumer half of G56; G56 itself is done and deliberately stopped at the collector + extractor** · prio? **Med** —
-  **G56 now DERIVES `storage_scope`, but the two places that act on multi-host
-  identity still behave as if it were always `unknown`.** Left out of G56 on purpose:
-  that item's acceptance and inputs are the collector and the extractor, and this is a
-  CLAIM-LAYER change with its own judgment in it.
-  **(1) THE STALE FLAG.** `drydocs_lineage/writer.py` computes
-  `unconfirmed = len(node_hosts) > 1` and stamps `identity_unconfirmed_across_hosts`
-  without reading scope at all. Under the D1 ruling + the D-amendment that is right for
-  `local` and `unknown` and WRONG for `shared`: one NFS export seen on twenty hosts is
-  one file, and flagging it queues twenty non-findings for SME review. The two comments
-  that say "until G56 lands" (writer.py, at the `storage_scope` setdefault and at the
-  `unconfirmed` line) were re-pointed here at the G56 build rather than left reading
-  false; the LOGIC is untouched, so nothing changed behaviour.
-  **(2) THE CAVEAT THAT MAKES IT MORE THAN A ONE-LINER, and the reason it is not a
-  trivial fix.** `storage_scope: shared` does NOT by itself prove two hosts see the SAME
-  file — two hosts can both mount nfs4 at `/home/svc` from DIFFERENT exports. Confirming
-  identity needs MOUNT SOURCE equality (`synthfiler01:/export/apps` on both), and the
-  source is captured in `mounts.tsv` and stamped as `mount_source` on every record
-  precisely so this is cheap when it is picked up. So the rule is three-way, not two:
-  shared AND same mount_source → confirmed · shared but DIFFERENT source → still
-  unconfirmed (and worth its own count, since it is a real finding) · local or unknown →
-  unconfirmed, unchanged.
-  **(3) DOWNSTREAM ALREADY WORKS AND NEEDS NOTHING.** `drydocs_lineage/archival.py`
-  reads `storage_scope` off the occurrence records and gates the misdeployment bucket on
-  `local` (G58 §c) — it was written against this shape and goes live on real values with
-  no edit. Named here so a groom does not re-open it.
-
-- **`Idea-174`** · 2026-08-25 · `[task]` · **open — INTERNAL-ONLY work (both probes run on live psgmgr); re-homed from the retired 2026-07-16 internal-session checklist, whose other seven items were all owned or superseded** · prio? **High** —
-  **Two live-psgmgr probes lost their only home when `docs/next-internal-session.md`
-  retired, and one of them BLOCKS any multi-DC load.** The checklist was the recorded
-  owner (its own audit trail says the DC-collision check was "ALREADY ROUTED to the
-  internal-session checklist"), so deleting it without this capture would have dropped
-  them silently.
-  **(1) DC-COLLISION IDENTITY CHECK — HIGH (advisor-confirmation §2a).** One query:
-  `SELECT TABLE_ID, COUNT(DISTINCT DATA_CENTER) FROM psgmgr.CM_DEF_VTAB GROUP BY TABLE_ID
-  HAVING COUNT(DISTINCT DATA_CENTER) > 1;` Staging keys by `(data_center, folder_id,
-  job_id)` but graph identity is `(folder_id, job_id)` — zero rows means document the
-  uniqueness invariant in `controlm_folders.cypher`; ANY rows mean cross-DC nodes
-  silently merge and the fix is an IDENTITY change (data_center into the folder + job
-  keys) → HITL gate + constraint migration. The single-DC pilot structurally cannot
-  expose this, and it has become MORE urgent, not less: the 2026-08-24 SME direction
-  (Idea-169/170) commits to per-DC extraction over THREE DCs, which is exactly the
-  regime where a TABLE_ID reused across DCs merges two different folders into one node.
-  Run it BEFORE the first multi-DC load, not after.
-  **(2) ctlm_id RIPPLE SWEEP — now DESK WORK, no login needed.** Which other CM_ views
-  carry the derived `ctlm_id` (folder_id.job_id), as join-upgrade candidates over the
-  weak SCHED_TABLE / JOB_MEM_NAME joins? When this parked (2026-07-14) it needed live
-  queries; doc 08 Phase 2 (step 220, 2026-08-25) has since censused all seven psgmgr
-  objects with complete column inventories, so the answer now reads off
-  `config/source-mappings/psgmgr.yaml` — with the one known negative already recorded
-  (CM_AVG_RUN carries NO ctlm_id; the 2026-07-22 relay proved it). Fold the outcome into
-  the column ledger rather than a new doc.
-  Checklist disposition for the record: items 1/6 were ticked done; 2 (E1), 8
-  (software-usage-patterns) stay owned by their live item and the pending-gates list; 3
-  superseded by K6/K16/K17; 7 by G12/G13/G22/G23; 9 by M3's signed gates.
-
-- **`Idea-173`** · 2026-08-25 · `[bug]` · **open** · prio? **High** —
+- **`Idea-173`** · 2026-08-25 · `[bug]` · **open — the two ACTIONABLE halves LANDED 2026-08-25 (database-inventory.md at ede62d44; the alias-in-prose sweep + SME ruling at f22da676). What stays open is the GENERALIZATION: a canonical-producer file has no company-writable surface, so a company-side fact about a company-side system still has nowhere to live** · prio? **High** —
   **A company session recorded a census on `config/source-registry.yaml`, which is
   `canonical-producer` — so the next port deletes it.** Not hypothetical and not a
   criticism of that session: it asked the right question, got the right answer for
@@ -231,7 +152,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   mention is a connection mechanism that loses its point if generalized. Same shape as
   the four J13 classes — the assistant proposes, the SME rules.
 
-- **`Idea-172`** · 2026-08-25 · `[idea]` · **open — groom into EPIC O (SME placement); the UI-display half is a TOP-OF-LIST review, not a build** · prio? **High** —
+- **`Idea-172`** · 2026-08-25 · `[idea]` · **groomed → O68 (2026-08-26); the debug-tier Cypher DISPLAY question stays an SME review and is top of the review list — O68 may report that kind's size and retention and may not render its contents** · prio? **High** —
   **The console admin page should surface the log estate: directory, path, size and capacity per
   kind.** SME direction, 2026-08-25, given alongside the ADR 0014 retention rulings. Epic O already
   owns the console and an admin config-traceability lens, and the SME placed this there rather than
@@ -261,71 +182,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   whenever `DRYDOCS_LOGDIR` is set, so a panel built today would confidently show the wrong
   directory for exactly the kind the SME most wants to see. Fix that first or the panel ships a
   known-wrong row.
-
-- **`Idea-171`** · 2026-08-24 · `[idea]` · **open — clauses 1/3/4 were RULED into ADR 0014 (2026-08-25); the `data_zones._resolve()` env-field gap is the un-consumed residue and needs its own item** · prio? **Med** —
-  **Logging is configurable globally or not at all; it needs to be configurable BY KIND, and
-  `kind` is not yet a thing the code knows about.** User direction, 2026-08-24, taken while
-  reviewing ADR 0014 clause 3. MEASURED FIRST (desktop, `C:\coding\projects\logs\DryDocs`,
-  J18): 86 files / 396 KB in one flat directory — 84 loader run logs plus a 2-file graph-QA
-  ledger (54 entries, 18.9 KB, 40 `llm_call` + 14 `run` lines over 14 run ids). One directory,
-  one level, no retention, and the level field is read by nothing.
-  **WHY IT CANNOT BE CONFIGURED TODAY:** `kind` is a filename convention, not a code concept.
-  Three independent sites mint it and none of them agree to anything —
-  `run_log.py:147` hardcodes the literal `load.` prefix, `llm_ledger.py` hardcodes
-  `qa.graph_qa`, and `sql_run_log` accepts a caller-supplied `base_name` with no prefix
-  enforcement at all, so that family can currently write any kind it likes. Nothing can be
-  configured per kind while no declaration says what the kinds ARE.
-  **TWO FINDINGS THAT CAME OUT OF THE SAME MEASUREMENT, both worth carrying into the build.**
-  (1) ADR 0014 clause 3's naming rule `<kind>.<name>.<YYYYmmdd-HHMMSS>` matches **5 of 86
-  files**. The other 79 read `load.<name>.v1.<ts>.log` — and the `v1` is INSIDE `loader_name`,
-  not a fourth field, so the rule is not wrong by one segment, it is describing the wrong
-  shape. The ledger is therefore not "the one exception" the clause calls it; the clause was
-  drafted without counting.
-  (2) The `run-logs` zone in `config/data-zones.yaml` declares `env: DRYDOCS_LOGDIR` and
-  `data_zones._resolve()` ignores the field entirely, handling only `base: home` and
-  `base: data_root`. With the variable set, the zone resolves to the untouched default
-  (`~/logs/DryDocs`, 11 stale files) while every real log lands elsewhere — and G81's
-  declared-equals-resolved guard misses it because that guard only walks zones with a
-  `helper`, which `run-logs` has as null. G109 made this WORSE by widening
-  `drydocs landing-zones` to report the zone: it was invisible before and is now reported
-  confidently and wrongly, which is the exact failure that command exists to prevent. The
-  root-resolution half of this proposal fixes it by construction, and the guard gap needs
-  closing whether or not the rest lands.
-  **PROPOSED SHAPE — `config/log-kinds.yaml`, schema `drydocs.log-kinds.v1`,** following the
-  `config/data-zones.yaml` idiom this repo already uses (declare in YAML, resolvers derive,
-  a guard asserts they agree). One `root` block carrying base/path/env — one place resolves
-  the variable, so finding (2) cannot recur. A `defaults` block (level, retention_days,
-  rotation `per-run|per-day`, format `log|jsonl`, dir). Then one entry per kind naming its
-  `writer`, overriding only what differs: `load` inherits everything; `qa` takes
-  `rotation: per-day`, `format: jsonl` and a longer retention, because it is an append-only
-  ledger whose `run` line is the ONLY place full question text lands (`:AgentRun` carries
-  sha256 + length), so its value is that one file reads end to end; `sql` is declared so the
-  family that accepts any `base_name` becomes checkable; `api` is declared
-  `status: planned` for ADR 0014 clause 6, so the kind exists before its writer does.
-  Optional per-kind `dir:` and a `DRYDOCS_LOGDIR_<KIND>` override generalize the sister
-  project's `<INTEGRATION>_LOG_DIR` pattern that Idea-152 captured.
-  **THE GRAMMAR THEN DERIVES INSTEAD OF BEING ASSERTED:** `<kind>.<name>.<stamp>.<ext>`,
-  where stamp granularity comes from `rotation` and `ext` from `format`. Under that,
-  `qa.graph_qa.20260820.jsonl` is CONFORMING rather than excepted — which dissolves ADR 0014
-  clause 3's self-flagged weakness ("one exception in a naming rule is how naming rules die")
-  without needing the exception at all. `<name>` stays free-form, which is what makes the 79
-  `.v1` files conforming too.
-  **Relationship to the ADR chain, so this is not groomed as a duplicate:** ADR 0014 clause 1
-  gives ONE `RuntimeSettings` group with a single `log_dir`/`log_level`/`log_retention_days`.
-  This is that clause widened from one global set to a per-kind declaration, and it should be
-  ruled ON the ADR rather than after it — G105 implements clause 1 and would otherwise build
-  the global shape first and have it widened immediately. Clause 3 is superseded by the
-  derived grammar above. Not started; no code written.
-  **OUTCOME 2026-08-25:** ruled into ADR 0014 as amendments to clauses 1 (per-kind
-  declaration), 3 (derived grammar, ledger exception withdrawn) and 4 (retention read from
-  the declaration), with G105's acceptance given a rider so it builds the amended shape.
-  **WHAT STAYS OPEN, and it is not covered by any of those:** `data_zones._resolve()`
-  ignores a zone's `env:` field, and G81's declared-equals-resolved guard only walks zones
-  carrying a `helper`, so `run-logs` (helper null) is unguarded and resolves to the wrong
-  directory whenever DRYDOCS_LOGDIR is set. The ADR's clause 1 fixes the class by giving
-  the log root ONE resolution site, but that is a forward fix: the guard gap and the
-  currently-wrong zone need closing on their own, and `drydocs landing-zones` reports that
-  zone confidently and wrongly until they are. Groom as a separate item.
 
 - **`Idea-170`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
   **The one-sided allocator partition bit: a company inbox capture landed with NO id at
@@ -363,50 +219,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   **Producer-side action: none** — all four guards are green here, and the id this entry
   carries was minted by them. Captured so the next port relays a finding instead of
   rebuilding it.
-
-- **`Idea-169`** · 2026-08-24 · `[task]` · **open** · prio? **High** —
-  **The Control-M extracts have no data-center dimension, and the estate is too big to pull
-  in one go — they need to run individually, per DC, in stages.** *(User direction
-  2026-08-24.)* **MEASURED, not recalled:** neither `controlm_folders.sql` nor
-  `controlm_jobs.sql` filters on `DATA_CENTER`. The scope binds are `:folder_filter`,
-  `:run_as` (jobs only), `:developer_sid` and `:row_cap` — built by `_scope_binds()`
-  (`drydocs/cli.py`) and exposed as `--folder` / `--run-as` / `--developer-sid` /
-  `--row-cap`. The siblings are the same: variables share those four,
-  `controlm_hosts.sql` has `:grpname_filter` + `:row_cap`, `controlm_avg_run.sql` has
-  `:folder_filter` + `:row_cap`. So a run today pulls **every** DC present in
-  actively-scheduled folders, and `controlm_folders.cypher` mints one `:ControlMServer`
-  per distinct `DATA_CENTER` — non-production included. `--folder` is the only lever and
-  it filters the wrong axis.
-  **THE SCOPE:** three production data centers, run one at a time — `T012-E0700-IB`,
-  `T014-E0700-ANY`, `T032-E0700-DMA` in the publishable spelling (the J13 environment-letter
-  swap; real values live in `internal/standards/technology/data-center-inventory.md`).
-  **WHY STAGING IS NOT OPTIONAL, with the numbers the 2026-08-24 census produced:** raw
-  object sizes are CM_DEF_VJOB 1,089,358 rows · CM_DEF_LNKI_P_VW 1,293,560 ·
-  CM_DEF_LNKO_P_VW 1,318,968 · CM_DEF_SETVAR_VW **4,716,529** · CM_DEF_VTAB 76,364. The
-  extract scope (`IS_CURRENT_VERSION = 'Y'` + `USER_DAILY IS NOT NULL`) already cuts jobs to
-  ~240,600 across four DCs, and the per-DC split (internal twin, capture 2026-06) runs
-  2,230–7,914 folders and 42,688–85,202 jobs per DC — so **per-DC is a fraction of the
-  estate, and variables is the object that actually forces staging**, not jobs.
-  **THE DBA ASK IS ALREADY WRITTEN, AND IT IS ALREADY DC-SHAPED:**
-  `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` is a DBA implementation script —
-  Section 0 pre-flight (is `TABLE_ID` unique across DCs? the design assumes the composite
-  key defensively), Section 1 base read views, `stg_run.data_centers` ("comma list processed
-  this run"), every staging table carrying `(run_id, data_center, folder_id, job_id)` with a
-  `(data_center, folder_id, job_id)` index, Section 6 grants, full-refresh load pattern,
-  sizing < 3M rows / < 2 GB with no partitioning needed. **"Dictate what we need" = hand
-  them that file.** What it does NOT yet carry is a per-DC RUN RECIPE (one run per DC vs one
-  run listing three), and `stg_run.data_centers` is a comma list, so either shape is
-  expressible — the choice needs writing down before the first load.
-  **NOT BUILT, deliberately:** no `:data_center` bind was added. The mechanism is cheap and
-  changes no projection (one NULL-tolerant bind per extract + `_scope_binds()` +
-  `--data-center`; the ledger and the SQL drift guard are untouched because the column set
-  does not move), but **which** DCs load is the SME's scope call, and the 22-vs-4 residual
-  under gate `controlm-hosts-topology` is still open.
-  **THE FOURTH DC — ANSWERED 2026-08-24 (user):** `T021-E0800-ANY`, the largest by folder
-  count, is a **deliberate scope cut, not an omission** — the graph and the UI get exercised
-  against the three-DC load before more is ingested. So the order is test-then-widen, and the
-  three DCs are a first cut rather than the final estate; nothing here rules the DC scope
-  call (`controlm-hosts-topology`), which stays the SME's.
 
 - **`Idea-168`** · 2026-08-24 · `[chore]` · **parked → next internal session** · prio? **Med** —
   **The Control-M profiling numbers are company-estate figures, and every threshold derived
@@ -456,26 +268,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   catalog-only path; and the DC scope call is still the SME's. The per-DC extraction
   requirement those row counts drive is [[Idea-169]].
 
-- **`Idea-166`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
-  **The load runbook's `--csv` example points at a path that exists nowhere in this repo.**
-  `docs/design/drydocs-load-runbook.md` step 3 reads
-  `poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv`, but
-  `internal/org/` holds exactly one file here (`product-overview.md`, from `36ae3828`) and
-  `internal/org/catalog/` has never existed producer-side. Every other producer mention of
-  that directory is a reference to the COMPANY's copy, not ours — `C26`'s divergence
-  ledger, `reconcile-port/SKILL.md`, `30-mappings-catalog.yaml`, and the 2026-07-27 inbox
-  line — all citing their 2026-06-25 catalog gate page. So the runbook teaches a
-  company-shaped path as if it were a local one, in a doc classified Internal-Public on the
-  grounds that it carries bundled sample data only. **Found the honest way:** a company
-  session hit the same line, could not find the file, and spent a session tracing why its
-  catalog folder kept reverting — the answer had nothing to do with the runbook, but the
-  runbook is where the hunt started. **Disposition, not decided:** either repoint the
-  example at a bundled sample under `drydocs/data/samples/` so a reader can actually run
-  it, or mark it explicitly as a company-side illustration. Do NOT invent an
-  `internal/org/catalog/` here to make the line true — real data never lands in this repo,
-  which is the whole asymmetry. Note the line was touched at load-runbook Rev 3 (annotation
-  only); the path was not examined then.
-
 - **`Idea-167`** · 2026-08-24 · `[question]` · **open** · prio? **Low** —
   **The company's `catalog` supplement declares two more terms than ours, and the gap is
   theirs, not producer staleness.** A company `apply-supplements` run reports
@@ -493,32 +285,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   superseded shape, they want retiring on their side. Producer does nothing until the two
   ids are known — this is a question, not a defect.
 
-- **`Idea-164`** · 2026-08-24 · `[task]` · **open** · prio? **Med** —
-  **The superseded-database guard does not scan the two packages where the stale names
-  actually were.** `tests/unit/test_database_names.py` has scanned six packages since G28
-  (`SCANNED_PACKAGES`), and `agents/` and `drydocs_docmeta/` are not among them — which is
-  precisely where the 2026-08-24 sweep found live-code docstrings naming `ddcontext` and
-  `dddocs`, including one (`agents/common/agent_run_writer.py`) whose module docstring said
-  *"targeting the ruled database — `ddcontext`, NEVER `drydocs`"* twenty lines above a
-  constant reading `drydocs`. The guard could not see either. Separately `SUPERSEDED_NAMES`
-  carries `drydocs_docs` (the docmeta plan's WORKING name) but not **`dddocs`**, the real one
-  that ADR 0006 §1 rejected — so the one name the fold's §C found declared-but-never-provisioned
-  is the one the guard does not blocklist. **Measured before proposing:** running the guard's
-  own line-scan logic over `agents/`, `drydocs_docmeta/`, `scripts/`, `libs/` and `web/` with
-  `dddocs` added returns exactly **four** hits, all four real, no false positives — so the
-  widening is a two-element tuple edit plus one frozenset entry, not a new instrument.
-  **The general form is the part worth keeping:** at the fold, every GUARDED surface followed
-  and nine unguarded ones did not, and the same runbook proves it both ways — Appendix B stayed
-  correct because `test_load_sequence_surfaces.py` derives it, Appendix A drifted because its
-  only stated source is a sentence. A third clause could extend the same scan to a small
-  DECLARED list of operator docs (the `EXTRA_DOCS` idiom in `test_runbook_currency.py`), which
-  would have caught all five doc sites. Deliberately scoped OUT of the sweep commit on the
-  user's call — raised here so the choice is visible rather than lost. Whoever takes it should
-  write the widening RED first and confirm it names the sites before any fix: a guard that is
-  green the moment it is written has proven nothing, which is the same rule N11 already applies
-  to an empty census.
-
-- **`Idea-163`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-163`** · 2026-08-24 · `[bug]` · **open — partially groomed → J54 (2026-08-26, the VERSIONING.md currency half only); the three RELEASE decisions stay the user's — push the v0.3.0 tag as-is or re-cut it post-squash, and whether the accumulated Unreleased section has earned a v0.4.0** · prio? **Med** —
   **`v0.3.0` — the first tagged release — exists only as a local tag on the desktop, and it
   points into orphaned history.** `git ls-remote --tags origin` returns only the six
   `port-base-*` tags, so the annotated tag was never pushed and is absent from
@@ -562,73 +329,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   What does not change either way is the hazard above — `DD1`–`DD9` stay in the producer band
   regardless, so renumbering `DD10` would not close this entry. See [[Idea-170]] for the
   guard half of the same partition.
-
-- **`Idea-160`** · 2026-08-23 · `[task]` · **open** · prio? **Med** —
-  **A SOURCE-mode `refresh-teams` now needs an input file nothing produces.** G79 wired
-  `pat_team_roles` into the team chain (it was gate-confirmed at C9 and had never run),
-  and it binds to `pat:people-report` — so a REAL run,
-  `drydocs refresh-teams --source pat:people-report`, resolves THREE files from that
-  source's landing zone: `dev_teams.csv`, `pat_product_mapping.csv` and now
-  `pat_team_roles.csv`. `scripts/project_pat_team_report.py` (G82) emits only the first
-  two, so the third has no documented way to exist. **Not silent** — G78's resolver
-  fails before the first write, naming the file and the directory searched, which is
-  the whole reason this is a task and not a bug. But the first company-side real run
-  will stop there with no instruction on what to do next, which is a poor place to
-  learn it. Two candidate dispositions, and the item should pick ONE with a reason:
-  extend `pat_projection.py` to emit `pat_team_roles.csv` from the same PAT team report
-  (its ledger, `config/source-mappings/pat-team-report.yaml`, would need the role
-  columns pinned — G82's `--header-map` discipline, spellings fixed at the first real
-  run, never guessed), or declare the file a hand-drop and say so where the operator
-  will look. Scope note: this is G82-adjacent (the projection's coverage), deliberately
-  NOT G79 — the split's job was to wire the loader and it did, fixture mode included
-  (verified live: 6 rows, 0 rejected). FIXTURE mode is unaffected; the bundled
-  `pat_team_roles__sample.csv` ships with the package.
-
-- **`Idea-159`** · 2026-08-23 · `[bug]` · **open** · prio? **Low** —
-  **Four tests pass in the full suite and FAIL when their file runs alone**, which
-  means the suite's green does not mean what a reader assumes it means.
-  `pytest -q tests/unit/test_repo_paths.py` alone gives 4 failures, all
-  `AttributeError: partially initialized module 'drydocs.cli_docs' has no attribute
-  'app' (most likely due to a circular import)` — the parametrized
-  `test_content_defaults_live_under_the_resolved_root[drydocs.cli_docs-*]` cases.
-  In the full suite something imports `drydocs.cli` first and the cycle resolves, so
-  the failure is invisible. **Verified PRE-EXISTING at `origin/main`, not introduced
-  by G79** — found while checking whether the G79 split had broken it, and confirmed
-  by running the same file alone on main (same 4 failures). Why it is worth fixing
-  rather than tolerating: a developer narrowing to one file to iterate gets four red
-  tests that have nothing to do with their change, which trains people to ignore red;
-  and the cycle it exposes is real (`cli_docs` <-> the composition root), so the
-  import graph is telling the truth about a coupling the boundary test permits by
-  the `ENTRYPOINT_MODULES` exemption. Likely fix is an import-order-independent
-  accessor in the test rather than loosening the module boundary. Whoever takes it
-  should check the other `cli_*` domain modules (S8 split them out) for the same
-  shape rather than fixing only the two that happen to be parametrized here.
-
-- **`Idea-158`** · 2026-08-23 · `[bug]` · **open** · prio? **Med** —
-  **`snapshot.ps1`'s board refresh half-failed and reported a traceback with no traceback in it.**
-  At this session's close the ritual printed
-  `WARNING: board refresh skipped: Traceback (most recent call last):` and nothing more, after
-  writing only three of `render_board.py`'s nine outputs (board.html, gates.json,
-  enforcement-matrix.json — then stopping before load-map, software-registry, context-types,
-  remediation-diff, ideas.html and roadmap.html). Run directly in the same tree seconds later the
-  same script completed all nine. **Two separable defects.**
-  **(1) The message is useless by construction.** The catch block
-  (`knowledge/depgraph-snapshots/snapshot.ps1:97`) prints `$_.Exception.Message`, which for a
-  failing NATIVE command is the first line of stderr — and the first line of a Python failure is
-  always the literal `Traceback (most recent call last):`. So the warning can never name a cause:
-  it reports the banner and discards the exception. Capture the command's full stderr and print
-  the LAST line (the exception type and message) or the whole block.
-  **(2) The refresh is "best-effort" and a PARTIAL run is indistinguishable from a skipped one.**
-  The step is wrapped so it never blocks the snapshot, which is right, but a half-written render
-  set is worse than none: the surfaces it did write are current and the six it did not are stale,
-  and the stale-render `git diff --quiet` check in the ritual runs against whatever it produced.
-  Nothing says which outputs landed. This is the Idea-111 shape again — an instrument whose
-  failure mode is silence, inside the ritual step added to stop exactly that.
-  **Root cause on this machine, for the reproduction:** the Claude Code shell pre-sets
-  `VIRTUAL_ENV` to `agents\.venv`, and `poetry run` inside the script inherits it, so the import
-  resolves against the wrong environment partway through. A user's own terminal is unaffected,
-  which is why this has never been seen interactively — and is a second reason the message needs
-  to name the cause rather than the banner. Mechanism-only, no gate.
 
 - **`Idea-154`** · 2026-08-21 · `[bug]` · **open — partially groomed → J52 (2026-08-22, the consequence half: the verify skill gains the session-launched-browser rule + recipe); the two-browser diagnostic that would prove the mechanism needs both machines in hand and stays the user's step** · prio? **Med** —
   **The Claude-in-Chrome extension browser is not trustworthy for console verification on the
@@ -1899,6 +1599,306 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **`Idea-176`** · 2026-08-25 · `[idea]` · **groomed → G112 (2026-08-26); the INVOCATION half is recorded inside G112 as a gate question and deliberately not built** · prio? **Med** —
+  **G92 put a resolved scope chain in the Control-M extractor, and exactly one
+  consumer uses it.** The chain is now built once per run (`_build_scope_chains`) and
+  `_resolve_shell` runs shell text through the one core resolver before the file-op
+  parse. Two other places in the SAME extractor still read RAW values and would be
+  strictly better with it:
+  **(1) THE G97 ARTIFACT PASS.** `_artifact_pass` skips any `ETL_ARTIFACT_URI` whose
+  value still holds a `%%ref` and counts it as `artifact_values_unresolved`. Many of
+  those are resolvable right now — the chain is already in hand two methods away. This
+  was NOT folded into G92 because G92's acceptance is explicit about file-op operands
+  and its counters are file-op counters; widening it would have silently changed G97's
+  tested numbers in the same commit that established them.
+  **(2) INVOCATION TARGETS.** The CMD_LINE pass deliberately still parses the VERBATIM
+  command for invocations (G92 resolves only the file-op half). That was the right call
+  and should stay a decision rather than drift: invocation identity is already
+  env-stabilised by `_stable_invocation_key` (DPL pipeline GUID, Ab Initio basename),
+  and re-keying it on resolved text would move a signed ruling (cmdline-lineage-review
+  2026-07-16). If this is ever revisited it is a GATE question, not a build.
+  **WHAT IS ALREADY TRUE AND NEEDS NOTHING:** the resolve counters
+  (`resolve_resolved` / `residue` / `unresolved` / `nothing_to_substitute` /
+  `no_scope_chain`) ride the existing `ExtractCoverage` summary line, so the yield of
+  any widening is measurable in the place the other counters already land.
+
+- **`Idea-175`** · 2026-08-25 · `[idea]` · **groomed → G113 (2026-08-26) — the three-way rule (shared AND the same mount source = confirmed) is the item's acceptance** · prio? **Med** —
+  **G56 now DERIVES `storage_scope`, but the two places that act on multi-host
+  identity still behave as if it were always `unknown`.** Left out of G56 on purpose:
+  that item's acceptance and inputs are the collector and the extractor, and this is a
+  CLAIM-LAYER change with its own judgment in it.
+  **(1) THE STALE FLAG.** `drydocs_lineage/writer.py` computes
+  `unconfirmed = len(node_hosts) > 1` and stamps `identity_unconfirmed_across_hosts`
+  without reading scope at all. Under the D1 ruling + the D-amendment that is right for
+  `local` and `unknown` and WRONG for `shared`: one NFS export seen on twenty hosts is
+  one file, and flagging it queues twenty non-findings for SME review. The two comments
+  that say "until G56 lands" (writer.py, at the `storage_scope` setdefault and at the
+  `unconfirmed` line) were re-pointed here at the G56 build rather than left reading
+  false; the LOGIC is untouched, so nothing changed behaviour.
+  **(2) THE CAVEAT THAT MAKES IT MORE THAN A ONE-LINER, and the reason it is not a
+  trivial fix.** `storage_scope: shared` does NOT by itself prove two hosts see the SAME
+  file — two hosts can both mount nfs4 at `/home/svc` from DIFFERENT exports. Confirming
+  identity needs MOUNT SOURCE equality (`synthfiler01:/export/apps` on both), and the
+  source is captured in `mounts.tsv` and stamped as `mount_source` on every record
+  precisely so this is cheap when it is picked up. So the rule is three-way, not two:
+  shared AND same mount_source → confirmed · shared but DIFFERENT source → still
+  unconfirmed (and worth its own count, since it is a real finding) · local or unknown →
+  unconfirmed, unchanged.
+  **(3) DOWNSTREAM ALREADY WORKS AND NEEDS NOTHING.** `drydocs_lineage/archival.py`
+  reads `storage_scope` off the occurrence records and gates the misdeployment bucket on
+  `local` (G58 §c) — it was written against this shape and goes live on real values with
+  no edit. Named here so a groom does not re-open it.
+
+- **`Idea-174`** · 2026-08-25 · `[task]` · **groomed → P6 (the data-center collision probe, internal-only, any-rows routes to the gate) + N17 (the ripple sweep, now desk work)** · prio? **High** —
+  **Two live-psgmgr probes lost their only home when `docs/next-internal-session.md`
+  retired, and one of them BLOCKS any multi-DC load.** The checklist was the recorded
+  owner (its own audit trail says the DC-collision check was "ALREADY ROUTED to the
+  internal-session checklist"), so deleting it without this capture would have dropped
+  them silently.
+  **(1) DC-COLLISION IDENTITY CHECK — HIGH (advisor-confirmation §2a).** One query:
+  `SELECT TABLE_ID, COUNT(DISTINCT DATA_CENTER) FROM psgmgr.CM_DEF_VTAB GROUP BY TABLE_ID
+  HAVING COUNT(DISTINCT DATA_CENTER) > 1;` Staging keys by `(data_center, folder_id,
+  job_id)` but graph identity is `(folder_id, job_id)` — zero rows means document the
+  uniqueness invariant in `controlm_folders.cypher`; ANY rows mean cross-DC nodes
+  silently merge and the fix is an IDENTITY change (data_center into the folder + job
+  keys) → HITL gate + constraint migration. The single-DC pilot structurally cannot
+  expose this, and it has become MORE urgent, not less: the 2026-08-24 SME direction
+  (Idea-169/170) commits to per-DC extraction over THREE DCs, which is exactly the
+  regime where a TABLE_ID reused across DCs merges two different folders into one node.
+  Run it BEFORE the first multi-DC load, not after.
+  **(2) ctlm_id RIPPLE SWEEP — now DESK WORK, no login needed.** Which other CM_ views
+  carry the derived `ctlm_id` (folder_id.job_id), as join-upgrade candidates over the
+  weak SCHED_TABLE / JOB_MEM_NAME joins? When this parked (2026-07-14) it needed live
+  queries; doc 08 Phase 2 (step 220, 2026-08-25) has since censused all seven psgmgr
+  objects with complete column inventories, so the answer now reads off
+  `config/source-mappings/psgmgr.yaml` — with the one known negative already recorded
+  (CM_AVG_RUN carries NO ctlm_id; the 2026-07-22 relay proved it). Fold the outcome into
+  the column ledger rather than a new doc.
+  Checklist disposition for the record: items 1/6 were ticked done; 2 (E1), 8
+  (software-usage-patterns) stay owned by their live item and the pending-gates list; 3
+  superseded by K6/K16/K17; 7 by G12/G13/G22/G23; 9 by M3's signed gates.
+
+- **`Idea-171`** · 2026-08-24 · `[idea]` · **groomed → G111 (2026-08-26, the residue only); clauses 1/3/4 were RULED into ADR 0014 on 2026-08-25 and built by G105** · prio? **Med** —
+  **Logging is configurable globally or not at all; it needs to be configurable BY KIND, and
+  `kind` is not yet a thing the code knows about.** User direction, 2026-08-24, taken while
+  reviewing ADR 0014 clause 3. MEASURED FIRST (desktop, `C:\coding\projects\logs\DryDocs`,
+  J18): 86 files / 396 KB in one flat directory — 84 loader run logs plus a 2-file graph-QA
+  ledger (54 entries, 18.9 KB, 40 `llm_call` + 14 `run` lines over 14 run ids). One directory,
+  one level, no retention, and the level field is read by nothing.
+  **WHY IT CANNOT BE CONFIGURED TODAY:** `kind` is a filename convention, not a code concept.
+  Three independent sites mint it and none of them agree to anything —
+  `run_log.py:147` hardcodes the literal `load.` prefix, `llm_ledger.py` hardcodes
+  `qa.graph_qa`, and `sql_run_log` accepts a caller-supplied `base_name` with no prefix
+  enforcement at all, so that family can currently write any kind it likes. Nothing can be
+  configured per kind while no declaration says what the kinds ARE.
+  **TWO FINDINGS THAT CAME OUT OF THE SAME MEASUREMENT, both worth carrying into the build.**
+  (1) ADR 0014 clause 3's naming rule `<kind>.<name>.<YYYYmmdd-HHMMSS>` matches **5 of 86
+  files**. The other 79 read `load.<name>.v1.<ts>.log` — and the `v1` is INSIDE `loader_name`,
+  not a fourth field, so the rule is not wrong by one segment, it is describing the wrong
+  shape. The ledger is therefore not "the one exception" the clause calls it; the clause was
+  drafted without counting.
+  (2) The `run-logs` zone in `config/data-zones.yaml` declares `env: DRYDOCS_LOGDIR` and
+  `data_zones._resolve()` ignores the field entirely, handling only `base: home` and
+  `base: data_root`. With the variable set, the zone resolves to the untouched default
+  (`~/logs/DryDocs`, 11 stale files) while every real log lands elsewhere — and G81's
+  declared-equals-resolved guard misses it because that guard only walks zones with a
+  `helper`, which `run-logs` has as null. G109 made this WORSE by widening
+  `drydocs landing-zones` to report the zone: it was invisible before and is now reported
+  confidently and wrongly, which is the exact failure that command exists to prevent. The
+  root-resolution half of this proposal fixes it by construction, and the guard gap needs
+  closing whether or not the rest lands.
+  **PROPOSED SHAPE — `config/log-kinds.yaml`, schema `drydocs.log-kinds.v1`,** following the
+  `config/data-zones.yaml` idiom this repo already uses (declare in YAML, resolvers derive,
+  a guard asserts they agree). One `root` block carrying base/path/env — one place resolves
+  the variable, so finding (2) cannot recur. A `defaults` block (level, retention_days,
+  rotation `per-run|per-day`, format `log|jsonl`, dir). Then one entry per kind naming its
+  `writer`, overriding only what differs: `load` inherits everything; `qa` takes
+  `rotation: per-day`, `format: jsonl` and a longer retention, because it is an append-only
+  ledger whose `run` line is the ONLY place full question text lands (`:AgentRun` carries
+  sha256 + length), so its value is that one file reads end to end; `sql` is declared so the
+  family that accepts any `base_name` becomes checkable; `api` is declared
+  `status: planned` for ADR 0014 clause 6, so the kind exists before its writer does.
+  Optional per-kind `dir:` and a `DRYDOCS_LOGDIR_<KIND>` override generalize the sister
+  project's `<INTEGRATION>_LOG_DIR` pattern that Idea-152 captured.
+  **THE GRAMMAR THEN DERIVES INSTEAD OF BEING ASSERTED:** `<kind>.<name>.<stamp>.<ext>`,
+  where stamp granularity comes from `rotation` and `ext` from `format`. Under that,
+  `qa.graph_qa.20260820.jsonl` is CONFORMING rather than excepted — which dissolves ADR 0014
+  clause 3's self-flagged weakness ("one exception in a naming rule is how naming rules die")
+  without needing the exception at all. `<name>` stays free-form, which is what makes the 79
+  `.v1` files conforming too.
+  **Relationship to the ADR chain, so this is not groomed as a duplicate:** ADR 0014 clause 1
+  gives ONE `RuntimeSettings` group with a single `log_dir`/`log_level`/`log_retention_days`.
+  This is that clause widened from one global set to a per-kind declaration, and it should be
+  ruled ON the ADR rather than after it — G105 implements clause 1 and would otherwise build
+  the global shape first and have it widened immediately. Clause 3 is superseded by the
+  derived grammar above. Not started; no code written.
+  **OUTCOME 2026-08-25:** ruled into ADR 0014 as amendments to clauses 1 (per-kind
+  declaration), 3 (derived grammar, ledger exception withdrawn) and 4 (retention read from
+  the declaration), with G105's acceptance given a rider so it builds the amended shape.
+  **WHAT STAYS OPEN, and it is not covered by any of those:** `data_zones._resolve()`
+  ignores a zone's `env:` field, and G81's declared-equals-resolved guard only walks zones
+  carrying a `helper`, so `run-logs` (helper null) is unguarded and resolves to the wrong
+  directory whenever DRYDOCS_LOGDIR is set. The ADR's clause 1 fixes the class by giving
+  the log root ONE resolution site, but that is a forward fix: the guard gap and the
+  currently-wrong zone need closing on their own, and `drydocs landing-zones` reports that
+  zone confidently and wrongly until they are. Groom as a separate item.
+
+- **`Idea-169`** · 2026-08-24 · `[task]` · **groomed → G115 (2026-08-26); the first multi-data-center LOAD is gated on P6, which G115's acceptance names** · prio? **High** —
+  **The Control-M extracts have no data-center dimension, and the estate is too big to pull
+  in one go — they need to run individually, per DC, in stages.** *(User direction
+  2026-08-24.)* **MEASURED, not recalled:** neither `controlm_folders.sql` nor
+  `controlm_jobs.sql` filters on `DATA_CENTER`. The scope binds are `:folder_filter`,
+  `:run_as` (jobs only), `:developer_sid` and `:row_cap` — built by `_scope_binds()`
+  (`drydocs/cli.py`) and exposed as `--folder` / `--run-as` / `--developer-sid` /
+  `--row-cap`. The siblings are the same: variables share those four,
+  `controlm_hosts.sql` has `:grpname_filter` + `:row_cap`, `controlm_avg_run.sql` has
+  `:folder_filter` + `:row_cap`. So a run today pulls **every** DC present in
+  actively-scheduled folders, and `controlm_folders.cypher` mints one `:ControlMServer`
+  per distinct `DATA_CENTER` — non-production included. `--folder` is the only lever and
+  it filters the wrong axis.
+  **THE SCOPE:** three production data centers, run one at a time — `T012-E0700-IB`,
+  `T014-E0700-ANY`, `T032-E0700-DMA` in the publishable spelling (the J13 environment-letter
+  swap; real values live in `internal/standards/technology/data-center-inventory.md`).
+  **WHY STAGING IS NOT OPTIONAL, with the numbers the 2026-08-24 census produced:** raw
+  object sizes are CM_DEF_VJOB 1,089,358 rows · CM_DEF_LNKI_P_VW 1,293,560 ·
+  CM_DEF_LNKO_P_VW 1,318,968 · CM_DEF_SETVAR_VW **4,716,529** · CM_DEF_VTAB 76,364. The
+  extract scope (`IS_CURRENT_VERSION = 'Y'` + `USER_DAILY IS NOT NULL`) already cuts jobs to
+  ~240,600 across four DCs, and the per-DC split (internal twin, capture 2026-06) runs
+  2,230–7,914 folders and 42,688–85,202 jobs per DC — so **per-DC is a fraction of the
+  estate, and variables is the object that actually forces staging**, not jobs.
+  **THE DBA ASK IS ALREADY WRITTEN, AND IT IS ALREADY DC-SHAPED:**
+  `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` is a DBA implementation script —
+  Section 0 pre-flight (is `TABLE_ID` unique across DCs? the design assumes the composite
+  key defensively), Section 1 base read views, `stg_run.data_centers` ("comma list processed
+  this run"), every staging table carrying `(run_id, data_center, folder_id, job_id)` with a
+  `(data_center, folder_id, job_id)` index, Section 6 grants, full-refresh load pattern,
+  sizing < 3M rows / < 2 GB with no partitioning needed. **"Dictate what we need" = hand
+  them that file.** What it does NOT yet carry is a per-DC RUN RECIPE (one run per DC vs one
+  run listing three), and `stg_run.data_centers` is a comma list, so either shape is
+  expressible — the choice needs writing down before the first load.
+  **NOT BUILT, deliberately:** no `:data_center` bind was added. The mechanism is cheap and
+  changes no projection (one NULL-tolerant bind per extract + `_scope_binds()` +
+  `--data-center`; the ledger and the SQL drift guard are untouched because the column set
+  does not move), but **which** DCs load is the SME's scope call, and the 22-vs-4 residual
+  under gate `controlm-hosts-topology` is still open.
+  **THE FOURTH DC — ANSWERED 2026-08-24 (user):** `T021-E0800-ANY`, the largest by folder
+  count, is a **deliberate scope cut, not an omission** — the graph and the UI get exercised
+  against the three-DC load before more is ingested. So the order is test-then-widen, and the
+  three DCs are a first cut rather than the final estate; nothing here rules the DC scope
+  call (`controlm-hosts-topology`), which stays the SME's.
+
+- **`Idea-166`** · 2026-08-24 · `[bug]` · **groomed → L29 (2026-08-26)** · prio? **Med** —
+  **The load runbook's `--csv` example points at a path that exists nowhere in this repo.**
+  `docs/design/drydocs-load-runbook.md` step 3 reads
+  `poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv`, but
+  `internal/org/` holds exactly one file here (`product-overview.md`, from `36ae3828`) and
+  `internal/org/catalog/` has never existed producer-side. Every other producer mention of
+  that directory is a reference to the COMPANY's copy, not ours — `C26`'s divergence
+  ledger, `reconcile-port/SKILL.md`, `30-mappings-catalog.yaml`, and the 2026-07-27 inbox
+  line — all citing their 2026-06-25 catalog gate page. So the runbook teaches a
+  company-shaped path as if it were a local one, in a doc classified Internal-Public on the
+  grounds that it carries bundled sample data only. **Found the honest way:** a company
+  session hit the same line, could not find the file, and spent a session tracing why its
+  catalog folder kept reverting — the answer had nothing to do with the runbook, but the
+  runbook is where the hunt started. **Disposition, not decided:** either repoint the
+  example at a bundled sample under `drydocs/data/samples/` so a reader can actually run
+  it, or mark it explicitly as a company-side illustration. Do NOT invent an
+  `internal/org/catalog/` here to make the line true — real data never lands in this repo,
+  which is the whole asymmetry. Note the line was touched at load-runbook Rev 3 (annotation
+  only); the path was not examined then.
+
+- **`Idea-164`** · 2026-08-24 · `[task]` · **groomed → G114 (2026-08-26) — written RED first, per the entry's own rule** · prio? **Med** —
+  **The superseded-database guard does not scan the two packages where the stale names
+  actually were.** `tests/unit/test_database_names.py` has scanned six packages since G28
+  (`SCANNED_PACKAGES`), and `agents/` and `drydocs_docmeta/` are not among them — which is
+  precisely where the 2026-08-24 sweep found live-code docstrings naming `ddcontext` and
+  `dddocs`, including one (`agents/common/agent_run_writer.py`) whose module docstring said
+  *"targeting the ruled database — `ddcontext`, NEVER `drydocs`"* twenty lines above a
+  constant reading `drydocs`. The guard could not see either. Separately `SUPERSEDED_NAMES`
+  carries `drydocs_docs` (the docmeta plan's WORKING name) but not **`dddocs`**, the real one
+  that ADR 0006 §1 rejected — so the one name the fold's §C found declared-but-never-provisioned
+  is the one the guard does not blocklist. **Measured before proposing:** running the guard's
+  own line-scan logic over `agents/`, `drydocs_docmeta/`, `scripts/`, `libs/` and `web/` with
+  `dddocs` added returns exactly **four** hits, all four real, no false positives — so the
+  widening is a two-element tuple edit plus one frozenset entry, not a new instrument.
+  **The general form is the part worth keeping:** at the fold, every GUARDED surface followed
+  and nine unguarded ones did not, and the same runbook proves it both ways — Appendix B stayed
+  correct because `test_load_sequence_surfaces.py` derives it, Appendix A drifted because its
+  only stated source is a sentence. A third clause could extend the same scan to a small
+  DECLARED list of operator docs (the `EXTRA_DOCS` idiom in `test_runbook_currency.py`), which
+  would have caught all five doc sites. Deliberately scoped OUT of the sweep commit on the
+  user's call — raised here so the choice is visible rather than lost. Whoever takes it should
+  write the widening RED first and confirm it names the sites before any fix: a guard that is
+  green the moment it is written has proven nothing, which is the same rule N11 already applies
+  to an empty census.
+
+- **`Idea-160`** · 2026-08-23 · `[task]` · **groomed → K27 (2026-08-26) — the item must pick ONE disposition and say why** · prio? **Med** —
+  **A SOURCE-mode `refresh-teams` now needs an input file nothing produces.** G79 wired
+  `pat_team_roles` into the team chain (it was gate-confirmed at C9 and had never run),
+  and it binds to `pat:people-report` — so a REAL run,
+  `drydocs refresh-teams --source pat:people-report`, resolves THREE files from that
+  source's landing zone: `dev_teams.csv`, `pat_product_mapping.csv` and now
+  `pat_team_roles.csv`. `scripts/project_pat_team_report.py` (G82) emits only the first
+  two, so the third has no documented way to exist. **Not silent** — G78's resolver
+  fails before the first write, naming the file and the directory searched, which is
+  the whole reason this is a task and not a bug. But the first company-side real run
+  will stop there with no instruction on what to do next, which is a poor place to
+  learn it. Two candidate dispositions, and the item should pick ONE with a reason:
+  extend `pat_projection.py` to emit `pat_team_roles.csv` from the same PAT team report
+  (its ledger, `config/source-mappings/pat-team-report.yaml`, would need the role
+  columns pinned — G82's `--header-map` discipline, spellings fixed at the first real
+  run, never guessed), or declare the file a hand-drop and say so where the operator
+  will look. Scope note: this is G82-adjacent (the projection's coverage), deliberately
+  NOT G79 — the split's job was to wire the loader and it did, fixture mode included
+  (verified live: 6 rows, 0 rejected). FIXTURE mode is unaffected; the bundled
+  `pat_team_roles__sample.csv` ships with the package.
+
+- **`Idea-159`** · 2026-08-23 · `[bug]` · **groomed → S15 (2026-08-26); reproduced at that groom on the desktop, 4 failed / 45 passed** · prio? **Low** —
+  **Four tests pass in the full suite and FAIL when their file runs alone**, which
+  means the suite's green does not mean what a reader assumes it means.
+  `pytest -q tests/unit/test_repo_paths.py` alone gives 4 failures, all
+  `AttributeError: partially initialized module 'drydocs.cli_docs' has no attribute
+  'app' (most likely due to a circular import)` — the parametrized
+  `test_content_defaults_live_under_the_resolved_root[drydocs.cli_docs-*]` cases.
+  In the full suite something imports `drydocs.cli` first and the cycle resolves, so
+  the failure is invisible. **Verified PRE-EXISTING at `origin/main`, not introduced
+  by G79** — found while checking whether the G79 split had broken it, and confirmed
+  by running the same file alone on main (same 4 failures). Why it is worth fixing
+  rather than tolerating: a developer narrowing to one file to iterate gets four red
+  tests that have nothing to do with their change, which trains people to ignore red;
+  and the cycle it exposes is real (`cli_docs` <-> the composition root), so the
+  import graph is telling the truth about a coupling the boundary test permits by
+  the `ENTRYPOINT_MODULES` exemption. Likely fix is an import-order-independent
+  accessor in the test rather than loosening the module boundary. Whoever takes it
+  should check the other `cli_*` domain modules (S8 split them out) for the same
+  shape rather than fixing only the two that happen to be parametrized here.
+
+- **`Idea-158`** · 2026-08-23 · `[bug]` · **groomed → J53 (2026-08-26)** · prio? **Med** —
+  **`snapshot.ps1`'s board refresh half-failed and reported a traceback with no traceback in it.**
+  At this session's close the ritual printed
+  `WARNING: board refresh skipped: Traceback (most recent call last):` and nothing more, after
+  writing only three of `render_board.py`'s nine outputs (board.html, gates.json,
+  enforcement-matrix.json — then stopping before load-map, software-registry, context-types,
+  remediation-diff, ideas.html and roadmap.html). Run directly in the same tree seconds later the
+  same script completed all nine. **Two separable defects.**
+  **(1) The message is useless by construction.** The catch block
+  (`knowledge/depgraph-snapshots/snapshot.ps1:97`) prints `$_.Exception.Message`, which for a
+  failing NATIVE command is the first line of stderr — and the first line of a Python failure is
+  always the literal `Traceback (most recent call last):`. So the warning can never name a cause:
+  it reports the banner and discards the exception. Capture the command's full stderr and print
+  the LAST line (the exception type and message) or the whole block.
+  **(2) The refresh is "best-effort" and a PARTIAL run is indistinguishable from a skipped one.**
+  The step is wrapped so it never blocks the snapshot, which is right, but a half-written render
+  set is worse than none: the surfaces it did write are current and the six it did not are stale,
+  and the stale-render `git diff --quiet` check in the ritual runs against whatever it produced.
+  Nothing says which outputs landed. This is the Idea-111 shape again — an instrument whose
+  failure mode is silence, inside the ritual step added to stop exactly that.
+  **Root cause on this machine, for the reproduction:** the Claude Code shell pre-sets
+  `VIRTUAL_ENV` to `agents\.venv`, and `poetry run` inside the script inherits it, so the import
+  resolves against the wrong environment partway through. A user's own terminal is unaffected,
+  which is why this has never been seen interactively — and is a second reason the message needs
+  to name the cause rather than the banner. Mechanism-only, no gate.
 
 - **`Idea-165`** · 2026-08-24 · `[bug]` · **done (2026-08-24)** · prio? **Med** —
   **A SKILL still routes agents into two databases that do not exist**, which is worse

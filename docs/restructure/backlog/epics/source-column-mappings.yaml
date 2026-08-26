@@ -26,3 +26,10 @@ groom_log:
     --- work") + the N4 render's day-one finding. N7 is the DESIGN SESSION bundling
     --- the four coupled registry decisions the J21 close note parked together.
   attached_at: N7
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Idea-174 clause 2. The derived-join-key ripple sweep parked in
+    July needing live queries; the doc 08 Phase 2 census (2026-08-25) made it desk work, so
+    N17 reads the answer off the completed psgmgr ledger and records it there rather than in
+    a new document.
+  attached_at: N17

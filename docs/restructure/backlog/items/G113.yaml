@@ -1,0 +1,31 @@
+id: G113
+epic: component-topology
+title: One shared export seen on twenty hosts is flagged as twenty unconfirmed identities — the multi-host
+  flag must read storage_scope and the mount source, not just the host count
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/writer.py
+- tests/unit/test_lineage_rua_load.py
+acceptance: |
+  (a) THE THREE-WAY RULE, not a two-way one. `drydocs_lineage/writer.py` computes `unconfirmed = len(node_hosts) > 1` and stamps `identity_unconfirmed_across_hosts` without reading scope. G56 now DERIVES `storage_scope` from the collected mount table, so the flag becomes: `shared` AND the same `mount_source` on every host means CONFIRMED (one export on N hosts is one file); `shared` with DIFFERENT mount sources stays unconfirmed AND gets its own count, because two hosts mounting the same path from different exports is a real finding rather than a non-finding; `local` or `unknown` stays unconfirmed exactly as today. Implementing only the first two thirds re-creates the defect in the other direction, so the middle case must be visible in the coverage line, not folded into the general count.
+
+  (b) SCOPE ALONE PROVES NOTHING. The reason this is not a one-line change is that `storage_scope: shared` does not by itself say two hosts see the same file. `mount_source` is stamped on every occurrence record by G56 precisely so the equality test is cheap; the item uses it and does not infer identity from scope alone.
+
+  (c) THE STALE COMMENTS GO. Two comments in `writer.py` currently point forward to this work (at the `storage_scope` setdefault and at the `unconfirmed` computation). They are replaced by the rule as built. The header block near the top of the file that describes the over-flagging also stops describing a live defect.
+
+  (d) DOWNSTREAM IS NOT TOUCHED. `drydocs_lineage/archival.py` already reads `storage_scope` off the occurrence records and gates the misdeployment bucket on `local` (G58 clause c). It was written against this shape and needs no edit; the item must not "helpfully" adjust it.
+
+  Verified on the bundled sample bundles with the multi-host case exercised in both directions (same source, different source), counts stated in the close note.
+notes: |
+  Groomed 2026-08-26 from Idea-175 — the CONSUMER half of G56, left out of that item because its acceptance and inputs were the collector and the extractor while this is a claim-layer change with its own judgment in it.
+
+  Under the D1 ruling and its amendment, the current behaviour is RIGHT for `local` and `unknown` and wrong only for `shared`. This item applies an existing ruling to code; it does not reopen it, and it mints no new relationship type — so it is a build, not a gate. If the middle case (shared, different mount sources) turns out to want a different disposition than "unconfirmed plus a count", that IS a gate question and stops here.
+
+  p2/sonnet: the rule is fully specified above and the inputs are two files.

@@ -28,3 +28,10 @@ groom_log:
     NOT the planned drydocs-docmeta component: that INGESTS docs into the graph; Epic L
     AUTHORS ours. They meet only at L7 (docs-as-context, through the gate).
   attached_at: K9
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Idea-160. G79 wired the team-roles loader into the team chain, so
+    a real source-mode refresh resolves three files from the PAT people-report landing zone
+    while the G82 projection emits two. K27 picks one disposition with a reason — extend the
+    projection, or declare the file a hand-drop and say so where the operator will look.
+  attached_at: K27

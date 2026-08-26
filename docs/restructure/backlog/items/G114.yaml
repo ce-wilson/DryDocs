@@ -1,0 +1,32 @@
+id: G114
+epic: component-topology
+title: The superseded-database guard does not scan the two packages where the stale names actually were,
+  and does not blocklist the one name that was declared but never provisioned
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_database_names.py
+- agents/
+- drydocs_docmeta/
+acceptance: |
+  (a) THE SCAN WIDENS. `SCANNED_PACKAGES` has held six packages since G28 and includes neither `agents/` nor `drydocs_docmeta/` — which is exactly where the 2026-08-24 sweep found live-code docstrings naming the retired databases, including one whose module docstring instructed the reader to target a database twenty lines above a constant naming the right one. Both packages join the tuple.
+
+  (b) THE BLOCKLIST GAINS THE NAME THAT WAS NEVER REAL. `SUPERSEDED_NAMES` carries the docmeta plan's WORKING name but not the name ADR 0006 section 1 actually rejected — the one the 2026-08-18 fold found declared-but-never-provisioned. It is added, with the same one-line comment idiom the other five entries use.
+
+  (c) WRITTEN RED FIRST. The widening is committed in a state that FAILS and names its sites before any source file is touched; the close note states which files and lines it named. A guard that is green the moment it is written has proven nothing — the same rule N11 applies to an empty census.
+
+  (d) THE SURVIVORS ARE DELIBERATE, NOT SWEPT. The existing escape (a line that says the name is superseded is allowed) is the intended disposition for the historical mentions already re-pointed on 2026-08-24; each surviving mention keeps or gains that wording rather than being deleted. No false positives: the close note states the final offender count is zero and that no allowance was widened to get there.
+
+  (e) OPTIONAL THIRD CLAUSE, TAKE IT OR RECORD THE REFUSAL. Extending the same line-scan to a small DECLARED list of operator docs (the extra-docs idiom `test_runbook_currency.py` already uses) would have caught the five doc sites the fold missed. Either do it or say in the close note why not — do not leave it unmentioned.
+notes: |
+  Groomed 2026-08-26 from Idea-164, which was deliberately scoped OUT of the 2026-08-24 sweep commit on the user's call and raised so the choice stayed visible.
+
+  The general form is the part worth keeping and belongs in the close note: at the fold every GUARDED surface followed and nine unguarded ones did not, and the load runbook proves it both ways — Appendix B stayed correct because a test derives it, Appendix A drifted because its only stated source is a sentence.
+
+  Module `graph-infra` follows G28, which owns this guard. p2/sonnet: a two-element tuple edit plus one frozenset entry, but the RED-first discipline and the allowance handling are what make it more than a one-liner.

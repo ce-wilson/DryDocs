@@ -61,3 +61,12 @@ groom_log:
     feat/ui-workstream branch, which is why 147 collided once and Idea-148 carries the
     re-issue note.
   attached_at: O64
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Idea-172 (SME direction 2026-08-25). The log-estate panel lands
+    on the O12 admin page by the SME's own placement rather than in a new epic. Depends on
+    G111 as a hard dependency, not a courtesy: without it the panel would show the wrong
+    directory for the very kind the SME asked to see. The debug-tier Cypher DISPLAY question
+    is an SME review, parked as an inbox question at this groom; the panel may report that
+    kind's size and retention and must not render its contents.
+  attached_at: O68

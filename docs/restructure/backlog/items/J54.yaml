@@ -1,0 +1,27 @@
+id: J54
+epic: release-infrastructure
+title: VERSIONING.md describes a backlog schema and a backlog file that no longer exist, so the release
+  ritual instructs a reader to cite a tombstone
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- VERSIONING.md
+- docs/restructure/backlog/README.md
+acceptance: |
+  (a) THE TWO STALE FACTS. `VERSIONING.md` names the backlog config schema at its PREVIOUS version, and its release-notes section tells the author to cite epic and item ids from `docs/restructure/backlog.yaml`. The schema is now v3 (ADR 0013) and that file is a tombstone — the backlog is one item per file under `docs/restructure/backlog/items/`. Both are corrected, and the ids-to-cite instruction points at the sharded tree.
+
+  (b) THE REST OF THE FILE IS READ, NOT JUST GREPPED. Any other statement in the ritual that names a path, a command or a guard is confirmed against the tree in the same pass; a currency fix that leaves the next stale line for the next reader has moved the problem rather than fixed it. The close note lists what was checked and found correct, not only what changed.
+
+  (c) OUT OF SCOPE, DELIBERATELY: the v0.3.0 tag disposition and whether a v0.4.0 is owed. Those are release decisions for the user (see the inbox question groomed alongside this item) and this chore must not enact either — it does not push a tag, re-cut one, or change the version string in `pyproject.toml`.
+notes: |
+  Groomed 2026-08-26 from Idea-163 clause 3, which offered the choice of folding this into the tag work or treating it as ordinary doc drift. Treated as doc drift because clauses 1 and 2 of that entry are user decisions with no default, and blocking a two-line currency fix behind a release call would leave the ritual actively misleading for as long as the call takes.
+
+  Module `docs`, epic release-infrastructure, phase 8 — VERSIONING.md is release-ritual documentation.
+
+  p3/haiku: two corrections against facts already established by ADR 0013.

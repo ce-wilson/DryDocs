@@ -41,3 +41,11 @@ groom_log:
     is primed, which is the mechanism that hid it. S8 itself is not reversed: the module
     boundary stands, only the root's import-time reach-back is wrong.
   attached_at: S13
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Idea-159. Four tests in test_repo_paths.py pass in the suite and
+    fail when the file runs alone (a circular import between a CLI domain module and the
+    composition root, hidden by import order). Reproduced at this groom on the desktop:
+    4 failed, 45 passed. Pre-existing, not introduced by G79; filed under S because the S8
+    CLI split produced the shape.
+  attached_at: S15
