@@ -152,7 +152,7 @@
       ],
       "gate_ref": "HITL gate (docs/restructure/03-hitl-sme-flow.md)",
       "status": "gate-pending",
-      "pending_entries": 21,
+      "pending_entries": 24,
       "env_refs": [],
       "files": [
         "config/taxonomy-ontology-map/00-header.yaml",
@@ -161,6 +161,7 @@
         "config/taxonomy-ontology-map/30-mappings-catalog.yaml",
         "config/taxonomy-ontology-map/40-mappings-docs.yaml",
         "config/taxonomy-ontology-map/50-mappings-architecture.yaml",
+        "config/taxonomy-ontology-map/60-mappings-corporate.yaml",
         "config/taxonomy-ontology-map/90-summary.yaml"
       ],
       "content": null,
@@ -181,7 +182,7 @@
       ],
       "gate_ref": "RELATIONSHIP_GUIDE.md + per-edge gates",
       "status": "gate-pending",
-      "pending_entries": 56,
+      "pending_entries": 59,
       "env_refs": [],
       "files": [
         "drydocs_core/ontology/relationship_vocabulary/00-header.yaml",
@@ -360,7 +361,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 120,
+      "pending_entries": 122,
       "env_refs": [],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
@@ -369,6 +370,7 @@
         "config/gate-prompts/bmc-docs-example.yaml",
         "config/gate-prompts/bmc-docs-lexical-load.yaml",
         "config/gate-prompts/business-application-identity.yaml",
+        "config/gate-prompts/business-layer-org-structure.yaml",
         "config/gate-prompts/code-graph-package-layer.yaml",
         "config/gate-prompts/controlm-avg-run-supplement.yaml",
         "config/gate-prompts/controlm-definition-precedence.yaml",

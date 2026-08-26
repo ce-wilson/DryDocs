@@ -119,6 +119,8 @@ MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:CatalogSubLOB {name: 'CatalogSubLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
+MERGE (n:SchemaMeta:OrgChangeEvent {name: 'OrgChangeEvent'})
+  SET n.class = 'org:ChangeEvent', n.prov_type = 'Activity';
 MERGE (n:SchemaMeta:Company {name: 'Company'})
   SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:BusinessSegment {name: 'BusinessSegment'})
@@ -648,6 +650,18 @@ MERGE (a)-[r:HAS_BUSINESS_SEGMENT]->(b)
 MATCH (a:SchemaMeta {name: 'Company'}), (b:SchemaMeta {name: 'BusinessSegment'})
 MERGE (a)-[r:HAS_BUSINESS_SEGMENT_HISTORICAL]->(b)
   SET r.vocab_id = 'corporate_has_business_segment_historical', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Company'})
+MERGE (a)-[r:HAS_SUB_ORGANIZATION]->(a)
+  SET r.vocab_id = 'corporate_has_sub_organization', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'OrgChangeEvent'}), (b:SchemaMeta {name: 'BusinessSegment'})
+MERGE (a)-[r:ORIGINAL_ORGANIZATION]->(b)
+  SET r.vocab_id = 'corporate_change_original', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'OrgChangeEvent'}), (b:SchemaMeta {name: 'BusinessSegment'})
+MERGE (a)-[r:RESULTING_ORGANIZATION]->(b)
+  SET r.vocab_id = 'corporate_change_resulting', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
 
 // ── domain: itsm ────────────────────────────────────────────────────────────
 

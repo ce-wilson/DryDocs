@@ -1016,6 +1016,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "business-layer-org-structure (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/business-layer-org-structure.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "code-graph-package-layer (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

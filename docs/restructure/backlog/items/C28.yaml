@@ -8,7 +8,7 @@ phase: 2
 agent: ontology-mapper
 model: fable
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - internal/context-graph-analysis/business-layer-location-experiment.md
@@ -20,3 +20,54 @@ acceptance: |
   A drydocs.gate-prompt.v1 spec in config/gate-prompts/ that DRAFTS ONLY — it decides nothing, and the SIGN-OFF is a separate SME session (the G27/U11/Q14 precedent) — putting three questions to the SME with the experiment's evidence attached: (a) whether W3C ORG org-unit terms bind to the LOB layer the repo already holds (the experiment found the annual report's org units ARE that layer, "managed on an LOB basis") or to a new class, given the CLAUDE.md warning about inventing a label for convenience; (b) how a structural change is expressed — the experiment's effective-dated org change event for a segment merge — so that a re-org ADDS a fact instead of rewriting the previous one; and (c) what the as-of/effective-dating shape is for org membership, reusing the as-of-assertion idiom already ruled for FID ownership rather than inventing a second one. Every proposed term is registered `status: planned` in the relationship-vocabulary fragments with a decision-matrix entry; nothing is flipped, no loader writes an edge, and the location half of the experiment is explicitly out of scope (it rides Z2).
 notes: |
   Groomed 2026-08-09 from Idea-90's org half. MODULE/EPIC CHOICE RECORDED, since the entry itself offered two homes ("a business-layer gate or E-epic item"): filed under ontology-mapping / phase 2 because a W3C ORG binding is an ontology-mapping decision of exactly the kind phase 2 exists for, and NOT under Epic Z, which is about physical server location, nor Epic E (context graph), whose subject is task-scoped projections rather than a standing org model. If the SME wants it run as one combined business-layer session with Z2, that is a scheduling choice the two prompts can accommodate — the drafts stay separable because their subjects are. Evidence base is public-source only (annual-report material), so the prompt itself is mechanism-and-public-fact and stays Internal-Public.
+
+  DONE 2026-08-25 (desktop). Drafted config/gate-prompts/business-layer-org-structure.yaml --
+  5 sections, 16 confirmations, loads via gate_pages.load_gate_spec, format guard green.
+  DRAFTS ONLY; the sign-off is a separate SME session.
+
+  THE PREMISE MOVED BETWEEN GROOMING AND DRAFT, recorded per the Q9/Q14 idiom: C28 was groomed
+  2026-08-09; gate corporate-backbone-vocabulary (G98) then SIGNED 19/19 on 2026-08-17 and
+  settled part of this item's ground -- :Company registered, the 2Q2024 reorg expressed as two
+  effective-dated edge types with its cost on the record, the corporate domain minted. The
+  draft BUILDS ON the signed clauses (L25 riders-not-edits) instead of re-asking them, which
+  reshaped the acceptance's three questions into the four that are actually open:
+
+  (a) became SHARPER, not moot: G98 did not ask what CLASS a segment is. :BusinessSegment sits
+  at org:FormalOrganization -- the same class as :Company -- while the source's own words
+  ("managed on an LOB basis", 2024 report p104) describe management units, and every other
+  unit-that-holds-people the repo models (:DevTeam, :ServiceNowGroup, :CatalogLOB,
+  :CatalogSubLOB) is org:OrganizationalUnit. Section A proposes the re-class with the
+  keep-option laid out; no label is minted either way (A3 -- the CLAUDE.md warning, both edges).
+
+  (b) became adopt-or-decline ON TOP of a signed shape: the reorg is already additive via
+  G98's dated edges. Section B asks only whether reifying the event as :OrgChangeEvent adds
+  value, with the cost stated in G98 SS B2's own terms (one fact, three encodings) and a named
+  re-arm trigger if declined (a split or transfer, which dated edges express poorly). B3 ties
+  in the CIB expansion rename this session's glossary work surfaced -- the same 2Q2024 event.
+
+  (c) became a CONVERGENCE question: the repo now holds TWO signed dating idioms (K17's
+  as-of-assertion; G98's dated edges) and no rule for which applies when. Section C proposes
+  the rule (as-of for dated-capture facts, dated edges for structural currency) and forbids
+  the session from ending with a third idiom.
+
+  NEW section D from the experiment's strongest finding: the legal-entity layer (the Firm is
+  not the bank; eight public subsidiaries) plus the claim-vs-site rule -- an aggregate
+  presence claim is NEVER exploded into structure -- adopted here so Z2 inherits it settled.
+  Section E fences location (Z2) and the corpus reshape (the registry's P4+ decision) out.
+
+  RESERVATIONS, all planned/proposed, nothing flipped: corporate_has_sub_organization,
+  corporate_change_original, corporate_change_resulting (49-local-corporate); node class
+  OrgChangeEvent (10-node-classifications, prov_type Activity per the ORG spec's PROV
+  alignment); three map rows in the NEW 60-mappings-corporate.yaml -- the corporate domain's
+  FIRST map fragment (G98's two signed edges predate map discipline and stay seeded-only).
+  The sub-organization reservation deliberately reuses :Company at both ends: the C26 lesson
+  is that a reservation FOLLOWS the label ruling, and SS D1 asks it first. Summary recount
+  proposed 6->9.
+
+  ONE EVIDENCE CORRECTION made at drafting rather than inherited: the experiment cites the
+  "2026 edition" of the annual report -- that file is a sha256-verified mislabeled copy of the
+  2024 edition, so the prompt cites 2024 with 2025 as corroboration.
+
+  Two format-guard rounds at the draft (meta block, provenance source-vs-derived split) --
+  both caught locally by test_gate_pages before commit. schema_graph.cypher re-rendered for
+  the new node class. Suite 2434 passed / 8 skipped; ruff clean.

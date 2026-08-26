@@ -1883,6 +1883,24 @@
       "status": "proposed",
       "label": "SUPERSEDES",
       "source": "any multi-version corpus (the internal process pages are the named case)"
+    },
+    {
+      "id": "company-has-sub-organization",
+      "status": "proposed",
+      "label": "HAS_SUB_ORGANIZATION",
+      "source": "doc-source-registry#jpmc-reports"
+    },
+    {
+      "id": "org-change-original",
+      "status": "proposed",
+      "label": "ORIGINAL_ORGANIZATION",
+      "source": "doc-source-registry#jpmc-reports"
+    },
+    {
+      "id": "org-change-resulting",
+      "status": "proposed",
+      "label": "RESULTING_ORGANIZATION",
+      "source": "doc-source-registry#jpmc-reports"
     }
   ],
   "unchained_loaders": [

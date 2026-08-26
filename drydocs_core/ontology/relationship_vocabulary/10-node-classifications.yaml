@@ -405,6 +405,19 @@ node_classifications:
       CatalogSubLOB -[:HAS_PRODUCT_LINE]-> ProductLine (catalog_sub_lob_has_product_line,
       planned). Divergence ledger: .claude/skills/reconcile-port/SKILL.md.
 
+  - label:      OrgChangeEvent
+    class:      "org:ChangeEvent"
+    prov_type:  Activity
+    note: >
+      PLANNED (C28, 2026-08-25) — reservation only; the gate may decline it
+      (business-layer-org-structure §B2, the one-fact-three-encodings cost).
+      Reifies an organizational change (the 2Q2024 segment merge is the worked
+      example) as an addressable, dated node with ORIGINAL_ORGANIZATION /
+      RESULTING_ORGANIZATION edges. prov_type Activity per the W3C ORG spec's own
+      PROV alignment (a change event is something that HAPPENS to organizations,
+      not an agent). G98's signed two-edge-type shape already carries the fact;
+      this class exists only if the SME rules the event itself worth addressing.
+
   - label:      Company
     class:      "org:FormalOrganization"
     prov_type:  Agent
