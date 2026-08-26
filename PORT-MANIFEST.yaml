@@ -1044,6 +1044,14 @@ default_ok:
 # =============================================================================
 row_may_match_nothing:
   # ---- side-local by construction ------------------------------------------
+  - path: "docs/next-internal-session.md"
+    reason: >
+      RETIRED 2026-08-25 — the file is deleted producer-side (audit + the Idea-174
+      re-home in the retirement commit) but its never-port row is KEPT DELIBERATELY
+      as the re-import tripwire: two prior ports imported this file by accident,
+      a company copy may still exist, and dropping the row is exactly how it would
+      fall through a future default again. A row that matches nothing here is the
+      row doing its job.
   - path: "PORT-MANIFEST.*.yaml"
     reason: >
       the J34 overlay slots. Each side tracks its OWN overlay and the other side's
