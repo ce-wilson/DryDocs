@@ -71,15 +71,16 @@ def test_the_three_families_that_disagreed_are_all_declared_now():
     assert {"load", "qa", "sql"} <= declared
 
 
-def test_a_planned_kind_is_marked_rather_than_silently_absent():
-    """`api` is declared before its writer exists (G108), so the kind is real the
-    moment the writer lands instead of being invented by it."""
-    planned = {k.id for k in lk.load_kinds() if k.planned}
-    assert "api" in planned
-    assert all(k.writer for k in lk.load_kinds() if not k.planned), (
-        "an ACTIVE kind must name the writer that mints it — that is the link "
-        "which makes the declaration checkable rather than decorative"
-    )
+def test_every_active_kind_names_its_writer():
+    """`api`/`api-debug` were declared planned before their writer existed
+    (G105), and flipped active when it landed (G108) — the status mechanism
+    working as designed. The assertion that survives the flip: an ACTIVE kind
+    must name the writer that mints it — the link that makes the declaration
+    checkable rather than decorative — and both api kinds now carry one."""
+    kinds = {k.id: k for k in lk.load_kinds()}
+    assert not kinds["api"].planned and not kinds["api-debug"].planned
+    assert kinds["api"].writer == kinds["api-debug"].writer == "drydocs_api.audit.ApiAuditLog"
+    assert all(k.writer for k in lk.load_kinds() if not k.planned)
 
 
 # ---- the derived naming rule ------------------------------------------------

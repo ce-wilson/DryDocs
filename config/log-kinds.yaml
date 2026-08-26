@@ -104,27 +104,31 @@ kinds:
       destroys the only record that turns a hash back into words.
 
   - id: api
-    status: planned # ADR 0014 clause 6; the writer does not exist yet (G108)
+    writer: drydocs_api.audit.ApiAuditLog
     rotation: per-day
     format: jsonl
     note: >
       One audit line per drydocs_api route that executes Cypher OR WRITES —
       widened from Cypher-only at the ruling, because intake.py writes to the data
       root and would otherwise be the one filesystem-touching surface with no
-      trail. Lean by design: no Cypher text. 90 days because the purpose is a
-      metrics window on what is searched. Declared now so the kind exists before
-      its writer does.
+      trail. Lean by design: no Cypher text, no result values, actor hashed
+      (sha256, the :AgentRun function). 90 days because the purpose is a metrics
+      window on what is searched. The writer's docstring carries the audited-route
+      enumeration (G108); the correlation_id field joins these lines to the qa
+      ledger's run_id.
 
   - id: api-debug
-    status: planned # G108
+    writer: drydocs_api.audit.ApiAuditLog
     retention_days: 7
     format: jsonl
     note: >
       The trace/debug tier, ruled a SEPARATE KIND rather than `api` at DEBUG
       level so a 90-day metrics record is never buried in debug noise and debug
       can be deleted aggressively without touching the audit. It DOES carry
-      Cypher text and request detail. Verbose is settings-level here, not
-      per-request: an HTTP request has no --verbose, and a per-request header
+      Cypher text and request detail; Cypher is bounded at 20,000 chars with a
+      cypher_truncated flag (audit.CYPHER_TEXT_BOUND — the stated size bound).
+      OFF UNLESS THIS DECLARATION SAYS level: DEBUG — verbose is settings-level,
+      not per-request: an HTTP request has no --verbose, and a per-request header
       would let an untrusted caller enable verbose capture of their own traffic.
       HELD FOR SME REVIEW: whether this text is ever DISPLAYED in the console.
       Capturing it is ruled; surfacing it is not.

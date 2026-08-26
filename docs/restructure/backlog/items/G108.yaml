@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G104
 inputs:
@@ -61,3 +61,41 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-152 clause (6). Module drydocs-api; depends on G104 for the ratified shape and, in practice, on G105 for the sink — sequenced through G104 only, so it does not block on core landing first if the ADR ends up specifying the sink completely.
 
   Deliberately scoped as an ACCESS record, not query persistence. Idea-152's closing line — that server-side persistence of executed Cypher for ask-search is a separate idea whose owning surface is unknown — is respected here: this item makes the request auditable without deciding where executed Cypher lives.
+  DONE 2026-08-26 (desktop). `drydocs_api/audit.py` — ApiAuditLog, and both declared kinds flipped
+  ACTIVE in config/log-kinds.yaml with `writer: drydocs_api.audit.ApiAuditLog` (the planned->active
+  mechanism working as G105 designed it; test_log_kinds now pins the flip instead of the planned
+  state). THE ENUMERATION, the deliverable's list, lives in audit.py's docstring and is TWELVE routes
+  under the ruled Cypher-OR-writes scope: five Cypher-executing (/query/{id}, /raw-cypher,
+  /specs/{id}/run, /specs/{id}/export, /specs/ephemeral — the last audited because the Cypher ENTERS
+  the system there and it is where the agent run_id arrives) and seven writes (the four intake POSTs,
+  overrides/draft, drafts/{id}/promote, app-code/draft). Exclusions are STATED with reasons, not
+  implied: /login and /logout touch only the in-memory session store; POST /mappings/changeset persists
+  nothing server-side (the O13 returned-artifact contract); every GET is a read. A 401 with NO bearer
+  header is unaudited — there is no actor to record — while invalid-token and forbidden outcomes
+  audit with the ORIGINAL error class (Forbidden, InvalidTokenError), never the mapped HTTPException;
+  a test pins that distinction. ONE INTERPRETATION RECORDED so the acceptance's literal wording reads
+  right: "via G105's dictConfig" predates the 2026-08-25 two-kind ruling that made `api` per-day
+  jsonl — jsonl kinds append directly via log_kinds.log_filename in run_log.resolve_log_dir's
+  directory (the `qa` ledger precedent; dictConfig serves the format:log `cli` kind). No second
+  mechanism: the declaration IS the mechanism and this writer is the one it names. ACTOR: sha256
+  hexdigest of the bearer token — the :AgentRun caller-identity function, REIMPLEMENTED because
+  agents/ is a separate venv, and pinned by a known-value test rather than asserted. RULING D WIRED
+  END TO END, not just fielded: X-DryDocs-Run-Id accepted on the five Cypher routes (bounded — 128
+  printable chars, failing values drop to the session-hash fallback, because it is untrusted caller
+  input headed for a 90-day record), ephemeral_client sends it, and agent.py threads run_id into
+  make_register as a CLOSURE so register_cypher's call signature — and every fake of it — is
+  unchanged. correlation_id = run_id else actor hash, correlation_source says which. DEBUG TIER:
+  settings-level per ruling C — on only when the api-debug DECLARATION says level: DEBUG (the repo
+  default is INFO = off, tested); per-run stamp frozen at construction; Cypher bounded at 20,000
+  chars with a cypher_truncated flag, the bound stated in the kind's note as the acceptance requires.
+  The api line is built from an ALLOWLIST so cypher/params structurally cannot leak into the 90-day
+  record (tested by setting them and asserting absence). Export streams record at job creation with
+  rows NULL — the row count is the export manifest's fact (registers on completion) — carrying
+  export_id instead. Ruling E honoured by omission: the debug text is written and NOTHING surfaces
+  it; any UI display is blocked on the SME review, not on this item. TESTS: 14 in
+  tests/unit/test_api_audit.py, two tiers — pure ApiAuditLog (the acceptance's core claims hold with
+  no framework installed) and TestClient wiring (one request per audited route = exactly one line;
+  reads add none). THREE MUTATIONS, all caught: write-only-on-success (the error tests bite),
+  cypher appended to the api line (the allowlist test bites), one route's audit deleted (the
+  per-route count bites). The enforcement matrix regenerated — the new guard tests changed that
+  derived surface. Suite 2495 passed / 10 skipped, ruff clean, CLI gates green.

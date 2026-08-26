@@ -49,10 +49,12 @@ def _get_provider() -> LiteLlmProvider:
     return _provider
 
 
-def _build_pipeline(control: dict, on_step) -> GraphQaPipeline:
+def _build_pipeline(control: dict, on_step, run_id: str | None = None) -> GraphQaPipeline:
     """Per-request pipeline: the provider (and its connection pool) is the
     singleton; the R4 registrar is per-request because the ephemeral specs it
-    mints are owned by the ASKING console session's token."""
+    mints are owned by the ASKING console session's token — which is also why
+    the run_id can close over it (G108 ruling D: the API audit's correlation
+    key back to this run's ledger lines)."""
     return GraphQaPipeline(
         provider=_get_provider(),
         run_read=run_read,
@@ -61,6 +63,7 @@ def _build_pipeline(control: dict, on_step) -> GraphQaPipeline:
         register_cypher=make_register(
             owner_token=control.get("api_token"),
             api_url=control.get("api_url"),
+            run_id=run_id,
         ),
         on_step=on_step,
     )
@@ -133,7 +136,7 @@ class GraphQaAgent(BaseAgent):
             def on_step(step) -> None:
                 loop.call_soon_threadsafe(queue.put_nowait, step)
 
-            pipeline = _build_pipeline(control, on_step)
+            pipeline = _build_pipeline(control, on_step, run_id)
             answer_task = asyncio.ensure_future(
                 asyncio.to_thread(
                     pipeline.answer,

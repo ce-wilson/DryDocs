@@ -22,6 +22,7 @@ from pathlib import Path
 import neo4j
 from pydantic import BaseModel
 
+from drydocs_api.audit import ApiAuditLog
 from drydocs_api.ephemeral_specs import (
     EphemeralSpecStore,
     EphemeralValidationError,
@@ -186,9 +187,15 @@ class LiveRunner:
             self._driver.close()
 
 
-def create_app(runner=None, store: InMemorySessionStore | None = None):
-    """App factory. ``runner``/``store`` are injectable for tests; the default
-    is the live driver + a fresh in-memory session store."""
+def create_app(
+    runner=None,
+    store: InMemorySessionStore | None = None,
+    audit: ApiAuditLog | None = None,
+):
+    """App factory. ``runner``/``store``/``audit`` are injectable for tests; the
+    default is the live driver + a fresh in-memory session store + the declared
+    api/api-debug audit sinks (G108 — see drydocs_api.audit's enumeration of
+    which routes are audited and why)."""
     from fastapi import FastAPI, Header, HTTPException, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
 
@@ -205,6 +212,7 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
+    audit = audit if audit is not None else ApiAuditLog()
 
     def _token(authorization: str | None) -> str:
         if not authorization or not authorization.lower().startswith("bearer "):
@@ -243,10 +251,20 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
     @app.post("/query/{query_id}")
     def post_query(
-        query_id: str, body: QueryBody, authorization: str | None = Header(default=None)
+        query_id: str,
+        body: QueryBody,
+        authorization: str | None = Header(default=None),
+        x_drydocs_run_id: str | None = Header(default=None),
     ) -> dict[str, object]:
+        token = _token(authorization)
         try:
-            return run_named(query_id, body.params, _token(authorization), sessions, graph)
+            with audit.observe("/query/{query_id}", token=token, run_id=x_drydocs_run_id) as rec:
+                rec.query_id = query_id
+                rec.params = body.params
+                out = run_named(query_id, body.params, token, sessions, graph)
+                rec.database = str(out["database"])
+                rec.rows = len(out["rows"])
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownQueryError:
@@ -256,10 +274,18 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
     @app.post("/raw-cypher")
     def post_raw(
-        body: RawBody, authorization: str | None = Header(default=None)
+        body: RawBody,
+        authorization: str | None = Header(default=None),
+        x_drydocs_run_id: str | None = Header(default=None),
     ) -> dict[str, object]:
+        token = _token(authorization)
         try:
-            return run_raw(body.cypher, _token(authorization), sessions, graph)
+            with audit.observe("/raw-cypher", token=token, run_id=x_drydocs_run_id) as rec:
+                rec.cypher = body.cypher  # debug tier only; the api line cannot carry it
+                out = run_raw(body.cypher, token, sessions, graph)
+                rec.database = str(out["database"])
+                rec.rows = len(out["rows"])
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -282,20 +308,32 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_ephemeral_register(
         body: EphemeralRegisterBody,
         x_drydocs_agent_key: str | None = Header(default=None),
+        x_drydocs_run_id: str | None = Header(default=None),
     ) -> dict[str, object]:
+        # Audited even though it executes nothing: the Cypher ENTERS the system
+        # here, and it is the route the QA agent's run_id arrives on (ruling D).
+        # The actor is the OWNER session the ref is scoped to.
         try:
-            return register_ephemeral(
-                x_drydocs_agent_key,
-                os.environ.get("DRYDOCS_AGENT_REG_KEY"),
-                body.owner_token,
-                body.cypher,
-                body.database,
-                body.params,
-                body.description,
-                body.columns,
-                sessions,
-                ephemerals,
-            )
+            with audit.observe(
+                "/specs/ephemeral", token=body.owner_token, run_id=x_drydocs_run_id
+            ) as rec:
+                rec.cypher = body.cypher
+                rec.params = body.params
+                rec.database = body.database
+                out = register_ephemeral(
+                    x_drydocs_agent_key,
+                    os.environ.get("DRYDOCS_AGENT_REG_KEY"),
+                    body.owner_token,
+                    body.cypher,
+                    body.database,
+                    body.params,
+                    body.description,
+                    body.columns,
+                    sessions,
+                    ephemerals,
+                )
+                rec.spec_id = str(out.get("explore_ref") or "") or None
+            return out
         except Forbidden as exc:
             raise HTTPException(403, str(exc)) from None
         except InvalidTokenError:
@@ -307,12 +345,20 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
     @app.post("/specs/{spec_id}/run")
     def post_spec_run(
-        spec_id: str, body: QueryBody, authorization: str | None = Header(default=None)
+        spec_id: str,
+        body: QueryBody,
+        authorization: str | None = Header(default=None),
+        x_drydocs_run_id: str | None = Header(default=None),
     ) -> dict[str, object]:
+        token = _token(authorization)
         try:
-            return run_spec(
-                spec_id, body.params, _token(authorization), sessions, graph, ephemerals
-            )
+            with audit.observe("/specs/{spec_id}/run", token=token, run_id=x_drydocs_run_id) as rec:
+                rec.spec_id = spec_id
+                rec.params = body.params
+                out = run_spec(spec_id, body.params, token, sessions, graph, ephemerals)
+                rec.database = str(out.get("database") or "") or None
+                rec.rows = len(out["rows"])
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -326,20 +372,33 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         body: QueryBody,
         format: str = "csv",
         authorization: str | None = Header(default=None),
+        x_drydocs_run_id: str | None = Header(default=None),
     ):
         from fastapi.responses import StreamingResponse
 
+        token = _token(authorization)
         try:
-            job = export_spec(
-                spec_id,
-                body.params,
-                format,
-                _token(authorization),
-                sessions,
-                graph,
-                export_ledger,
-                ephemerals=ephemerals,
-            )
+            # The audit line lands at job creation with rows null: the rows are
+            # streamed after this returns, and their count is the export
+            # MANIFEST's fact (it registers when the download completes). A
+            # failure after streaming starts is the manifest's to reveal.
+            with audit.observe(
+                "/specs/{spec_id}/export", token=token, run_id=x_drydocs_run_id
+            ) as rec:
+                rec.spec_id = spec_id
+                rec.params = body.params
+                job = export_spec(
+                    spec_id,
+                    body.params,
+                    format,
+                    token,
+                    sessions,
+                    graph,
+                    export_ledger,
+                    ephemerals=ephemerals,
+                )
+                rec.detail["export_id"] = job.export_id
+                rec.detail["format"] = format
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -378,9 +437,20 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     # machine and returns the legal-transitions map per record. ──
     intake_store = IntakeStore(default_intake_root())
 
-    def _intake_call(fn, *args, **kwargs):
+    def _intake_call(fn, *args, audit_route=None, audit_token=None, **kwargs):
+        # audit_route set = one of the four WRITE routes (G108); the GET reads
+        # pass neither and stay unaudited.
         try:
-            return fn(*args, **kwargs)
+            if audit_route is None:
+                return fn(*args, **kwargs)
+            with audit.observe(audit_route, token=audit_token) as rec:
+                out = fn(*args, **kwargs)
+                if isinstance(out, dict):
+                    for key in ("intake_id", "id"):
+                        if key in out:
+                            rec.detail["intake_id"] = out[key]
+                            break
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -396,14 +466,17 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_intake(
         body: IntakeCreateBody, authorization: str | None = Header(default=None)
     ) -> dict[str, object]:
+        token = _token(authorization)
         return _intake_call(
             create_intake,
             body.context_type,
             body.area,
             body.note,
-            _token(authorization),
+            token,
             sessions,
             intake_store,
+            audit_route="/intake",
+            audit_token=token,
         )
 
     @app.get("/intake")
@@ -422,6 +495,7 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         files: list[UploadFile],
         authorization: str | None = Header(default=None),
     ) -> dict[str, object]:
+        token = _token(authorization)
         out: dict[str, object] = {}
         for f in files:
             data = await f.read()
@@ -430,9 +504,11 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
                 intake_id,
                 f.filename or "unnamed",
                 data,
-                _token(authorization),
+                token,
                 sessions,
                 intake_store,
+                audit_route="/intake/{intake_id}/evidence",
+                audit_token=token,
             )
         return out
 
@@ -442,14 +518,17 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         body: IntakeTransitionBody,
         authorization: str | None = Header(default=None),
     ) -> dict[str, object]:
+        token = _token(authorization)
         return _intake_call(
             intake_transition,
             intake_id,
             body.to,
             body.note,
-            _token(authorization),
+            token,
             sessions,
             intake_store,
+            audit_route="/intake/{intake_id}/transition",
+            audit_token=token,
         )
 
     @app.post("/intake/{intake_id}/thread-decision")
@@ -458,22 +537,34 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         body: ThreadDecisionBody,
         authorization: str | None = Header(default=None),
     ) -> dict[str, object]:
+        token = _token(authorization)
         return _intake_call(
             thread_decision,
             intake_id,
             body.decision,
-            _token(authorization),
+            token,
             sessions,
             intake_store,
+            audit_route="/intake/{intake_id}/thread-decision",
+            audit_token=token,
         )
 
     # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
     # materialization; the ONLY "write" is a returned change artifact. ──
     mapping_store = MappingStore()
 
-    def _mapping_call(fn, *args, **kwargs):
+    def _mapping_call(fn, *args, audit_route=None, audit_token=None, **kwargs):
+        # audit_route set = one of the three var/mapping.db WRITE routes (G108).
+        # /mappings/changeset stays unaudited on purpose: it returns a change
+        # artifact and persists nothing server-side (the O13 contract).
         try:
-            return fn(*args, **kwargs)
+            if audit_route is None:
+                return fn(*args, **kwargs)
+            with audit.observe(audit_route, token=audit_token) as rec:
+                out = fn(*args, **kwargs)
+                if isinstance(out, dict) and "draft_id" in out:
+                    rec.detail["draft_id"] = out["draft_id"]
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -515,13 +606,16 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_override_draft(
         body: ChangesetBody, authorization: str | None = Header(default=None)
     ) -> dict[str, object]:
+        token = _token(authorization)
         return _mapping_call(
             draft_override,
             body.entries,
-            _token(authorization),
+            token,
             sessions,
             mapping_store,
             draft_id=body.draft_id,
+            audit_route="/mappings/overrides/draft",
+            audit_token=token,
         )
 
     @app.get("/mappings/drafts")
@@ -534,8 +628,15 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_promote_draft(
         draft_id: str, authorization: str | None = Header(default=None)
     ) -> dict[str, object]:
+        token = _token(authorization)
         return _mapping_call(
-            promote_draft, draft_id, _token(authorization), sessions, mapping_store
+            promote_draft,
+            draft_id,
+            token,
+            sessions,
+            mapping_store,
+            audit_route="/mappings/drafts/{draft_id}/promote",
+            audit_token=token,
         )
 
     @app.get("/mappings/overrides/report")
@@ -552,8 +653,15 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_app_code_draft(
         body: ChangesetBody, authorization: str | None = Header(default=None)
     ) -> dict[str, object]:
+        token = _token(authorization)
         return _mapping_call(
-            draft_app_code_mapping, body.entries, _token(authorization), sessions, mapping_store
+            draft_app_code_mapping,
+            body.entries,
+            token,
+            sessions,
+            mapping_store,
+            audit_route="/mappings/app-code/draft",
+            audit_token=token,
         )
 
     # K7 §B2 tier-3 readback (lifted from wip/k9-laptop at J30): dual-coded was
