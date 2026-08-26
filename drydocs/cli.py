@@ -1275,6 +1275,60 @@ def fid_census_cmd(
     )
 
 
+@app.command(name="profile-folder-set")
+def profile_folder_set(
+    source: Path = typer.Argument(
+        ..., help="Directory holding the Control-M definition XML export."
+    ),
+    out: Path = typer.Option(
+        Path("folder-set-profile.json"), "--out", "-o", help="Output JSON artifact path."
+    ),
+) -> None:
+    """G68 - census a folder set: what the export SAYS, and what only you can supply.
+
+    TRANSPORT NAMED, NOT DEFAULTED (the O58 precedent). A CLI verb writing a
+    JSON artifact, because remediation writes no graph - so QuerySpecs are out
+    BY CONSTRUCTION, not by preference - and no upload path exists yet. The
+    cost against ADR 0005 is nil: that ADR governs the browser->Neo4j access
+    path, and nothing here reads or writes a graph. `changedoc` and `jira`
+    already write artifacts from this component, so this adds no new shape.
+
+    The output has two halves, and the division is the point: FIVE CENSUSES
+    report what the export carries (shape, identity, variables, contacts,
+    invocation fan-out), each with WHERE-USED rather than bare distinct values;
+    then a SUBSTITUTION SLOT list names the facts the export does NOT carry -
+    DEVX_KEY, the MFTS set, the contact DLs - for a human to supply. A slot with
+    no current value reports `not-supplied` with a null value and NEVER a
+    default: inventing one is how a proposal becomes a wrong fact nobody
+    re-checks.
+
+    Asserts nothing about meaning. detect_all()'s findings ride alongside
+    unratified, and no graph is written (the module's standing invariant).
+    """
+    import json as _json
+
+    from drydocs_lineage.extractors import ControlMXmlDefsExtractor
+    from drydocs_remediation.profile import NOT_SUPPLIED, profile
+    from drydocs_remediation.xml_bridge import to_definition_set
+
+    definitions = to_definition_set(ControlMXmlDefsExtractor().extract(source))
+    result = profile(definitions)
+    # newline pinned: the artifact is deterministic output, and a CRLF host
+    # would otherwise make the same profile diff against itself
+    out.write_text(_json.dumps(result.as_dict(), indent=2), encoding="utf-8", newline="\n")
+    console.print(result.summary())
+    open_slots = [s.name for s in result.substitution_slots if s.status == NOT_SUPPLIED]
+    if open_slots:
+        console.print(
+            f"[yellow]not supplied by the export - needs an SME:[/] {', '.join(open_slots)}"
+        )
+    console.print(f"[green]wrote[/] {out}")
+    console.print(
+        "[dim]a census, not a ruling: findings ride alongside unratified and "
+        "nothing was written to a graph.[/]"
+    )
+
+
 # --- per-domain command modules (S8) -----------------------------------------
 # The root registers each domain's Typer FLAT, so every verb keeps its top-level
 # name. Imported at the bottom on purpose: the submodules import the shared

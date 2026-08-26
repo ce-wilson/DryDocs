@@ -74,6 +74,11 @@ class StagedJob(Protocol):
     watch_template: str
     notification_tags: tuple[str, ...]
     source_file: str
+    #: G68 census (b): the identity pair the XML already stages and the bridge
+    #: previously dropped. Widened here rather than re-derived downstream —
+    #: run_as is the job's OWNER and application its APPLICATION, both verbatim.
+    run_as: str
+    application: str
 
 
 class StagedExtract(Protocol):
@@ -143,6 +148,8 @@ def to_definition_set(extract: StagedExtract, source: str | None = None) -> Defi
                 notification_tags=tuple(job.notification_tags),
                 subfolder_path=job.subfolder_path,
                 scope_chain=chain,
+                run_as=getattr(job, "run_as", ""),
+                application=getattr(job, "application", ""),
             )
         )
 

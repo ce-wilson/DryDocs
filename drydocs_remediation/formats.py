@@ -60,6 +60,14 @@ class JobDefinition:
     notification_tags: tuple[str, ...] = ()
     #: "" at folder level, else "A" / "A/B" — which sub-folder holds the job
     subfolder_path: str = ""
+    #: OWNER verbatim — the account the job runs as. G68 census (b) reports it
+    #: BY JOB TYPE, never as a flat distinct list: a FileWatcher on the platform
+    #: account beside a payload job on the application account is the designed
+    #: pattern, and flattening the two would read as "this folder uses two
+    #: accounts" when the finding is a job-grain class split (2026-08-19 SME).
+    run_as: str = ""
+    #: APPLICATION verbatim — the Control-M application code, an identity input
+    application: str = ""
     #: the full ordered resolution chain, widest first, INCLUDING this job's
     #: own definitions as the last layer. Empty when the format cannot express
     #: scope (a single-folder M0 transcript) — callers fall back to
