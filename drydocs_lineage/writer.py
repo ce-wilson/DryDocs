@@ -549,10 +549,12 @@ def _write_curated(
 #   for the ID only — resolution never uses the fallback); repo locator =
 #   repo+ref+commit+path, joined to the server side on CONTENT HASH (the G24
 #   git blob sha1), never by path. sha256 absence is a real, counted state
-#   (§G2). storage_scope stamps 'unknown' until G56 captures the mount table;
-#   a script whose server occurrences span >1 host under unknown scope is
-#   flagged identity_unconfirmed_across_hosts, never silently merged-as-
-#   confirmed (§D1 + the D-amendment: the honesty lives in the claim layer).
+#   (§G2). storage_scope arrives from the G56 mount table on v3 bundles and
+#   falls back to 'unknown' on v1/v2, which carry none. A script whose
+#   server occurrences span >1 host is flagged identity_unconfirmed_across_
+#   hosts, never silently merged-as-confirmed (§D1 + the D-amendment: the
+#   honesty lives in the claim layer). That flag does NOT yet read scope, so
+#   it over-flags the shared case — Idea-175, at the computation below.
 # - (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path extension
 #   (§C3 — the shared core adapter; the term is OPTIONAL-MATCHed, never
 #   minted: a mapped term missing from the graph means bootstrap has not run).
@@ -789,7 +791,10 @@ def plan_rua(
             props = {k: v for k, v in occ.items() if isinstance(v, str) and v}
             props["origin"] = _SERVER_ORIGIN
             props["host"] = id_host
-            props.setdefault("storage_scope", "unknown")  # until G56 lands
+            # G56 landed: v3 bundles arrive already stamped by the extractor and
+            # this setdefault only covers v1/v2 bundles, which carry no mount
+            # table. The FLAG below still ignores scope — see Idea-175.
+            props.setdefault("storage_scope", "unknown")
             occurrence_rows.append(
                 {
                     "script_path": norm,
@@ -834,7 +839,10 @@ def plan_rua(
                     )
                     repo_occurrences += 1
 
-        unconfirmed = len(node_hosts) > 1  # scope is 'unknown' until G56
+        # NOT scope-aware, deliberately deferred: right for local/unknown, wrong
+        # for shared (one export on N hosts is ONE file). Idea-175 owns the fix,
+        # including the mount_source-equality caveat that makes it three-way.
+        unconfirmed = len(node_hosts) > 1
         if unconfirmed:
             multi_host_unconfirmed += 1
         if is_profile:

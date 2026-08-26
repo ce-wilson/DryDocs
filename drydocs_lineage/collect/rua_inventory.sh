@@ -17,6 +17,9 @@
 #   * scripts    : files matching -n name globs under the same scan roots
 #                  (metadata + sha256 into scripts.tsv; copies under scripts/,
 #                  config-gated + size-capped)                            [v2]
+#   * mounts     : the ACTUAL mount table (source/target/fstype/options), so a
+#                  consumer DERIVES whether a path is on shared storage
+#                  instead of being told                                  [v3]
 #   * (optional) : a `find -user` ownership sweep across the local filesystem
 #
 # Output is a self-describing bundle (meta.txt + *.tsv + profile copies) plus a
@@ -25,8 +28,9 @@
 # user -> ProcessNode.run_as, dirs/profiles -> DataAssetNode).
 # Re-homed from depgraph@feat/controlm-lineage collect/ (ADR 0002-C §4).
 # COLLECTOR_VERSION is the bundle schema stamp — v2 adds scripts.tsv and the
-# sha256 columns (G18, company-run parity); v1 bundles stay ingestible: the
-# extractor must treat scripts.tsv and the sha256 columns as OPTIONAL.
+# sha256 columns (G18, company-run parity), v3 adds mounts.tsv (G56). v1 AND
+# v2 bundles stay ingestible: the extractor must treat scripts.tsv, mounts.tsv
+# and the sha256 columns as OPTIONAL.
 #
 # POSIX sh; ksh-compatible. Uses GNU find/stat (standard on RHEL).
 #
@@ -41,7 +45,7 @@
 # =============================================================================
 
 set -u
-COLLECTOR_VERSION="rua-inventory/v2"
+COLLECTOR_VERSION="rua-inventory/v3"
 
 # ----------------------------------------------------------------------------- defaults (overridable by config)
 SCAN_ROOTS=""            # extra roots beyond $HOME (space-separated); $HOME always included
@@ -63,7 +67,7 @@ die() { echo "rua_inventory: $*" >&2; exit 1; }
 log() { echo "[rua] $*" >&2; }
 
 usage() {
-    sed -n '2,41p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,45p' "$0" | sed 's/^# \{0,1\}//'
     exit "${1:-0}"
 }
 
@@ -345,6 +349,48 @@ if [ -n "$NAME_GLOBS" ]; then
     echo "scripts_copy_skipped_size=$copy_skipped" >> "$META"
 fi
 
+# ----------------------------------------------------------------------------- mount table  [v3]
+# WHY THE MOUNT TABLE, AND WHY NOT THE TWO THINGS THAT LOOK LIKE IT (G56; gate
+# rua-load-shapes, the D-amendment). A deployment path may be SHARED: one export
+# mounted by N hosts is ONE FILE SEEN N TIMES, not N deployments — and nothing
+# else in this bundle can tell those apart. Sharing follows from the FSTYPE and
+# never from the array: twenty hosts each with their own LUN off one SAN is
+# twenty separate filesystems holding twenty files that genuinely drift, while
+# twenty hosts mounting one NFS export is one file. Hence:
+#   * NOT lsblk. `server:/path` is an NFS mount SPEC and NFS is not a block
+#     device, so a shared mount never appears in lsblk AT ALL — it would report
+#     a shared path as local, which is worse than reporting nothing.
+#   * NOT /etc/fstab alone. fstab is configured INTENT, not actual state:
+#     autofs, systemd and manual mounts are mounted without ever appearing
+#     there, and stale lines appear there without being mounted. Capture actual
+#     state; fstab is only worth adding if the intent-vs-actual delta is wanted.
+# findmnt is the source, /proc/mounts the fallback where it is absent. Both are
+# READ-ONLY and both run as the service account with NO privilege change — this
+# section costs the script's safety story nothing. Fields travel VERBATIM:
+# findmnt's \040-style escapes are passed through undecoded, because this script
+# reports and the consumer decides.
+MOUNTS_TSV="$BUNDLE/mounts.tsv"
+MOUNTS_SOURCE=""
+mount_count=0
+if command -v findmnt >/dev/null 2>&1; then
+    MOUNTS_SOURCE="findmnt"
+    printf 'source\ttarget\tfstype\toptions\n' > "$MOUNTS_TSV"
+    findmnt -rn -o SOURCE,TARGET,FSTYPE,OPTIONS 2>/dev/null \
+        | awk 'BEGIN {OFS="\t"} NF>0 {print $1, $2, $3, $4}' >> "$MOUNTS_TSV"
+elif [ -r /proc/mounts ]; then
+    MOUNTS_SOURCE="/proc/mounts"
+    log "findmnt not found — falling back to /proc/mounts"
+    printf 'source\ttarget\tfstype\toptions\n' > "$MOUNTS_TSV"
+    awk 'BEGIN {OFS="\t"} NF>0 {print $1, $2, $3, $4}' /proc/mounts >> "$MOUNTS_TSV"
+else
+    log "no findmnt and no readable /proc/mounts — mounts.tsv not written"
+fi
+if [ -n "$MOUNTS_SOURCE" ]; then
+    mount_count=$(( $(wc -l < "$MOUNTS_TSV") - 1 ))
+    echo "mounts_captured=$mount_count" >> "$META"
+    echo "mounts_source=$MOUNTS_SOURCE" >> "$META"
+fi
+
 # ----------------------------------------------------------------------------- optional ownership sweep
 if [ "$OWNERSHIP_SWEEP" = "yes" ]; then
     log "ownership sweep (find / -xdev -user $TARGET_USER) — this can take a while..."
@@ -378,6 +424,7 @@ echo "  home        : $REAL_HOME" >&2
 echo "  profiles    :${PROFILE_FOUND:- (none found)}" >&2
 echo "  directories : $scan_count captured" >&2
 [ -n "$NAME_GLOBS" ] && echo "  scripts     : $script_count captured" >&2
+[ -n "$MOUNTS_SOURCE" ] && echo "  mounts      : $mount_count captured (via $MOUNTS_SOURCE)" >&2
 echo "  bundle      : $BUNDLE" >&2
 [ -f "$TARBALL" ] && echo "  tarball     : $TARBALL" >&2
 echo "  scp back    : scp '$TARBALL' you@workstation:~/inventory/" >&2

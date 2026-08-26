@@ -93,6 +93,33 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-175`** · 2026-08-25 · `[idea]` · **open — the consumer half of G56; G56 itself is done and deliberately stopped at the collector + extractor** · prio? **Med** —
+  **G56 now DERIVES `storage_scope`, but the two places that act on multi-host
+  identity still behave as if it were always `unknown`.** Left out of G56 on purpose:
+  that item's acceptance and inputs are the collector and the extractor, and this is a
+  CLAIM-LAYER change with its own judgment in it.
+  **(1) THE STALE FLAG.** `drydocs_lineage/writer.py` computes
+  `unconfirmed = len(node_hosts) > 1` and stamps `identity_unconfirmed_across_hosts`
+  without reading scope at all. Under the D1 ruling + the D-amendment that is right for
+  `local` and `unknown` and WRONG for `shared`: one NFS export seen on twenty hosts is
+  one file, and flagging it queues twenty non-findings for SME review. The two comments
+  that say "until G56 lands" (writer.py, at the `storage_scope` setdefault and at the
+  `unconfirmed` line) were re-pointed here at the G56 build rather than left reading
+  false; the LOGIC is untouched, so nothing changed behaviour.
+  **(2) THE CAVEAT THAT MAKES IT MORE THAN A ONE-LINER, and the reason it is not a
+  trivial fix.** `storage_scope: shared` does NOT by itself prove two hosts see the SAME
+  file — two hosts can both mount nfs4 at `/home/svc` from DIFFERENT exports. Confirming
+  identity needs MOUNT SOURCE equality (`synthfiler01:/export/apps` on both), and the
+  source is captured in `mounts.tsv` and stamped as `mount_source` on every record
+  precisely so this is cheap when it is picked up. So the rule is three-way, not two:
+  shared AND same mount_source → confirmed · shared but DIFFERENT source → still
+  unconfirmed (and worth its own count, since it is a real finding) · local or unknown →
+  unconfirmed, unchanged.
+  **(3) DOWNSTREAM ALREADY WORKS AND NEEDS NOTHING.** `drydocs_lineage/archival.py`
+  reads `storage_scope` off the occurrence records and gates the misdeployment bucket on
+  `local` (G58 §c) — it was written against this shape and goes live on real values with
+  no edit. Named here so a groom does not re-open it.
+
 - **`Idea-174`** · 2026-08-25 · `[task]` · **open — INTERNAL-ONLY work (both probes run on live psgmgr); re-homed from the retired 2026-07-16 internal-session checklist, whose other seven items were all owned or superseded** · prio? **High** —
   **Two live-psgmgr probes lost their only home when `docs/next-internal-session.md`
   retired, and one of them BLOCKS any multi-DC load.** The checklist was the recorded

@@ -95,6 +95,8 @@ rua_<host>_<user>_<ts>/
                            #   size, mtime, sha256
   scripts/                 # (v2, only with -n + COPY_SCRIPTS=yes) copies of
                            #   matched files, tree-mirrored: scripts/<abs path>
+  mounts.tsv               # (v3) source, target, fstype, options — the ACTUAL
+                           #   mount table; always captured, no config knob
   ownership_dirs.tsv       # (only if OWNERSHIP_SWEEP=yes)
   rua_inventory.conf.used  # the exact config used (provenance)
 rua_<host>_<user>_<ts>.tar.gz
@@ -107,8 +109,43 @@ shape the lineage component already ingests (see the CSV-driven
 **Bundle schema versions.** `meta.txt` `schema=` stamps the collector version.
 `rua-inventory/v2` (G18) added `scripts.tsv` + the `sha256` columns — the
 content hash is the version discriminator and the anchor for the G24 code-repo
-blob sweep. v1 bundles STAY ingestible: the (G20) extractor must treat
-`scripts.tsv` and the `sha256` columns as optional.
+blob sweep. `rua-inventory/v3` (G56) added `mounts.tsv`. v1 AND v2 bundles STAY
+ingestible: the (G20) extractor must treat `scripts.tsv`, `mounts.tsv` and the
+`sha256` columns as optional, and it dispatches on the section being PRESENT,
+never on the `schema=` tag.
+
+## The mount table (v3) — why it is captured, and why not the obvious alternatives
+
+A deployment path may be **shared**. Twenty hosts mounting one NFS export hold
+**one file seen twenty times**, not twenty deployments — and no other section of
+this bundle can tell that apart from twenty genuinely independent copies. It
+matters downstream because drift detection and the G24 server-vs-repo
+corroboration both assume occurrences are *independent observations*; compare
+twenty views of one file and they always agree, which manufactures confidence
+rather than establishing it.
+
+Sharing follows from the **fstype**, never from the array. Twenty hosts each with
+their own LUN off one SAN is twenty separate filesystems holding twenty files
+that genuinely drift; "it's on the SAN" says nothing either way. So:
+
+- **not `lsblk`** — `server:/path` is an NFS mount *spec*, and NFS is not a block
+  device, so a shared mount never appears in `lsblk` at all. It would report a
+  shared path as local, which is worse than reporting nothing.
+- **not `/etc/fstab` alone** — fstab is configured *intent*, not actual state.
+  autofs, systemd and manual mounts are mounted without appearing there; stale
+  lines appear there without being mounted.
+
+The collector therefore reads the live mount table: `findmnt -rn -o
+SOURCE,TARGET,FSTYPE,OPTIONS`, falling back to `/proc/mounts` where `findmnt` is
+absent (`meta.txt` records which, as `mounts_source`). Both are read-only and
+both run as the service account — no privilege change. Fields travel verbatim,
+`\040`-style escapes included.
+
+The extractor resolves each staged path against the **longest matching mount
+target** and stamps `mount_root`, `fstype`, `mount_source` and `storage_scope`
+(`shared` | `local` | `unknown`) on every record. An fstype outside the known map
+is `unknown` **and counted** — never guessed in either direction — and `unknown`
+never defaults to independent: it suppresses the corroboration claim.
 
 ## Where bundles live (G19 — the landing zone)
 

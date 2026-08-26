@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/collect/rua_inventory.sh
@@ -21,3 +21,45 @@ acceptance: |
   A bundle answers "is this path on shared storage?" without asking a human. The collector emits an OPTIONAL mounts section capturing actual mount state — `findmnt -rn -o SOURCE,TARGET,FSTYPE,OPTIONS` with `/proc/mounts` as the no-findmnt fallback, both read-only and runnable as the service account with no privilege change. NOT lsblk and NOT /etc/fstab alone, and the script says why in a comment: `server:/path` is an NFS mount spec and NFS is not a block device, so it never appears in lsblk; and fstab is configured INTENT, not actual state (autofs/systemd/manual mounts are mounted without appearing there, stale lines appear without being mounted). COLLECTOR_VERSION bumps to v3. The extractor parses the section when present and files it under the EXISTING `sections_optional_absent` contract when absent, so every v1 and v2 bundle stays fully ingestible — the same discipline scripts.tsv already follows. Each staged path resolves against the LONGEST matching mount target to yield `mount_root` + `fstype`, and `storage_scope` derives from fstype — nfs/nfs4/cifs shared, xfs/ext4 single-host unless gfs2/ocfs2 clustered, anything unrecognised `unknown` and COUNTED, never guessed. Synthetic fixtures only (real mount specs carry live server names); tests cover a shared-NFS bundle, a local-only bundle, a mounts-absent v2 bundle, and an unrecognised fstype.
 notes: |
   Groomed 2026-08-06 (laptop) at the G22 session, from SME direction. THE PROBLEM IT SOLVES: a deployment path may be shared — the SME's case is roughly 20 VSI hosts against one shared filesystem — and then the same path on N hosts is ONE FILE SEEN N TIMES, not N deployments. Today that is not derivable from any bundle we hold: the collector captures no mount table at all, the envelope carries scan_roots but never which filesystem a root sits on, and the ownership sweep's -xdev stays on one filesystem without recording which. THE CORRECTION THAT SHAPES THE ACCEPTANCE, made at the session: "on the SAN" does not mean shared. Twenty hosts each with their OWN LUN from one array is twenty separate filesystems and twenty files that genuinely drift; twenty hosts mounting ONE NFS export is one file seen twenty times. Sharing follows from FSTYPE, never from the array — which is why the type column is load-bearing and why lsblk alone would actively mislead. WHY NOW IS THE CHEAP MOMENT (SME, same session): nothing has been loaded yet and the company-side twin collector is NOT present, so a schema bump costs no convergence debt. The earlier T14 caveat is WITHDRAWN on that correction. WHAT THIS DOES NOT REMOVE: bundles already collected stay scope-unknown, so the G22 D-amendment rule stands either way — `unknown` never defaults to independent, it SUPPRESSES the corroboration claim. This item reduces how often that state occurs; it does not retire it. NOT gate-bound: capturing a fact is an instrument change, not a decision about what an edge MEANS. It was deliberately NOT edited at the gate because the collector runs on production hosts.
+  DONE 2026-08-25 (desktop). Built exactly the acceptance, and the seam it lands on turned out
+  to already exist: G23's writer does `props.setdefault("storage_scope", "unknown")` and G58's
+  archival report reads `storage_scope` off the occurrence records, so stamping on the record
+  completed both with ZERO edits to either. COLLECTOR: v3, `mounts.tsv` emitted UNCONDITIONALLY
+  (read-only and instant — "optional" is the INGEST contract, not a config knob), `findmnt -rn -o
+  SOURCE,TARGET,FSTYPE,OPTIONS` normalised to tabs by awk, `/proc/mounts` the fallback, and
+  `meta.txt` records `mounts_captured` + `mounts_source` so which tool answered is a fact. Fields
+  travel verbatim — findmnt's \040 escapes are NOT decoded, so a space-bearing target simply fails
+  to match and shows up as `mount_unresolved` rather than as a wrong mount silently claimed. The
+  why-not-lsblk / why-not-fstab reasoning is in the script per the acceptance. ONE TRAP CAUGHT:
+  `usage()` renders the header block by LINE RANGE (`sed -n '2,41p'`), so the header growing by
+  four lines would have silently truncated `--help`; the range moved to 2,45 and the render was
+  checked. EXTRACTOR: presence dispatch, never the `schema=` tag (the scripts.tsv discipline);
+  absent files under the EXISTING `sections_optional_absent` contract. `None` (no table) and an
+  unmatched path are DIFFERENT states and stay different: a v1/v2 bundle stamps NOTHING and comes
+  out byte-identical, while a v3 bundle whose table misses a path stamps `unknown` and counts it.
+  Longest-match is BOUNDARY-AWARE (`/opt/app2` must not match `/opt/app`) with equal targets
+  resolving to the last row (mount order). The fstype map is EXACTLY the amendment's set — nfs,
+  nfs4, cifs, gfs2, ocfs2 shared; xfs, ext4 local; everything else `unknown`, counted, AND NAMED
+  in `mount_fstypes_unrecognised` so the review queue can say which. Stamping happens BEFORE the
+  occurrence copy, which is the D2 tie-in and is asserted. TWO DELIBERATE ADDITIONS beyond the
+  literal acceptance, both cheap-now/expensive-later on the amendment's own mount_root reasoning:
+  `mount_source` is stamped (shared fstype alone does NOT prove two hosts see the same file —
+  they can mount nfs4 at one path from different exports — and SOURCE equality is what a future
+  identity-confirmation pass needs), and a G103-style contract test pins the collector's header
+  literal against `_REQUIRED_COLS[MOUNTS_TSV]` so a renamed column cannot surface as "a bad
+  bundle". TESTS: 9 new in `tests/unit/test_lineage_rua.py` — the four the acceptance names
+  (shared-NFS, local-only, mounts-absent v2, unrecognised fstype) plus boundary-awareness,
+  present-but-unmatched, malformed rows, the collector/extractor column contract, and the scope
+  map itself. Synthetic fixtures only. The shared case doubles as the longest-match proof (`/` is
+  xfs and would read LOCAL; `/home/svc_synth` is nfs4 and is the answer), and both properties were
+  MUTATION-CHECKED: naive-startswith fails 1 test, first-match-wins fails 4. NOTE ON THIS ITEM'S
+  OWN `inputs`: it lists `tests/unit/test_lineage_inventory.py`, which is the Control-M oracle —
+  a groom slip; the rua tests live in `tests/unit/test_lineage_rua.py` and that is where these
+  went. NOT DONE, ON PURPOSE — Idea-175: writer.py's `identity_unconfirmed_across_hosts` is still
+  `len(node_hosts) > 1` with no scope check, so it over-flags the shared case. Out of scope here
+  (this item's inputs are the collector and the extractor; that is a claim-layer change carrying
+  the mount_source caveat above), but its two "until G56" comments were re-pointed at Idea-175 in
+  this commit rather than left reading false — comment-only, no logic moved. Collector verified
+  live on THIS DESKTOP under Git Bash/MSYS (not RHEL): a real run over a synthetic $HOME produced
+  a 4-row tab-separated `mounts.tsv` via the `/proc/mounts` fallback with escapes intact. Full
+  suite 2441 passed / 10 skipped, ruff check + format clean.
