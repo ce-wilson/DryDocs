@@ -93,6 +93,54 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-158`** · 2026-08-26 · `[bug]` · **open** · prio? **Med** —
+  **`MiniDag` never adopted the O66 `RelEdge` overlay, so relationship names still render BEHIND
+  the nodes on FIVE routes.** O66's acceptance says the fix is one component so that "one future
+  change fixes all three", and `components/RelEdge.tsx` says the same in its header comment — but
+  the three canvases that adopted it are explorer, lineage and ownership. `components/MiniDag.tsx`
+  was never migrated and still uses React Flow's built-in SVG `label` / `labelStyle` /
+  `labelBgStyle` props (`MiniDag.tsx:108-111`), which paint in the EDGE layer and therefore stack
+  below nodes — the exact treatment `RelEdge`'s comment names as the defect. Observed live
+  2026-08-26 on `/docs` (desktop, Vite :5173, this branch): the `DESCRIBES` edge into
+  `BMC Control-M` renders as the two letters `ES`, the rest hidden behind the `#1 What is a job?`
+  node. **Blast radius is five routes, not one** — `MiniDag` is rendered by `DocsRoute`,
+  `GatesRoute`, `RemediationRoute`, `RunbooksRoute` and `SoftwareRoute`, so every one of them
+  carries the defect O66 rated p1 on a single page. Filed Med rather than High only because each
+  MiniDag map loses SOME names rather than all of them, unlike [[Idea-157]]; raise it if the
+  console is about to be demonstrated. Migrating `MiniDag` to `RelEdge` is the obvious move and
+  makes the "one component" clause true for the first time — but do it AFTER 157, or it inherits
+  157's inverted occlusion on all five routes at once. Rendering only; no edge meaning moves.
+
+- **`Idea-157`** · 2026-08-26 · `[bug]` · **open** · prio? **High** —
+  **O66 is `done` but the defect came back inverted: `/ownership` now paints the relationship
+  chips ON TOP of the node boxes, so the NODE names are the unreadable half.** O66 fixed
+  "labels behind nodes" by moving the label into the `EdgeLabelRenderer` portal with an explicit
+  `zIndex: 10` (`RelEdge.tsx`), which does put relationship names above the node layer — its
+  acceptance genuinely holds. What the acceptance never said is that node names had to stay
+  readable too, so trading one occlusion for the other passed it. Observed live 2026-08-26
+  (desktop, Vite :5173, this branch, both the `Rollup (K4 shape)` view and after `fitView`):
+  every node in the chain is clipped by the chip of the edge leaving it — `LOB-R (synthetic`,
+  `edger Services (line)`, `Ledger An...`, `...Platforms (ToT)`, `Team N...`, and the
+  `BusinessApplication` kind line reduced to `inessApplication`. Cause is geometric, not a
+  z-order mistake: `demoOwnership.ts` places the chain at fixed x/y close enough that each
+  straight edge's MIDPOINT lands inside the neighbouring node box, and `RelEdge` puts the chip at
+  that midpoint. **So the fix is not another z-index pass — whichever layer wins, the other is
+  unreadable.** Remove the collision instead: offset the chip off the midpoint where it would
+  intersect a node rect, or space the chain so midpoints fall in the gaps. **Reopening O66 rather
+  than filing fresh is the groomer's call**, but note its acceptance needs the missing clause
+  (node names readable too, in both themes) or the next attempt can pass it the same way.
+  **RULED OUT at capture, so nobody re-derives it:** wiring the greyed-out `Layout` / `Fit` /
+  `Refresh` / `Export` toolbar buttons does NOT fix this. They are not disabled React Flow
+  controls — `ToolbarButton` (`routes/ModuleTemplate.tsx:83-90`) takes only `label` and
+  `disabled` and has no `onClick` and no handler anywhere, so enabling them yields four buttons
+  that do nothing. And none of the four acts on paint order even if implemented: `Fit` is
+  pan/zoom and scales nodes and labels together so relative overlap is unchanged (proven live by
+  clicking React Flow's own fit control on `/docs` — the clipped `DESCRIBES` stayed clipped, and
+  both panes already call `fitView` on mount), `Refresh` re-fetches the same positions, `Export`
+  does not touch the screen, and only `Layout` could even mitigate, by spacing nodes rather than
+  by changing the stacking rule. Sibling of [[Idea-158]], which is the same defect uninverted on
+  five other routes. Rendering only; K4's attribution shape is gate-confirmed and does not move.
+
 - **`Idea-156`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
   **The snapshot CI check can never see a branch, and the verdict still has no tests.** Filed on
   `feat/ui-workstream` as its Idea-152 and re-filed here at 156 because both 151 and 152 were
