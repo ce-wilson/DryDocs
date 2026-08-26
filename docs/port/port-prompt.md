@@ -1557,6 +1557,35 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   `internal/standards/technology/data-center-inventory.md`; this file is publishable, so
   it names none.
 
+- **RELAY-16 — THE `run_as` DETECTOR SHIPS; THE RUN IS YOURS, AND ITS NUMBERS LAND IN
+  THE SAME EVENT K16's 0-COUNTS ROW IS WAITING ON** `[VERIFIED-PRODUCER]` for the code
+  and the runner text; the finding it looks for is `[SME-REPORTED]` (2026-08-19). New
+  at the 2026-08-26 roll (producer K25, step 238).
+  **(1) WHAT LANDED AND WHAT DID NOT.** `drydocs/run_as_detect.py` ports with the range —
+  pure, injected, counts-only, thirteen synthetic tests. The DATA does not and cannot:
+  the producer has no estate extract, so every number this detector can produce is
+  yours. Producer-side it has been exercised against a fixture ONLY, and the fixture is
+  synthetic by construction (J18: this claim names its venue — desktop, no psgmgr).
+  **(2) THE ASK.** Run it against your Control-M extract and record the counts. The
+  runner prompt with the exact invocation is `docs/company-prompts/`
+  `k25-run-as-detection-company-prompt.md`, which is `never-port` and therefore NOT in
+  your tree — this relay is the channel, so either hand-carry that file or read the
+  invocation from the module docstring, which carries the same contract.
+  **(3) WHAT THE OUTPUT IS FOR.** The numbers belong in the same company-side event that
+  K16's 0-counts row is still waiting on; `docs/restructure/09-fid-identity-and-scope.md`
+  gains a `0-K25` method row saying exactly that. Nothing touches the graph in either
+  direction.
+  **(4) THE TWO THINGS NOT TO RE-DECIDE WHILE RUNNING IT.** How a platform account is
+  RECOGNIZED stays K17's ruling — the injected set is the seam, and doc 09's S3 ranking
+  is the evidence-backed proposal, not a default to override quietly. And a FileWatcher
+  on the platform account beside payload jobs on the application account is the DESIGNED
+  pattern, not a finding: the detector counts platform-class jobs and EXCLUDES them from
+  the directory comparison for that reason. A payload job on the platform account is the
+  countable anomaly.
+  **IF THE RUN IS NOT DONE THIS PORT:** say so in the PORT-REPORT rather than leaving it
+  silent — an unactioned relay with a reason is a live relay; an unmentioned one reads as
+  discharged and is how RELAY-5's false company-state claim happened.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -3293,6 +3322,253 @@ regeneration, never-port outputs — and get no step.
     APPLY — the map fragment merge is per-entry; your active entries survive by rule.
     Your two deliberate leftovers (review-labels spine, TDD prose) are yours to
     schedule and are recorded as such.
+
+228. THE PUBLIC BUSINESS GLOSSARY GROWS BY 119 CANDIDATE TERMS [config —
+    canonical-producer] (`af5f84a6` 110 terms, `edd9ee06` +4, `29a5ce71` +5 and one
+    upgrade). `config/glossary/terms-public.yaml` (schema `drydocs.glossary.v1`, the
+    G34 scaffold) is filled from a PUBLIC External source — the JPMorgan Chase annual
+    report glossaries — extracted mechanically, three passes: the 2025 glossary
+    wholesale, then a 2024 CCB home-and-auto lending sweep (TDR, UPB, GSE, FICO), then
+    Credit Cards (GPCC) plus four mid-line entries the first anchor-based extraction
+    missed (FDM, GAAP, LTD, VaR) and a GSE upgrade to the formal definition.
+    EVERY sense is `confidence: candidate` and NOTHING is SME-confirmed — a candidate
+    is a starting point for decoding a token, never an assertion about what a DryDocs
+    surface means. Org-unit acronyms carry `scope: business-domain`, the rest
+    `industry`. The source PDF is local and gitignored; each citation names the public
+    DOCUMENT, never the file (the no-image-provenance discipline, applied to PDFs).
+    APPLY: a clean take. Nothing reads this file yet — it is a decode aid for humans
+    and a future term_id source; your company-specific senses belong in
+    `internal/glossary/terms.yaml`, which this never touches.
+
+229. FOUR SME GATE PROMPTS DRAFTED, ALL UNSIGNED, ALL DECIDING NOTHING [gate-prompts —
+    canonical-company, and these are clean-adds] (`14c8c12f` C28
+    business-layer-org-structure, `285034a0` G61 script-provenance-gaps, `8cb80d09`
+    G95 standard-identity-and-carrier, `74670d8f` K20 tech-partner-attach-level).
+    Read the manifest row before reacting to the count: `config/gate-prompts/**` is
+    canonical-company — YOUR real specs win — and its note carves out exactly this
+    case, "new producer specs that don't collide are clean-adds". None of the four
+    collides. Each ships with a gate-log RECORD stub marked DRAFTED/unsigned, and J43's
+    reconcile check treats a DRAFTED stub as NON-AUTHORITY: no vocabulary status may
+    cite these headings, and none does. Subjects: C28 builds on the signed G98 rather
+    than re-asking it; G61 §B2 ratifies a boundary G97 already operates (below);
+    G95 prices three carriers for a standard identity and pre-picks none; K20 is an
+    AMENDMENT gate re-opening one clause of the signed K5 (Tech Partner at product vs
+    area-product level) on the G35 model. APPLY: take all four as files if you want the
+    text; run none of them — a producer draft is not a company gate, and your side runs
+    its own sessions on its own tracker.
+
+230. G56 — THE COLLECTOR CAPTURES THE MOUNT TABLE, SO SHARED-VS-LOCAL STORAGE IS
+    DERIVED [lineage — bundle schema v3] (`6fd395fb`). A deployment path may be SHARED,
+    and then the same path on N hosts is ONE FILE SEEN N TIMES, not N deployments — a
+    fact no section of the bundle could answer until now (the rua-load-shapes
+    D-amendment). Collector emits `mounts.tsv` UNCONDITIONALLY (`findmnt -rn -o
+    SOURCE,TARGET,FSTYPE,OPTIONS`, `/proc/mounts` fallback, `meta.txt` records which
+    answered) — read-only and instant, so "optional" is the INGEST contract, not a
+    config knob. Deliberately NOT `lsblk` (an NFS spec is not a block device, so a
+    shared mount never appears) and NOT `fstab` alone (configured intent, not actual
+    state). Extractor dispatches on PRESENCE, never on the `schema=` tag, so v1 and v2
+    bundles come out byte-identical; each path resolves against the LONGEST matching
+    mount target and `storage_scope` derives from fstype using exactly the amendment's
+    set — an unlisted fstype is `unknown`, counted and NAMED, never guessed either way.
+    APPLY: your collectors run on your hosts, so the value is yours to realise — re-run
+    the collector to get v3 bundles; existing bundles keep working unchanged, which is
+    the point of the presence dispatch.
+
+231. G97 — LAUNCHER AND PAYLOAD STOP SHARING THE `INVOKES` FOLD [lineage + a migration]
+    (`949b3b71`). The writer now emits `USES_ARTIFACT` to the PAYLOAD a launcher
+    dispatches, `INVOKES` keeps the launcher, and `:Script` gains `script_role
+    {launcher, payload}` plus the SME-3 artifact properties. Builds what two SIGNED
+    gates already ruled; nothing is reopened, no vocabulary entry edited. THE ONE
+    COLLISION IS WORTH YOUR ATTENTION because reading the rulings changed the answer:
+    the item read as if `USES_ARTIFACT` takes the Script|ETLProcess union — it does
+    not. `rua-load-shapes` B2 widened `scheduler_invokes` ONLY, and `cmdline-nfr-vetting`
+    SME-2 ruled m7 as ControlMJob->Script{payload}, which the live vocabulary entry
+    still says. So an Ab Initio pset or DPL pipeline reached THROUGH a launcher STAYS
+    on `INVOKES`, counted as its own bucket and never as "unclassified" — the reason is
+    a ruling, not missing evidence. The split is minted at EXTRACTION because three
+    things forbid a writer-only variant (`add_rel` refuses labels outside `REL_TYPES`;
+    `plan_curated` enforces confirmed <= graph.rels; `script_role` on both endpoints
+    needs a launcher node the extractor never minted).
+    APPLY: `drydocs/loaders/cypher/migrate_payload_invokes_to_uses_artifact_g97.cypher`
+    ships with it — run it against any graph already carrying folded INVOKES edges, and
+    read it before you do: it is the only file here that touches loaded data.
+
+232. G92 — THE JOB'S SCOPE CHAIN RESOLVES BEFORE THE FILE-OP PARSE [lineage]
+    (`30c7fb7e`). A job whose POSTCMD moves `%%R_PATH/out.dat` and a job whose CMD_LINE
+    moves `/data/r/out.dat` planned edges to TWO DataAsset nodes for ONE file, because
+    `_file_op` keyed the asset off the verbatim operand. BOTH passes had the defect;
+    pre/post only made it visible, because that is where variable forms concentrate.
+    A feed change, not a new parser and not a new resolver: the chain is built once per
+    run before the jobs pass, and shell text goes through `resolve_command_line` — the
+    one core resolver whose stated guardrail is that no caller may re-implement
+    substitution, now pinned by a test asserting this module imports no regex engine.
+    Raw stays BESIDE resolved (the G46 derived-fact shape): the asset keys on the
+    resolved location and every distinct raw spelling ACCUMULATES in `raw_operands` —
+    accumulated, not first-seen, because two jobs spelling one path two ways is exactly
+    the evidence that makes a wrong binding findable. `{ODATE}`-class residue is
+    EXPECTED and counted apart from a real miss; an unresolved user ref is counted AND
+    still stages on its raw spelling. APPLY: like-for-like. Expect your DataAsset counts
+    to FALL on the next inventory run — that is the duplicate collapsing, not data loss,
+    and the five new resolve counters on the coverage summary line are how you show it.
+
+233. G68 — THE FOLDER-SET PROFILE, PLUS THE SLOTS ONLY AN SME CAN FILL [remediation —
+    canonical-producer] (`783f754d`). The READ half of the remediation loop: five
+    censuses report what the export SAYS, and a substitution-slot list names what it
+    does NOT carry. That division — the machine reports what IS, the SME supplies what
+    is NOT THERE — is what keeps this out of the guessing that produced the drift C32
+    documents. Transport is NAMED rather than defaulted: a CLI verb writing a JSON
+    artifact, and the cost against ADR 0005 is NIL rather than merely acceptable —
+    that ADR governs the browser-to-Neo4j path, this reads no graph and writes none.
+    The verb lives in `drydocs/cli.py` deliberately (a new `cli_remediation` module
+    would be a component importing a component; the composition root is the only exempt
+    module and S8 adds no new exemption — `lineage-review` and `fid-census` already sit
+    there). Census (b) reports `run_as` BY JOB TYPE, honouring the 2026-08-19 SME
+    evidence rider: a FileWatcher on the platform account beside payload jobs on the
+    application account is the DESIGNED pattern, and flattening it reads as "two
+    accounts". APPLY: producer mechanism, your values — rule VALUES stay company-side
+    and never flow back (the `drydocs_remediation/**` row says so).
+
+234. G69 — R41-R44 REGISTERED AND DETECTED IN THE SAME CHANGE, AND ONE SHIPS WITHOUT A
+    DETECTOR ON PURPOSE [remediation + `internal/remediation/**`] (`49202a88`). The
+    PAIRING is the item: the registry is the single source for both gates, so a
+    detector with no entry emits findings nothing can rank, nothing can turn into a fix
+    and nothing can sign off on — the entry is the thing that gets ratified. R41
+    must-fix names the ORDINAL ACCIDENT, which is what justifies the severity, and
+    walks the RAW layers (a test pins that: `_declared` resolves into a dict and would
+    make the rule unable to fire). R42 should-fix, cross-folder: mixed separators do
+    not make a split FAIL, they make it return a different field count, so the
+    positional read silently lands on the wrong field. R44 advisory with its limit in
+    the message. R43 SHIPS REGISTERED WITH NO DETECTOR on evidence rather than
+    convenience: the carrier-ownership question was searched for — governance corpus,
+    guidelines page, gate prompts — and nothing rules shell-vs-Control-M ownership, so
+    a detector firing against an undecided rule would put a finding in front of an SME
+    with no defensible action attached. Its entry also records what it is NOT (R33 is
+    one FACT on two carriers; R43 is one NAME on two resolvers).
+    APPLY: R43 is a live question for YOUR governance side — if your standards own the
+    answer, rule it and the detector is a small build.
+
+235. G108 — THE FIRST AUDIT RECORD OF WHO ASKED THE GRAPH FOR WHAT [api + config —
+    two log kinds go active] (`cf7fac1c`). `drydocs_api` logged NOTHING. Now every
+    route that executes Cypher OR writes — twelve, enumerated in
+    `drydocs_api/audit.py`'s docstring with the exclusions stated — leaves one lean
+    line in the `api` kind (90-day metrics window, actor sha256-hashed the `:AgentRun`
+    way, NEVER Cypher text, NEVER result values), plus optionally a verbose line in
+    `api-debug` when THAT kind's declaration says `level: DEBUG` (ADR 0014 ruling C:
+    settings-level, never per-request; Cypher bounded at 20k with a truncated flag).
+    Ruling D wired end to end: `X-DryDocs-Run-Id` joins the audit line to the QA
+    ledger's `run_id` — `ephemeral_client` sends it, `agent.py` closes it over
+    `make_register` so `register_cypher`'s signature and every fake are unchanged;
+    fallback is the hashed session token and `correlation_source` says which won.
+    Both kinds flip planned->active WITH their writer named (`test_log_kinds` pins the
+    flip). APPLY: reads with steps 221-223 (ADR 0014, G105 log kinds, G107 batch run
+    log) — if you took those, this is the first consumer of the declaration. The
+    retention numbers are DOMAIN facts in `config/log-kinds.yaml`, so a different
+    company window is a config edit, not a code change.
+
+236. G70 — THE TOM ROLE VOCABULARY BECOMES DATA: ONE UNIT, SIXTEEN CLASSES [ontology +
+    a migration] (`4f28010d`). The G35 §A8 finding ends here. The role vocabulary lived
+    HARDCODED across four surfaces in three languages (enum, alias map, Cypher CASE,
+    scheme seed) and the only YAML copy was read by no code — it drifted TWICE inside
+    one gate with the suite green. Now `config/taxonomy/tom-role-vocabulary.yaml` is the
+    one declared surface, `drydocs_core/ontology/tom_role_vocabulary.py` reads it, and
+    SEVENTEEN drift guards force every other surface to defer. Seeded from the SIGNED
+    §G register: 7 required + 9 optional, the §G9 Operate Manager split (level property
+    retired), both SRE rows derived, Risk Manager crosswalked to
+    `technology_risk_controls` and stopped, retirement as an ACTIVE FLAG (§F6b),
+    cardinality recorded once on the scheme (§B3). `SealRole` is retired AS THE
+    ADMISSION GATE — an undeclared name loads FLAGGED, never dies at validation, so the
+    four classes §A1d measured as silently lost now load; the raw source string survives
+    verbatim beside the canonical (§A4b), retiring §A6c's accepted risk.
+    `business-application.yaml`'s roles register is DELETED; the memberships stay as the
+    sample, guarded against the declaration. APPLY: this is the largest behaviour change
+    in the range and it ships with
+    `drydocs/loaders/cypher/migrate_tom_role_split_g70.cypher`. Read it before running:
+    the Operate Manager split changes role identity on loaded rows. If your side already
+    diverged on role names, the declaration file is the ONE place to reconcile — that is
+    the whole point of the change.
+
+237. K22 — THE DEPLOYMENT MODULE CI PROPOSAL, DRAFTED AS A RIDER AND REGISTERED PLANNED
+    [ontology — nothing loads] (`a7ee9239`). A `G0d-RIDER` on
+    `tom-roles-enumeration-and-cardinality` (beside the signed §G0d, which already owns
+    the subject — L25: riders, not edits) carrying five ruled things in order: the
+    not-reopened fence, the CI-id-IS-the-business-key rule with the
+    composite-name-as-key refusal, the SME's topology verbatim, the C10
+    own-stable-name call (`:DeploymentModule`) with the twice-proven
+    label-is-not-identity evidence, and the correction scoping the form-default finding
+    to transactional records while the CI itself is real. Registered `planned` ONLY —
+    the `:DeploymentModule` node class (PROPOSED) and
+    `business_application_instantiates_deployment_module`; nothing loads, nothing flips
+    active, attribution stays on `:BusinessApplication`.
+    APPLY: informational. The rider is text on a gate page your side may hold its own
+    copy of (canonical-company); take the vocabulary entries as planned rows or not —
+    they write nothing either way.
+
+238. K25 — THE CROSS-APPLICATION `run_as` DETECTOR, CLASS-FIRST AND PER-JOB, WITH A
+    RUNNER THAT IS YOURS TO EXECUTE [review — and see RELAY-16] (`16c5ec2d`).
+    `drydocs/run_as_detect.py` is `fid_census`'s sibling with the same discipline end to
+    end: pure, injected, counts-only by return type. First cut is run_as CLASS
+    (platform_user / application_fid / unresolvable — the 2026-08-19 SME clarification),
+    per JOB and never per folder; the fixture reproduces the live IN-FOLDER split a
+    folder-grain read would miss. FileWatcher x platform is the DESIGNED pattern; a
+    payload job on the platform account is the countable anomaly. Platform-class jobs
+    are counted and EXCLUDED from the directory comparison; how a platform account is
+    recognized stays K17's ruling — the injected set is the seam, doc 09's S3 ranking
+    the evidence-backed proposal. The §G5 split parks at CASE grain until a human rules
+    each; unresolvable is counted by reason; case near-misses are reported on both joins
+    and never folded. Nothing touches the graph.
+    APPLY: the detector ports (`drydocs/**` default) — the DATA does not, and cannot.
+    RELAY-16 carries the ask.
+
+239. J39+J40+J43+J52 — THE RELEASE-INFRASTRUCTURE CLOSE-OUT BATCH [port machinery + one
+    SQL alias] (`155916e3`, format follow-up `cc38238a`). Four items, one commit,
+    every one of them about the port boundary itself. J43: manifest rows that carry
+    ontology/map fragments gain `gate_bound: config/gate-log.md`, and a new
+    `unsigned_activations()` reconcile check FAILS a reconcile that flips a vocabulary
+    entry to an ACTIVE status without a SIGNED gate-log section citing it — DRAFTED
+    stubs are explicitly not authority (step 229 depends on this). The same item adds
+    the `derived` DISPOSITION to the manifest legend and moves all six render rows
+    (board, roadmap, ideas, load-map, both TDD renders) onto it: take NEITHER side's
+    copy, REGENERATE from the reconciled tree — the naming gap your send-back had
+    already inboxed. J40: docmeta divergence decisions recorded (ADR numbers matched by
+    title-and-side, package-path convergence deferred to the adoption pass,
+    `prompts.py`/`pipeline.py` flagged as back-flow candidates with protective rows).
+    J39: six consolidated dispositions, of which ONE reached code — the header-row join
+    in `drydocs/loaders/sql/controlm_folders.sql` is re-aliased `H` -> `J` to match your
+    copy, back-flowed mechanism-only so the two sides' file stops carrying a permanent
+    cosmetic diff (two alias pins moved with it). J52: the verify skill gains a
+    dev-server VENUE rule — a session may observe only a browser it launched, and an
+    observation is cited as an observation. `cc38238a` is CI catching a `ruff format`
+    gate I skipped by running a test subset; it is the fix, not a second change.
+    APPLY: the manifest and the reconcile guards are the files your apply reads — take
+    them first, then re-run your reconcile, because `unsigned_activations()` is new and
+    may have something to say about entries already in your tree.
+
+240. PRODUCER-SIDE PORT HOUSEKEEPING — SIX RETIREMENTS, ONE MANIFEST ROW, ONE DOC FOLD
+    [never-port + docs] (`a796d13d`, `4a7f8a9c`, `5b67bcb4`, `26ddde09`, `00329469`,
+    `c622b1e9`). Cited rather than exempted because two of them touch files your apply
+    reads. The retirements: the sub-LoB/alias hand prompt (delivered by hand and
+    executed your side), four consumed delivery packs (each moved with its execution
+    evidence), and the 2026-07-16 internal-session checklist — 7 of its 9 items were
+    owned elsewhere and the 2 ORPHANS WERE RE-HOMED FIRST, which is the whole rule for
+    retiring a checklist. All land in `internal-local/archive/`, machine-local.
+    `26ddde09` is the consequence and the lesson: deleting the checklist left a
+    `PORT-MANIFEST.yaml` row matching nothing, CI caught it, and the fix is a
+    `row_may_match_nothing` entry — a subset test run is not the suite, which is the
+    second time that has cost a red build in this range. `00329469` folds a Mermaid
+    diagram into the doc that described it and drops `image-2.md` (a screenshot-derived
+    filename for a transcribed diagram); `c622b1e9` mints S14, which will relocate
+    `docs/Product/` to `knowledge/org/` after K20 — NOT done in this range, so the
+    paths cited by step 229's K20 prompt are still current.
+    APPLY: nothing to do; the manifest row is the only line that changes behaviour.
+
+LEDGER COVERAGE FOOTNOTE (2026-08-26 ROLL) — ritual commits in the
+`port-base-20260825..HEAD` extension, cited because the coverage check reads ONLY
+this section. DEPGRAPH SNAPSHOTS written `chore(snapshot):` instead of
+`chore(depgraph): snapshot` — the fourth through eighth instances of the same
+subject-line variant, still listed rather than fixed by loosening the pattern:
+`219fbf3d` `8a619377` `823d1427` `961dff15` `267d325c`. HANDOFF ROLL — `a8a6cadf`,
+`docs/next-session-handoff.md` plus the R23 desktop close: producer session state,
+never-port.
 
 LEDGER COVERAGE FOOTNOTE (2026-08-25 ROLL) — ritual commits in the
 `dd71116e..HEAD` extension, cited because the coverage check reads ONLY this
