@@ -37,6 +37,15 @@
 # their own are added: CCP and PCD — the source PDF was no longer on this machine, so their
 # definitions carry only the verbatim fragment the bleed preserved, marked as such; re-extract on a
 # machine that still holds the PDF to complete them.
+#
+# FIFTH PASS 2026-08-26 (user direction: add the C-suite acronyms related to data or information
+# owners and the technical CTO; source: business.com "C-Suite Job Titles", a PUBLIC business-press
+# article): CDO lands with BOTH senses the article defines (Chief Data Officer, Chief Digital
+# Officer); CIO gains the information-officer sense beside the report glossary's investment-office
+# sense, cross-noted both ways in does_not_mean; CTO added. Surveyed and deliberately NOT added:
+# CISO (security, not ownership), CAIO (AI policy), and the rest of the article's C-suite table —
+# outside the ask. The CDO entry also backs the cdo-* config ids the same-day sanitization pass
+# introduces (its does_not_mean carries the collateralized-debt-obligation collision).
 schema: drydocs.glossary.v1
 classification: Internal-Public
 terms:
@@ -299,6 +308,40 @@ terms:
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
+- acronym: CDO
+  senses:
+  - term_id: urn:drydocs:term:industry:CDO:1
+    scope: industry
+    pref_label: Chief Data Officer
+    alt_labels: []
+    definition: Oversees data-related business functions, including data management, data quality, data
+      strategy, data analytics and business intelligence — the executive data-owner role.
+    does_not_mean:
+    - Collateralized debt obligation — the structured-finance instrument, the default reading in many
+      bank-domain sources (the JPMC 2025 glossary defines CDS but not CDO). This repo's cdo-* config
+      ids take the chief-data-office sense (2026-08-26 sanitization ruling).
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+  - term_id: urn:drydocs:term:industry:CDO:2
+    scope: industry
+    pref_label: Chief Digital Officer
+    alt_labels: []
+    definition: Leads an organization's digital transformation efforts, overseeing the adoption of new
+      technologies and digital practices. The same source defines both CDO senses; sense :1 is the one
+      this repo's config ids mean.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
 - acronym: CDS
   senses:
   - term_id: urn:drydocs:term:industry:CDS:1
@@ -419,11 +462,29 @@ terms:
     alt_labels: []
     definition: Chief Investment Office. Expansion per the source glossary; see evidence_ref for the full
       entry.
-    does_not_mean: []
+    does_not_mean:
+    - Chief Information Officer — the industry C-suite technology role (sense :2 of this key); the two
+      senses collide wherever bank sources meet technology prose (flagged at the 2026-08-26 fifth pass).
     correlates_to: []
     evidence_ref:
     - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
       PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+  - term_id: urn:drydocs:term:industry:CIO:2
+    scope: industry
+    pref_label: Chief Information Officer
+    alt_labels: []
+    definition: Leads the organization in information technology (IT); owns corporate IT applications,
+      platforms and infrastructure — the executive information-owner role.
+    does_not_mean:
+    - Chief Investment Office — the JPMC annual-report glossary sense (sense :1 of this key); bank
+      filings default to the investment-office reading.
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
@@ -519,6 +580,22 @@ terms:
     evidence_ref:
     - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
       PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CTO
+  senses:
+  - term_id: urn:drydocs:term:industry:CTO:1
+    scope: industry
+    pref_label: Chief Technology Officer
+    alt_labels: []
+    definition: Focuses on how a company builds and uses technology and helps identify and solve
+      technology challenges — the technical executive role.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
