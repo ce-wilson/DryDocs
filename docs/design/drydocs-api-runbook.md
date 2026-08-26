@@ -145,8 +145,11 @@ across deliberately — a rebuild is routine), and they do NOT survive DELETING
 curl http://localhost:8001/health
 curl http://localhost:8001/mappings/domains -H "Authorization: Bearer <token>"
 ```
-Expect `status: ok`, then the domain registry with `ontology-map`, `job-application`,
-`seal-contact-override` and `app-code-mapping` marked `available: true`.
+Expect `status: ok`, then the domain registry with `ontology-map`,
+`seal-contact-override` and `app-code-mapping` marked `available: true`, and
+`fid-seal` / `alias-seal` `available: false`. (`job-application` was listed here
+until 2026-08-26; K15 retired the job-grain domain and it is now deleted from the
+registry outright — authoring lives at `app-code-mapping`.)
 
 **2. The role gate holds.** Log in as `jdoe4821` (role `user`) and call any
 `/mappings/*` route: expect **403**. A 200 here means the gate is gone.

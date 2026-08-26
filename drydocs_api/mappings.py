@@ -105,31 +105,6 @@ DOMAINS: tuple[dict, ...] = (
         "tier": 4,
         "available": False,
     },
-    # RETIRED at K15 (2026-08-05). K7 §A1 ruled attribution FOLDER-grain and K8
-    # retired the job-grain edge, so this domain's coverage grid read a
-    # relationship that no longer exists — it reported every row unresolved and
-    # drafted a changeset the server refuses. Retired rather than re-bound: a
-    # folder and its jobs carry the SAME app code, so a job-grain grid is N times rows
-    # carrying ONE folder-level fact, and a grid that looks per-job invites being
-    # read as per-job truth. Authoring lives at `app-code-mapping` (one row per app
-    # code); "which application owns this job" stays a one-hop traversal.
-    #
-    # NO LONGER SURFACED AS A TAB (user direction, 2026-08-26). The row stays in the
-    # registry so /mappings/domains keeps recording the retirement for any API
-    # consumer, and it sorts LAST. What this replaces is a claim that had already
-    # stopped being true: the row used to say it stayed visible so a bookmarked
-    # ?domain=job-application would not read as a silently vanished domain — but the
-    # console's deep-link initializer requires `available`, so that link has always
-    # fallen back to app-code-mapping without ever opening this domain. The tab it
-    # actually produced was a permanently disabled button, which is what was removed.
-    {
-        "id": "job-application",
-        "title": "Job → Application (RETIRED at K15 — folder grain supersedes)",
-        "kind": "manual",
-        "source": "(retired 2026-08-05 — author at app-code-mapping; jobs inherit their folder)",
-        "tier": 5,
-        "available": False,
-    },
 )
 
 # The committed override-list column order — the draft artifact reproduces the
@@ -306,12 +281,13 @@ class MappingStore:
         # The SELECT aliases are where the S3 boundary sits: the derived table keeps the
         # committed file's column name, the grid the console receives emits app_id
         # (gate business-application-identity §E1 / ADR 0010 rule 4).
-        if domain_id == "job-application":
-            return self._select(
-                "SELECT file, folder_id, job_id, seal_id AS app_id, "
-                "create_target_if_missing, authored_by, authored_on, note "
-                "FROM manual_mapping ORDER BY file, line_no"
-            )
+        #
+        # A `job-application` branch sat here until 2026-08-26. It was doubly dead:
+        # mapping_grid refuses any domain that is not `available`, and the domain has
+        # been unavailable since K15 — and the SELECT itself had rotted, asking for
+        # `job_id` and `seal_id`, neither of which manual_mapping has had since S3
+        # renamed seal_id to app_id. It would have raised OperationalError if anything
+        # had ever reached it. Removed with the domain.
         if domain_id == "seal-contact-override":
             return self._select(
                 "SELECT app_seal_id AS app_id, role_name, origin, holder_sid, holder_name, "

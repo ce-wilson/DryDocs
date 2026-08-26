@@ -87,8 +87,10 @@ Invoke-RestMethod http://localhost:8001/health          # -> {"status":"ok"}
 ```
 
 In the demo page, after logging in as `kchen2190`, the domain list should show **five
-domains** — `ontology-map`, `job-application`, and `seal-contact-override` available;
+domains** — `ontology-map`, `seal-contact-override` and `app-code-mapping` available;
 `fid-seal` and `alias-seal` greyed out (reconciler tables not built yet, expected).
+(`job-application` was the third available domain until K15 retired it, and it left the
+registry entirely on 2026-08-26.)
 The canonical domain registry is `DOMAINS` in `drydocs_api/mappings.py` — if the page
 and the registry disagree, the page is stale, not the registry.
 

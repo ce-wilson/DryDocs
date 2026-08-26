@@ -78,7 +78,15 @@ def test_steward_and_admin_see_domains(sessions, persona):
     out = list_domains(_token(sessions, persona), sessions)
     ids = [d["id"] for d in out["domains"]]
     assert ids == [d["id"] for d in DOMAINS]
-    assert "ontology-map" in ids and "job-application" in ids
+    assert "ontology-map" in ids
+    # INVERTED 2026-08-26 (was: job-application in ids). K15 retired the job-grain
+    # domain to available:false and KEPT the row so a bookmarked
+    # ?domain=job-application would render a visibly retired tab; the domain is now
+    # DELETED outright on user direction. Kept as an assertion rather than dropped,
+    # for the same reason K15 inverted its own two tests: the failure mode is someone
+    # re-adding the domain when a job-grain grid "looks missing", and K7 §A1 ruled
+    # attribution folder-grain. Authoring lives at app-code-mapping.
+    assert "job-application" not in ids
 
 
 def test_grid_serves_the_quintuple(sessions, store):

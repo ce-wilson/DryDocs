@@ -76,8 +76,9 @@ git → K2 gate → `manual_loads` loader.
   drydocs-api; the deployment path) and `neo4j.ts` (direct Bolt; dev-mode bench only).
 - **Named query** — a server-registered, param-validated, read-only Cypher statement
   (`drydocs_api/queries.py`); the browser sends an id + params, never Cypher.
-- **Mapping domain** — one stewarded mapping surface (`ontology-map`, `job-application`,
-  and the not-yet-built `fid-seal`, `alias-seal`).
+- **Mapping domain** — one stewarded mapping surface (`ontology-map`,
+  `seal-contact-override`, `app-code-mapping`, and the not-yet-built `fid-seal`,
+  `alias-seal`).
 - **Changeset artifact** — the CSV + manifest snippet returned by
   `POST /mappings/changeset`; a *proposal* for the git/gate/loader chain, never a write.
 - **MappingStore** — read-only accessor over the derived SQLite file (`var/mapping.db`),

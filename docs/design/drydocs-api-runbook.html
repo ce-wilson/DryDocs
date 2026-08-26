@@ -122,7 +122,7 @@ POST /mappings/drafts/{id}/promote  -&gt; {diff}  -&gt;  git apply on a branch  
 <p><strong>1. The service answers and the store is readable</strong> (no graph needed):</p>
 <pre class="powershell"><code>curl http://localhost:8001/health
 curl http://localhost:8001/mappings/domains -H &quot;Authorization: Bearer &lt;token&gt;&quot;</code></pre>
-<p>Expect <code>status: ok</code>, then the domain registry with <code>ontology-map</code>, <code>job-application</code>, <code>seal-contact-override</code> and <code>app-code-mapping</code> marked <code>available: true</code>.</p>
+<p>Expect <code>status: ok</code>, then the domain registry with <code>ontology-map</code>, <code>seal-contact-override</code> and <code>app-code-mapping</code> marked <code>available: true</code>, and <code>fid-seal</code> / <code>alias-seal</code> <code>available: false</code>. (<code>job-application</code> was listed here until 2026-08-26; K15 retired the job-grain domain and it is now deleted from the registry outright — authoring lives at <code>app-code-mapping</code>.)</p>
 <p><strong>2. The role gate holds.</strong> Log in as <code>jdoe4821</code> (role <code>user</code>) and call any <code>/mappings/*</code> route: expect <strong>403</strong>. A 200 here means the gate is gone.</p>
 <p><strong>3. The write guard holds — this is the check that matters.</strong> Post a write query to <code>/raw-cypher</code> and expect it REFUSED:</p>
 <pre><code>CREATE (n:Probe) RETURN n     -&gt;  rejected, never executed</code></pre>
