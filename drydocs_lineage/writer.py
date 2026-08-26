@@ -75,7 +75,7 @@ from drydocs_core import yaml_fragments
 from drydocs_core.ontology.swo_adapter import EXTENSION_LANGUAGE_IRI
 from drydocs_core.run_log import batch_run_log
 
-from .model import VOCAB_IDS, LineageGraph
+from .model import ETL_PROCESS_KINDS, VOCAB_IDS, LineageGraph
 
 #: The write target — ground truth. The trust axis IS the DB boundary (ADR 0002 D1).
 DATABASE = "drydocs"
@@ -87,11 +87,11 @@ _JOB_KIND = "controlm_job"
 
 #: invocation "engine" kinds that get their own :ETLProcess endpoint class
 #: instead of :Script (G12; gate-log 2026-07-16 "cmdline-lineage-review" §b).
-#: Identity is the SAME kind-scoped stable token the extractor already computes
-#: in ``controlm_inventory._stable_invocation_key`` for exactly these two kinds
-#: (everything else falls through to the full-target/path key Script already
-#: uses) — keep this set in sync with that function's special-casing.
-_ETL_PROCESS_KINDS = {"abinitio", "dpl"}
+#: MOVED TO model.py at G97 — the artifact pass needs the same set to know what
+#: it may not migrate onto USES_ARTIFACT, and two copies of a classification set
+#: is how they drift. Re-exported under the old private name so nothing that
+#: imported it here breaks.
+_ETL_PROCESS_KINDS = ETL_PROCESS_KINDS
 
 #: the ETLProcess ``kind`` property (etl | utility | notification — gate-log §a).
 #: AMBIGUITY CALL (G12, guardrail 5): the invocation engine alone cannot
@@ -102,6 +102,20 @@ _ETL_PROCESS_KINDS = {"abinitio", "dpl"}
 #: ``properties["mac_kind"]`` from pipeline.json subType, and the row build
 #: below consults it first — only non-MAC nodes still take the blind default.
 _DEFAULT_ETL_KIND = "etl"
+
+#: the :Script refinement properties (gate cmdline-nfr-vetting SME-3,
+#: 2026-07-21, adopted with m7 — G97 builds them). Read off ProcessNode
+#: .properties and passed through as NULL where a row does not carry one, which
+#: is what makes the coalesce guard in _SCRIPT_MERGE do its job.
+_SCRIPT_REFINEMENTS = (
+    "script_role",
+    "platform",
+    "artifact_uri",
+    "artifact_kind",
+    "platform_flags",
+    "script_path",
+    "evidence",
+)
 
 #: rel labels whose from_node is "ETLProcess | ControlMJob", never Script
 #: (gate-log 2026-07-15 EDIT; G13). Endpoint resolution below only special-
@@ -193,14 +207,28 @@ _ETL_PROCESS_CONSTRAINT = (
     "FOR (e:ETLProcess) REQUIRE e.token IS UNIQUE"
 )
 
+#: G97 — the :Script refinements gate cmdline-nfr-vetting SME-3 (2026-07-21)
+#: adopted with m7. `script_role` uses the SAME coalesce guard _RUA_SCRIPT_MERGE
+#: uses, and for the same reason: one path can be staged by two loaders (a rua
+#: profile AND a cmdline script), so a blind SET would let whichever ran last
+#: silently erase the other's stamp. The artifact properties coalesce too — a
+#: CMD_LINE row carries none of them, and it must not blank out what the
+#: variable feed already established about the same artifact.
 _SCRIPT_MERGE = """\
 UNWIND $rows AS row
 MERGE (s:Script {path: row.path})
   ON CREATE SET s.created_at = datetime($written_at),
                 s.source     = 'drydocs-lineage'
-SET s.kind         = row.kind,
-    s.name         = row.name,
-    s.last_seen_at = datetime($written_at)"""
+SET s.kind           = row.kind,
+    s.name           = row.name,
+    s.script_role    = coalesce(row.script_role, s.script_role),
+    s.platform       = coalesce(row.platform, s.platform),
+    s.artifact_uri   = coalesce(row.artifact_uri, s.artifact_uri),
+    s.artifact_kind  = coalesce(row.artifact_kind, s.artifact_kind),
+    s.platform_flags = coalesce(row.platform_flags, s.platform_flags),
+    s.script_path    = coalesce(row.script_path, s.script_path),
+    s.evidence       = coalesce(row.evidence, s.evidence),
+    s.last_seen_at   = datetime($written_at)"""
 
 _ETL_PROCESS_MERGE = """\
 UNWIND $rows AS row
@@ -247,6 +275,12 @@ class WritePlan:
     unresolved_file_ops: int  # script-src READS_FROM/WRITES_TO dropped: no
     # owning job found via INVOKES (G13) — counted,
     # never silently swallowed; see plan_curated
+    # -- G97 clause (e): what the launcher/payload split actually did in THIS
+    #    batch, read off the planned rows rather than recomputed
+    launchers: int = 0  # :Script rows carrying script_role='launcher'
+    payloads: int = 0  # :Script rows carrying script_role='payload'
+    scripts_unroled: int = 0  # :Script rows with no role — unchanged, reported
+    uses_artifact_rels: int = 0  # USES_ARTIFACT edges planned
 
 
 def _endpoint_class(graph: LineageGraph, node_id: str) -> str:
@@ -395,6 +429,11 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
                     "path": _node_key(nid),
                     "kind": node.kind,
                     "name": node.name,
+                    # G97 / SME-3: script_role {launcher, payload} plus the
+                    # adopted artifact properties. `evidence` is §B3's verbatim
+                    # derivation string — under §B2's union endpoints it is the
+                    # only way the endpoint-class choice stays re-checkable.
+                    **{k: node.properties.get(k) for k in _SCRIPT_REFINEMENTS},
                 }
             )
         elif cls == "etl_process":
@@ -458,6 +497,7 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
         )
         statements.append((cypher, {"rows": rows}))
 
+    roles = [r.get("script_role") for r in script_rows]
     return WritePlan(
         statements=tuple(statements),
         rel_types=tuple(sorted({r[1] for r in resolved})),
@@ -466,6 +506,10 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
         etl_processes=len(etl_process_rows),
         assets=len(asset_rows),
         unresolved_file_ops=unresolved_file_ops,
+        launchers=roles.count("launcher"),
+        payloads=roles.count("payload"),
+        scripts_unroled=sum(1 for r in roles if not r),
+        uses_artifact_rels=sum(1 for r in resolved if r[1] == "USES_ARTIFACT"),
     )
 
 

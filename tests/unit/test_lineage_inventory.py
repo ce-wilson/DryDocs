@@ -96,7 +96,11 @@ def test_shared_script_collapses(graph: LineageGraph) -> None:
 
 
 def test_rel_vocabulary_is_the_registered_set() -> None:
-    assert REL_TYPES == {"INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO"}
+    # USES_ARTIFACT joined at G97 — gate cmdline-nfr-vetting SME-2 (2026-07-21)
+    # registered it as a DISTINCT label rather than a role on INVOKES, and
+    # rua-load-shapes §A4 activated it. REL_ALIASES is deliberately untouched:
+    # the payload label is new vocabulary, not a prototype spelling.
+    assert REL_TYPES == {"INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO", "USES_ARTIFACT"}
     # prototype spellings normalize on entry, never leak into the graph
     g = LineageGraph()
     g.processes  # noqa: B018
@@ -496,3 +500,245 @@ def test_prepost_pass_never_mistakes_the_jobs_csv_for_variables(tmp_path) -> Non
         cov = ControlMInventoryExtractor().extract(source, LineageGraph())
         assert cov.prepost_rows_read == 0
         assert cov.prepost_file_ops_added == 0
+
+
+# =============================================================================
+# G97 - the launcher/payload split (USES_ARTIFACT)
+#
+# Two signed gates rule this and neither is reopened here: cmdline-nfr-vetting
+# 2026-07-21 (SME-2 the DISTINCT label, ControlMJob->Script{payload}; SME-3
+# the :Script refinements) and rua-load-shapes 2026-08-07 (B2 the union
+# endpoint that keeps INVOKES on :ETLProcess, B3 verbatim evidence, A4 the
+# activation). Fixtures are synthetic throughout.
+# =============================================================================
+
+_G97_HEADER = "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line,is_current_version\n"
+_VARS_HEADER = "folder_id,job_id,job_name,var_name,var_value,appl_type\n"
+_JID = "proc#controlm_job:161947.9"
+
+# a REGISTERED launcher (informatica.icdw_run_interface, named_launcher: true)
+_G97_JOBS = _G97_HEADER + (
+    "9,161947,JOB_SPARK,F1,svc.x,h1,"
+    "/apps/icdw/ICDW_etl_run_interface.ksh /apps/app/conform.jar,Y\n"
+)
+
+
+def _g97_extract(tmp_path, vars_csv: str, jobs_csv: str = _G97_JOBS):
+    jobs = tmp_path / "jobs.csv"
+    jobs.write_text(jobs_csv, encoding="utf-8")
+    variables = tmp_path / "vars.csv"
+    variables.write_text(vars_csv, encoding="utf-8")
+    graph = LineageGraph()
+    coverage = ControlMInventoryExtractor().extract(jobs, graph, variables_csv=variables)
+    return graph, coverage
+
+
+def _rels_of(graph, label):
+    return sorted(r for r in graph.rels if r[1] == label)
+
+
+def test_launcher_and_payload_yield_exactly_one_edge_each(tmp_path) -> None:
+    """The acceptance's headline case. One command line carrying a REGISTERED
+    launcher, plus the variable feed naming the payload it dispatches, yields
+    exactly one INVOKES (to the launcher) and one USES_ARTIFACT (to the
+    payload), with script_role stamped on both endpoints."""
+    graph, coverage = _g97_extract(
+        tmp_path,
+        _VARS_HEADER
+        + "161947,9,JOB_SPARK,%%ETL_ARTIFACT_URI,s3://synth/app/conform.jar,OS\n"
+        + "161947,9,JOB_SPARK,%%ETL_PLATFORM,emr,OS\n"
+        + "161947,9,JOB_SPARK,%%ETL_ARTIFACT_KIND,jar,OS\n"
+        + "161947,9,JOB_SPARK,%%ETL_PLATFORM_FLAGS,-py,OS\n",
+    )
+    launcher = "proc#informatica:/apps/icdw/ICDW_etl_run_interface.ksh"
+    payload = "proc#etl_artifact:s3://synth/app/conform.jar"
+
+    assert _rels_of(graph, "INVOKES") == [(_JID, "INVOKES", launcher)]
+    assert _rels_of(graph, "USES_ARTIFACT") == [(_JID, "USES_ARTIFACT", payload)]
+    assert graph.processes[launcher].properties["script_role"] == "launcher"
+
+    props = graph.processes[payload].properties
+    assert props["script_role"] == "payload"
+    assert props["artifact_uri"] == "s3://synth/app/conform.jar"
+    assert props["platform"] == "emr"  # the SME-3 adopted property set
+    assert props["artifact_kind"] == "jar"
+    assert props["platform_flags"] == "-py"
+    # B3: the derivation stays re-checkable, verbatim
+    assert "%%ETL_ARTIFACT_URI=s3://synth/app/conform.jar" in props["evidence"]
+
+    assert coverage.launchers_classified == 1
+    assert coverage.payloads_classified == 1
+    assert coverage.invocations_unclassified == 0
+
+
+def test_payload_less_command_line_yields_no_uses_artifact_edge(tmp_path) -> None:
+    """The acceptance's negative case: no artifact variable, no USES_ARTIFACT.
+    The launcher keeps its INVOKES and nothing is invented beside it."""
+    graph, coverage = _g97_extract(
+        tmp_path, _VARS_HEADER + "161947,9,JOB_SPARK,%%SOME_OTHER,value,OS\n"
+    )
+    assert _rels_of(graph, "USES_ARTIFACT") == []
+    assert len(_rels_of(graph, "INVOKES")) == 1
+    assert coverage.payloads_classified == 0
+    assert coverage.launchers_classified == 1
+
+
+def test_unregistered_interpreter_is_unclassified_never_promoted(tmp_path) -> None:
+    """Clause (e). spark-submit is a GENERIC interpreter rule, deliberately not
+    `named_launcher` in the registry - an arbitrary interpreter is not launcher
+    evidence. It stays exactly where it is today, on INVOKES with no role, and
+    it is COUNTED. Promoting it would be the guess the clause forbids."""
+    jobs = _G97_HEADER + (
+        "9,161947,JOB_SPARK,F1,svc.x,h1," "spark-submit --master yarn /apps/app/refine.py,Y\n"
+    )
+    graph, coverage = _g97_extract(tmp_path, _VARS_HEADER, jobs_csv=jobs)
+    node = graph.processes["proc#pyspark:/apps/app/refine.py"]
+    assert "script_role" not in node.properties
+    assert (_JID, "INVOKES", node.node_id) in graph.rels
+    assert coverage.invocations_unclassified == 1
+    assert coverage.launchers_classified == 0
+
+
+def test_payload_named_in_both_feeds_is_migrated_never_double_represented(tmp_path) -> None:
+    """Clause (d) - the outcome that must be IMPOSSIBLE. The same jar is named
+    on the command line (so the CMD_LINE pass staged it WITH an INVOKES edge)
+    and in the artifact variable. It must end as ONE node on ONE label: in the
+    writer both stagings MERGE onto the same :Script {path}, so a jar carrying
+    INVOKES and USES_ARTIFACT at once is exactly the double representation the
+    clause rules out. The edge is MOVED, not added beside."""
+    jobs = _G97_HEADER + (
+        "9,161947,JOB_JAVA,F1,svc.x,h1," "java -jar /apps/app/conform.jar --date 20260101,Y\n"
+    )
+    graph, coverage = _g97_extract(
+        tmp_path,
+        _VARS_HEADER + "161947,9,JOB_JAVA,%%ETL_ARTIFACT_URI,/apps/app/conform.jar,OS\n",
+        jobs_csv=jobs,
+    )
+    jar = "proc#java:/apps/app/conform.jar"
+    assert jar in graph.processes
+    assert "proc#etl_artifact:/apps/app/conform.jar" not in graph.processes  # ONE node
+    assert (_JID, "USES_ARTIFACT", jar) in graph.rels
+    assert (_JID, "INVOKES", jar) not in graph.rels
+    assert graph.processes[jar].properties["script_role"] == "payload"
+    assert coverage.payloads_migrated_off_invokes == 1
+
+
+def test_etl_process_payload_stays_on_invokes_per_b2(tmp_path) -> None:
+    """B2 in code. scheduler_uses_artifact's to_node is `Script` (SME-2), and
+    B2 chose the union endpoint precisely so INVOKES could keep landing on
+    :ETLProcess without re-modelling G12's working wrapper-payload expansion.
+    So an Ab Initio pset STAYS on INVOKES. That is not an unmigrated leftover,
+    and it is counted apart from `unclassified` because the reason is a RULING
+    rather than an absence of evidence."""
+    jobs = _G97_HEADER + (
+        # the abioncloud wrapper, whose -g payload IS expanded to the pset — so
+        # the node really is an :ETLProcess (G12) and not the wrapper script
+        "9,161947,JOB_AI,F1,svc.x,h1,/apps/ab/runscript.sh -g /sandbox/ing.pset,Y\n"
+    )
+    graph, coverage = _g97_extract(
+        tmp_path,
+        _VARS_HEADER + "161947,9,JOB_AI,%%ETL_ARTIFACT_URI,ing.pset,OS\n",
+        jobs_csv=jobs,
+    )
+    pset = "proc#abinitio:ing.pset"
+    assert (_JID, "INVOKES", pset) in graph.rels
+    assert _rels_of(graph, "USES_ARTIFACT") == []
+    assert "script_role" not in graph.processes[pset].properties  # not a :Script
+    assert coverage.payloads_kept_on_invokes_etl == 1
+    assert coverage.invocations_etl_process == 1
+
+
+def test_unresolved_artifact_value_is_counted_never_staged(tmp_path) -> None:
+    """SME-1's own caveat honoured: "payloads are often variable-held/
+    unresolvable". A value that is still a %%reference names no artifact, and
+    staging it would put a node called %%JAR_HOME/conform.jar in the graph that
+    reads as a real artifact forever after. Counted, not dropped, not invented."""
+    graph, coverage = _g97_extract(
+        tmp_path,
+        _VARS_HEADER + "161947,9,JOB_SPARK,%%ETL_ARTIFACT_URI,%%JAR_HOME/conform.jar,OS\n",
+    )
+    assert _rels_of(graph, "USES_ARTIFACT") == []
+    assert not [n for n in graph.processes if n.startswith("proc#etl_artifact:")]
+    assert coverage.artifact_values_unresolved == 1
+    assert coverage.payloads_classified == 0
+
+
+def test_values_decide_a_launcher_valued_artifact_variable_is_not_a_payload(tmp_path) -> None:
+    """The G16 value contract's load-bearing case, and the 2,384-variable gap
+    analysis' one durable finding: NAMES LIE. %%JAR_PATH holding dt-launcher.sh
+    is a LAUNCHER reference, not an artifact - classify_variable resolves it by
+    VALUE, so no payload stages and no USES_ARTIFACT edge appears."""
+    graph, coverage = _g97_extract(
+        tmp_path, _VARS_HEADER + "161947,9,JOB_SPARK,%%JAR_PATH,dt-launcher.sh,OS\n"
+    )
+    assert _rels_of(graph, "USES_ARTIFACT") == []
+    assert coverage.payloads_classified == 0
+    assert coverage.artifact_rows_read == 1  # it WAS read - it just is not a payload
+
+
+def test_artifact_row_for_an_unknown_job_is_counted(tmp_path) -> None:
+    """The house rule applied to the new pass: a fact whose job is not in this
+    extract is counted, never dropped."""
+    _, coverage = _g97_extract(
+        tmp_path,
+        _VARS_HEADER + "999999,1,JOB_ELSEWHERE,%%ETL_ARTIFACT_URI,s3://synth/x.jar,OS\n",
+    )
+    assert coverage.artifact_jobs_unmatched == 1
+    assert coverage.payloads_classified == 0
+
+
+def test_writer_plans_uses_artifact_and_counts_the_roles(tmp_path) -> None:
+    """The writer half: the split reaches the plan. USES_ARTIFACT gets its own
+    MATCH/MERGE batch with the scheduler_uses_artifact vocab id, the :Script
+    rows carry the SME-3 refinements, and WritePlan reports the clause-(e)
+    counts off the planned rows."""
+    from drydocs_lineage.writer import plan_curated
+
+    graph, _ = _g97_extract(
+        tmp_path,
+        _VARS_HEADER
+        + "161947,9,JOB_SPARK,%%ETL_ARTIFACT_URI,s3://synth/app/conform.jar,OS\n"
+        + "161947,9,JOB_SPARK,%%ETL_PLATFORM,emr,OS\n",
+    )
+    plan = plan_curated(graph, set(graph.rels))
+    assert "USES_ARTIFACT" in plan.rel_types
+    assert plan.uses_artifact_rels == 1
+    assert plan.launchers == 1 and plan.payloads == 1 and plan.scripts_unroled == 0
+
+    cypher = "\n".join(c for c, _ in plan.statements)
+    assert "MERGE (src)-[r:USES_ARTIFACT]->(dst)" in cypher
+    assert "scheduler_uses_artifact" in cypher
+    assert "s.script_role    = coalesce(row.script_role, s.script_role)" in cypher
+
+    payload_row = next(
+        r
+        for _, params in plan.statements
+        for r in params.get("rows", [])
+        if isinstance(r, dict) and r.get("script_role") == "payload"
+    )
+    assert payload_row["platform"] == "emr"
+    assert payload_row["artifact_uri"] == "s3://synth/app/conform.jar"
+
+
+def test_payload_migration_cypher_moves_the_edge_and_spares_etlprocess() -> None:
+    """Clause (d)'s written-down position, pinned so it cannot quietly drift.
+    A MERGE-only re-load cannot retract an edge an earlier load asserted, so the
+    named migration step is what makes double representation impossible on an
+    EXISTING graph - and it must leave :ETLProcess alone, because B2 puts those
+    on INVOKES deliberately."""
+    from pathlib import Path as _Path
+
+    repo = _Path(__file__).resolve().parents[2]
+    script = (
+        repo
+        / "drydocs"
+        / "loaders"
+        / "cypher"
+        / "migrate_payload_invokes_to_uses_artifact_g97.cypher"
+    )
+    text = script.read_text(encoding="utf-8")
+    assert "MATCH (j:ControlMJob)-[old:INVOKES]->(s:Script)" in text  # :Script ONLY
+    assert "s.script_role = 'payload'" in text  # evidence, never a path guess
+    assert "MERGE (j)-[new:USES_ARTIFACT]->(s)" in text
+    assert "DELETE old" in text  # MOVED, not copied
+    assert "ETLProcess" in text  # the exclusion is stated, not silent

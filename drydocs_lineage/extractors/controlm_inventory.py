@@ -57,10 +57,18 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from drydocs_core.orchestration.controlm import parse_command, pipeline_guid
-from drydocs_core.orchestration.controlm.variables import SHELL_VAR_NAMES
+from drydocs_core.orchestration.controlm.variables import SHELL_VAR_NAMES, classify_variable
+from drydocs_core.orchestration.shell import NAMED_LAUNCHER_RULES
 from drydocs_core.orchestration.shell import dpl_properties as _dpl_properties
 
-from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
+from ..model import (
+    ETL_PROCESS_KINDS,
+    DataAssetNode,
+    LineageGraph,
+    ProcessNode,
+    asset_id,
+    process_id,
+)
 
 # header tokens that identify a Control-M jobs CSV when searching a directory
 _JOBS_CSV_HINTS = ("job_name", "cmd_line", "node_id")
@@ -85,6 +93,36 @@ def _var(var_row: dict, field: str) -> str:
     value = var_row.get(field) or var_row.get(_VARS_RAW_SYNONYMS[field]) or ""
     return value.strip()
 
+
+#: G97 — the launcher/payload split, and WHICH FACT SAYS WHICH. These are the
+#: G16 FACT_REGISTRY canonical fact_types, reached through
+#: ``classify_variable`` so the "aliases suggest, VALUES decide" contract
+#: applies: a variable whose VALUE is a registered launcher is a launcher
+#: reference whatever it is NAMED (the JAR_PATH -> dt-launcher.sh gotcha), and
+#: a bare digest is a SHA, never a URI. The 2,384-variable gap analysis' one
+#: durable finding is that names lie, so nothing below ever reads a name.
+_PAYLOAD_FACT = "ARTIFACT_URI"
+_LAUNCHER_FACT = "LAUNCHER_SCRIPT_PATH"
+
+#: fact_type -> the :Script property it becomes. EXACTLY the set gate
+#: cmdline-nfr-vetting SME-3 (2026-07-21) adopted with m7 — platform /
+#: artifact_uri / artifact_kind / platform_flags / script_path. ARTIFACT_SHA is
+#: deliberately NOT here: it is named by the acceptance as a DISCRIMINATOR (a
+#: job carrying one has an artifact) and it is counted as such below, but SME-3
+#: did not adopt it as a Script property and this build mints no property a
+#: signed ruling did not name.
+_ARTIFACT_PROPS = {
+    "ETL_PLATFORM": "platform",
+    "PLATFORM_FLAGS": "platform_flags",
+    "ARTIFACT_KIND": "artifact_kind",
+    _LAUNCHER_FACT: "script_path",
+}
+
+#: the kind for a payload Script minted from a variable rather than parsed out
+#: of a command line. Deliberately OUTSIDE ``ETL_PROCESS_KINDS`` so the writer
+#: resolves it to the :Script endpoint class — scheduler_uses_artifact's
+#: to_node is `Script` (SME-2), not the Script|ETLProcess union INVOKES got.
+_ARTIFACT_KIND = "etl_artifact"
 
 #: file-op types that carry data flow (src read, tgt written) — the unix
 #: move/copy/gzip wrapper forms named in the 2026-07-15 gate caveat (G14).
@@ -137,6 +175,19 @@ class ExtractCoverage:
     prepost_commands_empty: int = 0  # shell variable present, value blank
     prepost_commands_unparsed: int = 0  # value present but 0 invocations AND 0 file ops
     prepost_file_ops_added: int = 0  # READS_FROM/WRITES_TO candidates from pre/post text
+    # -- the G97 launcher/payload split. Clause (e): every invocation lands in
+    #    exactly one of classified-launcher / classified-payload / unclassified,
+    #    and an unclassified one STAYS WHERE IT IS — never promoted on a guess.
+    launchers_classified: int = 0  # cmdline nodes stamped script_role=launcher
+    payloads_classified: int = 0  # USES_ARTIFACT candidates linked
+    invocations_unclassified: int = 0  # cmdline nodes with neither role — unchanged
+    payloads_migrated_off_invokes: int = 0  # payload that HAD an INVOKES edge; moved
+    payloads_kept_on_invokes_etl: int = 0  # payload is an :ETLProcess — §B2 keeps it
+    invocations_etl_process: int = 0  # cmdline node is an :ETLProcess (G12/§B2)
+    artifact_rows_read: int = 0  # variable rows carrying an artifact/launcher fact
+    artifact_jobs_unmatched: int = 0  # artifact fact whose job is not in this extract
+    artifact_values_unresolved: int = 0  # value holds %%refs/whitespace — no node minted
+    artifact_sha_seen: int = 0  # ARTIFACT_SHA discriminators observed (not a property)
 
     def as_dict(self) -> dict[str, int]:
         return asdict(self)
@@ -156,8 +207,29 @@ class ExtractCoverage:
             f"unmatched={self.prepost_jobs_unmatched} "
             f"empty={self.prepost_commands_empty} "
             f"unparsed={self.prepost_commands_unparsed} "
-            f"added={self.prepost_file_ops_added}"
+            f"added={self.prepost_file_ops_added} | "
+            f"roles: launcher={self.launchers_classified} "
+            f"payload={self.payloads_classified} "
+            f"unclassified={self.invocations_unclassified} "
+            f"etl_process={self.invocations_etl_process} "
+            f"(migrated={self.payloads_migrated_off_invokes} "
+            f"etl_kept={self.payloads_kept_on_invokes_etl}) | "
+            f"artifact-vars: rows={self.artifact_rows_read} "
+            f"unmatched={self.artifact_jobs_unmatched} "
+            f"unresolved={self.artifact_values_unresolved}"
         )
+
+
+def _is_resolved_literal(value: str) -> bool:
+    """True when a variable value names a KNOWN artifact rather than a promise.
+
+    An unresolved ``%%VAR`` reference and a multi-token command are both real
+    and common (SME-1: "payloads are often variable-held/unresolvable"), and
+    neither identifies an artifact — staging one would put a node named
+    ``%%JAR_PATH`` in the graph, which reads as a real artifact forever after.
+    Counted by the caller, never silently dropped."""
+    stripped = value.strip()
+    return bool(stripped) and "%%" not in stripped and not any(c.isspace() for c in stripped)
 
 
 def _stable_invocation_key(inv, target: str) -> str:
@@ -225,6 +297,10 @@ class ControlMInventoryExtractor:
         )
         if vars_path is not None:
             self._prepost_pass(vars_path, into, coverage)
+            # AFTER the CMD_LINE pass on purpose: the split reads the nodes that
+            # pass already staged, so a payload it can match is MOVED off INVOKES
+            # rather than duplicated beside it (clause d).
+            self._artifact_pass(vars_path, into, coverage)
         return coverage
 
     # -- internals --------------------------------------------------------------
@@ -316,6 +392,22 @@ class ControlMInventoryExtractor:
             kind = inv.invocation_type.lower()
             cid = process_id(kind, _stable_invocation_key(inv, target))
             props = _dpl_properties(inv.args) if kind == "dpl" else {}
+            # G97 clause (e), decided HERE because this is where the registry's
+            # verdict is in hand. `script_role` is a ruled :Script property
+            # (SME-3), so it belongs in this bag; the classifier RULE that
+            # produced it does not — that bag is definition-level launcher
+            # params and a test guards it against exactly this kind of drift.
+            if kind in ETL_PROCESS_KINDS:
+                # this node is an :ETLProcess, and script_role is a :Script
+                # property (SME-3) — stamping it here would put a Script
+                # refinement on a node that is not one. §B2 keeps these on
+                # INVOKES anyway, so they are their own count, not "unclassified".
+                coverage.invocations_etl_process += 1
+            elif inv.classifier_rule in NAMED_LAUNCHER_RULES:
+                props["script_role"] = "launcher"
+                coverage.launchers_classified += 1
+            else:
+                coverage.invocations_unclassified += 1
             into.add_process(
                 ProcessNode(
                     node_id=cid,
@@ -373,6 +465,155 @@ class ControlMInventoryExtractor:
                     self._file_op(jid, fop, into, coverage, prepost=True)
                 if not parsed.file_ops and not parsed.invocations:
                     coverage.prepost_commands_unparsed += 1
+
+    # -- G97: the launcher / payload split ---------------------------------------
+    def _artifact_pass(self, csv_path: Path, into: LineageGraph, coverage: ExtractCoverage) -> None:
+        """Artifact variables → USES_ARTIFACT payload candidates (G97).
+
+        WHY THIS READS VARIABLES AND NOT THE COMMAND LINE. A command line names
+        what was TYPED; the payload a launcher dispatches is usually held in a
+        folder/job VARIABLE, which is why gate cmdline-nfr-vetting SME-1
+        rejected the payload-sourced TRIGGERS variant ("payloads are often
+        variable-held/unresolvable") and why the G97 acceptance names the G16
+        FACT_REGISTRY canonicals as the discriminator. Classification runs
+        through :func:`classify_variable`, so the value contract decides and the
+        variable's NAME never does.
+
+        Each payload becomes a :Script (SME-2 ruled the edge
+        ControlMJob→Script{payload}) carrying script_role='payload' plus the
+        SME-3 property set, joined to its job by USES_ARTIFACT. Where the
+        CMD_LINE pass already staged that same artifact, the node is REUSED and
+        its INVOKES edge is MOVED — that is the "payload invocations migrate out
+        of the 1..n fold" both signed entries describe, and doing it here is
+        what makes a payload on both labels impossible rather than merely
+        unlikely (clause d).
+        """
+        by_name = self._job_name_index(into)
+        # job -> {fact_type: value}; one job's artifact facts are only complete
+        # once the whole file is read, so collect first and mint after
+        facts: dict[str, dict[str, str]] = {}
+        evidence: dict[str, list[str]] = {}
+        with csv_path.open(newline="", encoding="utf-8-sig") as fh:
+            for var_row in csv.DictReader(fh):
+                name = _var(var_row, "var_name")
+                value = _var(var_row, "var_value")
+                if not name:
+                    continue
+                classified = classify_variable(name, value)
+                fact = classified.fact_type
+                if fact not in _ARTIFACT_PROPS and fact not in (_PAYLOAD_FACT, "ARTIFACT_SHA"):
+                    continue
+                coverage.artifact_rows_read += 1
+                if fact == "ARTIFACT_SHA":
+                    # a DISCRIMINATOR, not a property (see _ARTIFACT_PROPS):
+                    # counted so "this job has an artifact" stays measurable
+                    coverage.artifact_sha_seen += 1
+                    continue
+                jid = self._join_job(var_row, into, by_name)
+                if not jid:
+                    coverage.artifact_jobs_unmatched += 1
+                    continue
+                if not _is_resolved_literal(value):
+                    # %%REF-bearing or multi-token: the artifact is not KNOWN
+                    # here, and minting a node named after an unresolved
+                    # reference would put a placeholder in the graph
+                    coverage.artifact_values_unresolved += 1
+                    continue
+                facts.setdefault(jid, {})[fact] = value
+                # §B3: the raw evidence string is kept VERBATIM, which under
+                # §B2's union endpoints is the only way the class choice stays
+                # re-checkable later
+                evidence.setdefault(jid, []).append(f"{name}={value}")
+
+        for jid, job_facts in sorted(facts.items()):
+            uri = job_facts.get(_PAYLOAD_FACT)
+            if not uri:
+                continue  # launcher/platform facts alone name no payload
+            self._stage_payload(jid, uri, job_facts, evidence.get(jid, []), into, coverage)
+
+    def _stage_payload(
+        self,
+        jid: str,
+        uri: str,
+        job_facts: dict[str, str],
+        evidence: list[str],
+        into: LineageGraph,
+        coverage: ExtractCoverage,
+    ) -> None:
+        """One job's payload artifact → a :Script + a USES_ARTIFACT candidate."""
+        existing = self._script_node_at(into, uri)
+        if existing is not None and into.processes[existing].kind in ETL_PROCESS_KINDS:
+            # §B2 kept INVOKES on :ETLProcess deliberately (it would mean
+            # re-modelling G12's working wrapper-payload expansion), and
+            # scheduler_uses_artifact's to_node is Script. So this one STAYS
+            # where it is and is counted — clause (e), on a ruling not a guess.
+            coverage.payloads_kept_on_invokes_etl += 1
+            return
+        if existing is not None:
+            pid = existing
+            if (jid, "INVOKES", pid) in into.rels:
+                into.rels.discard((jid, "INVOKES", pid))
+                coverage.payloads_migrated_off_invokes += 1
+        else:
+            pid = process_id(_ARTIFACT_KIND, uri)
+            into.add_process(
+                ProcessNode(
+                    node_id=pid,
+                    kind=_ARTIFACT_KIND,
+                    name=_basename(uri),
+                    path=uri,
+                )
+            )
+        node = into.processes[pid]
+        node.properties["script_role"] = "payload"
+        node.properties["artifact_uri"] = uri
+        for fact, prop in _ARTIFACT_PROPS.items():
+            if job_facts.get(fact):
+                node.properties[prop] = job_facts[fact]
+        if evidence:
+            node.properties["evidence"] = "\n".join(evidence)
+        into.add_rel(jid, "USES_ARTIFACT", pid)
+        coverage.payloads_classified += 1
+
+    # -- shared join helpers (the pre/post pass and the artifact pass agree) ------
+    @staticmethod
+    def _job_name_index(into: LineageGraph) -> dict[str, str | None]:
+        """job name -> node id, or None where the name is AMBIGUOUS in this
+        extract (a duplicate name resolves to nothing rather than to whichever
+        row was read last)."""
+        by_name: dict[str, str | None] = {}
+        for node in into.processes.values():
+            if node.kind == "controlm_job":
+                by_name[node.name] = None if node.name in by_name else node.node_id
+        return by_name
+
+    @staticmethod
+    def _join_job(var_row: dict, into: LineageGraph, by_name: dict[str, str | None]) -> str:
+        """A variables-CSV row -> its job node id, by the (folder_id, job_id)
+        node key, falling back to a UNIQUE job name. Empty string = unmatched,
+        which every caller counts."""
+        folder_id = _var(var_row, "folder_id")
+        job_id = _var(var_row, "job_id")
+        jid = process_id("controlm_job", f"{folder_id}.{job_id}") if folder_id and job_id else ""
+        if jid not in into.processes:
+            jid = by_name.get(_var(var_row, "job_name")) or ""
+        return jid
+
+    @staticmethod
+    def _script_node_at(into: LineageGraph, path: str) -> str | None:
+        """The already-staged process node whose Script key IS ``path``.
+
+        The writer keys :Script on the node key, so matching on it here is what
+        keeps one artifact ONE node: without this, a jar named both in a
+        command line and in an ETL_ARTIFACT_URI variable would stage twice,
+        MERGE onto the same :Script in the writer, and arrive carrying INVOKES
+        and USES_ARTIFACT at once — the one outcome clause (d) forbids."""
+        for node_id, node in into.processes.items():
+            if node.kind == "controlm_job" or node.kind == _ARTIFACT_KIND:
+                continue
+            if node_id.split(":", 1)[-1] == path:
+                return node_id
+        return None
 
     def _file_op(
         self,
