@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-25T22:10:49",
+    "captured_at": "2026-08-25T22:28:39",
     "date": "20260825",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "949b3b71",
-      "full": "949b3b71a2fa4a041ca15782ac75afc709822e13",
+      "commit": "30c7fb7e",
+      "full": "30c7fb7e6ab5dc1c62cb714842236b2a8e78139f",
       "branch": "main",
-      "describe": "port-base-20260825-15-g949b3b71",
-      "subject": "feat(lineage): G97 — launcher and payload stop sharing the INVOKES fold",
+      "describe": "port-base-20260825-21-g30c7fb7e",
+      "subject": "feat(lineage): G92 — resolve the job's scope chain before the file-op parse",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6501,6 +6501,15 @@
       "name": "rua-load-shapes.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/rua-load-shapes.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/script-provenance-gaps.yaml",
+      "name": "script-provenance-gaps.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/script-provenance-gaps.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19466,10 +19475,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2132.json",
-      "name": "drydocs-20260825-2132.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json",
+      "name": "drydocs-20260825.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825-2132.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25593,6 +25602,10 @@
     ],
     [
       "drydocs/drydocs_lineage/extractors/controlm_inventory.py",
+      "drydocs/drydocs_core/orchestration/controlm/resolver.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors/controlm_inventory.py",
       "drydocs/drydocs_core/orchestration/controlm/variables.py"
     ],
     [
@@ -26694,6 +26707,10 @@
     [
       "drydocs/tests/unit/test_lineage_inventory.py",
       "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_inventory.py",
+      "drydocs/drydocs_lineage/extractors/controlm_inventory.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_inventory.py",
@@ -32380,6 +32397,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/rua-load-shapes.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/script-provenance-gaps.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -39479,7 +39501,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2132.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -41891,13 +41913,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2371,
-    "edges": 1170,
+    "files": 2372,
+    "edges": 1172,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2654,
+    "rels": 2655,
     "directories": 284
   }
 }
