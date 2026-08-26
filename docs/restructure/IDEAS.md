@@ -5198,3 +5198,13 @@ question a 1,000-line file with the trail at the bottom could not answer.
   census runs before the gate) is now history, same as the prompt's rider says of itself. One-line
   docstring correction; noticed during K25 (its sibling module cites the signed state) and left
   out of that commit because it is K16's surface, not K25's.
+
+- **Idea-178 (2026-08-26, desktop):** the org-acronym sanitization (gate-log RECORD 2026-08-26;
+  mapping in `internal/cdo-reference/README.md`) renamed the doc corpus id the two repos JOIN on —
+  the company registry row still carries the pre-rename id, and their 2026-08-19 Confluence capture
+  ran under it. The next port session treats this as a deliberate id migration, per-entry per the
+  port-review F-table (producer fields cross, company fields never do), and checks whether their
+  load ran — i.e. whether graph doc ids carry the retired string (the `essential-graphrag` retired
+  entry is the string-lives-on-in-the-graph precedent). Also: the `hr-bootstrap-loads-config`
+  worktree predates the sweep — whoever merges it re-runs the done-gate grep (`git grep -i` for the
+  retired string outside `internal/`).
