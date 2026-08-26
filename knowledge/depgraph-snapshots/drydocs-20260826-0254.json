@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-26T00:02:25",
+    "captured_at": "2026-08-26T02:54:27",
     "date": "20260826",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "49202a88",
-      "full": "49202a88d74496b65f729857e8f6aecc9fc91a7b",
+      "commit": "16c5ec2d",
+      "full": "16c5ec2dcab6d41647ce81fa4d9b4c9e291e6247",
       "branch": "main",
-      "describe": "port-base-20260825-27-g49202a88",
-      "subject": "feat(remediation): G69 — R41-R44 registered and detected in the same change",
+      "describe": "port-base-20260825-37-g16c5ec2d",
+      "subject": "feat(review): K25 — the cross-application run_as detector, class-first and per-job",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7109,6 +7109,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/taxonomy/tom-role-vocabulary.yaml",
+      "name": "tom-role-vocabulary.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy/tom-role-vocabulary.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/taxonomy/ui-components.yaml",
       "name": "ui-components.yaml",
       "extension": ".yaml",
@@ -7266,6 +7275,15 @@
       "name": "k16-fid-census-company-prompt.md",
       "extension": ".md",
       "rel_path": "docs/company-prompts/k16-fid-census-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/k25-run-as-detection-company-prompt.md",
+      "name": "k25-run-as-detection-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/k25-run-as-detection-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15947,6 +15965,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/migrate_tom_role_split_g70.cypher",
+      "name": "migrate_tom_role_split_g70.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/migrate_tom_role_split_g70.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher",
       "name": "migrate_vocab_ids_g101.cypher",
       "extension": ".cypher",
@@ -16523,6 +16550,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/run_as_detect.py",
+      "name": "run_as_detect.py",
+      "extension": ".py",
+      "rel_path": "drydocs/run_as_detect.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/seal_samples.py",
       "name": "seal_samples.py",
       "extension": ".py",
@@ -16626,6 +16662,15 @@
       "name": "app.py",
       "extension": ".py",
       "rel_path": "drydocs_api/app.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_api/audit.py",
+      "name": "audit.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/audit.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17310,6 +17355,15 @@
       "name": "swo_adapter.py",
       "extension": ".py",
       "rel_path": "drydocs_core/ontology/swo_adapter.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/ontology/tom_role_vocabulary.py",
+      "name": "tom_role_vocabulary.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/ontology/tom_role_vocabulary.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19493,10 +19547,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2228.json",
-      "name": "drydocs-20260825-2228.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260826.json",
+      "name": "drydocs-20260826.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825-2228.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260826.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20942,6 +20996,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_api_audit.py",
+      "name": "test_api_audit.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_api_audit.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_app_identity_guard.py",
       "name": "test_app_identity_guard.py",
       "extension": ".py",
@@ -22139,6 +22202,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_run_as_detect.py",
+      "name": "test_run_as_detect.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_run_as_detect.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_runbook_coverage.py",
       "name": "test_runbook_coverage.py",
       "extension": ".py",
@@ -22368,6 +22440,15 @@
       "name": "test_tier2.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_tier2.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_tom_role_vocabulary.py",
+      "name": "test_tom_role_vocabulary.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_tom_role_vocabulary.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25057,6 +25138,10 @@
     ],
     [
       "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_api/audit.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/ephemeral_specs.py"
     ],
     [
@@ -25102,6 +25187,14 @@
     [
       "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_core/notifications.py"
+    ],
+    [
+      "drydocs/drydocs_api/audit.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/drydocs_api/audit.py",
+      "drydocs/drydocs_core/run_log.py"
     ],
     [
       "drydocs/drydocs_api/ephemeral_specs.py",
@@ -25364,6 +25457,10 @@
       "drydocs/drydocs_core/models/seal.py"
     ],
     [
+      "drydocs/drydocs_core/models/seal.py",
+      "drydocs/drydocs_core/ontology/tom_role_vocabulary.py"
+    ],
+    [
       "drydocs/drydocs_core/neo4j_client.py",
       "drydocs/drydocs_core/cypher_split.py"
     ],
@@ -25378,6 +25475,10 @@
     [
       "drydocs/drydocs_core/ontology/schema_graph.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/drydocs_core/ontology/tom_role_vocabulary.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_core/orchestration/__init__.py",
@@ -26050,6 +26151,18 @@
     [
       "drydocs/tests/unit/test_agent_telemetry.py",
       "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_api_audit.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_api_audit.py",
+      "drydocs/drydocs_api/audit.py"
+    ],
+    [
+      "drydocs/tests/unit/test_api_audit.py",
+      "drydocs/drydocs_api/sessions.py"
     ],
     [
       "drydocs/tests/unit/test_app_identity_guard.py",
@@ -27340,6 +27453,10 @@
       "drydocs/drydocs_core/models/__init__.py"
     ],
     [
+      "drydocs/tests/unit/test_run_as_detect.py",
+      "drydocs/drydocs/run_as_detect.py"
+    ],
+    [
       "drydocs/tests/unit/test_runbook_currency.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -27410,6 +27527,10 @@
     [
       "drydocs/tests/unit/test_seal_roles.py",
       "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_roles.py",
+      "drydocs/drydocs_core/ontology/tom_role_vocabulary.py"
     ],
     [
       "drydocs/tests/unit/test_seal_samples.py",
@@ -27546,6 +27667,14 @@
     [
       "drydocs/tests/unit/test_theme_vocabulary.py",
       "drydocs/drydocs_docmeta/manifest.py"
+    ],
+    [
+      "drydocs/tests/unit/test_tom_role_vocabulary.py",
+      "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/tests/unit/test_tom_role_vocabulary.py",
+      "drydocs/drydocs_core/ontology/tom_role_vocabulary.py"
     ],
     [
       "drydocs/tests/unit/test_transcribe_doc_markup.py",
@@ -32698,6 +32827,11 @@
     [
       "drydocs/config/taxonomy",
       "CONTAINS",
+      "drydocs/config/taxonomy/tom-role-vocabulary.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy",
+      "CONTAINS",
       "drydocs/config/taxonomy/ui-components.yaml"
     ],
     [
@@ -32899,6 +33033,11 @@
       "drydocs/docs/company-prompts",
       "CONTAINS",
       "drydocs/docs/company-prompts/k16-fid-census-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
+      "drydocs/docs/company-prompts/k25-run-as-detection-company-prompt.md"
     ],
     [
       "drydocs/docs/company-prompts",
@@ -37003,6 +37142,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/run_as_detect.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/seal_samples.py"
     ],
     [
@@ -37778,6 +37922,11 @@
     [
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/migrate_tom_role_split_g70.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
       "drydocs/drydocs/loaders/cypher/migrate_vocab_ids_g101.cypher"
     ],
     [
@@ -38004,6 +38153,11 @@
       "drydocs/drydocs_api",
       "CONTAINS",
       "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
+      "drydocs/drydocs_api/audit.py"
     ],
     [
       "drydocs/drydocs_api",
@@ -38334,6 +38488,11 @@
       "drydocs/drydocs_core/ontology",
       "CONTAINS",
       "drydocs/drydocs_core/ontology/swo_adapter.py"
+    ],
+    [
+      "drydocs/drydocs_core/ontology",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/tom_role_vocabulary.py"
     ],
     [
       "drydocs/drydocs_core/ontology/relationship_vocabulary",
@@ -39578,7 +39737,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825-2228.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260826.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40318,6 +40477,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_api_audit.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_app_identity_guard.py"
     ],
     [
@@ -40983,6 +41147,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_run_as_detect.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_runbook_coverage.py"
     ],
     [
@@ -41109,6 +41278,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_tier2.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_tom_role_vocabulary.py"
     ],
     [
       "drydocs/tests/unit",
@@ -41995,13 +42169,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2375,
-    "edges": 1182,
+    "files": 2384,
+    "edges": 1194,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2658,
+    "rels": 2667,
     "directories": 284
   }
 }
