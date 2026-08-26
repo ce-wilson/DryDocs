@@ -1015,6 +1015,19 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-26",
+      "title": "RECORD: gate `tech-partner-attach-level` DRAFTED, unsigned (K20)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/tech-partner-attach-level.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4151",
+      "unblocks": [
+        "K20"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

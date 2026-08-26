@@ -4147,3 +4147,27 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
 - **Related:** G94 (the selector — builds regardless, may not invent the carrier), G84
   (adoption measurement + the fence's origin), the etlprocess-kind-enum rider (where
   engine names must agree if per-engine standards get ids).
+
+## 2026-08-26 — RECORD: gate `tech-partner-attach-level` DRAFTED, unsigned (K20)
+
+- **What this records.** The K5-amendment prompt is drafted (5 sections, 9 confirmations,
+  `config/gate-prompts/tech-partner-attach-level.yaml`) and NOTHING is decided: K5 stays
+  signed, the supplement stays unedited, the ProductRole scheme stays exactly the fixed 7.
+  An amendment gate is how a signed clause is re-opened (the G35 precedent); drafting one
+  decides nothing (G27/W1/N10/G61).
+- **The four questions on the page.** (A) the attach level — K5 §B signed tech_partner
+  AreaProduct-only; the SME (2026-08-06) and the company role guidance both read it as
+  PRODUCT-level, and Area Tech Partner is separately defined. (B) whether area_tech_partner
+  is admitted as the eighth concept — the fixed-scheme rule exercised, not broken — with
+  fold-into-one and defer-for-extract laid out and priced. (C) the consequence restated
+  against current facts: G91 (2026-08-18) activated catalog_has_area_product after the item
+  was groomed, so Idea-75's no-rows-no-loader measurement is half-stale — what stands is
+  that no cabinet attribution loader exists on either side; plus the proposed
+  seeded-concept-reachability guard (the G35 §A2 + Idea-75 pair would both have surfaced at
+  seed time). (D) the change_note re-read — if the level moves, the note's two halves may
+  describe one role, and the CTO rename history may belong to whichever concept §B admits.
+- **Fences.** G35 §A6 (the SEAL-side tech partner -> CTO alias STAYS) is explicitly
+  unaffected; the TOM family, the three active attribution forms, the other five concepts
+  and area_product_owner's scope are named untouched.
+- **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
+  DRAFTED stubs as non-authority; no vocabulary status may cite this heading.

@@ -8,9 +8,9 @@ phase: 9
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
-gates: [product-cabinet-attribution]
+gates: [product-cabinet-attribution, tech-partner-attach-level]
 inputs:
 - config/gate-prompts/product-cabinet-attribution.yaml
 - docs/Product/technology_roles_and_responsibilities.md
@@ -19,4 +19,14 @@ acceptance: |
   A gate prompt is drafted on the G35 amendment model (drafting decides nothing; K5 stays signed and the supplement unedited until sign-off) covering: (1) the attach level — the SME (2026-08-06, in-chat) and the company role doc both read Tech Partner as PRODUCT-level while K5 §B118 signed AreaProduct-only; (2) whether Area Tech Partner needs its own concept in a scheme K5 fixed at exactly 7; (3) the measurable consequence today — tech_partner is scoped exclusively to a node class with zero instances and no loader (the technology_risk_controls G35 §A2 failure mode reproduced), which also argues for a seeded-concept-reachability check; (4) the K5 change_note re-read (its two halves may describe one level). The adjacent SEAL-side "tech partner" -> "CTO" alias ruling (G35 §A6) is cited as SEPARATE and unaffected.
 notes: |
   Groomed 2026-08-07 from Idea-75. p1 — a signed concept nothing can write is live governance debt. G35's scope fence explicitly declines to reopen K5, so this cannot fold into that walk; it needs its own gate. Inputs verified at the groom: the K5 gate prompt is config/gate-prompts/product-cabinet-attribution.yaml and the supplement lives in drydocs_core/schema/.
+  DONE 2026-08-26 (desktop, main session): prompt drafted at
+  config/gate-prompts/tech-partner-attach-level.yaml (5 sections, 9 confirmations) +
+  gate-log RECORD stub (DRAFTED, unsigned — non-authority per J43). All four acceptance
+  points covered; acceptance point (3) restated against current facts per the G35
+  moved-premise model, because G91 (2026-08-18) activated catalog_has_area_product with
+  loader area_products.cypher AFTER the item was groomed — Idea-75's no-rows-no-loader
+  measurement is half-stale, and the prompt says so up front (§C1) rather than repeating
+  the groomed snapshot. G35 §A6 alias fenced as SEPARATE (§D2). S14 relocation rider
+  honored: the role doc is cited at its current docs/Product path; S14 repoints the
+  citation if the gate is still unsigned when it runs.
   RIDER 2026-08-26 (S14): docs/Product/technology_roles_and_responsibilities.md relocates to knowledge/org/ AFTER this item completes — S14 depends_on K20 and owns the move plus the reference fixes (including repointing the drafted prompt's citation if the gate is still unsigned). K20 itself moves nothing; cite the docs/Product path as it stands today.

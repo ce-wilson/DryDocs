@@ -1,0 +1,160 @@
+# SME gate-prompt spec — the Tech Partner attach level (backlog K20).
+# AMENDMENT GATE, AND DRAFTING DECIDES NOTHING: this page RE-OPENS one clause of
+# a SIGNED ruling (product-cabinet-attribution / K5, 2026-07-20) on the G35
+# model — a signed gate is re-opened through a gate, never by an edit. K5 stays
+# signed, the supplement stays unedited, and the ProductRole scheme stays
+# exactly the fixed 7 until the SME signs this page (the G27/W1/N10/G61
+# precedent).
+#
+# WHAT MOVED SINCE THE ITEM WAS GROOMED, stated up front because one of the
+# item's four questions was written against a premise that is now partly wrong
+# (the G35 2026-08-10 header is the model for saying so):
+#   * Idea-75 (2026-08-06) measured tech_partner as "scoped to a node class
+#     that has no rows and no loader" — a signed concept nothing can write, the
+#     technology_risk_controls failure mode (G35 §A2) reproduced. On 2026-08-18
+#     G91 ACTIVATED catalog_has_area_product with a real loader
+#     (area_products.cypher + the C22 orphan sweep), and the SME confirmed
+#     (2026-08-17) that the production PAT extract carries the AreaProduct
+#     layer — the sample's area_products: 0 is a DATA gap, not a model gap.
+#     §C1 restates the consequence against current facts: tech_partner's
+#     SPECIAL exposure is gone; its MISPLACEMENT is not.
+#   * The catalog_cabinet_* attribution entries K5 left planned went ACTIVE
+#     when the K6 supplement landed. The fence (§E) names them untouched.
+# The attach-level CONFLICT — the item's core — is unchanged by any of this.
+#
+# SCOPE FENCE — what this page may NOT touch (§E makes it a confirmation):
+#   * the TOM role family and everything G35 signed (2026-08-11), including the
+#     §A6 alias ruling this page explicitly does not disturb;
+#   * the three attribution forms (reified chain + collapsed twin), all active;
+#   * the other five ProductRole concepts and area_product_owner's
+#     AreaProduct-only scope;
+#   * the attribution_id shape and the match-policy tiers (their own fences).
+#
+# Mechanism and role names only. Role names are public-tier throughout the repo
+# (catalog_ontology_supplement.cypher, config/taxonomy/). The role-doc quotes
+# are responsibility prose from a captured company guidance document already
+# tracked at Internal-Public. No SEAL ids, no application names, no person
+# names, no SIDs. Production-PAT counts stay in the internal twin (G91's own
+# handling) and are not reproduced here.
+# classification: Internal-Public
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: tech-partner-attach-level
+title: "SME Gate — the Tech Partner attach level: product or area-product, whether Area Tech Partner is its own concept, and what the CTO rename note describes after the correction"
+step: "Amendment to product-cabinet-attribution §B (K5, signed 2026-07-20) — before any Product Cabinet loader is built against the scheme, so the first attribution rows land on the right node class"
+summary: >
+  Rules four coupled things about the Product Cabinet role scheme's
+  tech_partner concept. (a) THE ATTACH LEVEL: K5 §B signed "area_product_owner
+  AND tech_partner attach ONLY to :AreaProduct", but the SME (in-chat,
+  2026-08-06) placed Tech Partner in the ProductCatalog-Product hierarchy at
+  the PRODUCT level, and the company's own role guidance agrees — it defines
+  Tech Partner as the accountable technology leader FOR A PRODUCT and lists
+  Area Tech Partner as a SEPARATE role that owns the technical strategy for
+  the domain. K5's stated basis for the AreaProduct scope was the rename
+  history, which is exactly where two roles can look like one. (b) WHETHER
+  AREA TECH PARTNER GETS ITS OWN CONCEPT in a scheme K5 fixed at exactly 7 —
+  the second worked example, after G35's 7-vs-9, of what a FIXED scheme costs
+  when the estate holds more classes than the signature; the alternatives
+  (one concept whose level is read from the attach node, or deferral until a
+  cabinet extract shows the role as a distinct holding) are laid out with
+  costs. (c) THE CONSEQUENCE, RESTATED AGAINST CURRENT FACTS: G91 activated
+  the AreaProduct hop after the item was groomed, so the "no rows and no
+  loader" measurement is stale — what remains true is that no Product Cabinet
+  loader exists on either side, and the seed placed a concept on a class the
+  producer sample cannot exercise; §C asks for the seeded-concept-reachability
+  guard that would have surfaced both this and G35 §A2 at seed time. (d) THE
+  CHANGE_NOTE RE-READ: if tech_partner is product-level, the signed note's two
+  halves ("this area-product role was formerly named 'CTO' in SEAL; SEAL's CTO
+  now denotes the product-level role") may be describing one level, and the
+  rename history may belong to whichever concept §B admits. Confirming this
+  page authorizes NO graph write; the supplement edit, the scheme change and
+  the map-entry amendment land afterwards as their own logged change, with a
+  re-apply refreshing already-loaded graphs (the K5 sign-off-corrections
+  precedent).
+
+meta:
+  Module: "ontology — the artifacts under discussion are drydocs_core/schema/catalog_ontology_supplement.cypher (the ProductRole scheme seed) and the product-cabinet-attribution map entry. The prompt DESCRIBES an amendment; nothing is edited until sign-off"
+  Source: "config/gate-log.md K5 section (2026-07-20, §A scheme FIXED + §B scope) · catalog_ontology_supplement.cypher ProductRole scheme (p4 tech_partner: scope AreaProduct + skos:changeNote) · docs/Product/technology_roles_and_responsibilities.md (Tech Partner and Area Tech Partner definitions) · SME in-chat 2026-08-06, transcribed in docs/restructure/IDEAS.md Idea-75 · G91 ruling 2026-08-18 (42-local-catalog.yaml, catalog_has_area_product activation note) · config/gate-log.md G35 section (2026-08-11, §A2 unreachable-concept failure mode; §A6 alias ruling)"
+  Precedent: "G35 (tom-roles-enumeration-and-cardinality) — a signed vocabulary clause is re-opened through a gate, and its 2026-08-10 header models restating moved premises up front · H4 (code-graph-package-layer §H4) — same source, same subgraph: AMEND the existing map entry, never mint a second one · K5 sign-off corrections — supplement edits land as their own logged change and a re-apply refreshes loaded graphs · G27/W1/N10/G61 — a drafted prompt decides nothing"
+  Registry ref: "no source-registry or doc-source-registry change — every evidence surface cited is already tracked, and no new source is onboarded by this ruling"
+  Classification: "Internal-Public — mechanism and public-tier role names only; role-doc quotes are responsibility prose; production-PAT counts stay in the internal twin and are not reproduced"
+  Vocabulary: "NOTHING registered at draft, deliberately. If §B admits area_tech_partner, the concept lands at sign-off as a supplement seed inside the existing product_roles scheme (a scheme-membership change this gate itself authorizes — the scheme's fixed: true means exactly that new roles require a gate, and this is that gate). The map entry product-cabinet-attribution takes an AMENDMENT note (H4), not a second entry. No relationship types change in any outcome"
+
+provenance:
+  - label: "The signed state — what K5 fixed, verbatim"
+    source_object: "drydocs_core/schema/catalog_ontology_supplement.cypher · config/gate-log.md (K5, 2026-07-20)"
+    key: "SkosConceptScheme product_roles (fixed: true) + ProductRole tech_partner"
+    loader: "NONE for attribution rows — K5's own effect line: any Product Cabinet loader stays blocked company-side (no person-level cabinet extract exists). The scheme seed itself ships in the supplement"
+    properties:
+      - name: scheme_fixed_at_seven
+        origin: source
+        from: "gate-log K5 §A: 'EXACTLY the fixed 7 (area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead); new roles require a new gate (the tom_roles precedent)' — and the supplement sets s.fixed = true"
+        note: "§B operates inside this rule, not against it: the fixed scheme is the mechanism by which an eighth concept is admitted, and this page is the gate the rule requires."
+      - name: tech_partner_scope
+        origin: source
+        from: "gate-log K5 §B: 'area_product_owner AND tech_partner attach ONLY to :AreaProduct'; supplement seed: p4.scope = 'AreaProduct'"
+        note: "The clause under amendment. Idea-75 cites the same ruling via the gate render's §B118 numbering."
+      - name: change_note_text
+        origin: source
+        from: "the p4 seed's skos:changeNote: 'in PAT the mapping changed slightly: this area-product role was formerly named CTO in SEAL; SEAL's CTO now denotes the product-level role. Recorded at the K5 gate (2026-07-20); supersedes the 2026-07-10 §B CTO-in-both-families record'"
+        note: "§D's whole subject. If tech_partner is product-level, 'this area-product role' mislabels the concept the note sits on, and the note's second half may be describing the same role."
+  - label: "The company role guidance — the doc that agrees with the SME, not the gate"
+    source_object: "docs/Product/technology_roles_and_responsibilities.md (captured company guidance, tracked Internal-Public; S14 relocates the file after this item — the citation follows it if this page is still unsigned)"
+    key: "Tech Partner · Area Tech Partner (two separately-defined roles)"
+    loader: "NONE — reference prose, not a load source"
+    properties:
+      - name: tech_partner_definition
+        origin: source
+        from: "'Accountable technology leader for a product' — first listed responsibility, and the section is headed Tech Partner alone"
+        note: "Product-level on its face. This is the repo's only captured company definition of the role."
+      - name: area_tech_partner_definition
+        origin: source
+        from: "a SEPARATE section: 'Owns the technical strategy for the domain; influences Area/Product roadmap' · 'Has an identifiable Area Product partner' · 'Manage the team, including hiring, compensation management...'"
+        note: "Separately defined responsibilities, not a levelled copy of the same list — the SKOS-side argument that this is a distinct concept, not one concept worn at two levels."
+      - name: overlap_clause
+        origin: source
+        from: "under Tech Partner: 'May also assume Area Tech Partner responsibilities based on product size'"
+        note: "The clause that makes two roles look like one — a PERSON can hold both, which is about holdings, not about the concept scheme. Named here so the gate can weigh it rather than trip over it, and because it is the likeliest mechanism behind the K5 conflation (§B2)."
+  - label: "The moved premise — what G91 changed and what still stands (assembled for this page)"
+    source_object: "drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml (catalog_has_area_product) · config/taxonomy/lob-product-team.yaml · docs/restructure/IDEAS.md Idea-75"
+    key: "reachability of the :AreaProduct attach class, then and now"
+    loader: "area_products.cypher (ACTIVE since G91, 2026-08-18) for the class; still NONE for cabinet attribution rows on either side"
+    properties:
+      - name: idea75_measurement
+        origin: derived
+        from: "Idea-75 (2026-08-06): area_products: 0 in the sample AND catalog_has_area_product status: planned — 'a signed concept nothing can write', the G35 §A2 technology_risk_controls failure mode reproduced"
+        note: "Accurate when written; half of it is now stale. Restated in §C1 so the amendment rests on current facts — the honest-restatement obligation the G35 header models."
+      - name: g91_activation
+        origin: derived
+        from: "the catalog_has_area_product entry note: ACTIVATED at G91 (2026-08-18) — supplement + loader both exist; the sample's area_products: 0 is a data gap ('independent lifecycles', K5 §B's own words), and the SME confirmed 2026-08-17 the production PAT extract carries the layer"
+        note: "What remains true today: no Product Cabinet attribution loader exists on either side, so no attribution row exercises ANY of the 7 concepts — tech_partner is no longer specially unreachable, it is (on the evidence of §A) specially misplaced."
+      - name: sme_placement
+        origin: derived
+        from: "SME in-chat 2026-08-06, transcribed in IDEAS.md Idea-75: 'in the catalog there is a role hierarchy ProductCatalog-Product with role Tech Partner'"
+        note: "The catalog-side placement statement that opened the item. Derived here because the quote reaches this page through the IDEAS transcription, not through a registered extract."
+
+sections:
+  - title: "A. The attach level — product or area-product"
+    confirmations:
+      - "A1. THE CONFLICT, RULED. K5 §B signed tech_partner as AreaProduct-only and the supplement seeds scope = 'AreaProduct'. Against that: the SME's catalog placement (2026-08-06, Product level) and the company role guidance ('Accountable technology leader for a product'), which also defines Area Tech Partner separately. K5's stated basis was the rename history — the one reading under which two roles collapse into one. Rule the attach level. AGENT RECOMMENDATION: PRODUCT — the only two estate voices in evidence (SME + company guidance) agree against the signed record, and the signed record's basis is the conflation §B2 names rather than an independent observation."
+      - "A2. THE SCOPE VALUE THAT FOLLOWS. If A1 rules Product: (option 1) scope = 'Product' strictly — correct IF §B admits area_tech_partner, since the area-level holding then has its own concept; (option 2) scope unset, i.e. Product-or-AreaProduct like the other five — correct only IF §B rejects a separate concept, so one concept must legally attach at both levels. The overlap clause ('may also assume... based on product size') is about a PERSON holding both roles, not about one concept spanning both classes — it argues for option 1 plus §B admission, not for option 2. Confirm the pairing rule: the scope value is decided BY the §B outcome, not independently of it."
+
+  - title: "B. Area Tech Partner — an eighth concept in a scheme fixed at seven"
+    confirmations:
+      - "B1. ADMIT, FOLD, OR DEFER. The scheme's fixed: true means new roles require a gate — this page is that gate, so the fixed rule is being exercised, not broken. (a) ADMIT area_tech_partner as the eighth concept, scope 'AreaProduct', on the role doc's separately-defined responsibilities (domain strategy + people management vs product technology accountability) — the second worked example, after G35's 7-vs-9, of a fixed scheme catching up with the estate. (b) FOLD: one tech_partner concept, level read from the attach node (Product = product-level, AreaProduct = area-level) — cheapest, but it erases a distinction the company's own guidance draws, and SKOS-wise two responsibility sets under one prefLabel is the shape G35 §G9 just unwound for Operate Manager. (c) DEFER until a person-level cabinet extract shows Area Tech Partner as a distinct accountable holding — the evidence today is guidance prose, not an attribution row; but note the dcat gate's §D1 deferral logic no longer applies as precedent, since G91 resolved that the AreaProduct TIER exists in production. AGENT RECOMMENDATION: (a) — the guidance defines two roles; modeling one guarantees the next cabinet extract repeats this gate."
+      - "B2. THE CONFLATION, RECORDED WITH ITS CAUSE. Whatever A1/B1 decide, the amendment records WHY the signed record read differently: the rename history plus the may-also-assume overlap made two roles look like one at K5. Confirm that the gate-log ruling names the cause — a correction with a mechanism is a precedent; a bare flip is just churn (the G35 §G9 correction-attached pattern)."
+
+  - title: "C. The consequence, restated — and the guard that would have caught it"
+    confirmations:
+      - "C1. THE MEASUREMENT, CORRECTED. Idea-75's 'no rows and no loader' was accurate on 2026-08-06 and is half-stale now: G91 activated catalog_has_area_product (loader area_products.cypher) on 2026-08-18 and production PAT carries the layer; the sample's area_products: 0 is a data gap with independent lifecycles (K5 §B's own words). What remains true: NO Product Cabinet attribution loader exists on either side, so nothing writes any of the 7 concepts today — and the seed still places tech_partner on the one class the producer sample cannot exercise. Confirm the corrected statement of consequence, so this amendment rests on current facts rather than on the groomed snapshot."
+      - "C2. THE SEEDED-CONCEPT-REACHABILITY GUARD. Twice now a signed concept sat unreachable with nothing noticing: technology_risk_controls (G35 §A2, Individual scope — no group to map to) and tech_partner-per-Idea-75 (attach class then unloadable). Proposed: a graph-test/QA check — every seeded concept with a scope property must name a node class that is loadable (an active loader or sample rows for the attach class), WARN-tier, run where the supplement-drift checks run. A graph-test, not a database constraint (G35 (c): Neo4j cannot declare a count over a traversal). Confirm grooming it as a follow-up item at sign-off — the item is the deliverable; the check's exact tier and home are the builder's call."
+
+  - title: "D. The change_note re-read — what the CTO rename history describes now"
+    confirmations:
+      - "D1. THE NOTE'S TWO HALVES. Signed text: 'this area-product role was formerly named CTO in SEAL; SEAL's CTO now denotes the product-level role.' If A1 rules Product, the halves collapse — the note calls its own concept area-product while its second half assigns the CTO name to the product level, i.e. plausibly the SAME role. Rule what the note becomes: rewritten on tech_partner to record the actual history (formerly CTO in SEAL; attach level corrected at this gate, with the K5 reading and its cause per §B2) — and if §B admits area_tech_partner, rule WHICH concept inherits the rename history, since 'the area-product role formerly named CTO' may have been describing the area role all along. The note is skos:changeNote — history accretes, it is never silently deleted."
+      - "D2. THE ALIAS FENCE, RESTATED SO IT CANNOT BE RE-LITIGATED HERE. G35 §A6 ruled the SEAL-side contact-extract alias 'tech partner' -> 'CTO' STAYS. That is a TOM-family extract-name fact about :BusinessApplication attribution and is UNAFFECTED by anything this page decides — both rulings are true at once (Idea-75 says exactly this). Confirm the fence."
+
+  - title: "E. Scope fence and landing mechanics"
+    confirmations:
+      - "E1. UNTOUCHED, BY NAME: the TOM role family and everything G35 signed; the three attribution forms (catalog_cabinet_qualified_attribution, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to — all active, shapes unchanged); the other five ProductRole concepts; area_product_owner's AreaProduct-only scope; the attribution_id 4-part shape and the match-policy tiers. Confirm the fence."
+      - "E2. HOW THE RULING LANDS. Nothing is edited at draft. At sign-off: the supplement edit (p4 scope + change_note, plus the area_tech_partner seed if §B admits it) lands as its own logged change and a supplement re-apply refreshes already-loaded graphs (the K5 sign-off-corrections precedent); the map entry product-cabinet-attribution takes an AMENDMENT note recording this gate's date and outcome (H4 — same source, same subgraph, never a second entry); the C2 guard item is groomed. Confirm the landing list — it is the build's checklist, so sign-off inherits it as obligations rather than discovering them."
