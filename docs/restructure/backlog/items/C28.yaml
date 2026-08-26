@@ -8,7 +8,7 @@ phase: 2
 agent: ontology-mapper
 model: fable
 priority: p3
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - internal/context-graph-analysis/business-layer-location-experiment.md
