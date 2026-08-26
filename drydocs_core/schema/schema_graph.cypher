@@ -89,6 +89,8 @@ MERGE (n:SchemaMeta:DataAsset {name: 'DataAsset'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DataFlow {name: 'DataFlow'})
   SET n.class = 'prov:Activity', n.prov_type = 'Activity';
+MERGE (n:SchemaMeta:DeploymentModule {name: 'DeploymentModule'})
+  SET n.class = 'dd:DeploymentModule', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})
   SET n.class = 'prov:Entity', n.dual_class = 'dprod:DataProduct', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Employee {name: 'Employee'})
@@ -335,6 +337,10 @@ MERGE (a)-[r:HAD_PRIMARY_SOURCE]->(b)
 MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'DistributionList'})
 MERGE (a)-[r:HAS_CONTACT_POINT]->(b)
   SET r.vocab_id = 'business_application_port_has_contact_point', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'DeploymentModule'})
+MERGE (a)-[r:INSTANTIATES]->(b)
+  SET r.vocab_id = 'business_application_instantiates_deployment_module', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'BusinessApplication'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)

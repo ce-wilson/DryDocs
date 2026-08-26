@@ -207,6 +207,36 @@
     domain:       business_application
     status:       planned
 
+  # ── Deployment Module CI (K22 PROPOSAL — rider G0d-RIDER on gate
+  # tom-roles-enumeration-and-cardinality, 2026-08-26) ──────────────────────
+
+  - id:           business_application_instantiates_deployment_module
+    neo4j_label:  INSTANTIATES
+    inverse_label: "instance of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      DeploymentModule
+    prov_maps_to: ~
+    note: >
+      PROPOSED at K22 (2026-08-26), routed via the tom-roles gate's G0d-RIDER —
+      the CI topology exactly as the SME gave it (2026-08-10, K21): Business
+      Application [Instantiates] Deployment Module, inverse [Instance of], and
+      above it [Contained by] area product (the parent is the AREA PRODUCT, a
+      node DryDocs already holds — no second containment edge is registered
+      here). The inverse label is THIS INSTANCE's ([Instance of]); the public
+      material writes [Instantiated by] — recorded because C10's rule (the
+      label is not the identity) is the whole reason we carry our own stable
+      names. Entity -> Entity structural containment/instantiation; no PROV
+      verb reached for (the m3_belongs_to_application precedent). THE TARGET'S
+      KEY IS THE CI's OWN ID, never the composite display name — see the
+      DeploymentModule node-class note. NOTHING LOADS: status planned until
+      the rider is ruled; G13/G14/G15's plausibly-shared subject (§G0d) is the
+      question the gate still owns, and this entry does not preempt it.
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       planned
+
   # ── FID / functional-id family (gate fid-identity-and-scope, SIGNED 2026-08-19) ──
 
   - id:           seal_appuser_belongs_to_application

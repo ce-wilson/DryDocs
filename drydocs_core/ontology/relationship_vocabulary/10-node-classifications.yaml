@@ -223,6 +223,29 @@ node_classifications:
       deepdoc-data-flow-overview.md §2.
 
   # — SEAL (active) —
+  - label:      DeploymentModule
+    class:      "dd:DeploymentModule"
+    prov_type:  Entity
+    note: >
+      PROPOSED (K22, 2026-08-26; rider G0d-RIDER on gate
+      tom-roles-enumeration-and-cardinality — routed via the gate, not a gate of
+      its own, because nothing here changes an attribution subject). The
+      ServiceNow Deployment Module CI class: one application, many deployments
+      (SME-confirmed; roughly 20-60 per shared function), 'deployment' and
+      'module' are ONE thing in this estate. THE BUSINESS KEY IS THE CI's OWN
+      UNIQUE ID — app_id(seal_id):deployment_id is a human-readable NAME, and a
+      loader keying on a bare deployment_id MERGEs distinct deployments
+      together (the identity gate's D2/C3 failure on a new axis). OUR OWN
+      STABLE NAME on C10's standing advice, proven twice on this instance: the
+      vendor's class label moved (Application Service -> Service Instance at
+      Yokohama) and the instance's inverse label differs from the public
+      material's. The CI is REAL (own id, own place in the chain, KB articles
+      attached) — the form-default finding applies to TRANSACTIONAL records
+      referencing it, so the grain is sound and only transaction-counting per
+      module is not. Attribution does NOT move here: :BusinessApplication stays
+      the subject. NOTHING LOADS until the rider is ruled; no supplement term,
+      no constraint, no loader.
+
   - label:      BusinessApplication
     class:      "prov:Entity"
     dual_class: "dprod:DataProduct"
