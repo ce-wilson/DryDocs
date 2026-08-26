@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - C32
 inputs:
@@ -21,3 +21,47 @@ acceptance: |
   Four defect classes C32 observed with no rule to hold them are registered AND detected in one change. The pairing is the item: the registry is the single source for both the validate gate and the greenfield gate, so a detector with no entry emits findings nothing can rank, nothing can turn into a fix, and -- the real problem -- nothing can SIGN OFF on. The entry is the thing that gets ratified. (a) R41 DUPLICATE DECLARATION IN ONE SCOPE -- one name declared twice in the same container with different values. Live: RPATH twice in one folder, a relative path and an absolute one. Severity must-fix, not should-fix: which value wins is an ordinal accident, so the job runs against whichever declaration happens to be last, and the reader of the folder sees both and cannot tell. (b) R42 FOLDER-NAME DELIMITER DRIFT -- one folder set mixing separators between the same positional fields, so a SQL parse splitting on the delimiter returns different field counts per folder. Live: two folders of one set using an underscore where their siblings use a hyphen. This is the rule whose finding must name the PARSE consequence, not the cosmetic one. (c) R43 CARRIER COLLISION -- one name resolved by two different resolvers in one command line: a Control-M %%VAR beside a shell ${VAR}. THE ENTRY MUST RULE WHICH CARRIER OWNS THE NAME BEFORE THE DETECTOR SHIPS, because the greenfield action differs completely by answer -- rename one carrier, or declare the shell export -- and a detector that fires without that ruling produces findings no one can act on. If the ruling is not available, R43 is registered status OPEN with no detector and the item says so; it does NOT ship a detector against an undecided rule. (d) R44 STALE AUTHORED PROVENANCE -- an authored "created by" field that travelled with a copied job, so it names the template's author rather than the job's. Detectable as one value across jobs whose independent audit trail names different users. Advisory severity, and the finding must say what to read INSTEAD (the creation/modification audit fields), since the value is not wrong so much as answering a different question. All four land status PROVISIONAL and emit ratified=False, per the module rule that only ratified rules may change a definition. Each gets its entry in the existing registry shape (check / engine / severity / status / source / greenfield action), a detector in the conformance pass, and a case in the drifted fixture -- with the greenfield fixture still raising ZERO findings, which is the assertion that the standard stays reachable. Suite green, ruff clean, publish-boundary clean.
 notes: |
   Raised 2026-08-11 (desktop) at SME request, immediately after C32 listed the four classes and deliberately did not build them. THE REASON THIS IS ITS OWN ITEM RATHER THAN A WIDENING OF G67: G67 shipped R30-R40 as a closed set with a signed-off shape. Adding rules to it means either reopening a done item or quietly growing it, and the second is exactly how a rule set stops matching the registry that is supposed to govern it -- the failure the pairing rule exists to prevent, committed by the change that implements the pairing rule. SCOPE DISCIPLINE, stated because three of these are easy and one is not: R41, R42 and R44 are mechanical and would ratify quickly. R43 is a genuine question about which carrier owns a name, and its answer changes what a fix even looks like. Do not let the three easy ones carry the hard one over the line -- shipping R43 as provisional-with-detector when the ownership question is open would put a finding in front of an SME that has no defensible action attached to it. NOT IN SCOPE: ratifying any of them. That is the HITL gate's, and it wants real findings from a real folder set rather than fixture hits -- which is what G68's profile run produces. The governance walk-through these four are the worked example of lives in drydocs_remediation/overview_readme.md.
+  DONE 2026-08-25 (desktop, same session as G68). Registered AND detected in one change — except R43,
+  and THAT IS THE ITEM'S OWN INSTRUCTION rather than a shortfall. THE R43 CALL, made on evidence not
+  convenience: the acceptance says ship no detector unless the carrier-ownership question is ruled,
+  so it was searched for — the governance corpus, the guidelines page and the gate prompts carry
+  NOTHING on shell-vs-Control-M carrier ownership. So R43 lands `status: OPEN` with no detector, is
+  absent from CONFORMANCE_RULE_IDS, and a test PINS both — the scope-discipline clause working as
+  designed, because the three mechanical rules were exactly the pressure that would have carried the
+  hard one over the line. R43's entry also records what it is NOT: R33 is one FACT carried by both a
+  literal and a variable; R43 is one NAME resolved by two engines. Different question, different fix.
+  R41 (must-fix): duplicate declaration in one scope with DIFFERENT values — a repeat of the same
+  value is noise. The message names the ORDINAL ACCIDENT, which is the severity's justification: the
+  job runs against whichever declaration is last and a reader sees both. The detector walks the RAW
+  layer definitions and a test pins that, because `_declared` resolves the chain into a dict and would
+  make the rule structurally unable to fire.
+  R42 (should-fix): cross-folder, over the folder list; a set of one cannot disagree with itself. The
+  finding names the PARSE consequence — mixed separators do not make the split FAIL, they make it
+  return a different field count, so the positional read silently lands on the wrong field. ONE
+  finding however many delimiters break, since it is one defect in the set's naming.
+  R44 (advisory): one authored value spanning jobs, message pointing at the creation/modification
+  AUDIT fields. THE HONEST LIMIT IS IN THE MESSAGE AND THE ENTRY, not left to be discovered: the rule
+  as written wants the value standing against an independent audit trail, that trail is a DB-side feed
+  a definition export does not carry, so the detector reports the pattern and says it cannot confirm
+  it. That gap is why the rule is advisory.
+  SCOPE NOTE, stated because it went past the item's named inputs: R44 had NO FEED. Nothing in the XML
+  extractor, the bridge protocol or JobDefinition carried an authored field, so the detector would
+  have been decoration — which is the same failure the pairing rule exists to prevent, read from the
+  other side. It was plumbed end to end (xml_vocab.AUTHORED_BY_ATTRS -> XmlJobRecord -> StagedJob ->
+  JobDefinition) as a SYNONYM SET rather than one spelling, because the authoritative element schema
+  is still unacquired and that is exactly the treatment DESCRIPTION and POSTCMD already get.
+  FIXTURES: the drifted XML gains one case per shipped rule — a name declared twice with two values, a
+  sibling folder separating the same positional fields with the other character, and one authored
+  value on two jobs. The R42 folder is deliberately EMPTY so it adds an R42 case and disturbs no other
+  rule's expectations. The greenfield fixture still raises ZERO findings, which is the assertion that
+  the standard stays reachable. TESTS: 9 new (27 in the file). Three mutations checked — and the
+  SECOND ONE FOUND A REAL GAP: making R44 fire on a SINGLE job passed, because the greenfield fixture
+  carries no authored value at all and was therefore clean by OMISSION rather than by the rule. The
+  test now asserts on sets that do carry one (lone job = no finding, shared value = finding, distinct
+  values = no finding) and the mutation is caught. NOT RATIFIED, and nothing here tries to be: all
+  four are PROVISIONAL emitting ratified=False, and the HITL gate wants real findings from a real
+  folder set — which is what G68's profile run, landed in this same session, now produces. The
+  governance walk-through in overview_readme.md gains these four as its worked example, written around
+  the R43 split rather than the three easy ones. Publish-boundary clean: no live folder, path, variable
+  or user string from the C32 capture reached committed code or fixtures (swept explicitly). Suite
+  2481 passed / 10 skipped, ruff clean, CLI gates green.

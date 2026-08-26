@@ -68,6 +68,10 @@ class JobDefinition:
     run_as: str = ""
     #: APPLICATION verbatim — the Control-M application code, an identity input
     application: str = ""
+    #: the AUTHORED "created by" value verbatim (R44). It travels when a job is
+    #: COPIED, so it records the TEMPLATE's author, not this job's — which is
+    #: precisely why R44 exists and why nothing may read it as authorship.
+    authored_by: str = ""
     #: the full ordered resolution chain, widest first, INCLUDING this job's
     #: own definitions as the last layer. Empty when the format cannot express
     #: scope (a single-folder M0 transcript) — callers fall back to

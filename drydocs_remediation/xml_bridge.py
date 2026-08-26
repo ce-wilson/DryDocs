@@ -79,6 +79,8 @@ class StagedJob(Protocol):
     #: run_as is the job's OWNER and application its APPLICATION, both verbatim.
     run_as: str
     application: str
+    #: R44 (G69): the authored "created by" field, staged verbatim
+    authored_by: str
 
 
 class StagedExtract(Protocol):
@@ -150,6 +152,7 @@ def to_definition_set(extract: StagedExtract, source: str | None = None) -> Defi
                 scope_chain=chain,
                 run_as=getattr(job, "run_as", ""),
                 application=getattr(job, "application", ""),
+                authored_by=getattr(job, "authored_by", ""),
             )
         )
 
