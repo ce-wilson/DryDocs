@@ -9,6 +9,16 @@
 # starting point for decoding a token, never an assertion about what a DryDocs surface means.
 # Org-unit acronyms (AWM, BWM, CB, CCB, CIB, JPMS*) carry scope business-domain; the rest industry.
 # The source PDF is local and gitignored; the citation names the public document, not the file.
+#
+# SECOND PASS 2026-08-25 (user direction: "one more pass for the CCB sections in 2024 -- Home & Auto
+# lending terms"): the 2025 glossary already carried the home-lending core (ARM, CLTV, FHA, HELOC,
+# LGD, LTV, MBS, MSR, PD, REO, VA). Four additions from the 2024 report: TDR (formally defined
+# there, deliberately dropped from the 2025 glossary), UPB and GSE (defined/expanded inline in the
+# body, never in either glossary), and FICO (heavily used, NEVER expanded -- a brand name; flagged
+# as such in its definition). GPCC (general purpose credit card) also surfaced in the CCB pages but
+# is card lending, outside the home-and-auto ask -- noted here so the exclusion reads as a decision.
+# Fannie Mae / Ginnie Mae ARE in the report glossaries but as PHRASE keys, not acronyms (no FNMA/
+# GNMA entries exist), so they stay out of an acronym-keyed list.
 schema: drydocs.glossary.v1
 classification: Internal-Public
 terms:
@@ -1773,6 +1783,75 @@ terms:
     evidence_ref:
     - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
       PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: TDR
+  senses:
+  - term_id: urn:drydocs:term:industry:TDR:1
+    scope: industry
+    pref_label: Troubled debt restructuring
+    alt_labels: []
+    definition: 'Troubled debt restructuring. Per the 2024 report glossary: applies to loan modifications
+      granted prior to January 1, 2023; the 2025 glossary DROPS the entry because the accounting concept
+      retired for later modifications -- a TDR seen in data is a pre-2023 fact.'
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - Glossary of Terms and Acronyms
+    - note:absent from the 2025 glossary by design (ASU 2022-02); 3 residual uses in the 2025 body
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: UPB
+  senses:
+  - term_id: urn:drydocs:term:industry:UPB:1
+    scope: industry
+    pref_label: Unpaid principal balance
+    alt_labels: []
+    definition: Unpaid principal balance -- the remaining principal owed on a loan, the balance home-lending
+      tables are presented at.
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - inline definition in the consumer lending tables
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GSE
+  senses:
+  - term_id: urn:drydocs:term:industry:GSE:1
+    scope: industry
+    pref_label: Government-sponsored enterprises
+    alt_labels: []
+    definition: Government-sponsored enterprises (Fannie Mae, Freddie Mac and similar) -- the agencies
+      that purchase or guarantee conforming residential mortgages; ~40 uses in each report year.
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - expansion in prose ('government-sponsored enterprises');
+      heavy use both years
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FICO
+  senses:
+  - term_id: urn:drydocs:term:industry:FICO:1
+    scope: industry
+    pref_label: FICO score (Fair Isaac Corporation consumer credit score)
+    alt_labels: []
+    definition: Consumer credit score used throughout the home- and auto-lending credit-quality tables
+      (FICO score bands beside LTV ratios). THE REPORTS NEVER EXPAND IT -- 26-27 uses in each year, always
+      bare, because it is a brand name; the expansion here is the standard industry reading, not the source's.
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report and standard:JPMorgan Chase 2025 Annual Report - used
+      unexpanded in the credit-quality disclosures
     confidence: candidate
     confirmed_by: null
     confirmed_on: null
