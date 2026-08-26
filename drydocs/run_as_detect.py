@@ -46,9 +46,9 @@ PER JOB, NEVER PER FOLDER (acceptance (e), from the SME's job-grain captures
 FileWatcher as the platform account while the folder default (the payload
 jobs) runs as the application's account. A folder-grain read would report
 that folder as application-run and miss the split entirely. So
-classification is per job, the report carries class × job type, and:
+classification is per job, the report carries class x job type, and:
 
-- FileWatcher × platform is the DESIGNED PATTERN (file watching is a
+- FileWatcher x platform is the DESIGNED PATTERN (file watching is a
   platform service) — counted as ``platform_designed_pattern``;
 - the countable anomaly is a PAYLOAD job running as the platform —
   ``platform_payload_anomaly``, broken down by job type.
@@ -122,7 +122,7 @@ class RunAsDetection:
     # ---- the first cut: run_as CLASS (SME 2026-08-19) ------------------------
     jobs_by_class: dict[str, int] = field(default_factory=dict)
     accounts_by_class: dict[str, int] = field(default_factory=dict)
-    #: class × job type — the (e) report. Nested counts, never rows.
+    #: class x job type — the (e) report. Nested counts, never rows.
     class_by_job_type: dict[str, dict[str, int]] = field(default_factory=dict)
 
     # ---- the platform bucket (expected to disagree BY CONSTRUCTION) ----------
