@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-25T03:48:41",
+    "captured_at": "2026-08-25T21:32:50",
     "date": "20260825",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "26b0ce79",
-      "full": "26b0ce795a15159f8832cfa19e15d24ee5d6e573",
+      "commit": "6fd395fb",
+      "full": "6fd395fb87149022e33a270728a800562b44444c",
       "branch": "main",
-      "describe": "port-base-20260824c-7-g26b0ce79",
-      "subject": "docs(handoff): R23's desktop half — the purge only that machine can do",
+      "describe": "port-base-20260825-12-g6fd395fb",
+      "subject": "feat(lineage): G56 — collector captures the mount table, so shared-vs-local storage is DERIVED",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6245,6 +6245,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/business-layer-org-structure.yaml",
+      "name": "business-layer-org-structure.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/business-layer-org-structure.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/code-graph-package-layer.yaml",
       "name": "code-graph-package-layer.yaml",
       "extension": ".yaml",
@@ -6677,6 +6686,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/log-kinds.yaml",
+      "name": "log-kinds.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/log-kinds.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/manual-loads",
       "name": "manual-loads",
       "extension": "",
@@ -6965,6 +6983,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/taxonomy-ontology-map/60-mappings-corporate.yaml",
+      "name": "60-mappings-corporate.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy-ontology-map/60-mappings-corporate.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/taxonomy-ontology-map/90-summary.yaml",
       "name": "90-summary.yaml",
       "extension": ".yaml",
@@ -7235,37 +7262,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/company-prompts/port-7c18ff4b-followup-company-prompt.md",
-      "name": "port-7c18ff4b-followup-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/company-prompts/port-7c18ff4b-followup-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/company-prompts/port-ais-supplement-company-prompt.md",
       "name": "port-ais-supplement-company-prompt.md",
       "extension": ".md",
       "rel_path": "docs/company-prompts/port-ais-supplement-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/company-prompts/port-backlog-shard-company-prompt.md",
-      "name": "port-backlog-shard-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/company-prompts/port-backlog-shard-company-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/company-prompts/port-xml-test-company-prompt.md",
-      "name": "port-xml-test-company-prompt.md",
-      "extension": ".md",
-      "rel_path": "docs/company-prompts/port-xml-test-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8526,15 +8526,6 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/next-internal-session.md",
-      "name": "next-internal-session.md",
-      "extension": ".md",
-      "rel_path": "docs/next-internal-session.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16946,6 +16937,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/log_kinds.py",
+      "name": "log_kinds.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/log_kinds.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/manual_mappings.py",
       "name": "manual_mappings.py",
       "extension": ".py",
@@ -19367,6 +19367,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/standards/technology/database-inventory.md",
+      "name": "database-inventory.md",
+      "extension": ".md",
+      "rel_path": "internal/standards/technology/database-inventory.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/standards/technology/description-field-metadata-plan.md",
       "name": "description-field-metadata-plan.md",
       "extension": ".md",
@@ -19448,10 +19457,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json",
-      "name": "drydocs-20260824.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json",
+      "name": "drydocs-20260825.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260824.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260825.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21059,6 +21068,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_component_run_logs.py",
+      "name": "test_component_run_logs.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_component_run_logs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_config_schemas.py",
       "name": "test_config_schemas.py",
       "extension": ".py",
@@ -21648,6 +21666,15 @@
       "name": "test_loader_run_log.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_loader_run_log.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_log_kinds.py",
+      "name": "test_log_kinds.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_log_kinds.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23997,6 +24024,10 @@
     ],
     [
       "drydocs/agents/common/llm_ledger.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/agents/common/llm_ledger.py",
       "drydocs/drydocs_core/run_log.py"
     ],
     [
@@ -24218,6 +24249,10 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_core/log_kinds.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -25172,6 +25207,14 @@
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
+      "drydocs/drydocs_core/config.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs_core/config.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
       "drydocs/drydocs_core/data_root.py",
       "drydocs/drydocs_core/data_zones.py"
     ],
@@ -25193,6 +25236,10 @@
     ],
     [
       "drydocs/drydocs_core/landing_zones.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/log_kinds.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
@@ -25380,6 +25427,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/run_log.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
       "drydocs/drydocs_core/schema/supplements.py",
       "drydocs/drydocs_core/cypher_split.py"
     ],
@@ -25413,11 +25464,19 @@
     ],
     [
       "drydocs/drydocs_docmeta/connectors/filedrop.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs_docmeta/connectors/filedrop.py",
       "drydocs/drydocs_docmeta/connectors/base.py"
     ],
     [
       "drydocs/drydocs_docmeta/connectors/filedrop.py",
       "drydocs/drydocs_docmeta/policy.py"
+    ],
+    [
+      "drydocs/drydocs_docmeta/connectors/web.py",
+      "drydocs/drydocs_core/run_log.py"
     ],
     [
       "drydocs/drydocs_docmeta/connectors/web.py",
@@ -25601,6 +25660,10 @@
     ],
     [
       "drydocs/drydocs_lineage/writer.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/writer.py",
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
@@ -25734,6 +25797,10 @@
     [
       "drydocs/scripts/external_vendor_scrape.py",
       "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/scripts/external_vendor_scrape.py",
+      "drydocs/drydocs_core/run_log.py"
     ],
     [
       "drydocs/scripts/external_vendor_scrape.py",
@@ -26102,6 +26169,34 @@
     [
       "drydocs/tests/unit/test_command_parser.py",
       "drydocs/drydocs_core/orchestration/shell.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_docmeta/connectors/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_docmeta/connectors/filedrop.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_docmeta/connectors/web.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_lineage/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_lineage/writer.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/scripts/external_vendor_scrape.py"
     ],
     [
       "drydocs/tests/unit/test_controlm_api.py",
@@ -26629,6 +26724,10 @@
     ],
     [
       "drydocs/tests/unit/test_lineage_rua.py",
+      "drydocs/drydocs_lineage/extractors/rua_inventory.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_rua.py",
       "drydocs/drydocs_lineage/model.py"
     ],
     [
@@ -26733,6 +26832,18 @@
     ],
     [
       "drydocs/tests/unit/test_loader_run_log.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/tests/unit/test_log_kinds.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_log_kinds.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/tests/unit/test_log_kinds.py",
       "drydocs/drydocs_core/run_log.py"
     ],
     [
@@ -32020,6 +32131,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/log-kinds.yaml"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/manual-loads"
     ],
     [
@@ -32106,6 +32222,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/business-application-identity.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/business-layer-org-structure.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -32515,6 +32636,11 @@
     [
       "drydocs/config/taxonomy-ontology-map",
       "CONTAINS",
+      "drydocs/config/taxonomy-ontology-map/60-mappings-corporate.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy-ontology-map",
+      "CONTAINS",
       "drydocs/config/taxonomy-ontology-map/90-summary.yaml"
     ],
     [
@@ -32556,11 +32682,6 @@
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/history"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/next-internal-session.md"
     ],
     [
       "drydocs/docs",
@@ -32680,22 +32801,7 @@
     [
       "drydocs/docs/company-prompts",
       "CONTAINS",
-      "drydocs/docs/company-prompts/port-7c18ff4b-followup-company-prompt.md"
-    ],
-    [
-      "drydocs/docs/company-prompts",
-      "CONTAINS",
       "drydocs/docs/company-prompts/port-ais-supplement-company-prompt.md"
-    ],
-    [
-      "drydocs/docs/company-prompts",
-      "CONTAINS",
-      "drydocs/docs/company-prompts/port-backlog-shard-company-prompt.md"
-    ],
-    [
-      "drydocs/docs/company-prompts",
-      "CONTAINS",
-      "drydocs/docs/company-prompts/port-xml-test-company-prompt.md"
     ],
     [
       "drydocs/docs/controlm",
@@ -37905,6 +38011,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/manual_mappings.py"
     ],
     [
@@ -39275,6 +39386,11 @@
     [
       "drydocs/internal/standards/technology",
       "CONTAINS",
+      "drydocs/internal/standards/technology/database-inventory.md"
+    ],
+    [
+      "drydocs/internal/standards/technology",
+      "CONTAINS",
       "drydocs/internal/standards/technology/description-field-metadata-plan.md"
     ],
     [
@@ -39345,7 +39461,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260824.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260825.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -40175,6 +40291,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_component_run_logs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_config_schemas.py"
     ],
     [
@@ -40501,6 +40622,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_loader_run_log.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_log_kinds.py"
     ],
     [
       "drydocs/tests/unit",
@@ -41747,13 +41873,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2367,
-    "edges": 1148,
+    "files": 2370,
+    "edges": 1169,
     "circular_files": 3,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2650,
+    "rels": 2653,
     "directories": 284
   }
 }
