@@ -206,6 +206,11 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
               <p className="shrink-0 text-[11px] text-muted">
                 {activeDef?.title} — read-only view of the committed source ({activeDef?.source}), served from the
                 mapping-store materialization.
+                {domainGrid && (
+                  <span className="ml-1 font-mono text-[10px] text-faint">
+                    {domainGrid.rows.length} rows
+                  </span>
+                )}
               </p>
               <DomainGridTable grid={domainGrid} apiDown={apiDown} />
             </>
@@ -237,7 +242,7 @@ function DomainGridTable({ grid, apiDown }: { grid: MappingGrid | null; apiDown:
     return <p className="px-1 py-2 text-[11px] text-faint">No committed entries yet.</p>
   }
   return (
-    <div className="mt-1.5 max-h-48 overflow-auto rounded-md border border-edge">
+    <div className="mt-1.5 min-h-0 flex-1 overflow-auto rounded-md border border-edge">
       <table className="w-full border-collapse text-left text-[11px]">
         <thead className="sticky top-0 bg-panel-2">
           <tr>
