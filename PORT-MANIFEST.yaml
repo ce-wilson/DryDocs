@@ -827,8 +827,15 @@ rows:
 
   - path: "docs/next-internal-session.md"
     disposition: never-port
-    note: "PRODUCER-LOCAL SESSION DIRECTOR — the live-data confirmation checklist the
-      producer maintains FOR the internal session. THE SECOND FILE to fall through
+    note: "RETIRED 2026-08-25 (file deleted; row KEPT as the re-import tripwire — two
+      prior ports imported this file by accident, and a company copy may still exist to
+      fall through a future default). Audit at retirement: 7 of its 9 items were owned
+      or superseded (E1, K6/K16/K17, G12/G13/G22/G23, M3, the pending-gates list); the
+      two live-psgmgr probes whose ONLY home it was — the DC-collision identity check
+      (HIGH, blocks any multi-DC load) and the ctlm_id ripple sweep — re-homed to
+      Idea-174 before deletion. WAS: PRODUCER-LOCAL SESSION DIRECTOR — the live-data
+      confirmation checklist the producer maintained FOR the internal session. THE
+      SECOND FILE to fall through
       `docs/*.md`: two prior ports imported it (bd7952f6 2026-07-20, c723b1c5
       2026-07-24) and the company copy was NEVER company-authored. Caught 2026-08-01
       while the copies were still BYTE-IDENTICAL — luck, not design: producer last

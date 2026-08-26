@@ -93,6 +93,35 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-174`** · 2026-08-25 · `[task]` · **open — INTERNAL-ONLY work (both probes run on live psgmgr); re-homed from the retired 2026-07-16 internal-session checklist, whose other seven items were all owned or superseded** · prio? **High** —
+  **Two live-psgmgr probes lost their only home when `docs/next-internal-session.md`
+  retired, and one of them BLOCKS any multi-DC load.** The checklist was the recorded
+  owner (its own audit trail says the DC-collision check was "ALREADY ROUTED to the
+  internal-session checklist"), so deleting it without this capture would have dropped
+  them silently.
+  **(1) DC-COLLISION IDENTITY CHECK — HIGH (advisor-confirmation §2a).** One query:
+  `SELECT TABLE_ID, COUNT(DISTINCT DATA_CENTER) FROM psgmgr.CM_DEF_VTAB GROUP BY TABLE_ID
+  HAVING COUNT(DISTINCT DATA_CENTER) > 1;` Staging keys by `(data_center, folder_id,
+  job_id)` but graph identity is `(folder_id, job_id)` — zero rows means document the
+  uniqueness invariant in `controlm_folders.cypher`; ANY rows mean cross-DC nodes
+  silently merge and the fix is an IDENTITY change (data_center into the folder + job
+  keys) → HITL gate + constraint migration. The single-DC pilot structurally cannot
+  expose this, and it has become MORE urgent, not less: the 2026-08-24 SME direction
+  (Idea-169/170) commits to per-DC extraction over THREE DCs, which is exactly the
+  regime where a TABLE_ID reused across DCs merges two different folders into one node.
+  Run it BEFORE the first multi-DC load, not after.
+  **(2) ctlm_id RIPPLE SWEEP — now DESK WORK, no login needed.** Which other CM_ views
+  carry the derived `ctlm_id` (folder_id.job_id), as join-upgrade candidates over the
+  weak SCHED_TABLE / JOB_MEM_NAME joins? When this parked (2026-07-14) it needed live
+  queries; doc 08 Phase 2 (step 220, 2026-08-25) has since censused all seven psgmgr
+  objects with complete column inventories, so the answer now reads off
+  `config/source-mappings/psgmgr.yaml` — with the one known negative already recorded
+  (CM_AVG_RUN carries NO ctlm_id; the 2026-07-22 relay proved it). Fold the outcome into
+  the column ledger rather than a new doc.
+  Checklist disposition for the record: items 1/6 were ticked done; 2 (E1), 8
+  (software-usage-patterns) stay owned by their live item and the pending-gates list; 3
+  superseded by K6/K16/K17; 7 by G12/G13/G22/G23; 9 by M3's signed gates.
+
 - **`Idea-173`** · 2026-08-25 · `[bug]` · **open** · prio? **High** —
   **A company session recorded a census on `config/source-registry.yaml`, which is
   `canonical-producer` — so the next port deletes it.** Not hypothetical and not a
