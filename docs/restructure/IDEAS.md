@@ -93,6 +93,43 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-160`** · 2026-08-26 · `[idea]` · **open** · prio? **Low** —
+  **A per-column checkbox on a grid that promotes that column into a label node and lands it in the
+  unstructured context graph.** Raised by the user 2026-08-26 alongside [[Idea-159]]. The appeal is
+  clear and it is the right instinct for **layer 4** (CLAUDE.md's context graph — the layer that
+  answers *what matters right now for this task*, and the one still marked future): a grid column IS
+  a dimension a reader has just decided is meaningful, and ticking it is the cheapest possible way to
+  say so. The obvious home is the column header of the grids that already exist —
+  `routes/DomainGridTable.tsx` and `explorer/SpecGrid.tsx`, which now share a header-button idiom.
+  - **IT COLLIDES WITH TWO STANDING RULINGS, and that is the whole reason to write it down rather
+    than build it.** (1) **The UI may not write the graph.** Gate `ui-write-surface` (O20, signed
+    off 2026-07-21) ruled M3 direct write **REFUSED STANDING** and C4 admin edits **NEVER**; every
+    console drafting surface produces a change ARTIFACT that travels git to gate to loader, and the
+    loader stays the only graph writer. (2) **The uncertain realm has a closed writer list.**
+    `tests/unit/test_uncertain_boundary.py` pins `UNCERTAIN_WRITERS` to exactly
+    `drydocs_deepdoc` and `agents/common/agent_run_writer.py`, with the comment stating outright
+    that adding an entry there *is a ruling, not a convenience* (gate `document-content-topology`
+    §F / ADR 0011 clause 1). A checkbox that writes into the context graph asks to become the third
+    entry on that list, from the browser.
+  - **So the viable shape is almost certainly PROPOSE, not CREATE:** the checkbox drafts a
+    proposal — column, its distinct values, the spec or domain it came from, and a rationale — into
+    a tray, and that becomes an artifact a loader applies after review. Same mechanism as the
+    /mappings changeset and the acronym add path backlog O68 describes. Worth checking whether one
+    drafting mechanism can serve all three rather than growing a third.
+  - **"LABEL NODE" NEEDS DISAMBIGUATING BEFORE ANY BUILD, because the two readings have very
+    different costs.** A *tag node* (a node that exists to group things, attached by an edge) is
+    data, and rides the normal proposal path. A new *node label* is an ONTOLOGY decision — new
+    labels and edge types go through `docs/RELATIONSHIP_GUIDE.md`, the relationship-vocabulary
+    registry and the HITL gate, and are explicitly never invented during import. A UI affordance
+    that mints labels by checkbox is the second thing, and would be minting ontology from a grid.
+  - **FILED Low, and the reason is readiness rather than merit:** nothing depends on it, and it
+    cannot be built at all without at least one ruling — possibly two. It should not sit in the
+    ready-to-pull strip competing with work that has no such precondition. The honest first step is
+    not a build item but a gate question: *may a console surface DRAFT a context-graph node
+    proposal, and does the uncertain writer list extend to whatever applies it?*
+
+  Mechanism-only; no real column values or company data land in a tracked file.
+
 - **`Idea-159`** · 2026-08-26 · `[idea]` · **open** · prio? **Med** —
   **Deepdoc meets acronyms all over the corpus and has nowhere to put them — expand that capture
   into an acronym LOADER that feeds the surface backlog O68 specifies.** Raised by the user
