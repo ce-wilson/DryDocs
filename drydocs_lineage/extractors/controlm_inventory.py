@@ -57,6 +57,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from drydocs_core.orchestration.controlm import parse_command, pipeline_guid
+from drydocs_core.orchestration.controlm.resolver import resolve_command_line
 from drydocs_core.orchestration.controlm.variables import SHELL_VAR_NAMES, classify_variable
 from drydocs_core.orchestration.shell import NAMED_LAUNCHER_RULES
 from drydocs_core.orchestration.shell import dpl_properties as _dpl_properties
@@ -86,6 +87,31 @@ _VARS_RAW_SYNONYMS = {
     "var_name": "NAME",
     "var_value": "VALUE",
 }
+
+
+#: G92 — the two spellings of "this row is FOLDER scope", both the repo's own.
+#: The formal projection DERIVES var_scope in SQL as `JOB_NAME = SCHED_TABLE`
+#: (drydocs/loaders/sql/controlm_variables.sql), and the raw SQL-Developer export
+#: has no such column — there drydocs/staging.py::collect_jobs falls back to the
+#: smart-folder header heuristic JOB_ID = 1. The raw shape carries BOTH job_name
+#: and the folder token, so the name comparison works there too; accepting
+#: either is strictly safer than accepting neither, and a row that matches no
+#: rule is simply JOB scope, which is the correct default.
+_FOLDER_SCOPE = "FOLDER"
+_FOLDER_HEADER_JOB_ID = "1"
+
+
+def _var_scope(var_row: dict) -> str:
+    """Read var_scope from the aliased projection, or derive it (see above)."""
+    declared = (var_row.get("var_scope") or var_row.get("VAR_SCOPE") or "").strip().upper()
+    if declared:
+        return declared
+    job_name = _var(var_row, "job_name")
+    if job_name and job_name == _var(var_row, "folder_id"):
+        return _FOLDER_SCOPE  # the SQL projection's own definition of FOLDER
+    if _var(var_row, "job_id") == _FOLDER_HEADER_JOB_ID:
+        return _FOLDER_SCOPE  # staging.py's raw-export heuristic
+    return "JOB"
 
 
 def _var(var_row: dict, field: str) -> str:
@@ -188,6 +214,16 @@ class ExtractCoverage:
     artifact_jobs_unmatched: int = 0  # artifact fact whose job is not in this extract
     artifact_values_unresolved: int = 0  # value holds %%refs/whitespace — no node minted
     artifact_sha_seen: int = 0  # ARTIFACT_SHA discriminators observed (not a property)
+    # -- G92: resolution quality of the shell text the file-op parse runs on, on
+    #    the ResolveCoverage precedent (drydocs/cmdline_staging.py). Every piece
+    #    of shell text lands in exactly one verdict bucket.
+    resolve_resolved: int = 0  # substitutions ran and no user %%ref remains
+    resolve_residue: int = 0  # {ODATE}-class canonical residue — EXPECTED, not a miss
+    resolve_unresolved: int = 0  # user %%ref with no binding — a real miss, reported
+    resolve_nothing_to_substitute: int = 0  # text carried no %%ref at all
+    resolve_no_scope_chain: int = 0  # no chain for this job — parsed raw, COUNTED
+    resolve_substitutions: int = 0  # total names substituted across the run
+    file_op_operands_unpaired: int = 0  # raw/resolved parses disagreed — raw kept
 
     def as_dict(self) -> dict[str, int]:
         return asdict(self)
@@ -216,7 +252,12 @@ class ExtractCoverage:
             f"etl_kept={self.payloads_kept_on_invokes_etl}) | "
             f"artifact-vars: rows={self.artifact_rows_read} "
             f"unmatched={self.artifact_jobs_unmatched} "
-            f"unresolved={self.artifact_values_unresolved}"
+            f"unresolved={self.artifact_values_unresolved} | "
+            f"resolve: ok={self.resolve_resolved} "
+            f"residue={self.resolve_residue} "
+            f"unresolved={self.resolve_unresolved} "
+            f"noop={self.resolve_nothing_to_substitute} "
+            f"no_chain={self.resolve_no_scope_chain}"
         )
 
 
@@ -288,13 +329,18 @@ class ControlMInventoryExtractor:
         csv_path = self._resolve_csv(Path(source))
         if csv_path is None:
             return coverage  # nothing to do — no Control-M export present
+        vars_path = self._resolve_variables_csv(
+            Path(variables_csv) if variables_csv is not None else Path(source)
+        )
+        # G92: read BEFORE the jobs pass, because the CMD_LINE file-op parse has
+        # the same raw-operand defect the pre/post pass does and needs the same
+        # chain. No chain available (no variables CSV) = the old behaviour
+        # exactly, counted rather than silent.
+        self._scope_chains = self._build_scope_chains(vars_path)
         with csv_path.open(newline="", encoding="utf-8-sig") as fh:
             for row in csv.DictReader(fh):
                 coverage.rows_read += 1
                 self._row(row, into, coverage)
-        vars_path = self._resolve_variables_csv(
-            Path(variables_csv) if variables_csv is not None else Path(source)
-        )
         if vars_path is not None:
             self._prepost_pass(vars_path, into, coverage)
             # AFTER the CMD_LINE pass on purpose: the split reads the nodes that
@@ -376,9 +422,15 @@ class ControlMInventoryExtractor:
         if not cmd:
             coverage.commands_empty += 1
             return
+        # G92: the file-op operands come from the RESOLVED text so a variable
+        # spelling and its resolved twin converge on ONE asset. The invocation
+        # side keeps parsing the verbatim command deliberately — invocation
+        # identity is already env-stabilised by _stable_invocation_key (DPL GUID,
+        # Ab Initio basename) and re-keying it here would move a signed ruling.
+        resolved_cmd = self._resolve_shell(cmd, folder_id, job_id, coverage)
+        for fop, raw_fop in self._paired_file_ops(cmd, resolved_cmd, coverage):
+            self._file_op(jid, fop, into, coverage, raw_fop=raw_fop)
         parsed = parse_command(cmd)
-        for fop in parsed.file_ops:
-            self._file_op(jid, fop, into, coverage)
         invocations = parsed.invocations
         if not invocations:
             if not parsed.file_ops:
@@ -424,6 +476,83 @@ class ControlMInventoryExtractor:
             if kind == "unknown":
                 coverage.invocations_unresolved += 1
 
+    # -- G92: the scope chain, and the ONE resolver ------------------------------
+    def _build_scope_chains(self, csv_path: Path | None) -> dict[str, list[tuple[str, str | None]]]:
+        """(folder key | job key) -> its ORDERED (name, value) definitions.
+
+        Folder rows are keyed by the folder token alone and job rows by
+        ``folder.job``, so :meth:`_layers_for` can assemble the vendor-priority
+        chain (folder outermost, job innermost) for any job in one lookup.
+        Definition ORDER is preserved because the resolver walks it as a
+        sequential assignment — reordering would change what binds what.
+        """
+        chains: dict[str, list[tuple[str, str | None]]] = {}
+        if csv_path is None:
+            return chains
+        with csv_path.open(newline="", encoding="utf-8-sig") as fh:
+            for var_row in csv.DictReader(fh):
+                name = _var(var_row, "var_name")
+                if not name:
+                    continue
+                folder_id = _var(var_row, "folder_id")
+                if not folder_id:
+                    continue
+                key = (
+                    folder_id
+                    if _var_scope(var_row) == _FOLDER_SCOPE
+                    else f"{folder_id}.{_var(var_row, 'job_id')}"
+                )
+                chains.setdefault(key, []).append((name, _var(var_row, "var_value") or None))
+        return chains
+
+    def _layers_for(self, folder_id: str, job_id: str):
+        """The vendor-priority chain for one job, or None when it has none.
+
+        NONE IS NOT "no variables" — it is "this extract cannot say", and the
+        caller counts it and parses the raw text rather than pretending the
+        text was resolved.
+        """
+        chains = getattr(self, "_scope_chains", None) or {}
+        folder_defs = chains.get(folder_id)
+        job_defs = chains.get(f"{folder_id}.{job_id}")
+        if folder_defs is None and job_defs is None:
+            return None
+        return [("FOLDER", folder_defs or []), ("JOB", job_defs or [])]
+
+    def _resolve_shell(
+        self, text: str, folder_id: str, job_id: str, coverage: ExtractCoverage
+    ) -> str:
+        """Shell text -> its RESOLVED spelling, through the one core resolver.
+
+        THE WHOLE POINT OF THIS ITEM: ``%%R_PATH/out.dat`` and ``/data/r/out.dat``
+        are one file, and keying the DataAsset off the verbatim operand made them
+        two. Resolution happens HERE, once, by calling
+        :func:`drydocs_core.orchestration.controlm.resolver.resolve_command_line`
+        — whose stated guardrail is that no caller may re-implement substitution.
+        There is deliberately no regex twin and no local %%-stripping helper in
+        this module; if one ever appears, this item has been undone.
+
+        Every verdict is counted (clause d), and clause (c)'s distinction is
+        kept: ``{ODATE}``-class canonical residue is EXPECTED and survives by
+        design, while a user %%ref with no binding is a real miss. Neither is
+        dropped, and neither stops the parse.
+        """
+        layers = self._layers_for(folder_id, job_id)
+        if layers is None:
+            coverage.resolve_no_scope_chain += 1
+            return text
+        rcl = resolve_command_line(layers, text)
+        coverage.resolve_substitutions += len(rcl.substituted)
+        if rcl.unresolved:
+            coverage.resolve_unresolved += 1
+        elif rcl.canonical_tokens:
+            coverage.resolve_residue += 1  # EXPECTED — runtime-only tokens
+        elif rcl.substituted:
+            coverage.resolve_resolved += 1
+        else:
+            coverage.resolve_nothing_to_substitute += 1
+        return rcl.resolved
+
     def _prepost_pass(self, csv_path: Path, into: LineageGraph, coverage: ExtractCoverage) -> None:
         """PRECMD/POSTCMD shell text → the SAME G14 file-op feed (G60).
 
@@ -460,10 +589,13 @@ class ControlMInventoryExtractor:
                 if not value:
                     coverage.prepost_commands_empty += 1
                     continue
-                parsed = parse_command(value)
-                for fop in parsed.file_ops:
-                    self._file_op(jid, fop, into, coverage, prepost=True)
-                if not parsed.file_ops and not parsed.invocations:
+                # G92: pre/post text is WHERE THE VARIABLE FORMS CONCENTRATE, so
+                # this is the pass that made the defect visible — resolve first
+                resolved = self._resolve_shell(value, folder_id, job_id, coverage)
+                pairs = self._paired_file_ops(value, resolved, coverage)
+                for fop, raw_fop in pairs:
+                    self._file_op(jid, fop, into, coverage, prepost=True, raw_fop=raw_fop)
+                if not pairs and not parse_command(resolved).invocations:
                     coverage.prepost_commands_unparsed += 1
 
     # -- G97: the launcher / payload split ---------------------------------------
@@ -615,6 +747,28 @@ class ControlMInventoryExtractor:
                 return node_id
         return None
 
+    @staticmethod
+    def _paired_file_ops(raw_text: str, resolved_text: str, coverage: ExtractCoverage):
+        """File ops of the RESOLVED text, each paired with its RAW counterpart.
+
+        Clause (b): raw stays BESIDE resolved, never replaced, so a wrong
+        binding stays auditable instead of being baked into the asset id.
+        Substitution replaces values IN PLACE — it never adds, removes or
+        reorders statements — so parsing both spellings yields the same ops in
+        the same order and zipping them is sound. When it is NOT (a variable
+        holding a whole `;`-separated command would do it), the disagreement is
+        COUNTED and the resolved op travels with no raw twin rather than being
+        paired with the wrong one.
+        """
+        resolved_ops = parse_command(resolved_text).file_ops
+        if resolved_text == raw_text:
+            return [(fop, fop) for fop in resolved_ops]
+        raw_ops = parse_command(raw_text).file_ops
+        if len(raw_ops) != len(resolved_ops):
+            coverage.file_op_operands_unpaired += 1
+            return [(fop, None) for fop in resolved_ops]
+        return list(zip(resolved_ops, raw_ops, strict=True))
+
     def _file_op(
         self,
         jid: str,
@@ -623,6 +777,7 @@ class ControlMInventoryExtractor:
         coverage: ExtractCoverage,
         *,
         prepost: bool = False,
+        raw_fop=None,
     ) -> None:
         """One parsed file op → READS_FROM/WRITES_TO candidates (G14).
 
@@ -640,7 +795,12 @@ class ControlMInventoryExtractor:
         if not src or not tgt:
             coverage.file_ops_no_operand += 1
             return
-        for location, rel_type in ((src, "READS_FROM"), (tgt, "WRITES_TO")):
+        raw_src = getattr(raw_fop, "src_pattern", None)
+        raw_tgt = getattr(raw_fop, "tgt_pattern", None)
+        for location, rel_type, raw_operand in (
+            (src, "READS_FROM", raw_src),
+            (tgt, "WRITES_TO", raw_tgt),
+        ):
             aid = asset_id(_FILE_OP_ASSET_KIND, location)
             into.add_data_asset(
                 DataAssetNode(
@@ -649,6 +809,17 @@ class ControlMInventoryExtractor:
                     location=location,
                 )
             )
+            # G92 clause (b), the G46 derived-fact shape: the asset is keyed on
+            # the RESOLVED location (that is what makes one file one node), and
+            # every DISTINCT raw spelling that reached it is kept beside it.
+            # Accumulated rather than first-seen because two jobs spelling one
+            # path two ways is exactly the evidence that makes a wrong binding
+            # findable — keeping only the first would hide the second.
+            if raw_operand and raw_operand != location:
+                node = into.data_assets[aid]
+                seen = [v for v in node.properties.get("raw_operands", "").split(" | ") if v]
+                if raw_operand not in seen:
+                    node.properties["raw_operands"] = " | ".join(sorted([*seen, raw_operand]))
             into.add_rel(jid, rel_type, aid)
             if prepost:
                 coverage.prepost_file_ops_added += 1

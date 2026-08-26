@@ -93,6 +93,29 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-176`** · 2026-08-25 · `[idea]` · **open — deliberately left out of G92, which scoped itself to file-op operands** · prio? **Med** —
+  **G92 put a resolved scope chain in the Control-M extractor, and exactly one
+  consumer uses it.** The chain is now built once per run (`_build_scope_chains`) and
+  `_resolve_shell` runs shell text through the one core resolver before the file-op
+  parse. Two other places in the SAME extractor still read RAW values and would be
+  strictly better with it:
+  **(1) THE G97 ARTIFACT PASS.** `_artifact_pass` skips any `ETL_ARTIFACT_URI` whose
+  value still holds a `%%ref` and counts it as `artifact_values_unresolved`. Many of
+  those are resolvable right now — the chain is already in hand two methods away. This
+  was NOT folded into G92 because G92's acceptance is explicit about file-op operands
+  and its counters are file-op counters; widening it would have silently changed G97's
+  tested numbers in the same commit that established them.
+  **(2) INVOCATION TARGETS.** The CMD_LINE pass deliberately still parses the VERBATIM
+  command for invocations (G92 resolves only the file-op half). That was the right call
+  and should stay a decision rather than drift: invocation identity is already
+  env-stabilised by `_stable_invocation_key` (DPL pipeline GUID, Ab Initio basename),
+  and re-keying it on resolved text would move a signed ruling (cmdline-lineage-review
+  2026-07-16). If this is ever revisited it is a GATE question, not a build.
+  **WHAT IS ALREADY TRUE AND NEEDS NOTHING:** the resolve counters
+  (`resolve_resolved` / `residue` / `unresolved` / `nothing_to_substitute` /
+  `no_scope_chain`) ride the existing `ExtractCoverage` summary line, so the yield of
+  any widening is measurable in the place the other counters already land.
+
 - **`Idea-175`** · 2026-08-25 · `[idea]` · **open — the consumer half of G56; G56 itself is done and deliberately stopped at the collector + extractor** · prio? **Med** —
   **G56 now DERIVES `storage_scope`, but the two places that act on multi-host
   identity still behave as if it were always `unknown`.** Left out of G56 on purpose:

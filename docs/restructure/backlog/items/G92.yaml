@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G14
 - G46
@@ -23,3 +23,46 @@ acceptance: |
   REPRODUCED AT THE GROOM, sample-only, no database (J18): the G60 pre/post pass calls parse_command(value) on the RAW variables-CSV var_value, and _file_op keys the asset as asset_id(_FILE_OP_ASSET_KIND, location) from that verbatim operand -- so a job whose POSTCMD moves "%%R_PATH/out.dat" and a job whose CMD_LINE moves "/data/r/out.dat" plan edges to TWO DataAsset nodes for ONE file. The CMD_LINE pass has the same defect; only the pre/post pass makes it visible, because pre/post text is where the variable forms concentrate. (a) RESOLVE, THEN PARSE. The extractor builds the job's folder -> job scope chain and runs the shell text through the ONE resolver (drydocs_core/orchestration/controlm/resolve_layers / resolve_command_line, whose stated guardrail is "no caller may re-implement substitution"), then parses the RESOLVED text. No second substitution engine, no regex twin, no local %%-stripping helper -- a new substitution path in this extractor fails this item outright. (b) RAW STAYS BESIDE RESOLVED, never replaced -- the G46 derived-fact shape. The candidate carries both the verbatim operand and the resolved location, so a wrong binding is auditable rather than baked in. (c) CANONICAL RESIDUE IS NOT A FAILURE. {ODATE}-class tokens survive resolution by design and stay symbolic in the operand; they are counted as EXPECTED residue, distinct from an unresolved user variable, which is counted as a miss. Neither is dropped (the coverage house rule). (d) COUNT THE RESOLUTION QUALITY on the ResolveCoverage precedent (drydocs/cmdline_staging.py): per-run counters for resolved / residue / nothing-to-substitute / no-scope-chain, reported through the existing ExtractCoverage summary line so the yield is measurable in the same place the prepost_* counters already land. (e) SCOPE CHAIN COMES FROM THE SAME CSV the shell text does. The aliased projection carries var_scope (FOLDER | JOB); the raw export does not, and there the folder rows are the header row where JOB_NAME equals the folder name (the drydocs/staging.py is_folder_header rule). Both shapes must feed the chain, and a row with NO resolvable scope chain is counted, never silently parsed raw. ENDPOINTS AND MEANING ARE UNCHANGED: same READS_FROM / WRITES_TO, same ControlMJob -> DataAsset shape from the 2026-07-15/16 gate EDIT, no new relationship type, m3_reads_from / m3_writes_to stay planned. Zero graph writes; a unit test on a sample job proves the resolved and raw spellings of one path converge on ONE asset id.
 notes: |
   Groomed 2026-08-12 (targeted groom) from Idea-112, raised working through the G60 result with the user. Verified at the groom rather than taken from the entry: _prepost_pass parses var_value directly (controlm_inventory.py), resolve_layers / resolve_command_line already return each definition's resolved_value plus substitution provenance (G46, done), and PRECMD/POSTCMD are themselves SETVAR definitions -- so the scope chain that resolves the rest of the job resolves them in place. This is a FEED change, not a new parser and not a new resolver, which is why it is sonnet: every semantic decision it depends on was made at G14, G46 and G60. MODULE: drydocs-lineage, chosen because the change point is the extractor's pass; core's resolver is CALLED, not modified. If core turns out to need a public helper for the scope-chain assembly, that is a drydocs-core follow-up item, not a widening of this one.
+  DONE 2026-08-25 (desktop, same session as G97). Built as a FEED change exactly as the notes framed
+  it: no new parser, no new resolver, and no second substitution path. (a) RESOLVE THEN PARSE, through
+  `resolve_command_line` — the one core resolver whose stated guardrail is that no caller may
+  re-implement substitution. The scope chain is built ONCE per run before the jobs pass
+  (`_build_scope_chains`), because the CMD_LINE file-op parse has the same defect the pre/post pass
+  does and needed the same chain; that reordering is the only structural change to `extract()`.
+  (b) RAW BESIDE RESOLVED: the asset is keyed on the RESOLVED location — that is what makes one file
+  one node — and every DISTINCT raw spelling that reached it accumulates in a `raw_operands` property.
+  ACCUMULATED rather than first-seen deliberately: two jobs spelling one path two ways IS the evidence
+  that makes a wrong binding findable, and keeping only the first would hide the second. Raw and
+  resolved ops are paired by parsing both spellings and zipping — sound because substitution replaces
+  values IN PLACE and never adds, removes or reorders statements; where the two parses disagree anyway
+  (a variable holding a whole `;`-separated command would do it) the disagreement is COUNTED and the
+  resolved op travels with no raw twin rather than being paired with the wrong one.
+  (c) RESIDUE IS NOT A MISS: `{ODATE}`-class canonical tokens survive by design and count as expected
+  residue; a user `%%ref` with no binding counts as a miss AND still stages on its raw spelling,
+  because a dropped operand is invisible and a raw one is not. (d) Five counters on the ResolveCoverage
+  precedent ride the existing ExtractCoverage summary line.
+  ONE CORRECTION TO THIS ITEM'S OWN ACCEPTANCE, clause (e). It says the raw export's folder rows are
+  "the header row where JOB_NAME equals the folder name (the drydocs/staging.py is_folder_header
+  rule)". That conflates two real rules in two files: the JOB_NAME = SCHED_TABLE comparison is how
+  drydocs/loaders/sql/controlm_variables.sql DERIVES `var_scope`, while staging.py's
+  `is_folder_header` falls back to the JOB_ID = 1 smart-folder heuristic when `var_scope` is absent.
+  Both were implemented: declared `var_scope` wins when present, else either spelling identifies a
+  folder row. Accepting both is strictly safer than accepting one, the raw shape carries the columns
+  for both, and a row matching neither is JOB scope, which is the correct default. No behaviour rests
+  on the acceptance's wording being right — it rests on the two files.
+  TESTS: 8 new in tests/unit/test_lineage_inventory.py, synthetic and no database (J18) — the
+  acceptance's named convergence test (a %%R_PATH POSTCMD job and a literal CMD_LINE job land on ONE
+  asset id, with the %%-spelling never becoming a node), expected residue, an unresolved user variable
+  as a counted miss, no-scope-chain counted with behaviour unchanged, BOTH clause-(e) scope-chain
+  shapes, job-scope-overrides-folder (pinned because the wrong chain order still resolves — just to
+  the wrong file, silently), and a clause-(a) guard that the module calls the one resolver and imports
+  no regex module. Three mutations checked and all caught: parsing raw (6 failures), reversing the
+  chain order, and collapsing the residue/miss distinction. ENDPOINTS AND MEANING UNCHANGED as
+  required: same READS_FROM / WRITES_TO, same ControlMJob -> DataAsset, no new relationship type,
+  zero graph writes. INVOCATION TARGETS DELIBERATELY STILL PARSE THE VERBATIM COMMAND: invocation
+  identity is already env-stabilised by `_stable_invocation_key` (DPL GUID, Ab Initio basename) and
+  re-keying it on resolved text would move a signed ruling (cmdline-lineage-review 2026-07-16) — that
+  is a gate question, not a build. Idea-176 captures both that boundary and the G97 artifact pass,
+  which still skips %%-bearing artifact values it could now resolve; left out because this item's
+  acceptance and counters are file-op ones and widening would have silently changed G97's numbers in
+  the commit that established them. Suite 2459 passed / 10 skipped, ruff clean, CLI gates green.

@@ -742,3 +742,171 @@ def test_payload_migration_cypher_moves_the_edge_and_spares_etlprocess() -> None
     assert "MERGE (j)-[new:USES_ARTIFACT]->(s)" in text
     assert "DELETE old" in text  # MOVED, not copied
     assert "ETLProcess" in text  # the exclusion is stated, not silent
+
+
+# =============================================================================
+# G92 - resolve the job's scope chain BEFORE the file-op parse
+#
+# The defect: _file_op keyed the DataAsset off the VERBATIM operand, so a job
+# whose POSTCMD moves %%R_PATH/out.dat and a job whose CMD_LINE moves
+# /data/r/out.dat planned edges to TWO nodes for ONE file. Endpoints and meaning
+# are unchanged (same READS_FROM / WRITES_TO, same ControlMJob -> DataAsset);
+# only the operand the asset is keyed on changes. Synthetic fixtures, no
+# database (J18).
+# =============================================================================
+
+_G92_JOBS = _G97_HEADER + (
+    # job 9 spells the path LITERALLY on its command line
+    "9,161947,JOB_LITERAL,F1,svc.x,h1,cp /data/r/out.dat /data/backup/out.dat,Y\n"
+    # job 8 reaches the same file through a FOLDER variable, in POSTCMD
+    "8,161947,JOB_VARIABLE,F1,svc.x,h1,/opt/scripts/noop.ksh,Y\n"
+)
+
+_G92_VARS = _VARS_HEADER + (
+    # job_id 1 = the smart-folder header row (staging.py's raw-export rule)
+    "161947,1,FOLDER_HDR,%%R_PATH,/data/r,OS\n"
+    "161947,8,JOB_VARIABLE,%%POSTCMD,mv %%R_PATH/out.dat /data/archive/out.dat,OS\n"
+)
+
+
+def test_variable_and_literal_spellings_converge_on_one_asset(tmp_path) -> None:
+    """The acceptance's named test. Two jobs, one file, ONE DataAsset id - and
+    the %%-spelling never becomes a node of its own."""
+    graph, coverage = _g97_extract(tmp_path, _G92_VARS, jobs_csv=_G92_JOBS)
+
+    resolved = "data#local_file:/data/r/out.dat"
+    assert resolved in graph.data_assets
+    assert "data#local_file:%%R_PATH/out.dat" not in graph.data_assets
+    # both jobs reach the SAME node - that is the whole point
+    assert ("proc#controlm_job:161947.9", "READS_FROM", resolved) in graph.rels
+    assert ("proc#controlm_job:161947.8", "READS_FROM", resolved) in graph.rels
+
+    # clause (b): raw stays BESIDE resolved, so a wrong binding is auditable
+    assert graph.data_assets[resolved].properties["raw_operands"] == "%%R_PATH/out.dat"
+    # the literal job contributed no raw twin - its operand already WAS resolved
+    backup = graph.data_assets["data#local_file:/data/backup/out.dat"]
+    assert "raw_operands" not in backup.properties
+
+    assert coverage.resolve_no_scope_chain == 0
+    assert coverage.resolve_substitutions >= 1
+
+
+def test_canonical_residue_is_expected_not_a_miss(tmp_path) -> None:
+    """Clause (c). {ODATE}-class tokens only exist at execution time, so they
+    survive resolution BY DESIGN and stay symbolic in the operand. They are
+    counted as EXPECTED residue - distinct from an unresolved user variable,
+    which is a real miss - and neither is dropped."""
+    jobs = _G97_HEADER + (
+        "9,161947,JOB_ODATE,F1,svc.x,h1,cp %%R_PATH/in_{{ODATE}}.dat /data/w/o.dat,Y\n"
+    )
+    vars_csv = _VARS_HEADER + "161947,1,FOLDER_HDR,%%R_PATH,/data/r,OS\n"
+    graph, coverage = _g97_extract(tmp_path, vars_csv, jobs_csv=jobs)
+
+    # the variable resolved; the runtime token did not, and should not have
+    asset = "data#local_file:/data/r/in_{{ODATE}}.dat"
+    assert asset in graph.data_assets
+    assert coverage.resolve_residue == 1
+    assert coverage.resolve_unresolved == 0  # residue is NOT a miss
+
+
+def test_unresolved_user_variable_is_a_counted_miss_never_dropped(tmp_path) -> None:
+    """Clause (c), the other half. A user %%ref with no binding IS a miss - it
+    is counted, and the candidate still stages on the raw spelling rather than
+    disappearing, because a dropped operand is invisible and a raw one is not."""
+    jobs = _G97_HEADER + ("9,161947,JOB_MISS,F1,svc.x,h1,cp %%NO_SUCH/in.dat /data/w/o.dat,Y\n")
+    vars_csv = _VARS_HEADER + "161947,1,FOLDER_HDR,%%R_PATH,/data/r,OS\n"
+    graph, coverage = _g97_extract(tmp_path, vars_csv, jobs_csv=jobs)
+
+    assert coverage.resolve_unresolved == 1
+    assert coverage.resolve_residue == 0
+    assert "data#local_file:%%NO_SUCH/in.dat" in graph.data_assets  # counted, not dropped
+    assert coverage.file_ops_added == 2
+
+
+def test_no_scope_chain_is_counted_and_parses_raw(tmp_path) -> None:
+    """Clause (e)'s floor: a job with NO resolvable chain is counted, never
+    silently parsed raw as though it had been resolved. Behaviour is exactly
+    what it was before this item - which is the point of counting it."""
+    jobs = _G97_HEADER + ("9,161947,JOB_NOVARS,F1,svc.x,h1,cp /data/r/a.dat /data/w/a.dat,Y\n")
+    csv_path = tmp_path / "jobs.csv"
+    csv_path.write_text(jobs, encoding="utf-8")
+    graph = LineageGraph()
+    coverage = ControlMInventoryExtractor().extract(csv_path, graph)  # no variables CSV
+    assert coverage.resolve_no_scope_chain == 1
+    assert coverage.file_ops_added == 2
+    assert "data#local_file:/data/r/a.dat" in graph.data_assets
+
+
+def test_scope_chain_reads_the_aliased_var_scope_column(tmp_path) -> None:
+    """Clause (e), the formal projection. When var_scope is present it is
+    AUTHORITATIVE - the folder row here carries neither job_id 1 nor a job_name
+    matching the folder, so only the declared column can identify it."""
+    jobs = _G97_HEADER + ("9,161947,JOB_A,F1,svc.x,h1,cp %%R_PATH/a.dat /data/w/a.dat,Y\n")
+    vars_csv = (
+        "folder_id,job_id,job_name,var_scope,var_name,var_value\n"
+        "161947,77,SOME_OTHER_NAME,FOLDER,%%R_PATH,/data/r\n"
+    )
+    graph, coverage = _g97_extract(tmp_path, vars_csv, jobs_csv=jobs)
+    assert "data#local_file:/data/r/a.dat" in graph.data_assets
+    assert coverage.resolve_no_scope_chain == 0
+
+
+def test_scope_chain_reads_the_raw_export_folder_header(tmp_path) -> None:
+    """Clause (e), the raw export. No var_scope column exists there, so the
+    folder row is identified by the repo's own two spellings of the same fact:
+    the SQL projection derives FOLDER from JOB_NAME = SCHED_TABLE, and
+    staging.py falls back to the JOB_ID = 1 smart-folder heuristic."""
+    (tmp_path / "controlm_jobs__sample.csv").write_text(
+        _G97_HEADER + "9,161947,JOB_A,F1,svc.x,h1,cp %%R_PATH/a.dat /data/w/a.dat,Y\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "controlm_variables__sample.csv").write_text(
+        "TABLE_NAME,JOB_NAME,JOB_ID,APPL_TYPE,NAME,VALUE\n"
+        # JOB_NAME == TABLE_NAME: the SQL projection's own definition of FOLDER
+        "161947,161947,77,OS,%%R_PATH,/data/r\n",
+        encoding="utf-8",
+    )
+    graph = LineageGraph()
+    coverage = ControlMInventoryExtractor().extract(tmp_path, graph)
+    assert "data#local_file:/data/r/a.dat" in graph.data_assets
+    assert coverage.resolve_no_scope_chain == 0
+
+
+def test_job_scope_overrides_folder_scope(tmp_path) -> None:
+    """Vendor priority order, which is the resolver's own contract rather than
+    anything this extractor decides: the JOB binding wins over the folder one.
+    Pinned because assembling the chain in the wrong order would still resolve
+    - just to the wrong file, silently."""
+    jobs = _G97_HEADER + ("9,161947,JOB_A,F1,svc.x,h1,cp %%R_PATH/a.dat /data/w/a.dat,Y\n")
+    vars_csv = _VARS_HEADER + (
+        "161947,1,FOLDER_HDR,%%R_PATH,/data/folder,OS\n" "161947,9,JOB_A,%%R_PATH,/data/job,OS\n"
+    )
+    graph, _ = _g97_extract(tmp_path, vars_csv, jobs_csv=jobs)
+    assert "data#local_file:/data/job/a.dat" in graph.data_assets
+    assert "data#local_file:/data/folder/a.dat" not in graph.data_assets
+
+
+def test_the_extractor_has_no_second_substitution_engine() -> None:
+    """Clause (a) as a guard, not a promise. The resolver's stated guardrail is
+    that no caller may re-implement substitution, and this item fails outright
+    if a regex twin or a local %%-stripping engine appears in this module.
+
+    The check that actually holds: this module calls the ONE resolver, and it
+    does not import `re` at all — a substitution engine needs one, so the
+    import is the honest tripwire. (The `removeprefix("%%")` already in the
+    pre/post pass is NOT a smell: it normalises a variable NAME to match it
+    against SHELL_VAR_NAMES, and never touches a value.)"""
+    import drydocs_lineage.extractors.controlm_inventory as mod
+
+    text = Path(mod.__file__).read_text(encoding="utf-8")
+    assert "resolve_command_line(layers, text)" in text  # the ONE resolver, called
+    code = [
+        line
+        for line in text.splitlines()
+        if not line.lstrip().startswith("#") and not line.lstrip().startswith("#:")
+    ]
+    assert not any(line.strip() in ("import re", "import regex") for line in code), (
+        "the extractor imported a regex module — a second substitution path is "
+        "exactly what G92 clause (a) forbids"
+    )
+    assert not hasattr(mod, "re")
