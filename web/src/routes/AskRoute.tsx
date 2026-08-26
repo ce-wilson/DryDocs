@@ -378,6 +378,34 @@ function MetricsChip({ envelope }: { envelope: AskEnvelope }) {
 
 function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof createApiAccess> }) {
   const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
+
+  // Transient label, self-clearing. The timer is cleaned up on unmount and on a
+  // re-copy, so a step that scrolls away mid-timeout never sets state after it.
+  useEffect(() => {
+    if (!copied) return
+    const t = setTimeout(() => setCopied(null), 1500)
+    return () => clearTimeout(t)
+  }, [copied])
+
+  // Copies the Cypher VERBATIM — no spec id, params or comment header prepended.
+  // What is on screen is what lands on the clipboard, so it pastes straight into
+  // the dev Cypher bench or Neo4j Browser and runs. (SpecGrid's `Copy as Cypher`
+  // adds a provenance header because it copies a REGISTERED spec, where the id
+  // and params are the point; a step's Cypher is already shown in full here.)
+  function copyCypher() {
+    const text = step.cypher
+    if (!text) return
+    if (!navigator.clipboard) {
+      setCopied('clipboard unavailable')
+      return
+    }
+    navigator.clipboard.writeText(text).then(
+      () => setCopied('copied'),
+      () => setCopied('clipboard unavailable'),
+    )
+  }
+
   return (
     <div className="rounded border border-edge-soft p-2">
       <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -410,9 +438,26 @@ function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof
         </p>
       )}
       {step.cypher && (
-        <pre className="mt-1 overflow-x-auto rounded bg-bg-2/60 p-2 font-mono text-[10px] text-muted">
-          {step.cypher}
-        </pre>
+        <>
+          <div className="mt-1 flex items-center justify-end gap-2">
+            {copied && (
+              <span aria-live="polite" className="font-mono text-[10px] text-faint">
+                {copied}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={copyCypher}
+              title="Copy this Cypher to the clipboard, verbatim"
+              className="rounded-md border border-edge bg-bg-2 px-1.5 py-0.5 text-[10px] font-medium text-muted hover:border-faint hover:text-text"
+            >
+              Copy
+            </button>
+          </div>
+          <pre className="mt-1 overflow-x-auto rounded bg-bg-2/60 p-2 font-mono text-[10px] text-muted">
+            {step.cypher}
+          </pre>
+        </>
       )}
       {open && step.explore_ref && (
         <div className="mt-2 h-72">
