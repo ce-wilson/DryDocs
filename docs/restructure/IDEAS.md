@@ -93,6 +93,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-162`** · 2026-08-27 · `[bug]` · **open** · prio? **Med** —
+  **The Z1/Z3 and Z5 fixtures were each built correctly and do not interlock, so the bundled
+  demo can only ever fill one of the map's three dimensions.** Found by running the whole Z3
+  chain on the desktop for the first time (`neo4jtest`, `drydocs` DB, 2026-08-27) to see why the
+  Locations tab drew nothing. The chain itself is fine — constraints applied, the infrastructure
+  supplement verified 6/6, the loader took 5 rows / 0 rejected first try, and its coverage
+  counters reported every gap honestly rather than hiding one. The gaps are all in how the three
+  sample files reference each other, and each one silences a different dimension:
+  - **Servers dimension — 2 of 5 rows cannot be placed.** The Z3 export fixture uses the
+    synthetic cities Sampleville and *Modelton*; the Z5 gazetteer seeded Sampleville and
+    *Otherton*. Two items independently invented a second synthetic city and picked different
+    names, so the DR rows resolve to nothing. Fix is one gazetteer row — pure classification,
+    guarded, no gate.
+  - **Jobs dimension — permanently empty.** The Control-M sample hosts are host-hldm-02/03 and
+    host-auto-01/02; the server export names are srv-synth-01..03 and srv-synth-51/52. The signed
+    T1/T2 tiers are exact and normalized-short-name, so those two sets can never join, and the
+    resolution pass correctly reported 4 of 4 hosts UNMATCHED. Nothing is wrong with the tiers —
+    the fixtures were simply never written to meet.
+  - **Teams dimension — permanently empty.** The export names business application 70055; the
+    graph carries 70051-70053. The technology-port leg is MATCH-only by gate ruling, so it minted
+    nothing and counted apps_unmatched 1, exactly as designed.
+  - **Why this matters beyond the demo:** every one of these is the shape of a real coverage gap,
+    so the bundled sample currently exercises the reporting path and never the success path. A
+    fixture set that interlocks would let the e2e prove the join tiers actually fire, which today
+    no test does. Cheapest order: gazetteer row, then align the export's host names and app id
+    with the Control-M sample.
+  - **Related:** the Z5 index defect fixed the same day (`ae740be5`) was load-bearing here — with
+    it unfixed, all five servers would have been unplaceable and a successful load would still
+    have drawn an empty world.
+
 - **`Idea-161`** · 2026-08-27 · `[question]` · **open** · prio? **Low** —
   **Salt DS as a SECOND UI track: the standing open question is answered, and the only substantive
   assessment we ever wrote is not in the working tree.** Raised at a 2026-08-27 review of what the
