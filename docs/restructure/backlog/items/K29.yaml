@@ -1,0 +1,42 @@
+id: K29
+epic: seal-attribution
+title: 'Run the K5-amendment gate: Tech Partner attach level + the Area-tier role set'
+type: task
+module: ontology
+phase: 9
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: [K20]
+gates: [tech-partner-attach-level]
+inputs:
+- config/gate-prompts/tech-partner-attach-level.yaml
+- config/gate-log.md
+acceptance: |
+  A sign-off session for gate `tech-partner-attach-level` is HELD and its outcome recorded in
+  config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
+  BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
+  session: a stale-premise sweep of the drafted page against current facts (the
+  C28/K20 moved-premise model -- G91 half-staled K20's clause 3 in nine days;
+  restate honestly, never re-ask signed clauses, L25 riders-not-edits), and the
+  extract-vintage precondition where the page keys on an extract (name the pull;
+  older pull => re-pull first -- 03-hitl-sme-flow.md convention, 2026-08-27).
+  AFTER: follow-up build items minted for every flip the ruling authorizes, or
+  an explicit none-needed note in the sign-off entry.
+  RIDERS THIS SESSION CARRIES: (1) the volumetrics ruling -- ratify 'totals +
+  ratios + all-N-of-N shape statements are Internal-Public; disaggregated splits
+  and per-named-entity raw counts stay in the twin' (classification.yaml's own
+  NOT-ruled flag; on sign-off: gate-log RECORD + one sentence in
+  PUBLISH-BOUNDARY.md + the classification.yaml comment upgraded to
+  ruled-with-date). (2) Precondition: the producer page is the company-amended
+  revision (SME review status packet #1, profiling-sync-packet.md intake step 6)
+  citing the company introducing commit -- the 5/9 producer draft argues from
+  conflicting testimonies, the amended page argues from the source.
+notes: |
+  Minted 2026-08-27 (Lane A groom pass, the run-the-gate sweep): 13 of 20
+  drafted-unsigned gates had NO item owning the sign-off -- the drafting item
+  closes done and the session is never scheduled. Drafting item K20 closed done when the prompt landed; nobody owned the RUN.
+  This item is the sign-off session's claim surface; the session itself is
+  HITL (agent: main).
+  Two-tier doctrine: this is the PRODUCER sign-off; the company runs its own.

@@ -93,6 +93,17 @@ Committed specs are **mechanism-only** (column names and rules — never real fo
 SIDs, or data values); pages for real PAT/SEAL steps render from a gitignored twin. Rendered
 HTML goes to a gitignored dir (`internal-local/gate-pages/`), never the repo.
 
+**Extract-vintage convention (2026-08-27, generalized from the PAT cabinet session's §G1
+finding):** a gate whose questions are keyed on an extract — a vocabulary enumeration, a
+role register, any "does X exist in the source" clause — **names the pull it rests on**
+(file + pull date, the same identity a review status records), and a sign-off session
+working from an older pull **re-pulls first**. The reason is measured, not hypothetical: a
+role class present in an August pull did not exist in the June pull, so a June-based ruling
+would have been correct on its evidence and wrong in fact, with no signal that anything was
+missing. An undated evidence base makes that failure invisible; a named one makes the
+re-pull a mechanical precondition instead of a judgment call. (Companion capture protocol:
+`docs/port/profiling-sync-packet.md`.)
+
 ## Promotion: `drydocs_context` → `drydocs` (trust axis = DB boundary)
 
 The multi-DB topology (ADR 0002) keeps **uncertain** context (`drydocs-deepdoc` output, stamped

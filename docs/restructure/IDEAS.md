@@ -91,6 +91,17 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-180`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
+  Gate state is not machine-readable: only 4 of 52 gate-prompt YAMLs carry a status key;
+  everything else resolves only by prose-parsing the 4,191-line gate-log — and the log is
+  already stale against the tree once (line ~1125 says the snowflake-data-catalog prompt is
+  not drafted; the file exists — G119 owns the dated correction). Surfaced by the 2026-08-27
+  gate survey that found 13 of 20 unsigned gates unowned. Candidate shape: a required
+  status key on every spec (drafted | signed-off | deferred) guarded by test_gate_pages,
+  derived FROM the gate-log at migration and drift-checked against it after — the log stays
+  the authority, the key becomes the queryable index (J37: read the importable object,
+  never parse a render — this is the same disease one layer up). Groom AFTER the 13
+  run-the-gate items land so the migration sweeps a stable queue.
 - **`Idea-179`** · 2026-08-27 · `[idea]` · **open** · prio? **Med** —
   ADR 0015 (Team Edition, rev 7 draft) application, from the Chase leadership-page scrape
   (docs/reviews/chase-leadership-scrape-2026-08-27.md): TE should ship a NEWCOMER'S

@@ -619,7 +619,9 @@
         "config/gate-prompts/email-dl-contact-point.yaml"
       ],
       "log_ref": "config/gate-log.md:2546",
-      "unblocks": []
+      "unblocks": [
+        "C36"
+      ]
     },
     {
       "kind": "log-entry",
@@ -1012,7 +1014,9 @@
         "config/gate-prompts/standard-identity-and-carrier.yaml"
       ],
       "log_ref": "config/gate-log.md:4120",
-      "unblocks": []
+      "unblocks": [
+        "G116"
+      ]
     },
     {
       "kind": "log-entry",
@@ -1024,7 +1028,8 @@
       ],
       "log_ref": "config/gate-log.md:4151",
       "unblocks": [
-        "K20"
+        "K20",
+        "K29"
       ]
     },
     {
@@ -1039,6 +1044,17 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-27",
+      "title": "RECORD: extract-vintage convention + the SME-review-status capture protocol (user direction, in-chat)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/tech-partner-attach-level.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4193",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1047,7 +1063,9 @@
         "config/gate-prompts/bmc-docs-example.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "J56"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1058,7 +1076,9 @@
         "config/gate-prompts/business-layer-org-structure.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "C35"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1082,7 +1102,9 @@
         "config/gate-prompts/controlm-definition-precedence.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "D11"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1097,7 +1119,8 @@
         "MM3",
         "MM8",
         "MM9",
-        "MM10"
+        "MM10",
+        "MM11"
       ]
     },
     {
@@ -1109,7 +1132,9 @@
         "config/gate-prompts/dcat-theme-subject-scheme.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "C37"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1159,7 +1184,9 @@
         "config/gate-prompts/etlprocess-kind-enum.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G118"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1170,7 +1197,9 @@
         "config/gate-prompts/registry-wiring-readiness.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "N18"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1194,7 +1223,9 @@
         "config/gate-prompts/script-provenance-gaps.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G117"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1216,7 +1247,9 @@
         "config/gate-prompts/snowflake-data-catalog.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G119"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1227,7 +1260,9 @@
         "config/gate-prompts/software-usage-patterns.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G120"
+      ]
     }
   ]
 }

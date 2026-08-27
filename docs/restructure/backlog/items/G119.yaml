@@ -1,0 +1,35 @@
+id: G119
+epic: component-topology
+title: 'Run the snowflake-data-catalog gate; fix the stale gate-log line while at it'
+type: task
+module: ontology
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: [G44]
+gates: [snowflake-data-catalog]
+inputs:
+- config/gate-prompts/snowflake-data-catalog.yaml
+- config/gate-log.md
+acceptance: |
+  A sign-off session for gate `snowflake-data-catalog` is HELD and its outcome recorded in
+  config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
+  BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
+  session: a stale-premise sweep of the drafted page against current facts (the
+  C28/K20 moved-premise model -- G91 half-staled K20's clause 3 in nine days;
+  restate honestly, never re-ask signed clauses, L25 riders-not-edits), and the
+  extract-vintage precondition where the page keys on an extract (name the pull;
+  older pull => re-pull first -- 03-hitl-sme-flow.md convention, 2026-08-27).
+  AFTER: follow-up build items minted for every flip the ruling authorizes, or
+  an explicit none-needed note in the sign-off entry.
+  The sweep also corrects the stale record: gate-log line ~1125 still says
+  'gate prompt not drafted' while config/gate-prompts/snowflake-data-catalog.yaml
+  exists -- dated correction in place, never a rewrite.
+notes: |
+  Minted 2026-08-27 (Lane A groom pass, the run-the-gate sweep): 13 of 20
+  drafted-unsigned gates had NO item owning the sign-off -- the drafting item
+  closes done and the session is never scheduled. Drafting item G44 closed done when the prompt landed; nobody owned the RUN.
+  This item is the sign-off session's claim surface; the session itself is
+  HITL (agent: main).

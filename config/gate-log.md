@@ -4189,3 +4189,24 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   (13/13, row 5 blocked-on-recapture) stands unchanged under the new name. CDO on these
   surfaces is the industry C-suite sense (chief data office/officer) — the sense
   collisions are recorded in `config/glossary/terms-public.yaml` (fifth pass).
+
+## 2026-08-27 — RECORD: extract-vintage convention + the SME-review-status capture protocol (user direction, in-chat)
+
+- **What this records:** two standing conventions, neither a ruling on any mapping.
+  (1) **Extract-vintage** — a gate keyed on an extract names the pull it rests on, and a
+  sign-off session working from an older pull re-pulls first. Generalized from the PAT
+  cabinet session's §G1 finding (2026-08-27): a role class present in the August pull did
+  not exist in the June pull, so a June-keyed ruling would have been correct on its
+  evidence and wrong in fact, with no signal anything was missing. Convention text lives
+  in docs/restructure/03-hitl-sme-flow.md (gate-page format section).
+  (2) **SME review status** — the company→producer profiling capture protocol is defined
+  at docs/port/profiling-sync-packet.md: one shape-only status per company review
+  session, hand-carried, landed in internal-local/company-backflow/, intaken by the
+  producer checklist (ledger → manifest → item flags → crosswalks → page adoption →
+  receiving tables). Wording rule: always "SME review status," never "what to send
+  back" — the hand-prompts-ask-nothing-back rule extended to the reverse channel.
+- **Pending ruling flagged, not made:** the volumetrics boundary (totals + ratios +
+  all-N-of-N publishable; disaggregated per-entity splits stay in the twin) remains
+  precedent-only per config/classification.yaml's own NOT-ruled flag; it rides the
+  tech-partner-attach-level sign-off session as a rider question.
+- **Authority note.** RECORD, not a ruling; no vocabulary status may cite this heading.
