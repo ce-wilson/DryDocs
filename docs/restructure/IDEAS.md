@@ -91,6 +91,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-183`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
+  SET-NOT-COUNT acceptance, adopted from the company session's measured trap (2026-08-27,
+  their memory note): two sessions independently measured the same failing-test TOTAL and
+  treated agreement as confirmation — but one of the failures was new and self-inflicted;
+  agreeing on a total is not agreeing on its contents. Producer surfaces that compare
+  totals today: the port acceptance (suite counts, Track-1 tallies, '55 of 55 are the
+  documented clusters'), snapshot.ps1's green-at-HEAD check, and any 'this is clean'
+  claim after a targeted fix. Candidate shape: (1) port/reconcile acceptance records the
+  failing-test ID SET (sorted node ids) and diffs sets between baseline and result — a
+  swap that keeps the total visible; (2) a 'clean claim' convention: targeted-file
+  verification is never sufficient — run the repo-wide guard family (module boundary,
+  render determinism, no-render-parsing, repo paths) whose failures no targeted file
+  catches — the company side recorded the same rule with their guard names the same day.
+  Groom into the reconcile-port skill + snapshot ritual when picked up.
 - **`Idea-182`** · 2026-08-27 · `[bug]` · **open** · prio? **High** —
   PRODUCER pat_projection.py SHARES THE G82 DEFECT CLASS the company just measured and
   fixed on their side (their G82 close-out session 2026-08-27; the header facts land as a
