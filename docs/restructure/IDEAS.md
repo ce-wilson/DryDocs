@@ -91,6 +91,28 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-181`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
+  YAML/PY HEADER STANDARD + a freshness guard (user review request 2026-08-27; ties to the
+  port protocol and TE). The exemplar exists and is already in use — the source-mapping
+  four-key block (schema: / source: / classification: / updated:, see
+  config/source-mappings/design-docs.yaml) — but coverage is thin and the one freshness key
+  we have LIES: of 138 non-backlog tracked YAMLs, 104 have no updated: key, 32 no schema:
+  key, and of 24 files WITH updated: checked against git last-touch, 16 are stale
+  (PORT-MANIFEST itself: updated 2026-08-20, git 2026-08-27) — a hand date that drifts is
+  worse than none. Gate prompts are the governed exception (Module/Source/Registry
+  ref/Classification enforced by test_gate_pages) but carry NO date key at all; files
+  without updated: bury their freshness in per-section notes (20-mappings-seal: 34 body
+  dates, none in the header). Py side is healthier informally: 214/446 module docstrings
+  cite an ADR/gate/item, 132 carry dates, 31 have no docstring — standardize lightly there.
+  Candidate shape: (1) the four-key header REQUIRED on governed config YAML (+ optional
+  layer:/domain: where the vocabulary domain applies), guarded like test_doc_registry;
+  (2) the guard must solve the LYING problem, not just presence — producer-side, compare
+  updated: against git -1 --format=%as per file; note git dates DO NOT survive the port
+  (disjoint histories stamp port day), which is exactly why the in-file date is the
+  cross-repo mechanism and why updated: is a PER-SIDE field at the manifest (the
+  doc-source-registry field-split precedent); (3) TE inherits the block — a copier-updated
+  instance needs in-file vintage because template refreshes rewrite files wholesale.
+  Groom with Idea-180 (gate status keys) — same disease, same guard family.
 - **`Idea-180`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
   Gate state is not machine-readable: only 4 of 52 gate-prompt YAMLs carry a status key;
   everything else resolves only by prose-parsing the 4,191-line gate-log — and the log is
