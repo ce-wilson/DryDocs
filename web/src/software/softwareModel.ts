@@ -82,7 +82,19 @@ export interface Corpus {
 export const VENDORS = softwareData.vendors as Vendor[]
 export const PRODUCTS = softwareData.products as Product[]
 export const VENDORS_WITHOUT_ICONS = (softwareData.vendors_without_icons ?? []) as string[]
-export const ACRONYMS = (softwareData.acronyms ?? {}) as Record<string, string>
+/** One glossary entry. Provenance is STRUCTURED (O68 clause d) — `source` and
+ *  `added` are required in config/taxonomy/software-registry.yaml and guarded
+ *  Python-side, so no row can render without saying where it came from. */
+export interface Acronym {
+  term: string
+  expansion: string
+  source: string
+  added: string
+  note: string | null
+}
+
+/** Term-sorted by the renderer — the file's order is the contract, not ours. */
+export const ACRONYMS = (softwareData.acronyms ?? []) as Acronym[]
 export const DRYDOCS_APPLICATION_ID = softwareData.drydocs_application_id as string | undefined
 
 export const CORPORA = (loadMapData.sources as unknown as (Corpus & { home?: string })[]).filter(

@@ -45,36 +45,56 @@ adr: docs/decisions/0004-software-registry-vendor-terminology.md
 # is REMOVED on both sides; the Ais spelling goes away everywhere else. The
 # expansion lives on THIS registry because it is the file that carries the
 # vendor/publisher URLs — the durable home for "what did that name mean".
-# Note 'Streaming' was itself a misnomer: the AIS folder also carried ETL and
-# managed file transfer. Company-side status (screenshot channel, 2026-07-21
-# pm): their copy is an explicitly PROVISIONAL gloss on the source-registry
-# entry for their internal AIS engineering-docs portal (root path
+#
+# SHAPE CHANGED 2026-08-27 (O68 clause d), from `TERM: "expansion"` to a mapping
+# per term. The reason is the whole point of the item: each entry's why/when
+# already existed, but it lived in a YAML COMMENT, and a comment is readable by
+# a person and invisible to every tool. The console could therefore render three
+# fully-sourced acronyms and a newly-added one indistinguishably. `source` and
+# `added` are REQUIRED on every entry and guarded by
+# tests/unit/test_software_registry.py::test_acronyms_shape_and_provenance —
+# an entry cannot be added without saying where it came from.
+#
+# `note` is OPTIONAL and carries a caveat the expansion alone would lose.
+#
+# WHAT STAYS A COMMENT, deliberately: the AIS port caveat, because it is about
+# how two REPOSITORIES reconcile rather than about the term. Company-side their
+# copy is an explicitly PROVISIONAL gloss on the source-registry entry for their
+# internal AIS engineering-docs portal (root path
 # /docs/ais/{orchestration,etl,file-transfer}/ — corroborates the 3 capability
-# areas), with a PORT-MANIFEST canonical-producer row directing "overwrite
-# with the producer's authoritative expansion at next cherrypick" — i.e. THIS
-# field. CAVEAT for the next port: their gloss sits in source-registry.yaml,
-# ours here — the expansion must be carried across files, not same-file
-# overwritten (inboxed in IDEAS.md).
+# areas), with a PORT-MANIFEST canonical-producer row directing "overwrite with
+# the producer's authoritative expansion at next cherrypick" — i.e. THIS field.
+# CAVEAT for the next port: their gloss sits in source-registry.yaml, ours here
+# — the expansion must be carried across files, not same-file overwritten
+# (inboxed in IDEAS.md).
 acronyms:
-  AIS: "Application Integration Streaming"
-  # ADDED 2026-08-09 (C25 prerequisite, SME-supplied from the internal DPL
-  # documentation site). Recorded HERE for the same reason AIS is: this file is
-  # the durable home for "what did that name mean". The internal application
-  # registration exists and is deliberately NOT transcribed — a registration id
-  # is Internal (PUBLISH-BOUNDARY.md), and the drydocs_application_id field
-  # below already establishes the pattern of a producer-side placeholder that
-  # the company copy reconciles at port time.
-  DPL: "Data Pipeline Library"
-  # ADDED 2026-08-09 (SME flag, marked IMPORTANT). Recorded here because this
-  # file is the durable home for "what did that name mean", and because the two
-  # names below are one string apart while meaning entirely different things.
-  # THE CONFUSION IS CONCRETE, not theoretical: Snowflake can hold ServiceNow
-  # data, at which point both names describe the same rows. The v2 grammar
-  # already settles it — `origin` is the SYSTEM OF RECORD and Snowflake is then
-  # the CARRIER (config/source-registry.yaml, and the retired-id ledger's
-  # "origin catalog, carrier snowflake"). The `snowflake` PRODUCT row below
-  # carries the same caveat.
-  SNOW: "ServiceNow — the ITSM/CMDB platform. NOT Snowflake."
+  AIS:
+    expansion: "Application Integration Streaming"
+    source: "SME ruling 2026-07-21 (pm) — corroborated by the 3 capability areas of the internal AIS engineering-docs portal"
+    added: 2026-07-21
+    note: >-
+      'Streaming' was itself a misnomer: the AIS folder also carried ETL and
+      managed file transfer.
+  DPL:
+    expansion: "Data Pipeline Library"
+    source: "SME-supplied 2026-08-09, from the internal DPL documentation site (C25 prerequisite)"
+    added: 2026-08-09
+    note: >-
+      The internal application registration exists and is deliberately NOT
+      transcribed — a registration id is Internal (PUBLISH-BOUNDARY.md), and
+      drydocs_application_id below already establishes the producer-side
+      placeholder pattern the company copy reconciles at port time.
+  SNOW:
+    expansion: "ServiceNow — the ITSM/CMDB platform. NOT Snowflake."
+    source: "SME flag 2026-08-09, marked IMPORTANT"
+    added: 2026-08-09
+    note: >-
+      THE CONFUSION IS CONCRETE, not theoretical: Snowflake can hold ServiceNow
+      data, at which point both names describe the same rows. The v2 grammar
+      already settles it — `origin` is the SYSTEM OF RECORD and Snowflake is
+      then the CARRIER (config/source-registry.yaml, and the retired-id ledger's
+      "origin catalog, carrier snowflake"). The `snowflake` PRODUCT row below
+      carries the same caveat.
 
 # Reserved Application id for DryDocs itself (no SEAL id producer-side; the
 # company copy reconciles this to the real SEAL id at port time).

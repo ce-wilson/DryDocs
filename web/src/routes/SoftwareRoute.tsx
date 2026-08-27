@@ -7,8 +7,8 @@ import EmptyState from '../components/ui/EmptyState'
 import type { Persona } from '../lib/auth'
 import { createApiAccess } from '../lib/graphApi'
 import VendorIcon from '../software/VendorIcon'
+import AcronymsPane from '../software/AcronymsPane'
 import {
-  ACRONYMS,
   COVERAGE_STATS,
   DRYDOCS_APPLICATION_ID,
   PRODUCTS,
@@ -174,10 +174,7 @@ export default function SoftwareRoute({ persona }: { persona: Persona }) {
       <p className="shrink-0 text-[10px] text-faint">
         Snowflake is absent from this table by construction — it is a registered SOURCE system but has no
         software-registry product row. <code>drydocs docs-coverage</code> lists every such system.
-        {DRYDOCS_APPLICATION_ID ? ` · self: ${DRYDOCS_APPLICATION_ID}` : ''}
-        {Object.keys(ACRONYMS).length
-          ? ` · ${Object.entries(ACRONYMS).map(([k, v]) => `${k}: ${v}`).join(' · ')}`
-          : ''}
+        {DRYDOCS_APPLICATION_ID ? ` · self: ${DRYDOCS_APPLICATION_ID}` : ''} · acronyms have their own tab
       </p>
     </div>
   )
@@ -360,6 +357,12 @@ export default function SoftwareRoute({ persona }: { persona: Persona }) {
     </div>
   )
 
+  // O68: the glossary gets a tab of its own rather than a middle-dot run-on at
+  // the end of a footnote about something else. `persona.id` is the drafter
+  // recorded in the artifact header -- the console has no other identity, and an
+  // unattributed change request is one a reviewer cannot follow up.
+  const acronymsTab = <AcronymsPane author={persona.id} today={new Date().toISOString().slice(0, 10)} />
+
   return (
     <ModuleTemplate
       module={softwareModule}
@@ -411,6 +414,7 @@ export default function SoftwareRoute({ persona }: { persona: Persona }) {
         Vendors: vendorsTab,
         'Documentation coverage': coverageTab,
         Corpora: corporaTab,
+        Acronyms: acronymsTab,
       }}
     />
   )

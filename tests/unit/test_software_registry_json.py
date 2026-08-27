@@ -139,3 +139,26 @@ def test_stack_is_a_list_so_built_on_and_ingested_from_stay_distinct():
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     for p in committed["products"]:
         assert isinstance(p["stack"], list), f"product {p['id']}: stack must be a list"
+
+
+def test_acronyms_render_as_a_sorted_list_with_provenance():
+    """O68: the view carries the glossary the /software Acronyms tab renders.
+
+    A LIST, not a mapping — the renderer's sort is the contract, so the pane
+    does not get to invent an order. `added` is stringified because PyYAML
+    parses a bare date into datetime.date, which json.dumps cannot serialize;
+    a regression there fails the build rather than the page.
+    """
+    view = json.loads(COMMITTED.read_text(encoding="utf-8"))
+    rows = view["acronyms"]
+    assert isinstance(rows, list) and rows
+    assert [r["term"] for r in rows] == sorted(r["term"] for r in rows)
+    for r in rows:
+        assert set(r) == {"term", "expansion", "source", "added", "note"}
+        assert r["expansion"].strip() and r["source"].strip()
+        assert isinstance(r["added"], str) and r["added"].count("-") == 2
+
+    declared = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))["acronyms"]
+    assert {r["term"] for r in rows} == set(
+        declared
+    ), "every declared acronym reaches the console, and the console invents none"

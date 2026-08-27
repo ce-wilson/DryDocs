@@ -162,6 +162,64 @@ suites:
           the network tab and be wrong on screen.
         source: "Q16 build 2026-08-07 - verified against the Vite dev server (curl, both paths)"
 
+      - id: TC-SOFTWARE-02
+        description: The SNOW gloss renders WHOLE - the case that validates the layout
+        steps:
+          - Open /software and select the Acronyms tab.
+          - Read the SNOW row end to end, in dark and in light.
+        expect: >-
+          The full sentence "ServiceNow - the ITSM/CMDB platform. NOT Snowflake."
+          renders with no truncation, no ellipsis and no tooltip, and its note
+          wraps onto a second line beneath it rather than clipping. The warning
+          IS the entry - an ellipsis here deletes the only thing it exists to
+          say. AIS and DPL are two words each and look fine under any layout,
+          so a design checked only against them proves nothing.
+        source: "O68 build 2026-08-27 - watched in Chrome against the Vite dev server, dark and light"
+
+      - id: TC-SOFTWARE-03
+        description: A date never breaks across two lines
+        steps:
+          - Open the Acronyms tab at a normal desktop width.
+          - Read the Added column.
+        expect: >-
+          Each date renders on ONE line. Found failing at the first build: the
+          expansion column took all the slack, squeezed Added, and 2026-07-21
+          broke after the hyphen into two lines. Fixed with table-fixed plus a
+          colgroup and whitespace-nowrap, so long glosses grow in LINES instead
+          of stealing width from the narrow columns.
+        source: "O68 build 2026-08-27 - observed broken, fixed, re-observed in Chrome"
+
+      - id: TC-SOFTWARE-04
+        description: Add drafts an ARTIFACT and writes nothing
+        steps:
+          - Acronyms tab -> "Add an acronym...".
+          - Type a term that already exists (try lower-case "snow").
+          - Replace it with a new term, fill expansion, source and rationale, draft it.
+          - Press "Download YAML snippet".
+        expect: >-
+          The duplicate is caught case-insensitively - "snow" is normalized to
+          SNOW, the warning names it, and the draft button stays disabled. The
+          button is also disabled until expansion, source AND rationale are all
+          non-empty. A valid draft lands in a tray; downloading yields a YAML
+          snippet carrying the drafter, the date, the per-entry rationale as a
+          comment, and a paste-ready block - and NOTHING is written server-side.
+          The registry is authored through git (gate ui-write-surface, O20).
+        source: "O68 build 2026-08-27 - drafted MFT in Chrome; the blob was captured and round-tripped through yaml.safe_load and the renderer's validator, which accepted it unchanged"
+
+      - id: TC-SOFTWARE-05
+        description: Every acronym shows its provenance, and one with none cannot exist
+        steps:
+          - Read the Source and Added columns on every row.
+          - Try adding an entry to the registry with no `source:` and re-render.
+        expect: >-
+          Every row states who said so and when. The provenance used to live in
+          a YAML COMMENT - visible to a reader, invisible to every tool - so the
+          page could have shown three sourced entries and a fourth with nothing,
+          indistinguishable. O68 clause (d) made it structured, and the renderer
+          now REFUSES an entry missing expansion, source or added
+          (tests/unit/test_software_registry.py::test_acronym_without_provenance_is_rejected).
+        source: "O68 build 2026-08-27 - guard written and run; page columns read in Chrome"
+
   # ---------------------------------------------------------------------------
   - id: TS-LOADMAP
     module: loadmap

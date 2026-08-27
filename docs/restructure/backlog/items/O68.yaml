@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/routes/SoftwareRoute.tsx
@@ -90,3 +90,54 @@ notes: |
   NOT gate-bound in itself: a glossary is not edge semantics, not the ontology, and not a graph
   write. If clause (d) lands on structured provenance fields, that is a config-schema change and
   rides the normal review, not the HITL gate.
+
+  2026-08-27 - DONE (branch feat/ui-workstream). Surface: an Acronyms TAB on /software
+  (web/src/software/AcronymsPane.tsx, registered in modules/registry.ts) - the run-on
+  footnote tail is gone and the page footnote now just points at the tab.
+
+  CLAUSE (d) RULED: STRUCTURED PROVENANCE, not comment-only. The acronyms block changed
+  shape from `TERM: "expansion"` to a per-term mapping with REQUIRED expansion/source/added
+  and an optional note, and all three committed entries were migrated with their comment
+  provenance lifted into fields. Reason for taking the more expensive fork: comment-only
+  would have satisfied the letter of (d) by printing a disclaimer, but the newly added
+  entry would still have been indistinguishable from the sourced ones on screen, which is
+  the outcome (d) exists to prevent. Config-schema change, not gate-bound (glossary, not
+  edge semantics). What deliberately STAYED a comment: the AIS port caveat, because it is
+  about how two repositories reconcile, not about the term.
+
+  CLAUSE (c): M1 artifact-only, not M2. /mappings drafts through a server store
+  (var/mapping.db, O24); acronyms need no store because the target is a committed config
+  file, so the tray is component state and submit downloads a YAML snippet carrying the
+  drafter, the date, a paste-ready block, and the per-entry rationale as a comment. The
+  drafted snippet was round-tripped at build: yaml.safe_load parses it and the renderer's
+  own validator accepts it unchanged, so a paste is valid on arrival.
+
+  CLAUSE (e) GUARDS, all Python-side (3 in test_software_registry.py, 1 in
+  test_software_registry_json.py): shape + provenance on every entry; the deciding case,
+  an entry missing source/expansion is REJECTED by scripts/render_software_registry.py
+  (which now validates rather than passing through); SNOW's expansion survives whole into
+  the view; and the generated JSON is a term-sorted list whose term set equals the
+  declared one.
+
+  VERIFIED IN CHROME against the Vite dev server, dark AND light, not only built: the tab
+  renders, all three entries render in full, and the SNOW warning is neither truncated nor
+  ellipsised. The add flow was exercised end to end - the duplicate guard caught lower-case
+  "snow" and normalized it, the draft button stayed disabled until expansion + source +
+  rationale were all present, and the artifact was captured by stubbing URL.createObjectURL
+  so no file was downloaded to the machine. FOUND AND FIXED at that pass: the Added column
+  broke "2026-07-21" across two lines because the expansion column took all the slack -
+  now table-fixed + colgroup + whitespace-nowrap, so a long gloss grows in lines instead of
+  stealing width. That is TC-SOFTWARE-03 and it is exactly the class of defect clause (b)
+  predicted, just in the neighbouring column.
+
+  TS-SOFTWARE seeded 1 -> 5 cases, every one sourced to this session's observation.
+  test_ui_tests_ledger.py's 6/13 seeded-suite pin correctly did NOT move (TS-SOFTWARE was
+  already seeded), so O43 does not advance here - it names the 9 EMPTY suites and this is
+  not one of them. ui-components.yaml gained AcronymsPane bound to `software` by directory
+  evidence; the binding pin moved 31/75 -> 32/76.
+
+  Full suite 2353 passed / 10 skipped; npm run build and oxlint clean (4 warnings, all
+  pre-existing files). NOTED, NOT FIXED HERE: drydocs_api/mappings.py and
+  tests/unit/test_mapping_api.py are committed unformatted and fail `ruff format --check`,
+  i.e. CI is red independently of this item - fixed in a separate commit so this one stays
+  about O68.

@@ -146,7 +146,7 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/software',
     tagline: 'Vendor to product to documentation, declared vs loaded',
     backsOnto: 'software-registry.json + doc corpora (generated) · DESCRIBES in drydocs',
-    tabs: ['Products', 'Vendors', 'Documentation coverage', 'Corpora'],
+    tabs: ['Products', 'Vendors', 'Documentation coverage', 'Corpora', 'Acronyms'],
     phase: 3,
     // FB-03: every column worth rendering here is a DELTA — gate state,
     // declared-vs-loaded, an edge withheld pending G32. An end user reading

@@ -328,3 +328,73 @@ def test_web_console_stack_matches_the_locked_site_plan() -> None:
     """The locked stack (docs/design/ui-exploration/site-plan.md §1), pinned so a swap is deliberate."""
     web = {p["id"] for p in _doc()["products"] if "web-console" in (p.get("stack") or [])}
     assert web == {"react", "reui", "react-flow", "tailwindcss", "neo4j"}
+
+
+# --- acronyms (O68) ---------------------------------------------------------
+# The block had NO test of any kind before this item, and its per-entry
+# provenance lived in YAML COMMENTS — readable by a person, invisible to every
+# tool. O68 clause (d) forced the choice rather than letting it default, and it
+# landed on STRUCTURED fields, so these guards are what make that real: an
+# entry cannot be added without saying where it came from.
+
+
+def _acronyms_helper():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "render_software_registry", REPO / "scripts" / "render_software_registry.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod._acronyms
+
+
+def test_acronyms_shape_and_provenance() -> None:
+    import datetime
+
+    acronyms = _doc()["acronyms"]
+    assert acronyms, "the glossary is the durable answer to 'what did that name mean'"
+    for term, entry in acronyms.items():
+        assert term == term.upper(), f"{term}: terms are upper-case"
+        assert isinstance(entry, dict), (
+            f"{term}: the bare 'TERM: expansion' shape was replaced at O68 — "
+            "provenance is a field now, not a comment"
+        )
+        for field in ("expansion", "source"):
+            assert str(entry.get(field) or "").strip(), f"{term}: {field} is required"
+        assert isinstance(
+            entry["added"], datetime.date
+        ), f"{term}: added must be a bare YAML date (2026-08-09), not a string"
+        assert (
+            set(entry) <= {"expansion", "source", "added", "note"}
+        ), f"{term}: unknown field(s) {sorted(set(entry) - {'expansion', 'source', 'added', 'note'})}"
+
+
+def test_acronym_without_provenance_is_rejected() -> None:
+    """The case that decides clause (d): a new entry with no source must fail.
+
+    This is the whole point of the schema change. If the renderer accepted it,
+    the console would present three fully-sourced entries and a fourth with
+    nothing, indistinguishable from each other on screen.
+    """
+    acronyms = _acronyms_helper()
+    with pytest.raises(ValueError, match="source is required"):
+        acronyms({"acronyms": {"XYZ": {"expansion": "Something", "added": "2026-08-27"}}})
+    with pytest.raises(ValueError, match="expansion is required"):
+        acronyms({"acronyms": {"XYZ": {"source": "someone", "added": "2026-08-27"}}})
+    with pytest.raises(ValueError, match="expected a mapping"):
+        acronyms({"acronyms": {"XYZ": "the old flat shape"}})
+
+
+def test_snow_is_the_layout_case_and_stays_whole() -> None:
+    """O68 clause (b): the warning IS the entry, so it must survive to the view.
+
+    AIS and DPL are two words each and would look fine under any layout. SNOW's
+    expansion is a full sentence whose entire job is to stop someone reading it
+    as Snowflake — the guard pins that it is neither truncated nor split off
+    into an optional field the pane might not render.
+    """
+    snow = _doc()["acronyms"]["SNOW"]
+    assert "ServiceNow" in snow["expansion"] and "NOT Snowflake" in snow["expansion"]
+    row = next(r for r in _acronyms_helper()(_doc()) if r["term"] == "SNOW")
+    assert row["expansion"] == snow["expansion"]

@@ -296,10 +296,13 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     AppCodeCascadePane — 'mappings' is not a registry module, so a binding
     would invent one. Extracted from the route when it grew filter / sort /
     column-width / CSV controls, the same reason AppCodeCascadePane was.
+    75 -> 76 at O68 (2026-08-27): AcronymsPane, BOUND to `software` by directory
+    evidence, so both counts move by one. It lives under software/ beside
+    VendorIcon and serves exactly the one module whose route renders it.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        31,
-        75,
+        32,
+        76,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

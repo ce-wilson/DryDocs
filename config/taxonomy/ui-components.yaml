@@ -171,7 +171,8 @@ components:
   # --- loads (1) ---
   - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx,                     module: loads,      module_evidence: directory }
 
-  # --- software (1) ---
+  # --- software (2) ---
+  - { id: AcronymsPane,            area: software,     path: software/AcronymsPane.tsx,                   module: software,   module_evidence: directory }
   - { id: VendorIcon,              area: software,     path: software/VendorIcon.tsx,                     module: software,   module_evidence: directory }
 
   # --- ownership (2) ---

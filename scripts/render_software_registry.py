@@ -47,6 +47,43 @@ def _dark_asset(icon: dict) -> str | None:
     return icon.get("svg_dark")
 
 
+def _acronyms(registry: dict) -> list[dict]:
+    """Normalize the acronyms block into a term-sorted list of rows.
+
+    O68 clause (d): provenance is STRUCTURED, not a YAML comment, so the console
+    can show where each expansion came from. `source` and `added` are required
+    (guarded in tests/unit/test_software_registry.py); `note` is optional and
+    carries a caveat the expansion alone would lose. Emitted as a LIST rather
+    than a mapping so the render order is the file's contract instead of the
+    consumer's — and `added` is stringified because PyYAML parses a bare date
+    into datetime.date, which json.dumps cannot serialize.
+    """
+    rows = []
+    for term, entry in sorted((registry.get("acronyms") or {}).items()):
+        if not isinstance(entry, dict):
+            raise ValueError(
+                f"acronym {term}: expected a mapping with expansion/source/added, "
+                f"got {type(entry).__name__} — the bare 'TERM: expansion' shape was "
+                "replaced at O68 so provenance could not be lost in a comment"
+            )
+        for field in ("expansion", "source", "added"):
+            if not str(entry.get(field) or "").strip():
+                raise ValueError(
+                    f"acronym {term}: {field} is required. An expansion nobody can "
+                    "trace is not a glossary entry — say who said so and when."
+                )
+        rows.append(
+            {
+                "term": term,
+                "expansion": entry["expansion"],
+                "source": entry["source"],
+                "added": str(entry["added"]),
+                "note": entry.get("note"),
+            }
+        )
+    return rows
+
+
 def build_software_registry_view() -> dict:
     registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
@@ -84,7 +121,9 @@ def build_software_registry_view() -> dict:
                 "asset": f"vendor-icons/{icon_id}{Path(source).suffix}",
                 "source": source,  # repo path inside drydocs-icons/ (provenance)
                 "asset_dark": (
-                    f"vendor-icons/{icon_id}-dark{Path(dark).suffix}" if (dark := _dark_asset(icon)) else None
+                    f"vendor-icons/{icon_id}-dark{Path(dark).suffix}"
+                    if (dark := _dark_asset(icon))
+                    else None
                 ),
                 "source_dark": dark,
             }
@@ -124,7 +163,7 @@ def build_software_registry_view() -> dict:
             "without a manifest icon are listed in vendors_without_icons — "
             "reported, never silent, never an error."
         ),
-        "acronyms": registry.get("acronyms", {}),
+        "acronyms": _acronyms(registry),
         "drydocs_application_id": registry.get("drydocs_application_id"),
         "vendors": vendors,
         "vendors_without_icons": without_icons,

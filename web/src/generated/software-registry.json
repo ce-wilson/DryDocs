@@ -5,11 +5,29 @@
     "drydocs-icons/manifest.json"
   ],
   "note": "Soft link by id (vendor.icon override, else vendor.id). Vendors without a manifest icon are listed in vendors_without_icons — reported, never silent, never an error.",
-  "acronyms": {
-    "AIS": "Application Integration Streaming",
-    "DPL": "Data Pipeline Library",
-    "SNOW": "ServiceNow — the ITSM/CMDB platform. NOT Snowflake."
-  },
+  "acronyms": [
+    {
+      "term": "AIS",
+      "expansion": "Application Integration Streaming",
+      "source": "SME ruling 2026-07-21 (pm) — corroborated by the 3 capability areas of the internal AIS engineering-docs portal",
+      "added": "2026-07-21",
+      "note": "'Streaming' was itself a misnomer: the AIS folder also carried ETL and managed file transfer."
+    },
+    {
+      "term": "DPL",
+      "expansion": "Data Pipeline Library",
+      "source": "SME-supplied 2026-08-09, from the internal DPL documentation site (C25 prerequisite)",
+      "added": "2026-08-09",
+      "note": "The internal application registration exists and is deliberately NOT transcribed — a registration id is Internal (PUBLISH-BOUNDARY.md), and drydocs_application_id below already establishes the producer-side placeholder pattern the company copy reconciles at port time."
+    },
+    {
+      "term": "SNOW",
+      "expansion": "ServiceNow — the ITSM/CMDB platform. NOT Snowflake.",
+      "source": "SME flag 2026-08-09, marked IMPORTANT",
+      "added": "2026-08-09",
+      "note": "THE CONFUSION IS CONCRETE, not theoretical: Snowflake can hold ServiceNow data, at which point both names describe the same rows. The v2 grammar already settles it — `origin` is the SYSTEM OF RECORD and Snowflake is then the CARRIER (config/source-registry.yaml, and the retired-id ledger's \"origin catalog, carrier snowflake\"). The `snowflake` PRODUCT row below carries the same caveat."
+    }
+  ],
   "drydocs_application_id": "DRYDOCS-SELF",
   "vendors": [
     {
