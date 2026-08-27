@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source-file map — where ingestion input lands, and which file feeds which loader</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Source-file map — where ingestion input lands, and which file feeds which loader</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Scope:</strong> a reference map, deliberately <strong>NOT a module runbook</strong> — it operates nothing and claims coverage of no module. It answers one question the runbooks assume you have already answered: <em>where does the input file go, and what is already there?</em></li><li><strong>Status:</strong> DESCRIPTIVE — documents the working convention. <strong>Rev 1, 2026-08-27.</strong></li><li><strong>Classification:</strong> Internal-Public (mechanism only — zone names, environment-variable names, bundled synthetic samples; no credentials, no company values, no real hostnames)</li><li><strong>Audience:</strong> anyone about to drop a file for a loader to read, anyone wondering why a load produced nothing, and anyone reading the bundled samples and asking what they prove</li><li><strong>Companion:</strong> <code>docs/design/drydocs-startup-refresh-runbook.md</code> (the SYSTEM-level cold start — <strong>it owns the load sequence, this document does not</strong>), <code>docs/design/drydocs-load-runbook.md</code> (one loader at a time), <code>docs/design/drydocs-core-runbook.md</code> (environment roots, provisioning, run logs), <code>internal/server-inventory/README.md</code> (the one zone that already has its own README)</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose and scope</h2>
+<p><strong>The gap this fills.</strong> The best explanation of the landing-zone convention in this repo is a module docstring — <code>drydocs_core/landing_zones.py</code>. The declared zones themselves are readable only as scattered <code>acquisition:</code> blocks inside <code>config/source-registry.yaml</code>, and <code>drydocs landing-zones</code> is named in exactly one place, the port prompt, which nobody reads as operator documentation. Nothing anywhere says which bundled sample feeds which loader. That is what this page collects.</p>
+<p><strong>What this page refuses to restate.</strong> The load sequence. It is declared once in <code>drydocs.cli.CANONICAL_LOAD_SEQUENCE</code> and profiled into <code>docs/design/drydocs-startup-refresh-runbook.md</code> Appendix B, pinned by <code>tests/unit/test_load_sequence_surfaces.py</code>. A third copy would be one more surface to keep in step, and the load runbook already records an explicit ruling against one.</p>
+<h2 id="where-location-is-declared"><span class="dd-margin-tag" aria-hidden="true">where-location-is-declared</span>1. Location is declared in one place, and it is not a filename</h2>
+<p>Every ingested dataset in <code>config/source-registry.yaml</code> carries an <code>acquisition:</code> block:</p>
+<pre class="yaml"><code>acquisition:
+  mode: manual                       # manual | automated | db
+  format: csv                        # csv | ascii | json | archive
+  drop_dir: internal/server-inventory/
+  drop_dir_base: repo                # repo | data_root</code></pre>
+<p><strong>There is no filename field, and no glob field, anywhere in the registry.</strong> The convention pins the <strong>directory</strong> and the <strong>format</strong>; the loader then takes what it finds. For the server export that is <code>sorted(export_path.glob(&quot;*.csv&quot;))</code> (<code>drydocs/cli_ingest.py:686</code>), so any CSV in the directory is picked up in name order.</p>
+<p>What replaces a filename convention is a <strong>grain contract</strong> stated in prose on the registry row. The infrastructure export is pulled per business application, one file per application, never merged — and that is enforced by a fixture guard (<code>test_one_application_per_file_is_the_download_grain</code>), not by a name pattern.</p>
+<p>Practical consequence: <strong>do not rename a file to make it match. Put it in the right directory in the right format, and give it a name a human can still recognize in six months.</strong></p>
+<h2 id="two-bases"><span class="dd-margin-tag" aria-hidden="true">two-bases</span>2. Two bases, and the reason there are two</h2>
+<p><code>drop_dir_base</code> selects how <code>drop_dir</code> resolves. The choice is about surviving <code>git clean</code>, which is the failure this convention exists to prevent.</p>
+<table><thead><tr><th>Base</th><th>Resolves under</th><th>Why a zone would choose it</th></tr></thead><tbody><tr><td><code>data_root</code></td><td><code>DRYDOCS_DATA_ROOT</code>, default <code>~/data/DryDocs</code></td><td>The directory sits <strong>outside the working tree</strong>, so no <code>git clean</code> at any strength can reach it. This is the default choice for real source payloads.</td></tr><tr><td><code>repo</code></td><td>the repository root</td><td>The zone holds <strong>tracked</strong> files. <code>git clean</code> removes untracked files, and a tracked file is not untracked, so it survives. Legitimate ONLY when the files are actually committed.</td></tr></tbody></table>
+<p>An in-tree zone whose files are not tracked has the protection of neither, which is the trap <code>drydocs_core/landing_zones.py</code> documents at length.</p>
+<p><strong>On this desktop</strong> <code>DRYDOCS_DATA_ROOT</code> is set to <code>C:\coding\projects\data\DryDocs</code>, not the <code>~/data/DryDocs</code> default. <code>.env</code> cannot set it — it is read from the environment.</p>
+<h2 id="declared-zones"><span class="dd-margin-tag" aria-hidden="true">declared-zones</span>3. The declared zones</h2>
+<p>Read them live with <code>drydocs landing-zones</code>, which prints every zone, its resolved absolute path, and its state. <code>--check</code> exits 1 on a zone that is present but empty; <code>--json</code> gives the machine-readable form.</p>
+<table><thead><tr><th>Source id</th><th>Format</th><th>Base</th><th>Directory</th></tr></thead><tbody><tr><td><code>controlm:deftable-xml-export</code></td><td>ascii</td><td>data_root</td><td><code>controlm-xml/</code></td></tr><tr><td><code>autosys:export</code></td><td>ascii</td><td>data_root</td><td><code>autosys/</code></td></tr><tr><td><code>airflow:dag-export</code></td><td>ascii</td><td>data_root</td><td><code>airflow/</code></td></tr><tr><td><code>seal:app-extract</code></td><td>csv</td><td>data_root</td><td><code>seal/</code></td></tr><tr><td><code>pat:product-catalog</code></td><td>csv</td><td>data_root</td><td><code>pat/</code></td></tr><tr><td><code>pat:people-report</code></td><td>csv</td><td>data_root</td><td><code>pat/</code></td></tr><tr><td><code>snow:cmdb-ci-classes</code></td><td>csv</td><td>data_root</td><td><code>snow/</code></td></tr><tr><td><code>exec-hosts:rua-bundle</code></td><td>archive</td><td>data_root</td><td><code>rua/</code></td></tr><tr><td><code>dpl:pipeline-registry</code></td><td>json</td><td>data_root</td><td><code>dpl/</code></td></tr><tr><td><code>dpl:dataset-registry</code></td><td>json</td><td>data_root</td><td><code>dpl/</code></td></tr><tr><td><code>bitbucket:repo-objects-manifest</code></td><td>ascii</td><td>data_root</td><td><code>bitbucket/</code></td></tr><tr><td><code>infra:server-export</code></td><td>csv</td><td><strong>repo</strong></td><td><code>internal/server-inventory/</code></td></tr><tr><td><code>repo:software-registry</code></td><td>ascii</td><td><strong>repo</strong></td><td><code>config/taxonomy/</code></td></tr><tr><td><code>repo:depgraph-snapshot</code></td><td>json</td><td><strong>repo</strong></td><td><code>knowledge/depgraph-snapshots/</code></td></tr><tr><td><code>repo:design-docs</code></td><td>ascii</td><td><strong>repo</strong></td><td><code>docs/design/</code></td></tr></tbody></table>
+<h3>Reading a zone&#x27;s state</h3>
+<p><code>absent</code> means the directory is not there. That is the healthy first state of a zone nobody has dropped into yet, and it is also what <code>git clean -fd</code> leaves behind, so it is never treated as a defect. <code>EMPTY</code> is the narrower and more suspicious signature — the directory exists and holds nothing, which is what a selective delete or a half-finished restore looks like. <code>--check</code> fails on <code>EMPTY</code>, never on <code>absent</code>.</p>
+<h2 id="undeclared-zones"><span class="dd-margin-tag" aria-hidden="true">undeclared-zones</span>4. Zones the code creates that the registry does not declare</h2>
+<p><code>drydocs_core/data_root.py</code> exposes named helpers for directories with <strong>no <code>source-registry</code> row</strong>, which means <code>drydocs landing-zones --check</code> cannot see them. They are real zones with no governance, and knowing they exist is the point of listing them:</p>
+<table><thead><tr><th>Helper</th><th>Directory</th></tr></thead><tbody><tr><td><code>controlm_xml_dir()</code></td><td><code>controlm-xml/</code> (this one is also declared)</td></tr><tr><td><code>email_extracts_dir()</code></td><td><code>email-extracts/</code></td></tr><tr><td><code>context_intake_dir()</code></td><td><code>context-intake/</code></td></tr><tr><td><code>vendor_docs_dir()</code></td><td><code>vendor-docs/&lt;tree&gt;/</code></td></tr><tr><td><code>catalog_dir()</code></td><td><code>catalog/</code></td></tr><tr><td><code>dpl_registry_dir()</code></td><td><code>dpl-registry/</code></td></tr><tr><td><code>rua_incoming_dir()</code> / <code>rua_extracted_dir()</code></td><td><code>rua/incoming/</code>, <code>rua/extracted/&lt;bundle&gt;/</code></td></tr><tr><td><code>remediation_incoming_dir()</code> and siblings</td><td><code>remediation/incoming</code>, <code>outgoing</code>, <code>recommendations</code></td></tr><tr><td>the cmdline staging database</td><td><code>cmdline-staging/</code></td></tr></tbody></table>
+<p>Note the drift worth not tripping over: the registry says <code>dpl/</code> while the code helper says <code>dpl-registry/</code>. Neither is wrong on its own; they simply do not agree, and nothing checks that they do.</p>
+<h2 id="bundled-samples"><span class="dd-margin-tag" aria-hidden="true">bundled-samples</span>5. The bundled samples, and which loader reads which file</h2>
+<p>The samples live at <code>drydocs/data/samples/</code> (<code>drydocs.cli.DEFAULT_SAMPLES_DIR</code>). They are the only end-to-end demonstration available without company data.</p>
+<p><strong>A tracking subtlety that has misled readers.</strong> <code>.gitignore</code> line 33 ignores <code>drydocs/data/</code>, and <code>internal/repo-README.md</code> describes the samples as git-ignored. Yet thirteen files under <code>drydocs/data/samples/</code> are <strong>tracked</strong>, because a tracked file is unaffected by a later ignore rule. So the samples DO arrive with a clone — but <strong>a new file dropped there is invisible to git by default</strong>, and adding one takes <code>git add -f</code>.</p>
+<table><thead><tr><th>Sample file</th><th>Read by</th><th>Chain</th></tr></thead><tbody><tr><td><code>catalog_lobs__sample.csv</code></td><td><code>CatalogLOBsLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code></td></tr><tr><td><code>product_lines__sample.csv</code></td><td><code>ProductLinesLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code></td></tr><tr><td><code>products__sample.csv</code></td><td><code>ProductsLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code></td></tr><tr><td><code>seal_application_data__sample.csv</code></td><td><code>SealApplicationsLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code> — <strong>file absent, see below</strong></td></tr><tr><td><code>seal_contact_data__sample.csv</code></td><td><code>SealContactsLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code> — <strong>file absent, see below</strong></td></tr><tr><td><code>dev_teams__sample.csv</code></td><td><code>DevTeamsLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code></td></tr><tr><td><code>pat_product_mapping__sample.csv</code></td><td><code>PatProductMappingLoader</code></td><td><code>REFRESH_REFERENCE_CHAIN</code></td></tr><tr><td><code>controlm_folders__sample.csv</code></td><td><code>ControlMFoldersLoader</code></td><td><code>ingest-controlm</code>, node stages</td></tr><tr><td><code>controlm_jobs__sample.csv</code></td><td><code>ControlMJobsLoader</code></td><td><code>ingest-controlm</code>, node stages</td></tr><tr><td><code>controlm_hosts__sample.csv</code></td><td><code>ControlMHostsLoader</code></td><td><code>ingest-controlm</code>, node stages</td></tr><tr><td><code>controlm_conditions_in__sample.csv</code></td><td>conditions-in loader</td><td><code>ingest-controlm</code></td></tr><tr><td><code>controlm_conditions_out__sample.csv</code></td><td>conditions-out loader</td><td><code>ingest-controlm</code></td></tr><tr><td><code>controlm_dependencies__sample.csv</code></td><td>dependencies loader</td><td><code>ingest-controlm</code>, relationship stages</td></tr><tr><td><code>controlm_variables__sample.csv</code></td><td>variable analysis and normalization</td><td><strong>file absent</strong></td></tr><tr><td><code>email-extracts/*.json</code></td><td>email-extract ingestion</td><td>two bundled files</td></tr></tbody></table>
+<p><strong>The two SEAL samples are deliberately absent.</strong> They were deleted in 2026-07 because they carried real <code>seal_id</code> values. A missing sample makes the step <strong>skip rather than fail</strong>, so a chain run looks clean while loading nothing — the single most operationally important sample fact in the repo, documented in depth in the startup/refresh runbook. Regenerate with <code>scripts/build_seal_samples.py</code> and expect <code>rows_rejected=5</code>.</p>
+<p>Two sanitized files sit outside that directory because they belong to tests and config:</p>
+<ul><li><code>tests/fixtures/server_inventory/synthetic-server-export.csv</code> — the publishable twin of the real <code>infra:server-export</code> download.</li><li><code>config/taxonomy/location-gazetteer.yaml</code> — not a sample, but the table that turns the place NAMES those files carry into points on the map.</li></ul>
+<h2 id="worked-example"><span class="dd-margin-tag" aria-hidden="true">worked-example</span>6. Worked example: the infrastructure server export</h2>
+<p>The one zone with its own README (<code>internal/server-inventory/README.md</code>), and the clearest illustration of every rule above.</p>
+<ul><li><strong>Declared at</strong> <code>infra:server-export</code> in <code>config/source-registry.yaml</code>.</li><li><strong>Location</strong> <code>internal/server-inventory/</code>, base <code>repo</code> — an in-tree zone, legitimate because the real exports are committed there. <code>internal/</code> is excluded from any public push by <code>PUBLISH-BOUNDARY.md</code>, which is what makes committing real hostnames acceptable.</li><li><strong>Filename</strong> unconstrained. The <strong>grain</strong> is the contract: one CSV per business application, carrying both that application&#x27;s PROD and DR servers.</li><li><strong>Loaded by</strong> <code>drydocs load-server-inventory --export &lt;file-or-directory&gt;</code>, which globs the directory when given one, then runs the derived <code>server_resolution</code> join pass.</li><li><strong>Synthetic twin</strong> <code>tests/fixtures/server_inventory/synthetic-server-export.csv</code>.</li></ul>
+<h2 id="known-gaps"><span class="dd-margin-tag" aria-hidden="true">known-gaps</span>7. Known gaps, recorded rather than smoothed over</h2>
+<ol><li id="known-gaps--the-bundled-samples-do-not-interlock"><strong>The bundled samples do not interlock.</strong> Run together, the Control-M samples and the server-export fixture cannot join: the sample hosts and the export&#x27;s server names share no value under the signed match tiers, the export names an application the graph does not carry, and its second synthetic city has no gazetteer row. The consequence is that the samples exercise the coverage-REPORTING path and never the success path. Recorded as <code>Idea-162</code> and item <strong>Z7</strong>.</li><li id="known-gaps--drydocs-landing-zones-is-missing-from-th"><strong><code>drydocs landing-zones</code> is missing from the CLI reference</strong> in <code>internal/repo-README.md</code>, which lists every other verb.</li><li id="known-gaps--env-example-documents-neither-drydocs-da"><strong><code>.env.example</code> documents neither <code>DRYDOCS_DATA_ROOT</code> nor <code>DRYDOCS_LOGDIR</code></strong>, so a new machine has to discover both from code or from this page.</li><li id="known-gaps--the-undeclared-zones-in-section-4"><strong>The undeclared zones in section 4 are invisible to <code>--check</code>.</strong> Nothing is broken by that today; it means only that the guard&#x27;s coverage is narrower than it appears.</li></ol>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-source-files-map-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-source-files-map", FILE="drydocs-source-files-map-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
