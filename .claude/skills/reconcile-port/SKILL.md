@@ -97,6 +97,24 @@ stay skipped — confirm with the operator if a new one appears.
 
 ## Divergence ledger (company is ahead — keep company)
 
+- **`drydocs/cli.py` + the `cli_*` submodules — the company tree carries BOTH
+  CLI generations AT ONCE (found 2026-08-27, company worktree session):** the
+  ported split modules (their `cli_docs.py` holds the producer
+  `load_doc_traceability`) ALONGSIDE the pre-split monolith (their `cli.py`
+  still defines an inline one) — duplicate command paths, not a simple
+  behind/ahead. Company-measured shape: their root 3,584 lines / 61 inline
+  `@app.command` vs producer 1,201 / 4 + submodules. The pair already bit
+  once as a PARTIAL ATOM: `cli_docs.py` crossed without its
+  `DOC_TRACEABILITY_CHAIN` dependency (producer `cli.py:364`), producing
+  their 58-red baseline; their session resolved it minimally,
+  company-authored, after MEASURING rather than taking the producer copy —
+  a producer sentence recommending the wholesale take was wrong and is the
+  incident behind profiling-sync-packet.md §6. NEITHER side's copy is
+  wholesale-takeable; de-duplicating onto the split is the company's own
+  reconcile session. TRIGGER: their SME review status citing the
+  constant-fix commit retires the partial-atom half; the
+  duplicate-generations half retires only when a company reconcile session
+  closes the de-dup with its own commit cited.
 - **`config/taxonomy/tom-role-vocabulary.yaml` — the register is company-RULED
   (2026-08-26 G70 adoption session): Module Owner renamed, Capacity Planner
   added, IRM flipped `required` — ruled against 232k-row report exports the

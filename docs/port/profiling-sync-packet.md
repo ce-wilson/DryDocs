@@ -157,7 +157,30 @@ sign-off: gate-log RECORD, one sentence in `PUBLISH-BOUNDARY.md`, and the
 classification.yaml comment upgraded from "not ruled" to ruled-with-date.
 Until then, this protocol applies the fence as written above.
 
-## 6. The internal concurrency model (context the intake should expect)
+## 6. Instructions that travel the other way (producer-authored, company-run)
+
+The J41 relay rules exist for the port prompt's STANDING RELAYS; this section
+extends them to INFORMAL hand-offs — the one-sentence chat instruction the SME
+relays into a company session, often deliberately without context. Measured,
+not hypothetical (2026-08-27): a producer sentence — "take the producer copy,
+it's plain canonical-producer code" — was relayed context-free; the premise
+was wrong (the company file was a 61-command monolith the producer had long
+since split into submodules), and a compliant execution would have deleted 57
+command definitions. The receiving agent's own caution was the only guard.
+Every producer-authored instruction bound for a company session therefore
+carries, IN THE SENTENCE ITSELF:
+
+- **its basis** — `[VERIFIED-PRODUCER]` scoped to exactly what was checked
+  (the constant exists producer-side; NOT "your file matches mine");
+- **its falsifier** — what to do when the company-side object differs
+  structurally: STOP AND SCOPE, never proceed;
+- **no assertion of company state** — expectations phrased as expectations;
+  only `[COMPANY-CONFIRMED]` facts (returned in a PORT-REPORT or an SME
+  review status) may be stated as their repo's reality.
+
+A sentence that cannot fit all three is not ready to relay.
+
+## 7. The internal concurrency model (context the intake should expect)
 
 The company side runs multiple concurrent review sessions in git worktrees
 (one worktree per cluster, `feat/*` branches off their main, a helper script
