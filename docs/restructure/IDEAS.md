@@ -91,6 +91,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-182`** · 2026-08-27 · `[bug]` · **open** · prio? **High** —
+  PRODUCER pat_projection.py SHARES THE G82 DEFECT CLASS the company just measured and
+  fixed on their side (their G82 close-out session 2026-08-27; the header facts land as a
+  citable file with that cluster's SME review status — do the edits from the FILE, not
+  from relay). Verified producer-side at drydocs/pat_projection.py: (a) the seal_ids
+  header is marked PINNED from the pat-evidence README at one spelling while the live
+  export uses a case-different one — and seal_ids is NOT in REQUIRED_FIELDS, so on a real
+  run the mismatch degrades to an empty column and a run that prints success writes zero
+  dev-team→application edges (exactly the company's finding); (b) test_pat_projection
+  writes its synthetic fixture header in the SAME believed spelling, so code and test
+  agree and are both wrong against reality — 'built and tested' and 'never run' true at
+  once, one layer down; (c) jira_board_id maps a header this report does not carry (it
+  lives in a sibling export); (d) KNOWN_DROPPED holds 12 believed spellings where the
+  company's landed census corrected and extended the set. FIX CLASS (Lane B item at
+  groom, after the PAT-cluster review status arrives): re-pin the header map + dropped
+  set from the LANDED header list; make EVERY mapped field's absence loud, not only
+  required ones (the company's adopted rule); re-pin fixtures against the recorded
+  header list from the review status §3.2 — the packet's schema-of-record section is
+  exactly what fixtures should assert against, which closes the fixture-agrees-with-code
+  trap structurally. Header names are mechanism (03-hitl-sme-flow: column names commit;
+  values never); estate row counts stay out per the volumetrics fence.
 - **`Idea-181`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
   YAML/PY HEADER STANDARD + a freshness guard (user review request 2026-08-27; ties to the
   port protocol and TE). The exemplar exists and is already in use — the source-mapping
