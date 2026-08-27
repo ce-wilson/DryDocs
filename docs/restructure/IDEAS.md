@@ -113,6 +113,19 @@ question a 1,000-line file with the trail at the bottom could not answer.
   doc-source-registry field-split precedent); (3) TE inherits the block — a copier-updated
   instance needs in-file vintage because template refreshes rewrite files wholesale.
   Groom with Idea-180 (gate status keys) — same disease, same guard family.
+  KEPT-UPDATED 2026-08-27: python-architect persona review
+  (docs/reviews/persona-python-architect-idea-181.md) against copier / copier-pdm /
+  ss-python / full-stack-fastapi-template — two prescriptions corrected before grooming:
+  (F1/F2) copier updates are three-way MERGES keyed on .copier-answers.yml _commit, not
+  wholesale rewrites — so the header standard scopes BY FILE CLASS (required on governed
+  DATA files, FORBIDDEN in template-class files where a hand date guarantees update
+  conflicts; the ADR 0015 D4 seam); (F3) the git-compare guard is blind in CI (shallow
+  checkout, no fetch-depth override — verified) — presence/schema guard in pytest now,
+  freshness as a producer-side pre-commit hook later (no .pre-commit-config exists yet);
+  (F4) enable ruff D100/D104 instead of a bespoke docstring guard (select has no D rules);
+  (F5) one JSON Schema for the header, not N bespoke tests; (F6) schema: is the
+  TE-load-bearing key (copier migrations key on it) — sequence schema-coverage first,
+  updated:-coverage second.
 - **`Idea-180`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
   Gate state is not machine-readable: only 4 of 52 gate-prompt YAMLs carry a status key;
   everything else resolves only by prose-parsing the 4,191-line gate-log — and the log is
