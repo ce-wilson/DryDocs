@@ -1,0 +1,43 @@
+id: Z7
+epic: server-location
+title: 'Light up the Teams dimension end to end on the bundled samples: folder attribution plus a host
+  join the samples make themselves, with no seeded edge'
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- Z3
+- Z5
+inputs:
+- drydocs/data/samples
+- tests/fixtures/server_inventory
+- config/taxonomy/location-gazetteer.yaml
+- drydocs/loaders
+acceptance: |
+  Against a local graph loaded only by documented verbs on the bundled synthetic samples — ingest-controlm, load-folder-attribution, load-server-inventory — the QuerySpec map.team-locations.v1 returns at least one row, and every row it returns resolves to a point in the gazetteer, so the console's Teams dimension draws instead of reading as empty. Nothing may be seeded by a test to make that happen: the samples themselves supply the join, which today they cannot, because the Control-M sample hosts and the server-export server names share no value under the signed T1/T2 tiers. The coverage counters keep telling the truth — apps_unmatched, unmatched hosts and unplaceable rows still report real gaps; the change is that the SUCCESS path is exercised as well, not that gaps go quiet. tests/integration/test_server_inventory_e2e.py, which seeds its own matching host today, is updated to the aligned names and stays green, and the existing fixture guards (reserved synthetic app block 70001-70099, one application per file, both PROD and DR designations, no Control-M scheduling-DC grammar in the physical data-center field) all still pass.
+notes: |
+  Raised 2026-08-27 from Idea-162, after running the whole Z3 chain on the desktop for the
+  first time to find out why the Z5 Locations map drew nothing. The chain itself was healthy:
+  constraints applied, the infrastructure supplement verified 6 of 6 terms, the loader took 5
+  rows and rejected none, and every coverage counter named its own gap without being asked.
+  WHAT IS ACTUALLY MISSING is that the sample files do not reference each other. Control-M
+  sample hosts are host-hldm-02, host-hldm-03, host-auto-01 and host-auto-02; the server export
+  names srv-synth-01 through srv-synth-03 plus srv-synth-51 and srv-synth-52. The signed tiers
+  are exact and normalized-short-name, so those two sets can never meet and the resolution pass
+  correctly reported 4 of 4 hosts unmatched. Separately the export names application 70055 while
+  the graph carries 70051 through 70053, and the gazetteer has no row for the export's second
+  synthetic city, so two of five servers cannot be placed even once they load.
+  TEAMS NEEDS ONE MORE THING THAN JOBS DOES. The team spec reaches place through the batch port
+  — application to port to folder to job to host to server to data center — so it also needs
+  BELONGS_TO_APPLICATION edges, which the K8 load-folder-attribution verb writes and which stood
+  at zero on this machine. Jobs needs only the host join. Do the host join first and Jobs lights
+  up on its own; Teams needs both.
+  WHY THIS IS WORTH A TASK RATHER THAN A FIXTURE TWEAK: the bundled samples are the only
+  end-to-end demonstration anyone gets without company data, and today, run together, they
+  exercise the coverage-reporting path and never the success path. The T1 tier IS proven in
+  isolation — the e2e seeds its own matching host and asserts the exact match — but nothing
+  proves the demo path, where the samples have to meet on their own. That is the gap this closes.
