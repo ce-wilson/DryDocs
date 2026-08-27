@@ -97,6 +97,33 @@ stay skipped — confirm with the operator if a new one appears.
 
 ## Divergence ledger (company is ahead — keep company)
 
+- **`config/taxonomy/tom-role-vocabulary.yaml` — the register is company-RULED
+  (2026-08-26 G70 adoption session): Module Owner renamed, Capacity Planner
+  added, IRM flipped `required` — ruled against 232k-row report exports the
+  producer never sees.** Manifest row landed 2026-08-27 (per-entry, the
+  lob-product-team shape): company-ruled classes stay; producer mechanism and
+  producer-NEW classes cross; required/scope/active on EXISTING classes are
+  never merged or "synced" — each side's SME owns its register.
+- **`config/gate-log.md` two-tier doctrine (ruled at PORT-REPORT-e33f8d02):
+  producer DRAFTED stubs are NOT appended company-side** — producer
+  gate-drafting is captured by the landed gate-prompt files; the company log is
+  the company's audit. Do not count producer stubs as missing entries at the
+  union check, and never write producer stubs into the company log.
+- **`drydocs_remediation/detect.py` — divergent+deferred union pending
+  (e33f8d02):** company carries DPL detectors and lacks R41–R44; producer b26
+  dropped DPL and refactored. Neither side is taken wholesale — the
+  remediation-adoption session (dossier `adoption-1-remediation-dossier.md`,
+  hand-carried) does the union: keep `detect_dpl_findings`, add R41–R44.
+- **Ontology + lineage clusters — deferred whole at e33f8d02 (both the 20260825
+  and 20260826 increments), adoption path is the three hand-carried dossiers**
+  (remediation, then lineage, then ontology-behind-a-company-gate). The G70
+  slice began 2026-08-26 company-side (register reconciled, wiring built);
+  until an adoption report closes a cluster, its files stay at the
+  company-divergent state and are NOT re-taken by a later port.
+- **`drydocs/run_as_detect.py` per-line reconcile — ENDED 2026-08-27:** the
+  producer adopted ASCII `x` (`64ec0e7e`), so the RUF002/RUF003 divergence
+  e33f8d02 recorded dies at the next port; no per-line handling needed.
+
 - Verify command: company `m6-verify` vs producer `m3-verify`.
 - `EXPECTED_CONSTRAINTS`: company is ahead as a **superset** (base + snow-support
   supplements; 45 ⊇ 40 at the 2026-07-20 bundle port). Counts drift every port —

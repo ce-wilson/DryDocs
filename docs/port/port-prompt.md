@@ -277,7 +277,30 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
-- **Producer head `5417ef10`** (2026-08-07), applied company-side as
+- **Producer base `port-base-20260826` (`9ef606b4`)**, applied company-side as
+  **PORT-REPORT-e33f8d02** (2026-08-26) — range
+  `port-base-20260825..port-base-20260826` = **44 commits / 46 files
+  (+4,967/−297), PRODUCER-VERIFIED 2026-08-26** (rev-list count matches; item
+  count 519 matches; report reviewed producer-side pre-push, verdict sound).
+  Port commit `e33f8d02` direct on company `main` (block of 3: `afe25946` the
+  prior 20260825 report + backup tag, `e33f8d02` payload, `f38999b7` report +
+  last-completed-port roll); backup tag `pre-cewilson-port-20260826` @
+  `afe25946`; **PUSHED** (company `origin/main` at `0155475c` after the
+  same-day G70 adoption block). Acceptance: Track-1 **123/3/0**; J42 backlog
+  union **PASS** (producer 519 / consumer 529, none missing); full suite
+  **2610 passed / 55 failed / 76 skipped** with **zero true regressions** vs
+  `afe25946` — all 55 are the documented deferred-feature clusters, one fewer
+  than the prior port. Strategy: continue-defer (SME-chosen) — ontology +
+  lineage + G68/G69 clusters stay company-divergent with the three hand-carried
+  adoption dossiers as the path; the G70 adoption slice began the SAME DAY
+  company-side (6 commits: register reconciled with three SME rulings, wiring
+  blockers cleared, drift guard authored — see the tom-role-vocabulary
+  divergence-ledger entry and its 2026-08-27 manifest row). New divergences
+  from the report: the `detect.py` union (dossier 1) and the `run_as_detect.py`
+  ASCII fix (already ENDED producer-side, `64ec0e7e`). Next-port base =
+  `port-base-20260826`; producer commits past it ride the next roll.
+
+- **PRIOR — producer head `5417ef10`** (2026-08-07), applied company-side as
   **PORT-REPORT-5417ef10** — range `a14a8028..5417ef10` = **50 commits / 63 changed
   paths, PRODUCER-VERIFIED 2026-08-07** (rev-list and diff counts match; G22 sign-off
   `3648cfcd` in range; the gate-log heading the report quotes matches verbatim).

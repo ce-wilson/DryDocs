@@ -682,6 +682,26 @@ rows:
       wholesale take would have dropped the company's LOB rows. The same class as
       the six rows above; the row lands producer-side and reaches the company at
       the next port, their PORT-REPORT census is the record of the gap.
+  - path: "config/taxonomy/tom-role-vocabulary.yaml"
+    disposition: per-entry
+    entry_rule: >
+      classes keyed by id — the company's ADOPTION-SESSION RULINGS are estate
+      truth and stay (2026-08-26: Module Owner renamed, Capacity Planner added,
+      IRM flipped required — ruled against 232k-row report exports the producer
+      never sees); the producer's register is the G35-signed seed and never
+      overwrites a company-ruled class. Producer-owned MECHANISM crosses whole:
+      the header, scheme-level fields (cardinality, scheme id), and any
+      producer-NEW class unions in by id. required/scope/active flips on
+      EXISTING classes are gate-ruled facts on whichever side rules them —
+      never merged, never "synced".
+    note: >
+      Row landed 2026-08-27, the day after the company's G70 adoption session
+      re-ruled the register their side. Without it the file resolved to the
+      config/** canonical-producer default and the NEXT port would have
+      overwritten their three rulings wholesale — the alias-episode class
+      (2026-08-25) and the J51/lob-product-team class (2026-08-20), third
+      instance. Each side's SME owns its register; the declaration file is
+      where the two reconcile, which only works if a port cannot flatten it.
   - path: "config/taxonomy/ui-components.yaml"
     disposition: per-entry
     entry_rule: >
