@@ -2169,10 +2169,14 @@ not one of them. ui-components.yaml gained AcronymsPane bound to `software` by d
 evidence; the binding pin moved 31/75 -&gt; 32/76.
 
 Full suite 2353 passed / 10 skipped; npm run build and oxlint clean (4 warnings, all
-pre-existing files). NOTED, NOT FIXED HERE: drydocs_api/mappings.py and
-tests/unit/test_mapping_api.py are committed unformatted and fail `ruff format --check`,
-i.e. CI is red independently of this item - fixed in a separate commit so this one stays
-about O68.
+pre-existing files). CI: green at the pushed sha 6b43c850 (run 33092183083). Worth
+recording because the branch was RED before this item and the cause was inside its own
+blast radius: scripts/render_software_registry.py was already committed unformatted, so
+`ruff format --check` failed at the claim commit; formatting it here turned CI green. A
+local `ruff format --check .` in this worktree ALSO named drydocs_api/mappings.py and
+tests/unit/test_mapping_api.py - that was a stale-cache false positive, contradicted by
+the CI log, which listed one file only, and by a re-run showing both already formatted
+and identical to HEAD. Trust the CI log over the local cache when the two disagree.
 </p></div></div>
 <div class="card" id="card-P1" data-id="P1" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p1 run the cm_hosts + cm_avg_run profiling probes internally; record conclusions + the dc scope call" tabindex="0"><div class="card-head"><span class="card-id">P1</span><span class="card-title">Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user&#x27;s performance flag) in the two gate specs&#x27; provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
 </p><p class="notes"><strong>Notes:</strong> User-run on the internal network (no producer-side psgmgr access); agent transcribes.</p></div></div>
