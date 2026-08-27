@@ -91,6 +91,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-178`** · 2026-08-26 · `[chore]` · **groomed → J55 (2026-08-27) — the ENFORCEMENT half only (nothing stops the retired string coming back); the cross-repo doc-corpus id migration stays STANDING → the next port session, which is the only place it can be settled** · prio? **Med** —
+  **The org-acronym sanitization renamed the doc corpus id the two repos JOIN on.** Gate-log
+  RECORD 2026-08-26; the old-to-new mapping is written once, in `internal/cdo-reference/README.md`.
+  The company registry row still carries the pre-rename id, and their 2026-08-19 Confluence
+  capture ran under it. The next port session treats this as a deliberate id migration, per-entry
+  per the port-review F-table (producer fields cross, company fields never do), and checks whether
+  their load ran — i.e. whether graph doc ids carry the retired string (the `essential-graphrag`
+  retired entry is the string-lives-on-in-the-graph precedent). Also: the `hr-bootstrap-loads-config`
+  worktree predates the sweep — whoever merges it re-runs the done-gate grep (`git grep -i` for
+  the retired string outside `internal/`).
+  **RELOCATED AND GROOMED 2026-08-27.** This entry was captured below the audit-trail heading in an
+  ad-hoc shape and was invisible to both `test_plan_ideas.py` guards; it is re-filed here with a
+  conforming header, and the guard gap that hid it is [[I5]]. The manual "re-run the done-gate grep"
+  step is what became **J55** — a boundary guard on J15's pattern, reading the retired token from
+  the internal mapping file so the test embeds no literal of it. What J55 explicitly does NOT touch
+  is the cross-repo half above: producer-side enforcement rules nothing about their registry row or
+  their loaded graph, so that stays open on the port trigger.
+
 <!-- add new ideas at the top -->
 
 - **`Idea-173`** · 2026-08-25 · `[bug]` · **open — the two ACTIONABLE halves LANDED 2026-08-25 (database-inventory.md at ede62d44; the alias-in-prose sweep + SME ruling at f22da676). What stays open is the GENERALIZATION: a canonical-producer file has no company-writable surface, so a company-side fact about a company-side system still has nowhere to live** · prio? **High** —
@@ -183,7 +201,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   directory for exactly the kind the SME most wants to see. Fix that first or the panel ships a
   known-wrong row.
 
-- **`Idea-170`** · 2026-08-24 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-170`** · 2026-08-24 · `[bug]` · **parked → the next company port relays it (re-read 2026-08-27: the entry's own finding is that producer-side action is NONE — all four guards are green here and the id this entry carries was minted by them, so there is nothing to groom and nothing to fix until the relay goes out)** · prio? **Med** —
   **The one-sided allocator partition bit: a company inbox capture landed with NO id at
   all, and its number was minted only after the user asked where it was.** Port step 160
   predicted this in as many words — *"Until that lands the partition is one-sided and the
@@ -268,7 +286,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   catalog-only path; and the DC scope call is still the SME's. The per-DC extraction
   requirement those row counts drive is [[Idea-169]].
 
-- **`Idea-167`** · 2026-08-24 · `[question]` · **open** · prio? **Low** —
+- **`Idea-167`** · 2026-08-24 · `[question]` · **parked → the company names the two extra catalog IRIs (re-read 2026-08-27: the entry says in terms that producer does nothing until the two ids are known, so the trigger is an answer, not a decision this side can take)** · prio? **Low** —
   **The company's `catalog` supplement declares two more terms than ours, and the gap is
   theirs, not producer staleness.** A company `apply-supplements` run reports
   base 47 / seal 15 / **catalog 24** / registry 4 / infrastructure 6; producer declares
@@ -306,7 +324,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   that file is a tombstone — either L19 doc-drift or folded in here. Surfaced while verifying a
   company-side port-close review, which correctly flagged the tag's absence on their main.
 
-- **`Idea-162`** · 2026-08-24 · `[chore]` · **open** · prio? **Low** —
+- **`Idea-162`** · 2026-08-24 · `[chore]` · **parked → a producer `DD` letter series is actually proposed (re-read 2026-08-27: nothing to do until then; the disposition is already recorded in the body so the choice cannot be made by accident, which is the only way it would be)** · prio? **Low** —
   **The company occupies `DD1`–`DD10` in the PRODUCER band, in a letter series this repo
   cannot see.** `DD1`–`DD9` predate the 2026-08-18 allocator partition and are
   grandfathered by the forward-only clause; `DD10` was minted 2026-08-24 — groomed from
@@ -1599,6 +1617,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **`Idea-177`** · 2026-08-26 · `[doc]` · **groomed → K28 (2026-08-27)** · prio? **Low** —
+  `drydocs/fid_census.py`'s module docstring still opens with "Gate ``fid-identity-and-scope`` is
+  DRAFTED AND UNSIGNED" — the gate SIGNED 33/33 on 2026-08-19 (recorded in the K16 company
+  prompt's rider and the gate log). The docstring's *reasoning* (the census runs before the gate)
+  is now history, same as the prompt's rider says of itself. One-line docstring correction;
+  noticed during K25 (its sibling module cites the signed state) and left out of that commit
+  because it is K16's surface, not K25's.
+  **RELOCATED AND GROOMED 2026-08-27.** Captured below the audit-trail heading in an ad-hoc shape
+  and invisible to both `test_plan_ideas.py` guards; re-filed with a conforming header. K28 carries
+  the correction AND the instruction to keep the ordering rationale as history rather than delete
+  it with the stale state. The guard gap that hid this entry is [[I5]].
 
 - **`Idea-176`** · 2026-08-25 · `[idea]` · **groomed → G112 (2026-08-26); the INVOCATION half is recorded inside G112 as a gate question and deliberately not built** · prio? **Med** —
   **G92 put a resolved scope chain in the Control-M extractor, and exactly one
@@ -5190,21 +5220,3 @@ question a 1,000-line file with the trail at the bottom could not answer.
   - Taxonomy-ontology-map audit (docs/reviews/tech-debt-taxonomy-ontology-map.md) → **C7**
     (vocab_id + capture fields at the next gate); F1–F4 fixes EXECUTED pre-groom
     (c396d75, ede0b94).
-
-
-- **Idea-177 (2026-08-26, desktop):** `drydocs/fid_census.py`'s module docstring still opens with
-  "Gate ``fid-identity-and-scope`` is DRAFTED AND UNSIGNED" — the gate SIGNED 33/33 on 2026-08-19
-  (recorded in the K16 company prompt's rider and the gate log). The docstring's *reasoning* (the
-  census runs before the gate) is now history, same as the prompt's rider says of itself. One-line
-  docstring correction; noticed during K25 (its sibling module cites the signed state) and left
-  out of that commit because it is K16's surface, not K25's.
-
-- **Idea-178 (2026-08-26, desktop):** the org-acronym sanitization (gate-log RECORD 2026-08-26;
-  mapping in `internal/cdo-reference/README.md`) renamed the doc corpus id the two repos JOIN on —
-  the company registry row still carries the pre-rename id, and their 2026-08-19 Confluence capture
-  ran under it. The next port session treats this as a deliberate id migration, per-entry per the
-  port-review F-table (producer fields cross, company fields never do), and checks whether their
-  load ran — i.e. whether graph doc ids carry the retired string (the `essential-graphrag` retired
-  entry is the string-lives-on-in-the-graph precedent). Also: the `hr-bootstrap-loads-config`
-  worktree predates the sweep — whoever merges it re-runs the done-gate grep (`git grep -i` for the
-  retired string outside `internal/`).

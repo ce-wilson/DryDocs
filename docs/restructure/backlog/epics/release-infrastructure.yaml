@@ -105,3 +105,12 @@ groom_log:
     currency fix only; the v0.3.0 tag disposition and whether a v0.4.0 is owed stay user
     decisions and are parked as an inbox question.
   attached_at: J53
+- date: '2026-08-27'
+  note: |-
+    Groomed 2026-08-27 from Idea-178, the mechanical half. The 2026-08-26 org-acronym retirement
+    was a one-time blind string sweep over 60+ publishable files with no enforcement point behind
+    it, and the entry already names an in-flight worktree that predates it. J55 gives it the J15
+    treatment — read the retired token from the internal mapping file, scan the tracked tree
+    outside internal/, embed no literal of the string, and skip loudly rather than silently in a
+    clone that has no internal/. The cross-repo id-migration half stays inboxed on the next port.
+  attached_at: J55

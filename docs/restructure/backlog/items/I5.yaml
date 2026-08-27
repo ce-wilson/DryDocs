@@ -1,0 +1,30 @@
+id: I5
+epic: project-board
+title: Two idea captures landed below the audit trail with a non-conforming header and were invisible
+  to BOTH IDEAS.md guards
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_plan_ideas.py
+- docs/restructure/IDEAS.md
+- .claude/skills/groom-backlog/SKILL.md
+acceptance: |
+  (a) THE GAP. `_inbox_entries()` slices `IDEAS.md` from the `## Inbox` heading to the next `## ` heading, so it never sees a capture filed after the audit-trail heading; `_all_idea_ids()` matches the full header grammar, so it never sees a capture that does not carry it. A capture that is both — appended at the end of the file in an ad-hoc shape — is invisible to the header guard AND to the uniqueness guard at once. A new test in `tests/unit/test_plan_ideas.py` fails on that case: any `Idea-<n>`-shaped capture ANYWHERE in the file that does not conform to the header grammar, or that carries the grammar but sits outside the two known sections, is reported by id and line.
+
+  (b) THE UNIQUENESS SCAN SEES THE SAME SET. Whatever loose pattern (a) uses to find candidate captures also feeds `test_idea_ids_are_unique`, so a duplicate number cannot hide behind a malformed header. This is the union-append case the existing docstring already argues for and does not currently cover.
+
+  (c) NO FALSE POSITIVES ON THE FILE'S OWN PROSE. The capture-format section documents the header shape with a literal `Idea-N` example, and the audit trail cites ids inside sentences. The guard distinguishes a CAPTURE from a CITATION and the test says how, in the docstring, rather than leaving the next reader to infer it from the regex.
+
+  (d) GREEN ON THE TREE AS LEFT BY THE 2026-08-27 GROOM, which relocated the two offending entries into the inbox with conforming headers. The guard must be red against the pre-groom shape and green after — state that check in the close note, because a guard that was never observed failing has not been shown to guard anything.
+notes: |
+  Groomed 2026-08-27, from the groom run itself. Idea-177 and Idea-178 were appended below `## Recently groomed (audit trail)` on 2026-08-26 in the shape `- **Idea-177 (2026-08-26, desktop):** ...`. `poetry run pytest tests/unit/test_plan_ideas.py -q` was 23-passed green over both of them, and this groom found them only because a commit message named an id the inbox scan did not return.
+
+  Second instance, which is why it earns an item rather than a fix in place. Idea-170 records the identical failure company-side (a capture that landed with no id at all, minted only after the user asked where it was) and quotes the existing docstring's own reasoning: "the entry simply does not appear in the scan, which reads as 'nothing to review here' rather than as a formatting slip". That is precisely what happened here, on the producer side, with all four guards green.
+
+  Epic project-board / module docs / phase 8: `test_plan_ideas.py` guards the capture loop that I1-I4 built, and I3 is the groom skill that reads the file. The release-infrastructure lane was the other plausible home and is the wrong one — nothing here is about releasing.

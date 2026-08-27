@@ -1,0 +1,33 @@
+id: K28
+epic: seal-attribution
+title: fid_census.py still tells its reader the FID gate is unsigned, seven rounds after it signed
+  33/33
+type: chore
+module: config
+phase: 9
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on:
+- K17
+inputs:
+- drydocs/fid_census.py
+- config/gate-log.md
+- docs/restructure/09-fid-identity-and-scope.md
+acceptance: |
+  (a) THE STALE CLAIM. `drydocs/fid_census.py`'s module docstring opens "Gate ``fid-identity-and-scope`` is DRAFTED AND UNSIGNED". The gate SIGNED OFF 33/33 on 2026-08-19 (config/gate-log.md, K17, which reads done). The docstring states the signed status instead.
+
+  (b) THE REASONING IS KEPT AS HISTORY, NOT DELETED. The sentence exists to explain why the census runs BEFORE the gate — doc 09 section D2's "about two hundred accounts per application" argument. That ordering rationale is still true and still worth reading; it is re-cast as history (the census ran ahead of a gate that has since signed), the same move the K16 company prompt's rider already made about itself. A fix that removes the paragraph loses the reason the module is shaped the way it is.
+
+  (c) THE REST OF THE MODULE IS READ, NOT JUST GREPPED FOR THAT ONE STRING. Any other gate-state, doc-09-phase or K16-status claim in the same file is confirmed against the gate log and doc 09 in the same pass, and the close note lists what was checked and found correct as well as what changed.
+
+  (d) NO BEHAVIOUR CHANGE. Docstrings and comments only — no signature, no field, no test expectation moves. `poetry run pytest tests/unit/test_fid_census.py -q` is green and `ruff format --check` is clean.
+notes: |
+  Groomed 2026-08-27 from Idea-177 (captured 2026-08-26, desktop). Noticed during K25, whose sibling module already cites the signed state, and deliberately left out of that commit because the file is K16's surface rather than K25's.
+
+  Epic seal-attribution / phase 9 rather than the release-infrastructure doc-drift lane: the stale fact is a GATE STATE on the FID work, and the reader who needs it corrected is whoever next picks up K16 or K26.
+
+  module `config` follows K16's own recorded convention for this file — `config` is the WORK AREA (a source-scoping measurement), while `tests/unit/test_module_boundary.py` classifies the code itself as drydocs-review because it loads nothing and configures nothing.
+
+  p3/haiku: a currency correction against a fact already established in the gate log, with no ruling of its own to make.

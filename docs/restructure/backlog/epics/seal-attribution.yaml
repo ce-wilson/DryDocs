@@ -35,3 +35,10 @@ groom_log:
     while the G82 projection emits two. K27 picks one disposition with a reason — extend the
     projection, or declare the file a hand-drop and say so where the operator will look.
   attached_at: K27
+- date: '2026-08-27'
+  note: |-
+    Groomed 2026-08-27 from Idea-177. K28 corrects fid_census.py's module docstring, which
+    still opens "Gate fid-identity-and-scope is DRAFTED AND UNSIGNED" although the gate signed
+    33/33 on 2026-08-19 (K17). The docstring's ORDERING argument — the census runs before the
+    gate, doc 09 section D2 — stays as history rather than being deleted with the stale state.
+  attached_at: K28
