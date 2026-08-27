@@ -115,10 +115,13 @@ question a 1,000-line file with the trail at the bottom could not answer.
     graph carries 70051-70053. The technology-port leg is MATCH-only by gate ruling, so it minted
     nothing and counted apps_unmatched 1, exactly as designed.
   - **Why this matters beyond the demo:** every one of these is the shape of a real coverage gap,
-    so the bundled sample currently exercises the reporting path and never the success path. A
-    fixture set that interlocks would let the e2e prove the join tiers actually fire, which today
-    no test does. Cheapest order: gazetteer row, then align the export's host names and app id
-    with the Control-M sample.
+    so the bundled samples, run together, exercise the reporting path and never the success path.
+    CORRECTED same day: the T1 tier IS proven — tests/integration/test_server_inventory_e2e.py
+    seeds its own :ExecutionHost matching a fixture server and asserts the exact match, so the
+    claim that no test proves the tiers fire was wrong. What no sample proves is the DEMO path,
+    where the Control-M sample's hosts meet the server export without a test seeding the join for
+    them. Cheapest order: gazetteer row, then align the export's host names and app id with the
+    Control-M sample (and update the e2e's seeded host with them).
   - **Related:** the Z5 index defect fixed the same day (`ae740be5`) was load-bearing here — with
     it unfixed, all five servers would have been unplaceable and a successful load would still
     have drawn an empty world.
