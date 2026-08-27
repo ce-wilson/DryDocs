@@ -93,6 +93,45 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-161`** · 2026-08-27 · `[question]` · **open** · prio? **Low** —
+  **Salt DS as a SECOND UI track: the standing open question is answered, and the only substantive
+  assessment we ever wrote is not in the working tree.** Raised at a 2026-08-27 review of what the
+  repo documents about the company design system (`@salt-ds/core`, Apache-2.0, public).
+  - **USER RULING 2026-08-27 — Salt is NOT mandated company-side. "Preferred" is the accurate
+    word.** This closes the make-or-break input that a cost estimate was blocked on: a preference
+    is a design argument, a mandate would have been a schedule constraint. Any future Salt work is
+    therefore an OPTION to be costed on its merits, not an obligation to be planned around. Record
+    it here because the question was previously unrecorded and a later session would re-ask it.
+  - **Do not repeat the counterexample.** An earlier draft of this review argued Salt is "not
+    demonstrably universal internally" from `internal/context-graph-analysis/ui-architecture-analysis.md`
+    section 3.4, which records one internal application using no component library at all. The user
+    ruled that a badly chosen example: one incubator application's stack says nothing about the
+    estate, and the inference does not follow. The ruling above stands on its own; the 3.4
+    observation is a fact about that one application and nothing more.
+  - **The evidence problem.** Every Salt mention now on disk is a one-line "dropped" note —
+    `IDEAS.md` (the 2026-07-17 decision line), `site-plan.md` sections 1 and 6,
+    `claude-design-ui-prompt.md` (listed under *superseded, do not follow*),
+    `backlog/epics/web-console.yaml`, `items/O8.yaml`, and a comment on the ReUI row in
+    `config/taxonomy/software-registry.yaml`. The ONLY substantive assessment ever written —
+    version and license, density modes, the AG-Grid pairing, the not-Tailwind and
+    aesthetically-opposite findings, the library-agnostic-shell mitigation — lives in git history at
+    commit `f9d0b2d0` (2026-07-17), consumed at groom `ea1a4554` and compressed to a one-liner.
+    This is the second time a Salt fact has had to be recovered from history rather than read from a
+    doc. If Salt is ever costed, that content is the starting point and it should be lifted back
+    onto disk first.
+  - **What a cost estimate still needs, if this is ever picked up** (the seam itself is sound —
+    `web/src/layout/shellConfig.ts` is the one typed layout config, and `layout-anatomy-checklist.md`
+    holds the zone decomposition, so a skin swaps components, not structure): a structure-only Salt
+    crosswalk in the same shape as `layout-anatomy-checklist.md`, covering (a) our seven
+    `components/ui/` primitives plus the five shell zones mapped to Salt equivalents and gaps,
+    (b) a ruling on whether a Salt track keeps Tailwind for layout or drops it — the coupling is
+    1,167 `className=` sites across 65 files and this single decision is the largest term in the
+    estimate, (c) a token-mapping test against the `ui-conventions.md` status table, and (d) an
+    offline/internal-registry install check against site-plan section 1's "no external requests of
+    any kind" intranet constraint, since Salt is a versioned npm dependency. The Kept Orbit brand
+    constraint is the open design risk: Salt's aesthetic was called opposite to the dark-schematic
+    spec and nobody has tested whether Salt theming can carry the brand.
+
 - **`Idea-160`** · 2026-08-26 · `[idea]` · **open** · prio? **Low** —
   **A per-column checkbox on a grid that promotes that column into a label node and lands it in the
   unstructured context graph.** Raised by the user 2026-08-26 alongside [[Idea-159]]. The appeal is
