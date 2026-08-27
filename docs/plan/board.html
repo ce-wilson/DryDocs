@@ -2795,6 +2795,20 @@ First consumer is the Explorer Locations tab (registry tabs edit + one JSX line)
 which is the reuse claim demonstrated rather than asserted; Z6&#x27;s runtime map is next
 and needs no change here. Both components are UNBOUND in the ui-components ledger for
 that reason.
+CORRECTION 2026-08-27, found by re-rendering the tab and looking: the claim above
+that the two synthetic fixture cities sit in open ocean did NOT hold in the shipped
+build. resolve.ts indexed a city under country_id when it has one and under a
+lower-cased country alias when it does not, while every lookup asked for the
+canonical id that country_lookup returns. Real countries were unaffected because
+their ids are numeric and normalize to themselves; synthetic ones keyed as syn and
+were looked up as SYN, so both fixture cities reported city not in the gazetteer.
+The rows that exist precisely so an empty graph still draws something were the only
+rows that could never be drawn. Fixed by keying the index on the canonical id
+verbatim, and guarded by test_every_city_is_reachable_by_the_consoles_own_lookup,
+which mirrors the console lookup against the artifact and fails on exactly those two
+cities under the old key shape. LESSON, the same one this item already recorded for
+the antimeridian: the defect was invisible to every existing test and visible in one
+glance at the rendered surface.
 Verified: suite 2346/10, ruff + oxlint clean, web build green (bundle +157 KB, +57 KB
 gzipped -- the world geometry, the price of working offline). Geometry verified by
 RENDERING it in Chrome and inspecting: 15 real cities land correctly, the two

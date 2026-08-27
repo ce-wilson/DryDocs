@@ -90,7 +90,14 @@ function norm(token: string): string {
  *  (there is a London in Ontario), so the country is part of the key, always. */
 const CITY_INDEX = new Map<string, GazCity>()
 for (const city of CITIES) {
-  const countryKey = city.country_id ?? norm(city.country_alias ?? '')
+  // The key's country half is the CANONICAL id verbatim — `country_lookup`
+  // returns exactly that, so normalizing here would build a key the lookup can
+  // never produce. It did: a synthetic city carries no numeric country_id, so
+  // this line lower-cased its alias to `syn|` while every lookup asked for
+  // `SYN|`, and both fixture cities silently reported "city not in the
+  // gazetteer" — the one class of row that exists so an empty graph still draws
+  // something was the only class that could not be drawn.
+  const countryKey = city.country_id ?? city.country_alias ?? ''
   CITY_INDEX.set(`${countryKey}|${norm(city.name)}`, city)
 }
 

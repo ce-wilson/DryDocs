@@ -194,3 +194,47 @@ def test_a_known_city_lands_where_it_should() -> None:
     city = next(c for c in _json()["cities"] if c["id"] == "us-new-york")
     assert abs(city["x"] - 294.43) < 0.05, city["x"]
     assert abs(city["y"] - 136.91) < 0.05, city["y"]
+
+
+def test_every_city_is_reachable_by_the_consoles_own_lookup() -> None:
+    """Mirror resolve.ts's two-step lookup and prove every city can be found.
+
+    THE BUG THIS EXISTS TO CATCH, found by rendering rather than by any test:
+    resolve.ts indexes a city under `country_id ?? country_alias` and looks it up
+    under `country_lookup[norm(country_token)]`. Those two must produce the same
+    string. They did for real countries, whose ids are numeric, and did NOT for
+    synthetic ones, whose key is an alias: the index lower-cased it to `syn` while
+    every lookup asked for `SYN`. Both fixture cities reported "city not in the
+    gazetteer" — the rows that exist precisely so an empty graph still draws
+    something were the only rows that could never be drawn.
+
+    Guarding the ARTIFACT rather than the TypeScript keeps this in one language,
+    and it is the artifact that decides: if a future generator emits a canonical
+    id that no token resolves to, the console loses those cities the same way.
+    """
+    data = _json()
+    lookup: dict[str, str] = data["country_lookup"]
+
+    index = {
+        f"{city['country_id'] or city['country_alias'] or ''}|{_norm(city['name'])}": city["id"]
+        for city in data["cities"]
+    }
+
+    for city in data["cities"]:
+        canonical = city["country_id"] or city["country_alias"] or ""
+        tokens = [token for token, cid in lookup.items() if cid == canonical]
+        assert tokens, (
+            f"{city['id']}: no country_lookup token resolves to {canonical!r}, so the "
+            f"console can never reach this city no matter how a row spells its country"
+        )
+        for token in tokens:
+            key = f"{lookup[token]}|{_norm(city['name'])}"
+            assert index.get(key) == city["id"], (
+                f"{city['id']}: spelling the country {token!r} builds lookup key {key!r}, "
+                f"which the city index does not hold"
+            )
+
+
+def _norm(token: str) -> str:
+    """resolve.ts's `norm`, in Python. Both must agree or the index is unreachable."""
+    return " ".join(token.split()).lower()
