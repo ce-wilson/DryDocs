@@ -1715,6 +1715,36 @@
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": []
+    },
+    {
+      "id": "chase-leadership-scrape",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "External",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "tier": "T1",
+      "curation": "none",
+      "connector": "web",
+      "target_db": "drydocs",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "none",
+        "value": null
+      },
+      "taxonomy_path": null,
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
     }
   ],
   "retired": [

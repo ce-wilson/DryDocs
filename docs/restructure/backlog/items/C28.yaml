@@ -71,3 +71,12 @@ notes: |
   Two format-guard rounds at the draft (meta block, provenance source-vs-derived split) --
   both caught locally by test_gate_pages before commit. schema_graph.cypher re-rendered for
   the new node class. Suite 2434 passed / 8 skipped; ruff clean.
+  EVIDENCE ADDED 2026-08-27 (draft-stage; the page stays DRAFTED/unsigned): the Chase
+  leadership-page scrape -- docs/reviews/chase-leadership-scrape-2026-08-27.md, registered
+  doc-source-registry#chase-leadership-scrape (External, confirmed: false, 23 public pages,
+  per-page sha256 in the review) -- attached to the gate page as a third provenance block.
+  Membership-grain evidence (bios assert MEMBERSHIP, never reporting lines; control seats
+  are firmwide-matrixed) plus the D1-D7 self-drift record (one fact in three concurrent
+  vintages on sibling pages) supporting section A's unit reading and C3's source-grain
+  corollary without deciding either. Composes with jpmc-reports into a two-layer public
+  org view. Nothing loads; nothing flips.

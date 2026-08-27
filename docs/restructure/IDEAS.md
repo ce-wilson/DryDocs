@@ -91,6 +91,23 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-179`** · 2026-08-27 · `[idea]` · **open** · prio? **Med** —
+  ADR 0015 (Team Edition, rev 7 draft) application, from the Chase leadership-page scrape
+  (docs/reviews/chase-leadership-scrape-2026-08-27.md): TE should ship a NEWCOMER'S
+  OPERATING-STRUCTURE OVERVIEW page — "who runs what around here" for the instance's org:
+  the team's unit inside its LOB, the leadership roster one level up, the function seats
+  that matter to support (CIO / data & analytics / risk / control), and the escalation
+  attachment the instance already models. Built from membership evidence the graph already
+  holds (SEAL contacts + escalation DB internally; public leadership pages as the External
+  twin), rendered with the HAS_MEMBERSHIP-not-REPORTS_TO discipline and a per-source as-of
+  stamp on every fact — the scrape's D1-D7 drift record is the proof the stamp is needed
+  (even the publisher's own page carried one fact in three concurrent vintages), so the
+  page teaches a newcomer to read org facts with dates attached instead of trusting them
+  flat. Fits ADR 0015 D1 (a completeness-ledger surface: derivable entirely from data the
+  instance already ingests, so its gaps are measurable) and D6 (ships in the template as a
+  GENERATED surface, never authored prose that would rot exactly the way the scraped bios
+  did). Groom into the ADR 0015 epic when that epic lands; until the ADR is accepted this
+  stays an inbox idea, not a commitment.
 - **`Idea-178`** · 2026-08-26 · `[chore]` · **groomed → J55 (2026-08-27) — the ENFORCEMENT half only (nothing stops the retired string coming back); the cross-repo doc-corpus id migration stays STANDING → the next port session, which is the only place it can be settled** · prio? **Med** —
   **The org-acronym sanitization renamed the doc corpus id the two repos JOIN on.** Gate-log
   RECORD 2026-08-26; the old-to-new mapping is written once, in `internal/cdo-reference/README.md`.

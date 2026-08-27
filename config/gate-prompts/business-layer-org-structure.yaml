@@ -46,7 +46,7 @@ summary: >
 
 meta:
   Module: "ontology (drydocs_core/ontology/relationship_vocabulary/ + config/taxonomy-ontology-map/) — no loader exists for any term this page proposes; nothing writes"
-  Source: "internal/context-graph-analysis/business-layer-location-experiment.md (2026-08-08, hand-applied ontology over public sources) · doc-source-registry#jpmc-reports (External, confirmed: false, captured 2026-06-30 = the 2024 edition) · 2024 annual report p104 (the reorg statement; NOTE the local file named 2026 is a sha-verified mislabeled copy of 2024) · 2025 edition as corroboration"
+  Source: "internal/context-graph-analysis/business-layer-location-experiment.md (2026-08-08, hand-applied ontology over public sources) · doc-source-registry#jpmc-reports (External, confirmed: false, captured 2026-06-30 = the 2024 edition) · 2024 annual report p104 (the reorg statement; NOTE the local file named 2026 is a sha-verified mislabeled copy of 2024) · 2025 edition as corroboration · docs/reviews/chase-leadership-scrape-2026-08-27.md (doc-source-registry#chase-leadership-scrape, External, confirmed: false — 23 public pages, membership grain; attached to the draft 2026-08-27)"
   Precedent: "G27/W1/U11/N10 — a drafted prompt decides nothing · L25 riders-not-edits — G98's signed clauses are built on, never re-opened · Q9/Q14 overtaken-recorded-not-re-done (C28 groomed 2026-08-09; G98 signed 2026-08-17) · C26 — a reservation follows the label ruling, never precedes it (§D1) · K2/G27 flips-are-follow-ups · m3_belongs_to_application — decline a weak PROV mapping rather than reach for one"
   Registry ref: "jpmc-reports stays confirmed: false and its reshape (DataAsset slices vs lexical backbone) is the registry's named P4+ decision — out of scope here (§E2); no registry flag moves at this gate"
   Classification: "Internal-Public — mechanism plus public-source facts only (SEC-filed annual report, one public profile page); the experiment doc it cites is Internal but nothing Internal is quoted onto this page"
@@ -83,6 +83,23 @@ provenance:
         origin: derived
         from: "the experiment's org:ChangeEvent row, set against G98 §B1's signed dated-edge shape"
         note: "§B's adopt-or-decline. The reservation exists either way so a port cannot take the names while the question is open."
+  - label: "The Chase leadership pages — membership-grain evidence plus the self-drift record (captured 2026-08-27; attached to the DRAFT the same day — a draft edit, not a rider; L25 governs signed clauses only)"
+    source_object: "docs/reviews/chase-leadership-scrape-2026-08-27.md (VERBATIM transcription of 23 public pages; registry row doc-source-registry#chase-leadership-scrape, External, confirmed: false — raw HTML not committed, per-page sha256 in the review)"
+    key: "page sha256 + captured_at — the pages publish no edit dates, so the hash is the only change signal and every fact is as-of its capture"
+    loader: "NONE — evidence-only corpus; any load is this gate session's decision"
+    properties:
+      - name: membership_assertions
+        origin: source
+        from: "22 bios, e.g. 'a member of the Consumer & Community Banking leadership team' (allison-beer); 'member of the CCB Leadership Team and the firm's Global Technology Leadership Team' (gill-haus); 'member of the firm's Operating Committee' (troy-rohrbaugh)"
+        note: "Evidence for MEMBERSHIP, never reporting lines — no bio says 'reports to', and the control-function seats declare a SECOND firmwide membership (Risk, Compliance, Audit, Control Management, HR), matrix by design. Supports §A's unit reading (people attach to management units) without deciding it; edge shape is HAS_MEMBERSHIP, the PAT precedent."
+      - name: unit_grouping
+        origin: derived
+        from: "'CCB's eight lines of business and nine functions' (pablo-rodriguez) set against title patterns across the 22 tiles — the review's §3 tree"
+        note: "SYNTHESIZED and labeled as such in the review: no page draws the tree; the grouping is inference from one sentence plus title patterns. Cite the review §3, never the pages, for the grouping."
+      - name: self_drift
+        origin: source
+        from: "review §5 (D1-D7): the CCB customer denominator live in THREE concurrent vintages across sibling bios (86M/7M vs 87M/7.5M vs 90M+); index tile vs bio title disagreement on one seat; the most senior tile missing its title; a moved portfolio's description copied forward verbatim"
+        note: "Calibration evidence FOR §C3's source-grain corollary, demonstrated on a first-party official page: the publisher's own surface carries concurrent vintages, so a scrape-sourced org fact is true as-of its capture and never fresher — the extreme case of §C's rule, a dated capture of an UNDATED source."
 
 sections:
   - title: "A. The segment's ORG class — unit of the Firm, or a second legal organization"

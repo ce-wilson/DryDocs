@@ -61,7 +61,7 @@
 # =============================================================================
 
 schema: drydocs.doc-source-registry.v1
-updated: 2026-08-18
+updated: 2026-08-27
 
 sources:
   # ---- Currently ingested corpora (backfill, Q5) ----------------------------
@@ -380,6 +380,38 @@ sources:
       here (Q5) so every live corpus traces to a registry entry; reshaping it
       onto the lexical backbone is a P4+ decision. The script still carries the
       pre-restructure repo path for its PDFs — update on next run.
+
+  - id: chase-leadership-scrape
+    classification: External            # public media/press pages; company-published leadership roster + bios
+    source: "docs/reviews/chase-leadership-scrape-2026-08-27.md (VERBATIM transcription + drift analysis; raw HTML NOT committed — the jpmc-reports never-commit precedent; per-page sha256 recorded in the review)"
+    source_url: "https://media.chase.com/leadership (index + 22 bio pages at /leadership/<slug>)"
+    captured_at: 2026-08-27
+    connector: web
+    manifest: ~                         # single-session capture; provenance (hashes, tiering, drift record) lives in the review doc
+    trust_default: VERBATIM             # quotes transcribed as fetched; the review's unit-grouping tree is SYNTHESIZED and labeled per-section
+    tier: T1                            # publisher's own public pages (the jpmc-reports precedent)
+    curation: none
+    target_db: drydocs
+    refresh: on-demand                  # refetch compares sha256 per page — the pages publish no edit dates, so the hash is the only change signal
+    taxonomy_path: ~
+    graph_locator:                      # evidence-only corpus; nothing loads
+      match: none
+      value: ~
+    confirmed: false                    # no loader binds here; the corpus is EVIDENCE for the drafted gate business-layer-org-structure (C28) — any load is that gate session's decision
+    notes: >
+      The CCB Leadership Team roster (22 leaders) captured as membership-grain
+      evidence for the business-layer gate: bios assert MEMBERSHIP ("member of
+      the CCB Leadership Team", GTL, Operating Committee), never reporting
+      lines — the control functions declare firmwide-matrix memberships, so
+      this corpus supports HAS_MEMBERSHIP-shape edges only. Composes with
+      jpmc-reports into a two-layer public org view (10-K executive-officer
+      register above, this page below, bridged by the one person in both).
+      The review's drift record (D1-D7: one fact in three concurrent
+      vintages, tile-vs-bio title disagreement, a missing tile field, a
+      stale cross-reference to a moved seat) is provenance calibration —
+      first-party official pages drift against themselves, so scrape-sourced
+      org facts are true as-of capture and never fresher (the gate's C3
+      source-grain corollary, demonstrated live).
 
 # ---------------------------------------------------------------------------
 # Retired corpus ids (the source-registry v2 D4 semantics, imported at the
