@@ -136,7 +136,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     all, which is the stronger default, but `--generate` reintroduces a small piece of the same
     problem: a credential nobody chose deliberately and nobody is tracking.
 
-- **`Idea-164`** · 2026-08-28 · `[bug]` · **open** · prio? **High** —
+- **`Idea-164`** · 2026-08-28 · `[bug]` · **groomed → O75, BUILT same day (`36a7422a`); rotation stays out of scope by O75 clause (f) and needs a per-identity generation stamp the credential file does not carry** · prio? **High** —
   **Removing a console credential does not end that account's live sessions — access continues for
   up to eight hours.** `InMemorySessionStore.revoke(token)` is token-scoped and driven by logout.
   `resolve(token)` checks the token and its expiry and never consults the credential store again,
