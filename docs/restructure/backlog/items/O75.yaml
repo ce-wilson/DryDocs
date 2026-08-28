@@ -1,0 +1,46 @@
+id: O75
+epic: web-console
+title: 'Removing a console account ends its live sessions: today the token keeps working for the rest
+  of its eight hours while the operator believes access was withdrawn'
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: in_progress
+depends_on:
+- O69
+- O73
+inputs:
+- drydocs_api/sessions.py
+- drydocs_api/credentials.py
+- drydocs_api/handlers.py
+- drydocs_api/app.py
+- docs/design/catalog-substrate-review.md
+acceptance: |
+  Withdrawing a console account withdraws its access. A session issued to a persona stops resolving once that persona no longer has a credential on this machine, and it stops on the NEXT REQUEST rather than at the end of its eight-hour term.
+
+  (a) THE CHECK LIVES AT THE SINGLE AUTHENTICATION POINT, for the reason expiry already lives there. `handlers.authenticate` is the one callable the `CurrentUser` dependency wraps, and `sessions.resolve` owns the expiry check precisely so no caller re-derives it and none can skip it. The account-still-exists check is the same kind of check and goes to the same place. It is NOT added to each route, and it is NOT pushed down into `sessions.py`, which owns tokens and must not learn about secrets.
+
+  (b) THE CREDENTIAL STORE ANSWERS ONE NEW QUESTION AND STILL DOES NOT ENUMERATE. `identities()` exists but its docstring is explicit that which accounts exist is exactly what the dummy derivation in `verify` hides, so the auth path asks `has_identity(id)` instead — a boolean about an id the caller already holds, never a list. It is added to `CredentialStore`, to `ReloadingCredentialStore`, and to the `CredentialChecker` protocol so the API's reloading store and a test's plain store stay interchangeable.
+
+  (c) A REFUSED SESSION IS DROPPED, not merely refused, so a withdrawn account does not leave a resolvable-looking entry sitting in the store until `purge_expired` happens to run. The session store gains `revoke_identity(persona_id)` for the explicit lever; the resolve-time check is what makes it automatic.
+
+  (d) THE UNREADABLE-FILE CASE MUST NOT LOCK ANYONE OUT, and this is the clause that decides it rather than leaving it to inference. O73 already ruled the two failure modes apart: an unreadable credential file keeps the last known-good store (failing closed there turns a routine rotation into a lockout), while an ABSENT file empties the store because somebody removed the accounts. The new check inherits both rulings unchanged — it reads whatever the reloading store currently holds and adds no failure mode of its own. A test covers the corrupt-file case explicitly: a live session survives a corrupt write, and does not survive a deletion.
+
+  (e) THE OFFLINE LAYER STAYS OFFLINE. `handlers.py` is provable without FastAPI installed and its handlers run their own `authenticate` call; the credential argument is therefore optional and only `app.py`'s dependency supplies it. The docstring says why in one line, so the asymmetry reads as a decision rather than an oversight.
+
+  (f) ROTATION IS OUT OF SCOPE AND SAYS SO. A rotated secret leaves the identity present, so an identity check cannot catch it; catching rotation needs a per-identity generation stamp the store does not carry. Removal is the case an operator actually relies on, and it is the one this item closes. The deferral is recorded in the item and in the code, not discovered later.
+
+  `poetry run pytest -q` green, including new cases for: a removed account's token refused on the next request; an admin token refused after removal where it previously reached an admin-only route; a live session surviving a corrupt credential file; and every session dying when the file is deleted. Ruff clean. Verified live against a running uvicorn on this desktop, with the venue named.
+notes: |
+  Raised 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding L3 — the second-pass survey of the catalog and lineage products (DataHub, OpenMetadata, Amundsen, OpenLineage/Marquez, Purview), by way of Idea-164.
+
+  THE SEQUENCE, because the defect is invisible from any single file. `InMemorySessionStore.revoke(token)` is token-scoped and driven by logout. `resolve(token)` checks that the token is known and that it has not expired, and never consults the credential store again. `ReloadingCredentialStore` does notice the file changing, but only `handlers.login` reads it. So: morpheus signs in and receives an eight-hour session; the operator runs `set_console_credential.py --remove morpheus`, or rotates because a secret leaked; the file changes; the API picks it up on the next login attempt; and the already-issued admin token keeps resolving until its term runs out.
+
+  WHY THIS IS THE ONE DEFECT IN A PATH THAT IS OTHERWISE RIGHT. The same review found the credential half stronger than its commercial peers on the property that usually goes wrong — a fresh clone ships no credential file, therefore no accounts, therefore every login is refused. What it does not have is the other half of an account lifecycle. An account you can create but cannot actually withdraw is a half-built control, and the operator has every reason to believe the withdrawal worked.
+
+  WHY THE SCRIPT CANNOT DO IT. `set_console_credential.py` does not share a process with the API, and giving it one would violate the guard that forbids filesystem writes inside `drydocs_api` — the rule that exists because an endpoint able to rewrite the credential file is an endpoint able to grant itself an account. So the fix runs in the direction O73 already established: the API notices the file, on its own schedule, through a stat comparison it already performs.
+
+  MODULE CHOICE, recorded because it was a judgement call. Every file this touches is under `drydocs_api/`, and a `drydocs-api` module exists. It is filed `drydocs-web` anyway, following O69, O73 and O74, which made the same call for the same console-authentication stream. A lone divergence would make the stream unfilterable by module for the sake of one row.
