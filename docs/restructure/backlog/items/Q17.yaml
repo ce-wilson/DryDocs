@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: fable
 priority: p3
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - config/doc-source-registry.yaml
