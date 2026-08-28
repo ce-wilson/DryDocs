@@ -265,7 +265,10 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   (exit code + message), and it strips ANSI / relies on the unit conftest's non-terminal console.
   Guarded by `tests/unit/test_no_render_parsing.py`.
 - **Tests gate every change:** `poetry run pytest -q`, `python -c "import drydocs.cli"`,
-  `drydocs --help`.
+  `drydocs --help`. The root import is ONE of eight CLI entry points — the other seven
+  (`cli_shared` + the six S8 command modules) are guarded by
+  `tests/unit/test_cli_import_order.py`, subprocess-per-import, because an in-process
+  import proves nothing about import order (S13: exactly that gap shipped a cycle).
 - **Secrets discipline:** architecture-level only. No real data values in commits.
 
 See `internal/repo-README.md` for the runnable pipeline and `docs/restructure/01-project-plan.md` for the plan.

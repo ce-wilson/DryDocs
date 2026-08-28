@@ -76,6 +76,11 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.cli_variables",
         "drydocs.cli_docs",
         "drydocs.cli_plan",
+        # S13 (2026-08-27): the hoisted shared state the command modules and the
+        # root both import (DAG: commands <- cli_shared -> nothing; root imports
+        # both). Load like its consumers; NOT an entrypoint — it imports only
+        # this component and core, and the root keeps the only wiring exemption.
+        "drydocs.cli_shared",
         "drydocs.snapshots",
         "drydocs.staging",
         "drydocs.cmdline_staging",

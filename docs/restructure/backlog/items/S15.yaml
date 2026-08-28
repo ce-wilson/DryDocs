@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: [S13]
 inputs:
 - tests/unit/test_repo_paths.py
@@ -34,3 +34,14 @@ notes: |
   depends_on set so the ready strip offers exactly one of the pair. Closing S13 per its
   acceptance (which now folds this item's narrower clauses) closes this item; set both
   done in the same commit.
+  DONE 2026-08-27 (laptop, Lane B — closed by S13's fix, same commit; full build detail in
+  S13's done note). This item's own clauses: (a) test_repo_paths.py standalone 4 failed /
+  45 passed before -> 49 passed after, green in the full suite both sides. (b) the boundary
+  was NOT loosened — ENTRYPOINT_MODULES is untouched; the fix is the module graph itself (the
+  cli_shared hoist), not a test accessor and not an exemption. (c) siblings: all six S8
+  command modules plus the root and cli_shared are covered by the new subprocess guard
+  (tests/unit/test_cli_import_order.py), so the next module someone adds to the list fails by
+  name, not by four confusing repo_paths failures. (d) the cycle is DISSOLVED, not merely
+  named — and the shape is recorded where the next reader meets it: cli_shared's module
+  docstring, the root's bottom-import comment (the old "blessed circular edge" sentence is
+  gone), each command module's _client wrapper, and MODULE_MAP.md.

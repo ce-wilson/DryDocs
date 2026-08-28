@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/cli.py
@@ -38,3 +38,24 @@ notes: |
   never offers both). S15's narrower acceptance clauses (file-alone runs shown, sibling
   modules checked, coupling named where the next reader meets it) fold into this item's
   acceptance as written.
+  DONE 2026-08-27 (laptop, Lane B; closes S15 in this commit). SHAPE: the hoist — the
+  acceptance's third candidate, the only one that removes the cycle rather than reordering it.
+  New drydocs/cli_shared.py holds every constant and stateless helper the six command modules
+  consume (loader registry, chains, gate/adapter/opt helpers, console); the command modules
+  import cli_shared and NEVER the root at module scope; the root imports both. Mutable state
+  stays on the root as the tested patch surfaces: _client unchanged, and the _registry cache is
+  read/written by cli_shared._source_registry() THROUGH drydocs.cli at call time
+  (function-local import — the _client idiom), so monkeypatch targets drydocs.cli._client and
+  drydocs.cli._registry both keep working, untouched tests prove it. (a) all eight CLI modules
+  import first-cleanly. (b) tests/unit/test_cli_import_order.py: subprocess-per-import, plus a
+  second parametrized guard asserting drydocs.cli never lands in sys.modules when a non-root
+  module imports first (removed-not-reordered as a tested property). RED first at 1c77e539:
+  14 failed / 1 passed. (c) test_repo_paths.py standalone: 4 failed / 45 passed before ->
+  49 passed after; green in the full suite both sides (2560 passed / 11 skipped after).
+  (d) drydocs --help byte-identical before/after (non-tty capture both sides); composition
+  root still the only ENTRYPOINT_MODULES exemption — the list is untouched; flat merge
+  unchanged at the root bottom. (e) CLAUDE.md working-agreements line widened to name the
+  guard and the eight entry points. MODULE_MAP.md row added; drydocs.cli_shared classified
+  load in test_module_boundary (default-deny caught it first, as designed). Root re-exports
+  the moved names (__all__ compat surface) so every existing drydocs.cli.X consumer — tests,
+  scripts/render_load_map.py, the company port — keeps its import path.
