@@ -18,6 +18,7 @@ import yaml
 
 from drydocs.loaders.catalog import DevTeamRow, PatProductMappingRow
 from drydocs.pat_projection import (
+    ACKNOWLEDGED_ABSENT,
     DEFAULT_HEADER_MAP,
     DEV_TEAMS_COLUMNS,
     DEV_TEAMS_FILE,
@@ -141,6 +142,33 @@ def test_missing_key_header_is_refused_not_guessed():
         [{**_row(), "Product Id": "PROD_X"}], [*headers, "Product Id"], hmap
     )
     assert mappings[0]["product_id"] == "PROD_X"
+
+
+def test_missing_optional_mapped_header_is_loud_not_silently_empty():
+    """(K30-a) seal_ids is mapped but NOT in REQUIRED_FIELDS. Before K30 a raw
+    report missing its header degraded to an empty seal_ids column on every
+    row and still reported success — the real-world failure mode this item
+    closes (an export with a differently-spelled SEAL-id column silently
+    writes zero application edges). After K30 this is a hard, loud refusal,
+    same as a required field, unless the field is in ACKNOWLEDGED_ABSENT."""
+    assert "seal_ids" not in ACKNOWLEDGED_ABSENT
+    headers = [h for h in RAW_HEADERS if h != "SEAL IDs"]
+    with pytest.raises(ProjectionError, match="seal_ids .*'SEAL IDs'"):
+        project_rows([_row()], headers)
+
+
+def test_jira_board_id_is_acknowledged_absent_not_loud():
+    """(K30-c) jira_board_id maps to 'JIRA Board', a header TEAM_DETAILS_REPORT
+    does not actually carry (it lives in a sibling PAT export). It is kept in
+    DEFAULT_HEADER_MAP but listed in ACKNOWLEDGED_ABSENT, so a normal run
+    without that header stays exit-0 (not (a)'s new loudness rule) and the
+    report names it explicitly rather than staying silent."""
+    assert "jira_board_id" in ACKNOWLEDGED_ABSENT
+    headers = [h for h in RAW_HEADERS if h != "JIRA Board"]
+    teams, _, report = project_rows([_row()], headers)
+    assert teams[0]["jira_board_id"] == ""
+    assert report.acknowledged_absent == ("jira_board_id",)
+    assert "acknowledged-absent" in "\n".join(report.lines())
 
 
 def test_header_map_override_rejects_unknown_logical_fields(tmp_path: Path):

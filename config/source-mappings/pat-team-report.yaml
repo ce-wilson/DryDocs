@@ -68,7 +68,7 @@ objects:
       - {name: "Team Name", disposition: projected, origin: source, target: "DevTeam.name",
          note: "pinned: false. Optional since C24 (sparse refresh carries id without name)"}
       - {name: "JIRA Board", disposition: projected, origin: source, target: "DevTeam.jira_board_id",
-         note: "pinned: false. The pat-evidence README reads 'JIRA instance/board' — one or two columns is a census question"}
+         note: "pinned: false. K30 (2026-08-28) verified this header is NOT carried by TEAM_DETAILS_REPORT — the field lives in a sibling PAT export. Kept mapped and listed in drydocs/pat_projection.py ACKNOWLEDGED_ABSENT rather than dropped, so a run without this header stays a normal exit-0 run, not a loud failure; not a census question, and not pending measurement against this report"}
       # --- pat_product_mapping__sample.csv (PatProductMappingLoader) ---
       - {name: "Product ID", disposition: projected, origin: source, target: "Product.product_id",
          note: "pinned: false. Required. Lands twice: PatProductMappingRow.product_id AND DevTeamRow.parent_product_id (the HAS_DEV_TEAM anchor)"}
