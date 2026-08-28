@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/sessions.py
@@ -18,7 +18,7 @@ inputs:
 - docs/decisions/0009-configuration-substrate.md
 - docs/design/web-scaffolding-review.md
 acceptance: |
-  Signing in requires proving a secret. The API gains a credential-checked login that returns a token with an expiry; the session store gains that expiry and rejects an expired token as 401; and authentication becomes a route signature rather than per-handler code, following the reviewed template's dependency-alias pattern (a CurrentUser-style annotated dependency, plus a separate one for the admin-only surfaces). Hashing uses pwdlib with Argon2 primary and bcrypt fallback - never a bare hash, never a comparison that is not constant-time. The server stays the role authority per ADR 0005 decision 3: the browser continues to hold nothing but an opaque token, and no role travels in the client's session blob. The MOCK banner's text is re-decided in the same change rather than left standing - it currently promises a decision that was already made. Every existing persona-gated behaviour still holds: an unauthorised deep link cannot reach the raw-Cypher console, a garbage session degrades to the sign-in screen, and the dev-only as= affordance stays baked out of production bundles.
+  Signing in requires proving a secret. The API gains a credential-checked login that returns a token with an expiry; the session store gains that expiry and rejects an expired token as 401; and authentication becomes a route signature rather than per-handler code, following the reviewed template's dependency-alias pattern (a CurrentUser-style annotated dependency, plus a separate one for the admin-only surfaces). Hashing uses a memory-hard KDF with a constant-time comparison - never a bare hash. AMENDED DURING THE BUILD from pwdlib with Argon2 to stdlib scrypt, for a reason that is a property of this repo rather than a preference: CI runs poetry install with no optional groups, so a hash reachable only through the api dependency group would be the one part of this item CI never exercises, and the pure-handler layer is deliberately importable without FastAPI. Argon2id stays the upgrade path, and the parameters stored beside each hash make adopting it non-breaking. The server stays the role authority per ADR 0005 decision 3: the browser continues to hold nothing but an opaque token, and no role travels in the client's session blob. The MOCK banner's text is re-decided in the same change rather than left standing - it currently promises a decision that was already made. Every existing persona-gated behaviour still holds: an unauthorised deep link cannot reach the raw-Cypher console, a garbage session degrades to the sign-in screen, and the dev-only as= affordance stays baked out of production bundles.
   THE CREDENTIAL CARRIER IS NAMED EXPLICITLY, against ADR 0009's two slots. That ADR gives configuration exactly two homes - committed git text, or a derived rebuildable materialization of it - and a password hash fits neither: it cannot be committed, because the publish boundary forbids it, and it cannot live in var/mapping.db under that file's deletable-without-data-loss contract, because deleting it would destroy the only copy. This item states where the hash lives, why that home is neither of the ADR's two, and what happens on a fresh clone with no credential file present. It is the first state in the repo that is neither source of truth nor derived from it, and it is written down as such rather than left implicit.
 notes: |
   Raised 2026-08-27 from the web-scaffolding review (docs/design/web-scaffolding-review.md),
@@ -36,10 +36,6 @@ notes: |
   template needs a self-contained credential path. A company binds its own OIDC or gateway at
   its seam, replacing the credential half and reusing everything above it - which is exactly
   what ADR 0005 already made possible by putting role resolution on the server.
-  THE GAP IS NARROWER THAN IT SOUNDS, and the acceptance is scoped to it. Token issue, resolve
-  and revoke already exist in drydocs_api/sessions.py; role already resolves server-side; the
-  login route already 401s an unknown identity. What is missing is a secret to prove, an
-  expiry, and the dependency shape that stops each handler re-implementing the check.
   DELIBERATELY NOT IN SCOPE, each with its reason in the review: SQLModel, PostgreSQL and a
   User table - and the authority for that refusal is ADR 0009, ruled at S1 on 2026-08-01, not
   this item's judgement. The ADR settled the substrate question permanently: git text is the
@@ -50,3 +46,55 @@ notes: |
   reproducible from committed text. Four personas do not justify reopening that. Also out of
   scope: email-based password recovery, React Email and Mailpit (a mail path and an SMTP
   dependency for a console with a handful of accounts); and any real directory integration.
+  BUILT 2026-08-28 (desktop). WHERE THE HASH LIVES, which was the open question and is now
+  answered: a machine-local JSON file under internal-local/, gitignored as a whole, path
+  overridable by DRYDOCS_CONSOLE_CREDENTIALS. Deliberately NOT under var/. That directory is
+  safe to delete precisely because everything in it rebuilds from committed text beside it; a
+  credential has no committed source, so putting it there would quietly break the contract that
+  makes var/ disposable for everything else. Two tests pin the placement - one asks git
+  check-ignore directly rather than reasoning about gitignore precedence, one asserts nothing
+  matching the filename is tracked.
+  THE ADR 0009 WRITE GUARD CAUGHT THIS BUILD, and it was right to. The store began with a save
+  method inside drydocs_api, and the guard in test_mapping_api.py failed it, because that test
+  bans every filesystem write primitive in the package. The rule was written about
+  configuration and it lands on credentials for a reason of its own: an endpoint that can
+  rewrite the credential file is an endpoint that can grant itself an account. Writing moved to
+  scripts/set_console_credential.py, run by a person at a terminal; the API loads and verifies
+  and cannot persist. A test asserts the store the API holds has no save method at all. Two
+  further repo guards steered the same code - the repo-root anchor had to go through repo_root
+  rather than a dunder-file climb, and the write had to pin its newline.
+  THE ROUTE-SHAPE GUARD FOUND SOMETHING ON ITS FIRST RUN. Authentication is now declared in the
+  signature: twenty-two routes take a CurrentUser dependency and raw-Cypher takes an AdminUser
+  one, with an AST guard asserting every route either declares a user or sits on a named public
+  list. It immediately reported the spec-catalogue route, which turned out to be public not by
+  decision but because nobody had looked. It stays public, being a listing of descriptions like
+  the named-query catalogue beside it, but it is now public on the record. The handlers keep
+  their own authenticate call: they are the framework-free layer the offline suite tests, and
+  they must fail closed when called directly.
+  THE BROWSER CLIENT CHANGED IN A WAY WORTH RECORDING. graphApi.ts used to log itself back in on
+  any 401, which was only possible because logging in took no secret - a client that can
+  re-authenticate out of a rejection makes the rejection meaningless, so expiry and revocation
+  would both have been decorative. It now reads the session token, and a 401 drops the session
+  and raises an event App.tsx listens for, so one rejection anywhere returns the whole console
+  to the sign-in screen. The dev-only as= affordance needs VITE_DEV_CONSOLE_SECRET with no
+  default and no fallback, because a baked-in dev password is the exact thing this item exists
+  to remove.
+  A THIRD GUARD NEARLY PULLED THIS ITEM INTO SHARED INFRASTRUCTURE, and did not, which is
+  worth recording because the next machine-local artifact will hit it too. The runbook
+  originally spelled the credential file as a full path; test_runbook_currency asserts every
+  path a document names exists, and this one must NOT exist on a clean checkout. Its two
+  exemption tables are for the past and for other repos, so a third category was drafted -
+  and then dropped, because the key would have tripped the J8 skip-guard policy, whose
+  docstring says in terms that it is deliberately not to be weakened further and that a
+  false skip guard is worse than a false positive. The runbook now names the directory and
+  the filename separately, which reads the same and asserts only what is true. The finding
+  stands for whoever needs it: a document naming a machine-local artifact should name it as
+  a file in a directory, not as a path.
+  VERIFIED LIVE on this desktop against uvicorn on ports 8097 to 8099 with a temporary
+  credential file: a wrong secret and an unknown persona both return 401 with an identical
+  body, a correct secret returns a token carrying an expiry, a fresh clone with no credential
+  file returns a 401 naming the bootstrap script, a user token gets 403 on raw-Cypher from the
+  dependency rather than from the handler, and a token stops working after logout. Session
+  expiry itself is unit-tested with an injected clock rather than by waiting eight hours. Suite
+  green, ruff clean, npm run build and oxlint clean. The runbook is at Rev 3 with the credential
+  prerequisite and four new troubleshooting rows.

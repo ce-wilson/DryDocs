@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from drydocs_api.credentials import CredentialStore
 from drydocs_api.guard import WriteRejected, ensure_read_only, is_write_cypher
 from drydocs_api.handlers import Forbidden, login, logout, run_named, run_raw
 from drydocs_api.personas import PERSONAS, UnknownPersonaError
@@ -151,11 +152,22 @@ def test_param_validation():
 
 # ── handlers ─────────────────────────────────────────────────────────────────
 
+#: Secrets exist only in memory here. The real store is machine-local and
+#: gitignored (drydocs_api.credentials) — a test must never need the real one.
+TEST_SECRET = "a-test-console-secret"
+
+
+def _credentials(*identities: str) -> CredentialStore:
+    creds = CredentialStore()
+    for identity in identities:
+        creds.set(identity, TEST_SECRET)
+    return creds
+
 
 def test_login_and_named_query_routes_database():
     store = InMemorySessionStore()
     runner = FakeRunner(keys=["labels", "count"], rows=[{"labels": ["X"], "count": 1}])
-    session = login("jdoe4821", store)
+    session = login("jdoe4821", TEST_SECRET, store, _credentials("jdoe4821"))
     out = run_named("overview-counts", {}, session["token"], store, runner)
     assert out["database"] == "drydocs" and out["rows"] == [{"labels": ["X"], "count": 1}]
     cypher, params, database = runner.calls[0]
@@ -187,7 +199,7 @@ def test_raw_cypher_admin_only_and_guarded():
 
 def test_logout_revokes():
     store = InMemorySessionStore()
-    session = login("asmith7734", store)
+    session = login("asmith7734", TEST_SECRET, store, _credentials("asmith7734"))
     logout(session["token"], store)
     with pytest.raises(InvalidTokenError):
         run_raw("MATCH (n) RETURN n", session["token"], store, FakeRunner())
@@ -202,10 +214,16 @@ def test_fastapi_wiring_smoke():
 
     from drydocs_api.app import create_app
 
-    app = create_app(runner=FakeRunner(), store=InMemorySessionStore())
+    app = create_app(
+        runner=FakeRunner(),
+        store=InMemorySessionStore(),
+        credentials=_credentials("jdoe4821", "asmith7734"),
+    )
     client = TestClient(app)
     assert client.get("/health").json() == {"status": "ok"}
-    token = client.post("/login", json={"persona_id": "jdoe4821"}).json()["token"]
+    login_res = client.post("/login", json={"persona_id": "jdoe4821", "secret": TEST_SECRET})
+    assert login_res.status_code == 200
+    token = login_res.json()["token"]
     ok = client.post(
         "/query/overview-counts", json={"params": {}}, headers={"Authorization": f"Bearer {token}"}
     )

@@ -261,11 +261,16 @@ def test_ephemeral_wiring_end_to_end(monkeypatch):
     from fastapi.testclient import TestClient
 
     from drydocs_api.app import create_app
+    from drydocs_api.credentials import CredentialStore
 
     monkeypatch.setenv("DRYDOCS_AGENT_REG_KEY", "wiring-test-key")
     store = InMemorySessionStore()
-    client = TestClient(create_app(runner=FakeRunner(), store=store))
-    token = client.post("/login", json={"persona_id": "jdoe4821"}).json()["token"]
+    secret = "a-test-console-secret"
+    creds = CredentialStore()
+    for identity in ("jdoe4821", "kchen2190"):
+        creds.set(identity, secret)
+    client = TestClient(create_app(runner=FakeRunner(), store=store, credentials=creds))
+    token = client.post("/login", json={"persona_id": "jdoe4821", "secret": secret}).json()["token"]
 
     # a browser bearer token alone can never register Cypher
     body = {"owner_token": token, "cypher": CYPHER, "database": "drydocs"}
@@ -297,7 +302,9 @@ def test_ephemeral_wiring_end_to_end(monkeypatch):
     assert manifest["query_spec"] == ref
 
     # the owning session only: a second login sees a plain 404
-    other = client.post("/login", json={"persona_id": "kchen2190"}).json()["token"]
+    other = client.post("/login", json={"persona_id": "kchen2190", "secret": secret}).json()[
+        "token"
+    ]
     foreign = client.post(
         f"/specs/{ref}/run", json={"params": {}}, headers={"Authorization": f"Bearer {other}"}
     )

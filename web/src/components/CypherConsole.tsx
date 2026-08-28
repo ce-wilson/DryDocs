@@ -88,7 +88,7 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
   const [events, setEvents] = useState<AdkEvent[] | null>(null)
   const [agentStatus, setAgentStatus] = useState('')
 
-  // ADK sessions are scoped to the signed-in mock persona (was hardcoded 'local-dev')
+  // ADK sessions are scoped to the signed-in persona (was hardcoded 'local-dev')
   const userId = personaId
 
   async function onListApps() {

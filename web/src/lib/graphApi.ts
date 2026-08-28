@@ -1,12 +1,19 @@
+import { sessionRejected, sessionToken } from './auth'
 import type { GraphAccess, GraphResult, NamedResult, SpecExport, SpecResult } from './graph'
 
 // The deployment adapter (ADR 0005): HTTP to the drydocs-api thin API.
-// Sessions are server-side — the adapter exchanges the signed-in persona id
-// for an opaque bearer token (the O5 auth stub; enterprise OIDC replaces the
-// exchange company-side) and retries ONCE on 401 (server restart drops the
-// in-memory session store). It must NEVER fall back to bolt silently, or the
-// seam would leak the dev path into deployment behavior — every failure here
-// is loud.
+// Sessions are server-side; this adapter READS the token the sign-in flow
+// obtained and never obtains one itself. It must NEVER fall back to bolt
+// silently, or the seam would leak the dev path into deployment behavior —
+// every failure here is loud.
+//
+// O69 CHANGED THE 401 BEHAVIOUR, and the change is the point rather than a
+// side effect. This client used to hold a persona id and silently log in
+// again on any 401, which was only possible because logging in took no
+// secret; a client that can re-authenticate itself out of a rejection is a
+// client for which the rejection means nothing. Now a 401 is terminal: the
+// local session is dropped, the app is told, and the user lands on the
+// sign-in screen. Expiry and revocation therefore actually take effect.
 
 interface ApiEnvelope {
   keys: string[]
@@ -23,23 +30,24 @@ export async function readDetail(res: Response): Promise<string> {
   }
 }
 
-/** The shared token-holding HTTP client behind every drydocs-api surface
- *  (GraphAccess here; the O13 mappings client in mappingsApi.ts). One
- *  login/refresh policy — persona exchange + a single retry on 401 — so no
- *  surface can drift its own auth behavior. */
+/** The shared HTTP client behind every drydocs-api surface (GraphAccess here;
+ *  the O13 mappings client in mappingsApi.ts). One auth policy — read the
+ *  session's token, treat a 401 as the end of that session — so no surface can
+ *  drift its own behaviour on rejection. */
 export interface ApiClient {
   authedPost(path: string, body: unknown): Promise<Response>
   authedGet(path: string): Promise<Response>
-  /** The session's own bearer token (logging in first if needed). R5 hands it
-   *  to the graph_qa agent as the R4 owner token, so ephemeral specs the agent
-   *  registers resolve for THIS session's runSpec/exportSpec calls — which is
-   *  why the Ask spoke must share ONE client between token and GraphAccess. */
+  /** The session's own bearer token. R5 hands it to the graph_qa agent as the
+   *  R4 owner token, so ephemeral specs the agent registers resolve for THIS
+   *  session's runSpec/exportSpec calls — which is why the Ask spoke must
+   *  share ONE client between token and GraphAccess. Rejects when there is no
+   *  session; it cannot create one. */
   getToken(): Promise<string>
 }
 
+// personaId is kept in the signature for the ~15 call sites that pass it and
+// for the error text; it is no longer a credential, because it never was one.
 export function createApiClient(baseUrl: string, personaId: string): ApiClient {
-  let token: string | null = null
-
   async function post(path: string, body: unknown, bearer?: string): Promise<Response> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
     if (bearer) headers.Authorization = `Bearer ${bearer}`
@@ -57,29 +65,37 @@ export function createApiClient(baseUrl: string, personaId: string): ApiClient {
     }
   }
 
-  async function login(): Promise<string> {
-    const res = await post('/login', { persona_id: personaId })
-    if (!res.ok) throw new Error(`api login failed (${res.status}): ${await readDetail(res)}`)
-    const session = (await res.json()) as { token: string }
-    token = session.token
+  /** The held token, or a loud failure. There is deliberately no path from
+   *  here to a new session: obtaining one needs a secret, which lives only in
+   *  the sign-in form and is never stored. */
+  function requireToken(): string {
+    const token = sessionToken()
+    if (!token) {
+      sessionRejected()
+      throw new Error(`not signed in as ${personaId} — the console session has ended`)
+    }
     return token
+  }
+
+  /** A 401 means the server refused the token we hold. Retrying with the same
+   *  token would just fail again, so drop the session and surface it. */
+  function rejectIfUnauthorized(res: Response): Response {
+    if (res.status === 401) sessionRejected()
+    return res
   }
 
   return {
     async authedPost(path: string, body: unknown): Promise<Response> {
-      let res = await post(path, body, token ?? (await login()))
-      if (res.status === 401) res = await post(path, body, await login()) // stale session: one retry
-      return res
+      return rejectIfUnauthorized(await post(path, body, requireToken()))
     },
     async authedGet(path: string): Promise<Response> {
-      const get = (bearer: string) =>
-        fetch(`${baseUrl}${path}`, { headers: { Authorization: `Bearer ${bearer}` } })
-      let res = await get(token ?? (await login()))
-      if (res.status === 401) res = await get(await login())
-      return res
+      const res = await fetch(`${baseUrl}${path}`, {
+        headers: { Authorization: `Bearer ${requireToken()}` },
+      })
+      return rejectIfUnauthorized(res)
     },
     async getToken(): Promise<string> {
-      return token ?? login()
+      return requireToken()
     },
   }
 }

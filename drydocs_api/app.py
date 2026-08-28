@@ -18,10 +18,12 @@ drydocs_core.config.Neo4jSettings) — never from a request, never in a browser.
 import os
 from collections.abc import Mapping
 from pathlib import Path
+from typing import Annotated
 
 import neo4j
 from pydantic import BaseModel
 
+from drydocs_api.credentials import CredentialStore
 from drydocs_api.ephemeral_specs import (
     EphemeralSpecStore,
     EphemeralValidationError,
@@ -36,7 +38,17 @@ from drydocs_api.exports import (
     run_spec,
 )
 from drydocs_api.guard import WriteRejected
-from drydocs_api.handlers import Forbidden, login, logout, run_named, run_raw
+from drydocs_api.handlers import (
+    BadCredentialsError,
+    CredentialsNotConfiguredError,
+    Forbidden,
+    authenticate,
+    login,
+    logout,
+    require_role,
+    run_named,
+    run_raw,
+)
 from drydocs_api.intake import (
     IllegalTransitionError,
     IntakeStore,
@@ -70,13 +82,16 @@ from drydocs_api.mappings import (
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import UnknownSpecError
-from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError
+from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError, Session
 from drydocs_core.config import Neo4jSettings
 from drydocs_core.notifications import from_summary, to_payload
 
 
 class LoginBody(BaseModel):
     persona_id: str
+    # O69: the thing being proved. Sent once, over the login call only; the
+    # browser keeps the returned token and never the secret.
+    secret: str
 
 
 class QueryBody(BaseModel):
@@ -186,10 +201,16 @@ class LiveRunner:
             self._driver.close()
 
 
-def create_app(runner=None, store: InMemorySessionStore | None = None):
-    """App factory. ``runner``/``store`` are injectable for tests; the default
-    is the live driver + a fresh in-memory session store."""
-    from fastapi import FastAPI, Header, HTTPException, UploadFile
+def create_app(
+    runner=None,
+    store: InMemorySessionStore | None = None,
+    credentials: CredentialStore | None = None,
+):
+    """App factory. ``runner``/``store``/``credentials`` are injectable for
+    tests; the default is the live driver, a fresh in-memory session store, and
+    the machine-local credential file (absent on a fresh clone, which yields an
+    empty store in which every login is refused)."""
+    from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
 
     app = FastAPI(
@@ -205,11 +226,41 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
 
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
+    creds = credentials if credentials is not None else CredentialStore.load()
 
     def _token(authorization: str | None) -> str:
         if not authorization or not authorization.lower().startswith("bearer "):
             raise HTTPException(401, "missing bearer token")
         return authorization.split(" ", 1)[1]
+
+    # ── O69: authentication as a route signature ────────────────────────────
+    # Every authenticated route declares ``user: CurrentUser`` (or ``AdminUser``)
+    # instead of accepting a raw Authorization header and remembering to check
+    # it. A route that forgets the parameter does not compile into an
+    # authenticated route at all — it becomes an obviously public one, which is
+    # the failure a reviewer can see. The handlers in handlers.py STILL run
+    # their own ``authenticate`` call: they are the framework-free layer with
+    # their own contract, provable offline without a server, and a second dict
+    # lookup is not a cost worth trading that for.
+    def _current_session(authorization: str | None = Header(default=None)) -> Session:
+        try:
+            return authenticate(_token(authorization), sessions)
+        except InvalidTokenError:
+            # Unknown and EXPIRED both land here; the client's answer to either
+            # is the same, which is why sessions.ExpiredTokenError subclasses it.
+            raise HTTPException(401, "invalid session") from None
+
+    # N806: these are type ALIASES, not variables — PascalCase is the
+    # convention FastAPI's own docs use for the annotated-dependency idiom.
+    CurrentUser = Annotated[Session, Depends(_current_session)]  # noqa: N806
+
+    def _current_admin(user: CurrentUser) -> Session:
+        try:
+            return require_role(user, "admin")
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+
+    AdminUser = Annotated[Session, Depends(_current_admin)]  # noqa: N806
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -232,21 +283,26 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     @app.post("/login")
     def post_login(body: LoginBody) -> dict[str, str]:
         try:
-            return login(body.persona_id, sessions)
-        except UnknownPersonaError:
-            raise HTTPException(401, "unknown persona") from None
+            return login(body.persona_id, body.secret, sessions, creds)
+        except CredentialsNotConfiguredError as exc:
+            # Not a security leak worth hiding: an empty store has nothing to
+            # enumerate, and the alternative is a fresh clone whose sign-in
+            # screen refuses every attempt with no way to learn why.
+            raise HTTPException(401, str(exc)) from None
+        except (BadCredentialsError, UnknownPersonaError):
+            # ONE message for both. Which of the two it was is precisely what
+            # an account enumerator is trying to learn.
+            raise HTTPException(401, "invalid credentials") from None
 
     @app.post("/logout")
-    def post_logout(authorization: str | None = Header(default=None)) -> dict[str, str]:
-        logout(_token(authorization), sessions)
+    def post_logout(user: CurrentUser) -> dict[str, str]:
+        logout(user.token, sessions)
         return {"status": "ok"}
 
     @app.post("/query/{query_id}")
-    def post_query(
-        query_id: str, body: QueryBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def post_query(query_id: str, body: QueryBody, user: CurrentUser) -> dict[str, object]:
         try:
-            return run_named(query_id, body.params, _token(authorization), sessions, graph)
+            return run_named(query_id, body.params, user.token, sessions, graph)
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownQueryError:
@@ -254,12 +310,14 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         except ParamValidationError as exc:
             raise HTTPException(422, str(exc)) from None
 
+    # The one route whose role requirement is visible in its signature: AdminUser
+    # 403s a non-admin before the body is read. run_raw re-asserts it anyway —
+    # the handler is what the offline suite tests, and it must fail closed on
+    # its own.
     @app.post("/raw-cypher")
-    def post_raw(
-        body: RawBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def post_raw(body: RawBody, user: AdminUser) -> dict[str, object]:
         try:
-            return run_raw(body.cypher, _token(authorization), sessions, graph)
+            return run_raw(body.cypher, user.token, sessions, graph)
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -306,13 +364,9 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             raise HTTPException(422, str(exc)) from None
 
     @app.post("/specs/{spec_id}/run")
-    def post_spec_run(
-        spec_id: str, body: QueryBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def post_spec_run(spec_id: str, body: QueryBody, user: CurrentUser) -> dict[str, object]:
         try:
-            return run_spec(
-                spec_id, body.params, _token(authorization), sessions, graph, ephemerals
-            )
+            return run_spec(spec_id, body.params, user.token, sessions, graph, ephemerals)
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -324,8 +378,8 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_spec_export(
         spec_id: str,
         body: QueryBody,
+        user: CurrentUser,
         format: str = "csv",
-        authorization: str | None = Header(default=None),
     ):
         from fastapi.responses import StreamingResponse
 
@@ -334,7 +388,7 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
                 spec_id,
                 body.params,
                 format,
-                _token(authorization),
+                user.token,
                 sessions,
                 graph,
                 export_ledger,
@@ -361,11 +415,9 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
         )
 
     @app.get("/exports/{export_id}/manifest")
-    def get_export_manifest(
-        export_id: str, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def get_export_manifest(export_id: str, user: CurrentUser) -> dict[str, object]:
         try:
-            return export_manifest(export_id, _token(authorization), sessions, export_ledger)
+            return export_manifest(export_id, user.token, sessions, export_ledger)
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownExportError:
@@ -393,34 +445,30 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             raise HTTPException(409, str(exc)) from None
 
     @app.post("/intake")
-    def post_intake(
-        body: IntakeCreateBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def post_intake(body: IntakeCreateBody, user: CurrentUser) -> dict[str, object]:
         return _intake_call(
             create_intake,
             body.context_type,
             body.area,
             body.note,
-            _token(authorization),
+            user.token,
             sessions,
             intake_store,
         )
 
     @app.get("/intake")
-    def get_intakes(authorization: str | None = Header(default=None)) -> dict[str, object]:
-        return _intake_call(list_intakes, _token(authorization), sessions, intake_store)
+    def get_intakes(user: CurrentUser) -> dict[str, object]:
+        return _intake_call(list_intakes, user.token, sessions, intake_store)
 
     @app.get("/intake/{intake_id}")
-    def get_one_intake(
-        intake_id: str, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
-        return _intake_call(get_intake, intake_id, _token(authorization), sessions, intake_store)
+    def get_one_intake(intake_id: str, user: CurrentUser) -> dict[str, object]:
+        return _intake_call(get_intake, intake_id, user.token, sessions, intake_store)
 
     @app.post("/intake/{intake_id}/evidence")
     async def post_intake_evidence(
         intake_id: str,
         files: list[UploadFile],
-        authorization: str | None = Header(default=None),
+        user: CurrentUser,
     ) -> dict[str, object]:
         out: dict[str, object] = {}
         for f in files:
@@ -430,7 +478,7 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
                 intake_id,
                 f.filename or "unnamed",
                 data,
-                _token(authorization),
+                user.token,
                 sessions,
                 intake_store,
             )
@@ -440,14 +488,14 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_intake_transition(
         intake_id: str,
         body: IntakeTransitionBody,
-        authorization: str | None = Header(default=None),
+        user: CurrentUser,
     ) -> dict[str, object]:
         return _intake_call(
             intake_transition,
             intake_id,
             body.to,
             body.note,
-            _token(authorization),
+            user.token,
             sessions,
             intake_store,
         )
@@ -456,13 +504,13 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     def post_thread_decision(
         intake_id: str,
         body: ThreadDecisionBody,
-        authorization: str | None = Header(default=None),
+        user: CurrentUser,
     ) -> dict[str, object]:
         return _intake_call(
             thread_decision,
             intake_id,
             body.decision,
-            _token(authorization),
+            user.token,
             sessions,
             intake_store,
         )
@@ -484,76 +532,56 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
             raise HTTPException(422, str(exc)) from None
 
     @app.get("/mappings/domains")
-    def get_domains(authorization: str | None = Header(default=None)) -> dict[str, object]:
-        return _mapping_call(list_domains, _token(authorization), sessions)
+    def get_domains(user: CurrentUser) -> dict[str, object]:
+        return _mapping_call(list_domains, user.token, sessions)
 
     @app.get("/mappings/grid/{domain_id}")
-    def get_grid(
-        domain_id: str, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
-        return _mapping_call(
-            mapping_grid, domain_id, _token(authorization), sessions, mapping_store
-        )
+    def get_grid(domain_id: str, user: CurrentUser) -> dict[str, object]:
+        return _mapping_call(mapping_grid, domain_id, user.token, sessions, mapping_store)
 
     @app.get("/mappings/options")
-    def get_options(authorization: str | None = Header(default=None)) -> dict[str, object]:
-        return _mapping_call(mapping_options, _token(authorization), sessions, mapping_store)
+    def get_options(user: CurrentUser) -> dict[str, object]:
+        return _mapping_call(mapping_options, user.token, sessions, mapping_store)
 
     @app.post("/mappings/changeset")
-    def post_changeset(
-        body: ChangesetBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
-        return _mapping_call(
-            draft_changeset, body.entries, _token(authorization), sessions, mapping_store
-        )
+    def post_changeset(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+        return _mapping_call(draft_changeset, body.entries, user.token, sessions, mapping_store)
 
     # ── O24 SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier),
     # moved to the S4 draft buffer: drafting writes ROWS to var/mapping.db and
     # returns a receipt; promotion emits the diff to apply on a branch. The
     # server still writes no committed file — git is the only commit target. ──
     @app.post("/mappings/overrides/draft")
-    def post_override_draft(
-        body: ChangesetBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def post_override_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
         return _mapping_call(
             draft_override,
             body.entries,
-            _token(authorization),
+            user.token,
             sessions,
             mapping_store,
             draft_id=body.draft_id,
         )
 
     @app.get("/mappings/drafts")
-    def get_drafts(
-        domain: str | None = None, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
-        return _mapping_call(list_drafts, _token(authorization), sessions, mapping_store, domain)
+    def get_drafts(user: CurrentUser, domain: str | None = None) -> dict[str, object]:
+        return _mapping_call(list_drafts, user.token, sessions, mapping_store, domain)
 
     @app.post("/mappings/drafts/{draft_id}/promote")
-    def post_promote_draft(
-        draft_id: str, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
-        return _mapping_call(
-            promote_draft, draft_id, _token(authorization), sessions, mapping_store
-        )
+    def post_promote_draft(draft_id: str, user: CurrentUser) -> dict[str, object]:
+        return _mapping_call(promote_draft, draft_id, user.token, sessions, mapping_store)
 
     @app.get("/mappings/overrides/report")
-    def get_override_report(authorization: str | None = Header(default=None)) -> dict[str, object]:
-        return _mapping_call(
-            source_corrections_report, _token(authorization), sessions, mapping_store
-        )
+    def get_override_report(user: CurrentUser) -> dict[str, object]:
+        return _mapping_call(source_corrections_report, user.token, sessions, mapping_store)
 
     # ── K9/K11 app-code defined-mapping drafting (gate seal-app-ref-edge-
     # reshape §E1/§E2/§G7): the steward cascade drafts store rows; the
     # artifact is the COMPLETE updated committed file. Server writes nothing;
     # the K8 loader stays the only graph writer (§E3). ──
     @app.post("/mappings/app-code/draft")
-    def post_app_code_draft(
-        body: ChangesetBody, authorization: str | None = Header(default=None)
-    ) -> dict[str, object]:
+    def post_app_code_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
         return _mapping_call(
-            draft_app_code_mapping, body.entries, _token(authorization), sessions, mapping_store
+            draft_app_code_mapping, body.entries, user.token, sessions, mapping_store
         )
 
     # K7 §B2 tier-3 readback (lifted from wip/k9-laptop at J30): dual-coded was
@@ -561,11 +589,9 @@ def create_app(runner=None, store: InMemorySessionStore | None = None):
     # reader or the condition is decorative.
     @app.get("/mappings/app-code/migrations")
     def get_app_code_migrations(
-        authorization: str | None = Header(default=None),
+        user: CurrentUser,
     ) -> dict[str, object]:
-        return _mapping_call(
-            app_code_migration_report, _token(authorization), sessions, mapping_store
-        )
+        return _mapping_call(app_code_migration_report, user.token, sessions, mapping_store)
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin
     # of docs/design/ui-exploration/wf-mapping-01.html until the O8 React shell exists.

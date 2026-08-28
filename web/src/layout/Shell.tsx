@@ -57,12 +57,21 @@ function ShellGrid({ session, persona, env, onEnvChange, onSignOut }: ShellProps
         gridTemplateAreas: '"banner banner banner" "header header header" "aside main sidebar"',
       }}
     >
+      {/* O69 re-decided this banner rather than leaving it standing. It read
+          "MOCK AUTH ... no real access control ... access path pending the O1
+          ADR", and by 2026-08-28 all three claims were false: the access path
+          was ruled in ADR 0005, sign-in proves a secret, and the session
+          expires server-side. What remains true is narrower and is what the
+          band now says — the identities are synthetic, and their secrets are
+          machine-local rather than issued by any directory. Muted, not yellow:
+          a warning colour for a condition that is no longer a defect trains
+          people to ignore the banner that matters. */}
       <div
         style={{ gridArea: 'banner' }}
-        className="border-b border-yellow/45 bg-yellow/10 px-3 py-1.5 text-center font-mono text-[11px] text-yellow"
+        className="border-b border-edge bg-bg-2 px-3 py-1.5 text-center font-mono text-[11px] text-muted"
       >
-        ◉ MOCK AUTH · SYNTHESIZED — persona {persona.id} ({session.role}) · no real access control · access
-        path pending the O1 ADR
+        SYNTHETIC ACCOUNT · {persona.id} ({session.role}) · session authenticated by drydocs-api ·
+        credentials are machine-local, not a directory
       </div>
       <div style={{ gridArea: 'header', height: 'var(--shell-header-h)' }} className="min-w-0">
         <Header session={session} persona={persona} env={env} onEnvChange={onEnvChange} onSignOut={onSignOut} />

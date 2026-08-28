@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol
 
+from drydocs_api.credentials import BOOTSTRAP_HINT, CredentialStore
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.queries import named_query, validate_params
 from drydocs_api.routing import database_for
@@ -41,20 +42,82 @@ class Forbidden(PermissionError):
     """Raised when the session's role may not use the endpoint."""
 
 
-def login(persona_id: str, store: InMemorySessionStore) -> dict[str, str]:
-    """Auth stub: exchange a synthetic persona id for a server session.
-    (Company-side this whole handler is replaced by the OIDC code-for-token
-    exchange — ADR 0005 Evidence.)"""
+class BadCredentialsError(PermissionError):
+    """Raised when an identity or its secret does not check out.
+
+    ONE error for both halves, deliberately. A caller must not be able to tell
+    "no such account" from "wrong secret", because the difference is what turns
+    a login endpoint into an account enumerator.
+    """
+
+
+class CredentialsNotConfiguredError(PermissionError):
+    """Raised when this machine has no credential file yet — the fresh-clone
+    state. Distinct from a bad secret because the fix is different: there is
+    nothing to get right until somebody bootstraps an account."""
+
+
+def login(
+    persona_id: str,
+    secret: str,
+    store: InMemorySessionStore,
+    credentials: CredentialStore,
+) -> dict[str, str]:
+    """Exchange proof of a secret for a server session.
+
+    The order matters. The secret is checked FIRST, against a store that pays
+    the same derivation cost for an unknown id as for a real one, so neither
+    the response nor its timing says whether the identity exists. Only then is
+    the persona resolved and a token issued.
+
+    Company-side this whole handler is replaced by the OIDC code-for-token
+    exchange (ADR 0005 Evidence); everything above it — the session store, the
+    role resolution, every route guard — is reused unchanged, which is the
+    point of putting role resolution on the server in the first place.
+    """
+    if not credentials.is_bootstrapped:
+        raise CredentialsNotConfiguredError(BOOTSTRAP_HINT)
+    if not secret or not credentials.verify(persona_id, secret):
+        raise BadCredentialsError("invalid credentials")
     session = store.issue(persona_id)
-    return {"token": session.token, "persona_id": session.persona_id, "role": session.role}
+    return {
+        "token": session.token,
+        "persona_id": session.persona_id,
+        "role": session.role,
+        "expires_at": session.expires_at,
+    }
 
 
 def logout(token: str, store: InMemorySessionStore) -> None:
     store.revoke(token)
 
 
-def _authenticate(token: str, store: InMemorySessionStore) -> Session:
-    return store.resolve(token)  # raises InvalidTokenError
+def authenticate(token: str, store: InMemorySessionStore) -> Session:
+    """Resolve a bearer token to its session, or raise.
+
+    The single authentication point for the whole API. ``store.resolve`` owns
+    the expiry check, so no caller re-derives it and none can skip it; both
+    unknown and expired raise ``InvalidTokenError`` (the expired case a
+    subclass), which every route already maps to 401. This is the callable the
+    FastAPI ``CurrentUser`` dependency wraps in ``app.py``.
+    """
+    return store.resolve(token)
+
+
+#: Retained name for the handlers below, which read better with the private
+#: spelling at the call site.
+_authenticate = authenticate
+
+
+def require_role(session: Session, *allowed: str) -> Session:
+    """Assert the session holds one of ``allowed``; the basis of the admin-only
+    and steward-or-admin route dependencies."""
+    if session.role not in allowed:
+        raise Forbidden(
+            f"role '{session.role}' may not use this endpoint "
+            f"(requires: {', '.join(sorted(allowed))})"
+        )
+    return session
 
 
 def run_named(

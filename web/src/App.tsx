@@ -1,6 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { canAccessIntake, currentSession, personaFor, PERSONAS, signIn, signOut, type Session } from './lib/auth'
+import {
+  canAccessIntake,
+  currentSession,
+  personaFor,
+  PERSONAS,
+  SESSION_REJECTED_EVENT,
+  signIn,
+  signOut,
+  type Session,
+} from './lib/auth'
 import SignIn from './components/SignIn'
 import Shell, { type EnvName } from './layout/Shell'
 import OverviewRoute from './routes/OverviewRoute'
@@ -27,21 +36,51 @@ import './App.css'
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
 // design-review's 🔴 #1 finding against the old `#/...` hash router) replace
-// the O2 hash-based App. Mock auth (lib/auth.ts) is unchanged: it still gates
-// everything behind a persona picker, pending the O1 access-path ADR; only
-// what happens AFTER sign-in is new.
+// the O2 hash-based App. O69 replaced the mock: sign-in now proves a secret to
+// drydocs-api (lib/auth.ts), and a session the server refuses drops the whole
+// console back here rather than leaving a shell whose panels all 401.
 export default function App() {
-  const [session, setSession] = useState<Session | null>(() => {
-    // DEV-only headless-verification affordance (the verify skill drives
-    // pages via `?as=<personaId>`): baked OUT of production bundles by the
-    // import.meta.env.DEV constant, same construction as boltAllowed().
-    if (import.meta.env.DEV) {
-      const as = new URLSearchParams(window.location.search).get('as')
-      if (as && PERSONAS.some((p) => p.id === as)) return signIn(as)
-    }
-    return currentSession()
-  })
+  const [session, setSession] = useState<Session | null>(() => currentSession())
   const [env, setEnv] = useState<EnvName>('Dev')
+
+  // DEV-only headless-verification affordance (the verify skill drives pages
+  // via `?as=<personaId>`), baked OUT of production bundles by the
+  // import.meta.env.DEV constant, same construction as boltAllowed(). It is a
+  // real sign-in now, so it needs a real secret: VITE_DEV_CONSOLE_SECRET, set
+  // in the dev shell beside the one scripts/set_console_credential.py stored.
+  // No default and no fallback — a baked-in dev password is the exact thing a
+  // credential step exists to remove.
+  useEffect(() => {
+    if (!import.meta.env.DEV || session) return
+    const as = new URLSearchParams(window.location.search).get('as')
+    if (!as || !PERSONAS.some((p) => p.id === as)) return
+    const secret = import.meta.env.VITE_DEV_CONSOLE_SECRET as string | undefined
+    if (!secret) {
+      console.warn(
+        `?as=${as} needs VITE_DEV_CONSOLE_SECRET set to that account's console secret; ` +
+          'showing the sign-in screen instead',
+      )
+      return
+    }
+    let cancelled = false
+    void signIn(as, secret)
+      .then((s) => {
+        if (!cancelled) setSession(s)
+      })
+      .catch((err: unknown) => console.warn(`?as=${as} sign-in refused:`, err))
+    return () => {
+      cancelled = true
+    }
+  }, [session])
+
+  // One 401 anywhere ends the session everywhere. Without this the shell keeps
+  // rendering while every request behind it fails, which reads as a broken
+  // console rather than an expired one.
+  useEffect(() => {
+    const drop = () => setSession(null)
+    window.addEventListener(SESSION_REJECTED_EVENT, drop)
+    return () => window.removeEventListener(SESSION_REJECTED_EVENT, drop)
+  }, [])
 
   function handleSignIn(s: Session) {
     setSession(s)

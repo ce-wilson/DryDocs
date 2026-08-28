@@ -5,7 +5,11 @@
   (V1 coverage rule, 2026-08-04). The `Module:` line is what
   `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
   makes about itself, never inferred from the filename.
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-25**
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-28
+  adds the credential step (backlog O69):** sign-in proves a secret to drydocs-api,
+  sessions expire, and a fresh clone has no accounts until
+  `scripts/set_console_credential.py` runs. The Rev 2 procedure is otherwise
+  unchanged. **Rev 2, 2026-08-25**
   (Rev 1, 2026-07-21, reflected commit `6766b4c`: post-O9 shell + Explorer, post-O11
   QuerySpec registry/export, post-O22 glyph set; six Explorer frames incl. the SME
   Folders / App-codes mapping views. **Rev 2 adds the ADK agent server** — the fourth
@@ -14,7 +18,8 @@
   diagnosing as a bare "Failed to fetch". Spec count refreshed 7 -> 35.)
 - **Classification:** Internal-Public (localhost ports and synthetic persona ids only —
   all already present in committed public code; NO credentials — Neo4j settings live
-  only in the repo-root `.env`, never here)
+  only in the repo-root `.env`, and console secrets only in a machine-local
+  `console-credentials.json` under `internal-local/`; neither is ever quoted here)
 - **Audience:** anyone bringing the DryDocs web console up locally — the UI stack is
   four processes: Neo4j (optional, for live frames), drydocs-api, the ADK agent server
   (only the Ask module needs it), and the Vite dev server
@@ -89,9 +94,25 @@ prerequisite only for live frames. Company-side deployment (OIDC, GHE) is not co
    belongs in the root `.env` and should be set in ONE place, and a name set to a
    non-empty value in `agents/.env` WINS — so a stale override there is invisible from
    the root file and is worth checking first when the agent reaches the wrong database.
-6. **Optional — a READY graph** per the companion startup-refresh runbook, if you want
+6. **A console credential on this machine** (O69). Sign-in proves a secret now, and a
+   fresh clone has none, so the first attempt on a new machine is refused with
+   `no console credentials are configured on this machine`:
+   ```powershell
+   poetry run python scripts/set_console_credential.py asmith7734
+   poetry run python scripts/set_console_credential.py --list
+   ```
+   The secret is prompted for with no echo, hashed with scrypt, and written to a
+   `console-credentials.json` under `internal-local/` — gitignored, never committed,
+   never ported, and NOT under `var/` (deleting `var/` is safe precisely because
+   everything in it rebuilds from committed text; a credential has no committed
+   source, so it would not). That file is absent on a fresh clone by design, which is
+   why it is named this way rather than as a path: a runbook that spells out a path
+   is asserting the path is there. Set one secret per persona you intend to sign in
+   as. Nothing here reaches the browser: the browser only ever holds the opaque token
+   the API returns.
+7. **Optional — a READY graph** per the companion startup-refresh runbook, if you want
    the Explorer frames to show live rows instead of the demo fallback.
-7. **Optional — `.claude/launch.json`** carries the `drydocs-web` dev-server entry for
+8. **Optional — `.claude/launch.json`** carries the `drydocs-web` dev-server entry for
    the Claude Code browser preview; no action needed, it is committed.
 
 <!-- anchor: startup -->
@@ -131,10 +152,25 @@ From OFF to READY. Run from the repo root; each step states its success check.
    *Success:* Vite prints `Local: http://localhost:5173/`; the sign-in screen renders
    at that URL. The API's CORS allow-list is exactly `localhost:5173` (dev) and
    `localhost:4173` (preview) — serve from those ports or frames will fail CORS.
-5. **Sign in:** pick a mock persona (synthetic, committed in `web/src/lib/auth.ts` /
-   `drydocs_api/personas.py`): `jdoe4821` (user), `asmith7734` (admin — raw-Cypher
-   console + `/admin` surfaces), `kchen2190` (steward — `/mappings`). *Success:* the
-   shell renders with the aside nav; the header shows the persona chip.
+5. **Sign in:** choose an account, then enter its secret. The identities are synthetic
+   and committed (`web/src/lib/auth.ts` / `drydocs_api/personas.py`): `jdoe4821` (user),
+   `asmith7734` (admin — raw-Cypher console + `/admin` surfaces), `kchen2190` (steward —
+   `/mappings`), `sme` (intake). The SECRETS are machine-local, from Prerequisite 6.
+   *Success:* the shell renders with the aside nav; the header shows the persona chip.
+   A refusal says only `invalid credentials` — the API deliberately does not say whether
+   the account or the secret was wrong, because the difference is what turns a login
+   route into an account enumerator.
+
+   **Headless verification (`?as=<personaId>`)** is a real sign-in now, so it needs a
+   real secret: set `VITE_DEV_CONSOLE_SECRET` in the shell that runs `npm run dev` to
+   the secret you stored for that account. There is no default and no fallback — a
+   baked-in dev password is the exact thing a credential step exists to remove. Without
+   it the affordance logs a warning to the browser console and shows the sign-in screen.
+   It stays DEV-only, baked out of production bundles by `import.meta.env.DEV`.
+
+   Sessions expire after 8 hours (`drydocs_api/sessions.DEFAULT_TTL`) and are held in
+   memory, so an API restart also ends them. Either way the console returns to this
+   screen by itself rather than rendering a shell whose every panel 401s.
 6. **Production-build variant** (instead of step 4, when verifying the deployable
    bundle):
    ```powershell
@@ -238,7 +274,10 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 | `tsc: Cannot find module 'react-router-dom'` (or any dep) on build | `web/node_modules` missing/stale on this machine | `npm install --prefix web` |
 | Browser console CORS errors on frame fetch | Console served from a port outside the API allow-list | Use 5173 (dev) or 4173 (preview); other origins need an `app.py` CORS row (reviewed change) |
 | `/specs` missing a spec you just added | uvicorn serving the import-time registry (no `--reload`) | Restart uvicorn, or dev with `--reload` (2026-07-21 incident, twice) |
-| Every request 401 after an API restart | In-memory session store dropped; stale token | Expected — the adapter retries once automatically; persistent 401 → sign out/in |
+| Sign-in refused with `no console credentials are configured on this machine` | Fresh clone or a new machine: the credential file does not exist yet, so there are no accounts | Prerequisite 6 — `poetry run python scripts/set_console_credential.py <persona-id>` |
+| Sign-in refused with `invalid credentials` | Wrong secret, or no secret stored for that account. The message is the same either way ON PURPOSE | `scripts/set_console_credential.py --list` shows which ids have one; re-run it for that id to rotate |
+| Signed out mid-session, back at the sign-in screen | The session expired (8h) or the API restarted and dropped the in-memory store. Since O69 the client no longer logs itself back in — it cannot, without the secret — so a 401 ends the session instead of being papered over | Sign in again. This is the designed behaviour, not a fault |
+| `?as=<persona>` shows the sign-in screen instead of signing in | `VITE_DEV_CONSOLE_SECRET` is unset in the Vite shell, or does not match that account's stored secret | Set it in the shell running `npm run dev` and restart Vite (env is inlined at startup); the browser console carries the reason |
 | Tabs all show demo fallback despite a running graph | Graph is up but EMPTY (specs ran, 0 rows), or `.env` points at the wrong Bolt port | Companion runbook Refresh section; check `.env` `NEO4J_URI` against `docker port` |
 | Export downloads but manifest fetch 404s | Manifests register only when the stream COMPLETES; a cancelled download never registers | Re-export; a served manifest always describes a full file (by design) |
 | Port 8001/5173/8000 already in use | Orphaned server from a previous session — a killed `npm`/shell parent leaves the `node`/`python` CHILD listening, so the port looks taken by nothing | `Get-CimInstance Win32_Process -Filter "ProcessId=<pid from netstat -ano>" | Select CommandLine` to identify it, `Stop-Process -Id <pid> -Force`, then restart. Start Vite with `--strictPort` so it fails loudly instead of drifting to 5174, which is OUTSIDE the API's CORS allow-list |

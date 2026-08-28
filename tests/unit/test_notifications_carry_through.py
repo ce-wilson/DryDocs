@@ -37,6 +37,7 @@ from common import agent_run_writer  # noqa: E402
 from graph_qa.envelope import Envelope, Metrics, StepRecord  # noqa: E402
 
 from drydocs_api import handlers  # noqa: E402
+from drydocs_api.credentials import CredentialStore  # noqa: E402
 from drydocs_api.query_specs import QUERY_SPECS  # noqa: E402
 from drydocs_core.notifications import Neo4jNotification, from_summary, to_payload  # noqa: E402
 
@@ -147,7 +148,9 @@ class _RichRunner(_PlainRunner):
 
 def test_handlers_attach_diagnostics_and_tolerate_plain_runners() -> None:
     store = handlers.InMemorySessionStore()
-    token = handlers.login("asmith7734", store)["token"]
+    creds = CredentialStore()
+    creds.set("asmith7734", "a-test-console-secret")
+    token = handlers.login("asmith7734", "a-test-console-secret", store, creds)["token"]
     rich = handlers.run_raw(
         "MATCH (n:NoSuchLabelR21) RETURN count(n) AS n", token, store, _RichRunner()
     )
