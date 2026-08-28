@@ -8,7 +8,7 @@ phase: 11
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - N12
 - N13
@@ -25,5 +25,26 @@ acceptance: |
   The second build the signed pending-source-correction gate authorized (config/gate-log.md 2026-08-18, 12/12; N13): the load that consumes a source carrying an overridden value notices when the source has caught up. (a) FIRST CONCRETE SURFACE, NAMED: the seal-contact override domain -- drydocs/loaders/seal_contacts.py reading the SEAL contact extract against the `seal_contact_override` rows O24 materializes from config/overrides/seal-contact-overrides.csv. When a loaded SEAL row's holder now EQUALS the override's corrected holder for the same (app_seal_id, role_name), that override is surfaced as a RETIREMENT CANDIDATE. (b) TWO HANDS, STRUCTURALLY (§B2/§B3): the load PROPOSES and a STEWARD confirms. It rides the draft mechanism that already exists rather than inventing a second one -- drydocs_core.mapping_store.add_draft and the commit-by-replace override draft path -- so an unattended run can only ever leave an OPEN DRAFT. Auto-retire was offered at the gate and DECLINED (coincidental agreement must not silently retire a correction that was masking a different defect), so a test asserts a detection run leaves every `seal_contact_override.status` value untouched. (c) HISTORY IS KEPT (§B4): confirming a candidate ARCHIVES the override row dated with its agreement evidence (which load run, which source value, observed when) -- the row is never deleted and the correction stays readable afterwards. Today's status CHECK is ('active','corrected-in-seal'); extending that enum and/or the evidence columns is part of this item and rides the committed-CSV -> mapping.db materialization, so the committed list stays the source of record and the store stays rebuildable. (d) FENCES: the detection writes NO graph (§A3; O24's rule that overrides never write the graph is unchanged), never fails a load, never blocks CI, and never treats "no candidates" as an error (§C3 class). The K7 §E2 permanent-by-nature domains are not scanned at all -- the app-code mapping store has no corrected-in-source lifecycle BY RULING (§D1). (e) SCOPE FENCE ON UI: this item builds the detection, the proposal record and the read path a surface can consume. Rendering the candidate flag on the /mappings pane or as a column in N14's union report is a FOLLOW-ON, not this item. Tests cover agreement detected, disagreement ignored, an already corrected-in-seal row skipped, and the no-flip assertion. Full suite green.
 notes: |
   Groomed 2026-08-18 from Idea-134 as N14's sibling. TWO ITEMS, NOT ONE, because the gate's two authorized builds land in different modules -- a report/export surface versus loader-side detection -- and each is independently startable; neither blocks the other, and both are p1 per the dispatch. MODULE, choice recorded: drydocs-load because the detection owns a RUN CADENCE (it happens during a load), which is the MODULE_MAP placement test; the store schema and its helpers land in drydocs_core/mapping_store.py where the store already lives, and any endpoint or pane exposure is drydocs-api / drydocs-web follow-on work. SONNET, NOT FABLE, deliberately: this DOES change a store schema, but the gate already made that decision (§B2/§B4, signed 12/12 2026-08-18) and the build implements a signed ruling against a written pass/fail test -- do not re-tier it on the schema-touch alone. HITL status: no new gate; the only thing that would need one is graph-side pending-ness, which §A3 fences out. VERIFIED AT THE GROOM, not recalled: the draft mechanism (add_draft plus the commit-by-replace override draft path), the status CHECK ('active','corrected-in-seal') and the thin seal_contacts loader shape were all read out of the tree.
+  DONE 2026-08-28 (desktop, Lane A build session, worktree). BUILT in
+  drydocs/loaders/seal_contacts.py: (a) the loader tees (app_id, role_name) ->
+  employee_sid through to_params and runs detection post-load, best-effort -- the load's
+  success is never hostage to the proposal channel; candidates = ACTIVE overrides whose
+  corrected holder now equals the loaded source holder. (b) TWO HANDS STRUCTURALLY: the
+  proposal is ONE open draft (domain seal-contact-retirement) via core add_draft --
+  distinct domain so the override promote path cannot misread it; there is no UPDATE
+  statement in the module and the no-flip test asserts statuses byte-identical across a
+  detection run. Idempotent per candidate (an open retirement draft suppresses
+  re-proposal, so a nightly load accumulates one proposal, not one per run). (c) HISTORY:
+  three nullable agreement-evidence columns (run id, source value, observed on) added to
+  the committed CSV header + DDL + materialization -- store schema bumped v3->v4 with the
+  test pin moved deliberately; the archived-row round-trip is tested, the enum stays
+  two-valued (corrected-in-seal IS the caught-up end state; evidence columns say how it
+  was confirmed). (d) no graph write, never fails a load, no-candidates is a clean zero;
+  permanent-by-nature stores unreachable (detection queries seal_contact_override only).
+  (e) read path = the existing open_drafts/draft_payloads surface; rendering = follow-on
+  as fenced. 8 tests in test_seal_agreement.py, offline (in-memory store build).
+  Suite 2598 passed / ruff check + format clean (venue: worktree of origin/main, MSI
+  desktop). Store connection helper mirrors the O14 rebuild chain core-side -- the
+  component never imports drydocs_api.
 annotations:
   priority: directed at dispatch 2026-08-18 — SME-confirmed, not proposed

@@ -94,7 +94,9 @@ def test_meta_records_source_hashes():
     conn = build(":memory:")
     try:
         meta = dict(conn.execute("SELECT key, value FROM meta"))
-        assert meta["schema_version"] == "drydocs.mapping-store.v3"  # v3 = the K18 row_kind format
+        assert (
+            meta["schema_version"] == "drydocs.mapping-store.v4"
+        )  # v4 = N15 agreement-evidence columns (v3 was the K18 row_kind format)
         assert "source:taxonomy-ontology-map.yaml" in meta
         assert "source:relationship_vocabulary.yaml" in meta
     finally:

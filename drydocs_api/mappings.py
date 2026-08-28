@@ -146,6 +146,11 @@ OVERRIDE_HEADER = (
     "authored_by",
     "authored_on",
     "status",
+    # N15 §B4 — agreement evidence, written only at steward CONFIRMATION of a
+    # retirement candidate (which run, which source value, observed when).
+    "agreement_run_id",
+    "agreement_source_value",
+    "agreement_observed_on",
 )
 
 # The defined-mapping list's committed column order (K9). A NEW file, so no
