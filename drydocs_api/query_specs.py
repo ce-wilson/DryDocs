@@ -665,10 +665,11 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "of :Document nodes joined by the gate-confirmed DESCRIBES edge. A ZERO "
                 "HERE MEANS NO EDGE IN THIS DATABASE AND NOTHING MORE: "
                 "config/doc-source-registry.yaml is the declaration, and a corpus "
-                "targeting a database this spec cannot read (dddocs, unprovisioned "
-                "pending G32) is absent by TOPOLOGY, not by defect. `drydocs "
-                "docs-coverage` is the multi-database reconciliation a single-database "
-                "spec cannot perform."
+                "targeting a database this spec cannot read is absent by TOPOLOGY, "
+                "not by defect (historical case: the corpus once declared the "
+                "superseded `dddocs`, rejected at the G32/G102 fold 2026-08-18; "
+                "every entry now targets `drydocs`). `drydocs docs-coverage` is the "
+                "multi-database reconciliation a single-database spec cannot perform."
             ),
             cypher=(
                 "MATCH (sp:SoftwareProduct) WHERE NOT sp:SchemaMeta "

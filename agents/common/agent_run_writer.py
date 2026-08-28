@@ -8,10 +8,11 @@ session, targeting the ruled database — ``drydocs``, and nothing else
 (refused here, not just documented: see ``agent_run_db`` below).
 
 THE RULING INVERTED AT THE G102 FOLD (2026-08-18) and this docstring is the
-correction. It read ``ddcontext``, NEVER ``drydocs`` — the pre-fold rule —
-while ``DEFAULT_AGENT_RUN_DB`` twenty lines below already said ``drydocs``.
-The defect to refuse is now a STALE env var still pointing at the retired
-``ddcontext``, which would write telemetry into a database nothing reads.
+correction. It read the superseded ``ddcontext`` name, NEVER ``drydocs`` —
+the pre-fold rule — while ``DEFAULT_AGENT_RUN_DB`` twenty lines below
+already said ``drydocs``. The defect to refuse is now a STALE env var
+still pointing at the retired ``ddcontext``, which would write telemetry
+into a database nothing reads.
 
 Privacy rules carried in the props, not the caller's discipline:
 
