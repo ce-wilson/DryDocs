@@ -9,7 +9,7 @@ phase: 9
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: blocked
 depends_on: []
 inputs:
 - drydocs/pat_projection.py
@@ -39,3 +39,19 @@ notes: |
   Epic seal-attribution / module drydocs-load / phase 9 follows G82 exactly (same epic, same module, same phase, same files). Model sonnet rather than fable: clauses (a), (c) and (d) are pass/fail engineering with tests, and nothing here changes an ontology edge or a boundary. `depends_on: []` because (a) and (c) are startable today; the (b)/(d) artifact dependency is handled by clause (g) rather than by a dependency on an id that does not exist in this repo.
 
   The generalisation is deliberately NOT scoped here: "which other loaders make a believed header authoritative and test it against itself" is the same disease, and belongs in its own sweep once this one worked example is fixed.
+  PARTIAL CLOSE 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree
+  branch). (a) and (c) done: project_rows now raises ProjectionError for ANY mapped header
+  absent from the raw file, not only REQUIRED_FIELDS -- closing the defect class where an
+  export with a differently-spelled seal_ids column writes zero application edges while
+  reporting success. A new ACKNOWLEDGED_ABSENT dict (field -> reason, the KNOWN_DROPPED
+  idiom) is the one documented exception mechanism; jira_board_id is its first and only
+  entry, kept mapped because it verifiably points at a header ("JIRA Board") that lives in
+  a sibling PAT export, not TEAM_DETAILS_REPORT. ProjectionReport.missing_optional renamed
+  to acknowledged_absent -- no third quiet path remains. Two new tests cover the loud path
+  and the acknowledged path; full unit suite green. BLOCKED for the rest: (b), the (d)
+  re-pin, and (e) require the company G82 close-out header list, not yet landed in this
+  tree (searched docs/reviews/, internal/, internal-local/). Unblock condition: that
+  artifact lands (or its internal-local/ path is recorded); re-pin only from it, never from
+  relay -- guessing spellings is the defect this item exists to prevent. The (d) structural
+  guard (fixture headers drawn from the recorded list, not the module constant) also waits
+  on that list; a guard against nothing would be decoration.
