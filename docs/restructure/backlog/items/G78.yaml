@@ -42,3 +42,8 @@ notes: |
   skip. repo-README + MODULE_MAP updated. Suite 2274 passed. G81 (paths declared in config, the
   overlap invariant, no silent data root) is the sibling one layer down and per its own notes is
   planned with the architect persona alongside G79 -- not picked up here.
+  DISCHARGED 2026-08-27 (laptop, G121): the "`load --csv` untouched" caveat above is closed. The
+  verb now resolves its path through data_zones.read_zone_containing(): a declared read zone loads
+  and the run record names the zone; an undeclared path exits 2 naming landing-zones, unless
+  --allow-unzoned is passed, and that override is recorded in the run record and the disk log
+  (flag, path, operator). Guarded by tests/unit/test_load_csv_acquisition.py.

@@ -101,10 +101,15 @@ This module has no service. "Startup" is running a single loader deliberately.
    sequence they belong to is the load map, not this page.
 
 3. **Run ONE loader** — most take `--csv` for a specific file, and the Control-M chain
-   takes `--use-oracle` and scoping flags:
+   takes `--use-oracle` and scoping flags. A `--csv` path must sit inside a declared
+   read zone (`drydocs landing-zones` lists them; declare a new drop in
+   `config/source-registry.yaml` under `acquisition.drop_dir`, or in
+   `config/data-zones.yaml`). An undeclared path exits 2 unless `--allow-unzoned` is
+   passed — and that override is recorded in the run record and the disk log, never
+   silently (G121):
    ```powershell
-   poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv   # a CSV loader: one file, one verb
-   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"              # the Control-M chain, Oracle-scoped
+   poetry run drydocs load catalog_lobs --csv "$env:DRYDOCS_DATA_ROOT/catalog/catalog_lobs.csv"  # a CSV loader: one file, from a declared zone
+   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"                          # the Control-M chain, Oracle-scoped
    ```
    Success: the run envelope printed at close, with `'status': 'OK'`.
 

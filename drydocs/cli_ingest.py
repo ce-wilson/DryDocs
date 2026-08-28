@@ -11,6 +11,7 @@ monkeypatch ``drydocs.cli._client`` keep working.
 
 from __future__ import annotations
 
+import getpass
 import uuid
 from collections.abc import Callable
 from dataclasses import asdict
@@ -49,6 +50,8 @@ from drydocs.cli import (
     _source_registry,
     console,
 )
+from drydocs_core.data_root import DataRootNotSetError
+from drydocs_core.data_zones import read_zone_containing
 from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.run_log import LoaderRunLog
 from drydocs_core.schema.supplements import (
@@ -117,12 +120,64 @@ def _client(database: str | None = None) -> Neo4jClient:
     return _root._client(database)
 
 
+def _csv_acquisition_meta(csv_path: Path, *, allow_unzoned: bool) -> dict[str, str]:
+    """G121: an acquisition route is DECLARED or it does not run.
+
+    `load --csv` gated the LOADER but never the PATH — the one acquisition
+    route landing-zones could not see. Resolution reuses the G81 runtime check
+    (:func:`drydocs_core.data_zones.read_zone_containing`); no second
+    resolution mechanism is minted. The returned dict is the loader's
+    ``run_meta`` — BaseLoader writes it onto the :JobRun AND into the disk
+    log's header, so a zoned load names its zone and an override is never
+    silent (flag, path, operator). The source-connection-and-run-identity
+    gate's E1 clause ratifies the rule as standing policy; if its E2 ruling
+    refuses overrides entirely, --allow-unzoned is removed in that build.
+    """
+    try:
+        zone = read_zone_containing(csv_path)
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    if zone is not None:
+        return {"acquisition_zone": zone.id, "acquisition_path": str(csv_path)}
+    if not allow_unzoned:
+        console.print(
+            f"[red]REFUSED: {csv_path} is outside every declared read zone.[/] "
+            "An acquisition route is declared or it does not run (G121). Declare the "
+            "drop in config/source-registry.yaml (acquisition.drop_dir) or "
+            "config/data-zones.yaml, then re-run — `drydocs landing-zones` lists what "
+            "is declared. To load it anyway pass --allow-unzoned; the override is "
+            "recorded in the run record and the disk log, never silently."
+        )
+        raise typer.Exit(2)
+    try:
+        operator = getpass.getuser()
+    except Exception:  # — some CI environments have no resolvable user
+        operator = ""
+    console.print(
+        f"[yellow]UNZONED OVERRIDE[/]: {csv_path} is outside every declared read zone "
+        f"— recorded in the run record and the disk log (operator: {operator or '<unknown>'})."
+    )
+    return {
+        "acquisition_override": "--allow-unzoned",
+        "acquisition_path": str(csv_path),
+        "acquisition_operator": operator,
+    }
+
+
 @app.command()
 def load(
     name: str = typer.Argument(..., help=f"Loader: {', '.join(LOADER_REGISTRY)}"),
     csv_path: Path | None = typer.Option(None, "--csv"),
     sql: str | None = typer.Option(None, "--sql"),
     batch_size: int = typer.Option(1000, "--batch-size"),
+    allow_unzoned: bool = typer.Option(
+        False,
+        "--allow-unzoned",
+        help="Accept a --csv path outside every declared read zone. The override is "
+        "recorded in the run record and the disk log (flag, path, operator) — "
+        "never silent.",
+    ),
 ) -> None:
     """Run a single loader against a CSV or Oracle source."""
     cls = LOADER_REGISTRY.get(name)
@@ -131,15 +186,17 @@ def load(
         raise typer.Exit(2)
     if name in LOADER_SOURCE:
         _gate_loader(cls)  # confirmed-gate (overlay-aware, D2) before any DB write
+    run_meta: dict[str, str] = {}
     if csv_path is not None:
-        adapter = _csv_adapter(csv_path)
+        adapter = _csv_adapter(csv_path)  # existence first: a typo reads as "not found"
+        run_meta = _csv_acquisition_meta(csv_path, allow_unzoned=allow_unzoned)
     elif sql is not None:
         adapter = _oracle_adapter(sql)
     else:
         console.print("[red]Provide either --csv or --sql.[/]")
         raise typer.Exit(2)
     with _client() as cli:
-        summary = cls(cli, adapter, batch_size=batch_size).load()
+        summary = cls(cli, adapter, batch_size=batch_size, run_meta=run_meta).load()
     console.print(summary.as_dict())
 
 
