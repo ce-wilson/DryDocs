@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-28T11:09:17",
+    "captured_at": "2026-08-28T13:13:01",
     "date": "20260828",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "55536e62",
-      "full": "55536e6280a9dd778eda4735554191e1ffcc9eed",
+      "commit": "ed91f03d",
+      "full": "ed91f03d7bb94b958b671eb40bba8b4d1d020ccb",
       "branch": "main",
-      "describe": "port-base-20260826-86-g55536e62",
-      "subject": "chore(plan): render the board after the advisor-dispatch batch (G111, J53, G114 done; K30 blocked)",
+      "describe": "port-base-20260826-110-ged91f03d",
+      "subject": "chore(plan): render the board, roadmap and load runbook after batch 2 (G115, G112, G113, J55, G93)",
       "dirty": true,
       "untracked_present": true,
       "pr": null
@@ -19286,6 +19286,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/company-prompt-python312-interpreter-standard.md",
+      "name": "company-prompt-python312-interpreter-standard.md",
+      "extension": ".md",
+      "rel_path": "internal/company-prompt-python312-interpreter-standard.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/context-graph-analysis",
       "name": "context-graph-analysis",
       "extension": "",
@@ -20060,10 +20069,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json",
-      "name": "drydocs-20260828.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260828-1109.json",
+      "name": "drydocs-20260828-1109.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260828.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260828-1109.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22638,6 +22647,15 @@
       "name": "test_provenance_migration.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_provenance_migration.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_publish_boundary_retired_org_acronym.py",
+      "name": "test_publish_boundary_retired_org_acronym.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_publish_boundary_retired_org_acronym.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26618,11 +26636,23 @@
     ],
     [
       "drydocs/drydocs_remediation/jira.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/jira.py",
       "drydocs/drydocs_remediation/detect.py"
     ],
     [
       "drydocs/drydocs_remediation/jira.py",
       "drydocs/drydocs_remediation/equivalence.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/jira.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/jira.py",
+      "drydocs/drydocs_remediation/transform.py"
     ],
     [
       "drydocs/drydocs_remediation/profile.py",
@@ -27131,6 +27161,26 @@
     [
       "drydocs/tests/unit/test_component_run_logs.py",
       "drydocs/drydocs_lineage/writer.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_remediation/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_remediation/detect.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_remediation/equivalence.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_remediation/formats.py"
+    ],
+    [
+      "drydocs/tests/unit/test_component_run_logs.py",
+      "drydocs/drydocs_remediation/jira.py"
     ],
     [
       "drydocs/tests/unit/test_component_run_logs.py",
@@ -28135,6 +28185,10 @@
     [
       "drydocs/tests/unit/test_remediation_handoff.py",
       "drydocs/drydocs_remediation/equivalence.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_handoff.py",
+      "drydocs/drydocs_remediation/formats.py"
     ],
     [
       "drydocs/tests/unit/test_remediation_handoff.py",
@@ -40330,6 +40384,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/company-prompt-python312-interpreter-standard.md"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/context-graph-analysis"
     ],
     [
@@ -40835,7 +40894,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260828-1109.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -42200,6 +42259,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_publish_boundary_retired_org_acronym.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_publish_boundary_values.py"
     ],
     [
@@ -43337,13 +43401,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2453,
-    "edges": 1234,
+    "files": 2455,
+    "edges": 1243,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2739,
+    "rels": 2741,
     "directories": 287
   }
 }
