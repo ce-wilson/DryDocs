@@ -247,7 +247,12 @@ def create_app(
     # lookup is not a cost worth trading that for.
     def _current_session(authorization: str | None = Header(default=None)) -> Session:
         try:
-            return authenticate(_token(authorization), sessions)
+            # ``creds`` is passed so a withdrawn account's token stops working on
+            # its NEXT request rather than at the end of its term (O75). This is
+            # the one caller that supplies it: every authenticated route enters
+            # through this dependency, so the check runs exactly once per
+            # request, at the door.
+            return authenticate(_token(authorization), sessions, creds)
         except InvalidTokenError:
             # Unknown and EXPIRED both land here; the client's answer to either
             # is the same, which is why sessions.ExpiredTokenError subclasses it.

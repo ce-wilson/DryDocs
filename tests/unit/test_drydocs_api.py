@@ -236,6 +236,41 @@ def test_fastapi_wiring_smoke():
     assert forbidden.status_code == 403
 
 
+def test_removing_an_account_shuts_its_admin_token_out_of_the_api():
+    """O75 at the HTTP surface, which is where the defect actually mattered.
+
+    The admin token reaches an admin-only route, the operator withdraws the
+    account, and the very next request over the same token is a 401 -- not a
+    403, because the session is no longer a session at all. Before O75 this
+    request succeeded for the rest of an eight-hour term.
+    """
+    fastapi = pytest.importorskip("fastapi")  # noqa: F841 — poetry install --with api
+    from fastapi.testclient import TestClient
+
+    from drydocs_api.app import create_app
+
+    creds = _credentials("morpheus", "mouse")
+    app = create_app(runner=FakeRunner(), store=InMemorySessionStore(), credentials=creds)
+    client = TestClient(app)
+
+    token = client.post("/login", json={"persona_id": "morpheus", "secret": TEST_SECRET}).json()[
+        "token"
+    ]
+    auth = {"Authorization": f"Bearer {token}"}
+
+    reached = client.post(
+        "/raw-cypher", json={"cypher": "MATCH (n) RETURN count(n) AS c"}, headers=auth
+    )
+    assert reached.status_code == 200, "the admin route must be reachable before withdrawal"
+
+    creds.remove("morpheus")
+
+    after = client.post(
+        "/raw-cypher", json={"cypher": "MATCH (n) RETURN count(n) AS c"}, headers=auth
+    )
+    assert after.status_code == 401
+
+
 # --- test-transport dependency (back-flow #4, 2026-07-28) --------------------
 
 

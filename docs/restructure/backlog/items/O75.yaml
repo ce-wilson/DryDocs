@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - O69
 - O73
@@ -42,5 +42,11 @@ notes: |
   WHY THIS IS THE ONE DEFECT IN A PATH THAT IS OTHERWISE RIGHT. The same review found the credential half stronger than its commercial peers on the property that usually goes wrong — a fresh clone ships no credential file, therefore no accounts, therefore every login is refused. What it does not have is the other half of an account lifecycle. An account you can create but cannot actually withdraw is a half-built control, and the operator has every reason to believe the withdrawal worked.
 
   WHY THE SCRIPT CANNOT DO IT. `set_console_credential.py` does not share a process with the API, and giving it one would violate the guard that forbids filesystem writes inside `drydocs_api` — the rule that exists because an endpoint able to rewrite the credential file is an endpoint able to grant itself an account. So the fix runs in the direction O73 already established: the API notices the file, on its own schedule, through a stat comparison it already performs.
+
+  BUILT 2026-08-28 (desktop). The check went to `handlers.authenticate`, the single callable the `CurrentUser` dependency wraps, and it drops the refused session rather than only refusing it. `has_identity` was added to `CredentialStore`, `ReloadingCredentialStore` and the `CredentialChecker` protocol -- narrower than `identities()`, whose own docstring forbids exposing the account list, because it answers yes or no about an id the caller already presented. `revoke_identity` landed on the session store as the explicit lever, though the resolve-time check is what makes withdrawal automatic. The `credentials` argument is optional so the framework-free layer stays provable with no FastAPI, and `app.py` is the one caller that supplies it.
+
+  VERIFIED LIVE on this desktop against uvicorn on port 8097 with a temporary credential file outside the repo, reaching the real `neo4jtest` container and the `drydocs` database (the admin route returned a node count of 3690, so this was not a stub). Sequence: morpheus signs in and reaches `/raw-cypher` with 200; the account is withdrawn through `set_console_credential.save_store`, the way an operator would; the SAME token then gets 401 on the next request, mouse's session is untouched and still gets 200, and morpheus can no longer log in. Before this item the second call returned 200. Eleven new guards, suite green, ruff clean.
+
+  ONE THING WORTH KNOWING FOR WHOEVER READS THIS NEXT: the refusal is a 401 carrying "invalid session", identical to an expired or unknown token. That is deliberate and matches the existing comment in `app.py` -- the client's answer to all three is the same, return to the sign-in screen -- but it does mean an operator debugging a withdrawal sees the same message as a stale tab.
 
   MODULE CHOICE, recorded because it was a judgement call. Every file this touches is under `drydocs_api/`, and a `drydocs-api` module exists. It is filed `drydocs-web` anyway, following O69, O73 and O74, which made the same call for the same console-authentication stream. A lone divergence would make the stream unfilterable by module for the sake of one row.

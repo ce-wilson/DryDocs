@@ -15,7 +15,7 @@ from drydocs_api.credentials import BOOTSTRAP_HINT, CredentialChecker
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.queries import named_query, validate_params
 from drydocs_api.routing import database_for
-from drydocs_api.sessions import InMemorySessionStore, Session
+from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError, Session
 
 
 class GraphRunner(Protocol):
@@ -92,7 +92,11 @@ def logout(token: str, store: InMemorySessionStore) -> None:
     store.revoke(token)
 
 
-def authenticate(token: str, store: InMemorySessionStore) -> Session:
+def authenticate(
+    token: str,
+    store: InMemorySessionStore,
+    credentials: CredentialChecker | None = None,
+) -> Session:
     """Resolve a bearer token to its session, or raise.
 
     The single authentication point for the whole API. ``store.resolve`` owns
@@ -100,8 +104,39 @@ def authenticate(token: str, store: InMemorySessionStore) -> Session:
     unknown and expired raise ``InvalidTokenError`` (the expired case a
     subclass), which every route already maps to 401. This is the callable the
     FastAPI ``CurrentUser`` dependency wraps in ``app.py``.
+
+    O75 ADDS THE SECOND REASON A VALID TOKEN STOPS WORKING: the account behind
+    it was withdrawn. Before, ``revoke`` was token-scoped and driven by logout,
+    and nothing re-read the credential store after login -- so removing an
+    account left its already-issued token resolving, at its full role, for the
+    remainder of an eight-hour term, while the operator who removed it had every
+    reason to believe access was gone. The check belongs HERE for the same
+    reason the expiry check belongs in ``resolve``: one place, so no route
+    re-derives it and no route can forget it.
+
+    The refused session is DROPPED rather than merely refused, so a withdrawn
+    account leaves nothing resolvable-looking in the store waiting on
+    ``purge_expired``.
+
+    ``credentials`` IS OPTIONAL, AND THAT IS A DECISION. This module is the
+    framework-free layer -- provable offline with no FastAPI installed -- and
+    its own handlers call ``authenticate`` a second time with only the session
+    store, having already passed the dependency at the door. ``app.py``'s
+    ``_current_session`` is the caller that always supplies it, so every
+    request through the API is checked exactly once, at the point a request
+    enters.
+
+    WHAT IT DOES NOT CATCH, stated so it is not mistaken for coverage: a
+    ROTATED secret. Rotation leaves the identity present, so an identity check
+    cannot see it; catching that needs a per-identity generation stamp the
+    credential file does not carry. Removal is the case an operator relies on
+    and the case this closes.
     """
-    return store.resolve(token)
+    session = store.resolve(token)
+    if credentials is not None and not credentials.has_identity(session.persona_id):
+        store.revoke(token)
+        raise InvalidTokenError("the account this session belongs to no longer exists")
+    return session
 
 
 #: Retained name for the handlers below, which read better with the private

@@ -98,6 +98,25 @@ class InMemorySessionStore:
     def revoke(self, token: str) -> None:
         self._sessions.pop(token, None)
 
+    def revoke_identity(self, persona_id: str) -> int:
+        """Drop EVERY session held by one persona; returns how many went (O75).
+
+        The explicit lever behind account withdrawal. It is not what makes
+        withdrawal work -- ``handlers.authenticate`` refuses and drops a
+        withdrawn account's session on its next request, so the common path
+        needs no coordination at all -- but a caller that already knows an
+        account is gone should not have to wait for each of its tokens to be
+        presented before the store stops holding them.
+
+        Named for the persona rather than the token because that is the unit a
+        withdrawal is expressed in. This store never learns WHY: it is told an
+        identity is finished, and the credential half is nowhere in scope here.
+        """
+        held = [t for t, s in self._sessions.items() if s.persona_id == persona_id]
+        for token in held:
+            del self._sessions[token]
+        return len(held)
+
     def purge_expired(self, *, now: datetime | None = None) -> int:
         """Drop every expired session; returns how many went. Sessions whose
         tokens are never presented again would otherwise sit here for the life

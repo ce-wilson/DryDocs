@@ -554,3 +554,153 @@ def test_the_roster_keeps_one_account_per_gated_tier_plus_spare_seats():
     assert set(by_role) == {"admin", "steward", "user"}
     assert len(by_role["admin"]) >= 1 and len(by_role["steward"]) >= 1
     assert len(by_role["user"]) >= 2, "per-persona isolation cannot be tested with one user"
+
+
+# ── O75: withdrawing an account withdraws its access ────────────────────────
+
+
+def test_withdrawn_account_token_is_refused_on_the_next_request():
+    """The defect in one test. Before O75 this session kept resolving, at its
+    full role, until its eight-hour term ran out."""
+    creds = _store("morpheus")
+    sessions = InMemorySessionStore()
+    token = login("morpheus", SECRET, sessions, creds)["token"]
+
+    # Still good while the account exists.
+    assert authenticate(token, sessions, creds).persona_id == "morpheus"
+
+    creds.remove("morpheus")
+
+    with pytest.raises(InvalidTokenError):
+        authenticate(token, sessions, creds)
+
+
+def test_a_refused_session_is_dropped_not_merely_refused():
+    """A withdrawn account must not leave a resolvable-looking entry sitting in
+    the store until purge_expired happens to run."""
+    creds = _store("morpheus")
+    sessions = InMemorySessionStore()
+    token = login("morpheus", SECRET, sessions, creds)["token"]
+    creds.remove("morpheus")
+
+    with pytest.raises(InvalidTokenError):
+        authenticate(token, sessions, creds)
+
+    # Gone from the store itself: the session-only path no longer knows it.
+    with pytest.raises(InvalidTokenError):
+        sessions.resolve(token)
+
+
+def test_withdrawing_one_account_leaves_the_others_signed_in():
+    """Withdrawal is per identity. A blast radius of 'everyone' would be its own
+    defect, and it is exactly what a naive store.clear() would produce."""
+    creds = _store("morpheus", "mouse")
+    sessions = InMemorySessionStore()
+    admin = login("morpheus", SECRET, sessions, creds)["token"]
+    user = login("mouse", SECRET, sessions, creds)["token"]
+
+    creds.remove("morpheus")
+
+    with pytest.raises(InvalidTokenError):
+        authenticate(admin, sessions, creds)
+    assert authenticate(user, sessions, creds).persona_id == "mouse"
+
+
+def test_authenticate_without_a_credential_store_is_unchanged():
+    """The offline layer stays offline: handlers.py is provable with no FastAPI
+    and no credential store, and its own second authenticate call passes
+    neither. Omitting the argument must not change what it did before."""
+    creds = _store("morpheus")
+    sessions = InMemorySessionStore()
+    token = login("morpheus", SECRET, sessions, creds)["token"]
+    creds.remove("morpheus")
+
+    # No credential store supplied -> the O69 behaviour, verbatim.
+    assert authenticate(token, sessions).persona_id == "morpheus"
+
+
+def test_rotation_is_not_caught_and_the_test_says_so():
+    """Clause (f), pinned as a test so the limit is documented where it will be
+    read. A rotated secret leaves the identity present, so an identity check
+    cannot see it. Catching rotation needs a per-identity generation stamp the
+    credential file does not carry. If this test ever starts failing, the
+    capability grew and the docstring on authenticate() is stale."""
+    creds = _store("morpheus")
+    sessions = InMemorySessionStore()
+    token = login("morpheus", SECRET, sessions, creds)["token"]
+
+    creds.set("morpheus", "a-completely-different-secret")
+
+    assert authenticate(token, sessions, creds).persona_id == "morpheus"
+
+
+def test_revoke_identity_drops_every_session_that_persona_holds():
+    """The explicit lever. Not what makes withdrawal work -- authenticate does
+    that with no coordination -- but a caller that already knows an account is
+    gone should not wait for each token to be presented.
+
+    No credential store here on purpose: this lever is the session store's own,
+    and it never learns WHY an identity is finished."""
+    sessions = InMemorySessionStore()
+    first = sessions.issue("morpheus").token
+    second = sessions.issue("morpheus").token
+    other = sessions.issue("mouse").token
+
+    assert sessions.revoke_identity("morpheus") == 2
+    assert sessions.revoke_identity("morpheus") == 0  # idempotent
+
+    for token in (first, second):
+        with pytest.raises(InvalidTokenError):
+            sessions.resolve(token)
+    assert sessions.resolve(other).persona_id == "mouse"
+
+
+def test_a_corrupt_credential_file_does_not_sign_anybody_out(tmp_path):
+    """Clause (d), the half that must NOT fail closed. O73 ruled an unreadable
+    file ambiguous and kept the last known-good store, because failing closed
+    there turns a routine rotation into a lockout. The new check inherits that
+    ruling and adds no failure mode of its own."""
+    target = save_store(_store("morpheus"), tmp_path / "creds.json")
+    creds = ReloadingCredentialStore(target)
+    sessions = InMemorySessionStore()
+    token = login("morpheus", SECRET, sessions, creds)["token"]
+
+    target.write_text("{ not json at all", encoding="utf-8", newline=chr(10))
+
+    assert authenticate(token, sessions, creds).persona_id == "morpheus"
+
+
+def test_deleting_the_credential_file_signs_everybody_out(tmp_path):
+    """Clause (d), the half that MUST fail closed. An absent file is not
+    ambiguous: somebody removed the accounts."""
+    target = save_store(_store("morpheus", "mouse"), tmp_path / "creds.json")
+    creds = ReloadingCredentialStore(target)
+    sessions = InMemorySessionStore()
+    admin = login("morpheus", SECRET, sessions, creds)["token"]
+    user = login("mouse", SECRET, sessions, creds)["token"]
+
+    target.unlink()
+
+    for token in (admin, user):
+        with pytest.raises(InvalidTokenError):
+            authenticate(token, sessions, creds)
+
+
+def test_has_identity_answers_without_enumerating():
+    """It is narrower than identities() on purpose: a yes/no about an id the
+    caller already holds, which is why the auth path may call it at all."""
+    creds = _store("morpheus")
+    assert creds.has_identity("morpheus") is True
+    assert creds.has_identity("mouse") is False
+    assert creds.has_identity("") is False
+
+
+def test_the_checker_protocol_covers_both_implementations(tmp_path):
+    """Adding a protocol member must stay a two-implementation change, or the
+    API could hold a store no test can substitute."""
+    target = save_store(_store("morpheus"), tmp_path / "creds.json")
+    for store in (_store("morpheus"), ReloadingCredentialStore(target)):
+        checker: CredentialChecker = store
+        assert checker.is_bootstrapped is True
+        assert checker.verify("morpheus", SECRET) is True
+        assert checker.has_identity("morpheus") is True

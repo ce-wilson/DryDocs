@@ -207,6 +207,18 @@ class CredentialStore:
         exist is exactly what the dummy derivation in ``verify`` hides."""
         return tuple(sorted(self._credentials))
 
+    def has_identity(self, identity: str) -> bool:
+        """Does this id still have a credential? (O75)
+
+        Deliberately narrower than :meth:`identities`, which the docstring above
+        forbids exposing. This answers a yes/no question about an id the caller
+        ALREADY HOLDS -- the persona name inside a session it is authenticating
+        -- so it enumerates nothing and tells an attacker nothing they did not
+        present. That distinction is why the authentication path calls this
+        rather than testing membership in the tuple.
+        """
+        return identity in self._credentials
+
     def verify(self, identity: str, secret: str) -> bool:
         """True when ``secret`` proves ``identity``.
 
@@ -274,17 +286,25 @@ class CredentialStore:
 
 
 class CredentialChecker(Protocol):
-    """What ``handlers.login`` actually needs: a bootstrap flag and a check.
+    """What the authentication path actually needs from a credential store.
+
+    Two callers, three members. ``handlers.login`` needs the bootstrap flag and
+    ``verify``; ``handlers.authenticate`` needs ``has_identity``, to refuse a
+    session belonging to an account that has since been withdrawn (O75).
 
     Typed as a protocol so the API can hold the reloading store below while
     every test injects a plain :class:`CredentialStore`, without either knowing
-    about the other.
+    about the other. Adding a member here is therefore a two-implementation
+    change by construction, which is the point: a store the API can hold but a
+    test cannot substitute would make the auth path untestable offline.
     """
 
     @property
     def is_bootstrapped(self) -> bool: ...
 
     def verify(self, identity: str, secret: str) -> bool: ...
+
+    def has_identity(self, identity: str) -> bool: ...
 
 
 class ReloadingCredentialStore:
@@ -377,6 +397,10 @@ class ReloadingCredentialStore:
     def identities(self) -> tuple[str, ...]:
         self._refresh()
         return self._store.identities()
+
+    def has_identity(self, identity: str) -> bool:
+        self._refresh()
+        return self._store.has_identity(identity)
 
     def __len__(self) -> int:
         self._refresh()
