@@ -321,30 +321,77 @@ def test_each_zone_path_equals_what_its_helper_actually_resolves(monkeypatch, tm
     whole mechanism silently, which is exactly the class G81 exists to end.
 
     Matching by NAME is not enough — that only proves the helper is mentioned.
+
+    WIDENED AT G111: this used to walk only zones carrying a `helper`, so a
+    helper-less zone (`run-logs` has `helper: ~`) was unguarded — which is why
+    `data_zones._resolve()` ignoring the `env:` field entirely survived both G81
+    and G109. Every zone is now walked. A helper-less zone declaring `env:` is
+    checked against an INDEPENDENT recomputation (never against `dz._resolve`
+    itself — that would only prove the code agrees with itself) built by
+    explicitly setting its env var to a known override directory and asserting
+    the declared path follows it; a helper-less zone with no `env:` falls back to
+    checking base + path directly, the same independence the helper branch gets
+    from calling the real helper function.
     """
     from drydocs_core import data_root
 
     monkeypatch.setenv(data_root.DATA_ROOT_ENV, str(tmp_path))
     mismatches = []
     for zone in dz.load_zones():
-        if not zone.helper:
-            continue  # `helper: ~` — owned elsewhere (run_log owns the log dir)
-        fn = getattr(data_root, zone.helper, None)
-        if fn is None:
-            continue  # named by test_declared_helpers_exist
-        resolved = fn()
-        declared = dz._resolve(zone.base, zone.path_spec)
-        if resolved.resolve() != declared.resolve():
-            mismatches.append(
-                f"{zone.id}: declares {declared} but {zone.helper}() returns {resolved}"
+        if zone.helper:
+            fn = getattr(data_root, zone.helper, None)
+            if fn is None:
+                continue  # named by test_declared_helpers_exist
+            resolved = fn()
+        elif zone.env:
+            # No helper to call — recompute independently by forcing the env
+            # var to a known value and expecting the declaration to follow it.
+            override_dir = tmp_path / f"env-override-{zone.id}"
+            monkeypatch.setenv(zone.env, str(override_dir))
+            resolved = override_dir
+        else:
+            # No helper and no env: the only independent check left is base +
+            # path, computed here rather than by calling the code under test.
+            resolved = (
+                Path.home() / zone.path_spec
+                if zone.base == dz.BASE_HOME
+                else data_root.resolve_data_root() / zone.path_spec
             )
+
+        declared = dz._resolve(zone.base, zone.path_spec, zone.env)
+        if zone.env:
+            monkeypatch.delenv(zone.env, raising=False)
+        if resolved.resolve() != declared.resolve():
+            source = f"{zone.helper}()" if zone.helper else "the independent recomputation"
+            mismatches.append(f"{zone.id}: declares {declared} but {source} gives {resolved}")
     assert not mismatches, (
-        "zone declaration(s) disagreeing with the helper that implements them:\n  "
+        "zone declaration(s) disagreeing with what actually resolves them:\n  "
         + "\n  ".join(mismatches)
         + "\nThe declaration is what both the invariant and the runtime refusal "
         "read, so a drift here protects the wrong directory while writes land in "
         "the real one."
     )
+
+
+def test_resolve_honors_env_when_set_and_falls_back_when_empty_or_unset(
+    monkeypatch, tmp_path
+) -> None:
+    """Clause (a) at the unit level, isolated from the zone walk above: an `env`
+    that is unset, or set to an empty/whitespace-only string, is not "set" — the
+    same rule `log_kinds.resolve_env_override` enforces for the log root, reused
+    here rather than re-derived so the two cannot judge "set" differently."""
+    monkeypatch.delenv("DRYDOCS_G111_PROBE", raising=False)
+    fallback = dz._resolve(dz.BASE_HOME, "logs/DryDocs/", "DRYDOCS_G111_PROBE")
+    assert fallback == Path.home() / "logs/DryDocs/"
+
+    monkeypatch.setenv("DRYDOCS_G111_PROBE", "   ")
+    assert dz._resolve(dz.BASE_HOME, "logs/DryDocs/", "DRYDOCS_G111_PROBE") == fallback
+
+    override = tmp_path / "wherever"
+    monkeypatch.setenv("DRYDOCS_G111_PROBE", str(override))
+    assert dz._resolve(dz.BASE_HOME, "logs/DryDocs/", "DRYDOCS_G111_PROBE") == override
+
+    assert dz._resolve(dz.BASE_HOME, "logs/DryDocs/", None) == fallback
 
 
 def test_landing_zones_reports_both_declarations_not_just_the_registry(
