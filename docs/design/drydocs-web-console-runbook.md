@@ -6,10 +6,11 @@
   `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
   makes about itself, never inferred from the filename.
 - **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-28
-  adds the credential step (backlog O69):** sign-in proves a secret to drydocs-api,
-  sessions expire, and a fresh clone has no accounts until
-  `scripts/set_console_credential.py` runs. The Rev 2 procedure is otherwise
-  unchanged. **Rev 2, 2026-08-25**
+  adds the credential step (backlog O69 and O73):** sign-in proves a secret to
+  drydocs-api, sessions expire, a fresh clone has no accounts until
+  `scripts/set_console_credential.py` runs, and the API re-reads that file on change
+  so a rotation needs no restart. `scripts/admin_demo_login.py` is the one-command
+  demo path. The Rev 2 procedure is otherwise unchanged. **Rev 2, 2026-08-25**
   (Rev 1, 2026-07-21, reflected commit `6766b4c`: post-O9 shell + Explorer, post-O11
   QuerySpec registry/export, post-O22 glyph set; six Explorer frames incl. the SME
   Folders / App-codes mapping views. **Rev 2 adds the ADK agent server** — the fourth
@@ -110,6 +111,31 @@ prerequisite only for live frames. Company-side deployment (OIDC, GHE) is not co
    is asserting the path is there. Set one secret per persona you intend to sign in
    as. Nothing here reaches the browser: the browser only ever holds the opaque token
    the API returns.
+
+   **No restart is needed** (O73). The API re-reads the credential file when it
+   changes, so adding or rotating a secret takes effect on the next sign-in. It
+   decides by a stat rather than a timer, so an unchanged file costs nothing. Two
+   edge cases behave differently on purpose: a file that is unreadable — corrupt, or
+   caught mid-write — keeps the credentials already loaded and logs why, because
+   locking everybody out during a routine rotation would be a fault caused by the
+   safety behaviour; a file that is DELETED empties the store, because that is
+   unambiguous. The writer replaces the file atomically, so the mid-write case is
+   rare rather than routine.
+
+   **For a demo, one command does all of this** and says what is missing:
+   ```powershell
+   poetry run python scripts/admin_demo_login.py                # what can sign in, is the API up
+   poetry run python scripts/admin_demo_login.py --ensure       # set every account that has none
+   poetry run python scripts/admin_demo_login.py --rotate admin
+   poetry run python scripts/admin_demo_login.py --check-login admin
+   ```
+   It takes short names (`admin`, `steward`, `user`, `sme`) instead of the synthetic
+   ids. `--check-login` performs the real HTTP login the browser performs and reports
+   which of the three usual causes it is: no credential set, the API not running, or
+   the secret itself. `--generate` invents a secret and prints it ONCE, which is the
+   right trade for a synthetic account on localhost and the wrong one anywhere else.
+   The script is deliberately disposable: it is the seam ADR 0005 hands to a company
+   OIDC binding, and it gets deleted rather than adapted when SSO lands.
 7. **Optional — a READY graph** per the companion startup-refresh runbook, if you want
    the Explorer frames to show live rows instead of the demo fallback.
 8. **Optional — `.claude/launch.json`** carries the `drydocs-web` dev-server entry for
@@ -275,7 +301,8 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 | Browser console CORS errors on frame fetch | Console served from a port outside the API allow-list | Use 5173 (dev) or 4173 (preview); other origins need an `app.py` CORS row (reviewed change) |
 | `/specs` missing a spec you just added | uvicorn serving the import-time registry (no `--reload`) | Restart uvicorn, or dev with `--reload` (2026-07-21 incident, twice) |
 | Sign-in refused with `no console credentials are configured on this machine` | Fresh clone or a new machine: the credential file does not exist yet, so there are no accounts | Prerequisite 6 — `poetry run python scripts/set_console_credential.py <persona-id>` |
-| Sign-in refused with `invalid credentials` | Wrong secret, or no secret stored for that account. The message is the same either way ON PURPOSE | `scripts/set_console_credential.py --list` shows which ids have one; re-run it for that id to rotate |
+| Sign-in refused with `invalid credentials` | Wrong secret, or no secret stored for that account. The message is the same either way ON PURPOSE | `scripts/admin_demo_login.py` shows which accounts are ready and whether the API is up; `--check-login <account>` says which of the three layers is actually failing |
+| A freshly-set secret is still refused | Since O73 the API re-reads the file on change, so this is no longer the restart case it was on the day O69 shipped. Check you set it against the SAME checkout the API is running from — a git worktree has its own `internal-local/` | `scripts/admin_demo_login.py` prints the credential file path the API resolves; compare it with where you wrote |
 | Signed out mid-session, back at the sign-in screen | The session expired (8h) or the API restarted and dropped the in-memory store. Since O69 the client no longer logs itself back in — it cannot, without the secret — so a 401 ends the session instead of being papered over | Sign in again. This is the designed behaviour, not a fault |
 | `?as=<persona>` shows the sign-in screen instead of signing in | `VITE_DEV_CONSOLE_SECRET` is unset in the Vite shell, or does not match that account's stored secret | Set it in the shell running `npm run dev` and restart Vite (env is inlined at startup); the browser console carries the reason |
 | Tabs all show demo fallback despite a running graph | Graph is up but EMPTY (specs ran, 0 rows), or `.env` points at the wrong Bolt port | Companion runbook Refresh section; check `.env` `NEO4J_URI` against `docker port` |

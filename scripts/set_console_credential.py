@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import getpass
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -51,20 +52,34 @@ NEWLINE = chr(10)
 
 
 def save_store(store: CredentialStore, target: Path) -> Path:
-    """Write the store, owner-readable only where the platform supports it."""
+    """Write the store atomically, owner-readable only where the platform allows.
+
+    ATOMIC ON PURPOSE (O73). The API re-reads this file when it changes, so a
+    truncate-then-write would give a login landing in the gap a half-written
+    JSON file. Writing a sibling temp file and calling os.replace makes the
+    swap a single rename: a reader sees either the whole old file or the whole
+    new one, never a torn one. os.replace is atomic on both platforms this repo
+    runs on, and the temp file is a sibling so the rename never crosses a
+    filesystem boundary.
+
+    The permission bits are set on the temp file BEFORE the rename, so the
+    credential file is never briefly world-readable under its final name.
+    """
     target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_name(target.name + ".tmp")
     # newline pinned: the render-determinism guard bans an unpinned write_text
     # anywhere in the tree, and a credential file that churns its line endings
     # between machines would be a diff nobody can read.
-    target.write_text(
+    tmp.write_text(
         json.dumps(store.as_payload(), indent=2) + NEWLINE,
         encoding="utf-8",
         newline=NEWLINE,
     )
     try:
-        target.chmod(0o600)
+        tmp.chmod(0o600)
     except OSError:  # pragma: no cover - Windows ACLs; best effort only
         pass
+    os.replace(tmp, target)
     return target
 
 

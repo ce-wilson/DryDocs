@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - O69
 inputs:
@@ -37,6 +37,15 @@ notes: |
   ambiguous - it may be mid-write - so the old store stands. An ABSENT file is not
   ambiguous: somebody removed the accounts, and the fresh-clone path is the documented
   meaning of no file at all.
+  VERIFIED LIVE on this desktop against a temporary credential file and uvicorn on port
+  8096, one process throughout: a login before any credential exists returns the fresh-clone
+  401; writing a credential while that same process runs makes the next login succeed with
+  no restart; rotating the secret refuses the old one and accepts the new one; truncating the
+  file to half a JSON object leaves the previously loaded credential working and logs the
+  parse error with a count of what it kept; and deleting the file returns the fresh-clone
+  message. Six behaviours, one running server. The unchanged-file path is unit-tested by
+  counting parses rather than asserted in prose - five verifications against an untouched
+  file re-parse it zero times.
   THE DEMO SCRIPT IS DELIBERATELY DISPOSABLE. It exists because the producer repo is a proof
   of concept whose console gets demonstrated, and a demo needs one command that answers is
   this thing signed-in-able right now. It is written to be deleted at the OIDC binding rather

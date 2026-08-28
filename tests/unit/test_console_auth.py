@@ -22,8 +22,10 @@ from drydocs_api.credentials import (
     ALGORITHM,
     DEFAULT_RELATIVE_PATH,
     PATH_ENV_VAR,
+    CredentialChecker,
     CredentialError,
     CredentialStore,
+    ReloadingCredentialStore,
     credentials_path,
     hash_secret,
     verify_secret,
@@ -377,3 +379,141 @@ def test_the_api_package_cannot_write_a_credential(monkeypatch: pytest.MonkeyPat
 def test_the_admin_only_route_declares_admin():
     by_path = dict(_route_functions())
     assert "AdminUser" in _annotation_names(by_path["/raw-cypher"])
+
+
+# ── O73: the store re-reads when its file changes ───────────────────────────
+
+
+def test_reloading_store_sees_a_credential_added_after_it_started(tmp_path: Path):
+    """The whole point: no restart between setting a secret and using it."""
+    target = tmp_path / "creds.json"
+    store = ReloadingCredentialStore(target)
+    assert store.is_bootstrapped is False
+
+    save_store(_store("jdoe4821"), target)
+    assert store.is_bootstrapped is True
+    assert store.verify("jdoe4821", SECRET) is True
+
+
+def test_reloading_store_sees_a_rotation(tmp_path: Path):
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    store = ReloadingCredentialStore(target)
+    assert store.verify("jdoe4821", SECRET) is True
+
+    rotated = CredentialStore()
+    rotated.set("jdoe4821", "a-different-secret")
+    save_store(rotated, target)
+
+    assert store.verify("jdoe4821", SECRET) is False
+    assert store.verify("jdoe4821", "a-different-secret") is True
+
+
+def test_reloading_store_honours_deletion(tmp_path: Path):
+    """An ABSENT file is unambiguous: somebody removed the accounts."""
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    store = ReloadingCredentialStore(target)
+    assert store.is_bootstrapped is True
+
+    target.unlink()
+    assert store.is_bootstrapped is False
+    assert store.verify("jdoe4821", SECRET) is False
+
+
+def test_a_corrupt_file_keeps_the_last_good_store(tmp_path: Path):
+    """An UNREADABLE file is ambiguous - it may be a write in progress - so the
+    previous credentials stand. Failing closed here would turn a routine
+    rotation into a lockout: a denial of service caused by the safety
+    behaviour rather than by the fault."""
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    store = ReloadingCredentialStore(target)
+    assert store.verify("jdoe4821", SECRET) is True
+
+    target.write_text('{"version":1,"credentials":{"jdoe', encoding="utf-8")
+    assert store.verify("jdoe4821", SECRET) is True  # last good stands
+
+    save_store(_store("jdoe4821", "asmith7734"), target)
+    assert store.verify("asmith7734", SECRET) is True  # and it recovers
+
+
+def test_a_corrupt_file_is_retried_rather_than_treated_as_settled(tmp_path: Path):
+    """The bad file's stat must NOT be recorded as the loaded state, or a file
+    that is repaired to the same size within one timestamp tick would be
+    ignored forever."""
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    store = ReloadingCredentialStore(target)
+    target.write_text("not json at all", encoding="utf-8")
+    store.is_bootstrapped  # noqa: B018 — the refresh is the point
+    assert store._stamp is not None  # still the last GOOD file's stamp
+    assert store._stamp != (target.stat().st_mtime_ns, target.stat().st_size)
+
+
+def test_an_unchanged_file_is_not_re_parsed(tmp_path: Path):
+    """A stat per login is the budget; re-deriving the store every request is
+    not. Counted rather than asserted in prose."""
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    store = ReloadingCredentialStore(target)
+
+    calls = 0
+    original = CredentialStore.load
+
+    def counting_load(path=None):
+        nonlocal calls
+        calls += 1
+        return original(path)
+
+    CredentialStore.load = staticmethod(counting_load)  # type: ignore[method-assign]
+    try:
+        for _ in range(5):
+            store.verify("jdoe4821", SECRET)
+    finally:
+        CredentialStore.load = original  # type: ignore[method-assign]
+    assert calls == 0
+
+
+def test_both_stores_satisfy_what_login_needs(tmp_path: Path):
+    """The protocol is what lets the API hold a reloading store while every
+    test injects a plain one."""
+    plain: CredentialChecker = _store("jdoe4821")
+    reloading: CredentialChecker = ReloadingCredentialStore(tmp_path / "creds.json")
+    for checker in (plain, reloading):
+        assert isinstance(checker.is_bootstrapped, bool)
+        assert checker.verify("nobody", "x") is False
+
+
+# ── O73: the write is atomic ────────────────────────────────────────────────
+
+
+def test_save_leaves_no_temp_file_behind(tmp_path: Path):
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    assert target.exists()
+    assert list(tmp_path.iterdir()) == [target]
+
+
+def test_save_replaces_rather_than_truncating(tmp_path: Path):
+    """A truncate-then-write gives a concurrent reader a half-file. The proof
+    a reader can rely on: the old content is complete right up until the new
+    content is complete - there is no moment where the path holds neither."""
+    target = tmp_path / "creds.json"
+    save_store(_store("jdoe4821"), target)
+    before = target.read_text(encoding="utf-8")
+    assert json.loads(before)["credentials"].keys() == {"jdoe4821"}
+
+    save_store(_store("jdoe4821", "asmith7734"), target)
+    after = target.read_text(encoding="utf-8")
+    assert json.loads(after)["credentials"].keys() == {"asmith7734", "jdoe4821"}
+    assert before != after
+
+
+def test_the_writer_uses_a_sibling_temp_path(tmp_path: Path):
+    """os.replace is only atomic within one filesystem, so the temp file must
+    be a sibling of the target rather than somewhere in the system temp dir."""
+    source = (REPO_ROOT / "scripts" / "set_console_credential.py").read_text(encoding="utf-8")
+    assert "target.with_name(" in source
+    assert "os.replace(" in source
+    assert "tempfile" not in source

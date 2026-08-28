@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol
 
-from drydocs_api.credentials import BOOTSTRAP_HINT, CredentialStore
+from drydocs_api.credentials import BOOTSTRAP_HINT, CredentialChecker
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.queries import named_query, validate_params
 from drydocs_api.routing import database_for
@@ -61,7 +61,7 @@ def login(
     persona_id: str,
     secret: str,
     store: InMemorySessionStore,
-    credentials: CredentialStore,
+    credentials: CredentialChecker,
 ) -> dict[str, str]:
     """Exchange proof of a secret for a server session.
 

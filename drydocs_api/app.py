@@ -23,7 +23,7 @@ from typing import Annotated
 import neo4j
 from pydantic import BaseModel
 
-from drydocs_api.credentials import CredentialStore
+from drydocs_api.credentials import CredentialChecker, ReloadingCredentialStore
 from drydocs_api.ephemeral_specs import (
     EphemeralSpecStore,
     EphemeralValidationError,
@@ -204,12 +204,15 @@ class LiveRunner:
 def create_app(
     runner=None,
     store: InMemorySessionStore | None = None,
-    credentials: CredentialStore | None = None,
+    credentials: CredentialChecker | None = None,
 ):
     """App factory. ``runner``/``store``/``credentials`` are injectable for
     tests; the default is the live driver, a fresh in-memory session store, and
     the machine-local credential file (absent on a fresh clone, which yields an
-    empty store in which every login is refused)."""
+    empty store in which every login is refused).
+
+    The default credential store RE-READS its file when it changes (O73), so
+    adding or rotating a secret takes effect without restarting the server."""
     from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
 
@@ -226,7 +229,7 @@ def create_app(
 
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
-    creds = credentials if credentials is not None else CredentialStore.load()
+    creds = credentials if credentials is not None else ReloadingCredentialStore()
 
     def _token(authorization: str | None) -> str:
         if not authorization or not authorization.lower().startswith("bearer "):

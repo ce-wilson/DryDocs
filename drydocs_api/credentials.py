@@ -43,12 +43,16 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import logging
 import os
 import secrets
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol
 
 from drydocs_core.repo_paths import repo_root
+
+logger = logging.getLogger(__name__)
 
 #: Bumped when the stored shape changes; a file from the future is refused.
 FORMAT_VERSION = 1
@@ -267,3 +271,113 @@ class CredentialStore:
             ),
             "credentials": {k: v.as_dict() for k, v in sorted(self._credentials.items())},
         }
+
+
+class CredentialChecker(Protocol):
+    """What ``handlers.login`` actually needs: a bootstrap flag and a check.
+
+    Typed as a protocol so the API can hold the reloading store below while
+    every test injects a plain :class:`CredentialStore`, without either knowing
+    about the other.
+    """
+
+    @property
+    def is_bootstrapped(self) -> bool: ...
+
+    def verify(self, identity: str, secret: str) -> bool: ...
+
+
+class ReloadingCredentialStore:
+    """A :class:`CredentialStore` that notices when its file changes (O73).
+
+    WHY, in one line: without it, adding or rotating a secret does nothing until
+    somebody restarts uvicorn, and that friction is what leaves a demo account's
+    secret unchanged for months.
+
+    HOW IT DECIDES: a stat, not a timer. Each check compares the file's
+    modification time and size against the pair it loaded from, so an unchanged
+    file costs one ``os.stat`` per login and nothing else. The pair can in
+    principle miss two writes inside one filesystem timestamp tick that leave
+    the size identical; for a file a person edits by hand, at a console, that is
+    not a case worth a hash over.
+
+    THE TWO FAILURE MODES ARE HANDLED DIFFERENTLY ON PURPOSE:
+
+    * The file is UNREADABLE — corrupt, or caught mid-write. Ambiguous, so the
+      last known-good store stands and the reason is logged. Failing closed here
+      would turn a routine rotation into a lockout, which is a denial of service
+      caused by the safety behaviour rather than by the fault. The writer makes
+      this rare anyway by replacing the file atomically rather than truncating
+      it in place.
+    * The file is ABSENT. Not ambiguous: somebody removed the accounts. The
+      store empties, and the next login gets the documented fresh-clone message.
+
+    Reading only. This class writes nothing, and neither does anything else in
+    ``drydocs_api`` — see :meth:`CredentialStore.as_payload`.
+    """
+
+    def __init__(self, path: Path | None = None) -> None:
+        self._path = path if path is not None else credentials_path()
+        self._store = CredentialStore()
+        self._stamp: tuple[int, int] | None = None
+        self._loaded_once = False
+        self._refresh()
+
+    @property
+    def path(self) -> Path:
+        return self._path
+
+    def _stat_stamp(self) -> tuple[int, int] | None:
+        try:
+            info = self._path.stat()
+        except OSError:
+            return None
+        return (info.st_mtime_ns, info.st_size)
+
+    def _refresh(self) -> None:
+        stamp = self._stat_stamp()
+        if stamp == self._stamp and self._loaded_once:
+            return
+        if stamp is None:
+            # Absent is unambiguous: the accounts are gone.
+            if self._stamp is not None:
+                logger.info(
+                    "console credential file %s is gone; no account can sign in", self._path
+                )
+            self._store = CredentialStore()
+            self._stamp = None
+            self._loaded_once = True
+            return
+        try:
+            self._store = CredentialStore.load(self._path)
+        except CredentialError as exc:
+            # Keep the last good store. Do NOT record the stamp, so the next
+            # call retries rather than treating the bad file as settled.
+            logger.warning(
+                "console credential file %s could not be read (%s); "
+                "continuing with the %d credential(s) loaded previously",
+                self._path,
+                exc,
+                len(self._store),
+            )
+            self._loaded_once = True
+            return
+        self._stamp = stamp
+        self._loaded_once = True
+
+    @property
+    def is_bootstrapped(self) -> bool:
+        self._refresh()
+        return self._store.is_bootstrapped
+
+    def verify(self, identity: str, secret: str) -> bool:
+        self._refresh()
+        return self._store.verify(identity, secret)
+
+    def identities(self) -> tuple[str, ...]:
+        self._refresh()
+        return self._store.identities()
+
+    def __len__(self) -> int:
+        self._refresh()
+        return len(self._store)
