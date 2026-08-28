@@ -93,6 +93,65 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-166`** · 2026-08-28 · `[idea]` · **open** · prio? **Med** —
+  **The catalog/lineage second pass proposes amendments to G81, G104 and G109 — they need a groom
+  or they die in a design doc.** `docs/design/catalog-substrate-review.md` (Rev 1) read DataHub,
+  OpenMetadata, Amundsen and OpenLineage/Marquez in depth plus Microsoft Purview for concepts,
+  against the two questions the SaaS-scaffold pass could not answer. It produced six proposals, all
+  landing on items that already exist, none applied.
+  - **G104 (ADR 0014).** Record the three-part-key ceiling: DryDocs derives
+    `urn:drydocs:dataset:(carrier,artifact,prod)` and DataHub's identical key could not hold two
+    deployments of one platform, forcing the `platform_instance` retrofit across every source. The
+    `[db]` redaction placeholder in our committed ids IS that instance coordinate. The ask is a
+    paragraph naming the ceiling, not the axis itself.
+  - **G104 again.** Bind per ORIGIN, not per dataset — OpenLineage's namespace/name split maps
+    exactly onto `origin@db.schema.table`, so fifteen automated datasets reduce to about six
+    origins. And reference env vars from committed YAML rather than reading them in Python, the
+    DataHub recipe pattern.
+  - **G81.** Widen clause (b) beyond the three named path families to the full origin set, and
+    implement clause (d)'s no-silent-default-root as ONE expansion function rather than per module.
+  - **G109.** Clause (a) names six undeclared code zones; the real gap also includes all fifteen
+    `acquisition.mode: automated` datasets, which resolve through nothing and which
+    `drydocs landing-zones --check` cannot see. Widen, or record why the automated half is out.
+  - **Why not groomed here.** Each is an amendment to a `todo` item's ruled acceptance, which is a
+    change of scope on work this session is not pulling. The review states them as proposals so the
+    user or a groom decides, rather than a design doc silently rewriting three items.
+
+- **`Idea-165`** · 2026-08-28 · `[idea]` · **open** · prio? **Med** —
+  **The credential store cannot tell a generated demo secret from a chosen operator one, so no
+  surface can say "rotate this."** `admin_demo_login.py --generate` invents a secret and prints it
+  once — defensible for a synthetic account on localhost, and the docstring argues it correctly.
+  But nothing records that it happened. `--list` and `--status` show only which ids have a
+  credential, so an account carrying a secret that was printed to a terminal weeks ago looks
+  identical to one set by hand at a no-echo prompt.
+  - **The fix is small and the format already anticipates it.** The credential entry gains
+    non-secret metadata, `origin: generated|prompted` plus `set_at`, and `FORMAT_VERSION` goes to
+    2 — the file already refuses a version it does not know, so the migration path exists.
+  - **Where it came from.** DataHub's documentation spends a page warning that its shipped
+    `datahub:datahub` account survives deleting the user in the UI. DryDocs ships no credential at
+    all, which is the stronger default, but `--generate` reintroduces a small piece of the same
+    problem: a credential nobody chose deliberately and nobody is tracking.
+
+- **`Idea-164`** · 2026-08-28 · `[bug]` · **open** · prio? **High** —
+  **Removing a console credential does not end that account's live sessions — access continues for
+  up to eight hours.** `InMemorySessionStore.revoke(token)` is token-scoped and driven by logout.
+  `resolve(token)` checks the token and its expiry and never consults the credential store again,
+  and `ReloadingCredentialStore` is read only by `handlers.login`.
+  - **The sequence.** `morpheus` signs in and gets an 8h session. The operator runs
+    `set_console_credential.py --remove morpheus`, or rotates the secret because it leaked. The
+    file changes, the API picks it up on the next login attempt, and the already-issued admin token
+    keeps resolving until its TTL runs out. The operator has every reason to believe access was
+    withdrawn.
+  - **The shape of the fix, which O73 already established.** `resolve` compares the session's
+    `persona_id` against the credential store's current identities, so a removed account's token
+    stops resolving on the next request through the same stat-based reload that already runs. The
+    bootstrap script cannot revoke directly — it does not share a process with the API, and giving
+    it one would violate the guard that keeps writes out of `drydocs_api`.
+  - **Rotation is the harder half and can be deferred with a reason.** A rotated secret leaves the
+    identity present, so identity comparison does not catch it; that needs a credential generation
+    counter or a per-identity stamp. Removal is the case an operator will actually rely on.
+  - Found by the second-pass review, `docs/design/catalog-substrate-review.md` finding L3.
+
 - **`Idea-163`** · 2026-08-27 · `[idea]` · **open** · prio? **Med** —
   **Copier is the mechanism the standalone-template goal has been missing — a template that can be
   UPDATED in place after generation, not just generated once.** Noticed while reviewing

@@ -11,7 +11,7 @@
 # =============================================================================
 
 schema: drydocs.reference-registry.v1
-updated: 2026-08-10           # L28: the research: stub becomes a real entry list — KGoT registered (paper + repo + BSD-3-Clause + what cites it), Unity Catalog and Essential GraphRAG backfilled
+updated: 2026-08-28           # catalog/lineage peer products registered (datahub, openmetadata, amundsen, openlineage, microsoft-purview) — the second-pass survey behind docs/design/catalog-substrate-review.md
 classification: External       # ALL reference material is External (public) — see config/classification.yaml
 verified: 2026-06-21           # A1: local mirrors (../llm-graph-builder, ../sdw-sosa-ssn) + all platform/standard docs resolve; no stale entries
 
@@ -183,3 +183,91 @@ research:
         benchmark verdict and the agent-traversal experiment (backlog Q1/Q2).
       docs: reference/research/essential-graphrag-notes.md
       verified: 2026-07-16
+
+    # ── Catalog / lineage peer products (2026-08-28 second-pass survey) ──────
+    # Registered as ONE group because they were read for one question and are
+    # cited by one document: how a catalog binds a declared source to a real
+    # connection, and how its console bootstraps a first login. Individual ids
+    # so a later citation can name the one it means.
+
+    - id: datahub
+      role: data-catalog-substrate-reference
+      title: "DataHub — metadata platform (ingestion recipes, URNs, JaaS console auth)"
+      publisher: "DataHub Project (originally LinkedIn)"
+      source_url: https://docs.datahub.com/docs/platform-instances
+      repos:
+        - https://github.com/datahub-project/datahub
+      license: "Apache-2.0 (no DataHub code vendored here — design only)"
+      why: >
+        The three-part dataset URN (platform, name, env) is the same shape DryDocs
+        derives, and DataHub had to RETROFIT platform_instance when one environment
+        held two deployments of one platform. Also the source of the committed-config
+        pattern that references env vars instead of holding secrets, and of the
+        default-credential lesson (user.props ships a working datahub:datahub that
+        deleting the UI user does not disable).
+      docs: docs/design/catalog-substrate-review.md
+      verified: 2026-08-28
+
+    - id: openmetadata
+      role: data-catalog-substrate-reference
+      title: "OpenMetadata — service connections and the secrets-manager abstraction"
+      publisher: "Collate / OpenMetadata community"
+      source_url: https://docs.open-metadata.org/latest/deployment/secrets-manager
+      repos:
+        - https://github.com/open-metadata/OpenMetadata
+      license: "Apache-2.0 (design only)"
+      why: >
+        The DERIVED secret path — a service's password lives at a location computed
+        from its type and name, so the secret reference cannot drift from the
+        registration. One of the two published answers to the locator.service hole
+        in config/source-registry.yaml; the other is Purview's named-object shape,
+        which the review recommends instead for this estate.
+      docs: docs/design/catalog-substrate-review.md
+      verified: 2026-08-28
+
+    - id: amundsen
+      role: data-catalog-substrate-reference
+      title: "Amundsen databuilder — scoped configuration for extractors"
+      publisher: "Amundsen (LF AI & Data)"
+      source_url: https://github.com/amundsen-io/amundsen/tree/main/databuilder
+      license: "Apache-2.0 (design only)"
+      why: >
+        Configuration keys namespaced by the component that reads them, composed with
+        a declared fallback chain — one mechanism supplying precedence instead of
+        seven modules each writing their own. Adopted as a SHAPE; its pyhocon
+        dependency is explicitly not taken (the repo already uses pydantic-settings).
+      docs: docs/design/catalog-substrate-review.md
+      verified: 2026-08-28
+
+    - id: openlineage
+      role: lineage-naming-reference
+      title: "OpenLineage naming conventions (and Marquez, its reference server)"
+      publisher: "OpenLineage (LF AI & Data)"
+      source_url: https://openlineage.io/docs/spec/naming/
+      repos:
+        - https://github.com/OpenLineage/OpenLineage
+        - https://github.com/MarquezProject/marquez
+      license: "Apache-2.0 (design only)"
+      why: >
+        The namespace-and-name split — namespace is the CONNECTION (varies per
+        machine, may carry a secret), name is the OBJECT (stable, safe to commit).
+        DryDocs' origin@db.schema.table grammar is already isomorphic to it, which is
+        why a per-ORIGIN binding table suffices and a per-dataset one is not needed.
+        Marquez itself is not taken: there is no runtime lineage service here.
+      docs: docs/design/catalog-substrate-review.md
+      verified: 2026-08-28
+
+    - id: microsoft-purview
+      role: data-catalog-substrate-reference
+      title: "Microsoft Purview Data Map — credentials for scans"
+      publisher: Microsoft
+      source_url: https://learn.microsoft.com/en-us/purview/data-map-data-scan-credentials
+      license: "public vendor documentation (cite, do not paste)"
+      why: >
+        Credential as a FIRST-CLASS object, created and rotated separately from the
+        sources that reference it by name. The recommended shape for DryDocs, because
+        one Oracle account reads eight psgmgr views — a per-source derived path would
+        restate the same secret eight times. Collibra, Alation and Atlan were checked
+        at the same time and dropped as duplicates of this shape.
+      docs: docs/design/catalog-substrate-review.md
+      verified: 2026-08-28
