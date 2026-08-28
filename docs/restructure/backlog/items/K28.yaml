@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on:
 - K17
 inputs:
@@ -31,3 +31,19 @@ notes: |
   module `config` follows K16's own recorded convention for this file — `config` is the WORK AREA (a source-scoping measurement), while `tests/unit/test_module_boundary.py` classifies the code itself as drydocs-review because it loads nothing and configures nothing.
 
   p3/haiku: a currency correction against a fact already established in the gate log, with no ruling of its own to make.
+  DONE 2026-08-27 (laptop, Lane B). (a)/(b) The opening claim recast as HISTORY, not
+  deleted: signed 33/33 2026-08-19 (gate-log:3914 confirmed), and the SS-D2 ran-ahead
+  rationale kept with the K16-rider framing the acceptance names. (c) THE WHOLE MODULE READ,
+  three claims moved and the rest confirmed current: (1) the head gate-state claim (fixed);
+  (2) the "settles for free" SS-Q5 bullet — Q5 was ANSWERED YES at round 1 (143
+  personal-shaped owners / 11,948 jobs; type is never a pull filter, only the SS-D2
+  breakdown lens) — recast with the answer, run_as_owner_types kept as the ongoing
+  evidence; (3) the OWNER_MINIMUM comment's "the account->owner edge does not exist yet" —
+  it now EXISTS registered-planned (human_appuser_owned_by, the Q7 owner-of-record ruling)
+  — recast to active-vs-planned truth; doc 09's own phase-list claim verified still
+  accurate (doc 09 unamended, no account->PERSON). CHECKED AND FOUND CORRECT, unchanged:
+  the purity/injected-inputs contract, counts-never-rows (SS-D2), the company-side runner
+  pointer, the G5_READINGS three-reading vocabulary, the registration-is-not-attribution
+  passage, and the two inline SS-Q5/SS-Q4 field labels (they name what the fields measure,
+  not a gate state). (d) No behaviour change — docstrings and comments only;
+  test_fid_census 17 passed; ruff format + check clean; full suite green.
