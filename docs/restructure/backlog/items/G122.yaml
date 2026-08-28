@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/config.py
@@ -21,3 +21,11 @@ acceptance: |
 notes: |
   Minted 2026-08-28 (WP-2.3 — the names-only half of the gate's A2 clause that needs no gate:
   it asserts about committed shape, not about any proposed field).
+  DONE 2026-08-27 (laptop, Lane B). tests/unit/test_env_example.py: the group walk is
+  INTROSPECTED (every BaseSettings subclass in drydocs_core.config, env_prefix + field name ->
+  expected env var), so a new group or field is covered the moment it exists; pydantic
+  properties are excluded by construction. A precondition test pins >= 3 groups each declaring
+  an env_prefix (the empty-walk-is-vacuously-green trap, per G81). Failure message names the
+  missing key AND its settings group. RED first at e198d634: NEO4J_IMPORT_DIR
+  (Neo4jSettings) was missing from .env.example — added as a name-only line. Names only
+  throughout; no value committed.
