@@ -342,6 +342,14 @@ MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Deploy
 MERGE (a)-[r:INSTANTIATES]->(b)
   SET r.vocab_id = 'business_application_instantiates_deployment_module', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'AreaProduct'})
+MERGE (a)-[r:CONTAINED_BY]->(b)
+  SET r.vocab_id = 'business_application_contained_by_ci', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'BusinessApplication'})
+MERGE (a)-[r:CONTAINED_BY]->(a)
+  SET r.vocab_id = 'business_application_contained_by_ci', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'BusinessApplication'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
   SET r.vocab_id = 'business_application_appuser_belongs_to_application', r.role = 'service_account', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
@@ -742,3 +750,7 @@ MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'Role'})
 MERGE (a)-[r:HAD_ROLE]->(b)
   SET r.vocab_id = 'catalog_dev_team_attribution_had_role', r.prov_maps_to = null, r.domain = 'human', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'Attribution'})
+MERGE (a)-[r:WAS_DERIVED_FROM]->(a)
+  SET r.vocab_id = 'human_attribution_derived_from', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'human', r.status = 'planned';

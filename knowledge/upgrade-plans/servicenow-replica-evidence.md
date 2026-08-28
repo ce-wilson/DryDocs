@@ -774,6 +774,7 @@ application list we already have**, not ingestion of a CMDB.
 | **One hop out** | `cmdb_ci_service_discovered` for seeded apps | ~200 × deployments each | The deployment modules `[Instance of]` a seeded application (§1.3(c): 1:N) |
 | **Edges** | `cmdb_rel_ci` **restricted to both endpoints in the seeded set** | small | Never the whole edge table |
 | **Attribution** | the TOM tables + `sys_user_group` + `core_company`, for seeded apps | — | What G35 needs; unchanged from §3.6 ring 2 except that it too is seed-scoped |
+| **Upward, N-level** *(G73 amendment, 2026-08-27)* | ancestor CIs of seeded applications, **for their TOM rows only** | small | The §E inheritance walk — see the amendment block below |
 | **NOT taken** | `cmdb_ci` as a table; the other ~14,480 business applications; the cloud/infrastructure classes; the `kb_*`, `cmn_*`, rota and SLA families | 21.6M | Out by SME ruling. Individual classes can be added later against a named use case. **The kb_* family now HAS one, and a verdict with it — see §11: out as ATTRIBUTION (the designed columns are 0-of-200 filled), alive as remediation REFERENCE/ARCHIVE, which is a read rather than a pull.** |
 
 **The scope has now collapsed by roughly four orders of magnitude** from §3.6's ring 1 — 21.6M CI
@@ -797,6 +798,21 @@ edges from arriving by default.
 defensible and cheap; two hops starts pulling infrastructure, which is exactly what is ruled out. If
 a support question ever needs "which server does this run on", that is a use case for adding a class
 by name, not a reason to widen the traversal.
+
+> **AMENDED 2026-08-27 (G73), carrying the 2026-08-11 sign-off's own commitment — the UPWARD
+> direction is settled, and it is not the depth question above.** The G35 §E ruling stores authored
+> TOM rows only and computes inheritance, which requires the ancestor chain — and ancestors sit
+> ABOVE the ~200 seeded applications, including CIs owned by teams DryDocs does not support. **The
+> pull therefore takes ancestor CIs of seeded applications, N levels up the containment chain, FOR
+> THEIR TOM ROWS ONLY** — the CI row enters as a chain rung and a TOM-row carrier, never as a
+> modelled asset, and none of its other relationships, attributes or descendants come with it. The
+> depth caution above is about the OUTWARD/DOWNWARD hop — where two hops starts pulling
+> infrastructure — and it stands untouched: upward is bounded by the containment chain's own height,
+> and the rows it admits are exactly the ones §C4's completeness check and the §E inheritance
+> computation cannot be correct without. The alternative (materialise inherited rows, flag them
+> derived) was considered at the sign-off and rejected: it duplicates, and it drifts when an
+> ancestor changes. Registered shape: `business_application_contained_by_ci` +
+> `human_attribution_derived_from` (both `planned`) in the relationship vocabulary.
 
 **Control-M stays where it is.** It is the largest pull and it comes from the Oracle `psgmgr`
 replica, not from here — nothing in this document changes that.
