@@ -81,6 +81,14 @@ sources:
     graph_locator:                      # pre-dates corpus_id; pages are identified by their repo path
       match: path_prefix
       value: external/orchestration/bmc-controlm/
+    # Q18: the product this corpus DESCRIBES — the declaration behind the one
+    # live software-to-docs traversal. OPTIONAL per corpus; when present it
+    # must name a config/taxonomy/software-registry.yaml product id (guarded
+    # by tests/unit/test_doc_registry.py) and the LOADER READS IT — the former
+    # SUBJECT_PRODUCT_ID module constant is gone, not shadowed. Edge term per
+    # the Q14 ruling (DESCRIBES reused); residency per the G32 fold: docs and
+    # the software registry share `drydocs`, so the edge is writable in-place.
+    describes_product: controlm
     confirmed: true                     # gate bmc-docs-lexical-load SME-accepted 2026-07-08 (config/gate-log.md) — moved here from the dropped pipeline twin (N9)
     notes: >
       The canonical T1 vendor corpus (gate bmc-docs-lexical-load, 2026-07-08 —

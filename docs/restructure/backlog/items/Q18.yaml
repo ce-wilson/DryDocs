@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G32
 - Q14
@@ -22,3 +22,23 @@ acceptance: |
   THE GAP: the live (:Document)-[:DESCRIBES]->(:SoftwareProduct) edges for `controlm` are asserted by a Python module constant -- `SUBJECT_PRODUCT_ID = "controlm"` in drydocs/loaders/bmc_docs.py -- while the corpus's doc-source-registry entry carries only `taxonomy_path`, which no file maps to a product id. So the ONE working software-to-docs traversal in the estate is unreproducible from the ledger, and a report cannot honestly infer the declaration (the /software page refuses to, deliberately -- O56 honesty rule 4). (a) doc-source-registry entries may carry `describes_product`, OPTIONAL because not every corpus describes a product, and the bmc-docs entry declares its product id. (b) The loader READS the registry. The constant is REMOVED, not shadowed -- a fallback constant beside a declared field is how the two silently disagree later. (c) A GUARD fails when `describes_product` names an id that is not a product in config/taxonomy/software-registry.yaml. This is the missing half today and the same "declared, and nothing checks it is reachable" family as G80 and J47. (d) THE EDGE TERM IS NOT DECIDED HERE. Q14 rules which term carries a documented entity; whatever it rules is what this loads, VIA THE GATE. If Q14 keeps DESCRIBES, this item is a declaration change only and writes no new edge type. (e) RESIDENCY IS NOT DECIDED HERE EITHER. G32 rules which database the doc corpora live in, and a Neo4j relationship cannot span databases -- so WHERE this edge can be written follows that ruling. The item states the consequence for the bmc-docs corpus rather than picking a database. (f) Q16 CLAUSE (b) LANDS HERE OR IS RESTATED: Q16 closed PARTIAL with clause (b) -- the pointer reaching the GRAPH -- explicitly unshipped and blocked behind Q14 behind G32. This item either closes it or says in writing what is still missing.
 notes: |
   Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-88, which had been parked because it touches a loader AND a gated corpus behind two open rulings. Promoted WITHOUT overriding that parking: depends_on [G32, Q14] reproduces it exactly, so the item stays out of next_ready until both rule, while the work itself becomes visible in the database instead of living only in an inbox file. This is the difference between filing a blocked item and pre-empting a gate. MODULE drydocs-load (matching Q16, its sibling): the change is a loader reading a registry field. The registry SCHEMA edit is config work the same item carries, as Q5's ledger items already do. WHAT IS ALREADY TRUE AND MUST NOT BE UNDONE: the DESCRIBES join is an OPTIONAL MATCH inside a FOREACH guard, and the loader already refuses when the software registry is absent from the database entirely and counts documents that landed with no edge. That is the honest behaviour this item feeds a declared id INTO -- do not replace those checks with a required match.
+  DONE 2026-08-27 (laptop, Lane B). (a) describes_product declared on the bmc-docs row,
+  OPTIONAL per corpus, with the field's contract in a row comment. (b) BmcDocsAdapter reads
+  it from the corpus's OWN registry row (declared_describes_product via
+  SourceRegistry.from_yaml — the doc-ledger union the registry already exposes);
+  SUBJECT_PRODUCT_ID is REMOVED, not shadowed — no fallback anywhere, and a row without the
+  field refuses at adapter construction, before anything is read or written. (c) the guard:
+  test_doc_registry.py proves every declared describes_product is a real
+  config/taxonomy/software-registry.yaml product id (with a vacuity check on the product
+  set) AND that bmc-docs declares one; test_bmc_docs.py proves the value is registry-driven
+  (a different declared value flows to every row) and the refusal fires. (d) Q14 ruled
+  DESCRIBES reused (SS-B1) — declaration change only, no new edge type, exactly the branch
+  the acceptance predicted. (e) G32's fold IS the residency consequence, stated on the row:
+  docs and the software registry share drydocs, so the edge is writable in-place — no
+  cross-database edge question remains. (f) Q16 clause (b) CLOSES at the declaration layer:
+  the pointer now reaches the graph THROUGH the loader (ledger -> adapter -> row -> cypher);
+  live edges re-stamp at the next bmc-docs load on a machine holding the graph (J18 — no
+  live-load claim made here; the loaded desktop edges already carry 'controlm' from the old
+  constant, so the next load is a no-op re-assertion, not a migration). The honest
+  FOREACH/OPTIONAL-MATCH behaviors are untouched, per the notes' instruction. Suite 2579
+  passed / 11 skipped; ruff clean.

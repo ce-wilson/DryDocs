@@ -483,3 +483,38 @@ def test_no_merge_on_nullable_keys() -> None:
     assert "product_id: row.subject_product_id" not in text.replace(
         "OPTIONAL MATCH (sp:SoftwareProduct {product_id: row.subject_product_id})", ""
     )
+
+
+# ---- Q18: the DESCRIBES target is the LEDGER's, not a module constant --------
+
+
+def test_describes_target_is_registry_driven_with_no_fallback_constant(tmp_path):
+    """The constant is REMOVED, not shadowed (Q18 (b)): the adapter takes its
+    subject from the corpus's own doc-source-registry row, a different declared
+    value flows straight through to every row, and a row without the field
+    refuses at construction — before anything is read or written."""
+    import drydocs.loaders.bmc_docs as mod
+    from drydocs_core.source_registry import SourceRegistry
+
+    assert not hasattr(mod, "SUBJECT_PRODUCT_ID"), "the fallback constant is back"
+
+    class _Entry:
+        def __init__(self, data):
+            self.data = data
+
+    class _Reg(SourceRegistry):
+        def __init__(self, data):
+            self._q18 = data
+
+        def get(self, source_id):
+            assert source_id == "bmc-docs"
+            return _Entry(self._q18)
+
+    adapter = mod.BmcDocsAdapter(registry=_Reg({"describes_product": "some-other-product"}))
+    assert adapter.describes_product == "some-other-product"
+
+    with pytest.raises(ValueError, match="describes_product"):
+        mod.BmcDocsAdapter(registry=_Reg({}))
+
+    # and the shipped registry declares the live corpus's real target
+    assert mod.BmcDocsAdapter().describes_product == "controlm"

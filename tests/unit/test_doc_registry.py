@@ -149,3 +149,28 @@ def test_ingested_corpora_are_backfilled() -> None:
     ids = {src.get("id") for src in _registry().get("sources", [])}
     missing = INGESTED_CORPORA - ids
     assert not missing, f"ingested corpora missing from the doc-source ledger: {sorted(missing)}"
+
+
+def test_describes_product_names_a_real_software_registry_product() -> None:
+    """Q18 (c) — the missing half of the declaration: `describes_product` is
+    OPTIONAL per corpus, but a declared id must be a product the software
+    registry actually holds. "Declared, and nothing checks it is reachable"
+    is the G80/J47 family this closes. The bmc-docs entry must declare it —
+    that corpus's DESCRIBES edges are live, and before Q18 their target was a
+    module constant no ledger could reproduce."""
+    software = yaml.safe_load(
+        (DOC_REGISTRY.parent / "taxonomy" / "software-registry.yaml").read_text(encoding="utf-8")
+    )
+    product_ids = {p["id"] for p in software.get("products", [])}
+    assert product_ids, "software registry parsed empty — the guard would be vacuous"
+
+    declared: dict[str, str] = {}
+    for src in _registry().get("sources", []):
+        pid = src.get("describes_product")
+        if pid is not None:
+            declared[src["id"]] = pid
+    assert "bmc-docs" in declared, "bmc-docs must declare describes_product (Q18 (a))"
+    unknown = {sid: pid for sid, pid in declared.items() if pid not in product_ids}
+    assert (
+        not unknown
+    ), f"describes_product names ids that are not software-registry products: {unknown}"
