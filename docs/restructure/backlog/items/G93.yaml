@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_remediation/jira.py
@@ -34,3 +34,17 @@ acceptance: |
   REPRODUCED AT THE GROOM, sample-only (J18): render_handoff() emits Findings, Scope, Change, Equivalence evidence, Acceptance and Rollback -- and not one count of what the run actually processed. The reviewer reading the ticket cannot tell whether the batch examined nine jobs or nine hundred, so "we fixed it" carries no denominator. Meanwhile the extractors already model exactly this (ExtractCoverage.summary() with the G60 prepost_* source split, XmlDefsCoverage, findings counted by rule) -- the pattern exists, the handoff just never reads it. (a) THE COUNTS RIDE THE RUN LOG, NOT THE CONSOLE. A remediation batch opens a LoaderRunLog (drydocs_core/run_log.py) and closes it with its counts in the summary, the same contract the loaders already use; the handoff is rendered FROM that recorded summary. Console output is a view of the run, never its record. (b) NUMBERS ARE RECORDED, NOT RECOMPUTED AT RENDER TIME. HandoffPackage carries the run's counts as data; render_handoff stays a pure deterministic template (the module's existing house rule). A test proves the rendered body reports the recorded numbers even when the finding list handed to the renderer is a subset -- otherwise the explanation silently re-derives a denominator from whatever survived filtering. (c) WHAT THE SECTION CARRIES, at minimum: objects examined, objects changed, findings by rule id and by severity, the ratified / unratified split (a warn-only finding must not inflate a fix count), and anything skipped WITH ITS REASON -- unparseable is counted, never dropped. (d) ABSENCE IS EXPLICIT. A package assembled without a run summary renders the section as not recorded rather than omitting it, so a missing measurement never reads as a clean run. (e) IT DOES NOT RESTATE THE EQUIVALENCE PROOF. proven / compared jobs stay in their own section with the three-valued PASS / DIVERGED / NOT PROVEN verdict; coverage counts what the run looked at, the proof states what it demonstrated, and merging them would let a big denominator read as evidence. Zero graph writes. No new relationship type, no vocabulary entry, no gate.
 notes: |
   Groomed 2026-08-12 (targeted groom) from Idea-113, user direction the same day. Verified at the groom: render_handoff has no counts section, and nothing under drydocs_remediation/ imports run_log at all today (drydocs/cli.py is the only LoaderRunLog caller) -- so the batch-side run log is part of this item, not an assumed prerequisite. MODULE: drydocs-remediation, chosen because both change points (jira.py, the batch entry point) are there; drydocs_core/run_log.py is ADOPTED unchanged. If the run-log contract itself needs a field it does not have, that is a drydocs-core follow-up, not this item. WHY IT MATTERS BEYOND TIDINESS: this is the support -> dev handoff of the runbook automation use case. The ticket is where a support engineer's evidence becomes a developer's instruction, and an explanation without counts cannot be audited later against the run that produced it.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  Built per the G107 rider: run_remediation_batch() in drydocs_remediation/jira.py is the
+  batch entry point, wrapped in drydocs_core.run_log.batch_run_log (the shared context
+  manager, never a hand-rolled open/try/finally) -- the fifth and last of the Idea-152
+  cadences joins the other four. RemediationCoverage (on HandoffPackage.coverage, data
+  not derivation) records objects examined and changed (a real position-paired diff of
+  legacy vs greenfield definitions), findings by rule id and by severity, the ratified/
+  unratified split, and skip reasons (counted, never dropped). render_handoff reads it in
+  its own Coverage section: clause (b) proven by handing the renderer a 2-finding subset
+  of a 12-finding recorded run and asserting the body still reports 12; clause (d) --
+  coverage=None renders "not recorded", never omits; clause (e) -- the Coverage section
+  carries no PASS/DIVERGED/proven text, the equivalence proof keeps its own section.
+  Zero graph writes; drydocs_remediation/__init__.py untouched (another session holds an
+  uncommitted edit there).
