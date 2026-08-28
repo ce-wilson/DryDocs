@@ -91,6 +91,25 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-186`** · 2026-08-28 · `[task]` · **open** · prio? **Med** —
+  **The superseded-database line-scan, applied to the five operator docs the 2026-08-24 fold
+  touched, finds 18 un-escaped historical mentions across four of the five files — G114's
+  clause (e) declined to bundle the fix and this is the recorded follow-up.** At G114's build
+  the guard's exact SUPERSEDED_NAMES / allowed-line logic was dry-run against
+  `drydocs_core/schema/provisioning/README.md`, `docs/design/drydocs-startup-refresh-runbook.md`,
+  `docs/design/drydocs-project-review.md`, `docs/design/drydocs-core-runbook.md`, and
+  `internal/repo-README.md` (the last is clean). The offenders are flowing narrative prose
+  naming retired databases without the escape wording on the same line — six lines in
+  project-review, five in the startup runbook. The reason it was not swept in G114: three of
+  the four files are GOVERNED design-doc renders (verbatim-publish rule, feedback anchors key
+  on the rendered text), so the fix is a prose pass plus a design-doc re-render and review,
+  not a mechanical reword. The follow-up item should: reword the 18 lines to carry the escape
+  wording, re-render with render_design_doc.py, and extend the guard's scan to a small
+  DECLARED operator-doc list (the extra-docs idiom test_runbook_currency.py uses) so the
+  surface stays guarded after the sweep — that last part is the piece that stops the drift
+  from recurring, per the G114 close note's general form (guarded surfaces followed the fold,
+  nine unguarded ones did not).
+
 - **`Idea-185`** · 2026-08-28 · `[question]` · **open — the MECHANICAL half is groomed → J61 (2026-08-28); the POLICY half below is the user's, because it is a choice about how two live sessions share one working tree** · prio? **Med** —
   **Twice on 2026-08-28, hours apart, a session could not sync the shared desktop checkout
   because the other live session was holding an uncommitted edit to a file the incoming merge

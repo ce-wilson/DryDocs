@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_database_names.py
@@ -30,3 +30,19 @@ notes: |
   The general form is the part worth keeping and belongs in the close note: at the fold every GUARDED surface followed and nine unguarded ones did not, and the load runbook proves it both ways — Appendix B stayed correct because a test derives it, Appendix A drifted because its only stated source is a sentence.
 
   Module `graph-infra` follows G28, which owns this guard. p2/sonnet: a two-element tuple edit plus one frozenset entry, but the RED-first discipline and the allowance handling are what make it more than a one-liner.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  SCANNED_PACKAGES gained agents and drydocs_docmeta (clause a); SUPERSEDED_NAMES gained
+  dddocs, the name ADR 0006 section 1 declared for the docs corpus but that G32/G102
+  (2026-08-18) rejected before it was ever provisioned (clause b). Written RED first per
+  clause (c): the widening alone was committed failing and named 7 offending lines --
+  drydocs/docs_verify.py:24, drydocs_api/query_specs.py:668, agents/common/agent_run_writer.py
+  (x2, the exact module-docstring case the item named), agents/graph_qa/task_graph.py:5, and
+  drydocs_docmeta/__init__.py (x2). Both widenings independently found live offenders: the
+  new packages carried ddcontext mentions, and dddocs hits surfaced in two ALREADY-scanned
+  packages, so neither half was vacuous. All 7 were deliberate historical mentions; each
+  gained the existing superseded/retired escape wording on the same line as the name --
+  final offender count zero, no allowance widened, _ALLOWED_IN_LINE untouched (clause d).
+  Clause (e) DECLINED with evidence: the same scan dry-run against the five operator docs
+  the fold touched finds 18 un-escaped lines across four files, three of them governed
+  design-doc renders -- a prose pass plus re-render, not a mechanical declared-list win;
+  recorded as Idea-186 rather than bundled here.
