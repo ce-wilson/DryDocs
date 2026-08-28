@@ -1610,6 +1610,40 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   silent — an unactioned relay with a reason is a live relay; an unmentioned one reads as
   discharged and is how RELAY-5's false company-state claim happened.
 
+- **RELAY-17 — STUB-AND-ENRICH IS THE RULED :Employee CREATION POLICY; YOUR RUNBOOK
+  (v2 AND PUBLISHED v3) FORBIDS WHAT BOTH SIDES' LOADERS DO — HARMONIZE THE DOC AND
+  VERIFY THE RECONCILIATION HALF** (standing since 2026-08-28; from G74, closed
+  2026-08-27).
+  `[VERIFIED-PRODUCER]` for the ruling and the producer surfaces: stub-and-enrich WINS
+  (SME direction 2026-08-18, producer gate-log RECORD same date; G74 clause 2 applied
+  it 2026-08-27). `seal_applications.cypher` mints `:Employee` placeholders at lines
+  145/169/192 (app-owner / CTO / info-owner SIDs) with `ON CREATE SET e.source='SEAL'`;
+  `source` IS the awaiting-enrichment marker and nothing else is minted (ruled on the
+  Employee class row in `10-node-classifications.yaml`); the count of `source='SEAL'`
+  survivors after a roster load is the HR-coverage report BY DESIGN, not debris.
+  `human_employee_reports_to` is registered `planned` (REPORTS_TO, Employee->Employee,
+  `52-local-human.yaml`, org:reportsTo); NO producer loader exists or may exist for it —
+  the source is your HR hierarchy through your `hr-emp-hierarchy` gate.
+  `[SME-REPORTED]` for the two surfaces only you hold — treat as expectation, never as
+  established state: (1) your "backbone-and-enrich" runbook prose (v2 and the published
+  v3) states `:Employee` is created ONLY by `load-employee-roster`, SEAL attaching
+  enrich-only via OPTIONAL MATCH — the opposite of the ruled behavior; (2) your
+  `load-employee-roster` MERGEs on the same key and flips `source` SEAL->HR
+  (authoritative), which is the reconciliation that makes the placeholder pattern safe.
+  Neither is checkable from the producer (T21 already records the roster test as
+  company-only; no such runbook prose exists under producer `docs/design/`).
+  **ACTION AT THE PORT THAT CARRIES THIS:** (1) harmonize the runbook text (v2 + v3) to
+  the placeholder pattern — the loader behavior is the policy; the doc is what changes;
+  a design doc that forbids what the loader does hands the next reader whichever truth
+  they open first. (2) VERIFY the reconciliation half live on your graph: a SID in both
+  upgrades to `source=HR` and gains REPORTS_TO; a roster-only SID creates fresh as HR; a
+  SEAL-only SID survives as the coverage report. **IF EITHER SURFACE IS NOT AS DESCRIBED
+  — the prose differs, or your roster loader does not flip `source` — STOP AND SCOPE:**
+  record what you actually hold in your ledger and leave the harmonization to a shape
+  that matches your tree; do not force this relay's description onto it. Outcomes live
+  in YOUR ledger. Same asymmetry class as RELAY-6: the producer holds the code that
+  mints; you hold the doc that forbids it and the loader that reconciles it.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
