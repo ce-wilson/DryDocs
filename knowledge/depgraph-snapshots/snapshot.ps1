@@ -84,31 +84,144 @@ function Get-WorktreeState {
   }
 }
 
-# --- refresh the project board (best-effort; part of the session-end ritual) --
-# docs/restructure/backlog/ -> docs/plan/board.html. Deterministic render: a resulting git
-# diff on board.html means the committed board was stale — commit the refresh.
-try {
+# --- refresh helpers (J53) ----------------------------------------------------
+# Both refresh steps below are best-effort (they must never block the snapshot)
+# but the OLD idiom could not say why a step failed. It ran the render under
+# $ErrorActionPreference = "Stop" with no explicit stderr capture and printed
+# $_.Exception.Message. For a failing NATIVE command that message is only the
+# FIRST line PowerShell wrapped from stderr — and the first line a Python
+# failure ever writes is the literal "Traceback (most recent call last):"
+# banner (every traceback starts with it), never the exception itself. So the
+# warning could name a cause only by accident, and in practice named none.
+# Worse: on a partial render (2026-08-23: 3 of the renderer's 9 outputs were
+# written, 6 were left stale) nothing said which was which, so the session
+# ritual's stale-render diff ran against an unknown state.
+#
+# Fix: capture the FULL merged stdout+stderr of the render explicitly (never
+# rely on PowerShell's console-dependent stderr-to-ErrorRecord wrapping — it is
+# not even consistent: a native command's nonzero exit does not always throw
+# under EAP=Stop, so the old catch block could also simply never fire and the
+# traceback would print with no warning at all), read $LASTEXITCODE directly,
+# and on failure report the LAST non-empty line (the exception type + message)
+# rather than the exception's own .Message. Landed vs. stale is read from each
+# expected output's mtime, compared before/after the run, so a partial render
+# is reported by name instead of by guess.
+#
+# WORKED EXAMPLE (the reproduction this was built against, not the fix itself):
+# on this desktop the trigger is $env:VIRTUAL_ENV being pre-set (to
+# agents\.venv — see the "Desktop VIRTUAL_ENV Leak" project memory) before this
+# script runs `poetry run python ...`. Poetry inherits it and resolves imports
+# against that OTHER environment instead of the project's own, so the render
+# gets partway through (writes board.html, gates.json, enforcement-matrix.json)
+# before failing on a package the leaked environment lacks (observed:
+# `ModuleNotFoundError: No module named 'typer'`, importing drydocs/cli.py from
+# scripts/render_load_map.py, the 4th of 9 render steps). A user's own terminal
+# does not pre-set VIRTUAL_ENV, so this was never seen interactively — which is
+# exactly why the warning has to name the cause rather than assuming whoever
+# reads it already knows it. This is not the fix; the fix is that the warning
+# below would now say `ModuleNotFoundError: No module named 'typer'` instead of
+# `Traceback (most recent call last):`.
+
+function Write-RefreshFailure {
+  param(
+    [string]$Name,
+    [string[]]$Output,
+    [string[]]$ExpectedOutputs,
+    [hashtable]$Before,
+    [string]$Repo
+  )
+  $landed = @()
+  $stale  = @()
+  foreach ($rel in $ExpectedOutputs) {
+    $p = Join-Path $Repo $rel
+    $after = if (Test-Path $p) { (Get-Item $p).LastWriteTimeUtc } else { $null }
+    if ($after -and $after -ne $Before[$rel]) { $landed += $rel } else { $stale += $rel }
+  }
+  # The LAST non-empty line names the cause: for a Python failure that is the
+  # exception type + message (the traceback's FIRST line is always the banner,
+  # never the cause); for a failing native command it is the last line of
+  # stderr, which is the closest a shell gets to "the actual error".
+  $causeLines = @($Output | Where-Object { $_.Trim() -ne "" })
+  $cause = if ($causeLines.Count -gt 0) { $causeLines[-1] } else { "(process produced no output)" }
+  $landedTxt = if ($landed.Count -gt 0) { $landed -join ", " } else { "(none)" }
+  $staleTxt  = if ($ExpectedOutputs.Count -eq 0) { "(not tracked)" } elseif ($stale.Count -gt 0) { $stale -join ", " } else { "(none)" }
+  Write-Warning @"
+$Name refresh FAILED -- cause: $cause
+  landed (written this run) : $landedTxt
+  stale  (unchanged)        : $staleTxt
+Full command output was printed above. The session ritual's stale-render diff
+check should be read against this landed/stale split, not against an unknown
+state -- a partial render is now distinguishable from a skipped one.
+"@
+}
+
+function Invoke-RefreshStep {
+  # Runs `poetry <Args>` best-effort: never throws past this function, always
+  # reports a real cause on failure (see the header comment above for why the
+  # old $_.Exception.Message idiom could not).
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][string[]]$Args,
+    [string[]]$ExpectedOutputs = @()
+  )
   Push-Location $repo
   $env:PYTHONPATH = "."
-  & poetry run python scripts/render_board.py | Write-Host
-  Pop-Location
-} catch {
-  Pop-Location -ErrorAction SilentlyContinue
-  Write-Warning "board refresh skipped: $($_.Exception.Message)"
+  $before = @{}
+  foreach ($rel in $ExpectedOutputs) {
+    $p = Join-Path $repo $rel
+    $before[$rel] = if (Test-Path $p) { (Get-Item $p).LastWriteTimeUtc } else { $null }
+  }
+  try {
+    # Capture merged stdout+stderr explicitly rather than letting a native
+    # command's stderr become a terminating ErrorRecord under EAP=Stop (see
+    # the U22 code-graph-freshness block below for the same PS 5.1 hazard).
+    $prevEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    $output = @(& poetry @Args 2>&1 | ForEach-Object { "$_" })
+    $exit = $LASTEXITCODE
+    $ErrorActionPreference = $prevEap
+    $output | Write-Host
+    if ($exit -ne 0) {
+      Write-RefreshFailure -Name $Name -Output $output -ExpectedOutputs $ExpectedOutputs -Before $before -Repo $repo
+    }
+  } catch {
+    # Something failed OUTSIDE the captured invocation (e.g. `poetry` itself
+    # is not on PATH) -- there is no captured stdout/stderr to read a cause
+    # from, so the exception message IS the real cause here.
+    Write-Warning "$Name refresh FAILED (could not run): $($_.Exception.Message)"
+  } finally {
+    Pop-Location -ErrorAction SilentlyContinue
+  }
 }
+
+# --- refresh the project board (best-effort; part of the session-end ritual) --
+# docs/restructure/backlog/ -> docs/plan/board.html plus the eight sibling renders
+# scripts/render_board.py chains (gates.json, enforcement-matrix.json, load-map.json
+# + load-map.html, software-registry.json, context-types.json, remediation-diff.json,
+# ideas.html, roadmap.html — nine outputs total). Deterministic render: a resulting
+# git diff on any of them means the committed render was stale — commit the refresh.
+Invoke-RefreshStep -Name "board" -Args @("run", "python", "scripts/render_board.py") -ExpectedOutputs @(
+  "docs\plan\board.html",
+  "web\src\generated\gates.json",
+  "web\src\generated\enforcement-matrix.json",
+  "web\src\generated\load-map.json",
+  "docs\plan\load-map.html",
+  "web\src\generated\software-registry.json",
+  "web\src\generated\context-types.json",
+  "web\src\generated\remediation-diff.json",
+  "docs\plan\ideas.html",
+  "docs\plan\roadmap.html"
+)
 
 # --- refresh the design docs (best-effort; part of the session-end ritual) ----
 # docs/design/*.md -> <stem>.html (one surface: screen + @media print; Epic L / L13). Deterministic render:
 # a resulting git diff on a doc render means the committed HTML was stale — commit it.
-try {
-  Push-Location $repo
-  $env:PYTHONPATH = "."
-  $designDocs = Get-ChildItem "$repo\docs\design\*.md" -ErrorAction SilentlyContinue
-  if ($designDocs) { & poetry run python scripts/render_design_doc.py @($designDocs.FullName) | Write-Host }
-  Pop-Location
-} catch {
-  Pop-Location -ErrorAction SilentlyContinue
-  Write-Warning "design-doc refresh skipped: $($_.Exception.Message)"
+# Same catch idiom as the board refresh above (J53 clause c) — a half-rendered
+# batch of design docs is exactly as silent a failure mode as a half-rendered
+# board, so it gets the identical treatment rather than a second copy of the bug.
+$designDocs = Get-ChildItem "$repo\docs\design\*.md" -ErrorAction SilentlyContinue
+if ($designDocs) {
+  $designOutputs = $designDocs | ForEach-Object { ($_.FullName -replace '\.md$', '.html').Substring($repo.Length + 1) }
+  Invoke-RefreshStep -Name "design-doc" -Args (@("run", "python", "scripts/render_design_doc.py") + @($designDocs.FullName)) -ExpectedOutputs $designOutputs
 }
 
 # --- CI gate check (Idea-111) — runs BEFORE the snapshot ---------------------
