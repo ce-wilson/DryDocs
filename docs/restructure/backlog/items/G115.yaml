@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/sql/controlm_folders.sql
@@ -33,3 +33,25 @@ notes: |
   Module `drydocs-load` and epic component-topology recorded as a choice with alternatives considered: runtime-topology (Epic P) owns the CM_HOSTS and CM_AVG_RUN supplements rather than extraction scope, and source-column-mappings (Epic N) owns the column ledgers rather than the pull. The work is in the loader SQL and the CLI, so it lands with the component that holds them.
 
   p1 because it gates the first real estate-scale load and the user has already given the direction. opus rather than sonnet because clause (b) is a decision with an operational consequence, not a transcription.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  (a) --data-center / :data_center_filter joins the scope-bind family following the
+  existing name-valued-dimension idiom (LIKE, _filter suffix, NULL-guarded absent-means-
+  all): folders and the folder-joined jobs and variables extracts, hosts on its own
+  long-form column, avg-run in the SQL contract ready for the gate-bound supplement.
+  Wired through _scope_binds and _data_center_opt in cli_shared, re-exported through
+  cli.py, on ingest-controlm / analyze-variables / normalize-variables. Safety
+  extension: a DC-scoped chain run is a PARTIAL extract (full_extract = no folder AND
+  no data-center bind), so the removed-from-source mark pass does not run -- a one-DC
+  run must not mark the other data centers removed. (b) DECIDED: one run per data
+  center, recorded in the load runbook (Rev 4, "Data-center-scoped runs") and echoed on
+  stg_run.data_centers in the staging DDL -- collision attributability first (P6),
+  bounded per-DC staging/rollback windows second, failure isolation third; matches the
+  user's 2026-08-24 direction. The comma-list field stays; it carries one value per run.
+  (c) production scope in the publishable J13 spellings T012-E0700-IB / T014-E0700-ANY /
+  T032-E0700-DMA from the internal data-center inventory; T021-E0800-ANY named as the
+  ruled first-cut exclusion. (d) four new tests read SQL code lines, the two-DC bundled
+  hosts sample, and app.registered_commands (J37); the SELECT-list drift guard passes
+  untouched. (e) the runbook names P6 as the precondition: one data center at a time
+  until the identity-collision probe rules. One layer note: the hosts value-domain
+  question is treated as answered by the 2026-07-22 avg-run profile probe (long-form
+  name everywhere), which is what lets one spelling scope the whole family.
