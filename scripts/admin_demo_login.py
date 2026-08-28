@@ -42,9 +42,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from set_console_credential import save_store  # noqa: E402 — sibling script
+from set_console_credential import describe, save_store  # noqa: E402 — sibling script
 
 from drydocs_api.credentials import (  # noqa: E402 — after the sys.path fix above
+    ORIGIN_GENERATED,
     CredentialError,
     CredentialStore,
     credentials_path,
@@ -105,7 +106,10 @@ def _set_secret(identity: str, target: Path, *, generate: bool) -> None:
     if generate:
         secret = secrets.token_urlsafe(GENERATED_SECRET_BYTES)
         store = _load(target)
-        store.set(identity, secret)
+        # Recorded as generated (O76) BECAUSE of the next two lines: this secret
+        # is about to be printed, and the whole point of the field is that a
+        # listing can later say so without anybody having to remember.
+        store.set(identity, secret, origin=ORIGIN_GENERATED)
         save_store(store, target)
         print(f"  {identity}: generated secret -> {secret}")
         print("  (shown once; it is not recoverable from the stored hash)")
@@ -144,12 +148,17 @@ def _status(target: Path, api: str) -> int:
         print("  NO ACCOUNT CAN SIGN IN - run with --ensure")
     alias_of = {identity: alias for alias, identity in ALIASES.items()}
     for identity in sorted(PERSONAS):
-        mark = "ready" if identity in ready else "no secret set"
+        credential = store.get(identity)
+        mark = describe(credential) if credential is not None else "no secret set"
         print(
             f"  {alias_of.get(identity, ''):<8} {identity:<10} {PERSONAS[identity].role:<8} {mark}"
         )
     for identity in sorted(ready - set(PERSONAS)):
         print(f"  {'':<8} {identity:<10} {'-':<8} has a secret but is not a known persona")
+    stale = [i for i in ready if (c := store.get(i)) is not None and c.wants_rotation]
+    if stale:
+        print(f"  ROTATE BEFORE DEMOING: {', '.join(sorted(stale))}")
+        print("  Each was generated and printed to a terminal. Replace: --rotate <account>")
 
     status, _ = _api_login(api, "", "")
     if status == 0:

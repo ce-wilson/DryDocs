@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - O73
 - O75
@@ -39,5 +39,11 @@ notes: |
   WHERE IT CAME FROM. `admin_demo_login.py --generate` invents a secret and prints it once, and the docstring argues the trade correctly for a synthetic account on localhost. What is missing is that nothing records it happened, so `--list` and the status table show only WHICH ids have a credential. An account carrying a secret that went to a terminal weeks ago looks exactly like one set by hand at a no-echo prompt. DataHub spends a documentation page compensating in prose for the same class of problem — its shipped `datahub:datahub` survives deleting the user in the UI — and prose is what you write when the artifact cannot answer for itself.
 
   THE RISK IS THE MIGRATION, NOT THE FIELDS. Adding two strings to a JSON object is nothing; changing the version of a file the running build refuses to read on mismatch is the whole item. The live file on this machine is version 1 with six accounts, and the failure mode of getting this wrong is a console that will not open and a message telling the operator to re-bootstrap. Clause (b) is written to be read before the constant is touched.
+
+  BUILT 2026-08-28 (desktop). `FORMAT_VERSION` is 2 and a new `READABLE_VERSIONS` names what the build accepts, so reading an older KNOWN version is a separate permission from reading an unknown one and a file from the future is still refused. `Credential` gained `origin` and `set_at` plus two derived properties, `age_days` and `wants_rotation`. `hash_secret` and `CredentialStore.set` take a keyword-only `origin` defaulting to unknown, so a caller that has not thought about provenance records that rather than asserting the common case. `describe()` lives in `set_console_credential.py` and is IMPORTED by `admin_demo_login.py`, because two surfaces disagreeing about what stale means would be worse than one surface that never said it.
+
+  A GUARD CAUGHT SOMETHING WORTH RECORDING. The ADR 0009 write guard in `test_mapping_api.py` scans this package for filesystem write primitives BY NAME, and it flagged `stamp.replace(tzinfo=UTC)` inside `age_days` -- a false positive on `datetime.replace`. The fix was to remove the call, not to exempt it: a naive stamp is now treated as unmeasurable, which is the more honest answer anyway, since every stamp this module writes carries a zone and picking one for a hand-edited value would invent the age being measured. A guard that stops an endpoint granting itself an account does not get an exemption for a line that had a clearer spelling available.
+
+  VERIFIED LIVE on this desktop against a temporary credential file outside the repo, with the real file left untouched (still version 1, six accounts, confirmed after). A hand-seeded version-1 file loads and verifies with origin unknown; the next write upgrades the file to version 2 while KEEPING the migrated entry unknown rather than relabelling it; a generated secret aged past the threshold reports 17 days and both listings print the rotation call to action; a prompted secret of any age and an unknown-origin entry are not flagged. Ten new guards, 173 tests green across the api, console, mapping, module-boundary and render-parsing surfaces, ruff clean.
 
   MODULE CHOICE follows O69, O73, O74 and O75 — every file is under `drydocs_api/` and `scripts/`, and a `drydocs-api` module exists, but the console-authentication stream is filed `drydocs-web` and a lone divergence would make it unfilterable for one row.

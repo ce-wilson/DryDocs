@@ -47,6 +47,7 @@ import logging
 import os
 import secrets
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
@@ -54,10 +55,37 @@ from drydocs_core.repo_paths import repo_root
 
 logger = logging.getLogger(__name__)
 
-#: Bumped when the stored shape changes; a file from the future is refused.
-FORMAT_VERSION = 1
+#: Bumped when the stored shape changes. This is what we WRITE.
+FORMAT_VERSION = 2
+
+#: What we can READ. Version 2 added the provenance fields below; version 1 files
+#: predate them and load with ``origin`` unknown. Reading an older KNOWN version is
+#: not the same permission as reading an unknown one -- a file from the future is
+#: still refused, because a field this build cannot interpret may be the one that
+#: matters. See ``Credential.from_dict`` and O76 clause (b): the live file on a
+#: working machine is version 1 carrying every account, so refusing it on a version
+#: bump would sign the operator out of their own console to gain a metadata field.
+READABLE_VERSIONS = (1, 2)
 
 ALGORITHM = "scrypt"
+
+#: How a stored secret came to exist. Non-secret metadata: it narrows nothing
+#: about the secret itself, and it is the whole point of O76 -- a generated secret
+#: was PRINTED TO A TERMINAL once, and a prompted one never was.
+ORIGIN_PROMPTED = "prompted"
+ORIGIN_GENERATED = "generated"
+#: A version-1 entry, migrated. NEVER inferred to be ``prompted``: it probably was,
+#: and "probably" is not a record. Guessing here would make the staleness flag
+#: below silently under-report in the exact file whose new job is provenance.
+ORIGIN_UNKNOWN = "unknown"
+ORIGINS = (ORIGIN_PROMPTED, ORIGIN_GENERATED, ORIGIN_UNKNOWN)
+
+#: When a GENERATED secret starts asking to be rotated. Named here rather than
+#: written at a call site so both reporting surfaces mean the same thing by
+#: "stale", and so changing the policy is one edit. Two weeks is a demo cycle: long
+#: enough that a secret generated for today's demo is not nagged about, short
+#: enough that one still sitting there next sprint is.
+GENERATED_SECRET_STALE_DAYS = 14
 
 # OWASP's scrypt configuration (N = 2^14, r = 8, p = 5). Roughly 16 MiB per
 # hash, so maxmem must be raised above hashlib's default with room to spare.
@@ -97,16 +125,66 @@ class Credential:
     n: int
     r: int
     p: int
+    #: Provenance (O76). Non-secret, and deliberately not defaulted to a
+    #: plausible value -- ``ORIGIN_UNKNOWN`` with no ``set_at`` is what a
+    #: migrated version-1 entry honestly is.
+    origin: str = ORIGIN_UNKNOWN
+    set_at: str | None = None  # ISO-8601 UTC, second precision
 
     def as_dict(self) -> dict[str, object]:
-        return {
+        payload: dict[str, object] = {
             "algorithm": self.algorithm,
             "salt": self.salt,
             "hash": self.hash,
             "n": self.n,
             "r": self.r,
             "p": self.p,
+            "origin": self.origin,
         }
+        # Omitted rather than written as null: an absent stamp and a stamp whose
+        # value is nothing are the same fact, and one of the two spellings is
+        # easier to read in a file a person opens.
+        if self.set_at is not None:
+            payload["set_at"] = self.set_at
+        return payload
+
+    @property
+    def age_days(self) -> int | None:
+        """Whole days since this secret was set, or None when unrecorded."""
+        if self.set_at is None:
+            return None
+        try:
+            stamp = datetime.fromisoformat(self.set_at)
+        except ValueError:
+            return None
+        if stamp.tzinfo is None:
+            # Every stamp this module writes carries a zone. A naive one came
+            # from a hand edit, and picking a zone for it would invent the very
+            # age it is being asked to measure -- so it is unmeasurable, exactly
+            # like an unparseable one above.
+            #
+            # (Written this way rather than with a tzinfo substitution for a
+            # second reason: the ADR 0009 guard in tests/unit/test_mapping_api.py
+            # scans this package for write primitives BY NAME, and .replace() is
+            # one of them. Its match on datetime.replace is a false positive, but
+            # a guard that stops an endpoint granting itself an account is not
+            # worth an exemption for a line that has a clearer spelling anyway.)
+            return None
+        return max(0, (datetime.now(UTC) - stamp).days)
+
+    @property
+    def wants_rotation(self) -> bool:
+        """True for a GENERATED secret past the staleness threshold.
+
+        Only generated ones, and only when the age is actually known. A prompted
+        secret was never printed anywhere, so age alone is not a reason to nag;
+        an unknown-origin entry has no age to judge. A flag that fires on
+        everything is a flag nobody reads.
+        """
+        if self.origin != ORIGIN_GENERATED:
+            return False
+        age = self.age_days
+        return age is not None and age >= GENERATED_SECRET_STALE_DAYS
 
     @classmethod
     def from_dict(cls, raw: object) -> Credential:
@@ -120,6 +198,16 @@ class Credential:
                 n=int(raw["n"]),
                 r=int(raw["r"]),
                 p=int(raw["p"]),
+                # OPTIONAL on purpose, and this is the whole migration (O76).
+                # A version-1 entry has neither key and lands as unknown with no
+                # stamp; nothing is invented for it. An origin string this build
+                # does not recognise is also read as unknown rather than refused,
+                # because provenance is metadata -- being unable to interpret it
+                # is not a reason to reject a credential that verifies.
+                origin=(
+                    str(raw["origin"]) if str(raw.get("origin", "")) in ORIGINS else ORIGIN_UNKNOWN
+                ),
+                set_at=str(raw["set_at"]) if raw.get("set_at") else None,
             )
         except (KeyError, TypeError, ValueError) as exc:
             raise CredentialError(f"malformed credential entry: {exc}") from None
@@ -143,10 +231,17 @@ def _derive(secret: str, salt: bytes, *, n: int, r: int, p: int) -> bytes:
     )
 
 
-def hash_secret(secret: str) -> Credential:
-    """Derive a fresh salted hash at the current parameters."""
+def hash_secret(secret: str, *, origin: str = ORIGIN_UNKNOWN) -> Credential:
+    """Derive a fresh salted hash at the current parameters.
+
+    ``origin`` is keyword-only and defaults to unknown rather than to the common
+    case, so a caller that has not thought about provenance records that it has
+    not, instead of quietly asserting the secret was prompted for.
+    """
     if not secret:
         raise ValueError("refusing to hash an empty secret")
+    if origin not in ORIGINS:
+        raise ValueError(f"unknown credential origin {origin!r}; expected one of {ORIGINS}")
     salt = secrets.token_bytes(SALT_BYTES)
     derived = _derive(secret, salt, n=SCRYPT_N, r=SCRYPT_R, p=SCRYPT_P)
     return Credential(
@@ -156,6 +251,8 @@ def hash_secret(secret: str) -> Credential:
         n=SCRYPT_N,
         r=SCRYPT_R,
         p=SCRYPT_P,
+        origin=origin,
+        set_at=datetime.now(UTC).isoformat(timespec="seconds"),
     )
 
 
@@ -232,8 +329,17 @@ class CredentialStore:
             return False
         return verify_secret(credential, secret)
 
-    def set(self, identity: str, secret: str) -> None:
-        self._credentials[identity] = hash_secret(secret)
+    def set(self, identity: str, secret: str, *, origin: str = ORIGIN_UNKNOWN) -> None:
+        self._credentials[identity] = hash_secret(secret, origin=origin)
+
+    def get(self, identity: str) -> Credential | None:
+        """The stored entry, for a REPORTING caller that wants its provenance.
+
+        Returns the credential rather than the secret -- there is no secret to
+        return, only a hash it cannot be recovered from. The two listing surfaces
+        use this; nothing on the HTTP path does.
+        """
+        return self._credentials.get(identity)
 
     def remove(self, identity: str) -> None:
         self._credentials.pop(identity, None)
@@ -252,10 +358,11 @@ class CredentialStore:
         if not isinstance(raw, dict):
             raise CredentialError(f"credential file {target} is not an object")
         version = raw.get("version")
-        if version != FORMAT_VERSION:
+        if version not in READABLE_VERSIONS:
             raise CredentialError(
                 f"credential file {target} is format version {version!r}; "
-                f"this build reads version {FORMAT_VERSION}"
+                f"this build reads {', '.join(str(v) for v in READABLE_VERSIONS)} "
+                f"and writes {FORMAT_VERSION}"
             )
         entries = raw.get("credentials")
         if not isinstance(entries, dict):
@@ -279,7 +386,9 @@ class CredentialStore:
                 "Machine-local console credentials. Never commit this file, never port it, "
                 "never copy it between machines. Deleting it removes every account; there is "
                 "no committed source to rebuild it from, which is exactly why it does not "
-                "live under var/. Re-bootstrap with scripts/set_console_credential.py."
+                "live under var/. Re-bootstrap with scripts/set_console_credential.py. "
+                "origin/set_at record HOW and WHEN a secret was set and are not secret; "
+                "origin 'unknown' means the entry predates version 2 and was not guessed at."
             ),
             "credentials": {k: v.as_dict() for k, v in sorted(self._credentials.items())},
         }

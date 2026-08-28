@@ -21,7 +21,14 @@ import pytest
 from drydocs_api.credentials import (
     ALGORITHM,
     DEFAULT_RELATIVE_PATH,
+    FORMAT_VERSION,
+    GENERATED_SECRET_STALE_DAYS,
+    ORIGIN_GENERATED,
+    ORIGIN_PROMPTED,
+    ORIGIN_UNKNOWN,
     PATH_ENV_VAR,
+    READABLE_VERSIONS,
+    Credential,
     CredentialChecker,
     CredentialError,
     CredentialStore,
@@ -374,7 +381,7 @@ def test_the_api_package_cannot_write_a_credential(monkeypatch: pytest.MonkeyPat
     creds = _store("mouse")
     assert not hasattr(creds, "save")
     payload = creds.as_payload()  # serializes, writes nothing
-    assert payload["version"] == 1 and "mouse" in payload["credentials"]
+    assert payload["version"] == FORMAT_VERSION and "mouse" in payload["credentials"]
 
 
 def test_the_admin_only_route_declares_admin():
@@ -704,3 +711,157 @@ def test_the_checker_protocol_covers_both_implementations(tmp_path):
         assert checker.is_bootstrapped is True
         assert checker.verify("morpheus", SECRET) is True
         assert checker.has_identity("morpheus") is True
+
+
+# ── O76: how each secret was set, and the migration that must not lock anyone out ──
+
+
+def test_a_version_one_file_still_loads_and_is_not_guessed_at():
+    """Clause (b) and (c) together, and the reason the item exists at all.
+
+    The real file on a working machine is version 1 carrying every account. If
+    the version bump refused it, the operator would be signed out of their own
+    console and told to re-bootstrap -- six working credentials destroyed to
+    gain a metadata field.
+    """
+    legacy = {
+        "version": 1,
+        "credentials": {"morpheus": hash_secret(SECRET).as_dict()},
+    }
+    # Strip the v2 keys, so this is genuinely a v1 entry rather than a v2 one
+    # wearing a v1 version number.
+    for key in ("origin", "set_at"):
+        legacy["credentials"]["morpheus"].pop(key, None)
+
+    store = CredentialStore({"morpheus": Credential.from_dict(legacy["credentials"]["morpheus"])})
+    assert store.verify("morpheus", SECRET) is True
+
+    credential = store.get("morpheus")
+    assert credential.origin == ORIGIN_UNKNOWN, "a migrated entry must not claim to be prompted"
+    assert credential.set_at is None
+    assert credential.age_days is None
+    assert credential.wants_rotation is False, "nothing is known about it, so nothing is claimed"
+
+
+def test_a_version_one_file_round_trips_through_load(tmp_path):
+    """The same thing through the real reader, since `load` is what refuses."""
+    target = tmp_path / "v1.json"
+    entry = hash_secret(SECRET).as_dict()
+    for key in ("origin", "set_at"):
+        entry.pop(key, None)
+    target.write_text(
+        json.dumps({"version": 1, "credentials": {"morpheus": entry}}),
+        encoding="utf-8",
+        newline=chr(10),
+    )
+    store = CredentialStore.load(target)
+    assert store.verify("morpheus", SECRET) is True
+    assert store.get("morpheus").origin == ORIGIN_UNKNOWN
+    # And it upgrades on the next WRITE, never on the read above.
+    assert store.as_payload()["version"] == FORMAT_VERSION
+
+
+def test_a_version_the_build_does_not_know_is_still_refused(tmp_path):
+    """Reading an older KNOWN version is not permission to read any version."""
+    target = tmp_path / "future.json"
+    target.write_text(
+        json.dumps({"version": max(READABLE_VERSIONS) + 1, "credentials": {}}),
+        encoding="utf-8",
+        newline=chr(10),
+    )
+    with pytest.raises(CredentialError, match="format version"):
+        CredentialStore.load(target)
+
+
+def test_provenance_round_trips(tmp_path):
+    creds = CredentialStore()
+    creds.set("morpheus", SECRET, origin=ORIGIN_GENERATED)
+    creds.set("mouse", SECRET, origin=ORIGIN_PROMPTED)
+    target = save_store(creds, tmp_path / "creds.json")
+
+    reloaded = CredentialStore.load(target)
+    assert reloaded.get("morpheus").origin == ORIGIN_GENERATED
+    assert reloaded.get("mouse").origin == ORIGIN_PROMPTED
+    assert reloaded.get("morpheus").set_at is not None
+    assert reloaded.verify("morpheus", SECRET) is True
+
+
+def test_provenance_defaults_to_unknown_rather_than_the_common_case():
+    """A caller that has not thought about origin records that it has not."""
+    creds = CredentialStore()
+    creds.set("morpheus", SECRET)
+    assert creds.get("morpheus").origin == ORIGIN_UNKNOWN
+
+
+def test_an_unrecognised_origin_reads_as_unknown_not_as_an_error():
+    """Provenance is metadata. Being unable to interpret it is not a reason to
+    refuse a credential that verifies."""
+    entry = hash_secret(SECRET, origin=ORIGIN_PROMPTED).as_dict()
+    entry["origin"] = "invented-by-a-future-build"
+    assert Credential.from_dict(entry).origin == ORIGIN_UNKNOWN
+
+
+def test_hash_secret_refuses_an_origin_it_does_not_know():
+    with pytest.raises(ValueError, match="unknown credential origin"):
+        hash_secret(SECRET, origin="nonsense")
+
+
+def _aged(origin: str, days: int) -> Credential:
+    stamp = datetime.now(UTC) - timedelta(days=days)
+    return Credential(
+        algorithm=ALGORITHM,
+        salt="00",
+        hash="00",
+        n=2,
+        r=8,
+        p=1,
+        origin=origin,
+        set_at=stamp.isoformat(timespec="seconds"),
+    )
+
+
+def test_rotation_flag_fires_only_for_stale_generated_secrets():
+    """Clause (f). A flag that fires on everything is a flag nobody reads."""
+    threshold = GENERATED_SECRET_STALE_DAYS
+    assert _aged(ORIGIN_GENERATED, threshold).wants_rotation is True
+    assert _aged(ORIGIN_GENERATED, threshold + 40).wants_rotation is True
+    # The boundary, from below.
+    assert _aged(ORIGIN_GENERATED, threshold - 1).wants_rotation is False
+    assert _aged(ORIGIN_GENERATED, 0).wants_rotation is False
+    # A prompted secret was never printed anywhere, so age alone is not a reason.
+    assert _aged(ORIGIN_PROMPTED, threshold + 400).wants_rotation is False
+    # An unknown-origin entry has no age to judge.
+    assert (
+        Credential(
+            algorithm=ALGORITHM, salt="00", hash="00", n=2, r=8, p=1, origin=ORIGIN_UNKNOWN
+        ).wants_rotation
+        is False
+    )
+
+
+def test_the_two_listings_share_one_definition_of_stale():
+    """Two surfaces that disagreed about what 'stale' means would be worse than
+    one surface that never said it, so admin_demo_login IMPORTS the helper."""
+    import admin_demo_login
+    import set_console_credential
+
+    assert admin_demo_login.describe is set_console_credential.describe
+    assert "ROTATE" in set_console_credential.describe(
+        _aged(ORIGIN_GENERATED, GENERATED_SECRET_STALE_DAYS + 1)
+    )
+    assert "ROTATE" not in set_console_credential.describe(_aged(ORIGIN_PROMPTED, 900))
+    unknown = Credential(
+        algorithm=ALGORITHM, salt="00", hash="00", n=2, r=8, p=1, origin=ORIGIN_UNKNOWN
+    )
+    assert "provenance" in set_console_credential.describe(unknown)
+
+
+def test_the_stored_payload_carries_no_secret_material():
+    """Provenance is added to a file whose whole discipline is that the secret
+    is not recoverable from it. Pin that the new fields did not change that."""
+    creds = CredentialStore()
+    creds.set("morpheus", SECRET, origin=ORIGIN_GENERATED)
+    blob = json.dumps(creds.as_payload())
+    assert SECRET not in blob
+    entry = creds.as_payload()["credentials"]["morpheus"]
+    assert set(entry) == {"algorithm", "salt", "hash", "n", "r", "p", "origin", "set_at"}

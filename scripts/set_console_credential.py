@@ -37,6 +37,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from drydocs_api.credentials import (  # noqa: E402 — after the sys.path fix above
+    GENERATED_SECRET_STALE_DAYS,
+    ORIGIN_PROMPTED,
+    ORIGIN_UNKNOWN,
+    Credential,
     CredentialError,
     CredentialStore,
     credentials_path,
@@ -49,6 +53,26 @@ MIN_SECRET_LENGTH = 12
 
 #: Pinned so the file does not churn its line endings between machines.
 NEWLINE = chr(10)
+
+
+def describe(credential: Credential) -> str:
+    """One column of provenance for a listing (O76).
+
+    Lives here rather than in ``drydocs_api`` because it is presentation, and it
+    is IMPORTED by ``admin_demo_login.py`` rather than reimplemented there --
+    two surfaces that disagree about what "stale" means would be worse than one
+    surface that never said it.
+    """
+    age = credential.age_days
+    when = "age unknown" if age is None else ("today" if age == 0 else f"{age}d ago")
+    if credential.origin == ORIGIN_UNKNOWN:
+        # Predates version 2. Not guessed at, and not flagged: nothing is known
+        # about when it was set, so there is nothing to judge it against.
+        return "set before provenance was recorded"
+    line = f"{credential.origin}, {when}"
+    if credential.wants_rotation:
+        line += f"  ROTATE - printed to a terminal, {GENERATED_SECRET_STALE_DAYS}d+ old"
+    return line
 
 
 def save_store(store: CredentialStore, target: Path) -> Path:
@@ -129,11 +153,17 @@ def main(argv: list[str] | None = None) -> int:
         if not store.is_bootstrapped:
             print("  (none - no account can sign in to the console on this machine)")
         for identity in store.identities():
-            known = "" if identity in PERSONAS else "   [not a known persona]"
-            print(f"  {identity}{known}")
+            known = "" if identity in PERSONAS else "  [not a known persona]"
+            credential = store.get(identity)
+            provenance = describe(credential) if credential is not None else ""
+            print(f"  {identity:<12} {provenance}{known}")
         for identity in sorted(PERSONAS):
             if identity not in store.identities():
-                print(f"  {identity}   [no secret set]")
+                print(f"  {identity:<12} [no secret set]")
+        if any((c := store.get(i)) is not None and c.wants_rotation for i in store.identities()):
+            print()
+            print("  A generated secret was printed to a terminal once and is still in use.")
+            print("  Rotate it: poetry run python scripts/set_console_credential.py <id>")
         return 0
 
     if args.remove:
@@ -161,7 +191,9 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     rotating = args.identity in store.identities()
-    store.set(args.identity, _prompt_secret(args.identity))
+    # Prompted by construction: _prompt_secret is a no-echo getpass, so this
+    # secret has never been rendered anywhere a screen share could catch it.
+    store.set(args.identity, _prompt_secret(args.identity), origin=ORIGIN_PROMPTED)
     save_store(store, target)
     verb = "rotated" if rotating else "set"
     print(f"{verb} the console secret for {args.identity}")

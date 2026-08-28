@@ -142,7 +142,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     survey can change what a decision must ADDRESS and never what it concludes; G109 gains clause
     (f). No existing clause was rewritten in any of the three.
 
-- **`Idea-165`** · 2026-08-28 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-165`** · 2026-08-28 · `[idea]` · **groomed → O76, BUILT same day** · prio? **Med** —
   **The credential store cannot tell a generated demo secret from a chosen operator one, so no
   surface can say "rotate this."** `admin_demo_login.py --generate` invents a secret and prints it
   once — defensible for a synthetic account on localhost, and the docstring argues it correctly.
