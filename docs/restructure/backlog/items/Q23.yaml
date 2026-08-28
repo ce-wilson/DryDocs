@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/doc-source-registry.yaml
@@ -34,3 +34,22 @@ notes: |
   MODULE, checked rather than assumed: `MODULE_MAP.md` places the doc-source-registry ledger and the capture pipeline under `drydocs_docmeta/**`, sharing `config/doc-capture.yaml` with `scripts/external_vendor_scrape.py` "so one number governs both doors" — the same reasoning applies to the registry id, so both doors are in scope and the item is filed drydocs-docmeta / docmeta / phase 14 alongside Q12 and Q13.
 
   Sibling of J51 (the doc-source-registry manifest row from the same review); this item is the mechanism half, J51 was the port-disposition half.
+  DONE 2026-08-27 (laptop, Lane B). THE ONE RESOLVER, both doors:
+  drydocs_docmeta.registry.resolve_capture_registry_id — explicit id must exist
+  (UnknownDocSourceError), a --purpose free-text must match EXACTLY ONE row across
+  id/source/notes (AmbiguousDocSourceError names every candidate), and neither given is an
+  ERROR that stops the run — never a warning. (a) scripts/external_vendor_scrape.py gains
+  --registry-id (overrides the tree's declared corpus_id), resolves BEFORE any fetch
+  (a row-less tree returns REFUSED / exit 2 with fetch proven untouched), and the manifest
+  stamps the RESOLVED id. (b) the row fields follow the bmc-docs-controlm-utilities shape,
+  never a new one — and per ADR 0009 the committed YAML is the source of truth, so the tool
+  EMITS the captured_at + manifest row fragment at DONE for the operator's commit instead
+  of editing the file behind git's back; graph_locator is stamped at load time (match:
+  corpus_id), stated in the fragment. (c) the round trip is tested against a fixture row:
+  resolve -> manifest names the id -> the row's manifest path resolves back to it
+  (tests/unit/test_capture_registry_join.py, 6 tests, offline). PORT BOUNDARY intact:
+  no doc-source-registry schema default added, no manifest edits — test_port_manifest +
+  test_port_reconcile_guards green in the full run (2594 passed / 11 skipped); ruff clean.
+  The docmeta CaptureManifest already records corpus_id at capture time (Q13); the
+  company's confluence runner adopts the resolver at its next build — the mechanism is
+  the producer's half, the values never cross (J51).

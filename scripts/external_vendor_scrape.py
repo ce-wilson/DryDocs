@@ -48,7 +48,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -67,6 +67,7 @@ if str(REPO_ROOT) not in sys.path:  # allow `python scripts/...` without PYTHONP
 from drydocs_core.data_root import vendor_docs_dir  # noqa: E402
 from drydocs_core.run_log import batch_run_log  # noqa: E402
 from drydocs_docmeta.policy import CapturePolicy, TooManyPagesError  # noqa: E402
+from drydocs_docmeta.registry import resolve_capture_registry_id  # noqa: E402
 
 #: The ceiling, the politeness delay, the user agent and the scheme allow-list
 #: all come from config/doc-capture.yaml (Q12: "config values, never hardcoded
@@ -411,6 +412,12 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"seconds between requests (default {DEFAULT_DELAY_SECONDS})",
     )
     p.add_argument("--refresh", action="store_true", help="re-fetch pages already on disk")
+    p.add_argument(
+        "--registry-id",
+        default=None,
+        help="config/doc-source-registry.yaml row this run fulfils; overrides the "
+        "tree's declared corpus_id. Q23: a run that cannot name its row does not run.",
+    )
     return p
 
 
@@ -429,6 +436,19 @@ def main(argv: list[str] | None = None) -> int:
     if tree is None:
         print(f"unknown tree {args.tree!r}; use --list", file=sys.stderr)
         return 1
+
+    # Q23: the run <-> row join, enforced BEFORE any fetch. The tree's declared
+    # corpus_id (or an explicit --registry-id override) must resolve to a real
+    # doc-source-registry row — an unresolvable or absent id is an ERROR, not a
+    # warning: a run that cannot say which row it fulfils is the case Q23
+    # removed (the 7c18ff4b port-review finding). The resolved id is what the
+    # manifest stamps.
+    try:
+        entry = resolve_capture_registry_id(args.registry_id or tree.corpus_id)
+    except LookupError as exc:
+        print(f"\nREFUSED: {exc}\n", file=sys.stderr)
+        return 2
+    tree = replace(tree, corpus_id=entry.id)
 
     print(f"Resolving table of contents: {tree.toc_url}")
     entries, per_book = parse_toc(fetch(tree.toc_url), book=tree.book)
@@ -454,6 +474,17 @@ def main(argv: list[str] | None = None) -> int:
         f"failed={manifest['failed']}"
     )
     print(f"      {vendor_docs_dir(tree.id)}")
+    # Q23 (b): the row gains captured_at + manifest at capture time — the
+    # bmc-docs-controlm-utilities shape, never a new one. The YAML is the
+    # committed source of truth (ADR 0009), so the tool EMITS the fragment for
+    # the operator's commit rather than editing the file behind git's back.
+    print(
+        "\nRegistry row fragment (paste onto the "
+        f"'{tree.corpus_id}' row in config/doc-source-registry.yaml):\n"
+        f"    captured_at: {manifest['captured_at'][:10]}\n"
+        f"    manifest: {vendor_docs_dir(tree.id).as_posix()}/capture-manifest.json\n"
+        "    # graph_locator is stamped at LOAD time (match: corpus_id), not here"
+    )
     return 0
 
 
