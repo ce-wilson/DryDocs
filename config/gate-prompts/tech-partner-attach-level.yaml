@@ -74,7 +74,7 @@ summary: >
 
 meta:
   Module: "ontology — the artifacts under discussion are drydocs_core/schema/catalog_ontology_supplement.cypher (the ProductRole scheme seed) and the product-cabinet-attribution map entry. The prompt DESCRIBES an amendment; nothing is edited until sign-off"
-  Source: "config/gate-log.md K5 section (2026-07-20, §A scheme FIXED + §B scope) · catalog_ontology_supplement.cypher ProductRole scheme (p4 tech_partner: scope AreaProduct + skos:changeNote) · docs/Product/technology_roles_and_responsibilities.md (Tech Partner and Area Tech Partner definitions) · SME in-chat 2026-08-06, transcribed in docs/restructure/IDEAS.md Idea-75 · G91 ruling 2026-08-18 (42-local-catalog.yaml, catalog_has_area_product activation note) · config/gate-log.md G35 section (2026-08-11, §A2 unreachable-concept failure mode; §A6 alias ruling)"
+  Source: "config/gate-log.md K5 section (2026-07-20, §A scheme FIXED + §B scope) · catalog_ontology_supplement.cypher ProductRole scheme (p4 tech_partner: scope AreaProduct + skos:changeNote) · knowledge/org/technology-roles-and-responsibilities.md (Tech Partner and Area Tech Partner definitions) · SME in-chat 2026-08-06, transcribed in docs/restructure/IDEAS.md Idea-75 · G91 ruling 2026-08-18 (42-local-catalog.yaml, catalog_has_area_product activation note) · config/gate-log.md G35 section (2026-08-11, §A2 unreachable-concept failure mode; §A6 alias ruling)"
   Precedent: "G35 (tom-roles-enumeration-and-cardinality) — a signed vocabulary clause is re-opened through a gate, and its 2026-08-10 header models restating moved premises up front · H4 (code-graph-package-layer §H4) — same source, same subgraph: AMEND the existing map entry, never mint a second one · K5 sign-off corrections — supplement edits land as their own logged change and a re-apply refreshes loaded graphs · G27/W1/N10/G61 — a drafted prompt decides nothing"
   Registry ref: "no source-registry or doc-source-registry change — every evidence surface cited is already tracked, and no new source is onboarded by this ruling"
   Classification: "Internal-Public — mechanism and public-tier role names only; role-doc quotes are responsibility prose; production-PAT counts stay in the internal twin and are not reproduced"
@@ -99,7 +99,7 @@ provenance:
         from: "the p4 seed's skos:changeNote: 'in PAT the mapping changed slightly: this area-product role was formerly named CTO in SEAL; SEAL's CTO now denotes the product-level role. Recorded at the K5 gate (2026-07-20); supersedes the 2026-07-10 §B CTO-in-both-families record'"
         note: "§D's whole subject. If tech_partner is product-level, 'this area-product role' mislabels the concept the note sits on, and the note's second half may be describing the same role."
   - label: "The company role guidance — the doc that agrees with the SME, not the gate"
-    source_object: "docs/Product/technology_roles_and_responsibilities.md (captured company guidance, tracked Internal-Public; S14 relocates the file after this item — the citation follows it if this page is still unsigned)"
+    source_object: "knowledge/org/technology-roles-and-responsibilities.md (captured company guidance, tracked Internal-Public; relocated from docs/Product by S14 on 2026-08-27 while this page was still unsigned — the citation followed the file, per this line as originally drafted)"
     key: "Tech Partner · Area Tech Partner (two separately-defined roles)"
     loader: "NONE — reference prose, not a load source"
     properties:

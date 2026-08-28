@@ -615,7 +615,7 @@ and the full PAT human role vocabulary.
 | `drydocs/loaders/cypher/pat_team_roles.cypher` | DevTeam HAS_MEMBERSHIP n-ary pattern |
 | `drydocs/models/seal.py` | Added `"tech partner": "CTO"` to `_ROLE_CANONICAL` |
 | `knowledge/ontology/NODE_QUICK_REFERENCE.md` | `AreaProduct` row in Catalog (active) table (rehomed from `docs/` — see the "Newer streams" note above) |
-| `docs/Product/` | `product-overview.md`, `Technology_Team_Types.md`, `technology_roles_and_responsibilities.md`, `quad-mermaid.js` |
+| `knowledge/org/` | `product-overview.md`, `technology-team-types.md`, `technology-roles-and-responsibilities.md`, `org-quad-chart.mmd` (relocated from `docs/Product/` at S14, 2026-08-27; kebab-case at the move) |
 
 **New graph topology:**
 ```

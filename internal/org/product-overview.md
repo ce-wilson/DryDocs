@@ -4,7 +4,8 @@ This is the VERBATIM capture formerly at docs/Product/product-overview.md
 (captured 2026-06-09; raw transcription artifact — includes the generating
 script's own text). It carries ~25 real names, two real SIDs, an internal DL,
 and real product/cabinet mappings: internal/org/ is its designated home
-(internal/README.md). The publishable stub at the old path keeps every
+(internal/README.md). The publishable stub, at knowledge/org/product-overview.md
+since S14 (2026-08-27; formerly the old docs/Product path), keeps every
 existing reference resolving; the PAT/catalog ontology terms it sourced are
 cited from drydocs_core/schema/catalog_ontology_supplement.cypher, whose
 comments now point here. Never copy values from this file outside internal/.

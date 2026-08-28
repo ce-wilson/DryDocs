@@ -1290,7 +1290,8 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   similarity picks it every time, because the correct column shares no words with
   `team_type` and the wrong one matches it exactly. The two are orthogonal facts: a
   Technology team may be Aligned, Flex or Dedicated.
-  **Do NOT take the "the ontology is stale" exit.** `docs/Product/Technology_Team_Types.md`
+  **Do NOT take the "the ontology is stale" exit.** `knowledge/org/technology-team-types.md`
+  (relocated from docs/Product at S14, 2026-08-27)
   §3 is the governing PAT definition of Aligned / Dedicated / Flex and states that Team
   Types are maintained in the PAT Product Catalog. Aligned/flex/dedicated is an asserted
   governance fact (who prioritizes the backlog, who funds it), not the discipline and not

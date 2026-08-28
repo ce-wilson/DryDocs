@@ -81,6 +81,17 @@ CTM_FOLDER_KEYS = frozenset(
     }
 )
 ALLOWLIST: dict[str, tuple[frozenset[str], str]] = {
+    "knowledge/org/org-quad-chart.mmd": (
+        frozenset({"166534", "334155"}),
+        "hex COLOR codes in Mermaid style directives (stroke:#166534 = green-800, "
+        "#334155 = slate-700) whose six hex chars happen to be all digits — colors, "
+        "not ids. Exposed to this scan when S14 moved the file under knowledge/",
+    ),
+    "knowledge/org/seal-application-hierarchy.md": (
+        frozenset({"145214"}),
+        "hex COLOR code in a Mermaid style directive (stroke:#145214) — a color, not "
+        "a SEAL id; every actual id in the file is synthetic-block. Same S14 exposure",
+    ),
     "config/taxonomy/controlm.yaml": (
         CTM_FOLDER_KEYS,
         "Control-M surrogate folder table keys of the sanitized sample family",
