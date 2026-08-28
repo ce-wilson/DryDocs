@@ -3,7 +3,10 @@
 Before this, four run cadences produced no record at all: `drydocs_lineage`'s two
 graph writes, `drydocs_docmeta`'s connector acquisitions, and
 `scripts/external_vendor_scrape.py`, which printed to stdout only — so a scrape
-that ran overnight left nothing behind once the terminal closed.
+that ran overnight left nothing behind once the terminal closed. G93 wires the
+fifth and last of the Idea-152 cadences, `drydocs_remediation`'s batch entry
+point (`jira.run_remediation_batch`) — the mechanism this file already proved
+out for the other four, applied unchanged.
 
 THE FAILURE PATH IS THE HALF THAT MATTERS, which is why every component here is
 tested twice. A run log that only exists when nothing went wrong records exactly
@@ -234,6 +237,57 @@ class _FakeTree:
 
     def __init__(self, tree_id: str) -> None:
         self.id = tree_id
+
+
+def test_remediation_batch_records_its_batch(logdir):
+    from drydocs_remediation.detect import Finding
+    from drydocs_remediation.equivalence import EquivalenceReport
+    from drydocs_remediation.formats import DefinitionSet, JobDefinition
+    from drydocs_remediation.jira import run_remediation_batch
+
+    definitions = DefinitionSet(jobs=[JobDefinition(name="JOB0001_SAMPLE_FW")])
+    findings = [
+        Finding(rule_id="R1", severity="should-fix", ratified=False, target="x", message="m"),
+        Finding(rule_id="R1", severity="should-fix", ratified=False, target="y", message="m"),
+        Finding(rule_id="R30", severity="must-fix", ratified=False, target="z", message="m"),
+    ]
+    proof = EquivalenceReport(equivalent=True, compared_jobs=1, proven_jobs=1)
+
+    package = run_remediation_batch(
+        definitions, findings, proof, title="[Remediation] synthetic batch"
+    )
+
+    assert package.coverage is not None
+    assert package.coverage.objects_examined == 1
+    fields = _parses(_one_log(logdir, "remediation.batch"))
+    assert fields["objects examined"] == "1"
+    assert fields["findings recorded"] == "3"
+    assert fields["findings ratified"] == "0"
+    assert fields["findings unratified"] == "3"
+    assert fields.get("run id")
+
+
+def test_remediation_batch_failure_is_recorded_and_re_raised(logdir, monkeypatch):
+    from drydocs_remediation import jira as jira_mod
+    from drydocs_remediation.detect import Finding
+    from drydocs_remediation.equivalence import EquivalenceReport
+    from drydocs_remediation.formats import DefinitionSet
+
+    def boom(*a, **k):
+        raise RuntimeError("unrecoverable parse")
+
+    monkeypatch.setattr(jira_mod, "_assemble_handoff", boom)
+    findings = [
+        Finding(rule_id="R1", severity="should-fix", ratified=False, target="x", message="m")
+    ]
+    proof = EquivalenceReport(equivalent=True, compared_jobs=0, proven_jobs=0)
+
+    with pytest.raises(RuntimeError, match="unrecoverable parse"):
+        jira_mod.run_remediation_batch(
+            DefinitionSet(), findings, proof, title="[Remediation] synthetic batch"
+        )
+
+    assert "FAILED: unrecoverable parse" in _one_log(logdir, "remediation.batch")
 
 
 def _source(source_id: str):
