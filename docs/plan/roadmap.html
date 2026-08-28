@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<!-- sources-fingerprint: 7de33365d703fcde96132e29a41e0416d24c19c7988475f5340bc4afcfb15b04 -->
+<!-- sources-fingerprint: db762ce8fea848b3ef2bb77e11d9ce682793b1cfb6dfa710e3952455e4bbc127 -->
 <title>DryDocs — module roadmap</title>
 <style>:root{color-scheme:light}
 body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1a1a1a;
@@ -61,10 +61,10 @@ h2{font-size:1.1rem;margin:0}
 <li><a class="item-link" href="board.html#card-G94">G94</a> <span class="status-badge status-todo">todo</span> Which standard does a job validate against? A selection resolver on job type, job role and ETL engine — and an executable proof that the DD version digit never selects one</li>
 </ul></section>
 <section class="module" id="module-drydocs-load"><div class="module-head"><h2>drydocs-load</h2><span class="stage stage-mature">mature</span><span class="counts">47 done &middot; 17 open</span></div><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="prose"><strong>Built:</strong> The heaviest-built module: Control-M XML and staging extractors, curated loaders with the canonical load sequence, the K2 match policy, docs-verify and docs-coverage reporting, and the 27-command CLI composition root.</p><p class="prose"><strong>Remaining:</strong> S8 splits the 1,519-line cli.py into per-domain command modules (the one file every port hand-merges), J33 fixes three guard tests that break on ANSI-colored output, and Z3 (Epic Z, gated behind Z1/Z2) loads the infrastructure server inventory and joins server names to Control-M job hosts.</p><ul class="open-items">
+<li><a class="item-link" href="board.html#card-G121">G121</a> <span class="status-badge status-in_progress">in_progress</span> Close the undeclared --csv acquisition route: load --csv resolves through declared zones or refuses, with a recorded override</li>
 <li><a class="item-link" href="board.html#card-C33">C33</a> <span class="status-badge status-blocked">blocked</span> Build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build</li>
 <li><a class="item-link" href="board.html#card-G106">G106</a> <span class="status-badge status-todo">todo</span> drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today — retention as a verb mirroring prune-snapshots, not a background sweeper thread</li>
 <li><a class="item-link" href="board.html#card-G115">G115</a> <span class="status-badge status-todo">todo</span> The Control-M extracts have no data-center dimension, so a run pulls every data center at once — add the scope bind and write down the per-data-center run recipe</li>
-<li><a class="item-link" href="board.html#card-G121">G121</a> <span class="status-badge status-todo">todo</span> Close the undeclared --csv acquisition route: load --csv resolves through declared zones or refuses, with a recorded override</li>
 <li><a class="item-link" href="board.html#card-G90">G90</a> <span class="status-badge status-todo">todo</span> Build the fix-tracking loader the remediation-fix-tracking gate authorized (§C1)</li>
 <li><a class="item-link" href="board.html#card-GN2">GN2</a> <span class="status-badge status-todo">todo</span> Execute the rename as ONE frozen unit and port it as one unit — data-named commands, loaders and source ids</li>
 <li><a class="item-link" href="board.html#card-K26">K26</a> <span class="status-badge status-todo">todo</span> Build the FID ingest per the signed fid-identity-and-scope gate: dataset registration, demand-set pull, crosswalk, the amended K2 tier, and the owner-of-record leg</li>

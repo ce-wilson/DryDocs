@@ -30,3 +30,11 @@ notes: |
   closes done and the session is never scheduled. Drafting item G95 closed done when the prompt landed; nobody owned the RUN.
   This item is the sign-off session's claim surface; the session itself is
   HITL (agent: main).
+  PRE-GATE SWEEP 2026-08-28 (desktop, Lane A): premises CURRENT. Verified against the
+  tree: G94 still todo (the page correctly says the selector is unbuilt); TOKEN_REGISTRY
+  still the single-source code-as-data with everything proposed (description_tokens.py);
+  no standard id minted anywhere (grep clean); ADR 0009/0014 as cited. One premise
+  STRENGTHENED, not moved: the B-section port-cost statement (the alias episode) now has
+  a newer third instance — the tom-role-vocabulary per-entry manifest row (2026-08-27) —
+  the SME may cite it at the session; the question itself is unchanged, so the page is
+  not edited (a sweep restates moved premises only). Session is runnable as drafted.

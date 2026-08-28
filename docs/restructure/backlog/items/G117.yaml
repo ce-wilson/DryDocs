@@ -33,3 +33,9 @@ notes: |
   closes done and the session is never scheduled. Drafting item G61 closed done when the prompt landed; nobody owned the RUN.
   This item is the sign-off session's claim surface; the session itself is
   HITL (agent: main).
+  PRE-GATE SWEEP 2026-08-28 (desktop, Lane A): premises CURRENT. The page was drafted
+  AFTER its two feeder closes (G97 payload build, G56 mount capture — both 2026-08-25,
+  and the page's own timing note says so); G97 confirmed done; scm_status implemented
+  nowhere (grep clean — the proposal is still a proposal); the two map rows
+  (script-scm-status, script-identity-binding) present in 50-mappings-architecture.yaml.
+  Session is runnable as drafted.
