@@ -1,0 +1,91 @@
+# tom-required-contacts suite — the G71 presence graph-test (gate
+# tom-roles-enumeration-and-cardinality, SIGNED 2026-08-11; §B5/§C1/§C4/§C6).
+#
+# WHY A GRAPH-TEST AND NOT A CONSTRAINT (§C1): Neo4j has no declarative form
+# for a count over a traversal — "at least one Attribution per (application,
+# required role class)" cannot be a constraint, in either direction. And the
+# tempting re-key that would let MERGE enforce it is refused (§C3): multiple
+# holders are the NORMAL shape, and the 4-part attribution_id key is pinned by
+# the identity gate. So presence is checked HERE, in the verify layer, as
+# §C4 rules: a query returning the offending (app, role) rows — reported,
+# never refused at write time (§B5: flag, but load the rest).
+#
+# THE DENOMINATOR IS RULED (§C6): only applications a feed actually covered
+# (>= 1 QUALIFIED_ATTRIBUTION). An application no feed mentioned is a CAPTURE
+# gap, and it is DELIBERATELY NOT a case in this suite — a capture gap wearing
+# a roster gap's costume produces a noisy check, and the first response to a
+# noisy check is to weaken it. Capture gaps are reported separately, on the
+# ownership review surface (ownership.capture-gaps.v1).
+#
+# NO REGISTER ID IS WRITTEN HERE, deliberately (G70): the cases join the
+# graph's own declared vocabulary — :TOMRole {required: true, active: true},
+# seeded from config/taxonomy/tom-role-vocabulary.yaml and drift-guarded —
+# so a register change never edits this file. The derived SRE classes are
+# excluded by construction (the G16 amendment made them optional+derived, and
+# the vocabulary reader refuses required+derived on one class).
+#
+# TWO CAVEATS RIDE THE FINDINGS, from the sign-off itself:
+#   (a) the Operate Manager assignments are MID-CORRECTION AT SOURCE — the SME
+#       is rescoping the team to platforms it owns — so findings in that
+#       family are real defects already being fixed elsewhere, not DryDocs
+#       discoveries;
+#   (b) the check counts to one and stops, so it CANNOT distinguish a genuine
+#       24h coverage gap from a satisfied one — Operate Manager multiplicity
+#       is geography, and nothing records which holder covers which region
+#       (signed residual 4).
+#
+# No `targets:` — the review backbone (config/review-labels.yaml) committed
+# here is seeded from the bmc-docs baseline; the SEAL/PAT chains live in the
+# gitignored twin (the business-application-identity.yaml precedent).
+# classification: Internal-Public (shape only — no counts, no real ids).
+classification: Internal-Public
+schema: drydocs.graph-tests.v1
+suite: tom-required-contacts
+description: >
+  G71: every application a feed covered carries at least one holder for every
+  required, active TOM role class. Reported (app, role) rows, never a write
+  refusal (SS-B5/C4); denominator = covered applications only (SS-C6). Findings
+  carry two caveats: Operate Manager assignments are mid-correction at source,
+  and a count-to-one check cannot see geography/coverage-window gaps
+  (signed residual 4).
+cases:
+  - id: TC-01
+    description: >
+      vacuity guard — the declared vocabulary is seeded: at least one
+      required, active TOMRole exists (without this, TC-03 passes vacuously
+      on an unseeded graph — the G81 empty-declaration trap)
+    cypher: >
+      MATCH (r:TOMRole)
+      WHERE r.required = true AND coalesce(r.active, true) = true
+        AND NOT r:SchemaMeta
+      RETURN r.id AS required_class
+    assert: nonempty
+
+  - id: TC-02
+    description: >
+      the G16-amendment invariant holds on the live graph — no class is both
+      required and derived (a derived, many-to-one fact has no place in a
+      per-application required-contact check)
+    cypher: >
+      MATCH (r:TOMRole)
+      WHERE r.required = true AND r.derived = true AND NOT r:SchemaMeta
+      RETURN r.id AS contradicting_class
+    assert: empty
+
+  - id: TC-03
+    description: >
+      the presence check (SS-C4, denominator per SS-C6) — a covered application
+      (>= 1 QUALIFIED_ATTRIBUTION) missing every holder of a required active
+      class is a finding, returned as the offending (app, role) row; counts
+      to one and stops
+    cypher: >
+      MATCH (r:TOMRole)
+      WHERE r.required = true AND coalesce(r.active, true) = true
+        AND NOT r:SchemaMeta
+      MATCH (a:BusinessApplication)
+      WHERE NOT a:SchemaMeta
+        AND (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)
+        AND NOT (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAD_ROLE]->(r)
+      RETURN a.app_id AS app_id, r.id AS missing_required_class
+      ORDER BY app_id, missing_required_class
+    assert: empty

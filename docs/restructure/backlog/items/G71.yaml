@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G70
 gates: [tom-roles-enumeration-and-cardinality]
@@ -19,3 +19,23 @@ acceptance: |
   A per-application completeness report and the graph-test behind it, per the signed §B5/§C4/§C6. THE CHECK COUNTS TO ONE AND STOPS: a REQUIRED class with zero holders on a covered application is REPORTED, never refused at write time — §C1 closed the constraint route on platform grounds (Neo4j cannot declare a count over a traversal in either direction), and §C3 refused the tempting re-key because multiple holders are the NORMAL shape. THE DENOMINATOR IS RULED (§C6): only applications a feed actually covered. An application no feed mentioned is a CAPTURE gap and is reported SEPARATELY — merging the two produces a noisy check, and the first response to a noisy check is to weaken it. IT JOINS THE EXISTING REVIEW SURFACE rather than opening a new one (§C5): ownership.attributions.v1 already orders unmapped rows first, so an operator reads ONE page for "what is wrong with this application's contacts". TWO CAVEATS THE REPORT MUST CARRY IN ITS OWN OUTPUT, both from the sign-off. (a) The Operate Manager assignments are MID-CORRECTION AT SOURCE (the SME is rescoping the team to platforms it owns), so findings there are real defects being fixed elsewhere — the report should say so rather than imply DryDocs discovered them. (b) The check cannot distinguish a genuine 24h coverage gap from a satisfied one, because Operate Manager multiplicity is GEOGRAPHY and nothing records which holder covers which region (signed residual 4).
 notes: |
   Raised 2026-08-11 at the G35 sign-off. Has no counterpart today: nothing checks per-application completeness at all, which is why a missing required contact is currently invisible while an unreadable role name kills its row — the exact inversion §B5 ruled against.
+  DONE 2026-08-27 (laptop, Lane B). THE GRAPH-TEST: graph-tests/tom-required-contacts.yaml
+  (Internal-Public, shape only; no targets: — the business-application-identity precedent, the
+  committed backbone has no SEAL labels). TC-03 is the SS-C4 presence check with the SS-C6
+  denominator built in (covered = >= 1 QUALIFIED_ATTRIBUTION; offending (app, role) rows;
+  counts to one and stops); TC-01 is a vacuity guard (an unseeded vocabulary FAILS rather than
+  passing the check vacuously); TC-02 pins the G16 invariant live (never required+derived).
+  Capture gaps are DELIBERATELY not a suite case (SS-C6's noisy-check warning) — they are the
+  separate report. THE REPORT joins the ownership surface per SS-C5: two specs beside
+  ownership.attributions.v1 — ownership.required-contact-gaps.v1 (covered apps x missing
+  required class, with both sign-off caveats IN the description and visibly in the console
+  tab, plus the unmapped-role cross-reference to the Attributions tab) and
+  ownership.capture-gaps.v1 (apps no feed mentioned; separate per SS-C6). Console: two new
+  tabs on /ownership with demo fallbacks; tsc --noEmit clean. G70 DISCIPLINE GUARDED:
+  tests/unit/test_tom_required_contacts.py asserts NO vocabulary class id appears literally
+  in the suite or either spec (they join required/active on the graph's own TOMRole nodes),
+  proves the presence case fails-on-violation / passes-on-none with a duck-typed runner, and
+  pins both caveats in the operator-facing outputs. The derived SRE classes are excluded by
+  construction (required filter + the reader's required/derived mutual exclusion).
+  VERIFICATION IS OFFLINE by design (J18): suite validation + duck-typed mechanics; no live
+  graph claim is made. Suite 2567 passed / 11 skipped; ruff + tsc clean.

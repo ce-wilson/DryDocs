@@ -565,6 +565,77 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        # G71 (gate tom-roles-enumeration-and-cardinality, signed 2026-08-11):
+        # the required-contact completeness report, joining THIS surface per
+        # SS-C5 rather than opening a new one — the Attributions tab already
+        # floats unmapped rows first, so one page answers "what is wrong with
+        # this application's contacts". Two specs because SS-C6 rules the two
+        # findings apart: a roster gap on a COVERED application, and a capture
+        # gap (no feed mentioned the application) — merging them produces a
+        # noisy check, and the first response to a noisy check is to weaken it.
+        QuerySpec(
+            id="ownership.required-contact-gaps.v1",
+            database="drydocs",
+            description=(
+                "Covered applications (>= 1 attribution from any feed) missing every "
+                "holder of a required, active TOM role class — the offending (app, "
+                "role) rows per SS-C4; counts to one and stops (SS-C3: multiple holders "
+                "are the normal shape, never a finding). The required set is the "
+                "graph's own declared vocabulary (G70), never a list here. TWO "
+                "CAVEATS from the sign-off ride every reading: (a) Operate Manager "
+                "assignments are MID-CORRECTION at source — findings in that family "
+                "are real defects already being fixed elsewhere, not DryDocs "
+                "discoveries; (b) a count-to-one check cannot distinguish a genuine "
+                "24h coverage gap from a satisfied one (multiplicity is geography; "
+                "signed residual 4). An apparent gap can also be an unmapped source "
+                "role awaiting crosswalk — the Attributions tab floats those first, "
+                "same page. Holder facts are confidential — Internal handling (J23)."
+            ),
+            cypher=(
+                "MATCH (r:TOMRole) "
+                "WHERE r.required = true AND coalesce(r.active, true) = true "
+                "AND NOT r:SchemaMeta "
+                "MATCH (a:BusinessApplication) "
+                "WHERE NOT a:SchemaMeta "
+                "AND (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution) "
+                "AND NOT (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAD_ROLE]->(r) "
+                "RETURN a.app_id AS app_id, r.id AS missing_required_class, "
+                "r.pref_label AS role_label "
+                "ORDER BY app_id, missing_required_class LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("missing_required_class", "string", "Missing required class"),
+                ColumnDef("role_label", "string", "Role"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="ownership.capture-gaps.v1",
+            database="drydocs",
+            description=(
+                "Applications NO feed mentioned (zero attributions) — the CAPTURE gap "
+                "SS-C6 rules must be reported separately from the roster gaps above: "
+                "an application the extract never covered would otherwise report as "
+                "missing ALL required contacts, a capture gap wearing a roster gap's "
+                "costume. The response to this list is a capture fix, not a contact "
+                "chase."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication) "
+                "WHERE NOT a:SchemaMeta "
+                "AND NOT (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution) "
+                "RETURN a.app_id AS app_id, a.name AS name "
+                "ORDER BY app_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("name", "string", "Name"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         QuerySpec(
             id="ownership.escalation-routing.v1",
             database="drydocs",
