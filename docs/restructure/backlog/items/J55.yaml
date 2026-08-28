@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - J15
 inputs:
@@ -34,3 +34,17 @@ notes: |
   Epic release-infrastructure / module config / phase 8 follows J15, the direct precedent (also `module: config`, also a publish-boundary guard test). depends_on J15 records the lineage; J15 is done, so this is startable now.
 
   Deliberately NOT merged into J15: J15 is closed with a close note, and reopening a done item to add a second scan would rewrite a record rather than extend it.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  Built tests/unit/test_publish_boundary_retired_org_acronym.py: the guard reads the
+  retired token at runtime out of internal/cdo-reference/README.md (regex against the
+  renamed directory segment -- NO literal of the retired string anywhere in the test,
+  the J15 rule) and fails, listing paths, when the token appears case-insensitive
+  whole-word in any git-tracked file outside internal/. Clause (b): with the mapping
+  file absent (a published clone) it raises pytest.skip with an explicit reason --
+  verified by monkeypatching the path; never a silent pass. Clause (c) enumeration:
+  zero real hits on the current tree; two case-insensitive substring coincidences (a
+  compressed JS blob in the console mockup, a base64 SVG path segment) correctly fail
+  the word-boundary test; the depgraph-snapshot survivor 3c2bfcdd named had already
+  rolled at d3f648ee. ALLOWLIST ships empty with the enumeration recorded inline.
+  Clause (e) boundary in the module docstring: the cross-repo half (company registry
+  row / loaded doc ids) is a port-session question under the F-table, not this guard's.
