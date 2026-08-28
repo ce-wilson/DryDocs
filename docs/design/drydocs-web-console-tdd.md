@@ -14,9 +14,9 @@ and the SME reviewing the console's access-path and stewardship mechanics. ·
 successor design); `docs/design/drydocs-mapping-demo-runbook.md` (start the demo);
 `knowledge/upgrade-plans/mapping-store-plan-2026-07-17.md` (the M0–M4 store plan).
 
-Worked example throughout: the admin persona `asmith7734` signs in and opens the Graph
+Worked example throughout: the admin persona `morpheus` signs in and opens the Graph
 view, which renders **live** `WAS_INFORMED_BY` edges from the `drydocs` EE database (9
-jobs / 8 edges at the O6 verification); the steward persona `kchen2190` opens `/demo`,
+jobs / 8 edges at the O6 verification); the steward persona `trinity` opens `/demo`,
 drafts one job→application entry, and downloads the resulting gate-bound changeset CSV.
 
 > **Read-me-first.** The console is a *read surface with one write-shaped exception, and
@@ -68,7 +68,7 @@ git → K2 gate → `manual_loads` loader.
 ## Definitions, acronyms & references
 
 - **Persona / role** — synthetic identities with roles ordered **user < steward < admin**:
-  `jdoe4821` (user), `kchen2190` (steward), `asmith7734` (admin). Client and server copies
+  `mouse` (user), `trinity` (steward), `morpheus` (admin). Client and server copies
   are drift-guarded by a test that parses the TS from Python.
 - **GraphAccess seam** — the single TypeScript interface (`web/src/lib/graph.ts`) through
   which any console code reads the graph; view components never import `neo4j-driver`.

@@ -99,7 +99,7 @@ prerequisite only for live frames. Company-side deployment (OIDC, GHE) is not co
    fresh clone has none, so the first attempt on a new machine is refused with
    `no console credentials are configured on this machine`:
    ```powershell
-   poetry run python scripts/set_console_credential.py asmith7734
+   poetry run python scripts/set_console_credential.py morpheus
    poetry run python scripts/set_console_credential.py --list
    ```
    The secret is prompted for with no echo, hashed with scrypt, and written to a
@@ -129,8 +129,8 @@ prerequisite only for live frames. Company-side deployment (OIDC, GHE) is not co
    poetry run python scripts/admin_demo_login.py --rotate admin
    poetry run python scripts/admin_demo_login.py --check-login admin
    ```
-   It takes short names (`admin`, `steward`, `user`, `sme`) instead of the synthetic
-   ids. `--check-login` performs the real HTTP login the browser performs and reports
+   It takes role shorthands (`admin`, `steward`, `user`, `sme`) as well as the ids
+   themselves; `--ensure` with no argument covers every account in the roster. `--check-login` performs the real HTTP login the browser performs and reports
    which of the three usual causes it is: no credential set, the API not running, or
    the secret itself. `--generate` invents a secret and prints it ONCE, which is the
    right trade for a synthetic account on localhost and the wrong one anywhere else.
@@ -179,9 +179,11 @@ From OFF to READY. Run from the repo root; each step states its success check.
    at that URL. The API's CORS allow-list is exactly `localhost:5173` (dev) and
    `localhost:4173` (preview) — serve from those ports or frames will fail CORS.
 5. **Sign in:** choose an account, then enter its secret. The identities are synthetic
-   and committed (`web/src/lib/auth.ts` / `drydocs_api/personas.py`): `jdoe4821` (user),
-   `asmith7734` (admin — raw-Cypher console + `/admin` surfaces), `kchen2190` (steward —
-   `/mappings`), `sme` (intake). The SECRETS are machine-local, from Prerequisite 6.
+   and committed (`web/src/lib/auth.ts` / `drydocs_api/personas.py`): `morpheus` (admin
+   — raw-Cypher console + `/admin` surfaces), `trinity` (steward — `/mappings`), `neo`
+   (user, and the persona `/intake` opens for), and `mouse`, `tank`, `dozer` (three
+   plain user-tier seats, alike in everything but identity, which is what makes
+   per-persona isolation testable). The SECRETS are machine-local, from Prerequisite 6.
    *Success:* the shell renders with the aside nav; the header shows the persona chip.
    A refusal says only `invalid credentials` — the API deliberately does not say whether
    the account or the secret was wrong, because the difference is what turns a login
@@ -349,7 +351,7 @@ poetry install --with api                                        # first time
 npm install --prefix web                                         # first time
 poetry run uvicorn drydocs_api.app:create_app --factory --port 8001
 npm run dev --prefix web
-# browse http://localhost:5173 → sign in (jdoe4821 / asmith7734 / kchen2190)
+# browse http://localhost:5173 → sign in (morpheus / trinity / mouse)
 ```
 
 **B2. The Ask module additionally needs the agent server** (its own venv — see
@@ -364,6 +366,7 @@ Copy-Item .env.example .env                                      # first time, t
 # check: Invoke-RestMethod http://localhost:8000/list-apps   → four apps incl. graph_qa
 ```
 
-**C. Mock personas** (synthetic — `drydocs_api/personas.py`): `jdoe4821` user ·
-`asmith7734` admin · `kchen2190` steward. No credentials exist; the "auth" is a
-persona-id-for-token exchange stub replaced company-side by OIDC (ADR 0005).
+**C. Console personas** (synthetic — `drydocs_api/personas.py`): `morpheus` admin ·
+`trinity` steward · `neo`, `mouse`, `tank`, `dozer` user. Since O69 signing in proves
+a secret and the server issues an expiring token; that credential half is what a
+company replaces with OIDC at its seam (ADR 0005), keeping every route above it.

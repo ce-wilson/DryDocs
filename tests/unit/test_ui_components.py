@@ -267,7 +267,7 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     /software page is a fully-bound addition, not a partial one.
     68 -> 70 at O47: IntakeRoute and IntakeStepper ride UNBOUND like
     MappingsRoute/AppCodeCascadePane — 'intake' is not a registry module (the
-    page is reached by ?as=sme / deep link, no Aside entry), so a binding
+    page is reached by ?as=neo / deep link, no Aside entry), so a binding
     would invent one.
     70 -> 69 at O53: HeroArt deleted (the code graph's first front-end orphan,
     Idea-77 -> graph-vs-files experiment ALPHA code set, SME-adopted). THIS pin

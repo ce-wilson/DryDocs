@@ -179,8 +179,8 @@ def test_no_ledger_means_no_cost_and_no_failure(tmp_path):
 
 
 def test_agent_run_props_mirror_the_acceptance_fields(tmp_path):
-    envelope = _answer(tmp_path, user_id="jdoe4821")
-    props = agent_run_writer.agent_run_props(envelope, user_id="jdoe4821")
+    envelope = _answer(tmp_path, user_id="mouse")
+    props = agent_run_writer.agent_run_props(envelope, user_id="mouse")
     assert props["kind"] == "qa" and props["run_id"] == "qa-test-r3"
     assert props["question_sha256"] == envelope.question_sha256
     assert props["question_chars"] == len("how many applications?")
@@ -195,10 +195,11 @@ def test_agent_run_props_mirror_the_acceptance_fields(tmp_path):
     assert props["stale_sources"] == 0  # staleness flags: honest zero until R7
     assert props["cost_est_usd"] is not None
     # reserved caller-identity slot: hash + length ONLY
-    expected = hashlib.sha256(b"jdoe4821").hexdigest()
+    expected = hashlib.sha256(b"mouse").hexdigest()
     assert props["user_id_sha256"] == expected
-    assert props["user_id_chars"] == 8
-    assert "jdoe4821" not in json.dumps({k: v for k, v in props.items() if k != "user_id_chars"})
+    assert props["user_id_chars"] == len("mouse")  # derived: a persona rename must not
+    # silently pass by matching some other id's length
+    assert "mouse" not in json.dumps({k: v for k, v in props.items() if k != "user_id_chars"})
 
 
 def test_writer_refuses_stale_databases_from_env_and_argument(tmp_path, monkeypatch):

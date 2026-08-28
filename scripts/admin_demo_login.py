@@ -51,14 +51,32 @@ from drydocs_api.credentials import (  # noqa: E402 — after the sys.path fix a
 )
 from drydocs_api.personas import PERSONAS  # noqa: E402
 
-#: Short names, so a demo does not need the synthetic ids memorised. The ids
-#: themselves stay accepted, and `--ensure` with no argument covers all of them.
+#: Role shorthands, so a demo can say what an account IS rather than who it is.
+#: The persona ids themselves stay accepted, and `--ensure` with no argument
+#: covers every account in PERSONAS rather than only the ones listed here — so
+#: adding a persona does not silently leave it out of the demo bootstrap.
+#:
+#: These are ALIASES, not a roster: every value must be an id the server knows
+#: (drydocs_api/personas.py). A name that is not a persona id fails at the door,
+#: which is what a `_resolve` miss is for. `--ensure` covers the rest.
 ALIASES: dict[str, str] = {
-    "admin": "asmith7734",
-    "steward": "kchen2190",
-    "user": "jdoe4821",
-    "sme": "sme",
+    "admin": "morpheus",
+    "steward": "trinity",
+    "sme": "neo",
+    "user": "mouse",
 }
+
+# Checked at import, because the alternative is a KeyError from inside a format
+# string three functions away. An alias VALUE is a persona id the server must
+# already know; editing this table renames a SHORTCUT, never an account.
+_unknown_aliases = sorted(v for v in ALIASES.values() if v not in PERSONAS)
+if _unknown_aliases:  # pragma: no cover - a wiring mistake, caught at import
+    raise SystemExit(
+        f"admin_demo_login.py: ALIASES points at {_unknown_aliases}, which the server does "
+        f"not know. An alias value must be a persona id from drydocs_api/personas.py "
+        f"(known: {', '.join(sorted(PERSONAS))}). To add an ACCOUNT rather than a nickname, "
+        "add it there AND to web/src/lib/auth.ts - a drift guard checks the two agree."
+    )
 
 DEFAULT_API = "http://localhost:8001"
 
@@ -124,12 +142,14 @@ def _status(target: Path, api: str) -> int:
     print(f"credential file: {target}")
     if not ready:
         print("  NO ACCOUNT CAN SIGN IN - run with --ensure")
-    for alias, identity in sorted(ALIASES.items()):
+    alias_of = {identity: alias for alias, identity in ALIASES.items()}
+    for identity in sorted(PERSONAS):
         mark = "ready" if identity in ready else "no secret set"
-        print(f"  {alias:<8} {identity:<12} {PERSONAS[identity].role:<8} {mark}")
-    orphans = sorted(ready - set(PERSONAS))
-    for identity in orphans:
-        print(f"  {'?':<8} {identity:<12} {'-':<8} has a secret but is not a known persona")
+        print(
+            f"  {alias_of.get(identity, ''):<8} {identity:<10} {PERSONAS[identity].role:<8} {mark}"
+        )
+    for identity in sorted(ready - set(PERSONAS)):
+        print(f"  {'':<8} {identity:<10} {'-':<8} has a secret but is not a known persona")
 
     status, _ = _api_login(api, "", "")
     if status == 0:
@@ -176,9 +196,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.ensure:
-        wanted = (
-            sorted(set(ALIASES.values())) if args.ensure == "__all__" else [_resolve(args.ensure)]
-        )
+        # Every persona, not just the aliased ones: a new account added to
+        # personas.py must not be silently left out of the demo bootstrap.
+        wanted = sorted(PERSONAS) if args.ensure == "__all__" else [_resolve(args.ensure)]
         have = set(_load(target).identities())
         missing = [i for i in wanted if i not in have]
         if not missing:

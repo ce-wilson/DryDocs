@@ -39,11 +39,11 @@ class FakeRunner:
 
 
 def _admin_token(store: InMemorySessionStore) -> str:
-    return store.issue("asmith7734").token
+    return store.issue("morpheus").token
 
 
 def _user_token(store: InMemorySessionStore) -> str:
-    return store.issue("jdoe4821").token
+    return store.issue("mouse").token
 
 
 # ── guard ────────────────────────────────────────────────────────────────────
@@ -92,8 +92,8 @@ def test_guard_allows_reads_and_data_mentions(cypher):
 
 def test_session_issue_resolve_revoke():
     store = InMemorySessionStore()
-    s = store.issue("jdoe4821")
-    assert s.role == "user" and s.persona_id == "jdoe4821" and len(s.token) > 20
+    s = store.issue("mouse")
+    assert s.role == "user" and s.persona_id == "mouse" and len(s.token) > 20
     assert store.resolve(s.token).role == "user"
     store.revoke(s.token)
     with pytest.raises(InvalidTokenError):
@@ -167,7 +167,7 @@ def _credentials(*identities: str) -> CredentialStore:
 def test_login_and_named_query_routes_database():
     store = InMemorySessionStore()
     runner = FakeRunner(keys=["labels", "count"], rows=[{"labels": ["X"], "count": 1}])
-    session = login("jdoe4821", TEST_SECRET, store, _credentials("jdoe4821"))
+    session = login("mouse", TEST_SECRET, store, _credentials("mouse"))
     out = run_named("overview-counts", {}, session["token"], store, runner)
     assert out["database"] == "drydocs" and out["rows"] == [{"labels": ["X"], "count": 1}]
     cypher, params, database = runner.calls[0]
@@ -199,7 +199,7 @@ def test_raw_cypher_admin_only_and_guarded():
 
 def test_logout_revokes():
     store = InMemorySessionStore()
-    session = login("asmith7734", TEST_SECRET, store, _credentials("asmith7734"))
+    session = login("morpheus", TEST_SECRET, store, _credentials("morpheus"))
     logout(session["token"], store)
     with pytest.raises(InvalidTokenError):
         run_raw("MATCH (n) RETURN n", session["token"], store, FakeRunner())
@@ -217,11 +217,11 @@ def test_fastapi_wiring_smoke():
     app = create_app(
         runner=FakeRunner(),
         store=InMemorySessionStore(),
-        credentials=_credentials("jdoe4821", "asmith7734"),
+        credentials=_credentials("mouse", "morpheus"),
     )
     client = TestClient(app)
     assert client.get("/health").json() == {"status": "ok"}
-    login_res = client.post("/login", json={"persona_id": "jdoe4821", "secret": TEST_SECRET})
+    login_res = client.post("/login", json={"persona_id": "mouse", "secret": TEST_SECRET})
     assert login_res.status_code == 200
     token = login_res.json()["token"]
     ok = client.post(

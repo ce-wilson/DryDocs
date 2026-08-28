@@ -26,8 +26,8 @@ export interface OverrideGridRow {
 
 export const DEMO_OVERRIDE_GRID: readonly OverrideGridRow[] = [
   { app_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'source', holder_sid: 'U111111', holder_name: null, rationale: null, authored_by: null, authored_on: null, status: 'active' },
-  { app_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'override', holder_sid: 'U222222', holder_name: 'Sam Steward', rationale: 'person left the team', authored_by: 'kchen2190', authored_on: '2026-07-21', status: 'active' },
-  { app_id: 'APP-2222', role_name: 'L1 Operate Manager', origin: 'override', holder_sid: 'U333333', holder_name: null, rationale: 'role unassigned in SEAL', authored_by: 'kchen2190', authored_on: '2026-07-21', status: 'active' },
+  { app_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'override', holder_sid: 'U222222', holder_name: 'Sam Steward', rationale: 'person left the team', authored_by: 'trinity', authored_on: '2026-07-21', status: 'active' },
+  { app_id: 'APP-2222', role_name: 'L1 Operate Manager', origin: 'override', holder_sid: 'U333333', holder_name: null, rationale: 'role unassigned in SEAL', authored_by: 'trinity', authored_on: '2026-07-21', status: 'active' },
 ]
 
 // K11 — the app-code cascade pane's demo frames (synthetic values only).

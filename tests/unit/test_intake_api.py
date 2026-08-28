@@ -78,7 +78,7 @@ def sessions() -> InMemorySessionStore:
     return InMemorySessionStore()
 
 
-def _token(sessions, persona="jdoe4821"):
+def _token(sessions, persona="mouse"):
     return sessions.issue(persona).token
 
 
@@ -183,7 +183,7 @@ def test_upload_refused_once_accepted(sessions, store):
     add_evidence(iid, "a.txt", b"x\n", token, sessions, store)
     for to in ("ontology-reviewed", "correlated", "sme-confirmed"):
         transition(iid, to, "", token, sessions, store)
-    admin = _token(sessions, "asmith7734")
+    admin = _token(sessions, "morpheus")
     transition(iid, "admin-accepted", "", admin, sessions, store)
     with pytest.raises(IllegalTransitionError):
         add_evidence(iid, "late.txt", b"y\n", token, sessions, store)
@@ -234,7 +234,7 @@ def test_normalized_subject_strips_reply_prefixes():
 def _thread_pair(sessions, store):
     token_a, first = _intake(sessions, store)
     add_evidence(first["intake_id"], "first.msg", FIRST_MAIL, token_a, sessions, store)
-    token_b = _token(sessions, "kchen2190")
+    token_b = _token(sessions, "trinity")
     second = create_intake("job-failure", {}, "", token_b, sessions, store)
     out = add_evidence(second["intake_id"], "reply.msg", REPLY_MAIL, token_b, sessions, store)
     return first, out, token_b
@@ -333,7 +333,7 @@ def test_accept_and_return_are_admin_only(sessions, store):
         transition(iid, to, "", token, sessions, store)
     with pytest.raises(Forbidden):
         transition(iid, "admin-accepted", "", token, sessions, store)
-    admin = _token(sessions, "asmith7734")
+    admin = _token(sessions, "morpheus")
     rec = transition(iid, "admin-accepted", "", admin, sessions, store)
     assert rec["status"] == "admin-accepted"
 
@@ -343,7 +343,7 @@ def test_return_requires_a_note(sessions, store):
     iid = rec["intake_id"]
     for to in ("ontology-reviewed", "correlated", "sme-confirmed"):
         transition(iid, to, "", token, sessions, store)
-    admin = _token(sessions, "asmith7734")
+    admin = _token(sessions, "morpheus")
     with pytest.raises(IntakeValidationError):
         transition(iid, "admin-returned", "", admin, sessions, store)
     rec = transition(iid, "admin-returned", "bindings look wrong", admin, sessions, store)
@@ -357,7 +357,7 @@ def test_legal_transitions_map_is_role_scoped(sessions, store):
         transition(iid, to, "", token, sessions, store)
     sme_view = get_intake(iid, token, sessions, store)["legal_transitions"]
     assert sme_view["transitions"] == []  # accept/return are not the SME's buttons
-    admin = _token(sessions, "asmith7734")
+    admin = _token(sessions, "morpheus")
     admin_view = get_intake(iid, admin, sessions, store)["legal_transitions"]
     assert {t["to"] for t in admin_view["transitions"]} == {"admin-accepted", "admin-returned"}
 
@@ -369,7 +369,7 @@ def test_admin_accepted_parks_waiting_on_gate(sessions, store):
     iid = rec["intake_id"]
     for to in ("ontology-reviewed", "correlated", "sme-confirmed"):
         transition(iid, to, "", token, sessions, store)
-    admin = _token(sessions, "asmith7734")
+    admin = _token(sessions, "morpheus")
     rec = transition(iid, "admin-accepted", "", admin, sessions, store)
     lt = rec["legal_transitions"]
     assert lt["waiting_on_gate"] is True and lt["transitions"] == []
@@ -383,11 +383,11 @@ def test_admin_accepted_parks_waiting_on_gate(sessions, store):
 
 def test_users_see_own_intakes_only(sessions, store):
     token_a, rec = _intake(sessions, store)
-    other_user = _token(sessions, "jdoe4821")  # same persona, new session — still owner
+    other_user = _token(sessions, "mouse")  # same persona, new session — still owner
     assert (
         get_intake(rec["intake_id"], other_user, sessions, store)["intake_id"] == rec["intake_id"]
     )
-    steward = _token(sessions, "kchen2190")
+    steward = _token(sessions, "trinity")
     assert len(list_intakes(steward, sessions, store)["intakes"]) == 1  # queue sees all
 
 

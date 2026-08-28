@@ -22,7 +22,7 @@ npm install          # first time only
 npm run dev          # → http://localhost:5173
 ```
 
-Open http://localhost:5173, pick a persona (see §Personas), review. Every synthetic
+Open http://localhost:5173, sign in as a persona (see §Personas), review. Every synthetic
 surface is tagged `EXAMPLE DATA · ILLUSTRATIVE` — that tag is the honesty convention,
 not an error.
 
@@ -83,11 +83,15 @@ instead") and the view stays usable on fixtures — a dead API never blanks a pa
 
 | Persona | Role | Use for |
 |---|---|---|
-| A. Smith (`asmith7734`) | admin | full review — all towers, all modules |
-| J. Doe (`jdoe4821`) | user | the scoped experience (own tower only) |
-| K. Chen (`kchen2190`) | steward | mapping-steward surfaces (manual tiers) |
+| Morpheus (`morpheus`) | admin | full review — all towers, all modules |
+| Trinity (`trinity`) | steward | mapping-steward surfaces (manual tiers) |
+| Neo (`neo`) | user | the scoped experience, plus `/intake` |
+| Mouse / Tank / Dozer | user | the scoped experience (own tower only) |
 
-Sign-out is in the header. The mock-auth banner across the top is intentional.
+Sign-out is in the header. Each account needs a secret on this machine first —
+`poetry run python scripts/admin_demo_login.py --ensure` sets any that are missing.
+The band across the top is a statement, not a warning: the accounts are synthetic
+and their secrets are machine-local rather than issued by a directory.
 
 ## What each view backs onto (live-readiness map)
 

@@ -149,8 +149,8 @@ class _RichRunner(_PlainRunner):
 def test_handlers_attach_diagnostics_and_tolerate_plain_runners() -> None:
     store = handlers.InMemorySessionStore()
     creds = CredentialStore()
-    creds.set("asmith7734", "a-test-console-secret")
-    token = handlers.login("asmith7734", "a-test-console-secret", store, creds)["token"]
+    creds.set("morpheus", "a-test-console-secret")
+    token = handlers.login("morpheus", "a-test-console-secret", store, creds)["token"]
     rich = handlers.run_raw(
         "MATCH (n:NoSuchLabelR21) RETURN count(n) AS n", token, store, _RichRunner()
     )

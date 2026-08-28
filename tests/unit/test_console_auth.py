@@ -38,6 +38,7 @@ from drydocs_api.handlers import (
     login,
     require_role,
 )
+from drydocs_api.personas import PERSONAS
 from drydocs_api.sessions import (
     ExpiredTokenError,
     InMemorySessionStore,
@@ -79,33 +80,33 @@ def test_hash_is_salted_so_two_accounts_with_one_secret_do_not_match():
 
 
 def test_stored_file_never_contains_the_plaintext(tmp_path: Path):
-    creds = _store("jdoe4821")
+    creds = _store("mouse")
     target = save_store(creds, tmp_path / "console-credentials.json")
     text = target.read_text(encoding="utf-8")
     assert SECRET not in text
     payload = json.loads(text)
-    assert payload["credentials"]["jdoe4821"]["algorithm"] == ALGORITHM
+    assert payload["credentials"]["mouse"]["algorithm"] == ALGORITHM
 
 
 def test_empty_store_refuses_everything():
     creds = CredentialStore()
     assert creds.is_bootstrapped is False
-    assert creds.verify("jdoe4821", SECRET) is False
+    assert creds.verify("mouse", SECRET) is False
 
 
 def test_unknown_identity_returns_false_rather_than_raising():
     """An exception would be an enumeration oracle: the caller could tell a
     real id from an invented one by which failure it got."""
-    creds = _store("jdoe4821")
+    creds = _store("mouse")
     assert creds.verify("nobody-at-all", SECRET) is False
 
 
 def test_round_trip_through_the_file(tmp_path: Path):
-    target = save_store(_store("jdoe4821", "asmith7734"), tmp_path / "creds.json")
+    target = save_store(_store("mouse", "morpheus"), tmp_path / "creds.json")
     reloaded = CredentialStore.load(target)
-    assert reloaded.identities() == ("asmith7734", "jdoe4821")
-    assert reloaded.verify("jdoe4821", SECRET) is True
-    assert reloaded.verify("asmith7734", "wrong") is False
+    assert reloaded.identities() == ("morpheus", "mouse")
+    assert reloaded.verify("mouse", SECRET) is True
+    assert reloaded.verify("morpheus", "wrong") is False
 
 
 def test_absent_file_is_the_fresh_clone_state_not_an_error(tmp_path: Path):
@@ -186,8 +187,8 @@ def test_no_credential_file_is_tracked():
 
 def test_login_issues_a_session_with_an_expiry():
     sessions = InMemorySessionStore()
-    out = login("asmith7734", SECRET, sessions, _store("asmith7734"))
-    assert out["persona_id"] == "asmith7734"
+    out = login("morpheus", SECRET, sessions, _store("morpheus"))
+    assert out["persona_id"] == "morpheus"
     assert out["role"] == "admin"  # resolved server-side, never sent by the client
     assert datetime.fromisoformat(out["expires_at"]) > datetime.now(UTC)
     assert authenticate(out["token"], sessions).role == "admin"
@@ -196,7 +197,7 @@ def test_login_issues_a_session_with_an_expiry():
 def test_login_refuses_a_wrong_secret():
     sessions = InMemorySessionStore()
     with pytest.raises(BadCredentialsError):
-        login("asmith7734", "not-the-secret", sessions, _store("asmith7734"))
+        login("morpheus", "not-the-secret", sessions, _store("morpheus"))
 
 
 def test_login_refuses_an_empty_secret():
@@ -204,32 +205,32 @@ def test_login_refuses_an_empty_secret():
     reach the KDF as a legitimate input."""
     sessions = InMemorySessionStore()
     with pytest.raises(BadCredentialsError):
-        login("asmith7734", "", sessions, _store("asmith7734"))
+        login("morpheus", "", sessions, _store("morpheus"))
 
 
 def test_unknown_identity_and_wrong_secret_are_indistinguishable():
     """Same exception type, same message — which of the two it was is exactly
     what turns a login route into an account enumerator."""
     sessions = InMemorySessionStore()
-    creds = _store("asmith7734")
+    creds = _store("morpheus")
     with pytest.raises(BadCredentialsError) as unknown:
         login("no-such-person", SECRET, sessions, creds)
     with pytest.raises(BadCredentialsError) as wrong:
-        login("asmith7734", "nope", sessions, creds)
+        login("morpheus", "nope", sessions, creds)
     assert str(unknown.value) == str(wrong.value)
 
 
 def test_fresh_clone_says_what_to_run():
     sessions = InMemorySessionStore()
     with pytest.raises(CredentialsNotConfiguredError) as exc:
-        login("asmith7734", SECRET, sessions, CredentialStore())
+        login("morpheus", SECRET, sessions, CredentialStore())
     assert "set_console_credential.py" in str(exc.value)
 
 
 def test_a_failed_login_issues_no_session():
     sessions = InMemorySessionStore()
     with pytest.raises(BadCredentialsError):
-        login("asmith7734", "wrong", sessions, _store("asmith7734"))
+        login("morpheus", "wrong", sessions, _store("morpheus"))
     assert sessions.purge_expired() == 0
     assert len(sessions._sessions) == 0  # the assertion IS the internal state
 
@@ -240,7 +241,7 @@ def test_a_failed_login_issues_no_session():
 def test_expired_token_is_rejected():
     sessions = InMemorySessionStore(ttl=timedelta(minutes=30))
     issued = datetime.now(UTC)
-    session = sessions.issue("jdoe4821", now=issued)
+    session = sessions.issue("mouse", now=issued)
     assert sessions.resolve(session.token, now=issued + timedelta(minutes=29)).role == "user"
     with pytest.raises(ExpiredTokenError):
         sessions.resolve(session.token, now=issued + timedelta(minutes=31))
@@ -256,7 +257,7 @@ def test_expired_reads_as_invalid_to_every_existing_caller():
 def test_expired_session_is_dropped_not_left_behind():
     sessions = InMemorySessionStore(ttl=timedelta(seconds=1))
     issued = datetime.now(UTC)
-    session = sessions.issue("jdoe4821", now=issued)
+    session = sessions.issue("mouse", now=issued)
     with pytest.raises(ExpiredTokenError):
         sessions.resolve(session.token, now=issued + timedelta(seconds=2))
     with pytest.raises(InvalidTokenError):  # gone, not merely expired
@@ -266,10 +267,10 @@ def test_expired_session_is_dropped_not_left_behind():
 def test_purge_expired_clears_only_the_stale_ones():
     sessions = InMemorySessionStore(ttl=timedelta(minutes=10))
     issued = datetime.now(UTC)
-    old = sessions.issue("jdoe4821", now=issued - timedelta(hours=1))
-    fresh = sessions.issue("asmith7734", now=issued)
+    old = sessions.issue("mouse", now=issued - timedelta(hours=1))
+    fresh = sessions.issue("morpheus", now=issued)
     assert sessions.purge_expired(now=issued) == 1
-    assert sessions.resolve(fresh.token, now=issued).persona_id == "asmith7734"
+    assert sessions.resolve(fresh.token, now=issued).persona_id == "morpheus"
     with pytest.raises(InvalidTokenError):
         sessions.resolve(old.token, now=issued)
 
@@ -279,8 +280,8 @@ def test_purge_expired_clears_only_the_stale_ones():
 
 def test_require_role_admits_and_refuses():
     sessions = InMemorySessionStore()
-    admin = sessions.issue("asmith7734")
-    user = sessions.issue("jdoe4821")
+    admin = sessions.issue("morpheus")
+    user = sessions.issue("mouse")
     assert require_role(admin, "admin") is admin
     assert require_role(user, "user", "steward") is user
     with pytest.raises(Forbidden):
@@ -370,10 +371,10 @@ def test_the_api_package_cannot_write_a_credential(monkeypatch: pytest.MonkeyPat
     credential file is an endpoint that can grant itself an account. Writing
     lives in scripts/set_console_credential.py, run by a person.
     """
-    creds = _store("jdoe4821")
+    creds = _store("mouse")
     assert not hasattr(creds, "save")
     payload = creds.as_payload()  # serializes, writes nothing
-    assert payload["version"] == 1 and "jdoe4821" in payload["credentials"]
+    assert payload["version"] == 1 and "mouse" in payload["credentials"]
 
 
 def test_the_admin_only_route_declares_admin():
@@ -390,35 +391,35 @@ def test_reloading_store_sees_a_credential_added_after_it_started(tmp_path: Path
     store = ReloadingCredentialStore(target)
     assert store.is_bootstrapped is False
 
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     assert store.is_bootstrapped is True
-    assert store.verify("jdoe4821", SECRET) is True
+    assert store.verify("mouse", SECRET) is True
 
 
 def test_reloading_store_sees_a_rotation(tmp_path: Path):
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     store = ReloadingCredentialStore(target)
-    assert store.verify("jdoe4821", SECRET) is True
+    assert store.verify("mouse", SECRET) is True
 
     rotated = CredentialStore()
-    rotated.set("jdoe4821", "a-different-secret")
+    rotated.set("mouse", "a-different-secret")
     save_store(rotated, target)
 
-    assert store.verify("jdoe4821", SECRET) is False
-    assert store.verify("jdoe4821", "a-different-secret") is True
+    assert store.verify("mouse", SECRET) is False
+    assert store.verify("mouse", "a-different-secret") is True
 
 
 def test_reloading_store_honours_deletion(tmp_path: Path):
     """An ABSENT file is unambiguous: somebody removed the accounts."""
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     store = ReloadingCredentialStore(target)
     assert store.is_bootstrapped is True
 
     target.unlink()
     assert store.is_bootstrapped is False
-    assert store.verify("jdoe4821", SECRET) is False
+    assert store.verify("mouse", SECRET) is False
 
 
 def test_a_corrupt_file_keeps_the_last_good_store(tmp_path: Path):
@@ -427,15 +428,15 @@ def test_a_corrupt_file_keeps_the_last_good_store(tmp_path: Path):
     rotation into a lockout: a denial of service caused by the safety
     behaviour rather than by the fault."""
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     store = ReloadingCredentialStore(target)
-    assert store.verify("jdoe4821", SECRET) is True
+    assert store.verify("mouse", SECRET) is True
 
     target.write_text('{"version":1,"credentials":{"jdoe', encoding="utf-8")
-    assert store.verify("jdoe4821", SECRET) is True  # last good stands
+    assert store.verify("mouse", SECRET) is True  # last good stands
 
-    save_store(_store("jdoe4821", "asmith7734"), target)
-    assert store.verify("asmith7734", SECRET) is True  # and it recovers
+    save_store(_store("mouse", "morpheus"), target)
+    assert store.verify("morpheus", SECRET) is True  # and it recovers
 
 
 def test_a_corrupt_file_is_retried_rather_than_treated_as_settled(tmp_path: Path):
@@ -443,7 +444,7 @@ def test_a_corrupt_file_is_retried_rather_than_treated_as_settled(tmp_path: Path
     that is repaired to the same size within one timestamp tick would be
     ignored forever."""
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     store = ReloadingCredentialStore(target)
     target.write_text("not json at all", encoding="utf-8")
     store.is_bootstrapped  # noqa: B018 — the refresh is the point
@@ -455,7 +456,7 @@ def test_an_unchanged_file_is_not_re_parsed(tmp_path: Path):
     """A stat per login is the budget; re-deriving the store every request is
     not. Counted rather than asserted in prose."""
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     store = ReloadingCredentialStore(target)
 
     calls = 0
@@ -469,7 +470,7 @@ def test_an_unchanged_file_is_not_re_parsed(tmp_path: Path):
     CredentialStore.load = staticmethod(counting_load)  # type: ignore[method-assign]
     try:
         for _ in range(5):
-            store.verify("jdoe4821", SECRET)
+            store.verify("mouse", SECRET)
     finally:
         CredentialStore.load = original  # type: ignore[method-assign]
     assert calls == 0
@@ -478,7 +479,7 @@ def test_an_unchanged_file_is_not_re_parsed(tmp_path: Path):
 def test_both_stores_satisfy_what_login_needs(tmp_path: Path):
     """The protocol is what lets the API hold a reloading store while every
     test injects a plain one."""
-    plain: CredentialChecker = _store("jdoe4821")
+    plain: CredentialChecker = _store("mouse")
     reloading: CredentialChecker = ReloadingCredentialStore(tmp_path / "creds.json")
     for checker in (plain, reloading):
         assert isinstance(checker.is_bootstrapped, bool)
@@ -490,7 +491,7 @@ def test_both_stores_satisfy_what_login_needs(tmp_path: Path):
 
 def test_save_leaves_no_temp_file_behind(tmp_path: Path):
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     assert target.exists()
     assert list(tmp_path.iterdir()) == [target]
 
@@ -500,13 +501,13 @@ def test_save_replaces_rather_than_truncating(tmp_path: Path):
     a reader can rely on: the old content is complete right up until the new
     content is complete - there is no moment where the path holds neither."""
     target = tmp_path / "creds.json"
-    save_store(_store("jdoe4821"), target)
+    save_store(_store("mouse"), target)
     before = target.read_text(encoding="utf-8")
-    assert json.loads(before)["credentials"].keys() == {"jdoe4821"}
+    assert json.loads(before)["credentials"].keys() == {"mouse"}
 
-    save_store(_store("jdoe4821", "asmith7734"), target)
+    save_store(_store("mouse", "morpheus"), target)
     after = target.read_text(encoding="utf-8")
-    assert json.loads(after)["credentials"].keys() == {"asmith7734", "jdoe4821"}
+    assert json.loads(after)["credentials"].keys() == {"morpheus", "mouse"}
     assert before != after
 
 
@@ -517,3 +518,39 @@ def test_the_writer_uses_a_sibling_temp_path(tmp_path: Path):
     assert "target.with_name(" in source
     assert "os.replace(" in source
     assert "tempfile" not in source
+
+
+# ── the demo script's alias table ───────────────────────────────────────────
+
+
+def test_every_alias_points_at_a_real_persona():
+    """The failure this guards was a live one: the alias table was edited with
+    names that were not persona ids, and it surfaced as a KeyError from inside
+    a format string rather than as a message saying what was wrong."""
+    import admin_demo_login
+
+    unknown = sorted(v for v in admin_demo_login.ALIASES.values() if v not in PERSONAS)
+    assert unknown == [], f"aliases point at ids the server does not know: {unknown}"
+
+
+def test_alias_roles_are_what_the_names_claim():
+    """An alias called 'admin' that resolves to a user-tier account would send
+    a demo down the wrong path silently."""
+    import admin_demo_login
+
+    expected = {"admin": "admin", "steward": "steward", "user": "user", "sme": "user"}
+    for alias, role in expected.items():
+        identity = admin_demo_login.ALIASES[alias]
+        assert PERSONAS[identity].role == role, f"alias {alias!r} -> {identity!r} is not {role}"
+
+
+def test_the_roster_keeps_one_account_per_gated_tier_plus_spare_seats():
+    """Every role a route gates on needs at least one account, or that surface
+    becomes untestable; and per-persona isolation needs two accounts alike in
+    everything but identity."""
+    by_role: dict[str, list[str]] = {}
+    for identity, p in PERSONAS.items():
+        by_role.setdefault(p.role, []).append(identity)
+    assert set(by_role) == {"admin", "steward", "user"}
+    assert len(by_role["admin"]) >= 1 and len(by_role["steward"]) >= 1
+    assert len(by_role["user"]) >= 2, "per-persona isolation cannot be tested with one user"

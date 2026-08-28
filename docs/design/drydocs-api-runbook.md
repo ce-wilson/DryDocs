@@ -99,10 +99,10 @@ startup/refresh runbook) — this service reads the graph and never loads it.
    per request and never sent by the client:
    ```powershell
    curl -X POST http://localhost:8001/login -H "Content-Type: application/json" `
-        -d '{\"persona_id\":\"kchen2190\"}'
+        -d '{\"persona_id\":\"trinity\"}'
    ```
-   Success: a token. The synthetic personas are `jdoe4821` (user), `kchen2190` (steward)
-   and `asmith7734` (admin) — `user` is deliberately refused by every `/mappings/*` route,
+   Success: a token. The synthetic personas are `mouse` (user), `trinity` (steward)
+   and `morpheus` (admin) — `user` is deliberately refused by every `/mappings/*` route,
    which is a working gate rather than a broken install.
 
 5. **Point a consumer at it.** The console reads `VITE_API_URL` (`web/.env.example`); the
@@ -151,7 +151,7 @@ Expect `status: ok`, then the domain registry with `ontology-map`,
 until 2026-08-26; K15 retired the job-grain domain and it is now deleted from the
 registry outright — authoring lives at `app-code-mapping`.)
 
-**2. The role gate holds.** Log in as `jdoe4821` (role `user`) and call any
+**2. The role gate holds.** Log in as `mouse` (role `user`) and call any
 `/mappings/*` route: expect **403**. A 200 here means the gate is gone.
 
 **3. The write guard holds — this is the check that matters.** Post a write query to
@@ -201,7 +201,7 @@ and no state in the process; every route recomputes from the store or the graph.
 | `ModuleNotFoundError: fastapi` at startup | the API group is optional and not installed | `poetry install --with api` |
 | uvicorn: "Factory has not returned an app" / app not found | `--factory` omitted; `create_app` is a factory | add `--factory` |
 | **401** on every route | no token, or the header is not `Authorization: Bearer <token>` | `POST /login` and send the bearer header |
-| **403** on `/mappings/*` | logged in as `jdoe4821`, role `user` | log in as `kchen2190` (steward) or `asmith7734` (admin) — the refusal is correct |
+| **403** on `/mappings/*` | logged in as `mouse`, role `user` | log in as `trinity` (steward) or `morpheus` (admin) — the refusal is correct |
 | **404 `unknown mapping domain`** | domain registered but `available: false` (`fid-seal`, `alias-seal` — their reconciler tables are not built) | expected; not a fault |
 | **422** on a draft | fail-closed validation mirroring the store's own rules (missing rationale, un-canonicalizable role, override equal to the SEAL value, duplicate defined-mapping key) | the message names the entry and the rule |
 | `/query/*` or `/raw-cypher` fails while `/mappings/*` works | the driver is LAZY — only graph routes need Neo4j | start the container per the startup/refresh runbook |
@@ -247,6 +247,6 @@ wins and the table is the defect:
 Select-String -Path drydocs_api\app.py -Pattern '@app\.(get|post)\("' | ForEach-Object { $_.Line.Trim() }
 ```
 
-**B. Personas** (synthetic, committed in `drydocs_api/personas.py`): `jdoe4821` = user,
-`kchen2190` = steward, `asmith7734` = admin. Enterprise OIDC replaces the stub
+**B. Personas** (synthetic, committed in `drydocs_api/personas.py`): `mouse` = user,
+`trinity` = steward, `morpheus` = admin. Enterprise OIDC replaces the stub
 company-side per ADR 0005; the role model does not change with it.

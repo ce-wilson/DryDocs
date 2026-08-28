@@ -148,7 +148,7 @@ export default function App() {
           element={persona.role === 'steward' || persona.role === 'admin' ? <UnderTheHoodRoute /> : <Navigate to="/" replace />}
         />
 
-        {/* O47: the sme persona (?as=sme) plus steward/admin — the intake
+        {/* O47: the intake persona (?as=neo) plus steward/admin — the intake
             page's gate lives in auth.ts (canAccessIntake), because "SME" is a
             persona, not a fourth role tier. */}
         <Route

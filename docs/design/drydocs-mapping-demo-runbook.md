@@ -55,11 +55,11 @@ persona logins, no passwords).
 
    | Persona | Role | Sees |
    |---------|------|------|
-   | `kchen2190` | steward | `/mappings/*` — **use this one for the demo** |
-   | `jdoe4821` | user | basic tier, no mapping stewardship |
-   | `asmith7734` | admin | everything incl. raw Cypher (needs Neo4j for graph queries) |
+   | `trinity` | steward | `/mappings/*` — **use this one for the demo** |
+   | `mouse` | user | basic tier, no mapping stewardship |
+   | `morpheus` | admin | everything incl. raw Cypher (needs Neo4j for graph queries) |
 
-   *Success:* logged in as `kchen2190`, the domain strip renders (see Verify).
+   *Success:* logged in as `trinity`, the domain strip renders (see Verify).
 
 Stop with `Ctrl+C` in the terminal.
 
@@ -86,7 +86,7 @@ poetry run python scripts/build_mapping_db.py --dump-dir var/dumps  # + gate-rev
 Invoke-RestMethod http://localhost:8001/health          # -> {"status":"ok"}
 ```
 
-In the demo page, after logging in as `kchen2190`, the domain list should show **five
+In the demo page, after logging in as `trinity`, the domain list should show **five
 domains** — `ontology-map`, `seal-contact-override` and `app-code-mapping` available;
 `fid-seal` and `alias-seal` greyed out (reconciler tables not built yet, expected).
 (`job-application` was the third available domain until K15 retired it, and it left the

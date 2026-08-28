@@ -37,9 +37,9 @@ Three synthetic personas (never real SIDs — publish boundary):
 
 | Persona | Role | Sees |
 |---|---|---|
-| `jdoe4821` (J. Doe) | user | all 9 modules; Ownership is their own My Apps rollup (read-only, ServiceNow-derived, synthesized) |
-| `asmith7734` (A. Smith) | admin | everything above, plus Console (dev) — the bolt/ADK sandbox — and the cosmetic Prod\|UAT\|Dev env toggle |
-| `kchen2190` (K. Chen) | steward | mapping stewardship (`/mappings`, O13): manual-tier grids, changeset drafts, override-list drafting (O24) — zero graph writes |
+| `mouse` (J. Doe) | user | all 9 modules; Ownership is their own My Apps rollup (read-only, ServiceNow-derived, synthesized) |
+| `morpheus` (A. Smith) | admin | everything above, plus Console (dev) — the bolt/ADK sandbox — and the cosmetic Prod\|UAT\|Dev env toggle |
+| `trinity` (K. Chen) | steward | mapping stewardship (`/mappings`, O13): manual-tier grids, changeset drafts, override-list drafting (O24) — zero graph writes |
 
 All 9 site-plan modules are open to every signed-in persona (post-O8); only
 `/console` is role-gated (admin, checked in `src/App.tsx`) and the tower demo

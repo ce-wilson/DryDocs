@@ -10,9 +10,14 @@
 // 3). Editing the stored blob by hand still buys nothing, because the fields
 // that gate anything are re-derived from PERSONAS here and re-checked there.
 //
-// Persona ids stay synthetic. Real SIDs never land in this repo (publish
-// boundary), and the secrets that back these ids are machine-local — see
-// drydocs_api/credentials.py and scripts/set_console_credential.py.
+// THE IDS ARE OBVIOUSLY FICTIONAL, and that is the point rather than a joke.
+// They were SID-shaped until 2026-08-28 (jdoe4821, asmith7734, kchen2190),
+// which read as realistic in a demo and carried a standing risk with it: an id
+// that looks like a real corporate SID is one somebody can mistake for one, in
+// a screenshot, a bug report, or a file that escapes the publish boundary. A
+// name no directory could ever issue cannot be mistaken that way. The secrets
+// behind them are machine-local — see drydocs_api/credentials.py and
+// scripts/set_console_credential.py.
 
 export type Role = 'user' | 'steward' | 'admin'
 
@@ -27,21 +32,14 @@ export interface Persona {
 
 export const PERSONAS: readonly Persona[] = [
   {
-    id: 'jdoe4821',
-    displayName: 'J. Doe',
-    role: 'user',
-    chip: 'app access derived from ServiceNow',
-    towerKey: 'home',
-  },
-  {
-    id: 'asmith7734',
-    displayName: 'A. Smith',
+    id: 'morpheus',
+    displayName: 'Morpheus',
     role: 'admin',
     chip: 'platform admin · all towers',
   },
   {
-    id: 'kchen2190',
-    displayName: 'K. Chen',
+    id: 'trinity',
+    displayName: 'Trinity',
     role: 'steward',
     chip: 'mapping steward · manual tiers (O13)',
   },
@@ -49,19 +47,44 @@ export const PERSONAS: readonly Persona[] = [
   // not a fourth role tier (adding one would ripple through canAccessModule
   // for a single page). /intake gates on `id === SME_PERSONA_ID || role !==
   // 'user'`, and towerKey scopes the area cascade's default exactly as it
-  // scopes jdoe4821's tower drill. NOTE: the plan says "towerId"; the roster
-  // field has been towerKey since O-series auth landed — field name wins.
+  // scopes the other user-tier drills. NOTE: the plan says "towerId"; the
+  // roster field has been towerKey since O-series auth landed — field name wins.
   {
-    id: 'sme',
-    displayName: 'S. Merchant',
+    id: 'neo',
+    displayName: 'Neo',
     role: 'user',
     chip: 'app-support SME · context intake',
+    towerKey: 'home',
+  },
+  // Three user-tier seats, identical in rights and distinct only in identity.
+  // Several console behaviours are scoped per PERSONA rather than per role —
+  // the Ask panel's stored last turn is the case O64 tested — and proving that
+  // isolation needs two accounts that differ in nothing else.
+  {
+    id: 'mouse',
+    displayName: 'Mouse',
+    role: 'user',
+    chip: 'app access derived from ServiceNow',
+    towerKey: 'home',
+  },
+  {
+    id: 'tank',
+    displayName: 'Tank',
+    role: 'user',
+    chip: 'app access derived from ServiceNow · second seat',
+    towerKey: 'home',
+  },
+  {
+    id: 'dozer',
+    displayName: 'Dozer',
+    role: 'user',
+    chip: 'app access derived from ServiceNow · third seat',
     towerKey: 'home',
   },
 ]
 
 /** The persona whose ?as= id opens /intake without steward/admin role (O47). */
-export const SME_PERSONA_ID = 'sme'
+export const SME_PERSONA_ID = 'neo'
 
 /** May this persona open the intake page? SME persona, steward, or admin. */
 export function canAccessIntake(persona: Persona): boolean {

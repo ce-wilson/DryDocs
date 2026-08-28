@@ -246,11 +246,11 @@ def test_override_round_trip_and_origin_flag(tmp_path: Path):
     fix = _override_csv(
         tmp_path,
         # L2 Manager exercises role canonicalization -> 'L2 Operate Manager'
-        "APP-1234,L2 Manager,U111111,U222222,Sam Steward,person left the team,kchen2190,2026-07-21,active",
+        "APP-1234,L2 Manager,U111111,U222222,Sam Steward,person left the team,trinity,2026-07-21,active",
         # no SEAL value captured (nobody assigned) -> only the override row
-        "APP-5678,L1 Operate Manager,,U333333,,role unassigned in SEAL,kchen2190,2026-07-21,active",
+        "APP-5678,L1 Operate Manager,,U333333,,role unassigned in SEAL,trinity,2026-07-21,active",
         # already fixed in SEAL -> kept for audit, out of the report
-        "APP-9012,L2 Operate Manager,U444444,U555555,,fixed last sprint,kchen2190,2026-07-01,corrected-in-seal",
+        "APP-9012,L2 Operate Manager,U444444,U555555,,fixed last sprint,trinity,2026-07-01,corrected-in-seal",
     )
     conn = build(":memory:", overrides_path=fix)
     try:
@@ -288,11 +288,11 @@ def test_override_round_trip_and_origin_flag(tmp_path: Path):
 @pytest.mark.parametrize(
     "row,reason",
     [
-        ("APP-1,Head Chef,U1,U2,,r,kchen2190,2026-07-21,active", "unknown role"),
-        ("APP-1,L2 Operate Manager,U1,U2,,,kchen2190,2026-07-21,active", "missing rationale"),
-        ("APP-1,L2 Operate Manager,U1,U1,,r,kchen2190,2026-07-21,active", "override == SEAL value"),
-        ("APP-1,L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,maybe", "bad status"),
-        (",L2 Operate Manager,U1,U2,,r,kchen2190,2026-07-21,active", "missing app"),
+        ("APP-1,Head Chef,U1,U2,,r,trinity,2026-07-21,active", "unknown role"),
+        ("APP-1,L2 Operate Manager,U1,U2,,,trinity,2026-07-21,active", "missing rationale"),
+        ("APP-1,L2 Operate Manager,U1,U1,,r,trinity,2026-07-21,active", "override == SEAL value"),
+        ("APP-1,L2 Operate Manager,U1,U2,,r,trinity,2026-07-21,maybe", "bad status"),
+        (",L2 Operate Manager,U1,U2,,r,trinity,2026-07-21,active", "missing app"),
     ],
 )
 def test_override_ingestion_fails_closed(tmp_path: Path, row: str, reason: str):
@@ -310,7 +310,7 @@ def test_override_edit_flips_is_current(manual_fixture, tmp_path: Path):
     with fix.open("a", encoding="utf-8", newline="") as fh:
         fh.write(
             "APP-1234,L2 Operate Manager,U111111,U222222,,added after build,"
-            "kchen2190,2026-07-21,active\n"
+            "trinity,2026-07-21,active\n"
         )
     assert not is_current(db, manifest_path=manual_fixture["manifest"], overrides_path=fix)
 
@@ -339,11 +339,11 @@ def test_app_code_round_trip_grid_and_migration_view(tmp_path: Path):
     DECLARATION carries the platform's OWN app_id."""
     fix = _app_code_csv(
         tmp_path,
-        "PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03",
-        "PLT,,platform,APP-9900,,defined,shared SRE-dictated code — resolves per folder,kchen2190,2026-08-03",
-        "PLT,F0001,platform,APP-5678,,defined,,kchen2190,2026-08-03",
-        "PLT,F0001,platform,APP-9012,,override,team split predates the row,kchen2190,2026-08-03",
-        "PRB,,dual-coded,APP-3456,all workload under PRB by the drain,defined,,kchen2190,2026-08-03",
+        "PRA,,seal-born,APP-1234,,defined,,trinity,2026-08-03",
+        "PLT,,platform,APP-9900,,defined,shared SRE-dictated code — resolves per folder,trinity,2026-08-03",
+        "PLT,F0001,platform,APP-5678,,defined,,trinity,2026-08-03",
+        "PLT,F0001,platform,APP-9012,,override,team split predates the row,trinity,2026-08-03",
+        "PRB,,dual-coded,APP-3456,all workload under PRB by the drain,defined,,trinity,2026-08-03",
     )
     conn = build(":memory:", app_code_mappings_path=fix)
     try:
@@ -422,7 +422,7 @@ def test_app_code_edit_flips_is_current(tmp_path: Path):
     build(db, app_code_mappings_path=fix).close()
     assert is_current(db, app_code_mappings_path=fix)
     with fix.open("a", encoding="utf-8", newline="") as fh:
-        fh.write("PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03\n")
+        fh.write("PRA,,seal-born,APP-1234,,defined,,trinity,2026-08-03\n")
     assert not is_current(db, app_code_mappings_path=fix)
 
 
@@ -492,10 +492,10 @@ def test_drafts_survive_a_rebuild(tmp_path: Path):
     try:
         add_draft(
             conn,
-            draft_id="kchen2190-aaaa",
+            draft_id="trinity-aaaa",
             domain="seal-contact-override",
             payloads=[{"app_seal_id": "APP-1"}, {"app_seal_id": "APP-2"}],
-            authored_by="kchen2190",
+            authored_by="trinity",
             authored_on="2026-08-04",
         )
     finally:
@@ -504,7 +504,7 @@ def test_drafts_survive_a_rebuild(tmp_path: Path):
     conn = build(db)  # the rebuild that used to be purely destructive
     try:
         assert [d["entries"] for d in open_drafts(conn)] == [2]
-        assert [p["app_seal_id"] for p in draft_payloads(conn, "kchen2190-aaaa")] == [
+        assert [p["app_seal_id"] for p in draft_payloads(conn, "trinity-aaaa")] == [
             "APP-1",
             "APP-2",
         ]
@@ -559,18 +559,18 @@ def test_promoting_keeps_the_rows_as_the_record(tmp_path: Path):
     try:
         add_draft(
             conn,
-            draft_id="kchen2190-bbbb",
+            draft_id="trinity-bbbb",
             domain="seal-contact-override",
             payloads=[{"app_seal_id": "APP-1"}],
-            authored_by="kchen2190",
+            authored_by="trinity",
             authored_on="2026-08-04",
         )
-        assert set_draft_status(conn, "kchen2190-bbbb", "promoted") == 1
+        assert set_draft_status(conn, "trinity-bbbb", "promoted") == 1
         assert open_drafts(conn) == []
-        assert draft_payloads(conn, "kchen2190-bbbb") == []  # no longer open
-        assert len(draft_payloads(conn, "kchen2190-bbbb", status="promoted")) == 1
+        assert draft_payloads(conn, "trinity-bbbb") == []  # no longer open
+        assert len(draft_payloads(conn, "trinity-bbbb", status="promoted")) == 1
         with pytest.raises(MappingStoreError):
-            set_draft_status(conn, "kchen2190-bbbb", "nonsense")
+            set_draft_status(conn, "trinity-bbbb", "nonsense")
     finally:
         conn.close()
 

@@ -1,0 +1,59 @@
+id: O74
+epic: web-console
+title: 'Console personas become unmistakably fictional, and gain the second user-tier seat per-persona
+  isolation was never testable without'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- O69
+- O73
+inputs:
+- drydocs_api/personas.py
+- web/src/lib/auth.ts
+- scripts/admin_demo_login.py
+acceptance: |
+  The console roster is renamed from SID-shaped synthetic ids to names no directory could issue, and grows from four accounts to six: one admin, one steward, and four at user tier of which one is the intake persona. The server table and the client roster agree, proven by the drift guard that already parses the TypeScript. Every persona-id reference in code, tests, demo data and current-behaviour documentation moves with it; references inside HISTORICAL records do NOT, because a verification that ran against the old id really did run against the old id and rewriting it would falsify the record - that covers closed backlog notes, the ui-tests ledger's source lines, and observed session ids.
+  THE DEMO SCRIPT'S ALIAS TABLE IS MADE UNBREAKABLE IN THE WAY IT BROKE. An alias value must be a persona id the server knows; a value that is not one now fails at import with a message naming the offender and saying where accounts are actually defined, instead of surfacing as a KeyError from inside a format string three functions away. The bootstrap covers every persona rather than only the aliased ones, so adding an account cannot silently leave it out.
+notes: |
+  Raised 2026-08-28 (desktop) on user direction, from a real failure: the ALIASES table in
+  scripts/admin_demo_login.py was edited with new names and the script stopped working.
+  TWO BUGS, AND THE SECOND ONE WAS SILENT. The first was a category error - ALIASES maps a
+  short name to a persona id the server must already know, so names that were not persona ids
+  made every lookup fail. It surfaced as a KeyError from inside an f-string, which says
+  nothing about the actual mistake, so the table now validates at import and names what is
+  wrong. The second was three duplicate dict keys: Python keeps the last, so two of the six
+  intended accounts vanished with no error at all. Worth recording that ruff already catches
+  that one - F601, on the standard config, in the check CI runs - so the guard existed and
+  simply had not been run.
+  WHY THE NAMES ARE OBVIOUSLY FICTIONAL, which turned out to be the better property rather
+  than a joke. The old ids were SID-shaped on purpose, to make demos look realistic. That
+  realism carried a standing risk in the other direction: an id that looks like a real
+  corporate SID is one somebody can mistake for a real corporate SID, in a screenshot, a bug
+  report, or a file that escapes the publish boundary. A name no directory could ever issue
+  cannot be mistaken that way. The sme persona was already a non-SID id, so the shape was
+  never inviolable.
+  SIX ACCOUNTS, NOT FOUR, and the extra two earn their place. Several console behaviours are
+  scoped per PERSONA rather than per role - the Ask panel's stored last turn is the case O64
+  tested - and proving that isolation needs two accounts differing in nothing but identity.
+  With one user-tier account that was untestable; a test could only show that a user and an
+  admin see different things, which role gating already explains.
+  THE RENAME'S BOUNDARY IS THE INTERESTING PART. Functional references move; historical ones
+  do not. The ui-tests ledger records that a case was verified against a specific persona on
+  a specific machine on a specific date, and closed backlog items record the same - rewriting
+  either would make the repo assert something that never happened. Same reasoning that kept
+  the runbook-currency guard's exemption tables split by claim type.
+  VERIFIED LIVE on this desktop against uvicorn on port 8095 with a seeded temporary
+  credential file: all six accounts sign in and receive the role the roster declares
+  (morpheus admin, trinity steward, neo and mouse and tank and dozer user); an old id is
+  refused; an admin token reaches raw-Cypher and is stopped only by the write guard, while a
+  user token is refused by the AdminUser dependency and by the steward gate on the mappings
+  surface. Suite green, ruff clean, npm run build and oxlint clean.
+  A GUARD CAUGHT THE ONE THING A NAME CHANGE CAN BREAK INVISIBLY. The telemetry test pinned
+  the caller-identity length at 8, the length of the old id, so it failed on the shorter new
+  one. It now derives the length from the id itself - a hardcoded length would pass again by
+  coincidence the moment some future id happened to be eight characters.

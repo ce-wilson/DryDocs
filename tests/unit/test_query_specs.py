@@ -58,7 +58,7 @@ class FakeStreamingRunner(FakeRunner):
 
 
 def _token(store: InMemorySessionStore) -> str:
-    return store.issue("jdoe4821").token
+    return store.issue("mouse").token
 
 
 # ── registry invariants ──────────────────────────────────────────────────────
@@ -398,7 +398,7 @@ def test_csv_export_streams_banner_header_rows_and_registers_manifest():
     assert manifest["database"] == "drydocs"
     assert manifest["row_count"] == 2
     assert manifest["classification"] == "internal"
-    assert manifest["exported_by"] == "jdoe4821"
+    assert manifest["exported_by"] == "mouse"
     assert manifest["executed_at"]
 
 

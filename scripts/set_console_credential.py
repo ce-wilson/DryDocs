@@ -1,8 +1,8 @@
 """Bootstrap or rotate a web-console credential on THIS machine.
 
-    poetry run python scripts/set_console_credential.py asmith7734
+    poetry run python scripts/set_console_credential.py morpheus
     poetry run python scripts/set_console_credential.py --list
-    poetry run python scripts/set_console_credential.py --remove asmith7734
+    poetry run python scripts/set_console_credential.py --remove morpheus
 
 The secret is read from a no-echo prompt and confirmed, never taken from argv —
 an argument would land in shell history, in the process table, and in whatever

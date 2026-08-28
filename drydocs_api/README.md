@@ -44,7 +44,7 @@ $env:NEO4J_PASSWORD = "<server-side only>"
 poetry run uvicorn drydocs_api.app:create_app --factory --port 8001
 ```
 
-Smoke: `POST /login {"persona_id": "asmith7734"}` → bearer token →
+Smoke: `POST /login {"persona_id": "morpheus"}` → bearer token →
 `POST /query/overview-counts {}`. `POST /raw-cypher` is admin-only and
 write-guarded. `GET /queries` lists the registry.
 

@@ -55,6 +55,11 @@ const HOME_LENDING_APPS: readonly MyApp[] = [
 ]
 
 export const MY_APPS_BY_PERSONA: Record<string, readonly MyApp[]> = {
-  jdoe4821: HOME_LENDING_APPS,
-  asmith7734: HOME_LENDING_APPS,
+  // The three user-tier seats share the home tower, so they share its apps —
+  // they differ in identity, not in access.
+  mouse: HOME_LENDING_APPS,
+  tank: HOME_LENDING_APPS,
+  dozer: HOME_LENDING_APPS,
+  neo: HOME_LENDING_APPS,
+  morpheus: HOME_LENDING_APPS,
 }

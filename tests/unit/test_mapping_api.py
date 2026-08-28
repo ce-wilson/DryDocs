@@ -55,11 +55,11 @@ def _token(sessions: InMemorySessionStore, persona: str) -> str:
 
 
 def test_steward_persona_exists():
-    assert PERSONAS["kchen2190"].role == "steward"
+    assert PERSONAS["trinity"].role == "steward"
 
 
 def test_user_role_is_refused(sessions, store):
-    token = _token(sessions, "jdoe4821")
+    token = _token(sessions, "mouse")
     with pytest.raises(Forbidden):
         list_domains(token, sessions)
     with pytest.raises(Forbidden):
@@ -73,7 +73,7 @@ def test_user_role_is_refused(sessions, store):
         )
 
 
-@pytest.mark.parametrize("persona", ["kchen2190", "asmith7734"])
+@pytest.mark.parametrize("persona", ["trinity", "morpheus"])
 def test_steward_and_admin_see_domains(sessions, persona):
     out = list_domains(_token(sessions, persona), sessions)
     ids = [d["id"] for d in out["domains"]]
@@ -90,7 +90,7 @@ def test_steward_and_admin_see_domains(sessions, persona):
 
 
 def test_grid_serves_the_quintuple(sessions, store):
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = mapping_grid("ontology-map", token, sessions, store)
     assert out["keys"][:5] == [
         "id",
@@ -117,7 +117,7 @@ def test_stale_store_rebuilds_on_read(sessions, tmp_path):
     from drydocs_core.mapping_store import source_hashes
 
     own = MappingStore(tmp_path / "mapping.db")
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     mapping_grid("ontology-map", token, sessions, own)  # first read builds
 
     rw = sqlite3.connect(str(tmp_path / "mapping.db"))  # simulate source drift
@@ -134,7 +134,7 @@ def test_stale_store_rebuilds_on_read(sessions, tmp_path):
 
 
 def test_unavailable_and_unknown_domains_404(sessions, store):
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     with pytest.raises(UnknownDomainError):
         mapping_grid("fid-seal", token, sessions, store)  # registered but not available
     with pytest.raises(UnknownDomainError):
@@ -142,7 +142,7 @@ def test_unavailable_and_unknown_domains_404(sessions, store):
 
 
 def test_options_feed_the_dropdowns(sessions, store):
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = mapping_options(token, sessions, store)
     labels = {r["label"] for r in out["labels"]}
     assert {"ControlMJob", "ControlMFolder", "BusinessApplication"} <= labels
@@ -156,7 +156,7 @@ def test_options_feed_the_dropdowns(sessions, store):
 def test_changeset_artifact_shape(sessions, store):
     """K9: the changeset artifact carries the K7 RULED edge shape, keyed by
     app_code (§B1 — job identity retired for authoring at §A1)."""
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = draft_changeset(
         [
             {
@@ -183,7 +183,7 @@ def test_changeset_artifact_shape(sessions, store):
     assert rows[0]["rel_props"] == "role=seal_app_ref"
     assert rows[0]["target_label"] == "Port"
     assert rows[0]["target_key"] == "app_id=APP-9876"
-    assert rows[0]["authored_by"] == "kchen2190"  # session persona, never client-supplied
+    assert rows[0]["authored_by"] == "trinity"  # session persona, never client-supplied
     assert rows[1]["create_target_if_missing"] == "true"
     assert "pending-load" in out["manifest_snippet"]
     assert "replaces_with" in out["manifest_snippet"]
@@ -219,7 +219,7 @@ def test_k2_shape_is_the_ruled_edge():
     ],
 )
 def test_changeset_fails_closed(sessions, store, bad, reason):
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     with pytest.raises(ChangesetValidationError):
         draft_changeset(bad, token, sessions, store)
 
@@ -239,9 +239,9 @@ def override_store(tmp_path, monkeypatch) -> MappingStore:
     fix.write_text(
         ",".join(OVERRIDE_HEADER) + "\n"
         "APP-1234,L2 Operate Manager,U111111,U222222,Sam Steward,"
-        "person left the team,kchen2190,2026-07-21,active\n"
+        "person left the team,trinity,2026-07-21,active\n"
         "APP-5678,L1 Operate Manager,,U333333,,role unassigned in SEAL,"
-        "kchen2190,2026-07-21,active\n",
+        "trinity,2026-07-21,active\n",
         encoding="utf-8",
     )
     monkeypatch.setattr("drydocs_core.mapping_store.SEAL_CONTACT_OVERRIDES_PATH", fix)
@@ -258,7 +258,7 @@ def test_override_grid_carries_origin_flag(sessions, override_store):
     """Every grid row is origin-flagged; the SEAL source value and the user
     override arrive as adjacent rows (source first) — never merged, never
     silently replaced."""
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = mapping_grid("seal-contact-override", token, sessions, override_store)
     assert "origin" in out["keys"]
     # The GRID emits app_id (S3 / gate §E1); the committed FILE below keeps
@@ -290,14 +290,14 @@ def test_draft_override_writes_a_row_not_a_file(sessions, override_store):
     own copy from the same base — whichever was committed last erased the
     other. The receipt names the draft instead; the diff comes from promotion.
     """
-    token = _token(sessions, "asmith7734")
+    token = _token(sessions, "morpheus")
     out = draft_override([_A_DRAFT], token, sessions, override_store)
 
     assert "csv" not in out, "drafting must no longer hand back a whole replacement file"
     assert out["domain"] == "seal-contact-override"
     assert out["entries"] == 1 and out["pending"] == 1
     assert out["committed_rows"] == 2
-    assert out["draft_id"].startswith("asmith7734-")  # readable in v_open_drafts
+    assert out["draft_id"].startswith("morpheus-")  # readable in v_open_drafts
 
     stored = override_store.draft_payloads(out["draft_id"])
     assert len(stored) == 1
@@ -306,7 +306,7 @@ def test_draft_override_writes_a_row_not_a_file(sessions, override_store):
     # wire's app_id), canonicalized role, server-stamped author.
     assert row["app_seal_id"] == "APP-9012"
     assert row["role_name"] == "L1 Operate Manager"
-    assert row["authored_by"] == "asmith7734"  # session persona, never client-supplied
+    assert row["authored_by"] == "morpheus"  # session persona, never client-supplied
     assert row["status"] == "active"
     assert "NO committed file was written" in out["note"]
 
@@ -317,8 +317,8 @@ def test_concurrent_drafts_from_two_sessions_both_survive(sessions, override_sto
     Two stewards drafting at the same time get two independent drafts; neither
     overwrites the other, and each promotes to its own diff.
     """
-    alice = _token(sessions, "kchen2190")
-    bob = _token(sessions, "asmith7734")
+    alice = _token(sessions, "trinity")
+    bob = _token(sessions, "morpheus")
 
     a = draft_override(
         [{**_A_DRAFT, "override_holder_sid": "U555555"}], alice, sessions, override_store
@@ -333,8 +333,8 @@ def test_concurrent_drafts_from_two_sessions_both_survive(sessions, override_sto
 
     pending = {d["draft_id"]: d for d in override_store.open_drafts()}
     assert set(pending) == {a["draft_id"], b["draft_id"]}
-    assert pending[a["draft_id"]]["authored_by"] == "kchen2190"
-    assert pending[b["draft_id"]]["authored_by"] == "asmith7734"
+    assert pending[a["draft_id"]]["authored_by"] == "trinity"
+    assert pending[b["draft_id"]]["authored_by"] == "morpheus"
 
     # Each still holds exactly its own row — no cross-contamination.
     assert override_store.draft_payloads(a["draft_id"])[0]["override_holder_sid"] == "U555555"
@@ -347,14 +347,14 @@ def test_draft_survives_a_store_rebuild(sessions, override_store, tmp_path, monk
     derived and IS discarded; the draft table is the deliberate exception."""
     from drydocs_core import mapping_store as core
 
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = draft_override([_A_DRAFT], token, sessions, override_store)
 
     # Touch the committed source: the next read sees drift and rebuilds.
     fix = Path(core.SEAL_CONTACT_OVERRIDES_PATH)
     fix.write_text(
         fix.read_text(encoding="utf-8")
-        + "APP-7777,L2 Operate Manager,,U888888,,added out of band,kchen2190,2026-07-22,active\n",
+        + "APP-7777,L2 Operate Manager,,U888888,,added out of band,trinity,2026-07-22,active\n",
         encoding="utf-8",
     )
     assert not core.is_current(override_store._db_path), "fixture edit should make the store stale"
@@ -373,7 +373,7 @@ def test_promote_emits_an_additive_diff_that_round_trips(sessions, override_stor
     """
     from drydocs_core import mapping_store as core
 
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     drafted = draft_override([_A_DRAFT], token, sessions, override_store)
     out = promote_draft(drafted["draft_id"], token, sessions, override_store)
 
@@ -398,7 +398,7 @@ def test_promote_emits_an_additive_diff_that_round_trips(sessions, override_stor
     rows = list(csv.DictReader(io.StringIO(patched)))
     assert [r["app_seal_id"] for r in rows] == ["APP-1234", "APP-5678", "APP-9012"]
     assert rows[-1]["role_name"] == "L1 Operate Manager"
-    assert rows[-1]["authored_by"] == "kchen2190"
+    assert rows[-1]["authored_by"] == "trinity"
     # committed rows survive byte-faithfully
     assert rows[0]["override_holder_name"] == "Sam Steward"
 
@@ -425,7 +425,7 @@ def test_promote_diff_applies_with_real_git(sessions, override_store, tmp_path):
 
     from drydocs_core import mapping_store as core
 
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     drafted = draft_override([_A_DRAFT], token, sessions, override_store)
     out = promote_draft(drafted["draft_id"], token, sessions, override_store)
 
@@ -572,13 +572,13 @@ def _apply_unified_diff(original: str, diff: str) -> str:
     ],
 )
 def test_draft_override_fails_closed(sessions, override_store, bad):
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     with pytest.raises(ChangesetValidationError):
         draft_override(bad, token, sessions, override_store)
 
 
 def test_override_endpoints_refuse_user_role(sessions, override_store):
-    token = _token(sessions, "jdoe4821")
+    token = _token(sessions, "mouse")
     with pytest.raises(Forbidden):
         draft_override(
             [
@@ -612,18 +612,18 @@ def app_code_store(tmp_path, monkeypatch) -> MappingStore:
     fix.write_text(
         ",".join(APP_CODE_HEADER) + "\n"
         # seal-born: code-level 1:1
-        "PRA,,seal-born,APP-1234,,defined,,kchen2190,2026-08-03\n"
+        "PRA,,seal-born,APP-1234,,defined,,trinity,2026-08-03\n"
         # the shared platform code declares itself (K18: the declaration
         # carries the platform's OWN SEAL + rationale, and attributes nothing)...
-        "PLT,,platform,APP-9900,,defined,shared SRE-dictated code,kchen2190,2026-08-03\n"
+        "PLT,,platform,APP-9900,,defined,shared SRE-dictated code,trinity,2026-08-03\n"
         # ...and resolves per folder
-        "PLT,F0001,platform,APP-5678,,defined,,kchen2190,2026-08-03\n"
+        "PLT,F0001,platform,APP-5678,,defined,,trinity,2026-08-03\n"
         # a per-folder override sits beside the defined row, origin-flagged
         "PLT,F0001,platform,APP-9012,,override,platform row predates the team split,"
-        "kchen2190,2026-08-03\n"
+        "trinity,2026-08-03\n"
         # dual-coded carries its DECLARED end state (§B2)
         "PRB,,dual-coded,APP-3456,all workload under PRB once the PLT folders drain,"
-        "defined,,kchen2190,2026-08-03\n",
+        "defined,,trinity,2026-08-03\n",
         encoding="utf-8",
     )
     monkeypatch.setattr("drydocs_core.mapping_store.APP_CODE_MAPPINGS_PATH", fix)
@@ -641,7 +641,7 @@ def test_app_code_grid_carries_row_kind_origin_and_end_state(sessions, app_code_
     per-folder resolutions; the dual-coded row's declared end state is on the
     surface (§B2). K18: the wire says row_kind, and the declaration row
     carries the platform's own app_id."""
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = mapping_grid("app-code-mapping", token, sessions, app_code_store)
     assert {"app_code", "row_kind", "origin", "declared_end_state"} <= set(out["keys"])
     rows = [(r["app_code"], r["folder_id"], r["origin"], r["app_id"]) for r in out["rows"]]
@@ -664,7 +664,7 @@ def test_app_code_migration_report_reads_the_declared_end_states(sessions, app_c
     v_dual_coded_migrations had exactly one consumer in the tree — a unit test.
     A declaration nothing reads back is a form field, not a condition.
     """
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = app_code_migration_report(token, sessions, app_code_store)
 
     assert out["count"] == len(out["migrations"])
@@ -680,7 +680,7 @@ def test_app_code_migration_report_reads_the_declared_end_states(sessions, app_c
 
 def test_app_code_migration_report_refuses_user_role(sessions, app_code_store):
     with pytest.raises(Forbidden):
-        app_code_migration_report(_token(sessions, "jdoe4821"), sessions, app_code_store)
+        app_code_migration_report(_token(sessions, "mouse"), sessions, app_code_store)
 
 
 def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_store):
@@ -690,7 +690,7 @@ def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_sto
     module does not carry two different write models."""
     from drydocs_core import mapping_store as core
 
-    token = _token(sessions, "asmith7734")
+    token = _token(sessions, "morpheus")
     out = draft_app_code_mapping(
         [
             {
@@ -709,7 +709,7 @@ def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_sto
     row = app_code_store.draft_payloads(out["draft_id"])[0]
     assert row["app_code"] == "PRC"
     assert row["origin"] == "defined"  # the default authoring origin
-    assert row["authored_by"] == "asmith7734"  # session persona, never client-supplied
+    assert row["authored_by"] == "morpheus"  # session persona, never client-supplied
 
     promoted = promote_draft(out["draft_id"], token, sessions, app_code_store)
     committed = Path(core.APP_CODE_MAPPINGS_PATH).read_text(encoding="utf-8")
@@ -748,7 +748,7 @@ def test_draft_app_code_mapping_writes_a_row_and_promotes(sessions, app_code_sto
     ],
 )
 def test_draft_app_code_mapping_fails_closed(sessions, app_code_store, bad):
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     with pytest.raises(ChangesetValidationError):
         draft_app_code_mapping(bad, token, sessions, app_code_store)
 
@@ -765,7 +765,7 @@ def test_app_code_draft_route_is_wired():
 
 
 def test_app_code_endpoints_refuse_user_role(sessions, app_code_store):
-    token = _token(sessions, "jdoe4821")
+    token = _token(sessions, "mouse")
     with pytest.raises(Forbidden):
         draft_app_code_mapping(
             [{"app_code": "PRC", "row_kind": "seal-born", "app_id": "APP-7777"}],
@@ -779,7 +779,7 @@ def test_source_corrections_report_content(sessions, override_store):
     """The report is the AO-facing artifact: SEAL current value, corrected
     value, author and rationale per outstanding override, with the AO-privilege
     framing spelled out."""
-    token = _token(sessions, "kchen2190")
+    token = _token(sessions, "trinity")
     out = source_corrections_report(token, sessions, override_store)
     assert out["count"] == 2
     md = out["markdown"]
