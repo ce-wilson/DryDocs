@@ -91,6 +91,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-185`** · 2026-08-28 · `[question]` · **open — the MECHANICAL half is groomed → J61 (2026-08-28); the POLICY half below is the user's, because it is a choice about how two live sessions share one working tree** · prio? **Med** —
+  **Twice on 2026-08-28, hours apart, a session could not sync the shared desktop checkout
+  because the other live session was holding an uncommitted edit to a file the incoming merge
+  also touched.** Commit `2946de82` records the first in its own message body (the port-ledger
+  session committed from a temp worktree, ff-blocked by the uncommitted ADR 0015 draft); the
+  weekly groom hit the identical abort on the identical file and independently invented the
+  identical workaround. J61 writes the recovery recipe down and gives the branch guardrail an
+  answer for the detached case, where the show-current command returns an EMPTY string.
+  **The sharp part is WHICH file blocks, and it is not the draft.** The uncommitted ADR 0015
+  body (`docs/decisions/0015-team-edition-template.md`) is UNTRACKED and blocks nothing at all;
+  what blocks is its one-line index row in `docs/decisions/README.md`, because Lane B's ADR 0016
+  appended a row to that same file. The ADR index is a shared APPEND surface, so any draft that
+  has touched the index blocks every incoming ADR for as long as the draft is held. The same
+  shape applies to every append-only index in the tree, not just this one.
+  **The question, four readings, and they lead different places.** (1) Commit the index row
+  immediately and separately, keeping the draft body uncommitted — the row is one line, it is
+  append-only, and it is the only part that collides; the cost is an index that points at a file
+  nobody else has. (2) Commit the whole draft at once as an explicit draft-status ADR, accepting
+  that a half-formed decision then sits in the governance index, which the repo treats as a
+  governed surface. (3) Hold the draft outside the tracked tree until it is ready, accepting that
+  it is then invisible to the other machine and unbacked by git — the exact failure the J31
+  work-visibility rule exists to prevent. (4) Change nothing and expect the second session to use
+  a worktree, accepting today's cost as the price of the current setup, which is what both
+  sessions did by default. A groom cannot pick between these: (1) and (2) trade governance
+  cleanliness against unblocking, (3) trades it against visibility, and (4) is a decision to
+  keep paying.
+  **Not urgent, and worth saying so.** The workaround works, J61 makes it cheap, and the block
+  clears the moment the ADR lands. This is captured because it recurred within one day and
+  because the index-is-the-hot-spot finding generalizes past this one draft.
+
 - **`Idea-184`** · 2026-08-27 · `[idea]` · **groomed → O71 (2026-08-28)** · prio? **High** —
   THE ADR 0015 REGISTER ROW'S NAMED TRIGGER HAS FIRED: the fastapi/full-stack-fastapi-
   template row says 'nothing adopted... only re-opens if a shared estate console is

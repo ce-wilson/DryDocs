@@ -130,3 +130,17 @@ groom_log:
     groomed — it asks to migrate after the 13 run-the-gate items land so the sweep meets a
     stable queue.
   attached_at: J57
+- date: '2026-08-28'
+  note: |-
+    2026-08-28 second groom of the day (desktop) - the IDEAS.md inbox held nothing ungroomed,
+    because the 206bab66 groom had already consumed it hours earlier, so the one item here
+    comes from a defect the groom run itself hit. J61: a shared checkout cannot pull or push
+    while the other live session holds an uncommitted edit to a file the incoming merge also
+    touches, and the detached worktree that is the only way out returns an EMPTY string from
+    the show-current branch command that section 0 names in capitals as the guardrail. Two
+    independent occurrences hours apart on 2026-08-28, both on the ADR index file, both
+    improvising the same workaround with nothing written down between them. The policy half -
+    whether a long-held draft should commit its index row early, commit whole as a draft, live
+    outside the tracked tree, or change nothing - is Idea-185 in the inbox and is the user's,
+    since every reading trades governance cleanliness against unblocking or visibility.
+  attached_at: J61
