@@ -21,9 +21,10 @@ wrong-db` cannot describe two situations that are live in the registry today,
 and reporting either as `missing` would be a false diagnosis:
 
 * ``db-absent`` — the declared ``target_db`` does not exist on this server.
-  Two entries declare ``dddocs``, which ``schema/provisioning/01_databases.cypher``
-  has never created. That is not a load failure; it is the open topology
-  question G32 exists to rule on.
+  Historical: two entries once declared the superseded ``dddocs`` (rejected
+  at G32/G102, 2026-08-18; ``01_databases.cypher`` never created it) and
+  now target ``drydocs``. The status class stays for the next declared-
+  but-unprovisioned name.
 * ``unshaped`` — the corpus is registered and real but was never put on the
   lexical Document->Chunk backbone (``jpmc-reports`` loaded as :DataAsset slices,
   pre-dating the docmeta plan). Its documents are not missing; they were never
