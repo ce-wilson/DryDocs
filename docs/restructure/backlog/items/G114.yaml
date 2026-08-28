@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - tests/unit/test_database_names.py
