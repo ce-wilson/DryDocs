@@ -501,6 +501,7 @@ def test_describes_target_is_registry_driven_with_no_fallback_constant(tmp_path)
     class _Entry:
         def __init__(self, data):
             self.data = data
+            self.id = "bmc-docs"  # Q26: the adapter also reads the row's id
 
     class _Reg(SourceRegistry):
         def __init__(self, data):
@@ -518,3 +519,17 @@ def test_describes_target_is_registry_driven_with_no_fallback_constant(tmp_path)
 
     # and the shipped registry declares the live corpus's real target
     assert mod.BmcDocsAdapter().describes_product == "controlm"
+
+
+def test_corpus_id_is_stamped_on_document_and_chunk_and_required_on_the_row():
+    """Q26 (G32 §A): corpus_id IS the blast-radius scoping — the cypher stamps
+    it on both grains, and the row model REQUIRES it. Required matters: the
+    model's extra="ignore" silently dropped the adapter's stamp on Q26's own
+    first live reload — an optional field would let that defect return."""
+    from drydocs.loaders.bmc_docs import BmcDocsLoader
+    from drydocs_core.models.docs import BmcDocChunkRow
+
+    cy = BmcDocsLoader.cypher_path.read_text(encoding="utf-8")
+    assert "doc.corpus_id" in cy and "c.corpus_id" in cy
+    assert BmcDocChunkRow.model_fields["corpus_id"].is_required()
+    assert BmcDocChunkRow.model_fields["subject_product_id"].is_required()  # no shadow default

@@ -6,10 +6,12 @@ checked that a declared corpus was ever loaded, or that it landed in the databas
 it declared. This module is that check, and ``drydocs docs-verify`` is its verb.
 
 REGISTRY-DRIVEN, NOT PER-LOADER — the acceptance's requirement, and the reason
-for ``graph_locator``. The registry is corpus-keyed but the graph is not: only
-the Q13 vendor-docs loader writes ``corpus_id``, while ``bmc_docs`` identifies
-its pages by repo-relative ``path`` and ``essential_graphrag`` writes a single
-Document whose ``doc_id`` IS the corpus id. Hard-coding those three shapes here
+for ``graph_locator``. Since Q26 EVERY lexical loader writes ``corpus_id``
+(bmc_docs and essential_graphrag joined the Q13 vendor-docs loader — the G32
+§A scoping made true of the loaded graph); ``bmc_docs`` documents ALSO stay
+path-identified, and its registry locator deliberately keeps ``path_prefix``
+until both machines' graphs carry the stamp (the row says so). Hard-coding
+per-loader shapes here
 would make this file a per-loader registry that silently rots as loaders change.
 Instead each entry declares how to find its own nodes, and a corpus that
 declares nothing is reported as such rather than guessed at.

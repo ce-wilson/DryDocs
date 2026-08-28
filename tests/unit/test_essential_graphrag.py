@@ -151,3 +151,17 @@ def test_real_pdf_splits_cleanly():
             by_ch.setdefault(c.chapter, []).append(int(c.section.split(".")[1]))
     for ch, secs in by_ch.items():
         assert secs == list(range(1, len(secs) + 1)), (ch, secs)
+
+
+def test_corpus_id_rides_every_row_from_the_registry(monkeypatch):
+    """Q26: to_params stamps corpus_id, resolved from the registry row the
+    loader's source_id names — never a loader literal — and the cypher writes
+    it on both grains."""
+    from drydocs.loaders.essential_graphrag import EssentialGraphragLoader
+
+    loader = EssentialGraphragLoader.__new__(EssentialGraphragLoader)
+    cid = loader._corpus_id()
+    assert cid == "neo4j-docs-essential-graphrag"
+
+    cy = EssentialGraphragLoader.cypher_path.read_text(encoding="utf-8")
+    assert "doc.corpus_id" in cy and "c.corpus_id" in cy

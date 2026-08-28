@@ -61,6 +61,9 @@ SET doc.title              = row.title,
     doc.target_version     = row.target_version,
     doc.classification     = row.classification,
     doc.subject_product_id = row.subject_product_id,
+    // Q26 (G32 SS-A): corpus_id IS the blast-radius scoping the fold ruled —
+    // stamped from the registry row the adapter resolved, never a literal
+    doc.corpus_id          = row.corpus_id,
     doc.last_seen_at       = datetime($loaded_at),
     doc.last_run_id        = $run_id
 
@@ -69,6 +72,7 @@ MERGE (c:Chunk:Entity {chunk_id: row.chunk_id})
   ON CREATE SET c.first_seen_at = datetime($loaded_at),
                 c.source     = 'markdown'
 SET c.seq          = row.seq,
+    c.corpus_id    = row.corpus_id,
     c.heading      = row.heading,
     c.level        = row.level,
     c.text         = row.text,

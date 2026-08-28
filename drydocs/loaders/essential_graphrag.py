@@ -338,7 +338,22 @@ class EssentialGraphragLoader(BaseLoader):
     source_label: ClassVar[str] = "pdf"
 
     def to_params(self, model: BaseModel) -> dict:
-        """Delta checksum over the full chunk row (the bmc_docs idiom)."""
+        """Delta checksum over the full chunk row (the bmc_docs idiom).
+
+        Q26: every row carries corpus_id — the G32 SS-A scoping property —
+        resolved ONCE per loader instance from the registry row this loader's
+        source_id names (the confirmed-gate already proves the row exists;
+        the resolve makes the stamp the ROW's id, never a loader literal)."""
         params = model.model_dump(mode="json")
+        params["corpus_id"] = self._corpus_id()
         params["row_checksum"] = compute_row_checksum(params)
         return params
+
+    def _corpus_id(self) -> str:
+        cached = getattr(self, "_corpus_id_cache", None)
+        if cached is None:
+            from drydocs_core.source_registry import SourceRegistry
+
+            cached = SourceRegistry.from_yaml().get(self.source_id).id
+            self._corpus_id_cache = cached
+        return cached

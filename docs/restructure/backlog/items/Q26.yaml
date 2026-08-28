@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/cypher/bmc_docs.cypher
@@ -38,3 +38,28 @@ notes: |
   TIMING, and why the natural vehicle already fired: G102 (done) ran R3's delete + reload live on the laptop (27 -> 0 -> 27 DESCRIBES, 374 chunks) AFTER the fold — and the reloaded documents still carry no corpus_id, because the loader does not stamp one. A future reload is the second chance, which is why clause (c) makes re-running it explicit rather than assuming it.
 
   Module drydocs-load: both cypher files live in `drydocs/loaders/`. Epic docmeta / phase 14 by the Q7/Q13/Q24 precedent. p2 and sonnet: the change is small and the acceptance is written, but it touches two loaders plus a per-machine graph action.
+  DONE 2026-08-27 (laptop, Lane B) — WITH THE LIVE HALF RUN, venue-stamped (J18: laptop,
+  neo4jtest, `drydocs` DB). (a) MEASURED BEFORE: 28 Documents / 417 Chunks, ALL in the
+  (none) bucket (corpus_id not even a known property key — the server said so). MEASURED
+  AFTER: Document bmc-docs 27 + neo4j-docs-essential-graphrag 1; Chunk 374 + 43; the (none)
+  bucket EMPTY on both grains. (b) both cyphers stamp corpus_id on :Document AND :Chunk,
+  read from the registry row (bmc adapter: reg.get(name).id beside the Q18 read; graphrag:
+  to_params resolves source_id through SourceRegistry once per instance) — never a loader
+  literal. THE BUILD'S OWN CATCH, now a guard: the first live reload silently DROPPED the
+  bmc stamp because BmcDocChunkRow's extra=ignore swallowed the adapter's new key — the
+  field is now REQUIRED on the row model, the test pins is_required(), and the same pass
+  removed the model's subject_product_id="controlm" shadow default (the Q18 defect one
+  layer down). Idempotence: rows_changed 374 on the stamping reload, ZERO on the re-run
+  (both corpora). (c) LAPTOP: scoped delete + reload executed (the G102 R3 vehicle; 27+374
+  and 1+43 deleted then reloaded stamped). DESKTOP: pre-Q26 graph stays unstamped until its
+  own reload — handed to the desktop session to ride its Q24 load (which reloads corpora
+  there anyway). (d) the registry KEEPS match: path_prefix WITH THE REASON ON THE ROW: the
+  locator file is shared while the two graphs are independent, so a corpus_id locator would
+  read MISSING on any machine whose reload has not run; the row names the switch condition
+  (both reloads landed) — and docs_verify.py's "only the Q13 loader writes corpus_id"
+  header prose is corrected in the same pass. docs-verify run live: bmc-docs + graphrag
+  both PRESENT. (e) EDGE_CORPUS_UNKNOWN stays, its comment recast: unreachable for a
+  freshly loaded corpus, still real for the other machine's pre-Q26 graph and for any
+  future loader that forgets the stamp. (f) no ontology change, no gate, no flip — a
+  provenance property on existing labels, exactly as fenced. Suite 2596 passed / 11
+  skipped; ruff clean.

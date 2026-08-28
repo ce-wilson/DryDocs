@@ -78,9 +78,13 @@ sources:
     target_db: drydocs                  # G102 fold (was dddocs — never provisioned; R1 retired the name)
     refresh: manual
     taxonomy_path: technology/orchestration/control-m
-    graph_locator:                      # pre-dates corpus_id; pages are identified by their repo path
-      match: path_prefix
+    graph_locator:                      # KEPT path_prefix BY DECISION (Q26 (d)): the loader
+      match: path_prefix                #   stamps corpus_id since Q26, but this file is shared
       value: external/orchestration/bmc-controlm/
+      # and the two machines' graphs are independent — a corpus_id locator would
+      # read MISSING on any graph whose reload has not run yet. Move to
+      # {match: corpus_id, value: bmc-docs} once every machine's bmc-docs reload
+      # has landed (laptop done 2026-08-27; desktop rides its Q24 session).
     # Q18: the product this corpus DESCRIBES — the declaration behind the one
     # live software-to-docs traversal. OPTIONAL per corpus; when present it
     # must name a config/taxonomy/software-registry.yaml product id (guarded

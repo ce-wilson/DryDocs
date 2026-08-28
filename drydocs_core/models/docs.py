@@ -70,7 +70,15 @@ class BmcDocChunkRow(BaseModel):
     )
     target_version: str = "9.0.21.300"
     classification: str = "External"
-    subject_product_id: str = "controlm"
+    # Q18/Q26: REQUIRED, no default — a fallback literal beside the declared
+    # registry field is how the two silently disagree later (the removed
+    # SUBJECT_PRODUCT_ID constant's defect, one layer down).
+    subject_product_id: str = Field(..., min_length=1)
+    corpus_id: str = Field(
+        ...,
+        min_length=1,
+        description="The doc-source-registry row id (Q26 — the G32 SS-A blast-radius scoping property, stamped on every :Document and :Chunk; the adapter reads it from the registry row, never a literal).",
+    )
 
     # --- Chunk fields ---
     chunk_id: str = Field(

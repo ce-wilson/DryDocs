@@ -248,7 +248,13 @@ class BmcDocsAdapter:
         # a fallback constant beside a declared field is how the two silently
         # disagree later. A row without the field refuses loudly at
         # construction, before anything is read or written.
-        self.describes_product = declared_describes_product(registry)
+        reg = registry or SourceRegistry.from_yaml()
+        self.describes_product = declared_describes_product(reg)
+        # Q26: corpus_id is the G32 SS-A blast-radius scoping — stamped on every
+        # Document and Chunk row, READ FROM the corpus's registry row (the same
+        # row the describes_product read resolved), never a loader literal. It
+        # is the docs-verify graph_locator join key.
+        self.corpus_id = reg.get(self.name).id
 
     def __enter__(self) -> BmcDocsAdapter:
         return self
@@ -282,6 +288,7 @@ class BmcDocsAdapter:
                     "target_version": TARGET_VERSION,
                     "classification": CLASSIFICATION,
                     "subject_product_id": self.describes_product,
+                    "corpus_id": self.corpus_id,
                     "chunk_id": chunk_id,
                     "seq": seq,
                     "heading": heading,
