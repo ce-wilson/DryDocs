@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -27,3 +27,16 @@ notes: |
   Module `docs` and epic release-infrastructure follow J52: the snapshot script is cross-cutting session-ritual tooling rather than any component's code.
 
   Mechanism only, no gate. p2: it does not corrupt anything, it hides things.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  Both refresh blocks (board and design-doc) now share Invoke-RefreshStep/Write-RefreshFailure:
+  the render command's merged stdout+stderr is captured explicitly, LASTEXITCODE is checked
+  directly (the old catch never fired reliably -- in this shell the native stderr never became
+  a terminating error, so the old idiom printed NO warning at all, strictly worse than the
+  groomed description), and on failure the warning names the LAST non-empty output line (the
+  exception type and message) plus a landed/stale list per expected output, compared by mtime
+  before and after the run. Verified against a live reproduction of the desktop VIRTUAL_ENV
+  leak (the clause (d) worked example, now recorded in a comment): the warning read
+  "ModuleNotFoundError: No module named 'typer'" and listed 3 landed / 6 stale outputs --
+  the exact 2026-08-23 incident shape. Success path confirmed unchanged (exit 0, all nine
+  wrote lines, no warning); only snapshot.ps1 changed, render byproducts reverted before
+  commit; script parse-checked and test_depgraph_snapshots.py green.
