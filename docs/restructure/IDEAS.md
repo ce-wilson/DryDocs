@@ -91,6 +91,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-184`** · 2026-08-27 · `[idea]` · **open** · prio? **High** —
+  THE ADR 0015 REGISTER ROW'S NAMED TRIGGER HAS FIRED: the fastapi/full-stack-fastapi-
+  template row says 'nothing adopted... only re-opens if a shared estate console is
+  chartered (the one legitimate use identified)' — and the internal ui-workstream branch
+  is now building the user/login implementation, which is that use. Per the register
+  discipline stated in the ADR itself: a watched source firing its trigger does not
+  auto-change anything — it opens a backlog item, and AUTH IS A TRUST BOUNDARY, so the
+  adoption routes through a gate. Candidate shape: cherry-pick the template's auth
+  PRACTICES (OAuth2 password flow + JWT + hashed credentials + user model + recovery
+  flow — the survey already characterized it: 'users-in-a-workspace rows behind JWT'),
+  cited in the register row, never the scaffold (the ADR's survey rejection stands —
+  clone-and-diverge, no update lifecycle, Stripe/orgs baggage). Producer-side the seam is
+  the O-epic's ?as= headless sign-in pattern (a stub exactly where real auth lands);
+  company-side it is their ui-workstream call. Groom: one item to draft the auth-boundary
+  gate question + the register-row amendment; the ADR file itself is the other session's
+  draft — coordinate, never sweep.
 - **`Idea-183`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
   SET-NOT-COUNT acceptance, adopted from the company session's measured trap (2026-08-27,
   their memory note): two sessions independently measured the same failing-test TOTAL and
