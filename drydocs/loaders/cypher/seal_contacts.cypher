@@ -49,6 +49,10 @@ SET e.full_name    = coalesce(row.employee_name, e.full_name),
 MERGE (m:Attribution {
     attribution_id: row.app_id + '|SEAL|' + row.role_name + '|' + row.employee_sid
 })
+  // G72 (SS-D3): 'SEAL' is the DECLARED stamp of the seal-contact-extract
+  // surface (config/precedence.yaml#attribution surfaces) — the discriminator
+  // that makes a SEAL-vs-ServiceNow roster disagreement readable. Guarded by
+  // tests/unit/test_attribution_surfaces.py; change the declaration, not this.
   ON CREATE SET m.source     = 'SEAL',
                 m.valid_from = date(),
                 m.valid_to   = null,

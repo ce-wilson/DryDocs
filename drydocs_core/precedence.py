@@ -94,10 +94,16 @@ class PrecedenceResolver:
         conflict_policy: dict | None = None,
     ) -> None:
         self._rank: dict[str, int] = {}
+        self._stamps: dict[str, str] = {}
         for idx, entry in enumerate(order):
             aid = entry["id"]
             # Explicit `authority:` wins; otherwise position (top = 1 = highest).
             self._rank[aid] = int(entry.get("authority", idx + 1))
+            # G72 (SS-D3): an attribution-surface entry declares the
+            # Attribution.source value it stamps; the discriminator vocabulary
+            # lives HERE so surface identity and precedence cannot drift apart.
+            if entry.get("stamp"):
+                self._stamps[aid] = str(entry["stamp"])
         self._active: dict[str, bool] = dict(active or {})
         self.conflict_policy: dict = dict(conflict_policy or {})
 
@@ -128,6 +134,23 @@ class PrecedenceResolver:
     def is_active(self, authority: str) -> bool:
         """A known authority is active unless explicitly toggled off."""
         return self.known(authority) and self._active.get(authority, True)
+
+    def stamp_for(self, authority: str) -> str | None:
+        """The Attribution.source value a declared surface stamps (G72 SS-D3);
+        None for a chain entry that is not an attribution surface."""
+        self.rank(authority)  # raises UnknownAuthorityError for an unknown id
+        return self._stamps.get(authority)
+
+    def authority_for_stamp(self, stamp: str) -> str | None:
+        """Reverse lookup: which declared surface stamped this value."""
+        for aid, s in self._stamps.items():
+            if s == stamp:
+                return aid
+        return None
+
+    def surface_ids(self) -> tuple[str, ...]:
+        """Attribution-surface authorities, highest precedence first (SS-D4)."""
+        return tuple(sorted(self._stamps, key=self._rank.__getitem__))
 
     # ---- resolution ------------------------------------------------------
 
