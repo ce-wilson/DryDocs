@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/extractors/controlm_inventory.py
@@ -27,3 +27,16 @@ notes: |
   Clause (d) is the hard rule doing its work — the invocation half touches edge identity under a signed gate ruling, so it is recorded as a gate question and NOT groomed into the build.
 
   p2/sonnet: the acceptance names the call site, the counter and the evidence, and the mechanism already exists one method away.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  _artifact_pass now runs each ETL artifact value through the G92 scope-chain resolver
+  (_resolve_shell, the single core-resolver call site) before the unresolved check, so a
+  URI the job's own folder/job scope can bind mints its node instead of counting into
+  artifact_values_unresolved. Evidence per clause (b): on the fixture exercising the
+  widening, artifact_values_unresolved 1 -> 0 and payloads_classified 0 -> 1; the
+  genuinely-unresolvable case still counts 1. No new counter family (clause c) -- the
+  yield rides the existing resolve_* counters on ExtractCoverage. Clause (d) is in
+  writing at the CMD_LINE call site: parse_command stays on the VERBATIM command and
+  _stable_invocation_key stays env-stable; re-keying on resolved text would move the
+  signed cmdline-lineage-review gate (2026-07-16) and goes back through HITL if ever
+  revisited. The evidence property keeps the raw spelling beside the resolved fact.
+  writer.py untouched (G113 owned it concurrently).
