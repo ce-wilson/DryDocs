@@ -201,7 +201,12 @@ CREATE TABLE stg_run (
     ended_at            TIMESTAMP,
     status              VARCHAR2(20 CHAR)   DEFAULT 'RUNNING' NOT NULL,
                         -- RUNNING | SUCCEEDED | FAILED
-    data_centers        VARCHAR2(200 CHAR),              -- comma list processed this run
+    data_centers        VARCHAR2(200 CHAR),              -- comma list processed this run.
+                        -- RECIPE DECIDED (G115): production runs are ONE RUN
+                        -- PER DATA CENTER, so this is a one-element list in
+                        -- practice; the multi-value shape stays expressible
+                        -- for reprocessing. The operator recipe and its
+                        -- reason: docs/design/drydocs-load-runbook.md.
     src_job_count       NUMBER(10),
     src_var_count       NUMBER(10),
     normalizer_version  VARCHAR2(40 CHAR),

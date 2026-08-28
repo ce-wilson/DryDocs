@@ -116,6 +116,7 @@ from .cli_shared import (
     CadenceDerivationError,
     LoadStep,
     _csv_adapter,
+    _data_center_opt,
     _developer_sid_opt,
     _folder_opt,
     _gate_loader,
@@ -185,6 +186,7 @@ __all__ = [
     "_run_as_opt",
     "_developer_sid_opt",
     "_row_cap_opt",
+    "_data_center_opt",
 ]
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
