@@ -150,6 +150,17 @@ do to ONE loader between chain runs.
   poetry run drydocs snapshot               # recompute rollups from the graph as it stands
   poetry run drydocs prune-snapshots        # deletes older than N years, keeps the newest
   ```
+- **The team chain's third file is a HAND-DROP (K27, ruled 2026-08-27).** A real
+  (`--source`) team refresh resolves THREE files from the `pat/` drop under
+  `DRYDOCS_DATA_ROOT`: `dev_teams.csv` and `pat_product_mapping.csv` come from the
+  projection (`scripts/project_pat_team_report.py` over the raw PAT team report), but
+  `pat_team_roles.csv` CANNOT — the report is one row per TEAM with no person columns,
+  and a per-person (team, employee SID, role) file is not derivable from it. It is
+  hand-authored by the SME from PAT's team-membership view (company-side data) and
+  dropped beside the other two. The G78 resolver already fails by name pointing at that
+  directory when it is absent; this bullet is where you learn what to do about it.
+  Fixture mode is unaffected — the bundled `pat_team_roles__sample.csv` ships with the
+  package.
 - **Doc corpora** reconcile declared-vs-loaded, and exit non-zero on the wrong database —
   which makes it a useful `NEO4J_DATABASE` check on its own:
   ```powershell

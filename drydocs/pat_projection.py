@@ -59,10 +59,13 @@ from pathlib import Path
 import yaml
 
 #: The two files THIS SCRIPT PRODUCES, by name. They are two of the THREE steps
-#: the team chain runs (cli.CHAINS['refresh-teams'] since the G79 split) — the
-#: third, pat_team_roles, has no projection here yet (Idea-160). Keep in lock-step
-#: with
-#: drydocs/cli.py. The ``__sample`` suffix is the chain's naming convention, not
+#: the team chain runs (cli.CHAINS['refresh-teams'] since the G79 split). The
+#: third, pat_team_roles, is a HAND-DROP BY RULING (K27, 2026-08-27), not a
+#: missing projection: the raw report is one row per TEAM and carries no person
+#: columns, so a per-person (team_id, employee_sid, role_id) file cannot be
+#: projected from it — the SME hand-authors it from PAT's team-membership view
+#: into the same pat/ drop (see the load runbook's Refresh section). Keep in
+#: lock-step with drydocs/cli.py. The ``__sample`` suffix is the chain's naming convention, not
 #: a claim that the content is synthetic: ``--samples-dir`` is simply "the
 #: directory the chain reads", and the projection writes there.
 DEV_TEAMS_FILE = "dev_teams__sample.csv"

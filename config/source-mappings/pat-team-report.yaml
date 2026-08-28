@@ -41,6 +41,12 @@ objects:
   # (PatProductMappingLoader, this dataset). Recorded here once, because the
   # split is a PROJECTION choice, not two source files.
   # Projection: drydocs/pat_projection.py (+ scripts/project_pat_team_report.py).
+  # THE THIRD team-chain input (pat_team_roles.csv) is NOT in this report and NOT
+  # a projection output — one row per team, no person columns, so per-person
+  # (team_id, employee_sid, role_id) rows are not derivable. Ruled a HAND-DROP at
+  # K27 (2026-08-27): SME-authored from PAT's team-membership view into the same
+  # pat/ drop. Recorded here so nobody reads this ledger and goes looking for
+  # role columns the report has never had.
   # ---------------------------------------------------------------------------
   - name: TEAM_DETAILS_REPORT
     kind: extract
