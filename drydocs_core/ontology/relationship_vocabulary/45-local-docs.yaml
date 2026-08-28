@@ -318,14 +318,18 @@
       state); no best-match sweep may drain it — the count is reported, and per
       C2 the assignment is also the retention key, so unassigned is unpurgeable
       by scope.
-      PLANNED until the writer build lands (flips-are-follow-ups, N13 §B1 —
-      Idea-137 owns the writer, Idea-138 the SME surface whose contract §B2
-      ruled). email_extracts.cypher stays test-guarded against ever gaining
+      ACTIVE since 2026-08-27 (Q21 — the writer build; flips-are-follow-ups,
+      N13 §B1: the gate authorized on 2026-08-19, the BUILD flips). The one
+      authorized writer is drydocs/loaders/email_concerns.py +
+      cypher/email_concerns.cypher — batch-refusing validation (SS-A3),
+      MATCH-only endpoints, endpoint_class/assigned_by/evidence on every
+      edge. Idea-138 still owns the SME surface whose contract SS-B2 ruled.
+      email_extracts.cypher stays test-guarded against ever gaining
       the write — the lexical loader is fenced forever.
-    supplement:   ~
-    loader:       ~
+    supplement:   ontology_supplement.cypher
+    loader:       email_concerns.cypher
     domain:       docs
-    status:       planned
+    status:       active
 
   # ── Evidence breadcrumb of a derived record (MM2, 2026-08-21; gate data-flow-overview DRAFTED, unsigned) ──
 

@@ -929,6 +929,34 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=(ParamSpec("q", "string"), *_LIMIT),
         ),
         QuerySpec(
+            id="docs.email-unassigned.v1",
+            database="drydocs",
+            description=(
+                "Ops emails with NO CONCERNS assignment — the SS-B3 first-class "
+                "resting state, REPORTED and never auto-drained (no best-match "
+                "sweep, no default; gate email-folder-assignment 8/8). Unassigned "
+                "is also unpurgeable by scope (SS-C2: the assignment is the "
+                "retention key). Zero rows on a database without the "
+                "ops-email-extracts corpus is the honest empty state. Wiring this "
+                "count into the pending-source-correction union report is N14's "
+                "rider, not this spec."
+            ),
+            cypher=(
+                "MATCH (d:Document {corpus_id: 'ops-email-extracts'}) "
+                "WHERE NOT d:SchemaMeta AND NOT (d)-[:CONCERNS]->() "
+                "RETURN d.doc_id AS doc_id, d.title AS title, "
+                "d.sent_at AS sent_at "
+                "ORDER BY doc_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("sent_at", "string", "Sent at"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="runbooks.series.v1",
             # G30 ruling (2026-07-26): curated lineage lands in `drydocs`, per ADR
             # 0002 D1/D2. Was `ddlineage` — a database nothing writes.

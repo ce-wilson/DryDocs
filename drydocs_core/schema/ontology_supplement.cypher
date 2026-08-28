@@ -171,6 +171,23 @@ MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#de
                + "pattern; no PROV row (aboutness, deliberately NOT wasDerivedFrom). "
                + "Edge carries target_version. Gate bmc-docs-lexical-load (2026-07-08).";
 
+// CONCERNS  —  Document → ControlMFolder | ETLProcess  (Q21; gate
+// email-folder-assignment SIGNED 8/8, 2026-08-19). An ops email Document is
+// ABOUT a folder or process — aboutness like DESCRIBES, never attribution
+// (the K7 §A1 fence: no derived ownership edge may cite it). Union endpoint
+// per the rua §B2 convention; endpoint_class + assigned_by + evidence ride
+// every edge (§A2/§A3 — no anonymous assignment). Writer:
+// drydocs/loaders/cypher/email_concerns.cypher, the ONE authorized site.
+MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#concerns"})
+  SET n.label  = "CONCERNS",
+      n.domain = "Document",
+      n.range  = "ControlMFolder | ETLProcess",
+      n.notes  = "Ops email Document is ABOUT a folder or process (SME-assigned or "
+               + "structured-source-signal; assigned_by + evidence required on every edge — "
+               + "no anonymous assignment). Aboutness, never attribution: the K7 fence "
+               + "forbids any derived ownership edge citing it. "
+               + "Gate email-folder-assignment (2026-08-19, 8/8); writer Q21.";
+
 // PART_OF  —  Chunk → Document  (dcterms:isPartOf pattern; lexical containment)
 MERGE (n:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontology#partOf"})
   SET n.label  = "PART_OF",

@@ -568,11 +568,11 @@ MERGE (a)-[r:SUPERSEDES]->(a)
 
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ControlMFolder'})
 MERGE (a)-[r:CONCERNS]->(b)
-  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:CONCERNS]->(b)
-  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'Document'})
 MERGE (a)-[r:EVIDENCED_BY]->(b)
