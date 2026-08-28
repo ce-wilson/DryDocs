@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-28T00:18:46",
+    "captured_at": "2026-08-28T11:09:17",
     "date": "20260828",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a9a89230",
-      "full": "a9a892301c2400be8c23d20c900434bec118f91c",
+      "commit": "55536e62",
+      "full": "55536e6280a9dd778eda4735554191e1ffcc9eed",
       "branch": "main",
-      "describe": "port-base-20260826-59-ga9a89230",
-      "subject": "chore(plan): the Lane B queue is empty — the handoff retires per its own lifecycle",
-      "dirty": false,
-      "untracked_present": false,
+      "describe": "port-base-20260826-86-g55536e62",
+      "subject": "chore(plan): render the board after the advisor-dispatch batch (G111, J53, G114 done; K30 blocked)",
+      "dirty": true,
+      "untracked_present": true,
       "pr": null
     },
     "depgraph": {
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": true,
+      "untracked_present": false,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -7496,6 +7496,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0015-team-edition-template.md",
+      "name": "0015-team-edition-template.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0015-team-edition-template.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/0016-jpmc-reports-corpus-shape.md",
       "name": "0016-jpmc-reports-corpus-shape.md",
       "extension": ".md",
@@ -11420,10 +11429,55 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/J57.yaml",
+      "name": "J57.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J57.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J58.yaml",
+      "name": "J58.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J58.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J59.yaml",
+      "name": "J59.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J59.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/J6.yaml",
       "name": "J6.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/J6.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J60.yaml",
+      "name": "J60.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J60.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J61.yaml",
+      "name": "J61.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J61.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11658,6 +11712,15 @@
       "name": "K3.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/K3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/K30.yaml",
+      "name": "K30.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/K30.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12878,10 +12941,37 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/O69.yaml",
+      "name": "O69.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O69.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/O7.yaml",
       "name": "O7.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/O7.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O70.yaml",
+      "name": "O70.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O70.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O71.yaml",
+      "name": "O71.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O71.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14624,6 +14714,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/neocarta-connector-comparison.md",
+      "name": "neocarta-connector-comparison.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/neocarta-connector-comparison.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/persona-neo4j-architect.md",
       "name": "persona-neo4j-architect.md",
       "extension": ".md",
@@ -15596,6 +15695,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -15693,6 +15801,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -16791,6 +16908,24 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/pat_projection.py",
@@ -19313,6 +19448,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/drydocs-ip-review-brief.md",
+      "name": "drydocs-ip-review-brief.md",
+      "extension": ".md",
+      "rel_path": "internal/drydocs-ip-review-brief.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/dsi-reference",
       "name": "dsi-reference",
       "extension": "",
@@ -19916,10 +20060,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260826.json",
-      "name": "drydocs-20260826.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json",
+      "name": "drydocs-20260828.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260826.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260828.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22751,6 +22895,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_seal_agreement.py",
+      "name": "test_seal_agreement.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_seal_agreement.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_seal_attribution.py",
       "name": "test_seal_attribution.py",
       "extension": ".py",
@@ -25529,6 +25682,14 @@
     ],
     [
       "drydocs/drydocs/loaders/seal_contacts.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/seal_contacts.py",
+      "drydocs/drydocs_core/mapping_store.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/seal_contacts.py",
       "drydocs/drydocs_core/models/__init__.py"
     ],
     [
@@ -25856,6 +26017,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_api/mappings.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
       "drydocs/drydocs_api/query_specs.py",
       "drydocs/drydocs_api/guard.py"
     ],
@@ -25926,6 +26091,10 @@
     [
       "drydocs/drydocs_core/data_zones.py",
       "drydocs/drydocs_core/landing_zones.py"
+    ],
+    [
+      "drydocs/drydocs_core/data_zones.py",
+      "drydocs/drydocs_core/log_kinds.py"
     ],
     [
       "drydocs/drydocs_core/data_zones.py",
@@ -27688,6 +27857,10 @@
       "drydocs/drydocs_core/mapping_store.py"
     ],
     [
+      "drydocs/tests/unit/test_mapping_api.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
       "drydocs/tests/unit/test_mapping_store.py",
       "drydocs/drydocs/loaders/manual_loads.py"
     ],
@@ -28118,6 +28291,18 @@
     [
       "drydocs/tests/unit/test_schema_meta_exclusion.py",
       "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_agreement.py",
+      "drydocs/drydocs/loaders/seal_contacts.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_agreement.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_seal_agreement.py",
+      "drydocs/drydocs_core/mapping_store.py"
     ],
     [
       "drydocs/tests/unit/test_seal_attribution.py",
@@ -33770,6 +33955,11 @@
     [
       "drydocs/docs/decisions",
       "CONTAINS",
+      "drydocs/docs/decisions/0015-team-edition-template.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
       "drydocs/docs/decisions/0016-jpmc-reports-corpus-shape.md"
     ],
     [
@@ -35920,7 +36110,32 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J57.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J58.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J59.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/J6.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J60.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J61.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -36051,6 +36266,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/K3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/K30.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -36730,7 +36950,22 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O69.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/O7.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O70.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O71.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -37455,6 +37690,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/neocarta-connector-comparison.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/persona-neo4j-architect.md"
     ],
     [
@@ -37800,6 +38040,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -37851,6 +38096,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/code_graph_freshness.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -37911,6 +38161,16 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -40085,6 +40345,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/drydocs-ip-review-brief.md"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/dsi-reference"
     ],
     [
@@ -40570,7 +40835,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260826.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -42075,6 +42340,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_seal_agreement.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_seal_attribution.py"
     ],
     [
@@ -43067,13 +43337,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2440,
-    "edges": 1226,
+    "files": 2453,
+    "edges": 1234,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2722,
-    "directories": 283
+    "rels": 2739,
+    "directories": 287
   }
 }
