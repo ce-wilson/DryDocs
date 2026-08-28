@@ -297,8 +297,9 @@ CONTROLM_PART2_STAGES: tuple[tuple[str, type, str, str], ...] = (
         "controlm_conditions_out.sql",
     ),
     # P3 host topology (gate controlm-hosts-topology): independent of
-    # folders/jobs — CM_HOSTS has no folder/owner/author grain, so the scope
-    # binds don't apply and the extract is always a full snapshot.
+    # folders/jobs — CM_HOSTS has no folder/owner/author grain, so those scope
+    # binds don't apply. The data-center bind DOES (G115: CM_HOSTS carries
+    # DATA_CENTER); absent, the extract stays a full snapshot.
     ("controlm_hosts", ControlMHostsLoader, "controlm_hosts__sample.csv", "controlm_hosts.sql"),
 )
 CONTROLM_REL_STAGES: tuple[tuple[str, type, str, str], ...] = (
@@ -780,6 +781,7 @@ def _scope_binds(
     run_as: str | None = None,
     developer_sid: str | None = None,
     row_cap: int | None = None,
+    data_center: str | None = None,
 ) -> dict:
     """Build the standard psgmgr-extract scope binds.
 
@@ -787,15 +789,22 @@ def _scope_binds(
     extracts (folders, conditions) ignore ``run_as``; python-oracledb drops
     named binds a statement does not use, so the full dict is safe everywhere.
 
-      folder_filter  folder-name LIKE pattern
-      run_as         tenant FID (service) user the job runs as — J.OWNER
-      developer_sid  human developer who authored/changed the definition;
-                     matched on J.AUTHOR / J.CREATION_USER / J.CHANGE_USERID
-                     (jobs) and T.LAST_UPDATED_USER (folders/conditions),
-                     joined back to the employee hierarchy. Control-M SIDs
-                     start with a lowercase letter; a SID ending in lowercase
-                     'p' is the automation release process, not a person.
-      row_cap        unordered ROWNUM sample cap
+      folder_filter       folder-name LIKE pattern
+      run_as              tenant FID (service) user the job runs as — J.OWNER
+      developer_sid       human developer who authored/changed the definition;
+                          matched on J.AUTHOR / J.CREATION_USER / J.CHANGE_USERID
+                          (jobs) and T.LAST_UPDATED_USER (folders/conditions),
+                          joined back to the employee hierarchy. Control-M SIDs
+                          start with a lowercase letter; a SID ending in lowercase
+                          'p' is the automation release process, not a person.
+      row_cap             unordered ROWNUM sample cap
+      data_center_filter  data-center name LIKE pattern (G115). One value domain
+                          across the family: the DC value-domain probe
+                          (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql,
+                          answered 2026-07-22) confirmed the long-form name is
+                          the key everywhere, so the full long-form spelling is
+                          an exact match and a prefix pattern also works. The
+                          pattern passes through untouched, like folder_filter.
 
     Operational employee identity (who *ran* actions, vs who authored the
     definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
@@ -818,6 +827,7 @@ def _scope_binds(
         "run_as": run_as.upper() if run_as else run_as,
         "developer_sid": developer_sid,
         "row_cap": row_cap,
+        "data_center_filter": data_center,
     }
 
 
@@ -849,3 +859,14 @@ def _developer_sid_opt():
 
 def _row_cap_opt():
     return typer.Option(None, "--row-cap", help=f"Unordered ROWNUM sample cap. {_SCOPE_HELP}")
+
+
+def _data_center_opt():
+    return typer.Option(
+        None,
+        "--data-center",
+        help=(
+            "Data-center name LIKE pattern (long-form, e.g. 'T032-E0700-DMA' or 'T032%'). "
+            f"{_SCOPE_HELP}"
+        ),
+    )

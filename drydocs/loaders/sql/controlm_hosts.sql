@@ -32,7 +32,9 @@
 -- pattern). Use case: server-patching / maintenance-window planning.
 --
 -- Scope binds (optional, NULL = no filter): :grpname_filter (H.GRPNAME LIKE),
--- :row_cap (ROWNUM sample cap). :folder_filter / :run_as / :developer_sid do
+-- :row_cap (ROWNUM sample cap), :data_center_filter (H.DATA_CENTER LIKE —
+-- G115; this column is long-form, so the family-shared long-form pattern
+-- applies directly). :folder_filter / :run_as / :developer_sid do
 -- not apply at this grain (no folder, owner, or author on CM_HOSTS).
 -- =============================================================================
 
@@ -43,6 +45,7 @@ SELECT
     H.PARTICIPATION_TYPE AS participation_type, -- VARCHAR2(1); domain probe pending
     H.CAPTURE_DATE       AS capture_date        -- replication timestamp — never authorship
 FROM   psgmgr.CM_HOSTS H
-WHERE  (:grpname_filter IS NULL OR H.GRPNAME LIKE :grpname_filter)
-  AND  (:row_cap        IS NULL OR ROWNUM     <=   :row_cap)
+WHERE  (:grpname_filter     IS NULL OR H.GRPNAME     LIKE :grpname_filter)
+  AND  (:data_center_filter IS NULL OR H.DATA_CENTER LIKE :data_center_filter)
+  AND  (:row_cap            IS NULL OR ROWNUM         <=  :row_cap)
 ;

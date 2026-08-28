@@ -4,7 +4,11 @@
 - **Module:** drydocs-load — this runbook IS the module runbook for drydocs-load
   (V1 coverage rule; V3 ruled AUTHOR-DISTINCT, see Purpose & scope for the overlap ruling
   against the system-level startup/refresh runbook).
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-24**
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-08-28**
+  (G115: the Control-M extract family gains the optional `--data-center` scope bind, and
+  the new "Data-center-scoped runs" section records the decided operating recipe — one
+  run per data center — the publishable production scope, and the P6 precondition that
+  blocks the first multi-data-center load; on top of Rev 3, 2026-08-24
   (PRESENTATION ONLY — the three fenced blocks that carry two commands now annotate each
   line with an aligned trailing `#`, matching the startup-refresh runbook's Rev 13 rule: a
   block with two or more commands annotates every line, a single-command block does not,
@@ -166,6 +170,65 @@ do to ONE loader between chain runs.
   ```powershell
   poetry run drydocs docs-verify
   ```
+
+<!-- anchor: data-center-scoped-runs -->
+### Data-center-scoped runs (G115)
+
+**The production recipe is one run per data center.** `drydocs ingest-controlm`
+(with `--use-oracle`), `drydocs analyze-variables`, and `drydocs normalize-variables`
+take `--data-center`, a long-form data-center name LIKE pattern that becomes the
+`:data_center_filter` bind in the extract SQL — the fifth member of the scope-bind
+family beside `--folder`, `--run-as`, `--developer-sid`, and `--row-cap`. Absent means
+all data centers, so no existing invocation changes behavior. The bind scopes the
+folders, jobs, variables, hosts, and avg-run extracts, and ONE spelling scopes all five:
+the data-center value-domain probe (`drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql`,
+answered 2026-07-22) confirmed the long-form name is the value everywhere.
+
+**Why one run per data center, when the staging layer can express both shapes**
+(`stg_run.data_centers` in `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` is a comma
+list, so one run naming several data centers is equally expressible): three reasons,
+in order of weight. First, safety — graph identity carries no data-center component (the
+P6 precondition below), so per-data-center runs keep each run's writes attributable to
+one data center in the run record and the staging rows, which is exactly the evidence an
+identity collision would need to be noticed rather than silently merged inside one
+multi-data-center run. Second, size — a single data center runs a few thousand folders
+and tens of thousands of jobs, and the ~1.1M-row variables object is what forces staging
+at all, so the per-data-center slice keeps every normalizer run and its DELETE-by-RUN_ID
+rollback window bounded. Third, failure isolation — a failed extract re-pulls one data
+center, not the estate, and the user's 2026-08-24 extraction-scope direction was already
+"filtered and run individually, one data center at a time". The comma-list field stays
+as declared; under this recipe it simply carries one value per run.
+
+**The production scope, in the publishable spelling.** Three production data centers,
+run one at a time. These spellings carry the J13 environment-letter swap (position 1
+reads `T` here; the real production values live in
+`internal/standards/technology/data-center-inventory.md` and never in this document):
+
+```powershell
+poetry run drydocs ingest-controlm --use-oracle --data-center "T012-E0700-IB"    # data center 1 of 3
+poetry run drydocs ingest-controlm --use-oracle --data-center "T014-E0700-ANY"   # data center 2 of 3
+poetry run drydocs ingest-controlm --use-oracle --data-center "T032-E0700-DMA"   # data center 3 of 3
+```
+
+The fourth production data center (`T021-E0800-ANY` in the publishable spelling) is a
+deliberate first-cut exclusion, not an omission: the graph and the UI get exercised
+against the three-data-center load first, and it re-enters when that testing says the
+shape holds (user ruling 2026-08-24, recorded in the internal inventory).
+
+Two operating consequences of a scoped run:
+
+- **A data-center-scoped run is a partial extract.** The removed-from-source mark pass
+  does not run (same rule as a `--folder`-scoped run), so `nodes_marked_removed` stays 0
+  by design — do not read that as "nothing was deleted at source".
+- **PRECONDITION — the FIRST multi-data-center load is blocked on P6.** Graph identity
+  is the folder id, and the job id under it, with NO data-center component. If one
+  table id is reused across data centers, loading a second data center into the same
+  graph merges two different folders into one node — silently, as a healthy-looking
+  MERGE. P6 (`docs/restructure/backlog/items/P6.yaml`, the identity-collision probe) is
+  the grouped count on live psgmgr that settles whether that reuse exists. Until P6
+  returns zero rows — or its any-rows finding routes an identity change through the
+  HITL gate — load ONE data center only; do not run the second command above against a
+  graph already holding the first.
 
 <!-- anchor: verify -->
 ## Verify

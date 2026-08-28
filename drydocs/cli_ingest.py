@@ -39,6 +39,7 @@ from drydocs.cli_shared import (
     LOGGER,
     SQL_DIR,
     _csv_adapter,
+    _data_center_opt,
     _developer_sid_opt,
     _folder_opt,
     _gate_loader,
@@ -1012,6 +1013,7 @@ def ingest_controlm(
     run_as: str | None = _run_as_opt(),
     developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
+    data_center: str | None = _data_center_opt(),
 ) -> None:
     """M3 chain: folders -> jobs -> conditions in/out -> derived dependencies.
 
@@ -1027,9 +1029,12 @@ def ingest_controlm(
     deferred dependency pass once, unscoped, after all nodes exist.
 
     Run nightly in production; ad-hoc against samples in dev. With
-    --use-oracle, --folder / --run-as / --developer-sid / --row-cap scope every
-    extract in the chain (folder/developer-sid/row-cap apply to all; run-as
-    applies to the job, variable, and dependency-anchor extracts).
+    --use-oracle, --folder / --run-as / --developer-sid / --row-cap /
+    --data-center scope every extract in the chain (folder/developer-sid/
+    row-cap apply to all; run-as applies to the job, variable, and
+    dependency-anchor extracts; data-center applies to the folders, jobs, and
+    hosts extracts — absent means all data centers, and the per-data-center
+    run recipe lives in docs/design/drydocs-load-runbook.md, G115).
     """
     if phase not in ("nodes", "relationships", "all"):
         console.print(f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]")
@@ -1042,7 +1047,7 @@ def ingest_controlm(
         cls for _, cls, *_ in (CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES)
     }:
         _gate_loader(cls)
-    scope = _scope_binds(folder, run_as, developer_sid, row_cap)
+    scope = _scope_binds(folder, run_as, developer_sid, row_cap, data_center=data_center)
     # Stage declarations live at module level (N3: CONTROLM_*_STAGES) so the
     # command's chain and the load map render from the same source.
     node_stages: list[tuple[str, type[BaseLoader], str, str]] = list(CONTROLM_NODE_STAGES)
@@ -1100,10 +1105,13 @@ def ingest_controlm(
                 sample = samples_dir / sample_csv
                 adapter = _csv_adapter(sample)
             console.print(f"[cyan]>> {stage_name}[/]")
-            # D7: with no folder filter the extract declares the full folder
-            # population (bundled samples or unfiltered Oracle), so unscoped
-            # loaders (folders) may run their removed-from-source mark pass.
-            summary = cls(cli, adapter, full_extract=folder is None).load()
+            # D7: with no folder filter AND no data-center filter the extract
+            # declares the full folder population (bundled samples or
+            # unfiltered Oracle), so unscoped loaders (folders) may run their
+            # removed-from-source mark pass. A data-center-scoped run is a
+            # partial extract (G115) — marking the other data centers removed
+            # would be exactly the source-outage-looks-like-deletion trap.
+            summary = cls(cli, adapter, full_extract=folder is None and data_center is None).load()
             line = f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
             if summary.nodes_marked_removed or summary.nodes_reactivated:
                 line += (

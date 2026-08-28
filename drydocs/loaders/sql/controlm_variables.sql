@@ -40,6 +40,8 @@
 --                   lowercase 'p' is the automation release process, not a
 --                   person.
 --   :row_cap        unordered sample cap (ROWNUM); NULL = unlimited
+--   :data_center_filter  data-center name LIKE pattern — T.DATA_CENTER (G115,
+--                   the per-data-center run recipe; long-form name)
 --   (Operational employee identity — who *ran* actions vs authored the def —
 --    is separate: it lives in the action-audit table psgmgr.CM_AUD_ACTS; wire
 --    it on a future audit extract, configure later.)
@@ -70,8 +72,9 @@ WHERE  V.IS_CURRENT_VERSION = 'Y'
   AND  J.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
-  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
-  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
-  AND  (:developer_sid IS NULL OR :developer_sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID))
-  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
+  AND  (:folder_filter      IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
+  AND  (:run_as             IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
+  AND  (:developer_sid      IS NULL OR :developer_sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID))
+  AND  (:data_center_filter IS NULL OR T.DATA_CENTER LIKE :data_center_filter)
+  AND  (:row_cap            IS NULL OR ROWNUM        <=  :row_cap)
 ;
