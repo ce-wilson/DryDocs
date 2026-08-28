@@ -429,6 +429,35 @@ sources:
 # Retired corpus ids (the source-registry v2 D4 semantics, imported at the
 # 2026-08-18 id-grammar rename): a retired string can NEVER be re-minted with
 # a different meaning. Loaders bound to a retired id do not resolve.
+  # -- the internal MWAA deployment docs (Q27; unparked when G32 fired) -------
+  - id: mwaa-implementation-docs
+    classification: Internal            # internal deployment/conventions/onboarding prose
+    source: "internal/airflow-reference/mwaa-internal-docs.md (the locator FILE — the real internal URL lives there and appears in no tracked config row, per PUBLISH-BOUNDARY)"
+    source_url: null                    # the pointer, never the value (Q27 (c))
+    captured_at: null                   # nothing captured yet — registration is a declaration
+    connector: web
+    manifest: null
+    trust_default: GROUNDED             # upgraded to VERBATIM only by a capture run whose manifest names this row (the Q23 join — the cdo-frameworks precedent)
+    tier: T2                            # internal platform docs
+    curation: sme-confirm               # fixed per tier (ADR 0006 SS-4)
+    target_db: drydocs                  # the single content database G32/G102 ruled
+    refresh: manual
+    taxonomy_path: technology/orchestration/airflow
+    graph_locator:
+      match: none                       # nothing loaded; a capture stamps corpus_id and this moves with it
+      value: null
+    confirmed: false                    # Q27 (d): a DECLARATION. No loader may write from this
+                                        # entry until a gate signs its doc-graph shape; the flip
+                                        # is its own follow-up (the Q24 precedent), never this row.
+    notes: >
+      The firm's OWN MWAA deployment documentation — a class corpus (our
+      deployment's docs), deliberately NOT the {vendor}-docs form: Apache
+      publishes Airflow's docs, but this corpus documents what WE built on
+      MWAA. The internal address is only in the internal/ locator file; the
+      airflow product row's documentation.corpus points here (atomic with this
+      row — a dangling pointer is the one FAILING rung in docs-coverage).
+
+
 retired:
   - id: bmc-controlm-utilities
     replaced_by: ["bmc-docs-controlm-utilities"]

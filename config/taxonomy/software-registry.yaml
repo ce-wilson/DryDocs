@@ -356,6 +356,15 @@ products:
     role: orchestrator
     type: open-source
     versions: ["3.x"]              # 3.3.0 current 2026-07; MWAA lags (3.0 / 2.4.3+)
+    documentation:
+      corpus: mwaa-implementation-docs   # -> config/doc-source-registry.yaml (Q27; atomic pair)
+      docs_version: "2026-08-07 locator" # OUR deployment's prose has no vendor release
+                                         # number — the value is the locator's recorded
+                                         # date, so currency still has both sides to compare
+      current_for: []                    # EMPTY = unverified for any runtime version; the
+                                         # computed drift line is TRUE until an SME confirms
+                                         # a capture. Registered-unconfirmed: the coverage
+                                         # rung is `ungated` until its doc-graph gate signs.
     used_by_drydocs: false          # crosswalk placeholder (airflow-mwaa source unconfirmed); flips if the source activates
 
   # --- C25 prerequisite rows (2026-08-09) -----------------------------------

@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/doc-source-registry.yaml
@@ -32,3 +32,22 @@ notes: |
   WHAT THE ROW BUYS: `drydocs docs-coverage` reports Airflow as `no-corpus` today, which is a TRUE statement and exactly the row the Q16 report exists to print — the internal MWAA implementation-docs locator exists on the `airflow` system row (`locator.internal_docs`, id `airflow:internal-implementation-docs`) with no corpus registered against it. Registering closes that gap without loading anything.
 
   Module `config` recorded as a CHOICE: both edited files are config declarations and no code changes, so `config` is the honest work area (Q23 sits on drydocs-docmeta because it touches connectors; this one does not). Epic docmeta because the doc-source registry IS the docmeta ledger — the Epic F Airflow crosswalk is untouched by this item.
+  DONE 2026-08-28 (laptop, Lane B). (a) both edits in one commit: mwaa-implementation-docs
+  in the doc registry + documentation.corpus on the airflow product row. (b) fields as
+  pre-decided (T2 / sme-confirm / web / Internal / target_db drydocs); class-based id — the
+  row's note says why the {vendor}-docs form is wrong here. trust_default GROUNDED with the
+  upgrade path written on the row: VERBATIM only via a capture run whose manifest names the
+  row (the Q23 join). (c) the pointer never the value: source cites the internal locator
+  FILE; source_url null; the real address stays in internal/. (d) confirmed: false with the
+  reason on the row (declaration; the flip is its own follow-up — the Q24 precedent).
+  (e) THE OBSERVABLE, run live: the airflow row lands on `ungated` (coverage AND blocker
+  columns; also no-locator/no-describes — true graph-side facts), exactly the expected
+  rung, NOT in FAILING; docs-coverage exits 0; suite green. TWO DELIBERATE PIN MOVES with
+  reasons in-file: the coverage census (15,14,9,8)->(15,13,10,8) and the currency-drift
+  list gains "airflow: runtime 3.x not covered by docs 2026-08-07 locator" (current_for
+  EMPTY is the true unverified state; docs_version is the locator's recorded date so the
+  currency machinery keeps both sides). ONE ADJACENT FALSEHOOD FIXED: the docs-coverage CLI
+  printed "documentation locator(s) with no corpus registered" unconditionally — now scoped
+  to rows still on no-corpus, since airflow's locator IS backed by a registered corpus.
+  Renders (load-map / software-registry / enforcement-matrix / board) regenerated
+  in-commit. Suite 2596 passed / 11 skipped; ruff clean.

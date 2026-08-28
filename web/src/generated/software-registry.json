@@ -412,7 +412,11 @@
       ],
       "used_by_drydocs": false,
       "seal_id": null,
-      "documentation": null,
+      "documentation": {
+        "corpus": "mwaa-implementation-docs",
+        "docs_version": "2026-08-07 locator",
+        "current_for": []
+      },
       "stack": []
     },
     {

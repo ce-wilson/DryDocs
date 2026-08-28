@@ -25,6 +25,7 @@ from drydocs.cli_shared import (
 )
 from drydocs_core.neo4j_client import Neo4jClient
 
+from .docs_coverage import NO_CORPUS as COVERAGE_NO_CORPUS
 from .docs_coverage import REGISTRY_DB as COVERAGE_REGISTRY_DB
 from .docs_coverage import coverage as build_docs_coverage
 from .docs_verify import Summary as DocsVerifySummary
@@ -451,7 +452,11 @@ def docs_coverage(
             )
         console.print(table)
         for r in rows:
-            if r.unregistered_doc_locators:
+            # Q27: the note is scoped to rows still on no-corpus — once a corpus
+            # IS registered (airflow -> mwaa-implementation-docs), printing
+            # "no corpus registered" for its locator would be a falsehood on an
+            # operator surface. The locator list itself still rides the row.
+            if r.unregistered_doc_locators and r.coverage == COVERAGE_NO_CORPUS:
                 console.print(
                     f"  [cyan]{r.product_id}[/]: documentation locator(s) with no corpus "
                     f"registered - {', '.join(r.unregistered_doc_locators)}"

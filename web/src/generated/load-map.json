@@ -1745,6 +1745,36 @@
       "taxonomy_captures": [],
       "ontology_mappings": [],
       "loaders": []
+    },
+    {
+      "id": "mwaa-implementation-docs",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "tier": "T2",
+      "curation": "sme-confirm",
+      "connector": "web",
+      "target_db": "drydocs",
+      "trust_default": "GROUNDED",
+      "graph_locator": {
+        "match": "none",
+        "value": null
+      },
+      "taxonomy_path": "technology/orchestration/airflow",
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": []
     }
   ],
   "retired": [

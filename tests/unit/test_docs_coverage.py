@@ -381,8 +381,8 @@ def test_the_live_coverage_census_is_pinned() -> None:
         )
         == (
             15,
-            14,
-            9,  # 8->9 at chase-leadership-scrape (2026-08-27) — prior move: Q10 ops-email-extracts, 2026-08-19
+            13,  # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
+            10,  # 9->10 at Q27: mwaa-implementation-docs registered — prior moves: chase-leadership-scrape 2026-08-27, Q10 ops-email-extracts 2026-08-19
             8,  # unclaimed 7->8 — org-structure gate evidence, not product documentation (same class as the email corpus before it)
         )
     ), (
