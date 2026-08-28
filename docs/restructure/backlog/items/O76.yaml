@@ -1,0 +1,43 @@
+id: O76
+epic: web-console
+title: 'The credential store records how each secret was set, so a generated demo secret printed to a
+  terminal stops being indistinguishable from one an operator chose'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: in_progress
+depends_on:
+- O73
+- O75
+inputs:
+- drydocs_api/credentials.py
+- scripts/set_console_credential.py
+- scripts/admin_demo_login.py
+- docs/design/catalog-substrate-review.md
+acceptance: |
+  A credential entry records HOW it was set and WHEN, and both reporting surfaces say so, so "which of these secrets was printed to a terminal three weeks ago" is answerable without remembering.
+
+  (a) NON-SECRET PROVENANCE ONLY. Each entry gains `origin` (`prompted` | `generated` | `unknown`) and `set_at` (ISO-8601 UTC, second precision). Neither is derived from the secret, neither narrows a guess against it, and the hash parameters keep travelling beside the hash exactly as they do now. `hash_secret` still refuses an empty secret; provenance never becomes a reason to store something weaker.
+
+  (b) THE VERSION BUMP MUST NOT LOCK ANYONE OUT — this is the clause the item turns on. `FORMAT_VERSION` goes to 2 because the written shape changes, but READING stays backward compatible: a version-1 file loads, and its entries land with `origin: unknown` and no `set_at`. The current build REFUSES any version it does not recognise, and this machine's real file is version 1 carrying all six accounts — so a naive bump signs the operator out of their own console and the refusal message tells them to re-bootstrap, destroying six working credentials to gain a metadata field. That is the same fail-closed-on-a-routine-operation defect O73 already ruled against for the unreadable-file case. A file from a version this build does not know is still refused; only the KNOWN older version is accepted.
+
+  (c) UNKNOWN MEANS UNKNOWN. A migrated v1 entry is never recorded as `prompted`. It was probably prompted, and probably is not a record. An inferred provenance is a false statement in the one file whose whole new job is to make provenance checkable, and it would make the flag in (e) silently under-report.
+
+  (d) UPGRADE ON WRITE, NEVER ON READ. The file is rewritten in version-2 shape the next time a person sets, rotates or removes a credential — never as a side effect of the API loading it. `drydocs_api` is forbidden from writing to the filesystem (the ADR 0009 guard behind `test_mapping_api.py`), so a read-triggered migration would be exactly the write that guard exists to prevent, in the one file where it matters most.
+
+  (e) BOTH REPORTING SURFACES SAY IT, because there are two and an operator uses whichever is nearer. `set_console_credential.py --list` and `admin_demo_login.py`'s status table each show origin and age per account. A `generated` secret older than a threshold NAMED IN CODE (not a magic number at a call site) is called out as wanting rotation, in a line that says what to run. `unknown` entries are shown as unknown and are not flagged, because nothing is known about their age.
+
+  (f) THE FLAG EARNS ITS PLACE OR IT IS NOISE. It fires on generated secrets past the threshold and on nothing else — not on prompted secrets, whatever their age, since those were never printed to a terminal, and not on a generated secret set today.
+
+  `poetry run pytest -q` green, with new cases for: a version-1 file loading with unknown origin and surviving a round trip; a version-2 file round-tripping origin and set_at; a version this build does not know still refused; `--generate` recording `generated` and a prompt recording `prompted`; the stale flag firing and not firing at the boundary. Ruff clean. Verified live on this desktop that the REAL version-1 credential file still signs in, and that the two listings render the new columns.
+notes: |
+  Raised 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding L2, via Idea-165. The sibling of O75: that item closed the account-withdrawal half of the lifecycle, this one closes the "what is actually in here" half.
+
+  WHERE IT CAME FROM. `admin_demo_login.py --generate` invents a secret and prints it once, and the docstring argues the trade correctly for a synthetic account on localhost. What is missing is that nothing records it happened, so `--list` and the status table show only WHICH ids have a credential. An account carrying a secret that went to a terminal weeks ago looks exactly like one set by hand at a no-echo prompt. DataHub spends a documentation page compensating in prose for the same class of problem — its shipped `datahub:datahub` survives deleting the user in the UI — and prose is what you write when the artifact cannot answer for itself.
+
+  THE RISK IS THE MIGRATION, NOT THE FIELDS. Adding two strings to a JSON object is nothing; changing the version of a file the running build refuses to read on mismatch is the whole item. The live file on this machine is version 1 with six accounts, and the failure mode of getting this wrong is a console that will not open and a message telling the operator to re-bootstrap. Clause (b) is written to be read before the constant is touched.
+
+  MODULE CHOICE follows O69, O73, O74 and O75 — every file is under `drydocs_api/` and `scripts/`, and a `drydocs-api` module exists, but the console-authentication stream is filed `drydocs-web` and a lone divergence would make it unfilterable for one row.
