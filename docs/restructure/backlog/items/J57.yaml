@@ -1,0 +1,36 @@
+id: J57
+epic: release-infrastructure
+title: Acceptance that compares TOTALS lets two sessions agree on a number and both be wrong — the
+  port and snapshot rituals record the failing-test ID SET, and a clean claim runs the repo-wide
+  guard family
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/reconcile-port/SKILL.md
+- docs/port/port-prompt.md
+- knowledge/depgraph-snapshots/snapshot.ps1
+- CLAUDE.md
+acceptance: |
+  (a) SET, NOT COUNT, IN THE PORT/RECONCILE ACCEPTANCE. Wherever the port and reconcile procedures today ask for a failing-test TOTAL (suite counts, Track-1 tallies, "N of N are the documented clusters"), they ask instead for the sorted set of failing test NODE IDS, and the acceptance is a SET DIFF between the baseline and the result — not an equality of two integers. The total stays visible alongside it; this is a swap of what the comparison keys on, not a removal of the number people read.
+
+  (b) THE FAILURE MODE IS WRITTEN DOWN WHERE THE STEP IS. The rule carries its one-sentence reason at the point of use: two sessions independently measured the same failing-test total and treated the agreement as confirmation, but one of the failures was new and self-inflicted — agreeing on a total is not agreeing on its contents. A rule with no recorded reason is the first thing a later session optimises away.
+
+  (c) THE CLEAN-CLAIM CONVENTION. A "this is clean" claim after a targeted fix is defined as insufficient on the targeted files alone: it requires a run of the REPO-WIDE guard family — module boundary, render determinism, no-render-parsing, repo-path guards — whose failures no targeted-file verification can catch. Name those guards by their test-file paths so the convention is executable rather than an exhortation, and verify each named path exists in this tree at the time of writing.
+
+  (d) THE SNAPSHOT RITUAL'S GREEN-AT-HEAD CHECK IS COVERED. `snapshot.ps1`'s CI check already matches on HEAD's sha (Idea-111's fix); state explicitly whether its verdict is a count comparison and, if so, apply (a) to it — or record that it is already identity-based and needs no change. Either answer is a pass; an unexamined third surface is not.
+
+  (e) THE DOCUMENTED SURFACES ARE ENUMERATED, NOT SAMPLED. The item lists every producer surface that compares totals today and states, per surface, whether it changed or why it did not. A partial sweep here reproduces exactly the class of miss the rule exists to prevent.
+
+  (f) OUT OF SCOPE: changing any test, guard or CI stage. This item edits PROCEDURE — skills, prompts, the operating guide — and ships no behaviour change to the suite.
+notes: |
+  Groomed 2026-08-28 from Idea-183 (captured 2026-08-27, Med). The trap was measured company-side on 2026-08-27 and the company recorded the same rule with their own guard names the same day; this item is the producer-side half, written against producer surfaces only — nothing here asserts anything about their tree.
+
+  Epic release-infrastructure / module docs / phase 8 follows J52, the direct precedent: the same shape of item (a verification discipline learned from one incident, written into a skill so the next session inherits it rather than rediscovers it) and the same epic/module/phase. Model sonnet, not haiku: clause (e) requires actually finding the surfaces, which is a survey rather than a transcription.
+
+  The general principle is J18's, one level up. J18 made a verification claim name its VENUE; this makes a verification claim name its CONTENTS. Both fix the same thing — an assertion that looks checkable and is not.

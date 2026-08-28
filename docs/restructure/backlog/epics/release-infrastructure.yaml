@@ -114,3 +114,19 @@ groom_log:
     outside internal/, embed no literal of the string, and skip loudly rather than silently in a
     clone that has no internal/. The cross-repo id-migration half stays inboxed on the next port.
   attached_at: J55
+- date: '2026-08-28'
+  note: |-
+    2026-08-28 weekly groom (desktop) — four items from two entries. J57 from Idea-183: port
+    and reconcile acceptance compares failing-test TOTALS, so two sessions can agree on a
+    number and both be wrong; the swap is to a sorted failing-test ID SET plus a clean-claim
+    convention that names the repo-wide guard family by test path. J58/J59/J60 from Idea-181,
+    split three ways on that entry's own python-architect persona review rather than kept
+    whole: J58 is the four-key YAML identity header as ONE JSON Schema, scoped by file class
+    so template-class files are exempt (copier updates are three-way merges, not rewrites),
+    schema: coverage sequenced ahead of updated:; J59 is the freshness half, which left J58
+    because comparing updated: to a git date is blind under CI's shallow checkout and so
+    ships as the repo's first pre-commit hook; J60 is the Python half, two ruff D rules
+    rather than a bespoke guard. The gate-status-key entry (Idea-180) is deliberately NOT
+    groomed — it asks to migrate after the 13 run-the-gate items land so the sweep meets a
+    stable queue.
+  attached_at: J57

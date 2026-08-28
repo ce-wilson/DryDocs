@@ -91,7 +91,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
-- **`Idea-184`** · 2026-08-27 · `[idea]` · **open** · prio? **High** —
+- **`Idea-184`** · 2026-08-27 · `[idea]` · **groomed → O71 (2026-08-28)** · prio? **High** —
   THE ADR 0015 REGISTER ROW'S NAMED TRIGGER HAS FIRED: the fastapi/full-stack-fastapi-
   template row says 'nothing adopted... only re-opens if a shared estate console is
   chartered (the one legitimate use identified)' — and the internal ui-workstream branch
@@ -107,7 +107,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   company-side it is their ui-workstream call. Groom: one item to draft the auth-boundary
   gate question + the register-row amendment; the ADR file itself is the other session's
   draft — coordinate, never sweep.
-- **`Idea-183`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
+  **GROOMED 2026-08-28 → O71.** One item, exactly as this entry asked: draft the gate
+  prompt for the console auth boundary and draft the register-row amendment. It adopts
+  nothing — the scaffold rejection stands, the practices are what go to the SME, and each
+  practice is a separately tickable confirmation so declining any subset is a valid
+  sign-off. Filed under epic O rather than a Team Edition epic because this entry names
+  the `?as=` headless sign-in as the producer-side seam and no TE epic exists yet (see
+  [[Idea-179]]). The coordination instruction is written INTO the item rather than left
+  here: `docs/decisions/0015-team-edition-template.md` was an uncommitted working file in
+  the shared tree at groom time, so O71 clause (d) lets the item close whether or not the
+  draft has landed and forbids a session from resolving the gap by authoring the ADR
+  itself.
+- **`Idea-183`** · 2026-08-27 · `[chore]` · **groomed → J57 (2026-08-28)** · prio? **Med** —
   SET-NOT-COUNT acceptance, adopted from the company session's measured trap (2026-08-27,
   their memory note): two sessions independently measured the same failing-test TOTAL and
   treated agreement as confirmation — but one of the failures was new and self-inflicted;
@@ -121,7 +132,16 @@ question a 1,000-line file with the trail at the bottom could not answer.
   render determinism, no-render-parsing, repo paths) whose failures no targeted file
   catches — the company side recorded the same rule with their guard names the same day.
   Groom into the reconcile-port skill + snapshot ritual when picked up.
-- **`Idea-182`** · 2026-08-27 · `[bug]` · **open** · prio? **High** —
+  **GROOMED 2026-08-28 → J57.** Both halves ride one item: the set-not-count swap on the
+  port/reconcile acceptance (sorted failing-test node ids, diffed as sets, with the total
+  still printed) and the clean-claim convention naming the repo-wide guard family by test
+  path so it is executable rather than an exhortation. Two clauses were added at grooming
+  that this entry did not state: the snapshot script's green-at-HEAD verdict is a third
+  surface that must be examined and either changed or explicitly ruled already
+  identity-based, and the surface list must be exhaustive rather than sampled — a partial
+  sweep here reproduces the exact class of miss the rule exists to prevent. The item edits
+  procedure only and ships no test change.
+- **`Idea-182`** · 2026-08-27 · `[bug]` · **groomed → K30 (2026-08-28); the two producer-verifiable halves are startable now, the header RE-PIN waits on the landed header list per that item's clause (g)** · prio? **High** —
   PRODUCER pat_projection.py SHARES THE G82 DEFECT CLASS the company just measured and
   fixed on their side (their G82 close-out session 2026-08-27; the header facts land as a
   citable file with that cluster's SME review status — do the edits from the FILE, not
@@ -142,7 +162,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
   exactly what fixtures should assert against, which closes the fixture-agrees-with-code
   trap structurally. Header names are mechanism (03-hitl-sme-flow: column names commit;
   values never); estate row counts stay out per the volumetrics fence.
-- **`Idea-181`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
+  **GROOMED 2026-08-28 → K30.** Every claim was re-verified against this tree before the
+  item was written, not carried across from the relay: `REQUIRED_FIELDS` holds three fields
+  and `seal_ids` is not among them; `missing_optional` is computed but reaches only the
+  report object and never an exit code; `KNOWN_DROPPED` holds 12 entries; the test fixture
+  writes the same believed SEAL-id spelling the module looks for. K30 splits by what is
+  verifiable TODAY — make every mapped field's absence loud, and resolve `jira_board_id`,
+  which maps a header this report does not carry — from what needs the landed header list,
+  and its clause (g) makes `blocked` a legitimate outcome for the latter so no session
+  re-pins from memory. Its clause (d) links the fixture to the RECORDED header list rather
+  than to the module's own constant, which is what closes the agrees-with-itself trap
+  structurally instead of moving it. The wider question — which OTHER loaders make a
+  believed header authoritative and test it against itself — is deliberately left out of
+  scope and stays available for a sweep once this worked example is fixed.
+- **`Idea-181`** · 2026-08-27 · `[chore]` · **groomed → J58, J59, J60 (2026-08-28)** · prio? **Med** —
   YAML/PY HEADER STANDARD + a freshness guard (user review request 2026-08-27; ties to the
   port protocol and TE). The exemplar exists and is already in use — the source-mapping
   four-key block (schema: / source: / classification: / updated:, see
@@ -177,6 +210,21 @@ question a 1,000-line file with the trail at the bottom could not answer.
   (F5) one JSON Schema for the header, not N bespoke tests; (F6) schema: is the
   TE-load-bearing key (copier migrations key on it) — sequence schema-coverage first,
   updated:-coverage second.
+  **GROOMED 2026-08-28 → J58, J59, J60.** Split three ways, and the split comes from this
+  entry's own persona review rather than from convenience. J58 is the header standard: one
+  JSON Schema (F5) under `config/schemas/`, scoped BY FILE CLASS with template-class files
+  FORBIDDEN from carrying a hand date (F1/F2 — copier updates are three-way merges keyed on
+  `.copier-answers.yml` `_commit`), `schema:` coverage sequenced ahead of `updated:` (F6),
+  and the 53 gate prompts gaining the date key they lack under the guard they already have.
+  J59 is the freshness half and it left J58 for a mechanical reason (F3): comparing
+  `updated:` to `git log -1 --format=%as` is blind under CI's shallow checkout — confirmed,
+  `.github/workflows/ci.yml` uses `actions/checkout@v4` with no `fetch-depth` — so it ships
+  as the repo's first pre-commit hook, and it carries the per-side `updated:` declaration at
+  the port manifest, because disjoint histories stamp every ported file with port day. J60
+  is the Python half: `select` carries no `D` rules today, so F4's D100/D104 plus the ~31
+  missing module docstrings, and no bespoke guard. The two measured baselines (32 files with
+  no `schema:`, 104 with no `updated:`; 16 of 24 dated headers stale) are recorded in the
+  items as figures to RE-MEASURE at pull time, not as facts to trust.
 - **`Idea-180`** · 2026-08-27 · `[chore]` · **open** · prio? **Med** —
   Gate state is not machine-readable: only 4 of 52 gate-prompt YAMLs carry a status key;
   everything else resolves only by prose-parsing the 4,191-line gate-log — and the log is
@@ -188,6 +236,14 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the authority, the key becomes the queryable index (J37: read the importable object,
   never parse a render — this is the same disease one layer up). Groom AFTER the 13
   run-the-gate items land so the migration sweeps a stable queue.
+  **RE-READ AT THE 2026-08-28 GROOM — deliberately NOT groomed, on this entry's own
+  instruction.** The last line asks for the migration to run after the 13 run-the-gate items
+  land so it sweeps a stable queue, and none of them has. Grooming it now would mint an item
+  whose first act is to wait, and whose derived-from-the-log migration would then have to be
+  re-run against a queue that moved underneath it. Nothing else changed: the gate-log is
+  still the authority and the status key is still proposed as a queryable index derived from
+  it, which is J37's rule one layer up. Re-check when the run-the-gate queue drains — it is
+  the trigger, and it is visible on the board rather than needing a reminder here.
 - **`Idea-179`** · 2026-08-27 · `[idea]` · **open** · prio? **Med** —
   ADR 0015 (Team Edition, rev 7 draft) application, from the Chase leadership-page scrape
   (docs/reviews/chase-leadership-scrape-2026-08-27.md): TE should ship a NEWCOMER'S
@@ -205,6 +261,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   GENERATED surface, never authored prose that would rot exactly the way the scraped bios
   did). Groom into the ADR 0015 epic when that epic lands; until the ADR is accepted this
   stays an inbox idea, not a commitment.
+  **RE-READ AT THE 2026-08-28 GROOM — not groomed, on this entry's own terms.** It closes by
+  saying it stays an inbox idea until ADR 0015 is accepted, and the ADR is still a draft:
+  `docs/decisions/` on `main` runs 0014 then 0016, with the Team Edition file an uncommitted
+  working copy in the shared tree. There is consequently no TE epic to file it into — the
+  same absence that pushed [[Idea-184]]'s item onto epic O instead. The idea itself is
+  unchanged and its two disciplines (HAS_MEMBERSHIP not REPORTS_TO; a per-source as-of stamp
+  on every fact) now have a nearer anchor than when it was captured, since the `:Employee`
+  backbone with its REPORTS_TO creation policy landed on `main` in the interim. Trigger: the
+  ADR is accepted and its epic is chartered.
 - **`Idea-178`** · 2026-08-26 · `[chore]` · **groomed → J55 (2026-08-27) — the ENFORCEMENT half only (nothing stops the retired string coming back); the cross-repo doc-corpus id migration stays STANDING → the next port session, which is the only place it can be settled** · prio? **Med** —
   **The org-acronym sanitization renamed the doc corpus id the two repos JOIN on.** Gate-log
   RECORD 2026-08-26; the old-to-new mapping is written once, in `internal/cdo-reference/README.md`.

@@ -42,3 +42,14 @@ groom_log:
     33/33 on 2026-08-19 (K17). The docstring's ORDERING argument — the census runs before the
     gate, doc 09 section D2 — stays as history rather than being deleted with the stale state.
   attached_at: K28
+- date: '2026-08-28'
+  note: |-
+    Groomed 2026-08-28 from Idea-182. K30 is G82's return leg: the projection G82 built pins
+    its header map to believed spellings, and its test fixture writes the SAME beliefs, so
+    code and test agree and can both be wrong against the real export. seal_ids is mapped but
+    not required, so a case-different column degrades to empty and a run that prints success
+    writes zero dev-team-to-application edges. Two halves are producer-verifiable today (make
+    every mapped field's absence loud; resolve jira_board_id, which maps a header this report
+    does not carry); the re-pin waits on the landed header list and the item says blocked is a
+    legitimate outcome rather than guessing the spellings.
+  attached_at: K30

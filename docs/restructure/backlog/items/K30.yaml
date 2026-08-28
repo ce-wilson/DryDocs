@@ -1,0 +1,41 @@
+id: K30
+epic: seal-attribution
+title: The PAT projection's header map is pinned to believed spellings and its test fixture repeats
+  the same beliefs, so a real export with a case-different SEAL-id column writes zero application
+  edges and still reports success
+type: bug
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/pat_projection.py
+- scripts/project_pat_team_report.py
+- tests/unit/test_pat_projection.py
+- config/source-mappings/pat-team-report.yaml
+- docs/restructure/backlog/items/G82.yaml
+acceptance: |
+  (a) EVERY MAPPED FIELD'S ABSENCE IS LOUD, NOT ONLY THE REQUIRED ONES. Today `_project` raises `ProjectionError` for the three `REQUIRED_FIELDS` (`team_id`, `product_id`, `relationship_type`) and merely RECORDS the rest on `ProjectionReport.missing_optional`, which `scripts/project_pat_team_report.py` never turns into a non-zero exit or a warning stream. Verified producer-side: `seal_ids` is mapped to the header `"SEAL IDs"` and marked PINNED, and it is NOT in `REQUIRED_FIELDS` — so a real export spelling that column differently degrades to an empty value for every row, the `PatProductMapping` rows carry no SEAL ids, and a run that prints a success summary writes zero dev-team-to-application edges. After this item, a mapped header that the raw report does not carry produces a loud, non-zero-exit failure or an explicit acknowledged-absence flag; there is no third path where it is quietly empty. Cover it with a test that drives `_project` with `seal_ids` absent and asserts the loud behaviour.
+
+  (b) THE HEADER MAP AND `KNOWN_DROPPED` ARE RE-PINNED FROM THE LANDED HEADER LIST, NOT FROM RELAY. The company session that measured and fixed this defect class on their side lands the header facts as a citable file carrying that cluster's SME review status. Do the edits FROM THAT FILE once it is in this tree (or in `internal-local/` with its path recorded in the close note) — never from a chat summary of it. `DEFAULT_HEADER_MAP` and the 12-entry `KNOWN_DROPPED` set are corrected and extended against the recorded schema-of-record section; every entry that changes says in a comment which spelling it replaced, so the previous belief stays legible instead of being overwritten silently.
+
+  (c) `jira_board_id` IS RESOLVED, ONE WAY OR THE OTHER. It currently maps to `"JIRA Board"`, a header this report does not carry — it lives in a sibling export. Either drop it from `DEFAULT_HEADER_MAP` (and record where the field really comes from), or keep it and mark it explicitly acknowledged-absent under (a) so it does not trip the new loudness rule on every run. A mapped field pointing at another file's column is exactly the condition (a) is meant to make impossible to ignore.
+
+  (d) THE FIXTURE STOPS AGREEING WITH THE CODE BY CONSTRUCTION. `tests/unit/test_pat_projection.py` writes its synthetic header row in the SAME believed spellings the code looks for (it writes `"SEAL IDs"`), so code and test can be wrong together and the suite cannot tell. Re-pin the fixture headers against the RECORDED header list from the review status, not against `DEFAULT_HEADER_MAP`. Add a guard asserting the fixture's header row is drawn from the recorded list rather than from the module's own constant — that structural link is what closes the trap; a hand-corrected fixture would only move the coincidence.
+
+  (e) THE LEDGER FOLLOWS. `config/source-mappings/pat-team-report.yaml` was authored from the projection's own header map (G82 deliverable 4), so every correction under (b) propagates to it; its `pinned:` flags flip only for spellings the landed list actually confirms, and the ones it does not cover stay `pinned: false`.
+
+  (f) NO REAL VALUES, AND NO ESTATE VOLUMETRICS. Header NAMES are mechanism and commit (03-hitl-sme-flow: column names commit, values never). Row counts for the real estate stay out per the volumetrics fence — the close note reports fixture counts and the shape of what changed, not how many teams the company has.
+
+  (g) BLOCKED-NOT-STARTED IS A LEGITIMATE OUTCOME FOR (b)/(d). If the landed header file is not in the tree when this is pulled, do (a) and (c) — which are fully producer-verifiable today — and set the item `blocked` with a note naming the missing artifact, rather than re-pinning from memory. Guessing the spellings is the exact defect being fixed.
+notes: |
+  Groomed 2026-08-28 from Idea-182 (captured 2026-08-27, High). The finding is the company's G82 close-out session measuring this defect class on their side; every clause above was RE-VERIFIED against this tree before grooming rather than accepted from the relay — `REQUIRED_FIELDS` at `drydocs/pat_projection.py:104` holds three fields and `seal_ids` is not among them; `missing_optional` is computed at line 208 and reaches only `ProjectionReport`; `KNOWN_DROPPED` holds 12 entries; the test fixture's header row at `tests/unit/test_pat_projection.py:54` writes `"SEAL IDs"`.
+
+  This is G82's exact residue, one layer down. G82 built the projection and closed with deliverable 5 (run it on the real export, fix spellings via `--header-map`) handed to the company. That handover is what surfaced the defect, so this item is the return leg, not a re-opening of G82 — G82 stays closed with its close note intact.
+
+  Epic seal-attribution / module drydocs-load / phase 9 follows G82 exactly (same epic, same module, same phase, same files). Model sonnet rather than fable: clauses (a), (c) and (d) are pass/fail engineering with tests, and nothing here changes an ontology edge or a boundary. `depends_on: []` because (a) and (c) are startable today; the (b)/(d) artifact dependency is handled by clause (g) rather than by a dependency on an id that does not exist in this repo.
+
+  The generalisation is deliberately NOT scoped here: "which other loaders make a believed header authoritative and test it against itself" is the same disease, and belongs in its own sweep once this one worked example is fixed.

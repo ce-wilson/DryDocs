@@ -1,0 +1,38 @@
+id: O71
+epic: web-console
+title: The ADR 0015 watched-source trigger for the FastAPI template has fired — draft the console
+  auth-boundary gate question and the register-row amendment, and decide nothing outside the gate
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- config/gate-prompts/ui-write-surface.yaml
+- docs/restructure/03-hitl-sme-flow.md
+- web/src/lib/auth.ts
+- web/src/
+- docs/design/drydocs-web-console-tdd.md
+acceptance: |
+  (a) A GATE PROMPT SPEC EXISTS AND PROPOSES, IT DOES NOT ADOPT. A new spec under `config/gate-prompts/` puts the console's authentication boundary to the SME, in the shape `config/gate-prompts/ui-write-surface.yaml` already uses (the O20 precedent: a page that PROPOSES a boundary and changes nothing by being rendered), and it satisfies whatever `tests/unit/test_gate_pages.py` requires of every spec — Module / Source / Registry ref / Classification. AUTH IS A TRUST BOUNDARY: nothing in this item adopts, installs, or wires an auth mechanism. Until the gate signs off, the console's sign-in stays the stub it is today.
+
+  (b) THE QUESTION IS ABOUT PRACTICES, NOT A SCAFFOLD, AND SAYS SO. The ADR's survey already REJECTED the `fastapi/full-stack-fastapi-template` scaffold — clone-and-diverge, no update lifecycle, Stripe and multi-org baggage — and that rejection stands; the spec must restate it so a reader cannot mistake the gate for a reversal. What is on the table is the template's auth PRACTICES, cited to the register row: OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow — the survey's characterisation was "users-in-a-workspace rows behind JWT". Each practice is a separately tickable confirmation, so declining any subset is a valid sign-off.
+
+  (c) THE PRODUCER-SIDE SEAM IS NAMED AND ITS CURRENT STATE MEASURED. Epic O's `?as=` headless sign-in is a stub sitting exactly where real auth would land. Read what it does today and record it in the spec, so the gate rules against the actual seam rather than a described one. State plainly which console surfaces are read-only today, because that standing state is itself one of the answers the SME may confirm.
+
+  (d) THE REGISTER-ROW AMENDMENT IS DRAFTED, AND COORDINATED RATHER THAN SWEPT. ADR 0015's watched-source register discipline is that a fired trigger opens a backlog item and auto-changes nothing; the row for this source therefore needs an amendment recording that its named trigger — "only re-opens if a shared estate console is chartered" — has fired, that the charter is the internal ui-workstream's user/login build, and that the disposition is this gate. THE ADR FILE IS ANOTHER SESSION'S IN-FLIGHT DRAFT and is not on `main` as of 2026-08-28 (`docs/decisions/` runs 0014 then 0016). Do not create, re-draft, or overwrite it. If it has landed by the time this item is pulled, amend the row in place; if it has not, the amendment ships as drafted TEXT inside the gate spec with a note naming where it belongs, and the item still closes.
+
+  (e) THE COMPANY SIDE IS NOT DECIDED HERE. Their ui-workstream makes their own call and runs their own gate; producer sign-off is not company sign-off. The spec says so in one line rather than leaving it to be assumed.
+
+  (f) NOTHING IS BUILT. No dependency added, no auth code, no user model, no route change. The deliverable is a gate spec plus a drafted register-row amendment, and the gate SESSION itself is a separate item minted after this one lands.
+notes: |
+  Groomed 2026-08-28 from Idea-184 (captured 2026-08-27, High). The entry's own instruction was "one item to draft the auth-boundary gate question + the register-row amendment", and this is that item, scoped no wider.
+
+  Epic/module/phase choice, recorded because it was a judgement call: filed under web-console / `drydocs-web` / phase 12 because the entry names the producer-side seam as "the O-epic's `?as=` headless sign-in pattern", which is where any adoption would land and what the gate must rule on. There is no Team Edition epic to file it under yet — ADR 0015 is still a draft, and Idea-179 records that a TE epic does not exist — so filing it there was not available. If a TE epic is later chartered, this item's register-row half is a candidate to move; the gate half stays with the console either way.
+
+  Model fable: the item frames a TRUST BOUNDARY question, which is the tier's stated trigger. It still decides nothing — per the HITL flow (`docs/restructure/03-hitl-sme-flow.md`), the adoption routes through the gate and stays unadopted until confirmed. Acceptance clause (a) is what holds that line.
+
+  Concurrency note, and it is load-bearing rather than courtesy: `docs/decisions/0015-team-edition-template.md` was an uncommitted working file in the shared tree at groom time. Clause (d) is written so this item can be pulled and closed whether or not that draft has landed, and so that a session pulling it cannot resolve the ambiguity by writing the ADR itself.
