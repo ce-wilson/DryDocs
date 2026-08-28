@@ -90,6 +90,21 @@ def _doc(path: Path | None = None) -> dict[str, Any]:
     return doc
 
 
+def resolve_env_override(env_name: str | None) -> Path | None:
+    """``<env_name>``, resolved as a path, when it names a set-and-non-empty
+    environment variable — ``None`` otherwise.
+
+    This is the ONE check both :func:`resolve_root` (the log root) and
+    :func:`drydocs_core.data_zones._resolve` (any zone declaring ``env:``) run
+    before falling back to their own default, factored out here so the two
+    resolvers cannot drift apart on what "set" means (blank/whitespace-only
+    counts as unset in both places, per G111).
+    """
+    if env_name and os.environ.get(env_name, "").strip():
+        return Path(os.environ[env_name].strip())
+    return None
+
+
 def resolve_root(path: Path | None = None, *, default: Path | None = None) -> Path:
     """The one place the log root is resolved.
 
@@ -97,18 +112,21 @@ def resolve_root(path: Path | None = None, *, default: Path | None = None) -> Pa
     deprecation cycle WITH A WARNING, and the declared default is the fallback —
     the exact order ``run_log`` has always used, preserved rather than replaced.
 
-    One place, because the failure this shape prevents is live next door:
-    ``config/data-zones.yaml``'s ``run-logs`` zone declares ``env:
-    DRYDOCS_LOGDIR`` and ``data_zones._resolve()`` ignores the field, so that
-    zone reports the untouched default while every real log lands elsewhere.
+    One place, but not the only CALLER of the order: ``config/data-zones.yaml``'s
+    ``run-logs`` zone also declares ``env: DRYDOCS_LOGDIR``, and
+    ``data_zones._resolve()`` honors it (G111) by calling
+    :func:`resolve_env_override` — the same primary-env check this function runs
+    — rather than re-deriving it, so the log root and the ``run-logs`` zone
+    cannot again report two different directories.
     """
     doc = _doc(path)
     root = doc.get("root") or {}
     env_name = root.get("env") or ""
     legacy = root.get("legacy_env") or ""
 
-    if env_name and os.environ.get(env_name, "").strip():
-        return Path(os.environ[env_name].strip())
+    override = resolve_env_override(env_name)
+    if override is not None:
+        return override
     if legacy and os.environ.get(legacy, "").strip():
         warnings.warn(
             f"{legacy} is deprecated and is honored for one more cycle — set "

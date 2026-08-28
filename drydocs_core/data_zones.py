@@ -42,6 +42,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from drydocs_core.data_root import resolve_data_root
+from drydocs_core.log_kinds import resolve_env_override
 from drydocs_core.repo_paths import repo_root
 
 READ = "read"
@@ -138,7 +139,17 @@ def inventory(zones: tuple[DataZone, ...] | None = None) -> tuple[ZoneState, ...
     return tuple(out)
 
 
-def _resolve(base: str, spec: str) -> Path:
+def _resolve(base: str, spec: str, env: str | None = None) -> Path:
+    """``base`` + ``spec``, unless ``env`` names a set-and-non-empty variable.
+
+    A zone declaring ``env:`` (``run-logs`` does, per the ``home`` idiom) is
+    overridable at runtime the same way the log root is — through
+    :func:`drydocs_core.log_kinds.resolve_env_override`, reused rather than
+    re-derived so the two resolvers cannot disagree on what "set" means (G111).
+    """
+    override = resolve_env_override(env)
+    if override is not None:
+        return override
     if base == BASE_HOME:
         return Path.home() / spec
     if base == BASE_DATA_ROOT:
@@ -186,15 +197,16 @@ def load_zones(path: Path | None = None) -> tuple[DataZone, ...]:
         if not spec:
             raise DataZoneError(f"{src}: zone {zid!r} declares no path")
         helper = row.get("helper")
+        env = str(row["env"]).strip() if row.get("env") else None
         zones.append(
             DataZone(
                 id=zid,
                 mode=mode,
                 base=base,
                 path_spec=spec,
-                path=_resolve(base, spec),
+                path=_resolve(base, spec, env),
                 helper=str(helper).strip() if helper else None,
-                env=(str(row["env"]).strip() if row.get("env") else None),
+                env=env,
                 note=str(row.get("note") or "").strip(),
             )
         )
