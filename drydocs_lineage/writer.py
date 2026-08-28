@@ -593,12 +593,19 @@ def _write_curated(
 #   for the ID only — resolution never uses the fallback); repo locator =
 #   repo+ref+commit+path, joined to the server side on CONTENT HASH (the G24
 #   git blob sha1), never by path. sha256 absence is a real, counted state
-#   (§G2). storage_scope arrives from the G56 mount table on v3 bundles and
-#   falls back to 'unknown' on v1/v2, which carry none. A script whose
-#   server occurrences span >1 host is flagged identity_unconfirmed_across_
-#   hosts, never silently merged-as-confirmed (§D1 + the D-amendment: the
-#   honesty lives in the claim layer). That flag does NOT yet read scope, so
-#   it over-flags the shared case — Idea-175, at the computation below.
+#   (§G2). storage_scope AND mount_source arrive from the G56 mount table on
+#   v3 bundles and fall back to 'unknown' (no mount_source at all) on v1/v2,
+#   which carry no mount table. A script whose server occurrences span >1
+#   host is flagged identity_unconfirmed_across_hosts UNLESS every host's
+#   occurrence reads storage_scope 'shared' AND carries the SAME
+#   mount_source (G113's three-way rule: one export mounted on N hosts is
+#   one file, proven by mount_source equality — never inferred from scope
+#   alone, since 'shared' by itself does not say two hosts see the same
+#   file). Hosts that agree on 'shared' but disagree on mount_source stay
+#   unconfirmed and are ALSO counted separately (multi_host_shared_diverged)
+#   — that split is a real finding (two hosts mounting the same path from
+#   different exports), never folded silently into the general count.
+#   'local' or 'unknown' scope stays unconfirmed exactly as before G113.
 # - (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path extension
 #   (§C3 — the shared core adapter; the term is OPTIONAL-MATCHed, never
 #   minted: a mapped term missing from the graph means bootstrap has not run).
@@ -730,6 +737,10 @@ class RuaWritePlan:
     hash_missing: int  # server occurrences staged hash-absent (§G2 — a real state)
     repo_join_uncomputable: int  # repo rows staged but no server copy to hash (G24)
     multi_host_unconfirmed: int  # scripts flagged identity_unconfirmed_across_hosts
+    multi_host_shared_diverged: int  # of which: every host reads storage_scope
+    # 'shared' but the hosts DISAGREE on mount_source (G113) — a real finding
+    # (two hosts mounting the same path from different exports), broken out
+    # so it stays visible on its own instead of vanishing into the total
     hosts: tuple[str, ...]  # distinct qualified fqdns for §D3 write-time resolution
     hosts_unqualified: int  # server occurrences with no qualified fqdn — unresolvable by rule
 
@@ -761,6 +772,7 @@ class RuaLoadReport:
             f"hash_missing={p.hash_missing} "
             f"unbound_ext={p.unbound_extensions} "
             f"multi_host_unconfirmed={p.multi_host_unconfirmed} "
+            f"(shared_diverged={p.multi_host_shared_diverged}) "
             f"repo_unjoinable={p.repo_join_uncomputable}"
         )
 
@@ -807,6 +819,7 @@ def plan_rua(
     hash_missing = 0
     repo_join_uncomputable = 0
     multi_host_unconfirmed = 0
+    multi_host_shared_diverged = 0
     hosts: set[str] = set()
     hosts_unqualified = 0
 
@@ -822,6 +835,10 @@ def plan_rua(
         is_profile = node.kind == RUA_PROFILE_KIND
 
         node_hosts: set[str] = set()
+        host_scopes: dict[str, str] = {}  # id_host -> storage_scope, for the
+        # G113 three-way rule below (per-host, since occurrences are per-host)
+        host_mount_sources: dict[str, str] = {}  # id_host -> mount_source,
+        # present only where G56's mount table stamped one
         records = node.occurrences or [dict(node.properties, path=node.path)]
         for occ in records:
             id_host, fqdn = _occurrence_host(occ)
@@ -837,8 +854,12 @@ def plan_rua(
             props["host"] = id_host
             # G56 landed: v3 bundles arrive already stamped by the extractor and
             # this setdefault only covers v1/v2 bundles, which carry no mount
-            # table. The FLAG below still ignores scope — see Idea-175.
+            # table (and so no mount_source either — those hosts can never
+            # qualify for the 'shared, same source' CONFIRMED leg below).
             props.setdefault("storage_scope", "unknown")
+            host_scopes[id_host] = props["storage_scope"]
+            if "mount_source" in props:
+                host_mount_sources[id_host] = props["mount_source"]
             occurrence_rows.append(
                 {
                     "script_path": norm,
@@ -883,12 +904,35 @@ def plan_rua(
                     )
                     repo_occurrences += 1
 
-        # NOT scope-aware, deliberately deferred: right for local/unknown, wrong
-        # for shared (one export on N hosts is ONE file). Idea-175 owns the fix,
-        # including the mount_source-equality caveat that makes it three-way.
-        unconfirmed = len(node_hosts) > 1
+        # G113 — the three-way rule. Multi-host is the precondition for all
+        # three legs; a single-host script is never unconfirmed.
+        #   1. every host reads storage_scope 'shared' AND all hosts agree on
+        #      mount_source -> CONFIRMED (one export seen on N hosts is one
+        #      file). mount_source equality is the identity test — scope
+        #      alone never proves it, per the item's ruling.
+        #   2. every host reads 'shared' but the hosts DISAGREE on
+        #      mount_source -> stays unconfirmed AND is counted on its own
+        #      (multi_host_shared_diverged) — two hosts mounting the same
+        #      path from different exports is a real finding, not a
+        #      non-finding folded silently into the general count.
+        #   3. anything else ('local', 'unknown', or a mixed scope set) ->
+        #      stays unconfirmed exactly as before G113.
+        shared_diverged = False
+        if len(node_hosts) <= 1:
+            unconfirmed = False
+        elif set(host_scopes.values()) == {"shared"}:
+            same_source_everywhere = (
+                len(host_mount_sources) == len(node_hosts)
+                and len(set(host_mount_sources.values())) == 1
+            )
+            unconfirmed = not same_source_everywhere
+            shared_diverged = unconfirmed
+        else:
+            unconfirmed = True
         if unconfirmed:
             multi_host_unconfirmed += 1
+        if shared_diverged:
+            multi_host_shared_diverged += 1
         if is_profile:
             profiles += 1
         script_rows.append(
@@ -953,6 +997,7 @@ def plan_rua(
         hash_missing=hash_missing,
         repo_join_uncomputable=repo_join_uncomputable,
         multi_host_unconfirmed=multi_host_unconfirmed,
+        multi_host_shared_diverged=multi_host_shared_diverged,
         hosts=tuple(sorted(hosts)),
         hosts_unqualified=hosts_unqualified,
     )
