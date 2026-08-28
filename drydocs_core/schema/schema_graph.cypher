@@ -754,3 +754,7 @@ MERGE (a)-[r:HAD_ROLE]->(b)
 MATCH (a:SchemaMeta {name: 'Attribution'})
 MERGE (a)-[r:WAS_DERIVED_FROM]->(a)
   SET r.vocab_id = 'human_attribution_derived_from', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'human', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Employee'})
+MERGE (a)-[r:REPORTS_TO]->(a)
+  SET r.vocab_id = 'human_employee_reports_to', r.prov_maps_to = null, r.domain = 'human', r.status = 'planned';

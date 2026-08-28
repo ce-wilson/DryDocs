@@ -263,7 +263,24 @@ node_classifications:
   - label:      Employee
     class:      "prov:Agent"
     prov_type:  Agent
-    note:       "Person holding a role membership. seal_ontology_supplement.cypher."
+    note: >
+      Person holding a role membership. seal_ontology_supplement.cypher.
+      CREATION POLICY (G74 clause 2; SME direction 2026-08-18, gate-log RECORD
+      same date): STUB-AND-ENRICH. Any loader that meets a SID may MERGE the
+      :Employee stub (seal_applications.cypher mints owner/CTO/info-owner
+      stubs ON CREATE SET source='SEAL'; pat_team_roles likewise with 'pat') —
+      the roster load MERGEs on the SAME key and flips source to 'HR'
+      (authoritative), so a stub is upgraded in place and never duplicated.
+      THE STUB MARKER IS `source` AND NOTHING ELSE IS MINTED (G74's
+      producer-side ruling): a non-'HR' source value IS "awaiting
+      enrichment", and the count of such survivors after a roster load is the
+      HR-coverage report — a second awaiting-enrichment property would be a
+      parallel record of the same fact, the drift seam this registry exists
+      to close. The company-side halves (the backbone-and-enrich runbook
+      prose that FORBIDS the stub, v2 + published v3, and the reconciling
+      roster loader) are harmonized THROUGH THE PORT, not from here — the
+      producer cannot fix a doc it does not hold. Hierarchy placement is
+      human_employee_reports_to in 52-local-human.yaml (planned).
 
   - label:      Membership
     class:      "org:Membership"

@@ -550,3 +550,42 @@
     loader:       ~
     domain:       human
     status:       planned
+
+  # ── G74: the employee-hierarchy edge (gate tom-roles SS-B7's deferral gains its owner) ──
+
+  - id:           human_employee_reports_to
+    neo4j_label:  REPORTS_TO
+    inverse_label: "manages"
+    role:         ~
+    from_node:    Employee
+    to_node:      Employee
+    prov_maps_to: ~
+    note: >
+      G74 (SS-B7, signed 2026-08-11: "if a person is in the role, create the
+      relationship to the employee hierarchy in a later pass" — the deferral
+      now defers TO this entry instead of at nothing). Maps to org:reportsTo
+      (W3C ORG); the decision-matrix Agent->Agent row (prov:actedOnBehalfOf)
+      is deliberately NOT reached for — a reporting line is org structure,
+      not delegation of an activity, and mapping it to PROV would assert
+      responsibility semantics the source does not carry. Current-state edge
+      (the 2026-07-23 HR-hierarchy direction: single :Employee spine,
+      REPORTS_TO current-state sweep — history is that direction's temporal
+      series, not extra edges here). THE SOURCE IS IDENTIFIED, NOT LOADED:
+      the company HR employee-hierarchy database (~300k people), owned by the
+      COMPANY hr-emp-hierarchy gate (two-scope HR supplement: MD-root
+      subtrees + graph-seeded resolution; two-pass loader). No producer
+      loader exists or is built by G74 — the acceptance forbids pre-empting
+      that gate, and the roster loader + its tests are already recorded
+      company-only (T21). sys_user_group MEMBERSHIP IS A DISTRACTION for this
+      edge, ruled here so it is not re-proposed: group members are ADJACENCY
+      (who shares a support group), not hierarchy (who reports to whom) — a
+      real people-graph, but its shape is owned by snow-hpsm-queue-to-group
+      and cannot populate a reporting line. WAITING CONSUMERS, so the
+      deferral's cost stays visible: SS-B7's later pass, and O44's first
+      column (the ownership-reconciliation alluvial), whose MANAGER FILTER is
+      its whole point. Status planned: flips active in the commit that lands
+      a roster loader, which is company-side work arriving via the port.
+    supplement:   ~
+    loader:       ~
+    domain:       human
+    status:       planned
