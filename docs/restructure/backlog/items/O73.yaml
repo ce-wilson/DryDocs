@@ -1,0 +1,44 @@
+id: O73
+epic: web-console
+title: 'Credentials reload when the file changes, and a demo-login script the operator maintains until
+  SSO replaces it'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: in_progress
+depends_on:
+- O69
+inputs:
+- drydocs_api/credentials.py
+- drydocs_api/app.py
+- scripts/set_console_credential.py
+acceptance: |
+  Rotating or adding a console credential takes effect without restarting the API. The store the API holds re-reads its file when that file changes, decided by a stat rather than by a timer, so an unchanged file costs nothing per request. A re-read that fails - a corrupt file, a partial write - keeps the last known-good store and logs the reason rather than signing everybody out, because a torn write during a routine rotation must not become a denial of service; and the writer makes that case rare by replacing the file atomically instead of truncating it in place. Deleting the file is honoured, not ignored: it empties the store and the next login gets the fresh-clone message. The API still writes nothing (the ADR 0009 guard), and the injected-store path every test uses is unchanged.
+  A SECOND SCRIPT serves the demo path the operator owns until SSO arrives: one command that reports which accounts can sign in and gets the missing ones set, one that rotates them, and one that proves a login against the running API end to end so a demo failure can be told apart from a console bug. It never takes a secret on the command line. It states in its own text that it is the seam ADR 0005 hands to a company OIDC binding, so the day that lands the script is deleted rather than adapted.
+notes: |
+  Raised and built 2026-08-28 (desktop) on direct user direction, immediately after O69.
+  BOTH HALVES CAME FROM USING IT. The reload half came from the first real sign-in attempt:
+  the console refused a freshly-set credential, because create_app reads the credential file
+  once at startup and the running process was still holding the empty store it booted with.
+  That is a rough edge O69 shipped rather than a defect it introduced, and it costs a restart
+  on every rotation, which is exactly the friction that makes people leave a demo account's
+  secret unchanged for months.
+  THE FAILURE MODE THE DESIGN TURNS ON is the torn read. The writer used a plain write_text,
+  so a login landing mid-write would have seen half a JSON file. Failing closed there would
+  have locked every account out during a routine rotation - a denial of service caused by
+  the safety behaviour rather than by the fault. So the writer became atomic (temp file plus
+  os.replace, which is atomic on both platforms this repo runs on) and the reader keeps its
+  last known-good store when a re-read fails. A corrupt file therefore cannot grant access
+  it did not already grant, and cannot revoke access either; it just gets logged.
+  DELETION IS HONOURED THOUGH, and that asymmetry is deliberate. An unreadable file is
+  ambiguous - it may be mid-write - so the old store stands. An ABSENT file is not
+  ambiguous: somebody removed the accounts, and the fresh-clone path is the documented
+  meaning of no file at all.
+  THE DEMO SCRIPT IS DELIBERATELY DISPOSABLE. It exists because the producer repo is a proof
+  of concept whose console gets demonstrated, and a demo needs one command that answers is
+  this thing signed-in-able right now. It is written to be deleted at the OIDC binding rather
+  than adapted into it: ADR 0005 already put role resolution on the server, so a company
+  replaces the credential half and keeps everything above it.
