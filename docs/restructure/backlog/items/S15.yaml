@@ -9,7 +9,7 @@ agent: main
 model: sonnet
 priority: p2
 status: todo
-depends_on: []
+depends_on: [S13]
 inputs:
 - tests/unit/test_repo_paths.py
 - drydocs/cli_docs.py
@@ -28,3 +28,9 @@ notes: |
   Why it is worth fixing rather than tolerating: a developer narrowing to one file to iterate gets four red tests that have nothing to do with their change, which trains people to ignore red.
 
   Epic structure-remediation and module `drydocs-load` follow S8, which performed the CLI split that produced this shape. p2/sonnet.
+
+  CROSS-CITE 2026-08-28 (grooming): same defect as S13 (groomed 2026-08-23) — this item
+  was groomed 2026-08-26 from Idea-159 without finding it. S13 is the claim surface;
+  depends_on set so the ready strip offers exactly one of the pair. Closing S13 per its
+  acceptance (which now folds this item's narrower clauses) closes this item; set both
+  done in the same commit.

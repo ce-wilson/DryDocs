@@ -4210,3 +4210,23 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   precedent-only per config/classification.yaml's own NOT-ruled flag; it rides the
   tech-partner-attach-level sign-off session as a rider question.
 - **Authority note.** RECORD, not a ruling; no vocabulary status may cite this heading.
+
+## 2026-08-28 — RECORD: gate `source-connection-and-run-identity` DRAFTED, unsigned (WP-1 of the source-registry two-issue plan)
+
+- **What this records:** the prompt file config/gate-prompts/source-connection-and-run-identity.yaml
+  exists (6 sections, 19 confirmations, 2 provenance blocks). It puts to the SME: (A) the
+  `connection:` block on SYSTEM rows — settings group + secret REFERENCES by env-var name +
+  restricted-record pointer, values never; (B) the RESTRICTED CONNECTION RECORD term replacing
+  the connection/values sense of "internal twin" only, plus a `handling: restricted` marker on
+  Internal (J23 note-class); (C) `acquisition.since:` + the dated transition history on top of
+  N13's signed flip ruling, and the ADR-0012-vs-N12 acquisition-vocabulary reconcile; (D) the
+  :JobRun input-identity envelope (dataset id, zone-relative path, input sha256 — M3/M4
+  family); (E) declare-or-refuse as standing acquisition policy with a recorded override;
+  (F) fence + the profiler-as-typed-run rider parked to the review-status protocol.
+- **Evidence base:** the 2026-08-28 registry/acquisition survey (as-built state: the psgmgr
+  row's nulled connection field; the :JobRun envelope's missing input identity; the `load
+  --csv` undeclared route) + DataHub/OpenMetadata as cited external models, not adoptions.
+- **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
+  DRAFTED stubs as non-authority; no registry field, envelope property, or term may cite this
+  heading. Sign-off item: N19. The --csv closure (G121) and the S13 import fix build as plain
+  defects and do not wait for this gate.

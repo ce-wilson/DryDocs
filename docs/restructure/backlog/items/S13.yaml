@@ -31,3 +31,10 @@ notes: |
   Found 2026-08-23 (laptop) during a groom, while checking which Ready-to-pull items were safely dispatchable -- not from the inbox. The trail: running `tests/unit/test_repo_paths.py` in a partial selection produced four failures that the full suite does not produce, which looked like an order-dependent test until the six-interpreter probe showed the import itself is broken and the test was reporting it faithfully.
   WHY IT IS p2 AND NOT p1: the shipped CLI is unaffected -- `drydocs --help` and every verb work, because the real entry point imports the root first, and `drydocs_core` is untouched. What is broken is every OTHER way in: a targeted pytest run, an editor's test runner, an agent importing one command module to read its verbs, and any future consumer that does `from drydocs.cli_docs import ...`. Cheap to fix, and it decays badly -- each further split adds another module that only works if something else imported first.
   RELATION TO S8 (done, 2026-08-21): this is S8's residue, not a reversal of it. The split was right and the module boundary it drew is the one MODULE_MAP.md line 77 records; the defect is purely that the composition root reaches back into its parts at import time. Same family as the standing repo theme in J26/G80/J47 -- a thing is declared, and the check that would notice it is missing or looks in a place where it cannot fail.
+
+  CROSS-CITE 2026-08-28 (grooming): S15 (groomed 2026-08-26 from Idea-159) is THE SAME
+  DEFECT captured twice — neither cited the other until now. S13 is the CLAIM SURFACE:
+  whoever fixes this closes S15 in the same commit (S15 now depends_on S13 so the board
+  never offers both). S15's narrower acceptance clauses (file-alone runs shown, sibling
+  modules checked, coupling named where the next reader meets it) fold into this item's
+  acceptance as written.

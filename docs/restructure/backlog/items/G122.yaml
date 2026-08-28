@@ -1,0 +1,23 @@
+id: G122
+epic: component-topology
+title: 'Guard: every env-var name a settings group declares appears in .env.example'
+type: chore
+module: config
+phase: 6
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/config.py
+- .env.example
+acceptance: |
+  A pure test walks the drydocs_core.config settings groups (env_prefix + field names ->
+  expected env-var names) and asserts each appears in the committed .env.example, so the
+  runtime shape is reproducible from a clean checkout with no value ever committed. Failure
+  message names the missing key and the settings group. .env.example updated if names are
+  missing today (names only). Full suite + ruff.
+notes: |
+  Minted 2026-08-28 (WP-2.3 — the names-only half of the gate's A2 clause that needs no gate:
+  it asserts about committed shape, not about any proposed field).

@@ -1,0 +1,34 @@
+id: N20
+epic: source-column-mappings
+title: 'Build the connection-by-reference layer per the signed gate: connection blocks, restricted-record sweep, handling marker, acquisition.since + history'
+type: task
+module: config
+phase: 11
+agent: pipeline-config
+model: fable
+priority: p1
+status: todo
+depends_on: [N19]
+gates: [source-connection-and-run-identity]
+inputs:
+- config/source-registry.yaml
+- drydocs_core/source_registry.py
+- config/classification.yaml
+- config/schemas/source-registry.schema.json
+acceptance: |
+  Per the SIGNED rulings only (nothing builds from the draft): (a) `connection:` blocks land
+  on every DB-backed SYSTEM row (settings_group + secret_refs names-only + restricted_record
+  pointer); the `locator.service: ~` twin-comment idiom retires; (b) the names-only guard —
+  every secret_refs name appears in .env.example, no value-shaped strings in any connection
+  child (enforcement-is-the-test, S6: schema stays shape-only); (c) classification.yaml gains
+  `handling: restricted` per the ruling, guarded (restricted only on Internal); (d) the
+  restricted-connection-record sweep runs over the grep classes (internal twin|internal-twin|
+  values-twin|ccb-twin — NEVER bare twin): config comments, PUBLISH-BOUNDARY.md, two module
+  headers, two test failure messages re-worded; gate-log entries get dated corrections in
+  place; sweep re-run at acceptance shows zero live hits for the connection/values sense;
+  (e) `acquisition.since:` on every dataset row (git-derived backfill where possible, dated
+  note where not) + `acquisition_history:` per the ruled shape; the vocabulary ruling (C3)
+  applied with no third vocabulary; (f) full suite + both ruff gates + render refresh.
+notes: |
+  Minted 2026-08-28, gated. The company side adopts via the SME-review-status channel — the
+  Chronicle registration becomes the first restricted connection record their side.

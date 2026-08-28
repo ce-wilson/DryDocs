@@ -1055,6 +1055,21 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-28",
+      "title": "RECORD: gate `source-connection-and-run-identity` DRAFTED, unsigned (WP-1 of the source-registry two-issue plan)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/source-connection-and-run-identity.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4214",
+      "unblocks": [
+        "N19",
+        "N20",
+        "N21"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

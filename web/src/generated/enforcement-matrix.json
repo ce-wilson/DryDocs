@@ -363,7 +363,9 @@
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
       "pending_entries": 125,
-      "env_refs": [],
+      "env_refs": [
+        "SECRET_NAME"
+      ],
       "files": [
         "config/gate-prompts/airflow-crosswalk.yaml",
         "config/gate-prompts/audit-envelope-phase4.yaml",
@@ -410,6 +412,7 @@
         "config/gate-prompts/software-usage-patterns.yaml",
         "config/gate-prompts/software-version-context.yaml",
         "config/gate-prompts/sosa-jobrun-observation.yaml",
+        "config/gate-prompts/source-connection-and-run-identity.yaml",
         "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/standard-identity-and-carrier.yaml",
         "config/gate-prompts/tech-partner-attach-level.yaml",

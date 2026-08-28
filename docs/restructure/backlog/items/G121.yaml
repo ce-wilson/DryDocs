@@ -1,0 +1,30 @@
+id: G121
+epic: component-topology
+title: 'Close the undeclared --csv acquisition route: load --csv resolves through declared zones or refuses, with a recorded override'
+type: bug
+module: drydocs-load
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/cli_ingest.py
+- drydocs_core/data_zones.py
+- drydocs/chain_inputs.py
+acceptance: |
+  (a) `drydocs load <name> --csv <path>` resolves the path through
+  data_zones.read_zone_containing(); a path inside a declared read zone loads as today and the
+  run record names the zone; (b) a path OUTSIDE every declared zone is REFUSED (exit 2, message
+  names landing-zones as where to declare it) unless an explicit override flag is passed — and
+  the override records itself in BOTH the run record and the disk log (flag, path shape,
+  operator), never silently; (c) the guard test proves refusal AND recorded-override, RED
+  before the fix; (d) chain_inputs.py is the reuse pattern — no second resolution mechanism is
+  minted; (e) G78's close-note caveat ('load --csv untouched') gets a dated discharge note.
+notes: |
+  Minted 2026-08-28 (WP-2.1, plain defect — builds now, does not wait for the
+  source-connection-and-run-identity gate; its E1 clause ratifies the POLICY, this item fixes
+  the seam). Same defect class the company hit at their K8 loader review (an undeclared manual
+  acquisition route invisible to landing-zones). If the gate later refuses overrides entirely
+  (E2), the flag is removed in that build — record the dependency, do not wait on it.
