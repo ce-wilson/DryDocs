@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs/cli_ingest.py
