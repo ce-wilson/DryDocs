@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web scaffolding review — what to take from full-stack-fastapi-template and ss-python</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Web scaffolding review — what to take from full-stack-fastapi-template and ss-python</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Scope:</strong> an evaluation, not a runbook and not a decision record. It compares two public project scaffolds against what the DryDocs console already has, and names the pieces worth adopting. Each adoption gets a backlog item; this page is the reasoning behind those items.</li><li><strong>Status:</strong> DESCRIPTIVE — <strong>Rev 1, 2026-08-27.</strong></li><li><strong>Classification:</strong> External reasoning over Internal-Public context (both reviewed projects are public; nothing here carries company values, credentials or internal URLs)</li><li><strong>Reviewed:</strong> <code>fastapi/full-stack-fastapi-template</code> (MIT) and <code>serious-scaffold/ss-python</code></li><li><strong>Companion:</strong> <code>docs/design/drydocs-web-console-runbook.md</code>, <code>docs/design/drydocs-api-runbook.md</code>, ADR 0005 (the browser-to-graph access path)</li></ul>
+<h2 id="why-now"><span class="dd-margin-tag" aria-hidden="true">why-now</span>Why this review happened now</h2>
+<p>The console has run on <strong>mock authentication since 2026-07-13</strong> (item O2). Its banner still reads &quot;access path pending the O1 ADR&quot; — but O1 closed, ADR 0005 ruled the thin API, and no successor item for real authentication was ever minted. So the console&#x27;s only access control is a client-side persona picker with no owner and no ticket.</p>
+<p><strong>The stated reason for holding off was uncertainty about how internal authentication is handled, and the user has ruled that this is not the deciding factor.</strong> That ruling is what unblocks the work, and it is also the right call on the merits: the producer repo is a personal proof of concept whose long-term goal is a sanitized standalone template. A self-contained credential path is what a template needs. Whatever the company binds at its own seam — OIDC, SAML, an internal gateway — replaces the credential half and reuses everything above it, exactly the way ADR 0005 already anticipated when it made the SERVER the role authority rather than the browser.</p>
+<h2 id="what-we-already-have"><span class="dd-margin-tag" aria-hidden="true">what-we-already-have</span>What DryDocs already has</h2>
+<p>The gap is narrower than &quot;we have no authentication,&quot; and being precise about that is what keeps the adopted scope small.</p>
+<table><thead><tr><th>Piece</th><th>State</th></tr></thead><tbody><tr><td>Thin API, server-side role resolution</td><td><strong>Present.</strong> ADR 0005 decision 3: the client holds an opaque token, the role is resolved server-side per request.</td></tr><tr><td>Token issue / resolve / revoke</td><td><strong>Present.</strong> <code>drydocs_api/sessions.py</code> — <code>InMemorySessionStore</code>, <code>secrets.token_urlsafe(24)</code>, issued-at stamp.</td></tr><tr><td>A login endpoint</td><td><strong>Present but credential-free.</strong> It takes a <code>persona_id</code> and returns a session; an unknown persona is a 401. There is no secret to prove.</td></tr><tr><td>Client session + role gating</td><td><strong>Present, client-side and mock.</strong> <code>web/src/lib/auth.ts</code> re-derives role from the persona table so a forged blob degrades to sign-in; <code>lib/views.ts</code> holds one <code>canSee</code> registry.</td></tr><tr><td>Frontend build</td><td><strong>Present.</strong> Vite, React 19, Tailwind v4, ReUI, react-router-dom 7, oxlint.</td></tr><tr><td>Frontend tests</td><td><strong>ABSENT.</strong> No test runner of any kind — no Vitest, no Playwright. O43 still poses this as an open question.</td></tr><tr><td>Typed API client</td><td><strong>ABSENT.</strong> <code>web/src/lib/graphApi.ts</code> is hand-written <code>fetch</code> with hand-kept response types.</td></tr><tr><td>One-command local stack</td><td><strong>ABSENT.</strong> Four processes started by hand from the runbook.</td></tr><tr><td>Pre-commit hooks</td><td><strong>ABSENT.</strong> No <code>.pre-commit-config.yaml</code>.</td></tr></tbody></table>
+<h2 id="fastapi-template"><span class="dd-margin-tag" aria-hidden="true">fastapi-template</span>full-stack-fastapi-template — what is worth taking</h2>
+<p>The template&#x27;s stack is close enough to ours that the comparison is useful rather than aspirational: FastAPI, Pydantic settings, pytest, Vite, TypeScript, Tailwind, and shadcn-style components. We already run the same shapes. Four pieces are worth adopting.</p>
+<h3 id="fastapi-template--1-the-authentication-pattern-not-the">1. The authentication pattern, not the user model</h3>
+<p>The mechanism, named exactly: <code>OAuth2PasswordBearer(tokenUrl=&quot;.../login/access-token&quot;)</code> for extraction; <code>pwdlib</code> with <code>Argon2Hasher()</code> primary and <code>BcryptHasher()</code> fallback for hashing; HS256 JWT carrying <code>sub</code> and <code>exp</code>; and — the part worth copying most — the <strong>dependency type aliases</strong>: <code>SessionDep</code>, <code>TokenDep</code>, <code>CurrentUser</code>, plus a separate <code>get_current_active_superuser</code>. A route declares <code>CurrentUser</code> and authentication becomes a signature, not a body of code repeated per handler.</p>
+<p><strong>What we take:</strong> the alias pattern, the hashing library choice, and the token shape. <strong>What we do not take:</strong> SQLModel, PostgreSQL, Alembic and a <code>User</code> table. DryDocs has no relational user store and should not grow one to hold four personas; the credential store is a small deliberate decision of its own, and the item names it as such rather than importing an ORM to answer it. <strong>What we do not need at all:</strong> email-based password recovery, React Email, Mailpit. A proof-of-concept console with a handful of accounts does not need a mail path, and adding one would put an SMTP dependency and an email template corpus into a repo whose publish boundary we would then have to reason about.</p>
+<h3 id="fastapi-template--2-the-generated-frontend-client">2. The generated frontend client</h3>
+<p>The template generates its TypeScript client from the backend&#x27;s OpenAPI schema. We hand-write <code>graphApi.ts</code> and hand-maintain its response types against <code>drydocs_api</code>. That is a drift surface with no guard, and this repo has already been bitten twice by the same class of problem in a different place — a surface that restates a declaration instead of deriving from it. Generating the client makes an API change a compile error in the browser code.</p>
+<h3 id="fastapi-template--3-playwright-for-end-to-end-tests">3. Playwright for end-to-end tests</h3>
+<p>The console has <strong>no automated test of any kind</strong>. Every UI verification this project has done was a person or an agent driving Chrome and looking, and the ledger in <code>config/taxonomy/ui-tests.yaml</code> records those observations as manual cases precisely because nothing can run them. The Z5 map defect found on 2026-08-27 is the argument: a synthetic city never resolved, no Python guard could see it because the bug was in TypeScript, and it took rendering the page and reading a list to find. That is exactly what an E2E test automates.</p>
+<h3 id="fastapi-template--4-compose-for-the-local-stack">4. Compose for the local stack</h3>
+<p>The runbook&#x27;s Startup section is four processes with four success checks. Compose collapses that to one command and makes the success checks a health-check declaration. <strong>What we do not take:</strong> Traefik and automatic HTTPS. There is no deployment; a reverse proxy would be scaffolding for a scenario that does not exist.</p>
+<h2 id="ss-python"><span class="dd-margin-tag" aria-hidden="true">ss-python</span>ss-python — what is worth taking</h2>
+<p>A Copier-based Python project scaffold: pdm, ruff, mypy, pytest with a coverage threshold, Sphinx with Furo, semantic-release, Renovate, commitlint, pre-commit, dev containers, and a Makefile that centralizes the common actions.</p>
+<p>Most of it we either already have in a different form or have deliberately ruled against.</p>
+<table><thead><tr><th>Piece</th><th>Verdict</th></tr></thead><tbody><tr><td>ruff, pytest</td><td>Already ours.</td></tr><tr><td><strong>pre-commit</strong></td><td><strong>ADOPT.</strong> See below — this one has direct evidence behind it.</td></tr><tr><td>mypy</td><td>Consider separately. A type-checking sweep over an existing codebase is its own project, not scaffolding.</td></tr><tr><td>Sphinx + Furo + Read the Docs</td><td><strong>REJECT.</strong> DryDocs has a deterministic <code>.md</code> to <code>.html</code> renderer whose output the HITL loop keys feedback anchors on. A second documentation system would compete with a governed surface.</td></tr><tr><td>semantic-release, commitlint</td><td><strong>REJECT for now.</strong> This repo&#x27;s commit discipline is a written convention with real reasons behind its shape; automating version bumps on a proof of concept buys nothing.</td></tr><tr><td>Renovate</td><td><strong>Worth an idea, not an item yet.</strong> Useful once dependency drift is a real problem.</td></tr><tr><td>Makefile as the single task entry point</td><td>Partially ours already via <code>poetry run</code> verbs and <code>snapshot.ps1</code>; a unified entry point is a nice-to-have, not a gap.</td></tr><tr><td><strong>Copier template mechanics</strong></td><td><strong>The strategically interesting one.</strong> DryDocs&#x27; long-term goal is a sanitized standalone template another organization can implement. Copier is a template that can be <em>updated in place</em> after generation, which is precisely the property that goal needs. Inboxed as an idea rather than an item, because it is a direction to rule on, not a task to schedule.</td></tr></tbody></table>
+<h3>pre-commit, and why it earns its place</h3>
+<p>Between <strong>2026-08-05 and 2026-08-12 this repo&#x27;s CI ran red for over a hundred consecutive runs</strong> on <code>ruff check</code> and <code>ruff format --check</code>, while sessions kept pushing past it. It stayed invisible because the unit suite passed the whole time, so nothing local ever looked wrong. The session ritual now checks CI explicitly, and <code>snapshot.ps1</code> performs that check itself — but both are <em>detection after the fact</em>. A pre-commit hook running the same two commands makes the failure impossible to commit in the first place. This is the one piece of ss-python&#x27;s tooling that answers a failure this project actually had.</p>
+<h2 id="adoption"><span class="dd-margin-tag" aria-hidden="true">adoption</span>Adoption plan</h2>
+<table><thead><tr><th>Item</th><th>What it does</th></tr></thead><tbody><tr><td><strong>O69</strong></td><td>Real authentication: a credential step and a durable session, replacing the persona picker. The headline item.</td></tr><tr><td><strong>O70</strong></td><td>Generate the TypeScript API client from the OpenAPI schema; retire the hand-written types.</td></tr><tr><td><strong>O71</strong></td><td>A frontend test runner — Vitest for units, Playwright for end to end — which also answers O43&#x27;s open question.</td></tr><tr><td><strong>O72</strong></td><td>One-command local stack via Compose, with the runbook&#x27;s success checks as health checks.</td></tr><tr><td><strong>J52</strong></td><td>pre-commit hooks running the two commands CI blocks on.</td></tr></tbody></table>
+<p>Deliberately not items: Traefik, email recovery, Sphinx, semantic-release, an ORM and a user table. Each is named above with the reason.</p>
+<h2 id="unresolved"><span class="dd-margin-tag" aria-hidden="true">unresolved</span>One unresolved reference</h2>
+<p>The review was asked to find a hardcoded login this project had built with users named something like <em>monk</em> or <em>morpheus</em>. <strong>It is not in this repository.</strong> Searched: the working tree, every branch and tag, and the archived pre-squash history (<code>archive/old-history-2026-07-20</code>) with <code>git log --all -S</code>, plus the sibling projects on this machine. Zero hits for <code>morpheus</code>; <code>monk</code> matches only <code>monkeypatch</code>, and <code>trinity</code> only BMC event documentation. The only demo-user set found nearby is the vendored React theme under <code>start_react_free_v1.0.0</code>, whose mock users are <code>admin</code>, <code>user</code> and <code>guest</code>.</p>
+<p>If that login exists it is on the other machine, in the company checkout, or on a surface outside git. Worth recovering before O69 starts only if it carried a decision we would otherwise re-make; the mechanism itself is not something we would copy.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>web-scaffolding-review-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<script>
+
+(function(){
+  var DOC="web-scaffolding-review", FILE="web-scaffolding-review-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

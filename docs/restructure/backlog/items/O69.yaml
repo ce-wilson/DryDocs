@@ -1,0 +1,45 @@
+id: O69
+epic: web-console
+title: 'Real authentication for the console: a credential step and a durable session, replacing the persona
+  picker the banner has called MOCK since July'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/sessions.py
+- drydocs_api/personas.py
+- drydocs_api/app.py
+- web/src/lib/auth.ts
+- docs/design/web-scaffolding-review.md
+acceptance: |
+  Signing in requires proving a secret. The API gains a credential-checked login that returns a token with an expiry; the session store gains that expiry and rejects an expired token as 401; and authentication becomes a route signature rather than per-handler code, following the reviewed template's dependency-alias pattern (a CurrentUser-style annotated dependency, plus a separate one for the admin-only surfaces). Hashing uses pwdlib with Argon2 primary and bcrypt fallback - never a bare hash, never a comparison that is not constant-time. The server stays the role authority per ADR 0005 decision 3: the browser continues to hold nothing but an opaque token, and no role travels in the client's session blob. The MOCK banner's text is re-decided in the same change rather than left standing - it currently promises a decision that was already made. Every existing persona-gated behaviour still holds: an unauthorised deep link cannot reach the raw-Cypher console, a garbage session degrades to the sign-in screen, and the dev-only as= affordance stays baked out of production bundles. Credentials for the synthetic personas live outside the publish boundary; no secret is committed.
+notes: |
+  Raised 2026-08-27 from the web-scaffolding review (docs/design/web-scaffolding-review.md),
+  which compared fastapi/full-stack-fastapi-template and serious-scaffold/ss-python against
+  what the console already has.
+  WHY THIS HAD NO ITEM UNTIL NOW, which is the finding rather than an excuse: O2 shipped the
+  mock deliberately un-blocked on O1, on the reasoning that real authn/authz would arrive with
+  the access-path decision. That decision arrived - O1 closed, ADR 0005 ruled the thin API -
+  and no successor item was ever minted, so the console's only access control has been a
+  client-side persona picker with no owner for six weeks. The banner still reads that the
+  access path is pending the O1 ADR, promising a pending decision that was made.
+  THE HOLD IS RELEASED BY USER RULING 2026-08-27: uncertainty about how internal authentication
+  is handled company-side is NOT the deciding factor. It should not be: the producer repo is a
+  personal proof of concept whose long-term goal is a sanitized standalone template, and a
+  template needs a self-contained credential path. A company binds its own OIDC or gateway at
+  its seam, replacing the credential half and reusing everything above it - which is exactly
+  what ADR 0005 already made possible by putting role resolution on the server.
+  THE GAP IS NARROWER THAN IT SOUNDS, and the acceptance is scoped to it. Token issue, resolve
+  and revoke already exist in drydocs_api/sessions.py; role already resolves server-side; the
+  login route already 401s an unknown identity. What is missing is a secret to prove, an
+  expiry, and the dependency shape that stops each handler re-implementing the check.
+  DELIBERATELY NOT IN SCOPE, each with its reason in the review: SQLModel, PostgreSQL and a
+  User table (DryDocs has no relational user store and should not grow an ORM to hold four
+  personas - where the credential lives is a small decision this item makes explicitly);
+  email-based password recovery, React Email and Mailpit (a mail path and an SMTP dependency
+  for a console with a handful of accounts); and any real directory integration.

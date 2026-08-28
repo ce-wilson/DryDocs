@@ -1,0 +1,28 @@
+id: O72
+epic: web-console
+title: 'One-command local stack: Compose the four processes the runbook starts by hand, with its success
+  checks expressed as health checks'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/design/drydocs-web-console-runbook.md
+- drydocs_api/app.py
+- web/package.json
+- docs/design/web-scaffolding-review.md
+acceptance: |
+  A committed Compose file brings up the console stack in one command: Neo4j, drydocs-api on 8001, the ADK agent server on 8000, and the Vite dev server on 5173. Each service declares a health check that is the runbook's own success test for that step - the API is healthy when /health answers ok, the agent server when it lists exactly its four apps, and Vite when it serves the page - so a broken dependency surfaces as an unhealthy service instead of a browser error three layers away. Ports stay exactly as they are, because the API's CORS allow-list names 5173 and 4173 specifically and a drifted port fails as a CORS error that reads like an API fault. The runbook's Startup section is updated to offer the one-command path alongside the per-process one, and keeps the per-process path, since debugging a single service is a real need. No credential is baked into the Compose file.
+notes: |
+  Raised 2026-08-27 from the web-scaffolding review. The reviewed FastAPI template uses
+  Compose for exactly this. Our runbook Startup section is four processes with four success
+  checks, and a session that starts them by hand gets to discover in the browser which one it
+  forgot - the documented Ask failure mode, where a missing agent server on 8000 presents as
+  a bare "Failed to fetch" with nothing in the API log, is precisely that shape.
+  NOT IN SCOPE: Traefik and automatic HTTPS, which the template ships and we would be adding
+  for a deployment that does not exist. This is a local-development convenience, and framing
+  it as anything more would invite exactly that scope.

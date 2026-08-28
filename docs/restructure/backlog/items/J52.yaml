@@ -1,0 +1,35 @@
+id: J52
+epic: release-infrastructure
+title: 'pre-commit hooks running the two commands CI blocks on, so the lint failure that ran red for a
+  hundred consecutive runs cannot be committed again'
+type: chore
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .github/workflows
+- pyproject.toml
+- docs/design/web-scaffolding-review.md
+acceptance: |
+  A committed .pre-commit-config.yaml runs, at minimum, the two commands CI blocks on - ruff check and ruff format - on staged files, so the failure mode this repo actually had cannot reach a commit. Installation is one documented command and the session ritual says where it goes; the hooks are not silently mandatory, because a repo that fails an unexplained hook on a fresh clone teaches people to pass --no-verify. The hook versions are pinned and match the ruff the project already depends on, so local and CI cannot disagree about what a violation is - a hook that lints to a different standard than CI is worse than no hook. CI keeps its own ruff steps unchanged: the hook is a faster first line, never a replacement for the gate.
+notes: |
+  Raised 2026-08-27 from the web-scaffolding review of serious-scaffold/ss-python, which
+  ships pre-commit as standard. Of that scaffold's tooling this is the single piece that
+  answers a failure this project actually had.
+  THE EVIDENCE: between 2026-08-05 and 2026-08-12 CI ran red for more than a hundred
+  consecutive runs on ruff check and ruff format, while sessions kept pushing past it. It
+  stayed invisible because the unit suite passed the whole time, so nothing local ever
+  looked wrong. The response then was detection - the session ritual now checks CI, and
+  snapshot.ps1 performs that check itself against HEAD's own sha. Both are after the fact.
+  A hook makes the commit itself fail, which is the only intervention that does not depend
+  on somebody remembering to look.
+  DELIBERATELY NOT ADOPTED from the same scaffold, with reasons in the review: Sphinx and
+  Read the Docs (we have a deterministic renderer whose output the HITL loop keys feedback
+  anchors on, and a second documentation system would compete with a governed surface);
+  semantic-release and commitlint (this repo's commit conventions carry reasons a linter
+  cannot check, and automated version bumps buy nothing on a proof of concept); mypy (a
+  type-checking sweep over an existing codebase is its own project, not scaffolding).

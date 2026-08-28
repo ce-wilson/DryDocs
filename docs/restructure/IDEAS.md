@@ -93,6 +93,30 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-163`** · 2026-08-27 · `[idea]` · **open** · prio? **Med** —
+  **Copier is the mechanism the standalone-template goal has been missing — a template that can be
+  UPDATED in place after generation, not just generated once.** Noticed while reviewing
+  `serious-scaffold/ss-python` for web scaffolding (`docs/design/web-scaffolding-review.md`); it is
+  the one piece of that project worth more than the tooling it ships.
+  - **The goal it serves.** A standing long-term aim is to turn DryDocs into a sanitized standalone
+    template another organization can implement. Every sanitization decision, every placeholder,
+    every `[seal-id]` and `[db]` in the registry already pays into it. What has never been decided
+    is HOW a downstream copy would be created, or what happens to it afterwards.
+  - **Why the update property is the whole point.** A one-shot generator (cookiecutter) hands
+    someone a copy that diverges from the day it is made — which is exactly the producer-to-company
+    divergence this project already manages by hand, with port prompts, a manifest, and a ledger.
+    Copier can re-apply template changes to an already-generated project, so downstream copies could
+    pull improvements instead of drifting. That is a different relationship than the one the
+    cross-repo port models, and it is worth knowing whether it is the better one.
+  - **The honest counter-argument, so it is not discovered later.** Most of what makes DryDocs
+    useful is CONTENT, not scaffolding — the ontology, the registries, the gate corpus, the
+    vocabularies. A template can carry the shapes and the guards; it cannot carry another
+    organization's Control-M estate. So the question is not "should we be a Copier template" but
+    "which layer is templatable at all", and that is a ruling, not a task.
+  - **Not an item on purpose.** This is a direction to decide, not work to schedule. If the answer
+    is yes, it reshapes how the repo is laid out; if no, the sanitization work stands unchanged and
+    loses nothing.
+
 - **`Idea-162`** · 2026-08-27 · `[bug]` · **open** · prio? **Med** —
   **The Z1/Z3 and Z5 fixtures were each built correctly and do not interlock, so the bundled
   demo can only ever fill one of the map's three dimensions.** Found by running the whole Z3
