@@ -763,6 +763,171 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal-public",
         ),
         # O17 runbooks frames.
+        # Q15 — agent NAVIGATION over the vendor-docs backbone (plan section 4).
+        # An agent usually arrives knowing the noun ("how do I use exportdefjob?"),
+        # so the name-addressable path is primary and similarity search is the
+        # FALLBACK, not the only door in. All four: bounded expansion (no
+        # variable-length traversal), every row carries source_url + doc_version +
+        # trust so the R5 citation surface renders provenance, and chunk text is
+        # NEVER returned here — docs.chunks.v1 is the deliberate second step,
+        # spent only after triage on abstract + page_role. Zero rows is the
+        # honest state until the Q24 flip + first load (desktop) and the Q25
+        # entity-core build land (gate vendor-docs-entity-core, signed 21/21).
+        QuerySpec(
+            id="docs.utility-lookup.v1",
+            database="drydocs",
+            description=(
+                "Exact utility name -> its documentation, grouped by page_role "
+                "(overview | rules | parameters | examples | reference). The PRIMARY "
+                "agent entry point: an indexed exact match beats a vector search for "
+                "a known identifier. Zero rows = the utility is not minted yet (Q25) "
+                "or the corpus is not loaded in this database (Q24, desktop-bound); "
+                "docs.search.v1 is the fallback when the NAME is unknown. Rows are "
+                "chunk-free: triage on abstract + page_role, then docs.chunks.v1. "
+                "doc_version rides every row — the capture is 9.0.20 against a "
+                "9.0.21 estate, and version_verified says whether the page was "
+                "checked against the newer release."
+            ),
+            cypher=(
+                "MATCH (u:ControlMUtility {name: $name}) WHERE NOT u:SchemaMeta "
+                "MATCH (d:Document)-[:DESCRIBES]->(u) WHERE NOT d:SchemaMeta "
+                "RETURN u.name AS utility, u.family AS family, u.kind AS kind, "
+                "d.page_role AS page_role, d.doc_id AS doc_id, d.title AS title, "
+                "d.abstract AS abstract, d.source_url AS source_url, "
+                "d.doc_version AS doc_version, d.version_verified AS version_verified, "
+                "d.trust AS trust "
+                "ORDER BY page_role, title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("utility", "string", "Utility"),
+                ColumnDef("family", "string", "Family"),
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("name", "string"), *_LIMIT),
+        ),
+        QuerySpec(
+            id="docs.section-browse.v1",
+            database="drydocs",
+            description=(
+                "One section of the vendor TOC: its documents and its immediate "
+                "subsections (kind column says which), ONE hop, never a tree walk. "
+                "IN_SECTION / SUBSECTION_OF are planned-only until the Q24 load "
+                "lands (desktop-bound), so the OPTIONAL MATCH halves return null "
+                "rows on an unloaded database — the honest empty state, not a "
+                "defect. Section rows carry '-' for the document-only citation "
+                "columns; document rows carry the full R5 provenance set."
+            ),
+            cypher=(
+                "MATCH (s:DocSection {section_id: $section_id}) "
+                "OPTIONAL MATCH (d:Document)-[:IN_SECTION]->(s) "
+                "WHERE NOT d:SchemaMeta "
+                "WITH s, collect(d) AS docs "
+                "OPTIONAL MATCH (child:DocSection)-[:SUBSECTION_OF]->(s) "
+                "WITH s, docs, collect(child) AS children "
+                "UNWIND (docs + children) AS row "
+                "WITH row WHERE row IS NOT NULL "
+                "RETURN CASE WHEN row:Document THEN 'document' ELSE 'subsection' END AS kind, "
+                "coalesce(row.doc_id, row.section_id) AS id, row.title AS title, "
+                "coalesce(row.page_role, '-') AS page_role, "
+                "coalesce(row.abstract, '-') AS abstract, "
+                "coalesce(row.source_url, '-') AS source_url, "
+                "coalesce(row.doc_version, '-') AS doc_version, "
+                "coalesce(row.trust, '-') AS trust "
+                "ORDER BY kind, page_role, title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("id", "string", "Id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("section_id", "string"), *_LIMIT),
+            planned_terms=("IN_SECTION", "SUBSECTION_OF"),
+        ),
+        QuerySpec(
+            id="docs.role-siblings.v1",
+            database="drydocs",
+            description=(
+                "From one document to the SAME utility's pages of another role — "
+                "'show me the examples for this' without a fresh search. One hop "
+                "through the shared ControlMUtility subject; zero rows until the "
+                "Q25 DESCRIBES title-match lands. Chunk-free; docs.chunks.v1 is "
+                "the second step."
+            ),
+            cypher=(
+                "MATCH (d:Document {doc_id: $doc_id})-[:DESCRIBES]->(u:ControlMUtility) "
+                "WHERE NOT d:SchemaMeta AND NOT u:SchemaMeta "
+                "MATCH (sib:Document)-[:DESCRIBES]->(u) "
+                "WHERE NOT sib:SchemaMeta AND sib.doc_id <> d.doc_id "
+                "RETURN u.name AS utility, sib.page_role AS page_role, "
+                "sib.doc_id AS doc_id, sib.title AS title, sib.abstract AS abstract, "
+                "sib.source_url AS source_url, sib.doc_version AS doc_version, "
+                "sib.version_verified AS version_verified, sib.trust AS trust "
+                "ORDER BY page_role, title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("utility", "string", "Utility"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("doc_id", "string"), *_LIMIT),
+        ),
+        QuerySpec(
+            id="docs.search.v1",
+            database="drydocs",
+            description=(
+                "Substring search over document titles and abstracts — EXPLICITLY "
+                "THE FALLBACK for 'I do not know the name'; when the utility name "
+                "is known, docs.utility-lookup.v1 is faster and more reliable (plan "
+                "section 4's demotion of similarity search). Deterministic bounded "
+                "scan, no index dependency; a full-text/vector upgrade rides the "
+                "loaded corpus and is recorded in the plan, not silently promised "
+                "here. Chunk-free; docs.chunks.v1 is the second step."
+            ),
+            cypher=(
+                "MATCH (d:Document) WHERE NOT d:SchemaMeta "
+                "AND (toLower(d.title) CONTAINS toLower($q) "
+                "OR toLower(coalesce(d.abstract, '')) CONTAINS toLower($q)) "
+                "RETURN d.doc_id AS doc_id, d.title AS title, "
+                "d.page_role AS page_role, d.abstract AS abstract, "
+                "d.source_url AS source_url, d.doc_version AS doc_version, "
+                "d.version_verified AS version_verified, d.trust AS trust "
+                "ORDER BY title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("q", "string"), *_LIMIT),
+        ),
         QuerySpec(
             id="runbooks.series.v1",
             # G30 ruling (2026-07-26): curated lineage lands in `drydocs`, per ADR

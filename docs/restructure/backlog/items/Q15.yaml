@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - Q13
 inputs:
@@ -20,3 +20,25 @@ acceptance: |
   Four registered QuerySpecs — docs.utility-lookup.v1 (exact name -> docs grouped by page_role), docs.section-browse.v1 (section -> siblings, one hop), docs.role-siblings.v1 (doc -> same-subject docs of another role), and docs.search.v1 (full-text/vector, explicitly the FALLBACK for "I don't know the name"). All four: bounded expansion with no unbounded variable-length traversal; every row carries source_url + doc_version + trust so the R5 citation surface renders provenance; chunk text is NOT returned by default — the agent asks for it as a deliberate second step. Proven against the loaded corpus, and reachable from /ask without touching /raw-cypher.
 notes: |
   Section 4 of the plan. The point is that an agent usually arrives already knowing the noun ("how do I use exportdefjob?"), and a vector search for a known exact identifier is both slower and less reliable than an indexed exact match — so similarity search is demoted to the fallback path rather than being the only door in. Chunk-free by default because agent context is the scarce resource: triage on abstract + page_role, spend context on text only after choosing. Specs over raw Cypher per the R4/R5 design (ephemeral specs + citations carrying trust and classification) — this keeps doc answers citable and keeps agents off /raw-cypher.
+  DONE 2026-08-27 (laptop, Lane B). All four specs registered in the docs family
+  (drydocs_api/query_specs.py, beside docs.chunks.v1 — which turned out to already BE the
+  deliberate second step for chunk text, so the specs cite it by id): utility-lookup (exact
+  ControlMUtility name -> docs grouped by page_role, the primary door), section-browse (one
+  TOC hop, documents + immediate subsections, kind column; IN_SECTION/SUBSECTION_OF are
+  planned-only so they ride OPTIONAL MATCH + planned_terms — R20's written-down
+  degradation), role-siblings (same-utility docs of another role via the shared DESCRIBES
+  subject), and search (substring over title+abstract, EXPLICITLY the fallback, naming
+  utility-lookup as the primary; the full-text/vector upgrade is recorded as riding the
+  loaded corpus, not silently promised). All rows carry source_url + doc_version + trust
+  (+ version_verified where document-grain) for the R5 citation surface; no :Chunk anywhere;
+  no variable-length traversal; LIMIT-bounded. REACHABLE FROM /ask BY CONSTRUCTION:
+  the graph_qa router's catalog derives one line per QUERY_SPECS entry
+  (agents/common/specs_catalog.catalog_lines), so registration IS reachability and
+  /raw-cypher is untouched. THE "PROVEN AGAINST THE LOADED CORPUS" CLAUSE IS DEFERRED
+  HONESTLY (J18, the Q13-close precedent): the corpus is loaded on NO machine — the Q24
+  flip + first load is venue-bound to the DESKTOP (gate SS-E4) and Q25 mints the entity
+  core — so proof here is offline (guard test test_docs_navigation_specs.py: citation
+  columns, chunk-free, bounded, fallback demotion, planned_terms exactness, O52
+  alias-column agreement; plus the R20 static vocabulary guard over all four). Live rows
+  arrive with Q24/Q25 on the machine holding the capture. Suite 2578 passed / 11 skipped;
+  ruff clean.
