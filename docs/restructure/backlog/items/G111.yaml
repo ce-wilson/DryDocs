@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/data_zones.py
@@ -29,3 +29,15 @@ notes: |
   Module `drydocs-core` and epic component-topology recorded as a choice: `config/data-zones.yaml` is the declaration but the defect is entirely in the resolver and its guard, which are core. Filing it under `config` would put the item on the shelf where nothing needs to change.
 
   Mechanism only. No edge semantics, no gate. p2 rather than p1 because nothing loses data — a log lands in the right place today; only the description of where it landed is wrong.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  data_zones._resolve() now honors a zone's declared env: field, reusing
+  drydocs_core.log_kinds.resolve_env_override() (extracted from resolve_root()'s existing
+  check) rather than re-deriving the order -- the log root and the run-logs zone read the
+  same environment variable through one implementation. The declared-equals-resolved guard
+  in tests/unit/test_data_zones.py now walks every zone, not just helper-carrying ones,
+  closing the gap that let this survive G81 and G109; it was written and run RED-first
+  against the unfixed code before the fix landed (TypeError + 2 failing tests recorded).
+  Verified live per J18: desktop, DRYDOCS_LOGDIR set -- drydocs landing-zones reports the
+  run-logs zone at the DRYDOCS_LOGDIR directory, matching drydocs_core.run_log.resolve_log_dir()
+  exactly. resolve_root()'s docstring paragraph that named the defect as live next door now
+  describes the fixed state.
