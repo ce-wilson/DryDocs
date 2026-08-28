@@ -115,6 +115,18 @@ stay skipped — confirm with the operator if a new one appears.
   constant-fix commit retires the partial-atom half; the
   duplicate-generations half retires only when a company reconcile session
   closes the de-dup with its own commit cited.
+  UPDATE 2026-08-28: that reconcile session is IN PROGRESS company-side (the
+  S8-apply session; survey-only so far, tree untouched at survey close --
+  their census: 61 inline / 40 in modules / 32 in both, 18 substantively
+  drifted BOTH directions / 29 inline-only / 8 module-only). Two producer
+  rulings relayed for it: merge policy = UNION-never-drop, refined by the
+  feature-vs-superseded-mechanism test (their inline run-log tee is probably
+  the pre-G105 generation -- LoaderRunLog now lives in loaders/base.py --
+  verify by behavior before keeping); the 29 company-only verbs DISTRIBUTE
+  BY DOMAIN into the six shared modules (never a provenance-keyed seventh
+  file). A mid-stage company tree may show partially-reconciled cli_* files
+  at the next port -- read the stage commits; do not treat half-merged pairs
+  as fresh drift.
 - **`config/taxonomy/tom-role-vocabulary.yaml` — the register is company-RULED
   (2026-08-26 G70 adoption session): Module Owner renamed, Capacity Planner
   added, IRM flipped `required` — ruled against 232k-row report exports the
