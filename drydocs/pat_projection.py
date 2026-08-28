@@ -31,14 +31,28 @@ spelling in :data:`DEFAULT_HEADER_MAP` is DryDocs' belief about the export,
 transcribed from the C17 gate record (ID + Name pairs for Product / Supporting
 Area Product / Sponsoring Area Product / Sponsoring Product; Product Line and
 Sponsoring Product Line as names only) and the pat-evidence README. So the map is
-a PARAMETER, not a constant: the projection REFUSES to guess — a required logical
+a PARAMETER, not a constant: the projection REFUSES to guess — a mapped logical
 field whose header is absent from the raw file is a hard error naming the header
-it looked for, never a silent empty column — and the first real run pins the
-spellings with ``--header-map`` (a YAML ``{logical_field: "Raw Header"}``), after
+it looked for, never a silent empty column (see LOUDNESS below for the one
+documented exception) — and the first real run pins the spellings with
+``--header-map`` (a YAML ``{logical_field: "Raw Header"}``), after
 which the ledger ``config/source-mappings/pat-team-report.yaml`` is corrected to
 the physical names and ``census: pending`` is closed. Column NAMES are mechanism
 (Internal-Public); the raw report and both projected files are Internal and stay
 under ``DRYDOCS_DATA_ROOT`` — never in the tree.
+
+LOUDNESS (K30, 2026-08-28). Absence of ANY mapped header is loud, not only the
+three in :data:`REQUIRED_FIELDS`. Before K30 a non-required field whose header
+was missing degraded to a silently empty column and only landed in
+``ProjectionReport.missing_optional`` — a line the CLI printed on a normal,
+exit-0 run, easy to miss. There are now exactly two outcomes for a mapped
+field whose header the raw file does not carry: it raises (the default), or it
+is named in :data:`ACKNOWLEDGED_ABSENT` with a reason (a permanent, documented
+exception — not a quiet "optional" tier). ``jira_board_id`` is the first
+occupant: it maps to ``"JIRA Board"``, a header ``TEAM_DETAILS_REPORT`` does
+not carry — the field lives in a sibling PAT export this module does not read.
+Kept mapped rather than dropped so ``DevTeamRow.jira_board_id`` stays a
+documented, named gap instead of one more silently absent column.
 
 WHAT IS DELIBERATELY DROPPED, and why it is written here rather than left to
 ``extra="ignore"``: ``Team Type Name`` (discipline — a property of the TEAM, not of
@@ -103,6 +117,24 @@ DEFAULT_HEADER_MAP: dict[str, str] = {
 #: for any of these is a hard error — the projection never invents a key.
 REQUIRED_FIELDS = ("team_id", "product_id", "relationship_type")
 
+#: Mapped logical fields (see LOUDNESS above) whose header is KNOWN to be
+#: permanently absent from THIS report — not a spelling gap --header-map will
+#: ever close, but a field this raw file simply does not carry. Listing a
+#: field here is what keeps (a)'s loudness rule from firing on every normal
+#: run; every entry says WHERE the header actually lives so the gap stays
+#: legible instead of quietly re-becoming a silent empty column.
+ACKNOWLEDGED_ABSENT: dict[str, str] = {
+    "jira_board_id": (
+        "maps to 'JIRA Board' (DEFAULT_HEADER_MAP); TEAM_DETAILS_REPORT does not "
+        "carry it — the field lives in a sibling PAT export this module does not "
+        "read. Kept mapped, not dropped, so DevTeamRow.jira_board_id has a named "
+        "home if a future projection joins that export in. K30, 2026-08-28."
+    ),
+}
+assert set(ACKNOWLEDGED_ABSENT) <= set(
+    DEFAULT_HEADER_MAP
+), "ACKNOWLEDGED_ABSENT names a logical field DEFAULT_HEADER_MAP does not map"
+
 #: Raw headers the projection knows it is dropping, with the reason — so the
 #: report can say "dropped by design" apart from "unknown column, look at it".
 KNOWN_DROPPED: dict[str, str] = {
@@ -141,8 +173,11 @@ class ProjectionReport:
     unrecognised_team_type: int = 0
     #: raw headers actually seen, in file order — the census input for the ledger
     raw_headers: tuple[str, ...] = ()
-    #: logical fields whose OPTIONAL header was absent (required ones raise)
-    missing_optional: tuple[str, ...] = ()
+    #: mapped logical fields listed in ACKNOWLEDGED_ABSENT whose header this
+    #: run's raw file did not carry — expected, reported, never raised. Any
+    #: OTHER mapped field with a missing header raises ProjectionError instead
+    #: of reaching this report at all (K30 — no quiet third path).
+    acknowledged_absent: tuple[str, ...] = ()
     #: raw headers neither mapped nor in KNOWN_DROPPED — look at these
     unknown_headers: tuple[str, ...] = ()
     dropped_by_design: tuple[str, ...] = ()
@@ -157,8 +192,11 @@ class ProjectionReport:
             f"unrecognised Relationship Type (loader will reject): {self.unrecognised_team_type}",
             f"raw headers ({len(self.raw_headers)}): {', '.join(self.raw_headers)}",
         ]
-        if self.missing_optional:
-            out.append(f"optional headers absent: {', '.join(self.missing_optional)}")
+        if self.acknowledged_absent:
+            out.append(
+                f"acknowledged-absent headers (expected missing, see ACKNOWLEDGED_ABSENT): "
+                f"{', '.join(self.acknowledged_absent)}"
+            )
         if self.unknown_headers:
             out.append(
                 f"UNKNOWN headers (not mapped, not known-dropped): {', '.join(self.unknown_headers)}"
@@ -205,7 +243,24 @@ def project_rows(
             + f"; raw headers are {raw_headers}. Pin the spelling with --header-map; the "
             "projection does not guess a key column."
         )
-    missing_optional = tuple(f for f in hmap if f not in REQUIRED_FIELDS and hmap[f] not in present)
+    # (a) K30: every OTHER mapped field's absence is loud too — there is no
+    # quiet "optional" tier left. A field is allowed to be absent only when it
+    # is explicitly named in ACKNOWLEDGED_ABSENT; anything else missing raises
+    # exactly like a required field, naming the header it looked for.
+    unacknowledged_missing = [
+        f
+        for f in hmap
+        if f not in REQUIRED_FIELDS and f not in ACKNOWLEDGED_ABSENT and hmap[f] not in present
+    ]
+    if unacknowledged_missing:
+        raise ProjectionError(
+            "raw report lacks the header(s) for mapped field(s) "
+            + ", ".join(f"{f} (looked for {hmap[f]!r})" for f in unacknowledged_missing)
+            + f"; raw headers are {raw_headers}. Pin the spelling with --header-map, or if "
+            "the field is genuinely not part of this report, add it to ACKNOWLEDGED_ABSENT "
+            "with a reason — a mapped header never degrades to a silent empty column."
+        )
+    acknowledged_absent = tuple(f for f in ACKNOWLEDGED_ABSENT if hmap[f] not in present)
     mapped_headers = {hmap[f] for f in hmap if hmap[f] in present}
     dropped = tuple(h for h in raw_headers if h in KNOWN_DROPPED and h not in mapped_headers)
     unknown = tuple(h for h in raw_headers if h not in mapped_headers and h not in KNOWN_DROPPED)
@@ -220,7 +275,7 @@ def project_rows(
     report = ProjectionReport(
         raw_rows=len(raw_rows),
         raw_headers=tuple(raw_headers),
-        missing_optional=missing_optional,
+        acknowledged_absent=acknowledged_absent,
         unknown_headers=unknown,
         dropped_by_design=dropped,
         header_map=dict(hmap),
