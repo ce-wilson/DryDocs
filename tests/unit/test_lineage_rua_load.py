@@ -317,8 +317,74 @@ def test_multi_host_scripts_flag_identity_unconfirmed(tmp_path: Path) -> None:
     assert plan.scripts == 3  # ONE node per path — never re-keyed per host
     assert plan.server_occurrences == 6
     assert plan.multi_host_unconfirmed == 3
+    assert plan.multi_host_shared_diverged == 0  # nothing here reads 'shared'
     script_rows = next(p for c, p in plan.statements if "MERGE (s:Script" in c)["rows"]
     assert all(r["identity_unconfirmed"] is True for r in script_rows)
+
+
+# --- G113: the three-way rule (shared scope + mount_source equality) -----------------
+
+
+def _shared_script_node(*, sources: tuple[str, str]) -> ProcessNode:
+    """A multi-host :Script staged directly (skips the bundle machinery — the
+    fixture only needs to vary storage_scope/mount_source per host, which the
+    collector stamps from mounts.tsv; see test_lineage_rua.py for that half)."""
+    return ProcessNode(
+        node_id=process_id("rua_script", "/opt/app/run.ksh"),
+        kind="rua_script",
+        name="run.ksh",
+        path="/opt/app/run.ksh",
+        occurrences=[
+            {
+                "path": "/opt/app/run.ksh",
+                "rua_fqdn": f"{HOST}.example.internal",
+                "storage_scope": "shared",
+                "mount_source": sources[0],
+            },
+            {
+                "path": "/opt/app/run.ksh",
+                "rua_fqdn": f"{HOST2}.example.internal",
+                "storage_scope": "shared",
+                "mount_source": sources[1],
+            },
+        ],
+    )
+
+
+def test_shared_scope_same_mount_source_is_confirmed() -> None:
+    """G113 leg 1: every host reads storage_scope 'shared' AND agrees on
+    mount_source — one export mounted on two hosts is one file, so the
+    multi-host flag does NOT go up, unlike the unknown-scope case above."""
+    g = LineageGraph()
+    g.add_process(
+        _shared_script_node(sources=("synthfiler01:/export/apps", "synthfiler01:/export/apps"))
+    )
+    plan = plan_rua(g)
+    assert plan.scripts == 1
+    assert plan.server_occurrences == 2
+    assert plan.multi_host_unconfirmed == 0
+    assert plan.multi_host_shared_diverged == 0
+    script_rows = next(p for c, p in plan.statements if "MERGE (s:Script" in c)["rows"]
+    assert script_rows[0]["identity_unconfirmed"] is False
+
+
+def test_shared_scope_different_mount_source_stays_unconfirmed_and_counted() -> None:
+    """G113 leg 2: every host reads 'shared' but the hosts DISAGREE on
+    mount_source — two hosts mounting the same path from different exports
+    is a real finding, not a non-finding. The node stays unconfirmed AND
+    the finding is visible on its own in multi_host_shared_diverged, not
+    silently indistinguishable inside the general count."""
+    g = LineageGraph()
+    g.add_process(
+        _shared_script_node(sources=("synthfiler01:/export/apps", "synthfiler02:/export/apps"))
+    )
+    plan = plan_rua(g)
+    assert plan.scripts == 1
+    assert plan.server_occurrences == 2
+    assert plan.multi_host_unconfirmed == 1
+    assert plan.multi_host_shared_diverged == 1
+    script_rows = next(p for c, p in plan.statements if "MERGE (s:Script" in c)["rows"]
+    assert script_rows[0]["identity_unconfirmed"] is True
 
 
 # --- §D3 host resolution ---------------------------------------------------------------
