@@ -12,6 +12,7 @@ status: todo
 depends_on:
 - G104
 inputs:
+- docs/design/catalog-substrate-review.md
 - config/source-registry.yaml
 - drydocs_core/data_root.py
 - drydocs_core/landing_zones.py
@@ -30,8 +31,12 @@ acceptance: |
 
   (e) The Confluence capture that lands IN-TREE against `landing_zones.py`'s tracked-only rule is ruled one way and the ruling is written down: either it moves under the data root, or the rule gains a stated exception naming it. It is not left as an undocumented violation of a rule the same module enforces on everything else.
 
+  (f) SIX IS THE WRONG NUMBER — the 2026-08-28 catalog-substrate review found the same defect one level wider, and this clause records the choice rather than leaving it discovered again. Fifteen of the thirty dataset rows carry `acquisition.mode: automated` and resolve through NOTHING: no `drop_dir`, no connection binding, `locator.service` a tilde with a comment saying the real value lives in `internal-local/`. `drydocs landing-zones --check` cannot see them, for the same reason it could not see the six code zones — it enumerates manual rows only. So the "check that silently covers half its subject" defect in clause (a) is not six zones out of twenty-one, it is six zones plus fifteen datasets. EITHER widen the declaration to cover the automated rows too, OR record in the item why the automated half is out of scope here and which item owns it (G81 is the candidate — it already declares paths with a mode). What is not acceptable is closing this item with `--check` reporting green over half the registry and no statement anywhere that the other half is undeclared.
+
   `poetry run pytest -q` including the classification guard (`tests/unit/test_classification.py` — every new registry row needs its `classification`, there is no unlabeled default), plus `drydocs landing-zones --check` reporting the full zone set. Ruff clean.
 notes: |
   Groomed 2026-08-21 (laptop) from Idea-152 clause (7) / finding (e). Module `config` because the deliverable is registry rows plus a derivation rule, not new component behavior; the `data_root.py` edit is the consequence of the declaration, not the point of the item.
 
   Watch item for whoever pulls it: each new source-registry row must carry a `classification` per CLAUDE.md §3 — the six zones are operational metadata, so Internal is the likely answer, but it is a per-zone call and no default exists.
+
+  AMENDED 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding B1, the second-pass survey of DataHub, OpenMetadata, Amundsen and OpenLineage/Marquez. Clause (f) added. The survey's point in one line: none of the four open-source catalogs has an undeclared source — DataHub types every source config, OpenMetadata validates every service connection against a published schema, Amundsen keys every extractor's connection by the extractor's own scope — and the reason they all made it mandatory is the reason it matters here. A source you cannot enumerate is a source you cannot audit, back up, or move, which is the failure that produced this item's parent incident in the first place.

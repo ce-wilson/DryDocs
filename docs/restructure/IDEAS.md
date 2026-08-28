@@ -93,7 +93,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-166`** · 2026-08-28 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-166`** · 2026-08-28 · `[idea]` · **merged → G81 (f)(g)(h) · G104 (the ADR's second requirement) · G109 (f) — all four proposals folded 2026-08-28, same day, same session** · prio? **Med** —
   **The catalog/lineage second pass proposes amendments to G81, G104 and G109 — they need a groom
   or they die in a design doc.** `docs/design/catalog-substrate-review.md` (Rev 1) read DataHub,
   OpenMetadata, Amundsen and OpenLineage/Marquez in depth plus Microsoft Purview for concepts,
@@ -113,9 +113,13 @@ question a 1,000-line file with the trail at the bottom could not answer.
   - **G109.** Clause (a) names six undeclared code zones; the real gap also includes all fifteen
     `acquisition.mode: automated` datasets, which resolve through nothing and which
     `drydocs landing-zones --check` cannot see. Widen, or record why the automated half is out.
-  - **Why not groomed here.** Each is an amendment to a `todo` item's ruled acceptance, which is a
-    change of scope on work this session is not pulling. The review states them as proposals so the
-    user or a groom decides, rather than a design doc silently rewriting three items.
+  - **Why it was stated as a proposal first.** Each is an amendment to a `todo` item's ruled
+    acceptance, which is a change of scope on work this session was not pulling. The review stated
+    them so the user could rule rather than a design doc silently rewriting three items. **The user
+    ruled the same day: fold them in.** Done — G81 gains clauses (f), (g) and (h); G104 gains a
+    second stated requirement on the ADR rather than acceptance clauses of its own, because a
+    survey can change what a decision must ADDRESS and never what it concludes; G109 gains clause
+    (f). No existing clause was rewritten in any of the three.
 
 - **`Idea-165`** · 2026-08-28 · `[idea]` · **open** · prio? **Med** —
   **The credential store cannot tell a generated demo secret from a chosen operator one, so no
