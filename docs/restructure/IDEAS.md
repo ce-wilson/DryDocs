@@ -93,6 +93,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-167`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
+  **"A claim ships NO render" is true for PULLING an item and false for MINTING one, and CLAUDE.md
+  states it without the distinction — it turned CI red today.** The O75 claim commit
+  (`49356d9a`) followed the pull rule as written, shipped no render, and failed the roadmap
+  staleness guard: `test_committed_roadmap_page_matches_its_sources`, "stale beyond a status-only
+  change".
+  - **Why the rule holds in its intended case.** Y5's tolerance is for a STATUS-ONLY diff. Flipping
+    an existing item `todo → in_progress` moves a value inside a row the roadmap already renders,
+    the guard forgives it, and the claim sha stays green. That is the case the rule was written
+    for and it still works.
+  - **Why it does not hold here.** A claim that MINTS a new item adds a row that did not exist, so
+    the roadmap's source fingerprint moves for a structural reason, not a status one, and the
+    tolerance correctly does not cover it. The guard is right; the instruction is incomplete.
+  - **The fix is one clause in CLAUDE.md §0**, not a code change: a claim on an EXISTING item ships
+    no render; a claim that mints a NEW item ships the board and roadmap render with it. Worth
+    stating because the failure is silent in the normal ritual — the item gets built, the next
+    push carries the render anyway, and the red claim sha is only visible to somebody reading
+    `gh run list` afterwards, which is precisely the "nobody was looking" failure Idea-111 already
+    made a session step for.
+  - **Not hypothetical.** `33214406376`, 2026-08-28, one failing test in a 2,388-test run.
+
 - **`Idea-166`** · 2026-08-28 · `[idea]` · **merged → G81 (f)(g)(h) · G104 (the ADR's second requirement) · G109 (f) — all four proposals folded 2026-08-28, same day, same session** · prio? **Med** —
   **The catalog/lineage second pass proposes amendments to G81, G104 and G109 — they need a groom
   or they die in a design doc.** `docs/design/catalog-substrate-review.md` (Rev 1) read DataHub,
