@@ -331,6 +331,29 @@ CREATE VIEW v_open_drafts AS
 #: Draft columns, in the order build() carries them over a rebuild.
 _DRAFT_COLUMNS = ("draft_id", "seq", "domain", "payload", "authored_by", "authored_on", "status")
 
+#: N14 (gate pending-source-correction, SIGNED 2026-08-18, §D1/§D2): every store
+#: DECLARES its correction-lifecycle nature at creation, and reports read THIS
+#: declaration — never a hardcoded exemption. "pending" rows exist to be retired
+#: when the source catches up (seal_contact_override carries a status column for
+#: exactly that); "permanent" rows are steward policy with NO corrected-in-source
+#: lifecycle (app_code_mapping's DDL carries no status column for exactly this
+#: reason — K7 §E2), so a pending-report may never scan them. Everything else is
+#: "not-a-correction-store". A table added to the DDL without a row here fails
+#: the paired coverage guard (tests assert sqlite_master == this key set), which
+#: is what makes the declaration happen AT creation instead of at the first
+#: report that guesses wrong.
+STORE_NATURES: dict[str, str] = {
+    "meta": "not-a-correction-store",
+    "node_classification": "not-a-correction-store",
+    "relationship_vocabulary": "not-a-correction-store",
+    "ontology_mapping": "not-a-correction-store",
+    "manual_load_file": "not-a-correction-store",
+    "manual_mapping": "not-a-correction-store",
+    "seal_contact_override": "pending",
+    "app_code_mapping": "permanent",
+    "draft": "not-a-correction-store",
+}
+
 _DUMP_ORDER = {
     "meta": "key",
     "node_classification": "label",

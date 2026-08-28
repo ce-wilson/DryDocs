@@ -65,6 +65,7 @@ from drydocs_api.mappings import (
     list_drafts,
     mapping_grid,
     mapping_options,
+    pending_source_correction_report,
     promote_draft,
     source_corrections_report,
 )
@@ -643,6 +644,28 @@ def create_app(
     def get_override_report(authorization: str | None = Header(default=None)) -> dict[str, object]:
         return _mapping_call(
             source_corrections_report, _token(authorization), sessions, mapping_store
+        )
+
+    @app.get("/mappings/pending/report")
+    def get_pending_report(authorization: str | None = Header(default=None)) -> dict[str, object]:
+        # N14: the union report. The email rider count is a GRAPH read
+        # (docs.email-unassigned.v1, Q21); the report itself must render with
+        # no graph in reach, so an unreachable graph degrades to the explicit
+        # "read it at the spec" line — never an error, never a silent zero.
+        token = _token(authorization)
+        email: int | None = None
+        try:
+            out = run_named("docs.email-unassigned.v1", {}, token, sessions, graph)
+            rows = out.get("rows") or []
+            email = int(next(iter(rows[0].values()))) if rows else 0
+        except Exception:  # — graph-unavailable is a rendered state here
+            email = None
+        return _mapping_call(
+            pending_source_correction_report,
+            token,
+            sessions,
+            mapping_store,
+            email_unassigned=email,
         )
 
     # ── K9/K11 app-code defined-mapping drafting (gate seal-app-ref-edge-

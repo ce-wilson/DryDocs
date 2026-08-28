@@ -30,6 +30,7 @@ from drydocs_api.mappings import (
     list_domains,
     mapping_grid,
     mapping_options,
+    pending_source_correction_report,
     promote_draft,
     source_corrections_report,
 )
@@ -780,3 +781,140 @@ def test_source_corrections_report_content(sessions, override_store):
     assert "person left the team" in md
     assert "(nobody assigned)" in md  # the empty-SEAL-value row is explicit
     assert out["filename"].startswith("seal-contact-source-corrections-")
+
+
+# ---------------------------------------------------------------------------
+# N14 — the pending-source-correction UNION report (gate SIGNED 2026-08-18).
+# One age-ordered list across domains; permanent-by-nature stores unreachable;
+# never a gate, never styled as a defect. Synthetic values only.
+# ---------------------------------------------------------------------------
+
+from drydocs_core.mapping_store import STORE_NATURES  # noqa: E402
+from drydocs_core.source_registry import Source, SourceRegistry  # noqa: E402
+
+
+def _tiny_registry() -> SourceRegistry:
+    """Two manual rows (one dated via acquisition.since, one undated) and one
+    automated row that must never appear — built directly so the test owns
+    every value (no shipped-file coupling)."""
+    rows = {
+        "infra@x.y.zzz": Source(
+            id="infra@x.y.zzz",
+            confirmed=True,
+            data={
+                "system": "infra",
+                "artifact": "zzz",
+                "acquisition": {
+                    "mode": "manual",
+                    "format": "csv",
+                    "drop_dir": "server-inventory/",
+                    "since": "2026-01-05",
+                },
+            },
+        ),
+        "seal@a.b.ccc": Source(
+            id="seal@a.b.ccc",
+            confirmed=False,
+            data={
+                "system": "seal",
+                "artifact": "ccc",
+                "acquisition": {"mode": "manual", "format": "csv", "drop_dir": "seal/"},
+            },
+        ),
+        "controlm@d.e.fff": Source(
+            id="controlm@d.e.fff",
+            confirmed=True,
+            data={
+                "system": "psgmgr",
+                "artifact": "fff",
+                "acquisition": {"mode": "automated", "via": "db"},
+            },
+        ),
+    }
+    return SourceRegistry(sources=rows)
+
+
+@pytest.fixture()
+def empty_override_store(tmp_path, monkeypatch) -> MappingStore:
+    fix = tmp_path / "seal-contact-overrides.csv"
+    fix.write_text(",".join(OVERRIDE_HEADER) + "\n", encoding="utf-8")
+    monkeypatch.setattr("drydocs_core.mapping_store.SEAL_CONTACT_OVERRIDES_PATH", fix)
+    return MappingStore(tmp_path / "mapping.db")
+
+
+def test_pending_report_unions_both_domains(sessions, override_store):
+    """(a) ONE report, both gate-joined domains, plus the Q21 email rider —
+    and (d) nothing worded as a defect."""
+    token = _token(sessions, "kchen2190")
+    out = pending_source_correction_report(
+        token, sessions, override_store, registry=_tiny_registry(), email_unassigned=3
+    )
+    md = out["markdown"]
+    assert out["counts"] == {"overrides": 2, "manual_sources": 2, "email_unassigned": 3}
+    assert out["count"] == 4
+    assert "APP-1234 / L2 Operate Manager" in md  # override domain present
+    assert "infra@x.y.zzz" in md and "seal@a.b.ccc" in md  # manual domain present
+    assert "controlm@d.e.fff" not in md  # automated rows are not placeholders
+    assert "3 unassigned email(s)" in md
+    low = md.lower()
+    assert "defect" not in low and "violation" not in low and "overdue" not in low
+    assert "expected first state" in md  # N12 clause (f) framing, verbatim intent
+    assert out["filename"].startswith("pending-source-corrections-")
+
+
+def test_pending_report_age_order_and_undated_bucket(sessions, override_store):
+    """(b) oldest first across BOTH domains on one list; rows with no
+    determinable age land in the explicit bucket, never silently."""
+    token = _token(sessions, "kchen2190")
+    out = pending_source_correction_report(
+        token, sessions, override_store, registry=_tiny_registry(), email_unassigned=None
+    )
+    md = out["markdown"]
+    assert md.index("| 2026-01-05 |") < md.index("| 2026-07-21 |")
+    undated = md.split("## Undated")[1]
+    assert "seal@a.b.ccc" in undated
+    # graph unavailable degrades to the named read path, never an error
+    assert "docs.email-unassigned.v1" in md
+
+
+def test_pending_report_reads_declared_natures_not_a_hardcoded_exemption():
+    """(e) §D2: the fetch map covers EXACTLY the stores declared pending, so a
+    permanent-by-nature store (app_code_mapping, K7 §E2) is structurally
+    unreachable and a new pending store must register a fetcher or fail here."""
+    from drydocs_api.mappings import _PENDING_STORE_FETCHERS
+
+    assert STORE_NATURES["app_code_mapping"] == "permanent"
+    assert set(_PENDING_STORE_FETCHERS) == {
+        table for table, nature in STORE_NATURES.items() if nature == "pending"
+    }
+
+
+def test_store_natures_cover_every_table(empty_override_store):
+    """The declaration happens AT creation: a table added to the DDL without a
+    declared nature fails here, not at the first report that guesses."""
+    rows = empty_override_store._select(
+        "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+    ).rows
+    assert {r["name"] for r in rows} == set(STORE_NATURES)
+
+
+def test_pending_report_empty_case(sessions, empty_override_store):
+    token = _token(sessions, "kchen2190")
+    out = pending_source_correction_report(
+        token,
+        sessions,
+        empty_override_store,
+        registry=SourceRegistry(sources={}),
+        email_unassigned=0,
+    )
+    assert out["count"] == 0
+    assert "(no dated placeholders)" in out["markdown"]
+    assert "nothing pending" in out["markdown"]
+
+
+def test_pending_report_refuses_user_role(sessions, override_store):
+    token = _token(sessions, "jdoe4821")
+    with pytest.raises(Forbidden):
+        pending_source_correction_report(
+            token, sessions, override_store, registry=SourceRegistry(sources={})
+        )
