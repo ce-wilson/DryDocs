@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/writer.py
@@ -29,3 +29,17 @@ notes: |
   Under the D1 ruling and its amendment, the current behaviour is RIGHT for `local` and `unknown` and wrong only for `shared`. This item applies an existing ruling to code; it does not reopen it, and it mints no new relationship type — so it is a build, not a gate. If the middle case (shared, different mount sources) turns out to want a different disposition than "unconfirmed plus a count", that IS a gate question and stops here.
 
   p2/sonnet: the rule is fully specified above and the inputs are two files.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  plan_rua's multi-host identity flag now applies the D1 three-way rule: shared scope
+  with the SAME mount_source on every host is CONFIRMED (one export on N hosts is one
+  file); shared scope with disagreeing mount_source values (or a host lacking one) stays
+  unconfirmed AND increments its own counter multi_host_shared_diverged, reported in
+  RuaLoadReport.summary() beside multi_host_unconfirmed so the middle case is visible,
+  not folded in; local/unknown/mixed keeps today's behaviour. Identity is proven only by
+  mount_source string equality across all hosts -- never inferred from scope alone
+  (clause b). Verified both directions on directly-constructed fixtures: same source =
+  confirmed (0 unconfirmed / 0 diverged), different source = 1/1; the pre-existing
+  all-unknown multi-host regression stays 3/0. The two Idea-175 forward-pointing
+  comments and the header's over-flagging description now state the rule as built; a
+  note records that v1/v2 bundles carry no mount_source and so can never reach the
+  confirmed leg. archival.py untouched per clause (d).
