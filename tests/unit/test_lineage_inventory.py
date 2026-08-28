@@ -663,6 +663,29 @@ def test_unresolved_artifact_value_is_counted_never_staged(tmp_path) -> None:
     assert coverage.payloads_classified == 0
 
 
+def test_scope_resolvable_artifact_uri_mints_instead_of_counting_unresolved(tmp_path) -> None:
+    """G112 - the widening. G92 built a resolved scope chain per job and the
+    ONE core-resolver call site (`_resolve_shell`), but `_artifact_pass` never
+    ran its value through it: an ETL_ARTIFACT_URI spelled with a %%FOLDER
+    reference the job's own scope chain resolves used to fall into the
+    previous test's bucket even though the job COULD name the artifact. Now
+    the value runs through `_resolve_shell` first, so a resolvable URI mints
+    its :Script node instead of counting artifact_values_unresolved. Same
+    FOLDER-header shape as G92's own fixture (job_id "1" = the smart-folder
+    header row, staging.py's raw-export rule)."""
+    graph, coverage = _g97_extract(
+        tmp_path,
+        _VARS_HEADER
+        + "161947,1,FOLDER_HDR,%%ARTIFACT_HOME,s3://synth/app,OS\n"
+        + "161947,9,JOB_SPARK,%%ETL_ARTIFACT_URI,%%ARTIFACT_HOME/conform.jar,OS\n",
+    )
+    payload = "proc#etl_artifact:s3://synth/app/conform.jar"
+    assert payload in graph.processes
+    assert graph.processes[payload].properties["artifact_uri"] == "s3://synth/app/conform.jar"
+    assert coverage.artifact_values_unresolved == 0
+    assert coverage.payloads_classified == 1
+
+
 def test_values_decide_a_launcher_valued_artifact_variable_is_not_a_payload(tmp_path) -> None:
     """The G16 value contract's load-bearing case, and the 2,384-variable gap
     analysis' one durable finding: NAMES LIE. %%JAR_PATH holding dt-launcher.sh

@@ -430,6 +430,18 @@ class ControlMInventoryExtractor:
         resolved_cmd = self._resolve_shell(cmd, folder_id, job_id, coverage)
         for fop, raw_fop in self._paired_file_ops(cmd, resolved_cmd, coverage):
             self._file_op(jid, fop, into, coverage, raw_fop=raw_fop)
+        # G112 clause (d), IN WRITING: invocation targets stay OUT OF SCOPE for
+        # the resolver widening. `parse_command` below runs on the VERBATIM
+        # `cmd`, not `resolved_cmd`, and `_stable_invocation_key` (below) keys
+        # off that verbatim target. Whether an invocation should instead be
+        # keyed on the resolved text is a HITL gate question, not a build
+        # decision made here — it would move gate `cmdline-lineage-review`
+        # (2026-07-16, SME session), which ruled invocation identity
+        # env-stable (DPL pipeline GUID, Ab Initio basename) precisely because
+        # resolved paths vary dev/uat/prod for the same workload. If this is
+        # ever revisited, it goes back through that gate — the next reader
+        # should meet a decision here, not an inconsistency between the
+        # file-op pass (resolved) and this one (verbatim).
         parsed = parse_command(cmd)
         invocations = parsed.invocations
         if not invocations:
@@ -619,6 +631,14 @@ class ControlMInventoryExtractor:
         of the 1..n fold" both signed entries describe, and doing it here is
         what makes a payload on both labels impossible rather than merely
         unlikely (clause d).
+
+        G112: before staging (or counting a gap), each row's value runs through
+        the SAME G92 resolver (`_resolve_shell`) the file-op passes use — a URI
+        spelled with a %%FOLDER/%%JOB reference the job's own scope chain
+        resolves is KNOWN, not a promise, and mints its node instead of
+        incrementing ``artifact_values_unresolved``. This rides the existing
+        ``resolve_*`` counters on :class:`ExtractCoverage` (clause c) — no
+        parallel counter family for the artifact pass.
         """
         by_name = self._job_name_index(into)
         # job -> {fact_type: value}; one job's artifact facts are only complete
@@ -645,15 +665,25 @@ class ControlMInventoryExtractor:
                 if not jid:
                     coverage.artifact_jobs_unmatched += 1
                     continue
-                if not _is_resolved_literal(value):
-                    # %%REF-bearing or multi-token: the artifact is not KNOWN
-                    # here, and minting a node named after an unresolved
-                    # reference would put a placeholder in the graph
+                # G112: resolve through the job's OWN scope chain before
+                # deciding this is a gap — a %%FOLDER/%%JOB reference the
+                # chain can bind names a real artifact, same as the file-op
+                # passes' operands (_resolve_shell rides the shared resolve_*
+                # counters, clause c).
+                resolved_value = self._resolve_shell(
+                    value, _var(var_row, "folder_id"), _var(var_row, "job_id"), coverage
+                )
+                if not _is_resolved_literal(resolved_value):
+                    # %%REF-bearing or multi-token, even after resolution: the
+                    # artifact is not KNOWN here, and minting a node named
+                    # after an unresolved reference would put a placeholder in
+                    # the graph
                     coverage.artifact_values_unresolved += 1
                     continue
-                facts.setdefault(jid, {})[fact] = value
-                # §B3: the raw evidence string is kept VERBATIM, which under
-                # §B2's union endpoints is the only way the class choice stays
+                facts.setdefault(jid, {})[fact] = resolved_value
+                # §B3: the raw evidence string is kept VERBATIM (the value as
+                # written, not the resolved spelling), which under §B2's union
+                # endpoints is the only way the class choice stays
                 # re-checkable later
                 evidence.setdefault(jid, []).append(f"{name}={value}")
 
