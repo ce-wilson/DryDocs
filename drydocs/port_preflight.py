@@ -47,6 +47,27 @@ RITUAL_SUBJECT_PATTERNS: tuple[re.Pattern[str], ...] = (
     re.compile(r"^chore\(depgraph\):\s*snapshot\b", re.I),
     re.compile(r"^chore\(render\):", re.I),
     re.compile(r"^chore\(board\):", re.I),
+    # THE SUBJECT CONVENTIONS DRIFTED AWAY FROM THE FIVE PATTERNS ABOVE, and the
+    # ledger header never changed: it still says "Grooms, claims, board/design
+    # renders and depgraph snapshots in the range are ritual ... and get no step."
+    # These four spell the SAME categories the way the repo actually writes them
+    # now. Measured on port-base-20260826..HEAD (2026-08-29): they account for 18
+    # of 132 uncited commits, every one a claim, a render or a snapshot the header
+    # had already exempted in words. This is a bug fix -- the policy is unchanged,
+    # only its spelling.
+    #
+    # DELIBERATELY NOT WIDENED: `chore(backlog): close ...`. A close is not in the
+    # header's ritual list, and close notes in this range carry findings a consumer
+    # must read (G114 clause (e), K30's blocked half). Exempting them would be a
+    # policy change, not a spelling fix, and it is the user's to make.
+    re.compile(r"^chore\((?:snapshot|depgraph)\):.*\bsnapshot\b", re.I),
+    re.compile(r"^chore\(plan\):\s*(?:re-)?render\b", re.I),
+    # A claim scoped to the ITEM rather than to `backlog`: `chore(Z5): claim`,
+    # `chore(O63): release claim`. Narrow on purpose -- the subject must OPEN with
+    # claim or release claim, so substantive work cannot inherit the exemption.
+    re.compile(r"^chore\([A-Za-z][A-Za-z0-9]*\):\s*(?:release\s+)?claim\b", re.I),
+    # The same claim spelled as the status it writes: `chore(backlog): O69 in_progress`.
+    re.compile(r"^chore\(backlog\):\s*[A-Za-z]+[0-9]+\s+in_progress\b", re.I),
     # The ledger roll itself, and it is not a convenience exemption — without it
     # the check cannot terminate. The commit that WRITES the citations can never
     # be among them, so every roll would mint a fresh uncited commit and the next

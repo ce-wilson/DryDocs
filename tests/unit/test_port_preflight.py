@@ -63,6 +63,17 @@ OWED COMPANY-SIDE:
         # Without these two the check cannot terminate — see below.
         "chore(port): roll the ledger through 0d3761a9",
         "chore(port): ledger step 122 — J41",
+        # THE DRIFTED SPELLINGS (2026-08-29). The ledger header exempted claims,
+        # renders and snapshots from the start; these are the subjects the repo
+        # actually writes them as, and each one was reported UNCITED on the
+        # port-base-20260826 range until the patterns learned them.
+        "chore(snapshot): roll the depgraph snapshot for the batch-2 close",
+        "chore(depgraph): session-close snapshot @062d71f6 (drydocs-20260829)",
+        "chore(plan): render the board, roadmap and load runbook after batch 2",
+        "chore(plan): re-render board and roadmap from committed sources only",
+        "chore(Z5): claim — in_progress",
+        "chore(O63): release claim — back to todo",
+        "chore(backlog): O69 in_progress — refusal now cites ADR 0009",
     ],
 )
 def test_ritual_subjects_need_no_ledger_step(subject: str) -> None:
@@ -94,6 +105,15 @@ def test_the_ledger_roll_commit_is_ritual_or_the_check_cannot_terminate() -> Non
         # a chore(port) and IS substantive work a consumer must be told about.
         "chore(port): retire the three discharged packs",
         "chore(port): stage five company packs above the never-port glob",
+        # A CLOSE IS NOT RITUAL, and the boundary is deliberate: the ledger
+        # header lists grooms, claims, renders and snapshots, never closes, and
+        # close notes carry findings a consumer must read. Pinned so a later
+        # widening cannot quietly swallow them.
+        "chore(backlog): close G112 — the artifact pass resolves before counting",
+        "chore(backlog): close J55 — the retired-acronym boundary guard is live",
+        # Near-misses for the new patterns: the scope shape alone must not exempt.
+        "chore(plan): the Lane B queue is empty — the handoff retires",
+        "chore(snapshot): retire the newest-only retention ruling",
     ],
 )
 def test_substantive_subjects_are_never_ritual(subject: str) -> None:

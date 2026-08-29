@@ -3716,6 +3716,227 @@ never-port.
 DEPGRAPH SNAPSHOT written `chore(snapshot):` instead of `chore(depgraph): snapshot` —
 the third instance of the same subject-line variant, listed rather than fixed by
 loosening the pattern: `28c1181a`.
+241. Z5 + Z7 — THE LOCATION MAP MODULE AND THE FIXTURE INTERLOCK [like-for-like,
+    canonical-producer] (`94157ba0` the module, `ae740be5` the synthetic-city fix,
+    `1a9668af` Z7, `8b9a431e` + `4b71fb19` the fixture finding and its correction).
+    A reusable world/country map console module that renders ANY located label, not a
+    one-off page. The finding is worth more than the code: the Z1/Z3 and Z5 sample
+    fixtures were each built correctly and never interlock, so the bundled demo lights
+    up no single dimension end to end. `4b71fb19` corrects the first reading — the T1
+    tier IS proven by the e2e; it is the fixtures that do not meet.
+
+242. THE /mappings CONSOLE PASS [like-for-like, canonical-producer] (`5e72eaf1` domain
+    strip, `4a51fc14` the registry delete, `d7e70ec7` the pane fix, `6d5b027e` grid
+    filter/sort/resize/CSV, `d22b3328` the Ask Copy button, `c19f118a` the React icon).
+    `4a51fc14` is marked `!` and means it: the retired job-application mapping domain is
+    DELETED from the registry, not hidden. Check your side for callers before taking it.
+    `d7e70ec7` is the honest one — 44 rows were being shown four at a time.
+
+243. O68 — ACRONYMS GET A REAL SURFACE [like-for-like, canonical-producer] (`1042ca96`
+    the item, `6b43c850` the build, `7ef523d1` a CI-line correction in the done note).
+    An add path that produces an ARTIFACT rather than a silent write, and provenance
+    stops living in a code comment. Pairs with the glossary work in 244.
+
+244. THE GLOSSARY PASSES AND THE cdo-* RETIREMENT [canonical-producer + boundary]
+    (`3d3e0e9b` fourth pass, `c860b4f5` fifth pass, `3c2bfcdd` the retirement sweep,
+    `9256fc49` the merge, `64ec0e7e` an ASCII-x style fix that removes a 1-file port
+    divergence). `3c2bfcdd` RETIRES AN INTERNAL ORG ACRONYM from every publishable
+    surface — the `cdo-*` rename — because the token had leaked into 60+ publishable
+    files. Cross-repo half: your registry rows and any loaded graph doc id may still
+    carry the pre-rename string. That is a per-entry port-review question, NOT a
+    wholesale rename on your side.
+
+245. J55 — THE RETIRED ACRONYM CANNOT COME BACK [guard, canonical-producer]
+    (`8c97a5c6` first cut, `90c624bf` the guard, `b2b89e4f` the close). The enforcement
+    point behind 244: the token is never written literally in the test, it is read at
+    run time from an Internal-only mapping file, so the guard cannot itself become a
+    place the string leaks from. Skips cleanly where that file is absent, which is what
+    your clone will do until you carry the mapping.
+
+246. WEB-CONSOLE RUNBOOK REV 2 [docs, canonical-producer] (`3100ce37`). The ADK agent
+    server joins the documented stack as the FOURTH process. If your console runbook
+    still describes three, this is the correction.
+
+247. REMEDIATION PACKAGE SURFACE — `profile` [like-for-like] (`2cbca5bc`, `95cd07e1`).
+    G68 omitted `profile` from `__init__`; the second commit teaches the package-surface
+    pin about it. `95cd07e1`'s note is the useful part for you: CI caught a subset run,
+    the third instance of the same local-subset blind spot.
+
+248. G93 — REMEDIATION COUNTS RIDE THE RUN LOG [like-for-like] (`732f18f1`, `8aedaf7c`,
+    `9df95879`). The run's RECORDED counts travel into the Jira handoff rather than
+    being recomputed at handoff time, so the ticket and the run agree by construction.
+
+249. G71-G74 — ATTRIBUTION SURFACE AND THE :Employee BACKBONE [ontology, gate-bound]
+    (`ba21e53b` G71 the required-contact completeness report plus a presence graph-test,
+    `71ce7435` G72 the attribution-surface discriminator joins the precedence chain,
+    `7b9c79f0` G73 the inheritance shape registered with K21 section 7.4 taking ancestor
+    CIs for TOM rows only, `cc5b84a8` G74 REPORTS_TO registered and the creation policy
+    recorded). READ `2946de82` WITH THIS: RELAY-17 carries the G74 stub-and-enrich
+    company half, which is yours to run. Vocabulary fragments are `per-entry` — merge by
+    id, never by path checkout.
+
+250. K27 + K28 — TWO SURFACES STOP LYING [docs/config] (`595d076d` K27: pat_team_roles.csv
+    is a hand-drop BY RULING and three surfaces now say so, `cdefec0a` K28: fid_census
+    stops telling its reader the FID gate is unsigned when it signed 33/33 on 2026-08-19).
+
+251. THE Q-SERIES — DOCMETA GROWS UP [like-for-like + one ADR] (`bcf70faa` Q15 four
+    agent-navigation specs over the vendor-docs backbone, `2107af6a` Q17 ADR 0016
+    PROPOSED on the jpmc-reports corpus shape, `ff87227f` Q18 the DESCRIBES target
+    declared in the ledger and read by the loader, `7b25b7f7` Q21 the docs_email_concerns
+    writer, `260e0f2c` Q23 a capture run names the registry row it fulfils or does not
+    run, `63de2acc` Q26 corpus_id scoping measured live, `87fca339` Q27 the internal MWAA
+    docs become a registered corpus and Airflow moves off no-corpus). ADR 0016 is
+    PROPOSED and awaits a ruling; do not read it as decided.
+
+252. S13 + S15 + S14 — THE IMPORT CYCLE REMOVED, AND docs/Product RELOCATED [structural]
+    (`5ab0c1d2` the S8 cycle removed by hoisting shared state to `cli_shared`, NOT by
+    reordering imports; `ac697959` S14 relocates docs/Product to knowledge/org, kebab-case,
+    and dissolves seal/). CAUTION, and this is the one to read twice: `drydocs/cli.py` is
+    `evaluate` in the manifest, and `76fbeec7` + `355a6f75` record that a cli de-dup
+    reconcile was ALREADY IN PROGRESS on your side. These two streams will meet. Reconcile
+    by hand against your de-dup result; do not take either side wholesale.
+
+253. G121 + G122 — ACQUISITION ROUTES AND ENV NAMES [like-for-like] (`3f5b5769` G121:
+    `load --csv` is a DECLARED acquisition route or it refuses, with a recorded override;
+    `b4c10ef1` G122: every settings-group env var has a name-only line in `.env.example`).
+    G121 will refuse loads your side may currently perform undeclared — that is the point,
+    but it is a behavior change worth sequencing.
+
+254. G111 — A ZONE'S DECLARED ENV VARIABLE IS HONORED [core, RED FIRST] (`13977357` the
+    widened guard written red, `c1158395` the resolver fix, `621fced8` the core landing,
+    `e6e5857d` the close). The guard walks EVERY zone now, not the sampled few.
+
+255. G114 — THE SUPERSEDED-DATABASE GUARD SCANS WHERE THE STALE NAMES WERE [guard]
+    (`3cb4e067` widen to agents/ and drydocs_docmeta/ with dddocs blocklisted, `83cb3c8b`
+    re-point mentions to the escape-hatch wording, `c31f495d` the guard, `c938b7c4` the
+    close, which records clause (e) as Idea-186 rather than pretending it landed).
+
+256. K30 (a)+(c) — EVERY MAPPED PAT HEADER ABSENCE IS LOUD [load] (`f28eabc4`, `67173799`,
+    `0f394d2c`). jira_board_id is acknowledged-absent rather than silently skipped. THE
+    ITEM IS BLOCKED ON YOU: clauses (b)/(d)/(e) need the company G82 header list, and
+    `0f394d2c` records the block rather than guessing the headers.
+
+257. J53 — THE REFRESH WARNING NAMES ITS CAUSE [docs tooling] (`d7b0bb68`, `66b40be3`,
+    `214e7eb8`). A partial render now lists what actually landed, and the snapshot refresh
+    warning prints the cause instead of the word Traceback.
+
+258. G112 + G113 — LINEAGE RESOLVES BEFORE IT COUNTS [like-for-like] (`d3d71392` and
+    `fa71bf76` G112: the artifact pass runs its value through the G92 resolver BEFORE
+    counting a gap, so a resolvable value stops reading as missing; `6e98d119` close;
+    `f0377ddf` and `e79b43cd` G113: the multi-host identity flag reads scope and
+    mount_source, not just host count, three ways; `861509c5` close).
+
+259. G115 — THE DATA-CENTER SCOPE BIND [load] (`92c984b8`, `7063ad66`, `f50c16cc`). Joins
+    the Control-M extract family, and the one-run-per-data-center recipe is DECIDED rather
+    than left to the operator. Four production data centers behind the `[db]` placeholder
+    makes this yours to re-run per venue.
+
+260. N14 + N15 — THE UNION REPORT AND AGREEMENT CANDIDATES [api + load] (`8eb26ade` N14:
+    the pending-source-correction union report, both domains in one age-ordered list;
+    `0e25c9b5` N15: agreement-candidate detection where the LOAD PROPOSES, a steward
+    confirms, and nothing auto-retires).
+
+261. O69 + O73 + O74 + O75 + O76 — THE CONSOLE AUTHENTICATION CHAIN [canonical-producer,
+    security-relevant] (`36601a10` O69 real authentication plus the credential carrier
+    ADR 0009 did not cover, `65e92bcb` O73 credentials reload on change with a demo-login
+    script that gets deleted at SSO, `453f898c` O74 personas become unmistakably fictional
+    and gain the seats isolation testing needs, `36a7422a` O75 withdrawing an account now
+    withdraws its live access, `e0b6d7a4` O76 the store records HOW each secret was set,
+    `c16e4437` the Idea-164 groom). TAKE THIS AS A CHAIN, not file by file: O73/O75/O76
+    each assume O69's shape. A fresh clone gets NO credential file, therefore no accounts,
+    therefore every login refused with a message naming the bootstrap script — that is the
+    designed default and it is stronger than a shipped demo account.
+
+262. O77 AND THE OCCLUSION PAIR [like-for-like] (`358da344` O77: the ownership chips stop
+    landing on the node names by MOVING rather than stacking, `33b8bbad` the capture of
+    both occlusion bugs). O66 traded one occlusion for the other; O77 states that the
+    cause is GEOMETRY, not z-order, so the next attempt cannot pass by flipping layers.
+
+263. PORT MACHINERY [port, read before applying] (`e46cf8ab` three adoption dossiers for
+    the deferred clusters -- remediation, lineage, ontology; `aed7229b` the SME-review-status
+    capture protocol and the run-the-gate sweep; `fdaffd2f` the PORT-REPORT-e33f8d02
+    close-out with the tom-role register protected by a per-entry manifest row; `ce5a071d`
+    the Python 3.12 interpreter standard and venv rebuild hand prompt; `ad137c53` the
+    DRYDOCS_DATA_ROOT rollout hand prompt after your G81 completion). The two hand prompts
+    ask nothing back — they are yours to run and record in your own ledger.
+
+264. GATES — WP-1 AND THE PRE-GATE SWEEPS [gate-bound, nothing built] (`bfa49e4b` drafts
+    source-connection-and-run-identity and mints the two-issue work items; `95d90c12`
+    pre-gate sweeps for G116/G117 confirming both pages CURRENT and both sessions runnable
+    as drafted). Draft pages only. Nothing here writes the graph.
+
+265. LANE B — A HANDOFF THAT RETIRES ITSELF [plan] (`7ed4eab2` the build-lane queue,
+    `a9a89230` the queue empties and the handoff retires per its own lifecycle). Recorded
+    because a handoff file that never retires becomes a stale instruction.
+
+266. WEB SCAFFOLDING REVIEW [review + backlog] (`96002b6b`). The review and the five items
+    it produced, in one commit.
+
+267. THE CATALOG SUBSTRATE REVIEW [design, informs three open items] (`b58f3869` the
+    second-pass survey of DataHub, OpenMetadata, Amundsen and OpenLineage; `1925cadd`
+    folds its proposals into G81, G104 and G109). The finding worth your time: the
+    three-part dataset key (platform, name, environment) has a documented ceiling —
+    it cannot represent two deployments of one platform in one environment, which is
+    exactly your four-data-center situation behind one `[db]` placeholder.
+
+268. C28 — THE CHASE LEADERSHIP SCRAPE [evidence, External] (`3afa8307`). Membership-grain
+    evidence plus a self-drift record for the business-layer gate. Evidence, not a ruling.
+
+269. THE SOURCE-FILE MAP [design docs] (`368c4dfb`). Where ingestion input lands and what
+    reads it. `docs/design/**` is `evaluate` — compare against your own map rather than
+    taking it wholesale.
+
+270. PAT — THE TEAM_DETAILS_REPORT COLUMN CENSUS CLOSES [like-for-like] (`42dc12e8`).
+    A PINNED spelling was wrong; the census closes with it corrected.
+
+271. TWO SMALL CORRECTIONS [docs + demo] (`23c62418` the load-map page named three things
+    wrong about itself; `062d71f6` the depgraph demo queries in the console preset and the
+    graph_query agent default now match the labels the self-documentation gate actually
+    ruled -- `:CodeModule` / `IMPORTS` / `rel_path`, not `:CodeFile` / `DEPENDS_ON` /
+    `relPath`. Both call sites returned `status: success, rowCount: 0` against a populated
+    graph for as long as the drift stood, which is why nothing caught it).
+
+272. THE MERGE AND THE ID RE-MINT [CRITICAL — READ BEFORE YOU TOUCH IDEAS.md OR ANY
+    BACKLOG ITEM] (`3c250820` the merge, `846fa953` the re-mint, `1ad05b8c` the three
+    independent artifacts). On 2026-08-29 two producer machines collided on NINETEEN ids
+    at once. Resolution, and the rule it followed: ORIGIN KEEPS THE ID, the later mint
+    renumbers, decided on dependency weight rather than push order. Concretely, in this
+    range: backlog `O69`/`O70` keep their meaning and the desktop pair became `O81`/`O82`;
+    the branch-side `J52`, `MM11`, `O68`, `O71` became `J62`, `MM12`, `O79`, `O80`; and in
+    `IDEAS.md` the branch's `Idea-157` through `Idea-173` became `Idea-188` through
+    `Idea-204`, with every citation followed across twelve files.
+    WHY THIS MATTERS TO YOU MORE THAN ANY OTHER STEP IN THE RANGE:
+    `docs/restructure/IDEAS.md` is `union-append` and `backlog/items/*.yaml` is
+    `per-entry`. A naive union of this range re-introduces exactly the collisions the
+    range resolves — you would end with two `Idea-160`s meaning different things. Apply
+    the id set as it stands in the producer tree at the base; do NOT merge a pre-renumber
+    copy from an earlier fetch. The J42 backlog-union block is the check that proves you
+    did. `1ad05b8c` is unrelated content that rode the same cleanup: ADR 0015, a connector
+    comparison and an internal brief, landed off a wip branch.
+
+LEDGER COVERAGE FOOTNOTE (2026-08-29, THIRD ROLL) — the `port-base-20260826..HEAD`
+extension, cited here because the coverage check reads ONLY this section.
+IDEA CAPTURES — `docs/restructure/IDEAS.md` is `union-append` and an inbox entry is not
+apply content, so these get a citation rather than a step. Read 272 first: the ids in
+this range were re-minted. `c0ae3004` (Idea-178, and it earns a mention — it predicted
+that a cross-repo id rename would have to ride a port, which 272 is), `f1993e6f`
+(Idea-161, Salt is preferred not mandated), `f6e2ae60` + `d8a556c6` (Idea-160 and its
+KEPT-UPDATED correction), `06ae1383` + `3a7e1c93` (Idea-181, the lying `updated:` keys,
+with a persona review scoping it by file class), `e81aa45b` (Idea-182), `83c858c4`
+(Idea-183, set-not-count acceptance, adopted FROM your session's measured trap),
+`2268b47c` (Idea-184), `cdb91a01` (Idea-159), `5758b2b0` (Idea-167, the mint-vs-pull
+clause), `66eefc70` (Idea-169 gains the status field its header requires), `0292bacd`
+(Idea-205a/205b — the allocator is a sentence, not a mechanism; the entry that followed
+the collision in 272).
+RITUAL PATTERN FIX — the footnote one roll above listed `chore(snapshot):` as "the third
+instance of the same subject-line variant, listed rather than fixed by loosening the
+pattern". This roll is the fourth and fixes it: `drydocs/port_preflight.py` learns four
+drifted spellings the ledger header had exempted in words since the beginning — snapshot
+under either scope, `chore(plan): render`/`re-render`, an item-scoped `claim`, and a claim
+spelled `<ID> in_progress`. Eighteen commits in this range stopped reading as uncited. A
+`close` is deliberately still substantive. The commit carrying this is a `chore(port):
+ledger` roll and is ritual by the terminating-write rule.
+
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
