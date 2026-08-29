@@ -384,8 +384,9 @@ question a 1,000-line file with the trail at the bottom could not answer.
   must be scanned AFTER the commit it stamps exists, never before. A snapshot taken from the
   pre-merge tree that day recorded a directory main had renamed on 2026-08-26, tripped the
   [[J55]] publish-boundary guard, and had to be deleted and regenerated against the merge commit.
-  The script stamps `meta.commit`, so scanning first and committing second makes the stamp a
-  claim about a tree that was never scanned. Sibling entries in the same script, both about
+  The script stamps `meta.git` (`commit`, `full`, `branch`, `describe`, `subject`, `dirty`), so
+  scanning first and committing second makes that stamp a claim about a tree that was never
+  scanned. Sibling entries in the same script, both about
   correctness rather than cadence and neither superseded by this: [[Idea-170]] (the board refresh
   skips silently on this desktop) and the item behind the CI verdict asking about `main` from a
   branch.
