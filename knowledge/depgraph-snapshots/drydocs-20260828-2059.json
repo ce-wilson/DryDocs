@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-28T03:55:52",
+    "captured_at": "2026-08-28T20:59:15",
     "date": "20260828",
     "scan": "ui-workstream",
     "tree": true,
     "git": {
-      "commit": "36601a10",
-      "full": "36601a10226ebe03f6754881f3ed8d524723080e",
+      "commit": "66eefc70",
+      "full": "66eefc70b1dda826981e1d1bef60cc666186e77c",
       "branch": "feat/ui-workstream",
-      "describe": "port-base-20260820-158-g36601a10",
-      "subject": "feat(web): O69 — real console authentication, and the credential carrier ADR 0009 did not cover",
+      "describe": "port-base-20260820-174-g66eefc70",
+      "subject": "fix(plan): Idea-169 carries the status field its inbox header requires",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7469,6 +7469,24 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/docs/design/catalog-substrate-review.html",
+      "name": "catalog-substrate-review.html",
+      "extension": ".html",
+      "rel_path": "docs/design/catalog-substrate-review.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/catalog-substrate-review.md",
+      "name": "catalog-substrate-review.md",
+      "extension": ".md",
+      "rel_path": "docs/design/catalog-substrate-review.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/controlm-ingestion-tdd.html",
       "name": "controlm-ingestion-tdd.html",
       "extension": ".html",
@@ -11771,6 +11789,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/MM11.yaml",
+      "name": "MM11.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/MM11.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/MM2.yaml",
       "name": "MM2.yaml",
       "extension": ".yaml",
@@ -12617,6 +12644,60 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/O73.yaml",
+      "name": "O73.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O73.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O74.yaml",
+      "name": "O74.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O74.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O75.yaml",
+      "name": "O75.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O75.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O76.yaml",
+      "name": "O76.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O76.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O77.yaml",
+      "name": "O77.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O77.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O78.yaml",
+      "name": "O78.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O78.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/O8.yaml",
       "name": "O8.yaml",
       "extension": ".yaml",
@@ -13022,6 +13103,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/R23.yaml",
+      "name": "R23.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/R23.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/R3.yaml",
       "name": "R3.yaml",
       "extension": ".yaml",
@@ -13364,6 +13454,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/U27.yaml",
+      "name": "U27.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/U27.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/U3.yaml",
       "name": "U3.yaml",
       "extension": ".yaml",
@@ -13634,6 +13733,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/Y6.yaml",
+      "name": "Y6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/Y6.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/Z1.yaml",
       "name": "Z1.yaml",
       "extension": ".yaml",
@@ -13692,6 +13800,15 @@
       "name": "Z7.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/Z7.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/Z8.yaml",
+      "name": "Z8.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/Z8.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19493,10 +19610,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json",
-      "name": "drydocs-20260821.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json",
+      "name": "drydocs-20260828.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260821.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260828.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20253,6 +20370,15 @@
       "name": "README.md",
       "extension": ".md",
       "rel_path": "scripts/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/admin_demo_login.py",
+      "name": "admin_demo_login.py",
+      "extension": ".py",
+      "rel_path": "scripts/admin_demo_login.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25858,6 +25984,18 @@
       "drydocs/libs/oracle_kerberos/spider_login.py"
     ],
     [
+      "drydocs/scripts/admin_demo_login.py",
+      "drydocs/drydocs_api/credentials.py"
+    ],
+    [
+      "drydocs/scripts/admin_demo_login.py",
+      "drydocs/drydocs_api/personas.py"
+    ],
+    [
+      "drydocs/scripts/admin_demo_login.py",
+      "drydocs/scripts/set_console_credential.py"
+    ],
+    [
       "drydocs/scripts/build_mapping_db.py",
       "drydocs/drydocs_core/mapping_store.py"
     ],
@@ -26256,6 +26394,10 @@
     [
       "drydocs/tests/unit/test_console_auth.py",
       "drydocs/drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs/tests/unit/test_console_auth.py",
+      "drydocs/drydocs_api/personas.py"
     ],
     [
       "drydocs/tests/unit/test_console_auth.py",
@@ -32985,6 +33127,16 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/catalog-substrate-review.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/catalog-substrate-review.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/controlm-ingestion-tdd.html"
     ],
     [
@@ -35345,6 +35497,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/MM11.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/MM2.yaml"
     ],
     [
@@ -35815,6 +35972,36 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O73.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O74.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O75.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O76.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O77.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O78.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/O8.yaml"
     ],
     [
@@ -36040,6 +36227,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/R23.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/R3.yaml"
     ],
     [
@@ -36230,6 +36422,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/U27.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/U3.yaml"
     ],
     [
@@ -36380,6 +36577,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/Y6.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/Z1.yaml"
     ],
     [
@@ -36411,6 +36613,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/Z7.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/Z8.yaml"
     ],
     [
       "drydocs/docs/reviews",
@@ -39560,7 +39767,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260821.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -39921,6 +40128,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/README.md"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/admin_demo_login.py"
     ],
     [
       "drydocs/scripts",
@@ -42027,13 +42239,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2381,
-    "edges": 1155,
+    "files": 2395,
+    "edges": 1159,
     "circular_files": 0,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2668,
+    "rels": 2682,
     "directories": 288
   }
 }

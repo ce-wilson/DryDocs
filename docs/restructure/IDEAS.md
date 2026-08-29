@@ -93,6 +93,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-170`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
+  **snapshot.ps1's board refresh has been silently skipping on this desktop, and the warn-only
+  catch is what hides it.** Observed at the O77 close, 2026-08-28: the step reports "board
+  refresh skipped" followed by the first line of a traceback, which reads like noise; run the
+  same command from PowerShell and the real error is ModuleNotFoundError for typer, raised from
+  render_load_map.py. Cause is the known desktop VIRTUAL_ENV leak — the Claude Code shell
+  pre-sets VIRTUAL_ENV to the agents venv, so poetry resolves the wrong environment; a Bash
+  caller that unsets it succeeds and PowerShell inherits it and fails. Consequence is narrow but
+  exactly the class the ritual exists to catch: the load-map surfaces never refresh from the
+  snapshot on this machine, so a stale render there would not be noticed by the step meant to
+  notice it. Two candidate fixes, and the second matters more than the first: have the script
+  clear VIRTUAL_ENV before it calls poetry, and print the LAST line of a failed traceback rather
+  than the first, so the warning names the module instead of the word Traceback.
+
 - **`Idea-169`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
   **The verify convention serves the console on port 5199, which has not been able to sign in
   since O69.** The API's CORS allowlist (`drydocs_api/app.py`, `create_app`) is
