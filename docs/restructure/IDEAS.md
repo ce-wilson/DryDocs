@@ -360,6 +360,58 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-205b`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+  **Any fan-out orchestration has to allocate ids in the coordinator, because N parallel workers are
+  N more allocators inside one machine.** Split from [[Idea-205a]] because the disposition differs:
+  205a is a tool to build, this is a working agreement to write. No skill in this repo spawns
+  parallel workers today, so the whole concurrency model is cross-machine sessions and the rules in
+  CLAUDE.md section 0 are written for exactly that. An external fan-out command (the `/batch`
+  orchestration, invoked here on 2026-08-29) breaks the assumption in two ways at once. FIRST, ids:
+  if any worker grooms or mints, several allocators now run concurrently inside one checkout with no
+  counter between them, which is the same failure as [[Idea-205a]] with the rate raised. SECOND,
+  renders: every worker that touches the backlog or the inbox regenerates `docs/plan/board.html`,
+  `web/src/generated/gates.json`, `load-map.json` and the design HTML, so N units produce N
+  conflicting versions of files that are DERIVED and were never meant to have more than one writer
+  per cycle. Proposed rule, one sentence: the coordinator allocates every id up front and hands each
+  worker a pre-assigned id, workers never mint and never re-render, and fan-out is restricted to
+  units touching disjoint source files. Worth stating in CLAUDE.md section 0 beside the pull rule
+  rather than left for the next session to rediscover, since the orchestration command is not part
+  of this repo and cannot carry the rule itself.
+
+- **`Idea-205a`** · 2026-08-29 · `[idea]` · **open** · prio? **High** —
+  **There is no allocator. "Next free id" is a sentence in a skill file, and it has now failed six
+  times.** The rule lives at `.claude/skills/groom-backlog/SKILL.md` line 51 and at the entry-header
+  table in this file, and both amount to: an agent reads its OWN working tree and picks the next
+  number. No counter, no reservation, and nothing anywhere runs `git fetch` before minting.
+  `drydocs_core/backlog_store.py` is a reader by design and has no allocate path. The guards are all
+  local and after the fact: the duplicate-id check in `validate.py` only fires once both files sit in
+  one checkout, which is to say once the collision has already happened and the work is renumbering.
+  The band tests assert producer stays at or below 9999; nothing compares against a remote at all.
+  THE RECORD, because the count is the argument: C19 built twice (2026-07-28, produced [[J19]]), K9
+  built twice (produced [[J30]] and [[J31]]), a duplicate Idea-101 ([[J41]]), a duplicate Idea-86
+  ([[J47]], recorded at the time as "the second two-session id collision"), two different G70 AND two
+  different G71 renumbered to G75/G76 (the incident that produced the allocator bands), and on
+  2026-08-29 nineteen ids at once - O69, O70, and Idea-157 through Idea-173. Six incidents, six
+  conventions, zero enforcement points. THE CONTROL CASE IS THE INTERESTING PART: ADR numbering
+  survived the same day on the same two machines, because `docs/decisions/README.md` carried the line
+  "(0015 is an in-flight draft on the desktop.)" - a committed, pushed reservation on an id that did
+  not exist yet. Main took 0016, the desktop kept 0015, nothing collided. The mechanism that worked
+  was writing the claim down and pushing it at MINT time. PROPOSED, three parts. (a) Make "next free"
+  mean free across every remote ref rather than free in my tree: a `--next-id <letter>` mode on
+  `validate.py` that fetches, then reads `git ls-tree` over `refs/remotes/**` - tree listing only, no
+  checkout, cheap. This alone would have stopped 2026-08-29, because the laptop's O69 was already
+  pushed on `origin/feat/ui-workstream` when the desktop minted its own; the desktop never looked
+  past its own tree because the rule never said to. (b) Extend the claim protocol from PULLING to
+  MINTING - mint the id, push the stub, then write the body - which generalizes the ADR pattern and
+  closes the asymmetry [[Y6]] already identified. (c) A guard that compares local item ids against
+  `origin/main` and fails when one id carries two different titles, skipping with a named message
+  where no remote is reachable (the U26 precedent). NOT A RESTATEMENT OF THE BAND NOTE: the allocator
+  bands section of this file already says bands separate producer from company and do not cover two
+  producer machines, and commit `430025c5` says it again. The diagnosis has six descriptions and no
+  mechanism; this entry is only about the mechanism. Adjacent and deliberately not folded in:
+  [[Idea-185]]'s policy half (how two live sessions share one checkout, explicitly the user's call)
+  and [[Idea-170]]'s still-unbuilt company-side mirror guard, which leaves the partition one-sided.
+
 - **`Idea-173`** · 2026-08-25 · `[bug]` · **open — the two ACTIONABLE halves LANDED 2026-08-25 (database-inventory.md at ede62d44; the alias-in-prose sweep + SME ruling at f22da676). What stays open is the GENERALIZATION: a canonical-producer file has no company-writable surface, so a company-side fact about a company-side system still has nowhere to live** · prio? **High** —
   **A company session recorded a census on `config/source-registry.yaml`, which is
   `canonical-producer` — so the next port deletes it.** Not hypothetical and not a
