@@ -93,7 +93,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-169`** · 2026-08-28 · `[bug]` · prio? **Med** —
+- **`Idea-169`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
   **The verify convention serves the console on port 5199, which has not been able to sign in
   since O69.** The API's CORS allowlist (`drydocs_api/app.py`, `create_app`) is
   `http://localhost:5173` and `http://localhost:4173` only, so a console served anywhere else
