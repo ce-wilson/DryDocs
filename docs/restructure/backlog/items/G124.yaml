@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/design/catalog-substrate-review.md
@@ -111,3 +111,52 @@ notes: |
   standing ADRs (0009's git-text source of truth, 0014's per-machine exception). Module `docs`
   follows Y1/R1 and the G104 precedent: a decision document is docs work even when its subject is
   config. Epic component-topology and phase 6 follow G81/G104/G109, the three items this rules on.
+
+  DONE 2026-08-29 (desktop). docs/decisions/0017-source-binding-substrate.md written, status
+  PROPOSED, and the README row reads Proposed -- the ruling is the user's and this item does not
+  make it. All five decisions taken, plus the venue question the acceptance put first.
+
+  THE VENUE QUESTION IS ARGUED IN THE ADR'S FIRST SECTION AND THE ANSWER IS (i), STAND ALONE.
+  Two arguments, one of substance and one of process. SUBSTANCE: 0014's own governing line scopes
+  it to values that are "a per-machine operational fact -- a path, a verbosity, a retention
+  window", and a source-to-connection binding is a DOMAIN fact with an owner (which origins exist,
+  which datasets inherit each, which profile authenticates them). Filing it under 0014 would make
+  0014's scope line the first casualty. PROCESS: an accepted ADR is a ruling the user made, and
+  amending one goes back to them either way -- so the only question is whether it arrives as edits
+  scattered through a ruled document or as a record that can be read and rejected whole. The ADR
+  names where the ruling could go the other way rather than burying it: if the user reads the
+  runtime substrate as "everything about where things are on this machine", 0017 is withdrawn and
+  0014 gains a clause 8.
+
+  THE 0009 RECONCILIATION NEEDED NO NEW EXCEPTION, which is the cleanest outcome available and was
+  not assumed. It splits along the line 0014 already drew for config/data-zones.yaml -- the MAP is
+  committed git text, only the ROOT is per-machine -- one level over: the TABLE (which origins,
+  which profile, which variable NAME) passes all three of 0009 rule 1's named tests, and the
+  VALUES (host, port, SID, password) are 0014's per-machine exception plus the publish boundary.
+  The two ADRs do not have to be traded off against each other; this is the only split that
+  satisfies both.
+
+  THE SURVEY WAS RE-VERIFIED AGAINST THE TREE, NOT TRUSTED, and it earned that: the review is one
+  day old but was written on a branch, and one of its findings had already been overtaken by G126
+  the same morning -- the review argues DataHub's __DATAHUB_TO_FILE_ directive is wrong here
+  because the write runs the other way, and that file is now a DECLARED READ ZONE saying exactly
+  that mechanically. The rejected-alternatives entry cites G126 rather than restating the prose.
+  The counts hold: 15 manual / 15 automated confirmed by grep, and locator blocks confirmed to be
+  free-text prose (`service: ~` plus a comment) rather than a resolvable declaration.
+
+  ONE FINDING THE REVIEW DID NOT HAVE, carried in from G123's ruling and now the ADR's sharpest
+  piece of evidence: source-registry.yaml line 201 still advertises `DRYDOCS_DATA_ROOT (default
+  ~/data/DryDocs)` six days after G81 (d) removed that default. It survived because a locator
+  block is free text no guard reads. That is the ADR's whole argument in one line -- prose in a
+  locator block is not a declaration -- so it is quoted in Context rather than left in a backlog
+  note. The fix belongs to G125 clause (e).
+
+  TWO ALTERNATIVES ADDED BEYOND THE ONES THE ACCEPTANCE LISTED, because a rejected-alternatives
+  section that only lists what a survey happened to mention is not doing its job: Collibra/Alation/
+  Atlan (checked and dropped as duplicates of the Purview shape), and DOING NOTHING -- letting
+  internal-local/ hold the answer informally, which is the status quo and therefore the alternative
+  most likely to win by default. It is named and answered on the audit question.
+
+  SCOPE HELD: no code changed, nothing in 0014 was edited, and the ADR states in its own text that
+  G125 may leave the manual half alone -- ruling the two halves the same SHAPE without ordering a
+  rewrite that buys nothing. Suite 2742 passed / 9 skipped, ruff + format clean.
