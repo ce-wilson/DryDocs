@@ -39,8 +39,8 @@ def test_default_hidden_props_contract() -> None:
     assert "version_serial" in DEFAULT_HIDDEN_PROPS
 
 
-def test_provenance_from_spine_on_header() -> None:
-    spine = ReviewLabels.from_dict(
+def test_provenance_from_backbone_on_header() -> None:
+    backbone = ReviewLabels.from_dict(
         {
             "sources": [
                 {
@@ -51,7 +51,7 @@ def test_provenance_from_spine_on_header() -> None:
             ]
         }
     )
-    out = render_review(_ROWS, review_labels=spine)
+    out = render_review(_ROWS, review_labels=backbone)
     assert "bmc-x" in out and "vendor baseline" in out
 
 

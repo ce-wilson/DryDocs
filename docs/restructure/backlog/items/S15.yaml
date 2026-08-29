@@ -1,0 +1,47 @@
+id: S15
+epic: structure-remediation
+title: Four tests pass in the full suite and fail when their file runs alone — a circular import between
+  a CLI domain module and the composition root, hidden by import order
+type: bug
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: [S13]
+inputs:
+- tests/unit/test_repo_paths.py
+- drydocs/cli_docs.py
+- drydocs/cli.py
+acceptance: |
+  (a) THE FILE PASSES ALONE. Running `tests/unit/test_repo_paths.py` on its own currently gives four failures, all a partially-initialized-module error on a CLI domain module, from the parametrized content-defaults cases. In the full suite something imports the composition root first and the cycle resolves, so the failure is invisible. After this item the file passes both alone and in the suite, and the close note shows both runs.
+
+  (b) THE FIX DOES NOT LOOSEN THE BOUNDARY. The likely fix is an import-order-independent accessor in the TEST rather than a change to the module graph; if the fix instead touches the boundary test's entrypoint exemption, that is a different decision and needs saying out loud with a reason, not slipping in under a test fix.
+
+  (c) THE SIBLINGS ARE CHECKED. The S8 split produced several CLI domain modules, not just the one that happens to be parametrized here. Whoever takes it checks the others for the same shape and states the result — fixing only the two parametrized ones leaves the same trap for the next module someone adds to the list.
+
+  (d) THE CYCLE IS NAMED EVEN IF IT IS NOT DISSOLVED. The import graph is telling the truth about a real coupling between the domain module and the composition root. If the item does not remove that coupling, it records it where the next reader meets it, so a future reader does not re-derive the diagnosis from four confusing failures.
+notes: |
+  Groomed 2026-08-26 from Idea-159. Verified PRE-EXISTING at origin/main and still live: reproduced at this groom on the desktop (2026-08-26) — 4 failed, 45 passed running that file alone, the same four parametrized cases the entry names. Not introduced by G79.
+
+  Why it is worth fixing rather than tolerating: a developer narrowing to one file to iterate gets four red tests that have nothing to do with their change, which trains people to ignore red.
+
+  Epic structure-remediation and module `drydocs-load` follow S8, which performed the CLI split that produced this shape. p2/sonnet.
+
+  CROSS-CITE 2026-08-28 (grooming): same defect as S13 (groomed 2026-08-23) — this item
+  was groomed 2026-08-26 from Idea-159 without finding it. S13 is the claim surface;
+  depends_on set so the ready strip offers exactly one of the pair. Closing S13 per its
+  acceptance (which now folds this item's narrower clauses) closes this item; set both
+  done in the same commit.
+  DONE 2026-08-27 (laptop, Lane B — closed by S13's fix, same commit; full build detail in
+  S13's done note). This item's own clauses: (a) test_repo_paths.py standalone 4 failed /
+  45 passed before -> 49 passed after, green in the full suite both sides. (b) the boundary
+  was NOT loosened — ENTRYPOINT_MODULES is untouched; the fix is the module graph itself (the
+  cli_shared hoist), not a test accessor and not an exemption. (c) siblings: all six S8
+  command modules plus the root and cli_shared are covered by the new subprocess guard
+  (tests/unit/test_cli_import_order.py), so the next module someone adds to the list fails by
+  name, not by four confusing repo_paths failures. (d) the cycle is DISSOLVED, not merely
+  named — and the shape is recorded where the next reader meets it: cli_shared's module
+  docstring, the root's bottom-import comment (the old "blessed circular edge" sentence is
+  gone), each command module's _client wrapper, and MODULE_MAP.md.

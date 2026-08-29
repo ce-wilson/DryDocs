@@ -1,0 +1,40 @@
+id: J61
+epic: release-infrastructure
+title: A shared checkout blocked by another live session's uncommitted file can neither pull nor
+  push, and the branch guardrail returns EMPTY in the detached worktree that is the only way out —
+  write the recovery down instead of improvising it once per session
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- CLAUDE.md
+- scripts/render_board.py
+- docs/restructure/backlog/items/J48.yaml
+- docs/restructure/backlog/items/U27.yaml
+acceptance: |
+  (a) THE RECOVERY LIVES WHERE THE BLOCK IS HIT. The session ritual in CLAUDE.md section 0 today opens with "Start - git pull" and says nothing about that pull failing. It gains the named recovery for the one case that actually occurs on this desktop - the pull aborts because a file the incoming merge touches is dirty from the OTHER live session in the same tree, and the abort is wholesale even though nothing the arriving session intends to touch is involved. The recipe is a command sequence, not advice - fetch, add a detached worktree at origin slash main under the scratchpad, work and stage by explicit path there, commit, push HEAD to main, remove the worktree - and every command in it is run once against this tree while the item is being written, with the observed output recorded in the close note. A recipe nobody executed is the class of thing that is wrong the first time somebody needs it.
+
+  (b) THE BRANCH GUARDRAIL IS GIVEN AN ANSWER FOR THE DETACHED CASE, BECAUSE TODAY IT HAS NONE. Section 0 says to ALWAYS run the show-current branch command immediately before committing and to name the target branch. In a detached worktree that command prints an EMPTY string - measured in this groom - so the guardrail as written produces no name to check and a session following it literally either stops or waves it through. State the substitute check for the detached case and say what a correct answer looks like, so the guardrail keeps working rather than being skipped where it is needed most. Whatever substitute is chosen must distinguish "detached at the tip I intend to push onto" from "detached somewhere else", because those are the two outcomes the guardrail exists to separate.
+
+  (c) THE WORKAROUND COMPOUNDS THE BLOCK, AND THAT IS STATED IN THE RECIPE. Pushing from the detached worktree advances the remote while the blocked checkout's own main ref stays where it was, so the shared tree finishes the session further behind than it started and the next session meets the same dirty file plus more commits behind it. Say plainly that the workaround unblocks the WORK and not the TREE, and that only the session holding the uncommitted file can clear it. Without this a reader reasonably concludes the recipe fixed the situation.
+
+  (d) RENDERS FROM A WORKTREE ARE DECLARED SAFE AND THE FIX IS CITED. The session-close render is part of the ritual the recipe has to carry, and there is a live memory of renders written from a worktree landing in the MAIN checkout instead. J48 finished that fix. The recipe states that a default-paths board render run from a worktree writes worktree-local, cites J48 as the reason it is now true, and records the check - a render whose reported output paths all sit under the worktree root. Re-verify at build time rather than trusting this clause.
+
+  (e) THE EVIDENCE IS CITED BY ARTIFACT, NOT SUMMARIZED. Two independent occurrences on 2026-08-28, hours apart, on the same file. Commit 2946de82 records the first in its own message body - a port-ledger session committed from a temp worktree because the desktop checkout was ff-blocked by a concurrent session's uncommitted ADR index edit. This groom hit the identical abort on the identical file and independently invented the identical workaround. Two sessions solving the same problem the same way on the same day with nothing written down between them IS the defect being fixed here, and the item says so.
+
+  (f) OUT OF SCOPE, DELIBERATELY. Not in this item - any rule about how two sessions share one working tree, and any rule about how long an uncommitted draft may sit in it. Both are the user's call and are captured separately in the inbox rather than decided here. Also out of scope - the session-close CI check's own detached-HEAD blindness, which is U27's, already captured, and must not be re-solved here.
+
+  (g) NO CODE, NO GUARD. This item edits procedure only and ships no behaviour change and no test. Say so, and say why - the failing step is a human ritual reading a document, and there is no point in the sequence where a guard could observe it.
+notes: |
+  Groomed 2026-08-28 (desktop, weekly groom) from a defect observed DURING the groom rather than from an inbox entry, which is why it carries no Idea id of its own. The IDEAS.md inbox held nothing ungroomed at this run - the 2026-08-28 groom at 206bab66 had already consumed it - and this is the one thing the run itself turned up.
+
+  Epic release-infrastructure / module docs / phase 8 follows J52 and J57, the two direct precedents - a verification or operating discipline learned from a specific incident and written into the guide so the next session inherits it instead of rediscovering it. Same epic, same module, same phase, and the same reason for sonnet over haiku - clause (a) requires actually running the sequence and clause (b) requires choosing a substitute check, neither of which is transcription.
+
+  Clause (b) is the half worth the item on its own. The ff-block has a workaround and everybody finds it; what nobody notices is that the workaround silently disarms the ONE guardrail section 0 calls out in capitals, because the command it names returns an empty string instead of failing. A guardrail that returns nothing reads as a guardrail that passed.
+
+  This item was itself written and committed through the recipe it describes, from a detached worktree at origin slash main, which is the closest thing to a pre-verification the shape allows.

@@ -1,5 +1,6 @@
-"""SEAL row models — locked to the real DECO_SEAL_APP_INFO column list and
-the SEAL framework role vocabulary.
+"""SEAL row models — locked to the real DECO_SEAL_APP_INFO column list.
+The role vocabulary is DECLARED, not modelled here (G70):
+config/taxonomy/tom-role-vocabulary.yaml via drydocs_core.ontology.tom_role_vocabulary.
 
 Source table: ``PSGMGR.DECO_SEAL_APP_INFO``. Column list locked to the
 DDL the production support team shared. The ~90 source columns are
@@ -17,10 +18,11 @@ dropped at the boundary.
 
 from __future__ import annotations
 
+import re
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 # ============================================================================
 # Coercers
@@ -84,44 +86,20 @@ class RiskLevel(str, Enum):
     CRITICAL = "Critical"
 
 
-class SealRole(str, Enum):
-    """SEAL framework role vocabulary (per seal-overview-with-roles.txt).
-
-    Mandatory application-level roles come from the SEAL spec.
-    L1/L2 Operate Manager and Risk Manager are optional but commonly
-    set by production support teams; Backup Application Owner became
-    effective 2026-05-18.
-
-    This enum is the ADMISSION LIST for source role names — what a contact
-    row is allowed to say — and not the ontology's concept scheme. A name
-    admitted here still has to crosswalk to a :TOMRole in
-    loaders/cypher/seal_contacts.cypher; one that doesn't is loaded and
-    flagged ``unmapped_role`` rather than guessed at (the K4 policy).
-    Membership here is therefore the cheap, reversible half of the
-    vocabulary question that gate G35 is deciding in full.
-    """
-
-    APPLICATION_OWNER = "Application Owner"
-    PRIMARY_INFORMATION_OWNER = "Primary Information Owner"
-    BACKUP_INFORMATION_OWNER = "Backup Information Owner"
-    CTO = "CTO"
-    DESIGN_AUTHORITY = "Design Authority"
-    CHIEF_BUSINESS_TECHNOLOGIST = "Chief Business Technologist"
-    L1_OPERATE_MANAGER = "L1 Operate Manager"
-    L2_OPERATE_MANAGER = "L2 Operate Manager"
-    # Added 2026-08-06 on SME direction (gate G35 §A5, confirmed three times):
-    # L1, L2 and bare Operate Manager are THREE role classes that may be held by
-    # three different people or by one. Before this, a bare 'Operate Manager' had
-    # no admissible value of its own and was rewritten to L2 — see _ROLE_CANONICAL.
-    OPERATE_MANAGER = "Operate Manager"
-    BACKUP_APPLICATION_OWNER = "Backup Application Owner"
-    # Kept from the original DryDocs v3 §F design even though it doesn't
-    # appear in the published SEAL spec — production support teams set
-    # it via a custom field.
-    RISK_MANAGER = "Risk Manager"
-
+# The SealRole enum that stood here was RETIRED at G70 (gate tom-roles-
+# enumeration-and-cardinality §A3/§F4, signed 2026-08-11): an enum cannot
+# admit a name declared at load, and as the admission gate it silently cost
+# four of the SME's thirteen classes (§A1d measured it). The declared
+# vocabulary — config/taxonomy/tom-role-vocabulary.yaml, read by
+# drydocs_core.ontology.tom_role_vocabulary — is the one membership surface
+# now; an undeclared name LOADS flagged (``unmapped_role``), never dies at
+# validation.
 
 # Role name canonicalizer — tolerates common drift from real CSV exports.
+# SURVIVES the enum's retirement on purpose (§F4): alias tolerance
+# ('l2 ops manager', 'bio') is a separate concern from vocabulary membership.
+# Every value here must resolve INTO the declared vocabulary's source_names
+# (guarded by tests/unit/test_tom_role_vocabulary.py).
 _ROLE_CANONICAL: dict[str, str] = {
     # App Owner family
     "app owner": "Application Owner",
@@ -174,13 +152,55 @@ _ROLE_CANONICAL: dict[str, str] = {
 }
 
 
+_PAREN_SUFFIX = re.compile(r"\s*\([^)]*\)\s*$")
+_LEVEL_TOKEN = re.compile(r"\bl([12])\b", re.IGNORECASE)
+
+
+def _level_of(name: str) -> str | None:
+    """'l1' / 'l2' where the string names an Operate Manager level, else None."""
+    match = _LEVEL_TOKEN.search(name)
+    return f"l{match.group(1)}" if match else None
+
+
 def canonicalize_role(raw: Any) -> str | None:
-    """Canonical role name from an arbitrary input string. Returns the
-    canonical SEAL-spec name or None if unrecognised."""
+    """Canonical role name from an arbitrary input string, or None.
+
+    Resolution order (G70, gate §A3b's second question — normalise rather
+    than grow an alias per typographic variant):
+    1. the alias table, on the raw lowercased string (pre-G70 behaviour);
+    2. the same lookups after NORMALIZATION — internal whitespace collapsed
+       and one trailing parenthetical stripped, so the SME's
+       'Name (ABBREV)' convention ('Chief Technology Officer(CTO)')
+       resolves without an alias per bracketing;
+    3. the DECLARED vocabulary's source_names (casefold) — which is what
+       admits classes the alias table never listed (Deployment Owner et al.).
+
+    THE LEVEL INVARIANT EXTENDS TO EVERY PATH (the 2026-08-06 defect,
+    generalised): a raw string that names an Operate Manager level may only
+    resolve to that level, and one that names none may never gain one —
+    'Operate Manager (L2)' returns None (flagged) rather than silently
+    dropping the level its parenthetical stated.
+    """
     s = _str_or_none(raw)
     if s is None:
         return None
-    return _ROLE_CANONICAL.get(s.lower())
+    normalized = _PAREN_SUFFIX.sub("", " ".join(s.split()))
+    for candidate in (s, normalized):
+        if not candidate:
+            continue
+        hit = _ROLE_CANONICAL.get(candidate.lower())
+        if hit is None:
+            from drydocs_core.ontology.tom_role_vocabulary import load_vocabulary
+
+            concept = load_vocabulary().concept_for(candidate)
+            if concept is not None:
+                # return the DECLARED spelling, not the caller's casing
+                wanted = candidate.strip().casefold()
+                cls = load_vocabulary().by_id(concept)
+                hit = next(n for n in cls.source_names if n.casefold() == wanted)
+        if hit is not None:
+            return hit if _level_of(s) == _level_of(hit) else None
+    return None
 
 
 # ============================================================================
@@ -451,6 +471,22 @@ class SealContactRow(BaseModel):
 
     Expected columns (case-insensitive, populated_by_name aliases):
         app_id, role_name, employee_sid, employee_name, employee_email
+
+    G70 (gate §A3/§F4/§A4b): the row is no longer refused for an unrecognised
+    role name. Three role fields leave validation, all derived from the one
+    input:
+
+    - ``role_source_name`` — the raw source string, VERBATIM (§A4b: the field
+      ledger's "kept verbatim" promise, now actually kept — the raw survives
+      ALONGSIDE the canonical, so 'Tech Partner' vs 'CTO' stays answerable);
+    - ``role_name``       — the canonical spelling where the alias table or
+      the declared vocabulary recognises the input, else the raw name
+      admitted as-is (it still forms the attribution_id segment, so the
+      source's own term is kept — identity gate §B2);
+    - ``tom_role_id``     — the declared vocabulary's concept id, or None for
+      an UNDECLARED name, which the loader flags ``unmapped_role`` instead of
+      this model killing the row (§A1d: the old gate silently cost four of
+      the SME's thirteen classes).
     """
 
     model_config = ConfigDict(
@@ -460,7 +496,11 @@ class SealContactRow(BaseModel):
     )
 
     app_id: str = Field(..., min_length=1)
-    role_name: SealRole
+    role_name: str = Field(..., min_length=1)
+    #: the raw source string, verbatim (§A4b) — derived, never supplied
+    role_source_name: str = ""
+    #: declared-vocabulary concept id; None = undeclared, loads flagged
+    tom_role_id: str | None = None
     employee_sid: str = Field(
         ...,
         min_length=1,
@@ -482,10 +522,21 @@ class SealContactRow(BaseModel):
     def _opt_str(cls, v: Any) -> str | None:
         return _str_or_none(v)
 
-    @field_validator("role_name", mode="before")
+    @model_validator(mode="before")
     @classmethod
-    def _role(cls, v: Any) -> str:
-        canon = canonicalize_role(v)
-        if canon is None:
-            raise ValueError(f"unrecognised SEAL role: {v!r}")
-        return canon
+    def _roles(cls, data: Any) -> Any:
+        """Derive the three role fields from the one source input (G70).
+
+        Always derived, even when a caller supplies them — one source of
+        truth, so a stale ``tom_role_id`` cannot ride in from a fixture."""
+        if isinstance(data, dict):
+            raw = _str_or_none(data.get("role_name"))
+            if raw is not None:
+                canon = canonicalize_role(raw)
+                data = dict(data)
+                data["role_source_name"] = raw
+                data["role_name"] = canon if canon is not None else raw
+                from drydocs_core.ontology.tom_role_vocabulary import concept_for
+
+                data["tom_role_id"] = concept_for(data["role_name"])
+        return data

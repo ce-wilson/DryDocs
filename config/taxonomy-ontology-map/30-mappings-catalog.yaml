@@ -57,7 +57,7 @@
       qualified_form:
         pattern: "(Product|AreaProduct) -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> ProductRole"
         prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
-        role_vocabulary: "ProductRole (skos:Concept) — EXACTLY the fixed 7 in scheme product_roles: area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead. Scheme FIXED (the tom_roles precedent — new roles require a new gate) and NO cto member: the families are independent (SME 2026-07-20; rename history as a skos:changeNote on tech_partner — formerly named 'CTO' in SEAL, whose CTO now denotes the product-level role). Scope: :Product / :AreaProduct only, never :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct. DISTINCT from :Role (org:Role, PAT hierarchy membership) and from :TOMRole — no shared concepts."
+        role_vocabulary: "ProductRole (skos:Concept) — EXACTLY the fixed 7 in scheme product_roles: area_product_owner, product_owner, product_architect, tech_partner, data_owner, data_certifier, analytics_lead. Scheme FIXED on its own K5/K6 ruling — new roles require a new gate (the once-cited tom_roles precedent moved to a declared vocabulary at G70; K5 is not reopened) and NO cto member: the families are independent (SME 2026-07-20; rename history as a skos:changeNote on tech_partner — formerly named 'CTO' in SEAL, whose CTO now denotes the product-level role). Scope: :Product / :AreaProduct only, never :BusinessApplication; area_product_owner AND tech_partner attach ONLY to :AreaProduct. DISTINCT from :Role (org:Role, PAT hierarchy membership) and from :TOMRole — no shared concepts."
       vocab_id: [catalog_cabinet_qualified_attribution, human_attribution_has_agent, catalog_cabinet_attribution_had_role, catalog_cabinet_attributed_to]   # HAS_AGENT hop REUSES seal_attribution_has_agent (duplicate-triple guard, C8 schema meta-graph); catalog_cabinet_attributed_to = the collapsed simple form, SME-decided 2026-07-20 (gate section C)
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept, skos:inScheme)", "W3C ORG (org:reportsTo — cited for the deferred cross-family reporting edges, gate section D)"]
@@ -231,18 +231,33 @@
       entry stays status: planned until the product-scoped extract is onboarded
       here (C9 condition unchanged); K13 reconciled the semantics only.
 
-  # ---- C26: company-catalog divergence (2026-08-21) — ID RESERVATIONS ONLY, proposed ----
-  # Both ids are the ones the COMPANY gate page (internal/org/catalog/, 2026-06-25)
-  # expects. They are registered so an inbound port collides on a deliberate
-  # placeholder instead of adding a second concept beside lob-has-product-line /
-  # lob-reconciles-to-segment. Nothing is confirmed; adoption is C27.
+  # ---- C26 reservations — BOTH REJECTED at the C27 ruling (2026-08-25) ----------
+  # They reserved names NOBODY USES. C26 registered `sub-lob-org-unit` and
+  # `catalog-lob-reconciles-segment` reading the company's 2026-06-25 gate page;
+  # the company then built `lob-has-sub-lob` and `sub-lob-has-product-line` and
+  # KEPT the producer's `lob-reconciles-to-segment` rather than renaming it. A
+  # placeholder that guards a name nobody mints guards nothing, so the purpose
+  # C26 stated — "a port collides on a deliberate placeholder" — was never served.
+  #
+  # THE NAMES THE PRODUCER MUST NOT MINT, which is what the reservation was for:
+  #   lob-has-sub-lob            company-only row, their 60-mappings-company.yaml
+  #   sub-lob-has-product-line   company-only row, the widened HAS_PRODUCT_LINE range
+  # They live in a company-only fragment and the port is one-way, so they never
+  # arrive here. The collision risk is the producer later minting either name into
+  # its own fragment: the per-entry merge is id-keyed, so that lands as one id with
+  # two meanings. Recorded as names rather than as entries because the producer
+  # models no Sub-LoB grain — a full map row for a concept we do not hold would be
+  # a second fiction beside the one being retired here.
+  #
+  # Both rows below keep the `rejected` lifecycle: SUPERSEDED, not repudiated, kept
+  # for audit (the C12 `requires-scheduler` precedent).
   - id: sub-lob-org-unit
     taxonomy:
       source: "pat:product-catalog"
       element: "LOB contains Sub-LoB (company 5-field pat_lob_sublob_productline.csv grain; producer capture has no Sub-LoB column)"
     ontology:
       from_node: CatalogLOB
-      to_node: CatalogSubLOB                # company spelling :SubLOB — the C27 LABEL ruling decides
+      to_node: CatalogSubLOB                # RULED 2026-08-25 (C27 (b), Option 1): CatalogSubLOB stands; the company relabels :SubLOB
       matrix_row: "local catalog hierarchy (no PROV row)"
       neo4j_label: HAS_SUB_LOB
       prov_maps_to: ~
@@ -251,12 +266,14 @@
     capture: >
       waived — reservation only (C26 acceptance (b)). The producer taxonomy capture does not
       carry the grain; adopting it means a capture change, and that is C27's to rule.
-    status: proposed
+    status: rejected                        # SUPERSEDED by the company's real id, not repudiated (C27 ruling 2026-08-25)
+    superseded_by: lob-has-sub-lob          # company-only row; the producer must not mint this name for anything else
     depends_on: ~
     proposed_at: 2026-08-21
+    rejected_at: 2026-08-25
     open_questions:
-      - "LABEL and KEY together (C26 acceptance (c)): `:LOB` vs `:CatalogLOB`, and how the S3 `app_id` key (signed 2026-07-27) lands on shapes the company authored before the rename. The C27 gate rules both in one session; neither may be ruled alone."
-      - "Range widening: does HAS_PRODUCT_LINE from a Sub-LoB coexist with HAS_PRODUCT_LINE from a LOB (company fallback branch), or does every product line get a Sub-LoB parent once the column is captured?"
+      - "SETTLED 2026-08-25 (C27 (b), gate-log RULING heading): the label is CatalogSubLOB, Option 1 — the company relabels and the producer's reserved label stands. The LOB half was settled earlier by the company's own 2026-08-06 GATE REVERSAL. The S3 `app_id` half is NOT closed here: it is Tier-B HELD company-side under their tracker T1, rebuild-not-migrate, and was never this row's to rule."
+      - "STILL OPEN, and it belongs to whoever builds the grain: does HAS_PRODUCT_LINE from a Sub-LoB coexist with HAS_PRODUCT_LINE from a LOB (the company fallback branch), or does every product line get a Sub-LoB parent once the column is captured? The producer captures no Sub-LoB column, so this cannot be answered producer-side today."
 
   - id: catalog-lob-reconciles-segment
     taxonomy:
@@ -273,11 +290,13 @@
     capture: >
       waived — id reservation only (C26 acceptance (b)). Semantics live on lob-reconciles-to-segment;
       this row exists so a port sees the collision and reconciles by id instead of duplicating.
-    status: proposed
+    status: rejected                        # SUPERSEDED, not repudiated (C27 ruling 2026-08-25)
+    superseded_by: lob-reconciles-to-segment  # the producer's own confirmed id — it survived because the company never renamed
     depends_on: ~
     proposed_at: 2026-08-21
+    rejected_at: 2026-08-25
     open_questions:
-      - "Which id survives after C27 — the producer's (confirmed) or the company's — and whether the loser is deprecated with superseded_by per the id policy (never renamed in place)."
+      - "ANSWERED 2026-08-25: the PRODUCER's id survives. This row reserved the company's expected rename and the rename never happened — their C27 review confirms they kept `lob-reconciles-to-segment` and added company-only rows instead. Rejected per the id policy (deprecate with superseded_by, never rename in place)."
       - "RELAY, company-side: the page's functional-org target 'Corporate' is ambiguous against the seeded :BusinessSegment {code:'Corp', name:'Corporate'} — read as a code it MERGEs a phantom segment."
 
   # ---- G34: business-glossary scaffold (2026-08-21) — RESERVATION ONLY, proposed ----

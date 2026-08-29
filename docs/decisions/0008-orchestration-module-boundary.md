@@ -60,7 +60,7 @@ The crosswalks show the *concepts* hold and the *parsers* do not. Fidelity distr
 
 Airflow's four no-equivalents (trigger-rule vocabulary, pools, XCom, dynamic task mapping)
 are real gaps that route to `ontology-mapper`, not silent losses. Folder/job/condition — the
-graph's spine — maps cleanly for both.
+graph's backbone — maps cleanly for both.
 
 ### The real problem
 

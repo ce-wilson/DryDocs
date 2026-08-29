@@ -480,7 +480,7 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
           )}
         </section>
 
-        <PlaceholderSection n={4} title="Review for ontology (the FCDO-style pass)" slice="O48" />
+        <PlaceholderSection n={4} title="Review for ontology (the CDO-style pass)" slice="O48" />
         <PlaceholderSection n={5} title="Related nodes in the structured graph" slice="O49" />
         <PlaceholderSection n={6} title="Agent first-pass correlation" slice="O49" />
         <PlaceholderSection n={7} title="Confirm → admin review → (gated) load" slice="O50" />

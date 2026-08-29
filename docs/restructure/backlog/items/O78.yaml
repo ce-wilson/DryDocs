@@ -30,4 +30,4 @@ acceptance: |
 
   Evidence: screenshots of all five routes in both themes with every relationship name legible and every node name still legible; npm run build and oxlint clean.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-158 (2026-08-26, prio proposed Med). p2 rather than p1 because each MiniDag map loses SOME names rather than all of them, unlike O77 — raise it if the console is about to be demonstrated.
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-189 (2026-08-26, prio proposed Med). p2 rather than p1 because each MiniDag map loses SOME names rather than all of them, unlike O77 — raise it if the console is about to be demonstrated.

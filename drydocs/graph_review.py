@@ -6,7 +6,7 @@ row with ``hidden_props`` stripped.
 
 **No Neo4j in this module** — the CLI (or a script) fetches rows and hands them in as
 ``{label: [node_props, ...]}``, so rendering is pure and offline. The optional
-:class:`drydocs.review_labels.ReviewLabels` spine supplies section order + provenance.
+:class:`drydocs.review_labels.ReviewLabels` backbone supplies section order + provenance.
 
 classification: Internal-Public — the renderer is generic. A *rendered page* inherits
 the classification of the graph rows fed to it (real graph data is Internal+); such
@@ -45,9 +45,11 @@ def group_rows(
 def _ordered_labels(rows_by_label: Mapping[str, Any], review_labels: Any | None) -> list[str]:
     if review_labels is None:
         return list(rows_by_label)
-    spine = [lbl for lbl in review_labels.all_labels() if lbl in rows_by_label]
-    extra = [lbl for lbl in rows_by_label if lbl not in spine]  # present in rows, not in spine
-    return spine + extra
+    backbone = [lbl for lbl in review_labels.all_labels() if lbl in rows_by_label]
+    extra = [
+        lbl for lbl in rows_by_label if lbl not in backbone
+    ]  # present in rows, not in backbone
+    return backbone + extra
 
 
 def _provenance_for(label: str, review_labels: Any | None) -> str:
@@ -91,7 +93,7 @@ def render_review(
 
     ``rows_by_label`` maps each DATA label to its node-property dicts (use
     :func:`group_rows` for a flat stream). ``review_labels`` (optional) orders the
-    sections by the review spine and adds source provenance to each header.
+    sections by the review backbone and adds source provenance to each header.
     """
     hidden = frozenset(hidden_props)
     sections: list[str] = []

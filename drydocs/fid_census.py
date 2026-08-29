@@ -1,9 +1,12 @@
 """FID directory census (K16) — the Phase-0 measurement doc 09 says to run FIRST.
 
-Gate ``fid-identity-and-scope`` is DRAFTED AND UNSIGNED, and §D2 says why this runs
-before it: *"about two hundred accounts per application"* is an estimate the gate
-cannot rule on, and the census turns it into *"N of ~200, and here is what the other
-rows are"*.
+Gate ``fid-identity-and-scope`` SIGNED OFF 33/33 on 2026-08-19 (K17,
+config/gate-log.md). The census deliberately RAN AHEAD of it, and §D2 is why that
+ordering was right — kept as history because it is the reason this module is shaped
+the way it is (the K16 company prompt's rider made the same move about itself):
+*"about two hundred accounts per application"* was an estimate the gate could not
+rule on, and the census turned it into *"N of ~200, and here is what the other rows
+are"* — the Phase-0 numbers the sign-off then ruled from.
 
 WHAT THIS MODULE IS. The METHOD only. Every input is INJECTED — this module opens no
 file, contacts no database, and writes nothing. The counts it produces are Internal
@@ -46,9 +49,11 @@ unruled disagreement is visible as its own number rather than being absorbed int
 neighbouring bucket — the never-silent house rule applied to the report.
 
 TWO THINGS THE CENSUS SETTLES FOR FREE (doc 09, "Phase 0"):
-  * gate §Q5 — whether non-application account types ever appear as run-as owners. If
-    they do, type cannot be used even as an explanatory filter. See
-    ``run_as_owner_types``.
+  * gate §Q5 — whether non-application account types ever appear as run-as owners.
+    ANSWERED at round 1 (2026-08-19): YES — personal-shaped ids run jobs (143 owners /
+    11,948 jobs on the replica evidence), so the directory type column is never a pull
+    filter, only the §D2 breakdown lens. ``run_as_owner_types`` keeps reporting the
+    breakdown that is that answer's ongoing evidence.
   * the §Q4 disagreement rate above.
 
 REGISTRATION IS NOT ATTRIBUTION. The two facts this module compares answer DIFFERENT
@@ -80,9 +85,12 @@ UNRULED = "unruled"
 #: graph-test, never a Neo4j constraint. Twice-established precedent: minimum
 #: cardinality is not expressible in Neo4j ("NEVER a uniqueness constraint —
 #: graph-TEST instead, the TOM-roles lesson"), so the census counts violations
-#: and the enforcement lives in graph-tests/ once the account->owner edge exists.
-#: It does not exist yet: doc 09's phase list models account->APPLICATION and
-#: never account->PERSON, which is the gap this rule exposes.
+#: and the enforcement lives in graph-tests/ once the account->owner edge is
+#: ACTIVE. The edge is now REGISTERED, status planned — ``human_appuser_owned_by``
+#: (52-local-human.yaml; the Q7 owner-of-record ruling at the 2026-08-19
+#: sign-off) — closing the gap this rule exposed: doc 09's phase list modelled
+#: account->APPLICATION and never account->PERSON. Until a build item flips it
+#: active, this threshold stays a census measure, not an enforcement.
 OWNER_MINIMUM = 2
 
 #: doc 09's three demand sets, in the doc's own order.

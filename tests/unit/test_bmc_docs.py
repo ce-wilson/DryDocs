@@ -483,3 +483,53 @@ def test_no_merge_on_nullable_keys() -> None:
     assert "product_id: row.subject_product_id" not in text.replace(
         "OPTIONAL MATCH (sp:SoftwareProduct {product_id: row.subject_product_id})", ""
     )
+
+
+# ---- Q18: the DESCRIBES target is the LEDGER's, not a module constant --------
+
+
+def test_describes_target_is_registry_driven_with_no_fallback_constant(tmp_path):
+    """The constant is REMOVED, not shadowed (Q18 (b)): the adapter takes its
+    subject from the corpus's own doc-source-registry row, a different declared
+    value flows straight through to every row, and a row without the field
+    refuses at construction — before anything is read or written."""
+    import drydocs.loaders.bmc_docs as mod
+    from drydocs_core.source_registry import SourceRegistry
+
+    assert not hasattr(mod, "SUBJECT_PRODUCT_ID"), "the fallback constant is back"
+
+    class _Entry:
+        def __init__(self, data):
+            self.data = data
+            self.id = "bmc-docs"  # Q26: the adapter also reads the row's id
+
+    class _Reg(SourceRegistry):
+        def __init__(self, data):
+            self._q18 = data
+
+        def get(self, source_id):
+            assert source_id == "bmc-docs"
+            return _Entry(self._q18)
+
+    adapter = mod.BmcDocsAdapter(registry=_Reg({"describes_product": "some-other-product"}))
+    assert adapter.describes_product == "some-other-product"
+
+    with pytest.raises(ValueError, match="describes_product"):
+        mod.BmcDocsAdapter(registry=_Reg({}))
+
+    # and the shipped registry declares the live corpus's real target
+    assert mod.BmcDocsAdapter().describes_product == "controlm"
+
+
+def test_corpus_id_is_stamped_on_document_and_chunk_and_required_on_the_row():
+    """Q26 (G32 §A): corpus_id IS the blast-radius scoping — the cypher stamps
+    it on both grains, and the row model REQUIRES it. Required matters: the
+    model's extra="ignore" silently dropped the adapter's stamp on Q26's own
+    first live reload — an optional field would let that defect return."""
+    from drydocs.loaders.bmc_docs import BmcDocsLoader
+    from drydocs_core.models.docs import BmcDocChunkRow
+
+    cy = BmcDocsLoader.cypher_path.read_text(encoding="utf-8")
+    assert "doc.corpus_id" in cy and "c.corpus_id" in cy
+    assert BmcDocChunkRow.model_fields["corpus_id"].is_required()
+    assert BmcDocChunkRow.model_fields["subject_product_id"].is_required()  # no shadow default

@@ -372,7 +372,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             id="mappings.catalog-cascade.v1",
             database="drydocs",
             description=(
-                "The cascade's catalog spine: ProductLine -> HAS_PRODUCT -> Product "
+                "The cascade's catalog backbone: ProductLine -> HAS_PRODUCT -> Product "
                 "-> HAS_APPLICATION -> BusinessApplication, flat rows the picker "
                 "groups client-side. §G6 rules the COMPANY reading of "
                 "HAS_APPLICATION (a structural support link, 1:many by design — the "
@@ -565,6 +565,77 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal",
             params=_LIMIT,
         ),
+        # G71 (gate tom-roles-enumeration-and-cardinality, signed 2026-08-11):
+        # the required-contact completeness report, joining THIS surface per
+        # SS-C5 rather than opening a new one — the Attributions tab already
+        # floats unmapped rows first, so one page answers "what is wrong with
+        # this application's contacts". Two specs because SS-C6 rules the two
+        # findings apart: a roster gap on a COVERED application, and a capture
+        # gap (no feed mentioned the application) — merging them produces a
+        # noisy check, and the first response to a noisy check is to weaken it.
+        QuerySpec(
+            id="ownership.required-contact-gaps.v1",
+            database="drydocs",
+            description=(
+                "Covered applications (>= 1 attribution from any feed) missing every "
+                "holder of a required, active TOM role class — the offending (app, "
+                "role) rows per SS-C4; counts to one and stops (SS-C3: multiple holders "
+                "are the normal shape, never a finding). The required set is the "
+                "graph's own declared vocabulary (G70), never a list here. TWO "
+                "CAVEATS from the sign-off ride every reading: (a) Operate Manager "
+                "assignments are MID-CORRECTION at source — findings in that family "
+                "are real defects already being fixed elsewhere, not DryDocs "
+                "discoveries; (b) a count-to-one check cannot distinguish a genuine "
+                "24h coverage gap from a satisfied one (multiplicity is geography; "
+                "signed residual 4). An apparent gap can also be an unmapped source "
+                "role awaiting crosswalk — the Attributions tab floats those first, "
+                "same page. Holder facts are confidential — Internal handling (J23)."
+            ),
+            cypher=(
+                "MATCH (r:TOMRole) "
+                "WHERE r.required = true AND coalesce(r.active, true) = true "
+                "AND NOT r:SchemaMeta "
+                "MATCH (a:BusinessApplication) "
+                "WHERE NOT a:SchemaMeta "
+                "AND (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution) "
+                "AND NOT (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)-[:HAD_ROLE]->(r) "
+                "RETURN a.app_id AS app_id, r.id AS missing_required_class, "
+                "r.pref_label AS role_label "
+                "ORDER BY app_id, missing_required_class LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("missing_required_class", "string", "Missing required class"),
+                ColumnDef("role_label", "string", "Role"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
+            id="ownership.capture-gaps.v1",
+            database="drydocs",
+            description=(
+                "Applications NO feed mentioned (zero attributions) — the CAPTURE gap "
+                "SS-C6 rules must be reported separately from the roster gaps above: "
+                "an application the extract never covered would otherwise report as "
+                "missing ALL required contacts, a capture gap wearing a roster gap's "
+                "costume. The response to this list is a capture fix, not a contact "
+                "chase."
+            ),
+            cypher=(
+                "MATCH (a:BusinessApplication) "
+                "WHERE NOT a:SchemaMeta "
+                "AND NOT (a)-[:QUALIFIED_ATTRIBUTION]->(:Attribution) "
+                "RETURN a.app_id AS app_id, a.name AS name "
+                "ORDER BY app_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("name", "string", "Name"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         QuerySpec(
             id="ownership.escalation-routing.v1",
             database="drydocs",
@@ -594,10 +665,11 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 "of :Document nodes joined by the gate-confirmed DESCRIBES edge. A ZERO "
                 "HERE MEANS NO EDGE IN THIS DATABASE AND NOTHING MORE: "
                 "config/doc-source-registry.yaml is the declaration, and a corpus "
-                "targeting a database this spec cannot read (dddocs, unprovisioned "
-                "pending G32) is absent by TOPOLOGY, not by defect. `drydocs "
-                "docs-coverage` is the multi-database reconciliation a single-database "
-                "spec cannot perform."
+                "targeting a database this spec cannot read is absent by TOPOLOGY, "
+                "not by defect (historical case: the corpus once declared the "
+                "superseded `dddocs`, rejected at the G32/G102 fold 2026-08-18; "
+                "every entry now targets `drydocs`). `drydocs docs-coverage` is the "
+                "multi-database reconciliation a single-database spec cannot perform."
             ),
             cypher=(
                 "MATCH (sp:SoftwareProduct) WHERE NOT sp:SchemaMeta "
@@ -692,6 +764,199 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal-public",
         ),
         # O17 runbooks frames.
+        # Q15 — agent NAVIGATION over the vendor-docs backbone (plan section 4).
+        # An agent usually arrives knowing the noun ("how do I use exportdefjob?"),
+        # so the name-addressable path is primary and similarity search is the
+        # FALLBACK, not the only door in. All four: bounded expansion (no
+        # variable-length traversal), every row carries source_url + doc_version +
+        # trust so the R5 citation surface renders provenance, and chunk text is
+        # NEVER returned here — docs.chunks.v1 is the deliberate second step,
+        # spent only after triage on abstract + page_role. Zero rows is the
+        # honest state until the Q24 flip + first load (desktop) and the Q25
+        # entity-core build land (gate vendor-docs-entity-core, signed 21/21).
+        QuerySpec(
+            id="docs.utility-lookup.v1",
+            database="drydocs",
+            description=(
+                "Exact utility name -> its documentation, grouped by page_role "
+                "(overview | rules | parameters | examples | reference). The PRIMARY "
+                "agent entry point: an indexed exact match beats a vector search for "
+                "a known identifier. Zero rows = the utility is not minted yet (Q25) "
+                "or the corpus is not loaded in this database (Q24, desktop-bound); "
+                "docs.search.v1 is the fallback when the NAME is unknown. Rows are "
+                "chunk-free: triage on abstract + page_role, then docs.chunks.v1. "
+                "doc_version rides every row — the capture is 9.0.20 against a "
+                "9.0.21 estate, and version_verified says whether the page was "
+                "checked against the newer release."
+            ),
+            cypher=(
+                "MATCH (u:ControlMUtility {name: $name}) WHERE NOT u:SchemaMeta "
+                "MATCH (d:Document)-[:DESCRIBES]->(u) WHERE NOT d:SchemaMeta "
+                "RETURN u.name AS utility, u.family AS family, u.kind AS kind, "
+                "d.page_role AS page_role, d.doc_id AS doc_id, d.title AS title, "
+                "d.abstract AS abstract, d.source_url AS source_url, "
+                "d.doc_version AS doc_version, d.version_verified AS version_verified, "
+                "d.trust AS trust "
+                "ORDER BY page_role, title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("utility", "string", "Utility"),
+                ColumnDef("family", "string", "Family"),
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("name", "string"), *_LIMIT),
+        ),
+        QuerySpec(
+            id="docs.section-browse.v1",
+            database="drydocs",
+            description=(
+                "One section of the vendor TOC: its documents and its immediate "
+                "subsections (kind column says which), ONE hop, never a tree walk. "
+                "IN_SECTION / SUBSECTION_OF are planned-only until the Q24 load "
+                "lands (desktop-bound), so the OPTIONAL MATCH halves return null "
+                "rows on an unloaded database — the honest empty state, not a "
+                "defect. Section rows carry '-' for the document-only citation "
+                "columns; document rows carry the full R5 provenance set."
+            ),
+            cypher=(
+                "MATCH (s:DocSection {section_id: $section_id}) "
+                "OPTIONAL MATCH (d:Document)-[:IN_SECTION]->(s) "
+                "WHERE NOT d:SchemaMeta "
+                "WITH s, collect(d) AS docs "
+                "OPTIONAL MATCH (child:DocSection)-[:SUBSECTION_OF]->(s) "
+                "WITH s, docs, collect(child) AS children "
+                "UNWIND (docs + children) AS row "
+                "WITH row WHERE row IS NOT NULL "
+                "RETURN CASE WHEN row:Document THEN 'document' ELSE 'subsection' END AS kind, "
+                "coalesce(row.doc_id, row.section_id) AS id, row.title AS title, "
+                "coalesce(row.page_role, '-') AS page_role, "
+                "coalesce(row.abstract, '-') AS abstract, "
+                "coalesce(row.source_url, '-') AS source_url, "
+                "coalesce(row.doc_version, '-') AS doc_version, "
+                "coalesce(row.trust, '-') AS trust "
+                "ORDER BY kind, page_role, title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("kind", "string", "Kind"),
+                ColumnDef("id", "string", "Id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("section_id", "string"), *_LIMIT),
+            planned_terms=("IN_SECTION", "SUBSECTION_OF"),
+        ),
+        QuerySpec(
+            id="docs.role-siblings.v1",
+            database="drydocs",
+            description=(
+                "From one document to the SAME utility's pages of another role — "
+                "'show me the examples for this' without a fresh search. One hop "
+                "through the shared ControlMUtility subject; zero rows until the "
+                "Q25 DESCRIBES title-match lands. Chunk-free; docs.chunks.v1 is "
+                "the second step."
+            ),
+            cypher=(
+                "MATCH (d:Document {doc_id: $doc_id})-[:DESCRIBES]->(u:ControlMUtility) "
+                "WHERE NOT d:SchemaMeta AND NOT u:SchemaMeta "
+                "MATCH (sib:Document)-[:DESCRIBES]->(u) "
+                "WHERE NOT sib:SchemaMeta AND sib.doc_id <> d.doc_id "
+                "RETURN u.name AS utility, sib.page_role AS page_role, "
+                "sib.doc_id AS doc_id, sib.title AS title, sib.abstract AS abstract, "
+                "sib.source_url AS source_url, sib.doc_version AS doc_version, "
+                "sib.version_verified AS version_verified, sib.trust AS trust "
+                "ORDER BY page_role, title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("utility", "string", "Utility"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("doc_id", "string"), *_LIMIT),
+        ),
+        QuerySpec(
+            id="docs.search.v1",
+            database="drydocs",
+            description=(
+                "Substring search over document titles and abstracts — EXPLICITLY "
+                "THE FALLBACK for 'I do not know the name'; when the utility name "
+                "is known, docs.utility-lookup.v1 is faster and more reliable (plan "
+                "section 4's demotion of similarity search). Deterministic bounded "
+                "scan, no index dependency; a full-text/vector upgrade rides the "
+                "loaded corpus and is recorded in the plan, not silently promised "
+                "here. Chunk-free; docs.chunks.v1 is the second step."
+            ),
+            cypher=(
+                "MATCH (d:Document) WHERE NOT d:SchemaMeta "
+                "AND (toLower(d.title) CONTAINS toLower($q) "
+                "OR toLower(coalesce(d.abstract, '')) CONTAINS toLower($q)) "
+                "RETURN d.doc_id AS doc_id, d.title AS title, "
+                "d.page_role AS page_role, d.abstract AS abstract, "
+                "d.source_url AS source_url, d.doc_version AS doc_version, "
+                "d.version_verified AS version_verified, d.trust AS trust "
+                "ORDER BY title LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("page_role", "string", "Page role"),
+                ColumnDef("abstract", "string", "Abstract"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
+                ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("q", "string"), *_LIMIT),
+        ),
+        QuerySpec(
+            id="docs.email-unassigned.v1",
+            database="drydocs",
+            description=(
+                "Ops emails with NO CONCERNS assignment — the SS-B3 first-class "
+                "resting state, REPORTED and never auto-drained (no best-match "
+                "sweep, no default; gate email-folder-assignment 8/8). Unassigned "
+                "is also unpurgeable by scope (SS-C2: the assignment is the "
+                "retention key). Zero rows on a database without the "
+                "ops-email-extracts corpus is the honest empty state. Wiring this "
+                "count into the pending-source-correction union report is N14's "
+                "rider, not this spec."
+            ),
+            cypher=(
+                "MATCH (d:Document {corpus_id: 'ops-email-extracts'}) "
+                "WHERE NOT d:SchemaMeta AND NOT (d)-[:CONCERNS]->() "
+                "RETURN d.doc_id AS doc_id, d.title AS title, "
+                "d.sent_at AS sent_at "
+                "ORDER BY doc_id LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("sent_at", "string", "Sent at"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
         QuerySpec(
             id="runbooks.series.v1",
             # G30 ruling (2026-07-26): curated lineage lands in `drydocs`, per ADR

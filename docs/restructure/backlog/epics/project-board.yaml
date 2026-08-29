@@ -12,3 +12,12 @@ groom_log:
     schema or a boundary; sonnet for anything with an acceptance test already
     written; haiku for lookups, renames, ritual wiring.
   attached_at: I1
+- date: '2026-08-27'
+  note: |-
+    Groomed 2026-08-27 from the groom run itself — the first addition to Epic I since 2026-07-01.
+    Two captures (Idea-177, Idea-178) were appended below the audit-trail heading in an ad-hoc
+    shape and were invisible to BOTH IDEAS.md guards at once: the inbox slice stops at the next
+    "## " heading, and the uniqueness scan matches only the full header grammar. All four guards
+    were green over them. Idea-170 records the same failure class company-side, which is the
+    second instance that makes it I5 rather than a fix in place.
+  attached_at: I5

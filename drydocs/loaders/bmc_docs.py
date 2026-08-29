@@ -34,6 +34,7 @@ from pydantic import BaseModel
 
 from drydocs_core.models.docs import BmcDocChunkRow
 from drydocs_core.repo_paths import repo_root
+from drydocs_core.source_registry import SourceRegistry
 
 from .base import BaseLoader, LoadSummary, compute_row_checksum
 
@@ -49,10 +50,33 @@ CYPHER_DIR = Path(__file__).resolve().parent / "cypher"
 DEFAULT_CORPUS_DIR = REPO_ROOT / "external" / "orchestration" / "bmc-controlm"
 
 TARGET_VERSION = "9.0.21.300"
-SUBJECT_PRODUCT_ID = "controlm"
 CLASSIFICATION = "External"
 TRUST_DEFAULT = "GROUNDED"
 TIER_RULE_ID = "manifest-default-v1"
+
+
+def declared_describes_product(registry: SourceRegistry | None = None) -> str:
+    """Q18: the product id this corpus documents, from its OWN registry row.
+
+    `describes_product` is optional per corpus — not every corpus describes a
+    product — but for THIS loader it is load-bearing: without it the
+    (:Document)-[:DESCRIBES]->(:SoftwareProduct) join has no declared target,
+    which is exactly the unreproducible-constant state Q18 closed. The guard
+    in tests/unit/test_doc_registry.py proves the declared id is a real
+    config/taxonomy/software-registry.yaml product.
+    """
+    reg = registry or SourceRegistry.from_yaml()
+    entry = reg.get("bmc-docs")
+    product_id = (entry.data or {}).get("describes_product")
+    if not product_id:
+        raise ValueError(
+            "doc-source-registry entry 'bmc-docs' declares no describes_product — "
+            "the DESCRIBES join has no target. Declare the product id in "
+            "config/doc-source-registry.yaml (Q18: the loader reads the ledger; "
+            "there is no fallback constant)."
+        )
+    return str(product_id)
+
 
 # ---- header parsing ---------------------------------------------------------
 
@@ -211,8 +235,26 @@ class BmcDocsAdapter:
 
     name = "bmc-docs"
 
-    def __init__(self, corpus_dir: Path | str = DEFAULT_CORPUS_DIR) -> None:
+    def __init__(
+        self,
+        corpus_dir: Path | str = DEFAULT_CORPUS_DIR,
+        *,
+        registry: SourceRegistry | None = None,
+    ) -> None:
         self.corpus_dir = Path(corpus_dir)
+        # Q18: the DESCRIBES target is DECLARED on this corpus's own
+        # doc-source-registry row (`describes_product`), read here — the
+        # former SUBJECT_PRODUCT_ID module constant is REMOVED, not shadowed:
+        # a fallback constant beside a declared field is how the two silently
+        # disagree later. A row without the field refuses loudly at
+        # construction, before anything is read or written.
+        reg = registry or SourceRegistry.from_yaml()
+        self.describes_product = declared_describes_product(reg)
+        # Q26: corpus_id is the G32 SS-A blast-radius scoping — stamped on every
+        # Document and Chunk row, READ FROM the corpus's registry row (the same
+        # row the describes_product read resolved), never a loader literal. It
+        # is the docs-verify graph_locator join key.
+        self.corpus_id = reg.get(self.name).id
 
     def __enter__(self) -> BmcDocsAdapter:
         return self
@@ -245,7 +287,8 @@ class BmcDocsAdapter:
                     "trust_default": TRUST_DEFAULT,
                     "target_version": TARGET_VERSION,
                     "classification": CLASSIFICATION,
-                    "subject_product_id": SUBJECT_PRODUCT_ID,
+                    "subject_product_id": self.describes_product,
+                    "corpus_id": self.corpus_id,
                     "chunk_id": chunk_id,
                     "seq": seq,
                     "heading": heading,

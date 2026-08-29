@@ -10,3 +10,12 @@ groom_log:
     walkthrough; gate controlm-hosts-topology SIGNED OFF 18/18 same day
     (config/gate-log.md); gate controlm-avg-run-supplement prepped, awaiting SME.
   attached_at: P1
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Idea-174 clause 1. P6 re-homes the data-center collision probe
+    that lost its owner when the 2026-07-16 internal-session checklist retired; the checklist
+    was its recorded home, so deleting that file without this capture would have dropped it.
+    Internal-only and user-run on live psgmgr, following the P1 precedent (agent transcribes
+    conclusions, never rows). Its any-rows branch is an IDENTITY change and routes through the
+    HITL gate rather than being decided in the item.
+  attached_at: P6

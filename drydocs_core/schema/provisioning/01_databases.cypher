@@ -17,7 +17,7 @@ CREATE DATABASE drydocs IF NOT EXISTS;
 // (ADR 0002 X1 amendment). Nothing ever wrote it — ADR 0002 D1/D2 puts curated lineage
 // writes in `drydocs` (asserted structurally by 0002-C §5), and the G30-repointed specs
 // read `drydocs`. If lineage ever earns its own database (the ADR's named revisit
-// trigger: a :ControlMJob proxy-node spine), recreate it here with its ddall alias —
+// trigger: a :ControlMJob proxy-node backbone), recreate it here with its ddall alias —
 // the design is the expensive part, the DDL is two lines.
 
 // `ddcontext` RETIRED 2026-08-18 — gate document-content-topology (G32) §A, applied

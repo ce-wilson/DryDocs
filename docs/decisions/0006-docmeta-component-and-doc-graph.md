@@ -112,7 +112,7 @@ Two facts changed since the plan was written:
    overwrites confirmed content.
 
 5. **Adopted from the P0 verdict** (its "what the ADR should adopt" list):
-   the lexical graph is the spine (active `docs_*` vocabulary + navigation
+   the lexical graph is the backbone (active `docs_*` vocabulary + navigation
    properties); ch.8's evaluation harness (RAGAS-style, Cypher-as-ground-truth,
    per-stage failure attribution) becomes the component's own gate; a fulltext
    index is standing infrastructure; embeddings/vector is a **pluggable arm

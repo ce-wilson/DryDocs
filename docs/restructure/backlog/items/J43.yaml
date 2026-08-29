@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: fable
 priority: p1
-status: todo
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -21,3 +21,22 @@ acceptance: |
   Two gaps in the same manifest vocabulary, closed together because both are "the disposition set is missing a value" on one file with one reviewer. (a) A `gate_bound:` key on the rows whose CONTENT assumes a signed gate -- starting with drydocs_core/ontology/relationship_vocabulary/** -- naming the gate id, plus a RECONCILE-TIME check that refuses to activate an entry whose named gate is unsigned ON THE RECEIVING SIDE. The rule it encodes is written into the manifest in these words: "identical to base" and "per-entry equivalent" are BOTH insufficient tests for a gate-bound file, because status and id-set parity is not field-and-gate parity. The check is proven to fail on an injected defect before it is trusted (J26). (b) The DERIVED-RENDER disposition is decided across ALL the derived rows at once -- docs/plan/board.html, docs/plan/roadmap.html, the design-doc .html renders -- either as a new `derived` disposition meaning REGENERATE from the reconciled tree, or by keeping canonical-company WITH the reason recorded in the manifest. Splitting one row away from the board.html precedent is explicitly refused; whichever exit is taken, the manifest says which and why. This item RECORDS preconditions and changes no gate's status: writing a gate_bound value signs nothing and unsigns nothing.
 notes: |
   Groomed 2026-08-11 from Idea-100, with Idea-101 MERGED IN as clause (b). The occurrence, recorded honestly: the company's initial vocabulary reconcile at PORT-REPORT-0d3761a9 ACTIVATED the G55 rua-load-shapes lineage flips, because K8 (seal-app-ref-edge-reshape) IS signed company-side and the files looked takeable -- rua-load-shapes is a DIFFERENT gate and is still unsigned there. They reverted all three vocabulary fragments, and the G23/rua code ported inert because it is gate-bound IN CODE and refuses planned labels, so the code's own guard caught what the manifest could not express. It was caught by a human re-reading their own work, which is not a control. Clause (b) rides here rather than as its own item: canonical -company reads "keep what you have" while every company note on those rows says REGENERATE, and keeping a stale render is as wrong as taking the producer's. The roadmap.yaml row had the same class of defect and was clear enough to fix outright (evaluate -> per-entry); these were left because splitting a single row away from the board.html precedent would create a worse inconsistency than the imprecision.
+  DONE 2026-08-26 (desktop). Both halves in one change, as the acceptance required.
+  (a) gate_bound: keys on the two per-entry rows whose content assumes signed gates
+  (relationship_vocabulary/**, taxonomy-ontology-map/**), each carrying the required
+  sentence -- identical-to-base and per-entry-equivalent are BOTH insufficient for a
+  gate-bound file, because status and id-set parity is not field-and-gate parity. The
+  reconcile-time check is unsigned_activations() beside the existing pure rules: an entry
+  REACHING active/confirmed/applied across the reconcile (or arriving new already-active)
+  must trace to signing authority in the RECEIVING side's gate-log -- where authority =
+  GATE...SIGNED OFF, RULING: or AMENDMENT headings, sliced section-by-section so a DRAFTED
+  stub that merely mentions the entry is NOT authority (the G95-stub near-miss is its own
+  proven-to-fail test, J26). Five fixture tests incl. arrives-already-active; a live
+  RECONCILE_BEFORE_DIR variant runs beside the no-downgrade check off the same snapshot.
+  (b) THE DERIVED-RENDER DISPOSITION DECIDED ACROSS ALL ROWS AT ONCE: the manifest
+  vocabulary gained `derived` (take NEITHER copy -- REGENERATE from the reconciled tree)
+  and all six derived rows flipped together (board, roadmap, ideas, load-map, the two TDD
+  renders); the roadmap row's inboxed naming question is settled in place, and
+  test_port_manifest adds derived to VALID_DISPOSITIONS + the note-required set (a derived
+  row must name what regenerates it). Splitting one row was refused, per the acceptance.
+  Records preconditions only: no gate signed or unsigned by any of it.

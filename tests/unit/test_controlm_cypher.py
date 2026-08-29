@@ -98,10 +98,13 @@ def test_folder_sql_joins_header_row_for_application() -> None:
     """APPLICATION comes from the folder header row (JOB_ID=1, SMART Table) —
     CM_DEF_VTAB has no APPLICATION column. LEFT JOIN so header-less folders load."""
     text = (SQL_DIR / "controlm_folders.sql").read_text(encoding="utf-8")
-    assert "LEFT JOIN psgmgr.CM_DEF_VJOB H" in text
-    assert "H.JOB_ID   = 1" in text or "H.JOB_ID = 1" in text
-    assert "H.APPLICATION" in text
-    assert "H.IS_CURRENT_VERSION = 'Y'" in text  # string literal, VARCHAR2(1); domain 'Y' (D4)
+    # J39 (2026-08-26): alias H -> J, back-flowed from the company copy so the two
+    # sides stop carrying a permanent cosmetic diff. The guard pins the JOIN, and
+    # the alias letter only because the assertions must name it.
+    assert "LEFT JOIN psgmgr.CM_DEF_VJOB J" in text
+    assert "J.JOB_ID   = 1" in text or "J.JOB_ID = 1" in text
+    assert "J.APPLICATION" in text
+    assert "J.IS_CURRENT_VERSION = 'Y'" in text  # string literal, VARCHAR2(1); domain 'Y' (D4)
 
 
 def test_ingest_chain_order_is_enforced() -> None:
@@ -495,3 +498,112 @@ def test_run_as_bind_is_upper_cased_but_the_column_is_not() -> None:
             f"{sql_name}: the OWNER column must not be wrapped in UPPER() — it is "
             "already upper at rest, so the function is a no-op that costs the index"
         )
+
+
+# ---- G115: the data-center scope bind ------------------------------------
+
+#: The extract family the data-center bind joins (G115 clause a). Conditions
+#: and the dependency anchor are deliberately not in this list — the item
+#: scoped the bind to the five extracts named here.
+DC_BOUND_SQL = [
+    "controlm_folders.sql",
+    "controlm_jobs.sql",
+    "controlm_variables.sql",
+    "controlm_hosts.sql",
+    "controlm_avg_run.sql",
+]
+
+
+@pytest.mark.parametrize("name", DC_BOUND_SQL)
+def test_data_center_bind_joins_the_extract_family(name: str) -> None:
+    """Every extract in the family carries the optional :data_center_filter
+    bind (G115), NULL-guarded exactly like the other scope binds so an absent
+    value means all data centers. Code lines only — a header comment naming
+    the bind must not false-pass this."""
+    code = _sql_code(name)
+    assert ":data_center_filter" in code, f"{name}: missing the data-center bind"
+    assert re.search(
+        r":data_center_filter\s+IS\s+NULL\s+OR\s+\w+\.DATA_CENTER\s+LIKE\s+:data_center_filter",
+        code,
+    ), f"{name}: the data-center predicate must be NULL-guarded (absent means all)"
+
+
+def test_scope_binds_data_center_both_states() -> None:
+    """The bind in both states (G115 clause d). Absent: None flows through so
+    the SQL guard short-circuits and every data center is read — the state
+    every pre-G115 invocation runs in. Set: the operator's LIKE pattern passes
+    through untouched (same rule as folder_filter; the long-form spelling used
+    here is the bundled hosts sample's own publishable value, so the fixture
+    corpus and this contract stay on one spelling)."""
+    import csv
+
+    from drydocs.cli import DEFAULT_SAMPLES_DIR, _scope_binds
+
+    absent = _scope_binds()
+    assert absent["data_center_filter"] is None
+    # the existing four dimensions are untouched by the fifth joining
+    assert set(absent) == {
+        "folder_filter",
+        "run_as",
+        "developer_sid",
+        "row_cap",
+        "data_center_filter",
+    }
+
+    dc = "T012-E0700-SYN"  # a data_center value carried by controlm_hosts__sample.csv
+    scope = _scope_binds("CCB_AUTO_%", None, None, 100, data_center=dc)
+    assert scope["data_center_filter"] == dc
+    assert scope["folder_filter"] == "CCB_AUTO_%"
+    # the bundled samples carry the dimension in both value states the bind
+    # sees: the hosts sample holds long-form names, and a set filter selects
+    # a strict subset of its rows while an absent one selects them all
+    # resolved through the importable declaration, the same object fixture
+    # mode itself reads (these samples are committed, not local-only assets)
+    sample = DEFAULT_SAMPLES_DIR / "controlm_hosts__sample.csv"
+    with sample.open(encoding="utf-8", newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    assert rows, "hosts sample is empty"
+    matched = [r for r in rows if r["data_center"] == dc]
+    assert matched, "the tested pattern must select sample rows (set state)"
+    assert len({r["data_center"] for r in rows}) >= 2, (
+        "the hosts sample must span more than one data center so the set and "
+        "absent states of the bind are distinguishable on the fixture corpus"
+    )
+
+
+def test_data_center_option_is_registered_on_the_commands() -> None:
+    """J37: assert against the registered command objects, never `--help`.
+    The option joins the scope quartet on the three Oracle-scoped verbs."""
+    import inspect
+
+    import typer
+
+    from drydocs import cli
+
+    def _params(command_name: str) -> dict[str, object]:
+        info = next(
+            i
+            for i in cli.app.registered_commands
+            if (i.name or i.callback.__name__.replace("_", "-")) == command_name
+        )
+        return {name: p.default for name, p in inspect.signature(info.callback).parameters.items()}
+
+    for command_name in ("ingest-controlm", "analyze-variables", "normalize-variables"):
+        params = _params(command_name)
+        assert "data_center" in params, f"{command_name}: no data_center parameter"
+        default = params["data_center"]
+        assert isinstance(default, typer.models.OptionInfo), command_name
+        assert "--data-center" in default.param_decls, command_name
+        # optional and absent-means-all: the default is None, so every
+        # existing invocation keeps its behavior
+        assert default.default is None, command_name
+
+
+def test_data_center_scoped_chain_is_a_partial_extract() -> None:
+    """A data-center-scoped chain run must not run the removed-from-source
+    mark pass (D7 extended by G115): marking the other data centers removed
+    is the source-outage-looks-like-deletion trap. Pinned on the command
+    source the same way the runs_on ordering pin reads it."""
+    cli_src = (ROOT / "drydocs" / "cli_ingest.py").read_text(encoding="utf-8")
+    ingest = cli_src[cli_src.index("def ingest_controlm") :]
+    assert "full_extract=folder is None and data_center is None" in ingest

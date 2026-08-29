@@ -101,7 +101,23 @@ CONFORMANCE_RULE_IDS = (
     "R39a",
     "R39b",
     "R40",
+    # G69 — the four fan-out classes C32 observed with no rule to hold them.
+    # R43 is REGISTERED BUT NOT LISTED HERE, and that is the item's own
+    # instruction rather than an omission: which carrier owns a name (Control-M
+    # %%VAR or shell ${VAR}) is UNDECIDED, and the greenfield action differs
+    # completely by answer — rename one carrier, or declare the shell export.
+    # A detector firing against an undecided rule puts a finding in front of an
+    # SME with no defensible action attached to it, so R43 ships as status OPEN
+    # with no detector until the ownership ruling exists.
+    "R41",
+    "R42",
+    "R44",
 )
+
+#: the delimiters a folder-name parse may split on. R42 is about a SET
+#: disagreeing with itself, so both are tried and the finding names whichever
+#: one a parse would actually break on.
+_FOLDER_DELIMITERS = ("-", "_")
 
 #: Declaration sets the standard requires, by job type. Checked against the
 #: WHOLE resolution chain, not job scope — under the scope ladder most of
@@ -276,11 +292,12 @@ def _is_command(job: JobDefinition) -> bool:
 
 
 def detect_conformance(definitions: DefinitionSet) -> list[Finding]:
-    """Evaluate the greenfield job standard (R2 + R30-R40) over a whole set.
+    """Evaluate the greenfield job standard (R2 + R30-R40 + R41/R42/R44).
 
-    Whole-SET, not per-job: three of the rules are cross-job by nature —
-    hoistable invariants, retyped composed paths, and the name-drift census
-    only mean anything with the siblings in view.
+    Whole-SET, not per-job: five of the rules are cross-job by nature —
+    hoistable invariants, retyped composed paths, the name-drift census, the
+    folder-name delimiter spread (R42 compares SIBLINGS) and the authored-value
+    span (R44 only means anything across jobs).
     """
     findings: list[Finding] = []
     findings.extend(_check_names(definitions))
@@ -292,7 +309,141 @@ def detect_conformance(definitions: DefinitionSet) -> list[Finding]:
     findings.extend(_check_retyped_paths(definitions))
     findings.extend(_check_post_exec(definitions))
     findings.extend(_check_notifications(definitions))
+    # G69 — R43 is absent BY INSTRUCTION, not by oversight: the carrier
+    # ownership question is undecided, so it registers OPEN with no detector
+    findings.extend(_check_duplicate_declarations(definitions))
+    findings.extend(_check_folder_delimiters(definitions))
+    findings.extend(_check_authored_provenance(definitions))
     return _deduped(findings)
+
+
+# -- R41: one name declared TWICE in one container, with different values ------------
+
+
+def _check_duplicate_declarations(definitions: DefinitionSet) -> list[Finding]:
+    """R41. MUST-FIX, and the severity is the whole point.
+
+    Which value wins is an ORDINAL ACCIDENT: the job runs against whichever
+    declaration happens to be last, and a reader of the folder sees both and
+    cannot tell which one is live. That is a correctness defect, not tidiness.
+
+    Walks the RAW layer definitions on purpose. ``_declared`` resolves the chain
+    into a dict, so it collapses a duplicate by construction — reading it here
+    would make this rule structurally unable to fire.
+    """
+    findings: list[Finding] = []
+    containers: list[tuple[str, str, list[tuple[str, str | None]]]] = [
+        (folder.scope, folder.name, folder.variables) for folder in definitions.folders
+    ]
+    containers += [("JOB", job.name, job.variables) for job in definitions.jobs]
+    for scope, container, defs in containers:
+        seen: dict[str, list[str]] = {}
+        for raw_name, value in defs:
+            seen.setdefault(_strip(raw_name), []).append((value or "").strip())
+        for name, values in seen.items():
+            if len(values) < 2 or len(set(values)) < 2:
+                continue  # a repeat of the SAME value is noise, not a defect
+            findings.append(
+                _finding(
+                    "R41",
+                    "must-fix",
+                    f"{container}:{name}",
+                    f"declared {len(values)} times in one {scope.lower()} scope with "
+                    f"different values ({' vs '.join(sorted(set(values)))}) — which one "
+                    f"wins is an ordinal accident, so the job runs against whichever "
+                    f"declaration is last and a reader cannot tell which is live. "
+                    f"Keep one declaration",
+                )
+            )
+    return findings
+
+
+# -- R42: one folder set mixing separators between the same positional fields --------
+
+
+def _check_folder_delimiters(definitions: DefinitionSet) -> list[Finding]:
+    """R42. The finding must name the PARSE consequence, not the cosmetic one.
+
+    A folder name is positional, and downstream SQL splits it on a delimiter to
+    read the fields out. When siblings in one set disagree about the separator,
+    that split returns a DIFFERENT FIELD COUNT per folder — so the parse does
+    not fail, it silently reads the wrong field. Saying "the names look
+    inconsistent" would describe the symptom and hide the defect.
+    """
+    names = [f.name for f in definitions.folders if f.scope == "FOLDER"]
+    if len(names) < 2:
+        return []  # a set of one cannot disagree with itself
+    broken: list[str] = []
+    spreads: list[str] = []
+    for delimiter in _FOLDER_DELIMITERS:
+        counts = {name: len(name.split(delimiter)) for name in names}
+        if len(set(counts.values())) < 2:
+            continue
+        broken.append(delimiter)
+        spreads.append(
+            f"on '{delimiter}': "
+            + ", ".join(f"{name}={count}" for name, count in sorted(counts.items()))
+        )
+    if not broken:
+        return []
+    # ONE finding, however many delimiters break: this is one defect in the
+    # SET's naming, and emitting it per delimiter would read as several
+    return [
+        _finding(
+            "R42",
+            "should-fix",
+            f"{sorted(names)[0]}:folder-name",
+            f"this folder set mixes separators, so a parse splitting on "
+            f"{' or '.join(repr(d) for d in broken)} returns a different field "
+            f"COUNT per folder ({'; '.join(spreads)}) — the positional read "
+            f"silently lands on the WRONG FIELD rather than failing. Use one "
+            f"separator across the set",
+        )
+    ]
+
+
+# -- R44: an authored "created by" that travelled with a copied job ------------------
+
+
+def _check_authored_provenance(definitions: DefinitionSet) -> list[Finding]:
+    """R44. ADVISORY, and the message must say what to read INSTEAD.
+
+    The value is not WRONG so much as answering a different question: "created
+    by" is an AUTHORED field that travels when a job is copied, so it records
+    the template's author rather than this job's. Anything treating it as
+    authorship is wrong, and the audit-envelope work should read the
+    creation/modification audit fields.
+
+    WHAT THIS PASS CAN AND CANNOT SEE. The rule as written is "one value across
+    jobs whose INDEPENDENT AUDIT TRAIL names different users". The audit trail
+    is a database-side feed (the creation/modification user), and a definition
+    export does not carry it — so this detector reports the SUSPICIOUS PATTERN
+    (one authored value spanning several jobs) and cannot confirm the
+    contradiction. That gap is exactly why the rule is advisory, and it is
+    stated in the registry entry rather than left for a reader to discover.
+    """
+    by_value: dict[str, list[str]] = {}
+    for job in definitions.jobs:
+        value = (job.authored_by or "").strip()
+        if value:
+            by_value.setdefault(value, []).append(job.name)
+    findings: list[Finding] = []
+    for value, jobs in sorted(by_value.items()):
+        if len(jobs) < 2:
+            continue
+        findings.append(
+            _finding(
+                "R44",
+                "advisory",
+                f"{jobs[0]}:authored_by",
+                f"one authored 'created by' value ({value}) spans {len(jobs)} jobs "
+                f"({', '.join(jobs)}) — an authored field TRAVELS when a job is "
+                f"copied, so it names the template's author rather than each job's. "
+                f"Read the creation/modification AUDIT fields instead; this pass "
+                f"sees no audit trail, so the pattern is reported, not confirmed",
+            )
+        )
+    return findings
 
 
 def _deduped(findings: list[Finding]) -> list[Finding]:

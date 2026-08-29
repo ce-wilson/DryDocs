@@ -145,6 +145,16 @@ docs/design/feedback/scans/*
 # publish boundary. Design references live machine-local in internal-local/ui-examples/.
 *.fig
 
+# Producer reviews of a COMPANY port (2026-08-24). A `port-review-*` file transcribes
+# another side's session — its acceptance numbers, branch and tag names, item counts,
+# and the verified-vs-company-claim split that is the whole point of the format. That is
+# operational state belonging to the side that ran the port, and `docs/reviews/**` is
+# dispositioned `default_ok` in PORT-MANIFEST.yaml, so a tracked one PORTS BACK to the
+# repo it is about. They stay machine-local and travel by hand, like /internal-local/.
+# NOT retroactive by itself: `port-review-7c18ff4b-20260820.md` was already tracked and
+# needed `git rm --cached` in the same commit as this rule (.gitignore never untracks).
+docs/reviews/port-review-*
+
 # OS
 .DS_Store
 Thumbs.db

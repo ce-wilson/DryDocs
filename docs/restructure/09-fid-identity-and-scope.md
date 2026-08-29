@@ -243,7 +243,7 @@ surface over the directory proper:
 |---|---|---|
 | Who owns/manages this run-as account? | A (HR) | `run_as` name -> A.name -> A.manager (owner's standard id) — at (account id, owner) grain |
 | Which application is this FID assigned to? | B (id-owner) | `run_as` name -> B.name -> the search's application id; B is the K2 tier-2 candidate |
-| Identity spine | B's ids | the FID/record id keys the `:AppUser` node (the doc's standing rule); A's employee-id is a per-row key of the HR carrier, not the identity |
+| Identity core | B's ids | the FID/record id keys the `:AppUser` node (the doc's standing rule); A's employee-id is a per-row key of the HR carrier, not the identity |
 | Census (a) | B | by-application total (over-broad; §D filters rule what counts) |
 | Census owner-side counts | A | owner fan-out, name collisions, LOB/cost-center distribution |
 
@@ -370,6 +370,7 @@ reports case-only mismatches rather than folding them.
 |-------|------|-----------|
 | **0** | Census on one application (counts only); answer the six gate open questions with the directory owner | before sign-off |
 | **0-method** | ✅ **METHOD DELIVERED 2026-08-07 (K16, producer side)** — `drydocs/fid_census.py`, guarded by `tests/unit/test_fid_census.py`. Pure: no file, no database, no writes; every input injected. Run it with [`docs/company-prompts/k16-fid-census-company-prompt.md`](../k16-fid-census-company-prompt.md) | before sign-off |
+| **0-K25** | ✅ **DETECTION METHOD DELIVERED 2026-08-26 (K25, producer side)** — `drydocs/run_as_detect.py`, guarded by `tests/unit/test_run_as_detect.py`: the cross-application run_as class detector over the S1-S4 join (per-JOB class platform_user / application_fid / unresolvable; class × job type; the §G5 split parked until ruled). Same discipline as the census row above — pure, injected, counts-only by return type. Run it with [`docs/company-prompts/k25-run-as-detection-company-prompt.md`](../k25-run-as-detection-company-prompt.md); its numbers land in the same company-side event the 0-counts row awaits | evidence for K17 |
 | **0-counts** | ⬜ **AWAITING THE COMPANY-SIDE RUN** — the numbers are Internal and cannot be produced in this repo, which holds no directory extract. The table below fills in from that run | before sign-off |
 | **1** | Register the system + dataset (`config/source-registry.yaml` v2, `confirmed: false`); register the audit-envelope entry as `stub` | at sign-off |
 | **2** | Demand-set extract → dated retained snapshot under `internal/` company-side | after sign-off |

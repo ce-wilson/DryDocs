@@ -1,0 +1,42 @@
+id: J53
+epic: release-infrastructure
+title: The snapshot script's board refresh half-failed and reported a traceback banner with no traceback
+  in it — name the cause, and make a partial render distinguishable from a skipped one
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- scripts/render_board.py
+acceptance: |
+  (a) THE MESSAGE NAMES A CAUSE. The catch block around the board refresh prints the exception message, which for a failing native command is the FIRST line of stderr — and the first line of a Python failure is always the literal traceback banner. So the warning can never name a cause by construction: it reports the banner and discards the exception. Capture the command's full stderr and print the LAST line (the exception type and message) or the whole block. Proven by making the render fail deliberately and reading the warning.
+
+  (b) A PARTIAL RUN IS VISIBLE. The refresh is wrapped so it never blocks the snapshot, which is right and stays. But a half-written render set is worse than none: on 2026-08-23 three of the renderer's nine outputs were written and six were left stale, and nothing said which. After this item the warning states which outputs landed and which did not, so the stale-render diff check in the session ritual is run against a known state rather than an unknown one.
+
+  (c) THE SAME TREATMENT WHERE IT APPLIES. The design-doc refresh immediately below uses the identical catch idiom. Fix both or state why one is different — leaving the sibling with the message that cannot name a cause reproduces the defect the next time it fires.
+
+  (d) THE REPRODUCTION IS RECORDED, NOT THE MACHINE-SPECIFIC CAUSE ALONE. On this desktop the trigger is the pre-set virtual-environment variable that the script's poetry invocation inherits, so the import resolves against the wrong environment partway through; a user's own terminal is unaffected, which is why it was never seen interactively. That belongs in a comment as the worked example. It is not the fix — the fix is that the message would have named it.
+notes: |
+  Groomed 2026-08-26 from Idea-158. This is the Idea-111 shape again — an instrument whose failure mode is silence — inside the ritual step that was added to stop exactly that, which is the argument for fixing it rather than remembering it.
+
+  Module `docs` and epic release-infrastructure follow J52: the snapshot script is cross-cutting session-ritual tooling rather than any component's code.
+
+  Mechanism only, no gate. p2: it does not corrupt anything, it hides things.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  Both refresh blocks (board and design-doc) now share Invoke-RefreshStep/Write-RefreshFailure:
+  the render command's merged stdout+stderr is captured explicitly, LASTEXITCODE is checked
+  directly (the old catch never fired reliably -- in this shell the native stderr never became
+  a terminating error, so the old idiom printed NO warning at all, strictly worse than the
+  groomed description), and on failure the warning names the LAST non-empty output line (the
+  exception type and message) plus a landed/stale list per expected output, compared by mtime
+  before and after the run. Verified against a live reproduction of the desktop VIRTUAL_ENV
+  leak (the clause (d) worked example, now recorded in a comment): the warning read
+  "ModuleNotFoundError: No module named 'typer'" and listed 3 landed / 6 stale outputs --
+  the exact 2026-08-23 incident shape. Success path confirmed unchanged (exit 0, all nine
+  wrote lines, no warning); only snapshot.ps1 changed, render byproducts reverted before
+  commit; script parse-checked and test_depgraph_snapshots.py green.

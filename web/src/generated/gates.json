@@ -426,10 +426,10 @@
     {
       "kind": "log-entry",
       "date": "2026-08-05",
-      "title": "GATE: fcdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)",
+      "title": "GATE: cdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)",
       "status": "signed-off",
       "prompt_files": [
-        "config/gate-prompts/fcdo-crosswalk.yaml"
+        "config/gate-prompts/cdo-crosswalk.yaml"
       ],
       "log_ref": "config/gate-log.md:1432",
       "unblocks": []
@@ -437,10 +437,10 @@
     {
       "kind": "log-entry",
       "date": "2026-08-05",
-      "title": "RECORD: `fcdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the fcdo-crosswalk sign-off)",
+      "title": "RECORD: `cdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the cdo-crosswalk sign-off)",
       "status": "recorded",
       "prompt_files": [
-        "config/gate-prompts/fcdo-crosswalk.yaml"
+        "config/gate-prompts/cdo-crosswalk.yaml"
       ],
       "log_ref": "config/gate-log.md:1454",
       "unblocks": []
@@ -619,7 +619,9 @@
         "config/gate-prompts/email-dl-contact-point.yaml"
       ],
       "log_ref": "config/gate-log.md:2546",
-      "unblocks": []
+      "unblocks": [
+        "C36"
+      ]
     },
     {
       "kind": "log-entry",
@@ -971,6 +973,103 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-08-22",
+      "title": "GATE: vendor-docs-entity-spine — SIGNED OFF 21/21 (Q14)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/email-folder-assignment.yaml"
+      ],
+      "log_ref": "config/gate-log.md:3986",
+      "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-22",
+      "title": "RECORD: gate vendor-docs-entity-core — RENAMED from vendor-docs-entity-spine, the same day's SIGNED OFF 21/21 TRANSFERS (user ruling; Q6 precedent)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/source-registry-v2.yaml",
+        "config/gate-prompts/vendor-docs-entity-core.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4061",
+      "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-25",
+      "title": "RULING: catalog Sub-LoB label — `CatalogSubLOB` (C27 item (b); SME, Option 1)",
+      "status": "recorded",
+      "prompt_files": [],
+      "log_ref": "config/gate-log.md:4082",
+      "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-25",
+      "title": "RECORD: gate `standard-identity-and-carrier` DRAFTED, unsigned (G95)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/etlprocess-kind-enum.yaml",
+        "config/gate-prompts/standard-identity-and-carrier.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4120",
+      "unblocks": [
+        "G116"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-26",
+      "title": "RECORD: gate `tech-partner-attach-level` DRAFTED, unsigned (K20)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/tech-partner-attach-level.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4151",
+      "unblocks": [
+        "K20",
+        "K29"
+      ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-26",
+      "title": "RECORD: org-acronym sanitization — the `cdo-*` rename (user direction, in-chat)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/cdo-crosswalk.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4175",
+      "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-27",
+      "title": "RECORD: extract-vintage convention + the SME-review-status capture protocol (user direction, in-chat)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/tech-partner-attach-level.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4193",
+      "unblocks": []
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-08-28",
+      "title": "RECORD: gate `source-connection-and-run-identity` DRAFTED, unsigned (WP-1 of the source-registry two-issue plan)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/source-connection-and-run-identity.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4214",
+      "unblocks": [
+        "N19",
+        "N20",
+        "N21"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -979,7 +1078,22 @@
         "config/gate-prompts/bmc-docs-example.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "J56"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "business-layer-org-structure (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/business-layer-org-structure.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "C35"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1003,7 +1117,9 @@
         "config/gate-prompts/controlm-definition-precedence.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "D11"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1018,7 +1134,8 @@
         "MM3",
         "MM8",
         "MM9",
-        "MM10"
+        "MM10",
+        "MM11"
       ]
     },
     {
@@ -1030,7 +1147,9 @@
         "config/gate-prompts/dcat-theme-subject-scheme.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "C37"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1074,13 +1193,15 @@
     {
       "kind": "prompt-only",
       "date": null,
-      "title": "etlprocess-kind-enum (gate page rendered — session not yet run)",
+      "title": "etlprocess-kind-enum (rulings/citations logged — gate sign-off not recorded)",
       "status": "open",
       "prompt_files": [
         "config/gate-prompts/etlprocess-kind-enum.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G118"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1091,7 +1212,9 @@
         "config/gate-prompts/registry-wiring-readiness.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "N18"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1104,6 +1227,19 @@
       "log_ref": null,
       "unblocks": [
         "G63"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "script-provenance-gaps (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/script-provenance-gaps.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "G117"
       ]
     },
     {
@@ -1126,7 +1262,9 @@
         "config/gate-prompts/snowflake-data-catalog.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G119"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1137,7 +1275,9 @@
         "config/gate-prompts/software-usage-patterns.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "G120"
+      ]
     }
   ]
 }

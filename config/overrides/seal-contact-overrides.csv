@@ -1,1 +1,1 @@
-app_seal_id,role_name,seal_holder_sid,override_holder_sid,override_holder_name,rationale,authored_by,authored_on,status
+app_seal_id,role_name,seal_holder_sid,override_holder_sid,override_holder_name,rationale,authored_by,authored_on,status,agreement_run_id,agreement_source_value,agreement_observed_on

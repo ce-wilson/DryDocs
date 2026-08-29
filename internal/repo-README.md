@@ -90,7 +90,7 @@ poetry run drydocs ingest-controlm             # Control-M folders → jobs → 
 poetry run drydocs load-software-registry      # third-party software registry
 poetry run drydocs load-bmc-docs               # BMC docs lexical graph (Document → Chunk)
 poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itself
-poetry run drydocs load-essential-graphrag     # optional: ebook corpus (→ ddcontext)
+poetry run drydocs load-essential-graphrag     # optional: ebook corpus (→ drydocs)
 
 # 4. Verify invariants
 poetry run drydocs verify-reference   # m1-verify still works (deprecated alias, S8)

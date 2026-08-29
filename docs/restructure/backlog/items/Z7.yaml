@@ -20,7 +20,7 @@ inputs:
 acceptance: |
   Against a local graph loaded only by documented verbs on the bundled synthetic samples — ingest-controlm, load-folder-attribution, load-server-inventory — the QuerySpec map.team-locations.v1 returns at least one row, and every row it returns resolves to a point in the gazetteer, so the console's Teams dimension draws instead of reading as empty. Nothing may be seeded by a test to make that happen: the samples themselves supply the join, which today they cannot, because the Control-M sample hosts and the server-export server names share no value under the signed T1/T2 tiers. The coverage counters keep telling the truth — apps_unmatched, unmatched hosts and unplaceable rows still report real gaps; the change is that the SUCCESS path is exercised as well, not that gaps go quiet. tests/integration/test_server_inventory_e2e.py, which seeds its own matching host today, is updated to the aligned names and stays green, and the existing fixture guards (reserved synthetic app block 70001-70099, one application per file, both PROD and DR designations, no Control-M scheduling-DC grammar in the physical data-center field) all still pass.
 notes: |
-  Raised 2026-08-27 from Idea-162, after running the whole Z3 chain on the desktop for the
+  Raised 2026-08-27 from Idea-193, after running the whole Z3 chain on the desktop for the
   first time to find out why the Z5 Locations map drew nothing. The chain itself was healthy:
   constraints applied, the infrastructure supplement verified 6 of 6 terms, the loader took 5
   rows and rejected none, and every coverage counter named its own gap without being asked.

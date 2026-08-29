@@ -34,7 +34,7 @@ rule B1) — see ``internal/remediation/m0/``. Contract:
 ``docs/design/drydocs-remediation-tdd.md`` wins on conflict.
 """
 
-from . import corroborate, detect, equivalence, formats, jira, transform, xml_bridge
+from . import corroborate, detect, equivalence, formats, jira, profile, transform, xml_bridge
 
 __all__ = [
     "corroborate",
@@ -42,6 +42,12 @@ __all__ = [
     "equivalence",
     "formats",
     "jira",
+    "profile",
     "transform",
     "xml_bridge",
 ]
+
+import logging
+
+#: G105/ADR 0014 clause 2 — a module logger per component.
+LOGGER = logging.getLogger(__name__)

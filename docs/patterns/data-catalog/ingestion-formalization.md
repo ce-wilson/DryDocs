@@ -24,7 +24,7 @@ ingesting DryDocs output.
 
 **Built aligned, not coupled.** No enterprise system consumes DryDocs today, and nothing in
 this design assumes one will. DryDocs is nonetheless **modeled to the enterprise governance
-spine** on purpose: same backbone (`Application → flow → job → Dataset`), same key (the
+backbone** on purpose: same backbone (`Application → flow → job → Dataset`), same key (the
 application / SEAL ID). The enterprise platform's own reference model defines a
 `dataFlow → dataJob` layer under each application that today sits **unfilled** — there is no
 automated source for run-time job-to-dataset lineage. By speaking that model from day one,
@@ -60,7 +60,7 @@ never copies them.
 | **Build posture** | Large, multi-system, multi-year program | Small, single-pipeline, reuse-not-rebuild |
 
 **The shared backbone (why a clean handshake is possible).** Both models hang everything off
-the same spine: `Application → (flow) → (job) → produces/consumes → Dataset`. The enterprise
+the same backbone: `Application → (flow) → (job) → produces/consumes → Dataset`. The enterprise
 platform owns the right side (Dataset and below); DryDocs owns the middle (flow/job). Same
 Application node, same direction of flow — they snap together at the Application key.
 

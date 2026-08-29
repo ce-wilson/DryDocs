@@ -1075,7 +1075,7 @@ build** with its three premise errors corrected.
     committed producer ids carry [db].[schema] placeholders.
   - **Q2 — URN env segment: always prod** (promotion-clone/lag not modeled).
   - **Q3 — derived stores:** @ grammar + derived: true; authority OMITTED —
-    not SOR/ADS, and FCDO SOC was checked (§H vocabulary: System of Capture =
+    not SOR/ADS, and CDO SOC was checked (§H vocabulary: System of Capture =
     upstream ingestion feeding an SOR) and does not fit downstream transforms.
   - **Q4 — snow registers NOW as a SaaS system;** first dataset =
     snow:cmdb-ci-classes (the sampled CMDB class export), doubling as the
@@ -1125,7 +1125,7 @@ list in `config/source-registry.yaml` refuses every old id from here on.
 | `snowflake-data-catalog` | `catalog@[db].[schema].datasets_v` + `distributions_v` | (unconfirmed — gate prompt not drafted) |
 | `code-repo` | `bitbucket:repo-objects-manifest` | (unconfirmed — G22) |
 | `oracle-schemas` / `snowflake` | `oracle:schema-inventory` / `snowflake:schema-inventory` | (unconfirmed placeholders) |
-| `bmc-docs` / `essential-graphrag` / `fcdo-frameworks` | NOT renamed — pipeline twins dropped; ids stay live in `config/doc-source-registry.yaml` (one home), which now carries their `confirmed:` state | bmc-docs-lexical-load 2026-07-08 (covers essential-graphrag per the Q2 groom) |
+| `bmc-docs` / `essential-graphrag` / `cdo-frameworks` | NOT renamed — pipeline twins dropped; ids stay live in `config/doc-source-registry.yaml` (one home), which now carries their `confirmed:` state | bmc-docs-lexical-load 2026-07-08 (covers essential-graphrag per the Q2 groom) |
 
 **Per-row residual executed:** every row above was confirmed individually at the N9 build
 (the N7 residual). New rows registered: `seal@[db].psgmgr.cm_escalation_db` (the gate's worked
@@ -1157,7 +1157,7 @@ The id exists at every grain — the team report just does not project it.
   is what makes the ruling executable: while it is required, the name-only team
   report cannot load product lines at all, so a name cannot become the de-facto
   key by accident. Corroborated independently of the SME by
-  `internal/fcdo-reference` (the PAT-catalog artifact described as a 5-level
+  `internal/cdo-reference` (the PAT-catalog artifact described as a 5-level
   hierarchy with "native IDs at each level") and by the company's own 5-field
   `pat_lob_sublob_productline.csv` — an extract already at that grain.
 - **§b — RECORDED: `area_product_id` is the SUPPORTING area product.**
@@ -1429,31 +1429,31 @@ rename of the frozen names.
   emptiness probes; a non-empty probe stops as a defect report).
 
 
-## 2026-08-05 — GATE: fcdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)
+## 2026-08-05 — GATE: cdo-crosswalk (Epic W; drafted at W1) — SIGNED OFF, 13/13 (row 5 stays blocked-on-recapture)
 
-**Spec:** `config/gate-prompts/fcdo-crosswalk.yaml` · **SME:** chad.wilson, in-chat
+**Spec:** `config/gate-prompts/cdo-crosswalk.yaml` · **SME:** chad.wilson, in-chat
 (section walkthrough; page rendered to `internal-local/gate-pages/`). The DryDocs ↔
-firmwide-framework vocabulary crosswalk (`config/crosswalks/fcdo-vocabulary.yaml`,
+firmwide-framework vocabulary crosswalk (`config/crosswalks/cdo-vocabulary.yaml`,
 8 rows). Ratifies the ALIGNMENT-PLAN verdict: already structurally aligned — every
 row maps an EXISTING DryDocs term to a standard term; nothing renamed, reshaped,
 or added.
 
 | Item | Ruling |
 |---|---|
-| A1–A4 scope | **CONFIRMED** — review-only; mechanism-only surfaces (standard CURIEs, no internal names); nothing new minted; the ALIGNMENT-PLAN skip list is binding. **SME remark on A:** activation of the `fcdo-frameworks` corpus is UNDER CONSIDERATION now that alignment is verified — it remains a separate registry decision, NOT flipped by this gate. |
+| A1–A4 scope | **CONFIRMED** — review-only; mechanism-only surfaces (standard CURIEs, no internal names); nothing new minted; the ALIGNMENT-PLAN skip list is binding. **SME remark on A:** activation of the `cdo-frameworks` corpus is UNDER CONSIDERATION now that alignment is verified — it remains a separate registry decision, NOT flipped by this gate. |
 | B1 rows 1/2/3/7 exact | **CONFIRMED** — ControlMJob↔OL Job, JobRun/ControlMJobRun↔OL Run, DataAsset↔Dataset, SUBCLASS_OF/MAPS_TO↔rdfs bridging. |
 | B2 row 2 scope note | **CONFIRMED** — the 2026-07-31 batch-history ruling restated; name conformance only, no run-event-ingestion mandate. |
 | B3 row 4 grain split | **CONFIRMED** — their grain is the Run, ours the definition (ETLProcess \| ControlMJob); both grains recorded; any future run-grain lineage lands on ControlMJobRun without displacing the definition-grain edges. |
 | B4 row 6 documentation-only | **CONFIRMED** — the adms:status reading is a translation aid; the proposed→confirmed→applied HITL machinery changes in no way. |
 | B5 row 8 carrier difference | **CONFIRMED** — RECONCILES_TO {confidence} carries skos:closeMatch + mapping-confidence semantics on an edge property rather than an RDF mapping resource. |
-| C1 row 5 blocked | **CONFIRMED** — stays OPEN, signed neither way, until the registered `fcdo-frameworks` scrape recaptures the Descriptive Metadata Framework. |
+| C1 row 5 blocked | **CONFIRMED** — stays OPEN, signed neither way, until the registered `cdo-frameworks` scrape recaptures the Descriptive Metadata Framework. |
 | C2 absence ≠ absence | **CONFIRMED** — transcript absence is never treated as absence from their standard. |
 | D1–D2 sign-off | **CONFIRMED** — rows 1–4, 6–8 and the file status flip proposed → confirmed; row 5 stays `blocked-on-recapture`; the guard test moves to the post-gate state in the same commit (F1/F2 precedent); corpus activation stays a separate, later decision. |
 
 
-## 2026-08-05 — RECORD: `fcdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the fcdo-crosswalk sign-off)
+## 2026-08-05 — RECORD: `cdo-frameworks` corpus ACTIVATED (user ruling in-chat, same day as the cdo-crosswalk sign-off)
 
-- **What this records:** the in-chat user ruling activating the `fcdo-frameworks`
+- **What this records:** the in-chat user ruling activating the `cdo-frameworks`
   doc corpus — `config/doc-source-registry.yaml` `confirmed: false → true`. A record
   on the G51/X1 idiom (direction, not a gate session): no ontology edge, no
   vocabulary status change, no graph write. The stated rationale: "settle our
@@ -1464,7 +1464,7 @@ or added.
   `blocked-on-recapture` regardless — that is crosswalk-side state, untouched here;
   if anything, activation is the path that PRODUCES the recapture evidence
   (Descriptive Metadata is the first-priority recapture target in the entry's notes).
-- **What activation does and does not do:** `require_confirmed("fcdo-frameworks")`
+- **What activation does and does not do:** `require_confirmed("cdo-frameworks")`
   now passes, so the docmeta pipeline may ingest the corpus when the Confluence
   connector runs — which is company-network-side only; nothing can be scraped from
   the producer machine. T4 `sme-confirm` curation still applies per ingested page,
@@ -1484,7 +1484,7 @@ or added.
   SME asked, a day later, whether it had been confirmed. That is the
   "did the gate land?" failure mode arriving on schedule: **a CONFIRMED CLAUSE
   inside an UNSIGNED gate has no home in a log organised by sign-off.** Recorded on
-  the G51/X1/`fcdo-frameworks` RECORD idiom — direction, not a gate session.
+  the G51/X1/`cdo-frameworks` RECORD idiom — direction, not a gate session.
 - **What was confirmed (2026-08-05, in-chat):** *"three separate role classes, not
   one concept with a level."* Restated 2026-08-06 with the cardinality attached:
   *"L1 Operate Manager, L2 Operate Manager, Operate Manager are 3 separate roles
@@ -3659,8 +3659,8 @@ six confirmations (A1-A3, B1-B2, C1), no held clauses.
   are captured with stage: ~ until evidence lands, per the
   keep-imports-faithful rule; their mapping is a capture UPDATE when a real
   artifact arrives, not a re-gate.
-- **§B2 — FCDO IS CONTEXT, NOT ESTATE TRUTH:** the Raw / Conformed-Silver /
-  Consumable-Gold mesh framing (internal/fcdo-reference/) is a third, external
+- **§B2 — CDO IS CONTEXT, NOT ESTATE TRUTH:** the Raw / Conformed-Silver /
+  Consumable-Gold mesh framing (internal/cdo-reference/) is a third, external
   vocabulary — crosswalk context only; nothing from it enters the stage set.
 - **§C1 — THE FENCE: NO EDGE, NOT EVEN PLANNED.** This capture declares no
   dataset/job stage-attribution edge anywhere. When a consumer actually needs
@@ -3981,3 +3981,252 @@ never edit the prompt).
   vocabulary are untouched; `match_method: 'fid'` keeps its meaning; the
   signed gate's yaml is not edited (N13) — this entry is the amendment
   record, on the G35-amendment precedent.
+
+
+## 2026-08-22 — GATE: vendor-docs-entity-spine — SIGNED OFF 21/21 (Q14)
+
+The SME session for the gate Q14 drafted the same day — all 21 confirmations,
+one clarification exchange recorded (§A2), no held clauses, no edits to the
+drafted proposals. Venue for the live evidence: laptop, `neo4jtest`, `drydocs`
+DB, 2026-08-22 (J18). Signing moves NO data and writes NO graph; every
+activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
+
+- **§A — ControlMUtility IS a first-class node (A1), a NEW dd:ControlMUtility
+  class (A2).** A2 carried the session's one clarification: the SME's condition
+  — "I agree if it contains ControlMJob, ControlMFolder and is not a sibling" —
+  was confirmed to mean FAMILY PLACEMENT: ControlMUtility files IN the
+  Control-M class family (the 10-node-classifications group holding
+  ControlMJob/ControlMFolder/ControlMServer) and is NEVER a SoftwareProduct
+  row; the rejected alternative would have put each utility beside controlm/
+  neo4j/oracle-db as a peer product ("sibling"), and the SME's own reading was
+  that the corpus documents Control-M's parts, so peerhood never made sense.
+  Restated and confirmed as drafted. A3: the docs_utility_part_of bridge
+  (PART_OF -> SoftwareProduct {controlm}, third triple of the label, C8)
+  confirmed with direction. A4: name-keyed identity + deterministic
+  family/kind derivation with unclassified counts reported, confirmed.
+- **§B — REUSE DESCRIBES (B1), bare edge (B2), title-match basis (B3).** The
+  aboutness label is not duplicated: docs_describes_utility is a new triple
+  beside the ACTIVE Document -> SoftwareProduct entry; a DOCUMENTS mint was
+  offered and declined. No version properties ride the edge — the caveat is
+  node-grain per the Q13 close. Derivation is deterministic title-match,
+  unmatched count reported, never defaulted (the email-folder-assignment
+  structured-signal bar; here the structured signal IS the title).
+- **§C — vendor cross-links ARE assertions we carry (C1), basis REQUIRED
+  (C2), rdfs:seeAlso ADOPTED (C3).** docs_see_also carries href + anchor
+  evidence on every edge (O24 / email-folder-assignment §A3 — no anonymous
+  assertions); vendor-asserted origin, never :Uncertain. C3 is a real ruling,
+  not a note: the rdfs namespace is declared in namespaces.py, so the mapping
+  is ADOPTED on the entry rather than parked as a candidate (the ANNOTATES
+  local-pending pattern explicitly NOT followed here, because its blocker —
+  an undeclared namespace — does not exist). C4 acknowledged (the decline
+  path was priced; the choice was made knowingly).
+- **§D — the overtaken premise RECORDED (D1), the real chain ruled (D2), NEW
+  TRIPLE over widening (D3), no-demo registration accepted (D4).** Q14's
+  acceptance required the layer-3 join "recorded as BLOCKED on G32"; G32
+  signed 2026-08-18 and the G102 fold executed, so the record here is the
+  dissolution (the Q9 overtaken-not-re-done idiom), and what now gates the
+  join is: §A/§B (this page), the §E load, and the CMD_LINE -> utility
+  parser work (G14 feed pattern under the G32 §E graph-seeded charter).
+  scheduler_invokes_utility stays a separate planned triple — the ACTIVE
+  scheduler_invokes is untouched (PATH-keyed Script vs NAME-keyed utility;
+  no blast radius on the shipped extractor). The sample estate carries zero
+  utility invocations (17/17 jobs with cmd_line, none matching) — registered
+  with no demo, stated plainly.
+- **§E — THIS page is the corpus's doc-graph gate (E1), the Q13 shape
+  confirmed (E2), the two unregistered loader edges registered (E3), the
+  flip authorized-not-performed (E4), scope fenced (E5).** E1 resolves the
+  chicken-and-egg Q14's close named: the acceptance's LOADED-spine evidence
+  premise was unmeetable because the load waited on this very page; G32's Q6
+  clause left the doc-graph gate unsigned and no other backlog item owned
+  it. E2 confirms the layer-1 shape exactly as Q13 shipped it (capture-scoped
+  doc_id; :DocSection reused from the design-doc family, second use recorded
+  on its classification). E3 closes the loader-without-vocabulary gap found
+  at the draft: docs_in_section / docs_subsection_of registered planned.
+  E4: signing AUTHORIZES bmc-docs-controlm-utilities -> confirmed: true; the
+  flip and the first live load are Q24 (the machine holding the capture is
+  the desktop — the load is venue-bound, J18). E5: Q15 QuerySpecs, Q18
+  describes_product, all loader code, and the bmc-docs corpus are out of
+  scope.
+- **Terminus.** Signing changes vocabulary NOTES and the map entry status
+  only. All seven entries STAY `planned` — they flip active WITH their build
+  (K2/G55 flips-are-follow-ups): Q24 (registry confirmed flip + first live
+  layer-1 load, desktop) and Q25 (the entity-spine build: utility minting +
+  DESCRIBES title-match + SEE_ALSO parse + PART_OF bridge, flipping those
+  entries active with supplement blocks). scheduler_invokes_utility stays
+  planned past Q25 — its flip rides the future parser work per §D2(iii).
+  Map entry vendor-docs-entity-spine: proposed -> confirmed (summary 9->8
+  proposed, 25->26 confirmed).
+
+
+## 2026-08-22 — RECORD: gate vendor-docs-entity-core — RENAMED from vendor-docs-entity-spine, the same day's SIGNED OFF 21/21 TRANSFERS (user ruling; Q6 precedent)
+
+- **What this records.** Minutes after signing the gate above, the SME ruled the
+  id itself: "spine" is on the US-business-English banned list
+  (docs/style/us-business-english.md; CLAUDE.md §6 — "backbone"/"core", never
+  "spine"), so `vendor-docs-entity-spine` becomes **`vendor-docs-entity-core`**.
+  A signed-off gate TRANSFERS across a rename — the Q6 / source-registry-v2
+  precedent — so the 21/21 sign-off, its one §A2 clarification, and every ruling
+  stand unchanged under the new id. This entry's heading carries the new slug so
+  the gates surface accounts for the renamed prompt file; the SIGNED OFF entry
+  above is the ruling record and is not edited (L25 riders-not-edits).
+- **Scope of the rename — pointers, never the signed record.** The prompt file
+  (`git mv`), its `id:` and `title:`, the taxonomy-ontology-map entry id +
+  `gate_spec:` path, the map header/summary comments, the vocabulary-note gate
+  references (7 entries + banners), Q14's close-note annotation, Q24/Q25 (unsigned
+  items — their prose de-spines too), and NODE_QUICK_REFERENCE. The signed
+  confirmations' body prose retains "spine" as the SME saw it; the mechanism-name
+  boundary (CLAUDE.md §6: a style pass never renames identifiers) is not crossed
+  because this IS the identifier's owner renaming it, not a style pass.
+- **History.** Everything before this entry is filed under the old id; the yaml's
+  header note points here.
+## 2026-08-25 — RULING: catalog Sub-LoB label — `CatalogSubLOB` (C27 item (b); SME, Option 1)
+
+- **What this rules.** The company built the Sub-LoB grain as node label `:SubLOB`; the
+  producer reserved `CatalogSubLOB` at C26. Two labels for one concept — divergence #3 of the
+  C26 ledger repeating one level below the LOB question. **RULED: `CatalogSubLOB`, Option 1 —
+  the company relabels, the producer's reserved label stands, one shape both sides.** The
+  vocabulary id `catalog_has_sub_lob` is unchanged and shared; only the target label moves.
+- **Why Option 1 and not the other two.** The LOB precedent is six weeks old and went the same
+  way: the company's own **GATE REVERSAL of 2026-08-06** (`gate-log.md:1678`, port
+  `drydocs-port-20260806`, producer head `a14a8028`) retired the 2026-06-25 "Option A" gate and
+  adopted the full producer catalog model — `:LOB` → `:CatalogLOB`, `code` reinstated. Ruling
+  Sub-LoB the other way would leave the hierarchy inconsistent with itself one level down.
+  Option 2 (company renames its vocab id, keeps `:SubLOB`) removes the id ambiguity but freezes
+  the two-label divergence permanently; Option 3 (producer adopts `:SubLOB`) reverses the LOB
+  ruling for one level only.
+- **NOT a port break, and an earlier producer note that said so was wrong.**
+  `drydocs_core/ontology/relationship_vocabulary/**` is `per-entry`, and its entry rule is
+  explicit: *"NEVER downgrade a consumer entry whose status is active (or a node class a live
+  loader depends on) to the producer's planned/deprecated."* The company entry is `active` with
+  `sub_lobs.cypher` behind it; the producer's is `planned`. The merge keeps the company's — no
+  duplicate id, no `FragmentSourceError`. What the divergence actually was is a mismatch with
+  no expiry, which is why it needed a ruling rather than a deadline.
+- **FLIPS ARE FOLLOW-UPS.** This authorizes; it performs nothing. The producer's
+  `catalog_has_sub_lob` and `catalog_sub_lob_has_product_line` stay `planned` — the producer
+  models no Sub-LoB grain and has no loader, and an `active` entry with no loader is the claim
+  this repo does not allow. The build is groomed separately.
+- **Three of C27's four questions were already settled outside it,** which is why this entry is
+  a ruling rather than a gate session: (b) the LOB label by the 2026-08-06 reversal; (a) the
+  Sub-LoB grain by the company build; (c) the map ids by the company adding company-only rows
+  rather than renaming producer ones. (d) the S3 `app_id` cutover is NOT closed here — it is
+  Tier-B HELD company-side under their own tracker T1, rebuild-not-migrate, and pulling it into
+  a catalog ruling would give it a second owner.
+- **Map-id correction made with this ruling.** C26's two reservations named ids nobody uses:
+  it reserved `sub-lob-org-unit` and `catalog-lob-reconciles-segment` while the company built
+  `lob-has-sub-lob` and `sub-lob-has-product-line` and KEPT the producer's
+  `lob-reconciles-to-segment`. A placeholder that guards a name nobody mints guards nothing, so
+  both are moved to `rejected` (superseded, kept for audit — the C12 `requires-scheduler`
+  lifecycle) with the real company ids recorded as the names the producer must not mint.
+## 2026-08-25 — RECORD: gate `standard-identity-and-carrier` DRAFTED, unsigned (G95)
+
+- **What this records.** The G95 prompt is drafted (5 sections, 17 confirmations) and
+  NOTHING is decided: no config family exists, TOKEN_REGISTRY is untouched, and its every
+  entry stays `proposed` exactly as its own header says. This stub exists because the G95
+  acceptance names it as part of the deliverable — the gates surface should show the gate
+  as awaiting-SME rather than the question living only in a YAML file nobody re-reads.
+- **The four questions on the page.** (A) whether a validation standard gets a stable id
+  (proposed `<domain>.<subject>.v<N>`, opaque to selection), with the CONTRACT CHANGE said
+  plainly — an id outside TOKEN_REGISTRY turns the registry-vs-standard agreement test from
+  a two-way guard (code == document) into a three-way one (code == document == carrier),
+  both directions. (B) the carrier, three candidates priced and none pre-picked: versioned
+  YAML on the launcher-registry/G26 precedent; SQLite-as-primary, which collides with ADR
+  0009 rule 1 and ADR 0014's domain-fact line and is PRICED rather than forbidden; and
+  0009's own hybrid (YAML truth + mapping.db derived read model + rule-5 draft flow), which
+  is the shape the floated "config table" can have without breaching anything. The port
+  disposition of BY-TEAM rows is part of the ruling (the 2026-08-25 alias lesson: company
+  values in a canonical-producer file are overwritten wholesale). (C) the §7.5/G84 fence
+  ratified explicitly — the DD digit is a grammar version and selects nothing, ruled NOW
+  because a per-team registry is exactly the pressure that would break it. (D) divergence
+  policy: ADD is the C16 case and stays free; RELAXING a company-required token is put as
+  forbidden vs permitted-with-ratification, with recorded-only recommended against in the
+  page's own text.
+- **Registered: nothing, deliberately.** Identity and carrier are config-layer; no
+  vocabulary term, node class, property term or map row is proposed. §E1 makes the
+  absence a decision on the record; a future :Standard graph presence would be its own
+  ontology gate.
+- **Related:** G94 (the selector — builds regardless, may not invent the carrier), G84
+  (adoption measurement + the fence's origin), the etlprocess-kind-enum rider (where
+  engine names must agree if per-engine standards get ids).
+
+## 2026-08-26 — RECORD: gate `tech-partner-attach-level` DRAFTED, unsigned (K20)
+
+- **What this records.** The K5-amendment prompt is drafted (5 sections, 9 confirmations,
+  `config/gate-prompts/tech-partner-attach-level.yaml`) and NOTHING is decided: K5 stays
+  signed, the supplement stays unedited, the ProductRole scheme stays exactly the fixed 7.
+  An amendment gate is how a signed clause is re-opened (the G35 precedent); drafting one
+  decides nothing (G27/W1/N10/G61).
+- **The four questions on the page.** (A) the attach level — K5 §B signed tech_partner
+  AreaProduct-only; the SME (2026-08-06) and the company role guidance both read it as
+  PRODUCT-level, and Area Tech Partner is separately defined. (B) whether area_tech_partner
+  is admitted as the eighth concept — the fixed-scheme rule exercised, not broken — with
+  fold-into-one and defer-for-extract laid out and priced. (C) the consequence restated
+  against current facts: G91 (2026-08-18) activated catalog_has_area_product after the item
+  was groomed, so Idea-75's no-rows-no-loader measurement is half-stale — what stands is
+  that no cabinet attribution loader exists on either side; plus the proposed
+  seeded-concept-reachability guard (the G35 §A2 + Idea-75 pair would both have surfaced at
+  seed time). (D) the change_note re-read — if the level moves, the note's two halves may
+  describe one role, and the CTO rename history may belong to whichever concept §B admits.
+- **Fences.** G35 §A6 (the SEAL-side tech partner -> CTO alias STAYS) is explicitly
+  unaffected; the TOM family, the three active attribution forms, the other five concepts
+  and area_product_owner's scope are named untouched.
+- **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
+  DRAFTED stubs as non-authority; no vocabulary status may cite this heading.
+
+## 2026-08-26 — RECORD: org-acronym sanitization — the `cdo-*` rename (user direction, in-chat)
+
+- **What this records:** a four-letter internal org acronym was retired from every
+  publishable surface (user direction 2026-08-26, this session). The gate formerly named
+  for it is now `cdo-crosswalk` (spec `config/gate-prompts/cdo-crosswalk.yaml`); the
+  vocabulary crosswalk is `config/crosswalks/cdo-vocabulary.yaml`; the doc corpus id is
+  `cdo-frameworks`; the Epic W id is `cdo-alignment`; the reference capture moved to
+  `internal/cdo-reference/`. Prior entries in this log were swept IN PLACE — read `cdo-*`
+  (or "CDO") in any pre-2026-08-26 entry as the renamed id, signed under its former name.
+- **The old↔new mapping** is recorded once, in `internal/cdo-reference/README.md`
+  (Internal — the old string may not appear in this publishable file). The retired
+  strings can never re-mint with a different meaning (doc-source-registry `retired:`
+  carries the placeholder entry).
+- **What this does NOT do:** no ruling is reopened. The 2026-08-05 crosswalk sign-off
+  (13/13, row 5 blocked-on-recapture) stands unchanged under the new name. CDO on these
+  surfaces is the industry C-suite sense (chief data office/officer) — the sense
+  collisions are recorded in `config/glossary/terms-public.yaml` (fifth pass).
+
+## 2026-08-27 — RECORD: extract-vintage convention + the SME-review-status capture protocol (user direction, in-chat)
+
+- **What this records:** two standing conventions, neither a ruling on any mapping.
+  (1) **Extract-vintage** — a gate keyed on an extract names the pull it rests on, and a
+  sign-off session working from an older pull re-pulls first. Generalized from the PAT
+  cabinet session's §G1 finding (2026-08-27): a role class present in the August pull did
+  not exist in the June pull, so a June-keyed ruling would have been correct on its
+  evidence and wrong in fact, with no signal anything was missing. Convention text lives
+  in docs/restructure/03-hitl-sme-flow.md (gate-page format section).
+  (2) **SME review status** — the company→producer profiling capture protocol is defined
+  at docs/port/profiling-sync-packet.md: one shape-only status per company review
+  session, hand-carried, landed in internal-local/company-backflow/, intaken by the
+  producer checklist (ledger → manifest → item flags → crosswalks → page adoption →
+  receiving tables). Wording rule: always "SME review status," never "what to send
+  back" — the hand-prompts-ask-nothing-back rule extended to the reverse channel.
+- **Pending ruling flagged, not made:** the volumetrics boundary (totals + ratios +
+  all-N-of-N publishable; disaggregated per-entity splits stay in the twin) remains
+  precedent-only per config/classification.yaml's own NOT-ruled flag; it rides the
+  tech-partner-attach-level sign-off session as a rider question.
+- **Authority note.** RECORD, not a ruling; no vocabulary status may cite this heading.
+
+## 2026-08-28 — RECORD: gate `source-connection-and-run-identity` DRAFTED, unsigned (WP-1 of the source-registry two-issue plan)
+
+- **What this records:** the prompt file config/gate-prompts/source-connection-and-run-identity.yaml
+  exists (6 sections, 19 confirmations, 2 provenance blocks). It puts to the SME: (A) the
+  `connection:` block on SYSTEM rows — settings group + secret REFERENCES by env-var name +
+  restricted-record pointer, values never; (B) the RESTRICTED CONNECTION RECORD term replacing
+  the connection/values sense of "internal twin" only, plus a `handling: restricted` marker on
+  Internal (J23 note-class); (C) `acquisition.since:` + the dated transition history on top of
+  N13's signed flip ruling, and the ADR-0012-vs-N12 acquisition-vocabulary reconcile; (D) the
+  :JobRun input-identity envelope (dataset id, zone-relative path, input sha256 — M3/M4
+  family); (E) declare-or-refuse as standing acquisition policy with a recorded override;
+  (F) fence + the profiler-as-typed-run rider parked to the review-status protocol.
+- **Evidence base:** the 2026-08-28 registry/acquisition survey (as-built state: the psgmgr
+  row's nulled connection field; the :JobRun envelope's missing input identity; the `load
+  --csv` undeclared route) + DataHub/OpenMetadata as cited external models, not adoptions.
+- **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
+  DRAFTED stubs as non-authority; no registry field, envelope property, or term may cite this
+  heading. Sign-off item: N19. The --csv closure (G121) and the S13 import fix build as plain
+  defects and do not wait for this gate.

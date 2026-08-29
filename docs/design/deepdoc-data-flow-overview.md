@@ -183,7 +183,9 @@ because sysout naming varies by site; and the name's date field is recorded as `
 **not** merged into the launcher's `-od` `order_date`, because on real logs the two differ and which
 one the name carries is an open question for the estate.
 
-**Proposed extractor** — `drydocs_lineage/extractors/controlm_output.py`, the same shape as
+**Proposed extractor** — a `controlm_output` module in the lineage extractor package,
+**PLANNED and not yet written** (backlog MM7 writes it; the path is deliberately not cited
+here, because a citation is a claim that the file is in the tree). Same shape as
 `dpl_mac.py`: it never creates the seed; it joins onto `:ETLProcess` rows another extractor already
 staged **on the pipeline GUID** (falling back to `<job, run>` when the command line carried only a
 variable), and it returns an `OutputCoverage` dataclass counting every skip by reason (`no_launcher_banner`,

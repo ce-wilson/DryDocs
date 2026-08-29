@@ -72,3 +72,66 @@
     loader:       ~
     domain:       corporate
     status:       planned
+
+  # ── C28 reservations (2026-08-25) — gate business-layer-org-structure ────────
+  # NAMES ONLY, planned, nothing flipped. The gate's own §D1 applies the C26
+  # lesson: the reservation reuses :Company for both sub-organization endpoints
+  # BECAUSE whether a distinct legal-entity label is warranted is the gate's
+  # question — reserving a label the ruling might reject guards nothing.
+
+  - id:           corporate_has_sub_organization
+    neo4j_label:  HAS_SUB_ORGANIZATION
+    inverse_label: "sub-organization of"
+    role:         ~
+    from_node:    Company
+    to_node:      Company
+    prov_maps_to: ~
+    note: >
+      PLANNED (C28, 2026-08-25) — reservation only. The legal-entity layer the
+      business-layer experiment surfaced: the Firm is not the bank (the national
+      bank subsidiary is its own legal entity, HQ Columbus), plus eight public
+      subsidiaries at country grain, one inactive (lifecycle = a property, never
+      a deletion — the retired: true discipline). org:hasSubOrganization is the
+      ORG term; prov_maps_to stays null until the gate rules the endpoint label
+      question (gate §D1). TRIGGER: gate business-layer-org-structure.
+    supplement:   ~
+    loader:       ~
+    domain:       corporate
+    status:       planned
+
+  - id:           corporate_change_original
+    neo4j_label:  ORIGINAL_ORGANIZATION
+    inverse_label: "original organization in"
+    role:         ~
+    from_node:    OrgChangeEvent
+    to_node:      BusinessSegment
+    prov_maps_to: ~
+    note: >
+      PLANNED (C28, 2026-08-25) — reservation only, and the gate may DECLINE the
+      whole reification (its §B2 states the one-fact-three-encodings cost in G98
+      §B2's own terms). org:originalOrganization from an org:ChangeEvent node to
+      each pre-change unit — the 2Q2024 worked example points at the former CIB
+      and CB segments. Registered so a port cannot take the name for something
+      else while the question is open. TRIGGER: gate business-layer-org-structure §B.
+    supplement:   ~
+    loader:       ~
+    domain:       corporate
+    status:       planned
+
+  - id:           corporate_change_resulting
+    neo4j_label:  RESULTING_ORGANIZATION
+    inverse_label: "resulting organization in"
+    role:         ~
+    from_node:    OrgChangeEvent
+    to_node:      BusinessSegment
+    prov_maps_to: ~
+    note: >
+      PLANNED (C28, 2026-08-25) — reservation only; the §B sibling of
+      corporate_change_original (read that entry's note). org:resultingOrganization
+      to the post-change unit — the merged CIB in the worked example. The same
+      event renamed the CIB acronym's expansion; gate §B3 rules whether the event
+      node or the glossary owns that story. TRIGGER: gate business-layer-org-structure §B.
+    supplement:   ~
+    loader:       ~
+    domain:       corporate
+    status:       planned

@@ -16,6 +16,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from drydocs_core.run_log import batch_run_log
+
 from ..policy import CapturePolicy
 from .base import FetchSource, RawPage, SourceUnavailableError
 
@@ -34,7 +36,7 @@ class FiledropConnector:
     def __init__(self, *, policy: CapturePolicy | None = None) -> None:
         self.policy = policy or CapturePolicy.load()
 
-    def fetch(self, source: FetchSource) -> list[RawPage]:
+    def _fetch(self, source: FetchSource) -> list[RawPage]:
         paths = self._resolve(source)
         # Same pre-flight discipline as the web connector: a filedrop that
         # resolves to thousands of files is as much an unsized run as a scrape,
@@ -49,6 +51,23 @@ class FiledropConnector:
             )
             for p in paths
         ]
+
+    def fetch(self, source: FetchSource) -> list[RawPage]:
+        """One acquisition batch, wrapped in a run log (G107).
+
+        Delegates to :meth:`_fetch` unchanged — this records that the batch ran
+        and what it acquired; it does not change what is fetched. Keeps the
+        public name so the ``Connector`` protocol is still satisfied.
+        """
+        with batch_run_log(
+            "docmeta.filedrop",
+            source=source.id,
+            meta={"connector": "FiledropConnector"},
+        ) as summary:
+            pages = self._fetch(source)
+            summary["pages fetched"] = len(pages)
+            summary["bytes fetched"] = sum(len(page.body) for page in pages)
+            return pages
 
     def _resolve(self, source: FetchSource) -> list[Path]:
         found: list[Path] = []

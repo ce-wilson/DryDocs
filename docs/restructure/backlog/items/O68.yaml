@@ -1,147 +1,36 @@
 id: O68
 epic: web-console
-title: Acronyms need a real surface — today they are a run-on footnote with no way to add one; give
-  them a readable list and an add affordance on the artifact path
+title: 'The admin page should show the log estate: directory, path, size and capacity per kind â€” and
+  must not render debug-tier Cypher until that display is reviewed'
 type: task
 module: drydocs-web
 phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: done
-depends_on: []
+status: todo
+depends_on:
+- G111
 inputs:
-- web/src/routes/SoftwareRoute.tsx
-- web/src/software/softwareModel.ts
-- config/taxonomy/software-registry.yaml
-- scripts/render_software_registry.py
-- config/taxonomy/ui-components.yaml
-- config/taxonomy/ui-tests.yaml
+- web/src/
+- drydocs_core/data_zones.py
+- drydocs_core/log_kinds.py
+- config/log-kinds.yaml
 acceptance: |
-  (a) DISPLAY — acronyms render as a readable list, one row per term (term, expansion), instead of
-  being concatenated with a middle dot onto the end of a footnote. The recommended home is a tab on
-  /software, because that page already loads the data and the registry is where acronyms live;
-  exact placement is the builder's, but it must be reachable without hunting and must not be a
-  footnote on a tab about something else.
+  (a) THE PANEL. The admin configuration page (O12) gains a log-estate panel: per declared kind and per declared zone, the directory, the resolved path, the file count, the total size, and the declared retention. It is a PANEL on that existing surface, not a new page â€” the SME placed it there rather than in a new epic.
 
-  (b) THE LAYOUT TEST IS THE SNOW ENTRY, not the short ones. Its expansion is a full sentence
-  carrying a warning (ServiceNow, the ITSM/CMDB platform, explicitly NOT Snowflake), and that
-  warning is the entire reason the entry exists. It must render in full — not truncated, not
-  ellipsised behind a tooltip. AIS and DPL are two words each and will look fine under any layout,
-  so a design validated only against them proves nothing.
+  (b) THE DATA MOSTLY EXISTS, SO MOST OF THIS IS WIRING. G109 shipped a zone inventory returning present/absent plus a file count per declared zone, and the landing-zones command already emits manual and declared zones as one document with path, mode, base, in-repo, exists, file count and empty. The panel needs a read endpoint over that, not new collection. The ONE genuinely missing field is capacity â€” the inventory counts files and does not sum bytes â€” so a total-bytes value is added beside the count in CORE, not computed in the API and not in the browser.
 
-  (c) ADD — the same view carries an affordance to add an acronym, and it produces a CHANGE
-  ARTIFACT rather than writing anything. This is settled doctrine, not a fresh design question:
-  the ui-write-surface gate (O20, SIGNED OFF 2026-07-21, config/gate-log.md) ruled M3 direct write
-  REFUSED STANDING, C4 admin edits NEVER, and C3 server-side git DEFERRED — so M1 (artifact-only)
-  or M2 (an origin-flagged non-graph draft store) is the path, and the committed YAML stays
-  authored through git. Reuse the shape /mappings already uses rather than inventing a second: draft
-  into a per-user tray, submit produces a downloadable snippet plus rationale, and it travels git
-  to review to merge. A rationale is REQUIRED on the draft, as it is on every other drafting
-  surface here.
+  (c) THE DEBUG TIER IS REPORTED, NEVER RENDERED. ADR 0014 clause 6 as ruled splits the lean, longer-retention API log from a verbose short-retention debug log that carries Cypher text and request detail. CAPTURING that text is ruled; SURFACING it in a console is NOT, and they are different risks â€” a short-lived file on an operator's disk versus a rendered page. This panel may report the debug kind's SIZE and RETENTION like any other kind and MUST NOT render its contents. Anything that would display it is blocked on the SME review, which is a separate ruling and not this item's to make.
 
-  (d) PROVENANCE — the acceptance forces a decision rather than letting it be lost by default.
-  Each committed acronym today carries its why/when/who in a YAML COMMENT beside it (AIS cites the
-  capability-area corroboration; DPL and SNOW are both dated 2026-08-09 and named as SME-supplied,
-  SNOW marked IMPORTANT). A UI cannot read comments. Either the add flow captures that into
-  structured fields — in which case the schema grows and the three existing entries are migrated in
-  the same change — or the display states plainly that provenance is comment-only and not shown.
-  What is NOT acceptable is a surface that presents three fully-sourced entries and a new one with
-  no source, indistinguishable from each other.
+  (d) IT DOES NOT SHIP A KNOWN-WRONG ROW. G111 is a hard dependency, not a courtesy: today the run-logs zone resolves to the default whenever the log-directory variable is set, so a panel built before that fix would confidently show the wrong directory for exactly the kind the SME most wants to see.
 
-  (e) A GUARD — nothing tests the acronyms block today, in either
-  tests/unit/test_software_registry.py or test_software_registry_json.py. Whatever shape (c) and (d)
-  settle on gets one, including the case that decides (d): an entry missing whatever provenance the
-  ruling requires.
-
-  Registered in ui-components.yaml and ui-tests.yaml with coverage pins; both themes; npm run build
-  and oxlint clean.
+  (e) WHY A PANEL AND NOT JUST THE CLI, stated in the panel's own copy or its PR note: the command exists so "my extracts are gone" is a one-command answer, and the person most likely to ask is on a machine where the CLI is not the habitual surface. Post-retention it answers the same question for logs â€” days declared against days actually on disk.
 notes: |
-  Raised 2026-08-26 by the user during the ui-workstream session, alongside the /mappings grid-control
-  work — the same complaint in a different place: data that exists in the repo but has no surface a
-  person can actually read or extend.
+  Groomed 2026-08-26 from Idea-172 (SME direction 2026-08-25, given alongside the ADR 0014 retention rulings). Epic O and the admin page are the SME's own placement.
 
-  WHAT IS THERE TODAY, because it is the whole argument for clause (a): SoftwareRoute.tsx joins the
-  acronym map into a single string with a middle-dot separator and appends it to a 10px footnote that
-  already carries two other sentences (the Snowflake-absent-by-construction note and the self
-  application id). Three entries and it is already a run-on; the SNOW gloss alone is a sentence, so
-  the line reads as prose rather than a glossary. The data is fine — it is the presentation that has
-  no room to grow, and it gets worse with every acronym added.
+  Module `drydocs-web` recorded as a choice: the item spans three modules â€” the total-bytes field is core, the read endpoint is api, the panel is web â€” and it is filed against the surface the SME asked for. Whoever takes it should keep the core slice in core (clause b) rather than letting a byte sum drift into the API layer, which is the seam the module boundary exists to protect.
 
-  ADD IS A WRITE SURFACE, which is why clause (c) cites the ruling instead of leaving it open. The
-  O20 gate settled the mechanism tiers console-wide and a builder who does not know that will reach
-  for the obvious thing, which is editing the YAML server-side. Worth noting the boundary precisely:
-  acronyms live in a committed config file, NOT the graph, so the refused M3 tier is about graph
-  writes and does not literally name this case. The reason the artifact path still applies is C4
-  (admin edits, confirmed NEVER) and C3 (server-side git, DEFERRED) — the committed tree is authored
-  through git, and a console that edits config files directly reopens a question the gate closed.
+  The Cypher-display question in clause (c) is an SME review, parked as a question in the inbox at this groom and named in the groom report; the item is complete without it and stays blocked on it for that one behaviour only.
 
-  FOUND WHILE SCOPING, both recorded so they are not rediscovered: the acronyms block has NO test of
-  any kind, and the per-entry provenance lives only in comments. The second is the interesting one —
-  it is a real instance of the pattern this repo keeps naming elsewhere, where the thing that makes a
-  fact trustworthy is present for a human reader and invisible to every tool.
-
-  DELIBERATELY NOT SPECIFIED: whether the surface is a new /software tab or its own route; whether
-  the add affordance is inline in the list or a dialog; and whether provenance becomes structured
-  fields or stays comment-only. The first two are page design and belong with the builder. The third
-  is a genuine fork with a schema consequence, and clause (d) requires it be DECIDED and stated
-  rather than defaulted into.
-
-  NOT gate-bound in itself: a glossary is not edge semantics, not the ontology, and not a graph
-  write. If clause (d) lands on structured provenance fields, that is a config-schema change and
-  rides the normal review, not the HITL gate.
-
-  2026-08-27 - DONE (branch feat/ui-workstream). Surface: an Acronyms TAB on /software
-  (web/src/software/AcronymsPane.tsx, registered in modules/registry.ts) - the run-on
-  footnote tail is gone and the page footnote now just points at the tab.
-
-  CLAUSE (d) RULED: STRUCTURED PROVENANCE, not comment-only. The acronyms block changed
-  shape from `TERM: "expansion"` to a per-term mapping with REQUIRED expansion/source/added
-  and an optional note, and all three committed entries were migrated with their comment
-  provenance lifted into fields. Reason for taking the more expensive fork: comment-only
-  would have satisfied the letter of (d) by printing a disclaimer, but the newly added
-  entry would still have been indistinguishable from the sourced ones on screen, which is
-  the outcome (d) exists to prevent. Config-schema change, not gate-bound (glossary, not
-  edge semantics). What deliberately STAYED a comment: the AIS port caveat, because it is
-  about how two repositories reconcile, not about the term.
-
-  CLAUSE (c): M1 artifact-only, not M2. /mappings drafts through a server store
-  (var/mapping.db, O24); acronyms need no store because the target is a committed config
-  file, so the tray is component state and submit downloads a YAML snippet carrying the
-  drafter, the date, a paste-ready block, and the per-entry rationale as a comment. The
-  drafted snippet was round-tripped at build: yaml.safe_load parses it and the renderer's
-  own validator accepts it unchanged, so a paste is valid on arrival.
-
-  CLAUSE (e) GUARDS, all Python-side (3 in test_software_registry.py, 1 in
-  test_software_registry_json.py): shape + provenance on every entry; the deciding case,
-  an entry missing source/expansion is REJECTED by scripts/render_software_registry.py
-  (which now validates rather than passing through); SNOW's expansion survives whole into
-  the view; and the generated JSON is a term-sorted list whose term set equals the
-  declared one.
-
-  VERIFIED IN CHROME against the Vite dev server, dark AND light, not only built: the tab
-  renders, all three entries render in full, and the SNOW warning is neither truncated nor
-  ellipsised. The add flow was exercised end to end - the duplicate guard caught lower-case
-  "snow" and normalized it, the draft button stayed disabled until expansion + source +
-  rationale were all present, and the artifact was captured by stubbing URL.createObjectURL
-  so no file was downloaded to the machine. FOUND AND FIXED at that pass: the Added column
-  broke "2026-07-21" across two lines because the expansion column took all the slack -
-  now table-fixed + colgroup + whitespace-nowrap, so a long gloss grows in lines instead of
-  stealing width. That is TC-SOFTWARE-03 and it is exactly the class of defect clause (b)
-  predicted, just in the neighbouring column.
-
-  TS-SOFTWARE seeded 1 -> 5 cases, every one sourced to this session's observation.
-  test_ui_tests_ledger.py's 6/13 seeded-suite pin correctly did NOT move (TS-SOFTWARE was
-  already seeded), so O43 does not advance here - it names the 9 EMPTY suites and this is
-  not one of them. ui-components.yaml gained AcronymsPane bound to `software` by directory
-  evidence; the binding pin moved 31/75 -> 32/76.
-
-  Full suite 2353 passed / 10 skipped; npm run build and oxlint clean (4 warnings, all
-  pre-existing files). CI: green at the pushed sha 6b43c850 (run 33092183083). Worth
-  recording because the branch was RED before this item and the cause was inside its own
-  blast radius: scripts/render_software_registry.py was already committed unformatted, so
-  `ruff format --check` failed at the claim commit; formatting it here turned CI green. A
-  local `ruff format --check .` in this worktree ALSO named drydocs_api/mappings.py and
-  tests/unit/test_mapping_api.py - that was a stale-cache false positive, contradicted by
-  the CI log, which listed one file only, and by a re-run showing both already formatted
-  and identical to HEAD. Trust the CI log over the local cache when the two disagree.
+  p2/sonnet: the data exists, the acceptance names the one new field, and the single hard rule (no debug content) is stated in the negative so it is testable.

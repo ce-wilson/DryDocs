@@ -207,6 +207,78 @@
     domain:       business_application
     status:       planned
 
+  # ── Deployment Module CI (K22 PROPOSAL — rider G0d-RIDER on gate
+  # tom-roles-enumeration-and-cardinality, 2026-08-26) ──────────────────────
+
+  - id:           business_application_instantiates_deployment_module
+    neo4j_label:  INSTANTIATES
+    inverse_label: "instance of"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      DeploymentModule
+    prov_maps_to: ~
+    note: >
+      PROPOSED at K22 (2026-08-26), routed via the tom-roles gate's G0d-RIDER —
+      the CI topology exactly as the SME gave it (2026-08-10, K21): Business
+      Application [Instantiates] Deployment Module, inverse [Instance of], and
+      above it [Contained by] area product (the parent is the AREA PRODUCT, a
+      node DryDocs already holds — no second containment edge is registered
+      here). The inverse label is THIS INSTANCE's ([Instance of]); the public
+      material writes [Instantiated by] — recorded because C10's rule (the
+      label is not the identity) is the whole reason we carry our own stable
+      names. Entity -> Entity structural containment/instantiation; no PROV
+      verb reached for (the m3_belongs_to_application precedent). THE TARGET'S
+      KEY IS THE CI's OWN ID, never the composite display name — see the
+      DeploymentModule node-class note. NOTHING LOADS: status planned until
+      the rider is ruled; G13/G14/G15's plausibly-shared subject (§G0d) is the
+      question the gate still owns, and this entry does not preempt it.
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       planned
+
+  - id:           business_application_contained_by_ci
+    neo4j_label:  CONTAINED_BY
+    inverse_label: "contains"
+    role:         ~
+    from_node:    BusinessApplication
+    to_node:      "AreaProduct | BusinessApplication"
+    prov_maps_to: ~
+    note: >
+      G73 (gate tom-roles-enumeration-and-cardinality SS-E4, SIGNED 2026-08-11):
+      the MODELLED ANCESTOR — the cmdb containment hop from a seeded CI to its
+      parent CI, named for what the SOURCE asserts (cmdb_rel_ci "Contained by",
+      taken endpoints-in-seed by K21 sect. 7.4), never for the computation over
+      it. It is what makes "why does this application show a different owner
+      than its parent" TRAVERSABLE (SS-D2's operator question): TOM inheritance
+      is COMPUTED by walking this edge upward — one mechanism applied
+      repeatedly up an N-level chain (SS-E1e), nearest ancestor holding the
+      role wins, and overrides PROPAGATE (a child inherits the ancestor's
+      CURRENT value even when that value is itself an override). The
+      DeploymentModule rung of the same chain is NOT re-registered here —
+      business_application_instantiates_deployment_module already carries that
+      pair, and the C8 identical-triple rule says reuse, traversed against the
+      arrow. DISTINCT FROM K22's declined second containment edge, on K22's
+      own terms: that decline was the app->area-product CATALOG rollup, which
+      the catalog family already links; this is the cmdb containment CHAIN
+      whose ancestors include CIs the catalog family will never hold — CIs
+      owned by teams DryDocs does not support, taken FOR THEIR TOM ROWS ONLY
+      (the K21 sect. 7.4 amendment this item writes). A foreign ancestor's
+      node class is deliberately unresolved until the company pull builds it
+      (the K22 deferral idiom); to_node names the classes DryDocs holds.
+      Entity -> Entity structural containment; no PROV verb reached for (the
+      m3_belongs_to_application precedent). Attribution rows carry
+      assertion_mode 'direct' | 'overridden' (the source's BLANK is Direct;
+      'inherited' is NEVER stored — SS-E: authored rows only, inheritance is a
+      computation, and storing a derived fact as though asserted is how a
+      graph starts disagreeing with its source). NOTHING LOADS producer-side:
+      status planned until the company TOM pull lands (the G72
+      servicenow-tom entry is the surface it will stamp).
+    supplement:   ~
+    loader:       ~
+    domain:       business_application
+    status:       planned
+
   # ── FID / functional-id family (gate fid-identity-and-scope, SIGNED 2026-08-19) ──
 
   - id:           seal_appuser_belongs_to_application

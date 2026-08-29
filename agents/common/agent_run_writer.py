@@ -4,9 +4,15 @@ One :AgentRun node per answered question, mirroring the loader :JobRun
 envelope (kind='qa' instead of kind='load') so agent telemetry is queryable
 next to load telemetry. This module is the DEDICATED writer the R1 gate
 ruling requires: the ONLY code path in the agent service that opens a WRITE
-session, targeting the ruled database — ``ddcontext``, NEVER ``drydocs``
-(refused here, not just documented; a revisit that moves telemetry to its
-own dd* database is an ADR 0002 topology amendment, changed via env).
+session, targeting the ruled database — ``drydocs``, and nothing else
+(refused here, not just documented: see ``agent_run_db`` below).
+
+THE RULING INVERTED AT THE G102 FOLD (2026-08-18) and this docstring is the
+correction. It read the superseded ``ddcontext`` name, NEVER ``drydocs`` —
+the pre-fold rule — while ``DEFAULT_AGENT_RUN_DB`` twenty lines below
+already said ``drydocs``. The defect to refuse is now a STALE env var
+still pointing at the retired ``ddcontext``, which would write telemetry
+into a database nothing reads.
 
 Privacy rules carried in the props, not the caller's discipline:
 

@@ -24,8 +24,8 @@ description: >
   reconcile (attributed + unmatched + conflicts + pinned = eligible;
   attributed = edges written + dropped_in_graph, drops surfaced, never
   silent).
-# No `targets:` — the review spine (config/review-labels.yaml) has no entry
-# covering :Port, and declaring labels the spine cannot check is the drift
+# No `targets:` — the review backbone (config/review-labels.yaml) has no entry
+# covering :Port, and declaring labels the backbone cannot check is the drift
 # the sibling business-application-identity suite documents.
 cases:
   - id: TC-01

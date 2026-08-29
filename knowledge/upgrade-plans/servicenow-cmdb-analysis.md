@@ -79,7 +79,7 @@ Crawl/Walk/Run/Fly ladder (Business App + App Service + relationships FIRST, Inf
 Object data-flow edges LAST); "once a CI, always a CI"; remediation playbooks =
 Analysis play / Fix play / Data Governance play.
 
-- INCORPORATE → terminology research: the table map is the crosswalk spine; ALSO the
+- INCORPORATE → terminology research: the table map is the crosswalk backbone; ALSO the
   Yokohama rename warning — "Application Service" is already unstable vendor naming
   (now "Service Instance"), so DryDocs should adopt the CONCEPT (deployed instance),
   not the label. Candidate #1 refined.

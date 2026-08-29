@@ -56,6 +56,69 @@ order:
       *meaning*, but the sole authority for *who owns it* — used to attach context, not to
       redefine orchestration objects.
 
+  # ---- G72: the TOM attribution surfaces (gate tom-roles-enumeration-and-
+  # cardinality, SIGNED 2026-08-11, SS-D3/SS-D4). THE SURFACES ARE THREE, not the
+  # two SS-D1 described, and every Attribution stamps `source` with its
+  # surface's `stamp:` below — so a roster disagreement ("five Operate
+  # Managers?") is a READABLE fact: which surface said so. Disjoint `governs`
+  # from everything above; the SS-D4 order is hand-verified > ServiceNow TOM >
+  # SEAL extract (human verification outranks both automated surfaces; the
+  # operating-model source outranks the contact extract).
+  #
+  # NEVER-READ vs DID-NOT-ASSERT (the O44 alluvial's ribbon-stop): this block
+  # declares which surfaces EXIST; whether one was READ is a load-record fact
+  # (the loader's :JobRun rows, or — for the two company-side surfaces — the
+  # loader's very existence on that side). An Attribution absent FROM a read
+  # surface means "did not assert". A diagram cannot draw a difference the
+  # data does not carry, and this declaration is the half the data carries.
+  #
+  # SS-E1g CHECKED BEFORE BUILDING (evidence doc section 10.3): ServiceNow's
+  # Direct rows carry `u_source` naming the feed INTO ServiceNow (e.g. the
+  # SEAL deployment-contacts feed). That discriminates ServiceNow's own row
+  # provenance — it complements this vocabulary (the TOM loader should carry
+  # it through as its own property) but it cannot name the OTHER two
+  # surfaces, so it does not replace the discriminator ruled here.
+  - id: hand-verified-crosswalk
+    authority: 5
+    role: attribution-surface
+    governs: [tom-attribution-roster]
+    stamp: HAND_VERIFIED
+    source: "company-side hand-verified crosswalk (gate snow-hpsm-queue-to-group; per-machine, gitignored)"
+    rationale: >
+      Human verification outranks both automated surfaces (SS-D4). Trust rides the
+      crosswalk's EXISTING verification vocabulary — verified / cert_status /
+      cert_next_date — reused rather than minted (the cmdb_rel_type descriptor-column
+      discipline). COMPANY-SIDE ONLY (RELAY-6): the producer repo cannot load this
+      surface, and that is exactly why the discriminator must be able to NAME a
+      surface this repo cannot itself read.
+
+  - id: servicenow-tom
+    authority: 6
+    role: attribution-surface
+    governs: [tom-attribution-roster]
+    stamp: SERVICENOW_TOM
+    source: "ServiceNow TOM Accountable view (company replica; knowledge/upgrade-plans/servicenow-replica-evidence.md)"
+    rationale: >
+      The operating-model source outranks the contact extract (SS-D4). Not ingested
+      producer-side; declared so its rows are attributable the day the company loader
+      lands, and so a SEAL-vs-TOM count difference reads as two surfaces disagreeing
+      rather than one roster mutating. Direct rows carry u_source (SS-E1g) — pass it
+      through on the Attribution when that loader is built.
+
+  - id: seal-contact-extract
+    authority: 7
+    role: attribution-surface
+    governs: [tom-attribution-roster]
+    stamp: SEAL
+    source: "SEAL application-info + contact extracts (drydocs/loaders/cypher/seal_applications.cypher, seal_contacts.cypher)"
+    rationale: >
+      The one surface loaded producer-side today; BOTH loader sites stamp this
+      surface. The stamp is deliberately the literal 'SEAL' every already-loaded
+      graph carries and the pinned 4-part attribution_id embeds (app_id|SEAL|role|sid,
+      identity gate SS-D2) — declaring the existing value costs zero migration and
+      keeps property and key telling one story. (The PAT team-role attributions are a
+      different fact family and already stamp 'pat' — not part of this roster.)
+
 # How conflicts are recorded when a lower authority disagrees with a higher one.
 conflict_policy:
   winner: highest-authority
@@ -69,6 +132,9 @@ active:
   internal-standards: true
   seal-pat-source-of-record: true   # live but silent until the docmeta corpus feeds it
   lob-product-team: true
+  hand-verified-crosswalk: true     # live but silent — company-side surface (G72)
+  servicenow-tom: true              # live but silent — company loader not built (G72)
+  seal-contact-extract: true
 
 # =============================================================================
 # History: the seal-pat-source-of-record authority above was PROPOSED at the

@@ -1,0 +1,34 @@
+id: J59
+epic: release-infrastructure
+title: The one freshness key the repo has LIES — 16 of 24 dated YAML headers are stale against git,
+  so the `updated:` field needs a check that compares it to something, and that check cannot live in CI
+type: chore
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- J58
+inputs:
+- PORT-MANIFEST.yaml
+- config/schemas/
+- .github/workflows/ci.yml
+- docs/reviews/persona-python-architect-idea-181.md
+acceptance: |
+  (a) THE GUARD IS A PRODUCER-SIDE LOCAL HOOK, AND THE REASON IS RECORDED. Freshness is checked by comparing each governed file's `updated:` value against `git log -1 --format=%as <path>`. That comparison is BLIND IN CI — the workflow uses a shallow checkout with no `fetch-depth` override (verified against `.github/workflows/ci.yml`), so per-file git dates are not available to the runner and a CI-hosted version of this check would report green while measuring nothing. It therefore ships as a pre-commit hook, which means creating the repo's first `.pre-commit-config.yaml` (none exists today) plus the hook script, with installation named in the session ritual. A check that cannot run where it is installed is the exact failure this item exists to avoid repeating.
+
+  (b) IT SOLVES THE LYING PROBLEM, NOT THE PRESENCE PROBLEM. Presence is J58's. This one fails when `updated:` disagrees with the file's git last-touch date beyond a stated tolerance, and the tolerance is written with its reason rather than picked. Worked example to close against, measured 2026-08-27: of 24 files carrying `updated:`, 16 are stale — `PORT-MANIFEST.yaml` itself reads `updated: 2026-08-20` against a git date of 2026-08-27. Re-measure at pull time.
+
+  (c) `updated:` IS A PER-SIDE FIELD AT THE PORT MANIFEST, AND THIS SAYS SO. Git dates DO NOT survive the port: disjoint histories stamp every ported file with port day, so the company's git date for a file is the day it arrived, not the day its content changed. That is precisely why the IN-FILE date is the cross-repo freshness mechanism and why `updated:` must be declared a per-side field in `PORT-MANIFEST.yaml` — the doc-source-registry field-split is the precedent. Without this clause the hook would make every ported file look freshly touched on their side.
+
+  (d) THE HOOK IS ADVISORY-CAPABLE AND NEVER BLOCKS A COMMIT SILENTLY. It either fails loudly with the file list and the two dates per file, or it is bypassed with a recorded, deliberate flag. It never passes because it could not determine a date — an unresolvable file is reported, not skipped.
+
+  (e) OUT OF SCOPE: adding `updated:` to files that lack it (J58 clause (c)), and the Python docstring standard (J60).
+notes: |
+  Groomed 2026-08-28 from Idea-181 (captured 2026-08-27), the freshness half. Split from J58 on the entry's own persona-review finding F3 — the git-compare guard is blind in CI — which turns "one guard" into two mechanisms with different homes. Keeping them in one item would have produced a guard that ships to CI, passes, and measures nothing, which is the same shape as the defect it is meant to catch.
+
+  `depends_on: [J58]` is real, not decorative: there is nothing to compare until the `updated:` key is required and populated, and the schema J58 writes is what tells this hook which files it governs.
+
+  Epic release-infrastructure / module config / phase 8 follows J58. Model sonnet; priority p3 rather than p2 because a stale in-file date is a smaller harm than a missing one, and because the hook is producer-machine-local and so cannot be enforced for anyone who has not installed it — which is itself worth stating in the close note as a known limit rather than discovered later.

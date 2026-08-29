@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: fable
 priority: p2
-status: todo
+status: done
 depends_on:
 - G70
 inputs:
@@ -19,3 +19,26 @@ acceptance: |
   Per the signed §D3/§D4. THE SURFACES ARE THREE, not the two §D1 described: hand-verified crosswalk, SEAL contact extract, ServiceNow TOM. Every Attribution records which asserted it — today Attribution.source is the literal string 'SEAL' at both loader sites regardless, so a count difference is unattributable. TRUST RIDES ON EXISTING VOCABULARY, NOT A NEW ONE: the company crosswalk already carries `verified` / `cert_status` / `cert_next_date`. Reuse rather than mint — the same discipline that reads cmdb_rel_type's descriptor columns instead of splitting `name`. PRECEDENCE IS RULED AND GOES INTO config/precedence.yaml: hand-verified > ServiceNow TOM > SEAL extract. §A's both-registers ruling made this MANDATORY rather than deferrable — two ingested surfaces that disagree with no rule is the one outcome §D4 refuses. CHECK BEFORE BUILDING (§E1g): ServiceNow's Direct rows carry `u_source` naming the feed that produced them, which may already be the discriminator this item would otherwise invent. THE CONSUMER IS O44, the four-column reconciliation alluvial — a disagreement renders as a ribbon that STOPS, so the discriminator must distinguish "this surface did not assert it" from "this surface was never read". A diagram cannot draw a difference the data does not carry.
 notes: |
   Raised 2026-08-11 at the G35 sign-off. NOTE THE THIRD SURFACE IS COMPANY-SIDE ONLY: the hand-verified crosswalk belongs to gate snow-hpsm-queue-to-group, which the producer repo does not hold (RELAY-6, and §9 of the evidence doc). So the discriminator must be able to NAME a surface this repo cannot itself load.
+  DONE 2026-08-27 (laptop, Lane B). THE SURFACES JOIN THE EXISTING CHAIN: three
+  attribution-surface entries in config/precedence.yaml#order (authorities 5/6/7, disjoint
+  governs tom-attribution-roster), so surface identity, the SS-D4 order AND resolution live in
+  the one mechanism the config layer already has — PrecedenceResolver settles a roster
+  disagreement with no new machinery (test proves hand-verified beats both, ServiceNow TOM
+  beats the extract, losers become aliases never drops). Each entry declares its `stamp:` (the
+  Attribution.source value; schema extended): HAND_VERIFIED / SERVICENOW_TOM / SEAL — the SEAL
+  stamp is DELIBERATELY the literal every loaded graph already carries and the pinned 4-part
+  key embeds, so the build costs zero migration; both loader cypher sites gained the
+  declaration comment and tests/unit/test_attribution_surfaces.py ties their stamps to the
+  declaration (change the file, not the cypher). Reader: stamp_for / authority_for_stamp /
+  surface_ids on the existing PrecedenceResolver. SS-E1g CHECKED BEFORE BUILDING, as the
+  acceptance ordered: u_source (evidence doc 10.3) names feeds INTO ServiceNow — it
+  discriminates ServiceNow's own row provenance, complements this vocabulary (pass it through
+  when the company TOM loader is built — noted on the servicenow-tom entry) but cannot name
+  the other two surfaces, so it does not replace the ruled discriminator. O44's ribbon-stop
+  semantics recorded on the block: the declaration says which surfaces EXIST; the load record
+  says which were READ; absence from a read surface = did not assert. The third surface is
+  NAMED though this repo cannot load it (RELAY-6) — exactly the acceptance's requirement.
+  PAT team-role attributions already stamp 'pat' (different fact family; recorded, untouched).
+  Trust axis: reused verified/cert_status/cert_next_date, minted nothing. Offline verification
+  (J18): resolver + declaration + cypher-text guards; no live-graph claim. Suite 2571 passed /
+  11 skipped; ruff clean.

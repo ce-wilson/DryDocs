@@ -1,0 +1,48 @@
+id: G123
+epic: self-documentation
+title: The catalog-substrate review amended three items that had already closed on main — decide,
+  per item, whether each amendment is a follow-up or a reopen
+type: task
+module: graph-infra
+phase: 16
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/design/catalog-substrate-review.md
+- docs/restructure/backlog/items/G81.yaml
+- docs/restructure/backlog/items/G104.yaml
+- docs/restructure/backlog/items/G109.yaml
+acceptance: |
+  Each of the three amendments below is ruled ONE of: already satisfied by the work that closed
+  the item (say where), a follow-up item (mint it), or a reopen of the original (say why the
+  closed work no longer meets the amended acceptance). No amendment is left in the state this
+  item exists to clear — recorded in a review document but attached to nothing that tracks it.
+
+  (a) G81 — amended from findings B3, B4 and L4: the per-origin binding shape, and the
+  environment-variable reference rule (clauses (f) and (g) as the branch stated them).
+
+  (b) G104 — amended with a SECOND REQUIREMENT: the ADR records the three-part-key ceiling
+  (platform, name, environment) and names the binding table as where an instance coordinate
+  lands, without minting the axis; plus the rejected-alternatives list extending to the survey.
+
+  (c) G109 — amended with clause (f): six is the wrong number, the same defect one level wider.
+
+  Ruling each one is the deliverable. Implementing whatever the ruling produces is NOT in scope.
+notes: |
+  WHY THIS ITEM EXISTS — a merge artifact, recorded rather than resolved by guess. The
+  catalog-substrate survey was written branch-side on feat/ui-workstream and amended five items
+  on 2026-08-28 (G81, G104, G109, O75, O76). Main independently closed G81, G104 and G109 on
+  2026-08-24, four days earlier, so when the branch merged, three items were simultaneously
+  done-on-main and amended-on-branch.
+
+  THE MERGE KEPT MAIN'S CLOSED ITEMS VERBATIM and did not silently reopen them, because a
+  closed item's notes record work that actually happened and an amendment arriving afterwards
+  does not un-happen it. It also did not drop the amendments: docs/design/catalog-substrate-review.md
+  merges in whole (330 lines) and carries every finding, so nothing is lost — but a finding in a
+  review document is attached to no backlog state, which is the gap this item closes.
+
+  O75 and O76 needed nothing here: they are branch-side items main never had, so their
+  amendments merged with them intact.

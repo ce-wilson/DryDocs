@@ -1,0 +1,125 @@
+# SME gate-prompt spec — connection-by-reference + run input identity (the
+# source-registry two-issue redesign; plan approved 2026-08-28). GATE-BOUND AND
+# DECIDES NOTHING: drafting a prompt is not a schema change (the G27/W1/U11/N10
+# precedent). No registry field lands, no envelope property is written, and the
+# SIGN-OFF is a separate SME session.
+#
+# WHY THIS PAGE EXISTS: the DPL/Chronicle registration session (company-side,
+# 2026-08-27) exposed that registering a DB-backed system of record has no
+# typed mechanism — the committed row's whole answer is `locator.service: ~`
+# plus a prose comment pointing at "the internal twin," a term the SME ruled
+# does not carry the risk implications. Separately, the :JobRun record cannot
+# identify its input (no dataset id, no input path, no digest), so
+# "this graph state came from this file" is not answerable from the graph.
+#
+# EXTERNAL MODELS, cited not adopted: DataHub (committed recipe; credentials
+# only as ${SECRET_NAME} references) and OpenMetadata (the Service entity owns
+# the connection; secrets are references resolved at runtime; the ingestion
+# pipeline is a first-class entity with typed runs and run history). Both draw
+# the same line this page proposes: connection SHAPE is declarable
+# configuration; credentials exist only as named references. Neither has
+# classification tiers, a publish boundary, or a confirmation gate — those
+# stay DryDocs mechanisms and this page does not import any tool.
+#
+# BUILT-ON, NEVER RE-ASKED (L25): N12's acquisition block (mode/via/format/
+# drop_dir/drop_dir_base) and its clause (f) ruling that `mode: manual` is
+# never a defect; N13's signed lifecycle-flip ruling; N16's source_label
+# carrier enum; ADR 0014's env split (per-machine operational facts to the
+# environment, domain meaning to committed YAML); the S6 rule that the JSON
+# Schema stays shape-only and ENFORCEMENT IS THE TEST.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: source-connection-and-run-identity
+title: "SME Gate — source connection by reference, the restricted connection record, and run input identity"
+step: "Registering a DB-backed source today nulls the connection field and points at prose; the run record cannot name its input. This page puts six sections to the SME: the connection block on SYSTEM rows (references, never values), the restricted-connection-record term and handling marker, the acquisition.since field and transition history, the :JobRun input-identity envelope, declare-or-refuse as a standing acquisition rule, and the fence. Nothing lands until sign-off; the --csv defect closure and the S13 import fix build independently as plain bugs."
+summary: >
+  Section A proposes a typed `connection:` block on SYSTEM rows — a settings
+  group, secret REFERENCES by env-var name, and a pointer to the restricted
+  connection record — so a committed row documents a DB-backed source
+  completely while carrying no value. Section B ratifies the term "restricted
+  connection record" for the credential-adjacent record class (replacing the
+  connection/values sense of "internal twin" only) plus a
+  `handling: restricted` marker on the Internal level. Section C adds the
+  dated `acquisition.since:` field and the recorded manual-to-automated
+  transition history on top of N13's signed flip ruling, and reconciles ADR
+  0012's five-value acquisition vocabulary with N12's mode/via so no third
+  vocabulary exists. Section D adds input identity to the :JobRun envelope
+  (dataset id, zone-relative path, input sha256) so reproducibility is
+  answerable from the graph. Section E ratifies declare-or-refuse for every
+  acquisition route with a recorded override. Section F fences N13/N14/N15
+  and parks the profiler-as-typed-run idea as a rider.
+meta:
+  Module: "drydocs_core (source_registry.py, run_log.py — declaration/resolution) + drydocs-load (loaders/base.py — the :JobRun envelope); no loader gains a write and no field lands at drafting"
+  Source: "config/source-registry.yaml (v2, N7/N12 state — the psgmgr row's `locator.service: ~` is the live evidence) · drydocs/loaders/base.py `_open_run`/`_close_run` (the envelope as built) · drydocs_core/config.py settings groups (Neo4jSettings/OracleSettings, SecretStr, .env) · the 2026-08-28 registry/acquisition survey (this session) · DataHub recipe + OpenMetadata ingestionPipeline/secrets docs (external models, cited in the header)"
+  Registry ref: "source-registry v2 (gate source-registry-v2, SIGNED 2026-07-31) — this page proposes ADDITIVE fields only; no row's confirmed state moves; the schema stays shape-only per S6 with enforcement in tests/unit/test_source_registry.py"
+  Classification: "Internal-Public — mechanism, field names, and rules only; no endpoint, host, account, login, or path value appears on this page, and the worked example cites rows by registry id"
+  Precedent: "G27/W1/U11/N10 — a drafted prompt decides nothing · L25 riders-not-edits — N12/N13/N16/ADR 0014 are built on, never re-opened · M3/M4 — envelope property additions are gate territory · S6 — schema shape-only, enforcement is the test · J23 — handling markers are notes on the Internal level, not a fourth tier"
+  Vocabulary: "no relationship-vocabulary entries — every proposal here is a registry/envelope FIELD, not an edge; the one term minted is the record-class name (Section B), which is classification vocabulary, not graph vocabulary"
+provenance:
+  - label: "The as-built state — what the tree does today (nothing here is proposed)"
+    source_object: "config/source-registry.yaml + drydocs/loaders/base.py + drydocs/cli_ingest.py at the 2026-08-28 survey"
+    key: "registry id / envelope property name"
+    loader: "NONE at drafting — Section D's fields land only after sign-off, via the M3/M4 envelope discipline"
+    properties:
+      - name: connection_mechanism_today
+        origin: source
+        from: "config/source-registry.yaml psgmgr SYSTEM row: `locator.service: ~` with the comment 'DB service/TNS — connection env (internal-local/), never committed'"
+        note: "The entire current mechanism for 'document the connection without exposing it' is a nulled field and prose. The settings groups (drydocs_core/config.py) and the registry do not reference each other in either direction — the join Section A proposes is unbuilt."
+      - name: jobrun_envelope_today
+        origin: source
+        from: "drydocs/loaders/base.py _open_run/_close_run: run_id, kind, loader, source (the N16 source_label carrier), started_at/completed_at, status, row counts, per-row row_checksum"
+        note: "No dataset id, no input path, no input digest. The input path reaches only the disk log's `source:` header line, which is never committed and never queried — reproducibility is not answerable from the graph."
+      - name: undeclared_route_today
+        origin: source
+        from: "drydocs/cli_ingest.py `load <name> --csv <path>`: confirmed-gated but path-free — no drop_dir resolution, no data_zones.read_zone_containing(), no record of the zone"
+        note: "Cited as EVIDENCE for Section E's rule, not decided here — the closure itself builds as a plain defect (G78's close note already named the seam: 'load --csv untouched — its contract was copied up, not rebuilt')."
+  - label: "The derived layer — what this page proposes (every field additive, nothing flips)"
+    source_object: "the approved 2026-08-28 plan (source-registry two-issue redesign) — Sections A–E below"
+    key: "proposed field / term name"
+    loader: "NONE"
+    properties:
+      - name: connection_block_shape
+        origin: derived
+        from: "the DataHub/OpenMetadata reference line (connection declared once; secrets by named reference) mapped onto ADR 0014's env split and the existing settings groups"
+        note: "Derived, not copied: the external tools resolve references from a server-side secrets store; this proposal resolves them from the runtime substrate the repo already rules (env/.env), which is why it is a field addition and not a dependency."
+      - name: rcr_term_and_marker
+        origin: derived
+        from: "the SME's own framing ('internal-twin doesn't carry the risk implications') + the survey's inventory of the term's five senses, of which exactly one renames"
+        note: "The sweep list is scoped by grep class (`internal twin|internal-twin|values-twin|ccb-twin`), never bare 'twin' — the other four senses (port copy, ontology sibling, -CYC/-DLY folders, collector build) are named untouched."
+      - name: run_input_identity
+        origin: derived
+        from: "the :JobRun gap set against the OpenMetadata pipelineStatuses[] shape and the M3/M4 audit-envelope precedent"
+        note: "Zone-relative path only — the shape rule test_drop_dir_stays_inside_the_landing_zone_convention already enforces the boundary this reuses: real machine paths live in the disk log and the restricted connection record, never the graph."
+sections:
+  - title: "A. The connection block on SYSTEM rows — references, never values"
+    confirmations:
+      - "A1. THE BLOCK: a SYSTEM row may carry `connection:` with exactly three children — `settings_group:` (the drydocs_core.config settings class / env prefix that reaches this system, e.g. the Oracle group for the replica DB), `secret_refs:` (the LIST OF ENV-VAR NAMES the connection requires — names only, values never, the DataHub ${SECRET_NAME} convention adapted to ADR 0014), and `restricted_record:` (the stable id/path of the Section-B record holding the citable coordinates). Confirm the three-child shape, or re-draw it."
+      - "A2. NAMES-ONLY IS GUARDED, NOT TRUSTED: a test asserts every name in any `secret_refs:` list appears in the committed `.env.example` (so the shape is reproducible from a clean checkout) AND that no `connection:` child carries a value-shaped string (host:port, URI, account number classes). The schema stays shape-only per S6; enforcement is the test. Confirm."
+      - "A3. THE JOIN IS ONE-DIRECTIONAL BY DESIGN: the registry points at the settings group; drydocs_core/config.py never reads the registry (settings stay importable with no YAML in reach — the ADR 0014 clause). Confirm the direction."
+      - "A4. `locator.service: ~` ROWS MIGRATE: every SYSTEM row whose locator nulls a connection field with a twin-pointing comment gains a `connection:` block at the build, and the comment idiom retires. Rows with no reachable connection (pure file-drop systems) carry NO block — absence means nothing to connect to, never 'not yet filled in.' Confirm."
+  - title: "B. The restricted connection record — the term that carries the risk"
+    confirmations:
+      - "B1. THE TERM: the credential-adjacent record class (endpoint, cluster, account, server version, login identities, capture clock — the citable coordinates a profile needs) is named RESTRICTED CONNECTION RECORD. It replaces the connection/values sense of 'internal twin' ONLY; the other four senses of 'twin' in this repo are named untouched. Confirm the term (SME pre-selected it 2026-08-28; this clause makes the selection a signed fact)."
+      - "B2. THE MARKER: config/classification.yaml's Internal level gains `handling: restricted` as a per-entry note class (the J23 collapse precedent — a marker on Internal, never a fourth tier). A restricted connection record is always Internal + restricted; restricted never appears on External or Internal-Public entries, and a guard says so. Confirm."
+      - "B3. THE SPLIT THE TERM ENFORCES: coordinates (citable, restricted record) versus credentials (passwords, tokens, key material — NEVER in git on any side, env-reference only per Section A). A restricted connection record carrying a credential-class field is a defect the sweep's guard catches, not a judgment call. Confirm the two-class split."
+      - "B4. THE SWEEP is dated-correction-in-place: gate-log's ~15 'internal twin' entries get dated correction notes, never rewrites; config comments, PUBLISH-BOUNDARY.md, the two module headers, and the two test failure messages re-word at the build. Sweep scope = the grep classes named in provenance, run at the build and again at acceptance. Confirm."
+  - title: "C. The dated acquisition — since, history, and one vocabulary"
+    confirmations:
+      - "C1. `acquisition.since:` — the dated field N14 clause (b) proposed: when the CURRENT route began. Required on every dataset row at the build (backfilled from git history where derivable, else the registration date with a note). Confirm."
+      - "C2. THE TRANSITION HISTORY: a manual-to-automated flip (N13's SIGNED ruling — built on here, never re-asked) leaves the prior route ON THE ROW as a dated `acquisition_history:` entry (route, since, until, reason) — the registry v2 add-new-plus-retire-old idiom applied to routes. The manual era stays on the record; Idea-132's 'no field to flip' case becomes the worked example. Confirm the history shape."
+      - "C3. ONE VOCABULARY: ADR 0012 proposed five acquisition values (file-drop/db-pull/api-pull/repo/scrape) that were never reconciled with N12's built mode/via pair. RULE IT HERE: the proposal is mode/via STAYS the stored shape, and the ADR 0012 five-value list becomes the DERIVED display vocabulary (mode+via+format map onto it deterministically). Whatever the ruling, no third vocabulary may leave this session. Confirm or re-draw."
+  - title: "D. Run input identity — the :JobRun envelope learns what it read"
+    confirmations:
+      - "D1. DATASET ID: `_open_run` records the source-registry DATASET id on the :JobRun (alongside, never replacing, the N16 source_label carrier — they answer different questions). SOURCELESS_LOADERS rows record their declared written reason instead. Confirm."
+      - "D2. INPUT PATH, zone-relative: the run records the input as `<zone-id>/<relative-path>` — shape-safe by the same rule test_drop_dir_stays_inside_the_landing_zone_convention enforces; the real machine path stays in the disk log only. Confirm."
+      - "D3. INPUT DIGEST: a per-run sha256 of the input artifact (file digest for file routes; for db routes the extract watermark/row-count pair, digest where the adapter can stream one). This is the M3/M4 envelope family — additive properties, LoadSummary and the run-log header gain the same fields so graph and disk records agree. Confirm."
+      - "D4. THE CLAIM IT BUYS, stated so acceptance can test it: after the build, 'this graph state came from this input' is answerable from the graph alone for every route that has an input artifact — the round-trip proof in the plan's verification section. Confirm the acceptance shape."
+  - title: "E. Declare-or-refuse — the standing acquisition rule"
+    confirmations:
+      - "E1. THE RULE: every acquisition route is DECLARED (registry acquisition block + landing/data zones) or the CLI refuses. The rule is ratified here as standing policy; the `load --csv` closure itself builds as a plain defect and does not wait for this gate. Confirm the rule."
+      - "E2. THE RECORDED OVERRIDE: an explicit override flag may accept an undeclared input, and when it does, the run record AND the disk log both say so (flag name, path shape, operator) — a declared escape hatch, never a silent side door. Refusing an override entirely is also a valid ruling; say which. Confirm."
+  - title: "F. Fence, riders, and the transcribe gate"
+    confirmations:
+      - "F1. FENCED OUT: N14 (union report) and N15 (agreement detection) build exactly as minted; N13's flip ruling and N12's mode/via semantics are untouched; nothing in this page moves any row's `confirmed` state. Confirm the fence."
+      - "F2. RIDER, RECORDED NOT RULED: profiling sessions as a TYPED run against a registered source (the OpenMetadata profiler-pipeline analog) — so an SME review status cites a run id instead of a chat transcript — rides to the profiling-sync-packet protocol as a candidate, with this clause as its pointer. Confirm the rider parks there."
+      - "F3. Safe to transcribe into config/gate-log.md."

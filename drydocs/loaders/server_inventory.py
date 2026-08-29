@@ -4,7 +4,7 @@
 Source: ``infra:server-export`` — the infrastructure site's PER-BUSINESS-
 APPLICATION server export (CSV; one file per application, both PROD and DR
 rows — the prod filter selects applications at download, never rows here).
-Produces :Server nodes (the inventory spine, keyed ``name`` — gate §A1),
+Produces :Server nodes (the inventory backbone, keyed ``name`` — gate §A1),
 :DataCenter nodes (PHYSICAL buildings, keyed ``name``, carrying the geography
 properties + the Idea-90 ``location_grain`` declaration — §B1/§B2), the
 LOCATED_IN placement edges (``infra_located_in``; rack rides the edge), and

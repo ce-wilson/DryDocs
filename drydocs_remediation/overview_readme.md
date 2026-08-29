@@ -59,6 +59,22 @@ artifact for the SME to approve; you would be asking someone to ratify a behavio
 exists only as Python. The entry is not paperwork ahead of the code. **The entry is the
 thing that gets ratified.**
 
+### The worked example: four classes, three detectors
+
+R41–R44 were added as one change, and the split is the lesson.
+
+Three of them (duplicate declaration in one scope, folder-name delimiter drift, stale
+authored provenance) are mechanical: register, detect, fixture, done. **R43 is not.**
+It is a genuine question — when one name is resolved by two carriers, which carrier owns
+it? — and the answer changes what a fix even looks like: rename one carrier, or declare
+the shell export. No ruling existed, so R43 shipped **registered with no detector**.
+
+That is the pairing rule read in the other direction. An entry without a detector is a
+decision on the record, waiting to be ratified. A detector without an entry is a finding
+nobody can sign off on. The failure mode worth naming is letting the three easy rules
+carry the hard one over the line: shipping R43 provisional-with-detector would have put
+a finding in front of an SME with **no defensible action attached to it**.
+
 ---
 
 ## The lifecycle, end to end

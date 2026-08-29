@@ -14,8 +14,7 @@ from __future__ import annotations
 import typer
 from rich.table import Table
 
-from drydocs import cli as _root  # the composition root; call-time lookups only
-from drydocs.cli import (
+from drydocs.cli_shared import (
     console,
 )
 from drydocs_core.neo4j_client import Neo4jClient
@@ -24,7 +23,13 @@ app = typer.Typer()
 
 
 def _client(database: str | None = None) -> Neo4jClient:
-    """Resolved through the root at call time (tests patch drydocs.cli._client)."""
+    """Resolved through the root at call time (tests patch drydocs.cli._client).
+
+    The import is function-local ON PURPOSE: a module-scope root import is the
+    S13 cycle (root body -> command modules -> root), and the guard
+    (test_cli_import_order.py) fails this module by name if one returns."""
+    from drydocs import cli as _root
+
     return _root._client(database)
 
 

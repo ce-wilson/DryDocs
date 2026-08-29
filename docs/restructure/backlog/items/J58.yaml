@@ -1,0 +1,38 @@
+id: J58
+epic: release-infrastructure
+title: Governed config YAML has no required identity header — one JSON Schema for the four-key block,
+  scoped BY FILE CLASS so template-class files are exempt, with schema coverage sequenced first
+type: chore
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/source-mappings/design-docs.yaml
+- config/schemas/source-mapping.schema.json
+- tests/unit/test_doc_registry.py
+- tests/unit/test_gate_pages.py
+- docs/reviews/persona-python-architect-idea-181.md
+acceptance: |
+  (a) THE HEADER IS ONE JSON SCHEMA, NOT N BESPOKE TESTS. The four-key identity block already in use — `schema:` / `source:` / `classification:` / `updated:`, exemplified by `config/source-mappings/design-docs.yaml` — is expressed once as a JSON Schema under `config/schemas/`, alongside the six that already live there, and every guard validates against that one file. Optional `layer:` / `domain:` keys are admitted where the vocabulary domain applies.
+
+  (b) FILE CLASS DECIDES WHO MUST CARRY IT — and the classes are enumerated in the schema's own prose, not inferred by a glob nobody can find. REQUIRED on governed DATA files (source mappings, registries, taxonomy config, gate prompts). FORBIDDEN on template-class files: a hand-maintained date inside a file that a `copier` update three-way MERGES is a guaranteed update conflict, which is the ADR 0015 D4 seam. Any file in neither class is listed explicitly with its reason — a default-deny posture, matching `test_module_boundary.py`'s UNCLASSIFIED rule.
+
+  (c) SCHEMA COVERAGE FIRST, `updated:` COVERAGE SECOND — as two separately-green steps inside this item. `schema:` is the TE-load-bearing key (copier migrations key on it), so it lands and goes green before any `updated:` work starts. The measured 2026-08-27 baseline to close against: of 138 non-backlog tracked YAMLs, 32 carry no `schema:` key and 104 carry no `updated:` key. Re-measure at pull time and report both the found baseline and the closed one; a drifted baseline is expected and is not a reason to skip the measurement.
+
+  (d) GATE PROMPTS GET THE DATE KEY THEY LACK. The 53 gate-prompt specs are already a governed exception with their own enforced header (Module / Source / Registry ref / Classification, via `test_gate_pages`), but carry NO date key at all. Extend their required set with `updated:` under the same schema, and keep `test_gate_pages` as the enforcement point rather than adding a second guard over the same files.
+
+  (e) PRESENCE AND SHAPE ONLY — FRESHNESS IS NOT THIS ITEM. The guard checks that required keys exist and match the schema. It does NOT compare `updated:` against anything; the lying-date problem is J59's, deliberately split because the check that would catch it cannot run in CI (see J59 clause (a)).
+
+  (f) IT RUNS IN THE DEFAULT SUITE with no live services, and it is green on the tree as left by this item — which means every file the new rule covers actually carries the block by the time this closes, not just the ones that already did.
+notes: |
+  Groomed 2026-08-28 from Idea-181 (captured 2026-08-27, Med; user review request). Split into two items plus a small Python-side chore because the entry's own persona review — `docs/reviews/persona-python-architect-idea-181.md`, run against copier / copier-pdm / ss-python / full-stack-fastapi-template — corrected two of the original prescriptions before grooming, and the corrections change the SEQUENCING, not just the wording. F6 (schema first) is why (c) is ordered. F5 (one JSON Schema) is (a). F1/F2 (copier updates are three-way merges keyed on `.copier-answers.yml` `_commit`, not wholesale rewrites) is why (b) scopes by file class instead of applying the block everywhere. F3 (the git-compare guard is blind in CI) is why freshness left this item entirely and became J59.
+
+  Verified before grooming: `config/schemas/` holds six schemas today, so (a) adds a seventh to an existing pattern rather than inventing a location; `config/gate-prompts/` holds 53 specs.
+
+  Epic release-infrastructure / module config / phase 8 follows J55, the nearest precedent (also `module: config`, also a repo-wide convention given an enforcement point). Model sonnet: the acceptance is written and mechanical.
+
+  The Python-side half of the original entry (module docstring standards) is J60, not this item — different language, different enforcement mechanism, and the persona review's answer there was "use a lint rule the toolchain already ships" rather than "write a guard".

@@ -1,0 +1,75 @@
+id: S14
+epic: structure-remediation
+title: 'Relocate docs/Product/ to knowledge/org/: captured org/product source material gets a proper
+  home, the seal/ name-directory dissolves'
+type: chore
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: [K20]
+gates: []
+inputs:
+- docs/Product/product-overview.md
+- docs/Product/Technology_Team_Types.md
+- docs/Product/technology_roles_and_responsibilities.md
+- docs/Product/quad-mermaid.js
+- docs/Product/seal/seal-application-hierarchy.md
+- PORT-MANIFEST.yaml
+- git-readme.md
+- knowledge/upgrade-plans/docmeta-component.md
+acceptance: |
+  docs/Product/ no longer exists. Its five files live at knowledge/org/ with kebab-case
+  names: product-overview.md, technology-team-types.md,
+  technology-roles-and-responsibilities.md, org-quad-chart.mmd (the "quad-mermaid.js"
+  file is a Mermaid org diagram, not JavaScript — the extension is corrected at the
+  move), seal-application-hierarchy.md (the seal/ subdirectory dissolves; the file has
+  zero code references, verified 2026-08-26). Living references updated in the SAME
+  commit: (1) PORT-MANIFEST.yaml default_ok "docs/Product/**" becomes
+  "knowledge/org/**" scoped to these files (knowledge/** already has a default_ok
+  entry — fold in or narrow, keep the reason's "consumer has the authoritative
+  originals internally" sentence); (2) git-readme.md directory table row; (3) both
+  knowledge/upgrade-plans/docmeta-component.md T3 source paths; (4) the K5-amendment
+  gate prompt drafted by K20 — IF still unsigned, repoint its
+  technology_roles_and_responsibilities.md citation; if already SIGNED, leave the
+  prompt and gate-log untouched (L25: signed records keep their as-of paths) and note
+  the move in this item's done-note instead. Dated records stay as-is: doc-inventory
+  rows, port-prompt ledger steps and archives, IDEAS.md Idea-75 text, J14/K20 done
+  inputs, the catalog_ontology_supplement.cypher J14 history comment. Full unit suite
+  green (the port-manifest and reconcile guards check manifest paths against the
+  tree); board re-rendered; internal/org/product-overview.md verbatim-twin header
+  repointed to the new residue path if it names the old one.
+notes: |
+  Minted 2026-08-26 from the SME's in-session call: docs/Product is tech debt — out of
+  place, and "seal" is a proper noun as a directory name. Target knowledge/org/ follows
+  the J14 pattern (sanitized public captures live under knowledge/; verbatim twins
+  under internal/ — product-overview.md's verbatim capture is already at
+  internal/org/product-overview.md). depends_on K20 is deliberate sequencing, not a
+  data dependency: K20's gate-prompt draft cites
+  docs/Product/technology_roles_and_responsibilities.md as evidence, so the move runs
+  after K20 completes to avoid churning an item mid-draft — K20 itself moves nothing
+  (rider recorded in K20's notes). Reference census as of 2026-08-26: zero code
+  references to any docs/Product file (py/cypher/sql/js/ps1 trees swept); living prose
+  references are exactly the four in acceptance; everything else is dated or generated
+  (depgraph snapshots regenerate). SEAL as a TERM stays — the ruled boundary is that
+  SEAL ids/values are Internal, not the system name; this item only dissolves the
+  directory.
+  DONE 2026-08-27 (laptop, Lane B). docs/Product/ is gone; the five files live at
+  knowledge/org/ with the kebab-case names the acceptance lists (quad-mermaid.js ->
+  org-quad-chart.mmd, extension corrected). Living references, same commit: PORT-MANIFEST
+  docs/Product/** entry became a knowledge/org/** entry placed beside the knowledge/** row,
+  reason sentence kept verbatim; git-readme directory table row; both docmeta-component T3
+  paths; the tech-partner-attach-level prompt citation FOLLOWED THE FILE (gate verified
+  still unsigned at gate-log 2026-08-26 RECORD — the L25 signed-record branch was not
+  taken); internal/org/product-overview.md twin header now names the stub's new path.
+  TWO GUARD-FORCED EDITS BEYOND THE CENSUS, both narrow: (1) port-prompt line ~1293 is
+  LIVE guidance (the currency guard checks its paths), so that one citation repointed —
+  the ledger steps and archives stay as-is per the acceptance; (2) the publish-boundary
+  bare-id scan sweeps knowledge/ but never swept docs/Product, so the move exposed three
+  6-digit tokens — ALL are hex COLOR codes in Mermaid style directives (#166534/#334155/
+  #145214), not ids; allowlisted with that reason in test_publish_boundary_values.py.
+  Suite 2560 passed / 11 skipped; ruff clean; board re-rendered. NOTE for the next port:
+  the two Lane A surfaces touched (PORT-MANIFEST, the unsigned prompt) carry only the
+  S14-mandated path edits.

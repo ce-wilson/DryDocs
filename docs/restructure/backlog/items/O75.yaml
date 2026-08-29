@@ -35,7 +35,7 @@ acceptance: |
 
   `poetry run pytest -q` green, including new cases for: a removed account's token refused on the next request; an admin token refused after removal where it previously reached an admin-only route; a live session surviving a corrupt credential file; and every session dying when the file is deleted. Ruff clean. Verified live against a running uvicorn on this desktop, with the venue named.
 notes: |
-  Raised 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding L3 — the second-pass survey of the catalog and lineage products (DataHub, OpenMetadata, Amundsen, OpenLineage/Marquez, Purview), by way of Idea-164.
+  Raised 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding L3 — the second-pass survey of the catalog and lineage products (DataHub, OpenMetadata, Amundsen, OpenLineage/Marquez, Purview), by way of Idea-195.
 
   THE SEQUENCE, because the defect is invisible from any single file. `InMemorySessionStore.revoke(token)` is token-scoped and driven by logout. `resolve(token)` checks that the token is known and that it has not expired, and never consults the credential store again. `ReloadingCredentialStore` does notice the file changing, but only `handlers.login` reads it. So: morpheus signs in and receives an eight-hour session; the operator runs `set_console_credential.py --remove morpheus`, or rotates because a secret leaked; the file changes; the API picks it up on the next login attempt; and the already-issued admin token keeps resolving until its term runs out.
 

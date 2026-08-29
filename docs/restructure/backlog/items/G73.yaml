@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: fable
 priority: p2
-status: todo
+status: done
 depends_on:
 - G70
 gates: [tom-roles-enumeration-and-cardinality]
@@ -20,6 +20,28 @@ acceptance: |
   Per the signed §E. THE LOAD STORES AUTHORED ROWS ONLY: of the three Inheritance states, Direct (blank) and Overridden are AUTHORED; Inherited rows are DERIVED COPIES carrying two lineage pointers. Inheritance is computed, not materialised — storing a derived fact as though asserted is how a graph starts disagreeing with its source. THE ANCESTOR IS A MODELLED EDGE, not a property (§E4 ruled), so "why does this application show a different owner than its parent" is TRAVERSABLE — which is what §D2 says an operator cannot do today. Both lineage references are load-bearing: the ancestor CI and the ancestor ROW. IT IS ONE MECHANISM UP AN N-LEVEL CHAIN, not a two-level relation (§E1e): "copy from the nearest ancestor holding the role", applied repeatedly. A model built for a fixed application→deployment relation cannot represent the observed pass-through case, where a role originates two rungs up and passes straight through the application untouched. OVERRIDES PROPAGATE: a child inherits the ancestor's CURRENT value even when that value is itself an Override, so the effective holder can differ from the top of the chain. AND IT AMENDS THE PULL SCOPE — this is the item that carries it. Reconstructing an inherited holder requires ANCESTOR CIs, which sit ABOVE the ~200 applications DryDocs supports, including CIs owned by teams it does not. K21 §7.4 is amended to take ancestor CIs FOR THEIR TOM ROWS ONLY, and the amendment is written there rather than left implicit.
 notes: |
   Raised 2026-08-11 at the G35 sign-off. This is the first place the ~200-application boundary and the inheritance model actually conflict, and the gate crossed it deliberately rather than quietly. The alternative — materialise inherited rows and flag them derived — stays inside the boundary and was considered and rejected: it duplicates, and it drifts when an ancestor changes.
+  DONE 2026-08-27 (laptop, Lane B). TWO EDGES REGISTERED, BOTH status planned (nothing loads
+  on either side today; the G72 servicenow-tom surface is what the future loader stamps):
+  (1) business_application_contained_by_ci (CONTAINED_BY, BusinessApplication ->
+  AreaProduct | BusinessApplication, in 41) — the SS-E4 modelled ancestor, NAMED FOR WHAT THE
+  SOURCE ASSERTS (cmdb_rel_ci "Contained by", endpoints-in-seed per K21 7.4), never for the
+  computation over it; the note answers K22's declined-containment decision on K22's own
+  terms (catalog rollup vs the cmdb chain whose ancestors the catalog will never hold), cites
+  the C8 reuse of INSTANTIATES for the DeploymentModule rung, records SS-E1e's one-mechanism-
+  N-level walk + override propagation, and records assertion_mode semantics (direct |
+  overridden; the source's blank IS Direct; inherited NEVER stored). (2)
+  human_attribution_derived_from (WAS_DERIVED_FROM, Attribution -> Attribution,
+  prov:wasDerivedFrom, in 52 — the per-domain rule split the pair across two fragments though
+  the item listed only 41) — the ancestor-ROW pointer, registered so a materialised
+  projection (O44) has a shape instead of inventing one; the note states registration is not
+  a licence to materialise (the rejected alternative stays rejected). assertion_mode is NOT a
+  property_terms row — that section is standard-CURIE bindings and PROV has no term shaped
+  like it; semantics live in the edge notes. K21 7.4 AMENDED IN PLACE, dated blockquote +
+  take-table row: ancestor CIs of seeded applications, N levels UP, FOR THEIR TOM ROWS ONLY —
+  and the amendment reconciles the standing depth caution (that sentence is the
+  OUTWARD/DOWNWARD hop and stands untouched; upward is bounded by the chain's height).
+  schema_graph.cypher regenerated (C8 render). Offline verification (J18): registry schema +
+  schema-graph drift guards + full suite; ruff clean.
 annotations:
   inputs[]:
   - drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml — was 41-local-seal.yaml

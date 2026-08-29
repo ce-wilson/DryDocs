@@ -1,0 +1,32 @@
+id: P6
+epic: runtime-topology
+title: Run the data-center collision probe on live psgmgr before any multi-data-center load — one table
+  id in two data centers silently merges two folders into one graph node
+type: task
+module: config
+phase: 13
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/sql/ddl/controlm_staging_ddl.sql
+- drydocs_core/schema/controlm_folders.cypher
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  (a) THE PROBE. One grouped count over the folder-definition view: how many table ids appear in more than one data center. Counts only, never result rows — the producer side has no psgmgr access, so this is user-run on the internal network and the agent transcribes the conclusion, exactly the arrangement P1 records.
+
+  (b) ZERO ROWS. The uniqueness invariant is DOCUMENTED in `drydocs_core/schema/controlm_folders.cypher` beside the constraint that relies on it, saying which query established it and on what date — an invariant nobody wrote down is the state that let this become a question twice.
+
+  (c) ANY ROWS. Then graph identity is wrong: staging keys by data center plus folder id plus job id, while the graph keys by folder id plus job id, so two different folders in two data centers merge into one node. That is an IDENTITY change (the data center joins the folder and job keys) and it is a constraint migration, so it routes through the HITL gate and is NOT decided in this item. The acceptance is met by recording the finding and drafting the gate prompt, not by changing a key.
+
+  (d) TIMING IS THE POINT. Run it BEFORE the first multi-data-center load, not after. The single-data-center pilot structurally cannot expose this, and the 2026-08-24 direction to extract per data center over three production data centers is exactly the regime where a reused table id merges two folders. G115 builds the bind; this item is what makes the resulting load safe to run.
+notes: |
+  Groomed 2026-08-26 from Idea-174 clause 1. Re-homed from the retired 2026-07-16 internal-session checklist, whose own audit trail recorded this probe as "already routed to the internal-session checklist" — deleting that file without this capture would have dropped it silently. The staging DDL's own section 0 pre-flight asks the same question, which is why the composite key was chosen defensively there.
+
+  Epic runtime-topology and module `config` follow the P1 precedent for an internal-only probe whose output is a recorded conclusion rather than code. Phase 13 for the same reason.
+
+  The hard rule applies here in the open direction: clause (c) says the identity change goes through the gate. Nothing about folder or job identity is settled by this item.
+
+  p1 because it blocks a load the user has already directed. opus because the reading of the result decides whether a constraint migration is owed.

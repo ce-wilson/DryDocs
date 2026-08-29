@@ -1,32 +1,38 @@
 id: O71
 epic: web-console
-title: 'The console has no automated test of any kind: add a unit runner and an end-to-end browser test,
-  and answer the standing O43 question with the choice'
+title: The ADR 0015 watched-source trigger for the FastAPI template has fired â€” draft the console
+  auth-boundary gate question and the register-row amendment, and decide nothing outside the gate
 type: task
 module: drydocs-web
 phase: 12
 agent: main
-model: sonnet
+model: fable
 priority: p1
 status: todo
 depends_on: []
 inputs:
-- web/package.json
-- config/taxonomy/ui-tests.yaml
-- web/src/components/map/resolve.ts
-- docs/design/web-scaffolding-review.md
+- config/gate-prompts/ui-write-surface.yaml
+- docs/restructure/03-hitl-sme-flow.md
+- web/src/lib/auth.ts
+- web/src/
+- docs/design/drydocs-web-console-tdd.md
 acceptance: |
-  The web package gains a unit test runner and at least one end-to-end browser test, both runnable from a documented npm script and both wired into CI so a red test blocks the way a ruff failure does. The end-to-end test covers a path a person has actually had to verify by hand - sign in, reach a module, assert a rendered value - proving the runner works against the real dev server rather than a mocked shell. The unit runner covers at least one pure module where a defect has already escaped: web/src/components/map/resolve.ts is the named case, because its city-index defect was invisible to every Python guard by construction and was found only by rendering the page. O43's standing question, whether a UI test runner is warranted, is ANSWERED here rather than left open; the ui-tests.yaml ledger records which of its manual cases the automated tests now cover and which stay manual, so the ledger stops implying every case in it is unautomatable.
+  (a) A GATE PROMPT SPEC EXISTS AND PROPOSES, IT DOES NOT ADOPT. A new spec under `config/gate-prompts/` puts the console's authentication boundary to the SME, in the shape `config/gate-prompts/ui-write-surface.yaml` already uses (the O20 precedent: a page that PROPOSES a boundary and changes nothing by being rendered), and it satisfies whatever `tests/unit/test_gate_pages.py` requires of every spec â€” Module / Source / Registry ref / Classification. AUTH IS A TRUST BOUNDARY: nothing in this item adopts, installs, or wires an auth mechanism. Until the gate signs off, the console's sign-in stays the stub it is today.
+
+  (b) THE QUESTION IS ABOUT PRACTICES, NOT A SCAFFOLD, AND SAYS SO. The ADR's survey already REJECTED the `fastapi/full-stack-fastapi-template` scaffold â€” clone-and-diverge, no update lifecycle, Stripe and multi-org baggage â€” and that rejection stands; the spec must restate it so a reader cannot mistake the gate for a reversal. What is on the table is the template's auth PRACTICES, cited to the register row: OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow â€” the survey's characterisation was "users-in-a-workspace rows behind JWT". Each practice is a separately tickable confirmation, so declining any subset is a valid sign-off.
+
+  (c) THE PRODUCER-SIDE SEAM IS NAMED AND ITS CURRENT STATE MEASURED. Epic O's `?as=` headless sign-in is a stub sitting exactly where real auth would land. Read what it does today and record it in the spec, so the gate rules against the actual seam rather than a described one. State plainly which console surfaces are read-only today, because that standing state is itself one of the answers the SME may confirm.
+
+  (d) THE REGISTER-ROW AMENDMENT IS DRAFTED, AND COORDINATED RATHER THAN SWEPT. ADR 0015's watched-source register discipline is that a fired trigger opens a backlog item and auto-changes nothing; the row for this source therefore needs an amendment recording that its named trigger â€” "only re-opens if a shared estate console is chartered" â€” has fired, that the charter is the internal ui-workstream's user/login build, and that the disposition is this gate. THE ADR FILE IS ANOTHER SESSION'S IN-FLIGHT DRAFT and is not on `main` as of 2026-08-28 (`docs/decisions/` runs 0014 then 0016). Do not create, re-draft, or overwrite it. If it has landed by the time this item is pulled, amend the row in place; if it has not, the amendment ships as drafted TEXT inside the gate spec with a note naming where it belongs, and the item still closes.
+
+  (e) THE COMPANY SIDE IS NOT DECIDED HERE. Their ui-workstream makes their own call and runs their own gate; producer sign-off is not company sign-off. The spec says so in one line rather than leaving it to be assumed.
+
+  (f) NOTHING IS BUILT. No dependency added, no auth code, no user model, no route change. The deliverable is a gate spec plus a drafted register-row amendment, and the gate SESSION itself is a separate item minted after this one lands.
 notes: |
-  Raised 2026-08-27 from the web-scaffolding review, which found the console has no test
-  runner at all - no Vitest, no Playwright - while the reviewed FastAPI template ships
-  end-to-end tests as a matter of course.
-  THE EVIDENCE THIS ITEM RESTS ON is from the same week. The Z5 map's two synthetic cities
-  could never resolve, because the index keyed them one way and every lookup asked another;
-  no Python guard could see it, the bug being in TypeScript, and it was found by rendering
-  the tab and reading the unplaceable list. Twice now a console defect has been caught by a
-  person looking rather than by a test, and both times the item's own notes recorded that as
-  the lesson. A test runner is the only thing that changes it.
-  SCOPE GUARD: this item buys the CAPABILITY and proves it on two real cases. Backfilling
-  coverage across every console surface is not in it - that is what the ui-tests ledger's
-  per-surface seeded suites are for, one surface at a time.
+  Groomed 2026-08-28 from Idea-184 (captured 2026-08-27, High). The entry's own instruction was "one item to draft the auth-boundary gate question + the register-row amendment", and this is that item, scoped no wider.
+
+  Epic/module/phase choice, recorded because it was a judgement call: filed under web-console / `drydocs-web` / phase 12 because the entry names the producer-side seam as "the O-epic's `?as=` headless sign-in pattern", which is where any adoption would land and what the gate must rule on. There is no Team Edition epic to file it under yet â€” ADR 0015 is still a draft, and Idea-179 records that a TE epic does not exist â€” so filing it there was not available. If a TE epic is later chartered, this item's register-row half is a candidate to move; the gate half stays with the console either way.
+
+  Model fable: the item frames a TRUST BOUNDARY question, which is the tier's stated trigger. It still decides nothing â€” per the HITL flow (`docs/restructure/03-hitl-sme-flow.md`), the adoption routes through the gate and stays unadopted until confirmed. Acceptance clause (a) is what holds that line.
+
+  Concurrency note, and it is load-bearing rather than courtesy: `docs/decisions/0015-team-edition-template.md` was an uncommitted working file in the shared tree at groom time. Clause (d) is written so this item can be pulled and closed whether or not that draft has landed, and so that a session pulling it cannot resolve the ambiguity by writing the ADR itself.

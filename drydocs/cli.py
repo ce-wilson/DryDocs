@@ -20,7 +20,11 @@ still work — since G29 they are thin aliases that delegate into the same
 chain runner, so they too verify and write a run log.
 
 Ingest commands:
-  drydocs refresh-reference       — catalog + SEAL weekly refresh chain
+  drydocs refresh-catalog         — LOB -> product line -> product (weekly)
+  drydocs refresh-applications    — SEAL applications + contacts (weekly)
+  drydocs refresh-teams           — dev teams, team roles, team<->app alignment
+  drydocs refresh-reference       — DEPRECATED alias: runs the three above in
+                                    order (G79 split them by subject)
   drydocs ingest-controlm         — Control-M chain (folders → jobs → conditions → deps)
   drydocs load <name> --csv       — single loader against a CSV file
   drydocs load-software-registry  — third-party software registry from
@@ -59,485 +63,150 @@ Ingest commands:
 
 from __future__ import annotations
 
-import logging
 import uuid
 from pathlib import Path
-from typing import NamedTuple
 
 import typer
-from rich.console import Console
 from rich.table import Table
 
-import drydocs_core
-from drydocs_core.adapters import CsvAdapter, OracleAdapter
 from drydocs_core.config import load_settings
+from drydocs_core.data_root import DataRootNotSetError, ReadZoneWriteError
 from drydocs_core.neo4j_client import Neo4jClient
-from drydocs_core.repo_paths import repo_root
 from drydocs_core.run_log import LoaderRunLog
-from drydocs_core.source_registry import (
-    RetiredSourceIdError,
-    SourceRegistry,
-    UnconfirmedSourceError,
-    UnknownSourceError,
+from drydocs_core.source_registry import SourceRegistry
+
+# --- shared state, hoisted (S13) ---------------------------------------------
+# Definitions live in drydocs/cli_shared.py; re-exported here so every existing
+# `drydocs.cli.X` consumer — tests, scripts, the render pipeline, the company
+# port — keeps its import path. __all__ below is that compat surface. The root
+# REMAINS the composition root: the app, the mutable registry cache and the
+# client factory stay in THIS module, and only this module wires components.
+from .cli_shared import (
+    _REPO_ROOT,
+    AD_HOC_COMMANDS,
+    APPLICATION_IDENTITY_LOADER,
+    BUSINESS_APPLICATION_CHAIN,
+    BUSINESS_APPLICATION_MINTERS,
+    CADENCE_PROFILES,
+    CANONICAL_LOAD_SEQUENCE,
+    CATALOG_CHAIN,
+    CHAINS,
+    COMMAND_LOADERS,
+    CONSTRAINTS_FILE,
+    CONTROLM_NODE_STAGES,
+    CONTROLM_PART2_STAGES,
+    CONTROLM_REL_STAGES,
+    DEFAULT_SAMPLES_DIR,
+    DERIVED,
+    DOC_TRACEABILITY_CHAIN,
+    GENERATED_SAMPLE_FILES,
+    LOAD_PROFILES,
+    LOADER_REGISTRY,
+    LOADER_SOURCE,
+    LOGGER,
+    ONTOLOGY_FILE,
+    SCHEDULED_INGEST_EXCLUSIONS,
+    SCHEMA_DIR,
+    SCHEMA_GRAPH_DATABASE,
+    SCHEMA_GRAPH_FILE,
+    SOURCELESS_LOADERS,
+    SQL_DIR,
+    TEAM_CHAIN,
+    UNCHAINED_LOADER_EXCLUSIONS,
+    CadenceDerivationError,
+    LoadStep,
+    _csv_adapter,
+    _data_center_opt,
+    _developer_sid_opt,
+    _folder_opt,
+    _gate_loader,
+    _gate_source,
+    _oracle_adapter,
+    _row_cap_opt,
+    _run_as_opt,
+    _scope_binds,
+    _source_registry,
+    chain_steps,
+    console,
+    load_profile,
+    step_profiles,
+    step_sources,
+    unchained_loaders,
+    unchained_registry_loaders,
 )
 
-from .loaders import seal_applications as seal_apps_mod
-from .loaders import seal_contacts as seal_contacts_mod
-from .loaders.batch_port_orchestrator import (
-    BatchPortOrchestratorLoader,
-)
-from .loaders.bmc_docs import (
-    BmcDocsLoader,
-)
-from .loaders.catalog import (
-    AreaProductsLoader,
-    CatalogLOBsLoader,
-    DevTeamsLoader,
-    PatProductMappingLoader,
-    PatTeamRolesLoader,
-    ProductLinesLoader,
-    ProductsLoader,
-)
-from .loaders.code_snapshot import (
-    CodeSnapshotLoader,
-    CodeTreeLoader,
-)
-from .loaders.controlm_conditions_in import ControlMConditionsInLoader
-from .loaders.controlm_conditions_out import ControlMConditionsOutLoader
-from .loaders.controlm_dependencies_derived import ControlMDependenciesDerivedLoader
-from .loaders.controlm_folders import ControlMFoldersLoader
-from .loaders.controlm_hosts import ControlMHostsLoader
-from .loaders.controlm_jobs import ControlMJobsLoader
-from .loaders.doc_traceability import (
-    DesignDocFeedbackAdapter,
-    DesignDocSectionsAdapter,
-    DesignDocSectionsLoader,
-    DocFeedbackLoader,
-    DocTraceabilityLoader,
-    TraceabilityMatrixAdapter,
-)
-from .loaders.email_extracts import EmailExtractsLoader
-from .loaders.essential_graphrag import (
-    EssentialGraphragLoader,
-)
-from .loaders.folder_attribution import (
-    FolderAttributionLoader,
-)
-from .loaders.manual_loads import (
-    ManualSealAttributionLoader,
-)
-from .loaders.server_inventory import ServerInventoryLoader
-from .loaders.software_registry import (
-    SoftwareRegistryLoader,
-)
-from .loaders.vendor_docs import VendorDocsLoader
+__all__ = [
+    "console",
+    "LOGGER",
+    "SCHEMA_DIR",
+    "CONSTRAINTS_FILE",
+    "ONTOLOGY_FILE",
+    "SCHEMA_GRAPH_FILE",
+    "SCHEMA_GRAPH_DATABASE",
+    "_REPO_ROOT",
+    "DEFAULT_SAMPLES_DIR",
+    "LOADER_REGISTRY",
+    "SQL_DIR",
+    "LOADER_SOURCE",
+    "SOURCELESS_LOADERS",
+    "CATALOG_CHAIN",
+    "BUSINESS_APPLICATION_CHAIN",
+    "TEAM_CHAIN",
+    "CHAINS",
+    "BUSINESS_APPLICATION_MINTERS",
+    "APPLICATION_IDENTITY_LOADER",
+    "CONTROLM_NODE_STAGES",
+    "CONTROLM_PART2_STAGES",
+    "CONTROLM_REL_STAGES",
+    "DOC_TRACEABILITY_CHAIN",
+    "COMMAND_LOADERS",
+    "AD_HOC_COMMANDS",
+    "UNCHAINED_LOADER_EXCLUSIONS",
+    "GENERATED_SAMPLE_FILES",
+    "LoadStep",
+    "DERIVED",
+    "CADENCE_PROFILES",
+    "CadenceDerivationError",
+    "LOAD_PROFILES",
+    "SCHEDULED_INGEST_EXCLUSIONS",
+    "CANONICAL_LOAD_SEQUENCE",
+    "chain_steps",
+    "unchained_registry_loaders",
+    "unchained_loaders",
+    "step_sources",
+    "step_profiles",
+    "load_profile",
+    "_source_registry",
+    "_gate_source",
+    "_gate_loader",
+    "_csv_adapter",
+    "_oracle_adapter",
+    "_scope_binds",
+    "_folder_opt",
+    "_run_as_opt",
+    "_developer_sid_opt",
+    "_row_cap_opt",
+    "_data_center_opt",
+]
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
-console = Console()
-LOGGER = logging.getLogger("drydocs.cli")
-
-SCHEMA_DIR = Path(drydocs_core.__file__).resolve().parent / "schema"
-CONSTRAINTS_FILE = SCHEMA_DIR / "constraints.cypher"
-ONTOLOGY_FILE = SCHEMA_DIR / "ontology.cypher"
-# The schema meta-graph is a SEPARATE GRAPH with separate constraints (SME
-# 2026-08-02), so it carries its own target rather than following NEO4J_DATABASE.
-SCHEMA_GRAPH_FILE = SCHEMA_DIR / "schema_graph.cypher"
-SCHEMA_GRAPH_DATABASE = "ddschema"
-# The supplement .cypher paths are NOT constants here — they live in the
-# registry (drydocs_core.schema.supplements), so the chain and its order have
-# exactly one home. G29.
-
-#: The checkout the CALLER is standing in, for the repo-CONTENT defaults below
-#: (Idea-109). The two package-internal constants in this module deliberately do
-#: NOT route through it — see each one's note.
-_REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
-
-# Bundled CSV samples ship inside the package so dev-mode commands work
-# from any cwd — including from an installed wheel where there is no repo
-# root. Override with --samples-dir to point at an alternate fixture set.
-# PACKAGE-INTERNAL on purpose, and the sentence above is the reason: an
-# installed wheel HAS no checkout to follow, so `__file__` is the only anchor
-# that answers. (`drydocs.seal_samples.DEFAULT_SAMPLES_DIR` names the same
-# directory and DOES follow the caller — it is a build script's WRITE target,
-# not a runtime read default.)
-DEFAULT_SAMPLES_DIR = Path(__file__).resolve().parent / "data" / "samples"
-
-LOADER_REGISTRY: dict[str, type] = {
-    "seal_applications": seal_apps_mod.SealApplicationsLoader,
-    "seal_contacts": seal_contacts_mod.SealContactsLoader,
-    "catalog_lobs": CatalogLOBsLoader,
-    "product_lines": ProductLinesLoader,
-    "products": ProductsLoader,
-    "dev_teams": DevTeamsLoader,
-    # PAT (catalog expansion):
-    "area_products": AreaProductsLoader,
-    "pat_product_mapping": PatProductMappingLoader,
-    "pat_team_roles": PatTeamRolesLoader,
-    # M3 (part 1):
-    "controlm_folders": ControlMFoldersLoader,
-    "controlm_jobs": ControlMJobsLoader,
-    # M3 (part 2):
-    "controlm_conditions_in": ControlMConditionsInLoader,
-    "controlm_conditions_out": ControlMConditionsOutLoader,
-    "controlm_dependencies_derived": ControlMDependenciesDerivedLoader,
-    # P3 (host topology; gate controlm-hosts-topology):
-    "controlm_hosts": ControlMHostsLoader,
-    # Z3 (server inventory; gate server-location-ontology):
-    "server_inventory": ServerInventoryLoader,
-    # bmc-docs lexical graph (Document -> Chunk):
-    "bmc_docs": BmcDocsLoader,
-    # Essential GraphRAG ebook lexical graph (Q2 experiment):
-    "email_extracts": EmailExtractsLoader,
-    "essential_graphrag": EssentialGraphragLoader,
-    # Doc traceability + review feedback (L7 connector #1):
-    "doc_sections": DesignDocSectionsLoader,
-    "doc_traceability": DocTraceabilityLoader,
-    "doc_feedback": DocFeedbackLoader,
-}
-
-# PACKAGE-INTERNAL: the .sql files are package data and travel with it.
-SQL_DIR = Path(__file__).resolve().parent / "loaders" / "sql"
-
-# Which source-registry entry each loader draws from. The confirmed-gate (D3)
-# uses this to refuse a loader whose source's crosswalk is not SME-confirmed.
-# DERIVED since N3: each loader class declares its own `source_id` — this dict
-# is a projection of those declarations, never hand-maintained (a re-hardcoded
-# entry here would be a drift bug; test_load_map_declarations guards the tie).
-# Note the bmc-docs nuance survives the derivation: until a source is
-# SME-confirmed, `_gate_source` fails fast (exit 2) — correct, not a bug.
-LOADER_SOURCE: dict[str, str] = {
-    cli_name: cls.source_id
-    for cli_name, cls in LOADER_REGISTRY.items()
-    if cls.source_id is not None
-}
-
-# ---- N3: the load map's three declared joins --------------------------------
-# (1) loader -> source_id lives ON each loader class (BaseLoader.source_id);
-# (2) command -> loaders, in run order, is COMMAND_LOADERS below (the chain
-#     constants are consumed by the command bodies, so the declaration cannot
-#     drift from behavior);
-# (3) the ONE canonical ordered load sequence is CANONICAL_LOAD_SEQUENCE.
-# All three are guarded by tests/unit/test_load_map_declarations.py and joined
-# into web/src/generated/load-map.json by the N4 render.
-
-# Loaders with deliberately NO source-registry id — every entry needs a written
-# reason (silent omissions are the defect this exists to end).
-SOURCELESS_LOADERS: dict[type, str] = {
-    ManualSealAttributionLoader: (
-        "SME-authored tier-5 mapping CSVs gated by config/manual-loads/"
-        "manifest.yaml (gate seal-attribution-match-policy §F) — a human "
-        "source with its own manifest governance, not a registry feed"
-    ),
-}
-
-# The M1 reference-refresh chain (weekly cadence): (cli name, loader class,
-# bundled sample filename). Order matters — hierarchy parents before children,
-# SEAL apps before contacts, mapping last.
-REFRESH_REFERENCE_CHAIN: tuple[tuple[str, type, str], ...] = (
-    ("catalog_lobs", CatalogLOBsLoader, "catalog_lobs__sample.csv"),
-    ("product_lines", ProductLinesLoader, "product_lines__sample.csv"),
-    ("products", ProductsLoader, "products__sample.csv"),
-    (
-        "seal_applications",
-        seal_apps_mod.SealApplicationsLoader,
-        "seal_application_data__sample.csv",
-    ),
-    ("seal_contacts", seal_contacts_mod.SealContactsLoader, "seal_contact_data__sample.csv"),
-    ("dev_teams", DevTeamsLoader, "dev_teams__sample.csv"),
-    ("pat_product_mapping", PatProductMappingLoader, "pat_product_mapping__sample.csv"),
-)
-
-# The M3 ingest-controlm stages: (cli name, loader class, sample csv, sql file).
-# Order is enforced — jobs MATCH their parent folder; conditions MATCH their
-# parent job; the deferred dependency pass MATCHes both endpoints (two-phase
-# contract). PART2 extends NODE when --skip-part2 is not set.
-CONTROLM_NODE_STAGES: tuple[tuple[str, type, str, str], ...] = (
-    (
-        "controlm_folders",
-        ControlMFoldersLoader,
-        "controlm_folders__sample.csv",
-        "controlm_folders.sql",
-    ),
-    ("controlm_jobs", ControlMJobsLoader, "controlm_jobs__sample.csv", "controlm_jobs.sql"),
-)
-CONTROLM_PART2_STAGES: tuple[tuple[str, type, str, str], ...] = (
-    (
-        "controlm_conditions_in",
-        ControlMConditionsInLoader,
-        "controlm_conditions_in__sample.csv",
-        "controlm_conditions_in.sql",
-    ),
-    (
-        "controlm_conditions_out",
-        ControlMConditionsOutLoader,
-        "controlm_conditions_out__sample.csv",
-        "controlm_conditions_out.sql",
-    ),
-    # P3 host topology (gate controlm-hosts-topology): independent of
-    # folders/jobs — CM_HOSTS has no folder/owner/author grain, so the scope
-    # binds don't apply and the extract is always a full snapshot.
-    ("controlm_hosts", ControlMHostsLoader, "controlm_hosts__sample.csv", "controlm_hosts.sql"),
-)
-CONTROLM_REL_STAGES: tuple[tuple[str, type, str, str], ...] = (
-    (
-        "controlm_dependencies_derived",
-        ControlMDependenciesDerivedLoader,
-        "controlm_dependencies__sample.csv",
-        "controlm_dependencies_recursive.sql",
-    ),
-)
-
-# The L7 doc-traceability chain: (loader class, adapter class, which directory
-# option feeds it). Three passes in a fixed order — sections, then matrix rows
-# (sections MATCHed, never MERGEd), then feedback.
-DOC_TRACEABILITY_CHAIN: tuple[tuple[type, type, str], ...] = (
-    (DesignDocSectionsLoader, DesignDocSectionsAdapter, "design"),
-    (DocTraceabilityLoader, TraceabilityMatrixAdapter, "design"),
-    (DocFeedbackLoader, DesignDocFeedbackAdapter, "feedback"),
-)
-
-# (2) Command -> the loaders it runs, in order. Derived from the chain
-# constants above wherever a chain exists, so declaration == behavior.
-COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
-    "refresh-reference": tuple(cls for _, cls, _ in REFRESH_REFERENCE_CHAIN),
-    "ingest-controlm": tuple(
-        cls for _, cls, *_ in CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES
-    ),
-    "load-software-registry": (SoftwareRegistryLoader,),
-    "load-batch-orchestrators": (BatchPortOrchestratorLoader,),
-    "load-code-snapshot": (CodeSnapshotLoader, CodeTreeLoader),
-    "load-bmc-docs": (BmcDocsLoader,),
-    "load-vendor-docs": (VendorDocsLoader,),
-    "load-doc-traceability": tuple(cls for cls, _, _ in DOC_TRACEABILITY_CHAIN),
-    "load-email-extracts": (EmailExtractsLoader,),
-    "load-essential-graphrag": (EssentialGraphragLoader,),
-    "load-folder-attribution": (FolderAttributionLoader,),
-    "load-server-inventory": (ServerInventoryLoader,),
-    "load-manual-mappings": (ManualSealAttributionLoader,),
-}
-
-# Loader-running commands that are OPERATOR-DRIVEN, not sequence members:
-# `load` runs any single LOADER_REGISTRY loader ad hoc; manual mappings load
-# when an SME authors one (manifest-gated), not on a refresh cadence.
-AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings"})
-
-# (3) THE canonical ordered load sequence — declared once; ingest.sh and the
-# startup/refresh runbook derive from it (N6 retires their independent copies).
-# mode: "standing" = every full refresh; "optional" = site/experiment decision;
-# "gated" = blocked on a source confirmation or precondition named in the note.
-#
-# N6 (2026-08-04) added `profiles`. Before it, the two operator surfaces ran
-# DIFFERENT step sets and nothing said whether that was a decision or drift —
-# which is the actual defect, because a deliberate subset and an accidental one
-# look identical from outside. A profile names an operator surface; membership
-# is declared per step; each surface then filters the ONE sequence instead of
-# keeping a list of its own.
 
 
-class LoadStep(NamedTuple):
-    """One step of the canonical sequence.
+# --- root-owned state (the tested patch surfaces) ----------------------------
 
-    A NamedTuple, not a bare 3-tuple, because N6 widened it: unpacking sites
-    that assumed ``for command, mode, note in ...`` now fail loudly at import
-    rather than silently binding ``note`` to a set of profile names.
-    """
-
-    command: str
-    mode: str
-    profiles: frozenset[str]
-    note: str
-
-
-#: The operator surfaces that RUN a filtered view of the sequence. Adding one
-#: means adding a surface, not a preference — every profile here has a real file
-#: that derives from it and a guard that proves the derivation.
-LOAD_PROFILES: dict[str, str] = {
-    "scheduled-ingest": (
-        "scripts/ingest.sh — unattended scheduled ingestion (Control-M / cron). "
-        "The Control-M estate chain plus what it needs and the invariant checks; "
-        "deliberately NOT a full refresh (see SCHEDULED_INGEST_EXCLUSIONS)"
-    ),
-    "cold-start": (
-        "docs/design/drydocs-startup-refresh-runbook.md Appendix B — a human "
-        "bringing an empty container all the way up, so every standing step runs "
-        "plus the self-documentation corpus that makes the graph demonstrable"
-    ),
-}
-
-#: N6's RULING, made machine-checkable: every `standing` step the scheduled
-#: ingest does NOT run needs a reason here. Without this the omission of four
-#: steps from ingest.sh was indistinguishable from someone forgetting them.
-#: (`optional`/`gated` steps need no entry — not running them is what those
-#: modes already mean.) Guarded by tests/unit/test_load_sequence_surfaces.py.
-SCHEDULED_INGEST_EXCLUSIONS: dict[str, str] = {
-    "refresh-reference": (
-        "different cadence, declared on the command itself: the M1 reference "
-        "chain is WEEKLY (REFRESH_REFERENCE_CHAIN's own comment, and the "
-        "command's help text) while Control-M ingestion runs on the batch "
-        "schedule. Running it every ingest would re-load the catalog/SEAL feeds "
-        "many times a week for no source change"
-    ),
-    "load-software-registry": (
-        "repo-triggered, not estate-triggered: the registry is loaded from "
-        "config/taxonomy/software-registry.yaml, so it changes when the REPO "
-        "changes and not when Control-M data does. The runbook's own framing is "
-        "'after ANY container rebuild', which is the cold-start profile"
-    ),
-    "load-bmc-docs": (
-        "same class as load-software-registry — a vendor document corpus read "
-        "from external/orchestration/bmc-controlm/. It moves with the repo, not "
-        "with the batch estate, and re-chunking a static corpus on every ingest "
-        "is cost for no change"
-    ),
-    "docs-verify": (
-        "it would FAIL this profile by design. docs-verify reconciles the "
-        "doc-source registry against what the graph holds, and the scheduled "
-        "profile deliberately loads no doc corpora — under `set -e` a non-zero "
-        "exit here would abort a Control-M ingest over a reconciliation that was "
-        "never supposed to hold on this path"
-    ),
-}
-
-
-_ALL = frozenset({"scheduled-ingest", "cold-start"})
-_COLD = frozenset({"cold-start"})
-_NONE: frozenset[str] = frozenset()
-
-CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
-    LoadStep("check", "standing", _ALL, "Neo4j + APOC reachable"),
-    LoadStep("bootstrap", "standing", _ALL, "constraints + ontology seed"),
-    LoadStep(
-        "bootstrap-schema-graph",
-        "standing",
-        _ALL,
-        "schema meta-graph rendered + applied to ddschema (C21/G51). Targets a "
-        "DIFFERENT database, so it is chain-independent of everything below and "
-        "could sit anywhere — it sits here because a wiped DBMS is exactly when "
-        "the meta-graph gets forgotten. ADDED 2026-08-04: it was already in both "
-        "operator surfaces (scripts/ingest.sh step 3/6 and the startup runbook's "
-        "Appendix B) and missing ONLY here, so the generated load-map published "
-        "15 steps while both real paths ran 16",
-    ),
-    LoadStep("apply-supplements", "standing", _ALL, "the ONE verified supplement chain (G29)"),
-    LoadStep("refresh-reference", "standing", _COLD, "catalog + SEAL + dev teams (M1)"),
-    LoadStep(
-        "ingest-controlm", "standing", _ALL, "folders -> jobs -> conditions -> derived deps (M3)"
-    ),
-    LoadStep("load-software-registry", "standing", _COLD, "vendor/product registry (plan 07)"),
-    LoadStep(
-        "load-batch-orchestrators",
-        "optional",
-        _NONE,
-        "declared batch-port USES_SOFTWARE edges (C14); MATCH-only — needs the "
-        "SEAL chain and the software registry already loaded",
-    ),
-    LoadStep("load-bmc-docs", "standing", _COLD, "BMC corpus lexical graph"),
-    LoadStep(
-        "load-vendor-docs",
-        "optional",
-        _NONE,
-        "Q13 captured vendor documentation (verbatim, out-of-repo capture -> "
-        "convert -> load); taxonomy only, gated until its corpus is confirmed",
-    ),
-    LoadStep("load-essential-graphrag", "optional", _NONE, "Q2 book corpus -> drydocs (G102 fold)"),
-    LoadStep(
-        "load-email-extracts",
-        "optional",
-        _NONE,
-        "Q10 failure/activity email extracts -> lexical graph (assignment edge gated)",
-    ),
-    LoadStep(
-        "load-doc-traceability",
-        "optional",
-        _COLD,
-        "L7 self-documentation (design docs + feedback). The one `optional` step "
-        "a profile runs: a cold start is exactly when the doc graph is empty, and "
-        "it stayed missing from the runbook until Rev 5 for want of saying so",
-    ),
-    LoadStep(
-        "load-code-snapshot",
-        "optional",
-        _NONE,
-        "G33 self-documentation; ritual-driven (newest committed snapshot)",
-    ),
-    LoadStep(
-        "load-folder-attribution",
-        "gated",
-        _NONE,
-        "K8 folder-grain attribution: the app-code defined mapping "
-        "(config/overrides/app-code-mappings.csv) + the stg_app_fact fallback "
-        "feed need ingest-controlm + refresh-reference first (gate §E "
-        "preconditions)",
-    ),
-    LoadStep(
-        "load-server-inventory",
-        "optional",
-        _NONE,
-        "Z3 server inventory: per-application infra exports (the "
-        "internal/server-inventory/ landing zone) -> :Server/:DataCenter + "
-        "the tiered ExecutionHost join; the app port leg is MATCH-only, so "
-        "refresh-reference (SEAL) and ingest-controlm (hosts) first make it "
-        "complete rather than valid",
-    ),
-    LoadStep("m1-verify", "standing", _ALL, "M1 invariants"),
-    LoadStep("m3-verify", "standing", _ALL, "M3 invariants"),
-    LoadStep(
-        "docs-verify",
-        "standing",
-        _COLD,
-        "doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)",
-    ),
-)
-
-
-def load_profile(name: str) -> tuple[LoadStep, ...]:
-    """The steps ONE operator surface runs, in canonical order.
-
-    This is the derivation N6 exists for: ``scripts/ingest.sh`` calls this at
-    run time, so that script has no sequence of its own left to drift from.
-    The runbook's Appendix B cannot call anything — it is prose — so its copy is
-    held to the same answer by tests/unit/test_load_sequence_surfaces.py.
-    """
-    if name not in LOAD_PROFILES:
-        raise KeyError(f"unknown load profile {name!r} — declared: {sorted(LOAD_PROFILES)}")
-    return tuple(step for step in CANONICAL_LOAD_SEQUENCE if name in step.profiles)
-
-
-# --- helpers -----------------------------------------------------------------
-
+#: Source-registry cache. Read/written by ``cli_shared._source_registry()``
+#: THROUGH this module at call time; tests monkeypatch it here.
 _registry: SourceRegistry | None = None
-
-
-def _source_registry() -> SourceRegistry:
-    global _registry
-    if _registry is None:
-        _registry = SourceRegistry.from_yaml()
-    return _registry
-
-
-def _gate_source(source_id: str) -> None:
-    """Confirmed-gate (D3): fail fast (exit 2) unless the source is SME-confirmed."""
-    try:
-        _source_registry().require_confirmed(source_id)
-    except (UnconfirmedSourceError, UnknownSourceError, RetiredSourceIdError) as exc:
-        console.print(f"[red]{exc}[/]")
-        raise typer.Exit(2) from exc
-
-
-def _gate_loader(cls: type) -> None:
-    """Confirmed-gate for a LOADER: gate the dataset id the loader actually
-    binds to — the per-side overlay entry when one exists (D2,
-    config/loader-source-overlay.yaml wins over the class default), else the
-    class's own N3 ``source_id`` declaration."""
-    effective = _source_registry().effective_source_id(cls.name, cls.source_id)
-    if effective is not None:
-        _gate_source(effective)
 
 
 def _client(database: str | None = None) -> Neo4jClient:
     """Build the Neo4j client from settings; ``database`` overrides the
     configured target DB (post-G102 every content load targets ``drydocs``;
-    the override survives for ``ddschema`` and transitional sweeps)."""
+    the override survives for ``ddschema`` and transitional sweeps).
+
+    Stays ON THE ROOT (S8): command modules resolve it through this module at
+    call time, so tests that monkeypatch ``drydocs.cli._client`` keep working.
+    """
     cfg, _, _ = load_settings()
     pw = cfg.password.get_secret_value()
     if not pw:
@@ -546,116 +215,100 @@ def _client(database: str | None = None) -> Neo4jClient:
     return Neo4jClient(cfg.uri, cfg.user, pw, database or cfg.database)
 
 
-def _csv_adapter(csv_path: Path) -> CsvAdapter:
-    if not csv_path.exists():
-        console.print(f"[red]CSV not found: {csv_path}[/]")
-        raise typer.Exit(2)
-    return CsvAdapter(csv_path)
+# --- entry point -------------------------------------------------------------
 
 
-def _oracle_adapter(
-    query: str, bind_params: dict | None = None, name: str | None = None
-) -> OracleAdapter:
-    _, oracle_cfg, _ = load_settings()
-    if not oracle_cfg.configured:
-        console.print("[red]Oracle not configured.[/]")
-        raise typer.Exit(2)
-    return OracleAdapter(
-        user=oracle_cfg.user,
-        password=oracle_cfg.password.get_secret_value(),
-        dsn=oracle_cfg.dsn,
-        query=query,
-        bind_params=bind_params,
-        name=name,
-    )
+def run() -> None:
+    """Console-script entry point (``pyproject.toml`` -> ``drydocs``).
 
-
-def _scope_binds(
-    folder: str | None = None,
-    run_as: str | None = None,
-    developer_sid: str | None = None,
-    row_cap: int | None = None,
-) -> dict:
-    """Build the standard psgmgr-extract scope binds.
-
-    NULL-tolerant: a None value = no filter on that dimension. Folder-grained
-    extracts (folders, conditions) ignore ``run_as``; python-oracledb drops
-    named binds a statement does not use, so the full dict is safe everywhere.
-
-      folder_filter  folder-name LIKE pattern
-      run_as         tenant FID (service) user the job runs as — J.OWNER
-      developer_sid  human developer who authored/changed the definition;
-                     matched on J.AUTHOR / J.CREATION_USER / J.CHANGE_USERID
-                     (jobs) and T.LAST_UPDATED_USER (folders/conditions),
-                     joined back to the employee hierarchy. Control-M SIDs
-                     start with a lowercase letter; a SID ending in lowercase
-                     'p' is the automation release process, not a person.
-      row_cap        unordered ROWNUM sample cap
-
-    Operational employee identity (who *ran* actions, vs who authored the
-    definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
-    wire it on a future audit extract.
-
-    ``run_as`` IS UPPER-CASED HERE, and the reason is worth stating because the
-    obvious alternative is wrong. psgmgr stores ``CM_DEF_VJOB.OWNER`` ALL UPPER
-    (SME 2026-08-12), while the SQL binds ``J.OWNER = :run_as`` as an exact
-    match — so a lower-case ``--run-as`` silently returned ZERO ROWS and looked
-    like "that account runs nothing". Normalizing the BIND VALUE fixes it for
-    free: the column is untouched, so the predicate stays sargable on a ~240k-row
-    table. Wrapping the COLUMN (``UPPER(J.OWNER) = ...``) would fix the same
-    symptom while defeating a plain b-tree index — and would be pure loss here,
-    since a column already upper at rest makes ``UPPER()`` on it a no-op.
-    Case-folding the DIRECTORY side is a separate matter and does not belong in
-    this bind (gate fid-identity-and-scope §Q6).
+    Exists to turn an OPERATOR CONFIGURATION error into a message and exit 2
+    rather than a Python traceback. G81 made ``DRYDOCS_DATA_ROOT`` mandatory,
+    and the command most likely to meet that error is ``landing-zones`` — whose
+    entire reason for existing is that "my extracts are gone" should be a
+    one-command answer. Handing that operator a stack trace would defeat the
+    command at exactly the moment it matters. Exit 2 is the repo's
+    operator-error code (the G78 ``load``/chain contract).
     """
-    return {
-        "folder_filter": folder,
-        "run_as": run_as.upper() if run_as else run_as,
-        "developer_sid": developer_sid,
-        "row_cap": row_cap,
-    }
-
-
-# Reusable scope CLI options — attach to any command that runs a psgmgr extract.
-_SCOPE_HELP = "psgmgr scope (Oracle only); omit for the full population."
-
-
-def _folder_opt():
-    return typer.Option(
-        None, "--folder", help=f"Folder-name LIKE pattern, e.g. 'CCB_AUTO_%'. {_SCOPE_HELP}"
-    )
-
-
-def _run_as_opt():
-    return typer.Option(
-        None,
-        "--run-as",
-        help=f"Tenant FID (service) user the job runs as — J.OWNER, exact. {_SCOPE_HELP}",
-    )
-
-
-def _developer_sid_opt():
-    return typer.Option(
-        None,
-        "--developer-sid",
-        help=f"Developer SID who authored/changed the def — J.AUTHOR/CREATION_USER/CHANGE_USERID or folder LAST_UPDATED_USER. {_SCOPE_HELP}",
-    )
-
-
-def _row_cap_opt():
-    return typer.Option(None, "--row-cap", help=f"Unordered ROWNUM sample cap. {_SCOPE_HELP}")
+    try:
+        app()
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise SystemExit(2) from exc
+    except ReadZoneWriteError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise SystemExit(2) from exc
 
 
 # --- callback ---------------------------------------------------------------
 
 
+def configure_logging(*, verbose: bool = False) -> None:
+    """The ONE logging configuration call — ADR 0014 clause 2 (G105).
+
+    Replaces the single ``basicConfig`` this CLI carried, which was stderr-only
+    and took its level from ``--verbose`` alone, so ``AppSettings.log_level``
+    existed and was read by nobody.
+
+    Stdlib ``dictConfig``, no new runtime dependency. Console plus a file sink
+    under the resolved log root; the level comes from ``RuntimeSettings``, and
+    ``--verbose`` still WINS over it — a flag the operator typed outranks a
+    declared default.
+
+    THE RULE THAT FOLLOWS FROM THIS BEING THE ONLY CALL: no module calls
+    ``basicConfig``. A library that configures the root logger steals it from its
+    caller, which is why the four components get module loggers instead.
+
+    Never raises. Logging that refuses to start must not stop the command the
+    operator actually asked for — the same reasoning that makes a run log
+    best-effort after open.
+    """
+    import logging.config
+
+    level = "DEBUG" if verbose else "INFO"
+    handlers: dict[str, dict[str, object]] = {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": level,
+            "formatter": "plain",
+            "stream": "ext://sys.stderr",
+        }
+    }
+    try:
+        from drydocs_core.config import RuntimeSettings
+        from drydocs_core.log_kinds import log_filename
+        from drydocs_core.run_log import resolve_log_dir
+
+        if not verbose:
+            level = RuntimeSettings().log_level.upper()
+            handlers["console"]["level"] = level
+        log_dir = resolve_log_dir()
+        log_dir.mkdir(parents=True, exist_ok=True)
+        handlers["file"] = {
+            "class": "logging.FileHandler",
+            "level": level,
+            "formatter": "plain",
+            "filename": str(log_dir / log_filename("cli", "console")),
+            "encoding": "utf-8",
+            "delay": True,  # no file until something is actually logged
+        }
+    except Exception:  # — an unconfigurable sink never costs the operator the console
+        pass
+
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {"plain": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}},
+            "handlers": handlers,
+            "root": {"level": level, "handlers": sorted(handlers)},
+        }
+    )
+
+
 @app.callback()
 def main(verbose: bool = typer.Option(False, "--verbose", "-v")) -> None:
     """DryDocs — production support inventory + data product KG."""
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format="%(asctime)s %(name)s %(levelname)s %(message)s",
-    )
+    configure_logging(verbose=verbose)
 
 
 # --- M0 commands -------------------------------------------------------------
@@ -932,15 +585,71 @@ def fid_census_cmd(
     )
 
 
+@app.command(name="profile-folder-set")
+def profile_folder_set(
+    source: Path = typer.Argument(
+        ..., help="Directory holding the Control-M definition XML export."
+    ),
+    out: Path = typer.Option(
+        Path("folder-set-profile.json"), "--out", "-o", help="Output JSON artifact path."
+    ),
+) -> None:
+    """G68 - census a folder set: what the export SAYS, and what only you can supply.
+
+    TRANSPORT NAMED, NOT DEFAULTED (the O58 precedent). A CLI verb writing a
+    JSON artifact, because remediation writes no graph - so QuerySpecs are out
+    BY CONSTRUCTION, not by preference - and no upload path exists yet. The
+    cost against ADR 0005 is nil: that ADR governs the browser->Neo4j access
+    path, and nothing here reads or writes a graph. `changedoc` and `jira`
+    already write artifacts from this component, so this adds no new shape.
+
+    The output has two halves, and the division is the point: FIVE CENSUSES
+    report what the export carries (shape, identity, variables, contacts,
+    invocation fan-out), each with WHERE-USED rather than bare distinct values;
+    then a SUBSTITUTION SLOT list names the facts the export does NOT carry -
+    DEVX_KEY, the MFTS set, the contact DLs - for a human to supply. A slot with
+    no current value reports `not-supplied` with a null value and NEVER a
+    default: inventing one is how a proposal becomes a wrong fact nobody
+    re-checks.
+
+    Asserts nothing about meaning. detect_all()'s findings ride alongside
+    unratified, and no graph is written (the module's standing invariant).
+    """
+    import json as _json
+
+    from drydocs_lineage.extractors import ControlMXmlDefsExtractor
+    from drydocs_remediation.profile import NOT_SUPPLIED, profile
+    from drydocs_remediation.xml_bridge import to_definition_set
+
+    definitions = to_definition_set(ControlMXmlDefsExtractor().extract(source))
+    result = profile(definitions)
+    # newline pinned: the artifact is deterministic output, and a CRLF host
+    # would otherwise make the same profile diff against itself
+    out.write_text(_json.dumps(result.as_dict(), indent=2), encoding="utf-8", newline="\n")
+    console.print(result.summary())
+    open_slots = [s.name for s in result.substitution_slots if s.status == NOT_SUPPLIED]
+    if open_slots:
+        console.print(
+            f"[yellow]not supplied by the export - needs an SME:[/] {', '.join(open_slots)}"
+        )
+    console.print(f"[green]wrote[/] {out}")
+    console.print(
+        "[dim]a census, not a ruling: findings ride alongside unratified and "
+        "nothing was written to a graph.[/]"
+    )
+
+
 # --- per-domain command modules (S8) -----------------------------------------
 # The root registers each domain's Typer FLAT, so every verb keeps its top-level
-# name. Imported at the bottom on purpose: the submodules import the shared
-# state defined above, and this is the one point where the circular edge is
-# safe. The three verbs above (resolve-cmdline-staging, lineage-review,
-# fid-census) stay here because they wire another component (drydocs_lineage,
-# drydocs.fid_census) — the composition root is the only module
-# exempt from the component-import invariant (ENTRYPOINT_MODULES), and S8 adds
-# no new exemption.
+# name. Since S13 the import graph is a DAG, not a blessed cycle: the command
+# modules import drydocs.cli_shared (never this module at module scope), and
+# this root imports both — so any CLI module works as the first import of a
+# fresh interpreter (guarded by tests/unit/test_cli_import_order.py). The three
+# verbs above (resolve-cmdline-staging, lineage-review, fid-census) stay here
+# because they wire another component (drydocs_lineage, drydocs.fid_census) —
+# the composition root is the only module exempt from the component-import
+# invariant (ENTRYPOINT_MODULES); S8 added no new exemption and S13 removes
+# none.
 from . import (  # noqa: E402
     cli_docs,
     cli_ingest,
@@ -956,4 +665,4 @@ for _sub in COMMAND_MODULES:
 
 
 if __name__ == "__main__":
-    app()
+    run()

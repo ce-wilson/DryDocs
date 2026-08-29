@@ -33,9 +33,15 @@ def make_register(
     owner_token: str | None,
     api_url: str | None = None,
     agent_key: str | None = None,
+    run_id: str | None = None,
 ) -> Callable[..., str] | None:
     """Build the pipeline's ``register_cypher`` callable, or None when the
-    registration surface isn't configured (no owner token / no agent key)."""
+    registration surface isn't configured (no owner token / no agent key).
+
+    ``run_id`` rides as ``X-DryDocs-Run-Id`` (G108 ruling D): it is the
+    correlation key that joins the API's audit line to this run's ledger
+    lines — closed over here rather than threaded through the pipeline, so
+    ``register_cypher``'s call signature (and every fake of it) is unchanged."""
     api_url = (api_url or os.environ.get("DRYDOCS_API_URL") or DEFAULT_API_URL).rstrip("/")
     agent_key = agent_key or os.environ.get("DRYDOCS_AGENT_REG_KEY")
     if not owner_token or not agent_key:
@@ -56,13 +62,16 @@ def make_register(
                 "description": description,
             }
         ).encode("utf-8")
+        headers = {
+            "Content-Type": "application/json",
+            "X-DryDocs-Agent-Key": agent_key,
+        }
+        if run_id:
+            headers["X-DryDocs-Run-Id"] = run_id
         request = urllib.request.Request(
             f"{api_url}/specs/ephemeral",
             data=body,
-            headers={
-                "Content-Type": "application/json",
-                "X-DryDocs-Agent-Key": agent_key,
-            },
+            headers=headers,
             method="POST",
         )
         with urllib.request.urlopen(request, timeout=TIMEOUT_S) as response:

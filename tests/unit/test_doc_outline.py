@@ -180,7 +180,7 @@ PROJECT_REVIEW = REPO_ROOT / "docs" / "design" / "drydocs-project-review.md"
 def test_real_review_outline_loads() -> None:
     outline = load_outline(REVIEW_OUTLINE)
     assert outline.doc_type == "Review"
-    # the review narrates — no traceability spine (that's the TDDs' job)
+    # the review narrates — no traceability backbone (that's the TDDs' job)
     assert not outline.traceability.get("matrix_section")
     # the status section is the reason the Rev-per-epic-close cadence exists
     assert "status" in outline.required_anchors()

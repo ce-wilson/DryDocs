@@ -48,13 +48,15 @@ groom_log:
     Acceptance requires verification from BOTH venues (main checkout and worktree), since a
     worktree-only check is what would have hidden it.
   attached_at: U26
-- date: '2026-08-28'
+- date: '2026-08-22'
   note: |-
-    ── 2026-08-28 groom (ui-workstream worktree) ───────────────────────────────
-    U27 the snapshot CI verdict asks GitHub about main and matches the local head
-    against it, so from any branch it sits on the no-run-yet path forever, and
-    Get-CiVerdict still has no tests (Idea-156). Sibling of U26 in the same script:
-    U26 lost the JSON write from a worktree, U27 mis-reports the step before it. The
-    runs-array half was already fixed on main (22b8ad7, then 5c0308e) and is out of
-    scope by an explicit clause so it is not re-done.
+    ── 2026-08-22 groom (laptop) — Idea-156 ────────────────────────────────────
+    U27: the same script's CI check asks `gh run list --branch main` and matches LOCAL HEAD
+    against the answer, so from any branch HEAD can never appear and the verdict degrades to
+    the yellow no-run-yet path permanently — the branch it was filed from is the worked
+    example (green on feat/ui-workstream, invisible to the check). The verdict is a pure
+    function of (runs, head) by its own design note and still has no tests; five named
+    fixtures are the second half, skipping cleanly where no PowerShell exists because this
+    repo has no Pester. The array-unrolling half of the original report was already fixed at
+    5c0308e / U24 and is recorded in the item so it is not re-done.
   attached_at: U27

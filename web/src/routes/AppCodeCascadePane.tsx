@@ -410,7 +410,7 @@ export default function AppCodeCascadePane({
           the edge's origin and the port's confirmation stamp (§G7/K10). One mechanism, not two.
         </p>
 
-        {/* 1-2 — catalog spine */}
+        {/* 1-2 — catalog backbone */}
         <div className="grid shrink-0 grid-cols-2 gap-2">
           <div>
             <StepLabel n={1} title="Product line" />

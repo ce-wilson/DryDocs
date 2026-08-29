@@ -1,0 +1,34 @@
+id: J60
+epic: release-infrastructure
+title: Module and package docstrings are enforced by nothing — enable ruff's D100/D104 instead of
+  writing a bespoke guard, and fill the modules that have no docstring at all
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- pyproject.toml
+- .github/workflows/ci.yml
+- docs/reviews/persona-python-architect-idea-181.md
+acceptance: |
+  (a) THE RULE COMES FROM THE LINTER ALREADY IN THE GATE, NOT FROM A NEW TEST. `[tool.ruff.lint].select` currently reads `["E", "F", "W", "I", "B", "UP", "N", "RUF"]` — no `D` rules at all. Add `D100` (missing docstring in public module) and `D104` (missing docstring in public package) to `select`, with the pydocstyle convention set explicitly so the rest of the `D` family is not switched on by accident. CI already blocks on `ruff check` (J10 stage 5), so the enforcement point is free; a bespoke docstring test would be a second, weaker copy of a check the toolchain ships.
+
+  (b) THE EXISTING EXEMPTIONS SURVIVE. The vendored Anthropic skill scripts and the captured experiment records are already excluded from ruff for recorded reasons; the new rules inherit those exclusions unchanged. Tests and scripts get a per-file-ignore if the first run says they need one, with the reason written next to it in the same style as the existing entries.
+
+  (c) THE MODULES WITH NO DOCSTRING ARE FILLED, NOT IGNORED. The 2026-08-27 measurement found 31 modules with no docstring; re-measure at pull time and report both numbers. Each new docstring says what the module is FOR in one or two sentences of U.S. business-technical English — not a restatement of the filename. Where the module has an obvious governing record (an ADR, a gate, a backlog id), cite it, which is what 214 of the existing docstrings already do; where it does not, do not invent one.
+
+  (d) `ruff check` AND `ruff format --check` BOTH EXIT 0 on the tree as left by this item, verified locally before push, so CI's last two stages are green at the sha that ships this.
+
+  (e) OUT OF SCOPE: function and class docstrings (D101/D102/D103), any date or provenance key inside a docstring, and the YAML header standard — that is J58/J59. This item adds two rules and the prose they demand, nothing else.
+notes: |
+  Groomed 2026-08-28 from Idea-181 (captured 2026-08-27), prescription F4 of its python-architect persona review: enable ruff D100/D104 rather than build a bespoke docstring guard. Filed separately from J58/J59 because the language, the enforcement mechanism and the failure mode are all different — those two are JSON-Schema guards over governed YAML; this one is two lines of lint config plus the writing they oblige.
+
+  Verified before grooming: `select` in `pyproject.toml` carries no `D` rules; the vendored-skill and captured-experiment ruff exclusions exist with their reasons recorded.
+
+  Epic release-infrastructure / module docs / phase 8. `module: docs` rather than a code component because the deliverable is prose about modules plus a lint setting, and it spans every package rather than belonging to one — the same call J50/J52/J54 make. Model sonnet: (c) is writing, not lookup, and a haiku pass would produce filename restatements.
+
+  Priority p3: nothing is broken today. The value is that a module arriving with no docstring stops being invisible, which matters most to the Team Edition reader who has no author to ask.

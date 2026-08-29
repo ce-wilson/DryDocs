@@ -363,25 +363,28 @@ def test_the_live_coverage_census_is_pinned() -> None:
     report = coverage(software["products"], doc["sources"])
     s = report.summary()
     assert (
-        s["products"],
-        s["products_no-corpus"],
-        s["corpora_total"],
-        s["corpora_unclaimed"],
-        # PIN MOVED 2026-08-09 (C25): 13 -> 15 products and 12 -> 14 without a
-        # documentation pointer. Both deltas are the two prerequisite rows the
-        # software-version-context gate needed — `snowflake` and `dpl` — neither of
-        # which has a docs corpus. Corpora counts are unchanged.
-        # WORTH KNOWING, because the number looks like it should have moved: the
-        # same commit added an `evidence:` block to the `abinitio` row, and abinitio
-        # still counts as having NO documentation pointer. That is correct rather
-        # than a miss — `evidence:` points at hand-compiled rows that inform the
-        # product, `documentation:` points at a docs corpus that describes it. The
-        # gate's §C5 ruling turns on exactly that distinction.
-    ) == (
-        15,
-        14,
-        8,  # 7->8 corpora at Q10 (ops-email-extracts, 2026-08-19)
-        7,  # unclaimed 6->7 — an email corpus is evidence, not product documentation
+        (
+            s["products"],
+            s["products_no-corpus"],
+            s["corpora_total"],
+            s["corpora_unclaimed"],
+            # PIN MOVED 2026-08-09 (C25): 13 -> 15 products and 12 -> 14 without a
+            # documentation pointer. Both deltas are the two prerequisite rows the
+            # software-version-context gate needed — `snowflake` and `dpl` — neither of
+            # which has a docs corpus. Corpora counts are unchanged.
+            # WORTH KNOWING, because the number looks like it should have moved: the
+            # same commit added an `evidence:` block to the `abinitio` row, and abinitio
+            # still counts as having NO documentation pointer. That is correct rather
+            # than a miss — `evidence:` points at hand-compiled rows that inform the
+            # product, `documentation:` points at a docs corpus that describes it. The
+            # gate's §C5 ruling turns on exactly that distinction.
+        )
+        == (
+            15,
+            13,  # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
+            10,  # 9->10 at Q27: mwaa-implementation-docs registered — prior moves: chase-leadership-scrape 2026-08-27, Q10 ops-email-extracts 2026-08-19
+            8,  # unclaimed 7->8 — org-structure gate evidence, not product documentation (same class as the email corpus before it)
+        )
     ), (
         f"coverage census changed: {s['products']} products, "
         f"{s['products_no-corpus']} with no documentation pointer, "

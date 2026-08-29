@@ -173,25 +173,70 @@ MATCH (local:OntologyTerm:LocalRelationship {iri: "https://drydocs.local/ontolog
 MATCH (pp:OntologyTerm:ProvProperty         {iri: "http://www.w3.org/ns/prov#hadRole"})
 MERGE (local)-[:MAPS_TO]->(pp);
 
-// ----- TOMRole concept scheme (the fixed 7 — gate §B revised set) -----------
-// Multi-person roles load the qualified/reified form; Operate Manager L1/L2 is
-// ONE concept — the level (L1|L2) rides the Attribution node as a property
-// (gate wording "one or both", 1–3 persons), keeping the scheme at 7 concepts.
+// ----- TOMRole concept scheme — the DECLARED vocabulary (G70) ----------------
+// SEEDED FROM config/taxonomy/tom-role-vocabulary.yaml (gate tom-roles-
+// enumeration-and-cardinality §F3, signed 2026-08-11) and GUARDED against it:
+// tests/unit/test_tom_role_vocabulary.py fails this file when the declaration
+// moves, so the two cannot drift the way §A1b measured (the old YAML list
+// moved twice inside one gate with the suite green — because no code read it).
+// 16 concepts: the §G register's 7 REQUIRED + 9 optional, incl. the §G9
+// Operate Manager split (three classes; the old level property retires — see
+// migrate_tom_role_split_g70.cypher) and BOTH SRE rows (close-out 2026-08-11:
+// which one a team uses is an implementation choice, so a reorganisation
+// moves data, not vocabulary). `required` rides the concept (§B3); the
+// cardinality rule — one-or-more holders everywhere (§B1) — is recorded ONCE
+// on the scheme, never per concept. `active` is the §F6b lifecycle flag:
+// retirement is a state, not a deletion. `derived` marks the SRE rows G71's
+// completeness report must EXCLUDE.
 
 MERGE (s:SkosConceptScheme {id: "tom_roles"})
   SET s.label = "SEAL Technical Operational Roles",
-      s.source = "gate seal-tom-attribution-reshape (2026-07-10 §B)";
-MERGE (c1:TOMRole {id: "application_owner"})          SET c1.pref_label = "Application Owner";
-MERGE (c2:TOMRole {id: "primary_information_owner"})  SET c2.pref_label = "Primary Information Owner";
-MERGE (c3:TOMRole {id: "backup_information_owner"})   SET c3.pref_label = "Backup Information Owner";
+      s.cardinality = "one-or-more",
+      s.source = "gate seal-tom-attribution-reshape (2026-07-10 §B) as amended by tom-roles-enumeration-and-cardinality (2026-08-11 §G), declared in config/taxonomy/tom-role-vocabulary.yaml (G70)";
+
+// -- required (the §G short list) --
+MERGE (c1:TOMRole {id: "application_owner"})
+  SET c1.pref_label = "Application Owner", c1.required = true, c1.scope = "Individual", c1.active = true;
+MERGE (c2:TOMRole {id: "primary_information_owner"})
+  SET c2.pref_label = "Primary Information Owner", c2.required = true, c2.scope = "Individual", c2.active = true;
+MERGE (c3:TOMRole {id: "backup_information_owner"})
+  SET c3.pref_label = "Backup Information Owner", c3.required = true, c3.scope = "Individual", c3.active = true;
 // K5 gate 2026-07-20: cto is NOT shared with product_roles (families independent) —
 // REMOVE clears the stale shared_with stamp on already-loaded graphs (idempotent).
-MERGE (c4:TOMRole {id: "cto"})                        SET c4.pref_label = "CTO"
-                                                      REMOVE c4.shared_with;
-MERGE (c5:TOMRole {id: "technology_risk_controls"})   SET c5.pref_label = "Technology Risk & Controls";
-MERGE (c6:TOMRole {id: "design_authority"})           SET c6.pref_label = "Design Authority";
-MERGE (c7:TOMRole {id: "operate_manager"})            SET c7.pref_label = "Operate Manager",
-                                                          c7.levels = "L1,L2";
+MERGE (c4:TOMRole {id: "cto"})
+  SET c4.pref_label = "CTO", c4.required = true, c4.scope = "Individual", c4.active = true
+  REMOVE c4.shared_with;
+MERGE (c5:TOMRole {id: "technology_risk_controls"})
+  SET c5.pref_label = "Technology Risk & Controls", c5.required = true, c5.scope = "Individual", c5.active = true;
+MERGE (c6:TOMRole {id: "design_authority"})
+  SET c6.pref_label = "Design Authority", c6.required = true, c6.scope = "Individual", c6.active = true;
+MERGE (c16:TOMRole {id: "backup_application_owner"})
+  SET c16.pref_label = "Backup Application Owner", c16.required = true, c16.scope = "Individual", c16.active = true;
+
+// -- optional (the extended list) --
+// The bare class is defined by RESPONSIBILITY SCOPE (change, problem and
+// incident resolution), not a level (§G9) — L1/L2 are levelled coverage tiers.
+MERGE (c7:TOMRole {id: "operate_manager"})
+  SET c7.pref_label = "Operate Manager", c7.required = false, c7.scope = "Individual", c7.active = true,
+      c7.definition = "responsibility scope: change, problem and incident resolution (§G9)";
+MERGE (c8:TOMRole {id: "operate_manager_l1"})
+  SET c8.pref_label = "L1 Operate Manager", c8.required = false, c8.scope = "Individual", c8.active = true;
+MERGE (c9:TOMRole {id: "operate_manager_l2"})
+  SET c9.pref_label = "L2 Operate Manager", c9.required = false, c9.scope = "Individual", c9.active = true;
+MERGE (c10:TOMRole {id: "chief_business_technologist"})
+  SET c10.pref_label = "Chief Business Technologist", c10.required = false, c10.scope = "Individual", c10.active = true;
+MERGE (c11:TOMRole {id: "deployment_owner"})
+  SET c11.pref_label = "Deployment Owner", c11.required = false, c11.scope = "Individual", c11.active = true;
+MERGE (c12:TOMRole {id: "deployment_information_owner"})
+  SET c12.pref_label = "Deployment Information Owner", c12.required = false, c12.scope = "Individual", c12.active = true;
+MERGE (c13:TOMRole {id: "application_module_owner"})
+  SET c13.pref_label = "Application Module Owner", c13.required = false, c13.scope = "Individual", c13.active = true;
+MERGE (c14:TOMRole {id: "site_reliability_engineer"})
+  SET c14.pref_label = "Site Reliability Engineer", c14.required = false, c14.scope = "Individual", c14.active = true,
+      c14.derived = true;
+MERGE (c15:TOMRole {id: "sre_devops_incident_resolver_team"})
+  SET c15.pref_label = "Incident Resolver – SRE / DevOps Team", c15.required = false, c15.scope = "Group", c15.active = true,
+      c15.derived = true;
 WITH 1 AS _
 MATCH (s:SkosConceptScheme {id: "tom_roles"})
 MATCH (c:TOMRole)

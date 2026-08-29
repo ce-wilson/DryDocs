@@ -198,7 +198,7 @@ illustration of every rule above.
    no value under the signed match tiers, the export names an application the graph does
    not carry, and its second synthetic city has no gazetteer row. The consequence is that
    the samples exercise the coverage-REPORTING path and never the success path. Recorded as
-   `Idea-162` and item **Z7**.
+   `Idea-193` and item **Z7**.
 2. **`drydocs landing-zones` is missing from the CLI reference** in
    `internal/repo-README.md`, which lists every other verb.
 3. **`.env.example` documents neither `DRYDOCS_DATA_ROOT` nor `DRYDOCS_LOGDIR`**, so a new

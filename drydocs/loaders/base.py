@@ -25,6 +25,7 @@ import hashlib
 import json
 import logging
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -299,6 +300,7 @@ class BaseLoader:
         index_wait_seconds: int = 300,
         full_extract: bool = False,
         run_log: bool = True,
+        run_meta: Mapping[str, str] | None = None,
     ) -> None:
         if not self.cypher_path:
             raise NotImplementedError(f"{type(self).__name__} must set cypher_path")
@@ -313,6 +315,12 @@ class BaseLoader:
         self.loaded_at = datetime.now(UTC).replace(microsecond=0).isoformat()
         self.full_extract = full_extract
         self.run_log = run_log
+        # G121: acquisition facts the caller resolved (the declared zone a --csv
+        # path fell in, or the recorded override that accepted an undeclared one).
+        # ONE channel, BOTH records: _open_run writes it onto the :JobRun and
+        # _open_run_log puts it in the disk log's header meta block, so the two
+        # can never disagree about how the input was acquired.
+        self.run_meta: dict[str, str] = dict(run_meta or {})
         self._scope_values: set = set()  # distinct sweep_scope_property values seen
 
     # ---- entrypoint ------------------------------------------------------
@@ -400,7 +408,11 @@ class BaseLoader:
             self.run_id,
             source=source,
             target=f"{uri} db={database}".strip(),
-            meta={"batch size": self.batch_size, "full extract": self.full_extract},
+            meta={
+                "batch size": self.batch_size,
+                "full extract": self.full_extract,
+                **self.run_meta,
+            },
         )
         try:
             path = log.open()
@@ -581,12 +593,14 @@ class BaseLoader:
                             run.loader      = $loader,
                             run.source      = $source_label,
                             run.started_at  = datetime($loaded_at),
-                            run.status      = 'STARTED'
+                            run.status      = 'STARTED',
+                            run += $run_meta
             """,
             run_id=self.run_id,
             loader=self.name,
             source_label=self.source_label,
             loaded_at=self.loaded_at,
+            run_meta=self.run_meta,
         )
 
     def _close_run(self, *, status: str, summary: LoadSummary) -> None:

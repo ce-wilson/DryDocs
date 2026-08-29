@@ -8,11 +8,10 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - G104
 inputs:
-- docs/design/catalog-substrate-review.md
 - config/source-registry.yaml
 - drydocs_core/data_root.py
 - drydocs_core/landing_zones.py
@@ -31,12 +30,69 @@ acceptance: |
 
   (e) The Confluence capture that lands IN-TREE against `landing_zones.py`'s tracked-only rule is ruled one way and the ruling is written down: either it moves under the data root, or the rule gains a stated exception naming it. It is not left as an undocumented violation of a rule the same module enforces on everything else.
 
-  (f) SIX IS THE WRONG NUMBER — the 2026-08-28 catalog-substrate review found the same defect one level wider, and this clause records the choice rather than leaving it discovered again. Fifteen of the thirty dataset rows carry `acquisition.mode: automated` and resolve through NOTHING: no `drop_dir`, no connection binding, `locator.service` a tilde with a comment saying the real value lives in `internal-local/`. `drydocs landing-zones --check` cannot see them, for the same reason it could not see the six code zones — it enumerates manual rows only. So the "check that silently covers half its subject" defect in clause (a) is not six zones out of twenty-one, it is six zones plus fifteen datasets. EITHER widen the declaration to cover the automated rows too, OR record in the item why the automated half is out of scope here and which item owns it (G81 is the candidate — it already declares paths with a mode). What is not acceptable is closing this item with `--check` reporting green over half the registry and no statement anywhere that the other half is undeclared.
-
   `poetry run pytest -q` including the classification guard (`tests/unit/test_classification.py` — every new registry row needs its `classification`, there is no unlabeled default), plus `drydocs landing-zones --check` reporting the full zone set. Ruff clean.
 notes: |
   Groomed 2026-08-21 (laptop) from Idea-152 clause (7) / finding (e). Module `config` because the deliverable is registry rows plus a derivation rule, not new component behavior; the `data_root.py` edit is the consequence of the declaration, not the point of the item.
 
   Watch item for whoever pulls it: each new source-registry row must carry a `classification` per CLAUDE.md §3 — the six zones are operational metadata, so Internal is the likely answer, but it is a per-zone call and no default exists.
+  DONE 2026-08-24 (desktop). TWO OF THE FIVE CLAUSES WERE ALREADY SATISFIED BY G81, which
+  landed four days after this item was groomed -- recorded as overtaken per the Q9/Q14 idiom,
+  acceptance text untouched, NOT re-done.
 
-  AMENDED 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding B1, the second-pass survey of DataHub, OpenMetadata, Amundsen and OpenLineage/Marquez. Clause (f) added. The survey's point in one line: none of the four open-source catalogs has an undeclared source — DataHub types every source config, OpenMetadata validates every service connection against a published schema, Amundsen keys every extractor's connection by the extractor's own scope — and the reason they all made it mandatory is the reason it matters here. A source you cannot enumerate is a source you cannot audit, back up, or move, which is the failure that produced this item's parent incident in the first place.
+  (b) OVERTAKEN: the dpl/ vs dpl-registry/ drift is already reconciled. Both dpl rows read
+  dpl-registry/ and data_root.py records that the registry said dpl/ from N12 until G81
+  corrected it. No alias was needed; the company relay about exports stranded in dpl/ already
+  rode out in fcf973b5.
+
+  (c) OVERTAKEN: resolvers already derive from the declaration and two guards already assert
+  the agreement -- test_every_data_root_helper_maps_to_a_declared_zone (code to declaration)
+  and test_each_zone_path_equals_what_its_helper_actually_resolves (declaration to code, added
+  at G81's follow-through and proven to fire on injected drift). The acceptance said "derived
+  FROM the rows" meaning source-registry rows; G81 derived them from config/data-zones.yaml
+  instead. Same intent, different file, and ADR 0014's fence against a THIRD declaration is
+  why it stays that way.
+
+  (a) THE PREMISE MOVED AND THE REAL DEFECT IS SHARPER. The acceptance says the six zones have
+  no source-registry row so landing-zones --check is blind to them. Post-G81 all six DO have a
+  declaration -- in config/data-zones.yaml -- and the command was still blind, because it read
+  only the registry. Duplicating them into the registry was the wrong fix twice over:
+  data-zones.yaml's own header rules that a zone duplicating a registry row FAILS the guard,
+  and a write zone has no provenance, trust axis or acquisition mode, so its registry row would
+  be a field set of nulls asserting a source that does not exist. That is the acceptance's own
+  "recorded reason a zone legitimately has none" branch, now written into the header naming all
+  seven write zones. What was fixed instead is the READ SURFACE: drydocs landing-zones reports
+  BOTH declarations (15 registry + 11 declared = 26 zones, was 15), and --check is MODE-AWARE
+  -- an empty read zone fails, an empty write zone does not, because failing on an output
+  directory the system rebuilds trains the operator to ignore the exit code.
+
+  ONE BUG CAUGHT IN MY OWN CHANGE before it shipped: the first cut printed a second JSON array,
+  so --json emitted two documents and stopped parsing. Restructured to one object,
+  manual_zones plus declared_zones, and a guard asserts that shape -- a machine surface that
+  does not parse is worse than one omitting half the data, because the omission is readable.
+
+  (d) .env.example documents DRYDOCS_LOGDIR. Only that one: G81 added the data root on
+  2026-08-23, so "documents neither" was half-stale at drafting. The block records that the log
+  dir is OPTIONAL where the data root is mandatory -- the G81 (d) scope fence.
+
+  (e) RULED: THE CAPTURE MOVES, it does not get an exception. The cdo-frameworks Confluence
+  capture had been landing in-tree under internal/knowledge/data/<space>/ -- untracked AND not
+  gitignored, the one category git clean -fd removes without needing -x. An exception could
+  never expire: landing_zones.py permits an in-tree zone only when its contents are TRACKED,
+  and PUBLISH-BOUNDARY forbids ever tracking a verbatim capture carrying real employee names
+  and internal URLs, so it would be permanent by construction. Declared as read zone
+  confluence-capture; vendor-docs is the exact precedent, existing as the ServiceNow .gitignore
+  precedent generalized to a real out-of-repo home. The doc-source row gains
+  landing_zone: confluence-capture, and its historical source: path is LEFT AS WRITTEN --
+  falsifying a provenance record to match a later ruling is the one thing a VERBATIM row may
+  not do, so the ruling governs the next capture, not the record of the last one. Producer has
+  no internal/knowledge/ at all, so this costs nothing here and is a real relocation only on
+  the checkout holding the capture.
+
+  NO NEW REGISTRY ROW WAS MINTED, so the groom's classification watch item never triggered --
+  worth saying plainly, because "the guard did not fire" and "the guard was not reached" look
+  identical from a green suite.
+
+  Two new guards, both behavioural rather than structural: the read surface covers every
+  declared zone and stays one JSON document, and --check distinguishes an empty read zone from
+  an empty write zone. MODULE_MAP's data_zones row records the new read surface.
+  Suite 2384 passed / 10 skipped, ruff + format clean, CLI import + --help pass.

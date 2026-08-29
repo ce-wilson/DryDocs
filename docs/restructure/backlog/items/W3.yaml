@@ -1,6 +1,6 @@
 id: W3
-epic: fcdo-alignment
-title: fcdo-ontology-builder documented as an optional add-source-object Step-3 aid (structural profiling
+epic: cdo-alignment
+title: ontology-builder documented as an optional add-source-object Step-3 aid (structural profiling
   only, never bypasses the gate)
 type: chore
 module: docs
@@ -11,7 +11,7 @@ priority: p3
 status: done
 depends_on: []
 inputs:
-- internal/fcdo-reference/ALIGNMENT-PLAN.md
+- internal/cdo-reference/ALIGNMENT-PLAN.md
 - .claude/skills/add-source-object/
 acceptance: |
   The add-source-object skill documents the optional aid for flat/ denormalized sources: run on header-only/redacted extracts ONLY; reuse its SKOS enum extraction + HTML data-dictionary render; translate its generic classes through ontology-mapper into decision-matrix terms; and state plainly that it does NO data profiling (counts/nulls/grain/join coverage stay ours) and never bypasses the HITL gate. Cites the PAT-catalog worked example (ALIGNMENT-PLAN Phase 3).

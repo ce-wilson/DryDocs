@@ -381,6 +381,15 @@ products:
     role: orchestrator
     type: open-source
     versions: ["3.x"]              # 3.3.0 current 2026-07; MWAA lags (3.0 / 2.4.3+)
+    documentation:
+      corpus: mwaa-implementation-docs   # -> config/doc-source-registry.yaml (Q27; atomic pair)
+      docs_version: "2026-08-07 locator" # OUR deployment's prose has no vendor release
+                                         # number — the value is the locator's recorded
+                                         # date, so currency still has both sides to compare
+      current_for: []                    # EMPTY = unverified for any runtime version; the
+                                         # computed drift line is TRUE until an SME confirms
+                                         # a capture. Registered-unconfirmed: the coverage
+                                         # rung is `ungated` until its doc-graph gate signs.
     used_by_drydocs: false          # crosswalk placeholder (airflow-mwaa source unconfirmed); flips if the source activates
 
   # --- C25 prerequisite rows (2026-08-09) -----------------------------------
@@ -433,7 +442,7 @@ products:
     # a products: row and an engine value; DPL carried only the engine value,
     # and that asymmetry has already cost something concrete: the 2026-07-27
     # G26 guard catch removed the `abinitio-dtlaunch-wrapper` pattern row
-    # because dt-launcher.sh/dtlaunch.sh is the DPL spine, and the
+    # because dt-launcher.sh/dtlaunch.sh is the DPL backbone, and the
     # coverage_policy forbids a pattern row without a real product id. This row
     # is what lets a correct DPL pattern row exist.
     # MECHANISM (internal documentation, SME-supplied 2026-08-09; the site and
@@ -552,7 +561,7 @@ invocation_patterns:
     # `abinitio.dtlaunch_accelerator` — a rule id that no longer exists. The
     # 2026-07-16 SME ruling (gate-log cmdline-lineage-review, echoed in
     # config/launcher-registry.yaml) is that dt-launcher.sh/dtlaunch.sh is
-    # the DPL accelerator spine and DPL is NOT Ab Initio. DPL has no
+    # the DPL accelerator backbone and DPL is NOT Ab Initio. DPL has no
     # `products:` row yet, and the coverage_policy forbids pattern rows
     # without a real product id — so DPL joins the gate spec's
     # candidates-without-a-product open question instead of carrying a

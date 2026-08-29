@@ -232,8 +232,10 @@ def test_committed_ledger_loads(controlm: SourceMapping) -> None:
 def test_every_object_has_a_profile_and_default_sweep(controlm: SourceMapping) -> None:
     """Every object carries a profile and sweeps its long tail. The census is
     either the Phase-0 `pending` placeholder (no count recorded) or `complete`
-    with a real column_count — the first completed census landed 2026-07-22
-    (CM_AVG_RUN P0 probe); count reconciliation is census_failures()' job."""
+    with a real column_count — the first landed 2026-07-22 (CM_AVG_RUN P0 probe)
+    and the remaining six on 2026-08-24 (doc 08 Phase 2, read-only catalog census
+    against live psgmgr, transcribed), so the ledger is now censused 7/7; count
+    reconciliation is census_failures()' job."""
     censused = set()
     for oname in _EXPECTED_OBJECTS:
         obj = controlm.get(oname)
@@ -247,7 +249,9 @@ def test_every_object_has_a_profile_and_default_sweep(controlm: SourceMapping) -
         assert obj.default_disposition is not None, oname
         assert obj.default_disposition["disposition"] == "excluded"
         assert obj.default_disposition["reason"] == "scope"
-    assert censused == {"CM_AVG_RUN"}  # extend as further P0 censuses land
+    # Doc 08 Phase 2 closed this set: every object in the ledger is censused.
+    # A NEW object arrives `pending` and must fail here until its census lands.
+    assert censused == set(_EXPECTED_OBJECTS)
 
 
 def test_vjob_projected_includes_the_audit_envelope(controlm: SourceMapping) -> None:

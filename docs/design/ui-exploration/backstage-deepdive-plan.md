@@ -63,7 +63,7 @@
 Each WP names its target paths in the clone, its output, and a rough size. Order matters:
 WP-1/WP-2 feed everything else; WP-7 is external and can run in parallel.
 
-- **WP-1 — Architecture spine read** (½ session). `docs/overview/architecture-overview/`,
+- **WP-1 — Architecture backbone read** (½ session). `docs/overview/architecture-overview/`,
   `docs/frontend-system/`, `docs/backend-system/`, `beps/`. Output: 1-page map of
   app-shell → plugin → backend-plugin → datastore flow, annotated with the DryDocs
   counterpart per layer (frame rows B, C, I).

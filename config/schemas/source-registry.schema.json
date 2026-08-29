@@ -156,6 +156,14 @@
           "notes": {
             "type": "string"
           },
+          "cadence": {
+            "description": "G79 (2026-08-23): HOW OFTEN the source refreshes — a property of the SOURCE, not of the command that reads it. cli.load_profile() DERIVES which operator surface runs a standing loader-backed step by filtering on this, so changing a feed's refresh rhythm is a registry edit rather than a hand-maintained profile tuple. A DIFFERENT AXIS from acquisition.mode (how the data arrives) and from confirmed (semantic sign-off) — the three compose on one row. weekly = a reference feed on its own slow rhythm; batch = moves with the batch estate, so every scheduled ingest wants it; repo-change = changes when the REPO changes, not when the data source does. Required only on rows a STANDING sequenced loader draws from (derived, never hand-listed); enforcement is tests/unit/test_load_sequence_surfaces.py, this schema being shape-only (S6).",
+            "enum": [
+              "weekly",
+              "batch",
+              "repo-change"
+            ]
+          },
           "acquisition": {
             "description": "N12 (2026-08-18): HOW the data arrives. manual = a hand drop into a landing zone (the expected FIRST state of every source's exploratory phase — never a defect); automated = a pull the pipeline runs. Enforcement lives in test_source_registry.py (this schema is shape-only, S6). `archive` widens the groomed csv|ascii|json enum by one value for the rua tar.gz bundle.",
             "type": "object",

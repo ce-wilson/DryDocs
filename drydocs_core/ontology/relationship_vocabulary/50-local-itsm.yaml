@@ -14,11 +14,11 @@
   # REUSED as shared qualified-attribution infrastructure; only the triples that
   # DIFFER are registered. Same call K5 made for the Cabinet and G91 for DevTeam.
   #
-  # ONE :Employee SPINE, KEYED ON THE SID. The SME's requirement is that ServiceNow
+  # ONE :Employee BACKBONE, KEYED ON THE SID. The SME's requirement is that ServiceNow
   # technicians land on the SAME hr-employee-SID as their PAT and SEAL roles, and
   # :Employee {employee_id} IS that SID (constraints.cypher). The company-side model
   # reaches people through a separate :Worker {sid} label; the producer deliberately
-  # does NOT mint that second person class — a second spine is exactly what makes
+  # does NOT mint that second person class — a second backbone is exactly what makes
   # "which roles does this person hold" unanswerable in one traversal.
   #
   # THE GROUP -> APPLICATION LINK IS NOT REGISTERED HERE. SUPPORTED_BY /

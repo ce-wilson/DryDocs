@@ -1,23 +1,2065 @@
 # Business glossary — PUBLIC terms (Internal-Public / External sources). Shape: schema.yaml (drydocs.glossary.v1).
 # Only senses whose expansion and source are public belong here; everything company-specific goes to
 # internal/glossary/terms.yaml. First entry added 2026-08-21 by user ruling (the scaffold G34 defined none).
+#
+# BULK ADDITION 2026-08-25 (user direction: "scan it for acronyms with a goal of adding them to our
+# list"): the glossary section of the JPMorgan Chase 2025 Annual Report — a PUBLIC External source —
+# extracted mechanically (pypdf over the Glossary of Terms and Acronyms pages) and added as
+# confidence: candidate, one sense each. NOTHING here is SME-confirmed; a candidate sense is a
+# starting point for decoding a token, never an assertion about what a DryDocs surface means.
+# Org-unit acronyms (AWM, BWM, CB, CCB, CIB, JPMS*) carry scope business-domain; the rest industry.
+# The source PDF is local and gitignored; the citation names the public document, not the file.
+#
+# SECOND PASS 2026-08-25 (user direction: "one more pass for the CCB sections in 2024 -- Home & Auto
+# lending terms"): the 2025 glossary already carried the home-lending core (ARM, CLTV, FHA, HELOC,
+# LGD, LTV, MBS, MSR, PD, REO, VA). Four additions from the 2024 report: TDR (formally defined
+# there, deliberately dropped from the 2025 glossary), UPB and GSE (defined/expanded inline in the
+# body, never in either glossary), and FICO (heavily used, NEVER expanded -- a brand name; flagged
+# as such in its definition). GPCC (general purpose credit card) also surfaced in the CCB pages but
+# is card lending, outside the home-and-auto ask -- noted here so the exclusion reads as a decision.
+# Fannie Mae / Ginnie Mae ARE in the report glossaries but as PHRASE keys, not acronyms (no FNMA/
+# GNMA entries exist), so they stay out of an acronym-keyed list.
+#
+# THIRD PASS 2026-08-25 (user direction: the CCB Credit Cards space + add GPCC): GPCC lands with its
+# 2024 footnote definition (excludes private label and Commercial Card). The card sweep also exposed
+# an EXTRACTION MISS in the first pass: six glossary entries sit mid-line after PDF text-join and the
+# line-start anchor never saw them -- FDM (the SUCCESSOR to TDR, which pairs with the TDR entry
+# above), GAAP, LTD, VaR, GSE(s) and CROs. Four added, GSE's sense upgraded to the glossary's own
+# definition, CROs skipped as a plural variant of the existing CRO. Card-context terms surveyed and
+# deliberately NOT added: ACH/RTP/ATM (payments rails, not card lending), CAGR (chart metric), SAR
+# (Hong Kong Special Administrative Region in this report, not suspicious-activity-report).
+#
+# FOURTH PASS 2026-08-26 (review of the three passes above): the third pass caught entries the
+# line-start anchor MISSED; this pass repairs the mirror defect it left behind — six entries whose
+# pref_label/definition swallowed the FOLLOWING glossary entry after the same PDF text-join (CCO ate
+# CCP, FDIC ate FDM, PCAOB ate PCD, PD ate the Pillar-1 phrase entry, VA ate VaR, OPEB ate a page
+# header). All six truncated to their own expansion. The two swallowed entries that had no key of
+# their own are added: CCP and PCD — the source PDF was no longer on this machine, so their
+# definitions carry only the verbatim fragment the bleed preserved, marked as such; re-extract on a
+# machine that still holds the PDF to complete them.
+#
+# FIFTH PASS 2026-08-26 (user direction: add the C-suite acronyms related to data or information
+# owners and the technical CTO; source: business.com "C-Suite Job Titles", a PUBLIC business-press
+# article): CDO lands with BOTH senses the article defines (Chief Data Officer, Chief Digital
+# Officer); CIO gains the information-officer sense beside the report glossary's investment-office
+# sense, cross-noted both ways in does_not_mean; CTO added. Surveyed and deliberately NOT added:
+# CISO (security, not ownership), CAIO (AI policy), and the rest of the article's C-suite table —
+# outside the ask. The CDO entry also backs the cdo-* config ids the same-day sanitization pass
+# introduces (its does_not_mean carries the collateralized-debt-obligation collision).
 schema: drydocs.glossary.v1
 classification: Internal-Public
 terms:
-  - acronym: DRY
-    senses:
-      - term_id: "urn:drydocs:term:technical-domain:DRY:1"
-        scope: technical-domain
-        pref_label: "Don't Repeat Yourself"
-        alt_labels: ["DRY principle"]
-        definition: >
-          Software-engineering principle (Hunt & Thomas, The Pragmatic Programmer): every piece of
-          knowledge has a single, unambiguous, authoritative representation within a system. The
-          name DryDocs takes its first syllable from it — one ledger per fact, derived views never
-          hand-maintained.
-        does_not_mean: []
-        correlates_to: [project-name]
-        evidence_ref: ["standard:https://en.wikipedia.org/wiki/Don%27t_repeat_yourself"]
-        confidence: confirmed
-        confirmed_by: user
-        confirmed_on: 2026-08-21
+- acronym: DRY
+  senses:
+  - term_id: urn:drydocs:term:technical-domain:DRY:1
+    scope: technical-domain
+    pref_label: Don't Repeat Yourself
+    alt_labels:
+    - DRY principle
+    definition: 'Software-engineering principle (Hunt & Thomas, The Pragmatic Programmer): every piece
+      of knowledge has a single, unambiguous, authoritative representation within a system. The name DryDocs
+      takes its first syllable from it — one ledger per fact, derived views never hand-maintained.
+
+      '
+    does_not_mean: []
+    correlates_to:
+    - project-name
+    evidence_ref:
+    - standard:https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
+    confidence: confirmed
+    confirmed_by: user
+    confirmed_on: 2026-08-21
+- acronym: ABS
+  senses:
+  - term_id: urn:drydocs:term:industry:ABS:1
+    scope: industry
+    pref_label: Asset-backed securities
+    alt_labels: []
+    definition: Asset-backed securities. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: AFS
+  senses:
+  - term_id: urn:drydocs:term:industry:AFS:1
+    scope: industry
+    pref_label: Available-for-sale
+    alt_labels: []
+    definition: Available-for-sale. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ALCO
+  senses:
+  - term_id: urn:drydocs:term:industry:ALCO:1
+    scope: industry
+    pref_label: Asset Liability Committee
+    alt_labels: []
+    definition: Asset Liability Committee. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: AOCI
+  senses:
+  - term_id: urn:drydocs:term:industry:AOCI:1
+    scope: industry
+    pref_label: Accumulated other comprehensive income/(loss)
+    alt_labels: []
+    definition: Accumulated other comprehensive income/(loss). Expansion per the source glossary; see
+      evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ARM(s)
+  senses:
+  - term_id: urn:drydocs:term:industry:ARM(s):1
+    scope: industry
+    pref_label: Adjustable rate mortgage(s)
+    alt_labels: []
+    definition: Adjustable rate mortgage(s). Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: AUC
+  senses:
+  - term_id: urn:drydocs:term:industry:AUC:1
+    scope: industry
+    pref_label: Assets under custody
+    alt_labels: []
+    definition: Assets under custody. Represents assets held directly or indirectly on behalf of clients
+      under safekeeping, custody and servicing arrangements.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: AUM
+  senses:
+  - term_id: urn:drydocs:term:industry:AUM:1
+    scope: industry
+    pref_label: Assets under management
+    alt_labels: []
+    definition: Assets under management. Represent assets managed by AWM on behalf of its Private Banking,
+      Institutional and Retail clients. Includes “Committed capital not Called.”.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: AWM
+  senses:
+  - term_id: urn:drydocs:term:business-domain:AWM:1
+    scope: business-domain
+    pref_label: Asset & Wealth Management
+    alt_labels: []
+    definition: Asset & Wealth Management. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: BHC
+  senses:
+  - term_id: urn:drydocs:term:industry:BHC:1
+    scope: industry
+    pref_label: Bank holding company
+    alt_labels: []
+    definition: Bank holding company. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: BWM
+  senses:
+  - term_id: urn:drydocs:term:business-domain:BWM:1
+    scope: business-domain
+    pref_label: Banking & Wealth Management
+    alt_labels: []
+    definition: Banking & Wealth Management. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CB
+  senses:
+  - term_id: urn:drydocs:term:business-domain:CB:1
+    scope: business-domain
+    pref_label: Commercial Banking
+    alt_labels: []
+    definition: Commercial Banking. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CCAR
+  senses:
+  - term_id: urn:drydocs:term:industry:CCAR:1
+    scope: industry
+    pref_label: Comprehensive Capital Analysis and Review
+    alt_labels: []
+    definition: Comprehensive Capital Analysis and Review. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CCB
+  senses:
+  - term_id: urn:drydocs:term:business-domain:CCB:1
+    scope: business-domain
+    pref_label: Consumer & Community Banking
+    alt_labels: []
+    definition: Consumer & Community Banking. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CCO
+  senses:
+  - term_id: urn:drydocs:term:industry:CCO:1
+    scope: industry
+    pref_label: Chief Compliance Officer
+    alt_labels: []
+    definition: Chief Compliance Officer. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CCP
+  senses:
+  - term_id: urn:drydocs:term:industry:CCP:1
+    scope: industry
+    pref_label: Central counterparty
+    alt_labels: []
+    definition: Central counterparty. The recovered fragment of the source entry reads "a clearing house
+      that interposes" (see the fourth-pass note above); full definition per the source glossary — see
+      evidence_ref.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CDO
+  senses:
+  - term_id: urn:drydocs:term:industry:CDO:1
+    scope: industry
+    pref_label: Chief Data Officer
+    alt_labels: []
+    definition: Oversees data-related business functions, including data management, data quality, data
+      strategy, data analytics and business intelligence — the executive data-owner role.
+    does_not_mean:
+    - Collateralized debt obligation — the structured-finance instrument, the default reading in many
+      bank-domain sources (the JPMC 2025 glossary defines CDS but not CDO). This repo's cdo-* config
+      ids take the chief-data-office sense (2026-08-26 sanitization ruling).
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+  - term_id: urn:drydocs:term:industry:CDO:2
+    scope: industry
+    pref_label: Chief Digital Officer
+    alt_labels: []
+    definition: Leads an organization's digital transformation efforts, overseeing the adoption of new
+      technologies and digital practices. The same source defines both CDO senses; sense :1 is the one
+      this repo's config ids mean.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CDS
+  senses:
+  - term_id: urn:drydocs:term:industry:CDS:1
+    scope: industry
+    pref_label: Credit default swaps
+    alt_labels: []
+    definition: Credit default swaps. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CECL
+  senses:
+  - term_id: urn:drydocs:term:industry:CECL:1
+    scope: industry
+    pref_label: Current Expected Credit Losses
+    alt_labels: []
+    definition: Current Expected Credit Losses. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CEO
+  senses:
+  - term_id: urn:drydocs:term:industry:CEO:1
+    scope: industry
+    pref_label: 'Chief Executive Officer CET1 Capital: Common equity Tier 1 capital'
+    alt_labels: []
+    definition: 'Chief Executive Officer CET1 Capital: Common equity Tier 1 capital. Expansion per the
+      source glossary; see evidence_ref for the full entry.'
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CFO
+  senses:
+  - term_id: urn:drydocs:term:industry:CFO:1
+    scope: industry
+    pref_label: Chief Financial Officer
+    alt_labels: []
+    definition: Chief Financial Officer. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CFP
+  senses:
+  - term_id: urn:drydocs:term:industry:CFP:1
+    scope: industry
+    pref_label: Contingency funding plan
+    alt_labels: []
+    definition: Contingency funding plan. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CFTC
+  senses:
+  - term_id: urn:drydocs:term:industry:CFTC:1
+    scope: industry
+    pref_label: Commodity Futures Trading Commission
+    alt_labels: []
+    definition: Commodity Futures Trading Commission. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CIB
+  senses:
+  - term_id: urn:drydocs:term:business-domain:CIB:1
+    scope: business-domain
+    pref_label: Commercial & Investment Bank
+    alt_labels: []
+    definition: Commercial & Investment Bank. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CIO
+  senses:
+  - term_id: urn:drydocs:term:industry:CIO:1
+    scope: industry
+    pref_label: Chief Investment Office
+    alt_labels: []
+    definition: Chief Investment Office. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean:
+    - Chief Information Officer — the industry C-suite technology role (sense :2 of this key); the two
+      senses collide wherever bank sources meet technology prose (flagged at the 2026-08-26 fifth pass).
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+  - term_id: urn:drydocs:term:industry:CIO:2
+    scope: industry
+    pref_label: Chief Information Officer
+    alt_labels: []
+    definition: Leads the organization in information technology (IT); owns corporate IT applications,
+      platforms and infrastructure — the executive information-owner role.
+    does_not_mean:
+    - Chief Investment Office — the JPMC annual-report glossary sense (sense :1 of this key); bank
+      filings default to the investment-office reading.
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CLO
+  senses:
+  - term_id: urn:drydocs:term:industry:CLO:1
+    scope: industry
+    pref_label: Collateralized loan obligations Glossary of Terms and Acronyms 320 JPMorgan Chase &
+    alt_labels: []
+    definition: Collateralized loan obligations Glossary of Terms and Acronyms 320 JPMorgan Chase &. Expansion
+      per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CLTV
+  senses:
+  - term_id: urn:drydocs:term:industry:CLTV:1
+    scope: industry
+    pref_label: Combined loan-to-value
+    alt_labels: []
+    definition: Combined loan-to-value. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CMT
+  senses:
+  - term_id: urn:drydocs:term:industry:CMT:1
+    scope: industry
+    pref_label: Constant Maturity Treasury
+    alt_labels: []
+    definition: Constant Maturity Treasury. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CRO
+  senses:
+  - term_id: urn:drydocs:term:industry:CRO:1
+    scope: industry
+    pref_label: Chief Risk Officer
+    alt_labels: []
+    definition: Chief Risk Officer. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CRR
+  senses:
+  - term_id: urn:drydocs:term:industry:CRR:1
+    scope: industry
+    pref_label: Capital Requirements Regulation
+    alt_labels: []
+    definition: Capital Requirements Regulation. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CTC
+  senses:
+  - term_id: urn:drydocs:term:industry:CTC:1
+    scope: industry
+    pref_label: CIO, Treasury and Corporate
+    alt_labels: []
+    definition: CIO, Treasury and Corporate. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CTO
+  senses:
+  - term_id: urn:drydocs:term:industry:CTO:1
+    scope: industry
+    pref_label: Chief Technology Officer
+    alt_labels: []
+    definition: Focuses on how a company builds and uses technology and helps identify and solve
+      technology challenges — the technical executive role.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:https://www.business.com/articles/c-suite-job-titles/ ("C-Suite Job Titles", business.com,
+      updated 2026-05-01)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: CVA
+  senses:
+  - term_id: urn:drydocs:term:industry:CVA:1
+    scope: industry
+    pref_label: Credit valuation adjustment
+    alt_labels: []
+    definition: Credit valuation adjustment. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: DVA
+  senses:
+  - term_id: urn:drydocs:term:industry:DVA:1
+    scope: industry
+    pref_label: Debit valuation adjustment
+    alt_labels: []
+    definition: Debit valuation adjustment. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: EC
+  senses:
+  - term_id: urn:drydocs:term:industry:EC:1
+    scope: industry
+    pref_label: European Commission
+    alt_labels: []
+    definition: European Commission. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: EPS
+  senses:
+  - term_id: urn:drydocs:term:industry:EPS:1
+    scope: industry
+    pref_label: Earnings per share
+    alt_labels: []
+    definition: Earnings per share. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ERISA
+  senses:
+  - term_id: urn:drydocs:term:industry:ERISA:1
+    scope: industry
+    pref_label: Employee Retirement Income Security Act of 1974
+    alt_labels: []
+    definition: Employee Retirement Income Security Act of 1974. Expansion per the source glossary; see
+      evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ESG
+  senses:
+  - term_id: urn:drydocs:term:industry:ESG:1
+    scope: industry
+    pref_label: Environmental, Social and Governance
+    alt_labels: []
+    definition: Environmental, Social and Governance. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ETD
+  senses:
+  - term_id: urn:drydocs:term:industry:ETD:1
+    scope: industry
+    pref_label: Exchange-traded derivatives
+    alt_labels: []
+    definition: Exchange-traded derivatives. Derivative contracts that are executed on an exchange and
+      settled via a central clearing house.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: EU
+  senses:
+  - term_id: urn:drydocs:term:industry:EU:1
+    scope: industry
+    pref_label: European Union
+    alt_labels: []
+    definition: European Union. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FASB
+  senses:
+  - term_id: urn:drydocs:term:industry:FASB:1
+    scope: industry
+    pref_label: Financial Accounting Standards Board
+    alt_labels: []
+    definition: Financial Accounting Standards Board. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FCA
+  senses:
+  - term_id: urn:drydocs:term:industry:FCA:1
+    scope: industry
+    pref_label: Financial Conduct Authority
+    alt_labels: []
+    definition: Financial Conduct Authority. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FCC
+  senses:
+  - term_id: urn:drydocs:term:industry:FCC:1
+    scope: industry
+    pref_label: Firmwide Control Committee
+    alt_labels: []
+    definition: Firmwide Control Committee. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FDIC
+  senses:
+  - term_id: urn:drydocs:term:industry:FDIC:1
+    scope: industry
+    pref_label: Federal Deposit Insurance Corporation
+    alt_labels: []
+    definition: Federal Deposit Insurance Corporation. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FFIEC
+  senses:
+  - term_id: urn:drydocs:term:industry:FFIEC:1
+    scope: industry
+    pref_label: Federal Financial Institutions Examination Council
+    alt_labels: []
+    definition: Federal Financial Institutions Examination Council. Expansion per the source glossary;
+      see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FHA
+  senses:
+  - term_id: urn:drydocs:term:industry:FHA:1
+    scope: industry
+    pref_label: Federal Housing Administration
+    alt_labels: []
+    definition: Federal Housing Administration. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FHLB
+  senses:
+  - term_id: urn:drydocs:term:industry:FHLB:1
+    scope: industry
+    pref_label: Federal Home Loan Bank
+    alt_labels: []
+    definition: Federal Home Loan Bank. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FICC
+  senses:
+  - term_id: urn:drydocs:term:industry:FICC:1
+    scope: industry
+    pref_label: The Fixed Income Clearing Corporation
+    alt_labels: []
+    definition: The Fixed Income Clearing Corporation. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FINRA
+  senses:
+  - term_id: urn:drydocs:term:industry:FINRA:1
+    scope: industry
+    pref_label: Financial Industry Regulatory Authority
+    alt_labels: []
+    definition: Financial Industry Regulatory Authority. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FRC
+  senses:
+  - term_id: urn:drydocs:term:industry:FRC:1
+    scope: industry
+    pref_label: Firmwide Risk Committee
+    alt_labels: []
+    definition: Firmwide Risk Committee. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FSB
+  senses:
+  - term_id: urn:drydocs:term:industry:FSB:1
+    scope: industry
+    pref_label: Financial Stability Board
+    alt_labels: []
+    definition: Financial Stability Board. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FTE
+  senses:
+  - term_id: urn:drydocs:term:industry:FTE:1
+    scope: industry
+    pref_label: Fully taxable equivalent
+    alt_labels: []
+    definition: Fully taxable equivalent. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FVA
+  senses:
+  - term_id: urn:drydocs:term:industry:FVA:1
+    scope: industry
+    pref_label: Funding valuation adjustment
+    alt_labels: []
+    definition: Funding valuation adjustment. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FX
+  senses:
+  - term_id: urn:drydocs:term:industry:FX:1
+    scope: industry
+    pref_label: 'Foreign exchange G7 Group of Seven nations: Countries in the G7 are Canada, France,'
+    alt_labels: []
+    definition: 'Foreign exchange G7 Group of Seven nations: Countries in the G7 are Canada, France, Germany,
+      Italy, Japan, the U.K. and the U.S. G7 government securities: Securities issued by the government
+      of one of the G7 nations.'
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GSIB
+  senses:
+  - term_id: urn:drydocs:term:industry:GSIB:1
+    scope: industry
+    pref_label: Global systemically important banks
+    alt_labels: []
+    definition: Global systemically important banks. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: HELOC
+  senses:
+  - term_id: urn:drydocs:term:industry:HELOC:1
+    scope: industry
+    pref_label: 'Home equity line of credit Home equity – senior lien: Represents loans and commitments'
+    alt_labels: []
+    definition: 'Home equity line of credit Home equity – senior lien: Represents loans and commitments.
+      Expansion per the source glossary; see evidence_ref for the full entry.'
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: HQLA
+  senses:
+  - term_id: urn:drydocs:term:industry:HQLA:1
+    scope: industry
+    pref_label: High-quality liquid assets
+    alt_labels: []
+    definition: High-quality liquid assets. Also refer to Eligible HQLA.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: HTM
+  senses:
+  - term_id: urn:drydocs:term:industry:HTM:1
+    scope: industry
+    pref_label: Held-to-maturity
+    alt_labels: []
+    definition: Held-to-maturity. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: IBOR
+  senses:
+  - term_id: urn:drydocs:term:industry:IBOR:1
+    scope: industry
+    pref_label: Interbank Offered Rate
+    alt_labels: []
+    definition: Interbank Offered Rate. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ICAAP
+  senses:
+  - term_id: urn:drydocs:term:industry:ICAAP:1
+    scope: industry
+    pref_label: Internal capital adequacy assessment process
+    alt_labels: []
+    definition: Internal capital adequacy assessment process. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: IDI
+  senses:
+  - term_id: urn:drydocs:term:industry:IDI:1
+    scope: industry
+    pref_label: Insured depository institutions
+    alt_labels: []
+    definition: Insured depository institutions. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: IHC
+  senses:
+  - term_id: urn:drydocs:term:industry:IHC:1
+    scope: industry
+    pref_label: JPMorgan Chase Holdings LLC, an intermediate holding company
+    alt_labels: []
+    definition: JPMorgan Chase Holdings LLC, an intermediate holding company. Expansion per the source
+      glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: IPO
+  senses:
+  - term_id: urn:drydocs:term:industry:IPO:1
+    scope: industry
+    pref_label: Initial public offering
+    alt_labels: []
+    definition: Initial public offering. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: IR
+  senses:
+  - term_id: urn:drydocs:term:industry:IR:1
+    scope: industry
+    pref_label: Interest rate
+    alt_labels: []
+    definition: Interest rate. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ISDA
+  senses:
+  - term_id: urn:drydocs:term:industry:ISDA:1
+    scope: industry
+    pref_label: International Swaps and Derivatives Association
+    alt_labels: []
+    definition: International Swaps and Derivatives Association. Expansion per the source glossary; see
+      evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: JPMSE
+  senses:
+  - term_id: urn:drydocs:term:business-domain:JPMSE:1
+    scope: business-domain
+    pref_label: J.P. Morgan SE
+    alt_labels: []
+    definition: J.P. Morgan SE. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LCR
+  senses:
+  - term_id: urn:drydocs:term:industry:LCR:1
+    scope: industry
+    pref_label: Liquidity coverage ratio
+    alt_labels: []
+    definition: Liquidity coverage ratio. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LDA
+  senses:
+  - term_id: urn:drydocs:term:industry:LDA:1
+    scope: industry
+    pref_label: Loss Distribution Approach
+    alt_labels: []
+    definition: Loss Distribution Approach. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LGD
+  senses:
+  - term_id: urn:drydocs:term:industry:LGD:1
+    scope: industry
+    pref_label: Loss given default
+    alt_labels: []
+    definition: Loss given default. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LIBOR
+  senses:
+  - term_id: urn:drydocs:term:industry:LIBOR:1
+    scope: industry
+    pref_label: London Interbank Offered Rate
+    alt_labels: []
+    definition: London Interbank Offered Rate. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LLC
+  senses:
+  - term_id: urn:drydocs:term:industry:LLC:1
+    scope: industry
+    pref_label: Limited Liability Company
+    alt_labels: []
+    definition: Limited Liability Company. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LOB
+  senses:
+  - term_id: urn:drydocs:term:industry:LOB:1
+    scope: industry
+    pref_label: Line of business
+    alt_labels: []
+    definition: Line of business. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LTIP
+  senses:
+  - term_id: urn:drydocs:term:industry:LTIP:1
+    scope: industry
+    pref_label: Long-term incentive plan
+    alt_labels: []
+    definition: Long-term incentive plan. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LTV
+  senses:
+  - term_id: urn:drydocs:term:industry:LTV:1
+    scope: industry
+    pref_label: Loan-to-value
+    alt_labels: []
+    definition: Loan-to-value. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: MBS
+  senses:
+  - term_id: urn:drydocs:term:industry:MBS:1
+    scope: industry
+    pref_label: Mortgage-backed securities
+    alt_labels: []
+    definition: Mortgage-backed securities. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: MD&A
+  senses:
+  - term_id: urn:drydocs:term:industry:MD&A:1
+    scope: industry
+    pref_label: Management’s discussion and analysis
+    alt_labels: []
+    definition: Management’s discussion and analysis. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: MEVs
+  senses:
+  - term_id: urn:drydocs:term:industry:MEVs:1
+    scope: industry
+    pref_label: Macroeconomic variables
+    alt_labels: []
+    definition: Macroeconomic variables. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: MREL
+  senses:
+  - term_id: urn:drydocs:term:industry:MREL:1
+    scope: industry
+    pref_label: Minimum requirements for own funds and eligible liabilities
+    alt_labels: []
+    definition: Minimum requirements for own funds and eligible liabilities. Expansion per the source
+      glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: MSR
+  senses:
+  - term_id: urn:drydocs:term:industry:MSR:1
+    scope: industry
+    pref_label: Mortgage servicing rights
+    alt_labels: []
+    definition: Mortgage servicing rights. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: NA
+  senses:
+  - term_id: urn:drydocs:term:industry:NA:1
+    scope: industry
+    pref_label: Data is not applicable or available for the period presented
+    alt_labels: []
+    definition: Data is not applicable or available for the period presented.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: NAV
+  senses:
+  - term_id: urn:drydocs:term:industry:NAV:1
+    scope: industry
+    pref_label: Net Asset Value
+    alt_labels: []
+    definition: Net Asset Value. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: NFA
+  senses:
+  - term_id: urn:drydocs:term:industry:NFA:1
+    scope: industry
+    pref_label: National Futures Association
+    alt_labels: []
+    definition: National Futures Association. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: NM
+  senses:
+  - term_id: urn:drydocs:term:industry:NM:1
+    scope: industry
+    pref_label: Not meaningful
+    alt_labels: []
+    definition: Not meaningful. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: NOL
+  senses:
+  - term_id: urn:drydocs:term:industry:NOL:1
+    scope: industry
+    pref_label: Net operating loss
+    alt_labels: []
+    definition: Net operating loss. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: NSFR
+  senses:
+  - term_id: urn:drydocs:term:industry:NSFR:1
+    scope: industry
+    pref_label: Net Stable Funding Ratio
+    alt_labels: []
+    definition: Net Stable Funding Ratio. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: OAS
+  senses:
+  - term_id: urn:drydocs:term:industry:OAS:1
+    scope: industry
+    pref_label: Option-adjusted spread
+    alt_labels: []
+    definition: Option-adjusted spread. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: OCC
+  senses:
+  - term_id: urn:drydocs:term:industry:OCC:1
+    scope: industry
+    pref_label: Office of the Comptroller of the Currency
+    alt_labels: []
+    definition: Office of the Comptroller of the Currency. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: OCI
+  senses:
+  - term_id: urn:drydocs:term:industry:OCI:1
+    scope: industry
+    pref_label: Other comprehensive income/(loss)
+    alt_labels: []
+    definition: Other comprehensive income/(loss). Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: OPEB
+  senses:
+  - term_id: urn:drydocs:term:industry:OPEB:1
+    scope: industry
+    pref_label: Other postretirement employee benefit
+    alt_labels: []
+    definition: Other postretirement employee benefit. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: PCAOB
+  senses:
+  - term_id: urn:drydocs:term:industry:PCAOB:1
+    scope: industry
+    pref_label: Public Company Accounting Oversight Board
+    alt_labels: []
+    definition: Public Company Accounting Oversight Board. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: PCD
+  senses:
+  - term_id: urn:drydocs:term:industry:PCD:1
+    scope: industry
+    pref_label: Purchased credit deteriorated
+    alt_labels: []
+    definition: Purchased credit deteriorated assets ("assets" is the recovered start of the source entry;
+      see the fourth-pass note above). Full definition per the source glossary — see evidence_ref.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: PD
+  senses:
+  - term_id: urn:drydocs:term:industry:PD:1
+    scope: industry
+    pref_label: Probability of default
+    alt_labels: []
+    definition: Probability of default. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: PRA
+  senses:
+  - term_id: urn:drydocs:term:industry:PRA:1
+    scope: industry
+    pref_label: Prudential Regulation Authority
+    alt_labels: []
+    definition: Prudential Regulation Authority. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: PSU(s)
+  senses:
+  - term_id: urn:drydocs:term:industry:PSU(s):1
+    scope: industry
+    pref_label: Performance share units
+    alt_labels: []
+    definition: Performance share units. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: REO
+  senses:
+  - term_id: urn:drydocs:term:industry:REO:1
+    scope: industry
+    pref_label: Real estate owned
+    alt_labels: []
+    definition: Real estate owned. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: RHS
+  senses:
+  - term_id: urn:drydocs:term:industry:RHS:1
+    scope: industry
+    pref_label: Rural Housing Service of the U.S. Department of Agriculture
+    alt_labels: []
+    definition: Rural Housing Service of the U.S. Department of Agriculture. Expansion per the source
+      glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ROA
+  senses:
+  - term_id: urn:drydocs:term:industry:ROA:1
+    scope: industry
+    pref_label: Return on assets
+    alt_labels: []
+    definition: Return on assets. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ROE
+  senses:
+  - term_id: urn:drydocs:term:industry:ROE:1
+    scope: industry
+    pref_label: Return on equity
+    alt_labels: []
+    definition: Return on equity. Expansion per the source glossary; see evidence_ref for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: ROTCE
+  senses:
+  - term_id: urn:drydocs:term:industry:ROTCE:1
+    scope: industry
+    pref_label: Return on tangible common equity
+    alt_labels: []
+    definition: Return on tangible common equity. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: RSU(s)
+  senses:
+  - term_id: urn:drydocs:term:industry:RSU(s):1
+    scope: industry
+    pref_label: Restricted stock units
+    alt_labels: []
+    definition: Restricted stock units. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: RWA
+  senses:
+  - term_id: urn:drydocs:term:industry:RWA:1
+    scope: industry
+    pref_label: Risk-weighted assets
+    alt_labels: []
+    definition: Risk-weighted assets. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: S&P
+  senses:
+  - term_id: urn:drydocs:term:industry:S&P:1
+    scope: industry
+    pref_label: Standard and Poor’s
+    alt_labels: []
+    definition: Standard and Poor’s. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: SCB
+  senses:
+  - term_id: urn:drydocs:term:industry:SCB:1
+    scope: industry
+    pref_label: Stress capital buffer
+    alt_labels: []
+    definition: Stress capital buffer. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: SEC
+  senses:
+  - term_id: urn:drydocs:term:industry:SEC:1
+    scope: industry
+    pref_label: U.S. Securities and Exchange Commission
+    alt_labels: []
+    definition: U.S. Securities and Exchange Commission. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: SLR
+  senses:
+  - term_id: urn:drydocs:term:industry:SLR:1
+    scope: industry
+    pref_label: Supplementary leverage ratio
+    alt_labels: []
+    definition: Supplementary leverage ratio. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: SMBS
+  senses:
+  - term_id: urn:drydocs:term:industry:SMBS:1
+    scope: industry
+    pref_label: Stripped mortgage-backed securities
+    alt_labels: []
+    definition: Stripped mortgage-backed securities. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: SOFR
+  senses:
+  - term_id: urn:drydocs:term:industry:SOFR:1
+    scope: industry
+    pref_label: Secured Overnight Financing Rate
+    alt_labels: []
+    definition: Secured Overnight Financing Rate. Expansion per the source glossary; see evidence_ref
+      for the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: SPEs
+  senses:
+  - term_id: urn:drydocs:term:industry:SPEs:1
+    scope: industry
+    pref_label: Special purpose entities
+    alt_labels: []
+    definition: Special purpose entities. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: TBVPS
+  senses:
+  - term_id: urn:drydocs:term:industry:TBVPS:1
+    scope: industry
+    pref_label: Tangible book value per share
+    alt_labels: []
+    definition: Tangible book value per share. Expansion per the source glossary; see evidence_ref for
+      the full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: TCE
+  senses:
+  - term_id: urn:drydocs:term:industry:TCE:1
+    scope: industry
+    pref_label: Tangible common equity
+    alt_labels: []
+    definition: Tangible common equity. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: TLAC
+  senses:
+  - term_id: urn:drydocs:term:industry:TLAC:1
+    scope: industry
+    pref_label: 'Total Loss Absorbing Capacity U.K.: United Kingdom'
+    alt_labels: []
+    definition: 'Total Loss Absorbing Capacity U.K.: United Kingdom. Expansion per the source glossary;
+      see evidence_ref for the full entry.'
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: VA
+  senses:
+  - term_id: urn:drydocs:term:industry:VA:1
+    scope: industry
+    pref_label: U.S. Department of Veterans Affairs
+    alt_labels: []
+    definition: U.S. Department of Veterans Affairs. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: VCG
+  senses:
+  - term_id: urn:drydocs:term:industry:VCG:1
+    scope: industry
+    pref_label: Valuation Control Group
+    alt_labels: []
+    definition: Valuation Control Group. Expansion per the source glossary; see evidence_ref for the full
+      entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: VGF
+  senses:
+  - term_id: urn:drydocs:term:industry:VGF:1
+    scope: industry
+    pref_label: Valuation Governance Forum
+    alt_labels: []
+    definition: Valuation Governance Forum. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: VIEs
+  senses:
+  - term_id: urn:drydocs:term:industry:VIEs:1
+    scope: industry
+    pref_label: Variable interest entities
+    alt_labels: []
+    definition: Variable interest entities. Expansion per the source glossary; see evidence_ref for the
+      full entry.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms (pp. 352-359 of the
+      PDF)
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: TDR
+  senses:
+  - term_id: urn:drydocs:term:industry:TDR:1
+    scope: industry
+    pref_label: Troubled debt restructuring
+    alt_labels: []
+    definition: 'Troubled debt restructuring. Per the 2024 report glossary: applies to loan modifications
+      granted prior to January 1, 2023; the 2025 glossary DROPS the entry because the accounting concept
+      retired for later modifications -- a TDR seen in data is a pre-2023 fact.'
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - Glossary of Terms and Acronyms
+    - note:absent from the 2025 glossary by design (ASU 2022-02); 3 residual uses in the 2025 body
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: UPB
+  senses:
+  - term_id: urn:drydocs:term:industry:UPB:1
+    scope: industry
+    pref_label: Unpaid principal balance
+    alt_labels: []
+    definition: Unpaid principal balance -- the remaining principal owed on a loan, the balance home-lending
+      tables are presented at.
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - inline definition in the consumer lending tables
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GSE
+  senses:
+  - term_id: urn:drydocs:term:industry:GSE:1
+    scope: industry
+    pref_label: U.S. government-sponsored enterprises
+    alt_labels: []
+    definition: 'Quasi-governmental, privately-held entities established or chartered by the U.S. government
+      to serve public purposes specified by Congress, improving the flow of credit to specific sectors
+      (Fannie Mae, Freddie Mac). UPGRADED from the earlier prose-cited sense: the 2025 glossary defines
+      GSE(s) formally under the quoted-key form the first extraction missed.'
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms - the GSE(s) entry
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FICO
+  senses:
+  - term_id: urn:drydocs:term:industry:FICO:1
+    scope: industry
+    pref_label: FICO score (Fair Isaac Corporation consumer credit score)
+    alt_labels: []
+    definition: Consumer credit score used throughout the home- and auto-lending credit-quality tables
+      (FICO score bands beside LTV ratios). THE REPORTS NEVER EXPAND IT -- 26-27 uses in each year, always
+      bare, because it is a brand name; the expansion here is the standard industry reading, not the source's.
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report and standard:JPMorgan Chase 2025 Annual Report - used
+      unexpanded in the credit-quality disclosures
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GPCC
+  senses:
+  - term_id: urn:drydocs:term:industry:GPCC:1
+    scope: industry
+    pref_label: General purpose credit card
+    alt_labels: []
+    definition: 'General purpose credit card. Per the 2024 report footnote: GPCC spend excludes private
+      label and Commercial Card -- the category boundary matters when reading card sales-volume figures.'
+    does_not_mean: []
+    correlates_to:
+    - card-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2024 Annual Report - inline definition, CCB card-spend footnote
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: FDM
+  senses:
+  - term_id: urn:drydocs:term:industry:FDM:1
+    scope: industry
+    pref_label: Financial difficulty modification
+    alt_labels: []
+    definition: 'Financial difficulty modification -- THE SUCCESSOR TO TDR. Applies to loan modifications
+      effective January 1, 2023 (principal forgiveness, interest rate reduction, other-than-insignificant
+      payment delay, term extension, or combinations). Read with this file''s TDR entry: TDR = pre-2023
+      modifications, FDM = 2023 onward. Card-loan FDMs are the stated exception to the nonaccrual-placement
+      norm.'
+    does_not_mean: []
+    correlates_to:
+    - home-lending
+    - card-lending
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    - standard:JPMorgan Chase 2024 Annual Report - same entry
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: GAAP
+  senses:
+  - term_id: urn:drydocs:term:industry:GAAP:1
+    scope: industry
+    pref_label: Accounting principles generally accepted in the U.S.
+    alt_labels: []
+    definition: Accounting principles generally accepted in the United States of America.
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: LTD
+  senses:
+  - term_id: urn:drydocs:term:industry:LTD:1
+    scope: industry
+    pref_label: Long-term debt
+    alt_labels: []
+    definition: Long-term debt satisfying certain eligibility criteria (the report's capital/TLAC usage).
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null
+- acronym: VaR
+  senses:
+  - term_id: urn:drydocs:term:industry:VaR:1
+    scope: industry
+    pref_label: Value-at-risk
+    alt_labels: []
+    definition: A measure of the dollar amount of potential loss from adverse market moves in an ordinary
+      market environment. The glossary separately defines Regulatory VaR (daily aggregated VaR under regulatory
+      rules).
+    does_not_mean: []
+    correlates_to: []
+    evidence_ref:
+    - standard:JPMorgan Chase 2025 Annual Report - Glossary of Terms and Acronyms
+    confidence: candidate
+    confirmed_by: null
+    confirmed_on: null

@@ -166,7 +166,9 @@ poetry run python -c "import yaml; print(yaml.safe_load(open('config/dev-environ
 `config/dev-environment.yaml` is the canonical list, and
 `tests/unit/test_dev_environment.py` holds it BIDIRECTIONALLY against
 `01_databases.cypher` — a database in one and not the other fails the suite. Every name
-it reports should come back `online` from `SHOW DATABASES`, plus the composite `ddall`.
+it reports should come back `online` from `SHOW DATABASES`. Since the G32/G102 fold
+(2026-08-18) that list is `drydocs` + `ddschema`; the composite `ddall` retired with its
+second constituent, so a container still showing it predates the fold and owes a drop.
 
 **3. The vocabulary registry is coherent.** These are guards, so run them rather than
 reading the file:

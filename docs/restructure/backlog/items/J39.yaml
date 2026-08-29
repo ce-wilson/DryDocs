@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - .claude/skills/reconcile-port/SKILL.md
@@ -17,3 +17,21 @@ acceptance: |
   Each of the six advances is DISPOSITIONED — reproduced producer-side mechanism-only (no company values) or recorded in the reconcile-port divergence ledger with the reason and the trigger that would change it: the snow-support schema supplement pair (hpsm_queue_key / sn_group_name) plus the snow-snowflake-itsm source stub; the drydocs_remediation DPL watch-drift rule and its tests; the graph_verify Assertion refactor; the docgen deviations against the finalized company TDD; the CONFLUENCE_BASE_URL config seam (mechanism = base-URL as config, the value stays company-side); and the controlm_folders.sql `J` table alias. None is left undecided, and anything that touches edge meaning is registered `planned` and routed to its gate rather than adopted here.
 notes: |
   Groomed 2026-08-07 (pm) from Idea-19 (bd7952f follow-up 3). Module docs and epic J because the deliverable is a disposition record per advance, not one component's code — the reproductions that follow are separate items in their own modules. Motivation, in the entry's own words: until these land, every port repeats the squash-reconcile instead of a clean linear apply. The 2026-07-20 bundle port went bidirectional (+288 producer / +148 company) precisely because they never came back.
+  DONE 2026-08-26 (desktop). All six advances DISPOSITIONED -- one reproduced, five
+  ledgered with reason + named trigger, in one consolidated reconcile-port divergence-ledger
+  entry. REPRODUCED: the controlm_folders.sql J table alias (H -> J, provenance comment in
+  the file; the two alias-pinning guards updated with the J39 cite -- the only advance whose
+  full content was visible from the diff shape). LEDGERED: the snow-support pair +
+  snow-snowflake-itsm stub (partially superseded by G100's :ServiceNowGroup; trigger = the
+  snow loader build after Q4 signs -- constraints without a loader are dead DDL); the DPL
+  watch-drift rule (content never seen producer-side; reproducing a detector from its name
+  manufactures semantics; trigger = the screenshot channel or the drydocs-review epic
+  delivering the rule body, landing as an R-rule like R41-R44); the graph_verify Assertion
+  refactor (the module itself is company-only; rides the drydocs-review epic wholesale);
+  the CONFLUENCE_BASE_URL seam (right mechanism, no consumer -- a seam with no connector is
+  dead config; trigger = the confluence connector build, the seam ships WITH it). OVERTAKEN
+  AND CLOSED: the docgen deviations vs the finalized company TDD -- the renderer converged
+  through the L-epic fixes and J43 (same day) ruled the TDD renders `derived`, so a
+  deviation list against a frozen render is a category that no longer exists; any future
+  semantic loss in their regeneration is a renderer BUG, not a deviation. Nothing touching
+  edge meaning was adopted outside a gate.

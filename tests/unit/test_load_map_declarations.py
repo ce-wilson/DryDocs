@@ -20,6 +20,8 @@ from __future__ import annotations
 import importlib
 import pkgutil
 
+import pytest
+
 import drydocs.loaders as loaders_pkg
 from drydocs import cli
 from drydocs.loaders.base import BaseLoader
@@ -144,7 +146,7 @@ def test_chain_constants_agree_with_the_loader_registry():
     """The (cli name, class) pairs in the chain constants must be the SAME
     binding LOADER_REGISTRY carries — a renamed key or swapped class here
     would run one loader while reporting another."""
-    pairs = [(nm, cls) for nm, cls, _ in cli.REFRESH_REFERENCE_CHAIN]
+    pairs = [(nm, cls) for nm, cls, _ in cli.chain_steps()]
     pairs += [
         (nm, cls)
         for nm, cls, *_ in (
@@ -170,6 +172,69 @@ def test_every_concrete_loader_is_reachable_or_ad_hoc():
         f"Concrete loader(s) no declared command runs and `load` cannot reach: "
         f"{orphans} — declare them in COMMAND_LOADERS or LOADER_REGISTRY."
     )
+
+
+# ---- G80: registry membership alone is not reachability ----------------------
+
+
+def test_no_registry_loader_is_silently_unchained():
+    """G80: the test above accepts bare LOADER_REGISTRY membership, which is
+    exactly how area_products and pat_team_roles sat runnable-by-name while no
+    operator path ever ran them. A registry loader in NO command's chain fails
+    BY NAME unless cli.UNCHAINED_LOADER_EXCLUSIONS carries its written reason
+    (the G59 unchained-supplement guard, one registry over)."""
+    missing = cli.unchained_loaders()
+    assert not missing, (
+        f"LOADER_REGISTRY loader(s) no declared command runs and no written "
+        f"reason excuses: {list(missing)} — wire each into a COMMAND_LOADERS "
+        "chain or add it to UNCHAINED_LOADER_EXCLUSIONS with a written reason."
+    )
+
+
+def test_unchained_exclusions_are_real_unchained_and_carry_reasons():
+    """Exclusion hygiene (the SCHEDULED_INGEST_EXCLUSIONS idiom): every entry
+    names a registry loader (else stale), one that is NOT in any chain (else
+    contradictory — this is what forces G79 to delete the exclusion when it
+    wires the orphan), and carries a sentence, not a token."""
+    chained = {cls for classes in cli.COMMAND_LOADERS.values() for cls in classes}
+    for name, reason in cli.UNCHAINED_LOADER_EXCLUSIONS.items():
+        assert name in cli.LOADER_REGISTRY, f"stale exclusion: {name!r} not in LOADER_REGISTRY"
+        assert cli.LOADER_REGISTRY[name] not in chained, (
+            f"{name!r} is excluded AND chained — contradictory; delete the " "exclusion"
+        )
+        assert len(reason.split()) >= 5, f"{name!r}: the reason must be a sentence, not a token"
+
+
+def test_unchained_detection_names_the_loader(monkeypatch):
+    """The guard actually fires: a registry entry no chain runs is reported by
+    NAME, not swallowed into a count — repo-agnostic (a synthetic orphan, not a
+    pinned producer membership, so the consumer repo's differing chains pass)."""
+
+    class _OrphanProbeLoader:
+        pass
+
+    monkeypatch.setitem(cli.LOADER_REGISTRY, "orphan_probe", _OrphanProbeLoader)
+    assert "orphan_probe" in cli.unchained_loaders()
+    # and the excused set stays out of the failure list
+    for name in cli.UNCHAINED_LOADER_EXCLUSIONS:
+        assert name not in cli.unchained_loaders()
+
+
+def test_generated_sample_declarations_are_real_and_carry_reasons():
+    """GENERATED_SAMPLE_FILES hygiene: every entry names a file some chain
+    actually declares (else stale), and says how to build it."""
+    declared = {sample for _nm, _cls, sample in cli.chain_steps()}
+    declared |= {
+        sample
+        for _nm, _cls, sample, _sql in (
+            cli.CONTROLM_NODE_STAGES + cli.CONTROLM_PART2_STAGES + cli.CONTROLM_REL_STAGES
+        )
+    }
+    for filename, reason in cli.GENERATED_SAMPLE_FILES.items():
+        assert (
+            filename in declared
+        ), f"stale GENERATED_SAMPLE_FILES entry: {filename!r} is declared by no chain"
+        assert len(reason.split()) >= 5, f"{filename!r}: say how to build it, not a token"
 
 
 # ---- (3) the canonical sequence ---------------------------------------------
@@ -215,3 +280,122 @@ def test_ad_hoc_commands_are_real():
         assert (
             command in registered
         ), f"AD_HOC_COMMANDS names {command!r}, not a registered command."
+
+
+# ---- G79 (e): the load-order invariant is declared, not accidental -----------
+
+
+def test_application_identity_loads_before_any_business_application_minter():
+    """seal_applications must run BEFORE anything that can MINT a
+    :BusinessApplication. The producer satisfied this only as a POSITION IN A
+    TUPLE, which is exactly what a chain split loses; asserting it against the
+    SEQUENCE is what makes the next reorder fail loudly instead of silently."""
+    order = {step.command: i for i, step in enumerate(cli.CANONICAL_LOAD_SEQUENCE)}
+    commands_of = {}
+    for command, classes in cli.COMMAND_LOADERS.items():
+        if command in cli.AD_HOC_COMMANDS:
+            continue  # an alias delegates; it is not a sequence position
+        for cls in classes:
+            commands_of.setdefault(cls, []).append(command)
+
+    identity_cmds = commands_of.get(cli.APPLICATION_IDENTITY_LOADER, [])
+    assert identity_cmds, (
+        f"{cli.APPLICATION_IDENTITY_LOADER.__name__} is the declared identity "
+        "authority but no sequenced command runs it."
+    )
+    earliest_identity = min(order[c] for c in identity_cmds if c in order)
+
+    for minter in cli.BUSINESS_APPLICATION_MINTERS:
+        for command in commands_of.get(minter, []):
+            if command not in order:
+                continue
+            assert order[command] > earliest_identity, (
+                f"{minter.__name__} runs in {command!r} at sequence position "
+                f"{order[command]}, at or before the application-identity loader "
+                f"{cli.APPLICATION_IDENTITY_LOADER.__name__} ({earliest_identity}). "
+                "SEAL is the authority for application identity — a minter reaching "
+                "an application node first decides that identity by accident of "
+                "order (G79 (e); the company's RELAY-8 collision)."
+            )
+
+
+def test_declared_minters_are_real_loaders_that_a_command_runs():
+    """Hygiene: a minter naming a loader nothing runs is a stale declaration, and
+    the invariant above would pass vacuously over it."""
+    concrete = _concrete_loader_classes()
+    runnable = {cls for classes in cli.COMMAND_LOADERS.values() for cls in classes}
+    for cls in cli.BUSINESS_APPLICATION_MINTERS | {cli.APPLICATION_IDENTITY_LOADER}:
+        assert cls in concrete, f"{cls.__name__} is not a concrete loader — stale declaration"
+        assert cls in runnable, f"{cls.__name__} is declared but no command runs it"
+
+
+# ---- G79 (c): profiles DERIVE from cadence, with no cli edit -----------------
+
+
+def test_flipping_a_sources_cadence_moves_the_command_between_surfaces():
+    """THE CONTRACT the derivation exists for: a feed's rhythm changes in the
+    REGISTRY and the operator surfaces follow, with no edit to this package.
+
+    Driven over a fixture registry rather than the real one — the point is the
+    mechanism, and a test that edited config/ would be changing the answer it
+    checks."""
+
+    class _FakeSource:
+        def __init__(self, cadence):
+            self.cadence = cadence
+
+    class _FakeRegistry:
+        def __init__(self, cadence):
+            self._cadence = cadence
+
+        def get(self, _sid):
+            return _FakeSource(self._cadence)
+
+    step = next(s for s in cli.CANONICAL_LOAD_SEQUENCE if s.command == "refresh-catalog")
+    assert step.profiles is None, "refresh-catalog should derive its profiles, not declare them"
+
+    weekly = cli.step_profiles(step, registry=_FakeRegistry("weekly"))
+    batch = cli.step_profiles(step, registry=_FakeRegistry("batch"))
+
+    assert weekly == frozenset({"cold-start"})
+    assert batch == frozenset({"cold-start", "scheduled-ingest"})
+    assert "scheduled-ingest" not in weekly and "scheduled-ingest" in batch, (
+        "flipping the source's cadence must move the command between operator "
+        "surfaces — that is what makes 'the source dictates how often it "
+        "refreshes' true in code rather than in a comment (G79 (c))."
+    )
+
+
+def test_a_command_whose_sources_disagree_about_cadence_raises():
+    """The divergence rule. A command may read several sources, but they must
+    share a rhythm — otherwise which surface runs it has no honest answer, and
+    picking one silently is the hand-maintained-tuple failure all over again."""
+
+    class _SplitRegistry:
+        def __init__(self, mapping):
+            self._mapping = mapping
+
+        def get(self, sid):
+            return type("S", (), {"cadence": self._mapping[sid]})()
+
+    step = next(s for s in cli.CANONICAL_LOAD_SEQUENCE if s.command == "refresh-teams")
+    sources = cli.step_sources("refresh-teams")
+    assert len(sources) > 1, "refresh-teams should read more than one source for this test"
+    split = dict.fromkeys(sources, "weekly")
+    split[sources[0]] = "batch"
+
+    with pytest.raises(cli.CadenceDerivationError, match="DIFFERENT cadences"):
+        cli.step_profiles(step, registry=_SplitRegistry(split))
+
+
+def test_a_derived_step_with_an_undeclared_cadence_fails_loud():
+    """Never a silent empty set: a DERIVED step whose source declares no cadence
+    must raise, not quietly run on no surface at all."""
+
+    class _BlankRegistry:
+        def get(self, _sid):
+            return type("S", (), {"cadence": None})()
+
+    step = next(s for s in cli.CANONICAL_LOAD_SEQUENCE if s.command == "refresh-catalog")
+    with pytest.raises(cli.CadenceDerivationError, match="no.*cadence"):
+        cli.step_profiles(step, registry=_BlankRegistry())

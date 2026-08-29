@@ -1,0 +1,78 @@
+# =============================================================================
+# taxonomy-ontology-map — CORPORATE domain fragment (S5 fragment directory;
+# merged in sorted-filename order; read the merged document, never one file)
+# =============================================================================
+# NEW FILE at C28 (2026-08-25). The corporate domain minted at G98 (gate
+# corporate-backbone-vocabulary, SIGNED 19/19 2026-08-17) but its two signed
+# edges predate map discipline for this domain and are seeded by
+# ontology.cypher; THIS fragment starts the domain's map with the C28 gate's
+# three reservations. All three are `proposed` — the decision-matrix entries the
+# C28 acceptance requires — and gate `business-layer-org-structure` is the one
+# session that rules them. Nothing here is confirmed; no loader exists.
+
+  - id: company-has-sub-organization
+    taxonomy:
+      source: "doc-source-registry#jpmc-reports"
+      element: "The Firm's legal-entity layer: the national bank subsidiary (its own HQ) + eight public subsidiaries at country grain, one inactive (2026-08-08 business-layer experiment, public sources only)"
+    ontology:
+      from_node: Company
+      to_node: Company                      # DELIBERATE — whether a :LegalEntity label is warranted is the gate's §D1 question; the reservation follows the answer (the C26 lesson)
+      matrix_row: "local corporate hierarchy (no PROV row)"
+      neo4j_label: HAS_SUB_ORGANIZATION
+      prov_maps_to: ~
+      vocab_id: corporate_has_sub_organization
+    precedence_authority: lob-product-team
+    capture: >
+      waived — reservation only. No producer taxonomy capture carries the
+      legal-entity layer; adopting one is downstream of the gate's §D1 label
+      ruling.
+    status: proposed
+    depends_on: ~
+    proposed_at: 2026-08-25
+    open_questions:
+      - "§D1: does the legal-entity layer reuse :Company for both endpoints, or is a distinct label warranted? The CLAUDE.md never-invent warning cuts both ways — minting for convenience AND stretching a wrong existing label are both the named failure."
+      - "§D2 (inherited, not re-ruled): lifecycle as a property — how `inactive` is modelled rides the same future work G98 §B4 named for retired: true on :BusinessSegment."
+
+  - id: org-change-original
+    taxonomy:
+      source: "doc-source-registry#jpmc-reports"
+      element: "2Q2024 reorg, pre-change side: the former CIB and CB segments the merge consumed (2024 annual report p104; the experiment's org:ChangeEvent row)"
+    ontology:
+      from_node: OrgChangeEvent
+      to_node: BusinessSegment
+      matrix_row: "local corporate change event (ORG-PROV alignment: prov:Activity)"
+      neo4j_label: ORIGINAL_ORGANIZATION
+      prov_maps_to: ~
+      vocab_id: corporate_change_original
+    precedence_authority: lob-product-team
+    capture: >
+      waived — reservation only, and the WHOLE reification may be declined at
+      the gate's §B2 (one fact, three encodings — G98 §B2's own cost argument
+      extended). The reservation exists so a port cannot take the name while
+      the question is open.
+    status: proposed
+    depends_on: ~
+    proposed_at: 2026-08-25
+    open_questions:
+      - "§B2: adopt the event node, or decline and record the re-arm trigger (a re-org richer than a two-into-one merge — a split, a transfer — which dated edges express poorly)."
+
+  - id: org-change-resulting
+    taxonomy:
+      source: "doc-source-registry#jpmc-reports"
+      element: "2Q2024 reorg, post-change side: the merged CIB segment (2024 annual report p104)"
+    ontology:
+      from_node: OrgChangeEvent
+      to_node: BusinessSegment
+      matrix_row: "local corporate change event (ORG-PROV alignment: prov:Activity)"
+      neo4j_label: RESULTING_ORGANIZATION
+      prov_maps_to: ~
+      vocab_id: corporate_change_resulting
+    precedence_authority: lob-product-team
+    capture: >
+      waived — reservation only; the §B sibling of org-change-original, ruled
+      with it or declined with it, never separately.
+    status: proposed
+    depends_on: ~
+    proposed_at: 2026-08-25
+    open_questions:
+      - "§B3: the same event renamed CIB's expansion (Corporate & Investment Bank -> Commercial & Investment Bank). If the event node is adopted it anchors that history; if declined, the glossary's CIB sense carries it alone. Which surface owns the rename story?"

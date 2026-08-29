@@ -78,6 +78,8 @@ def test_every_collection_in_the_json_has_a_consumer() -> None:
         "ad_hoc_commands": "AD_HOC_COMMANDS",
         "sourceless_loaders": "SOURCELESS_LOADERS",
         "map_entries_without_registry_source": "MAP_ENTRIES_WITHOUT_SOURCE",
+        "unchained_loaders": "UNCHAINED_LOADERS",
+        "steps_with_uncommitted_inputs": "STEPS_WITH_UNCOMMITTED_INPUTS",
         "note": "GENERATOR_NOTE",
     }
     keys = set(_data()) - {"note"}
@@ -103,6 +105,8 @@ def test_the_route_renders_each_collection_whole() -> None:
         "AD_HOC_COMMANDS",
         "SOURCELESS_LOADERS",
         "MAP_ENTRIES_WITHOUT_SOURCE",
+        "UNCHAINED_LOADERS",
+        "STEPS_WITH_UNCOMMITTED_INPUTS",
     ):
         assert f"{export}." in route, f"{export} is imported but never rendered by LoadMapRoute"
 
@@ -123,14 +127,28 @@ def test_both_defect_lists_reach_the_defects_tab() -> None:
     assert "l.reason" in route, "sourceless loaders render without their stated reason"
     assert "e.exemption" in route, "unregistered-source entries render without their exemption text"
 
-    # The headline defect number must be the SUM of both lists. Reporting only
-    # one of them is the failure that looks most like success: a "1 declared
-    # defect" tile beside a tab holding four rows reads as though the other
-    # three were reviewed and dismissed.
+    # The headline defect number must be the SUM of all four lists. Reporting
+    # only some of them is the failure that looks most like success: a "1
+    # declared defect" tile beside a tab holding four rows reads as though the
+    # other three were reviewed and dismissed. (G80 added the second pair.)
     model = MODEL.read_text(encoding="utf-8")
+    defect_count_block = model.split("export const DEFECT_COUNT", 1)[1].split("\n\n", 1)[0]
+    for term in (
+        "SOURCELESS_LOADERS.length",
+        "MAP_ENTRIES_WITHOUT_SOURCE.length",
+        "UNCHAINED_LOADERS.length",
+        "STEPS_WITH_UNCOMMITTED_INPUTS.length",
+    ):
+        assert term in defect_count_block, (
+            f"DEFECT_COUNT no longer totals {term} — the headline number must "
+            "sum every declared defect list"
+        )
+    # and the G80 rows render with their reason-or-null made visible
+    route_src = ROUTE.read_text(encoding="utf-8")
+    assert "l.reason ??" in route_src, "unchained loaders render without the null-reason fallback"
     assert (
-        "SOURCELESS_LOADERS.length + MAP_ENTRIES_WITHOUT_SOURCE.length" in model
-    ), "DEFECT_COUNT no longer totals both declared defect lists"
+        "s.exemption ??" in route_src
+    ), "uncommitted-input rows render without the null-exemption fallback"
 
 
 # --------------------------------------------------------------------------- #

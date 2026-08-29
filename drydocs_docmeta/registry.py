@@ -142,6 +142,60 @@ def load_doc_sources(path: str | Path | None = None) -> dict[str, DocSourceEntry
     return entries
 
 
+class AmbiguousDocSourceError(LookupError):
+    """A --purpose string matched more than one ledger row (Q23 — the run
+    must name exactly one row; the SME picking by hand is the removed case)."""
+
+
+def resolve_capture_registry_id(
+    registry_id: str | None = None,
+    *,
+    purpose: str | None = None,
+    path: str | Path | None = None,
+) -> DocSourceEntry:
+    """Q23: the run <-> row join, ONE resolver for both capture doors.
+
+    A capture run must be able to say WHICH doc-source-registry row it
+    fulfils — the 7c18ff4b port review found a VERBATIM upgrade whose run was
+    keyed by a Confluence space plus a free-text purpose, neither a registry
+    id, so the SME had to pick the row by hand. This function is the removal
+    of that case: an explicit ``registry_id`` must exist
+    (:class:`UnknownDocSourceError` otherwise); a ``purpose`` free-text must
+    match EXACTLY ONE row across id/source/notes
+    (:class:`AmbiguousDocSourceError` names every candidate otherwise);
+    neither given is an error, never a warning — a run that cannot name its
+    row does not run.
+    """
+    if registry_id:
+        return get(registry_id, path)
+    if purpose:
+        needle = purpose.strip().lower()
+        if needle:
+            entries = load_doc_sources(path)
+            hits = [
+                e
+                for sid, e in sorted(entries.items())
+                if needle in sid.lower()
+                or needle in str(e.data.get("source", "")).lower()
+                or needle in str(e.data.get("notes", "")).lower()
+            ]
+            if len(hits) == 1:
+                return hits[0]
+            if not hits:
+                raise UnknownDocSourceError(
+                    f"purpose {purpose!r} matches no doc-source-registry row — "
+                    "register the corpus first (docmeta invariant 1)"
+                )
+            raise AmbiguousDocSourceError(
+                f"purpose {purpose!r} matches {len(hits)} rows "
+                f"({[e.id for e in hits]}) — pass --registry-id to name exactly one"
+            )
+    raise UnknownDocSourceError(
+        "no registry id and no resolvable purpose — a capture run that cannot "
+        "say which doc-source-registry row it fulfils does not run (Q23)"
+    )
+
+
 def get(source_id: str, path: str | Path | None = None) -> DocSourceEntry:
     try:
         return load_doc_sources(path)[source_id]

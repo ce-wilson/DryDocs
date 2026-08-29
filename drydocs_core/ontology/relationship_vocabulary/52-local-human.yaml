@@ -9,7 +9,7 @@
   # prov:agent / prov:hadRole). Edges that merely name an ORG UNIT as a catalog
   # node (Product -> DevTeam, DevTeam -> Product SUPPORTS, DevTeam -> JiraBoard)
   # are the product-catalog hierarchy and stay in `catalog`; the :Employee
-  # node spine itself is G74's.
+  # node backbone itself is G74's.
   #
   # PARTITION MOVE ONLY: ids, labels, directions, statuses, notes, loaders and
   # supplements are exactly as they were in 41-local-business-application.yaml
@@ -234,11 +234,9 @@
     note: >
       ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
       qualified-attribution reification — names which TOM role the Attribution grants. The
-      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
-      backup_information_owner | cto | technology_risk_controls |
-      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
-      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
-      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      scheme (tom_roles) is the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority arrived
+      with the 2026-07-10 revision.
       cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
     supplement:   seal_ontology_supplement.cypher
@@ -268,11 +266,9 @@
     note: >
       ACTIVE (K4, 2026-07-15; gate 2026-07-10 §B REVISED role set). prov:hadRole inside the
       qualified-attribution reification — names which TOM role the Attribution grants. The
-      fixed 7-concept scheme (tom_roles): application_owner | primary_information_owner |
-      backup_information_owner | cto | technology_risk_controls |
-      design_authority | operate_manager (L1/L2 = a level property on the Attribution, per
-      the gate's "one or both" wording). Subsumes the old flat 6: data_owner -> Information
-      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority is new.
+      scheme (tom_roles) is the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). Subsumes the old flat 6: data_owner -> Information
+      Owner, risk_compliance_officer -> Technology Risk & Controls; Design Authority arrived
+      with the 2026-07-10 revision.
       cto NOT shared with K5 ProductRole (K5 gate 2026-07-20: families independent).
       TOMRole is a skos:Concept, DISTINCT from :Role (org:Role, PAT hierarchy only).
       REPLACES seal_attribution_had_role at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
@@ -523,3 +519,73 @@
     domain:       human
     loader:       pat_team_roles.cypher
     status:       active
+
+  # ── G73: the inheritance row-pointer (gate tom-roles SS-E3/SS-E4, signed 2026-08-11) ──
+
+  - id:           human_attribution_derived_from
+    neo4j_label:  WAS_DERIVED_FROM
+    inverse_label: "derived to"
+    role:         ~
+    from_node:    Attribution
+    to_node:      Attribution
+    prov_maps_to: "prov:wasDerivedFrom"
+    note: >
+      G73 (SS-E3 option (i), the evidence doc's "the PROV shape is now
+      obvious"): an INHERITED assignment prov:wasDerivedFrom the ancestor
+      assignment — the second of the two load-bearing lineage pointers (the
+      ancestor CI rides business_application_contained_by_ci in
+      41-local-business-application.yaml; this is the ancestor ROW). THE LOAD
+      NEVER WRITES IT: SS-E stores authored rows only (assertion_mode 'direct'
+      | 'overridden'; the source's blank IS Direct; 'inherited' is never
+      stored), and inheritance is computed by the nearest-ancestor walk. This
+      edge exists so that IF a read layer ever materialises an effective-
+      roster projection (O44's alluvial is the named consumer), the derived
+      copy's provenance has a registered shape instead of an invented one —
+      registering the shape is not a licence to materialise (the gate's own
+      alternative, materialise-and-flag, was considered and REJECTED: it
+      duplicates, and it drifts when an ancestor changes). Straight decision-
+      matrix row: Entity -> Entity = prov:wasDerivedFrom. Status planned;
+      nothing loads on either side today.
+    supplement:   ~
+    loader:       ~
+    domain:       human
+    status:       planned
+
+  # ── G74: the employee-hierarchy edge (gate tom-roles SS-B7's deferral gains its owner) ──
+
+  - id:           human_employee_reports_to
+    neo4j_label:  REPORTS_TO
+    inverse_label: "manages"
+    role:         ~
+    from_node:    Employee
+    to_node:      Employee
+    prov_maps_to: ~
+    note: >
+      G74 (SS-B7, signed 2026-08-11: "if a person is in the role, create the
+      relationship to the employee hierarchy in a later pass" — the deferral
+      now defers TO this entry instead of at nothing). Maps to org:reportsTo
+      (W3C ORG); the decision-matrix Agent->Agent row (prov:actedOnBehalfOf)
+      is deliberately NOT reached for — a reporting line is org structure,
+      not delegation of an activity, and mapping it to PROV would assert
+      responsibility semantics the source does not carry. Current-state edge
+      (the 2026-07-23 HR-hierarchy direction: single :Employee spine,
+      REPORTS_TO current-state sweep — history is that direction's temporal
+      series, not extra edges here). THE SOURCE IS IDENTIFIED, NOT LOADED:
+      the company HR employee-hierarchy database (~300k people), owned by the
+      COMPANY hr-emp-hierarchy gate (two-scope HR supplement: MD-root
+      subtrees + graph-seeded resolution; two-pass loader). No producer
+      loader exists or is built by G74 — the acceptance forbids pre-empting
+      that gate, and the roster loader + its tests are already recorded
+      company-only (T21). sys_user_group MEMBERSHIP IS A DISTRACTION for this
+      edge, ruled here so it is not re-proposed: group members are ADJACENCY
+      (who shares a support group), not hierarchy (who reports to whom) — a
+      real people-graph, but its shape is owned by snow-hpsm-queue-to-group
+      and cannot populate a reporting line. WAITING CONSUMERS, so the
+      deferral's cost stays visible: SS-B7's later pass, and O44's first
+      column (the ownership-reconciliation alluvial), whose MANAGER FILTER is
+      its whole point. Status planned: flips active in the commit that lands
+      a roster loader, which is company-side work arriving via the port.
+    supplement:   ~
+    loader:       ~
+    domain:       human
+    status:       planned

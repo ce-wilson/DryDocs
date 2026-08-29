@@ -352,10 +352,10 @@ def test_doc_ledger_union_gates_doc_corpora() -> None:
     assert bmc.urn is None  # doc corpora keep docmeta identity
     reg.require_confirmed("neo4j-docs-essential-graphrag")
     # ACTIVATED 2026-08-05 (user ruling in-chat, gate-log RECORD): the covering
-    # crosswalk gate (fcdo-crosswalk) signed the same day; before that, this
+    # crosswalk gate (cdo-crosswalk) signed the same day; before that, this
     # line pinned the UnconfirmedSourceError refusal.
-    fcdo = reg.require_confirmed("fcdo-frameworks")
-    assert fcdo.home == "doc-registry"
+    cdo = reg.require_confirmed("cdo-frameworks")
+    assert cdo.home == "doc-registry"
 
 
 def test_temp_registry_does_not_union_shipped_ledgers(tmp_path: Path) -> None:
@@ -679,4 +679,111 @@ def test_drop_dir_stays_inside_the_landing_zone_convention() -> None:
     assert not bad, (
         "drop_dir values that look like real machine paths (real paths live in the "
         "internal twin only):\n  " + "\n  ".join(bad)
+    )
+
+
+# ---- G79: cadence (2026-08-23) ----------------------------------------------
+# HOW OFTEN a source refreshes, so cli.load_profile() can DERIVE which operator
+# surface runs a standing loader-backed step instead of reading a hand-kept
+# tuple. Required only where a standing sequenced loader draws on the row --
+# DERIVED from the sequence, never hand-listed here, so wiring a new chain makes
+# this fail until its source declares a rhythm.
+
+CADENCES = ("weekly", "batch", "repo-change")
+
+
+def _sources_of_standing_loader_steps() -> set[str]:
+    from drydocs import cli
+
+    needed: set[str] = set()
+    for step in cli.CANONICAL_LOAD_SEQUENCE:
+        if step.mode != "standing":
+            continue
+        for cls in cli.COMMAND_LOADERS.get(step.command, ()):
+            if cls.source_id is not None:
+                needed.add(cls.source_id)
+    return needed
+
+
+def test_declared_cadences_are_from_the_vocabulary() -> None:
+    bad = [
+        f"{r['id']}: {r['cadence']!r}"
+        for r in _real_dataset_rows()
+        if "cadence" in r and r["cadence"] not in CADENCES
+    ]
+    assert not bad, f"cadence must be one of {CADENCES}: {bad}"
+
+
+def test_every_source_a_standing_chain_reads_declares_a_cadence() -> None:
+    """The profile derivation is only honest if the rows it reads carry the
+    field. A source with no cadence is not a silent default -- the step keeps
+    its DECLARED profiles and this test names the row so that choice is made
+    deliberately."""
+    rows = {r["id"]: r for r in _real_dataset_rows()}
+    missing = sorted(
+        sid
+        for sid in _sources_of_standing_loader_steps()
+        if sid in rows and not rows[sid].get("cadence")
+    )
+    assert not missing, (
+        f"dataset row(s) a STANDING sequenced loader reads with no cadence: {missing} "
+        "-- declare weekly|batch|repo-change so load_profile() can derive the step's "
+        "operator surfaces (G79 (c))."
+    )
+
+
+def test_cadence_is_a_dataset_field_not_a_doc_ledger_one() -> None:
+    """N12 fenced the doc ledger out of the acquisition work and cadence keeps
+    that fence: load-bmc-docs' corpus lives there, so its step keeps declared
+    profiles rather than being handed a rhythm the ledger cannot state."""
+    import yaml
+
+    doc = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "config" / "doc-source-registry.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stray = [e["id"] for e in doc["sources"] if "cadence" in e]
+    assert not stray, (
+        f"doc-registry rows carrying cadence: {stray} -- the field is a DATASET-row "
+        "field (N12's fence); extending it to the doc ledger is a separate call."
+    )
+
+
+def test_manually_downloaded_reports_name_the_report_they_come_from() -> None:
+    """A hand-downloaded report is only as traceable as the name it is filed under.
+
+    The generalized form of the manual-load PoC's issue 1 (2026-08-28): three
+    registry rows fed loaders from a download page, and NOTHING in the registry
+    said WHICH published report a row read. Anyone joining loader -> source ->
+    report had to guess, and the guess was wrong for at least one row -- the
+    `pat:people-report` id is bound to the *Team Details Report*, while the report
+    actually named "...People Report" is `pat:product-catalog`'s. That naming
+    defect is gate territory (D1, gate manual-download-provenance) and is NOT
+    fixed by renaming here; what IS fixed is that the report name is now a
+    declared, checkable field instead of tribal knowledge.
+
+    Scope is deliberately narrow -- ``artifact_kind: report`` AND
+    ``acquisition.mode: manual``. An automated feed has a connection string; a
+    manual bundle or snapshot (rua, depgraph) is not a "report" and has no
+    published name to carry. Widening this to every manual row would demand a
+    field that half of them cannot honestly fill.
+
+    The URL is deliberately NOT required and deliberately not here: a download
+    page is a connection coordinate and lives in the internal twin per the N7
+    rule. Names are mechanism (Internal-Public), coordinates are not.
+    """
+    doc = yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    missing = [
+        entry["id"]
+        for entry in doc["datasets"]
+        if entry.get("artifact_kind") == "report"
+        and (entry.get("acquisition") or {}).get("mode") == "manual"
+        and not str((entry.get("locator") or {}).get("report") or "").strip()
+    ]
+    assert not missing, (
+        "manually-downloaded report rows with no locator.report: "
+        f"{sorted(missing)} -- name the report AS PUBLISHED on the download page "
+        "so loader -> source -> report resolves without tribal knowledge. The URL "
+        "stays in the internal twin (N7); only the name belongs here."
     )

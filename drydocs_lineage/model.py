@@ -41,7 +41,7 @@ SCHEMA = "drydocs.lineage-graph.v1"
 SCHEMA_COMPAT = {SCHEMA, "depgraph-machine-first/v2"}
 
 #: typed relationship labels — the registered (planned, gate-bound) vocabulary
-REL_TYPES = {"INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO"}
+REL_TYPES = {"INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO", "USES_ARTIFACT"}
 #: depgraph prototype spellings → registered labels
 REL_ALIASES = {"READS": "READS_FROM", "WRITES": "WRITES_TO"}
 #: label → relationship_vocabulary.yaml id (the ontology contract per edge)
@@ -52,7 +52,23 @@ VOCAB_IDS = {
     "TRIGGERS": "scheduler_triggers",
     "READS_FROM": "scheduler_reads_from",
     "WRITES_TO": "scheduler_writes_to",
+    # G97: the PAYLOAD half of the launcher/payload split. Gate
+    # cmdline-nfr-vetting SME-2 (2026-07-21) registered it as a DISTINCT label
+    # rather than one label with a role — the documented RUNS_ON-overload risk —
+    # and rua-load-shapes §A4 (2026-08-07) activated it in the same breath as
+    # INVOKES so payloads never land in the 1..n fold and then need moving.
+    "USES_ARTIFACT": "scheduler_uses_artifact",
 }
+
+#: invocation kinds whose node is an :ETLProcess rather than a :Script (G12;
+#: gate-log 2026-07-16 cmdline-lineage-review §b). LIVES HERE, not in the
+#: writer, because two consumers now need it: the writer picks the endpoint
+#: MATCH shape from it, and the G97 artifact pass reads it to know what it may
+#: NOT migrate — scheduler_uses_artifact.to_node is `Script` (SME-2), and §B2
+#: kept INVOKES on :ETLProcess deliberately rather than re-modelling G12's
+#: working wrapper-payload expansion. Identity is the SAME kind-scoped stable
+#: token ``controlm_inventory._stable_invocation_key`` computes for these two.
+ETL_PROCESS_KINDS = {"abinitio", "dpl"}
 
 
 @dataclass

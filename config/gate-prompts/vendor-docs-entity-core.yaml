@@ -1,0 +1,138 @@
+# RENAMED 2026-08-22 (user ruling, same day as the sign-off): vendor-docs-entity-spine
+# -> vendor-docs-entity-core — "spine" is on the US-business-English banned list
+# (docs/style/us-business-english.md; CLAUDE.md §6: "backbone"/"core", never "spine").
+# ID, TITLE AND FILENAME ONLY: the signed confirmations below are the historical
+# record of what the SME saw and are NOT edited (L25 riders-not-edits); body prose
+# retains "spine" as signed. The 21/21 sign-off TRANSFERS across the rename (the
+# Q6 precedent) — see the gate-log RECORD entry of the same date. History before
+# the rename is filed under the old id.
+# SME gate-prompt spec — the vendor-docs entity core (backlog Q14). GATE-BOUND
+# AND DECIDES NOTHING: drafting a prompt is not an ontology change (the
+# G27/W1/U11/N10 precedent). Every term this page proposes sits at
+# `status: planned` in the relationship vocabulary and `status: proposed` in the
+# taxonomy-ontology map; no loader writes an edge, no registry flag flips, and
+# the SIGN-OFF is a separate SME session. The corpus this page is about
+# (bmc-docs-controlm-utilities) has NEVER LOADED on either machine — §E states
+# why that is this gate's own subject rather than a missing prerequisite.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: vendor-docs-entity-core
+title: "SME Gate — the vendor-docs entity core: is a documented utility a first-class node, and which edge carries it?"
+step: "The bmc-docs-controlm-utilities capture (1016 verbatim BMC pages, 1017 TOC nodes, 9.0.20) is registered confirmed: false and has never loaded on either machine. The Q13 pipeline that would load its layer-1 spine is built and offline-tested (60 tests) but refuses to run until an SME signs the doc-graph shape — the refusal G32's Q6 clause left standing on purpose ('the fold made the write legal, not ruled'). This page is that ruling. Sections A–D put the four layer-2/3 questions from knowledge/upgrade-plans/vendor-docs-agent-navigation.md §3; section E is the enabling layer-1 confirmation without which the gate's own subject can never load. Nothing changes before this page signs."
+summary: >
+  The corpus's page titles are exact utility names (exportdefjob, ctmorder, the
+  emdef family) — a navigable entity spine the publisher ships for free and the
+  lexical shape throws away. Section A rules the identity question: a new
+  :ControlMUtility class is proposed, with the software-registry alternative
+  laid out for explicit rejection rather than omission. Section B rules the
+  edge: reuse of the ACTIVE DESCRIBES label as a new triple is proposed over a
+  new DOCUMENTS label. Section C rules whether the vendor's own in-page
+  cross-links are assertions we carry (SEE_ALSO, basis-required) or
+  presentation we drop. Section D records that this item's acceptance premise —
+  the estate join BLOCKED on G32 — was overtaken by the G32 sign-off
+  (2026-08-18) and the G102 fold, and rules what now actually gates the join.
+  Section E confirms the layer-1 spine shape itself and authorizes the
+  registry flip that lets the corpus load at all.
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/ + config/taxonomy-ontology-map/) — the loader is Q13's shipped pipeline; no loader code changes at this gate"
+  Source: "config/doc-source-registry.yaml (bmc-docs-controlm-utilities, confirmed: false, counts transcribed at capture) · DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/capture-manifest.json (desktop-resident) · live graph venue: laptop, neo4jtest, drydocs DB, queried 2026-08-22 (J18)"
+  Precedent: "G27/W1/U11/N10 — a drafted prompt decides nothing · C8 same-label-new-triple (doc_section_part_of over Chunk-PART_OF) · O24 / email-folder-assignment §A3 — no anonymous assertions · K2/G27 flips-are-follow-ups · Q9 'overtaken, recorded not re-done' (satisfied-by-fold) · G32 Q6 — 'the fold made the write legal, not ruled'"
+  Registry ref: "bmc-docs-controlm-utilities stays confirmed: false while this page is unsigned; §E3 rules what signing authorizes, and the flip itself is a groomed follow-up item, never performed here"
+  Classification: "Internal-Public — mechanism only; the evidence is BMC's published TOC structure and page titles (External at source) plus mechanism-level graph counts; no company estate values, hosts, or SIDs appear"
+  Vocabulary: "seven proposed entries, all status: planned — docs_describes_utility, docs_see_also, docs_utility_part_of, docs_in_section, docs_subsection_of (45-local-docs), scheduler_invokes_utility (40-local-scheduler; G87 domain-prefix policy), node class ControlMUtility (10-node-classifications) — plus map entry vendor-docs-entity-spine (40-mappings-docs, status: proposed)"
+  Source of record: "backlog Q14 · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md"
+
+mapping:
+  - n: 1
+    element: "A vendor page whose title IS the utility's exact name (exportdefjob, ctmorder, defjob)"
+    target: ":ControlMUtility {name} — first-class, name-addressable, uniqueness-constrained"
+    edge: "§A — the identity ruling: new class, or instances of the software-registry model"
+  - n: 2
+    element: "A Document that is ABOUT a utility"
+    target: "DESCRIBES (the ACTIVE aboutness label, reused as a new triple Document -> ControlMUtility)"
+    edge: "§B — reuse vs a new DOCUMENTS label"
+  - n: 3
+    element: "The vendor's own in-page cross-link between two topics"
+    target: "SEE_ALSO (Document -> Document), evidence-carrying, or nothing at all"
+    edge: "§C — assertion we carry vs presentation we drop"
+  - n: 4
+    element: "A job whose CMD_LINE invokes a utility the corpus documents"
+    target: "INVOKES (new triple ControlMJob -> ControlMUtility) — the layer-3 estate join"
+    edge: "§D — formerly BLOCKED on G32; the fold made it legal, this page rules it"
+  - n: 5
+    element: "The layer-1 spine itself: Document / IN_SECTION / DocSection / SUBSECTION_OF + page_role + abstract + version properties"
+    target: "the Q13 loader's shape, confirmed as the doc-graph shape for this corpus"
+    edge: "§E — the enabling confirmation; without it the gate's own subject never loads"
+
+provenance:
+  - label: "The capture — source-grain evidence (the spine is NOT loaded; see §E1 for why that is this gate's subject)"
+    source_object: "DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/ (desktop-resident, out-of-repo; counts transcribed into config/doc-source-registry.yaml at capture, zero scrape failures)"
+    key: "doc_id, capture-scoped (Q13 close defect 3 — Author-it reuses topic ids across publications)"
+    loader: "drydocs/loaders/ vendor-docs pipeline (built at Q13, 60 offline tests; refuses to run while confirmed: false)"
+    properties:
+      - name: title
+        origin: source
+        from: "the publisher's toc.json — vendor-canonical entity names"
+        note: "The emdef family alone: defjob, exportdefjob, updatedef, copydefjob, deldefjob, duplicatedefjob — each with its rules / parameters / examples page. These titles ARE the utility names §A proposes to mint nodes from."
+      - name: counts
+        origin: source
+        from: "the capture manifest"
+        note: "1016 documents / 1017 TOC nodes (the one-node gap is deliberate: 89881.htm#o90021 addresses a SECTION of another page — a real navigation node, not a second document). 258 of the 1016 pages are XML/export/import/definition topics — the documented gap behind drydocs_lineage/extractors/controlm_xml.py's ASSUMED contract."
+      - name: page_role
+        origin: derived
+        from: "an explicit title rule ('* XML file rules' -> rules), never an LLM"
+        note: "Derivation must report how many pages it could NOT classify rather than defaulting them silently — the Q13 determinism discipline."
+      - name: doc_version / version_verified
+        origin: source
+        from: "the capture (9.0.20) vs the estate runtime (9.0.21.300); BMC ships NO Utilities book in the trimmed 9.0.21 publication"
+        note: "Rides :Document, :Chunk AND :DocSection (Q13 close), so a chunk surfacing alone in retrieval still carries the caveat. version_verified stays false until a page is checked against 9.0.21 — a judgement, not a string comparison."
+  - label: "The live sibling corpus — venue-tagged loaded evidence (laptop, neo4jtest, drydocs DB, 2026-08-22 — J18; the two machines hold independent graphs)"
+    source_object: "the bmc-docs corpus (26 hand-converted pages, ACTIVE lexical shape) + the sample Control-M estate"
+    key: "corpus bmc-docs; gate bmc-docs-lexical-load (accepted 2026-07-08)"
+    loader: "bmc_docs.cypher"
+    properties:
+      - name: DESCRIBES edges, live
+        origin: derived
+        from: "MATCH (d:Document)-[:DESCRIBES]->(p:SoftwareProduct) — 27 edges to controlm, 1 to neo4j"
+        note: "The ACTIVE aboutness shape §B proposes to reuse. These are the R3-reloaded, fold-durable edges the Q20 record verified; an agent traverses product -> docs in one hop today."
+      - name: utilities-spine count, live
+        origin: derived
+        from: "MATCH (d:Document) grouped by corpus — zero nodes from bmc-docs-controlm-utilities"
+        note: "Confirms the registry's never-loaded claim on this machine. The acceptance's 'LOADED layer-1 spine' evidence premise is unmeetable until §E signs — stated here rather than papered over."
+      - name: sample estate CMD_LINE
+        origin: derived
+        from: "17 of 17 sample ControlMJob nodes carry cmd_line; ZERO invoke any known Control-M utility name"
+        note: "The §D join pays on the company estate, not the bundled samples — nothing on this machine can demo it, and this page says so instead of promising a demo it cannot give."
+
+sections:
+  - title: "A. Utility identity — a new class, or the software registry stretched"
+    confirmations:
+      - "A1. IS A FIRST-CLASS NODE WARRANTED AT ALL? The agent entry-point argument (plan §2a): an agent usually arrives knowing the noun — 'how do I use exportdefjob?' — and MATCH (u {name: $name}) with a uniqueness constraint is both faster and more reliable than a vector search for a known exact identifier. The alternative is to stay lexical-only (utilities remain page titles, findable by search but not addressable by name). Confirm the entity spine is worth carrying at all before ruling what it is."
+      - "A2. WHICH CLASS — a new dd:ControlMUtility (prov:Entity) is PROPOSED, and the software-registry alternative is laid out for explicit rejection rather than omission. Against SoftwareProduct instances: the registry classifies what a vendor SHIPS as a governed product row — hand-curated, declaration-driven, seal_id-bearing, ~a dozen rows (live count: 9 products on the queried venue). Minting a corpus-derived node per documented utility into that registry inverts its grain and its curation model. The CLAUDE.md §1 warning cuts both ways: inventing a label for convenience is the named failure, but so is stuffing a wrong existing label to avoid the accusation. The new class follows the scheduler naming family (ControlMJob / ControlMFolder / ControlMServer — vendor-prefixed labels are the accepted norm in that domain). Rule it."
+      - "A3. THE BRIDGE TO THE PRODUCT: docs_utility_part_of — PART_OF, ControlMUtility -> SoftwareProduct {product_id: controlm}, dcterms:isPartOf family, no PROV row (structural, not derivation). This is the THIRD triple of the PART_OF label (after Chunk -> Document and DocSection -> DesignDoc) — the C8 same-label-new-triple discipline: same label, new entry per endpoint pair. It keeps the utility inside the software family without making it a product. Confirm the bridge and its direction."
+      - "A4. IDENTITY AND PROPERTIES: name as the uniqueness key (the vendor-canonical string; exportdefjob), family (emdef | ctm | other — from the TOC grouping), kind where the title rule can derive one. All derivation is deterministic from vendor titles and the TOC — never an LLM — and reports its unclassified count (the page_role discipline applied to entity minting). Confirm the key and the determinism bar."
+  - title: "B. The aboutness edge — reuse DESCRIBES, or mint DOCUMENTS"
+    confirmations:
+      - "B1. REUSE IS PROPOSED: docs_describes_utility — DESCRIBES, a NEW TRIPLE Document -> ControlMUtility beside the ACTIVE Document -> SoftwareProduct entry (27 live edges on the queried venue). Same meaning (dcterms:subject / foaf:primaryTopic aboutness, deliberately NOT wasDerivedFrom), new endpoint pair, separate vocabulary entry — the C8 discipline again. A new DOCUMENTS label is the alternative: it would name the corpus's role but split every aboutness query across two labels carrying one meaning. Rule reuse vs mint."
+      - "B2. WHAT RIDES THE EDGE: nothing version-shaped. The product-targeted DESCRIBES carries target_version because that corpus documents SaaS pages applied to a pinned release; here the version caveat is NODE-grain (doc_version / version_verified on Document, Chunk and DocSection per the Q13 close) and duplicating it onto the edge would create two places for one fact to rot. Confirm the edge stays bare."
+      - "B3. THE DERIVATION BASIS: a Document gets the edge by deterministic title-match to the utility node (the title IS the name — evidence block 1), with the unmatched count reported, never defaulted. No prose inference, no LLM proposal — the email-folder-assignment B1 bar (structured signal only) applied to a corpus whose structured signal is the title itself. Confirm the basis."
+  - title: "C. The vendor's own cross-links — assertion or presentation"
+    confirmations:
+      - "C1. THE QUESTION AS THE PLAN LEFT IT (§3): an in-page hyperlink from one topic to another is the vendor's own lateral navigation — the only lateral signal the corpus ships beyond the TOC, and exactly what the lexical shape's 'no lateral movement' failure (plan §2b) needs. PROPOSED: carry it as docs_see_also — SEE_ALSO, Document -> Document, Entity -> Entity reference, no PROV row (a link is not derivation). The corpus is VERBATIM throughout: the link is the vendor's words as much as the sentence around it. Rule whether a vendor's own cross-link is an assertion we carry."
+      - "C2. IF CARRIED, THE BASIS IS REQUIRED: every edge carries its evidence — the source href and the anchor it was parsed from — following the O24 / email-folder-assignment §A3 discipline: no anonymous assertions. On the G32 §F axes this edge is vendor-asserted (origin: the source), and it is never :Uncertain — parsing a literal href is mechanical, not inference. Confirm the required-basis shape."
+      - "C3. THE STANDARDS ANALOG: rdfs:seeAlso — and rdfs IS a declared namespace (drydocs_core/ontology/namespaces.py), unlike the ANNOTATES case where the analog (oa:hasTarget) was undeclared and the term stayed local. Adopt the rdfs:seeAlso mapping in the entry note, or keep the label local with the analog named as candidate — either is coherent; rule which."
+      - "C4. THE DECLINE PATH, priced plainly: if the SME reads cross-links as presentation, docs_see_also retires (rejected in the taxonomy-ontology map, never loaded) and lateral movement stays TOC-only — an agent moving from 'defjob XML file rules' to a related non-sibling topic goes back through search. That is a legitimate ruling; this clause exists so it is made knowingly, not by default."
+  - title: "D. The estate join — the acceptance premise was overtaken; here is the honest state"
+    confirmations:
+      - "D1. THE RECORD (overtaken, recorded not re-done — the Q9 idiom): Q14's acceptance, written before 2026-08-18, requires the layer-3 join 'recorded as BLOCKED on G32' — the Q8 constraint that a relationship cannot span Neo4j databases, plus ADR 0006's plan to re-target doc corpora to dddocs while the software registry kept writing drydocs. G32 SIGNED 2026-08-18 (32/32): one content database, dddocs rejected and retired at R1, executed by the G102 fold. The cross-database impossibility is DISSOLVED, and per G32's own Q6 clause the fold 'made the write legal, not ruled' — this page is where it gets ruled. Confirm the record."
+      - "D2. WHAT NOW GATES THE JOIN, stated honestly: (i) §A and §B must sign — there is no utility node to join to until they do; (ii) the spine must actually load (§E); (iii) the derivation is parser work — CMD_LINE -> utility extraction rides the G14 file-ops feed pattern under the G32 §E charter: the parser-driven command-line path is an INPUT that seeds the graph, and NO relationship is created unless its subject already exists in the grounded graph. Confirm this is the real dependency chain, replacing the retired G32 block."
+      - "D3. THE PROPOSED TERM: scheduler_invokes_utility — INVOKES, a new triple ControlMJob -> ControlMUtility, prov:used (Activity -> Entity, the matrix row scheduler_invokes already rides), status planned. Deliberately NOT a widening of the ACTIVE scheduler_invokes entry (Script | ETLProcess): widening an active entry is a gate edit with blast radius across a shipped extractor, and the two targets have different identity rules (Script is PATH-keyed; a utility is NAME-keyed). If the SME prefers the widening, that is a coherent alternative — rule which shape."
+      - "D4. THE EVIDENCE HONESTY CLAUSE: on the queried venue all 17 sample jobs carry cmd_line and ZERO invoke a known utility name — the join pays on the company estate, and nothing on this machine can demo it. The term is registered planned with no demo attached, exactly what the plan prescribed for layer 3 ('a planned vocabulary entry and nothing more'), updated only in what it waits for. Confirm that registering without a demo is acceptable here."
+  - title: "E. The enabling confirmation — the unsigned doc-graph gate, and the chicken-and-egg"
+    confirmations:
+      - "E1. THE CHICKEN-AND-EGG, stated plainly: Q14's acceptance asks for evidence drawn from the LOADED layer-1 spine, but the spine cannot load — the registry row is confirmed: false, and per docmeta discipline no loader may write from an unconfirmed entry until an SME gate signs the doc-graph shape. G32's Q6 clause names that gate as unsigned; a backlog sweep (2026-08-22) finds no other item owning it. THIS page is therefore the doc-graph gate for this corpus, and the evidence above is capture-grain plus sibling-corpus live grain, venue-tagged, instead of the spine itself. Confirm the framing — or name the other gate this page failed to find."
+      - "E2. THE LAYER-1 SHAPE PUT FOR CONFIRMATION, exactly as Q13 shipped it: Document {doc_id capture-scoped, title, breadcrumb, source_url, sha256, abstract, page_role, doc_version, version_verified} · Chunk -PART_OF-> Document (the existing lexical shape, unchanged) · Document -IN_SECTION-> DocSection · DocSection -SUBSECTION_OF-> DocSection (the publisher's toc.json tree, one navigation node addressing a page section by fragment rather than minting a phantom Document). Pure transcription of the publisher's structure — no meaning edges. The :DocSection label is REUSED from the design-doc traceability family (single-classification discipline, the :Document dedupe precedent); its classification note records the second use. Confirm the shape."
+      - "E3. TWO EDGES THE LOADER SHIPS THAT THE VOCABULARY NEVER REGISTERED: IN_SECTION and SUBSECTION_OF are written by Q13's cypher but absent from the relationship vocabulary, while their structural siblings (PART_OF, FIRST_CHUNK, NEXT_CHUNK) are all registered and gate-accepted. Registered NOW as docs_in_section / docs_subsection_of, status planned (structural containment / hierarchy, no PROV row, dcterms:isPartOf family analog) — closing a loader-without-vocabulary gap found at this draft, not minting new meaning. Confirm both entries."
+      - "E4. WHAT SIGNING AUTHORIZES — AND DOES NOT PERFORM: signing this page authorizes bmc-docs-controlm-utilities -> confirmed: true. The flip itself is a groomed FOLLOW-UP item (flips-are-follow-ups: the gate authorizes, never performs), and the first live load then runs on the machine holding the capture (the desktop data root), venue-tagged per J18, with docs-verify's registry-driven corpus check closing the loop (the Q13 defect-2 test). Until that follow-up lands, nothing loads — signing moves no data."
+      - "E5. SCOPE FENCE: not in scope here — the Q15 QuerySpecs (they build on whatever this page confirms), the Q18 describes_product registry field (behind this gate, unchanged by it), any loader code change, and any change to the bmc-docs corpus or its ACTIVE entries. If the SME wants the utilities corpus surfaced on the board or the load map, that is a separate item — say so and it gets one."
+      - "E6. SAFE TO TRANSCRIBE: the rulings above are complete as ticked, edits and held clauses are recorded beside their sections, and this page may be transcribed into config/gate-log.md as the gate's record — the standard closing confirmation (03-hitl-sme-flow.md §Gate-page format)."

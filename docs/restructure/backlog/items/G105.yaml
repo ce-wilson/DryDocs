@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - G104
 inputs:
@@ -22,6 +22,8 @@ inputs:
 acceptance: |
   Clauses (1), (2) and (3) of ADR 0014 as ratified — no more, and nothing the ADR deferred.
 
+  RIDER ADDED AT THE 2026-08-25 RULING, because this item's clause-by-clause text restates the PRE-AMENDMENT ADR and two of its premises are now wrong. (i) Clause 1 was ruled PER-KIND: the group reads `config/log-kinds.yaml` (root + defaults + one entry per kind naming its writer), so `log_dir` / `log_level` / `log_retention_days` below are the per-kind DEFAULTS, not one global set. Build the declaration and its reader, not four flat fields. (ii) The sentence below claiming `sql_run_log.py` "honors ONLY the legacy variable" is FALSE and was already false when this item was groomed -- it imports `claim_log_path` from `run_log`, so both families have always shared the resolver; they differ only in file naming. (iii) Clause 3 was ruled DERIVED, not asserted: `<kind>.<name>.<stamp>.<ext>` with stamp granularity from `rotation` and ext from `format`, and the per-day ledger is CONFORMING rather than excepted. (iv) `kind` does not exist in code today -- three sites hardcode it and none agree (`run_log.py:147`, `llm_ledger.py`, and `sql_run_log`'s unvalidated `base_name`); making it real is part of this item, not a precondition of it. Idea-171 carries the measurement behind all four.
+
   (1) A `RuntimeSettings` group in `drydocs_core/config.py` (pydantic-settings, `DRYDOCS_` prefix, beside `Neo4jSettings`) carries `log_dir`, `log_level`, `log_retention_days`, `data_root`. Today's resolution order is PRESERVED as the default rather than replaced: `DRYDOCS_LOGDIR` wins, `SPIDERP_LOGDIR` still resolves for one deprecation cycle with a warning, `~/logs/DryDocs` stays the fallback. `drydocs_core/adapters/sql_run_log.py`, which honors ONLY the legacy variable today, resolves through the same group, so the two run-log families can no longer disagree about where the directory is.
 
   (2) `drydocs/cli.py`'s single `basicConfig` — the only one in the tree, currently stderr-only with its level from `--verbose` alone — is replaced by `logging.config.dictConfig` built from the group: console plus a JSON-lines file sink under `log_dir`, level from `RuntimeSettings.log_level`, `--verbose` still overriding it. Stdlib only: a test asserts `pyproject.toml` gained no runtime dependency. `run_log.py`'s header/summary file contract is byte-identical before and after (a test writes one run log each way and diffs). The four components with no logger at all today — `drydocs_remediation`, `drydocs_lineage`, `drydocs_docmeta`, `drydocs_deepdoc` — get a module logger each, and `agents/graph_qa/agent.py`'s bare telemetry-failure swallow logs at warning instead of passing silently.
@@ -33,3 +35,58 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-152 clauses (1)(2)(3) — "a core item (1-3)" in that entry's own decomposition. `depends_on: [G104]` because ADR 0009 makes git-tracked YAML the settings source of truth, so an env-driven settings group has to be reconciled with it BEFORE it is built rather than after. Module drydocs-core by the ADR 0002-A placement test: pure config and typed-model work, no graph write, no run cadence.
 
   The `SPIDERP_` alias deliberately survives one cycle instead of being deleted here. The data root already has no legacy variable, so the end state is symmetric either way, but a hard cut breaks any live shell still exporting the old name and that failure is silent.
+  DONE 2026-08-25 (desktop). Built to the RATIFIED clauses, which is what the rider said to do --
+  the pre-amendment text below is left as written rather than rewritten to match the outcome.
+
+  CLAUSE 1, PER-KIND. New config/log-kinds.yaml (schema drydocs.log-kinds.v1) + reader
+  drydocs_core/log_kinds.py, on the data-zones.yaml idiom: declare in YAML, resolvers derive, a
+  guard asserts they agree. One root block (base/path/env/legacy_env), a defaults block, and six
+  kinds -- load, sql, cli, qa active; api and api-debug declared status: planned so G108's kinds
+  exist before their writer does. RuntimeSettings joins config.py beside Neo4jSettings, carrying
+  the FALLBACK level and retention plus log_dir/data_root properties; keeping four flat fields
+  there as well would have been the second declaration the ADR fences against.
+
+  KIND IS NOW A REAL THING, which was the precondition nothing else could proceed without. All
+  three minting sites funnel through claim_log_path, which parses <kind>.<name> and refuses an
+  undeclared kind naming what IS declared. The SQL family gained the `sql.` segment it never had
+  -- SqlRunLog took a caller-supplied base_name with no prefix enforcement and wrote
+  `oracle.<ts>.log`, so it was the one family that could write any kind it liked. Its guard was
+  updated to the conforming shape; no such files existed on disk, so nothing was orphaned.
+
+  CLAUSE 3, DERIVED. log_filename() builds <kind>.<name>.<stamp>.<ext> with stamp granularity from
+  `rotation` and ext from `format`. The per-day ledger is CONFORMING rather than excepted, and the
+  79 load.<name>.v1.<ts>.log files conform because <name> stays free-form -- the drafted rule
+  matched 5 of 86 real files precisely because it did not know the version sits inside <name>.
+
+  CLAUSE 2, dictConfig. drydocs/cli.py's basicConfig -- the only one in the tree, stderr-only with
+  its level from --verbose alone -- is replaced by configure_logging(): console + file sink, level
+  from RuntimeSettings, --verbose still winning. Stdlib only, asserted rather than trusted. The
+  four components that had NO logger get one each, and graph_qa's bare telemetry swallow now warns
+  with exc_info instead of passing silently -- the swallow itself is unchanged, because refusing to
+  fail an answer over telemetry was always the right call; what was wrong is that a permanently
+  broken sink reported nothing.
+
+  TWO THINGS CAUGHT BY EXISTING GUARDS, both mine, both worth recording.
+  (1) The first cut resolved the log root from the declaration's literal, which BYPASSED the unit
+  conftest's monkeypatch of DEFAULT_LOGDIR -- the seam that keeps the suite out of the developer's
+  real ~/logs/DryDocs. Every test writing a run log would have written there. resolve_root() now
+  takes an injectable `default` that wins the LAST branch only, so the seam works and a set
+  DRYDOCS_LOGDIR still outranks it. Guarded both ways.
+  (2) The dictConfig file sink was first written as `drydocs.cli.log` -- a name that quietly did
+  not conform to the rule shipping in the same commit, since `drydocs` is not a kind. Added the
+  `cli` kind and derived the name. A sink exempt from its own naming rule is how the rule stops
+  meaning anything.
+
+  DEFAULTS UNCHANGED, PROVEN: with the environment cleared the declaration resolves to
+  Path.home()/logs/DryDocs, exactly where DEFAULT_LOGDIR pointed before. SPIDERP_LOGDIR still
+  resolves for one cycle and now emits a DeprecationWarning naming its removal trigger.
+  .env.example documents all four knobs. config/log-kinds.yaml has its enforcement-matrix row
+  (the default-deny config guard caught its absence).
+
+  NOT DONE HERE, deliberately: the data_zones._resolve() env-field bug and the declared-equals-
+  resolved guard gap behind it. Clause 1's single root block means the log root cannot repeat that
+  class, but the data-zones side is Idea-171's residue and still needs its own item -- landing-zones
+  reports that zone confidently and wrongly until it does.
+
+  20 new guards in test_log_kinds.py. Suite 2428 passed / 11 skipped, ruff + format clean, CLI
+  import + --help pass.

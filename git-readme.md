@@ -226,7 +226,7 @@ take FROM this repo.
 
 | Path | What it is | Disposition |
 |---|---|---|
-| `docs/decisions/0001-*.md` | ADR 0001 — ontology base scope (PROV spine) | clean-add |
+| `docs/decisions/0001-*.md` | ADR 0001 — ontology base scope (PROV backbone) | clean-add |
 | `docs/decisions/0002-*.md`, `0002-a-*.md`, `0002-b-*.md`, `0002-c-*.md` | ADR 0002 — component & database topology + core-extraction plan + spinoff-rebase checklist + depgraph-lineage re-home | clean-add |
 | `MODULE_MAP.md` | the `drydocs-core` ↔ component boundary (authoritative) | clean-add |
 | `tests/unit/test_module_boundary.py` | stdlib guard enforcing the boundary (Track-1 portable, no data) | clean-add |
@@ -275,7 +275,7 @@ them the **opposite** way to everything else in this guide:
 >   `drydocs/sme_notes.py`
 > - `drydocs/gate_pages.py` (the HITL prompt-page generator) + any generated `pages/`
 > - `drydocs/publishing/**`
-> - `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**` (seed spine,
+> - `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**` (seed backbone,
 >   gate-prompt specs, acceptance suites — company's real ones win)
 
 If you have `git fetch`ed and see the producer touch these, drop the incoming side and
@@ -615,7 +615,7 @@ and the full PAT human role vocabulary.
 | `drydocs/loaders/cypher/pat_team_roles.cypher` | DevTeam HAS_MEMBERSHIP n-ary pattern |
 | `drydocs/models/seal.py` | Added `"tech partner": "CTO"` to `_ROLE_CANONICAL` |
 | `knowledge/ontology/NODE_QUICK_REFERENCE.md` | `AreaProduct` row in Catalog (active) table (rehomed from `docs/` — see the "Newer streams" note above) |
-| `docs/Product/` | `product-overview.md`, `Technology_Team_Types.md`, `technology_roles_and_responsibilities.md`, `quad-mermaid.js` |
+| `knowledge/org/` | `product-overview.md`, `technology-team-types.md`, `technology-roles-and-responsibilities.md`, `org-quad-chart.mmd` (relocated from `docs/Product/` at S14, 2026-08-27; kebab-case at the move) |
 
 **New graph topology:**
 ```

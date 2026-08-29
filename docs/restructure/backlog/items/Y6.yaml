@@ -27,7 +27,7 @@ acceptance: |
 
   Verified by minting a throwaway item, committing the claim with the renders per the new clause, and confirming the roadmap guard passes at that sha — then discarding it. poetry run pytest -q green.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-167 (2026-08-28, prio proposed Med). A one-clause documentation fix, filed as an item rather than done inline because it edits the routing file every session reads and the wording is the whole deliverable.
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-198 (2026-08-28, prio proposed Med). A one-clause documentation fix, filed as an item rather than done inline because it edits the routing file every session reads and the wording is the whole deliverable.
 
   WORTH STATING BECAUSE THE FAILURE IS SILENT in the normal ritual: the item gets built, the next push carries the render anyway, and the red claim sha is only visible to somebody reading gh run list afterwards — precisely the nobody-was-looking failure Idea-111 already made a session step for.
 

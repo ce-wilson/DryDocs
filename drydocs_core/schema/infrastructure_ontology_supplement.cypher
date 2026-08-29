@@ -24,7 +24,7 @@
 MERGE (n:OntologyTerm:LocalClass {iri: "https://drydocs.local/ontology#Server"})
   SET n.label = "Server",
       n.notes = "Physical/virtual server from the per-application "
-              + "infrastructure export — the INVENTORY spine (gate §A1). "
+              + "infrastructure export — the INVENTORY backbone (gate §A1). "
               + "Distinct from ExecutionHost (Control-M's view, often an LB "
               + "alias), ControlMServer (a scheduler instance) and "
               + "ControlMHostGroup (an LB set); joined to ExecutionHost only "

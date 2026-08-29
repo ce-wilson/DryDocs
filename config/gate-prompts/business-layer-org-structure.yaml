@@ -1,0 +1,134 @@
+# SME gate-prompt spec — the business-layer org structure (backlog C28). GATE-BOUND
+# AND DECIDES NOTHING: drafting a prompt is not an ontology change (the
+# G27/W1/U11/N10 precedent). Every term this page proposes sits at
+# `status: planned` in the relationship vocabulary and `status: proposed` in the
+# taxonomy-ontology map; no loader writes an edge, nothing flips, and the
+# SIGN-OFF is a separate SME session.
+#
+# OVERTAKEN PREMISES, recorded per the Q9/Q14 idiom rather than papered over:
+# C28 was groomed 2026-08-09; gate `corporate-backbone-vocabulary` (G98) then
+# SIGNED 19/19 on 2026-08-17 and settled part of this page's original ground —
+# `:Company` registered org:FormalOrganization (§A1), the 2Q2024 segment reorg
+# expressed as TWO effective-dated edge types (§B1, with its recorded §B2 cost),
+# and the `corporate` domain minted (§B3). NOTHING here re-opens a signed
+# clause (L25 riders-not-edits): §B below asks whether a ChangeEvent node adds
+# value ON TOP of the signed shape, never whether the signed shape was right.
+#
+# EVIDENCE BASE is public-source only (annual-report material + one public
+# profile page), applied by hand in
+# internal/context-graph-analysis/business-layer-location-experiment.md
+# (2026-08-08) — which is why this page stays Internal-Public. One evidence
+# correction made at drafting: the experiment cites the "2026 edition" of the
+# annual report; that file is a byte-identical mislabeled copy of the 2024
+# edition (sha256-verified 2026-08-25), so citations below say 2024, with the
+# 2025 edition as corroboration where checked.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: business-layer-org-structure
+title: "SME Gate — the business-layer org structure: what class a segment is, whether a re-org is a node, and one dating idiom instead of two"
+step: "The business-layer experiment (2026-08-08) proved the W3C ORG ontology produces a coherent org view from public sources alone — org units, an effective-dated reorg, a legal-entity split the prose blurs. G98 then signed the corporate backbone (Company, two dated segment edges). This page puts the four questions that remain OPEN after both: the segment's ORG class, reifying the reorg event, converging on one as-of idiom, and the legal-entity layer. Location is explicitly out of scope — it rides Z2."
+summary: >
+  Section A puts the class question G98 did not ask: :BusinessSegment is
+  registered org:FormalOrganization — the same class as :Company — but the
+  source's own words ("managed on an LOB basis") describe management units of
+  one legal firm, which is org:OrganizationalUnit, the class :DevTeam,
+  :ServiceNowGroup, :CatalogLOB and :CatalogSubLOB already carry. Section B asks
+  whether the 2Q2024 segment merge, already carried by G98's two dated edge
+  types, should ALSO be reified as an org:ChangeEvent node — with the
+  one-fact-three-encodings cost stated against it in G98's own §B2 terms.
+  Section C converges the repo's two effective-dating idioms (K17's
+  as-of-assertion for FID ownership; G98's effective_from/effective_to edge
+  dating) into one ruled choice for org membership. Section D rules the
+  legal-entity layer the experiment surfaced (the Firm is not the bank;
+  eight subsidiaries at country grain) and adopts the claim-vs-site rule —
+  an aggregate presence claim is never exploded into structure. Section E
+  fences scope.
+
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/ + config/taxonomy-ontology-map/) — no loader exists for any term this page proposes; nothing writes"
+  Source: "internal/context-graph-analysis/business-layer-location-experiment.md (2026-08-08, hand-applied ontology over public sources) · doc-source-registry#jpmc-reports (External, confirmed: false, captured 2026-06-30 = the 2024 edition) · 2024 annual report p104 (the reorg statement; NOTE the local file named 2026 is a sha-verified mislabeled copy of 2024) · 2025 edition as corroboration · docs/reviews/chase-leadership-scrape-2026-08-27.md (doc-source-registry#chase-leadership-scrape, External, confirmed: false — 23 public pages, membership grain; attached to the draft 2026-08-27)"
+  Precedent: "G27/W1/U11/N10 — a drafted prompt decides nothing · L25 riders-not-edits — G98's signed clauses are built on, never re-opened · Q9/Q14 overtaken-recorded-not-re-done (C28 groomed 2026-08-09; G98 signed 2026-08-17) · C26 — a reservation follows the label ruling, never precedes it (§D1) · K2/G27 flips-are-follow-ups · m3_belongs_to_application — decline a weak PROV mapping rather than reach for one"
+  Registry ref: "jpmc-reports stays confirmed: false and its reshape (DataAsset slices vs lexical backbone) is the registry's named P4+ decision — out of scope here (§E2); no registry flag moves at this gate"
+  Classification: "Internal-Public — mechanism plus public-source facts only (SEC-filed annual report, one public profile page); the experiment doc it cites is Internal but nothing Internal is quoted onto this page"
+  Vocabulary: "four reservations, all planned/proposed: corporate_has_sub_organization, corporate_change_original, corporate_change_resulting (49-local-corporate), node class OrgChangeEvent (10-node-classifications) — plus three map rows in the NEW 60-mappings-corporate.yaml fragment (the corporate domain's first; G98's two signed edges predate map discipline and stay seeded-only)"
+
+provenance:
+  - label: "The annual-report facts — source-grain evidence (public, SEC-filed; applied by hand, nothing loaded)"
+    source_object: "jpmorgan-chase-annualreport-2024.pdf + 2025 edition (repo-root local, gitignored; registry row doc-source-registry#jpmc-reports, External, confirmed: false)"
+    key: "edition year — an annual-report fact is true AS OF its edition and never fresher (§C3)"
+    loader: "NONE — no loader exists for any term this page proposes, which is the point of flips-are-follow-ups (§E3)"
+    properties:
+      - name: reorg_statement
+        origin: source
+        from: "2024 edition p104"
+        note: "'The Firm is managed on an LOB basis. Effective in the second quarter of 2024 ... combining the former Corporate & Investment Bank and Commercial Banking ... three reportable business segments.' The words 'managed on an LOB basis' are §A's whole case; the merge is §B's worked example."
+      - name: legal_entities
+        origin: source
+        from: "2024 edition p80 (the bank subsidiary, HQ Columbus) + the public GlobalData profile (eight subsidiaries, country grain, one inactive)"
+        note: "The Firm-is-not-the-bank split §D models; the prose blurs it, the ontology forces it."
+      - name: presence_claims
+        origin: source
+        from: "2024 edition p6/p10 ('177 locations in the U.S.', '100+ markets', '160 countries')"
+        note: "DELIBERATELY NOT structure — §D3's claim-vs-site rule: an aggregate measurement is never exploded into site nodes. Cited as evidence FOR the rule, not as data."
+  - label: "The derived layer — what this page itself proposes (every row planned/proposed, nothing flipped)"
+    source_object: "internal/context-graph-analysis/business-layer-location-experiment.md §3 — the hand-applied ORG mapping table"
+    key: "vocab id / node label (the reservations named in meta.Vocabulary)"
+    loader: "NONE"
+    properties:
+      - name: org_class_binding
+        origin: derived
+        from: "the experiment's §3 row 'CCB, CIB, AWM, Corporate -> org:OrganizationalUnit' set against the REGISTERED class org:FormalOrganization on :BusinessSegment"
+        note: "The §A tension is DERIVED by comparing the two — neither source states it. That is why it is a gate question and not a correction."
+      - name: change_event_shape
+        origin: derived
+        from: "the experiment's org:ChangeEvent row, set against G98 §B1's signed dated-edge shape"
+        note: "§B's adopt-or-decline. The reservation exists either way so a port cannot take the names while the question is open."
+  - label: "The Chase leadership pages — membership-grain evidence plus the self-drift record (captured 2026-08-27; attached to the DRAFT the same day — a draft edit, not a rider; L25 governs signed clauses only)"
+    source_object: "docs/reviews/chase-leadership-scrape-2026-08-27.md (VERBATIM transcription of 23 public pages; registry row doc-source-registry#chase-leadership-scrape, External, confirmed: false — raw HTML not committed, per-page sha256 in the review)"
+    key: "page sha256 + captured_at — the pages publish no edit dates, so the hash is the only change signal and every fact is as-of its capture"
+    loader: "NONE — evidence-only corpus; any load is this gate session's decision"
+    properties:
+      - name: membership_assertions
+        origin: source
+        from: "22 bios, e.g. 'a member of the Consumer & Community Banking leadership team' (allison-beer); 'member of the CCB Leadership Team and the firm's Global Technology Leadership Team' (gill-haus); 'member of the firm's Operating Committee' (troy-rohrbaugh)"
+        note: "Evidence for MEMBERSHIP, never reporting lines — no bio says 'reports to', and the control-function seats declare a SECOND firmwide membership (Risk, Compliance, Audit, Control Management, HR), matrix by design. Supports §A's unit reading (people attach to management units) without deciding it; edge shape is HAS_MEMBERSHIP, the PAT precedent."
+      - name: unit_grouping
+        origin: derived
+        from: "'CCB's eight lines of business and nine functions' (pablo-rodriguez) set against title patterns across the 22 tiles — the review's §3 tree"
+        note: "SYNTHESIZED and labeled as such in the review: no page draws the tree; the grouping is inference from one sentence plus title patterns. Cite the review §3, never the pages, for the grouping."
+      - name: self_drift
+        origin: source
+        from: "review §5 (D1-D7): the CCB customer denominator live in THREE concurrent vintages across sibling bios (86M/7M vs 87M/7.5M vs 90M+); index tile vs bio title disagreement on one seat; the most senior tile missing its title; a moved portfolio's description copied forward verbatim"
+        note: "Calibration evidence FOR §C3's source-grain corollary, demonstrated on a first-party official page: the publisher's own surface carries concurrent vintages, so a scrape-sourced org fact is true as-of its capture and never fresher — the extreme case of §C's rule, a dated capture of an UNDATED source."
+
+sections:
+  - title: "A. The segment's ORG class — unit of the Firm, or a second legal organization"
+    confirmations:
+      - "A1. THE QUESTION G98 DID NOT ASK: :BusinessSegment is registered `org:FormalOrganization` (10-node-classifications.yaml — adopted as 'the more precise valid term' over a doc/supplement disagreement, BEFORE the business-layer experiment ran). That makes a reportable segment the same class as :Company itself. The source's own words cut the other way: 'the Firm is managed on an LOB basis' (2024 annual report p104) describes CCB/CIB/AWM/Corporate as MANAGEMENT UNITS of one legal firm — org:OrganizationalUnit, 'an organization such as a department or support unit which is part of some larger FormalOrganization'. Segments are not separately incorporated; they are how the Firm reports. PROPOSED: :BusinessSegment re-classes to org:OrganizationalUnit. Confirm or keep FormalOrganization, and record the reason either way."
+      - "A2. THE CONSISTENCY ARGUMENT, laid out rather than implied: org:OrganizationalUnit is already the registered class for :DevTeam, :ServiceNowGroup, :CatalogLOB and :CatalogSubLOB — every 'unit that holds people/work inside the Firm' the repo models. Ruling A1 for OrganizationalUnit makes the whole internal hierarchy one class family with :Company as the single FormalOrganization anchor; ruling it for FormalOrganization leaves segments class-identical to the legal firm while their own sub-tiers (CatalogLOB downward) are units. Neither is wrong in isolation — confirm WHICH reading the repo standardizes on."
+      - "A3. NO NEW LABEL EITHER WAY (the CLAUDE.md §1 warning, both edges of it): the experiment confirms the annual report's org units ARE the LOB layer the repo already holds — the label set (:Company, :BusinessSegment, :CatalogLOB, ...) does not grow from this section. A1 is a CLASS annotation question, not a label question. Confirm that no org-unit label is minted."
+      - "A4. IF A1 RE-CLASSES: the change is a one-line class edit plus the schema-graph re-render, and prov_type Agent is UNCHANGED (an OrganizationalUnit is still a PROV agent). The edge-level prov_maps_to on the two G98 segment edges stays null per that gate's own recorded reasoning (org:hasUnit carries no effective-dating; the m3_belongs_to_application decline-a-weak-mapping precedent). Confirm the blast radius reading."
+
+  - title: "B. The reorg as a node — reify org:ChangeEvent, or decline the third encoding"
+    confirmations:
+      - "B1. WHAT IS ALREADY SIGNED AND NOT RE-OPENED: G98 §B1 carries the 2Q2024 reorg as TWO effective-dated edge types (HAS_BUSINESS_SEGMENT open-ended, HAS_BUSINESS_SEGMENT_HISTORICAL closed at 2024-03-31), and §B2 records the cost — currency encoded twice, guarded by a graph-test. The reorg is ALREADY additive: nothing was rewritten when CIB absorbed CB. This section asks a strictly NEW question on top."
+      - "B2. THE PROPOSAL: reify the merge itself as an :OrgChangeEvent node (class org:ChangeEvent, PROV alignment prov:Activity) with ORIGINAL_ORGANIZATION edges to the former CIB and CB segments and a RESULTING_ORGANIZATION edge to the merged CIB, effective 2024-04-01. What reification buys: the EVENT becomes addressable — 'what happened in 2Q2024' is a node with a date, not an inference over two edge families' date fields; future re-orgs accumulate as history the same way. What it costs, in G98 §B2's own terms: the same fact would then live in THREE encodings (two edge types, their date fields, and the event node), and every new encoding is a new way for the graph to disagree with itself. Rule adopt or decline — and if declined, record that a future re-org richer than a two-into-one merge (a split, a transfer) is the named re-arm trigger, since dated edges express those poorly."
+      - "B3. THE WORKED EXAMPLE IS ALSO A VOCABULARY FACT: the same 2Q2024 event renamed the CIB acronym's expansion (Corporate & Investment Bank -> Commercial & Investment Bank; the glossary's CIB sense carries the 2025 report's spelling). If B2 adopts, the ChangeEvent node is the natural anchor for that does_not_mean/alt_label history; if B2 declines, the glossary carries it alone. Confirm which surface owns the rename story."
+
+  - title: "C. One effective-dating idiom — as-of assertion or dated edges, ruled once"
+    confirmations:
+      - "C1. THE REPO NOW HAS TWO DATING IDIOMS AND NO RULE FOR WHICH APPLIES WHEN: (1) the K17 as-of-assertion (fid-identity-and-scope, SIGNED 33/33): ownership is an AS-OF fact — the assertion carries the date it was true, and a later assertion supersedes without deleting; (2) the G98 dated-edge shape: effective_from/effective_to properties, currency also encoded in the type name. Both are signed; neither names its scope. PROPOSED RULE: as-of assertion for facts SOURCED FROM A DATED CAPTURE (a report edition, an extract run — the fact is 'true as of the source's date'); dated edges for STRUCTURAL currency the graph itself must answer ('which segments exist NOW'). Confirm the rule or re-draw the line — what this section must not end with is a third idiom."
+      - "C2. ORG MEMBERSHIP SPECIFICALLY: person/team membership in org units already rides :Membership (org:Membership, the K4/G70 machinery) — this section adds NO membership edge. What it rules is only the DATING SHAPE a future org-membership loader uses, per C1's rule. Confirm that reading, so the section cannot be misread as a new membership model."
+      - "C3. THE SOURCE-GRAIN COROLLARY, adopted as a standing rule for this corpus: an annual-report fact is true AS OF the edition's fiscal year and never fresher; a loader that writes org facts from jpmc-reports stamps the edition it read (the doc-source-registry captured_at discipline). The experiment found the registry's captured_at (2026-06-30, 2024 edition) already lags the newest local edition — the stamp is what makes that visible instead of silent. Confirm."
+
+  - title: "D. The legal-entity layer, and the claim-vs-site rule"
+    confirmations:
+      - "D1. THE FIRM IS NOT THE BANK, and the prose blurs what the ontology forces apart: the annual report names the national bank subsidiary ('headquartered in Columbus') as a distinct legal entity under the Firm; the public profile adds eight subsidiaries at country grain, one carrying a lifecycle state (inactive). Today the repo has ONE :Company node and no sub-organization shape at all. PROPOSED: corporate_has_sub_organization (HAS_SUB_ORGANIZATION, Company -> Company, org:hasSubOrganization) registered planned — the RESERVATION deliberately reuses :Company for both endpoints, and WHETHER a distinct :LegalEntity label is warranted is this clause's question, with the C26 lesson applied (reserving a label the ruling then rejects guards nothing; the label question is asked FIRST, the reservation follows the answer)."
+      - "D2. LIFECYCLE IS A PROPERTY, NEVER A DELETION: the inactive subsidiary stays a node with a status — the same audit-kept discipline as retired: true on :BusinessSegment (G98 §B4 named that property's modelling as separate work; this clause inherits, not re-rules, it). Confirm."
+      - "D3. THE CLAIM-VS-SITE RULE, adopted as a standing load rule for this corpus: an enumerable site ('regional headquarters in London') is structure; an aggregate presence claim ('177 locations in the U.S.', '100+ markets') is a MEASUREMENT about the org and is never exploded into fake site nodes — the business-layer twin of the load-map's 'unmatched is reported, not dropped'. Any future jpmc-reports loader carries this rule in its spec. Confirm the rule here so the Z2 location gate inherits it settled."
+
+  - title: "E. Scope fence"
+    confirmations:
+      - "E1. LOCATION IS OUT — every site, address, and geography-grain question rides the Z2 gate (the experiment's grain findings are Z2 evidence, not this page's). This page rules org STRUCTURE only."
+      - "E2. THE CORPUS RESHAPE IS OUT — whether jpmc-reports moves onto the lexical Document->Chunk backbone (making real GraphRAG possible) is the registry's named P4+ decision with its own trail (Idea-49, the empty-venue finding). Nothing here depends on it: this page's evidence is the hand-applied experiment, not a graph query."
+      - "E3. FLIPS ARE FOLLOW-UPS: signing this page authorizes; it performs nothing. Every planned/proposed registration stays exactly there until a groomed build item flips it with a loader behind it."

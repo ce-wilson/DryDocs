@@ -1,6 +1,6 @@
 id: W1
-epic: fcdo-alignment
-title: 'FCDO vocabulary crosswalk: DryDocs terms mapped to the firmwide framework terms as status: proposed,
+epic: cdo-alignment
+title: 'CDO vocabulary crosswalk: DryDocs terms mapped to the firmwide framework terms as status: proposed,
   with a gate spec — mechanism-only rows'
 type: task
 module: ontology
@@ -11,11 +11,11 @@ priority: p2
 status: done
 depends_on: []
 inputs:
-- internal/fcdo-reference/ALIGNMENT-PLAN.md
+- internal/cdo-reference/ALIGNMENT-PLAN.md
 - drydocs_core/ontology/relationship_vocabulary.yaml
 - config/crosswalks/
 - config/gate-prompts/
 acceptance: |
-  config/crosswalks/fcdo-vocabulary.yaml exists carrying the ALIGNMENT-PLAN Phase-1 rows (ControlMJob<->OL Job, JobRun<->OL Run, DataAsset<->Dataset, READS_FROM/WRITES_TO<->prov:used/wasGeneratedBy with the Run-grain vs definition-grain note, loader envelope<->metadata envelope, lifecycle<->adms:status as documentation-only, SUBCLASS_OF/MAPS_TO<->rdfs bridging, RECONCILES_TO confidence<->skos:closeMatch+mappingConfidence), every row status: proposed and MECHANISM-ONLY (standard CURIEs; no internal URLs/names — those stay in internal/); a gate prompt config/gate-prompts/fcdo-crosswalk.yaml covers every row; rows whose evidence sits in the known capture holes (Descriptive Metadata, Data Quality, DPROD contracts, taxonomy property tables) are marked blocked-on-recapture, not proposed-as-ready. NOTHING flips confirmed except the SME gate session (gate-log entry). Schema/board tests green.
+  config/crosswalks/cdo-vocabulary.yaml exists carrying the ALIGNMENT-PLAN Phase-1 rows (ControlMJob<->OL Job, JobRun<->OL Run, DataAsset<->Dataset, READS_FROM/WRITES_TO<->prov:used/wasGeneratedBy with the Run-grain vs definition-grain note, loader envelope<->metadata envelope, lifecycle<->adms:status as documentation-only, SUBCLASS_OF/MAPS_TO<->rdfs bridging, RECONCILES_TO confidence<->skos:closeMatch+mappingConfidence), every row status: proposed and MECHANISM-ONLY (standard CURIEs; no internal URLs/names — those stay in internal/); a gate prompt config/gate-prompts/cdo-crosswalk.yaml covers every row; rows whose evidence sits in the known capture holes (Descriptive Metadata, Data Quality, DPROD contracts, taxonomy property tables) are marked blocked-on-recapture, not proposed-as-ready. NOTHING flips confirmed except the SME gate session (gate-log entry). Schema/board tests green.
 notes: |
-  Groomed 2026-07-31 from the same-day inbox idea (FCDO crosswalk = Phase 1 of the alignment plan). Phase chosen: 2 (ontology mapping + HITL) over 11 — this is term-mapping, not a per-source ledger (recorded per the groom rule). Same mechanism as the AutoSys/Airflow crosswalks (F1/F2 precedent). DONE 2026-08-05 (desktop, eaa4469): 8 rows under sibling schema drydocs.vocab-crosswalk.v1 (orchestrator runtime skips it deliberately), row 5 blocked-on-recapture (Descriptive Metadata hole); gate spec fcdo-crosswalk covers all rows; test_fcdo_crosswalk.py pins the proposed-only/mechanism-only/runtime-skip invariants. Gate SESSION is still open — it joins the AWAITING list, and row 5 stays unsignable until the fcdo-frameworks recapture.
+  Groomed 2026-07-31 from the same-day inbox idea (CDO crosswalk = Phase 1 of the alignment plan). Phase chosen: 2 (ontology mapping + HITL) over 11 — this is term-mapping, not a per-source ledger (recorded per the groom rule). Same mechanism as the AutoSys/Airflow crosswalks (F1/F2 precedent). DONE 2026-08-05 (desktop, eaa4469): 8 rows under sibling schema drydocs.vocab-crosswalk.v1 (orchestrator runtime skips it deliberately), row 5 blocked-on-recapture (Descriptive Metadata hole); gate spec cdo-crosswalk covers all rows; test_cdo_crosswalk.py pins the proposed-only/mechanism-only/runtime-skip invariants. Gate SESSION is still open — it joins the AWAITING list, and row 5 stays unsignable until the cdo-frameworks recapture.

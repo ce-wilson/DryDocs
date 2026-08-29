@@ -224,3 +224,75 @@
       purge is project/process-scoped, so an unassigned email is unpurgeable by scope and
       is surfaced by the report, never deleted by a default.
 
+  # ---- Q14: vendor-docs entity core (2026-08-22 — gate DRAFTED, unsigned) ----
+  # The bmc-docs-controlm-utilities capture (1016 VERBATIM pages, 1017 TOC nodes,
+  # 9.0.20; confirmed: false, NEVER loaded on either machine). One entry per gate,
+  # edge_shapes per term — the L7 doc-traceability-feedback shape.
+
+  - id: vendor-docs-entity-core
+    taxonomy:
+      source: "bmc-docs-controlm-utilities"
+      element: "Vendor page titles ARE exact utility names (exportdefjob, ctmorder, the emdef family: defjob/exportdefjob/updatedef/copydefjob/deldefjob/duplicatedefjob, each with rules/parameters/examples) — a name-addressable entity core the publisher ships in toc.json, modeled as first-class nodes + aboutness/navigation/estate-join edges (backlog Q14; plan knowledge/upgrade-plans/vendor-docs-agent-navigation.md §3)"
+    ontology:
+      from_node: ControlMUtility            # dd:ControlMUtility (NEW class, proposed — gate §A; prov:Entity)
+      to_node: "SoftwareProduct | Document | DocSection | ControlMJob"
+      prov_type_from: Entity
+      prov_type_to: "Entity (SoftwareProduct/Document/DocSection) | Activity (ControlMJob)"
+      matrix_row: "several — one row per edge; see edge_shapes"
+      edge_shapes:
+        - edge: "Document -[:DESCRIBES]-> ControlMUtility"
+          matrix_row: "Entity -> Entity aboutness, no PROV row — REUSED label, new triple beside the ACTIVE Document -> SoftwareProduct (C8 discipline; gate §B)"
+          vocab_id: docs_describes_utility
+        - edge: "ControlMUtility -[:PART_OF]-> SoftwareProduct"
+          matrix_row: "structural containment, no PROV row (dcterms:isPartOf family) — THIRD triple of PART_OF (gate §A3)"
+          vocab_id: docs_utility_part_of
+        - edge: "Document -[:SEE_ALSO]-> Document"
+          matrix_row: "Entity -> Entity reference, no PROV row (rdfs:seeAlso analog, namespace declared) — vendor-asserted, basis REQUIRED (gate §C)"
+          vocab_id: docs_see_also
+        - edge: "Document -[:IN_SECTION]-> DocSection"
+          matrix_row: "structural containment, no PROV row — layer-1 TOC transcription; loader-without-vocabulary gap closed at the draft (gate §E3)"
+          vocab_id: docs_in_section
+        - edge: "DocSection -[:SUBSECTION_OF]-> DocSection"
+          matrix_row: "structural hierarchy, no PROV row — layer-1 TOC transcription; same §E3 gap"
+          vocab_id: docs_subsection_of
+        - edge: "ControlMJob -[:INVOKES]-> ControlMUtility"
+          matrix_row: "Activity -> Entity = prov:used — new triple beside the ACTIVE scheduler_invokes (Script | ETLProcess); the layer-3 estate join, formerly BLOCKED on G32, made legal-not-ruled by the fold (gate §D)"
+          vocab_id: scheduler_invokes_utility
+      node_classifications_added: [ControlMUtility]
+    precedence_authority: bmc-baseline
+    vocab_id: docs_describes_utility   # primary; all six in edge_shapes
+    status: confirmed
+    proposed_at: 2026-08-22
+    confirmed_by: chad.wilson
+    confirmed_on: 2026-08-22   # gate session same day as the draft, all 21 confirmations (A1-A4, B1-B3, C1-C4, D1-D4, E1-E6) — transcribed in config/gate-log.md
+    gate_spec: config/gate-prompts/vendor-docs-entity-core.yaml
+    capture: >
+      waived — the classification source is the OUT-OF-REPO capture
+      (DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.20-utilities/, desktop
+      data root: the verbatim vendor payload never enters the repo per the
+      publish boundary) plus its doc-source-registry row
+      (config/doc-source-registry.yaml, counts transcribed at capture); no
+      config/taxonomy/ import exists for the vendor TOC — the entity core is
+      minted FROM the loaded corpus at Q25, not from a taxonomy capture file.
+      The taxonomy-first gap this field records rather than hides (the
+      email-concerns-subject precedent).
+    note: >
+      CONFIRMED MAPPING, NOT YET WRITTEN: every vocab entry stays status: planned
+      until its build lands (flips-are-follow-ups — Q24 flips the registry row +
+      runs the first layer-1 load on the DESKTOP, which holds the capture; Q25
+      builds the entity core and flips its entries active with supplements;
+      scheduler_invokes_utility waits past Q25 on the CMD_LINE parser work,
+      §D2(iii)). THE SESSION'S ONE CLARIFICATION (§A2): the SME's condition —
+      family placement, never a SoftwareProduct peer — is exactly what the draft
+      does; the "sibling" scenario was the REJECTED alternative (each utility as
+      a registry product row beside controlm/neo4j). C3 RULED ADOPTION: the
+      rdfs:seeAlso mapping is adopted on docs_see_also (rdfs is a declared
+      namespace — the ANNOTATES local-pending pattern deliberately not followed).
+      TWO ACCEPTANCE PREMISES had been OVERTAKEN and were confirmed as recorded
+      (the Q9 idiom): the LOADED-backbone evidence premise (unmeetable — §E1 ruled
+      THIS page is the corpus's doc-graph gate; evidence was capture-grain plus
+      the live sibling corpus, venue-tagged laptop/neo4jtest/drydocs 2026-08-22
+      J18) and the layer-3 BLOCKED-on-G32 premise (G32 signed 2026-08-18, G102
+      fold executed; §D ruled the real chain). E5 fence: Q15/Q18/loader code/
+      bmc-docs corpus untouched by this gate.
+

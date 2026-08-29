@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - G104
 inputs:
@@ -29,3 +29,48 @@ notes: |
   MODULE CHOICE, recorded because the entry asked for "per-component items" (plural) and this groom filed ONE: the change is a single mechanical pattern applied four times against one core contract, so four items would fragment one review across four pulls while multiplying the chance the four drift into four slightly different run-log shapes — which is the exact defect the item exists to remove. `module: drydocs-lineage` names the first component in the list; the acceptance enumerates all four so nothing is lost by the single filing. If whoever pulls this finds a component needs materially different treatment, split THAT one out as its own item rather than reshaping this acceptance.
 
   G93 (drydocs-remediation) is the built precedent and is deliberately not re-done here.
+  DONE 2026-08-25 (desktop). THREE of the four named components wired, one refused with cause.
+
+  THE ACCEPTANCE'S CITED PRECEDENT DOES NOT EXIST. It says to do this "exactly as
+  drydocs_remediation does after G93" -- G93 is still todo, so remediation opens no run log and
+  logs nothing at all. Built against the LIVE precedent instead: drydocs/loaders/base.py, which
+  has always done it correctly (open -> capture the exception -> re-raise -> close in finally)
+  across eight call sites. G93 gains a rider so remediation joins this shape rather than minting
+  a fifth.
+
+  DEEPDOC IS REFUSED, NOT SKIPPED. drydocs_deepdoc is a scaffold -- its own __init__ says
+  NotImplementedError until MM10, and both investigate_failure() and write_findings() raise on
+  their first line. Wrapping a function that cannot run produces a log that opens and immediately
+  closes with a failure summary, every time, forever; a test asserting that would be asserting the
+  scaffold. It rides MM10, and the test module says so in its docstring rather than leaving a
+  reader to wonder which component is missing and why.
+
+  ONE SHARED HELPER, NOT FOUR COPIES -- drydocs_core.run_log.batch_run_log, a context manager
+  yielding a mutable summary dict. base.py had the right block but inline, so a component wanting
+  the same behaviour had to copy it. Copying it four times IS the drift this item's own groom note
+  warned about: four components, four almost-identical shapes, no single place to fix the one that
+  is subtly wrong. It also carries base.py's OSError rule -- an unwritable log directory is
+  swallowed and the batch runs WITHOUT a log, because a run log is an audit trail and must never be
+  the reason a batch fails.
+
+  WIRED, each by rename-plus-wrapper so the diff is the wrapper rather than a re-indented body:
+  lineage write_curated + write_rua, docmeta's two connectors (fetch kept as the PUBLIC name, so
+  the Connector protocol still holds -- guarded), and the vendor scrape's capture, which printed to
+  stdout only and left nothing behind once the terminal closed.
+
+  A JUDGEMENT CALL: write_curated's empty-confirmed guard runs BEFORE the log opens. Nothing was
+  asked for, so there is no batch to record, and a log per no-op call would bury real runs among
+  empties. Guarded, so the choice is visible rather than incidental.
+
+  A BUG MY OWN TEST HID, worth recording because the lesson is general. Both connectors were
+  written against source.source_id -- a field FetchSource does not have; it is source.id. My new
+  test used a FAKE carrying source_id, so it passed against the same invention, and SEVENTEEN
+  EXISTING docmeta tests are what caught it. The fix was not just the attribute: the test now
+  constructs the REAL FetchSource. A fake allowed to differ from the type it stands in for
+  validates the author's belief instead of the code.
+
+  12 new guards, every component tested on BOTH paths -- the failure path is the half that matters,
+  since a run log that only exists when nothing went wrong records the runs nobody needs. Also
+  guarded: the protocol still holds, and an unwritable log directory does not break a batch.
+  Suite 2410 passed / 11 skipped, ruff + format clean, CLI import + --help pass, module boundary
+  green (the helper lives in core; components import core, never each other).

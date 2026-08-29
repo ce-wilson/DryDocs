@@ -23,6 +23,8 @@
 --   :developer_sid  authoring developer SID — J.AUTHOR/CREATION_USER/CHANGE_USERID
 --                   (lowercase-initial; trailing 'p' = automation release process)
 --   :row_cap        ROWNUM sample cap
+--   :data_center_filter  data-center name LIKE pattern — T.DATA_CENTER (G115,
+--                   the per-data-center run recipe; long-form name)
 --   (operational who-ran-it identity is separate — psgmgr.CM_AUD_ACTS, later)
 -- =============================================================================
 
@@ -67,8 +69,9 @@ JOIN   psgmgr.CM_DEF_VTAB T   ON J.TABLE_ID = T.TABLE_ID
 WHERE  J.IS_CURRENT_VERSION = 'Y'
   AND  T.USER_DAILY IS NOT NULL
   -- optional scope (any bind NULL = no filter on that dimension)
-  AND  (:folder_filter IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
-  AND  (:run_as        IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
-  AND  (:developer_sid IS NULL OR :developer_sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID))
-  AND  (:row_cap       IS NULL OR ROWNUM        <=  :row_cap)
+  AND  (:folder_filter      IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
+  AND  (:run_as             IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
+  AND  (:developer_sid      IS NULL OR :developer_sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID))
+  AND  (:data_center_filter IS NULL OR T.DATA_CENTER LIKE :data_center_filter)
+  AND  (:row_cap            IS NULL OR ROWNUM        <=  :row_cap)
 ;

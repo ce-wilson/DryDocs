@@ -1,0 +1,101 @@
+# SME gate-prompt spec — the two Script provenance gaps (backlog G61). GATE-BOUND
+# AND DECIDES NOTHING: drafting a prompt is not an ontology change (the
+# G27/W1/N10 precedent). Nothing is written to the graph until sign-off, no
+# loader changes, and the property-term bindings this page proposes land in the
+# vocabulary's section 0b AT SIGN-OFF, not before — the envelope-property-terms
+# (M4) precedent: `decided_by` names a signed gate, so a binding cannot precede
+# its gate. The two map rows ARE the pre-gate registration (status: proposed).
+#
+# THE LIVE CASE both gaps come from (cmdline-nfr-vetting, SIGNED 4/4
+# 2026-07-21; Idea-21): a file-watcher-shaped job whose .tok is produced by an
+# UPSTREAM API-call job writing the file locally — the name and the type lie.
+# The anti-pattern itself is ALREADY CODIFIED (_FW-really-API + design
+# principle 8: intent from resolved flow, flag the name-token disagreement) and
+# is NOT re-ruled here. What that case left OPEN is what this page puts to the
+# SME: (a) the flag for a payload script deployed on the execution host but
+# absent from source control, and (b) Script identity where no pipeline id
+# exists.
+#
+# TIMING NOTE, because both of tonight's closes feed this page: G97 (the m7
+# payload build) made the GUID-vs-path boundary OPERATIONAL — GUID-keyed DPL
+# targets stay :ETLProcess on INVOKES, path-shaped payloads land :Script on
+# USES_ARTIFACT — and G56's mount-table capture is what makes path identity
+# DECIDABLE on shared storage. Section B rules the policy those builds are
+# already running on.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: script-provenance-gaps
+title: "SME Gate — Script provenance gaps: the not-in-source-control flag, and path-keyed identity where no pipeline id exists"
+step: "The FW-really-API live case surfaced two gaps the signed anti-pattern does not cover: a payload script that RUNS on the execution host but cannot be found in source control (the code search finds only the XML variable reference), and Script identity for non-DPL jobs, which carry no pipeline-id key at all. Both are keying/meaning decisions, so they route through this gate rather than through a build. G97 and G56 (closed 2026-08-25) made both questions concrete: the GUID-vs-path boundary now operates in the payload build, and mount capture makes shared-vs-local storage a derived fact."
+summary: >
+  Section A rules the artifact-not-in-SCM flag: a tri-state scm_status on
+  :Script (tracked | deployed-only | unknown) rather than a boolean — because
+  "checked and absent" and "never checked" must never share a value — carried
+  with the search that established it (no anonymous assertions, as-of the
+  search date), and with what a consumer MAY and MAY NOT conclude stated on
+  the term itself. Section B rules identity: whether the resolved, normalized
+  PATH is the identity fallback for scripts that have no GUID, whether the
+  GUID-vs-path boundary is confirmed as the kind discriminator it already
+  operationally is after G97, and what storage scope (G56's derived
+  shared-vs-local) does to the key shape. Section C fences scope: the
+  anti-pattern stays as signed, the description-field metadata plan remains
+  the declared-provenance carrier, and every binding lands at sign-off.
+
+meta:
+  Module: "ontology (drydocs_core/ontology/relationship_vocabulary/ 20-property-terms §0b at SIGN-OFF + config/taxonomy-ontology-map/) — no loader changes; the G97 payload build and G56 collector are inputs, not subjects"
+  Source: "internal/remediation/governance/nfr-consistency-and-greenfield.md (design principle 8, the _FW-really-API anti-pattern) · the cmdline-nfr-vetting sign-off (2026-07-21, 4/4) whose live case minted both gap classes · G97 close note (the INVOKES/USES_ARTIFACT split as built) · G56 close (mount table -> storage scope derived)"
+  Precedent: "G27/W1/N10 — a drafted prompt decides nothing · envelope-property-terms (M4) — property bindings land at sign-off, decided_by names a signed gate · O24 / email-folder-assignment §A3 — no anonymous assertions: a flag carries its basis · K17 as-of-assertion — an SCM absence is true as of the search that established it · business-application-identity (S3) — an identity ruling is a property binding, no edge · load-map 'unmatched is reported, not dropped' — unknown is a value, never a default false"
+  Registry ref: "no registry flag moves; the scripts this page is about arrive through the CMDLINE resolution chain and the rua bundle evidence, both already registered"
+  Classification: "Internal-Public — mechanism only; the live case is described by shape (a file-watcher-shaped job, an upstream API-call job), never by job name, host, path or SID"
+  Vocabulary: "NO new edge and NO new node class — both gaps are property/identity questions on the existing :Script. Two map rows registered proposed (50-mappings-architecture.yaml): script-scm-status and script-identity-binding. The scm_status property-term binding (§0b) lands at sign-off per M4"
+
+provenance:
+  - label: "The live case — source-grain evidence (shape only; the instance stays internal)"
+    source_object: "cmdline-nfr-vetting gate session evidence (2026-07-21) + internal/remediation/governance/nfr-consistency-and-greenfield.md"
+    key: "the anti-pattern id (_FW-really-API); the instance itself is never keyed here"
+    loader: "NONE — nothing this page proposes has a loader; that is §C3's fence"
+    properties:
+      - name: fw_really_api
+        origin: source
+        from: "the live case: a .tok produced by an UPSTREAM API-call job writing locally — no external push exists; the job's name and type both mislead"
+        note: "Already codified as the anti-pattern + design principle 8. Cited as the ORIGIN of both gaps, not re-ruled (§C1)."
+      - name: scm_absence
+        origin: source
+        from: "the same case's code search: the payload script deployed on the execution host appears NOWHERE in source control — the only hit is the XML variable reference that names it"
+        note: "Gap (a). The search is an event with a date and a scope, which is exactly what §A2 makes the flag carry."
+  - label: "The derived layer — what the payload build already does (policy running ahead of ruling)"
+    source_object: "G97 (m7 payload build, 2026-08-25) + G56 (collector mount capture, 2026-08-25)"
+    key: "kind discriminator as BUILT: GUID-keyed -> :ETLProcess on INVOKES; path-shaped payload -> :Script on USES_ARTIFACT"
+    loader: "drydocs_lineage payload extraction (G97) — an input to this gate, not its subject"
+    properties:
+      - name: guid_vs_path_boundary
+        origin: derived
+        from: "G97's close: the one real collision resolved — a DPL pipeline reached through a launcher STAYS :ETLProcess; payloads with no GUID land :Script"
+        note: "§B2 asks the SME to CONFIRM this operational boundary as the ruled kind discriminator, or re-draw it — the build follows the ruling either way."
+      - name: storage_scope
+        origin: derived
+        from: "G56: shared-vs-local storage is now DERIVED from the captured mount table"
+        note: "§B3's input: a path on a shared mount is ONE script across N hosts; a local path is per-host. The identity key shape depends on which."
+
+sections:
+  - title: "A. The artifact-not-in-SCM flag — name, shape, attachment, and what it licenses"
+    confirmations:
+      - "A1. THE SHAPE IS TRI-STATE, NOT BOOLEAN: proposed property `scm_status` on :Script with values tracked | deployed-only | unknown, DEFAULT unknown. A boolean cannot distinguish 'checked and absent' from 'never checked', and collapsing those two is how an unverified script reads as a verified-missing one. `unknown` is a value the load-map discipline already stands behind (unmatched is reported, not dropped). The alternative — a bare `artifact_not_in_scm: true` flag written only on the bad cases — is laid out for explicit rejection: it makes absence-of-flag ambiguous, which is the same defect one level up. Rule the name and the value set."
+      - "A2. NO ANONYMOUS ASSERTIONS (O24/A3), AND AS-OF (K17): `deployed-only` is a CLAIM ABOUT A SEARCH, so the flag carries its basis — proposed companions scm_checked_at (date) and scm_search_scope (what was searched: which SCM roots/orgs). An SCM absence is true AS OF the search that established it and within the scope that was searched — a later import or an unsearched repo can falsify it, which is why the date and scope are part of the assertion, not decoration. Confirm the companion properties ride with the flag or name a leaner basis shape."
+      - "A3. IT ATTACHES TO :Script, NOT to the job and NOT to the edge: the artifact is the thing that is absent. A job-level flag would smear one script's status across every job that invokes it; an edge-level flag would fork the status per invocation. Confirm the attachment."
+      - "A4. WHAT A CONSUMER MAY CONCLUDE from deployed-only — stated on the term so the first consumer does not invent it: (may) the running artifact has no reviewable source; change-management and remediation flows must treat it as unreviewable (a fix package cannot cite a repo); it is a governance finding worth surfacing. (may NOT) that the script is unmanaged or orphaned — it may live in an unsearched repo (that is what scm_search_scope bounds); and NEVER a deletion or cleanup candidate on this evidence alone. Confirm both lists, or amend."
+      - "A5. NOT :Uncertain — deliberately argued rather than assumed: the deepdoc :Uncertain discipline marks findings whose TRUTH is unestablished. deployed-only is a GROUNDED observation (the search ran; its scope and date are on the node) with a bounded conclusion. Blurring grounded-negative-evidence into :Uncertain would teach consumers to discount exactly the flag §A4 wants acted on. Confirm the trust framing."
+
+  - title: "B. Script identity where no pipeline id exists — path as the fallback key"
+    confirmations:
+      - "B1. THE STANDING NOTE THIS SECTION MUST EITHER AMEND OR OBEY: the lineage model's own rule says path is 'kept as node PROPERTIES, never identity' — written when GUID-keyed DPL pipelines were the only first-class code objects, and :Script carries NO uniqueness constraint today. Non-DPL payloads (python/shell reached by the CMDLINE chain) have no GUID at all, so today they have NO identity key whatsoever — two loads can mint two nodes for one script. PROPOSED: the resolved, normalized path IS the identity fallback for kind: payload scripts, amending the standing note from 'never identity' to 'never identity WHERE A GUID EXISTS'. Rule it — and if declined, name what else keys a GUID-less script, because 'nothing' is the current answer and it cannot survive a second load."
+      - "B2. THE GUID-vs-PATH BOUNDARY AS THE KIND DISCRIMINATOR — confirm what already operates: G97 built exactly this split (GUID-keyed targets stay :ETLProcess on INVOKES; path-shaped payloads land :Script on USES_ARTIFACT), resolving its one real collision in favour of the boundary (a DPL pipeline reached through a launcher is an :ETLProcess, full stop). This clause asks the SME to RATIFY the boundary as the ruled discriminator — has-a-GUID means pipeline-class identity, path-only means Script — so the build stops running ahead of its ruling. If re-drawn, G97's bucket counts are the named re-verification."
+      - "B3. NORMALIZATION AND STORAGE SCOPE, the two hazards that make naive path identity wrong: (1) one script, many spellings — %%VAR-resolved prefixes, symlinks, relative forms; identity must be the RESOLVED, normalized path (the CMDLINE resolution chain already produces it) or the key shatters per spelling. (2) one path, many machines — G56 now DERIVES shared-vs-local from the mount table: a shared-mount path is ONE artifact across N hosts, a local path is per-host. PROPOSED key shape: (storage_scope, normalized_path), collapsing to path alone on shared storage. The path-only alternative (simpler, wrong on local storage where two hosts' /opt/x.py are different files) is laid out for explicit rejection. Rule the key shape."
+      - "B4. CONTENT IS A PROPERTY, NEVER THE KEY: where bundle evidence supplies a content hash (the rua collector), it lands as a property for drift detection — same path, changed content is a VERSION fact, not a new identity. Hash-as-identity is rejected in the prompt body because it inverts the operator question (operators ask 'what runs at this path', never 'where does this hash run'). Confirm."
+      - "B5. THE CONSTRAINT CONSEQUENCE, stated so sign-off knows its blast radius: ruling B1+B3 implies a uniqueness constraint on :Script over the ruled key — a constraints.cypher addition, an EXPECTED_CONSTRAINTS bump, and a backfill question for any Script nodes already minted without it (the S3 null-ignoring-uniqueness lesson: MERGE on a new key beside old unkeyed nodes creates twins). The migration is a groomed follow-up, never performed at sign-off. Confirm the reading."
+
+  - title: "C. Scope fence"
+    confirmations:
+      - "C1. THE ANTI-PATTERN IS NOT RE-RULED: _FW-really-API and design principle 8 (intent from resolved flow; flag the name-token disagreement) stand as signed at cmdline-nfr-vetting. This page rules only the two gaps that case exposed."
+      - "C2. THE DECLARED-PROVENANCE CARRIER IS OUT: the description-field metadata plan owns how a job DECLARES its provenance going forward; this page rules only what the graph asserts when nothing was declared. The two must not be merged — one is authoring policy, the other is observed-estate modelling."
+      - "C3. FLIPS ARE FOLLOW-UPS, and for property terms the M4 rule is stricter: signing authorizes; the §0b property-term bindings are REGISTERED at sign-off (decided_by names this gate), the constraint/backfill migration is a groomed follow-up, and no loader writes any of it until then. The two map rows stay proposed until this page signs."

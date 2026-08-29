@@ -1,4 +1,4 @@
-"""Load / ingest commands: load, refresh-reference, apply-supplements (+ legacy per-supplement aliases), load-software-registry, load-batch-orchestrators, load-code-snapshot, patch-window, load-server-inventory, load-folder-attribution, load-manual-mappings, ingest-controlm.
+"""Load / ingest commands: load, refresh-catalog, refresh-applications, refresh-teams (+ the deprecated refresh-reference alias that runs all three), apply-supplements (+ legacy per-supplement aliases), load-software-registry, load-batch-orchestrators, load-code-snapshot, patch-window, load-server-inventory, load-folder-attribution, load-manual-mappings, ingest-controlm.
 
 S8 (2026-08-21): split out of drydocs/cli.py. The root stays the composition
 root and the only module that may wire other components; this module holds
@@ -11,14 +11,15 @@ monkeypatch ``drydocs.cli._client`` keep working.
 
 from __future__ import annotations
 
+import getpass
 import uuid
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
 
 import typer
 from rich.table import Table
 
-from drydocs import cli as _root  # the composition root; call-time lookups only
 from drydocs.chain_inputs import (
     ChainModeError,
     ChainStep,
@@ -27,7 +28,8 @@ from drydocs.chain_inputs import (
     resolve_chain_inputs,
     summary_lines,
 )
-from drydocs.cli import (
+from drydocs.cli_shared import (
+    CHAINS,
     CONTROLM_NODE_STAGES,
     CONTROLM_PART2_STAGES,
     CONTROLM_REL_STAGES,
@@ -35,9 +37,9 @@ from drydocs.cli import (
     LOADER_REGISTRY,
     LOADER_SOURCE,
     LOGGER,
-    REFRESH_REFERENCE_CHAIN,
     SQL_DIR,
     _csv_adapter,
+    _data_center_opt,
     _developer_sid_opt,
     _folder_opt,
     _gate_loader,
@@ -48,6 +50,8 @@ from drydocs.cli import (
     _source_registry,
     console,
 )
+from drydocs_core.data_root import DataRootNotSetError
+from drydocs_core.data_zones import read_zone_containing
 from drydocs_core.neo4j_client import Neo4jClient
 from drydocs_core.run_log import LoaderRunLog
 from drydocs_core.schema.supplements import (
@@ -112,8 +116,59 @@ app = typer.Typer()
 
 
 def _client(database: str | None = None) -> Neo4jClient:
-    """Resolved through the root at call time (tests patch drydocs.cli._client)."""
+    """Resolved through the root at call time (tests patch drydocs.cli._client).
+
+    The import is function-local ON PURPOSE: a module-scope root import is the
+    S13 cycle (root body -> command modules -> root), and the guard
+    (test_cli_import_order.py) fails this module by name if one returns."""
+    from drydocs import cli as _root
+
     return _root._client(database)
+
+
+def _csv_acquisition_meta(csv_path: Path, *, allow_unzoned: bool) -> dict[str, str]:
+    """G121: an acquisition route is DECLARED or it does not run.
+
+    `load --csv` gated the LOADER but never the PATH — the one acquisition
+    route landing-zones could not see. Resolution reuses the G81 runtime check
+    (:func:`drydocs_core.data_zones.read_zone_containing`); no second
+    resolution mechanism is minted. The returned dict is the loader's
+    ``run_meta`` — BaseLoader writes it onto the :JobRun AND into the disk
+    log's header, so a zoned load names its zone and an override is never
+    silent (flag, path, operator). The source-connection-and-run-identity
+    gate's E1 clause ratifies the rule as standing policy; if its E2 ruling
+    refuses overrides entirely, --allow-unzoned is removed in that build.
+    """
+    try:
+        zone = read_zone_containing(csv_path)
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    if zone is not None:
+        return {"acquisition_zone": zone.id, "acquisition_path": str(csv_path)}
+    if not allow_unzoned:
+        console.print(
+            f"[red]REFUSED: {csv_path} is outside every declared read zone.[/] "
+            "An acquisition route is declared or it does not run (G121). Declare the "
+            "drop in config/source-registry.yaml (acquisition.drop_dir) or "
+            "config/data-zones.yaml, then re-run — `drydocs landing-zones` lists what "
+            "is declared. To load it anyway pass --allow-unzoned; the override is "
+            "recorded in the run record and the disk log, never silently."
+        )
+        raise typer.Exit(2)
+    try:
+        operator = getpass.getuser()
+    except Exception:  # — some CI environments have no resolvable user
+        operator = ""
+    console.print(
+        f"[yellow]UNZONED OVERRIDE[/]: {csv_path} is outside every declared read zone "
+        f"— recorded in the run record and the disk log (operator: {operator or '<unknown>'})."
+    )
+    return {
+        "acquisition_override": "--allow-unzoned",
+        "acquisition_path": str(csv_path),
+        "acquisition_operator": operator,
+    }
 
 
 @app.command()
@@ -122,6 +177,13 @@ def load(
     csv_path: Path | None = typer.Option(None, "--csv"),
     sql: str | None = typer.Option(None, "--sql"),
     batch_size: int = typer.Option(1000, "--batch-size"),
+    allow_unzoned: bool = typer.Option(
+        False,
+        "--allow-unzoned",
+        help="Accept a --csv path outside every declared read zone. The override is "
+        "recorded in the run record and the disk log (flag, path, operator) — "
+        "never silent.",
+    ),
 ) -> None:
     """Run a single loader against a CSV or Oracle source."""
     cls = LOADER_REGISTRY.get(name)
@@ -130,68 +192,72 @@ def load(
         raise typer.Exit(2)
     if name in LOADER_SOURCE:
         _gate_loader(cls)  # confirmed-gate (overlay-aware, D2) before any DB write
+    run_meta: dict[str, str] = {}
     if csv_path is not None:
-        adapter = _csv_adapter(csv_path)
+        adapter = _csv_adapter(csv_path)  # existence first: a typo reads as "not found"
+        run_meta = _csv_acquisition_meta(csv_path, allow_unzoned=allow_unzoned)
     elif sql is not None:
         adapter = _oracle_adapter(sql)
     else:
         console.print("[red]Provide either --csv or --sql.[/]")
         raise typer.Exit(2)
     with _client() as cli:
-        summary = cls(cli, adapter, batch_size=batch_size).load()
+        summary = cls(cli, adapter, batch_size=batch_size, run_meta=run_meta).load()
     console.print(summary.as_dict())
 
 
 # --- M1 commands -------------------------------------------------------------
 
 
-@app.command(name="refresh-reference")
-def refresh_reference(
-    samples_dir: Path | None = typer.Option(
-        None,
-        "--samples-dir",
-        help=(
-            "FIXTURE run: directory holding the bundled *__sample.csv fixtures. No default "
-            "(G78) — a default loaded fixtures into a real graph and reported success."
-        ),
-    ),
-    source: list[str] = typer.Option(
-        [],
-        "--source",
-        help=(
-            "REAL run: a source-registry dataset id (repeatable). Each selected step reads "
-            "<step>.csv from the source's declared landing zone (acquisition.drop_dir under "
-            "DRYDOCS_DATA_ROOT); steps bound to an unselected source are reported NOT SELECTED."
-        ),
-    ),
-    snapshot: bool = typer.Option(True),
-) -> None:
-    """M1 reference-refresh chain (catalog + SEAL + dev teams). Weekly cadence.
+# ---- G79: one command per SUBJECT -------------------------------------------
+# These three replace the single `refresh-reference`, which bundled seven loaders
+# across three sources with three rhythms. They share ONE runner because the
+# contract is identical (G78: explicit input or exit 2, resolve every step before
+# the first write, closing table) — what differs is the subject, which is exactly
+# what the chain constant now names.
 
-    Explicit input or exit 2 — the single-loader `load --csv` contract, copied up
-    (G78): every step's file is resolved BEFORE the first write, a missing
-    required file fails the whole chain by name, and the closing table says
-    which path each step read and how many rows it loaded.
-    """
+_SAMPLES_HELP = (
+    "FIXTURE run: directory holding the bundled *__sample.csv fixtures. No default "
+    "(G78) — a default loaded fixtures into a real graph and reported success."
+)
+_SOURCE_HELP = (
+    "REAL run: a source-registry dataset id (repeatable). Each selected step reads "
+    "<step>.csv from the source's declared landing zone (acquisition.drop_dir under "
+    "DRYDOCS_DATA_ROOT); steps bound to an unselected source are reported NOT SELECTED."
+)
+
+
+def _run_reference_chain(
+    command: str,
+    *,
+    samples_dir: Path | None,
+    sources: list[str],
+    snapshot: bool,
+    snapshot_families: tuple[str, ...],
+    preamble: Callable[[Neo4jClient], None] | None = None,
+) -> None:
+    """Run ONE subject chain end to end. `snapshot_families` names the snapshot
+    writers this SUBJECT owns — never write_all(), which spans two subjects and
+    would have each command claiming the others' entities."""
+    chain = CHAINS[command]
     # Confirmed-gate (D3): every feed the chain touches must be SME-confirmed
-    # before any write — derived from the chain's own source_id declarations
-    # (overlay-aware per D2).
-    for cls in {cls for _, cls, _ in REFRESH_REFERENCE_CHAIN}:
+    # before any write — derived from the chain's own source_id declarations.
+    for cls in {cls for _, cls, _ in chain}:
         _gate_loader(cls)
-    steps = [ChainStep(nm, cls, fixture) for nm, cls, fixture in REFRESH_REFERENCE_CHAIN]
+    steps = [ChainStep(nm, cls, fixture) for nm, cls, fixture in chain]
     try:
         plan = resolve_chain_inputs(
-            steps, samples_dir=samples_dir, sources=source, registry=_source_registry()
+            steps, samples_dir=samples_dir, sources=sources, registry=_source_registry()
         )
     except (ChainModeError, MissingChainInputError) as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from exc
     mode = "FIXTURE" if samples_dir is not None else "SOURCE"
-    console.print(f"[cyan]refresh-reference — {mode} run; {len(plan.inputs)} step(s) resolved[/]")
+    console.print(f"[cyan]{command} — {mode} run; {len(plan.inputs)} step(s) resolved[/]")
     results: list[StepResult] = []
     with _client() as cli:
-        bs = refresh_business_segments(cli)
-        console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
+        if preamble is not None:
+            preamble(cli)
         for item in plan.inputs:
             console.print(f"[cyan]>> {item.step.name}[/]  {item.path}")
             summary = item.step.loader(cli, _csv_adapter(item.path)).load()
@@ -206,11 +272,109 @@ def refresh_reference(
                     source_id=item.source_id,
                 )
             )
-        if snapshot:
+        if snapshot and snapshot_families:
             console.print("[cyan]>> snapshots[/]")
-            console.print(SnapshotWriter(cli).write_all())
+            writer = SnapshotWriter(cli)
+            console.print(
+                {fam: getattr(writer, f"write_{fam}_snapshots")() for fam in snapshot_families}
+            )
     for line in summary_lines(results, plan.skipped):
         console.print(line)
+
+
+def _segments_preamble(cli: Neo4jClient) -> None:
+    """business_segments RE-HOMED here (G79). It is a read-only COUNT, not a
+    loader — it verifies the bootstrap-seeded corporate backbone is still there.
+    It belongs to the CATALOG subject because catalog_lobs reconciles LOBs to
+    those corporate BusinessSegments, so the count is that reconciliation's
+    precondition rather than a step of its own."""
+    bs = refresh_business_segments(cli)
+    console.print(f"[cyan]Business segments active: {bs['codes']}[/]")
+
+
+@app.command(name="refresh-catalog")
+def refresh_catalog(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """Product catalog hierarchy: LOBs -> product lines -> products.
+
+    Explicit input or exit 2 — the single-loader `load --csv` contract (G78).
+    """
+    _run_reference_chain(
+        "refresh-catalog",
+        samples_dir=samples_dir,
+        sources=source,
+        snapshot=snapshot,
+        snapshot_families=("product", "lob"),
+        preamble=_segments_preamble,
+    )
+
+
+@app.command(name="refresh-applications")
+def refresh_applications(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """Business applications and their contacts (SEAL).
+
+    Runs BEFORE refresh-teams: SEAL is the authority for application identity,
+    and refresh-teams carries a :BusinessApplication minter (G79 (e)).
+    """
+    _run_reference_chain(
+        "refresh-applications",
+        samples_dir=samples_dir,
+        sources=source,
+        snapshot=snapshot,
+        snapshot_families=("application",),
+    )
+
+
+@app.command(name="refresh-teams")
+def refresh_teams(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """The delivery organisation: dev teams, their roles, and team<->app alignment.
+
+    No snapshot family: the temporal snapshot writers cover applications,
+    products and LOBs — there is no team snapshot to write, and inventing one
+    here would be a load this subject was never asked for.
+    """
+    _run_reference_chain(
+        "refresh-teams",
+        samples_dir=samples_dir,
+        sources=source,
+        snapshot=snapshot,
+        snapshot_families=(),
+    )
+
+
+@app.command(name="refresh-reference")
+def refresh_reference(
+    samples_dir: Path | None = typer.Option(None, "--samples-dir", help=_SAMPLES_HELP),
+    source: list[str] = typer.Option([], "--source", help=_SOURCE_HELP),
+    snapshot: bool = typer.Option(True),
+) -> None:
+    """[dim](deprecated)[/] Runs refresh-catalog, refresh-applications and
+    refresh-teams in sequence — the three subjects this command used to bundle.
+
+    DEPRECATED, NOT DELETED (the S8 `m1-verify` -> `verify-reference`
+    precedent): operator muscle memory, runbooks and the company's own scripts
+    name this verb, and a removed command fails in a way that reads like a
+    broken install. It DELEGATES — there is no second implementation to drift.
+    """
+    console.print(
+        "[yellow]refresh-reference is deprecated (G79): it bundled three subjects "
+        "with three refresh rhythms. Running refresh-catalog, refresh-applications "
+        "and refresh-teams in order.[/]"
+    )
+    refresh_catalog(samples_dir=samples_dir, source=source, snapshot=snapshot)
+    refresh_applications(samples_dir=samples_dir, source=source, snapshot=snapshot)
+    refresh_teams(samples_dir=samples_dir, source=source, snapshot=snapshot)
 
 
 _TERM_TOTAL = "MATCH (n:OntologyTerm) RETURN count(n) AS n"
@@ -671,7 +835,7 @@ def load_server_inventory(
     """Z3: load the infra server export + the tiered ExecutionHost join.
 
     Gate server-location-ontology (SIGNED OFF 12/12, 2026-08-19): :Server is
-    the inventory spine (§A1), :DataCenter carries geography + the Idea-90
+    the inventory backbone (§A1), :DataCenter carries geography + the Idea-90
     location_grain declaration (§B1/§B2), and the §C2 technology-port leg —
     (:BusinessApplication)-[:HAS_PORT]->(:Port {kind:'Technology'})-
     [:RUNS_ON {role:'technology_port'}]->(:Server) — is MATCH-only on the
@@ -849,6 +1013,7 @@ def ingest_controlm(
     run_as: str | None = _run_as_opt(),
     developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
+    data_center: str | None = _data_center_opt(),
 ) -> None:
     """M3 chain: folders -> jobs -> conditions in/out -> derived dependencies.
 
@@ -864,9 +1029,12 @@ def ingest_controlm(
     deferred dependency pass once, unscoped, after all nodes exist.
 
     Run nightly in production; ad-hoc against samples in dev. With
-    --use-oracle, --folder / --run-as / --developer-sid / --row-cap scope every
-    extract in the chain (folder/developer-sid/row-cap apply to all; run-as
-    applies to the job, variable, and dependency-anchor extracts).
+    --use-oracle, --folder / --run-as / --developer-sid / --row-cap /
+    --data-center scope every extract in the chain (folder/developer-sid/
+    row-cap apply to all; run-as applies to the job, variable, and
+    dependency-anchor extracts; data-center applies to the folders, jobs, and
+    hosts extracts — absent means all data centers, and the per-data-center
+    run recipe lives in docs/design/drydocs-load-runbook.md, G115).
     """
     if phase not in ("nodes", "relationships", "all"):
         console.print(f"[red]--phase must be nodes | relationships | all (got {phase!r}).[/]")
@@ -879,7 +1047,7 @@ def ingest_controlm(
         cls for _, cls, *_ in (CONTROLM_NODE_STAGES + CONTROLM_PART2_STAGES + CONTROLM_REL_STAGES)
     }:
         _gate_loader(cls)
-    scope = _scope_binds(folder, run_as, developer_sid, row_cap)
+    scope = _scope_binds(folder, run_as, developer_sid, row_cap, data_center=data_center)
     # Stage declarations live at module level (N3: CONTROLM_*_STAGES) so the
     # command's chain and the load map render from the same source.
     node_stages: list[tuple[str, type[BaseLoader], str, str]] = list(CONTROLM_NODE_STAGES)
@@ -937,10 +1105,13 @@ def ingest_controlm(
                 sample = samples_dir / sample_csv
                 adapter = _csv_adapter(sample)
             console.print(f"[cyan]>> {stage_name}[/]")
-            # D7: with no folder filter the extract declares the full folder
-            # population (bundled samples or unfiltered Oracle), so unscoped
-            # loaders (folders) may run their removed-from-source mark pass.
-            summary = cls(cli, adapter, full_extract=folder is None).load()
+            # D7: with no folder filter AND no data-center filter the extract
+            # declares the full folder population (bundled samples or
+            # unfiltered Oracle), so unscoped loaders (folders) may run their
+            # removed-from-source mark pass. A data-center-scoped run is a
+            # partial extract (G115) — marking the other data centers removed
+            # would be exactly the source-outage-looks-like-deletion trap.
+            summary = cls(cli, adapter, full_extract=folder is None and data_center is None).load()
             line = f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
             if summary.nodes_marked_removed or summary.nodes_reactivated:
                 line += (

@@ -8,8 +8,10 @@ import OwnershipGraphPane from '../ownership/OwnershipGraphPane'
 import AssetSearchPanel from '../ownership/AssetSearchPanel'
 import {
   ATTRIBUTIONS_FRAME,
+  CAPTURE_GAPS_FRAME,
   ESCALATION_FRAME,
   OWNERSHIP_NODES,
+  REQUIRED_CONTACT_GAPS_FRAME,
   TEAMS_FRAME,
   type DemoFrame,
   type OwnershipSelection,
@@ -58,6 +60,42 @@ export default function OwnershipRoute({ persona }: { persona: Persona }) {
             specId="ownership.attributions.v1"
             fallback={<OwnershipDemoFrame frame={ATTRIBUTIONS_FRAME} {...frameProps} />}
           />
+        ),
+        // G71 (SS-C5): the completeness pair JOINS this page rather than opening a
+        // new one — the Attributions tab beside it floats unmapped rows first, so
+        // one page answers "what is wrong with this application's contacts".
+        // SS-C6 keeps the two findings apart: roster gaps on covered apps here,
+        // capture gaps (no feed mentioned the app) on their own tab.
+        'Required-contact gaps': (
+          <div className="flex h-full min-h-0 flex-col">
+            <p className="shrink-0 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+              Caveats from the sign-off: Operate Manager assignments are mid-correction at
+              source (findings there are being fixed elsewhere), and this check counts to
+              one and stops — it cannot see geography / coverage-window gaps.
+            </p>
+            <div className="min-h-0 flex-1">
+              <SpecGrid
+                access={access}
+                specId="ownership.required-contact-gaps.v1"
+                fallback={<OwnershipDemoFrame frame={REQUIRED_CONTACT_GAPS_FRAME} {...frameProps} />}
+              />
+            </div>
+          </div>
+        ),
+        'Capture gaps': (
+          <div className="flex h-full min-h-0 flex-col">
+            <p className="shrink-0 px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
+              Applications no feed mentioned. A capture gap is not a roster gap — the
+              response is a capture fix, not a contact chase.
+            </p>
+            <div className="min-h-0 flex-1">
+              <SpecGrid
+                access={access}
+                specId="ownership.capture-gaps.v1"
+                fallback={<OwnershipDemoFrame frame={CAPTURE_GAPS_FRAME} {...frameProps} />}
+              />
+            </div>
+          </div>
         ),
         'Escalation routing': (
           <SpecGrid

@@ -1,6 +1,6 @@
 # Standards Rules Registry (machine-checkable) — DRAFT
 
-**Corpus:** INTERNAL. **Status:** 🟠 DRAFT — 2026-06-11; governance rules added 2026-06-17; **R30–R40 (the greenfield job standard) added 2026-08-11 with a working detector — G67**.
+**Corpus:** INTERNAL. **Status:** 🟠 DRAFT — 2026-06-11; governance rules added 2026-06-17; **R30–R40 (the greenfield job standard) added 2026-08-11 with a working detector — G67**; **R41–R44 (the C32 fan-out classes) added 2026-08-25 — G69**, three with detectors and R43 deliberately OPEN with none until its carrier-ownership question is ruled.
 The prose standards turned into a **checkable rule set** — the single source for both *validation* (Gate 2) and *greenfield generation* (Gate 3). Each rule: how the engine detects it, severity, the standard it comes from, the greenfield action, and ratification status. Built in M2; seeded here. **R1–R12** = resolver/naming/metadata core; **R13–R28** = the tier ③/④ governance standards (escalation routing, self-heal, critical-batch tiering, NFR catalog, FW time-limit, command-line/canonical-variables, artifact-source security) digested from the [governance/](governance/) corpus; **R29** = the first 🟣 greenfield *recommendation* rule (job numbering — [D5](governance/greenfield-recommendations.md)).
 
 **Status legend:** ✅ ratified · 🟡 provisional (observed, not signed off) · ❓ open (needs SME).
@@ -256,6 +256,38 @@ Control-M object: technician routing belongs to the escalation DB via the `EJOBN
 - **Sev:** 🟡 **Status:** 🟡
 - **Scope (widened 2026-08-11):** `DOMAIL` is now flagged with the shouts. REQ-2 removed only the shouts and left mail "out of scope"; the SME ruled mail goes too, so the rule enforces the ruling rather than the page it extends. The mail destination has at least three spellings in the estate (`%%NOTIFY`, `%%EMAIL_GRP`, `%%EMAIL_GRP_S`). **CORRECTED 2026-08-11 (C32):** the first framing said none of them is declared, so deletion costs nothing. That holds for the DPL-**generated** folders, where the block resolves to `CTMERR` and mails nothing. It is FALSE for hand-built Ab Initio folders, which declare all three to a real L2 support address — there the block sends, and deleting it stops a working mail path. The ruling is unchanged; the severity of the *change* is not uniform, so a fix batch should separate the two populations.
 - **Greenfield action:** delete the `ON`/`DOMAIL` block. **Never** declare the destination to make it resolve — that repairs a mechanism being retired, and would first require ruling which of the two spellings is canonical. The job message says so explicitly so a fix-generator cannot read it the other way.
+
+## R41 — No duplicate declaration in one scope
+- **Check:** one name declared **twice in the same container** with **different values**. A repeat of the same value is noise; two values is the defect.
+- **Engine:** `_check_duplicate_declarations`, over the RAW layer definitions. **Sev:** 🔴 **Status:** 🟡
+- **Source:** C32 Part C defect 1 (a path variable declared twice in one folder, once relative and once absolute).
+- **Why 🔴 and not 🟡:** which value wins is an **ordinal accident** — the job runs against whichever declaration happens to be last — and a reader of the folder sees both and cannot tell which is live. That is a correctness defect, not untidiness.
+- **Note on the engine:** it must read the raw layers, never the resolved chain. `_declared` resolves into a dict and so collapses a duplicate by construction, which would make this rule structurally unable to fire.
+- **Greenfield:** keep one declaration. Choosing WHICH is a content decision, so the finding names both values rather than proposing one.
+
+## R42 — One separator per folder set
+- **Check:** a folder set mixing separators between the same positional fields, so a parse splitting on a delimiter returns a **different field count per folder**.
+- **Engine:** `_check_folder_delimiters` — cross-folder, over the folder list; a set of one cannot disagree with itself. **Sev:** 🟡 **Status:** 🟡
+- **Source:** C32 Part C defect 4 (two folders of one set using an underscore where their siblings use a hyphen).
+- **Why the finding names the PARSE consequence:** a folder name is positional and is split downstream to read its fields out. Mixed separators do not make the parse fail — they make it return a different number of fields, so the positional read **silently lands on the wrong field**. A finding that said "the names look inconsistent" would describe the symptom and hide the defect.
+- **Greenfield:** one separator across the set. Renaming a live folder has blast radius (R4's own caution), so propose, never auto-rename.
+
+## R43 — Carrier collision: one name, two resolvers
+- **Check:** one name resolved by two different carriers in one command line — a Control-M `%%VAR` beside a shell `${VAR}`.
+- **Engine:** **NONE SHIPPED.** **Sev:** — **Status:** ❓ **OPEN**
+- **Source:** C32 Part C defect 7.
+- **WHY NO DETECTOR, deliberately:** the entry must rule **which carrier owns the name** before a detector ships, because the greenfield action differs completely by answer — rename one carrier, or declare the shell export. No ruling exists: a sweep of the governance corpus and the guidelines page at G69 found nothing on shell-vs-Control-M carrier ownership. A detector firing against an undecided rule produces findings with no defensible action attached, which is worse than no finding. Registered so the question is **on the record and ratifiable**, which is the half that matters.
+- **Distinct from R33**, which is about one FACT carried by both a command literal and a declared variable. This is one NAME resolved by two engines — a different question with a different fix.
+- **Greenfield:** undecided pending the ownership ruling.
+
+## R44 — Stale authored provenance
+- **Check:** one authored "created by" value spanning several jobs. The full rule is that value standing against an **independent audit trail naming different users**.
+- **Engine:** `_check_authored_provenance`. **Sev:** ⚪ **Status:** 🟡
+- **Source:** C32 Part C defect 10 (one authored value on five jobs that three different users actually created).
+- **Why ⚪ advisory:** the value is not wrong so much as **answering a different question**. "Created by" is an authored field that TRAVELS when a job is copied, so it records the template's author rather than this job's. Anything reading it as authorship is wrong.
+- **WHAT THE DETECTOR CAN AND CANNOT SEE — stated here rather than left to be discovered:** the audit trail is a database-side feed (the creation/modification user) and a definition export does not carry it. So this detector reports the **suspicious pattern** — one authored value spanning jobs — and cannot confirm the contradiction. That gap is why the rule is advisory, and the finding says so in its own message.
+- **Feed note:** the authored field reaches the pass through `xml_vocab.AUTHORED_BY_ATTRS`, a synonym SET rather than one spelling, because the authoritative element schema is still unacquired — the same assumed-contract treatment `DESCRIPTION` and `POSTCMD` already get.
+- **Greenfield:** read the creation/modification **audit** fields instead; do not repair the authored value, which is doing what an authored field does.
 
 ---
 

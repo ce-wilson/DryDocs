@@ -1,0 +1,29 @@
+id: N21
+epic: source-column-mappings
+title: 'Build run input identity per the signed gate: dataset id, zone-relative path, input digest on the JobRun envelope'
+type: task
+module: drydocs-load
+phase: 11
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: [N19]
+gates: [source-connection-and-run-identity]
+inputs:
+- drydocs/loaders/base.py
+- drydocs_core/run_log.py
+- config/log-kinds.yaml
+acceptance: |
+  Per the SIGNED rulings only: (a) _open_run/_close_run record the source-registry DATASET id
+  (alongside the N16 source_label, never replacing it; SOURCELESS_LOADERS record their written
+  reason), the zone-relative input path (shape-safe per the drop_dir convention rule; real
+  machine path stays in the disk log only), and the input digest (file sha256; watermark/
+  row-count pair for db routes per the ruling); (b) LoadSummary and the LoaderRunLog header
+  gain the same fields so graph and disk agree — parsed-back-as-dict tested, the G107 idiom;
+  (c) the round-trip proof: one manual dataset re-ingested via its declared zone produces a
+  :JobRun from which dataset id + input digest answer 'this graph state came from this
+  input' with no disk log consulted; (d) full suite + both ruff gates.
+notes: |
+  Minted 2026-08-28, gated (M3/M4 envelope-family precedent). Closes the survey's GAP B: the
+  run record cannot identify its input today.

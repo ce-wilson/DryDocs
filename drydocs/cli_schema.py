@@ -14,8 +14,7 @@ from __future__ import annotations
 import typer
 from rich.table import Table
 
-from drydocs import cli as _root  # the composition root; call-time lookups only
-from drydocs.cli import (
+from drydocs.cli_shared import (
     CONSTRAINTS_FILE,
     ONTOLOGY_FILE,
     SCHEMA_GRAPH_DATABASE,
@@ -29,7 +28,13 @@ app = typer.Typer()
 
 
 def _client(database: str | None = None) -> Neo4jClient:
-    """Resolved through the root at call time (tests patch drydocs.cli._client)."""
+    """Resolved through the root at call time (tests patch drydocs.cli._client).
+
+    The import is function-local ON PURPOSE: a module-scope root import is the
+    S13 cycle (root body -> command modules -> root), and the guard
+    (test_cli_import_order.py) fails this module by name if one returns."""
+    from drydocs import cli as _root
+
     return _root._client(database)
 
 
@@ -71,22 +76,50 @@ def landing_zones_cmd(
         raise typer.Exit(2)
 
     statuses = inventory(zones)
+
+    # G109: the OTHER declaration. Until now this command read only the manual
+    # rows in source-registry.yaml, so every zone G81 declared in
+    # config/data-zones.yaml -- eleven of them, including read zones holding real
+    # source data -- was invisible to the one command whose whole purpose is that
+    # "my extracts are gone" is a one-command answer. A check that silently covers
+    # half the zones reads as coverage; that is the defect, not the count.
+    from drydocs_core.data_zones import READ as ZONE_READ
+    from drydocs_core.data_zones import inventory as zone_inventory
+    from drydocs_core.data_zones import load_zones
+
+    declared = zone_inventory(load_zones())
+
     if as_json:
         console.print_json(
-            data=[
-                {
-                    "source_id": s.zone.source_id,
-                    "format": s.zone.fmt,
-                    "base": s.zone.base,
-                    "drop_dir": s.zone.drop_dir,
-                    "path": str(s.zone.path),
-                    "inside_repo": s.zone.inside_repo,
-                    "exists": s.exists,
-                    "file_count": s.file_count,
-                    "empty": s.empty,
-                }
-                for s in statuses
-            ]
+            data={
+                "manual_zones": [
+                    {
+                        "source_id": s.zone.source_id,
+                        "format": s.zone.fmt,
+                        "base": s.zone.base,
+                        "drop_dir": s.zone.drop_dir,
+                        "path": str(s.zone.path),
+                        "inside_repo": s.zone.inside_repo,
+                        "exists": s.exists,
+                        "file_count": s.file_count,
+                        "empty": s.empty,
+                    }
+                    for s in statuses
+                ],
+                "declared_zones": [
+                    {
+                        "zone_id": s.zone.id,
+                        "mode": s.zone.mode,
+                        "base": s.zone.base,
+                        "path": str(s.zone.path),
+                        "inside_repo": s.zone.inside_repo,
+                        "exists": s.exists,
+                        "file_count": s.file_count,
+                        "empty": s.empty,
+                    }
+                    for s in declared
+                ],
+            }
         )
     else:
         t = Table(title="Manual landing zones (acquisition.mode: manual)")
@@ -118,11 +151,34 @@ def landing_zones_cmd(
             "zones hold TRACKED files, which no clean removes at any strength.[/]"
         )
 
+    if not as_json:
+        dt = Table(title="Declared data zones (config/data-zones.yaml)")
+        for col in ("zone", "mode", "base", "path", "state"):
+            dt.add_column(col, overflow="fold")
+        for s in declared:
+            if not s.exists:
+                state = "[dim]absent[/]"
+            elif s.empty:
+                state = "[yellow]EMPTY[/]" if s.zone.mode == ZONE_READ else "[dim]empty[/]"
+            else:
+                state = f"[green]{s.file_count} file(s)[/]"
+            dt.add_row(s.zone.id, s.zone.mode, s.zone.base, str(s.zone.path), state)
+        console.print(dt)
+        console.print(
+            "[dim]Mode decides what EMPTY means, which is why it is a column. An empty "
+            "READ zone is the same signature as above -- source data that was there and "
+            "is not. An empty write/scratch zone is an output directory the system will "
+            "rebuild, so --check never fails on one.[/]"
+        )
+
     # A zone INSIDE the tree is a standing defect regardless of --check: it is
-    # reachable by `git clean -fdx` no matter what .gitignore says.
+    # reachable by `git clean -fdx` no matter what .gitignore says. Both
+    # declarations are checked -- the hazard is the resolved path, not the file
+    # that declared it.
     exposed = [
         s.zone.source_id for s in statuses if s.zone.base == "data_root" and s.zone.inside_repo
     ]
+    exposed += [s.zone.id for s in declared if s.zone.base == "data_root" and s.zone.inside_repo]
     if exposed:
         console.print(
             f"[red]{len(exposed)} data_root zone(s) resolve INSIDE the repo tree "
@@ -133,6 +189,7 @@ def landing_zones_cmd(
 
     if check:
         emptied = [s.zone.source_id for s in statuses if s.empty]
+        emptied += [s.zone.id for s in declared if s.empty and s.zone.mode == ZONE_READ]
         if emptied:
             console.print(
                 f"[yellow]{len(emptied)} zone(s) exist but are empty: " f"{', '.join(emptied)}[/]"

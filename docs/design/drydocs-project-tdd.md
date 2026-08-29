@@ -260,7 +260,7 @@ backlog — never resolved silently.
 <!-- anchor: decisions-discussions -->
 ## Decisions & discussions
 
-ADR 0001 (PROV spine as ontology base) · ADR 0002 + a/b/c (component/database topology; core
+ADR 0001 (PROV backbone as ontology base) · ADR 0002 + a/b/c (component/database topology; core
 extraction — executed; remediation rebase — executed; lineage re-home — in flight, G9) ·
 ADR 0003 (`JobFolder`→`ControlMFolder`) · ADR 0004 (software registry, vendor = brand only).
 Live discussions ride the backlog and gate specs; the recurring architectural theme —

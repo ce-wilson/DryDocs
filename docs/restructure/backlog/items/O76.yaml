@@ -34,7 +34,7 @@ acceptance: |
 
   `poetry run pytest -q` green, with new cases for: a version-1 file loading with unknown origin and surviving a round trip; a version-2 file round-tripping origin and set_at; a version this build does not know still refused; `--generate` recording `generated` and a prompt recording `prompted`; the stale flag firing and not firing at the boundary. Ruff clean. Verified live on this desktop that the REAL version-1 credential file still signs in, and that the two listings render the new columns.
 notes: |
-  Raised 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding L2, via Idea-165. The sibling of O75: that item closed the account-withdrawal half of the lifecycle, this one closes the "what is actually in here" half.
+  Raised 2026-08-28 (desktop) from `docs/design/catalog-substrate-review.md` finding L2, via Idea-196. The sibling of O75: that item closed the account-withdrawal half of the lifecycle, this one closes the "what is actually in here" half.
 
   WHERE IT CAME FROM. `admin_demo_login.py --generate` invents a secret and prints it once, and the docstring argues the trade correctly for a synthetic account on localhost. What is missing is that nothing records it happened, so `--list` and the status table show only WHICH ids have a credential. An account carrying a secret that went to a terminal weeks ago looks exactly like one set by hand at a no-echo prompt. DataHub spends a documentation page compensating in prose for the same class of problem — its shipped `datahub:datahub` survives deleting the user in the UI — and prose is what you write when the artifact cannot answer for itself.
 

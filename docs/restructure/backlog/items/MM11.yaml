@@ -1,40 +1,32 @@
 id: MM11
 epic: mind-map
-title: Acronyms are the one thing every corpus in the deepdoc investigation is dense with and the extractor
-  has no class for them — add acronym candidates, with the sentence they were found in, to the mind-map
-  state file
+title: 'Run the deepdoc data-flow-overview SME walk (drafted 2026-08-21, walk never scheduled)'
 type: task
-module: drydocs-deepdoc
+module: ontology
 phase: 17
 agent: main
-model: sonnet
+model: fable
 priority: p2
 status: todo
-depends_on:
-- MM3
+depends_on: [MM2]
+gates: [data-flow-overview]
 inputs:
-- drydocs_deepdoc/
-- docs/design/deepdoc-data-flow-overview.md
-- drydocs_core/
+- config/gate-prompts/data-flow-overview.yaml
+- config/gate-log.md
 acceptance: |
-  The shared entity/ID extractor MM3 builds recognises acronym candidates, and each one lands in the mind-map state file with the evidence needed to judge it.
-
-  (a) A NEW EXTRACTED CLASS. The extractor's enumerated token classes today are application-id tokens, issue keys, folder-name positional tokens via the PRAOCG decode, table names, distribution-list names and GUIDs — acronyms are not among them, and the word acronym appears nowhere in the deepdoc design doc or the package. This adds the class using the same typed matches-with-spans design the other classes already use.
-
-  (b) THE SENTENCE TRAVELS WITH THE TOKEN, which is the shape that makes this class different from the others. SNOW is only useful because someone wrote down that it means ServiceNow and explicitly NOT Snowflake, and that distinction lives in prose, not in the token. Each candidate carries its surrounding evidence span, not just the string.
-
-  (c) IT LANDS IN THE MIND-MAP STATE FILE (drydocs.deepdoc.mindmap.v1) AND NOWHERE ELSE. Whether a harvested acronym eventually becomes graph nodes or proposes into the config glossary is an OPEN FORK the user has not ruled, and it is deliberately out of scope here — see the notes. This item stops at the state file, which is a place a candidate can sit without anyone having decided what it is.
-
-  (d) TRUST IS NOT OPTIONAL. A harvested acronym is corpus-derived and therefore SYNTHESIZED: it carries the Uncertain discipline (ADR 0006 corpus-consumer ruling, ADR 0011, tests/unit/test_uncertain_boundary.py) and must never be indistinguishable from an SME-supplied entry. A test asserts that every acronym candidate is marked so.
-
-  (e) NO WRITER LIST CHANGES. This item adds no entry to UNCERTAIN_WRITERS — drydocs_deepdoc is already on it — and writes nothing to the graph.
-
-  poetry run pytest -q green, ruff clean, with a unit case per acronym shape and one asserting an ambiguous acronym keeps two distinct evidence spans rather than collapsing to one meaning.
+  A sign-off session for gate `data-flow-overview` is HELD and its outcome recorded in
+  config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
+  BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
+  session: a stale-premise sweep of the drafted page against current facts (the
+  C28/K20 moved-premise model -- G91 half-staled K20's clause 3 in nine days;
+  restate honestly, never re-ask signed clauses, L25 riders-not-edits), and the
+  extract-vintage precondition where the page keys on an extract (name the pull;
+  older pull => re-pull first -- 03-hitl-sme-flow.md convention, 2026-08-27).
+  AFTER: follow-up build items minted for every flip the ruling authorizes, or
+  an explicit none-needed note in the sign-off entry.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-159 (2026-08-26, prio proposed Med). Sibling of O68, which gave acronyms a readable surface and a MANUAL add path; this is the feeder half.
-
-  ONLY THE EXTRACTOR HALF WAS PROMOTED. The note's own stated fork — does a loaded acronym land as graph NODES with a LOADER_REGISTRY row, or does it PROPOSE into config/taxonomy/software-registry.yaml and ride the change-artifact path O68 clause (c) describes — is a decision nobody has made, and the two answers have different modules, different guards and different gate exposure. Picking silently is exactly what the note asked not to happen, so it stays parked in IDEAS.md as a question for the user. The extraction is useful under either answer, which is why it could be promoted on its own.
-
-  THE PROVENANCE FORK IS THE SAME FORK O68 CLAUSE (d) ALREADY FORCES, reached from the other direction. Whichever item lands first should settle it for both: two surfaces disagreeing about what makes an acronym trustworthy is worse than either gap.
-
-  Mechanism only; no real acronym values from any company corpus land in a tracked file.
+  Minted 2026-08-27 (Lane A groom pass, the run-the-gate sweep): 13 of 20
+  drafted-unsigned gates had NO item owning the sign-off -- the drafting item
+  closes done and the session is never scheduled. Drafting item MM2 closed done when the prompt landed; nobody owned the RUN.
+  This item is the sign-off session's claim surface; the session itself is
+  HITL (agent: main).

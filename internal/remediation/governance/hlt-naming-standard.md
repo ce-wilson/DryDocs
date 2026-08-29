@@ -36,7 +36,7 @@ Positional read (1-based; *some meanings inferred — confirm*):
 
 Folder example: `PRSVG-HLDM-110865-MOODY-TRUST-MTH` (HL Servicing, SEAL 110865, MOODY-TRUST dataset, Monthly).
 
-**HLT vs DAT structural difference:** HLT job names carry **file-pipeline stages** (`SRC/FW/SFTP/UNZIP/CPY/HK/CTL/PREPROC`) because HLT jobs are largely **file movement**; DAT names carry **data-lake stages** (`AWS RFND`) because DAT jobs are data pipelines. Same positional spine, different middle vocabulary.
+**HLT vs DAT structural difference:** HLT job names carry **file-pipeline stages** (`SRC/FW/SFTP/UNZIP/CPY/HK/CTL/PREPROC`) because HLT jobs are largely **file movement**; DAT names carry **data-lake stages** (`AWS RFND`) because DAT jobs are data pipelines. Same positional backbone, different middle vocabulary.
 
 ---
 
@@ -68,7 +68,7 @@ Folder example: `PRSVG-HLDM-110865-MOODY-TRUST-MTH` (HL Servicing, SEAL 110865, 
 
 **QR convention:** `PR<appcode>-HL-QR` (PRSRV/PRORG/PREBM/PRCOH/PRARA-HL-QR). **QR = Quantitative Resource** (Control-M concurrency/workload control on shared servers — *not* a support queue; see the [DAT QR enumeration §2c](dat-naming-standard.md) for the multi-QR + max-quantity-cap model HLT shares).
 
-> **Shared vocabulary (consistency finding):** HLT uses the **same governed zone (`TRUST/RFND/OVRH/PROV/TECH`) and job-type (`_FW/_SFTP/_PREPROC/_CPY/_MV/_AUT/_EXT/_RECON/_SPLIT/_SK/_FM/…`) enumerations as DAT** ([dat-naming-standard §2c](dat-naming-standard.md)) — same positional spine, same descriptor vocabulary. The deltas are the appcode (application vs platform) and the escalation default (§3), not the token sets.
+> **Shared vocabulary (consistency finding):** HLT uses the **same governed zone (`TRUST/RFND/OVRH/PROV/TECH`) and job-type (`_FW/_SFTP/_PREPROC/_CPY/_MV/_AUT/_EXT/_RECON/_SPLIT/_SK/_FM/…`) enumerations as DAT** ([dat-naming-standard §2c](dat-naming-standard.md)) — same positional backbone, same descriptor vocabulary. The deltas are the appcode (application vs platform) and the escalation default (§3), not the token sets.
 
 **Anti-redundancy (stated):** avoid repeated tokens (`…COMPLIANCE_ONE…COMPLIANCE_ONE…`); modernize legacy acquisition names (`WAMUSBO`, 2009 WaMu → `SBO`).
 

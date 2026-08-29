@@ -19,10 +19,10 @@ from pathlib import Path
 import typer
 from rich.table import Table
 
-from drydocs import cli as _root  # the composition root; call-time lookups only
-from drydocs.cli import (
+from drydocs.cli_shared import (
     DEFAULT_SAMPLES_DIR,
     SQL_DIR,
+    _data_center_opt,
     _developer_sid_opt,
     _folder_opt,
     _oracle_adapter,
@@ -47,7 +47,13 @@ app = typer.Typer()
 
 
 def _client(database: str | None = None) -> Neo4jClient:
-    """Resolved through the root at call time (tests patch drydocs.cli._client)."""
+    """Resolved through the root at call time (tests patch drydocs.cli._client).
+
+    The import is function-local ON PURPOSE: a module-scope root import is the
+    S13 cycle (root body -> command modules -> root), and the guard
+    (test_cli_import_order.py) fails this module by name if one returns."""
+    from drydocs import cli as _root
+
     return _root._client(database)
 
 
@@ -158,6 +164,7 @@ def analyze_variables(
     run_as: str | None = _run_as_opt(),
     developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
+    data_center: str | None = _data_center_opt(),
 ) -> None:
     """Variable taxonomy coverage report (no Neo4j required).
 
@@ -167,13 +174,13 @@ def analyze_variables(
     the coverage numbers that validate the taxonomy. With --resolve, each
     job's definitions are resolved under its folder scope (Phase B) and
     resolution coverage is reported. With --use-oracle, --folder / --run-as /
-    --developer-sid / --row-cap scope the psgmgr extract.
+    --developer-sid / --row-cap / --data-center scope the psgmgr extract.
     """
     if use_oracle:
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
         adapter = _oracle_adapter(
             sql,
-            _scope_binds(folder, run_as, developer_sid, row_cap),
+            _scope_binds(folder, run_as, developer_sid, row_cap, data_center=data_center),
             name="controlm_variables.sql",
         )
     else:
@@ -323,6 +330,7 @@ def normalize_variables(
     run_as: str | None = _run_as_opt(),
     developer_sid: str | None = _developer_sid_opt(),
     row_cap: int | None = _row_cap_opt(),
+    data_center: str | None = _data_center_opt(),
 ) -> None:
     """Classify + resolve the variable extract and emit staging load files.
 
@@ -330,8 +338,9 @@ def normalize_variables(
     columns matching controlm_staging_ddl.sql exactly — load them into the
     DRYDOCS_STG schema via SQL Developer import or SQL*Loader. No database
     write access required from this command. With --use-oracle, --folder /
-    --run-as / --developer-sid / --row-cap scope the extract (handy for fresh
-    samples from a single folder, run-as FID, or developer).
+    --run-as / --developer-sid / --row-cap / --data-center scope the extract
+    (handy for fresh samples from a single folder, run-as FID, developer, or
+    one data center — the G115 per-data-center run recipe).
     """
     import csv as _csv
     import uuid
@@ -341,7 +350,7 @@ def normalize_variables(
         sql = (SQL_DIR / "controlm_variables.sql").read_text(encoding="utf-8")
         adapter = _oracle_adapter(
             sql,
-            _scope_binds(folder, run_as, developer_sid, row_cap),
+            _scope_binds(folder, run_as, developer_sid, row_cap, data_center=data_center),
             name="controlm_variables.sql",
         )
     else:

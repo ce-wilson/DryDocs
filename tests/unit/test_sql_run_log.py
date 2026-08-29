@@ -105,7 +105,13 @@ def test_run_log_shape(tmp_path, monkeypatch):
     log = SqlRunLog("controlm_folders.sql", target="PSGMGR_ALIAS", user="CM_RO_USER")
     path = log.open()
     assert path.parent == tmp_path
-    assert path.name.startswith("controlm_folders.sql.")
+    # G105: the `sql.` KIND segment. This family wrote `<base_name>.<ts>.log`
+    # with no kind at all -- SqlRunLog takes a caller-supplied base_name and
+    # enforced no prefix, so it was the one family that could write any kind it
+    # liked. The name here is `controlm_folders.sql`, so the conforming filename
+    # reads sql.controlm_folders.sql.<ts>.log: <kind>.<name>.<stamp>.<ext> with a
+    # free-form <name> that happens to end in .sql.
+    assert path.name.startswith("sql.controlm_folders.sql.")
     assert path.suffix == ".log"
     log.handshake("Oracle Database 19c")
     log.statement("SELECT 1 FROM dual", {"row_cap": 100})

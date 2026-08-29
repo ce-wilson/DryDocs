@@ -29,7 +29,11 @@
 -- precedent). Unmatched stats rows are a coverage metric, never node-creating.
 --
 -- Scope binds (optional, NULL = no filter): :folder_filter (A.SCHED_TABLE
--- LIKE — same bind the other five extracts use), :row_cap (ROWNUM cap).
+-- LIKE — same bind the other five extracts use), :row_cap (ROWNUM cap),
+-- :data_center_filter (A.DATA_CENTER LIKE — G115; long-form, and the DC
+-- value-domain probe in adhoc/profile_cm_avg_run.sql, answered 2026-07-22,
+-- confirmed the long-form value domain matches CM_DEF_VTAB, so one pattern
+-- scopes the whole extract family).
 -- :run_as / :developer_sid do not apply (no owner/author at this grain).
 -- =============================================================================
 
@@ -49,6 +53,7 @@ SELECT
     A.SAMPLES_START_TIME  AS samples_start_time, -- raw <ts>:<odate> pairs — day-of-week medians
     A.CAPTURE_DATE        AS capture_date        -- replication timestamp — never authorship
 FROM   psgmgr.CM_AVG_RUN A
-WHERE  (:folder_filter IS NULL OR A.SCHED_TABLE LIKE :folder_filter)
-  AND  (:row_cap       IS NULL OR ROWNUM       <=   :row_cap)
+WHERE  (:folder_filter      IS NULL OR A.SCHED_TABLE LIKE :folder_filter)
+  AND  (:data_center_filter IS NULL OR A.DATA_CENTER LIKE :data_center_filter)
+  AND  (:row_cap            IS NULL OR ROWNUM        <=   :row_cap)
 ;

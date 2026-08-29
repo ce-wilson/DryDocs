@@ -37,10 +37,14 @@ import logging
 import os
 import sys
 import time
-from collections.abc import Callable, Mapping
+import uuid
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+LOGGER = logging.getLogger(__name__)
 
 DEFAULT_LOGDIR = Path.home() / "logs" / "DryDocs"
 LOGDIR_ENV = "DRYDOCS_LOGDIR"
@@ -58,12 +62,28 @@ CAPTURE_NAMESPACES = ("drydocs", "drydocs_core")
 
 
 def resolve_log_dir() -> Path:
-    """The configurable log path: DRYDOCS_LOGDIR > SPIDERP_LOGDIR > default."""
-    for env in (LOGDIR_ENV, LEGACY_LOGDIR_ENV):
-        raw = os.environ.get(env, "").strip()
-        if raw:
-            return Path(raw)
-    return DEFAULT_LOGDIR
+    """The configurable log path: DRYDOCS_LOGDIR > SPIDERP_LOGDIR > default.
+
+    G105: the ORDER is unchanged and is now resolved in ONE place —
+    :func:`drydocs_core.log_kinds.resolve_root`, reading ``config/log-kinds.yaml``
+    — so the log root has a declaration like every other configured path instead
+    of living in three module constants. The legacy variable now emits a
+    DeprecationWarning when it is the one that resolved; it still resolves.
+
+    Falls back to the module constants if the declaration cannot be read. That is
+    deliberate and narrow: a run log must never be the reason a load fails, and
+    this function is called from inside ``open()``.
+    """
+    try:
+        from drydocs_core.log_kinds import resolve_root
+
+        return resolve_root(default=DEFAULT_LOGDIR)
+    except Exception:  # — a broken declaration must not take the loaders with it
+        for env in (LOGDIR_ENV, LEGACY_LOGDIR_ENV):
+            raw = os.environ.get(env, "").strip()
+            if raw:
+                return Path(raw)
+        return DEFAULT_LOGDIR
 
 
 def caller_stamp() -> str:
@@ -84,12 +104,29 @@ def claim_log_path(base_name: str, *, now: Callable[[], datetime] = datetime.now
     """
     log_dir = resolve_log_dir()
     log_dir.mkdir(parents=True, exist_ok=True)
-    stamp = now().strftime("%Y%m%d-%H%M%S")
-    path = log_dir / f"{base_name}.{stamp}.log"
+
+    # G105: the stamp granularity and the extension are DERIVED from the declared
+    # kind — ``base_name`` is ``<kind>.<name>``, and the kind is what says whether
+    # this rotates per run or per day and whether it is .log or .jsonl. Every
+    # caller funnels through here, which is what makes `kind` a real thing rather
+    # than a prefix three sites happened to agree on for `load` and not for `sql`.
+    kind_id, _, name = base_name.partition(".")
+    try:
+        from drydocs_core.log_kinds import kind as declared_kind
+        from drydocs_core.log_kinds import stamp_for
+
+        spec = declared_kind(kind_id)
+        stamp = stamp_for(spec.rotation, now())
+        suffix = spec.format
+    except Exception:  # — an unreadable declaration falls back to the old shape
+        stamp = now().strftime("%Y%m%d-%H%M%S")
+        suffix = "log"
+
+    path = log_dir / f"{base_name}.{stamp}.{suffix}"
     seq = 1
-    while path.exists():  # same base within one second (tests, retries)
+    while path.exists():  # same base within one stamp (tests, retries, per-day)
         seq += 1
-        path = log_dir / f"{base_name}.{stamp}-{seq}.log"
+        path = log_dir / f"{base_name}.{stamp}-{seq}.{suffix}"
     return path
 
 
@@ -220,3 +257,61 @@ class LoaderRunLog:
             self._fh.write(text)
         except OSError:
             pass
+
+
+@contextmanager
+def batch_run_log(
+    name: str,
+    *,
+    run_id: str | None = None,
+    source: str = "",
+    target: str = "",
+    meta: Mapping[str, Any] | None = None,
+) -> Iterator[dict[str, Any]]:
+    """Open a :class:`LoaderRunLog` for one COMPONENT batch and close it on both paths.
+
+    G107. ``drydocs/loaders/base.py`` has always done this correctly — open,
+    capture the exception, re-raise, close in ``finally`` — but it did it inline,
+    so the four components that run their own cadences had no way to get the same
+    behaviour without copying the block. Copying it four times is precisely the
+    drift G107 exists to prevent: four components, four almost-identical shapes,
+    and no single place to fix the one that is subtly wrong. This is that block,
+    once.
+
+    Yields a mutable ``summary`` dict. Fill it during the batch; whatever it holds
+    at exit becomes the log's summary block. The batch's OWN return value is
+    untouched — this records a run, it does not wrap one.
+
+    ``OSError`` while claiming the file is swallowed and the batch runs WITHOUT a
+    log, matching ``base.py._open_run_log``: a run log is an audit trail and must
+    never be the reason a batch fails. An exception inside the batch is recorded
+    and re-raised unchanged.
+
+        with batch_run_log("lineage.curated", target="drydocs") as summary:
+            written = do_the_work()
+            summary["rels written"] = written
+    """
+    log = LoaderRunLog(
+        name,
+        run_id or str(uuid.uuid4()),
+        source=source,
+        target=target,
+        meta=meta,
+    )
+    summary: dict[str, Any] = {}
+    try:
+        path = log.open()
+    except OSError as exc:  # — unwritable log dir: record nothing, run anyway
+        LOGGER.warning("%s: run log unavailable (%s) — continuing without", name, exc)
+        yield summary
+        return
+    log.attach()
+    LOGGER.info("[run-log] %s", path)
+    error: BaseException | None = None
+    try:
+        yield summary
+    except BaseException as exc:
+        error = exc
+        raise
+    finally:
+        log.close(summary, error=error)

@@ -712,7 +712,7 @@ PROCEDURE:
       (test_controlm_cypher/models/lineage_inventory) + fixture CSVs flipped '1'/'0'→'Y'/'N'
       (tests/fixtures/lineage/jobs.csv + 3 drydocs/data/samples CSVs — synthetic, canonical-producer).
     - docs/design/controlm-ingestion-tdd.{md,html,print.html}: NEW MANIFEST ROWS —
-      canonical-company. YOUR finalized TDD is ahead (SPIDERP §7f etc.); KEEP IT. The
+      canonical-company. YOUR finalized TDD is ahead (psgmgr §7f etc.); KEEP IT. The
       producer's Rev-3 mirror only gained the 'Y' literals your doc already has.
     - config/source-mappings/controlm-psgmgr.yaml (canonical-producer per the config/** row):
       IS_CURRENT_VERSION entry — the gate controlm-q1q3-phase1 §Q2 domain probe is RESOLVED

@@ -1,0 +1,53 @@
+id: Q27
+epic: docmeta
+title: Register the internal MWAA documentation as a doc corpus — the target_db block G32 owned is
+  discharged, so Airflow can stop reporting no-corpus
+type: task
+module: config
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- config/doc-source-registry.yaml
+- config/taxonomy/software-registry.yaml
+- config/source-registry.yaml
+- internal/airflow-reference/mwaa-internal-docs.md
+- tests/unit/test_doc_registry.py
+acceptance: |
+  (a) TWO EDITS, ONE COMMIT: a new row in `config/doc-source-registry.yaml` AND a `documentation:` block (`corpus:` pointing at that row's id) on the `airflow` product row in `config/taxonomy/software-registry.yaml`. They are atomic on purpose — a `documentation.corpus` naming an id the doc registry does not carry lands on `unregistered-corpus`, the ONE rung in `docs_coverage.FAILING`, so splitting the edits turns the suite red between two commits.
+
+  (b) FIELD VALUES, pre-decided at the 2026-08-07 capture and unchanged by the unpark: tier T2 (internal platform), curation `sme-confirm` (fixed per tier, ADR 0006 §4), connector `web`, classification `Internal`, `target_db: drydocs` — the single content database G32/G102 ruled, and now the only value `tests/unit/test_doc_registry.py` admits. The id is CLASS-BASED per the registry's non-vendor grammar: this is our DEPLOYMENT's documentation, not a vendor publication, so the `{vendor}-docs` form must not be used.
+
+  (c) THE POINTER, NEVER THE VALUE: `source:` cites `internal/airflow-reference/mwaa-internal-docs.md`. The real internal MWAA address stays in that file and appears in no tracked config row — the same rule the `airflow` row's own `locator.internal_docs` comment already states in `config/source-registry.yaml`.
+
+  (d) `confirmed: false`, WITH THE REASON ON THE ROW: registration is a DECLARATION. No loader may write from the entry until a gate signs its doc-graph shape, and flipping the flag is a separate follow-up (the Q24 precedent), never this item.
+
+  (e) THE OBSERVABLE: `drydocs docs-coverage` moves the `airflow` product row off `no-corpus`, and the close note quotes the rung it actually lands on (expected `ungated` — registered but not gate-confirmed, which is NOT in `FAILING`). The command still exits 0, and the full unit suite is green.
+notes: |
+  Groomed 2026-08-22 (laptop) — Idea-86, UNPARKED because its NAMED TRIGGER HAS FIRED. The entry was parked 2026-08-07 on the user's ruling "WAIT for G32 rather than declare a target_db the ruling may reverse", and re-checked 2026-08-12 as not-fired. It has now fired twice over: gate document-content-topology SIGNED 32/32 on 2026-08-18 (G32) and G102 applied the fold, so `target_db` has exactly one legal value and `test_doc_registry.py`'s admitted set is `{drydocs}`. Nothing about the entry's other field choices changes — they were decided at capture.
+
+  WHAT THE ROW BUYS: `drydocs docs-coverage` reports Airflow as `no-corpus` today, which is a TRUE statement and exactly the row the Q16 report exists to print — the internal MWAA implementation-docs locator exists on the `airflow` system row (`locator.internal_docs`, id `airflow:internal-implementation-docs`) with no corpus registered against it. Registering closes that gap without loading anything.
+
+  Module `config` recorded as a CHOICE: both edited files are config declarations and no code changes, so `config` is the honest work area (Q23 sits on drydocs-docmeta because it touches connectors; this one does not). Epic docmeta because the doc-source registry IS the docmeta ledger — the Epic F Airflow crosswalk is untouched by this item.
+  DONE 2026-08-28 (laptop, Lane B). (a) both edits in one commit: mwaa-implementation-docs
+  in the doc registry + documentation.corpus on the airflow product row. (b) fields as
+  pre-decided (T2 / sme-confirm / web / Internal / target_db drydocs); class-based id — the
+  row's note says why the {vendor}-docs form is wrong here. trust_default GROUNDED with the
+  upgrade path written on the row: VERBATIM only via a capture run whose manifest names the
+  row (the Q23 join). (c) the pointer never the value: source cites the internal locator
+  FILE; source_url null; the real address stays in internal/. (d) confirmed: false with the
+  reason on the row (declaration; the flip is its own follow-up — the Q24 precedent).
+  (e) THE OBSERVABLE, run live: the airflow row lands on `ungated` (coverage AND blocker
+  columns; also no-locator/no-describes — true graph-side facts), exactly the expected
+  rung, NOT in FAILING; docs-coverage exits 0; suite green. TWO DELIBERATE PIN MOVES with
+  reasons in-file: the coverage census (15,14,9,8)->(15,13,10,8) and the currency-drift
+  list gains "airflow: runtime 3.x not covered by docs 2026-08-07 locator" (current_for
+  EMPTY is the true unverified state; docs_version is the locator's recorded date so the
+  currency machinery keeps both sides). ONE ADJACENT FALSEHOOD FIXED: the docs-coverage CLI
+  printed "documentation locator(s) with no corpus registered" unconditionally — now scoped
+  to rows still on no-corpus, since airflow's locator IS backed by a registered corpus.
+  Renders (load-map / software-registry / enforcement-matrix / board) regenerated
+  in-commit. Suite 2596 passed / 11 skipped; ruff clean.

@@ -25,9 +25,12 @@
 #   - config/audit-fields.yaml (the source_created_*/source_updated_* envelope
 #     mapping for CM_DEF_VJOB / CM_DEF_VTAB)
 #
-# No column census has been run yet (doc 08 Phase 2 does that against the live
-# view/table via the controlm-db skill) — every `profile:` block below is a
-# `census: pending` placeholder, not a real inventory count. Column names are
+# DOC 08 PHASE 2 IS DONE for this ledger: all 7 objects carry a real catalog
+# census (`census: complete`, 2026-07-22 CM_AVG_RUN + 2026-08-24 the other six),
+# run read-only against live psgmgr in an internal session and transcribed here —
+# so `column_count` is now an inventory count and every sweep carries its frozen
+# `count:`. What is NOT done: per-column DATA profiling (null rates, distinct
+# counts, value domains), and the CM_HOSTS definition-side probes. Column names are
 # vendor-schema mechanism (no data values) — classification: Internal-Public,
 # even though the real source (config/source-registry.yaml) is classification:
 # Internal. Typed accessor: drydocs/source_mappings.py.
@@ -42,7 +45,7 @@
 schema: drydocs.source-mapping.v1
 source: psgmgr                # v2 SYSTEM id (carrier scope) — objects below map 1:1 to controlm@[db].psgmgr.* dataset rows
 classification: Internal-Public
-updated: 2026-07-31
+updated: 2026-08-24
 
 objects:
   # ---------------------------------------------------------------------------
@@ -54,10 +57,16 @@ objects:
   - name: CM_DEF_VTAB
     kind: table
     profile:
-      profiled_on: ~
-      via: "sql/controlm_folders.sql header + docs/restructure/06a (no controlm-db skill profile run yet)"
-      column_count: ~
-      census: pending
+      profiled_on: 2026-08-24
+      via: >
+        Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
+        internal session 2026-08-24 — conclusions transcribed producer-side,
+        no data values read. Real TABLE, 26 columns — the 10
+        dispositioned below + 16 swept; 76,364 rows at census time. Probe
+        sql/adhoc/profile_cm_def_objects.sql is company-side (not present here).
+        Prior basis kept: sql/controlm_folders.sql header + docs/restructure/06a.
+      column_count: 26
+      census: complete
     note: >
       APPLICATION (the :ControlMApplication grouping) is NOT a native CM_DEF_VTAB
       column — CM_DEF_VTAB carries no APPLICATION column at all. It comes from the
@@ -87,6 +96,7 @@ objects:
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 16
       note: >
         Phase-1 inventory+lineage projection (06a). Named exclusions from the SQL
         header: the folder-level soft-delete columns (TBL_DELETION_*) are
@@ -100,12 +110,23 @@ objects:
   # cypher/controlm_jobs.cypher.
   # ---------------------------------------------------------------------------
   - name: CM_DEF_VJOB
-    kind: view
+    kind: table
     profile:
-      profiled_on: ~
-      via: "sql/controlm_jobs.sql header + docs/restructure/06a (no controlm-db skill profile run yet)"
-      column_count: ~
-      census: pending
+      profiled_on: 2026-08-24
+      via: >
+        Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
+        internal session 2026-08-24 — conclusions transcribed producer-side,
+        no data values read. Real TABLE — this ledger recorded
+        kind: view until the census; corrected 2026-08-24 (the family name is
+        misleading, the same trap drydocs_core/models/controlm.py already flags
+        for CM_DEF_VTAB). 121 columns — the 33 dispositioned below + 88 swept;
+        1,089,358 rows at census time (ALL versions, ALL data centers — the
+        extract's IS_CURRENT_VERSION='Y' + USER_DAILY scope cuts this to roughly
+        240k). Probe sql/adhoc/profile_cm_def_objects.sql is company-side (not
+        present here). Prior basis kept: sql/controlm_jobs.sql header +
+        docs/restructure/06a.
+      column_count: 121
+      census: complete
     columns:
       - {name: JOB_ID, disposition: projected, origin: source, target: "ControlMJob.job_id",
          note: "folder-scoped (same JOB_ID recurs across folders); JOB_ID=1 = the folder header/SMART-Table row (gate Q3)"}
@@ -173,6 +194,7 @@ objects:
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 88
       note: >
         Phase-1 inventory+lineage projection (06a/SQL header): schedule-detail
         columns (DAY_STR, INTERVAL_SEQUENCE, MONTH_1..MONTH_12, etc.) and every
@@ -188,10 +210,17 @@ objects:
   - name: CM_DEF_LNKI_P_VW
     kind: view
     profile:
-      profiled_on: ~
-      via: "sql/controlm_conditions_in.sql header + docs/restructure/06a DDL check (no controlm-db skill profile run yet)"
-      column_count: ~
-      census: pending
+      profiled_on: 2026-08-24
+      via: >
+        Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
+        internal session 2026-08-24 — conclusions transcribed producer-side,
+        no data values read. 12 columns — all 12 dispositioned
+        below, sweep empty (06a's DDL check holds exactly); 1,293,560 rows at
+        census time. Probe sql/adhoc/profile_cm_def_objects.sql is company-side
+        (not present here). Prior basis kept: sql/controlm_conditions_in.sql
+        header + docs/restructure/06a DDL check.
+      column_count: 12
+      census: complete
     columns:
       - {name: TABLE_ID, disposition: projected, origin: source, target: "Condition.folder_id"}
       - {name: JOB_ID, disposition: projected, origin: source, target: "staging:job_id",
@@ -215,6 +244,7 @@ objects:
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 0
       note: >
         06a's DDL check found exactly these twelve columns (all confirmed
         selected); this sweep is defensive only, in case the live view carries
@@ -231,10 +261,17 @@ objects:
   - name: CM_DEF_LNKO_P_VW
     kind: view
     profile:
-      profiled_on: ~
-      via: "sql/controlm_conditions_out.sql header + docs/restructure/06a DDL check (no controlm-db skill profile run yet)"
-      column_count: ~
-      census: pending
+      profiled_on: 2026-08-24
+      via: >
+        Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
+        internal session 2026-08-24 — conclusions transcribed producer-side,
+        no data values read. 10 columns — all 10 dispositioned
+        below, sweep empty (06a's DDL check holds exactly); 1,318,968 rows at
+        census time. Probe sql/adhoc/profile_cm_def_objects.sql is company-side
+        (not present here). Prior basis kept: sql/controlm_conditions_out.sql
+        header + docs/restructure/06a DDL check.
+      column_count: 10
+      census: complete
     columns:
       - {name: TABLE_ID, disposition: projected, origin: source, target: "Condition.folder_id"}
       - {name: JOB_ID, disposition: projected, origin: source, target: "staging:job_id",
@@ -254,6 +291,7 @@ objects:
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 0
       note: >
         06a's DDL check found exactly these ten columns (all confirmed
         selected); this sweep is defensive only, in case the live view carries
@@ -272,10 +310,19 @@ objects:
   - name: CM_DEF_SETVAR_VW
     kind: view
     profile:
-      profiled_on: ~
-      via: "sql/controlm_variables.sql header + docs/restructure/06a (object name CONFIRMED 2026-07-10 against live psgmgr; full controlm-db skill column census still pending)"
-      column_count: ~
-      census: pending
+      profiled_on: 2026-08-24
+      via: >
+        Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
+        internal session 2026-08-24 — conclusions transcribed producer-side,
+        no data values read. 11 columns — the 4 dispositioned
+        below + 7 swept; 4,716,529 rows at census time, the largest object in
+        this ledger and the reason the variables extract is the one to stage.
+        Probe sql/adhoc/profile_cm_def_objects.sql is company-side (not present
+        here). Prior basis kept: sql/controlm_variables.sql header +
+        docs/restructure/06a (object name CONFIRMED 2026-07-10 against live
+        psgmgr).
+      column_count: 11
+      census: complete
     note: >
       Object name confirmed 2026-07-10 (psgmgr.CM_DEF_SETVAR_VW); full column
       census still pending the controlm-db skill profile (doc 08 Phase 2). The
@@ -297,6 +344,7 @@ objects:
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 7
       note: >
         Only the four columns behind the (TABLE_NAME|JOB_NAME|JOB_ID|APPL_TYPE|
         NAME|VALUE) extract are dispositioned here. CM_DEF_SETVAR_VW carries its
@@ -322,15 +370,23 @@ objects:
   - name: CM_HOSTS
     kind: table
     profile:
-      profiled_on: ~
+      profiled_on: 2026-08-24
       via: >
-        internal SQL Developer initial pass 2026-07-09 (22 distinct
-        DATA_CENTERs / 5,396 GRPNAMEs / 8,161 NODEIDs) + column view; formal
-        census still doc 08 Phase 2; remaining probes in
+        Read-only catalog census (ALL_TAB_COLUMNS + row count), live psgmgr,
+        internal session 2026-08-24 — conclusions transcribed producer-side,
+        no data values read. Real TABLE, 5 columns (all
+        nullable) — exactly the 5 dispositioned below, sweep empty; 13,745 rows
+        at census time. The catalog half ran from a scratch census file rather
+        than sql/adhoc/profile_cm_hosts.sql, whose remaining probes return real
+        host/group names: catalog-only keeps the census at the same no-data-values
+        bar as the CM_DEF_* objects. EARLIER PASS, still true: internal SQL
+        Developer 2026-07-09 — 22 distinct DATA_CENTERs / 5,396 GRPNAMEs / 8,161
+        NODEIDs. STILL OWED: the definition-side probes in
         sql/adhoc/profile_cm_hosts.sql (grain, participation domain, DC
-        value-domain match, NODE_ID resolution census)
-      column_count: ~
-      census: pending
+        value-domain match, NODE_ID resolution census) — a catalog census is not
+        those.
+      column_count: 5
+      census: complete
     note: >
       Gate controlm-hosts-topology CONFIRMED 2026-07-09 (config/gate-log.md;
       spec config/gate-prompts/controlm-hosts-topology.yaml); hosts loader +
@@ -354,6 +410,7 @@ objects:
     default_disposition:
       disposition: excluded
       reason: scope
+      count: 0
       note: >
         The column view shows exactly these five columns; this sweep is
         defensive only, in case the live table carries columns added since

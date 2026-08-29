@@ -1,0 +1,29 @@
+id: L29
+epic: doc-infrastructure
+title: The load runbook's CSV example points at a directory that has never existed in this repo, so it
+  teaches a company-shaped path as if it were a local one
+type: bug
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/design/drydocs-load-runbook.md
+- drydocs/data/samples/
+acceptance: |
+  (a) THE LINE IS FIXED, ONE WAY OR THE OTHER, AND THE CHOICE IS STATED. Step 3 of `docs/design/drydocs-load-runbook.md` gives a CSV loader example whose path is under a directory that has never existed producer-side. Either repoint the example at a bundled sample under `drydocs/data/samples/` so a reader can actually run the command as written, or mark it explicitly as a company-side illustration. Preference, unless the sample turns out not to exist: repoint it, because a runbook step a reader can execute is worth more than one they must interpret.
+
+  (b) THE FORBIDDEN FIX. Do NOT create that directory here to make the line true. Real data never lands in this repo — that asymmetry is the publish boundary, and inventing the path to satisfy a doc would be the first exception to it.
+
+  (c) THE NEIGHBOURS ARE CHECKED, NOT ASSUMED. Every other producer mention of that directory is a reference to the COMPANY's copy (the divergence ledger, the reconcile-port skill, the mappings catalog, a 2026-07-27 inbox line), and those are correct as written. The sweep confirms they still read as company references after the runbook line changes, so the fix does not make the surrounding prose inconsistent.
+
+  (d) THE RENDER FOLLOWS. `docs/design/*.md` is the source of truth and the single HTML is a deterministic render, so the render is regenerated in the same commit and the committed HTML matches.
+notes: |
+  Groomed 2026-08-26 from Idea-166. Found the honest way: a company session hit the same line, could not find the file, and spent a session tracing why its catalog folder kept reverting — the answer had nothing to do with the runbook, but the runbook is where the hunt started. That is the cost being paid, and it is why a doc-only bug is p2 rather than p3.
+
+  The line was touched at load-runbook Rev 3 (annotation only) and the path was not examined then, so a currency guard would not have caught it either — the path resolves to nothing rather than to something stale.
+
+  Epic doc-infrastructure and module `docs`: the runbook is a design doc under the Epic L render chain.

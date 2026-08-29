@@ -83,10 +83,14 @@ MERGE (n:SchemaMeta:ExecutionHost {name: 'ExecutionHost'})
   SET n.class = 'prov:SoftwareAgent', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:ControlMHostGroup {name: 'ControlMHostGroup'})
   SET n.class = 'dd:ControlMHostGroup', n.prov_type = 'Collection';
+MERGE (n:SchemaMeta:ControlMUtility {name: 'ControlMUtility'})
+  SET n.class = 'dd:ControlMUtility', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DataAsset {name: 'DataAsset'})
   SET n.class = 'dcat:Dataset', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:DataFlow {name: 'DataFlow'})
   SET n.class = 'prov:Activity', n.prov_type = 'Activity';
+MERGE (n:SchemaMeta:DeploymentModule {name: 'DeploymentModule'})
+  SET n.class = 'dd:DeploymentModule', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:BusinessApplication {name: 'BusinessApplication'})
   SET n.class = 'prov:Entity', n.dual_class = 'dprod:DataProduct', n.prov_type = 'Entity';
 MERGE (n:SchemaMeta:Employee {name: 'Employee'})
@@ -117,6 +121,8 @@ MERGE (n:SchemaMeta:CatalogLOB {name: 'CatalogLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:CatalogSubLOB {name: 'CatalogSubLOB'})
   SET n.class = 'org:OrganizationalUnit', n.prov_type = 'Agent';
+MERGE (n:SchemaMeta:OrgChangeEvent {name: 'OrgChangeEvent'})
+  SET n.class = 'org:ChangeEvent', n.prov_type = 'Activity';
 MERGE (n:SchemaMeta:Company {name: 'Company'})
   SET n.class = 'org:FormalOrganization', n.prov_type = 'Agent';
 MERGE (n:SchemaMeta:BusinessSegment {name: 'BusinessSegment'})
@@ -314,6 +320,10 @@ MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'ExecutionHost'})
 MERGE (a)-[r:DELEGATES_TO]->(b)
   SET r.vocab_id = 'scheduler_delegates_to', r.prov_maps_to = 'prov:actedOnBehalfOf', r.domain = 'scheduler', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'ControlMJob'}), (b:SchemaMeta {name: 'ControlMUtility'})
+MERGE (a)-[r:INVOKES]->(b)
+  SET r.vocab_id = 'scheduler_invokes_utility', r.prov_maps_to = 'prov:used', r.domain = 'scheduler', r.status = 'planned';
+
 // ── domain: business_application ────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'Port'})
@@ -327,6 +337,18 @@ MERGE (a)-[r:HAD_PRIMARY_SOURCE]->(b)
 MATCH (a:SchemaMeta {name: 'Port'}), (b:SchemaMeta {name: 'DistributionList'})
 MERGE (a)-[r:HAS_CONTACT_POINT]->(b)
   SET r.vocab_id = 'business_application_port_has_contact_point', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'DeploymentModule'})
+MERGE (a)-[r:INSTANTIATES]->(b)
+  SET r.vocab_id = 'business_application_instantiates_deployment_module', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'BusinessApplication'}), (b:SchemaMeta {name: 'AreaProduct'})
+MERGE (a)-[r:CONTAINED_BY]->(b)
+  SET r.vocab_id = 'business_application_contained_by_ci', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'BusinessApplication'})
+MERGE (a)-[r:CONTAINED_BY]->(a)
+  SET r.vocab_id = 'business_application_contained_by_ci', r.prov_maps_to = null, r.domain = 'business_application', r.status = 'planned';
 
 MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'BusinessApplication'})
 MERGE (a)-[r:BELONGS_TO_APPLICATION]->(b)
@@ -546,11 +568,11 @@ MERGE (a)-[r:SUPERSEDES]->(a)
 
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ControlMFolder'})
 MERGE (a)-[r:CONCERNS]->(b)
-  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ETLProcess'})
 MERGE (a)-[r:CONCERNS]->(b)
-  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+  SET r.vocab_id = 'docs_email_concerns', r.prov_maps_to = null, r.domain = 'docs', r.status = 'active';
 
 MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'Document'})
 MERGE (a)-[r:EVIDENCED_BY]->(b)
@@ -559,6 +581,26 @@ MERGE (a)-[r:EVIDENCED_BY]->(b)
 MATCH (a:SchemaMeta {name: 'DataFlow'}), (b:SchemaMeta {name: 'Chunk'})
 MERGE (a)-[r:EVIDENCED_BY]->(b)
   SET r.vocab_id = 'docs_evidenced_by', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'ControlMUtility'})
+MERGE (a)-[r:DESCRIBES]->(b)
+  SET r.vocab_id = 'docs_describes_utility', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'ControlMUtility'}), (b:SchemaMeta {name: 'SoftwareProduct'})
+MERGE (a)-[r:PART_OF]->(b)
+  SET r.vocab_id = 'docs_utility_part_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'})
+MERGE (a)-[r:SEE_ALSO]->(a)
+  SET r.vocab_id = 'docs_see_also', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'DocSection'})
+MERGE (a)-[r:IN_SECTION]->(b)
+  SET r.vocab_id = 'docs_in_section', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'DocSection'})
+MERGE (a)-[r:SUBSECTION_OF]->(a)
+  SET r.vocab_id = 'docs_subsection_of', r.prov_maps_to = null, r.domain = 'docs', r.status = 'planned';
 
 // ── domain: all ─────────────────────────────────────────────────────────────
 
@@ -622,6 +664,18 @@ MERGE (a)-[r:HAS_BUSINESS_SEGMENT]->(b)
 MATCH (a:SchemaMeta {name: 'Company'}), (b:SchemaMeta {name: 'BusinessSegment'})
 MERGE (a)-[r:HAS_BUSINESS_SEGMENT_HISTORICAL]->(b)
   SET r.vocab_id = 'corporate_has_business_segment_historical', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Company'})
+MERGE (a)-[r:HAS_SUB_ORGANIZATION]->(a)
+  SET r.vocab_id = 'corporate_has_sub_organization', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'OrgChangeEvent'}), (b:SchemaMeta {name: 'BusinessSegment'})
+MERGE (a)-[r:ORIGINAL_ORGANIZATION]->(b)
+  SET r.vocab_id = 'corporate_change_original', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'OrgChangeEvent'}), (b:SchemaMeta {name: 'BusinessSegment'})
+MERGE (a)-[r:RESULTING_ORGANIZATION]->(b)
+  SET r.vocab_id = 'corporate_change_resulting', r.prov_maps_to = null, r.domain = 'corporate', r.status = 'planned';
 
 // ── domain: itsm ────────────────────────────────────────────────────────────
 
@@ -696,3 +750,11 @@ MERGE (a)-[r:QUALIFIED_ATTRIBUTION]->(b)
 MATCH (a:SchemaMeta {name: 'Attribution'}), (b:SchemaMeta {name: 'Role'})
 MERGE (a)-[r:HAD_ROLE]->(b)
   SET r.vocab_id = 'catalog_dev_team_attribution_had_role', r.prov_maps_to = null, r.domain = 'human', r.status = 'active';
+
+MATCH (a:SchemaMeta {name: 'Attribution'})
+MERGE (a)-[r:WAS_DERIVED_FROM]->(a)
+  SET r.vocab_id = 'human_attribution_derived_from', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'human', r.status = 'planned';
+
+MATCH (a:SchemaMeta {name: 'Employee'})
+MERGE (a)-[r:REPORTS_TO]->(a)
+  SET r.vocab_id = 'human_employee_reports_to', r.prov_maps_to = null, r.domain = 'human', r.status = 'planned';

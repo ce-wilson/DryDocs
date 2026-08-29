@@ -6,10 +6,12 @@ checked that a declared corpus was ever loaded, or that it landed in the databas
 it declared. This module is that check, and ``drydocs docs-verify`` is its verb.
 
 REGISTRY-DRIVEN, NOT PER-LOADER — the acceptance's requirement, and the reason
-for ``graph_locator``. The registry is corpus-keyed but the graph is not: only
-the Q13 vendor-docs loader writes ``corpus_id``, while ``bmc_docs`` identifies
-its pages by repo-relative ``path`` and ``essential_graphrag`` writes a single
-Document whose ``doc_id`` IS the corpus id. Hard-coding those three shapes here
+for ``graph_locator``. Since Q26 EVERY lexical loader writes ``corpus_id``
+(bmc_docs and essential_graphrag joined the Q13 vendor-docs loader — the G32
+§A scoping made true of the loaded graph); ``bmc_docs`` documents ALSO stay
+path-identified, and its registry locator deliberately keeps ``path_prefix``
+until both machines' graphs carry the stamp (the row says so). Hard-coding
+per-loader shapes here
 would make this file a per-loader registry that silently rots as loaders change.
 Instead each entry declares how to find its own nodes, and a corpus that
 declares nothing is reported as such rather than guessed at.
@@ -19,11 +21,12 @@ wrong-db` cannot describe two situations that are live in the registry today,
 and reporting either as `missing` would be a false diagnosis:
 
 * ``db-absent`` — the declared ``target_db`` does not exist on this server.
-  Two entries declare ``dddocs``, which ``schema/provisioning/01_databases.cypher``
-  has never created. That is not a load failure; it is the open topology
-  question G32 exists to rule on.
+  Historical: two entries once declared the superseded ``dddocs`` (rejected
+  at G32/G102, 2026-08-18; ``01_databases.cypher`` never created it) and
+  now target ``drydocs``. The status class stays for the next declared-
+  but-unprovisioned name.
 * ``unshaped`` — the corpus is registered and real but was never put on the
-  lexical Document->Chunk spine (``jpmc-reports`` loaded as :DataAsset slices,
+  lexical Document->Chunk backbone (``jpmc-reports`` loaded as :DataAsset slices,
   pre-dating the docmeta plan). Its documents are not missing; they were never
   documents.
 
@@ -59,7 +62,7 @@ FAILING = frozenset({WRONG_DB, WRONG_REALM})
 MATCH_CORPUS_ID = "corpus_id"  # (:Document {corpus_id: value})  — Q13 loaders
 MATCH_DOC_ID = "doc_id"  # (:Document {doc_id: value})     — single-doc corpora
 MATCH_PATH_PREFIX = "path_prefix"  # d.path STARTS WITH value        — file-tree corpora
-MATCH_NONE = "none"  # not on the lexical spine at all
+MATCH_NONE = "none"  # not on the lexical backbone at all
 
 LOCATOR_KINDS = frozenset({MATCH_CORPUS_ID, MATCH_DOC_ID, MATCH_PATH_PREFIX, MATCH_NONE})
 
@@ -91,7 +94,7 @@ class CorpusRow:
 def locator_of(source: dict) -> tuple[str, str | None, bool]:
     """Return ``(kind, value, declared)`` for an entry.
 
-    ``declared`` separates "this corpus is deliberately not on the lexical spine"
+    ``declared`` separates "this corpus is deliberately not on the lexical backbone"
     (``match: none``, a ruling someone made) from "nobody said" (no
     ``graph_locator`` at all). Both end up ``unshaped``, but only one of them is
     an answer, and the detail line must not claim the entry said nothing when it
@@ -182,7 +185,7 @@ def verify(
                     target_db=target,
                     status=UNSHAPED,
                     detail=(
-                        "declared not on the :Document spine (match: none)"
+                        "declared not on the :Document backbone (match: none)"
                         if declared
                         else "no graph_locator declared — nobody has ruled how to find this corpus"
                     ),

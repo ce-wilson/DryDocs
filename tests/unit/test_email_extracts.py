@@ -90,8 +90,12 @@ def test_split_body_paragraphs():
 
 def test_cypher_is_single_statement_and_never_assigns():
     """The floor's hard fence: this loader writes the lexical shape ONLY. The
-    assignment edge (docs_email_concerns / CONCERNS) is status: planned behind
-    gate email-folder-assignment — its tokens may never appear here."""
+    assignment edge (docs_email_concerns / CONCERNS) went ACTIVE at Q21, and
+    its ONE authorized writer is loaders/cypher/email_concerns.cypher — the
+    exemption is BY NAME, and this fence on the LEXICAL loader's cypher is
+    permanent: widening the check to the directory would discharge it, and
+    lifting it would let the lexical loader quietly gain the write the gate
+    placed elsewhere."""
     cypher = EmailExtractsLoader.cypher_path.read_text(encoding="utf-8")
     assert _code_semicolons(cypher) == 1
     code = "\n".join(line for line in cypher.splitlines() if not line.strip().startswith("//"))

@@ -6,8 +6,10 @@ holds database credentials or picks a database; this component does.
 - **Read-only by construction**: `guard.ensure_read_only` rejects write-shaped
   Cypher at the endpoint layer (comments/strings stripped first), and the live
   runner pins `RoutingControl.READ` behind it.
-- **Per-view database routing** (`routing.py`): which database a view reads
-  (`drydocs` vs `ddall`) is a server-side row, never a client string.
+- **Per-view database routing** (`routing.py`): which database a view reads is a
+  server-side row, never a client string. Since the G102 fold (2026-08-18) every
+  content spec routes to `drydocs` — the row survives because server-side routing was
+  never only about having a choice, and `SPEC_DATABASES` still refuses anything else.
 - **Named queries** (`queries.py`): overview-counts, folder-census,
   dependency-chain, c4-graph — params declared + validated, fail closed.
 - **QuerySpec registry** (O11, `query_specs.py`): versioned module specs behind

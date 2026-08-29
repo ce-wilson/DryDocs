@@ -17,9 +17,9 @@
 #
 # classification: Internal-Public (shape/consistency only — no counts, no real ids).
 #
-# No `targets:` — the review spine (config/review-labels.yaml) maps Control-M and
+# No `targets:` — the review backbone (config/review-labels.yaml) maps Control-M and
 # docs SOURCES to their labels and has no entry covering :BusinessApplication or
-# :Port. Declaring labels the spine cannot check is the drift these suites exist to
+# :Port. Declaring labels the backbone cannot check is the drift these suites exist to
 # catch (the old seal-attribution-coverage suite named a retired `Application`
 # label until its K8 rewrite as folder-attribution-coverage, which is what that
 # looks like once it has set).

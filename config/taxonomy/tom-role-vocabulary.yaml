@@ -1,0 +1,364 @@
+# =============================================================================
+# config/taxonomy/tom-role-vocabulary.yaml — the DECLARED TOM role vocabulary
+#
+# G70, gate tom-roles-enumeration-and-cardinality (SIGNED 2026-08-11, §F3):
+# THIS FILE IS THE ONE SURFACE the four formerly-hardcoded ones defer to
+# (§A8: the SealRole enum, the _ROLE_CANONICAL alias map, the loader's Cypher
+# CASE, the supplement's scheme seed — three languages, four lists, none
+# agreeing). Reader: drydocs_core/ontology/tom_role_vocabulary.py. Drift
+# guards: tests/unit/test_tom_role_vocabulary.py — a vocabulary nobody is
+# forced to update rots into fiction (the ui-components precedent), so the
+# supplement seed, the alias table, the loader and the taxonomy sample are
+# all tested against THIS file.
+#
+# TWO REGISTERS, ONE FILE (§A). Each class records the SEAL extract's spelling
+# (seal_extract_name — also the CANONICAL spelling the loaders key on) and the
+# ServiceNow TOM catalog's row (catalog_name). The catalog's own description
+# text marks its SEAL-sourced rows "… from SEAL" — that marker IS the
+# two-register mapping §A asked for, and it is READ, not reconstructed.
+# TRANSCRIPTION CAVEAT (stated so the file does not claim a read it never
+# made): the 83-row catalog export lives COMPANY-SIDE (J18 venue discipline;
+# the export is not in this tree), so catalog names and markers here are
+# transcribed from K21 §10.7/§10.8 — the rows K21 names are carried, the rest
+# are summarized under `catalog:` below, and company-side verification against
+# the export itself is pending.
+#
+# CARDINALITY IS RECORDED ONCE, HERE, NOT PER CLASS (§B3): every role class is
+# ONE-OR-MORE holders per application (§B1 ruled the multi-holder shape normal
+# — four Backup Information Owners on one application is the observed estate,
+# not an anomaly). Singleton-ness, where it ever matters, is a graph-TEST
+# question, never a database constraint. `required` IS per class (§B0/§B3):
+# the short list of required contacts vs the extended optional list is the
+# primary structure, seeded from the signed §G register.
+#
+# RETIREMENT IS A STATE, NOT A DELETION (§F6b): the source's own tom_roles
+# table carries an `active` flag and the SME's queries filter on it, so
+# classes retire rather than vanish. Every class here declares `active`;
+# nothing is retired today, and when something is, it stays in this file
+# flagged false.
+#
+# CANONICAL SPELLINGS ARE FROZEN (§H5 / identity gate §D2): the contact-side
+# attribution_id embeds seal_extract_name, so renaming one re-keys every
+# Attribution for that class and orphans the old nodes. A rename is a
+# migration, never an edit — test_seal_roles.py pins every pre-G70 canonical
+# spelling byte-identical.
+# =============================================================================
+
+schema: drydocs.tom-role-vocabulary.v1
+taxonomy: tom-role-vocabulary
+concept: TOMRole                      # skos:Concept in scheme tom_roles
+scheme: tom_roles
+source: "gate tom-roles-enumeration-and-cardinality §G register (signed 2026-08-11) + K21 §10.7 catalog transcription"
+classification: Internal-Public       # role names and mechanism only — the gate's own
+                                      # classification note: names are public-tier;
+                                      # the live registry stays Internal
+cardinality: one-or-more              # §B3: recorded ONCE, on the scheme — see header
+
+# Per class:
+#   id                — the TOMRole concept id (graph key; stable, never renamed casually)
+#   pref_label        — display label
+#   abbrev            — the SME's parenthetical abbreviation, where one was given
+#   scope             — Individual | Group (the catalog's scope column)
+#   type              — the catalog's type column. NULL (~) throughout: the export
+#                       shows it weakly populated (overwhelmingly 'other'; §3.2's
+#                       rule — present but not a reliable classifier), and this
+#                       repo does not hold the per-row values to transcribe. Filled
+#                       company-side from the export if ever needed.
+#   required          — the signed §G register (7 required, the rest optional)
+#   active            — §F6b lifecycle flag (all true today)
+#   derived           — SRE only: presence is READ, not asserted (G16 amendment);
+#                       G71's completeness report EXCLUDES derived classes
+#   seal_extract_name — the SEAL extract register's spelling = the CANONICAL
+#                       spelling (frozen; see header). ~ = not a SEAL-register class
+#   source_names      — every FULL spelling admitted as this class (the canonical
+#                       first). Short-form aliases ('ao', 'l2 ops manager') live in
+#                       drydocs_core/models/seal.py _ROLE_CANONICAL, which must
+#                       resolve INTO this list (guarded)
+#   catalog_name      — the ServiceNow catalog row (K21 §10.7/§10.8 transcription)
+#   catalog_marker    — 'from SEAL' where K21 §10.7 transcribes the catalog's own
+#                       description marker; 'pending' where the row's marker was
+#                       not transcribed
+
+classes:
+  # ---- REQUIRED (the §G short list, 7) --------------------------------------
+  - id: application_owner
+    pref_label: Application Owner
+    abbrev: AO
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: Application Owner
+    source_names: [Application Owner]
+    catalog_name: Application Owner
+    catalog_marker: from SEAL
+
+  - id: primary_information_owner
+    pref_label: Primary Information Owner
+    abbrev: PIO
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: Primary Information Owner
+    source_names: [Primary Information Owner]
+    catalog_name: Primary Information Owner
+    catalog_marker: from SEAL
+
+  - id: backup_information_owner
+    pref_label: Backup Information Owner
+    abbrev: BIO
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: Backup Information Owner
+    source_names: [Backup Information Owner]
+    catalog_name: Backup Information Owner
+    catalog_marker: from SEAL
+
+  - id: cto
+    pref_label: CTO
+    abbrev: CTO
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: CTO
+    source_names: [CTO, Chief Technology Officer]
+    catalog_name: CTO
+    catalog_marker: from SEAL
+    note: >
+      The canonical stays the extract's own 'CTO' — renaming it to the long form
+      would re-key every contact-side CTO Attribution (§H5). 'Tech Partner' is an
+      ALIAS here (the PAT name for the application-level tech lead) and its
+      collapse into CTO is the §A6c accepted-risk NO LONGER TAKEN: since G70 the
+      raw source string survives on Attribution.role_source_name (§A4b), so a
+      Product Cabinet 'Tech Partner' arriving in the contact extract is
+      recoverable. DISTINCT from the K5 product_roles tech_partner concept — the
+      families are independent (2026-07-20) and that ruling is not reopened.
+
+  - id: technology_risk_controls
+    pref_label: Technology Risk & Controls
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: Risk Manager
+    source_names: [Risk Manager, Technology Risk & Controls]
+    catalog_name: Information Risk Manager
+    catalog_marker: from SEAL
+    note: >
+      ONE CLASS, TWO NAMES (§A2): the SEAL custom field says 'Risk Manager', the
+      concept is technology_risk_controls, and the crosswalk STOPS THERE — the
+      residual asking for a SEAL-risk <-> ServiceNow-group resolution was CLOSED
+      2026-08-11 (the catalog shows the role at Individual scope, so there is no
+      group to map to; none is designed and none is missing). 'Risk Manager' is
+      absent from the SME's 2026-08-06 thirteen-class list — a capture change,
+      NOT a retirement (the capture's own note) — which is why the class stays
+      active and required per §G.
+
+  - id: design_authority
+    pref_label: Design Authority
+    abbrev: DA
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: Design Authority
+    source_names: [Design Authority]
+    catalog_name: Design Authority
+    catalog_marker: from SEAL
+
+  - id: backup_application_owner
+    pref_label: Backup Application Owner
+    abbrev: BAO
+    scope: Individual
+    type: ~
+    required: true
+    active: true
+    seal_extract_name: Backup Application Owner
+    source_names: [Backup Application Owner]
+    catalog_name: Backup Application Owner
+    catalog_marker: from SEAL
+    note: effective 2026-05-18 in the SEAL spec.
+
+  # ---- OPTIONAL (the §G extended list) --------------------------------------
+  - id: operate_manager_l1
+    pref_label: L1 Operate Manager
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: L1 Operate Manager
+    source_names: [L1 Operate Manager]
+    catalog_name: ~
+    catalog_marker: pending
+    note: >
+      One of the THREE Operate Manager classes (§A5, confirmed three times; the
+      §G9 split applied at G70). A levelled coverage TIER — distinct from the
+      bare class, which is defined by responsibility scope. The pre-G70 model's
+      level property (one concept + level on the Attribution) retires with the
+      split; migrate_tom_role_split_g70.cypher moves loaded graphs. K21 §10.7
+      records 'the Operate Manager family' in the catalog's SEAL-marked block
+      without transcribing the per-row names, hence catalog_name pending.
+
+  - id: operate_manager_l2
+    pref_label: L2 Operate Manager
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: L2 Operate Manager
+    source_names: [L2 Operate Manager]
+    catalog_name: ~
+    catalog_marker: pending
+    note: the L2 coverage tier — see operate_manager_l1.
+
+  - id: operate_manager
+    pref_label: Operate Manager
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: Operate Manager
+    source_names: [Operate Manager]
+    catalog_name: ~
+    catalog_marker: pending
+    note: >
+      The BARE class, defined by RESPONSIBILITY SCOPE, not a level (§G9, ruled
+      2026-08-11): it covers change, problem and incident resolution. That is
+      what distinguishes it from L1/L2, which are levelled coverage tiers.
+      DATA CAVEAT riding with the ruling: the SME reports current assignments
+      are wrong in a known way (teams recorded with responsibilities they do
+      not own, mid-correction at source), so the first load's Operate Manager
+      rows are NOT a baseline to reconcile against, and completeness findings
+      on them are defects already being fixed elsewhere.
+
+  - id: chief_business_technologist
+    pref_label: Chief Business Technologist
+    abbrev: CBT
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: Chief Business Technologist
+    source_names: [Chief Business Technologist]
+    catalog_name: Chief Business Technologist
+    catalog_marker: from SEAL
+    note: >
+      Restored 2026-08-06 as an optional class by SME ruling. That ruling's
+      "no cypher crosswalk, in case it appears" was the PRE-GATE interim; the
+      signed §G register lists CBT as an optional line, so since G70 it
+      crosswalks to this concept like every declared class. NOT an alias of
+      CTO — 70001 in the sample carries both, held by different people (G10
+      disposed).
+
+  - id: deployment_owner
+    pref_label: Deployment Owner
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: Deployment Owner
+    source_names: [Deployment Owner]
+    catalog_name: Deployment Owner
+    catalog_marker: from SEAL
+    note: >
+      §G13. One of the four classes the pre-G70 code REJECTED OUTRIGHT (§A1d
+      measured it). SHARED-SUBJECT NOTE (recorded so the register does not
+      rediscover it): G13/G14/G15 plausibly share ONE subject, the Deployment
+      Module CI — "deployment" and "module" are the same thing here (SME,
+      one application : many deployments, identifier app_id(seal_id):deployment_id).
+      The CI class capture is K22; attribution itself does NOT move off the
+      application.
+
+  - id: deployment_information_owner
+    pref_label: Deployment Information Owner
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: Deployment Information Owner
+    source_names: [Deployment Information Owner]
+    catalog_name: ~
+    catalog_marker: pending
+    note: "§G14; previously rejected outright (§A1d). Shared-subject note: see deployment_owner."
+
+  - id: application_module_owner
+    pref_label: Application Module Owner
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    seal_extract_name: Application Module Owner
+    source_names: [Application Module Owner]
+    catalog_name: ~
+    catalog_marker: pending
+    note: "§G15; previously rejected outright (§A1d). Shared-subject note: see deployment_owner."
+
+  - id: site_reliability_engineer
+    pref_label: Site Reliability Engineer
+    abbrev: SRE
+    scope: Individual
+    type: ~
+    required: false
+    active: true
+    derived: true
+    seal_extract_name: Site Reliability Engineer
+    source_names: [Site Reliability Engineer]
+    catalog_name: "Site Reliability Engineer (SRE)"
+    catalog_marker: pending
+    note: >
+      §G16, AMENDED 2026-08-11: OPTIONAL and DERIVED — G71's completeness
+      report EXCLUDES derived classes, because a derived many-to-one fact in a
+      per-application required-contact report would generate a finding on every
+      application whose SRE cover simply was not asserted. BOTH SRE catalog
+      rows are seeded (close-out 2026-08-11): which one an application uses is
+      a PER-TEAM IMPLEMENTATION CHOICE, so a reorganising team moves DATA, not
+      vocabulary. K21 §10.8's flag rides here unresolved: the amendment's
+      derivation reasoning described the GROUP row while the SME's 13-class
+      list reads as THIS Individual row; the ruling (optional) holds either
+      way. REVISIT TRIGGER (recorded, not "we'll see"): when the holder shape
+      FLIPS for an application DryDocs supports — a named-person SRE becoming
+      a shared team or the reverse.
+
+  - id: sre_devops_incident_resolver_team
+    pref_label: "Incident Resolver – SRE / DevOps Team"
+    scope: Group
+    type: ~
+    required: false
+    active: true
+    derived: true
+    seal_extract_name: ~
+    source_names: ["Incident Resolver – SRE / DevOps Team"]
+    catalog_name: "Incident Resolver – SRE / DevOps Team"
+    catalog_marker: pending
+    note: >
+      The GROUP-scoped SRE row (K21 §10.8) — an operational team serving
+      roughly 20-60 applications, which is why its presence is DERIVED from
+      the group naming convention's FUNCTION SEGMENT rather than asserted.
+      DO NOT PATTERN-MATCH THE ROLE NAME: in the sampled data an SRE-named
+      role resolves to a SUPPORT-function group (the team reuses one), so the
+      role label disagrees with the group and the GROUP is right — the label
+      is not the identity (the §A3b defect class). Whether DryDocs parses the
+      convention belongs to the group-membership work, not this file.
+
+# ---- The catalog remainder — MARKED, not dropped (sign-off note 2026-08-11) --
+# The export is 83 rows; the 16 classes above are the in-scope registers. The
+# rest is NOT OURS, and the sign-off instructs marking it so the file's
+# coverage stays legible. The per-row names live company-side with the export;
+# the FAMILIES K21 §10.7 names are recorded here. A future company-side pass
+# may expand these to rows — each would land `in_scope: false`, never deleted.
+catalog:
+  total_rows: 83                       # corrected from the SME's initial "100+" (K21 §10.7)
+  rows_carried: 16                     # the classes above; the remainder is company-side
+  scope_shape: "roughly a quarter Individual, the rest Group — the catalog is mostly the operational and approval layer"
+  seal_marker: "a block of Individual-scoped rows is described '… from SEAL' in the catalog's own description text — the two-register mapping, written down by the source (K21 §10.7)"
+  out_of_scope_families:               # named by K21 §10.7; none is ours to model
+    - third-party-website ownership
+    - RTM pair for external e-bonding
+    - capacity planning
+    - legal-entity approvals
+    - universal-request fulfilment ladder
+    - central management teams

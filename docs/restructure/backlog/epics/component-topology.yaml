@@ -50,8 +50,8 @@ groom_log:
   attached_at: G45
 - date: '2026-07-31'
   note: |-
-    ── Epic W — FCDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
-    Groomed 2026-07-31 from the FCDO capture (internal/fcdo-reference/, 8abc05f)
+    ── Epic W — CDO ontology alignment (main / ontology-mapper) — Phase 2 ─────
+    Groomed 2026-07-31 from the CDO capture (internal/cdo-reference/, 8abc05f)
     and its ALIGNMENT-PLAN.md: align producer ontology to the internal governance
     group's firmwide frameworks ON PLANNED ITEMS ONLY (user rule: don't add what
     we won't use). Every confirmation routes through the SME gate; the plan's
@@ -78,3 +78,17 @@ groom_log:
     do-not-recommend), namely MODULE_MAP contradicting the boundary test and four unpinned
     agent-runtime dependencies.
   attached_at: G104
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from the IDEAS inbox (Ideas 171, 176, 175, 164, 169). Five items,
+    four of them the deliberate residue of a finished item rather than new work: G111 the
+    data-zone env-field gap that ADR 0014's log-root fix does not cover (Idea-171's residue,
+    clauses 1/3/4 having been ruled into the ADR on 2026-08-25); G112 the G92 scope chain
+    widened to the G97 artifact pass, with the INVOCATION half recorded as a gate question
+    and deliberately not built (Idea-176); G113 the consumer half of G56, where one shared
+    export on N hosts is currently flagged as N unconfirmed identities (Idea-175); G114 the
+    superseded-database guard widened to the two packages the 2026-08-24 fold sweep actually
+    found stale names in (Idea-164); G115 the per-data-center Control-M extraction bind and
+    run recipe (Idea-169, user direction 2026-08-24), whose first multi-DC LOAD is gated on
+    the new P6 identity probe.
+  attached_at: G111

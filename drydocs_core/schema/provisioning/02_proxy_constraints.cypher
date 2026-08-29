@@ -12,7 +12,7 @@
 // one home for one-database keys: `controlmjob_key` was always there (this file
 // duplicated it), and `dataasset_id` moved there at G31 with the D1 note. The
 // D1 discipline (identity is always a business key, never an internal node id)
-// survives as tests/unit/test_business_key_spine.py: every label a shipped
+// survives as tests/unit/test_business_key_backbone.py: every label a shipped
 // loader MATCHes as a join target must carry a constrained key.
 //
 // Kept as a tombstone rather than deleted so the provisioning sequence numbers

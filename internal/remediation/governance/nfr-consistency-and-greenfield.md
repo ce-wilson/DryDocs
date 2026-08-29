@@ -9,7 +9,7 @@ Goal-2 deliverable: what's **consistent** across the standards (Vendor / Platfor
 
 ---
 
-## 1. The common spine (consistent across DAT + HLT)
+## 1. The common backbone (consistent across DAT + HLT)
 
 Both tower standards share one positional skeleton and one escalation contract — the stable base to build the greenfield on:
 

@@ -1,35 +1,39 @@
 id: J52
 epic: release-infrastructure
-title: 'pre-commit hooks running the two commands CI blocks on, so the lint failure that ran red for a
-  hundred consecutive runs cannot be committed again'
+title: Verification evidence about a local dev server counts only when the session launched the browser
+  itself â€” record the rule and the recipe in the verify skill
 type: chore
-module: config
-phase: 11
+module: docs
+phase: 8
 agent: main
-model: sonnet
-priority: p2
-status: todo
+model: haiku
+priority: p3
+status: done
 depends_on: []
 inputs:
-- .github/workflows
-- pyproject.toml
-- docs/design/web-scaffolding-review.md
+- .claude/skills/verify/SKILL.md
+- web/README.md
 acceptance: |
-  A committed .pre-commit-config.yaml runs, at minimum, the two commands CI blocks on - ruff check and ruff format - on staged files, so the failure mode this repo actually had cannot reach a commit. Installation is one documented command and the session ritual says where it goes; the hooks are not silently mandatory, because a repo that fails an unexplained hook on a fresh clone teaches people to pass --no-verify. The hook versions are pinned and match the ruff the project already depends on, so local and CI cannot disagree about what a violation is - a hook that lints to a different standard than CI is worse than no hook. CI keeps its own ruff steps unchanged: the hook is a faster first line, never a replacement for the gate.
+  (a) THE RULE: `.claude/skills/verify/SKILL.md` gains a short entry in its existing gotchas/discipline section â€” a claim about what a LOCAL DEV SERVER (Vite, drydocs-api, the ADK server) rendered or returned is evidence only when the browser making the request was launched by the session making the claim. A browser the session merely ATTACHED to is not a known venue, and "verified" without a known venue is the J18 defect in browser form.
+
+  (b) THE RECIPE IS THERE, NOT JUST THE PROHIBITION: the skill already documents headless Edge for rendered HTML files; it gains the dev-server case â€” a session-launched headless browser driven from the session scratchpad (the 2026-08-21 close used puppeteer-core against a Vite dev server on an alternate port and behaved correctly throughout), carrying the same "launch from PowerShell/`subprocess`, NOT Git Bash" caveat the skill already states.
+
+  (c) THE OBSERVATION IS CITED AS AN OBSERVATION: on 2026-08-21 an extension-connected tab at `localhost:5173` served a DryDocs checkout that did not match the working tree while reporting `isLocal: true`, and cache-bypassed fetches from inside that tab disagreed with `curl` against the same address. The reading that the session was attached to another machine's Chrome is UNPROVEN by the entry's own admission and MUST NOT be written into a tracked, ported file as a mechanism â€” the rule stands on the venue argument, which holds either way.
+
+  (d) NO MECHANISM CHANGE AND NO CODE: one rule and one recipe in an existing skill. Nothing in `web/` changes; `web/README.md` is an input only because it is where the `?as=<persona>` headless sign-in is already documented, and a one-line cross-reference belongs there if the recipe needs it.
 notes: |
-  Raised 2026-08-27 from the web-scaffolding review of serious-scaffold/ss-python, which
-  ships pre-commit as standard. Of that scaffold's tooling this is the single piece that
-  answers a failure this project actually had.
-  THE EVIDENCE: between 2026-08-05 and 2026-08-12 CI ran red for more than a hundred
-  consecutive runs on ruff check and ruff format, while sessions kept pushing past it. It
-  stayed invisible because the unit suite passed the whole time, so nothing local ever
-  looked wrong. The response then was detection - the session ritual now checks CI, and
-  snapshot.ps1 performs that check itself against HEAD's own sha. Both are after the fact.
-  A hook makes the commit itself fail, which is the only intervention that does not depend
-  on somebody remembering to look.
-  DELIBERATELY NOT ADOPTED from the same scaffold, with reasons in the review: Sphinx and
-  Read the Docs (we have a deterministic renderer whose output the HITL loop keys feedback
-  anchors on, and a second documentation system would compete with a governed surface);
-  semantic-release and commitlint (this repo's commit conventions carry reasons a linter
-  cannot check, and automated version bumps buy nothing on a proof of concept); mypy (a
-  type-checking sweep over an existing codebase is its own project, not scaffolding).
+  Groomed 2026-08-22 (laptop) from Idea-154's CONSEQUENCE half. The entry itself STAYS OPEN in the inbox, marked in place: its other half â€” open the extension picker with two browsers connected and see which Chrome the "Browser 1 / isLocal: true" session really is â€” needs both machines in hand and is the user's step, not an agent's, and it is the only thing that would turn the reading into a mechanism.
+
+  Module `docs` / phase 8 / epic release-infrastructure recorded as a CHOICE, not a finding: the verify skill is cross-cutting session tooling â€” it covers the design-doc renderer, the board and gate renders and the CLI as well as the console â€” so it lands with the session-ritual infrastructure rather than in Epic O's web-console work. The edit is identical either way; only the shelf differs.
+
+  p3 and haiku: one written paragraph plus a recipe already executed once, against an acceptance that names exactly what may and may not be asserted.
+  DONE 2026-08-26 (desktop). The verify skill gained its own "Local dev servers â€” the venue
+  rule" section: (a) the rule verbatim from the acceptance -- dev-server evidence counts only
+  from a browser THIS session launched; an attached browser is not a known venue, and
+  "verified" without a venue is the J18 defect in browser form. (b) the recipe beside the
+  prohibition: session-launched headless browser from the scratchpad (the 2026-08-21
+  puppeteer-core-vs-Vite close as the worked example), carrying the existing
+  PowerShell-not-Git-Bash launch caveat. (c) the 2026-08-21 observation cited AS an
+  observation -- the mismatched localhost:5173 tab, isLocal: true, fetch-vs-curl disagreement
+  -- with the attached-to-another-machine reading explicitly NOT asserted as mechanism, per
+  the acceptance's own instruction. Skill-file edit only; no code.

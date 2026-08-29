@@ -70,7 +70,7 @@
   - id: seal-tom-attribution
     taxonomy:
       source: "seal:app-extract"
-      element: "SEAL Technical Operating Model (TOM) role-holders (gate §B revised fixed 7: application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, operate_manager L1/L2) attributed to the BusinessApplication asset"
+      element: "SEAL Technical Operating Model (TOM) role-holders attributed to the BusinessApplication asset — role vocabulary DECLARED in config/taxonomy/tom-role-vocabulary.yaml (G70: 16 classes, 7 required per the signed §G register; the 2026-07-10 fixed-7 is superseded)"
     ontology:
       from_node: BusinessApplication                # PROPOSED class: prov:Entity / dprod:DataProduct
       to_node: Employee                      # prov:Agent
@@ -83,14 +83,15 @@
       qualified_form:
         pattern: "BusinessApplication -[:QUALIFIED_ATTRIBUTION]-> (:Attribution) -[:HAS_AGENT]-> Employee ; (:Attribution) -[:HAD_ROLE]-> TOMRole"
         prov_maps_to: ["prov:qualifiedAttribution", "prov:agent", "prov:hadRole"]
-        role_vocabulary: "TOMRole (skos:Concept) — the gate §B REVISED fixed 7 in scheme tom_roles: application_owner, primary_information_owner, backup_information_owner, cto (shared with the K5 ProductRole scheme), technology_risk_controls, design_authority, operate_manager (L1/L2 = level property on the Attribution). DISTINCT from :Role (org:Role, PAT hierarchy only)."
+        role_vocabulary: "TOMRole (skos:Concept) in scheme tom_roles — the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). required/scope/active/derived ride the concept (§B3); cardinality (one-or-more) is recorded ONCE on the scheme. cto NOT shared with the K5 ProductRole scheme (families independent, 2026-07-20). DISTINCT from :Role (org:Role, PAT hierarchy only)."
       vocab_id: [human_qualified_attribution, human_attribution_has_agent, human_attribution_had_role]   # seal_app_attributed_to_employee stays planned (simple form optional/derivable, gate §B)
     precedence_authority: lob-product-team
     standards_cited: ["PROV-O (prov:wasAttributedTo, prov:qualifiedAttribution, prov:agent, prov:hadRole)", "SKOS (skos:Concept)"]
     capture: >
-      waived — the role vocabulary is the tom_roles SkosConceptScheme seeded by
-      drydocs_core/schema/seal_ontology_supplement.cypher; its source taxonomy is the gate §B
-      fixed set (config/gate-log.md 2026-07-10), not a config/taxonomy/ capture file.
+      config/taxonomy/tom-role-vocabulary.yaml (G70) — the DECLARED vocabulary the
+      supplement's tom_roles scheme seed is drift-guarded against
+      (tests/unit/test_tom_role_vocabulary.py). Until G70 this read "waived" and the
+      seed's source was the 2026-07-10 fixed set; the declaration is now the source.
     status: applied
     depends_on: application-as-dataproduct
     proposed_at: 2026-07-08
@@ -102,10 +103,11 @@
       product hierarchy (DevTeam etc., real organizations; catalog_dev_team_has_membership is a
       DIFFERENT governance concept sharing the org: pattern). seal_has_membership / seal_of_role /
       seal_held_by DEPRECATED at K4 clause 3 (deprecated_at 2026-07-15). seal_has_port KEPT
-      (dprod:Port structural edge, unrelated). Contact roles outside the fixed 7 load with
-      unmapped_role=true + role_source_name preserved — surfaced, never guessed (loader comment).
+      (dprod:Port structural edge, unrelated). Contact roles outside the DECLARED vocabulary load with
+      unmapped_role=true + role_source_name preserved VERBATIM (§A4b — the raw source
+      string, since G70 no longer overwritten by the canonical) — surfaced, never guessed.
     resolved_questions:
-      - "Role set: gate §B fixed the REVISED 7 (subsumes the old flat 6; Design Authority new); the scheme is fixed, not open-ended — new roles need a new gate."
+      - "Role set: gate §B fixed the REVISED 7 in 2026-07-10; SUPERSEDED at the tom-roles-enumeration-and-cardinality sign-off (2026-08-11, applied at G70) — the scheme is now the DECLARED vocabulary (16 classes), an undeclared name loads flagged rather than being refused, and retirement is an active-flag state, not a deletion."
       - "Simple vs qualified form: only the QUALIFIED form is loaded (multi-person roles require it); the simple wasAttributedTo stays optional/derivable — seal_app_attributed_to_employee remains status: planned."
 
   # ---- C2: BusinessApplication / SEAL edges (reuse ACTIVE vocab — batch) ----

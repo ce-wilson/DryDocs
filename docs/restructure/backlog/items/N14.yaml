@@ -8,7 +8,7 @@ phase: 11
 agent: main
 model: sonnet
 priority: p1
-status: todo
+status: in_progress
 depends_on:
 - N12
 - N13
@@ -25,5 +25,24 @@ acceptance: |
   ONE report class lists every LIVE placeholder across BOTH domains the signed pending-source-correction gate joined (config/gate-log.md 2026-08-18, SIGNED 12/12; N13). (a) BOTH DOMAINS, ONE REPORT (gate §A1 -- a single `pending_source_correction` vocabulary; two domain-local flags were offered and declined): the ACTIVE seal-contact override rows (`seal_contact_override.status = 'active'`, the v_source_corrections feed O24 built) AND every config/source-registry.yaml dataset row whose `acquisition.mode` is `manual` (N12). One class and one query answer "what are we carrying?" -- not two reports printed side by side. (b) ORDERED BY AGE (§C1), with the age BASIS recorded per domain because it is asymmetric: override rows already carry `authored_on`; a manual registry row carries NO dated field today, so this build PICKS one basis and documents it (a declared `acquisition.since:` written when a row is classified, or the row's first-classified commit date) and applies it uniformly. Rows with no determinable age sort into an explicit bucket, never silently. (c) NO CLOCK, NO PRESSURE (§C2): no deadline, no SLA, no alerting, no per-row review_by dates -- per-row clocks were offered at the gate and DECLINED, because they manufacture urgency the exploratory-phase framing says is false. The report is read at the SME's cadence. (d) NEVER A GATE (§C3): it never gates a load, never blocks CI, never fails a test -- a placeholder is recorded state, not an error. And per N12 clause (f), `acquisition.mode: manual` is the EXPECTED first state of a source: no column header, wording or styling may present a manual row as a defect, as debt, or as a violation. (e) THE EXEMPTION IS ENFORCED, NOT MERELY DOCUMENTED (§D1 + K7 §E2): permanent-by-nature domains are EXCLUDED -- concretely the steward-defined app-code mapping store (`app_code_mapping`, whose DDL already carries no status column precisely because its overrides may be permanent). A test asserts an app_code_mapping row can never appear. Per §D2 the report reads each store's DECLARED pending-vs-permanent property rather than hardcoding the one exemption, so a new store declares its nature at creation. (f) SCOPE FENCE (§A3): config and stores ONLY. Nothing graph-side expresses pending-ness -- no node, property or edge -- because that would be a new RELATIONSHIP_GUIDE proposal and its own gate. The report writes neither source of record. (g) SURFACE: it ships in the O24 report family -- a read-only drydocs_api endpoint returning the exportable artifact (markdown + manifest fields, the source_corrections_report shape). A console pane is a FOLLOW-ON and is not required here. Tests cover both domains appearing, the age ordering, the exemption, and the empty case. Full suite green. RIDER (2026-08-19 groom, from Idea-137 / Q21): the EMAIL unassigned count is a THIRD domain this report is the natural home for. Gate email-folder-assignment §B3 said so in terms -- an email whose folder or process is unassigned is REPORTED, never auto-drained onto a best-match folder -- and §C2 makes the assignment the retention key, so an unassigned email is unpurgeable by scope and must never be swept by a default. Q21 exposes the count on a read path; this item is what reads it. NOT a depends_on: if this report ships first it ships with the two domains the pending-source-correction gate joined, and the email domain arrives when Q21 lands -- clauses (c) and (d) govern it unchanged (no clock, no deadline, never a gate, never styled as a defect).
 notes: |
   Groomed 2026-08-18 from Idea-134 -- one of the two builds the signed gate authorized but did not build (its own terminus clause: "this gate rules the LIFECYCLE; it builds nothing"). MODULE/PHASE/EPIC, choice recorded: the code lands in drydocs-api because that is where the mapping store's read endpoints and the O24 report already live, but the ITEM stays in Epic N / phase 11 with the ruling that authorizes it (N13) and the registry half it reads (N12) -- the registry is Epic N's anchor, and filing the report in Epic O would separate the build from its gate. If a console pane follows, it rides /mappings the way O24's did (Epic O territory at that point). HITL status: NO new gate -- the lifecycle is ruled 12/12 and this item implements it, deciding nothing new; sonnet because the acceptance is a written pass/fail test over a signed ruling. Coordination, not a dependency: N15's retirement CANDIDATE flag is a natural extra column here, so whichever of N14/N15 lands second adds it. VERIFIED AT THE GROOM, not recalled: the clause anchors come from the signed gate entry in config/gate-log.md, and the app_code_mapping DDL comment plus the v_source_corrections view were read out of drydocs_core/mapping_store.py.
+  DONE 2026-08-28 (desktop, Lane A build session, worktree -- main checkout ff-blocked,
+  the J61 recipe). BUILT: pending_source_correction_report (drydocs_api/mappings.py) +
+  GET /mappings/pending/report (app.py, the O24 report family shape). (a) ONE list, both
+  gate-joined domains -- active overrides via the v_source_corrections feed; every
+  registry dataset with acquisition.mode manual. (b) AGE BASIS PICKED AND DOCUMENTED in
+  the report header: overrides authored_on; manual sources a declared acquisition.since
+  where present, rows without one in the explicit undated bucket -- since: is the drafted
+  source-connection-and-run-identity gate's C1 subject, so the bucket self-heals when N20
+  backfills; deliberately NOT git-derived (shallow-CI-blind, the J59 finding). (c)/(d) no
+  clock, never a gate, manual framed as the expected first state (wording asserted in
+  tests). (e) EXEMPTION ENFORCED BY DECLARATION: STORE_NATURES minted in
+  drydocs_core/mapping_store.py (pending | permanent | not-a-correction-store, all 9
+  tables, sqlite_master coverage guard) and the report iterates the declaration through a
+  fetch map pinned to the declared-pending set -- app_code_mapping (permanent, K7 E2) is
+  structurally unreachable. (f) no graph write anywhere. (g) RIDER SHIPPED: Q21 landed
+  first, so the email domain rides -- the route reads docs.email-unassigned.v1 via
+  run_named; a graph-unavailable answer degrades to the named read path, never an error
+  or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
+  format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
 annotations:
   priority: directed at dispatch 2026-08-18 — SME-confirmed, not proposed

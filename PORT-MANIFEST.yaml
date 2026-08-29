@@ -25,6 +25,14 @@
 #                      drop either side's entries
 #   per-entry          collision resolves INSIDE the file, entry by entry — the
 #                      entry_rule is mandatory and path-level checkout is FORBIDDEN
+#   derived            the file is a DETERMINISTIC RENDER: take NEITHER side's copy —
+#                      REGENERATE it from the reconciled tree (guardrail 5), then commit
+#                      the refresh. Keeping a stale consumer render is as wrong as taking
+#                      the producer's. (J43, 2026-08-26 — decided across ALL derived rows
+#                      at once; splitting one row from the board.html precedent is refused.
+#                      Settles the naming question the roadmap.html row had inboxed: these
+#                      rows carried canonical-company, which was a poor fit for a render
+#                      with no authored consumer content to be canonical about.)
 #   evaluate           collision: hand-merge per the reconcile-port collision ledger
 #   never-port         must not cross the boundary in either direction (values,
 #                      credentials, gitignored data)
@@ -134,6 +142,14 @@ rows:
   # ---- per-entry files (checkout of the whole file is FORBIDDEN) ------------
   - path: "drydocs_core/ontology/relationship_vocabulary/**"
     disposition: per-entry
+    gate_bound: config/gate-log.md   # J43: entries here ACTIVATE only by signed gate.
+                                     # "identical to base" and "per-entry equivalent" are
+                                     # BOTH insufficient tests for a gate-bound file,
+                                     # because status and id-set parity is not
+                                     # field-and-gate parity. The reconcile-time check
+                                     # (test_port_reconcile_guards: unsigned_activations)
+                                     # refuses to activate an entry whose cited gate is
+                                     # unsigned ON THE RECEIVING SIDE'S gate-log.
     entry_rule: >
       S5 (2026-08-04): the registry is a fragment DIRECTORY — per-domain files
       merged in sorted-filename order by drydocs_core/yaml_fragments.py; apply
@@ -150,6 +166,10 @@ rows:
     note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py"
   - path: "config/taxonomy-ontology-map/**"
     disposition: per-entry
+    gate_bound: config/gate-log.md   # J43: same rule as the vocabulary row above —
+                                     # confirmed/applied entries exist only by signed
+                                     # gate, and the receiving side's gate-log is the
+                                     # authority the reconcile check reads.
     entry_rule: >
       S5 (2026-08-04): fragment DIRECTORY, same shape and rule as the
       relationship_vocabulary row above — apply the split, merge per entry.
@@ -321,21 +341,21 @@ rows:
   - path: "docs/design/controlm-ingestion-tdd.md"
     disposition: canonical-company
     note: >
-      the consumer's TDD is FINALIZED (2026-07-15) and ahead — carries the SPIDERP §7f
+      the consumer's TDD is FINALIZED (2026-07-15) and ahead — carries the psgmgr §7f
       audit chain + live-verified content; the producer copy is the mirror. Producer-side
       corrections that originated FROM the finalized doc (e.g. the D4 IS_CURRENT_VERSION
       'Y' fix, step 34) are already present consumer-side by construction.
   - path: "docs/design/controlm-ingestion-tdd.html"
-    disposition: canonical-company
+    disposition: derived
     note: "render of the above — regenerate consumer-side, never take the producer render"
   - path: "docs/design/controlm-ingestion-tdd.print.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       RETIRED producer-side (L13, 2026-07-18): the render series collapsed to the single
       .html (screen + @media print). At the next port, DELETE the consumer-side twin and
       regenerate the single .html consumer-side — never take a producer render.
   - path: "docs/plan/load-map.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — the N5 human load-map surface, a deterministic render of the
       consumer's OWN source registry + N3 loader declarations + ledgers + map
@@ -345,7 +365,7 @@ rows:
       (Row added 2026-07-29 when the J16 coverage guard caught the new file —
       the .json twin rides web/** and regenerates under guardrail 5.)
   - path: "docs/plan/ideas.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — the idea-inbox read view, a deterministic render of the
       consumer's OWN docs/restructure/IDEAS.md (scripts/render_ideas.py, rides
@@ -357,7 +377,7 @@ rows:
       tree. (Row added 2026-08-05 with the page; the J16 coverage guard caught
       the new file in the same run that created it, which is the guard working.)
   - path: "docs/plan/roadmap.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — the module-roadmap page (scripts/render_roadmap.py, rides the
       default board render): counts and open-item links are read live from the
@@ -368,21 +388,30 @@ rows:
       because keeping a stale consumer render is as wrong as taking the
       producer's. (Row added 2026-08-09 — the J16 guard caught the pair one
       session after the page shipped.)
-      NAMING QUESTION, raised by the company's send-back and deliberately NOT
-      decided here: `canonical-company` is a poor fit for a DERIVED render,
-      which has no authored consumer content to be canonical about — it is
-      regenerated, not kept. board.html and the design-doc renders carry the
-      same label for the same reason, so splitting this one row would create an
-      inconsistency worse than the imprecision. Whether the vocabulary needs a
-      `derived` disposition is inboxed rather than settled unilaterally.
+      NAMING QUESTION SETTLED at J43 (2026-08-26): the vocabulary gained the
+      `derived` disposition and every derived-render row flipped to it in one
+      change — the company's send-back was right that canonical-company was a
+      poor fit, and the fix landed across the whole family, never one row.
   - path: "docs/plan/board.html"
-    disposition: canonical-company
+    disposition: derived
     note: >
       DERIVED — a deterministic render of docs/restructure/backlog.yaml
       (scripts/render_board.py). Keep the consumer's copy through the port, then
       REGENERATE it from the merged backlog; taking the producer's render ships
       the producer's plan as the consumer's board. Same rule as the design-doc
       renders. Had no row until 2026-07-28 (J16).
+  - path: "drydocs/docmeta/**"
+    disposition: canonical-company
+    note: "J40 (2026-08-26): the COMPANY's docmeta package path — does not exist producer-side
+      (producer authored drydocs_docmeta/ top-level, T21). Deliberately divergent until the
+      company's docmeta ADOPTION PASS converges onto the producer layout (the module-boundary
+      invariant makes top-level the only legal component shape); until then no producer take,
+      no deletion sweep, may touch it. prompts.py + pipeline.py inside it are back-flow
+      candidates. Full decision: docs/port/port-prompt.md, the J40 divergence entry."
+  - path: "drydocs/scrapers/**"
+    disposition: canonical-company
+    note: "J40: company-only acquisition framework sibling of drydocs/docmeta/** — same
+      protection, same decision entry, same adoption-pass trigger."
   - path: "drydocs_core/adapters/oracle_adapter.py"
     disposition: canonical-company
     note: >
@@ -496,9 +525,28 @@ rows:
       the fact at best; a per-entry union prevents it. Same class as the
       registry wired-field problem (registry-wiring-readiness gate prompt): one
       disposition cannot carry two sides' facts.
+  - path: "drydocs_core/schema/provisioning/01_databases.cypher"
+    disposition: canonical-producer   # UNCHANGED from the schema/** default; the row exists for the note
+    note: >
+      THE TOPOLOGY IS A CROSS-DISPOSITION ATOM — read this before resolving any one of
+      its files. This DDL, `config/dev-environment.yaml` (canonical-COMPANY, row above)
+      and `tests/unit/test_database_names.py` + `tests/unit/test_dev_environment.py`
+      (per-entry / evaluate) are ONE change under THREE dispositions, held together by
+      two exact-equality guards that read the DDL by parsing it.
+      TAKE THEM IN ONE COMMIT. Taking exactly one fails loudly and the message names
+      only the file in front of you: `test_databases_match_provisioning_script` reports
+      the two databases and says nothing about the config file you also had to fold, so
+      the cheapest-looking exit is to revert the DDL — which is a canonical-producer file
+      going backwards, and reads to the producer as a dropped file.
+      MEASURED, not theorised (2026-08-24): a company copy of this DDL was found still
+      carrying `CREATE DATABASE ddcontext` and the `ddall` composite after the range
+      containing the fold (`988bf0d6`, in `port-base-20260819`) was reported merged.
+      RELAY-13 carries the diagnostic and the resolution. The disposition is NOT changed
+      here and should not be — it was already right, and the apply still did not land it;
+      what was missing is this paragraph, not different mechanism.
   - path: "drydocs_core/schema/**"
     disposition: canonical-producer
-    note: "supplements + the schema meta-graph; constraints.cypher carved out per-entry ABOVE (first match wins) after the 2026-08-20 drop"
+    note: "supplements + the schema meta-graph; constraints.cypher carved out per-entry ABOVE (first match wins) after the 2026-08-20 drop, and 01_databases.cypher likewise for its cross-disposition note"
   - path: "tests/unit/test_variable_*.py"
     disposition: canonical-producer
     note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"
@@ -550,6 +598,37 @@ rows:
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"
+  - path: "tests/unit/test_database_names.py"
+    disposition: per-entry
+    entry_rule: >
+      The TOPOLOGY assertions are producer-canonical — the provisioned set and
+      SUPERSEDED_NAMES are a signed gate's ruling (document-content-topology,
+      32/32, 2026-08-18), not a per-side preference, and they move with
+      `drydocs_core/schema/provisioning/01_databases.cypher` ALWAYS. SCANNED_PACKAGES
+      is the opposite: it is an extensible list of the packages each side scans, and
+      a company-only package is never dropped by a port. Same split, same reason, as
+      `tests/unit/test_module_boundary.py` two rows above — which was canonical-producer
+      until a wholesale take dropped the company's extended groups.
+    note: >
+      MOVES WITH `drydocs_core/schema/provisioning/01_databases.cypher`, ALWAYS.
+      This guard DERIVES the provisioned set by parsing that cypher file and
+      compares it against a hard-coded expectation, so the two encode ONE
+      topology ruling and neither is meaningful alone. Without this row the pair
+      split across dispositions - the cypher `canonical-producer` under
+      `drydocs_core/schema/**`, the guard falling to the `tests/**` default_ok
+      whose reason is "consumer expectations legitimately diverge". That reason
+      is right about test_schema.py's constraint count and WRONG here: the
+      topology is ruled by a signed gate (document-content-topology, 32/32,
+      2026-08-18), not chosen per side.
+      WHY THIS ROW EXISTS, measured not theorised (2026-08-24): taking exactly
+      one of the pair fails LOUDLY, which is fine - a folded cypher against a
+      pre-fold guard is red, and so is the reverse. Taking NEITHER is green and
+      wrong, and that is the case that happened: a company copy of the cypher was
+      found still carrying `CREATE DATABASE ddcontext` and the `ddall` composite
+      after the range containing the fold (`988bf0d6`, in `port-base-20260819`)
+      was reported merged. A green suite described a topology two names too wide.
+      This row cannot force the take - nothing in a manifest can - but it puts
+      the coupling where a port session resolving either file will read it.
   - path: "tests/unit/test_port_manifest.py"
     disposition: canonical-producer
   - path: "PORT-MANIFEST.yaml"
@@ -603,6 +682,26 @@ rows:
       wholesale take would have dropped the company's LOB rows. The same class as
       the six rows above; the row lands producer-side and reaches the company at
       the next port, their PORT-REPORT census is the record of the gap.
+  - path: "config/taxonomy/tom-role-vocabulary.yaml"
+    disposition: per-entry
+    entry_rule: >
+      classes keyed by id — the company's ADOPTION-SESSION RULINGS are estate
+      truth and stay (2026-08-26: Module Owner renamed, Capacity Planner added,
+      IRM flipped required — ruled against 232k-row report exports the producer
+      never sees); the producer's register is the G35-signed seed and never
+      overwrites a company-ruled class. Producer-owned MECHANISM crosses whole:
+      the header, scheme-level fields (cardinality, scheme id), and any
+      producer-NEW class unions in by id. required/scope/active flips on
+      EXISTING classes are gate-ruled facts on whichever side rules them —
+      never merged, never "synced".
+    note: >
+      Row landed 2026-08-27, the day after the company's G70 adoption session
+      re-ruled the register their side. Without it the file resolved to the
+      config/** canonical-producer default and the NEXT port would have
+      overwritten their three rulings wholesale — the alias-episode class
+      (2026-08-25) and the J51/lob-product-team class (2026-08-20), third
+      instance. Each side's SME owns its register; the declaration file is
+      where the two reconcile, which only works if a port cannot flatten it.
   - path: "config/taxonomy/ui-components.yaml"
     disposition: per-entry
     entry_rule: >
@@ -622,13 +721,13 @@ rows:
       captured_at, manifest, source (the where — a space or data-root path is
       estate data), and the inline comment on confirmed. `confirmed` itself is
       PER-REPO (the F4 rule one file over — the company ratifies its own
-      activations; the 2026-08-19 company ratification of fcdo-frameworks stands
+      activations; the 2026-08-19 company ratification of cdo-frameworks stands
       beside the producer's 2026-08-05 ruling, both true). Company-only ids are
       kept; producer-only ids are clean-adds. Precedent: source-registry v2's
       company-canonical ids + the D2 overlay seam.
     note: >
       J51 (2026-08-20), found at the 7c18ff4b review: the producer row for
-      fcdo-frameworks reads VERBATIM while the company row — where the run
+      cdo-frameworks reads VERBATIM while the company row — where the run
       happened — still read GROUNDED / "no connector has run" with its own
       ratification citation; config/** would have overwritten the citation and,
       after their load, graph_locator, at every port. Idea-148 (the run <-> row
@@ -744,7 +843,7 @@ rows:
       THREE were retired and TWO deliberately retained above -- see that block). After
       the delivering port merges, the
       COMPANY copy is the live one — their pending sessions (rua-load-shapes
-      ratification, source-registry-v2 review, fcdo-crosswalk, cmdline-nfr-vetting)
+      ratification, source-registry-v2 review, cdo-crosswalk, cmdline-nfr-vetting)
       read it, and they retire it at their own close-out. Producer originals retire to
       internal-local/archive/ once delivery is confirmed; this row exists so the
       producer-side retirement DELETIONS never delete the company's live copy. A FUTURE
@@ -777,8 +876,15 @@ rows:
 
   - path: "docs/next-internal-session.md"
     disposition: never-port
-    note: "PRODUCER-LOCAL SESSION DIRECTOR — the live-data confirmation checklist the
-      producer maintains FOR the internal session. THE SECOND FILE to fall through
+    note: "RETIRED 2026-08-25 (file deleted; row KEPT as the re-import tripwire — two
+      prior ports imported this file by accident, and a company copy may still exist to
+      fall through a future default). Audit at retirement: 7 of its 9 items were owned
+      or superseded (E1, K6/K16/K17, G12/G13/G22/G23, M3, the pending-gates list); the
+      two live-psgmgr probes whose ONLY home it was — the DC-collision identity check
+      (HIGH, blocks any multi-DC load) and the ctlm_id ripple sweep — re-homed to
+      Idea-174 before deletion. WAS: PRODUCER-LOCAL SESSION DIRECTOR — the live-data
+      confirmation checklist the producer maintained FOR the internal session. THE
+      SECOND FILE to fall through
       `docs/*.md`: two prior ports imported it (bd7952f6 2026-07-20, c723b1c5
       2026-07-24) and the company copy was NEVER company-authored. Caught 2026-08-01
       while the copies were still BYTE-IDENTICAL — luck, not design: producer last
@@ -919,7 +1025,7 @@ default_ok:
       consumer legitimately holds its own status for the same subject, so
       evaluate-on-collision is right and a blanket take-producer would overwrite it.
   - path: "docs/decisions/**"
-    reason: "ADRs — a decision record is append-only-ish history for the repo that made it; both sides may hold the same ADR number for different decisions, so never checkout"
+    reason: "ADRs — a decision record is append-only-ish history for the repo that made it; both sides may hold the same ADR number for different decisions, so never checkout. J40 (2026-08-26) names the LIVE instance: company docmeta ADR = 0005 while producer 0005 = browser access and producer docmeta = 0006 — each numbering canonical on its own side, nothing renumbered (G87: ids are join keys), cross-repo citations by TITLE + side, never bare number. Full decision: the J40 entry in docs/port/port-prompt.md"
   - path: "docs/reviews/**"
     reason: "point-in-time review records (tech-debt, code-graph plans) — historical artifacts of the side that ran the review"
   - path: "docs/patterns/**"
@@ -930,14 +1036,14 @@ default_ok:
     reason: "outward-facing non-governed doc (CLAUDE.md §6) — editorial treatment applies, and each side's audience differs"
   - path: "docs/overview/**"
     reason: "outward-facing executive overview; same audience-differs reasoning as the whitepaper"
-  - path: "docs/Product/**"
-    reason: "product/role reference prose captured producer-side; consumer has the authoritative originals internally"
   - path: "SDLC-Docs/**"
     reason: "extracted SDLC method docs (BDD/SDD howto, FCD requirements) — external method material, not DryDocs content"
 
   # ---- assets + knowledge ---------------------------------------------------
   - path: "drydocs-icons/**"
     reason: "vendor/product icon assets (svg/png/webp). External marks reproduced for UI use; binary, no merge semantics — clean-add is the only sensible resolution"
+  - path: "knowledge/org/**"
+    reason: "product/role reference prose captured producer-side (relocated from docs/Product/** at S14, 2026-08-27; same entry, new home); consumer has the authoritative originals internally"
   - path: "knowledge/**"
     reason: "Internal-Public design prose + upgrade plans (the depgraph-snapshots rows above are the exception). Producer-authored thinking; a collision means both sides wrote on the topic and both texts matter"
   - path: "internal/**"
@@ -1000,6 +1106,23 @@ default_ok:
 # =============================================================================
 row_may_match_nothing:
   # ---- side-local by construction ------------------------------------------
+  - path: "drydocs/docmeta/**"
+    reason: >
+      J40: a COMPANY-ONLY package path, protected by its canonical-company row so a
+      deletion sweep or verbatim take can never silently remove it — producer-side the
+      glob matches nothing by construction, which is the row doing its job.
+  - path: "drydocs/scrapers/**"
+    reason: >
+      J40: same as drydocs/docmeta/** — company-only capability, row exists to protect,
+      matches nothing producer-side by construction.
+  - path: "docs/next-internal-session.md"
+    reason: >
+      RETIRED 2026-08-25 — the file is deleted producer-side (audit + the Idea-174
+      re-home in the retirement commit) but its never-port row is KEPT DELIBERATELY
+      as the re-import tripwire: two prior ports imported this file by accident,
+      a company copy may still exist, and dropping the row is exactly how it would
+      fall through a future default again. A row that matches nothing here is the
+      row doing its job.
   - path: "PORT-MANIFEST.*.yaml"
     reason: >
       the J34 overlay slots. Each side tracks its OWN overlay and the other side's

@@ -1,0 +1,26 @@
+id: N19
+epic: source-column-mappings
+title: 'Run the source-connection-and-run-identity gate: connection block, restricted record term, since/history, run input identity'
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+gates: [source-connection-and-run-identity]
+inputs:
+- config/gate-prompts/source-connection-and-run-identity.yaml
+- config/gate-log.md
+acceptance: |
+  A sign-off session for gate `source-connection-and-run-identity` is HELD and its
+  outcome recorded in config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm
+  trigger, or BLOCKED with a named blocker. BEFORE the session: a stale-premise sweep
+  of the drafted page against current facts (the moved-premise model), and the
+  extract-vintage precondition does not apply (no extract-keyed clause). AFTER:
+  N20/N21 flip from gated-todo per the rulings, or record why not.
+notes: |
+  Minted 2026-08-28 (WP-1 of the approved source-registry two-issue plan). p1 because it
+  blocks N20/N21 and is sequenced with the N14/N15 p1 builds; the SME gate queue slots it
+  after K29 (tech-partner + volumetrics rider). Session is HITL (agent: main).

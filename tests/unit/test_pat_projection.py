@@ -18,6 +18,7 @@ import yaml
 
 from drydocs.loaders.catalog import DevTeamRow, PatProductMappingRow
 from drydocs.pat_projection import (
+    ACKNOWLEDGED_ABSENT,
     DEFAULT_HEADER_MAP,
     DEV_TEAMS_COLUMNS,
     DEV_TEAMS_FILE,
@@ -40,8 +41,8 @@ RAW_HEADERS = [
     "Team ID",
     "Legacy Team ID",
     "Team Name",
-    "LOB",
-    "Product Line",
+    "Team LoB Name",
+    "Product Line Name",
     "Product ID",
     "Product Name",
     "Supporting Area Product ID",
@@ -50,13 +51,12 @@ RAW_HEADERS = [
     "Sponsoring Product Name",
     "Sponsoring Area Product ID",
     "Sponsoring Area Product Name",
-    "Sponsoring Product Line",
-    "SEAL IDs",
+    "Sponsoring Product Line Name",
+    "Seal IDs",
     "Relationship Type",
     "Team Type Name",
-    "JIRA Instance",
     "JIRA Board",
-    "Status",
+    "Team Status",
     "Agile Framework",
 ]
 
@@ -68,16 +68,16 @@ def _row(**over: str) -> dict[str, str]:
             "Team ID": "T0042",
             "Legacy Team ID": "0f0f0f0f-0000-0000-0000-000000000000",
             "Team Name": "CCB Auto Risk Pod",
-            "LOB": "CCB",
-            "Product Line": "Auto",
+            "Team LoB Name": "CCB",
+            "Product Line Name": "Auto",
             "Product ID": "PROD_AUTO_05",
             "Product Name": "Auto Pricing",
             "Supporting Area Product ID": "AP_AUTO_PUB",
-            "SEAL IDs": "70051; 70052",
+            "Seal IDs": "70051; 70052",
             "Relationship Type": "Dedicated",
             "Team Type Name": "Technology",
             "JIRA Board": "JIRA-AUTO",
-            "Status": "Active",
+            "Team Status": "Active",
             "Agile Framework": "Scrum",
         }
     )
@@ -95,7 +95,7 @@ def test_projection_output_validates_through_both_loader_row_models():
                 "Team Name": "CCB Auto Onboarding",
                 "Product ID": "PROD_AUTO_07",
                 "Supporting Area Product ID": "",
-                "SEAL IDs": "70053",
+                "Seal IDs": "70053",
                 "Relationship Type": "Aligned",
                 "JIRA Board": "JIRA-ONBOARD",
                 "Sponsoring Product ID": "PROD_AUTO_05",
@@ -141,6 +141,33 @@ def test_missing_key_header_is_refused_not_guessed():
         [{**_row(), "Product Id": "PROD_X"}], [*headers, "Product Id"], hmap
     )
     assert mappings[0]["product_id"] == "PROD_X"
+
+
+def test_missing_optional_mapped_header_is_loud_not_silently_empty():
+    """(K30-a) seal_ids is mapped but NOT in REQUIRED_FIELDS. Before K30 a raw
+    report missing its header degraded to an empty seal_ids column on every
+    row and still reported success — the real-world failure mode this item
+    closes (an export with a differently-spelled SEAL-id column silently
+    writes zero application edges). After K30 this is a hard, loud refusal,
+    same as a required field, unless the field is in ACKNOWLEDGED_ABSENT."""
+    assert "seal_ids" not in ACKNOWLEDGED_ABSENT
+    headers = [h for h in RAW_HEADERS if h != "Seal IDs"]
+    with pytest.raises(ProjectionError, match="seal_ids .*'Seal IDs'"):
+        project_rows([_row()], headers)
+
+
+def test_jira_board_id_is_acknowledged_absent_not_loud():
+    """(K30-c) jira_board_id maps to 'JIRA Board', a header TEAM_DETAILS_REPORT
+    does not actually carry (it lives in a sibling PAT export). It is kept in
+    DEFAULT_HEADER_MAP but listed in ACKNOWLEDGED_ABSENT, so a normal run
+    without that header stays exit-0 (not (a)'s new loudness rule) and the
+    report names it explicitly rather than staying silent."""
+    assert "jira_board_id" in ACKNOWLEDGED_ABSENT
+    headers = [h for h in RAW_HEADERS if h != "JIRA Board"]
+    teams, _, report = project_rows([_row()], headers)
+    assert teams[0]["jira_board_id"] == ""
+    assert report.acknowledged_absent == ("jira_board_id",)
+    assert "acknowledged-absent" in "\n".join(report.lines())
 
 
 def test_header_map_override_rejects_unknown_logical_fields(tmp_path: Path):
@@ -208,8 +235,17 @@ def test_the_ledger_is_authored_from_what_the_projection_reads():
     (obj,) = doc["objects"]
     projected = {c["name"] for c in obj["columns"] if c["disposition"] == "projected"}
     excluded = {c["name"] for c in obj["columns"] if c["disposition"] == "excluded"}
-    assert projected == set(DEFAULT_HEADER_MAP.values())
+    # The ledger lists COLUMNS OF THE REPORT. `jira_board_id` is mapped but its
+    # header is not one of them (K30; confirmed by the 2026-08-29 census), so it
+    # is named in ACKNOWLEDGED_ABSENT and deliberately absent below — a mapping
+    # belief is not a column, and only columns are counted in the census.
+    mapped_to_real_columns = {
+        header for field, header in DEFAULT_HEADER_MAP.items() if field not in ACKNOWLEDGED_ABSENT
+    }
+    assert projected == mapped_to_real_columns
     assert excluded == set(KNOWN_DROPPED)
+    # The census closes only when every column of the export has a disposition.
+    assert len(projected) + len(excluded) == obj["profile"]["column_count"] == 43
     assert not projected & excluded
     registry = yaml.safe_load(
         (REPO / "config" / "source-registry.yaml").read_text(encoding="utf-8")

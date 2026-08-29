@@ -12,7 +12,7 @@ real file can reach it, so "built and tested" and "never run" were both true at
 once. ``locator.mapping: ~`` on ``pat:people-report`` was the fingerprint.
 
 WHAT THIS DOES. One raw CSV in, two CSVs out, named exactly as
-``REFRESH_REFERENCE_CHAIN`` expects (``dev_teams__sample.csv`` and
+the team chain expects (``dev_teams__sample.csv`` and
 ``pat_product_mapping__sample.csv``) so the existing command runs them unchanged::
 
     poetry run python scripts/project_pat_team_report.py <raw.csv> --out-dir <dir>
@@ -27,27 +27,68 @@ SME-pinned (source-registry row ``pat:people-report``, C17 / 2026-08-11 evidence
 ``Relationship Type`` (the alignment — Aligned / Flex / Dedicated), ``Team Type
 Name`` (the DISCIPLINE decoy beside it — NEVER the alignment), ``Legacy Team ID``
 (unmodelled), and the semicolon-delimited SEAL-id column. Every other default
-spelling in :data:`DEFAULT_HEADER_MAP` is DryDocs' belief about the export,
-transcribed from the C17 gate record (ID + Name pairs for Product / Supporting
-Area Product / Sponsoring Area Product / Sponsoring Product; Product Line and
-Sponsoring Product Line as names only) and the pat-evidence README. So the map is
-a PARAMETER, not a constant: the projection REFUSES to guess — a required logical
-field whose header is absent from the raw file is a hard error naming the header
-it looked for, never a silent empty column — and the first real run pins the
-spellings with ``--header-map`` (a YAML ``{logical_field: "Raw Header"}``), after
-which the ledger ``config/source-mappings/pat-team-report.yaml`` is corrected to
-the physical names and ``census: pending`` is closed. Column NAMES are mechanism
-(Internal-Public); the raw report and both projected files are Internal and stay
-under ``DRYDOCS_DATA_ROOT`` — never in the tree.
+spelling in :data:`DEFAULT_HEADER_MAP` WAS DryDocs' belief about the export,
+transcribed from the C17 gate record and the pat-evidence README.
+
+CENSUS CLOSED 2026-08-29. Every spelling below is now MEASURED against the live
+43-column ``TEAM_DETAILS_REPORT`` export rather than believed, and the ledger
+``config/source-mappings/pat-team-report.yaml`` carries all 43 columns with a
+disposition each. What the census found, recorded because a belief that survives
+review is not the same as one that survives measurement:
+
+* ``Seal IDs`` — the SEAL-id column was carried as ``"SEAL IDs"``. The README
+  pinned its EXISTENCE and its semicolon delimiter; the CASING was never
+  verified and was wrong. Header matching is exact string membership, so this
+  RAISED on the first real run instead of loading an empty column — correct
+  behaviour on a field feeding the ACTIVE ``arch_develops`` edge, but the entry
+  had been marked pinned.
+* Four :data:`KNOWN_DROPPED` keys were wrong (``Product Line`` and
+  ``Sponsoring Product Line`` both carry a ``Name`` suffix; ``Status`` is
+  ``Team Status``; there is no bare ``LOB`` — the report carries two, one for
+  the team and one for its product). A wrong key there never raises; it leaves
+  the real column in ``unknown_headers``, which is why they survived.
+* C17 held exactly as written: ID + Name pairs for Product / Supporting Area
+  Product / Sponsoring Area Product / Sponsoring Product, and both Product Line
+  and Sponsoring Product Line name-only with no id column.
+* 28 columns had no disposition at all. Most are display names, lifecycle dates,
+  a leadership chain and a certification block; ``Parent ID`` / ``Parent Name``
+  is the one REAL grain we do not model — a team hierarchy, in the same class as
+  the parked Sub-LoB decision.
+
+The map remains a PARAMETER, not a constant: the projection REFUSES to guess — a
+mapped logical field whose header is absent from the raw file is a hard error
+naming the header it looked for, never a silent empty column (see LOUDNESS below
+for the one documented exception) — and a re-export that moves a spelling is
+re-pinned with ``--header-map`` (a YAML ``{logical_field: "Raw Header"}``) and
+the ledger corrected. Column NAMES are mechanism (Internal-Public); the raw
+report and both projected files are Internal and stay under
+``DRYDOCS_DATA_ROOT`` — never in the tree.
+
+LOUDNESS (K30, 2026-08-28). Absence of ANY mapped header is loud, not only the
+three in :data:`REQUIRED_FIELDS`. Before K30 a non-required field whose header
+was missing degraded to a silently empty column and only landed in
+``ProjectionReport.missing_optional`` — a line the CLI printed on a normal,
+exit-0 run, easy to miss. There are now exactly two outcomes for a mapped
+field whose header the raw file does not carry: it raises (the default), or it
+is named in :data:`ACKNOWLEDGED_ABSENT` with a reason (a permanent, documented
+exception — not a quiet "optional" tier). ``jira_board_id`` is the first
+occupant: it maps to ``"JIRA Board"``, a header ``TEAM_DETAILS_REPORT`` does
+not carry — the field lives in a sibling PAT export this module does not read.
+Kept mapped rather than dropped so ``DevTeamRow.jira_board_id`` stays a
+documented, named gap instead of one more silently absent column.
 
 WHAT IS DELIBERATELY DROPPED, and why it is written here rather than left to
 ``extra="ignore"``: ``Team Type Name`` (discipline — a property of the TEAM, not of
-its relationship to a product; own home, own gate), ``Sponsoring Product Line`` and
-``Product Line`` (NAME-ONLY in this report; keying a :ProductLine by name is what
-C17 §a forbids), ``Legacy Team ID`` (opaque predecessor key; ``team_id`` is the
-only key), LOB / status / agile framework (not consumed by either row model).
-Dropped columns are COUNTED in the report so a new column in a re-export is
-visible, not silently ignored.
+its relationship to a product; own home, own gate), ``Sponsoring Product Line Name``
+and ``Product Line Name`` (NAME-ONLY in this report; keying a :ProductLine by name
+is what C17 §a forbids), ``Legacy Team ID`` (opaque predecessor key; ``team_id`` is
+the only key), the two LoB columns / ``Team Status`` / ``Agile Framework`` (not
+consumed by either row model), the lifecycle dates and their by-SID pairs, the
+three ``CXO-n`` pairs and the five certification columns (person and governance
+grains with their own gates — never a team-report side effect), and
+``Parent ID`` / ``Parent Name`` (a team hierarchy we do not model yet; the drop is
+provisional, not a ruling). Dropped columns are COUNTED in the report so a new
+column in a re-export is visible, not silently ignored.
 """
 
 from __future__ import annotations
@@ -58,8 +99,14 @@ from pathlib import Path
 
 import yaml
 
-#: The two files REFRESH_REFERENCE_CHAIN reads, by name — keep in lock-step with
-#: drydocs/cli.py. The ``__sample`` suffix is the chain's naming convention, not
+#: The two files THIS SCRIPT PRODUCES, by name. They are two of the THREE steps
+#: the team chain runs (cli.CHAINS['refresh-teams'] since the G79 split). The
+#: third, pat_team_roles, is a HAND-DROP BY RULING (K27, 2026-08-27), not a
+#: missing projection: the raw report is one row per TEAM and carries no person
+#: columns, so a per-person (team_id, employee_sid, role_id) file cannot be
+#: projected from it — the SME hand-authors it from PAT's team-membership view
+#: into the same pat/ drop (see the load runbook's Refresh section). Keep in
+#: lock-step with drydocs/cli.py. The ``__sample`` suffix is the chain's naming convention, not
 #: a claim that the content is synthetic: ``--samples-dir`` is simply "the
 #: directory the chain reads", and the projection writes there.
 DEV_TEAMS_FILE = "dev_teams__sample.csv"
@@ -86,7 +133,14 @@ DEFAULT_HEADER_MAP: dict[str, str] = {
     "jira_board_id": "JIRA Board",
     "product_id": "Product ID",
     "supporting_area_product_id": "Supporting Area Product ID",
-    "seal_ids": "SEAL IDs",  # PINNED (pat-evidence README): semicolon-delimited
+    # PINNED — spelling MEASURED 2026-08-29 against the live 43-column export.
+    # It was carried as "SEAL IDs" from the pat-evidence README, which pinned the
+    # column's EXISTENCE and its semicolon delimiter; the CASING rode along as an
+    # unverified transcription and was wrong. Matching here is exact string
+    # membership (see project_rows), so the old value raised ProjectionError on
+    # the first real run rather than loading an empty column — K30's loudness rule
+    # doing its job, on a field that feeds the ACTIVE arch_develops edge.
+    "seal_ids": "Seal IDs",
     "relationship_type": "Relationship Type",  # PINNED (SME 2026-08-11): Aligned|Flex|Dedicated
     "sponsoring_product_id": "Sponsoring Product ID",
     "sponsoring_area_product_id": "Sponsoring Area Product ID",
@@ -97,21 +151,86 @@ DEFAULT_HEADER_MAP: dict[str, str] = {
 #: for any of these is a hard error — the projection never invents a key.
 REQUIRED_FIELDS = ("team_id", "product_id", "relationship_type")
 
+#: Mapped logical fields (see LOUDNESS above) whose header is KNOWN to be
+#: permanently absent from THIS report — not a spelling gap --header-map will
+#: ever close, but a field this raw file simply does not carry. Listing a
+#: field here is what keeps (a)'s loudness rule from firing on every normal
+#: run; every entry says WHERE the header actually lives so the gap stays
+#: legible instead of quietly re-becoming a silent empty column.
+ACKNOWLEDGED_ABSENT: dict[str, str] = {
+    "jira_board_id": (
+        "maps to 'JIRA Board' (DEFAULT_HEADER_MAP); TEAM_DETAILS_REPORT does not "
+        "carry it — the field lives in a sibling PAT export this module does not "
+        "read. Kept mapped, not dropped, so DevTeamRow.jira_board_id has a named "
+        "home if a future projection joins that export in. K30, 2026-08-28."
+    ),
+}
+assert set(ACKNOWLEDGED_ABSENT) <= set(
+    DEFAULT_HEADER_MAP
+), "ACKNOWLEDGED_ABSENT names a logical field DEFAULT_HEADER_MAP does not map"
+
 #: Raw headers the projection knows it is dropping, with the reason — so the
 #: report can say "dropped by design" apart from "unknown column, look at it".
+#:
+#: MEASURED 2026-08-29 against the live 43-column TEAM_DETAILS_REPORT export, so
+#: every key below is a physical spelling rather than a belief. Four of the
+#: pre-census entries were wrong and are corrected here: "Product Line" and
+#: "Sponsoring Product Line" both carry a `` Name`` suffix; "Status" is
+#: ``Team Status``; and there is no bare "LOB" — the report carries TWO LoB
+#: columns, one for the team and one for its product. "JIRA Instance" is gone
+#: entirely: like ``JIRA Board`` it is not a column of this report (the jira
+#: fields live in a sibling PAT export — K30). A wrong key here never raised; it
+#: simply left the real column in ``unknown_headers``, which is why these
+#: survived until a census ran.
 KNOWN_DROPPED: dict[str, str] = {
+    # --- decoys and predecessor keys (SME-pinned before the census) ----------
     "Team Type Name": "discipline (Technology/Product/Design/...), NOT the alignment — not modelled (C17 docstring)",
     "Legacy Team ID": "opaque predecessor key; team_id is the only team key",
-    "Product Line": "name-only in this report; :ProductLine is never keyed by name (C17 §a)",
-    "Sponsoring Product Line": "name-only; third sponsoring form OUT OF SCOPE (C17 §c)",
+    # --- name-only grains (C17) ---------------------------------------------
+    "Product Line Name": "name-only in this report; :ProductLine is never keyed by name (C17 §a)",
+    "Sponsoring Product Line Name": "name-only; third sponsoring form OUT OF SCOPE (C17 §c)",
+    # --- display names beside an id we already take -------------------------
     "Product Name": "display name; the id column is the key",
     "Supporting Area Product Name": "display name; the id column is the key",
     "Sponsoring Area Product Name": "display name; the id column is the key",
     "Sponsoring Product Name": "display name; the id column is the key",
-    "LOB": "not consumed by either row model; the LOB tier comes from the catalog hierarchy",
-    "Status": "not consumed by either row model",
+    "Parent Name": "display name beside Parent ID",
+    # --- team hierarchy: a REAL grain we do not model yet --------------------
+    "Parent ID": (
+        "the team's parent TEAM — a hierarchy neither row model carries. Not a "
+        "display duplicate and not out of scope: a real source grain we do not "
+        "model, in the same class as Sub-LoB. Dropping it is provisional"
+    ),
+    # --- org tiers the catalog hierarchy owns --------------------------------
+    "Team LoB Name": "LoB tier comes from the catalog hierarchy (catalog_lobs.cypher), not from a team report",
+    "Product LoB Name": "as Team LoB Name; the product's LoB, still the catalog's grain",
+    "Team Sub-LoB Name": "Sub-LoB is a real source grain we do not model yet (C17; parked ontology decision)",
+    "Sub-LoB Name": "the PRODUCT's Sub-LoB, same parked grain as Team Sub-LoB Name",
+    # --- team attributes neither row model consumes --------------------------
     "Agile Framework": "not consumed by either row model",
-    "JIRA Instance": "not consumed; jira_board_id is the modelled field",
+    "Team Status": "not consumed by either row model",
+    "Team Description": "free text; not consumed",
+    "Team Member Type": "not consumed by either row model",
+    "Fixed Price Shell Indicator": "not consumed by either row model",
+    # --- audit/lifecycle dates: the envelope's job, not a row model's --------
+    "Date Created": "lifecycle date; the provenance envelope owns dating, not the team row",
+    "Activation Date": "lifecycle date; as Date Created",
+    "Last Updated Date": "lifecycle date; as Date Created",
+    "Last Updated By SID": "person reference on an audit field; not consumed",
+    "Last Updated By Name": "display name beside Last Updated By SID",
+    # --- leadership chain: person data, own gate ----------------------------
+    "CXO-1 SID": "leadership chain; person data with its own attribution gate — never a team-report side effect",
+    "CXO-1 Name": "display name beside CXO-1 SID",
+    "CXO-2 SID": "as CXO-1 SID",
+    "CXO-2 Name": "display name beside CXO-2 SID",
+    "CXO-3 SID": "as CXO-1 SID",
+    "CXO-3 Name": "display name beside CXO-3 SID",
+    # --- data certification: a governance grain of its own -------------------
+    "Name of Data Certifier": "display name beside SID of Data Certifier",
+    "SID of Data Certifier": "certification is its own governance grain; not a team/product fact",
+    "Date of Last Certification": "as SID of Data Certifier",
+    "Certification Status": "as SID of Data Certifier",
+    "Certification Due Date": "as SID of Data Certifier",
 }
 
 
@@ -135,8 +254,11 @@ class ProjectionReport:
     unrecognised_team_type: int = 0
     #: raw headers actually seen, in file order — the census input for the ledger
     raw_headers: tuple[str, ...] = ()
-    #: logical fields whose OPTIONAL header was absent (required ones raise)
-    missing_optional: tuple[str, ...] = ()
+    #: mapped logical fields listed in ACKNOWLEDGED_ABSENT whose header this
+    #: run's raw file did not carry — expected, reported, never raised. Any
+    #: OTHER mapped field with a missing header raises ProjectionError instead
+    #: of reaching this report at all (K30 — no quiet third path).
+    acknowledged_absent: tuple[str, ...] = ()
     #: raw headers neither mapped nor in KNOWN_DROPPED — look at these
     unknown_headers: tuple[str, ...] = ()
     dropped_by_design: tuple[str, ...] = ()
@@ -151,8 +273,11 @@ class ProjectionReport:
             f"unrecognised Relationship Type (loader will reject): {self.unrecognised_team_type}",
             f"raw headers ({len(self.raw_headers)}): {', '.join(self.raw_headers)}",
         ]
-        if self.missing_optional:
-            out.append(f"optional headers absent: {', '.join(self.missing_optional)}")
+        if self.acknowledged_absent:
+            out.append(
+                f"acknowledged-absent headers (expected missing, see ACKNOWLEDGED_ABSENT): "
+                f"{', '.join(self.acknowledged_absent)}"
+            )
         if self.unknown_headers:
             out.append(
                 f"UNKNOWN headers (not mapped, not known-dropped): {', '.join(self.unknown_headers)}"
@@ -199,7 +324,24 @@ def project_rows(
             + f"; raw headers are {raw_headers}. Pin the spelling with --header-map; the "
             "projection does not guess a key column."
         )
-    missing_optional = tuple(f for f in hmap if f not in REQUIRED_FIELDS and hmap[f] not in present)
+    # (a) K30: every OTHER mapped field's absence is loud too — there is no
+    # quiet "optional" tier left. A field is allowed to be absent only when it
+    # is explicitly named in ACKNOWLEDGED_ABSENT; anything else missing raises
+    # exactly like a required field, naming the header it looked for.
+    unacknowledged_missing = [
+        f
+        for f in hmap
+        if f not in REQUIRED_FIELDS and f not in ACKNOWLEDGED_ABSENT and hmap[f] not in present
+    ]
+    if unacknowledged_missing:
+        raise ProjectionError(
+            "raw report lacks the header(s) for mapped field(s) "
+            + ", ".join(f"{f} (looked for {hmap[f]!r})" for f in unacknowledged_missing)
+            + f"; raw headers are {raw_headers}. Pin the spelling with --header-map, or if "
+            "the field is genuinely not part of this report, add it to ACKNOWLEDGED_ABSENT "
+            "with a reason — a mapped header never degrades to a silent empty column."
+        )
+    acknowledged_absent = tuple(f for f in ACKNOWLEDGED_ABSENT if hmap[f] not in present)
     mapped_headers = {hmap[f] for f in hmap if hmap[f] in present}
     dropped = tuple(h for h in raw_headers if h in KNOWN_DROPPED and h not in mapped_headers)
     unknown = tuple(h for h in raw_headers if h not in mapped_headers and h not in KNOWN_DROPPED)
@@ -214,7 +356,7 @@ def project_rows(
     report = ProjectionReport(
         raw_rows=len(raw_rows),
         raw_headers=tuple(raw_headers),
-        missing_optional=missing_optional,
+        acknowledged_absent=acknowledged_absent,
         unknown_headers=unknown,
         dropped_by_design=dropped,
         header_map=dict(hmap),

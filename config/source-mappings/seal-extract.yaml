@@ -218,23 +218,23 @@ objects:
       column_count: ~
       census: pending
     note: >
-      role_name is EVIDENCE and is kept verbatim (gate business-application-identity
-      §B2(ii); §D2 pins it): it lands on Attribution.role_source_name AND forms the
-      role segment of attribution_id, while the crosswalked concept goes to
-      TOMRole.id. 'L1 Operate Manager' and 'L2 Operate Manager' both map to the
-      operate_manager concept with the level carried separately — which is why the
-      SOURCE string cannot be dropped from the key without collapsing three real
-      role holdings into one (§D2, evidenced by the SME's live-registry screenshots).
-      OPEN: the seal-tom-attribution-reshape gate has the live registry showing NINE
-      role classes against the signed seven; that gate owns the enumeration, not this
-      ledger.
+      role_name is EVIDENCE and is kept verbatim — and since G70 the claim is TRUE
+      MECHANICALLY, not aspirationally (§A4b found the old row typed SealRole, so the
+      CANONICALIZED value reached the graph and the raw string died at validation):
+      the RAW source string lands on Attribution.role_source_name verbatim, the
+      CANONICAL spelling forms the role segment of attribution_id (frozen — a rename
+      is a §H5 migration), and the DECLARED-vocabulary concept
+      (config/taxonomy/tom-role-vocabulary.yaml) goes to TOMRole.id via
+      row.tom_role_id. L1/L2 are their own concepts since the §G9 split (the level
+      property retired). The enumeration question this note used to carry as OPEN
+      was ruled at tom-roles-enumeration-and-cardinality (signed 2026-08-11).
     columns:
       - {name: app_id, disposition: projected, origin: source, target: "BusinessApplication.app_id",
          decided_by: business-application-identity,
          note: "the JOIN key — MATCHes the application node, creates nothing. Loader field name; the application extract's confirmed header for the same value is `Application ID`"}
       - {name: role_name, disposition: projected, origin: source, target: "Attribution.role_source_name",
          decided_by: seal-tom-attribution-reshape,
-         note: "EVIDENCE — kept verbatim. Also the role segment of Attribution.attribution_id, and crosswalked (not renamed) to TOMRole.id"}
+         note: "EVIDENCE — the RAW string kept verbatim on role_source_name (G70 §A4b); the CANONICAL spelling keys the attribution_id segment; crosswalked (not renamed) to the declared vocabulary's TOMRole.id"}
       - {name: employee_sid, disposition: projected, origin: source, target: "Employee.employee_id",
          note: "also the trailing segment of Attribution.attribution_id"}
       - {name: employee_name, disposition: projected, origin: source, target: "Employee.full_name"}

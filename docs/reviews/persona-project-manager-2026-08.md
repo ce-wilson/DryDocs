@@ -105,7 +105,7 @@ correctly labeled.
 matters: component-topology spans packages by design; web-console touches
 `web`+`drydocs_api`+generated surfaces; docmeta touches `drydocs_docmeta`
 +registry+config; release-infrastructure touches CI/scripts/skills;
-fcdo-alignment stayed inside `config`+vocabulary fragments. No epic's
+cdo-alignment stayed inside `config`+vocabulary fragments. No epic's
 footprint contradicts its charter. The Run-1 caveat (the two most active
 epics under-measured because the graph couldn't see `drydocs_api`) is
 retired — the graph sees all their roots now.

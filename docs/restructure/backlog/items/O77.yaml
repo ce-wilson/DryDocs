@@ -31,7 +31,7 @@ acceptance: |
 
   Evidence: screenshots in both themes with every relationship name and every node name legible; npm run build and oxlint clean.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-157 (2026-08-26, prio proposed High). p1 as proposed and by the O66 precedent: the page's only content is unreadable, so the surface is effectively down.
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-188 (2026-08-26, prio proposed High). p1 as proposed and by the O66 precedent: the page's only content is unreadable, so the surface is effectively down.
 
   FILED AS A NEW ITEM RATHER THAN REOPENING O66, which the note left to the groomer. O66 is done and its acceptance genuinely holds — relationship names ARE above the node layer now. Reopening it would make a closed, verified record retrospectively false and detach the commit that closed it. The missing clause travels here instead, in (b), where the next attempt has to meet it.
 

@@ -45,6 +45,8 @@ SET doc.title          = row.title,
     doc.path           = row.path,
     doc.trust_default  = row.trust_default,
     doc.classification = row.classification,
+    // Q26 (G32 SS-A): the corpus scoping property, from the registry row
+    doc.corpus_id      = row.corpus_id,
     doc.last_seen_at   = datetime($loaded_at),
     doc.last_run_id    = $run_id
 
@@ -53,6 +55,7 @@ MERGE (c:Chunk:Entity {chunk_id: row.chunk_id})
   ON CREATE SET c.first_seen_at = datetime($loaded_at),
                 c.source     = 'pdf'
 SET c.seq          = row.seq,
+    c.corpus_id    = row.corpus_id,
     c.heading      = row.heading,
     c.level        = row.level,
     c.text         = row.text,

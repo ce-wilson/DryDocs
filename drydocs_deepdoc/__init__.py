@@ -41,7 +41,15 @@ Scaffold status: interfaces + contracts (G4, 2026-07-10); bodies raise
 ``NotImplementedError`` until MM10.
 """
 
+import logging
+
 from . import investigate, writer
+
+#: G105/ADR 0014 clause 2 — a module logger per component. These components
+#: had NONE, so anything they wanted to say had nowhere to go. A component
+#: never calls basicConfig: configuring the root logger steals it from the
+#: caller, which is why drydocs.cli owns the one dictConfig call.
+LOGGER = logging.getLogger(__name__)
 
 #: The write target. Name per the DEPLOYED topology (``drydocs`` / ``ddschema``,
 #: created by ``drydocs_core/schema/provisioning/01_databases.cypher``;

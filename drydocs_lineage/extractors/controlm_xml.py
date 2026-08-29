@@ -68,6 +68,10 @@ import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from drydocs_core.orchestration.controlm.xml_vocab import (
+    AUTHORED_BY_ATTRS as _AUTHORED_BY_ATTRS,
+)
+
 # The tag/attribute synonym VOCABULARY is shared with the remediation
 # component's xml_io (components never import each other, so it lives in
 # core — see xml_vocab's docstring). The leading-underscore aliases keep
@@ -166,6 +170,9 @@ class XmlJobRecord:
     watch_template: str = ""
     #: notification tags on this job (REQ-2 evidence, G67)
     notification_tags: tuple[str, ...] = ()
+    #: AUTHORED provenance verbatim (R44/G69) — the field that travels with a
+    #: COPIED job. Staged, never interpreted: it is not authorship.
+    authored_by: str = ""
 
 
 @dataclass(frozen=True)
@@ -447,6 +454,7 @@ class ControlMXmlDefsExtractor:
                 node_id=_attr(elem, "NODEID"),
                 application=_attr(elem, "APPLICATION"),
                 run_as=_attr(elem, "RUN_AS"),
+                authored_by=_attr(elem, *_AUTHORED_BY_ATTRS),
                 source_file=path.as_posix(),
                 description=description,
                 post_command=_attr(elem, *_POSTCMD_ATTRS),

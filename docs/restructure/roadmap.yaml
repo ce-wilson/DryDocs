@@ -207,7 +207,7 @@ modules:
       endpoints, and the ownership/attribution query family — the contract both
       the console and the agent tier consume.
     remaining: >
-      Six open items: Q15 doc-spine navigation QuerySpecs, G38 federated-read
+      Six open items: Q15 doc-backbone navigation QuerySpecs, G38 federated-read
       proof (ddall), O48 review-for-ontology extraction, O49 related-nodes panel,
       O52 the always-null holder_sid fix, and R9 the agent query command.
     ideas: []
@@ -227,7 +227,7 @@ modules:
   - module: drydocs-docmeta
     stage: early
     built: >
-      Document-corpus ingestion core (ADR 0006) with the doc spine and
+      Document-corpus ingestion core (ADR 0006) with the doc backbone and
       traceability loads. The company side is AHEAD of the producer here — their
       package layout diverged and they carry prompts.py and pipeline.py, which do
       not exist in this tree.
@@ -240,7 +240,7 @@ modules:
     ideas:
       - id: Idea-44
         estimate: S
-        note: fcdo-frameworks live Confluence scrape — company-side, parked on
+        note: cdo-frameworks live Confluence scrape — company-side, parked on
           company network access.
 
   - module: reference
@@ -278,7 +278,7 @@ modules:
       The meaning layer is the project's center of gravity: 33 closed items
       spanning the supplement files, the relationship-vocabulary registry, and
       this quarter's signed gates (match policy, SEAL edge reshape, audit
-      envelope, envelope terms, registry redesign, FCDO crosswalk).
+      envelope, envelope terms, registry redesign, CDO crosswalk).
     remaining: >
       Sixteen open items, and the bottleneck is deliberate: most are SME-bound
       HITL gates, not code — E1 SOSA and G35 TOM roles in progress; K17 FID
@@ -333,15 +333,13 @@ modules:
       export (Epic Z: per-application download, prod + DR, geography fields —
       whose data-center field is NOT the Control-M field of that name).
     ideas:
-      - id: Idea-88
-        estimate: M
-        note: describes_product field on doc-source-registry entries so the one
-          loaded software-docs edge is reproducible from the ledger — parked on
-          G32, then Q14.
-      - id: Idea-86
-        estimate: S
-        note: Register the internal MWAA docs as a corpus — parked on G32 ruling
-          target_db.
+      # Idea-88 (describes_product on doc-source-registry rows) retired here at the
+      # 2026-08-22 groom: it became Q18 on 2026-08-13 and the estimate belongs to that
+      # item now. It survived nine days only because the inbox-citation guard matches a
+      # SUBSTRING, and Idea-86's body cited `Idea-88` — moving Idea-86 to the audit trail
+      # in this groom is what exposed it.
+      # Idea-86 (register the internal MWAA docs as a corpus) retired the same day: its
+      # parked trigger fired (G32 signed 2026-08-18, G102 applied) and it became Q27.
       - id: Idea-28
         estimate: S
         note: Tier-1/tier-2 app-code rows — SME data entry, not a backlog item.

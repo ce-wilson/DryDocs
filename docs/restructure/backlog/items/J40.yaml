@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - git-readme.md
@@ -20,3 +20,21 @@ acceptance: |
   A recorded reconcile decision, written where the next port session reads it (docs/port/port-prompt.md and/or git-readme.md, with PORT-MANIFEST rows adjusted to match), covering all three divergences by name: (a) the ADR NUMBER COLLISION — the company carries docmeta at 0005 while the producer's 0005 is the browser-to-Neo4j access path and its docmeta ADR is 0006, so the decision states which number is canonical on each side and how a reader of either repo learns that; (b) the PACKAGE PATH — company drydocs/docmeta/ (drydocs.docmeta) vs producer top-level drydocs_docmeta/ — converged, or deliberately divergent WITH the reason recorded; (c) the two company-only files, prompts.py and pipeline.py, dispositioned as back-flow candidates or as company-only with a reason. Until that decision exists, docmeta paths are marked in the manifest so a verbatim apply cannot silently take them.
 notes: |
   Groomed 2026-08-09 from Idea-87. This is the class a port silently clobbers: a straight producer-to-company take would overwrite the package path, renumber-or-duplicate the ADR, and DROP two files that exist only on the company side. Same failure mode as Idea-79/J34 (the PORT-MANIFEST company-overlay seam, built 2026-08-07) but a different artifact — J34 gives this item the mechanism to express (b) and (c); what J34 cannot decide is which ADR number is canonical, and that is a user/SME call this item is the venue for, not a groom decision. Sequence it BEFORE the next docmeta-touching port, not after.
+  DONE 2026-08-26 (desktop). The reconcile decision recorded in docs/port/port-prompt.md's
+  divergence section (the surface the apply session reads at the tag), all three parts, each
+  with the docmeta ADOPTION PASS as the standing trigger (the e1ce510b port deferred the
+  docs-verify/docmeta cluster as a coherent whole):
+  (a) ADR NUMBERS: permanent and harmless once named -- company docmeta = 0005, producer
+  0005 = browser access, producer docmeta = 0006. Each side canonical in its own repo,
+  nothing renumbered (G87: ids are join keys), cross-repo citations by TITLE + side. The
+  docs/decisions/** default_ok reason now names the live instance -- an explicit row was
+  tried first and correctly rejected by the guard as a duplicate of the existing default_ok
+  coverage.
+  (b) PACKAGE PATH: deliberately divergent WITH a convergence target -- producer top-level
+  drydocs_docmeta/ wins at the adoption pass because the module-boundary invariant forbids
+  nesting a component inside the CLI package, and the producer package was AUTHORED against
+  the described shape, never copied (T21). No rename before the pass.
+  (c) prompts.py + pipeline.py: back-flow candidates riding the drydocs-review epic;
+  protected meanwhile by NEW canonical-company rows for drydocs/docmeta/** and
+  drydocs/scrapers/** (+ row_may_match_nothing entries, since both globs match nothing
+  producer-side by construction -- the row doing its job).

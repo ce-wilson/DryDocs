@@ -4,7 +4,17 @@
 - **Module:** drydocs-load — this runbook IS the module runbook for drydocs-load
   (V1 coverage rule; V3 ruled AUTHOR-DISTINCT, see Purpose & scope for the overlap ruling
   against the system-level startup/refresh runbook).
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 2, 2026-08-04**
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-08-28**
+  (G115: the Control-M extract family gains the optional `--data-center` scope bind, and
+  the new "Data-center-scoped runs" section records the decided operating recipe — one
+  run per data center — the publishable production scope, and the P6 precondition that
+  blocks the first multi-data-center load; on top of Rev 3, 2026-08-24
+  (PRESENTATION ONLY — the three fenced blocks that carry two commands now annotate each
+  line with an aligned trailing `#`, matching the startup-refresh runbook's Rev 13 rule: a
+  block with two or more commands annotates every line, a single-command block does not,
+  because its numbered step title is already the description. No command, flag or success
+  check changed; on top of
+  Rev 2, 2026-08-04
   (N6 landed: the two operator surfaces are now PROFILES of the declaration rather than
   hand-maintained copies, so the "until N6 lands they can disagree" framing below is
   replaced by what the profiles are; the re-derive one-liner is also fixed — N6 widened
@@ -95,10 +105,15 @@ This module has no service. "Startup" is running a single loader deliberately.
    sequence they belong to is the load map, not this page.
 
 3. **Run ONE loader** — most take `--csv` for a specific file, and the Control-M chain
-   takes `--use-oracle` and scoping flags:
+   takes `--use-oracle` and scoping flags. A `--csv` path must sit inside a declared
+   read zone (`drydocs landing-zones` lists them; declare a new drop in
+   `config/source-registry.yaml` under `acquisition.drop_dir`, or in
+   `config/data-zones.yaml`). An undeclared path exits 2 unless `--allow-unzoned` is
+   passed — and that override is recorded in the run record and the disk log, never
+   silently (G121):
    ```powershell
-   poetry run drydocs load catalog_lobs --csv internal/org/catalog/catalog_lobs.csv
-   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"
+   poetry run drydocs load catalog_lobs --csv "$env:DRYDOCS_DATA_ROOT/catalog/catalog_lobs.csv"  # a CSV loader: one file, from a declared zone
+   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"                          # the Control-M chain, Oracle-scoped
    ```
    Success: the run envelope printed at close, with `'status': 'OK'`.
 
@@ -136,14 +151,84 @@ do to ONE loader between chain runs.
   nodes. Check `nodes_marked_removed` against what you expect BEFORE sweeping.
 - **Snapshots** recompute without re-loading source:
   ```powershell
-  poetry run drydocs snapshot
+  poetry run drydocs snapshot               # recompute rollups from the graph as it stands
   poetry run drydocs prune-snapshots        # deletes older than N years, keeps the newest
   ```
+- **The team chain's third file is a HAND-DROP (K27, ruled 2026-08-27).** A real
+  (`--source`) team refresh resolves THREE files from the `pat/` drop under
+  `DRYDOCS_DATA_ROOT`: `dev_teams.csv` and `pat_product_mapping.csv` come from the
+  projection (`scripts/project_pat_team_report.py` over the raw PAT team report), but
+  `pat_team_roles.csv` CANNOT — the report is one row per TEAM with no person columns,
+  and a per-person (team, employee SID, role) file is not derivable from it. It is
+  hand-authored by the SME from PAT's team-membership view (company-side data) and
+  dropped beside the other two. The G78 resolver already fails by name pointing at that
+  directory when it is absent; this bullet is where you learn what to do about it.
+  Fixture mode is unaffected — the bundled `pat_team_roles__sample.csv` ships with the
+  package.
 - **Doc corpora** reconcile declared-vs-loaded, and exit non-zero on the wrong database —
   which makes it a useful `NEO4J_DATABASE` check on its own:
   ```powershell
   poetry run drydocs docs-verify
   ```
+
+<!-- anchor: data-center-scoped-runs -->
+### Data-center-scoped runs (G115)
+
+**The production recipe is one run per data center.** `drydocs ingest-controlm`
+(with `--use-oracle`), `drydocs analyze-variables`, and `drydocs normalize-variables`
+take `--data-center`, a long-form data-center name LIKE pattern that becomes the
+`:data_center_filter` bind in the extract SQL — the fifth member of the scope-bind
+family beside `--folder`, `--run-as`, `--developer-sid`, and `--row-cap`. Absent means
+all data centers, so no existing invocation changes behavior. The bind scopes the
+folders, jobs, variables, hosts, and avg-run extracts, and ONE spelling scopes all five:
+the data-center value-domain probe (`drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql`,
+answered 2026-07-22) confirmed the long-form name is the value everywhere.
+
+**Why one run per data center, when the staging layer can express both shapes**
+(`stg_run.data_centers` in `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` is a comma
+list, so one run naming several data centers is equally expressible): three reasons,
+in order of weight. First, safety — graph identity carries no data-center component (the
+P6 precondition below), so per-data-center runs keep each run's writes attributable to
+one data center in the run record and the staging rows, which is exactly the evidence an
+identity collision would need to be noticed rather than silently merged inside one
+multi-data-center run. Second, size — a single data center runs a few thousand folders
+and tens of thousands of jobs, and the ~1.1M-row variables object is what forces staging
+at all, so the per-data-center slice keeps every normalizer run and its DELETE-by-RUN_ID
+rollback window bounded. Third, failure isolation — a failed extract re-pulls one data
+center, not the estate, and the user's 2026-08-24 extraction-scope direction was already
+"filtered and run individually, one data center at a time". The comma-list field stays
+as declared; under this recipe it simply carries one value per run.
+
+**The production scope, in the publishable spelling.** Three production data centers,
+run one at a time. These spellings carry the J13 environment-letter swap (position 1
+reads `T` here; the real production values live in
+`internal/standards/technology/data-center-inventory.md` and never in this document):
+
+```powershell
+poetry run drydocs ingest-controlm --use-oracle --data-center "T012-E0700-IB"    # data center 1 of 3
+poetry run drydocs ingest-controlm --use-oracle --data-center "T014-E0700-ANY"   # data center 2 of 3
+poetry run drydocs ingest-controlm --use-oracle --data-center "T032-E0700-DMA"   # data center 3 of 3
+```
+
+The fourth production data center (`T021-E0800-ANY` in the publishable spelling) is a
+deliberate first-cut exclusion, not an omission: the graph and the UI get exercised
+against the three-data-center load first, and it re-enters when that testing says the
+shape holds (user ruling 2026-08-24, recorded in the internal inventory).
+
+Two operating consequences of a scoped run:
+
+- **A data-center-scoped run is a partial extract.** The removed-from-source mark pass
+  does not run (same rule as a `--folder`-scoped run), so `nodes_marked_removed` stays 0
+  by design — do not read that as "nothing was deleted at source".
+- **PRECONDITION — the FIRST multi-data-center load is blocked on P6.** Graph identity
+  is the folder id, and the job id under it, with NO data-center component. If one
+  table id is reused across data centers, loading a second data center into the same
+  graph merges two different folders into one node — silently, as a healthy-looking
+  MERGE. P6 (`docs/restructure/backlog/items/P6.yaml`, the identity-collision probe) is
+  the grouped count on live psgmgr that settles whether that reuse exists. Until P6
+  returns zero rows — or its any-rows finding routes an identity change through the
+  HITL gate — load ONE data center only; do not run the second command above against a
+  graph already holding the first.
 
 <!-- anchor: verify -->
 ## Verify
@@ -153,8 +238,8 @@ do to ONE loader between chain runs.
 
 **2. The invariants hold:**
 ```powershell
-poetry run drydocs m1-verify
-poetry run drydocs m3-verify
+poetry run drydocs m1-verify              # reference / catalog / SEAL layer
+poetry run drydocs m3-verify              # the Control-M chain
 ```
 M1 covers the reference/catalog/SEAL layer, M3 the Control-M chain. These are assertions
 about the populated graph, so they are the real proof a load worked — the envelope only

@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - G104
 inputs:
@@ -17,6 +17,41 @@ inputs:
 - docs/decisions/0014-runtime-substrate.md
 - docs/decisions/0007-agentic-qa-architecture.md
 acceptance: |
+  SME RULINGS FOLDED IN 2026-08-25 — the clause-6 deferral is CLOSED and this item now builds TWO
+  kinds, not one. Read these before the original acceptance below, which predates them.
+
+  (A) TWO KINDS, not one surface at two levels. `api` is the AUDIT record: lean, 90-day retention,
+  and it does NOT carry Cypher text. `api-debug` is a separate declared kind in
+  config/log-kinds.yaml: verbose, short retention, per-run rotation, and it DOES carry Cypher text
+  and request detail. Ruled as a split rather than one kind at DEBUG level so a 90-day metrics
+  record is never buried in debug noise and debug can be deleted aggressively without touching the
+  audit. This closes ADR 0014 clause 6's deferred question ("does the line carry the Cypher text")
+  by answering it per kind instead of once.
+
+  (B) 90-DAY RETENTION ON THE AUDIT KIND, and the reason is a metrics window, not an audit relic:
+  the SME's purpose is meaningful figures on WHAT IS SEARCHED. Declared in config/log-kinds.yaml
+  per G105, never as a literal here.
+
+  (C) VERBOSE IS SETTINGS-LEVEL, NOT PER REQUEST. There is no `--verbose` on an HTTP request, and a
+  per-request header would let an untrusted caller turn on verbose capture of their own traffic.
+  The `api-debug` kind's level comes from its declaration, so it is configured rather than asked
+  for -- the everything-configurable principle applied to a surface that has no CLI flag.
+
+  (D) A CORRELATION ID IS REQUIRED, and it is the field this item would otherwise have shipped
+  without. The QA ledger holds the QUESTION TEXT and the API audit holds the ROUTE AND OUTCOME, and
+  today nothing joins them: the ledger carries `run_id` and the drafted audit fields carry no
+  equivalent. Without it "what is searched" cannot be answered -- half the metric is in each file.
+  This is not hypothetical wiring: agents/graph_qa/agent.py:60 calls ephemeral_client, which POSTs
+  to {api_url}/specs/ephemeral, so one console question really does produce ledger lines AND an API
+  call. Carry the agent `run_id` where the control part supplies one, else the hashed session token
+  that control.py already passes. Adding it later is a migration; adding it now is a field.
+
+  (E) THE ONE THING HELD FOR SME REVIEW: whether debug-tier Cypher text is ever DISPLAYED IN THE
+  UI. Capturing it is ruled; surfacing it is not, and the SME asked for that specific question to
+  go to the TOP of the review list. So this item may write it and must not surface it, and any UI
+  work that would display it is blocked on that review rather than on this item.
+
+
   Every `drydocs_api` route that executes Cypher writes one audit record per request — `/raw-cypher` and `/specs/{id}/run` at minimum, plus any sibling found by enumerating the routes rather than by memory (the enumeration is part of the deliverable: the item lists what it found). The component logs NOTHING today, so this is the first record of who asked the graph for what through the API.
 
   Each record carries: timestamp, route, spec id where one applies, the outcome (rows returned or the error class), elapsed time, and an ACTOR identifier hashed by the same function `:AgentRun` already uses — never a raw actor value, so the record is publishable under the §3 sensitivity rules and cannot become the place a real identity leaks. The record does NOT contain result values; it is an access record, not a data copy. Where the Cypher text itself is recorded, that choice and its size bound are stated in the acceptance of whoever builds it — this item does not silently decide to persist query text.
@@ -26,3 +61,41 @@ notes: |
   Groomed 2026-08-21 (laptop) from Idea-152 clause (6). Module drydocs-api; depends on G104 for the ratified shape and, in practice, on G105 for the sink — sequenced through G104 only, so it does not block on core landing first if the ADR ends up specifying the sink completely.
 
   Deliberately scoped as an ACCESS record, not query persistence. Idea-152's closing line — that server-side persistence of executed Cypher for ask-search is a separate idea whose owning surface is unknown — is respected here: this item makes the request auditable without deciding where executed Cypher lives.
+  DONE 2026-08-26 (desktop). `drydocs_api/audit.py` — ApiAuditLog, and both declared kinds flipped
+  ACTIVE in config/log-kinds.yaml with `writer: drydocs_api.audit.ApiAuditLog` (the planned->active
+  mechanism working as G105 designed it; test_log_kinds now pins the flip instead of the planned
+  state). THE ENUMERATION, the deliverable's list, lives in audit.py's docstring and is TWELVE routes
+  under the ruled Cypher-OR-writes scope: five Cypher-executing (/query/{id}, /raw-cypher,
+  /specs/{id}/run, /specs/{id}/export, /specs/ephemeral — the last audited because the Cypher ENTERS
+  the system there and it is where the agent run_id arrives) and seven writes (the four intake POSTs,
+  overrides/draft, drafts/{id}/promote, app-code/draft). Exclusions are STATED with reasons, not
+  implied: /login and /logout touch only the in-memory session store; POST /mappings/changeset persists
+  nothing server-side (the O13 returned-artifact contract); every GET is a read. A 401 with NO bearer
+  header is unaudited — there is no actor to record — while invalid-token and forbidden outcomes
+  audit with the ORIGINAL error class (Forbidden, InvalidTokenError), never the mapped HTTPException;
+  a test pins that distinction. ONE INTERPRETATION RECORDED so the acceptance's literal wording reads
+  right: "via G105's dictConfig" predates the 2026-08-25 two-kind ruling that made `api` per-day
+  jsonl — jsonl kinds append directly via log_kinds.log_filename in run_log.resolve_log_dir's
+  directory (the `qa` ledger precedent; dictConfig serves the format:log `cli` kind). No second
+  mechanism: the declaration IS the mechanism and this writer is the one it names. ACTOR: sha256
+  hexdigest of the bearer token — the :AgentRun caller-identity function, REIMPLEMENTED because
+  agents/ is a separate venv, and pinned by a known-value test rather than asserted. RULING D WIRED
+  END TO END, not just fielded: X-DryDocs-Run-Id accepted on the five Cypher routes (bounded — 128
+  printable chars, failing values drop to the session-hash fallback, because it is untrusted caller
+  input headed for a 90-day record), ephemeral_client sends it, and agent.py threads run_id into
+  make_register as a CLOSURE so register_cypher's call signature — and every fake of it — is
+  unchanged. correlation_id = run_id else actor hash, correlation_source says which. DEBUG TIER:
+  settings-level per ruling C — on only when the api-debug DECLARATION says level: DEBUG (the repo
+  default is INFO = off, tested); per-run stamp frozen at construction; Cypher bounded at 20,000
+  chars with a cypher_truncated flag, the bound stated in the kind's note as the acceptance requires.
+  The api line is built from an ALLOWLIST so cypher/params structurally cannot leak into the 90-day
+  record (tested by setting them and asserting absence). Export streams record at job creation with
+  rows NULL — the row count is the export manifest's fact (registers on completion) — carrying
+  export_id instead. Ruling E honoured by omission: the debug text is written and NOTHING surfaces
+  it; any UI display is blocked on the SME review, not on this item. TESTS: 14 in
+  tests/unit/test_api_audit.py, two tiers — pure ApiAuditLog (the acceptance's core claims hold with
+  no framework installed) and TestClient wiring (one request per audited route = exactly one line;
+  reads add none). THREE MUTATIONS, all caught: write-only-on-success (the error tests bite),
+  cypher appended to the api line (the allowlist test bites), one route's audit deleted (the
+  per-route count bites). The enforcement matrix regenerated — the new guard tests changed that
+  derived surface. Suite 2495 passed / 10 skipped, ruff clean, CLI gates green.

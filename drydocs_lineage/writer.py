@@ -73,8 +73,9 @@ from typing import Any
 import drydocs_core.ontology as _core_ontology
 from drydocs_core import yaml_fragments
 from drydocs_core.ontology.swo_adapter import EXTENSION_LANGUAGE_IRI
+from drydocs_core.run_log import batch_run_log
 
-from .model import VOCAB_IDS, LineageGraph
+from .model import ETL_PROCESS_KINDS, VOCAB_IDS, LineageGraph
 
 #: The write target — ground truth. The trust axis IS the DB boundary (ADR 0002 D1).
 DATABASE = "drydocs"
@@ -86,11 +87,11 @@ _JOB_KIND = "controlm_job"
 
 #: invocation "engine" kinds that get their own :ETLProcess endpoint class
 #: instead of :Script (G12; gate-log 2026-07-16 "cmdline-lineage-review" §b).
-#: Identity is the SAME kind-scoped stable token the extractor already computes
-#: in ``controlm_inventory._stable_invocation_key`` for exactly these two kinds
-#: (everything else falls through to the full-target/path key Script already
-#: uses) — keep this set in sync with that function's special-casing.
-_ETL_PROCESS_KINDS = {"abinitio", "dpl"}
+#: MOVED TO model.py at G97 — the artifact pass needs the same set to know what
+#: it may not migrate onto USES_ARTIFACT, and two copies of a classification set
+#: is how they drift. Re-exported under the old private name so nothing that
+#: imported it here breaks.
+_ETL_PROCESS_KINDS = ETL_PROCESS_KINDS
 
 #: the ETLProcess ``kind`` property (etl | utility | notification — gate-log §a).
 #: AMBIGUITY CALL (G12, guardrail 5): the invocation engine alone cannot
@@ -101,6 +102,20 @@ _ETL_PROCESS_KINDS = {"abinitio", "dpl"}
 #: ``properties["mac_kind"]`` from pipeline.json subType, and the row build
 #: below consults it first — only non-MAC nodes still take the blind default.
 _DEFAULT_ETL_KIND = "etl"
+
+#: the :Script refinement properties (gate cmdline-nfr-vetting SME-3,
+#: 2026-07-21, adopted with m7 — G97 builds them). Read off ProcessNode
+#: .properties and passed through as NULL where a row does not carry one, which
+#: is what makes the coalesce guard in _SCRIPT_MERGE do its job.
+_SCRIPT_REFINEMENTS = (
+    "script_role",
+    "platform",
+    "artifact_uri",
+    "artifact_kind",
+    "platform_flags",
+    "script_path",
+    "evidence",
+)
 
 #: rel labels whose from_node is "ETLProcess | ControlMJob", never Script
 #: (gate-log 2026-07-15 EDIT; G13). Endpoint resolution below only special-
@@ -192,14 +207,28 @@ _ETL_PROCESS_CONSTRAINT = (
     "FOR (e:ETLProcess) REQUIRE e.token IS UNIQUE"
 )
 
+#: G97 — the :Script refinements gate cmdline-nfr-vetting SME-3 (2026-07-21)
+#: adopted with m7. `script_role` uses the SAME coalesce guard _RUA_SCRIPT_MERGE
+#: uses, and for the same reason: one path can be staged by two loaders (a rua
+#: profile AND a cmdline script), so a blind SET would let whichever ran last
+#: silently erase the other's stamp. The artifact properties coalesce too — a
+#: CMD_LINE row carries none of them, and it must not blank out what the
+#: variable feed already established about the same artifact.
 _SCRIPT_MERGE = """\
 UNWIND $rows AS row
 MERGE (s:Script {path: row.path})
   ON CREATE SET s.created_at = datetime($written_at),
                 s.source     = 'drydocs-lineage'
-SET s.kind         = row.kind,
-    s.name         = row.name,
-    s.last_seen_at = datetime($written_at)"""
+SET s.kind           = row.kind,
+    s.name           = row.name,
+    s.script_role    = coalesce(row.script_role, s.script_role),
+    s.platform       = coalesce(row.platform, s.platform),
+    s.artifact_uri   = coalesce(row.artifact_uri, s.artifact_uri),
+    s.artifact_kind  = coalesce(row.artifact_kind, s.artifact_kind),
+    s.platform_flags = coalesce(row.platform_flags, s.platform_flags),
+    s.script_path    = coalesce(row.script_path, s.script_path),
+    s.evidence       = coalesce(row.evidence, s.evidence),
+    s.last_seen_at   = datetime($written_at)"""
 
 _ETL_PROCESS_MERGE = """\
 UNWIND $rows AS row
@@ -246,6 +275,12 @@ class WritePlan:
     unresolved_file_ops: int  # script-src READS_FROM/WRITES_TO dropped: no
     # owning job found via INVOKES (G13) — counted,
     # never silently swallowed; see plan_curated
+    # -- G97 clause (e): what the launcher/payload split actually did in THIS
+    #    batch, read off the planned rows rather than recomputed
+    launchers: int = 0  # :Script rows carrying script_role='launcher'
+    payloads: int = 0  # :Script rows carrying script_role='payload'
+    scripts_unroled: int = 0  # :Script rows with no role — unchanged, reported
+    uses_artifact_rels: int = 0  # USES_ARTIFACT edges planned
 
 
 def _endpoint_class(graph: LineageGraph, node_id: str) -> str:
@@ -394,6 +429,11 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
                     "path": _node_key(nid),
                     "kind": node.kind,
                     "name": node.name,
+                    # G97 / SME-3: script_role {launcher, payload} plus the
+                    # adopted artifact properties. `evidence` is §B3's verbatim
+                    # derivation string — under §B2's union endpoints it is the
+                    # only way the endpoint-class choice stays re-checkable.
+                    **{k: node.properties.get(k) for k in _SCRIPT_REFINEMENTS},
                 }
             )
         elif cls == "etl_process":
@@ -457,6 +497,7 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
         )
         statements.append((cypher, {"rows": rows}))
 
+    roles = [r.get("script_role") for r in script_rows]
     return WritePlan(
         statements=tuple(statements),
         rel_types=tuple(sorted({r[1] for r in resolved})),
@@ -465,13 +506,17 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
         etl_processes=len(etl_process_rows),
         assets=len(asset_rows),
         unresolved_file_ops=unresolved_file_ops,
+        launchers=roles.count("launcher"),
+        payloads=roles.count("payload"),
+        scripts_unroled=sum(1 for r in roles if not r),
+        uses_artifact_rels=sum(1 for r in resolved if r[1] == "USES_ARTIFACT"),
     )
 
 
 # --- the live load ---------------------------------------------------------------
 
 
-def write_curated(
+def _write_curated(
     graph: LineageGraph,
     confirmed: set[tuple[str, str, str]],
     client: Any = None,
@@ -548,10 +593,19 @@ def write_curated(
 #   for the ID only — resolution never uses the fallback); repo locator =
 #   repo+ref+commit+path, joined to the server side on CONTENT HASH (the G24
 #   git blob sha1), never by path. sha256 absence is a real, counted state
-#   (§G2). storage_scope stamps 'unknown' until G56 captures the mount table;
-#   a script whose server occurrences span >1 host under unknown scope is
-#   flagged identity_unconfirmed_across_hosts, never silently merged-as-
-#   confirmed (§D1 + the D-amendment: the honesty lives in the claim layer).
+#   (§G2). storage_scope AND mount_source arrive from the G56 mount table on
+#   v3 bundles and fall back to 'unknown' (no mount_source at all) on v1/v2,
+#   which carry no mount table. A script whose server occurrences span >1
+#   host is flagged identity_unconfirmed_across_hosts UNLESS every host's
+#   occurrence reads storage_scope 'shared' AND carries the SAME
+#   mount_source (G113's three-way rule: one export mounted on N hosts is
+#   one file, proven by mount_source equality — never inferred from scope
+#   alone, since 'shared' by itself does not say two hosts see the same
+#   file). Hosts that agree on 'shared' but disagree on mount_source stay
+#   unconfirmed and are ALSO counted separately (multi_host_shared_diverged)
+#   — that split is a real finding (two hosts mounting the same path from
+#   different exports), never folded silently into the general count.
+#   'local' or 'unknown' scope stays unconfirmed exactly as before G113.
 # - (:Script)-[:IS_ENCODED_IN]->(SwoClass) derived from the path extension
 #   (§C3 — the shared core adapter; the term is OPTIONAL-MATCHed, never
 #   minted: a mapped term missing from the graph means bootstrap has not run).
@@ -683,6 +737,10 @@ class RuaWritePlan:
     hash_missing: int  # server occurrences staged hash-absent (§G2 — a real state)
     repo_join_uncomputable: int  # repo rows staged but no server copy to hash (G24)
     multi_host_unconfirmed: int  # scripts flagged identity_unconfirmed_across_hosts
+    multi_host_shared_diverged: int  # of which: every host reads storage_scope
+    # 'shared' but the hosts DISAGREE on mount_source (G113) — a real finding
+    # (two hosts mounting the same path from different exports), broken out
+    # so it stays visible on its own instead of vanishing into the total
     hosts: tuple[str, ...]  # distinct qualified fqdns for §D3 write-time resolution
     hosts_unqualified: int  # server occurrences with no qualified fqdn — unresolvable by rule
 
@@ -714,6 +772,7 @@ class RuaLoadReport:
             f"hash_missing={p.hash_missing} "
             f"unbound_ext={p.unbound_extensions} "
             f"multi_host_unconfirmed={p.multi_host_unconfirmed} "
+            f"(shared_diverged={p.multi_host_shared_diverged}) "
             f"repo_unjoinable={p.repo_join_uncomputable}"
         )
 
@@ -760,6 +819,7 @@ def plan_rua(
     hash_missing = 0
     repo_join_uncomputable = 0
     multi_host_unconfirmed = 0
+    multi_host_shared_diverged = 0
     hosts: set[str] = set()
     hosts_unqualified = 0
 
@@ -775,6 +835,10 @@ def plan_rua(
         is_profile = node.kind == RUA_PROFILE_KIND
 
         node_hosts: set[str] = set()
+        host_scopes: dict[str, str] = {}  # id_host -> storage_scope, for the
+        # G113 three-way rule below (per-host, since occurrences are per-host)
+        host_mount_sources: dict[str, str] = {}  # id_host -> mount_source,
+        # present only where G56's mount table stamped one
         records = node.occurrences or [dict(node.properties, path=node.path)]
         for occ in records:
             id_host, fqdn = _occurrence_host(occ)
@@ -788,7 +852,14 @@ def plan_rua(
             props = {k: v for k, v in occ.items() if isinstance(v, str) and v}
             props["origin"] = _SERVER_ORIGIN
             props["host"] = id_host
-            props.setdefault("storage_scope", "unknown")  # until G56 lands
+            # G56 landed: v3 bundles arrive already stamped by the extractor and
+            # this setdefault only covers v1/v2 bundles, which carry no mount
+            # table (and so no mount_source either — those hosts can never
+            # qualify for the 'shared, same source' CONFIRMED leg below).
+            props.setdefault("storage_scope", "unknown")
+            host_scopes[id_host] = props["storage_scope"]
+            if "mount_source" in props:
+                host_mount_sources[id_host] = props["mount_source"]
             occurrence_rows.append(
                 {
                     "script_path": norm,
@@ -833,9 +904,35 @@ def plan_rua(
                     )
                     repo_occurrences += 1
 
-        unconfirmed = len(node_hosts) > 1  # scope is 'unknown' until G56
+        # G113 — the three-way rule. Multi-host is the precondition for all
+        # three legs; a single-host script is never unconfirmed.
+        #   1. every host reads storage_scope 'shared' AND all hosts agree on
+        #      mount_source -> CONFIRMED (one export seen on N hosts is one
+        #      file). mount_source equality is the identity test — scope
+        #      alone never proves it, per the item's ruling.
+        #   2. every host reads 'shared' but the hosts DISAGREE on
+        #      mount_source -> stays unconfirmed AND is counted on its own
+        #      (multi_host_shared_diverged) — two hosts mounting the same
+        #      path from different exports is a real finding, not a
+        #      non-finding folded silently into the general count.
+        #   3. anything else ('local', 'unknown', or a mixed scope set) ->
+        #      stays unconfirmed exactly as before G113.
+        shared_diverged = False
+        if len(node_hosts) <= 1:
+            unconfirmed = False
+        elif set(host_scopes.values()) == {"shared"}:
+            same_source_everywhere = (
+                len(host_mount_sources) == len(node_hosts)
+                and len(set(host_mount_sources.values())) == 1
+            )
+            unconfirmed = not same_source_everywhere
+            shared_diverged = unconfirmed
+        else:
+            unconfirmed = True
         if unconfirmed:
             multi_host_unconfirmed += 1
+        if shared_diverged:
+            multi_host_shared_diverged += 1
         if is_profile:
             profiles += 1
         script_rows.append(
@@ -900,6 +997,7 @@ def plan_rua(
         hash_missing=hash_missing,
         repo_join_uncomputable=repo_join_uncomputable,
         multi_host_unconfirmed=multi_host_unconfirmed,
+        multi_host_shared_diverged=multi_host_shared_diverged,
         hosts=tuple(sorted(hosts)),
         hosts_unqualified=hosts_unqualified,
     )
@@ -911,7 +1009,7 @@ def plan_rua(
 RUA_VOCAB_IDS = {"OCCURRENCE_OF": "arch_occurrence_of", "IS_ENCODED_IN": "arch_is_encoded_in"}
 
 
-def write_rua(
+def _write_rua(
     graph: LineageGraph,
     client: Any = None,
     *,
@@ -979,3 +1077,54 @@ def write_rua(
         hosts_unresolved=tuple(sorted(hosts_unresolved)),
         coverage=dict(coverage or {}),
     )
+
+
+def write_curated(
+    graph: LineageGraph,
+    confirmed: set[tuple[str, str, str]],
+    client: Any = None,
+    *,
+    registry: Path | None = None,
+) -> int:
+    """Curated ground-truth write, wrapped in a run log (G107).
+
+    Delegates to :func:`_write_curated` unchanged — this adds a record of the
+    run, not behaviour. The empty-``confirmed`` guard runs BEFORE the log opens
+    deliberately: nothing was asked for, so there is no batch to record, and a
+    log per no-op call would bury the real runs.
+    """
+    if not confirmed:
+        return 0
+    with batch_run_log(
+        "lineage.curated",
+        target=DATABASE,
+        meta={"confirmed rels": len(confirmed)},
+    ) as summary:
+        written = _write_curated(graph, confirmed, client, registry=registry)
+        summary["rels written"] = written
+        summary["confirmed rels"] = len(confirmed)
+        return written
+
+
+def write_rua(
+    graph: LineageGraph,
+    client: Any = None,
+    *,
+    bundle_dir: str | Path | None = None,
+    registry: Path | None = None,
+    coverage: dict[str, Any] | None = None,
+) -> RuaLoadReport:
+    """The live rua load, wrapped in a run log (G107).
+
+    Delegates to :func:`_write_rua` unchanged.
+    """
+    with batch_run_log(
+        "lineage.rua",
+        target=DATABASE,
+        source=str(bundle_dir or ""),
+    ) as summary:
+        report = _write_rua(
+            graph, client, bundle_dir=bundle_dir, registry=registry, coverage=coverage
+        )
+        summary["report"] = report
+        return report

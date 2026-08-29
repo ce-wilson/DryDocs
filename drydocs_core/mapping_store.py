@@ -92,7 +92,7 @@ APP_CODE_AUTHORED_ORIGINS = ("defined", "override", "manual-pin")
 # retired — the empty-app_id encoding discarded a true fact, the platform's
 # SEAL, to signal a different one). Bumped so a pre-K18 database reads as
 # stale and rebuilds from the committed CSV rather than failing at query.
-SCHEMA_VERSION = "drydocs.mapping-store.v3"
+SCHEMA_VERSION = "drydocs.mapping-store.v4"  # v4: N15 agreement-evidence columns
 
 # Table DDL. Nullable columns mirror the YAML's reality (property supplements
 # have no to_node, infrastructure edges have no prov term, etc.).
@@ -213,7 +213,14 @@ CREATE TABLE seal_contact_override (
   authored_by          TEXT NOT NULL,
   authored_on          TEXT,
   status               TEXT NOT NULL
-      CHECK (status IN ('active','corrected-in-seal'))
+      CHECK (status IN ('active','corrected-in-seal')),
+  -- N15 (gate pending-source-correction §B4): agreement evidence, filled when a
+  -- steward CONFIRMS a retirement candidate — which load run observed the source
+  -- matching, what value it carried, and when. Nullable: an active override has
+  -- none, and detection itself NEVER writes these (two hands, §B2/§B3).
+  agreement_run_id       TEXT,
+  agreement_source_value TEXT,
+  agreement_observed_on  TEXT
 );
 
 -- The /mappings grid: every attribution ROW carries an origin flag — the
@@ -330,6 +337,29 @@ CREATE VIEW v_open_drafts AS
 
 #: Draft columns, in the order build() carries them over a rebuild.
 _DRAFT_COLUMNS = ("draft_id", "seq", "domain", "payload", "authored_by", "authored_on", "status")
+
+#: N14 (gate pending-source-correction, SIGNED 2026-08-18, §D1/§D2): every store
+#: DECLARES its correction-lifecycle nature at creation, and reports read THIS
+#: declaration — never a hardcoded exemption. "pending" rows exist to be retired
+#: when the source catches up (seal_contact_override carries a status column for
+#: exactly that); "permanent" rows are steward policy with NO corrected-in-source
+#: lifecycle (app_code_mapping's DDL carries no status column for exactly this
+#: reason — K7 §E2), so a pending-report may never scan them. Everything else is
+#: "not-a-correction-store". A table added to the DDL without a row here fails
+#: the paired coverage guard (tests assert sqlite_master == this key set), which
+#: is what makes the declaration happen AT creation instead of at the first
+#: report that guesses wrong.
+STORE_NATURES: dict[str, str] = {
+    "meta": "not-a-correction-store",
+    "node_classification": "not-a-correction-store",
+    "relationship_vocabulary": "not-a-correction-store",
+    "ontology_mapping": "not-a-correction-store",
+    "manual_load_file": "not-a-correction-store",
+    "manual_mapping": "not-a-correction-store",
+    "seal_contact_override": "pending",
+    "app_code_mapping": "permanent",
+    "draft": "not-a-correction-store",
+}
 
 _DUMP_ORDER = {
     "meta": "key",
@@ -784,7 +814,9 @@ def _ingest_seal_overrides(conn: sqlite3.Connection, path: Path) -> None:
             conn.execute(
                 "INSERT INTO seal_contact_override (line_no, app_seal_id, role_name, "
                 "seal_holder_sid, override_holder_sid, override_holder_name, rationale, "
-                "authored_by, authored_on, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "authored_by, authored_on, status, agreement_run_id, "
+                "agreement_source_value, agreement_observed_on) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     line_no,
                     app,
@@ -796,6 +828,9 @@ def _ingest_seal_overrides(conn: sqlite3.Connection, path: Path) -> None:
                     authored_by,
                     _text(raw.get("authored_on")),
                     status,
+                    _text(raw.get("agreement_run_id")),
+                    _text(raw.get("agreement_source_value")),
+                    _text(raw.get("agreement_observed_on")),
                 ),
             )
 

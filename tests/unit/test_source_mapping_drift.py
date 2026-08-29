@@ -48,7 +48,10 @@ REGISTRY = REPO_ROOT / "config" / "source-registry.yaml"
 # CM_DEF_VJOB folder HEADER ROW join (gate controlm-q1q3-phase1 §Q3); the ledger
 # carries APPLICATION under CM_DEF_VJOB for that reason.
 SQL_OBJECT_ALIASES: dict[str, dict[str, str]] = {
-    "controlm_folders.sql": {"T": "CM_DEF_VTAB", "H": "CM_DEF_VJOB"},
+    "controlm_folders.sql": {
+        "T": "CM_DEF_VTAB",
+        "J": "CM_DEF_VJOB",
+    },  # J39: alias J, matching the company copy
     "controlm_jobs.sql": {"J": "CM_DEF_VJOB"},
     "controlm_conditions_in.sql": {"L": "CM_DEF_LNKI_P_VW"},
     "controlm_conditions_out.sql": {"L": "CM_DEF_LNKO_P_VW"},
@@ -179,8 +182,15 @@ def test_strict_parser_grammar() -> None:
 # --- 2. coverage / census reconciliation ----------------------------------------
 
 
-def test_committed_ledger_census_is_pending_and_reconciles(ledger: SourceMapping) -> None:
-    # Phase 0 state: every census pending -> nothing to reconcile, by design
+def test_committed_ledger_census_reconciles(ledger: SourceMapping) -> None:
+    """Every committed ledger balances — whether its census is pending or closed.
+
+    Was ``..._is_pending_and_reconciles``: while every census was pending there
+    was nothing to reconcile and the assertion was vacuously true. The PAT team
+    report closed its census on 2026-08-29 (43 columns, measured), so this now
+    actually reconciles explicit rows + sweep against ``column_count`` for at
+    least one object, and the next ledger to close is covered without an edit.
+    """
     assert ledger.census_failures() == []
 
 

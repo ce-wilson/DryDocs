@@ -36,6 +36,13 @@ DESCRIPTION_ATTRS = ("DESCRIPTION", "DESC")
 POSTCMD_ATTRS = ("POSTCMD", "POST_CMD", "POSTCOMMAND", "POSCMD")
 #: FileWatcher watched-path template
 WATCH_ATTRS = ("FILE_PATH", "WATCH_FILE")
+#: AUTHORED provenance — the "created by" field a copied job CARRIES WITH IT,
+#: so it names the template's author rather than the job's (R44). A synonym
+#: SET rather than one spelling because the authoritative element schema is
+#: still unacquired (formats.py records the 403 block), and the assumed
+#: contract is the parser's to hold — the same reason DESCRIPTION and POSTCMD
+#: are tuples here. NOT to be read as authorship: see the R44 entry.
+AUTHORED_BY_ATTRS = ("CREATED_BY", "CREATEDBY", "AUTHOR")
 
 #: the notification family REQ-2 governs — recorded by name, not just counted
 NOTIFICATION_TAGS = frozenset({"SHOUT", "DOSHOUT", "DOMAIL"})

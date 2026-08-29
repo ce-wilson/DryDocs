@@ -17,7 +17,7 @@
 #       the ARTIFACT (the book/guide), never the adapter or capture version:
 #       bmc-docs-controlm-utilities, neo4j-docs-essential-graphrag.
 #   NON-VENDOR corpora (SME/internal/public-filing classes) keep class-based
-#   ids (adhoc-sme-email, jpmc-reports, fcdo-frameworks, seal-pat-scrape) —
+#   ids (adhoc-sme-email, jpmc-reports, cdo-frameworks, seal-pat-scrape) —
 #   deliberately OUT of the vendor grammar, recorded so it does not creep.
 #   RENAMES are add-new + retire-old: the renamed row carries `replaces:`, the
 #   old string enters `retired:` below and can NEVER re-mint with a different
@@ -47,7 +47,7 @@
 #                    corpus id. Declaring it here keeps the check registry-driven
 #                    instead of teaching the verifier three loader shapes.
 #                    `match: none` = deliberately NOT on the Document->Chunk
-#                    lexical spine; docs-verify reports `unshaped`, never
+#                    lexical backbone; docs-verify reports `unshaped`, never
 #                    `missing`, so "never loaded this way" is not read as a defect.
 #
 # Freshness is gate-preserving (ADR 0006 §4): a sha256 change on refetch
@@ -61,7 +61,7 @@
 # =============================================================================
 
 schema: drydocs.doc-source-registry.v1
-updated: 2026-08-18
+updated: 2026-08-27
 
 sources:
   # ---- Currently ingested corpora (backfill, Q5) ----------------------------
@@ -78,9 +78,21 @@ sources:
     target_db: drydocs                  # G102 fold (was dddocs — never provisioned; R1 retired the name)
     refresh: manual
     taxonomy_path: technology/orchestration/control-m
-    graph_locator:                      # pre-dates corpus_id; pages are identified by their repo path
-      match: path_prefix
+    graph_locator:                      # KEPT path_prefix BY DECISION (Q26 (d)): the loader
+      match: path_prefix                #   stamps corpus_id since Q26, but this file is shared
       value: external/orchestration/bmc-controlm/
+      # and the two machines' graphs are independent — a corpus_id locator would
+      # read MISSING on any graph whose reload has not run yet. Move to
+      # {match: corpus_id, value: bmc-docs} once every machine's bmc-docs reload
+      # has landed (laptop done 2026-08-27; desktop rides its Q24 session).
+    # Q18: the product this corpus DESCRIBES — the declaration behind the one
+    # live software-to-docs traversal. OPTIONAL per corpus; when present it
+    # must name a config/taxonomy/software-registry.yaml product id (guarded
+    # by tests/unit/test_doc_registry.py) and the LOADER READS IT — the former
+    # SUBJECT_PRODUCT_ID module constant is gone, not shadowed. Edge term per
+    # the Q14 ruling (DESCRIBES reused); residency per the G32 fold: docs and
+    # the software registry share `drydocs`, so the edge is writable in-place.
+    describes_product: controlm
     confirmed: true                     # gate bmc-docs-lexical-load SME-accepted 2026-07-08 (config/gate-log.md) — moved here from the dropped pipeline twin (N9)
     notes: >
       The canonical T1 vendor corpus (gate bmc-docs-lexical-load, 2026-07-08 —
@@ -186,11 +198,17 @@ sources:
       constant matches the graph, not this id.
 
   # ---- Queued corpora (registered, not yet ingested) ------------------------
-  - id: fcdo-frameworks
+  - id: cdo-frameworks                  # renamed 2026-08-26 (org-acronym sanitization); mapping in internal/cdo-reference/README.md
     classification: Internal               # confidential handling: real employee names + internal Confluence URLs in the capture (J23 collapse)
-    source: "the 2026-08-19 live Confluence fetch (company-side capture, J18: drydocs-scrape on the company checkout — consolidated HTML + manifest run-20260819T215955Z under internal/knowledge/data/<space>/); supersedes the 2026-07-30 screenshot transcriptions in internal/fcdo-reference/*.md, which remain the provenance trail"
+    source: "the 2026-08-19 live Confluence fetch (company-side capture, J18: drydocs-scrape on the company checkout — consolidated HTML + manifest run-20260819T215955Z under internal/knowledge/data/<space>/); supersedes the 2026-07-30 screenshot transcriptions in internal/cdo-reference/*.md, which remain the provenance trail"
     connector: confluence                 # company-network only; scrape supersedes the transcripts
-    manifest: ~                           # provenance + gap ledger lives in internal/fcdo-reference/README.md
+    landing_zone: confluence-capture      # G109 (e): the capture lands in the DECLARED read zone under
+                                          # DRYDOCS_DATA_ROOT, never in-tree. The 2026-08-19 capture path
+                                          # recorded in `source:` above is left as written -- it is what
+                                          # happened, and falsifying a provenance record to match a later
+                                          # ruling is the one thing a VERBATIM row may not do. The ruling
+                                          # applies to where the NEXT capture lands; see config/data-zones.yaml.
+    manifest: ~                           # provenance + gap ledger lives in internal/cdo-reference/README.md (dir renamed 2026-08-26; its top note records the mapping)
     trust_default: VERBATIM               # upgraded 2026-08-19 per this row's own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0 failed). Was GROUNDED while the capture was screenshot transcription
     tier: T4
     curation: sme-confirm                 # T4 ladder post-J23 (+confidential rider retired with the tier)
@@ -200,12 +218,12 @@ sources:
     graph_locator:                      # no connector has run — nothing to locate until the confluence fetch exists
       match: none
       value: ~
-    confirmed: true                     # ACTIVATED by user ruling in-chat 2026-08-05 (gate-log RECORD): the fcdo-crosswalk gate it waited on signed the same day 13/13; activation proceeds independently of the row-5 recapture ("settle our ontology with what they published"). The scrape itself stays company-network-side; T4 sme-confirm curation still applies to every ingested page.
+    confirmed: true                     # ACTIVATED by user ruling in-chat 2026-08-05 (gate-log RECORD): the cdo-crosswalk gate it waited on signed the same day 13/13; activation proceeds independently of the row-5 recapture ("settle our ontology with what they published"). The scrape itself stays company-network-side; T4 sme-confirm curation still applies to every ingested page.
     notes: >
-      The FCDO firmwide data-publishing frameworks corpus (ontology/taxonomy/
+      The chief-data-office (CDO) data-publishing frameworks corpus (ontology/taxonomy/
       provenance/ETL standards from the internal governance group). Purpose:
-      reference for the FCDO ontology crosswalk
-      (internal/fcdo-reference/ALIGNMENT-PLAN.md). Priority recapture targets
+      reference for the CDO ontology crosswalk
+      (internal/cdo-reference/ALIGNMENT-PLAN.md). Priority recapture targets
       when the confluence connector runs: Descriptive Metadata, Data Quality,
       Data Contracts (DPROD) frameworks + the Taxonomy Framework property
       tables — the known capture holes that block crosswalk sign-off.
@@ -213,7 +231,7 @@ sources:
       (Descriptive Metadata + its WIP CDAO twin, Data Quality, Data Contracts/
       DPROD, Taxonomy Framework v21) — the crosswalk's capture holes are closed.
       One page came back 0 bytes (the drafts/upcoming index) — QA'd company-side.
-      LOAD PATH: docs/company-prompts/fcdo-frameworks-load-company-prompt.md (the load is
+      LOAD PATH: docs/company-prompts/cdo-frameworks-load-company-prompt.md (the load is
       company-side by guardrail 6 — the capture never leaves the company
       network); graph_locator fills when that load runs.
 
@@ -280,7 +298,7 @@ sources:
       one :Document carrying doc_id / subject / sent_at / custodian /
       source_digest / corpus_id, with NO body text and NO :Chunk chain. The
       body carries named individuals and internal addresses, and there is no
-      email connector to refetch it reproducibly; the Document→Chunk spine
+      email connector to refetch it reproducibly; the Document→Chunk backbone
       stays available without rework if one is ever built. Raw messages and
       attachments live company-side under internal/, never in this repo.
       TRUST IS SPLIT, and the split is the point: the DOCUMENT is VERBATIM;
@@ -301,7 +319,7 @@ sources:
       ADD rather than discover the question at build time. They are currently
       registered as two because four properties differ, not because nobody
       looked: (1) SHAPE — this one is citation-only, Q10's loads the ACTIVE
-      lexical Document->Chunk spine; (2) CADENCE — one-off SME evidence with no
+      lexical Document->Chunk backbone; (2) CADENCE — one-off SME evidence with no
       pipeline, vs a recurring operational feed with an extraction step;
       (3) RETENTION — Q10's file-server extracts become the ONLY copy after the
       6-18 month Outlook purge, so that corpus carries a backup obligation this
@@ -366,19 +384,80 @@ sources:
     graph_locator:                      # :DataAsset slices, NOT Document->Chunk — see notes; reshaping is P4+
       match: none
       value: ~
-    confirmed: false                    # no active loader binds here; reshaping onto the lexical spine is a P4+ decision — a future loader gates on this flag (N9)
+    confirmed: false                    # no active loader binds here; reshaping onto the lexical backbone is a P4+ decision — a future loader gates on this flag (N9)
     notes: >
       The FIRST ddcontext doc ingestion (pre-dates the docmeta plan): JPMC
       annual-report sections as :DataAsset slices seeding the effective-dated
       BusinessSegment context — NOT the lexical Document→Chunk shape. Backfilled
       here (Q5) so every live corpus traces to a registry entry; reshaping it
-      onto the lexical spine is a P4+ decision. The script still carries the
+      onto the lexical backbone is a P4+ decision. The script still carries the
       pre-restructure repo path for its PDFs — update on next run.
+
+  - id: chase-leadership-scrape
+    classification: External            # public media/press pages; company-published leadership roster + bios
+    source: "docs/reviews/chase-leadership-scrape-2026-08-27.md (VERBATIM transcription + drift analysis; raw HTML NOT committed — the jpmc-reports never-commit precedent; per-page sha256 recorded in the review)"
+    source_url: "https://media.chase.com/leadership (index + 22 bio pages at /leadership/<slug>)"
+    captured_at: 2026-08-27
+    connector: web
+    manifest: ~                         # single-session capture; provenance (hashes, tiering, drift record) lives in the review doc
+    trust_default: VERBATIM             # quotes transcribed as fetched; the review's unit-grouping tree is SYNTHESIZED and labeled per-section
+    tier: T1                            # publisher's own public pages (the jpmc-reports precedent)
+    curation: none
+    target_db: drydocs
+    refresh: on-demand                  # refetch compares sha256 per page — the pages publish no edit dates, so the hash is the only change signal
+    taxonomy_path: ~
+    graph_locator:                      # evidence-only corpus; nothing loads
+      match: none
+      value: ~
+    confirmed: false                    # no loader binds here; the corpus is EVIDENCE for the drafted gate business-layer-org-structure (C28) — any load is that gate session's decision
+    notes: >
+      The CCB Leadership Team roster (22 leaders) captured as membership-grain
+      evidence for the business-layer gate: bios assert MEMBERSHIP ("member of
+      the CCB Leadership Team", GTL, Operating Committee), never reporting
+      lines — the control functions declare firmwide-matrix memberships, so
+      this corpus supports HAS_MEMBERSHIP-shape edges only. Composes with
+      jpmc-reports into a two-layer public org view (10-K executive-officer
+      register above, this page below, bridged by the one person in both).
+      The review's drift record (D1-D7: one fact in three concurrent
+      vintages, tile-vs-bio title disagreement, a missing tile field, a
+      stale cross-reference to a moved seat) is provenance calibration —
+      first-party official pages drift against themselves, so scrape-sourced
+      org facts are true as-of capture and never fresher (the gate's C3
+      source-grain corollary, demonstrated live).
 
 # ---------------------------------------------------------------------------
 # Retired corpus ids (the source-registry v2 D4 semantics, imported at the
 # 2026-08-18 id-grammar rename): a retired string can NEVER be re-minted with
 # a different meaning. Loaders bound to a retired id do not resolve.
+  # -- the internal MWAA deployment docs (Q27; unparked when G32 fired) -------
+  - id: mwaa-implementation-docs
+    classification: Internal            # internal deployment/conventions/onboarding prose
+    source: "internal/airflow-reference/mwaa-internal-docs.md (the locator FILE — the real internal URL lives there and appears in no tracked config row, per PUBLISH-BOUNDARY)"
+    source_url: null                    # the pointer, never the value (Q27 (c))
+    captured_at: null                   # nothing captured yet — registration is a declaration
+    connector: web
+    manifest: null
+    trust_default: GROUNDED             # upgraded to VERBATIM only by a capture run whose manifest names this row (the Q23 join — the cdo-frameworks precedent)
+    tier: T2                            # internal platform docs
+    curation: sme-confirm               # fixed per tier (ADR 0006 SS-4)
+    target_db: drydocs                  # the single content database G32/G102 ruled
+    refresh: manual
+    taxonomy_path: technology/orchestration/airflow
+    graph_locator:
+      match: none                       # nothing loaded; a capture stamps corpus_id and this moves with it
+      value: null
+    confirmed: false                    # Q27 (d): a DECLARATION. No loader may write from this
+                                        # entry until a gate signs its doc-graph shape; the flip
+                                        # is its own follow-up (the Q24 precedent), never this row.
+    notes: >
+      The firm's OWN MWAA deployment documentation — a class corpus (our
+      deployment's docs), deliberately NOT the {vendor}-docs form: Apache
+      publishes Airflow's docs, but this corpus documents what WE built on
+      MWAA. The internal address is only in the internal/ locator file; the
+      airflow product row's documentation.corpus points here (atomic with this
+      row — a dangling pointer is the one FAILING rung in docs-coverage).
+
+
 retired:
   - id: bmc-controlm-utilities
     replaced_by: ["bmc-docs-controlm-utilities"]
@@ -386,3 +465,6 @@ retired:
   - id: essential-graphrag
     replaced_by: ["neo4j-docs-essential-graphrag"]
     reason: "id-grammar rename; RETIRED AS A REGISTRY ID ONLY — the string stays LIVE in the graph as the Document's doc_id business key and in the loader's DOC_ID constant"
+  - id: "(sanitized-2026-08-26)"
+    replaced_by: ["cdo-frameworks"]
+    reason: "org-acronym sanitization (user direction 2026-08-26): the retired string contains an internal org acronym and may not appear in this publishable file; the old<->new mapping is recorded once, in internal/cdo-reference/README.md. Never-re-mint applies to the recorded string."

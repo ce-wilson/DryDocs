@@ -1,7 +1,7 @@
 id: O48
 epic: web-console
 title: 'Review-for-ontology pass: extraction over uploaded evidence → proposed-bindings panel the SME
-  confirms (the FCDO-style review)'
+  confirms (the CDO-style review)'
 type: requirement
 module: drydocs-api
 phase: 12
@@ -19,4 +19,4 @@ inputs:
 acceptance: |
   One button runs a server-side extraction pass over the intake's evidence and returns proposed bindings: recognized entities (Control-M folder/job names, dataset identifiers, SEAL ids, file paths, DL addresses) each with the ontology CLASS it would bind to and a match tier (exact id / name / fuzzy), plus the extractor's context-type guess shown against the SME's pick (SME wins). Every row is confirm/retype/discard-editable; the output is a candidate-binding set stored on the intake record with status: proposed per row — a STORE write, never a graph write, and no new relationship semantics: classes come from the confirmed vocabulary only. What the SME confirmed is exactly what the admin queue later renders (governed-surface discipline).
 notes: |
-  Slice 4 (plan §4). The interaction is the FCDO tool's review pass: machine proposes, human disposes. Whether this panel generalizes into a shared component with the gate pages is an open question deferred until this first build proves the shape.
+  Slice 4 (plan §4). The interaction is the CDO tool's review pass: machine proposes, human disposes. Whether this panel generalizes into a shared component with the gate pages is an open question deferred until this first build proves the shape.

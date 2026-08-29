@@ -51,8 +51,27 @@ def test_runbook_header_carries_rev_and_commit() -> None:
     assert header["doc_id"] == "drydocs-startup-refresh-runbook"
     assert header["doc_type"] == "Runbook"
     assert (
-        header["rev"] == 10
-    )  # Rev 10, 2026-08-04 (N6: Appendix B becomes the `cold-start` PROFILE of
+        header["rev"] == 13
+    )  # Rev 13, 2026-08-24: PRESENTATION ONLY. Appendix B's fifteen bare command lines gain
+    # a numbered `#` comment per step and blank-line phase grouping, and the four remaining
+    # bare commands elsewhere pick up the aligned trailing comment the doc's other
+    # multi-command blocks already had. THE RULE: a fenced block with two or more commands
+    # annotates every line; a single-command block does not, its step title already being
+    # the description. No command, order or success check changed. Appendix B stays
+    # guard-clean because test_load_sequence_surfaces extracts verbs with
+    # `poetry run drydocs (<verb>)` and never sees a comment — which is also why a
+    # superseded step must never be left commented-out there: the regex would match it.
+    # Rev 12, 2026-08-24: the rev11 SME feedback — provisioning moves out of Startup to the
+    # end of Prerequisites (it is a precondition of every startup step, not one of them),
+    # "Schema backbone" -> "Schema core", the per-file-verb scolding dropped. The same
+    # feedback's "commands run together" note was a RENDERER defect, not prose: render_body
+    # folded a fenced block inside a list item into the item's text.
+    # Rev 11, 2026-08-24: the G102 catch-up. The doc had told readers for two weeks to
+    # provision a four-database topology two of whose names retired at the 2026-08-18 fold,
+    # and it ordered provisioning FOURTH — after the verbs that connect to the databases it
+    # creates, so `drydocs check` raises DatabaseNotFound and the sequence could not be
+    # followed on the fresh container it was written for. Provisioning is now step 2.
+    # Rev 10, 2026-08-04 (N6: Appendix B becomes the `cold-start` PROFILE of
     # cli.CANONICAL_LOAD_SEQUENCE rather than a second sequence — it gains the standing
     # docs-verify step it was missing, and test_load_sequence_surfaces.py now fails on
     # any drift between the block and the declaration). Rev 9 same day was X2: ddlineage
@@ -199,10 +218,17 @@ def test_no_committed_ref_is_sheared_mid_parenthetical() -> None:
 
 
 def test_feedback_adapter_reads_rev1_with_lifecycle_and_author() -> None:
+    """The rev1 file specifically — scoped by doc_rev, not just doc_id.
+
+    The doc has more than one feedback file now (rev11 landed 2026-08-24), and a
+    doc_id-only filter silently widened this from "the rev1 file" to "every note ever
+    left on this doc" — which is a test that changes meaning every time a review
+    happens. Filtering on the rev keeps it pinned to the file it names.
+    """
     rows = [
         r
         for r in DesignDocFeedbackAdapter(FEEDBACK_DIR).rows()
-        if r["doc_id"] == "drydocs-startup-refresh-runbook"
+        if r["doc_id"] == "drydocs-startup-refresh-runbook" and r["doc_rev"] == 1
     ]
     assert len(rows) == 2, f"the committed rev1 file carries 2 notes, got {len(rows)}"
     for r in rows:
@@ -212,6 +238,26 @@ def test_feedback_adapter_reads_rev1_with_lifecycle_and_author() -> None:
         assert model.author == "chad.wilson"  # file-level author field
         assert model.base_anchor == model.anchor  # authored anchors, not derived
     assert {r["anchor"] for r in rows} == {"front-matter", "purpose-scope"}
+
+
+def test_feedback_adapter_reads_rev11_startup_review() -> None:
+    """The rev11 file — the review that moved provisioning out of Startup (Rev 12).
+
+    It carries the two rev1 notes forward alongside its own, which is deliberate: the
+    reviewer re-sent the whole sheet, and dropping the already-applied ones would leave
+    a reader chasing two of the notes they can see in the source.
+    """
+    rows = [
+        r
+        for r in DesignDocFeedbackAdapter(FEEDBACK_DIR).rows()
+        if r["doc_id"] == "drydocs-startup-refresh-runbook" and r["doc_rev"] == 11
+    ]
+    assert len(rows) == 3
+    assert {r["anchor"] for r in rows} == {"front-matter", "purpose-scope", "startup"}
+    for r in rows:
+        model = FeedbackNoteRow.model_validate(r)
+        assert model.status == "applied"  # all three resolved at Rev 12
+        assert model.author == "chad.wilson"
 
 
 def test_feedback_derived_anchor_degrades_to_base(tmp_path: Path) -> None:

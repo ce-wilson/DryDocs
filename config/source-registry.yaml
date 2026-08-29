@@ -19,9 +19,9 @@
 #                is not established public vocabulary — psgmgr is)
 #                {system}:{artifact}             born-here datasets
 #   Derived stores keep the @ grammar + `derived: true`; `authority` is
-#   omitted there (Q3 — not SOR/ADS; FCDO SOC = upstream capture, doesn't fit).
+#   omitted there (Q3 — not SOR/ADS; CDO SOC = upstream capture, doesn't fit).
 #
-# AUTHORITY (FCDO vocabulary as a FIELD): SOR = originating source for this
+# AUTHORITY (CDO vocabulary as a FIELD): SOR = originating source for this
 # set of data; ADS = approved copy/redistribution carrier. Attaches to the
 # DATASET, never the system (their own definition is per-data-subset).
 #
@@ -348,6 +348,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [folders]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -369,6 +370,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [jobs]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -392,6 +394,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [conditions, dependencies]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -414,6 +417,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [conditions]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -455,6 +459,7 @@ datasets:
     authority: ADS
     feeds_taxonomy: [hosts]
     adapter: oracle
+    cadence: batch                 # G79: how OFTEN it refreshes -- moves with the Control-M estate, so every scheduled ingest wants it
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
@@ -592,6 +597,30 @@ datasets:
       feeds_taxonomy: []), so no graph data is affected by the discrepancy — the
       claim is what was wrong, and it is corrected here rather than left to be
       read as licence.
+      CENSUS RECORDED 2026-08-25 (relayed): read-only catalog census
+      (ALL_TAB_COLUMNS + row count) run against live psgmgr in an internal
+      session 2026-08-24 — conclusions transcribed producer-side, NO data values
+      read, and the database name stays out of the id per the signed N9 grammar
+      (J13 class 3: redact the db, publish schema.table). Real TABLE, 30
+      columns, 934,402 rows at census time. SHAPE: `EJOBNAME` VARCHAR2(64) NOT
+      NULL is the join key and it is JOB grain — which is the whole reason the
+      2026-08-17 correction above exists. Routing is three triads per dimension
+      (`E<dim>FAILED` / `E<dim>LS` / `E<dim>LR`) across WORKGROUP, SYSTEM,
+      COMPONENT (= SEAL), ITEM, MODULE, SEVERITY and PAGEOUT;
+      `ESPECIALINSTRUCTIONS` VARCHAR2(4000) is the field the
+      `email-dl-contact-point` gate names as a candidate authoritative source
+      for job→DL notification wiring, and that gate is NOT signed — its only
+      gate-log entry is a 2026-08-12 RECORD. Remaining columns: ELOB,
+      EAPPLICATION VARCHAR2(72), ENV NOT NULL, EUSER, EUPDATETIME, SCHEDULER
+      NOT NULL, CAPTURE_DATE.
+      WHY THE CENSUS LIVES HERE AND NOT IN THE COLUMN LEDGER, because the
+      question will be asked again: `config/source-mappings/psgmgr.yaml` is the
+      doc-08 disposition ledger and `tests/unit/test_source_mapping_drift.py`
+      requires EVERY ledger object to be exercised by at least one loader SQL.
+      This table has no loader by design (`confirmed: false`, `adapter: ~`), so
+      adding it there would break that guard — correctly. A census is a FACT and
+      records here; a column-disposition ledger is a set of DECISIONS about
+      where each column lands, and those are gate work, not transcription.
 
   # ---- Control-M born-here export --------------------------------------------
   - id: "controlm:deftable-xml-export"
@@ -685,6 +714,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [applications, ports, memberships, roles, employees]
     adapter: csv                        # CsvAdapter (samples) / internal extract in prod
+    cadence: weekly                 # G79: how OFTEN it refreshes -- business applications are not created daily (SME cadence argument, G79) -- the operational estate can be, and that is a different source
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
@@ -692,6 +722,7 @@ datasets:
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       mapping: config/source-mappings/seal-extract.yaml   # column ledger (S3; gate business-application-identity §B1(c))
+      report: "SEAL report data downloads"   # names the DOWNLOAD PAGE rather than one export — the SEAL side publishes a set, not a single named report. Recorded as-published so loader -> source -> report still resolves; correct it if the page ever names one export
     confirmed: true                     # live since the M1 chain; transfers per Q6
     replaces: seal-extract
     notes: >
@@ -712,6 +743,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [lob, product_lines, products, area_products, dev_teams]
     adapter: csv
+    cadence: weekly                 # G79: how OFTEN it refreshes -- the M1 reference rhythm the chain's own comment and the command help have always stated -- the catalog hierarchy is not re-cut daily
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
@@ -719,6 +751,7 @@ datasets:
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       extract: ~                        # real report path/export coordinates — internal/ twin only
+      report: "Product Catalog People Report"   # the report NAME as published on the download page. Names are mechanism (Internal-Public); the URL is a connection coordinate and stays in the internal twin (N7)
     confirmed: true                     # catalog-hierarchy gates (SME 2026-06-21 rulings; C9 2026-07-18) — transfers per Q6
     replaces: catalog-pat
     notes: >
@@ -745,13 +778,15 @@ datasets:
     authority: SOR
     feeds_taxonomy: [team_applications]
     adapter: csv
+    cadence: weekly                 # G79: how OFTEN it refreshes -- same reference rhythm as its sibling catalog feed: the team report is re-issued on a slow cycle, not with the batch estate
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: csv
       drop_dir: pat/
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
-      mapping: config/source-mappings/pat-team-report.yaml   # G82 (2026-08-21): authored from what drydocs/pat_projection.py reads; header spellings pinned at the first real run — REAL rows never committed here
+      mapping: config/source-mappings/pat-team-report.yaml   # G82 (2026-08-21): authored from what drydocs/pat_projection.py reads; census CLOSED 2026-08-29 against the live 43-column export — REAL rows never committed here
+      report: "Team Details Report"     # export file name TEAM_DETAILS_REPORT. NOTE THE MISMATCH the id cannot express: this row is the TEAM report, while the report actually named "...People Report" is pat:product-catalog's. The two ids read crossed — a NAMING defect, gate territory (D1, gate manual-download-provenance), deliberately NOT renamed here
     confirmed: true                     # C9 gate (2026-07-18): the PAT team report as the team_applications feed — transfers per Q6
     replaces: catalog-pat
     notes: >
@@ -807,6 +842,7 @@ datasets:
     authority: SOR
     feeds_taxonomy: [vendors, software_products]
     adapter: yaml                       # RegistryYamlAdapter (flattens vendors/products)
+    cadence: repo-change                 # G79: how OFTEN it refreshes -- read from config/taxonomy/software-registry.yaml, so it changes when the REPO changes and not when any data source does
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: ascii
@@ -888,7 +924,9 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: archive
-      drop_dir: rua/
+      drop_dir: rua/incoming/   # G81: was the over-broad `rua/`, which CONTAINED the
+                               # rua/extracted/ write zone (an unpack overwrites there).
+                               # Narrowed to what data_root.py's docstring has said since G19.
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # rua_*.tar.gz — `archive` added to the enum for exactly this row; the tsv/text lives INSIDE the envelope
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — clauses a–g all ruled. Authority to load, NOT a loader: the curated build is G23 and adapter stays ~
@@ -913,7 +951,9 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: dpl/
+      drop_dir: dpl-registry/  # G81: was `dpl/`, which NEVER matched dpl_registry_dir()'s
+                               # `dpl-registry/` — so a drop that followed the registry was
+                               # never read. Corrected to the path the G25 flow actually uses.
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # manual TODAY: hand-exported Swagger json per SEAL. Flips automated/api when a pull is built — the N13 flip, recorded not ruled
     confirmed: true                     # gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28) — §G ruled clause (f) GUID-vs-URN, §H ruled clause (g) three-signal usage. Field contract still ASSUMED (T13): the envelope entry is a ruled stub
@@ -938,7 +978,9 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: manual
       format: json
-      drop_dir: dpl/
+      drop_dir: dpl-registry/  # G81: was `dpl/`, which NEVER matched dpl_registry_dir()'s
+                               # `dpl-registry/` — so a drop that followed the registry was
+                               # never read. Corrected to the path the G25 flow actually uses.
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # manual TODAY — same as its sibling; flips automated/api with the N13 flip
     confirmed: true                     # same activation condition as dpl:pipeline-registry — gate rua-load-shapes SIGNED OFF 2026-08-07 (G22, 28/28)
@@ -1057,7 +1099,7 @@ datasets:
     artifact_kind: table
     taxonomy_category: Software / Apps
     asset_type: dcat:Dataset
-    derived: true                       # Q3 ruling: derived store — @ grammar for visibility, authority omitted (not SOR/ADS; FCDO SOC checked, doesn't fit)
+    derived: true                       # Q3 ruling: derived store — @ grammar for visibility, authority omitted (not SOR/ADS; CDO SOC checked, doesn't fit)
     feeds_taxonomy: [applications]      # semantic facts attribute a ControlMJob to an Application (SEAL)
     adapter: oracle
     acquisition:                        # N12 (2026-08-18): how the data arrives
@@ -1159,7 +1201,9 @@ retired:
     replaced_by: ["repo:design-docs"]
     reason: "born-here grammar (pipeline-side only per Q5)"
   # NOTE — bmc-docs / neo4j-docs-essential-graphrag (formerly essential-graphrag,
-# renamed 2026-08-18 in its one home) / fcdo-frameworks are NOT retired:
+# renamed 2026-08-18 in its one home) / cdo-frameworks (renamed 2026-08-26
+# in its one home — org-acronym sanitization; mapping in
+# internal/cdo-reference/README.md) are NOT retired here:
   # those ids stay LIVE in their one home (config/doc-source-registry.yaml);
   # only the pipeline twin rows dropped. The runtime registry unions the doc
   # ledger, so loaders bound to them still resolve and gate.

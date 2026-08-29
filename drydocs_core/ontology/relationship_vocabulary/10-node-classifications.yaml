@@ -54,8 +54,8 @@ node_classifications:
     prov_type:  Activity
     note: >
       One actual execution of a ControlMJob, from the Control-M history API.
-      FCDO alignment registered PLANNED (W2 2026-08-05; crosswalk
-      config/crosswalks/fcdo-vocabulary.yaml row 2): when this label builds,
+      CDO alignment registered PLANNED (W2 2026-08-05; crosswalk
+      config/crosswalks/cdo-vocabulary.yaml row 2): when this label builds,
       its properties adopt the OpenLineage-as-PROV Run semantics — run UUID,
       nominalTime (the scheduled time), parent run/job link, errorMessage —
       with START/COMPLETE/FAIL/ABORT as the run-event value set; the same
@@ -141,6 +141,26 @@ node_classifications:
       (ControlMJob.group_name) is the application-group concept — a different
       thing entirely; "host group" is the 9.0.x vendor term.
 
+  - label:      ControlMUtility
+    class:      "dd:ControlMUtility"
+    prov_type:  Entity
+    note: >
+      CONFIRMED (gate vendor-docs-entity-core §A, drafted 2026-08-22 at Q14 —
+      SIGNED OFF 2026-08-22 21/21; stays planned until its build lands). A Control-M command-line utility the vendor
+      documents by exact name (exportdefjob, ctmorder, the emdef family) —
+      the name-addressable entry point of the vendor-docs entity core, minted
+      deterministically from the bmc-docs-controlm-utilities page titles,
+      never by an LLM. prov:Entity: jobs USE it (scheduler_invokes_utility,
+      Activity -> Entity = prov:used); documents DESCRIBE it
+      (docs_describes_utility). Uniqueness key: name (the vendor-canonical
+      string); carries family + kind where the title rule derives them,
+      unclassified counts reported. Vendor-prefixed label per ADR 0003/0008
+      (the ControlMJob/ControlMFolder/ControlMServer family). Deliberately NOT
+      a :SoftwareProduct row — the registry classifies what a vendor SHIPS as
+      a governed, hand-curated product entry; the gate §A2 lays that
+      alternative out for explicit rejection. Bridge to the product:
+      docs_utility_part_of (PART_OF -> SoftwareProduct {controlm}).
+
   - label:      DataSource
     class:      "dcat:Dataset"
     prov_type:  Entity
@@ -203,6 +223,29 @@ node_classifications:
       deepdoc-data-flow-overview.md §2.
 
   # — SEAL (active) —
+  - label:      DeploymentModule
+    class:      "dd:DeploymentModule"
+    prov_type:  Entity
+    note: >
+      PROPOSED (K22, 2026-08-26; rider G0d-RIDER on gate
+      tom-roles-enumeration-and-cardinality — routed via the gate, not a gate of
+      its own, because nothing here changes an attribution subject). The
+      ServiceNow Deployment Module CI class: one application, many deployments
+      (SME-confirmed; roughly 20-60 per shared function), 'deployment' and
+      'module' are ONE thing in this estate. THE BUSINESS KEY IS THE CI's OWN
+      UNIQUE ID — app_id(seal_id):deployment_id is a human-readable NAME, and a
+      loader keying on a bare deployment_id MERGEs distinct deployments
+      together (the identity gate's D2/C3 failure on a new axis). OUR OWN
+      STABLE NAME on C10's standing advice, proven twice on this instance: the
+      vendor's class label moved (Application Service -> Service Instance at
+      Yokohama) and the instance's inverse label differs from the public
+      material's. The CI is REAL (own id, own place in the chain, KB articles
+      attached) — the form-default finding applies to TRANSACTIONAL records
+      referencing it, so the grain is sound and only transaction-counting per
+      module is not. Attribution does NOT move here: :BusinessApplication stays
+      the subject. NOTHING LOADS until the rider is ruled; no supplement term,
+      no constraint, no loader.
+
   - label:      BusinessApplication
     class:      "prov:Entity"
     dual_class: "dprod:DataProduct"
@@ -220,7 +263,24 @@ node_classifications:
   - label:      Employee
     class:      "prov:Agent"
     prov_type:  Agent
-    note:       "Person holding a role membership. seal_ontology_supplement.cypher."
+    note: >
+      Person holding a role membership. seal_ontology_supplement.cypher.
+      CREATION POLICY (G74 clause 2; SME direction 2026-08-18, gate-log RECORD
+      same date): STUB-AND-ENRICH. Any loader that meets a SID may MERGE the
+      :Employee stub (seal_applications.cypher mints owner/CTO/info-owner
+      stubs ON CREATE SET source='SEAL'; pat_team_roles likewise with 'pat') —
+      the roster load MERGEs on the SAME key and flips source to 'HR'
+      (authoritative), so a stub is upgraded in place and never duplicated.
+      THE STUB MARKER IS `source` AND NOTHING ELSE IS MINTED (G74's
+      producer-side ruling): a non-'HR' source value IS "awaiting
+      enrichment", and the count of such survivors after a roster load is the
+      HR-coverage report — a second awaiting-enrichment property would be a
+      parallel record of the same fact, the drift seam this registry exists
+      to close. The company-side halves (the backbone-and-enrich runbook
+      prose that FORBIDS the stub, v2 + published v3, and the reconciling
+      roster loader) are harmonized THROUGH THE PORT, not from here — the
+      producer cannot fix a doc it does not hold. Hierarchy placement is
+      human_employee_reports_to in 52-local-human.yaml (planned).
 
   - label:      Membership
     class:      "org:Membership"
@@ -277,9 +337,8 @@ node_classifications:
     prov_type:  n/a
     note: >
       ACTIVE (K4, 2026-07-15): SEAL Technical Operating Model role vocabulary — skos:Concept
-      in scheme tom_roles (SkosConceptScheme), the gate §B REVISED fixed 7: application_owner,
-      primary_information_owner, backup_information_owner, cto, technology_risk_controls,
-      design_authority, operate_manager (L1/L2 = Attribution property). cto is NOT shared
+      in scheme tom_roles (SkosConceptScheme). Since G70 (2026-08-11 gate, applied 2026-08-26)
+      the DECLARED vocabulary config/taxonomy/tom-role-vocabulary.yaml (G70, gate tom-roles-enumeration-and-cardinality §F3, signed 2026-08-11): 16 classes — the §G register's 7 REQUIRED (application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner) + 9 optional incl. the §G9 Operate Manager split (operate_manager_l1 | operate_manager_l2 | operate_manager — three classes; the level property retired) and both SRE rows (derived). cto is NOT shared
       with the K5 ProductRole scheme — the K5 gate (signed off 2026-07-20) decided the two
       families are INDEPENDENT, superseding the 2026-07-10 §B "CTO in both families" record
       (rename history in the gate log: the area-product Tech Partner was formerly named
@@ -349,8 +408,10 @@ node_classifications:
       ACTIVE (K6, 2026-07-20; gate product-cabinet-attribution signed off same day) —
       Product Cabinet role vocabulary, skos:Concept in scheme product_roles; EXACTLY the
       fixed 7 (area_product_owner, product_owner, product_architect, tech_partner,
-      data_owner, data_certifier, analytics_lead), scheme FIXED (the tom_roles precedent —
-      new roles require a new gate). NO cto member: the two role families are INDEPENDENT
+      data_owner, data_certifier, analytics_lead), scheme FIXED on its OWN ruling —
+      new roles require a new gate. (This row once cited "the tom_roles precedent"; tom_roles
+      moved to a DECLARED vocabulary at G70, which does not reopen K5 — product_roles stays
+      fixed because ITS gate ruled it so.) NO cto member: the two role families are INDEPENDENT
       (SME 2026-07-20 — the shared-cto concept from the 2026-07-10 gate §B record is
       dropped for now; SEAL's cto stays a TOM role attributed to :BusinessApplication).
       Rename history, carried as a skos:changeNote on the tech_partner concept: in PAT the
@@ -374,7 +435,7 @@ node_classifications:
     note: >
       PLANNED (C26, 2026-08-21): the Sub-LoB tier between a line of business and its
       product lines — a real, id-keyed grain at source (SME 2026-08-01: LoB, Sub-LoB,
-      Product Line, Product and Area Product EACH carry a numeric id; FCDO capture
+      Product Line, Product and Area Product EACH carry a numeric id; CDO capture
       "5-level hierarchy, native IDs at each level") that the producer does not model.
       The COMPANY already builds it as `:SubLOB {sub_lob_id}` ("only CIB and AWM have
       them"); the label is reserved here under the producer's Catalog* convention so
@@ -384,6 +445,19 @@ node_classifications:
       CatalogLOB -[:HAS_SUB_LOB]-> CatalogSubLOB (catalog_has_sub_lob, planned) and
       CatalogSubLOB -[:HAS_PRODUCT_LINE]-> ProductLine (catalog_sub_lob_has_product_line,
       planned). Divergence ledger: .claude/skills/reconcile-port/SKILL.md.
+
+  - label:      OrgChangeEvent
+    class:      "org:ChangeEvent"
+    prov_type:  Activity
+    note: >
+      PLANNED (C28, 2026-08-25) — reservation only; the gate may decline it
+      (business-layer-org-structure §B2, the one-fact-three-encodings cost).
+      Reifies an organizational change (the 2Q2024 segment merge is the worked
+      example) as an addressable, dated node with ORIGINAL_ORGANIZATION /
+      RESULTING_ORGANIZATION edges. prov_type Activity per the W3C ORG spec's own
+      PROV alignment (a change event is something that HAPPENS to organizations,
+      not an agent). G98's signed two-edge-type shape already carries the fact;
+      this class exists only if the SME rules the event itself worth addressing.
 
   - label:      Company
     class:      "org:FormalOrganization"
@@ -426,7 +500,7 @@ node_classifications:
       A ServiceNow assignment group — the ITSM support unit technicians belong to.
       Same class as :DevTeam: both are organizational units that hold people in
       roles, and modelling them alike is what lets one :Employee carry PAT, SEAL
-      and ITSM roles off one spine. Registered at G100 (2026-08-18) with the
+      and ITSM roles off one backbone. Registered at G100 (2026-08-18) with the
       staffing edges, never an edge whose node class is unclassified (the
       ControlMApplication lesson, 2026-07-09).
       SOURCED OOTB: ServiceNow ships the group in sys_user_group, its membership in
@@ -594,6 +668,12 @@ node_classifications:
       from :Chunk (ingested/H2-chunked) per the managed-vs-ingested boundary. DocSection
       is the shared target of both traceability (Requirement -[:SPECIFIED_IN]->) and
       review feedback (FeedbackNote -[:ANNOTATES]->).
+      SECOND USE (gate vendor-docs-entity-core §E2, drafted 2026-08-22 at
+      Q14, SIGNED OFF 2026-08-22): the vendor-docs TOC tree — Q13's loader writes
+      :DocSection nodes from the publisher's toc.json (capture-scoped
+      section_id, docs_in_section / docs_subsection_of, both planned). Same
+      single-classification discipline as :Document's dedupe (2026-07-09):
+      one label, the second use recorded here; §E2 signed 2026-08-22 — loads at Q24.
 
   - label:      Requirement
     class:      "dd:Requirement"
@@ -738,7 +818,7 @@ node_classifications:
     note: >
       RULED at gate server-location-ontology §A1 (SIGNED 2026-08-19): a PHYSICAL/VIRTUAL server from
       the infrastructure site's per-application export (infra:server-export) —
-      the INVENTORY spine. Deliberately distinct from THREE near-neighbors, and
+      the INVENTORY backbone. Deliberately distinct from THREE near-neighbors, and
       the distinctions are the point: (1) ExecutionHost is Control-M's VIEW of
       a host (prov:SoftwareAgent, keyed on nodeid; may be an LB alias) — the
       two join ONLY via infra_resolves_to_server's evidence-carrying edge,

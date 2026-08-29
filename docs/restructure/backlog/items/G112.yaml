@@ -1,0 +1,42 @@
+id: G112
+epic: component-topology
+title: The artifact pass still reads raw values and counts resolvable URIs as unresolved — run the G92
+  scope chain through it, and record the invocation half as a gate question rather than letting it drift
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/controlm_inventory.py
+- tests/unit/test_lineage_inventory.py
+acceptance: |
+  (a) THE WIDENING. `_artifact_pass` skips any ETL artifact URI whose value still holds an unresolved variable reference and increments `artifact_values_unresolved`. G92 built a resolved scope chain per job (`_build_scope_chains`) and a single core-resolver call site (`_resolve_shell`) two methods away. The artifact pass runs its value through that same resolver before deciding, so a URI resolvable from the job's own scope mints its node instead of being counted as a gap.
+
+  (b) THE NUMBER MOVES AND THE MOVE IS SHOWN. `artifact_values_unresolved` falls on the bundled samples and the drop is stated as a before/after pair in the close note, not asserted qualitatively. A widening that changes no count on the fixtures means the fixtures do not exercise it — add a case that does rather than declaring the item done.
+
+  (c) THE COUNTERS STAY WHERE THEY ARE. The resolve counters (`resolve_resolved`, residue, unresolved, nothing-to-substitute, `resolve_no_scope_chain`) already ride the `ExtractCoverage` summary line, so the yield of the widening lands beside the file-op counters with no new reporting surface. Do not mint a parallel counter family for the artifact pass.
+
+  (d) INVOCATION TARGETS ARE OUT OF SCOPE, DELIBERATELY AND IN WRITING. The CMD_LINE pass still parses the VERBATIM command for invocations, and this item does not change that. Invocation identity is env-stabilised by `_stable_invocation_key` (the DPL pipeline GUID, the Ab Initio basename), and re-keying it on resolved text would move a signed ruling (gate cmdline-lineage-review, 2026-07-16). If it is ever revisited it goes back through the HITL gate; the item is complete when a comment at the CMD_LINE pass says that, so the next reader meets a decision instead of an inconsistency.
+notes: |
+  Groomed 2026-08-26 from Idea-176. The entry is explicit that this was left out of G92 on purpose: G92's acceptance named file-op operands and its counters are file-op counters, so widening it there would have silently changed the numbers G97 established in the same commit. That reasoning is why this is a separate item rather than a G92 amendment.
+
+  Clause (d) is the hard rule doing its work — the invocation half touches edge identity under a signed gate ruling, so it is recorded as a gate question and NOT groomed into the build.
+
+  p2/sonnet: the acceptance names the call site, the counter and the evidence, and the mechanism already exists one method away.
+  CLOSED 2026-08-28 (desktop, advisor-dispatch build; merged --no-ff from a worktree branch).
+  _artifact_pass now runs each ETL artifact value through the G92 scope-chain resolver
+  (_resolve_shell, the single core-resolver call site) before the unresolved check, so a
+  URI the job's own folder/job scope can bind mints its node instead of counting into
+  artifact_values_unresolved. Evidence per clause (b): on the fixture exercising the
+  widening, artifact_values_unresolved 1 -> 0 and payloads_classified 0 -> 1; the
+  genuinely-unresolvable case still counts 1. No new counter family (clause c) -- the
+  yield rides the existing resolve_* counters on ExtractCoverage. Clause (d) is in
+  writing at the CMD_LINE call site: parse_command stays on the VERBATIM command and
+  _stable_invocation_key stays env-stable; re-keying on resolved text would move the
+  signed cmdline-lineage-review gate (2026-07-16) and goes back through HITL if ever
+  revisited. The evidence property keeps the raw spelling beside the resolved fact.
+  writer.py untouched (G113 owned it concurrently).

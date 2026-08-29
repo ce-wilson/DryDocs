@@ -58,7 +58,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # Classified load, not review: the item chose drydocs-load because the verb sits
     # beside m1-verify/m3-verify and must work BEFORE the docmeta component exists
     # (Q6). RE-HOME it to docmeta if that component takes over corpus state.
-    # drydocs.seal_samples = generates the two SEAL fixtures REFRESH_REFERENCE_CHAIN
+    # drydocs.seal_samples = generates the two SEAL fixtures the business-application chain
     # declares (drydocs/data/ is gitignored, so they are built per machine, never
     # committed). Load, same bucket as staging: it produces loader INPUT and its
     # output filenames are the chain's own constants.
@@ -76,13 +76,18 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.cli_variables",
         "drydocs.cli_docs",
         "drydocs.cli_plan",
+        # S13 (2026-08-27): the hoisted shared state the command modules and the
+        # root both import (DAG: commands <- cli_shared -> nothing; root imports
+        # both). Load like its consumers; NOT an entrypoint — it imports only
+        # this component and core, and the root keeps the only wiring exemption.
+        "drydocs.cli_shared",
         "drydocs.snapshots",
         "drydocs.staging",
         "drydocs.cmdline_staging",
         "drydocs.docs_verify",
         "drydocs.seal_samples",
         # drydocs.pat_projection = projects the raw PAT team report into the two
-        # files REFRESH_REFERENCE_CHAIN reads (G82). Load, same bucket and same
+        # files the team chain reads (G82). Load, same bucket and same
         # reason as seal_samples: loader INPUT, output filenames are the chain's.
         "drydocs.pat_projection",
         # drydocs.chain_inputs = the G78 chain-input resolver (fixture dir or declared
@@ -120,6 +125,10 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.gate_pages",
         "drydocs.publishing",
         "drydocs.fid_census",
+        # drydocs.run_as_detect = K25, fid_census's sibling: the cross-application
+        # run_as detection the K17 gate's §G numbers come from. Same reasoning,
+        # same stdlib-only porting discipline.
+        "drydocs.run_as_detect",
     ),
     # drydocs-plan — backlog.yaml -> HTML project board renderer (Epic I).
     # plan_roadmap belongs HERE (unlike plan_ideas, below): it renders no
@@ -136,7 +145,7 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # nothing else" note was protecting still holds: the guards run without a
     # repository, and now the checks run against the CALLER's checkout rather than
     # certifying the main tree from inside a worktree.
-    "port": ("drydocs.port_preflight",),
+    "port": ("drydocs.port_preflight", "drydocs.port_backlog_union"),
     # drydocs-docgen — canonical doc-outline validation + deterministic render + HITL
     # markup (Epic L). Imports only stdlib + config; never a component.
     #

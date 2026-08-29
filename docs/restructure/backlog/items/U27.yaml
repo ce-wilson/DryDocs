@@ -1,8 +1,7 @@
 id: U27
 epic: self-documentation
-title: The snapshot CI verdict asks GitHub about main and matches the LOCAL head against it, so from
-  any branch it degrades to no-run-yet forever — query the current branch, and give the verdict the tests
-  its own design note says it should have
+title: 'snapshot.ps1''s CI check asks `gh run list --branch main`, so from any branch HEAD can never
+  appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests'
 type: bug
 module: graph-infra
 phase: 16
@@ -13,23 +12,23 @@ status: todo
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
-- tests/unit/test_probe_instrument.py
+- tests/unit/test_depgraph_snapshots.py
 - knowledge/depgraph-snapshots/README.md
 acceptance: |
-  The session ritual's CI check reports the truth from a branch as well as from main, and the function that decides the verdict is tested.
+  (a) THE BRANCH PIN: the caller asks CI about the branch it is actually on — `git rev-parse --abbrev-ref HEAD` in place of the literal `main` (line 166 at this groom: `gh run list --branch main --limit 10 --json ...`). Today the script fetches main's ten newest runs and matches the LOCAL HEAD sha against them, so from a worktree, an epic slice, an agent fork or any `feat/` branch — exactly the sessions CLAUDE.md tells you to branch for — HEAD is never in the answer and every run takes the yellow "no run yet for HEAD" path until merge. The worked example is the branch this was filed from: CI was GREEN on `feat/ui-workstream` and invisible to a query pinned to `main`. A detached HEAD degrades to something honest (a named skip), never a crash.
 
-  (a) THE VERDICT QUERIES THE BRANCH IT IS ON. The caller runs gh run list with the literal main and then matches the local HEAD against the result, so from any branch — which is what CLAUDE.md instructs for worktree, epic-slice and agent work — HEAD can never appear and the check sits permanently on the yellow no-run-yet path. The branch is resolved at run time (git rev-parse --abbrev-ref HEAD) and passed to gh. The worked example is the branch this was filed from: CI was green on feat/ui-workstream and invisible to a query pinned to main.
+  (b) FIVE FIXTURES FOR `Get-CiVerdict`, which its own design comment already claims is "a pure function of (runs, head) so every branch is exercisable without a network" and which has NO tests: green-at-head, failed-at-head-with-an-older-success-in-the-list, in-progress-at-head, no-run-yet-for-head, and EMPTY runs. The empty case is the one that would have caught the 2026-08-20 false GREEN.
 
-  (b) A DETACHED OR UNPUSHED HEAD STILL SAYS SOMETHING HONEST. When the resolved ref is not a branch GitHub knows, the check reports that in words rather than silently reusing main's runs — the whole failure being fixed here is a check that looks fine while answering about somebody else's commits.
+  (c) THE TESTS MUST NOT BREAK CI: there is no Pester in this repo and the CI runner's PowerShell availability is not established, so the check SKIPS CLEANLY where no PowerShell is present, with a message naming what is missing (the U26 precedent for `test_probe_instrument.py`'s skip). The mechanism is the implementer's — pytest invoking pwsh with the function dot-sourced, or extracting the verdict so it can be driven directly — the five named cases are the acceptance, not the harness.
 
-  (c) THE VERDICT GETS TESTS, and this clause is why the first defect shipped at all. Get-CiVerdict is a pure function of (runs, head) by its own design note and has none. Fixtures cover green-at-head, failed-at-head-with-an-older-success, in-progress, no-run-yet, and EMPTY. The empty case is named explicitly because it is the one that would have caught the original defect.
+  (d) WARN-ONLY IS UNCHANGED (U24 clause d): this reports, it never blocks the snapshot.
 
-  (d) THE ALREADY-FIXED HALF IS NOT RE-DONE. The runs-array enumeration defect (mine[0] being the whole ten-run array, so any recent success read as success) was fixed on main by 22b8ad7 and properly by 5c0308e; the PS 5.1 trap is written down at the line. This item does not revisit it.
-
-  (e) WARN-ONLY, STILL. The check never blocks the snapshot write. Recording repo structure and passing a lint gate are unrelated jobs; the failure being fixed is nobody looking.
-
-  Verified from both venues and both stated: one run from the main checkout and one from a worktree on a branch with a real run, each printing a verdict that matches what gh run list shows for that branch. Ruff clean, poetry run pytest -q green.
+  (e) VERIFIED BY RE-RUN, NOT BY READING, with the venue named (J18): one snapshot run FROM A BRANCH whose printed verdict line is quoted in the close note, plus one from the main checkout.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-156 (2026-08-21, prio proposed Med), which was re-filed from the branch's own Idea-152 after both 151 and 152 were taken on main by unrelated entries.
+  Groomed 2026-08-22 (laptop) from Idea-156. That entry was filed on `feat/ui-workstream` as that branch's Idea-152 and re-filed at 156 on main, because 151 and 152 were both taken there by unrelated entries while the branch sat unmerged — the allocator-band hazard playing out inside one side.
 
-  Module graph-infra / epic self-documentation / phase 16 follows U15, U24, U25 and U26 — the snapshot instrument's items all live there. Sibling of U26 in the same script: that one lost the JSON write from a worktree, this one mis-reports the step before it. Mechanism only, no gate.
+  HALF OF THE ORIGINAL REPORT IS ALREADY FIXED AND IS NOT THIS ITEM. Recorded here only so it is not re-done: defect (1) — `Get-CiVerdict` never enumerating the runs array, so `$mine[0]` was the whole ten-run array and `conclusion -eq "success"` was truthy if ANY recent run passed — landed at 22b8ad7 and properly at 5c0308e / U24, which pins one run object and reads `status` and `conclusion` as scalar strings, with the PS 5.1 ConvertFrom-Json trap written down at the line.
+
+  Module graph-infra / phase 16 / epic self-documentation by the U7, U12, U15, U24, U25 and U26 precedent — every snapshot.ps1 item in this backlog lands there. Sibling of U26 (done) in the same script: that one lost the JSON write from a worktree, this one mis-reports the step immediately before it, and both are invisible from the main checkout. Mechanism only, no gate.
+
+  p2 rather than p3 because the check exists precisely to stop a repeat of Idea-111 (CI red for 100+ consecutive runs while sessions pushed past it), and a check that structurally cannot see branch work is the same failure with a green-looking wrapper.

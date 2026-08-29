@@ -51,7 +51,22 @@ the accumulated lessons from prior ports. Read both.
      avoids re-deriving the skip guards — see ledger note).
    - **Collisions** → hand-merge per the ledger below.
 4. **Validate Track-1** (the contract — needs no data file).
-5. **Don't push.** Write a port report (template below) and stop.
+5. **CHECK THE BACKLOG UNION (J42).** The manifest's row for
+   `docs/restructure/backlog/items/*.yaml` promises *"never drop a file"*, and until
+   J42 nothing compared the two id sets — every backlog guard reads ONE copy, so a
+   port that quietly under-delivered items left both sides internally consistent and
+   green. Run it AFTER the apply, from this repo, naming the same port-base tag you
+   ported from:
+   `poetry run python scripts/port_backlog_union.py --producer-ref port-base-YYYYMMDD`
+   Exit 0 = the union holds (any ruled omissions print WITH their reasons). Exit 1 =
+   the port dropped items and the run names every id — restore each file from the
+   base, or record it in `drydocs.port_backlog_union.UNION_EXCLUSIONS` with the
+   reason it stays behind. Exit 2 = a side could not be read, which is a FAILURE and
+   never "no difference": the tombstone `docs/restructure/backlog.yaml` has no
+   `items` key, so a check aimed there would compare two empty sets and pass for
+   being wrong. Paste the printed block into the port report. This covers the UNION
+   half only — the status-regression half is the J16 before/after guard above.
+6. **Don't push.** Write a port report (template below) and stop.
 
 ## Encoding trap (company send-back, PORT-REPORT-ae21ee4, 2026-08-10)
 
@@ -81,6 +96,63 @@ already richer (prior ports skipped `3bc7adb`, `0eb98a5`, `6c5b7b5`, `0063f07`)
 stay skipped — confirm with the operator if a new one appears.
 
 ## Divergence ledger (company is ahead — keep company)
+
+- **`drydocs/cli.py` + the `cli_*` submodules — the company tree carries BOTH
+  CLI generations AT ONCE (found 2026-08-27, company worktree session):** the
+  ported split modules (their `cli_docs.py` holds the producer
+  `load_doc_traceability`) ALONGSIDE the pre-split monolith (their `cli.py`
+  still defines an inline one) — duplicate command paths, not a simple
+  behind/ahead. Company-measured shape: their root 3,584 lines / 61 inline
+  `@app.command` vs producer 1,201 / 4 + submodules. The pair already bit
+  once as a PARTIAL ATOM: `cli_docs.py` crossed without its
+  `DOC_TRACEABILITY_CHAIN` dependency (producer `cli.py:364`), producing
+  their 58-red baseline; their session resolved it minimally,
+  company-authored, after MEASURING rather than taking the producer copy —
+  a producer sentence recommending the wholesale take was wrong and is the
+  incident behind profiling-sync-packet.md §6. NEITHER side's copy is
+  wholesale-takeable; de-duplicating onto the split is the company's own
+  reconcile session. TRIGGER: their SME review status citing the
+  constant-fix commit retires the partial-atom half; the
+  duplicate-generations half retires only when a company reconcile session
+  closes the de-dup with its own commit cited.
+  UPDATE 2026-08-28: that reconcile session is IN PROGRESS company-side (the
+  S8-apply session; survey-only so far, tree untouched at survey close --
+  their census: 61 inline / 40 in modules / 32 in both, 18 substantively
+  drifted BOTH directions / 29 inline-only / 8 module-only). Two producer
+  rulings relayed for it: merge policy = UNION-never-drop, refined by the
+  feature-vs-superseded-mechanism test (their inline run-log tee is probably
+  the pre-G105 generation -- LoaderRunLog now lives in loaders/base.py --
+  verify by behavior before keeping); the 29 company-only verbs DISTRIBUTE
+  BY DOMAIN into the six shared modules (never a provenance-keyed seventh
+  file). A mid-stage company tree may show partially-reconciled cli_* files
+  at the next port -- read the stage commits; do not treat half-merged pairs
+  as fresh drift.
+- **`config/taxonomy/tom-role-vocabulary.yaml` — the register is company-RULED
+  (2026-08-26 G70 adoption session): Module Owner renamed, Capacity Planner
+  added, IRM flipped `required` — ruled against 232k-row report exports the
+  producer never sees.** Manifest row landed 2026-08-27 (per-entry, the
+  lob-product-team shape): company-ruled classes stay; producer mechanism and
+  producer-NEW classes cross; required/scope/active on EXISTING classes are
+  never merged or "synced" — each side's SME owns its register.
+- **`config/gate-log.md` two-tier doctrine (ruled at PORT-REPORT-e33f8d02):
+  producer DRAFTED stubs are NOT appended company-side** — producer
+  gate-drafting is captured by the landed gate-prompt files; the company log is
+  the company's audit. Do not count producer stubs as missing entries at the
+  union check, and never write producer stubs into the company log.
+- **`drydocs_remediation/detect.py` — divergent+deferred union pending
+  (e33f8d02):** company carries DPL detectors and lacks R41–R44; producer b26
+  dropped DPL and refactored. Neither side is taken wholesale — the
+  remediation-adoption session (dossier `adoption-1-remediation-dossier.md`,
+  hand-carried) does the union: keep `detect_dpl_findings`, add R41–R44.
+- **Ontology + lineage clusters — deferred whole at e33f8d02 (both the 20260825
+  and 20260826 increments), adoption path is the three hand-carried dossiers**
+  (remediation, then lineage, then ontology-behind-a-company-gate). The G70
+  slice began 2026-08-26 company-side (register reconciled, wiring built);
+  until an adoption report closes a cluster, its files stay at the
+  company-divergent state and are NOT re-taken by a later port.
+- **`drydocs/run_as_detect.py` per-line reconcile — ENDED 2026-08-27:** the
+  producer adopted ASCII `x` (`64ec0e7e`), so the RUF002/RUF003 divergence
+  e33f8d02 recorded dies at the next port; no per-line handling needed.
 
 - Verify command: company `m6-verify` vs producer `m3-verify`.
 - `EXPECTED_CONSTRAINTS`: company is ahead as a **superset** (base + snow-support
@@ -150,8 +222,42 @@ stay skipped — confirm with the operator if a new one appears.
   NAME on a missing fixture and `refresh-reference` has no fixture default at all
   (`--samples-dir` for fixtures, `--source <id>` for landing zones) — so a company port
   that keeps its single-underscore fixtures must either rename them or carry its own
-  `REFRESH_REFERENCE_CHAIN` fixture names; do not "fix" the divergence by loosening the
+  the subject chains' fixture names (`cli.CHAINS`; one `REFRESH_REFERENCE_CHAIN` tuple
+  before the G79 split); do not "fix" the divergence by loosening the
   resolver back to a skip.
+- **The six un-back-flowed company advances — ALL SIX DISPOSITIONED (J39, 2026-08-26).**
+  One reproduced, five ledgered with reason + trigger; none left undecided, nothing
+  touching edge meaning adopted outside a gate:
+  1. **controlm_folders.sql `J` table alias — REPRODUCED** (mechanism-only, the alias
+     rename H→J with a provenance comment in the file). The one advance whose whole
+     content was visible from the diff shape; the standing cosmetic divergence ends.
+  2. **snow-support schema pair (`hpsm_queue_key`/`sn_group_name`) + `snow-snowflake-itsm`
+     stub — LEDGERED, partially superseded.** G100 (2026-08-18) already brought
+     :ServiceNowGroup producer-side with the sys_user_group sourcing note; the constraint
+     pair and the source stub are the ITSM LOADER's to carry. TRIGGER: the snow loader
+     build after gate `snow-cmdb-ci-classes` (Q4) signs — adopting constraints for a
+     loader that does not exist is dead DDL.
+  3. **drydocs_remediation DPL watch-drift rule + tests — LEDGERED.** The rule's CONTENT
+     has never been seen producer-side (only its existence, via the J51 DPL-* id list);
+     reproducing a detector from its name manufactures semantics. TRIGGER: the
+     screenshot/describe channel or the drydocs-review back-flow epic delivering the rule
+     body; it then lands as an R-rule through detect.py's registry like R41-R44 did.
+  4. **graph_verify Assertion refactor — LEDGERED.** graph_verify.py itself is
+     company-only; the producer cannot refactor what it does not hold. TRIGGER: the
+     drydocs-review back-flow epic, which reproduces the whole toolkit — the refactor
+     rides in with it, never separately.
+  5. **docgen deviations vs the finalized company TDD — OVERTAKEN, closed.** Two things
+     ended it: the renderer converged through the L-epic fixes (the 2026-08-24
+     nested-fence fix regenerated every runbook render), and J43 (2026-08-26) ruled the
+     TDD renders `derived` — regenerated from the reconciled tree with the CURRENT
+     renderer, so a deviation list against a frozen render is a category that no longer
+     exists. Residue, if their regeneration ever shows semantic loss: that is a renderer
+     BUG filed as one, not a deviation to catalog.
+  6. **CONFLUENCE_BASE_URL config seam — LEDGERED.** The mechanism (base-URL as config,
+     value company-side) is right, but the producer has no confluence connector — the
+     doc-source-registry's cdo row says 'when the confluence connector runs' in its own
+     words. A config seam with no consumer is dead config. TRIGGER: the confluence
+     connector build in drydocs_docmeta/connectors/; the seam ships WITH it.
 - **PAT catalog ontology — company is AHEAD and the producer has ADOPTED NOTHING (C26,
   2026-08-21; adoption = C27, gated on the COMPANY catalog gate's own sign-off).** The
   company gate page `internal/org/catalog/_catalog_gate_page.html` (dated 2026-06-25, "SME
@@ -164,13 +270,24 @@ stay skipped — confirm with the operator if a new one appears.
      and the flattening is INVISIBLE: a sub-LoB id in `parent_lob_id` MERGEs a phantom LOB.
   2. **Range** — company widens `HAS_PRODUCT_LINE` to `(:SubLOB|:LOB) → ProductLine`; producer
      `catalog_has_product_line` is `CatalogLOB → ProductLine` only.
-  3. **Label** — company writes `:LOB {lob_id, name}`; producer writes `:CatalogLOB {lob_id,
-     code, name}` (`catalog_lobs.cypher`). Same thing, two labels — the fallback branch in
-     (1) and our loader cannot both be right.
-  4. **Map ids** — company page expects `sub-lob-org-unit` and `catalog-lob-reconciles-segment`;
-     producer has `lob-has-product-line` and `lob-reconciles-to-segment` (confirmed 2026-06-21).
-     Both company ids are now RESERVED `proposed` in `30-mappings-catalog.yaml` so a port
-     collides on a deliberate placeholder instead of silently adding a duplicate concept.
+  3. **Label — SETTLED, both levels, and NOT by C27.** LOB: the company's own **GATE
+     REVERSAL of 2026-08-06** (their `gate-log.md:1678`, port `drydocs-port-20260806`,
+     producer head `a14a8028`) retired the 2026-06-25 gate and adopted the full producer
+     model — `:LOB` -> `:CatalogLOB`, `code` reinstated, TC-CAT-003 retired. Both sides now
+     `MERGE (l:CatalogLOB {lob_id: ...})`. Sub-LoB: **RULED 2026-08-25 (SME, Option 1) —
+     `CatalogSubLOB`**; the company relabels its active `:SubLOB` build, the producer's
+     reserved label stands, the shared vocab id `catalog_has_sub_lob` is unchanged. Do NOT
+     re-open either as a divergence to preserve.
+  4. **Map ids — the C26 reservation named the WRONG ids and is retired.** It reserved
+     `sub-lob-org-unit` + `catalog-lob-reconciles-segment` off the 2026-06-25 page; the company
+     actually built `lob-has-sub-lob` + `sub-lob-has-product-line` and KEPT the producer's
+     `lob-reconciles-to-segment`. Both reservations moved to `rejected` with `superseded_by`
+     at the C27 ruling (2026-08-25) — a placeholder guarding a name nobody mints guards
+     nothing. The producer keeps `lob-has-product-line` / `lob-reconciles-to-segment`
+     (confirmed 2026-06-21); the company's two live in their own company-only fragment and
+     never arrive here. **The real reservation is a rule, not a row: the producer must not
+     mint `lob-has-sub-lob` or `sub-lob-has-product-line` for anything else** — the per-entry
+     merge is id-keyed, so that would land as one id with two meanings.
   5. **Capture grain** — company ingests the 5-field `pat_lob_sublob_productline.csv` (164
      rows, with a Sub-LoB Name column); producer `config/taxonomy/lob-product-team.yaml`
      has no Sub-LoB column at all.
@@ -277,8 +394,8 @@ present. For a fresh `psgmgr` pull:
   alias). In that config a plain `--use-oracle` run uses OCI and WILL hit the
   real Kerberos SPN errors (ORA-12514 / ORA-12638) — that is a DBA / SPN /
   tnsnames issue, NOT a code toggle. Thin mode is only an option if you can set
-  `ORACLE_KERBEROS=False` AND supply a real `host:port/service` DSN (a TNS alias
-  like `SPIDERP` resolves only via tnsnames and won't work thin).
+  `ORACLE_KERBEROS=False` AND supply a real `host:port/service` DSN (a bare TNS
+  alias resolves only via tnsnames and won't work thin).
 - Scope binds are **connection-mode agnostic** (NULL-tolerant SQL predicates —
   they work the same under thick/Kerberos once the SQL is ported): `--folder`
   (SCHED_TABLE LIKE), `--run-as` (tenant FID = `OWNER`), `--developer-sid`
@@ -303,6 +420,7 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
+- Backlog union (J42): <paste the scripts/port_backlog_union.py block — producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>

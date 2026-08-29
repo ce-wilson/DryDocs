@@ -140,8 +140,12 @@ DIVERGENCE_EDGE_CORPUS_UNKNOWN = "edge-corpus-unidentifiable"
 DIVERGENCE_RESIDENT_OFF_DECLARATION = "resident-off-declaration"
 
 #: The bucket a DESCRIBES edge lands in when the graph cannot say which corpus
-#: produced it. A REAL, EXPECTED state: `bmc_docs.cypher` writes no `corpus_id`
-#: (its locator is `path_prefix`), so those documents genuinely carry no corpus.
+#: produced it. Since Q26 this is UNREACHABLE for a freshly loaded corpus —
+#: `bmc_docs.cypher` and `essential_graphrag.cypher` both stamp `corpus_id`
+#: now — but the constant STAYS: a graph loaded before Q26 on the OTHER
+#: machine still carries unstamped documents until its own reload runs (the
+#: two machines' graphs are independent, J18), and a future loader that
+#: forgets the stamp should land here visibly rather than vanish.
 EDGE_CORPUS_UNKNOWN = "(no corpus_id)"
 
 
@@ -546,7 +550,7 @@ def _detail(row: ProductCoverageRow) -> str:
     if row.coverage == UNGATED:
         return "corpus registered but confirmed: false — no loader may write from it"
     if row.coverage == NO_LOCATOR:
-        return "graph_locator match: none — not on the lexical spine, by ruling"
+        return "graph_locator match: none — not on the lexical backbone, by ruling"
     if row.coverage == NOT_PROBED:
         return "declaration clean; graph not probed"
     if DIVERGENCE_EDGES_UNDECLARED in row.divergence:

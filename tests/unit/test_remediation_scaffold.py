@@ -26,6 +26,9 @@ def test_package_surface() -> None:
         "equivalence",
         "formats",
         "jira",
+        # G68 (pinned 2026-08-27): the folder-set profile joined the surface at
+        # the adoption-review fix — it had been reachable only by direct import.
+        "profile",
         "transform",
         # G67: adapts a staged definition export into DefinitionSet. Reading
         # was never the blocked half of the XML problem — dump() still raises.

@@ -19,7 +19,7 @@
 # hot-edit facts between Revs; the Rev/commit line is the doc's honesty contract.
 #
 # NO TRACEABILITY BLOCK: like the runbook, the review has no requirements to
-# trace — it narrates; the TDDs carry the spine. If that ever changes, add the
+# trace — it narrates; the TDDs carry the backbone. If that ever changes, add the
 # `traceability:` block here (the validator already supports it).
 #
 # VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py pins the

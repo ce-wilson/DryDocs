@@ -1,0 +1,218 @@
+# =============================================================================
+# config/data-zones.yaml — every path the system may WRITE, declared with a mode
+# =============================================================================
+# G81, 2026-08-23. THE INCIDENT: an internal folder holding extracted CSV source
+# data was OVERWRITTEN (2026-08-11). Recovered from backup, so nothing was
+# permanently lost — but the class stays live until a write path and a source
+# drop path can no longer be the same place by accident. The full reconstruction,
+# including the four measured overlaps that existed when this file was written,
+# is docs/reviews/g81-data-path-reconstruction.md.
+#
+# WHY A CONFIG FILE AND NOT PYTHON. Before this, a path was whatever one of
+# twelve helpers in drydocs_core/data_root.py returned. Nothing distinguished a
+# folder the system OWNS from a folder a human DROPS INTO — that lived only in
+# docstrings — and no reader could enumerate what the system touches without
+# reading every helper and its call sites. That is why an overlap stayed
+# invisible until it destroyed something.
+#
+# THE INVARIANT (tests/unit/test_data_zones.py, and it is the whole defect in one
+# sentence): NO write-mode path may equal, contain, OR BE CONTAINED BY a
+# read-mode path. Both directions — the acceptance named only one, and two of the
+# four live findings ran the other way (see the reconstruction §3).
+#
+# WHY A WRITE ZONE HAS NO SOURCE-REGISTRY ROW (G109 (a), recorded rather than
+# fixed). The registry declares SOURCES — where data ARRIVES from and drops in.
+# A write or scratch zone is an output the system owns; it has no provenance, no
+# trust axis and no acquisition mode, so a registry row for one would be a field
+# set of nulls asserting a source that does not exist. That is the "recorded
+# reason a zone legitimately has none" branch, and it covers rua-extracted,
+# remediation-outgoing, remediation-recommendations, vendor-docs, context-intake,
+# cmdline-staging and run-logs. What G109 fixed instead was the READ SURFACE:
+# `drydocs landing-zones` used to read only the registry, so every zone in this
+# file was invisible to the one command that answers "are my extracts still
+# there". It now reports both declarations and --check covers the read zones of
+# each. Mode decides what EMPTY means — an empty read zone is missing source
+# data, an empty write zone is a directory the system rebuilds.
+#
+# READ ZONES ARE NOT DECLARED HERE when they are dataset drops. Those already
+# live in config/source-registry.yaml as `acquisition.drop_dir` (N12), resolved
+# by drydocs_core/landing_zones.py; duplicating them would create exactly the
+# drift this repo keeps killing. The invariant JOINS the two files. Only a read
+# zone that is NOT a dataset drop (an evidence area, a per-fix working drop) is
+# declared here, and the guard fails if a zone here duplicates a registry row.
+#
+# MODES
+#   read     source data a human drops in. The system may NEVER write it, and
+#            its helper cannot create, clean or write (G81 (e)).
+#   write    outputs the system owns and may rebuild. May create.
+#   scratch  disposable working space. May create and clean.
+#
+# BASES — where `path` is rooted. Never a real machine path (the J15 rule:
+# enumerate the shape, never the values; real paths live in the internal twin).
+#   data_root  under DRYDOCS_DATA_ROOT. Since G81 (d) that variable is MANDATORY:
+#              unset or empty FAILS naming it, rather than silently relocating
+#              every zone to ~/data/DryDocs.
+#   home       under the user's home directory (the run-log idiom).
+schema: drydocs.data-zones.v1
+
+zones:
+  # ---- rua bundles (G19) ----------------------------------------------------
+  # The pair this item exists to separate. `rua/incoming/` is the READ half and
+  # is declared in the source registry (exec-hosts:rua-bundle), whose drop_dir
+  # was corrected from the over-broad `rua/` to `rua/incoming/` at G81 — the
+  # narrowing this file's invariant requires, and what data_root.py's own module
+  # docstring has said since G19.
+  - id: rua-extracted
+    mode: write
+    base: data_root
+    path: rua/extracted/
+    helper: rua_extracted_dir
+    note: >
+      Unpack area, one directory per bundle. THE OVERWRITE PRIMITIVE lives here:
+      rua_inventory._unpack calls tarfile.extractall, which overwrites existing
+      files with no warning and no diff, into a directory named after the
+      tarball's own basename. It is legitimately rebuilt by a re-run, which is
+      exactly why it must never sit inside the zone the bundles are dropped into.
+
+  # ---- remediation (the fix-package lifecycle) ------------------------------
+  # incoming is a READ zone with no dataset row: per-fix working copies of folder
+  # .xml exports, dropped by hand. Deliberately separate from the controlm-xml
+  # INGESTION zone so that "which exports are loaded?" stays answerable.
+  - id: remediation-incoming
+    mode: read
+    base: data_root
+    path: remediation/incoming/
+    helper: remediation_incoming_dir
+    note: >
+      Hand-dropped folder exports awaiting a remediation pass. Not a dataset drop
+      (no source-registry row): its lifecycle is the fix package, not the graph
+      load. Read-mode, so its helper cannot create — a missing zone is reported,
+      never silently made.
+
+  - id: remediation-outgoing
+    mode: write
+    base: data_root
+    path: remediation/outgoing/
+    helper: remediation_outgoing_dir
+    note: >
+      Emitted <folder>.updated.xml minimal-diff artifacts that xml_io.write
+      produced and self-checked; one fix package's target/ contents stage here.
+
+  - id: remediation-recommendations
+    mode: write
+    base: data_root
+    path: remediation/recommendations/
+    helper: remediation_recommendations_dir
+    note: >
+      Recommendation documents — change docs, equivalence reports, fix-tracking
+      change-sets awaiting the loader.
+
+  # ---- system-written corpora ----------------------------------------------
+  - id: vendor-docs
+    mode: write
+    base: data_root
+    path: vendor-docs/
+    helper: vendor_docs_dir
+    note: >
+      VERBATIM external-vendor documentation captures the SCRAPER writes
+      (<tree>/pages/*.htm + capture-manifest.json). Write-mode because a capture
+      run owns and rebuilds it; the vendor's words are re-fetchable, unlike a
+      hand-carried source extract.
+
+  - id: context-intake
+    mode: write
+    base: data_root
+    path: context-intake/
+    helper: context_intake_dir
+    note: >
+      O46 SME context-intake: the intake.db record store beside per-intake
+      evidence directories. The system writes both. The 2026-08-06 storage ruling
+      keys on this being ONE configured base path — records carry sha256 digests
+      and relative keys only, so local -> share -> object store is a config
+      change. Declaring it here is that ruling's mechanism, not a new one.
+
+  # ---- human evidence drops (read, no dataset row) --------------------------
+  - id: catalog-exports
+    mode: read
+    base: data_root
+    path: catalog/
+    helper: catalog_dir
+    note: >
+      G42 Snowflake data-catalog view exports plus the SME evidence screenshots
+      under catalog/screenshots/. Hand-pulled: real dataset names, GUIDs, app
+      ids, emails and buckets. Read-mode — the helper lost `create` at G81 (e),
+      because a system that can make this directory can also land a write in it.
+
+  - id: email-extracts
+    mode: read
+    base: data_root
+    path: email-extracts/
+    helper: email_extracts_dir
+    note: >
+      Q10 landing zone: Copilot JSON extracts beside their original .msg files,
+      hand-exported. The repo carries only synthetic samples. Read-mode.
+
+  # ---- staging + operator config (found while walking the call sites) -------
+  - id: cmdline-staging
+    mode: write
+    base: data_root
+    path: cmdline-staging/
+    helper: cmdline_staging_dir
+    note: >
+      G39 job-detail staging store (SQLite). A TEMPORARY stand-in for the unbuilt
+      psgmgr CM_DEF_VJOB_DETAIL table, rebuilt by export-cmdline-staging — the
+      system owns it outright. Reached through source_dir() before G81 and so
+      undeclared; found by walking the call sites, which is the audit the
+      Python-side declaration made impossible.
+
+  - id: controlm-api-config
+    mode: read
+    base: data_root
+    path: controlm-api/
+    helper: controlm_api_config_dir
+    note: >
+      Holds controlm_api.cfg — the G96 Control-M API adapter's endpoint/credential
+      pointer, AUTHORED BY AN OPERATOR. Read-mode: the system consumes it and must
+      never rewrite it, and overwriting an operator's credentials config is the
+      same class as overwriting their extract.
+
+  # ---- logs (the third family the SME named) -------------------------------
+  - id: run-logs
+    mode: write
+    base: home
+    path: logs/DryDocs/
+    helper: ~   # drydocs_core.run_log owns this one; no data_root helper
+    env: DRYDOCS_LOGDIR
+    note: >
+      ALL loader/supplement run logs. Declared here so the three families the SME
+      named (logs, loader input, remediation output) are enumerable in one place.
+      SCOPE FENCE: unlike the data root, this keeps its default — G81 (d) names
+      the DATA root, and a relocated log is annoying where a relocated data root
+      is destructive. A log may hold real source values (job names, rejected
+      rows), which is why it is outside the repo either way.
+
+  # ---- verbatim doc captures (G109 (e)) -------------------------------------
+  - id: confluence-capture
+    mode: read
+    base: data_root
+    path: confluence-capture/
+    helper: ~   # arrives with the loader that reads it; declaring the zone does not need one
+    note: >
+      RULED AT G109 (e), which required this to be settled one way rather than
+      left as an undocumented violation. The cdo-frameworks capture
+      (config/doc-source-registry.yaml, VERBATIM, Internal) has been landing
+      IN-TREE under internal/knowledge/data/<space>/. That is the most deletable
+      state a payload can be in: untracked AND not gitignored, which `git clean
+      -fd` removes without even needing -x. THE RULING IS "IT MOVES", not "the
+      rule gains an exception", and the reason it cannot be an exception is that
+      it could never expire — landing_zones.py permits an in-tree zone only when
+      its contents are TRACKED, and PUBLISH-BOUNDARY.md forbids ever tracking a
+      verbatim capture carrying real employee names and internal URLs. An
+      exception here would be permanent by construction. Every sibling verbatim
+      capture already lands out of tree for the same reason: vendor-docs/ exists
+      precisely as "the external/ServiceNow/extracted/ .gitignore precedent
+      generalized to a real out-of-repo home". Read-mode: the capture is the
+      scrape's output and DryDocs' input, so nothing here may write it.
+      COMPANY-SIDE NOTE, since that is where the scrape runs: producer has no
+      internal/knowledge/ directory at all, so this ruling costs nothing to adopt
+      here and is a real relocation only on the checkout that holds the capture.

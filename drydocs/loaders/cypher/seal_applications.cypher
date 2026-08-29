@@ -148,6 +148,10 @@ FOREACH (_ IN CASE WHEN row.app_owner_sid IS NOT NULL THEN [1] ELSE [] END |
       e.last_seen_at = datetime($loaded_at),
       e.last_run_id  = $run_id
   // K4 (gate 2026-07-10 §B/§C): qualified-attribution shape replaces Membership/Role
+  // G72 (SS-D3): every embedded-contact Attribution below stamps source 'SEAL' —
+  // the DECLARED stamp of the seal-contact-extract surface
+  // (config/precedence.yaml#attribution surfaces; guarded by
+  // tests/unit/test_attribution_surfaces.py).
   MERGE (m1:Attribution {
       attribution_id: row.app_id + '|SEAL|application_owner|' + row.app_owner_sid
   })

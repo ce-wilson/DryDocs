@@ -187,6 +187,32 @@ SURFACES: list[dict] = [
         "gate_ref": None,
     },
     {
+        "id": "data-zones",
+        "title": "Data zones (path modes + the non-overlap invariant)",
+        "file": "config/data-zones.yaml",
+        "consumers": [
+            "drydocs_core/data_zones.py",
+            "drydocs_core/data_root.py",
+            # the READ half of the invariant: acquisition.drop_dir rows
+            "config/source-registry.yaml",
+        ],
+        "guard_tests": ["test_data_zones.py"],
+        "gate_ref": None,
+    },
+    {
+        "id": "log-kinds",
+        "title": "Log kinds (root, level, retention, rotation, format per kind)",
+        "file": "config/log-kinds.yaml",
+        "consumers": [
+            "drydocs_core/log_kinds.py",
+            "drydocs_core/run_log.py",
+            "drydocs_core/adapters/sql_run_log.py",
+            "agents/common/llm_ledger.py",
+        ],
+        "guard_tests": ["test_log_kinds.py", "test_loader_run_log.py"],
+        "gate_ref": None,
+    },
+    {
         "id": "dev-environment",
         "title": "Dev/test environment names",
         "file": "config/dev-environment.yaml",

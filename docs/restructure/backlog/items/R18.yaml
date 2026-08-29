@@ -76,5 +76,7 @@ notes: |
   use case, and it is worth noting there that `docs.documents.v1` applies no search filter at all
   (it lists every Document and the answer LLM picked the match out of 27 rows by title
   similarity), so the retrieval was approximate even though the answer was right. R13 concerns
-  growth of the same `.adk/session.db` this evidence was read from, and Idea-151 records a
-  cleartext credential in that same store.
+  growth of the same `.adk/session.db` this evidence was read from, and R23 (groomed 2026-08-22
+  from Idea-155) is the cleartext credential in that same store — cited here as "Idea-151" when
+  this note was written, which is the BRANCH-side number for that report; on `main` Idea-151 is
+  the unrelated stale-render entry that became Y5.

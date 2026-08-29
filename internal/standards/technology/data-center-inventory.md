@@ -46,6 +46,32 @@ class-2 ruling. They were pulled because the identifier swap had left real produ
 counts sitting under test-environment labels — wrong as well as disclosed. If the SME
 rules volumetrics publishable, restore the split to the DDL header.
 
+## Extraction scope (user direction, 2026-08-24)
+
+The Control-M extracts are to be **filtered and run individually, one data center at a
+time**, over these three:
+
+| Data center | Folders | Jobs |
+|---|---|---|
+| `P012-E0700-IB` | 2,230 | 42,688 |
+| `P014-E0700-ANY` | 4,188 | 52,976 |
+| `P032-E0700-DMA` | 4,441 | 85,202 |
+
+**`P021-E0800-ANY` is NOT in that list** — and it is the largest of the four by folder
+count (7,914 folders / 59,712 jobs). **RULED 2026-08-24 (user): a deliberate scope cut,
+not an omission.** The graph and the UI get exercised against the three-DC load before
+more is ingested — test first, widen after. So this table is a FIRST CUT with a named
+reason to revisit, not the final extraction scope, and `P021-E0800-ANY` re-enters when
+that testing says the shape holds.
+
+This is an EXTRACTION-SCOPE direction, not the DC scope call. The
+`controlm-hosts-topology` residual ("load all 22 data centers or production-only") is
+still open and still the SME's — three production DCs to pull first says nothing about
+what the graph should ultimately hold.
+
+No data-center bind exists on any extract today (`:folder_filter` / `:run_as` /
+`:developer_sid` / `:row_cap` are the whole scope surface), so this requires a build.
+
 ## Open, still
 
 Environments beyond production: the CM_HOSTS profile found **22 distinct DATA_CENTER

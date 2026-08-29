@@ -54,7 +54,7 @@ groom_log:
     Removal is cheap BY THE ADR'S OWN ACCOUNTING: "ddlineage is empty, so choosing
     it later costs a design, not a data migration" — and recreating it later costs
     one CREATE DATABASE line, while the design question (a :ControlMJob proxy-node
-    spine) was never answered and stays owned by the named revisit trigger.
+    backbone) was never answered and stays owned by the named revisit trigger.
     Sequencing: X1 (decision record) → X2 (repo sweep) → X3/X4 (live drops, one
     per machine — the G50/G52 venue-pinned precedent; the two machines hold
     independent graphs, so one item cannot close both).
@@ -69,3 +69,78 @@ groom_log:
     inbox for a user/SME ruling: Idea-104 (MFT route-id shape) and Idea-105
     (the DESCRIPTION field's two claimants).
   attached_at: J42
+- date: '2026-08-22'
+  note: |-
+    ── 2026-08-22 groom (laptop) — Idea-154's consequence half ──────────────────
+    J52: verification evidence about a LOCAL DEV SERVER counts only when the session
+    launched the browser itself — an attached/extension-controlled browser is not a known
+    venue, which is the J18 rule in browser form. The rule and the session-launched headless
+    recipe land in .claude/skills/verify/SKILL.md. The acceptance forbids asserting the
+    unproven mechanism (that the extension session was attached to the other machine's
+    Chrome) in a tracked, ported file; the two-browser diagnostic that would settle it needs
+    both machines in hand and stays the user's step in the inbox. Epic/module recorded as a
+    choice: the verify skill is cross-cutting session tooling, not an Epic O console feature.
+  attached_at: J52
+- date: '2026-08-23'
+  note: |-
+    ── 2026-08-23 groom (laptop) — no notes to groom; ONE merge here ───────────
+    The inbox held nothing ungroomed (the earlier fork of this same session swept it at
+    81f1eb08), so this run promoted nothing into epic J (its one promotion, S13, is a
+    structure-remediation item). The finding came from checking which Ready-to-pull items
+    were safely dispatchable: J42 — the port-time backlog-union guard, p1 and in
+    the ready strip — still aimed at docs/restructure/backlog.yaml and its items[] key, which
+    Y2 turned into a TOMBSTONE on 2026-08-20. Read literally it would have diffed two empty
+    sets and PASSED. Repointed at the sharded grain (the entry IS the file, ADR 0013 Clause 6),
+    with the empty/absent-directory case and the filename-vs-inner-id mismatch now required to
+    FAIL, and the never-regress-a-status half fenced out to J16 where the manifest already puts
+    it. A sweep of every other citation of the tombstone across the item files found them all
+    in DONE items, where naming the old path is correct history — J42 was the only live one.
+  attached_at: J42
+- date: '2026-08-26'
+  note: |-
+    Groomed 2026-08-26 from Ideas 158 and 163. J53 the snapshot script's board refresh, whose
+    catch block can never name a cause (it prints the first stderr line, which for Python is
+    always the traceback banner) and whose partial run is indistinguishable from a skipped one
+    — the Idea-111 shape inside the ritual step added to prevent it. J54 the VERSIONING.md
+    currency fix only; the v0.3.0 tag disposition and whether a v0.4.0 is owed stay user
+    decisions and are parked as an inbox question.
+  attached_at: J53
+- date: '2026-08-27'
+  note: |-
+    Groomed 2026-08-27 from Idea-178, the mechanical half. The 2026-08-26 org-acronym retirement
+    was a one-time blind string sweep over 60+ publishable files with no enforcement point behind
+    it, and the entry already names an in-flight worktree that predates it. J55 gives it the J15
+    treatment — read the retired token from the internal mapping file, scan the tracked tree
+    outside internal/, embed no literal of the string, and skip loudly rather than silently in a
+    clone that has no internal/. The cross-repo id-migration half stays inboxed on the next port.
+  attached_at: J55
+- date: '2026-08-28'
+  note: |-
+    2026-08-28 weekly groom (desktop) — four items from two entries. J57 from Idea-183: port
+    and reconcile acceptance compares failing-test TOTALS, so two sessions can agree on a
+    number and both be wrong; the swap is to a sorted failing-test ID SET plus a clean-claim
+    convention that names the repo-wide guard family by test path. J58/J59/J60 from Idea-181,
+    split three ways on that entry's own python-architect persona review rather than kept
+    whole: J58 is the four-key YAML identity header as ONE JSON Schema, scoped by file class
+    so template-class files are exempt (copier updates are three-way merges, not rewrites),
+    schema: coverage sequenced ahead of updated:; J59 is the freshness half, which left J58
+    because comparing updated: to a git date is blind under CI's shallow checkout and so
+    ships as the repo's first pre-commit hook; J60 is the Python half, two ruff D rules
+    rather than a bespoke guard. The gate-status-key entry (Idea-180) is deliberately NOT
+    groomed — it asks to migrate after the 13 run-the-gate items land so the sweep meets a
+    stable queue.
+  attached_at: J57
+- date: '2026-08-28'
+  note: |-
+    2026-08-28 second groom of the day (desktop) - the IDEAS.md inbox held nothing ungroomed,
+    because the 206bab66 groom had already consumed it hours earlier, so the one item here
+    comes from a defect the groom run itself hit. J61: a shared checkout cannot pull or push
+    while the other live session holds an uncommitted edit to a file the incoming merge also
+    touches, and the detached worktree that is the only way out returns an EMPTY string from
+    the show-current branch command that section 0 names in capitals as the guardrail. Two
+    independent occurrences hours apart on 2026-08-28, both on the ADR index file, both
+    improvising the same workaround with nothing written down between them. The policy half -
+    whether a long-held draft should commit its index row early, commit whole as a draft, live
+    outside the tracked tree, or change nothing - is Idea-185 in the inbox and is the user's,
+    since every reading trades governance cleanliness against unblocking or visibility.
+  attached_at: J61

@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/writer.py
@@ -21,3 +21,51 @@ acceptance: |
   NO GATE IS OPENED OR REOPENED -- this builds what two signed gates already ruled. cmdline-nfr-vetting (2026-07-21, SME-2 / SME-3) ruled the DISTINCT label rather than a single label with a role, and adopted the :Script refinements with it; rua-load-shapes (2026-08-07, 28/28, applied at G55) ACTIVATED m3_invokes and m7_uses_artifact in the same breath, on the stated reasoning that activating INVOKES alone would land payloads in the 1..n fold first and force an in-graph migration. G16's own notes name this item: "the m7 build (payload migration to USES_ARTIFACT, script_role stamping) is its own follow-up item once the writer endpoint work lands." (a) THE SPLIT: the writer emits USES_ARTIFACT from the job to the PAYLOAD artifact the launcher dispatches, while INVOKES keeps the LAUNCHER only. The discrimination comes from the G16 FACT_REGISTRY canonicals (ETL_ARTIFACT_URI / ETL_ARTIFACT_KIND / ETL_ARTIFACT_SHA and the ETL_PLATFORM pair) under the aliases-suggest-values-decide contract, plus the G15 launcher properties -- NEVER from a variable NAME alone, which is the 2,384-variable gap analysis' one durable finding: names lie. (b) :Script GAINS script_role {launcher, payload} and the gate-adopted artifact properties (platform / artifact_uri / artifact_kind / platform_flags / script_path). The property already exists -- the writer stamps script_role='profile' for the rua profile case (G23, section C2) -- so this EXTENDS a value set rather than inventing a property. Script identity stays PATH-keyed; that ruling is not touched. (c) ENDPOINT CLASS PER EDGE: to_node is Script | ETLProcess per rua-load-shapes section B2 -- one edge meaning, two endpoint classes, the endpoint RECORDED on the edge -- with the raw evidence string (the command line or variable form that produced it) kept VERBATIM per section B3, which is what keeps the endpoint choice re-checkable later. (d) EXISTING GRAPHS: state the position rather than assume a clean load. Where a live graph already folded payloads into a 1..n INVOKES set, either an idempotent re-load (MERGE-keyed) or a named migration step covers it -- whichever, it is written down and the counts are reported. A silent double-representation (payload on both labels) is the one outcome that must be impossible. (e) COUNTS AND A WARN STREAM: invocations classified launcher, classified payload, and UNCLASSIFIED. An unclassified invocation stays exactly where it is today and is reported; it is never promoted to a payload on a guess. TESTS: a fixture command line carrying both a launcher and a payload yields exactly one INVOKES and one USES_ARTIFACT edge with script_role stamped on both endpoints; a payload-less command line yields no USES_ARTIFACT edge at all; the vocabulary guard (write_curated raises GateBoundVocabularyError on a non-active entry) still holds. Full suite green.
 notes: |
   Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-23, whose parked trigger -- "once the writer's ETLProcess endpoint work makes the edge landable" -- has FIRED, verified two ways at the groom rather than assumed. (1) m7_uses_artifact is `status: active` in drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml, activated 2026-08-07, where the inbox entry recorded it as `planned`. (2) drydocs_lineage/writer.py MERGEs :ETLProcess on its token and carries the union-endpoint machinery, so the endpoint class the edge needs exists. ALSO VERIFIED ABSENT, so this is a real build and not a re-close: the writer emits NO USES_ARTIFACT edge today and stamps script_role only for the rua profile case -- a grep of writer.py on 2026-08-13 returns the profile stamp and nothing else. MODULE drydocs-lineage: the change point is the writer's plan/write surface. The G14 / G16 extractor facts it consumes are already produced; core's parser is CALLED, not modified. RELATED: G23 (the curated rua load this extends), G55 (the activation), G16 (the fact feed), G12 (which already lands INVOKES on :ETLProcess for the wrapper-payload expansion and is the precedent for clause (c)).
+  DONE 2026-08-25 (desktop). NO GATE OPENED OR REOPENED, and the two ruling texts were READ rather
+  than worked from their one-line restatements -- which mattered, because the acceptance's clause (c)
+  reads as if USES_ARTIFACT gets the Script|ETLProcess union and IT DOES NOT. rua-load-shapes B2
+  widened `scheduler_invokes` only ("FOLLOW-UP BUILD per I1: the m3_invokes entry's to_node widens at
+  its build"), while cmdline-nfr-vetting SME-2 ruled m7 as ControlMJob->Script{payload} and the live
+  vocabulary entry still says `to_node: Script`. THAT RESOLVES THE ONE REAL COLLISION IN THE ITEM: an
+  Ab Initio pset or DPL pipeline reached through a launcher is an :ETLProcess, so it STAYS on INVOKES
+  -- which is exactly what B2 bought when it declined B1 rather than re-model G12's working
+  wrapper-payload expansion. It is counted as its own bucket, never as clause (e)'s "unclassified",
+  because the reason is a ruling and not an absence of evidence. No vocabulary entry was edited.
+  WHERE THE SPLIT LANDED, and why not purely in the writer as the groom note suggested: three things
+  in the code forbid it. `LineageGraph.add_rel` refuses any label outside REL_TYPES, so USES_ARTIFACT
+  joins the model wherever it is emitted; `plan_curated` enforces confirmed <= graph.rels, so a
+  writer-invented edge could never be confirmed by the SME and the writer would be writing meaning the
+  curation surface never saw; and the acceptance's own test wants script_role on BOTH endpoints, which
+  needs a launcher NODE that today's extractor never mints (it keys the single node on `target`, which
+  IS the payload whenever one exists). So the split is minted at extraction and the writer plans,
+  stamps and counts it. That respects the note's actual constraint -- core's parser is CALLED, never
+  modified -- and controlm_inventory.py is the same component. THE FEED IS THE VARIABLES, per the
+  acceptance: a new `_artifact_pass` over the same variables CSV `_prepost_pass` already joins, routed
+  through `classify_variable` so the G16 "aliases suggest, VALUES decide" contract applies and no code
+  path ever reads a variable NAME (the 2,384-var finding). ARTIFACT_URI names the payload,
+  LAUNCHER_SCRIPT_PATH/ETL_PLATFORM/PLATFORM_FLAGS/ARTIFACT_KIND become the SME-3 properties.
+  ARTIFACT_SHA is deliberately NOT a Script property -- the acceptance names it a DISCRIMINATOR, SME-3
+  did not adopt it, and this build mints no property a signed ruling did not name; it is counted
+  instead. CLAUSE (d), the outcome that had to be impossible: the same jar can be named on the command
+  line AND in a variable, and both stagings MERGE onto the same :Script{path} in the writer -- so the
+  artifact pass runs AFTER the CMD_LINE pass, matches the already-staged node by its Script key, and
+  MOVES the INVOKES edge instead of adding USES_ARTIFACT beside it. For graphs loaded BEFORE this,
+  a re-load cannot fix it (every write here is a MERGE and MERGE only adds), so
+  drydocs/loaders/cypher/migrate_payload_invokes_to_uses_artifact_g97.cypher is the named idempotent
+  step, restricted to :Script and keyed on script_role='payload' -- never on a path guess -- and it
+  reports its count. TWO THINGS THE TESTS CAUGHT that a read-through had not: `classifier_rule` in the
+  ProcessNode property bag broke the G15 definition-properties guard (right call by that test -- the
+  bag is definition values), so the role is stamped inline where the parse verdict is in hand; and
+  stamping script_role on a DPL node would have put a :Script refinement on an :ETLProcess, which is
+  what made the ETLProcess bucket explicit rather than incidental. ALSO MOVED: `_ETL_PROCESS_KINDS`
+  writer -> model (re-exported under the old name), because two consumers now need it and two copies of
+  a classification set is how they drift. TESTS: 10 new in tests/unit/test_lineage_inventory.py --
+  both cases the acceptance names (one command line yielding exactly one INVOKES + one USES_ARTIFACT
+  with script_role on both endpoints; a payload-less line yielding no USES_ARTIFACT at all), plus the
+  clause-(e) unclassified case, the clause-(d) migrate-never-duplicate case, the B2 ETLProcess case,
+  unresolved %%value, values-decide (%%JAR_PATH holding dt-launcher.sh is a LAUNCHER), unmatched job,
+  the writer plan (USES_ARTIFACT batch + scheduler_uses_artifact vocab id + the SME-3 rows + the
+  counts), and the migration script's own shape. Synthetic fixtures only. Three mutations checked and
+  all caught: not moving the edge, letting ETLProcess payloads migrate, and staging unresolved values.
+  The vocabulary guard still holds (test_lineage_writer green). Suite 2451 passed / 10 skipped, ruff
+  check + format clean, `import drydocs.cli` + `drydocs --help` green.

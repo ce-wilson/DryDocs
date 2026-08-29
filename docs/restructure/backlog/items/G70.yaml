@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: fable
 priority: p1
-status: todo
+status: done
 depends_on:
 - G35
 gates: [tom-roles-enumeration-and-cardinality]
@@ -27,6 +27,63 @@ acceptance: |
   LANDS AS ONE COMMIT SERIES, NOT PIECEMEAL — §H3 of the signed gate is explicit that these surfaces are mutually inconsistent if they land apart, and §A8 measured why: the vocabulary is hardcoded across four surfaces in three languages and the only YAML copy is read by no code. (1) NEW FILE under config/taxonomy/ holds the declared role vocabulary, per §F3, carrying BOTH registers (§A: the ServiceNow TOM catalog of 100+ types AND the SEAL extract's 13, with the mapping between them), plus per-class `scope` (Individual|Group), `type` (Accountable|Operational|Approval|Assignment), `required` (from the §G register) and a RETIREMENT state — §F6b: the ServiceNow side carries an `active` flag, so classes retire rather than being deleted, and DryDocs has no equivalent today. It gets a READER and a drift guard; a vocabulary nobody is forced to update rots into fiction (the ui-components precedent). (2) config/taxonomy/business-application.yaml's `roles:` list is DELETED, not reinterpreted — §F3 named leaving both as the one outcome to refuse. Note `roles:` is DERIVED from the memberships block, so the membership blocks move with it. (3) THE REGISTER IS SEEDED FROM THE SIGNED §G: REQUIRED = application_owner, primary_information_owner, backup_information_owner, cto, technology_risk_controls, design_authority, backup_application_owner. OPTIONAL = the three Operate Manager classes, chief_business_technologist, deployment_owner, deployment_information_owner, application_module_owner, and site_reliability_engineer. SEED BOTH SRE ROWS (SME 2026-08-11): the catalog carries Site Reliability Engineer at INDIVIDUAL scope AND an SRE/DevOps incident-resolver team at GROUP scope, and which one an application uses is a PER-TEAM IMPLEMENTATION CHOICE. Seed both, each with its own scope from the catalog, so a team that reorganises moves DATA rather than VOCABULARY. A register that picked one would need re-ruling every time a team changed shape. AND READ THE REGISTER MARKER RATHER THAN RECONSTRUCTING IT: the catalog's own description text labels the SEAL-sourced rows ('... from SEAL'), which IS the two-register mapping §A asked for. Read it and verify; do not derive it. Note `type` is weakly populated (mostly 'other'), so it is not a reliable classifier on its own, and most of the 83 rows are out of scope — MARK those rather than dropping them, so the file's coverage stays legible. SRE IS A SPECIAL CASE — AMENDED 2026-08-11 after the sign-off, see the gate-log amendment. It is OPTIONAL *and DERIVED*: an SRE team serves 1:many applications (roughly 20-60), so it is a shared function pointing at many apps rather than a per-application holding, and its presence is READ FROM THE GROUP NAMING CONVENTION's function segment rather than asserted. Seed it with a `derived: true` marker so G71's completeness report can EXCLUDE it — a derived many-to-one fact in a per-application required-contact report generates a finding on every application whose SRE team simply was not asserted. AND DO NOT PATTERN-MATCH THE ROLE NAME: in the sampled data an SRE-named role resolves to a SUPPORT-function group (the team reuses one), so the role label disagrees with the group and the GROUP is right. (4) THE OPERATE MANAGER SPLIT IS APPLIED: operate_manager becomes THREE concepts (L1, L2, bare); the `level` property and c7.levels retire with it. The bare class carries its ruled definition — responsibility scope (change, problem and incident resolution), not a level. (5) RISK MANAGER CROSSWALKS TO technology_risk_controls (§A2 ruled: one class, two names) — and STOPS THERE. The SEAL-risk ↔ ServiceNow-group mapping is NOT known and no group resolution is designed for it (signed residual 1). (6) SealRole IS RETIRED AS THE ADMISSION GATE (§A3/§F4): an unrecognised name LOADS flagged undeclared instead of raising ValidationError and killing the row. _ROLE_CANONICAL survives as an alias table. The four classes today's code rejects outright must load after this. (7) EVERY DOWNSTREAM SURFACE AMENDED IN THE SAME UNIT: the supplement's scheme seed, both loader crosswalks, the map entry's role_vocabulary text, the vocabulary fragment, NODE_QUICK_REFERENCE.md, and the seal-extract field ledger's "kept verbatim" claim (§A4b — the raw source string must survive ALONGSIDE the canonical one, not instead of it). (8) MIGRATION IS EXPLICIT (§H5): seal_contacts.cypher builds attribution_id from the SOURCE role name while seal_applications.cypher uses literal concept ids, so any renaming re-keys the contact-side Attributions and orphans the old nodes. Either carry a migration step or rebuild from source — say which. The attribution_id 4-part shape itself is UNTOUCHED (identity gate §D2). Suite green; no graph write beyond the supplement re-run.
 notes: |
   Raised 2026-08-11 at the G35 sign-off. THE ONE-UNIT RULE IS THE POINT — §A8 showed the vocabulary living in four hardcoded places, and §A1b showed the one YAML copy drifting twice inside a single gate with the full suite passing both times, because no code reads it. G35 §A ruled BOTH REGISTERS, so this file is not a list of 13 names: it holds the ServiceNow catalog's 100+ types with their Scope and Type, the SEAL extract's names, and the mapping. Only ~28 types were observed instantiated on one sampled application, so the file should distinguish DECLARED from OBSERVED rather than implying every catalog entry is in use. MERGED 2026-08-11 from Idea-102 (does not change the signed section G register, which is why it lands here and not in the acceptance): the SME confirmed the deployment grain -- ONE APPLICATION, MANY DEPLOYMENTS, with the identifier reading app_id(seal_id):deployment_id -- and supplied the CI topology behind it (Business Application [Instantiates] Deployment Module, inverse [Instance of], [Contained by] area product). The consequence for this file is that section G's G13 deployment_owner, G14 deployment_information_owner and G15 application_module_owner plausibly share ONE SUBJECT, the Deployment Module CI, because "deployment" and "module" are the same thing here. Record the shared subject rather than carrying three unrelated register lines, and note that attribution itself does NOT move -- everything DryDocs maps stays off the application. The CI class capture is K22; this entry exists so the register does not have to rediscover it.
+  DONE 2026-08-26 (desktop), AS ONE COMMIT — §H3's one-unit rule taken literally: every named
+  surface amended together, and the drift guards are what keep them together afterwards. THE NEW
+  SURFACE: config/taxonomy/tom-role-vocabulary.yaml (16 classes) + its reader
+  drydocs_core/ontology/tom_role_vocabulary.py (the concept_scheme.py precedent; MODULE_MAP row
+  updated) + tests/unit/test_tom_role_vocabulary.py (17 tests), which is the guard §F3's "a
+  vocabulary nobody is forced to update rots into fiction" demanded — the supplement seed is
+  regex-parsed and compared to the declaration (ids, pref_label, required, scope, derived), the
+  alias table must resolve INTO declared source_names, the loader Cypher is asserted CASE-free, the
+  taxonomy capture is asserted register-free, and every membership sample name must canonicalize
+  into the declaration. REGISTER: seeded from the signed §G exactly (7 required: application_owner,
+  primary_information_owner, backup_information_owner, cto, technology_risk_controls,
+  design_authority, backup_application_owner; a test pins the set). BOTH SRE ROWS seeded at their
+  own scopes, both derived:true, required+derived made structurally ILLEGAL in the reader (the G16
+  amendment as a validation rule); §10.8's individual-vs-group tension and the revisit trigger are
+  recorded in the row notes, unresolved because the gate left them so. THE OM SPLIT applied:
+  operate_manager_l1 / operate_manager_l2 / operate_manager, the bare class carrying its §G9
+  responsibility-scope definition AND the mid-correction data caveat; c7.levels and m.level retire.
+  §A2 crosswalk: Risk Manager -> technology_risk_controls and STOPS (the close-out made it
+  unconditional — Individual scope, no group to map to). §B3 as ruled: cardinality one-or-more
+  recorded ONCE on the scheme (file level + s.cardinality), a test refuses a per-class field.
+  ADMISSION: SealRole DELETED (no consumer outside seal.py/tests — swept), _ROLE_CANONICAL survives
+  as the alias table; canonicalize_role gains §A3b's answer — normalize whitespace + one trailing
+  parenthetical BEFORE lookup, then fall through to declared source_names — with the 2026-08-06
+  level invariant extended to BOTH directions on the new paths ('Operate Manager (L2)' returns None
+  and loads flagged rather than silently dropping the stated level). §A4b fixed MECHANICALLY:
+  role_source_name now carries the RAW string verbatim (the old model discarded it at validation),
+  role_name the canonical, tom_role_id the declared concept — so §A6c's Tech-Partner/CTO
+  indistinguishability risk is NO LONGER TAKEN, and the field ledger's "kept verbatim" claim is
+  true rather than aspirational (ledger note rewritten to say how). §H5 ANSWERED "SAY WHICH":
+  MIGRATION CARRIED — drydocs/loaders/cypher/migrate_tom_role_split_g70.cypher — and it is small
+  because NO ATTRIBUTION RE-KEYS: every pre-G70 canonical spelling is frozen byte-identical
+  (test_every_pre_g70_canonical_spelling_is_frozen pins all 11, so a 'tidy the canonical' edit
+  fails a test instead of orphaning nodes); the migration touches concepts only (L1/L2 re-point,
+  three formerly-unmapped declared names gain HAD_ROLE, level/levels removed) and a guard asserts
+  no executable line touches attribution_id. It needs a business-key EXEMPT row (population-select
+  by role class, one-to-many by design, idempotent). INTERPRETATION STATED for acceptance (2)'s
+  "the membership blocks move with it": the roles: register is DELETED from
+  business-application.yaml (with a tombstone comment); the memberships REMAIN — they are the gate
+  walk's sample, not a vocabulary declaration — and the guard that every membership name
+  canonicalizes into the declaration replaces the derivation, which is what §H4's
+  "would not survive regeneration" was actually about. CBT: the 2026-08-06 "no cypher mapping, in
+  case it appears" is superseded by the signed §G register line — CBT now crosswalks like every
+  declared class; stated in the vocabulary note rather than silently changed. PRODUCER-SIDE
+  HONESTY (J18): the 83-row catalog export is COMPANY-SIDE and not in this tree, so catalog names
+  and the '… from SEAL' register marker are TRANSCRIBED from K21 §10.7/§10.8 (the file header says
+  exactly that, verification pending); the remainder is carried as the marked out-of-scope family
+  list + total, never silently dropped. Downstream prose amended: 20-mappings-seal (element,
+  role_vocabulary, capture, resolved_questions), 52-local-human (both HAD_ROLE rows),
+  10-node-classifications (TOMRole row + the product_roles row's stale "tom_roles precedent"
+  citation, which now notes the move WITHOUT reopening K5 — same one-line fix in
+  30-mappings-catalog), NODE_QUICK_REFERENCE. NO GRAPH WRITE happened in this change: the
+  supplement re-run + migration are per-machine steps (two machines, two graphs) still to run.
+  The bundled sample now loads its FULL surface — test_seal_samples flipped from pinning the four
+  refusals to pinning their admission with concepts. Tests: 17 new + test_seal_roles rewritten
+  (21 in file) + samples flipped; THREE MUTATIONS all caught (supplement drops a class; canonical
+  spelling renamed; required flag quietly demoted). Suite 2521 passed / 10 skipped, ruff clean,
+  CLI gates green.
 annotations:
   inputs[]:
   - drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml — was 41-local-seal.yaml

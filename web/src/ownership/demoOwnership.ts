@@ -106,6 +106,23 @@ export const ATTRIBUTIONS_FRAME: DemoFrame = {
   nodeIds: ['att2', 'att1', 'app'],
 }
 
+// G71: the required-contact completeness pair (SS-C4/SS-C6). Synthetic rows —
+// same id idiom as the frames above.
+export const REQUIRED_CONTACT_GAPS_FRAME: DemoFrame = {
+  cols: ['Application ID', 'Missing required class', 'Role'],
+  rows: [
+    ['APP-1234', 'design_authority', 'Design Authority'],
+    ['APP-2222', 'technology_risk_controls', 'Technology Risk & Controls'],
+  ],
+  nodeIds: ['app', 'app'],
+}
+
+export const CAPTURE_GAPS_FRAME: DemoFrame = {
+  cols: ['Application ID', 'Name'],
+  rows: [['APP-3333', 'Synthetic Ledger Feed']],
+  nodeIds: ['app'],
+}
+
 export const ESCALATION_FRAME: DemoFrame = {
   cols: ['Group id', 'Group'],
   rows: [

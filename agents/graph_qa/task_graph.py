@@ -2,9 +2,11 @@
 
 R1 gate ruling A (2026-07-23, `config/gate-log.md`): the enhance branch's task
 graph is agent working memory in KGoT's NetworkX shape — it **dies with the
-run**, and UI snapshots are ephemeral. Persisting it to `ddcontext`
-(SYNTHESIZED, session-tagged, TTL-swept) was considered and DEFERRED; proposing
-it again is a NEW gate, never a default.
+run**, and UI snapshots are ephemeral. Persisting it to `ddcontext` (retired
+at the G102 fold, 2026-08-18; SYNTHESIZED, session-tagged, TTL-swept) was
+considered and DEFERRED; proposing it again is a NEW gate, never a default.
+That fold changes where such a proposal would land and nothing about the
+deferral — the ruling was about persisting at all, not about where.
 
 That ruling is why this module has no driver, no session, no database name and
 no Cypher in it — and why `tests/unit/test_tier2.py` reads the source and fails

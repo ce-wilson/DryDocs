@@ -29,7 +29,7 @@ acceptance: |
 
   Cheapest order, and the order to work in: gazetteer row, then host names, then the app id. Verified live with the venue named (machine, container, database): the full chain loads and the Locations tab draws servers, jobs and teams. poetry run pytest -q green.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-162 (2026-08-27, prio proposed Med), found by running the whole Z3 chain on the desktop for the first time (neo4jtest, drydocs DB) to see why the Locations tab drew nothing. The chain itself is fine: constraints applied, the infrastructure supplement verified 6/6, the loader took 5 rows and 0 rejected first try, and its coverage counters reported every gap honestly rather than hiding one. Every gap is in how the three sample files reference each other.
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-193 (2026-08-27, prio proposed Med), found by running the whole Z3 chain on the desktop for the first time (neo4jtest, drydocs DB) to see why the Locations tab drew nothing. The chain itself is fine: constraints applied, the infrastructure supplement verified 6/6, the loader took 5 rows and 0 rejected first try, and its coverage counters reported every gap honestly rather than hiding one. Every gap is in how the three sample files reference each other.
 
   A CORRECTION FROM THE CAPTURE IS CARRIED FORWARD so it is not re-derived: the T1 tier IS proven by the e2e, which seeds its own matching host. What no sample proves is the DEMO path, where the Control-M sample's hosts meet the server export without a test seeding the join for them.
 

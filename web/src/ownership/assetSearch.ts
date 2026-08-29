@@ -239,7 +239,7 @@ export const PATH_EDGES: readonly PathEdge[] = [
   { id: 'e13', source: 'vw', target: 'hl2', label: 'read by (unruled — O23)' },
 ]
 
-/** ids visible on first render (the SHORTEST-path spine; hidden = expandable context) */
+/** ids visible on first render (the SHORTEST-path backbone; hidden = expandable context) */
 export function initialVisible(): Set<string> {
   return new Set(PATH_NODES.filter((n) => !n.hidden).map((n) => n.id))
 }

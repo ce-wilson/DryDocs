@@ -149,7 +149,12 @@ class SqlRunLog:
 
     def open(self) -> Path:
         """Create the log dir if missing, claim a timestamped file, write the header."""
-        path = claim_log_path(self.base_name)
+        # G105: the `sql.` KIND segment this family never carried. It wrote
+        # `oracle.<ts>.log` because base_name is caller-supplied with no prefix
+        # enforcement -- the one family that could write any kind it liked. The
+        # header below keeps the UNPREFIXED name: that line names the statement,
+        # not the file.
+        path = claim_log_path(f"sql.{self.base_name}")
         self._fh = path.open("w", encoding="utf-8", newline="")
         self.path = path
         self._started = time.monotonic()

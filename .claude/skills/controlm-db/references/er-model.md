@@ -15,7 +15,7 @@ vendor map so you can locate any concept.
 
 ---
 
-## §HUBS — the two spine tables
+## §HUBS — the two backbone tables
 
 Everything hangs off two entities:
 

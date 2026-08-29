@@ -217,7 +217,7 @@ first have bitten on the first live curated write.
    invariant. A Neo4j transaction cannot span databases, so from `ddlineage` those MATCHes
    would match nothing and **every job-endpoint edge would vanish silently** (an unmatched
    MATCH yields zero rows, not an error). Moving lineage would first require a
-   `:ControlMJob` proxy-node spine in `ddlineage` and a redefinition of what "the M3 load
+   `:ControlMJob` proxy-node backbone in `ddlineage` and a redefinition of what "the M3 load
    owns them" means. That is a design, not a rename.
 
 **What changes:** the four specs (`lineage.hops.v1`, `lineage.data-assets.v1`,
@@ -229,7 +229,7 @@ spec can never again read a database nothing writes.
 **Named trigger to revisit** (as an amendment, through the SME gate — not by drift): the
 docmeta gate (2026-07-18, ADR 0006 §b) adopted a `dddocs` component database on the G1
 pattern and *re-targets* the bmc-docs corpus out of `drydocs`. If component-per-database
-proves out there, and lineage grows a proxy-node spine of its own, reopen this. Deferring
+proves out there, and lineage grows a proxy-node backbone of its own, reopen this. Deferring
 is the cheap direction: `ddlineage` is empty, so choosing it later costs a design, not a
 data migration.
 
@@ -270,10 +270,10 @@ drift both grew in exactly this gap between "provisioned" and "used").
 
 **What retirement answers — and what it deliberately does not.** It answers where the
 database went. It does **not** answer the residency clarification's deferred design
-question (a `:ControlMJob` proxy-node spine in a lineage database, and a redefinition
+question (a `:ControlMJob` proxy-node backbone in a lineage database, and a redefinition
 of "the M3 load owns those nodes"); that question transfers intact to the named
 revisit trigger, which stands: if component-per-database proves out at `dddocs` and
-lineage grows a proxy spine of its own, reopen — through the SME gate, as an
+lineage grows a proxy backbone of its own, reopen — through the SME gate, as an
 amendment. The only change to the reopening cost is direction: it now *recreates* the
 database (one `CREATE DATABASE ... IF NOT EXISTS` plus the `ddall` alias line) rather
 than finds it waiting. The ADR's own accounting priced this: "`ddlineage` is empty, so

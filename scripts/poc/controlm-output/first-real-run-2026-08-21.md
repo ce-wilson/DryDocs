@@ -1,5 +1,17 @@
 # First run against real logs — sanitized record (2026-08-21)
 
+```yaml
+status: DATED RECORD      # a run capture, not a live description of this tree
+captured: 2026-08-21      # the run itself; landed at 293a6439, unchanged since
+```
+
+> **Why the header.** The Provenance line below cites a transcript on the **company
+> machine's working copy** (`internal-local/`, gitignored there). That path resolves on
+> no producer machine, ever — not because the record is stale but because the file it
+> names was never in this tree and never will be. Annotating the record is the Idea-110
+> convention: a capture's paths are facts about the session that produced it, so the
+> document declares itself rather than having its own evidence edited out of it.
+
 **What this is.** The PoC parsers in this directory were run for the first time against a real
 estate's Control-M Output-tab logs — eleven of them, one data-flow neighbourhood. This file records
 what came out, **sanitized**: application ids, flow names, hosts, paths, GUIDs and cluster ids are

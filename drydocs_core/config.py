@@ -70,5 +70,52 @@ class AppSettings(BaseSettings):
     log_level: str = "INFO"
 
 
+class RuntimeSettings(BaseSettings):
+    """The runtime substrate — ADR 0014 clause 1, accepted 2026-08-25.
+
+    A per-machine operational group: a path, a verbosity, a retention window.
+    ADR 0009's rule 1 keeps git text the source of truth for anything an SME
+    gates, a port carries, or a classification test guards — this is none of the
+    three, which is why it is an exception 0009 already permits rather than an
+    amendment to it. (``PORT-MANIFEST.yaml`` marks the sibling
+    ``dev-environment.yaml`` ``canonical-company`` for the same reason: every
+    value in it is a local fact that must never cross.)
+
+    THE PER-KIND HALF LIVES IN ``config/log-kinds.yaml``, not here. The ruling
+    amended clause 1 from one global set to a per-kind declaration, so
+    ``log_level`` and ``log_retention_days`` below are the FALLBACKS a kind
+    inherits when it declares none of its own — read
+    :func:`drydocs_core.log_kinds.load_kinds` for the resolved values. Keeping
+    four flat fields here as well would be the second declaration the ADR fences
+    against.
+    """
+
+    model_config = SettingsConfigDict(
+        env_prefix="DRYDOCS_",
+        env_file=_ENV_FILE,
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    log_level: str = "INFO"
+    log_retention_days: int = 90
+
+    @property
+    def log_dir(self) -> Path:
+        """Resolved through the ONE root site — ``DRYDOCS_LOGDIR`` >
+        ``SPIDERP_LOGDIR`` (deprecated, warns) > the declared default."""
+        from drydocs_core.run_log import resolve_log_dir
+
+        return resolve_log_dir()
+
+    @property
+    def data_root(self) -> Path:
+        """The G81 data root. MANDATORY — unset raises rather than relocating
+        every zone to a default, which is how a write lands on source data."""
+        from drydocs_core.data_root import resolve_data_root
+
+        return resolve_data_root()
+
+
 def load_settings() -> tuple[Neo4jSettings, OracleSettings, AppSettings]:
     return Neo4jSettings(), OracleSettings(), AppSettings()

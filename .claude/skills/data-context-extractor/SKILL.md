@@ -1,6 +1,6 @@
 ---
 name: data-context-extractor
-description: "DryDocs domain context extractor. Adds platform, application, or organizational context to the DryDocs knowledge graph. Use when: (1) a target platform (Oracle, Snowflake, Teradata, S3, SQLServer, Linux, or reference documents) needs its data objects documented as DataAsset nodes, (2) a specific Application (by SEAL ID) needs its AppDataFlow and cross-platform lineage mapped, (3) the corporate hierarchy (BusinessSegment → CatalogLOB → ProductLine → Product → Application) needs inter-dependency queries answered, or (4) reference documents (PDF annual reports, 10-K filings) need content extracted into ddcontext as SYNTHESIZED DataAsset or BusinessSegment nodes. Outputs machine-first §META §DATAASSETS §JOBS §UC §CYPHER §OQ reference files. DO NOT generate SQL analyst skills, relational schemas, or any artifact that bypasses the Neo4j graph model."
+description: "DryDocs domain context extractor. Adds platform, application, or organizational context to the DryDocs knowledge graph. Use when: (1) a target platform (Oracle, Snowflake, Teradata, S3, SQLServer, Linux, or reference documents) needs its data objects documented as DataAsset nodes, (2) a specific Application (by SEAL ID) needs its AppDataFlow and cross-platform lineage mapped, (3) the corporate hierarchy (BusinessSegment → CatalogLOB → ProductLine → Product → Application) needs inter-dependency queries answered, or (4) reference documents (PDF annual reports, 10-K filings) need content extracted as SYNTHESIZED DataAsset or BusinessSegment nodes. Outputs machine-first §META §DATAASSETS §JOBS §UC §CYPHER §OQ reference files. DO NOT generate SQL analyst skills, relational schemas, or any artifact that bypasses the Neo4j graph model."
 ---
 
 # DryDocs Domain Context Extractor
@@ -30,8 +30,10 @@ skill builder.
   - Public-domain documents (annual reports, 10-K SEC filings): `classification: External`,
     `trust: VERBATIM / GROUNDED`, load directly into `drydocs`. No sanitization needed.
     Always cite `source_url`.
-  - Internal documents: `trust: SYNTHESIZED`, target `ddcontext` only.
-    Never write to `drydocs` without HITL gate confirmation.
+  - Internal documents: `trust: SYNTHESIZED`, written to `drydocs` and LABELLED
+    `:Uncertain`. Never assert them as ground truth without HITL gate confirmation —
+    the label is what holds them out of every ground-truth query, not a separate
+    database (G32/G102 fold, 2026-08-18).
 
 ---
 
@@ -53,7 +55,7 @@ Use when you need to:
 - Answer inter-dependency questions: which apps/jobs belong to a segment? which
   teams support a product? what is the cross-segment blast radius?
 - Extract business segment metrics from reference documents (annual reports, 10-K
-  filings) into `ddcontext` as `trust: SYNTHESIZED` content
+  filings) as `trust: SYNTHESIZED` content, labelled `:Uncertain`
 
 Mode C uses UC8–UC11 (`references/use-cases.md`) in addition to or instead of UC1–UC7.
 
@@ -73,7 +75,7 @@ graph node labels or types):
 `oracle` | `snowflake` | `teradata` | `s3` | `sqlserver` | `linux` | `document`
 
 `document` = reference documents (PDF annual reports, 10-K filings, org charts).
-Document DataAssets always carry `trust: SYNTHESIZED` and target `ddcontext`.
+Document DataAssets always carry `trust: SYNTHESIZED` and the `:Uncertain` label.
 
 See `references/platforms.md` for URN patterns and sanitization rules per platform.
 
@@ -194,14 +196,14 @@ If ingesting from a reference document:
 - Model the document as `DataAsset {platform: 'document', trust: 'VERBATIM'}` for
   direct quotes, or `trust: 'GROUNDED'` for derived/calculated facts
 - Always set `source_url` to the public filing URL
-- Load directly into `drydocs` — no ddcontext staging required
+- Load directly into `drydocs` with no `:Uncertain` label — this is sourced, cited content
 - Carry extracted metrics as properties on `BusinessSegment` nodes in `drydocs`
 - Write `GENERATED` edges: document → BusinessSegment, document → DataAsset (firmwide)
 
 **Internal documents:**
 - `classification: Internal-Public` or higher
 - Model as `DataAsset {platform: 'document', trust: 'SYNTHESIZED'}`
-- Target `ddcontext` only; promote to `drydocs` via HITL gate
+- Write to `drydocs` LABELLED `:Uncertain`; the gate clears the label, it does not move the row
 
 ### Step 4 — Generate output files
 
@@ -266,5 +268,5 @@ drydocs/data/data-catalog/             ← internal, gitignored, never committed
 - [ ] LOB → BusinessSegment `RECONCILES_TO` edges include `confidence` property
 - [ ] `§HIERARCHY` section documents the full LOB → ProductLine → Product → App chain
 - [ ] Cross-segment dependency queries (UC11) scoped to active segments only (no CB)
-- [ ] **Public documents** (annual reports, 10-K): `classification: External`, `trust: VERBATIM/GROUNDED`, `source_url` set, load to `drydocs` — no sanitization, no ddcontext staging
-- [ ] **Internal documents**: `trust: SYNTHESIZED`, `reliability` set (0.0–1.0), target `ddcontext` only
+- [ ] **Public documents** (annual reports, 10-K): `classification: External`, `trust: VERBATIM/GROUNDED`, `source_url` set, load to `drydocs` unlabelled — no sanitization, no staging
+- [ ] **Internal documents**: `trust: SYNTHESIZED`, `reliability` set (0.0–1.0), written to `drydocs` LABELLED `:Uncertain`

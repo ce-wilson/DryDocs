@@ -102,7 +102,7 @@ behind that decision, not core-path.
 
 ## What the docmeta ADR (P1) should adopt
 
-1. **The lexical graph is the spine** — Document→Chunk with the active `docs_*`
+1. **The lexical graph is the backbone** — Document→Chunk with the active `docs_*`
    vocabulary, proven twice (bmc-docs 2026-07-08; the Q2 book load). Chunk
    navigation properties (chapter/section/page or heading/seq) earn their cost.
 2. **Ch.8's evaluation harness as the component's own gate**: RAGAS-style context

@@ -139,7 +139,7 @@ def test_profiles_are_declared_with_reasons_and_are_all_used():
         )
     declared = set(cli.LOAD_PROFILES)
     for step in cli.CANONICAL_LOAD_SEQUENCE:
-        unknown = set(step.profiles) - declared
+        unknown = set(cli.step_profiles(step)) - declared
         assert not unknown, (
             f"step {step.command!r} claims undeclared profile(s) {sorted(unknown)} — "
             f"declare them in LOAD_PROFILES: {sorted(declared)}"
@@ -167,7 +167,7 @@ def test_every_standing_step_is_in_the_cold_start_profile():
     missing = [
         step.command
         for step in cli.CANONICAL_LOAD_SEQUENCE
-        if step.mode == "standing" and "cold-start" not in step.profiles
+        if step.mode == "standing" and "cold-start" not in cli.step_profiles(step)
     ]
     assert not missing, (
         f"standing step(s) absent from the cold-start profile: {missing} — either "
@@ -182,7 +182,12 @@ def test_scheduled_ingest_omissions_are_ruled_rather_than_forgotten():
         step.command
         for step in cli.CANONICAL_LOAD_SEQUENCE
         if step.mode == "standing"
-        and "scheduled-ingest" not in step.profiles
+        and "scheduled-ingest" not in cli.step_profiles(step)
+        # G79: a cadence-DERIVED omission needs no prose entry — the source's
+        # declared rhythm IS the written reason, and it is one a reader can
+        # check against the registry rather than take on trust. Only steps that
+        # declare their profiles by hand still owe SCHEDULED_INGEST_EXCLUSIONS.
+        and step.profiles is not None
         and step.command not in cli.SCHEDULED_INGEST_EXCLUSIONS
     ]
     assert not unexplained, (
@@ -202,7 +207,7 @@ def test_scheduled_ingest_exclusions_are_current_and_carry_reasons():
             f"SCHEDULED_INGEST_EXCLUSIONS names {command!r}, which is not a "
             "sequence step at all — stale entry."
         )
-        assert "scheduled-ingest" not in by_command[command].profiles, (
+        assert "scheduled-ingest" not in cli.step_profiles(by_command[command]), (
             f"{command!r} IS in the scheduled-ingest profile and also carries an "
             "exclusion reason — pick one."
         )

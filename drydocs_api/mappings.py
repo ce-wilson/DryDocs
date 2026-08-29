@@ -32,6 +32,8 @@ from pathlib import Path
 
 from drydocs_api.handlers import Forbidden
 from drydocs_api.sessions import InMemorySessionStore, Session
+from drydocs_core.mapping_store import STORE_NATURES
+from drydocs_core.source_registry import SourceRegistry
 
 MAPPING_ROLES = ("steward", "admin")
 
@@ -126,6 +128,11 @@ OVERRIDE_HEADER = (
     "authored_by",
     "authored_on",
     "status",
+    # N15 §B4 — agreement evidence, written only at steward CONFIRMATION of a
+    # retirement candidate (which run, which source value, observed when).
+    "agreement_run_id",
+    "agreement_source_value",
+    "agreement_observed_on",
 )
 
 # The defined-mapping list's committed column order (K9). A NEW file, so no
@@ -836,6 +843,132 @@ def source_corrections_report(
         "filename": f"seal-contact-source-corrections-{today}.md",
         "markdown": "\n".join(lines) + "\n",
         "count": len(rows),
+        "generated_on": today,
+        "generated_by": session.persona_id,
+    }
+
+
+#: N14 §D2: how each PENDING-nature store's live rows are fetched. Keyed by the
+#: table name STORE_NATURES declares — the report iterates the DECLARATION, so a
+#: permanent-by-nature store (app_code_mapping) is structurally unreachable and
+#: a new pending store shows up here or fails the paired test, never silently.
+_PENDING_STORE_FETCHERS = {
+    "seal_contact_override": lambda store: store.source_corrections(),
+}
+
+
+def pending_source_correction_report(
+    token: str,
+    sessions: InMemorySessionStore,
+    store,
+    registry: SourceRegistry | None = None,
+    email_unassigned: int | None = None,
+) -> dict:
+    """N14 — the pending-source-correction UNION report (gate SIGNED 2026-08-18).
+
+    ONE age-ordered list of every live placeholder across the domains the gate
+    joined: ACTIVE seal-contact override rows (the O24 feed) and every registry
+    dataset still hand-fed (``acquisition.mode: manual``), plus the Q21 email
+    unassigned count (the §B3 rider domain). No clock, no SLA, never a gate
+    (§C2/§C3) — read at the SME's cadence. Permanent-by-nature stores are not
+    scanned: the report iterates STORE_NATURES' declarations (§D1/§D2).
+    """
+    session = _authorize(token, sessions)
+    today = date.today().isoformat()
+    reg = registry if registry is not None else SourceRegistry.from_yaml()
+
+    dated: list[tuple[str, str, str, str]] = []
+    undated: list[tuple[str, str, str]] = []
+
+    override_count = 0
+    for table, nature in STORE_NATURES.items():
+        if nature != "pending":
+            continue  # permanent / non-correction stores are never scanned (K7 §E2)
+        for r in _PENDING_STORE_FETCHERS[table](store):
+            override_count += 1
+            item = f"{r['app_seal_id']} / {r['role_name']}"
+            detail = f"override active — correct to {r.get('override_holder_sid') or '(unset)'}"
+            authored = r.get("authored_on")
+            if authored:
+                dated.append((authored, "override (authored_on)", item, detail))
+            else:
+                undated.append(("override", item, detail))
+
+    manual_count = 0
+    for sid in reg.ids():
+        src = reg.get(sid)
+        if src.home != "source-registry":
+            continue
+        acq = src.data.get("acquisition") or {}
+        if acq.get("mode") != "manual":
+            continue
+        manual_count += 1
+        detail = (
+            f"hand-fed — format {acq.get('format') or '?'}, "
+            f"zone {acq.get('drop_dir') or '?'} (expected first state, N12 f)"
+        )
+        since = acq.get("since")
+        if since:
+            dated.append((str(since), "manual source (acquisition.since)", sid, detail))
+        else:
+            undated.append(("manual source", sid, detail))
+
+    dated.sort(key=lambda row: row[0])
+
+    lines = [
+        "# Pending source corrections — the union report (all domains, one list)",
+        "",
+        f"Generated {today} by {session.persona_id}. Read at the SME's cadence: "
+        "no deadline, no SLA, no per-row clock (gate pending-source-correction "
+        "§C2), and nothing here gates a load or fails CI (§C3). A manual "
+        "acquisition route is the expected first state of a source (N12 clause "
+        "f) and an active override is recorded state — rows below are what we "
+        "are carrying, not errors.",
+        "",
+        "Age basis, per domain (asymmetric by design, §C1): overrides use "
+        "`authored_on`; manual sources use a declared `acquisition.since:` "
+        "where one exists — rows without one sort into the explicit undated "
+        "bucket (the `since` field is the drafted source-connection-and-run-"
+        "identity gate's §C1 subject and back-fills with it).",
+        "",
+        f"Carrying: {override_count} active override(s) · {manual_count} " "hand-fed source(s).",
+        "",
+        "| Age (oldest first) | Kind | Item | Detail |",
+        "|---|---|---|---|",
+    ]
+    for when, kind, item, detail in dated:
+        lines.append(f"| {when} | {kind} | {item} | {detail} |")
+    if not dated:
+        lines.append("| — | — | — | (no dated placeholders) |")
+    lines += ["", "## Undated (explicit bucket — never silent)", ""]
+    if undated:
+        lines += [f"- {kind}: {item} — {detail}" for kind, item, detail in undated]
+    else:
+        lines.append("- (none)")
+    lines += ["", "## Email assignments (Q21 rider — gate email-folder-assignment §B3)", ""]
+    if email_unassigned is None:
+        lines.append(
+            "- count unavailable from this surface — read query spec "
+            "`docs.email-unassigned.v1`. Unassigned emails are REPORTED, never "
+            "auto-drained onto a best-match folder, and stay unpurgeable by scope."
+        )
+    else:
+        lines.append(
+            f"- {email_unassigned} unassigned email(s) awaiting SME assignment "
+            "(`docs.email-unassigned.v1`; reported, never auto-drained)."
+        )
+    if not (override_count or manual_count):
+        lines += ["", "(nothing pending — both correction domains are empty)"]
+
+    return {
+        "filename": f"pending-source-corrections-{today}.md",
+        "markdown": "\n".join(lines) + "\n",
+        "count": override_count + manual_count,
+        "counts": {
+            "overrides": override_count,
+            "manual_sources": manual_count,
+            "email_unassigned": email_unassigned,
+        },
         "generated_on": today,
         "generated_by": session.persona_id,
     }

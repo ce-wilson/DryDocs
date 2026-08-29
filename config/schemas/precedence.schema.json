@@ -36,6 +36,11 @@
             "type": "integer",
             "minimum": 1
           },
+          "stamp": {
+            "description": "G72 (SS-D3): the Attribution.source value this surface stamps — attribution-surface entries only",
+            "type": "string",
+            "pattern": "^[A-Za-z_]+$"
+          },
           "role": {
             "type": "string"
           },

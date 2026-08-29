@@ -23,6 +23,7 @@ from typing import Annotated
 import neo4j
 from pydantic import BaseModel
 
+from drydocs_api.audit import ApiAuditLog
 from drydocs_api.credentials import CredentialChecker, ReloadingCredentialStore
 from drydocs_api.ephemeral_specs import (
     EphemeralSpecStore,
@@ -76,6 +77,7 @@ from drydocs_api.mappings import (
     list_drafts,
     mapping_grid,
     mapping_options,
+    pending_source_correction_report,
     promote_draft,
     source_corrections_report,
 )
@@ -205,15 +207,17 @@ def create_app(
     runner=None,
     store: InMemorySessionStore | None = None,
     credentials: CredentialChecker | None = None,
+    audit: ApiAuditLog | None = None,
 ):
-    """App factory. ``runner``/``store``/``credentials`` are injectable for
-    tests; the default is the live driver, a fresh in-memory session store, and
+    """App factory. ``runner``/``store``/``credentials``/``audit`` are injectable
+    for tests; the default is the live driver, a fresh in-memory session store,
     the machine-local credential file (absent on a fresh clone, which yields an
-    empty store in which every login is refused).
+    empty store in which every login is refused), and the declared api/api-debug
+    audit sinks (G108 — see drydocs_api.audit for which routes are audited).
 
     The default credential store RE-READS its file when it changes (O73), so
     adding or rotating a secret takes effect without restarting the server."""
-    from fastapi import Depends, FastAPI, Header, HTTPException, UploadFile
+    from fastapi import Depends, FastAPI, Header, HTTPException, Request, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
 
     app = FastAPI(
@@ -230,6 +234,7 @@ def create_app(
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
     creds = credentials if credentials is not None else ReloadingCredentialStore()
+    audit = audit if audit is not None else ApiAuditLog()
 
     def _token(authorization: str | None) -> str:
         if not authorization or not authorization.lower().startswith("bearer "):
@@ -262,10 +267,31 @@ def create_app(
     # convention FastAPI's own docs use for the annotated-dependency idiom.
     CurrentUser = Annotated[Session, Depends(_current_session)]  # noqa: N806
 
-    def _current_admin(user: CurrentUser) -> Session:
+    def _current_admin(request: Request, user: CurrentUser) -> Session:
         try:
             return require_role(user, "admin")
         except Forbidden as exc:
+            # G108 x O69, reconciled at the merge. Moving the role check to the
+            # door put it OUTSIDE every route's audit block, so a REFUSED admin
+            # request stopped being recorded at all -- and an unauthorized
+            # attempt is precisely what an audit log exists to capture. The
+            # rejection is therefore recorded here, carrying the original
+            # Forbidden class rather than the 403 it is mapped to.
+            #
+            # FAILURE PATH ONLY: a request that passes is audited by the route
+            # itself, and a line here as well would double-count it. The inner
+            # re-raise exists so ``observe`` sees the exception and stamps
+            # error_class; it is caught immediately because the caller's answer
+            # is the HTTP 403, not the internal class.
+            route = request.scope.get("route")
+            path = getattr(route, "path", request.url.path)
+            try:
+                with audit.observe(
+                    path, token=user.token, run_id=request.headers.get("x-drydocs-run-id")
+                ):
+                    raise exc
+            except Forbidden:
+                pass
             raise HTTPException(403, str(exc)) from None
 
     AdminUser = Annotated[Session, Depends(_current_admin)]  # noqa: N806
@@ -308,9 +334,22 @@ def create_app(
         return {"status": "ok"}
 
     @app.post("/query/{query_id}")
-    def post_query(query_id: str, body: QueryBody, user: CurrentUser) -> dict[str, object]:
+    def post_query(
+        query_id: str,
+        body: QueryBody,
+        user: CurrentUser,
+        x_drydocs_run_id: str | None = Header(default=None),
+    ) -> dict[str, object]:
         try:
-            return run_named(query_id, body.params, user.token, sessions, graph)
+            with audit.observe(
+                "/query/{query_id}", token=user.token, run_id=x_drydocs_run_id
+            ) as rec:
+                rec.query_id = query_id
+                rec.params = body.params
+                out = run_named(query_id, body.params, user.token, sessions, graph)
+                rec.database = str(out["database"])
+                rec.rows = len(out["rows"])
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownQueryError:
@@ -323,9 +362,18 @@ def create_app(
     # the handler is what the offline suite tests, and it must fail closed on
     # its own.
     @app.post("/raw-cypher")
-    def post_raw(body: RawBody, user: AdminUser) -> dict[str, object]:
+    def post_raw(
+        body: RawBody,
+        user: AdminUser,
+        x_drydocs_run_id: str | None = Header(default=None),
+    ) -> dict[str, object]:
         try:
-            return run_raw(body.cypher, user.token, sessions, graph)
+            with audit.observe("/raw-cypher", token=user.token, run_id=x_drydocs_run_id) as rec:
+                rec.cypher = body.cypher  # debug tier only; the api line cannot carry it
+                out = run_raw(body.cypher, user.token, sessions, graph)
+                rec.database = str(out["database"])
+                rec.rows = len(out["rows"])
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -348,20 +396,32 @@ def create_app(
     def post_ephemeral_register(
         body: EphemeralRegisterBody,
         x_drydocs_agent_key: str | None = Header(default=None),
+        x_drydocs_run_id: str | None = Header(default=None),
     ) -> dict[str, object]:
+        # Audited even though it executes nothing: the Cypher ENTERS the system
+        # here, and it is the route the QA agent's run_id arrives on (ruling D).
+        # The actor is the OWNER session the ref is scoped to.
         try:
-            return register_ephemeral(
-                x_drydocs_agent_key,
-                os.environ.get("DRYDOCS_AGENT_REG_KEY"),
-                body.owner_token,
-                body.cypher,
-                body.database,
-                body.params,
-                body.description,
-                body.columns,
-                sessions,
-                ephemerals,
-            )
+            with audit.observe(
+                "/specs/ephemeral", token=body.owner_token, run_id=x_drydocs_run_id
+            ) as rec:
+                rec.cypher = body.cypher
+                rec.params = body.params
+                rec.database = body.database
+                out = register_ephemeral(
+                    x_drydocs_agent_key,
+                    os.environ.get("DRYDOCS_AGENT_REG_KEY"),
+                    body.owner_token,
+                    body.cypher,
+                    body.database,
+                    body.params,
+                    body.description,
+                    body.columns,
+                    sessions,
+                    ephemerals,
+                )
+                rec.spec_id = str(out.get("explore_ref") or "") or None
+            return out
         except Forbidden as exc:
             raise HTTPException(403, str(exc)) from None
         except InvalidTokenError:
@@ -372,9 +432,22 @@ def create_app(
             raise HTTPException(422, str(exc)) from None
 
     @app.post("/specs/{spec_id}/run")
-    def post_spec_run(spec_id: str, body: QueryBody, user: CurrentUser) -> dict[str, object]:
+    def post_spec_run(
+        spec_id: str,
+        body: QueryBody,
+        user: CurrentUser,
+        x_drydocs_run_id: str | None = Header(default=None),
+    ) -> dict[str, object]:
         try:
-            return run_spec(spec_id, body.params, user.token, sessions, graph, ephemerals)
+            with audit.observe(
+                "/specs/{spec_id}/run", token=user.token, run_id=x_drydocs_run_id
+            ) as rec:
+                rec.spec_id = spec_id
+                rec.params = body.params
+                out = run_spec(spec_id, body.params, user.token, sessions, graph, ephemerals)
+                rec.database = str(out.get("database") or "") or None
+                rec.rows = len(out["rows"])
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -388,20 +461,32 @@ def create_app(
         body: QueryBody,
         user: CurrentUser,
         format: str = "csv",
+        x_drydocs_run_id: str | None = Header(default=None),
     ):
         from fastapi.responses import StreamingResponse
 
         try:
-            job = export_spec(
-                spec_id,
-                body.params,
-                format,
-                user.token,
-                sessions,
-                graph,
-                export_ledger,
-                ephemerals=ephemerals,
-            )
+            # The audit line lands at job creation with rows null: the rows are
+            # streamed after this returns, and their count is the export
+            # MANIFEST's fact (it registers when the download completes). A
+            # failure after streaming starts is the manifest's to reveal.
+            with audit.observe(
+                "/specs/{spec_id}/export", token=user.token, run_id=x_drydocs_run_id
+            ) as rec:
+                rec.spec_id = spec_id
+                rec.params = body.params
+                job = export_spec(
+                    spec_id,
+                    body.params,
+                    format,
+                    user.token,
+                    sessions,
+                    graph,
+                    export_ledger,
+                    ephemerals=ephemerals,
+                )
+                rec.detail["export_id"] = job.export_id
+                rec.detail["format"] = format
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -438,9 +523,20 @@ def create_app(
     # machine and returns the legal-transitions map per record. ──
     intake_store = IntakeStore(default_intake_root())
 
-    def _intake_call(fn, *args, **kwargs):
+    def _intake_call(fn, *args, audit_route=None, audit_token=None, **kwargs):
+        # audit_route set = one of the four WRITE routes (G108); the GET reads
+        # pass neither and stay unaudited.
         try:
-            return fn(*args, **kwargs)
+            if audit_route is None:
+                return fn(*args, **kwargs)
+            with audit.observe(audit_route, token=audit_token) as rec:
+                out = fn(*args, **kwargs)
+                if isinstance(out, dict):
+                    for key in ("intake_id", "id"):
+                        if key in out:
+                            rec.detail["intake_id"] = out[key]
+                            break
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -462,6 +558,8 @@ def create_app(
             user.token,
             sessions,
             intake_store,
+            audit_route="/intake",
+            audit_token=user.token,
         )
 
     @app.get("/intake")
@@ -489,6 +587,8 @@ def create_app(
                 user.token,
                 sessions,
                 intake_store,
+                audit_route="/intake/{intake_id}/evidence",
+                audit_token=user.token,
             )
         return out
 
@@ -506,6 +606,8 @@ def create_app(
             user.token,
             sessions,
             intake_store,
+            audit_route="/intake/{intake_id}/transition",
+            audit_token=user.token,
         )
 
     @app.post("/intake/{intake_id}/thread-decision")
@@ -521,15 +623,26 @@ def create_app(
             user.token,
             sessions,
             intake_store,
+            audit_route="/intake/{intake_id}/thread-decision",
+            audit_token=user.token,
         )
 
     # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
     # materialization; the ONLY "write" is a returned change artifact. ──
     mapping_store = MappingStore()
 
-    def _mapping_call(fn, *args, **kwargs):
+    def _mapping_call(fn, *args, audit_route=None, audit_token=None, **kwargs):
+        # audit_route set = one of the three var/mapping.db WRITE routes (G108).
+        # /mappings/changeset stays unaudited on purpose: it returns a change
+        # artifact and persists nothing server-side (the O13 contract).
         try:
-            return fn(*args, **kwargs)
+            if audit_route is None:
+                return fn(*args, **kwargs)
+            with audit.observe(audit_route, token=audit_token) as rec:
+                out = fn(*args, **kwargs)
+                if isinstance(out, dict) and "draft_id" in out:
+                    rec.detail["draft_id"] = out["draft_id"]
+            return out
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except Forbidden as exc:
@@ -568,6 +681,8 @@ def create_app(
             sessions,
             mapping_store,
             draft_id=body.draft_id,
+            audit_route="/mappings/overrides/draft",
+            audit_token=user.token,
         )
 
     @app.get("/mappings/drafts")
@@ -576,11 +691,45 @@ def create_app(
 
     @app.post("/mappings/drafts/{draft_id}/promote")
     def post_promote_draft(draft_id: str, user: CurrentUser) -> dict[str, object]:
-        return _mapping_call(promote_draft, draft_id, user.token, sessions, mapping_store)
+        return _mapping_call(
+            promote_draft,
+            draft_id,
+            user.token,
+            sessions,
+            mapping_store,
+            audit_route="/mappings/drafts/{draft_id}/promote",
+            audit_token=user.token,
+        )
 
     @app.get("/mappings/overrides/report")
     def get_override_report(user: CurrentUser) -> dict[str, object]:
         return _mapping_call(source_corrections_report, user.token, sessions, mapping_store)
+
+    @app.get("/mappings/pending/report")
+    def get_pending_report(user: CurrentUser) -> dict[str, object]:
+        # N14: the union report. The email rider count is a GRAPH read
+        # (docs.email-unassigned.v1, Q21); the report itself must render with
+        # no graph in reach, so an unreachable graph degrades to the explicit
+        # "read it at the spec" line — never an error, never a silent zero.
+        #
+        # O69 at the merge: this route arrived on main AFTER the branch converted
+        # every other route to the declared-user signature, so it was the one
+        # raw-Authorization holdout the guard caught. Converted here rather than
+        # exempted — the guard's whole point is that it has no exceptions.
+        email: int | None = None
+        try:
+            out = run_named("docs.email-unassigned.v1", {}, user.token, sessions, graph)
+            rows = out.get("rows") or []
+            email = int(next(iter(rows[0].values()))) if rows else 0
+        except Exception:  # — graph-unavailable is a rendered state here
+            email = None
+        return _mapping_call(
+            pending_source_correction_report,
+            user.token,
+            sessions,
+            mapping_store,
+            email_unassigned=email,
+        )
 
     # ── K9/K11 app-code defined-mapping drafting (gate seal-app-ref-edge-
     # reshape §E1/§E2/§G7): the steward cascade drafts store rows; the
@@ -589,7 +738,13 @@ def create_app(
     @app.post("/mappings/app-code/draft")
     def post_app_code_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
         return _mapping_call(
-            draft_app_code_mapping, body.entries, user.token, sessions, mapping_store
+            draft_app_code_mapping,
+            body.entries,
+            user.token,
+            sessions,
+            mapping_store,
+            audit_route="/mappings/app-code/draft",
+            audit_token=user.token,
         )
 
     # K7 §B2 tier-3 readback (lifted from wip/k9-laptop at J30): dual-coded was

@@ -8,7 +8,7 @@ phase: 9
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - K16
 inputs:
@@ -19,3 +19,41 @@ acceptance: |
   SME direction 2026-08-19, raised with the two-source FID evidence: a job's run_as account can belong to a different application than the folder's own attribution, and that case needs an item of its own rather than a footnote. The gate's §G MALCOLM counterexample already proved one INSTANCE (registered-to-platform, attributed-to-product); this item makes the CLASS measurable. (a) A detection over the census join: for every Control-M run_as owner resolvable through the id-owner listing (doc 09 Source B), compare the FID's application assignment against the folder's confirmed attribution; emit counts by outcome — same application / different application / unresolvable — never a row dump (the K16 discipline; the output is Internal and lands company-side). (b) The different-application bucket is broken down by the gate's §G5 readings (different subjects both correct / stale directory / wrong folder attribution) the same parked-until-ruled way the census handles disagreements: every case starts unruled, a human rules each, and the unruled count is itself reportable. (c) NOTHING is written to the graph and no edge is proposed here — if the SME wants cross-application run_as expressed as an edge or a property, that is a K17-gate amendment, and this item's output is the evidence it would cite. (d) The known-legitimate shared-platform case (the 171-way agent account measured 2026-08-19) is handled as a NAMED expectation, not a finding: a shared platform FID serving many applications' folders is the EXPECTED shape of that account class, so the detector must separate account-class-expected sharing from genuine cross-application anomalies, or the report drowns. SME CLARIFICATION 2026-08-19, and it upgrades (d) from a filter to a CLASSIFICATION: the 171-way name IS the Control-M platform user — the account jobs run as when they run as Control-M itself — and the class is cross-platform (Informatica carries several platform accounts under which business-application jobs run). So the detector's first cut is run_as CLASS (application FID / platform-user account / unresolvable), the platform-user bucket is EXPECTED to disagree with folder attribution by construction and resolves through the platform's own attribution chain instead of the directory, and the by-class counts are themselves a deliverable (how much of the estate runs as the platform is a number nobody has). How a platform account is RECOGNIZED (curated list vs the directory's type/purpose columns) is a K17 §D/§G ruling this item must not preempt — it may propose, with evidence. JOB-GRAIN EVIDENCE 2026-08-19 (SME captures, a live legacy-LOB folder): the class splits INSIDE one folder — the FileWatcher job runs as the platform account while the folder default (the payload jobs) runs as the application's account. So (e) the detector classifies PER JOB, never per folder, and reports run_as class BY JOB TYPE: FileWatcher x platform-account is the designed pattern (file watching is a platform service); the countable anomaly is a PAYLOAD job running as the platform. A folder-grain read would have reported this folder as application-run and missed the split entirely.
 notes: |
   Direct add 2026-08-19 (desktop, SME direction at the K16 two-source evidence session). depends_on K16 because the detection runs over the same census join the counts come from — building it before the census has real rows would validate it against nothing. Sonnet: the acceptance is a written pass/fail over a defined join. Priority p2 with K16: this is the measurable half of the §G registration-vs-attribution problem, and the gate's §G3 ruling on the K2 FID tier will want these numbers in front of it.
+  DONE 2026-08-26 (desktop). THE STATUS CALL, made explicitly because K16 — the dependency — sits
+  in_progress on the same company-side event: K16's acceptance demands REAL COUNTS, which this repo
+  structurally cannot produce; K25's acceptance asks for A DETECTION, and every clause (a)-(e) is
+  implemented and synthetic-tested, so done is the honest state HERE while the numbers themselves
+  remain company-side. The runner is docs/company-prompts/k25-run-as-detection-company-prompt.md,
+  and its run is the SAME event K16's 0-counts row awaits — doc 09's phase table now carries a
+  0-K25 method row saying exactly that. `drydocs/run_as_detect.py` (fid_census's sibling: pure,
+  stdlib-only for the same porting reason, counts-only BY RETURN TYPE — int/bool/str->int fields,
+  a row dump unexpressible, pinned structurally and by a serialized-output sweep that asserts no
+  injected identifier escapes; job-TYPE strings are the one deliberate non-count content, they are
+  TASK_TYPE vocabulary not identifiers). THE FIRST CUT IS RUN_AS CLASS per the 2026-08-19 SME
+  clarification: platform_user / application_fid / unresolvable, per JOB and never per folder —
+  the fixture reproduces the SME's live in-folder split (FileWatcher on the platform account
+  beside payload jobs on the application account) and asserts a folder-grain read could not
+  express it. FileWatcher x platform is the DESIGNED pattern (PLATFORM_EXPECTED_JOB_TYPES, a
+  declared constant with the ruling cited); the countable anomaly is a PAYLOAD job on the
+  platform, broken down by job type. INTERPRETATION STATED for "resolves through the platform's
+  own attribution chain": platform-class jobs are COUNTED AND EXCLUDED from the directory
+  comparison — no platform-chain resolution is built here and no input for one exists; the
+  by-class counts (how much of the estate runs as the platform) are the deliverable the SME named.
+  PLATFORM RECOGNITION IS NOT PREEMPTED (the K17 §D/§G fence): platform_accounts is an INJECTED
+  set — the seam whatever K17 rules feeds — and doc 09's S3 spread-ranking + SME confirmation is
+  the standing evidence-backed proposal for filling it; an empty set is legal and tested. Platform
+  wins over directory presence (the 171-way name IS a directory row — that is WHY recognition
+  cannot be "is it registered") and the overlap is a visible counter. OUTCOMES (a): same /
+  different / unresolvable for application-class jobs only, with unresolvable counted BY REASON
+  (folder_unattributed vs job_carried_no_folder — different facts). §G5 (b): the different bucket
+  splits at CASE grain — a distinct (account, attributed application) pair, so fifty jobs sharing
+  one disagreement are ONE case for a human — every case parks unruled, rulings are injected, an
+  unknown reading is refused, and the unruled count is itself reportable. (c): nothing touches the
+  graph, no edge proposed; the output is the evidence a K17 amendment would cite. Case handling:
+  trim-only normalization with the caller-normalizes contract (the K16 2026-08-12 ruling), and
+  case-only near-misses are counted on BOTH joins — directory AND platform set — after the review
+  pass caught the platform-side silent-miss gap. TESTS: 13 in tests/unit/test_run_as_detect.py,
+  synthetic throughout; THREE MUTATIONS all caught (directory-before-platform recognition;
+  unruled silently inferred as different_subjects; the designed-pattern set emptied).
+  MODULE_MAP row + module-boundary registration (drydocs-review, beside fid_census, same
+  reasoning). Suite 2540 passed / 11 skipped, ruff clean, CLI gates green.

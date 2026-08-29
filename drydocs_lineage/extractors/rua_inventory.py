@@ -33,6 +33,12 @@ What each bundle section becomes:
   content: rows stage with ``hash_missing`` and ``script_copies_missing``
   counted. Presence dispatch: ``scripts.tsv`` (v2, richer) WINS when both
   exist; the csv is the fallback; neither present files optional-absent.
+- ``mounts.tsv``                   → NOT a node. The v3 mount table is the
+  DERIVATION INPUT for ``mount_root`` / ``fstype`` / ``storage_scope``, stamped
+  on every staged record — and so onto its occurrences, which is what the G23
+  load and the G58 archival report read. OPTIONAL on the same contract as
+  ``scripts.tsv``: a v1 or v2 bundle carries no mount table, stamps nothing,
+  and stays ingestible exactly as before.
 
 Identity is deliberately rua-scoped (``rua_script`` / ``rua_profile`` /
 ``rua_path``), NOT shared with the CMD_LINE invocation namespace: whether a
@@ -52,7 +58,7 @@ import tarfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from drydocs_core.data_root import rua_extracted_dir
+from drydocs_core.data_root import refuse_write_into_read_zone, rua_extracted_dir
 
 from ..model import DataAssetNode, LineageGraph, ProcessNode, asset_id, process_id
 
@@ -63,6 +69,7 @@ PROFILES_TSV = "profiles.tsv"
 SCRIPTS_TSV = "scripts.tsv"  # v2 only — OPTIONAL on ingest; WINS over the csv
 SCRIPTS_CSV = "scripts.csv"  # metadata-only listing fallback (G45; pipe-delim)
 OWNERSHIP_TSV = "ownership_dirs.tsv"  # only when OWNERSHIP_SWEEP=yes
+MOUNTS_TSV = "mounts.tsv"  # v3 only — OPTIONAL on ingest (G56)
 
 #: staged kinds — rua-scoped on purpose (cross-source identity is G22's ruling)
 RUA_PATH_KIND = "rua_path"
@@ -93,6 +100,7 @@ _REQUIRED_COLS = {
     PROFILES_TSV: ("name", "path", "size", "mtime", "perms", "owner"),
     SCRIPTS_TSV: ("path", "owner", "group", "perms", "size", "mtime"),
     OWNERSHIP_TSV: ("path", "type", "perms", "size", "mtime"),
+    MOUNTS_TSV: ("source", "target", "fstype", "options"),
 }
 
 #: the metadata-only listing contract (G45): path = containing directory,
@@ -100,6 +108,88 @@ _REQUIRED_COLS = {
 _SCRIPTS_CSV_COLS = ("path", "script", "permission", "date", "size")
 
 _TARBALL_SUFFIXES = (".tar.gz", ".tgz", ".tar")
+
+#: fstype → storage_scope (G56; gate rua-load-shapes, the D-amendment). SHARING
+#: FOLLOWS FROM THE FSTYPE, never from the array: twenty hosts each with their
+#: own LUN off one SAN is twenty filesystems holding twenty files that genuinely
+#: drift, while twenty hosts mounting ONE NFS export is one file seen twenty
+#: times. The two sets are exactly the ones the amendment named, and the map is
+#: deliberately NOT widened by inference — an unlisted fstype is ``unknown`` AND
+#: COUNTED (below), because a wrong ``local`` manufactures the independent
+#: observations that G2 drift detection and the G24 corroboration both assume,
+#: while a wrong ``shared`` suppresses real drift. The counter is the review
+#: feed: widen this map from what an estate actually reports, never from what
+#: looks likely.
+_SHARED_FSTYPES = frozenset({"nfs", "nfs4", "cifs", "gfs2", "ocfs2"})
+_LOCAL_FSTYPES = frozenset({"xfs", "ext4"})
+
+#: the three values the amendment ruled — ``unknown`` NEVER defaults to
+#: independent; it SUPPRESSES the corroboration claim (D-amendment, G58 §c)
+SCOPE_SHARED = "shared"
+SCOPE_LOCAL = "local"
+SCOPE_UNKNOWN = "unknown"
+
+
+def storage_scope_for(fstype: str) -> str:
+    """``fstype`` → ``shared`` | ``local`` | ``unknown``. Unrecognised is its
+    own answer, not a lean toward either — see the map's note above."""
+    ftype = (fstype or "").strip().lower()
+    if ftype in _SHARED_FSTYPES:
+        return SCOPE_SHARED
+    if ftype in _LOCAL_FSTYPES:
+        return SCOPE_LOCAL
+    return SCOPE_UNKNOWN
+
+
+class _MountTable:
+    """The v3 ``mounts.tsv``, resolved by LONGEST MATCHING TARGET.
+
+    Longest-match is what makes a nested mount readable: a host with ``/`` on
+    xfs and ``/home/svc`` on nfs holds ``/home/svc/app/run.ksh`` on SHARED
+    storage, and only the deeper target says so. Matching is BOUNDARY-AWARE —
+    ``/opt/app2`` must not match an ``/opt/app`` mount — and equal-length
+    targets resolve to the LAST row, which is mount order: a later mount over
+    the same point shadows the earlier one.
+
+    Present-but-unmatched is a real state and is COUNTED, never defaulted: a
+    partial table with no root mount leaves a path scope-``unknown``.
+    """
+
+    __slots__ = ("_rows",)
+
+    def __init__(self, rows: list[tuple[str, str, str]]) -> None:
+        self._rows = rows  # (target, fstype, source), in file order
+
+    def __bool__(self) -> bool:
+        return bool(self._rows)
+
+    def stamp(self, path: str, props: dict[str, str], coverage: RuaCoverage) -> None:
+        """Add ``mount_root`` / ``fstype`` / ``mount_source`` / ``storage_scope``
+        to ``props`` — in place, before any occurrence copy is taken."""
+        best: tuple[str, str, str] | None = None
+        best_len = -1
+        for target, fstype, source in self._rows:
+            stripped = target.rstrip("/")
+            if not stripped:  # the root mount matches every absolute path
+                matched, stripped = path.startswith("/"), "/"
+            else:
+                matched = path == stripped or path.startswith(stripped + "/")
+            if matched and len(stripped) >= best_len:
+                best, best_len = (stripped, fstype, source), len(stripped)
+        if best is None:
+            coverage.mount_unresolved += 1
+            props["storage_scope"] = SCOPE_UNKNOWN
+            return
+        mount_root, fstype, source = best
+        scope = storage_scope_for(fstype)
+        props["mount_root"] = mount_root
+        props["fstype"] = fstype
+        props["mount_source"] = source
+        props["storage_scope"] = scope
+        if scope == SCOPE_UNKNOWN:
+            coverage.mount_scope_unknown_fstype += 1
+            if fstype not in coverage.mount_fstypes_unrecognised:
+                coverage.mount_fstypes_unrecognised.append(fstype)
 
 
 @dataclass
@@ -128,6 +218,11 @@ class RuaCoverage:
     ownership_staged: int = 0
     ownership_malformed: int = 0
     hash_missing: int = 0  # artifact row without a sha256 (v1, or unreadable)
+    mounts_rows: int = 0  # v3 mount-table rows read
+    mounts_malformed: int = 0  # mount row with no target (counted, never used)
+    mount_unresolved: int = 0  # table present, but no target matched the path
+    mount_scope_unknown_fstype: int = 0  # matched a mount of an UNLISTED fstype
+    mount_fstypes_unrecognised: list[str] = field(default_factory=list)  # which
     cross_host_collisions: int = 0  # id already staged from a DIFFERENT host
     meta: dict[str, str] = field(default_factory=dict)  # the FULL parsed meta.txt
     # (G23's metadata-as-nodes raw material)
@@ -149,7 +244,9 @@ class RuaCoverage:
             f"malformed: dirs={self.directories_malformed} "
             f"profiles={self.profiles_malformed} scripts={self.scripts_malformed} "
             f"ownership={self.ownership_malformed} | "
-            f"cross_host={self.cross_host_collisions}"
+            f"cross_host={self.cross_host_collisions} | "
+            f"mounts={self.mounts_rows} "
+            f"scope_unknown={self.mount_scope_unknown_fstype}+{self.mount_unresolved}"
         )
 
 
@@ -212,10 +309,16 @@ class RuaInventoryExtractor:
         bundle_dir = self._resolve_bundle_dir(src)
 
         env_props = self._read_envelope(bundle_dir, coverage)
-        self._stage_paths(bundle_dir / DIRECTORIES_TSV, DIRECTORIES_TSV, into, coverage, env_props)
-        self._stage_paths(bundle_dir / OWNERSHIP_TSV, OWNERSHIP_TSV, into, coverage, env_props)
-        self._stage_profiles(bundle_dir, into, coverage, env_props)
-        self._stage_scripts(bundle_dir, into, coverage, env_props)
+        # read BEFORE staging — every record's storage_scope derives from it
+        mounts = self._read_mounts(bundle_dir, coverage)
+        self._stage_paths(
+            bundle_dir / DIRECTORIES_TSV, DIRECTORIES_TSV, into, coverage, env_props, mounts
+        )
+        self._stage_paths(
+            bundle_dir / OWNERSHIP_TSV, OWNERSHIP_TSV, into, coverage, env_props, mounts
+        )
+        self._stage_profiles(bundle_dir, into, coverage, env_props, mounts)
+        self._stage_scripts(bundle_dir, into, coverage, env_props, mounts)
         return coverage
 
     # -- bundle resolution ----------------------------------------------------
@@ -226,10 +329,21 @@ class RuaInventoryExtractor:
                 name = name[: -len(suffix)]
                 break
         dest = Path(unpack_dir) if unpack_dir else rua_extracted_dir(name, create=True)
+        # G81 — THE WRITE SITE, and the one the static invariant cannot see.
+        # `unpack_dir` is a caller-supplied path, so no comparison of DECLARED
+        # zones can catch it: an operator naming their own extract folder here
+        # gets it overwritten file by file. `extractall` overwrites with no
+        # warning and no diff, which is what makes this the incident's shape
+        # rather than merely a mess. The check runs for BOTH branches — the
+        # default zone benefits too, since a future declaration change could
+        # move it under a drop zone without anyone re-reading this function.
+        refuse_write_into_read_zone(dest, action="unpack into")
         dest.mkdir(parents=True, exist_ok=True)
         with tarfile.open(tarball) as tf:
             # filter="data": strips absolute paths / traversal / specials — a
-            # carried-back tarball is data, never something to trust blindly
+            # carried-back tarball is data, never something to trust blindly.
+            # NOTE the two are different guarantees: filter= polices what is
+            # INSIDE the archive, the refusal above polices WHERE it lands.
             tf.extractall(dest, filter="data")
         return dest
 
@@ -263,6 +377,39 @@ class RuaInventoryExtractor:
                 coverage.meta_fields_missing += 1
         return props
 
+    # -- mounts.tsv → the storage_scope derivation input (v3, OPTIONAL) ---------
+    def _read_mounts(self, bundle_dir: Path, coverage: RuaCoverage) -> _MountTable | None:
+        """Parse the v3 mount table, or ``None`` when the bundle has none.
+
+        ``None`` is not "no mounts" — it is "this bundle predates the capture",
+        and the difference matters: a v1/v2 bundle stamps NOTHING (no
+        ``storage_scope`` key at all, so every downstream default still
+        applies and pre-v3 behaviour is unchanged), while a v3 bundle whose
+        table simply does not cover a path stamps ``unknown`` and counts it.
+        Absence files under the EXISTING optional-absent contract, the same
+        one ``scripts.tsv`` uses — dispatch is on PRESENCE, never on the
+        ``schema=`` tag, so a bundle that carries the section is read whatever
+        it calls itself."""
+        tsv = bundle_dir / MOUNTS_TSV
+        if not tsv.is_file():
+            coverage.sections_optional_absent.append(MOUNTS_TSV)
+            return None
+        rows: list[tuple[str, str, str]] = []
+        for row in _read_tsv(tsv, _REQUIRED_COLS[MOUNTS_TSV]):
+            if row is None:
+                coverage.sections_missing.append(f"{MOUNTS_TSV}:bad-header")
+                return None
+            if not row or not row.get("target"):
+                coverage.mounts_malformed += 1
+                continue
+            coverage.mounts_rows += 1
+            # fields travel as the collector wrote them: findmnt's \040-style
+            # escapes are NOT decoded here either, so a target with a space
+            # simply never matches — visible as mount_unresolved rather than
+            # as a wrong mount silently claimed
+            rows.append((row["target"], row.get("fstype", ""), row.get("source", "")))
+        return _MountTable(rows)
+
     # -- directories.tsv / ownership_dirs.tsv → rua_path DataAssets --------------
     def _stage_paths(
         self,
@@ -271,6 +418,7 @@ class RuaInventoryExtractor:
         graph: LineageGraph,
         coverage: RuaCoverage,
         env_props: dict[str, str],
+        mounts: _MountTable | None,
     ) -> None:
         optional = section == OWNERSHIP_TSV
         if not tsv.is_file():
@@ -296,6 +444,8 @@ class RuaInventoryExtractor:
                 if row.get(col):
                     props[col] = row[col]
             props["rua_section"] = section
+            if mounts is not None:
+                mounts.stamp(path, props, coverage)
             existing = graph.data_assets.get(aid)
             if existing is None:
                 graph.add_data_asset(
@@ -320,6 +470,7 @@ class RuaInventoryExtractor:
         graph: LineageGraph,
         coverage: RuaCoverage,
         env_props: dict[str, str],
+        mounts: _MountTable | None,
     ) -> None:
         tsv = bundle_dir / PROFILES_TSV
         if not tsv.is_file():
@@ -344,6 +495,7 @@ class RuaInventoryExtractor:
                 graph,
                 coverage,
                 env_props,
+                mounts,
             )
 
     # -- scripts.tsv | scripts.csv → rua_script artifacts (OPTIONAL) --------------
@@ -353,15 +505,16 @@ class RuaInventoryExtractor:
         graph: LineageGraph,
         coverage: RuaCoverage,
         env_props: dict[str, str],
+        mounts: _MountTable | None,
     ) -> None:
         """Presence dispatch (G45): the v2 ``scripts.tsv`` (abs-path rows,
         sha256, ``scripts/`` body mirror) WINS when both files exist; else the
         metadata-only ``scripts.csv`` listing stages; else the bundle carries
         no scripts section and stays ingestible (optional-absent)."""
         if (bundle_dir / SCRIPTS_TSV).is_file():
-            self._stage_scripts_tsv(bundle_dir, graph, coverage, env_props)
+            self._stage_scripts_tsv(bundle_dir, graph, coverage, env_props, mounts)
         elif (bundle_dir / SCRIPTS_CSV).is_file():
-            self._stage_scripts_csv(bundle_dir, graph, coverage, env_props)
+            self._stage_scripts_csv(bundle_dir, graph, coverage, env_props, mounts)
         else:
             coverage.sections_optional_absent.append(SCRIPTS_TSV)
 
@@ -371,6 +524,7 @@ class RuaInventoryExtractor:
         graph: LineageGraph,
         coverage: RuaCoverage,
         env_props: dict[str, str],
+        mounts: _MountTable | None,
     ) -> None:
         tsv = bundle_dir / SCRIPTS_TSV
         for row in _read_tsv(tsv, _REQUIRED_COLS[SCRIPTS_TSV]):
@@ -402,6 +556,7 @@ class RuaInventoryExtractor:
                 graph,
                 coverage,
                 env_props,
+                mounts,
             )
 
     def _stage_scripts_csv(
@@ -410,6 +565,7 @@ class RuaInventoryExtractor:
         graph: LineageGraph,
         coverage: RuaCoverage,
         env_props: dict[str, str],
+        mounts: _MountTable | None,
     ) -> None:
         """The metadata-only listing (G45): ``path`` is the containing
         directory and ``script`` the filename, so the staged identity is the
@@ -444,6 +600,7 @@ class RuaInventoryExtractor:
                 graph,
                 coverage,
                 env_props,
+                mounts,
             )
 
     # -- shared artifact staging ---------------------------------------------------
@@ -458,6 +615,7 @@ class RuaInventoryExtractor:
         graph: LineageGraph,
         coverage: RuaCoverage,
         env_props: dict[str, str],
+        mounts: _MountTable | None,
     ) -> None:
         props = dict(env_props)
         # the provenance-origin discriminator (G24): this record says what is
@@ -472,6 +630,13 @@ class RuaInventoryExtractor:
             props["sha256"] = sha  # the version discriminator (G24 anchor)
         else:
             coverage.hash_missing += 1
+        # STAMPED BEFORE the occurrence copy below, deliberately: §D2 ruled the
+        # occurrence the grain that carries mount_root + fstype + storage_scope,
+        # and the G23 load and the G58 archival report both read it off the
+        # RECORD, never off the node props. Stamping after would leave the
+        # second host's occurrence scope-less.
+        if mounts is not None:
+            mounts.stamp(path, props, coverage)
         copy_path = bundle_dir / copy_rel.lstrip("/")
         is_profile = kind == RUA_PROFILE_KIND
         if copy_path.is_file():

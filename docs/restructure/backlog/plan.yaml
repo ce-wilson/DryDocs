@@ -46,7 +46,7 @@ plan:
   - id: 10
     title: Documentation infrastructure
     goal: Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF
-      render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability spine (Epic
+      render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic
       L).
     status: in_progress
   - id: 11

@@ -44,15 +44,21 @@ _DRIFTED = f"""<?xml version="1.0" encoding="UTF-8"?>
 <DEFTABLE>
   <SMART_FOLDER DATACENTER="{DC}" FOLDER_NAME="FOLDER-SYNTH-DRIFT">
     <VARIABLE NAME="%%DevX-project" VALUE="SYNTHKEY"/>
+    <!-- R41: the SAME name twice in one scope, two different values. Which
+         one wins is an ordinal accident, and a reader of the folder sees both. -->
+    <VARIABLE NAME="%%DevX-project" VALUE="SYNTHKEY_OVERRIDE"/>
     <SHOUT DEST="EM" MESSAGE="synthetic"/>
     <JOB JOBNAME="JOB0010_SAMPLE_DAT_ONPM_FW" TASKTYPE="FileWatcher"
+         CREATED_BY="synth.template.author"
          FILE_PATH="%%FILE_PATH%%FILE_PREFIX.%%$ODATE.%%FILE_EXTENSION"
          POSTCMD="cat %%FILE_PATH%%FILE_PREFIX.%%$ODATE.%%FILE_EXTENSION">
       <VARIABLE NAME="%%FILE_PATH" VALUE="/data/synth/dropbox/UPD/"/>
       <VARIABLE NAME="%%FILE_PREFIX" VALUE="SAMPLE_LKP_"/>
       <VARIABLE NAME="%%FILE_EXTENSION" VALUE=".txt"/>
     </JOB>
+    <!-- R44: the SAME authored value on a second job — it TRAVELLED with the copy -->
     <JOB JOBNAME="JOB0011_SAMPLE_TOK_ONPM_FW" TASKTYPE="FileWatcher"
+         CREATED_BY="synth.template.author"
          FILE_PATH="%%FILE_PATH.%%FILE_NM_PREFIX.%%$ODATE.%%FILE_NM_SUFFIX.tok"
          POSTCMD="cat %%FILE_PATH.%%FILE_PREFIX.%%$ODATE..tok">
       <VARIABLE NAME="%%FILE_PATH" VALUE="/data/synth/dropbox/UPD/"/>
@@ -84,6 +90,10 @@ _DRIFTED = f"""<?xml version="1.0" encoding="UTF-8"?>
       </ON>
     </JOB>
   </SMART_FOLDER>
+  <!-- R42: a sibling of the set above that separates the same positional
+       fields with "_" where its sibling uses "-". A SQL parse splitting on
+       either one now returns a different field COUNT per folder. -->
+  <SMART_FOLDER DATACENTER="{DC}" FOLDER_NAME="FOLDER_SYNTH_DRIFT2"/>
 </DEFTABLE>
 """
 
@@ -324,3 +334,137 @@ def test_every_finding_is_unratified(drifted) -> None:
 def test_findings_carry_the_registry_severity_vocabulary(drifted) -> None:
     allowed = {"must-fix", "should-fix", "advisory"}
     assert {f.severity for f in detect_all(drifted)} <= allowed
+
+
+# == G69 — the four fan-out defect classes (R41-R44) =========================
+# Registered AND detected in one change, which IS the item: the registry is the
+# single source for both the validate gate and the greenfield gate, so a
+# detector with no entry emits findings nothing can rank, nothing can turn into
+# a fix, and — the real problem — nothing can SIGN OFF on.
+
+
+def test_r41_names_the_ordinal_accident_not_the_untidiness(drifted) -> None:
+    """MUST-FIX, and the message has to say why. Which of two declarations wins
+    is an ordinal accident: the job runs against whichever is last, and a reader
+    of the folder sees both and cannot tell which is live."""
+    (finding,) = _by_rule(detect_conformance(drifted))["R41"]
+    assert finding.severity == "must-fix"
+    assert finding.target.endswith(":DevX-project")
+    assert "ordinal accident" in finding.message
+    assert "SYNTHKEY" in finding.message and "SYNTHKEY_OVERRIDE" in finding.message
+
+
+def test_r41_reads_the_raw_layers_not_the_resolved_chain(drifted) -> None:
+    """The rule is structurally unable to fire off `_declared`, which resolves
+    the chain into a dict and so collapses the duplicate by construction. This
+    pins that it walks the raw definitions instead."""
+    from drydocs_remediation.detect import _declared
+
+    folder = next(f for f in drifted.folders if f.scope == "FOLDER")
+    raw = [name for name, _v in folder.variables if name == "%%DevX-project"]
+    assert len(raw) == 2, "the fixture must keep BOTH declarations"
+    job = drifted.jobs[0]
+    assert len(_declared(drifted, job)) < len(folder.variables) + len(job.variables)
+
+
+def test_r42_names_the_parse_consequence_not_the_cosmetic_one(drifted) -> None:
+    """The rule whose finding must name what BREAKS. A positional folder name is
+    split downstream to read its fields out; when siblings disagree about the
+    separator the split returns a different field COUNT, so the read silently
+    lands on the wrong field rather than failing."""
+    (finding,) = _by_rule(detect_conformance(drifted))["R42"]
+    assert "field COUNT" in finding.message
+    assert "WRONG FIELD" in finding.message
+    assert "FOLDER-SYNTH-DRIFT" in finding.message and "FOLDER_SYNTH_DRIFT2" in finding.message
+    # ONE finding for one defect, however many delimiters a parse would break on
+    assert finding.rule_id == "R42"
+
+
+def test_r42_cannot_fire_on_a_set_of_one(greenfield) -> None:
+    """A set of one folder cannot disagree with itself, and reporting it would
+    be a finding about nothing."""
+    assert "R42" not in _by_rule(detect_conformance(greenfield))
+
+
+def test_r44_is_advisory_and_says_what_to_read_instead(drifted) -> None:
+    """The value is not WRONG so much as answering a different question, so the
+    finding must point at the audit fields — and must NOT claim more than this
+    pass can see: a definition export carries no audit trail, so the pattern is
+    reported, never confirmed."""
+    (finding,) = _by_rule(detect_conformance(drifted))["R44"]
+    assert finding.severity == "advisory"
+    assert "AUDIT fields" in finding.message
+    assert "reported, not confirmed" in finding.message
+    assert "synth.template.author" in finding.message
+
+
+def test_r44_needs_two_jobs_sharing_one_authored_value() -> None:
+    """One job carrying an authored value says NOTHING — every job has an
+    author. The signal is the value SPANNING jobs, which is what a copy
+    produces. Asserted on a set that actually CARRIES an authored value, not on
+    the greenfield fixture: that one has none, so it would pass this by
+    omission and a detector that fired on every single job would slip through.
+    """
+    from drydocs_remediation.formats import DefinitionSet, JobDefinition
+
+    lone = DefinitionSet(jobs=[JobDefinition(name="JOB0010_ONLY", authored_by="synth.one.author")])
+    assert "R44" not in _by_rule(detect_conformance(lone))
+
+    pair = DefinitionSet(
+        jobs=[
+            JobDefinition(name="JOB0010_A", authored_by="synth.one.author"),
+            JobDefinition(name="JOB0020_B", authored_by="synth.one.author"),
+        ]
+    )
+    assert "R44" in _by_rule(detect_conformance(pair))
+
+    distinct = DefinitionSet(
+        jobs=[
+            JobDefinition(name="JOB0010_A", authored_by="synth.author.one"),
+            JobDefinition(name="JOB0020_B", authored_by="synth.author.two"),
+        ]
+    )
+    assert "R44" not in _by_rule(detect_conformance(distinct))
+
+
+def test_r43_ships_registered_but_undetected_on_purpose(drifted) -> None:
+    """THE SCOPE-DISCIPLINE CLAUSE, pinned so the three easy rules cannot carry
+    the hard one over the line. Which carrier owns a name — Control-M %%VAR or
+    shell ${VAR} — is UNDECIDED, and the greenfield action differs completely by
+    answer: rename one carrier, or declare the shell export. A detector firing
+    against an undecided rule puts a finding in front of an SME with no
+    defensible action attached to it."""
+    from drydocs_remediation.detect import CONFORMANCE_RULE_IDS
+
+    assert "R43" not in CONFORMANCE_RULE_IDS
+    assert "R43" not in _by_rule(detect_conformance(drifted))
+
+
+def test_all_four_new_rules_are_registered_even_the_undetected_one() -> None:
+    """The pairing rule, as a test. The registry is what gets RATIFIED, so an
+    entry without a detector is a decision on the record while a detector
+    without an entry is a finding nobody can sign off on. R43 is the first case
+    deliberately; the other three are the second, and neither is allowed."""
+    from pathlib import Path as _Path
+
+    registry = (
+        _Path(__file__).resolve().parents[2]
+        / "internal"
+        / "remediation"
+        / "standards-rules-registry.md"
+    ).read_text(encoding="utf-8")
+    for rule in ("R41", "R42", "R43", "R44"):
+        assert f"## {rule} " in registry, f"{rule} has no registry entry"
+    from drydocs_remediation.detect import CONFORMANCE_RULE_IDS
+
+    for rule in ("R41", "R42", "R44"):
+        assert rule in CONFORMANCE_RULE_IDS
+
+
+def test_the_new_rules_are_provisional_and_unratified(drifted) -> None:
+    """Only ratified rules may change a definition, and ratifying is the HITL
+    gate's — which wants real findings from a real folder set (G68's profile
+    run), not fixture hits."""
+    for rule in ("R41", "R42", "R44"):
+        for finding in _by_rule(detect_conformance(drifted))[rule]:
+            assert finding.ratified is False

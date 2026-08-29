@@ -1,0 +1,49 @@
+id: K27
+epic: seal-attribution
+title: A real source-mode team refresh needs an input file nothing produces — either the projection emits
+  the team-roles CSV or it is declared a hand-drop, in writing
+type: task
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- scripts/project_pat_team_report.py
+- config/source-mappings/pat-team-report.yaml
+- docs/design/drydocs-load-runbook.md
+acceptance: |
+  (a) THE GAP. G79 wired the team-roles loader into the team chain (it was gate-confirmed at C9 and had never run) and bound it to the PAT people-report source, so a real source-mode refresh resolves THREE files from that source's landing zone: the dev-teams CSV, the product-mapping CSV, and now the team-roles CSV. The projection script (G82) emits only the first two, so the third has no documented way to exist.
+
+  (b) ONE DISPOSITION, WITH A REASON. The item picks ONE and says why: either extend the projection to emit the team-roles CSV from the same PAT team report, or declare the file a hand-drop. Leaving both open is what produced this gap.
+
+  (c) IF IT IS THE PROJECTION: the source-mapping ledger for the PAT team report gains the role columns, pinned at the FIRST REAL RUN under G82's header-map discipline — spellings fixed from the real report, never guessed. A guessed column spelling in a ledger is worse than an absent one because it looks confirmed.
+
+  (d) IF IT IS A HAND-DROP: it is said where the operator will look — the load runbook and the resolver's failure message path — naming the file, the directory and who produces it. G78's resolver already fails before the first write and names the file and the directory searched, which is why this is a task and not a bug; the point is that the operator learns what to do next somewhere other than at the failure.
+
+  (e) FIXTURE MODE IS UNAFFECTED and must stay so — the bundled sample ships with the package and the loader is verified working in fixture mode (6 rows, 0 rejected).
+notes: |
+  Groomed 2026-08-26 from Idea-160. Scope recorded from the entry: this is G82-adjacent (the projection's coverage) and deliberately NOT G79 — that split's job was to wire the loader and it did.
+
+  Epic seal-attribution and phase 9 follow G82, which owns the PAT team-report projection; module `drydocs-load` because both the script and the loader chain live there.
+
+  Not merged into G82: that item is done and its acceptance was the projection's first two files. A closed item is not the place to add a third.
+
+  p2/sonnet: the failure is loud and early, so nothing is at risk; the cost is that the first company-side real run learns it at a stop.
+  DONE 2026-08-27 (laptop, Lane B). (b) DISPOSITION: HAND-DROP, and the reason is structural,
+  not preference — the raw PAT team report is ONE ROW PER TEAM with no person columns (the
+  ledger's own census basis), so a per-person (team_id, employee_sid, role_id) file is not
+  DERIVABLE from it by any projection; extending the projection was not an option that
+  existed. (d) Said where the operator looks, three surfaces in one commit: the load
+  runbook's Refresh section (file, directory = the pat/ drop under DRYDOCS_DATA_ROOT,
+  producer = SME hand-authoring from PAT's team-membership view; notes the G78 resolver
+  already fails by name at that directory), pat_projection.py's file-roster comment (the
+  "no projection here yet" line is now the ruling), and the TEAM_DETAILS_REPORT ledger
+  object (so nobody reads the ledger hunting for role columns the report never had).
+  (c) n/a — the projection branch was not taken; the ledger gains no guessed role columns.
+  (e) fixture mode untouched: the bundled pat_team_roles__sample.csv ships with the
+  package; no code changed. Runbook html re-rendered. Suite 2571 passed / 11 skipped;
+  ruff clean; pat_projection + source-mapping-drift + runbook-currency +
+  load-sequence-surfaces guards all green.

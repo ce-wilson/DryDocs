@@ -1,8 +1,43 @@
 # Runbook — DryDocs local startup & refresh (EE container + sample ingest)
 
 <!-- anchor: front-matter -->
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 10, 2026-08-04**
-  (Appendix B is now a PROFILE of the one declared load sequence, not a copy of it —
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 13, 2026-08-24**
+  (PRESENTATION ONLY — no command, no order and no success check changed. Appendix B was
+  fifteen bare command lines: correct, guarded, and unreadable without scrolling back to
+  the sections that explain each one. It now carries a numbered `#` comment per step and a
+  blank line between phases, so the whole cold start reads in one screenful — the shape the
+  internal Confluence "Poetry Sequence" page uses, which is the format the reviewer finds
+  easier to follow. The four commands elsewhere that were still bare —
+  `load-software-registry`, `load-bmc-docs`, `m1-verify`, `m3-verify` — pick up the aligned
+  trailing comment every other multi-command block in this doc already had. THE RULE, so
+  the next edit does not have to re-derive it: a fenced block with two or more commands
+  annotates every line; a single-command block does not, because its numbered step title
+  is already the description. Appendix B stays guard-clean — `test_load_sequence_surfaces`
+  extracts verbs with `poetry run drydocs (<verb>)`, so comments are invisible to it,
+  which also means a superseded step must NEVER be left commented-out in that block: the
+  regex would match it and inject a phantom verb; on top of
+  Rev 12, 2026-08-24 (SME feedback applied — `docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml`:
+  provisioning moves OUT of Startup to the end of Prerequisites, where it belongs — it is
+  a precondition of every startup step rather than one of them, and putting it there also
+  makes the scope note's "first-time pointer" true instead of aspirational; "Schema
+  backbone" reads "Schema core"; and the per-file-verb scolding is dropped, since the
+  ruling it protects is already stated one sentence earlier. The feedback's fourth note —
+  commands running together — was NOT a prose defect: `render_body` folded a fenced block
+  inside a list item into the item's text, so every operator runbook rendered its commands
+  on one line. Fixed in `drydocs/design_doc.py`, which is why this Rev changes more `.html`
+  than `.md`); on top of
+  Rev 11, 2026-08-24 (CATCH-UP TO THE G102 FOLD, 2026-08-18 — this doc had been Rev 10 / 2026-08-04, so it
+  spent two weeks telling readers to provision a four-database topology two of whose
+  names were retired. Three defects fixed: the topology enumerations drop to
+  **`drydocs` + `ddschema`**; `load-essential-graphrag` no longer documents a
+  `-> ddcontext` target the CLI stopped carrying at `4763e63e`; and **provisioning moves
+  from step 4 to step 2**, because it CREATES the databases every later step connects to —
+  `drydocs check` raises `DatabaseNotFound` on a DBMS where `drydocs` is absent, so the
+  old order could not be followed on the fresh container it was written for. Why it
+  drifted is worth one line: Appendix B stayed correct throughout because
+  `tests/unit/test_load_sequence_surfaces.py` guards it, and nothing guards Appendix A or
+  the Startup list; on top of
+  Rev 10, 2026-08-04, where Appendix B became a PROFILE of the one declared load sequence, not a copy of it —
   it gains the standing `docs-verify` step it had been missing and a guard now fails
   if it drifts again (N6); on top of
   Rev 9, same day, where `ddlineage` retired — ADR 0002 X1 amendment: the topology enumerations drop to four
@@ -41,10 +76,14 @@
 >
 > The ruling: the script's shorter list is **deliberate**. A scheduled Control-M ingest is
 > not a full refresh, and the four steps it skips each have a reason now recorded in code
-> (`cli.SCHEDULED_INGEST_EXCLUSIONS`) — `refresh-reference` is a weekly chain on a
-> different cadence, `load-software-registry` and `load-bmc-docs` are repo-triggered
-> corpora that change when the repo does rather than when the estate does, and
-> `docs-verify` would fail that path by design, since it loads no doc corpora.
+> (`cli.SCHEDULED_INGEST_EXCLUSIONS`) or, since G79, DERIVED from the source's own
+> declared `cadence` — the three reference commands (`refresh-catalog`,
+> `refresh-applications`, `refresh-teams`) are `cadence: weekly` feeds on a different
+> rhythm from the batch estate, `load-software-registry` and `load-bmc-docs` are
+> repo-triggered corpora that change when the repo does rather than when the estate
+> does, and `docs-verify` would fail that path by design, since it loads no doc
+> corpora. The cadence-derived omissions need no prose entry: the registry field is
+> the reason, and it is one a reader can check.
 >
 > Appendix B's omission was **not** deliberate: `docs-verify` is a standing step and a cold
 > start is exactly when the doc corpora get loaded, so it is now the last line of the
@@ -187,6 +226,26 @@ beyond a first-time pointer (G1's `provision.ps1` README owns it).
 4. **Reference docs at hand:** `internal/repo-README.md` §Quick start (the canonical
    command chain this runbook operationalizes) and
    `internal/helpmeloginlocalneo4j.md` (if login misbehaves).
+5. **The topology provisioned — `drydocs` + `ddschema`.** A PREREQUISITE and not a
+   startup step, because nothing in Startup creates a database: every verb there opens a
+   session against one that must already exist, and `drydocs check` raises
+   `Neo.ClientError.Database.DatabaseNotFound` where `drydocs` is absent. Needed on a
+   DBMS never provisioned, and again after anything that destroys databases — a deleted
+   `neo4j-testdata` volume, a hand `DROP DATABASE`. Skip it where `SHOW DATABASES`
+   already lists both.
+   ```powershell
+   .\drydocs_core\schema\provisioning\provision.ps1
+   ```
+   *Success:* `OK  topology provisioned (drydocs, ddschema …)`, and `SHOW DATABASES`
+   lists `drydocs` and `ddschema` `online`. The procedure and its caveats belong to
+   `drydocs_core/schema/provisioning/README.md` — this is the first-time pointer the
+   scope note above reserves, not a second copy of it. The two caveats that cost a
+   session if unknown: `CREATE DATABASE … IF NOT EXISTS` is a no-op on a name that
+   exists, so a green re-run proves nothing about a NEWLY ADDED one; and provisioning
+   **never drops**, so a container older than a retirement still carries the dead name
+   after a green run (`ddlineage` 2026-08-04; `ddcontext` and the `ddall` composite
+   2026-08-18, at the G32/G102 fold). Dropping those is manual and per-machine; they are
+   inert meanwhile.
 
 <!-- anchor: startup -->
 ## Startup
@@ -206,10 +265,10 @@ check; go to Troubleshooting.
    poetry run drydocs check
    ```
    *Success:* exit 0 — server version and APOC reported.
-3. **Schema backbone, then the supplement chain:**
+3. **Schema core, then the supplement chain:**
    ```powershell
    poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher
-   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (G51 provisions it)
+   poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (Prerequisite 5 made it)
    poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry
    ```
    One command, not four. The order is load-bearing — `catalog` reuses the
@@ -217,8 +276,7 @@ check; go to Troubleshooting.
    the canonical `:Role` seeds the SEAL/PAT loaders MATCH at runtime (since K6 also the
    `product_roles` ProductRole scheme) — so the order lives in ONE place,
    `drydocs_core.schema.supplements.SUPPLEMENTS`, rather than in whatever sequence a
-   runbook happened to list (G29). Do not hand-run the per-file verbs to "save a step":
-   that is exactly how `registry` went missing from this runbook for months.
+   runbook happened to list (G29).
 
    *Success:* exit 0, and the printed table shows every supplement with
    `Verified == Declared terms` and `OK = yes`. The command FAILS if a supplement
@@ -229,21 +287,6 @@ check; go to Troubleshooting.
    *Opt-in:* `--with-sosa` appends the EXPERIMENTAL SOSA/SSN supplement. It is not a
    declared company standard and is never in the default chain — leave it off unless
    you are deliberately working layer-4.
-4. **First-time only — multi-DB topology** (drydocs + ddcontext + ddschema
-   + the ddall composite): run the G1 provisioning per
-   `drydocs_core/schema/provisioning/README.md` (`provision.ps1`). Skip on an
-   already-provisioned container.
-
-   Note the ordering trap on an EXISTING container: `CREATE DATABASE … IF NOT EXISTS`
-   is a no-op where the database already exists, so re-running provisioning proves
-   nothing about a newly added name. `ddschema` was created by hand during C21 and only
-   provisioned by DDL at G51 — on any machine that predates G51, confirm with
-   `SHOW DATABASES` rather than inferring it from a successful `provision.ps1` run.
-   The same asymmetry runs the other way for a RETIRED name: provisioning never drops
-   anything, so a container that predates the 2026-08-04 `ddlineage` retirement (ADR
-   0002 X1) still carries it after a green `provision.ps1` — dropping it is the manual
-   Epic X step (alias out of `ddall`, zero-node probe, then `DROP DATABASE ddlineage`).
-
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
 
@@ -264,7 +307,9 @@ samples; the Oracle variant is the same chain with scope binds.
 
 1. **Reference data (M1 chain):**
    ```powershell
-   poetry run drydocs refresh-reference           # catalog + SEAL + dev teams (+ snapshots)
+   poetry run drydocs refresh-catalog             # LOBs -> product lines -> products (+ snapshots)
+   poetry run drydocs refresh-applications        # SEAL applications + contacts (+ snapshots)
+   poetry run drydocs refresh-teams               # dev teams, team roles, team<->app alignment
    ```
 2. **Control-M (M3 chain):**
    ```powershell
@@ -275,10 +320,10 @@ samples; the Oracle variant is the same chain with scope binds.
 3. **Demonstrable content — after ANY container rebuild** (a fresh container has none
    of these corpora; the loaders are idempotent, re-running on a live container is safe):
    ```powershell
-   poetry run drydocs load-software-registry
-   poetry run drydocs load-bmc-docs
+   poetry run drydocs load-software-registry      # vendor / product registry (plan 07)
+   poetry run drydocs load-bmc-docs               # BMC corpus -> Document/Chunk lexical graph
    poetry run drydocs load-doc-traceability       # L7 — DryDocs documenting itself
-   poetry run drydocs load-essential-graphrag     # optional (-> ddcontext)
+   poetry run drydocs load-essential-graphrag     # optional (-> drydocs)
    ```
    `load-doc-traceability` is the L7 self-documentation chain: `docs/design/*.md` →
    `:DesignDoc`/`:DocSection`, the traceability-matrix rows → `:Requirement`/
@@ -306,8 +351,8 @@ samples; the Oracle variant is the same chain with scope binds.
 
 1. **Graph invariants:**
    ```powershell
-   poetry run drydocs m1-verify
-   poetry run drydocs m3-verify
+   poetry run drydocs m1-verify                   # reference / catalog / SEAL layer
+   poetry run drydocs m3-verify                   # the Control-M chain
    ```
    *Success:* both exit 0, every invariant `yes` — including "active folders contain at
    least one job" (`empty=0` since D6). The canonical expected `m3-verify` output for the
@@ -338,12 +383,14 @@ Known-good is cheap here because every loader MERGEs idempotently.
 3. **Container-level:** `docker stop` is always safe — graph data lives in the named
    volume `neo4j-testdata` and survives restarts. Recreating the *container* can remap
    host ports (re-check `docker port`, update `.env` — that is exactly what the
-   2026-07-23 recreation did, Appendix A); deleting the *volume* loses the graph — the
-   recovery is this runbook from Startup step 3, including Refresh step 3 (the document
-   corpora live only in the DB).
+   2026-07-23 recreation did, Appendix A); deleting the *volume* loses the graph — and it
+   takes the DATABASES with it, not just their contents, so the recovery starts at
+   **Prerequisite 5** (provisioning), not at any Startup step. Then run it through,
+   including Refresh step 3 (the document corpora live only in the DB).
 4. **Destructive last resort:** `poetry run drydocs reset --yes` DETACH-DELETEs every
    node and relationship in the default DB. Blast radius: the whole graph, including
-   gate-accepted corpora loads. Recovery: Startup steps 3–4 + the full Refresh section.
+   gate-accepted corpora loads. The DATABASES survive (it deletes contents, not names),
+   so recovery is Startup step 3 + the full Refresh section — no re-provisioning.
 
 <!-- anchor: troubleshooting -->
 ## Troubleshooting
@@ -377,8 +424,12 @@ don't duplicate it here.
 <!-- anchor: appendices -->
 ## Appendices
 
-**A. Current local environment** — a render of `config/dev-environment.yaml` (2026-08-03).
-Change it *there* first, then here; verify against `docker port`, never assume:
+**A. Current local environment** — a render of `config/dev-environment.yaml`
+(re-read 2026-08-24, post-fold). Change it *there* first, then here; verify against
+`docker port`, never assume. **This table is PER-MACHINE**: `dev-environment.yaml` is
+`canonical-company` in `PORT-MANIFEST.yaml`, so container names, ports and paths are
+local facts that must never be copied across the repo boundary — only the DATABASE row
+is a shared fact, because the topology is ruled rather than local.
 
 | Item | Value |
 |---|---|
@@ -388,7 +439,7 @@ Change it *there* first, then here; verify against `docker port`, never assume:
 | Plugins | `apoc` (174 procs) + `gds` (471 procs), both 2026.05.0. Needs `apoc.*,gds.*` in BOTH `dbms.security.procedures.unrestricted` and `..._allowlist`. NOT `NEO4J_PLUGINS` — see Rev 4 |
 | HTTP / Browser | container 7474 → host **7474** (`http://localhost:7474/browser/`) |
 | Bolt | container 7687 → host **7687** (`bolt://localhost:7687`) |
-| Databases | `drydocs`, `ddcontext` + composite `ddall` (G1/G7), and `ddschema` for the schema meta-graph (G51) — deliberately NOT a `ddall` constituent, since it describes the schema rather than the estate. (`ddlineage` retired 2026-08-04, ADR 0002 X1 — a container provisioned earlier still shows it until the Epic X drop) |
+| Databases | `drydocs` (ground truth AND the document corpora) and `ddschema` (the schema meta-graph) — the folded set, `01_databases.cypher`. RETIRED names a container provisioned earlier still shows until it is dropped by hand: `ddlineage` (2026-08-04, ADR 0002 X1), and `ddcontext` + the composite `ddall` (2026-08-18, gate `document-content-topology` / G102). `ddschema` was never a `ddall` constituent — it describes the schema, not the estate. |
 | Credentials | `.env` only (`NEO4J_URI` / `NEO4J_USER` / `NEO4J_PASSWORD`) |
 
 **No rollback copy exists on the laptop.** The retired `neo4j-drydocs-ee` (7476/7689) container
@@ -405,16 +456,37 @@ compares this block against the declaration and fails on any difference, so a st
 or removed here alone breaks the suite (N6, Rev 10):
 
 ```powershell
+# 1. Container up -- confirm the host port mapping before anything talks to it
 docker start neo4jtest
+
+# 2. Sanity check -- Neo4j reachable, APOC present
 poetry run drydocs check
+
+# 3. Schema core -- constraints.cypher + ontology.cypher
 poetry run drydocs bootstrap
+
+# 3b. Schema meta-graph -> ddschema (the database itself comes from Prerequisites, not here)
 poetry run drydocs bootstrap-schema-graph
+
+# 4. The ONE verified supplement chain: base -> seal -> catalog -> registry (G29)
 poetry run drydocs apply-supplements
-poetry run drydocs refresh-reference
+
+# 5. Reference load, by SOURCE (G79 split). Order is load-bearing: the catalog
+#    skeleton creates no :BusinessApplication, SEAL is authoritative for it, and
+#    refresh-teams carries a minter -- so applications precede teams.
+poetry run drydocs refresh-catalog
+poetry run drydocs refresh-applications
+poetry run drydocs refresh-teams
+
+# 6. Control-M -- folders -> jobs -> conditions -> derived deps (M3)
 poetry run drydocs ingest-controlm
+
+# 7. Registries and corpora
 poetry run drydocs load-software-registry
 poetry run drydocs load-bmc-docs
 poetry run drydocs load-doc-traceability
+
+# 8. Verify
 poetry run drydocs m1-verify
 poetry run drydocs m3-verify
 poetry run drydocs docs-verify

@@ -5,6 +5,12 @@ without intervention any test that exercises a loader would write real files
 under ``~/logs/DryDocs``. Keep the suite hermetic: point the log family's
 default at the test's tmp dir and clear the ambient env knobs. Tests that
 exercise the env resolution set the variables themselves AFTER this fixture.
+
+The DATA root gets the same treatment for a different reason. Since G81 (d)
+``DRYDOCS_DATA_ROOT`` is MANDATORY — unset raises rather than silently
+relocating every zone — so the suite must provide one, and it must be a tmp
+directory: a test that resolved the developer's REAL data root could create
+directories in it, which is the class G81 exists to close.
 """
 
 from __future__ import annotations
@@ -29,7 +35,17 @@ import pytest
 os.environ.pop("FORCE_COLOR", None)
 os.environ.setdefault("TERM", "dumb")
 
+import drydocs_core.data_root as data_root
 import drydocs_core.run_log as run_log  # after the console knob, on purpose
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_data_root(tmp_path, monkeypatch):
+    """G81 (d): the root is mandatory, so give the suite a throwaway one.
+
+    A test needing a specific root (or the unset case) overrides this with its
+    own monkeypatch, which runs after."""
+    monkeypatch.setenv(data_root.DATA_ROOT_ENV, str(tmp_path / "data-root"))
 
 
 @pytest.fixture(autouse=True)

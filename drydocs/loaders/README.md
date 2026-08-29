@@ -26,7 +26,7 @@ into a `.cypher` template → provenance `:JobRun`). Loaders are grouped here by
 
 ## Docs corpus (lexical graph)
 - `bmc_docs` (Document→Chunk, gate `bmc-docs-lexical-load`) ·
-  `essential_graphrag` (Q2 ebook load) · `doc_traceability` (L7 spine:
+  `essential_graphrag` (Q2 ebook load) · `doc_traceability` (L7 backbone:
   DesignDoc/DocSection/Requirement/Component/TestCase/FeedbackNote)
 
 ## Shared

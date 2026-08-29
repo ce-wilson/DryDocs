@@ -1,0 +1,32 @@
+id: O80
+epic: web-console
+title: 'The console has no automated test of any kind: add a unit runner and an end-to-end browser test,
+  and answer the standing O43 question with the choice'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/package.json
+- config/taxonomy/ui-tests.yaml
+- web/src/components/map/resolve.ts
+- docs/design/web-scaffolding-review.md
+acceptance: |
+  The web package gains a unit test runner and at least one end-to-end browser test, both runnable from a documented npm script and both wired into CI so a red test blocks the way a ruff failure does. The end-to-end test covers a path a person has actually had to verify by hand - sign in, reach a module, assert a rendered value - proving the runner works against the real dev server rather than a mocked shell. The unit runner covers at least one pure module where a defect has already escaped: web/src/components/map/resolve.ts is the named case, because its city-index defect was invisible to every Python guard by construction and was found only by rendering the page. O43's standing question, whether a UI test runner is warranted, is ANSWERED here rather than left open; the ui-tests.yaml ledger records which of its manual cases the automated tests now cover and which stay manual, so the ledger stops implying every case in it is unautomatable.
+notes: |
+  Raised 2026-08-27 from the web-scaffolding review, which found the console has no test
+  runner at all - no Vitest, no Playwright - while the reviewed FastAPI template ships
+  end-to-end tests as a matter of course.
+  THE EVIDENCE THIS ITEM RESTS ON is from the same week. The Z5 map's two synthetic cities
+  could never resolve, because the index keyed them one way and every lookup asked another;
+  no Python guard could see it, the bug being in TypeScript, and it was found by rendering
+  the tab and reading the unplaceable list. Twice now a console defect has been caught by a
+  person looking rather than by a test, and both times the item's own notes recorded that as
+  the lesson. A test runner is the only thing that changes it.
+  SCOPE GUARD: this item buys the CAPABILITY and proves it on two real cases. Backfilling
+  coverage across every console surface is not in it - that is what the ui-tests ledger's
+  per-surface seeded suites are for, one surface at a time.

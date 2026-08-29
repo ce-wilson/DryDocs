@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 gates: [pending-source-correction, email-folder-assignment]
 inputs:
@@ -23,3 +23,24 @@ acceptance: |
   The build the SIGNED gate email-folder-assignment (config/gate-log.md 2026-08-19, 8/8) authorized and did not build: the writer that lands the assignment edge Q10 registered and fenced. (a) THE EDGE, EXACTLY AS RULED: (:Document)-[:CONCERNS]->(:ControlMFolder | :ETLProcess). The spelling is CONCERNS (§A1 -- ASSIGNED_TO was offered and declined: it names the workflow act rather than the meaning), two endpoint classes with one meaning, and the endpoint CLASS recorded on the edge (§A2, the rua §B2 convention this reuses). (b) NO ANONYMOUS ASSIGNMENT (§A3): every write carries `assigned_by` (sme | source-signal) AND an evidence pointer -- the extract line, or the ruling note. A write missing either is refused, and a test asserts the refusal rather than documenting it. (c) THE §B1 BAR IS STRUCTURAL, not prose: only a folder or process name in a STRUCTURED FIELD of the extract may PERFORM an edge. Mentions anywhere in prose -- body OR subject line -- are candidates surfaced to the SME, never edges. The assumed extract contract (the G47 synthetic samples under drydocs/data/samples/email-extracts/) has no such field, so the source-signal path ships with no live producer: a test asserts an extraction pass over the bundled samples writes ZERO edges. (d) THE FLIP LANDS HERE AND ONLY HERE (N13 §B1 -- the build flips, intent never flips anything): docs_email_concerns in 45-local-docs.yaml goes status: planned -> active in this commit, citing the gate. The map row email-concerns-subject was already flipped to confirmed at the gate and is not re-touched. (e) THE FENCE MOVES, IT DOES NOT LIFT: tests/unit/test_email_extracts.py forbids the tokens CONCERNS / ControlMFolder / ETLProcess / ASSIGNED in the LEXICAL loader's cypher. That fence stays on email_extracts.cypher FOREVER -- the lexical loader never gains the write. This item's new cypher file is exempted BY NAME; widening the check to the directory would discharge the fence instead of moving it. (f) UNASSIGNED IS FIRST-CLASS AND NEVER DECAYS (§B3): no sweep, no best-match backfill, no default. This item exposes the unassigned COUNT on a read path; wiring that count into the pending-source-correction union report is a RIDER ON N14, not scope here -- N14 is still todo and a prose dependency on an unbuilt report would strand this build. (g) THE K7 §A1 FENCE STANDS (§C1): this edge says what an email is ABOUT. It never authors folder-to-application attribution, ownership or support routing, and no derived edge may ever cite a CONCERNS edge as its basis -- traversing email -> folder -> application is legitimate READING. Retention rides the assignment (§C2): nothing here deletes, expires or purges an unassigned email. Vocabulary regenerations that ride a flip (schema graph, enforcement matrix, the SQLite mirror) land in the same commit. Full suite green.
 notes: |
   Groomed 2026-08-19 from Idea-137, the day the gate signed. MODULE, choice recorded: drydocs-load, not drydocs-docmeta, because Q10's floor actually landed in drydocs/loaders/email_extracts.py plus loaders/cypher/email_extracts.cypher, this writer sits beside it, and it owns a RUN CADENCE -- the MODULE_MAP placement test. Q10's own row says drydocs-docmeta; that is history and is not rewritten (the done-items rule from the 2026-08-09 inputs sweep). EPIC/PHASE stay docmeta / 14 with Q10. SONNET, NOT FABLE, deliberately, on the N15 precedent: this flips a vocabulary entry, but the gate already made that decision (8/8, 2026-08-19) and the build implements a signed ruling against a written pass/fail test -- do not re-tier on the flip alone. Dependency-free: Q10 (the floor) is done and the gate is signed. HITL: no new gate; the only thing that would need one is a graph-side expression of assignment WORKFLOW state, which nothing here creates. VERIFIED AT THE GROOM rather than recalled: the fence test's forbidden-token tuple (test_email_extracts.py:98), the loader's module docstring stating the unassigned resting state, and the docs_email_concerns entry at 45-local-docs.yaml:292 with status: planned.
+  DONE 2026-08-27 (laptop, Lane B). THE WRITER: drydocs/loaders/email_concerns.py +
+  cypher/email_concerns.cypher — (a) the edge exactly as ruled (CONCERNS, two endpoint
+  classes, endpoint_class ON the edge, keys folder_id/token, MATCH-only both endpoints —
+  mints nothing; unmatched counted, never silent). (b) validate() refuses missing
+  assigned_by OR evidence, batch-refusal is all-before-any (one bad row, zero writes — the
+  recording-client test proves the graph is never touched), and the refusal is TESTED, all
+  four ways. (c) STRUCTURED_SIGNAL_FIELDS is EMPTY BY CONTRACT with a comment making the
+  emptiness load-bearing; extract_source_signal over the bundled G47 samples performs ZERO
+  assignments (tested with a vacuity check that the samples parsed non-empty; prose/subject
+  mentions are not even read here — candidates are Idea-138's SME surface). (d) THE FLIP:
+  docs_email_concerns planned -> active in 45-local-docs.yaml citing gate + Q21, loader
+  named — and the G55 invariant surfaced the missing half honestly: active requires the
+  supplement seed, so the CONCERNS OntologyTerm block joined ontology_supplement.cypher in
+  the same commit (test_yaml_fragments enforced it; exactly the flips-ride-with-builds
+  terminus the vendor gate wrote). (e) the fence on the LEXICAL loader is untouched and its
+  docstring now names email_concerns.cypher as the one exemption BY NAME — the check was
+  not widened. (f) the unassigned count reads via docs.email-unassigned.v1 (SS-B3/SS-C2 in
+  its description; N14's union-report wiring explicitly left as N14's rider). (g) the K7
+  fence rides the cypher header, the module docstring, and the supplement notes.
+  Regenerations in-commit: schema_graph, board, enforcement matrix. Offline (J18):
+  recording client, no live graph. Suite 2588 passed / 11 skipped; ruff clean.
