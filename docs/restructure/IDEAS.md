@@ -93,6 +93,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-169`** · 2026-08-28 · `[bug]` · prio? **Med** —
+  **The verify convention serves the console on port 5199, which has not been able to sign in
+  since O69.** The API's CORS allowlist (`drydocs_api/app.py`, `create_app`) is
+  `http://localhost:5173` and `http://localhost:4173` only, so a console served anywhere else
+  gets a browser-blocked `/login` and the page falls back to the sign-in screen. The symptom
+  names the wrong cause: the client reports "drydocs-api unreachable", because a CORS-blocked
+  fetch and a dead server are the same rejection to `fetch`. Found while verifying [[O77]] on
+  2026-08-28 — 5199 is the port the ui-tests ledger's own O65/O66 sources cite, and 5173 was
+  already taken by another dev server, so verification ran on 4173. Worth deciding as one
+  question rather than two: whether the allowlist should carry the verification port, and
+  whether that error message should distinguish a refused connection from a blocked origin.
+
 - **`Idea-168`** · 2026-08-28 · `[question]` · **open — user ruling, blocks the second half of the acronym stream** · prio? **Med** —
   **Where does a harvested acronym LAND — the graph, or the config glossary?** Split out of
   [[Idea-159]] at the 2026-08-28 groom so it is visible as a decision rather than buried in a

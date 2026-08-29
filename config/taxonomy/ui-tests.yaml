@@ -296,6 +296,30 @@ suites:
           with a rendering pass.
         source: "O66 fix 2026-08-21 — laptop, headless Chrome vs Vite :5199, both themes screenshot-checked (chips z-index 10 probed on all three graph canvases)"
 
+      - id: TC-OWNERSHIP-02
+        description: The relationship chips and the node names are readable AT THE SAME TIME — neither is painted over the other
+        steps:
+          - Open /ownership (Rollup (K4 shape) view) in dark mode, then light.
+          - Read every relationship name AND every node name, at the default view and again after the canvas Fit control.
+        expect: >
+          Both halves of the picture survive. O66 put the chips above the node
+          layer and thereby moved the damage rather than removing it: the chips
+          then covered the node names (BusinessApplication rendered as
+          inessApplication). The cause is GEOMETRY — ownership's column pitch
+          (185-220px) is close to the node width (max-w-56 = 224px), so a chip
+          drawn at the path midpoint lands inside a neighbouring box, and any
+          z-index pass only chooses which text is destroyed. RelEdge now
+          measures its own chip, reads the real node rects from the ReactFlow
+          store, and walks the chip out along the edge's perpendicular to the
+          first position that intersects nothing; a midpoint that is already
+          clear does not move, which is why the bezier canvases are unchanged.
+          Check the six names O77 pinned: LOB-R (synthetic), Ledger Services
+          (line), Ledger Analytics, Data Platforms (ToT), Team Nightowl, and
+          the BusinessApplication kind line. Direction, arrowheads and the
+          EXAMPLE DATA banner are untouched — edge MEANING is K4's
+          gate-confirmed shape and never moves with a rendering pass.
+        source: "O77 fix 2026-08-28 — desktop, Chrome vs Vite :4173 against drydocs-api :8002, both themes. Measured, not eyeballed: a DOM probe of chip rects against node rects reported 7 of 8 chips colliding over 2516px2 before the fix and 0 chips / 0px2 after, holding through Fit and in both themes; /lineage (7 chips) and /explorer (5 chips) re-probed at 0 collisions for regression."
+
   # --- declared, not yet seeded ----------------------------------------------
   # Present so the coverage gap is a number, not an absence. Seed each from
   # verified behaviour when that module is next worked on — never by inventing

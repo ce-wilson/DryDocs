@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/components/RelEdge.tsx
@@ -36,3 +36,13 @@ notes: |
   FILED AS A NEW ITEM RATHER THAN REOPENING O66, which the note left to the groomer. O66 is done and its acceptance genuinely holds — relationship names ARE above the node layer now. Reopening it would make a closed, verified record retrospectively false and detach the commit that closed it. The missing clause travels here instead, in (b), where the next attempt has to meet it.
 
   O78 depends on this item deliberately: MiniDag has not adopted RelEdge yet, and migrating it first would inherit this inverted occlusion on five routes at once.
+
+  DONE 2026-08-28 (ui-workstream worktree, desktop). The fix acts on geometry, as clause (a) required: RelEdge measures its own chip, reads the real node rects out of the ReactFlow store, and walks the chip along the edge perpendicular to the first position that intersects nothing. A midpoint that is already clear never moves, which is why the bezier canvases render identically to before.
+
+  MEASURED RATHER THAN EYEBALLED, and the control run is the part worth keeping: with HEAD restored, a DOM probe of chip rects against node rects reported 7 of 8 chips colliding over 2516 square pixels; with the fix, 0 chips and 0 pixels, holding at the default view, after the canvas Fit control, and in both themes. All six node names in clause (b) render whole, including the BusinessApplication kind line that was clipped to inessApplication. Regression probes: lineage 7 chips and explorer 5 chips, both at 0 collisions.
+
+  Clause (c) held without effort because the change is entirely inside the shared component; no page-local treatment was added. Clause (e) held: no edge, direction, arrowhead or banner text was touched. Clause (d) was not re-derived.
+
+  Ledger: TC-OWNERSHIP-02 added to config/taxonomy/ui-tests.yaml, with the before/after numbers as its source. TC-OWNERSHIP-01 is left exactly as written, because it records what was verified on 2026-08-21 and remains true of what it claims.
+
+  ONE THING THE VERIFICATION TURNED UP THAT IS NOT THIS ITEM: the verify convention of serving the console on port 5199 cannot sign in since O69, because the API CORS allowlist is 5173 and 4173 only. Verification ran on 4173. Inboxed to IDEAS rather than fixed here.
