@@ -360,6 +360,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-206`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+  **The depgraph snapshot rolls at every session close, and 30 of the last 33 rolls carried no
+  debt signal at all.** Measured on `knowledge/depgraph-snapshots/debt-metrics.jsonl`, 34 rows
+  spanning 2026-08-21 to 2026-08-29: 15 consecutive pairs are flat on every metric, another 15
+  move only `snapshot_imports` — which says the tree grew, not that anything got worse — and
+  **three** move a real debt metric (`4176c12`, `5a0383e`, `55536e6`, each an `a3_fan_in` plus
+  `a4_first_party_orphans` shift). That is 9 percent signal. The cadence is roughly five rolls a
+  day and peaked at nine on 2026-08-24. WHAT IS ACTUALLY VALUABLE HERE IS NOT THE SNAPSHOT: the
+  JSON is under a newest-only retention ruling, so each roll DELETES its predecessor and the
+  in-tree file carries no history whatsoever — the durable time series is `debt-metrics.jsonl`,
+  which is append-only and costs one line. The two are currently welded together by
+  `snapshot.ps1`, so the cheap thing that has lasting value can only be produced by also doing
+  the expensive thing that does not. Splitting them is the idea. NOT A PROPOSAL TO DROP IT:
+  `tests/unit/test_depgraph_snapshots.py` requires exactly one committed snapshot and
+  `tests/unit/test_code_snapshot_loader.py` loads it, so zero snapshots is not a reachable state.
+  This is about CADENCE. Directions for the groom to pick between, deliberately not chosen here:
+  (a) decouple — append the metrics row every close, roll the snapshot JSON only when the scan
+  shows a structural change; (b) skip the roll when every debt metric is unchanged, which makes
+  the commit itself the signal; (c) cap it at one roll per day; (d) leave it, on the argument
+  that a cheap ritual nobody has to think about beats a conditional one they do. A SECOND CLAUSE
+  THAT IS INDEPENDENT OF THE CADENCE RULING, because it cost real work on 2026-08-29: a snapshot
+  must be scanned AFTER the commit it stamps exists, never before. A snapshot taken from the
+  pre-merge tree that day recorded a directory main had renamed on 2026-08-26, tripped the
+  [[J55]] publish-boundary guard, and had to be deleted and regenerated against the merge commit.
+  The script stamps `meta.commit`, so scanning first and committing second makes the stamp a
+  claim about a tree that was never scanned. Sibling entries in the same script, both about
+  correctness rather than cadence and neither superseded by this: [[Idea-170]] (the board refresh
+  skips silently on this desktop) and the item behind the CI verdict asking about `main` from a
+  branch.
+
 - **`Idea-205b`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
   **Any fan-out orchestration has to allocate ids in the coordinator, because N parallel workers are
   N more allocators inside one machine.** Split from [[Idea-205a]] because the disposition differs:
