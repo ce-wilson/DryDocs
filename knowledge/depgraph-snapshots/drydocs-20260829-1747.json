@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-29T11:51:21",
+    "captured_at": "2026-08-29T17:48:00",
     "date": "20260829",
-    "scan": "ui-workstream",
+    "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "3c250820",
-      "full": "3c250820b6b0560eab4eacf3366315ed53cbd01a",
-      "branch": "feat/ui-workstream",
-      "describe": "port-base-20260826-162-g3c250820",
-      "subject": "Merge origin/main into feat/ui-workstream",
+      "commit": "53359622",
+      "full": "53359622782c3e7ec81f6b9d69fb7b2a94feb198",
+      "branch": "main",
+      "describe": "port-base-20260829-7-g53359622",
+      "subject": "docs(adr): G124 — ADR 0017 source-binding substrate, PROPOSED; the venue is argued, not assumed",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -5552,15 +5552,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/.git",
-      "name": ".git",
-      "extension": "",
-      "rel_path": ".git",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/.git-blame-ignore-revs",
       "name": ".git-blame-ignore-revs",
       "extension": "",
@@ -7514,10 +7505,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0015-team-edition-template.md",
+      "name": "0015-team-edition-template.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0015-team-edition-template.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/0016-jpmc-reports-corpus-shape.md",
       "name": "0016-jpmc-reports-corpus-shape.md",
       "extension": ".md",
       "rel_path": "docs/decisions/0016-jpmc-reports-corpus-shape.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/decisions/0017-source-binding-substrate.md",
+      "name": "0017-source-binding-substrate.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0017-source-binding-substrate.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10056,6 +10065,33 @@
       "name": "G123.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/G123.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G124.yaml",
+      "name": "G124.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G124.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G125.yaml",
+      "name": "G125.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G125.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G126.yaml",
+      "name": "G126.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G126.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13157,6 +13193,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/O81.yaml",
+      "name": "O81.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O81.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O82.yaml",
+      "name": "O82.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O82.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/O9.yaml",
       "name": "O9.yaml",
       "extension": ".yaml",
@@ -14912,6 +14966,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/neocarta-connector-comparison.md",
+      "name": "neocarta-connector-comparison.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/neocarta-connector-comparison.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/persona-neo4j-architect.md",
       "name": "persona-neo4j-architect.md",
       "extension": ".md",
@@ -15911,6 +15974,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -16008,6 +16080,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -17106,6 +17187,24 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/pat_projection.py",
@@ -19700,6 +19799,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/drydocs-ip-review-brief.md",
+      "name": "drydocs-ip-review-brief.md",
+      "extension": ".md",
+      "rel_path": "internal/drydocs-ip-review-brief.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/dsi-reference",
       "name": "dsi-reference",
       "extension": "",
@@ -20298,6 +20406,15 @@
       "name": "debt-metrics.jsonl",
       "extension": ".jsonl",
       "rel_path": "knowledge/depgraph-snapshots/debt-metrics.jsonl",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260829.json",
+      "name": "drydocs-20260829.json",
+      "extension": ".json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260829.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27699,6 +27816,10 @@
     ],
     [
       "drydocs/tests/unit/test_data_zones.py",
+      "drydocs/drydocs_api/credentials.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_zones.py",
       "drydocs/drydocs_core/__init__.py"
     ],
     [
@@ -30216,11 +30337,6 @@
       "drydocs",
       "CONTAINS",
       "drydocs/.env.example"
-    ],
-    [
-      "drydocs",
-      "CONTAINS",
-      "drydocs/.git"
     ],
     [
       "drydocs",
@@ -34530,7 +34646,17 @@
     [
       "drydocs/docs/decisions",
       "CONTAINS",
+      "drydocs/docs/decisions/0015-team-edition-template.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
       "drydocs/docs/decisions/0016-jpmc-reports-corpus-shape.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
+      "drydocs/docs/decisions/0017-source-binding-substrate.md"
     ],
     [
       "drydocs/docs/decisions",
@@ -35911,6 +36037,21 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/G123.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G124.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G125.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G126.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -37635,6 +37776,16 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O81.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O82.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/O9.yaml"
     ],
     [
@@ -38365,6 +38516,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/neocarta-connector-comparison.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/persona-neo4j-architect.md"
     ],
     [
@@ -38710,6 +38866,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -38761,6 +38922,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/code_graph_freshness.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -38821,6 +38987,16 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -41050,6 +41226,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/drydocs-ip-review-brief.md"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/dsi-reference"
     ],
     [
@@ -41531,6 +41712,11 @@
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
       "drydocs/knowledge/depgraph-snapshots/debt-metrics.jsonl"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots",
+      "CONTAINS",
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260829.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -44127,13 +44313,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2498,
-    "edges": 1274,
+    "files": 2507,
+    "edges": 1275,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2784,
-    "directories": 287
+    "rels": 2797,
+    "directories": 291
   }
 }
