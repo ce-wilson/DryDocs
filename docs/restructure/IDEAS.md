@@ -93,7 +93,29 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-167`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-168`** · 2026-08-28 · `[question]` · **open — user ruling, blocks the second half of the acronym stream** · prio? **Med** —
+  **Where does a harvested acronym LAND — the graph, or the config glossary?** Split out of
+  [[Idea-159]] at the 2026-08-28 groom so it is visible as a decision rather than buried in a
+  promoted note. MM11 takes the extractor half (acronym candidates, with the sentence they were
+  found in, into the mind-map state file), which is useful under either answer. This is the half
+  that is not.
+  - **Option A — graph nodes.** It becomes a real loader with a `LOADER_REGISTRY` row, and
+    "loader" means what it means everywhere else in the repo. It also means minting a node label
+    and an attaching edge, which is an ontology decision and goes through
+    `docs/RELATIONSHIP_GUIDE.md`, the relationship-vocabulary registry and the HITL gate, with the
+    mapping `planned` until confirmed.
+  - **Option B — propose into the registry.** It lands in
+    `config/taxonomy/software-registry.yaml` — today's durable home for the three committed
+    entries — as a change artifact riding the path O68 clause (c) already describes. No new
+    edge meaning, no gate; but "loader" would be the wrong word for it, and the graph never learns
+    the acronym.
+  - **The two answers have different modules, different guards and different gate exposure**, which
+    is exactly why the groom would not pick. Whichever way it goes, it should settle the same
+    provenance question O68 clause (d) forces from the other direction — two surfaces disagreeing
+    about what makes an acronym trustworthy is worse than either gap — and a corpus-harvested
+    acronym stays SYNTHESIZED and `:Uncertain` under both.
+
+- **`Idea-167`** · 2026-08-28 · `[bug]` · **groomed → Y6 (2026-08-28)** · prio? **Med** —
   **"A claim ships NO render" is true for PULLING an item and false for MINTING one, and CLAUDE.md
   states it without the distinction — it turned CI red today.** The O75 claim commit
   (`49356d9a`) followed the pull rule as written, shipped no render, and failed the roadmap
@@ -177,7 +199,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     counter or a per-identity stamp. Removal is the case an operator will actually rely on.
   - Found by the second-pass review, `docs/design/catalog-substrate-review.md` finding L3.
 
-- **`Idea-163`** · 2026-08-27 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-163`** · 2026-08-27 · `[idea]` · **open — re-read at the 2026-08-28 groom and NOT promoted: which layer is templatable at all is a user ruling, and the entry says so itself** · prio? **Med** —
   **Copier is the mechanism the standalone-template goal has been missing — a template that can be
   UPDATED in place after generation, not just generated once.** Noticed while reviewing
   `serious-scaffold/ss-python` for web scaffolding (`docs/design/web-scaffolding-review.md`); it is
@@ -201,7 +223,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     is yes, it reshapes how the repo is laid out; if no, the sanitization work stands unchanged and
     loses nothing.
 
-- **`Idea-162`** · 2026-08-27 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-162`** · 2026-08-27 · `[bug]` · **groomed → Z8 (2026-08-28)** · prio? **Med** —
   **The Z1/Z3 and Z5 fixtures were each built correctly and do not interlock, so the bundled
   demo can only ever fill one of the map's three dimensions.** Found by running the whole Z3
   chain on the desktop for the first time (`neo4jtest`, `drydocs` DB, 2026-08-27) to see why the
@@ -234,7 +256,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     it unfixed, all five servers would have been unplaceable and a successful load would still
     have drawn an empty world.
 
-- **`Idea-161`** · 2026-08-27 · `[question]` · **open** · prio? **Low** —
+- **`Idea-161`** · 2026-08-27 · `[question]` · **open — the mandate question is ANSWERED (not mandated, preferred); the residue is conditional on Salt ever being costed, so nothing was promoted at the 2026-08-28 groom** · prio? **Low** —
   **Salt DS as a SECOND UI track: the standing open question is answered, and the only substantive
   assessment we ever wrote is not in the working tree.** Raised at a 2026-08-27 review of what the
   repo documents about the company design system (`@salt-ds/core`, Apache-2.0, public).
@@ -273,7 +295,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     constraint is the open design risk: Salt's aesthetic was called opposite to the dark-schematic
     spec and nobody has tested whether Salt theming can carry the brand.
 
-- **`Idea-160`** · 2026-08-26 · `[idea]` · **open** · prio? **Low** —
+- **`Idea-160`** · 2026-08-26 · `[idea]` · **open — NOT groomable: both readings mint ontology, so the first step is the three-clause gate question the entry states, not a build item (re-read 2026-08-28)** · prio? **Low** —
   **A per-column checkbox on a grid that promotes that column into a label node and lands it in the
   unstructured context graph.** Raised by the user 2026-08-26 alongside [[Idea-159]]. The appeal is
   clear and it is the right instinct for **layer 4** (CLAUDE.md's context graph — the layer that
@@ -319,7 +341,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
   Mechanism-only; no real column values or company data land in a tracked file.
 
-- **`Idea-159`** · 2026-08-26 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-159`** · 2026-08-26 · `[idea]` · **groomed → MM11 (2026-08-28) — the EXTRACTOR half only; the destination fork (graph nodes vs config-glossary proposal) is re-filed as [[Idea-168]] and stays the user's** · prio? **Med** —
   **Deepdoc meets acronyms all over the corpus and has nowhere to put them — expand that capture
   into an acronym LOADER that feeds the surface backlog O68 specifies.** Raised by the user
   2026-08-26, right after O68 was filed: O68 gives acronyms a readable surface and a MANUAL add
@@ -357,7 +379,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Sibling of backlog O68 (the surface and the manual add), and depends on MM3 for the extractor.
   Mechanism-only; no real acronym values from any company corpus land in a tracked file.
 
-- **`Idea-158`** · 2026-08-26 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-158`** · 2026-08-26 · `[bug]` · **groomed → O78 (2026-08-28, depends on O77)** · prio? **Med** —
   **`MiniDag` never adopted the O66 `RelEdge` overlay, so relationship names still render BEHIND
   the nodes on FIVE routes.** O66's acceptance says the fix is one component so that "one future
   change fixes all three", and `components/RelEdge.tsx` says the same in its header comment — but
@@ -375,7 +397,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   makes the "one component" clause true for the first time — but do it AFTER 157, or it inherits
   157's inverted occlusion on all five routes at once. Rendering only; no edge meaning moves.
 
-- **`Idea-157`** · 2026-08-26 · `[bug]` · **open** · prio? **High** —
+- **`Idea-157`** · 2026-08-26 · `[bug]` · **groomed → O77 (2026-08-28) — filed as a NEW item, not a reopen of O66; the missing acceptance clause travels in O77 clause (b)** · prio? **High** —
   **O66 is `done` but the defect came back inverted: `/ownership` now paints the relationship
   chips ON TOP of the node boxes, so the NODE names are the unreadable half.** O66 fixed
   "labels behind nodes" by moving the label into the `EdgeLabelRenderer` portal with an explicit
@@ -405,7 +427,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   by changing the stacking rule. Sibling of [[Idea-158]], which is the same defect uninverted on
   five other routes. Rendering only; K4's attribution shape is gate-confirmed and does not move.
 
-- **`Idea-156`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-156`** · 2026-08-21 · `[bug]` · **groomed → U27 (2026-08-28)** · prio? **Med** —
   **The snapshot CI check can never see a branch, and the verdict still has no tests.** Filed on
   `feat/ui-workstream` as its Idea-152 and re-filed here at 156 because both 151 and 152 were
   taken on `main` by unrelated entries while the branch sat unmerged. **Half of the original
@@ -427,7 +449,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   that would have caught it. Sibling of [[Idea-150]] in the same script: that one loses the JSON
   write from a worktree, this one mis-reports the step before it. Mechanism-only, no gate.
 
-- **`Idea-155`** · 2026-08-21 · `[bug]` · **open** · prio? **High** —
+- **`Idea-155`** · 2026-08-21 · `[bug]` · **groomed → R23 (2026-08-28)** · prio? **High** —
   The Ask control token is persisted in cleartext in the ADK session store. `web/src/ask/askApi.ts`
   sends the drydocs-api session token as an in-band message part
   (`{"drydocs_control": {"api_token": ..., "api_url": ...}}`, the R5 handshake in
@@ -448,7 +470,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `session.db` after a run, and purge the existing file since its tokens are live until the API
   restarts.
 
-- **`Idea-154`** · 2026-08-21 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-154`** · 2026-08-21 · `[bug]` · **open — a standing verification CAUTION, not repo work; closing it needs both machines in hand, which is the user's (re-read 2026-08-28)** · prio? **Med** —
   **The Claude-in-Chrome extension browser is not trustworthy for console verification on the
   laptop: it served a NON-laptop DryDocs root at localhost:5173 while claiming `isLocal: true`.**
   Observed during the O64-O67 verification: the extension-connected tab at localhost:5173 served a
@@ -1719,6 +1741,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **FILED 2026-08-28 (ui-workstream worktree, groom of the open inbox)** — **Promoted 7, inboxed 1 new, merged 0, marked-in-place 4.** New items: **O77** — O66 traded one occlusion for the other, so /ownership now paints the relationship chips ON TOP of the node boxes (Idea-157). The note left the reopen-or-refile call to the groomer and it was **filed fresh**: O66 is done and its acceptance genuinely holds, so reopening it would make a verified record retrospectively false; the clause O66 was missing (node names readable too, both themes) travels in O77 clause (b), and clause (a) states that the cause is GEOMETRY, not z-order, so the next attempt cannot pass by flipping the layers again. **O78** MiniDag never adopted RelEdge, so five routes still draw labels behind the nodes (Idea-158) — `depends_on: [O77]` deliberately, or it inherits the inverted occlusion on five routes at once. **U27** the snapshot CI verdict queries `main` by literal and matches the LOCAL head against it, so from any branch it degrades to the no-run-yet path permanently, and `Get-CiVerdict` still has no tests (Idea-156). **R23** the Ask control token is written to the ADK session database in cleartext once per turn and never expires (Idea-155) — p1, filed **drydocs-agents** because the write to disk happens where the control part meets ADK, though the token is minted in `drydocs_api`; the module fork is recorded in the item. **Y6** the pull rule's "a claim ships NO render" is true for claiming an EXISTING item and false for one that MINTS a new one (Idea-167) — documentation only, and Y5's status-only tolerance is explicitly NOT widened, because widening it would forgive the stale render the guard exists to catch. **Z8** the Z1/Z3 and Z5 sample files each built correctly and never meet, so the bundled demo fills none of the map's three dimensions (Idea-162) — fixtures move, the signed T1/T2 tiers and the MATCH-only technology-port ruling do not. **MM11** acronym candidates as a new class on the MM3 extractor, carrying the sentence they were found in (Idea-159) — **the extractor half only**. **One parked as a new `[question]`:** **Idea-168**, where a harvested acronym LANDS — graph nodes with a `LOADER_REGISTRY` row (which mints a label and an attaching edge, so it routes through the HITL gate) or a proposal into the config glossary. The two answers have different modules, different guards and different gate exposure, so the groom would not pick; MM11 was written to be useful under either. **Four marked in place, not promoted, with the reason recorded on each:** Idea-163 (Copier — which layer is templatable at all is a ruling, and the entry says so itself), Idea-161 (Salt — the mandate question is answered; the residue is conditional on Salt ever being costed), Idea-160 (the grid-column checkbox — both readings mint ontology, so the first step is a gate question, not a build item), Idea-154 (the extension-browser locality defect — a standing verification caution; closing it needs both machines in hand). **No plan change:** every item lands in an existing epic and phase, no epic or phase was minted. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-168 (new, above), Idea-104, Idea-93 (E1's status), Idea-74, Idea-34, Idea-33, Idea-32, Idea-28, Idea-17, Idea-16.
 
 - **FILED 2026-08-21 (laptop, groom of the open inbox)** — **Promoted 17, inboxed 0 new, merged 0, marked-in-place 1.** New items: **G104–G109**, the six-item runtime-substrate chain Idea-152 asked for in writing (G104 ADR 0014 DRAFTED-Proposed only — acceptance is the user’s and must reconcile with ADR 0009; G105 the `RuntimeSettings` group + `dictConfig`; G106 `drydocs prune-logs`; G107 per-component `LoaderRunLog`; G108 the API audit line; G109 the data-zone declaration) — filed under **component-topology / phase 6 for want of a runtime-substrate epic, which a groom cannot mint; a dedicated epic is PROPOSED TO THE USER** and taking it moves `epic:`, not ids. **G110** the Idea-141 residue (MODULE_MAP contradicts the boundary test; four agent-runtime dependencies unpinned). **O64–O67** the four console defects (Ask loses the last completed turn; dark mode never reaches the shared controls; /ownership labels render behind the nodes; `ModuleIcon` has no exhaustiveness guard). **R20–R22**, one Ask incident split into three separable defects — stale spec vocabulary, discarded Neo4j notifications, and the synthesized UI term *Tower* proxied onto `:TOMRole`; **module drydocs-api on all three, verified at the groom (the QuerySpec registry is `drydocs_api/query_specs.py`, not `agents/`)**, and R22 carries the gate boundary in its acceptance. **Q23** the scrape-run ↔ registry-row join, bounded by J51’s per-entry FIELD split. **U26** snapshot.ps1’s three-hop sibling resolution, which dies in every worktree — and its test’s skip path resolves it the same wrong way, so the two agree while both are wrong. **Y5** the claim-commit-vs-stale-render contradiction: Idea-151 asked the groom to decide and it did — **option (b), the guards tolerate status-only drift**, because option (a) puts generated files into every claim commit and recreates the shared-line conflict Y2’s sharding removed. **One marked in place, not moved:** Idea-141 — the poetry-group verdict and its four open questions stand; only the residue was groomed. **No note was parked as a new `[question]`:** every open entry was either actionable or already the user’s. **No plan change** — every item lands in an existing epic and phase, with the runtime-substrate epic proposed rather than created. **Left for the user or the SME, unchanged and named so they are not mistaken for oversights:** Idea-104 (which MFT route-id shape is real), Idea-93 (E1’s status), Idea-74 (does DryDocs ingest the SNOW queue/group export, and which side), Idea-34 (the AIS acronym entry), Idea-33 (the unlocated typo), Idea-32 (the Oracle-connection scope), Idea-28 (the tier-1/tier-2 app-code enumeration — SME data entry), Idea-17 (two local relics, destructive), Idea-16 (the SNYK_TOKEN repo secret — no agent can set one), and Idea-141’s four packaging questions.
 

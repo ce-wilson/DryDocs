@@ -23,3 +23,12 @@ groom_log:
     the HITL gate and stays planned. Module drydocs-api on all three, verified at the groom:
     the QuerySpec registry is drydocs_api/query_specs.py, not agents/.
   attached_at: R20
+- date: '2026-08-28'
+  note: |-
+    ── 2026-08-28 groom (ui-workstream worktree) ───────────────────────────────
+    R23 the Ask control token is persisted in cleartext in the ADK session database,
+    once per turn, and never expires (Idea-155). Module drydocs-agents, recorded as a
+    fork at the groom: the token is minted in drydocs_api and sent by web/src/ask, but
+    the write to disk happens where the control part meets ADK. Session TTL is
+    adjacent and deliberately not in scope.
+  attached_at: R23

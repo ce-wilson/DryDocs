@@ -1,0 +1,39 @@
+id: R23
+epic: agentic-qa
+title: The Ask control token is written to the ADK session database in cleartext, once per turn, and
+  it never expires — keep the credential out of anything ADK persists
+type: bug
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- agents/graph_qa/control.py
+- web/src/ask/askApi.ts
+- drydocs_api/sessions.py
+- tests/unit/test_graph_qa_control.py
+acceptance: |
+  After a full Ask turn, the API session token does not appear anywhere in agents/graph_qa/.adk/session.db.
+
+  (a) THE MECHANISM, so the fix aims at the right layer. askApi.ts sends the drydocs-api session token as an in-band message part (the drydocs_control envelope carrying api_token and api_url — the R5 handshake), and ADK writes every message part verbatim into its events table. So the raw bearer token lands on disk once per turn. Observed 2026-08-21 on this desktop in session ask-jdoe4821-wjtacr8x, the same token in all three user events.
+
+  (b) WHY IT IS WORSE THAN A STRAY LOG LINE. The token has no expiry — InMemorySessionStore.issue mints a random string and only revoke or an API restart ends it — so a copy taken from the file is replayable for the life of the API process, and the store is never pruned, so tokens accumulate.
+
+  (c) THE FIX IS ONE OF TWO SHAPES, and either satisfies this item: strip the control part from the event before ADK persists it, or redact the value on write and keep the token in process memory for the turn only. What must NOT change is the property control.py already states and holds — control parts never reach the LLM. The gap it does not cover is persistence, and that is what this closes.
+
+  (d) A REGRESSION TEST IS THE ACCEPTANCE. A test runs a turn and asserts that no api_token VALUE appears in the session store, rather than asserting the shape of the part — the defect is about what reaches disk, so the test reads what reached disk.
+
+  (e) THE EXISTING FILE IS PURGED as part of the fix, with the reason stated: the tokens in it are live until the API process restarts. Nothing reached the repo — .adk/ is gitignored — so this is a local-hygiene step, not a commit-boundary incident.
+
+  (f) IT SHOULD END UP CONSISTENT WITH THE ROW BESIDE IT. Envelope already reduces question text and caller identity to a sha256 plus a length so neither is persisted; the credential travelling beside them raw is the contradiction being removed.
+
+  poetry run pytest -q green, ruff clean.
+notes: |
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-155 (2026-08-21, prio proposed High). p1: a replayable credential at rest, written every turn, with no expiry to bound it.
+
+  MODULE CHOICE, recorded because it was a real fork. The token is minted in drydocs_api and sent by web/src/ask, but the write to disk happens where the control part meets ADK, in agents/graph_qa — so the fix lands there and the item is filed drydocs-agents, matching R10-R13. If the chosen shape turns out to require the API to stop issuing an unbounded token instead, that is a second item, not a re-file of this one.
+
+  Session expiry is adjacent and deliberately NOT in scope here: this item stops the credential being persisted, it does not give the session store a TTL policy.

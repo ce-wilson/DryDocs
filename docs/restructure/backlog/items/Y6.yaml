@@ -1,0 +1,34 @@
+id: Y6
+epic: backlog-sharding
+title: 'The pull rule says a claim ships no render, which is true when you claim an existing item and
+  false when you mint a new one — state the distinction in CLAUDE.md before it turns CI red again'
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- CLAUDE.md
+- tests/unit/test_plan_roadmap.py
+- docs/restructure/backlog/items/Y5.yaml
+acceptance: |
+  CLAUDE.md section 0's pull rule distinguishes the two kinds of claim, in the sentence that currently makes the blanket statement.
+
+  (a) THE RULE HOLDS IN ITS INTENDED CASE and the text must keep saying so. Y5's tolerance is for a STATUS-ONLY diff: flipping an existing item from todo to in_progress moves a value inside a row the roadmap already renders, the guard forgives it, and the claim sha stays green.
+
+  (b) THE CASE IT DOES NOT COVER is a claim that MINTS a new item, which adds a row that did not exist. The roadmap's source fingerprint then moves for a structural reason, not a status one, and the tolerance correctly does not apply. The guard is right; the instruction is incomplete. After this item: a claim on an EXISTING item ships no render; a claim that mints a NEW item ships the board and roadmap render with it.
+
+  (c) NO CODE CHANGE. test_plan_roadmap.py and the Y5 tolerance are correct as they stand and are not widened to make the blanket sentence true — widening them would forgive exactly the stale render the guard exists to catch.
+
+  (d) THE EVIDENCE IS NAMED IN THE COMMIT, not in CLAUDE.md: the O75 claim commit 49356d9a followed the rule as written, shipped no render, and failed test_committed_roadmap_page_matches_its_sources with "stale beyond a status-only change" (run 33214406376, 2026-08-28, one failing test in a 2,388-test run).
+
+  Verified by minting a throwaway item, committing the claim with the renders per the new clause, and confirming the roadmap guard passes at that sha — then discarding it. poetry run pytest -q green.
+notes: |
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-167 (2026-08-28, prio proposed Med). A one-clause documentation fix, filed as an item rather than done inline because it edits the routing file every session reads and the wording is the whole deliverable.
+
+  WORTH STATING BECAUSE THE FAILURE IS SILENT in the normal ritual: the item gets built, the next push carries the render anyway, and the red claim sha is only visible to somebody reading gh run list afterwards — precisely the nobody-was-looking failure Idea-111 already made a session step for.
+
+  Module docs / epic backlog-sharding / phase 8: the change is prose in CLAUDE.md, but it is the claim protocol Y5 ruled on, so it belongs with Y5 rather than in a documentation epic of its own. Filed as a chore, not a bug — the guard is not defective, the instruction is.

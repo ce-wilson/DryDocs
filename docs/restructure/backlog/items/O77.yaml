@@ -1,0 +1,38 @@
+id: O77
+epic: web-console
+title: 'O66 traded one occlusion for the other: /ownership now paints the relationship chips ON TOP of
+  the node boxes, so the node names are the unreadable half — remove the collision instead of re-ordering
+  the layers'
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/src/components/RelEdge.tsx
+- web/src/data/demoOwnership.ts
+- web/src/routes/OwnershipRoute.tsx
+- config/taxonomy/ui-tests.yaml
+acceptance: |
+  On /ownership, BOTH halves of the picture are readable at once: every relationship name AND every node name, in the dark and the light theme, at the default view and after Fit.
+
+  (a) THE CAUSE IS GEOMETRY, NOT Z-ORDER, and the fix must act on the geometry. O66 moved the relationship name into the EdgeLabelRenderer portal with an explicit zIndex above the node layer, which is why it is now the chips that win. demoOwnership.ts places the chain at fixed x/y close enough that each straight edge's MIDPOINT falls inside the neighbouring node rect, and RelEdge draws the chip at that midpoint. Any further z-index pass just chooses which text is destroyed. The fix is to stop the chip and the node rect from overlapping — offset the chip off the midpoint when it would intersect a node, or space the chain so the midpoints land in the gaps — and the acceptance is satisfied only by a change that makes the two no longer occupy the same pixels.
+
+  (b) THE CLAUSE O66 WAS MISSING IS NOW WRITTEN DOWN, so the next attempt cannot pass the same way: node names are readable too. Named as observed on 2026-08-26 and each one whole after the fix: the LOB-R synthetic node, the Ledger Services line, the Ledger An... node, the ...Platforms (ToT) node, the Team N... node, and the BusinessApplication kind line that rendered as inessApplication.
+
+  (c) IT STAYS ONE COMPONENT. RelEdge remains the single treatment shared by explorer, lineage and ownership, so the collision handling lands there or in the layout data it reads — never as a page-local special case on /ownership, which would undo the one clause O66 was built to make true.
+
+  (d) RULED OUT AT CAPTURE, DO NOT RE-DERIVE: wiring the greyed-out Layout / Fit / Refresh / Export toolbar buttons does not fix this. ToolbarButton in routes/ModuleTemplate.tsx takes only label and disabled, has no onClick and no handler anywhere, and none of the four acts on paint order even if implemented.
+
+  (e) NOTHING ABOUT EDGE MEANING MOVES. The left-to-right relationship direction, the arrowheads and the EXAMPLE DATA banner wording are preserved exactly, because the page's subject is the K4 gate-confirmed qualified-attribution shape and a readability pass is exactly the change that quietly relabels or re-points an edge. Any such change routes through the HITL gate.
+
+  Evidence: screenshots in both themes with every relationship name and every node name legible; npm run build and oxlint clean.
+notes: |
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-157 (2026-08-26, prio proposed High). p1 as proposed and by the O66 precedent: the page's only content is unreadable, so the surface is effectively down.
+
+  FILED AS A NEW ITEM RATHER THAN REOPENING O66, which the note left to the groomer. O66 is done and its acceptance genuinely holds — relationship names ARE above the node layer now. Reopening it would make a closed, verified record retrospectively false and detach the commit that closed it. The missing clause travels here instead, in (b), where the next attempt has to meet it.
+
+  O78 depends on this item deliberately: MiniDag has not adopted RelEdge yet, and migrating it first would inherit this inverted occlusion on five routes at once.

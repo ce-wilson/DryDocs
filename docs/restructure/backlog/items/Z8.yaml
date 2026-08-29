@@ -1,0 +1,38 @@
+id: Z8
+epic: server-location
+title: 'The Z1/Z3 and Z5 sample files were each built correctly and never meet, so the bundled demo can
+  only ever fill one of the map''s three dimensions — make the three fixtures interlock'
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/fixtures/
+- config/taxonomy/
+- tests/integration/test_server_inventory_e2e.py
+acceptance: |
+  Running the bundled samples end to end draws a map with all three dimensions populated — servers placed, jobs joined, teams attributed — instead of a correct coverage report over an empty world.
+
+  (a) SERVERS: one gazetteer row. The Z3 export fixture uses the synthetic cities Sampleville and Modelton; the Z5 gazetteer seeded Sampleville and Otherton. Two items independently invented a second synthetic city and picked different names, so 2 of 5 rows resolve to nothing. Adding the missing city is pure classification — no edge meaning, no gate.
+
+  (b) JOBS: the host names must be able to meet. The Control-M sample hosts are host-hldm-02/03 and host-auto-01/02; the server export names srv-synth-01..03 and srv-synth-51/52, so under the signed T1 exact and T2 normalized-short-name tiers those two sets can never join and the resolution pass correctly reports 4 of 4 UNMATCHED. THE TIERS ARE NOT TOUCHED — they are gate-signed and they are not the defect. The fixtures are aligned to each other instead.
+
+  (c) TEAMS: the export names business application 70055 and the graph carries 70051-70053. The technology-port leg is MATCH-only by gate ruling, so it correctly minted nothing and counted apps_unmatched 1. Again the fixture moves, never the ruling.
+
+  (d) THE E2E MOVES WITH THEM. tests/integration/test_server_inventory_e2e.py seeds its own ExecutionHost to prove the T1 tier; its seeded host is updated to the aligned name so the test still proves the tier rather than accidentally proving the fixture.
+
+  (e) THE REPORTING PATH KEEPS ITS OWN COVERAGE. At least one deliberate, commented non-match survives in the fixtures, so the coverage counters are still exercised. The point of this item is that today the samples exercise ONLY the reporting path and never the success path; swapping which one is untested would be no better.
+
+  Cheapest order, and the order to work in: gazetteer row, then host names, then the app id. Verified live with the venue named (machine, container, database): the full chain loads and the Locations tab draws servers, jobs and teams. poetry run pytest -q green.
+notes: |
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-162 (2026-08-27, prio proposed Med), found by running the whole Z3 chain on the desktop for the first time (neo4jtest, drydocs DB) to see why the Locations tab drew nothing. The chain itself is fine: constraints applied, the infrastructure supplement verified 6/6, the loader took 5 rows and 0 rejected first try, and its coverage counters reported every gap honestly rather than hiding one. Every gap is in how the three sample files reference each other.
+
+  A CORRECTION FROM THE CAPTURE IS CARRIED FORWARD so it is not re-derived: the T1 tier IS proven by the e2e, which seeds its own matching host. What no sample proves is the DEMO path, where the Control-M sample's hosts meet the server export without a test seeding the join for them.
+
+  Related: the Z5 index defect fixed the same day (ae740be5) was load-bearing here — with it unfixed, all five servers would have been unplaceable and a successful load would still have drawn an empty world.
+
+  Module drydocs-load rather than drydocs-web: every change is to fixture and taxonomy data the loader reads, and the map surface is only where the absence shows.

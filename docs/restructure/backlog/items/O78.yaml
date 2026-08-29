@@ -1,0 +1,33 @@
+id: O78
+epic: web-console
+title: MiniDag never adopted the O66 RelEdge overlay, so relationship names still render behind the nodes
+  on five routes — migrate it and make the one-component clause true for the first time
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O77
+inputs:
+- web/src/components/MiniDag.tsx
+- web/src/components/RelEdge.tsx
+- config/taxonomy/ui-components.yaml
+acceptance: |
+  Every relationship name drawn by MiniDag is readable, on all five routes that render it.
+
+  (a) THE DEFECT. MiniDag still uses React Flow's built-in SVG label / labelStyle / labelBgStyle props (MiniDag.tsx around lines 108-111 at this groom; match on the props, not the line numbers), which paint in the EDGE layer and therefore stack below the nodes. That is the exact treatment RelEdge's own header comment names as the defect it exists to remove. Observed live 2026-08-26 on /docs (desktop, Vite 5173): the DESCRIBES edge into BMC Control-M rendered as the two letters ES, the rest hidden behind the node.
+
+  (b) BLAST RADIUS IS FIVE ROUTES, and all five are the evidence: DocsRoute, GatesRoute, RemediationRoute, RunbooksRoute and SoftwareRoute. Each is checked after the migration, not just /docs.
+
+  (c) ONE COMPONENT, WHICH IS THE POINT. MiniDag adopts components/RelEdge.tsx rather than growing its own overlay, so O66's "one future change fixes all three" becomes true across all four canvases. No page-local label treatment survives this item.
+
+  (d) ORDERED AFTER O77 ON PURPOSE. Migrating before the chip-versus-node collision is fixed inherits the inverted occlusion on five routes at once, turning one unreadable page into five.
+
+  (e) RENDERING ONLY. No edge meaning, direction, arrowhead or banner wording moves; the maps keep drawing exactly the relationships they draw today.
+
+  Evidence: screenshots of all five routes in both themes with every relationship name legible and every node name still legible; npm run build and oxlint clean.
+notes: |
+  Groomed 2026-08-28 (ui-workstream worktree) from Idea-158 (2026-08-26, prio proposed Med). p2 rather than p1 because each MiniDag map loses SOME names rather than all of them, unlike O77 — raise it if the console is about to be demonstrated.

@@ -16,3 +16,11 @@ groom_log:
     this source carries PHYSICAL geography (rack, building, city/state/country).
     Never join or crosswalk the two by field name.
   attached_at: Z1
+- date: '2026-08-28'
+  note: |-
+    ── 2026-08-28 groom (ui-workstream worktree) ───────────────────────────────
+    Z8 the Z1/Z3 and Z5 sample files were each built correctly and never meet, so the
+    bundled demo fills none of the map's three dimensions (Idea-162). Every fix is to
+    fixture and taxonomy data — the signed T1/T2 host tiers and the MATCH-only
+    technology-port ruling are explicitly not touched.
+  attached_at: Z8

@@ -61,3 +61,14 @@ groom_log:
     feat/ui-workstream branch, which is why 147 collided once and Idea-148 carries the
     re-issue note.
   attached_at: O64
+- date: '2026-08-28'
+  note: |-
+    ── 2026-08-28 groom (ui-workstream worktree) — the O66 aftermath ───────────
+    O77 /ownership now paints the relationship chips ON TOP of the nodes, so the node
+    names became the unreadable half (Idea-157) — filed as a NEW item rather than
+    reopening the done and verified O66, whose acceptance genuinely holds; the missing
+    clause (node names readable too, both themes) travels in O77 instead. O78 MiniDag
+    never adopted RelEdge, so five routes still draw labels behind the nodes
+    (Idea-158), deliberately ordered AFTER O77 so it does not inherit the inverted
+    occlusion on all five at once.
+  attached_at: O77

@@ -30,3 +30,12 @@ groom_log:
     shared-line conflict Y2's sharding removed. The ruling and its reason are in the item's
     acceptance.
   attached_at: Y5
+- date: '2026-08-28'
+  note: |-
+    ── 2026-08-28 groom (ui-workstream worktree) ───────────────────────────────
+    Y6 the pull rule's "a claim ships no render" is true for claiming an EXISTING item
+    and false for one that MINTS a new one, and CLAUDE.md states it without the
+    distinction (Idea-167). Y5's tolerance is status-only by design and is NOT widened
+    — the guard is right, the instruction is incomplete. Evidence: the O75 claim
+    commit 49356d9a, run 33214406376.
+  attached_at: Y6

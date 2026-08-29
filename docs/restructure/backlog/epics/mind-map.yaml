@@ -17,3 +17,13 @@ groom_log:
     Sanitization rule for every tracked artifact: SEAL → APP_ID, Jira keys → <JIRA-nnnn>,
     the DevX project/space → Auto.
   attached_at: MM1
+- date: '2026-08-28'
+  note: |-
+    ── 2026-08-28 groom (ui-workstream worktree) ───────────────────────────────
+    MM11 acronym candidates as a new class on the MM3 extractor, carrying the sentence
+    they were found in, landing in the mind-map state file (Idea-159). ONLY the
+    extractor half was promoted: where a loaded acronym finally lands — graph nodes
+    with a LOADER_REGISTRY row, or a proposal into the config glossary — is an
+    unruled fork with different modules and different gate exposure, and it stays
+    parked in IDEAS.md as a question for the user.
+  attached_at: MM11
