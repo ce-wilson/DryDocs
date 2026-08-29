@@ -1,0 +1,86 @@
+id: G126
+epic: component-topology
+title: 'The console credential file is an undeclared read-and-write path, and it is the case the
+  zone declaration cannot currently express: one mode per zone, and no base outside the data root'
+type: bug
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/data-zones.yaml
+- drydocs_core/data_zones.py
+- drydocs_core/data_root.py
+- drydocs_api/credentials.py
+- scripts/set_console_credential.py
+- tests/unit/test_data_zones.py
+- docs/reviews/g81-data-path-reconstruction.md
+- docs/design/catalog-substrate-review.md
+acceptance: |
+  `internal-local/console-credentials.json` — the path `DRYDOCS_CONSOLE_CREDENTIALS` overrides — is
+  DECLARED, and the declaration is expressive enough to say what it actually is. G81's rule is
+  "every path the system reads or writes must be declared in configuration with a mode"; this path
+  is neither declared nor expressible today, and it did not exist when G81 closed.
+
+  (a) THE MODE AXIS CARRIES THE DUAL CASE (review finding L4). The file is WRITE for one script run
+  by a person (`scripts/set_console_credential.py`), READ for the API (`drydocs_api/credentials.py`,
+  which stat-reloads it), and it must never be `scratch` — a disposable credential store is an
+  outage. Today a zone gets exactly one of read / write / scratch. Either the axis gains a way to
+  say "written by one named actor, read by the system" or the item records why the single-mode axis
+  is right and which single mode this file takes. What is NOT acceptable is calling it `write` and
+  losing the guarantee that the API cannot write it — the guard forbidding filesystem writes inside
+  `drydocs_api` is the reason an endpoint cannot grant itself an account, and a declaration that
+  contradicts that guard is worse than no declaration.
+
+  (b) THE BASE AXIS REACHES IT. `config/data-zones.yaml` declares two bases, `data_root` (under
+  `DRYDOCS_DATA_ROOT`) and `home`. This path is under neither: it is IN-TREE, under
+  `internal-local/`, gitignored, and deliberately not under `var/`. A third base is added, or the
+  file records why an in-tree operator-authored path is out of scope for it — with the same rigor
+  G109 (e) applied when it ruled the Confluence capture out of the tree rather than granting an
+  exception that could never expire.
+
+  (c) THE INVARIANT STILL HOLDS AND IS PROVEN TO. Whatever mode and base this lands on,
+  `tests/unit/test_data_zones.py`'s check — no write-mode path may equal, contain, or be contained
+  by a read-mode path, in BOTH directions — runs over the new zone, and a test proves it fires on
+  an injected overlap involving it. A declaration the invariant does not actually cover is
+  decoration.
+
+  (d) NO BEHAVIOR CHANGES AND NO FILE MOVES. G81's scope fence, restated because it applies with
+  more force here: the credential file is machine-local with no committed source to rebuild from,
+  so a config change that relocated it would destroy the only copy. This declares where the file
+  already is. If the right home turns out to be elsewhere, that is a separate item with a migration.
+
+  `poetry run pytest -q` green, ruff + format clean.
+notes: |
+  Minted 2026-08-29 (desktop) by G123, ruling the L4 half of the catalog-substrate review's G81
+  amendment a FOLLOW-UP rather than a reopen. The deciding fact, verified from git rather than
+  assumed:
+
+  THE PATH DID NOT EXIST WHEN G81 CLOSED. `drydocs_api/credentials.py` was ADDED on 2026-08-28 by
+  `36601a10` (O69, real console authentication). G81 closed on 2026-08-24 at `db2d96b8`. G81's
+  declaration could not have covered a file that would not exist for another four days, and its
+  reconstruction — which walked the write-capable surface and measured four live overlaps — was
+  complete and correct for the tree it walked.
+
+  WHY IT IS STILL WORTH ITS OWN ITEM RATHER THAN A NOTE. L4 is not merely "one more path to add."
+  It is the first path that tests G81's declaration at BOTH of its axes and fails at both: the mode
+  axis has no dual state, and the base axis has no in-tree option. The review put it exactly right —
+  "it is the sharpest test of that item's mode axis; if the declaration G81 lands cannot express
+  that, it is not expressive enough." The credentials module already argues the read/write boundary
+  in prose (O69's own notes explain why the file sits outside `var/`); this is the chance to make
+  it mechanical.
+
+  `type: bug` because an undeclared read-and-write path IS the G81 defect class, not a feature gap —
+  the same class, on a file that arrived after the guard was built. p2 rather than G81's p0: the
+  irreversibility that made G81 p0 is bounded here (one machine-local file, and no automated writer
+  can reach it — the write is a person running a script), so it is a real gap without a live
+  destruction path. Module `drydocs-core` because the deliverable is the zone declaration and its
+  guard, both of which live there; `drydocs_api` is read-only in this item by construction.
+
+  `depends_on: []` — independent of G124/G125. Those two decide and build the CONNECTION binding
+  (a source to a service); this one is a filesystem path in the existing zone declaration. They
+  meet only at the shared question of which environment variables the system reads, which G125 (c)
+  enumerates and this item does not touch.

@@ -1,0 +1,100 @@
+id: G125
+epic: component-topology
+title: 'The automated half of the registry declares no binding: fifteen datasets resolve through
+  nothing, seven modules each invent their own precedence, and landing-zones --check reads as
+  coverage over half its subject'
+type: task
+module: config
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G124
+inputs:
+- config/source-registry.yaml
+- config/data-zones.yaml
+- drydocs_core/landing_zones.py
+- drydocs_core/data_root.py
+- drydocs_core/config.py
+- drydocs_api/credentials.py
+- .env.example
+- docs/decisions/0017-source-binding-substrate.md
+- docs/design/catalog-substrate-review.md
+acceptance: |
+  Every source the system reads is DECLARED with a binding, not only the filesystem ones, and the
+  resolution precedence is written once. Implements what G124's ADR rules; if that ADR is ruled
+  differently, this acceptance follows the ruling and not this text.
+
+  (a) THE FIFTEEN AUTOMATED DATASETS GET A BINDING (review finding B1, and the amendment to both
+  G81 (b) and G109 (a)). `config/source-registry.yaml` carries 15 `acquisition.mode: manual` rows
+  that resolve through `drop_dir` and 15 `automated` rows that resolve through NOTHING — their
+  system rows carry `locator.service: ~` with a comment saying the real value lives in
+  `internal-local/`, and nothing resolves a comment. Per G124 (b) the binding is one row per
+  ORIGIN, inherited by every dataset under it, so the fifteen reduce to roughly six. A row that
+  legitimately has no binding (a crosswalk-only activation with no export feed — `autosys` and the
+  other `locator: {}` rows are the candidates) records that reason explicitly, the way
+  `data-zones.yaml`'s header records why a write zone has no registry row.
+
+  (b) `drydocs landing-zones --check` STOPS READING AS COVERAGE OVER HALF ITS SUBJECT. G109 fixed
+  this once already for the code zones — the command now reports both declarations, 26 zones where
+  it used to report 15 — and the automated half is the same defect one level wider: a clean run
+  over the rows it knows about, silent about the rows it does not. The command reports the binding
+  state of every origin, and `--check` distinguishes "bound and reachable" from "declared with no
+  binding" from "bound to an unset variable". It stays ONE JSON document (the bug G109 caught in
+  its own change before it shipped).
+
+  (c) ONE EXPANSION FUNCTION, NOT SEVEN (finding B4; the amendment to G81 (d)). Today
+  `resolve_data_root()` treats an empty string as unset, `resolve_log_dir()` walks two variables
+  before its default, `credentials_path()` takes any non-empty override verbatim, and
+  `MappingStore.__init__` imports `os` inside the constructor to read one variable. One function
+  expands a variable reference, with one error naming the unset variable, and one enumerable list
+  of every variable the system reads — `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR` (plus the legacy
+  `SPIDERP_LOGDIR` alias), `DRYDOCS_CONSOLE_CREDENTIALS`, `DRYDOCS_MAPPING_DB`,
+  `DRYDOCS_MAPPING_READ`, the Control-M adapter's config variable, and the `NEO4J_*` set. This is
+  what makes G81 (d) — an unset root FAILS rather than silently relocating — implementable in one
+  place instead of seven. G81 (d)'s behavior does not change; its implementation stops being local
+  to one resolver.
+
+  (d) NO VALUE THAT IS SECRET LANDS IN COMMITTED YAML. The table names variables; it never holds a
+  host, service name, SID or credential. Guarded, because this is the publish boundary (CLAUDE.md
+  §3) and a guard is the only thing that keeps a convenience commit from putting a real value in a
+  committed file. Every new row carries its `classification` — there is no unlabeled default, and
+  `tests/unit/test_classification.py` enforces it.
+
+  (e) ONE STALE LOCATOR STRING IS CORRECTED, found while ruling this item rather than by a guard:
+  `config/source-registry.yaml` line 201 reads `data_root: "DRYDOCS_DATA_ROOT (default
+  ~/data/DryDocs); ..."`. G81 (d) REMOVED that default — the variable is mandatory and an unset
+  root now fails naming it. The prose has contradicted the code since 2026-08-23. It is a
+  free-text `locator` string, which is why nothing caught it, and that is the argument for (a):
+  prose in a locator block is not a declaration.
+
+  `poetry run pytest -q` green including the classification guard, `drydocs landing-zones --check`
+  reporting the full source set, ruff + format clean.
+notes: |
+  Minted 2026-08-29 (desktop) by G123. It carries TWO of the catalog-substrate review's amendments
+  because they are ONE finding at two altitudes, and minting two items for one gap would recreate
+  the two-declarations defect G109 closed:
+
+    - the G81 (b) amendment — extend the declaration from the three families the SME named to the
+      full ORIGIN set, so the fifteen automated datasets are covered and not only the filesystem
+      ones; plus the G81 (d) amendment, one expansion function per B4 rather than one per module;
+    - the G109 (a) amendment — "the gap is larger than six: every automated dataset is undeclared
+      too. Either widen the clause or record why the automated half is out of scope."
+
+  BOTH RULED FOLLOW-UP, NOT REOPEN, and the reasons are different (full ruling in G123's notes).
+  G81's declaration covers every path that EXISTED when it closed and its invariant holds; what the
+  amendment asks for is a connection binding, which is not a filesystem path and has no expressible
+  base in `data-zones.yaml`. G109 had already ruled its own six-zone premise moved and fixed the
+  read surface instead; the automated half was never in its acceptance and needs a mechanism the
+  item never had.
+
+  `depends_on: [G124]` so nothing implements an unratified decision — the G104/G105-G109 precedent
+  exactly. Module `config` follows G109's reasoning: the deliverable is declaration rows plus a
+  derivation rule, and the resolver edits are the consequence of the declaration rather than the
+  point. Model sonnet: G124 makes the boundary decision, this executes it against tests.
+
+  WATCH ITEM for whoever pulls it, inherited from G109's groom and still live: each new row needs
+  its `classification` per CLAUDE.md §3. A connection binding is operational metadata, so Internal
+  is the likely answer, but it is a per-row call and no default exists.

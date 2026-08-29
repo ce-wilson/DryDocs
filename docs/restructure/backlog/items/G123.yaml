@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/design/catalog-substrate-review.md
@@ -46,3 +46,78 @@ notes: |
 
   O75 and O76 needed nothing here: they are branch-side items main never had, so their
   amendments merged with them intact.
+
+  DONE 2026-08-29 (desktop). ALL THREE RULED FOLLOW-UP; NONE REOPENED; NONE ALREADY SATISFIED.
+  Three items minted — G124, G125, G126 — and every amendment in the review's "What this changes
+  for the existing items" table is now attached to backlog state. The three closed items keep
+  their acceptance text and their close notes untouched, which is the whole premise of the merge
+  this item cleans up after.
+
+  FIRST, A CORRECTION TO THIS ITEM'S OWN ACCEPTANCE, because ruling from it would have cited text
+  that does not exist. It calls the amendments "clauses (f) and (g)" on G81 and "clause (f)" on
+  G109, "as the branch stated them". THOSE CLAUSE LETTERS ARE NOWHERE IN THE TREE:
+  `git log --all` on all three item files shows no branch-side edit commit at all (G81's last
+  touch is db2d96b8, G104's is 566b5fbd, G109's is 3c2bfcdd, every one of them main-side), and the
+  review states its amendments as changes to EXISTING clauses — G81 (b) and (d), G104 (7) plus one
+  new row, G109 (a). The lettering was groom-side shorthand for clauses that would exist if the
+  amendments were applied. The rulings below therefore cite the review's table rows. The acceptance
+  text is left as written rather than corrected: it named the right three amendments, and
+  falsifying a record to match what was later learned is the one thing this repo does not do.
+
+  (b) G104 — FOLLOW-UP: G124, a new ADR 0017 drafted Proposed. NOT a reopen, and the reason is
+  sharper than the review could have known. THE REVIEW WAS WRITTEN BLIND TO THE ACCEPTANCE:
+  `docs/design/catalog-substrate-review.md` was authored at b58f3869 (2026-08-28), and that
+  commit's history does NOT contain 413b9186 (2026-08-25), which accepted ADR 0014 WITH FOUR
+  AMENDMENTS. Verified with `git merge-base --is-ancestor`, not inferred from the dates. So the
+  review asks for text to be added to an ADR it had every reason to believe was still Proposed —
+  G104 had closed it that way the day before the branch diverged. G104's acceptance said in terms
+  "status Proposed — never Accepted, because acceptance is the user's"; the user ruled four days
+  later. Reopening G104 would put a closed item in the position of editing a decision that has
+  since been made, which is exactly the state its own acceptance forbade. G124 also inherits the
+  VENUE question rather than assuming it: 0014's subject is the RUNTIME substrate (per-machine
+  operational facts), a source-to-connection binding is a different subject, and G124's first
+  clause makes it argue stand-alone-ADR versus amendment instead of picking one silently.
+
+  (a) G81 — FOLLOW-UP, SPLIT TWO WAYS because the two halves of the amendment fail at different
+  places. NOT a reopen: G81's declaration covers every path that EXISTED on 2026-08-24 and its
+  invariant holds unchanged.
+    - The "full origin set" half (review table, G81 clause (b)) plus "one expansion function per
+      B4, not per module" (clause (d)) → G125. What the amendment asks for is a CONNECTION
+      binding, not a filesystem path: the fifteen automated datasets have no `drop_dir` and no
+      expressible base in `config/data-zones.yaml`, whose two bases are `data_root` and `home`.
+      That is outside the three families the SME named and outside the file G81 built. G81 (d)'s
+      behavior does not change under G125 — an unset root still fails naming the variable; only
+      its implementation stops being local to one resolver.
+    - The L4 half (the credential file as an undeclared read-and-write path) → G126. THE DECIDING
+      FACT: `drydocs_api/credentials.py` was ADDED on 2026-08-28 by 36601a10 (O69), four days
+      AFTER G81 closed at db2d96b8. G81 could not have declared a file that did not exist. It
+      earns its own item rather than a note because it is the first path that fails BOTH of the
+      declaration's axes — the mode axis has no dual state (write for a script run by a person,
+      read for the API, never scratch) and the base axis has no in-tree option (the file is under
+      `internal-local/`, gitignored, deliberately not under `var/`). Confirmed live rather than
+      recalled: `DRYDOCS_CONSOLE_CREDENTIALS` appears in `drydocs_api/credentials.py` and O69's
+      notes and in NO configuration file.
+
+  (c) G109 — FOLLOW-UP, MERGED INTO G125 rather than given an item of its own. The review's G109
+  row and the G81 (b) row are ONE finding at two altitudes — "the gap is larger than six: every
+  automated dataset is undeclared too" IS "extend the declaration to the full origin set", seen
+  from the check surface instead of from the declaration. Minting two items for one gap would
+  recreate the two-declarations drift G109 closed. NOT a reopen: G109 had already ruled its own
+  six-zone premise moved (its close note records all five clauses, two of them overtaken by G81)
+  and fixed the READ SURFACE instead, taking `landing-zones` from 15 zones to 26 with a mode-aware
+  `--check`. The automated half was never in its acceptance and needs a mechanism the item never
+  had. G125 (b) is that same fix one level wider, and it inherits G109's own hard-won constraint:
+  the surface stays ONE JSON document.
+
+  ONE LIVE DEFECT FOUND WHILE RULING, not left as a remark. `config/source-registry.yaml` line 201
+  reads `data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); ..."`. G81 (d) REMOVED that
+  default on 2026-08-23 — the variable is mandatory and an unset root fails naming it — so the
+  registry has told an operator the opposite of the code for six days. It survived because it is a
+  free-text `locator` string that no guard reads, which is the argument for G125 (a) in one line:
+  prose in a locator block is not a declaration. Folded into G125 as clause (e) rather than fixed
+  here, because this item rules and does not build.
+
+  SCOPE HELD: nothing was implemented, no ADR was written, no acceptance text on any closed item
+  was edited. The deliverable was three rulings and it is three rulings plus the items they mint.
+  L2 and L3 needed nothing from this item — the review routed them to the O epic, and O75 and O76
+  had already shipped them by the time the branch merged.

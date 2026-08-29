@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 566 items &middot; 109 todo / 6 in progress / 2 blocked / 449 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 569 items &middot; 111 todo / 6 in progress / 2 blocked / 450 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -85,7 +85,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">2 / 2</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">110 / 128</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">110 / 131</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">7 / 7</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">61 / 72</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
@@ -95,10 +95,10 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">5 / 6</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:92%"></div></div><p class="progress-text">24 / 26</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:52%"></div></div><p class="progress-text">12 / 23</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:79%"></div></div><p class="progress-text">23 / 29</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:17%"></div></div><p class="progress-text">2 / 12</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (95; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G94"><code>G94</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O58"><code>O58</code></a> <a class="ready-id" href="#O59"><code>O59</code></a> <a class="ready-id" href="#O60"><code>O60</code></a> <a class="ready-id" href="#O61"><code>O61</code></a> <a class="ready-id" href="#O62"><code>O62</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O71"><code>O71</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O78"><code>O78</code></a> <a class="ready-id" href="#O80"><code>O80</code></a> <a class="ready-id" href="#O81"><code>O81</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#G123"><code>G123</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (96; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G94"><code>G94</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G124"><code>G124</code></a> <a class="ready-id" href="#G126"><code>G126</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O58"><code>O58</code></a> <a class="ready-id" href="#O59"><code>O59</code></a> <a class="ready-id" href="#O60"><code>O60</code></a> <a class="ready-id" href="#O61"><code>O61</code></a> <a class="ready-id" href="#O62"><code>O62</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O71"><code>O71</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O78"><code>O78</code></a> <a class="ready-id" href="#O80"><code>O80</code></a> <a class="ready-id" href="#O81"><code>O81</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -179,7 +179,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">109</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">111</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
 config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
 BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
 session: a stale-premise sweep of the drafted page against current facts (the
@@ -400,6 +400,237 @@ drafted-unsigned gates had NO item owning the sign-off -- the drafting item
 closes done and the session is never scheduled. No drafting item ever existed for this page.
 This item is the sign-off session&#x27;s claim surface; the session itself is
 HITL (agent: main).
+</p></div></div>
+<div class="card ready" id="card-G124" data-id="G124" data-module="docs" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g124 adr 0017 drafted (proposed, not accepted): the source-binding substrate — the three-part-key ceiling, the per-origin binding table, and the environment-variable reference rule" tabindex="0"><div class="card-head"><span class="card-id">G124</span><span class="card-title">ADR 0017 DRAFTED (Proposed, not accepted): the source-binding substrate — the three-part-key ceiling, the per-origin binding table, and the environment-variable reference rule</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A new `docs/decisions/0017-source-binding-substrate.md` exists with status **Proposed** — never
+Accepted, because acceptance is the user&#x27;s and is recorded in `docs/decisions/README.md` only
+after they rule. 0017 is the next free number as of this ruling (0016 is the reports-corpus ADR).
+
+THE VENUE QUESTION IS THE FIRST THING THE ADR SETTLES, and it is why this is a new ADR rather
+than an edit. The catalog-substrate review asks for this text to land IN ADR 0014, but it was
+written against a branch history that did not contain 0014&#x27;s acceptance (see notes). 0014 is
+ACCEPTED as of 2026-08-25 and its subject is the RUNTIME substrate — log directory, log level,
+retention, data root: per-machine operational facts. A binding from a declared source to a real
+connection is a different subject with a different owner, so the ADR states in its own text
+whether it (i) stands alone and 0014 gains only a cross-reference, or (ii) amends 0014, in which
+case it says exactly what in 0014 changes and the amendment goes to the user as 0014&#x27;s own four
+amendments did. Assuming (i) without arguing it is the failure this clause exists to prevent.
+
+(a) THE THREE-PART-KEY CEILING IS RECORDED, AND THE AXIS IS NOT MINTED (review finding B2).
+DryDocs derives `urn:drydocs:dataset:({carrier-or-origin},{artifact},prod)` — platform, name,
+environment, environment pinned. DataHub shipped that exact key, could not represent two
+deployments of one platform in one environment, and paid for it with a `dataPlatformInstance`
+retrofit that changed URN generation across every source. The ADR records that the ceiling is
+known and NOT hypothetical here: committed dataset ids carry `[db]` as a redaction placeholder
+and `[db]` IS the instance coordinate, with four production Control-M data centers behind those
+ids and two machines holding independent graphs. It names the binding table below as where an
+instance coordinate lands when it is needed, so the eventual answer is a configuration change
+and not an id migration. It explicitly does NOT add an instance segment now — an id migration
+bought with no current benefit.
+
+(b) THE BINDING IS PER-ORIGIN, NOT PER-DATASET (finding B3). OpenLineage&#x27;s naming specification
+splits every dataset into a namespace (the connection — varies by machine, carries the host, can
+hold a secret) and a name (the object — stable across deployments, safe to commit). DryDocs&#x27;s
+grammar `{origin}@{db}.{schema}.{table}` is already isomorphic to it. The ADR decides that the
+binding table carries a row per ORIGIN, inherited by every dataset under it — fifteen automated
+datasets reduce to roughly six origins — and that a landing zone is the same shape with a `file`
+namespace and a root, which is what `drop_dir_base` already is one level less general. One
+mechanism for both halves, or a stated reason there are two.
+
+(c) COMMITTED YAML REFERENCES ENVIRONMENT VARIABLES; IT NEVER HOLDS A VALUE (finding B4). The
+ADR rules that the binding table names variables (DataHub&#x27;s `${VAR}` recipe shape) and that ONE
+expansion function resolves them, with ONE error message when a referenced variable is unset,
+giving the system a single enumerable list of every variable it reads. Seven modules implement
+their own precedence today and they disagree. The ADR states how this reconciles with ADR 0009 —
+a binding row is a per-machine operational fact by 0014&#x27;s test, but the TABLE is a domain
+declaration, and the ADR says which half 0009 governs.
+
+(d) THE CREDENTIAL SHAPE IS RULED (finding B5): named connection profiles referenced by several
+registry rows (the Purview shape — one Oracle account reads eight `psgmgr` views, which is the
+actual situation), rather than a secret path derived from the row (the OpenMetadata shape). Each
+profile resolves its secret through an environment-variable reference per (c). The registry keeps
+naming the source; a profile names the connection; neither holds a value. A different ruling is
+fine — an unargued one is not.
+
+(e) THE FRESH-CLONE DEFAULT IS RECORDED AS A DECISION, NOT LEFT AS BEHAVIOR (finding L1). DataHub
+ships a working `datahub:datahub` account in `user.props` and documents that deleting the user in
+the UI does not disable it. DryDocs ships nothing: a fresh clone has no credential file, therefore
+no accounts, therefore every login is refused and the refusal names the bootstrap script. That is
+already implemented and is the better default; the ADR records it as a property, because it is the
+kind of thing a later convenience commit quietly removes.
+
+(f) REJECTED ALTERNATIVES EXTEND TO THE SURVEY, the way 0014 already records the sister project&#x27;s
+gotcha list. Named with the reason, from the review&#x27;s own &quot;what we deliberately do not take&quot;: a
+metastore or securable-object namespace (Unity Catalog — answers what things mean, not where they
+are); a secrets-manager plugin interface (OpenMetadata — an abstraction over one implementation on
+one machine with one operator); pyhocon (Amundsen&#x27;s scoped-key idea is worth taking, its HOCON
+dependency is not — the repo already uses pydantic-settings for this shape); a `platform_instance`
+retrofit now (per (a)); Marquez&#x27;s namespace-per-source at the API layer (no lineage service takes
+runtime events here — the naming grammar is useful, the server around it is not); and DataHub&#x27;s
+`__DATAHUB_TO_FILE_` directive (it writes a credential file FROM configuration; here a person at a
+terminal writes the file, and the guard keeping writes out of `drydocs_api` says it stays that way).
+
+`docs/decisions/README.md` gains the 0017 row reading Proposed. NO CODE CHANGES in this item —
+G125 implements, and it depends on this.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-29 (desktop) by G123, ruling the catalog-substrate review&#x27;s G104 amendment a
+FOLLOW-UP rather than a reopen. The full ruling and its evidence live in G123&#x27;s notes; the one
+fact that decided it is repeated here because this item is where a reader lands:
+
+THE REVIEW WAS WRITTEN BLIND TO THE ACCEPTANCE. `docs/design/catalog-substrate-review.md` was
+authored branch-side at `b58f3869` (2026-08-28) on `feat/ui-workstream`, and that commit&#x27;s
+history does NOT contain `413b9186` (2026-08-25), which accepted ADR 0014 with four amendments.
+The review therefore proposes amending an ADR it had every reason to believe was still Proposed —
+G104 had closed it that way the day before the branch diverged. Verified with
+`git merge-base --is-ancestor`, not inferred from dates.
+
+WHY NOT REOPEN G104. Its acceptance said, in terms, &quot;status Proposed — never Accepted, because
+acceptance is the user&#x27;s and is recorded in README.md only after they rule.&quot; The user ruled on
+2026-08-25. Reopening G104 would put a closed item in the position of editing a decision that has
+since been made, which is exactly the state its own acceptance forbade. The amendment is new
+PROPOSED text against a ruled ADR, and it goes to the user the way 0014&#x27;s own four amendments did.
+
+MODEL fable because the ADR decides a boundary — where a binding may live at all — against two
+standing ADRs (0009&#x27;s git-text source of truth, 0014&#x27;s per-machine exception). Module `docs`
+follows Y1/R1 and the G104 precedent: a decision document is docs work even when its subject is
+config. Epic component-topology and phase 6 follow G81/G104/G109, the three items this rules on.
+</p></div></div>
+<div class="card" id="card-G125" data-id="G125" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g125 the automated half of the registry declares no binding: fifteen datasets resolve through nothing, seven modules each invent their own precedence, and landing-zones --check reads as coverage over half its subject" tabindex="0"><div class="card-head"><span class="card-id">G125</span><span class="card-title">The automated half of the registry declares no binding: fifteen datasets resolve through nothing, seven modules each invent their own precedence, and landing-zones --check reads as coverage over half its subject</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G124" data-target="card-G124">G124</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every source the system reads is DECLARED with a binding, not only the filesystem ones, and the
+resolution precedence is written once. Implements what G124&#x27;s ADR rules; if that ADR is ruled
+differently, this acceptance follows the ruling and not this text.
+
+(a) THE FIFTEEN AUTOMATED DATASETS GET A BINDING (review finding B1, and the amendment to both
+G81 (b) and G109 (a)). `config/source-registry.yaml` carries 15 `acquisition.mode: manual` rows
+that resolve through `drop_dir` and 15 `automated` rows that resolve through NOTHING — their
+system rows carry `locator.service: ~` with a comment saying the real value lives in
+`internal-local/`, and nothing resolves a comment. Per G124 (b) the binding is one row per
+ORIGIN, inherited by every dataset under it, so the fifteen reduce to roughly six. A row that
+legitimately has no binding (a crosswalk-only activation with no export feed — `autosys` and the
+other `locator: {}` rows are the candidates) records that reason explicitly, the way
+`data-zones.yaml`&#x27;s header records why a write zone has no registry row.
+
+(b) `drydocs landing-zones --check` STOPS READING AS COVERAGE OVER HALF ITS SUBJECT. G109 fixed
+this once already for the code zones — the command now reports both declarations, 26 zones where
+it used to report 15 — and the automated half is the same defect one level wider: a clean run
+over the rows it knows about, silent about the rows it does not. The command reports the binding
+state of every origin, and `--check` distinguishes &quot;bound and reachable&quot; from &quot;declared with no
+binding&quot; from &quot;bound to an unset variable&quot;. It stays ONE JSON document (the bug G109 caught in
+its own change before it shipped).
+
+(c) ONE EXPANSION FUNCTION, NOT SEVEN (finding B4; the amendment to G81 (d)). Today
+`resolve_data_root()` treats an empty string as unset, `resolve_log_dir()` walks two variables
+before its default, `credentials_path()` takes any non-empty override verbatim, and
+`MappingStore.__init__` imports `os` inside the constructor to read one variable. One function
+expands a variable reference, with one error naming the unset variable, and one enumerable list
+of every variable the system reads — `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR` (plus the legacy
+`SPIDERP_LOGDIR` alias), `DRYDOCS_CONSOLE_CREDENTIALS`, `DRYDOCS_MAPPING_DB`,
+`DRYDOCS_MAPPING_READ`, the Control-M adapter&#x27;s config variable, and the `NEO4J_*` set. This is
+what makes G81 (d) — an unset root FAILS rather than silently relocating — implementable in one
+place instead of seven. G81 (d)&#x27;s behavior does not change; its implementation stops being local
+to one resolver.
+
+(d) NO VALUE THAT IS SECRET LANDS IN COMMITTED YAML. The table names variables; it never holds a
+host, service name, SID or credential. Guarded, because this is the publish boundary (CLAUDE.md
+§3) and a guard is the only thing that keeps a convenience commit from putting a real value in a
+committed file. Every new row carries its `classification` — there is no unlabeled default, and
+`tests/unit/test_classification.py` enforces it.
+
+(e) ONE STALE LOCATOR STRING IS CORRECTED, found while ruling this item rather than by a guard:
+`config/source-registry.yaml` line 201 reads `data_root: &quot;DRYDOCS_DATA_ROOT (default
+~/data/DryDocs); ...&quot;`. G81 (d) REMOVED that default — the variable is mandatory and an unset
+root now fails naming it. The prose has contradicted the code since 2026-08-23. It is a
+free-text `locator` string, which is why nothing caught it, and that is the argument for (a):
+prose in a locator block is not a declaration.
+
+`poetry run pytest -q` green including the classification guard, `drydocs landing-zones --check`
+reporting the full source set, ruff + format clean.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-29 (desktop) by G123. It carries TWO of the catalog-substrate review&#x27;s amendments
+because they are ONE finding at two altitudes, and minting two items for one gap would recreate
+the two-declarations defect G109 closed:
+
+  - the G81 (b) amendment — extend the declaration from the three families the SME named to the
+    full ORIGIN set, so the fifteen automated datasets are covered and not only the filesystem
+    ones; plus the G81 (d) amendment, one expansion function per B4 rather than one per module;
+  - the G109 (a) amendment — &quot;the gap is larger than six: every automated dataset is undeclared
+    too. Either widen the clause or record why the automated half is out of scope.&quot;
+
+BOTH RULED FOLLOW-UP, NOT REOPEN, and the reasons are different (full ruling in G123&#x27;s notes).
+G81&#x27;s declaration covers every path that EXISTED when it closed and its invariant holds; what the
+amendment asks for is a connection binding, which is not a filesystem path and has no expressible
+base in `data-zones.yaml`. G109 had already ruled its own six-zone premise moved and fixed the
+read surface instead; the automated half was never in its acceptance and needs a mechanism the
+item never had.
+
+`depends_on: [G124]` so nothing implements an unratified decision — the G104/G105-G109 precedent
+exactly. Module `config` follows G109&#x27;s reasoning: the deliverable is declaration rows plus a
+derivation rule, and the resolver edits are the consequence of the declaration rather than the
+point. Model sonnet: G124 makes the boundary decision, this executes it against tests.
+
+WATCH ITEM for whoever pulls it, inherited from G109&#x27;s groom and still live: each new row needs
+its `classification` per CLAUDE.md §3. A connection binding is operational metadata, so Internal
+is the likely answer, but it is a per-row call and no default exists.
+</p></div></div>
+<div class="card ready" id="card-G126" data-id="G126" data-module="drydocs-core" data-phase="6" data-epic="component-topology" data-type="bug" data-status="todo" data-search="g126 the console credential file is an undeclared read-and-write path, and it is the case the zone declaration cannot currently express: one mode per zone, and no base outside the data root" tabindex="0"><div class="card-head"><span class="card-id">G126</span><span class="card-title">The console credential file is an undeclared read-and-write path, and it is the case the zone declaration cannot currently express: one mode per zone, and no base outside the data root</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> `internal-local/console-credentials.json` — the path `DRYDOCS_CONSOLE_CREDENTIALS` overrides — is
+DECLARED, and the declaration is expressive enough to say what it actually is. G81&#x27;s rule is
+&quot;every path the system reads or writes must be declared in configuration with a mode&quot;; this path
+is neither declared nor expressible today, and it did not exist when G81 closed.
+
+(a) THE MODE AXIS CARRIES THE DUAL CASE (review finding L4). The file is WRITE for one script run
+by a person (`scripts/set_console_credential.py`), READ for the API (`drydocs_api/credentials.py`,
+which stat-reloads it), and it must never be `scratch` — a disposable credential store is an
+outage. Today a zone gets exactly one of read / write / scratch. Either the axis gains a way to
+say &quot;written by one named actor, read by the system&quot; or the item records why the single-mode axis
+is right and which single mode this file takes. What is NOT acceptable is calling it `write` and
+losing the guarantee that the API cannot write it — the guard forbidding filesystem writes inside
+`drydocs_api` is the reason an endpoint cannot grant itself an account, and a declaration that
+contradicts that guard is worse than no declaration.
+
+(b) THE BASE AXIS REACHES IT. `config/data-zones.yaml` declares two bases, `data_root` (under
+`DRYDOCS_DATA_ROOT`) and `home`. This path is under neither: it is IN-TREE, under
+`internal-local/`, gitignored, and deliberately not under `var/`. A third base is added, or the
+file records why an in-tree operator-authored path is out of scope for it — with the same rigor
+G109 (e) applied when it ruled the Confluence capture out of the tree rather than granting an
+exception that could never expire.
+
+(c) THE INVARIANT STILL HOLDS AND IS PROVEN TO. Whatever mode and base this lands on,
+`tests/unit/test_data_zones.py`&#x27;s check — no write-mode path may equal, contain, or be contained
+by a read-mode path, in BOTH directions — runs over the new zone, and a test proves it fires on
+an injected overlap involving it. A declaration the invariant does not actually cover is
+decoration.
+
+(d) NO BEHAVIOR CHANGES AND NO FILE MOVES. G81&#x27;s scope fence, restated because it applies with
+more force here: the credential file is machine-local with no committed source to rebuild from,
+so a config change that relocated it would destroy the only copy. This declares where the file
+already is. If the right home turns out to be elsewhere, that is a separate item with a migration.
+
+`poetry run pytest -q` green, ruff + format clean.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-29 (desktop) by G123, ruling the L4 half of the catalog-substrate review&#x27;s G81
+amendment a FOLLOW-UP rather than a reopen. The deciding fact, verified from git rather than
+assumed:
+
+THE PATH DID NOT EXIST WHEN G81 CLOSED. `drydocs_api/credentials.py` was ADDED on 2026-08-28 by
+`36601a10` (O69, real console authentication). G81 closed on 2026-08-24 at `db2d96b8`. G81&#x27;s
+declaration could not have covered a file that would not exist for another four days, and its
+reconstruction — which walked the write-capable surface and measured four live overlaps — was
+complete and correct for the tree it walked.
+
+WHY IT IS STILL WORTH ITS OWN ITEM RATHER THAN A NOTE. L4 is not merely &quot;one more path to add.&quot;
+It is the first path that tests G81&#x27;s declaration at BOTH of its axes and fails at both: the mode
+axis has no dual state, and the base axis has no in-tree option. The review put it exactly right —
+&quot;it is the sharpest test of that item&#x27;s mode axis; if the declaration G81 lands cannot express
+that, it is not expressive enough.&quot; The credentials module already argues the read/write boundary
+in prose (O69&#x27;s own notes explain why the file sits outside `var/`); this is the chance to make
+it mechanical.
+
+`type: bug` because an undeclared read-and-write path IS the G81 defect class, not a feature gap —
+the same class, on a file that arrived after the guard was built. p2 rather than G81&#x27;s p0: the
+irreversibility that made G81 p0 is bounded here (one machine-local file, and no automated writer
+can reach it — the write is a person running a script), so it is a real gap without a live
+destruction path. Module `drydocs-core` because the deliverable is the zone declaration and its
+guard, both of which live there; `drydocs_api` is read-only in this item by construction.
+
+`depends_on: []` — independent of G124/G125. Those two decide and build the CONNECTION binding
+(a source to a service); this one is a filesystem path in the existing zone declaration. They
+meet only at the shared question of which environment variables the system reads, which G125 (c)
+enumerates and this item does not touch.
 </p></div></div>
 <div class="card ready" id="card-I5" data-id="I5" data-module="docs" data-phase="8" data-epic="project-board" data-type="bug" data-status="todo" data-search="i5 two idea captures landed below the audit trail with a non-conforming header and were invisible to both ideas.md guards" tabindex="0"><div class="card-head"><span class="card-id">I5</span><span class="card-title">Two idea captures landed below the audit trail with a non-conforming header and were invisible to BOTH IDEAS.md guards</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GAP. `_inbox_entries()` slices `IDEAS.md` from the `## Inbox` heading to the next `## ` heading, so it never sees a capture filed after the audit-trail heading; `_all_idea_ids()` matches the full header grammar, so it never sees a capture that does not carry it. A capture that is both — appended at the end of the file in an ad-hoc shape — is invisible to the header guard AND to the uniqueness guard at once. A new test in `tests/unit/test_plan_ideas.py` fails on that case: any `Idea-&lt;n&gt;`-shaped capture ANYWHERE in the file that does not conform to the header grammar, or that carries the grammar but sits outside the two known sections, is reported by id and line.
 
@@ -1140,36 +1371,6 @@ the unrelated stale-render entry that became Y5.
 <div class="card ready" id="card-S11" data-id="S11" data-module="drydocs-docgen" data-phase="6" data-epic="structure-remediation" data-type="chore" data-status="todo" data-search="s11 extract drydocs_plan/, drydocs_docgen/ and drydocs_port/ — the three declared components that never got a package" tabindex="0"><div class="card-head"><span class="card-id">S11</span><span class="card-title">Extract drydocs_plan/, drydocs_docgen/ and drydocs_port/ — the three declared components that never got a package</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-docgen</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">structure-remediation</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-S8" data-target="card-S8">S8</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Three first-party packages exist and the seven modules no longer sit at drydocs/ root: drydocs_plan/ (plan_board, plan_roadmap), drydocs_docgen/ (doc_outline, design_doc, doc_pdf, plan_ideas — plan_ideas stays with docgen, the 2026-08-05 ruling stands) and drydocs_port/ (port_preflight). test_module_boundary.py classifies all three BY PACKAGE ROOT and the hand-maintained &quot;plan&quot; / &quot;docgen&quot; / &quot;port&quot; module-name tuples are DELETED, not re-pointed — that deletion is the acceptance signal that the physical tree now carries the classification the test was carrying by hand. pyproject packages updated; the five scripts/render_*.py wrappers, scripts/doc_to_pdf.py and the six unit test modules import the new paths; `drydocs --help` lists the same commands under the same names. Zero behaviour change is PROVEN, not asserted: docs/plan/board.html, ideas.html, roadmap.html and docs/design/*.html regenerate byte-identical from the moved code. MODULE_MAP.md&#x27;s &quot;Module (today)&quot; table gains three package rows and drops the per-file drydocs/ rows they replace. Full suite green. Lands as ONE frozen unit and is ported as ONE unit (GN2&#x27;s discipline — a wide move landing in pieces leaves the two repos disagreeing about import paths for as long as the pieces take).
 </p><p class="notes"><strong>Notes:</strong> Raised 2026-08-18 from a module-ownership read of drydocs/. drydocs-plan, drydocs-docgen and drydocs-port are DECLARED in `modules:` and enforced as logical groups by test_module_boundary.py, but they are the only components with no physical directory — every other one was extracted (drydocs_api, drydocs_lineage, drydocs_deepdoc, drydocs_docmeta, drydocs_remediation). G2 extracted core and stopped, so drydocs/ still carries five components&#x27; worth of loose modules and the boundary test compensates with a curated list of module names. NOT into drydocs_core, and the reason is what core is FOR: models, adapters, neo4j lifecycle, config/precedence/source_registry, ontology, schema DDL, orchestration — the DOMAIN core, whose value is that importing it carries no opinion about presentation. An HTML renderer and a headless-Chromium shell-out would spend exactly that guarantee. Sibling packages follow the precedent every other component already set. Cheap by construction: design_doc and doc_pdf are pure stdlib; doc_outline and plan_board are yaml plus one drydocs_core import; plan_roadmap and plan_ideas import siblings. No graph access, no loader coupling, no component imports. Dependency direction after the move is drydocs_plan -&gt; drydocs_docgen -&gt; stdlib/core: one edge, pointing the right way. The sweep is ~11 tracked importers, not S9&#x27;s 31 — but score the sweep before committing to an effort number, which is the lesson S9 recorded the hard way. depends_on S8 so cli.py is a thin composition root with per-domain sub-apps BEFORE the files move; the other order makes S8 split a CLI across three packages instead of one. Not a hard blocker on correctness — if S8 stalls, this can be re-scored and run first. port_preflight rides along ON PURPOSE: identical position (own group, own declared component, stdlib + subprocess + one repo_paths import), and extracting two of the three guarantees a repeat visit. Cut it from scope only if the SME rules drydocs-port folds into another component. S7 is what makes this a rename rather than a preference: module names name COMPONENTS, directories name CODE ROOTS, and they must coincide for first-party Python packages precisely because test_module_boundary.py classifies by package root. REJECTED ALTERNATIVE: one drydocs_docs/ package holding all three groups. Fewer top-level entries, but it invents a fourth component name that the ledgers, runbooks, guards and backlog `modules:` list do not know, so every one of them would need updating for no structural gain. Follow the declared components.
 </p></div></div>
-<div class="card ready" id="card-G123" data-id="G123" data-module="graph-infra" data-phase="16" data-epic="self-documentation" data-type="task" data-status="todo" data-search="g123 the catalog-substrate review amended three items that had already closed on main — decide, per item, whether each amendment is a follow-up or a reopen" tabindex="0"><div class="card-head"><span class="card-id">G123</span><span class="card-title">The catalog-substrate review amended three items that had already closed on main — decide, per item, whether each amendment is a follow-up or a reopen</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Each of the three amendments below is ruled ONE of: already satisfied by the work that closed
-the item (say where), a follow-up item (mint it), or a reopen of the original (say why the
-closed work no longer meets the amended acceptance). No amendment is left in the state this
-item exists to clear — recorded in a review document but attached to nothing that tracks it.
-
-(a) G81 — amended from findings B3, B4 and L4: the per-origin binding shape, and the
-environment-variable reference rule (clauses (f) and (g) as the branch stated them).
-
-(b) G104 — amended with a SECOND REQUIREMENT: the ADR records the three-part-key ceiling
-(platform, name, environment) and names the binding table as where an instance coordinate
-lands, without minting the axis; plus the rejected-alternatives list extending to the survey.
-
-(c) G109 — amended with clause (f): six is the wrong number, the same defect one level wider.
-
-Ruling each one is the deliverable. Implementing whatever the ruling produces is NOT in scope.
-</p><p class="notes"><strong>Notes:</strong> WHY THIS ITEM EXISTS — a merge artifact, recorded rather than resolved by guess. The
-catalog-substrate survey was written branch-side on feat/ui-workstream and amended five items
-on 2026-08-28 (G81, G104, G109, O75, O76). Main independently closed G81, G104 and G109 on
-2026-08-24, four days earlier, so when the branch merged, three items were simultaneously
-done-on-main and amended-on-branch.
-
-THE MERGE KEPT MAIN&#x27;S CLOSED ITEMS VERBATIM and did not silently reopen them, because a
-closed item&#x27;s notes record work that actually happened and an amendment arriving afterwards
-does not un-happen it. It also did not drop the amendments: docs/design/catalog-substrate-review.md
-merges in whole (330 lines) and carries every finding, so nothing is lost — but a finding in a
-review document is attached to no backlog state, which is the gap this item closes.
-
-O75 and O76 needed nothing here: they are branch-side items main never had, so their
-amendments merged with them intact.
-</p></div></div>
 <div class="card ready" id="card-U10" data-id="U10" data-module="ontology" data-phase="16" data-epic="self-documentation" data-type="task" data-status="todo" data-search="u10 run the code-graph package-layer gate to sign-off: does the package become a node, and how is one recognised offline" tabindex="0"><div class="card-head"><span class="card-id">U10</span><span class="card-title">Run the code-graph package-layer gate to sign-off: does the PACKAGE become a node, and how is one recognised offline</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">self-documentation</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-U9" data-target="card-U9">U9</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> All 30 confirmations of config/gate-prompts/code-graph-package-layer.yaml are ruled with the SME and recorded in config/gate-log.md — including §C2, the page&#x27;s own &quot;real decision&quot; (how a package is recognised OFFLINE, given __init__.py presence is UNSOUND here: drydocs_core/schema is a live PEP 420 namespace package with none, imported by the CLI), and the question the U9 scanner change added: whether the containment level loads as :CodePackage, as the :Directory nodes the artifact now carries, or both. Then per the page&#x27;s §I: the proposed terms (u1_has_package, u1_defines_package, and the u1_has_module revision) are registered `status: planned` ONLY; the taxonomy-ontology-map entry is AMENDED per §H4 rather than duplicated; the parent gate&#x27;s §B1/§B2/§C4 are annotated in place as re-opened-and-superseded-by-this-gate with the date; a BUILD item is added to backlog.yaml naming this gate as its dependency; and gates.json + the enforcement matrix regenerate. NOTHING is written to the graph at the gate itself.
 </p><p class="notes"><strong>Notes:</strong> HITL — the sign-off is an SME session, never auto-decided (CLAUDE.md §6), and no build item is opened ahead of it because §I says the gate opens it. Trigger was the SME reading the LIVE GRAPH 2026-08-02: &quot;:HAS_MODULE is overused ... I thought module described the next highest group under the project.&quot; The page corrects the vocabulary before answering — in Python a module IS what `import` binds, so drydocs/cli.py genuinely is the module drydocs.cli and the file nodes are correctly typed; the level the question points at is the PACKAGE, and the one place the model is factually wrong is __init__.py, which is not a module named __init__ but the thing that makes its directory a package. §A4 asks the SME to accept that correction FIRST, because §C is written against it. Not drift: the parent gate (signed 36/36 2026-07-27) named this exact cost in writing at §C1 and declined the two-level option at §B1(c) on COST, not correctness — a recorded, accepted cost that is later felt is precisely what a re-open is for. Fable: a new node class, two new edge types, and an ACTIVE vocabulary entry re-pointed.
 </p></div></div>
@@ -1435,7 +1636,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">449</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">450</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -5442,6 +5643,111 @@ gone), each command module&#x27;s _client wrapper, and MODULE_MAP.md.
 </p></div></div>
 <div class="card" id="card-G33" data-id="G33" data-module="drydocs-load" data-phase="16" data-epic="self-documentation" data-type="requirement" data-status="done" data-search="g33 load the drydocs code-dependency snapshot into the graph under a project root, using the seeded-but-unused software ontology" tabindex="0"><div class="card-head"><span class="card-id">G33</span><span class="card-title">Load the DryDocs code-dependency snapshot into the graph under a Project root, using the seeded-but-unused software ontology</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A `drydocs load-code-snapshot` verb reads the newest knowledge/depgraph-snapshots/*.json (schema depgraph-machine-first/v1) and MERGEs it idempotently into `drydocs`, so it survives the wipe-and-rebuild cycle like every other loader and is re-runnable from committed files with zero data loss (the ADR 0002 D3 stateless test). Everything hangs off an explicit (:Project {project_id:&#x27;drydocs&#x27;}) root so &quot;is this our own code?&quot; is one hop, and modules carry a label that CANNOT collide with the software registry&#x27;s :SoftwareProduct nodes. The new node classes and relationships plus their binding to the SWO terms are registered `status: planned` and go through the HITL gate; no loader writes them until it confirms. snapshot.ps1 stays DECOUPLED — the session ritual must keep working with no database running. GATE SIGNED OFF 2026-07-27 (config/gate-prompts/self-documentation-code-graph.yaml, 36/36, 0 edits) — THIS ITEM IS NOW CLEARED TO BUILD and the acceptance is tightened to what was ruled. FIVE registrations already exist at `status: planned`, not the four this text originally named: node classes :Project and :CodeModule, edges HAS_MODULE, IMPORTS and IS_ENCODED_IN (the third added by the §E1(b) SWO ruling). Build to these rulings: (1) ONE :Project root; the snapshot&#x27;s SIX scan roots are a `project` PROPERTY on :CodeModule, never sibling nodes (§B1a). (2) :CodeModule is keyed on `file_id`, the repo-relative path — the only non-colliding key (§C1a/§C4). (3) `circular` loads as a property (§C3). (4) edges carry the M2 pull-provenance fields first_seen_at / last_seen_at / last_run_id like every other loader (§D3). (5) IS_ENCODED_IN targets the already-seeded SwoClass Python, value derived from node.extension (§E1b). (6) the :CodeModule / :SoftwareProduct exclusion is a GRAPH-TEST, not a constraint — Neo4j cannot declare label mutual-exclusion (§F1). (7) the loader DISCRIMINATES ON meta.tree and REFUSES tree-mode input (§G1a) — BUILD NOTE 2026-07-27, post-sign-off review finding: the tree-mode files carry NO `meta` key AT ALL (verified: top-level keys are schema/projects/nodes/edges/stats/rels), so there is no `tree: true` to refuse on — and a naive `*.json` name-sort picks tree-this-version.json as &quot;newest&quot; (&#x27;t&#x27; &gt; &#x27;d&#x27;). A literal negative check (`meta.get(&#x27;tree&#x27;)` truthy → refuse) would therefore ACCEPT the tree files. Implement as a POSITIVE assertion: select `drydocs-*.json` only, require `meta` PRESENT and `meta.tree == false`, refuse loudly on anything else. The §G1(a) ruling stands; this fixes only its literal reading. SECOND selection subtlety, found LIVE at the first build run: a date-only name (drydocs-20260727.json, a one-off) sorts ordinally AFTER every timed name of the same day (&#x27;.&#x27; &gt; &#x27;-&#x27;), so raw string sort picked the stale 12:42 capture over the 17:33 one. &quot;Newest by filename timestamp&quot; (§H2) must PARSE the drydocs-YYYYMMDD[-HHMM] timestamp, date-only keyed as 0000. (8) `abs_path` is DROPPED; load rel_path / file_id only (§H4). (9) a refusal must be LOUD — see the &quot;succeeds loudly, does nothing&quot; family. (10) register the source in config/source-registry.yaml with classification Internal-Public (§H6).
 </p><p class="notes"><strong>Notes:</strong> User source 2026-07-26: load the DryDocs project code snapshot under the software ontology, &quot;which may prevent missing code fixes&quot;, plus &quot;a way to distinguish it&#x27;s for drydocs project and not the products metadata&quot;. Cheap because both halves already exist and neither is used: ontology.cypher seeds 7 SwoClass + 6 SwoProperty terms (Python, Shell, SQL, &quot;is encoded in&quot;, &quot;implements&quot;, &quot;has specified data input/output&quot;, &quot;uses platform&quot;) with ZERO consumers anywhere in the tree, and snapshot.ps1 already writes a code dependency graph every session that never enters Neo4j — it is JSON plus a viewer.html. *** THREE PREMISES IN THIS NOTE WERE WRONG AND ARE CORRECTED HERE (gate self-documentation-code-graph, 2026-07-27). All three came from describing the artifact without opening it, and finding them was the gate&#x27;s main value: (i) it said the depgraph schema &quot;already carries a `projects` key (=1), so the Project root matches the producer&#x27;s own shape rather than inventing one&quot;. IT CARRIES SIX — drydocs, drydocs_core, drydocs_deepdoc, drydocs_lineage, drydocs_remediation, tests — and 142 of the 183 nodes declare a project that is NOT &#x27;drydocs&#x27;. The single root was a modelling CHOICE presented as a read-off; §B1 made it a choice and ruled (a). (ii) it said &quot;664 nodes / 86 edges at the latest&quot;. That figure belongs to tree-this-version.json, a one-off TREE-mode capture (540 files + 124 dirs, projects: [&#x27;drydocs1&#x27;], a CONTAINS relationship). The rolling dependency snapshots are 183 files / 98 edges — the real load is about a QUARTER the size this note implied. (iii) both shapes declare the SAME schema string depgraph-machine-first/v1, so a loader keying on it alone mis-reads one; §G1 ruled discrimination on meta.tree. *** TARGET IS `drydocs`, NOT dddocs, and the stated purpose is what decides it: &quot;prevent missing code fixes&quot; means traversing from a DryDocs module to the loader to the Control-M job it loads. That is a path query, so they must share a database — and code is not reference material ABOUT a system, it IS one, deterministically derived from source we control with no authority ambiguity. Same character as folders and jobs. The Project root is what keeps it from polluting product metadata. RE-PHASED 2026-07-26, same day, on the user&#x27;s call. Groomed into phase 6 / component-topology with the marginal fit flagged rather than hidden; the user ratified it as a NEW CAPABILITY — &quot;similar to a major version change of the snapshot ritual&quot; — so it moved to the new phase 16 (self-documentation) and the new epic of the same name. The framing that earned the phase: the depgraph ritual&#x27;s output stops being a JSON file a human reads and becomes a queryable :Project subgraph, which is a different KIND of thing, not a bigger version of the same thing. ID KEPT AS G33 DELIBERATELY. It no longer matches its epic letter, which is the lesser of two evils: ids are stable references (groom rule, git-readme §backlog id allocation) and G33 is already named in commit a37043a, which cannot be amended. Epic U is therefore the first epic whose opening item carries another letter&#x27;s id — historical, not a pattern to copy. New items in this epic take U1, U2, … (T is NOT free: it is the port-turn series, e.g. docs/port-T12-*.md). Load only the LATEST snapshot as current state; the ~70 dated files (not ~20) are a time series available later if code evolution is ever wanted — §A5 scoped that out. &quot;Do not build it&quot; is DISCHARGED as of 2026-07-27: it meant &quot;not before the gate&quot;, and the gate is signed. Build to the ten rulings in `acceptance`. WHAT THIS ITEM STILL DOES NOT DELIVER, stated so it is not judged against a promise it never made (§H5): the motivating query — traverse from a DryDocs module to the loader to the Control-M job it loads — needs an edge NOTHING in a dependency snapshot knows, because that mapping lives in the loaders&#x27; Cypher, not in their imports. This item lands the code subgraph and the shared database that make the join possible; the join itself is a separate Epic U item.
+</p></div></div>
+<div class="card" id="card-G123" data-id="G123" data-module="graph-infra" data-phase="16" data-epic="self-documentation" data-type="task" data-status="done" data-search="g123 the catalog-substrate review amended three items that had already closed on main — decide, per item, whether each amendment is a follow-up or a reopen" tabindex="0"><div class="card-head"><span class="card-id">G123</span><span class="card-title">The catalog-substrate review amended three items that had already closed on main — decide, per item, whether each amendment is a follow-up or a reopen</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Each of the three amendments below is ruled ONE of: already satisfied by the work that closed
+the item (say where), a follow-up item (mint it), or a reopen of the original (say why the
+closed work no longer meets the amended acceptance). No amendment is left in the state this
+item exists to clear — recorded in a review document but attached to nothing that tracks it.
+
+(a) G81 — amended from findings B3, B4 and L4: the per-origin binding shape, and the
+environment-variable reference rule (clauses (f) and (g) as the branch stated them).
+
+(b) G104 — amended with a SECOND REQUIREMENT: the ADR records the three-part-key ceiling
+(platform, name, environment) and names the binding table as where an instance coordinate
+lands, without minting the axis; plus the rejected-alternatives list extending to the survey.
+
+(c) G109 — amended with clause (f): six is the wrong number, the same defect one level wider.
+
+Ruling each one is the deliverable. Implementing whatever the ruling produces is NOT in scope.
+</p><p class="notes"><strong>Notes:</strong> WHY THIS ITEM EXISTS — a merge artifact, recorded rather than resolved by guess. The
+catalog-substrate survey was written branch-side on feat/ui-workstream and amended five items
+on 2026-08-28 (G81, G104, G109, O75, O76). Main independently closed G81, G104 and G109 on
+2026-08-24, four days earlier, so when the branch merged, three items were simultaneously
+done-on-main and amended-on-branch.
+
+THE MERGE KEPT MAIN&#x27;S CLOSED ITEMS VERBATIM and did not silently reopen them, because a
+closed item&#x27;s notes record work that actually happened and an amendment arriving afterwards
+does not un-happen it. It also did not drop the amendments: docs/design/catalog-substrate-review.md
+merges in whole (330 lines) and carries every finding, so nothing is lost — but a finding in a
+review document is attached to no backlog state, which is the gap this item closes.
+
+O75 and O76 needed nothing here: they are branch-side items main never had, so their
+amendments merged with them intact.
+
+DONE 2026-08-29 (desktop). ALL THREE RULED FOLLOW-UP; NONE REOPENED; NONE ALREADY SATISFIED.
+Three items minted — G124, G125, G126 — and every amendment in the review&#x27;s &quot;What this changes
+for the existing items&quot; table is now attached to backlog state. The three closed items keep
+their acceptance text and their close notes untouched, which is the whole premise of the merge
+this item cleans up after.
+
+FIRST, A CORRECTION TO THIS ITEM&#x27;S OWN ACCEPTANCE, because ruling from it would have cited text
+that does not exist. It calls the amendments &quot;clauses (f) and (g)&quot; on G81 and &quot;clause (f)&quot; on
+G109, &quot;as the branch stated them&quot;. THOSE CLAUSE LETTERS ARE NOWHERE IN THE TREE:
+`git log --all` on all three item files shows no branch-side edit commit at all (G81&#x27;s last
+touch is db2d96b8, G104&#x27;s is 566b5fbd, G109&#x27;s is 3c2bfcdd, every one of them main-side), and the
+review states its amendments as changes to EXISTING clauses — G81 (b) and (d), G104 (7) plus one
+new row, G109 (a). The lettering was groom-side shorthand for clauses that would exist if the
+amendments were applied. The rulings below therefore cite the review&#x27;s table rows. The acceptance
+text is left as written rather than corrected: it named the right three amendments, and
+falsifying a record to match what was later learned is the one thing this repo does not do.
+
+(b) G104 — FOLLOW-UP: G124, a new ADR 0017 drafted Proposed. NOT a reopen, and the reason is
+sharper than the review could have known. THE REVIEW WAS WRITTEN BLIND TO THE ACCEPTANCE:
+`docs/design/catalog-substrate-review.md` was authored at b58f3869 (2026-08-28), and that
+commit&#x27;s history does NOT contain 413b9186 (2026-08-25), which accepted ADR 0014 WITH FOUR
+AMENDMENTS. Verified with `git merge-base --is-ancestor`, not inferred from the dates. So the
+review asks for text to be added to an ADR it had every reason to believe was still Proposed —
+G104 had closed it that way the day before the branch diverged. G104&#x27;s acceptance said in terms
+&quot;status Proposed — never Accepted, because acceptance is the user&#x27;s&quot;; the user ruled four days
+later. Reopening G104 would put a closed item in the position of editing a decision that has
+since been made, which is exactly the state its own acceptance forbade. G124 also inherits the
+VENUE question rather than assuming it: 0014&#x27;s subject is the RUNTIME substrate (per-machine
+operational facts), a source-to-connection binding is a different subject, and G124&#x27;s first
+clause makes it argue stand-alone-ADR versus amendment instead of picking one silently.
+
+(a) G81 — FOLLOW-UP, SPLIT TWO WAYS because the two halves of the amendment fail at different
+places. NOT a reopen: G81&#x27;s declaration covers every path that EXISTED on 2026-08-24 and its
+invariant holds unchanged.
+  - The &quot;full origin set&quot; half (review table, G81 clause (b)) plus &quot;one expansion function per
+    B4, not per module&quot; (clause (d)) → G125. What the amendment asks for is a CONNECTION
+    binding, not a filesystem path: the fifteen automated datasets have no `drop_dir` and no
+    expressible base in `config/data-zones.yaml`, whose two bases are `data_root` and `home`.
+    That is outside the three families the SME named and outside the file G81 built. G81 (d)&#x27;s
+    behavior does not change under G125 — an unset root still fails naming the variable; only
+    its implementation stops being local to one resolver.
+  - The L4 half (the credential file as an undeclared read-and-write path) → G126. THE DECIDING
+    FACT: `drydocs_api/credentials.py` was ADDED on 2026-08-28 by 36601a10 (O69), four days
+    AFTER G81 closed at db2d96b8. G81 could not have declared a file that did not exist. It
+    earns its own item rather than a note because it is the first path that fails BOTH of the
+    declaration&#x27;s axes — the mode axis has no dual state (write for a script run by a person,
+    read for the API, never scratch) and the base axis has no in-tree option (the file is under
+    `internal-local/`, gitignored, deliberately not under `var/`). Confirmed live rather than
+    recalled: `DRYDOCS_CONSOLE_CREDENTIALS` appears in `drydocs_api/credentials.py` and O69&#x27;s
+    notes and in NO configuration file.
+
+(c) G109 — FOLLOW-UP, MERGED INTO G125 rather than given an item of its own. The review&#x27;s G109
+row and the G81 (b) row are ONE finding at two altitudes — &quot;the gap is larger than six: every
+automated dataset is undeclared too&quot; IS &quot;extend the declaration to the full origin set&quot;, seen
+from the check surface instead of from the declaration. Minting two items for one gap would
+recreate the two-declarations drift G109 closed. NOT a reopen: G109 had already ruled its own
+six-zone premise moved (its close note records all five clauses, two of them overtaken by G81)
+and fixed the READ SURFACE instead, taking `landing-zones` from 15 zones to 26 with a mode-aware
+`--check`. The automated half was never in its acceptance and needs a mechanism the item never
+had. G125 (b) is that same fix one level wider, and it inherits G109&#x27;s own hard-won constraint:
+the surface stays ONE JSON document.
+
+ONE LIVE DEFECT FOUND WHILE RULING, not left as a remark. `config/source-registry.yaml` line 201
+reads `data_root: &quot;DRYDOCS_DATA_ROOT (default ~/data/DryDocs); ...&quot;`. G81 (d) REMOVED that
+default on 2026-08-23 — the variable is mandatory and an unset root fails naming it — so the
+registry has told an operator the opposite of the code for six days. It survived because it is a
+free-text `locator` string that no guard reads, which is the argument for G125 (a) in one line:
+prose in a locator block is not a declaration. Folded into G125 as clause (e) rather than fixed
+here, because this item rules and does not build.
+
+SCOPE HELD: nothing was implemented, no ADR was written, no acceptance text on any closed item
+was edited. The deliverable was three rulings and it is three rulings plus the items they mint.
+L2 and L3 needed nothing from this item — the review routed them to the O epic, and O75 and O76
+had already shipped them by the time the branch merged.
 </p></div></div>
 <div class="card" id="card-U1" data-id="U1" data-module="docs" data-phase="16" data-epic="self-documentation" data-type="task" data-status="done" data-search="u1 run the python-architect structural review over the live code graph (code-graph review plan, phase 1)" tabindex="0"><div class="card-head"><span class="card-id">U1</span><span class="card-title">Run the python-architect structural review over the live code graph (code-graph review plan, Phase 1)</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> docs/reviews/persona-python-architect-2026-07.md exists and answers all six seed units (A1 layering, A2 circular cross-check, A3 fan-in ranking, A4 the 24 orphan candidates each dispositioned entry-point/dead/blind-spot by a human read, A5 test-coverage shape, A6 cross-root coupling vs MODULE_MAP), recording the plan&#x27;s probed baselines next to current values so drift is visible. Every finding carries the query that found it AND the confirming file read; findings are ranked by the tech-debt skill&#x27;s (Impact+Risk)x(6-Effort) score; each actionable one lands as a tagged IDEAS inbox line. Zero backlog.yaml or graph edits.
 </p><p class="notes"><strong>Notes:</strong> Fresh-graph precondition: snapshot.ps1 -&gt; drydocs load-code-snapshot (idempotent). Model opus, not sonnet: A4/A6 dispositions are judgment reads, not checklist work; not fable — no schema/boundary decision rides on it. IMPORTS caveat (gate D2) applies to every conclusion: never read an edge as &quot;breaks if removed&quot;. CLOSED 2026-07-28 (run 1, all six units): headline = the snapshot records ZERO cross-root IMPORTS edges and no function-level imports, and drydocs_api is not a scan root — A1/A5/A6 vacuous, A4&#x27;s 24 orphans = 24 false positives (each dispositioned with grep evidence); A2 healthy (scanner + live graph agree, 0 cycles); A3 base.py 18-&gt;19, lineage/model.py 9 = new second hotspot. Findings ranked; scanner-fix IDEAS line filed — U4 should wait on that fix or the query pack enshrines vacuous queries. Zero graph/backlog edits from the review.

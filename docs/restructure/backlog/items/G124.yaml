@@ -1,0 +1,113 @@
+id: G124
+epic: component-topology
+title: 'ADR 0017 DRAFTED (Proposed, not accepted): the source-binding substrate — the three-part-key
+  ceiling, the per-origin binding table, and the environment-variable reference rule'
+type: task
+module: docs
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/design/catalog-substrate-review.md
+- docs/decisions/0014-runtime-substrate.md
+- docs/decisions/0009-configuration-substrate.md
+- docs/decisions/README.md
+- config/source-registry.yaml
+- config/data-zones.yaml
+- drydocs_core/landing_zones.py
+acceptance: |
+  A new `docs/decisions/0017-source-binding-substrate.md` exists with status **Proposed** — never
+  Accepted, because acceptance is the user's and is recorded in `docs/decisions/README.md` only
+  after they rule. 0017 is the next free number as of this ruling (0016 is the reports-corpus ADR).
+
+  THE VENUE QUESTION IS THE FIRST THING THE ADR SETTLES, and it is why this is a new ADR rather
+  than an edit. The catalog-substrate review asks for this text to land IN ADR 0014, but it was
+  written against a branch history that did not contain 0014's acceptance (see notes). 0014 is
+  ACCEPTED as of 2026-08-25 and its subject is the RUNTIME substrate — log directory, log level,
+  retention, data root: per-machine operational facts. A binding from a declared source to a real
+  connection is a different subject with a different owner, so the ADR states in its own text
+  whether it (i) stands alone and 0014 gains only a cross-reference, or (ii) amends 0014, in which
+  case it says exactly what in 0014 changes and the amendment goes to the user as 0014's own four
+  amendments did. Assuming (i) without arguing it is the failure this clause exists to prevent.
+
+  (a) THE THREE-PART-KEY CEILING IS RECORDED, AND THE AXIS IS NOT MINTED (review finding B2).
+  DryDocs derives `urn:drydocs:dataset:({carrier-or-origin},{artifact},prod)` — platform, name,
+  environment, environment pinned. DataHub shipped that exact key, could not represent two
+  deployments of one platform in one environment, and paid for it with a `dataPlatformInstance`
+  retrofit that changed URN generation across every source. The ADR records that the ceiling is
+  known and NOT hypothetical here: committed dataset ids carry `[db]` as a redaction placeholder
+  and `[db]` IS the instance coordinate, with four production Control-M data centers behind those
+  ids and two machines holding independent graphs. It names the binding table below as where an
+  instance coordinate lands when it is needed, so the eventual answer is a configuration change
+  and not an id migration. It explicitly does NOT add an instance segment now — an id migration
+  bought with no current benefit.
+
+  (b) THE BINDING IS PER-ORIGIN, NOT PER-DATASET (finding B3). OpenLineage's naming specification
+  splits every dataset into a namespace (the connection — varies by machine, carries the host, can
+  hold a secret) and a name (the object — stable across deployments, safe to commit). DryDocs's
+  grammar `{origin}@{db}.{schema}.{table}` is already isomorphic to it. The ADR decides that the
+  binding table carries a row per ORIGIN, inherited by every dataset under it — fifteen automated
+  datasets reduce to roughly six origins — and that a landing zone is the same shape with a `file`
+  namespace and a root, which is what `drop_dir_base` already is one level less general. One
+  mechanism for both halves, or a stated reason there are two.
+
+  (c) COMMITTED YAML REFERENCES ENVIRONMENT VARIABLES; IT NEVER HOLDS A VALUE (finding B4). The
+  ADR rules that the binding table names variables (DataHub's `${VAR}` recipe shape) and that ONE
+  expansion function resolves them, with ONE error message when a referenced variable is unset,
+  giving the system a single enumerable list of every variable it reads. Seven modules implement
+  their own precedence today and they disagree. The ADR states how this reconciles with ADR 0009 —
+  a binding row is a per-machine operational fact by 0014's test, but the TABLE is a domain
+  declaration, and the ADR says which half 0009 governs.
+
+  (d) THE CREDENTIAL SHAPE IS RULED (finding B5): named connection profiles referenced by several
+  registry rows (the Purview shape — one Oracle account reads eight `psgmgr` views, which is the
+  actual situation), rather than a secret path derived from the row (the OpenMetadata shape). Each
+  profile resolves its secret through an environment-variable reference per (c). The registry keeps
+  naming the source; a profile names the connection; neither holds a value. A different ruling is
+  fine — an unargued one is not.
+
+  (e) THE FRESH-CLONE DEFAULT IS RECORDED AS A DECISION, NOT LEFT AS BEHAVIOR (finding L1). DataHub
+  ships a working `datahub:datahub` account in `user.props` and documents that deleting the user in
+  the UI does not disable it. DryDocs ships nothing: a fresh clone has no credential file, therefore
+  no accounts, therefore every login is refused and the refusal names the bootstrap script. That is
+  already implemented and is the better default; the ADR records it as a property, because it is the
+  kind of thing a later convenience commit quietly removes.
+
+  (f) REJECTED ALTERNATIVES EXTEND TO THE SURVEY, the way 0014 already records the sister project's
+  gotcha list. Named with the reason, from the review's own "what we deliberately do not take": a
+  metastore or securable-object namespace (Unity Catalog — answers what things mean, not where they
+  are); a secrets-manager plugin interface (OpenMetadata — an abstraction over one implementation on
+  one machine with one operator); pyhocon (Amundsen's scoped-key idea is worth taking, its HOCON
+  dependency is not — the repo already uses pydantic-settings for this shape); a `platform_instance`
+  retrofit now (per (a)); Marquez's namespace-per-source at the API layer (no lineage service takes
+  runtime events here — the naming grammar is useful, the server around it is not); and DataHub's
+  `__DATAHUB_TO_FILE_` directive (it writes a credential file FROM configuration; here a person at a
+  terminal writes the file, and the guard keeping writes out of `drydocs_api` says it stays that way).
+
+  `docs/decisions/README.md` gains the 0017 row reading Proposed. NO CODE CHANGES in this item —
+  G125 implements, and it depends on this.
+notes: |
+  Minted 2026-08-29 (desktop) by G123, ruling the catalog-substrate review's G104 amendment a
+  FOLLOW-UP rather than a reopen. The full ruling and its evidence live in G123's notes; the one
+  fact that decided it is repeated here because this item is where a reader lands:
+
+  THE REVIEW WAS WRITTEN BLIND TO THE ACCEPTANCE. `docs/design/catalog-substrate-review.md` was
+  authored branch-side at `b58f3869` (2026-08-28) on `feat/ui-workstream`, and that commit's
+  history does NOT contain `413b9186` (2026-08-25), which accepted ADR 0014 with four amendments.
+  The review therefore proposes amending an ADR it had every reason to believe was still Proposed —
+  G104 had closed it that way the day before the branch diverged. Verified with
+  `git merge-base --is-ancestor`, not inferred from dates.
+
+  WHY NOT REOPEN G104. Its acceptance said, in terms, "status Proposed — never Accepted, because
+  acceptance is the user's and is recorded in README.md only after they rule." The user ruled on
+  2026-08-25. Reopening G104 would put a closed item in the position of editing a decision that has
+  since been made, which is exactly the state its own acceptance forbade. The amendment is new
+  PROPOSED text against a ruled ADR, and it goes to the user the way 0014's own four amendments did.
+
+  MODEL fable because the ADR decides a boundary — where a binding may live at all — against two
+  standing ADRs (0009's git-text source of truth, 0014's per-machine exception). Module `docs`
+  follows Y1/R1 and the G104 precedent: a decision document is docs work even when its subject is
+  config. Epic component-topology and phase 6 follow G81/G104/G109, the three items this rules on.
