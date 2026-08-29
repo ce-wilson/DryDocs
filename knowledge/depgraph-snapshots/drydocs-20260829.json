@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-28T20:59:15",
-    "date": "20260828",
+    "captured_at": "2026-08-29T03:00:08",
+    "date": "20260829",
     "scan": "ui-workstream",
     "tree": true,
     "git": {
-      "commit": "66eefc70",
-      "full": "66eefc70b1dda826981e1d1bef60cc666186e77c",
+      "commit": "062d71f6",
+      "full": "062d71f60c880d6e1655f11ce23a29c08861934d",
       "branch": "feat/ui-workstream",
-      "describe": "port-base-20260820-174-g66eefc70",
-      "subject": "fix(plan): Idea-169 carries the status field its inbox header requires",
+      "describe": "port-base-20260820-176-g062d71f6",
+      "subject": "fix(web,agents): the depgraph demo queries match the labels the gate actually ruled",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19610,10 +19610,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json",
-      "name": "drydocs-20260828.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260828-2059.json",
+      "name": "drydocs-20260828-2059.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260828.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260828-2059.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39767,7 +39767,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260828.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260828-2059.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
