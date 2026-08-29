@@ -16,9 +16,14 @@ from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from google.genai import types
 
+# The self-documentation code graph as the gate RULED it, not as G33 first
+# proposed it: gate self-documentation-code-graph §C1 picked :CodeModule and
+# explicitly rejected option (b) :CodeFile, and §D1 named the edge :IMPORTS.
+# The loader writes snake_case `rel_path`. This query trailed all three and
+# returned zero rows against a populated graph.
 DEFAULT_QUERY = (
-    "MATCH (a:CodeFile)-[:DEPENDS_ON]->(b:CodeFile) "
-    "RETURN a.relPath AS source, b.relPath AS target LIMIT 25"
+    "MATCH (a:CodeModule)-[:IMPORTS]->(b:CodeModule) "
+    "RETURN a.rel_path AS source, b.rel_path AS target LIMIT 25"
 )
 
 

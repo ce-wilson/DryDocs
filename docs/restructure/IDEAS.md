@@ -93,6 +93,39 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-173`** · 2026-08-29 · `[bug]` · **open** · prio? **Low** —
+  **The console's bolt panel defaults its database to `neo4j`, so a fresh clone runs correct
+  Cypher against the wrong database and gets zero rows.** `CypherConsole.tsx` reads
+  `env.VITE_NEO4J_DATABASE ?? 'neo4j'`; every depgraph and Control-M surface lives in `drydocs`,
+  and the home database is explicitly NOT part of the topology (the same drift that put stray
+  sample loads in it until 2026-07-27). A machine whose `web/.env.local` sets the variable never
+  sees this, which is why it has survived — the failure only reaches someone who copied
+  `.env.example` and did not fill it, and it presents as an empty result rather than an error.
+  Candidate fix is to default to `drydocs` rather than the driver's home database, since no
+  surface this panel serves reads from `neo4j`.
+
+- **`Idea-172`** · 2026-08-29 · `[chore]` · **open** · prio? **Low** —
+  **`agents/.env` carries an empty `NEO4J_PASSWORD`, and only a falsy-check keeps the agent tier
+  working.** The file is a filled-in copy of `.env.example` whose password line was left blank,
+  per the agents README step. It works today because `common/neo4j_tool.py` merges the root
+  `.env` with `if _value and not os.getenv(_name)`, and an empty string is falsy, so the root
+  value fills the gap. The fragility is that the guard reads like a normal precedence rule while
+  actually depending on that emptiness: rewrite it as a membership test and the blank line
+  silently wins, giving the whole agent tier an empty password. Either clear the line so the
+  merge has nothing to override, or make the guard's intent explicit in a comment.
+
+- **`Idea-171`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+  **A demo query that names a label the graph does not have returns `status: success, rowCount:
+  0`, and nothing anywhere notices.** Found 2026-08-29 (desktop, `neo4jtest`, `drydocs`): the
+  console's `C4 components (depgraph)` preset and the matching `DEFAULT_QUERY` in
+  `agents/graph_query/agent.py` both queried `:CodeFile` / `DEPENDS_ON` / `relPath`, while the
+  self-documentation-code-graph gate ruled `:CodeModule` (rejecting option (b) `:CodeFile`) and
+  `IMPORTS`, and the loader writes snake_case `rel_path`. Both were fixed the same day, but the
+  interesting part is the detection gap: the two call sites drifted from a SIGNED gate ruling,
+  the unit suite stayed green, and the surface reported success. Worth deciding whether the
+  gate-ruled labels should be generated or guarded rather than hand-copied into demo queries —
+  the same generated-artifact-plus-drift-test shape already used elsewhere in the UI work.
+
 - **`Idea-170`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
   **snapshot.ps1's board refresh has been silently skipping on this desktop, and the warn-only
   catch is what hides it.** Observed at the O77 close, 2026-08-28: the step reports "board

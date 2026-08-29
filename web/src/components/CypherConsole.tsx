@@ -7,8 +7,12 @@ import type { Role } from '../lib/auth'
 const env = import.meta.env
 
 const PRESETS: Record<string, string> = {
+  // Labels/edge/property per gate self-documentation-code-graph: §C1 ruled
+  // :CodeModule (option (b) :CodeFile was rejected), §D1 ruled :IMPORTS, and the
+  // loader writes snake_case `rel_path`. Kept in step with DEFAULT_QUERY in
+  // agents/graph_query/agent.py, which is section 2's empty-message default.
   'C4 components (depgraph)':
-    'MATCH (a:CodeFile)-[:DEPENDS_ON]->(b:CodeFile) RETURN a.relPath AS source, b.relPath AS target LIMIT 25',
+    'MATCH (a:CodeModule)-[:IMPORTS]->(b:CodeModule) RETURN a.rel_path AS source, b.rel_path AS target LIMIT 25',
   'Label counts': 'MATCH (n) RETURN labels(n) AS labels, count(*) AS count ORDER BY count DESC',
 }
 
