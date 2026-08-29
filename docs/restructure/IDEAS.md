@@ -91,6 +91,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-187`** · 2026-08-29 · `[task]` · **open** · prio? **Med** —
+  **Producer has no registry row for the PAT Product Application Report, so two loaders the
+  company runs have no producer-side source.** The 2026-08-28 manual-load PoC established the
+  three PAT reports and which loaders each feeds: Team Details Report (`pat:people-report`),
+  Product Catalog People Report (`pat:product-catalog`), and the **Product Application Report**
+  — which feeds `pat_product_owners` and `pat_area_products` company-side under the id
+  `pat:catalog-app`, and which producer's registry does not carry at all. The gate prompt
+  `manual-download-provenance.yaml` (company, drafted 2026-08-28) records the wider form: a
+  2026-08-27 PAT pull landed thirteen reports in the `pat/` drop zone and four in active
+  analytical use resolve to no dataset id.
+  **Why this was not just added at the 2026-08-29 census close.** Adding `locator.report` to
+  EXISTING rows is a field edit and was done. Minting a NEW dataset id is T19 territory — T19
+  ruled `pat:product-catalog` precisely so neither repo's legacy string survived, and inventing
+  a third id unilaterally producer-side would re-open exactly that. The company id
+  (`pat:catalog-app`, replacing `pat-catalog-app`) is a candidate, not a default.
+  **Also unresolved and riding the same gate:** `pat:people-report` is bound to the Team Details
+  Report while the report actually named "…People Report" is `pat:product-catalog`'s — the two
+  ids read crossed (D1). The mismatch is now recorded in the registry row's own comment and the
+  new `test_manually_downloaded_reports_name_the_report_they_come_from` guard makes the report
+  name declared rather than tribal, but the RENAME is the gate's call, not a build's.
+
 - **`Idea-186`** · 2026-08-28 · `[task]` · **open** · prio? **Med** —
   **The superseded-database line-scan, applied to the five operator docs the 2026-08-24 fold
   touched, finds 18 un-escaped historical mentions across four of the five files — G114's

@@ -722,6 +722,7 @@ datasets:
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       mapping: config/source-mappings/seal-extract.yaml   # column ledger (S3; gate business-application-identity §B1(c))
+      report: "SEAL report data downloads"   # names the DOWNLOAD PAGE rather than one export — the SEAL side publishes a set, not a single named report. Recorded as-published so loader -> source -> report still resolves; correct it if the page ever names one export
     confirmed: true                     # live since the M1 chain; transfers per Q6
     replaces: seal-extract
     notes: >
@@ -750,6 +751,7 @@ datasets:
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
       extract: ~                        # real report path/export coordinates — internal/ twin only
+      report: "Product Catalog People Report"   # the report NAME as published on the download page. Names are mechanism (Internal-Public); the URL is a connection coordinate and stays in the internal twin (N7)
     confirmed: true                     # catalog-hierarchy gates (SME 2026-06-21 rulings; C9 2026-07-18) — transfers per Q6
     replaces: catalog-pat
     notes: >
@@ -783,7 +785,8 @@ datasets:
       drop_dir: pat/
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
     locator:
-      mapping: config/source-mappings/pat-team-report.yaml   # G82 (2026-08-21): authored from what drydocs/pat_projection.py reads; header spellings pinned at the first real run — REAL rows never committed here
+      mapping: config/source-mappings/pat-team-report.yaml   # G82 (2026-08-21): authored from what drydocs/pat_projection.py reads; census CLOSED 2026-08-29 against the live 43-column export — REAL rows never committed here
+      report: "Team Details Report"     # export file name TEAM_DETAILS_REPORT. NOTE THE MISMATCH the id cannot express: this row is the TEAM report, while the report actually named "...People Report" is pat:product-catalog's. The two ids read crossed — a NAMING defect, gate territory (D1, gate manual-download-provenance), deliberately NOT renamed here
     confirmed: true                     # C9 gate (2026-07-18): the PAT team report as the team_applications feed — transfers per Q6
     replaces: catalog-pat
     notes: >

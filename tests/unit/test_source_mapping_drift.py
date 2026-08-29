@@ -182,8 +182,15 @@ def test_strict_parser_grammar() -> None:
 # --- 2. coverage / census reconciliation ----------------------------------------
 
 
-def test_committed_ledger_census_is_pending_and_reconciles(ledger: SourceMapping) -> None:
-    # Phase 0 state: every census pending -> nothing to reconcile, by design
+def test_committed_ledger_census_reconciles(ledger: SourceMapping) -> None:
+    """Every committed ledger balances — whether its census is pending or closed.
+
+    Was ``..._is_pending_and_reconciles``: while every census was pending there
+    was nothing to reconcile and the assertion was vacuously true. The PAT team
+    report closed its census on 2026-08-29 (43 columns, measured), so this now
+    actually reconciles explicit rows + sweep against ``column_count`` for at
+    least one object, and the next ledger to close is covered without an edit.
+    """
     assert ledger.census_failures() == []
 
 

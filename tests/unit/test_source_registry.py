@@ -748,3 +748,42 @@ def test_cadence_is_a_dataset_field_not_a_doc_ledger_one() -> None:
         f"doc-registry rows carrying cadence: {stray} -- the field is a DATASET-row "
         "field (N12's fence); extending it to the doc ledger is a separate call."
     )
+
+
+def test_manually_downloaded_reports_name_the_report_they_come_from() -> None:
+    """A hand-downloaded report is only as traceable as the name it is filed under.
+
+    The generalized form of the manual-load PoC's issue 1 (2026-08-28): three
+    registry rows fed loaders from a download page, and NOTHING in the registry
+    said WHICH published report a row read. Anyone joining loader -> source ->
+    report had to guess, and the guess was wrong for at least one row -- the
+    `pat:people-report` id is bound to the *Team Details Report*, while the report
+    actually named "...People Report" is `pat:product-catalog`'s. That naming
+    defect is gate territory (D1, gate manual-download-provenance) and is NOT
+    fixed by renaming here; what IS fixed is that the report name is now a
+    declared, checkable field instead of tribal knowledge.
+
+    Scope is deliberately narrow -- ``artifact_kind: report`` AND
+    ``acquisition.mode: manual``. An automated feed has a connection string; a
+    manual bundle or snapshot (rua, depgraph) is not a "report" and has no
+    published name to carry. Widening this to every manual row would demand a
+    field that half of them cannot honestly fill.
+
+    The URL is deliberately NOT required and deliberately not here: a download
+    page is a connection coordinate and lives in the internal twin per the N7
+    rule. Names are mechanism (Internal-Public), coordinates are not.
+    """
+    doc = yaml.safe_load(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    missing = [
+        entry["id"]
+        for entry in doc["datasets"]
+        if entry.get("artifact_kind") == "report"
+        and (entry.get("acquisition") or {}).get("mode") == "manual"
+        and not str((entry.get("locator") or {}).get("report") or "").strip()
+    ]
+    assert not missing, (
+        "manually-downloaded report rows with no locator.report: "
+        f"{sorted(missing)} -- name the report AS PUBLISHED on the download page "
+        "so loader -> source -> report resolves without tribal knowledge. The URL "
+        "stays in the internal twin (N7); only the name belongs here."
+    )
