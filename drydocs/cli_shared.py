@@ -633,7 +633,14 @@ CANONICAL_LOAD_SEQUENCE: tuple[LoadStep, ...] = (
         "never having run) and the team<->application alignment",
     ),
     LoadStep(
-        "ingest-controlm", "standing", _ALL, "folders -> jobs -> conditions -> derived deps (M3)"
+        "ingest-controlm",
+        "standing",
+        _ALL,
+        "folders -> jobs -> conditions -> hosts -> derived deps (M3). The hosts "
+        "pass rides part 2 but has its own grain (P3 topology): CM_HOSTS carries "
+        "no folder, owner or author, so of the scope binds only --data-center "
+        "applies to it. The note said 'conditions -> derived deps' until "
+        "2026-08-28, which contradicted this row's own loaders column",
     ),
     LoadStep("load-software-registry", "standing", _COLD, "vendor/product registry (plan 07)"),
     LoadStep(
