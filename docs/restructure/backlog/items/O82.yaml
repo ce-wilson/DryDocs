@@ -1,0 +1,57 @@
+id: O82
+epic: web-console
+title: 'Agent chat surface over the ADK tier via the AG-UI protocol — explicitly WITHOUT
+  adopting LangChain/LangGraph'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- agents/serve.py
+- agents/graph_qa/
+- web/src/
+- drydocs_api/query_specs.py
+- docs/decisions/0007-agentic-qa-architecture.md
+acceptance: |
+  (a) THE FRAMEWORK DECISION, RECORDED SO IT IS NOT RE-LITIGATED. The agent tier is Google
+  ADK (ADR 0007) and STAYS ADK. The web integration speaks AG-UI — the framework-agnostic
+  agent-user interaction protocol with first-class ADK support — not a LangChain/LangGraph
+  runtime. assistant-ui's react-langgraph runtime and agent-chat-ui were surveyed and
+  DECLINED for exactly one reason each: both assume a LangGraph server. CopilotKit is
+  permitted ONLY as an AG-UI client library, never as a reason to restructure the agent.
+
+  (b) SERVER SIDE FIRST. agents/ exposes an AG-UI endpoint over the existing graph_qa
+  app on the version of ADK pinned in agents/requirements.txt — behind the same read-only
+  posture the tier already has (no new write capability arrives with a protocol). If the
+  pinned ADK version cannot serve AG-UI, this item STOPS and reports the version gap; it
+  does not upgrade ADK as a side effect.
+
+  (c) CLIENT SIDE THIN. A chat panel in web/ consuming the AG-UI event stream: streamed
+  tokens, and tool-call events rendered as WHICH QuerySpec ran — the R2 transparency
+  contract made visible in the console. Prefer a hand-rolled AG-UI client (the protocol is
+  an SSE event stream) before adding any framework dependency; a client library enters
+  web/ only if the hand-rolled path costs more than it saves, and that trade is stated in
+  the PR note.
+
+  (d) LEDGERS. The chat panel registers in config/taxonomy/ui-components.yaml; any new
+  package lands in the software registry with vendor and license recorded; the AG-UI
+  protocol pick is a candidate row for the ADR 0015 sources-and-tooling-watch register
+  (watch trigger: protocol spec breaks, or ADK absorbs a first-party UI surface).
+
+  (e) SCOPE FENCE. Read-only Q&A only. No agent-initiated writes, no memory surface, no
+  session persistence beyond what the tier already has — those wait on the ADR 0015 D6
+  memory plan and its gates.
+notes: |
+  Groomed 2026-08-27, same session as O81 (the UI-components review). SECONDARY to O81 by
+  SME direction. No hard depends_on: the two items touch different seams (O81 is
+  api-results -> canvas; this is agents -> chat), so either lands independently; they meet
+  only at ui-components.yaml, which unions.
+
+  Module drydocs-web recorded as a choice, same as O68: the item spans agents (endpoint)
+  and web (panel); it is filed against the surface the user asked for. The (b) slice stays
+  in agents/, the (c) slice in web/ — the boundary guard's classification is unaffected
+  because agents/ is already scanned.

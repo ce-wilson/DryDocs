@@ -70,6 +70,14 @@ groom_log:
     is an SME review, parked as an inbox question at this groom; the panel may report that
     kind's size and retention and must not render its contents.
   attached_at: O68
+- date: '2026-08-27'
+  note: |-
+    O81-O82: the UI-components review session (cowork). Survey of Neo4j viz + agent web
+    integration ruled: NVL first (O81, p1, license ruled acceptable by the SME at groom;
+    react-force-graph recorded as MIT fallback), agent chat via the AG-UI protocol over
+    the EXISTING ADK tier (O82, p2) with LangChain/LangGraph runtimes explicitly declined.
+    Both items keep the O20 read boundary untouched.
+  attached_at: O81
 - date: '2026-08-28'
   note: |-
     ── 2026-08-28 groom (ui-workstream worktree) — the O66 aftermath ───────────

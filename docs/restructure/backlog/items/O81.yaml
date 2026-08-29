@@ -1,0 +1,66 @@
+id: O81
+epic: web-console
+title: 'NVL graph canvas: first-party Neo4j visualization components over QuerySpec results —
+  the console gets a real graph surface, fed only through the read API'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/src/
+- drydocs_api/query_specs.py
+- config/taxonomy/ui-components.yaml
+- config/taxonomy/software-registry.yaml
+- drydocs-icons/manifest.json
+- docs/design/drydocs-web-console-tdd.md
+acceptance: |
+  Written as ORDERED STEPS for the UI worktree session (branch off main, screenshots in the
+  PR note, session ritual per CLAUDE.md §0).
+
+  (1) DEPENDENCY + LICENSE RECORD. Add @neo4j-nvl/base and @neo4j-nvl/react to web/. NVL
+  enters config/taxonomy/software-registry.yaml as a product of the existing Neo4j vendor
+  row before the first import lands. The license was RULED acceptable at this groom (SME
+  2026-08-27, in-chat); the step that remains is mechanical: record the license identifier
+  the installed package actually declares in the registry row, so the ruling and the
+  artifact agree on the record. A mismatch with the ruling's basis is a stop-and-report,
+  not a silent proceed.
+
+  (2) THE DATA SEAM — API RESULTS IN, NEVER BOLT. One mapper module
+  (web/src/lib/nvl-mapping.ts or equivalent): QuerySpec result rows -> NVL
+  nodes/relationships. The canvas consumes ONLY drydocs_api spec results — the ADR 0005
+  read boundary is untouched, no browser-side driver, no new endpoint that accepts Cypher.
+  Node styling keys off the existing icon registry + label conventions, not a parallel
+  style table.
+
+  (3) THE CANVAS COMPONENT. GraphCanvas wraps @neo4j-nvl/react: pan/zoom/select,
+  click-a-node -> the EXISTING detail panel components (no duplicate detail rendering),
+  force layout default. A declared node-count ceiling with an HONEST truncation indicator —
+  a capped render says it is capped (the absent-is-never-empty discipline applies to
+  pixels too).
+
+  (4) FIRST TWO SURFACES, both over already-reviewed specs: the runbook/data-series
+  traversal view (runbooks.series.v1) and a blast-radius/neighborhood view for a selected
+  application or job. No new QuerySpec rows are minted in this item; if a view needs one,
+  that is a separate api-side item through the normal review.
+
+  (5) LEDGER + GUARD. Register GraphCanvas (and the mapper) in
+  config/taxonomy/ui-components.yaml (test_ui_components.py drift guard) and add the
+  ui-tests entry. The component census stays reciprocal with the software registry's
+  react product row.
+
+  (6) CLOSE-OUT. Screenshots of both surfaces in the PR note; the worktree session ends
+  with the suite green and no change to any /raw-cypher or write-surface behavior.
+notes: |
+  Groomed 2026-08-27 from the UI-components review session (cowork): survey of Neo4j viz
+  options ruled NVL first (first-party, Bloom-grade interactions, React wrappers, plain-data
+  input that fits the QuerySpec-only read contract). react-force-graph (MIT) recorded as
+  the fallback if step (1)'s license record ever contradicts the ruling. NeoDash and the
+  dashboard/platform tier declined: they want browser Cypher, which fights the O20-pinned
+  read boundary, and the renders/board already own dashboard ground.
+
+  p1 at the SME's direction ("first priority"). Priority order with O82: this lands first;
+  O82 is the secondary.
