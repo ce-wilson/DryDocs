@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/data-zones.yaml
@@ -84,3 +84,78 @@ notes: |
   (a source to a service); this one is a filesystem path in the existing zone declaration. They
   meet only at the shared question of which environment variables the system reads, which G125 (c)
   enumerates and this item does not touch.
+
+  DONE 2026-08-29 (desktop). THE RULING ON (a) IS THAT THE SINGLE-MODE AXIS IS RIGHT AND THE MODE
+  IS `read` -- L4's premise is the part that does not survive contact with the declaration. `read`
+  in this file has never meant "nobody writes it"; the header defines it as "source data a human
+  drops in. The system may NEVER write it." The operator's hand is not the system, so a file
+  written by a person at a no-echo prompt and read by the API is not a dual case at all -- it is
+  the read case, stated. THE PRECEDENT WAS ALREADY IN THE FILE, one zone above where the new one
+  landed: `controlm-api-config` is an operator-authored endpoint-and-credential pointer declared
+  `mode: read`, whose note reads "the system consumes it and must never rewrite it, and overwriting
+  an operator's credentials config is the same class as overwriting their extract." The second
+  enforcer points the same way -- tests/unit/test_mapping_api.py forbids every filesystem write
+  primitive inside drydocs_api -- so a `write` declaration would have CONTRADICTED a standing
+  guard, which the acceptance named as the one unacceptable outcome. No new mode was invented, and
+  inventing one would have weakened the axis to describe a case it already covered.
+
+  (b) THE BASE AXIS GAINS `repo`, SPELLED THE WAY THE OTHER HALF ALREADY SPELLS IT. The two
+  declarations join in overlaps(), and landing_zones.py has had BASE_REPO = "repo" since N12 while
+  data-zones.yaml had only data_root and home -- so this is adopting a vocabulary, not minting one.
+  The in-tree question was NOT waved through on the strength of that: G109 (e) ruled the Confluence
+  capture out of the tree because its exception could never expire, and the same test applied here
+  gives a different answer for a reason that is recorded rather than asserted. The capture was
+  untracked AND unignored, the one state `git clean -fd` removes without -x, and its only rebuild
+  was a company-side re-scrape. /internal-local/ is gitignored (.gitignore line 60), so only -fdx
+  reaches it, and the system's payload there is rebuilt in one command by the operator who owns it.
+  THAT DIFFERENCE IS THE PRICE, AND IT IS CHARGED: zones gain a `rebuild:` field, and a guard fails
+  any repo-based zone that declares none. Not a blanket exception -- a stated recovery path, checked.
+  A second guard pins the in-tree set to an explicit list, so a NEW in-tree zone is a decision
+  someone makes on purpose. G109 found two zones nobody had declared precisely because nothing
+  forced that moment.
+
+  (c) THE INVARIANT COVERS IT AND IS PROVEN TO FIRE ON THE NEW BASE. A repo-based read zone
+  protects exactly as much as a data_root one, and the injected-overlap test asserts a write nested
+  inside one is caught naming both paths. The declared-equals-resolved guard (G111) was WIDENED
+  rather than exempted: its independent recomputation had two branches, home and data_root, and a
+  repo zone fell silently into the data_root branch and compared the wrong path -- caught by the
+  existing test failing, which is the guard doing its job on the first new base it ever saw.
+  A THIRD AGREEMENT was added because this zone has no data_root helper to check against:
+  credentials_path() -- the module that actually owns the path -- must resolve inside the declared
+  zone. Without it the declaration and the code could drift with nothing to notice.
+
+  ONE LIMIT NAMED RATHER THAN HIDDEN, and it cost the zone its `env:` row. DRYDOCS_CONSOLE_CREDENTIALS
+  names a FILE; a zone's `env:` override resolves a DIRECTORY, so wiring the two would have made
+  the zone resolve to a file path and report "absent" forever -- a declaration that looks live and
+  guards nothing. A machine that sets the variable has moved its credentials outside this
+  declaration's reach and nothing here can follow, which is the same shape as the runtime leg G81
+  recorded. The unset case IS mechanical, which is what the credentials_path() guard above covers.
+
+  ONE OVERCLAIM CAUGHT BY LIVE-TESTING MY OWN CHANGE. The first cut printed "it is rebuildable in
+  one command" against a zone the command reported as holding 216 files -- but `rebuild:` recreates
+  the CREDENTIAL FILE, not the deepdoc corpus and Confluence scripts sitting beside it. Read
+  literally by an operator that sentence invites a `git clean -fdx` that destroys hand-carried
+  material. The field is now scoped in the YAML, in the guard's docstring and on the surface, which
+  tells the reader to take the file count as "what -fdx would delete", never as "what one command
+  restores". The zone is declared to keep the SYSTEM out, not to mark the directory disposable.
+
+  ALSO FIXED BECAUSE IT BECAME FALSE: `drydocs landing-zones` told the reader that "repo zones hold
+  TRACKED files, which no clean removes at any strength". True of landing zones, and this item made
+  it untrue of data zones. Corrected in place rather than left as a stale reassurance -- a wrong
+  safety claim is worse than none.
+
+  `rebuild` also rides the --json surface, guarded: a machine reader that can see `inside_repo` but
+  not `rebuild` knows a zone is deletable and nothing about getting it back.
+
+  SCOPE FENCE HELD (d): nothing moved, no behavior changed, drydocs_api is untouched. VERIFIED LIVE
+  (J18: desktop, this checkout, DRYDOCS_DATA_ROOT = C:/coding/projects/data/DryDocs) -- `drydocs
+  landing-zones` reports 28 zones where it reported 26, the new row reads read/repo, and the
+  rebuild and scope lines render. Suite 2742 passed / 9 skipped, ruff + format clean, CLI import
+  and --help pass. The enforcement matrix regenerated to pick up the new guards.
+
+  ONE FALSE START WORTH RECORDING, since it is a policy this repo enforces on purpose: the
+  injected-overlap fixture first used the real directory name as its path literal, and
+  test_skip_guard_policy.py flagged the file as referencing a gitignored asset without a skip
+  guard. The policy was RIGHT and the fix was the fixture, not the policy -- a skip guard here
+  would have been a lie that let every assertion in the file silently vanish on a fresh clone. The
+  fixture is synthetic under tmp_path now and says so.

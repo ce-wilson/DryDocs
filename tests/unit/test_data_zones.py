@@ -352,11 +352,14 @@ def test_each_zone_path_equals_what_its_helper_actually_resolves(monkeypatch, tm
         else:
             # No helper and no env: the only independent check left is base +
             # path, computed here rather than by calling the code under test.
-            resolved = (
-                Path.home() / zone.path_spec
-                if zone.base == dz.BASE_HOME
-                else data_root.resolve_data_root() / zone.path_spec
-            )
+            if zone.base == dz.BASE_HOME:
+                resolved = Path.home() / zone.path_spec
+            elif zone.base == dz.BASE_REPO:
+                # G126: the repo base recomputed from the module-level constant,
+                # not from data_zones' own _REPO_ROOT — same independence rule.
+                resolved = REPO / zone.path_spec
+            else:
+                resolved = data_root.resolve_data_root() / zone.path_spec
 
         declared = dz._resolve(zone.base, zone.path_spec, zone.env)
         if zone.env:
@@ -439,6 +442,14 @@ def test_landing_zones_reports_both_declarations_not_just_the_registry(
     }, "widening the command must not drop the registry half it already covered"
     assert reported, "no declared zones reported at all — the join is dead"
 
+    # G126: the hazard and its recovery travel in the same row. A machine reader
+    # that can see `inside_repo` but not `rebuild` knows a zone is deletable and
+    # nothing about getting it back.
+    in_tree = [row for row in payload["declared_zones"] if row["base"] == dz.BASE_REPO]
+    assert in_tree, "the in-tree zone vanished from the machine surface"
+    for row in in_tree:
+        assert row["rebuild"], f"in-tree zone {row['zone_id']} reports no rebuild path"
+
 
 def test_check_fails_on_an_empty_read_zone_but_not_an_empty_write_zone(
     monkeypatch, tmp_path
@@ -469,3 +480,133 @@ def test_check_fails_on_an_empty_read_zone_but_not_an_empty_write_zone(
     assert (
         CliRunner().invoke(cli.app, ["landing-zones", "--check"]).exit_code == 1
     ), "an empty READ zone must fail --check — it is the missing-source signature"
+
+
+# --------------------------------------------------------------------------- #
+# G126 — the in-tree zone, its price, and the code that owns its path
+# --------------------------------------------------------------------------- #
+IN_TREE_ZONES = {"console-credentials"}
+"""Every zone deliberately declared inside the working tree.
+
+An explicit set rather than a computed one, because the point is the TRIPWIRE: a
+new in-tree zone is a decision someone has to make on purpose, and G109 found two
+zones nobody had declared precisely because nothing forced that moment. Adding an
+id here is the moment.
+"""
+
+
+def test_in_tree_zones_are_the_ones_we_meant() -> None:
+    """A repo-based zone is reachable by ``git clean -fdx`` whatever .gitignore
+    says, so arriving at one by accident is the failure this pins down."""
+    actual = {z.id for z in dz.load_zones() if z.base == dz.BASE_REPO}
+    assert actual == IN_TREE_ZONES, (
+        f"in-tree zone set changed: {actual ^ IN_TREE_ZONES}. A repo-based zone "
+        "sits where `git clean -fdx` can delete it. If that is intended, add the "
+        "id to IN_TREE_ZONES and give the zone a `rebuild:`."
+    )
+
+
+def test_an_in_tree_zone_declares_how_it_is_rebuilt() -> None:
+    """THE PRICE OF THE EXCEPTION, and what keeps it from being a blanket.
+
+    A landing zone earns its in-tree place by holding TRACKED files
+    (``test_landing_zones.py``). ``internal-local/`` can never be tracked —
+    PUBLISH-BOUNDARY.md forbids committing credential material, permanently — so
+    it earns its place the other way: by saying, in the declaration, how an
+    operator recreates THE SYSTEM'S PAYLOAD there from nothing. G109 (e) ruled the
+    Confluence capture OUT of the tree because its exception could never expire
+    and it had no rebuild short of a company-side re-scrape. This one has a
+    one-command rebuild, and that difference is the whole argument, so it is
+    checked rather than asserted in prose.
+
+    THE FIELD IS SCOPED AND THE GUARD DOES NOT OVERSTATE IT: a `rebuild:` covers
+    what DryDocs put in the zone, never everything an operator keeps beside it.
+    ``internal-local/`` holds 200-plus files this command cannot restore, so the
+    zone is declared to keep the SYSTEM out, not to mark the directory
+    disposable. A guard that read `rebuild:` as "safe to delete" would be worse
+    than no guard.
+    """
+    missing = [z.id for z in dz.load_zones() if z.base == dz.BASE_REPO and not z.rebuild]
+    assert not missing, (
+        f"in-tree zone(s) with no `rebuild:` — {missing}. Declare the command "
+        "that recreates the contents, or move the zone out of the tree."
+    )
+
+
+def test_the_credential_path_the_code_uses_falls_inside_its_declared_zone(monkeypatch) -> None:
+    """The declaration cannot drift from the module that owns the path.
+
+    ``credentials_path()`` is the authority on where the file lives; the zone is
+    the declaration of where the system may not write. This is the G81
+    helper-agreement idiom applied to a path whose owner is not a ``data_root``
+    helper. The variable is cleared first: with it SET the operator has moved the
+    file outside the declaration's reach on purpose, which the zone's note records
+    as a limit rather than pretending to follow.
+    """
+    from drydocs_api.credentials import PATH_ENV_VAR, credentials_path
+
+    monkeypatch.delenv(PATH_ENV_VAR, raising=False)
+    zone = next(z for z in dz.load_zones() if z.id == "console-credentials")
+    assert dz._contains(zone.path, credentials_path()), (
+        f"credentials_path() resolves to {credentials_path()}, which is outside "
+        f"the declared zone {zone.path} — one of the two moved and the other did not."
+    )
+
+
+def test_the_credential_zone_is_read_so_nothing_may_create_under_it(monkeypatch) -> None:
+    """READ means the SYSTEM may never write, and the operator's hand is not the
+    system. Proven against the create-capable public helper, the one G81's
+    reconstruction found aimed at a hand-drop folder."""
+    from drydocs_core import data_root
+
+    zone = next(z for z in dz.load_zones() if z.id == "console-credentials")
+    assert zone.mode == dz.READ
+    assert zone.creatable is False
+    # The runtime refusal — the leg that sees a path handed in at call time,
+    # which is how the incident happened with every declaration correct.
+    hit = dz.read_zone_containing(zone.path / "console-credentials.json")
+    assert hit is not None and hit.id == zone.id
+    nested = dz.read_zone_containing(zone.path / "deepdoc" / "anything")
+    assert nested is not None and nested.id == zone.id
+    # And the runtime refusal every write site calls names it rather than
+    # failing anonymously — the G81 (c) rule that a violation names both ends.
+    with pytest.raises(Exception, match="console-credentials"):
+        data_root.refuse_write_into_read_zone(zone.path / "out", action="create")
+
+
+def test_a_write_inside_the_in_tree_read_zone_is_caught(tmp_path: Path) -> None:
+    """PROOF OF FAIL for the new base: the invariant is not base-aware, and it
+    must not become so — a repo-based read zone protects exactly as much as a
+    data_root one.
+
+    The fixture path is deliberately NOT the real zone's name. A synthetic
+    declaration under tmp_path proves the shape without writing a literal that
+    ``test_skip_guard_policy.py`` reads as a real gitignored asset this file
+    opens — and that policy is right to flag it, because a skip guard here would
+    be a lie that let these assertions silently vanish on a fresh clone.
+    """
+    read = dz.DataZone(
+        id="machine-local",
+        mode=dz.READ,
+        base=dz.BASE_REPO,
+        path_spec="machine-local/",
+        path=tmp_path / "machine-local",
+        helper=None,
+        env=None,
+        note="",
+        rebuild="a command",
+    )
+    write = dz.DataZone(
+        id="output",
+        mode=dz.WRITE,
+        base=dz.BASE_REPO,
+        path_spec="machine-local/out/",
+        path=tmp_path / "machine-local" / "out",
+        helper=None,
+        env=None,
+        note="",
+    )
+    found = dz.overlaps((write, read))
+    assert len(found) == 1
+    assert "is INSIDE" in found[0]
+    assert str(read.path) in found[0] and str(write.path) in found[0]

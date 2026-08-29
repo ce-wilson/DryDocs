@@ -53,6 +53,18 @@
 #              unset or empty FAILS naming it, rather than silently relocating
 #              every zone to ~/data/DryDocs.
 #   home       under the user's home directory (the run-log idiom).
+#   repo       in the working tree. The spelling matches landing_zones.BASE_REPO
+#              on purpose -- the two declarations join in overlaps(), so one base
+#              meaning "the repo" in one file and nothing in the other is a seam
+#              waiting to be misread. G126 added it.
+#
+# IN-TREE ZONES PAY A PRICE: `rebuild`. A repo-based zone is reachable by
+# `git clean -fdx` no matter what .gitignore says, so it must say how an operator
+# gets its contents back from nothing. A landing zone earns its in-tree place by
+# holding TRACKED files (tests/unit/test_landing_zones.py); a zone here that is
+# ignored and untracked -- console-credentials is the one -- earns it by
+# declaring a one-command rebuild instead. Not a blanket exception: the guard
+# fails a new in-tree zone that declares neither.
 schema: drydocs.data-zones.v1
 
 zones:
@@ -216,3 +228,52 @@ zones:
       COMPANY-SIDE NOTE, since that is where the scrape runs: producer has no
       internal/knowledge/ directory at all, so this ruling costs nothing to adopt
       here and is a real relocation only on the checkout that holds the capture.
+
+  # ---- machine-local operator area (G126) -----------------------------------
+  - id: console-credentials
+    mode: read
+    base: repo
+    path: internal-local/
+    helper: ~   # drydocs_api.credentials.credentials_path() owns it; no data_root helper
+    rebuild: poetry run python scripts/set_console_credential.py <persona-id>
+    note: >
+      Holds console-credentials.json -- the web console's scrypt hashes, WRITTEN
+      BY A PERSON at a no-echo prompt and read by the API. The exact shape of
+      controlm-api-config above, and it takes the same mode for the same reason:
+      READ means the SYSTEM may never write here, and the operator's hand is not
+      the system. That is not a workaround for a missing dual mode -- it is the
+      guarantee the console actually needs, and it already has a second enforcer
+      pointing the same way (tests/unit/test_mapping_api.py forbids every
+      filesystem write primitive inside drydocs_api, because an endpoint that can
+      rewrite this file is an endpoint that can grant itself an account). A
+      `write` declaration would contradict that guard, which is worse than no
+      declaration at all.
+      THE ZONE IS THE DIRECTORY, NOT THE FILE. Nothing in the system writes
+      anywhere under internal-local/ -- verified by walking the call sites, the
+      G81 method -- so the broad claim is the true one and it protects the
+      deepdoc corpus and the Confluence scripts living beside the credentials.
+      IN-TREE AND IGNORED, WHICH IS WHY IT CARRIES `rebuild`. /internal-local/ is
+      gitignored (.gitignore line 60), so `git clean -fd` cannot reach it and only
+      `-fdx` can -- materially safer than the state G109 (e) ruled out of the tree,
+      which was untracked AND unignored. It cannot become tracked: PUBLISH-BOUNDARY
+      forbids committing credential material, permanently. What makes that
+      survivable rather than a standing defect is that THE SYSTEM'S OWN PAYLOAD
+      here -- the credential file -- is REBUILDABLE in one command by the operator
+      who owns it, where the Confluence capture needed a company-side re-scrape.
+      `rebuild:` is scoped to that payload and says nothing about the rest of the
+      directory: the deepdoc corpus and the Confluence scripts beside it are the
+      operator's, travel by hand, and that command does not bring them back. The
+      zone is declared to keep the system OUT, not to promise the directory is
+      disposable. G126 declares where the file already is and
+      moves nothing -- relocating a machine-local file with no committed source is
+      how you destroy the only copy.
+      NO `env:` ROW, AND THAT IS A LIMIT WORTH NAMING RATHER THAN HIDING.
+      DRYDOCS_CONSOLE_CREDENTIALS names a FILE; a zone's `env:` override resolves
+      a DIRECTORY, so wiring the two would make this zone resolve to a file path
+      and report "absent" forever. A machine that sets the variable has moved its
+      credentials outside this declaration's reach and nothing here can follow
+      them -- the same shape as the runtime leg G81 recorded, where a
+      caller-supplied path is invisible to any comparison of declarations. What
+      IS mechanical is the unset case: a guard asserts credentials_path()
+      resolves inside this zone, so the declaration cannot drift from the code
+      that owns the path.

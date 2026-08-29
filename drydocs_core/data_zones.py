@@ -54,7 +54,11 @@ MODES = (READ, WRITE, SCRATCH)
 
 BASE_DATA_ROOT = "data_root"
 BASE_HOME = "home"
-BASES = (BASE_DATA_ROOT, BASE_HOME)
+#: In the working tree. The spelling is ``landing_zones.BASE_REPO`` deliberately:
+#: the two declarations join in :func:`overlaps`, so a base meaning "the repo" in
+#: one file and nothing in the other is a seam waiting to be misread (G126 (b)).
+BASE_REPO = "repo"
+BASES = (BASE_DATA_ROOT, BASE_HOME, BASE_REPO)
 
 #: Modes whose helper may call mkdir. G81 (e): any path a ``create=True`` helper
 #: may build is write-mode BY CONSTRUCTION, so the converse is enforced — a
@@ -81,6 +85,12 @@ class DataZone:
     helper: str | None
     env: str | None
     note: str
+    #: How an operator rebuilds this zone's contents from nothing, for a zone
+    #: that ``git clean -fdx`` can reach. ``None`` means "does not need one" —
+    #: either the zone is outside the tree, or its contents are tracked. G126
+    #: makes this the price of an in-tree untracked zone: not a blanket
+    #: exception, a stated recovery path, checked by the guard.
+    rebuild: str | None = None
 
     @property
     def creatable(self) -> bool:
@@ -154,6 +164,8 @@ def _resolve(base: str, spec: str, env: str | None = None) -> Path:
         return Path.home() / spec
     if base == BASE_DATA_ROOT:
         return resolve_data_root() / spec
+    if base == BASE_REPO:
+        return _REPO_ROOT / spec
     raise DataZoneError(f"unknown base {base!r} — declared: {sorted(BASES)}")
 
 
@@ -208,6 +220,7 @@ def load_zones(path: Path | None = None) -> tuple[DataZone, ...]:
                 helper=str(helper).strip() if helper else None,
                 env=env,
                 note=str(row.get("note") or "").strip(),
+                rebuild=str(row["rebuild"]).strip() if row.get("rebuild") else None,
             )
         )
     return tuple(zones)

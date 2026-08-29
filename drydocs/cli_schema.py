@@ -113,6 +113,10 @@ def landing_zones_cmd(
                         "base": s.zone.base,
                         "path": str(s.zone.path),
                         "inside_repo": s.zone.inside_repo,
+                        # G126: an in-tree zone is reachable by `git clean -fdx`,
+                        # so a machine reader needs the recovery path in the same
+                        # row as the hazard, not in prose beside it.
+                        "rebuild": s.zone.rebuild,
                         "exists": s.exists,
                         "file_count": s.file_count,
                         "empty": s.empty,
@@ -148,7 +152,9 @@ def landing_zones_cmd(
         console.print(
             "[dim]Detection is the weaker half. What prevents the loss is location: "
             "data_root zones sit outside the tree where no clean can reach them, and repo "
-            "zones hold TRACKED files, which no clean removes at any strength.[/]"
+            "LANDING zones hold TRACKED files, which no clean removes at any strength. "
+            "One declared data zone is neither — see the rebuild note under the second "
+            "table (G126).[/]"
         )
 
     if not as_json:
@@ -170,6 +176,22 @@ def landing_zones_cmd(
             "is not. An empty write/scratch zone is an output directory the system will "
             "rebuild, so --check never fails on one.[/]"
         )
+        rebuildable = [s.zone for s in declared if s.zone.base == "repo"]
+        for zone in rebuildable:
+            console.print(
+                f"[red]{zone.id} sits INSIDE the working tree and is gitignored, so "
+                "`git clean -fd` cannot reach it but `-fdx` CAN — and a zone is only "
+                "as recoverable as the payload it holds.[/]"
+            )
+            console.print(
+                f"[dim]The system's own payload here is rebuilt by:[/] [cyan]{zone.rebuild}[/]"
+            )
+            console.print(
+                "[dim]Anything ELSE an operator keeps in this directory is theirs, "
+                "travels by hand, and that command does not bring it back. Read the "
+                "count above as 'files -fdx would delete', not as 'files one command "
+                "restores'.[/]"
+            )
 
     # A zone INSIDE the tree is a standing defect regardless of --check: it is
     # reachable by `git clean -fdx` no matter what .gitignore says. Both
