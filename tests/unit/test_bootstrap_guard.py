@@ -117,6 +117,26 @@ class _FakeClient:
     def constraint_names(self) -> frozenset[str]:
         return frozenset(self.names)
 
+    def constraints_detail(self) -> tuple[dict, ...]:
+        """G130: the double models the real client's detail read.
+
+        Added when the inverse check landed, and the two tests that failed here
+        were RIGHT to fail -- a double missing a method the command calls is a
+        double that no longer models the client. Label and property are synthetic
+        (the drift report only formats them); the NAME is what the comparison keys
+        on, so that is real.
+        """
+        return tuple(
+            {
+                "name": n,
+                "type": "UNIQUENESS",
+                "entityType": "NODE",
+                "labelsOrTypes": ["Fake"],
+                "properties": ["id"],
+            }
+            for n in sorted(self.names)
+        )
+
 
 @pytest.fixture()
 def fake_client(monkeypatch):

@@ -317,6 +317,70 @@ def landing_zones_cmd(
             raise typer.Exit(1)
 
 
+def _report_undeclared_constraints(cli) -> int:
+    """The INVERSE of the D8 guard: live constraints the schema tree declares nowhere (G130).
+
+    The presence check above answers "did every declaration land". This answers
+    the question nobody was asking and should have been: WHAT ELSE IS IN THERE.
+
+    THE MECHANISM IS IN THE OUTPUT because without it the warning is not
+    actionable. Constraints outlive data wipes -- a wipe is a data delete, not a
+    database drop, which is why a census at a true-zero node baseline still found
+    62 constraints. A clean graph is not a clean schema, and a retired label's
+    constraint keeps enforcing an old identity rule against any future load that
+    reuses the label.
+
+    NEVER AN AUTOMATIC DROP, and this is not caution for its own sake: the
+    company-side safety check before each drop was a zero-node count AND a human
+    decision. This reports, names what each constraint enforces, and says what a
+    human would need to check. Dropping a constraint that still guards live data
+    is unrecoverable in a way that leaving one in place is not.
+
+    A WARNING, never an exit code. Undeclared is a STATE -- a graph legitimately
+    carries constraints from provisioning and older experiments -- and failing
+    bootstrap on one would make the operator's next move "skip the check".
+    """
+    from drydocs_core.schema.constraints import undeclared_constraints
+
+    schema_dir = CONSTRAINTS_FILE.parent
+    extra = undeclared_constraints(cli.constraints_detail(), schema_dir)
+    if not extra:
+        console.print("[dim]No live constraint is undeclared in the schema tree.[/]")
+        return 0
+
+    t = Table(title=f"Live but UNDECLARED constraints ({len(extra)}) — drift, not a failure")
+    for col in ("name", "kind", "entity", "label / type", "properties"):
+        t.add_column(col, overflow="fold")
+    for row in extra:
+        t.add_row(
+            str(row.get("name", "")),
+            str(row.get("type", "")),
+            str(row.get("entityType", "")),
+            ", ".join(row.get("labelsOrTypes") or []),
+            ", ".join(row.get("properties") or []),
+        )
+    console.print(t)
+    console.print(
+        "[yellow]These are enforced by the database and declared by no file under "
+        f"{schema_dir.name}/. That is DRIFT, not a failure — a graph legitimately "
+        "carries constraints from provisioning and from older experiments.[/]"
+    )
+    console.print(
+        "[dim]Why one survives a wipe: a data wipe deletes DATA, not the schema. A "
+        "census at a true-zero node baseline still found 62 constraints. So a retired "
+        "label's constraint goes on enforcing an old identity rule against the next "
+        "load that reuses that label — and nothing else would ever tell you.[/]"
+    )
+    console.print(
+        "[dim]Before dropping any of these, a human checks: (1) does the label still "
+        "appear in the ontology or any loader; (2) does the graph hold nodes with it "
+        "right now; (3) is it provisioning's rather than the schema tree's. This "
+        "command drops NOTHING — the company-side procedure was a zero-node count plus "
+        "a human decision, and that is the standard it keeps.[/]"
+    )
+    return len(extra)
+
+
 @app.command()
 def bootstrap(
     skip_constraints: bool = typer.Option(False),
@@ -345,6 +409,7 @@ def bootstrap(
             console.print(
                 f"[green]Constraints applied ({len(declared)}/{len(declared)} declared present).[/]"
             )
+            _report_undeclared_constraints(cli)
         if not skip_ontology:
             cli.execute_file(ONTOLOGY_FILE)
             console.print("[green]Ontology seed applied.[/]")

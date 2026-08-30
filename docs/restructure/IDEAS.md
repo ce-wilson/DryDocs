@@ -359,6 +359,23 @@ question a 1,000-line file with the trail at the bottom could not answer.
   their loaded graph, so that stays open on the port trigger.
 
 <!-- add new ideas at the top -->
+- **`Idea-226`** · 2026-08-30 · `[chore]` · **open — three instances in ONE session** · prio? **Med** —
+  **Source-reading guards keep failing on their own prose, and every author invents the fix again.**
+  A guard that greps its own source tree for a forbidden pattern also matches the COMMENT that
+  explains why the pattern is forbidden. It happened three times on 2026-08-30 alone: G128's
+  declared-list guards matched `os.environ` and `${VAR:-default}` in their own docstrings (fixed
+  with a local `_code_only()` helper using `tokenize`); G129's no-import guard matched the *text*
+  `set_env_var` in three modules that merely name the script in prose (fixed with an AST import
+  walk); and G130's purity guard matched `session` and `run(` in its own docstring (fixed with an
+  AST call walk). Each fix was correct and each was written from scratch. The consequence is the
+  one worth naming: **a guard that fails on the explanation teaches people to stop writing
+  explanations**, which in this repo would cost more than the guard is worth. Proposal: one shared
+  test helper — `tests/unit/_source_scan.py` or similar — offering `code_only(source)` (tokenize,
+  strip COMMENT and STRING) plus `imported_modules(source)` and `called_attributes(source)` over
+  the AST, and a note in the testing conventions that a source-reading guard uses it rather than
+  a bare `in`. Small, and it removes a recurring authoring trap rather than a bug. Related
+  [[G128]], [[G129]], [[G130]], [[J37]].
+
 - **`Idea-225`** · 2026-08-30 · `[idea]` · **open — found by G129's doctor, desktop** · prio? **Med** —
   **A variable set in `.env` alone is visible to every loader and invisible to every binding check,
   and the two surfaces will disagree out loud the first time an Oracle account lands here.** The

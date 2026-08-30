@@ -106,3 +106,19 @@ class Neo4jClient:
     def constraint_names(self) -> frozenset[str]:
         """Names from ``SHOW CONSTRAINTS`` — the D8 bootstrap guard keys on these."""
         return frozenset(r["name"] for r in self.run("SHOW CONSTRAINTS YIELD name RETURN name"))
+
+    def constraints_detail(self) -> tuple[dict, ...]:
+        """Name, kind, entity, labels and properties for every live constraint (G130).
+
+        The INVERSE check needs more than names: a warning that says only
+        "``membership_id`` is undeclared" sends the reader back to the database to
+        find out what it enforces. The label and property are what let a human
+        decide anything, and deciding is the only action this check ever asks for.
+        """
+        return tuple(
+            dict(r)
+            for r in self.run(
+                "SHOW CONSTRAINTS YIELD name, type, entityType, labelsOrTypes, properties "
+                "RETURN name, type, entityType, labelsOrTypes, properties ORDER BY name"
+            )
+        )
