@@ -57,6 +57,12 @@ So either D2 is scoped to its own subject and clause 4's field proceeds, or it i
 and that one field waits for N10's page to sign. Ruling it here is what stops it being
 re-litigated per row, the way "established public vocabulary" was.
 
+> **RULED 2026-08-30 (user): D2 IS SCOPED, and clause 4's field PROCEEDS.** The reason given is
+> the practical one and it is decisive: without the field, a source added later has no way to name
+> the connection that reaches it — registration and profiling cannot be sequenced, so the field is
+> what makes a source registrable at all rather than a convenience on top. N10's D2 continues to
+> fence its own subject, the `wired`/`ready` split, which is untouched here.
+
 ## Why this is a new ADR and not an edit to 0014
 
 The catalog-substrate review asks for two of these rulings to land **in ADR 0014**. That
@@ -67,6 +73,13 @@ on 2026-08-25.
 
 That changes the venue question from a preference to a decision, and it is settled here
 first because everything below depends on it.
+
+> **RULED 2026-08-30 (user): 0017 STANDS ALONE.** The reason given, and it is a third argument
+> the two below do not make: the two records have **diverged**. 0014 is about the runtime
+> substrate; this one carries the open-source tool comparisons in detail — three source passes over
+> OpenLineage and DataHub, folded into the clauses at Rev 2. Merging that into 0014 would bury a
+> body of evidence inside an ADR about log directories and retention windows. The venue question
+> is closed; the paragraph below is kept as the record of how it was argued.
 
 **The ruling: 0017 stands alone, and 0014 gains a cross-reference rather than an
 amendment.** Two arguments, one of substance and one of process.
