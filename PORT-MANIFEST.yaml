@@ -732,6 +732,31 @@ rows:
       ratification citation; config/** would have overwritten the citation and,
       after their load, graph_locator, at every port. Idea-148 (the run <-> row
       join) adds the fields this split protects.
+  - path: "config/source-bindings.yaml"
+    disposition: per-entry
+    entry_rule: >
+      profiles[] keyed by id, with a FIELD SPLIT on the same principle as
+      doc-source-registry.yaml one row up — the WHAT crosses and the WHERE never
+      does. Producer-owned (cross on take): id, carrier, platform, classification,
+      serves, note, and the KEYS of the env map (which coordinates a connection
+      needs is a property of the platform, and both sides need the same ones).
+      Company-owned (NEVER overwritten by a port): the VARIABLE NAMES those keys
+      reference, and `status` — each side names its own variables and knows its
+      own configured state. `unbound[]` is per-entry by carrier: a carrier the
+      company binds and the producer does not is a company row, kept.
+      Company-only profiles are kept; producer-only profiles are clean-adds.
+    note: >
+      G125 (h), 2026-08-30, and this row exists because the alternative was
+      measured rather than imagined. Without it the file inherits the config/**
+      default below and a port carries ONE MACHINE'S BINDING onto the other side.
+      That default's own note records the same omission being caught once
+      already: "A file of LOCAL infrastructure facts does not belong under this
+      default; dev-environment.yaml sat here by omission until the 2026-07-28
+      port." A binding table is the same kind of file one level up — it holds no
+      values, but which variables a side reads and which carriers it has
+      configured are local facts. ADR 0017's reconciliation with ADR 0009 turns
+      on the port test, and this row is what makes that test TRUE rather than
+      assumed.
   - path: "config/**"
     disposition: canonical-producer
     note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log, dev-environment (first match wins). A file of LOCAL infrastructure facts does not belong under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port"

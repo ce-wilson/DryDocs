@@ -24,7 +24,8 @@
         "required": [
           "id",
           "name",
-          "classification"
+          "classification",
+          "binding"
         ],
         "properties": {
           "id": {
@@ -65,6 +66,13 @@
           },
           "notes": {
             "type": "string"
+          },
+          "binding": {
+            "description": "G125: the id of a connection profile in config/source-bindings.yaml, or null when this carrier has none. Null REQUIRES a matching entry in that file's `unbound:` list giving the reason -- enforced by tests/unit/test_source_bindings.py, not here (S6: this schema is shape-only, so a dangling reference would validate silently).",
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "not": {

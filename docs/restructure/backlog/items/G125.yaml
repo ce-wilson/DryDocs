@@ -9,7 +9,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G124
 inputs:
@@ -165,6 +165,51 @@ notes: |
   WATCH ITEM for whoever pulls it, inherited from G109's groom and still live: each new row needs
   its `classification` per CLAUDE.md §3. A connection binding is operational metadata, so Internal
   is the likely answer, but it is a per-row call and no default exists.
+
+  BUILT 2026-08-30 (desktop, MSI). What shipped, and two places this item's own text was wrong.
+
+  THE SHAPE. config/source-bindings.yaml declares FOUR connection profiles -- one per carrier
+  with automated datasets: oracle-psgmgr (10), snowflake-catalog (3), oracle-drydocs-stg (1),
+  oracle-inventory (1). That is all fifteen. Every SYSTEM row now carries `binding:` naming a
+  profile or `~`, and `~` requires a matching `unbound:` entry giving the reason -- twelve of
+  them. A system in neither list fails the guard, because silence is the defect. Two new core
+  modules: drydocs_core/env_refs.py (the one expansion function, the declared list, secret
+  masking) and drydocs_core/source_bindings.py (profiles, the typed report). 27 guards in
+  tests/unit/test_source_bindings.py.
+
+  THE ITEM UNDER-COUNTED TWICE, and both corrections are the kind worth recording. (1) Clause
+  (e) said ONE stale locator string advertising the removed DRYDOCS_DATA_ROOT default. There
+  were FOUR (lines 217, 260, 277, 675 pre-edit); all four are corrected and a guard now fails on
+  the string. (2) ADR 0017 Rev 1 estimated the fifteen automated datasets "reduce to roughly six
+  origins". Keyed per CARRIER as the amended clause 2 rules, they reduce to FOUR -- which is the
+  clause-2 correction paying off in the measurement, not a separate finding.
+
+  ONE PROFILE IS DELIBERATELY EMPTY. snowflake-catalog declares `env: {}` and
+  `status: declared-unconfigured`: no Snowflake account exists on either machine, so there is
+  nothing for a variable to hold. Declaring it empty is what makes the state VISIBLE -- the check
+  reports "declared, no variables" instead of the carrier being absent from the report entirely,
+  which is the coverage lie this item exists to end.
+
+  THE THREE ORACLE PROFILES RESOLVE TO THE SAME VARIABLES TODAY and are still three declarations,
+  on purpose: the day staging or the inventory probe moves behind its own account, the change is
+  one row here and no id anywhere. Sharing one profile would make that a migration.
+
+  WHAT WAS NOT DONE, stated rather than left to be discovered. Clause (c) asked for one expansion
+  function INSTEAD OF seven, and what shipped is the one function, the one error shape and the one
+  enumerable list -- the seven existing resolvers still hold their own semantics and were not
+  migrated. Migrating them changes exception types that other tests catch, and the risk was not
+  worth taking inside this item. What DOES now hold the line is the guard
+  test_every_variable_first_party_code_reads_is_declared: it reads the IMPORTABLE objects (the
+  env-name constants plus each pydantic settings class's env_prefix + fields, per J37 -- a grep
+  cannot see NEO4J_URI because the prefix composes it), so a new undeclared variable fails. That
+  is the property clause (c) actually wanted; the resolver migration is a follow-up and is
+  inboxed.
+
+  VERIFIED. Full suite green; `drydocs landing-zones --json` is still ONE document, now with
+  four keys; `--check` exits 0 on this desktop, where all three Oracle bindings read
+  `not-configured-on-this-machine` -- a STATE, not a failure, which is rule (i) doing its job on
+  the machine that has no Oracle credentials. A malformed binding exits 2 regardless of --check,
+  because that is the declaration and not the environment.
 
   AMENDED 2026-08-30 to follow ADR 0017 Rev 2, which the acceptance's own opening sentence already
   required ("if that ADR is ruled differently, this acceptance follows the ruling"). Three source

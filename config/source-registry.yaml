@@ -21,6 +21,19 @@
 #   Derived stores keep the @ grammar + `derived: true`; `authority` is
 #   omitted there (Q3 — not SOR/ADS; CDO SOC = upstream capture, doesn't fit).
 #
+# BINDING (G125; ADR 0017 ACCEPTED 2026-08-30): every SYSTEM row carries
+# `binding:` — the id of a connection profile in config/source-bindings.yaml, or
+# `~` when it has none. The profile names ENVIRONMENT VARIABLES and never holds a
+# host, service name, SID or credential; the registry names the source, the
+# profile names the connection, neither holds a value. The grain is the
+# CONNECTION CARRIER, not the origin: `origin: controlm` spans three systems so a
+# per-origin binding cannot reach one connection, and `system: psgmgr` carries
+# three origins so keying per origin re-fragments the connection the table exists
+# to share. `binding: ~` REQUIRES a matching entry in that file's `unbound:` list
+# giving the reason — a system in neither list is a test failure, because silence
+# is how "which sources are undeclared" became an investigation. Guarded by
+# tests/unit/test_source_bindings.py, both directions.
+#
 # AUTHORITY (CDO vocabulary as a FIELD): SOR = originating source for this
 # set of data; ADS = approved copy/redistribution carrier. Attaches to the
 # DATASET, never the system (their own definition is per-data-subset).
@@ -72,6 +85,8 @@ systems:
     cmdb_ci: ~                          # crosswalk source = snow:cmdb-ci-classes (Q4); value lands at that gate
     layer: data
     classification: Internal            # operational scheduling metadata; not for public GitHub
+    binding: oracle-psgmgr            # -> config/source-bindings.yaml (G125); the profile names
+                                        # the VARIABLES, never a value
     locator:
       platform: oracle-db               # what CARRIES it — software-registry product id
       service: ~                        # DB service/TNS — connection env (internal-local/), never committed
@@ -89,6 +104,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
       source_product: controlm          # config/taxonomy/software-registry.yaml product id
     sdlc: ~
@@ -103,6 +120,8 @@ systems:
     cmdb_ci: ~
     layer: business
     classification: Internal            # confidential handling: real applications, ownership, employees, SEAL ids
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator: {}
     sdlc: ~
     notes: "Applications + ownership; SOR for the application/org datasets."
@@ -113,6 +132,8 @@ systems:
     cmdb_ci: ~
     layer: business
     classification: Internal            # confidential handling: real LOB→Product→Team rosters, team names, SEAL ids
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
       source_product: pat
     sdlc: ~
@@ -157,6 +178,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
       hosting: saas                     # Q4 ruling 2026-07-31: registers NOW, typed SaaS
     sdlc: ~
@@ -171,6 +194,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator: {}
     sdlc: ~
     notes: "Crosswalk-only activation; no export feed exists (external/orchestration/autosys/)."
@@ -181,6 +206,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
       # THE POINTER, NEVER THE VALUE (internal/README.md): the internal MWAA
       # implementation-docs URL is a real internal address and lives ONLY in the
@@ -197,8 +224,10 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal            # confidential handling: real SEAL ids + pipeline/dataset GUIDs
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); dpl-registry/<seal>/ = per-SEAL exports"
+      data_root: "DRYDOCS_DATA_ROOT (MANDATORY since G81 (d) -- no default); dpl-registry/<seal>/ = per-SEAL exports"
       resolver: drydocs_core/data_root.py   # dpl_registry_dir() (the G19 shared helper)
     sdlc: ~
     notes: >
@@ -226,6 +255,8 @@ systems:
     cmdb_ci: ~
     layer: data
     classification: Internal
+    binding: snowflake-catalog            # -> config/source-bindings.yaml (G125); the profile names
+                                        # the VARIABLES, never a value
     locator: {}
     sdlc: ~
     notes: "Carrier for the catalog@... registration views; per-schema data expansion is a future gate."
@@ -236,8 +267,10 @@ systems:
     cmdb_ci: ~
     layer: data
     classification: Internal            # confidential handling: real dataset names, GUIDs, app ids, contacts, buckets, URIs
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); catalog/ = view exports, catalog/screenshots/ = evidence captures (confidential, never in-tree even gitignored)"
+      data_root: "DRYDOCS_DATA_ROOT (MANDATORY since G81 (d) -- no default); catalog/ = view exports, catalog/screenshots/ = evidence captures (confidential, never in-tree even gitignored)"
       resolver: drydocs_core/data_root.py   # catalog_dir() (the G19 shared helper)
     sdlc: ~
     notes: >
@@ -251,8 +284,10 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal            # confidential handling: bundles hold real hostnames, uids, home paths, script copies
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); rua/incoming/ = tarballs, rua/extracted/<bundle>/ = unpacked"
+      data_root: "DRYDOCS_DATA_ROOT (MANDATORY since G81 (d) -- no default); rua/incoming/ = tarballs, rua/extracted/<bundle>/ = unpacked"
       resolver: drydocs_core/data_root.py   # the ONE shared helper (G19)
     sdlc: ~
     notes: >
@@ -266,6 +301,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal            # real repo/branch names + script paths; content stays company-side
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator: {}
     sdlc: ~
     notes: >
@@ -284,6 +321,8 @@ systems:
     cmdb_ci: ~
     layer: data
     classification: Internal            # confidential handling: real schema/table/object names
+    binding: oracle-inventory            # -> config/source-bindings.yaml (G125); the profile names
+                                        # the VARIABLES, never a value
     locator: {}
     sdlc: ~
     notes: "Per-schema system split + datasets per table group are a future gate (migration sketch row)."
@@ -294,6 +333,8 @@ systems:
     cmdb_ci: ~
     layer: data
     classification: Internal
+    binding: oracle-drydocs-stg            # -> config/source-bindings.yaml (G125); the profile names
+                                        # the VARIABLES, never a value
     locator:
       schema: drydocs_stg               # our own staging schema (mechanism; committed in v1 too)
     sdlc: docs/reviews/sdlc-oracle-ingestion.md
@@ -305,6 +346,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal-Public     # the repo's own committed artifacts; per-dataset notes tighten where needed
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator: {}
     sdlc: ~
     notes: "Born-here datasets: the software-registry ledger, depgraph snapshots, design docs (tenant 0)."
@@ -315,6 +358,8 @@ systems:
     cmdb_ci: ~
     layer: technology
     classification: Internal            # confidential handling: real hostnames, racks, building locations, owning-app identifiers
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
     locator:
       hosting: internal-web             # an internal inventory UI; the site name/URL live ONLY in the internal/ twin (pointer-never-the-value)
       drop_readme: internal/server-inventory/README.md   # the landing zone's tracked procedure doc (Z1)
@@ -640,7 +685,7 @@ datasets:
       drop_dir_base: data_root  # resolved under DRYDOCS_DATA_ROOT — OUTSIDE the tree, so no git clean can reach it
       # xml is text — `ascii` is the plain-text bucket; drop_dir is the existing controlm-xml/ landing zone (locator.data_root)
     locator:
-      data_root: "DRYDOCS_DATA_ROOT (default ~/data/DryDocs); controlm-xml/ = definition exports (arbitrarily-named .xml — landing-zone convention + classification are the guard)"
+      data_root: "DRYDOCS_DATA_ROOT (MANDATORY since G81 (d) -- no default); controlm-xml/ = definition exports (arbitrarily-named .xml — landing-zone convention + classification are the guard)"
       resolver: drydocs_core/data_root.py   # controlm_xml_dir() (the G19 shared helper)
     confirmed: false                    # OPEN precedence ruling vs the psgmgr replica datasets (HITL — IDEAS question 2026-07-29); NOTHING writes the graph before it
     replaces: controlm-xml-export

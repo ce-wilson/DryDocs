@@ -1,0 +1,163 @@
+# =============================================================================
+# config/source-bindings.yaml — THE BINDING TABLE (G125; ADR 0017, ACCEPTED
+# 2026-08-30).
+#
+# WHAT THIS FILE IS. A registry row says WHAT a source is. This file says HOW to
+# REACH the carrier it lives on — and it says it by naming ENVIRONMENT VARIABLES,
+# never by holding a value. The registry names the source; a profile names the
+# connection; neither holds a host, a service name, a SID or a credential.
+#
+# WHY IT EXISTS. Fifteen of the thirty dataset rows are `acquisition.mode:
+# automated` and declared no binding at all: their system rows carried
+# `locator.service: ~` with a comment saying the real value lives in
+# `internal-local/`, and nothing resolves a comment. So `drydocs landing-zones
+# --check` reported a clean run over the manual half and said nothing about the
+# other half — a check that silently covers half its subject reads as coverage.
+#
+# THE GRAIN (ADR 0017 clause 2 as amended). One profile per CONNECTION CARRIER,
+# inherited by every dataset beneath it — NOT per origin. The registry disproves
+# per-origin: `origin: controlm` spans three systems, so a per-origin row cannot
+# bind to one connection; and `system: psgmgr` carries three origins, so keying
+# per origin re-fragments the connection this table exists to share. Four
+# carriers cover all fifteen automated datasets.
+#
+# WHICH ROW POINTS AT WHICH. A system row in config/source-registry.yaml carries
+# `binding: <profile id>`, or `binding: ~` with a `binding_note` saying why it has
+# none. The reference is GUARDED in both directions (tests/unit/
+# test_source_bindings.py): a row naming a profile that does not exist fails, and
+# a profile no row names is reported. DataHub ships this same standalone-profile
+# shape and omits exactly that link, which is why it is written down here — a
+# profile nothing references is a profile nothing can audit.
+#
+# THE VALUE RULE, and it is a publish-boundary rule (CLAUDE.md §3). Every `env:`
+# entry is a bare ${NAME} reference to a variable declared in
+# drydocs_core/env_refs.py. Bash-style defaults (${VAR:-x}) are REFUSED, not
+# unimplemented: a default in committed YAML puts G81 (d)'s silent relocation back
+# at the syntax level where the one expansion function cannot see it. A literal
+# value in any of these fields is a test failure.
+#
+# WHAT A BINDING IS NOT. It is not an instance coordinate and it does not change
+# any identifier. ADR 0017 clause 1 defers the instance axis and rules that
+# un-redacting `[db]`/`[schema]` must move together with SourceEntry.urn, under
+# its own SME gate. Nothing here touches a dataset id or a derived URN.
+# =============================================================================
+schema: drydocs.source-bindings.v1
+updated: 2026-08-30 # G125 — first build, from ADR 0017 (ACCEPTED 2026-08-30)
+
+profiles:
+  # ---------------------------------------------------------------------------
+  - id: oracle-psgmgr
+    carrier: psgmgr
+    platform: oracle-db
+    classification: Internal
+    env:
+      user: "${ORACLE_USER}"
+      password: "${ORACLE_PASSWORD}"
+      dsn: "${ORACLE_DSN}"
+    serves: 10 # every automated dataset on this carrier
+    note: >
+      The Control-M replica. ONE Oracle account reads all ten views, which is
+      exactly the situation a NAMED PROFILE suits and a derived
+      one-secret-per-source path does not (ADR 0017 clause 4, the Purview shape
+      over OpenMetadata's).
+
+      CARRIER-VALUE CAVEAT, recorded rather than silently relied on (ADR 0017
+      clause 2 qualification i): `psgmgr` is a SCHEMA, and the database it sits in
+      is `spiderdb` — which the registry names nowhere, because it is the token
+      `[db]` redacts in all ten ids. So keying this profile on `psgmgr` is a
+      proxy that holds only while one schema equals one database. A second schema
+      in `spiderdb`, or a `psgmgr` schema in a second database, breaks it
+      silently. `spiderdb` is a NAME and publishes (ruled 2026-08-30, the
+      pronounceable head of the TNS alias); the rest of the alias and what it
+      resolves to stay in the twin, and ORACLE_DSN is where they live.
+  # ---------------------------------------------------------------------------
+  - id: oracle-drydocs-stg
+    carrier: drydocs-stg
+    platform: oracle-db
+    classification: Internal
+    env:
+      user: "${ORACLE_USER}"
+      password: "${ORACLE_PASSWORD}"
+      dsn: "${ORACLE_DSN}"
+    serves: 1
+    note: >
+      The staging schema for the app-fact join. It shares the psgmgr account
+      today, which is WHY it is a separate profile rather than a second reference
+      to the same one: the profiles are separate declarations that currently
+      resolve to the same variables, so the day staging moves behind its own
+      account the change is one row here and no id anywhere. Sharing a profile
+      would make that a migration.
+  # ---------------------------------------------------------------------------
+  - id: oracle-inventory
+    carrier: oracle
+    platform: oracle-db
+    classification: Internal
+    env:
+      user: "${ORACLE_USER}"
+      password: "${ORACLE_PASSWORD}"
+      dsn: "${ORACLE_DSN}"
+    serves: 1
+    note: >
+      The schema-inventory probe — a catalog read of the instance itself rather
+      than of one schema. Same account today; separate profile for the same
+      reason as drydocs-stg.
+  # ---------------------------------------------------------------------------
+  - id: snowflake-catalog
+    carrier: snowflake
+    platform: snowflake
+    classification: Internal
+    env: {} # DELIBERATELY EMPTY — see below
+    serves: 3
+    status: declared-unconfigured
+    note: >
+      DECLARED WITH NO VARIABLES YET, and that is a state rather than an omission.
+      The three Snowflake datasets are registered and unconfirmed; no Snowflake
+      account exists on either machine, so there is nothing for a variable to
+      hold. Declaring the profile empty is what makes that VISIBLE — the check
+      reports "declared, no variables" instead of the carrier being absent from
+      the report altogether, which is the coverage lie this whole item exists to
+      end. When an account appears, this grows an `env:` block and nothing else
+      changes.
+
+# -----------------------------------------------------------------------------
+# CARRIERS WITH NO BINDING, and the reason each has none. A system absent from
+# BOTH lists is a test failure: silence is how "which sources are undeclared"
+# became an investigation in the first place. The pattern is data-zones.yaml's —
+# its header records why a write zone has no registry row.
+# -----------------------------------------------------------------------------
+unbound:
+  - carrier: airflow
+    reason: placeholder vendor — mapped to the BMC baseline, no export feed exists
+  - carrier: autosys
+    reason: placeholder vendor — mapped to the BMC baseline, no export feed exists
+  - carrier: bitbucket
+    reason: manual acquisition — the promotion-repo clone lands in a declared drop zone
+  - carrier: catalog
+    reason: >
+      an ORIGIN, not a carrier — its datasets sit on the `snowflake` carrier and
+      inherit that profile. Kept here so the absence is declared rather than
+      inferred.
+  - carrier: controlm
+    reason: >
+      an ORIGIN, not a carrier — the Control-M XML export is hand-carried into a
+      drop zone, and the replica it also feeds is reached through `oracle-psgmgr`.
+  - carrier: dpl
+    reason: manual acquisition — per-SEAL Swagger exports land in the G19 drop zone
+  - carrier: exec-hosts
+    reason: manual acquisition — the host inventory is a hand-dropped extract
+  - carrier: infra
+    reason: manual acquisition — infrastructure notes are hand-maintained
+  - carrier: pat
+    reason: manual acquisition — the people/product reports are hand-pulled
+  - carrier: repo
+    reason: the repository itself — read from the working tree, not over a connection
+  - carrier: seal
+    reason: >
+      an ORIGIN, not a carrier — the application extract is hand-dropped, and the
+      escalation table it also names is reached through `oracle-psgmgr`.
+  - carrier: snow
+    reason: >
+      manual acquisition TODAY and moving (Idea-132): the ServiceNow extracts are
+      hand-pulled CSV becoming SQL over the replica. When that flips, this row
+      becomes a profile — which is the transition N12's `acquisition.mode` field
+      exists to make visible.

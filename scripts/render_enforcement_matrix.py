@@ -200,6 +200,21 @@ SURFACES: list[dict] = [
         "gate_ref": None,
     },
     {
+        "id": "source-bindings",
+        "title": "Source bindings (one connection profile per carrier; variable NAMES only)",
+        "file": "config/source-bindings.yaml",
+        "consumers": [
+            "drydocs_core/source_bindings.py",
+            "drydocs_core/env_refs.py",
+            # the `binding:` field on every system row points here, and the guard
+            # checks the reference in BOTH directions
+            "config/source-registry.yaml",
+            "drydocs/cli_schema.py",
+        ],
+        "guard_tests": ["test_source_bindings.py"],
+        "gate_ref": None,
+    },
+    {
         "id": "log-kinds",
         "title": "Log kinds (root, level, retention, rotation, format per kind)",
         "file": "config/log-kinds.yaml",

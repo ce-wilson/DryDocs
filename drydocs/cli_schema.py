@@ -89,6 +89,21 @@ def landing_zones_cmd(
 
     declared = zone_inventory(load_zones())
 
+    # G125: the THIRD declaration, and the one that made this command's headline
+    # claim only half true. Both surfaces above are FILESYSTEM zones -- the manual
+    # half. The fifteen `acquisition.mode: automated` rows resolved through
+    # nothing at all: their system rows carried `locator.service: ~` and a comment,
+    # and nothing resolves a comment. So a clean run here covered the rows it knew
+    # about and said nothing about the rows it did not, which is the same defect
+    # G109 fixed one level narrower. ADR 0017 clause 7 rules the SCOPE: this
+    # reports what is configured on THIS machine, starts at the registration
+    # rather than at .env, and stops at the first stage that is not built.
+    from drydocs_core.source_bindings import load_unbound
+    from drydocs_core.source_bindings import reports as binding_reports
+
+    bindings = binding_reports()
+    unbound = load_unbound()
+
     if as_json:
         console.print_json(
             data={
@@ -123,6 +138,32 @@ def landing_zones_cmd(
                     }
                     for s in declared
                 ],
+                # G125: ONE document, still. G109 caught this command emitting two
+                # JSON payloads in its own change before it shipped; a third
+                # declaration is a third KEY, never a second print_json call.
+                "bindings": [
+                    {
+                        "carrier": b.carrier,
+                        "profile": b.profile_id,
+                        "verdict": b.verdict,
+                        "venue": b.venue,
+                        "datasets": b.datasets,
+                        "stopped_at": b.stopped_at,
+                        "unset": list(b.unset),
+                        "is_failure": b.is_failure,
+                        "stages": [
+                            {
+                                "stage": st.stage,
+                                "capable": st.capable,
+                                "detail": st.detail,
+                                "mitigation": st.mitigation,
+                            }
+                            for st in b.stages
+                        ],
+                    }
+                    for b in bindings
+                ],
+                "unbound_carriers": [{"carrier": u.carrier, "reason": u.reason} for u in unbound],
             }
         )
     else:
@@ -193,6 +234,52 @@ def landing_zones_cmd(
                 "restores'.[/]"
             )
 
+    if not as_json:
+        bt = Table(title="Source bindings (config/source-bindings.yaml) — automated carriers")
+        for col in ("carrier", "profile", "datasets", "state", "stopped at"):
+            bt.add_column(col, overflow="fold")
+        for b in bindings:
+            if b.is_failure:
+                state = f"[red]{b.verdict}[/]"
+            elif b.verdict == "configured":
+                state = "[green]configured[/]"
+            else:
+                state = f"[dim]{b.verdict}[/]"
+            bt.add_row(
+                b.carrier, b.profile_id, str(b.datasets), state, b.stopped_at or "[green]-[/]"
+            )
+        console.print(bt)
+        console.print(
+            f"[dim]Reported on [/][cyan]{bindings[0].venue if bindings else '?'}[/]"
+            "[dim]. The two machines hold different subsets, so a verdict is only "
+            "meaningful beside the venue that produced it (J18).[/]"
+            if bindings
+            else ""
+        )
+        console.print(
+            "[dim]not-configured-on-this-machine = the profile is declared and its "
+            "variables are unset HERE. That is a STATE, never a defect: --check does not "
+            "fail on it, because the other machine configures a different subset and "
+            "scoring its bindings red would make this report noise.[/]"
+        )
+        console.print(
+            "[dim]not-built-yet = the binding resolves and the pipeline downstream of it "
+            "does not exist yet. Also a state — most of the registry is mid-lifecycle by "
+            "design, and N12 (f) already rules that `manual` is the expected first state "
+            "and never debt to eliminate.[/]"
+        )
+        console.print(
+            "[dim]Nothing here tests your .env. The walk starts at the REGISTRATION and "
+            "runs downstream; it never asserts a variable holds a CORRECT host and never "
+            "probes a credential (ADR 0017 clause 7).[/]"
+        )
+        if unbound:
+            console.print(
+                f"[dim]{len(unbound)} carrier(s) declare NO binding, each with its reason "
+                "in source-bindings.yaml `unbound:` — declared absence, not silence. "
+                "A system in neither list is a test failure.[/]"
+            )
+
     # A zone INSIDE the tree is a standing defect regardless of --check: it is
     # reachable by `git clean -fdx` no matter what .gitignore says. Both
     # declarations are checked -- the hazard is the resolved path, not the file
@@ -206,6 +293,17 @@ def landing_zones_cmd(
             f"[red]{len(exposed)} data_root zone(s) resolve INSIDE the repo tree "
             f"({', '.join(exposed)}) — DRYDOCS_DATA_ROOT is pointed at the working "
             "tree, so a port-time clean can delete them.[/]"
+        )
+        raise typer.Exit(2)
+
+    # G125: a MALFORMED binding is a defect regardless of --check, the same way an
+    # in-tree zone is. It means a committed declaration cannot be resolved at all
+    # -- not that this machine has not configured it.
+    broken = [b.carrier for b in bindings if b.is_failure]
+    if broken:
+        console.print(
+            f"[red]{len(broken)} binding(s) are malformed and cannot resolve "
+            f"({', '.join(broken)}) — this is the declaration, not your environment.[/]"
         )
         raise typer.Exit(2)
 

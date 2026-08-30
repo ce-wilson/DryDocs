@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 569 items &middot; 109 todo / 6 in progress / 2 blocked / 452 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 569 items &middot; 108 todo / 6 in progress / 2 blocked / 453 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -85,7 +85,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">2 / 2</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">112 / 131</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">113 / 131</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">7 / 7</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">61 / 72</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
@@ -98,7 +98,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:17%"></div></div><p class="progress-text">2 / 12</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (95; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G94"><code>G94</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G125"><code>G125</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O58"><code>O58</code></a> <a class="ready-id" href="#O59"><code>O59</code></a> <a class="ready-id" href="#O60"><code>O60</code></a> <a class="ready-id" href="#O61"><code>O61</code></a> <a class="ready-id" href="#O62"><code>O62</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O71"><code>O71</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O78"><code>O78</code></a> <a class="ready-id" href="#O80"><code>O80</code></a> <a class="ready-id" href="#O81"><code>O81</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (94; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G94"><code>G94</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O58"><code>O58</code></a> <a class="ready-id" href="#O59"><code>O59</code></a> <a class="ready-id" href="#O60"><code>O60</code></a> <a class="ready-id" href="#O61"><code>O61</code></a> <a class="ready-id" href="#O62"><code>O62</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O71"><code>O71</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O78"><code>O78</code></a> <a class="ready-id" href="#O80"><code>O80</code></a> <a class="ready-id" href="#O81"><code>O81</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -179,7 +179,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">109</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">108</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
 config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
 BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
 session: a stale-premise sweep of the drafted page against current facts (the
@@ -400,158 +400,6 @@ drafted-unsigned gates had NO item owning the sign-off -- the drafting item
 closes done and the session is never scheduled. No drafting item ever existed for this page.
 This item is the sign-off session&#x27;s claim surface; the session itself is
 HITL (agent: main).
-</p></div></div>
-<div class="card ready" id="card-G125" data-id="G125" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g125 the automated half of the registry declares no binding: fifteen datasets resolve through nothing, seven modules each invent their own precedence, and landing-zones --check reads as coverage over half its subject" tabindex="0"><div class="card-head"><span class="card-id">G125</span><span class="card-title">The automated half of the registry declares no binding: fifteen datasets resolve through nothing, seven modules each invent their own precedence, and landing-zones --check reads as coverage over half its subject</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G124" data-target="card-G124">G124</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every source the system reads is DECLARED with a binding, not only the filesystem ones, and the
-resolution precedence is written once. Implements what G124&#x27;s ADR rules; if that ADR is ruled
-differently, this acceptance follows the ruling and not this text.
-
-(a) THE FIFTEEN AUTOMATED DATASETS GET A BINDING (review finding B1, and the amendment to both
-G81 (b) and G109 (a)). `config/source-registry.yaml` carries 15 `acquisition.mode: manual` rows
-that resolve through `drop_dir` and 15 `automated` rows that resolve through NOTHING — their
-system rows carry `locator.service: ~` with a comment saying the real value lives in
-`internal-local/`, and nothing resolves a comment. Per ADR 0017 clause 2 AS AMENDED 2026-08-30
-the binding is one row per CONNECTION CARRIER, inherited by every dataset under it -- NOT per
-origin, which Rev 1 said and the registry disproves: `origin: controlm` spans three systems
-(controlm, drydocs-stg, psgmgr) so a per-origin row cannot bind to one connection, and
-`system: psgmgr` carries three origins (controlm, hr, seal) so keying per origin re-fragments
-the connection the table exists to share. Carrier is the level `system` occupies, so the ten
-psgmgr datasets share one row. TWO QUALIFICATIONS, both from the amended clause: (i) `system`
-is at the right LEVEL carrying the wrong VALUE -- psgmgr is a schema and the database is
-spiderdb, so the proxy holds only while one schema equals one database; record that on the row
-rather than silently relying on it; (ii) the connection is not the only binding -- which READER
-fetches a datapoint is a finer, dataset-grained choice that `adapter:` already carries, and it
-is OUT of scope here (Idea-222, riding N10). A row that
-legitimately has no binding (a crosswalk-only activation with no export feed — `autosys` and the
-other `locator: {}` rows are the candidates) records that reason explicitly, the way
-`data-zones.yaml`&#x27;s header records why a write zone has no registry row.
-
-(b) `drydocs landing-zones --check` STOPS READING AS COVERAGE OVER HALF ITS SUBJECT. G109 fixed
-this once already for the code zones — the command now reports both declarations, 26 zones where
-it used to report 15 — and the automated half is the same defect one level wider: a clean run
-over the rows it knows about, silent about the rows it does not. The command reports the binding
-state of every carrier, and `--check` distinguishes &quot;bound and reachable&quot; from &quot;declared with no
-binding&quot; from &quot;bound to an unset variable&quot;. It stays ONE JSON document (the bug G109 caught in
-its own change before it shipped). SHAPE OF THE RESULT (ADR 0017 clause 7): a connection check
-returns a TYPED REPORT, not a boolean -- reachable, plus what it could and could not do, plus
-what to do about it. That is DataHub&#x27;s TestableSource.test_connection shape, and it is the half
-of a validating form an editor-first operator can still have.
-
-SCOPE AND DIRECTION OF THE TEST (ADR 0017 clause 7, RULED 2026-08-30 -- three rules, each
-closing a way this check could go back to lying). (i) IT RUNS ONLY FOR BINDINGS CONFIGURED ON
-THIS MACHINE, because that is the only thing testable. A binding whose variables are unset here
-is &quot;not configured on this machine&quot; -- a DISTINCT VERDICT, never a failure. The two machines hold
-different subsets, so scoring another machine&#x27;s binding red would make the check noise, and
-noise is how the original coverage lie survived. The report names the venue it was produced on
-(J18 as a return value). (ii) IT STARTS AT THE REGISTRATION, NEVER ON THE CONFIG SIDE OF THE
-WALL. Side (A) is .env -- machine-local values and secrets. Nothing tests side (A): no assertion
-that a variable holds a CORRECT host, no probing of credentials. The check begins once something
-is REGISTERED, at side (B), and runs DOWNSTREAM to the configured points as defined --
-connection, then the declared object, then the adapter, then the load surface. (iii) IT STOPS AT
-THE FIRST STAGE NOT YET BUILT and names that stage. &quot;Not built yet&quot; is a THIRD verdict class,
-distinct from both reachable and broken -- most of the registry is mid-lifecycle by design, and
-N12 clause (f) already rules that mode: manual is the expected first state and never a defect, so
-scoring unbuilt stages as failures would be wrong about the majority of rows. The load state the
-walk ends at is the one the load-map surface already renders: the check and the rendered view
-answer with the same fact, never two.
-
-(c) ONE EXPANSION FUNCTION, NOT SEVEN (finding B4; the amendment to G81 (d)). Today
-`resolve_data_root()` treats an empty string as unset, `resolve_log_dir()` walks two variables
-before its default, `credentials_path()` takes any non-empty override verbatim, and
-`MappingStore.__init__` imports `os` inside the constructor to read one variable. One function
-expands a variable reference, with one error naming the unset variable, and one enumerable list
-of every variable the system reads — `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR` (plus the legacy
-`SPIDERP_LOGDIR` alias), `DRYDOCS_CONSOLE_CREDENTIALS`, `DRYDOCS_MAPPING_DB`,
-`DRYDOCS_MAPPING_READ`, the Control-M adapter&#x27;s config variable, and the `NEO4J_*` set. This is
-what makes G81 (d) — an unset root FAILS rather than silently relocating — implementable in one
-place instead of seven. G81 (d)&#x27;s behavior does not change; its implementation stops being local
-to one resolver. TWO RIDERS from the amended ADR clause 3: (i) the expander SUBSTITUTES AND
-REFUSES DEFAULTS -- no bash-style `${VAR:-default}`, because a default operator puts G81 (d)&#x27;s
-silent relocation back at the syntax level where the one function cannot see it; an unset
-variable is an error naming the variable and the row that wanted it; (ii) the expander is also
-where a resolved value is REGISTERED AS SECRET, since it is the only place that can know, so
-masking is created at expansion rather than bolted on at each print site.
-
-(d) NO VALUE THAT IS SECRET LANDS IN COMMITTED YAML. The table names variables; it never holds a
-host, service name, SID or credential. Guarded, because this is the publish boundary (CLAUDE.md
-§3) and a guard is the only thing that keeps a convenience commit from putting a real value in a
-committed file. Every new row carries its `classification` — there is no unlabeled default, and
-`tests/unit/test_classification.py` enforces it.
-
-(e) ONE STALE LOCATOR STRING IS CORRECTED, found while ruling this item rather than by a guard:
-`config/source-registry.yaml` line 201 reads `data_root: &quot;DRYDOCS_DATA_ROOT (default
-~/data/DryDocs); ...&quot;`. G81 (d) REMOVED that default — the variable is mandatory and an unset
-root now fails naming it. The prose has contradicted the code since 2026-08-23. It is a
-free-text `locator` string, which is why nothing caught it, and that is the argument for (a):
-prose in a locator block is not a declaration.
-
-(f) THE PROFILE IS REFERENCED, AND THE REFERENCE IS GUARDED (ADR 0017 clause 4 as amended). The
-registry row NAMES its connection profile. A guard fails a row naming a profile that does not
-exist, and reports a profile no row names. This is in acceptance because DataHub ships the same
-shape and omits exactly this: its dataHubConnection declares no relationship to any dataset, so
-a profile nothing references is a profile nothing can audit -- the defect this item exists to
-close, reintroduced one level up.
-
-(g) THE `$`-PREFIX WRITE GUARD (ADR 0017 clause 6). In any committed YAML, a field whose key is
-credential-shaped (password, token, secret, connection_string, sqlalchemy_uri, plus the
-_password / _token / _key / _connection_string suffixes) must hold a variable REFERENCE -- a
-value beginning with the dollar sign -- or nothing at all. One test. It is the enforcement of a
-rule this repo already states and neither peer product has: an identifier publishes, a
-connection coordinate goes to the internal twin.
-
-(h) THE BINDING TABLE GETS ITS OWN PORT DISPOSITION (ADR 0017, the ADR 0009 reconciliation as
-ruled 2026-08-30). PORT-MANIFEST.yaml gains a row for the binding table -- `per-entry` with a
-FIELD SPLIT, the WHAT crossing and the WHERE never crossing -- modelled on the row
-config/doc-source-registry.yaml already carries, where producer-owned fields cross on take and
-company-owned fields (explicitly graph_locator and source, &quot;the where&quot;) are never overwritten by
-a port. WITHOUT THIS ROW the file inherits the config/** default `canonical-producer` and a port
-carries one machine&#x27;s binding onto the other side. That is not hypothetical: the default&#x27;s own
-note records the same omission being caught once already -- &quot;A file of LOCAL infrastructure facts
-does not belong under this default; dev-environment.yaml sat here by omission until the
-2026-07-28 port&quot;. Guarded by tests/unit/test_port_reconcile_guards.py, which already proves
-overlay union and verbatim-apply survival for the per-entry rows.
-
-SCOPE FENCE, so the id work is not started here: this item changes NO dataset id, NO retired-id
-mapping, and NOT `SourceEntry.urn`. ADR 0017 clause 1 as amended rules that un-redacting `[db]`
-or `[schema]` must move together with the URN derivation in one commit, and that pairing rides
-its own SME gate. Bindings only.
-
-`poetry run pytest -q` green including the classification guard, `drydocs landing-zones --check`
-reporting the full source set, ruff + format clean.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-29 (desktop) by G123. It carries TWO of the catalog-substrate review&#x27;s amendments
-because they are ONE finding at two altitudes, and minting two items for one gap would recreate
-the two-declarations defect G109 closed:
-
-  - the G81 (b) amendment — extend the declaration from the three families the SME named to the
-    full ORIGIN set, so the fifteen automated datasets are covered and not only the filesystem
-    ones; plus the G81 (d) amendment, one expansion function per B4 rather than one per module;
-  - the G109 (a) amendment — &quot;the gap is larger than six: every automated dataset is undeclared
-    too. Either widen the clause or record why the automated half is out of scope.&quot;
-
-BOTH RULED FOLLOW-UP, NOT REOPEN, and the reasons are different (full ruling in G123&#x27;s notes).
-G81&#x27;s declaration covers every path that EXISTED when it closed and its invariant holds; what the
-amendment asks for is a connection binding, which is not a filesystem path and has no expressible
-base in `data-zones.yaml`. G109 had already ruled its own six-zone premise moved and fixed the
-read surface instead; the automated half was never in its acceptance and needs a mechanism the
-item never had.
-
-`depends_on: [G124]` so nothing implements an unratified decision — the G104/G105-G109 precedent
-exactly. Module `config` follows G109&#x27;s reasoning: the deliverable is declaration rows plus a
-derivation rule, and the resolver edits are the consequence of the declaration rather than the
-point. Model sonnet: G124 makes the boundary decision, this executes it against tests.
-
-WATCH ITEM for whoever pulls it, inherited from G109&#x27;s groom and still live: each new row needs
-its `classification` per CLAUDE.md §3. A connection binding is operational metadata, so Internal
-is the likely answer, but it is a per-row call and no default exists.
-
-AMENDED 2026-08-30 to follow ADR 0017 Rev 2, which the acceptance&#x27;s own opening sentence already
-required (&quot;if that ADR is ruled differently, this acceptance follows the ruling&quot;). Three source
-passes read the cited products rather than a survey of them, and the binding key changed as a
-result: per CARRIER, not per origin. Clause (b) gained the typed-report shape, (c) gained the
-no-defaults and register-at-expansion riders, and (f)/(g) are new -- the profile reference guard
-and the dollar-prefix write guard, both of which exist because a peer product omits them.
-A scope fence was added so the id/URN pairing is not started here; it rides its own gate.
-Evidence: `docs/design/openlineage-substrate-review.md` and
-`docs/design/datahub-substrate-review.md` (Rev 2), plus Ideas 215, 218, 220, 222.
 </p></div></div>
 <div class="card ready" id="card-I5" data-id="I5" data-module="docs" data-phase="8" data-epic="project-board" data-type="bug" data-status="todo" data-search="i5 two idea captures landed below the audit trail with a non-conforming header and were invisible to both ideas.md guards" tabindex="0"><div class="card-head"><span class="card-id">I5</span><span class="card-title">Two idea captures landed below the audit trail with a non-conforming header and were invisible to BOTH IDEAS.md guards</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GAP. `_inbox_entries()` slices `IDEAS.md` from the `## Inbox` heading to the next `## ` heading, so it never sees a capture filed after the audit-trail heading; `_all_idea_ids()` matches the full header grammar, so it never sees a capture that does not carry it. A capture that is both — appended at the end of the file in an ad-hoc shape — is invisible to the header guard AND to the uniqueness guard at once. A new test in `tests/unit/test_plan_ideas.py` fails on that case: any `Idea-&lt;n&gt;`-shaped capture ANYWHERE in the file that does not conform to the header grammar, or that carries the grammar but sits outside the two known sections, is reported by id and line.
 
@@ -1572,7 +1420,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">452</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">453</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -3355,6 +3203,203 @@ most likely to win by default. It is named and answered on the audit question.
 SCOPE HELD: no code changed, nothing in 0014 was edited, and the ADR states in its own text that
 G125 may leave the manual half alone -- ruling the two halves the same SHAPE without ordering a
 rewrite that buys nothing. Suite 2742 passed / 9 skipped, ruff + format clean.
+</p></div></div>
+<div class="card" id="card-G125" data-id="G125" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="done" data-search="g125 the automated half of the registry declares no binding: fifteen datasets resolve through nothing, seven modules each invent their own precedence, and landing-zones --check reads as coverage over half its subject" tabindex="0"><div class="card-head"><span class="card-id">G125</span><span class="card-title">The automated half of the registry declares no binding: fifteen datasets resolve through nothing, seven modules each invent their own precedence, and landing-zones --check reads as coverage over half its subject</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G124" data-target="card-G124">G124</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every source the system reads is DECLARED with a binding, not only the filesystem ones, and the
+resolution precedence is written once. Implements what G124&#x27;s ADR rules; if that ADR is ruled
+differently, this acceptance follows the ruling and not this text.
+
+(a) THE FIFTEEN AUTOMATED DATASETS GET A BINDING (review finding B1, and the amendment to both
+G81 (b) and G109 (a)). `config/source-registry.yaml` carries 15 `acquisition.mode: manual` rows
+that resolve through `drop_dir` and 15 `automated` rows that resolve through NOTHING — their
+system rows carry `locator.service: ~` with a comment saying the real value lives in
+`internal-local/`, and nothing resolves a comment. Per ADR 0017 clause 2 AS AMENDED 2026-08-30
+the binding is one row per CONNECTION CARRIER, inherited by every dataset under it -- NOT per
+origin, which Rev 1 said and the registry disproves: `origin: controlm` spans three systems
+(controlm, drydocs-stg, psgmgr) so a per-origin row cannot bind to one connection, and
+`system: psgmgr` carries three origins (controlm, hr, seal) so keying per origin re-fragments
+the connection the table exists to share. Carrier is the level `system` occupies, so the ten
+psgmgr datasets share one row. TWO QUALIFICATIONS, both from the amended clause: (i) `system`
+is at the right LEVEL carrying the wrong VALUE -- psgmgr is a schema and the database is
+spiderdb, so the proxy holds only while one schema equals one database; record that on the row
+rather than silently relying on it; (ii) the connection is not the only binding -- which READER
+fetches a datapoint is a finer, dataset-grained choice that `adapter:` already carries, and it
+is OUT of scope here (Idea-222, riding N10). A row that
+legitimately has no binding (a crosswalk-only activation with no export feed — `autosys` and the
+other `locator: {}` rows are the candidates) records that reason explicitly, the way
+`data-zones.yaml`&#x27;s header records why a write zone has no registry row.
+
+(b) `drydocs landing-zones --check` STOPS READING AS COVERAGE OVER HALF ITS SUBJECT. G109 fixed
+this once already for the code zones — the command now reports both declarations, 26 zones where
+it used to report 15 — and the automated half is the same defect one level wider: a clean run
+over the rows it knows about, silent about the rows it does not. The command reports the binding
+state of every carrier, and `--check` distinguishes &quot;bound and reachable&quot; from &quot;declared with no
+binding&quot; from &quot;bound to an unset variable&quot;. It stays ONE JSON document (the bug G109 caught in
+its own change before it shipped). SHAPE OF THE RESULT (ADR 0017 clause 7): a connection check
+returns a TYPED REPORT, not a boolean -- reachable, plus what it could and could not do, plus
+what to do about it. That is DataHub&#x27;s TestableSource.test_connection shape, and it is the half
+of a validating form an editor-first operator can still have.
+
+SCOPE AND DIRECTION OF THE TEST (ADR 0017 clause 7, RULED 2026-08-30 -- three rules, each
+closing a way this check could go back to lying). (i) IT RUNS ONLY FOR BINDINGS CONFIGURED ON
+THIS MACHINE, because that is the only thing testable. A binding whose variables are unset here
+is &quot;not configured on this machine&quot; -- a DISTINCT VERDICT, never a failure. The two machines hold
+different subsets, so scoring another machine&#x27;s binding red would make the check noise, and
+noise is how the original coverage lie survived. The report names the venue it was produced on
+(J18 as a return value). (ii) IT STARTS AT THE REGISTRATION, NEVER ON THE CONFIG SIDE OF THE
+WALL. Side (A) is .env -- machine-local values and secrets. Nothing tests side (A): no assertion
+that a variable holds a CORRECT host, no probing of credentials. The check begins once something
+is REGISTERED, at side (B), and runs DOWNSTREAM to the configured points as defined --
+connection, then the declared object, then the adapter, then the load surface. (iii) IT STOPS AT
+THE FIRST STAGE NOT YET BUILT and names that stage. &quot;Not built yet&quot; is a THIRD verdict class,
+distinct from both reachable and broken -- most of the registry is mid-lifecycle by design, and
+N12 clause (f) already rules that mode: manual is the expected first state and never a defect, so
+scoring unbuilt stages as failures would be wrong about the majority of rows. The load state the
+walk ends at is the one the load-map surface already renders: the check and the rendered view
+answer with the same fact, never two.
+
+(c) ONE EXPANSION FUNCTION, NOT SEVEN (finding B4; the amendment to G81 (d)). Today
+`resolve_data_root()` treats an empty string as unset, `resolve_log_dir()` walks two variables
+before its default, `credentials_path()` takes any non-empty override verbatim, and
+`MappingStore.__init__` imports `os` inside the constructor to read one variable. One function
+expands a variable reference, with one error naming the unset variable, and one enumerable list
+of every variable the system reads — `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR` (plus the legacy
+`SPIDERP_LOGDIR` alias), `DRYDOCS_CONSOLE_CREDENTIALS`, `DRYDOCS_MAPPING_DB`,
+`DRYDOCS_MAPPING_READ`, the Control-M adapter&#x27;s config variable, and the `NEO4J_*` set. This is
+what makes G81 (d) — an unset root FAILS rather than silently relocating — implementable in one
+place instead of seven. G81 (d)&#x27;s behavior does not change; its implementation stops being local
+to one resolver. TWO RIDERS from the amended ADR clause 3: (i) the expander SUBSTITUTES AND
+REFUSES DEFAULTS -- no bash-style `${VAR:-default}`, because a default operator puts G81 (d)&#x27;s
+silent relocation back at the syntax level where the one function cannot see it; an unset
+variable is an error naming the variable and the row that wanted it; (ii) the expander is also
+where a resolved value is REGISTERED AS SECRET, since it is the only place that can know, so
+masking is created at expansion rather than bolted on at each print site.
+
+(d) NO VALUE THAT IS SECRET LANDS IN COMMITTED YAML. The table names variables; it never holds a
+host, service name, SID or credential. Guarded, because this is the publish boundary (CLAUDE.md
+§3) and a guard is the only thing that keeps a convenience commit from putting a real value in a
+committed file. Every new row carries its `classification` — there is no unlabeled default, and
+`tests/unit/test_classification.py` enforces it.
+
+(e) ONE STALE LOCATOR STRING IS CORRECTED, found while ruling this item rather than by a guard:
+`config/source-registry.yaml` line 201 reads `data_root: &quot;DRYDOCS_DATA_ROOT (default
+~/data/DryDocs); ...&quot;`. G81 (d) REMOVED that default — the variable is mandatory and an unset
+root now fails naming it. The prose has contradicted the code since 2026-08-23. It is a
+free-text `locator` string, which is why nothing caught it, and that is the argument for (a):
+prose in a locator block is not a declaration.
+
+(f) THE PROFILE IS REFERENCED, AND THE REFERENCE IS GUARDED (ADR 0017 clause 4 as amended). The
+registry row NAMES its connection profile. A guard fails a row naming a profile that does not
+exist, and reports a profile no row names. This is in acceptance because DataHub ships the same
+shape and omits exactly this: its dataHubConnection declares no relationship to any dataset, so
+a profile nothing references is a profile nothing can audit -- the defect this item exists to
+close, reintroduced one level up.
+
+(g) THE `$`-PREFIX WRITE GUARD (ADR 0017 clause 6). In any committed YAML, a field whose key is
+credential-shaped (password, token, secret, connection_string, sqlalchemy_uri, plus the
+_password / _token / _key / _connection_string suffixes) must hold a variable REFERENCE -- a
+value beginning with the dollar sign -- or nothing at all. One test. It is the enforcement of a
+rule this repo already states and neither peer product has: an identifier publishes, a
+connection coordinate goes to the internal twin.
+
+(h) THE BINDING TABLE GETS ITS OWN PORT DISPOSITION (ADR 0017, the ADR 0009 reconciliation as
+ruled 2026-08-30). PORT-MANIFEST.yaml gains a row for the binding table -- `per-entry` with a
+FIELD SPLIT, the WHAT crossing and the WHERE never crossing -- modelled on the row
+config/doc-source-registry.yaml already carries, where producer-owned fields cross on take and
+company-owned fields (explicitly graph_locator and source, &quot;the where&quot;) are never overwritten by
+a port. WITHOUT THIS ROW the file inherits the config/** default `canonical-producer` and a port
+carries one machine&#x27;s binding onto the other side. That is not hypothetical: the default&#x27;s own
+note records the same omission being caught once already -- &quot;A file of LOCAL infrastructure facts
+does not belong under this default; dev-environment.yaml sat here by omission until the
+2026-07-28 port&quot;. Guarded by tests/unit/test_port_reconcile_guards.py, which already proves
+overlay union and verbatim-apply survival for the per-entry rows.
+
+SCOPE FENCE, so the id work is not started here: this item changes NO dataset id, NO retired-id
+mapping, and NOT `SourceEntry.urn`. ADR 0017 clause 1 as amended rules that un-redacting `[db]`
+or `[schema]` must move together with the URN derivation in one commit, and that pairing rides
+its own SME gate. Bindings only.
+
+`poetry run pytest -q` green including the classification guard, `drydocs landing-zones --check`
+reporting the full source set, ruff + format clean.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-29 (desktop) by G123. It carries TWO of the catalog-substrate review&#x27;s amendments
+because they are ONE finding at two altitudes, and minting two items for one gap would recreate
+the two-declarations defect G109 closed:
+
+  - the G81 (b) amendment — extend the declaration from the three families the SME named to the
+    full ORIGIN set, so the fifteen automated datasets are covered and not only the filesystem
+    ones; plus the G81 (d) amendment, one expansion function per B4 rather than one per module;
+  - the G109 (a) amendment — &quot;the gap is larger than six: every automated dataset is undeclared
+    too. Either widen the clause or record why the automated half is out of scope.&quot;
+
+BOTH RULED FOLLOW-UP, NOT REOPEN, and the reasons are different (full ruling in G123&#x27;s notes).
+G81&#x27;s declaration covers every path that EXISTED when it closed and its invariant holds; what the
+amendment asks for is a connection binding, which is not a filesystem path and has no expressible
+base in `data-zones.yaml`. G109 had already ruled its own six-zone premise moved and fixed the
+read surface instead; the automated half was never in its acceptance and needs a mechanism the
+item never had.
+
+`depends_on: [G124]` so nothing implements an unratified decision — the G104/G105-G109 precedent
+exactly. Module `config` follows G109&#x27;s reasoning: the deliverable is declaration rows plus a
+derivation rule, and the resolver edits are the consequence of the declaration rather than the
+point. Model sonnet: G124 makes the boundary decision, this executes it against tests.
+
+WATCH ITEM for whoever pulls it, inherited from G109&#x27;s groom and still live: each new row needs
+its `classification` per CLAUDE.md §3. A connection binding is operational metadata, so Internal
+is the likely answer, but it is a per-row call and no default exists.
+
+BUILT 2026-08-30 (desktop, MSI). What shipped, and two places this item&#x27;s own text was wrong.
+
+THE SHAPE. config/source-bindings.yaml declares FOUR connection profiles -- one per carrier
+with automated datasets: oracle-psgmgr (10), snowflake-catalog (3), oracle-drydocs-stg (1),
+oracle-inventory (1). That is all fifteen. Every SYSTEM row now carries `binding:` naming a
+profile or `~`, and `~` requires a matching `unbound:` entry giving the reason -- twelve of
+them. A system in neither list fails the guard, because silence is the defect. Two new core
+modules: drydocs_core/env_refs.py (the one expansion function, the declared list, secret
+masking) and drydocs_core/source_bindings.py (profiles, the typed report). 27 guards in
+tests/unit/test_source_bindings.py.
+
+THE ITEM UNDER-COUNTED TWICE, and both corrections are the kind worth recording. (1) Clause
+(e) said ONE stale locator string advertising the removed DRYDOCS_DATA_ROOT default. There
+were FOUR (lines 217, 260, 277, 675 pre-edit); all four are corrected and a guard now fails on
+the string. (2) ADR 0017 Rev 1 estimated the fifteen automated datasets &quot;reduce to roughly six
+origins&quot;. Keyed per CARRIER as the amended clause 2 rules, they reduce to FOUR -- which is the
+clause-2 correction paying off in the measurement, not a separate finding.
+
+ONE PROFILE IS DELIBERATELY EMPTY. snowflake-catalog declares `env: {}` and
+`status: declared-unconfigured`: no Snowflake account exists on either machine, so there is
+nothing for a variable to hold. Declaring it empty is what makes the state VISIBLE -- the check
+reports &quot;declared, no variables&quot; instead of the carrier being absent from the report entirely,
+which is the coverage lie this item exists to end.
+
+THE THREE ORACLE PROFILES RESOLVE TO THE SAME VARIABLES TODAY and are still three declarations,
+on purpose: the day staging or the inventory probe moves behind its own account, the change is
+one row here and no id anywhere. Sharing one profile would make that a migration.
+
+WHAT WAS NOT DONE, stated rather than left to be discovered. Clause (c) asked for one expansion
+function INSTEAD OF seven, and what shipped is the one function, the one error shape and the one
+enumerable list -- the seven existing resolvers still hold their own semantics and were not
+migrated. Migrating them changes exception types that other tests catch, and the risk was not
+worth taking inside this item. What DOES now hold the line is the guard
+test_every_variable_first_party_code_reads_is_declared: it reads the IMPORTABLE objects (the
+env-name constants plus each pydantic settings class&#x27;s env_prefix + fields, per J37 -- a grep
+cannot see NEO4J_URI because the prefix composes it), so a new undeclared variable fails. That
+is the property clause (c) actually wanted; the resolver migration is a follow-up and is
+inboxed.
+
+VERIFIED. Full suite green; `drydocs landing-zones --json` is still ONE document, now with
+four keys; `--check` exits 0 on this desktop, where all three Oracle bindings read
+`not-configured-on-this-machine` -- a STATE, not a failure, which is rule (i) doing its job on
+the machine that has no Oracle credentials. A malformed binding exits 2 regardless of --check,
+because that is the declaration and not the environment.
+
+AMENDED 2026-08-30 to follow ADR 0017 Rev 2, which the acceptance&#x27;s own opening sentence already
+required (&quot;if that ADR is ruled differently, this acceptance follows the ruling&quot;). Three source
+passes read the cited products rather than a survey of them, and the binding key changed as a
+result: per CARRIER, not per origin. Clause (b) gained the typed-report shape, (c) gained the
+no-defaults and register-at-expansion riders, and (f)/(g) are new -- the profile reference guard
+and the dollar-prefix write guard, both of which exist because a peer product omits them.
+A scope fence was added so the id/URN pairing is not started here; it rides its own gate.
+Evidence: `docs/design/openlineage-substrate-review.md` and
+`docs/design/datahub-substrate-review.md` (Rev 2), plus Ideas 215, 218, 220, 222.
 </p></div></div>
 <div class="card" id="card-G126" data-id="G126" data-module="drydocs-core" data-phase="6" data-epic="component-topology" data-type="bug" data-status="done" data-search="g126 the console credential file is an undeclared read-and-write path, and it is the case the zone declaration cannot currently express: one mode per zone, and no base outside the data root" tabindex="0"><div class="card-head"><span class="card-id">G126</span><span class="card-title">The console credential file is an undeclared read-and-write path, and it is the case the zone declaration cannot currently express: one mode per zone, and no base outside the data root</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> `internal-local/console-credentials.json` — the path `DRYDOCS_CONSOLE_CREDENTIALS` overrides — is
 DECLARED, and the declaration is expressive enough to say what it actually is. G81&#x27;s rule is

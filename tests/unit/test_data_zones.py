@@ -425,9 +425,19 @@ def test_landing_zones_reports_both_declarations_not_just_the_registry(
     assert result.exit_code == 0, result.output
 
     payload = json.loads(result.stdout)
-    assert set(payload) == {"manual_zones", "declared_zones"}, (
-        "the JSON surface must stay ONE document with both halves — two printed "
-        "arrays do not parse, which would break the machine-readable contract"
+    assert set(payload) == {
+        "manual_zones",
+        "declared_zones",
+        # G125: the third and fourth keys. The automated half of the registry
+        # declared no binding at all, so this command reported a clean run over
+        # the filesystem zones and said nothing about fifteen datasets — the same
+        # coverage defect G109 fixed one level narrower.
+        "bindings",
+        "unbound_carriers",
+    }, (
+        "the JSON surface must stay ONE document with every half in it — two "
+        "printed arrays do not parse, which would break the machine-readable "
+        "contract. A new declaration is a new KEY, never a second print_json."
     )
 
     reported = {row["zone_id"] for row in payload["declared_zones"]}
