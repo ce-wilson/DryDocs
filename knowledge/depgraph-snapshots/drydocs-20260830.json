@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-30T02:39:14",
+    "captured_at": "2026-08-30T13:34:07",
     "date": "20260830",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "c4ffc14f",
-      "full": "c4ffc14f010a7ea6fd928b9aeb3f28f952c35597",
+      "commit": "d1466b61",
+      "full": "d1466b618b5d739b1d54f33380c33edcc1ab2334",
       "branch": "main",
-      "describe": "port-base-20260829-35-gc4ffc14f",
-      "subject": "feat(core): G94 — which standard does a job validate against?",
+      "describe": "port-base-20260829-38-gd1466b61",
+      "subject": "feat(core): G128 — the resolvers read through the one expansion function",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20699,10 +20699,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
-      "name": "drydocs-20260830.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-0239.json",
+      "name": "drydocs-20260830-0239.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830-0239.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22746,6 +22746,15 @@
       "name": "test_env_example.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_env_example.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_env_refs_migration.py",
+      "name": "test_env_refs_migration.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_env_refs_migration.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26478,6 +26487,10 @@
     ],
     [
       "drydocs/drydocs/loaders/manual_loads.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/manual_loads.py",
       "drydocs/drydocs_core/manual_mappings.py"
     ],
     [
@@ -26515,6 +26528,10 @@
     [
       "drydocs/drydocs/loaders/seal_contacts.py",
       "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/seal_contacts.py",
+      "drydocs/drydocs_core/env_refs.py"
     ],
     [
       "drydocs/drydocs/loaders/seal_contacts.py",
@@ -26750,6 +26767,10 @@
     ],
     [
       "drydocs/drydocs_api/credentials.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs_api/credentials.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
@@ -26850,6 +26871,10 @@
     ],
     [
       "drydocs/drydocs_api/mappings.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs_api/mappings.py",
       "drydocs/drydocs_core/mapping_store.py"
     ],
     [
@@ -26929,6 +26954,10 @@
       "drydocs/drydocs_core/data_zones.py"
     ],
     [
+      "drydocs/drydocs_core/data_root.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
       "drydocs/drydocs_core/data_zones.py",
       "drydocs/drydocs_core/data_root.py"
     ],
@@ -26951,6 +26980,10 @@
     [
       "drydocs/drydocs_core/landing_zones.py",
       "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/log_kinds.py",
+      "drydocs/drydocs_core/env_refs.py"
     ],
     [
       "drydocs/drydocs_core/log_kinds.py",
@@ -28319,6 +28352,22 @@
     [
       "drydocs/tests/unit/test_env_example.py",
       "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_refs_migration.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_refs_migration.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_refs_migration.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_refs_migration.py",
+      "drydocs/drydocs_core/log_kinds.py"
     ],
     [
       "drydocs/tests/unit/test_ephemeral_specs.py",
@@ -42246,7 +42295,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-0239.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43312,6 +43361,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_env_example.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_env_refs_migration.py"
     ],
     [
       "drydocs/tests/unit",
@@ -44853,13 +44907,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2540,
-    "edges": 1291,
+    "files": 2541,
+    "edges": 1301,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2831,
+    "rels": 2832,
     "directories": 292
   }
 }
