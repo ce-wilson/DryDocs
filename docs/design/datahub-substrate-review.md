@@ -5,8 +5,14 @@
   closed by saying "clauses 3, 4 and 5 rest on DataHub, OpenMetadata and Purview and are untouched
   by any of this." This is the pass that touches them. Its question is the same narrow one:
   **ADR 0017 cites DataHub four times — are those citations right?**
-- **Status:** DESCRIPTIVE — **Rev 1, 2026-08-30.** This review rules nothing. ADR 0017 is
+- **Status:** DESCRIPTIVE — **Rev 2, 2026-08-30.** This review rules nothing. ADR 0017 is
   PROPOSED and its acceptance is the user's; G125 stays `todo`.
+  *Rev 2 adds the three-way overview, and findings 7 and 8: how DataHub actually registers a
+  connection and a datasource, and what DryDocs has for database configuration today. The user's
+  question that prompted them — "I did not see anything about having database configuration; you
+  are creating the YAML files as we go in VS Code, as an application that assumes the user is not
+  using a UI" — is answered at `finding-7`, and the answer is that the editor-first posture is
+  DataHub's own canonical path, not a degraded substitute for one.*
 - **Classification:** External reasoning over Internal-Public context. Every fact about DataHub is
   public and Apache-2.0; every fact about DryDocs is read from `config/source-registry.yaml` and
   `drydocs_core/source_registry.py`, both already committed. No connection coordinate appears here.
@@ -50,6 +56,31 @@ Clause 3's `${VAR}` shape is correct and worth keeping, but DataHub's expander i
 supports `${VAR:-default}` — adopting the syntax as cited would re-introduce, at the syntax level,
 the exact silent-default behavior G81 clause (d) removed. Clauses 4 and 5 are corroborated, each
 with a better example than the one the ADR uses.
+
+<!-- anchor: overview -->
+## Overview — ADR 0017 against both peers, one table
+
+The two peers answer different questions, and ADR 0017 borrows from each without saying which
+half it is borrowing. Stated plainly:
+
+| | OpenLineage | DataHub | DryDocs today |
+|---|---|---|---|
+| **What it is** | a wire format | a running catalog service | a git repo with loaders |
+| **Identity** | (`namespace`, `name`) — connection + object | URN (`platform`, `name`, `fabric`) — three parts, enforced | dataset id (4 parts) AND a derived URN (3 parts) that drops db + schema |
+| **Instance axis** | inside the namespace (`oracle://host:port`) | inside the `name`; adding one changes identity | `[db]`, redacted, absent from the URN entirely |
+| **Naming convention** | published for 40+ platforms | none; one delimiter char per platform | one grammar, one page of the registry header |
+| **Source configuration** | **none — it has no sources** | a typed `source.config` block per recipe, pydantic-validated | pydantic-settings, but ONE Oracle triple for all sources |
+| **Credential** | none | `dataHubSecret` + `dataHubConnection`, AES-256-GCM, standalone | machine-local `.env`, `SecretStr`, gitignored |
+| **Reference syntax** | none | `${VAR}` in the recipe, three backends, bash-style | direct env reads in seven resolvers |
+| **Connection test** | none | `TestableSource.test_connection()` → a typed report | `landing-zones --check`, manual half only |
+| **Normative rule against credentials in ids** | none | none | **yes** — the registered-ids rule, unenforced |
+| **Primary authoring surface** | n/a | **a YAML file in an editor**; the UI stores the same recipe as a string | a YAML file in an editor |
+
+**The single most useful line in that table is the last one**, and it is the one ADR 0017 never
+states: OpenLineage cannot help with the substrate at all, because it has no sources to configure.
+Everything ADR 0017 needs — a typed connection block, a credential object, a reference syntax, a
+connection test — exists in DataHub and nowhere in OpenLineage. The ADR cites them as if they were
+two comparable precedents. They are a grammar and a product.
 
 <!-- anchor: what-datahub-implements -->
 ## What DataHub actually implements
@@ -240,6 +271,128 @@ the research report says so directly, calling DataHub's side *"net-new code, not
 fresh-clone default — as a property this system holds that a later convenience commit could
 quietly remove — because it is the one substrate property where the peers are behind.
 
+<!-- anchor: finding-7 -->
+## Finding 7 — how DataHub actually registers a connection, and why the editor-first posture is the canonical one
+
+This is the pass the user asked for, and it changes the framing of the whole ADR. **A DataHub
+datasource is registered by writing a YAML file in an editor.** The UI is a wrapper over that same
+file, not an alternative model.
+
+**The recipe is the registration.** `datahub ingest -c <file>` takes a `.yaml` or `.toml` recipe
+with two blocks, `source` (a `type` plus a typed `config`) and `sink` (`docs/cli.md:135-165`). The
+shipped Oracle example is exactly a database configuration and nothing more
+(`metadata-ingestion/docs/sources/oracle/oracle_recipe.yml`):
+
+```yaml
+source:
+  type: oracle
+  config:
+    host_port: localhost:1521
+    database: dbname
+    username: user
+    password: pass
+    service_name: svc      # omit database if using this option
+```
+
+The Snowflake example alongside it writes `username: "${SNOWFLAKE_USER}"` and
+`password: "${SNOWFLAKE_PASS}"` instead. Both shapes are legal; only the second is committable.
+
+**The config block is a pydantic model, and DryDocs already uses the same library.** Every source's
+`config` is a `ConfigModel` (`metadata-ingestion/src/datahub/configuration/common.py`) — pydantic
+v2, `SecretStr` for credential fields, validation at load. `drydocs_core/config.py` is the same
+shape: `Neo4jSettings`, `OracleSettings`, `password: SecretStr`. The difference is not the
+technology; it is that DataHub's models are **keyed per source** and DryDocs's are **singletons**
+(finding 8).
+
+**The UI does not have its own model.** The entity a UI-created ingestion source writes is
+`dataHubIngestionSourceInfo`, and its config record is:
+
+```
+config: record DataHubIngestionSourceConfig {
+    recipe: string          // "The JSON recipe to use for ingestion"
+    version: optional string
+    executorId: optional string
+    ...
+}
+```
+
+The recipe is stored as an **opaque string** alongside a schedule and an executor id. So the UI
+path is strictly *less* structured than the file path: a committed YAML file gets pydantic
+validation, editor tooling and a diff; the UI's copy is a blob in a database. A team that never
+opens the UI loses a scheduler and a form, and loses nothing about the model.
+
+**Three mechanisms in that path are worth taking, and one is the enforcement DryDocs is missing.**
+
+1. **`${VAR}` expansion is also where the secret is registered for masking.**
+   `metadata-ingestion/src/datahub/masking/bootstrap.py` states the design in its own header:
+   *"Config loaders register secrets during `${VAR}` expansion; Pydantic models register `SecretStr`
+   fields during validation"* — so a resolved value is entered into a `SecretRegistry`, and a
+   logging filter plus an exception hook mask it everywhere thereafter. This is the answer to
+   clause 3's "one expansion function": the expander is not only where the value is read, it is the
+   only place that can know a value is secret, so it is where the masking obligation is created.
+   *(Note this narrows the research report's `C-36`, which reports no shared framework-level
+   sanitizer in either language: at HEAD there is no DSN **sanitizer**, but there IS a shared
+   Python masking layer — `datahub/masking/` — that the report's sweep terms would not have
+   matched.)*
+2. **A committed value that starts with `$` is a reference; anything else is a value.** The
+   redaction helper carries the rule literally: *"If it is just a variable reference, it is ok to
+   show as-is"* — `if value.startswith("$"): return value`, otherwise `********`, over a key
+   allow-list (`password`, `token`, `secret`, `connection_string`, `sqlalchemy_uri`, plus
+   `_password` / `_token` / `_key` / `_connection_string` suffixes). That is a **write guard
+   DryDocs can implement in one test**: in any committed YAML, a field whose key matches the
+   credential list must hold a `$`-prefixed reference or nothing. Finding 6 says DryDocs has the
+   stated rule and no enforcement; this is the enforcement, and it is twenty lines.
+3. **A connection test is a typed report, not a boolean.** `TestableSource.test_connection(config_dict)`
+   returns a `TestConnectionReport` carrying `basic_connectivity` and a per-capability
+   `CapabilityReport` with `capable`, `failure_reason` and `mitigation_message`
+   (`metadata-ingestion/src/datahub/ingestion/api/source.py:522-528, 800`). ADR 0017's opening
+   complaint is that `landing-zones --check` "reports a clean run over the rows it knows about and
+   says nothing about the rows it does not." The automated half's check IS a connection test, and
+   this is the shape it should return — reachable, plus what it could and could not do, plus what
+   to do about it.
+
+**So the posture is right and the ADR should say so.** ADR 0017 never states that DryDocs assumes
+an operator working in an editor with no UI, and because it never states it, it also never claims
+the benefits: the configuration is diffable, reviewable, portable across the two machines by the
+same git sync as everything else, and typed by the same library DataHub uses. Recording it turns
+an unexamined assumption into a design property — the same treatment clause 5 gives the
+fresh-clone default. It also names the two things the operator gives up, so the choice is real:
+no scheduler, and no form that validates before you save.
+
+<!-- anchor: finding-8 -->
+## Finding 8 — DryDocs has database configuration; it has exactly one of each, and the ADR never says so
+
+The question behind this pass was whether DryDocs has database configuration at all. It does, and
+the precise shape is the finding.
+
+| | Declared where | Consumers | Keyed per source? |
+|---|---|---|---|
+| Neo4j — the **destination** | `Neo4jSettings` (`NEO4J_*`) + `config/dev-environment.yaml` | 8 modules | n/a, there is one graph |
+| Oracle — the **source** | `OracleSettings` (`ORACLE_USER`, `ORACLE_PASSWORD`, `ORACLE_DSN`) | one: `_oracle_adapter` (`drydocs/cli_shared.py:769-782`) | **no** |
+| Everything else | `locator:` prose in `config/source-registry.yaml` | none — free text no guard reads | no |
+
+So the destination is configured well and the **source side is a singleton**: one user, one
+password, one DSN, for every Oracle extract in the registry. `_oracle_adapter` takes a query and
+optional binds — it never takes a source id, so there is no seam where a second Oracle connection
+could enter. That is not a missing feature so much as an unstated ceiling, and it is the same
+ceiling clause 1 records for identifiers, one layer down: **a second Oracle service behind
+`psgmgr` breaks the connection layer before it breaks the id layer.** The ADR's closing trigger
+paragraph names that event and attributes it only to identity.
+
+**The committed-map/machine-local-value split the ADR proposes already exists here, for one
+system.** `config/dev-environment.yaml` is exactly it: container name, image, volumes, ports,
+plugin list — committed, with its own header saying *"Contains NO company data and NO secrets
+(names/ports only; passwords live in gitignored .env files, never in a committed file)."* ADR 0017
+reaches for `config/data-zones.yaml` as the model for its map/root split, and data-zones is the
+right precedent for **filesystem** sources. For a **connection**, `dev-environment.yaml` is the
+closer analogue and the stronger argument, because it is the same split already carrying a live
+database. The binding table is that file generalized from one destination to N sources.
+
+One consequence worth stating for whoever builds G125: the `.env.example` template is already
+organized by system (`NEO4J_*`, then `ORACLE_*`, then `GITHUB_*`), so the variable naming
+convention a binding table would need — one prefix per bound system — is established practice
+rather than a new invention. What is missing is only that no registry row names its prefix.
+
 <!-- anchor: method-check -->
 ## Method check — the report's §0 correction does not travel to the third pass
 
@@ -289,7 +442,11 @@ Nothing in this document changes code, and nothing in it has been applied.
 | 4 | ADR 0017 clause 4 | Cite `dataHubConnection` as the shipped precedent, and declare the reference direction plus its guard, which DataHub omits. |
 | 5 | ADR 0017 clause 5 | Substitute the `ENCRYPTION_KEY` fallback for the demo account as the worked example. |
 | 6 | ADR 0017 | Record the registered-ids rule as a held property: both peers lack a normative prohibition, and only one has any implementation. |
-| 7 | IDEAS | The replica-edge question, for the relationship guide and the HITL gate. |
+| 7 | ADR 0017 | Record the editor-first posture as a design property: no UI, YAML authored in an editor, which is DataHub's own canonical path — with the two things it gives up (a scheduler, a validating form) named. |
+| 8 | ADR 0017 | State that source-side database configuration is a SINGLETON today (one Oracle triple, one consumer, no source id) and that the trigger paragraph's "second Oracle service" breaks the connection layer before the id layer. |
+| 9 | ADR 0017 clause 2 / G125 | Cite `config/dev-environment.yaml`, not only `config/data-zones.yaml`, as the map/value precedent — it is the same split already carrying a live database. |
+| 10 | A guard | The `$`-prefix rule as a committed-YAML write guard: a credential-keyed field holds a reference or nothing. This is the enforcement finding 6 says is missing. |
+| 11 | IDEAS | The replica-edge question, for the relationship guide and the HITL gate. |
 
 <!-- anchor: verification -->
 ## Verification checklist
@@ -316,3 +473,18 @@ Each item is a command, so a reader can disagree with evidence rather than with 
 10. In DryDocs at `main`: build a `SourceRegistry.from_yaml()`, take `.urn` over every
     `source-registry` row, and expect 30 rows, 30 distinct URNs, none carrying a database or
     schema segment.
+11. `cat metadata-ingestion/docs/sources/oracle/oracle_recipe.yml` — expect `host_port`,
+    `database`, `username`, `password`, `service_name` under a typed `source.config` block, and
+    the Snowflake recipe beside it to use `${SNOWFLAKE_USER}` / `${SNOWFLAKE_PASS}` instead.
+12. `cat metadata-models/src/main/pegasus/com/linkedin/ingestion/DataHubIngestionSourceInfo.pdl` —
+    expect `recipe: string`, the UI's copy of the same document.
+13. `sed -n '1,15p' metadata-ingestion/src/datahub/masking/bootstrap.py` — expect the two-line
+    architecture note: config loaders register secrets during `${VAR}` expansion, pydantic models
+    register `SecretStr` fields during validation.
+14. `grep -n 'startswith("\$")' -B4 metadata-ingestion/src/datahub/configuration/common.py` —
+    expect the reference-vs-value rule, above `REDACT_KEYS` / `REDACT_SUFFIXES`.
+15. `sed -n '520,528p;798,802p' metadata-ingestion/src/datahub/ingestion/api/source.py` — expect
+    `TestConnectionReport` and `TestableSource.test_connection`.
+16. In DryDocs: `grep -rn "load_settings" --include=*.py .` — expect exactly one consumer of the
+    Oracle half, `_oracle_adapter` at `drydocs/cli_shared.py:769-782`, taking a query and no
+    source id.

@@ -360,6 +360,38 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-220`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+  **Source-side database configuration is a SINGLETON and ADR 0017 never says so; and the
+  editor-first posture it assumes is DataHub's own canonical path, which the ADR also never says.**
+  Fifth pass, evidence in `docs/design/datahub-substrate-review.md` Rev 2 (findings 7 and 8);
+  venue = this desktop, DataHub clone HEAD `dea0f9c1`. MEASURED at main: the DESTINATION is
+  configured well (`Neo4jSettings` + committed `config/dev-environment.yaml`, 8 consumer modules);
+  the SOURCE side is one Oracle triple (`ORACLE_USER`/`ORACLE_PASSWORD`/`ORACLE_DSN`) with exactly
+  ONE consumer, `_oracle_adapter` at `drydocs/cli_shared.py:769-782`, which takes a query and no
+  source id — so there is no seam where a second Oracle connection could enter, and everything
+  else is `locator:` prose no guard reads. Consequence the ADR's closing trigger paragraph misses:
+  a second Oracle service behind `psgmgr` breaks the CONNECTION layer before it breaks the id
+  layer. WHAT DATAHUB DOES: a datasource is registered by writing a YAML recipe in an editor —
+  `source.type` plus a pydantic-validated `source.config` carrying host_port/database/username/
+  password/service_name — and the UI has NO model of its own: `DataHubIngestionSourceInfo` stores
+  `recipe: string`, an opaque blob plus a schedule and an executor id. So the file path is MORE
+  structured than the UI path, and DryDocs's no-UI posture is canonical rather than degraded; what
+  it gives up is a scheduler and a validating form, which is worth naming so the choice is real.
+  THREE MECHANISMS TO TAKE: (1) `${VAR}` expansion is also where the secret is REGISTERED for
+  masking (`datahub/masking/bootstrap.py` states it: config loaders register during expansion,
+  pydantic models register `SecretStr` at validation) — that is what clause 3's "one expansion
+  function" is FOR; (2) the reference-vs-value rule, `if value.startswith("$"): return value` else
+  mask, over a credential key allow-list — a committed-YAML WRITE GUARD in about twenty lines, and
+  the enforcement [[Idea-218]] (f) says DryDocs lacks; (3) `TestableSource.test_connection` returns
+  a TYPED report (`basic_connectivity` + per-capability `capable`/`failure_reason`/
+  `mitigation_message`), which is the shape the automated half of `landing-zones --check` should
+  return instead of a boolean. ALSO: `config/dev-environment.yaml` — not `config/data-zones.yaml`
+  — is the closer precedent for ADR 0017's committed-map/machine-local-value split, because it is
+  that split already carrying a live database. NOTE a narrowing of the research report: `C-36`
+  says no shared framework-level sanitizer in either language; at HEAD there is no DSN *sanitizer*
+  but there IS a shared Python masking layer (`datahub/masking/`) the report's sweep terms would
+  not have matched. Related [[Idea-218]], [[G125]].
+
 - **`Idea-218`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **ADR 0017 clause 1 cites DataHub for a deferral DataHub did not make, and the ceiling it records
   is in the wrong artifact.** Fourth-pass review, evidence in
