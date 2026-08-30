@@ -40,6 +40,7 @@ from drydocs_core.env_doctor import (
 )
 from drydocs_core.env_refs import DECLARED_VARIABLES, GROUPS, EnvVar
 from drydocs_core.source_bindings import ConnectionProfile, load_profiles
+from tests.source_scan import imported_modules, source_text
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -369,17 +370,10 @@ def test_no_module_imports_the_writer() -> None:
     roots = ("drydocs", "drydocs_core", "drydocs_api")
     offenders: list[str] = []
     for root in roots:
-        base = REPO / root
-        for path in sorted(base.rglob("*.py"), key=lambda p: p.as_posix()):
-            tree = ast.parse(path.read_text(encoding="utf-8"))
-            for node in ast.walk(tree):
-                mods: list[str] = []
-                if isinstance(node, ast.Import):
-                    mods = [a.name for a in node.names]
-                elif isinstance(node, ast.ImportFrom):
-                    mods = [node.module or ""]
-                if any("set_env_var" in m for m in mods):
-                    offenders.append(f"{path.relative_to(REPO).as_posix()}:{node.lineno}")
+        for path in sorted((REPO / root).rglob("*.py"), key=lambda p: p.as_posix()):
+            modules = imported_modules(source_text(path))
+            if any("set_env_var" in m for m in modules):
+                offenders.append(path.relative_to(REPO).as_posix())
     assert not offenders, (
         f"{offenders} IMPORT the operator's writer. Nothing the pipeline runs may "
         "write the machine-local tree (G126)."

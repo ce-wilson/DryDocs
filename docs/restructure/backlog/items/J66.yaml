@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_env_refs_migration.py
@@ -61,6 +61,64 @@ acceptance: |
   note records the run rather than asserting cleanliness - a targeted-file check is exactly the
   claim J57 rules insufficient.
 notes: |
+  BUILT 2026-08-30 (desktop, MSI). Helper at tests/source_scan.py; 19 guards in
+  tests/unit/test_source_scan.py.
+
+  (a) FOUR CALL SITES MIGRATED, NOT THREE. The item names three; a fourth of the same disease was
+  written the same day at the I6 CI fix (an ast call-NAME walk inside tests/unit/test_backlog.py)
+  and is migrated with them, because leaving it would have been the fourth hand-rolled copy the
+  item exists to prevent. No local definition survives: a guard walks the unit directory for any
+  function named code_only or _code_only and fails on one, with the Cypher stripper named as the
+  single exemption rather than pattern-matched away.
+
+  (b) THREE VERBS: code_only (tokenize, COMMENT and STRING removed), imported_modules (both
+  import forms), called_names (kind=name/attribute/all). The KIND parameter is load-bearing rather
+  than tidy - a guard asserting a module never calls client.run must not fire on a local helper
+  named run - and it collapses what would otherwise have been a fourth verb. Plus source_text as
+  the one thin path convenience the clause allows, which also pins the UTF-8 read in one place
+  (the locale codec is cp1252 here; that exact defect crashed the I6 allocator on an em dash).
+  The public surface is __all__ and a guard pins it, so a fifth verb cannot arrive quietly.
+
+  (c) THE CYPHER STRIPPER IS UNTOUCHED and its exemption is PINNED by a test asserting it is still
+  there and still says what it is. If that test ever fails because someone folded it in, that is a
+  decision to re-take, not a test to delete: the Cypher grammar is not Python's and a tokenizer
+  cannot read it.
+
+  (d) LOCATION: tests/source_scan.py, at the tests ROOT on the tests/env_drift.py precedent -
+  conftest.py already imports that as `from tests import env_drift`. Both properties confirmed at
+  build time by tests rather than by inspection: pytest's default python_files is test_*.py /
+  *_test.py so this module is never collected, and an importlib round-trip proves both suites can
+  import it. The unit directory would have worked and would have said the wrong thing - the helper
+  is not one suite's.
+
+  (e) THE RULE IS IN CLAUDE.md's working agreements immediately before the tests-gate bullet, in
+  the same voice as J37 and naming its guard. It carries ONE exception the item did not state and
+  the build found necessary: a guard whose subject IS the prose - asserting an error message or an
+  operator-facing string - reads raw source on purpose and says so. That is not a loophole, it is
+  the distinction the whole item rests on, and test_constraint_drift.py now shows both in adjacent
+  lines: "does it DROP" goes through code_only, "does the OUTPUT say it drops nothing" does not.
+
+  (f) THE META-GUARD IS DECLINED, IN WRITING, AFTER BEING EXAMINED RATHER THAN WAVED OFF. Measured:
+  28 test files read Python source and 103 read other text (yaml, markdown, Cypher, JSON), so
+  filtering to Python reads is feasible. The decisive problem is the SECOND discrimination, and it
+  is undecidable statically: a raw-source substring test is correct when the subject is the prose
+  and a defect when the subject is the behaviour, and those two appear IN THE SAME FUNCTION in
+  test_constraint_drift.py, two lines apart, with no AST shape separating them. A guard would
+  therefore either flag correct code or miss the defect, and a guard that flags correct code gets
+  deselected. Declined; the CLAUDE.md rule and the migration guard carry the weight instead.
+
+  (g) VERIFIED, and the run is recorded rather than the cleanliness asserted (J57): full suite
+  green, 2882 passed / 9 skipped, ruff + format clean across 469 files. No assertion in any
+  migrated guard changed - each keeps the same subject and the same expectation, with only the
+  reading mechanism replaced.
+
+  THREE CORRECTIONS TO MY OWN TESTS, all caught by running them. One claimed code_only's output
+  cannot be re-parsed and used a one-line body - `def f ( ) : return 1` is valid Python, so it did
+  not raise; a two-statement body is the honest case. One pinned the module surface against vars()
+  and failed on the module's own imports (Path, Final) rather than on any new verb; it reads
+  __all__ now. One forbade a private stripper while I had left a thin delegating wrapper in place,
+  which was the guard correctly refusing the half-migration.
+
   Groomed 2026-08-30 from Idea-226. Every claim in that entry was re-verified against this tree
   before the item was written, and one of them changed: the entry counts three instances, and a
   fourth same-named function exists in the vocabulary endpoints guard which is NOT the same thing

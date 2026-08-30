@@ -23,6 +23,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.source_scan import NAME, called_names
+
 try:
     import yaml
 
@@ -314,7 +316,6 @@ def test_the_taken_set_is_a_union_of_all_three_sources() -> None:
     what is ASSERTED is the shape: every term is in the union, and the allocator
     reads all three.
     """
-    import ast
     import inspect
 
     alloc = _allocator()
@@ -329,11 +330,7 @@ def test_the_taken_set_is_a_union_of_all_three_sources() -> None:
     # All three terms are actually consulted -- the risk a set-comparison cannot
     # see is a term quietly dropped from known_ids() while the union still looks
     # complete on a checkout where two terms happen to cover the third.
-    called = {
-        node.func.id
-        for node in ast.walk(ast.parse(inspect.getsource(alloc.known_ids)))
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
-    }
+    called = called_names(inspect.getsource(alloc.known_ids), kind=NAME)
     assert {"local_ids", "remote_ids", "historical_ids"} <= called, (
         f"known_ids() no longer reads all three sources (calls: {sorted(called)}). "
         "Free in one place is not free -- that is the whole item."

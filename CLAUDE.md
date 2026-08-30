@@ -280,6 +280,19 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   wraps (J33). A test may assert against CLI output only when that output IS the contract under test
   (exit code + message), and it strips ANSI / relies on the unit conftest's non-terminal console.
   Guarded by `tests/unit/test_no_render_parsing.py`.
+- **A guard reads CODE, not the prose around it (J66).** A source-reading guard goes
+  through [`tests/source_scan.py`](tests/source_scan.py) — `code_only` (comments and string
+  literals stripped), `imported_modules`, `called_names` — never a bare substring test over
+  raw source. The reason ships with the rule because the reason IS the rule: a guard that
+  greps for a forbidden pattern also matches the **comment explaining why it is forbidden**,
+  so it fails on the explanation and teaches people to stop writing explanations — which, in
+  a repo whose comments carry its rulings, costs more than the guard is worth. It happened
+  three times on 2026-08-30 alone (G128, G129, G130), each fixed from scratch. This is J37's
+  disease at the other end: J37 says read the importable object rather than a render; this
+  says read the code rather than the prose around it. Guarded by
+  `tests/unit/test_source_scan.py`. The one exception is a guard whose subject IS the prose —
+  asserting an error message or an operator-facing string — which reads raw source on purpose
+  and says so.
 - **Tests gate every change:** `poetry run pytest -q`, `python -c "import drydocs.cli"`,
   `drydocs --help`. The root import is ONE of eight CLI entry points — the other seven
   (`cli_shared` + the six S8 command modules) are guarded by

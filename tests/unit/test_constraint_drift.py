@@ -25,6 +25,7 @@ from drydocs_core.schema.constraints import (
     declared_constraint_names_in_tree,
     undeclared_constraints,
 )
+from tests.source_scan import ATTRIBUTE, called_names, code_only
 
 REPO = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = REPO / "drydocs_core" / "schema"
@@ -84,15 +85,9 @@ def test_the_scan_opens_no_session_and_reads_only_files() -> None:
     function's own DOCSTRING, which names the thing it forbids -- and a guard that
     fails on the explanation teaches people to stop writing explanations.
     """
-    import ast
     import inspect
 
-    tree = ast.parse(inspect.getsource(undeclared_constraints))
-    called = {
-        node.func.attr
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-    }
+    called = called_names(inspect.getsource(undeclared_constraints), kind=ATTRIBUTE)
     assert not (called & {"run", "session", "execute_query", "execute_file"}), (
         f"the comparison calls the database: {sorted(called)}. It must stay pure -- "
         "the live rows are an argument, which is what makes the rule unit-testable."
@@ -148,7 +143,11 @@ def test_nothing_in_the_drift_path_can_drop_a_constraint() -> None:
     from drydocs.cli_schema import _report_undeclared_constraints
 
     source = inspect.getsource(_report_undeclared_constraints)
-    assert "DROP CONSTRAINT" not in source.upper()
+    # Two different questions, so two different reads (J66). "does it DROP" is
+    # about behaviour and goes through the helper -- otherwise this very
+    # function's explanation of why it never drops would fail it. "does the
+    # OUTPUT say so" is about the prose, so it reads the raw source on purpose.
+    assert "DROP CONSTRAINT" not in code_only(source).upper()
     assert "drops NOTHING" in source, "the output must say so, not just be so"
 
 

@@ -17,28 +17,9 @@ import pytest
 import yaml
 
 from drydocs_core import data_root, env_refs, log_kinds
+from tests.source_scan import code_only, source_text
 
 REPO = Path(__file__).resolve().parents[2]
-
-
-def _code_only(rel: str) -> str:
-    """``rel``'s source with comments and string literals removed.
-
-    These tests assert about what the code DOES, and every one of them names the
-    thing it forbids — ``os.environ``, ``${VAR:-default}`` — in its own prose.
-    Matching raw text would fail on the explanation rather than the behavior,
-    which is the shape of a guard that teaches people to stop writing comments.
-    """
-    import io
-    import tokenize
-
-    source = (REPO / rel).read_text(encoding="utf-8")
-    kept: list[str] = []
-    for tok in tokenize.generate_tokens(io.StringIO(source).readline):
-        if tok.type in (tokenize.COMMENT, tokenize.STRING):
-            continue
-        kept.append(tok.string)
-    return " ".join(kept)
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +70,7 @@ def test_the_migrated_resolvers_no_longer_read_the_environment_directly() -> Non
     ``os.environ`` read and is excluded — see the rationale test below.
     """
     for rel in MIGRATED:
-        source = _code_only(rel)
+        source = code_only(source_text(rel, REPO))
         assert "os.environ" not in source.replace(" ", ""), (
             f"{rel} still reads os.environ directly. The whole of G125 clause (c) "
             "is that one function does the lookup, so seven private ones cannot "
@@ -99,7 +80,9 @@ def test_the_migrated_resolvers_no_longer_read_the_environment_directly() -> Non
 
 def test_every_migrated_module_uses_the_declared_accessor() -> None:
     for rel in MIGRATED:
-        assert "resolve_optional" in _code_only(rel), f"{rel} does not read through env_refs"
+        assert "resolve_optional" in code_only(
+            source_text(rel, REPO)
+        ), f"{rel} does not read through env_refs"
 
 
 def test_mapping_store_itself_never_read_the_environment() -> None:
@@ -111,7 +94,7 @@ def test_mapping_store_itself_never_read_the_environment() -> None:
     sites (``manual_loads``, ``seal_contacts``, ``drydocs_api/mappings``), which
     is where the migration went.
     """
-    code = _code_only("drydocs_core/mapping_store.py").replace(" ", "")
+    code = code_only(source_text("drydocs_core/mapping_store.py", REPO)).replace(" ", "")
     assert "os.environ" not in code
     assert "importos" not in code
 
@@ -142,7 +125,7 @@ def test_a_whitespace_only_data_root_is_unset(monkeypatch) -> None:
 def test_no_default_operator_entered_at_any_layer() -> None:
     """The expander refuses bash defaults; the migration must not smuggle one in."""
     for rel in (*MIGRATED, "drydocs_core/env_refs.py", "drydocs_core/log_kinds.py"):
-        code = _code_only(rel)
+        code = code_only(source_text(rel, REPO))
         assert ":-" not in code.replace(" ", ""), (
             f"{rel} appears to use a bash default operator in CODE (its prose may "
             "name one -- env_refs documents the operator it refuses)"
