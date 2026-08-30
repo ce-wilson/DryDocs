@@ -31,8 +31,18 @@ acceptance: |
   G81 (b) and G109 (a)). `config/source-registry.yaml` carries 15 `acquisition.mode: manual` rows
   that resolve through `drop_dir` and 15 `automated` rows that resolve through NOTHING — their
   system rows carry `locator.service: ~` with a comment saying the real value lives in
-  `internal-local/`, and nothing resolves a comment. Per G124 (b) the binding is one row per
-  ORIGIN, inherited by every dataset under it, so the fifteen reduce to roughly six. A row that
+  `internal-local/`, and nothing resolves a comment. Per ADR 0017 clause 2 AS AMENDED 2026-08-30
+  the binding is one row per CONNECTION CARRIER, inherited by every dataset under it -- NOT per
+  origin, which Rev 1 said and the registry disproves: `origin: controlm` spans three systems
+  (controlm, drydocs-stg, psgmgr) so a per-origin row cannot bind to one connection, and
+  `system: psgmgr` carries three origins (controlm, hr, seal) so keying per origin re-fragments
+  the connection the table exists to share. Carrier is the level `system` occupies, so the ten
+  psgmgr datasets share one row. TWO QUALIFICATIONS, both from the amended clause: (i) `system`
+  is at the right LEVEL carrying the wrong VALUE -- psgmgr is a schema and the database is
+  spiderdb, so the proxy holds only while one schema equals one database; record that on the row
+  rather than silently relying on it; (ii) the connection is not the only binding -- which READER
+  fetches a datapoint is a finer, dataset-grained choice that `adapter:` already carries, and it
+  is OUT of scope here (Idea-222, riding N10). A row that
   legitimately has no binding (a crosswalk-only activation with no export feed — `autosys` and the
   other `locator: {}` rows are the candidates) records that reason explicitly, the way
   `data-zones.yaml`'s header records why a write zone has no registry row.
@@ -41,9 +51,12 @@ acceptance: |
   this once already for the code zones — the command now reports both declarations, 26 zones where
   it used to report 15 — and the automated half is the same defect one level wider: a clean run
   over the rows it knows about, silent about the rows it does not. The command reports the binding
-  state of every origin, and `--check` distinguishes "bound and reachable" from "declared with no
+  state of every carrier, and `--check` distinguishes "bound and reachable" from "declared with no
   binding" from "bound to an unset variable". It stays ONE JSON document (the bug G109 caught in
-  its own change before it shipped).
+  its own change before it shipped). SHAPE OF THE RESULT (ADR 0017 clause 7): a connection check
+  returns a TYPED REPORT, not a boolean -- reachable, plus what it could and could not do, plus
+  what to do about it. That is DataHub's TestableSource.test_connection shape, and it is the half
+  of a validating form an editor-first operator can still have.
 
   (c) ONE EXPANSION FUNCTION, NOT SEVEN (finding B4; the amendment to G81 (d)). Today
   `resolve_data_root()` treats an empty string as unset, `resolve_log_dir()` walks two variables
@@ -55,7 +68,12 @@ acceptance: |
   `DRYDOCS_MAPPING_READ`, the Control-M adapter's config variable, and the `NEO4J_*` set. This is
   what makes G81 (d) — an unset root FAILS rather than silently relocating — implementable in one
   place instead of seven. G81 (d)'s behavior does not change; its implementation stops being local
-  to one resolver.
+  to one resolver. TWO RIDERS from the amended ADR clause 3: (i) the expander SUBSTITUTES AND
+  REFUSES DEFAULTS -- no bash-style `${VAR:-default}`, because a default operator puts G81 (d)'s
+  silent relocation back at the syntax level where the one function cannot see it; an unset
+  variable is an error naming the variable and the row that wanted it; (ii) the expander is also
+  where a resolved value is REGISTERED AS SECRET, since it is the only place that can know, so
+  masking is created at expansion rather than bolted on at each print site.
 
   (d) NO VALUE THAT IS SECRET LANDS IN COMMITTED YAML. The table names variables; it never holds a
   host, service name, SID or credential. Guarded, because this is the publish boundary (CLAUDE.md
@@ -69,6 +87,25 @@ acceptance: |
   root now fails naming it. The prose has contradicted the code since 2026-08-23. It is a
   free-text `locator` string, which is why nothing caught it, and that is the argument for (a):
   prose in a locator block is not a declaration.
+
+  (f) THE PROFILE IS REFERENCED, AND THE REFERENCE IS GUARDED (ADR 0017 clause 4 as amended). The
+  registry row NAMES its connection profile. A guard fails a row naming a profile that does not
+  exist, and reports a profile no row names. This is in acceptance because DataHub ships the same
+  shape and omits exactly this: its dataHubConnection declares no relationship to any dataset, so
+  a profile nothing references is a profile nothing can audit -- the defect this item exists to
+  close, reintroduced one level up.
+
+  (g) THE `$`-PREFIX WRITE GUARD (ADR 0017 clause 6). In any committed YAML, a field whose key is
+  credential-shaped (password, token, secret, connection_string, sqlalchemy_uri, plus the
+  _password / _token / _key / _connection_string suffixes) must hold a variable REFERENCE -- a
+  value beginning with the dollar sign -- or nothing at all. One test. It is the enforcement of a
+  rule this repo already states and neither peer product has: an identifier publishes, a
+  connection coordinate goes to the internal twin.
+
+  SCOPE FENCE, so the id work is not started here: this item changes NO dataset id, NO retired-id
+  mapping, and NOT `SourceEntry.urn`. ADR 0017 clause 1 as amended rules that un-redacting `[db]`
+  or `[schema]` must move together with the URN derivation in one commit, and that pairing rides
+  its own SME gate. Bindings only.
 
   `poetry run pytest -q` green including the classification guard, `drydocs landing-zones --check`
   reporting the full source set, ruff + format clean.
@@ -98,3 +135,13 @@ notes: |
   WATCH ITEM for whoever pulls it, inherited from G109's groom and still live: each new row needs
   its `classification` per CLAUDE.md §3. A connection binding is operational metadata, so Internal
   is the likely answer, but it is a per-row call and no default exists.
+
+  AMENDED 2026-08-30 to follow ADR 0017 Rev 2, which the acceptance's own opening sentence already
+  required ("if that ADR is ruled differently, this acceptance follows the ruling"). Three source
+  passes read the cited products rather than a survey of them, and the binding key changed as a
+  result: per CARRIER, not per origin. Clause (b) gained the typed-report shape, (c) gained the
+  no-defaults and register-at-expansion riders, and (f)/(g) are new -- the profile reference guard
+  and the dollar-prefix write guard, both of which exist because a peer product omits them.
+  A scope fence was added so the id/URN pairing is not started here; it rides its own gate.
+  Evidence: `docs/design/openlineage-substrate-review.md` and
+  `docs/design/datahub-substrate-review.md` (Rev 2), plus Ideas 215, 218, 220, 222.
