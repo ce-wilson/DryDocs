@@ -360,6 +360,91 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-211`** · 2026-08-30 · `[bug]` · **closed — fixed same day, 2026-08-30** · prio? **High** —
+  **The supplement chain is documented as FOUR members in nine live places and has been FIVE
+  since Z3 (2026-08-19); the guard that should have caught it asserts a PREFIX.** `default_chain()`
+  returns `base -> seal -> catalog -> registry -> infrastructure`. Nine first-party surfaces on
+  main said four: the run-drydocs skill, `drydocs/cli.py`'s module header, the
+  `apply-supplements` DOCSTRING, `supplements.py`'s own registry comment, `MODULE_MAP.md`, the
+  startup-refresh runbook in three places, `RELATIONSHIP_GUIDE.md`, the SME checklist and
+  `internal/repo-README.md` twice. THE SHARPEST ONE IS THE RUNBOOK AT `:146` — it is a CORRECTION
+  NOTE, written because an earlier version of that runbook left readers "quietly one supplement
+  short", and it states "it has FOUR members". The note that fixed the defect became the next
+  instance of it. WHY NO GUARD FIRED: `test_supplements.py` pinned the run-log envelope with
+  `assert "chain      : base -> seal -> catalog -> registry" in text` — a substring assertion
+  against a `" -> ".join(...)` of the live chain, so the four-name string is a PREFIX of the
+  five-name string and the test passes green on exactly the drift it exists to catch. A
+  prefix assertion over an ordered join can never detect growth at the end. The correct
+  behavioural guards were right all along (`test_registry_order_is_the_documented_chain` and
+  `test_sosa_is_opt_in_and_never_in_the_default_chain` both list five) — the code was never wrong,
+  only every sentence describing it. Found by transcribing the company-side 2026-08-28 triage
+  (`internal/research/triage-bootstrap-2026-08-28.md`, their F-4 claim 1, which named only the
+  skill file and missed the other eight). FIXED 2026-08-30: nine strings corrected, the prefix
+  assertion made exact, and a NEW GUARD added that scans first-party prose for any arrow-joined
+  run of supplement names and asserts it equals `default_chain()` — so the tenth site cannot be
+  written wrong. Dated records (CHANGELOG, `G29.yaml`, [[Idea-52]]) deliberately left alone: the
+  chain WAS four when they were written. Related [[Idea-212]].
+
+- **`Idea-212`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+  **`bootstrap` verifies declared-present and never reports live-but-undeclared, and that
+  asymmetry is how retired-label constraints survive a wipe.** The command already asserts
+  "58/58 declared present". It cannot see the other direction: a constraint alive in the database
+  that no `drydocs_core/schema/**/*.cypher` declares. The company-side 2026-08-28 triage found
+  three of them on their instance — `ais_capability_id` on `:AisCapability` and `ais_tool_id` on
+  `:AisTool` (both typo leftovers, dropped there after a zero-node safety check) and
+  `membership_id` on `:Membership`. THE MECHANISM THAT MAKES THIS BITE: constraints outlive data
+  wipes. Their census recorded 62 constraints at a TRUE-ZERO node baseline, because the SME's
+  wipe was a data delete, not a database drop — so a clean graph is not a clean schema, and a
+  retired-label constraint silently enforces an old identity rule against any future load that
+  reuses the label. On producer main all three are already resolved (`membership_id` DROPPED at
+  G99, 2026-08-18; the two `Ais*` labels appear nowhere in `drydocs_core/schema/`), so this is
+  NOT a producer defect today — it is a missing DETECTOR, and the next retirement will recreate
+  the condition on any long-lived instance. Shape: `SHOW CONSTRAINTS` minus the parsed
+  declarations, reported as a drift WARNING, never an automatic drop — the safety check before
+  each of their two drops was a zero-node count, which is a human decision. Needs a live graph,
+  so it is not a pure-unit item. Related [[Idea-211]], [[G99]].
+
+- **`Idea-213`** · 2026-08-30 · `[research]` · **open** · prio? **Med** —
+  **The company tree registers 67 CLI commands to producer main's 50 — the first MEASURED
+  back-flow inventory the epic has had.** Both counts read from
+  `drydocs.cli.app.registered_commands`, not from `--help` or prose. Theirs and not ours: the
+  whole `docs-*` family (`docs-diff`, `docs-fetch`, `docs-preview`, `docs-publish`,
+  `docs-register`, `docs-status`), `graph-review`, `graph-verify`, `sme-notes`,
+  `new-doc-section`, `ingest-controlm-xml`, `m6-verify`, five `load-snow-*` verbs,
+  `load-employee-roster`, `load-dev-teams`, `load-seal-attribution`, and the
+  `apply-contacts/locations/platforms/resource-pools/seal-deployments-supplement` verbs. Ours and
+  not theirs: `load-essential-graphrag`, `profile-folder-set`. THE FIRST GROUP IS PRECISELY THE
+  SME-REVIEW / HITL TOOLKIT already named as the top back-flow candidate — `graph-review`,
+  `graph-verify` and `sme-notes` are the generic mechanism this repo has only as docs. Two of the
+  five `apply-*-supplement` verbs were already known company-local from [[Idea-52]] (resource-pools
+  and platforms, verified 2026-08-04), which corroborates the census rather than duplicating it.
+  ALSO UNPORTED: the `devx` system row and its two `devx:bitbucket-repo` / `devx:githubrepo`
+  datasets exist in their `config/source-registry.yaml` and nowhere in ours. Detail and the
+  per-finding comparison: `internal/research/triage-bootstrap-2026-08-28.md`. Grooming note: this
+  is an INVENTORY, not a work item — the deliverable is deciding which of the 17 to reproduce
+  mechanism-only, which is [[project_drydocs_review_backflow]]'s standing question, now with
+  numbers.
+
+- **`Idea-214`** · 2026-08-30 · `[question]` · **open** · prio? **High** —
+  **A review run against an un-ported checkout manufactures defects, and it has now happened
+  three times.** The company-side 2026-08-28 triage reported the `refresh-*` verbs as "exactly
+  backwards" and an exploration pass listed eight commands as unregistered. On producer main all
+  three refresh verbs ARE registered with `refresh-reference` as the deprecated alias delegating
+  to them (that is G79, shipped 2026-08-23), and SEVEN of the eight commands they called
+  unregistered exist here. Their observations were correct for their tree; the DEFECT FRAMING was
+  not. This is the third instance: [[Idea-210]] recorded six wrong facts from a checkout predating
+  S8/S13/G78/G79, and the same class produced their F-4 claim 2 and most of F-5. So it is a
+  pattern with a cause, not a coincidence — and the reviewer has NO WAY to tell a real gap from a
+  missing port, because nothing in a review's output states which tree it ran against. Note the
+  irony worth keeping: their own adopted method correction ("command names come from
+  `registered_commands`, never from prose") is right, is our J37, and would NOT have prevented
+  this — reading the importable object faithfully still reports a stale tree faithfully. THE
+  MISSING PIECE IS PROVENANCE, NOT METHOD: a review surface that names its own commit and its
+  port base, so "absent here" can be read as "not yet ported" rather than "broken". Rides
+  [[Idea-210]]'s registry-surface argument (a surface should report the tree it is run against)
+  but the justification is cross-repo, which is why it is captured separately. Related
+  [[project_port_workflow_topology]].
+
 - **`Idea-207`** · 2026-08-29 · `[bug]` · **open** · prio? **High** —
   **The id grammar calls identifiers "connection coordinates" and redacts them, so a registered id
   cannot always identify anything.** SME hit this registering downloaded AWS/Glue metadata as a

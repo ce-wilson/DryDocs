@@ -56,9 +56,12 @@ class Supplement:
         return SCHEMA_DIR / self.filename
 
 
-#: The apply chain, in order. base -> seal -> catalog -> registry; SOSA is
-#: opt-in (W3C standard, NOT a declared company standard — ADR-fenced, every
-#: term it seeds carries ``adoption:"experimental"``).
+#: The apply chain, in order.
+#: base -> seal -> catalog -> registry -> infrastructure
+#: SOSA is opt-in (W3C standard, NOT a declared company standard — ADR-fenced,
+#: every term it seeds carries ``adoption:"experimental"``). Keep the chain on
+#: ONE line: ``test_supplements.py`` sweeps prose against ``default_chain()``
+#: and a chain wrapped across a comment prefix reads as a short chain.
 SUPPLEMENTS: tuple[Supplement, ...] = (
     Supplement(
         name="base",

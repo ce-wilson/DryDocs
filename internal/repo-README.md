@@ -77,7 +77,7 @@ poetry run drydocs check
 # 2. Schema backbone (constraints + ontology), then the whole supplement chain
 poetry run drydocs bootstrap
 poetry run drydocs bootstrap-schema-graph      # schema meta-graph → ddschema (its own database)
-poetry run drydocs apply-supplements           # base → seal → catalog → registry, verified
+poetry run drydocs apply-supplements           # base → seal → catalog → registry → infrastructure, verified
 
 # 3. Load sample data
 poetry run drydocs refresh-reference --samples-dir drydocs/data/samples   # FIXTURE run (M1 chain; SEAL fixtures via scripts/build_seal_samples.py first)
@@ -121,8 +121,8 @@ for its options.
 - `check` — verify Neo4j connectivity, server version, APOC.
 - `bootstrap` — apply `constraints.cypher` + `ontology.cypher`.
 - `bootstrap-schema-graph` — render + apply the schema meta-graph to `ddschema` (C21/G51). Its own database: the exemplars carry a real label beside `:SchemaMeta`, which the `drydocs` NODE KEYs reject. Chain-independent of the supplements; belongs in cold start because a wiped DBMS is when it gets forgotten. `--database` overrides the target.
-- `apply-supplements` — the ordered, verified supplement chain (base → seal → catalog → registry). `--only NAME` (repeatable) scopes it; `--with-sosa` appends the experimental SOSA/SSN terms. Idempotent.
-- `apply-ontology-supplement` / `apply-seal-supplement` / `apply-catalog-supplement` / `apply-registry-supplement` / `apply-sosa-supplement` — the pre-G29 per-file verbs, kept as delegating aliases (they inherit the verification and the run log).
+- `apply-supplements` — the ordered, verified supplement chain (base → seal → catalog → registry → infrastructure). `--only NAME` (repeatable) scopes it; `--with-sosa` appends the experimental SOSA/SSN terms. Idempotent.
+- `apply-ontology-supplement` / `apply-seal-supplement` / `apply-catalog-supplement` / `apply-registry-supplement` / `apply-sosa-supplement` — the pre-G29 per-file verbs, kept as delegating aliases (they inherit the verification and the run log). `apply-infrastructure-supplement` is the same shape but was minted WITH its supplement at Z3, so it has no pre-G29 history.
 - `verify` — report ontology-term counts by source label.
 - `reset --yes` — **destructive**: `DETACH DELETE` every node + relationship.
 

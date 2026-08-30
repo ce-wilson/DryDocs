@@ -347,7 +347,7 @@ Then:
 Run this once per environment, after `drydocs bootstrap`:
 
 ```bash
-drydocs apply-supplements          # base -> seal -> catalog -> registry
+drydocs apply-supplements          # base -> seal -> catalog -> registry -> infrastructure
 ```
 
 One verb applies the whole chain in the order declared by

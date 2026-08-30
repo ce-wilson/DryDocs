@@ -65,13 +65,13 @@ Then:
 poetry run drydocs check                       # verify Neo4j + APOC
 poetry run drydocs bootstrap                   # apply constraints + ontology seed
 poetry run drydocs bootstrap-schema-graph      # schema meta-graph -> ddschema (own database, G51)
-poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry, verified
+poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry -> infrastructure, verified
 poetry run drydocs ingest-controlm             # full M3 chain: folders -> jobs -> conditions -> deps
 poetry run drydocs m1-verify                   # assert M1 invariants
 poetry run drydocs m3-verify                   # assert M3 invariants; all should be "yes"
 ```
 
-`apply-supplements` (G29) replaces the four per-supplement verbs with one
+`apply-supplements` (G29) replaces the five per-file supplement verbs with one
 data-driven chain — the order lives in `drydocs_core/schema/supplements.py` and
 is load-bearing (**seal before catalog**: catalog reuses seal's `:Attribution`
 class and `#hasAgent` term; this block used to list them the wrong way round).

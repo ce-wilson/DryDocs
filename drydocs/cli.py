@@ -3,9 +3,10 @@
 Bootstrap order (first run):
   1. drydocs bootstrap           — constraints + ontology backbone
   2. drydocs apply-supplements   — the whole ordered supplement chain
-                                   (base -> seal -> catalog -> registry), each
-                                   one verified against the terms its .cypher
-                                   declares. The chain is DATA:
+                                   (base -> seal -> catalog -> registry ->
+                                   infrastructure), each one verified against
+                                   the terms its .cypher declares. The chain is
+                                   DATA, and this sentence is swept against it:
                                    drydocs_core.schema.supplements.SUPPLEMENTS.
 
 Optional / experimental:

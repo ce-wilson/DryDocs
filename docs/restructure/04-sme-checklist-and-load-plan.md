@@ -75,12 +75,13 @@ Phase 1 · Bootstrap (schema backbone)
   poetry run drydocs bootstrap                  # constraints.cypher + ontology.cypher
 
 Phase 2 · Ontology supplements (order matters — it is enforced, not typed)
-  poetry run drydocs apply-supplements          # base → seal → catalog → registry
+  poetry run drydocs apply-supplements          # base → seal → catalog → registry → infrastructure
                                                 #   base:     Control-M anchor terms
                                                 #   seal:     SEAL / BusinessApplication terms
                                                 #   catalog:  Catalog/PAT terms + all Role seeds
                                                 #             (incl. SUPPORTS→AreaProduct + DEVELOPS, C4)
                                                 #   registry: Vendor / SoftwareProduct terms
+                                                #   infrastructure: server / location terms (Z3)
                                                 # each file verified against the IRIs it declares (G29)
 
 Phase 3 · Migration (EXISTING graphs only — skip on a fresh DB)

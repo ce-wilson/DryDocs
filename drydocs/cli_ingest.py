@@ -512,10 +512,11 @@ def apply_supplements(
 ) -> None:
     """Apply the ontology supplement chain in order, verified (idempotent).
 
-    Default chain: base -> seal -> catalog -> registry. The order is
-    load-bearing — catalog reuses the :Attribution class and #hasAgent term
-    that seal declares — and it lives in ONE place,
-    ``drydocs_core.schema.supplements.SUPPLEMENTS``.
+    Default chain: base -> seal -> catalog -> registry -> infrastructure.
+    The order is load-bearing — catalog reuses the :Attribution class and
+    #hasAgent term that seal declares — and it lives in ONE place,
+    ``drydocs_core.schema.supplements.SUPPLEMENTS``. That chain is DATA; this
+    sentence is prose, so ``test_supplements.py`` sweeps it against the data.
 
     Each file is applied, then every :OntologyTerm IRI it declares is checked
     for presence in the graph; a supplement that runs but seeds nothing fails

@@ -20,6 +20,10 @@ graph as a set of IRIs.
 
 from __future__ import annotations
 
+import re
+import subprocess
+from pathlib import Path
+
 import pytest
 from typer.testing import CliRunner
 
@@ -228,7 +232,14 @@ def test_chain_writes_the_run_log_envelope(fake_client, tmp_path, monkeypatch) -
     assert len(logs) == 1, f"expected one load.supplement.<stamp>.log, got {logs}"
     text = logs[0].read_text(encoding="utf-8")
     assert "loader     : supplement" in text
-    assert "chain      : base -> seal -> catalog -> registry" in text
+    # Derived, and matched to END OF LINE. A literal four-name string used to sit
+    # here and passed green for eleven days after `infrastructure` joined the chain
+    # at Z3, because `base -> seal -> catalog -> registry` is a PREFIX of the
+    # five-name join the envelope actually writes. A prefix assertion over an
+    # ordered join cannot detect growth at the end — which is the only direction
+    # this chain ever grows.
+    chain_line = "chain      : " + " -> ".join(s.name for s in sup.default_chain())
+    assert chain_line + "\n" in text, f"expected {chain_line!r} as a whole line"
     assert "target     : bolt://fake:7687 db=drydocs" in text
     assert "status               : OK" in text
     assert "terms missing        : 0" in text
@@ -293,3 +304,93 @@ def test_legacy_verb_delegates_to_the_same_chain(
     assert client.applied == [supplement.filename]
     # the alias inherits the envelope + verification, not just the execute
     assert list((tmp_path / "logs").glob("load.supplement.*.log"))
+
+
+# ---- the prose sweep ---------------------------------------------------------
+#
+# Idea-211. The chain grew to five at Z3 (2026-08-19) and NINE first-party
+# surfaces went on saying four for eleven days: the run-drydocs skill, cli.py's
+# module header, the apply-supplements docstring, supplements.py's own registry
+# comment, MODULE_MAP.md, the startup-refresh runbook (three times),
+# RELATIONSHIP_GUIDE.md, the SME checklist and repo-README (twice).
+#
+# The sharpest one was the runbook's own correction note -- written because an
+# EARLIER version of that runbook left readers "quietly one supplement short" --
+# which stated the chain "has FOUR members". The note that fixed the defect
+# became the next instance of it.
+#
+# So the fix is not nine edits; nine edits is what happens again next time a
+# supplement is added. This sweep makes the tenth site impossible to write
+# wrong: any arrow-joined run of supplement names, in any tracked first-party
+# file, must BE the chain.
+
+_ARROW = r"\s*(?:->|→)\s*"
+
+
+def _chain_runs(text: str) -> list[list[str]]:
+    """Every arrow-joined run of two or more supplement names in *text*."""
+    names = "|".join(sorted((s.name for s in sup.SUPPLEMENTS), key=len, reverse=True))
+    pattern = re.compile(rf"\b(?:{names})(?:{_ARROW}(?:{names}))+\b")
+    return [re.split(_ARROW, m.group(0)) for m in pattern.finditer(text)]
+
+
+#: Files that record what the chain WAS on a date. A changelog entry, a closed
+#: item's acceptance and a dated inbox note are history, and rewriting them to
+#: match today would be falsifying the record rather than fixing a defect. The
+#: transcription of the company-side triage is the same: it quotes their file.
+_HISTORICAL = {
+    "CHANGELOG.md",
+    "docs/restructure/IDEAS.md",
+    "docs/restructure/backlog/items/G29.yaml",
+    "internal/research/triage-bootstrap-2026-08-28.md",
+    "tests/unit/test_supplements.py",  # this file: the comments above quote the stale string
+}
+
+
+def _tracked_text_files() -> list[Path]:
+    root = Path(__file__).resolve().parents[2]
+    out = subprocess.run(
+        ["git", "ls-files", "-z", "*.md", "*.py", "*.yaml", "*.yml", "*.cypher"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return [root / rel for rel in out.stdout.split("\0") if rel and rel not in _HISTORICAL]
+
+
+def test_no_prose_anywhere_names_a_chain_that_is_not_the_chain() -> None:
+    expected = [s.name for s in sup.default_chain()]
+    offenders: list[str] = []
+    for path in _tracked_text_files():
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        for run in _chain_runs(text):
+            if run != expected:
+                offenders.append(f"{path.name}: {' -> '.join(run)}")
+    assert not offenders, (
+        "prose names a supplement chain that is not `default_chain()` "
+        f"({' -> '.join(expected)}). The chain is DATA "
+        "(drydocs_core.schema.supplements) and every sentence describing it must "
+        "match it — a supplement added without sweeping these leaves readers one "
+        "supplement short, which is the G29 defect returning.\n"
+        "If the chain here looks RIGHT but short, check whether it is WRAPPED across "
+        "lines: a comment prefix (`#:`, `> `) between two names hides the tail, so "
+        "keep a chain on one line.\n  " + "\n  ".join(sorted(set(offenders)))
+    )
+
+
+def test_the_prose_sweep_catches_a_stale_chain() -> None:
+    """The sweep is worthless if it cannot see the exact drift that happened."""
+    stale = " -> ".join(s.name for s in sup.default_chain()[:-1])
+    runs = _chain_runs(f"the chain is {stale}, verified")
+    assert runs == [[s.name for s in sup.default_chain()[:-1]]]
+    assert runs[0] != [s.name for s in sup.default_chain()]
+
+
+def test_the_prose_sweep_reads_both_arrow_spellings() -> None:
+    """Half the surfaces write `->` and half write `→`; both must be seen."""
+    assert _chain_runs("base -> seal") == [["base", "seal"]]
+    assert _chain_runs("base → seal") == [["base", "seal"]]

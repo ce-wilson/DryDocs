@@ -143,7 +143,7 @@
 > quietly one supplement short.** The cold-start step listed three per-file verbs
 > (`apply-ontology-supplement` / `-seal-` / `-catalog-`) and Appendix B copied the same
 > three. Since **G29** the chain is DATA — `drydocs_core.schema.supplements.SUPPLEMENTS`
-> — and it has FOUR members: `base -> seal -> catalog -> registry`. So every reader who
+> — and it has FIVE members: `base -> seal -> catalog -> registry -> infrastructure`. So every reader who
 > followed this runbook literally skipped the **registry** supplement, and
 > `load-software-registry` (which is in the ingest step, and which MATCHes the terms that
 > supplement seeds) was running against a graph that had never been given them. That is
@@ -269,9 +269,9 @@ check; go to Troubleshooting.
    ```powershell
    poetry run drydocs bootstrap                   # constraints.cypher + ontology.cypher
    poetry run drydocs bootstrap-schema-graph      # meta-graph -> ddschema (Prerequisite 5 made it)
-   poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry
+   poetry run drydocs apply-supplements           # base -> seal -> catalog -> registry -> infrastructure
    ```
-   One command, not four. The order is load-bearing — `catalog` reuses the
+   One command, not five. The order is load-bearing — `catalog` reuses the
    `:Attribution` class and `#hasAgent` term that `seal` declares, and `catalog` owns
    the canonical `:Role` seeds the SEAL/PAT loaders MATCH at runtime (since K6 also the
    `product_roles` ProductRole scheme) — so the order lives in ONE place,
@@ -468,7 +468,7 @@ poetry run drydocs bootstrap
 # 3b. Schema meta-graph -> ddschema (the database itself comes from Prerequisites, not here)
 poetry run drydocs bootstrap-schema-graph
 
-# 4. The ONE verified supplement chain: base -> seal -> catalog -> registry (G29)
+# 4. The ONE verified supplement chain: base -> seal -> catalog -> registry -> infrastructure (G29)
 poetry run drydocs apply-supplements
 
 # 5. Reference load, by SOURCE (G79 split). Order is load-bearing: the catalog
