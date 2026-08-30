@@ -360,6 +360,63 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-216`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+  **The BDAT `layer` is a property of the SYSTEM, so it records where an extract came FROM, not
+  what it is ABOUT — which is why `human` is structurally unreachable rather than merely unused.**
+  MEASURED at main: no dataset row carries `layer`; all 16 system rows do (gate source-registry-v2,
+  2026-07-31, put it on the v2 system row). Every dataset therefore INHERITS its layer from its
+  carrier. Consequences, all live rows: `hr@[db].psgmgr.hr_phone_exp` is `taxonomy_category:
+  People & Org` and inherits **data** from psgmgr; `seal@[db].psgmgr.cm_escalation_db` — the
+  ServiceNow/HPSM technician routing — also inherits **data**, and would inherit **technology** if
+  it came from the `snow` system instead; `pat:people-report` is also `People & Org` and inherits
+  **business** from pat. So THE TWO `People & Org` DATASETS ALREADY SIT IN TWO DIFFERENT LAYERS,
+  same subject, different label, purely because they were pulled from different carriers. That is
+  the axis measuring the wrong thing, demonstrated without needing a new row. AND IT EXPLAINS THE
+  ZERO: `human` is empty not because we hold no human data (we hold at least three such datasets)
+  but because a SYSTEM is a place you connect to and no place is a person — the label can only be
+  reached by inventing a fake "HR system" to carry it, which is the same category error one level
+  up. [[Idea-210]]'s note that `technology` is the default bucket (9 of 16) is true but secondary;
+  this is the structural half. SHAPE OF THE FIX (a ruling, not applied): `layer` describes the
+  dataset's SUBJECT, so either it moves to the dataset or it is DERIVED from `taxonomy_category`,
+  which is already dataset-grained, already has the right values (People & Org 2, Software/Apps 4,
+  Product 1, Pipelines 11, Data Asset 5, Infrastructure 3, Architecture 2, ITSM/Gov 2) and has
+  ZERO consumers today. Deriving costs no new field, which matters because gate clause D2
+  (`registry-wiring-readiness`, N10, UNSIGNED) fences the schema until the SME signs. NEEDED WITH
+  IT — the subject-vs-reference test, or it gets re-litigated per row the way "established public
+  vocabulary" was: **is a person the SUBJECT of a row, or an ATTRIBUTE of one?** An application
+  contacts extract is one row per person-role -> human; an application list with an owner column is
+  one row per application -> business. The test is countable (ask what the grain is) and it also
+  decides the functional-account case in [[Idea-217]]. Related [[Idea-215]], [[N10]].
+
+- **`Idea-217`** · 2026-08-30 · `[question]` · **open** · prio? **Med** —
+  **Two filtered extracts from ONE HR table (functional accounts vs employees) is the right call,
+  and the id grammar cannot express it.** User proposal, 2026-08-30: functional account IDs live in
+  an HR table alongside human owners, so take two extracts from the same table on a filter. AGREED,
+  and the strongest reason is not convenience — applying [[Idea-216]]'s grain test, the two land in
+  DIFFERENT LAYERS: an employee row has a person as its subject (human), while a functional-account
+  row has an ACCOUNT as its subject and the human is an owner attribute (a non-human principal —
+  technology or business, not human). Two subjects, two layers, two ontology classes, two
+  `confirmed` states, two gates, and plausibly two classifications (a named-human roster is more
+  sensitive than a list of account ids). They cannot be one dataset row. TWO OBSTACLES, both real:
+  (1) THE ID GRAMMAR IS TABLE-GRAINED — `{origin}@{db}.{schema}.{table}` derives the SAME id for
+  both extracts, and `SourceEntry.urn` collides too since it builds from `system` + `artifact`. A
+  subset qualifier in the grammar, or an `artifact` that is not the table name (which breaks the
+  grammar's own rule that the segment after `@` is "the ACTUAL qualified carrier locator"). Either
+  way it is a grammar change and therefore an SME gate — the SAME gate the `[db]` un-redaction in
+  [[Idea-215]] needs, so they should ride together. (2) THE FILTER MUST BE DECLARED AS DATA, NOT
+  PROSE. A predicate in a `notes:` block recreates ADR 0017's own opening complaint that "prose in
+  a locator block is not a declaration" — nothing could then check that the two extracts are
+  disjoint, or that together they cover the table. Ready-made shape: OpenLineage's
+  `BaseSubsetDatasetFacet` condition grammar (`spec/facets/BaseSubsetDatasetFacet.json` — field vs
+  literal expressions, `compare` with EQUAL/GREATER_THAN/..., `binary` with AND/OR, plus partition
+  and location variants). HONEST COUNTERPOINT, since it is the one place the precedent points the
+  other way: OpenLineage itself would NOT split — its subset facet is an input/output facet, so it
+  is run-scoped, and OL keeps ONE dataset identity while recording the filter on the read. That is
+  right for observed pipeline lineage and wrong here, because a DryDocs dataset row is a GOVERNED
+  REGISTRATION carrying `confirmed`, a gate, a classification and a loader binding — all of which
+  must differ between the two extracts. Take OL's predicate grammar; leave its identity decision.
+  Related [[Idea-216]], [[Idea-215]].
+
 - **`Idea-215`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **ADR 0017 clause 2 keys the source binding per `origin`, and for the registry's largest origin
   that row cannot exist.** The clause argues from OpenLineage — "`{origin}@{db}.{schema}.{table}`
