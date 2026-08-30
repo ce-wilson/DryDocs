@@ -296,27 +296,48 @@ def test_the_allocator_refuses_to_cross_into_the_company_band() -> None:
         alloc.next_id("Z", {"Z" + str(PRODUCER_BAND_CEILING)})
 
 
-def test_the_taken_set_is_a_union_and_every_term_carries_its_weight() -> None:
-    """Measured, not assumed: no single source is complete.
+def test_the_taken_set_is_a_union_of_all_three_sources() -> None:
+    """The union is at least as large as each term, and all three are consulted.
 
-    O79 and O80 sit in the working tree and appear in NEITHER history listing
-    (they arrived through a re-mint rename), and a burned id appears in history
-    and in no tree at all. Reading one source is how "free in my tree" got
-    mistaken for free.
+    WHAT THIS DELIBERATELY DOES NOT ASSERT, after it broke CI: that each term
+    contributes an id the others miss. That is TRUE and it is MEASURED -- on the
+    authoring clone, O79 and O80 sit in the working tree and appear in neither
+    history listing (they arrived through a re-mint rename), and burned ids appear
+    in history and in no tree at all -- but it is a property of THIS CHECKOUT's
+    git graph, not of the code. CI checks out a different ref set and the
+    difference came back empty, so the assertion failed on a machine where nothing
+    was wrong. That is the same class as the Path-sorting bug in
+    test_render_determinism.py: a test that passes on the authoring machine and
+    fails on the runner is testing the machine.
+
+    So the measurement lives in the docstring where it belongs as evidence, and
+    what is ASSERTED is the shape: every term is in the union, and the allocator
+    reads all three.
     """
+    import ast
+    import inspect
+
     alloc = _allocator()
     local = alloc.local_ids()
     history = alloc.historical_ids()
     union, counts, _ = alloc.known_ids()
 
-    assert local <= union and history <= union
-    if history:  # git history is unavailable in a source export; no claim there
-        assert local - history, (
-            "expected at least one id present in the tree and absent from the history "
-            "listing -- if this ever becomes empty the history term alone would do, and "
-            "the union's justification needs re-checking rather than the test relaxing"
-        )
+    assert local <= union, "the local items are not all in the union"
+    assert history <= union, "the historical adds are not all in the union"
     assert counts["local"] == len(local)
+
+    # All three terms are actually consulted -- the risk a set-comparison cannot
+    # see is a term quietly dropped from known_ids() while the union still looks
+    # complete on a checkout where two terms happen to cover the third.
+    called = {
+        node.func.id
+        for node in ast.walk(ast.parse(inspect.getsource(alloc.known_ids)))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert {"local_ids", "remote_ids", "historical_ids"} <= called, (
+        f"known_ids() no longer reads all three sources (calls: {sorted(called)}). "
+        "Free in one place is not free -- that is the whole item."
+    )
 
 
 def test_every_local_id_parses_as_a_series_and_a_number() -> None:

@@ -110,8 +110,24 @@ notes: |
   computes the local sha in-process by git's own object rule, so only genuinely differing files
   are read. 12 seconds, and the check is exact rather than sampled.
 
-  VERIFIED: full suite green (2851 passed), ruff + format clean, `--next-id` exercised live on
-  this desktop for the G, N, O and Idea series and refused DD and the company band.
+  A THIRD DEFECT, FOUND BY CI RATHER THAN BY ME, and the item records it because the shape
+  matters. One guard asserted that each of the three sources contributes an id the others miss.
+  That is TRUE on this clone and it is the measurement that justifies the union - but it is a
+  property of THIS CHECKOUT's git graph, not of the code. CI checks out a different ref set, the
+  difference came back empty, and the assertion failed on a machine where nothing was wrong. Same
+  class as the Path-sorting bug that held CI red for roughly 180 runs (test_render_determinism.py):
+  a test that passes where it was written and fails on the runner is testing the machine. The
+  measurement now lives in the docstring as EVIDENCE; what is asserted is the shape - every term is
+  in the union, and an AST check that known_ids() still calls all three, which is the risk a set
+  comparison cannot see anyway.
+
+  RITUAL MISS, named rather than quietly fixed: CI was not checked after this commit or after J63,
+  so the red ran three commits before anyone looked. CLAUDE.md makes checking CI a STEP for exactly
+  this reason - the failure was invisible locally, where the suite was green the whole time.
+
+  VERIFIED: full suite green (2851 passed locally, and CI green at the fix), ruff + format clean,
+  `--next-id` exercised live on this desktop for the G, N, O and Idea series and refused DD and
+  the company band.
 
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-205a. Priority p1 because the failure rate
   is measured rather than anticipated and every instance cost rework.
