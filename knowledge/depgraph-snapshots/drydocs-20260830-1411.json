@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-30T13:34:07",
+    "captured_at": "2026-08-30T14:11:32",
     "date": "20260830",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "d1466b61",
-      "full": "d1466b618b5d739b1d54f33380c33edcc1ab2334",
+      "commit": "1bd29b42",
+      "full": "1bd29b429174d138cb188443bf8ec121815cb3fe",
       "branch": "main",
-      "describe": "port-base-20260829-38-gd1466b61",
-      "subject": "feat(core): G128 — the resolvers read through the one expansion function",
+      "describe": "port-base-20260829-41-g1bd29b42",
+      "subject": "feat(G129): the internal twin becomes navigable — find, document, update",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -18026,6 +18026,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/env_doctor.py",
+      "name": "env_doctor.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/env_doctor.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/env_refs.py",
       "name": "env_refs.py",
       "extension": ".py",
@@ -20699,10 +20708,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-0239.json",
-      "name": "drydocs-20260830-0239.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "name": "drydocs-20260830.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830-0239.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21878,6 +21887,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/render_env_example.py",
+      "name": "render_env_example.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_env_example.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/render_gates.py",
       "name": "render_gates.py",
       "extension": ".py",
@@ -21963,6 +21981,15 @@
       "name": "set_console_credential.py",
       "extension": ".py",
       "rel_path": "scripts/set_console_credential.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/set_env_var.py",
+      "name": "set_env_var.py",
+      "extension": ".py",
+      "rel_path": "scripts/set_env_var.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22728,6 +22755,15 @@
       "name": "test_enforcement_matrix.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_enforcement_matrix.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_env_doctor.py",
+      "name": "test_env_doctor.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_env_doctor.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26007,6 +26043,10 @@
     ],
     [
       "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/env_doctor.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
       "drydocs/drydocs_core/landing_zones.py"
     ],
     [
@@ -26974,6 +27014,18 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/env_doctor.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs_core/env_doctor.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/env_doctor.py",
+      "drydocs/drydocs_core/source_bindings.py"
+    ],
+    [
       "drydocs/drydocs_core/landing_zones.py",
       "drydocs/drydocs_core/data_root.py"
     ],
@@ -27690,6 +27742,10 @@
       "drydocs/drydocs/design_doc.py"
     ],
     [
+      "drydocs/scripts/render_env_example.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
       "drydocs/scripts/render_gates.py",
       "drydocs/drydocs_core/backlog_store.py"
     ],
@@ -27740,6 +27796,14 @@
     [
       "drydocs/scripts/set_console_credential.py",
       "drydocs/drydocs_api/personas.py"
+    ],
+    [
+      "drydocs/scripts/set_env_var.py",
+      "drydocs/drydocs_core/env_doctor.py"
+    ],
+    [
+      "drydocs/scripts/set_env_var.py",
+      "drydocs/drydocs_core/env_refs.py"
     ],
     [
       "drydocs/scripts/shard_backlog.py",
@@ -28340,6 +28404,38 @@
     [
       "drydocs/tests/unit/test_email_extracts.py",
       "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/drydocs_core/env_doctor.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/drydocs_core/source_bindings.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/scripts/render_env_example.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/scripts/set_env_var.py"
     ],
     [
       "drydocs/tests/unit/test_env_drift.py",
@@ -40755,6 +40851,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/env_doctor.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/env_refs.py"
     ],
     [
@@ -42295,7 +42396,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-0239.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -42785,6 +42886,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/render_env_example.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/render_gates.py"
     ],
     [
@@ -42831,6 +42937,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/set_console_credential.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/set_env_var.py"
     ],
     [
       "drydocs/scripts",
@@ -43351,6 +43462,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_enforcement_matrix.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_env_doctor.py"
     ],
     [
       "drydocs/tests/unit",
@@ -44907,13 +45023,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2541,
-    "edges": 1301,
+    "files": 2545,
+    "edges": 1316,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2832,
+    "rels": 2836,
     "directories": 292
   }
 }
