@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G84
 inputs:
@@ -20,4 +20,47 @@ inputs:
 acceptance: |
   Today the token set is selected by ONE dimension: required_tokens(JobType) over FILE_WATCHER / PUBLISHER / BOTH. User direction 2026-08-12 rules the real selection a DECISION TREE -- a FileWatcher validates against the FileWatcher standard; a COMMAND job selects on its ETL ENGINE FIRST (DPL, Ab Initio, Informatica -- names the launcher registry already classifies as invocation_type DPL / ABINITIO / INFORMATICA) and falls back to a GENERIC standard carrying only the shared tokens (the DevX project key, the EMAIL_DL contacts) when no engine is identified. (a) ONE FUNCTION, ONE ANSWER: a selector takes the derived TASKTYPE, the registered JOB_ROLE token and the launcher classification, and returns a STANDARD IDENTITY plus the token set that identity requires. Selection is separated from validation -- validate() keeps taking what it is given, so the tree can be re-ruled without touching the parser. (b) THE GUARDRAIL BECOMES A TEST, which is the point of the item: guidelines section 7.5 and G84 clause (c) rule the DD digit a grammar VERSION that MUST NOT select a template or a standard. A test asserts that the SAME job under "DD1|" and under a hypothetical "DD2|" selects the SAME standard, so the next person who reaches for the version slot as a selector reds a guard instead of shipping it. (c) THE ENGINE BRANCH IS DECLARED, NOT INVENTED. Per-engine standards get their identity and their branch; the CONTENT of each engine's token set is NOT ruled here -- an engine with no ruled set inherits the generic set and REPORTS that it did, so an unruled engine is visible rather than silently generic. Inventing per-engine required tokens in this item is out of scope and fails it. (d) THE GENERIC SET IS DERIVED, NOT RETYPED: it is the shared subset already carried in the registry (JobType.BOTH plus the FOLDER_VARIABLES entries), so it cannot drift from TOKEN_REGISTRY. (e) UNSELECTABLE IS AN ANSWER. A job whose engine cannot be classified and whose job role is absent returns the generic standard WITH a reason, and coverage counts the reasons -- the adoption-not-compliance measure G84 established. Zero graph writes; every token stays proposed; no relationship-vocabulary entry and no property term is touched. Storage of the selected standard is explicitly NOT here -- see G95.
 notes: |
+  BUILT 2026-08-30 (desktop, MSI). drydocs_core/orchestration/controlm/standard_selection.py plus
+  21 guards in tests/unit/test_standard_selection.py.
+
+  THE TREE, as ruled: FILE_WATCHER takes the FileWatcher standard; a command job classifies its
+  executable through shell.classify_executable and DPL / ABINITIO / INFORMATICA each take their own
+  branch identity; everything else takes the generic standard AND says why. The engine outranks the
+  job role, and there is a test asserting that ordering rather than trusting it.
+
+  CLAUSE (b) IS ASSERTED TWO WAYS, because one of them is stronger than the item asked for. The
+  functional half parses the same body under DD1| and DD2| and compares the selection. The
+  STRUCTURAL half is the better guard: the grammar version is ABSENT from select_standard's
+  signature, so a future contributor reaching for the version slot has nowhere to put it -- unused
+  is a convention, absent is enforcement. Both are in the file.
+
+  CLAUSE (d) LANDED ON ITS OWN DESCRIPTION, which is the check that the derivation is RIGHT rather
+  than merely automatic. The acceptance describes the generic standard in words -- "the DevX
+  project key, the EMAIL_DL contacts" -- and the computed set is exactly
+  (DevX-project, EMAIL_DL_L2, EMAIL_DL_L3, EMAIL_DL_PDN), with nothing typed out.
+
+  ONE THING THE BUILD FOUND, and it changed a test rather than the code: RETIREMENT IS
+  CARRIER-SCOPED. EMAIL_DL_L2 is retired in TOKEN_REGISTRY (a description token) and LIVE in
+  FOLDER_VARIABLES (a folder variable) -- one spelling, two carriers, two lifecycles, which is
+  exactly what the Carrier enum exists to keep apart. A naive "never require a retired key" filter
+  over the union would silently drop a live folder variable, so the filter is applied PER TABLE.
+  The first version of the guard asserted the naive rule and was wrong; it now asserts the real
+  one and says why.
+
+  A SECOND SMALL DECLARATION WAS NEEDED: C30 §5.3 renamed two folder variables (L2_EMAIL_DL_NM ->
+  EMAIL_DL_L2, L3 likewise) and the register keeps BOTH spellings so live extracts resolve either
+  way. A required set demanding both spellings of one fact would be wrong in a way no reader could
+  see, so the rename map is declared as DATA in the module (two entries, citing C30 §5.3) rather
+  than parsed out of the register's prose notes. Both spellings still PARSE; only what is REQUIRED
+  changes.
+
+  FENCES HELD. ENGINE_TOKEN_SETS is empty BY DECLARATION and a guard fails if an entry appears --
+  every engine currently inherits the generic set and REPORTS that it did (inherited_generic), so
+  an unruled engine is visible rather than silently generic. Identities are INTERIM in the shape
+  gate `standard-identity-and-carrier` §A2 proposes, per its §E2 ("G94 BUILDS REGARDLESS ... what
+  G94 may NOT do is invent the carrier"): a guard greps this module's own source for open(),
+  yaml.safe_load, sqlite3, Path( and read_text so storage cannot arrive here by accident. Zero
+  graph writes; TOKEN_REGISTRY is not touched, and a guard proves selection does not mutate either
+  register.
+
   Groomed 2026-08-12 (targeted groom) from Idea-114, clause 1 (the decision tree). Verified at the groom: config/launcher-registry.yaml already emits DPL / ABINITIO / INFORMATICA invocation types through classify_executable(), so the engine dimension needs no new classifier; JOB_ROLES is already the C30 discriminator set (PUBLISHER / PLACEMENT / TRUST_INGEST); and required_tokens() is currently keyed on JobType alone, which is the gap. depends_on G84 because the selector must read the population and the version the sentinel parse produces, and G84 is where both were built. WHY THIS HALF IS BUILDABLE AND THE OTHER HALF IS NOT: choosing WHICH standard applies is derivable from data the repo already has. Choosing WHERE a standard lives, what its id is, and whether a team may hold its own profile is a contract change to the parse contract -- that is G95, and it goes to the gate first.
