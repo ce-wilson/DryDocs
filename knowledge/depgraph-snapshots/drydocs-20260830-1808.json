@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-30T17:32:48",
+    "captured_at": "2026-08-30T18:08:47",
     "date": "20260830",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "1ec181eb",
-      "full": "1ec181eb0df96279224b9ddfda5aaf86525abd53",
+      "commit": "294c8fd6",
+      "full": "294c8fd6590613b442672105b74e13ec007fd161",
       "branch": "main",
-      "describe": "port-base-20260829-53-g1ec181eb",
-      "subject": "chore(J66): a guard reads code, not the prose around it",
+      "describe": "port-base-20260829-55-g294c8fd6",
+      "subject": "fix(I6): a mint stub carries its final title, because the guard reads titles",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -20726,10 +20726,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1411.json",
-      "name": "drydocs-20260830-1411.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "name": "drydocs-20260830.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830-1411.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -42496,7 +42496,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1411.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
