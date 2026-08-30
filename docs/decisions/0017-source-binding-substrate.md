@@ -45,6 +45,18 @@ Two things are deliberately still open and named as such: the **grammar** work (
 and `[schema]`, which must move with `SourceEntry.urn`) rides its own SME gate, and **path
 multiplicity** (Idea-222) rides N10's.
 
+**One question Rev 2 CREATED, and it is the user's before this is accepted.** Clause 4 as amended
+requires the registry row to **name its profile** — which is a new field on
+`config/source-registry.yaml`. The drafted, unsigned gate `registry-wiring-readiness` (N10) carries
+clause D2: *"THE SCHEMA CHANGES ONLY WHEN THIS PAGE SIGNS. `config/schemas/source-registry.schema.json`,
+the registry file, and `require_confirmed()` are untouched until then."* Read literally that fences
+this. Read in context it fences the `wired`/`ready` split D2 is about — and **practice supports the
+narrow reading**: N12 added the whole `acquisition` block to the same registry and the same schema
+file (`a10b0191`) while that sentence stood, and the schema has been modified twice more since.
+So either D2 is scoped to its own subject and clause 4's field proceeds, or it is a blanket freeze
+and that one field waits for N10's page to sign. Ruling it here is what stops it being
+re-litigated per row, the way "established public vocabulary" was.
+
 ## Why this is a new ADR and not an edit to 0014
 
 The catalog-substrate review asks for two of these rulings to land **in ADR 0014**. That
