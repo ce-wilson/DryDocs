@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-29T22:39:50",
-    "date": "20260829",
+    "captured_at": "2026-08-30T01:51:48",
+    "date": "20260830",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "b480c35d",
-      "full": "b480c35d3ec49116356a80ee9be733fc5c59267a",
+      "commit": "683d85fe",
+      "full": "683d85fef7e2fabbf9e74387826ec0b0ae4b6fe6",
       "branch": "main",
-      "describe": "port-base-20260829-19-gb480c35d",
-      "subject": "docs(ADR-0017): fourth pass — read DataHub's source behind the other four citations",
+      "describe": "port-base-20260829-30-g683d85fe",
+      "subject": "feat(config): G125 — the automated half of the registry declares a binding",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6879,6 +6879,15 @@
       "name": "taxonomy-ontology-map.schema.json",
       "extension": ".json",
       "rel_path": "config/schemas/taxonomy-ontology-map.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/source-bindings.yaml",
+      "name": "source-bindings.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/source-bindings.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17837,6 +17846,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/env_refs.py",
+      "name": "env_refs.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/env_refs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/landing_zones.py",
       "name": "landing_zones.py",
       "extension": ".py",
@@ -18552,6 +18570,15 @@
       "name": "supplements.py",
       "extension": ".py",
       "rel_path": "drydocs_core/schema/supplements.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/source_bindings.py",
+      "name": "source_bindings.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/source_bindings.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20483,10 +20510,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260829-1747.json",
-      "name": "drydocs-20260829-1747.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260829.json",
+      "name": "drydocs-20260829.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260829-1747.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260829.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23480,6 +23507,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_source_bindings.py",
+      "name": "test_source_bindings.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_source_bindings.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_source_labels.py",
       "name": "test_source_labels.py",
       "extension": ".py",
@@ -25775,6 +25811,10 @@
       "drydocs/drydocs_core/schema/constraints.py"
     ],
     [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/source_bindings.py"
+    ],
+    [
       "drydocs/drydocs/cli_shared.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -26917,6 +26957,14 @@
     [
       "drydocs/drydocs_core/schema/supplements.py",
       "drydocs/drydocs_core/cypher_split.py"
+    ],
+    [
+      "drydocs/drydocs_core/source_bindings.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs_core/source_bindings.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_core/source_registry.py",
@@ -29077,6 +29125,38 @@
     [
       "drydocs/tests/unit/test_software_registry.py",
       "drydocs/drydocs_core/models/registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_api/credentials.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/adapters/controlm/api.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_bindings.py",
+      "drydocs/drydocs_core/source_bindings.py"
     ],
     [
       "drydocs/tests/unit/test_source_labels.py",
@@ -33949,6 +34029,11 @@
       "drydocs/config",
       "CONTAINS",
       "drydocs/config/schemas"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
+      "drydocs/config/source-bindings.yaml"
     ],
     [
       "drydocs/config",
@@ -40303,6 +40388,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/landing_zones.py"
     ],
     [
@@ -40364,6 +40454,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/schema"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/source_bindings.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -41828,7 +41923,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260829-1747.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260829.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43423,6 +43518,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_source_bindings.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_source_labels.py"
     ],
     [
@@ -44425,13 +44525,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2514,
-    "edges": 1275,
+    "files": 2518,
+    "edges": 1286,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2805,
+    "rels": 2809,
     "directories": 292
   }
 }
