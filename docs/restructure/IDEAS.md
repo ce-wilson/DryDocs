@@ -388,9 +388,12 @@ question a 1,000-line file with the trail at the bottom could not answer.
   one row per application -> business. The test is countable (ask what the grain is) and it also
   decides the functional-account case in [[Idea-217]]. Related [[Idea-215]], [[N10]].
 
-- **`Idea-217`** · 2026-08-30 · `[question]` · **open** · prio? **Med** —
-  **Two filtered extracts from ONE HR table (functional accounts vs employees) is the right call,
-  and the id grammar cannot express it.** User proposal, 2026-08-30: functional account IDs live in
+- **`Idea-217`** · 2026-08-30 · `[idea]` · **open — shape RULED 2026-08-30** · prio? **Med** —
+  **RULED 2026-08-30 (user): two filtered extracts from one table are distinguished by a SUBSET
+  QUALIFIER NAMING THE PREDICATE — `hr@spiderdb.psgmgr.hr_phone_exp#employees` and
+  `...#functional-accounts` — not by a `[taxonomy].` prefix on the id.** The remaining work is the
+  gate that changes the grammar and the shape of the declared predicate; the discriminator itself
+  is decided. Original finding: User proposal, 2026-08-30: functional account IDs live in
   an HR table alongside human owners, so take two extracts from the same table on a filter. AGREED,
   and the strongest reason is not convenience — applying [[Idea-216]]'s grain test, the two land in
   DIFFERENT LAYERS: an employee row has a person as its subject (human), while a functional-account
@@ -415,7 +418,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   right for observed pipeline lineage and wrong here, because a DryDocs dataset row is a GOVERNED
   REGISTRATION carrying `confirmed`, a gate, a classification and a loader binding — all of which
   must differ between the two extracts. Take OL's predicate grammar; leave its identity decision.
-  CANDIDATE CONSIDERED AND ARGUED AGAINST (user proposal, 2026-08-30):
+  CANDIDATE CONSIDERED AND RULED OUT (user proposal, then user agreement on the alternative, 2026-08-30):
   `[taxonomy].{origin}@{db}.{schema}.{table}`. It does disambiguate THIS case and it makes the
   subject visible in the id, which is a real merit against [[Idea-216]]. Four arguments against.
   (a) It disambiguates by accident, not by construction — it works only because employees and
@@ -434,7 +437,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   classification in facets, DataHub's URN is platform+name+env, and ours is origin @ qualified
   locator; a taxonomy prefix would be the first semantic segment in any of them. Cost if adopted:
   all 30 ids change, plus 83 `source_id` references, the overlay, the retired list, the derived
-  URNs, every gate citing an id, and the company port. PREFERRED SHAPE instead — a subset
+  URNs, every gate citing an id, and the company port. ADOPTED SHAPE instead (user, 2026-08-30) — a subset
   qualifier naming the PREDICATE rather than its classification, e.g.
   `hr@spiderdb.psgmgr.hr_phone_exp#employees` and `...#functional-accounts`: it keeps the
   grammar's own rule intact (the locator is still exactly `spiderdb.psgmgr.hr_phone_exp` and the
@@ -442,7 +445,15 @@ question a 1,000-line file with the trail at the bottom could not answer.
   actually differs. Verified there is NO charset/regex validation on dataset ids — they are free
   strings checked only for membership and retirement — so the separator choice is a design
   question, not a code constraint. Migration precedent exists: `retired.replaced_by` is a LIST and
-  `controlm-psgmgr` -> 7 ids is the standing 1->many case. Related [[Idea-216]], [[Idea-215]].
+  `controlm-psgmgr` -> 7 ids is the standing 1->many case. STILL OPEN, and all of it is gate work
+  rather than shape work: the separator character (`#` reads as a URI fragment and nothing in the
+  code constrains it, but it has to be checked against the URN derivation and the id-bearing
+  surfaces); whether the qualifier also appears in the derived URN or only in the dataset id;
+  the structured form of the predicate itself (OpenLineage's condition grammar is the shape to
+  copy — field vs literal expressions, `compare`, `binary` AND/OR); and whether the guard should
+  assert that the subsets of one table are mutually exclusive, and separately whether they are
+  required to cover it. This rides the SAME grammar gate as the `[db]` un-redaction in
+  [[Idea-215]]. Related [[Idea-216]], [[Idea-215]].
 
 - **`Idea-215`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **ADR 0017 clause 2 keys the source binding per `origin`, and for the registry's largest origin
