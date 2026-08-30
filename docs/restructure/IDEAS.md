@@ -380,6 +380,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
   precedent); whether registration tools bypass the gate that `confirmed` exists to hold; and where
   such a server would live under MODULE_MAP (a component, never core). Related [[Idea-220]],
   [[Idea-218]].
+  AMENDED 2026-08-30 (user), and it corrects the emphasis above: **the MCP server is a READ
+  surface used AFTER configuration, to read the source's metadata -- and the SME identifies WHICH
+  server and WHICH configuration, for a given DATAPOINT/PURPOSE.** So it sits on the ingestion
+  side, not the curation side: it is a way to REACH a source, not a way to edit our registry. That
+  makes it an ADAPTER, and the field already exists at the right grain -- `adapter:` is
+  dataset-grained and already names the read mechanism (measured at main: `oracle` 10, `csv` 4,
+  `json`/`markdown`/`yaml` 1 each, `~` 13). An MCP server is a new adapter kind; what a row cannot
+  say today is WHICH server and with what configuration, and that is precisely the ADR 0017
+  binding. Note the 10 `oracle` rows are the same 10 that share one global connection triple
+  ([[Idea-220]]), so both gaps sit on the same rows. EVIDENCE FOR THE CLAUSE-2 DEBATE, and it is
+  the useful part: selection is per DATAPOINT and per PURPOSE -- finer than per-origin (the ADR's
+  proposal) and finer than per-carrier ([[Idea-215]]'s correction). Both of those are about the
+  CONNECTION and neither covers the READER, so the binding is two things at two grains: a
+  connection per carrier, and a reader per datapoint. DataHub's shape agrees -- a recipe is
+  `source.type` plus `source.config`, one per source, and one platform can carry many recipes.
+  THE PURPOSE AXIS IS THE GENUINELY NEW PART and does not fit a single static `adapter:` value:
+  the same datapoint read for two purposes may want two servers or two configurations, which is
+  layer-4 (context graph) shaped rather than layer-1. Flagged, not assumed. AND THE SME CHOICE IS
+  A GATE DECISION -- "which server, which configuration, for this datapoint" is the kind of thing
+  the HITL flow says is never auto-decided, so it is recorded on the row with its ruling, never
+  inferred from the platform.
 
 - **`Idea-220`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **Source-side database configuration is a SINGLETON and ADR 0017 never says so; and the
