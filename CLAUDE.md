@@ -67,6 +67,13 @@ things share the word *port* — never conflate them:
   `bfb2f0b` stranded on a branch); and the C19 double-build above. What this does NOT fix: a session
   that dies before its first push stays invisible, and no convention changes that.
 
+**Mint rule (the claim protocol's other half; I6).** A pull is claimed by pushing `status: in_progress`. An id is claimed the same way, and for the same reason: an id that exists only in your tree is an id the other machine will mint too. **Never read the next free number off your own tree** — ask the allocator, which unions the local items, every remote ref's tree listing, and every id ever added in history, and returns max+1 (a gap is usually a BURNED id — `config/gate-log.md` cites ids inside SIGNED records, so re-issuing one silently re-points a signed gate):
+```
+python .claude/skills/groom-backlog/validate.py --next-id G      # a backlog series
+python .claude/skills/groom-backlog/validate.py --next-id Idea   # the idea inbox
+```
+Then **mint, push the stub, and only then write the body** — the mechanism that already works for ADR numbering, where a committed, pushed index line reserves a number for a draft that does not exist yet. This has failed six times without it, most recently O69 on 2026-08-29: one machine's id was already pushed on a feature branch and the other never looked past its own working tree. The allocator BANDS (producer 1–9999, company 10000+) are a different rule and unchanged — they separate the two repos, never the two machines.
+
 **Session ritual (keeps every platform aligned):**
 1. **Start:** `git pull` → read this file → open the board's Ready-to-pull strip (or run
    `python .claude/skills/groom-backlog/validate.py` for the derived list), pick the next ready item.

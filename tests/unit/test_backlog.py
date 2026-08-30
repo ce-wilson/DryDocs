@@ -18,6 +18,7 @@ plan.yaml + modules.yaml. The board is a render of it. This guard keeps it hones
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -233,6 +234,168 @@ def test_producer_allocates_below_the_company_band() -> None:
         f"backlog ids in the COMPANY band (>{PRODUCER_BAND_CEILING}): {sorted(stray)}. "
         "Producer allocates 1-9999 in every series. If these arrived through a port, "
         "add them to PORTED_COMPANY_IDS rather than widening the band."
+    )
+
+
+# ---- the id allocator (I6, 2026-08-30) --------------------------------------
+# The band guard above partitions the two REPOS and always did its job. It says
+# nothing about the two PRODUCER MACHINES minting the same number inside one
+# band, which has now happened six times -- most recently O69 on 2026-08-29,
+# where one machine's id was already pushed on a feature branch and the other
+# never looked past its own working tree. These guards close that, and they are
+# separate from the band rule rather than a restatement of it.
+
+
+def _allocator():
+    """The allocator module, imported by path (it lives under .claude/skills/).
+
+    Imported rather than reimplemented: a test that spelled "next free" itself
+    would be a SECOND allocator, which is the shape of the original defect.
+    """
+    import importlib.util
+
+    path = REPO / ".claude" / "skills" / "groom-backlog" / "validate.py"
+    spec = importlib.util.spec_from_file_location("groom_validate", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_the_allocator_and_the_band_guard_agree_on_the_ceiling() -> None:
+    """The ceiling is written down twice, so it is asserted equal.
+
+    validate.py duplicates it deliberately -- it runs where pytest does not,
+    which is its entire reason to exist. A duplicated constant with a guard is
+    one fact; a duplicated constant without one is two facts drifting.
+    """
+    assert _allocator().PRODUCER_BAND_CEILING == PRODUCER_BAND_CEILING
+
+
+def test_next_free_is_max_plus_one_and_never_fills_a_gap() -> None:
+    """A gap is not evidence a number is free; it is usually evidence it is BURNED.
+
+    G70 and G71 were forced to G75/G76 because config/gate-log.md cites ids
+    inside SIGNED records. Handing G70 out again would silently re-point a
+    citation inside a signed-off gate, which is worse than leaving a hole.
+    """
+    alloc = _allocator()
+    taken = {"Z1", "Z2", "Z5"}  # Z3 and Z4 are gaps
+    assert alloc.next_id("Z", taken) == ("Z6", 5)
+
+
+def test_the_allocator_refuses_the_reserved_series() -> None:
+    alloc = _allocator()
+    with pytest.raises(SystemExit, match="reserved for company-side"):
+        alloc.next_id("DD", {"DD1"})
+
+
+def test_the_allocator_refuses_to_cross_into_the_company_band() -> None:
+    alloc = _allocator()
+    with pytest.raises(SystemExit, match="COMPANY band"):
+        alloc.next_id("Z", {"Z" + str(PRODUCER_BAND_CEILING)})
+
+
+def test_the_taken_set_is_a_union_and_every_term_carries_its_weight() -> None:
+    """Measured, not assumed: no single source is complete.
+
+    O79 and O80 sit in the working tree and appear in NEITHER history listing
+    (they arrived through a re-mint rename), and a burned id appears in history
+    and in no tree at all. Reading one source is how "free in my tree" got
+    mistaken for free.
+    """
+    alloc = _allocator()
+    local = alloc.local_ids()
+    history = alloc.historical_ids()
+    union, counts, _ = alloc.known_ids()
+
+    assert local <= union and history <= union
+    if history:  # git history is unavailable in a source export; no claim there
+        assert local - history, (
+            "expected at least one id present in the tree and absent from the history "
+            "listing -- if this ever becomes empty the history term alone would do, and "
+            "the union's justification needs re-checking rather than the test relaxing"
+        )
+    assert counts["local"] == len(local)
+
+
+def test_every_local_id_parses_as_a_series_and_a_number() -> None:
+    """The allocator can only count ids it can parse.
+
+    An id shaped unlike G129 is invisible to max+1, so it would be handed out
+    again. Assert the corpus is parseable rather than trusting the regex.
+    """
+    alloc = _allocator()
+    doc = _load()
+    unparsed = [
+        str(item.get("id"))
+        for item in doc.get("items", [])
+        if not alloc._ID_RE.match(str(item.get("id", "")))
+    ]
+    assert not unparsed, (
+        f"item id(s) the allocator cannot parse: {unparsed}. An unparseable id is "
+        "invisible to next-free and will be minted twice."
+    )
+
+
+def test_no_id_carries_two_different_titles_across_the_remote_trunk() -> None:
+    """The collision, caught while it is still cheap.
+
+    The duplicate-id check above fires only once both files sit in ONE checkout,
+    which is to say once the collision has already happened and the work is
+    renumbering. This compares the local item files against the remote trunk,
+    where the other machine's push lands first.
+
+    Skips with a named message where no remote is reachable -- the U26 precedent.
+    A guard that FAILED offline would be a guard people learn to skip.
+    """
+    alloc = _allocator()
+    trunk = "refs/remotes/origin/main"
+    listing = alloc._git("ls-tree", "-r", trunk, "--", alloc.ITEMS_REL)
+    if not listing:
+        pytest.skip(trunk + " not listable here - remote check skipped, not failed")
+
+    # Blob shas first, and read only the files that actually DIFFER. Comparing
+    # every item with its own `git show` took 38 seconds; almost every file is
+    # byte-identical to the trunk, so the sha is the cheap discriminator and the
+    # read happens only where there is something to disagree about.
+    trunk_blobs: dict[str, str] = {}
+    for row in listing.splitlines():
+        meta, _, name = row.partition("\t")
+        parts = meta.split()
+        if len(parts) == 3 and alloc._FILE_RE.search(name.strip()):
+            trunk_blobs[name.strip()] = parts[2]
+
+    header = b"blob %d" + bytes([0])  # git's own object rule: "blob <len>" NUL body
+    candidates: list[tuple[str, str]] = []
+    for name, sha in trunk_blobs.items():
+        local_path = REPO / name
+        if not local_path.exists():
+            continue  # on the trunk and not here: a pull away, not a collision
+        raw = local_path.read_bytes()
+        local_sha = hashlib.sha1(header % len(raw) + raw).hexdigest()
+        if local_sha != sha:
+            candidates.append((name, sha))
+
+    disagreements: list[str] = []
+    for name, sha in candidates:
+        blob = alloc._git("cat-file", "-p", sha)
+        if not blob:
+            continue
+        remote_title = (yaml.safe_load(blob) or {}).get("title")
+        local_title = (yaml.safe_load((REPO / name).read_text(encoding="utf-8")) or {}).get("title")
+        if remote_title and local_title and remote_title != local_title:
+            iid = alloc._FILE_RE.search(name).group("id")
+            disagreements.append(
+                f"{iid}: local {local_title[:60]!r} vs trunk {remote_title[:60]!r}"
+            )
+
+    assert not disagreements, (
+        "id(s) carrying a DIFFERENT title here than on the remote trunk -- two "
+        "machines minted the same number:\n  "
+        + "\n  ".join(disagreements)
+        + "\nRenumber the LOCAL one with: python .claude/skills/groom-backlog/"
+        "validate.py --next-id <SERIES>"
     )
 
 

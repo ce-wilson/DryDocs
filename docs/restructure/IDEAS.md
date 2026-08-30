@@ -38,7 +38,7 @@ file already used (`2026-08-05 — [bug] **Title**`), just carrying identity and
 
 | Field | Rule |
 |---|---|
-| **id** | `Idea-<n>`, assigned in CAPTURE order — oldest is `Idea-1`. Ids are **stable references**: never renumber, never reuse. A new capture takes the next free number wherever it sits in the file (new entries still go at the TOP; position is chronology, the id is identity). **This side allocates 1–9999** — see the allocator bands below. |
+| **id** | `Idea-<n>`, assigned in CAPTURE order — oldest is `Idea-1`. Ids are **stable references**: never renumber, never reuse. **Ask the allocator for the next one** (I6): `python .claude/skills/groom-backlog/validate.py --next-id Idea` — it reads this file, every remote ref's copy of it, and every revision in history, because a branch that appended an entry is invisible to a local read. New entries still go at the TOP; position is chronology, the id is identity. **This side allocates 1–9999** — see the allocator bands below. |
 | **split** | A big entry whose parts have DIFFERENT dispositions splits into `Idea-Na`, `Idea-Nb`, … Split only when the parts would carry different **status or priority or target item** — not merely because an entry is long. |
 | **date** | Capture date. Unchanged by later edits; a later finding is a `KEPT-UPDATED <date>` line in the body. |
 | **tag** | `idea` · `bug` · `doc` · `source` · `question` · `chore` — as before. |

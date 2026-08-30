@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/groom-backlog/validate.py
@@ -50,6 +50,69 @@ acceptance: |
   Full suite green; the new mode runs against this repo and its output is recorded in the close
   note.
 notes: |
+  BUILT 2026-08-30 (desktop, MSI). 7 guards added to tests/unit/test_backlog.py.
+
+  (a) THE ALLOCATOR IS A COMMAND: `python .claude/skills/groom-backlog/validate.py --next-id G`.
+  It fetches, then unions THREE sources, and every term is load-bearing -- which was MEASURED
+  while building it rather than assumed. (1) the local items directory; (2) every remote ref's
+  tree listing via `git ls-tree` -- listing only, no checkout, and the source the O69 collision
+  needed; (3) every id ever ADDED under items/ across all refs in history, so a renumbered id
+  stays BURNED. Proof that no single term suffices: O79 and O80 sit in the working tree and
+  appear in NEITHER history listing, even with rename detection off, because they arrived
+  through a re-mint rename; and burned ids appear in history and in no tree at all. Read one
+  source and you hand out a taken number.
+
+  THE ANSWER IS MAX+1, NEVER THE LOWEST GAP, and that is a ruling rather than an implementation
+  detail. A gap is not evidence a number is free; it is usually evidence it was burned. G70 and
+  G71 were forced to G75/G76 because config/gate-log.md cites ids inside SIGNED records, so
+  re-issuing G70 would silently re-point a citation inside a signed-off gate. The `--show-ids`
+  mode prints the gaps and labels them NOT free, so the reasoning is visible where someone would
+  otherwise be tempted.
+
+  IT ANSWERS FOR THE IDEA INBOX TOO (`--next-id Idea`). Not scope creep: clause (d) requires the
+  inbox's header table to stop carrying its own wording, and a table cannot point at a command
+  that does not answer its question. Same three-term union, because a branch that appended an
+  entry to the single IDEAS.md file is invisible to a local read.
+
+  (b) THE CLAIM PROTOCOL NOW COVERS MINTING as well as pulling, stated in CLAUDE.md next to the
+  pull rule: mint, push the STUB, then write the body. This generalizes the mechanism that
+  already worked -- ADR numbering survived the same day on the same two machines because the
+  decisions index carried a committed, pushed line reserving an id for a draft that did not
+  exist yet.
+
+  (c) THE REMOTE-TRUNK GUARD compares every local item file against origin/main and fails when
+  one id carries two different titles. The existing duplicate-id check only fires once both
+  files sit in ONE checkout -- which is to say once the collision has happened and the work is
+  renumbering. It SKIPS with a named message where the trunk is not listable (U26 precedent): a
+  guard that failed offline is a guard people learn to skip.
+
+  (d) THE RULE IS STATED ONCE. SKILL.md's `id` row and IDEAS.md's header table both now point at
+  the command instead of paraphrasing it, and CLAUDE.md carries the mint half of the claim
+  protocol with the command beside it.
+
+  (e) THE BAND GUARD IS UNTOUCHED. Bands (producer 1-9999, company 10000+) partition the two
+  REPOS and always did their job; they say nothing about two producer MACHINES minting the same
+  number inside one band, which is the gap this closes. The allocator enforces the ceiling as a
+  refusal rather than restating the rule, and a guard asserts its copy of the constant equals the
+  test's -- validate.py duplicates it deliberately because it runs where pytest does not, and a
+  duplicated constant without a guard is two facts drifting.
+
+  TWO DEFECTS FOUND IN THIS WORK'S OWN CODE, both fixed and both worth naming. (1) subprocess
+  `text=True` decodes with the LOCALE codec, cp1252 on this desktop, and every item file holds em
+  dashes -- so `git show` of one raised UnicodeDecodeError inside a reader thread. The allocator
+  now decodes UTF-8 explicitly. (2) The idea-history term matched nothing because `git log -p`
+  prefixes every line with a diff marker and the header pattern was line-anchored; it reported
+  `history=0` beside `local=224`, which is exactly why the per-source counts are PRINTED rather
+  than summed away.
+
+  ONE PERFORMANCE FIX with a correctness reason behind it: the trunk guard first compared every
+  item with its own `git show` and took 38 seconds. It now reads blob shas from `ls-tree` and
+  computes the local sha in-process by git's own object rule, so only genuinely differing files
+  are read. 12 seconds, and the check is exact rather than sampled.
+
+  VERIFIED: full suite green (2851 passed), ruff + format clean, `--next-id` exercised live on
+  this desktop for the G, N, O and Idea series and refused DD and the company band.
+
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-205a. Priority p1 because the failure rate
   is measured rather than anticipated and every instance cost rework.
 

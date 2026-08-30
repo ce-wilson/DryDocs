@@ -47,7 +47,7 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 
 | Field | How to choose |
 |---|---|
-| `id` | Next free number in the matching epic's letter; new theme → next free letter with an epic comment header. NEVER allocate the DD-series (`DD1`, `DD2`, …) — reserved for company-side-only items (cross-repo convention 2026-07-20, git-readme.md). |
+| `id` | **Ask the allocator — do not read it off the tree** (I6): `python .claude/skills/groom-backlog/validate.py --next-id <SERIES>`. Free in YOUR tree is not free: it unions the local items, every remote ref's tree listing, and every id ever added in history, then returns max+1 (a gap is usually a BURNED id, not a free one). It refuses the DD-series and the company band by itself. New theme → next free letter with an epic comment header. Then **mint the way a pull is claimed: write the stub, commit and PUSH it, then write the body.** |
 | `title` | Plain English, understandable in 6 months with zero context. Never rely on codenames. |
 | `type` | `requirement` (future capability ask) / `task` (concrete work) / `chore` (hygiene, docs, renames) / `bug` (defect). |
 | `module` | From `docs/restructure/backlog/modules.yaml`. Code work → the MODULE_MAP component; non-code → a work area (taxonomy/ontology/config/reference/graph-infra/docs). |
