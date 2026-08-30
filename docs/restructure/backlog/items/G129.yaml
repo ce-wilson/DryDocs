@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - G125
 inputs:
@@ -55,6 +55,82 @@ acceptance: |
   Full suite green, ruff and format clean, and the generated example file committed with no diff
   against a re-run.
 notes: |
+  BUILT 2026-08-30 (desktop, MSI). 34 guards in tests/unit/test_env_doctor.py.
+
+  (a) FIND is `drydocs env-doctor [--check|--json]`, over drydocs_core/env_doctor.py. It
+  reports THREE states for the reason ADR 0017 clause 7 gives the binding verdicts five: the
+  two machines hold different subsets, so an unset variable is a GAP only when something here
+  wants it -- it is required, or its profile is HALF configured. A profile with none of its
+  variables set is a carrier this machine does not use; a profile with all of them set is
+  configured; only the middle is somebody's half-finished setup, and only the middle earns a
+  red line. Every report names its venue as a return value (J18).
+
+  A FINDING THE DOCTOR MADE ON ITS FIRST RUN, and the reason it has a `channel` field. There
+  are TWO channels and they are not the same channel: the settings classes declare
+  `env_file=.env` (drydocs_core/config.py), so pydantic reads the machine-local file, while
+  env_refs.expand reads os.environ and nothing else. A variable set in the FILE ONLY is
+  therefore visible to a loader and invisible to a binding check -- the loader connects and
+  `landing-zones --check` calls the same profile not-configured-here. On this desktop that is
+  live: every NEO4J_* variable resolves through the file, not the process. The doctor REPORTS
+  the divergence (`invisible_to_bindings`, and a named line in the console view) rather than
+  papering over it, because papering over it means choosing which of the two lies to tell.
+  Making expand() read the file was considered and REFUSED: every test that monkeypatches a
+  variable to empty would then silently pick up the author's own .env, which trades a visible
+  disagreement for a machine-dependent suite.
+
+  (b) DOCUMENT: .env.example is now a RENDER of DECLARED_VARIABLES
+  (scripts/render_env_example.py, --check mode included), so the 17-vs-24 gap cannot reopen.
+  The gap was re-derived at pull time rather than trusted from the item text and the count
+  holds: the hand-maintained file carried 17 keys, the declarations carry 24, and the seven
+  keys plus two legacy aliases it never named are exactly the ones the item lists. Secrets get
+  a key and documentation and NO value -- enforced at the DECLARATION (EnvVar refuses
+  secret=True with an example), not in the renderer, because a placeholder password in a
+  template is a password somebody ships and the renderer is not the only thing that could read
+  one.
+
+  PORT CONSEQUENCE, recorded on the manifest row rather than left to be discovered: .env.example
+  stays per-entry union-on-collision, but the union now happens in the DECLARATIONS. An edit to
+  the file is overwritten by the next render, and a key added there alone is a key no binding
+  may reference.
+
+  (c) UPDATE is scripts/set_env_var.py -- no-echo (getpass + confirm) whenever the DECLARATION
+  says secret, never a value from argv, and it refuses an undeclared name while naming the file
+  to declare it in. The rewrite is surgical: an operator's own comments and ordering in .env
+  survive byte-for-byte, because a writer that normalized the file would be a writer that
+  discarded somebody's note to themselves. A guard asserts NO module in drydocs/, drydocs_core/
+  or drydocs_api/ imports it -- G126 rules the machine-local tree read-mode for the SYSTEM, and
+  the operator's hand is not the system, so the placement IS the enforcement.
+
+  (d) The twin pointer lives on the BINDING (config/source-bindings.yaml `twin:`), not in a new
+  index of the machine-local tree -- an index of twenty directories is a second surface to keep
+  in step and it rots the first time nobody updates it. Three Oracle profiles name the
+  consolidated connection notes; the Snowflake profile declares `twin: ~` because there is
+  nothing to document until an account exists, which its own status already says. A guard
+  requires a twin on every profile that has variables, and requires the value to be a repo-
+  relative pointer into the machine-local tree rather than anything value-shaped. The doctor
+  carries it through to the VARIABLE view, so a reader looking up ORACLE_DSN does not first
+  have to know which profile references it.
+
+  (e) The enumeration is the importable tuple, asserted in both directions: the existing
+  settings-class guard in test_source_bindings.py reads env_prefix + model_fields (no grep sees
+  NEO4J_URI when the prefix composes it), and a new guard asserts the doctor's list IS
+  DECLARED_VARIABLES in its order, so it cannot grow a second source.
+
+  (f) NO VALUE IS PRINTED, asserted THREE ways because the three fail at different times.
+  Structural: VariableStatus has no field that could hold a value, and resolved_via is checked
+  against the declared NAMES -- stronger than a print site that remembers to mask. Content: the
+  rendered .env.example carries no value for any secret. Static: the writer declares no
+  value-shaped argument, so the guard fires the moment someone adds one for scripting. A fourth
+  scans the whole --json document for any value actually set on this machine.
+
+  ONE GUARD-HYGIENE MISS, made and fixed: the first version of the no-import guard matched the
+  TEXT `set_env_var` and failed on three modules that merely NAME the script in their prose.
+  That is the same lesson G128 recorded -- a guard that fails on the explanation teaches people
+  to stop writing explanations. It now walks the AST and matches IMPORTS.
+
+  VERIFIED: full suite green (2844 passed), ruff + format clean, root import OK,
+  `drydocs env-doctor` and `--json` live on this desktop.
+
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-209. Priority p1 because the entry's own
   measurement is that eight live variables are declared nowhere at all, which is a publish-boundary
   adjacent gap as much as an ergonomics one.

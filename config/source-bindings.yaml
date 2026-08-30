@@ -36,6 +36,15 @@
 # at the syntax level where the one expansion function cannot see it. A literal
 # value in any of these fields is a test failure.
 #
+# WHICH TWIN DOCUMENTS IT (G129 (d)). Every profile names the machine-local
+# file that holds the coordinates its variables resolve to, or `twin: ~` with the
+# reason in its note. The pointer lives HERE rather than in a separate index of
+# the machine-local tree, because an index of twenty directories is a second
+# surface to keep in step and it rots the first time nobody updates it. The path
+# is a POINTER, never a value -- naming a gitignored file is not publishing its
+# contents, and it is the whole difference between `locator.service: ~ # lives in
+# internal-local/` and a reader who can actually find it.
+#
 # WHAT A BINDING IS NOT. It is not an instance coordinate and it does not change
 # any identifier. ADR 0017 clause 1 defers the instance axis and rules that
 # un-redacting `[db]`/`[schema]` must move together with SourceEntry.urn, under
@@ -47,6 +56,7 @@ updated: 2026-08-30 # G125 — first build, from ADR 0017 (ACCEPTED 2026-08-30)
 profiles:
   # ---------------------------------------------------------------------------
   - id: oracle-psgmgr
+    twin: internal-local/oracle-connection-consolidated.md   # G129 (d) — which twin documents these coordinates
     carrier: psgmgr
     platform: oracle-db
     classification: Internal
@@ -72,6 +82,7 @@ profiles:
       resolves to stay in the twin, and ORACLE_DSN is where they live.
   # ---------------------------------------------------------------------------
   - id: oracle-drydocs-stg
+    twin: internal-local/oracle-connection-consolidated.md   # G129 (d) — which twin documents these coordinates
     carrier: drydocs-stg
     platform: oracle-db
     classification: Internal
@@ -89,6 +100,7 @@ profiles:
       would make that a migration.
   # ---------------------------------------------------------------------------
   - id: oracle-inventory
+    twin: internal-local/oracle-connection-consolidated.md   # G129 (d) — which twin documents these coordinates
     carrier: oracle
     platform: oracle-db
     classification: Internal
@@ -103,6 +115,7 @@ profiles:
       reason as drydocs-stg.
   # ---------------------------------------------------------------------------
   - id: snowflake-catalog
+    twin: ~   # G129 (d) — no twin yet; see status below
     carrier: snowflake
     platform: snowflake
     classification: Internal

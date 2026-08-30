@@ -87,6 +87,22 @@ class EnvVar:
     secret: bool = False
     required: bool = False
     aliases: tuple[str, ...] = ()
+    group: str = ""
+    doc: str = ""
+    example: str = ""
+
+    def __post_init__(self) -> None:
+        # A secret with an example is how a fake value becomes a real one: the
+        # next operator copies `.env.example`, the placeholder looks like a
+        # setting rather than a prompt, and it ships. G129 (f) forbids a value
+        # in any of the three verbs; this forbids one in the DECLARATION, which
+        # is the only place a generated file could have picked one up.
+        if self.secret and self.example:
+            raise ValueError(
+                f"{self.name}: a secret declaration may not carry an example value. "
+                "The generated .env.example emits the key and its documentation; the "
+                "value is typed at a no-echo prompt (scripts/set_env_var.py)."
+            )
 
     @property
     def is_set(self) -> bool:
@@ -110,54 +126,198 @@ class EnvVar:
 # referenced by a committed binding: `expand()` refuses it. That is what keeps
 # the list honest rather than aspirational -- it is load-bearing, not a doc.
 # ---------------------------------------------------------------------------
+#: The section headings the generated `.env.example` emits, in order. Declared
+#: rather than derived from the variable order, because the FILE's order is a
+#: reading order for a human and the tuple's is an append order for code; making
+#: one serve both would mean every new variable silently re-arranges the file.
+GROUPS: Final[tuple[tuple[str, str], ...]] = (
+    ("neo4j", "Neo4j connection (required)"),
+    ("roots", "Data root and log roots"),
+    ("machine-local", "Machine-local paths and identity (optional -- all have defaults)"),
+    ("oracle", "Oracle (optional -- the psgmgr replica; see config/source-bindings.yaml)"),
+    ("github", "GitHub (optional -- code loader)"),
+    ("llm", "LLM keys (optional -- GraphRAG experiments)"),
+)
+
 DECLARED_VARIABLES: Final[tuple[EnvVar, ...]] = (
     EnvVar(
         name="DRYDOCS_DATA_ROOT",
         purpose="root for every source drop and every output the system writes (G81)",
         required=True,
+        group="roots",
+        doc=(
+            "MANDATORY since 2026-08-23: there is no default. Every source drop and every\n"
+            "output the system writes is rooted here, and an unset variable used to\n"
+            "relocate all of them silently to ~/data/DryDocs -- which is how a write lands\n"
+            "on somebody else's source data. Point it at YOUR data root (a real local path;\n"
+            "never committed). See config/dev-environment.yaml and config/data-zones.yaml."
+        ),
     ),
     EnvVar(
         name="DRYDOCS_LOGDIR",
         purpose="root for loader and supplement run logs (ADR 0014 clause 1)",
         aliases=("SPIDERP_LOGDIR",),
+        group="roots",
+        doc=(
+            "OPTIONAL, unlike the data root above: it defaults to ~/logs/DryDocs, and a\n"
+            "relocated log is annoying where a relocated data root is destructive (G81 (d)\n"
+            "names the DATA root deliberately, and config/data-zones.yaml records the same\n"
+            "scope fence on the run-logs zone). Every loader and supplement run log lands\n"
+            "here. SPIDERP_LOGDIR is still honored as a deprecated alias on both log\n"
+            "families and is dropped at the cycle ADR 0014 clause 1 names -- set this one."
+        ),
     ),
-    EnvVar(name="DRYDOCS_LOG_LEVEL", purpose="fallback level for a log kind that declares none"),
+    EnvVar(
+        name="DRYDOCS_LOG_LEVEL",
+        purpose="fallback level for a log kind that declares none",
+        group="roots",
+        example="INFO",
+        doc=(
+            "Level and retention are the FALLBACKS a log kind inherits when it declares\n"
+            "none of its own -- the per-kind values live in config/log-kinds.yaml (ADR 0014\n"
+            "clause 1 as amended: per KIND, not one global set). Setting these changes what\n"
+            "an undeclared kind gets, not what `qa` or `api` get."
+        ),
+    ),
     EnvVar(
         name="DRYDOCS_LOG_RETENTION_DAYS",
         purpose="fallback retention for a log kind that declares none",
+        group="roots",
+        example="90",
     ),
     EnvVar(
         name="DRYDOCS_CONSOLE_CREDENTIALS",
         purpose="path to the machine-local console credential file (O69/O73)",
         secret=True,
+        group="machine-local",
+        doc=(
+            "A PATH, not a secret -- and declared secret anyway, because the file it points\n"
+            "at IS the credential store, and a path naming an operator's home directory is\n"
+            "still worth masking in a shared terminal. Defaults into internal-local/. Write\n"
+            "the credentials themselves with scripts/set_console_credential.py, never by hand."
+        ),
     ),
-    EnvVar(name="DRYDOCS_MAPPING_DB", purpose="path to the derived mapping read model (ADR 0009)"),
-    EnvVar(name="DRYDOCS_MAPPING_READ", purpose="read-only toggle for the mapping store"),
-    EnvVar(name="DRYDOCS_CONTROLM_API_CFG", purpose="path to the Control-M API adapter config"),
-    EnvVar(name="DRYDOCS_AGENT_REG_KEY", purpose="agent registry key"),
+    EnvVar(
+        name="DRYDOCS_MAPPING_DB",
+        purpose="path to the derived mapping read model (ADR 0009)",
+        group="machine-local",
+        doc="Derived, gitignored and rebuildable -- override only to move it off the default.",
+    ),
+    EnvVar(
+        name="DRYDOCS_MAPPING_READ",
+        purpose="read-only toggle for the mapping store",
+        group="machine-local",
+    ),
+    EnvVar(
+        name="DRYDOCS_CONTROLM_API_CFG",
+        purpose="path to the Control-M API adapter config",
+        group="machine-local",
+        doc=(
+            "The adapter config carries CONNECTION COORDINATES, so it lives in the\n"
+            "machine-local tree and this variable is the only committed thing that knows\n"
+            "its name (CLAUDE.md section 3)."
+        ),
+    ),
+    EnvVar(
+        name="DRYDOCS_AGENT_REG_KEY",
+        purpose="agent registry key",
+        group="machine-local",
+    ),
     EnvVar(
         name="DRYDOCS_CALLER",
         purpose="caller identity stamped on run logs",
         aliases=("SPIDERP_CALLER",),
+        group="machine-local",
+        doc="SPIDERP_CALLER is the deprecated alias, on the same cycle as SPIDERP_LOGDIR.",
     ),
-    EnvVar(name="NEO4J_URI", purpose="bolt URI of the destination graph", required=True),
-    EnvVar(name="NEO4J_USER", purpose="graph user", required=True),
-    EnvVar(name="NEO4J_PASSWORD", purpose="graph password", secret=True, required=True),
-    EnvVar(name="NEO4J_DATABASE", purpose="target topology database (ADR 0002)"),
-    EnvVar(name="NEO4J_IMPORT_DIR", purpose="server import directory for bulk-import flows"),
-    EnvVar(name="NEO4J_CONTAINER", purpose="local container name (config/dev-environment.yaml)"),
-    EnvVar(name="ORACLE_USER", purpose="Oracle account the psgmgr extracts read as", secret=False),
-    EnvVar(name="ORACLE_PASSWORD", purpose="Oracle account password", secret=True),
+    EnvVar(
+        name="NEO4J_URI",
+        purpose="bolt URI of the destination graph",
+        required=True,
+        group="neo4j",
+        example="bolt://localhost:7687",
+        doc=(
+            "NEO4J_USER maps to the `user` field in Neo4jSettings (prefix NEO4J_), which is\n"
+            "why no text search finds these names in the code -- read the settings class,\n"
+            "not the tree (J37). Canonical local dev/test instance: config/dev-environment.yaml."
+        ),
+    ),
+    EnvVar(name="NEO4J_USER", purpose="graph user", required=True, group="neo4j", example="neo4j"),
+    EnvVar(
+        name="NEO4J_PASSWORD",
+        purpose="graph password",
+        secret=True,
+        required=True,
+        group="neo4j",
+        doc=(
+            "No example value, deliberately: a placeholder password in a template is a\n"
+            "password somebody ships. Type it at a no-echo prompt instead --\n"
+            "  poetry run python scripts/set_env_var.py NEO4J_PASSWORD"
+        ),
+    ),
+    EnvVar(
+        name="NEO4J_DATABASE",
+        purpose="target topology database (ADR 0002)",
+        group="neo4j",
+        example="drydocs",
+        doc=(
+            "Target a topology database (ADR 0002), NOT the EE home db `neo4j` -- ground\n"
+            "truth loads go to `drydocs`. Provision first: drydocs_core/schema/provisioning/."
+        ),
+    ),
+    EnvVar(
+        name="NEO4J_IMPORT_DIR",
+        purpose="server import directory for bulk-import flows",
+        group="neo4j",
+        doc="The server's import directory. Leave empty unless a loader's docs ask for it.",
+    ),
+    EnvVar(
+        name="NEO4J_CONTAINER",
+        purpose="local container name (config/dev-environment.yaml)",
+        group="neo4j",
+        doc=(
+            "The local EE container. Declared here because first-party code reads it and\n"
+            "nothing declared it until G125 -- one of the eight."
+        ),
+    ),
+    EnvVar(
+        name="ORACLE_USER",
+        purpose="Oracle account the psgmgr extracts read as",
+        secret=False,
+        group="oracle",
+    ),
+    EnvVar(name="ORACLE_PASSWORD", purpose="Oracle account password", secret=True, group="oracle"),
     EnvVar(
         name="ORACLE_DSN",
         purpose="Oracle connection descriptor -- a CONNECTION COORDINATE, twin-only",
         secret=True,
+        group="oracle",
+        doc=(
+            "The descriptor IS the connection coordinate: host, port and service. It is\n"
+            "twin-only and never committed in any form, which is exactly why a registry id\n"
+            "may carry the schema NAME -- the name identifies, this reaches."
+        ),
     ),
-    EnvVar(name="GITHUB_TOKEN", purpose="code loader token", secret=True),
-    EnvVar(name="GITHUB_USER", purpose="code loader user"),
-    EnvVar(name="OPENAI_API_KEY", purpose="GraphRAG experiments", secret=True),
-    EnvVar(name="ANTHROPIC_API_KEY", purpose="GraphRAG experiments", secret=True),
-    EnvVar(name="ANTHROPIC_MODEL", purpose="model id for GraphRAG experiments"),
+    EnvVar(name="GITHUB_TOKEN", purpose="code loader token", secret=True, group="github"),
+    EnvVar(name="GITHUB_USER", purpose="code loader user", group="github"),
+    EnvVar(
+        name="OPENAI_API_KEY",
+        purpose="OpenAI key for GraphRAG experiments",
+        secret=True,
+        group="llm",
+    ),
+    EnvVar(
+        name="ANTHROPIC_API_KEY",
+        purpose="Anthropic key for GraphRAG experiments",
+        secret=True,
+        group="llm",
+    ),
+    EnvVar(
+        name="ANTHROPIC_MODEL",
+        purpose="model id for GraphRAG experiments",
+        group="llm",
+        example="claude-sonnet-4-6",
+    ),
 )
 
 _BY_NAME: Final[dict[str, EnvVar]] = {v.name: v for v in DECLARED_VARIABLES}

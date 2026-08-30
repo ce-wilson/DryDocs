@@ -989,7 +989,13 @@ default_ok:
   - path: ".editorconfig"
     reason: "editor line-ending/charset policy (2026-08-13, with the * text=auto eol=lf attributes rule) — same accumulate-and-union shape as .gitignore; consumer may carry its own additions"
   - path: ".env.example"
-    reason: "key-name template only, no values (PUBLISH-BOUNDARY). Consumer adds its own keys (Kerberos/RAC), so union on collision"
+    reason: >-
+      key-name template only, no values (PUBLISH-BOUNDARY). GENERATED since G129
+      (2026-08-30) from DECLARED_VARIABLES in drydocs_core/env_refs.py, so the
+      consumer's own keys (Kerberos/RAC) now belong in the DECLARATION, not in this
+      file: an edit here is overwritten by the next render, and a key added here alone
+      is a key no binding may reference. Still per-entry, still union on collision —
+      union the DECLARATIONS, then re-run scripts/render_env_example.py
   - path: "poetry.lock"
     reason: "DERIVED from pyproject.toml, which is per-entry — taking the producer's lock against a merged pyproject yields an inconsistent pair. Re-lock after the merge instead"
   - path: "poetry.toml"

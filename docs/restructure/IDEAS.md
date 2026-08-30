@@ -359,6 +359,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
   their loaded graph, so that stays open on the port trigger.
 
 <!-- add new ideas at the top -->
+- **`Idea-225`** · 2026-08-30 · `[idea]` · **open — found by G129's doctor, desktop** · prio? **Med** —
+  **A variable set in `.env` alone is visible to every loader and invisible to every binding check,
+  and the two surfaces will disagree out loud the first time an Oracle account lands here.** The
+  settings classes declare `env_file=.env` (`drydocs_core/config.py`), so pydantic reads the
+  machine-local file; `drydocs_core.env_refs.expand()` reads `os.environ` and nothing else, which is
+  what `config/source-bindings.yaml` resolves through. Live on this desktop today: every `NEO4J_*`
+  variable answers from the file, not the process. It is harmless there because no profile
+  references them — but put `ORACLE_DSN` in `.env` and a loader connects while
+  `drydocs landing-zones --check` calls `oracle-psgmgr` not-configured-on-this-machine. G129 REPORTS
+  the divergence (`drydocs env-doctor` flags `invisible_to_bindings` and names the affected
+  profiles) rather than resolving it, because the obvious fix is wrong: making `expand()` read the
+  file would mean every test that monkeypatches a variable to empty silently picks up the author's
+  own `.env`, trading a visible disagreement for a machine-dependent suite. The real options are (i)
+  a documented "export it" instruction, which is what the doctor prints today, (ii) an explicit
+  opt-in file read on the binding path only, guarded so tests never see it, or (iii) moving the
+  settings classes off `env_file` so there is one channel. That is a ruling, not a build. Related
+  [[G125]], [[G129]], [[Idea-223]].
+
 
 - **`Idea-223`** · 2026-08-30 · `[idea]` · **groomed → G128 (2026-08-30)** · prio? **Med** —
   **G125 built the ONE expansion function but did not migrate the seven resolvers onto it — the

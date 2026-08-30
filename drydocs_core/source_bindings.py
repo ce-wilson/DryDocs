@@ -105,6 +105,12 @@ class ConnectionProfile:
     serves: int
     note: str
     status: str = ""
+    #: The machine-local file documenting the coordinates these variables resolve
+    #: to (G129 (d)). A POINTER, never a value: naming a gitignored file is not
+    #: publishing its contents, and it is the difference between "the real value
+    #: lives in internal-local/" and a reader who can find it. Empty means the
+    #: profile declares none, which the note must then explain.
+    twin: str = ""
 
     @property
     def variables(self) -> tuple[str, ...]:
@@ -196,6 +202,7 @@ def load_profiles(path: Path | None = None) -> tuple[ConnectionProfile, ...]:
                 serves=int(row.get("serves") or 0),
                 note=(row.get("note") or "").strip(),
                 status=row.get("status", "") or "",
+                twin=(row.get("twin") or "").strip(),
             )
         )
     return tuple(out)

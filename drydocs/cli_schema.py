@@ -452,3 +452,108 @@ def sweep_removed_cmd(
 
 
 # --- shared load command -----------------------------------------------------
+
+
+@app.command(name="env-doctor")
+def env_doctor_cmd(
+    as_json: bool = typer.Option(False, "--json", help="machine-readable report"),
+    check: bool = typer.Option(
+        False, "--check", help="exit 1 when a variable this machine needs is unset"
+    ),
+) -> None:
+    """Which declared variables are set on THIS machine, and which twin documents them.
+
+    NO VALUE IS EVER PRINTED. The report carries names and states -- there is no
+    field on the underlying record that could hold a value, which is a stronger
+    guarantee than a print site that remembers to mask.
+
+    Three states, not two, for the same reason the binding verdicts have five
+    (ADR 0017 clause 7): the two machines hold different subsets, so an unset
+    variable is a GAP only when something here wants it -- it is required, or its
+    profile is half-configured. Everything else is a state, and --check ignores
+    it.
+    """
+    from drydocs_core.env_doctor import DOTENV, NOT_APPLICABLE, SET, report
+
+    rep = report()
+
+    if as_json:
+        console.print_json(
+            data={
+                "venue": rep.venue,
+                "env_file": rep.env_file,
+                "env_file_exists": rep.env_file_exists,
+                "variables": [
+                    {
+                        "name": v.name,
+                        "purpose": v.purpose,
+                        "group": v.group,
+                        "secret": v.secret,
+                        "required": v.required,
+                        "aliases": list(v.aliases),
+                        "state": v.state,
+                        "resolved_via": v.resolved_via,
+                        "channel": v.channel,
+                        "profiles": list(v.profiles),
+                        "twins": list(v.twins),
+                        "is_gap": v.is_gap,
+                    }
+                    for v in rep.variables
+                ],
+                "gaps": [v.name for v in rep.gaps],
+                "invisible_to_bindings": [v.name for v in rep.divergent],
+                "is_failure": rep.is_failure,
+            }
+        )
+    else:
+        t = Table(title=f"Declared environment variables — venue: {rep.venue}")
+        for col in ("variable", "state", "via", "needed by", "twin"):
+            t.add_column(col, overflow="fold")
+        for v in rep.variables:
+            if v.state == SET:
+                state = "[green]set[/]" + (" [dim](file)[/]" if v.channel == DOTENV else "")
+            elif v.state == NOT_APPLICABLE:
+                state = "[dim]not used here[/]"
+            else:
+                state = "[yellow]UNSET[/]"
+            via = v.resolved_via if v.via_deprecated_alias else ""
+            t.add_row(
+                v.name + (" [dim]secret[/]" if v.secret else ""),
+                state,
+                f"[yellow]{via}[/]" if via else "",
+                ", ".join(v.profiles),
+                ", ".join(v.twins),
+            )
+        console.print(t)
+        console.print(
+            f"[dim]{rep.env_file} is "
+            f"{'present' if rep.env_file_exists else 'not created yet'}. Values are never "
+            "printed here. Set one at a no-echo prompt: "
+            "poetry run python scripts/set_env_var.py <NAME>[/]"
+        )
+        console.print(
+            "[dim]not used here = declared, unset, and nothing on this machine wants it. "
+            "The two machines hold different subsets, so this is a state and never a "
+            "defect (J18) — --check ignores it.[/]"
+        )
+        for v in rep.variables:
+            if v.via_deprecated_alias:
+                console.print(
+                    f"[yellow]{v.name} resolved through the deprecated alias "
+                    f"{v.resolved_via}[/] [dim]— set the canonical name; the alias drops "
+                    "at the cycle ADR 0014 clause 1 names.[/]"
+                )
+        for v in rep.divergent:
+            console.print(
+                f"[yellow]{v.name} is set in {rep.env_file} but not in the process "
+                f"environment[/] [dim]— the settings classes read the file, and "
+                "config/source-bindings.yaml resolves through os.environ only, so "
+                f"`landing-zones --check` will report profile(s) {', '.join(v.profiles)} "
+                "as not-configured-here while a loader connects fine. Export it to make "
+                "the two surfaces agree.[/]"
+            )
+        for v in rep.gaps:
+            console.print(f"[yellow]UNSET and needed here:[/] {v.name} — {v.purpose}")
+
+    if check and rep.is_failure:
+        raise typer.Exit(1)

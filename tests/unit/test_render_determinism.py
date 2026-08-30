@@ -170,6 +170,9 @@ COMMITTED_SURFACE_WRITERS = (
     "knowledge/depgraph-snapshots/metrics_ledger.py",
     # O31 (2026-08-21): benchmarkData.ts is a render (harness run + verdicts.yaml).
     "scripts/render_benchmark_data.py",
+    # G129 (2026-08-30): `.env.example` stopped being hand-maintained and became a
+    # render of DECLARED_VARIABLES. It is a committed surface like any other.
+    "scripts/render_env_example.py",
 )
 
 #: Globs whose CONTENT is committed and must be byte-identical across platforms.
@@ -183,6 +186,8 @@ COMMITTED_SURFACE_GLOBS = (
     # The generated meta-graph — a render like any other, and the surface whose
     # CRLF warning exposed the gap in the writer list above.
     "drydocs_core/schema/schema_graph.cypher",
+    # G129: generated from drydocs_core/env_refs.py.
+    ".env.example",
 )
 
 
