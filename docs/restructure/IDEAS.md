@@ -396,13 +396,20 @@ question a 1,000-line file with the trail at the bottom could not answer.
   was never in doubt. This is a RULING and goes to the user;
   nothing is applied. The standing plan already reached the same answer for [[G125]] by a
   different route, and the ADR text is the piece that was never updated to match.
-  ALSO: `spiderdb` is the exact test case for the plan's §0 — a database NAME, which nobody
-  connects with (that needs host, port, service and a Kerberos principal), so under the standing
-  registered-id test it publishes, and OpenLineage puts it in the NAME half by construction. The
-  one thing that would flip it is if `spiderdb` is a TNS alias / service name rather than the
-  database name; that is an SME statement and is NOT settled here. Note the grammar already
-  publishes `psgmgr` as "established public vocabulary" while redacting `spiderdb` — the same kind
-  of token one level up — which is the ad-hoc carve-out §0 replaces with a test. Full evidence,
+  ALSO: `spiderdb` is the exact test case for the plan's §0, and it is RULED (user, 2026-08-30):
+  it is the NAME — the leading, pronounceable segment of the TNS alias. The alias itself is a
+  connection coordinate (it resolves through `tnsnames.ora` to host/port/service, which is why the
+  port notes warn an alias "resolves only via tnsnames and won't work thin"); its pronounceable
+  head is what the database is CALLED. Standing test: nobody connects with `spiderdb` alone —
+  that needs the rest of the alias, a tnsnames entry, and a Kerberos principal. So it is an
+  identifier, it PUBLISHES, and that is where OpenLineage puts it too (the
+  `{serviceName}.{schema}.{table}` name half). Consequences: the `[db]` placeholder in the ten
+  psgmgr ids has a known correct value, so un-redacting is a concrete edit — still an id change,
+  so still the `retired:`/`replaced_by` re-key plus the SME gate §0 describes; and the grammar
+  header's rule ("real db/schema values are connection coordinates -> internal twin only") is now
+  wrong on its own flagship case in BOTH halves — `psgmgr` publishes by a hand-waved "established
+  public vocabulary" exemption and `spiderdb` publishes on the test. The rule is not merely too
+  cautious, it misclassifies the thing it names. Full evidence,
   the scaffolding assessment and a re-derivation checklist:
   `docs/design/openlineage-substrate-review.md`. Related [[Idea-207]].
 

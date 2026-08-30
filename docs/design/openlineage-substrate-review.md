@@ -34,10 +34,12 @@ per origin." OpenLineage's namespace is a **connection** — `oracle://{host}:{p
 **three** different systems, so a per-origin row cannot bind to one connection at all.
 
 **And `system` is at the right level while carrying the wrong value.** `system: psgmgr` names a
-**schema**; the database connection behind it is **`spiderdb`**, which the registry names nowhere
-— it is the token `[db]` redacts in all ten ids, and `locator.service: ~` on the system row. So
-the binding keys on the connection carrier, `spiderdb`, and `system: psgmgr` is a usable proxy
-only for as long as one schema happens to equal one database.
+**schema**; the database it sits in is **`spiderdb`**, which the registry names nowhere — it is
+the token `[db]` redacts in all ten ids, and `locator.service: ~` on the system row. So the
+binding keys on the connection carrier, `spiderdb`, and `system: psgmgr` is a usable proxy only
+for as long as one schema happens to equal one database. `spiderdb` is a name and not a
+coordinate — the pronounceable head of the TNS alias, ruled publishable 2026-08-30 — so nothing
+about the redaction was buying secrecy.
 
 Clause 1's citation holds, but is used to support a deferral OpenLineage itself does not make.
 Clauses 3, 4 and 5 rest on DataHub, OpenMetadata and Purview and are untouched by any of this.
@@ -169,13 +171,25 @@ for the **Spider/PSGMGR schema**" — schema, stated as such, in a doc that pred
    (`drydocs_core/source_registry.py:127-135`), so the ten psgmgr rows derive
    `urn:drydocs:dataset:(psgmgr,cm_def_vtab,prod)`. Correcting the system id would change ten
    derived URNs — a real cost, and the reason this is a ruling and not a tidy-up.
-3. **`spiderdb` is the exact test case for the plan's §0.** It is a database *name*: nobody
-   connects with it — that needs the host, port, service and a Kerberos principal. Under the
-   user's standing test it publishes, and OpenLineage puts it in the *name* half, the half
-   designed to be credential-free. The one thing that could flip that is if `spiderdb` is a TNS
-   alias or service name rather than the database name, which would make it a connection
-   coordinate. That distinction is the SME's to state, and it is worth stating on the row rather
-   than leaving the whole database segment redacted to avoid the question.
+3. **`spiderdb` is the exact test case for the plan's §0, and the SME has ruled it.** *(Ruling,
+   2026-08-30: it is the **name** — the leading, pronounceable segment of the TNS alias.)* That
+   distinction is the whole of §0 in one token. A **TNS alias** is a connection coordinate: it
+   resolves through `tnsnames.ora` to a host, a port and a service, which is why the port notes
+   already warn that an alias "resolves only via tnsnames and won't work thin." The alias's
+   pronounceable head is not that — it is what the database is *called*. Apply the standing test:
+   nobody connects with `spiderdb` alone; that needs the rest of the alias, a `tnsnames` entry to
+   resolve it, and a Kerberos principal. **So it is an identifier and it publishes** — which is
+   also where OpenLineage puts it, in the `{serviceName}.{schema}.{table}` name half, the half
+   that is credential-free by construction.
+
+   Two things follow, neither applied here. The `[db]` placeholder in the ten psgmgr ids has a
+   known correct value, so un-redacting them is a concrete edit rather than an open question —
+   still an id change, so still the `retired:`/`replaced_by` re-key and the SME gate the plan's §0
+   describes. And the grammar header's rule — *"real db/schema values are connection coordinates
+   → internal twin only"* — is now wrong on its own flagship case in both halves: `psgmgr` is a
+   schema that publishes by a hand-waved exemption, and `spiderdb` is a database name that
+   publishes on the test. The rule is not merely too cautious; it is misclassifying the thing it
+   names.
 
 **Recommended amendment**, for the user's ruling rather than applied: clause 2 keys the binding
 per **connection carrier**, which is the level `system` occupies. The rest of the clause survives
@@ -343,10 +357,11 @@ Ordered by value, each independently checkable.
 1. **Re-run the cardinality measurement.** Load `config/source-registry.yaml`, group the automated
    datasets by `system` and by `origin`, and list any origin spanning more than one system. If
    `controlm` no longer spans three, Finding 1's fatal half is stale — the rest of it is not.
-2. **Confirm what `spiderdb` is** — the Oracle database name, or a TNS alias / service name. The
-   whole of Finding 1b's consequence 3 turns on it: a database name is an identifier and
-   publishes, a service name is a connection coordinate and does not. This is an SME statement,
-   not a repository fact, and nothing here should be read as having settled it.
+2. **`spiderdb` is settled — do not re-open it.** It is the database name, the leading
+   pronounceable segment of the TNS alias, ruled 2026-08-30. Identifier, therefore publishable.
+   What is still checkable is the *rest* of the alias and what it resolves to: that part is a
+   connection coordinate and stays in the twin. If a future reviewer finds the whole alias
+   committed anywhere, that is the defect — not the name.
 3. Read `website/docs/spec/naming.md` end to end and look for one namespace form containing
    userinfo. A single counterexample weakens Finding 2.
 4. `git tag --contains 2cfa2594b` in the clone. Empty today; a tag means the `lineage` facet
