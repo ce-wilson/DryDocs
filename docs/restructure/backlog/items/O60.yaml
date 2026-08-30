@@ -1,7 +1,8 @@
 id: O60
 epic: web-console
 title: '/lineage swimlane data-flow view: lanes Control-M | Data Layer | File Server / Database, rendering
-  job -> pipeline -> asset per data series'
+  job -> pipeline -> asset per data series -- plus a second LANE BASIS, the BDAT layer (business | data
+  | technology | human), as a different view of the same graph'
 type: task
 module: drydocs-web
 phase: 12
@@ -17,7 +18,26 @@ inputs:
 - docs/design/ui-exploration/wireframes/out/dataflow.svg
 - config/taxonomy/ui-components.yaml
 - config/taxonomy/ui-tests.yaml
+- config/source-registry.yaml
+- web/src/generated/load-map.json
+- web/src/loadmap/loadMapModel.ts
+- drydocs_core/ontology/relationship_vocabulary/00-header.yaml
 acceptance: |
   /lineage gains a swimlane layout (proposed lineage/SwimlaneView.tsx; the final filename is recorded at build) with three lanes -- Control-M | Data Layer | File Server / Database -- rendering job -> pipeline -> asset per data series: the FW job "detected by" join, the launcher->pipeline token join per the G15 contract, and condition edges per the BMC baseline. READS/WRITES edges render DASHED and visibly marked as planned for as long as m3_reads_from / m3_writes_to carry status: planned in the relationship vocabulary -- drawing them skips no gate, and the view says so ON the surface, not only in code. Each rendered region traces to its WF-DFL-01..17 wireframe key so SME feedback (the FB-2026-08-13-01 convention in docs/design/ui-exploration/wireframes/wireframes.json) re-attaches to a component that now exists. Demo data stays SYNTHESIZED (the demoLineage idiom -- no real folder/job/host values). Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
+
+  LANE BASIS IS A PARAMETER, NOT A CONSTANT (amended 2026-08-30). The three lanes above are ONE basis. The component takes the lane assignment from a single resolver -- one function, one place -- so a second basis is a different argument and never a re-layout. Deep-linkable in the existing ?domain= idiom (proposed ?lanes=source-kind | ?lanes=layer; the final parameter name is recorded at build).
+
+  SECOND BASIS -- the BDAT layer (business | data | technology | human), over the data that actually declares one. web/src/generated/load-map.json already carries systems[].layer and reaches the app with no new plumbing, so this basis renders REGISTRY entities (systems and the datasets that inherit from them). Three requirements, each of which is the point rather than a detail:
+    (a) The human lane renders DECLARED AND EMPTY, never hidden. An empty declared lane is the finding, not a rendering problem -- it is 0 of 16 today, and a view that hides it destroys the only evidence a reader would get.
+    (b) The lane label states WHICH AXIS it means, because three different axes in this repo use these words. The BDAT layer lives on source-registry SYSTEM rows. The relationship vocabulary has a separate `human` DOMAIN (drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml) which its own header rules is "a file/loader PARTITION -- not rdfs:domain (from_node/to_node carry that) and not the BDAT layer on source-registry SYSTEM rows" (gate vocabulary-domains-and-id-policy §A3, 2026-08-12). rdfs:domain is the third. The view must not silently merge them.
+    (c) The surface says that a layer lane groups by CARRIER, not by subject, for as long as that is true. `layer` is a SYSTEM field today, so an extract inherits the layer of the database it was pulled through -- which is why the two People & Org datasets sit in different lanes (hr@[db].psgmgr.hr_phone_exp in data, pat:people-report in business). Idea-216 rules on moving or deriving it; this item does NOT wait on that ruling, because making the skew visible is the item's value. Same convention as the planned READS/WRITES edges above: say it on the surface, not only in code.
+
+  OUT OF SCOPE, and named so it is not invented at build time: laning the job -> pipeline -> asset graph itself by BDAT layer. That needs an ontology-node-class -> layer mapping which is declared nowhere -- neither the vocabulary domains nor the registry layer answers "which lane does a :ControlMJob belong in". Minting one is an ontology decision and goes through docs/RELATIONSHIP_GUIDE.md plus the HITL gate, never through a UI item. The lane-basis parameter is built so that mapping becomes a third basis when it exists.
 notes: |
   Groomed 2026-08-17 (targeted groom -- the UI / docs/design/ui-exploration inbox entries only) from Idea-116, captured 2026-08-13 from SME chat while testing the wireframe feedback loop; traces to the user's original Full Circle Docs document-portal concept, §7 Business Flow Diagrams (transcription is machine-local at internal-local/fullcircle-docs-scan-20260813.md, by design -- never committed). The wireframe half was DONE at capture: docs/design/ui-exploration/wireframes/out/dataflow.svg, keys WF-DFL-01..17, renderer spec v2 (lane + arrow primitives). This item is the React half only. Wireframe-first is the point: SME feedback cites WF-DFL keys before any component exists. No ontology decision rides here -- the planned-status caveat in the acceptance is what keeps the drawn READS/WRITES edges from becoming a done deal ahead of their gate.
+
+  AMENDED 2026-08-30 (user): the BDAT layers can be the swimlanes -- the same data, laned differently. Taken as a SECOND BASIS rather than a replacement, because the two answer different questions: the original three lanes are a data-flow reading (what runs, what it processes, where it lands) and the layer lanes are a governance reading (what kind of thing is this). Making the basis a parameter is what keeps them one component.
+
+  Three things were verified before this amendment rather than assumed. web/src/generated/load-map.json carries systems[].layer today (row keys: id, name, layer, classification, taxonomy_captures), so the layer basis needs no new generator work. The layer distribution is technology 9, data 5, business 2, human 0 over 16 systems -- so the human lane is empty and the skew is real. And the word "human" is already claimed by a second axis: the relationship vocabulary registered a `human` DOMAIN at gate vocabulary-domains-and-id-policy §A3 (2026-08-12), whose header explicitly rules it is NOT the BDAT layer. That collision is why acceptance (b) exists; without it the view would look right and mean something else.
+
+  The carrier-versus-subject caveat in (c) is the UI half of Idea-216: `layer` sits on the SYSTEM row, so it records where an extract came from rather than what it is about, and `human` is unreachable while that holds because a system is a place and no place is a person. This item deliberately does NOT depend_on that ruling -- a view that renders the defect is how the defect gets ruled, and blocking the view on the ruling would invert that. When 216 lands, the change is inside the one lane resolver.
