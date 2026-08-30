@@ -1,6 +1,7 @@
 # Web scaffolding review — what to take from full-stack-fastapi-template and ss-python
 
 <!-- anchor: front-matter -->
+- **Reviewed at:** commit `96002b6b` on `main` (2026-08-27), port base `port-base-20260820`; venue MSI (producer desktop). *The commit is this file's own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (`docs/style/review-provenance.md`, J63).*
 - **Scope:** an evaluation, not a runbook and not a decision record. It compares two public
   project scaffolds against what the DryDocs console already has, and names the pieces worth
   adopting. Each adoption gets a backlog item; this page is the reasoning behind those items.

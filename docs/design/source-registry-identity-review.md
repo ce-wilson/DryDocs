@@ -1,6 +1,7 @@
 # Source-registry identity review — the redaction rule is destroying the identifiers the registry exists to carry
 
 <!-- anchor: front-matter -->
+- **Reviewed at:** commit `c4daa879` on `main` (2026-08-29), port base `port-base-20260829`; venue MSI (producer desktop). *The commit is this file's own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (`docs/style/review-provenance.md`, J63).*
 - **Scope:** an evaluation, not a runbook and not a decision record. It reads one question: can
   `config/source-registry.yaml` actually identify the things it registers, and can anyone find out
   what it holds? Each finding feeds an existing item or names the one it needs; nothing here mints

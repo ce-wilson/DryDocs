@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - CLAUDE.md
@@ -42,12 +42,59 @@ acceptance: |
   (f) NO CODE AND NO GUARD IS REQUIRED BY THIS ITEM, but if the stamp is cheap to generate for one
   surface, doing so is in scope; asserting it across all of them is not.
 notes: |
+  BUILT 2026-08-30 (desktop, MSI). The convention is docs/style/review-provenance.md; the
+  generator is scripts/review_stamp.py.
+
+  (a) THE STAMP IS FOUR FIELDS - reviewed_commit, reviewed_branch, reviewed_port_base, venue -
+  and the port base is the most recent port-base-* tag REACHABLE FROM HEAD rather than the newest
+  tag in the repo, because a tag cut on another branch says nothing about what this tree carries.
+
+  (b) THE THREE INSTANCES ARE IN THE CONVENTION so the cost is visible rather than remembered:
+  the 2026-08-28 triage reporting the refresh verbs as backwards (all three registered on producer
+  main with the older verb kept as a deprecated alias delegating to them, G79); the same triage
+  calling eight commands unregistered when seven exist here; and the earlier review with six wrong
+  facts from a checkout predating S8, S13, G78 and G79.
+
+  (c) THE IRONY IS WRITTEN DOWN under its own heading, because without it the next reviewer
+  reaches for the method rule again: reading the importable object faithfully (J37) STILL reports
+  a stale tree faithfully. The method was never wrong. That is why no method rule closes this and
+  why the fix is provenance.
+
+  (d) THE SURFACES ARE NAMED IN A TABLE - design reviews at the front-matter anchor, research and
+  triage front matter, docs/reviews front matter, and the port prompt plus each PORT-REPORT - and
+  the stamp was APPLIED, not merely specified: all six docs/design/*-review.md files now carry a
+  Reviewed at line, each with the commit of that file's own last revision, which is the tree its
+  reading was done against. Stated as a proxy on the line itself rather than presented as exact.
+
+  THE TRIAGE DOCUMENT IS THE STAMP'S BEST APPLICATION and is stamped UNRECORDED on purpose. Its
+  commit and port base were never written down, and that absence is precisely what let three
+  tree-drift observations read as defects. Recording the absence is the half producer can do; the
+  note beside it names which three findings are drift.
+
+  A SWEEP WAS CONSIDERED AND REFUSED, with the reason in the convention: back-filling a
+  present-day SHA onto a document written against a different tree is the exact failure this
+  convention exists to prevent, applied to itself. Existing files are stamped when next revised.
+
+  (e) THE CROSS-REPO HALF IS FENCED. Guardrail 8 already required SHA-stamped citations in the
+  PORT-REPORT, so the port surface was the one already solved; what the prompt gains is a
+  DESCRIPTION of producer practice that explains why producer documents now carry a SHA line. It
+  asks for nothing back, names no artifact the company owes, and says outright that a company-side
+  document arriving without a stamp is read exactly as it always was.
+
+  (f) NO GUARD, AND THE ITEM SAYS WHY IN THE CONVENTION ITSELF: a repo-wide assertion would fail
+  on every historical document, and the fix for that would be the sweep just refused. If a guard
+  is ever wanted it belongs on NEWLY ADDED files only, which is a different item. The generator
+  was cheap, so it exists - one surface, per clause (f) - and nothing depends on it.
+
+  It deliberately does NOT re-solve N26 clause (g), which stamps the registry surfaces
+  specifically; this is the general convention and that is one application of it.
+
+  VERIFIED: full suite green (2851 passed), ruff + format clean, the six design renders
+  regenerated from their sources, and the generator exercised live on this desktop.
+
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-214, which is tagged as a question but whose
   missing piece is named unambiguously - provenance, not method - so it is groomed as a chore with
   the ruling already implicit in the entry.
 
   Priority p1 because the failure is recurrent, cross-repo and produces confident wrong findings,
   which is the most expensive kind.
-
-  It deliberately does NOT re-solve N26 clause (g), which stamps the registry surfaces
-  specifically; this is the general convention and that is one application of it.

@@ -1,6 +1,7 @@
 # Catalog substrate review — what to take from the data-catalog and lineage products
 
 <!-- anchor: front-matter -->
+- **Reviewed at:** commit `b58f3869` on `main` (2026-08-28), port base `port-base-20260820`; venue MSI (producer desktop). *The commit is this file's own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (`docs/style/review-provenance.md`, J63).*
 - **Scope:** an evaluation, not a runbook and not a decision record. It is the SECOND pass over
   two questions the first pass left half-answered: how a console bootstraps its own login, and
   how a declared data source binds to a real location on a real machine. Each adoption feeds an

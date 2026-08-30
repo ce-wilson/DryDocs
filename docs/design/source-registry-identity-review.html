@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <body>
 <main>
 <h1>Source-registry identity review — the redaction rule is destroying the identifiers the registry exists to carry</h1>
-<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Scope:</strong> an evaluation, not a runbook and not a decision record. It reads one question: can <code>config/source-registry.yaml</code> actually identify the things it registers, and can anyone find out what it holds? Each finding feeds an existing item or names the one it needs; nothing here mints work on its own.</li><li><strong>Status:</strong> DESCRIPTIVE — <strong>Rev 1, 2026-08-29.</strong></li><li><strong>Classification:</strong> Internal-Public — mechanism only. No real database, schema or application-id value appears here; every measurement is a count or a shape.</li><li><strong>Companion:</strong> ADR 0009 (configuration substrate), ADR 0014 (runtime substrate), ADR 0017 (source-binding substrate, PROPOSED at G124), <code>docs/design/catalog-substrate-review.md</code>, <code>config/gate-prompts/registry-wiring-readiness.yaml</code></li></ul>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Reviewed at:</strong> commit <code>c4daa879</code> on <code>main</code> (2026-08-29), port base <code>port-base-20260829</code>; venue MSI (producer desktop). <em>The commit is this file&#x27;s own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (<code>docs/style/review-provenance.md</code>, J63).</em></li><li><strong>Scope:</strong> an evaluation, not a runbook and not a decision record. It reads one question: can <code>config/source-registry.yaml</code> actually identify the things it registers, and can anyone find out what it holds? Each finding feeds an existing item or names the one it needs; nothing here mints work on its own.</li><li><strong>Status:</strong> DESCRIPTIVE — <strong>Rev 1, 2026-08-29.</strong></li><li><strong>Classification:</strong> Internal-Public — mechanism only. No real database, schema or application-id value appears here; every measurement is a count or a shape.</li><li><strong>Companion:</strong> ADR 0009 (configuration substrate), ADR 0014 (runtime substrate), ADR 0017 (source-binding substrate, PROPOSED at G124), <code>docs/design/catalog-substrate-review.md</code>, <code>config/gate-prompts/registry-wiring-readiness.yaml</code></li></ul>
 <h2 id="why-now"><span class="dd-margin-tag" aria-hidden="true">why-now</span>Why now</h2>
 <p>Two failures in one week, one root cause, and the second is the serious one.</p>
 <p><strong>Registering AWS/Glue metadata as a replica was blocked by the id grammar.</strong> That is not a workflow annoyance. Source-to-target mapping over registered ids is the core function of a data-governance product, and an id that resolves to nothing cannot be mapped to anything.</p>
@@ -151,7 +151,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 </ol>
 </section>
 </main>
-<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<footer class="dd-print-footer">Rev 1 · commit c4daa879</footer>
 <script>
 
 (function(){

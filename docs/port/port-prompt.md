@@ -670,6 +670,18 @@ GUARDRAILS (durable — apply to every port):
    tag, acceptance numbers) land in **Last completed port** before the port is
    considered closed.
 
+   REVIEW PROVENANCE, ON THE PRODUCER SIDE (J63) — stated here as a DESCRIPTION OF
+   OUR PRACTICE and not as a request for anything back. Producer review, triage and
+   research surfaces now name the tree they were read against: commit, branch and
+   port base (`docs/style/review-provenance.md`). The reason is measured on our own
+   side, three times: a review run against an un-ported checkout reports absences as
+   DEFECTS when they are simply not-yet-ported, and reading the importable object
+   faithfully still reports a stale tree faithfully, so no method rule closes it.
+   Nothing about this binds the company side, and a company-side artifact arriving
+   without a stamp is read exactly as it always was. It is written down because it
+   explains why producer documents suddenly carry a SHA line, not because anything
+   is owed.
+
 9. RUFF / FORMAT CONVERGENCE (J10 — each side formats its OWN tree). Authority:
    `git show cewilson/main:docs/ruff-format-convergence.md`. Find the boundary BY
    COMMIT SUBJECT, never by SHA — every commit is tagged `J10 stage <N>`:

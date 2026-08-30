@@ -1,6 +1,7 @@
 # OpenLineage substrate review — reading the source ADR 0017 cites
 
 <!-- anchor: front-matter -->
+- **Reviewed at:** commit `b6e3b74c` on `main` (2026-08-29), port base `port-base-20260829`; venue MSI (producer desktop). *The commit is this file's own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (`docs/style/review-provenance.md`, J63).*
 - **Scope:** a THIRD pass, and the first one that reads a single product's source rather than
   surveying many. Its question is narrow: **ADR 0017 cites OpenLineage twice for its central
   shape — are those citations right?** Everything else here is downstream of that answer.

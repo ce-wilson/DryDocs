@@ -1,6 +1,7 @@
 # DataHub substrate review — reading the source behind ADR 0017's other four citations
 
 <!-- anchor: front-matter -->
+- **Reviewed at:** commit `cb5d45d8` on `main` (2026-08-29), port base `port-base-20260829`; venue MSI (producer desktop). *The commit is this file's own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (`docs/style/review-provenance.md`, J63).*
 - **Scope:** the FOURTH pass, and the companion to `openlineage-substrate-review.md`. That review
   closed by saying "clauses 3, 4 and 5 rest on DataHub, OpenMetadata and Purview and are untouched
   by any of this." This is the pass that touches them. Its question is the same narrow one:

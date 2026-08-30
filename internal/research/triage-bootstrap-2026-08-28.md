@@ -14,6 +14,19 @@ transcription_note: >
   names, label names, Confluence page ids, counts — are reproduced in full, per the registered-id
   rule (a name identifies; only host/port/service/credential connects).
 venue_of_the_original: "company desktop / container neo4jtest / database drydocs / bolt://localhost:7687"
+reviewed_commit_of_the_original: UNRECORDED
+reviewed_port_base_of_the_original: UNRECORDED
+review_provenance_note: >
+  The two UNRECORDED fields above are the point of this stamp rather than a gap in it (J63,
+  docs/style/review-provenance.md). This session's findings were read against a company-side
+  worktree whose commit and port base nobody wrote down, and THREE of them are tree drift rather
+  than defects: the refresh verbs it reported as backwards are all three registered on producer
+  main with the older verb kept as a deprecated alias delegating to them (G79, 2026-08-23), and
+  seven of the eight commands it called unregistered exist on producer main. Every observation
+  was correct for the tree it ran on; the DEFECT FRAMING was not, and only a commit could have
+  told the two apart. Producer cannot make a company-side artifact carry the stamp -- this note
+  records what is missing so the findings are read correctly here, which is the half producer
+  can do.
 worktree_of_the_original: "C:\\Users\\<user>\\scratch\\projects\\DryDocs\\.claude\\worktrees\\dd-lineage"
 branch_of_the_original: feat/dd_lineage
 tags: [bootstrap, initial-load, triage, doc-drift, schema-hygiene, controlm, back-flow]

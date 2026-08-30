@@ -256,6 +256,15 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   "prettier" copy silently breaks feedback re-attachment). *Non-governed outward-facing docs*
   — the whitepaper, the website — are the ONLY place editorial/design treatment
   (artifact-design pass, visual identity) applies.
+- **A review names the tree it ran against (J63).** Every review, triage or research
+  artifact states its `reviewed_commit`, `reviewed_branch` and `reviewed_port_base`
+  ([`docs/style/review-provenance.md`](docs/style/review-provenance.md);
+  `python scripts/review_stamp.py` prints the block). Without it, *absent here* reads as
+  **broken** when it means **not yet ported** — which has now manufactured findings three
+  times, most recently the 2026-08-28 triage that called three registered refresh verbs
+  backwards and seven existing commands unregistered. Note what this is NOT: J37 (read the
+  importable object) was followed correctly every time. Reading faithfully still reports a
+  STALE tree faithfully, so this is provenance and no method rule can substitute for it.
 - **Prose style: U.S. business-technical English.** All new prose follows
   [`docs/style/us-business-english.md`](docs/style/us-business-english.md) — plain, concrete,
   direct; "backbone"/"core"/"source of truth", not "spine"/"planes"/"decays"; lead with the
