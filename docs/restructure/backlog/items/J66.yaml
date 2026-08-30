@@ -1,7 +1,7 @@
 id: J66
 epic: release-infrastructure
 title: A source-reading guard that fails on its own explanation teaches people to stop explaining
-  - four hand-rolled workarounds exist, give them one helper
+  - three hand-rolled workarounds in one day, give them one helper
 type: chore
 module: docs
 phase: 8
@@ -16,8 +16,61 @@ inputs:
 - tests/unit/test_env_doctor.py
 - tests/unit/test_vocabulary_endpoints.py
 - tests/env_drift.py
-- tests/unit/test_no_render_parsing.py
+- CLAUDE.md
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) THE THREE CALL SITES ARE MIGRATED, NOT JOINED BY A FOURTH. All three were written from
+  scratch on 2026-08-30 and all three were verified in the tree at groom time: the tokenize-based
+  comment-and-string stripper defined inside the env-refs migration guard; the inline abstract
+  syntax tree call walk inside the constraint-drift guard, which imports the ast and inspect
+  modules in the middle of a test function; and the import walk inside the environment-doctor
+  guard. A helper that exists while the local copies stay is the same duplication one directory
+  deeper, so the item is not done until each local definition is gone.
+
+  (b) THREE VERBS, EACH ALREADY PROVEN BY ONE OF THOSE CALL SITES. Source with comments and string
+  literals removed; the set of modules a source imports; and the set of attribute names a source
+  calls. Each takes source text so it is unit-testable without a file, with a thin path-taking
+  convenience over it if the call sites want one. Nothing else goes in - a helper module that
+  grows a fourth verb nobody calls is how a shared helper becomes a private one again.
+
+  (c) THE CYPHER STRIPPER IS EXPLICITLY OUT OF SCOPE AND THE ITEM SAYS WHY. The vocabulary
+  endpoints guard defines a function of the same name, but it strips CYPHER comments and literals
+  with regular expressions over a different grammar - the Python tokenizer cannot do that job.
+  Leaving it alone is the ruling; the risk this clause closes is a build that sees a matching name
+  and folds two unrelated things together.
+
+  (d) THE LOCATION IS DECIDED ONCE, AGAINST THE PRECEDENT THAT ALREADY EXISTS. The repo already
+  carries a shared non-test module for the suite at the tests root. Pick between that root and the
+  unit directory, state the reason, and confirm two properties at build time: pytest does not
+  collect the module as a test, and both the unit and integration suites can import it.
+
+  (e) THE RULE IS WRITTEN WHERE THE SISTER RULE LIVES, or it is a helper nobody discovers. The
+  never-parse-a-render rule sits in the working agreements of the root agent guide with its guard
+  named. This one joins it in the same voice and in one or two sentences: a source-reading guard
+  reads code through the helper rather than doing a bare substring test over raw source. The
+  reason ships with the rule, because the reason is the whole point - a guard that fails on the
+  explanation costs more than the guard is worth in a repo whose comments carry its rulings.
+
+  (f) NO META-GUARD UNLESS IT CAN BE WRITTEN WITHOUT THE TRAP IT POLICES. A test that hunts for
+  bare substring tests over source text would itself have to scan source text, and would match
+  this item's own explanation everywhere it is quoted. Either write it over the abstract syntax
+  tree so prose cannot trip it, or decline it and record the decision in the close note. Declining
+  is an acceptable outcome; leaving it unexamined is not.
+
+  (g) THE SUITE IS THE PROOF, AND NO GUARD IS WEAKENED TO FIT THE HELPER. Each migrated guard
+  passes before and after with the same assertions, the full unit suite is green, and the close
+  note records the run rather than asserting cleanliness - a targeted-file check is exactly the
+  claim J57 rules insufficient.
 notes: |
-  Minted 2026-08-30 from Idea-226.
+  Groomed 2026-08-30 from Idea-226. Every claim in that entry was re-verified against this tree
+  before the item was written, and one of them changed: the entry counts three instances, and a
+  fourth same-named function exists in the vocabulary endpoints guard which is NOT the same thing
+  - it is a Cypher stripper - so clause (c) fences it rather than letting a build absorb it.
+
+  Module docs, on the J37 precedent: a testing-convention item files under docs even though it
+  ships test code, because the durable output is the rule in the working agreements and the helper
+  is what makes the rule cheap to follow. Phase 8, epic release-infrastructure, with the rest of
+  the guard-hygiene stream.
+
+  Related G128, G129, G130 - the three builds whose guards each invented the workaround - and J37,
+  which is the same disease at the other end: J37 says read the importable object instead of a
+  render, and this says read the code instead of the prose around it.

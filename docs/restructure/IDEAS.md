@@ -359,22 +359,6 @@ question a 1,000-line file with the trail at the bottom could not answer.
   their loaded graph, so that stays open on the port trigger.
 
 <!-- add new ideas at the top -->
-- **`Idea-226`** · 2026-08-30 · `[chore]` · **open — three instances in ONE session** · prio? **Med** —
-  **Source-reading guards keep failing on their own prose, and every author invents the fix again.**
-  A guard that greps its own source tree for a forbidden pattern also matches the COMMENT that
-  explains why the pattern is forbidden. It happened three times on 2026-08-30 alone: G128's
-  declared-list guards matched `os.environ` and `${VAR:-default}` in their own docstrings (fixed
-  with a local `_code_only()` helper using `tokenize`); G129's no-import guard matched the *text*
-  `set_env_var` in three modules that merely name the script in prose (fixed with an AST import
-  walk); and G130's purity guard matched `session` and `run(` in its own docstring (fixed with an
-  AST call walk). Each fix was correct and each was written from scratch. The consequence is the
-  one worth naming: **a guard that fails on the explanation teaches people to stop writing
-  explanations**, which in this repo would cost more than the guard is worth. Proposal: one shared
-  test helper — `tests/unit/_source_scan.py` or similar — offering `code_only(source)` (tokenize,
-  strip COMMENT and STRING) plus `imported_modules(source)` and `called_attributes(source)` over
-  the AST, and a note in the testing conventions that a source-reading guard uses it rather than
-  a bare `in`. Small, and it removes a recurring authoring trap rather than a bug. Related
-  [[G128]], [[G129]], [[G130]], [[J37]].
 
 - **`Idea-225`** · 2026-08-30 · `[idea]` · **open — found by G129's doctor, desktop** · prio? **Med** —
   **A variable set in `.env` alone is visible to every loader and invisible to every binding check,
@@ -2869,6 +2853,35 @@ question a 1,000-line file with the trail at the bottom could not answer.
   template 31.docx`, `Business Requirements Template - FULL CDI Version.docx`.
 
 ## Recently groomed (audit trail)
+
+- **`Idea-226`** · 2026-08-30 · `[chore]` · **groomed → J66 (2026-08-30)** · prio? **Med** —
+  **Source-reading guards keep failing on their own prose, and every author invents the fix again.**
+  A guard that greps its own source tree for a forbidden pattern also matches the COMMENT that
+  explains why the pattern is forbidden. It happened three times on 2026-08-30 alone: G128's
+  declared-list guards matched `os.environ` and `${VAR:-default}` in their own docstrings (fixed
+  with a local `_code_only()` helper using `tokenize`); G129's no-import guard matched the *text*
+  `set_env_var` in three modules that merely name the script in prose (fixed with an AST import
+  walk); and G130's purity guard matched `session` and `run(` in its own docstring (fixed with an
+  AST call walk). Each fix was correct and each was written from scratch. The consequence is the
+  one worth naming: **a guard that fails on the explanation teaches people to stop writing
+  explanations**, which in this repo would cost more than the guard is worth. Proposal: one shared
+  test helper — `tests/unit/_source_scan.py` or similar — offering `code_only(source)` (tokenize,
+  strip COMMENT and STRING) plus `imported_modules(source)` and `called_attributes(source)` over
+  the AST, and a note in the testing conventions that a source-reading guard uses it rather than
+  a bare `in`. Small, and it removes a recurring authoring trap rather than a bug. Related
+  [[G128]], [[G129]], [[G130]], [[J37]].
+  **GROOMED 2026-08-30 → J66.** One item, and the count changed at grooming: this entry
+  names three instances and a fourth same-named function exists in the vocabulary endpoints
+  guard — but that one strips CYPHER comments and literals with regular expressions, a
+  different grammar the Python tokenizer cannot parse, so J66 clause (c) fences it out
+  explicitly rather than letting a build fold two unrelated things together on a name match.
+  All three real call sites were re-verified in the tree before the item was written. Two
+  clauses were added that this entry did not state: the location decision is made once against
+  the existing shared-suite-module precedent at the tests root (with pytest-does-not-collect
+  and both-suites-can-import confirmed at build), and the tempting meta-guard — a test that
+  hunts for bare substring tests over source — must be written over the abstract syntax tree
+  or declined in the close note, because a text-scanning version of it would match this very
+  explanation. The rule itself lands in the root guide's working agreements beside J37.
 
 - **`Idea-177`** · 2026-08-26 · `[doc]` · **groomed → K28 (2026-08-27)** · prio? **Low** —
   `drydocs/fid_census.py`'s module docstring still opens with "Gate ``fid-identity-and-scope`` is
