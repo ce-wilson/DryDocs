@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-30T14:11:32",
+    "captured_at": "2026-08-30T17:32:48",
     "date": "20260830",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "1bd29b42",
-      "full": "1bd29b429174d138cb188443bf8ec121815cb3fe",
+      "commit": "1ec181eb",
+      "full": "1ec181eb0df96279224b9ddfda5aaf86525abd53",
       "branch": "main",
-      "describe": "port-base-20260829-41-g1bd29b42",
-      "subject": "feat(G129): the internal twin becomes navigable — find, document, update",
+      "describe": "port-base-20260829-53-g1ec181eb",
+      "subject": "chore(J66): a guard reads code, not the prose around it",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -11771,6 +11771,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/J66.yaml",
+      "name": "J66.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J66.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/J7.yaml",
       "name": "J7.yaml",
       "extension": ".yaml",
@@ -15411,6 +15420,15 @@
       "name": "l22-idiom-inventory.md",
       "extension": ".md",
       "rel_path": "docs/style/l22-idiom-inventory.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/style/review-provenance.md",
+      "name": "review-provenance.md",
+      "extension": ".md",
+      "rel_path": "docs/style/review-provenance.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20708,10 +20726,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
-      "name": "drydocs-20260830.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1411.json",
+      "name": "drydocs-20260830-1411.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830-1411.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21977,6 +21995,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/review_stamp.py",
+      "name": "review_stamp.py",
+      "extension": ".py",
+      "rel_path": "scripts/review_stamp.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/set_console_credential.py",
       "name": "set_console_credential.py",
       "extension": ".py",
@@ -22206,6 +22233,15 @@
       "name": "test_server_inventory_e2e.py",
       "extension": ".py",
       "rel_path": "tests/integration/test_server_inventory_e2e.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/source_scan.py",
+      "name": "source_scan.py",
+      "extension": ".py",
+      "rel_path": "tests/source_scan.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22494,6 +22530,15 @@
       "name": "test_console_auth.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_console_auth.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_constraint_drift.py",
+      "name": "test_constraint_drift.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_constraint_drift.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23781,6 +23826,15 @@
       "name": "test_source_registry.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_source_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_source_scan.py",
+      "name": "test_source_scan.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_source_scan.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27942,6 +27996,10 @@
       "drydocs/drydocs_core/backlog_store.py"
     ],
     [
+      "drydocs/tests/unit/test_backlog.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
       "drydocs/tests/unit/test_base_loader_smoke.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -28172,6 +28230,26 @@
     [
       "drydocs/tests/unit/test_console_auth.py",
       "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_constraint_drift.py",
+      "drydocs/drydocs/cli_schema.py"
+    ],
+    [
+      "drydocs/tests/unit/test_constraint_drift.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/tests/unit/test_constraint_drift.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/unit/test_constraint_drift.py",
+      "drydocs/drydocs_core/schema/constraints.py"
+    ],
+    [
+      "drydocs/tests/unit/test_constraint_drift.py",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests/unit/test_controlm_api.py",
@@ -28438,6 +28516,10 @@
       "drydocs/scripts/set_env_var.py"
     ],
     [
+      "drydocs/tests/unit/test_env_doctor.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
       "drydocs/tests/unit/test_env_drift.py",
       "drydocs/tests/env_drift.py"
     ],
@@ -28464,6 +28546,10 @@
     [
       "drydocs/tests/unit/test_env_refs_migration.py",
       "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/tests/unit/test_env_refs_migration.py",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests/unit/test_ephemeral_specs.py",
@@ -29548,6 +29634,10 @@
     [
       "drydocs/tests/unit/test_source_registry.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_scan.py",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests/unit/test_sql_run_log.py",
@@ -37501,6 +37591,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J66.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/J7.yaml"
     ],
     [
@@ -39487,6 +39582,11 @@
       "drydocs/docs/style",
       "CONTAINS",
       "drydocs/docs/style/l22-idiom-inventory.md"
+    ],
+    [
+      "drydocs/docs/style",
+      "CONTAINS",
+      "drydocs/docs/style/review-provenance.md"
     ],
     [
       "drydocs/docs/style",
@@ -42396,7 +42496,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1411.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -42936,6 +43036,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/review_stamp.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/set_console_credential.py"
     ],
     [
@@ -43067,6 +43172,11 @@
       "drydocs/tests",
       "CONTAINS",
       "drydocs/tests/integration"
+    ],
+    [
+      "drydocs/tests",
+      "CONTAINS",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests",
@@ -43317,6 +43427,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_console_auth.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_constraint_drift.py"
     ],
     [
       "drydocs/tests/unit",
@@ -44032,6 +44147,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_source_registry.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_source_scan.py"
     ],
     [
       "drydocs/tests/unit",
@@ -45023,13 +45143,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2545,
-    "edges": 1316,
+    "files": 2551,
+    "edges": 1325,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2836,
+    "rels": 2842,
     "directories": 292
   }
 }
