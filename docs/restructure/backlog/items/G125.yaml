@@ -58,6 +58,24 @@ acceptance: |
   what to do about it. That is DataHub's TestableSource.test_connection shape, and it is the half
   of a validating form an editor-first operator can still have.
 
+  SCOPE AND DIRECTION OF THE TEST (ADR 0017 clause 7, RULED 2026-08-30 -- three rules, each
+  closing a way this check could go back to lying). (i) IT RUNS ONLY FOR BINDINGS CONFIGURED ON
+  THIS MACHINE, because that is the only thing testable. A binding whose variables are unset here
+  is "not configured on this machine" -- a DISTINCT VERDICT, never a failure. The two machines hold
+  different subsets, so scoring another machine's binding red would make the check noise, and
+  noise is how the original coverage lie survived. The report names the venue it was produced on
+  (J18 as a return value). (ii) IT STARTS AT THE REGISTRATION, NEVER ON THE CONFIG SIDE OF THE
+  WALL. Side (A) is .env -- machine-local values and secrets. Nothing tests side (A): no assertion
+  that a variable holds a CORRECT host, no probing of credentials. The check begins once something
+  is REGISTERED, at side (B), and runs DOWNSTREAM to the configured points as defined --
+  connection, then the declared object, then the adapter, then the load surface. (iii) IT STOPS AT
+  THE FIRST STAGE NOT YET BUILT and names that stage. "Not built yet" is a THIRD verdict class,
+  distinct from both reachable and broken -- most of the registry is mid-lifecycle by design, and
+  N12 clause (f) already rules that mode: manual is the expected first state and never a defect, so
+  scoring unbuilt stages as failures would be wrong about the majority of rows. The load state the
+  walk ends at is the one the load-map surface already renders: the check and the rendered view
+  answer with the same fact, never two.
+
   (c) ONE EXPANSION FUNCTION, NOT SEVEN (finding B4; the amendment to G81 (d)). Today
   `resolve_data_root()` treats an empty string as unset, `resolve_log_dir()` walks two variables
   before its default, `credentials_path()` takes any non-empty override verbatim, and
@@ -101,6 +119,18 @@ acceptance: |
   value beginning with the dollar sign -- or nothing at all. One test. It is the enforcement of a
   rule this repo already states and neither peer product has: an identifier publishes, a
   connection coordinate goes to the internal twin.
+
+  (h) THE BINDING TABLE GETS ITS OWN PORT DISPOSITION (ADR 0017, the ADR 0009 reconciliation as
+  ruled 2026-08-30). PORT-MANIFEST.yaml gains a row for the binding table -- `per-entry` with a
+  FIELD SPLIT, the WHAT crossing and the WHERE never crossing -- modelled on the row
+  config/doc-source-registry.yaml already carries, where producer-owned fields cross on take and
+  company-owned fields (explicitly graph_locator and source, "the where") are never overwritten by
+  a port. WITHOUT THIS ROW the file inherits the config/** default `canonical-producer` and a port
+  carries one machine's binding onto the other side. That is not hypothetical: the default's own
+  note records the same omission being caught once already -- "A file of LOCAL infrastructure facts
+  does not belong under this default; dev-environment.yaml sat here by omission until the
+  2026-07-28 port". Guarded by tests/unit/test_port_reconcile_guards.py, which already proves
+  overlay union and verbatim-apply survival for the per-entry rows.
 
   SCOPE FENCE, so the id work is not started here: this item changes NO dataset id, NO retired-id
   mapping, and NOT `SourceEntry.urn`. ADR 0017 clause 1 as amended rules that un-redacting `[db]`

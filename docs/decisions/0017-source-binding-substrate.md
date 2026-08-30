@@ -1,8 +1,9 @@
 # ADR 0017 — Source-binding substrate: a declared source binds to a real place through one per-origin table
 
 ```yaml
-status: PROPOSED          # the drafting session never accepts its own ADR — acceptance is the user's
+status: ACCEPTED          # user, 2026-08-30 — all three open questions ruled; see "Acceptance" below
 date: 2026-08-29
+accepted: 2026-08-30
 amended: 2026-08-30       # Rev 2 — the source passes landed; see "What Rev 2 changed" below
 authored_by: G124 (desktop)
 deciders: [chad.wilson]
@@ -23,6 +24,29 @@ executed_by: G125 (the binding table and the one expansion function)
 
 > **Nothing in this record changes code.** G125 implements it and `depends_on` this ADR, so
 > nothing implements an unratified ruling — the G104 → G105–G109 shape exactly.
+
+## Acceptance
+
+**ACCEPTED by the user, 2026-08-30**, after three source passes and Rev 2. Every question this
+record raised for the user is ruled, and each ruling is recorded inline where the argument sits
+rather than only here:
+
+| # | Question | Ruling |
+|---|---|---|
+| 1 | Venue — 0017 standalone, or an amendment adding 0014 clause 8? | **Standalone.** The records have diverged; this one carries the tool comparisons in detail, which merging would bury. |
+| 2 | Does ADR 0009 gain a real carve-out, or does 0014's exception cover it? | **No new carve-out** — 0014's exception covers it. But the port test was asserted rather than checked: the binding table needs its own `per-entry` field-split disposition, or it inherits `canonical-producer` and a port carries one machine's binding across. G125 clause. |
+| 3 | Does N10 clause D2 fence clause 4's new registry field? | **Scoped — the field proceeds.** Without it, a source added later cannot name the connection that reaches it. |
+
+Two rulings arrived with acceptance and are recorded in the clauses they govern: the **port
+disposition** above, and the **connection test's scope and direction** in (7) — configured-on-this-
+machine only, starting at the registration rather than at `.env`, stopping at the first unbuilt
+stage.
+
+**What is still fenced out, and none of it blocks the build:** the id-grammar work (un-redacting
+`[db]`/`[schema]` paired with `SourceEntry.urn`, which must move together — clause 1), path
+multiplicity (Idea-222, riding N10), the replica derivation edge (Idea-219, which needs the
+relationship guide and the HITL gate), and the per-row `classification` calls G125 carries as a
+watch item.
 
 ## What Rev 2 changed, and why the ADR is only now ready to rule on
 
@@ -168,6 +192,29 @@ a per-machine fact — because the row exists to describe *this* machine's conne
 the table belongs in the environment too, and 0009 gains a real carve-out rather than
 reusing 0014's. The argument against is that the rows are identical on both machines and the
 only per-machine part is what the variables resolve to.
+
+> **RULED 2026-08-30 (user): NO NEW 0009 CARVE-OUT — the split rides 0014's existing exception.
+> But the port test above was asserted, not checked, and checking it changes what G125 must
+> build.**
+>
+> The claim was that "the port carries it (both sides have the same origins)." Measured:
+> `config/source-registry.yaml` has **no row of its own** in `PORT-MANIFEST.yaml`. It falls through
+> to the `config/**` default, `disposition: canonical-producer` — producer wins wholesale — and
+> that default carries its own warning: *"A file of LOCAL infrastructure facts does not belong
+> under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port."* The
+> closest existing analogue to a binding table has already been caught sitting in exactly this
+> place once.
+>
+> The sibling file already solves it, so the fix is precedent rather than invention:
+> `config/doc-source-registry.yaml` is `per-entry` with a **FIELD SPLIT** — producer-owned fields
+> cross on take, and company-owned fields, explicitly including `graph_locator` and `source`
+> (*"the where — a space or data-root path"*), are NEVER overwritten by a port.
+>
+> **So the binding table takes a port disposition of its own: `per-entry` with a field split, the
+> WHAT crossing and the WHERE never crossing.** Without that row it inherits `canonical-producer`
+> and a port would carry one machine's binding onto the other side — the defect the manifest
+> already caught once. This is an acceptance clause on G125, not a new exception to 0009: rule 1's
+> scope clause is satisfied exactly as argued above, once test 2 is made true rather than assumed.
 
 ## Decision
 
@@ -405,6 +452,33 @@ binding is what makes it possible: a connection test that returns a typed report
 what it could and could not do, plus what to do about it — rather than a boolean. That is the
 shape DataHub's `TestableSource.test_connection` returns, and it is the honest form of the
 `landing-zones --check` complaint this ADR opens with.
+
+**RULED 2026-08-30 (user) — the test's SCOPE and DIRECTION, which a typed report alone does not
+settle.** Three rules, and each closes a way the check could go back to lying:
+
+1. **It runs only for bindings CONFIGURED ON THIS MACHINE, because that is the only thing that can
+   be tested.** The two machines hold different subsets; a binding whose variables are unset here
+   is **"not configured on this machine"**, a distinct verdict, never a failure. Reporting another
+   machine's binding as red would make the check noise, and noise is how the original coverage lie
+   survived. This is J18 as a return value rather than a footnote: a result names the venue it was
+   produced on.
+2. **The test starts at the REGISTRATION and never on the config side of the wall.** Side (A) is
+   `.env` — machine-local values and secrets. Nothing tests side (A): there is no assertion about
+   whether a variable holds a *correct* host, and no probing of credentials. The check begins once
+   something is **registered**, at side (B), and runs **downstream to the configured points as
+   defined** — connection, then the declared object, then the adapter, then the load surface.
+3. **It stops at the first stage that is not yet built, and reports that stage by name.** "Not
+   built yet" is a third verdict class, distinct from both "reachable" and "broken". Most of the
+   registry is mid-lifecycle by design — N12 clause (f) already rules that `mode: manual` is the
+   expected first state and never a defect — so a check that scores unbuilt stages as failures
+   would be wrong about the majority of rows. The walk terminates cleanly and says where it
+   stopped.
+
+Rules 2 and 3 together are what make the report honest in the direction that matters: it reports
+**how far a registration actually reaches**, which is the question `landing-zones --check` was
+silently answering for only half its subject. The load state at the end of that walk is the one
+the load-map surface already renders, so the check and the rendered view answer with the same
+fact rather than two.
 
 Whether a further surface — an MCP server, so an agent can read a source's metadata after
 configuration — is worth building is **not ruled here**. It is Idea-221, it would be a *reader*
