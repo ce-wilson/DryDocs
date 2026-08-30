@@ -360,6 +360,45 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-222`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+  **ACCESS PATHS to one datapoint are already documented THREE times, each per-source, and never
+  generalized: a row can name one path, never a choice among several, and nothing ranks them.**
+  User capture, 2026-08-30 ("it may have been documented -- manual reports, database, API; code
+  from the repo versus a copy from the server; the user path versus functional-id access points").
+  Checked before writing, and the user is right: WHAT EXISTS ALREADY — (1) the `acquisition:`
+  block, N12 clause (c), declares the enum `via: api | db` with the G96 Control-M adapter
+  (`drydocs_core/adapters/controlm/api.py`, which exists) as the worked example, and clause (b)
+  covers the manual-report path with `format: csv | ascii | json` plus `drop_dir`. So all THREE
+  paths the user names are in the vocabulary. Measured at main: mode manual 15 / automated 15;
+  `via` = `db` on all 15 automated rows and `api` on ZERO. (2) The repo-versus-server case is
+  documented in full in `docs/design/drydocs-lineage-mac-runbook.md` — promotion-repo clone
+  (Bitbucket, `<name>#<guid>` folders) versus the per-pipeline Swagger export tool, WITH the
+  ruling: the SME caveat (2026-07-23) that the clone main may LAG because feature branches are not
+  reliably merged, so "the folder listing is a floor on the inventory, never the authority", and
+  "dataflow is per-pipeline swagger regardless of which source discovered the pipeline".
+  (3) `config/gate-prompts/dpl-dataset-registry-contract.yaml` already treats per-SEAL API versus
+  bulk export as two paths to one datapoint and gates the choice: clause C4 rules discovery
+  precedence "in config/precedence.yaml terms", backed by clause B4's measured api-versus-bulk diff
+  for the same SEAL/day (GUIDs in one and not the other, field-level divergence counts).
+  WHAT IS MISSING, and it is three things, not one: (a) `via` is a SCALAR, so a row records the
+  path taken, never that the datapoint HAS two — the three cases above each had to write prose
+  instead; (b) nothing ranks paths — `config/precedence.yaml` exists with the right conflict policy
+  (winner highest-authority, loser_disposition alias, require_sme_confirmation, never silent-drop)
+  but its `order:` entries rank SOURCES OF TRUTH ABOUT A FACT (bmc-baseline, internal-standards,
+  seal-pat-source-of-record, lob-product-team, hand-verified-crosswalk, servicenow-tom,
+  seal-contact-extract), which is a different question from WHICH PATH TO THE SAME SOURCE WINS —
+  so the DPL gate points at a mechanism whose shape does not fit yet; (c) THE USER-PATH VERSUS
+  FUNCTIONAL-ID DISTINCTION IS A FOURTH DIMENSION not in the vocabulary at all — a human at a
+  Swagger web page and a service account at a programmatic endpoint are the same `via: api` and
+  the same object, but differ in PRINCIPAL, in what each can see, and in auditability. That is
+  closer to the K2 FID/ALIAS tiers than to a format. WHY IT MATTERS beyond tidiness: paths
+  DISAGREE (the clone-lag measurement is exactly that), so an unrecorded path choice makes a
+  divergence unattributable — you cannot tell a stale copy from a real change. And an MCP server
+  ([[Idea-221]]) would be one more path, so this is the axis that idea plugs into rather than a
+  competing one. NOT PROPOSED: widening `via` to a list, or adding a path-precedence section to
+  precedence.yaml, are schema changes fenced by the unsigned N10 clause D2 and would ride its
+  gate. Related [[Idea-221]], [[N12]], [[G25]].
+
 - **`Idea-221`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
   **The missing surface may be an MCP SERVER, not a UI — for Jira, for Confluence, or for data
   registrations themselves.** User capture, 2026-08-30, against [[Idea-220]]: DataHub's UI turned
