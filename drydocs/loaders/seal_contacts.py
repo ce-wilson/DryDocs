@@ -147,12 +147,14 @@ def _store_connection():
     """The same derived-file chain the API wrapper runs (O14): rebuild when the
     committed sources drifted, plain connect when current. Core-only imports —
     a component may never reach into drydocs_api."""
-    import os
     import sqlite3
 
+    from drydocs_core.env_refs import resolve_optional
     from drydocs_core.mapping_store import DEFAULT_DB_PATH, build, is_current
 
-    db = Path(os.environ.get("DRYDOCS_MAPPING_DB") or DEFAULT_DB_PATH)
+    # G128: through the declared list; DEFAULT_DB_PATH is still the fallback.
+    override, _ = resolve_optional("DRYDOCS_MAPPING_DB", where="seal_contacts")
+    db = Path(override or DEFAULT_DB_PATH)
     if not is_current(db):
         return build(db)
     return sqlite3.connect(str(db))

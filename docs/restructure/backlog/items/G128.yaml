@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G125
 inputs:
@@ -45,6 +45,62 @@ acceptance: |
   the actual risk G125 declined. Full suite green, ruff and format clean, and the close note lists
   every exception type whose identity changed.
 notes: |
+  BUILT 2026-08-30 (desktop, MSI). 17 guards in tests/unit/test_env_refs_migration.py.
+
+  (a) THE DECISION, made and written down before anything moved: SUBCLASS. DataRootNotSetError now
+  extends UnsetVariableError. The reason is not diff size -- it is that the specific type is
+  LOAD-BEARING at two catch sites, drydocs/cli.py and drydocs/cli_ingest.py, which catch it to
+  print the data root's OWN remediation. One flat type would have made an unset NEO4J_PASSWORD
+  print advice about the data root: a regression wearing a refactor's clothes. Subclassing keeps
+  `except UnsetVariableError` working as the family catch while the specific handler stays
+  specific, and both directions are asserted.
+
+  EXCEPTION TYPES WHOSE IDENTITY CHANGED (clause e asks for the list): exactly ONE.
+  DataRootNotSetError changed BASE from RuntimeError to UnsetVariableError. No type was renamed,
+  removed, or replaced at any call site, so every existing `except` clause still catches what it
+  caught. That is the whole point of the (a) ruling.
+
+  (b) WHAT MOVED: resolve_data_root, credentials_path, the log-kinds legacy-alias branch, and the
+  three mapping-store call sites. A new non-raising accessor -- resolve_optional(name) ->
+  (value, which_name_resolved) -- is what makes the migration possible for resolvers that
+  legitimately have a default: expand() raises, which is right for a binding and wrong for a log
+  directory called from inside open(). Two functions, ONE declaration list. Returning WHICH name
+  answered is what lets the log resolver still emit its DeprecationWarning for the legacy alias.
+
+  TWO CORRECTIONS TO THIS ITEM'S OWN TEXT, both recorded as tests rather than left in prose.
+  (1) Clause (b) says MappingStore.__init__ imports os inside its constructor to read one
+  variable. It does not, and did not: drydocs_core/mapping_store.py reads NO environment variable
+  at all. The three reads live at component call sites (manual_loads, seal_contacts,
+  drydocs_api/mappings), which is where the migration went -- and that is the better outcome,
+  since core stays free of the lookup entirely. (2) The item inherited "seven resolvers" from
+  G125's prose; the migrated set is five modules across core, api and loaders, plus one
+  deliberately left alone (below).
+
+  (d) I HIT THE CLAUSE AND OBEYED IT. The first attempt put the declared-list check inside
+  log_kinds.resolve_env_override, and it broke
+  test_resolve_honors_env_when_set_and_falls_back_when_empty_or_unset, which drives that mechanism
+  with a synthetic probe (DRYDOCS_G111_PROBE). Clause (d) says stop and say why rather than relax
+  the test. The test was RIGHT and the guard was in the wrong place: that function answers "is this
+  NAME set", and a caller naming its own variable is legitimate. What must reference only declared
+  variables is a COMMITTED DECLARATION, so the check moved to a test over config/log-kinds.yaml's
+  root and every `env:` in config/data-zones.yaml. resolve_env_override keeps its own os.environ
+  read, and a guard requires the rationale to stay in its source so the next person does not
+  re-add the check and re-break the same test. NO test was weakened.
+
+  A DRIFT RISK THE MIGRATION CREATED AND THEN CLOSED: the legacy alias is now declared TWICE --
+  config/log-kinds.yaml's `legacy_env` and the EnvVar `aliases` tuple. A guard asserts the two
+  agree, so it is one fact with a check rather than two places kept in step by hand.
+
+  ONE TIGHTENING, named because it is a behavior change however small: credentials_path now treats
+  a whitespace-only override as unset. That is what "set" means everywhere else (G111), and the
+  disagreement was one of the four G125 catalogued.
+
+  GUARD HYGIENE: the source-reading tests strip comments and string literals before matching,
+  because every one of them names the thing it forbids in its own prose. A guard that fails on the
+  explanation is a guard that teaches people to stop writing explanations.
+
+  VERIFIED: full suite green (2810 passed), ruff + format clean, root import OK.
+
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-223.
 
   This is the rest of G125 clause (c), which shipped the one function, the one error shape and the

@@ -44,13 +44,13 @@ import hashlib
 import hmac
 import json
 import logging
-import os
 import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
+from drydocs_core.env_refs import resolve_optional
 from drydocs_core.repo_paths import repo_root
 
 logger = logging.getLogger(__name__)
@@ -273,7 +273,12 @@ def credentials_path(root: Path | None = None) -> Path:
     ``DRYDOCS_CONSOLE_CREDENTIALS`` wins; otherwise ``internal-local/`` under
     the repository root. Never ``var/`` — see this module's docstring.
     """
-    override = os.environ.get(PATH_ENV_VAR)
+    # G128: the read goes through the declared list, so this variable is
+    # enumerable like every other. Behavior is unchanged in the one way that
+    # matters -- an override still wins verbatim -- with the single tightening
+    # that a whitespace-only value now counts as unset, which is what "set" means
+    # everywhere else (G111) and was the disagreement G125 catalogued.
+    override, _ = resolve_optional(PATH_ENV_VAR, where="credentials_path()")
     if override:
         return Path(override)
     base = root if root is not None else repo_root(Path(__file__).resolve().parents[1])

@@ -175,9 +175,11 @@ class MappingStore:
 
     def __init__(self, db_path: str | Path | None = None) -> None:
         if db_path is None:
-            import os
+            # G128: through the declared list, so the API tier reads the same
+            # enumerable variable set as everything else.
+            from drydocs_core.env_refs import resolve_optional
 
-            db_path = os.environ.get("DRYDOCS_MAPPING_DB")
+            db_path, _ = resolve_optional("DRYDOCS_MAPPING_DB", where="MappingRepo")
         if db_path is None:
             from drydocs_core.mapping_store import DEFAULT_DB_PATH
 

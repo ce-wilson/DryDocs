@@ -285,3 +285,42 @@ def is_set(name: str) -> bool:
     """Whether a DECLARED variable resolves to a value here. Never returns it."""
     var = _BY_NAME.get(name)
     return bool(var and var.is_set)
+
+
+# ---------------------------------------------------------------------------
+# The OPTIONAL read (G128 (b)).
+#
+# :func:`expand` raises on unset, which is right for a binding: a declared
+# connection that cannot resolve is an error. It is WRONG for the resolvers that
+# legitimately have a default -- the log directory is the case, and it is called
+# from inside ``open()``, where "a broken declaration must not take the loaders
+# with it". Those need the same DECLARATION and the same alias chain without the
+# raise, which is what this is. Two functions, one declaration list: the thing
+# G125 set out to end was seven private lookups, not the existence of a default.
+# ---------------------------------------------------------------------------
+def resolve_optional(name: str, *, where: str) -> tuple[str | None, str | None]:
+    """``(value, which_name_resolved)`` for a declared variable, or ``(None, None)``.
+
+    Returns WHICH name won so a caller can act on it -- the log resolver emits a
+    DeprecationWarning when the legacy alias is the one that answered, and it can
+    only do that if the lookup tells it. Secrets are registered exactly as
+    :func:`expand` registers them, because a value read here is as real as a
+    value read there.
+
+    Raises :class:`UndeclaredVariableError` for an unknown name: a default does
+    not excuse a variable from being declared.
+    """
+    var = _BY_NAME.get(name)
+    if var is None:
+        raise UndeclaredVariableError(
+            f"{where}: {name!r} is not a declared variable. Add it to "
+            "DECLARED_VARIABLES in drydocs_core/env_refs.py -- having a default "
+            "is not an exemption from being enumerable."
+        )
+    for candidate in (var.name, *var.aliases):
+        raw = os.environ.get(candidate, "").strip()
+        if raw:
+            if var.secret:
+                _SECRETS.register(raw)
+            return raw, candidate
+    return None, None

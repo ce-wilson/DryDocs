@@ -50,8 +50,9 @@ profile/script copies (confidential (Internal, J23)) — DATA NEVER ENTERS THE R
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
+
+from drydocs_core.env_refs import UnsetVariableError, resolve_optional
 
 DEFAULT_DATA_ROOT = Path.home() / "data" / "DryDocs"
 DATA_ROOT_ENV = "DRYDOCS_DATA_ROOT"
@@ -61,8 +62,19 @@ class ReadZoneWriteError(RuntimeError):
     """A write was aimed at a declared READ zone — the G81 incident's shape."""
 
 
-class DataRootNotSetError(RuntimeError):
-    """``DRYDOCS_DATA_ROOT`` is unset or empty — G81 (d): never a silent default."""
+class DataRootNotSetError(UnsetVariableError):
+    """``DRYDOCS_DATA_ROOT`` is unset or empty — G81 (d): never a silent default.
+
+    SUBCLASSES the generic unset-variable error rather than being replaced by it
+    (G128 clause (a), decided before any resolver moved). The specific type is
+    load-bearing at two catch sites — ``drydocs/cli.py`` and
+    ``drydocs/cli_ingest.py`` both catch THIS type to print the data root's own
+    remediation. Collapsing every unset variable into one type would have made
+    an unset ``NEO4J_PASSWORD`` print a message about the data root, which is a
+    regression wearing a refactor's clothes. Subclassing keeps
+    ``except UnsetVariableError`` working as the family catch while the specific
+    handler stays specific.
+    """
 
 
 def resolve_data_root() -> Path:
@@ -80,7 +92,7 @@ def resolve_data_root() -> Path:
     it is what an operator should usually point the variable at, and what the
     error message suggests — but nothing resolves to it implicitly.
     """
-    raw = os.environ.get(DATA_ROOT_ENV, "").strip()
+    raw, _ = resolve_optional(DATA_ROOT_ENV, where="resolve_data_root()")
     if not raw:
         raise DataRootNotSetError(
             f"{DATA_ROOT_ENV} is not set. Every source drop and every output the "

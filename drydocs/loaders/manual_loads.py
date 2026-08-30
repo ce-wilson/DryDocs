@@ -56,9 +56,13 @@ def mapping_rows(
     (drydocs_core.mapping_store) — validation is the same chain either way.
     Set DRYDOCS_MAPPING_READ=yaml to force the legacy direct-CSV path
     (the M1 fallback; parity is test-guarded)."""
-    import os
+    # G128: read through the declared list rather than a local os.environ call,
+    # so this variable is enumerable. "db" stays the effective default -- it is
+    # the code's choice here, not a syntax-level fallback the expander supplies.
+    from drydocs_core.env_refs import resolve_optional
 
-    if os.environ.get("DRYDOCS_MAPPING_READ", "db").lower() == "yaml":
+    mode, _ = resolve_optional("DRYDOCS_MAPPING_READ", where="manual_loads")
+    if (mode or "db").lower() == "yaml":
         return parse_mapping_csv(
             csv_path, manifest_path=manifest_path, vocabulary_path=vocabulary_path
         )

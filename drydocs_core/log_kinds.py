@@ -100,9 +100,22 @@ def resolve_env_override(env_name: str | None) -> Path | None:
     resolvers cannot drift apart on what "set" means (blank/whitespace-only
     counts as unset in both places, per G111).
     """
-    if env_name and os.environ.get(env_name, "").strip():
-        return Path(os.environ[env_name].strip())
-    return None
+    # G128, AND WHY THE DECLARED-LIST CHECK IS *NOT* HERE. The first attempt
+    # raised from this function when `env_name` was in no DECLARED_VARIABLES
+    # entry, and it broke `test_resolve_honors_env_when_set_and_falls_back_...`,
+    # which drives the mechanism with a synthetic probe (`DRYDOCS_G111_PROBE`).
+    # That test is right and the guard was in the wrong place: this function
+    # answers "is this NAME set", and a caller passing a name of its own is a
+    # legitimate use. What must reference only declared variables is a COMMITTED
+    # DECLARATION -- config/log-kinds.yaml's root and every `env:` in
+    # config/data-zones.yaml -- so the check lives in
+    # tests/unit/test_env_refs_migration.py over those files. Clause (d) says
+    # stop rather than weaken a guard to fit the migration; this is that, and the
+    # test it would have forced me to relax stayed exactly as it was.
+    if not env_name:
+        return None
+    raw = os.environ.get(env_name, "").strip()
+    return Path(raw) if raw else None
 
 
 def resolve_root(path: Path | None = None, *, default: Path | None = None) -> Path:
@@ -127,15 +140,24 @@ def resolve_root(path: Path | None = None, *, default: Path | None = None) -> Pa
     override = resolve_env_override(env_name)
     if override is not None:
         return override
-    if legacy and os.environ.get(legacy, "").strip():
-        warnings.warn(
-            f"{legacy} is deprecated and is honored for one more cycle — set "
-            f"{env_name} instead (ADR 0014 clause 1; the removal trigger is the "
-            "next port after that ADR was accepted).",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return Path(os.environ[legacy].strip())
+    if legacy:
+        # G128: the legacy alias is ALSO declared -- on the primary variable's
+        # `aliases` tuple in env_refs -- so reading it through the declared list
+        # is what keeps the two declarations (config/log-kinds.yaml's
+        # `legacy_env` and the EnvVar alias) from drifting. The agreement itself
+        # is guarded in tests/unit/test_env_refs_migration.py.
+        from drydocs_core.env_refs import resolve_optional
+
+        raw, which = resolve_optional(env_name, where="log-kinds root")
+        if raw is not None and which == legacy:
+            warnings.warn(
+                f"{legacy} is deprecated and is honored for one more cycle — set "
+                f"{env_name} instead (ADR 0014 clause 1; the removal trigger is the "
+                "next port after that ADR was accepted).",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return Path(raw)
 
     if default is not None:
         # The caller's own default wins the LAST branch only. run_log passes
