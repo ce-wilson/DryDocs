@@ -360,6 +360,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-221`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+  **The missing surface may be an MCP SERVER, not a UI — for Jira, for Confluence, or for data
+  registrations themselves.** User capture, 2026-08-30, against [[Idea-220]]: DataHub's UI turned
+  out to have no model of its own (it stores the recipe as an opaque string), so the honest cost of
+  the no-UI posture is only a scheduler and a validating form. An MCP server is a third option that
+  was not in that comparison — it is not a UI and not raw YAML editing, but a typed tool surface an
+  agent drives, which fits a repo where the operator is already working through an agent in the
+  editor. THREE CANDIDATES, and they are not the same kind of thing: (a) DATA REGISTRATIONS — tools
+  to register/validate/inspect a source-registry row, which is the one that fills the [[Idea-220]]
+  gap directly, and the validating-form half of it is `test_connection`-shaped (a typed report,
+  reachability plus per-capability verdicts); (b) JIRA — a seam already exists,
+  `drydocs_remediation/jira.py` (the remediation handoff, G3); (c) CONFLUENCE — the publisher is
+  machine-local at `internal-local/confluence/`, smoke-validated 2026-07-07 against the personal
+  instance. PRECEDENT IN-REPO: the graph is already reached this way (`neo4j-drydocs` MCP server),
+  so the pattern is established rather than new. THINGS THAT WOULD HAVE TO BE RULED before any of
+  this is built, none of them decided here: whether an MCP tool may WRITE a committed config file
+  or only propose a diff (the HITL gate question, and G126's read-zone ruling is the nearest
+  precedent); whether registration tools bypass the gate that `confirmed` exists to hold; and where
+  such a server would live under MODULE_MAP (a component, never core). Related [[Idea-220]],
+  [[Idea-218]].
+
 - **`Idea-220`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **Source-side database configuration is a SINGLETON and ADR 0017 never says so; and the
   editor-first posture it assumes is DataHub's own canonical path, which the ADR also never says.**
