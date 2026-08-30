@@ -415,7 +415,34 @@ question a 1,000-line file with the trail at the bottom could not answer.
   right for observed pipeline lineage and wrong here, because a DryDocs dataset row is a GOVERNED
   REGISTRATION carrying `confirmed`, a gate, a classification and a loader binding — all of which
   must differ between the two extracts. Take OL's predicate grammar; leave its identity decision.
-  Related [[Idea-216]], [[Idea-215]].
+  CANDIDATE CONSIDERED AND ARGUED AGAINST (user proposal, 2026-08-30):
+  `[taxonomy].{origin}@{db}.{schema}.{table}`. It does disambiguate THIS case and it makes the
+  subject visible in the id, which is a real merit against [[Idea-216]]. Four arguments against.
+  (a) It disambiguates by accident, not by construction — it works only because employees and
+  functional accounts happen to fall in different categories; two extracts from one table in the
+  SAME category (active vs terminated employees, per-LOB splits) collide again, so it solves the
+  instance and not the class, and it encodes a CONSEQUENCE of the filter rather than the filter.
+  (b) It puts a mutable judgement in an immutable identifier: `taxonomy_category` is a ruling that
+  changes (the mis-layered `dpl` row is live, and [[Idea-216]] proposes re-deriving the whole
+  axis), so every re-classification becomes an id migration through `retired:`/`replaced_by` —
+  the cost ADR 0017 clause 1 explicitly declined for the INSTANCE axis, and worse here, because
+  instance coordinates change rarely while classifications change whenever an SME rules. (c) It
+  duplicates a field that already exists on the row and creates a way for the two to disagree; a
+  guard asserting prefix == field would prove the segment carries no information (derivable =
+  redundant, divergent = defect, no third option). (d) Every precedent puts LOCATION in identity
+  and MEANING in metadata — OpenLineage's (namespace, name) are both pure location with
+  classification in facets, DataHub's URN is platform+name+env, and ours is origin @ qualified
+  locator; a taxonomy prefix would be the first semantic segment in any of them. Cost if adopted:
+  all 30 ids change, plus 83 `source_id` references, the overlay, the retired list, the derived
+  URNs, every gate citing an id, and the company port. PREFERRED SHAPE instead — a subset
+  qualifier naming the PREDICATE rather than its classification, e.g.
+  `hr@spiderdb.psgmgr.hr_phone_exp#employees` and `...#functional-accounts`: it keeps the
+  grammar's own rule intact (the locator is still exactly `spiderdb.psgmgr.hr_phone_exp` and the
+  fragment is visibly not part of it), it is stable under re-classification, and it names what
+  actually differs. Verified there is NO charset/regex validation on dataset ids — they are free
+  strings checked only for membership and retirement — so the separator choice is a design
+  question, not a code constraint. Migration precedent exists: `retired.replaced_by` is a LIST and
+  `controlm-psgmgr` -> 7 ids is the standing 1->many case. Related [[Idea-216]], [[Idea-215]].
 
 - **`Idea-215`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **ADR 0017 clause 2 keys the source binding per `origin`, and for the registry's largest origin
