@@ -360,6 +360,56 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-218`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+  **ADR 0017 clause 1 cites DataHub for a deferral DataHub did not make, and the ceiling it records
+  is in the wrong artifact.** Fourth-pass review, evidence in
+  `docs/design/datahub-substrate-review.md` (Rev 1); venue = this desktop, DataHub clone HEAD
+  `dea0f9c1` 2026-08-30, seven decisive claims re-derived. (a) THE MECHANISM: clause 1 says the
+  three-part-key ceiling was fixed with a `dataPlatformInstance` aspect, and concludes the eventual
+  DryDocs fix is therefore "a configuration change rather than an id migration". `platform_instance`
+  is NOT a fourth key component — `DatasetUrn.createFromUrn` still throws on `key.size() != 3`, and
+  the instance is concatenated into the URN name (`avro_codegen.py:516`), so adding one CHANGES the
+  dataset's identity. DataHub's fix WAS an id migration, and its connection-shaped object
+  (`dataHubConnection`) could not absorb the instance because identity is not resolvable through
+  configuration. The ruling may still stand; the reason given does not — the migration is
+  DEFERRED, not AVOIDED. (b) THE REAL CEILING: clause 1 points at `[db]` in the committed id string,
+  but `[db]` is a redaction in a string no code keys on. `SourceEntry.urn` derives
+  `({carrier},{artifact},prod)` — dropping the database AND the schema. Measured at main: 30 rows,
+  30 distinct URNs, so nothing is broken yet, but the key is (carrier, bare table name, prod) and
+  `psgmgr` already carries three origins, `snowflake` two. DataHub's URN name was always the FULLY
+  QUALIFIED native name (verified in the Snowflake connector), so DataHub was one axis short;
+  DryDocs is three. Consequence for the pending grammar work: un-redacting `[db]`/`[schema]` in ids
+  does nothing for the URN unless `SourceEntry.urn` changes in the same commit. (c) CLAUSE 3 RIDER:
+  DataHub's `${VAR}` expander is bash-style and supports `${VAR:-default}` — adopting the syntax as
+  cited puts G81 (d)'s silent-default behavior back at the SYNTAX level, where the one expansion
+  function cannot see it; the expander must substitute and REFUSE defaults. Also three backends with
+  a stated precedence (DataHub > File > Environment), so a second backend needs one stated
+  precedence added to clause 3's list. (d) CLAUSE 4 CORROBORATED + a cost: `dataHubConnection` IS
+  the Purview shape shipped, standalone by construction — and NOTHING links it to the datasets it
+  serves, which is the same un-enumerable defect ADR 0017 opens with. Clause 4 should declare the
+  reference direction and its guard. (e) CLAUSE 5: better example available — the encryption key
+  falls back to the literal string `ENCRYPTION_KEY` (`application.yaml:173`), so setting it
+  correctly later is what breaks decryption; sharper than the demo account. (f) NEW PROPERTY WORTH
+  RECORDING: neither peer has a normative prohibition on credentials in an identifier, and DataHub
+  has no sanitizer in either language (zero-hit Java sweep re-derived) — DryDocs HAS the stated rule
+  and no enforcement, the one substrate property where the peers are behind. Related [[Idea-215]],
+  [[G125]], [[N10]].
+
+- **`Idea-219`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+  **Replica-ness is recorded three times in the registry and as no EDGE — DataHub rules that the
+  typed derivation edge is the answer and the aliasing mechanism is an anti-pattern.** Today
+  `origin != system` (the id shape), `authority: ADS`, and prose in `notes` all say "this is a
+  copy"; all three are attributes and none is traversable, so no query can walk replica -> origin.
+  DataHub's ruling (research report `D-04`): use `Upstream{type=COPY}` (released 2020-05-21,
+  patchable one edge at a time), never `Siblings` — because `Siblings` asserts "these are the same
+  thing" and `SiblingGraphService` ACTIVELY DELETES any lineage relationship between two siblings
+  from the default merged read path, destroying the very fact being recorded. Second half of their
+  ruling worth carrying: record the HOW redundantly, because the lineage TYPE does not survive graph
+  traversal on any of their four read paths. Minting a derivation relationship type here is an
+  ontology decision — `docs/RELATIONSHIP_GUIDE.md` plus the relationship-vocabulary registry plus
+  the HITL gate, `status: planned` first — so this is inboxed, not proposed. Evidence:
+  `docs/design/datahub-substrate-review.md` anchor `replica-note`. Related [[Idea-218]].
+
 - **`Idea-216`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
   **The BDAT `layer` is a property of the SYSTEM, so it records where an extract came FROM, not
   what it is ABOUT — which is why `human` is structurally unreachable rather than merely unused.**

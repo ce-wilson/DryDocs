@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataHub substrate review — reading the source behind ADR 0017&#x27;s other four citations</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>DataHub substrate review — reading the source behind ADR 0017&#x27;s other four citations</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Scope:</strong> the FOURTH pass, and the companion to <code>openlineage-substrate-review.md</code>. That review closed by saying &quot;clauses 3, 4 and 5 rest on DataHub, OpenMetadata and Purview and are untouched by any of this.&quot; This is the pass that touches them. Its question is the same narrow one: <strong>ADR 0017 cites DataHub four times — are those citations right?</strong></li><li><strong>Status:</strong> DESCRIPTIVE — <strong>Rev 1, 2026-08-30.</strong> This review rules nothing. ADR 0017 is PROPOSED and its acceptance is the user&#x27;s; G125 stays <code>todo</code>.</li><li><strong>Classification:</strong> External reasoning over Internal-Public context. Every fact about DataHub is public and Apache-2.0; every fact about DryDocs is read from <code>config/source-registry.yaml</code> and <code>drydocs_core/source_registry.py</code>, both already committed. No connection coordinate appears here.</li><li><strong>Companion:</strong> <code>docs/design/openlineage-substrate-review.md</code> (the third pass), <code>docs/design/catalog-substrate-review.md</code> (the survey ADR 0017 rules on), <code>docs/decisions/0017-source-binding-substrate.md</code>.</li><li><strong>Verification venue (J18):</strong> this desktop, <code>C:\coding\projects\datahub</code>, cloned 2026-08-30 (<code>--depth 1 --filter=blob:none</code>). HEAD <code>dea0f9c1</code>, commit date 2026-08-30, licence Apache-2.0. The OpenLineage clone at <code>C:\coding\projects\OpenLineage</code> HEAD <code>b995ee00</code> is re-used for the method check below. Counts over DryDocs come from <code>poetry run python</code> against the registry at <code>main</code>, not from reading YAML by eye.</li><li><strong>Second source:</strong> <code>ce-wilson/research</code>, <code>scratchpad/research/reports/</code> <code>datahub-datasource-onboarding-model-analysis.md</code> — a 925-line analysis pinned to DataHub <code>7d5cedd5f8</code> (2026-08-28), reporting 312 claims of which 229 were confirmed, 47 corrected and 1 refuted under adversarial re-verification. Its claim ids (<code>C-nn</code>, <code>D-nn</code>, <code>R-nn</code>) are cited below. <strong>Seven of its decisive claims were re-derived here against a clone taken two days later; all seven reproduced.</strong> Claims not re-derived are marked as such.</li></ul>
+<h2 id="bottom-line"><span class="dd-margin-tag" aria-hidden="true">bottom-line</span>Bottom line</h2>
+<p><strong>Two of ADR 0017&#x27;s four DataHub citations are corroborated and made stronger. One is right in shape but incomplete in a way that would re-introduce a defect the repo has already fixed. One is wrong in the direction that matters most, and it is the clause the whole deferral rests on.</strong></p>
+<p>Clause 1 says DataHub&#x27;s three-part-key ceiling was fixed with a <code>dataPlatformInstance</code> aspect, and concludes that DryDocs can therefore defer its own instance axis because &quot;the binding table is where an instance coordinate goes when something needs it, which makes the eventual answer a configuration change rather than an id migration.&quot; <strong>DataHub did not do that.</strong> <code>platform_instance</code> is not a fourth key component; it is concatenated into the URN&#x27;s <code>name</code>, so adding one <strong>changes the dataset&#x27;s identity</strong>. DataHub&#x27;s fix <em>was</em> an id migration. The escape hatch clause 1 promises has no precedent in the product cited for it.</p>
+<p><strong>And the ceiling is lower than clause 1 records, in a place the clause does not look.</strong> Clause 1 points at <code>[db]</code> in the committed id string. But <code>[db]</code> is a redaction inside a string no code keys on, whereas <code>SourceEntry.urn</code> derives <code>({carrier},{artifact},prod)</code> — which drops the database <strong>and the schema</strong>. DataHub&#x27;s URN name was always the fully qualified native name, so DataHub was missing exactly one axis. DryDocs&#x27;s derived URN is missing three.</p>
+<p>Clause 3&#x27;s <code>${VAR}</code> shape is correct and worth keeping, but DataHub&#x27;s expander is bash-style and supports <code>${VAR:-default}</code> — adopting the syntax as cited would re-introduce, at the syntax level, the exact silent-default behavior G81 clause (d) removed. Clauses 4 and 5 are corroborated, each with a better example than the one the ADR uses.</p>
+<h2 id="what-datahub-implements"><span class="dd-margin-tag" aria-hidden="true">what-datahub-implements</span>What DataHub actually implements</h2>
+<p>Four mechanisms matter here, and they are separate objects by construction rather than by convention.</p>
+<table><thead><tr><th>Concern</th><th>Mechanism</th><th>Shape</th></tr></thead><tbody><tr><td>Identity</td><td><code>datasetKey</code> → <code>DatasetUrn(platform, name, origin)</code></td><td>exactly three components, enforced</td></tr><tr><td>Instance</td><td><code>platform_instance</code></td><td><strong>concatenated into <code>name</code></strong>, not a fourth component</td></tr><tr><td>Credential</td><td><code>dataHubSecret</code> + <code>dataHubConnection</code></td><td>standalone entities, AES-256-GCM, no link to any dataset</td></tr><tr><td>Reference</td><td><code>${VAR}</code> in a recipe</td><td>resolved at job time, three backends, bash-style defaults</td></tr></tbody></table>
+<p>The identity/access split is real and structural: no shipped identifier builder in either language accepts a credential (<code>C-32</code>), and the connection entity declares no relationship to anything (<code>C-40</code>).</p>
+<h2 id="finding-1"><span class="dd-margin-tag" aria-hidden="true">finding-1</span>Finding 1 — clause 1 cites DataHub for a deferral DataHub did not make</h2>
+<p>ADR 0017 clause 1 is right that the ceiling exists and right that DataHub hit it. It is wrong about the shape of the fix, and the ADR&#x27;s own conclusion depends on that shape.</p>
+<p>Verified at HEAD, not taken from the report:</p>
+<ul><li><code>DatasetUrn.createFromUrn</code> still throws on <code>key.size() != 3</code> (<code>li-utils/src/main/javaPegasus/com/linkedin/common/urn/DatasetUrn.java</code>). The key was never widened.</li><li>The instance is folded into the name: <code>name=f&quot;{platform_instance}.{table_name}&quot; if platform_instance else table_name</code> (<code>metadata-ingestion/scripts/avro_codegen.py:516</code>, with the same pattern at :460, :560 and :575 for flows, charts and dashboards).</li><li>The aspect that looks like the answer is not one: <code>DataPlatformInstance</code> declares zero <code>@Relationship</code> annotations (<code>C-45</code>, not re-derived here), so instance grouping is a search facet and cannot be traversed.</li></ul>
+<p>So the sequence was: the key stayed at three, the instance went into the identifier, and every already-ingested dataset that later gained a platform instance <strong>became a different dataset</strong>. That is the id migration clause 1 says the binding table lets DryDocs avoid.</p>
+<p><strong>What this changes about the clause.</strong> The ruling — record the ceiling, do not mint the axis — may well still be right; deferring a migration with no current benefit is defensible on its own terms. What is not supported is the <em>reason given</em>: that a binding table converts the eventual fix into a configuration change. DataHub had a connection-shaped object available (<code>dataHubConnection</code>) and still could not put the instance there, because identity is not resolvable through configuration — an identifier either distinguishes two things or it does not. The accurate form of the clause is that the migration is <strong>deferred</strong>, not <strong>avoided</strong>, and the trigger paragraph at the end of the ADR already names when it comes due.</p>
+<h2 id="finding-2"><span class="dd-margin-tag" aria-hidden="true">finding-2</span>Finding 2 — the ceiling is in the derived URN, not in <code>[db]</code></h2>
+<p>DryDocs carries <strong>two</strong> identifiers with different keys, and clause 1 examines only one.</p>
+<table><thead><tr><th></th><th>Parts</th><th>Example</th></tr></thead><tbody><tr><td>Committed dataset id</td><td><code>{origin}@{db}.{schema}.{table}</code></td><td><code>controlm@[db].psgmgr.cm_def_vtab</code></td></tr><tr><td>Derived URN (<code>source_registry.py:127-135</code>)</td><td><code>({carrier},{artifact},prod)</code></td><td><code>urn:drydocs:dataset:(psgmgr,cm_def_vtab,prod)</code></td></tr></tbody></table>
+<p>The URN drops the database <strong>and the schema</strong>. Measured live at <code>main</code>: 30 dataset rows, 30 distinct URNs — nothing is broken today. But the key is (carrier, bare table name, <code>prod</code>), so the first collision arrives with <strong>a second schema on one carrier holding a same-named table</strong>, and two carriers are already one table name away from it: <code>psgmgr</code> carries three origins (<code>controlm</code>, <code>hr</code>, <code>seal</code>) and <code>snowflake</code> carries two (<code>catalog</code>, <code>snowflake</code>).</p>
+<p><strong>The comparison the ADR draws is therefore too generous to DryDocs.</strong> DataHub&#x27;s URN <code>name</code> is the fully qualified native name — verified in the Snowflake connector, which builds it from <code>table_name</code>, <code>schema_name</code> and <code>db_name</code> together (<code>metadata-ingestion/src/datahub/ingestion/source/snowflake/snowflake_utils.py:466-472</code>). DataHub before the <code>platform_instance</code> work was missing <strong>one</strong> axis. DryDocs&#x27;s derived URN is missing <strong>three</strong>: instance, database and schema.</p>
+<p>Two consequences worth stating plainly:</p>
+<ol><li><code>[db]</code> is a redaction inside a string. No code keys on it. The URN is what a loader and the graph key on, and the redaction debate has never reached it.</li><li>The pending grammar work — un-redacting <code>[db]</code> and <code>[schema]</code> in committed ids — does <strong>nothing</strong> for the URN unless <code>SourceEntry.urn</code> changes in the same commit. A registry whose ids are precise and whose URNs are not is the worse of the two states, because the imprecise identifier is the one that gets written into the graph.</li></ol>
+<h2 id="finding-3"><span class="dd-margin-tag" aria-hidden="true">finding-3</span>Finding 3 — clause 3&#x27;s <code>${VAR}</code> is the right shape and the wrong expander</h2>
+<p>Clause 3 says: &quot;DataHub&#x27;s recipes write <code>password: ${MSSQL_PASSWORD}</code> and expand at load, so the file is committable and the secret never is. That is the shape adopted here.&quot; The shape is right and the citation is accurate. Two properties of the real expander are not stated, and both matter.</p>
+<p><strong>It resolves from three backends with a precedence order, and the committed file does not say which one answered.</strong> <code>docs/secret-resolution.md:53</code>: <em>&quot;All backends are checked and values are merged. If the same secret exists in multiple backends, <strong>DataHub</strong> takes precedence over <strong>File</strong>, which takes precedence over <strong>Environment</strong>.&quot;</em> DryDocs has one backend today, so this is a warning rather than a defect: if a second ever arrives, clause 3&#x27;s &quot;one expansion function, one error, one enumerable list&quot; needs a fourth item — <em>one stated precedence</em> — or the enumerable list stops telling an operator which value is live.</p>
+<p><strong>It is bash-style, and bash-style includes defaults.</strong> <code>${VAR:-default}</code> uses the default when <code>VAR</code> is unset or empty; <code>${VAR-default}</code> when unset (<code>docs/secret-resolution.md:34-41</code>). There is also a documented trap: <code>${DB-PASSWORD}</code> parses as <em>&quot;variable <code>DB</code>, with default <code>PASSWORD</code>&quot;</em> (:25-28) — harmless here, since DryDocs variable names use underscores.</p>
+<p>The default operator is not harmless. <strong>G81 clause (d) ruled that an unset data root must FAIL rather than silently relocate</strong>, and clause 3 names G81 (d) as something it makes implementable in one place instead of seven. Adopting DataHub&#x27;s expansion syntax verbatim would put the silent-default behavior back at the syntax level, where the one expansion function cannot see it — the committed YAML would carry the fallback, not the code. The rider is one sentence: <strong>the expander substitutes and refuses defaults</strong>; an unset variable is an error naming the variable and the row that wanted it.</p>
+<h2 id="finding-4"><span class="dd-margin-tag" aria-hidden="true">finding-4</span>Finding 4 — clause 4 is corroborated by a closer precedent, and DataHub also shows its cost</h2>
+<p>Clause 4 rules for &quot;the Purview shape&quot; — a credential as a first-class named object referenced by many rows — over OpenMetadata&#x27;s derived-path shape. DataHub implements the Purview shape too, and the ADR does not cite it for this.</p>
+<p>Verified: <code>metadata-models/src/main/pegasus/com/linkedin/connection/</code> contains exactly <code>DataHubConnectionDetails.pdl</code> and <code>DataHubJsonConnection.pdl</code>, and a relationship sweep over that directory returns nothing. The connection is keyed by an opaque id, carries only its details plus a platform instance, and its upsert input accepts no dataset URN (<code>C-40</code>). Identity and access are separated <strong>by construction in the model, not by convention</strong> — which is the ruling clause 4 makes, shipped and released.</p>
+<p><strong>And the cost is visible in the same place.</strong> Nothing links a connection to the datasets it serves. <code>DataPlatformInstanceProperties</code> declares no relationship either (<code>C-67</code>, not re-derived), and the research report&#x27;s open question 9 records that the secret-resolution documentation never says whether a recipe can reference a connection by URN at all — recipes reference <em>secrets</em> by <code>${NAME}</code>, and the connection entity sits beside that path rather than in it.</p>
+<p>A profile that nothing references is a profile nothing can audit. That is the defect ADR 0017 opens with — <em>&quot;a source nobody can enumerate is a source nobody can audit, back up, or move&quot;</em> — so the ADR would be adopting the shape and inheriting the hole. The rider: <strong>clause 4 declares the reference direction as part of the ruling.</strong> The registry row names its profile; a guard fails a row naming a profile that does not exist, and reports a profile no row names. DataHub&#x27;s omission is the argument for writing it down rather than assuming it.</p>
+<h2 id="finding-5"><span class="dd-margin-tag" aria-hidden="true">finding-5</span>Finding 5 — clause 5 is right, and its stronger example is one line away</h2>
+<p>Clause 5 records fresh-clone-has-no-credential as a property, citing DataHub&#x27;s shipped <code>datahub:datahub</code> account. That example is real. The better one is the encryption key.</p>
+<p>Verified at HEAD, <code>metadata-service/configuration/src/main/resources/application.yaml:173</code>:</p>
+<pre><code>encryptionKey: &quot;#{systemEnvironment[&#x27;SECRET_SERVICE_ENCRYPTION_KEY&#x27;] ?: &#x27;ENCRYPTION_KEY&#x27;}&quot;</code></pre>
+<p>The fallback is the literal string <code>ENCRYPTION_KEY</code>. Per the research report (<code>R-03</code>/<code>C-148</code>, the surrounding details not re-derived here): HMAC-derived, no salt, no key id, no rotation tooling — so an installation that never set the variable has been encrypting every stored secret under a publicly known key, and <em>correctly setting</em> the key later is the action that breaks decryption of everything already stored.</p>
+<p>This is the same class as the demo account and a sharper instance of it: a shipped default that works, that nothing forces anyone to change, and whose correction is itself a breaking change. It is worth substituting into clause 5 because it answers the objection the demo account invites — &quot;we would obviously change that&quot; — with a case where the obvious fix is the destructive one.</p>
+<p>Clause 5&#x27;s ruling is unaffected and holds: DryDocs ships no credential, every login on a fresh clone is refused, and the refusal names the bootstrap script.</p>
+<h2 id="finding-6"><span class="dd-margin-tag" aria-hidden="true">finding-6</span>Finding 6 — the one place DryDocs leads both peers, and it is unenforced</h2>
+<p>Across the two source reviews, this is the finding no ADR clause covers.</p>
+<ul><li>DataHub has <strong>no normative prohibition</strong> on credentials in an identifier. Two documentation sweeps for a rule return nothing prohibitive; the exclusion is <em>&quot;an accident of API shape, not a stated rule&quot;</em> (<code>C-33</code>, not re-derived). The only reserved characters in a dataset name are <code>(</code>, <code>)</code>, <code>,</code> and the unit separator — <code>@ : / = ?</code> are all legal (<code>C-35</code>).</li><li>DataHub has <strong>no shared sanitizer in either language</strong>. The negative sweep re-derived here — <code>grep -rn &quot;removePassword\|stripCredential\|maskPassword\|scrubUrl\|sanitizeUrl\|sanitizeJdbc&quot; --include=*.java .</code> — returns <strong>zero hits</strong> at HEAD. Python has only ad-hoc per-connector helpers.</li><li>OpenLineage, per the third pass, has <code>JdbcUrlSanitizer</code> in Java with tests, and nothing in Python.</li></ul>
+<p>So across both peers there is exactly <strong>one</strong> implementation of the guard and <strong>no</strong> stated rule anywhere. DryDocs is the inverse: it has the stated rule — the registered-ids rule and the internal twin, with the discriminator <em>could someone connect with this string alone?</em> — and no enforcement at all.</p>
+<p>Two things follow. First, the OpenLineage review&#x27;s scaffolding item 1 (port those regexes to Python) is not one option among two; it is the only implementation that exists in either peer, and the research report says so directly, calling DataHub&#x27;s side <em>&quot;net-new code, not a port&quot;</em> (<code>R-09</code>). Second, the rule itself is worth recording in ADR 0017 the way clause 5 records the fresh-clone default — as a property this system holds that a later convenience commit could quietly remove — because it is the one substrate property where the peers are behind.</p>
+<h2 id="method-check"><span class="dd-margin-tag" aria-hidden="true">method-check</span>Method check — the report&#x27;s §0 correction does not travel to the third pass</h2>
+<p>The research report opens by invalidating its own prescribed maturity test: <code>git tag --contains</code> produces false negatives in DataHub, because releases are cut on long-lived branches that are never merged back, so <code>v1.7.0</code> is not an ancestor of master and <code>v1.6.0.1</code> is dated nine days <em>after</em> it.</p>
+<p>The third pass (OpenLineage) used exactly that test to grade <code>LineageDatasetFacet</code> as merged but unreleased. So the correction has to be checked against that repo rather than assumed either way. Re-derived on this desktop: in <code>C:\coding\projects\OpenLineage</code>, <code>git merge-base --is-ancestor 1.52.0 HEAD</code> returns <strong>true</strong>. Tags there are ancestors of the mainline, the test is valid, and the OpenLineage release-status findings stand unchanged.</p>
+<p>Recorded because a reader moving between the two documents would reasonably assume a method correction in one applies to both.</p>
+<h2 id="replica-note"><span class="dd-margin-tag" aria-hidden="true">replica-note</span>Outside ADR 0017&#x27;s scope, but the registry&#x27;s own case</h2>
+<p>DataHub&#x27;s model answers a question DryDocs asks constantly and ADR 0017 does not raise: how to record that one dataset is a <strong>copy</strong> of another on a different platform. That is <code>{origin}@{db}.{schema}.{table}</code> with <code>authority: ADS</code>, ten times over on <code>psgmgr</code> alone.</p>
+<p>DataHub&#x27;s ruling (<code>D-04</code>) is to use the typed lineage edge <code>Upstream{type=COPY}</code> — released 2020-05-21, patchable one edge at a time — and never the aliasing mechanism. Its reason is worth carrying: <code>Siblings</code> asserts <em>&quot;these are the same thing&quot;</em>, and <code>SiblingGraphService</code> <strong>actively deletes any lineage relationship between two siblings</strong> from the merged read path, which is the default (<code>C-58</code>/<code>C-59</code>, the report&#x27;s own highest-value verification item; not re-derived here). Using the aliasing mechanism destroys the fact being recorded.</p>
+<p>DryDocs today records replica-ness three ways and as no edge: the id shape (<code>origin != system</code>), the <code>authority: ADS</code> field, and prose in <code>notes</code>. All three are attributes; none is traversable. Minting a derivation edge is an ontology decision that goes through <code>docs/RELATIONSHIP_GUIDE.md</code> and the HITL gate, so nothing here proposes one. It is inboxed rather than ruled.</p>
+<h2 id="what-changes"><span class="dd-margin-tag" aria-hidden="true">what-changes</span>What would change, if the user rules this way</h2>
+<p>Nothing in this document changes code, and nothing in it has been applied.</p>
+<table><thead><tr><th>#</th><th>Where</th><th>Change</th></tr></thead><tbody><tr><td>1</td><td>ADR 0017 clause 1</td><td>Correct the mechanism: <code>platform_instance</code> is concatenated into the URN name, not a fourth key part, so DataHub&#x27;s fix WAS an id migration. Restate the ruling as deferral, not avoidance.</td></tr><tr><td>2</td><td>ADR 0017 clause 1</td><td>Name the real ceiling — the derived URN drops db and schema, so DryDocs is three axes short where DataHub was one. Pair any id un-redaction with <code>SourceEntry.urn</code>.</td></tr><tr><td>3</td><td>ADR 0017 clause 3</td><td>Add the rider: the expander substitutes and REFUSES defaults (G81 (d) at the syntax level), and if a second backend ever exists, one stated precedence.</td></tr><tr><td>4</td><td>ADR 0017 clause 4</td><td>Cite <code>dataHubConnection</code> as the shipped precedent, and declare the reference direction plus its guard, which DataHub omits.</td></tr><tr><td>5</td><td>ADR 0017 clause 5</td><td>Substitute the <code>ENCRYPTION_KEY</code> fallback for the demo account as the worked example.</td></tr><tr><td>6</td><td>ADR 0017</td><td>Record the registered-ids rule as a held property: both peers lack a normative prohibition, and only one has any implementation.</td></tr><tr><td>7</td><td>IDEAS</td><td>The replica-edge question, for the relationship guide and the HITL gate.</td></tr></tbody></table>
+<h2 id="verification"><span class="dd-margin-tag" aria-hidden="true">verification</span>Verification checklist</h2>
+<p>Each item is a command, so a reader can disagree with evidence rather than with me.</p>
+<ol><li id="verification--cd-c-coding-projects-datahub-git-log-1"><code>cd C:\coding\projects\datahub &amp;&amp; git log -1 --format=%H</code> — expect <code>dea0f9c1</code>, 2026-08-30.</li><li id="verification--sed-n-46-56p-li-utils-src-main-javapegas"><code>sed -n &#x27;46,56p&#x27; li-utils/src/main/javaPegasus/com/linkedin/common/urn/DatasetUrn.java</code> — expect <code>key.size() != 3</code>.</li><li id="verification--grep-n-platform-instance-metadata-ingest"><code>grep -n &#x27;platform_instance}\.&#x27; metadata-ingestion/scripts/avro_codegen.py</code> — expect the name concatenation at :516 (and :460, :560, :575).</li><li id="verification--grep-n-def-get-dataset-identifier-a6-met"><code>grep -n &#x27;def get_dataset_identifier&#x27; -A6 metadata-ingestion/src/datahub/ingestion/source/snowflake/snowflake_utils.py</code> — expect <code>table_name</code>, <code>schema_name</code> and <code>db_name</code> combined.</li><li id="verification--grep-rn-removepassword-stripcredential-m"><code>grep -rn &quot;removePassword\|stripCredential\|maskPassword\|scrubUrl\|sanitizeUrl\|sanitizeJdbc&quot; --include=*.java .</code> — expect zero hits.</li><li id="verification--grep-n-encryptionkey-metadata-service-co"><code>grep -n encryptionKey metadata-service/configuration/src/main/resources/application.yaml</code> — expect the <code>?: &#x27;ENCRYPTION_KEY&#x27;</code> fallback at :173.</li><li id="verification--sed-n-25-55p-docs-secret-resolution-md-e"><code>sed -n &#x27;25,55p&#x27; docs/secret-resolution.md</code> — expect the hyphen caution, the bash default table and the DataHub &gt; File &gt; Environment precedence line.</li><li id="verification--ls-metadata-models-src-main-pegasus-com"><code>ls metadata-models/src/main/pegasus/com/linkedin/connection/</code> — expect two files, and a relationship sweep of that directory to return nothing.</li><li id="verification--cd-c-coding-projects-openlineage-git-mer"><code>cd C:\coding\projects\OpenLineage &amp;&amp; git merge-base --is-ancestor 1.52.0 HEAD</code> — expect exit 0, which is what keeps the third pass&#x27;s release grades valid.</li><li id="verification--in-drydocs-at-main-build-a">In DryDocs at <code>main</code>: build a <code>SourceRegistry.from_yaml()</code>, take <code>.urn</code> over every <code>source-registry</code> row, and expect 30 rows, 30 distinct URNs, none carrying a database or schema segment.</li></ol>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>datahub-substrate-review-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<script>
+
+(function(){
+  var DOC="datahub-substrate-review", FILE="datahub-substrate-review-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
