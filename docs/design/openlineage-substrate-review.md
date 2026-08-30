@@ -29,10 +29,15 @@ registry it governs is the thing that disproves it.**
 Clause 2 says DryDocs's grammar is "already isomorphic" to OpenLineage's, with `origin` sitting
 where OpenLineage puts the namespace, and concludes that the binding table therefore needs "a row
 per origin." OpenLineage's namespace is a **connection** — `oracle://{host}:{port}`. DryDocs's
-`origin` is a **provenance label** — who produced the data. The registry field that actually
-behaves like a namespace is `system`, and the two are measurably not the same field:
-`origin: controlm` spans **three** different systems, so a per-origin row cannot bind to one
-connection at all.
+`origin` is a **provenance label** — who produced the data. The registry field at the right
+*level* is `system`, and the two are measurably not the same field: `origin: controlm` spans
+**three** different systems, so a per-origin row cannot bind to one connection at all.
+
+**And `system` is at the right level while carrying the wrong value.** `system: psgmgr` names a
+**schema**; the database connection behind it is **`spiderdb`**, which the registry names nowhere
+— it is the token `[db]` redacts in all ten ids, and `locator.service: ~` on the system row. So
+the binding keys on the connection carrier, `spiderdb`, and `system: psgmgr` is a usable proxy
+only for as long as one schema happens to equal one database.
 
 Clause 1's citation holds, but is used to support a deferral OpenLineage itself does not make.
 Clauses 3, 4 and 5 rest on DataHub, OpenMetadata and Purview and are untouched by any of this.
@@ -74,7 +79,7 @@ Two consequences matter here, and they pull in opposite directions:
   nodes won't connect to new ones."
 
 <!-- anchor: finding-1 -->
-## Finding 1 — clause 2 maps `origin` to the namespace; the registry says the namespace is `system`
+## Finding 1 — clause 2 maps `origin` to the namespace; the connection is `spiderdb`
 
 ADR 0017 clause 2, verbatim:
 
@@ -90,11 +95,17 @@ The registry disagrees with the first sentence, and it does so in the row the AD
     origin: controlm
 ```
 
-`origin` is `controlm` — the orchestrator whose data this is. `system` is `psgmgr` — the Oracle
-service you connect to. It is `system` that behaves like an OpenLineage namespace: one place, one
+`origin` is `controlm` — the orchestrator whose data this is. `system` is `psgmgr` — the place it
+was replicated to. It is `system` that sits at the OpenLineage namespace's level: one place, one
 connection, one set of credentials. `origin` answers a question OpenLineage does not ask in the
 identifier at all; its equivalents are the `dataSource` and `ownership` **facets**, which are
 metadata hung off identity, never identity itself.
+
+The registry says as much in its own prose. The `psgmgr` system row's note reads *"The Control-M
+replica database — CARRIER, not origin: Control-M data (origin controlm) and SEAL data (origin
+seal) both land here as replica datasets."* All ten of its datasets carry `authority: ADS` —
+approved copy, never `SOR`. The carrier/origin split is already understood here; clause 2 keys on
+the wrong half of it.
 
 That is not automatically a defect in DryDocs's grammar — it is our grammar, and putting a
 provenance token in the identity position is a defensible choice. What it does mean is that the
@@ -114,7 +125,7 @@ The ADR's "roughly six origins" is arithmetically correct. The problem is not th
 **Two structural facts decide it, and the second one is fatal:**
 
 1. `system: psgmgr` carries three origins — `controlm`, `hr`, `seal`. A per-origin key mints three
-   binding rows for **one** Oracle service, each repeating the same coordinates. That is precisely
+   binding rows for **one** Oracle database, each repeating the same coordinates. That is precisely
    the duplication clause 4 argues against when it chooses Purview's named-profile shape over
    OpenMetadata's derived paths: *"one Oracle account reads eight `psgmgr` views."* Clause 2
    re-fragments the connection that clause 4 exists to share. The ADR contradicts itself across
@@ -123,15 +134,60 @@ The ADR's "roughly six origins" is arithmetically correct. The problem is not th
    origin in the registry has **no single connection to bind to**. A per-origin row is not merely
    redundant here; it is unsatisfiable. `origin: seal` spans two systems and fails the same way.
 
+<!-- anchor: finding-1b -->
+### The `system` value is a schema; the connection is `spiderdb`
+
+Correcting `origin` to `system` fixes the *level* and leaves a second error underneath it,
+recorded here because the binding table is the thing that would inherit it.
+
+**`psgmgr` is a schema inside an Oracle database whose connection name is `spiderdb`.** It is not
+a system of record and it is not a database. The registry already half-knows this — the same
+system row that is *identified* as `psgmgr` also declares `locator.schema: psgmgr` — so one token
+is doing duty as system id and as schema name on the same row, while the database it lives in is
+the redacted `[db]` and the connection is `locator.service: ~`.
+
+Laid against the naming table, the picture resolves cleanly and the missing piece is obvious:
+
+| OpenLineage | Value here | Where it lives in the registry |
+|---|---|---|
+| namespace — `oracle://{host}:{port}` | the Oracle host serving `spiderdb` | nowhere; `locator.service: ~` plus a comment |
+| name — `{serviceName}.{schema}.{table}` | `spiderdb.psgmgr.cm_def_vtab` | `[db].psgmgr.cm_def_vtab` — **only `spiderdb` is missing** |
+
+The corroboration is already committed elsewhere in the repo under the older spelling: the log and
+caller variables `SPIDERP_LOGDIR` / `SPIDERP_CALLER` are kept as deliberate legacy aliases, and
+`libs/oracle_kerberos/spider_login.py` is documented as "a standalone Kerberos external-auth login
+for the **Spider/PSGMGR schema**" — schema, stated as such, in a doc that predates the registry.
+
+**Three consequences, none of them applied here:**
+
+1. **The binding row keys on the connection carrier — `spiderdb` — not on `psgmgr`.** Keying on
+   `system` as it stands works today only because these ten datasets happen to be one schema in
+   one database. A second schema in `spiderdb`, or a `psgmgr` schema in a second database, breaks
+   it silently, and a binding table is precisely the artifact that must not be silently wrong.
+2. **The derived URN currently names a schema as the carrier.** `SourceEntry.urn` builds
+   `urn:drydocs:dataset:({carrier},{artifact},prod)` from `carrier = system`
+   (`drydocs_core/source_registry.py:127-135`), so the ten psgmgr rows derive
+   `urn:drydocs:dataset:(psgmgr,cm_def_vtab,prod)`. Correcting the system id would change ten
+   derived URNs — a real cost, and the reason this is a ruling and not a tidy-up.
+3. **`spiderdb` is the exact test case for the plan's §0.** It is a database *name*: nobody
+   connects with it — that needs the host, port, service and a Kerberos principal. Under the
+   user's standing test it publishes, and OpenLineage puts it in the *name* half, the half
+   designed to be credential-free. The one thing that could flip that is if `spiderdb` is a TNS
+   alias or service name rather than the database name, which would make it a connection
+   coordinate. That distinction is the SME's to state, and it is worth stating on the row rather
+   than leaving the whole database segment redacted to avoid the question.
+
 **Recommended amendment**, for the user's ruling rather than applied: clause 2 keys the binding
-per **SYSTEM**. The rest of the clause survives unchanged — the inheritance-by-datasets shape, the
-"one mechanism, not two" fence with landing zones, and the observation that OpenLineage splits
-connection from object are all still right. Only the field name changes, and the OpenLineage
-argument gets *stronger* under the correction, because `system` really is the namespace.
+per **connection carrier**, which is the level `system` occupies. The rest of the clause survives
+unchanged — the inheritance-by-datasets shape, the "one mechanism, not two" fence with landing
+zones, and the observation that OpenLineage splits connection from object are all still right.
+The counts stay four, three, one and one, because the grouping was never in doubt; what changes is
+which field the row is keyed and named by.
 
 This is the same conclusion the standing plan already reached for G125 ("bind per **SYSTEM**
-(psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1), not per origin"). Two independent routes to
-one answer, and the ADR text is the piece that was never updated to match.
+(psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1), not per origin"), with the schema-versus-
+database correction above riding on top of it. Two independent routes to one answer, and the ADR
+text is the piece that was never updated to match.
 
 <!-- anchor: finding-2 -->
 ## Finding 2 — the `[db]` redaction is backwards, and OpenLineage puts it more sharply than the ADR uses it
@@ -141,14 +197,20 @@ the database a connection coordinate. Measured against the naming table, that is
 
 | Half | OpenLineage | Carries | DryDocs today |
 |---|---|---|---|
-| Name | `{serviceName}.{schema}.{table}` | database, schema, table | `[db].psgmgr.cm_def_vtab` — **database redacted** |
+| Name | `{serviceName}.{schema}.{table}` | database, schema, table | `[db].psgmgr.cm_def_vtab` — **`spiderdb` redacted** |
 | Namespace | `oracle://{host}:{port}` | host, port | undeclared — `locator.service: ~` plus a comment |
 
 DryDocs redacts the half OpenLineage treats as safe by construction, and leaves undeclared the
 half OpenLineage treats as the connection. Note what is left in `controlm@[db].psgmgr.cm_def_vtab`
-after the redaction: `psgmgr` is the **schema** and publishes fine; the single redacted token is
-the database. So the boundary is already being drawn in the right *place* for schema and table,
-and only the database is on the wrong side of it.
+after the redaction: `psgmgr` is the **schema** and publishes fine — the grammar header says so
+outright, exempting it as "established public vocabulary" — and the single redacted token is the
+database, `spiderdb`. So the boundary is already being drawn in the right *place* for schema and
+table, and exactly one segment is on the wrong side of it.
+
+That also makes the grammar's carve-out visible as the ad-hoc thing it is: `psgmgr` publishes
+because someone judged it established vocabulary, while `spiderdb` — the same kind of token, one
+level up, equally unable to connect to anything on its own — is redacted because nobody made that
+judgement for it. A test replaces the judgement; that is the plan's §0.
 
 This corroborates §0 of the standing plan with a citation rather than an argument, and it
 strengthens the user's standing test — *could someone connect with this string alone?* — by
@@ -281,14 +343,18 @@ Ordered by value, each independently checkable.
 1. **Re-run the cardinality measurement.** Load `config/source-registry.yaml`, group the automated
    datasets by `system` and by `origin`, and list any origin spanning more than one system. If
    `controlm` no longer spans three, Finding 1's fatal half is stale — the rest of it is not.
-2. Read `website/docs/spec/naming.md` end to end and look for one namespace form containing
+2. **Confirm what `spiderdb` is** — the Oracle database name, or a TNS alias / service name. The
+   whole of Finding 1b's consequence 3 turns on it: a database name is an identifier and
+   publishes, a service name is a connection coordinate and does not. This is an SME statement,
+   not a repository fact, and nothing here should be read as having settled it.
+3. Read `website/docs/spec/naming.md` end to end and look for one namespace form containing
    userinfo. A single counterexample weakens Finding 2.
-3. `git tag --contains 2cfa2594b` in the clone. Empty today; a tag means the `lineage` facet
+4. `git tag --contains 2cfa2594b` in the clone. Empty today; a tag means the `lineage` facet
    shipped and the "do not take" list needs revisiting.
-4. Confirm `origin` has no OpenLineage counterpart in the identifier by searching the spec for any
+5. Confirm `origin` has no OpenLineage counterpart in the identifier by searching the spec for any
    identity component describing data *provenance* rather than *location*. If one exists, Finding
    1's framing needs adjusting.
-5. Check that `JdbcUrlSanitizer`'s regexes still number five and that no Python equivalent has
+6. Check that `JdbcUrlSanitizer`'s regexes still number five and that no Python equivalent has
    landed, before spending effort on scaffold item 1.
-6. Re-derive the facet `$id` versions before using anything in scaffold item 6. They drift between
+7. Re-derive the facet `$id` versions before using anything in scaffold item 6. They drift between
    releases and this review pins none of them.

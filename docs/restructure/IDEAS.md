@@ -367,23 +367,42 @@ question a 1,000-line file with the trail at the bottom could not answer.
   row per origin. Read at the source (clone at `C:\coding\projects\OpenLineage`, HEAD `b995ee00`,
   Apache-2.0), the OpenLineage namespace is a CONNECTION: `oracle://{host}:{port}`, one shape
   across forty-odd platforms. DryDocs's `origin` is a PROVENANCE label — who produced the data —
-  and the registry field that behaves like a namespace is `system`. The row the ADR describes says
+  and the registry field at the right LEVEL is `system`. The row the ADR describes says
   so itself: `controlm@[db].psgmgr.cm_def_vtab` carries `system: psgmgr`, `origin: controlm`.
+  AND `system` IS THE RIGHT LEVEL CARRYING THE WRONG VALUE (user ruling, 2026-08-30): `psgmgr` is
+  a SCHEMA, not a system and not a system of record; the database connection behind it is
+  `spiderdb`, which the registry names nowhere — it is the token `[db]` redacts in all ten ids and
+  `locator.service: ~` on the system row. The registry already half-knows this (the same row is
+  identified `psgmgr` AND declares `locator.schema: psgmgr`) and fully knows the carrier half (its
+  note reads "the Control-M replica database — CARRIER, not origin"; all ten datasets are
+  `authority: ADS`, never SOR). Two consequences: the binding row keys on the connection carrier
+  `spiderdb`, since keying on `system` works only while one schema happens to equal one database;
+  and `SourceEntry.urn` builds the carrier slot from `system`
+  (`drydocs_core/source_registry.py:127-135`), so the ten rows currently derive
+  `urn:drydocs:dataset:(psgmgr,cm_def_vtab,prod)` — a schema in the carrier position, and
+  correcting the id would change ten derived URNs.
   MEASURED over `config/source-registry.yaml` at main, 15 automated datasets: keyed by `system`
   = 4 rows (psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1); keyed by `origin` = 6 rows
   (controlm 9, hr 1, seal 1, catalog 2, oracle 1, snowflake 1) — so the ADR's "roughly six
   origins" counted right and keyed wrong. TWO FACTS DECIDE IT AND THE SECOND IS FATAL: `system:
   psgmgr` carries three origins (`controlm`, `hr`, `seal`), so a per-origin key mints three
-  binding rows for ONE Oracle service, re-fragmenting the connection that clause 4 chose Purview's
+  binding rows for ONE Oracle database, re-fragmenting the connection that clause 4 chose Purview's
   named-profile shape to share — the ADR contradicts itself across two clauses; and `origin:
   controlm` spans THREE systems (`controlm`, `drydocs-stg`, `psgmgr`), so the largest origin has
   no single connection to bind to and a per-origin row is unsatisfiable, not merely redundant.
   `origin: seal` spans two and fails the same way. The fix is one field name — the rest of clause
   2 (inheritance by dataset, the "one mechanism, not two" fence with landing zones, the
-  connection/object split itself) all survives, and the OpenLineage argument gets STRONGER under
-  the correction because `system` really is the namespace. This is a RULING and goes to the user;
+  connection/object split itself) all survives, and the counts stay 4/3/1/1 because the grouping
+  was never in doubt. This is a RULING and goes to the user;
   nothing is applied. The standing plan already reached the same answer for [[G125]] by a
-  different route, and the ADR text is the piece that was never updated to match. Full evidence,
+  different route, and the ADR text is the piece that was never updated to match.
+  ALSO: `spiderdb` is the exact test case for the plan's §0 — a database NAME, which nobody
+  connects with (that needs host, port, service and a Kerberos principal), so under the standing
+  registered-id test it publishes, and OpenLineage puts it in the NAME half by construction. The
+  one thing that would flip it is if `spiderdb` is a TNS alias / service name rather than the
+  database name; that is an SME statement and is NOT settled here. Note the grammar already
+  publishes `psgmgr` as "established public vocabulary" while redacting `spiderdb` — the same kind
+  of token one level up — which is the ad-hoc carve-out §0 replaces with a test. Full evidence,
   the scaffolding assessment and a re-derivation checklist:
   `docs/design/openlineage-substrate-review.md`. Related [[Idea-207]].
 
