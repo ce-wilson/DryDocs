@@ -1,0 +1,23 @@
+id: J66
+epic: release-infrastructure
+title: A source-reading guard that fails on its own explanation teaches people to stop explaining
+  - four hand-rolled workarounds exist, give them one helper
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_env_refs_migration.py
+- tests/unit/test_constraint_drift.py
+- tests/unit/test_env_doctor.py
+- tests/unit/test_vocabulary_endpoints.py
+- tests/env_drift.py
+- tests/unit/test_no_render_parsing.py
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-30 from Idea-226.
