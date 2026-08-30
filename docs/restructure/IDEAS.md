@@ -360,6 +360,33 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-215`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+  **ADR 0017 clause 2 keys the source binding per `origin`, and for the registry's largest origin
+  that row cannot exist.** The clause argues from OpenLineage — "`{origin}@{db}.{schema}.{table}`
+  puts the origin where OpenLineage puts the namespace" — and concludes the binding table needs a
+  row per origin. Read at the source (clone at `C:\coding\projects\OpenLineage`, HEAD `b995ee00`,
+  Apache-2.0), the OpenLineage namespace is a CONNECTION: `oracle://{host}:{port}`, one shape
+  across forty-odd platforms. DryDocs's `origin` is a PROVENANCE label — who produced the data —
+  and the registry field that behaves like a namespace is `system`. The row the ADR describes says
+  so itself: `controlm@[db].psgmgr.cm_def_vtab` carries `system: psgmgr`, `origin: controlm`.
+  MEASURED over `config/source-registry.yaml` at main, 15 automated datasets: keyed by `system`
+  = 4 rows (psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1); keyed by `origin` = 6 rows
+  (controlm 9, hr 1, seal 1, catalog 2, oracle 1, snowflake 1) — so the ADR's "roughly six
+  origins" counted right and keyed wrong. TWO FACTS DECIDE IT AND THE SECOND IS FATAL: `system:
+  psgmgr` carries three origins (`controlm`, `hr`, `seal`), so a per-origin key mints three
+  binding rows for ONE Oracle service, re-fragmenting the connection that clause 4 chose Purview's
+  named-profile shape to share — the ADR contradicts itself across two clauses; and `origin:
+  controlm` spans THREE systems (`controlm`, `drydocs-stg`, `psgmgr`), so the largest origin has
+  no single connection to bind to and a per-origin row is unsatisfiable, not merely redundant.
+  `origin: seal` spans two and fails the same way. The fix is one field name — the rest of clause
+  2 (inheritance by dataset, the "one mechanism, not two" fence with landing zones, the
+  connection/object split itself) all survives, and the OpenLineage argument gets STRONGER under
+  the correction because `system` really is the namespace. This is a RULING and goes to the user;
+  nothing is applied. The standing plan already reached the same answer for [[G125]] by a
+  different route, and the ADR text is the piece that was never updated to match. Full evidence,
+  the scaffolding assessment and a re-derivation checklist:
+  `docs/design/openlineage-substrate-review.md`. Related [[Idea-207]].
+
 - **`Idea-211`** · 2026-08-30 · `[bug]` · **closed — fixed same day, 2026-08-30** · prio? **High** —
   **The supplement chain is documented as FOUR members in nine live places and has been FIVE
   since Z3 (2026-08-19); the guard that should have caught it asserts a PREFIX.** `default_chain()`

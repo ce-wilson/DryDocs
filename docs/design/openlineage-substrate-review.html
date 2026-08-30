@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenLineage substrate review — reading the source ADR 0017 cites</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>OpenLineage substrate review — reading the source ADR 0017 cites</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Scope:</strong> a THIRD pass, and the first one that reads a single product&#x27;s source rather than surveying many. Its question is narrow: <strong>ADR 0017 cites OpenLineage twice for its central shape — are those citations right?</strong> Everything else here is downstream of that answer.</li><li><strong>Status:</strong> DESCRIPTIVE — <strong>Rev 1, 2026-08-30.</strong> This review rules nothing. ADR 0017 is PROPOSED and its acceptance is the user&#x27;s; G125 stays <code>todo</code>.</li><li><strong>Classification:</strong> External reasoning over Internal-Public context. Every fact about OpenLineage is public and Apache-2.0; every fact about DryDocs is read from <code>config/source-registry.yaml</code>, which is already committed. No connection coordinate appears here.</li><li><strong>Companion:</strong> <code>docs/design/catalog-substrate-review.md</code> (the second pass, the survey ADR 0017 rules on), <code>docs/decisions/0017-source-binding-substrate.md</code>, <code>config/source-registry.yaml</code>.</li><li><strong>Verification venue (J18):</strong> this desktop, <code>C:\coding\projects\OpenLineage</code>, cloned 2026-08-30. HEAD <code>b995ee00</code> (commit date 2026-08-28), latest release tag <code>1.52.0</code>, licence Apache-2.0. Counts over DryDocs come from <code>poetry run python</code> against <code>config/source-registry.yaml</code> at <code>main</code>, not from reading the file by eye.</li><li><strong>Second source:</strong> <code>ce-wilson/research</code>, <code>openlineage-datasource-onboarding/</code> — a 55-claim analysis of the same repo at the same commit, produced independently. Its sampled claims are re-derived below rather than accepted.</li></ul>
+<h2 id="bottom-line"><span class="dd-margin-tag" aria-hidden="true">bottom-line</span>Bottom line</h2>
+<p><strong>One of ADR 0017&#x27;s two OpenLineage citations does not survive contact with the source, and the registry it governs is the thing that disproves it.</strong></p>
+<p>Clause 2 says DryDocs&#x27;s grammar is &quot;already isomorphic&quot; to OpenLineage&#x27;s, with <code>origin</code> sitting where OpenLineage puts the namespace, and concludes that the binding table therefore needs &quot;a row per origin.&quot; OpenLineage&#x27;s namespace is a <strong>connection</strong> — <code>oracle://{host}:{port}</code>. DryDocs&#x27;s <code>origin</code> is a <strong>provenance label</strong> — who produced the data. The registry field that actually behaves like a namespace is <code>system</code>, and the two are measurably not the same field: <code>origin: controlm</code> spans <strong>three</strong> different systems, so a per-origin row cannot bind to one connection at all.</p>
+<p>Clause 1&#x27;s citation holds, but is used to support a deferral OpenLineage itself does not make. Clauses 3, 4 and 5 rest on DataHub, OpenMetadata and Purview and are untouched by any of this.</p>
+<p>And OpenLineage does <strong>not</strong> solve the problem ADR 0017 exists to solve. It is a wire format. It has no binding table, no credential store and no source configuration of any kind. Its contribution is a grammar and one transferable rule; treating it as a design precedent for the substrate itself would over-cite it.</p>
+<h2 id="what-openlineage-implements"><span class="dd-margin-tag" aria-hidden="true">what-openlineage-implements</span>What OpenLineage actually implements</h2>
+<p>Dataset identity is the pair (<code>namespace</code>, <code>name</code>), both required (<code>spec/OpenLineage.json</code>, <code>$defs/Dataset</code>). The naming convention assigns them by platform. Read off <code>website/docs/spec/naming.md</code> at HEAD, unedited:</p>
+<table><thead><tr><th>Platform</th><th>Namespace</th><th>Name</th></tr></thead><tbody><tr><td>Oracle</td><td><code>oracle://{host}:{port}</code></td><td><code>{serviceName}.{schema}.{table}</code> or <code>{sid}.{schema}.{table}</code></td></tr><tr><td>Snowflake</td><td><code>snowflake://{org}-{account}</code></td><td><code>{database}.{schema}.{table}</code></td></tr><tr><td>Postgres</td><td><code>postgres://{host}:{port}</code></td><td><code>{database}.{schema}.{table}</code></td></tr><tr><td>MSSQL</td><td><code>mssql://{host}:{port}</code></td><td><code>{database}.{schema}.{table}</code></td></tr><tr><td>Redshift</td><td><code>redshift://{cluster_identifier}.{region_name}:{port}</code></td><td><code>{database}.{schema}.{table}</code></td></tr><tr><td>S3</td><td><code>s3://{bucket name}</code></td><td><code>{object key}</code></td></tr><tr><td>Local file</td><td><code>file</code></td><td><code>{path}</code></td></tr><tr><td>Remote file</td><td><code>file://{host}</code></td><td><code>{path}</code></td></tr></tbody></table>
+<p>Forty-odd rows, one shape. <strong>The namespace is where you connect. The name is what you asked for.</strong> Not one of the forty carries a username, a password or a URI userinfo component — a fact the second source calls its load-bearing claim, and which I re-read the full table to confirm.</p>
+<p>Two consequences matter here, and they pull in opposite directions:</p>
+<ul><li>The database — <code>serviceName</code>, <code>{database}</code> — sits in the <strong>name</strong>. It is part of the object&#x27;s stable identity, and it is committed.</li><li>The host and port sit in the <strong>namespace</strong>. They are part of identity too, which is what makes two Oracle instances distinct without any extra axis, and also what makes the identifier fragile: <code>naming.md</code> warns that switching Snowflake namespace formats means &quot;existing lineage nodes won&#x27;t connect to new ones.&quot;</li></ul>
+<h2 id="finding-1"><span class="dd-margin-tag" aria-hidden="true">finding-1</span>Finding 1 — clause 2 maps <code>origin</code> to the namespace; the registry says the namespace is <code>system</code></h2>
+<p>ADR 0017 clause 2, verbatim:</p>
+<blockquote><p>DryDocs&#x27;s grammar is already isomorphic: <code>{origin}@{db}.{schema}.{table}</code> puts the origin where OpenLineage puts the namespace and the qualified object where it puts the name. So the binding table needs <strong>a row per origin</strong>, inherited by every dataset beneath it.</p></blockquote>
+<p>The registry disagrees with the first sentence, and it does so in the row the ADR is describing:</p>
+<pre class="yaml"><code>  - id: &quot;controlm@[db].psgmgr.cm_def_vtab&quot;
+    system: psgmgr
+    origin: controlm</code></pre>
+<p><code>origin</code> is <code>controlm</code> — the orchestrator whose data this is. <code>system</code> is <code>psgmgr</code> — the Oracle service you connect to. It is <code>system</code> that behaves like an OpenLineage namespace: one place, one connection, one set of credentials. <code>origin</code> answers a question OpenLineage does not ask in the identifier at all; its equivalents are the <code>dataSource</code> and <code>ownership</code> <strong>facets</strong>, which are metadata hung off identity, never identity itself.</p>
+<p>That is not automatically a defect in DryDocs&#x27;s grammar — it is our grammar, and putting a provenance token in the identity position is a defensible choice. What it does mean is that the <strong>isomorphism argument cannot carry the binding conclusion</strong>, because the field the conclusion keys on is not the field the analogy maps.</p>
+<p><strong>Measured, over <code>config/source-registry.yaml</code> at <code>main</code> — 16 systems, 30 datasets, 15 automated and 15 manual:</strong></p>
+<table><thead><tr><th>Keyed by</th><th>Rows needed for the 15 automated datasets</th></tr></thead><tbody><tr><td><code>system</code></td><td><strong>4</strong> — psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1</td></tr><tr><td><code>origin</code></td><td><strong>6</strong> — controlm 9, hr 1, seal 1, catalog 2, oracle 1, snowflake 1</td></tr></tbody></table>
+<p>The ADR&#x27;s &quot;roughly six origins&quot; is arithmetically correct. The problem is not the count.</p>
+<p><strong>Two structural facts decide it, and the second one is fatal:</strong></p>
+<ol><li><code>system: psgmgr</code> carries three origins — <code>controlm</code>, <code>hr</code>, <code>seal</code>. A per-origin key mints three binding rows for <strong>one</strong> Oracle service, each repeating the same coordinates. That is precisely the duplication clause 4 argues against when it chooses Purview&#x27;s named-profile shape over OpenMetadata&#x27;s derived paths: <em>&quot;one Oracle account reads eight <code>psgmgr</code> views.&quot;</em> Clause 2 re-fragments the connection that clause 4 exists to share. The ADR contradicts itself across two clauses.</li><li><code>origin: controlm</code> spans three systems — <code>controlm</code>, <code>drydocs-stg</code>, <code>psgmgr</code>. So the largest origin in the registry has <strong>no single connection to bind to</strong>. A per-origin row is not merely redundant here; it is unsatisfiable. <code>origin: seal</code> spans two systems and fails the same way.</li></ol>
+<p><strong>Recommended amendment</strong>, for the user&#x27;s ruling rather than applied: clause 2 keys the binding per <strong>SYSTEM</strong>. The rest of the clause survives unchanged — the inheritance-by-datasets shape, the &quot;one mechanism, not two&quot; fence with landing zones, and the observation that OpenLineage splits connection from object are all still right. Only the field name changes, and the OpenLineage argument gets <em>stronger</em> under the correction, because <code>system</code> really is the namespace.</p>
+<p>This is the same conclusion the standing plan already reached for G125 (&quot;bind per <strong>SYSTEM</strong> (psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1), not per origin&quot;). Two independent routes to one answer, and the ADR text is the piece that was never updated to match.</p>
+<h2 id="finding-2"><span class="dd-margin-tag" aria-hidden="true">finding-2</span>Finding 2 — the <code>[db]</code> redaction is backwards, and OpenLineage puts it more sharply than the ADR uses it</h2>
+<p>Committed dataset ids carry <code>[db]</code> as a redaction placeholder because the registry grammar calls the database a connection coordinate. Measured against the naming table, that is exactly inverted:</p>
+<table><thead><tr><th>Half</th><th>OpenLineage</th><th>Carries</th><th>DryDocs today</th></tr></thead><tbody><tr><td>Name</td><td><code>{serviceName}.{schema}.{table}</code></td><td>database, schema, table</td><td><code>[db].psgmgr.cm_def_vtab</code> — <strong>database redacted</strong></td></tr><tr><td>Namespace</td><td><code>oracle://{host}:{port}</code></td><td>host, port</td><td>undeclared — <code>locator.service: ~</code> plus a comment</td></tr></tbody></table>
+<p>DryDocs redacts the half OpenLineage treats as safe by construction, and leaves undeclared the half OpenLineage treats as the connection. Note what is left in <code>controlm@[db].psgmgr.cm_def_vtab</code> after the redaction: <code>psgmgr</code> is the <strong>schema</strong> and publishes fine; the single redacted token is the database. So the boundary is already being drawn in the right <em>place</em> for schema and table, and only the database is on the wrong side of it.</p>
+<p>This corroborates §0 of the standing plan with a citation rather than an argument, and it strengthens the user&#x27;s standing test — <em>could someone connect with this string alone?</em> — by showing a 40-platform convention that answers it the same way for every platform.</p>
+<p><strong>The caveat that keeps this honest:</strong> the guarantee is convention plus tested implementation, not a normative prohibition. Nothing in <code>spec/OpenLineage.json</code> forbids a namespace containing userinfo. What exists is a uniform table, 28 Java <code>Naming</code> classes whose constructors take no credential parameter, and a sanitizer that strips credentials when a URL arrives anyway. That is strong evidence about the intended boundary and weak evidence about enforcement — do not cite it as a rule the spec imposes.</p>
+<h2 id="finding-3"><span class="dd-margin-tag" aria-hidden="true">finding-3</span>Finding 3 — clause 1 defers an axis OpenLineage never defers, and the trade is real</h2>
+<p>Clause 1 records the three-part-key ceiling and declines to mint the instance axis, on DataHub&#x27;s <code>platform_instance</code> retrofit as the cautionary case. The reasoning is sound and the DataHub facts are as described.</p>
+<p>OpenLineage is the counter-example, and the ADR does not mention it: <strong>there is no instance axis to add, because the host is already in the namespace.</strong> Two Oracle services, two namespaces, two distinct datasets, no retrofit — ever.</p>
+<p>It is not free. Identity that contains the connection is identity that breaks when the connection moves, which is exactly the Snowflake warning quoted above: change the namespace format and old nodes never join new ones. DataHub&#x27;s separate <code>dataPlatformInstance</code> aspect exists to avoid that coupling; it pays for the decoupling with a retrofit.</p>
+<p>So the two products bracket the choice rather than agreeing, and ADR 0017&#x27;s deferral sits between them defensibly. The recommendation is only that clause 1 <strong>name the trade</strong> instead of implying a settled direction: OpenLineage shows the axis can live in the identifier, and shows what that costs when the identifier has to change. The ADR&#x27;s own escape hatch — the instance coordinate lands in the binding table when a second instance appears — is the DataHub side of that bracket, and is better argued once the OpenLineage side is stated.</p>
+<h2 id="finding-4"><span class="dd-margin-tag" aria-hidden="true">finding-4</span>Finding 4 — OpenLineage does not solve the problem ADR 0017 is about</h2>
+<p>Stated plainly because the risk here is over-citation, not under-citation.</p>
+<p>OpenLineage is an <strong>event format</strong>. Searched at HEAD: it has no source configuration, no connection registry, no credential store, no secret reference, no binding of a declared source to a real place. Its credential separation is achieved by <em>never putting a credential in the identifier</em> — a property of the grammar, not a mechanism. There is nothing to adopt for the substrate itself.</p>
+<p>Concretely: clause 3 (committed YAML references environment variables), clause 4 (named connection profiles) and clause 5 (the fresh-clone default) rest entirely on DataHub, OpenMetadata and Purview. Nothing in this review touches them, and no OpenLineage citation should be added to them.</p>
+<p><strong>One exception, and it is a good one.</strong> The OpenLineage <em>Python client</em> configures itself the way clause 3 wants DryDocs to: a YAML file found at <code>OPENLINEAGE_CONFIG</code>, then the working directory, then <code>$HOME/.openlineage</code>, deep-merged with environment variables under an <code>OPENLINEAGE__</code> prefix where <code>__</code> is a path separator into the nested config (<code>client/python/src/openlineage/client/client.py:213-241, 406-446</code>). That is <strong>structural</strong> override — a variable addresses a node in the config tree — where DataHub&#x27;s <code>${MSSQL_PASSWORD}</code> is string interpolation into a value slot. Structural override is the better fit for clause 3&#x27;s &quot;one expansion function, one error, one enumerable list,&quot; because the set of legal variables is derivable from the config schema instead of from scanning files for <code>${...}</code>.</p>
+<h2 id="second-source"><span class="dd-margin-tag" aria-hidden="true">second-source</span>Finding 5 — the second source checks out, and its central rule lands on <code>system</code></h2>
+<p>Sampled claims from <code>ce-wilson/research</code>, re-derived here rather than accepted:</p>
+<table><thead><tr><th>Claim</th><th>Re-derivation</th><th>Result</th></tr></thead><tbody><tr><td>Sourced at <code>b995ee00c</code>, release <code>1.52.0</code></td><td><code>git rev-parse HEAD</code> → <code>b995ee00</code>; <code>git describe --tags --abbrev=0</code> → <code>1.52.0</code></td><td>confirmed</td></tr><tr><td><code>C-46</code> — the <code>lineage</code> facet is unreleased</td><td><code>git tag --contains 2cfa2594b</code> → <strong>empty</strong></td><td>confirmed, still true today</td></tr><tr><td><code>C-10</code>/<code>C-11</code>/<code>C-12</code>/<code>C-14</code> — namespace forms, no userinfo anywhere</td><td>full <code>naming.md</code> table read</td><td>confirmed</td></tr><tr><td><code>C-51</code>/<code>C-52</code> — Java ships <code>JdbcUrlSanitizer</code>, five regex passes, Python has none</td><td>file read; `grep -rniE &quot;sanitiz\</td><td>dropSensitive&quot; client/python/src/` returns nothing relevant</td><td>confirmed</td></tr><tr><td>Apache-2.0</td><td><code>LICENSE</code></td><td>confirmed</td></tr></tbody></table>
+<p>Its <code>D-05</code> — <em>&quot;the vault key is derived from the OpenLineage namespace, not the reverse; credential rotation never changes the namespace, so no lineage node is ever orphaned by a password change&quot;</em> — is the single most transferable idea in the document for our purposes. Applied to DryDocs it says the credential profile is keyed by the thing that identifies the <strong>connection</strong>, and Finding 1 already established which field that is: <code>system</code>. Two documents, two routes, one correction.</p>
+<p><strong>Where its framing has to be adjusted before reuse.</strong> It answers a <em>datasource onboarding</em> question — how to emit incremental curation as OpenLineage events — which is not ADR 0017&#x27;s question. Its <code>D-01</code> through <code>D-04</code> and its whole risk table are about producing events against a lineage backend. DryDocs produces no OpenLineage events and has no lineage backend, so those sections are reference material for a different decision, not input to this one. Read <code>D-05</code>, <code>C-10</code>–<code>C-14</code> and <code>C-51</code>–<code>C-52</code>; leave the rest for whenever the emission question is actually asked.</p>
+<h2 id="scaffolding"><span class="dd-margin-tag" aria-hidden="true">scaffolding</span>What can be scaffolded</h2>
+<p>Apache-2.0 throughout, so vendoring with attribution is legally clean. Ranked by value per unit of cost, and honest about what is a dependency versus a pattern.</p>
+<table><thead><tr><th>#</th><th>Take</th><th>From</th><th>Cost</th><th>What it buys</th></tr></thead><tbody><tr><td>1</td><td><strong>The five credential-stripping regexes</strong>, ported to Python</td><td><code>client/java/.../jdbc/JdbcUrlSanitizer.java</code></td><td>~15 lines plus tests</td><td>The Python client has <strong>no equivalent</strong> — verified. This is the guard behind the plan&#x27;s fence that no connection string reaches a committed file. Note it drops the entire query string rather than allow-listing; adopt that stricter posture.</td></tr><tr><td>2</td><td><strong>The default-redact posture with an explicit allow-list</strong></td><td><code>client/python/.../utils.py</code> <code>RedactMixin</code>; <code>client/python/redact_fields.yml</code></td><td>pattern, no code</td><td>The plan&#x27;s <code>registry env</code> surface must print <code>set</code>/<code>unset</code> and never a value. Default-deny with a named exemption list is the same shape as <code>test_module_boundary.py</code>&#x27;s UNCLASSIFIED rule, and it is how a new field fails closed instead of leaking.</td></tr><tr><td>3</td><td><strong>Structural env override of a config tree</strong></td><td><code>client.py:213-241, 406-446</code> (<code>OPENLINEAGE__A__B__C</code> → <code>config[&quot;a&quot;][&quot;b&quot;][&quot;c&quot;]</code>, deep-merged, JSON-parsed values)</td><td>pattern, ~40 lines</td><td>Clause 3&#x27;s one expansion function. Better than <code>${VAR}</code> interpolation because the legal variable set is derivable from the schema — which is exactly what makes the plan&#x27;s generated <code>.env.example</code> and its &quot;one enumerable list&quot; possible.</td></tr><tr><td>4</td><td><strong>The <code>DatasetNaming</code> protocol shape</strong> — <code>get_namespace()</code> / <code>get_name()</code>, one small validated class per platform</td><td><code>client/python/src/openlineage/client/naming/dataset.py</code> (512 lines, <code>attrs</code> only)</td><td>copy the shape, not the file</td><td>A typed, per-platform locator builder for the binding table, replacing free-text <code>locator:</code> prose that no guard reads — the ADR&#x27;s own one-line argument for itself. Do <strong>not</strong> vendor the module: it builds OpenLineage identifiers, which DryDocs does not emit.</td></tr><tr><td>5</td><td><strong>The 40-platform namespace vocabulary</strong></td><td><code>website/docs/spec/naming.md</code></td><td>copy as data</td><td>A ready-made controlled vocabulary for whatever field ends up holding the connection form, and a published answer to &quot;what shape does an S3 / Glue / Snowflake / file source take&quot; that we would otherwise invent per source.</td></tr><tr><td>6</td><td><strong>The 38 facet JSON schemas</strong></td><td><code>spec/facets/*.json</code></td><td>none to read</td><td>Relevant to the <em>ontology</em> layer, not to ADR 0017. Two worth knowing: <code>TagsDatasetFacet.field</code> gives column-level classification inside a dataset-level facet, and <code>HierarchyDatasetFacet</code> is an ordered database→schema→table array — the credential-free display projection the plan&#x27;s §2 view needs.</td></tr></tbody></table>
+<p><strong>Do not take:</strong> the <code>lineage</code> facet (unreleased — <code>git tag --contains 2cfa2594b</code> is empty as of today, re-check before relying on it), the transport layer, the event model, <code>SymlinksDatasetFacet</code> (it asserts two names for <strong>one</strong> entity and would collapse a replica into its origin — the exact fact a replica registration exists to record), and the OpenLineage client as a runtime dependency. DryDocs has no lineage service and no reason to acquire one here.</p>
+<h2 id="what-changes"><span class="dd-margin-tag" aria-hidden="true">what-changes</span>What this changes, and what it does not</h2>
+<p><strong>Changes proposed, none applied:</strong></p>
+<ol><li id="what-changes--adr-0017-clause-2-key"><strong>ADR 0017 clause 2</strong> — key the binding per <code>system</code>, not per <code>origin</code>. Four rows, not six, and <code>controlm</code> becomes bindable. This is a ruling; it goes to the user.</li><li id="what-changes--adr-0017-clause-1-name"><strong>ADR 0017 clause 1</strong> — name OpenLineage as the counter-case that puts the instance in the identifier, and state the cost it pays. Strengthens the existing deferral; does not reverse it.</li><li id="what-changes--g125-acceptance-already-needs-the"><strong>G125 acceptance</strong> — already needs the per-system rewrite. This review is the evidence for it.</li></ol>
+<p><strong>Unchanged:</strong> clauses 3, 4 and 5, whose sources are elsewhere. The <code>[db]</code> question, which is corroborated here but was already the standing plan&#x27;s §0 and is still a sensitivity ruling the SME owns. And the scope fence — no new registry field, no ADR 0017 implementation.</p>
+<h2 id="verification"><span class="dd-margin-tag" aria-hidden="true">verification</span>Verification checklist for a reviewing agent</h2>
+<p>Ordered by value, each independently checkable.</p>
+<ol><li id="verification--re-run-the-cardinality-measurement-load"><strong>Re-run the cardinality measurement.</strong> Load <code>config/source-registry.yaml</code>, group the automated datasets by <code>system</code> and by <code>origin</code>, and list any origin spanning more than one system. If <code>controlm</code> no longer spans three, Finding 1&#x27;s fatal half is stale — the rest of it is not.</li><li id="verification--read-website-docs-spec-naming-md-end-to">Read <code>website/docs/spec/naming.md</code> end to end and look for one namespace form containing userinfo. A single counterexample weakens Finding 2.</li><li id="verification--git-tag-contains-2cfa2594b-in-the"><code>git tag --contains 2cfa2594b</code> in the clone. Empty today; a tag means the <code>lineage</code> facet shipped and the &quot;do not take&quot; list needs revisiting.</li><li id="verification--confirm-origin-has-no-openlineage-counte">Confirm <code>origin</code> has no OpenLineage counterpart in the identifier by searching the spec for any identity component describing data <em>provenance</em> rather than <em>location</em>. If one exists, Finding 1&#x27;s framing needs adjusting.</li><li id="verification--check-that-jdbcurlsanitizer-s-regexes-st">Check that <code>JdbcUrlSanitizer</code>&#x27;s regexes still number five and that no Python equivalent has landed, before spending effort on scaffold item 1.</li><li id="verification--re-derive-the-facet-id-versions-before">Re-derive the facet <code>$id</code> versions before using anything in scaffold item 6. They drift between releases and this review pins none of them.</li></ol>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>openlineage-substrate-review-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<script>
+
+(function(){
+  var DOC="openlineage-substrate-review", FILE="openlineage-substrate-review-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
