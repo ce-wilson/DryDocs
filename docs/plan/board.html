@@ -4585,6 +4585,16 @@ measurement now lives in the docstring as EVIDENCE; what is asserted is the shap
 in the union, and an AST check that known_ids() still calls all three, which is the risk a set
 comparison cannot see anyway.
 
+AMENDED 2026-08-30, same day, after the protocol met its first real use. The J66 groom minted a
+stub, refined the title, then pushed the body - and clause (c)&#x27;s trunk guard read local-vs-trunk
+as two machines minting one number and went RED until the body landed. The guard is right and the
+INSTRUCTION was incomplete: it compares titles and not bodies, so a title that changes between
+the two pushes is indistinguishable from a collision. The mint rule now says the stub carries the
+FINAL title, in both CLAUDE.md and the skill&#x27;s id row, and the guard&#x27;s failure message names both
+causes with their opposite fixes - renumber for a real collision, push the body for a stub in
+flight. Recorded here rather than silently patched because the amendment came from the mechanism
+being used, which is the only way this class of gap surfaces.
+
 RITUAL MISS, named rather than quietly fixed: CI was not checked after this commit or after J63,
 so the red ran three commits before anyone looked. CLAUDE.md makes checking CI a STEP for exactly
 this reason - the failure was invisible locally, where the suite was green the whole time.

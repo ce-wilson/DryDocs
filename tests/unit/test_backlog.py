@@ -409,11 +409,15 @@ def test_no_id_carries_two_different_titles_across_the_remote_trunk() -> None:
             )
 
     assert not disagreements, (
-        "id(s) carrying a DIFFERENT title here than on the remote trunk -- two "
-        "machines minted the same number:\n  "
+        "id(s) carrying a DIFFERENT title here than on the remote trunk:\n  "
         + "\n  ".join(disagreements)
-        + "\nRenumber the LOCAL one with: python .claude/skills/groom-backlog/"
-        "validate.py --next-id <SERIES>"
+        + "\n\nTWO CAUSES, and they need opposite fixes. (1) Two machines minted the "
+        "same number -- renumber the LOCAL one with: python .claude/skills/"
+        "groom-backlog/validate.py --next-id <SERIES>. (2) You pushed a mint stub "
+        "and then refined its title before pushing the body -- this guard compares "
+        "TITLES, not bodies, so it cannot tell that apart from a collision. Push the "
+        "body. The mint rule says the stub carries the FINAL title for exactly this "
+        "reason (CLAUDE.md, I6)."
     )
 
 
