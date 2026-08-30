@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-29T17:48:00",
+    "captured_at": "2026-08-29T22:39:50",
     "date": "20260829",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "53359622",
-      "full": "53359622782c3e7ec81f6b9d69fb7b2a94feb198",
+      "commit": "b480c35d",
+      "full": "b480c35d3ec49116356a80ee9be733fc5c59267a",
       "branch": "main",
-      "describe": "port-base-20260829-7-g53359622",
-      "subject": "docs(adr): G124 — ADR 0017 source-binding substrate, PROPOSED; the venue is argued, not assumed",
+      "describe": "port-base-20260829-19-gb480c35d",
+      "subject": "docs(ADR-0017): fourth pass — read DataHub's source behind the other four citations",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7586,6 +7586,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/datahub-substrate-review.html",
+      "name": "datahub-substrate-review.html",
+      "extension": ".html",
+      "rel_path": "docs/design/datahub-substrate-review.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/datahub-substrate-review.md",
+      "name": "datahub-substrate-review.md",
+      "extension": ".md",
+      "rel_path": "docs/design/datahub-substrate-review.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/deepdoc-data-flow-overview.html",
       "name": "deepdoc-data-flow-overview.html",
       "extension": ".html",
@@ -7959,6 +7977,42 @@
       "name": "graph-retrieval-benchmark-persona-rerun.md",
       "extension": ".md",
       "rel_path": "docs/design/graph-retrieval-benchmark-persona-rerun.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/openlineage-substrate-review.html",
+      "name": "openlineage-substrate-review.html",
+      "extension": ".html",
+      "rel_path": "docs/design/openlineage-substrate-review.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/openlineage-substrate-review.md",
+      "name": "openlineage-substrate-review.md",
+      "extension": ".md",
+      "rel_path": "docs/design/openlineage-substrate-review.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/source-registry-identity-review.html",
+      "name": "source-registry-identity-review.html",
+      "extension": ".html",
+      "rel_path": "docs/design/source-registry-identity-review.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/source-registry-identity-review.md",
+      "name": "source-registry-identity-review.md",
+      "extension": ".md",
+      "rel_path": "docs/design/source-registry-identity-review.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20267,6 +20321,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/research",
+      "name": "research",
+      "extension": "",
+      "rel_path": "internal/research",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/internal/research/triage-bootstrap-2026-08-28.md",
+      "name": "triage-bootstrap-2026-08-28.md",
+      "extension": ".md",
+      "rel_path": "internal/research/triage-bootstrap-2026-08-28.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/server-inventory",
       "name": "server-inventory",
       "extension": "",
@@ -20411,10 +20483,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260829.json",
-      "name": "drydocs-20260829.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260829-1747.json",
+      "name": "drydocs-20260829-1747.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260829.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260829-1747.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -34686,6 +34758,16 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/datahub-substrate-review.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/datahub-substrate-review.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/deepdoc-data-flow-overview.html"
     ],
     [
@@ -34867,6 +34949,26 @@
       "drydocs/docs/design",
       "CONTAINS",
       "drydocs/docs/design/graph-retrieval-benchmark-persona-rerun.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/openlineage-substrate-review.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/openlineage-substrate-review.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/source-registry-identity-review.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/source-registry-identity-review.md"
     ],
     [
       "drydocs/docs/design",
@@ -41271,6 +41373,11 @@
     [
       "drydocs/internal",
       "CONTAINS",
+      "drydocs/internal/research"
+    ],
+    [
+      "drydocs/internal",
+      "CONTAINS",
       "drydocs/internal/server-inventory"
     ],
     [
@@ -41614,6 +41721,11 @@
       "drydocs/internal/remediation/m0/parad0011b-modern-transcript.yaml"
     ],
     [
+      "drydocs/internal/research",
+      "CONTAINS",
+      "drydocs/internal/research/triage-bootstrap-2026-08-28.md"
+    ],
+    [
       "drydocs/internal/server-inventory",
       "CONTAINS",
       "drydocs/internal/server-inventory/README.md"
@@ -41716,7 +41828,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260829.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260829-1747.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -44313,13 +44425,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2507,
+    "files": 2514,
     "edges": 1275,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2797,
-    "directories": 291
+    "rels": 2805,
+    "directories": 292
   }
 }
