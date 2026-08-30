@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source-registry identity review — the redaction rule is destroying the identifiers the registry exists to carry</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Source-registry identity review — the redaction rule is destroying the identifiers the registry exists to carry</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Scope:</strong> an evaluation, not a runbook and not a decision record. It reads one question: can <code>config/source-registry.yaml</code> actually identify the things it registers, and can anyone find out what it holds? Each finding feeds an existing item or names the one it needs; nothing here mints work on its own.</li><li><strong>Status:</strong> DESCRIPTIVE — <strong>Rev 1, 2026-08-29.</strong></li><li><strong>Classification:</strong> Internal-Public — mechanism only. No real database, schema or application-id value appears here; every measurement is a count or a shape.</li><li><strong>Companion:</strong> ADR 0009 (configuration substrate), ADR 0014 (runtime substrate), ADR 0017 (source-binding substrate, PROPOSED at G124), <code>docs/design/catalog-substrate-review.md</code>, <code>config/gate-prompts/registry-wiring-readiness.yaml</code></li></ul>
+<h2 id="why-now"><span class="dd-margin-tag" aria-hidden="true">why-now</span>Why now</h2>
+<p>Two failures in one week, one root cause, and the second is the serious one.</p>
+<p><strong>Registering AWS/Glue metadata as a replica was blocked by the id grammar.</strong> That is not a workflow annoyance. Source-to-target mapping over registered ids is the core function of a data-governance product, and an id that resolves to nothing cannot be mapped to anything.</p>
+<p><strong>A generic question cost forty searches and produced a confidently wrong answer.</strong> Asked to review a loader and report its registry mapping, an agent searched roughly forty times and returned a review wrong in six places — including quoting a closed defect&#x27;s error string as current behavior. The facts were all in importable objects. The surface that hands them over in one call does not exist, so the search filled the gap with plausible wrongness.</p>
+<h2 id="what-the-registry-already-has"><span class="dd-margin-tag" aria-hidden="true">what-the-registry-already-has</span>What the registry already has</h2>
+<p>Stated first, because two findings below are &quot;this is already right, stop here.&quot;</p>
+<p><strong>The two-level split is correct and mature.</strong> Schema v2 (gate signed 2026-07-31) carries 16 systems and 30 datasets: a system row is the thing we connect to, a dataset row is the thing a loader reads. Retired ids are refused at parse, at lookup, and at overlay binding.</p>
+<p><strong>Loader binding is fully enumerable and needs no search.</strong> Four layers, all importable: <code>BaseLoader.source_id</code> ClassVars, <code>LOADER_REGISTRY</code>, the derived <code>LOADER_SOURCE</code> projection, and the per-repo <code>config/loader-source-overlay.yaml</code> resolved by <code>SourceRegistry.effective_source_id()</code>. <code>scripts/render_load_map.py</code> already inverts them.</p>
+<p><strong>The BDAT layer axis exists</strong> on every system row — human, business, data, technology — ruled at a gate on 2026-07-31.</p>
+<h2 id="id-findings"><span class="dd-margin-tag" aria-hidden="true">id-findings</span>Findings: the identifiers</h2>
+<h3 id="i1"><span class="dd-margin-tag" aria-hidden="true">i1</span>I1. The grammar calls identifiers &quot;connection coordinates&quot;, and they are not</h3>
+<p>The id grammar states that real db and schema values are <strong>connection coordinates</strong> and belong to the internal twin only. That premise is wrong. A database or schema <em>name</em> is an identifier. Nobody connects with a schema name; connecting needs a host, a port, a service and credentials. Redacting the name buys no secrecy and destroys the identity the row exists to carry.</p>
+<p>The repo has already ruled it wrong once. <strong>J13 class 3, 2026-08-11:</strong> &quot;schema/table/column ids: NO SWEEP OWED — already covered by the SIGNED N9 id grammar, which redacts the database and publishes schema.table.&quot; Schema is publishable, by a ruling on record.</p>
+<p><strong>Two live rows ignore that ruling</strong>, and they are the flagship replica rows — the ones the <code>catalog</code> system note calls &quot;exactly the replica case the @ grammar exists for&quot;: <code>catalog@[db].[schema].datasets_v</code> and <code>catalog@[db].[schema].distributions_v</code>. The only real token in those ids is the view name. A third instance is a <em>template</em> on the <code>snow</code> system row, <code>snow@[db].[schema].&lt;table&gt;</code>, which teaches the shape to the next row someone writes.</p>
+<p><strong>Why it keeps recurring: the carve-out is a judgement, not a test.</strong> One schema is published because someone decided it is &quot;established public vocabulary&quot;. Nothing states what qualifies, so every new source re-litigates it and the safe-looking answer — redact — wins by default and silently destroys an identifier.</p>
+<p>The discriminator that would settle it: <em>could someone connect with this string alone?</em> A schema name fails that test. A service name, host, port or credential passes it.</p>
+<h3 id="i2"><span class="dd-margin-tag" aria-hidden="true">i2</span>I2. The db placeholder is carrying two jobs, and ADR 0017 already separates them</h3>
+<p>The reason the db placeholder felt necessary is that it conflates the <strong>logical database name</strong> (identity, committable) with <strong>which physical deployment</strong> (the instance coordinate, per-machine).</p>
+<p>ADR 0017 clause 1 — drafted at G124, awaiting the user&#x27;s ruling — already rules that the instance coordinate lands in the binding table, precisely so the eventual answer is a configuration change rather than an id migration. Applied here the tension dissolves: the id carries the real logical name, the binding carries the account, region, service and endpoint, and nothing is redacted to preserve a distinction the binding table expresses properly.</p>
+<p>This is also what makes an AWS/Glue table registrable. <code>{origin}@{database}.{schema}.{table}</code> is a complete identity; the connection stays where connections belong.</p>
+<h3 id="i3"><span class="dd-margin-tag" aria-hidden="true">i3</span>I3. The application id is a placeholder on every system row</h3>
+<p>The application-id field reads the same literal placeholder on <strong>all 16</strong> systems, by the D1 amendment: a standing placeholder on every committed system row, with the real value living only in the internal twin.</p>
+<p>So the Application ID — the identifier through which a governance product maps business ownership — is absent from every row in the registry. Same category error as I1, a third time: an application id <strong>identifies</strong>, it does not <strong>connect</strong>.</p>
+<h2 id="view-findings"><span class="dd-margin-tag" aria-hidden="true">view-findings</span>Findings: nothing can see what the registry holds</h2>
+<h3 id="v1"><span class="dd-margin-tag" aria-hidden="true">v1</span>V1. The view is organized by name, so a miscategorization is invisible</h3>
+<p><code>dpl</code> is registered <code>layer: technology</code>. It is a pipeline and dataset taxonomy registry — a data-layer asset. The registration is wrong, and nothing surfaces it for review.</p>
+<p>The distribution explains how it happened: <strong>technology 9, data 5, business 2, human 0.</strong> Technology is the default bucket, <code>human</code> is declared in the vocabulary and has never been used, and no surface anywhere asks anyone to confirm a layer. The rendered load map shows <code>layer</code> as one column of a flat systems table; it never groups by it, never counts it, and never flags a row nobody has confirmed.</p>
+<p>A view organized by BDAT layer, then application, then ontology class would have made this legible on the day it was registered. A view organized by id string cannot.</p>
+<h3 id="v2"><span class="dd-margin-tag" aria-hidden="true">v2</span>V2. The DCAT field cannot be the ontology heading — it is a constant</h3>
+<p><code>asset_type</code> reads <code>dcat:Dataset</code> on <strong>30 of 30</strong> rows. A constant discriminates nothing, and a constant rendered as a column reads as an answer when it is a default. The genuine class comes from <code>config/taxonomy-ontology-map/</code>, which the generator already joins as <code>ontology_mappings</code>. A row still sitting on the bare default is <em>unclassified</em> and should say so rather than borrowing the appearance of a classification.</p>
+<h3 id="v3"><span class="dd-margin-tag" aria-hidden="true">v3</span>V3. Three declared axes have no consumer, and one has none at all</h3>
+<ul><li><strong><code>taxonomy_category</code></strong> has a full vocabulary — Pipelines 11, Data Asset 5, Software/Apps 4, Infrastructure 3, Architecture 2, ITSM/Gov 2, People and Org 2, Product 1 — and <strong>zero readers</strong> anywhere outside <code>config/</code>. No render, no test, no module.</li><li><strong><code>acquisition</code></strong> reaches exactly one surface, <code>drydocs landing-zones</code>, and only its manual half, because <code>manual_zones()</code> filters on it. The automated half is invisible.</li><li><strong>Replica is computable and computed nowhere.</strong> <code>origin != system</code> is the exact predicate, and <code>authority: ADS</code> (approved copy) versus <code>SOR</code> (originating source) corroborates it — all ten psgmgr rows are ADS. Neither reaches any surface.</li></ul>
+<h2 id="twin-findings"><span class="dd-margin-tag" aria-hidden="true">twin-findings</span>Findings: the internal twin is a black hole</h2>
+<h3 id="t1"><span class="dd-margin-tag" aria-hidden="true">t1</span>T1. The registry names no variable, points at no twin file, and cannot say what is unset</h3>
+<p>The registry says the real value lives only in the internal twin, and stops. It never says <em>which</em> twin file, <em>which</em> variables, or <em>whether they are set</em>. <code>internal/</code> holds roughly twenty directories with no index of which one carries which system&#x27;s settings.</p>
+<p><strong>Measured:</strong> <code>.env.example</code> declares 17 keys. First-party code reads <strong>8 more that are declared nowhere</strong> — the console-credentials path, the Control-M API config pointer, the two mapping-store variables, the agent registration key, the caller variable, a Neo4j container name, and the legacy aliases of the log and caller variables.</p>
+<p>So a null service locator with an explanatory comment is not merely an empty slot. It is an empty slot with no way to discover that it is empty, no statement of what would fill it, and no path to fill it.</p>
+<h3 id="t2"><span class="dd-margin-tag" aria-hidden="true">t2</span>T2. The enumeration cannot be a grep, which is how the gap grew unseen</h3>
+<p><code>drydocs_core/config.py</code> uses pydantic-settings with prefixed groups, so a variable like the Neo4j URI never appears as a literal string in the source. A text search sees a prefix and misses the field — and a text search is what anyone reaches for first.</p>
+<p>Any list of &quot;every variable the system reads&quot; must therefore be built from the <strong>settings classes plus the declarations</strong>, never from a search. This is J37 restated one layer over: read the importable object, never the render — and never the text that happens to spell it.</p>
+<h2 id="what-changes"><span class="dd-margin-tag" aria-hidden="true">what-changes</span>What this changes for the existing items</h2>
+<p>Proposals, not applied. Each names the item that owns it.</p>
+<table><thead><tr><th>Item</th><th>Clause</th><th>Proposed amendment</th></tr></thead><tbody><tr><td><strong>ADR 0017</strong> (G124, PROPOSED)</td><td>(1) the key ceiling</td><td>I2 makes the deferral concrete: the instance coordinate is what the db placeholder stands in for TODAY, not a future need. Worth stating before the ruling.</td></tr><tr><td><strong>G125</strong></td><td>(a) the undeclared half</td><td>Bind per <strong>SYSTEM</strong> (psgmgr 10, snowflake 3, oracle 1, drydocs-stg 1), not per origin (~6): the <code>controlm</code>, <code>hr</code> and <code>seal</code> origins all resolve to one connection. Also four stale data-root locator strings, not one.</td></tr><tr><td><strong>N18</strong> (the wiring gate)</td><td>A2</td><td>The SME ruled <code>cm_escalation_db</code> a REFERENCE — untrusted for application SEAL, authoritative for the failure to queue to technician mapping, joined to the Control-M job definition table on job name. That confirms clause A2&#x27;s &quot;third kind&quot;.</td></tr><tr><td><strong>N18</strong></td><td>D3</td><td>The SME asked for this on a rendered surface. D3 says that gets its own item; V1 to V3 say what it must show.</td></tr><tr><td><strong>J13</strong></td><td>class 3</td><td>The ruling stands and is VIOLATED by two live rows plus one template. Enforcement, not a re-ask.</td></tr><tr><td><strong>new</strong></td><td>—</td><td>The id-grammar ruling (I1 to I3). It changes committed ids and needs the SME, so it is a gate rider, not an edit.</td></tr><tr><td><strong>new</strong></td><td>—</td><td>The registry read surface (V1 to V3) and the twin leg (T1, T2).</td></tr></tbody></table>
+<h2 id="not-taken"><span class="dd-margin-tag" aria-hidden="true">not-taken</span>What we deliberately do not take</h2>
+<ul><li><strong>A trust vocabulary on pipeline rows.</strong> The SME ruled kind-not-trust: with no adapter, no <code>feeds_taxonomy</code> and <code>confirmed: false</code>, a reference is already derivable. Adding a vocabulary would pre-empt a ruling the wiring gate reserves.</li><li><strong>Any new registry field at all.</strong> Layer, category, authority, acquisition and origin already exist; replica and reference are DERIVED predicates over them. Gate clause D2 keeps the schema closed until the wiring gate signs, and nothing here needs it open.</li><li><strong>Publishing a value to make an id resolvable.</strong> The rule is names, never values. If a specific database name is itself the confidential material, that is a per-row SME ruling cited on the row — an auditable exception, not the ambient default that caused this.</li><li><strong>A second database.</strong> ADR 0009 already accepts SQLite as the derived read model and <code>var/mapping.db</code> already implements it, drafts and all. The registry gets tables there or nowhere.</li><li><strong>Rewriting the manual half to match the automated one.</strong> The fifteen manual rows resolve correctly today. Ruling the two halves the same SHAPE costs nothing; rewriting working rows to prove it buys nothing.</li></ul>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>source-registry-identity-review-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit —</footer>
+<script>
+
+(function(){
+  var DOC="source-registry-identity-review", FILE="source-registry-identity-review-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

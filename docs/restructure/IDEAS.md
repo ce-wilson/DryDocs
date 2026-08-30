@@ -360,6 +360,87 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-207`** · 2026-08-29 · `[bug]` · **open** · prio? **High** —
+  **The id grammar calls identifiers "connection coordinates" and redacts them, so a registered id
+  cannot always identify anything.** SME hit this registering downloaded AWS/Glue metadata as a
+  replica: source-to-target mapping over registered ids is the core function, and an id that
+  resolves to nothing cannot be mapped. A db or schema NAME is an identifier, not a connection
+  coordinate — nobody connects with a schema name. **J13 class 3 already ruled schema publishable**
+  ("redacts the database and publishes schema.table", 2026-08-11) and TWO LIVE ROWS VIOLATE IT:
+  `catalog@[db].[schema].datasets_v` and `.distributions_v` — the flagship replica rows, whose only
+  real token is the view name — plus a `snow@[db].[schema].<table>` TEMPLATE that teaches the shape
+  to the next row. It recurs because the carve-out is a judgement ("established public vocabulary")
+  with no test behind it, so redact wins by default. THE TEST THAT WOULD SETTLE IT: could someone
+  connect with this string alone? A schema name fails; a host, port, service or credential passes.
+  THE DB HALF RESOLVES THROUGH ADR 0017, not through redaction — the placeholder is conflating the
+  logical database name (identity) with which deployment (the instance coordinate), and 0017 clause
+  1 already puts the instance in the binding table. THIRD INSTANCE, same category error: the
+  application-id field is a standing placeholder on all 16 system rows (D1 amendment), so the
+  identifier a governance product maps ownership through is absent everywhere. Full argument and
+  measurements: [[source-registry-identity-review]] I1–I3. NEEDS AN SME GATE — it changes committed
+  ids (retired-id mint, `replaced_by`, test pins), so a rider, not an edit. Related [[Idea-208]],
+  [[Idea-209]].
+
+- **`Idea-208`** · 2026-08-29 · `[bug]` · **open** · prio? **High** —
+  **Nothing can see what the registry holds, so a wrong registration is invisible for as long as
+  nobody trips over it.** `dpl` is registered `layer: technology` and is wrong — it is a
+  pipeline/dataset taxonomy registry, a DATA-layer asset. The distribution shows how: **technology
+  9, data 5, business 2, human 0.** Technology is the default bucket, `human` is declared and never
+  used, and NO SURFACE ANYWHERE ASKS ANYONE TO CONFIRM A LAYER. The load map renders `layer` as one
+  column of a flat systems table — never grouped, never counted, never flagged as unconfirmed.
+  THE VIEW MUST BE ORGANIZED BY CLASS, NOT BY NAME: BDAT layer → business application → application
+  id → ontology class, with loader and module names demoted to detail. `asset_type` CANNOT be the
+  ontology heading — it reads `dcat:Dataset` on 30 of 30 rows, and a constant rendered as a column
+  reads as an answer when it is a default; the real class comes from
+  `config/taxonomy-ontology-map/`, which the generator already joins, and a row still on the bare
+  default is UNCLASSIFIED and should say so. THREE AXES HAVE NO CONSUMER: `taxonomy_category` has a
+  full vocabulary (Pipelines 11, Data Asset 5, Software/Apps 4, Infrastructure 3, Architecture 2,
+  ITSM/Gov 2, People and Org 2, Product 1) and ZERO readers outside `config/`; `acquisition` reaches
+  only `landing-zones` and only its manual half; and replica is COMPUTABLE (`origin != system`,
+  corroborated by `authority: ADS`) and computed nowhere. Gate `registry-wiring-readiness` clause D3
+  says surfacing this "is a separate item — say so and it gets one"; the SME said so. NO NEW FIELD
+  IS NEEDED — every indicator derives from fields that exist, which is what keeps it clear of that
+  gate's clause D2. Detail: [[source-registry-identity-review]] V1–V3. Related [[Idea-207]],
+  [[Idea-209]], [[N18]].
+
+- **`Idea-209`** · 2026-08-29 · `[bug]` · **open** · prio? **Med** —
+  **The internal twin is a black hole: the registry names no variable, points at no twin file, and
+  cannot say what is unset.** It says the real value lives in the twin and stops — never WHICH
+  file, WHICH variables, or WHETHER they are set. `internal/` holds ~20 directories with no index of
+  which one carries which system's settings. MEASURED: `.env.example` declares 17 keys; first-party
+  code reads **8 more declared nowhere** (console-credentials path, Control-M API config pointer,
+  both mapping-store variables, agent registration key, caller variable, a Neo4j container name,
+  plus the legacy log/caller aliases). So a null service locator with a comment is an empty slot
+  with no way to discover it is empty. THREE VERBS, each reusing a precedent: FIND (a set/unset
+  doctor that never prints a value — ADR 0017 clause 3's "one enumerable list" made real), DOCUMENT
+  (`.env.example` GENERATED from the declarations so it cannot drift 8 behind again), UPDATE (a
+  no-echo writer to the machine-local file, the `set_console_credential.py` pattern — consistent
+  with G126's ruling that `internal-local/` is read-mode because the SYSTEM may never write there
+  and the operator's hand is not the system). THE TRAP: the enumeration CANNOT BE A GREP —
+  `config.py` uses prefixed pydantic-settings, so the Neo4j URI never appears as a literal and a
+  text search sees the prefix and misses the field. J37 one layer over: read the importable object,
+  never the text that happens to spell it. Detail: [[source-registry-identity-review]] T1–T2.
+  Related [[Idea-207]], [[G125]].
+
+- **`Idea-210`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+  **A generic loader question cost ~40 searches and produced a review wrong in six places — the
+  wrongness is the finding, not the slowness.** Asked to review a loader and report its registry
+  mapping, an agent searched roughly forty times and returned: `cli_ingest.py` is orphaned (it is
+  registered, and `CHAINS` comes from `cli_shared` since S13); the samples dir is missing so the run
+  skips and exits 0 (it exists, the flag has no default since G78, and a missing input exits 2 —
+  that "skipping" string is the CLOSED defect quoted from `chain_inputs.py` as if it were live); the
+  SEAL row has no `locator.report` (it does); `AliasChoices` is on the row model (it is not — the
+  lowercasing is in the CSV adapter); and MODULE_MAP calls the S8 split deferred (it says it
+  shipped). It also MISSED that a third loader binds the same dataset id. EVERY ONE OF THOSE FACTS
+  IS IN AN IMPORTABLE OBJECT — `LOADER_REGISTRY`, `LOADER_SOURCE`, `effective_source_id()`, the
+  `BaseLoader` ClassVars — and `render_load_map.py` already inverts them. The facts were reachable;
+  the surface that hands them over in one call does not exist, so the search filled the gap with
+  plausible wrongness. A `drydocs registry --loader <name>` verb removes the room in which that
+  answer gets assembled. NOTE the miss pattern: four of the six are STALENESS (a checkout predating
+  S8/S13/G78/G79), which is its own argument for a surface that reports the tree it is run against.
+  Rides [[Idea-208]] as the same generator; called out separately because the justification is
+  different. Detail: [[source-registry-identity-review]].
+
 - **`Idea-206`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
   **The depgraph snapshot rolls at every session close, and 30 of the last 33 rolls carried no
   debt signal at all.** Measured on `knowledge/depgraph-snapshots/debt-metrics.jsonl`, 34 rows
