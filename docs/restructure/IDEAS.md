@@ -360,6 +360,46 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-223`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+  **G125 built the ONE expansion function but did not migrate the seven resolvers onto it — the
+  list is enforced, the resolvers still disagree.** What shipped: `drydocs_core/env_refs.py` with
+  `expand()` (bare `${NAME}` only, bash defaults REFUSED, secret registered at expansion),
+  `DECLARED_VARIABLES` (24 entries) and process-local masking. What did NOT: `resolve_data_root()`
+  still treats an empty string as unset and raises its own `DataRootNotSetError`;
+  `resolve_log_dir()` still walks `DRYDOCS_LOGDIR` then the `SPIDERP_LOGDIR` alias then a default;
+  `credentials_path()` still takes any non-empty override verbatim; `MappingStore.__init__` still
+  imports `os` inside the constructor to read one variable. WHY DEFERRED, and it was a risk call
+  rather than an oversight: each resolver raises a type other tests catch by name, so migrating
+  them is a behavior change disguised as a refactor, and G125 had eight other acceptance clauses
+  to land. WHAT HOLDS THE LINE MEANWHILE:
+  `test_every_variable_first_party_code_reads_is_declared` reads the IMPORTABLE objects — the
+  env-name constants plus each pydantic settings class's `env_prefix` + fields (J37, because no
+  grep can see `NEO4J_URI` when the prefix composes it) — so a NEW undeclared variable fails even
+  though the old resolvers are untouched. That is the property clause (c) actually wanted; this
+  item is the rest of it. THE ONE DESIGN DECISION TO MAKE FIRST, so the migration does not become
+  a bisect: whether the resolver-specific errors become subclasses of `UnsetVariableError` (callers
+  and tests keep working, one exception hierarchy) or whether the callers move to the new type (a
+  wider diff, a cleaner end state). `EnvVar.aliases` already covers the `SPIDERP_*` legacy chain,
+  so the log-dir case needs no new mechanism. Related [[G125]], [[Idea-222]].
+
+- **`Idea-224`** · 2026-08-30 · `[idea]` · **open** · prio? **Low** —
+  **The `snowflake-catalog` binding profile is declared with NO variables, and is the one row
+  waiting on something outside the repo.** State at main: `config/source-bindings.yaml` declares
+  it with `env: {}` and `status: declared-unconfigured`, serving three datasets
+  (`catalog@[db].[schema].datasets_v`, `...distributions_v`, `snowflake:schema-inventory` — all
+  three `confirmed: false`, all three `adapter: ~`). No Snowflake account exists on either
+  machine, so there is nothing for a variable to hold. DECLARING IT EMPTY IS DELIBERATE and should
+  not be "tidied away": the check reports `declared-no-variables` instead of the carrier being
+  absent from the report altogether, which is exactly the coverage lie G125 exists to end. WHEN AN
+  ACCOUNT APPEARS, three things move together and none of them is an id change: (1) the profile
+  grows an `env:` block of `${NAME}` references; (2) those names are added to
+  `DECLARED_VARIABLES` in `drydocs_core/env_refs.py`, or `expand()` refuses them — a variable
+  cannot enter by being used; (3) `status: declared-unconfigured` is dropped. ADJACENT AND
+  SEPARATE: the two `catalog@...` rows are the flagship `[schema]`-redacted ids, so they also sit
+  in the id-grammar gate ([[Idea-215]], [[Idea-218]]) — that work pairs the un-redaction with
+  `SourceEntry.urn` and rides its own SME gate, and NOTHING here waits on it. A binding is how a
+  carrier is reached; the id is what the dataset is called. Related [[G125]], [[Idea-218]].
+
 - **`Idea-222`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
   **ACCESS PATHS to one datapoint are already documented THREE times, each per-source, and never
   generalized: a row can name one path, never a choice among several, and nothing ranks them.**
