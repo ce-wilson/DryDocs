@@ -1,0 +1,44 @@
+id: G130
+epic: component-topology
+title: bootstrap verifies declared-present and never reports live-but-undeclared, which is how a
+  retired label's constraint survives a data wipe
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/schema/
+- internal/research/triage-bootstrap-2026-08-28.md
+- docs/restructure/backlog/items/G99.yaml
+acceptance: |
+  (a) THE COMMAND REPORTS THE OTHER DIRECTION TOO. It already asserts that every declared
+  constraint is present; it gains the inverse - the live constraint set minus the parsed
+  declarations under the schema tree - reported as a drift WARNING.
+
+  (b) NEVER AN AUTOMATIC DROP. The safety check before each company-side drop was a zero-node
+  count and a human decision. This reports, names each undeclared constraint with its label and
+  property, and says what a human would need to check before dropping it.
+
+  (c) THE MECHANISM IS IN THE OUTPUT SO THE WARNING IS ACTIONABLE - constraints outlive data
+  wipes. Their census recorded 62 constraints at a true-zero node baseline, because the wipe was a
+  data delete and not a database drop. A clean graph is not a clean schema, and a retired label's
+  constraint silently enforces an old identity rule against any future load that reuses the label.
+
+  (d) THIS IS A MISSING DETECTOR AND NOT A PRODUCER DEFECT TODAY, and the item proves that rather
+  than asserting it - the membership constraint was dropped at G99 on 2026-08-18 and the two
+  mis-spelled capability and tool labels appear nowhere in the schema tree. Re-verify all three at
+  build time and record the verification in the close note.
+
+  (e) IT NEEDS A LIVE GRAPH, SO IT IS NOT A PURE-UNIT ITEM. The test skips with a named message
+  when no database is reachable (the U26 precedent) and any live run names its venue - machine,
+  container and database (J18).
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-212, which was transcribed from the
+  company-side 2026-08-28 triage where three undeclared constraints were actually found.
+
+  Module graph-infra and epic component-topology follow the schema and provisioning work; the
+  deliverable is a check in the bootstrap path, not a loader change.

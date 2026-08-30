@@ -1,0 +1,60 @@
+id: I6
+epic: project-board
+title: There is no id allocator - next free id is a sentence in a skill file and it has failed six
+  times; make free mean free across every remote ref
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/groom-backlog/validate.py
+- .claude/skills/groom-backlog/SKILL.md
+- drydocs_core/backlog_store.py
+- tests/unit/test_backlog.py
+- docs/restructure/IDEAS.md
+- CLAUDE.md
+acceptance: |
+  (a) NEXT FREE MEANS FREE ACROSS EVERY REMOTE REF, NOT FREE IN MY TREE. The validator gains a
+  next-id mode taking an epic letter: it fetches, then reads a tree listing over the remote refs -
+  listing only, no checkout, cheap - and returns the next free number in that letter across all of
+  them. Verified against the case it would have prevented: on 2026-08-29 one machine's O69 was
+  already pushed on a feature branch when the other minted its own, and the second machine never
+  looked past its own tree because the rule never said to.
+
+  (b) THE CLAIM PROTOCOL EXTENDS FROM PULLING TO MINTING - mint the id, push the stub, then write
+  the body. This generalizes the mechanism that actually worked: ADR numbering survived the same
+  day on the same two machines because the decisions index carried a committed, pushed line
+  reserving an id for a draft that did not exist yet. It also closes the asymmetry Y6 identified,
+  so the two rules are stated together rather than in two places with different shapes.
+
+  (c) A GUARD COMPARES LOCAL ITEM IDS AGAINST THE REMOTE TRUNK and fails when one id carries two
+  different titles, skipping with a named message where no remote is reachable (the U26
+  precedent). The existing duplicate-id check only fires once both files sit in one checkout,
+  which is to say once the collision has already happened and the work is renumbering.
+
+  (d) THE RULE IS STATED ONCE. The skill file, the inbox's entry-header table and CLAUDE.md must
+  not each carry their own wording; the two documents point at the command.
+
+  (e) THE BAND GUARD IS UNTOUCHED AND THE ITEM SAYS WHY - bands separate producer from company and
+  do not cover two producer machines, which is the gap this closes. This is not a restatement of
+  the band note.
+
+  (f) THE RECORD IS WRITTEN INTO THE ITEM SO THE COUNT STAYS AUDITABLE - C19 built twice, K9 built
+  twice, a duplicate Idea-101, a duplicate Idea-86, a G70 and G71 pair renumbered to G75 and G76,
+  and nineteen ids at once on 2026-08-29. Six incidents, six conventions, zero enforcement points.
+
+  Full suite green; the new mode runs against this repo and its output is recorded in the close
+  note.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-205a. Priority p1 because the failure rate
+  is measured rather than anticipated and every instance cost rework.
+
+  Module drydocs-plan and epic project-board: the allocator is planning infrastructure and the
+  validator is the surface that already reads the backlog.
+
+  The entry's own scope fence is kept - the policy question about how two live sessions share one
+  working tree stays the user's and is not folded in here.

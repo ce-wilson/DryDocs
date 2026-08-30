@@ -33,3 +33,7 @@ groom_log:
     N17 reads the answer off the completed psgmgr ledger and records it there rather than in
     a new document.
   attached_at: N17
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: N22-N26 minted from the 08-29/08-30 registry findings. Four of the five are GATE DRAFTS and apply nothing - N23 carries the whole id grammar as ONE question (un-redaction, the URN carrier slot, the subset qualifier) because those parts cannot be ruled apart, N24 the access-path and reader axis, N25 the layer axis. N26 is the only build and needs no new field.
+  attached_at: N22

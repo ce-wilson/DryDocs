@@ -1,0 +1,37 @@
+id: O85
+epic: web-console
+title: The console cannot sign in on the verification port because the API allowlist names only
+  two dev ports, and the client blames an unreachable server instead
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/app.py
+- web/src/
+acceptance: |
+  (a) DECIDED AS ONE QUESTION, NOT TWO, and both answers land together - whether the allowlist
+  carries the verification port, and whether the client can distinguish a refused connection from
+  a blocked origin.
+
+  (b) THE ALLOWLIST IS RECONCILED WITH THE LEDGER. The API's cross-origin allowlist names the two
+  standard dev ports only, so a console served anywhere else gets a browser-blocked sign-in and
+  falls back to the sign-in screen. Either the allowlist gains the port the UI-test ledger's own
+  O65 and O66 sources cite, or the ledger is corrected to a port the API already serves. Do one,
+  and state the reason.
+
+  (c) THE ERROR MESSAGE STOPS NAMING THE WRONG CAUSE. A blocked origin and a dead server are the
+  same rejection to the browser fetch API, so the client says which it cannot tell apart, or
+  probes once to tell them apart, rather than asserting the API is unreachable.
+
+  (d) VERIFIED BY SERVING THE CONSOLE ON THE CHOSEN PORT AND SIGNING IN, on this desktop, with the
+  venue named (J18) - the failure is a browser behaviour and no unit test observes it.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-200, found while verifying O77 on
+  2026-08-28 - the verification ran on a fallback port because the standard one was already taken
+  by another dev server, which is how a documented verification port and the API's allowlist came
+  to disagree unnoticed since O69.

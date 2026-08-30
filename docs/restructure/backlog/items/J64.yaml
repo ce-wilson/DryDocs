@@ -1,0 +1,42 @@
+id: J64
+epic: release-infrastructure
+title: A depgraph snapshot scanned before the commit it stamps is a claim about a tree that was
+  never scanned - scan after, not before
+type: bug
+module: graph-infra
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- knowledge/depgraph-snapshots/README.md
+- tests/unit/test_depgraph_snapshots.py
+acceptance: |
+  (a) THE ORDERING IS ENFORCED IN THE SCRIPT, NOT LEFT TO THE RITUAL'S PROSE. The snapshot stamps
+  a git metadata header - commit, full sha, branch, describe, subject and dirty flag - so the scan
+  must run against the tree of the commit it stamps. A scan taken before that commit exists makes
+  the stamp a claim about a tree nobody scanned.
+
+  (b) THE 2026-08-29 INCIDENT IS THE TEST CASE. A snapshot taken from the pre-merge tree recorded
+  a directory that main had renamed on 2026-08-26, tripped the J55 publish-boundary guard, and had
+  to be deleted and regenerated against the merge commit. Reproduce the ordering fault once,
+  confirm the fix prevents it, and record both in the close note.
+
+  (c) A DIRTY TREE AT SCAN TIME IS REPORTED AS SUCH rather than stamped silently, since the header
+  already carries the flag and nothing reads it.
+
+  (d) OUT OF SCOPE, DELIBERATELY - the CADENCE question. Thirty of the last thirty-three rolls
+  carried no debt signal at all, and the four candidate directions are a user ruling that stays in
+  the inbox. This item changes ordering only and rolls exactly as often as it does today.
+
+  (e) SIBLING DEFECTS IN THE SAME SCRIPT ARE NOT RE-SOLVED HERE - the board refresh skipping
+  silently is J65, and the session-close CI verdict's detached-HEAD blindness is U27.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-206, taking ONLY its second clause. The
+  entry states in terms that the cadence directions are deliberately not chosen, so grooming them
+  would be guessing at a user decision; the ordering half is a plain defect with a reproduction.
+
+  The cadence half stays in the inbox as an open question and is named in the groom report.

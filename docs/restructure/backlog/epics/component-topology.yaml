@@ -92,3 +92,7 @@ groom_log:
     run recipe (Idea-169, user direction 2026-08-24), whose first multi-DC LOAD is gated on
     the new P6 identity probe.
   attached_at: G111
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: G127-G131 minted. G128 and G129 are both G125 follow-ups the build recorded rather than hid - the resolver migration it declined, and the environment doctor its declared list finally makes possible.
+  attached_at: G127

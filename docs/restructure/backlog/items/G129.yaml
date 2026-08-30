@@ -1,0 +1,66 @@
+id: G129
+epic: component-topology
+title: The internal twin is a black hole - the registry names no variable, points at no twin file,
+  and cannot say which settings are unset
+type: task
+module: config
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on:
+- G125
+inputs:
+- config/source-registry.yaml
+- config/source-bindings.yaml
+- drydocs_core/env_refs.py
+- .env.example
+- docs/design/source-registry-identity-review.md
+- docs/decisions/0017-source-binding-substrate.md
+acceptance: |
+  Three verbs, each reusing an existing precedent, and NO VALUE IS EVER PRINTED.
+
+  (a) FIND - a set-and-unset doctor built on G125's declared-variable list, which is ADR 0017
+  clause 3's one enumerable list made real. It reports set, unset, or not-applicable-on-this-
+  machine, and names the venue it ran on (J18), because the two machines hold different subsets
+  and an untagged report reads as a defect from the other machine.
+
+  (b) DOCUMENT - the example environment file is GENERATED from the declarations so it cannot
+  drift again. The measured gap is re-derived at pull time and not trusted from this text: the
+  example declared 17 keys while first-party code read 8 more declared nowhere - the console
+  credentials path, the Control-M adapter's config pointer, both mapping-store variables, the
+  agent registration key, the caller variable, a Neo4j container name, and the legacy log and
+  caller aliases.
+
+  (c) UPDATE - a no-echo writer to the machine-local file on the existing console-credential
+  script's pattern. It is the OPERATOR'S tool, invoked by hand, and no load path calls it. That is
+  consistent with the G126 ruling that the machine-local tree is read-mode for the SYSTEM - the
+  operator's hand is not the system - and the item states the distinction rather than assuming a
+  reader will infer it.
+
+  (d) THE REGISTRY SAYS WHICH TWIN FILE AND WHICH VARIABLES CARRY A SYSTEM'S SETTINGS, so a null
+  service locator with a comment stops being an empty slot nobody can discover. The internal tree
+  holds roughly twenty directories with no index of which one carries which system's settings; the
+  deliverable names the file on the BINDING rather than adding a separate index that would rot.
+
+  (e) THE ENUMERATION CANNOT BE A GREP, and that is guarded. The settings classes use prefixed
+  pydantic settings, so the Neo4j URI never appears as a literal and a text search sees the prefix
+  and misses the field. Read the importable object (J37), the way G125's declared-variable guard
+  already does.
+
+  (f) NO SECRET IS PRINTED BY ANY OF THE THREE VERBS, ever - a doctor that echoes a value is the
+  defect it exists to prevent - and a guard asserts it rather than a comment promising it.
+
+  Full suite green, ruff and format clean, and the generated example file committed with no diff
+  against a re-run.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-209. Priority p1 because the entry's own
+  measurement is that eight live variables are declared nowhere at all, which is a publish-boundary
+  adjacent gap as much as an ergonomics one.
+
+  Depends on G125, which shipped the declared list and the one expansion function these three verbs
+  read; before G125 there was nothing to enumerate.
+
+  Module config rather than drydocs-core: the deliverable is declaration and documentation of what
+  the environment must hold, with the verbs as its surface.

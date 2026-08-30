@@ -1,0 +1,100 @@
+id: N23
+epic: source-column-mappings
+title: One SME gate for the whole id grammar - un-redact the database and schema, correct the
+  carrier slot the derived URN builds from, and add the subset qualifier, because the four
+  findings cannot be ruled apart
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+gates:
+- registry-wiring-readiness
+inputs:
+- config/source-registry.yaml
+- drydocs_core/source_registry.py
+- docs/design/source-registry-identity-review.md
+- docs/design/openlineage-substrate-review.md
+- docs/design/datahub-substrate-review.md
+- docs/decisions/0017-source-binding-substrate.md
+acceptance: |
+  A single gate prompt puts the id grammar to the SME as ONE question with four parts. NOTHING IS
+  APPLIED: no id changes, no retired-id mint, no change to the URN derivation, until the gate is
+  signed. The reason they ride together is mechanical - parts (a) and (c) must land in the same
+  commit or the change is a no-op, and part (d) needs the same grammar edit.
+
+  (a) THE REDACTION TEST IS STATED AND THE VIOLATIONS ARE NAMED. The test the prompt asks the SME
+  to ratify - could someone connect with this string alone - fails for a schema or database name
+  and passes for a host, port, service or credential. Class 3 of the J13 ruling already ruled
+  schema publishable (redact the database, publish schema and table, 2026-08-11) and two live rows
+  violate it - the two catalog view rows whose only real token is the view name - plus a snow
+  template that teaches the shape to the next row. It recurs because the carve-out today is a
+  judgement about established public vocabulary with no test behind it, so redaction wins by
+  default.
+
+  (b) THE DATABASE HALF HAS A KNOWN CORRECT VALUE, SO THE PROMPT ASKS ABOUT MIGRATION, NOT ABOUT
+  MEANING. The user ruled 2026-08-30 that spiderdb is the NAME - the pronounceable head of the TNS
+  alias - while the alias itself is a connection coordinate that resolves through tnsnames to
+  host, port and service. Nobody connects with spiderdb alone, so it is an identifier and it
+  publishes. The prompt carries that ruling and asks only how the ten psgmgr ids migrate.
+
+  (c) THE URN MOVES IN THE SAME COMMIT OR THE UN-REDACTION BUYS NOTHING. SourceEntry.urn derives a
+  three-part key from system and artifact, dropping the database AND the schema, so the ten psgmgr
+  rows currently put a SCHEMA in the carrier position. Measured at main - 30 rows, 30 distinct
+  URNs, so nothing collides yet - but psgmgr carries three origins and snowflake two, so the
+  headroom is accidental. ADR 0017 clause 1 as amended already rules that the id change and the
+  derivation change pair; the prompt makes that pairing explicit and asks for the carrier value,
+  not just the shape.
+
+  (d) THE SUBSET QUALIFIER, WHOSE SHAPE IS ALREADY RULED AND WHOSE DETAIL IS NOT. The user ruled
+  2026-08-30 that two filtered extracts from one table are distinguished by a qualifier naming the
+  PREDICATE, appended to the id after the locator, and NOT by a taxonomy prefix - the four
+  arguments against the prefix are recorded in the inbox entry and are quoted in the prompt so the
+  rejected option stays visible. What the gate still settles - the separator character, whether
+  the qualifier appears in the derived URN or only in the dataset id, the structured form of the
+  predicate itself (OpenLineage's condition grammar is the shape to copy - field versus literal
+  expressions, compare, binary AND and OR), and whether the guard asserts that subsets of one
+  table are mutually exclusive and separately whether they must cover it. The filter is declared
+  AS DATA, never as prose in a notes block, or nothing can check either property.
+
+  (e) THE MIGRATION COST IS ENUMERATED BY MEASUREMENT, NOT ESTIMATED. Every id-bearing surface is
+  listed with a count taken at pull time - dataset ids, source_id references, the overlay, the
+  retired list, the derived URNs, every gate prompt citing an id, and the company port. The
+  retired replaced_by field is a LIST and the controlm-psgmgr expansion to seven ids is the
+  standing one-to-many precedent, so the mechanism exists and only the scale is new.
+
+  (f) THE GRAMMAR HEADER'S OWN RULE IS PUT TO THE SME, because it is wrong on its flagship case in
+  both halves - psgmgr publishes today by a hand-waved vocabulary exemption and spiderdb publishes
+  on the test, while the header says real database and schema values are connection coordinates
+  belonging to the internal twin. The rule is not merely too cautious; it misclassifies the thing
+  it names.
+
+  (g) TWO SMALLER THINGS RIDE, BOTH FOUND WHILE WRITING THIS ITEM. First, ADR 0017's TITLE still
+  reads as a per-origin table while its own Rev 2 clause 2 rules the binding per CARRIER - correct
+  the title in the same pass, since the ADR is an input to this prompt and a governed artifact
+  should not contradict its own accepted text. Second, the application-id field is a standing
+  placeholder on all 16 system rows, which is the same category error a third time - an identifier
+  a governance product maps ownership through, absent everywhere - and the prompt asks whether it
+  is filled, declined or deferred.
+
+  Closes when the prompt exists, is listed in the gate log, every id-bearing surface it would
+  touch is enumerated with a measured count, and the validator is green. Any build that follows is
+  a separate item and cannot start before sign-off.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Ideas 207, 215, 217 and 218, which are four
+  entries about one grammar. They were NOT groomed as four items: 207 and 215 both say the change
+  needs an SME gate, 217 says in terms that it rides the SAME gate as the un-redaction, and 218's
+  surviving half is that the ids and the URN derivation must move together. Four prompts would let
+  the SME sign three of them and leave the change incoherent.
+
+  What is NOT in this item, deliberately. The ADR-text corrections that 218 and 220 asked for
+  already landed - ADR 0017 Rev 2 is ACCEPTED and folded every finding into its clauses, and the
+  binding mechanisms 220 named shipped in G125 - so only the title defect survives, as clause (g).
+  The layer axis (Idea-216) is a different question about a different field and is N25.
+
+  Model fable because the prompt has to frame a decision that changes committed identifiers, the
+  derived URN and the port surface at once; getting the framing wrong is more expensive than the
+  drafting. The RULING is the SME's and this item applies nothing.

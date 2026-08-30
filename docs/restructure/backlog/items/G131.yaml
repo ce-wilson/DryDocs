@@ -1,0 +1,37 @@
+id: G131
+epic: component-topology
+title: The agent tier's environment file carries an empty Neo4j password and only a falsy check
+  keeps it working
+type: chore
+module: drydocs-agents
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- agents/common/neo4j_tool.py
+- agents/README.md
+- .env.example
+acceptance: |
+  (a) THE FRAGILITY IS NAMED IN THE CODE OR REMOVED FROM THE FILE. The merge in the agent tier's
+  Neo4j tool takes a value only when it is truthy and the variable is not already set, so an empty
+  password line falls through to the root environment file. It reads like a normal precedence rule
+  while actually depending on the empty string being falsy - rewrite it as a membership test and
+  the blank line silently wins, giving the whole agent tier an empty password.
+
+  (b) PICK ONE AND SAY WHICH. Either the blank line is cleared from the agent environment file so
+  the merge has nothing to override, or the guard's intent is made explicit at the merge site.
+  Both are acceptable; leaving it undocumented is not.
+
+  (c) THE README STEP THAT PRODUCES THE BLANK LINE IS CORRECTED IN THE SAME CHANGE, or the next
+  person who follows it undoes the fix.
+
+  (d) NO CREDENTIAL VALUE APPEARS IN ANY COMMIT. The agent environment file stays machine-local.
+
+  Agent tier still connects after the change, verified on this desktop with the venue named.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-203. Low priority and haiku because the
+  work is a two-line change plus a README correction; it is captured because the failure mode is
+  silent and tier-wide, not because it is urgent.

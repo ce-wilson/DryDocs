@@ -1,0 +1,55 @@
+id: G128
+epic: component-topology
+title: G125 shipped the one expansion function and left seven resolvers on their own semantics -
+  migrate them, after deciding first whether the old error types subclass the new one
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G125
+inputs:
+- drydocs_core/env_refs.py
+- drydocs_core/data_root.py
+- drydocs_core/config.py
+- drydocs_core/mapping_store.py
+- drydocs_api/credentials.py
+- tests/unit/test_source_bindings.py
+acceptance: |
+  (a) THE DESIGN DECISION IS MADE AND WRITTEN DOWN BEFORE ANY RESOLVER MOVES, because taking it
+  midway turns the migration into a bisect. Either the resolver-specific errors become subclasses
+  of the new unset-variable error - callers and tests keep working, one exception hierarchy - or
+  the callers move to the new type, a wider diff and a cleaner end state. Record which, and why.
+
+  (b) THE FOUR NAMED RESOLVERS MOVE ONTO THE ONE EXPANSION FUNCTION. The data-root resolver still
+  treats an empty string as unset and raises its own error type; the log-directory resolver still
+  walks its variable, then the legacy alias, then a default; the credentials-path resolver still
+  takes any non-empty override verbatim; and the mapping store still imports the os module inside
+  its constructor to read one variable. The alias field on the declared-variable record already
+  covers the legacy chain, so the log-directory case needs no new mechanism.
+
+  (c) RULED BEHAVIOUR IS PRESERVED EXACTLY. An unset data root FAILS naming the variable (G81
+  clause d) rather than silently relocating, and no bash-style default operator enters at any
+  layer - the expander substitutes and refuses defaults, which is what keeps that ruling
+  implementable in one place instead of seven.
+
+  (d) THE GUARD THAT HOLDS THE LINE TODAY STAYS GREEN AND IS NOT WEAKENED TO FIT THE MIGRATION.
+  The declared-variable guard reads the importable objects - the environment-name constants plus
+  each settings class's prefix and fields - because no grep can see a variable name the prefix
+  composes (J37). If the migration needs that test relaxed, stop and say why.
+
+  (e) THE MIGRATION IS VERIFIED AGAINST THE TESTS THAT CATCH THE OLD TYPES BY NAME, since that is
+  the actual risk G125 declined. Full suite green, ruff and format clean, and the close note lists
+  every exception type whose identity changed.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-223.
+
+  This is the rest of G125 clause (c), which shipped the one function, the one error shape and the
+  one enumerable list, and deliberately left the resolvers alone - a risk call, recorded in G125's
+  own close note as a follow-up rather than discovered later. Depends on G125 for that reason.
+
+  Module drydocs-core because every file it touches is core; sonnet because clause (a) is a
+  bounded design choice with a written acceptance rather than a boundary decision.

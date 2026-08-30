@@ -1,0 +1,85 @@
+id: N24
+epic: source-column-mappings
+title: A registry row names the access path it took and can never say the datapoint has two,
+  nothing ranks paths, and the principal behind a path is not in the vocabulary at all
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+gates:
+- registry-wiring-readiness
+inputs:
+- config/source-registry.yaml
+- config/precedence.yaml
+- docs/design/drydocs-lineage-mac-runbook.md
+- config/gate-prompts/dpl-dataset-registry-contract.yaml
+- docs/decisions/0017-source-binding-substrate.md
+acceptance: |
+  A rider to the registry-wiring-readiness gate puts the access-path axis to the SME. NOTHING IS
+  APPLIED - widening the path field or adding a path-precedence section are schema changes fenced
+  by that gate's clause D2 and this item ships a draft, not a field.
+
+  (a) WHAT ALREADY EXISTS IS STATED FIRST, so the rider does not propose vocabulary the registry
+  has. The acquisition block already declares the api and db path enum with the Control-M adapter
+  as the worked example, and already covers the manual-report path with a format enum and a drop
+  directory. All three paths a human would name are therefore in the vocabulary. Measured at main
+  and to be re-measured at pull - manual 15, automated 15, with the database path on all 15
+  automated rows and the api path on none.
+
+  (b) THE FIELD IS A SCALAR, SO A ROW RECORDS THE PATH TAKEN AND NEVER THAT THE DATAPOINT HAS TWO.
+  Three documented cases had to write prose instead, and the rider cites all three - the lineage
+  MAC runbook's promotion-repo clone versus the per-pipeline export tool, WITH its SME caveat that
+  the clone may lag because feature branches are not reliably merged, so the folder listing is a
+  floor on the inventory and never the authority; and the DPL dataset-registry gate, which already
+  treats per-application API versus bulk export as two paths to one datapoint and gates the choice.
+
+  (c) NOTHING RANKS PATHS, AND THE MECHANISM THAT LOOKS LIKE IT DOES ANSWERS A DIFFERENT QUESTION.
+  The precedence config has the right conflict policy - highest authority wins, the loser is
+  recorded as an alias, SME confirmation required, never a silent drop - but its order entries
+  rank SOURCES OF TRUTH ABOUT A FACT, which is not the same as which PATH TO THE SAME SOURCE wins.
+  The rider says which mechanism carries path precedence and does not assume it is that one.
+
+  (d) THE PRINCIPAL AXIS IS THE PART NOT IN THE VOCABULARY AT ALL. A human at a web console and a
+  service account at a programmatic endpoint are the same path and the same object, but differ in
+  principal, in what each can see, and in auditability. That is closer to the K2 identity tiers
+  than to a format, and the rider asks whether it is a field, a tier, or a property of the binding.
+
+  (e) THE READER GRAIN RIDES THE SAME RIDER, because it is the other half of the same answer. A
+  CONNECTION binds per carrier (ADR 0017 clause 2 as amended, shipped in G125); a READER is finer,
+  and the adapter field is already dataset-grained - measured at main as oracle 10, csv 4, one
+  each for json, markdown and yaml, and 13 unset. What a row cannot say today is WHICH reader
+  implementation and with what configuration. An MCP server is a new adapter KIND rather than a
+  new axis, and the ten oracle rows are the same ten that share one connection profile, so both
+  gaps sit on the same rows.
+
+  (f) THE PURPOSE AXIS IS FLAGGED AND NOT ASSUMED. The same datapoint read for two purposes may
+  want two readers or two configurations, which is layer-4 context-graph shaped rather than a
+  static registry value. The rider records it as an open question with that framing, so it is not
+  quietly designed into a layer-1 field.
+
+  (g) THE CHOICE IS AN SME RULING RECORDED ON THE ROW. Which reader and which configuration for a
+  given datapoint is exactly the kind of thing the HITL flow says is never auto-decided, so the
+  answer is written on the row with its ruling and never inferred from the platform.
+
+  (h) WHY IT MATTERS IS IN THE RIDER, not left as tidiness - paths DISAGREE, the clone-lag caveat
+  is a measured instance, and an unrecorded path choice makes a divergence unattributable. You
+  cannot tell a stale copy from a real change.
+
+  Closes when the rider exists against the registry-wiring-readiness prompt, is listed in the gate
+  log, and the validator is green.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-222, carrying the reader-grain half of
+  Idea-221 as clause (e). Idea-221 stays open in the inbox for its build half - whether an MCP
+  server is stood up for Jira, Confluence or the registry - because that is downstream of this
+  ruling and of a separate HITL question about whether such a tool may write a committed file.
+
+  Both entries say in terms that nothing here is proposed as a schema change: the path field and
+  precedence work is fenced by the unsigned N10 clause D2, which is why this is a rider draft.
+
+  Model fable for the same reason as N23 - the framing decides what the SME can and cannot say,
+  and clause (f) is the one place a wrong frame would bake a context-graph question into a
+  taxonomy field.

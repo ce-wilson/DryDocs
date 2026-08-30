@@ -1,0 +1,33 @@
+id: O83
+epic: web-console
+title: The console's bolt panel defaults its database to the home database, so a fresh clone runs
+  correct Cypher against the wrong database and gets zero rows
+type: bug
+module: drydocs-web
+phase: 12
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- web/src/components/CypherConsole.tsx
+- web/.env.example
+acceptance: |
+  (a) THE DEFAULT BECOMES THE PROJECT DATABASE, not the driver's home database, since no surface
+  this panel serves reads from the home database - every depgraph and Control-M surface lives in
+  the project database, and the home database is explicitly not part of the topology.
+
+  (b) THE EXAMPLE ENVIRONMENT FILE AND THE CONSOLE README STATE THE VARIABLE AND ITS DEFAULT, so
+  the setting is discoverable rather than inherited by luck.
+
+  (c) BOTH PATHS ARE CHECKED - a machine whose local environment file sets the variable is
+  unaffected, which is why this survived; the failure only reaches someone who copied the example
+  and did not fill it.
+
+  (d) VERIFIED BY RUNNING A PRESET FROM A CLONE WITH NO LOCAL ENVIRONMENT FILE, because the
+  failure presents as an empty result rather than an error and a green unit suite proves nothing
+  about it.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-204. Low priority and haiku - a one-line
+  default plus documentation - but it is a real first-run defect and the symptom is silent.

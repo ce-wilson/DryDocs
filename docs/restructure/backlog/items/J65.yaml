@@ -1,0 +1,44 @@
+id: J65
+epic: release-infrastructure
+title: The snapshot script's board refresh has been silently skipping on this desktop, and the
+  warning prints the word Traceback instead of the module that is missing
+type: bug
+module: graph-infra
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- knowledge/depgraph-snapshots/snapshot.ps1
+- scripts/render_load_map.py
+- scripts/render_board.py
+acceptance: |
+  (a) THE SCRIPT CLEARS THE VIRTUAL-ENVIRONMENT VARIABLE BEFORE IT CALLS POETRY, so a PowerShell
+  caller that inherited this desktop's leak - the shell pre-sets it to the agents environment -
+  resolves the project environment instead. The failure today is a missing typer module raised
+  from the load-map renderer; a Bash caller that unsets the variable succeeds and PowerShell
+  inherits it and fails.
+
+  (b) A FAILED STEP PRINTS THE LAST LINE OF THE TRACEBACK, NOT THE FIRST. This is the half that
+  matters more than the first: the current output reads as noise, which is exactly why the skip
+  survived unnoticed. After the change the warning names the module.
+
+  (c) VERIFIED BY RUNNING THE STEP FROM BOTH SHELLS ON THIS DESKTOP and recording both outcomes in
+  the close note, with the venue named (J18).
+
+  (d) THE CONSEQUENCE IS STATED AND THEN CHECKED - the load-map surfaces never refreshed from the
+  snapshot on this machine, so a stale render would not be caught by the step meant to catch it.
+  Run the stale-render check once after the fix and commit any refresh it turns up.
+
+  (e) WARN-ONLY STAYS WARN-ONLY. A failed board refresh still does not block the snapshot;
+  recording repo structure and refreshing a render are unrelated jobs, and the failure being fixed
+  is nobody seeing the warning.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-201, observed at the O77 close on
+  2026-08-28.
+
+  Same script as J64 and deliberately a separate item - that one is about WHEN the scan runs and
+  this one is about a step inside it failing invisibly. Neither should re-solve the other, and
+  both say so.

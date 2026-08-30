@@ -1,0 +1,62 @@
+id: N22
+epic: source-column-mappings
+title: The PAT Product Application Report feeds two company loaders and has no producer registry
+  row, and the two PAT report names read crossed — put both to the gate rather than picking a
+  string
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- config/gate-log.md
+acceptance: |
+  A gate prompt exists that lets the SME rule on a new PAT dataset id and on a rename. NOTHING IS
+  APPLIED by this item: no id is minted, no registry row is edited, and no rename is performed
+  until the gate is signed.
+
+  (a) THE MISSING ROW IS DESCRIBED, THE ID IS PROPOSED, NEVER CHOSEN. The 2026-08-28 manual-load
+  PoC established three PAT reports and which loader each feeds - Team Details Report, Product
+  Catalog People Report, and the Product Application Report, which feeds the product-owners and
+  area-products loaders company-side and which the producer registry does not carry at all. The
+  prompt presents the company id (pat colon catalog-app, itself replacing an older hyphenated
+  spelling) as a CANDIDATE with its alternatives, and quotes the T19 precedent - T19 ruled the
+  product-catalog id precisely so that neither repo's legacy string survived - so the SME rules
+  with that history in view. Inventing a third id unilaterally producer-side re-opens exactly
+  what T19 closed, which is why this is a gate and not an edit.
+
+  (b) THE CROSSED NAMES RIDE THE SAME PROMPT. The people-report id is bound to the Team Details
+  Report, while the report actually named as a People Report belongs to the product-catalog id.
+  The prompt asks for a rename ruling and states the cost of each direction - retired-id mint,
+  replaced_by entry, test pins, and the company port - so declining the rename is a valid
+  sign-off with a stated consequence.
+
+  (c) THE WIDER FORM IS IN SCOPE. A 2026-08-27 PAT pull landed thirteen reports in the drop zone
+  and four in active analytical use resolve to no dataset id. The prompt asks whether each
+  unmapped report is registered, declined, or deferred, each with a reason, so the gap is closed
+  as a set rather than one row at a time. Re-measure the thirteen and the four at pull time;
+  the figures here are to be re-derived, not trusted.
+
+  (d) THE COMPANY-SIDE PROMPT IS CITED AS PRIOR ART, NOT COPIED. The manual-download-provenance
+  prompt drafted company-side 2026-08-28 records the wider form; the producer prompt states its
+  own scope and its own questions, because the two repos run their own gates and a producer
+  sign-off is not a company sign-off.
+
+  (e) THE FIELD EDIT THAT WAS ALREADY DONE IS NOT REDONE. Adding the report-name locator field to
+  EXISTING rows landed at the 2026-08-29 census close, and a guard now makes the report name
+  declared rather than tribal. This item touches only what needs a ruling.
+
+  Closes when the prompt file exists, is listed in the gate log, and the validator is green.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-187.
+
+  Module config and phase 11 follow N18 - the deliverable is a registry-governance artifact, not
+  loader code. Epic source-column-mappings for the same reason.
+
+  The reason this is a gate-drafting item rather than a build: minting a dataset id is the exact
+  decision T19 ruled, and the entry says so in terms. A groom that picked the id would be
+  grooming an id policy into a done deal.

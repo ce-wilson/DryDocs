@@ -1,0 +1,77 @@
+id: N26
+epic: source-column-mappings
+title: Nothing surfaces what the registry holds, so a wrong registration stays invisible until
+  somebody trips over it - one view organized by class and one answer per loader, both from
+  fields that already exist
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- config/taxonomy-ontology-map/
+- scripts/render_load_map.py
+- docs/plan/load-map.html
+- docs/design/source-registry-identity-review.md
+acceptance: |
+  Two surfaces, one generator, NO NEW FIELD - every indicator derives from fields the registry
+  already carries, which is what keeps this clear of the registry-wiring-readiness gate's clause
+  D2. The SME already ruled that surfacing this is a separate item and gets one (clause D3).
+
+  (a) THE VIEW IS ORGANIZED BY CLASS, NOT BY NAME. Today the load map renders the layer as one
+  column of a flat systems table - never grouped, never counted, never flagged as unconfirmed. The
+  refreshed view leads with BDAT layer, then business application, then application id, then
+  ontology class, and demotes loader and module names to detail.
+
+  (b) THE ONTOLOGY HEADING IS NOT THE ASSET TYPE. That field reads the same DCAT dataset value on
+  30 of 30 rows, and a constant rendered as a column reads as an answer when it is a default. The
+  real class comes from the taxonomy-to-ontology map the generator already joins, and a row still
+  on the bare default is rendered UNCLASSIFIED and says so.
+
+  (c) THE THREE UNREAD AXES GET A CONSUMER. The taxonomy category has a full vocabulary and zero
+  readers outside config; the acquisition block reaches only the landing-zones command and only
+  its manual half; and replica-ness is COMPUTABLE (origin differs from system, corroborated by the
+  authority field) and computed nowhere. Each appears on the view. Re-measure the distributions at
+  pull time rather than trusting the figures in this item.
+
+  (d) THE KNOWN-WRONG ROW IS THE ACCEPTANCE TEST, not an anecdote - the DPL row is registered as
+  technology and is a pipeline and dataset taxonomy registry, so it is a data-layer asset. After
+  this item that row is VISIBLY odd on the view without anyone knowing to look for it. Correcting
+  the value itself is not in scope here (N25 rules the axis); being able to SEE it is.
+
+  (e) ONE ANSWER PER LOADER, IN ONE CALL. A registry query verb - drydocs registry with a loader
+  name - returns that loader's registry binding, its source id, the datasets it writes and the
+  other loaders bound to the same id. Every fact it prints comes from an IMPORTABLE object (the
+  loader registry, the loader-source binding, the effective-source-id resolver, the base-loader
+  class variables), never from a rendered surface or prose, per J37. The generator that feeds the
+  view is the same one that answers the verb, so the two cannot disagree.
+
+  (f) THE VERB EXISTS BECAUSE THE ABSENCE COST A WRONG REVIEW, and the item records it so the
+  motivation survives - a generic loader question cost roughly forty searches and produced an
+  answer wrong in six places, four of them staleness, and it missed that a third loader binds the
+  same dataset id. Every one of those facts was reachable from an importable object; the surface
+  that hands them over in one call did not exist, so the search filled the gap with plausible
+  wrongness. That miss - a third loader on one dataset id - is an explicit test case for the verb.
+
+  (g) THE SURFACE NAMES THE TREE IT RAN AGAINST. The view and the verb both stamp the commit they
+  were produced from, which is the narrow, in-scope half of the review-provenance problem J63
+  generalizes.
+
+  Guarded by a drift test - the committed render matches its source (the stale-render check) - and
+  the full suite plus ruff stay green.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-208 and Idea-210, which are one deliverable
+  argued from two directions. Idea-210 says so itself - it rides the same generator and was
+  captured separately only because the justification differs - so two items would have produced
+  two surfaces that could disagree, which is the defect both entries describe.
+
+  Module config and phase 11 follow N18 - the deliverable is registry governance made visible, and
+  the CLI verb is the delivery mechanism rather than the point. Whoever pulls this should check
+  MODULE_MAP before adding the command module row, per the default-deny boundary guard.
+
+  Clause (g) is deliberately narrow. The general rule - every review surface names its commit and
+  its port base - is J63, and this item must not re-solve it.

@@ -1,0 +1,54 @@
+id: C38
+epic: ontology-mapping
+title: Replica-ness is recorded three times as attributes and as no edge - register a derivation
+  relationship type as planned and take its meaning to the gate
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/RELATIONSHIP_GUIDE.md
+- drydocs_core/ontology/relationship_vocabulary/
+- config/source-registry.yaml
+- docs/design/datahub-substrate-review.md
+acceptance: |
+  NOTHING IS WRITTEN TO THE GRAPH AND NO MAPPING LEAVES planned until the gate confirms it. This
+  item registers a candidate and drafts the question; the meaning is the SME's.
+
+  (a) THE GAP IS STATED WITH ITS THREE CURRENT SPELLINGS. Today a replica says so three times -
+  the origin differing from the system in the id shape, the authority field reading as an
+  authorized distribution rather than a system of record, and prose in the notes - and all three
+  are ATTRIBUTES. None is traversable, so no query can walk from a replica to its origin.
+
+  (b) THE CANDIDATE IS A TYPED DERIVATION EDGE, registered in the relationship-vocabulary registry
+  under the right domain with status planned, and routed through the relationship guide and the
+  HITL gate. The precedent cited is DataHub's ruling - an upstream edge with a COPY type, released
+  2020-05-21 and patchable one edge at a time.
+
+  (c) THE ANTI-PATTERN IS CARRIED WITH THE PROPOSAL, because it is the load-bearing half. A
+  sibling-style construct asserts that two nodes are the same thing, and DataHub's sibling graph
+  service ACTIVELY DELETES any lineage relationship between two siblings from the default merged
+  read path - destroying the very fact being recorded. The prompt names this so the SME can reject
+  the sibling shape knowingly rather than by omission.
+
+  (d) THE SECOND HALF OF THAT RULING RIDES TOO - record the HOW redundantly, because the lineage
+  TYPE does not survive graph traversal on any of their four read paths. Whatever edge is minted,
+  the item asks whether the derivation kind is also kept as a property, and says why.
+
+  (e) EVIDENCE IS CITED BY ANCHOR, not summarized - the DataHub substrate review's replica-note
+  anchor - so the reasoning can be re-read rather than re-derived.
+
+  Closes when the vocabulary entry exists with status planned, the gate question is drafted and
+  listed in the gate log, and the validator plus the vocabulary guards are green.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-219, which says in terms that minting a
+  derivation relationship type is an ontology decision and inboxes itself rather than proposing.
+  This item honours that - it takes the entry as far as planned and no further, which is exactly
+  the path CLAUDE.md prescribes for a new relationship type.
+
+  Agent ontology-mapper and module ontology per the layer table; model fable because edge meaning
+  is the category the matrix reserves it for.

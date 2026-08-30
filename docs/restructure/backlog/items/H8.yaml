@@ -1,0 +1,56 @@
+id: H8
+epic: drydocs-review-backflow
+title: The company tree registers 67 CLI commands to producer main's 50 - turn the measured
+  back-flow inventory into a per-command disposition the user can rule on
+type: task
+module: docs
+phase: 7
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- internal/research/triage-bootstrap-2026-08-28.md
+- MODULE_MAP.md
+- config/source-registry.yaml
+acceptance: |
+  The deliverable is a TABLE, not a build. Nothing is reproduced by this item.
+
+  (a) BOTH COUNTS ARE RE-READ FROM THE IMPORTABLE OBJECT - the registered-commands collection on
+  the CLI application - never from the help output or from prose (J37), and re-measured at pull
+  time rather than trusted from the 67-to-50 figure recorded here.
+
+  (b) EVERY COMPANY-ONLY COMMAND GETS A ROW - reproduce mechanism-only, skip, or defer - with a
+  one-line reason and the producer module it would land in per MODULE_MAP. The set as measured
+  2026-08-28 was the whole documentation-command family, the graph review and verify verbs, the
+  SME notes verb, a new-doc-section verb, an XML Control-M ingest verb, an M6 verify verb, five
+  ServiceNow load verbs, three roster and team and attribution loaders, and five apply-supplement
+  verbs.
+
+  (c) THE HITL TOOLKIT IS CALLED OUT AS THE STANDING TOP CANDIDATE - the graph review, graph
+  verify and SME notes verbs are the generic mechanism this repo has only as documentation, and
+  the disposition says so rather than treating them as seventeen equal rows.
+
+  (d) CORROBORATION IS DISTINGUISHED FROM NEW FINDING so the census is not double-counted - two of
+  the five apply-supplement verbs were already known company-local from a 2026-08-04 verification,
+  and their rows say so.
+
+  (e) THE UNPORTED REGISTRY ROWS ARE DISPOSITIONED IN THE SAME TABLE - a developer-experience
+  system row and its two repository datasets exist in their registry and nowhere in ours.
+
+  (f) SANITIZATION IS DECIDED PER ROW, NOT AT THE END. Any row whose reproduction would carry
+  company instance detail is marked mechanism-only, per the standing back-flow rule, and a row
+  that cannot be reproduced without instance detail is marked skip with that as the reason.
+
+  (g) EACH reproduce ROW BECOMES ITS OWN ITEM LATER. This item mints none of them; the user rules
+  on the table first, and the table records which rows are the user's call rather than the
+  author's.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-213, which says in terms that it is an
+  inventory and not a work item and that the deliverable is deciding which of the seventeen to
+  reproduce. That is what this item produces - a proposal with reasons - while the ruling stays
+  the user's.
+
+  Epic drydocs-review-backflow and phase 7 even though that phase is marked done: the epic is the
+  home of exactly this question and the census is the first measured input it has ever had.

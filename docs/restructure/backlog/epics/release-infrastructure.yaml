@@ -144,3 +144,7 @@ groom_log:
     outside the tracked tree, or change nothing - is Idea-185 in the inbox and is the user's,
     since every reading trades governance cleanliness against unblocking or visibility.
   attached_at: J61
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: J63-J65 minted. J63 is the cross-repo one - a review that does not name its tree manufactures defects, three times now. J64 and J65 are two DIFFERENT defects in the snapshot script and each says it does not re-solve the other.
+  attached_at: J63

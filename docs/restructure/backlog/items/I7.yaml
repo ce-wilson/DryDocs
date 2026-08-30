@@ -1,0 +1,47 @@
+id: I7
+epic: project-board
+title: Fan-out orchestration puts several id allocators and several render writers inside one
+  checkout - write the coordinator rule into the operating guide before a skill spawns workers
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- CLAUDE.md
+- .claude/skills/groom-backlog/SKILL.md
+acceptance: |
+  (a) ONE RULE, BESIDE THE PULL RULE IN THE OPERATING GUIDE'S SECTION 0 - the coordinator
+  allocates every id up front and hands each worker a pre-assigned id, workers never mint and
+  never re-render, and fan-out is restricted to units touching disjoint source files.
+
+  (b) BOTH MECHANISMS ARE GIVEN, NOT JUST IDS. Ids are the obvious half; the sharper half is that
+  every worker touching the backlog or the inbox regenerates the board, the generated gate and
+  load-map artifacts and the design HTML, so several workers produce several conflicting versions
+  of files that are DERIVED and have one writer per cycle by construction.
+
+  (c) THE RULE LIVES IN THIS REPO BECAUSE THE ORCHESTRATION COMMAND DOES NOT. An external fan-out
+  invocation cannot carry the rule, which is why leaving it for the next session to rediscover is
+  the failure mode being fixed.
+
+  (d) THE ASSUMPTION IT BREAKS IS NAMED. No skill in this repo spawns parallel workers today, so
+  the whole concurrency model in section 0 is written for cross-machine sessions; a fan-out
+  command breaks that assumption inside one checkout, at a higher rate.
+
+  (e) NO CODE, NO GUARD - procedure only - and the item says why: the actor is an orchestrator
+  outside this repo and there is no point in the sequence where a guard could observe it.
+
+  (f) IT DOES NOT RESTATE I6. I6 builds the allocator; this constrains who may call it. If I6 has
+  landed by the time this is pulled, the rule points at the command rather than describing it.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-205b, which was split from Idea-205a by the
+  capture itself on the grounds that one is a tool to build and the other is a working agreement to
+  write. The split is kept for the same reason - no dependency between them, and the agreement is
+  useful whether or not the allocator exists.
+
+  Module docs and phase 8 follow the J-series precedents for operating-guide rules learned from an
+  incident; epic project-board rather than release-infrastructure because the subject is id
+  allocation and the board.

@@ -10,3 +10,7 @@ groom_log:
     HITL toolkit GENERICALLY in this public producer. Re-implement from screenshots/
     descriptions — never copy company code. See docs/restructure/05-drydocs-review-backflow.md.
   attached_at: H1
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: H8 minted from the first MEASURED back-flow inventory (67 company commands to producer's 50). The deliverable is a per-command disposition, not a build - the ruling stays the user's.
+  attached_at: H8

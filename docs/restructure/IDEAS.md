@@ -91,7 +91,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
-- **`Idea-187`** · 2026-08-29 · `[task]` · **open** · prio? **Med** —
+- **`Idea-187`** · 2026-08-29 · `[task]` · **groomed → N22 (2026-08-30)** · prio? **Med** —
   **Producer has no registry row for the PAT Product Application Report, so two loaders the
   company runs have no producer-side source.** The 2026-08-28 manual-load PoC established the
   three PAT reports and which loaders each feeds: Team Details Report (`pat:people-report`),
@@ -112,7 +112,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   new `test_manually_downloaded_reports_name_the_report_they_come_from` guard makes the report
   name declared rather than tribal, but the RENAME is the gate's call, not a build's.
 
-- **`Idea-186`** · 2026-08-28 · `[task]` · **open** · prio? **Med** —
+- **`Idea-186`** · 2026-08-28 · `[task]` · **groomed → G127 (2026-08-30)** · prio? **Med** —
   **The superseded-database line-scan, applied to the five operator docs the 2026-08-24 fold
   touched, finds 18 un-escaped historical mentions across four of the five files — G114's
   clause (e) declined to bundle the fix and this is the recorded follow-up.** At G114's build
@@ -360,7 +360,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-223`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-223`** · 2026-08-30 · `[idea]` · **groomed → G128 (2026-08-30)** · prio? **Med** —
   **G125 built the ONE expansion function but did not migrate the seven resolvers onto it — the
   list is enforced, the resolvers still disagree.** What shipped: `drydocs_core/env_refs.py` with
   `expand()` (bare `${NAME}` only, bash defaults REFUSED, secret registered at expansion),
@@ -382,7 +382,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   wider diff, a cleaner end state). `EnvVar.aliases` already covers the `SPIDERP_*` legacy chain,
   so the log-dir case needs no new mechanism. Related [[G125]], [[Idea-222]].
 
-- **`Idea-224`** · 2026-08-30 · `[idea]` · **open** · prio? **Low** —
+- **`Idea-224`** · 2026-08-30 · `[idea]` · **open — re-read at the 2026-08-30 groom and deliberately not groomed: the trigger is a Snowflake account existing on a machine, not a decision anyone can take here** · prio? **Low** —
   **The `snowflake-catalog` binding profile is declared with NO variables, and is the one row
   waiting on something outside the repo.** State at main: `config/source-bindings.yaml` declares
   it with `env: {}` and `status: declared-unconfigured`, serving three datasets
@@ -400,7 +400,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `SourceEntry.urn` and rides its own SME gate, and NOTHING here waits on it. A binding is how a
   carrier is reached; the id is what the dataset is called. Related [[G125]], [[Idea-218]].
 
-- **`Idea-222`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-222`** · 2026-08-30 · `[idea]` · **groomed → N24 (2026-08-30)** · prio? **Med** —
   **ACCESS PATHS to one datapoint are already documented THREE times, each per-source, and never
   generalized: a row can name one path, never a choice among several, and nothing ranks them.**
   User capture, 2026-08-30 ("it may have been documented -- manual reports, database, API; code
@@ -439,7 +439,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   precedence.yaml, are schema changes fenced by the unsigned N10 clause D2 and would ride its
   gate. Related [[Idea-221]], [[N12]], [[G25]].
 
-- **`Idea-221`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-221`** · 2026-08-30 · `[idea]` · **groomed → N24 clause (e) (2026-08-30), the READER-GRAIN half only; the MCP-server build stays open, downstream of that ruling and of a separate HITL question about whether such a tool may write a committed file** · prio? **Med** —
   **The missing surface may be an MCP SERVER, not a UI — for Jira, for Confluence, or for data
   registrations themselves.** User capture, 2026-08-30, against [[Idea-220]]: DataHub's UI turned
   out to have no model of its own (it stores the recipe as an opaque string), so the honest cost of
@@ -481,7 +481,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the HITL flow says is never auto-decided, so it is recorded on the row with its ruling, never
   inferred from the platform.
 
-- **`Idea-220`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+- **`Idea-220`** · 2026-08-30 · `[bug]` · **closed — ADR 0017 Rev 2 (accepted 2026-08-30) folded these findings into its clauses and G125 shipped the three mechanisms; the only residue is the ADR's stale per-origin TITLE, which rides N23 clause (g)** · prio? **High** —
   **Source-side database configuration is a SINGLETON and ADR 0017 never says so; and the
   editor-first posture it assumes is DataHub's own canonical path, which the ADR also never says.**
   Fifth pass, evidence in `docs/design/datahub-substrate-review.md` Rev 2 (findings 7 and 8);
@@ -513,7 +513,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   but there IS a shared Python masking layer (`datahub/masking/`) the report's sweep terms would
   not have matched. Related [[Idea-218]], [[G125]].
 
-- **`Idea-218`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+- **`Idea-218`** · 2026-08-30 · `[bug]` · **merged → N23 (2026-08-30), the id-and-URN half; the ADR-text corrections landed in ADR 0017 Rev 2** · prio? **High** —
   **ADR 0017 clause 1 cites DataHub for a deferral DataHub did not make, and the ceiling it records
   is in the wrong artifact.** Fourth-pass review, evidence in
   `docs/design/datahub-substrate-review.md` (Rev 1); venue = this desktop, DataHub clone HEAD
@@ -548,7 +548,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   and no enforcement, the one substrate property where the peers are behind. Related [[Idea-215]],
   [[G125]], [[N10]].
 
-- **`Idea-219`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-219`** · 2026-08-30 · `[idea]` · **groomed → C38 (2026-08-30) — registered `planned` only; the edge meaning stays the gate's** · prio? **Med** —
   **Replica-ness is recorded three times in the registry and as no EDGE — DataHub rules that the
   typed derivation edge is the answer and the aliasing mechanism is an anti-pattern.** Today
   `origin != system` (the id shape), `authority: ADS`, and prose in `notes` all say "this is a
@@ -563,7 +563,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the HITL gate, `status: planned` first — so this is inboxed, not proposed. Evidence:
   `docs/design/datahub-substrate-review.md` anchor `replica-note`. Related [[Idea-218]].
 
-- **`Idea-216`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+- **`Idea-216`** · 2026-08-30 · `[bug]` · **groomed → N25 (2026-08-30)** · prio? **High** —
   **The BDAT `layer` is a property of the SYSTEM, so it records where an extract came FROM, not
   what it is ABOUT — which is why `human` is structurally unreachable rather than merely unused.**
   MEASURED at main: no dataset row carries `layer`; all 16 system rows do (gate source-registry-v2,
@@ -591,7 +591,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   one row per application -> business. The test is countable (ask what the grain is) and it also
   decides the functional-account case in [[Idea-217]]. Related [[Idea-215]], [[N10]].
 
-- **`Idea-217`** · 2026-08-30 · `[idea]` · **open — shape RULED 2026-08-30** · prio? **Med** —
+- **`Idea-217`** · 2026-08-30 · `[idea]` · **groomed → N23 clause (d) (2026-08-30) — the same grammar gate this entry asks to ride** · prio? **Med** —
   **RULED 2026-08-30 (user): two filtered extracts from one table are distinguished by a SUBSET
   QUALIFIER NAMING THE PREDICATE — `hr@spiderdb.psgmgr.hr_phone_exp#employees` and
   `...#functional-accounts` — not by a `[taxonomy].` prefix on the id.** The remaining work is the
@@ -658,7 +658,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   required to cover it. This rides the SAME grammar gate as the `[db]` un-redaction in
   [[Idea-215]]. Related [[Idea-216]], [[Idea-215]].
 
-- **`Idea-215`** · 2026-08-30 · `[bug]` · **open** · prio? **High** —
+- **`Idea-215`** · 2026-08-30 · `[bug]` · **groomed → N23 (2026-08-30)** · prio? **High** —
   **ADR 0017 clause 2 keys the source binding per `origin`, and for the registry's largest origin
   that row cannot exist.** The clause argues from OpenLineage — "`{origin}@{db}.{schema}.{table}`
   puts the origin where OpenLineage puts the namespace" — and concludes the binding table needs a
@@ -736,7 +736,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   written wrong. Dated records (CHANGELOG, `G29.yaml`, [[Idea-52]]) deliberately left alone: the
   chain WAS four when they were written. Related [[Idea-212]].
 
-- **`Idea-212`** · 2026-08-30 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-212`** · 2026-08-30 · `[idea]` · **groomed → G130 (2026-08-30)** · prio? **Med** —
   **`bootstrap` verifies declared-present and never reports live-but-undeclared, and that
   asymmetry is how retired-label constraints survive a wipe.** The command already asserts
   "58/58 declared present". It cannot see the other direction: a constraint alive in the database
@@ -755,7 +755,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   each of their two drops was a zero-node count, which is a human decision. Needs a live graph,
   so it is not a pure-unit item. Related [[Idea-211]], [[G99]].
 
-- **`Idea-213`** · 2026-08-30 · `[research]` · **open** · prio? **Med** —
+- **`Idea-213`** · 2026-08-30 · `[research]` · **groomed → H8 (2026-08-30) — the disposition table; which of the seventeen to reproduce stays the user's ruling** · prio? **Med** —
   **The company tree registers 67 CLI commands to producer main's 50 — the first MEASURED
   back-flow inventory the epic has had.** Both counts read from
   `drydocs.cli.app.registered_commands`, not from `--help` or prose. Theirs and not ours: the
@@ -776,7 +776,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   mechanism-only, which is [[project_drydocs_review_backflow]]'s standing question, now with
   numbers.
 
-- **`Idea-214`** · 2026-08-30 · `[question]` · **open** · prio? **High** —
+- **`Idea-214`** · 2026-08-30 · `[question]` · **groomed → J63 (2026-08-30)** · prio? **High** —
   **A review run against an un-ported checkout manufactures defects, and it has now happened
   three times.** The company-side 2026-08-28 triage reported the `refresh-*` verbs as "exactly
   backwards" and an exploration pass listed eight commands as unregistered. On producer main all
@@ -796,7 +796,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   but the justification is cross-repo, which is why it is captured separately. Related
   [[project_port_workflow_topology]].
 
-- **`Idea-207`** · 2026-08-29 · `[bug]` · **open** · prio? **High** —
+- **`Idea-207`** · 2026-08-29 · `[bug]` · **groomed → N23 (2026-08-30)** · prio? **High** —
   **The id grammar calls identifiers "connection coordinates" and redacts them, so a registered id
   cannot always identify anything.** SME hit this registering downloaded AWS/Glue metadata as a
   replica: source-to-target mapping over registered ids is the core function, and an id that
@@ -817,7 +817,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   ids (retired-id mint, `replaced_by`, test pins), so a rider, not an edit. Related [[Idea-208]],
   [[Idea-209]].
 
-- **`Idea-208`** · 2026-08-29 · `[bug]` · **open** · prio? **High** —
+- **`Idea-208`** · 2026-08-29 · `[bug]` · **groomed → N26 (2026-08-30), with Idea-210** · prio? **High** —
   **Nothing can see what the registry holds, so a wrong registration is invisible for as long as
   nobody trips over it.** `dpl` is registered `layer: technology` and is wrong — it is a
   pipeline/dataset taxonomy registry, a DATA-layer asset. The distribution shows how: **technology
@@ -839,7 +839,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   gate's clause D2. Detail: [[source-registry-identity-review]] V1–V3. Related [[Idea-207]],
   [[Idea-209]], [[N18]].
 
-- **`Idea-209`** · 2026-08-29 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-209`** · 2026-08-29 · `[bug]` · **groomed → G129 (2026-08-30)** · prio? **Med** —
   **The internal twin is a black hole: the registry names no variable, points at no twin file, and
   cannot say what is unset.** It says the real value lives in the twin and stops — never WHICH
   file, WHICH variables, or WHETHER they are set. `internal/` holds ~20 directories with no index of
@@ -858,7 +858,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   never the text that happens to spell it. Detail: [[source-registry-identity-review]] T1–T2.
   Related [[Idea-207]], [[G125]].
 
-- **`Idea-210`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-210`** · 2026-08-29 · `[idea]` · **groomed → N26 (2026-08-30), with Idea-208 — one generator, two surfaces** · prio? **Med** —
   **A generic loader question cost ~40 searches and produced a review wrong in six places — the
   wrongness is the finding, not the slowness.** Asked to review a loader and report its registry
   mapping, an agent searched roughly forty times and returned: `cli_ingest.py` is orphaned (it is
@@ -877,7 +877,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Rides [[Idea-208]] as the same generator; called out separately because the justification is
   different. Detail: [[source-registry-identity-review]].
 
-- **`Idea-206`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-206`** · 2026-08-29 · `[idea]` · **groomed → J64 (2026-08-30), the SCAN-ORDERING half only; the CADENCE ruling stays open with its four named directions and is the user's** · prio? **Med** —
   **The depgraph snapshot rolls at every session close, and 30 of the last 33 rolls carried no
   debt signal at all.** Measured on `knowledge/depgraph-snapshots/debt-metrics.jsonl`, 34 rows
   spanning 2026-08-21 to 2026-08-29: 15 consecutive pairs are flat on every metric, another 15
@@ -908,7 +908,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   skips silently on this desktop) and the item behind the CI verdict asking about `main` from a
   branch.
 
-- **`Idea-205b`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-205b`** · 2026-08-29 · `[idea]` · **groomed → I7 (2026-08-30)** · prio? **Med** —
   **Any fan-out orchestration has to allocate ids in the coordinator, because N parallel workers are
   N more allocators inside one machine.** Split from [[Idea-205a]] because the disposition differs:
   205a is a tool to build, this is a working agreement to write. No skill in this repo spawns
@@ -926,7 +926,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   rather than left for the next session to rediscover, since the orchestration command is not part
   of this repo and cannot carry the rule itself.
 
-- **`Idea-205a`** · 2026-08-29 · `[idea]` · **open** · prio? **High** —
+- **`Idea-205a`** · 2026-08-29 · `[idea]` · **groomed → I6 (2026-08-30)** · prio? **High** —
   **There is no allocator. "Next free id" is a sentence in a skill file, and it has now failed six
   times.** The rule lives at `.claude/skills/groom-backlog/SKILL.md` line 51 and at the entry-header
   table in this file, and both amount to: an agent reads its OWN working tree and picks the next
@@ -1198,7 +1198,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   guard half of the same partition.
 
 - **`Idea-154`** · 2026-08-21 · `[bug]` · **open — partially groomed → J52 (2026-08-22, the consequence half: the verify skill gains the session-launched-browser rule + recipe); the two-browser diagnostic that would prove the mechanism needs both machines in hand and stays the user's step** · prio? **Med** —
-- **`Idea-204`** · 2026-08-29 · `[bug]` · **open** · prio? **Low** —
+- **`Idea-204`** · 2026-08-29 · `[bug]` · **groomed → O83 (2026-08-30)** · prio? **Low** —
   **The console's bolt panel defaults its database to `neo4j`, so a fresh clone runs correct
   Cypher against the wrong database and gets zero rows.** `CypherConsole.tsx` reads
   `env.VITE_NEO4J_DATABASE ?? 'neo4j'`; every depgraph and Control-M surface lives in `drydocs`,
@@ -1209,7 +1209,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   Candidate fix is to default to `drydocs` rather than the driver's home database, since no
   surface this panel serves reads from `neo4j`.
 
-- **`Idea-203`** · 2026-08-29 · `[chore]` · **open** · prio? **Low** —
+- **`Idea-203`** · 2026-08-29 · `[chore]` · **groomed → G131 (2026-08-30)** · prio? **Low** —
   **`agents/.env` carries an empty `NEO4J_PASSWORD`, and only a falsy-check keeps the agent tier
   working.** The file is a filled-in copy of `.env.example` whose password line was left blank,
   per the agents README step. It works today because `common/neo4j_tool.py` merges the root
@@ -1219,7 +1219,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   silently wins, giving the whole agent tier an empty password. Either clear the line so the
   merge has nothing to override, or make the guard's intent explicit in a comment.
 
-- **`Idea-202`** · 2026-08-29 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-202`** · 2026-08-29 · `[idea]` · **groomed → O84 (2026-08-30)** · prio? **Med** —
   **A demo query that names a label the graph does not have returns `status: success, rowCount:
   0`, and nothing anywhere notices.** Found 2026-08-29 (desktop, `neo4jtest`, `drydocs`): the
   console's `C4 components (depgraph)` preset and the matching `DEFAULT_QUERY` in
@@ -1231,7 +1231,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   gate-ruled labels should be generated or guarded rather than hand-copied into demo queries —
   the same generated-artifact-plus-drift-test shape already used elsewhere in the UI work.
 
-- **`Idea-201`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-201`** · 2026-08-28 · `[bug]` · **groomed → J65 (2026-08-30)** · prio? **Med** —
   **snapshot.ps1's board refresh has been silently skipping on this desktop, and the warn-only
   catch is what hides it.** Observed at the O77 close, 2026-08-28: the step reports "board
   refresh skipped" followed by the first line of a traceback, which reads like noise; run the
@@ -1245,7 +1245,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   clear VIRTUAL_ENV before it calls poetry, and print the LAST line of a failed traceback rather
   than the first, so the warning names the module instead of the word Traceback.
 
-- **`Idea-200`** · 2026-08-28 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-200`** · 2026-08-28 · `[bug]` · **groomed → O85 (2026-08-30)** · prio? **Med** —
   **The verify convention serves the console on port 5199, which has not been able to sign in
   since O69.** The API's CORS allowlist (`drydocs_api/app.py`, `create_app`) is
   `http://localhost:5173` and `http://localhost:4173` only, so a console served anywhere else

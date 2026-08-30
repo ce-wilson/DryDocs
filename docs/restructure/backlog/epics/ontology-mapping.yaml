@@ -6,3 +6,7 @@ groom_log:
 - date: ''
   note: ── Epic C — Ontology mapping + HITL (ontology-mapper, sonnet) — Phase 2 ───
   attached_at: C1
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: C38 minted from Idea-219 - a typed derivation edge for replica-ness, registered `planned` only. The meaning is the gate's; the DataHub sibling anti-pattern rides the prompt so it can be rejected knowingly.
+  attached_at: C38

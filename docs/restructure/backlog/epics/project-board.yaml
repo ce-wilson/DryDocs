@@ -21,3 +21,7 @@ groom_log:
     were green over them. Idea-170 records the same failure class company-side, which is the
     second instance that makes it I5 rather than a fix in place.
   attached_at: I5
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: I6 and I7 minted from the id-allocator entries. I6 makes `next free` mean free across every remote ref after six recorded collisions; I7 writes the fan-out coordinator rule, kept separate because one is a tool and one is a working agreement.
+  attached_at: I6

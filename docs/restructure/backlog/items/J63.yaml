@@ -1,0 +1,53 @@
+id: J63
+epic: release-infrastructure
+title: A review run against an un-ported checkout manufactures defects, three times now - make
+  every review surface name the tree it ran against
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- CLAUDE.md
+- docs/port/PORT-MANIFEST.yaml
+- internal/research/triage-bootstrap-2026-08-28.md
+- docs/design/
+acceptance: |
+  (a) A REVIEW OR TRIAGE ARTIFACT STATES THE TREE IT RAN AGAINST - its commit, its branch, and its
+  port base - so that absent here reads as not yet ported rather than broken. That is the whole
+  mechanism, and it is provenance rather than method.
+
+  (b) THE THREE INSTANCES ARE RECORDED IN THE CONVENTION SO THE COST IS VISIBLE. The 2026-08-28
+  triage reported the refresh verbs as exactly backwards when all three are registered on producer
+  main with the older verb as a deprecated alias delegating to them (G79, 2026-08-23); seven of
+  the eight commands it called unregistered exist here; and an earlier review recorded six wrong
+  facts from a checkout predating the S8, S13, G78 and G79 work. Every observation was correct for
+  the tree it ran on; the DEFECT FRAMING was not.
+
+  (c) THE IRONY IS WRITTEN DOWN BECAUSE IT PREVENTS THE WRONG FIX. Reading the importable object
+  faithfully (J37) still reports a STALE tree faithfully, so a method rule cannot close this gap.
+  Say so explicitly, or the next reviewer will reach for the method rule again.
+
+  (d) WHERE THE STAMP LIVES IS DECIDED ONCE and applied to the surfaces that already exist - the
+  research and triage documents, the design reviews, and the port report - rather than invented
+  per artifact. Name the surfaces; a convention with no list is a convention nobody applies.
+
+  (e) THE CROSS-REPO HALF IS FENCED AND STATED. Producer cannot make the company's reviews carry
+  the stamp. What producer can do is carry it on its own surfaces and say so in the port prompt as
+  a description of our practice, never as a request for anything back.
+
+  (f) NO CODE AND NO GUARD IS REQUIRED BY THIS ITEM, but if the stamp is cheap to generate for one
+  surface, doing so is in scope; asserting it across all of them is not.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-214, which is tagged as a question but whose
+  missing piece is named unambiguously - provenance, not method - so it is groomed as a chore with
+  the ruling already implicit in the entry.
+
+  Priority p1 because the failure is recurrent, cross-repo and produces confident wrong findings,
+  which is the most expensive kind.
+
+  It deliberately does NOT re-solve N26 clause (g), which stamps the registry surfaces
+  specifically; this is the general convention and that is one application of it.

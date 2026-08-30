@@ -89,3 +89,7 @@ groom_log:
     (Idea-189), deliberately ordered AFTER O77 so it does not inherit the inverted
     occlusion on all five at once.
   attached_at: O77
+- date: '2026-08-30'
+  note: >-
+    2026-08-30 weekly groom: O83-O85 minted from three console defects that all present as the wrong symptom - zero rows instead of a wrong database, success instead of an unknown label, unreachable instead of a blocked origin.
+  attached_at: O83

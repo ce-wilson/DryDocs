@@ -1,0 +1,69 @@
+id: N25
+epic: source-column-mappings
+title: The BDAT layer sits on the system, so it records where an extract came from rather than
+  what it is about, which is why the human value is structurally unreachable rather than merely
+  unused
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+gates:
+- registry-wiring-readiness
+inputs:
+- config/source-registry.yaml
+- docs/design/source-registry-identity-review.md
+acceptance: |
+  A rider to the registry-wiring-readiness gate puts the layer axis to the SME. NOTHING IS
+  APPLIED - moving or deriving the field is a schema change fenced by that gate's clause D2.
+
+  (a) THE MEASUREMENT, RE-DERIVED AT PULL TIME AND NOT TRUSTED FROM THIS TEXT. No dataset row
+  carries the layer field; all 16 system rows do, because the source-registry-v2 gate put it on
+  the v2 system row in 2026-07-31. Every dataset therefore INHERITS its layer from its carrier.
+
+  (b) THE DEMONSTRATION USES LIVE ROWS AND NEEDS NO NEW ONE. The HR phone extract is categorized
+  People and Org and inherits the data layer from psgmgr; the escalation-database row - the
+  technician routing table - also inherits data, and would inherit technology had it been pulled
+  from the ServiceNow system instead; the PAT people report is also People and Org and inherits
+  business. Two People and Org datasets already sit in two different layers, same subject,
+  different label, purely because they were pulled from different carriers.
+
+  (c) THE ZERO IS EXPLAINED, WHICH IS THE STRUCTURAL HALF. The human value is empty not because we
+  hold no human data - at least three such datasets are registered - but because a SYSTEM is a
+  place you connect to and no place is a person. The label can only be reached by inventing a
+  fake HR system to carry it, which is the same category error one level up. That technology is
+  the default bucket (9 of 16) is true and secondary, and the rider says so rather than leading
+  with it.
+
+  (d) THE PROPOSED SHAPE IS A RULING, NOT AN APPLICATION. Layer describes the dataset's SUBJECT,
+  so either it moves to the dataset or it is DERIVED from the taxonomy category, which is already
+  dataset-grained, already carries the right values, and has ZERO consumers today. Deriving costs
+  no new field, and the rider says why that matters - it keeps the change clear of clause D2's
+  fence on new schema.
+
+  (e) THE SUBJECT-VERSUS-REFERENCE TEST SHIPS WITH THE RIDER OR THE AXIS GETS RE-LITIGATED PER
+  ROW, the way the established-public-vocabulary carve-out did. The test - is a person the SUBJECT
+  of a row, or an ATTRIBUTE of one - is countable, because it asks what the grain is. A contacts
+  extract is one row per person-role and is human; an application list with an owner column is one
+  row per application and is business. The rider states that this same test decides the
+  functional-account case N23 carries, so the two gates cannot answer it differently.
+
+  (f) THE COST OF THE ALTERNATIVE IS RECORDED. If the SME rules the field stays on the system, the
+  rider says what follows - the two People and Org rows keep two layers, and any query that groups
+  by layer is grouping by carrier and must say so on the surface.
+
+  Closes when the rider exists against the registry-wiring-readiness prompt, is listed in the gate
+  log, and the validator is green.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-216.
+
+  Kept SEPARATE from N23 on purpose even though both are registry-grammar riders - N23 asks what a
+  row is CALLED and N25 asks what a row is ABOUT. They share one dependency, since clause (e)'s
+  grain test also decides N23's functional-account split, and the rider says so, which is cheaper
+  than merging two questions the SME could reasonably answer differently.
+
+  Model fable because the deliverable is a definitional test that will be applied to every future
+  row, and a loose one is worse than none.

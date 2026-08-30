@@ -1,0 +1,58 @@
+id: G127
+epic: component-topology
+title: Eighteen un-escaped historical database mentions survive in four operator docs, three of
+  which are governed renders, and the guard does not scan them at all
+type: chore
+module: docs
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- G114
+inputs:
+- drydocs_core/schema/provisioning/README.md
+- docs/design/drydocs-startup-refresh-runbook.md
+- docs/design/drydocs-project-review.md
+- docs/design/drydocs-core-runbook.md
+- internal/repo-README.md
+- tests/unit/test_runbook_currency.py
+acceptance: |
+  (a) THE COUNT IS RE-MEASURED BEFORE ANYTHING IS REWORDED, using the guard's own superseded-name
+  list and allowed-line logic rather than a hand search. The dry run at G114 found 18 offending
+  lines across four of five files - six in the project review, five in the startup runbook, the
+  rest split between the provisioning README and the core runbook, with the internal repo README
+  clean. Those are figures to re-derive, not facts to carry.
+
+  (b) EACH OFFENDING LINE GAINS THE ESCAPE WORDING. The offenders are flowing narrative prose
+  naming retired databases without the escape wording on the same line. The rewrite follows the
+  U.S. business-technical style guide, and no mechanism name is renamed by the pass.
+
+  (c) THE GOVERNED RENDERS ARE RE-RENDERED, NOT HAND-EDITED. Three of the four files are design-doc
+  renders under the verbatim-publish rule, where the HITL feedback anchors key on the rendered
+  text. The markdown is the source, the design-doc renderer is re-run, and the committed HTML
+  matches its source afterwards - the stale-render check in the session ritual, run explicitly.
+
+  (d) THE GUARD'S SCAN IS EXTENDED TO A DECLARED OPERATOR-DOC LIST, using the extra-docs idiom the
+  runbook-currency test already carries. This is the clause that stops the drift recurring, and it
+  is the reason the item exists rather than a one-off sweep - G114's close note recorded the
+  general form, that guarded surfaces followed the database fold and nine unguarded ones did not.
+
+  (e) DATED HISTORICAL RECORDS ARE NOT SWEPT. A line that was true when it was written stays, the
+  way the supplement-chain correction deliberately left the changelog and the older item notes
+  alone. The declared list in (d) therefore names operator docs only, and the item says so, so the
+  next person does not widen it into history.
+
+  Full suite green including the superseded-name guard, ruff and format clean, and no diff left in
+  the committed renders after re-rendering.
+notes: |
+  Groomed 2026-08-30 (desktop, weekly groom) from Idea-186.
+
+  Follows G114 exactly - same epic, same phase - and depends on it because the guard whose logic
+  clause (a) reuses is G114's. Module docs rather than graph-infra because the deliverable is a
+  prose pass plus a render, with a small test-side extension; G114 was the reverse.
+
+  G114 declined to bundle this on purpose, and the reason is the reason this item is sonnet and
+  not haiku - governed renders make it a review-and-re-render job rather than a mechanical
+  substitution.
