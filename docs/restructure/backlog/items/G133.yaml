@@ -1,0 +1,20 @@
+id: G133
+epic: component-topology
+title: api.py calls execute() outside the try that catches FileNotFoundError, so a missing binary breaks
+  the documented exit-code contract - and API-CALLS.md records one folder-export path where two exist
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/adapters/controlm/api.py
+- drydocs_core/adapters/controlm/API-CALLS.md
+- drydocs_core/adapters/controlm/README.md
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-30.

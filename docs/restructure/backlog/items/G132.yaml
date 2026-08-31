@@ -1,0 +1,22 @@
+id: G132
+epic: component-topology
+title: The Control-M folder-pull collector lives only on a server - home it beside rua_inventory with
+  its conf and a version-tagged output, and let the acquisition block name it without implying a cadence
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/collect/rua_inventory.sh
+- drydocs_lineage/collect/rua_inventory.conf
+- drydocs_lineage/collect/README.md
+- config/source-registry.yaml
+- .gitattributes
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-30.
