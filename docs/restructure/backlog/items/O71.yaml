@@ -78,3 +78,12 @@ notes: |
 
   NOT DONE, BY DESIGN: the gate SESSION. This item drafts the question; running it is a
   separate item to mint after this lands, per the item's own clause (f).
+
+  AMENDED 2026-08-31 (user direction, after close): P3 (JWT) no longer carries a
+  recommendation. The draft led with "recommended: decline", which is defensible but
+  pre-empts the SME on the one practice whose answer depends on a REQUIREMENT nobody has
+  stated -- does anything have to verify a console token without asking the issuer? P2 and
+  P5's recommendations rest on facts about the producer (no OAuth tooling in use, no mail
+  path) and stand. P3 is now put as a trade with both sides costed and no default, with the
+  revocability property still stated plainly because it describes what the console has
+  today and the SME needs it to rule either way.

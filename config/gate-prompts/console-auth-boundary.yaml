@@ -19,6 +19,18 @@
 #
 # Drafted 2026-08-31 by the ui-workstream session that pulled O71. Mechanism
 # only — no real ids, secrets, or company values anywhere on this page.
+#
+# AMENDED 2026-08-31 (user direction, pre-sign-off) — P3 (JWT) NO LONGER CARRIES
+# A RECOMMENDATION. The draft led with "recommended: decline", which put the
+# page's thumb on a scale the SME is here to hold: unlike P2 and P5, whose
+# recommendations rest on facts about the producer (no OAuth tooling in use, no
+# mail path), the JWT question turns on a REQUIREMENT nobody has stated yet —
+# whether anything must verify a token without asking the issuer. With that
+# unstated, a recommendation is a preference wearing an argument's clothes. So
+# P3 is now put as a trade with both sides costed and NO default; the
+# revocability property is still stated plainly, because it is a fact about what
+# the console has today and the SME needs it to rule either way. The other four
+# recommendations stand as drafted.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: console-auth-boundary
@@ -43,7 +55,9 @@ summary: >
   secret, and the server re-resolves the real role from the token on every call
   (ADR 0005 decision 3). So "hashed credentials" is not a proposal — it is the
   status quo, and the honest question about JWT is whether to REPLACE a
-  deliberately revocable opaque token with a stateless one.
+  deliberately revocable opaque token with a stateless one — put below as a
+  trade with no recommendation, because the answer depends on a requirement the
+  producer has not stated rather than on anything already decided.
 
   Each practice below is separately tickable. DECLINING ANY SUBSET IS A VALID
   SIGN-OFF, and declining ALL of them is the standing state — the console works
@@ -73,7 +87,7 @@ mapping:
     edge: "candidate practice  [OPEN — SME rules adopt / decline]"
   - n: 4
     element: "P3 — JWT in place of the opaque server-side token"
-    target: "RECOMMENDED: decline, and the reason is a property being kept rather than a feature not wanted. An opaque token is REVOCABLE — sign-out and expiry are enforced server-side by the session store, and a token can be dropped mid-life. A JWT is stateless by design: revocation needs a denylist, which reintroduces the server-side store the JWT was adopted to remove, plus key management. Adopt only if a use case needs a token verified WITHOUT the issuer"
+    target: "NO RECOMMENDATION — the trade, both sides costed, because the answer turns on a requirement nobody has stated. KEEPING the opaque token keeps REVOCABILITY: sign-out and expiry are enforced server-side by the session store, and a token can be dropped mid-life. ADOPTING a JWT buys verification WITHOUT asking the issuer — the thing that matters when a second service, an edge proxy, or an offline consumer must check a token itself — and costs key management plus, if revocation is still required, a denylist that reintroduces the server-side state. The deciding question is therefore: does anything have to verify a token without the issuer? If yes, JWT; if no, the opaque token is doing the job"
     edge: "candidate practice  [OPEN — SME rules adopt / decline]"
   - n: 5
     element: "P4 — a user model (persistent accounts, rather than a fixed roster)"
@@ -108,7 +122,7 @@ provenance:
       - {name: scaffold_rejected, origin: source, from: "ADR 0015 — 'clone-and-diverge repos or proprietary generators with no update lifecycle'; teams there means 'users-in-a-workspace rows behind JWT next to Stripe'", note: "quoted so this gate cannot be read as re-opening it"}
       - {name: watch_trigger, origin: source, from: "ADR 0015 register — 'Only re-opens if a shared estate console is chartered (the one legitimate use identified)'", note: "the trigger this gate answers"}
       - {name: practice_list, origin: derived, from: "the survey's characterisation of what such templates ship (OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow)", note: "the five candidates below are DERIVED from that characterisation — the SME may add or remove one"}
-      - {name: recommendations, origin: derived, from: "this page's drafting, against the mechanism read above", note: "P1 already in place, P2/P3/P5 decline, P4 the genuinely open one — every one an OPEN SME ruling, not a decision"}
+      - {name: recommendations, origin: derived, from: "this page's drafting, against the mechanism read above", note: "P1 already in place, P2 and P5 decline, P4 the genuinely open one — every one an OPEN SME ruling, not a decision. P3 carries NO recommendation after the 2026-08-31 amendment: its answer depends on an unstated requirement, so recommending would pre-empt the SME rather than inform them"}
 
 sections:
   - title: "A. What is NOT being asked — reaffirmation"
@@ -126,7 +140,7 @@ sections:
     confirmations:
       - "P1 hashed credentials: CONFIRM the current mechanism (salted scrypt at OWASP parameters) as the standing one, or rule a change. Nothing is being proposed — this row exists so the status quo is a recorded decision rather than an assumption nobody checked."
       - "P2 OAuth2 password flow: adopt or DECLINE (recommended decline). It changes the shape of the login request and nothing about who may sign in; its value is interop with OAuth tooling, which the producer does not use today."
-      - "P3 JWT in place of the opaque token: adopt or DECLINE (recommended decline). The property at stake is revocability — an opaque token is revoked by the session store, while a JWT needs a denylist that reintroduces exactly the server-side state it was adopted to avoid, plus key management. Adopt only if something must verify a token WITHOUT asking the issuer."
+      - "P3 JWT in place of the opaque token: ADOPT or DECLINE — this page makes no recommendation, deliberately. The two properties are both real and they trade against each other: the opaque token is revocable server-side (sign-out and expiry are enforced by the session store), and a JWT is verifiable without asking the issuer, which is what a second service or an edge proxy needs. Choosing costs the other, or costs a denylist to keep both. THE DECIDING QUESTION IS A REQUIREMENT, not a preference: does anything have to verify a console token without the issuer? Nobody has stated one — if the answer is still no at the session, declining is the low-cost answer and should be recorded as such rather than as a rejection of JWT."
       - "P4 a user model: adopt / decline / DEFER WITH A NAMED TRIGGER. This is the one the charter actually presses on — a shared estate console needs accounts that outlive one machine's credential file. It is a data model, a storage decision and a lifecycle (create, disable, rotate), so adopting it means scoping those, not installing a library. If deferred, name the trigger here so the deferral is re-openable the way the register row was."
       - "P5 a recovery flow: adopt or DECLINE (recommended decline). It presupposes P4 and a mail path the producer does not have, so it is decided WITH P4 rather than independently."
   - title: "D. The register-row amendment — drafted here, applied at sign-off"
