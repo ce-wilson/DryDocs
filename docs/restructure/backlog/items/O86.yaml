@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - O81
 inputs:
@@ -70,3 +70,56 @@ notes: |
   strip. O81 deliberately left that alone because it would displace each route's
   existing reviewed pane, and that is a call about what a module leads with - a
   different decision from giving a surface its own page.
+
+  DONE 2026-08-31 (desktop). `/graph/:specId` renders one canvas surface full page.
+
+  (a) A REAL ROUTE, as the mint decided and the build did not re-litigate. Same shape as
+  `lineage/asset/:assetId` and `explorer/tower/:towerKey`; deep-linkable, back-button safe,
+  and sendable — which neither a maximize toggle nor the Fullscreen API produces.
+
+  (b) THE WHITELIST STOPS THE REQUEST BEFORE THE NETWORK, which is stronger than the clause
+  asked for and is the evidence worth keeping: visiting /graph/runbooks.series.v2 rendered
+  the named "not a canvas surface" state and issued ZERO calls to drydocs-api (measured with
+  performance.getEntriesByType('resource')). CANVAS_ROUTES is the whitelist and is typed
+  `satisfies Record<CanvasSpecId, CanvasRoute>`, so adding a surface without a route entry
+  is a COMPILE error — a new canvas cannot ship with no page and no gate. isCanvasSpecId
+  uses Object.hasOwn, so 'toString' and '__proto__' are refused; pinned in tests.
+
+  (c) THE ROUTE GATES ON ITS HOST MODULE and carries no designation of its own, so there is
+  no second place to edit and nothing to disagree with. It fails CLOSED if the host cannot
+  be found. AND IT CLOSED A GAP I OPENED AT O59: that item set /remediation's registry
+  access to 'sme', which hid the nav entry but left the ROUTE reachable by typing the URL.
+  Now gated like /software and /gates. Both hosts (runbooks, explorer) admit every role
+  today, so neither full-page canvas is restricted — stated in a test so a reader learns it
+  there rather than assuming.
+
+  (d) AN ANCHOR, NOT window.open — verified as a real <a href="/graph/runbooks.series.v1">,
+  so middle-click and ctrl-click work and no popup blocker is involved. It renders in the
+  canvas header of each surface that has a route, and the full page does NOT link to itself.
+
+  (e) NO SESSION IN THE URL: a fresh full-page load stayed signed in, reading the token from
+  localStorage. Nothing was added to make that true; it already was.
+
+  (f) O81'S LIMITATION IS CLOSED. The strip gave the canvas ~215px; the route gives it the
+  page. Measured 1108px of canvas height against 0 in the strip's collapsed case below.
+
+  THE BUG THE LIVE CHECK CAUGHT, and it is the reason clause (d)-style verification is not
+  ceremony: the first build rendered a canvas of height ZERO while its header truthfully
+  reported "8 nodes · 6 rels · 3 rows". The route returned a fragment instead of a
+  `flex h-full min-h-0 flex-col` root, so the shell's <main> grid area gave its flex
+  children no height and NVL drew into nothing. Every unit test passed. This is O81's
+  header-says-nine-canvas-shows-one failure in a new costume, and no assertion about the
+  GRAPH would ever have caught it — only looking.
+
+  VERIFIED LIVE (J18): this desktop, Chrome vs Vite :5176 + drydocs-api :8003 (dedicated
+  ports, dev server confirmed started rather than assumed). Both specs return zero rows on
+  this machine, so the drawn graph used fixture rows injected at the API boundary — the
+  O81 technique; the mapper, the canvas and the route are the real ones. Screenshot shows
+  two process clusters with INVOKES / WRITES_TO edges at full page height. The role-refusal
+  path is NOT re-verified live: the throwaway credential mints only the admin persona, and
+  the gate is the same inline pattern /software and /gates already carry, covered by unit
+  tests over canAccessModule.
+
+  LEDGERS: GraphCanvasRoute registered UNBOUND (35/82) — it renders surfaces from DIFFERENT
+  modules, so binding it to one would encode the first caller as owner, the same rule its
+  own GraphCanvas and SpecGraphPane follow. TC-RUNBOOKS-02 seeded, automated (10/31).

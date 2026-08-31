@@ -377,6 +377,7 @@
         "config/gate-prompts/business-layer-org-structure.yaml",
         "config/gate-prompts/cdo-crosswalk.yaml",
         "config/gate-prompts/code-graph-package-layer.yaml",
+        "config/gate-prompts/console-auth-boundary.yaml",
         "config/gate-prompts/controlm-avg-run-supplement.yaml",
         "config/gate-prompts/controlm-definition-precedence.yaml",
         "config/gate-prompts/controlm-hosts-topology.yaml",

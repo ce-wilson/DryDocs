@@ -1,0 +1,144 @@
+# SME gate-prompt spec — the console's AUTHENTICATION boundary (backlog O71).
+#
+# GATE-BOUND, and the wording matters here more than usual: this page PROPOSES.
+# Nothing is adopted, installed, or wired by rendering it. Authentication is a
+# trust boundary, so until this gate signs off the console keeps exactly the
+# mechanism it has today — which is described, not assumed, in section A.
+#
+# WHY THIS GATE EXISTS NOW: ADR 0015's watched-source register carries a row for
+# fastapi/full-stack-fastapi-template whose named trigger is "only re-opens if a
+# shared estate console is chartered". That trigger HAS FIRED — the internal
+# ui-workstream's user/login build is that charter. The register's discipline is
+# that a fired trigger opens a backlog item and auto-changes nothing, which is
+# this item, and this page is its output.
+#
+# WHAT IS *NOT* ON THE TABLE, stated first because a reader who skims will
+# otherwise mistake this gate for a reversal: the SCAFFOLD was surveyed on
+# 2026-08-27 and REJECTED on evidence, and that rejection STANDS. It is not
+# re-opened here, not partially, not conditionally. See section A confirmation 2.
+#
+# Drafted 2026-08-31 by the ui-workstream session that pulled O71. Mechanism
+# only — no real ids, secrets, or company values anywhere on this page.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: console-auth-boundary
+title: "SME Gate — the console's authentication boundary: which of the surveyed auth PRACTICES the console adopts, now that the ADR 0015 watched-source trigger has fired"
+step: "Pre-decision gate for backlog O71 — opened by the fired watch trigger on the fastapi/full-stack-fastapi-template register row (ADR 0015, Sources & tooling watch)"
+summary: >
+  THE QUESTION IS ABOUT PRACTICES, NOT A SCAFFOLD. ADR 0015 surveyed the
+  SaaS-scaffold option and rejected it on evidence: copier-native templates ship
+  no auth, and the templates that DO ship auth are clone-and-diverge repos with
+  no update lifecycle, whose "teams" means users-in-a-workspace rows behind JWT
+  next to Stripe — a different axis from a generated instance with its own
+  databases, so adoption would inherit a users/orgs/billing model to rip out
+  while gaining nothing. THAT VERDICT STANDS AND IS NOT RE-OPENED. What this gate
+  rules is narrower: of the auth PRACTICES the survey characterised, which does
+  the producer console adopt, decline, or has it already answered?
+
+  AND THREE OF THE FIVE ARE ALREADY ANSWERED, which is why this page measures
+  before it asks (O71 clause c). The console's sign-in has not been a stub since
+  O69: a secret is proved to drydocs-api, which verifies it against a salted
+  scrypt hash at OWASP parameters and issues an OPAQUE bearer token with a TTL
+  from a server-side session store; the browser holds the token and never the
+  secret, and the server re-resolves the real role from the token on every call
+  (ADR 0005 decision 3). So "hashed credentials" is not a proposal — it is the
+  status quo, and the honest question about JWT is whether to REPLACE a
+  deliberately revocable opaque token with a stateless one.
+
+  Each practice below is separately tickable. DECLINING ANY SUBSET IS A VALID
+  SIGN-OFF, and declining ALL of them is the standing state — the console works
+  as shipped. Nothing here is applied until ticked and transcribed to
+  config/gate-log.md.
+meta:
+  Module: "drydocs-web + drydocs-api (the console sign-in and the API that verifies it)"
+  Source: "docs/decisions/0015-team-edition-template.md (the Sources & tooling watch register row and the Scaffold-substrate rejection) + docs/decisions/0005-browser-neo4j-access-path.md decision 3 (the server re-resolves role) + web/src/lib/auth.ts + web/src/App.tsx (the ?as= seam) + drydocs_api/credentials.py + drydocs_api/sessions.py"
+  Registry ref: "no source-registry change — the watched row is an ADR 0015 register entry, and its amendment ships with this gate (see section D)"
+  Classification: "Internal-Public (this page, mechanism only — no secrets, no ids, no company values)"
+  Taxonomy: "n/a — no taxonomy capture is touched by this gate"
+  Ontology map: "n/a — no vocabulary entries are proposed. If an adopted practice later needs a graph shape (a user model as nodes, say), THAT shape gets its own ontology gate first"
+  Source of record: "docs/restructure/backlog/items/O71.yaml · config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md (the flow this gate follows)"
+
+mapping:
+  - n: 1
+    element: "The scaffold verdict — reaffirmation, not a re-opening"
+    target: "fastapi/full-stack-fastapi-template is NOT adopted as a scaffold. The 2026-08-27 survey's grounds stand: clone-and-diverge with no update lifecycle, and a users/orgs/billing model on a different tenancy axis from TE's generated-instance-per-team"
+    edge: "verdict reaffirmation  [PROPOSED — the default that survives if every practice below is declined]"
+  - n: 2
+    element: "P1 — hashed credentials"
+    target: "ALREADY IN PLACE, not a proposal: salted hashlib.scrypt at OWASP parameters (N=2^14, r=8, p=5), parameters stored WITH each hash so an old hash still verifies under its own. Confirm as the standing mechanism"
+    edge: "already implemented  [CONFIRM — or rule a change]"
+  - n: 3
+    element: "P2 — OAuth2 password flow (the template's login shape)"
+    target: "RECOMMENDED: decline. The console posts JSON to /login and receives a token; the OAuth2 password grant adds a form-encoded contract and a spec-shaped vocabulary while changing nothing about who may sign in. It buys interop with OAuth tooling the producer does not use"
+    edge: "candidate practice  [OPEN — SME rules adopt / decline]"
+  - n: 4
+    element: "P3 — JWT in place of the opaque server-side token"
+    target: "RECOMMENDED: decline, and the reason is a property being kept rather than a feature not wanted. An opaque token is REVOCABLE — sign-out and expiry are enforced server-side by the session store, and a token can be dropped mid-life. A JWT is stateless by design: revocation needs a denylist, which reintroduces the server-side store the JWT was adopted to remove, plus key management. Adopt only if a use case needs a token verified WITHOUT the issuer"
+    edge: "candidate practice  [OPEN — SME rules adopt / decline]"
+  - n: 5
+    element: "P4 — a user model (persistent accounts, rather than a fixed roster)"
+    target: "THE GENUINELY OPEN ONE. Today PERSONAS is a hardcoded roster of six deliberately fictional identities in web/src/lib/auth.ts, with secrets in a machine-local credential file. A shared estate console needs accounts that outlive a machine — which is a data model, a storage decision, and a lifecycle (create/disable/rotate), not a library choice"
+    edge: "candidate practice  [OPEN — SME rules adopt / decline / defer with a named trigger]"
+  - n: 6
+    element: "P5 — a credential recovery flow"
+    target: "RECOMMENDED: decline for now, and note the dependency rather than the preference — recovery presupposes P4 (an account to recover, and an identity to prove) and a mail path the producer does not have. If P4 is declined or deferred, this is decided with it"
+    edge: "candidate practice  [OPEN — depends on P4]"
+  - n: 7
+    element: "The ?as= seam — what it is TODAY"
+    target: "MEASURED, not described from memory (O71 clause c): a DEV-ONLY affordance in web/src/App.tsx, removed from production bundles by the import.meta.env.DEV constant. Since O69 it performs a REAL sign-in — it calls signIn() with VITE_DEV_CONSOLE_SECRET and has no default and no fallback, so with the variable unset it does nothing and the sign-in screen renders. It is a verification convenience, NOT a bypass, and the item's own description of it as 'a stub sitting where real auth would land' is out of date"
+    edge: "current state  [FOR INFORMATION — corrects the item's framing]"
+
+provenance:
+  - label: "The console's authentication mechanism as it stands today (mapping rows 2, 7)"
+    source_object: "drydocs_api/credentials.py + drydocs_api/sessions.py + web/src/lib/auth.ts + web/src/App.tsx"
+    key: "mechanism — not a data object; provenance here records where each claim on this page was READ from"
+    loader: "~ (no loader — this gate rules on a console mechanism, not on data)"
+    properties:
+      - {name: scrypt_hashing, origin: source, from: "drydocs_api/credentials.py — ALGORITHM = 'scrypt', OWASP parameters N=2^14/r=8/p=5, per-credential salt, parameters stored with the hash", note: "read from the module at drafting, not recalled"}
+      - {name: opaque_bearer_token, origin: source, from: "drydocs_api/sessions.py — InMemorySessionStore issues tokens with a TTL; authentication happens BEFORE issue()", note: "the revocability argument in P3 rests on this"}
+      - {name: secret_never_stored_client_side, origin: source, from: "web/src/lib/auth.ts — 'the secret leaves this function in one request and is never stored'", note: "the browser holds a token and its expiry only"}
+      - {name: role_reresolved_server_side, origin: source, from: "web/src/lib/auth.ts + ADR 0005 decision 3 — the stored role drives nav rendering only; the server re-resolves the real one per request", note: "why a hand-edited session blob buys nothing"}
+      - {name: dev_only_as_seam, origin: source, from: "web/src/App.tsx — guarded by import.meta.env.DEV, requires VITE_DEV_CONSOLE_SECRET, no default and no fallback", note: "corrects the O71 item's 'stub' framing; O69 replaced the mock"}
+      - {name: fictional_roster, origin: source, from: "web/src/lib/auth.ts PERSONAS — six ids no directory could issue, deliberately not SID-shaped since 2026-08-28", note: "what P4 would replace"}
+  - label: "The surveyed template and the verdict that stands (mapping rows 1, 3-6)"
+    source_object: "docs/decisions/0015-team-edition-template.md — the Scaffold-substrate rejection and the Sources & tooling watch row"
+    key: "ADR 0015 register row: fastapi/full-stack-fastapi-template"
+    loader: "~ (no loader — an ADR register row, not an ingested source)"
+    properties:
+      - {name: scaffold_rejected, origin: source, from: "ADR 0015 — 'clone-and-diverge repos or proprietary generators with no update lifecycle'; teams there means 'users-in-a-workspace rows behind JWT next to Stripe'", note: "quoted so this gate cannot be read as re-opening it"}
+      - {name: watch_trigger, origin: source, from: "ADR 0015 register — 'Only re-opens if a shared estate console is chartered (the one legitimate use identified)'", note: "the trigger this gate answers"}
+      - {name: practice_list, origin: derived, from: "the survey's characterisation of what such templates ship (OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow)", note: "the five candidates below are DERIVED from that characterisation — the SME may add or remove one"}
+      - {name: recommendations, origin: derived, from: "this page's drafting, against the mechanism read above", note: "P1 already in place, P2/P3/P5 decline, P4 the genuinely open one — every one an OPEN SME ruling, not a decision"}
+
+sections:
+  - title: "A. What is NOT being asked — reaffirmation"
+    confirmations:
+      - "The SCAFFOLD stays rejected. fastapi/full-stack-fastapi-template is not adopted, vendored, or partially copied, and this gate does not re-open that survey. The register row keeps its verdict; only its trigger state changes."
+      - "This gate rules on PRACTICES the survey described, evaluated on their own merits against what the console already does. A practice is judged by whether the producer needs it, never by whether the template ships it."
+      - "Declining every practice below is a valid sign-off. The console authenticates today and would continue to; nothing here is a gap being patched."
+  - title: "B. What the console does TODAY — confirm the measurement"
+    confirmations:
+      - "Sign-in proves a secret to drydocs-api, which verifies it against a salted scrypt hash (OWASP parameters, stored per-credential so old hashes still verify) and issues an opaque bearer token with a TTL from a server-side session store. The browser holds the token and its expiry; the secret is sent once and stored nowhere."
+      - "Roles are re-resolved server-side from the token on every request. The role in the browser's session blob drives which nav entries render and nothing else, so editing it grants nothing (ADR 0005 decision 3)."
+      - "Accounts are a FIXED roster of six deliberately fictional identities, with secrets in a machine-local credential file that is absent on a fresh clone (every login is then refused). There is no account creation, no directory, and no recovery path."
+      - "The ?as= affordance is DEV-only, removed from production bundles, and performs a real sign-in with a secret supplied by the dev shell — it is not a bypass. If the SME expected a stub here, that expectation predates O69."
+  - title: "C. The five practices — rule each"
+    confirmations:
+      - "P1 hashed credentials: CONFIRM the current mechanism (salted scrypt at OWASP parameters) as the standing one, or rule a change. Nothing is being proposed — this row exists so the status quo is a recorded decision rather than an assumption nobody checked."
+      - "P2 OAuth2 password flow: adopt or DECLINE (recommended decline). It changes the shape of the login request and nothing about who may sign in; its value is interop with OAuth tooling, which the producer does not use today."
+      - "P3 JWT in place of the opaque token: adopt or DECLINE (recommended decline). The property at stake is revocability — an opaque token is revoked by the session store, while a JWT needs a denylist that reintroduces exactly the server-side state it was adopted to avoid, plus key management. Adopt only if something must verify a token WITHOUT asking the issuer."
+      - "P4 a user model: adopt / decline / DEFER WITH A NAMED TRIGGER. This is the one the charter actually presses on — a shared estate console needs accounts that outlive one machine's credential file. It is a data model, a storage decision and a lifecycle (create, disable, rotate), so adopting it means scoping those, not installing a library. If deferred, name the trigger here so the deferral is re-openable the way the register row was."
+      - "P5 a recovery flow: adopt or DECLINE (recommended decline). It presupposes P4 and a mail path the producer does not have, so it is decided WITH P4 rather than independently."
+  - title: "D. The register-row amendment — drafted here, applied at sign-off"
+    confirmations:
+      - "The ADR 0015 register row for fastapi/full-stack-fastapi-template is amended to record that its trigger HAS FIRED, what fired it (the internal ui-workstream's user/login build — the chartered shared estate console the row anticipated), and that the disposition is this gate. The row's 'What TE takes' column is unchanged: still nothing adopted."
+      - "The amendment records the FIRING, never the outcome. Whatever this gate rules is transcribed to config/gate-log.md, which is the record of record; the register row points at the gate rather than restating it, so the two cannot drift."
+      - "This preserves ADR 0015's own discipline — a fired trigger opens a backlog item and auto-changes nothing. The row is not deleted, and the watch is not closed: a rejected scaffold with a fired trigger is still worth watching."
+  - title: "E. Boundaries recorded at sign-off"
+    confirmations:
+      - "NOTHING IS BUILT BY THIS PAGE. No dependency added, no auth code, no user model, no route change. Any adopted practice becomes its own backlog item with its own acceptance test, and a practice that touches stored credentials or session lifetime carries its own security review."
+      - "THE COMPANY SIDE IS NOT DECIDED HERE. Their ui-workstream makes its own call and runs its own gate; producer sign-off is not company sign-off."
+      - "Until this gate signs off, the console's authentication is unchanged — the mechanism described in section B is what ships."
+  - title: "F. Sign-off"
+    confirmations:
+      - "SME sign-off recorded here and transcribed to config/gate-log.md with the date and the per-practice rulings, including any DEFER and its named trigger."

@@ -19,6 +19,12 @@
 // demoOwnership's OWNERSHIP_KIND_TOKEN. Components consume tokens, never raw hex
 // (site-plan §2), so both themes render correctly.
 
+// TYPE-ONLY, and deliberately so: the full-page route (O86) gates on the HOST
+// module's access designation, so a surface has to name its host. A type import
+// is erased at build time, which keeps this module free of a runtime edge to the
+// registry — it stays a pure mapper, importable by anything.
+import type { ModuleId } from '../modules/registry'
+
 /** A row as it arrives from a spec result: column name -> value. */
 export type SpecRow = Record<string, unknown>
 
@@ -200,3 +206,39 @@ export const CANVAS_SURFACES = {
 } as const satisfies Record<string, (rows: readonly SpecRow[]) => CanvasGraph>
 
 export type CanvasSpecId = keyof typeof CANVAS_SURFACES
+
+/** What the full-page route needs to know about a canvas surface (O86).
+ *
+ *  `module` is the surface's HOST — the module whose tab renders it inline —
+ *  and it is what the route gates on, so `/graph/:specId` applies whatever rule
+ *  its host applies and cannot become the one page that does not check. */
+export interface CanvasRoute {
+  module: ModuleId
+  title: string
+}
+
+/** Every canvas surface, keyed for the full-page route.
+ *
+ *  `satisfies Record<CanvasSpecId, ...>` is doing real work: adding a surface to
+ *  CANVAS_SURFACES without a route entry here is a COMPILE ERROR, so a new canvas
+ *  cannot quietly ship with no page and no gate. The whitelist the route checks
+ *  is this object — an id that is not a key renders a named refusal rather than
+ *  being passed through to the API (O86 clause b). */
+export const CANVAS_ROUTES = {
+  'runbooks.series.v1': { module: 'runbooks', title: 'Data-series provisioning graph' },
+  'explorer.folder-applications.v1': {
+    module: 'explorer',
+    title: 'Application neighbourhood',
+  },
+} as const satisfies Record<CanvasSpecId, CanvasRoute>
+
+/** Is this arbitrary string a canvas surface the route may render? */
+export function isCanvasSpecId(value: string | undefined): value is CanvasSpecId {
+  return value !== undefined && Object.hasOwn(CANVAS_ROUTES, value)
+}
+
+/** The path `/graph/:specId` for a surface — one place, so the anchor in a
+ *  canvas header and the route that answers it cannot disagree. */
+export function canvasRoutePath(specId: CanvasSpecId): string {
+  return `/graph/${encodeURIComponent(specId)}`
+}

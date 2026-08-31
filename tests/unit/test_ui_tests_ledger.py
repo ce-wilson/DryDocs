@@ -146,7 +146,7 @@ def test_automated_cases_name_a_file_that_exists() -> None:
 
 
 def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
-    """Eight of twenty-nine. The point is that the number is SMALL and visible.
+    """Ten of thirty-one. The point is that the number is SMALL and visible.
 
     O80 bought the capability and proved it on cases that had already escaped
     into main; it did not backfill coverage, and this pin is what stops a later
@@ -160,12 +160,19 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     runner can hold. The two cases left manual are the ones that need a person
     to look at a rendered frame. The share moving up is not evidence that
     backfilling happened.
+
+    8/29 -> 9/30 at O85 (2026-08-31): TC-SHELL-07, automated by
+    test_console_origins.py. Note what that guard does and does not cover: it
+    checks the ALLOWLIST half mechanically (every port the ledger documents is
+    served or declared), which is the half that drifted. The diagnosis half was
+    verified in a real browser against real servers, because a browser is the
+    only thing that can produce the failure at all.
     """
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        8,
-        29,
+        10,
+        31,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 

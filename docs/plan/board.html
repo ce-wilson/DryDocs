@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 598 items &middot; 123 todo / 6 in progress / 2 blocked / 467 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 598 items &middot; 120 todo / 6 in progress / 2 blocked / 470 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -91,14 +91,14 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">19 / 31</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:74%"></div></div><p class="progress-text">67 / 91</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:77%"></div></div><p class="progress-text">70 / 91</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">5 / 6</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:92%"></div></div><p class="progress-text">24 / 26</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:52%"></div></div><p class="progress-text">12 / 23</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:17%"></div></div><p class="progress-text">2 / 12</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (108; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C38"><code>C38</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G133"><code>G133</code></a> <a class="ready-id" href="#G134"><code>G134</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O58"><code>O58</code></a> <a class="ready-id" href="#O60"><code>O60</code></a> <a class="ready-id" href="#O61"><code>O61</code></a> <a class="ready-id" href="#O62"><code>O62</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O71"><code>O71</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O85"><code>O85</code></a> <a class="ready-id" href="#O86"><code>O86</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (105; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C38"><code>C38</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G133"><code>G133</code></a> <a class="ready-id" href="#G134"><code>G134</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O58"><code>O58</code></a> <a class="ready-id" href="#O60"><code>O60</code></a> <a class="ready-id" href="#O61"><code>O61</code></a> <a class="ready-id" href="#O62"><code>O62</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -179,7 +179,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">123</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">120</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
 config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
 BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
 session: a stale-premise sweep of the drafted page against current facts (the
@@ -1858,25 +1858,6 @@ about twice - never parse a render, never hand-copy a declaration. The QuerySpec
 the natural first beneficiary: 35 specs whose column shapes the console currently trusts by
 convention alone.
 </p></div></div>
-<div class="card ready" id="card-O71" data-id="O71" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o71 the adr 0015 watched-source trigger for the fastapi template has fired â€” draft the console auth-boundary gate question and the register-row amendment, and decide nothing outside the gate" tabindex="0"><div class="card-head"><span class="card-id">O71</span><span class="card-title">The ADR 0015 watched-source trigger for the FastAPI template has fired â€” draft the console auth-boundary gate question and the register-row amendment, and decide nothing outside the gate</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) A GATE PROMPT SPEC EXISTS AND PROPOSES, IT DOES NOT ADOPT. A new spec under `config/gate-prompts/` puts the console&#x27;s authentication boundary to the SME, in the shape `config/gate-prompts/ui-write-surface.yaml` already uses (the O20 precedent: a page that PROPOSES a boundary and changes nothing by being rendered), and it satisfies whatever `tests/unit/test_gate_pages.py` requires of every spec â€” Module / Source / Registry ref / Classification. AUTH IS A TRUST BOUNDARY: nothing in this item adopts, installs, or wires an auth mechanism. Until the gate signs off, the console&#x27;s sign-in stays the stub it is today.
-
-(b) THE QUESTION IS ABOUT PRACTICES, NOT A SCAFFOLD, AND SAYS SO. The ADR&#x27;s survey already REJECTED the `fastapi/full-stack-fastapi-template` scaffold â€” clone-and-diverge, no update lifecycle, Stripe and multi-org baggage â€” and that rejection stands; the spec must restate it so a reader cannot mistake the gate for a reversal. What is on the table is the template&#x27;s auth PRACTICES, cited to the register row: OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow â€” the survey&#x27;s characterisation was &quot;users-in-a-workspace rows behind JWT&quot;. Each practice is a separately tickable confirmation, so declining any subset is a valid sign-off.
-
-(c) THE PRODUCER-SIDE SEAM IS NAMED AND ITS CURRENT STATE MEASURED. Epic O&#x27;s `?as=` headless sign-in is a stub sitting exactly where real auth would land. Read what it does today and record it in the spec, so the gate rules against the actual seam rather than a described one. State plainly which console surfaces are read-only today, because that standing state is itself one of the answers the SME may confirm.
-
-(d) THE REGISTER-ROW AMENDMENT IS DRAFTED, AND COORDINATED RATHER THAN SWEPT. ADR 0015&#x27;s watched-source register discipline is that a fired trigger opens a backlog item and auto-changes nothing; the row for this source therefore needs an amendment recording that its named trigger â€” &quot;only re-opens if a shared estate console is chartered&quot; â€” has fired, that the charter is the internal ui-workstream&#x27;s user/login build, and that the disposition is this gate. THE ADR FILE IS ANOTHER SESSION&#x27;S IN-FLIGHT DRAFT and is not on `main` as of 2026-08-28 (`docs/decisions/` runs 0014 then 0016). Do not create, re-draft, or overwrite it. If it has landed by the time this item is pulled, amend the row in place; if it has not, the amendment ships as drafted TEXT inside the gate spec with a note naming where it belongs, and the item still closes.
-
-(e) THE COMPANY SIDE IS NOT DECIDED HERE. Their ui-workstream makes their own call and runs their own gate; producer sign-off is not company sign-off. The spec says so in one line rather than leaving it to be assumed.
-
-(f) NOTHING IS BUILT. No dependency added, no auth code, no user model, no route change. The deliverable is a gate spec plus a drafted register-row amendment, and the gate SESSION itself is a separate item minted after this one lands.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-28 from Idea-184 (captured 2026-08-27, High). The entry&#x27;s own instruction was &quot;one item to draft the auth-boundary gate question + the register-row amendment&quot;, and this is that item, scoped no wider.
-
-Epic/module/phase choice, recorded because it was a judgement call: filed under web-console / `drydocs-web` / phase 12 because the entry names the producer-side seam as &quot;the O-epic&#x27;s `?as=` headless sign-in pattern&quot;, which is where any adoption would land and what the gate must rule on. There is no Team Edition epic to file it under yet â€” ADR 0015 is still a draft, and Idea-179 records that a TE epic does not exist â€” so filing it there was not available. If a TE epic is later chartered, this item&#x27;s register-row half is a candidate to move; the gate half stays with the console either way.
-
-Model fable: the item frames a TRUST BOUNDARY question, which is the tier&#x27;s stated trigger. It still decides nothing â€” per the HITL flow (`docs/restructure/03-hitl-sme-flow.md`), the adoption routes through the gate and stays unadopted until confirmed. Acceptance clause (a) is what holds that line.
-
-Concurrency note, and it is load-bearing rather than courtesy: `docs/decisions/0015-team-edition-template.md` was an uncommitted working file in the shared tree at groom time. Clause (d) is written so this item can be pulled and closed whether or not that draft has landed, and so that a session pulling it cannot resolve the ambiguity by writing the ADR itself.
-</p></div></div>
 <div class="card ready" id="card-O72" data-id="O72" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o72 one-command local stack: compose the four processes the runbook starts by hand, with its success checks expressed as health checks" tabindex="0"><div class="card-head"><span class="card-id">O72</span><span class="card-title">One-command local stack: Compose the four processes the runbook starts by hand, with its success checks expressed as health checks</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A committed Compose file brings up the console stack in one command: Neo4j, drydocs-api on 8001, the ADK agent server on 8000, and the Vite dev server on 5173. Each service declares a health check that is the runbook&#x27;s own success test for that step - the API is healthy when /health answers ok, the agent server when it lists exactly its four apps, and Vite when it serves the page - so a broken dependency surfaces as an unhealthy service instead of a browser error three layers away. Ports stay exactly as they are, because the API&#x27;s CORS allow-list names 5173 and 4173 specifically and a drifted port fails as a CORS error that reads like an API fault. The runbook&#x27;s Startup section is updated to offer the one-command path alongside the per-process one, and keeps the per-process path, since debugging a single service is a real need. No credential is baked into the Compose file.
 </p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from the web-scaffolding review. The reviewed FastAPI template uses
 Compose for exactly this. Our runbook Startup section is four processes with four success
@@ -1924,80 +1905,6 @@ Module drydocs-web recorded as a choice, same as O68: the item spans agents (end
 and web (panel); it is filed against the surface the user asked for. The (b) slice stays
 in agents/, the (c) slice in web/ — the boundary guard&#x27;s classification is unaffected
 because agents/ is already scanned.
-</p></div></div>
-<div class="card ready" id="card-O85" data-id="O85" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="todo" data-search="o85 the console cannot sign in on the verification port because the api allowlist names only two dev ports, and the client blames an unreachable server instead" tabindex="0"><div class="card-head"><span class="card-id">O85</span><span class="card-title">The console cannot sign in on the verification port because the API allowlist names only two dev ports, and the client blames an unreachable server instead</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) DECIDED AS ONE QUESTION, NOT TWO, and both answers land together - whether the allowlist
-carries the verification port, and whether the client can distinguish a refused connection from
-a blocked origin.
-
-(b) THE ALLOWLIST IS RECONCILED WITH THE LEDGER. The API&#x27;s cross-origin allowlist names the two
-standard dev ports only, so a console served anywhere else gets a browser-blocked sign-in and
-falls back to the sign-in screen. Either the allowlist gains the port the UI-test ledger&#x27;s own
-O65 and O66 sources cite, or the ledger is corrected to a port the API already serves. Do one,
-and state the reason.
-
-(c) THE ERROR MESSAGE STOPS NAMING THE WRONG CAUSE. A blocked origin and a dead server are the
-same rejection to the browser fetch API, so the client says which it cannot tell apart, or
-probes once to tell them apart, rather than asserting the API is unreachable.
-
-(d) VERIFIED BY SERVING THE CONSOLE ON THE CHOSEN PORT AND SIGNING IN, on this desktop, with the
-venue named (J18) - the failure is a browser behaviour and no unit test observes it.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-30 (desktop, weekly groom) from Idea-200, found while verifying O77 on
-2026-08-28 - the verification ran on a fallback port because the standard one was already taken
-by another dev server, which is how a documented verification port and the API&#x27;s allowlist came
-to disagree unnoticed since O69.
-</p></div></div>
-<div class="card ready" id="card-O86" data-id="O86" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o86 a graph canvas in the data-frame strip is legible only if you drag the divider - give each canvas surface a full-page route it can be opened into" tabindex="0"><div class="card-head"><span class="card-id">O86</span><span class="card-title">A graph canvas in the data-frame strip is legible only if you drag the divider - give each canvas surface a full-page route it can be opened into</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O81" data-target="card-O81">O81</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) A REAL ROUTE, NOT A DISPLAY TOGGLE. `/graph/:specId` renders one canvas
-surface full-page, and it is a route for the reason site-plan §1 gives: every view
-deep-linkable and back-button safe. The precedent is already in the router -
-`lineage/asset/:assetId` and `explorer/tower/:towerKey` are parameterised routes
-rendering a focused view, and this is the same shape. A maximize toggle or the
-Fullscreen API would both be cheaper and neither produces a link somebody can send.
-
-(b) THE SPEC ID IS WHITELISTED AGAINST CANVAS_SURFACES, never passed through. That
-map is already a closed pairing of spec id to the mapper that knows which Cypher
-pattern the spec walked, so an id outside it renders a named &quot;not a canvas surface&quot;
-state. Without the check the URL quietly becomes a place to name arbitrary spec ids:
-drydocs-api would refuse anything unregistered, so this is not a data-exposure fix,
-it is a refusal to invite the attempt - and it keeps the ADR 0005 rule that the
-console never chooses a query the registry did not review.
-
-(c) THE ROUTE GATES LIKE ITS SIBLINGS. Whatever role rule the hosting module&#x27;s tabs
-apply, the full-page route applies too. A deep link is reachable by anyone holding
-it, and the server re-resolves the real role from the token on every call, so the
-data is safe either way; the point is that this must not become the one page that
-does not check.
-
-(d) THE WAY IN IS AN ANCHOR, not window.open - middle-click and ctrl-click keep
-working and no popup blocker is involved. Opened from the canvas header of each
-surface that has a route.
-
-(e) THE SESSION IS NOT PASSED IN THE URL and does not need to be. The token lives
-in localStorage under drydocs.session.v2, so a same-origin tab boots the app and
-finds it. A token in a query string would land in history, logs and any shared link.
-
-(f) O81&#x27;S LIMITATION IS CLOSED OR RESTATED. That item shipped the canvas in the
-data-frame strip - about 215px at the default split, where the whole graph fits but
-its captions render small - and named the resizable divider as the answer for now.
-Either this route makes that acceptable, or the item says plainly what still is not.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 from O81&#x27;s close, at the user&#x27;s request, after O81 reported the
-legibility limitation rather than deferring it silently.
-
-WHY A ROUTE RATHER THAN THE TWO CHEAPER OPTIONS, decided at the mint so the build
-does not re-litigate it: a maximize toggle (CSS only, ~20 lines) and the Fullscreen
-API (~10 lines) both solve the height and neither produces a shareable link or a
-back-button-safe view, which is exactly what site-plan §1 locked the console into
-real routes to get. The route is also the only one of the three that survives being
-sent to somebody.
-
-WHAT IS ALREADY TRUE AND NEEDS NO WORK: the session is in localStorage, so a new
-tab is signed in with no second login and no token in the URL. That fact is what
-makes the route cheap, and it was verified while answering the question rather
-than assumed.
-
-NOT IN SCOPE: hosting the canvas in the module GRAPH PANE instead of the data-frame
-strip. O81 deliberately left that alone because it would displace each route&#x27;s
-existing reviewed pane, and that is a call about what a module leads with - a
-different decision from giving a surface its own page.
 </p></div></div>
 <div class="card ready" id="card-P6" data-id="P6" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="todo" data-search="p6 run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node" tabindex="0"><div class="card-head"><span class="card-id">P6</span><span class="card-title">Run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE PROBE. One grouped count over the folder-definition view: how many table ids appear in more than one data center. Counts only, never result rows — the producer side has no psgmgr access, so this is user-run on the internal network and the agent transcribes the conclusion, exactly the arrangement P1 records.
 
@@ -2385,7 +2292,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">467</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">470</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -6726,6 +6633,67 @@ expiry itself is unit-tested with an injected clock rather than by waiting eight
 green, ruff clean, npm run build and oxlint clean. The runbook is at Rev 3 with the credential
 prerequisite and four new troubleshooting rows.
 </p></div></div>
+<div class="card" id="card-O71" data-id="O71" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o71 the adr 0015 watched-source trigger for the fastapi template has fired â€” draft the console auth-boundary gate question and the register-row amendment, and decide nothing outside the gate" tabindex="0"><div class="card-head"><span class="card-id">O71</span><span class="card-title">The ADR 0015 watched-source trigger for the FastAPI template has fired â€” draft the console auth-boundary gate question and the register-row amendment, and decide nothing outside the gate</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) A GATE PROMPT SPEC EXISTS AND PROPOSES, IT DOES NOT ADOPT. A new spec under `config/gate-prompts/` puts the console&#x27;s authentication boundary to the SME, in the shape `config/gate-prompts/ui-write-surface.yaml` already uses (the O20 precedent: a page that PROPOSES a boundary and changes nothing by being rendered), and it satisfies whatever `tests/unit/test_gate_pages.py` requires of every spec â€” Module / Source / Registry ref / Classification. AUTH IS A TRUST BOUNDARY: nothing in this item adopts, installs, or wires an auth mechanism. Until the gate signs off, the console&#x27;s sign-in stays the stub it is today.
+
+(b) THE QUESTION IS ABOUT PRACTICES, NOT A SCAFFOLD, AND SAYS SO. The ADR&#x27;s survey already REJECTED the `fastapi/full-stack-fastapi-template` scaffold â€” clone-and-diverge, no update lifecycle, Stripe and multi-org baggage â€” and that rejection stands; the spec must restate it so a reader cannot mistake the gate for a reversal. What is on the table is the template&#x27;s auth PRACTICES, cited to the register row: OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow â€” the survey&#x27;s characterisation was &quot;users-in-a-workspace rows behind JWT&quot;. Each practice is a separately tickable confirmation, so declining any subset is a valid sign-off.
+
+(c) THE PRODUCER-SIDE SEAM IS NAMED AND ITS CURRENT STATE MEASURED. Epic O&#x27;s `?as=` headless sign-in is a stub sitting exactly where real auth would land. Read what it does today and record it in the spec, so the gate rules against the actual seam rather than a described one. State plainly which console surfaces are read-only today, because that standing state is itself one of the answers the SME may confirm.
+
+(d) THE REGISTER-ROW AMENDMENT IS DRAFTED, AND COORDINATED RATHER THAN SWEPT. ADR 0015&#x27;s watched-source register discipline is that a fired trigger opens a backlog item and auto-changes nothing; the row for this source therefore needs an amendment recording that its named trigger â€” &quot;only re-opens if a shared estate console is chartered&quot; â€” has fired, that the charter is the internal ui-workstream&#x27;s user/login build, and that the disposition is this gate. THE ADR FILE IS ANOTHER SESSION&#x27;S IN-FLIGHT DRAFT and is not on `main` as of 2026-08-28 (`docs/decisions/` runs 0014 then 0016). Do not create, re-draft, or overwrite it. If it has landed by the time this item is pulled, amend the row in place; if it has not, the amendment ships as drafted TEXT inside the gate spec with a note naming where it belongs, and the item still closes.
+
+(e) THE COMPANY SIDE IS NOT DECIDED HERE. Their ui-workstream makes their own call and runs their own gate; producer sign-off is not company sign-off. The spec says so in one line rather than leaving it to be assumed.
+
+(f) NOTHING IS BUILT. No dependency added, no auth code, no user model, no route change. The deliverable is a gate spec plus a drafted register-row amendment, and the gate SESSION itself is a separate item minted after this one lands.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-28 from Idea-184 (captured 2026-08-27, High). The entry&#x27;s own instruction was &quot;one item to draft the auth-boundary gate question + the register-row amendment&quot;, and this is that item, scoped no wider.
+
+Epic/module/phase choice, recorded because it was a judgement call: filed under web-console / `drydocs-web` / phase 12 because the entry names the producer-side seam as &quot;the O-epic&#x27;s `?as=` headless sign-in pattern&quot;, which is where any adoption would land and what the gate must rule on. There is no Team Edition epic to file it under yet â€” ADR 0015 is still a draft, and Idea-179 records that a TE epic does not exist â€” so filing it there was not available. If a TE epic is later chartered, this item&#x27;s register-row half is a candidate to move; the gate half stays with the console either way.
+
+Model fable: the item frames a TRUST BOUNDARY question, which is the tier&#x27;s stated trigger. It still decides nothing â€” per the HITL flow (`docs/restructure/03-hitl-sme-flow.md`), the adoption routes through the gate and stays unadopted until confirmed. Acceptance clause (a) is what holds that line.
+
+Concurrency note, and it is load-bearing rather than courtesy: `docs/decisions/0015-team-edition-template.md` was an uncommitted working file in the shared tree at groom time. Clause (d) is written so this item can be pulled and closed whether or not that draft has landed, and so that a session pulling it cannot resolve the ambiguity by writing the ADR itself.
+
+DONE 2026-08-31 (desktop). Deliverable is a gate spec plus the register-row amendment.
+Nothing was built, no dependency added, no auth code written — clause (f) held.
+
+(a) THE SPEC PROPOSES AND DOES NOT ADOPT. `config/gate-prompts/console-auth-boundary.yaml`,
+in the O20 `ui-write-surface.yaml` shape, passing test_gate_pages.py (Module / Source /
+Registry ref / Classification, provenance with the source-vs-derived split). Until it signs
+off the console&#x27;s authentication is exactly what section B describes.
+
+(b) THE REJECTION IS RESTATED FIRST, in the file header and again as section A confirmation
+1, quoting the ADR&#x27;s own grounds — clone-and-diverge with no update lifecycle, and a
+&quot;users-in-a-workspace rows behind JWT next to Stripe&quot; tenancy on a different axis from a
+generated instance with its own databases. A reader who skims cannot mistake this gate for
+a reversal. Each of the five practices is separately tickable, so declining any subset is a
+valid sign-off and declining all of them is the standing state.
+
+(c) THE SEAM WAS MEASURED, AND THE MEASUREMENT CORRECTS THE ITEM. O71 describes `?as=` as
+&quot;a stub sitting exactly where real auth would land&quot;. IT IS NOT, and has not been since O69:
+it is DEV-only (removed from production bundles by import.meta.env.DEV), it performs a REAL
+sign-in through signIn() with VITE_DEV_CONSOLE_SECRET, and it has no default and no
+fallback — unset, it does nothing and the sign-in screen renders. Reading the modules also
+changed the SHAPE of the gate: three of the five practices are already answered. Secrets
+are salted scrypt at OWASP parameters with the parameters stored per-credential; tokens are
+OPAQUE with a TTL from a server-side store; the server re-resolves role per request. So
+&quot;hashed credentials&quot; is a confirmation, not a proposal, and the honest JWT question is
+whether to REPLACE a deliberately revocable token with a stateless one — which is a
+property being kept, not a feature not wanted. P4, a real user model, is the one the
+charter actually presses on, and it is a data model plus a lifecycle rather than a library.
+This is exactly what clause (c) was for: the gate now rules against the actual seam.
+
+(d) THE ADR HAD LANDED, so the row was amended IN PLACE rather than shipped as drafted text.
+`docs/decisions/0015-team-edition-template.md` is on main (the clause anticipated it might
+not be, as of 2026-08-28). The row records that the trigger FIRED, what fired it, and that
+the disposition is this gate; &quot;What TE takes&quot; still reads *nothing adopted*, and the watch
+stays open. THE RULING IS NOT WRITTEN INTO THE ROW — it lands in config/gate-log.md, and the
+row points at the gate, so the two cannot drift. The ADR was not re-drafted or overwritten.
+
+(e) The company side is one line in section E: their ui-workstream runs its own gate, and
+producer sign-off is not company sign-off.
+
+NOT DONE, BY DESIGN: the gate SESSION. This item drafts the question; running it is a
+separate item to mint after this lands, per the item&#x27;s own clause (f).
+</p></div></div>
 <div class="card" id="card-O73" data-id="O73" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o73 credentials reload when the file changes, and a demo-login script the operator maintains until sso replaces it" tabindex="0"><div class="card-head"><span class="card-id">O73</span><span class="card-title">Credentials reload when the file changes, and a demo-login script the operator maintains until SSO replaces it</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O69" data-target="card-O69">O69</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Rotating or adding a console credential takes effect without restarting the API. The store the API holds re-reads its file when that file changes, decided by a stat rather than by a timer, so an unchanged file costs nothing per request. A re-read that fails - a corrupt file, a partial write - keeps the last known-good store and logs the reason rather than signing everybody out, because a torn write during a routine rotation must not become a denial of service; and the writer makes that case rare by replacing the file atomically instead of truncating it in place. Deleting the file is honoured, not ignored: it empties the store and the next login gets the fresh-clone message. The API still writes nothing (the ADR 0009 guard), and the injected-store path every test uses is unchanged.
 A SECOND SCRIPT serves the demo path the operator owns until SSO arrives: one command that reports which accounts can sign in and gets the missing ones set, one that rotates them, and one that proves a login against the running API end to end so a demo failure can be told apart from a console bug. It never takes a secret on the command line. It states in its own text that it is the seam ADR 0005 hands to a company OIDC binding, so the day that lands the script is deleted rather than adapted.
 </p><p class="notes"><strong>Notes:</strong> Raised and built 2026-08-28 (desktop) on direct user direction, immediately after O69.
@@ -7388,6 +7356,179 @@ it to skip on. Adding a skip branch that can never fire would be worse than sayi
 VERIFIED: Python suite 2886 passed / 12 skipped, ruff check + format clean, vitest 43
 passed (11 new over the extractor), oxlint unchanged (4 pre-existing warnings), tsc build
 clean.
+</p></div></div>
+<div class="card" id="card-O85" data-id="O85" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="done" data-search="o85 the console cannot sign in on the verification port because the api allowlist names only two dev ports, and the client blames an unreachable server instead" tabindex="0"><div class="card-head"><span class="card-id">O85</span><span class="card-title">The console cannot sign in on the verification port because the API allowlist names only two dev ports, and the client blames an unreachable server instead</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) DECIDED AS ONE QUESTION, NOT TWO, and both answers land together - whether the allowlist
+carries the verification port, and whether the client can distinguish a refused connection from
+a blocked origin.
+
+(b) THE ALLOWLIST IS RECONCILED WITH THE LEDGER. The API&#x27;s cross-origin allowlist names the two
+standard dev ports only, so a console served anywhere else gets a browser-blocked sign-in and
+falls back to the sign-in screen. Either the allowlist gains the port the UI-test ledger&#x27;s own
+O65 and O66 sources cite, or the ledger is corrected to a port the API already serves. Do one,
+and state the reason.
+
+(c) THE ERROR MESSAGE STOPS NAMING THE WRONG CAUSE. A blocked origin and a dead server are the
+same rejection to the browser fetch API, so the client says which it cannot tell apart, or
+probes once to tell them apart, rather than asserting the API is unreachable.
+
+(d) VERIFIED BY SERVING THE CONSOLE ON THE CHOSEN PORT AND SIGNING IN, on this desktop, with the
+venue named (J18) - the failure is a browser behaviour and no unit test observes it.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-30 (desktop, weekly groom) from Idea-200, found while verifying O77 on
+2026-08-28 - the verification ran on a fallback port because the standard one was already taken
+by another dev server, which is how a documented verification port and the API&#x27;s allowlist came
+to disagree unnoticed since O69.
+
+DONE 2026-08-31 (desktop). Both halves landed together, as clause (a) required.
+
+(b) THE ALLOWLIST MOVED, NOT THE LEDGER, and the reason is the whole point. The ledger
+cites `Vite :5199` in five `source` fields (O64, O65, O66) because five real
+verifications ran there — the standard port was taken, so the fallback became the
+documented one. Those fields are a RECORD OF WHAT HAPPENED. Editing them to name a port
+the API already served would make a true record false to spare a config change, so
+`http://localhost:5199` joined the built-in list in create_app().
+AND NO localhost REGEX, refused deliberately and recorded in the code: &quot;any port on this
+machine&quot; is a materially wider trust boundary than &quot;these named ports&quot;, it would be
+adopted with no gate, and DRYDOCS_CORS_ORIGINS (O80) already covers the one-off case
+declaratively — the e2e suite and O59&#x27;s live verification both used it.
+
+(c) THE MESSAGE STOPS ASSERTING A CAUSE IT CANNOT KNOW. A dead server and a blocked
+origin are the same opaque TypeError to fetch, and BOTH call sites picked one and
+asserted it. `web/src/lib/reachability.ts` probes once with `mode: &#x27;no-cors&#x27;`, which is
+not subject to the allowlist: a resolved opaque response means something answered, a
+rejection means nothing did. Reachable-but-failed now reports what it OBSERVED and says
+&quot;almost always&quot; about the inference, naming DRYDOCS_CORS_ORIGINS and the page&#x27;s own
+origin; unreachable names the start command. One helper, both call sites (auth.ts
+sign-in and graphApi.ts), so they cannot drift apart again.
+
+THE DRIFT ITSELF IS NOW GUARDED, which the item did not ask for and is the part worth
+keeping. tests/unit/test_console_origins.py reads the allowlist from the BUILT APP
+(J37 — create_app().user_middleware, never a regex over app.py, which would also match
+the comment explaining the list) and every `Vite :&lt;port&gt;` the ledger documents, and
+fails when a documented port is neither served nor declared in SUPPLIED_ELSEWHERE with
+the mechanism that supplies it (5273 is there: playwright.config.ts passes it). PROVEN
+TO CATCH IT: removing the 5199 line reds the guard with the port named, then restoring
+greens it. It also refuses a `*` or an origin regex, so the boundary cannot be widened
+by a later test update.
+
+(d) VERIFIED LIVE (J18): this desktop, Chrome against the console on :5199 talking to
+drydocs-api :8002, DRYDOCS_CORS_ORIGINS UNSET so only the built-in list was in play.
+Sign-in driven through the real form: sign-in screen gone, nav rendered, session stored.
+Both diagnosis branches driven against real servers rather than stubs — a live server
+sending no CORS headers on :8099 returned `blocked-origin`, and a dead :8098 returned
+`unreachable`. Seven vitest cases cover the branches with fetch injected.
+
+A NOTE ON THE VERIFICATION ITSELF, because it nearly produced a false claim: my first
+attempt to start a dev server on :5199 FAILED (port already in use by another session&#x27;s
+server) and curl still answered 200, so the page under test was not one I had started.
+Caught by reading the vite log rather than trusting the curl. The re-run pointed my own
+API at the port that server targets, which is why the venue above names :8002. The
+concurrent-session hazard is real on this machine and a 200 is not proof you started it.
+</p></div></div>
+<div class="card" id="card-O86" data-id="O86" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o86 a graph canvas in the data-frame strip is legible only if you drag the divider - give each canvas surface a full-page route it can be opened into" tabindex="0"><div class="card-head"><span class="card-id">O86</span><span class="card-title">A graph canvas in the data-frame strip is legible only if you drag the divider - give each canvas surface a full-page route it can be opened into</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O81" data-target="card-O81">O81</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) A REAL ROUTE, NOT A DISPLAY TOGGLE. `/graph/:specId` renders one canvas
+surface full-page, and it is a route for the reason site-plan §1 gives: every view
+deep-linkable and back-button safe. The precedent is already in the router -
+`lineage/asset/:assetId` and `explorer/tower/:towerKey` are parameterised routes
+rendering a focused view, and this is the same shape. A maximize toggle or the
+Fullscreen API would both be cheaper and neither produces a link somebody can send.
+
+(b) THE SPEC ID IS WHITELISTED AGAINST CANVAS_SURFACES, never passed through. That
+map is already a closed pairing of spec id to the mapper that knows which Cypher
+pattern the spec walked, so an id outside it renders a named &quot;not a canvas surface&quot;
+state. Without the check the URL quietly becomes a place to name arbitrary spec ids:
+drydocs-api would refuse anything unregistered, so this is not a data-exposure fix,
+it is a refusal to invite the attempt - and it keeps the ADR 0005 rule that the
+console never chooses a query the registry did not review.
+
+(c) THE ROUTE GATES LIKE ITS SIBLINGS. Whatever role rule the hosting module&#x27;s tabs
+apply, the full-page route applies too. A deep link is reachable by anyone holding
+it, and the server re-resolves the real role from the token on every call, so the
+data is safe either way; the point is that this must not become the one page that
+does not check.
+
+(d) THE WAY IN IS AN ANCHOR, not window.open - middle-click and ctrl-click keep
+working and no popup blocker is involved. Opened from the canvas header of each
+surface that has a route.
+
+(e) THE SESSION IS NOT PASSED IN THE URL and does not need to be. The token lives
+in localStorage under drydocs.session.v2, so a same-origin tab boots the app and
+finds it. A token in a query string would land in history, logs and any shared link.
+
+(f) O81&#x27;S LIMITATION IS CLOSED OR RESTATED. That item shipped the canvas in the
+data-frame strip - about 215px at the default split, where the whole graph fits but
+its captions render small - and named the resizable divider as the answer for now.
+Either this route makes that acceptable, or the item says plainly what still is not.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 from O81&#x27;s close, at the user&#x27;s request, after O81 reported the
+legibility limitation rather than deferring it silently.
+
+WHY A ROUTE RATHER THAN THE TWO CHEAPER OPTIONS, decided at the mint so the build
+does not re-litigate it: a maximize toggle (CSS only, ~20 lines) and the Fullscreen
+API (~10 lines) both solve the height and neither produces a shareable link or a
+back-button-safe view, which is exactly what site-plan §1 locked the console into
+real routes to get. The route is also the only one of the three that survives being
+sent to somebody.
+
+WHAT IS ALREADY TRUE AND NEEDS NO WORK: the session is in localStorage, so a new
+tab is signed in with no second login and no token in the URL. That fact is what
+makes the route cheap, and it was verified while answering the question rather
+than assumed.
+
+NOT IN SCOPE: hosting the canvas in the module GRAPH PANE instead of the data-frame
+strip. O81 deliberately left that alone because it would displace each route&#x27;s
+existing reviewed pane, and that is a call about what a module leads with - a
+different decision from giving a surface its own page.
+
+DONE 2026-08-31 (desktop). `/graph/:specId` renders one canvas surface full page.
+
+(a) A REAL ROUTE, as the mint decided and the build did not re-litigate. Same shape as
+`lineage/asset/:assetId` and `explorer/tower/:towerKey`; deep-linkable, back-button safe,
+and sendable — which neither a maximize toggle nor the Fullscreen API produces.
+
+(b) THE WHITELIST STOPS THE REQUEST BEFORE THE NETWORK, which is stronger than the clause
+asked for and is the evidence worth keeping: visiting /graph/runbooks.series.v2 rendered
+the named &quot;not a canvas surface&quot; state and issued ZERO calls to drydocs-api (measured with
+performance.getEntriesByType(&#x27;resource&#x27;)). CANVAS_ROUTES is the whitelist and is typed
+`satisfies Record&lt;CanvasSpecId, CanvasRoute&gt;`, so adding a surface without a route entry
+is a COMPILE error — a new canvas cannot ship with no page and no gate. isCanvasSpecId
+uses Object.hasOwn, so &#x27;toString&#x27; and &#x27;__proto__&#x27; are refused; pinned in tests.
+
+(c) THE ROUTE GATES ON ITS HOST MODULE and carries no designation of its own, so there is
+no second place to edit and nothing to disagree with. It fails CLOSED if the host cannot
+be found. AND IT CLOSED A GAP I OPENED AT O59: that item set /remediation&#x27;s registry
+access to &#x27;sme&#x27;, which hid the nav entry but left the ROUTE reachable by typing the URL.
+Now gated like /software and /gates. Both hosts (runbooks, explorer) admit every role
+today, so neither full-page canvas is restricted — stated in a test so a reader learns it
+there rather than assuming.
+
+(d) AN ANCHOR, NOT window.open — verified as a real &lt;a href=&quot;/graph/runbooks.series.v1&quot;&gt;,
+so middle-click and ctrl-click work and no popup blocker is involved. It renders in the
+canvas header of each surface that has a route, and the full page does NOT link to itself.
+
+(e) NO SESSION IN THE URL: a fresh full-page load stayed signed in, reading the token from
+localStorage. Nothing was added to make that true; it already was.
+
+(f) O81&#x27;S LIMITATION IS CLOSED. The strip gave the canvas ~215px; the route gives it the
+page. Measured 1108px of canvas height against 0 in the strip&#x27;s collapsed case below.
+
+THE BUG THE LIVE CHECK CAUGHT, and it is the reason clause (d)-style verification is not
+ceremony: the first build rendered a canvas of height ZERO while its header truthfully
+reported &quot;8 nodes · 6 rels · 3 rows&quot;. The route returned a fragment instead of a
+`flex h-full min-h-0 flex-col` root, so the shell&#x27;s &lt;main&gt; grid area gave its flex
+children no height and NVL drew into nothing. Every unit test passed. This is O81&#x27;s
+header-says-nine-canvas-shows-one failure in a new costume, and no assertion about the
+GRAPH would ever have caught it — only looking.
+
+VERIFIED LIVE (J18): this desktop, Chrome vs Vite :5176 + drydocs-api :8003 (dedicated
+ports, dev server confirmed started rather than assumed). Both specs return zero rows on
+this machine, so the drawn graph used fixture rows injected at the API boundary — the
+O81 technique; the mapper, the canvas and the route are the real ones. Screenshot shows
+two process clusters with INVOKES / WRITES_TO edges at full page height. The role-refusal
+path is NOT re-verified live: the throwaway credential mints only the admin persona, and
+the gate is the same inline pattern /software and /gates already carry, covered by unit
+tests over canAccessModule.
+
+LEDGERS: GraphCanvasRoute registered UNBOUND (35/82) — it renders surfaces from DIFFERENT
+modules, so binding it to one would encode the first caller as owner, the same rule its
+own GraphCanvas and SpecGraphPane follow. TC-RUNBOOKS-02 seeded, automated (10/31).
 </p></div></div>
 <div class="card" id="card-P1" data-id="P1" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p1 run the cm_hosts + cm_avg_run profiling probes internally; record conclusions + the dc scope call" tabindex="0"><div class="card-head"><span class="card-id">P1</span><span class="card-title">Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user&#x27;s performance flag) in the two gate specs&#x27; provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
 </p><p class="notes"><strong>Notes:</strong> User-run on the internal network (no producer-side psgmgr access); agent transcribes.</p></div></div>

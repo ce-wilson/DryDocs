@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import type { GraphAccess, SpecResult } from '../lib/graph'
-import { CANVAS_SURFACES, type CanvasNode, type CanvasSpecId } from '../lib/nvl-mapping'
+import {
+  CANVAS_SURFACES,
+  canvasRoutePath,
+  type CanvasNode,
+  type CanvasSpecId,
+} from '../lib/nvl-mapping'
 import GraphCanvas from './GraphCanvas'
 import EmptyState from './ui/EmptyState'
 import { IdChip } from './ui/IdChip'
@@ -31,6 +36,9 @@ export interface SpecGraphPaneProps {
   /** Lifted so the canvas and the route's other frames share one selection. */
   selected: CanvasNode | null
   onSelect: (node: CanvasNode | null) => void
+  /** O86: set by /graph/:specId itself. The inline frame offers a link to the
+   *  full page; the full page does not offer a link to itself. */
+  fullPage?: boolean
 }
 
 export default function SpecGraphPane({
@@ -40,6 +48,7 @@ export default function SpecGraphPane({
   badge,
   selected,
   onSelect,
+  fullPage = false,
 }: SpecGraphPaneProps) {
   const [result, setResult] = useState<SpecResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -85,6 +94,7 @@ export default function SpecGraphPane({
           onSelect={onSelect}
           title={title}
           badge={badge ?? result?.classification?.toUpperCase()}
+          fullPageHref={fullPage ? undefined : canvasRoutePath(specId)}
         />
       </div>
       {selected && <SelectedNodeDetail node={selected} onClose={() => onSelect(null)} />}

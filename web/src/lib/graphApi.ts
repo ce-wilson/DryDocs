@@ -1,4 +1,5 @@
 import { sessionRejected, sessionToken } from './auth'
+import { diagnoseNetworkFailure } from './reachability'
 import type { GraphAccess, GraphResult, NamedResult, SpecExport, SpecResult } from './graph'
 
 // The deployment adapter (ADR 0005): HTTP to the drydocs-api thin API.
@@ -58,10 +59,10 @@ export function createApiClient(baseUrl: string, personaId: string): ApiClient {
         body: JSON.stringify(body),
       })
     } catch {
-      throw new Error(
-        `drydocs-api unreachable at ${baseUrl} — start it with: ` +
-          'poetry run uvicorn drydocs_api.app:create_app --factory --port 8001',
-      )
+      // O85: same probe as the sign-in path. A blocked origin and a dead
+      // server are indistinguishable to this catch, and asserting the second
+      // sends the reader to start a server that is already running.
+      throw new Error((await diagnoseNetworkFailure(baseUrl)).message)
     }
   }
 

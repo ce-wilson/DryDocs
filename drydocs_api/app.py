@@ -230,12 +230,28 @@ def create_app(
     # allowlist makes the console untestable on any other port, and the O80
     # end-to-end suite needs its own so it never adopts or collides with a dev
     # server somebody is already running.
+    #
+    # O85 — WHY 5199 IS IN THE BUILT-IN LIST, and why the ledger was not "fixed"
+    # instead. config/taxonomy/ui-tests.yaml cites `Vite :5199` in five `source`
+    # fields (O64, O65, O66), because five real verifications ran there: the
+    # standard port was taken by another dev server, so the fallback became the
+    # documented one and the allowlist never heard about it. Those source fields
+    # are a RECORD OF WHAT HAPPENED. Editing them to name a port the API already
+    # served would make a true record false to spare a config change, which is
+    # the wrong direction — so the config moved.
+    #
+    # AND NO `allow_origin_regex` FOR localhost, which is the tempting fix and is
+    # refused deliberately: "any port on this machine" is a materially wider trust
+    # boundary than "these named ports", it would be adopted here without a gate,
+    # and DRYDOCS_CORS_ORIGINS already covers the one-off case declaratively — the
+    # O80 suite and O59's live verification both used it rather than needing one.
     extra_origins, _ = resolve_optional("DRYDOCS_CORS_ORIGINS", where="create_app()")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            "http://localhost:5173",
-            "http://localhost:4173",
+            "http://localhost:5173",  # vite dev
+            "http://localhost:4173",  # vite preview
+            "http://localhost:5199",  # the ui-tests ledger's documented verification port
             *[o.strip() for o in (extra_origins or "").split(",") if o.strip()],
         ],
         allow_methods=["*"],

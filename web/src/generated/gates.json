@@ -1111,6 +1111,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "console-auth-boundary (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/console-auth-boundary.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "controlm-definition-precedence (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

@@ -27,6 +27,7 @@ import AdminConfigRoute from './routes/AdminConfigRoute'
 import LoadsRoute from './routes/LoadsRoute'
 import RunbooksRoute from './routes/RunbooksRoute'
 import RemediationRoute from './routes/RemediationRoute'
+import GraphCanvasRoute from './routes/GraphCanvasRoute'
 import DocsRoute from './routes/DocsRoute'
 import SoftwareRoute from './routes/SoftwareRoute'
 import GatesRoute from './routes/GatesRoute'
@@ -115,7 +116,23 @@ export default function App() {
         <Route path="ownership" element={<OwnershipRoute persona={persona} />} />
         <Route path="ownership/asset/:assetId" element={<AssetPathRoute />} />
         <Route path="runbooks" element={<RunbooksRoute persona={persona} />} />
-        <Route path="remediation" element={<RemediationRoute />} />
+        {/* O59 set this module's registry access to 'sme'. That hid the nav
+            entry but left the ROUTE open to anyone typing the URL — the gap
+            O86 clause (c) names. Gated here like /software and /gates. */}
+        <Route
+          path="remediation"
+          element={
+            persona.role === 'steward' || persona.role === 'admin' ? (
+              <RemediationRoute />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+        {/* O86: one canvas surface, full page. The spec id is whitelisted
+            against CANVAS_ROUTES inside the route, and the route gates on the
+            surface's HOST module. */}
+        <Route path="graph/:specId" element={<GraphCanvasRoute persona={persona} />} />
         <Route path="docs" element={<DocsRoute persona={persona} />} />
         <Route path="docs/document/:docId" element={<DocsRoute persona={persona} />} />
         {/* FB-03: SME designation (steward+admin) from the module registry */}

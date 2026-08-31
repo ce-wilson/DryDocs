@@ -307,6 +307,12 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     LocationMap. Their mapper, lib/nvl-mapping.ts, is NOT here for the same
     reason loadMapModel.ts is not: the scan boundary is .tsx only and widening
     it waits on O42.
+    81 -> 82 at O86 (2026-08-31): GraphCanvasRoute, deliberately UNBOUND. It is a
+    ROUTE whose whole job is to render whichever canvas surface the URL names,
+    and those surfaces belong to different modules (runbooks, explorer) — so
+    binding it to one would encode the first caller as its owner, the same
+    reason GraphCanvas and SpecGraphPane, which it composes, are unbound. Bound
+    therefore stays at 35 while the total moves one.
     78 -> 81 at O59 (2026-08-31): ProfileFrame, StandardsFindings and
     Substitutions, all three BOUND to `remediation` by directory evidence, so
     both counts move by three. Unlike the O81 pair above they have exactly one
@@ -319,5 +325,5 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         35,
-        81,
+        82,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

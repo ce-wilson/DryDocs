@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/app.py
@@ -35,3 +35,49 @@ notes: |
   2026-08-28 - the verification ran on a fallback port because the standard one was already taken
   by another dev server, which is how a documented verification port and the API's allowlist came
   to disagree unnoticed since O69.
+
+  DONE 2026-08-31 (desktop). Both halves landed together, as clause (a) required.
+
+  (b) THE ALLOWLIST MOVED, NOT THE LEDGER, and the reason is the whole point. The ledger
+  cites `Vite :5199` in five `source` fields (O64, O65, O66) because five real
+  verifications ran there — the standard port was taken, so the fallback became the
+  documented one. Those fields are a RECORD OF WHAT HAPPENED. Editing them to name a port
+  the API already served would make a true record false to spare a config change, so
+  `http://localhost:5199` joined the built-in list in create_app().
+  AND NO localhost REGEX, refused deliberately and recorded in the code: "any port on this
+  machine" is a materially wider trust boundary than "these named ports", it would be
+  adopted with no gate, and DRYDOCS_CORS_ORIGINS (O80) already covers the one-off case
+  declaratively — the e2e suite and O59's live verification both used it.
+
+  (c) THE MESSAGE STOPS ASSERTING A CAUSE IT CANNOT KNOW. A dead server and a blocked
+  origin are the same opaque TypeError to fetch, and BOTH call sites picked one and
+  asserted it. `web/src/lib/reachability.ts` probes once with `mode: 'no-cors'`, which is
+  not subject to the allowlist: a resolved opaque response means something answered, a
+  rejection means nothing did. Reachable-but-failed now reports what it OBSERVED and says
+  "almost always" about the inference, naming DRYDOCS_CORS_ORIGINS and the page's own
+  origin; unreachable names the start command. One helper, both call sites (auth.ts
+  sign-in and graphApi.ts), so they cannot drift apart again.
+
+  THE DRIFT ITSELF IS NOW GUARDED, which the item did not ask for and is the part worth
+  keeping. tests/unit/test_console_origins.py reads the allowlist from the BUILT APP
+  (J37 — create_app().user_middleware, never a regex over app.py, which would also match
+  the comment explaining the list) and every `Vite :<port>` the ledger documents, and
+  fails when a documented port is neither served nor declared in SUPPLIED_ELSEWHERE with
+  the mechanism that supplies it (5273 is there: playwright.config.ts passes it). PROVEN
+  TO CATCH IT: removing the 5199 line reds the guard with the port named, then restoring
+  greens it. It also refuses a `*` or an origin regex, so the boundary cannot be widened
+  by a later test update.
+
+  (d) VERIFIED LIVE (J18): this desktop, Chrome against the console on :5199 talking to
+  drydocs-api :8002, DRYDOCS_CORS_ORIGINS UNSET so only the built-in list was in play.
+  Sign-in driven through the real form: sign-in screen gone, nav rendered, session stored.
+  Both diagnosis branches driven against real servers rather than stubs — a live server
+  sending no CORS headers on :8099 returned `blocked-origin`, and a dead :8098 returned
+  `unreachable`. Seven vitest cases cover the branches with fetch injected.
+
+  A NOTE ON THE VERIFICATION ITSELF, because it nearly produced a false claim: my first
+  attempt to start a dev server on :5199 FAILED (port already in use by another session's
+  server) and curl still answered 200, so the page under test was not one I had started.
+  Caught by reading the vite log rather than trusting the curl. The re-run pointed my own
+  API at the port that server targets, which is why the venue above names :8002. The
+  concurrent-session hazard is real on this machine and a 200 is not proof you started it.

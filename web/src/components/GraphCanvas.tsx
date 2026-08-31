@@ -59,6 +59,11 @@ export interface GraphCanvasProps {
   title: string
   /** Provenance/trust line rendered beside the title, as the other panes do. */
   badge?: string
+  /** O86: where the full-page view of this canvas lives. An ANCHOR, never
+   *  window.open — middle-click and ctrl-click keep working and no popup
+   *  blocker is involved. Omitted when the canvas has no route (the header
+   *  then renders no affordance rather than a dead one). */
+  fullPageHref?: string
 }
 
 export default function GraphCanvas({
@@ -67,6 +72,7 @@ export default function GraphCanvas({
   onSelect,
   title,
   badge,
+  fullPageHref,
 }: GraphCanvasProps) {
   const epoch = useThemeEpoch()
   const byId = useRef(new Map<string, CanvasNode>())
@@ -117,7 +123,7 @@ export default function GraphCanvas({
   if (graph.nodes.length === 0) {
     return (
       <div className="flex h-full flex-col">
-        <CanvasHeader title={title} badge={badge} graph={graph} />
+        <CanvasHeader title={title} badge={badge} graph={graph} fullPageHref={fullPageHref} />
         <EmptyState
           title="No graph to draw"
           hint={
@@ -132,7 +138,7 @@ export default function GraphCanvas({
 
   return (
     <div className="flex h-full flex-col">
-      <CanvasHeader title={title} badge={badge} graph={graph} />
+      <CanvasHeader title={title} badge={badge} graph={graph} fullPageHref={fullPageHref} />
       {/* Fills the frame it is given rather than forcing a height: a fixed
           minimum overflowed the data-frame strip and pushed the graph below the
           fold. The strip is about 215px, which fits the graph but renders its
@@ -176,10 +182,12 @@ function CanvasHeader({
   title,
   badge,
   graph,
+  fullPageHref,
 }: {
   title: string
   badge?: string
   graph: CanvasGraph
+  fullPageHref?: string
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2 border-b border-edge px-3 py-2">
@@ -201,6 +209,19 @@ function CanvasHeader({
         >
           TRUNCATED {graph.nodes.length}/{graph.nodeCount}
         </span>
+      )}
+      {fullPageHref && (
+        // A plain anchor, for the reason O86 clause (d) gives: middle-click and
+        // ctrl-click open a tab the way the reader expects, and nothing has to
+        // survive a popup blocker. The session is already in localStorage, so a
+        // same-origin tab boots signed in with no token in the URL.
+        <a
+          href={fullPageHref}
+          className="rounded-xs border border-edge px-1.5 py-0.5 font-mono text-[10px] text-muted no-underline hover:border-[var(--blue-br)] hover:text-text"
+          title="Open this graph on its own page"
+        >
+          full page
+        </a>
       )}
     </div>
   )

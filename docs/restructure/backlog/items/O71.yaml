@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/gate-prompts/ui-write-surface.yaml
@@ -36,3 +36,45 @@ notes: |
   Model fable: the item frames a TRUST BOUNDARY question, which is the tier's stated trigger. It still decides nothing â€” per the HITL flow (`docs/restructure/03-hitl-sme-flow.md`), the adoption routes through the gate and stays unadopted until confirmed. Acceptance clause (a) is what holds that line.
 
   Concurrency note, and it is load-bearing rather than courtesy: `docs/decisions/0015-team-edition-template.md` was an uncommitted working file in the shared tree at groom time. Clause (d) is written so this item can be pulled and closed whether or not that draft has landed, and so that a session pulling it cannot resolve the ambiguity by writing the ADR itself.
+
+  DONE 2026-08-31 (desktop). Deliverable is a gate spec plus the register-row amendment.
+  Nothing was built, no dependency added, no auth code written — clause (f) held.
+
+  (a) THE SPEC PROPOSES AND DOES NOT ADOPT. `config/gate-prompts/console-auth-boundary.yaml`,
+  in the O20 `ui-write-surface.yaml` shape, passing test_gate_pages.py (Module / Source /
+  Registry ref / Classification, provenance with the source-vs-derived split). Until it signs
+  off the console's authentication is exactly what section B describes.
+
+  (b) THE REJECTION IS RESTATED FIRST, in the file header and again as section A confirmation
+  1, quoting the ADR's own grounds — clone-and-diverge with no update lifecycle, and a
+  "users-in-a-workspace rows behind JWT next to Stripe" tenancy on a different axis from a
+  generated instance with its own databases. A reader who skims cannot mistake this gate for
+  a reversal. Each of the five practices is separately tickable, so declining any subset is a
+  valid sign-off and declining all of them is the standing state.
+
+  (c) THE SEAM WAS MEASURED, AND THE MEASUREMENT CORRECTS THE ITEM. O71 describes `?as=` as
+  "a stub sitting exactly where real auth would land". IT IS NOT, and has not been since O69:
+  it is DEV-only (removed from production bundles by import.meta.env.DEV), it performs a REAL
+  sign-in through signIn() with VITE_DEV_CONSOLE_SECRET, and it has no default and no
+  fallback — unset, it does nothing and the sign-in screen renders. Reading the modules also
+  changed the SHAPE of the gate: three of the five practices are already answered. Secrets
+  are salted scrypt at OWASP parameters with the parameters stored per-credential; tokens are
+  OPAQUE with a TTL from a server-side store; the server re-resolves role per request. So
+  "hashed credentials" is a confirmation, not a proposal, and the honest JWT question is
+  whether to REPLACE a deliberately revocable token with a stateless one — which is a
+  property being kept, not a feature not wanted. P4, a real user model, is the one the
+  charter actually presses on, and it is a data model plus a lifecycle rather than a library.
+  This is exactly what clause (c) was for: the gate now rules against the actual seam.
+
+  (d) THE ADR HAD LANDED, so the row was amended IN PLACE rather than shipped as drafted text.
+  `docs/decisions/0015-team-edition-template.md` is on main (the clause anticipated it might
+  not be, as of 2026-08-28). The row records that the trigger FIRED, what fired it, and that
+  the disposition is this gate; "What TE takes" still reads *nothing adopted*, and the watch
+  stays open. THE RULING IS NOT WRITTEN INTO THE ROW — it lands in config/gate-log.md, and the
+  row points at the gate, so the two cannot drift. The ADR was not re-drafted or overwritten.
+
+  (e) The company side is one line in section E: their ui-workstream runs its own gate, and
+  producer sign-off is not company sign-off.
+
+  NOT DONE, BY DESIGN: the gate SESSION. This item drafts the question; running it is a
+  separate item to mint after this lands, per the item's own clause (f).

@@ -88,7 +88,7 @@ components:
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
 
-  # --- route (23) ---
+  # --- route (24) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
@@ -107,6 +107,11 @@ components:
   - { id: OverviewRoute,           area: route,        path: routes/OverviewRoute.tsx }
   - { id: OwnershipRoute,          area: route,        path: routes/OwnershipRoute.tsx,                   module: ownership,  module_evidence: route-name }
   - { id: RemediationRoute,        area: route,        path: routes/RemediationRoute.tsx,                 module: remediation, module_evidence: route-name }
+  # O86: the full-page canvas route. UNBOUND deliberately — it renders whichever
+  # canvas surface the URL names, and those surfaces belong to DIFFERENT modules
+  # (runbooks, explorer), so binding it to one would encode the first as owner.
+  # Same rule as GraphCanvas and SpecGraphPane, which it composes.
+  - { id: GraphCanvasRoute,        area: route,        path: routes/GraphCanvasRoute.tsx }
   - { id: RunbooksRoute,           area: route,        path: routes/RunbooksRoute.tsx,                    module: runbooks,   module_evidence: route-name }
   - { id: UnderTheHoodRoute,       area: route,        path: routes/UnderTheHoodRoute.tsx }
   - { id: ExplorerLiveRoute,       area: route,        path: routes/explorer/ExplorerLiveRoute.tsx,       module: explorer,   module_evidence: route-dir }

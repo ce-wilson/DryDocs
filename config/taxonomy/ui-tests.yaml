@@ -28,14 +28,16 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Eight cases are automated out of twenty-nine. The
+# WHAT THIS DOES NOT CLAIM. Ten cases are automated out of thirty-one. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
 # evidence); the fifth arrived with the surface it guards (O81); the next three
 # arrived with the O59 intake frames, whose load-bearing claims are about pure
 # functions and a generated artifact and so are exactly what a runner can hold.
-# The share moving up is not evidence that anything was backfilled.
+# The share moving up is not evidence that anything was backfilled; the ninth is
+# O85's and the tenth O86's, and each automates only the half a machine can
+# check — the half that needed eyes is recorded in the case's `source`.
 #
 # SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
 # backlog close note recording something that was actually observed working.
@@ -146,6 +148,25 @@ suites:
         source: "O80 build 2026-08-31 — desktop, Playwright/Chromium; API returned 401"
         automated_by: web/e2e/console.spec.ts
 
+      - id: TC-SHELL-07
+        description: The console signs in on the documented verification port, and a failed
+          request says WHICH failure it was
+        steps:
+          - Serve the console on the ledger's documented verification port (:5199) with
+            DRYDOCS_CORS_ORIGINS unset, so only the built-in allowlist is in play.
+          - Sign in through the form.
+          - Point the console at a port where a server IS listening but sends no CORS
+            headers, and at a port where nothing listens at all.
+        expect: >
+          The sign-in succeeds on :5199 from the built-in allowlist alone. The two failure
+          cases report DIFFERENT causes: a reachable server says the response was discarded
+          and names DRYDOCS_CORS_ORIGINS; a dead one says nothing answered and names the
+          start command. Before O85 both said "drydocs-api unreachable — start it with
+          ...", which sends the reader to start a server that is already running, and is
+          how the allowlist and the ledger's own documented port stayed out of step from
+          O69 with nobody noticing.
+        source: "O85 fix 2026-08-31 — desktop, Chrome vs the console on :5199 against drydocs-api :8002, DRYDOCS_CORS_ORIGINS unset; both diagnosis branches driven against real servers (a live no-CORS server on :8099 and a dead :8098)"
+        automated_by: tests/unit/test_console_origins.py
   # ---------------------------------------------------------------------------
   - id: TS-LOADS
     module: loads
@@ -410,6 +431,25 @@ suites:
           lineage load runs.
         source: "O81 build 2026-08-31 — desktop; mapper unit-tested, canvas rendered against the live API"
         automated_by: web/src/lib/nvl-mapping.test.ts
+
+      - id: TC-RUNBOOKS-02
+        description: A canvas surface opens full-page at its own URL, and an unlisted spec id
+          is refused before any request is made
+        steps:
+          - Open the Series graph tab and click "full page" in the canvas header.
+          - Check that it is an anchor (middle-click opens a tab) and that the URL is
+            /graph/runbooks.series.v1.
+          - Visit /graph/<something not in CANVAS_ROUTES> directly.
+        expect: >
+          The full page renders the SAME reviewed spec at full height, with a crumb back
+          to the host module and no "full page" link to itself. An unlisted id renders a
+          named "not a canvas surface" state and issues ZERO calls to drydocs-api — the
+          whitelist stops it before the network. The API would refuse an unregistered spec
+          anyway; the point is not to invite the attempt, and to keep ADR 0005's rule that
+          the console never chooses a query the registry did not review. The session is
+          NOT in the URL: a same-origin tab reads it from localStorage.
+        source: "O86 build 2026-08-31 — desktop, Chrome vs Vite :5176 (origin supplied with DRYDOCS_CORS_ORIGINS) + drydocs-api :8003; full page drew 8 nodes / 6 rels from fixture rows injected at the API boundary, and the refusal path recorded zero :8003 requests"
+        automated_by: web/src/lib/canvasRoutes.test.ts
   - id: TS-REMEDIATION
     module: remediation
     description: >

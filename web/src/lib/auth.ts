@@ -19,6 +19,8 @@
 // behind them are machine-local — see drydocs_api/credentials.py and
 // scripts/set_console_credential.py.
 
+import { diagnoseNetworkFailure } from './reachability'
+
 export type Role = 'user' | 'steward' | 'admin'
 
 export interface Persona {
@@ -124,10 +126,9 @@ export async function signIn(personaId: string, secret: string): Promise<Session
       body: JSON.stringify({ persona_id: personaId, secret }),
     })
   } catch {
-    throw new SignInError(
-      `drydocs-api unreachable at ${apiBaseUrl()} — start it with: ` +
-        'poetry run uvicorn drydocs_api.app:create_app --factory --port 8001',
-    )
+    // O85: a dead server and a blocked origin are the same TypeError here, and
+    // this line used to assert the first. One probe tells them apart.
+    throw new SignInError((await diagnoseNetworkFailure(apiBaseUrl())).message)
   }
   if (!res.ok) {
     let detail = 'invalid credentials'
