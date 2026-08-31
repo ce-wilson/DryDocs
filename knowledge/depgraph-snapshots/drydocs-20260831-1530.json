@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-31T15:20:50",
+    "captured_at": "2026-08-31T15:30:30",
     "date": "20260831",
-    "scan": "ui-workstream",
+    "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "fb5e9444",
-      "full": "fb5e9444b6fa68379d01162fab75393b2a0cd7ae",
-      "branch": "feat/ui-web",
-      "describe": "port-base-20260829-108-gfb5e9444",
-      "subject": "docs(Idea-232): the body - the ready list is blind to a hold that exists because the deps are done",
+      "commit": "02cadd7a",
+      "full": "02cadd7a2093980f5e08ac168144fd2faaf5f1cf",
+      "branch": "main",
+      "describe": "port-base-20260829-111-g02cadd7a",
+      "subject": "docs(Idea-233): the body - a capture rung says how the bytes were obtained, which the trust axis does not",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -5547,15 +5547,6 @@
       "name": ".env.example",
       "extension": ".example",
       "rel_path": ".env.example",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/.git",
-      "name": ".git",
-      "extension": "",
-      "rel_path": ".git",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16334,6 +16325,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/adapters",
+      "name": "adapters",
+      "extension": "",
+      "rel_path": "drydocs/adapters",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -16431,6 +16431,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/controlm",
+      "name": "controlm",
+      "extension": "",
+      "rel_path": "drydocs/controlm",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -17520,6 +17529,24 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/models",
+      "name": "models",
+      "extension": "",
+      "rel_path": "drydocs/models",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/ontology",
+      "name": "ontology",
+      "extension": "",
+      "rel_path": "drydocs/ontology",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/pat_projection.py",
@@ -20798,10 +20825,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1055.json",
-      "name": "drydocs-20260831-1055.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json",
+      "name": "drydocs-20260831.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831-1055.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31720,11 +31747,6 @@
     [
       "drydocs",
       "CONTAINS",
-      "drydocs/.git"
-    ],
-    [
-      "drydocs",
-      "CONTAINS",
       "drydocs/.git-blame-ignore-revs"
     ],
     [
@@ -40445,6 +40467,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/adapters"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -40500,6 +40527,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/controlm"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/data"
     ],
     [
@@ -40551,6 +40583,16 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/models"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -43310,7 +43352,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1055.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -46167,13 +46209,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2603,
+    "files": 2602,
     "edges": 1406,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2892,
-    "directories": 290
+    "rels": 2895,
+    "directories": 294
   }
 }
