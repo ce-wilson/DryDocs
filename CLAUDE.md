@@ -139,7 +139,7 @@ Index: [`reference/REGISTRY.yaml`](reference/REGISTRY.yaml)
 
 | Platform | What it is | How to call it |
 |----------|-----------|----------------|
-| **Neo4j** | the graph platform itself | `neo4j-skills` plugin — trimmed locally to 9 skills: cypher, modeling, import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
+| **Neo4j** | the graph platform itself | `neo4j-skills` plugin — trimmed locally to 10 skills: cypher, modeling, import, document-import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
 | **Ontology standards** | PROV-O, W3C ORG, DPROD/EKGF, **SOSA/SSN**, DCAT, SKOS | [`reference/standards/`](reference/standards/README.md) |
 | **Academic research** | papers backing modeling choices | [`reference/research/`](reference/research/README.md) |
 
@@ -176,8 +176,11 @@ Index: [`external/orchestration/README.md`](external/orchestration/README.md)
 | **AutoSys (CA/Broadcom)** | placeholder — map to baseline | [`external/orchestration/autosys/`](external/orchestration/autosys/README.md) |
 | **AWS Airflow / MWAA** | placeholder — map to baseline | [`external/orchestration/airflow/`](external/orchestration/airflow/README.md) |
 
-Oracle (source DB) and Snowflake (future) are **data platforms**, referenced via the Oracle
-`db` skill and [`reference/platforms/`](reference/platforms/README.md).
+Oracle (source DB) and Snowflake (future) are **data platforms**, referenced via the
+[`oracle-db` skill](.claude/skills/oracle-db/SKILL.md) and [`reference/platforms/`](reference/platforms/README.md).
+**Both Oracle skills are currently OFF** — `oracle-db` is `"off"` in `.claude/settings.local.json`
+`skillOverrides`, and the vendor plugin `db@oracle-skills` is `false` in `~/.claude/settings.json`
+`enabledPlugins`. Turn one on before routing Oracle work here, or use `reference/platforms/` alone.
 
 ---
 

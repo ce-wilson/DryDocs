@@ -2,7 +2,7 @@
 name: backlog-groomer
 description: >
   Execute a groom-backlog run: promote/inbox/merge raw notes into docs/restructure/backlog/ (one item per file, ADR 0013)
-  (schema drydocs.backlog.v2), update the IDEAS.md inbox/audit trail, recompute roll-ups,
+  (schema drydocs.backlog.v3), update the IDEAS.md inbox/audit trail, recompute roll-ups,
   validate, regenerate the board, and commit+push. Dispatched by the groom-backlog skill
   (context: fork) — the skill body is the work order; this definition pins the model and tools.
 tools: Read, Grep, Glob, Edit, Write, Bash
