@@ -1,0 +1,21 @@
+id: O90
+epic: web-console
+title: 'The console shows no wired-vs-planned key: render the cross of gate-confirmation
+  and loader presence, which is derivable today and mints no schema field'
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/generated/load-map.json
+- scripts/render_board.py
+- config/gate-prompts/registry-wiring-readiness.yaml
+- docs/restructure/backlog/items/N10.yaml
+acceptance: |
+  Stub minted per the I6 rule — the body lands in the next commit.
+notes: |
+  Minted 2026-08-31. Body to follow.
