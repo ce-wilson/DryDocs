@@ -93,12 +93,59 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 - **`Idea-231`** · 2026-08-31 · `[bug]` · **open** · prio? **Med** —
   **`canAccessModule` decides who sees which console module and has no test, and no guard
-  pins which modules are designated `sme`.** (Body to follow — id minted and pushed first,
-  per the I6 rule.)
+  pins which modules are designated `sme`.** Noticed at O59, which set `access: 'sme'` on
+  `/remediation` — a one-word edit that changed the module from visible-to-every-role to
+  steward+admin. The change was intended and the reason is recorded inline, but nothing
+  outside the diff would have caught it either way.
+  TWO SEPARATE HOLES, and the second is the larger one. (1) `canAccessModule` in
+  `web/src/modules/registry.ts` is a pure three-line function with three call sites
+  (`layout/Aside.tsx`, `lib/auth.ts`, `routes/OverviewRoute.tsx`) and no test — exactly the
+  shape the O80 vitest runner exists for, and cheaper to guard than to argue about. (2) No
+  guard pins the DESIGNATIONS. Which modules are `sme` is a visibility decision made
+  deliberately, module by module, with a reason written beside each (FB-03 for `/software`
+  and `/gates`, the delta argument for `/remediation`); a designation added or removed by
+  accident reads as an ordinary registry edit, and the failure is silent in BOTH directions —
+  a module wrongly opened shows an end user numbers they will misread, and a module wrongly
+  closed simply disappears for them with no error.
+  WHAT THIS IS NOT: not an authorization defect. The server re-resolves the real role from
+  the token on every call and the API is the enforcement point, so nothing here is a data
+  exposure — this is about the console's own audience decisions staying deliberate. Say that
+  in the item so nobody prices it as a security fix.
+  CHEAPEST HONEST SHAPE: a vitest file over `canAccessModule` (the three roles against the
+  three designations, including the `undefined`/`'all'` default), plus a pinned list of which
+  module ids carry a non-default `access` — the same "state the number so it cannot drift up
+  quietly" pattern `ui-tests.yaml`'s coverage pins already use. A pin is right here precisely
+  because the list SHOULD change rarely and always on purpose.
 
 - **`Idea-230`** · 2026-08-31 · `[chore]` · **open** · prio? **Med** —
   **An item's acceptance can be overtaken by its own dependency's growth, and nothing
-  notices.** (Body to follow — id minted and pushed first, per the I6 rule.)
+  notices.** Found while building O59, whose acceptance says "PROFILE frames render G68's
+  four censuses". G68 has five: census (e) INVOCATIONS was merged into it from `Idea-140` on
+  2026-08-19, eight days after O59 was raised on 2026-08-11. Nothing connected the two.
+  WHY IT IS WORTH A MECHANISM RATHER THAN CARE. The builder is left with two bad options and
+  no third: follow the LETTER and ship four censuses when five exist, or follow the PURPOSE
+  and silently deviate from a written acceptance. O59 took the second and recorded the
+  deviation in the code and the close note, which is the best available answer and still
+  relies on somebody happening to read the dependency's notes closely enough to spot it. The
+  information was not missing — G68's own notes say "MERGED 2026-08-19 (groom)" in plain
+  words — it just had no route to the item that depends on it.
+  WHERE THE HOLE IS, precisely. `depends_on` is a SCHEDULING edge: it decides what enters
+  `next_ready` and nothing else. It carries no currency claim, so an amended dependency and
+  an untouched dependent are indistinguishable from a dependency that never changed. The
+  groom amends items, but a groom is triggered by inbox entries, not by another item's
+  amendment. Y5 and the render guards catch STALE RENDERS; nothing catches stale cross-item
+  PROSE, and no validator ever could by diffing text.
+  CHEAPEST HONEST SHAPE: not a prose diff. For each item still `todo` or `in_progress`, ask
+  git whether any file in its `depends_on` set was modified more recently than the item's own
+  file, and report that as a currency WARNING in `validate.py` — mechanical, one `git log -1`
+  per file, no judgement. It must be WARN-ONLY and it must be said out loud why: most
+  dependency edits are irrelevant to the dependent, so a failing check would be noise inside
+  a week and would train people to ignore it. The value is a list somebody scans at groom
+  time, not a gate.
+  SCOPE CAUTION for whoever picks this up: `done` items are deliberately excluded. A closed
+  item's acceptance describing an older dependency is a HISTORICAL RECORD and correct as
+  written — re-opening those would make verified records retrospectively false, which is the
+  same argument the 2026-08-28 groom used when it filed O77 fresh rather than reopening O66.
 
 - **`Idea-229`** · 2026-08-31 · `[chore]` · **open** · prio? **High** —
   **A cancelled CI run is neither green nor red, and nothing reads it as unverified — so a
