@@ -360,6 +360,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-228`** · 2026-08-31 · `[bug]` · **open — found while verifying O78, desktop** · prio? **Low** —
+  **Relationship chips dodge NODES but not each other, so two names whose edges pass near the same
+  point still overlap — now visible on /docs, where DESCRIBES lands on top of NEXT_CHUNK.** O66
+  moved the label out of the SVG edge layer into an HTML chip; O77 taught the chip to walk along
+  the edge's perpendicular until it clears every NODE rect; O78 brought MiniDag onto that same
+  component, which is what made this visible — before it, DESCRIBES rendered as the two letters
+  "ES" behind a node, so there was nothing to collide WITH. The obstacle set in
+  `placeClearOfNodes` is `nodeRects` from the store and nothing else. NOT FIXED AT O78 by a
+  deliberate call: chip-vs-chip placement is order-dependent in a way node-dodging is not — each
+  chip's final position depends on the others', so a naive registry of placed rects invites a
+  render loop or an order-dependent layout, and the three canvases O77 tuned are currently
+  correct. A safe approximation exists if this is ever worth doing: treat other edges'
+  MIDPOINTS (computable from endpoint node centres, so no feedback) as small obstacles. Cheap
+  mitigations that do NOT work: raising z-index only chooses which of the two names is destroyed,
+  which is the trade O77 already rejected once.
+
 - **`Idea-227`** · 2026-08-31 · `[bug]` · **open — found by O80's new unit runner, desktop** · prio? **Med** —
   **A synthetic city's country reports that it HAS a drawable outline when it does not, because
   `resolve.ts` reads `country_id` and ignores `country_alias` — the same family as the Z5 index bug

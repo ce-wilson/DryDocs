@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - O77
 inputs:
@@ -30,4 +30,42 @@ acceptance: |
 
   Evidence: screenshots of all five routes in both themes with every relationship name legible and every node name still legible; npm run build and oxlint clean.
 notes: |
-  Groomed 2026-08-28 (ui-workstream worktree) from Idea-189 (2026-08-26, prio proposed Med). p2 rather than p1 because each MiniDag map loses SOME names rather than all of them, unlike O77 — raise it if the console is about to be demonstrated.
+  BUILT 2026-08-31 (desktop, MSI). MiniDag adopts components/RelEdge.tsx.
+
+  (a) THE DEFECT IS GONE. The built-in `label` / `labelStyle` / `labelBgStyle` props are
+  removed; names now render as HTML chips in the EdgeLabelRenderer portal, which is what
+  takes them out of the edge layer that stacks below nodes. The cited case is fixed: the
+  DESCRIBES edge into BMC Control-M on /docs rendered as the two letters "ES" and now
+  renders whole. The local `style` went with the label props because RelEdge owns the
+  stroke and the arrowhead itself.
+
+  (b) ALL FIVE ROUTES CHECKED, both themes, signed in against the real API. Chips read:
+  /docs FIRST_CHUNK, NEXT_CHUNK x2, DESCRIBES; /remediation batched x2, transforms,
+  handoff; /runbooks condition x3, WRITES_TO x2; /software MADE_BY. /gates draws no chips
+  and that is DATA, not a regression -- its dag renders only once a gate row is selected,
+  and the first row's gate references nothing, so the map is a single node with no edges.
+
+  (c) ONE COMPONENT, TRUE FOR THE FIRST TIME. MiniDag was the fourth canvas and the only
+  holdout; ownership, explorer and lineage already routed through RelEdge. No page-local
+  label treatment survives.
+
+  ONE CHANGE TO THE SHARED COMPONENT, small and inert for the other three: an edge with no
+  name now draws NO chip. The canvases that adopted RelEdge first always carry a name, so
+  the case never arose for them; MiniDag's edge label is optional, and rendering
+  unconditionally would have put an empty bordered box on every unlabelled edge across
+  five routes.
+
+  RESIDUE, NAMED RATHER THAN CLAIMED FIXED -- clause (a) says every name is readable, and
+  on /docs one pair is not: DESCRIBES now lands on top of the NEXT_CHUNK chip. The chips
+  dodge NODE rects (O77) and not each other, and this only became visible BECAUSE this item
+  landed -- before it, DESCRIBES was two letters behind a node and had nothing to collide
+  with. Not fixed here by a deliberate call: chip-vs-chip placement is order-dependent in a
+  way node-dodging is not, so a registry of placed rects risks a render loop or an
+  order-dependent layout in three canvases that are currently correct and were tuned at
+  O77. Inboxed as Idea-228 with a safe approximation recorded (other edges' MIDPOINTS as
+  obstacles, computable without feedback). Net position: every name that was unreadable
+  because it painted behind a node is now readable; one pair is mutually obscured.
+
+  VERIFIED: tsc build clean, oxlint unchanged (4 pre-existing warnings, none in these
+  files), vitest 32 passed, playwright 2 passed, Python suite green. Screenshots of all
+  five routes in both themes captured at the build.

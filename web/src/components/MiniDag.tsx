@@ -5,13 +5,13 @@ import {
   Handle,
   Position,
   ReactFlow,
-  type Edge,
   type Node,
   type NodeProps,
   MarkerType,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import TrustLegend from './TrustLegend'
+import { relEdgeTypes, type RelFlowEdge } from './RelEdge'
 
 // The shared mini-DAG graph pane (extracted at O17 — the 4th copy of this
 // React Flow boilerplate was the signal): theme-token node colors, labeled
@@ -99,16 +99,23 @@ export default function MiniDag({
       })),
     [nodes, selectedId],
   )
-  const rfEdges: Edge[] = useMemo(
+  // O78: names render through the SHARED RelEdge overlay, not React Flow's
+  // built-in `label`/`labelStyle`/`labelBgStyle`. Those paint in the EDGE layer,
+  // which stacks BELOW nodes — the exact defect RelEdge's header names — so on
+  // these maps a name longer than its edge clipped behind the node boxes
+  // (observed on /docs 2026-08-26: DESCRIBES into BMC Control-M rendered as the
+  // two letters "ES"). Adopting the component rather than growing a local
+  // overlay is what finally makes O66's one-change-fixes-all-canvases true: this
+  // was the fourth canvas and the only holdout. Stroke and arrowhead come from
+  // RelEdge itself, which is why the local `style` went with the label props.
+  const rfEdges: RelFlowEdge[] = useMemo(
     () =>
       edges.map((e) => ({
         id: e.id,
+        type: 'rel' as const,
         source: e.source,
         target: e.target,
-        label: e.label,
-        style: { stroke: 'var(--faint)', strokeWidth: 1.4 },
-        labelStyle: { fill: 'var(--muted)', fontSize: 10, fontFamily: 'var(--mono)' },
-        labelBgStyle: { fill: 'var(--panel)', fillOpacity: 0.85 },
+        data: { rel: e.label ?? '' },
         markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--faint)', width: 16, height: 16 },
       })),
     [edges],
@@ -127,6 +134,7 @@ export default function MiniDag({
           nodes={rfNodes}
           edges={rfEdges}
           nodeTypes={nodeTypes}
+          edgeTypes={relEdgeTypes}
           onNodeClick={(_, node) => onSelect(selectedId === node.id ? null : node.id)}
           onPaneClick={() => onSelect(null)}
           fitView

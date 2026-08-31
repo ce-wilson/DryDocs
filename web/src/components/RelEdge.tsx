@@ -141,15 +141,22 @@ export default function RelEdge({
   return (
     <>
       <BaseEdge path={path} markerEnd={markerEnd} style={{ stroke: 'var(--faint)', strokeWidth: 1.4 }} />
-      <EdgeLabelRenderer>
-        <div
-          ref={chipRef}
-          className="pointer-events-none absolute whitespace-nowrap rounded border border-edge bg-panel px-1.5 py-0.5 font-mono text-[10px] text-muted shadow-sm"
-          style={{ transform: `translate(-50%, -50%) translate(${at.x}px,${at.y}px)`, zIndex: 10 }}
-        >
-          {data?.rel}
-        </div>
-      </EdgeLabelRenderer>
+      {/* O78: an UNNAMED edge draws no chip. The three canvases that adopted
+          this component first always carry a name, so this never fired for
+          them; MiniDag's edge label is optional, and rendering the chip
+          unconditionally would have put an empty bordered box on every
+          unlabelled edge across five routes. */}
+      {data?.rel ? (
+        <EdgeLabelRenderer>
+          <div
+            ref={chipRef}
+            className="pointer-events-none absolute whitespace-nowrap rounded border border-edge bg-panel px-1.5 py-0.5 font-mono text-[10px] text-muted shadow-sm"
+            style={{ transform: `translate(-50%, -50%) translate(${at.x}px,${at.y}px)`, zIndex: 10 }}
+          >
+            {data.rel}
+          </div>
+        </EdgeLabelRenderer>
+      ) : null}
     </>
   )
 }
