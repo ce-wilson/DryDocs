@@ -1167,6 +1167,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "dpl-dataset-identity-zone (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/dpl-dataset-identity-zone.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "G136"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "dpl-dataset-registry-contract (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

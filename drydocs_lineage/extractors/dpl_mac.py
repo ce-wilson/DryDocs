@@ -128,8 +128,23 @@ def parse_clone_folder(dirname: str) -> CloneFolder | None:
 _DPL_KIND = "dpl"
 #: DataAsset kind for MAC dataset endpoints. Candidate-side shape for the
 #: "DataAsset zone/glue-table" open item riding G17: identity = dataset GUID
-#: alone (version/zone are properties), pending the G22 clause-f GUID-vs-URN
-#: ruling.
+#: alone (version/zone are properties). That clause SIGNED — rua-load-shapes
+#: §G1, 2026-08-07: managed assets key on the GUID alone and the URN is a
+#: render of it — so this is a ruling now, not a pending question.
+#:
+#: IT IS ALSO UNDER A RIDER (G136, config/gate-prompts/dpl-dataset-identity-zone.yaml,
+#: DRAFTED and UNSIGNED). §G1 was reached from the premise that `zone`
+#: discriminates the medallion layer, and the sign-off quotes THIS COMMENT back
+#: as corroboration — so the clause and the code are one source of belief, not
+#: two agreeing ones. Company-side evidence (the G64 session) reports `zone` as
+#: a storage technology carried identically on raw, trusted and refined. If that
+#: holds, one GUID at one version is both the input and the output of a
+#: raw-to-trusted hop, _stage_dataset() merges them onto ONE node, and a chain
+#: derived as "A's output GUID is B's input GUID" matches A to itself.
+#:
+#: NOTHING IS CHANGED HERE ON THAT BASIS. The key stands as ruled and the
+#: candidates stage as before; this note exists so a reader consuming them knows
+#: what is contested and where it is being decided (G136 clauses B1 and C1).
 MAC_DATASET_KIND = "dpl_dataset"
 
 #: pipeline.json subType → the gate-log 2026-07-16 §a kind enum

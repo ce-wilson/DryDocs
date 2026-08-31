@@ -10,7 +10,9 @@ model: fable
 priority: p2
 status: todo
 depends_on: []
+gates: [dpl-dataset-identity-zone]
 inputs:
+- config/gate-prompts/dpl-dataset-identity-zone.yaml
 - drydocs_lineage/extractors/dpl_mac.py
 - config/taxonomy/medallion-stages.yaml
 - config/gate-prompts/rua-load-shapes.yaml
@@ -75,3 +77,28 @@ notes: |
 
   DELIBERATELY NOT HERE: the field contract (G64/G65 clause C1), the extractor's own
   never-silent accounting (G135), and any change to config/taxonomy/medallion-stages.yaml.
+
+  PROGRESS 2026-08-31 (desktop, main) - the DRAFTING half is done, the gate is not run.
+  The rider is config/gate-prompts/dpl-dataset-identity-zone.yaml: three sections, nine
+  confirmations. A confirms the payload reading before anything touches the key (and states
+  in its own clause A3 that medallion-stage-vocabulary is not re-opened). B rules identity,
+  with the consequence written into the clause so the options get compared against it rather
+  than in the abstract, and with B2 forcing the amend-vs-carve-out choice on §G1 rather than
+  letting a general rule go quietly false on its largest population. C disposes of the
+  candidates already staged and asks for the collision to be REPORTED either way, which is
+  the clause worth having even if B1 changes nothing.
+
+  ACCEPTANCE CLAUSE (d) DONE IN THE SAME PASS: the MAC_DATASET_KIND comment in dpl_mac.py now
+  says what is contested and where it is being decided. It also stopped being wrong on its own
+  terms - it read "pending the G22 clause-f GUID-vs-URN ruling" three weeks after that clause
+  signed. Nothing about the key or the staged candidates changed.
+
+  THE ARGUMENT THE RIDER TURNS ON, recorded here because it is the part that is easy to lose:
+  §G1's sign-off text cites dpl_mac.py's own comment as evidence that GUID-only identity "was
+  already the code's own assumption". That reads as corroboration and is not - the comment is
+  where the assumption came from. One belief, quoted twice. That is not a criticism of the
+  ruling, which was reasonable on what was in hand; it is the reason a rider is the right
+  instrument rather than a build.
+
+  STILL OPEN: clauses A-C are unsigned, and clause (e) holds - the payload claim stays marked
+  company-reported until internal/research/G64-SME-MM-research.md arrives by back-flow.

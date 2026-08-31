@@ -1,0 +1,81 @@
+# SME gate-prompt spec — the DPL dataset identity / zone rider (backlog G136).
+# DRAFTED 2026-08-31, UNSIGNED. A decision RIDER on rua-load-shapes §G1
+# (SIGNED 2026-08-07), raised because that clause and the code it ruled on
+# share ONE unexamined premise about what the payload field `zone` carries.
+# The clause is not disputed on its merits and nothing here re-opens the
+# medallion stage vocabulary (SIGNED 6/6, 2026-08-19).
+# GATE-BOUND: this page PROPOSES; rendering it builds, flips and stamps
+# nothing. Mechanism-only: GUIDs, SEAL ids, bucket names, Glue database names
+# and connector names stay company-side (PUBLISH-BOUNDARY.md).
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: dpl-dataset-identity-zone
+title: "SME Gate — the DPL dataset identity rider: `zone` names a storage technology, not a medallion layer, so a GUID-only key makes one pipeline read and write the same DataAsset"
+step: "Decision rider from G136 on rua-load-shapes §G1 (SIGNED 2026-08-07), which ruled managed assets key on the GUID alone with `version` and `zone` as properties. It decides what identifies a MAC dataset endpoint, and therefore whether the G17 READS_FROM / WRITES_TO candidates can carry a raw-to-trusted-to-refined chain at all."
+summary: >
+  §G1 is a good ruling reached from a premise nobody had checked. It says
+  managed assets key on the GUID alone "with version and zone as properties",
+  and it says so because the code already assumed it — the sign-off quotes
+  dpl_mac.py's own comment back as corroboration. Neither the clause nor the
+  comment had seen a real flow payload. The company-side G64 session reports
+  that in the payload `zone` is a STORAGE TECHNOLOGY carried identically on
+  raw, trusted and refined endpoints, and that the layer lives in
+  `connectorName` / `glueDatabaseName` instead. If that holds, the same dataset
+  GUID at the same version appears as BOTH the input and the output of a
+  raw-to-trusted pipeline, the two collapse onto one node, and chaining
+  pipelines by "A's output GUID is B's input GUID" matches A to itself.
+  Section A confirms the payload reading. Section B rules identity. Section C
+  rules what happens to the candidates already staged under the old key.
+  Zero graph writes.
+meta:
+  Module: "drydocs_lineage (G17 seam: dpl_mac.py — MAC_DATASET_KIND / _stage_dataset); taxonomy-first candidates, no loader is built here"
+  Source: "dpl:pipeline-registry and dpl:dataset-registry (source-registry, confirmed: true at G22) — the per-pipeline MAC set's dataset_flow payload; company-side evidence, see Precedent"
+  Precedent: "rua-load-shapes §G1 (SIGNED 2026-08-07): identity is a business key, the URN is a render, managed assets key on the GUID alone. ADR 0001: node identity is always a business key, never a URL. medallion-stage-vocabulary (SIGNED 6/6, 2026-08-19) §B1: zones are physical residency, stages are logical; §C1: no stage-attribution edge exists, not even planned. J32: two things, one spelling"
+  Registry ref: "no registry flag moves. Both dpl rows stay confirmed: true and adapter: ~; this rider decides a KEY, and its only writes are to dpl_mac.py and, if §C rules so, the staged candidates"
+  Classification: "Internal-Public page. The payload field NAMES are mechanism and appear here; their VALUES (bucket names, Glue database names, connector names, GUIDs, SEAL ids) are Internal and stay company-side"
+  Source of record: "config/gate-log.md (transcription target) · docs/restructure/03-hitl-sme-flow.md · backlog G136"
+
+mapping:
+  - n: 1
+    element: "dataset_flow.json `zone` (payload field)"
+    target: "a storage-technology property — NOT the medallion layer, and not the `zone_prefix` of the signed stage capture"
+    edge: "field binding corrected  [clause A1]"
+  - n: 2
+    element: "`connectorName` / `glueDatabaseName` (payload fields)"
+    target: "where the layer actually lives, if anywhere"
+    edge: "layer binding named  [clause A2]"
+  - n: 3
+    element: "The MAC dataset endpoint (:DataAsset, kind dpl_dataset)"
+    target: "its business key — GUID alone, or GUID plus a residency component"
+    edge: "identity ruled  [clause B1 — THE CENTER OF THE RIDER]"
+  - n: 4
+    element: "Candidates already staged as READS_FROM / WRITES_TO under the GUID-only key"
+    target: "re-staged, annotated, or left standing with the limit recorded"
+    edge: "disposition of existing candidates  [clause C1]"
+
+provenance:
+  - label: "What the code stages today, and under which ruling"
+    source_object: "drydocs_lineage/extractors/dpl_mac.py (G17) + synthetic fixtures"
+    key: "asset_id(MAC_DATASET_KIND, ds_guid) — the GUID alone; version, zone and dataset_name are properties merged onto that node by _stage_dataset()"
+    loader: "~ (deliberately none — candidates only; the curated-load gate still refuses a live write)"
+    properties:
+      - {name: dataset_key, origin: derived, from: "rua-load-shapes §G1", note: "GUID-only, ruled 2026-08-07. The clause's own text cites dpl_mac.py's comment as evidence that this was already the code's assumption — so the ruling and the code are ONE source of belief, not two agreeing ones"}
+      - {name: zone, origin: source, from: "dataset_flow.json inputDatasets/outputDatasets entries", note: "staged verbatim as a property named `zone`. The ASSUMED FIELD CONTRACT in dpl_mac.py's header defines the field; no real payload has validated it (tracker T10, pending)"}
+      - {name: stale_pointer, origin: derived, from: "dpl_mac.py MAC_DATASET_KIND comment", note: "reads 'pending the G22 clause-f GUID-vs-URN ruling' — that clause SIGNED on 2026-08-07, so the comment points at a decision already made. Correcting it is housekeeping and needs no gate; it is named here so the fix is not mistaken for this rider's outcome"}
+
+sections:
+  - title: "A. The payload reading — confirm the premise before touching the key"
+    confirmations:
+      - "A1 [confirm]: in the MAC flow payload, `zone` carries a STORAGE TECHNOLOGY and carries the same value on raw, trusted and refined endpoints alike — it is not the medallion layer and not the `zone_prefix` of the signed stage capture. Company-side evidence (the G64 session); this page carries the reading, never the values. [confirmed / corrected / not yet evidenced]"
+      - "A2 [confirm]: the layer, where it is recoverable at all, lives in `connectorName` / `glueDatabaseName` rather than in `zone`. If it is recoverable in neither, say so — an unrecoverable layer is a finding, and it changes B1's options rather than blocking them. [named / unrecoverable]"
+      - "A3 [scope]: this rider re-opens NOTHING in medallion-stage-vocabulary. §B1 already ruled zones physical and stages logical, which a storage-technology field sits comfortably inside; §C1's no-stage-edge fence is untouched. Confirm that reading, so the sign-off cannot later be read as amending a signed vocabulary. [confirm]"
+  - title: "B. Identity — what keys a MAC dataset endpoint"
+    confirmations:
+      - "B1 [rule]: the business key for a managed DPL dataset endpoint. THE CONSEQUENCE, stated so the options are compared against it rather than in the abstract: under a GUID-only key the raw-to-trusted pipeline reads and writes ONE node, and pipeline-to-pipeline lineage derived as 'A's output GUID is B's input GUID' matches A to itself. Options: (i) GUID ALONE STANDS and the hop is modelled some other way — the reading and the writing are distinguished on the EDGE, never on the node; (ii) THE KEY GAINS A RESIDENCY COMPONENT, (guid, connectorName) or whatever A2 named, so the same dataset at two layers is two nodes; (iii) THE KEY STANDS AND THE CHAIN IS NOT DERIVED HERE — the registry-derived lineage is declared out of scope until its own gate. Each option states what it costs the URN render that §G1 made derived-from-the-key. [ruled]"
+      - "B2 [rule]: whether B1 AMENDS §G1 or SCOPES it. §G1 ruled managed assets generally; if B1 takes option (ii) it can either amend that general clause or carve the DPL dataset endpoint out of it as a named exception. Amend-vs-carve is a real choice with a real cost either way — a general rule with one stated exception is honest; a general rule quietly false on its largest population is not. [amend / carve out]"
+      - "B3 [confirm]: whichever way B1 goes, `version` stays a property rather than a key component, unless the SME rules otherwise here. The G64 census reports the pipeline and dataset version fields under different names and different types (an integer on one half, a semantic-version string on the other), which is a CONTRACT question owned by G64 clause C1 — flagged so B1 is not decided on a version model that C1 may change. [confirm / defer to C1]"
+  - title: "C. What happens to what is already staged"
+    confirmations:
+      - "C1 [rule]: the disposition of READS_FROM / WRITES_TO candidates already staged under the GUID-only key. Nothing has loaded — the curated-load gate still refuses a live write — so this is about the staged working set and the tests pinning it, never about graph repair. Options: re-stage under the new key, annotate in place as pending, or leave standing with the limit recorded on the seam. Deleting is not offered: a candidate is evidence of what a feed said. [ruled]"
+      - "C2 [rule]: what the seam REPORTS when it stages one GUID as both an input and an output of the same pipeline. Today that is silent — the two merge onto one node and no counter fires. Whether or not B1 changes the key, the collision is a fact the run should state, in the never-silent house rule's terms. [ruled]"
+      - "C3 [record]: tracker T10 (MAC field contract validated vs a REAL DPL export) is where the rest of this payload's contract belongs. Record whether A1/A2 discharge any part of it or whether it stands whole — the same split G64 made between a profile and a ruling. [recorded]"

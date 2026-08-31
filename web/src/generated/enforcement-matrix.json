@@ -387,6 +387,7 @@
         "config/gate-prompts/doc-traceability-feedback.yaml",
         "config/gate-prompts/document-content-topology.yaml",
         "config/gate-prompts/document-supersession.yaml",
+        "config/gate-prompts/dpl-dataset-identity-zone.yaml",
         "config/gate-prompts/dpl-dataset-registry-contract.yaml",
         "config/gate-prompts/dpl-pipeline-registry-contract.yaml",
         "config/gate-prompts/email-dl-contact-point.yaml",
