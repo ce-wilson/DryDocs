@@ -14,7 +14,85 @@ inputs:
 - drydocs_core/adapters/controlm/api.py
 - drydocs_core/adapters/controlm/API-CALLS.md
 - drydocs_core/adapters/controlm/README.md
+- tests/unit/test_controlm_api.py
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) THE EXIT-CODE HOLE, FIXED AND GUARDED. In api.py the try at line 418 covers
+  load_config and plan, and its handler at 421 catches FileNotFoundError - but
+  that handler only ever fires for the missing-CONFIG raise at line 253.
+  `result = execute(planned)` sits at line 437, OUTSIDE the try, and execute
+  reaches subprocess.run through _default_runner (line 361), which raises
+  FileNotFoundError when the named binary is not on PATH. So a missing `ctm` or
+  `exportdeffolder` produces a traceback and NO JSON on stdout, breaking the
+  exit-code contract README.md documents. Fix: execution failure reports through
+  the same CallResult/JSON channel as every other outcome, with an exit code the
+  README table names. A test drives the CLI entry point with a runner or PATH
+  that raises FileNotFoundError and asserts BOTH halves - parseable JSON on
+  stdout AND the contracted exit code - because asserting only the exit code
+  passes on a traceback that happens to exit non-zero.
+
+  (b) WHICH CODE, DECIDED RATHER THAN DEFAULTED. README.md's contract already
+  spends 0-3, with 2 as "config/usage error (bad path, unknown operation,
+  missing template parameter)" and 3 as the reported capability gap. A missing
+  BINARY is neither a config error nor a capability gap - the operation is
+  supported and configured, the host just cannot run it. Say which code it takes
+  and record why in the README table in the same change; do not quietly widen
+  the meaning of 2.
+
+  (c) API-CALLS.md STOPS IMPLYING ONE FOLDER-EXPORT PATH. The folder_export row
+  maps to exportdeffolder (em-xml-utility) with status "Available - XML
+  supported-but-deprecated window. Syntax = corpus gap; config template
+  required." That is accurate and incomplete: a second transport is in working
+  use - the Automation API GET /deploy/jobs?ctm=&folder=&format=XML - and the two
+  return DIFFERENT SHAPES. Measured 2026-08-30 on one folder present in both
+  exports: the payloads are identical in content (30 JOB, 21 VARIABLE, 1 INCOND,
+  1 OUTCOND, 1 RULE_BASED_CALENDAR) and the API copy omits six EM-instance
+  attributes (IS_CURRENT_VERSION, VERSION_SERIAL, VERSION_HOST, VERSION_OPCODE,
+  MODIFIED, JOBS_IN_GROUP) while carrying REAL_FOLDER_ID=0. The row records that
+  both transports exist, which attributes each carries, and that the deploy path
+  is DEPLOYABLE-shaped - the zeroed id is correct for an artifact whose id is
+  assigned by Control-M on upload, not a defect in the pull.
+
+  (d) NAME WHAT THE SHAPE DIFFERENCE COSTS, IN THIS REPO'S TERMS, so the row is
+  useful to the next reader rather than a curiosity. The graph keys folders on
+  folder_id (drydocs/loaders/cypher/controlm_folders.cypher MERGE, sourced from
+  CM_DEF_VTAB.TABLE_ID), so an API-pulled folder cannot be reconciled to a loaded
+  folder by identity - only by name. IS_CURRENT_VERSION is a live filter across
+  the loader SQL, so without it "these are the current definitions" is an
+  assumption about API behaviour rather than a field that can be tested. What is
+  NOT lost: resolve-cmdline-staging joins on (data_center, folder_name, job_name)
+  - names, not ids - so the API export is usable for the lineage weld unchanged.
+
+  (e) EITHER A VERIFIED TEMPLATE OR A RECORDED ABSENCE. Deliver one of: a
+  verified call or utility invocation that returns the database-shaped export
+  (non-zero REAL_FOLDER_ID and IS_CURRENT_VERSION present), evidenced by a real
+  pull of the same folder; OR a recorded finding that no such Automation API call
+  exists at 9.0.21.300 and the EM XML utility is the only database-shaped path,
+  with the evidence that rules the API out. Silence is the one non-outcome - the
+  row is corrected either way.
 notes: |
-  Minted 2026-08-30.
+  Minted 2026-08-30. Both defects were found alongside a real folder pull, and
+  both are verified against this tree at cae680e7: the try/execute line numbers
+  are exact, and the API-CALLS.md folder_export row reads as quoted.
+
+  DO NOT TEMPLATE A CALL FROM MEMORY. README.md section 4 and the corpus headers
+  say why: every controlm-api-*.md page in external/orchestration/bmc-controlm/
+  is flagged SaaS-conceptual and, in two cases, confirmed structurally inaccurate
+  and partly SYNTHESIZED. They ground WHICH properties and behaviours exist, not
+  syntax. The one grounded default template that ships is api_probe
+  (`ctm config servers::get`); start from that probe against the live gateway and
+  enumerate the deploy/config services, rather than reconstructing an endpoint
+  from a doc page.
+
+  WHY THIS IS NOT G132. That item moves a collector into the repo and is a
+  drydocs-lineage change; this one is a drydocs-core adapter defect plus a
+  reference correction. They were drafted as one item and split because the api.py
+  fix is small, verified and independent of any gate, while the transport question
+  needs a live probe. Neither blocks the other.
+
+  WHAT THIS DOES TO THE D11 GATE. Clauses A1/A2 of controlm-definition-precedence
+  assume ONE XML feed against ONE replica. There are two XML export paths with
+  different attribute sets, and the scriptable one is the one that loses folder
+  identity and the version columns. The question stops being "does XML beat the
+  replica" and becomes "which XML, and can it still be joined" - which strengthens
+  the complementarity reading in that gate's OQ-9 rather than the winner/loser
+  framing. Recorded here so the gate session finds it; this item rules nothing.

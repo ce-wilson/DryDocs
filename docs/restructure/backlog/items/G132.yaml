@@ -17,6 +17,72 @@ inputs:
 - config/source-registry.yaml
 - .gitattributes
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) HOME IT WHERE THE PRECEDENT PUTS IT. The folder-pull collector and a conf
+  sibling land in drydocs_lineage/collect/, the directory rua_inventory.sh
+  already occupies. The mode bit ships executable - history carries a commit
+  whose entire subject is restoring +x on rua_inventory.sh, so this is a known
+  way to lose a day. LF is free: .gitattributes already pins *.sh text eol=lf
+  with the reason recorded, that a CRLF in the shebang breaks execution on the
+  Linux scheduler hosts these run on.
+
+  (b) THE COMMITTED CONF IS A TEMPLATE, NOT A CONFIGURED COPY. rua_inventory.conf
+  ships with its settings EMPTY and its examples in comments (SCAN_ROOTS= with
+  the example on the line above). The folder-pull conf does the same: endpoint,
+  Control-M server name, functional ID and any host are Internal per section 3
+  of CLAUDE.md, so the committed copy carries the KEYS and none of the VALUES.
+  A real configured copy stays on the server. Nothing in this item puts a real
+  endpoint, SID, server address or FID in a tracked file.
+
+  (c) VERSION-TAG THE OUTPUT. rua_inventory.sh carries COLLECTOR_VERSION
+  ("rua-inventory/v3") and stamps it into the bundle, which is what lets ADR
+  0002-C port the shell verbatim between repos and still promise that bundles
+  from either copy stay ingestible. The folder pull gets the equivalent stamp,
+  for the equivalent reason: two copies of this script will exist (server and
+  repo) before they converge, and the extractor needs to know which one wrote
+  the file it is reading.
+
+  (d) THE ACQUISITION BLOCK NAMES THE COLLECTOR AND DOES NOT CONVERT
+  `mode: manual`. This is the clause the item exists to protect. The
+  controlm:deftable-xml-export row carries `acquisition.mode: manual`, and that
+  field is the evidence behind the D11 gate's B3 rider - a definition source of
+  record arriving by manual drop needs a cadence, or the ruling inverts in
+  practice. Homing the script makes the pull REPEATABLE; it does not make it
+  SCHEDULED. It still runs in an interactive session on a Linux host under a
+  functional ID, so its refresh is bounded by a person's availability and that
+  FID's entitlement. Name the collector in the row's notes the way
+  exec-hosts:rua-bundle's notes name drydocs_lineage/collect/rua_inventory.sh,
+  keep `mode: manual`, and state the FID-session constraint in the block so a
+  later reader cannot mistake a committed collector for handled acquisition.
+
+  (e) THE DIRECTORY README STOPS BEING ABOUT ONE COLLECTOR. collect/README.md is
+  titled "Run-As-User inventory collector" and is rua-specific throughout. Either
+  the new collector gets its own README beside it, or that file becomes a
+  directory index that routes to both. Decide and do one; leaving a
+  rua-titled README over a two-collector directory is how the next reader
+  concludes the second script is undocumented.
+
+  (f) THE REGISTRY ROW STAYS `confirmed: false`. Homing a collector asserts
+  nothing about whether its feed is trusted - exec-hosts:rua-bundle sat
+  confirmed: false with rua_inventory.sh committed and no loader, from the G18/G20
+  work until gate rua-load-shapes signed 2026-08-07. controlm:deftable-xml-export
+  is confirmed: false for the same class of reason and stays that way; the flip is
+  a consequence of the D11 ruling, never of this item.
 notes: |
-  Minted 2026-08-30.
+  Minted 2026-08-30. The script was written in an agent session by converting an
+  existing job-rerun API call into a folder pull; it runs on a server and is still
+  under test, which is the same posture rua_inventory.sh was in when it was brought
+  in-repo. That is the whole precedent: under-test is not a reason to keep a
+  collector out of the tree, because trust rides on the registry's `confirmed`
+  flag and not on whether the file exists.
+
+  SIX OF EIGHT RUNGS ALREADY EXIST, which is why this is smaller than the rua
+  chain was. Present: the collect/ home, the LF pin, the registry dataset row
+  (controlm:deftable-xml-export), and the extractor that reads the output
+  (drydocs_lineage/extractors/controlm_xml.py, which rua needed G20 built for).
+  Missing: the script and its conf, and the acquisition-block update.
+
+  RELATED, DELIBERATELY NOT HERE: the transport question - the Automation API
+  deploy path returns a payload identical in content but with REAL_FOLDER_ID
+  zeroed and the six EM-instance attributes absent - is G133's half, because it
+  is a correction to API-CALLS.md rather than a collector move. Whichever
+  transport this collector ends up using, (d) is unchanged.
