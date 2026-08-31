@@ -93,7 +93,44 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 - **`Idea-233`** · 2026-08-31 · `[idea]` · **open** · prio? **Med** —
   **Record HOW a source was captured, not only how much its content is trusted: a capture-rung
-  alongside the VERBATIM/GROUNDED/SYNTHESIZED axis.** Body follows.
+  alongside the VERBATIM/GROUNDED/SYNTHESIZED axis.** Every `SOURCE-MANIFEST` today carries a
+  trust axis, which says how much interpretation sits between the source and the claim. It does
+  not say how the bytes were obtained, and those are different questions: a fact read out of a
+  served OpenAPI document and the same fact read off a printed rendering of that document can
+  both be labelled VERBATIM, while one is reproducible with a single request and the other is
+  a parsing project that silently drops whatever did not render.
+  THE LADDER, five rungs, worth capturing as a declared vocabulary rather than prose: (1) a
+  machine-readable spec or bulk export - the served document itself, byte-for-byte; (2) an
+  authenticated API call you make yourself - same data, one object at a time; (3) saved HTML or
+  a rendered DOM - structure survives as markup, often incomplete for a single-page app; (4)
+  print-to-PDF plus layout-mode text extraction - position survives, semantics do not, and it
+  is expensive and bug-prone; (5) copy/paste as text - loses indentation, required markers, and
+  anything held in glyph position. The operating rule is to work DOWN only until something
+  answers, and never to start below rung 3 without checking above it.
+  WHY IT PAYS FOR ITSELF: the failure it prevents is scraping a rendering when the source was
+  one request away, and that failure is invisible after the fact - the transcript of a rung-4
+  capture looks exactly as authoritative as a rung-1 one. Recording the rung per evidence slot
+  makes a finding's cost legible without re-deriving its provenance, and makes "nobody has
+  probed this source yet" a task rather than a silent gap.
+  THE COROLLARY THAT IS NOT OBVIOUS: the ladder is TYPICAL fidelity, not a guarantee - a lower
+  rung can beat a higher one. Observed case: a print-to-PDF came back text-bearing and looked
+  like the better capture, but the page's central table had rendered as an image, so its rows
+  were simply absent from the extracted text, while the copy/paste of the same page preserved
+  every row. So a rung is a prior, not a verdict: check what a capture actually CONTAINS before
+  ranking it, because the loss is silent when the rest of the page extracts cleanly.
+  RELATED, and the reason this is not just method prose: it generalises the rule this repo
+  already holds about images - a rendering may inform a reading, it may not be the citation. The
+  ladder says the same thing with a gradient instead of a boundary, and it adds the exception
+  that boundary lacks: a rendering is worth capturing when it shows RELATIONSHIPS a flat export
+  only shows as columns (which row is a definition and which an execution, which value is an
+  alias and which resolved from it). Capture it to understand the export; assert only from the
+  export.
+  SHAPE IF BUILT: a declared `capture_rung` on the source registry entry and on a research log's
+  evidence slots, with the same default-deny discipline the classification label has - no
+  unlabeled default. Cheapest first step is the vocabulary plus the manifest field; the probe
+  procedure can stay prose until something needs to enforce it.
+  PROVENANCE: surfaced 2026-08-31 from a company-side research-template review; the transcription
+  is machine-local and Internal. The ladder itself is mechanism and carries nothing company-specific.
 
 
 - **`Idea-232`** · 2026-08-31 · `[bug]` · **open** · prio? **High** —
