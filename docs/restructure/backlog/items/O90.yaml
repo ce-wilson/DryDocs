@@ -16,6 +16,59 @@ inputs:
 - config/gate-prompts/registry-wiring-readiness.yaml
 - docs/restructure/backlog/items/N10.yaml
 acceptance: |
-  Stub minted per the I6 rule — the body lands in the next commit.
+  (a) TWO AXES THAT ALREADY EXIST, CROSSED — NO NEW FIELD. Every source row in
+  `load-map.json` carries `confirmed` (a boolean: has a gate ruled its meaning) and
+  `loaders` (a list: is anything built that writes it). The key renders the cross of those
+  two facts. It MUST NOT add a `wired:` field to the registry, derive one, or write one
+  anywhere — see (c).
+
+  (b) FOUR CELLS, AND ALL FOUR ARE OCCUPIED. Census of the 40 source rows, 2026-08-31
+  (desktop, this worktree):
+
+      confirmed + loader      16   ruled and built          — wired
+      confirmed, no loader     9   ruled, nothing built     — planned
+      loader, not confirmed    1   built, awaiting its gate
+      neither                 14   registered only
+
+  The lone third-cell row is `bmc-docs-controlm-utilities`, which is exactly Q24's subject
+  (flip `confirmed` and run the first live layer-1 load). That the cross puts a real,
+  independently-tracked item in its own cell is the evidence the two axes are genuinely
+  independent and the key is reporting something true rather than decorating a boolean.
+  Re-run the census at build time and quote it in the close note; do not trust these
+  numbers, which will move.
+
+  (c) THE KEY REPORTS; IT DOES NOT RULE. A registry field that separates pipeline-wiring
+  readiness from semantic confirmation is GATE TERRITORY and the gate is drafted and
+  unsigned: `config/gate-prompts/registry-wiring-readiness.yaml` (N10, done 2026-08-19 —
+  drafting decides nothing). N10's own census found the `confirmed: false` rows split
+  three ways (5 semantic, 3 wiring, 1 neither) with the distinction living only in YAML
+  comments, "nowhere a test, a query or a port can reach it". This item does not fix that
+  and must not appear to: it crosses two fields that already exist. If the gate later signs
+  a real wiring field, the key reads it instead — a strictly better input, not a rewrite.
+
+  (d) NAME THE CELLS HONESTLY. "Wired" and "planned" are the user-facing words, but the
+  two middle cells are neither, and flattening four states into two is the exact conflation
+  N10 exists to end. Each cell gets a label that says what is true of it, and the legend
+  states the two questions being crossed rather than leaving the reader to infer them.
+
+  (e) TOKENS, NOT HEX; A LEGEND, NOT COLOUR ALONE. Use the console's theme tokens
+  (`--green` / `--yellow` / `--muted` / `--status-fail-soft`, DL-3/DL-5) and give every
+  cell a text label, so the key survives a monochrome print — which matters because O88
+  puts these pages on paper.
+
+  (f) GENERATED, NOT HAND-KEPT. The counts come from `load-map.json` at render time, never
+  from a number typed into a component. `render_board.py` already owns that artifact and
+  the drift guard already catches a stale copy.
 notes: |
-  Minted 2026-08-31. Body to follow.
+  Minted 2026-08-31 (desktop, ui-workstream worktree), from a session asking for "a key for
+  components and data sources that are wired or planned". The ask is answerable today, which
+  was not obvious — the first read was that it needed the unsigned wiring gate.
+
+  WHY IT IS NOT BLOCKED. The blocked thing is a registry FIELD asserting wiring readiness as
+  a first-class disposition. The unblocked thing is reporting the cross of two dispositions
+  the registry already records separately. The distinction matters because getting it wrong
+  in either direction is costly: inventing the field preempts an SME gate, and assuming the
+  gate blocks everything leaves a question answerable-from-committed-data unanswered.
+
+  INDEPENDENT OF O88/O89 ON PURPOSE. This is a rendering over a committed artifact — no
+  capture, no anchors, no running API. It can ship first and is the cheapest of the three.
