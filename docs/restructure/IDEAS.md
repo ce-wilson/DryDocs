@@ -91,6 +91,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-230`** · 2026-08-31 · `[chore]` · **open** · prio? **Med** —
+  **An item's acceptance can be overtaken by its own dependency's growth, and nothing
+  notices.** (Body to follow — id minted and pushed first, per the I6 rule.)
+
 - **`Idea-229`** · 2026-08-31 · `[chore]` · **open** · prio? **High** —
   **A cancelled CI run is neither green nor red, and nothing reads it as unverified — so a
   commit can reach main having never been checked, and its failure surfaces on somebody
