@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/components/CypherConsole.tsx
@@ -39,9 +39,52 @@ acceptance: |
   (e) VERIFIED AGAINST A LIVE GRAPH ONCE, with the venue named (J18), and the unit-side guard
   skipping with a named message where no database is reachable.
 notes: |
-  Groomed 2026-08-30 (desktop, weekly groom) from Idea-202.
+  BUILT 2026-08-31 (desktop, MSI). The guard is tests/unit/test_first_party_queries.py;
+  the surface half is in CypherConsole with web/src/lib/cypher-labels.ts behind it.
 
-  The interesting property, and the reason it is a bug rather than an idea - two call sites
-  drifted from a SIGNED gate ruling, the unit suite stayed green, and the surface reported
-  success. A ruling that only exists in a gate document and in two hand-copied strings has no
-  enforcement point at all.
+  (a) THE DRIFT IS RECORDED IN THE GUARD'S OWN HEADER, and the subject is the detection
+  gap rather than the two strings: a ruling that exists only in a gate document and in two
+  hand-copied strings has no enforcement point, so the query stayed valid Cypher, the
+  database answered it, and the surface reported success with zero rows.
+
+  (b) A GUARD, NOT A GENERATED ARTIFACT, and the reason the other was refused is written
+  where the choice lives. The two call sites are in different languages -- a TypeScript
+  preset map and a Python default -- so a shared artifact needs two consumers, a build step
+  and a drift test of its own: three moving parts to enforce one sentence. The schema files
+  already ARE the source of truth. The generated-artifact shape stays right where a VALUE
+  must be rendered into a surface (gates.json, load-map.json); here nothing is rendered.
+
+  J66 IS LOAD-BEARING HERE RATHER THAN CEREMONIAL, and the first attempt got it wrong in an
+  instructive way. Both source files NAME the rejected label in the comment explaining the
+  ruling, so a substring scan would fail on the explanation. The TypeScript side gets a
+  local comment stripper (the precedent source_scan's own header sets for a grammar Python
+  cannot parse). The Python side reached for source_scan.code_only first and that helper
+  strips comments AND STRING LITERALS -- the thing being guarded IS a string literal, so it
+  found nothing. Caught immediately by this module's own finds-nothing guard, which exists
+  because an extractor that silently returns [] passes forever. It now reads an AST, where
+  comments do not exist at all, and a test asserts the rejected name is still present in
+  both raw files and absent from everything the extractors return.
+
+  THE GUARD IS PROVEN AGAINST THE DRIFT, not just against today's correct strings: the
+  rejected shape is run through the same extraction and the same declared sets, so the
+  suite would have failed on 2026-08-29. Without that test, a guard checking nothing and a
+  guard checking correct code report identically.
+
+  (c) THE SURFACE HALF. An empty PRESET result now asks the database which labels it has
+  and names the missing ones, so "the graph holds no matching data" reads differently from
+  "this preset names nothing real". The diagnosis is best-effort: a database that will not
+  answer db.labels() must not turn a successful query into an error.
+
+  (d) THE FENCE IS ENFORCED, not just stated. The diagnosis fires only when the query is an
+  EXACT match for one of the presets, so an edited preset is user Cypher again and the
+  raw-Cypher bench stays a bench. cypher-labels.ts says the same in its header.
+
+  (e) LIVE VERIFICATION, VENUE NAMED (J18): desktop, `neo4jtest` container -- `drydocs`
+  reports 80 labels and `neo4j` 50; CodeModule is present in both and CodeFile in neither,
+  which is exactly the fact the diagnosis rests on. NOTE ON THE SKIP CLAUSE: the guard
+  reads source and schema files only and touches no database, so there is no database for
+  it to skip on. Adding a skip branch that can never fire would be worse than saying this.
+
+  VERIFIED: Python suite 2886 passed / 12 skipped, ruff check + format clean, vitest 43
+  passed (11 new over the extractor), oxlint unchanged (4 pre-existing warnings), tsc build
+  clean.

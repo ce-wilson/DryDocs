@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { boltAllowed, type GraphResult } from '../lib/graph'
+import { labelsNamedIn } from '../lib/cypher-labels'
 import { createBoltAccess } from '../lib/neo4j'
 import { listApps, createSession, runAgent, type AdkEvent } from '../lib/adk'
 import type { Role } from '../lib/auth'
@@ -77,9 +78,41 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
       const access = createBoltAccess({ uri, user, password, database })
       const res = await access.runRead(query)
       setResult(res)
-      setCypherStatus(`${res.rows.length} rows`)
+      setCypherStatus(`${res.rows.length} rows${await emptyPresetDiagnosis(access, res)}`)
     } catch (e) {
       setCypherStatus(String(e))
+    }
+  }
+
+  // O84 clause (c): ZERO ROWS FROM A PRESET IS NOT SELF-EXPLANATORY. A preset
+  // whose labels drifted from the schema returns success with an empty result,
+  // which reads exactly like an empty graph — that is how two first-party call
+  // sites named a rejected label for weeks with a green suite behind them. So an
+  // empty preset result asks the database which labels it actually has and says
+  // which of the named ones are missing.
+  //
+  // PRESETS ONLY, per clause (d). The box below is a raw-Cypher bench and
+  // user-typed queries are none of this function's business; widening it into a
+  // general validator is a product decision nobody has made. Identity is by
+  // exact match against PRESETS, so an edited preset is user Cypher again.
+  async function emptyPresetDiagnosis(
+    access: ReturnType<typeof createBoltAccess>,
+    res: GraphResult,
+  ): Promise<string> {
+    if (res.rows.length > 0) return ''
+    if (!Object.values(PRESETS).includes(query)) return ''
+    const named = labelsNamedIn(query)
+    if (named.length === 0) return ''
+    try {
+      const present = await access.runRead('CALL db.labels() YIELD label RETURN label')
+      const have = new Set(present.rows.map((r) => String(r.label)))
+      const missing = named.filter((l) => !have.has(l))
+      if (missing.length === 0) return ''
+      return ` — but database '${database}' has no ${missing.join(', ')} label, so this is a preset naming nothing real rather than an empty result`
+    } catch {
+      // The diagnosis is a courtesy; a database that will not answer
+      // db.labels() must not turn a successful query into an error.
+      return ''
     }
   }
 
