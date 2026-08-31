@@ -17,8 +17,56 @@ inputs:
 - web/src/lib/nvl-mapping.ts
 - web/src/modules/registry.ts
 acceptance: |
-  STUB - body written in the follow-up commit.
+  (a) A REAL ROUTE, NOT A DISPLAY TOGGLE. `/graph/:specId` renders one canvas
+  surface full-page, and it is a route for the reason site-plan §1 gives: every view
+  deep-linkable and back-button safe. The precedent is already in the router -
+  `lineage/asset/:assetId` and `explorer/tower/:towerKey` are parameterised routes
+  rendering a focused view, and this is the same shape. A maximize toggle or the
+  Fullscreen API would both be cheaper and neither produces a link somebody can send.
+
+  (b) THE SPEC ID IS WHITELISTED AGAINST CANVAS_SURFACES, never passed through. That
+  map is already a closed pairing of spec id to the mapper that knows which Cypher
+  pattern the spec walked, so an id outside it renders a named "not a canvas surface"
+  state. Without the check the URL quietly becomes a place to name arbitrary spec ids:
+  drydocs-api would refuse anything unregistered, so this is not a data-exposure fix,
+  it is a refusal to invite the attempt - and it keeps the ADR 0005 rule that the
+  console never chooses a query the registry did not review.
+
+  (c) THE ROUTE GATES LIKE ITS SIBLINGS. Whatever role rule the hosting module's tabs
+  apply, the full-page route applies too. A deep link is reachable by anyone holding
+  it, and the server re-resolves the real role from the token on every call, so the
+  data is safe either way; the point is that this must not become the one page that
+  does not check.
+
+  (d) THE WAY IN IS AN ANCHOR, not window.open - middle-click and ctrl-click keep
+  working and no popup blocker is involved. Opened from the canvas header of each
+  surface that has a route.
+
+  (e) THE SESSION IS NOT PASSED IN THE URL and does not need to be. The token lives
+  in localStorage under drydocs.session.v2, so a same-origin tab boots the app and
+  finds it. A token in a query string would land in history, logs and any shared link.
+
+  (f) O81'S LIMITATION IS CLOSED OR RESTATED. That item shipped the canvas in the
+  data-frame strip - about 215px at the default split, where the whole graph fits but
+  its captions render small - and named the resizable divider as the answer for now.
+  Either this route makes that acceptable, or the item says plainly what still is not.
 notes: |
-  Minted 2026-08-31 from O81's close: the canvas ships in the data-frame strip
-  (about 215px at the default split), where the whole graph fits but its captions
-  render small.
+  Minted 2026-08-31 from O81's close, at the user's request, after O81 reported the
+  legibility limitation rather than deferring it silently.
+
+  WHY A ROUTE RATHER THAN THE TWO CHEAPER OPTIONS, decided at the mint so the build
+  does not re-litigate it: a maximize toggle (CSS only, ~20 lines) and the Fullscreen
+  API (~10 lines) both solve the height and neither produces a shareable link or a
+  back-button-safe view, which is exactly what site-plan §1 locked the console into
+  real routes to get. The route is also the only one of the three that survives being
+  sent to somebody.
+
+  WHAT IS ALREADY TRUE AND NEEDS NO WORK: the session is in localStorage, so a new
+  tab is signed in with no second login and no token in the URL. That fact is what
+  makes the route cheap, and it was verified while answering the question rather
+  than assumed.
+
+  NOT IN SCOPE: hosting the canvas in the module GRAPH PANE instead of the data-frame
+  strip. O81 deliberately left that alone because it would displace each route's
+  existing reviewed pane, and that is a call about what a module leads with - a
+  different decision from giving a surface its own page.
