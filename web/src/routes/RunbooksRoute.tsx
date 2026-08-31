@@ -4,6 +4,8 @@ import { createApiAccess } from '../lib/graphApi'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
+import SpecGraphPane from '../components/SpecGraphPane'
+import type { CanvasNode } from '../lib/nvl-mapping'
 import MiniDag from '../components/MiniDag'
 import LinkedDemoFrame from '../components/LinkedDemoFrame'
 import {
@@ -26,6 +28,11 @@ const NOTICE = 'SYNTHESIZED · ILLUSTRATIVE — live series data is company-side
 
 export default function RunbooksRoute({ persona }: { persona: Persona }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // O81: the canvas keeps its own selection rather than sharing selectedId —
+  // that one is a DEMO node id (RUNBOOK_NODES), and a spec-derived node id is a
+  // different namespace. Collapsing them would make a click on one surface
+  // highlight an unrelated row on the other.
+  const [canvasNode, setCanvasNode] = useState<CanvasNode | null>(null)
   const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
   const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
@@ -52,6 +59,19 @@ export default function RunbooksRoute({ persona }: { persona: Persona }) {
             access={access}
             specId="runbooks.series.v1"
             fallback={<LinkedDemoFrame frame={SERIES_FRAME} notice={NOTICE} {...frameProps} />}
+          />
+        ),
+        // O81 surface 1: the SAME reviewed spec the Series tab tables, drawn as
+        // the graph its rows were flattened from (job -INVOKES-> process
+        // -WRITES_TO-> asset). Zero rows until the curated lineage load runs,
+        // and the canvas says so rather than showing an empty rectangle.
+        'Series graph': (
+          <SpecGraphPane
+            access={access}
+            specId="runbooks.series.v1"
+            title="Data-series traversal · job → ETL process → asset"
+            selected={canvasNode}
+            onSelect={setCanvasNode}
           />
         ),
         'Generated runbooks': (

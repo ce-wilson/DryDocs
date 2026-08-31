@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/
@@ -55,12 +55,83 @@ acceptance: |
   (6) CLOSE-OUT. Screenshots of both surfaces in the PR note; the worktree session ends
   with the suite green and no change to any /raw-cypher or write-surface behavior.
 notes: |
-  Groomed 2026-08-27 from the UI-components review session (cowork): survey of Neo4j viz
-  options ruled NVL first (first-party, Bloom-grade interactions, React wrappers, plain-data
-  input that fits the QuerySpec-only read contract). react-force-graph (MIT) recorded as
-  the fallback if step (1)'s license record ever contradicts the ruling. NeoDash and the
-  dashboard/platform tier declined: they want browser Cypher, which fights the O20-pinned
-  read boundary, and the renders/board already own dashboard ground.
+  BUILT 2026-08-31 (desktop, MSI). All six steps; the license step fired its
+  stop-and-report and was ruled before any import landed.
 
-  p1 at the SME's direction ("first priority"). Priority order with O82: this lands first;
-  O82 is the secondary.
+  (1) LICENSE: THE STOP-AND-REPORT TRIGGERED, and the finding is that there is no
+  identifier to record. Both packages (1.2.1) declare "SEE LICENSE IN
+  'LICENSE.txt'", not an SPDX id, and LICENSE.txt is three lines of proprietary
+  terms whose constraint is not on copying the code but on WHAT IT MAY TALK TO:
+  usable only with Aura or subscription-licensed Neo4j. Reported with the text in
+  hand; RULED 2026-08-31 (user, in-session) that the license is available
+  internally and Aura is available for testing, which satisfies the condition and
+  reaffirms the 2026-08-27 SME ruling. Recorded on the neo4j-nvl registry row with
+  the terms quoted, the ruling dated, and what it costs the standalone-template
+  goal stated. The packages were UNINSTALLED while the question was open.
+
+  THE SITE PLAN WAS AMENDED, NOT CONTRADICTED. Its graph-canvas row named NVL "the
+  fallback only if Neo4j-native rendering becomes a requirement"; it became one at
+  the SME's direction, so the row now carries both libraries and the locked-stack
+  guard moved with it. React Flow keeps the DAG/flow canvases -- the two split by
+  SHAPE, not preference.
+
+  (2) THE DATA SEAM IS A FLATTENING RUN BACKWARDS. A spec returns rows because
+  that is what a reviewed query returns; the graph is implied by the row shape.
+  Each mapper names the Cypher pattern its spec walked and rebuilds exactly that.
+  Two refusals are the substance of the file: the :Port hop in the neighbourhood
+  spec is NOT drawn (the rows carry no port identity, and K7/K8 put that hop under
+  a signed gate), and the job COUNT is a property, never N invented job nodes.
+  Zero browser Cypher, no new endpoint, no spec minted -- ADR 0005 untouched.
+
+  (3) THE CANVAS. Tokens are resolved against live computed style and re-resolved
+  on theme change, because NVL takes concrete colours and the console's rule is
+  tokens-never-hex. Declared ceiling of 300 nodes with a truncation badge carrying
+  BOTH numbers -- absent-is-never-empty applies to pixels. Selection feeds a detail
+  strip built from the existing IdChip/token primitives; NodeInspector could not be
+  reused because it is typed to the demo graph's Selection, not spec-derived nodes.
+
+  THREE RENDERING DEFECTS FOUND BY RENDERING IT, each of which would have shipped
+  a plausible-looking wrong picture. (a) NVL's DEFAULT WebGL renderer "does not
+  support captions and arrowheads" -- every node and relationship here carries a
+  caption, so the default would have drawn an unlabelled blob graph, and it cannot
+  initialise headless at all (the first capture closed the browser). (b) layout
+  'forceDirected' stacked all nine fixture nodes at the origin: the header said
+  nine, the canvas showed one, nothing errored. d3Force spreads them. (c) no fit
+  call meant the viewport framed whatever sat under it; the fit now runs after the
+  layout settles.
+
+  (4) TWO SURFACES, both over already-reviewed specs, added as FRAMES BESIDE their
+  existing tables rather than replacing any reviewed surface: /runbooks "Series
+  graph" (runbooks.series.v1) and /explorer "App neighbourhood"
+  (explorer.folder-applications.v1). Frames are declared in modules/registry.ts --
+  a tabContent key alone renders nothing, which is why the first capture found no
+  tab.
+
+  LIVE STATE, STATED PLAINLY: both specs return ZERO ROWS on this desktop, so both
+  surfaces render the honest empty state, and that is what the unfixtured
+  screenshots show. The render path was verified separately with fixture rows
+  injected at the API boundary: 3 rows -> 9 nodes / 7 rels, drawn, coloured by
+  kind, with edges. What is NOT yet demonstrated is either surface against real
+  loaded data.
+
+  KNOWN LIMITATION, not deferred silently: in the data-frame strip (~215px at the
+  default split) the whole graph fits but its captions render small. The shell's
+  resizable divider is the answer today. Hosting the canvas in the taller GRAPH
+  PANE is the better home and was deliberately not taken here, because it would
+  displace each route's existing reviewed pane -- a call worth making explicitly
+  rather than inside this item.
+
+  (5) LEDGERS. GraphCanvas + SpecGraphPane registered UNBOUND (each has two
+  consumers on day one, so binding either would encode the first caller as owner --
+  the RelEdge/TrustLegend/LocationMap rule); 76 -> 78 components, bound stays 32.
+  lib/nvl-mapping.ts is deliberately NOT a row: the ledger's scan boundary is .tsx
+  and widening waits on O42, so one .ts row would be an arbitrary exception rather
+  than coverage. ui-tests gains TC-RUNBOOKS-01, seeding TS-RUNBOOKS (8/13 -> 9/13);
+  automated share 4/23 -> 5/24. Two census pins moved with reasons: the software
+  registry's generated view was re-rendered, and the docs-coverage census records
+  NVL as a product with NO documentation pointer, which is the honest state.
+
+  (6) VERIFIED: Python suite 2881 passed / 12 skipped, ruff check + format clean,
+  vitest 32 passed (16 new, over the mappers), playwright 2 passed, tsc build
+  clean, oxlint unchanged (4 pre-existing warnings, none in new files).
+  Screenshots captured for both surfaces plus the fixture-fed render.

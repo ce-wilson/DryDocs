@@ -122,9 +122,18 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (17) ---
+  # --- component (19) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
+  # O81: the NVL canvas and its QuerySpec-bound frame. UNBOUND to any module on
+  # purpose — the same rule as RelEdge and TrustLegend: both take their graph as
+  # props and already have two consumers (runbooks and explorer), so binding
+  # either to one module would be evidence-free. Their mapper, lib/nvl-mapping.ts,
+  # is NOT a row here: this ledger's declared scope is .tsx only (see the SCOPE
+  # CAVEAT above), and widening it waits on O42's disposition — one .ts row while
+  # 25 others stay out would be an arbitrary exception, not coverage.
+  - { id: GraphCanvas,             area: component,    path: components/GraphCanvas.tsx }
+  - { id: SpecGraphPane,           area: component,    path: components/SpecGraphPane.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
   - { id: GraphSvg,                area: component,    path: components/GraphSvg.tsx }
   - { id: IntakeStepper,           area: component,    path: components/IntakeStepper.tsx }

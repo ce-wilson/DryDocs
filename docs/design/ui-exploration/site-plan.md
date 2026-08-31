@@ -20,7 +20,7 @@
 | Build | Vite + React + TypeScript | |
 | Styling | Tailwind + CSS custom properties | tokens are the theme API (§2) |
 | Components | **ReUI free** (shadcn-style, copied into repo) | Data Grid, Filters, Tree, Timeline, Resizable, Sheet cover the shell + frames; enable ReUI MCP (`https://mcp.reui.io`) + `@reui/skills-claude` when build starts |
-| Graph canvas | React Flow | lineage + explorer canvases; NVL is the fallback only if Neo4j-native rendering becomes a requirement |
+| Graph canvas | React Flow **and** Neo4j NVL | React Flow keeps the lineage + explorer canvases and the DAG/flow shapes. **NVL joined at O81 (2026-08-31)** — this row's own condition was met rather than overridden: Neo4j-native rendering became a requirement at the SME's direction, so NVL is no longer a fallback. It renders graph-shaped surfaces (traversal, neighbourhood) fed ONLY by QuerySpec results; the ADR 0005 read boundary is untouched. Its licence is proprietary and conditions use on Aura or subscription-licensed Neo4j — recorded in full on the `neo4j-nvl` row of `config/taxonomy/software-registry.yaml`, with react-force-graph (MIT) still the fallback if that condition ever binds |
 | Routing | React Router (real routes, not display toggles) | fixes design-review 🔴 #1: every view deep-linkable + back-button safe |
 | Backend | **drydocs-api** (shipped, O5 / ADR 0005) via the O4 GraphAccess seam; ADK 2.0 agent layer added later for agent/chat features | UI never speaks Bolt directly (dev-mode bolt adapter only, per ADR 0005) |
 | Fonts | IBM Plex Sans + IBM Plex Mono, **self-hosted woff2** | design-review: no Google Fonts CDN (intranet target) |

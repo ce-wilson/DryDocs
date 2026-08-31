@@ -329,9 +329,17 @@ def test_neo4j_spans_both_stacks() -> None:
 
 
 def test_web_console_stack_matches_the_locked_site_plan() -> None:
-    """The locked stack (docs/design/ui-exploration/site-plan.md §1), pinned so a swap is deliberate."""
+    """The locked stack (docs/design/ui-exploration/site-plan.md §1), pinned so a swap is deliberate.
+
+    neo4j-nvl joined at O81 (2026-08-31). The site plan's graph-canvas row had
+    named NVL "the fallback only if Neo4j-native rendering becomes a
+    requirement"; it became one at the SME's direction, so the row was AMENDED
+    rather than contradicted, and this pin moved with it. React Flow stays —
+    the two split by shape, not by preference: flow/DAG canvases against
+    graph-shaped traversal and neighbourhood views.
+    """
     web = {p["id"] for p in _doc()["products"] if "web-console" in (p.get("stack") or [])}
-    assert web == {"react", "reui", "react-flow", "tailwindcss", "neo4j"}
+    assert web == {"react", "reui", "react-flow", "tailwindcss", "neo4j", "neo4j-nvl"}
 
 
 # --- acronyms (O68) ---------------------------------------------------------

@@ -180,6 +180,39 @@ products:
                                    # the driver as its OWN product would hit this
                                    # file's "drivers stay out" scope rule.
 
+  - id: neo4j-nvl
+    vendor: neo4j
+    name: Neo4j Visualization Library
+    category: Graph Visualization
+    role: tool
+    type: commercial
+    versions: ["1.2.1"]           # @neo4j-nvl/base + @neo4j-nvl/react
+    used_by_drydocs: true
+    stack: [web-console]
+    # LICENSE: THERE IS NO IDENTIFIER TO RECORD, and that is the record. Both
+    # packages declare `"license": "SEE LICENSE IN 'LICENSE.txt'"` — not an SPDX
+    # id — and LICENSE.txt is three lines of proprietary terms, quoted here in
+    # substance because the constraint is not on copying the code but on WHAT THE
+    # CODE MAY TALK TO: NVL "may only be used with (i) the Aura software as a
+    # service offering ... or (ii) the proprietary commercial graph database
+    # products developed by Neo4j ... subject to the Neo4j Subscription
+    # Agreement."
+    #
+    # O81 step (1) made a license mismatch a stop-and-report, and it fired: the
+    # item anticipated recording an identifier, and there is none. REPORTED AND
+    # RULED 2026-08-31 (user, in-session): the license is available internally and
+    # Aura is available for testing if needed, which satisfies limb (i)/(ii). That
+    # reaffirms the 2026-08-27 SME ruling with the actual terms in hand rather
+    # than the survey's summary of them.
+    #
+    # WHAT THIS COSTS, recorded so it is not rediscovered: the condition binds the
+    # DEPLOYMENT, so any environment running this console against a Neo4j that is
+    # neither Aura nor subscription-licensed is outside the grant. That matters
+    # for the standalone-template goal, where an adopter inherits the condition.
+    # react-force-graph (MIT, 1.48.2) remains the recorded fallback if that ever
+    # becomes the binding constraint.
+    license_note: "proprietary — Neo4j, Inc. License Agreement for NVL; no SPDX id declared; usable only with Aura or subscription-licensed Neo4j"
+
   - id: neo4j-bloom
     vendor: neo4j
     name: Neo4j Bloom

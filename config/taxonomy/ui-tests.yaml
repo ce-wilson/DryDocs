@@ -28,11 +28,11 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Four cases are automated out of twenty-three. The
+# WHAT THIS DOES NOT CLAIM. Five cases are automated out of twenty-four. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
-# it must not start implying the opposite. The automated four were chosen
-# because each had already escaped into main and been caught by a person looking
-# (O80's evidence), not because they were the easiest to write.
+# it must not start implying the opposite. The first four were chosen because
+# each had already escaped into main and been caught by a person looking (O80's
+# evidence); the fifth arrived with the surface it guards (O81).
 #
 # SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
 # backlog close note recording something that was actually observed working.
@@ -40,7 +40,7 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 8 of 13 areas seeded (3 of 12 when this file
+# COVERAGE IS PARTIAL AND SAYS SO: 9 of 13 areas seeded (3 of 12 when this file
 # was written). The rest are declared with `cases: []` so the gap is a visible
 # number rather than an absence, and the guard pins it.
 # =============================================================================
@@ -385,7 +385,28 @@ suites:
         source: "Z5 defect, found by rendering the tab 2026-08-27; locked in by unit tests at O80 2026-08-31"
         automated_by: web/src/components/map/resolve.test.ts
   - { id: TS-LINEAGE,     module: lineage,     description: "Lineage source->target DAG canvas.", cases: [] }
-  - { id: TS-RUNBOOKS,    module: runbooks,    description: "Data-series provisioning chain views.", cases: [] }
+  - id: TS-RUNBOOKS
+    module: runbooks
+    description: >
+      Data-series provisioning chain views. Seeded at O81 by the NVL series
+      canvas — the first case here asserts what the canvas may DRAW, which is a
+      claim about the graph rather than about pixels, so it is unit-testable.
+    cases:
+      - id: TC-RUNBOOKS-01
+        description: The series canvas draws only the hops its spec walked
+        steps:
+          - Open /runbooks and select the Series graph tab.
+          - Compare the drawn hops against runbooks.series.v1's own Cypher.
+        expect: >
+          Job -INVOKES-> ETL process, and process -WRITES_TO-> asset where the
+          row landed one. Nothing else: the canvas rebuilds the pattern the
+          reviewed spec walked and never a hop it did not. The job edge reads
+          INVOKES, not TRIGGERS — G89 moved the spec onto the edge a loader may
+          actually write, and the picture follows the spec. Zero rows renders the
+          honest empty state, which is the expected result until the curated
+          lineage load runs.
+        source: "O81 build 2026-08-31 — desktop; mapper unit-tested, canvas rendered against the live API"
+        automated_by: web/src/lib/nvl-mapping.test.ts
   - { id: TS-REMEDIATION, module: remediation, description: "Finding -> fix-batch flow.", cases: [] }
   - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }
   - id: TS-GATES

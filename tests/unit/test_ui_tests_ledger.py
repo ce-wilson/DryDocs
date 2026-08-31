@@ -111,7 +111,10 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # turn was storage-seeded, not produced by a live agent run.
     # 6/13 -> 8/13 at O80 (2026-08-31): TS-GATES and TS-EXPLORER arrive seeded,
     # both from cases the new runners actually execute rather than from prose.
-    assert (len(seeded), len(suites)) == (8, 13), (
+    # 8/13 -> 9/13 at O81 (2026-08-31): TS-RUNBOOKS seeded by the NVL series
+    # canvas, whose case asserts what the canvas may DRAW — a claim about the
+    # graph rather than about pixels, so the unit runner can hold it.
+    assert (len(seeded), len(suites)) == (9, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )
@@ -138,7 +141,7 @@ def test_automated_cases_name_a_file_that_exists() -> None:
 
 
 def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
-    """Four of twenty-three. The point is that the number is SMALL and visible.
+    """Five of twenty-four. The point is that the number is SMALL and visible.
 
     O80 bought the capability and proved it on cases that had already escaped
     into main; it did not backfill coverage, and this pin is what stops a later
@@ -147,8 +150,8 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        4,
-        23,
+        5,
+        24,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 

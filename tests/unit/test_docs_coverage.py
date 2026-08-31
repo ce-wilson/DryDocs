@@ -357,7 +357,14 @@ def test_every_corpus_declares_the_one_database() -> None:
 
 def test_the_live_coverage_census_is_pinned() -> None:
     """Known-state pin over the REAL config. Not a failure condition — a change
-    to the coverage picture must be LOUD without being red."""
+    to the coverage picture must be LOUD without being red.
+
+    15/13 -> 16/14 at O81 (2026-08-31): the neo4j-nvl product row. It arrives
+    WITHOUT a documentation pointer, which is the honest state — NVL's reference
+    is Neo4j's hosted docs, and no corpus here has scraped them. Recording it as
+    an uncovered product is the point of this census; quietly pointing it at the
+    existing neo4j corpus would claim coverage that does not exist.
+    """
     software = yaml.safe_load(SOFTWARE_REGISTRY.read_text(encoding="utf-8"))
     doc = yaml.safe_load(DOC_REGISTRY.read_text(encoding="utf-8"))
     report = coverage(software["products"], doc["sources"])
@@ -380,8 +387,9 @@ def test_the_live_coverage_census_is_pinned() -> None:
             # gate's §C5 ruling turns on exactly that distinction.
         )
         == (
-            15,
-            13,  # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
+            16,  # 15->16 at O81 (2026-08-31): the neo4j-nvl product row
+            14,  # 13->14 at O81: NVL has no scraped corpus, so it counts as uncovered
+            # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
             10,  # 9->10 at Q27: mwaa-implementation-docs registered — prior moves: chase-leadership-scrape 2026-08-27, Q10 ops-email-extracts 2026-08-19
             8,  # unclaimed 7->8 — org-structure gate evidence, not product documentation (same class as the email corpus before it)
         )

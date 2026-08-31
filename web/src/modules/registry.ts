@@ -67,7 +67,20 @@ export const MODULES: readonly ModuleDef[] = [
     // Locations (Z5, 2026-08-22): the reusable map module's first consumer.
     // It sits beside Servers deliberately — same estate, one tab answering
     // "what do we have" and the next answering "where is it".
-    tabs: ['Applications', 'Folders', 'App codes', 'Jobs', 'Conditions', 'Servers', 'Locations'],
+    // 'App neighbourhood' added at O81: the NVL canvas over the same
+    // explorer.folder-applications.v1 the Folders tab tables, drawn as folder →
+    // application and folder → data centre. It sits directly after Folders so
+    // the table and its picture are neighbours.
+    tabs: [
+      'Applications',
+      'Folders',
+      'App neighbourhood',
+      'App codes',
+      'Jobs',
+      'Conditions',
+      'Servers',
+      'Locations',
+    ],
     phase: 1,
     retrieval: 'agent', // graph-nav Q&A over the drydocs graph (Epic R router target)
     agent: 'graph-qa (ADK)',
@@ -116,7 +129,10 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/runbooks',
     tagline: 'Data-series provisioning chain',
     backsOnto: 'runbook-automation',
-    tabs: ['Series', 'Generated runbooks', 'Metadata completeness'],
+    // 'Series graph' added at O81: the NVL canvas over runbooks.series.v1 —
+    // the SAME reviewed spec the Series tab tables, drawn as the graph its rows
+    // were flattened from. It sits beside its table rather than replacing it.
+    tabs: ['Series', 'Series graph', 'Generated runbooks', 'Metadata completeness'],
     phase: 2,
   },
   {

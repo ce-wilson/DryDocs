@@ -7,6 +7,8 @@ import ModuleTemplate from '../ModuleTemplate'
 import ExplorerGraphPane from '../../explorer/ExplorerGraphPane'
 import DataFrame from '../../explorer/DataFrame'
 import SpecGrid from '../../explorer/SpecGrid'
+import SpecGraphPane from '../../components/SpecGraphPane'
+import type { CanvasNode } from '../../lib/nvl-mapping'
 import LocationMap, { type MapDimension } from '../../components/map/LocationMap'
 import NodeInspector from '../../explorer/NodeInspector'
 import {
@@ -63,6 +65,9 @@ const LOCATION_DIMENSIONS: readonly MapDimension[] = [
 export default function ExplorerRoute({ persona }: { persona: Persona }) {
   const [tower, setTower] = useState<TowerKey>('home')
   const [selection, setSelection] = useState<Selection | null>(null)
+  // O81: spec-derived node ids are a different namespace from the demo graph's
+  // Selection, so the canvas holds its own rather than sharing this one.
+  const [canvasNode, setCanvasNode] = useState<CanvasNode | null>(null)
   const sidebar = useRightSidebar()
   // O11: each tab binds to its versioned QuerySpec via the GraphAccess api
   // adapter; the O9 demo frames survive as the visible fallback when
@@ -115,6 +120,20 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
             access={access}
             specId="explorer.folder-applications.v1"
             fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
+          />
+        ),
+        // O81 surface 2: the application neighbourhood, drawn from the same
+        // reviewed spec the Folders tab tables — folder → application, folder →
+        // data centre. The :Port hop the spec traverses is deliberately NOT
+        // drawn: the rows carry no port identity, so a port node would be one
+        // the console invented (see nvl-mapping.ts).
+        'App neighbourhood': (
+          <SpecGraphPane
+            access={access}
+            specId="explorer.folder-applications.v1"
+            title="Application neighbourhood · folder → application · folder → data centre"
+            selected={canvasNode}
+            onSelect={setCanvasNode}
           />
         ),
         'App codes': (

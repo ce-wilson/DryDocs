@@ -228,6 +228,23 @@
       ]
     },
     {
+      "id": "neo4j-nvl",
+      "vendor": "neo4j",
+      "name": "Neo4j Visualization Library",
+      "category": "Graph Visualization",
+      "role": "tool",
+      "type": "commercial",
+      "versions": [
+        "1.2.1"
+      ],
+      "used_by_drydocs": true,
+      "seal_id": null,
+      "documentation": null,
+      "stack": [
+        "web-console"
+      ]
+    },
+    {
       "id": "neo4j-bloom",
       "vendor": "neo4j",
       "name": "Neo4j Bloom",

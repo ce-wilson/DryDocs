@@ -299,10 +299,18 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     75 -> 76 at O68 (2026-08-27): AcronymsPane, BOUND to `software` by directory
     evidence, so both counts move by one. It lives under software/ beside
     VendorIcon and serves exactly the one module whose route renders it.
+    76 -> 78 at O81 (2026-08-31): GraphCanvas + SpecGraphPane, both deliberately
+    UNBOUND, so bound stays at 32 while the total moves two. Each already has
+    TWO consumers on the day it lands — the runbooks series traversal and the
+    explorer application neighbourhood — so binding either to one module would
+    encode the first caller as the owner. Same rule as RelEdge, TrustLegend and
+    LocationMap. Their mapper, lib/nvl-mapping.ts, is NOT here for the same
+    reason loadMapModel.ts is not: the scan boundary is .tsx only and widening
+    it waits on O42.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         32,
-        76,
+        78,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
