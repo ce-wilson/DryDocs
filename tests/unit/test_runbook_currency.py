@@ -95,6 +95,14 @@ HISTORICAL_PATHS: dict[str, str] = {
 #: cross-repo excuse. Every entry here must be a path the document asserts is
 #: absent producer-side or names in a sibling — never one we simply deleted.
 FOREIGN_PATHS: dict[str, str] = {
+    "internal/research/G64-SME-MM-research.md": (
+        "COMPANY-side research log (the G64 dpl pipeline-registry contract session, "
+        "2026-08-31). T13's row cites it as the venue where the validation actually ran, "
+        "which is the J63 provenance rule doing its job: an evidence claim names the "
+        "artifact that carries it, and that artifact lives on the other side of the port "
+        "until back-flow brings it over. Naming a company-side log is the citation, not a "
+        "stale claim about this tree"
+    ),
     "docs/port-prompt.md": (
         "COMPANY-side path, and the ONE the S9 move created (step 177): the producer's "
         "prompt now lives at docs/port/port-prompt.md, while the company's copy is still "
