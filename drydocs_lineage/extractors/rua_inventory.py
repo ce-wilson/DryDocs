@@ -679,9 +679,19 @@ class RuaInventoryExtractor:
         else:
             # counted AND kept: cross_host_collisions stays the ambiguity
             # signal (§D3 — one file under shared storage vs N files under
-            # local, undecidable without fstype or a hash), while the record
-            # itself now accumulates instead of being dropped. Identical
-            # re-arrivals (same origin/host/path) dedup for idempotent staging.
+            # local), while the record itself now accumulates instead of being
+            # dropped. Identical re-arrivals (same origin/host/path) dedup for
+            # idempotent staging.
+            #
+            # "undecidable without fstype or a hash" is TRUE OF A v1/v2 BUNDLE
+            # ONLY. G56 decides it structurally: a v3 bundle ships mounts.tsv,
+            # and _MountTable stamps storage_scope=shared|local onto the node
+            # before this branch is ever reached. Where the scope is already
+            # `shared`, a collision here means ONE FILE SEEN N TIMES, not N
+            # deployments that disagree — read the counter that way. Without
+            # mounts.tsv the resolver stamps SCOPE_UNKNOWN and the ambiguity
+            # genuinely stands, so the answer to an unreadable collision is to
+            # RE-COLLECT at v3, not to infer sharing here.
             self._check_cross_host(existing.properties, env_props, coverage)
             key = self._occurrence_key(occurrence)
             if all(self._occurrence_key(o) != key for o in existing.occurrences):
