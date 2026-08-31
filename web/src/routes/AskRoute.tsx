@@ -5,6 +5,7 @@ import SpecGrid from '../explorer/SpecGrid'
 import { createApiAccess, createApiClient } from '../lib/graphApi'
 import { ask, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
 import TaskGraphPane from '../ask/TaskGraphPane'
+import FileReport from '../ask/FileReport'
 import type { Persona } from '../lib/auth'
 
 // The Ask spoke (R5 / ADR 0007): free-text Q&A over the knowledge graph for
@@ -165,6 +166,24 @@ export default function AskRoute({ persona }: { persona: Persona }) {
       <ModuleToolbar crumbs={[{ label: 'Home', to: '/' }, { label: 'Ask' }]} />
       <div className="min-h-0 flex-1 overflow-auto p-4">
         <div className="mx-auto flex max-w-4xl flex-col gap-4">
+          {/* O62 — the REPORT rendering, beside the free-text ask rather than
+              instead of it. The two answer the same question through different
+              routes: the agent reasons, this binds one reviewed spec that
+              filters server-side. The item's own observation is why both exist
+              — a live session answered a file-name question by listing every
+              document and letting the model pick, which cannot say "not found".
+              Collapsed by default so the free-text box stays the front door. */}
+          <details className="rounded-md border border-edge">
+            <summary className="cursor-pointer select-none px-3 py-2 text-sm font-semibold text-text">
+              File / table report
+              <span className="ml-2 text-xs font-normal text-muted">
+                which application and process owns this file, and who to escalate to
+              </span>
+            </summary>
+            <div className="border-t border-edge p-3">
+              <FileReport personaId={persona.id} />
+            </div>
+          </details>
           <header>
             <h1 data-view-heading tabIndex={-1} className="text-lg font-semibold text-text">
               Ask the knowledge graph

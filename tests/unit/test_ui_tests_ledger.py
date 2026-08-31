@@ -155,7 +155,7 @@ def test_automated_cases_name_a_file_that_exists() -> None:
 
 
 def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
-    """Fifteen of thirty-eight. The point is that the number is SMALL and visible.
+    """Sixteen of thirty-nine. The point is that the number is SMALL and visible.
 
     O80 bought the capability and proved it on cases that had already escaped
     into main; it did not backfill coverage, and this pin is what stops a later
@@ -180,8 +180,8 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        15,
-        38,
+        16,
+        39,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 

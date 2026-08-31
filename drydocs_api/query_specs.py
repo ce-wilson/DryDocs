@@ -1462,6 +1462,83 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             classification="internal-public",
             uncertain=True,
         ),
+        # O62 — THE FIRST SPEC THAT ACCEPTS A SEARCH TERM, and it exists because
+        # the item's own 2026-08-21 observation made it a prerequisite rather
+        # than an assumption. A live Ask session answered a file-name question
+        # correctly by routing to `docs.documents.v1`, whose Cypher applies NO
+        # filter: it lists every :Document and the answer model picked the match
+        # out of 27 rows by title similarity. That works at 27 documents and
+        # degrades as the corpus grows — and, more sharply, a full listing can
+        # never render "not found", so the honest-absence clause would have been
+        # unimplementable on top of it. The filtering has to be IN the spec.
+        #
+        # ANCHORED ON THE ASSET, not the application, because a file-name search
+        # starts from the file. The item's acceptance describes an
+        # Application-anchored shortest path; anchoring there would mean scanning
+        # every application to find one whose subtree mentions the term, which is
+        # the same full-scan defect in a different place. The legs walked are the
+        # same either way.
+        #
+        # EVERY HOP IS ONE AN EXISTING SPEC ALREADY WALKS — READS_FROM/WRITES_TO
+        # (lineage.hops.v1), CONTAINS_JOB and the seal_app_ref BELONGS_TO_APPLICATION
+        # -> :Port <- HAS_PORT pattern (explorer.folder-applications.v1), and the
+        # WAS_ATTRIBUTED_TO {role: developed_by} attribution (the R20 correction,
+        # which fixed a DEVELOPS edge that was never registered and made every
+        # team read 0). Nothing new is invented, so the vocabulary guard is a
+        # check rather than an obstacle.
+        #
+        # THE REPO LEG IS ABSENT ON PURPOSE. The captured example names code
+        # repos, and NO :CodeRepo label exists in node_classifications — the
+        # code-graph declares :CodeModule and :CodeDirectory, which are a
+        # different subject. Rather than bend one of those into standing for a
+        # repo, the spec does not ask, and the report renders that leg as "not
+        # found via this spec". Minting a repo label is an ontology decision.
+        QuerySpec(
+            id="ask.file-search.v1",
+            database="drydocs",
+            description=(
+                "File-name / asset search for the Ask report: the DataAsset whose id "
+                "matches the term, the activity that reads or writes it, the Control-M "
+                "folder and job behind that activity, the owning BusinessApplication "
+                "through the seal_app_ref Port, and the dev team the application is "
+                "attributed to as developer. Term-filtered IN THE SPEC — the first "
+                "registered spec that takes a search term, so 'not found' is a real "
+                "answer rather than an empty slice of a full listing."
+            ),
+            cypher=(
+                "MATCH (d:DataAsset) WHERE NOT d:SchemaMeta "
+                "AND toLower(coalesce(d.assetId, '')) CONTAINS toLower($term) "
+                "OPTIONAL MATCH (x)-[hop:READS_FROM|WRITES_TO]->(d) WHERE NOT x:SchemaMeta "
+                "OPTIONAL MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(x) "
+                "OPTIONAL MATCH (f)-[:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]"
+                "->(p:Port)<-[:HAS_PORT]-(a:BusinessApplication) "
+                "OPTIONAL MATCH (a)-[:WAS_ATTRIBUTED_TO {role: 'developed_by'}]->(dt:DevTeam) "
+                "RETURN d.assetId AS asset, d.kind AS asset_kind, type(hop) AS hop, "
+                "coalesce(x.token, x.path, x.job_name) AS activity, "
+                "labels(x)[0] AS activity_type, f.sched_table AS folder, "
+                "a.app_id AS app_id, a.name AS application, dt.name AS dev_team "
+                "ORDER BY asset, activity LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("asset", "string", "File / asset"),
+                ColumnDef("asset_kind", "string", "Asset kind"),
+                ColumnDef("hop", "string", "Hop"),
+                ColumnDef("activity", "string", "Process"),
+                ColumnDef("activity_type", "string", "Process type"),
+                ColumnDef("folder", "string", "Control-M folder"),
+                ColumnDef("app_id", "string", "Application ID"),
+                ColumnDef("application", "string", "Business application"),
+                ColumnDef("dev_team", "string", "Dev team"),
+            ),
+            # Internal: the row carries application ids and team names, and team
+            # rosters are confidential material (J23), same call ownership.teams
+            # makes.
+            classification="internal",
+            params=(
+                ParamSpec("term", "string", required=True),
+                ParamSpec("limit", "int", required=False, default=200),
+            ),
+        ),
     )
 }
 

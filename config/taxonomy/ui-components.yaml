@@ -168,11 +168,15 @@ components:
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- ask (1) ---
+  # --- ask (2) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
   - { id: TaskGraphPane,           area: ask,          path: ask/TaskGraphPane.tsx,                       module: ask,        module_evidence: directory }
+  # O62: the file-name REPORT. Binds ask.file-search.v1 - the first registered
+  # spec that accepts a search term, which is what lets 'not found' mean
+  # something rather than being an empty slice of a full listing.
+  - { id: FileReport,              area: ask,          path: ask/FileReport.tsx,                          module: ask,        module_evidence: directory }
 
   # --- explorer (4) ---
   - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }

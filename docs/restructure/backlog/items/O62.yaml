@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/ask/
@@ -37,3 +37,66 @@ notes: |
   Two sibling runs in the same session missed entirely, both answering "not ingested" while the
   corpus held the document; that evidence and the per-hop reasoning are recorded on R18, the
   trace item, rather than duplicated here.
+
+  DONE 2026-08-31 (desktop). /ask gains a "File / table report" pane.
+
+  THE PREREQUISITE THE ITEM'S OWN NOTE NAMED WAS REAL, and closing it is the main work.
+  No registered spec accepted a search term. `ask.file-search.v1` is the FIRST that does,
+  and the note's 2026-08-21 observation is exactly why it had to exist: a live Ask session
+  answered a file-name question by routing to `docs.documents.v1`, whose Cypher applies NO
+  filter — it lists every :Document and the answer model picked the match out of 27 rows.
+  Correct that day, degrading as the corpus grows, and — the sharper problem — A FULL
+  LISTING CAN NEVER RENDER "NOT FOUND", so this item's honest-absence clause would have
+  been unimplementable on top of it. The filtering had to move into the spec.
+
+  ANCHORED ON THE ASSET, NOT THE APPLICATION, and the deviation is recorded rather than
+  quiet. The acceptance describes an Application-anchored shortest path; anchoring there
+  means scanning every application to find one whose subtree mentions the term, which is
+  the same full-scan defect relocated. A file-name search starts from the file. The legs
+  walked are identical either way.
+
+  EVERY HOP IS ONE AN EXISTING SPEC ALREADY WALKS, so the strict vocabulary guard
+  (test_query_spec_vocabulary: every label declared, every relationship non-deprecated AND
+  with a live writer) is a check rather than an obstacle — READS_FROM/WRITES_TO from
+  lineage.hops.v1, CONTAINS_JOB and the seal_app_ref BELONGS_TO_APPLICATION -> :Port <-
+  HAS_PORT pattern from explorer.folder-applications.v1, and WAS_ATTRIBUTED_TO
+  {role: developed_by} (the R20 correction that replaced a DEVELOPS edge which was never
+  registered and made every team read 0).
+
+  THE REPO LEG IS ABSENT BY CONSTRUCTION, and the surface says so DIFFERENTLY from a
+  missing one. There is no :CodeRepo label in node_classifications at all — the code graph
+  declares :CodeModule and :CodeDirectory, a different subject — so the spec does not ask,
+  and the report renders "not modelled: no :CodeRepo label exists in the ontology, so no
+  load would supply this". A missing application or dev team renders "not found via
+  ask.file-search.v1" instead. Collapsing the two would tell a reader a load might fix
+  something that needs an ontology gate. Guarded: the spec must not name a repo.
+
+  ESCALATION IS THE POINT, so both processes render: the demo answer showed two rows for
+  one asset (a WRITES_TO process with its application, folder and dev team, and a READS_FROM
+  process with none), which is the captured example's shape — the file-transfer leg fed by
+  an event-based application.
+
+  SOURCE LEGEND: the column -> node-label -> asserting-system table the captured example
+  carries, so a reader can tell which source asserted each row rather than assuming one
+  system knows all of it.
+
+  VERIFIED LIVE (J18): this desktop, Chrome vs Vite :5180 (origin supplied with
+  DRYDOCS_CORS_ORIGINS) + drydocs-api :8007. THE NOT-FOUND PATH RAN AGAINST THE REAL GRAPH
+  and is the half that mattered most: the graph holds ZERO :DataAsset nodes (confirmed by a
+  raw-cypher count — the curated lineage load has not run here), so every term returned 0
+  rows and the surface rendered the named absence. The FOUND path used rows injected at the
+  API boundary (the O81/O86 technique) and rendered both processes, three "not found via"
+  legs and the not-modelled repo leg. Said plainly: no row of this report has been rendered
+  from real graph data on this machine, because there is none to render.
+
+  GUARD: tests/unit/test_ask_file_search_spec.py pins the property that matters — the spec
+  takes a term AND USES it (a spec that accepted one and ignored it would pass every other
+  check while reproducing the exact defect), the filter is case-insensitive on BOTH sides
+  (one-sided lower-casing turns a real match into a false "not found", the worst answer this
+  surface can give), it returns every leg the report renders, it claims no repo, and it
+  writes nothing. Ledgers: FileReport registered (39/86); TC-ASK-04 seeded and automated
+  (16/39 cases).
+
+  NOT DECIDED HERE, per the item: whether this report also becomes an Ask-agent tool answer
+  (the Idea-125 named-verbs direction). This renders the report; the agent-tool question
+  stays in the inbox.

@@ -28,7 +28,7 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Fifteen cases are automated out of thirty-eight. The
+# WHAT THIS DOES NOT CLAIM. Sixteen cases are automated out of thirty-nine. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
@@ -712,3 +712,22 @@ suites:
           persona; an in-place persona swap (?as=) re-derives the list on
           render, and a sign-out/sign-in remount re-reads storage.
         source: "O64 verification 2026-08-21 — laptop, headless-Chrome harness vs Vite :5199: otherPersonaSeesNothing / ownerPersonaSeesTheirTurn true, jdoe4821-empty screenshot in the close"
+
+      - id: TC-ASK-04
+        description: The file report says "not found via the spec", and says something DIFFERENT for a leg nobody has modelled
+        steps:
+          - Open /ask and expand "File / table report".
+          - Search a term the graph cannot answer.
+          - Search a term that returns rows where some legs are missing.
+        expect: >
+          A term with no match renders "No asset matches <term>" naming
+          ask.file-search.v1, because the spec filtered SERVER-SIDE - so an empty
+          answer is a real "not found" rather than a slice of a full listing. A
+          row missing an application, folder or dev team renders "not found via
+          ask.file-search.v1" on that leg: the graph could hold it and does not.
+          The CODE REPOSITORY leg reads differently on purpose - "not modelled, no
+          :CodeRepo label exists in the ontology" - because no load would supply
+          it and saying "not found" would suggest one might. Minting that label is
+          a gate decision, not a UI one.
+        source: "O62 build 2026-08-31 - desktop, Chrome vs Vite :5180 (origin supplied with DRYDOCS_CORS_ORIGINS) + drydocs-api :8007. The NOT-FOUND path ran against the live graph (0 :DataAsset nodes - the curated lineage load has not run here, confirmed by raw-cypher count); the FOUND path used rows injected at the API boundary, and rendered both processes with 3 not-found legs and the not-modelled repo leg."
+        automated_by: tests/unit/test_ask_file_search_spec.py
