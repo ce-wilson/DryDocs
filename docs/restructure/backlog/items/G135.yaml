@@ -1,0 +1,19 @@
+id: G135
+epic: component-topology
+title: The dpl registry extractor stages a wrong contract as a clean run, because every counter it
+  keeps is a skip counter and a record with no seal field takes the enclosing folder's name
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/dpl_registry.py
+- tests/unit/test_lineage_dpl_registry.py
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-31.

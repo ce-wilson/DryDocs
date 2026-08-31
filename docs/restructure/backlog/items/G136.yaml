@@ -1,0 +1,21 @@
+id: G136
+epic: component-topology
+title: The MAC flow payload's zone is a storage technology rather than the medallion layer, so a
+  dataset identified by GUID alone turns a raw-to-trusted hop into a self-loop
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/dpl_mac.py
+- config/taxonomy/medallion-stages.yaml
+- config/gate-prompts/rua-load-shapes.yaml
+- docs/decisions/0001-ontology-base-scope.md
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-31.
