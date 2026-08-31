@@ -147,3 +147,17 @@ notes: |
 
   The entry's own scope fence is kept - the policy question about how two live sessions share one
   working tree stays the user's and is not folded in here.
+
+  AMENDED AGAIN 2026-08-30, from the second real use. The G132/G133 mint pushed a stub with
+  final titles - the first amendment's rule, followed correctly - and CI went RED anyway, on
+  test_committed_roadmap_page_matches_its_sources rather than the collision guard. The cause is
+  the same shape as the first: the mint rule is precise about CLAIMING and silent about a guard
+  consequence. The Y5 tolerance that lets a claim ship no render covers STATUS-ONLY drift, and a
+  new item is beyond it, so the trunk is red for the whole window between the stub push and the
+  body push - by construction, on every mint, not by anyone's mistake. The rule now says the stub
+  commit carries the refreshed board and roadmap, in CLAUDE.md and the skill's id row. NOTHING
+  ABOUT THE GUARD CHANGES: it is right that a new item stales the page, its message already names
+  the fix, and widening it to tolerate stub-shaped items would trade a real staleness check for a
+  convenience. Recorded rather than silently patched for the reason the first amendment gives -
+  this class of gap only surfaces from the mechanism being used, and twice now it has surfaced on
+  the very next use.

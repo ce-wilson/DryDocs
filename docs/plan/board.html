@@ -4785,6 +4785,20 @@ validator is the surface that already reads the backlog.
 
 The entry&#x27;s own scope fence is kept - the policy question about how two live sessions share one
 working tree stays the user&#x27;s and is not folded in here.
+
+AMENDED AGAIN 2026-08-30, from the second real use. The G132/G133 mint pushed a stub with
+final titles - the first amendment&#x27;s rule, followed correctly - and CI went RED anyway, on
+test_committed_roadmap_page_matches_its_sources rather than the collision guard. The cause is
+the same shape as the first: the mint rule is precise about CLAIMING and silent about a guard
+consequence. The Y5 tolerance that lets a claim ship no render covers STATUS-ONLY drift, and a
+new item is beyond it, so the trunk is red for the whole window between the stub push and the
+body push - by construction, on every mint, not by anyone&#x27;s mistake. The rule now says the stub
+commit carries the refreshed board and roadmap, in CLAUDE.md and the skill&#x27;s id row. NOTHING
+ABOUT THE GUARD CHANGES: it is right that a new item stales the page, its message already names
+the fix, and widening it to tolerate stub-shaped items would trade a real staleness check for a
+convenience. Recorded rather than silently patched for the reason the first amendment gives -
+this class of gap only surfaces from the mechanism being used, and twice now it has surfaced on
+the very next use.
 </p></div></div>
 <div class="card" id="card-J1" data-id="J1" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j1 sweep the iteration fragments (naming drift, superseded banners)" tabindex="0"><div class="card-head"><span class="card-id">J1</span><span class="card-title">Sweep the iteration fragments (naming drift, superseded banners)</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> DryDocs1 -&gt; DryDocs in CLAUDE.md:1 and 01-project-plan.md (title, repo URL; merged-branch line removed); drydocs1 -&gt; drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README (existing drydocs1-*.json snapshot files left untouched as history); the stray &quot;@claude - &lt;Aura console URL&gt;&quot; line removed from README.md:1; a &quot;Superseded by the Phase 0-5 restructure plan&quot; banner on docs/reviews/drydocs-consolidated-plan.md and the persona/SDLC review docs; a README in SDLC-Docs/ marking it a frozen reference corpus that fed the ADRs. Tests stay green.
 </p><p class="notes"><strong>Notes:</strong> Done 2026-07-01 (haiku agent per the model matrix; opus review pass). 19 files: renames (CLAUDE.md, 01-project-plan.md incl. URL + merged-branch line, snapshot.ps1 + README + viewer.html, reference/REGISTRY.yaml — a residual the sweep caught beyond the checklist), README.md stray console-URL line removed, 11 docs/reviews/ superseded banners, SDLC-Docs/README.md created (frozen corpus). Residuals justified: historical drydocs1-*.json snapshots, the drydocs1-live-neo4j memory name, docs/history/. m1/m3-verify renames stay parked for the v1.0 window.
