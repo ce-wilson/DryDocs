@@ -128,7 +128,7 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # absent slot renders "not supplied", an uncomputed census renders "not
     # profiled" -- rather than that a thing appears. Those are the claims a
     # reader would otherwise have to take on trust.
-    assert (len(seeded), len(suites)) == (11, 13), (
+    assert (len(seeded), len(suites)) == (12, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )
@@ -155,7 +155,7 @@ def test_automated_cases_name_a_file_that_exists() -> None:
 
 
 def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
-    """Twelve of thirty-four. The point is that the number is SMALL and visible.
+    """Fifteen of thirty-eight. The point is that the number is SMALL and visible.
 
     O80 bought the capability and proved it on cases that had already escaped
     into main; it did not backfill coverage, and this pin is what stops a later
@@ -180,8 +180,8 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        12,
-        34,
+        15,
+        38,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 
@@ -209,8 +209,12 @@ def test_which_cases_should_i_run_after_changing_a_component() -> None:
     assert _cases_for_component("LoadsTimeline") == ["TC-LOADS-01", "TC-LOADS-02"]
     assert _cases_for_component("LoadsRoute") == ["TC-LOADS-01", "TC-LOADS-02"]
     # a module whose suite is declared but unseeded resolves to nothing YET —
-    # correctly empty rather than falsely reassuring
-    assert _cases_for_component("LineageGraphPane") == []
+    # correctly empty rather than falsely reassuring. The example moved from
+    # LineageGraphPane to HallucinationSpotlight at O60 (2026-08-31), when
+    # TS-LINEAGE was seeded: an "unseeded" example has to name a suite that is
+    # ACTUALLY unseeded, or the assertion stops testing the property and starts
+    # testing a stale fact. TS-UNDERHOOD is the last one left.
+    assert _cases_for_component("HallucinationSpotlight") == []
 
 
 def test_shared_components_resolve_to_nothing_and_that_is_honest() -> None:

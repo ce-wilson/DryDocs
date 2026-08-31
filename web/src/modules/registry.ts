@@ -109,7 +109,10 @@ export const MODULES: readonly ModuleDef[] = [
     // G30 ruling 2026-07-26: curated lineage lands in `drydocs` (ADR 0002 D1/D2).
     // Was 'ddlineage' — written by nothing, retired 2026-08-04 (ADR 0002 X1).
     backsOnto: 'drydocs',
-    tabs: ['Hops', 'Data assets', 'Schema definition', 'Row-level preview'],
+    // O60 added 'Swimlanes': job -> pipeline -> asset across lanes, with the
+    // lane BASIS as a parameter (?lanes=source-kind | ?lanes=layer) rather than
+    // a constant, so a further basis is an argument and not a re-layout.
+    tabs: ['Hops', 'Data assets', 'Schema definition', 'Row-level preview', 'Swimlanes'],
     phase: 1,
   },
   {

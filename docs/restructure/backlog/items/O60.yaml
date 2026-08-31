@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/lineage/
@@ -41,3 +41,65 @@ notes: |
   Three things were verified before this amendment rather than assumed. web/src/generated/load-map.json carries systems[].layer today (row keys: id, name, layer, classification, taxonomy_captures), so the layer basis needs no new generator work. The layer distribution is technology 9, data 5, business 2, human 0 over 16 systems -- so the human lane is empty and the skew is real. And the word "human" is already claimed by a second axis: the relationship vocabulary registered a `human` DOMAIN at gate vocabulary-domains-and-id-policy §A3 (2026-08-12), whose header explicitly rules it is NOT the BDAT layer. That collision is why acceptance (b) exists; without it the view would look right and mean something else.
 
   The carrier-versus-subject caveat in (c) is the UI half of Idea-216: `layer` sits on the SYSTEM row, so it records where an extract came from rather than what it is about, and `human` is unreachable while that holds because a system is a place and no place is a person. This item deliberately does NOT depend_on that ruling -- a view that renders the defect is how the defect gets ruled, and blocking the view on the ruling would invert that. When 216 lands, the change is inside the one lane resolver.
+
+  DONE 2026-08-31 (desktop). /lineage gains a "Swimlanes" tab.
+  Filename recorded, as the item asked: web/src/lineage/SwimlaneView.tsx.
+  Deep-link parameter recorded: ?lanes=source-kind | ?lanes=layer.
+
+  THE DASHED/PLANNED CLAUSE RESOLVED THE OTHER WAY, and this is the item's most
+  useful outcome. The acceptance says READS/WRITES render dashed and marked planned
+  "for as long as m3_reads_from / m3_writes_to carry status: planned". THEY DO NOT: both
+  are `deprecated`, superseded by `scheduler_reads_from` and `scheduler_writes_to`, and
+  BOTH SUCCESSORS ARE ACTIVE. So the condition is false, the edges are backed, and drawing
+  them dashed would UNDERSTATE a confirmed ruling. They render solid, the surface names the
+  two entries and their status so a reader can check the claim, and it says the wireframe's
+  own WF-DFL-14/15 "(planned)" labels are stale for the same reason.
+  CREDIT WHERE IT IS DUE: the item wrote the rule as a CONDITION ON THE DATA rather than a
+  flat instruction, which is exactly what let the build resolve it correctly instead of
+  following stale wording. That is the pattern Idea-230 is asking for, already working.
+  Guarded by tests/unit/test_lineage_edge_backing.py, which fails if the vocabulary ever
+  changes its mind — and also fails if m3_* are revived, because that would reopen the
+  acceptance's original condition rather than silently leave the view wrong.
+
+  LANE BASIS IS A PARAMETER, per the amendment. web/src/lineage/laneBasis.ts holds ONE
+  resolver; the view asks it for lanes and items and NEVER branches on the basis id, so a
+  third basis is a resolver case and not a re-layout. ?lanes= round-trips both ways
+  (deep link selects on load, picker writes back), and an unrecognised value falls back to
+  the default rather than rendering nothing.
+
+  THE BDAT BASIS, all three clauses:
+  (a) The human lane renders DECLARED AND EMPTY with a note saying so — live counts are
+      business 2 / data 5 / technology 9 / human 0 of 16. Hiding it would destroy the only
+      evidence a reader gets. A system with NO declared layer would land in its own
+      `undeclared` lane rather than being folded into technology, and any value the data
+      carries that the declared set does not name is surfaced too.
+  (b) The lane label states WHICH AXIS it means, and names what it is NOT: the BDAT layer
+      on source-registry SYSTEM rows, NOT the vocabulary's `human` DOMAIN (its own header
+      rules that a file/loader partition), NOT rdfs:domain. Three axes in this repo use
+      these words and the view must not merge them.
+  (c) The surface says a layer lane groups by CARRIER, not subject, while `layer` is a
+      SYSTEM field — which is why the two People & Org datasets sit in different lanes.
+      Idea-216 rules on moving or deriving it; this does not wait, because making the skew
+      visible is the value.
+
+  ALL SEVENTEEN WF-DFL KEYS RENDER — toolbar (01), the three lanes (02-04), six nodes
+  (05-10), six edges (11-16) and the mode tag (17) — so SME feedback written against the
+  wireframe re-attaches to a component that exists.
+
+  OUT OF SCOPE HELD: the job -> pipeline -> asset graph is NOT laned by BDAT layer. That
+  needs an ontology-node-class -> layer mapping declared nowhere, and minting one is an
+  ontology decision for the RELATIONSHIP_GUIDE plus the HITL gate, never a UI item. The
+  resolver is shaped so it becomes a third basis when it exists.
+
+  VERIFIED LIVE (J18): this desktop, Chrome vs Vite :5179 (origin supplied with
+  DRYDOCS_CORS_ORIGINS) + drydocs-api :8006. ?lanes=layer loaded directly and rendered the
+  four BDAT lanes with the real registry counts; the picker round-tripped to
+  ?lanes=source-kind; all 17 keys collected from the page; both themes checked by computed
+  style. SYNTHESIZED series for the source-kind basis; the BDAT basis renders REAL registry
+  systems from the generated load-map, which is stated on the surface.
+
+  LEDGERS: SwimlaneView registered (38/85); TS-LINEAGE seeded with 4 cases, 3 automated
+  (12/13 suites, 15/38 cases). One knock-on worth noting: test_ui_tests_ledger used
+  LineageGraphPane as its example of "a suite declared but unseeded", which stopped being
+  true here — moved to HallucinationSpotlight (TS-UNDERHOOD is the last unseeded suite), so
+  the assertion keeps testing the property instead of a stale fact.

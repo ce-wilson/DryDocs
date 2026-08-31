@@ -180,8 +180,11 @@ components:
   - { id: NodeInspector,           area: explorer,     path: explorer/NodeInspector.tsx,                  module: explorer,   module_evidence: directory }
   - { id: SpecGrid,                area: explorer,     path: explorer/SpecGrid.tsx,                       module: explorer,   module_evidence: directory }
 
-  # --- lineage (1) ---
+  # --- lineage (2) ---
   - { id: LineageGraphPane,        area: lineage,      path: lineage/LineageGraphPane.tsx,                module: lineage,    module_evidence: directory }
+  # O60: the swimlane view. Its lane-assignment resolver (laneBasis.ts) and
+  # demo data are .ts and stay outside this ledger's .tsx scope caveat.
+  - { id: SwimlaneView,            area: lineage,      path: lineage/SwimlaneView.tsx,                    module: lineage,    module_evidence: directory }
 
   # --- loads (1) ---
   - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx,                     module: loads,      module_evidence: directory }

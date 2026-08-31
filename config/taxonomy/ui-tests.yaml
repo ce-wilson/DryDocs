@@ -28,7 +28,7 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Twelve cases are automated out of thirty-four. The
+# WHAT THIS DOES NOT CLAIM. Fifteen cases are automated out of thirty-eight. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
@@ -45,7 +45,7 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 11 of 13 areas seeded (3 of 12 when this file
+# COVERAGE IS PARTIAL AND SAYS SO: 12 of 13 areas seeded (3 of 12 when this file
 # was written). The rest are declared with `cases: []` so the gap is a visible
 # number rather than an absence, and the guard pins it.
 # =============================================================================
@@ -425,7 +425,68 @@ suites:
           worse claim than "we could not place this".
         source: "Z5 defect, found by rendering the tab 2026-08-27; locked in by unit tests at O80 2026-08-31"
         automated_by: web/src/components/map/resolve.test.ts
-  - { id: TS-LINEAGE,     module: lineage,     description: "Lineage source->target DAG canvas.", cases: [] }
+  - id: TS-LINEAGE
+    module: lineage
+    description: >
+      Source->target DAG, hops and asset frames, plus the O60 swimlane - the
+      same things laned by a CHOSEN basis. Seeded at O60 because that view makes
+      three claims a reader has to be able to check: which axis a lane means,
+      that an empty lane is a finding, and what backs an edge it draws solid.
+    cases:
+      - id: TC-LINEAGE-01
+        description: The lane basis is a parameter, and the URL carries it both ways
+        steps:
+          - Open /lineage?lanes=layer directly and select the Swimlanes tab.
+          - Switch basis with the picker and read the address bar.
+        expect: >
+          The deep link selects the basis on load, and the picker writes it back
+          to ?lanes= so the view is shareable in either basis. An unrecognised
+          value falls back to the default rather than rendering nothing - a bad
+          link should still show the page. The layout never branches on the basis
+          id: it renders whatever the single resolver returns, which is what makes
+          a third basis an argument rather than a re-layout.
+        source: "O60 build 2026-08-31 - desktop, Chrome vs Vite :5179 (origin supplied with DRYDOCS_CORS_ORIGINS) + drydocs-api :8006; ?lanes=layer loaded directly, picker round-tripped to ?lanes=source-kind"
+        automated_by: web/src/lineage/laneBasis.test.ts
+      - id: TC-LINEAGE-02
+        description: The human BDAT lane renders DECLARED AND EMPTY, and the axis is stated
+        steps:
+          - Open the Swimlanes tab with ?lanes=layer.
+          - Read the human lane and the axis line above the lanes.
+        expect: >
+          The human lane renders with a note saying it is declared and empty -
+          0 of 16 registry systems carry it, and hiding the lane would destroy
+          the only evidence a reader gets. The axis line says WHICH sense of
+          "layer" is meant: the BDAT layer on source-registry SYSTEM rows, NOT
+          the vocabulary's `human` domain (a file/loader partition) and NOT
+          rdfs:domain. A caveat states that a layer lane groups by CARRIER, not
+          subject, while `layer` is a system field.
+        source: "O60 build 2026-08-31 - desktop; live counts business 2 / data 5 / technology 9 / human 0, axis line and carrier caveat both rendered, both themes"
+        automated_by: web/src/lineage/laneBasis.test.ts
+      - id: TC-LINEAGE-03
+        description: READS/WRITES render SOLID, because the vocabulary entries backing them are active
+        steps:
+          - Open the Swimlanes tab in the source-kind basis.
+          - Read the edge footer beneath the lanes.
+        expect: >
+          The two data edges are solid and the footer names what backs them -
+          scheduler_reads_from and scheduler_writes_to, both ACTIVE. O60's
+          acceptance made dashed/planned conditional on m3_reads_from /
+          m3_writes_to carrying status planned; they carry DEPRECATED and their
+          successors are active, so the condition is false and dashing them would
+          understate a confirmed ruling. The wireframe's own WF-DFL-14/15 labels
+          still read "(planned)" and the footer says they are stale.
+        source: "O60 build 2026-08-31 - vocabulary read at build: m3_* deprecated, scheduler_* active; guarded by tests/unit/test_lineage_edge_backing.py"
+        automated_by: tests/unit/test_lineage_edge_backing.py
+      - id: TC-LINEAGE-04
+        description: Every wireframe region key renders, so SME feedback re-attaches
+        steps:
+          - Open the Swimlanes tab and collect every WF-DFL key on the page across both bases.
+        expect: >
+          All seventeen WF-DFL-01..17 keys appear: the toolbar, the three lanes,
+          the six nodes, the six edges and the mode tag. Feedback written against
+          the wireframe (the FB-2026-08-13-01 convention) then re-attaches to a
+          component that exists rather than to a picture that does not.
+        source: "O60 build 2026-08-31 - desktop; all 17 keys collected from the rendered page"
   - id: TS-RUNBOOKS
     module: runbooks
     description: >

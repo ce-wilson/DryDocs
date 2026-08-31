@@ -6,6 +6,7 @@ import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
 import LineageGraphPane from '../lineage/LineageGraphPane'
+import SwimlaneView from '../lineage/SwimlaneView'
 import {
   ASSETS_FRAME,
   HOPS_FRAME,
@@ -43,6 +44,9 @@ export default function LineageRoute({ persona }: { persona: Persona }) {
       selection={selection?.label}
       graphPane={<LineageGraphPane selection={selection} onSelect={setSelection} />}
       tabContent={{
+        // O60: SYNTHESIZED series for the source-kind basis; the BDAT basis
+        // renders REAL registry systems from the generated load-map.
+        Swimlanes: <SwimlaneView />,
         Hops: (
           <SpecGrid
             access={access}
