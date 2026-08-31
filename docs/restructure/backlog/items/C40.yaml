@@ -11,7 +11,80 @@ priority: p2
 status: todo
 depends_on:
 - C39
+inputs:
+- config/gate-log.md
+- config/gate-prompts/
+- config/audit-fields.yaml
+- docs/restructure/03-hitl-sme-flow.md
+- web/src/routes/GatesRoute.tsx
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  REVISIT BECOMES A FIRST-CLASS OUTCOME, distinct from amendment. A revisit is LOOKING AGAIN.
+  An amendment is CHANGING. Today only the second has a shape, so new evidence against an old
+  ruling has nowhere to land except a change nobody wants to make - and the ruling quietly
+  keeps standing on a premise that has moved.
+
+  (a) THE THREE OUTCOMES, AND `STANDS` IS THE ONE THAT MATTERS. A revisit closes as STANDS
+  (looked again, ruling holds, and the NEW evidence is recorded beside it), AMENDED (the ruling
+  changes, in the gate's own terms), or SUPERSEDED (a later gate replaces it). If STANDS is not
+  recordable, nobody raises a revisit, because raising one that changes nothing looks like
+  wasted effort and reads like an attack on a signed decision. Making STANDS a real outcome is
+  what makes the axis safe to use.
+
+  (b) RAISING A REVISIT DOES NOT WEAKEN THE RULING. State it in the mechanism, not only in the
+  prose: a gate with an open revisit is still SIGNED, still binding, still the thing loaders and
+  guards obey. Nothing unflips, nothing reverts to planned, no status moves on the strength of a
+  question. The ruling changes when a revisit closes AMENDED and not one moment earlier.
+
+  (c) A REVISIT CARRIES ITS TRIGGER, and the trigger is evidence rather than doubt. What was
+  learned, where it is written down, and which clause it bears on. "This feels old" is not a
+  trigger; "the research at <artifact> reports X, which clause B2 assumed was Y" is. The
+  producer already writes exactly this shape in prose - config/audit-fields.yaml carries
+  REVISIT TRIGGER paragraphs naming a tracker and, since 2026-08-31, a fired trigger naming its
+  session log. Reuse that shape rather than inventing one; the job is to give it a home on gates.
+
+  (d) IT IS RECORDED WHERE RULINGS ARE RECORDED. config/gate-log.md is the source of record, and
+  a revisit is a log entry beside the sign-off it revisits - not a rewrite of it. The log already
+  has more than one entry kind (RECORD, PARTIAL RULING), so a REVISIT kind is consistent with how
+  the file already works. The original sign-off text is never edited: the N13 rule that sign-offs
+  never edit the prompt applies with equal force to revisits never editing the ruling.
+
+  (e) THE SURFACE SHOWS AGE AND OPEN REVISITS. A signed gate with an open revisit must be
+  visibly different from a plain signed gate, or the revisit is invisible and the axis is
+  decorative. Together with C39 clause (f), which names the date shown: age plus open-revisit is
+  the pair that lets a reader scan for rulings worth a second look. This item does NOT propose an
+  expiry - no ruling goes stale on a timer, because most of them do not.
+
+  (f) THE BACKLOG OF REVISITS THIS ALREADY HAS. Seed the axis with the cases in hand rather than
+  shipping an empty mechanism: rua-load-shapes section G1 (dataset identity - the G136 rider is a
+  revisit in everything but name), and the audit-envelope-phase4 dpl entries whose trigger fired
+  on 2026-08-31. Each is recorded with its trigger and left OPEN; this item rules none of them.
+
+  (g) NAMING IS THE DELIVERABLE, NOT A DETAIL. `revisit` is the SME's word, chosen over `amend`
+  deliberately (2026-08-31): amendment presumes the outcome, revisit does not. Whatever the field
+  is called, the vocabulary must keep the two apart everywhere they appear - log entry kind,
+  prompt field, surface label - because collapsing them is how "let us look at this again" turns
+  into "let us change this", which is the thing that stops people looking.
 notes: |
-  Minted 2026-08-31.
+  Minted 2026-08-31 on SME direction, from the observation that a run of mind-map research
+  sessions has produced findings that bear on rulings signed before the research existed. The
+  need is not to change those rulings. It is to be able to go back and read them in a new light,
+  and to record that the reading happened.
+
+  THE PRODUCER ALREADY DOES THIS, INFORMALLY AND ONLY ON ONE LEDGER. config/audit-fields.yaml
+  entries carry REVISIT TRIGGER prose naming what would make the entry re-gatable, and on
+  2026-08-31 one of them recorded a trigger FIRING while explicitly holding its status. That is
+  the whole mechanism, in prose, on the wrong ledger - it lives on audit entries and not on the
+  gates whose rulings actually bind. This item moves the pattern to where it belongs.
+
+  WHY IT DEPENDS ON C39. C39 makes a gate's session state a declared field with a guard behind
+  it. A revisit is a second state on the same object, and adding it to an inference rather than
+  to a field would produce the same class of invisible work one layer up.
+
+  THE FAILURE MODE TO DESIGN AGAINST is not a ruling that should have changed and did not. It is
+  a revisit nobody raises. Every clause above is aimed at that: STANDS is recordable (a), raising
+  costs the ruling nothing (b), the bar is evidence rather than seniority (c), and the surface
+  shows the raised ones (e). A revisit axis that feels like a challenge will not be used, and an
+  unused axis is worse than none because it looks like coverage.
+
+  EXPLICITLY NOT HERE: any ruling. This item builds the shape and seeds it with the cases already
+  in hand; each of those closes at its own session, in its own gate's terms.

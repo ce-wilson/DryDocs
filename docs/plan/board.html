@@ -270,11 +270,136 @@ the path CLAUDE.md prescribes for a new relationship type.
 Agent ontology-mapper and module ontology per the layer table; model fable because edge meaning
 is the category the matrix reserves it for.
 </p></div></div>
-<div class="card ready" id="card-C39" data-id="C39" data-module="config" data-phase="5" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c39 the gate session queue is inferred from log prose, so a gate drafted under a record entry reads as signed off and disappears from the list of sessions still owed" tabindex="0"><div class="card-head"><span class="card-id">C39</span><span class="card-title">The gate session queue is inferred from log prose, so a gate drafted under a RECORD entry reads as signed off and disappears from the list of sessions still owed</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P5</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (id minted per I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31.
+<div class="card ready" id="card-C39" data-id="C39" data-module="config" data-phase="5" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c39 the gate session queue is inferred from log prose, so a gate drafted under a record entry reads as signed off and disappears from the list of sessions still owed" tabindex="0"><div class="card-head"><span class="card-id">C39</span><span class="card-title">The gate session queue is inferred from log prose, so a gate drafted under a RECORD entry reads as signed off and disappears from the list of sessions still owed</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P5</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The answer to &quot;which gate sessions are still owed&quot; becomes a FIELD READ. Today it is an
+inference over log prose, and the inference is wrong in a direction that hides work.
+
+(a) THE DEFECT, MEASURED FIRST so the fix is aimed at it. gates.json classifies a prompt by
+the LOG ENTRIES that cite it, not by the absence of a sign-off. A gate whose drafting was
+logged as a `RECORD:` entry therefore classifies `recorded` - and `recorded` is not in
+GatesRoute&#x27;s OPEN_STATUSES, so it renders under &quot;Signed off&quot;. Five prompts say
+&quot;DRAFTED, unsigned&quot; or &quot;still UNSIGNED&quot; in the log entry&#x27;s own title and are invisible
+anyway: source-connection-and-run-identity, standard-identity-and-carrier,
+tech-partner-attach-level, rua-bundle-data-profile, email-dl-contact-point. Measured
+2026-08-31 at main; re-measure at the build, because the number is the point.
+
+(b) THE PROMPT FILE DECLARES ITS OWN STATE. A `status:` field on the gate-prompt yaml,
+closed vocabulary, authored by the person who drafts or signs it - not derived. `awaiting-sme`
+is the queue; the others exist so the field can never be a lie of omission. Minimum set to
+design against: awaiting-sme, signed, deferred, superseded. The field is REQUIRED, like every
+other field on a governed ledger, so a new prompt cannot exist without declaring where it sits.
+
+(c) THE GUARD IS THE POINT, not the field. A test asserts the declaration and the log AGREE:
+a prompt claiming `signed` has a sign-off entry in config/gate-log.md, and a prompt with a
+sign-off entry does not claim `awaiting-sme`. Disagreement fails with both readings printed.
+Without this the field is just a second place to be stale - which is the exact failure this
+item is fixing one level up.
+
+(d) NOTHING RE-CLASSIFIES A RULING. This item adds a field describing a gate&#x27;s SESSION state;
+it does not touch what any gate decided, does not edit config/gate-log.md, and does not move
+an entry between statuses. Filling the field is transcription from the log. Where the log is
+genuinely ambiguous - product-cabinet-attribution is recorded-only but its entry flips a map
+entry to confirmed - the field records the ambiguity and the row is raised, never guessed.
+
+(e) THE SURFACE STOPS BURYING UNSIGNED WORK. GatesRoute buckets by the declared field rather
+than by OPEN_STATUSES, so nothing unsigned renders under &quot;Signed off&quot;. A partially-ruled gate
+is the case that proves the bucketing: fid-identity-and-scope has closed sections and an
+unsigned one, and it currently reads as done.
+
+(f) THE DATE SHOWN IS THE ONE A READER NEEDS. The table already shows a date; make explicit
+WHICH date it is (the log entry&#x27;s) and show the SIGN-OFF date on a signed row, because that is
+the number that says how old a ruling is. Age is the input to C40 - you cannot decide whether
+a ruling deserves a second look without seeing when it was made.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31. Found while re-deriving the SME gate session list from the repo rather
+than from a hand-kept ledger. The ledger had gone stale - it carries a correction reading
+&quot;this entry&#x27;s prepped/awaiting state was STALE&quot; about one of its own rows - which is why
+the queue should be derived. The derivation then turned out to under-report, which is why
+it should be declared instead.
+
+WHY A FIELD BEATS A BETTER INFERENCE. The obvious alternative is to teach the generator to
+read RECORD entries more cleverly - look for &quot;unsigned&quot; in the title, count sections. That
+is a parser for prose whose shape nobody controls, and it fails silently the first time
+someone words an entry differently. A gate&#x27;s session state is a fact its author knows at
+the moment of writing; asking them to type it is cheaper than inferring it forever, and the
+guard in (c) is what keeps the typed value honest.
+
+THE COUNT IS THE ARGUMENT. Seventeen gates render as open. The real number is at least
+twenty-two. A queue that under-reports by five does not read as broken - it reads as a
+shorter list, which is the failure mode nobody investigates.
+
+RELATED, DELIBERATELY SEPARATE: C40 is the revisit axis - what happens to a ruling that is
+already signed and might deserve a second look. This item is only about which sessions have
+never been run. Clause (f) is the seam between them: C40 needs the age of a ruling to be
+visible, and this item is where the date gets named.
 </p></div></div>
-<div class="card" id="card-C40" data-id="C40" data-module="config" data-phase="5" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c40 a signed ruling has no revisit axis, so new research can only amend it or leave it alone, and a revisit that ends in stands is the outcome with nowhere to be recorded" tabindex="0"><div class="card-head"><span class="card-id">C40</span><span class="card-title">A signed ruling has no revisit axis, so new research can only amend it or leave it alone, and a revisit that ends in STANDS is the outcome with nowhere to be recorded</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P5</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C39" data-target="card-C39">C39</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (id minted per I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31.
+<div class="card" id="card-C40" data-id="C40" data-module="config" data-phase="5" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c40 a signed ruling has no revisit axis, so new research can only amend it or leave it alone, and a revisit that ends in stands is the outcome with nowhere to be recorded" tabindex="0"><div class="card-head"><span class="card-id">C40</span><span class="card-title">A signed ruling has no revisit axis, so new research can only amend it or leave it alone, and a revisit that ends in STANDS is the outcome with nowhere to be recorded</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P5</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C39" data-target="card-C39">C39</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> REVISIT BECOMES A FIRST-CLASS OUTCOME, distinct from amendment. A revisit is LOOKING AGAIN.
+An amendment is CHANGING. Today only the second has a shape, so new evidence against an old
+ruling has nowhere to land except a change nobody wants to make - and the ruling quietly
+keeps standing on a premise that has moved.
+
+(a) THE THREE OUTCOMES, AND `STANDS` IS THE ONE THAT MATTERS. A revisit closes as STANDS
+(looked again, ruling holds, and the NEW evidence is recorded beside it), AMENDED (the ruling
+changes, in the gate&#x27;s own terms), or SUPERSEDED (a later gate replaces it). If STANDS is not
+recordable, nobody raises a revisit, because raising one that changes nothing looks like
+wasted effort and reads like an attack on a signed decision. Making STANDS a real outcome is
+what makes the axis safe to use.
+
+(b) RAISING A REVISIT DOES NOT WEAKEN THE RULING. State it in the mechanism, not only in the
+prose: a gate with an open revisit is still SIGNED, still binding, still the thing loaders and
+guards obey. Nothing unflips, nothing reverts to planned, no status moves on the strength of a
+question. The ruling changes when a revisit closes AMENDED and not one moment earlier.
+
+(c) A REVISIT CARRIES ITS TRIGGER, and the trigger is evidence rather than doubt. What was
+learned, where it is written down, and which clause it bears on. &quot;This feels old&quot; is not a
+trigger; &quot;the research at &lt;artifact&gt; reports X, which clause B2 assumed was Y&quot; is. The
+producer already writes exactly this shape in prose - config/audit-fields.yaml carries
+REVISIT TRIGGER paragraphs naming a tracker and, since 2026-08-31, a fired trigger naming its
+session log. Reuse that shape rather than inventing one; the job is to give it a home on gates.
+
+(d) IT IS RECORDED WHERE RULINGS ARE RECORDED. config/gate-log.md is the source of record, and
+a revisit is a log entry beside the sign-off it revisits - not a rewrite of it. The log already
+has more than one entry kind (RECORD, PARTIAL RULING), so a REVISIT kind is consistent with how
+the file already works. The original sign-off text is never edited: the N13 rule that sign-offs
+never edit the prompt applies with equal force to revisits never editing the ruling.
+
+(e) THE SURFACE SHOWS AGE AND OPEN REVISITS. A signed gate with an open revisit must be
+visibly different from a plain signed gate, or the revisit is invisible and the axis is
+decorative. Together with C39 clause (f), which names the date shown: age plus open-revisit is
+the pair that lets a reader scan for rulings worth a second look. This item does NOT propose an
+expiry - no ruling goes stale on a timer, because most of them do not.
+
+(f) THE BACKLOG OF REVISITS THIS ALREADY HAS. Seed the axis with the cases in hand rather than
+shipping an empty mechanism: rua-load-shapes section G1 (dataset identity - the G136 rider is a
+revisit in everything but name), and the audit-envelope-phase4 dpl entries whose trigger fired
+on 2026-08-31. Each is recorded with its trigger and left OPEN; this item rules none of them.
+
+(g) NAMING IS THE DELIVERABLE, NOT A DETAIL. `revisit` is the SME&#x27;s word, chosen over `amend`
+deliberately (2026-08-31): amendment presumes the outcome, revisit does not. Whatever the field
+is called, the vocabulary must keep the two apart everywhere they appear - log entry kind,
+prompt field, surface label - because collapsing them is how &quot;let us look at this again&quot; turns
+into &quot;let us change this&quot;, which is the thing that stops people looking.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 on SME direction, from the observation that a run of mind-map research
+sessions has produced findings that bear on rulings signed before the research existed. The
+need is not to change those rulings. It is to be able to go back and read them in a new light,
+and to record that the reading happened.
+
+THE PRODUCER ALREADY DOES THIS, INFORMALLY AND ONLY ON ONE LEDGER. config/audit-fields.yaml
+entries carry REVISIT TRIGGER prose naming what would make the entry re-gatable, and on
+2026-08-31 one of them recorded a trigger FIRING while explicitly holding its status. That is
+the whole mechanism, in prose, on the wrong ledger - it lives on audit entries and not on the
+gates whose rulings actually bind. This item moves the pattern to where it belongs.
+
+WHY IT DEPENDS ON C39. C39 makes a gate&#x27;s session state a declared field with a guard behind
+it. A revisit is a second state on the same object, and adding it to an inference rather than
+to a field would produce the same class of invisible work one layer up.
+
+THE FAILURE MODE TO DESIGN AGAINST is not a ruling that should have changed and did not. It is
+a revisit nobody raises. Every clause above is aimed at that: STANDS is recordable (a), raising
+costs the ruling nothing (b), the bar is evidence rather than seniority (c), and the surface
+shows the raised ones (e). A revisit axis that feels like a challenge will not be used, and an
+unused axis is worse than none because it looks like coverage.
+
+EXPLICITLY NOT HERE: any ruling. This item builds the shape and seeds it with the cases already
+in hand; each of those closes at its own session, in its own gate&#x27;s terms.
 </p></div></div>
 <div class="card ready" id="card-G100" data-id="G100" data-module="ontology" data-phase="6" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="g100 itsm technician-group gate: ratify the snowrole register (seng / asup) and the servicenow staffing attribution, then build the ootb lookup" tabindex="0"><div class="card-head"><span class="card-id">G100</span><span class="card-title">ITSM technician-group gate: ratify the SnowRole register (SENG / ASUP) and the ServiceNow staffing attribution, then build the OOTB lookup</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The vocabulary half LANDED 2026-08-18 on SME direction (G100 registration commit): :ServiceNowGroup + :SnowRole node classes, itsm_group_qualified_attribution and itsm_attribution_had_role, all status: planned, in a new `itsm` domain. This item is the GATE that ratifies them plus the build behind it. (a) RATIFY THE REGISTER as a closed set on the K5 fixed-scheme precedent: SME direction is developers -&gt; SENG, production support -&gt; ASUP. Rule whether those two are the whole set or a seed, and whether the tier numbering that pairs with them in the estate&#x27;s group naming is modelled at all producer-side (it is deliberately NOT asserted today). (b) CONFIRM THE ONE-BACKBONE RULING: technicians resolve to :Employee on the SID, NOT to a second person class. The company model reaches people through :Worker {sid}; the producer does not mint that. This is what makes &quot;which roles does this person hold across PAT, SEAL and ITSM&quot; one traversal instead of three. (c) THE HAS_AGENT HOP IS REUSED, never twinned (C8 refuses duplicate (from,label,to); schema_graph.py raises). Confirm rather than re-derive. (d) FENCE HOLDS: the group -&gt; application link (SUPPORTED_BY / HAS_SUPPORT_QUEUE / RESOLVED_BY) belongs to the company&#x27;s SIGNED snow-hpsm-queue-to-group gate. This family models WHO STAFFS A GROUP only. Do not re-mint a competing group-&gt;app shape — the trap G98 named when it warned G35 off the same thing. (e) THE BUILD, after sign-off: an OOTB lookup over sys_user_group / sys_user_grmember / sys_user (no custom table), resolving members to :Employee by SID and emitting the attribution triple. Entries flip planned -&gt; active WITH their supplement in the same change (flips-are-follow-ups). Nothing loads before sign-off; SnowRole concepts stay proposed.
 </p><p class="notes"><strong>Notes:</strong> SOURCE NOTE 2026-08-18 (SME), and it changes what clause (e) builds against: the ServiceNow extracts are being re-sourced INTERNALLY from hand-pulled CSV/YAML onto SQL over the Snowflake replica views. So the lookup here targets the SOURCED feed — snow@[db].[schema].&lt;servicenow_table&gt; per the grammar the `snow` system row already rules — not a CSV shape that is being retired underneath it. Name the dataset for the ServiceNow TABLE, never the V_-prefixed view wrapper (same row). Row models do not move; the SQL aliases columns onto existing field names. Full note: Idea-132, which also carries the two NET-NEW areas (per-CI TOM responsibilities, incidents) that are NOT part of this gate and need their own. Raised 2026-08-18 alongside the registration, at the G91 close. FOURTH family on the qualified-attribution pattern (SEAL K4, PAT products K5, PAT dev teams G91, ITSM here) — the shape is settled, so this gate rules the REGISTER and the identity join, not the modelling pattern. The SME&#x27;s stated use case is a support team reaching applications through PEOPLE (members holding an operate-manager role) rather than through a develops edge, which is why the single :Employee backbone is the load-bearing part.
