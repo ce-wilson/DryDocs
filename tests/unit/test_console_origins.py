@@ -46,32 +46,30 @@ LEDGER = REPO / "config" / "taxonomy" / "ui-tests.yaml"
 #: How the ledger writes a browser venue: "... vs Vite :5199 ...".
 VITE_PORT = re.compile(r"Vite\s*:(\d{4,5})")
 
-#: Ports the ledger cites that are deliberately NOT in the built-in allowlist,
-#: each with the mechanism that supplies them instead. An entry here is a
-#: statement that something else declares the origin, not a way to silence the
-#: guard — adding one without naming a real mechanism is the drift this test
-#: exists for.
-#:
-#: THE FRICTION IS THE FEATURE. Every ad-hoc verification port needs a line here
-#: saying how its origin was supplied, which is mildly annoying and is the whole
-#: point: the defect this guards was a port that got DOCUMENTED as a venue while
-#: nothing served it. This map caught its own author within the hour — the O86
-#: verification ran on 5176 and the full suite went red until the mechanism was
-#: written down.
+#: Ports the ledger cites that a CONFIG FILE declares, with the file named. An
+#: entry here is a durable declaration — something in the tree passes this origin
+#: every time it runs — not a way to silence the guard.
 SUPPLIED_ELSEWHERE = {
     "5273": (
         "the O80 end-to-end suite's dedicated port — web/playwright.config.ts passes "
-        "it through DRYDOCS_CORS_ORIGINS so the suite never adopts or collides with "
-        "a dev server somebody is already running"
-    ),
-    "5176": (
-        "the O86 full-page-canvas verification — a one-off port, supplied at run time "
-        "with DRYDOCS_CORS_ORIGINS rather than added to the built-in list, which is "
-        "what that variable is for. Deliberately NOT promoted to the allowlist: a "
-        "built-in entry is a standing statement about what the API serves, and a "
-        "single verification is not one"
+        "it through DRYDOCS_CORS_ORIGINS on every run"
     ),
 }
+
+#: The affirmative a ONE-OFF verification port must carry in its own `source`
+#: line to be accepted.
+#:
+#: WHY THIS EXISTS RATHER THAN MORE MAP ENTRIES. The first version had only the
+#: map, and within one session it collected three near-identical rows for
+#: one-off ports (O86's 5176, O58's 5177) — a sign the shape was wrong, not that
+#: the authors were careless. A one-off port is not a standing fact about what
+#: the API serves, so recording it in a durable map overstates it; what a reader
+#: needs is HOW that particular run supplied the origin, and the place they will
+#: actually look is the `source` line making the claim. So the declaration lives
+#: next to the claim. The phrase is affirmative on purpose: O85's own source line
+#: says "DRYDOCS_CORS_ORIGINS unset" about a port that IS in the allowlist, and a
+#: bare substring match would read that as a declaration.
+SUPPLIED_IN_SOURCE = "supplied with DRYDOCS_CORS_ORIGINS"
 
 
 def _allowlist() -> list[str]:
@@ -92,12 +90,31 @@ def _allowlist() -> list[str]:
 
 
 def _ledger_vite_ports() -> set[str]:
+    """Every documented Vite port that does NOT declare its own supply.
+
+    A source line carrying the affirmative phrase has said how that run got its
+    origin, so it needs nothing from the allowlist and nothing from the map.
+    """
     doc = yaml.safe_load(LEDGER.read_text(encoding="utf-8"))
     ports: set[str] = set()
     for suite in doc["suites"]:
         for case in suite["cases"]:
-            ports |= set(VITE_PORT.findall(case.get("source", "")))
+            source = case.get("source", "")
+            if SUPPLIED_IN_SOURCE in source:
+                continue
+            ports |= set(VITE_PORT.findall(source))
     return ports
+
+
+def _all_ledger_vite_ports() -> set[str]:
+    """Every documented Vite port, declared or not — the finds-nothing check."""
+    doc = yaml.safe_load(LEDGER.read_text(encoding="utf-8"))
+    return {
+        port
+        for suite in doc["suites"]
+        for case in suite["cases"]
+        for port in VITE_PORT.findall(case.get("source", ""))
+    }
 
 
 def test_the_ledger_still_records_its_venues_in_the_readable_shape() -> None:
@@ -106,7 +123,7 @@ def test_the_ledger_still_records_its_venues_in_the_readable_shape() -> None:
     If the ``Vite :<port>`` convention is dropped, this module stops checking
     anything and reports success — the same failure mode as the drift it guards.
     """
-    assert _ledger_vite_ports(), (
+    assert _all_ledger_vite_ports(), (
         "no 'Vite :<port>' venue found in any ui-tests.yaml source field — either the "
         "convention changed or this guard has quietly stopped checking"
     )
@@ -125,8 +142,10 @@ def test_every_documented_verification_port_is_served_or_declared() -> None:
         f"the ui-tests ledger documents verification(s) on port(s) {unserved}, which the "
         "API's cross-origin allowlist does not serve and nothing else supplies. A console "
         "served there cannot sign in, and the browser reports it as an unreachable server. "
-        "Either add the origin to create_app()'s allowlist, or add it to SUPPLIED_ELSEWHERE "
-        "naming the mechanism that passes it."
+        f"Fix it one of three ways: add the origin to create_app()'s allowlist (for a port "
+        f"the API should routinely serve); add it to SUPPLIED_ELSEWHERE naming the CONFIG FILE "
+        f"that passes it; or, for a one-off verification, say '{SUPPLIED_IN_SOURCE}' in the "
+        f"case's own source line, which is where a reader will look."
     )
 
 

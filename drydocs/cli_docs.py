@@ -23,14 +23,14 @@ from drydocs.cli_shared import (
     _gate_loader,
     console,
 )
+from drydocs_core.docs_verify import Summary as DocsVerifySummary
+from drydocs_core.docs_verify import exit_code as docs_verify_exit_code
+from drydocs_core.docs_verify import verify as verify_corpora
 from drydocs_core.neo4j_client import Neo4jClient
 
 from .docs_coverage import NO_CORPUS as COVERAGE_NO_CORPUS
 from .docs_coverage import REGISTRY_DB as COVERAGE_REGISTRY_DB
 from .docs_coverage import coverage as build_docs_coverage
-from .docs_verify import Summary as DocsVerifySummary
-from .docs_verify import exit_code as docs_verify_exit_code
-from .docs_verify import verify as verify_corpora
 from .loaders.bmc_docs import (
     DEFAULT_CORPUS_DIR,
     BmcDocsAdapter,

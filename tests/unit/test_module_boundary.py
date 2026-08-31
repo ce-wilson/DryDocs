@@ -54,10 +54,15 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # drydocs.cmdline_staging = the G39/G40 TEMPORARY cmd-line job-detail
     # staging store + parse (graph read -> SQLite under the data root; no
     # graph writes) — load-cadence tooling, same bucket as staging.
-    # drydocs.docs_verify = the Q7 doc-corpus reconciliation behind `docs-verify`.
-    # Classified load, not review: the item chose drydocs-load because the verb sits
-    # beside m1-verify/m3-verify and must work BEFORE the docmeta component exists
-    # (Q6). RE-HOME it to docmeta if that component takes over corpus state.
+    # drydocs.docs_verify was here until O58 (2026-08-31), when it moved to
+    # drydocs_core. The old note said "RE-HOME it to docmeta if that component
+    # takes over corpus state" — what actually forced the move was a SECOND
+    # CONSUMER: the console's docs-verify surface needs the reconciliation in
+    # drydocs_api, and a component may not import another component. The
+    # placement test answers it without an exception, because the module imports
+    # stdlib only and its single I/O seam is an injected callable: pure resolve
+    # logic belongs in core. The `docs-verify` VERB stays here — it owns the
+    # driver, the SHOW DATABASES probe and the table, which is the I/O half.
     # drydocs.seal_samples = generates the two SEAL fixtures the business-application chain
     # declares (drydocs/data/ is gitignored, so they are built per machine, never
     # committed). Load, same bucket as staging: it produces loader INPUT and its

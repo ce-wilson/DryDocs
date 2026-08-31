@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/docs_verify.py
@@ -21,3 +21,73 @@ acceptance: |
   A console surface answers "which declared doc corpora are actually loaded, and in which database" with the same six states drydocs/docs_verify.py computes — loaded | missing | stale | wrong-db | unshaped | db-absent — and renders wrong-db as the alarm the CLI's non-zero exit means. THE TRANSPORT IS THIS ITEM'S REAL CONTENT, and it must be chosen and written down, not defaulted: the reconciliation is inherently MULTI-database (it sweeps drydocs, dddocs and ddcontext precisely so a corpus sitting in a database it did not declare is visible, a result unobtainable from any single one of them), while a registered QuerySpec carries exactly one `database:` field by construction and SPEC_DATABASES does not even admit dddocs — so this cannot be a plain spec-backed page. The item names ONE of: (a) a server-side sweep endpoint in drydocs_api reusing docs_verify.verify(), whose `run(database, cypher, params)` is already its only I/O seam, making the reuse exact; (b) N registered specs, one per swept database, joined client-side with the join rule written down; or (c) a generated JSON artifact refreshed by the session ritual, the /software precedent. Whichever is chosen, the commit body records the choice AND its cost against ADR 0005 — option (a) adds a non-spec read path to an API whose standing rule is that /raw-cypher is the only interactive Cypher surface, and that is a boundary change, not a detail. Two things are never invented: a database that was not queried renders "not queried", never 0 (the O56 honesty rule); and a guard asserts the surface's state set against docs_verify.py's constants, so a seventh status cannot appear in the CLI and silently miss the page.
 notes: |
   Groomed 2026-08-07 from the Q16 session. Q7 shipped the registry-vs-graph reconciliation as a CLI verb only (drydocs docs-verify, 2026-08-01) and no item ever claimed a surface for it — the same invisible-rather-than-deferred gap O56 records for /software. Model fable, not sonnet, and the reason is specific: the transport choice can change the drydocs_api read-path boundary. Options (b) and (c) leave it intact; option (a) does not. A groom cannot make that call for the builder, so the acceptance forces it to be made explicitly and costed. Module drydocs-web / epic web-console by the O54 precedent (file by the surface delivered) even though the hard work may land in drydocs_api — recorded here so the choice is visible rather than looking like a mis-bin. NOT gate-bound and NOT blocked on G32: this surface REPORTS the residency situation G32 owns (db-absent is a true statement about the world today, exactly as docs_verify.py already treats it) rather than resolving it. It should be readable before the ruling, which is when it is most useful.
+
+  DONE 2026-08-31 (desktop). /docs gains a "Corpus status" tab.
+
+  TRANSPORT: OPTION (a), a server-side sweep endpoint (`GET /docs-verify`) reusing
+  `verify()` through its injected `run()` seam. The other two were rejected on evidence
+  and the evidence is recorded in drydocs_api/corpus_status.py, not just here:
+  * (b) N SPECS is worse than the item knew. SPEC_DATABASES is `{"drydocs"}` and
+    `ddcontext` was REMOVED from the reviewed set at G102 with the single-database fold —
+    so (b) means reversing a signed gate ruling to build a page. It also means
+    REIMPLEMENTING verify()'s status derivation in TypeScript (two copies of one
+    reconciliation, in two languages), and it still cannot produce `db-absent`, which
+    comes from SHOW DATABASES — a server-level query no spec expresses.
+  * (c) A GENERATED ARTIFACT is fatal on determinism: its content depends on a LIVE
+    graph, the two machines hold independent graphs (J18), so a committed copy cannot be
+    drift-guarded the way every other generated artifact here is, and it would be stale
+    by construction for a question whose whole value is "as of now".
+
+  COST AGAINST ADR 0005, as the item demanded: this is a read path OUTSIDE the QuerySpec
+  registry, so it is outside the spec review, the per-spec `classification` and the spec
+  guards — the payload therefore carries its own classification and its own status
+  vocabulary. What it is NOT is a widening: the endpoint takes NO parameters, every
+  Cypher string is chosen server-side, and the browser cannot influence which query runs,
+  which is the property ADR 0005 protects. Decision 2 provides for named server-side
+  queries and /query/{id} is the standing precedent, so a fixed server-chosen read path
+  is an established shape here rather than a new one.
+
+  AND IT FORCED A MODULE MOVE THE ITEM DID NOT ANTICIPATE — the most consequential part
+  of this build. `docs_verify` lived in `drydocs/` (the load component) and `drydocs_api`
+  is a different component; components may not import each other. The options were a
+  declared cross-component exception or a promotion. PROMOTED to `drydocs_core`, because
+  that is where MODULE_MAP's own placement test already puts it: it imports stdlib only
+  and its single I/O seam is an injected callable, i.e. pure resolve logic. No boundary
+  exception was added, no invariant weakened, and the verb keeps its I/O (driver, SHOW
+  DATABASES, the table) in `drydocs/cli_docs.py`. MODULE_MAP row and the boundary test's
+  comment both updated; the old note's "re-home if docmeta takes over corpus state" was
+  answered by a second CONSUMER instead.
+
+  THE ITEM'S "SIX STATES" WAS WRONG AND THE BUILD CAUGHT IT. There are SEVEN —
+  `wrong-realm` arrived with G102 as the wrong-db check's replacement subject after the
+  fold. A page built to the item's letter would have had no cell for it. Closed properly
+  rather than by hand-patching: a new `STATUSES` frozenset in core is the ONE named set,
+  the payload ships it, and the surface renders whatever it is sent, so an eighth status
+  reaches the page with no UI change. This is Idea-230's class again (an item's wording
+  overtaken by its dependency's growth), found the same way — by reading the module.
+
+  HONESTY RULES: `databases_queried` is carried explicitly, because the rows alone cannot
+  say whether a database was skipped; an un-queried database renders a named banner, never
+  0. A corpus with no match shows an em dash rather than 0 — zero documents and "we did
+  not find it" are different statements. A REFUSED SHOW DATABASES returns the candidates
+  unfiltered rather than reporting everything db-absent: a failed probe must not become a
+  false diagnosis, which is the confidently-wrong shape this module exists to remove.
+
+  ROLE GATE, and a bug caught by live verification: `require_role` is an exact membership
+  test, not a ranking, so `require_role(user, "steward")` REFUSED AN ADMIN — and the
+  uncaught Forbidden surfaced as a 500. Now `require_role(user, "steward", "admin")` with
+  Forbidden mapped to 403, which is the server-side twin of canAccessModule's 'sme'.
+
+  VERIFIED LIVE (J18): this desktop, Chrome vs Vite :5177 + drydocs-api :8004 against the
+  real `drydocs` graph. 10 corpora — 1 loaded (bmc-docs, 27 docs / 374 chunks), 3 missing,
+  6 unshaped; both swept databases present, so `ddcontext` still exists here exactly as
+  the CLI's comment anticipated. All seven statuses charted including the five zeroes.
+  The not-queried banner is unit-covered but NOT exercised live, because both databases
+  exist on this machine — said plainly rather than implied.
+
+  GUARD: tests/unit/test_corpus_status.py asserts the console sweep and the CLI verb visit
+  the same databases (the constant is mirrored, not imported, because cli_docs is a
+  component drydocs_api may not import — the guard is what makes the mirror safe), that
+  the payload carries every status the core module can return, and that a refused probe
+  does not report everything absent. Ledgers: CorpusStatus registered (36/83, new `docs`
+  area), TS-DOCS seeded 2 cases both automated (11/13 suites, 12/33 cases).

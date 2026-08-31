@@ -6,6 +6,7 @@ import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
 import OwnershipGraphPane from '../ownership/OwnershipGraphPane'
 import AssetSearchPanel from '../ownership/AssetSearchPanel'
+import ProductRollup from '../ownership/ProductRollup'
 import {
   ATTRIBUTIONS_FRAME,
   CAPTURE_GAPS_FRAME,
@@ -47,6 +48,10 @@ export default function OwnershipRoute({ persona }: { persona: Persona }) {
         </div>
       }
       tabContent={{
+        // O61: SYNTHESIZED, and no spec — the two roll-up SHAPES are the
+        // content, and one of its edges is deliberately unbacked by any graph
+        // relationship, so there is nothing here for a QuerySpec to return.
+        'Product roll-up': <ProductRollup />,
         Teams: (
           <SpecGrid
             access={access}

@@ -96,6 +96,7 @@ export default function RelEdge({
   targetPosition,
   markerEnd,
   data,
+  style,
 }: EdgeProps<RelFlowEdge>) {
   // straight for chain layouts (ownership); bezier default matches the curve
   // the explorer/lineage canvases rendered before adopting this component
@@ -140,7 +141,18 @@ export default function RelEdge({
 
   return (
     <>
-      <BaseEdge path={path} markerEnd={markerEnd} style={{ stroke: 'var(--faint)', strokeWidth: 1.4 }} />
+      {/* The caller's `style` is MERGED, not ignored. This component used to
+          hardcode the stroke and drop whatever the edge declared, which meant a
+          caller could set `style` and watch nothing happen — found at O61, where
+          a dashed "no confirmed relationship" edge rendered solid and therefore
+          asserted exactly what it was drawn to deny. Colour and weight stay the
+          defaults so the shared look holds unless a caller deliberately says
+          otherwise. */}
+      <BaseEdge
+        path={path}
+        markerEnd={markerEnd}
+        style={{ stroke: 'var(--faint)', strokeWidth: 1.4, ...style }}
+      />
       {/* O78: an UNNAMED edge draws no chip. The three canvases that adopted
           this component first always carry a name, so this never fired for
           them; MiniDag's edge label is optional, and rendering the chip

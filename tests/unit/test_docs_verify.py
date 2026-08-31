@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from drydocs.docs_verify import (
+from drydocs_core.docs_verify import (
     DB_ABSENT,
     LOADED,
     MISSING,

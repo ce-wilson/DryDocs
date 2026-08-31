@@ -120,7 +120,9 @@ export const MODULES: readonly ModuleDef[] = [
     backsOnto: 'seal-attribution',
     // 'Memberships' -> 'Attributions' at O15: K4 replaced the membership
     // scheme with qualified Attribution nodes (the tab tracks the model).
-    tabs: ['Teams', 'Attributions', 'Escalation routing'],
+    // O61 added 'Product roll-up': which area a job or folder supports, with
+    // the two join rules (framework vs app-tied) side by side.
+    tabs: ['Teams', 'Attributions', 'Escalation routing', 'Product roll-up'],
     phase: 2,
   },
   {
@@ -168,7 +170,11 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/docs',
     tagline: 'Document → Chunk corpus map',
     backsOnto: 'docmeta',
-    tabs: ['Documents', 'Chunks', 'Trust/provenance audit'],
+    // O58 added 'Corpus status': the docs-verify reconciliation — which
+    // declared corpus is actually loaded, and in which database. It sits with
+    // /docs because that is the module that backs onto docmeta, and the answer
+    // is about the corpora this page already lists.
+    tabs: ['Documents', 'Chunks', 'Trust/provenance audit', 'Corpus status'],
     phase: 3,
     retrieval: 'agent', // docmeta corpus Q&A — free-input, agent-interpreted (Epic R target)
     agent: 'docmeta-qa (ADK)',

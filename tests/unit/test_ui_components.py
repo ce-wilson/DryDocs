@@ -307,6 +307,12 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     LocationMap. Their mapper, lib/nvl-mapping.ts, is NOT here for the same
     reason loadMapModel.ts is not: the scan boundary is .tsx only and widening
     it waits on O42.
+    83 -> 84 at O61 (2026-08-31): ProductRollup, BOUND to `ownership` by
+    directory evidence. Its data module (demoProductRollup.ts) is .ts and stays
+    outside the scan boundary, like every other demo* module.
+    82 -> 83 at O58 (2026-08-31): CorpusStatus, BOUND to `docs` by directory
+    evidence — it lives under docs/ and serves exactly the module whose route
+    renders it. Both counts move by one.
     81 -> 82 at O86 (2026-08-31): GraphCanvasRoute, deliberately UNBOUND. It is a
     ROUTE whose whole job is to render whichever canvas surface the URL names,
     and those surfaces belong to different modules (runbooks, explorer) — so
@@ -324,6 +330,6 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        35,
-        82,
+        37,
+        84,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

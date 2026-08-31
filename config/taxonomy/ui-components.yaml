@@ -74,6 +74,7 @@ areas:
   - { id: underhood,     title: "/under-the-hood benchmark showcase" }
   - { id: software,      title: "Software registry / documentation-coverage panes" }
   - { id: remediation,   title: "Remediation module panes (the fix-diff working session)" }
+  - { id: docs,          title: "Docs module panes (the corpus reconciliation surface)" }
 
 components:
   # --- entry (2) ---
@@ -189,9 +190,13 @@ components:
   - { id: AcronymsPane,            area: software,     path: software/AcronymsPane.tsx,                   module: software,   module_evidence: directory }
   - { id: VendorIcon,              area: software,     path: software/VendorIcon.tsx,                     module: software,   module_evidence: directory }
 
-  # --- ownership (2) ---
+  # --- ownership (3) ---
   - { id: AssetSearchPanel,        area: ownership,    path: ownership/AssetSearchPanel.tsx,              module: ownership,  module_evidence: directory }
   - { id: OwnershipGraphPane,      area: ownership,    path: ownership/OwnershipGraphPane.tsx,            module: ownership,  module_evidence: directory }
+  # O61: the product roll-up view — two join rules side by side, and one
+  # deliberately unbacked edge. SYNTHESIZED; no spec, because the SHAPES are
+  # the content and one edge has no confirmed graph relationship to bind to.
+  - { id: ProductRollup,           area: ownership,    path: ownership/ProductRollup.tsx,                 module: ownership,  module_evidence: directory }
 
   # --- underhood (7) ---
   - { id: HallucinationSpotlight,  area: underhood,    path: underhood/HallucinationSpotlight.tsx,        module: underhood,  module_evidence: directory }
@@ -201,6 +206,13 @@ components:
   - { id: StrategyCards,           area: underhood,    path: underhood/StrategyCards.tsx,                 module: underhood,  module_evidence: directory }
   - { id: ThinkingLogicPanel,      area: underhood,    path: underhood/ThinkingLogicPanel.tsx,            module: underhood,  module_evidence: directory }
   - { id: TokenMemoryChart,        area: underhood,    path: underhood/TokenMemoryChart.tsx,              module: underhood,  module_evidence: directory }
+
+  # --- docs (1) ---
+  # O58: the docs-verify reconciliation surface. NOT a SpecGrid frame — the
+  # sweep is multi-database by design and cannot be a QuerySpec, so this
+  # component owns its own fetch (lib/corpusStatus.ts, a .ts file and therefore
+  # outside this ledger's .tsx scope caveat).
+  - { id: CorpusStatus,            area: docs,         path: docs/CorpusStatus.tsx,                       module: docs,       module_evidence: directory }
 
   # --- remediation (4) ---
   # (demo frames live in demoRemediation.ts, data-only; FixDiff is the first

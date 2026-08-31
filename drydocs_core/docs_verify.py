@@ -52,6 +52,15 @@ WRONG_REALM = "wrong-realm"
 UNSHAPED = "unshaped"
 DB_ABSENT = "db-absent"
 
+#: Every status ``verify()`` can return — ONE named set, so a consumer never
+#: hand-copies the list. O58 added it because the console renders these and the
+#: item's own acceptance said "six" while the module already had SEVEN
+#: (``wrong-realm`` arrived with G102). A page built from that wording would have
+#: silently had no cell for the status that replaced the wrong-db subject.
+STATUSES: frozenset[str] = frozenset(
+    {LOADED, MISSING, STALE, WRONG_DB, WRONG_REALM, UNSHAPED, DB_ABSENT}
+)
+
 #: these fail the command (acceptance: "exits non-zero on any wrong-db"; G102
 #: extends the same severity to the realm check that replaced its subject)
 FAILING = frozenset({WRONG_DB, WRONG_REALM})

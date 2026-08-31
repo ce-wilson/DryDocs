@@ -7,6 +7,7 @@ import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
 import MiniDag from '../components/MiniDag'
 import LinkedDemoFrame from '../components/LinkedDemoFrame'
+import CorpusStatus from '../docs/CorpusStatus'
 import {
   CHUNKS_FRAME,
   DOCS_EDGES,
@@ -48,6 +49,10 @@ export default function DocsRoute({ persona }: { persona: Persona }) {
         />
       }
       tabContent={{
+        // O58: NOT a SpecGrid — this one reads a named server-side sweep, not a
+        // QuerySpec, because the reconciliation is multi-database by design.
+        // The component owns its own fetch and its own error state.
+        'Corpus status': <CorpusStatus />,
         Documents: (
           <SpecGrid
             access={access}

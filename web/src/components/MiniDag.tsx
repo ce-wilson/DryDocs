@@ -36,6 +36,15 @@ export interface DagEdgeDef {
   source: string
   target: string
   label?: string
+  /** O61: render DASHED, for an edge no confirmed graph relationship backs.
+   *
+   *  A solid arrow on this canvas reads as "the graph holds this". Some
+   *  diagrams need to show an alignment the estate genuinely has while the
+   *  ONTOLOGY has not ruled on it — the "aligns to platform" cross-branch is
+   *  the case O61 raised. Drawing it dashed says so at a glance; drawing it
+   *  solid would assert a relationship nobody confirmed, and omitting it
+   *  would hide something real. The view is expected to caption it too. */
+  unbacked?: boolean
 }
 
 type MiniDagData = { def: DagNodeDef; selected: boolean }
@@ -116,6 +125,10 @@ export default function MiniDag({
         source: e.source,
         target: e.target,
         data: { rel: e.label ?? '' },
+        // The dashed stroke is the ONLY visual difference, and it is deliberate:
+        // an unbacked edge is still a real claim about the estate, so it is
+        // drawn, labelled and de-emphasised rather than hidden.
+        style: e.unbacked ? { strokeDasharray: '5 4' } : undefined,
         markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--faint)', width: 16, height: 16 },
       })),
     [edges],

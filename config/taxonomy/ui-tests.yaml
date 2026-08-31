@@ -28,7 +28,7 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Ten cases are automated out of thirty-one. The
+# WHAT THIS DOES NOT CLAIM. Twelve cases are automated out of thirty-four. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
@@ -45,7 +45,7 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 10 of 13 areas seeded (3 of 12 when this file
+# COVERAGE IS PARTIAL AND SAYS SO: 11 of 13 areas seeded (3 of 12 when this file
 # was written). The rest are declared with `cases: []` so the gap is a visible
 # number rather than an absence, and the guard pins it.
 # =============================================================================
@@ -380,6 +380,23 @@ suites:
           gate-confirmed shape and never moves with a rendering pass.
         source: "O77 fix 2026-08-28 — desktop, Chrome vs Vite :4173 against drydocs-api :8002, both themes. Measured, not eyeballed: a DOM probe of chip rects against node rects reported 7 of 8 chips colliding over 2516px2 before the fix and 0 chips / 0px2 after, holding through Fit and in both themes; /lineage (7 chips) and /explorer (5 chips) re-probed at 0 collisions for regression."
 
+      - id: TC-OWNERSHIP-03
+        description: The unbacked "aligns to platform" edge is drawn DASHED, and only that edge
+        steps:
+          - Open /ownership > Product roll-up.
+          - Inspect the stroke of every edge path in the pane.
+          - Read the legend and the caption beneath the diagram.
+        expect: >
+          Exactly ONE edge carries a dash pattern - the cross-branch "aligns to
+          platform" - and every other edge is solid. The alignment is real in the
+          estate and NO confirmed graph relationship backs it: solid would assert
+          an edge nobody ruled, and omitting it would hide something true. The
+          legend and the caption both say so in words, so the dash is never left
+          to be interpreted. If the relationship is ever ruled it becomes solid
+          through the relationship-vocabulary registry and the HITL gate, not
+          through this view.
+        source: "O61 build 2026-08-31 - desktop, Chrome vs Vite :5178 (origin supplied with DRYDOCS_CORS_ORIGINS) + drydocs-api :8005; computed style: exactly one path at 5px/4px in BOTH themes, stroke re-resolving to the light token on switch"
+
   # --- declared, not yet seeded ----------------------------------------------
   # Present so the coverage gap is a number, not an absence. Seed each from
   # verified behaviour when that module is next worked on — never by inventing
@@ -525,7 +542,42 @@ suites:
           printing 0 for "we did not look" is the confident wrong number this
           whole module exists to remove.
         source: "O59 build 2026-08-31 — honesty rule inherited from O56/O58; the artifact side is pinned by test_remediation_profile_json"
-  - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }
+  - id: TS-DOCS
+    module: docs
+    description: >
+      Document->Chunk corpus map, plus the O58 corpus reconciliation - which
+      declared corpus is actually loaded, and in which database. Seeded at O58
+      because that surface makes claims a reader must be able to trust: a zero
+      and a "we did not look" are different answers, and the page has to show
+      which one it means.
+    cases:
+      - id: TC-DOCS-01
+        description: The reconciliation renders every status the server declares, including the zeroes
+        steps:
+          - Sign in as steward or admin and open /docs > Corpus status.
+          - Read the chip strip above the table.
+        expect: >
+          One chip per status the SERVER sent, zeroes included - "0 wrong-db" is
+          the reassurance worth showing, and a status that disappears when empty
+          reads as "this page does not check for that". The vocabulary is never
+          typed into the UI: O58's own acceptance said six states while the module
+          has had SEVEN since G102 added wrong-realm, so a hand-copied list would
+          have had no cell for it.
+        source: "O58 build 2026-08-31 - desktop, Chrome vs Vite :5177 (origin supplied with DRYDOCS_CORS_ORIGINS) + drydocs-api :8004 against the live drydocs graph: 10 corpora, 1 loaded / 3 missing / 6 unshaped, all seven statuses charted"
+        automated_by: tests/unit/test_corpus_status.py
+
+      - id: TC-DOCS-02
+        description: A database that was not queried says so, and is never reported as zero
+        steps:
+          - Run the surface against a server missing one of the swept databases.
+        expect: >
+          A banner names the un-queried database and says corpora declaring it
+          report db-absent. The O56 honesty rule: absence of a database is not
+          absence of data in it, and a count of zero would assert something the
+          sweep never checked. A corpus with no match shows an em dash, not 0,
+          for the same reason.
+        source: "O58 build 2026-08-31 - the branch is unit-covered (test_corpus_status); on this desktop both swept databases exist, so the banner was not exercised live"
+        automated_by: tests/unit/test_corpus_status.py
   - id: TS-GATES
     module: gates
     description: >

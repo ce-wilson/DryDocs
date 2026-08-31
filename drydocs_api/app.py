@@ -24,6 +24,7 @@ import neo4j
 from pydantic import BaseModel
 
 from drydocs_api.audit import ApiAuditLog
+from drydocs_api.corpus_status import DOC_REGISTRY_PATH, corpus_status
 from drydocs_api.credentials import CredentialChecker, ReloadingCredentialStore
 from drydocs_api.ephemeral_specs import (
     EphemeralSpecStore,
@@ -326,6 +327,42 @@ def create_app(
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    # O58 — the doc-corpus reconciliation, as a NAMED SERVER-SIDE READ.
+    #
+    # Not a QuerySpec, and it cannot be one: the sweep visits MORE THAN ONE
+    # database on purpose (that is the only way a corpus sitting where it did not
+    # declare becomes visible), while a spec carries exactly one `database:` and
+    # SPEC_DATABASES is {"drydocs"} since the G102 fold. It also needs
+    # SHOW DATABASES, a server-level query no spec expresses, which is where
+    # `db-absent` comes from.
+    #
+    # THE ADR 0005 POSITION, stated because O58 required the cost recorded: this
+    # takes NO parameters, and every Cypher string is chosen server-side by
+    # drydocs_core.docs_verify. The browser cannot influence which query runs,
+    # which is the property the ADR protects; decision 2 provides for named
+    # server-side queries, and /query/{id} is the existing precedent. What it
+    # genuinely gives up is the spec REGISTRY's review — so the payload carries
+    # its own classification and its own status vocabulary.
+    #
+    # Steward+admin, matching the /gates and /software audience: every row here
+    # is a delta against a declaration, and an end user reads "wrong-db" as
+    # breakage rather than as the governance signal it is.
+    @app.get("/docs-verify")
+    def get_docs_verify(user: CurrentUser) -> dict[str, object]:
+        # BOTH roles, because require_role is an exact membership test, not a
+        # ranking — `require_role(user, "steward")` refuses an ADMIN, which is
+        # never what an SME-surface gate means here. This is the server-side
+        # twin of canAccessModule's 'sme' designation (steward OR admin), and
+        # the console's /gates and /software pages read the same way.
+        try:
+            require_role(user, "steward", "admin")
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+        import yaml
+
+        registry = yaml.safe_load(DOC_REGISTRY_PATH.read_text(encoding="utf-8"))
+        return corpus_status(registry.get("sources", []), graph)
 
     @app.get("/queries")
     def queries() -> list[dict[str, object]]:

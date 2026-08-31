@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/ownership/
@@ -21,3 +21,46 @@ acceptance: |
   The ownership module gains a product roll-up flow view (mermaid-style or MiniDag -- the shape choice is recorded at build): folder token = PAT AreaProduct as the leaf, rolling up AreaProduct -> Product -> ProductLine -> LOB, with the TWO roll-up shapes rendered SIDE BY SIDE -- framework applications (no direct SEAL; the AreaProduct token is the join) vs app-tied applications (carry SEAL; the Control-M sub-application is the join) -- the folder-name grammar as the leaf annotation and data classification beneath it. The dotted cross-branch "aligns to platform" edge renders as a VISUALLY DISTINCT annotation (dashed/dotted, labelled), because no confirmed graph relationship backs it today -- rendering it commits nothing and skips no gate, and the view says so. Demo data stays SYNTHESIZED (the demoOwnership idiom -- no real org-taxonomy values from the machine-local transcription reach the committed tree). Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
 notes: |
   Groomed 2026-08-17 (targeted groom -- the UI / docs/design/ui-exploration inbox entries only) from Idea-122: the SME supplied a rendered mermaid example (screenshot + transcription machine-local at internal-local/ui-examples/, real org-taxonomy values -- never committed; the item's committed fixture is a synthesized twin of its SHAPE). Ties to the PRAOCG folder grammar and the G94 standard-selection decision tree -- a TIE, not a dependency: the view renders the roll-up from existing taxonomy and does not consume G94's selector, so depends_on stays []. module drydocs-web on the placement test (a React view, writes nothing); /ownership chosen over a new module page because the registry already names it "SEAL -> PAT -> team rollup" -- the exact chain this view draws. If build finds the ownership tabs too crowded, where the view lands within the console is the builder's call to record, not a new module decision.
+
+  DONE 2026-08-31 (desktop). /ownership gains a "Product roll-up" tab.
+
+  SHAPE CHOICE (the item asked for it recorded): MiniDag, not mermaid. Three reasons in
+  order of weight. (1) /ownership already renders React Flow in its graph pane, so a
+  mermaid block would put two graph idioms on one module. (2) MiniDag's hand-authored
+  positions are usually its limitation (Idea-228) and here they are an ASSET — this is a
+  fixed taxonomy diagram whose two columns carry meaning, so a layout engine would fight
+  it. (3) The dashed affordance the honest rendering needs was a small addition to a
+  component five routes already share, rather than a new renderer.
+
+  TWO COLUMNS BECAUSE THERE ARE TWO JOIN RULES, which is the view's whole point: a
+  framework application carries no SEAL and reaches its AreaProduct by NAMING the token;
+  an app-tied application carries a SEAL and joins through the Control-M sub-application.
+  One column would imply one rule. Leaf annotation (folder-name grammar + classification)
+  renders on selection rather than always, because two at once is what made the SME's
+  original example hard to read.
+
+  THE UNBACKED EDGE FOUND A REAL BUG IN A SHARED COMPONENT, and this is the part worth
+  keeping. `RelEdge` HARDCODED its stroke and silently dropped whatever `style` an edge
+  declared — so the first build rendered the "aligns to platform" edge SOLID, asserting
+  exactly the confirmed relationship it was drawn to deny. Found by measuring rather than
+  looking (computed strokeDasharray was empty on every path). RelEdge now MERGES the
+  caller's style over its defaults, so colour and weight stay shared unless a caller
+  deliberately says otherwise. Any of the five routes using MiniDag could have hit this.
+
+  VERIFIED LIVE (J18): this desktop, Chrome vs Vite :5178 (origin supplied with
+  DRYDOCS_CORS_ORIGINS) + drydocs-api :8005. Computed style: EXACTLY ONE path carries
+  `5px, 4px` and every other edge is solid — checked in BOTH themes, with the stroke
+  re-resolving to the light token on the switch and the legend colour following. Honest
+  about method: my first several DOM probes used a `.react-flow__edge-path` selector that
+  does not exist in this React Flow version and reported 0 edges while the screenshot
+  plainly showed them; `svg path` was the right query. The wrong selector cost several
+  attempts and nearly produced a false "no edges render" conclusion.
+
+  SYNTHESIZED throughout — invented LOB/product/folder names, SEAL from the reserved
+  70001-70099 block. The SME's rendered example carries real org taxonomy and stays
+  machine-local; what is committed is a twin of its SHAPE (the demoOwnership idiom).
+
+  LEDGERS: ProductRollup registered (37/84); TC-OWNERSHIP-03 seeded, MANUAL on purpose —
+  the claim is "exactly one edge is dashed, in both themes", and the only check that means
+  anything is a computed style in a real browser; a unit test over the fixture would just
+  re-assert the data it read.

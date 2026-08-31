@@ -42,8 +42,8 @@ so it is provable **with the database switched off**. That is the difference
 between honest reporting and calling a ruled topology "missing data".
 
 *Layer 2 — graph probe.* Optional, through the same injected
-``run(database, cypher, params)`` seam :mod:`drydocs.docs_verify` already uses,
-and reusing its :func:`~drydocs.docs_verify.count_query` verbatim so the two
+``run(database, cypher, params)`` seam :mod:`drydocs_core.docs_verify` already uses,
+and reusing its :func:`~drydocs_core.docs_verify.count_query` verbatim so the two
 verbs can never disagree about whether a corpus is loaded. When it does not run,
 every graph-derived field is ``None`` — the explicit ``not-probed`` sentinel,
 **never 0**, because a 0 there is a false claim of absence.
@@ -72,7 +72,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import asdict, dataclass, field
 
-from drydocs.docs_verify import locator_of
+from drydocs_core.docs_verify import locator_of
 
 #: The database the software registry writes (`software_registry.cypher`).
 #: Pre-fold the doc-registry guard constrained `target_db` to the
