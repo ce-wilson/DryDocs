@@ -62,13 +62,20 @@ acceptance: |
   NOT lost: resolve-cmdline-staging joins on (data_center, folder_name, job_name)
   - names, not ids - so the API export is usable for the lineage weld unchanged.
 
-  (e) EITHER A VERIFIED TEMPLATE OR A RECORDED ABSENCE. Deliver one of: a
-  verified call or utility invocation that returns the database-shaped export
-  (non-zero REAL_FOLDER_ID and IS_CURRENT_VERSION present), evidenced by a real
-  pull of the same folder; OR a recorded finding that no such Automation API call
-  exists at 9.0.21.300 and the EM XML utility is the only database-shaped path,
-  with the evidence that rules the API out. Silence is the one non-outcome - the
-  row is corrected either way.
+  (e) THE RUNNER SEAM REACHES THE ENTRY POINT. execute() already accepts an
+  injectable Runner, but main() calls `execute(planned)` bare, so no test can
+  drive the CLI's RUN path - every existing CLI test uses --plan-only, which is
+  why (a) went unnoticed. Thread the runner through main (or make the default
+  runner the single patch point and say so), so the entry point is testable for
+  execution outcomes and not only for planning ones.
+
+  NOT IN SCOPE, AND NAMED SO IT IS NOT SILENTLY ASSUMED: verifying a real call
+  against a live Control-M. Nothing producer-side is configured to make one -
+  no endpoint, no token, no ctm CLI - so a clause demanding a verified template
+  would make this item unclosable here (J18: a live-verification claim names its
+  venue). That work is G132 clause (g), on the server where the collector runs.
+  Everything above is closable on a machine with no Control-M access at all,
+  because (a) tests the binary being ABSENT.
 notes: |
   Minted 2026-08-30. Both defects were found alongside a real folder pull, and
   both are verified against this tree at cae680e7: the try/execute line numbers

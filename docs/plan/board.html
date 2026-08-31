@@ -541,6 +541,24 @@ confirmed: false with rua_inventory.sh committed and no loader, from the G18/G20
 work until gate rua-load-shapes signed 2026-08-07. controlm:deftable-xml-export
 is confirmed: false for the same class of reason and stays that way; the flip is
 a consequence of the D11 ruling, never of this item.
+(g) THE TRANSPORT QUESTION, ANSWERED FROM THE VENUE THAT CAN ANSWER IT.
+Deliver ONE of: a verified call or utility invocation that returns the
+DATABASE-shaped export - non-zero REAL_FOLDER_ID and IS_CURRENT_VERSION
+present - evidenced by a real pull of the same folder that produced the
+deployable-shaped one; OR a recorded finding that no such Automation API call
+exists at 9.0.21.300 and the EM XML utility is the only database-shaped path,
+with the evidence that rules the API out. Silence is the one non-outcome.
+THIS CLAUSE LIVES HERE AND NOT IN G133 because it needs a configured endpoint,
+a token and the ctm CLI, none of which exist producer-side - and whoever homes
+the collector is already on the server that has them. Name the venue in the
+finding (J18). Do NOT template a call from memory: README.md section 4 and the
+corpus headers say why - every controlm-api-*.md page is flagged
+SaaS-conceptual and, in two cases, confirmed structurally inaccurate and
+partly SYNTHESIZED, so they ground WHICH behaviours exist, never syntax. The
+one grounded default template that ships is api_probe
+(`ctm config servers::get`); start from that probe against the live gateway
+and enumerate the deploy/config services. The result corrects API-CALLS.md&#x27;s
+folder_export row, which G133 clause (c) reshapes to hold both transports.
 </p><p class="notes"><strong>Notes:</strong> Minted 2026-08-30. The script was written in an agent session by converting an
 existing job-rerun API call into a folder pull; it runs on a server and is still
 under test, which is the same posture rua_inventory.sh was in when it was brought
@@ -606,13 +624,20 @@ assumption about API behaviour rather than a field that can be tested. What is
 NOT lost: resolve-cmdline-staging joins on (data_center, folder_name, job_name)
 - names, not ids - so the API export is usable for the lineage weld unchanged.
 
-(e) EITHER A VERIFIED TEMPLATE OR A RECORDED ABSENCE. Deliver one of: a
-verified call or utility invocation that returns the database-shaped export
-(non-zero REAL_FOLDER_ID and IS_CURRENT_VERSION present), evidenced by a real
-pull of the same folder; OR a recorded finding that no such Automation API call
-exists at 9.0.21.300 and the EM XML utility is the only database-shaped path,
-with the evidence that rules the API out. Silence is the one non-outcome - the
-row is corrected either way.
+(e) THE RUNNER SEAM REACHES THE ENTRY POINT. execute() already accepts an
+injectable Runner, but main() calls `execute(planned)` bare, so no test can
+drive the CLI&#x27;s RUN path - every existing CLI test uses --plan-only, which is
+why (a) went unnoticed. Thread the runner through main (or make the default
+runner the single patch point and say so), so the entry point is testable for
+execution outcomes and not only for planning ones.
+
+NOT IN SCOPE, AND NAMED SO IT IS NOT SILENTLY ASSUMED: verifying a real call
+against a live Control-M. Nothing producer-side is configured to make one -
+no endpoint, no token, no ctm CLI - so a clause demanding a verified template
+would make this item unclosable here (J18: a live-verification claim names its
+venue). That work is G132 clause (g), on the server where the collector runs.
+Everything above is closable on a machine with no Control-M access at all,
+because (a) tests the binary being ABSENT.
 </p><p class="notes"><strong>Notes:</strong> Minted 2026-08-30. Both defects were found alongside a real folder pull, and
 both are verified against this tree at cae680e7: the try/execute line numbers
 are exact, and the API-CALLS.md folder_export row reads as quoted.
