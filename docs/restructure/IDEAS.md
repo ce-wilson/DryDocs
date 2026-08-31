@@ -375,6 +375,33 @@ question a 1,000-line file with the trail at the bottom could not answer.
   MIDPOINTS (computable from endpoint node centres, so no feedback) as small obstacles. Cheap
   mitigations that do NOT work: raising z-index only chooses which of the two names is destroyed,
   which is the trade O77 already rejected once.
+  · **AMENDED 2026-08-31 (user question: would the NVL canvas fix this, and how does mermaid
+  handle it?) — THE RECOMMENDATION ABOVE IS THE LESSER ANSWER. Better dodging shrinks this class;
+  it does not retire it. There are three strategies and we have been climbing them one rung at a
+  time.** (1) PAINT ORDER — the SVG label in the edge layer, which is what O78 removed: the label
+  loses to nodes. (2) POST-HOC DODGING — O66/O77/O78: the label is placed after the layout and
+  then walked clear, which cannot see other labels without an ordering problem, and that IS this
+  entry. (3) LAYOUT-TIME RESERVATION — the label is a first-class layout participant with
+  dimensions, so space is allocated for it rather than negotiated afterwards; no dodging code
+  exists because none is needed. **MERMAID IS (3):** its flowcharts lay out through dagre, which
+  inserts a dummy node carrying the edge label's size into the ranking pass — our own
+  `docs/design/drydocs-remediation-tdd.md` diagram is exactly this shape (`C -->|"rule codeable"|
+  D1`). Caveat, stated because it was not verified in-repo: mermaid is not a dependency here (the
+  fences are rendered by whatever displays the markdown), so that is dagre's documented behaviour
+  rather than something read from source this session; it also reserves RANK space rather than
+  guaranteeing zero overlap. **NVL IS NOT A FIX, verified against the installed package rather
+  than assumed:** `@neo4j-nvl/base` 1.2.1 exposes NO overlap, collision or label-avoidance option
+  at all — `captionAlign` is only top/bottom/center within an element, and neither
+  ForceDirectedOptions nor the other layout options mention label space. What NVL changes is the
+  ODDS, two ways: node captions render INSIDE the node, so O78's defect class cannot recur there
+  at all, and a force layout makes edges long relative to their labels, unlike MiniDag's tight
+  hand-authored positions. Two edge captions near the same point still collide, and O81's canvas
+  carries the same exposure today. **WHY MINIDAG CANNOT SIMPLY DO (3):** its node positions are
+  hand-authored constants in the demo data, so there is no layout engine to hand the label to —
+  dodging was chosen because it is the only option inside that architecture. So the real fork is
+  not "better geometry": it is whether these surfaces move onto a layout engine (dagre, or NVL's
+  force layout) at all, which retires the whole class, versus another rung of dodging, which does
+  not.
 
 - **`Idea-227`** · 2026-08-31 · `[bug]` · **open — found by O80's new unit runner, desktop** · prio? **Med** —
   **A synthetic city's country reports that it HAS a drawable outline when it does not, because
