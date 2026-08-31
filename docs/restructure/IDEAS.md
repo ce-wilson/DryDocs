@@ -93,8 +93,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 - **`Idea-232`** · 2026-08-31 · `[bug]` · **open** · prio? **High** —
   **A backlog item can be HELD by an annotation while the ready list still calls it ready,
-  because `next_ready` is computed from `depends_on` alone.** (Body to follow — id minted
-  and pushed first, per the I6 rule.)
+  because `next_ready` is computed from `depends_on` alone.** Found the expensive way: O26
+  was pulled and claimed during a p2 task run because both its dependencies were `done`.
+  It carries `annotations.status: 'SME HOLD 2026-07-22: runbook template shape goes through
+  a HITL template session BEFORE this view is built — deps are done but do NOT pull this
+  item until that session rules'`. The claim was released the same session with nothing
+  built, but the pull commit and its release are both on the trunk, and a session with less
+  slack would have built it.
+  WHY THE READY LIST CANNOT SEE IT. `next_ready` is derived — status `todo` plus every
+  `depends_on` `done`. That is the right rule for DEPENDENCIES and it is the whole rule
+  today, so a hold expressed anywhere else is invisible to it. The board's Ready-to-pull
+  strip, `validate.py`'s derived list, and the pull rule in CLAUDE.md all inherit the same
+  blindness — the pull rule tells an agent to take the next ready item and says nothing
+  about reading annotations first.
+  WHAT MAKES IT WORSE THAN A ONE-OFF: the hold is on the item precisely BECAUSE the deps
+  are done. An item blocked by dependencies needs no annotation; the annotation exists for
+  exactly the case the ready list gets wrong. So the two mechanisms are most likely to
+  disagree in the situation the annotation was written for.
+  CHEAPEST HONEST SHAPE, and it is small: teach the derivation to exclude an item whose
+  `annotations.status` (or any annotation the schema blesses for this) reads as a hold, and
+  render it on the board as HELD with the annotation text rather than dropping it silently
+  — an item that vanishes with no reason is its own defect. If the schema has no blessed
+  field for this, minting one is the first step and is a `drydocs.backlog.v3` change, so it
+  is a schema decision rather than a validator tweak.
+  SCOPE CAUTION: do NOT let this become a general "block on any annotation" rule. Most
+  annotations are notes, not holds. The distinction has to be a declared field or a declared
+  vocabulary, or the guard starts refusing items nobody meant to hold — which would be worse
+  than today, because a false hold is invisible in the other direction.
+  RELATED: [[Idea-230]] is the same family seen from the other side — there, an item's
+  acceptance went stale against its dependency; here, an item's PULLABILITY goes stale
+  against a ruling. Both are "the backlog knows something the derived view does not".
 
 
 - **`Idea-231`** · 2026-08-31 · `[bug]` · **open** · prio? **Med** —
