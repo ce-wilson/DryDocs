@@ -176,11 +176,14 @@ Index: [`external/orchestration/README.md`](external/orchestration/README.md)
 | **AutoSys (CA/Broadcom)** | placeholder — map to baseline | [`external/orchestration/autosys/`](external/orchestration/autosys/README.md) |
 | **AWS Airflow / MWAA** | placeholder — map to baseline | [`external/orchestration/airflow/`](external/orchestration/airflow/README.md) |
 
-Oracle (source DB) and Snowflake (future) are **data platforms**, referenced via the
-[`oracle-db` skill](.claude/skills/oracle-db/SKILL.md) and [`reference/platforms/`](reference/platforms/README.md).
-**Both Oracle skills are currently OFF** — `oracle-db` is `"off"` in `.claude/settings.local.json`
-`skillOverrides`, and the vendor plugin `db@oracle-skills` is `false` in `~/.claude/settings.json`
-`enabledPlugins`. Turn one on before routing Oracle work here, or use `reference/platforms/` alone.
+Oracle (source DB) and Snowflake (future) are **data platforms**, indexed under
+[`reference/platforms/`](reference/platforms/README.md). **There is no general Oracle skill in the
+routing set** — both were disabled and the pointer was dropped 2026-08-31, because there is no
+working Oracle connection from this machine, so live-DB guidance had nothing to act on. Oracle work
+here is *replica-shaped*, not connection-shaped: the CM_ objects in the `psgmgr` schema are reached
+through the [`controlm-db` skill](.claude/skills/controlm-db/SKILL.md), which is the correct entry
+point for "which table holds X" and for any `controlm_*.sql` loader. Note `reference/platforms/`
+currently carries **`neo4j/` only** — there is no `oracle/` directory behind this link yet.
 
 ---
 
