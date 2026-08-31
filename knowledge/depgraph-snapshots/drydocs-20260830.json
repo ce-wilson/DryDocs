@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-30T18:08:47",
+    "captured_at": "2026-08-30T21:11:36",
     "date": "20260830",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "294c8fd6",
-      "full": "294c8fd6590613b442672105b74e13ec007fd161",
+      "commit": "6f141090",
+      "full": "6f14109068a96bfa7adb76892fa50ee65f9e0864",
       "branch": "main",
-      "describe": "port-base-20260829-55-g294c8fd6",
-      "subject": "fix(I6): a mint stub carries its final title, because the guard reads titles",
+      "describe": "port-base-20260829-58-g6f141090",
+      "subject": "feat(backlog): G132 + G133 bodies - the folder-pull collector comes home, and api.py's exit-code hole",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -10218,6 +10218,24 @@
       "name": "G131.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/G131.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G132.yaml",
+      "name": "G132.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G132.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G133.yaml",
+      "name": "G133.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G133.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20726,10 +20744,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
-      "name": "drydocs-20260830.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1808.json",
+      "name": "drydocs-20260830-1808.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830-1808.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -36731,6 +36749,16 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G132.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G133.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/G14.yaml"
     ],
     [
@@ -42496,7 +42524,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1808.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -45143,13 +45171,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2551,
+    "files": 2553,
     "edges": 1325,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2842,
+    "rels": 2844,
     "directories": 292
   }
 }
