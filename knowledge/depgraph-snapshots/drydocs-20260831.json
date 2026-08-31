@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-30T21:11:36",
-    "date": "20260830",
+    "captured_at": "2026-08-31T09:29:54",
+    "date": "20260831",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6f141090",
-      "full": "6f14109068a96bfa7adb76892fa50ee65f9e0864",
+      "commit": "3c171013",
+      "full": "3c17101374a1d14b9911429295f4158393a830da",
       "branch": "main",
-      "describe": "port-base-20260829-58-g6f141090",
-      "subject": "feat(backlog): G132 + G133 bodies - the folder-pull collector comes home, and api.py's exit-code hole",
-      "dirty": false,
+      "describe": "port-base-20260829-87-g3c171013",
+      "subject": "docs(Idea-229): a cancelled CI run is neither green nor red, and nothing reads it as unverified",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -10241,6 +10241,33 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/G134.yaml",
+      "name": "G134.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G134.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G135.yaml",
+      "name": "G135.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G135.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/G136.yaml",
+      "name": "G136.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/G136.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/G14.yaml",
       "name": "G14.yaml",
       "extension": ".yaml",
@@ -13476,6 +13503,15 @@
       "name": "O85.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/O85.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/O86.yaml",
+      "name": "O86.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/O86.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20744,10 +20780,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1808.json",
-      "name": "drydocs-20260830-1808.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "name": "drydocs-20260830.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830-1808.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22904,6 +22940,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_first_party_queries.py",
+      "name": "test_first_party_queries.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_first_party_queries.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_folder_attribution.py",
       "name": "test_folder_attribution.py",
       "extension": ".py",
@@ -24119,6 +24164,33 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/e2e",
+      "name": "e2e",
+      "extension": "",
+      "rel_path": "web/e2e",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/e2e/bootstrap_credential.py",
+      "name": "bootstrap_credential.py",
+      "extension": ".py",
+      "rel_path": "web/e2e/bootstrap_credential.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/e2e/console.spec.ts",
+      "name": "console.spec.ts",
+      "extension": ".ts",
+      "rel_path": "web/e2e/console.spec.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/index.html",
       "name": "index.html",
       "extension": ".html",
@@ -24141,6 +24213,15 @@
       "name": "package.json",
       "extension": ".json",
       "rel_path": "web/package.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/playwright.config.ts",
+      "name": "playwright.config.ts",
+      "extension": ".ts",
+      "rel_path": "web/playwright.config.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24389,6 +24470,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/GraphCanvas.tsx",
+      "name": "GraphCanvas.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/GraphCanvas.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/GraphExplorer.tsx",
       "name": "GraphExplorer.tsx",
       "extension": ".tsx",
@@ -24465,6 +24555,15 @@
       "name": "SignIn.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/SignIn.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/SpecGraphPane.tsx",
+      "name": "SpecGraphPane.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/SpecGraphPane.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24564,6 +24663,15 @@
       "name": "projection.ts",
       "extension": ".ts",
       "rel_path": "web/src/components/map/projection.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/map/resolve.test.ts",
+      "name": "resolve.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/components/map/resolve.test.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24965,6 +25073,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/cypher-labels.test.ts",
+      "name": "cypher-labels.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/cypher-labels.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/cypher-labels.ts",
+      "name": "cypher-labels.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/cypher-labels.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/forceLayout.ts",
       "name": "forceLayout.ts",
       "extension": ".ts",
@@ -25014,6 +25140,24 @@
       "name": "neo4j.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/neo4j.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/nvl-mapping.test.ts",
+      "name": "nvl-mapping.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/nvl-mapping.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/nvl-mapping.ts",
+      "name": "nvl-mapping.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/nvl-mapping.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25635,6 +25779,15 @@
       "name": "vite.config.ts",
       "extension": ".ts",
       "rel_path": "web/vite.config.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/vitest.config.ts",
+      "name": "vitest.config.ts",
+      "extension": ".ts",
+      "rel_path": "web/vitest.config.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26864,6 +27017,10 @@
     [
       "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_core/env_refs.py"
     ],
     [
       "drydocs/drydocs_api/app.py",
@@ -29850,6 +30007,18 @@
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
+      "drydocs/web/e2e/bootstrap_credential.py",
+      "drydocs/drydocs_api/credentials.py"
+    ],
+    [
+      "drydocs/web/e2e/bootstrap_credential.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/web/e2e/bootstrap_credential.py",
+      "drydocs/scripts/set_console_credential.py"
+    ],
+    [
       "drydocs/web/src/App.tsx",
       "drydocs/web/src/components/SignIn.tsx"
     ],
@@ -29967,11 +30136,23 @@
     ],
     [
       "drydocs/web/src/components/CypherConsole.tsx",
+      "drydocs/web/src/lib/cypher-labels.ts"
+    ],
+    [
+      "drydocs/web/src/components/CypherConsole.tsx",
       "drydocs/web/src/lib/graph.ts"
     ],
     [
       "drydocs/web/src/components/CypherConsole.tsx",
       "drydocs/web/src/lib/neo4j.ts"
+    ],
+    [
+      "drydocs/web/src/components/GraphCanvas.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/components/GraphCanvas.tsx",
+      "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
       "drydocs/web/src/components/GraphExplorer.tsx",
@@ -29992,6 +30173,10 @@
     [
       "drydocs/web/src/components/IntakeStepper.tsx",
       "drydocs/web/src/lib/intakeApi.ts"
+    ],
+    [
+      "drydocs/web/src/components/MiniDag.tsx",
+      "drydocs/web/src/components/RelEdge.tsx"
     ],
     [
       "drydocs/web/src/components/MiniDag.tsx",
@@ -30020,6 +30205,26 @@
     [
       "drydocs/web/src/components/SignIn.tsx",
       "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/components/SpecGraphPane.tsx",
+      "drydocs/web/src/components/GraphCanvas.tsx"
+    ],
+    [
+      "drydocs/web/src/components/SpecGraphPane.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/components/SpecGraphPane.tsx",
+      "drydocs/web/src/components/ui/IdChip.tsx"
+    ],
+    [
+      "drydocs/web/src/components/SpecGraphPane.tsx",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/components/SpecGraphPane.tsx",
+      "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
       "drydocs/web/src/components/ThemeToggle.tsx",
@@ -30064,6 +30269,10 @@
     [
       "drydocs/web/src/components/map/projection.ts",
       "drydocs/web/src/generated/world-map.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/resolve.test.ts",
+      "drydocs/web/src/components/map/resolve.ts"
     ],
     [
       "drydocs/web/src/components/map/resolve.ts",
@@ -30218,6 +30427,10 @@
       "drydocs/web/src/lib/auth.ts"
     ],
     [
+      "drydocs/web/src/lib/cypher-labels.test.ts",
+      "drydocs/web/src/lib/cypher-labels.ts"
+    ],
+    [
       "drydocs/web/src/lib/graph.ts",
       "drydocs/web/src/lib/auth.ts"
     ],
@@ -30240,6 +30453,10 @@
     [
       "drydocs/web/src/lib/neo4j.ts",
       "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/lib/nvl-mapping.test.ts",
+      "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
       "drydocs/web/src/lib/views.ts",
@@ -30715,6 +30932,10 @@
     ],
     [
       "drydocs/web/src/routes/RunbooksRoute.tsx",
+      "drydocs/web/src/components/SpecGraphPane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/RunbooksRoute.tsx",
       "drydocs/web/src/explorer/SpecGrid.tsx"
     ],
     [
@@ -30724,6 +30945,10 @@
     [
       "drydocs/web/src/routes/RunbooksRoute.tsx",
       "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/routes/RunbooksRoute.tsx",
+      "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
       "drydocs/web/src/routes/RunbooksRoute.tsx",
@@ -30823,6 +31048,10 @@
     ],
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
+      "drydocs/web/src/components/SpecGraphPane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
       "drydocs/web/src/components/map/LocationMap.tsx"
     ],
     [
@@ -30860,6 +31089,10 @@
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
       "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
+      "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
@@ -36759,6 +36992,21 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G134.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G135.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/G136.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/G14.yaml"
     ],
     [
@@ -38555,6 +38803,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/O85.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/O86.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -42524,7 +42777,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830-1808.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43654,6 +43907,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_first_party_queries.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_folder_attribution.py"
     ],
     [
@@ -44324,6 +44582,11 @@
     [
       "drydocs/web",
       "CONTAINS",
+      "drydocs/web/e2e"
+    ],
+    [
+      "drydocs/web",
+      "CONTAINS",
       "drydocs/web/index.html"
     ],
     [
@@ -44335,6 +44598,11 @@
       "drydocs/web",
       "CONTAINS",
       "drydocs/web/package.json"
+    ],
+    [
+      "drydocs/web",
+      "CONTAINS",
+      "drydocs/web/playwright.config.ts"
     ],
     [
       "drydocs/web",
@@ -44365,6 +44633,21 @@
       "drydocs/web",
       "CONTAINS",
       "drydocs/web/vite.config.ts"
+    ],
+    [
+      "drydocs/web",
+      "CONTAINS",
+      "drydocs/web/vitest.config.ts"
+    ],
+    [
+      "drydocs/web/e2e",
+      "CONTAINS",
+      "drydocs/web/e2e/bootstrap_credential.py"
+    ],
+    [
+      "drydocs/web/e2e",
+      "CONTAINS",
+      "drydocs/web/e2e/console.spec.ts"
     ],
     [
       "drydocs/web/public",
@@ -44589,6 +44872,11 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/GraphCanvas.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/GraphExplorer.tsx"
     ],
     [
@@ -44630,6 +44918,11 @@
       "drydocs/web/src/components",
       "CONTAINS",
       "drydocs/web/src/components/SignIn.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
+      "drydocs/web/src/components/SpecGraphPane.tsx"
     ],
     [
       "drydocs/web/src/components",
@@ -44690,6 +44983,11 @@
       "drydocs/web/src/components/map",
       "CONTAINS",
       "drydocs/web/src/components/map/projection.ts"
+    ],
+    [
+      "drydocs/web/src/components/map",
+      "CONTAINS",
+      "drydocs/web/src/components/map/resolve.test.ts"
     ],
     [
       "drydocs/web/src/components/map",
@@ -44874,6 +45172,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/cypher-labels.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/cypher-labels.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/forceLayout.ts"
     ],
     [
@@ -44900,6 +45208,16 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/neo4j.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/nvl-mapping.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -45171,13 +45489,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2553,
-    "edges": 1325,
+    "files": 2569,
+    "edges": 1345,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2844,
-    "directories": 292
+    "rels": 2861,
+    "directories": 293
   }
 }
