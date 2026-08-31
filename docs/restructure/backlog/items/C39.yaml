@@ -1,0 +1,16 @@
+id: C39
+epic: ontology-mapping
+title: The gate session queue is inferred from log prose, so a gate drafted under a RECORD entry
+  reads as signed off and disappears from the list of sessions still owed
+type: task
+module: config
+phase: 5
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-31.
