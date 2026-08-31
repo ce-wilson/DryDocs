@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-31T10:55:40",
+    "captured_at": "2026-08-31T15:20:50",
     "date": "20260831",
     "scan": "ui-workstream",
     "tree": true,
     "git": {
-      "commit": "2777476f",
-      "full": "2777476fdab935ab40514f5b77c84a512b417c92",
+      "commit": "fb5e9444",
+      "full": "fb5e9444b6fa68379d01162fab75393b2a0cd7ae",
       "branch": "feat/ui-web",
-      "describe": "port-base-20260829-95-g2777476f",
-      "subject": "docs(Idea-230, Idea-231): the bodies - a dependency's growth has no route to its dependent, and the console's access designations have no guard",
+      "describe": "port-base-20260829-108-gfb5e9444",
+      "subject": "docs(Idea-232): the body - the ready list is blind to a hold that exists because the deps are done",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6276,6 +6276,15 @@
       "name": "code-graph-package-layer.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/code-graph-package-layer.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/console-auth-boundary.yaml",
+      "name": "console-auth-boundary.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/console-auth-boundary.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16613,15 +16622,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/docs_verify.py",
-      "name": "docs_verify.py",
-      "extension": ".py",
-      "rel_path": "drydocs/docs_verify.py",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/drydocs/fid_census.py",
       "name": "fid_census.py",
       "extension": ".py",
@@ -17765,6 +17765,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_api/corpus_status.py",
+      "name": "corpus_status.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/corpus_status.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_api/credentials.py",
       "name": "credentials.py",
       "extension": ".py",
@@ -18093,6 +18102,15 @@
       "name": "vendor_html.py",
       "extension": ".py",
       "rel_path": "drydocs_core/docs/vendor_html.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/docs_verify.py",
+      "name": "docs_verify.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/docs_verify.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20780,10 +20798,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json",
-      "name": "drydocs-20260831.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1055.json",
+      "name": "drydocs-20260831-1055.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831-1055.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22382,6 +22400,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_ask_file_search_spec.py",
+      "name": "test_ask_file_search_spec.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_ask_file_search_spec.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_attribution_surfaces.py",
       "name": "test_attribution_surfaces.py",
       "extension": ".py",
@@ -22598,6 +22625,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_console_origins.py",
+      "name": "test_console_origins.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_console_origins.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_constraint_drift.py",
       "name": "test_constraint_drift.py",
       "extension": ".py",
@@ -22665,6 +22701,15 @@
       "name": "test_controlm_resource_pool.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_controlm_resource_pool.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_corpus_status.py",
+      "name": "test_corpus_status.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_corpus_status.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23106,6 +23151,15 @@
       "name": "test_lineage_dpl_registry.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_lineage_dpl_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_lineage_edge_backing.py",
+      "name": "test_lineage_edge_backing.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_edge_backing.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24407,6 +24461,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/web/src/ask/FileReport.tsx",
+      "name": "FileReport.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/FileReport.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/ask/TaskGraphPane.tsx",
       "name": "TaskGraphPane.tsx",
       "extension": ".tsx",
@@ -24812,6 +24875,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/docs",
+      "name": "docs",
+      "extension": "",
+      "rel_path": "web/src/docs",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/docs/CorpusStatus.tsx",
+      "name": "CorpusStatus.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/docs/CorpusStatus.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/docsmod",
       "name": "docsmod",
       "extension": "",
@@ -25100,6 +25181,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/canvasRoutes.test.ts",
+      "name": "canvasRoutes.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/canvasRoutes.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/corpusStatus.ts",
+      "name": "corpusStatus.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/corpusStatus.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/cypher-labels.test.ts",
       "name": "cypher-labels.test.ts",
       "extension": ".ts",
@@ -25190,6 +25289,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/reachability.test.ts",
+      "name": "reachability.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/reachability.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/reachability.ts",
+      "name": "reachability.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/reachability.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/runtimeView.ts",
       "name": "runtimeView.ts",
       "extension": ".ts",
@@ -25244,10 +25361,46 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lineage/SwimlaneView.tsx",
+      "name": "SwimlaneView.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/lineage/SwimlaneView.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lineage/demoLineage.ts",
       "name": "demoLineage.ts",
       "extension": ".ts",
       "rel_path": "web/src/lineage/demoLineage.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lineage/demoSwimlane.ts",
+      "name": "demoSwimlane.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lineage/demoSwimlane.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lineage/laneBasis.test.ts",
+      "name": "laneBasis.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lineage/laneBasis.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lineage/laneBasis.ts",
+      "name": "laneBasis.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lineage/laneBasis.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25352,6 +25505,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/ownership/ProductRollup.tsx",
+      "name": "ProductRollup.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ownership/ProductRollup.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/ownership/assetSearch.ts",
       "name": "assetSearch.ts",
       "extension": ".ts",
@@ -25365,6 +25527,15 @@
       "name": "demoOwnership.ts",
       "extension": ".ts",
       "rel_path": "web/src/ownership/demoOwnership.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/ownership/demoProductRollup.ts",
+      "name": "demoProductRollup.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/ownership/demoProductRollup.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25545,6 +25716,15 @@
       "name": "GatesRoute.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/routes/GatesRoute.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "name": "GraphCanvasRoute.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/routes/GraphCanvasRoute.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26195,10 +26375,6 @@
     ],
     [
       "drydocs/drydocs/cli_docs.py",
-      "drydocs/drydocs/docs_verify.py"
-    ],
-    [
-      "drydocs/drydocs/cli_docs.py",
       "drydocs/drydocs/loaders/bmc_docs.py"
     ],
     [
@@ -26220,6 +26396,10 @@
     [
       "drydocs/drydocs/cli_docs.py",
       "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs/cli_docs.py",
+      "drydocs/drydocs_core/docs_verify.py"
     ],
     [
       "drydocs/drydocs/cli_docs.py",
@@ -26567,7 +26747,7 @@
     ],
     [
       "drydocs/drydocs/docs_coverage.py",
-      "drydocs/drydocs/docs_verify.py"
+      "drydocs/drydocs_core/docs_verify.py"
     ],
     [
       "drydocs/drydocs/gate_pages.py",
@@ -27071,6 +27251,10 @@
     ],
     [
       "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_api/corpus_status.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/credentials.py"
     ],
     [
@@ -27132,6 +27316,14 @@
     [
       "drydocs/drydocs_api/audit.py",
       "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs_api/corpus_status.py",
+      "drydocs/drydocs_core/docs_verify.py"
+    ],
+    [
+      "drydocs/drydocs_api/corpus_status.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_api/credentials.py",
@@ -28262,6 +28454,10 @@
       "drydocs/drydocs/loaders/software_registry.py"
     ],
     [
+      "drydocs/tests/unit/test_ask_file_search_spec.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
       "drydocs/tests/unit/test_attribution_surfaces.py",
       "drydocs/drydocs_core/precedence.py"
     ],
@@ -28522,6 +28718,10 @@
       "drydocs/drydocs_api/sessions.py"
     ],
     [
+      "drydocs/tests/unit/test_console_origins.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
       "drydocs/tests/unit/test_constraint_drift.py",
       "drydocs/drydocs/cli_schema.py"
     ],
@@ -28580,6 +28780,18 @@
     [
       "drydocs/tests/unit/test_controlm_resource_pool.py",
       "drydocs/drydocs_core/orchestration/controlm/resource_pool.py"
+    ],
+    [
+      "drydocs/tests/unit/test_corpus_status.py",
+      "drydocs/drydocs/cli_docs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_corpus_status.py",
+      "drydocs/drydocs_api/corpus_status.py"
+    ],
+    [
+      "drydocs/tests/unit/test_corpus_status.py",
+      "drydocs/drydocs_core/docs_verify.py"
     ],
     [
       "drydocs/tests/unit/test_cypher_split.py",
@@ -28719,7 +28931,7 @@
     ],
     [
       "drydocs/tests/unit/test_docs_verify.py",
-      "drydocs/drydocs/docs_verify.py"
+      "drydocs/drydocs_core/docs_verify.py"
     ],
     [
       "drydocs/tests/unit/test_drydocs_api.py",
@@ -30171,6 +30383,10 @@
     ],
     [
       "drydocs/web/src/App.tsx",
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/App.tsx",
       "drydocs/web/src/routes/IntakeRoute.tsx"
     ],
     [
@@ -30224,6 +30440,22 @@
     [
       "drydocs/web/src/App.tsx",
       "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/FileReport.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/FileReport.tsx",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/ask/FileReport.tsx",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/ask/FileReport.tsx",
+      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/ask/TaskGraphPane.tsx",
@@ -30402,6 +30634,22 @@
       "drydocs/web/src/lib/status.ts"
     ],
     [
+      "drydocs/web/src/docs/CorpusStatus.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/docs/CorpusStatus.tsx",
+      "drydocs/web/src/components/ui/StatusChip.tsx"
+    ],
+    [
+      "drydocs/web/src/docs/CorpusStatus.tsx",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/docs/CorpusStatus.tsx",
+      "drydocs/web/src/lib/corpusStatus.ts"
+    ],
+    [
       "drydocs/web/src/docsmod/demoDocs.ts",
       "drydocs/web/src/components/MiniDag.tsx"
     ],
@@ -30542,6 +30790,26 @@
       "drydocs/web/src/lib/auth.ts"
     ],
     [
+      "drydocs/web/src/lib/auth.ts",
+      "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/lib/canvasRoutes.test.ts",
+      "drydocs/web/src/lib/nvl-mapping.ts"
+    ],
+    [
+      "drydocs/web/src/lib/canvasRoutes.test.ts",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/lib/corpusStatus.ts",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/lib/corpusStatus.ts",
+      "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
       "drydocs/web/src/lib/cypher-labels.test.ts",
       "drydocs/web/src/lib/cypher-labels.ts"
     ],
@@ -30556,6 +30824,10 @@
     [
       "drydocs/web/src/lib/graphApi.ts",
       "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/lib/graphApi.ts",
+      "drydocs/web/src/lib/reachability.ts"
     ],
     [
       "drydocs/web/src/lib/intakeApi.ts",
@@ -30574,6 +30846,14 @@
       "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
+      "drydocs/web/src/lib/nvl-mapping.ts",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/lib/reachability.test.ts",
+      "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
       "drydocs/web/src/lib/views.ts",
       "drydocs/web/src/lib/auth.ts"
     ],
@@ -30588,6 +30868,26 @@
     [
       "drydocs/web/src/lineage/LineageGraphPane.tsx",
       "drydocs/web/src/lineage/demoLineage.ts"
+    ],
+    [
+      "drydocs/web/src/lineage/SwimlaneView.tsx",
+      "drydocs/web/src/lineage/demoSwimlane.ts"
+    ],
+    [
+      "drydocs/web/src/lineage/SwimlaneView.tsx",
+      "drydocs/web/src/lineage/laneBasis.ts"
+    ],
+    [
+      "drydocs/web/src/lineage/demoSwimlane.ts",
+      "drydocs/web/src/lineage/laneBasis.ts"
+    ],
+    [
+      "drydocs/web/src/lineage/laneBasis.test.ts",
+      "drydocs/web/src/lineage/demoSwimlane.ts"
+    ],
+    [
+      "drydocs/web/src/lineage/laneBasis.test.ts",
+      "drydocs/web/src/lineage/laneBasis.ts"
     ],
     [
       "drydocs/web/src/loads/LoadsTimeline.tsx",
@@ -30628,6 +30928,18 @@
     [
       "drydocs/web/src/ownership/OwnershipGraphPane.tsx",
       "drydocs/web/src/ownership/demoOwnership.ts"
+    ],
+    [
+      "drydocs/web/src/ownership/ProductRollup.tsx",
+      "drydocs/web/src/components/MiniDag.tsx"
+    ],
+    [
+      "drydocs/web/src/ownership/ProductRollup.tsx",
+      "drydocs/web/src/ownership/demoProductRollup.ts"
+    ],
+    [
+      "drydocs/web/src/ownership/demoProductRollup.ts",
+      "drydocs/web/src/components/MiniDag.tsx"
     ],
     [
       "drydocs/web/src/remediation/ProfileFrame.tsx",
@@ -30711,6 +31023,10 @@
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/ask/FileReport.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/ask/TaskGraphPane.tsx"
     ],
     [
@@ -30771,6 +31087,10 @@
     ],
     [
       "drydocs/web/src/routes/DocsRoute.tsx",
+      "drydocs/web/src/docs/CorpusStatus.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/DocsRoute.tsx",
       "drydocs/web/src/docsmod/demoDocs.ts"
     ],
     [
@@ -30812,6 +31132,34 @@
     [
       "drydocs/web/src/routes/GatesRoute.tsx",
       "drydocs/web/src/routes/ModuleTemplate.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/components/SpecGraphPane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/layout/ModuleToolbar.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/lib/nvl-mapping.ts"
+    ],
+    [
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
+      "drydocs/web/src/modules/registry.ts"
     ],
     [
       "drydocs/web/src/routes/IntakeRoute.tsx",
@@ -30856,6 +31204,10 @@
     [
       "drydocs/web/src/routes/LineageRoute.tsx",
       "drydocs/web/src/lineage/LineageGraphPane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/LineageRoute.tsx",
+      "drydocs/web/src/lineage/SwimlaneView.tsx"
     ],
     [
       "drydocs/web/src/routes/LineageRoute.tsx",
@@ -31044,6 +31396,10 @@
     [
       "drydocs/web/src/routes/OwnershipRoute.tsx",
       "drydocs/web/src/ownership/OwnershipGraphPane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/OwnershipRoute.tsx",
+      "drydocs/web/src/ownership/ProductRollup.tsx"
     ],
     [
       "drydocs/web/src/routes/OwnershipRoute.tsx",
@@ -34990,6 +35346,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/code-graph-package-layer.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/console-auth-boundary.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -40164,11 +40525,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/docs_verify.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/fid_census.py"
     ],
     [
@@ -41284,6 +41640,11 @@
     [
       "drydocs/drydocs_api",
       "CONTAINS",
+      "drydocs/drydocs_api/corpus_status.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
       "drydocs/drydocs_api/credentials.py"
     ],
     [
@@ -41395,6 +41756,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/docs"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/docs_verify.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -42944,7 +43310,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1055.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43764,6 +44130,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_ask_file_search_spec.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_attribution_surfaces.py"
     ],
     [
@@ -43884,6 +44255,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_console_origins.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_constraint_drift.py"
     ],
     [
@@ -43920,6 +44296,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_controlm_resource_pool.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_corpus_status.py"
     ],
     [
       "drydocs/tests/unit",
@@ -44165,6 +44546,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_lineage_dpl_registry.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_lineage_edge_backing.py"
     ],
     [
       "drydocs/tests/unit",
@@ -44924,6 +45310,11 @@
     [
       "drydocs/web/src",
       "CONTAINS",
+      "drydocs/web/src/docs"
+    ],
+    [
+      "drydocs/web/src",
+      "CONTAINS",
       "drydocs/web/src/docsmod"
     ],
     [
@@ -45010,6 +45401,11 @@
       "drydocs/web/src",
       "CONTAINS",
       "drydocs/web/src/underhood"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
+      "drydocs/web/src/ask/FileReport.tsx"
     ],
     [
       "drydocs/web/src/ask",
@@ -45222,6 +45618,11 @@
       "drydocs/web/src/data/towers.ts"
     ],
     [
+      "drydocs/web/src/docs",
+      "CONTAINS",
+      "drydocs/web/src/docs/CorpusStatus.tsx"
+    ],
+    [
       "drydocs/web/src/docsmod",
       "CONTAINS",
       "drydocs/web/src/docsmod/demoDocs.ts"
@@ -45354,6 +45755,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/canvasRoutes.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/corpusStatus.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/cypher-labels.test.ts"
     ],
     [
@@ -45404,6 +45815,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/reachability.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/runtimeView.ts"
     ],
     [
@@ -45429,7 +45850,27 @@
     [
       "drydocs/web/src/lineage",
       "CONTAINS",
+      "drydocs/web/src/lineage/SwimlaneView.tsx"
+    ],
+    [
+      "drydocs/web/src/lineage",
+      "CONTAINS",
       "drydocs/web/src/lineage/demoLineage.ts"
+    ],
+    [
+      "drydocs/web/src/lineage",
+      "CONTAINS",
+      "drydocs/web/src/lineage/demoSwimlane.ts"
+    ],
+    [
+      "drydocs/web/src/lineage",
+      "CONTAINS",
+      "drydocs/web/src/lineage/laneBasis.test.ts"
+    ],
+    [
+      "drydocs/web/src/lineage",
+      "CONTAINS",
+      "drydocs/web/src/lineage/laneBasis.ts"
     ],
     [
       "drydocs/web/src/loadmap",
@@ -45464,12 +45905,22 @@
     [
       "drydocs/web/src/ownership",
       "CONTAINS",
+      "drydocs/web/src/ownership/ProductRollup.tsx"
+    ],
+    [
+      "drydocs/web/src/ownership",
+      "CONTAINS",
       "drydocs/web/src/ownership/assetSearch.ts"
     ],
     [
       "drydocs/web/src/ownership",
       "CONTAINS",
       "drydocs/web/src/ownership/demoOwnership.ts"
+    ],
+    [
+      "drydocs/web/src/ownership",
+      "CONTAINS",
+      "drydocs/web/src/ownership/demoProductRollup.ts"
     ],
     [
       "drydocs/web/src/remediation",
@@ -45560,6 +46011,11 @@
       "drydocs/web/src/routes",
       "CONTAINS",
       "drydocs/web/src/routes/GatesRoute.tsx"
+    ],
+    [
+      "drydocs/web/src/routes",
+      "CONTAINS",
+      "drydocs/web/src/routes/GraphCanvasRoute.tsx"
     ],
     [
       "drydocs/web/src/routes",
@@ -45711,13 +46167,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2584,
-    "edges": 1362,
+    "files": 2603,
+    "edges": 1406,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2872,
-    "directories": 289
+    "rels": 2892,
+    "directories": 290
   }
 }
