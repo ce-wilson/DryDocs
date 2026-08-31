@@ -177,13 +177,18 @@ Index: [`external/orchestration/README.md`](external/orchestration/README.md)
 | **AWS Airflow / MWAA** | placeholder — map to baseline | [`external/orchestration/airflow/`](external/orchestration/airflow/README.md) |
 
 Oracle (source DB) and Snowflake (future) are **data platforms**, indexed under
-[`reference/platforms/`](reference/platforms/README.md). **There is no general Oracle skill in the
-routing set** — both were disabled and the pointer was dropped 2026-08-31, because there is no
-working Oracle connection from this machine, so live-DB guidance had nothing to act on. Oracle work
-here is *replica-shaped*, not connection-shaped: the CM_ objects in the `psgmgr` schema are reached
-through the [`controlm-db` skill](.claude/skills/controlm-db/SKILL.md), which is the correct entry
-point for "which table holds X" and for any `controlm_*.sql` loader. Note `reference/platforms/`
-currently carries **`neo4j/` only** — there is no `oracle/` directory behind this link yet.
+[`reference/platforms/`](reference/platforms/README.md) and served by the
+[`oracle-db` skill](.claude/skills/oracle-db/SKILL.md) (general Oracle/PL-SQL/tuning guidance).
+**That skill is present and ported, but OFF producer-side** — `"off"` in `.claude/settings.local.json`
+`skillOverrides`, because the producer has no live Oracle connection for it to act on. The state is
+venue-specific and the enablement call is each repo's own (J18): `.claude/**` is `canonical-producer`,
+so the company inherits the skill tree while `settings.local.json` stays machine-local — the company
+side, which does have a live `psgmgr` connection, is expected to turn it on. Two adjacent pointers,
+so nobody re-fixes this line wrongly: the vendor plugin `db@oracle-skills` is a *different* thing and
+is `false` in `~/.claude/settings.json` `enabledPlugins`; and `reference/platforms/` currently carries
+**`neo4j/` only** — there is no `oracle/` directory behind that link yet. For the CM_ objects in the
+`psgmgr` schema, the entry point is the [`controlm-db` skill](.claude/skills/controlm-db/SKILL.md),
+which answers "which table holds X" against the replica and needs no connection at all.
 
 ---
 
