@@ -91,6 +91,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-233`** · 2026-08-31 · `[idea]` · **open** · prio? **Med** —
+  **Record HOW a source was captured, not only how much its content is trusted: a capture-rung
+  alongside the VERBATIM/GROUNDED/SYNTHESIZED axis.** Body follows.
+
+
 - **`Idea-232`** · 2026-08-31 · `[bug]` · **open** · prio? **High** —
   **A backlog item can be HELD by an annotation while the ready list still calls it ready,
   because `next_ready` is computed from `depends_on` alone.** Found the expensive way: O26
