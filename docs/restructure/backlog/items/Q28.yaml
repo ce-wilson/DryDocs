@@ -16,6 +16,64 @@ inputs:
 - tests/unit/test_doc_registry.py
 - tests/unit/test_external_vendor_scrape.py
 acceptance: |
-  Stub minted per the I6 rule — the body lands in the next commit.
+  (a) TWO EDITS, ONE COMMIT: a new `bmc-docs-controlm-parameters` row in
+  `config/doc-source-registry.yaml` AND `corpus_id="bmc-docs-controlm-parameters"` on the
+  `bmc-controlm-9.0.21-parameters` VendorTree in `scripts/external_vendor_scrape.py`. Atomic
+  for the same reason Q27's pair was: a `corpus_id` naming a row the registry does not carry
+  fails `resolve_capture_registry_id` exactly as a `None` does, so splitting the edits buys
+  nothing and leaves a window where the tree still refuses.
+
+  (b) THE REFUSAL THIS CLEARS IS AT CAPTURE, NOT CONVERSION. The Q23 join runs BEFORE the TOC
+  request (`main()`, immediately after tree lookup), so today the tree is INERT: it lists under
+  `--list`, and `bmc-controlm-9.0.21-parameters --dry-run` exits 2 with "no registry id and no
+  resolvable purpose". Reproduced 2026-08-31 (desktop, this worktree). The dataclass comment
+  reading "conversion refuses rather than guessing" understates it — the fetch never starts.
+  Fix the comment with the row.
+
+  (c) FIELD VALUES, taking the sibling row as the template and departing only where the facts
+  differ: classification `External`, connector `web`, trust_default `VERBATIM` (a scrape is
+  BMC's own words), tier T1, curation `none` (T1 ladder, ADR 0006 §4), target_db `drydocs`
+  (G102 fold — the only value `test_doc_registry.py` admits), refresh `on-demand`,
+  taxonomy_path `technology/orchestration/control-m`, `graph_locator: {match: corpus_id, value:
+  bmc-docs-controlm-parameters}`. The id uses the `{vendor}-docs-*` VENDOR grammar — this IS a
+  vendor publication, so unlike Q27's class-based MWAA id the sibling form is correct.
+
+  (d) NOT YET CAPTURED, AND THE ROW MUST SAY SO. Unlike the utilities row, no capture exists:
+  `captured_at` and `manifest` describe a run that has not happened, so they carry the
+  not-yet-captured state rather than invented values, and `source` says the payload is absent
+  from every tree. The Q27 precedent — a row may register before its payload lands — is what
+  makes this legal; state it on the row so the asymmetry with the sibling reads as deliberate.
+
+  (e) `confirmed: false`, WITH THE REASON ON THE ROW: registration is a DECLARATION. No loader
+  writes from the entry until a gate signs the doc-graph shape, and flipping the flag is a
+  separate follow-up (the Q24 precedent), never this item. NO CAPTURE RUN IS AUTHORIZED HERE
+  either — this item makes the tree capturable; whether to spend 9.0.21's page budget against
+  a third party is the operator's call at a later, explicit step.
+
+  (f) THE OBSERVABLE: `bmc-controlm-9.0.21-parameters --dry-run` stops refusing and prints its
+  plan — tree, books, subtree filter and resolved page count — reaching the `--dry-run:
+  nothing fetched` line with exit 0, having made exactly ONE network request (the TOC). The
+  close note quotes the resolved page count and the corpus entry line, and the unit suite is
+  green including `test_doc_registry.py` and `test_external_vendor_scrape.py`.
 notes: |
-  Minted 2026-08-31. Body to follow.
+  Minted 2026-08-31 (desktop, ui-workstream worktree) from a stale-branch sweep, NOT from the
+  inbox — `feat/external-vendor-scraper` was being checked for unmerged work (it had none:
+  0 ahead / 1314 behind) and the gap surfaced in the code it had already landed on main.
+
+  WHY NO ITEM EXISTED. The Q series built the whole capability around this tree and never
+  registered it: Q12 the scale guardrail, Q13 capture->convert->load, Q23 the run<->row join
+  that now blocks it, Q24 the utilities flip, Q27 the MWAA registration. The 9.0.21 tree was
+  added to TREES as a capturable target and left with `corpus_id: None` — the documented
+  "not registered yet" state, which is honest, but nothing carried it forward. Swept before
+  minting: all 27 Q items, every item matching 9.0.21 / corpus_id / vendor-scrape, and the
+  IDEAS.md inbox. Q24 is the nearest miss and is a different corpus (9.0.20 utilities).
+
+  WHY THIS TREE IS WORTH REGISTERING. It is the VERSION-CORRECT one: the estate runs
+  9.0.21.300, and the registered sibling is 9.0.20 only because BMC trimmed the 9.0.21 help
+  publication so it carries no Utilities book. Its own note in TREES names the second payoff —
+  it overlaps the hand-converted external/orchestration/bmc-controlm/ corpus, so it doubles as
+  a drift check of our GROUNDED paraphrase against vendor VERBATIM.
+
+  Module `config` as a CHOICE, following Q27: the substance is a registry declaration. The
+  scraper edit is one field plus a comment correction, not a behavior change — the refusal
+  path, the ceiling and the politeness delay are all untouched.
