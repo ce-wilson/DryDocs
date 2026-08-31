@@ -91,6 +91,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-231`** · 2026-08-31 · `[bug]` · **open** · prio? **Med** —
+  **`canAccessModule` decides who sees which console module and has no test, and no guard
+  pins which modules are designated `sme`.** (Body to follow — id minted and pushed first,
+  per the I6 rule.)
+
 - **`Idea-230`** · 2026-08-31 · `[chore]` · **open** · prio? **Med** —
   **An item's acceptance can be overtaken by its own dependency's growth, and nothing
   notices.** (Body to follow — id minted and pushed first, per the I6 rule.)
