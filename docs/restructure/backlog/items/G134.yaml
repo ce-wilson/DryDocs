@@ -1,0 +1,20 @@
+id: G134
+epic: component-topology
+title: The document registry records a corpus's trust level but not the rung that produced it, so a
+  GROUNDED row cannot say whether anything higher was ever tried
+type: task
+module: config
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/doc-source-registry.yaml
+- tests/unit/test_doc_registry.py
+- config/classification.yaml
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  Minted 2026-08-31.
