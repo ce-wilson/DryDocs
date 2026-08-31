@@ -23,15 +23,24 @@ pre-paint boot script in `index.html` (System/Dark/Light — see
 `src/lib/theme.ts` and `src/components/ThemeToggle.tsx`); IBM Plex is
 self-hosted via `@fontsource` (no Google Fonts CDN).
 
-## Mock persona sign-in (SYNTHESIZED)
+## Persona sign-in (real, as of O69)
 
-The console is gated by a **mock** persona sign-in — a client-side picker with a
-localStorage session (`drydocs.mock-session.v1`) and **zero real security**: anyone
-can pick any persona; nothing is verified anywhere. It exists so role-gated views
-can be built and demoed now. **This is not an architecture decision** — the real
-access path is decided (**ADR 0005**: thin API; see "Graph access" below), but
-real authn/authz still replaces `src/lib/auth.ts` company-side (enterprise OIDC
-per the ADR's Evidence). `?as=<persona>` gives a headless sign-in for demos.
+Signing in means proving a secret to `drydocs-api` and holding the opaque token it
+returns (`src/lib/auth.ts`, session key `drydocs.session.v2`). The **client-side
+picker this section used to describe is gone** — until 2026-08-28 any persona
+could be chosen with nothing verifying it, and `?as=<persona>` gave a headless
+sign-in for demos. Neither exists now: there is no `?as=`, and a browser that
+edits its stored session buys nothing, because the role that gates anything is
+re-derived from `PERSONAS` client-side and re-resolved from the token server-side
+on every request (ADR 0005 decision 3).
+
+Secrets are **machine-local and absent on a fresh clone**, so every login on a new
+checkout is refused until one is set — the correct default for a proof of concept,
+and the reason the refusal names its bootstrap command rather than reading as a
+bug. Set one with `poetry run python scripts/set_console_credential.py <persona>`
+(no-echo prompt; see `drydocs_api/credentials.py` for why the hash lives outside
+both git and `var/`). Real enterprise authn/authz still replaces this layer
+company-side per the ADR's Evidence.
 
 Three synthetic personas (never real SIDs — publish boundary):
 
@@ -51,6 +60,43 @@ Run it: `cp .env.example .env.local` (point `VITE_NEO4J_URI` at your local Neo4j
 canonical container/ports live in `config/dev-environment.yaml`; bolt is
 `bolt://localhost:7687` on the `neo4jtest` EE container), then
 `npm install && npm run dev`.
+
+## Tests (O80)
+
+Two runners, both blocking in CI's `web` job the way `ruff` is in `gates`:
+
+```powershell
+npm test                 # vitest — pure modules, no browser, no servers
+npm run test:watch       # the same, in watch mode
+npm run test:e2e:install # once per machine: fetch the Chromium build
+npm run test:e2e         # playwright — the browser path, against real servers
+```
+
+**What each is for.** `npm test` covers pure modules where a defect has already
+escaped — `src/components/map/resolve.test.ts` is the seed case, because the Z5
+map's synthetic cities could never resolve and no Python guard could see it, the
+bug being in TypeScript. `npm run test:e2e` walks the path a person has had to
+walk by hand after every auth change: sign in, reach a module through the nav,
+assert a value the page rendered.
+
+**The e2e suite starts its own servers and needs nothing running.** It boots
+`drydocs-api` on **:8011** and Vite on **:5273**, mints a throwaway credential
+into a temp directory, and tears it down after. It deliberately does not reuse a
+server you already have: an API started against your real credential file cannot
+verify its throwaway secret, which fails the run on a machine where nothing is
+wrong. Your own `:8001` / `:5173` are never touched, adopted, or stopped.
+
+**No Neo4j required.** The API's driver is created lazily and the module it
+asserts against (`/gates`) renders from a committed generated artifact, so the
+whole path runs with no graph — which is exactly the CI runner's condition.
+
+**Ports are not freely chosen.** :5273 is a browser ORIGIN, and the API only
+accepts origins it names; the harness passes its own via `DRYDOCS_CORS_ORIGINS`,
+which *adds* to the built-in dev origins (5173, 4173) and never replaces them.
+Changing the web port means changing that variable with it.
+
+The case ledger is `config/taxonomy/ui-tests.yaml`: cases carrying `automated_by`
+are run by these files, and the rest are still checklists a person works through.
 
 ## Graph access (ADR 0005) — the GraphAccess seam
 

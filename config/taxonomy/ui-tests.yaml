@@ -22,13 +22,17 @@
 # "click this, see that". Same spirit, different assertion surface, so this is
 # a sibling schema rather than a strained reuse.
 #
-# EXECUTION IS MANUAL. There is no UI test runner today: web/package.json has
-# dev/build/lint/preview and nothing else, and there is not a single .test.tsx
-# in the tree. These are CHECKLISTS a human works through — which is exactly
-# how the UI is being tested right now, so the ledger meets reality instead of
-# assuming a harness that does not exist. `execution: manual` says so out loud;
-# if a runner ever lands, cases gain an `automated_by` key and the mode flips
-# per case, not per file.
+# EXECUTION IS MIXED, AS OF O80 (2026-08-31). A runner landed — Vitest for pure
+# modules, Playwright for the browser path — so the mode flipped exactly as this
+# header said it would: PER CASE, via `automated_by`, not per file. A case with
+# `automated_by` is run by that file in CI; a case without one is still a
+# checklist a human works through, and most of them are.
+#
+# WHAT THIS DOES NOT CLAIM. Four cases are automated out of twenty-three. The
+# ledger's job is unchanged — it stops implying every case is unautomatable, and
+# it must not start implying the opposite. The automated four were chosen
+# because each had already escaped into main and been caught by a person looking
+# (O80's evidence), not because they were the easiest to write.
 #
 # SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
 # backlog close note recording something that was actually observed working.
@@ -36,19 +40,26 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 3 of 12 areas seeded. The rest are declared
-# with `cases: []` so the gap is a visible number rather than an absence, and
-# the guard pins it.
+# COVERAGE IS PARTIAL AND SAYS SO: 8 of 13 areas seeded (3 of 12 when this file
+# was written). The rest are declared with `cases: []` so the gap is a visible
+# number rather than an absence, and the guard pins it.
 # =============================================================================
 
 schema: drydocs.ui-tests.v1
 classification: Internal-Public
-updated: 2026-07-31
+updated: 2026-08-31
 
 # --- joins -------------------------------------------------------------------
 component_ledger: config/taxonomy/ui-components.yaml   # component -> module
 module_registry: web/src/modules/registry.ts           # the canonical module ids
-execution: manual                                      # no runner exists (see header)
+execution: mixed                                       # per-case; see automated_by
+
+# --- runners (O80) -----------------------------------------------------------
+# Named here so `automated_by` can cite one and the guard can check the file
+# exists. Both run in CI's `web` job and block a merge the way ruff does.
+runners:
+  vitest: web/vitest.config.ts        # pure modules, no browser
+  playwright: web/playwright.config.ts  # the browser path, against real servers
 
 suites:
   # ---------------------------------------------------------------------------
@@ -106,6 +117,31 @@ suites:
           React Flow chrome styling goes through the variables, never direct
           rules.
         source: "O65 fix 2026-08-21 — laptop, headless Chrome vs Vite :5199: computed-style probes (btn bg #121e2e dark / white light, attribution transparent) + keyboard-Tab focus-ring probe + screenshots both themes"
+
+      - id: TC-SHELL-05
+        description: A valid secret signs in and the shell replaces the sign-in screen
+        steps:
+          - Open the console signed out.
+          - Choose a persona, enter its secret, submit.
+        expect: >
+          The sign-in heading goes away and the module nav renders. The secret is
+          checked by drydocs-api, not by the browser — so this exercises all three
+          processes (browser, Vite, API) and fails if any of them is misconfigured.
+        source: "O80 build 2026-08-31 — desktop, Playwright/Chromium against Vite :5273 + drydocs-api :8011, no graph"
+        automated_by: web/e2e/console.spec.ts
+
+      - id: TC-SHELL-06
+        description: A wrong secret is refused and the console stays signed out
+        steps:
+          - Open the console signed out.
+          - Choose a persona, enter an incorrect secret, submit.
+        expect: >
+          The sign-in screen stays up and no module nav appears. The refusal is the
+          SERVER's — this is the one case in the ledger whose verdict the client
+          does not decide — and without it the case above would pass against a
+          login that accepted anything.
+        source: "O80 build 2026-08-31 — desktop, Playwright/Chromium; API returned 401"
+        automated_by: web/e2e/console.spec.ts
 
   # ---------------------------------------------------------------------------
   - id: TS-LOADS
@@ -324,12 +360,54 @@ suites:
   # Present so the coverage gap is a number, not an absence. Seed each from
   # verified behaviour when that module is next worked on — never by inventing
   # cases that nobody has watched pass.
-  - { id: TS-EXPLORER,    module: explorer,    description: "Explorer tower/app drill-down + inspector.", cases: [] }
+  - id: TS-EXPLORER
+    module: explorer
+    description: >
+      Explorer tower/app drill-down + inspector, and the location map it renders
+      (web/src/components/map). Seeded at O80 by the unit runner rather than by a
+      browser case — the defect below was in a PURE module, which is why no
+      Python guard could see it and why a unit test is the right shape for it.
+    cases:
+      - id: TC-EXPLORER-01
+        description: Every location row is either placed on the map or reported as unplaceable
+        steps:
+          - Resolve a set of rows covering each failure mode (no country, unknown
+            country, no city, unknown city) plus the two synthetic fixture cities.
+        expect: >
+          Nothing vanishes: each row is either a placed site or an entry in
+          `unplaceable` carrying its reason, and placed + unplaceable equals the
+          input count. The synthetic cities in particular MUST place — they carry
+          a country alias rather than a numeric id, and keying the index on one
+          while looking up with the other made the one class of row that exists so
+          an empty graph still draws something the only class that could not be
+          drawn. A missing dot reads as "nothing there", which is a different and
+          worse claim than "we could not place this".
+        source: "Z5 defect, found by rendering the tab 2026-08-27; locked in by unit tests at O80 2026-08-31"
+        automated_by: web/src/components/map/resolve.test.ts
   - { id: TS-LINEAGE,     module: lineage,     description: "Lineage source->target DAG canvas.", cases: [] }
   - { id: TS-RUNBOOKS,    module: runbooks,    description: "Data-series provisioning chain views.", cases: [] }
   - { id: TS-REMEDIATION, module: remediation, description: "Finding -> fix-batch flow.", cases: [] }
   - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }
-  - { id: TS-GATES,       module: gates,       description: "Gate dependency graph + gate log.", cases: [] }
+  - id: TS-GATES
+    module: gates
+    description: >
+      Gate dependency graph + gate log, rendered read-only from the generated
+      gates.json (O19). Seeded at O80 because this page is the console's one
+      module that renders entirely from a committed artifact, which makes it the
+      only module a browser test can assert against with no graph running.
+    cases:
+      - id: TC-GATES-01
+        description: The page reports the gate record's own count
+        steps:
+          - Sign in and open /gates from the module nav.
+          - Read the count in the table hint.
+        expect: >
+          The count equals the length of `gates` in web/src/generated/gates.json.
+          The assertion is COMPUTED from that artifact rather than pinned to a
+          number, so grooming the gate record moves the page and the test together
+          and only a page that stopped reading the artifact fails.
+        source: "O80 build 2026-08-31 — desktop, Playwright/Chromium; 108 gates at the build"
+        automated_by: web/e2e/console.spec.ts
   - { id: TS-UNDERHOOD,   module: underhood,   description: "Benchmark showcase surfaces.", cases: [] }
 
   # ---------------------------------------------------------------------------

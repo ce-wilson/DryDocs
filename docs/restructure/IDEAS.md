@@ -360,6 +360,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
+- **`Idea-227`** · 2026-08-31 · `[bug]` · **open — found by O80's new unit runner, desktop** · prio? **Med** —
+  **A synthetic city's country reports that it HAS a drawable outline when it does not, because
+  `resolve.ts` reads `country_id` and ignores `country_alias` — the same family as the Z5 index bug
+  the file was written to catch.** `PlacedSite.countryHasNoShape` is computed as
+  `COUNTRY_NO_SHAPE.has(city.country_id ?? '')`, but a synthetic city carries no numeric
+  `country_id` — only `country_alias: 'SYN'` — so the lookup asks for the empty string and misses
+  `SYN`, which the gazetteer declares `no_shape: true`. The UI therefore offers an outline to tint
+  and drill into for a country that has none. `countryId` is null for the same reason, so synthetic
+  countries never reach `countryIds` and never appear in the drill-down list either. Both follow
+  from one missing `?? city.country_alias`. NOT FIXED AT O80 by that item's scope guard — it buys
+  the test capability and proves it, and changing what the map draws is Z-series work with its own
+  review. The correct expectation is already written down as a deliberately failing
+  `it.fails` case in `web/src/components/map/resolve.test.ts`, so fixing the code turns that test
+  red and tells whoever fixed it to flip `it.fails` back to `it`. Worth noting as evidence rather
+  than coincidence: the runner found this on its FIRST run, in the one module the item named.
+
 - **`Idea-225`** · 2026-08-30 · `[idea]` · **open — found by G129's doctor, desktop** · prio? **Med** —
   **A variable set in `.env` alone is visible to every loader and invisible to every binding check,
   and the two surfaces will disagree out loud the first time an Oracle account lands here.** The
