@@ -1,0 +1,24 @@
+id: O86
+epic: web-console
+title: A graph canvas in the data-frame strip is legible only if you drag the divider - give each
+  canvas surface a full-page route it can be opened into
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O81
+inputs:
+- web/src/App.tsx
+- web/src/components/SpecGraphPane.tsx
+- web/src/lib/nvl-mapping.ts
+- web/src/modules/registry.ts
+acceptance: |
+  STUB - body written in the follow-up commit.
+notes: |
+  Minted 2026-08-31 from O81's close: the canvas ships in the data-frame strip
+  (about 215px at the default split), where the whole graph fits but its captions
+  render small.
