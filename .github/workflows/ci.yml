@@ -83,6 +83,76 @@ jobs:
       - name: ruff format --check
         run: poetry run ruff format --check .
 
+  # --- console tests (O80) ---------------------------------------------------
+  # BLOCKING, the way ruff is. The console had no automated test of any kind
+  # until this job existed: twice a defect reached main and was caught by a
+  # person rendering the page (the Z5 map's unplaceable synthetic cities, the O36
+  # cascade flattening), and both times the close note recorded that as the
+  # lesson. A test that does not run in CI would have changed neither case.
+  #
+  # A SEPARATE JOB rather than steps in `gates`, because it needs a Node
+  # toolchain and a browser that the Python gates have no use for; keeping them
+  # apart means a red console test names itself in the checks list instead of
+  # hiding inside a job called "gates".
+  #
+  # NO NEO4J, on purpose. The e2e path signs in and reads a module rendered from
+  # a COMMITTED GENERATED ARTIFACT, and the API's driver is created lazily, so
+  # the whole path runs without a graph — verified locally against an unreachable
+  # bolt URI, which is exactly this runner's condition. A graph-backed assertion
+  # would make this job a database test wearing a browser.
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      # The e2e suite starts drydocs-api as one of its two servers, so this job
+      # needs the Python side installed too — the browser is only one of the
+      # three processes the path crosses.
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install Python dependencies
+        working-directory: .
+        run: poetry install --no-interaction
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Unit tests (vitest)
+        run: npm test
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests (playwright)
+        run: npm run test:e2e
+
+      # Traces and screenshots are retained on failure only; uploading them makes
+      # a red run diagnosable without reproducing it locally, which for a browser
+      # failure is most of the work.
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report/
+          retention-days: 7
+
   # --- Snyk security scanning (added 2026-07-20, user request) ---------------
   # SCA over the Poetry manifest/lockfile (Snyk reads pyproject.toml/poetry.lock
   # natively — no dependency install needed) + an ADVISORY SAST pass (snyk code,

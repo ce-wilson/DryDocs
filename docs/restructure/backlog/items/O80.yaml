@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/package.json
@@ -18,15 +18,80 @@ inputs:
 acceptance: |
   The web package gains a unit test runner and at least one end-to-end browser test, both runnable from a documented npm script and both wired into CI so a red test blocks the way a ruff failure does. The end-to-end test covers a path a person has actually had to verify by hand - sign in, reach a module, assert a rendered value - proving the runner works against the real dev server rather than a mocked shell. The unit runner covers at least one pure module where a defect has already escaped: web/src/components/map/resolve.ts is the named case, because its city-index defect was invisible to every Python guard by construction and was found only by rendering the page. O43's standing question, whether a UI test runner is warranted, is ANSWERED here rather than left open; the ui-tests.yaml ledger records which of its manual cases the automated tests now cover and which stay manual, so the ledger stops implying every case in it is unautomatable.
 notes: |
-  Raised 2026-08-27 from the web-scaffolding review, which found the console has no test
-  runner at all - no Vitest, no Playwright - while the reviewed FastAPI template ships
-  end-to-end tests as a matter of course.
-  THE EVIDENCE THIS ITEM RESTS ON is from the same week. The Z5 map's two synthetic cities
-  could never resolve, because the index keyed them one way and every lookup asked another;
-  no Python guard could see it, the bug being in TypeScript, and it was found by rendering
-  the tab and reading the unplaceable list. Twice now a console defect has been caught by a
-  person looking rather than by a test, and both times the item's own notes recorded that as
-  the lesson. A test runner is the only thing that changes it.
-  SCOPE GUARD: this item buys the CAPABILITY and proves it on two real cases. Backfilling
-  coverage across every console surface is not in it - that is what the ui-tests ledger's
-  per-surface seeded suites are for, one surface at a time.
+  BUILT 2026-08-31 (desktop, MSI). Two runners, both blocking in CI.
+
+  (a) THE UNIT RUNNER IS VITEST, on the app's own Vite pipeline rather than a second
+  toolchain -- the same transform, the same resolve rules, the same JSON imports. A test
+  that passes under a transform the app does not use proves nothing about the app.
+  16 tests over resolve.ts, run against the REAL generated gazetteer rather than a
+  fixture: a fixture would have been written with the same wrong assumption the code
+  had, and would have passed while the page stayed broken.
+
+  IT FOUND A DEFECT ON ITS FIRST RUN, in the module the item named, which is the
+  item's own thesis arriving as evidence. countryHasNoShape reads city.country_id and
+  ignores country_alias, so a synthetic city -- which carries only the alias -- reports
+  that Synthetica HAS a drawable outline when the gazetteer declares no_shape: true.
+  Same family as the Z5 index bug this file exists to catch. NOT FIXED HERE by the
+  scope guard: changing what the map draws is Z-series work. The correct expectation is
+  written as a deliberately failing it.fails case, so fixing the code turns it red and
+  tells whoever fixed it to flip it back. Inboxed as Idea-227.
+
+  (b) THE END-TO-END RUNNER IS PLAYWRIGHT and drives three real processes -- browser,
+  Vite, drydocs-api. Sign in, reach /gates through the nav, assert the gate count the
+  page rendered. The count is COMPUTED from the artifact the page reads, not pinned, so
+  grooming the gate record moves page and test together. A negative case rides with it:
+  a wrong secret is refused BY THE SERVER, without which the positive case would pass
+  against a login that accepted anything.
+
+  NO NEO4J, VERIFIED RATHER THAN ASSUMED: the API's driver is lazy and /gates renders
+  from a committed generated artifact, so the path was re-run against an unreachable
+  bolt URI and passed -- which is the CI runner's actual condition.
+
+  THREE HARNESS BUGS, ALL FOUND BY RUNNING IT, all recorded because each would have
+  read as a broken console rather than a broken test. (1) reuseExistingServer adopted
+  the API already running on this desktop, pointed at the REAL credential file, which
+  cannot verify the throwaway secret -- every sign-in 401'd on a machine where nothing
+  was wrong. The suite now runs its own API on :8011 and never adopts one. (2) The web
+  port is an ORIGIN: the API's CORS allowlist named only 5173/4173, so serving the
+  console anywhere else failed every /login preflight with no Access-Control-Allow-Origin
+  and the page showed Failed to fetch. (3) Playwright evaluates its config in the runner
+  AND in every worker, so a straight randomBytes minted a second secret in the worker
+  while the API held the first. The env vars are now the handoff: whoever finds them set
+  is a worker and adopts them.
+
+  ONE PRODUCTION CHANGE, deliberately small: DRYDOCS_CORS_ORIGINS, declared in env_refs
+  (a default is not an exemption from being enumerable) and ADDING to the built-in dev
+  origins rather than replacing them, so unset means exactly the behaviour that line
+  always had. The hardcoded allowlist was what made the console untestable on any
+  isolated port. `*` is not special-cased -- that would be a decision about a deployed
+  API, not a convenience for a test. .env.example re-rendered by its own generator.
+
+  THE E2E CREDENTIAL IS ITS OWN ENTRY POINT, not a flag on the operator script.
+  set_console_credential.py takes its secret through getpass BY CONSTRUCTION, because
+  O76's provenance record distinguishes a prompted secret from a generated one; adding
+  --secret-from-env for CI's benefit would put a third, unrecorded origin into the
+  operator's own tool. The harness script refuses to write to the machine's real
+  credential path, compared against the DEFAULT location rather than credentials_path()
+  -- which honours the env var the harness just set and would have compared the temp
+  path with itself.
+
+  (c) O43'S STANDING QUESTION IS ANSWERED: yes, a UI test runner is warranted, and the
+  answer is two of them because the two jobs are different -- pure modules need no
+  browser and the browser path needs no mocks. O43 itself stays open for the remaining
+  seeded suites; this item did not backfill them.
+
+  (d) THE LEDGER FLIPPED PER CASE, exactly as its own header said it would: execution:
+  mixed, a runners: block the guard resolves, and automated_by on the four cases these
+  files actually run. TS-GATES and TS-EXPLORER arrive seeded (6/13 -> 8/13). The
+  automated share is PINNED at 4/23 so it cannot drift up quietly -- the ledger stops
+  implying every case is unautomatable and must not start implying the opposite.
+
+  A STALE README SECTION CORRECTED IN PASSING: web/README.md still described the
+  pre-O69 client-side picker with zero security and a ?as= headless sign-in, neither of
+  which has existed since 2026-08-28. It is the mechanism the e2e suite depends on, so
+  leaving it would have actively misled the next person to run the suite.
+
+  VERIFIED: full Python suite 2881 passed / 12 skipped, ruff check + format clean, CLI
+  import and --help, vitest 16 passed, playwright 2 passed (and re-passed with no graph
+  reachable), tsc build clean, oxlint unchanged (4 pre-existing warnings, none in new
+  files).

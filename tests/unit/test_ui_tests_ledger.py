@@ -49,11 +49,12 @@ def test_schema_and_declared_joins_resolve() -> None:
     assert doc["classification"] == "Internal-Public"
     assert (REPO / doc["component_ledger"]).exists()
     assert (REPO / doc["module_registry"]).exists()
-    assert doc["execution"] == "manual", (
-        "no UI runner exists (web/package.json has no test script and there is "
-        "no .test.tsx in the tree) — flipping this would claim a harness we do "
-        "not have"
+    assert doc["execution"] == "mixed", (
+        "a runner landed at O80, so execution is per-case via `automated_by` — "
+        "flipping this back to `manual` would deny a harness that runs in CI"
     )
+    for name, path in doc["runners"].items():
+        assert (REPO / path).exists(), f"runner {name} points at a missing file: {path}"
 
 
 def test_every_suite_targets_a_real_module() -> None:
@@ -108,10 +109,47 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # 5/13 -> 6/13 at O64 (2026-08-21): TS-ASK seeded from the last-turn
     # persistence verification — with its stated caveat that the completed
     # turn was storage-seeded, not produced by a live agent run.
-    assert (len(seeded), len(suites)) == (6, 13), (
+    # 6/13 -> 8/13 at O80 (2026-08-31): TS-GATES and TS-EXPLORER arrive seeded,
+    # both from cases the new runners actually execute rather than from prose.
+    assert (len(seeded), len(suites)) == (8, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )
+
+
+# --------------------------------------------------------------------------- #
+# automation, stated as a number for the same reason coverage is (O80)
+# --------------------------------------------------------------------------- #
+def test_automated_cases_name_a_file_that_exists() -> None:
+    """`automated_by` is a claim that something RUNS this case.
+
+    A path that has been renamed or deleted turns the ledger's most load-bearing
+    new field into decoration, and the failure mode is silent: the case still
+    reads as covered. Checking the file exists is the cheapest thing that makes
+    the claim mean something.
+    """
+    missing = [
+        (c["id"], c["automated_by"])
+        for s in _tests()["suites"]
+        for c in s["cases"]
+        if c.get("automated_by") and not (REPO / c["automated_by"]).exists()
+    ]
+    assert not missing, f"case(s) claim automation by a missing file: {missing}"
+
+
+def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
+    """Four of twenty-three. The point is that the number is SMALL and visible.
+
+    O80 bought the capability and proved it on cases that had already escaped
+    into main; it did not backfill coverage, and this pin is what stops a later
+    session from believing it did.
+    """
+    cases = [c for s in _tests()["suites"] for c in s["cases"]]
+    automated = [c for c in cases if c.get("automated_by")]
+    assert (len(automated), len(cases)) == (
+        4,
+        23,
+    ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 
 def test_every_console_module_has_a_suite_even_if_empty() -> None:

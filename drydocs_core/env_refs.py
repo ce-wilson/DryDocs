@@ -186,6 +186,23 @@ DECLARED_VARIABLES: Final[tuple[EnvVar, ...]] = (
         example="90",
     ),
     EnvVar(
+        name="DRYDOCS_CORS_ORIGINS",
+        purpose="extra browser origins drydocs-api accepts, comma-separated (O80 e2e)",
+        group="machine-local",
+        example="http://localhost:5273",
+        doc=(
+            "ADDS to the built-in dev origins (vite dev 5173, vite preview 4173); it never\n"
+            "replaces them, so an empty or unset value leaves the allowlist exactly as it\n"
+            "has always been. It exists because the allowlist was HARDCODED, which made the\n"
+            "console untestable anywhere but those two ports: the end-to-end suite needs its\n"
+            "own port so it never adopts, collides with, or has to stop a dev server\n"
+            "somebody is using, and a browser origin the API does not name fails every\n"
+            "preflight with no Access-Control-Allow-Origin. Entries are taken verbatim --\n"
+            "`*` is NOT special-cased here, and setting it would be a decision about a\n"
+            "deployed API rather than a convenience for a test."
+        ),
+    ),
+    EnvVar(
         name="DRYDOCS_CONSOLE_CREDENTIALS",
         purpose="path to the machine-local console credential file (O69/O73)",
         secret=True,

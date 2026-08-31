@@ -86,6 +86,7 @@ from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQuer
 from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError, Session
 from drydocs_core.config import Neo4jSettings
+from drydocs_core.env_refs import resolve_optional
 from drydocs_core.notifications import from_summary, to_payload
 
 
@@ -224,9 +225,19 @@ def create_app(
         title="drydocs-api", description="Thin read API over the knowledge graph (ADR 0005)"
     )
     # The web console dev server is the only expected browser origin today.
+    # DRYDOCS_CORS_ORIGINS ADDS to this list and never replaces it, so unset means
+    # exactly the behaviour this line has always had. It exists because a hardcoded
+    # allowlist makes the console untestable on any other port, and the O80
+    # end-to-end suite needs its own so it never adopts or collides with a dev
+    # server somebody is already running.
+    extra_origins, _ = resolve_optional("DRYDOCS_CORS_ORIGINS", where="create_app()")
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://localhost:4173"],
+        allow_origins=[
+            "http://localhost:5173",
+            "http://localhost:4173",
+            *[o.strip() for o in (extra_origins or "").split(",") if o.strip()],
+        ],
         allow_methods=["*"],
         allow_headers=["*"],
     )

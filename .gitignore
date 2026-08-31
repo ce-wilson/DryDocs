@@ -21,6 +21,14 @@ build/
 # Node (web/)
 node_modules/
 
+# Playwright output (O80). Traces and screenshots are retained on FAILURE only,
+# so these directories are debugging residue from a red run, never an artifact
+# anything reads. CI uploads its own copy as a job artifact instead.
+web/test-results/
+web/playwright-report/
+web/blob-report/
+web/.playwright/
+
 # ADK local runtime state (agents/ — session DBs the api_server writes)
 .adk/
 
