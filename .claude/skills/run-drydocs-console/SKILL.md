@@ -77,6 +77,30 @@ so a fresh clone has no personas and `/login` returns 401 for every attempt. `/l
 returns ONE message for bad-secret and unknown-persona on purpose (enumeration), so a 401
 does not tell you which it was — check the store exists before debugging the request.
 
+## Step 4 — test persona credentials (only if sign-in refuses)
+
+The console signs in against a MACHINE-LOCAL store, so this step is per-desktop and is
+not part of a normal start. Six Matrix-named personas share one dev-only secret
+convention; the values live in `internal-local/console-credentials-README.md`, which is
+gitignored, alongside the persona/role table. They are deliberately NOT written here —
+this skill is tracked, and CLAUDE.md section 3 keeps credentials out of tracked surfaces.
+
+```powershell
+poetry run python scripts/set_console_credential.py --list        # which ids have one
+poetry run python scripts/set_console_credential.py <persona-id>  # create or rotate
+poetry run python scripts/set_console_credential.py --remove <id>
+```
+
+**Rotating while the stack is running is safe and needs no restart.** The API reads the
+store at request time, so a new secret takes effect on the next sign-in; sessions already
+open keep working until their token expires.
+
+The script prompts via `getpass` and has NO `--secret-from-env` flag. That is O76's
+ruling: a prompted secret was never rendered where a screen share could catch it, while a
+generated one was printed once and is flagged for rotation. Do not add such a flag to feed
+values in non-interactively — the e2e suite has its own entry point
+(`web/e2e/bootstrap_credential.py`), which refuses to write to the real store's location.
+
 ## What the console reads
 
 Two different sources, and confusing them wastes time:
