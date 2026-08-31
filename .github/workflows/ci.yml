@@ -126,9 +126,14 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
 
+      # --with api, unlike the `gates` job: the e2e suite STARTS drydocs-api, and
+      # fastapi/uvicorn live in that optional group. The gates job deliberately
+      # installs without it (credentials.py's KDF choice turns on exactly that:
+      # a check CI never runs is worse than an older one it does), so this is the
+      # one job that needs the group and it says why.
       - name: Install Python dependencies
         working-directory: .
-        run: poetry install --no-interaction
+        run: poetry install --with api --no-interaction
 
       - name: Install web dependencies
         run: npm ci
