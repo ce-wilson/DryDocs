@@ -91,6 +91,12 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-232`** · 2026-08-31 · `[bug]` · **open** · prio? **High** —
+  **A backlog item can be HELD by an annotation while the ready list still calls it ready,
+  because `next_ready` is computed from `depends_on` alone.** (Body to follow — id minted
+  and pushed first, per the I6 rule.)
+
+
 - **`Idea-231`** · 2026-08-31 · `[bug]` · **open** · prio? **Med** —
   **`canAccessModule` decides who sees which console module and has no test, and no guard
   pins which modules are designated `sme`.** Noticed at O59, which set `access: 'sme'` on
