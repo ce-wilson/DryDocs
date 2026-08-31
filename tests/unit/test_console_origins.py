@@ -18,6 +18,17 @@ J37 — THE ALLOWLIST IS READ FROM THE BUILT APP, never from the source of ``app
 asks the object what it will serve instead of pattern-matching the call that
 configured it. A regex over the source would also match the comment that explains the
 list, which is J66's failure mode in the same file.
+
+AND THAT CHOICE COSTS AN OPTIONAL DEPENDENCY, which is worth stating rather than
+discovering. FastAPI is not in the base install — CI's `gates` job runs without it and
+every API-touching test here skips on ``importorskip``. Reading the built app therefore
+means these checks SKIP where fastapi is absent rather than failing, which is the right
+trade (a source regex would run everywhere and check the wrong thing), but it means the
+allowlist assertions are only enforced where the API group is installed: the `web` job,
+and any developer with `poetry install --with api`. The ledger-shape check below needs
+no app and runs everywhere. Learned the direct way: the first version imported
+``create_app`` at module scope, passed locally with the api group installed, and reded
+CI with three ModuleNotFoundErrors.
 """
 
 from __future__ import annotations
@@ -64,7 +75,12 @@ SUPPLIED_ELSEWHERE = {
 
 
 def _allowlist() -> list[str]:
-    """The origins the built app will actually serve, from the middleware stack."""
+    """The origins the built app will actually serve, from the middleware stack.
+
+    ``importorskip`` here rather than at module scope so the ledger-shape guard —
+    which needs no app at all — still runs where fastapi is absent.
+    """
+    pytest.importorskip("fastapi", reason="fastapi is an optional dep (the api group)")
     from drydocs_api.app import create_app
 
     app = create_app()
@@ -131,7 +147,7 @@ def test_the_allowlist_is_a_list_of_named_origins_not_a_wildcard() -> None:
     as a side effect of a port fix. DRYDOCS_CORS_ORIGINS already covers the one-off
     case declaratively, which is what makes the narrow list affordable.
     """
-    assert "*" not in _allowlist()
+    assert "*" not in _allowlist()  # skips here if fastapi is absent
 
     from drydocs_api.app import create_app
 
