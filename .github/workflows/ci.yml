@@ -105,6 +105,17 @@ jobs:
     defaults:
       run:
         working-directory: web
+    # create_app() builds the intake store at import, and the data root has NO
+    # default on purpose (G81: an unset variable used to relocate every source
+    # drop and every output silently, which is how a write lands on somebody's
+    # source data). So the API refuses to boot without it, and this job must say
+    # where. A runner-temp path is right for a suite that reads none of it and
+    # keeps none of it. Neither variable can be caught locally on a dev machine,
+    # where both are set in the user environment — this failure was only ever
+    # going to appear here.
+    env:
+      DRYDOCS_DATA_ROOT: ${{ github.workspace }}/.ci-data
+      DRYDOCS_LOGDIR: ${{ github.workspace }}/.ci-logs
     steps:
       - uses: actions/checkout@v4
 
