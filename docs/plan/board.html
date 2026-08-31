@@ -665,8 +665,81 @@ replica&quot; and becomes &quot;which XML, and can it still be joined&quot; - wh
 the complementarity reading in that gate&#x27;s OQ-9 rather than the winner/loser
 framing. Recorded here so the gate session finds it; this item rules nothing.
 </p></div></div>
-<div class="card ready" id="card-G134" data-id="G134" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g134 the document registry records a corpus&#x27;s trust level but not the rung that produced it, so a grounded row cannot say whether anything higher was ever tried" tabindex="0"><div class="card-head"><span class="card-id">G134</span><span class="card-title">The document registry records a corpus&#x27;s trust level but not the rung that produced it, so a GROUNDED row cannot say whether anything higher was ever tried</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (id minted per I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31.
+<div class="card ready" id="card-G134" data-id="G134" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="todo" data-search="g134 the document registry records a corpus&#x27;s trust level but not the rung that produced it, so a grounded row cannot say whether anything higher was ever tried" tabindex="0"><div class="card-head"><span class="card-id">G134</span><span class="card-title">The document registry records a corpus&#x27;s trust level but not the rung that produced it, so a GROUNDED row cannot say whether anything higher was ever tried</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE LADDER IS DECLARED ONCE, IN THE FILE&#x27;S HEADER, and it is ordered
+best-to-worst because the rule that matters is &quot;work down only until something
+answers&quot;: 1 machine-readable spec or bulk export (OpenAPI, GraphQL
+introspection, a DB catalog) - 2 an authenticated API call you make yourself -
+3 saved HTML or a rendered DOM - 4 print-to-PDF plus layout extraction -
+5 copy/paste text. Rungs 1-2 can yield VERBATIM; 3-4 yield GROUNDED; 5 yields
+GROUNDED and lossy. The ladder does not replace trust_default - it explains it.
+
+(b) EVERY ROW GAINS A RUNG, AND `unprobed` IS A VALUE. The field records the
+highest rung REACHED, never the highest that exists, so `unprobed` means the
+ladder was never walked and reads as a TASK rather than a limit. A row whose
+trust_default is GROUNDED and whose rung is unprobed is the finding this item
+exists to make visible: today that row is indistinguishable from one where
+rungs 1 and 2 were checked and refused.
+
+(c) THE FIELD IS REQUIRED AND GUARDED, like every other field on this ledger.
+tests/unit/test_doc_registry.py enforces the existing REQUIRED set; the rung
+joins it, with the vocabulary closed and the trust pairing checked - a row
+claiming VERBATIM at rung 4 or 5 fails, because a layout extraction is not the
+served bytes. A row may be GROUNDED at rung 1 or 2 (a spec can be transcribed
+badly); the constraint is one-directional on purpose.
+
+(d) THE PROSE THAT ALREADY DOES THIS JOB CONVERTS TO DATA. Two rows carry rung
+history in comments today. `confluence-*` reads &quot;upgraded 2026-08-19 per this
+row&#x27;s own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0
+failed). Was GROUNDED while the capture was screenshot transcription&quot; - that is
+a rung 5 to rung 2 upgrade written as narrative. Convert those to the field and
+keep the prose as the WHY; the field carries what a guard can read, the comment
+carries what a person needs.
+
+(e) TWO RULES SHIP WITH THE FIELD OR IT WILL BE FILLED IN WRONG.
+ONE: a blocked agent fetch says nothing about the host. Chat-tool network policy
+is not the machine&#x27;s network access, and a source recorded `unreachable` on that
+basis is mis-recorded - both DPL hosts were &quot;blocked&quot; for an agent and answered
+immediately from a terminal on the same machine. TWO: rung 1 EXISTING is not
+rung 1 WORKING. The counterexample is already in hand and belongs in the header
+as the reason the field records reached-not-available: a service whose
+documented REST interface is gated for an account while a lower, undocumented
+route still answers. The ladder is walked, not inferred.
+
+(f) NOTHING IN THIS ITEM RE-CLASSIFIES A CORPUS OR CHANGES A `confirmed:` FLAG.
+Rung is a property of HOW a corpus was captured. Classification is sensitivity
+and stays where config/classification.yaml puts it; trust_default keeps its
+meaning; confirmed stays the gate&#x27;s. If filling in the field reveals that a
+row&#x27;s trust_default is wrong for its rung, that is a FINDING recorded in the
+row&#x27;s notes and raised - never a silent correction, because trust_default is
+what loaders read.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31. The ladder comes from a company-side research pass that
+captured two DPL service specs and wrote up the capture route as a reusable
+framework rather than a one-off. Producer-side the applicable surface is
+config/doc-source-registry.yaml - 13 rows, each already carrying
+trust_default: VERBATIM | GROUNDED | SYNTHESIZED, which is the SAME vocabulary
+the ladder assigns. So this is not a new axis: it is the missing HALF of an axis
+the ledger already has. The registry records the verdict and not the method,
+and the method is what tells a later reader whether the verdict can be improved.
+
+WHY IT IS WORTH A FIELD RATHER THAN A CONVENTION. The evidence that the
+convention alone does not hold is in the file: the one row that DID improve its
+capture route recorded the improvement in a comment, which no guard reads and no
+census can count. Ask &quot;which corpora could be VERBATIM but are not&quot; today and
+the answer requires reading thirteen comment blocks and inferring.
+
+THE LESSON THE LADDER ENCODES, which is the part worth keeping even if the field
+shape changes: look for the machine-readable source before building a scraper
+for the human-readable rendering of it. A Swagger UI page always has a spec
+behind it. That was proven the expensive way - a PDF-derived capture of those
+two services needed three captures and four parser-bug fixes to agree with the
+spec, and even then could not recover required-field arrays, enum values or
+$ref links, because the UI inlines references and renders enums as collapsed
+stubs. The spec route was one request.
+
+DELIBERATELY NOT HERE: the DPL registry field-contract correction. That is G64&#x27;s
+and it needs its research written up properly first - the findings currently
+live in a session rather than in a log, which is the same gap J63 names for
+reviews. This item touches no DPL row.
 </p></div></div>
 <div class="card ready" id="card-H8" data-id="H8" data-module="docs" data-phase="7" data-epic="drydocs-review-backflow" data-type="task" data-status="todo" data-search="h8 the company tree registers 67 cli commands to producer main&#x27;s 50 - turn the measured back-flow inventory into a per-command disposition the user can rule on" tabindex="0"><div class="card-head"><span class="card-id">H8</span><span class="card-title">The company tree registers 67 CLI commands to producer main&#x27;s 50 - turn the measured back-flow inventory into a per-command disposition the user can rule on</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P7</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">drydocs-review-backflow</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The deliverable is a TABLE, not a build. Nothing is reproduced by this item.
 
