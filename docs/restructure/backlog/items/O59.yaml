@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - G68
 inputs:
@@ -22,3 +22,82 @@ acceptance: |
   /remediation gains a FILE-BACKED input beside its existing flow pane: given G68's profile artifact for a staged folder set, an SME sees three frames and fills one form. PROFILE frames render G68's four censuses -- shape, identity (FIDs / run-as / SEAL), variables by scope with their R30/R31 state inline, contacts split by kind and labelled documentation-only. FINDINGS renders detect_all() output grouped by rule id with severity visible, each row citing the rule id so the reader can reach the registry entry; the two failure classes are NOT flattened into one list, because name drift produces SILENCE (no row loads) while a value-contract breach produces a CONFIDENTLY WRONG row, and a page that ranks them together teaches the reader the wrong triage order. SUBSTITUTIONS is a form over G68's slot list: current value or ABSENT, the shape rule shown beside the input (FTS_ID matches its shape, DEVX_KEY is UPPER_SNAKE and hyphen-free, a DL is an address), and the affected job count. Its output is a PROPOSAL the SME can export -- never an applied change, and nothing on this page writes XML or a graph. Honesty rules inherited from O56/O58 and restated because they are what makes the page trustworthy: a slot with no value renders "not supplied", never a default or a guess; a census the profile did not compute renders "not profiled", never 0. Access designation 'sme' with the reason recorded. The O17 deviation STANDS and is not quietly reversed: the remediation frames bind no QuerySpec, because drydocs_remediation writes zero graph and minting :Finding / :FixBatch labels in a spec would smuggle an ontology decision past the HITL gate. Registered in ui-components.yaml + ui-tests.yaml with coverage pins, both themes, npm run build and oxlint clean.
 notes: |
   Raised 2026-08-11 on SME direction ("update the backlog for the UI-WEB remediate"), as the SME-facing half of G68. The remediation module page has existed since O17 (2026-07-21) on SYNTHESIZED fixtures with no real input path; this is that input path, and it arrives as a FILE rather than a graph binding, which is exactly why O17's no-spec deviation survives rather than being an embarrassment to fix. THE LOOP THIS CLOSES, in the SME's own framing: remediate bad coding and accidental typos today, and author new Control-M jobs that populate the flow automatically on ingest -- no manual mapping step. The profile is what makes the second half credible: if the estate's real variable names and scopes are visible before the standard is applied, the standard is being written against what exists rather than against what a screenshot suggested. Deliberately NOT specified: whether the profile arrives by upload or by pointing at a generated artifact path. That follows G68's transport choice and must not be pre-empted here -- an upload widget built against a transport that turns out to be a CLI artifact is thrown away.
+
+  DONE 2026-08-31 (desktop). Three frames on /remediation, beside the O17 flow panes rather
+  than instead of them: Profile, Standards findings, Substitutions.
+
+  TRANSPORT: the item left this open on purpose and said it FOLLOWS G68's choice. G68 named
+  a CLI verb writing a JSON artifact, so the console consumes that shape --
+  scripts/render_remediation_profile.py runs the real profile() over a synthetic export into
+  web/src/generated/remediation-profile.json, registered in render_board.py's default-paths
+  run and drift-guarded by tests/unit/test_remediation_profile_json.py. No upload widget was
+  built, which is exactly the waste the item warned about. Same render+guard shape the fix-diff
+  frame has used since 2026-08-12, so the pattern is not new.
+
+  THE FINDINGS SPLIT IS THE ITEM'S HARDEST CLAUSE AND IT IS MECHANISED, not styled. R2 is the
+  SILENCE class and R34 the CONFIDENTLY WRONG class -- both spellings are detect.py's own, from
+  its module docstring -- and web/src/remediation/findingClasses.ts holds a two-entry map with
+  everything else landing in `conformance`, which is a real third answer rather than a fallback.
+  Confidently-wrong renders above silence, each section states what the defect does to the
+  DOWNSTREAM ROW, and empty classes still render because a section that disappears reads as
+  "this page does not check for that". Worth stating: severity alone happens to rank the two
+  correctly today, which is the point at which a sort looks sufficient and is not -- severity is
+  a per-rule judgement the registry can re-rule, the class is a property of the defect.
+
+  THE DEMO FIXTURE CARRIES BOTH CLASSES BY CONSTRUCTION -- %%ds_ver (case drift, R2) and
+  %%DS_VER = "v3" (contract breach, R34) -- because a frame whose headline claim is "these are
+  not the same list" must not demonstrate it with one empty section. Pinned on both sides:
+  test_remediation_profile_json asserts both rule ids are present, findingClasses.test.ts
+  asserts both groups are non-empty. It also carries the 2026-08-19 SME evidence shape
+  (FileWatcher on the platform account, payload jobs on the application account), a shared
+  wrapper at fan-out 2 beside a solo wrapper at fan-out 1, an orphan declaration, all three
+  contact kinds, and 7 of 9 slots not supplied.
+
+  HONESTY RULES, implemented rather than asserted. An absent slot renders "not supplied" and
+  exports as `proposed: null` -- never "" and never a placeholder. A census the profile did not
+  COMPUTE renders "not profiled", which needed censusComputed() reading the RAW object: the
+  typed view cannot answer it, because every field is declared and TypeScript would say yes for
+  a key that is not in the file. The shape check reports `unchecked` rather than a green tick
+  for the four slots with no rule on the guidelines page -- a tick against an invented pattern
+  tells the SME a value was validated when nothing checked it.
+
+  FIVE CENSUSES RENDERED, NOT FOUR. The acceptance names four; census (e) INVOCATIONS was merged
+  into G68 from Idea-140 on 2026-08-19, eight days after this item was raised. Rendering it is
+  following the item's purpose over its wording.
+
+  ACCESS 'sme', reason recorded in registry.ts: every number on the page is a delta against a
+  standard ("7/9 not supplied", "21 findings") and an end user reads those as breakage; the
+  substitutions frame goes further and asks for input only an SME can supply. Same argument
+  /gates and /software carry. NOTE THE BEHAVIOUR CHANGE -- O17 exposed /remediation to every
+  role and it is now steward+admin.
+
+  O17'S NO-SPEC DEVIATION STANDS and is stated on every frame's banner rather than being quietly
+  reversed: drydocs_remediation writes ZERO graph, so there is nothing for a QuerySpec to read,
+  and minting :Finding / :FixBatch labels to make one would smuggle an ontology decision past
+  the HITL gate.
+
+  WHY 'Standards findings' AND 'Findings' BOTH EXIST, which reads as a duplicate and is not:
+  'Findings' is a node in the finding -> fix-batch -> Jira FLOW, wired to the graph pane's
+  selection; 'Standards findings' is detect_all() over one folder set, which is what an SME
+  reads BEFORE any of that. Merging them would have cost the flow pane its linked frame and
+  taught the reader that a census and a work queue are the same list.
+
+  VERIFIED LIVE (J18): this desktop, Vite :5275 against drydocs-api :8012 started with a
+  throwaway credential in a temp directory, signed in as morpheus. All three frames rendered;
+  the findings frame showed confidently-wrong (1) above silence (1) above other conformance
+  (19); the substitution form's three verdict branches were exercised through real input events
+  (DEVX_KEY hyphen -> bad, FTS_ID version fragment -> bad, USER -> unchecked); the exported
+  proposal carried `status: PROPOSAL -- not applied` with an untouched slot at `proposed: null`.
+  NO GRAPH WAS INVOLVED, which is the point -- these frames read a file. Light theme checked by
+  computed style rather than by eye (the browser window would not resize past 1210x263, so a
+  full-page light screenshot was not taken); every colour in the three components resolves from
+  a theme token, verified by grep for hex.
+
+  LEDGERS: three ui-components.yaml rows (35/81, up from 32/78); TS-REMEDIATION seeded with five
+  cases, three automated (10/13 suites, 8/29 cases). The automated share moving up is not
+  backfilling -- this suite's load-bearing claims are about pure functions and a generated
+  artifact, which is what a runner can hold.
+
+  NOT DONE, deliberately: nothing here writes XML or a graph, and the proposal has no consumer
+  wired to it. The equivalence proof already consumes a proposal of this shape; connecting them
+  is a separate item and a gate question.

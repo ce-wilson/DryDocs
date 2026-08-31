@@ -307,10 +307,17 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     LocationMap. Their mapper, lib/nvl-mapping.ts, is NOT here for the same
     reason loadMapModel.ts is not: the scan boundary is .tsx only and widening
     it waits on O42.
+    78 -> 81 at O59 (2026-08-31): ProfileFrame, StandardsFindings and
+    Substitutions, all three BOUND to `remediation` by directory evidence, so
+    both counts move by three. Unlike the O81 pair above they have exactly one
+    consumer each and live under a module-named folder, which is what the
+    evidence rule asks for. Their pure helpers -- profileData.ts,
+    findingClasses.ts, slotShapes.ts -- are .ts and stay outside the scan
+    boundary for the same reason nvl-mapping.ts does.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        32,
-        78,
+        35,
+        81,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

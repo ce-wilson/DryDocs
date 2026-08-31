@@ -114,7 +114,12 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # 8/13 -> 9/13 at O81 (2026-08-31): TS-RUNBOOKS seeded by the NVL series
     # canvas, whose case asserts what the canvas may DRAW — a claim about the
     # graph rather than about pixels, so the unit runner can hold it.
-    assert (len(seeded), len(suites)) == (9, 13), (
+    # 9/13 -> 10/13 at O59 (2026-08-31): TS-REMEDIATION seeded by the SME intake
+    # frames. It is the first suite whose cases assert HONESTY properties -- an
+    # absent slot renders "not supplied", an uncomputed census renders "not
+    # profiled" -- rather than that a thing appears. Those are the claims a
+    # reader would otherwise have to take on trust.
+    assert (len(seeded), len(suites)) == (10, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )
@@ -141,17 +146,26 @@ def test_automated_cases_name_a_file_that_exists() -> None:
 
 
 def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
-    """Five of twenty-four. The point is that the number is SMALL and visible.
+    """Eight of twenty-nine. The point is that the number is SMALL and visible.
 
     O80 bought the capability and proved it on cases that had already escaped
     into main; it did not backfill coverage, and this pin is what stops a later
     session from believing it did.
+
+    5/24 -> 8/29 at O59 (2026-08-31): the intake suite arrives with three of its
+    five cases automated, which is a higher share than any suite before it and
+    for a reason worth stating rather than celebrating -- its load-bearing claims
+    are about PURE functions (which class a rule falls in, which shape a slot
+    must match) and about a GENERATED artifact, and both are exactly what a unit
+    runner can hold. The two cases left manual are the ones that need a person
+    to look at a rendered frame. The share moving up is not evidence that
+    backfilling happened.
     """
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        5,
-        24,
+        8,
+        29,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 

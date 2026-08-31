@@ -1,0 +1,543 @@
+{
+  "source": "SYNTHETIC demo export — export.xml (1 file staged)",
+  "shape": {
+    "data_centers": [
+      "T032-E0700-DMA"
+    ],
+    "folders": [
+      "PRSYNQ-INTAKE-DLY"
+    ],
+    "subfolders": [
+      "PRSYNQ-INTAKE-DLY/SAMPLE_DATASET"
+    ],
+    "jobs": 4,
+    "jobs_by_type": {
+      "file-watcher": 1,
+      "other": 1,
+      "placement": 1,
+      "trust": 1
+    },
+    "datasets_inferred": [
+      "SAMPLE_DATASET"
+    ]
+  },
+  "identity": [
+    {
+      "fact": "APPLICATION",
+      "value": "SYNTHAPP",
+      "jobs": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST"
+      ],
+      "job_types": []
+    },
+    {
+      "fact": "APPLICATION",
+      "value": "SYNTHOTHER",
+      "jobs": [
+        "JOB0040_SAMPLE_SOLO"
+      ],
+      "job_types": []
+    },
+    {
+      "fact": "FID",
+      "value": "fid.synth.intake",
+      "jobs": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ],
+      "job_types": []
+    },
+    {
+      "fact": "RUN_AS",
+      "value": "ctm.platform.acct",
+      "jobs": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW"
+      ],
+      "job_types": [
+        "file-watcher"
+      ]
+    },
+    {
+      "fact": "RUN_AS",
+      "value": "svc.synth.app",
+      "jobs": [
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ],
+      "job_types": [
+        "placement",
+        "trust",
+        "other"
+      ]
+    },
+    {
+      "fact": "SEAL",
+      "value": "70004",
+      "jobs": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ],
+      "job_types": []
+    }
+  ],
+  "variables": [
+    {
+      "name": "DS_NAME",
+      "scope": "SUBFOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY/SAMPLE_DATASET"
+      ],
+      "distinct_values": 1,
+      "reference_count": 1,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "DS_VER",
+      "scope": "JOB",
+      "containers": [
+        "JOB0020_SAMPLE_PLCT"
+      ],
+      "distinct_values": 1,
+      "reference_count": 1,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "EMAIL_DL_L2",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 0,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "EMAIL_DL_PDN",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 0,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "ENVCODE",
+      "scope": "JOB",
+      "containers": [
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST"
+      ],
+      "distinct_values": 1,
+      "reference_count": 2,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "FID",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 0,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "MAPPING",
+      "scope": "JOB",
+      "containers": [
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST"
+      ],
+      "distinct_values": 2,
+      "reference_count": 2,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "NOTIFY",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 0,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "ORPHAN_ONE",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 0,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "SEAL",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 0,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "WRAPPER",
+      "scope": "FOLDER",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "distinct_values": 1,
+      "reference_count": 2,
+      "unreferenced": false,
+      "unresolved": false
+    },
+    {
+      "name": "ds_ver",
+      "scope": "JOB",
+      "containers": [
+        "JOB0030_SAMPLE_TRUST"
+      ],
+      "distinct_values": 1,
+      "reference_count": 1,
+      "unreferenced": false,
+      "unresolved": false
+    }
+  ],
+  "contacts": [
+    {
+      "name": "EMAIL_DL_L2",
+      "value": "l2_support@example.invalid",
+      "kind": "support-tier",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "documentation_only": true
+    },
+    {
+      "name": "EMAIL_DL_PDN",
+      "value": "downstream_owners@example.invalid",
+      "kind": "delay-notification-consumer",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "documentation_only": true
+    },
+    {
+      "name": "NOTIFY",
+      "value": "legacy_mail@example.invalid",
+      "kind": "domail-destination",
+      "containers": [
+        "PRSYNQ-INTAKE-DLY"
+      ],
+      "documentation_only": true
+    }
+  ],
+  "invocations": [
+    {
+      "target": "%%WRAPPER",
+      "invocation_type": "unknown",
+      "fan_out": 2,
+      "jobs": [
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST"
+      ],
+      "varying_variables": [
+        "MAPPING",
+        "DS_VER",
+        "ds_ver"
+      ],
+      "constant_variables": [
+        "WRAPPER",
+        "ENVCODE"
+      ]
+    },
+    {
+      "target": "/apps/synth/bin/solo_only.ksh",
+      "invocation_type": "shell_script",
+      "fan_out": 1,
+      "jobs": [
+        "JOB0040_SAMPLE_SOLO"
+      ],
+      "varying_variables": [],
+      "constant_variables": [
+        "DS_NAME"
+      ]
+    }
+  ],
+  "substitution_slots": [
+    {
+      "name": "DEVX_KEY",
+      "home": "folder",
+      "rule": "the DevX project key; hyphens are illegal in a Control-M name, so `DevX-project` becomes DEVX_KEY (guidelines §5.3)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ]
+    },
+    {
+      "name": "DELIVERY_MECHANISM",
+      "home": "watcher-description",
+      "rule": "one of MFTS_AGENT | SFTP_DIRECT | API_GENERATED (guidelines §7.1)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW"
+      ]
+    },
+    {
+      "name": "USER",
+      "home": "watcher-description",
+      "rule": "the transfer service account (guidelines §7.1)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW"
+      ]
+    },
+    {
+      "name": "FTS_ID",
+      "home": "watcher-description",
+      "rule": "the BARE File Transfer id, shape ^FTS[A-Z]*[0-9]+$ — drop version fragments (`ST 6.0 - FTS2` is FTS2). Open but governed vocabulary, so a shape and not a closed list (guidelines §7.1)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW"
+      ]
+    },
+    {
+      "name": "REC_ID",
+      "home": "watcher-description",
+      "rule": "source-system reference id(s), comma-separated (guidelines §7.1)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW"
+      ]
+    },
+    {
+      "name": "SOURCE_CONTACT",
+      "home": "watcher-description",
+      "rule": "who owns the file at the ORIGINATING system; whether it must be a DL rather than a named individual is an OPEN question on the page (§7.1, open list)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW"
+      ]
+    },
+    {
+      "name": "EMAIL_DL_L2",
+      "home": "folder",
+      "rule": "internal support tier 2. A FOLDER variable, documentation-only — MUST NOT be bound to a DOMAIL destination (guidelines §7.3)",
+      "status": "present",
+      "value": "l2_support@example.invalid",
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ]
+    },
+    {
+      "name": "EMAIL_DL_L3",
+      "home": "folder",
+      "rule": "internal support tier 3. Same folder-scope, documentation-only rule (guidelines §7.3)",
+      "status": "not-supplied",
+      "value": null,
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ]
+    },
+    {
+      "name": "EMAIL_DL_PDN",
+      "home": "folder",
+      "rule": "downstream BUSINESS USERS for Production Delay Notification — a different audience from L2/L3, and MUST NOT be collapsed with them (guidelines §7.3)",
+      "status": "present",
+      "value": "downstream_owners@example.invalid",
+      "applies_to": [
+        "JOB0010_SAMPLE_DAT_ONPM_FW",
+        "JOB0020_SAMPLE_PLCT",
+        "JOB0030_SAMPLE_TRUST",
+        "JOB0040_SAMPLE_SOLO"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "rule_id": "R2",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0030_SAMPLE_TRUST:ds_ver",
+      "message": "case drift from canonical DS_VER; registry lookup is exact, so this name produces NO fact row at all — the lineage is missing, not wrong"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0010_SAMPLE_DAT_ONPM_FW:FILE_DIR",
+      "message": "the standard requires FILE_DIR on every FileWatcher job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0010_SAMPLE_DAT_ONPM_FW:FILE_PREFIX",
+      "message": "the standard requires FILE_PREFIX on every FileWatcher job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0010_SAMPLE_DAT_ONPM_FW:FILE_BUSINESS_DATE",
+      "message": "the standard requires FILE_BUSINESS_DATE on every FileWatcher job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0010_SAMPLE_DAT_ONPM_FW:FILE_EXTENSION",
+      "message": "the standard requires FILE_EXTENSION on every FileWatcher job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0020_SAMPLE_PLCT:LAUNCHER_SCRIPT_PATH",
+      "message": "the standard requires LAUNCHER_SCRIPT_PATH on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0020_SAMPLE_PLCT:ETL_PLATFORM",
+      "message": "the standard requires ETL_PLATFORM on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0020_SAMPLE_PLCT:ETL_ARTIFACT_URI",
+      "message": "the standard requires ETL_ARTIFACT_URI on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0020_SAMPLE_PLCT:ETL_ARTIFACT_KIND",
+      "message": "the standard requires ETL_ARTIFACT_KIND on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0030_SAMPLE_TRUST:LAUNCHER_SCRIPT_PATH",
+      "message": "the standard requires LAUNCHER_SCRIPT_PATH on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0030_SAMPLE_TRUST:ETL_PLATFORM",
+      "message": "the standard requires ETL_PLATFORM on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0030_SAMPLE_TRUST:ETL_ARTIFACT_URI",
+      "message": "the standard requires ETL_ARTIFACT_URI on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0030_SAMPLE_TRUST:ETL_ARTIFACT_KIND",
+      "message": "the standard requires ETL_ARTIFACT_KIND on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0040_SAMPLE_SOLO:LAUNCHER_SCRIPT_PATH",
+      "message": "the standard requires LAUNCHER_SCRIPT_PATH on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0040_SAMPLE_SOLO:ETL_PLATFORM",
+      "message": "the standard requires ETL_PLATFORM on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0040_SAMPLE_SOLO:ETL_ARTIFACT_URI",
+      "message": "the standard requires ETL_ARTIFACT_URI on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R32",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0040_SAMPLE_SOLO:ETL_ARTIFACT_KIND",
+      "message": "the standard requires ETL_ARTIFACT_KIND on every Command job, at some scope in the chain; it is declared at none"
+    },
+    {
+      "rule_id": "R34",
+      "severity": "must-fix",
+      "ratified": false,
+      "target": "JOB0020_SAMPLE_PLCT:DS_VER",
+      "message": "value does not satisfy the contract for DS_VER (a dataset version is dotted-numeric). The NAME resolves, so this writes a fact row with a false value — a wrong row, not a missing one. Check for a swap with a sibling"
+    },
+    {
+      "rule_id": "R35",
+      "severity": "advisory",
+      "ratified": false,
+      "target": "JOB0020_SAMPLE_PLCT:ENVCODE",
+      "message": "declared identically at JOB scope on 2 jobs; hoist to the widest scope that holds it so there is one copy to maintain"
+    },
+    {
+      "rule_id": "R39b",
+      "severity": "must-fix",
+      "ratified": false,
+      "target": "JOB0010_SAMPLE_DAT_ONPM_FW:post_command",
+      "message": "cats a DAT file. Data files can be multi-GB; echoing one into sysout floods the log and can breach sysout limits. The cat belongs on the TOK/CTL watcher, which is where the declared record count lives"
+    },
+    {
+      "rule_id": "R40",
+      "severity": "should-fix",
+      "ratified": false,
+      "target": "JOB0040_SAMPLE_SOLO:notifications",
+      "message": "emits DOMAIL; the standard requires zero of these — delete the block, do not declare its destination"
+    }
+  ],
+  "note": "GENERATED by scripts/render_remediation_profile.py — never hand-edit; regenerate with a default-paths render_board.py run",
+  "provenance": "SYNTHETIC folder-set export through the REAL G68 profile() — the same census the `drydocs profile-folder-set` verb writes. Real exports carry real FIDs, SEALs and DLs and are Internal; drydocs_remediation writes no graph, so there is no QuerySpec by design.",
+  "summary": "folders=1 subfolders=1 jobs=4 | identity=6 variables=12 contacts=3 | wrappers=2 (shared=1) | slots: 7/9 not-supplied | findings=21"
+}

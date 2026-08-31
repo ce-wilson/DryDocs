@@ -4,6 +4,9 @@ import ModuleTemplate from './ModuleTemplate'
 import MiniDag from '../components/MiniDag'
 import LinkedDemoFrame from '../components/LinkedDemoFrame'
 import FixDiff from '../remediation/FixDiff'
+import ProfileFrame from '../remediation/ProfileFrame'
+import StandardsFindings from '../remediation/StandardsFindings'
+import Substitutions from '../remediation/Substitutions'
 import {
   BATCHES_FRAME,
   FINDINGS_FRAME,
@@ -45,6 +48,22 @@ export default function RemediationRoute() {
         />
       }
       tabContent={{
+        // O59 — THE INTAKE PATH, beside the O17 flow panes rather than instead
+        // of them. The three frames below are file-backed: G68's real profile()
+        // over a synthetic export, drift-guarded, arriving as a generated
+        // artifact because G68 NAMED its transport as a CLI verb writing JSON.
+        //
+        // WHY 'Standards findings' AND 'Findings' BOTH EXIST, which looks like
+        // a duplicate and is not. 'Findings' is a node in the finding ->
+        // fix-batch -> Jira FLOW, wired to the graph pane's selection; it
+        // illustrates what happens to a finding once it is batched. 'Standards
+        // findings' is detect_all()'s output over one folder set, which is what
+        // an SME reads BEFORE any of that. Merging them would have cost the
+        // flow pane its linked frame and taught the reader that a census and a
+        // work queue are the same list.
+        Profile: <ProfileFrame />,
+        'Standards findings': <StandardsFindings />,
+        Substitutions: <Substitutions />,
         Findings: <LinkedDemoFrame frame={FINDINGS_FRAME} notice={NOTICE} {...frameProps} />,
         'Fix batches': <LinkedDemoFrame frame={BATCHES_FRAME} notice={NOTICE} {...frameProps} />,
         // The SME working-session diff (2026-08-12): generated-artifact-backed,

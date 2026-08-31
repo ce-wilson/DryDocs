@@ -141,8 +141,26 @@ export const MODULES: readonly ModuleDef[] = [
     path: '/remediation',
     tagline: 'Finding → fix-batch flow',
     backsOnto: 'drydocs_remediation',
-    tabs: ['Findings', 'Fix batches', 'Jira handoffs'],
+    // O59 added the first three: the SME INTAKE path — read the folder-set
+    // profile, read the standards findings over it, supply the substitutions
+    // the XML cannot carry. They sit ahead of the O17 flow tabs because that
+    // is the order the work happens in.
+    tabs: [
+      'Profile',
+      'Standards findings',
+      'Substitutions',
+      'Findings',
+      'Fix batches',
+      'Jira handoffs',
+    ],
     phase: 2,
+    // FB-03, and the same argument /gates and /software carry: every number on
+    // this page is a DELTA against a standard — "7/9 slots not supplied", "21
+    // findings" — and an end user reading those without the standard in mind
+    // reads them as breakage. The substitutions frame goes further and asks for
+    // input only an SME can supply. Opening this later is a one-line change;
+    // the reverse is a retraction.
+    access: 'sme',
   },
   {
     id: 'docs',

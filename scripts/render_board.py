@@ -60,6 +60,7 @@ def main() -> None:
         import render_ideas
         import render_load_map
         import render_remediation_diff
+        import render_remediation_profile
         import render_roadmap
         import render_software_registry
 
@@ -81,6 +82,12 @@ def main() -> None:
         # so any change to that mechanism must re-render the committed frame
         # or the drift guard (test_remediation_diff_json) goes red.
         render_remediation_diff.main()
+        # The remediation PROFILE frame (O59, 2026-08-31) rides here for the
+        # same reason: it is G68's real profile() over a synthetic export, so a
+        # change to any census -- or to the detector whose findings ride along
+        # in it -- must re-render the committed artifact or
+        # test_remediation_profile_json goes red.
+        render_remediation_profile.main()
         # The inbox render (2026-08-05) rides here for the same reason as the
         # others: the board links to it, so a groom that edits IDEAS.md without
         # re-rendering would leave a committed page describing a stale inbox —

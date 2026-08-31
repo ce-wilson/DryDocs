@@ -197,7 +197,17 @@ components:
   - { id: ThinkingLogicPanel,      area: underhood,    path: underhood/ThinkingLogicPanel.tsx,            module: underhood,  module_evidence: directory }
   - { id: TokenMemoryChart,        area: underhood,    path: underhood/TokenMemoryChart.tsx,              module: underhood,  module_evidence: directory }
 
-  # --- remediation (1) ---
+  # --- remediation (4) ---
   # (demo frames live in demoRemediation.ts, data-only; FixDiff is the first
   # .tsx: the SME working-session diff over generated/remediation-diff.json)
+  #
+  # O59 added the three INTAKE frames. All four are file-backed rather than
+  # spec-backed, and that is the module's standing design rather than a gap:
+  # drydocs_remediation writes ZERO graph, so there is nothing for a QuerySpec
+  # to read. Their pure helpers -- profileData.ts, findingClasses.ts,
+  # slotShapes.ts -- are .ts and therefore outside this ledger's scope caveat
+  # above, the same way demoRemediation.ts is.
   - { id: FixDiff,                 area: remediation,  path: remediation/FixDiff.tsx,                     module: remediation, module_evidence: directory }
+  - { id: ProfileFrame,            area: remediation,  path: remediation/ProfileFrame.tsx,                module: remediation, module_evidence: directory }
+  - { id: StandardsFindings,       area: remediation,  path: remediation/StandardsFindings.tsx,           module: remediation, module_evidence: directory }
+  - { id: Substitutions,           area: remediation,  path: remediation/Substitutions.tsx,               module: remediation, module_evidence: directory }

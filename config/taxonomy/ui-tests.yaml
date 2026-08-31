@@ -28,11 +28,14 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Five cases are automated out of twenty-four. The
+# WHAT THIS DOES NOT CLAIM. Eight cases are automated out of twenty-nine. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
-# evidence); the fifth arrived with the surface it guards (O81).
+# evidence); the fifth arrived with the surface it guards (O81); the next three
+# arrived with the O59 intake frames, whose load-bearing claims are about pure
+# functions and a generated artifact and so are exactly what a runner can hold.
+# The share moving up is not evidence that anything was backfilled.
 #
 # SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
 # backlog close note recording something that was actually observed working.
@@ -40,7 +43,7 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 9 of 13 areas seeded (3 of 12 when this file
+# COVERAGE IS PARTIAL AND SAYS SO: 10 of 13 areas seeded (3 of 12 when this file
 # was written). The rest are declared with `cases: []` so the gap is a visible
 # number rather than an absence, and the guard pins it.
 # =============================================================================
@@ -407,7 +410,81 @@ suites:
           lineage load runs.
         source: "O81 build 2026-08-31 — desktop; mapper unit-tested, canvas rendered against the live API"
         automated_by: web/src/lib/nvl-mapping.test.ts
-  - { id: TS-REMEDIATION, module: remediation, description: "Finding -> fix-batch flow.", cases: [] }
+  - id: TS-REMEDIATION
+    module: remediation
+    description: >
+      The SME INTAKE path (O59) — read the folder-set profile, read the
+      standards findings over it, supply the substitutions the XML cannot carry
+      — plus the O17 finding -> fix-batch flow the intake feeds. Seeded at O59
+      because the intake frames are the first on this module that a person has
+      to read for correctness rather than for illustration: every one of them
+      makes a claim about what the export says, and a claim can be wrong.
+    cases:
+      - id: TC-REMEDIATION-01
+        description: The two failure classes are reported apart, worst first
+        steps:
+          - Open /remediation and select the Standards findings frame.
+          - Read the section order and the effect line on each.
+        expect: >
+          Confidently wrong sits ABOVE Silence, and each section states what the
+          defect does to the downstream row rather than only its severity. Every
+          class renders even when it holds nothing — a section that disappears
+          when empty reads as "this page does not check for that". Ranking them
+          together is the defect this case exists to catch: a value-contract
+          breach writes a fact row with a false value, while name drift writes no
+          row at all, so a reader who triages them as one list works the wrong
+          one first.
+        source: "O59 build 2026-08-31 — desktop; rendered against the committed profile artifact"
+        automated_by: web/src/remediation/findingClasses.test.ts
+      - id: TC-REMEDIATION-02
+        description: A slot the export does not carry renders "not supplied", never a default
+        steps:
+          - Open the Substitutions frame.
+          - Find a slot whose status is not-supplied and read the "In the export" column.
+          - Export the proposal and read the same slot in the JSON.
+        expect: >
+          The frame prints "not supplied" and the exported slot carries
+          `proposed: null` — never "" and never a placeholder. A pre-filled guess
+          is how a proposal becomes a wrong fact nobody re-checks, so absence has
+          to survive both the render and the export as itself.
+        source: "O59 build 2026-08-31 — desktop; export captured from the live frame"
+        automated_by: tests/unit/test_remediation_profile_json.py
+      - id: TC-REMEDIATION-03
+        description: A slot with no shape rule reports unchecked, not a green tick
+        steps:
+          - Type any value into USER, REC_ID or SOURCE_CONTACT.
+          - Read the note under the input.
+        expect: >
+          "no shape rule on the guidelines page — recorded as typed, and not
+          validated". Four of the nine slots have no shape on the page, and
+          SOURCE_CONTACT's own rule text says whether it must be a DL is still
+          open. A tick against an invented pattern tells the SME a value was
+          validated when nothing checked it.
+        source: "O59 build 2026-08-31 — desktop; all three verdict branches exercised live"
+        automated_by: web/src/remediation/slotShapes.test.ts
+      - id: TC-REMEDIATION-04
+        description: The intake frames read a file, and say so
+        steps:
+          - Open each of Profile, Standards findings and Substitutions.
+          - Read the banner at the top of each frame.
+        expect: >
+          Every frame carries the same notice — a synthetic export through the
+          real G68 profile(), no graph and no QuerySpec BY DESIGN. The module
+          writes zero graph, so there is nothing for a spec to read, and minting
+          :Finding / :FixBatch labels to make one would smuggle an ontology
+          decision past the HITL gate. O17's no-spec deviation stands rather than
+          being quietly reversed.
+        source: "O59 build 2026-08-31 — desktop; three frames verified signed in as morpheus"
+      - id: TC-REMEDIATION-05
+        description: A census the profile did not compute renders "not profiled", never 0
+        steps:
+          - Remove a census key from the profile artifact and reload /remediation.
+        expect: >
+          The section prints "not profiled" and explains that nothing looked, so
+          nothing can be concluded. Zero is an answer; absence is not, and
+          printing 0 for "we did not look" is the confident wrong number this
+          whole module exists to remove.
+        source: "O59 build 2026-08-31 — honesty rule inherited from O56/O58; the artifact side is pinned by test_remediation_profile_json"
   - { id: TS-DOCS,        module: docs,        description: "Document->Chunk corpus map (Q13/Q15 will extend this).", cases: [] }
   - id: TS-GATES
     module: gates
