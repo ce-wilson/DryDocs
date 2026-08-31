@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-31T09:29:54",
+    "captured_at": "2026-08-31T10:55:40",
     "date": "20260831",
-    "scan": "DryDocs",
+    "scan": "ui-workstream",
     "tree": true,
     "git": {
-      "commit": "3c171013",
-      "full": "3c17101374a1d14b9911429295f4158393a830da",
-      "branch": "main",
-      "describe": "port-base-20260829-87-g3c171013",
-      "subject": "docs(Idea-229): a cancelled CI run is neither green nor red, and nothing reads it as unverified",
-      "dirty": true,
+      "commit": "2777476f",
+      "full": "2777476fdab935ab40514f5b77c84a512b417c92",
+      "branch": "feat/ui-web",
+      "describe": "port-base-20260829-95-g2777476f",
+      "subject": "docs(Idea-230, Idea-231): the bodies - a dependency's growth has no route to its dependent, and the console's access designations have no guard",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -5552,6 +5552,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/.git",
+      "name": ".git",
+      "extension": "",
+      "rel_path": ".git",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/.git-blame-ignore-revs",
       "name": ".git-blame-ignore-revs",
       "extension": "",
@@ -6357,6 +6366,15 @@
       "name": "document-supersession.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/document-supersession.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/dpl-dataset-identity-zone.yaml",
+      "name": "dpl-dataset-identity-zone.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/dpl-dataset-identity-zone.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9701,10 +9719,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/C39.yaml",
+      "name": "C39.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/C39.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/C4.yaml",
       "name": "C4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/C4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/C40.yaml",
+      "name": "C40.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/C40.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16289,15 +16325,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -16395,15 +16422,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -17502,24 +17520,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/pat_projection.py",
@@ -20780,10 +20780,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json",
-      "name": "drydocs-20260830.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json",
+      "name": "drydocs-20260831.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260830.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22008,6 +22008,15 @@
       "name": "render_remediation_diff.py",
       "extension": ".py",
       "rel_path": "scripts/render_remediation_diff.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/render_remediation_profile.py",
+      "name": "render_remediation_profile.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_remediation_profile.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23624,6 +23633,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_remediation_profile_json.py",
+      "name": "test_remediation_profile_json.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_profile_json.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_remediation_scaffold.py",
       "name": "test_remediation_scaffold.py",
       "extension": ".py",
@@ -24938,6 +24956,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/generated/remediation-profile.json",
+      "name": "remediation-profile.json",
+      "extension": ".json",
+      "rel_path": "web/src/generated/remediation-profile.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/generated/software-registry.json",
       "name": "software-registry.json",
       "extension": ".json",
@@ -25361,10 +25388,82 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/remediation/ProfileFrame.tsx",
+      "name": "ProfileFrame.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/remediation/ProfileFrame.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/StandardsFindings.tsx",
+      "name": "StandardsFindings.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/remediation/StandardsFindings.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/Substitutions.tsx",
+      "name": "Substitutions.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/remediation/Substitutions.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/remediation/demoRemediation.ts",
       "name": "demoRemediation.ts",
       "extension": ".ts",
       "rel_path": "web/src/remediation/demoRemediation.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/findingClasses.test.ts",
+      "name": "findingClasses.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/remediation/findingClasses.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/findingClasses.ts",
+      "name": "findingClasses.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/remediation/findingClasses.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/profileData.ts",
+      "name": "profileData.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/remediation/profileData.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/slotShapes.test.ts",
+      "name": "slotShapes.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/remediation/slotShapes.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/slotShapes.ts",
+      "name": "slotShapes.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/remediation/slotShapes.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27960,6 +28059,10 @@
     ],
     [
       "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_remediation_profile.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
       "drydocs/scripts/render_roadmap.py"
     ],
     [
@@ -28005,6 +28108,18 @@
     [
       "drydocs/scripts/render_remediation_diff.py",
       "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_profile.py",
+      "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_profile.py",
+      "drydocs/drydocs_remediation/profile.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_profile.py",
+      "drydocs/drydocs_remediation/xml_bridge.py"
     ],
     [
       "drydocs/scripts/render_roadmap.py",
@@ -30515,8 +30630,48 @@
       "drydocs/web/src/ownership/demoOwnership.ts"
     ],
     [
+      "drydocs/web/src/remediation/ProfileFrame.tsx",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/StandardsFindings.tsx",
+      "drydocs/web/src/remediation/findingClasses.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/StandardsFindings.tsx",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/Substitutions.tsx",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/Substitutions.tsx",
+      "drydocs/web/src/remediation/slotShapes.ts"
+    ],
+    [
       "drydocs/web/src/remediation/demoRemediation.ts",
       "drydocs/web/src/components/MiniDag.tsx"
+    ],
+    [
+      "drydocs/web/src/remediation/findingClasses.test.ts",
+      "drydocs/web/src/remediation/findingClasses.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/findingClasses.test.ts",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/findingClasses.ts",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/slotShapes.test.ts",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation/slotShapes.test.ts",
+      "drydocs/web/src/remediation/slotShapes.ts"
     ],
     [
       "drydocs/web/src/routes/AdminConfigRoute.tsx",
@@ -30916,6 +31071,18 @@
     ],
     [
       "drydocs/web/src/routes/RemediationRoute.tsx",
+      "drydocs/web/src/remediation/ProfileFrame.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/RemediationRoute.tsx",
+      "drydocs/web/src/remediation/StandardsFindings.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/RemediationRoute.tsx",
+      "drydocs/web/src/remediation/Substitutions.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/RemediationRoute.tsx",
       "drydocs/web/src/remediation/demoRemediation.ts"
     ],
     [
@@ -31193,6 +31360,11 @@
       "drydocs",
       "CONTAINS",
       "drydocs/.env.example"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/.git"
     ],
     [
       "drydocs",
@@ -34872,6 +35044,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/dpl-dataset-identity-zone.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/dpl-dataset-registry-contract.yaml"
     ],
     [
@@ -36692,7 +36869,17 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/C39.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/C4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/C40.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -39897,11 +40084,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -39953,11 +40135,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/code_graph_freshness.py"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/controlm"
     ],
     [
       "drydocs/drydocs",
@@ -40018,16 +40195,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -42777,7 +42944,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260830.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43293,6 +43460,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/render_remediation_diff.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/render_remediation_profile.py"
     ],
     [
       "drydocs/scripts",
@@ -44287,6 +44459,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_remediation_profile_json.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_remediation_scaffold.py"
     ],
     [
@@ -45112,6 +45289,11 @@
     [
       "drydocs/web/src/generated",
       "CONTAINS",
+      "drydocs/web/src/generated/remediation-profile.json"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
       "drydocs/web/src/generated/software-registry.json"
     ],
     [
@@ -45297,7 +45479,47 @@
     [
       "drydocs/web/src/remediation",
       "CONTAINS",
+      "drydocs/web/src/remediation/ProfileFrame.tsx"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/StandardsFindings.tsx"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/Substitutions.tsx"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
       "drydocs/web/src/remediation/demoRemediation.ts"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/findingClasses.test.ts"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/findingClasses.ts"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/profileData.ts"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/slotShapes.test.ts"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/slotShapes.ts"
     ],
     [
       "drydocs/web/src/routes",
@@ -45489,13 +45711,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2569,
-    "edges": 1345,
+    "files": 2584,
+    "edges": 1362,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2861,
-    "directories": 293
+    "rels": 2872,
+    "directories": 289
   }
 }
