@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/extractors/dpl_registry.py
@@ -90,3 +90,25 @@ notes: |
   EVIDENCE PROVENANCE: the defect is producer-verifiable as stated above. The company-side
   session that made it worth fixing now is logged at internal/research/G64-SME-MM-research.md
   (company repo, pending back-flow); nothing from that log is asserted here.
+
+  DONE 2026-08-31 (desktop, main). Built in drydocs_lineage/extractors/dpl_registry.py with
+  five tests in tests/unit/test_lineage_dpl_registry.py, clause by clause. (a) FieldCensus
+  (present / empty / absent) per kind per contract field, reached through
+  RegistryCoverage.census() and reported by contract_lines(); the census runs BEFORE any skip,
+  because a record rejected for a missing guid is still evidence about every other field.
+  (b) active_absent joins active_unknown and both print in summary(). (c) RegistryRecord gains
+  seal_origin (record | folder | empty) and coverage gains seal_from_folder, so a seal inferred
+  from a directory name is visible as inferred. (d) _count_passed_over() counts JSON under the
+  root whose name is not an expected one and lists the distinct names, so a landing zone full
+  of differently-named exports no longer reads as an empty directory. (e) the guid_only_root
+  fixture is the regression the original six could not express - records carrying the guid and
+  nothing else - and it asserts each missing field is named in the census.
+
+  CLAUSE (f) HELD, and it is worth recording that it was the hard part rather than the easy
+  one: knowing what the real field names are and still not writing them down. _EXPORT_SHAPES,
+  _ACTIVE_SPELLINGS and the seal lookup are untouched, the ASSUMED FIELD CONTRACT docstring
+  still says assumed, and _CENSUS_FIELDS is documented in place as a census list and not a
+  lookup order so a later reader does not mistake it for the amendment.
+
+  SUITE: 2895 passed, 9 skipped (full unit run); ruff format + check clean on both files. The
+  three rich-ANSI failures the G58 note recorded are gone - the suite is fully green here.

@@ -8,6 +8,11 @@ clause: (a) taxonomy-first staging records with provenance, (b) v-shape
 tolerance (bare list / wrapped) + malformed counted, (c) the active flag
 staged-not-judged, (d) the GUID cross-check vs G15 observations, (e) the
 clone-lag third column, (f) NO graph writes.
+
+G135 adds (g): the accounting reports a contract that is WRONG, not only one
+that is broken. Every case above (a)-(f) supplies the assumed field names, so
+none of them can fail when the assumption itself is wrong — which is why the
+guid-only fixture exists.
 """
 
 from __future__ import annotations
@@ -196,3 +201,87 @@ def test_extract_and_cross_check_never_touch_the_graph(registry_root: Path) -> N
     cross_check(result, g, clone_guids={GUID_P1})
     assert g.stats() == before  # read-only, candidates stay flat
     assert g.rels == set()
+
+
+# -- (g) G135: the accounting can see a WRONG contract, not only a broken one -----------
+#
+# Every counter above this section is a SKIP counter. These pin the half that
+# reports a record which staged FINE and carried almost nothing — the shape a
+# wrong field contract actually takes.
+
+
+@pytest.fixture()
+def guid_only_root(tmp_path: Path) -> Path:
+    """The regression the original fixtures could not express: records whose
+    only contract field is the guid. Every other assumed name is absent."""
+    root = tmp_path / "guid-only" / "dpl-registry"
+    seal_a = root / SEAL_A
+    seal_a.mkdir(parents=True)
+    (seal_a / "pipeline_id.json").write_text(
+        json.dumps([{"pipelineId": GUID_P1}, {"pipelineId": GUID_P2}]),
+        encoding="utf-8",
+    )
+    return root
+
+
+def test_a_contract_wrong_on_every_optional_field_is_reported(guid_only_root: Path) -> None:
+    result = DplRegistryExtractor().extract(guid_only_root)
+    coverage = result.coverage
+
+    # it staged cleanly — that is the point: no skip counter fires
+    assert coverage.pipelines_read == 2
+    assert (coverage.records_no_guid, coverage.files_invalid) == (0, 0)
+
+    # ...and the census says so anyway, field by field, by name
+    lines = coverage.contract_lines()
+    for missing in ("version", "active", "ownerSealId", "sealId", "name"):
+        assert f"pipeline.{missing}: absent 2/2" in lines
+    assert "pipeline.pipelineId: present 2/2" in lines
+
+
+def test_an_absent_active_flag_is_counted_apart_from_an_unreadable_one(
+    guid_only_root: Path, run
+) -> None:
+    absent = DplRegistryExtractor().extract(guid_only_root).coverage
+    assert (absent.active_absent, absent.active_unknown) == (2, 0)
+    assert "active_absent=2" in absent.summary()
+    # the mixed-spelling fixture is the other case: present but unreadable
+    assert (run.coverage.active_absent, run.coverage.active_unknown) == (0, 1)
+
+
+def test_a_seal_inferred_from_the_path_is_counted_as_inferred(guid_only_root: Path, run) -> None:
+    inferred = DplRegistryExtractor().extract(guid_only_root)
+    assert inferred.coverage.seal_from_folder == 2
+    assert inferred.coverage.records_no_seal == 0  # it HAS one — from the path
+    assert {r.seal_origin for r in inferred.records} == {"folder"}
+    assert "seal_from_folder=2" in inferred.coverage.summary()
+    # a record that carries its own seal is not counted as inferred
+    p1 = next(r for r in run.records if r.guid == GUID_P1)
+    assert p1.seal_origin == "record"
+    assert run.coverage.seal_from_folder == sum(1 for r in run.records if r.seal_origin == "folder")
+
+
+def test_json_passed_over_for_its_name_is_counted_and_listed(tmp_path: Path) -> None:
+    root = tmp_path / "dpl-registry" / SEAL_A
+    root.mkdir(parents=True)
+    (root / "response_1788150600408.json").write_text("[]", encoding="utf-8")
+    (root / "response_1788151602238.json").write_text("[]", encoding="utf-8")
+    result = DplRegistryExtractor().extract(root.parent)
+    # without this the run reads as an empty directory and complains about nothing
+    assert result.coverage.files_read == 0
+    assert result.coverage.files_skipped_by_name == 2
+    assert result.coverage.skipped_file_names == [
+        "response_1788150600408.json",
+        "response_1788151602238.json",
+    ]
+    assert "by_name=2" in result.coverage.summary()
+
+
+def test_the_census_survives_as_dict(guid_only_root: Path) -> None:
+    """Coverage is reported through as_dict(); the census has to travel in it."""
+    payload = DplRegistryExtractor().extract(guid_only_root).coverage.as_dict()
+    assert payload["fields"]["pipeline"]["version"] == {
+        "present": 0,
+        "empty": 0,
+        "absent": 2,
+    }
