@@ -8,12 +8,85 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs_lineage/extractors/dpl_registry.py
 - tests/unit/test_lineage_dpl_registry.py
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  The extractor gains the ability to REPORT that its field contract is wrong. It does not
+  gain an opinion about what the right one is - that is clause C1 of the
+  dpl-pipeline-registry-contract gate and it belongs to the SME.
+
+  (a) EVERY COUNTER IN RegistryCoverage IS A SKIP COUNTER, AND THAT IS THE DEFECT.
+  files_invalid, records_no_guid, records_no_seal, duplicate_guids and active_unknown all
+  fire when a record is REJECTED. A record that parses and stages with five of its six
+  fields empty fires none of them, so the run summary is indistinguishable from a run that
+  got everything. Add a per-field presence census - for each field the contract names, the
+  count of records where it was present, absent, or present-but-empty - and put it in the
+  run's own output. A contract that is wrong then reads as "version absent on 508 of 508",
+  which is a sentence a person can act on.
+
+  (b) AN ABSENT FLAG AND AN UNREADABLE FLAG ARE THE SAME EVENT AND ONLY ONE IS COUNTED.
+  `active_unknown` increments on an unrecognized SPELLING (`if spelled and not active`) and
+  stays silent when the field is absent, because an absent field yields an empty string and
+  the guard reads it as nothing-to-report. Both cases mean the flag was not read. Count them
+  separately and name them separately - a missing field is a contract question, a strange
+  value is a data question, and collapsing them loses which one you have.
+
+  (c) THE SEAL FALLBACK INVENTS A VALUE RATHER THAN COUNTING A MISS. When neither seal field
+  is present the extractor takes `export.parent.name`, suppressed only when that name is
+  literally `dpl-registry`. Under the documented layout the folder IS the SEAL, so the
+  fallback is right; under any other layout it stages a directory name as an identifier and
+  reports records_no_seal=0. Record WHERE each seal came from (the record field or the
+  folder) and count the folder-derived ones, so a run whose exports did not land in per-SEAL
+  folders says so instead of asserting a SEAL it inferred from a path.
+
+  (d) A RUN THAT READ NOTHING SAYS WHAT IT DECLINED TO READ. `extract()` rglobs exactly
+  `pipeline_id.json` and `dataset_id.json`; a landing zone holding JSON under any other name
+  produces files_read=0 with no complaint and no list. Count the JSON files passed over
+  because their name did not match, so an intake-naming problem is visible in the coverage
+  line rather than looking like an empty directory. Which convention wins - the extractor's
+  path or a rename at intake - is NOT decided here (it is the gate's OQ-8); this clause only
+  makes the mismatch reportable.
+
+  (e) THE REGRESSION TEST IS THE ONE THE FIXTURES NEVER HAD. Every fixture in
+  tests/unit/test_lineage_dpl_registry.py supplies the assumed field names, so no test can
+  fail when the assumption is wrong. Add a fixture whose records carry the guid field and
+  NOTHING else the contract names, and assert that the run's coverage reports each missing
+  field by name. That test is the one that would have caught this.
+
+  (f) NO FIELD NAME CHANGES AND NO SPELLING IS ADDED. Not to `_EXPORT_SHAPES`, not to
+  `_ACTIVE_SPELLINGS`, not to the seal lookup. The ASSUMED FIELD CONTRACT docstring keeps
+  saying it is assumed. Amending the mapping is the gate's clause C1, and pre-empting it
+  from a build item is exactly the move the T10/T13 discipline exists to prevent.
+
+  Suite green; the module boundary and no-render-parsing guards unaffected.
 notes: |
-  Minted 2026-08-31.
+  Minted 2026-08-31. FOUND WHILE READING, NOT WHILE RUNNING: this is provable from the
+  producer tree alone - trace any record lacking the assumed optional fields through
+  `_read_export` and every counter stays zero while five of six staged values are empty
+  strings. No company-side data is needed to see it, which is precisely why it is separable
+  from the gate.
+
+  WHY IT MATTERS MORE THAN THE SPELLINGS IT SITS NEXT TO. The dpl-pipeline-registry-contract
+  gate exists to validate a contract that has been assumed since G25. Correcting a field name
+  fixes one contract once. Making a wrong contract VISIBLE fixes the next one too, and there
+  will be a next one - the same assumed-until-validated shape is live on autosys:export,
+  airflow:dag-export and infra:server-export, all confirmed sources with stub envelopes.
+
+  THE ASYMMETRY WORTH KEEPING IN MIND WHILE BUILDING. The two halves of this extractor fail
+  differently. The dataset leg fails LOUDLY by luck: its wrapper key happens to match, its
+  guid field does not, so every record lands in records_no_guid and the run screams. The
+  pipeline leg fails QUIETLY: its guid field happens to match, so records stage successfully
+  with everything else empty. The quiet failure is the dangerous one and it is dangerous for
+  a reason that has nothing to do with which fields are right - it is dangerous because the
+  accounting can only see rejections.
+
+  DELIBERATELY NOT HERE: the field mapping itself (gate clause C1), the audit-envelope
+  outcome (C2), whether the active flag can still serve as G22's third usage signal (C3), and
+  the zone/identity question (G136). This item touches no config/ file and no gate page.
+
+  EVIDENCE PROVENANCE: the defect is producer-verifiable as stated above. The company-side
+  session that made it worth fixing now is logged at internal/research/G64-SME-MM-research.md
+  (company repo, pending back-flow); nothing from that log is asserted here.

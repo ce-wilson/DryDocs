@@ -15,7 +15,63 @@ inputs:
 - config/taxonomy/medallion-stages.yaml
 - config/gate-prompts/rua-load-shapes.yaml
 - docs/decisions/0001-ontology-base-scope.md
+- config/gate-log.md
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  A rider is DRAFTED and put to the SME. Nothing is applied: dataset identity is a signed
+  ruling (G22 section G clause f, rua-load-shapes, 2026-08-07) and re-opening it is the
+  gate's, never a build's.
+
+  (a) THE COLLISION IS STATED PRODUCER-SIDE FIRST, so the rider does not rest on evidence
+  this repo does not hold. `dpl_mac.py` stages a property spelled `zone` from the flow
+  payload's inputDatasets/outputDatasets. The signed medallion capture spells the layer
+  `zone_prefix` and carries RAW / TRUSTED / REFINED on three stages with the fourth null.
+  Two things, one spelling - the J32 class - and the item names which is which before it
+  proposes anything.
+
+  (b) THE MEDALLION CAPTURE IS NOT RE-OPENED AND THE RIDER SAYS SO IN ITS OWN TEXT.
+  medallion-stage-vocabulary signed 6/6 on 2026-08-19, and section B1 already ruled that
+  zones are PHYSICAL RESIDENCY while stages are LOGICAL. A payload field naming a storage
+  technology is comfortably inside that ruling; what is in question is the extractor's
+  BINDING of a payload field to a taxonomy term, not the taxonomy. An item that reads as
+  re-litigating a signed vocabulary gets refused, correctly.
+
+  (c) THE IDENTITY QUESTION IS PUT IN ITS OWN TERMS, WITH THE CONSEQUENCE SHOWN RATHER THAN
+  ASSERTED. `dpl_mac.py` pins dataset identity to the GUID alone, with version and zone as
+  properties, explicitly pending the G22 clause-(f) ruling that has since signed. If a
+  dataset GUID is NOT scoped to its storage layer, then one hop's input and its output carry
+  the same GUID at the same version, and a raw-to-trusted pipeline models as a self-loop. The
+  rider offers the options and rules none of them: identity stays the GUID and the hop is
+  modelled some other way; identity gains a second component; or the layer is carried on the
+  EDGE rather than the node. Each option is stated with what it costs the URN render that
+  section G1 made derived-from-the-business-key.
+
+  (d) THE G17 CANDIDATE EDGES ARE MARKED SUSPECT, NEVER SILENTLY CORRECTED. Whatever
+  READS_FROM / WRITES_TO candidates the MAC seam stages today are staged under the identity
+  the rider questions. They are annotated as pending this ruling, in place, so a later reader
+  does not consume them as settled. No candidate is deleted and no shape is changed before
+  the gate.
+
+  (e) THE EVIDENCE IS CITED TO A FILE, NOT TO A SESSION. The payload observation comes from
+  the company-side G64 session; the rider cites internal/research/G64-SME-MM-research.md and
+  waits for it to arrive by back-flow before asserting the payload's contents as fact. Until
+  then the rider carries the producer-side collision from clause (a), which stands on its
+  own, and marks the payload claim as company-reported.
 notes: |
-  Minted 2026-08-31.
+  Minted 2026-08-31 alongside G135, from the same company-side G64 read. The two were split
+  on exactly the line the user drew: G135 is a defect provable from this tree and it gets
+  built; this one changes what a node IS, so it gets drafted and gated.
+
+  WHY IT IS NOT FOLDED INTO THE DPL CONTRACT GATES. G64 and G65 validate a FIELD CONTRACT -
+  which names carry which values. This is an IDENTITY question, and identity was ruled
+  separately and earlier, at rua-load-shapes section G. Folding an identity change into a
+  contract-validation sign-off is how a signed ruling gets amended as a side effect of a
+  different conversation.
+
+  WHAT MAKES IT URGENT ENOUGH TO MINT RATHER THAN INBOX. A self-loop is not a cosmetic
+  modelling defect: the raw-to-trusted-to-refined chain is the lineage the DPL seam exists to
+  produce, and a self-loop is the one shape that makes a chain unreadable while still
+  loading cleanly. It has the same character as the G135 defect one layer up - wrong, and
+  quiet about it.
+
+  DELIBERATELY NOT HERE: the field contract (G64/G65 clause C1), the extractor's own
+  never-silent accounting (G135), and any change to config/taxonomy/medallion-stages.yaml.
