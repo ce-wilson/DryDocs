@@ -1919,7 +1919,7 @@ OWED COMPANY-SIDE:
 | T10 | MAC field contract validated vs a REAL DPL export — amend dpl_mac.py contract + fixtures together | pending (producer belief, as of 2026-08-01) |
 | T11 | L7 ratification entry in company gate-log (Tier A record) | **RATIFIED 2026-07-27** (company gate-log; §6a is the standing template) |
 | T12 | Company platforms gate: AIS position vs producer C12 | **RULED — SUPERSEDE, 2026-07-21** (company gate-log): the AIS layer is superseded by the software-registry model; excision applied, Tier B holds discharged 2026-07-27, session packs retired |
-| T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | pending (producer belief, as of 2026-08-01) |
+| T13 | DPL registry field contract validated vs a REAL per-SEAL export (pipeline_id.json/dataset_id.json) — amend dpl_registry.py header + fixtures together, cite provenance (the T10 discipline) | **THE VALIDATION RAN 2026-08-31** (company-side; both halves profiled, session logged at `internal/research/G64-SME-MM-research.md`, pending back-flow) — but the row asks for the AMENDMENT, not the profile, so it stays **pending**. What the profile found is the `dpl-pipeline-registry-contract` gate's clause C1 to rule (G64) and its dataset sibling's (G65); neither has signed. Producer-side the profile changed one thing that needed no gate: G135 makes the extractor able to REPORT a wrong contract (per-field census, absent-vs-unreadable active flag, seal-inferred-from-path counted, unmatched JSON counted) without moving a single field name |
 | T14 | rua collector convergence: company's own -n implementation vs producer G18 v2 — reconcile to ONE v2 (flags, scripts.tsv columns incl. sha256, size cap, COLLECTOR_VERSION stamp) so bundles stay cross-ingestible. Step 49e's G45 listing fallback is the same family — reconcile together | pending (producer belief, as of 2026-08-01) |
 | T15 | G33 company code-graph load: run YOUR post-U6 `snapshot.ps1` (snapshot `*.json` is never-port BOTH ways; primary on-main checkout, never a worktree) → `drydocs load-code-snapshot` into your graph; second `:Project` root is INTENDED (gate §B3(a)); rides with the Tier A ratification entry (guardrail 6) | pending (producer belief, as of 2026-08-01) |
 | T16 | CM_DEF_VJOB_DETAIL built for real in psgmgr — retires the G39 staging stand-in as the feed (G40 parse stays as cross-check); premise correction folded into G22 prep. NOTE step 49g: if the XML export becomes a standing feed, this retirement gains a SECOND path — the unruled precedence question decides, not the port | pending (producer belief, as of 2026-08-01) |
@@ -1934,8 +1934,11 @@ OWED COMPANY-SIDE:
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker
   section (guardrail 1 has the `git show` path; they are NOT restated here). T9 reminder: producer sign-off never substitutes for load verification on
-  your graph. T10/T13: until a real export parses with zero mismatches, treat the
-  field names as ASSUMED.
+  your graph. T10: until a real export parses with zero mismatches, treat the
+  field names as ASSUMED. **T13 has now had that parse (2026-08-31) and it did NOT come
+  back clean** — so the DPL registry field names are no longer merely assumed, they are
+  known-contested pending the G64/G65 gate rulings. Treat them as neither confirmed nor
+  corrected until those sign.
 
 STEP LEDGER — delta since `caa0406` (steps 43–123 collapsed above; 124–134 are the
 `ae21ee4..caa0406` range, DELIVERED and producer-reviewed but with an unconfirmed

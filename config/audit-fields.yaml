@@ -298,6 +298,13 @@ sources:
       while their audit entries read that native audit columns are unknowable
       until a live export exists — confirmed source, stub envelope, loader
       separately gated. Exactly the shape here.
+      REVISIT TRIGGER FIRED 2026-08-31: a real per-SEAL export was pulled and
+      profiled company-side (session logged at
+      internal/research/G64-SME-MM-research.md, company repo, pending
+      back-flow). The gate dpl-pipeline-registry-contract convenes on that
+      evidence and its clause C2 rules this entry. STATUS STAYS stub until it
+      signs — a profile is evidence, not a ruling, and this note records that
+      the trigger fired rather than what it found.
 
   - id: "dpl:dataset-registry"
     status: stub                             # same ruling, same tracker trigger as dpl:pipeline-registry (gate rua-load-shapes §J, 2026-08-07)
@@ -308,6 +315,18 @@ sources:
       reasoning. Recorded as its OWN entry rather than a cross-reference because
       the guard keys on ids: a source without its own row is a source with no
       envelope decision, whatever a neighbouring note says.
+      WHAT THE CROSS-REFERENCE CARRIES, AND WHAT IT DOES NOT (added 2026-08-31).
+      This entry inherits the 2026-08-07 REASONING above and nothing else. The
+      two exports answer from different endpoints, so a profile that discharges
+      one can leave the other standing, and G64 and G65 are run as separate
+      gates for exactly that reason. When the pipeline entry moves, this one is
+      RE-READ, never moved with it — the sentence "see dpl:pipeline-registry"
+      points at an argument, not at an outcome.
+      REVISIT TRIGGER FIRED 2026-08-31: same company-side session, same log
+      (internal/research/G64-SME-MM-research.md, pending back-flow). The dataset
+      half was profiled alongside the pipeline half, which pre-answers part of
+      the dpl-dataset-registry-contract gate's section B and none of its
+      section C. STATUS STAYS stub.
 
   - id: "infra:server-export"
     status: stub                             # registered at the Z3 build (gate server-location-ontology, 2026-08-19); the ENVELOPE gate has not run
