@@ -1,0 +1,21 @@
+id: Q28
+epic: docmeta
+title: Register the BMC Control-M 9.0.21 Parameters tree as a doc corpus — the scraper can capture
+  it, but corpus_id None makes conversion refuse rather than guess
+type: task
+module: config
+phase: 14
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/doc-source-registry.yaml
+- scripts/external_vendor_scrape.py
+- tests/unit/test_doc_registry.py
+- tests/unit/test_external_vendor_scrape.py
+acceptance: |
+  Stub minted per the I6 rule — the body lands in the next commit.
+notes: |
+  Minted 2026-08-31. Body to follow.
