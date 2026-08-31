@@ -91,6 +91,28 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-229`** · 2026-08-31 · `[chore]` · **open** · prio? **High** —
+  **A cancelled CI run is neither green nor red, and nothing reads it as unverified — so a
+  commit can reach main having never been checked, and its failure surfaces on somebody
+  else's next push.** Both of this session's first two pushes were cancelled by the newer
+  push; the guard failure they carried appeared on the OTHER machine's commit, where it read
+  as that commit's fault until the log was opened.
+  WHAT ALREADY COVERS THIS AND WHERE THE HOLE IS: snapshot.ps1's CI check matches on HEAD's
+  sha, which is what makes "green" mean green AT WHAT YOU PUSHED rather than at somebody
+  else's older commit (Idea-111). That catches STALE GREEN. It does not catch NO VERDICT — a
+  cancelled run has a matching sha and no result, so the check has nothing to disagree with.
+  The producer-side half is one sentence of logic: treat `cancelled` as UNVERIFIED and say so,
+  the same warn-only way the existing check reports.
+  WHY IT MATTERS MORE THAN IT LOOKS: two machines pushing minutes apart is the normal case
+  here, not the edge case — the same concurrency the I6 mint rule and the J31 wip-branch rule
+  exist for. Every one of those rules makes work VISIBLE across machines; this is the same
+  gap in the verification channel.
+  SEPARATE AND ALREADY RESOLVED, recorded so the run ids in this entry still read correctly:
+  on 2026-08-31 run 33401557831 failed all three jobs in 2-3 seconds on a GitHub billing block
+  ("recent account payments have failed or your spending limit needs to be increased"),
+  executing nothing. The user raised the spending limit the same day and the re-run started
+  normally. Account-side, no repo change, closed.
+
 - **`Idea-187`** · 2026-08-29 · `[task]` · **groomed → N22 (2026-08-30)** · prio? **Med** —
   **Producer has no registry row for the PAT Product Application Report, so two loaders the
   company runs have no producer-side source.** The 2026-08-28 manual-load PoC established the
