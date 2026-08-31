@@ -117,6 +117,38 @@ def test_env_templates_target_ground_truth_db_not_home_db():
         )
 
 
+CONSOLE_TSX = REPO / "web" / "src" / "components" / "CypherConsole.tsx"
+
+
+def test_the_console_code_fallback_also_targets_the_ground_truth_db():
+    """The TEMPLATE guard above is not enough, and O83 is the proof.
+
+    That guard passed the whole time the console's own fallback said `neo4j`,
+    because a template is only read by someone who copies it. A clone with no
+    `web/.env.local` never reads the template at all — it runs the code default,
+    which pointed at the driver's HOME database, so correct Cypher returned zero
+    rows against a database holding none of this console's data. Silent, because
+    an empty result is not an error, and invisible to every machine that has ever
+    run the console, all of which have a local env file.
+
+    The pattern matched is the CODE form `VITE_NEO4J_DATABASE ?? '<db>'` rather
+    than the bare database name, so the comment above it explaining the old value
+    cannot satisfy this guard (J66).
+    """
+    ground = _load()["neo4j"]["databases"]["ground_truth"]
+    text = CONSOLE_TSX.read_text(encoding="utf-8")
+    m = re.search(r"VITE_NEO4J_DATABASE\s*\?\?\s*'([^']+)'", text)
+    assert m, (
+        "CypherConsole.tsx: no `VITE_NEO4J_DATABASE ?? '<db>'` fallback found — "
+        "if the default moved somewhere else, move this guard with it"
+    )
+    assert m.group(1) == ground, (
+        f"CypherConsole.tsx defaults its database to {m.group(1)!r}; every surface "
+        f"this panel serves lives in the ADR 0002 ground-truth db {ground!r}, and "
+        "the home db is not part of the topology"
+    )
+
+
 PROVISION_PS1 = REPO / "drydocs_core" / "schema" / "provisioning" / "provision.ps1"
 
 

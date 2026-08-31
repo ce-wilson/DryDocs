@@ -134,6 +134,13 @@ The full stack walkthrough is the governed runbook
 The graph must be loaded first (repo README "Quick start"). Point
 `VITE_API_URL` at the API if it is not on `http://localhost:8001`.
 
+**Which database the bolt panel talks to.** `VITE_NEO4J_DATABASE`, defaulting to
+`drydocs` — the project database (`config/dev-environment.yaml` `ground_truth`,
+the ADR 0002 topology), not the driver's home database. With no `.env.local` the
+built-in default applies, so a fresh clone queries the right database rather than
+returning zero rows from an empty one; the failure this replaced was silent,
+because an empty result is not an error.
+
 **Dev-mode credential rule:** the Neo4j password is form-entered at runtime,
 localhost targets only. Never define `VITE_NEO4J_PASSWORD` in any env file or
 CI — Vite inlines `VITE_*` values into the built bundle, so a committed or

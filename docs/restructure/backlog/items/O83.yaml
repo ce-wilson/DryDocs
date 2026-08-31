@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/components/CypherConsole.tsx
@@ -29,5 +29,39 @@ acceptance: |
   failure presents as an empty result rather than an error and a green unit suite proves nothing
   about it.
 notes: |
-  Groomed 2026-08-30 (desktop, weekly groom) from Idea-204. Low priority and haiku - a one-line
-  default plus documentation - but it is a real first-run defect and the symptom is silent.
+  BUILT 2026-08-31 (desktop, MSI). One-line default, plus the guard that was actually
+  missing.
+
+  (a) THE DEFAULT IS NOW THE PROJECT DATABASE -- `drydocs`, the ADR 0002 ground truth in
+  config/dev-environment.yaml. The home database is not part of the topology and no surface
+  this panel serves reads from it.
+
+  (b) STATED IN BOTH PLACES: web/.env.example now says the variable IS the console's
+  built-in default rather than merely carrying a value, and web/README.md gains a short
+  section naming the variable, the default, and why it is not the home database.
+
+  (c) BOTH PATHS CHECKED, and the asymmetry is the whole reason this survived: every
+  machine that has ever run this console has a web/.env.local setting the variable, so the
+  author never reaches the fallback. Confirmed on this desktop -- the file exists and sets
+  `drydocs`.
+
+  (d) VERIFIED AS A CLONE SEES IT, without touching the local env file: built through a
+  throwaway config whose envDir points at an empty directory, which is exactly what a fresh
+  clone reads. The bundle carries `useState(...VITE_NEO4J_DATABASE ?? "drydocs")`, so with
+  the variable undefined the panel opens on the project database. The control build, with
+  the local env file, is unchanged.
+
+  THE GUARD IS THE PART THAT WAS MISSING, and its placement is the finding. A guard already
+  existed asserting the three .env.example TEMPLATES target the ground-truth database, and
+  it passed the entire time the code default was wrong -- a template is only read by
+  someone who copies it, and a clone with no local env file reads none of them. The new
+  guard sits beside it in tests/unit/test_dev_environment.py and reads the CODE fallback
+  against the same dev-environment.yaml value. Proven to bite: reverting the fallback to
+  the home database fails it with the offending value named.
+
+  J66: the pattern matched is the code form `VITE_NEO4J_DATABASE ?? '<db>'`, not the bare
+  database name, so the comment above it -- which necessarily names the old value to
+  explain the defect -- cannot satisfy the guard.
+
+  VERIFIED: full Python suite green, ruff check + format clean, vitest 43 passed, tsc build
+  clean, oxlint unchanged.

@@ -66,7 +66,16 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
   const [uri, setUri] = useState(env.VITE_NEO4J_URI ?? 'bolt://localhost:7687')
   const [user, setUser] = useState(env.VITE_NEO4J_USER ?? 'neo4j')
   const [password, setPassword] = useState('')
-  const [database, setDatabase] = useState(env.VITE_NEO4J_DATABASE ?? 'neo4j')
+  // O83: the fallback is the PROJECT database, not the driver's home database.
+  // Every surface this panel serves lives in `drydocs` (config/dev-environment.yaml
+  // `ground_truth`, the ADR 0002 topology); the home database is explicitly not
+  // part of that topology. The old 'neo4j' fallback meant a fresh clone ran
+  // correct Cypher against the wrong database and got zero rows — silent, because
+  // an empty result is not an error. It survived because every machine that has
+  // ever run this has a web/.env.local setting the variable, so the author never
+  // reaches the fallback. Kept in step with config/dev-environment.yaml by
+  // tests/unit/test_dev_environment.py.
+  const [database, setDatabase] = useState(env.VITE_NEO4J_DATABASE ?? 'drydocs')
   const [query, setQuery] = useState(PRESETS['C4 components (depgraph)'])
   const [result, setResult] = useState<GraphResult | null>(null)
   const [cypherStatus, setCypherStatus] = useState('')
