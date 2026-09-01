@@ -356,8 +356,20 @@
       are per-application schema and service accounts for ONBOARDING, not
       job-execution identity. The 557 is ACCESS BREADTH — a number ~80x too
       large to read as ownership. "What does this person own" is answered from
-      ServiceNow TOM or SEAL Attribution, NEVER from an FCT-account count; SEAL
-      already had it right (seal_apps = 7 against TOM's 6 + PSF = 7).
+      INDIVIDUAL-scoped ServiceNow TOM or SEAL Attribution, NEVER from an
+      FCT-account count; SEAL already had it right (seal_apps = 7 against TOM's
+      6 + PSF = 7). THE SCOPE WORD IS LOAD-BEARING — TOM has two scopes and they
+      measure different things: ownership is INDIVIDUAL-scoped and lands on
+      roughly 7 CIs, while support accountability is GROUP-scoped and lands on
+      65-153. Reading group-scoped rows as ownership inflates one person to
+      100+ CIs. Measured on an L2 support sample: production-support staff hold
+      ZERO or near-zero individual TOM rows while carrying 118-237 group-scoped
+      rows, almost all Incident Resolver variants. The decisive case is an
+      account owner who is the EMP_MGRS_ID of record for a SEAL-registered
+      functional account and has zero individual TOM rows — his accountability
+      is resolving incidents, not owning. THE FCT OWNER FIELD LANDS IN NEITHER
+      MECHANISM, which is why an L2 "production ownership" transfer leaves no
+      trace in any system of record and cannot be built as a control.
       Recorded because the prose above invited exactly the wrong inference,
       a reading session made it, and its first correction then argued the
       convergence proved technical accountability — also wrong: FCT ownership
