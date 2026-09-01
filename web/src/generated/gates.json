@@ -1090,7 +1090,9 @@
         "config/gate-prompts/source-registry-v2.yaml"
       ],
       "log_ref": "config/gate-log.md:4263",
-      "unblocks": []
+      "unblocks": [
+        "C41"
+      ]
     },
     {
       "kind": "prompt-only",

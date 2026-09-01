@@ -1,0 +1,25 @@
+id: C41
+epic: ontology-mapping
+title: The backlog series letter is an epoch tag, not a topic - mint domains as first-class registered
+  objects and carry the topic axis in a field, gated on the Teams Edition ADR
+type: requirement
+module: config
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: blocked
+depends_on: []
+gates:
+- schema-identifier-publish-ceiling-teams-edition
+inputs:
+- docs/decisions/0015-team-edition-template.md
+- drydocs_core/ontology/relationship_vocabulary/00-header.yaml
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_backlog.py
+- docs/restructure/backlog/epics/
+- git-readme.md
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  STUB.
