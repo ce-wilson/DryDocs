@@ -1,0 +1,21 @@
+id: J70
+epic: release-infrastructure
+title: Four registry-id rewrites were requested as a find-and-replace — two are id renames
+  that owe a retired-id row, and one contradicts the signed J13 class-3 ruling
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- config/gate-log.md
+- docs/restructure/backlog/items/J13.yaml
+- drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml
+acceptance: |
+  Stub minted per the I6 rule — the body lands in the next commit.
+notes: |
+  Minted 2026-09-01. Body to follow.
