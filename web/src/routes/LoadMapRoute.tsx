@@ -23,6 +23,14 @@ import {
   type LoadMapSource,
 } from '../loadmap/loadMapModel'
 import WiringKey from '../loadmap/WiringKey'
+import {
+  SortableTh,
+  TableControlBar,
+  download,
+  toCsv,
+  useTableControls,
+  useTableView,
+} from '../components/ui/tableControls'
 
 // /load-map (O57) — the console lens on web/src/generated/load-map.json.
 //
@@ -40,18 +48,49 @@ const loadMapModule = MODULES.find((m) => m.id === 'loadmap')!
 const TH = 'border-b border-edge px-2.5 py-1.5 font-semibold text-muted'
 const TD = 'border-b border-edge-soft px-2.5 py-1.5'
 
-function Table({ headers, children }: { headers: readonly string[]; children: React.ReactNode }) {
+// The sources table's columns, paired with the row key each sorts on. A null
+// key marks a column with no single sortable value — `Pipeline reach` is a
+// composed label and `Loaders` is a list, so sorting them would sort on a
+// rendering rather than on data.
+const SOURCE_COLUMNS: readonly { label: string; key: string | null }[] = [
+  { label: 'Source id', key: 'id' },
+  { label: 'System', key: 'system' },
+  { label: 'Origin', key: 'origin' },
+  { label: 'Kind', key: 'kind' },
+  { label: 'Authority', key: 'authority' },
+  { label: 'Classification', key: 'classification' },
+  { label: 'Confirmed', key: 'confirmed' },
+  { label: 'Wiring', key: null },
+  { label: 'Ledger', key: null },
+  { label: 'Pipeline reach', key: null },
+  { label: 'Loaders', key: null },
+]
+
+const SOURCE_SEARCH_KEYS = ['id', 'system', 'origin', 'kind', 'authority', 'classification'] as const
+
+function Table({
+  headers,
+  headerRow,
+  children,
+}: {
+  headers?: readonly string[]
+  /** Supply a rendered <tr> instead when the columns are sortable. */
+  headerRow?: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
     <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
       <table className="w-full border-collapse text-left text-[11px]">
         <thead className="sticky top-0 bg-panel-2">
-          <tr>
-            {headers.map((h) => (
-              <th key={h} className={TH}>
-                {h}
-              </th>
-            ))}
-          </tr>
+          {headerRow ?? (
+            <tr>
+              {(headers ?? []).map((h) => (
+                <th key={h} className={TH}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          )}
         </thead>
         <tbody>{children}</tbody>
       </table>
@@ -63,6 +102,18 @@ export default function LoadMapRoute() {
   const [kind, setKind] = useState<string | null>(null)
 
   const shown: LoadMapSource[] = useMemo(() => (kind ? SOURCES.filter((s) => s.kind === kind) : SOURCES), [kind])
+
+  // The kind chips narrow WHICH rows exist in the view; these controls order and
+  // partition what is left. Kept separate so a kind filter plus a sort reads as
+  // two decisions rather than one compound state.
+  const srcCtl = useTableControls()
+  const srcView = useTableView(shown as unknown as Record<string, unknown>[], {
+    filter: srcCtl.filter,
+    searchKeys: SOURCE_SEARCH_KEYS,
+    sort: srcCtl.sort,
+    groupKey: srcCtl.grouped ? 'system' : null,
+  })
+  const srcRows = srcView.rows as unknown as LoadMapSource[]
 
   const banner = (
     <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
@@ -117,6 +168,54 @@ export default function LoadMapRoute() {
     </div>
   )
 
+
+  // One row renderer, used flat and inside groups — a second copy for the
+  // grouped view is how the two drift.
+  function renderSourceRows(rows: LoadMapSource[], offset = 0) {
+    return rows.map((s, idx) => {
+      const i = idx + offset
+            const reach = pipelineReach(s)
+            const path = ledgerPath(s.ledger)
+            return (
+              <tr key={s.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
+                <td className={`${TD} font-mono text-[10px] text-text`}>
+                  {s.id}
+                  {s.derived && <span className="ml-1 text-faint">· derived</span>}
+                  {s.replaces && <span className="ml-1 text-faint">· replaces {s.replaces}</span>}
+                </td>
+                <td className={`${TD} text-muted`}>{s.system ?? '—'}</td>
+                <td className={`${TD} text-muted`}>{s.origin ?? '—'}</td>
+                <td className={`${TD} font-mono text-[10px] text-muted`}>{s.kind}</td>
+                <td className={`${TD} text-muted`}>{s.authority ?? '—'}</td>
+                <td className={`${TD} text-muted`}>{s.classification ?? '—'}</td>
+                <td className={`${TD} ${s.confirmed ? 'text-text' : 'text-faint'}`}>
+                  {s.confirmed ? 'yes' : 'not yet'}
+                </td>
+                <td className={TD}>
+                  <span
+                    className="inline-flex items-center rounded-full border px-1.5 py-px font-mono text-[9.5px] font-semibold"
+                    style={{
+                      borderColor: `var(${wiringState(s).token})`,
+                      color: `var(${wiringState(s).token})`,
+                      background: `color-mix(in srgb, var(${wiringState(s).token}) 10%, transparent)`,
+                    }}
+                    title={wiringState(s).meaning}
+                  >
+                    {wiringState(s).label}
+                  </span>
+                </td>
+                <td className={`${TD} font-mono text-[10px] text-muted`} title={path ?? undefined}>
+                  {ledgerState(s.ledger)}
+                </td>
+                <td className={`${TD} text-[10px] ${reach.loaded ? 'text-text' : 'text-faint'}`}>{reach.label}</td>
+                <td className={`${TD} font-mono text-[10px] text-muted`}>
+                  {s.loaders.map((l) => l.cli_name ?? l.name).join(', ') || '—'}
+                </td>
+              </tr>
+            )
+    })
+  }
+
   const sourcesTab = (
     <div className="flex h-full min-h-0 flex-col gap-1.5">
       <div className="flex shrink-0 flex-wrap items-center gap-1.5">
@@ -147,64 +246,58 @@ export default function LoadMapRoute() {
           </button>
         ))}
       </div>
-      <Table
-        headers={[
-          'Source id',
-          'System',
-          'Origin',
-          'Kind',
-          'Authority',
-          'Classification',
-          'Confirmed',
-          'Wiring',
-          'Ledger',
-          'Pipeline reach',
-          'Loaders',
-        ]}
-      >
-        {shown.map((s, i) => {
-          const reach = pipelineReach(s)
-          const path = ledgerPath(s.ledger)
-          return (
-            <tr key={s.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
-              <td className={`${TD} font-mono text-[10px] text-text`}>
-                {s.id}
-                {s.derived && <span className="ml-1 text-faint">· derived</span>}
-                {s.replaces && <span className="ml-1 text-faint">· replaces {s.replaces}</span>}
-              </td>
-              <td className={`${TD} text-muted`}>{s.system ?? '—'}</td>
-              <td className={`${TD} text-muted`}>{s.origin ?? '—'}</td>
-              <td className={`${TD} font-mono text-[10px] text-muted`}>{s.kind}</td>
-              <td className={`${TD} text-muted`}>{s.authority ?? '—'}</td>
-              <td className={`${TD} text-muted`}>{s.classification ?? '—'}</td>
-              <td className={`${TD} ${s.confirmed ? 'text-text' : 'text-faint'}`}>
-                {s.confirmed ? 'yes' : 'not yet'}
-              </td>
-              <td className={TD}>
-                <span
-                  className="inline-flex items-center rounded-full border px-1.5 py-px font-mono text-[9.5px] font-semibold"
-                  style={{
-                    borderColor: `var(${wiringState(s).token})`,
-                    color: `var(${wiringState(s).token})`,
-                    background: `color-mix(in srgb, var(${wiringState(s).token}) 10%, transparent)`,
-                  }}
-                  title={wiringState(s).meaning}
-                >
-                  {wiringState(s).label}
-                </span>
-              </td>
-              <td className={`${TD} font-mono text-[10px] text-muted`} title={path ?? undefined}>
-                {ledgerState(s.ledger)}
-              </td>
-              <td className={`${TD} text-[10px] ${reach.loaded ? 'text-text' : 'text-faint'}`}>{reach.label}</td>
-              <td className={`${TD} font-mono text-[10px] text-muted`}>
-                {s.loaders.map((l) => l.cli_name ?? l.name).join(', ') || '—'}
-              </td>
-            </tr>
+      <TableControlBar
+        filter={srcCtl.filter}
+        onFilter={srcCtl.setFilter}
+        count={srcRows.length}
+        total={shown.length}
+        groupLabel="system"
+        grouped={srcCtl.grouped}
+        onToggleGroup={srcCtl.toggleGroup}
+        onExport={() =>
+          download(
+            'load-map-sources.csv',
+            toCsv(
+              SOURCE_SEARCH_KEYS as unknown as string[],
+              srcRows as unknown as Record<string, unknown>[],
+            ),
           )
-        })}
+        }
+      />
+      <Table
+        headerRow={
+          <tr>
+            {SOURCE_COLUMNS.map((c) => (
+              <SortableTh
+                key={c.label}
+                label={c.label}
+                sortKey={c.key}
+                sort={srcCtl.sort}
+                onSort={srcCtl.cycleSort}
+                className={TH}
+              />
+            ))}
+          </tr>
+        }
+      >
+        {srcView.groups
+          ? srcView.groups.flatMap((g) => {
+              // The group header spans the table so the system name reads as a
+              // band rather than as a value in the first column.
+              const before = srcView.groups!.slice(0, srcView.groups!.indexOf(g)).reduce((n, x) => n + x.rows.length, 0)
+              return [
+                <tr key={`grp-${g.key}`} className="bg-panel-2">
+                  <td className="border-y border-edge px-2.5 py-1 text-[10px] font-semibold text-text" colSpan={SOURCE_COLUMNS.length}>
+                    {g.label}
+                    <span className="ml-2 font-normal text-faint">{g.rows.length}</span>
+                  </td>
+                </tr>,
+                ...renderSourceRows(g.rows as unknown as LoadMapSource[], before),
+              ]
+            })
+          : renderSourceRows(srcRows)}
       </Table>
-      <WiringKey sources={shown} />
+      <WiringKey sources={srcRows} />
       <p className="shrink-0 text-[10px] text-faint">
         “Pipeline reach” names the stages a source has actually been taken through — it is not a score. A source that
         stops at <i>registered only</i> may be entirely correct; the registries say what exists, not what ought to.
