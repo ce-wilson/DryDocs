@@ -14,8 +14,12 @@ assertions had drifted and two were wrong. The rule that came out of J68 is that
 `PORT-MANIFEST.yaml` owns disposition and nothing else may assert it; a generated
 table obeys that rule, a typed one does not.
 
-Output is `docs/port/port-dispositions.md`, regenerated and drift-guarded the same
-way the board and the enforcement matrix are (`tests/unit/test_port_dispositions.py`).
+Output is `docs/port/port-dispositions.md` and it is DELIBERATELY NOT COMMITTED.
+Its range is `<base>..HEAD`, so a committed copy would go stale on every commit and a
+drift guard over it would red the suite constantly — a guard people learn to work
+around is worse than no guard. The file is gitignored working state; the MECHANISM is
+what carries guards (`tests/unit/test_port_dispositions.py`). Regenerate it per apply,
+naming the base you are applying FROM.
 """
 
 from __future__ import annotations

@@ -138,6 +138,23 @@ FOREIGN_PATHS: dict[str, str] = {
     ),
 }
 
+#: Paths a documented command PRODUCES on demand and that are deliberately not
+#: committed. A third claim, kept separate for the same reason HISTORICAL and
+#: FOREIGN are separate: "the past", "the other tree" and "regenerate it" are
+#: different statements, and a merged table lets a genuinely-deleted path hide
+#: behind whichever excuse is loosest. Every entry names the command that makes it —
+#: an exemption a reader cannot act on is just a silenced failure.
+GENERATED_PATHS: dict[str, str] = {
+    "docs/port/port-dispositions.md": (
+        "GENERATED per apply by `python scripts/render_port_dispositions.py <base-tag>` "
+        "(J69) and gitignored on purpose: its range is <base>..HEAD, so a committed copy "
+        "goes stale on every commit and a drift guard over it would red the suite "
+        "constantly. The renderer carries the guards instead "
+        "(tests/unit/test_port_dispositions.py); the output is working state"
+    ),
+}
+
+
 #: Extensions worth checking. Deliberately narrow: prose mentions plenty of
 #: things that look path-like, and a guard with false positives gets muted.
 _PATH = re.compile(
@@ -213,14 +230,20 @@ def test_every_path_a_document_names_exists() -> None:
     failures: list[str] = []
     for name, text in _documents().items():
         for path in sorted(set(_PATH.findall(text))):
-            if "/" not in path or path in HISTORICAL_PATHS or path in FOREIGN_PATHS:
+            if (
+                "/" not in path
+                or path in HISTORICAL_PATHS
+                or path in FOREIGN_PATHS
+                or path in GENERATED_PATHS
+            ):
                 continue
             if not (REPO_ROOT / path).exists():
                 failures.append(f"{name}: `{path}` does not exist")
     assert not failures, (
         f"{len(failures)} path(s) name something that is not there — fix the path, or add "
-        "it to HISTORICAL_PATHS (a statement about the past) or FOREIGN_PATHS (a path in "
-        "another repo), with the reason:\n" + "\n".join(failures)
+        "it to HISTORICAL_PATHS (a statement about the past), FOREIGN_PATHS (a path in "
+        "another repo) or GENERATED_PATHS (produced by a documented command, not "
+        "committed), with the reason:\n" + "\n".join(failures)
     )
 
 
@@ -255,7 +278,11 @@ def test_path_exemptions_carry_a_reason_and_are_still_cited() -> None:
     """Shrink-only, the N2 LEDGER_PENDING idiom: an exemption for a path nobody
     cites any more is dead weight that outlives the reason it was added."""
     all_text = "\n".join(_documents().values())
-    for label, table in (("HISTORICAL_PATHS", HISTORICAL_PATHS), ("FOREIGN_PATHS", FOREIGN_PATHS)):
+    for label, table in (
+        ("HISTORICAL_PATHS", HISTORICAL_PATHS),
+        ("FOREIGN_PATHS", FOREIGN_PATHS),
+        ("GENERATED_PATHS", GENERATED_PATHS),
+    ):
         empty = [p for p, why in table.items() if not why.strip()]
         assert not empty, f"{label} exemption without a reason: {empty}"
 

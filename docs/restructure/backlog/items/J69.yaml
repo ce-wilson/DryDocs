@@ -75,9 +75,18 @@ notes: |
   the four made since port-base-20260901, which is the correct answer.
 
   (d) DERIVED, NOT HAND-KEPT. scripts/render_port_dispositions.py classifies the range's changed paths
-  through PORT-MANIFEST.yaml and writes docs/port/port-dispositions.md, drift-guarded like the board
-  and the enforcement matrix. The port-prompt carries the COMMAND and the class rules, never a path
-  list - a hand-typed table would be the second source of disposition truth J68 just removed.
+  through PORT-MANIFEST.yaml and writes docs/port/port-dispositions.md. The port-prompt carries the
+  COMMAND and the class rules, never a path list - a hand-typed table would be the second source of
+  disposition truth J68 just removed.
+
+  A CORRECTION MADE MID-BUILD, because the first design was wrong. The artifact was going to be
+  committed and drift-guarded like the board - and its own guard caught the flaw on the first full
+  run: the range is base..HEAD, so the committed copy goes stale on EVERY commit and the guard would
+  red the suite constantly. A guard people learn to work around is worse than no guard, which is J66's
+  lesson arriving from the other end. So the output is gitignored working state, generated per apply
+  from the base YOU are applying from, and the guards moved onto the MECHANISM: classify() resolves in
+  manifest order (specific row, then glob, then default_ok, then DEFAULT) and render() buckets without
+  inventing a class. Those hold regardless of what HEAD does.
 
   THE GUARD FOUND A GAP ON ITS FIRST RUN, which is the argument for it existing: `clean-add` is a
   disposition the manifest uses and APPLY_ORDER had no rule for it, so it would have rendered as

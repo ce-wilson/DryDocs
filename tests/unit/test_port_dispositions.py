@@ -1,9 +1,12 @@
-"""The generated port disposition table matches its sources (J69).
+"""The port disposition renderer classifies by the manifest, and only by it (J69).
 
-`docs/port/port-dispositions.md` is a DERIVED artifact — the same
-generated-artifact + drift-test pattern the board, the enforcement matrix and
-`gates.json` use. It exists because a port is applied by disposition class rather
-than in commit order, and the classes must come from `PORT-MANIFEST.yaml` rather
+`docs/port/port-dispositions.md` is generated per-apply and is NOT committed —
+its range is `<base>..HEAD`, so a committed copy would go stale on every commit and
+a guard over it would red the suite constantly. A guard people learn to work around
+is worse than no guard (J66's lesson at the other end), so the MECHANISM is guarded
+here and the output is working state, gitignored like any other per-run artifact.
+
+What must hold is that the classification comes from `PORT-MANIFEST.yaml` rather
 than from a hand-typed copy of it.
 
 The hand-typed copy is not hypothetical: J68 (2026-09-01) removed four disposition
@@ -24,7 +27,6 @@ yaml = pytest.importorskip("yaml")
 
 REPO = Path(__file__).resolve().parents[2]
 RENDERER = REPO / "scripts" / "render_port_dispositions.py"
-RENDERED = REPO / "docs" / "port" / "port-dispositions.md"
 MANIFEST = REPO / "PORT-MANIFEST.yaml"
 PORT_PROMPT = REPO / "docs" / "port" / "port-prompt.md"
 
@@ -38,20 +40,49 @@ def _renderer():
     return module
 
 
-def test_the_committed_table_matches_a_fresh_render() -> None:
-    """Re-render from the same default base and compare. A diff means the committed
-    artifact stopped describing the manifest — which is the state this file exists to
-    make impossible to reach quietly."""
+def test_classify_reads_the_manifest_in_first_match_order() -> None:
+    """The renderer must resolve a path the way the manifest does — specific row
+    first, glob after, `default_ok` only once every row has missed, DEFAULT last.
+    Synthetic rows, so this tests the logic and not today's manifest content."""
     module = _renderer()
-    base = module.newest_base_tag()
-    if not base:
-        pytest.skip("no port-base-* tag in this clone — nothing to render against")
-    doc = yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))
-    fresh = module.render(base, module.changed_paths(base), doc)
-    assert RENDERED.read_text(encoding="utf-8") == fresh, (
-        f"{RENDERED.relative_to(REPO)} is stale — re-run "
-        "`PYTHONPATH=. python scripts/render_port_dispositions.py` and commit the result"
-    )
+    doc = {
+        "rows": [
+            {"path": "config/gate-log.md", "disposition": "union-append"},
+            {"path": "config/**", "disposition": "canonical-producer"},
+            {"path": "docs/x.md", "disposition": "per-entry", "entry_rule": "  keyed by id  "},
+        ],
+        "default_ok": [{"path": "tests/**", "reason": "expectations diverge"}],
+    }
+    # the specific row wins over the later glob
+    assert module.classify("config/gate-log.md", doc)[:2] == ("union-append", "config/gate-log.md")
+    # the glob catches everything else under it
+    assert module.classify("config/other.yaml", doc)[:2] == ("canonical-producer", "config/**")
+    # entry_rule comes back whitespace-normalised for the renderer
+    assert module.classify("docs/x.md", doc)[2] == "keyed by id"
+    # default_ok is consulted only after every row misses — J16's whole distinction
+    assert module.classify("tests/unit/test_x.py", doc)[:2] == ("default_ok", "tests/**")
+    # and a path in neither is DEFAULT, which is "nobody thought about it"
+    assert module.classify("some/new/path.py", doc)[:2] == ("DEFAULT", "(no row)")
+
+
+def test_render_buckets_by_class_and_never_invents_one() -> None:
+    """Every path lands in exactly one class, the counts add up, and a disposition
+    with no paths prints no section — an empty class in an apply plan reads as work
+    that was skipped rather than work that did not exist."""
+    module = _renderer()
+    doc = {
+        "rows": [
+            {"path": "a/**", "disposition": "canonical-producer"},
+            {"path": "b/**", "disposition": "per-entry", "entry_rule": "rows union by id"},
+        ],
+        "default_ok": [],
+    }
+    text = module.render("port-base-test", ["a/one.py", "a/two.py", "b/three.yaml"], doc)
+    assert "**3 changed paths**" in text
+    assert "`canonical-producer` | 2 |" in text
+    assert "`per-entry` | 1 |" in text
+    assert "rows union by id" in text, "the entry_rule must travel with its class"
+    assert "union-append" not in text, "a class with no paths must not print a section"
 
 
 def test_every_disposition_the_manifest_uses_has_an_apply_rule() -> None:

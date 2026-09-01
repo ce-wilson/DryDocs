@@ -2023,7 +2023,10 @@ applying FROM:
 PYTHONPATH=. python scripts/render_port_dispositions.py <your-base-tag>
 ```
 
-It writes `docs/port/port-dispositions.md`: every changed path in the range, bucketed
+It writes `docs/port/port-dispositions.md` — **gitignored working state, generated
+per apply and never committed.** Its range is `<base>..HEAD`, so a committed copy would
+be stale the moment anyone commits; the RENDERER is what carries guards. The file holds
+every changed path in the range, bucketed
 by the disposition `PORT-MANIFEST.yaml` resolves for it, with each row's `entry_rule`
 attached where one exists. **No disposition is typed into this file by hand.** J68
 (2026-09-01) removed four hand-kept disposition assertions from the reconcile-port
