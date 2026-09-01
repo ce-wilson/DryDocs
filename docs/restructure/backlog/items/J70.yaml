@@ -10,7 +10,9 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
+gates: [schema-identifier-publish-ceiling-teams-edition]
 inputs:
+- config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml
 - config/source-registry.yaml
 - config/gate-log.md
 - docs/restructure/backlog/items/J13.yaml
@@ -80,3 +82,10 @@ notes: |
   formed id that a fluent reader parses wrongly is still a defect, just not the one the
   request named. If (a) comes back declined, the residue is a legibility question about the
   `_db` suffix, and that deserves its own entry rather than dying with the escalation.
+  CLAUSE (a) NOW HAS ITS VEHICLE, drafted by the other session on 2026-09-01 and unsigned:
+  config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml. It is framed the
+  way the clause asks — it does NOT assert J13 class 3 was wrong, it asks whether a CONDITION
+  inside that ruling ("established public vocabulary") still holds for psgmgr once Teams
+  Edition ships the tree outside this company. That framing is what keeps this an escalation
+  rather than a reversal, and it is why the `gates:` field on this item points there: nothing
+  in (a) is swept, renamed or redacted until it signs.
