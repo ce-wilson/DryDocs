@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - J68
 inputs:
@@ -86,3 +86,35 @@ notes: |
   per-entry rule was written THIS SESSION, hours before this item, as part of J68 - and it names
   6 of 29 fields. The defect it fixes reappeared in the row that fixed it, which is the strongest
   available argument that enumeration is the wrong instrument.
+
+  DONE 2026-09-01. All four clauses met.
+
+  (a)+(b) Four rules are now TOTAL, each carrying a literal `UNNAMED FIELDS:` clause, and each
+  ruled on its own file's principle rather than on a blanket preference. source-bindings: the KEY
+  crosses and the VALUE does not, with `twin` as the worked example and a tie-break that fails
+  toward the consumer - when a new field is ambiguous, KEEP YOURS, because an unfamiliar producer
+  value can point a consumer at something that does not exist while keeping their own only leaves
+  them a version behind, and the second failure is visible where the first is silent.
+  doc-source-registry: producer-owned by default except fields naming a location, so
+  classification/describes_product/replaces/source_url cross and landing_zone does not.
+  audit-fields: producer-owned, except `status` is per-repo (each side records what IT confirmed)
+  and `decided_by` travels with the status it justifies. source-registry: producer-owned except
+  LOCATION fields and SIDE-RULED fields (`confirmed` and its stamps, the F4 per-repo rule).
+
+  (c) test_every_per_entry_rule_is_total, red first, failing on all four rows before any was
+  edited - source-bindings 2, doc-source-registry 5, source-registry 23, audit-fields 4. The
+  companion test injects a hole and asserts `twin` specifically is reported, so the detector is
+  pinned to the field the real drop turned on. ENTRY_FILES is hand-declared because which
+  top-level sequences hold entries is not derivable - a `counts:` block is a mapping, not entries.
+
+  A METHOD NOTE THAT CHANGED THE ANSWER: the first scan regexed `^\s+([a-z_]+):` over raw YAML and
+  reported `session`, `prose` and `anyway` as fields across the backlog items - prose inside
+  `notes:` blocks. That is J66 (a guard reads code, not the prose around it) arriving in a config
+  file rather than a Python one. Parsing the document instead cut the finding from noise to four
+  real rows, and the guard parses.
+
+  (d) RELAY-19, naming each owed field and which way it goes, and stating plainly that the company
+  did not miss this - the rule did, and taking the file wholesale would have been wrong too.
+
+  Suite 2941 passed / 9 skipped. No file content moved; this changed merge RULES and the guard
+  over them.

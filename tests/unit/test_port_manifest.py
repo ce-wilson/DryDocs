@@ -283,3 +283,99 @@ def test_the_coupling_detector_catches_an_uncoupled_pair() -> None:
         {"path": "tests/unit/test_module_boundary.py", "note": "reads MODULE_MAP.md"},
     ]
     assert uncoupled_pairs(from_guard, pair) == []
+
+
+# ---- J71: a per-entry merge rule must be TOTAL ------------------------------
+# A rule that ENUMERATES fields has a hole in it the moment a field is added, and
+# enumerating harder does not close it — the next field reopens it. Measured on
+# 2026-09-01, from a real drop: config/source-bindings.yaml's rule named six
+# producer-owned fields and two company-owned ones, `twin` and `reason` were in
+# neither, and the company port carried none of `1bd29b42` because a per-entry
+# merge with no instruction for a field has no defensible move.
+#
+# So the property is TOTALITY, not completeness. Name what you want to name, then
+# declare what happens to everything else. "Is this rule total" is decidable;
+# "is this rule complete enough" is not, which is why the second cannot be guarded.
+
+#: The literal that makes a rule total. Deliberately a marker rather than a prose
+#: match: "producer owns the rest" and "the rest is producer-owned" and a dozen
+#: other spellings all mean the same thing, and a guard that accepts any of them
+#: also accepts a sentence that merely sounds like a default.
+DEFAULT_MARKER = "UNNAMED FIELDS:"
+
+#: Per-entry rows whose governed file is a YAML document of list entries, with the
+#: top-level sequences whose entries carry the fields. Hand-declared: which
+#: sequences hold entries is not derivable (a `counts:` block is a mapping, not
+#: entries), and a typed list forces a human look when a new per-entry file appears.
+ENTRY_FILES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("config/source-bindings.yaml", ("profiles", "unbound")),
+    ("config/doc-source-registry.yaml", ("sources",)),
+    ("config/source-registry.yaml", ("systems", "datasets")),
+    ("config/audit-fields.yaml", ("envelope", "sources")),
+)
+
+
+def entry_fields(path: str, sequences: tuple[str, ...]) -> set[str]:
+    """Every field name appearing on an entry under ``sequences``.
+
+    Parsed, never grepped. A regex over raw YAML matches prose inside `notes:`
+    blocks — the first version of this check reported `session`, `prose` and
+    `anyway` as fields across the backlog items, which is the J66 lesson (a guard
+    reads code, not the prose around it) arriving in a config file.
+    """
+    import yaml as _yaml
+
+    doc = _yaml.safe_load((REPO / path).read_text(encoding="utf-8"))
+    fields: set[str] = set()
+    for sequence in sequences:
+        for entry in doc.get(sequence) or []:
+            if isinstance(entry, dict):
+                fields |= set(entry)
+    return fields
+
+
+def incomplete_rules(rows: list[dict]) -> list[tuple[str, list[str]]]:
+    """(path, unclassified fields) for every per-entry rule that is not total."""
+    by_path = {row["path"]: row for row in rows}
+    out: list[tuple[str, list[str]]] = []
+    for path, sequences in ENTRY_FILES:
+        row = by_path.get(path)
+        if not row or row.get("disposition") != "per-entry":
+            continue
+        rule = row.get("entry_rule") or ""
+        if DEFAULT_MARKER in rule:
+            continue  # total by declaration — unnamed fields have an answer
+        unnamed = sorted(f for f in entry_fields(path, sequences) if f not in rule)
+        if unnamed:
+            out.append((path, unnamed))
+    return out
+
+
+def test_every_per_entry_rule_is_total(manifest: dict) -> None:
+    """J71 (c). The failure this prevents is silent by construction: a dropped
+    field leaves no conflict, no red test and no diff on either side — it is simply
+    absent, and stays absent until somebody happens to look for it, which on
+    2026-09-01 took two days and an SME reading a console table."""
+    gaps = incomplete_rules(manifest["rows"])
+    assert not gaps, (
+        "per-entry rules that do not say what happens to every field in their file. "
+        f"Name the field, or add a `{DEFAULT_MARKER}` clause saying which side owns "
+        "everything not listed:\n  " + "\n  ".join(f"{path}: {fields}" for path, fields in gaps)
+    )
+
+
+def test_the_totality_detector_catches_an_injected_hole() -> None:
+    """The J26 idiom: a detector that silently matches nothing reads as a pass."""
+    rows = [
+        {
+            "path": "config/source-bindings.yaml",
+            "disposition": "per-entry",
+            "entry_rule": "producer owns id and carrier",
+        }
+    ]
+    gaps = incomplete_rules(rows)
+    assert gaps and gaps[0][0] == "config/source-bindings.yaml"
+    assert "twin" in gaps[0][1], "the field the real drop turned on must be reported"
+    # the marker closes it without naming anything further
+    rows[0]["entry_rule"] += f" {DEFAULT_MARKER} producer-owned."
+    assert incomplete_rules(rows) == []

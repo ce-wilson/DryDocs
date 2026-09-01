@@ -254,6 +254,12 @@ rows:
       confirmed-source entries (9 of them at PORT-REPORT-5417ef10) — company
       entries never come from, or are removed by, a port. Mechanism/policy
       prose is producer-canonical.
+      UNNAMED FIELDS: producer-owned by default, because this file is a policy
+      declaration and its fields describe the POLICY rather than either estate —
+      with one exception that is not a default at all: `status` is per-repo, since
+      each side's entry records what THAT side has confirmed, and `decided_by`
+      travels with the `status` it justifies. `notes` and `objects` are producer
+      mechanism and cross. (J71, 2026-09-01.)
     note: >
       Relay #2 of PORT-REPORT-5417ef10 (2026-08-07): sat under the blanket
       `config/**` = canonical-producer by omission — third instance of the
@@ -746,6 +752,12 @@ rows:
       beside the producer's 2026-08-05 ruling, both true). Company-only ids are
       kept; producer-only ids are clean-adds. Precedent: source-registry v2's
       company-canonical ids + the D2 overlay seam.
+      UNNAMED FIELDS: producer-owned by default — a field this rule does not name is
+      part of the WHAT and crosses on take — EXCEPT any field whose value names a
+      location, which follows `source` and `graph_locator` into company-owned. Of the
+      five unnamed at J71 (2026-09-01): `classification`, `describes_product`,
+      `replaces` and `source_url` are WHAT and cross; `landing_zone` is a WHERE and
+      does not.
     note: >
       J51 (2026-08-20), found at the 7c18ff4b review: the producer row for
       cdo-frameworks reads VERBATIM while the company row — where the run
@@ -766,6 +778,18 @@ rows:
       own configured state. `unbound[]` is per-entry by carrier: a carrier the
       company binds and the producer does not is a company row, kept.
       Company-only profiles are kept; producer-only profiles are clean-adds.
+      UNNAMED FIELDS: the KEY crosses and the VALUE does not. A field this rule does
+      not name is producer MECHANISM — take the field and its documentation — while
+      its value stays company-owned wherever the value is a path, a coordinate or
+      anything else naming where something lives on one machine. `twin` (J71,
+      2026-09-01) is the worked example: it points at the machine-local file holding a
+      carrier's coordinates, so the field crosses and
+      `internal-local/oracle-connection-consolidated.md` does not. `reason` on
+      `unbound[]` is company-owned outright — why a carrier is unbound is a fact about
+      that side's estate. When a new field is genuinely ambiguous, KEEP YOURS: an
+      unfamiliar producer value can point a consumer at something that does not exist,
+      while keeping your own only leaves you a version behind, and the second failure
+      is visible where the first is silent.
     note: >
       G125 (h), 2026-08-30, and this row exists because the alternative was
       measured rather than imagined. Without it the file inherits the config/**
@@ -793,6 +817,22 @@ rows:
       MOVES WITH `tests/unit/test_source_registry.py`, ALWAYS — that guard
       validates the rows this file declares, so a row lost here is a guard failure
       rather than a silent absence.
+      UNNAMED FIELDS: producer-owned by default — the registry's field vocabulary is
+      mechanism and a field this rule does not name crosses on take — EXCEPT the two
+      classes that are estate facts wherever they appear: anything naming a LOCATION
+      (`locator`, `drop_dir`, `drop_dir_base`, `data_root`, `graph_locator`,
+      `service`, `hosting`) and anything recording what a SIDE has ruled or observed
+      (`confirmed`, and any `_by` / `_at` stamp beside it — the F4 per-repo rule, since
+      each side ratifies its own activations). Everything else — `acquisition`,
+      `adapter`, `artifact`, `artifact_kind`, `asset_type`, `cadence`,
+      `classification`, `crosswalk`, `derived`, `feeds_taxonomy`, `gate_spec`, `layer`,
+      `loader`, `name`, `notes`, `replaces`, `taxonomy_category`, `trusted_ref` — is
+      WHAT and crosses.
+      THIS CLAUSE IS J71 REPAIRING A ROW J68 WROTE THE SAME DAY. The rule above was
+      authored 2026-09-01 to fix a wholesale-take defect and it named 6 of this file's
+      29 fields, which is the identical hole one row over — the clearest evidence
+      available that enumeration is the wrong instrument and a declared default is the
+      right one.
     note: >
       J68 (2026-09-01), and this row exists because the alternative was measured.
       The file had NO row and fell through to the `config/**` canonical-producer

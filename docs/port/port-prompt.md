@@ -1723,6 +1723,51 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   PORT-REPORT-40c35724 measured 55 your side, and a count in a producer file rots
   between ports. Read it from your own run.
 
+- **RELAY-19 — FOUR MERGE RULES HAD NO ANSWER FOR FIELDS THAT EXIST, WHICH IS WHY
+  `source-bindings.yaml` DROPPED; THE RULES ARE NOW TOTAL AND FOUR FIELDS ARE OWED
+  BACK** (new 2026-09-01; J71, from the SME's own catch).
+  `[SME-REPORTED]` for the drop, `[VERIFIED-PRODUCER]` for everything measured below.
+  **YOU DID NOT MISS THIS — THE RULE DID.** `config/source-bindings.yaml` was not
+  carried from `1bd29b42` (G129), which added `twin:` to every profile. The row's
+  field split ENUMERATES: producer-owned `id, carrier, platform, classification,
+  serves, note` plus the env-map keys; company-owned the variable names and `status`.
+  **`twin` and `reason` are in neither list.** The rule was written at `683d85fe`
+  (G125) and `twin` landed the next day at `1bd29b42`; nobody went back to classify
+  it. A per-entry merge with no instruction for a field has no defensible move.
+  **AND TAKING IT WOULD ALSO HAVE BEEN WRONG,** which is the part worth reading:
+  `twin` holds `internal-local/oracle-connection-consolidated.md`, a machine-local
+  path. By the row's own principle — *the WHAT crosses and the WHERE never does* —
+  **the KEY is producer mechanism and the VALUE is yours.** Take the field and its
+  header comment; point it at YOUR twin. Neither "take the file" nor "skip the file"
+  was ever the right instruction, and the manifest said neither.
+  **WHAT IS OWED BACK, by file. Each is a FIELD to adopt, not a value to copy:**
+  1. `config/source-bindings.yaml` — add `twin:` to each profile (yours, or `~` with
+     the reason in its note) and `reason:` on `unbound[]` rows. Both stay yours.
+  2. `config/doc-source-registry.yaml` — five fields the rule never named:
+     `classification`, `describes_product`, `replaces`, `source_url` are WHAT and
+     **cross on take**; `landing_zone` is a WHERE and **stays yours**. Five commits in
+     the applied range touched this file (`87fca339`, `63de2acc`, `ff87227f`,
+     `3afa8307`, `3c2bfcdd`) — worth a diff against `port-base-20260901` rather than
+     an assumption about which way each went.
+  3. `config/audit-fields.yaml` — `notes` and `objects` cross; **`status` is per-repo
+     and `decided_by` travels with it**, so yours stand. Two commits (`07d9caab`,
+     `3c2bfcdd`).
+  4. `config/source-registry.yaml` — see RELAY-18: it was `canonical-producer` during
+     your apply, so its failure was the opposite one (overwritten, not dropped, which
+     is your `test_source_registry` 1 -> 7). It is `per-entry` now.
+  **THE STRUCTURAL FIX, so this stops recurring:** every per-entry `entry_rule` is now
+  **TOTAL** — it names the fields it wants to name and then declares, under a literal
+  `UNNAMED FIELDS:` marker, which side owns everything else. A field added tomorrow has
+  an answer the day it lands. `test_every_per_entry_rule_is_total` enforces it, written
+  red first against all four rows. **One default is worth knowing before you merge
+  anything:** on `source-bindings.yaml`, when a new field is genuinely ambiguous,
+  **KEEP YOURS.** An unfamiliar producer value can point you at something that does not
+  exist on your machine; keeping your own only leaves you a version behind — and the
+  second failure is visible where the first is silent.
+  **AND ONE ADMISSION, because it is the best argument for the change:** the
+  `source-registry.yaml` rule that RELAY-18 announces was written the same morning and
+  named 6 of that file's 29 fields. The defect reappeared in the row that fixed it.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
